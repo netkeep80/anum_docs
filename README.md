@@ -43,12 +43,14 @@ core/root_library.py        загрузка корневой библиотек
 core/validate_root.py       структурная валидация
 core/anum_parser.py         чтение контейнерных файлов *.anum
 core/anum_projector.py      проекция двухабитных форм
-core/anum_memory.py         модель load/find/realize
+core/anum_memory.py         тестовая symbolic-модель протокольных инвариантов
 converters/anum_cli.py      CLI parse/project/normalize/realize
 converters/text_to_anum.py  UTF-8 payload → четверичная запись
 converters/anum_to_text.py  четверичная запись → UTF-8 payload
 converters/ascii_unicode.py ASCII ↔ Unicode
 ```
+
+`core/anum_memory.py` не является реализацией полноценной апамяти.
 
 ## Проверка
 
