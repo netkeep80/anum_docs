@@ -18,7 +18,8 @@
 | [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) | typed L2 syntax и interpretation |
 | [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | L3 `*.anum`, raw parser и serialization |
 | [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md) | contextual L3 projection и quote semantics |
-| [MTS contract v0.2](contracts/mts-contract-v0.2.json) | machine-readable contract для внешних consumers |
+| [MTS contract v0.2](contracts/mts-contract-v0.2.json) | language-neutral normative contract |
+| [MTS conformance v0.2](contracts/mts-conformance-v0.2.json) | cross-language executable compatibility corpus |
 | [Корневая программа](tests/mtc_formulas.mtc) | единственный машинный root definitions source |
 
 `docs/research/` содержит ненормативные исходные заметки и не определяет активную систему.
@@ -149,6 +150,8 @@ core/validate_root.py     structural root validation
 
 contracts/mts-contract-v0.2.json
                          versioned language-neutral contract
+contracts/mts-conformance-v0.2.json
+                         versioned cross-language conformance vectors
 
 core/anum_model.py        typed L3 contexts/results
 core/anum_parser.py       raw parse + incremental decoder + serialization
@@ -165,11 +168,25 @@ converters/ascii_unicode.py
 
 `core/mtc_interpreter.py` — единственный active formal interpreter. Candidate/legacy copies после promotion не сохраняются.
 
+## Cross-language conformance
+
+`contracts/mts-conformance-v0.2.json` содержит одинаковые входы и ожидаемые результаты для любой реализации МТС v0.2:
+
+```text
+lexing cases
+canonicalization cases
+ContextFrame + memory fixtures
+expected local substitutions / aliases
+normalized resolution trace kinds
+```
+
+Python reference runtime обязан проходить этот corpus в CI. Другие consumers, включая `aprover`, должны проходить тот же файл, а не копировать правила вручную.
+
 ## Интеграция с визуальным апрувером
 
-`anum_docs` должен оставаться единственным normative source МТС.
+`anum_docs` остаётся единственным normative source МТС.
 
-Будущий `aprover` потребляет versioned machine contract и conformance vectors отсюда. Display labels не являются runtime identity: визуально одинаковые occurrences могут иметь разные `HoleId`/`LinkRef`.
+`aprover` потребляет versioned contract и conformance corpus отсюда. Display labels не являются runtime identity: визуально одинаковые occurrences могут иметь разные `HoleId`/`LinkRef`.
 
 ## Проверка
 

@@ -12,6 +12,7 @@ from core.validate_root import validate_root_library
 ROOT = Path(__file__).resolve().parents[1]
 ROOT_FIXTURE = ROOT / "tests/mtc_formulas.mtc"
 MTS_CONTRACT = ROOT / "contracts/mts-contract-v0.2.json"
+MTS_CONFORMANCE = ROOT / "contracts/mts-conformance-v0.2.json"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md"}
 ACTIVE_SPECS = {
     "Reference model МТС v0.2.md",
@@ -89,17 +90,28 @@ def test_root_fixture_is_exact_and_excludes_protocol_hypotheses():
     assert len([line for line in formula_text.splitlines() if line]) == 10
 
 
-def test_v02_machine_contract_is_single_active_formal_contract():
+def test_v02_machine_contract_and_conformance_are_single_active_pair():
     assert MTS_CONTRACT.is_file()
+    assert MTS_CONFORMANCE.is_file()
+
     contract = json.loads(MTS_CONTRACT.read_text(encoding="utf-8"))
+    corpus = json.loads(MTS_CONFORMANCE.read_text(encoding="utf-8"))
+
     assert contract["schema"] == "mts-contract/v0.2"
     assert contract["status"] == "accepted"
     assert contract["rootProgram"] == "tests/mtc_formulas.mtc"
+    assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.2.json"
     assert contract["formalNotation"]["context"]["atomicPronouns"] is True
     assert contract["formalNotation"]["context"]["bracketOverloading"] is False
 
+    assert corpus["schema"] == "mts-conformance/v0.2"
+    assert corpus["contract"] == contract["schema"]
+    assert corpus["status"] == "accepted"
+
     contract_files = sorted((ROOT / "contracts").glob("mts-contract-*.json"))
+    conformance_files = sorted((ROOT / "contracts").glob("mts-conformance-*.json"))
     assert contract_files == [MTS_CONTRACT]
+    assert conformance_files == [MTS_CONFORMANCE]
 
 
 def test_candidate_runtime_fixture_and_reference_paths_are_removed_after_promotion():

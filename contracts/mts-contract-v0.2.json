@@ -1,6 +1,7 @@
 {
   "schema": "mts-contract/v0.2",
   "status": "accepted",
+  "conformanceCorpus": "contracts/mts-conformance-v0.2.json",
   "layers": {
     "formalNotation": "L2",
     "anumSerialization": "L3",
