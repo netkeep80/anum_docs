@@ -1,36 +1,105 @@
-# -*- coding: utf-8 -*-
-"""Tests for issue #61 two-abit protocol projection."""
+"""Conformance tests for contextual L3 Anum protocol v0.1."""
 
-from core.anum_model import Abit
-from core.anum_projector import project_two_abit_form
+import pytest
+
+from core.anum_model import ProjectionContext, ProjectionKind
+from core.anum_parser import normalize_raw_form, parse_raw_quaternary
+from core.anum_protocol import (
+    has_quote_envelope,
+    project_anum,
+    quote_anum,
+    unquote_anum,
+    validate_anum,
+)
 
 
-def test_projects_container_form_to_protocol_zero():
-    projection = project_two_abit_form(Abit.OPEN, Abit.CLOSE)
+def test_root_context_projects_container_to_experimental_zero():
+    projection = project_anum(parse_raw_quaternary("[]"), ProjectionContext.ROOT)
 
+    assert projection.kind is ProjectionKind.PROTOCOL_VALUE
     assert projection.source == "[]"
     assert projection.arrow_form == "α ⟼ β"
     assert projection.protocol_value == "0"
-    assert "container" in projection.meaning
+    assert "experimental" in projection.note
 
 
-def test_projects_bridge_form_to_protocol_one():
-    projection = project_two_abit_form(Abit.CLOSE, Abit.OPEN)
+def test_root_context_projects_bridge_to_experimental_one():
+    projection = project_anum(parse_raw_quaternary("]["), ProjectionContext.ROOT)
 
+    assert projection.kind is ProjectionKind.PROTOCOL_VALUE
     assert projection.source == "]["
     assert projection.arrow_form == "β ⟼ α"
     assert projection.protocol_value == "1"
-    assert "bridge" in projection.meaning
 
 
-def test_open_open_and_close_close_are_existing_forms():
-    open_open = project_two_abit_form(Abit.OPEN, Abit.OPEN)
-    close_close = project_two_abit_form(Abit.CLOSE, Abit.CLOSE)
+def test_open_open_and_close_close_remain_boundary_forms_without_value():
+    open_open = project_anum(parse_raw_quaternary("[["), ProjectionContext.ROOT)
+    close_close = project_anum(parse_raw_quaternary("]]"), ProjectionContext.ROOT)
 
-    assert open_open.source == "[["
+    assert open_open.kind is ProjectionKind.BOUNDARY_FORM
     assert open_open.arrow_form == "α ⟼ α"
     assert open_open.protocol_value is None
 
-    assert close_close.source == "]]"
+    assert close_close.kind is ProjectionKind.BOUNDARY_FORM
     assert close_close.arrow_form == "β ⟼ β"
     assert close_close.protocol_value is None
+
+
+def test_relative_context_preserves_all_boundary_forms_raw():
+    for source in ("[[", "[]", "][", "]]"):
+        projection = project_anum(
+            parse_raw_quaternary(source),
+            ProjectionContext.RELATIVE,
+        )
+        assert projection.kind is ProjectionKind.RAW
+        assert projection.protocol_value is None
+        assert normalize_raw_form(projection.projected) == source
+
+
+def test_quote_context_preserves_unwrapped_raw_payload():
+    source = parse_raw_quaternary("][")
+    projection = project_anum(source, ProjectionContext.QUOTE)
+
+    assert projection.kind is ProjectionKind.QUOTED_RAW
+    assert normalize_raw_form(projection.projected) == "]["
+    assert projection.protocol_value is None
+
+
+def test_real_quote_envelope_raises_description_level_one_step():
+    raw = parse_raw_quaternary("][")
+    quoted = quote_anum(raw)
+    quoted_twice = quote_anum(quoted)
+
+    assert normalize_raw_form(raw) == "]["
+    assert normalize_raw_form(quoted) == "[][]"
+    assert normalize_raw_form(quoted_twice) == "[[][]]"
+    assert has_quote_envelope(quoted)
+
+    first = project_anum(quoted_twice, ProjectionContext.QUOTE)
+    second = project_anum(first.projected, ProjectionContext.QUOTE)
+
+    assert normalize_raw_form(first.projected) == "[][]"
+    assert normalize_raw_form(second.projected) == "]["
+
+
+def test_unquote_requires_explicit_outer_envelope():
+    with pytest.raises(ValueError, match="quote-оболочку"):
+        unquote_anum(parse_raw_quaternary("]["))
+
+
+def test_context_validation_is_separate_from_raw_parser():
+    raw = parse_raw_quaternary("][[]]10")
+
+    for context in ProjectionContext:
+        result = validate_anum(raw, context)
+        assert result.is_valid
+        assert result.context is context
+
+
+def test_general_root_carrier_remains_raw_until_denotation_is_defined():
+    raw = parse_raw_quaternary("[01]][")
+    projection = project_anum(raw, ProjectionContext.ROOT)
+
+    assert projection.kind is ProjectionKind.RAW
+    assert normalize_raw_form(projection.projected) == "[01]]["
+    assert "no general root denotation" in projection.note
