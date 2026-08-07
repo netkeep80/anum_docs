@@ -14,10 +14,10 @@
 |---|---|
 | [Основания МТС](docs/theory/Основания%20МТС.md) | онтологические основания |
 | [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md) | нормативное чтение корневых формул |
-| [Reference model МТС v0.1](docs/specs/Reference%20model%20МТС%20v0.1.md) | границы L0–L5 и инженерный семантический контракт версии |
+| [Reference model МТС v0.1](docs/specs/Reference%20model%20МТС%20v0.1.md) | границы L0–L5 и инженерный контракт версии |
 | [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) | typed L2 syntax, скобочные формы и роли вхождений |
-| [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | форматы `*.anum` и практические инструменты |
-| [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md) | рабочая протокольная спецификация |
+| [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | контейнер `*.anum`, raw parser, dictionary и serialization |
+| [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md) | contextual L3 projection и quote semantics |
 | [Корневой fixture](tests/mtc_formulas.mtc) | единственный машинно-читаемый набор формул |
 
 `docs/research/` содержит ненормативные исходные заметки. Они не определяют активную систему.
@@ -43,7 +43,7 @@ L5  теория вывода
 {} — пустой пучок связей
 
 (...) — круглая формальная нотация
-[...] — квадратная ачисловая нотация
+[...] — квадратная форма L2
 {...} — пучковая нотация
 ```
 
@@ -57,18 +57,22 @@ core/mtc_ast.py             typed AST формального языка L2
 core/mtc_parser.py          tokenizer, Pratt parser и static validation L2
 core/root_library.py        загрузка fixture через typed AST
 core/validate_root.py       структурная валидация root library
-core/anum_parser.py         чтение контейнерных файлов *.anum
-core/anum_projector.py      проекция двухабитных форм
-core/anum_memory.py         тестовая symbolic-модель протокольных инвариантов
-converters/anum_cli.py      CLI parse/project/normalize/realize
-converters/text_to_anum.py  UTF-8 payload → четверичная запись
-converters/anum_to_text.py  четверичная запись → UTF-8 payload
+
+core/anum_model.py          typed L3 contexts/results
+core/anum_parser.py         raw parse + incremental decoder + deterministic serialization
+core/anum_protocol.py       validate/project/quote/unquote/dictionary layer
+core/anum_memory.py         временный L4 symbolic test-double до #72
+converters/anum_cli.py      CLI parse/validate/project/normalize/quote/unquote
+converters/text_to_anum.py  UTF-8 payload → quaternary запись
+converters/anum_to_text.py  quaternary запись → UTF-8 payload
 converters/ascii_unicode.py ASCII ↔ Unicode
 ```
 
-L2 имеет один production parsing path: `core/mtc_parser.py`. Старый строковый `mtc_reader.py` и отдельная enum-классификация «слоёв чтения» удалены после перевода root library на AST.
+L2 имеет один production parsing path: `core/mtc_parser.py`. L3 имеет один protocol path: `core/anum_parser.py` читает только raw carrier, а `core/anum_protocol.py` выполняет context validation/projection.
 
-`core/reference_model.py` не является interpreter или prover: он фиксирует границы и обязательства последующих реализаций. `core/anum_memory.py` не является реализацией полноценной апамяти.
+Старые `mtc_reader.py`, `layers.py`, двухабитный `anum_projector.py` и отдельный symbolic `Quote` удалены после миграции consumers.
+
+`core/reference_model.py` не является interpreter или prover. `core/anum_memory.py` не является реализацией полноценной апамяти.
 
 ## Проверка
 
