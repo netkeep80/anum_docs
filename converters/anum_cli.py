@@ -1,64 +1,98 @@
-# -*- coding: utf-8 -*-
-"""CLI for practical *.anum parser, projection and symbolic realization."""
+"""CLI for the canonical L3 ``*.anum`` protocol v0.1."""
 
 import argparse
 from pathlib import Path
 
-from core.anum_memory import AnumMemory, Link, SymbolicAnum
-from core.anum_model import AnumForm, AnumSource
-from core.anum_parser import normalize_anum_form, parse_anum_file
-from core.anum_projector import project_two_abit_form
+from core.anum_model import AnumForm, AnumSource, ProjectionContext
+from core.anum_parser import normalize_raw_form, parse_anum_file
+from core.anum_protocol import (
+    project_anum,
+    quote_anum,
+    unquote_anum,
+    validate_anum,
+)
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        description="Инструменты для практической нотации *.anum"
-    )
+    parser = argparse.ArgumentParser(description="Инструменты протокола *.anum v0.1")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    parse_parser = subparsers.add_parser("parse", help="Разобрать файл *.anum")
-    parse_parser.add_argument("file", help="Путь к файлу *.anum")
+    parse_parser = subparsers.add_parser("parse", help="Разобрать raw *.anum")
+    parse_parser.add_argument("file")
+
+    validate_parser = subparsers.add_parser(
+        "validate",
+        help="Проверить raw carrier в явном контексте",
+    )
+    validate_parser.add_argument("file")
+    _add_context_argument(validate_parser)
 
     project_parser = subparsers.add_parser(
         "project",
-        help="Показать проекцию двухабитных квадратных форм",
+        help="Спроецировать raw carrier в явном контексте",
     )
-    project_parser.add_argument("file", help="Путь к файлу *.anum")
+    project_parser.add_argument("file")
+    _add_context_argument(project_parser)
 
     normalize_parser = subparsers.add_parser(
         "normalize",
-        help="Удалить пробелы и комментарии из quaternary *.anum",
+        help="Вывести каноническую quaternary запись",
     )
-    normalize_parser.add_argument("file", help="Путь к файлу *.anum")
+    normalize_parser.add_argument("file")
 
-    realize_parser = subparsers.add_parser(
-        "realize",
-        help="Материализовать строковую символическую связь",
+    quote_parser = subparsers.add_parser(
+        "quote",
+        help="Добавить одну реальную quote-оболочку [ ... ]",
     )
-    realize_parser.add_argument("file", help="Путь к файлу *.anum")
+    quote_parser.add_argument("file")
+
+    unquote_parser = subparsers.add_parser(
+        "unquote",
+        help="Снять одну quote-оболочку [ ... ]",
+    )
+    unquote_parser.add_argument("file")
 
     args = parser.parse_args(argv)
 
     try:
         if args.command == "parse":
             _command_parse(args.file)
+        elif args.command == "validate":
+            _command_validate(args.file, ProjectionContext(args.context))
         elif args.command == "project":
-            _command_project(args.file)
+            _command_project(args.file, ProjectionContext(args.context))
         elif args.command == "normalize":
             _command_normalize(args.file)
-        elif args.command == "realize":
-            _command_realize(args.file)
+        elif args.command == "quote":
+            _command_quote(args.file)
+        elif args.command == "unquote":
+            _command_unquote(args.file)
         else:
             parser.error(f"Неизвестная команда: {args.command}")
-    except (TypeError, ValueError) as exc:
+    except (KeyError, TypeError, ValueError) as exc:
         parser.exit(1, f"{exc}\n")
 
     return 0
 
 
+def _add_context_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--context",
+        choices=[context.value for context in ProjectionContext],
+        default=ProjectionContext.ROOT.value,
+    )
+
+
 def _read_source(path: str) -> AnumForm | AnumSource:
     text = Path(path).read_text(encoding="utf-8")
     return parse_anum_file(text)
+
+
+def _require_quaternary(path: str, command: str) -> AnumForm:
+    source = _read_source(path)
+    if not isinstance(source, AnumForm):
+        raise ValueError(f"{command} поддерживает только quaternary *.anum")
+    return source
 
 
 def _command_parse(path: str) -> None:
@@ -72,50 +106,45 @@ def _command_parse(path: str) -> None:
     print(source.text)
 
 
-def _command_project(path: str) -> None:
-    source = _read_source(path)
-    if not isinstance(source, AnumForm):
-        raise ValueError("project поддерживает только quaternary *.anum")
-    if len(source.tokens) % 2 != 0:
-        raise ValueError("project ожидает чётное число квадратных абитов")
+def _command_validate(path: str, context: ProjectionContext) -> None:
+    source = _require_quaternary(path, "validate")
+    result = validate_anum(source, context)
 
-    for index in range(0, len(source.tokens), 2):
-        left = source.tokens[index].abit
-        right = source.tokens[index + 1].abit
-        projection = project_two_abit_form(left, right)
+    print(f"context: {result.context.value}")
+    print(f"valid: {str(result.is_valid).lower()}")
+    for message in result.messages:
+        print(f"message: {message}")
 
-        print(f"input: {projection.source}")
-        print(f"projection: {projection.arrow_form}")
-        print(f"protocol_value: {projection.protocol_value}")
-        print(f"meaning: {projection.meaning}")
-        if index + 2 < len(source.tokens):
-            print()
+
+def _command_project(path: str, context: ProjectionContext) -> None:
+    source = _require_quaternary(path, "project")
+    result = project_anum(source, context)
+
+    print(f"context: {result.context.value}")
+    print(f"input: {result.source}")
+    print(f"kind: {result.kind.value}")
+    print(f"protocol_value: {result.protocol_value}")
+    if result.arrow_form is not None:
+        print(f"arrow_form: {result.arrow_form}")
+    if result.projected is not None:
+        print(f"projected: {normalize_raw_form(result.projected)}")
+    if result.note:
+        print(f"note: {result.note}")
 
 
 def _command_normalize(path: str) -> None:
-    source = _read_source(path)
-    if not isinstance(source, AnumForm):
-        raise ValueError("normalize поддерживает только quaternary *.anum")
-
-    print(normalize_anum_form(source))
+    source = _require_quaternary(path, "normalize")
+    print(normalize_raw_form(source))
 
 
-def _command_realize(path: str) -> None:
-    source = _read_source(path)
-    if not isinstance(source, AnumSource) or source.format != "string":
-        raise ValueError(
-            "realize в прототипе поддерживает только string *.anum вида: a b"
-        )
+def _command_quote(path: str) -> None:
+    source = _require_quaternary(path, "quote")
+    print(normalize_raw_form(quote_anum(source)))
 
-    anum = _parse_symbolic_link(source.text)
-    memory = AnumMemory()
-    realized = memory.realize(anum)
 
-    if isinstance(realized, Link):
-        print(f"realized: {realized.left} ⟼ {realized.right}")
-        return
-
-    print(f"realized: {realized!r}")
+def _command_unquote(path: str) -> None:
+    source = _require_quaternary(path, "unquote")
+    print(normalize_raw_form(unquote_anum(source)))
 
 
 def _print_form(form: AnumForm) -> None:
@@ -123,15 +152,6 @@ def _print_form(form: AnumForm) -> None:
     print("tokens:")
     for index, token in enumerate(form.tokens):
         print(f"  {index}: {token.abit.value}")
-
-
-def _parse_symbolic_link(text: str) -> SymbolicAnum:
-    parts = text.split()
-    if len(parts) != 2:
-        raise ValueError(
-            "string *.anum для realize должен содержать ровно два имени"
-        )
-    return SymbolicAnum(parts[0], parts[1])
 
 
 if __name__ == "__main__":
