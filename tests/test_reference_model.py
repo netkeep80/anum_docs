@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Conformance tests for the declarative MTS/Anum v0.1 reference model."""
 
 from core.reference_model import (
