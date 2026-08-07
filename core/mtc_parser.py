@@ -5,8 +5,8 @@ from enum import Enum, auto
 
 from core.mtc_ast import (
     BundleForm,
-    ContextPath,
     ContextPole,
+    ContextPronoun,
     Definition,
     EndProjection,
     Equality,
@@ -127,8 +127,6 @@ _PRECEDENCE_PROJECTION = reference_operator("♀").precedence
 
 
 def tokenize(text: str) -> tuple[Token, ...]:
-    """Tokenize one L2 formula while preserving exact source spans."""
-
     tokens: list[Token] = []
     position = 0
 
@@ -139,9 +137,7 @@ def tokenize(text: str) -> tuple[Token, ...]:
             continue
 
         if text.startswith("!=", position):
-            tokens.append(
-                Token(TokenKind.NOT_EQUAL, "!=", SourceSpan(position, position + 2))
-            )
+            tokens.append(Token(TokenKind.NOT_EQUAL, "!=", SourceSpan(position, position + 2)))
             position += 2
             continue
 
@@ -167,17 +163,13 @@ def tokenize(text: str) -> tuple[Token, ...]:
                 SourceSpan(position, position + 1),
             )
 
-        tokens.append(
-            Token(TokenKind.SYMBOL, text[start:position], SourceSpan(start, position))
-        )
+        tokens.append(Token(TokenKind.SYMBOL, text[start:position], SourceSpan(start, position)))
 
     tokens.append(Token(TokenKind.EOF, "", SourceSpan(len(text), len(text))))
     return tuple(tokens)
 
 
 def parse_formula(text: str) -> Expression:
-    """Parse one complete L2 formula into a typed AST or raise ``MTCParseError``."""
-
     tokens = tokenize(text)
     ast = _Parser(text, tokens).parse()
     diagnostics = validate_expression(ast)
@@ -188,31 +180,20 @@ def parse_formula(text: str) -> Expression:
 
 
 def parse_formula_result(text: str) -> ParseResult:
-    """Parse without throwing so root-library validation can aggregate errors."""
-
     try:
         tokens = tokenize(text)
     except MTCParseError as error:
-        return ParseResult(
-            text=text,
-            ast=None,
-            tokens=(),
-            diagnostics=(ParseDiagnostic(error.message, error.span),),
-        )
+        return ParseResult(text, None, (), (ParseDiagnostic(error.message, error.span),))
 
     try:
         ast = _Parser(text, tokens).parse()
     except MTCParseError as error:
-        return ParseResult(
-            text=text,
-            ast=None,
-            tokens=tokens,
-            diagnostics=(ParseDiagnostic(error.message, error.span),),
-        )
+        return ParseResult(text, None, tokens, (ParseDiagnostic(error.message, error.span),))
 
-    static_diagnostics = validate_expression(ast)
-    diagnostics = tuple(_convert_static_diagnostic(item) for item in static_diagnostics)
-    return ParseResult(text=text, ast=ast, tokens=tokens, diagnostics=diagnostics)
+    diagnostics = tuple(
+        _convert_static_diagnostic(item) for item in validate_expression(ast)
+    )
+    return ParseResult(text, ast, tokens, diagnostics)
 
 
 class _Parser:
@@ -226,66 +207,40 @@ class _Parser:
         return self.tokens[self.position]
 
     def peek(self, offset: int = 1) -> Token:
-        index = min(self.position + offset, len(self.tokens) - 1)
-        return self.tokens[index]
+        return self.tokens[min(self.position + offset, len(self.tokens) - 1)]
 
     def parse(self) -> Expression:
         expression = self.parse_expression(0)
         if self.current.kind is not TokenKind.EOF:
-            raise MTCParseError(
-                f"Неожиданный токен {self.current.value!r}",
-                self.current.span,
-            )
+            raise MTCParseError(f"Неожиданный токен {self.current.value!r}", self.current.span)
         return expression
 
     def parse_expression(self, minimum_precedence: int) -> Expression:
         left = self.parse_prefix_or_primary()
 
         while True:
-            if (
-                self.current.kind is TokenKind.END
-                and _PRECEDENCE_PROJECTION >= minimum_precedence
-            ):
+            if self.current.kind is TokenKind.END and _PRECEDENCE_PROJECTION >= minimum_precedence:
                 end = self.take(TokenKind.END)
                 left_form = self.require_form(left, "Оператор ♂ применяется только к форме")
-                left = EndProjection(
-                    left_form,
-                    SourceSpan(left_form.span.start, end.span.end),
-                )
+                left = EndProjection(left_form, SourceSpan(left_form.span.start, end.span.end))
                 continue
 
-            if (
-                self.current.kind in _FORM_STARTS
-                and _PRECEDENCE_SEQUENCE >= minimum_precedence
-            ):
+            if self.current.kind in _FORM_STARTS and _PRECEDENCE_SEQUENCE >= minimum_precedence:
                 if not isinstance(left, Form):
                     break
                 right = self.parse_expression(_PRECEDENCE_SEQUENCE + 1)
-                right_form = self.require_form(
-                    right,
-                    "Элемент последовательности должен быть формой",
-                )
-                items = (
-                    left.items + (right_form,)
-                    if isinstance(left, Sequence)
-                    else (left, right_form)
-                )
-                left = Sequence(
-                    items,
-                    SourceSpan(left.span.start, right_form.span.end),
-                )
+                right_form = self.require_form(right, "Элемент последовательности должен быть формой")
+                items = left.items + (right_form,) if isinstance(left, Sequence) else (left, right_form)
+                left = Sequence(items, SourceSpan(left.span.start, right_form.span.end))
                 continue
 
             kind = self.current.kind
             if kind is TokenKind.COLON:
-                precedence = _PRECEDENCE_DEFINITION
-                right_associative = True
+                precedence, right_associative = _PRECEDENCE_DEFINITION, True
             elif kind in (TokenKind.EQUAL, TokenKind.NOT_EQUAL):
-                precedence = _PRECEDENCE_JUDGMENT
-                right_associative = False
+                precedence, right_associative = _PRECEDENCE_JUDGMENT, False
             elif kind is TokenKind.ARROW:
-                precedence = _PRECEDENCE_LINK
-                right_associative = False
+                precedence, right_associative = _PRECEDENCE_LINK, False
             else:
                 break
 
@@ -293,30 +248,15 @@ class _Parser:
                 break
 
             operator = self.take()
-            right = self.parse_expression(
-                precedence if right_associative else precedence + 1
-            )
+            right = self.parse_expression(precedence if right_associative else precedence + 1)
 
             if kind is TokenKind.COLON:
-                target = self.require_form(
-                    left,
-                    "Левая часть определения должна быть формой",
-                )
-                left = Definition(
-                    target,
-                    right,
-                    SourceSpan(target.span.start, right.span.end),
-                )
+                target = self.require_form(left, "Левая часть определения должна быть формой")
+                left = Definition(target, right, SourceSpan(target.span.start, right.span.end))
                 continue
 
-            left_form = self.require_form(
-                left,
-                f"Левый операнд {operator.value} должен быть формой",
-            )
-            right_form = self.require_form(
-                right,
-                f"Правый операнд {operator.value} должен быть формой",
-            )
+            left_form = self.require_form(left, f"Левый операнд {operator.value} должен быть формой")
+            right_form = self.require_form(right, f"Правый операнд {operator.value} должен быть формой")
             span = SourceSpan(left_form.span.start, right_form.span.end)
 
             if kind is TokenKind.ARROW:
@@ -330,7 +270,6 @@ class _Parser:
 
     def parse_prefix_or_primary(self) -> Form:
         token = self.current
-
         if token.kind is TokenKind.NOT:
             self.take()
             value = self.require_form(
@@ -351,26 +290,21 @@ class _Parser:
 
     def parse_primary(self) -> Form:
         token = self.current
-
         if token.kind is TokenKind.SYMBOL:
             self.take()
             return Symbol(token.value, token.span)
         if token.kind is TokenKind.CONTEXT:
-            return self.parse_context_path()
+            return self.parse_context_pronoun()
         if token.kind is TokenKind.LPAREN:
             return self.parse_round_form()
         if token.kind is TokenKind.LBRACKET:
             return self.parse_square_form()
         if token.kind is TokenKind.LBRACE:
             return self.parse_bundle_form()
+        raise MTCParseError(f"Ожидалась форма, получено {token.value!r}", token.span)
 
-        raise MTCParseError(
-            f"Ожидалась форма, получено {token.value!r}",
-            token.span,
-        )
-
-    def parse_context_path(self) -> ContextPath:
-        """Parse ``$+ [|]+`` using source adjacency as the lexical boundary."""
+    def parse_context_pronoun(self) -> ContextPronoun:
+        """Parse one of exactly two contextual roles: ``$+ [`` or ``$+ ]``."""
 
         opening = self.take(TokenKind.CONTEXT)
         dollar_count = 1
@@ -383,29 +317,22 @@ class _Parser:
             previous = self.take()
             dollar_count += 1
 
-        steps: list[ContextPole] = []
-        while (
-            self.current.kind in (TokenKind.LBRACKET, TokenKind.RBRACKET)
-            and self.current.span.start == previous.span.end
+        token = self.current
+        if (
+            token.kind not in (TokenKind.LBRACKET, TokenKind.RBRACKET)
+            or token.span.start != previous.span.end
         ):
-            token = self.take()
-            steps.append(
-                ContextPole.START
-                if token.kind is TokenKind.LBRACKET
-                else ContextPole.END
-            )
-            previous = token
-
-        if not steps:
             raise MTCParseError(
-                "После `$` ожидается путь из `[` и `]`",
+                "После `$` ожидается одно из двух контекстных местоимений: `[` или `]`",
                 SourceSpan(opening.span.start, previous.span.end),
             )
 
-        return ContextPath(
+        pole_token = self.take()
+        pole = ContextPole.START if pole_token.kind is TokenKind.LBRACKET else ContextPole.END
+        return ContextPronoun(
             up=dollar_count - 1,
-            steps=tuple(steps),
-            span=SourceSpan(opening.span.start, previous.span.end),
+            pole=pole,
+            span=SourceSpan(opening.span.start, pole_token.span.end),
         )
 
     def parse_round_form(self) -> RoundForm:
@@ -417,17 +344,11 @@ class _Parser:
         literal = self.try_parse_single_literal(TokenKind.RPAREN)
         if literal is not None:
             closing = self.take(TokenKind.RPAREN)
-            return RoundForm(
-                literal,
-                SourceSpan(opening.span.start, closing.span.end),
-            )
+            return RoundForm(literal, SourceSpan(opening.span.start, closing.span.end))
 
         content = self.parse_expression(0)
         closing = self.take(TokenKind.RPAREN)
-        return RoundForm(
-            content,
-            SourceSpan(opening.span.start, closing.span.end),
-        )
+        return RoundForm(content, SourceSpan(opening.span.start, closing.span.end))
 
     def parse_square_form(self) -> SquareForm:
         opening = self.take(TokenKind.LBRACKET)
@@ -438,17 +359,11 @@ class _Parser:
         literal = self.try_parse_single_literal(TokenKind.RBRACKET)
         if literal is not None:
             closing = self.take(TokenKind.RBRACKET)
-            return SquareForm(
-                literal,
-                SourceSpan(opening.span.start, closing.span.end),
-            )
+            return SquareForm(literal, SourceSpan(opening.span.start, closing.span.end))
 
         content = self.parse_expression(0)
         closing = self.take(TokenKind.RBRACKET)
-        return SquareForm(
-            content,
-            SourceSpan(opening.span.start, closing.span.end),
-        )
+        return SquareForm(content, SourceSpan(opening.span.start, closing.span.end))
 
     def parse_bundle_form(self) -> BundleForm:
         opening = self.take(TokenKind.LBRACE)
@@ -463,16 +378,10 @@ class _Parser:
                 self.take()
                 continue
             closing = self.take(TokenKind.RBRACE)
-            return BundleForm(
-                tuple(items),
-                SourceSpan(opening.span.start, closing.span.end),
-            )
+            return BundleForm(tuple(items), SourceSpan(opening.span.start, closing.span.end))
 
     def try_parse_single_literal(self, closing_kind: TokenKind) -> Literal | None:
-        if (
-            self.current.kind in _LITERAL_IN_CONTAINER
-            and self.peek().kind is closing_kind
-        ):
+        if self.current.kind in _LITERAL_IN_CONTAINER and self.peek().kind is closing_kind:
             token = self.take()
             return Literal(token.value, token.span)
         return None
@@ -482,10 +391,7 @@ class _Parser:
         if expected_kind is not None and token.kind is not expected_kind:
             expected = _token_kind_description(expected_kind)
             actual = token.value or "конец строки"
-            raise MTCParseError(
-                f"Ожидалось {expected}, получено {actual!r}",
-                token.span,
-            )
+            raise MTCParseError(f"Ожидалось {expected}, получено {actual!r}", token.span)
         self.position += 1
         return token
 
