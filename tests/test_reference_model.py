@@ -56,7 +56,8 @@ def test_context_pronouns_and_anonymous_form_are_first_class_l2_concepts():
     assert "◁" in pronouns.description and "▷" in pronouns.description
     assert "↑" in pronouns.description
     assert anonymous.layer is Layer.FORMAL_LANGUAGE
-    assert "typed AST" in anonymous.description
+    assert "structural" in anonymous.description
+    assert "path" in anonymous.description
 
 
 def test_l2_operator_contract_separates_form_judgment_and_definition():
@@ -72,7 +73,8 @@ def test_l2_square_form_does_not_claim_identity_with_l3_abits_or_context_pronoun
     assert concept("abit").layer is Layer.SERIALIZATION
     square = operator("[...]").denotation
     assert "L3" in square
-    assert "не перегружены context syntax" in square
+    assert "context syntax" in square
+    assert "не перегруж" in square
 
 
 def test_issue_61_projection_remains_experimental():
