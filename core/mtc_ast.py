@@ -25,10 +25,10 @@ class Judgment(Expression):
 
 
 class ContextPole(str, Enum):
-    """One of the two roles of a binary contextual link."""
+    """The two atomic pronouns of a binary interpretation context."""
 
-    START = "["
-    END = "]"
+    START = "◁"
+    END = "▷"
 
 
 @dataclass(frozen=True)
@@ -49,19 +49,20 @@ class Literal(Form):
 class ContextPronoun(Form):
     """Deictic reference to one pole of current/ancestor execution context.
 
-    The binary contextual link has exactly two primitive pronouns::
+    The binary context has exactly two primitive one-code-point pronouns::
 
-        $[   current.start
-        $]   current.end
+        ◁   current.start
+        ▷   current.end
 
-    Additional ``$`` characters move to an ancestor context::
+    Context ascent is a separate unary marker and never changes the pronoun::
 
-        $$[  parent.start
-        $$]  parent.end
+        ↑◁   parent.start
+        ↑▷   parent.end
+        ↑↑◁  grandparent.start
 
-    ``up=0`` means the current context; ``up=1`` means its parent. There is no
-    generic path language after the pronoun: deeper structure is expressed by
-    the existing MTS operators, e.g. ``♀$[`` and ``$]♂``.
+    ``up=0`` means the current context; ``up=1`` means its parent. Square
+    brackets remain completely independent L2/L3 delimiters. Deeper link
+    structure is expressed by existing MTS operators, e.g. ``♀◁`` and ``▷♂``.
     """
 
     up: int
@@ -362,7 +363,7 @@ def _format(expression: Expression, parent_precedence: int) -> str:
     elif isinstance(expression, Literal):
         text = expression.value
     elif isinstance(expression, ContextPronoun):
-        text = "$" * (expression.up + 1) + expression.pole.value
+        text = "↑" * expression.up + expression.pole.value
     elif isinstance(expression, RoundForm):
         text = f"({_format(expression.content, 0) if expression.content is not None else ''})"
     elif isinstance(expression, SquareForm):
