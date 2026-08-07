@@ -6,8 +6,9 @@
 
 | Содержимое | Каталог |
 |---|---|
-| корневые формулы и тесты | `tests/` |
-| reader, загрузка, reference contract и валидация | `core/` |
+| корневые definitions и conformance tests | `tests/` |
+| reference runtime и валидация | `core/` |
+| versioned external contracts | `contracts/` |
 | практические преобразования | `converters/` |
 | нормативная теория | `docs/theory/` |
 | технические спецификации | `docs/specs/` |
@@ -17,7 +18,7 @@
 
 ## Reference model и уровни
 
-Архитектурные границы текущей версии задаёт [Reference model МТС v0.1](specs/Reference%20model%20МТС%20v0.1.md).
+Архитектурные границы текущей версии задаёт [Reference model МТС v0.2](specs/Reference%20model%20МТС%20v0.2.md).
 
 Изменение одного уровня не должно скрыто менять другой:
 
@@ -31,6 +32,17 @@ L5 — теория вывода
 ```
 
 Если одинаковый видимый знак используется на нескольких уровнях, тождество его денотаций должно быть задано отдельным явным правилом.
+
+Для L2 v0.2 дополнительно зафиксировано:
+
+```text
+◁/▷ — атомарные context pronouns;
+↑ — отдельный context ascent;
+[`[`, `]`] не перегружаются context syntax;
+[] — occurrence-local anonymous form;
+interpret — read-only;
+realize — отдельный memory effect.
+```
 
 ## Жизненный цикл фундаментального решения
 
@@ -51,6 +63,17 @@ Research
 `Accepted` означает явное решение владельца теории. До этого кандидат имеет статус `experimental`, даже если для него уже существует код или тестовая модель.
 
 Состояния `Rejected`, `Deferred` и `Superseded` не требуют сохранения старой реализации в рабочем дереве: история решения остаётся в Git и GitHub.
+
+## Promotion без compatibility-копий
+
+После принятия фундаментального кандидата:
+
+1. все consumers переводятся на новый canonical path;
+2. versioned machine contract обновляется;
+3. candidate/legacy implementation удаляется в том же migration PR;
+4. CI запрещает возвращение параллельной активной реализации.
+
+Старые варианты доступны через Git history и не должны участвовать в runtime.
 
 ## Ограничения
 
