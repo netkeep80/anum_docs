@@ -2,12 +2,8 @@
 
 from dataclasses import dataclass
 
-from core.context_interpreter_candidate import (
-    ContextFrame,
-    MemoryView,
-    interpret_constraints,
-)
-from core.mtc_ast import LinkForm, SquareForm, structural_key
+from core.context_interpreter_candidate import ContextFrame, MemoryView, interpret_constraints
+from core.mtc_ast import LinkForm, RoundForm, SquareForm, structural_key
 from core.mtc_parser import parse_formula
 
 
@@ -38,14 +34,7 @@ class ChallengeMemory(MemoryView):
 
 
 def memory() -> ChallengeMemory:
-    return ChallengeMemory(
-        {
-            1: (1, 1),  # ∞ carrier
-            2: (2, 2),
-            3: (3, 3),
-            10: (2, 3),
-        }
-    )
+    return ChallengeMemory({1: (1, 1), 2: (2, 2), 3: (3, 3), 10: (2, 3)})
 
 
 def test_old_empty_equals_root_statement_is_local_binding_not_global_rewrite():
@@ -55,18 +44,14 @@ def test_old_empty_equals_root_statement_is_local_binding_not_global_rewrite():
         memory(),
         symbols={"∞": 1},
     )
-
     assert first.success
     assert tuple(value for _, value in first.holes) == (1,)
 
-    # A new parse/interpretation has a fresh anonymous occurrence. Nothing from
-    # the previous equality is a global rewrite rule for the glyph `[]`.
     second = interpret_constraints(
         parse_formula("[] = $["),
         ContextFrame(start=2, end=3),
         memory(),
     )
-
     assert second.success
     assert tuple(value for _, value in second.holes) == (2,)
 
@@ -77,11 +62,7 @@ def test_two_empty_glyphs_are_two_occurrences_before_any_binding():
     assert isinstance(ast.right, SquareForm)
     assert ast.left.span != ast.right.span
 
-    result = interpret_constraints(
-        ast,
-        ContextFrame(start=2, end=3),
-        memory(),
-    )
+    result = interpret_constraints(ast, ContextFrame(start=2, end=3), memory())
     assert result.success
     assert len(result.aliases) == 1
     assert result.holes == ()
@@ -111,7 +92,8 @@ def test_left_and_right_association_remain_structurally_distinct_queries():
     assert isinstance(left, LinkForm)
     assert isinstance(left.left, LinkForm)
     assert isinstance(right, LinkForm)
-    assert isinstance(right.right, LinkForm)
+    assert isinstance(right.right, RoundForm)
+    assert isinstance(right.right.content, LinkForm)
     assert structural_key(left) != structural_key(right)
 
 
@@ -130,13 +112,7 @@ def test_existing_link_can_be_decomposed_directly_into_two_anonymous_substitutio
 
 def test_nested_link_pattern_can_decompose_associative_memory_without_realize():
     store = ChallengeMemory(
-        {
-            1: (1, 1),
-            2: (2, 2),
-            3: (3, 3),
-            10: (2, 3),
-            20: (10, 1),
-        }
+        {1: (1, 1), 2: (2, 2), 3: (3, 3), 10: (2, 3), 20: (10, 1)}
     )
     before = dict(store.links)
 
