@@ -5,6 +5,8 @@ from enum import Enum, auto
 
 from core.mtc_ast import (
     BundleForm,
+    ContextPath,
+    ContextPole,
     Definition,
     EndProjection,
     Equality,
@@ -28,6 +30,7 @@ from core.reference_model import operator as reference_operator
 
 class TokenKind(Enum):
     SYMBOL = auto()
+    CONTEXT = auto()
     COLON = auto()
     ARROW = auto()
     EQUAL = auto()
@@ -80,6 +83,7 @@ class MTCParseError(ValueError):
 
 
 _SINGLE_CHAR_TOKENS = {
+    "$": TokenKind.CONTEXT,
     ":": TokenKind.COLON,
     "⟼": TokenKind.ARROW,
     "=": TokenKind.EQUAL,
@@ -106,6 +110,7 @@ _LITERAL_IN_CONTAINER = {
 
 _FORM_STARTS = {
     TokenKind.SYMBOL,
+    TokenKind.CONTEXT,
     TokenKind.LPAREN,
     TokenKind.LBRACKET,
     TokenKind.LBRACE,
@@ -350,6 +355,8 @@ class _Parser:
         if token.kind is TokenKind.SYMBOL:
             self.take()
             return Symbol(token.value, token.span)
+        if token.kind is TokenKind.CONTEXT:
+            return self.parse_context_path()
         if token.kind is TokenKind.LPAREN:
             return self.parse_round_form()
         if token.kind is TokenKind.LBRACKET:
@@ -360,6 +367,45 @@ class _Parser:
         raise MTCParseError(
             f"Ожидалась форма, получено {token.value!r}",
             token.span,
+        )
+
+    def parse_context_path(self) -> ContextPath:
+        """Parse ``$+ [|]+`` using source adjacency as the lexical boundary."""
+
+        opening = self.take(TokenKind.CONTEXT)
+        dollar_count = 1
+        previous = opening
+
+        while (
+            self.current.kind is TokenKind.CONTEXT
+            and self.current.span.start == previous.span.end
+        ):
+            previous = self.take()
+            dollar_count += 1
+
+        steps: list[ContextPole] = []
+        while (
+            self.current.kind in (TokenKind.LBRACKET, TokenKind.RBRACKET)
+            and self.current.span.start == previous.span.end
+        ):
+            token = self.take()
+            steps.append(
+                ContextPole.START
+                if token.kind is TokenKind.LBRACKET
+                else ContextPole.END
+            )
+            previous = token
+
+        if not steps:
+            raise MTCParseError(
+                "После `$` ожидается путь из `[` и `]`",
+                SourceSpan(opening.span.start, previous.span.end),
+            )
+
+        return ContextPath(
+            up=dollar_count - 1,
+            steps=tuple(steps),
+            span=SourceSpan(opening.span.start, previous.span.end),
         )
 
     def parse_round_form(self) -> RoundForm:
