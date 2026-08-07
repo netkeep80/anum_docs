@@ -1,6 +1,7 @@
 """Typed abstract syntax tree for the L2 formal notation of MTS."""
 
 from dataclasses import dataclass
+from enum import Enum
 
 
 @dataclass(frozen=True)
@@ -23,6 +24,13 @@ class Judgment(Expression):
     """Expression that states a relation between forms."""
 
 
+class ContextPole(str, Enum):
+    """One binary navigation step inside a contextual link."""
+
+    START = "["
+    END = "]"
+
+
 @dataclass(frozen=True)
 class Symbol(Form):
     name: str
@@ -34,6 +42,30 @@ class Literal(Form):
     """Literal operator/boundary glyph inside a container, e.g. ``(=)``."""
 
     value: str
+    span: SourceSpan
+
+
+@dataclass(frozen=True)
+class ContextPath(Form):
+    """Deictic path through the current/ancestor execution context.
+
+    ``$[`` and ``$]`` are the two primitive pronouns of a binary contextual
+    link. Additional ``$`` characters move to an ancestor context; additional
+    ``[``/``]`` characters walk through start/end links from that anchor.
+
+    Examples::
+
+        $[    current.start
+        $]    current.end
+        $[[   current.start.start
+        $][   current.end.start
+        $$]   parent.end
+
+    ``up=0`` means current context, ``up=1`` means its parent.
+    """
+
+    up: int
+    steps: tuple[ContextPole, ...]
     span: SourceSpan
 
 
@@ -109,9 +141,8 @@ class Definition(Expression):
     """L2 introduction ``target : expression``.
 
     The right-hand side is intentionally ``Expression`` rather than ``Form``:
-    the canonical root formula ``∞ : [] = [] ⟼ []`` introduces ``∞`` through
-    an equality judgment, and ``(=)`` is introduced through a bundle of
-    judgments.
+    a definition may introduce a sign through a local bundle of constraints.
+    ``:`` opens an interpretation scope; it is not a global assignment.
     """
 
     target: Form
@@ -161,8 +192,8 @@ def format_expression(expression: Expression) -> str:
 def structural_key(expression: Expression | None):
     """Return a source-span-independent structural representation.
 
-    This is used by round-trip tests and later proof/debug tooling. It is not a
-    semantic equality operation; L1 equality is defined by the reference model.
+    This is used by round-trip tests and proof/debug tooling. It is not a
+    semantic equality operation.
     """
 
     if expression is None:
@@ -171,6 +202,12 @@ def structural_key(expression: Expression | None):
         return ("symbol", expression.name)
     if isinstance(expression, Literal):
         return ("literal", expression.value)
+    if isinstance(expression, ContextPath):
+        return (
+            "context-path",
+            expression.up,
+            tuple(step.value for step in expression.steps),
+        )
     if isinstance(expression, RoundForm):
         return ("round", structural_key(expression.content))
     if isinstance(expression, SquareForm):
@@ -208,6 +245,23 @@ def _validate(expression: Expression, diagnostics: list[StaticDiagnostic]) -> No
     if isinstance(expression, (Symbol, Literal)):
         return
 
+    if isinstance(expression, ContextPath):
+        if expression.up < 0:
+            diagnostics.append(
+                StaticDiagnostic(
+                    "Глубина контекстного пути не может быть отрицательной",
+                    expression.span,
+                )
+            )
+        if not expression.steps:
+            diagnostics.append(
+                StaticDiagnostic(
+                    "Контекстный путь должен выбирать начало `[` или конец `]` связи",
+                    expression.span,
+                )
+            )
+        return
+
     if isinstance(expression, RoundForm):
         if expression.content is not None:
             _validate(expression.content, diagnostics)
@@ -233,17 +287,30 @@ def _validate(expression: Expression, diagnostics: list[StaticDiagnostic]) -> No
     if isinstance(expression, Sequence):
         if len(expression.items) < 2:
             diagnostics.append(
-                StaticDiagnostic("Последовательность должна содержать минимум две формы", expression.span)
+                StaticDiagnostic(
+                    "Последовательность должна содержать минимум две формы",
+                    expression.span,
+                )
             )
         for item in expression.items:
             if not isinstance(item, Form):
-                diagnostics.append(StaticDiagnostic("Элемент последовательности должен быть формой", item.span))
+                diagnostics.append(
+                    StaticDiagnostic(
+                        "Элемент последовательности должен быть формой",
+                        item.span,
+                    )
+                )
             _validate(item, diagnostics)
         return
 
     if isinstance(expression, (StartProjection, EndProjection, Inversion)):
         if not isinstance(expression.value, Form):
-            diagnostics.append(StaticDiagnostic("Унарный оператор применяется только к форме", expression.value.span))
+            diagnostics.append(
+                StaticDiagnostic(
+                    "Унарный оператор применяется только к форме",
+                    expression.value.span,
+                )
+            )
         _validate(expression.value, diagnostics)
         return
 
@@ -261,7 +328,12 @@ def _validate(expression: Expression, diagnostics: list[StaticDiagnostic]) -> No
 
     if isinstance(expression, Definition):
         if not isinstance(expression.target, Form):
-            diagnostics.append(StaticDiagnostic("Левая часть определения должна быть формой", expression.target.span))
+            diagnostics.append(
+                StaticDiagnostic(
+                    "Левая часть определения должна быть формой",
+                    expression.target.span,
+                )
+            )
         _validate(expression.target, diagnostics)
         _validate(expression.value, diagnostics)
         return
@@ -276,9 +348,19 @@ def _validate_binary_form_operands(
     diagnostics: list[StaticDiagnostic],
 ) -> None:
     if not isinstance(left, Form):
-        diagnostics.append(StaticDiagnostic(f"Левый операнд {operator} должен быть формой", left.span))
+        diagnostics.append(
+            StaticDiagnostic(
+                f"Левый операнд {operator} должен быть формой",
+                left.span,
+            )
+        )
     if not isinstance(right, Form):
-        diagnostics.append(StaticDiagnostic(f"Правый операнд {operator} должен быть формой", right.span))
+        diagnostics.append(
+            StaticDiagnostic(
+                f"Правый операнд {operator} должен быть формой",
+                right.span,
+            )
+        )
     _validate(left, diagnostics)
     _validate(right, diagnostics)
 
@@ -290,6 +372,10 @@ def _format(expression: Expression, parent_precedence: int) -> str:
         text = expression.name
     elif isinstance(expression, Literal):
         text = expression.value
+    elif isinstance(expression, ContextPath):
+        text = "$" * (expression.up + 1) + "".join(
+            step.value for step in expression.steps
+        )
     elif isinstance(expression, RoundForm):
         text = f"({_format(expression.content, 0) if expression.content is not None else ''})"
     elif isinstance(expression, SquareForm):
@@ -297,7 +383,9 @@ def _format(expression: Expression, parent_precedence: int) -> str:
     elif isinstance(expression, BundleForm):
         text = "{" + ", ".join(_format(item, 0) for item in expression.items) + "}"
     elif isinstance(expression, Sequence):
-        text = "".join(_format(item, _PRECEDENCE_SEQUENCE + 1) for item in expression.items)
+        text = "".join(
+            _format(item, _PRECEDENCE_SEQUENCE + 1) for item in expression.items
+        )
     elif isinstance(expression, StartProjection):
         text = "♀" + _format(expression.value, _PRECEDENCE_PROJECTION)
     elif isinstance(expression, EndProjection):
