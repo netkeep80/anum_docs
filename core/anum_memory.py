@@ -1,42 +1,28 @@
-# -*- coding: utf-8 -*-
-"""Minimal symbolic memory model for anum deserialization tests."""
+"""Minimal symbolic L4 test double for load/find/realize invariants.
+
+Quotation belongs to the real L3 protocol in ``core.anum_protocol``. This test
+double intentionally has no fake ``Quote`` type and no context-free ``project_K``
+method.
+"""
 
 from dataclasses import dataclass
-from typing import Any
 
 
 @dataclass(frozen=True)
 class Link:
-    """A materialized symbolic link."""
-
     left: str
     right: str
 
 
 @dataclass(frozen=True)
 class SymbolicAnum:
-    """A symbolic anum whose denotation is ``left ⟼ right``."""
+    """Test-only symbolic description whose denotation is ``left ⟼ right``."""
 
     left: str
     right: str
 
 
-@dataclass(frozen=True)
-class Quote:
-    """A non-materializing quote wrapper."""
-
-    value: Any
-
-
-def deserialize(anum: Any) -> Any:
-    """Return the denotation of one symbolic deserialization step.
-
-    ``SymbolicAnum("a", "b")`` denotes ``Link("a", "b")``. A quote raises the
-    description level, so ``Quote(A)`` denotes ``A`` instead of ``den(A)``.
-    """
-
-    if isinstance(anum, Quote):
-        return anum.value
+def symbolic_denotation(anum: SymbolicAnum | Link) -> Link:
     if isinstance(anum, SymbolicAnum):
         return Link(anum.left, anum.right)
     if isinstance(anum, Link):
@@ -45,42 +31,23 @@ def deserialize(anum: Any) -> Any:
 
 
 class AnumMemory:
-    """Small test double for separating load/find/realize semantics."""
+    """Small test double retained until the real L4 memory in issue #72."""
 
     def __init__(self):
-        self.raw_forms = set()
-        self.links = set()
+        self.raw_forms: set[SymbolicAnum] = set()
+        self.links: set[Link] = set()
 
-    def load(self, anum: Any) -> Any:
-        """Store raw description without creating its denotation."""
-
+    def load(self, anum: SymbolicAnum) -> SymbolicAnum:
         self.raw_forms.add(anum)
         return anum
 
-    def decode(self, anum: Any) -> Any:
-        """Decode a loaded form without materializing its denotation."""
-
+    def decode(self, anum: SymbolicAnum) -> SymbolicAnum:
         return anum
 
-    def project_K(self, anum: Any) -> Any:
-        """Project a symbolic form in the current test context."""
+    def find(self, anum: SymbolicAnum) -> bool:
+        return symbolic_denotation(anum) in self.links
 
-        return deserialize(anum)
-
-    def find(self, anum: Any) -> bool:
-        """Check whether the projected denotation already exists."""
-
-        projected = self.project_K(anum)
-        if isinstance(projected, Link):
-            return projected in self.links
-        return projected in self.raw_forms
-
-    def realize(self, anum: Any) -> Any:
-        """Materialize the projected denotation when it is a link."""
-
-        projected = self.project_K(anum)
-        if isinstance(projected, Link):
-            self.links.add(projected)
-        else:
-            self.raw_forms.add(projected)
+    def realize(self, anum: SymbolicAnum) -> Link:
+        projected = symbolic_denotation(anum)
+        self.links.add(projected)
         return projected
