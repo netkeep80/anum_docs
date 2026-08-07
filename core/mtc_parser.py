@@ -30,7 +30,9 @@ from core.reference_model import operator as reference_operator
 
 class TokenKind(Enum):
     SYMBOL = auto()
-    CONTEXT = auto()
+    CONTEXT_START = auto()
+    CONTEXT_END = auto()
+    CONTEXT_UP = auto()
     COLON = auto()
     ARROW = auto()
     EQUAL = auto()
@@ -83,7 +85,9 @@ class MTCParseError(ValueError):
 
 
 _SINGLE_CHAR_TOKENS = {
-    "$": TokenKind.CONTEXT,
+    "◁": TokenKind.CONTEXT_START,
+    "▷": TokenKind.CONTEXT_END,
+    "↑": TokenKind.CONTEXT_UP,
     ":": TokenKind.COLON,
     "⟼": TokenKind.ARROW,
     "=": TokenKind.EQUAL,
@@ -110,7 +114,9 @@ _LITERAL_IN_CONTAINER = {
 
 _FORM_STARTS = {
     TokenKind.SYMBOL,
-    TokenKind.CONTEXT,
+    TokenKind.CONTEXT_START,
+    TokenKind.CONTEXT_END,
+    TokenKind.CONTEXT_UP,
     TokenKind.LPAREN,
     TokenKind.LBRACKET,
     TokenKind.LBRACE,
@@ -127,6 +133,8 @@ _PRECEDENCE_PROJECTION = reference_operator("♀").precedence
 
 
 def tokenize(text: str) -> tuple[Token, ...]:
+    """Tokenize L2 with context pronouns and brackets as independent atoms."""
+
     tokens: list[Token] = []
     position = 0
 
@@ -293,7 +301,11 @@ class _Parser:
         if token.kind is TokenKind.SYMBOL:
             self.take()
             return Symbol(token.value, token.span)
-        if token.kind is TokenKind.CONTEXT:
+        if token.kind in (
+            TokenKind.CONTEXT_START,
+            TokenKind.CONTEXT_END,
+            TokenKind.CONTEXT_UP,
+        ):
             return self.parse_context_pronoun()
         if token.kind is TokenKind.LPAREN:
             return self.parse_round_form()
@@ -304,35 +316,30 @@ class _Parser:
         raise MTCParseError(f"Ожидалась форма, получено {token.value!r}", token.span)
 
     def parse_context_pronoun(self) -> ContextPronoun:
-        """Parse one of exactly two contextual roles: ``$+ [`` or ``$+ ]``."""
+        """Parse ``↑*◁`` or ``↑*▷``; pronoun glyph itself is always atomic."""
 
-        opening = self.take(TokenKind.CONTEXT)
-        dollar_count = 1
-        previous = opening
-
-        while (
-            self.current.kind is TokenKind.CONTEXT
-            and self.current.span.start == previous.span.end
-        ):
-            previous = self.take()
-            dollar_count += 1
+        first = self.current
+        up = 0
+        while self.current.kind is TokenKind.CONTEXT_UP:
+            self.take()
+            up += 1
 
         token = self.current
-        if (
-            token.kind not in (TokenKind.LBRACKET, TokenKind.RBRACKET)
-            or token.span.start != previous.span.end
-        ):
+        if token.kind is TokenKind.CONTEXT_START:
+            pole = ContextPole.START
+        elif token.kind is TokenKind.CONTEXT_END:
+            pole = ContextPole.END
+        else:
             raise MTCParseError(
-                "После `$` ожидается одно из двух контекстных местоимений: `[` или `]`",
-                SourceSpan(opening.span.start, previous.span.end),
+                "После `↑` ожидается контекстное местоимение `◁` или `▷`",
+                first.span,
             )
 
         pole_token = self.take()
-        pole = ContextPole.START if pole_token.kind is TokenKind.LBRACKET else ContextPole.END
         return ContextPronoun(
-            up=dollar_count - 1,
+            up=up,
             pole=pole,
-            span=SourceSpan(opening.span.start, pole_token.span.end),
+            span=SourceSpan(first.span.start, pole_token.span.end),
         )
 
     def parse_round_form(self) -> RoundForm:
