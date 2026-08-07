@@ -61,7 +61,7 @@ def equality_memory() -> FakeMemory:
 
 
 def parse_equality_body() -> BundleForm:
-    ast = parse_formula("(=) : {♀$[ = ♀$], $[♂ = $]♂}")
+    ast = parse_formula("(=) : {♀◁ = ♀▷, ◁♂ = ▷♂}")
     assert isinstance(ast, Definition)
     assert isinstance(ast.value, BundleForm)
     return ast.value
@@ -78,8 +78,8 @@ def test_equality_context_compares_corresponding_forms_without_named_variables()
     assert result.success
     assert result.holes == ()
     assert result.aliases == ()
-    assert "context:$[->10" in result.trace
-    assert "context:$]->10" in result.trace
+    assert "context:◁->10" in result.trace
+    assert "context:▷->10" in result.trace
     assert "start:10->110" in result.trace
     assert "end:10->210" in result.trace
 
@@ -98,7 +98,7 @@ def test_equality_context_detects_structurally_different_operand():
 
 def test_each_empty_square_occurrence_is_an_independent_local_hole():
     memory = equality_memory()
-    expression = parse_formula("{[] = $[, [] = $]}")
+    expression = parse_formula("{[] = ◁, [] = ▷}")
     result = interpret_constraints(
         expression,
         ContextFrame(start=10, end=12),
@@ -114,12 +114,12 @@ def test_identical_empty_form_glyphs_do_not_bind_globally_between_calls():
     memory = equality_memory()
 
     first = interpret_constraints(
-        parse_formula("[] = $["),
+        parse_formula("[] = ◁"),
         ContextFrame(start=10, end=12),
         memory,
     )
     second = interpret_constraints(
-        parse_formula("[] = $]"),
+        parse_formula("[] = ▷"),
         ContextFrame(start=10, end=12),
         memory,
     )
@@ -134,8 +134,8 @@ def test_parent_context_access_is_structural_and_independent_of_names():
     parent = ContextFrame(start=10, end=12)
     child = ContextFrame(start=1, end=2, parent=parent)
 
-    current_start = parse_formula("$[")
-    parent_end = parse_formula("$$]")
+    current_start = parse_formula("◁")
+    parent_end = parse_formula("↑▷")
     assert isinstance(current_start, ContextPronoun)
     assert isinstance(parent_end, ContextPronoun)
 
@@ -152,7 +152,7 @@ def test_context_frame_itself_does_not_need_a_materialized_link():
     reads_before = memory.reads
 
     result = interpret_constraints(
-        parse_formula("{[] = $[, [] = $]}"),
+        parse_formula("{[] = ◁, [] = ▷}"),
         ContextFrame(start=10, end=12),
         memory,
     )
@@ -220,9 +220,10 @@ def test_two_anonymous_holes_can_be_locally_aliased_without_becoming_global():
     assert len(result.aliases) == 1
 
 
-def test_two_pronouns_make_old_cyclic_slot_numbering_unnecessary_for_equality():
-    source = "(=) : {♀$[ = ♀$], $[♂ = $]♂}"
+def test_two_atomic_pronouns_make_hidden_slot_numbering_unnecessary_for_equality():
+    source = "(=) : {♀◁ = ♀▷, ◁♂ = ▷♂}"
 
     assert "[]₁" not in source
     assert "[]₂" not in source
+    assert "$" not in source
     assert all(name not in source for name in (" a ", " b ", " x ", " y "))
