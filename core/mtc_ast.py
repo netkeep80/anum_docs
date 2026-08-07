@@ -25,7 +25,7 @@ class Judgment(Expression):
 
 
 class ContextPole(str, Enum):
-    """One binary navigation step inside a contextual link."""
+    """One of the two roles of a binary contextual link."""
 
     START = "["
     END = "]"
@@ -46,26 +46,26 @@ class Literal(Form):
 
 
 @dataclass(frozen=True)
-class ContextPath(Form):
-    """Deictic path through the current/ancestor execution context.
+class ContextPronoun(Form):
+    """Deictic reference to one pole of current/ancestor execution context.
 
-    ``$[`` and ``$]`` are the two primitive pronouns of a binary contextual
-    link. Additional ``$`` characters move to an ancestor context; additional
-    ``[``/``]`` characters walk through start/end links from that anchor.
+    The binary contextual link has exactly two primitive pronouns::
 
-    Examples::
+        $[   current.start
+        $]   current.end
 
-        $[    current.start
-        $]    current.end
-        $[[   current.start.start
-        $][   current.end.start
-        $$]   parent.end
+    Additional ``$`` characters move to an ancestor context::
 
-    ``up=0`` means current context, ``up=1`` means its parent.
+        $$[  parent.start
+        $$]  parent.end
+
+    ``up=0`` means the current context; ``up=1`` means its parent. There is no
+    generic path language after the pronoun: deeper structure is expressed by
+    the existing MTS operators, e.g. ``♀$[`` and ``$]♂``.
     """
 
     up: int
-    steps: tuple[ContextPole, ...]
+    pole: ContextPole
     span: SourceSpan
 
 
@@ -202,12 +202,8 @@ def structural_key(expression: Expression | None):
         return ("symbol", expression.name)
     if isinstance(expression, Literal):
         return ("literal", expression.value)
-    if isinstance(expression, ContextPath):
-        return (
-            "context-path",
-            expression.up,
-            tuple(step.value for step in expression.steps),
-        )
+    if isinstance(expression, ContextPronoun):
+        return ("context-pronoun", expression.up, expression.pole.value)
     if isinstance(expression, RoundForm):
         return ("round", structural_key(expression.content))
     if isinstance(expression, SquareForm):
@@ -245,18 +241,11 @@ def _validate(expression: Expression, diagnostics: list[StaticDiagnostic]) -> No
     if isinstance(expression, (Symbol, Literal)):
         return
 
-    if isinstance(expression, ContextPath):
+    if isinstance(expression, ContextPronoun):
         if expression.up < 0:
             diagnostics.append(
                 StaticDiagnostic(
-                    "Глубина контекстного пути не может быть отрицательной",
-                    expression.span,
-                )
-            )
-        if not expression.steps:
-            diagnostics.append(
-                StaticDiagnostic(
-                    "Контекстный путь должен выбирать начало `[` или конец `]` связи",
+                    "Глубина контекстного местоимения не может быть отрицательной",
                     expression.span,
                 )
             )
@@ -372,10 +361,8 @@ def _format(expression: Expression, parent_precedence: int) -> str:
         text = expression.name
     elif isinstance(expression, Literal):
         text = expression.value
-    elif isinstance(expression, ContextPath):
-        text = "$" * (expression.up + 1) + "".join(
-            step.value for step in expression.steps
-        )
+    elif isinstance(expression, ContextPronoun):
+        text = "$" * (expression.up + 1) + expression.pole.value
     elif isinstance(expression, RoundForm):
         text = f"({_format(expression.content, 0) if expression.content is not None else ''})"
     elif isinstance(expression, SquareForm):
