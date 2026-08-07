@@ -17,6 +17,10 @@ class FakeMemory(MemoryView):
     links: dict[int, tuple[int, int]]
     reads: int = 0
 
+    def poles(self, link: int) -> tuple[int, int]:
+        self.reads += 1
+        return self.links[link]
+
     def find_link(self, start: int, end: int) -> int | None:
         self.reads += 1
         for link, poles in self.links.items():
@@ -144,8 +148,6 @@ def test_context_frame_itself_does_not_need_a_materialized_link():
     memory = equality_memory()
     before = dict(memory.links)
 
-    # There is no LinkRef whose poles are (10, 12), but the virtual frame is
-    # still a valid interpretation environment.
     assert memory.find_link(10, 12) is None
     reads_before = memory.reads
 
@@ -160,7 +162,24 @@ def test_context_frame_itself_does_not_need_a_materialized_link():
     assert memory.reads == reads_before
 
 
-def test_interpretation_only_reads_memory_and_returns_substitution_plan():
+def test_ground_link_is_decomposed_into_anonymous_pattern_substitutions():
+    memory = equality_memory()
+    before = dict(memory.links)
+
+    result = interpret_constraints(
+        parse_formula("30 = [] ⟼ []"),
+        ContextFrame(start=10, end=10),
+        memory,
+        symbols={"30": 30},
+    )
+
+    assert result.success
+    assert tuple(value for _, value in result.holes) == (2, 3)
+    assert "decompose:30->2,3" in result.trace
+    assert memory.links == before
+
+
+def test_grounded_structural_pattern_matches_without_materialization():
     memory = equality_memory()
     before = dict(memory.links)
 
@@ -173,8 +192,19 @@ def test_interpretation_only_reads_memory_and_returns_substitution_plan():
 
     assert result.success
     assert memory.links == before
-    assert memory.reads > 0
-    assert "link:2,3->30" in result.trace
+    assert "decompose:30->2,3" in result.trace
+
+
+def test_two_link_patterns_obtain_local_congruence_from_corresponding_poles():
+    memory = equality_memory()
+    result = interpret_constraints(
+        parse_formula("2 ⟼ 3 = 2 ⟼ 3"),
+        ContextFrame(start=10, end=10),
+        memory,
+        symbols={"2": 2, "3": 3},
+    )
+
+    assert result.success
 
 
 def test_two_anonymous_holes_can_be_locally_aliased_without_becoming_global():
