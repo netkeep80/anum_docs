@@ -14,8 +14,10 @@ memory, so interpreting ``A = B`` never needs to create the auxiliary link
 ``A ⟼ B`` first.
 
 Anonymous identity is derived from the typed AST position, never from display
-text, source offsets or Python object identity. Source spans remain diagnostics
-only and therefore whitespace/reformatting cannot change semantic occurrence ID.
+text, source offsets or Python object identity. A ``LinkForm`` is a structural
+pattern: when unified with an existing LinkRef, the interpreter reads that link's
+poles and produces substitutions instead of requiring the pattern to be grounded
+first. This is the associative query behavior needed by the future approver.
 """
 
 from dataclasses import dataclass, field
@@ -44,6 +46,8 @@ OccurrencePath: TypeAlias = tuple[int, ...]
 class MemoryView(Protocol):
     """Read-only associative-memory surface required by interpretation."""
 
+    def poles(self, link: LinkRef) -> tuple[LinkRef, LinkRef]: ...
+
     def find_link(self, start: LinkRef, end: LinkRef) -> LinkRef | None: ...
 
     def find_start_projection(self, form: LinkRef) -> LinkRef | None:
@@ -57,12 +61,7 @@ class MemoryView(Protocol):
 
 @dataclass(frozen=True)
 class ContextFrame:
-    """Virtual binary role environment for one interpretation step.
-
-    ``start`` and ``end`` are the two role values exposed by ``$[`` and ``$]``.
-    The frame is interpreter state, not a third MTS operand and not necessarily
-    a materialized Link in associative memory.
-    """
+    """Virtual binary role environment for one interpretation step."""
 
     start: LinkRef
     end: LinkRef
@@ -197,9 +196,63 @@ def _unify_forms(
     memory: MemoryView,
     state: InterpretationState,
 ) -> bool:
+    if _is_anonymous_form(left):
+        left_hole = _resolve_form(left, left_path, frame, memory, state)
+        if _is_anonymous_form(right):
+            right_hole = _resolve_form(right, right_path, frame, memory, state)
+            assert isinstance(left_hole, HoleId)
+            assert isinstance(right_hole, HoleId)
+            return _union_holes(left_hole, right_hole, state)
+        right_value = _resolve_form(right, right_path, frame, memory, state)
+        if isinstance(right_value, HoleId):
+            assert isinstance(left_hole, HoleId)
+            return _union_holes(left_hole, right_value, state)
+        assert isinstance(left_hole, HoleId)
+        return _bind_hole(left_hole, right_value, state)
+
+    if _is_anonymous_form(right):
+        right_hole = _resolve_form(right, right_path, frame, memory, state)
+        left_value = _resolve_form(left, left_path, frame, memory, state)
+        assert isinstance(right_hole, HoleId)
+        if isinstance(left_value, HoleId):
+            return _union_holes(left_value, right_hole, state)
+        return _bind_hole(right_hole, left_value, state)
+
+    if isinstance(left, LinkForm) and isinstance(right, LinkForm):
+        return _unify_forms(
+            left.left,
+            left_path + (0,),
+            right.left,
+            right_path + (0,),
+            frame,
+            memory,
+            state,
+        ) and _unify_forms(
+            left.right,
+            left_path + (1,),
+            right.right,
+            right_path + (1,),
+            frame,
+            memory,
+            state,
+        )
+
+    if isinstance(left, LinkForm):
+        right_ref = _require_resolved_link(
+            _resolve_form(right, right_path, frame, memory, state),
+            "правый операнд =",
+        )
+        return _match_link_pattern(left, left_path, right_ref, frame, memory, state)
+
+    if isinstance(right, LinkForm):
+        left_ref = _require_resolved_link(
+            _resolve_form(left, left_path, frame, memory, state),
+            "левый операнд =",
+        )
+        return _match_link_pattern(right, right_path, left_ref, frame, memory, state)
+
     left_value = _resolve_form(left, left_path, frame, memory, state)
     right_value = _resolve_form(right, right_path, frame, memory, state)
-
     if isinstance(left_value, HoleId) and isinstance(right_value, HoleId):
         return _union_holes(left_value, right_value, state)
     if isinstance(left_value, HoleId):
@@ -207,6 +260,55 @@ def _unify_forms(
     if isinstance(right_value, HoleId):
         return _bind_hole(right_value, left_value, state)
     return left_value == right_value
+
+
+def _match_link_pattern(
+    pattern: LinkForm,
+    path: OccurrencePath,
+    link: LinkRef,
+    frame: ContextFrame,
+    memory: MemoryView,
+    state: InterpretationState,
+) -> bool:
+    start, end = memory.poles(link)
+    state.trace.append(f"decompose:{link}->{start},{end}")
+    return _unify_form_with_ref(
+        pattern.left,
+        path + (0,),
+        start,
+        frame,
+        memory,
+        state,
+    ) and _unify_form_with_ref(
+        pattern.right,
+        path + (1,),
+        end,
+        frame,
+        memory,
+        state,
+    )
+
+
+def _unify_form_with_ref(
+    form: Form,
+    path: OccurrencePath,
+    value: LinkRef,
+    frame: ContextFrame,
+    memory: MemoryView,
+    state: InterpretationState,
+) -> bool:
+    if _is_anonymous_form(form):
+        hole = _resolve_form(form, path, frame, memory, state)
+        assert isinstance(hole, HoleId)
+        return _bind_hole(hole, value, state)
+
+    if isinstance(form, LinkForm):
+        return _match_link_pattern(form, path, value, frame, memory, state)
+
+    resolved = _resolve_form(form, path, frame, memory, state)
+    if isinstance(resolved, HoleId):
+        return _bind_hole(resolved, value, state)
+    return resolved == value
 
 
 def _resolve_form(
@@ -221,7 +323,7 @@ def _resolve_form(
         state.trace.append(f"context:{_format_pronoun(form)}->{resolved}")
         return resolved
 
-    if isinstance(form, SquareForm) and form.content is None:
+    if _is_anonymous_form(form):
         hole = HoleId(path)
         root = _find_hole_root(hole, state)
         bound = state.holes.get(root)
@@ -281,6 +383,10 @@ def _resolve_form(
     raise InterpretationError(
         f"Candidate interpreter ещё не разрешает форму {type(form).__name__}"
     )
+
+
+def _is_anonymous_form(form: Form) -> bool:
+    return isinstance(form, SquareForm) and form.content is None
 
 
 def _require_resolved_link(value: LinkRef | HoleId, role: str) -> LinkRef:
