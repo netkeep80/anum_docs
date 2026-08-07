@@ -1,9 +1,8 @@
-"""Declarative reference-model contract for MTS/Anum v0.1.
+"""Declarative reference-model contract for MTS/Anum v0.2.
 
-The module records layer boundaries and accepted semantic obligations. It is not
-the L1 interpreter or the L5 prover. Unresolved theoretical contracts are kept
-explicitly separate from accepted L1 rules so implementation cannot silently
-promote a research hypothesis into the normative model.
+This module is the machine-readable source for architectural layer boundaries,
+accepted L1 obligations, L2 operator types and L4 effect boundaries. It is not
+the semantic carrier implementation or the L5 proof kernel.
 """
 
 from dataclasses import dataclass
@@ -132,49 +131,55 @@ CONCEPTS = (
         "associative-root",
         Layer.SEMANTICS,
         StatementStatus.DEFINITION,
-        "Акорень допускает конечное циклическое представление полного самозамыкания.",
+        "Акорень имеет конечный cyclic carrier полного самозамыкания.",
     ),
     ConceptSpec(
         "start-form",
         Layer.SEMANTICS,
         StatementStatus.DEFINITION,
-        "Начало формы допускает циклическое самозамыкание start-полюса.",
+        "Начало формы имеет self-closed start-полюс.",
     ),
     ConceptSpec(
         "end-form",
         Layer.SEMANTICS,
         StatementStatus.DEFINITION,
-        "Конец формы допускает циклическое самозамыкание end-полюса.",
+        "Конец формы имеет self-closed end-полюс.",
     ),
     ConceptSpec(
         "inversion",
         Layer.SEMANTICS,
         StatementStatus.DEFINITION,
-        "Для конкретной Link-структуры инверсия меняет местами упорядоченные полюса.",
+        "Инверсия конкретной Link-структуры меняет местами её полюса.",
     ),
     ConceptSpec(
         "equality-meaning",
         Layer.SEMANTICS,
         StatementStatus.DEFINITION,
-        "Корневая система вводит формальный смысл равенства `(=)`.",
-    ),
-    ConceptSpec(
-        "equality-substitution-semantics",
-        Layer.SEMANTICS,
-        StatementStatus.EXPERIMENTAL,
-        "Occurrence binding, substitutivity и congruence полного L2-оператора `=` не стабилизированы; см. issue #79.",
+        "Равенство сравнивает соответствующие формы начала и конца двух ролей текущего бинарного контекста.",
     ),
     ConceptSpec(
         "bundle",
         Layer.SEMANTICS,
-        StatementStatus.DEFINITION,
-        "Текущий fixture фиксирует экстенсиональные примеры пучков.",
+        StatementStatus.CONFORMANCE,
+        "Пучковая algebra относится к semantic/conformance-слою, а не к root definitions.",
     ),
     ConceptSpec(
         "formal-notation",
         Layer.FORMAL_LANGUAGE,
         StatementStatus.DEFINITION,
-        "L2 различает формы, суждения и определения через typed AST.",
+        "L2 различает Form, Judgment и Definition через typed AST.",
+    ),
+    ConceptSpec(
+        "context-pronouns",
+        Layer.FORMAL_LANGUAGE,
+        StatementStatus.DEFINITION,
+        "◁ и ▷ — два атомарных местоимения start/end текущего ContextFrame; ↑ поднимает к parent context.",
+    ),
+    ConceptSpec(
+        "anonymous-form",
+        Layer.FORMAL_LANGUAGE,
+        StatementStatus.DEFINITION,
+        "Каждое [] — самостоятельное anonymous occurrence с identity по structural typed-AST path.",
     ),
     ConceptSpec(
         "anum",
@@ -186,25 +191,31 @@ CONCEPTS = (
         "abit",
         Layer.SERIALIZATION,
         StatementStatus.DEFINITION,
-        "Базовый четверичный алфавит v0.1 использует [ ] 1 0.",
+        "Базовый четверичный алфавит использует [ ] 1 0.",
     ),
     ConceptSpec(
         "issue-61-projection",
         Layer.SERIALIZATION,
         StatementStatus.EXPERIMENTAL,
-        "Проекция []→0 и ][→1 остаётся рабочей протокольной гипотезой.",
+        "Проекция []→0 и ][→1 остаётся рабочей L3-гипотезой issue #61.",
+    ),
+    ConceptSpec(
+        "formal-interpretation",
+        Layer.EXECUTION,
+        StatementStatus.DEFINITION,
+        "interpret исполняет L2 pattern относительно ContextFrame/MemoryView и возвращает локальные substitutions без materialization.",
     ),
     ConceptSpec(
         "memory-execution",
         Layer.EXECUTION,
         StatementStatus.DEFINITION,
-        "Изменение памяти отделено от чтения, декодирования и поиска.",
+        "Read-only interpretation/find отделены от explicit realize/delete effects.",
     ),
     ConceptSpec(
         "proof-system",
         Layer.INFERENCE,
         StatementStatus.EXPERIMENTAL,
-        "Trusted inference rules вводятся только на отдельном L5-этапе.",
+        "Trusted L5 proof rules ещё не приняты.",
     ),
 )
 
@@ -214,55 +225,50 @@ SEMANTIC_RULES = (
         "link",
         Layer.SEMANTICS,
         "Link(a, b)",
-        "Конкретная reference Link-структура имеет упорядоченные полюса start=a и end=b.",
+        "Concrete Link carrier has ordered start=a and end=b poles.",
     ),
     SemanticRuleSpec(
         "finite-cyclic-carrier",
         Layer.SEMANTICS,
         "Model = finite directed graph of Link nodes; cycles are allowed",
-        "Самоссылочные Link-структуры можно хранить конечным циклическим carrier без бесконечного unfolding.",
+        "Self-reference is represented by finite cycles without infinite unfolding.",
     ),
     SemanticRuleSpec(
         "associative-root-carrier",
         Layer.SEMANTICS,
         "root.start = root; root.end = root",
-        "Reference carrier акорня может быть одной полностью самозамкнутой Link-структурой; это не задаёт глобальные правила substitution по `=`.",
+        "Акорень может быть одной полностью self-closed Link-структурой.",
     ),
     SemanticRuleSpec(
         "start-form-carrier",
         Layer.SEMANTICS,
         "start(F).start = start(F); start(F).end = F",
-        "Reference carrier начала формы имеет самозамкнутый start-полюс.",
+        "Carrier начала формы замкнут по start.",
     ),
     SemanticRuleSpec(
         "end-form-carrier",
         Layer.SEMANTICS,
         "end(F).start = F; end(F).end = end(F)",
-        "Reference carrier конца формы имеет самозамкнутый end-полюс.",
+        "Carrier конца формы замкнут по end.",
     ),
     SemanticRuleSpec(
         "link-inversion",
         Layer.SEMANTICS,
         "invert(Link(a, b)) = Link(b, a)",
-        "Для уже различённой конкретной Link-структуры инверсия меняет направление.",
+        "Инверсия concrete Link меняет направление.",
     ),
     SemanticRuleSpec(
-        "bundle-conformance",
+        "contextual-equality",
         Layer.SEMANTICS,
-        "{A, A} = {A}; {A, B} = {B, A}",
-        "Fixture требует экстенсионального чтения перечисленных пучковых примеров; общая связь этого `=` с substitution semantics остаётся отдельным вопросом #79.",
+        "eq(A, B) := start(A) = start(B) and end(A) = end(B)",
+        "(=) исполняется в ContextFrame(A,B); constraints принадлежат только текущей интерпретации.",
     ),
 )
 
 
-OPEN_QUESTIONS = (
-    OpenQuestionSpec(
-        "equality-occurrence-binding",
-        Layer.SEMANTICS,
-        79,
-        "Формализовать различие literal form, positional occurrence и повторного pattern slot после `:`; определить область `=`, substitution и congruence.",
-    ),
-)
+# Accepted v0.2 has no unresolved L1/L2 blocker. New open questions are added
+# only with an explicit issue and layer assignment.
+OPEN_QUESTIONS: tuple[OpenQuestionSpec, ...] = ()
 
 
 OPERATORS = (
@@ -273,7 +279,7 @@ OPERATORS = (
         ValueKind.DEFINITION,
         10,
         Associativity.RIGHT,
-        "Вводит target через шаблон/выражение; не является присваиванием или L4-мутацией. Полная binding semantics отслеживается #79.",
+        "Вводит именованную форму через локально интерпретируемое expression; не является L4-мутацией.",
     ),
     OperatorSpec(
         "=",
@@ -282,7 +288,7 @@ OPERATORS = (
         ValueKind.JUDGMENT,
         20,
         Associativity.NONE,
-        "Строит L2-суждение равенства. Полные substitutivity/congruence и связь с occurrence binding остаются experimental до #79.",
+        "Строит локальное identity/unification constraint; не создаёт глобальное связывание или rewrite-rule.",
     ),
     OperatorSpec(
         "!=",
@@ -291,7 +297,7 @@ OPERATORS = (
         ValueKind.JUDGMENT,
         20,
         Associativity.NONE,
-        "Строит L2-суждение различимости; его метасвойства не выводятся автоматически из глобальной модели `=`.",
+        "Строит суждение различимости как отрицание локального сопоставления.",
     ),
     OperatorSpec(
         "⟼",
@@ -300,7 +306,7 @@ OPERATORS = (
         ValueKind.FORM,
         40,
         Associativity.LEFT,
-        "Строит Link-form с упорядоченными позициями; правило congruence по `=` должно быть явно принято в #79.",
+        "Строит ordered LinkForm; interpret может использовать её как pattern и декомпозировать существующий LinkRef через poles().",
     ),
     OperatorSpec(
         "¬",
@@ -309,7 +315,7 @@ OPERATORS = (
         ValueKind.FORM,
         60,
         Associativity.PREFIX,
-        "Инвертирует форму; конкретная Link-инверсия задана accepted carrier rule.",
+        "Инвертирует форму.",
     ),
     OperatorSpec(
         "♀",
@@ -336,7 +342,7 @@ OPERATORS = (
         ValueKind.FORM,
         80,
         Associativity.CONTAINER,
-        "Круглая форма содержит ноль или одно L2 expression.",
+        "RoundForm сохраняет grouping в AST; grouping прозрачен для interpret.",
     ),
     OperatorSpec(
         "[...]",
@@ -345,7 +351,7 @@ OPERATORS = (
         ValueKind.FORM,
         80,
         Associativity.CONTAINER,
-        "Квадратная L2-форма; glyph [ ] не тождественны L3-абитам автоматически.",
+        "SquareForm L2; [] является anonymous occurrence, а [ ] не перегружаются context syntax и не тождественны L3-абитам автоматически.",
     ),
     OperatorSpec(
         "{...}",
@@ -354,7 +360,7 @@ OPERATORS = (
         ValueKind.BUNDLE,
         80,
         Associativity.CONTAINER,
-        "Пучковая форма содержит ноль или более L2 expressions.",
+        "BundleForm содержит ноль или более L2 expressions.",
         variadic=True,
     ),
 )
@@ -377,7 +383,7 @@ EXECUTION_OPERATIONS = (
         ValueKind.PROJECTION,
         False,
         False,
-        "Разбирает носитель без изменения апамяти.",
+        "Разбирает сериализационный носитель без изменения апамяти.",
     ),
     ExecutionOperationSpec(
         "project",
@@ -386,7 +392,16 @@ EXECUTION_OPERATIONS = (
         ValueKind.PROJECTION,
         False,
         False,
-        "Применяет явный контекст K без изменения апамяти.",
+        "Применяет явный L3 context K без изменения апамяти.",
+    ),
+    ExecutionOperationSpec(
+        "interpret",
+        Layer.EXECUTION,
+        ValueKind.EXPRESSION,
+        ValueKind.MEMORY_QUERY,
+        False,
+        False,
+        "Исполняет typed L2 expression относительно ContextFrame и MemoryView; возвращает substitutions/aliases/trace без materialization.",
     ),
     ExecutionOperationSpec(
         "find",
@@ -404,7 +419,7 @@ EXECUTION_OPERATIONS = (
         ValueKind.MEMORY_EFFECT,
         True,
         True,
-        "Явно материализует denotation либо получает существующую каноническую связь.",
+        "Явно материализует denotation либо возвращает существующую canonical Link.",
     ),
     ExecutionOperationSpec(
         "delete",
@@ -413,7 +428,7 @@ EXECUTION_OPERATIONS = (
         ValueKind.MEMORY_EFFECT,
         True,
         False,
-        "Явно удаляет материализованную структуру.",
+        "Явно удаляет materialized structure.",
     ),
 )
 
@@ -459,20 +474,26 @@ def validate_reference_model() -> tuple[str, ...]:
         errors.append("all execution operations must belong to L4")
 
     if operator(":").operands != (ValueKind.FORM, ValueKind.EXPRESSION):
-        errors.append("definition must accept Form × Expression in the canonical fixture")
+        errors.append("definition must accept Form × Expression")
     if not operator("{...}").variadic:
         errors.append("bundle container must accept a variadic expression list")
 
     if concept("issue-61-projection").status is not StatementStatus.EXPERIMENTAL:
-        errors.append("issue #61 protocol projection must remain experimental in v0.1")
-    if concept("equality-substitution-semantics").status is not StatementStatus.EXPERIMENTAL:
-        errors.append("full equality/substitution semantics must remain experimental until issue #79 is accepted")
-    if not any(item.issue == 79 for item in OPEN_QUESTIONS):
-        errors.append("reference model must expose equality occurrence blocker #79")
-    if any(item.name == "equality" and "bisimilar" in item.equation for item in SEMANTIC_RULES):
-        errors.append("global equality must not be hard-coded as bisimulation while #79 is open")
+        errors.append("issue #61 protocol projection must remain experimental")
+    if concept("equality-meaning").status is not StatementStatus.DEFINITION:
+        errors.append("contextual equality must be accepted in v0.2")
+    if any(item.issue == 79 for item in OPEN_QUESTIONS):
+        errors.append("v0.2 must not keep accepted issue #79 as an open blocker")
 
-    for name in ("decode", "project", "find"):
+    equality_denotation = operator("=").denotation
+    if "локаль" not in equality_denotation or "глобаль" not in equality_denotation:
+        errors.append("equality must distinguish local binding from global rewriting")
+
+    square_denotation = operator("[...]").denotation
+    if "не перегружаются context syntax" not in square_denotation:
+        errors.append("square brackets must remain independent from context pronouns")
+
+    for name in ("decode", "project", "interpret", "find"):
         operation = execution_operation(name)
         if operation.mutates_memory or operation.materializes_denotation:
             errors.append(f"{name} must be non-mutating and non-materializing")
@@ -481,8 +502,11 @@ def validate_reference_model() -> tuple[str, ...]:
     if not load.mutates_memory or load.materializes_denotation:
         errors.append("load may store raw carrier but must not materialize denotation")
 
-    if not execution_operation("realize").materializes_denotation:
-        errors.append("realize must be the explicit denotation-materializing operation")
+    materializing = [
+        item.name for item in EXECUTION_OPERATIONS if item.materializes_denotation
+    ]
+    if materializing != ["realize"]:
+        errors.append("realize must be the only denotation-materializing operation")
 
     return tuple(errors)
 

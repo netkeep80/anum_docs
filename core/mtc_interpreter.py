@@ -1,16 +1,16 @@
-"""Experimental read-only interpreter for contextual MTS notation v0.2.
+"""Canonical read-only interpreter for MTS formal notation v0.2.
 
-The candidate has three semantic primitives beyond the existing L2 operators:
+The interpreter keeps three semantic boundaries explicit:
 
 * each empty ``[]`` is an occurrence-local anonymous Link pattern;
 * atomic ``◁`` / ``▷`` select the two roles of a virtual ``ContextFrame``;
 * ``interpret`` resolves patterns against existing associative memory and returns
   local substitutions/aliases/trace without materializing anything.
 
-``↑`` is a separate context-ascent operator for parent frames; it is not part of
-pronoun identity and never overloads bracket syntax. Identity of anonymous forms
-comes from typed-AST paths, not labels or source spans. Parentheses remain in the
-AST for round-trip fidelity but are transparent to interpretation.
+``↑`` is a separate context-ascent operator for parent frames. Pronouns never
+reuse square brackets, so bracket tokenization remains context-free. Anonymous
+identity comes from typed-AST paths, not labels or source spans. Parentheses are
+retained by the parser for round-trip fidelity and are transparent to matching.
 """
 
 from dataclasses import dataclass, field
@@ -37,6 +37,8 @@ OccurrencePath: TypeAlias = tuple[int, ...]
 
 
 class MemoryView(Protocol):
+    """Read-only associative-memory surface required by L2 interpretation."""
+
     def poles(self, link: LinkRef) -> tuple[LinkRef, LinkRef]: ...
 
     def find_link(self, start: LinkRef, end: LinkRef) -> LinkRef | None: ...
@@ -91,6 +93,8 @@ class InterpretationError(ValueError):
 
 
 def resolve_context_pronoun(pronoun: ContextPronoun, frame: ContextFrame) -> LinkRef:
+    """Resolve one atomic context pronoun against current/ancestor frame."""
+
     anchor = frame
     for _ in range(pronoun.up):
         if anchor.parent is None:
@@ -109,6 +113,8 @@ def interpret_constraints(
     *,
     symbols: dict[str, LinkRef] | None = None,
 ) -> InterpretationResult:
+    """Interpret one L2 judgment/bundle without mutating associative memory."""
+
     state = InterpretationState(symbols=dict(symbols or {}))
     success = _interpret_expression(expression, (), frame, memory, state)
     return InterpretationResult(
@@ -159,7 +165,7 @@ def _interpret_expression(
         return True
 
     raise InterpretationError(
-        "Candidate interpreter пока исполняет только constraints, получено "
+        "Интерпретатор constraints ожидает equality/inequality/bundle, получено "
         f"{type(expression).__name__}"
     )
 
@@ -376,7 +382,7 @@ def _resolve_form(
         return found
 
     raise InterpretationError(
-        f"Candidate interpreter ещё не разрешает форму {type(form).__name__}"
+        f"Интерпретатор ещё не разрешает форму {type(form).__name__}"
     )
 
 

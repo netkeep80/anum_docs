@@ -1,8 +1,8 @@
-"""Tests for the typed canonical MTS root library."""
+"""Tests for the typed canonical MTS v0.2 root library."""
 
 from pathlib import Path
 
-from core.mtc_ast import Definition, Equality, Inequality, RoundForm
+from core.mtc_ast import Definition, RoundForm
 from core.reference_model import StatementStatus
 from core.root_library import FormulaKind, SQUARE_ABIT_FORMS, load_root_library
 from core.validate_root import validate_root_library
@@ -11,18 +11,33 @@ from core.validate_root import validate_root_library
 ROOT_FORMULAS = Path(__file__).with_name("mtc_formulas.mtc")
 
 
-def test_loads_all_root_formulas_as_typed_ast():
+CANONICAL_DEFINITIONS = {
+    "∞": "{◁ = ∞, ▷ = ∞}",
+    "()": "♀() ⟼ ()♂",
+    "([)": "(♀∞)",
+    "(])": "(∞♂)",
+    "(⟼)": "(♀∞ ⟼ ∞♂)",
+    "(↛)": "(∞♂ ⟼ ♀∞)",
+    "[1]": "(⟼)",
+    "[0]": "(↛)",
+    "(=)": "{♀◁ = ♀▷, ◁♂ = ▷♂}",
+    "(!=)": "¬(=)",
+}
+
+
+def test_loads_ten_root_formulas_as_typed_definitions():
     library = load_root_library(ROOT_FORMULAS)
 
-    assert len(library.formulas) == 34
+    assert len(library.formulas) == 10
     assert all(formula.ast is not None for formula in library.formulas)
     assert all(formula.is_valid for formula in library.formulas)
+    assert all(formula.kind is FormulaKind.DEFINITION for formula in library.formulas)
 
 
 def test_source_locations_are_preserved():
     first = load_root_library(ROOT_FORMULAS).formulas[0]
 
-    assert first.text == "∞ : [] = [] ⟼ []"
+    assert first.text == "∞ : {◁ = ∞, ▷ = ∞}"
     assert first.source_path.endswith("mtc_formulas.mtc")
     assert first.line_no > 0
     assert first.ast is not None
@@ -30,47 +45,30 @@ def test_source_locations_are_preserved():
     assert first.ast.span.end == len(first.text)
 
 
-def test_root_contains_current_key_formulas_only():
-    texts = set(load_root_library(ROOT_FORMULAS).texts())
+def test_root_contains_only_canonical_named_definitions():
+    library = load_root_library(ROOT_FORMULAS)
+    texts = set(library.texts())
 
-    assert "∞ : [] = [] ⟼ []" in texts
-    assert "() : ♀() ⟼ ()♂" in texts
-    assert "([) : (♀∞)" in texts
-    assert "(]) : (∞♂)" in texts
-    assert "(⟼) : (♀∞ ⟼ ∞♂)" in texts
-    assert "(↛) : (∞♂ ⟼ ♀∞)" in texts
-    assert "[1] : (⟼)" in texts
-    assert "[0] : (↛)" in texts
-    assert "♀[] : ♀[] = ♀[] ⟼ []" in texts
-    assert "[]♂ : []♂ = [] ⟼ []♂" in texts
-    assert "(=) : {♀[] = ♀[], []♂ = []♂}" in texts
-    assert "(!=) : ¬(=)" in texts
-    assert "{} != []" in texts
+    assert texts == {
+        f"{target} : {value}" for target, value in CANONICAL_DEFINITIONS.items()
+    }
 
-    retired_equality = "(=) : {" + "[]♀ = []♀, ♂[] = ♂[]}"
-    assert retired_equality not in texts
+    assert "[] = ∞" not in texts
+    assert "[][] = [] ⟼ []" not in texts
+    assert "{} != []" not in texts
 
 
-def test_difference_registry_is_built_only_from_definition_ast_nodes():
+def test_difference_registry_matches_canonical_definition_surface():
     registry = load_root_library(ROOT_FORMULAS).registry
 
-    for symbol in (
-        "∞",
-        "()",
-        "([)",
-        "(])",
-        "(⟼)",
-        "(↛)",
-        "[1]",
-        "[0]",
-        "♀[]",
-        "[]♂",
-        "(=)",
-        "(!=)",
-    ):
+    assert set(registry.symbols()) == set(CANONICAL_DEFINITIONS)
+    assert registry.duplicates() == []
+
+    for symbol, introduction in CANONICAL_DEFINITIONS.items():
         entry = registry.lookup(symbol)
         assert entry is not None
         assert entry.status is StatementStatus.DEFINITION
+        assert entry.introduction == introduction
         assert isinstance(entry.source_formula.ast, Definition)
 
 
@@ -82,23 +80,10 @@ def test_square_abit_forms_are_exactly_four_and_infinity_is_not_one():
     assert "∞" not in library.square_abits()
 
 
-def test_formula_kinds_come_from_top_level_ast_type():
+def test_every_top_level_root_formula_is_a_definition():
     library = load_root_library(ROOT_FORMULAS)
-    kinds = {formula.text: formula.kind for formula in library.formulas}
-    asts = {formula.text: formula.ast for formula in library.formulas}
-
-    assert kinds["∞ : [] = [] ⟼ []"] is FormulaKind.DEFINITION
-    assert kinds["[] = ∞"] is FormulaKind.EQUATION
-    assert kinds["(=) : {♀[] = ♀[], []♂ = []♂}"] is FormulaKind.DEFINITION
-    assert kinds["(!=) : ¬(=)"] is FormulaKind.DEFINITION
-    assert kinds["[][] : [] ⟼ []"] is FormulaKind.DEFINITION
-    assert kinds["[][] = [] ⟼ []"] is FormulaKind.EQUATION
-    assert kinds["{} != []"] is FormulaKind.NON_EQUATION
-    assert kinds["[][][] != []([][])"] is FormulaKind.NON_EQUATION
-
-    assert isinstance(asts["∞ : [] = [] ⟼ []"], Definition)
-    assert isinstance(asts["[] = ∞"], Equality)
-    assert isinstance(asts["{} != []"], Inequality)
+    assert {formula.kind for formula in library.formulas} == {FormulaKind.DEFINITION}
+    assert all(isinstance(formula.ast, Definition) for formula in library.formulas)
 
 
 def test_colon_inside_round_form_is_not_registered_as_top_level_definition(tmp_path):
@@ -130,7 +115,7 @@ def test_root_library_validates():
 def test_duplicate_definitions_are_reported(tmp_path):
     formula_path = tmp_path / "duplicate_defs.mtc"
     formula_path.write_text(
-        "∞ : [] = [] ⟼ []\n∞ : []\n",
+        "∞ : {◁ = ∞, ▷ = ∞}\n∞ : []\n",
         encoding="utf-8",
     )
 

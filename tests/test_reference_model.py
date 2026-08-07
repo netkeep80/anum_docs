@@ -1,4 +1,4 @@
-"""Conformance tests for the declarative MTS/Anum v0.1 reference model."""
+"""Conformance tests for the declarative MTS/Anum v0.2 reference model."""
 
 from core.reference_model import (
     CONCEPTS,
@@ -33,16 +33,31 @@ def test_accepted_l1_carrier_rules_are_finite_and_cyclic_without_unfolding():
     assert "finite directed graph" in equations["finite-cyclic-carrier"]
 
 
-def test_full_equality_substitution_semantics_remains_explicitly_experimental():
-    equality = concept("equality-substitution-semantics")
+def test_contextual_equality_is_accepted_and_issue_79_is_not_an_open_blocker():
+    equality = concept("equality-meaning")
     assert equality.layer is Layer.SEMANTICS
-    assert equality.status is StatementStatus.EXPERIMENTAL
-    assert any(item.issue == 79 for item in OPEN_QUESTIONS)
-    assert not any(
-        item.name == "equality" and "bisimilar" in item.equation
-        for item in SEMANTIC_RULES
+    assert equality.status is StatementStatus.DEFINITION
+    assert not any(item.issue == 79 for item in OPEN_QUESTIONS)
+
+    equations = {item.name: item.equation for item in SEMANTIC_RULES}
+    assert equations["contextual-equality"] == (
+        "eq(A, B) := start(A) = start(B) and end(A) = end(B)"
     )
-    assert "#79" in operator("=").denotation
+    assert "локаль" in operator("=").denotation
+    assert "глобаль" in operator("=").denotation
+
+
+def test_context_pronouns_and_anonymous_form_are_first_class_l2_concepts():
+    pronouns = concept("context-pronouns")
+    anonymous = concept("anonymous-form")
+
+    assert pronouns.layer is Layer.FORMAL_LANGUAGE
+    assert pronouns.status is StatementStatus.DEFINITION
+    assert "◁" in pronouns.description and "▷" in pronouns.description
+    assert "↑" in pronouns.description
+    assert anonymous.layer is Layer.FORMAL_LANGUAGE
+    assert "structural" in anonymous.description
+    assert "path" in anonymous.description
 
 
 def test_l2_operator_contract_separates_form_judgment_and_definition():
@@ -51,11 +66,15 @@ def test_l2_operator_contract_separates_form_judgment_and_definition():
     assert operator("!=").result.value == "judgment"
     assert operator(":").result.value == "definition"
     assert operator("⟼").associativity.value == "left"
+    assert "poles()" in operator("⟼").denotation
 
 
-def test_l2_square_form_does_not_claim_identity_with_l3_abits():
+def test_l2_square_form_does_not_claim_identity_with_l3_abits_or_context_pronouns():
     assert concept("abit").layer is Layer.SERIALIZATION
-    assert "L3" in operator("[...]").denotation
+    square = operator("[...]").denotation
+    assert "L3" in square
+    assert "context syntax" in square
+    assert "не перегруж" in square
 
 
 def test_issue_61_projection_remains_experimental():
@@ -64,8 +83,17 @@ def test_issue_61_projection_remains_experimental():
     assert projection.status is StatementStatus.EXPERIMENTAL
 
 
+def test_interpret_is_read_only_and_non_materializing():
+    operation = execution_operation("interpret")
+    assert operation.input_kind.value == "expression"
+    assert operation.result_kind.value == "memory-query"
+    assert operation.mutates_memory is False
+    assert operation.materializes_denotation is False
+    assert "ContextFrame" in operation.contract
+
+
 def test_read_operations_do_not_mutate_or_materialize_denotation():
-    for name in ("decode", "project", "find"):
+    for name in ("decode", "project", "interpret", "find"):
         operation = execution_operation(name)
         assert operation.mutates_memory is False
         assert operation.materializes_denotation is False
@@ -77,7 +105,7 @@ def test_load_stores_raw_without_materializing_denotation():
     assert load.materializes_denotation is False
 
 
-def test_realize_is_the_explicit_materializing_operation():
+def test_realize_is_the_only_explicit_materializing_operation():
     materializing = [
         item.name for item in EXECUTION_OPERATIONS if item.materializes_denotation
     ]

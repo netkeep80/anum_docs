@@ -2,6 +2,7 @@
 """Architecture contract for the canonical active repository surface."""
 
 import hashlib
+import json
 import re
 from pathlib import Path
 from urllib.parse import unquote
@@ -10,9 +11,10 @@ from core.validate_root import validate_root_library
 
 ROOT = Path(__file__).resolve().parents[1]
 ROOT_FIXTURE = ROOT / "tests/mtc_formulas.mtc"
+MTS_CONTRACT = ROOT / "contracts/mts-contract-v0.2.json"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md"}
 ACTIVE_SPECS = {
-    "Reference model МТС v0.1.md",
+    "Reference model МТС v0.2.md",
     "Формальная нотация МТС.md",
     "Ачисла и сериализация.md",
     "Протокол абитов ачисел.md",
@@ -25,7 +27,17 @@ ACTIVE_MARKDOWN = (
 )
 FORBIDDEN_DIRECTORIES = {"archive", "legacy", "old", "deprecated"}
 FORBIDDEN_PROTOCOL_FORMULAS = {"[ := ∞♀", "] := ♂∞", "[] := 0", "][ := 1"}
-ROOT_FORMULAS_SHA256 = "e47f160e18259ef37f1361be5fa5220fa1c6d83303bac27a278822de460b445b"
+FORBIDDEN_CANDIDATE_PATHS = {
+    "core/context_interpreter_candidate.py",
+    "tests/fixtures/mtc_root_v02_candidate.mtc",
+    "tests/fixtures/mts_contract_v02_candidate.json",
+    "tests/test_context_interpreter_candidate.py",
+    "tests/test_mts_contract_v02_candidate.py",
+    "tests/test_root_v02_candidate.py",
+    "tests/test_root_v02_execution_candidate.py",
+    "docs/specs/Reference model МТС v0.1.md",
+}
+ROOT_FORMULAS_SHA256 = "1ccfb6fa0ae3c744dffcdefefcf2d5d96108573f4b04fdd8ac45a2e15a98ee3a"
 
 
 def root_formula_text() -> str:
@@ -74,6 +86,27 @@ def test_root_fixture_is_exact_and_excludes_protocol_hypotheses():
     formula_text = root_formula_text()
     assert hashlib.sha256(formula_text.encode("utf-8")).hexdigest() == ROOT_FORMULAS_SHA256
     assert all(formula not in formula_text for formula in FORBIDDEN_PROTOCOL_FORMULAS)
+    assert len([line for line in formula_text.splitlines() if line]) == 10
+
+
+def test_v02_machine_contract_is_single_active_formal_contract():
+    assert MTS_CONTRACT.is_file()
+    contract = json.loads(MTS_CONTRACT.read_text(encoding="utf-8"))
+    assert contract["schema"] == "mts-contract/v0.2"
+    assert contract["status"] == "accepted"
+    assert contract["rootProgram"] == "tests/mtc_formulas.mtc"
+    assert contract["formalNotation"]["context"]["atomicPronouns"] is True
+    assert contract["formalNotation"]["context"]["bracketOverloading"] is False
+
+    contract_files = sorted((ROOT / "contracts").glob("mts-contract-*.json"))
+    assert contract_files == [MTS_CONTRACT]
+
+
+def test_candidate_runtime_fixture_and_reference_paths_are_removed_after_promotion():
+    leftovers = [path for path in FORBIDDEN_CANDIDATE_PATHS if (ROOT / path).exists()]
+    assert leftovers == []
+    assert (ROOT / "core/mtc_interpreter.py").is_file()
+    assert (ROOT / "tests/test_mtc_interpreter.py").is_file()
 
 
 def test_anum_protocol_has_one_active_projection_and_quote_path():

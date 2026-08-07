@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from core.context_interpreter_candidate import ContextFrame, MemoryView, interpret_constraints
+from core.mtc_interpreter import ContextFrame, MemoryView, interpret_constraints
 from core.mtc_ast import LinkForm, RoundForm, SquareForm, structural_key
 from core.mtc_parser import parse_formula
 

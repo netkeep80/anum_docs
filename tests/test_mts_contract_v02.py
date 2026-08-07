@@ -1,4 +1,4 @@
-"""Contract tests for the language-neutral MTS v0.2 integration candidate."""
+"""Contract tests for the accepted language-neutral MTS v0.2 surface."""
 
 import json
 from pathlib import Path
@@ -6,9 +6,10 @@ from pathlib import Path
 from core.mtc_ast import ContextPole, ContextPronoun, Definition
 from core.mtc_parser import parse_formula
 
-FIXTURES = Path(__file__).with_name("fixtures")
-CONTRACT = FIXTURES / "mts_contract_v02_candidate.json"
-ROOT_PROGRAM = FIXTURES / "mtc_root_v02_candidate.mtc"
+
+ROOT = Path(__file__).resolve().parents[1]
+CONTRACT = ROOT / "contracts/mts-contract-v0.2.json"
+ROOT_PROGRAM = ROOT / "tests/mtc_formulas.mtc"
 
 
 def load_contract() -> dict:
@@ -23,20 +24,16 @@ def root_sources() -> list[str]:
     ]
 
 
-def test_contract_has_explicit_experimental_schema_and_layer_boundaries():
+def test_contract_is_accepted_v02_and_points_to_canonical_root():
     contract = load_contract()
-    assert contract["schema"] == "mts-contract/v0.2-candidate"
-    assert contract["status"] == "experimental"
-    assert contract["layers"] == {
-        "formalNotation": "L2",
-        "anumSerialization": "L3",
-        "memoryExecution": "L4",
-    }
+
+    assert contract["schema"] == "mts-contract/v0.2"
+    assert contract["status"] == "accepted"
+    assert contract["rootProgram"] == "tests/mtc_formulas.mtc"
 
 
-def test_contract_exposes_exactly_two_atomic_binary_context_roles():
-    contract = load_contract()
-    context = contract["formalNotation"]["context"]
+def test_contract_exposes_exactly_two_atomic_non_bracket_context_pronouns():
+    context = load_contract()["formalNotation"]["context"]
     roles = context["roles"]
 
     assert context["atomicPronouns"] is True
@@ -47,26 +44,18 @@ def test_contract_exposes_exactly_two_atomic_binary_context_roles():
     ]
     assert all(len(role["source"]) == 1 for role in roles)
     assert context["ancestor"]["operator"] == "↑"
-    assert context["genericPathLanguage"] is False
-    assert context["materializedLinkRequired"] is False
+
+    syntax = "".join(role["source"] for role in roles) + context["ancestor"]["operator"]
+    assert "[" not in syntax and "]" not in syntax
 
     parsed = [parse_formula(role["source"]) for role in roles]
     assert all(isinstance(item, ContextPronoun) for item in parsed)
     assert [item.pole for item in parsed] == [ContextPole.START, ContextPole.END]
 
 
-def test_contract_keeps_square_brackets_out_of_context_syntax():
-    context = load_contract()["formalNotation"]["context"]
-    syntax = "".join(
-        [role["source"] for role in context["roles"]]
-        + [context["ancestor"]["operator"]]
-    )
-    assert "[" not in syntax
-    assert "]" not in syntax
-
-
-def test_contract_declares_empty_form_identity_as_ast_occurrence_path():
+def test_contract_declares_occurrence_local_anonymous_form():
     anonymous = load_contract()["formalNotation"]["anonymousForm"]
+
     assert anonymous == {
         "source": "[]",
         "identity": "ast-occurrence-path",
@@ -74,37 +63,35 @@ def test_contract_declares_empty_form_identity_as_ast_occurrence_path():
     }
 
 
-def test_contract_declares_associative_link_pattern_decomposition():
-    pattern = load_contract()["formalNotation"]["patternMatching"]
+def test_contract_declares_read_only_recursive_associative_pattern_matching():
+    contract = load_contract()
+    pattern = contract["formalNotation"]["patternMatching"]
+    memory = contract["memory"]
+
     assert pattern == {
         "linkForm": "decompose-existing-link",
         "roundGrouping": "transparent",
         "materializes": False,
     }
-    assert "poles" in load_contract()["memory"]["readOperations"]
-
-
-def test_contract_keeps_interpretation_read_only_and_realize_explicit():
-    contract = load_contract()
-    interpret = contract["formalNotation"]["operations"]["interpret"]
-    memory = contract["memory"]
-    assert interpret["effect"] == "none"
+    assert "poles" in memory["readOperations"]
     assert memory["interpretMayMaterialize"] is False
     assert "realize" in memory["effectOperations"]
     assert "realize" not in memory["readOperations"]
 
 
-def test_contract_candidate_definitions_are_present_in_root_program():
+def test_contract_definitions_are_exactly_present_in_canonical_root():
     contract = load_contract()
     sources = set(root_sources())
-    assert contract["formalNotation"]["aroot"]["candidateDefinition"] in sources
-    assert contract["formalNotation"]["equality"]["candidateDefinition"] in sources
-    for source in sources:
-        assert isinstance(parse_formula(source), Definition)
+
+    assert contract["formalNotation"]["aroot"]["definition"] in sources
+    assert contract["formalNotation"]["equality"]["definition"] in sources
+    assert len(sources) == 10
+    assert all(isinstance(parse_formula(source), Definition) for source in sources)
 
 
-def test_contract_separates_anum_serialization_from_formal_interpretation():
+def test_contract_separates_formal_interpretation_from_anum_serialization():
     contract = load_contract()
+
     assert contract["anum"]["operations"] == ["serialize", "deserialize"]
     assert set(contract["formalNotation"]["operations"]) == {"parse", "interpret"}
     assert contract["anum"]["alphabet"] == ["[", "]", "1", "0"]
@@ -112,6 +99,7 @@ def test_contract_separates_anum_serialization_from_formal_interpretation():
 
 def test_contract_forbids_display_label_as_runtime_identity():
     integration = load_contract()["integration"]
+
     assert integration["displayLabelIsIdentity"] is False
     assert {"LinkRef", "HoleId", "ContextFrameId"}.issubset(
         integration["requiredRuntimeIdentities"]

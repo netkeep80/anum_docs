@@ -1,6 +1,6 @@
 {
-  "schema": "mts-contract/v0.2-candidate",
-  "status": "experimental",
+  "schema": "mts-contract/v0.2",
+  "status": "accepted",
   "layers": {
     "formalNotation": "L2",
     "anumSerialization": "L3",
@@ -50,10 +50,10 @@
     "equality": {
       "execution": "local-unification",
       "globalRewrite": false,
-      "candidateDefinition": "(=) : {♀◁ = ♀▷, ◁♂ = ▷♂}"
+      "definition": "(=) : {♀◁ = ♀▷, ◁♂ = ▷♂}"
     },
     "aroot": {
-      "candidateDefinition": "∞ : {◁ = ∞, ▷ = ∞}"
+      "definition": "∞ : {◁ = ∞, ▷ = ∞}"
     }
   },
   "anum": {
@@ -71,7 +71,7 @@
     "effectOperations": ["realize", "delete"],
     "interpretMayMaterialize": false
   },
-  "rootProgram": "tests/fixtures/mtc_root_v02_candidate.mtc",
+  "rootProgram": "tests/mtc_formulas.mtc",
   "integration": {
     "displayLabelIsIdentity": false,
     "requiredRuntimeIdentities": [
