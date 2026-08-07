@@ -1,4 +1,4 @@
-"""Challenge tests for the two binary contextual pronouns of MTS v0.2."""
+"""Challenge tests for the two atomic contextual pronouns of MTS v0.2."""
 
 import pytest
 
@@ -14,22 +14,24 @@ from core.mtc_ast import (
     format_expression,
     structural_key,
 )
-from core.mtc_parser import MTCParseError, parse_formula
+from core.mtc_parser import MTCParseError, TokenKind, parse_formula, tokenize
 
 
-def test_current_context_has_exactly_two_primitive_pronouns():
-    start = parse_formula("$[")
-    end = parse_formula("$]")
+def test_current_context_has_exactly_two_primitive_one_character_pronouns():
+    start = parse_formula("◁")
+    end = parse_formula("▷")
 
     assert isinstance(start, ContextPronoun)
     assert isinstance(end, ContextPronoun)
     assert start.up == 0 and start.pole is ContextPole.START
     assert end.up == 0 and end.pole is ContextPole.END
+    assert len(ContextPole.START.value) == 1
+    assert len(ContextPole.END.value) == 1
 
 
-def test_repeated_dollar_moves_to_ancestor_context_like_jsonrvm():
-    parent_start = parse_formula("$$[")
-    grandparent_end = parse_formula("$$$]")
+def test_context_ascent_is_separate_from_pronoun_identity():
+    parent_start = parse_formula("↑◁")
+    grandparent_end = parse_formula("↑↑▷")
 
     assert isinstance(parent_start, ContextPronoun)
     assert isinstance(grandparent_end, ContextPronoun)
@@ -39,11 +41,18 @@ def test_repeated_dollar_moves_to_ancestor_context_like_jsonrvm():
     assert grandparent_end.pole is ContextPole.END
 
 
+def test_context_ascent_is_whitespace_insensitive_but_prints_canonically():
+    parsed = parse_formula("↑ ↑  ◁")
+    assert isinstance(parsed, ContextPronoun)
+    assert parsed.up == 2
+    assert format_expression(parsed) == "↑↑◁"
+
+
 def test_deeper_structure_uses_existing_mts_projection_operators():
-    first_start = parse_formula("♀$[")
-    first_end = parse_formula("$[♂")
-    second_start = parse_formula("♀$]")
-    second_end = parse_formula("$]♂")
+    first_start = parse_formula("♀◁")
+    first_end = parse_formula("◁♂")
+    second_start = parse_formula("♀▷")
+    second_end = parse_formula("▷♂")
 
     assert isinstance(first_start, StartProjection)
     assert isinstance(first_start.value, ContextPronoun)
@@ -62,23 +71,46 @@ def test_deeper_structure_uses_existing_mts_projection_operators():
     assert second_end.value.pole is ContextPole.END
 
 
-def test_general_context_path_language_is_not_part_of_candidate():
-    # `$[[` is parsed as `$[` followed by a normal L2 square form start and
-    # therefore cannot silently become a special context-path primitive.
-    with pytest.raises(MTCParseError):
-        parse_formula("$[[")
+def test_square_brackets_are_lexed_independently_of_context_pronouns():
+    tokens = tokenize("◁[]▷")
+    assert [token.kind for token in tokens[:-1]] == [
+        TokenKind.CONTEXT_START,
+        TokenKind.LBRACKET,
+        TokenKind.RBRACKET,
+        TokenKind.CONTEXT_END,
+    ]
+    assert [token.value for token in tokens[:-1]] == ["◁", "[", "]", "▷"]
 
-    with pytest.raises(MTCParseError):
-        parse_formula("$][")
+
+def test_bracket_scanner_never_needs_pronoun_lookbehind():
+    plain = tokenize("[][]")
+    surrounded = tokenize("◁[][]▷")
+
+    assert [token.kind for token in plain[:-1]] == [
+        TokenKind.LBRACKET,
+        TokenKind.RBRACKET,
+        TokenKind.LBRACKET,
+        TokenKind.RBRACKET,
+    ]
+    assert [
+        token.kind
+        for token in surrounded[:-1]
+        if token.kind in (TokenKind.LBRACKET, TokenKind.RBRACKET)
+    ] == [
+        TokenKind.LBRACKET,
+        TokenKind.RBRACKET,
+        TokenKind.LBRACKET,
+        TokenKind.RBRACKET,
+    ]
 
 
-def test_bare_context_anchor_is_rejected():
-    with pytest.raises(MTCParseError, match="контекстных местоимений"):
-        parse_formula("$")
+def test_bare_context_ascent_is_rejected():
+    with pytest.raises(MTCParseError, match="местоимение `◁` или `▷`"):
+        parse_formula("↑")
 
 
 def test_equality_meaning_uses_only_two_context_pronouns_and_existing_mts_forms():
-    source = "(=) : {♀$[ = ♀$], $[♂ = $]♂}"
+    source = "(=) : {♀◁ = ♀▷, ◁♂ = ▷♂}"
     ast = parse_formula(source)
 
     assert isinstance(ast, Definition)
@@ -91,7 +123,6 @@ def test_equality_meaning_uses_only_two_context_pronouns_and_existing_mts_forms(
     ends = ast.value.items[1]
     assert isinstance(starts, Equality)
     assert isinstance(ends, Equality)
-
     assert isinstance(starts.left, StartProjection)
     assert isinstance(starts.right, StartProjection)
     assert isinstance(ends.left, EndProjection)
@@ -99,7 +130,7 @@ def test_equality_meaning_uses_only_two_context_pronouns_and_existing_mts_forms(
 
 
 def test_context_pronoun_round_trip_is_structural():
-    for source in ("$[", "$]", "$$[", "$$]", "$$$[", "♀$[", "$]♂"):
+    for source in ("◁", "▷", "↑◁", "↑▷", "↑↑◁", "♀◁", "▷♂"):
         original = parse_formula(source)
         canonical = format_expression(original)
         reparsed = parse_formula(canonical)
