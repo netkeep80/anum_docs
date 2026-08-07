@@ -48,7 +48,7 @@ def test_old_empty_equals_root_statement_is_local_binding_not_global_rewrite():
     assert tuple(value for _, value in first.holes) == (1,)
 
     second = interpret_constraints(
-        parse_formula("[] = $["),
+        parse_formula("[] = ◁"),
         ContextFrame(start=2, end=3),
         memory(),
     )
@@ -70,12 +70,12 @@ def test_two_empty_glyphs_are_two_occurrences_before_any_binding():
 
 def test_semantic_occurrence_ids_do_not_depend_on_source_offsets_or_whitespace():
     compact = interpret_constraints(
-        parse_formula("{[]=$[,[]=$]}"),
+        parse_formula("{[]=◁,[]=▷}"),
         ContextFrame(start=2, end=3),
         memory(),
     )
     spaced = interpret_constraints(
-        parse_formula("{  [] = $[ ,   [] = $]  }"),
+        parse_formula("{  [] = ◁ ,   [] = ▷  }"),
         ContextFrame(start=2, end=3),
         memory(),
     )
