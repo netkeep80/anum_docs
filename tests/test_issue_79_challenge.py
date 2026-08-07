@@ -2,11 +2,8 @@
 
 from dataclasses import dataclass
 
-import pytest
-
 from core.context_interpreter_candidate import (
     ContextFrame,
-    InterpretationError,
     MemoryView,
     interpret_constraints,
 )
@@ -17,6 +14,9 @@ from core.mtc_parser import parse_formula
 @dataclass
 class ChallengeMemory(MemoryView):
     links: dict[int, tuple[int, int]]
+
+    def poles(self, link: int) -> tuple[int, int]:
+        return self.links[link]
 
     def find_link(self, start: int, end: int) -> int | None:
         for link, poles in self.links.items():
@@ -115,14 +115,43 @@ def test_left_and_right_association_remain_structurally_distinct_queries():
     assert structural_key(left) != structural_key(right)
 
 
-def test_unbound_anonymous_poles_are_not_silently_materialized_to_resolve_link():
-    with pytest.raises(InterpretationError, match="анонимной формы"):
-        interpret_constraints(
-            parse_formula("10 = [] ⟼ []"),
-            ContextFrame(start=2, end=3),
-            memory(),
-            symbols={"10": 10},
-        )
+def test_existing_link_can_be_decomposed_directly_into_two_anonymous_substitutions():
+    result = interpret_constraints(
+        parse_formula("10 = [] ⟼ []"),
+        ContextFrame(start=2, end=3),
+        memory(),
+        symbols={"10": 10},
+    )
+
+    assert result.success
+    assert tuple(value for _, value in result.holes) == (2, 3)
+    assert "decompose:10->2,3" in result.trace
+
+
+def test_nested_link_pattern_can_decompose_associative_memory_without_realize():
+    store = ChallengeMemory(
+        {
+            1: (1, 1),
+            2: (2, 2),
+            3: (3, 3),
+            10: (2, 3),
+            20: (10, 1),
+        }
+    )
+    before = dict(store.links)
+
+    result = interpret_constraints(
+        parse_formula("20 = ([] ⟼ []) ⟼ []"),
+        ContextFrame(start=2, end=3),
+        store,
+        symbols={"20": 20},
+    )
+
+    assert result.success
+    assert tuple(value for _, value in result.holes) == (2, 3, 1)
+    assert "decompose:20->10,1" in result.trace
+    assert "decompose:10->2,3" in result.trace
+    assert store.links == before
 
 
 def test_explicit_grounded_link_query_can_resolve_without_mutation():
