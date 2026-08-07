@@ -6,6 +6,7 @@ import pytest
 
 from core.mtc_ast import (
     BundleForm,
+    ContextPronoun,
     Definition,
     EndProjection,
     Equality,
@@ -34,25 +35,28 @@ def fixture_formulas() -> list[str]:
     ]
 
 
-def test_root_fixture_has_34_typed_formulas():
+def test_root_fixture_has_ten_typed_definitions():
     formulas = fixture_formulas()
-    assert len(formulas) == 34
-    assert all(parse_formula_result(formula).is_valid for formula in formulas)
+    assert len(formulas) == 10
+    results = [parse_formula_result(formula) for formula in formulas]
+    assert all(result.is_valid for result in results)
+    assert all(isinstance(result.ast, Definition) for result in results)
 
 
-def test_definition_rhs_can_be_a_judgment():
-    ast = parse_formula("∞ : [] = [] ⟼ []")
+def test_aroot_definition_rhs_is_contextual_constraint_bundle():
+    ast = parse_formula("∞ : {◁ = ∞, ▷ = ∞}")
 
     assert isinstance(ast, Definition)
     assert isinstance(ast.target, Symbol)
     assert ast.target.name == "∞"
-    assert isinstance(ast.value, Equality)
-    assert isinstance(ast.value.left, SquareForm)
-    assert isinstance(ast.value.right, LinkForm)
+    assert isinstance(ast.value, BundleForm)
+    assert len(ast.value.items) == 2
+    assert all(isinstance(item, Equality) for item in ast.value.items)
+    assert all(isinstance(item.left, ContextPronoun) for item in ast.value.items)
 
 
 def test_equality_definition_bundle_contains_typed_judgments():
-    ast = parse_formula("(=) : {♀[] = ♀[], []♂ = []♂}")
+    ast = parse_formula("(=) : {♀◁ = ♀▷, ◁♂ = ▷♂}")
 
     assert isinstance(ast, Definition)
     assert isinstance(ast.target, RoundForm)
@@ -116,7 +120,7 @@ def test_juxtaposition_builds_sequence_without_string_reinterpretation():
     assert isinstance(ast.items[1].content, Sequence)
 
 
-def test_bundle_expansion_keeps_link_items_typed():
+def test_bundle_expansion_keeps_link_items_typed_as_parser_conformance():
     ast = parse_formula("[]{[], [][]} = {[] ⟼ [], [] ⟼ [][]}")
 
     assert isinstance(ast, Equality)
@@ -143,6 +147,17 @@ def test_tokenizer_recognizes_multi_character_not_equal_before_single_tokens():
     tokens = tokenize("[] != {}")
     significant = [token for token in tokens if token.kind is not TokenKind.EOF]
     assert [token.value for token in significant] == ["[", "]", "!=", "{", "}"]
+
+
+def test_context_pronouns_are_atomic_and_brackets_remain_independent_tokens():
+    tokens = tokenize("◁[]▷")
+    significant = [token for token in tokens if token.kind is not TokenKind.EOF]
+    assert [token.kind for token in significant] == [
+        TokenKind.CONTEXT_START,
+        TokenKind.LBRACKET,
+        TokenKind.RBRACKET,
+        TokenKind.CONTEXT_END,
+    ]
 
 
 def test_nested_definition_is_not_a_top_level_definition_node():
