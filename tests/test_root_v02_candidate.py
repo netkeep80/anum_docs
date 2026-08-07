@@ -101,8 +101,6 @@ def test_candidate_root_targets_are_unique():
 
 
 def test_candidate_root_contains_no_anonymous_empty_holes():
-    # `[]` is a query-time anonymous form in C3. The closed root program itself
-    # therefore must not depend on accidental anonymous occurrences.
     anonymous = [
         node
         for ast in candidate_asts()
@@ -136,7 +134,7 @@ def test_aroot_definition_is_contextual_self_closure_not_empty_form_rewrite():
         assert isinstance(item.right, Form)
 
 
-def test_equality_definition_uses_only_context_pronouns_for_operand_identity():
+def test_equality_definition_uses_only_atomic_context_pronouns_for_operand_identity():
     definition = candidate_asts()[-2]
     assert isinstance(definition, Definition)
     assert isinstance(definition.value, BundleForm)
@@ -147,8 +145,17 @@ def test_equality_definition_uses_only_context_pronouns_for_operand_identity():
         if isinstance(node, ContextPronoun)
     ]
     assert len(pronouns) == 4
-    assert {pronoun.pole.value for pronoun in pronouns} == {"[", "]"}
+    assert {pronoun.pole.value for pronoun in pronouns} == {"◁", "▷"}
+    assert all(len(pronoun.pole.value) == 1 for pronoun in pronouns)
     assert all(pronoun.up == 0 for pronoun in pronouns)
+
+
+def test_context_pronouns_do_not_consume_square_bracket_syntax():
+    text = "\n".join(candidate_formulas())
+    assert "$[" not in text
+    assert "$]" not in text
+    assert "◁" in text
+    assert "▷" in text
 
 
 def test_old_global_empty_equals_root_axiom_is_not_in_candidate():
