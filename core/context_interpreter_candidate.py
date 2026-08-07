@@ -12,6 +12,10 @@ are the only primitive contextual pronouns: first/start and second/end roles of
 the current frame. A frame itself does not have to be materialized as a Link in
 memory, so interpreting ``A = B`` never needs to create the auxiliary link
 ``A ⟼ B`` first.
+
+Anonymous identity is derived from the typed AST position, never from display
+text, source offsets or Python object identity. Source spans remain diagnostics
+only and therefore whitespace/reformatting cannot change semantic occurrence ID.
 """
 
 from dataclasses import dataclass, field
@@ -34,6 +38,7 @@ from core.mtc_ast import (
 
 
 LinkRef: TypeAlias = int
+OccurrencePath: TypeAlias = tuple[int, ...]
 
 
 class MemoryView(Protocol):
@@ -66,10 +71,9 @@ class ContextFrame:
 
 @dataclass(frozen=True, order=True)
 class HoleId:
-    """Identity of one anonymous ``[]`` AST occurrence inside one source."""
+    """Semantic identity of one anonymous ``[]`` typed-AST occurrence."""
 
-    start: int
-    end: int
+    path: OccurrencePath
 
 
 @dataclass
@@ -130,7 +134,7 @@ def interpret_constraints(
     """Resolve one judgment/bundle and return local substitutions and trace."""
 
     state = InterpretationState(symbols=dict(symbols or {}))
-    success = _interpret_expression(expression, frame, memory, state)
+    success = _interpret_expression(expression, (), frame, memory, state)
     return InterpretationResult(
         success=success,
         holes=tuple(sorted(_grounded_holes(state).items())),
@@ -141,23 +145,40 @@ def interpret_constraints(
 
 def _interpret_expression(
     expression: Expression,
+    path: OccurrencePath,
     frame: ContextFrame,
     memory: MemoryView,
     state: InterpretationState,
 ) -> bool:
     if isinstance(expression, Equality):
         state.trace.append("equality")
-        return _unify_forms(expression.left, expression.right, frame, memory, state)
+        return _unify_forms(
+            expression.left,
+            path + (0,),
+            expression.right,
+            path + (1,),
+            frame,
+            memory,
+            state,
+        )
 
     if isinstance(expression, Inequality):
         state.trace.append("inequality")
         trial = state.clone()
-        return not _unify_forms(expression.left, expression.right, frame, memory, trial)
+        return not _unify_forms(
+            expression.left,
+            path + (0,),
+            expression.right,
+            path + (1,),
+            frame,
+            memory,
+            trial,
+        )
 
     if isinstance(expression, BundleForm):
         state.trace.append(f"bundle:{len(expression.items)}")
-        for item in expression.items:
-            if not _interpret_expression(item, frame, memory, state):
+        for index, item in enumerate(expression.items):
+            if not _interpret_expression(item, path + (index,), frame, memory, state):
                 return False
         return True
 
@@ -169,13 +190,15 @@ def _interpret_expression(
 
 def _unify_forms(
     left: Form,
+    left_path: OccurrencePath,
     right: Form,
+    right_path: OccurrencePath,
     frame: ContextFrame,
     memory: MemoryView,
     state: InterpretationState,
 ) -> bool:
-    left_value = _resolve_form(left, frame, memory, state)
-    right_value = _resolve_form(right, frame, memory, state)
+    left_value = _resolve_form(left, left_path, frame, memory, state)
+    right_value = _resolve_form(right, right_path, frame, memory, state)
 
     if isinstance(left_value, HoleId) and isinstance(right_value, HoleId):
         return _union_holes(left_value, right_value, state)
@@ -188,6 +211,7 @@ def _unify_forms(
 
 def _resolve_form(
     form: Form,
+    path: OccurrencePath,
     frame: ContextFrame,
     memory: MemoryView,
     state: InterpretationState,
@@ -198,7 +222,7 @@ def _resolve_form(
         return resolved
 
     if isinstance(form, SquareForm) and form.content is None:
-        hole = HoleId(form.span.start, form.span.end)
+        hole = HoleId(path)
         root = _find_hole_root(hole, state)
         bound = state.holes.get(root)
         return bound if bound is not None else root
@@ -213,7 +237,7 @@ def _resolve_form(
 
     if isinstance(form, StartProjection):
         value = _require_resolved_link(
-            _resolve_form(form.value, frame, memory, state),
+            _resolve_form(form.value, path + (0,), frame, memory, state),
             "♀",
         )
         projected = memory.find_start_projection(value)
@@ -226,7 +250,7 @@ def _resolve_form(
 
     if isinstance(form, EndProjection):
         value = _require_resolved_link(
-            _resolve_form(form.value, frame, memory, state),
+            _resolve_form(form.value, path + (0,), frame, memory, state),
             "♂",
         )
         projected = memory.find_end_projection(value)
@@ -239,11 +263,11 @@ def _resolve_form(
 
     if isinstance(form, LinkForm):
         left = _require_resolved_link(
-            _resolve_form(form.left, frame, memory, state),
+            _resolve_form(form.left, path + (0,), frame, memory, state),
             "левый полюс ⟼",
         )
         right = _require_resolved_link(
-            _resolve_form(form.right, frame, memory, state),
+            _resolve_form(form.right, path + (1,), frame, memory, state),
             "правый полюс ⟼",
         )
         found = memory.find_link(left, right)
