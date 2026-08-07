@@ -1,22 +1,20 @@
-# -*- coding: utf-8 -*-
-"""
-Загрузка корневой библиотеки формул МТС из ``.mtc``.
+"""Load the canonical ``.mtc`` root library through the typed L2 parser."""
 
-Этот модуль удерживает архитектуру, где формулы МТС первичны, а Python только
-читает носитель, сохраняет source locations и строит диагностический реестр
-различий.
-"""
-
-import enum
 from dataclasses import dataclass
-from typing import List
+from enum import Enum
+from pathlib import Path
 
-from core.layers import INFINITY_SYMBOL, SQUARE_ABIT_SYMBOLS, Layer
-from core.mtc_reader import MTCReadResult, find_top_level_operators, read_formula
+from core.mtc_ast import Definition, Equality, Expression, Inequality, format_expression
+from core.mtc_parser import ParseDiagnostic, parse_formula, parse_formula_result
+from core.reference_model import StatementStatus
 
 
-class FormulaKind(enum.Enum):
-    """Минимальная классификация корневой формулы по top-level операторам."""
+INFINITY_SYMBOL = "∞"
+SQUARE_ABIT_FORMS = ("([)", "(])", "[1]", "[0]")
+
+
+class FormulaKind(Enum):
+    """Syntactic top-level category of one root-library expression."""
 
     DEFINITION = "definition"
     EQUATION = "equation"
@@ -24,139 +22,127 @@ class FormulaKind(enum.Enum):
     EXPRESSION = "expression"
 
 
-ROOT_SYMBOL_LAYERS = {
-    '∞': Layer.FORMAL_FORM,
-    '[]': Layer.SINGLE_CONNECTION_FORM,
-    '()': Layer.FORMAL_FORM,
-    '([)': Layer.FORMAL_FORM,
-    '(])': Layer.FORMAL_FORM,
-    '(⟼)': Layer.CONNECTION_MEANING,
-    '(↛)': Layer.CONNECTION_MEANING,
-    '[1]': Layer.QUATERNARY_SERIALIZATION,
-    '[0]': Layer.QUATERNARY_SERIALIZATION,
-    # Начало и конец формы связи в актуальной ориентации (♀F — начало, F♂ — конец).
-    # Старая ориентация []♀ / ♂[] больше не является активным корневым символом.
-    '♀[]': Layer.SINGLE_CONNECTION_FORM,
-    '[]♂': Layer.SINGLE_CONNECTION_FORM,
-    '(=)': Layer.FORMAL_FORM,
-    '(!=)': Layer.FORMAL_FORM,
-}
-
-
 @dataclass(frozen=True)
 class RootFormula:
-    """Одна формула корневой библиотеки с позицией в источнике."""
+    """One root formula together with source location and its typed AST."""
 
     text: str
     source_path: str
     line_no: int
-    read_result: MTCReadResult
+    ast: Expression | None
+    diagnostics: tuple[ParseDiagnostic, ...]
     kind: FormulaKind
+
+    @property
+    def is_valid(self) -> bool:
+        return self.ast is not None and not self.diagnostics
 
 
 @dataclass(frozen=True)
 class DifferenceEntry:
-    """Различие, введённое формулой вида ``A : F``."""
+    """Difference introduced by a top-level ``target : expression``."""
 
     symbol: str
     introduction: str
-    layer: Layer
-    status: str
+    status: StatementStatus
     source_formula: RootFormula
 
 
-class DifferenceRegistry(object):
-    """Реестр различий, построенный из формул корневой библиотеки."""
+class DifferenceRegistry:
+    """Registry built only from typed top-level ``Definition`` nodes."""
 
     def __init__(self):
-        self._entries = {}
-        self._duplicates = []
+        self._entries: dict[str, DifferenceEntry] = {}
+        self._duplicates: list[
+            tuple[str, DifferenceEntry, DifferenceEntry]
+        ] = []
 
-    def register(self, entry):
+    def register(self, entry: DifferenceEntry) -> None:
         existing = self._entries.get(entry.symbol)
         if existing is not None:
             self._duplicates.append((entry.symbol, existing, entry))
             return
         self._entries[entry.symbol] = entry
 
-    def lookup(self, symbol):
+    def lookup(self, symbol: str) -> DifferenceEntry | None:
         return self._entries.get(symbol)
 
-    def symbols(self):
-        return list(self._entries.keys())
+    def symbols(self) -> list[str]:
+        return list(self._entries)
 
-    def entries(self):
+    def entries(self) -> list[DifferenceEntry]:
         return list(self._entries.values())
 
-    def duplicates(self):
+    def duplicates(self) -> list[tuple[str, DifferenceEntry, DifferenceEntry]]:
         return list(self._duplicates)
 
 
 @dataclass(frozen=True)
 class RootLibrary:
-    """Загруженная корневая библиотека формул."""
+    """Loaded canonical root-library surface."""
 
-    formulas: List[RootFormula]
+    formulas: tuple[RootFormula, ...]
     registry: DifferenceRegistry
 
-    def texts(self):
+    def texts(self) -> list[str]:
         return [formula.text for formula in self.formulas]
 
-    def square_abits(self):
-        """Вернуть квадратные абиты, которые реально введены в .mtc."""
+    def square_abits(self) -> list[str]:
+        """Return the four L2 forms that introduce square abits."""
 
         return [
-            symbol for symbol in SQUARE_ABIT_SYMBOLS
+            symbol
+            for symbol in SQUARE_ABIT_FORMS
             if self.registry.lookup(symbol) is not None
         ]
 
 
-def load_root_library(path):
-    """Загрузить ``.mtc``-файл как одновременно решаемую библиотеку формул."""
+def load_root_library(path: str | Path) -> RootLibrary:
+    """Load all non-comment lines through the single typed L2 parser path."""
 
-    formulas = []
-    with open(path, 'r', encoding='utf-8') as source:
+    source_path = str(path)
+    formulas: list[RootFormula] = []
+
+    with open(path, "r", encoding="utf-8") as source:
         for line_no, raw_line in enumerate(source, 1):
             stripped = raw_line.strip()
-            if not stripped or stripped.startswith('#'):
+            if not stripped or stripped.startswith("#"):
                 continue
 
-            read_result = read_formula(
-                stripped,
-                expected_layer=Layer.FORMAL_FORM,
-                source_path=path,
-                line_no=line_no,
-            )
+            parse_result = parse_formula_result(stripped)
             formulas.append(
                 RootFormula(
                     text=stripped,
-                    source_path=path,
+                    source_path=source_path,
                     line_no=line_no,
-                    read_result=read_result,
-                    kind=classify_formula_kind(stripped),
+                    ast=parse_result.ast,
+                    diagnostics=parse_result.diagnostics,
+                    kind=classify_formula_kind(parse_result.ast),
                 )
             )
 
-    registry = build_difference_registry(formulas)
-    return RootLibrary(formulas=formulas, registry=registry)
+    formula_tuple = tuple(formulas)
+    return RootLibrary(
+        formulas=formula_tuple,
+        registry=build_difference_registry(formula_tuple),
+    )
 
 
-def build_difference_registry(formulas):
-    """Построить реестр различий из формул ``A : F``."""
+def build_difference_registry(
+    formulas: tuple[RootFormula, ...] | list[RootFormula],
+) -> DifferenceRegistry:
+    """Build the registry from actual ``Definition`` AST nodes only."""
 
     registry = DifferenceRegistry()
     for formula in formulas:
-        definition = _extract_definition(formula.text)
-        if definition is None:
+        if not isinstance(formula.ast, Definition):
             continue
 
-        symbol, introduction = definition
         registry.register(
             DifferenceEntry(
-                symbol=symbol,
-                introduction=introduction,
-                layer=_infer_definition_layer(symbol, introduction),
-                status=_infer_definition_status(symbol, introduction),
+                symbol=format_expression(formula.ast.target),
+                introduction=format_expression(formula.ast.value),
+                status=StatementStatus.DEFINITION,
                 source_formula=formula,
             )
         )
@@ -164,43 +150,15 @@ def build_difference_registry(formulas):
     return registry
 
 
-def _extract_definition(text):
-    positions = find_top_level_operators(text, ':')
-    if len(positions) != 1:
-        return None
+def classify_formula_kind(expression: Expression | str | None) -> FormulaKind:
+    """Classify by AST type, never by rescanning top-level operator text."""
 
-    pos = positions[0]
-    symbol = text[:pos].strip()
-    introduction = text[pos + 1:].strip()
-    if not symbol or not introduction:
-        return None
-    return symbol, introduction
-
-
-def classify_formula_kind(text):
-    """Классифицировать формулу без введения внешней grammar."""
-
-    if len(find_top_level_operators(text, ':')) == 1:
+    if isinstance(expression, str):
+        expression = parse_formula(expression)
+    if isinstance(expression, Definition):
         return FormulaKind.DEFINITION
-    if find_top_level_operators(text, '!='):
-        return FormulaKind.NON_EQUATION
-    if find_top_level_operators(text, '='):
+    if isinstance(expression, Equality):
         return FormulaKind.EQUATION
+    if isinstance(expression, Inequality):
+        return FormulaKind.NON_EQUATION
     return FormulaKind.EXPRESSION
-
-
-def _infer_definition_layer(symbol, introduction):
-    """Диагностически вывести слой по явной таблице корневых различий.
-
-    Таблица фиксирует текущий fixture ``tests/mtc_formulas.mtc``. Неизвестные
-    различия временно читаются как формальные формы в статусе development,
-    пока слой не стабилизирован отдельной корневой формулой.
-    """
-
-    return ROOT_SYMBOL_LAYERS.get(symbol, Layer.FORMAL_FORM)
-
-
-def _infer_definition_status(symbol, introduction):
-    if symbol in SQUARE_ABIT_SYMBOLS or symbol == INFINITY_SYMBOL:
-        return 'root'
-    return 'development'

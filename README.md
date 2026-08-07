@@ -15,7 +15,7 @@
 | [Основания МТС](docs/theory/Основания%20МТС.md) | онтологические основания |
 | [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md) | нормативное чтение корневых формул |
 | [Reference model МТС v0.1](docs/specs/Reference%20model%20МТС%20v0.1.md) | границы L0–L5 и инженерный семантический контракт версии |
-| [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) | скобочные нотации, слои и роли вхождений |
+| [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) | typed L2 syntax, скобочные формы и роли вхождений |
 | [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | форматы `*.anum` и практические инструменты |
 | [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md) | рабочая протокольная спецификация |
 | [Корневой fixture](tests/mtc_formulas.mtc) | единственный машинно-читаемый набор формул |
@@ -53,9 +53,10 @@ L5  теория вывода
 
 ```text
 core/reference_model.py     декларативный контракт МТС/Anum v0.1
-core/mtc_reader.py          чтение формул
-core/root_library.py        загрузка корневой библиотеки
-core/validate_root.py       структурная валидация
+core/mtc_ast.py             typed AST формального языка L2
+core/mtc_parser.py          tokenizer, Pratt parser и static validation L2
+core/root_library.py        загрузка fixture через typed AST
+core/validate_root.py       структурная валидация root library
 core/anum_parser.py         чтение контейнерных файлов *.anum
 core/anum_projector.py      проекция двухабитных форм
 core/anum_memory.py         тестовая symbolic-модель протокольных инвариантов
@@ -64,6 +65,8 @@ converters/text_to_anum.py  UTF-8 payload → четверичная запис�
 converters/anum_to_text.py  четверичная запись → UTF-8 payload
 converters/ascii_unicode.py ASCII ↔ Unicode
 ```
+
+L2 имеет один production parsing path: `core/mtc_parser.py`. Старый строковый `mtc_reader.py` и отдельная enum-классификация «слоёв чтения» удалены после перевода root library на AST.
 
 `core/reference_model.py` не является interpreter или prover: он фиксирует границы и обязательства последующих реализаций. `core/anum_memory.py` не является реализацией полноценной апамяти.
 

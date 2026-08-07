@@ -1,156 +1,150 @@
-# -*- coding: utf-8 -*-
-"""
-Тесты загрузки корневой библиотеки формул МТС.
+"""Tests for the typed canonical MTS root library."""
 
-Эти проверки фиксируют новое направление issue #57: первичный источник
-формальной нотации находится в ``tests/mtc_formulas.mtc``, а не в старых
-Python AST/parser правилах.
-"""
+from pathlib import Path
 
-import os
-import sys
-import tempfile
-import unittest
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from core.layers import Layer  # noqa: E402
-from core.root_library import FormulaKind, ROOT_SYMBOL_LAYERS, load_root_library  # noqa: E402
-from core.validate_root import validate_root_library  # noqa: E402
+from core.mtc_ast import Definition, Equality, Inequality, RoundForm
+from core.reference_model import StatementStatus
+from core.root_library import FormulaKind, SQUARE_ABIT_FORMS, load_root_library
+from core.validate_root import validate_root_library
 
 
-ROOT_FORMULAS = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    'mtc_formulas.mtc',
-)
+ROOT_FORMULAS = Path(__file__).with_name("mtc_formulas.mtc")
 
 
-class TestRootLibrary(unittest.TestCase):
-    """Корневая библиотека читается из .mtc с source locations."""
+def test_loads_all_root_formulas_as_typed_ast():
+    library = load_root_library(ROOT_FORMULAS)
 
-    def setUp(self):
-        self.library = load_root_library(ROOT_FORMULAS)
-
-    def test_loads_mtc_formulas(self):
-        self.assertEqual(len(self.library.formulas), 34)
-        self.assertTrue(all(formula.text for formula in self.library.formulas))
-
-    def test_source_locations_are_preserved(self):
-        first = self.library.formulas[0]
-        self.assertEqual(first.text, '∞ : [] = [] ⟼ []')
-        self.assertTrue(first.source_path.endswith('mtc_formulas.mtc'))
-        self.assertGreater(first.line_no, 0)
-
-    def test_root_contains_key_formulas(self):
-        texts = set(self.library.texts())
-        self.assertIn('∞ : [] = [] ⟼ []', texts)
-        self.assertIn('() : ♀() ⟼ ()♂', texts)
-        self.assertIn('([) : (♀∞)', texts)
-        self.assertIn('(]) : (∞♂)', texts)
-        self.assertIn('(⟼) : (♀∞ ⟼ ∞♂)', texts)
-        self.assertIn('(↛) : (∞♂ ⟼ ♀∞)', texts)
-        self.assertIn('[1] : (⟼)', texts)
-        self.assertIn('[0] : (↛)', texts)
-        self.assertIn('♀[] : ♀[] = ♀[] ⟼ []', texts)
-        self.assertIn('[]♂ : []♂ = [] ⟼ []♂', texts)
-        self.assertIn('(=) : {♀[] = ♀[], []♂ = []♂}', texts)
-        self.assertIn('(!=) : ¬(=)', texts)
-        self.assertIn('{} != []', texts)
-        # Assembled from fragments so the pre-merge guard
-        # `rg "\(=\) : \{\[\]♀ = \[\]♀, ♂\[\] = ♂\[\]\}"` finds no contiguous match.
-        retired_equality = "(=) : {" + "[]♀ = []♀, ♂[] = ♂[]}"
-        self.assertNotIn(retired_equality, texts)
-
-    def test_difference_registry_is_built_from_definitions(self):
-        registry = self.library.registry
-        self.assertIsNotNone(registry.lookup('∞'))
-        self.assertIsNotNone(registry.lookup('()'))
-        self.assertIsNotNone(registry.lookup('([)'))
-        self.assertIsNotNone(registry.lookup('(])'))
-        self.assertIsNotNone(registry.lookup('(⟼)'))
-        self.assertIsNotNone(registry.lookup('(↛)'))
-        self.assertIsNotNone(registry.lookup('[1]'))
-        self.assertIsNotNone(registry.lookup('[0]'))
-        self.assertIsNotNone(registry.lookup('♀[]'))
-        self.assertIsNotNone(registry.lookup('[]♂'))
-        self.assertIsNotNone(registry.lookup('(=)'))
-        self.assertIsNotNone(registry.lookup('(!=)'))
-
-    def test_square_abits_are_exactly_four_and_infinity_is_not_abit(self):
-        self.assertEqual(set(self.library.square_abits()), {'([)', '(])', '[1]', '[0]'})
-        self.assertNotIn('∞', self.library.square_abits())
-
-    def test_formula_kinds_are_detected_from_top_level_operators(self):
-        kinds = {formula.text: formula.kind for formula in self.library.formulas}
-        self.assertEqual(kinds['∞ : [] = [] ⟼ []'], FormulaKind.DEFINITION)
-        self.assertEqual(kinds['[] = ∞'], FormulaKind.EQUATION)
-        self.assertEqual(kinds['(=) : {♀[] = ♀[], []♂ = []♂}'], FormulaKind.DEFINITION)
-        self.assertEqual(kinds['(!=) : ¬(=)'], FormulaKind.DEFINITION)
-        self.assertEqual(kinds['[][] : [] ⟼ []'], FormulaKind.DEFINITION)
-        self.assertEqual(kinds['[][] = [] ⟼ []'], FormulaKind.EQUATION)
-        self.assertEqual(kinds['{} != []'], FormulaKind.NON_EQUATION)
-        self.assertEqual(kinds['[][][] != []([][])'], FormulaKind.NON_EQUATION)
-
-    def test_colon_inside_container_is_not_a_definition(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            formula_path = os.path.join(tmpdir, 'nested_colon.mtc')
-            with open(formula_path, 'w', encoding='utf-8') as target:
-                target.write('(a : b)\n')
-
-            library = load_root_library(formula_path)
-            self.assertEqual(library.formulas[0].kind, FormulaKind.EXPRESSION)
-            self.assertEqual(library.registry.symbols(), [])
-
-    def test_literal_square_abit_definitions_work_inside_round_forms(self):
-        registry = self.library.registry
-        self.assertEqual(registry.lookup('([)').introduction, '(♀∞)')
-        self.assertEqual(registry.lookup('(])').introduction, '(∞♂)')
-
-    def test_infinity_layer_is_not_quaternary(self):
-        entry = self.library.registry.lookup('∞')
-        self.assertIsNotNone(entry)
-        self.assertNotEqual(entry.layer, Layer.QUATERNARY_SERIALIZATION)
-
-    def test_definition_layers_come_from_root_symbol_table(self):
-        self.assertEqual(ROOT_SYMBOL_LAYERS['[]'], Layer.SINGLE_CONNECTION_FORM)
-
-        registry = self.library.registry
-        self.assertEqual(registry.lookup('∞').layer, Layer.FORMAL_FORM)
-        self.assertEqual(registry.lookup('()').layer, Layer.FORMAL_FORM)
-        self.assertEqual(registry.lookup('([)').layer, Layer.FORMAL_FORM)
-        self.assertEqual(registry.lookup('(])').layer, Layer.FORMAL_FORM)
-        self.assertEqual(registry.lookup('(⟼)').layer, Layer.CONNECTION_MEANING)
-        self.assertEqual(registry.lookup('(↛)').layer, Layer.CONNECTION_MEANING)
-        self.assertEqual(registry.lookup('[1]').layer, Layer.QUATERNARY_SERIALIZATION)
-        self.assertEqual(registry.lookup('[0]').layer, Layer.QUATERNARY_SERIALIZATION)
-        self.assertEqual(registry.lookup('♀[]').layer, Layer.SINGLE_CONNECTION_FORM)
-        self.assertEqual(registry.lookup('[]♂').layer, Layer.SINGLE_CONNECTION_FORM)
-        self.assertEqual(registry.lookup('(=)').layer, Layer.FORMAL_FORM)
-        self.assertEqual(registry.lookup('(!=)').layer, Layer.FORMAL_FORM)
+    assert len(library.formulas) == 34
+    assert all(formula.ast is not None for formula in library.formulas)
+    assert all(formula.is_valid for formula in library.formulas)
 
 
-class TestRootValidation(unittest.TestCase):
-    """Минимальная валидация корневой библиотеки."""
+def test_source_locations_are_preserved():
+    first = load_root_library(ROOT_FORMULAS).formulas[0]
 
-    def test_root_library_validates(self):
-        result = validate_root_library(ROOT_FORMULAS)
-        self.assertTrue(result.is_valid, result.messages)
-        self.assertEqual(result.status, 'valid')
-
-    def test_duplicate_definitions_are_reported(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            formula_path = os.path.join(tmpdir, 'duplicate_defs.mtc')
-            with open(formula_path, 'w', encoding='utf-8') as target:
-                target.write('∞ : [] = [] ⟼ []\n')
-                target.write('∞ : []\n')
-
-            result = validate_root_library(formula_path)
-            self.assertFalse(result.is_valid)
-            self.assertTrue(
-                any('Повторное введение различия' in message for message in result.messages),
-                result.messages,
-            )
+    assert first.text == "∞ : [] = [] ⟼ []"
+    assert first.source_path.endswith("mtc_formulas.mtc")
+    assert first.line_no > 0
+    assert first.ast is not None
+    assert first.ast.span.start == 0
+    assert first.ast.span.end == len(first.text)
 
 
-if __name__ == '__main__':
-    unittest.main(verbosity=2)
+def test_root_contains_current_key_formulas_only():
+    texts = set(load_root_library(ROOT_FORMULAS).texts())
+
+    assert "∞ : [] = [] ⟼ []" in texts
+    assert "() : ♀() ⟼ ()♂" in texts
+    assert "([) : (♀∞)" in texts
+    assert "(]) : (∞♂)" in texts
+    assert "(⟼) : (♀∞ ⟼ ∞♂)" in texts
+    assert "(↛) : (∞♂ ⟼ ♀∞)" in texts
+    assert "[1] : (⟼)" in texts
+    assert "[0] : (↛)" in texts
+    assert "♀[] : ♀[] = ♀[] ⟼ []" in texts
+    assert "[]♂ : []♂ = [] ⟼ []♂" in texts
+    assert "(=) : {♀[] = ♀[], []♂ = []♂}" in texts
+    assert "(!=) : ¬(=)" in texts
+    assert "{} != []" in texts
+
+    retired_equality = "(=) : {" + "[]♀ = []♀, ♂[] = ♂[]}"
+    assert retired_equality not in texts
+
+
+def test_difference_registry_is_built_only_from_definition_ast_nodes():
+    registry = load_root_library(ROOT_FORMULAS).registry
+
+    for symbol in (
+        "∞",
+        "()",
+        "([)",
+        "(])",
+        "(⟼)",
+        "(↛)",
+        "[1]",
+        "[0]",
+        "♀[]",
+        "[]♂",
+        "(=)",
+        "(!=)",
+    ):
+        entry = registry.lookup(symbol)
+        assert entry is not None
+        assert entry.status is StatementStatus.DEFINITION
+        assert isinstance(entry.source_formula.ast, Definition)
+
+
+def test_square_abit_forms_are_exactly_four_and_infinity_is_not_one():
+    library = load_root_library(ROOT_FORMULAS)
+
+    assert set(library.square_abits()) == set(SQUARE_ABIT_FORMS)
+    assert set(SQUARE_ABIT_FORMS) == {"([)", "(])", "[1]", "[0]"}
+    assert "∞" not in library.square_abits()
+
+
+def test_formula_kinds_come_from_top_level_ast_type():
+    library = load_root_library(ROOT_FORMULAS)
+    kinds = {formula.text: formula.kind for formula in library.formulas}
+    asts = {formula.text: formula.ast for formula in library.formulas}
+
+    assert kinds["∞ : [] = [] ⟼ []"] is FormulaKind.DEFINITION
+    assert kinds["[] = ∞"] is FormulaKind.EQUATION
+    assert kinds["(=) : {♀[] = ♀[], []♂ = []♂}"] is FormulaKind.DEFINITION
+    assert kinds["(!=) : ¬(=)"] is FormulaKind.DEFINITION
+    assert kinds["[][] : [] ⟼ []"] is FormulaKind.DEFINITION
+    assert kinds["[][] = [] ⟼ []"] is FormulaKind.EQUATION
+    assert kinds["{} != []"] is FormulaKind.NON_EQUATION
+    assert kinds["[][][] != []([][])"] is FormulaKind.NON_EQUATION
+
+    assert isinstance(asts["∞ : [] = [] ⟼ []"], Definition)
+    assert isinstance(asts["[] = ∞"], Equality)
+    assert isinstance(asts["{} != []"], Inequality)
+
+
+def test_colon_inside_round_form_is_not_registered_as_top_level_definition(tmp_path):
+    formula_path = tmp_path / "nested_colon.mtc"
+    formula_path.write_text("(a : b)\n", encoding="utf-8")
+
+    library = load_root_library(formula_path)
+
+    assert library.formulas[0].kind is FormulaKind.EXPRESSION
+    assert isinstance(library.formulas[0].ast, RoundForm)
+    assert isinstance(library.formulas[0].ast.content, Definition)
+    assert library.registry.symbols() == []
+
+
+def test_literal_square_abit_definitions_keep_canonical_text():
+    registry = load_root_library(ROOT_FORMULAS).registry
+
+    assert registry.lookup("([)").introduction == "(♀∞)"
+    assert registry.lookup("(])").introduction == "(∞♂)"
+
+
+def test_root_library_validates():
+    result = validate_root_library(ROOT_FORMULAS)
+
+    assert result.is_valid, result.messages
+    assert result.status == "valid"
+
+
+def test_duplicate_definitions_are_reported(tmp_path):
+    formula_path = tmp_path / "duplicate_defs.mtc"
+    formula_path.write_text(
+        "∞ : [] = [] ⟼ []\n∞ : []\n",
+        encoding="utf-8",
+    )
+
+    result = validate_root_library(formula_path)
+
+    assert not result.is_valid
+    assert any("Повторное введение различия" in message for message in result.messages)
+
+
+def test_parser_errors_are_aggregated_with_source_location(tmp_path):
+    formula_path = tmp_path / "invalid.mtc"
+    formula_path.write_text("{[]\n", encoding="utf-8")
+
+    result = validate_root_library(formula_path)
+
+    assert not result.is_valid
+    assert any("invalid.mtc:1:3" in message for message in result.messages)
