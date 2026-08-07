@@ -87,6 +87,23 @@ def test_two_empty_glyphs_are_two_occurrences_before_any_binding():
     assert result.holes == ()
 
 
+def test_semantic_occurrence_ids_do_not_depend_on_source_offsets_or_whitespace():
+    compact = interpret_constraints(
+        parse_formula("{[]=$[,[]=$]}"),
+        ContextFrame(start=2, end=3),
+        memory(),
+    )
+    spaced = interpret_constraints(
+        parse_formula("{  [] = $[ ,   [] = $]  }"),
+        ContextFrame(start=2, end=3),
+        memory(),
+    )
+
+    assert compact.success and spaced.success
+    assert compact.holes == spaced.holes
+    assert tuple(value for _, value in compact.holes) == (2, 3)
+
+
 def test_left_and_right_association_remain_structurally_distinct_queries():
     left = parse_formula("[] ⟼ [] ⟼ []")
     right = parse_formula("[] ⟼ ([] ⟼ [])")
