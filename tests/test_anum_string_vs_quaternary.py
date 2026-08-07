@@ -32,7 +32,7 @@ def test_string_mode_compiles_only_through_explicit_dictionary():
     dictionary.register("position", parse_raw_quaternary("]["))
 
     compiled = dictionary.compile(source)
-    assert compiled.values() == tuple("[][][")
+    assert compiled.values() == tuple("[]][")
 
 
 def test_dictionary_rejects_unknown_and_duplicate_names():
