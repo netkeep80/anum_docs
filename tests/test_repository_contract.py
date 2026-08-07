@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ROOT_FIXTURE = ROOT / "tests/mtc_formulas.mtc"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md"}
 ACTIVE_SPECS = {
+    "Reference model МТС v0.1.md",
     "Формальная нотация МТС.md",
     "Ачисла и сериализация.md",
     "Протокол абитов ачисел.md",
