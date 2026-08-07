@@ -1,6 +1,7 @@
 """Executable conformance tests for MTS formal-notation interpretation."""
 
 from dataclasses import dataclass
+from pathlib import Path
 
 from core.mtc_interpreter import (
     ContextFrame,
@@ -8,8 +9,11 @@ from core.mtc_interpreter import (
     interpret_constraints,
     resolve_context_pronoun,
 )
-from core.mtc_ast import BundleForm, ContextPronoun, Definition
+from core.mtc_ast import BundleForm, ContextPronoun, Definition, Symbol
 from core.mtc_parser import parse_formula
+
+
+ROOT_FORMULAS = Path(__file__).with_name("mtc_formulas.mtc")
 
 
 @dataclass
@@ -60,11 +64,53 @@ def equality_memory() -> FakeMemory:
     )
 
 
+def canonical_definition(target_name: str) -> Definition:
+    for line in ROOT_FORMULAS.read_text(encoding="utf-8").splitlines():
+        source = line.strip()
+        if not source or source.startswith("#"):
+            continue
+        ast = parse_formula(source)
+        if isinstance(ast, Definition) and isinstance(ast.target, Symbol):
+            if ast.target.name == target_name:
+                return ast
+    raise AssertionError(f"Definition not found: {target_name}")
+
+
 def parse_equality_body() -> BundleForm:
     ast = parse_formula("(=) : {♀◁ = ♀▷, ◁♂ = ▷♂}")
     assert isinstance(ast, Definition)
     assert isinstance(ast.value, BundleForm)
     return ast.value
+
+
+def test_aroot_contextual_self_closure_accepts_only_full_self_cycle():
+    aroot = canonical_definition("∞")
+    assert isinstance(aroot.value, BundleForm)
+
+    memory = FakeMemory({})
+    accepted = interpret_constraints(
+        aroot.value,
+        ContextFrame(start=1, end=1),
+        memory,
+        symbols={"∞": 1},
+    )
+    wrong_start = interpret_constraints(
+        aroot.value,
+        ContextFrame(start=2, end=1),
+        memory,
+        symbols={"∞": 1},
+    )
+    wrong_end = interpret_constraints(
+        aroot.value,
+        ContextFrame(start=1, end=2),
+        memory,
+        symbols={"∞": 1},
+    )
+
+    assert accepted.success
+    assert not wrong_start.success
+    assert not wrong_end.success
+    assert memory.reads == 0
 
 
 def test_equality_context_compares_corresponding_forms_without_named_variables():
