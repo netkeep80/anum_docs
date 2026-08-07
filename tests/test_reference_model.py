@@ -3,6 +3,7 @@
 from core.reference_model import (
     CONCEPTS,
     EXECUTION_OPERATIONS,
+    OPEN_QUESTIONS,
     SEMANTIC_RULES,
     DecisionState,
     Layer,
@@ -22,15 +23,26 @@ def test_every_architectural_layer_has_an_explicit_concept():
     assert {item.layer for item in CONCEPTS} == set(Layer)
 
 
-def test_core_l1_semantics_are_explicit_and_cyclic_without_unfolding():
+def test_accepted_l1_carrier_rules_are_finite_and_cyclic_without_unfolding():
     equations = {item.name: item.equation for item in SEMANTIC_RULES}
 
-    assert equations["associative-root"] == "∞ = Link(∞, ∞)"
-    assert equations["start-form"] == "♀F = Link(♀F, F)"
-    assert equations["end-form"] == "F♂ = Link(F, F♂)"
-    assert equations["inversion"] == "¬Link(a, b) = Link(b, a)"
+    assert equations["associative-root-carrier"] == "root.start = root; root.end = root"
+    assert equations["start-form-carrier"] == "start(F).start = start(F); start(F).end = F"
+    assert equations["end-form-carrier"] == "end(F).start = F; end(F).end = end(F)"
+    assert equations["link-inversion"] == "invert(Link(a, b)) = Link(b, a)"
     assert "finite directed graph" in equations["finite-cyclic-carrier"]
-    assert "bisimilar" in equations["equality"]
+
+
+def test_full_equality_substitution_semantics_remains_explicitly_experimental():
+    equality = concept("equality-substitution-semantics")
+    assert equality.layer is Layer.SEMANTICS
+    assert equality.status is StatementStatus.EXPERIMENTAL
+    assert any(item.issue == 79 for item in OPEN_QUESTIONS)
+    assert not any(
+        item.name == "equality" and "bisimilar" in item.equation
+        for item in SEMANTIC_RULES
+    )
+    assert "#79" in operator("=").denotation
 
 
 def test_l2_operator_contract_separates_form_judgment_and_definition():
