@@ -52,16 +52,24 @@ Link(start, end)
 
 Важно: `Link(start, end)` является **reference carrier для уже различённой связи**, а не автоматически полной семантикой всех L2-шаблонов и не правилом подстановки по `=`.
 
+Машинная реализация принятой части carrier находится в:
+
+```text
+core/semantic_carrier.py
+```
+
+Она хранит конечный rooted graph из `LinkNode(start,end)` и не содержит evaluator-а `:`/`=`.
+
 ### Акорень
 
-Для carrier полного самозамыкания допустимо:
+Для carrier полного самозамыкания:
 
 ```text
 root.start = root
 root.end = root
 ```
 
-Это конечное представление рекурсивной формы акорня. Из него само по себе не следует разрешение глобально заменять каждый `∞` или каждый `[]` любым равным выражением внутри произвольного L2-контекста.
+Это минимальный конечный self-cycle из одного LinkNode.
 
 ### Начало формы
 
@@ -87,7 +95,40 @@ end(F).end = end(F)
 invert(Link(a, b)) = Link(b, a)
 ```
 
-Инверсия меняет направление уже различённой Link-структуры; отсутствие связи из этого не следует.
+Реализация создаёт новый root с переставленными endpoint references и не мутирует исходный carrier. Она не выполняет рекурсивную инверсию всех достижимых связей.
+
+### Техническое сравнение carrier topology
+
+`core/semantic_carrier.py` предоставляет:
+
+```text
+carrier_isomorphic(A, B)
+```
+
+Это **не оператор МТС `=`**.
+
+Функция проверяет точный изоморфизм конечного rooted carrier с сохранением:
+
+```text
+root;
+start/end edge roles;
+cycle topology;
+sharing topology.
+```
+
+Она намеренно может различать:
+
+```text
+один self-cyclic root
+```
+
+и:
+
+```text
+явный Link двух отдельных копий root-carrier.
+```
+
+Наличие этой инженерной операции не решает вопрос #79 и не даёт права использовать её как semantic equality в prover/interpreter.
 
 ### Равенство: принятая часть и открытая часть
 
@@ -126,7 +167,7 @@ substitution;
 congruence `⟼`.
 ```
 
-Экспериментальный comparator конкретных уже материализованных cyclic Link-carriers допустим как инструмент #70, но его результат нельзя выдавать за полную семантику L2 `=` до принятия #79.
+Экспериментальный comparator concrete carriers допустим как технический инструмент #70, но его результат нельзя выдавать за полную семантику L2 `=` до принятия #79.
 
 ### Пучок
 
@@ -228,6 +269,25 @@ raw carrier
 
 Имена типа `window`, `position`, `int` не являются пятым видом абита.
 
+Канонический L3 pipeline уже реализован:
+
+```text
+parse_raw_quaternary
+→ validate_anum(context)
+→ project_anum(context)
+→ deterministic serialize
+```
+
+Контексты:
+
+```text
+root
+quote
+relative
+```
+
+Также реализованы incremental raw decoder, explicit `AnumDictionary` и quote envelope реальными абитами.
+
 Рабочая проекция issue #61:
 
 ```text
@@ -235,7 +295,7 @@ raw carrier
 ][ → 1
 ```
 
-остаётся **experimental**. Её наличие в prototype-коде не переносит гипотезу в корневую систему.
+остаётся **experimental**. Её наличие в коде не переносит гипотезу в корневую систему.
 
 ## 6. L4 — исполнение
 
@@ -323,9 +383,11 @@ Superseded
 
 ```text
 L0–L5 declarative contract                 core/reference_model.py
+accepted finite L1 carrier subset          core/semantic_carrier.py
 L2 typed AST                               core/mtc_ast.py
 L2 tokenizer/parser/static validation      core/mtc_parser.py
 L2 root-library loading                    core/root_library.py
+L3 contextual/incremental *.anum protocol core/anum_protocol.py + core/anum_parser.py
 ```
 
 Открытый gate:
@@ -337,8 +399,7 @@ L2 root-library loading                    core/root_library.py
 Ещё не реализованы как production layers:
 
 ```text
-полный L1 semantic evaluator (#70, заблокирован #79 в части `:`/`=`);
-полная L3 context model *.anum (#71);
+полный L1 evaluator `:`/`=` (#70, заблокирован #79);
 настоящая L4 апамять (#72);
 L5 proof kernel/search (#73, зависит от #79).
 ```
