@@ -14,7 +14,7 @@ ROOT_FIXTURE = ROOT / "tests/mtc_formulas.mtc"
 MTS_CONTRACT = ROOT / "contracts/mts-contract-v0.2.json"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md"}
 ACTIVE_SPECS = {
-    "Reference model МТС v0.1.md",
+    "Reference model МТС v0.2.md",
     "Формальная нотация МТС.md",
     "Ачисла и сериализация.md",
     "Протокол абитов ачисел.md",
@@ -35,6 +35,7 @@ FORBIDDEN_CANDIDATE_PATHS = {
     "tests/test_mts_contract_v02_candidate.py",
     "tests/test_root_v02_candidate.py",
     "tests/test_root_v02_execution_candidate.py",
+    "docs/specs/Reference model МТС v0.1.md",
 }
 ROOT_FORMULAS_SHA256 = "1ccfb6fa0ae3c744dffcdefefcf2d5d96108573f4b04fdd8ac45a2e15a98ee3a"
 
@@ -101,7 +102,7 @@ def test_v02_machine_contract_is_single_active_formal_contract():
     assert contract_files == [MTS_CONTRACT]
 
 
-def test_candidate_runtime_and_fixture_paths_are_removed_after_promotion():
+def test_candidate_runtime_fixture_and_reference_paths_are_removed_after_promotion():
     leftovers = [path for path in FORBIDDEN_CANDIDATE_PATHS if (ROOT / path).exists()]
     assert leftovers == []
     assert (ROOT / "core/mtc_interpreter.py").is_file()
