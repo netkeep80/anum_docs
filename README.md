@@ -53,6 +53,7 @@ L5  теория вывода
 
 ```text
 core/reference_model.py     декларативный контракт МТС/Anum v0.1
+core/semantic_carrier.py    конечный cyclic Link carrier принятой части L1
 core/mtc_ast.py             typed AST формального языка L2
 core/mtc_parser.py          tokenizer, Pratt parser и static validation L2
 core/root_library.py        загрузка fixture через typed AST
@@ -68,11 +69,13 @@ converters/anum_to_text.py  quaternary запись → UTF-8 payload
 converters/ascii_unicode.py ASCII ↔ Unicode
 ```
 
+L1 carrier уже умеет конечные циклы, self-closure начала/конца, конкретную Link-инверсию и проверку точной rooted carrier topology. `carrier_isomorphic()` является инженерным сравнением конечного носителя и **не является L2-оператором `=`**; полная equality/substitution semantics остаётся открытой в #79.
+
 L2 имеет один production parsing path: `core/mtc_parser.py`. L3 имеет один protocol path: `core/anum_parser.py` читает только raw carrier, а `core/anum_protocol.py` выполняет context validation/projection.
 
 Старые `mtc_reader.py`, `layers.py`, двухабитный `anum_projector.py` и отдельный symbolic `Quote` удалены после миграции consumers.
 
-`core/reference_model.py` не является interpreter или prover. `core/anum_memory.py` не является реализацией полноценной апамяти.
+`core/reference_model.py` не является prover. `core/semantic_carrier.py` не решает `:`/`=`. `core/anum_memory.py` не является реализацией полноценной апамяти.
 
 ## Проверка
 
