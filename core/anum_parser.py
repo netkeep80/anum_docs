@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-"""Parser for practical *.anum files.
+"""Raw parsing and deterministic serialization for ``*.anum``.
 
-This parser is intentionally separate from ``core.mtc_reader`` and from the
-UTF-8 payload codec in ``converters.text_to_anum`` / ``converters.anum_to_text``.
-The strict quaternary mode does not apply ordinary bracket-balance rules:
-``][``, ``[[`` and ``]]`` are valid two-abit forms.
+This L3 module deliberately does not decide denotation. Raw syntax, contextual
+validation and projection are separate stages. The strict quaternary layer does
+not apply ordinary bracket-balance rules: ``][``, ``[[`` and ``]]`` are valid
+raw carriers.
 """
 
 from core.anum_model import Abit, AnumForm, AnumSource, AnumToken
@@ -18,76 +17,104 @@ SUPPORTED_FORMATS = (FORMAT_QUATERNARY, FORMAT_STRING)
 _ABIT_BY_SYMBOL = {abit.value: abit for abit in Abit}
 
 
-def parse_quaternary_anum(text: str) -> AnumForm:
-    """Parse strict quaternary anum text into abits.
+class IncrementalQuaternaryDecoder:
+    """Stateful raw decoder whose result is equivalent to batch parsing.
 
-    Significant symbols are only ``[``, ``]``, ``1`` and ``0``. Whitespace is
-    ignored. ``#`` starts a comment that runs to the end of the line.
+    Completion of higher-level anum forms is context-dependent and is therefore
+    not invented here. ``feed`` emits newly recognized abits and ``finish``
+    returns the complete raw carrier accumulated so far.
     """
 
-    tokens = []
-    in_comment = False
+    def __init__(self):
+        self._offset = 0
+        self._in_comment = False
+        self._tokens: list[AnumToken] = []
 
-    for offset, char in enumerate(text):
-        if in_comment:
-            if char in "\r\n":
-                in_comment = False
-            continue
+    @property
+    def offset(self) -> int:
+        return self._offset
 
-        if char == "#":
-            in_comment = True
-            continue
+    def feed(self, chunk: str) -> tuple[AnumToken, ...]:
+        emitted: list[AnumToken] = []
 
-        if char.isspace():
-            continue
+        for index, char in enumerate(chunk):
+            absolute_offset = self._offset + index
 
-        abit = _ABIT_BY_SYMBOL.get(char)
-        if abit is not None:
-            tokens.append(AnumToken(abit=abit, offset=offset))
-            continue
+            if self._in_comment:
+                if char in "\r\n":
+                    self._in_comment = False
+                continue
 
-        raise ValueError(
-            'Недопустимый символ в quaternary anum в позиции '
-            f'{offset}: "{char}"'
-        )
+            if char == "#":
+                self._in_comment = True
+                continue
 
-    return AnumForm(tokens=tuple(tokens))
+            if char.isspace():
+                continue
+
+            abit = _ABIT_BY_SYMBOL.get(char)
+            if abit is None:
+                raise ValueError(
+                    "Недопустимый символ в quaternary anum в позиции "
+                    f'{absolute_offset}: "{char}"'
+                )
+
+            token = AnumToken(abit=abit, offset=absolute_offset)
+            self._tokens.append(token)
+            emitted.append(token)
+
+        self._offset += len(chunk)
+        return tuple(emitted)
+
+    def finish(self) -> AnumForm:
+        return AnumForm(tokens=tuple(self._tokens))
+
+
+def parse_raw_quaternary(text: str) -> AnumForm:
+    """Parse strict raw quaternary text into abits without semantic validation."""
+
+    decoder = IncrementalQuaternaryDecoder()
+    decoder.feed(text)
+    return decoder.finish()
 
 
 def parse_anum_file(text: str) -> AnumForm | AnumSource:
-    """Parse a complete *.anum file.
+    """Parse a complete ``*.anum`` container.
 
-    Without an explicit header the file is parsed as strict quaternary.
-    ``# anum-format: string`` keeps the body as a symbolic source and never
-    feeds it into the quaternary parser.
+    Without an explicit header the file is raw quaternary. String mode keeps
+    symbolic names as a separate source for explicit dictionary compilation.
     """
 
     format_name, body = _split_format_header(text)
 
     if format_name == FORMAT_QUATERNARY:
-        return parse_quaternary_anum(body)
+        return parse_raw_quaternary(body)
     if format_name == FORMAT_STRING:
         return AnumSource(text=body.strip(), format=FORMAT_STRING)
 
     raise ValueError(f'Неизвестный формат anum: "{format_name}"')
 
 
-def normalize_quaternary_anum(text: str) -> str:
-    """Return quaternary text without whitespace and comments."""
+def normalize_raw_form(form: AnumForm) -> str:
+    """Return the compact quaternary representation of one raw carrier."""
 
-    form = parse_quaternary_anum(text)
-    return normalize_anum_form(form)
+    return "".join(form.values())
 
 
-def normalize_anum_form(form: AnumForm) -> str:
-    """Return the compact textual representation of a parsed quaternary form."""
+def serialize_quaternary_anum(
+    form: AnumForm,
+    *,
+    include_header: bool = False,
+) -> str:
+    """Serialize a raw carrier deterministically."""
 
-    return "".join(token.abit.value for token in form.tokens)
+    body = normalize_raw_form(form)
+    if not include_header:
+        return body
+    return f"# anum-format: quaternary\n{body}\n"
 
 
 def _split_format_header(text: str) -> tuple[str, str]:
-    """Return declared format and body after an optional leading header."""
-
     offset = 0
     for line in text.splitlines(keepends=True):
         stripped = line.strip()

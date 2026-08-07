@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CLI smoke tests for converters.anum_cli."""
 
 import subprocess
@@ -25,16 +24,40 @@ def test_cli_parse_outputs_quaternary_tokens(tmp_path):
     assert "1: ]" in result.stdout
 
 
-def test_cli_project_outputs_two_abit_projection(tmp_path):
-    anum_file = tmp_path / "forms.anum"
-    anum_file.write_text("# anum-format: quaternary\n[]\n][\n", encoding="utf-8")
+def test_cli_validate_uses_explicit_context(tmp_path):
+    anum_file = tmp_path / "sample.anum"
+    anum_file.write_text("][", encoding="utf-8")
 
-    result = run_cli("project", str(anum_file))
+    result = run_cli("validate", str(anum_file), "--context", "relative")
 
+    assert "context: relative" in result.stdout
+    assert "valid: true" in result.stdout
+
+
+def test_cli_project_outputs_contextual_root_projection(tmp_path):
+    anum_file = tmp_path / "form.anum"
+    anum_file.write_text("[]", encoding="utf-8")
+
+    result = run_cli("project", str(anum_file), "--context", "root")
+
+    assert "context: root" in result.stdout
     assert "input: []" in result.stdout
+    assert "kind: protocol-value" in result.stdout
     assert "protocol_value: 0" in result.stdout
-    assert "input: ][" in result.stdout
-    assert "protocol_value: 1" in result.stdout
+    assert "arrow_form: α ⟼ β" in result.stdout
+
+
+def test_cli_quote_and_unquote_use_real_quaternary_envelope(tmp_path):
+    raw = tmp_path / "raw.anum"
+    raw.write_text("][", encoding="utf-8")
+
+    quoted = run_cli("quote", str(raw))
+    assert quoted.stdout.strip() == "[][]"
+
+    quoted_file = tmp_path / "quoted.anum"
+    quoted_file.write_text(quoted.stdout, encoding="utf-8")
+    unquoted = run_cli("unquote", str(quoted_file))
+    assert unquoted.stdout.strip() == "]["
 
 
 def test_cli_normalize_removes_comments_and_whitespace(tmp_path):
@@ -42,7 +65,6 @@ def test_cli_normalize_removes_comments_and_whitespace(tmp_path):
     anum_file.write_text("# anum-format: quaternary\n[ 0 1 ] # comment\n", encoding="utf-8")
 
     result = run_cli("normalize", str(anum_file))
-
     assert result.stdout.strip() == "[01]"
 
 
@@ -61,10 +83,12 @@ def test_cli_normalize_rejects_string_mode(tmp_path):
     assert "quaternary" in result.stderr
 
 
-def test_cli_realize_string_symbolic_link(tmp_path):
-    anum_file = tmp_path / "link.anum"
-    anum_file.write_text("# anum-format: string\na b\n", encoding="utf-8")
+def test_cli_no_longer_exposes_symbolic_realize_command():
+    result = subprocess.run(
+        [sys.executable, "-m", "converters.anum_cli", "realize", "missing.anum"],
+        capture_output=True,
+        text=True,
+    )
 
-    result = run_cli("realize", str(anum_file))
-
-    assert "realized: a ⟼ b" in result.stdout
+    assert result.returncode != 0
+    assert "invalid choice" in result.stderr

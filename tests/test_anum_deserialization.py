@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
-"""Tests for the minimal non-materializing anum memory model."""
+"""Tests for the temporary symbolic L4 memory model.
 
-from core.anum_memory import AnumMemory, Link, Quote, SymbolicAnum, deserialize
+Quotation is tested through the real L3 protocol, not through a fake Python
+wrapper.
+"""
+
+from core.anum_memory import AnumMemory, Link, SymbolicAnum, symbolic_denotation
 
 
-def test_symbolic_deserialize_and_quote_levels():
+def test_symbolic_denotation_maps_description_to_link():
     form = SymbolicAnum("a", "b")
-
-    assert deserialize(form) == Link("a", "b")
-    assert deserialize(Quote(form)) == form
-    assert deserialize(Quote(Quote(form))) == Quote(form)
+    assert symbolic_denotation(form) == Link("a", "b")
 
 
 def test_load_and_find_do_not_materialize_denoted_link():
@@ -28,12 +28,10 @@ def test_load_and_find_do_not_materialize_denoted_link():
     assert memory.find(form) is True
 
 
-def test_realizing_quote_does_not_materialize_inner_denotation():
+def test_decode_is_non_mutating_in_test_double():
     memory = AnumMemory()
     form = SymbolicAnum("a", "b")
 
-    realized = memory.realize(Quote(form))
-
-    assert realized == form
-    assert Link("a", "b") not in memory.links
-    assert form in memory.raw_forms
+    assert memory.decode(form) == form
+    assert memory.raw_forms == set()
+    assert memory.links == set()
