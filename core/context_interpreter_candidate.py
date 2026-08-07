@@ -1,18 +1,17 @@
 """Experimental contextual interpreter for MTS formal notation v0.2.
 
-This module tests the semantic direction behind issue #79. It is intentionally
-small and read-only:
+The candidate deliberately separates three things:
 
-* every empty ``[]`` occurrence is an anonymous local link hole;
-* ``$[`` / ``$]`` are the two deictic roles of a contextual binary link;
-* repeated ``$`` ascends the execution-context stack;
-* existing MTS operators (``♀F`` / ``F♂``) inspect deeper link structure;
-* ``=`` performs local unification and returns substitutions;
-* interpretation never turns equality into a global rewrite rule;
-* memory mutation/materialization remains a separate L4 operation.
+* formal syntax is parsed into a query/pattern AST;
+* interpretation runs in a virtual binary ``ContextFrame`` and returns local
+  substitutions/trace;
+* associative-memory mutation remains an explicit L4 operation.
 
-The memory interface is deliberately abstract so the same interpreter can later
-run over the real apamemory instead of owning another storage implementation.
+Every empty ``[]`` occurrence is an anonymous local link form. ``$[`` and ``$]``
+are the only primitive contextual pronouns: first/start and second/end roles of
+the current frame. A frame itself does not have to be materialized as a Link in
+memory, so interpreting ``A = B`` never needs to create the auxiliary link
+``A ⟼ B`` first.
 """
 
 from dataclasses import dataclass, field
@@ -40,8 +39,6 @@ LinkRef: TypeAlias = int
 class MemoryView(Protocol):
     """Read-only associative-memory surface required by interpretation."""
 
-    def poles(self, link: LinkRef) -> tuple[LinkRef, LinkRef]: ...
-
     def find_link(self, start: LinkRef, end: LinkRef) -> LinkRef | None: ...
 
     def find_start_projection(self, form: LinkRef) -> LinkRef | None:
@@ -55,9 +52,15 @@ class MemoryView(Protocol):
 
 @dataclass(frozen=True)
 class ContextFrame:
-    """One instantiated binary-link interpretation context."""
+    """Virtual binary role environment for one interpretation step.
 
-    link: LinkRef
+    ``start`` and ``end`` are the two role values exposed by ``$[`` and ``$]``.
+    The frame is interpreter state, not a third MTS operand and not necessarily
+    a materialized Link in associative memory.
+    """
+
+    start: LinkRef
+    end: LinkRef
     parent: "ContextFrame | None" = None
 
 
@@ -71,12 +74,7 @@ class HoleId:
 
 @dataclass
 class InterpretationState:
-    """Local substitutions produced while resolving one expression.
-
-    ``aliases`` is a tiny local union-find for constraints such as ``[] = []``.
-    It exists only for the current interpretation call; no binding leaks into
-    another formula or into associative memory.
-    """
+    """Local substitutions produced while resolving one expression."""
 
     symbols: dict[str, LinkRef] = field(default_factory=dict)
     holes: dict[HoleId, LinkRef] = field(default_factory=dict)
@@ -107,9 +105,8 @@ class InterpretationError(ValueError):
 def resolve_context_pronoun(
     pronoun: ContextPronoun,
     frame: ContextFrame,
-    memory: MemoryView,
 ) -> LinkRef:
-    """Resolve one of the two roles of current/ancestor contextual link."""
+    """Resolve one of two roles of the current/ancestor context frame."""
 
     anchor = frame
     for _ in range(pronoun.up):
@@ -120,8 +117,7 @@ def resolve_context_pronoun(
             )
         anchor = anchor.parent
 
-    start, end = memory.poles(anchor.link)
-    return start if pronoun.pole is ContextPole.START else end
+    return anchor.start if pronoun.pole is ContextPole.START else anchor.end
 
 
 def interpret_constraints(
@@ -183,12 +179,10 @@ def _unify_forms(
 
     if isinstance(left_value, HoleId) and isinstance(right_value, HoleId):
         return _union_holes(left_value, right_value, state)
-
     if isinstance(left_value, HoleId):
         return _bind_hole(left_value, right_value, state)
     if isinstance(right_value, HoleId):
         return _bind_hole(right_value, left_value, state)
-
     return left_value == right_value
 
 
@@ -199,7 +193,7 @@ def _resolve_form(
     state: InterpretationState,
 ) -> LinkRef | HoleId:
     if isinstance(form, ContextPronoun):
-        resolved = resolve_context_pronoun(form, frame, memory)
+        resolved = resolve_context_pronoun(form, frame)
         state.trace.append(f"context:{_format_pronoun(form)}->{resolved}")
         return resolved
 
@@ -296,7 +290,6 @@ def _union_holes(left: HoleId, right: HoleId, state: InterpretationState) -> boo
     if left_bound is not None and right_bound is not None and left_bound != right_bound:
         return False
 
-    # Deterministic representative independent of operand order.
     root, child = sorted((left_root, right_root))
     state.aliases[child] = root
     state.aliases[root] = root
@@ -342,11 +335,12 @@ def _grounded_holes(state: InterpretationState) -> dict[HoleId, LinkRef]:
 
 
 def _normalized_aliases(state: InterpretationState) -> dict[HoleId, HoleId]:
-    return {
-        hole: _find_hole_root(hole, state)
-        for hole in tuple(state.aliases)
-        if _find_hole_root(hole, state) != hole
-    }
+    result: dict[HoleId, HoleId] = {}
+    for hole in tuple(state.aliases):
+        root = _find_hole_root(hole, state)
+        if root != hole:
+            result[hole] = root
+    return result
 
 
 def _format_pronoun(pronoun: ContextPronoun) -> str:
