@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Declarative reference-model contract for MTS/Anum v0.1.
 
-This module does not evaluate MTS formulas and is not a prover.  It records the
+This module does not evaluate MTS formulas and is not a prover. It records the
 layer boundaries and semantic obligations that later implementations must obey.
 Executable semantics belongs to the follow-up reference interpreter.
 """
@@ -47,7 +47,7 @@ class DecisionState(str, Enum):
 
 
 class ValueKind(str, Enum):
-    """Implementation-level categories used to type the L2/L4 contracts."""
+    """Implementation-level categories used to type L2/L4 contracts."""
 
     FORM = "form"
     BUNDLE = "bundle"
@@ -80,6 +80,7 @@ class ConceptSpec:
 @dataclass(frozen=True)
 class SemanticRuleSpec:
     name: str
+    layer: Layer
     equation: str
     description: str
 
@@ -87,6 +88,7 @@ class SemanticRuleSpec:
 @dataclass(frozen=True)
 class OperatorSpec:
     symbol: str
+    layer: Layer
     operands: tuple[ValueKind, ...]
     result: ValueKind
     precedence: int
@@ -97,6 +99,7 @@ class OperatorSpec:
 @dataclass(frozen=True)
 class ExecutionOperationSpec:
     name: str
+    layer: Layer
     input_kind: ValueKind
     result_kind: ValueKind
     mutates_memory: bool
@@ -201,41 +204,49 @@ CONCEPTS = (
 SEMANTIC_RULES = (
     SemanticRuleSpec(
         "link",
+        Layer.SEMANTICS,
         "Link(a, b)",
         "L1 представляет связь как узел с упорядоченными полюсами start=a и end=b.",
     ),
     SemanticRuleSpec(
         "finite-cyclic-carrier",
+        Layer.SEMANTICS,
         "Model = finite directed graph of Link nodes; cycles are allowed",
         "Рекурсивные формы имеют конечный циклический носитель и не требуют бесконечного разворачивания.",
     ),
     SemanticRuleSpec(
         "associative-root",
+        Layer.SEMANTICS,
         "∞ = Link(∞, ∞)",
         "Акорень — узел полного самозамыкания.",
     ),
     SemanticRuleSpec(
         "start-form",
+        Layer.SEMANTICS,
         "♀F = Link(♀F, F)",
         "Префикс ♀ строит начало формы через самозамкнутый start-полюс.",
     ),
     SemanticRuleSpec(
         "end-form",
+        Layer.SEMANTICS,
         "F♂ = Link(F, F♂)",
         "Постфикс ♂ строит конец формы через самозамкнутый end-полюс.",
     ),
     SemanticRuleSpec(
         "inversion",
+        Layer.SEMANTICS,
         "¬Link(a, b) = Link(b, a)",
         "Инверсия меняет направление одной связи и не означает отсутствие связи.",
     ),
     SemanticRuleSpec(
         "equality",
+        Layer.SEMANTICS,
         "A = B iff their rooted ordered cyclic Link graphs are bisimilar",
         "Равенство v0.1 — коиндуктивное структурное сравнение start/end-рёбер.",
     ),
     SemanticRuleSpec(
         "bundle",
+        Layer.SEMANTICS,
         "{A, A} = {A}; {A, B} = {B, A}",
         "Пучки v0.1 читаются экстенсионально, как зафиксировано текущим fixture.",
     ),
@@ -245,6 +256,7 @@ SEMANTIC_RULES = (
 OPERATORS = (
     OperatorSpec(
         ":",
+        Layer.FORMAL_LANGUAGE,
         (ValueKind.FORM, ValueKind.FORM),
         ValueKind.DEFINITION,
         10,
@@ -253,6 +265,7 @@ OPERATORS = (
     ),
     OperatorSpec(
         "=",
+        Layer.FORMAL_LANGUAGE,
         (ValueKind.FORM, ValueKind.FORM),
         ValueKind.JUDGMENT,
         20,
@@ -261,6 +274,7 @@ OPERATORS = (
     ),
     OperatorSpec(
         "!=",
+        Layer.FORMAL_LANGUAGE,
         (ValueKind.FORM, ValueKind.FORM),
         ValueKind.JUDGMENT,
         20,
@@ -269,6 +283,7 @@ OPERATORS = (
     ),
     OperatorSpec(
         "⟼",
+        Layer.FORMAL_LANGUAGE,
         (ValueKind.FORM, ValueKind.FORM),
         ValueKind.FORM,
         40,
@@ -277,6 +292,7 @@ OPERATORS = (
     ),
     OperatorSpec(
         "¬",
+        Layer.FORMAL_LANGUAGE,
         (ValueKind.FORM,),
         ValueKind.FORM,
         60,
@@ -285,6 +301,7 @@ OPERATORS = (
     ),
     OperatorSpec(
         "♀",
+        Layer.FORMAL_LANGUAGE,
         (ValueKind.FORM,),
         ValueKind.FORM,
         70,
@@ -293,6 +310,7 @@ OPERATORS = (
     ),
     OperatorSpec(
         "♂",
+        Layer.FORMAL_LANGUAGE,
         (ValueKind.FORM,),
         ValueKind.FORM,
         70,
@@ -300,7 +318,8 @@ OPERATORS = (
         "Строит/читает конец формы в reference model.",
     ),
     OperatorSpec(
-        "(...)" ,
+        "(...)",
+        Layer.FORMAL_LANGUAGE,
         (ValueKind.FORM,),
         ValueKind.FORM,
         80,
@@ -309,6 +328,7 @@ OPERATORS = (
     ),
     OperatorSpec(
         "[...]",
+        Layer.FORMAL_LANGUAGE,
         (ValueKind.FORM,),
         ValueKind.FORM,
         80,
@@ -317,6 +337,7 @@ OPERATORS = (
     ),
     OperatorSpec(
         "{...}",
+        Layer.FORMAL_LANGUAGE,
         (ValueKind.FORM,),
         ValueKind.BUNDLE,
         80,
@@ -329,6 +350,7 @@ OPERATORS = (
 EXECUTION_OPERATIONS = (
     ExecutionOperationSpec(
         "load",
+        Layer.EXECUTION,
         ValueKind.RAW_ANUM,
         ValueKind.RAW_ANUM,
         True,
@@ -337,6 +359,7 @@ EXECUTION_OPERATIONS = (
     ),
     ExecutionOperationSpec(
         "decode",
+        Layer.EXECUTION,
         ValueKind.RAW_ANUM,
         ValueKind.PROJECTION,
         False,
@@ -345,6 +368,7 @@ EXECUTION_OPERATIONS = (
     ),
     ExecutionOperationSpec(
         "project",
+        Layer.EXECUTION,
         ValueKind.RAW_ANUM,
         ValueKind.PROJECTION,
         False,
@@ -353,6 +377,7 @@ EXECUTION_OPERATIONS = (
     ),
     ExecutionOperationSpec(
         "find",
+        Layer.EXECUTION,
         ValueKind.PROJECTION,
         ValueKind.MEMORY_QUERY,
         False,
@@ -361,6 +386,7 @@ EXECUTION_OPERATIONS = (
     ),
     ExecutionOperationSpec(
         "realize",
+        Layer.EXECUTION,
         ValueKind.PROJECTION,
         ValueKind.MEMORY_EFFECT,
         True,
@@ -369,6 +395,7 @@ EXECUTION_OPERATIONS = (
     ),
     ExecutionOperationSpec(
         "delete",
+        Layer.EXECUTION,
         ValueKind.PROJECTION,
         ValueKind.MEMORY_EFFECT,
         True,
@@ -420,14 +447,20 @@ def validate_reference_model() -> tuple[str, ...]:
     operator_symbols = [item.symbol for item in OPERATORS]
     if len(operator_symbols) != len(set(operator_symbols)):
         errors.append("L2 operator symbols must be unique")
+    if any(item.layer is not Layer.FORMAL_LANGUAGE for item in OPERATORS):
+        errors.append("all formal operators must belong to L2")
 
     semantic_names = [item.name for item in SEMANTIC_RULES]
     if len(semantic_names) != len(set(semantic_names)):
         errors.append("semantic rule names must be unique")
+    if any(item.layer is not Layer.SEMANTICS for item in SEMANTIC_RULES):
+        errors.append("all reference semantic rules must belong to L1")
 
     operation_names = [item.name for item in EXECUTION_OPERATIONS]
     if len(operation_names) != len(set(operation_names)):
         errors.append("L4 operation names must be unique")
+    if any(item.layer is not Layer.EXECUTION for item in EXECUTION_OPERATIONS):
+        errors.append("all execution operations must belong to L4")
 
     if concept("issue-61-projection").status is not StatementStatus.EXPERIMENTAL:
         errors.append("issue #61 protocol projection must remain experimental in v0.1")
