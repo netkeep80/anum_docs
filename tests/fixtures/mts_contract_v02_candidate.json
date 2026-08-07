@@ -9,19 +9,13 @@
   "formalNotation": {
     "anonymousForm": {
       "source": "[]",
-      "identity": "occurrence-local",
+      "identity": "ast-occurrence-path",
       "meaning": "anonymous-link-form"
     },
     "context": {
       "roles": [
-        {
-          "source": "$[",
-          "role": "start"
-        },
-        {
-          "source": "$]",
-          "role": "end"
-        }
+        {"source": "$[", "role": "start"},
+        {"source": "$]", "role": "end"}
       ],
       "ancestor": {
         "operator": "$",
@@ -30,12 +24,11 @@
           "$$]": "parent.end"
         }
       },
-      "genericPathLanguage": false
+      "genericPathLanguage": false,
+      "materializedLinkRequired": false
     },
     "operations": {
-      "parse": {
-        "effect": "none"
-      },
+      "parse": {"effect": "none"},
       "interpret": {
         "effect": "none",
         "returns": [
@@ -45,6 +38,11 @@
           "resolutionTrace"
         ]
       }
+    },
+    "patternMatching": {
+      "linkForm": "decompose-existing-link",
+      "roundGrouping": "transparent",
+      "materializes": false
     },
     "equality": {
       "execution": "local-unification",
@@ -56,28 +54,18 @@
     }
   },
   "anum": {
-    "operations": [
-      "serialize",
-      "deserialize"
-    ],
-    "alphabet": [
-      "[",
-      "]",
-      "1",
-      "0"
-    ]
+    "operations": ["serialize", "deserialize"],
+    "alphabet": ["[", "]", "1", "0"]
   },
   "memory": {
     "readOperations": [
       "find",
+      "poles",
       "findLink",
       "findStartProjection",
       "findEndProjection"
     ],
-    "effectOperations": [
-      "realize",
-      "delete"
-    ],
+    "effectOperations": ["realize", "delete"],
     "interpretMayMaterialize": false
   },
   "rootProgram": "tests/fixtures/mtc_root_v02_candidate.mtc",
