@@ -20,6 +20,7 @@ from core.mtc_ast import (
     structural_key,
 )
 from core.mtc_parser import parse_formula_result
+from core.root_library import FormulaKind, load_root_library
 
 
 CANDIDATE = Path(__file__).with_name("fixtures") / "mtc_root_v02_candidate.mtc"
@@ -80,6 +81,16 @@ def test_candidate_root_is_only_ten_named_semantic_definitions():
     assert len(formulas) == 10
     assert len(asts) == 10
     assert all(isinstance(ast, Definition) for ast in asts)
+
+
+def test_candidate_root_uses_existing_canonical_root_library_without_special_path():
+    library = load_root_library(CANDIDATE)
+
+    assert len(library.formulas) == 10
+    assert all(formula.is_valid for formula in library.formulas)
+    assert all(formula.kind is FormulaKind.DEFINITION for formula in library.formulas)
+    assert len(library.registry.entries()) == 10
+    assert library.registry.duplicates() == []
 
 
 def test_candidate_root_targets_are_unique():
