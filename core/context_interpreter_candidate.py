@@ -3,13 +3,14 @@
 The candidate has three semantic primitives beyond the existing L2 operators:
 
 * each empty ``[]`` is an occurrence-local anonymous Link pattern;
-* ``$[`` / ``$]`` select the two roles of a virtual ``ContextFrame``;
+* atomic ``◁`` / ``▷`` select the two roles of a virtual ``ContextFrame``;
 * ``interpret`` resolves patterns against existing associative memory and returns
   local substitutions/aliases/trace without materializing anything.
 
-Identity of anonymous forms comes from typed-AST paths, not labels or source
-spans. Parentheses remain in the AST for round-trip fidelity but are transparent
-to interpretation.
+``↑`` is a separate context-ascent operator for parent frames; it is not part of
+pronoun identity and never overloads bracket syntax. Identity of anonymous forms
+comes from typed-AST paths, not labels or source spans. Parentheses remain in the
+AST for round-trip fidelity but are transparent to interpretation.
 """
 
 from dataclasses import dataclass, field
@@ -230,11 +231,17 @@ def _unify_forms(
         )
 
     if isinstance(left, LinkForm):
-        right_ref = _require_link(_resolve_form(right, right_path, frame, memory, state), "правый операнд =")
+        right_ref = _require_link(
+            _resolve_form(right, right_path, frame, memory, state),
+            "правый операнд =",
+        )
         return _match_link_pattern(left, left_path, right_ref, frame, memory, state)
 
     if isinstance(right, LinkForm):
-        left_ref = _require_link(_resolve_form(left, left_path, frame, memory, state), "левый операнд =")
+        left_ref = _require_link(
+            _resolve_form(left, left_path, frame, memory, state),
+            "левый операнд =",
+        )
         return _match_link_pattern(right, right_path, left_ref, frame, memory, state)
 
     left_value = _resolve_form(left, left_path, frame, memory, state)
@@ -258,8 +265,20 @@ def _match_link_pattern(
 ) -> bool:
     start, end = memory.poles(link)
     state.trace.append(f"decompose:{link}->{start},{end}")
-    return _unify_form_with_ref(pattern.left, path + (0,), start, frame, memory, state) and _unify_form_with_ref(
-        pattern.right, path + (1,), end, frame, memory, state
+    return _unify_form_with_ref(
+        pattern.left,
+        path + (0,),
+        start,
+        frame,
+        memory,
+        state,
+    ) and _unify_form_with_ref(
+        pattern.right,
+        path + (1,),
+        end,
+        frame,
+        memory,
+        state,
     )
 
 
@@ -279,7 +298,11 @@ def _unify_form_with_ref(
     if isinstance(form, LinkForm):
         return _match_link_pattern(form, path, value, frame, memory, state)
     resolved = _resolve_form(form, path, frame, memory, state)
-    return _bind_hole(resolved, value, state) if isinstance(resolved, HoleId) else resolved == value
+    return (
+        _bind_hole(resolved, value, state)
+        if isinstance(resolved, HoleId)
+        else resolved == value
+    )
 
 
 def _resolve_form(
@@ -305,34 +328,56 @@ def _resolve_form(
         try:
             return state.symbols[form.name]
         except KeyError as exc:
-            raise InterpretationError(f"Символ {form.name!r} не связан в текущем окружении") from exc
+            raise InterpretationError(
+                f"Символ {form.name!r} не связан в текущем окружении"
+            ) from exc
 
     if isinstance(form, StartProjection):
-        value = _require_link(_resolve_form(form.value, path + (0,), frame, memory, state), "♀")
+        value = _require_link(
+            _resolve_form(form.value, path + (0,), frame, memory, state),
+            "♀",
+        )
         projected = memory.find_start_projection(value)
         if projected is None:
-            raise InterpretationError(f"Форма начала для {value} не различена; interpret не выполняет realize")
+            raise InterpretationError(
+                f"Форма начала для {value} не различена; interpret не выполняет realize"
+            )
         state.trace.append(f"start:{value}->{projected}")
         return projected
 
     if isinstance(form, EndProjection):
-        value = _require_link(_resolve_form(form.value, path + (0,), frame, memory, state), "♂")
+        value = _require_link(
+            _resolve_form(form.value, path + (0,), frame, memory, state),
+            "♂",
+        )
         projected = memory.find_end_projection(value)
         if projected is None:
-            raise InterpretationError(f"Форма конца для {value} не различена; interpret не выполняет realize")
+            raise InterpretationError(
+                f"Форма конца для {value} не различена; interpret не выполняет realize"
+            )
         state.trace.append(f"end:{value}->{projected}")
         return projected
 
     if isinstance(form, LinkForm):
-        left = _require_link(_resolve_form(form.left, path + (0,), frame, memory, state), "левый полюс ⟼")
-        right = _require_link(_resolve_form(form.right, path + (1,), frame, memory, state), "правый полюс ⟼")
+        left = _require_link(
+            _resolve_form(form.left, path + (0,), frame, memory, state),
+            "левый полюс ⟼",
+        )
+        right = _require_link(
+            _resolve_form(form.right, path + (1,), frame, memory, state),
+            "правый полюс ⟼",
+        )
         found = memory.find_link(left, right)
         if found is None:
-            raise InterpretationError(f"Связь ({left} ⟼ {right}) не различена; interpret не выполняет realize")
+            raise InterpretationError(
+                f"Связь ({left} ⟼ {right}) не различена; interpret не выполняет realize"
+            )
         state.trace.append(f"link:{left},{right}->{found}")
         return found
 
-    raise InterpretationError(f"Candidate interpreter ещё не разрешает форму {type(form).__name__}")
+    raise InterpretationError(
+        f"Candidate interpreter ещё не разрешает форму {type(form).__name__}"
+    )
 
 
 def _is_anonymous(form: Form) -> bool:
@@ -341,7 +386,9 @@ def _is_anonymous(form: Form) -> bool:
 
 def _require_link(value: LinkRef | HoleId, role: str) -> LinkRef:
     if isinstance(value, HoleId):
-        raise InterpretationError(f"{role} нельзя разрешить до связывания анонимной формы {value}")
+        raise InterpretationError(
+            f"{role} нельзя разрешить до связывания анонимной формы {value}"
+        )
     return value
 
 
@@ -407,4 +454,4 @@ def _normalized_aliases(state: InterpretationState) -> dict[HoleId, HoleId]:
 
 
 def _format_pronoun(pronoun: ContextPronoun) -> str:
-    return "$" * (pronoun.up + 1) + pronoun.pole.value
+    return "↑" * pronoun.up + pronoun.pole.value
