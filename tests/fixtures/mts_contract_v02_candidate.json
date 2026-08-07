@@ -1,0 +1,94 @@
+{
+  "schema": "mts-contract/v0.2-candidate",
+  "status": "experimental",
+  "layers": {
+    "formalNotation": "L2",
+    "anumSerialization": "L3",
+    "memoryExecution": "L4"
+  },
+  "formalNotation": {
+    "anonymousForm": {
+      "source": "[]",
+      "identity": "occurrence-local",
+      "meaning": "anonymous-link-form"
+    },
+    "context": {
+      "roles": [
+        {
+          "source": "$[",
+          "role": "start"
+        },
+        {
+          "source": "$]",
+          "role": "end"
+        }
+      ],
+      "ancestor": {
+        "operator": "$",
+        "examples": {
+          "$$[": "parent.start",
+          "$$]": "parent.end"
+        }
+      },
+      "genericPathLanguage": false
+    },
+    "operations": {
+      "parse": {
+        "effect": "none"
+      },
+      "interpret": {
+        "effect": "none",
+        "returns": [
+          "success",
+          "localSubstitutions",
+          "localAliases",
+          "resolutionTrace"
+        ]
+      }
+    },
+    "equality": {
+      "execution": "local-unification",
+      "globalRewrite": false,
+      "candidateDefinition": "(=) : {♀$[ = ♀$], $[♂ = $]♂}"
+    },
+    "aroot": {
+      "candidateDefinition": "∞ : {$[ = ∞, $] = ∞}"
+    }
+  },
+  "anum": {
+    "operations": [
+      "serialize",
+      "deserialize"
+    ],
+    "alphabet": [
+      "[",
+      "]",
+      "1",
+      "0"
+    ]
+  },
+  "memory": {
+    "readOperations": [
+      "find",
+      "findLink",
+      "findStartProjection",
+      "findEndProjection"
+    ],
+    "effectOperations": [
+      "realize",
+      "delete"
+    ],
+    "interpretMayMaterialize": false
+  },
+  "rootProgram": "tests/fixtures/mtc_root_v02_candidate.mtc",
+  "integration": {
+    "displayLabelIsIdentity": false,
+    "requiredRuntimeIdentities": [
+      "LinkRef",
+      "HoleId",
+      "ContextFrameId",
+      "JudgmentId",
+      "ProofStepId"
+    ]
+  }
+}
