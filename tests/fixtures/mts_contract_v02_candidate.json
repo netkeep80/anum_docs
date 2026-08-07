@@ -13,15 +13,18 @@
       "meaning": "anonymous-link-form"
     },
     "context": {
+      "atomicPronouns": true,
+      "bracketOverloading": false,
       "roles": [
-        {"source": "$[", "role": "start"},
-        {"source": "$]", "role": "end"}
+        {"source": "◁", "role": "start"},
+        {"source": "▷", "role": "end"}
       ],
       "ancestor": {
-        "operator": "$",
+        "operator": "↑",
         "examples": {
-          "$$[": "parent.start",
-          "$$]": "parent.end"
+          "↑◁": "parent.start",
+          "↑▷": "parent.end",
+          "↑↑◁": "grandparent.start"
         }
       },
       "genericPathLanguage": false,
@@ -47,10 +50,10 @@
     "equality": {
       "execution": "local-unification",
       "globalRewrite": false,
-      "candidateDefinition": "(=) : {♀$[ = ♀$], $[♂ = $]♂}"
+      "candidateDefinition": "(=) : {♀◁ = ♀▷, ◁♂ = ▷♂}"
     },
     "aroot": {
-      "candidateDefinition": "∞ : {$[ = ∞, $] = ∞}"
+      "candidateDefinition": "∞ : {◁ = ∞, ▷ = ∞}"
     }
   },
   "anum": {
