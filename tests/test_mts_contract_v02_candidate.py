@@ -34,19 +34,35 @@ def test_contract_has_explicit_experimental_schema_and_layer_boundaries():
     }
 
 
-def test_contract_exposes_exactly_two_binary_context_roles():
+def test_contract_exposes_exactly_two_atomic_binary_context_roles():
     contract = load_contract()
-    roles = contract["formalNotation"]["context"]["roles"]
+    context = contract["formalNotation"]["context"]
+    roles = context["roles"]
+
+    assert context["atomicPronouns"] is True
+    assert context["bracketOverloading"] is False
     assert roles == [
-        {"source": "$[", "role": "start"},
-        {"source": "$]", "role": "end"},
+        {"source": "◁", "role": "start"},
+        {"source": "▷", "role": "end"},
     ]
-    assert contract["formalNotation"]["context"]["genericPathLanguage"] is False
-    assert contract["formalNotation"]["context"]["materializedLinkRequired"] is False
+    assert all(len(role["source"]) == 1 for role in roles)
+    assert context["ancestor"]["operator"] == "↑"
+    assert context["genericPathLanguage"] is False
+    assert context["materializedLinkRequired"] is False
 
     parsed = [parse_formula(role["source"]) for role in roles]
     assert all(isinstance(item, ContextPronoun) for item in parsed)
     assert [item.pole for item in parsed] == [ContextPole.START, ContextPole.END]
+
+
+def test_contract_keeps_square_brackets_out_of_context_syntax():
+    context = load_contract()["formalNotation"]["context"]
+    syntax = "".join(
+        [role["source"] for role in context["roles"]]
+        + [context["ancestor"]["operator"]]
+    )
+    assert "[" not in syntax
+    assert "]" not in syntax
 
 
 def test_contract_declares_empty_form_identity_as_ast_occurrence_path():
