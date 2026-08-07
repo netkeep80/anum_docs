@@ -76,6 +76,17 @@ def test_root_fixture_is_exact_and_excludes_protocol_hypotheses():
     assert all(formula not in formula_text for formula in FORBIDDEN_PROTOCOL_FORMULAS)
 
 
+def test_anum_protocol_has_one_active_projection_and_quote_path():
+    assert not (ROOT / "core/anum_projector.py").exists()
+
+    memory_text = (ROOT / "core/anum_memory.py").read_text(encoding="utf-8")
+    cli_text = (ROOT / "converters/anum_cli.py").read_text(encoding="utf-8")
+
+    assert "class Quote" not in memory_text
+    assert '"realize"' not in cli_text
+    assert (ROOT / "core/anum_protocol.py").is_file()
+
+
 def test_root_library_validates():
     result = validate_root_library(ROOT_FIXTURE)
     assert result.is_valid, result.messages
