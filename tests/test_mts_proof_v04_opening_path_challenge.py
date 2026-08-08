@@ -82,7 +82,14 @@ def v03_artifact_replays(artifact: dict) -> bool:
 
 
 def opening_path_judgment(vector: dict) -> dict:
-    return {"relation": "DefinitionOpeningPath", **deepcopy(vector)}
+    return {
+        "relation": "DefinitionOpeningPath",
+        "scopes": deepcopy(vector["scopes"]),
+        "lookupScope": deepcopy(vector["lookupScope"]),
+        "startTarget": vector["startTarget"],
+        "edges": deepcopy(vector["edges"]),
+        "finalBody": vector["finalBody"],
+    }
 
 
 def check_opening_path_judgment(data: dict) -> bool:
