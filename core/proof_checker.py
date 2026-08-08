@@ -13,14 +13,16 @@ from dataclasses import dataclass
 import json
 from typing import TypeAlias
 
-from core.mtc_ast import Definition, Form, format_expression
+from core.mtc_ast import Definition, Expression, Form, format_expression
 from core.mtc_definitions import (
     DefinitionEnvironment,
+    DefinitionId,
     DefinitionLookupKind,
     DefinitionRegistrationKind,
     open_definition,
 )
 from core.mtc_interpreter import ContextFrame, MemoryView, interpret_constraints
+from core.mtc_opening_path import OpeningPathEdge, OpeningPathWitness, verify_opening_path
 from core.mtc_parser import parse_formula
 
 
@@ -477,7 +479,6 @@ def _memory_from_data(data: object) -> tuple[DistinguishedLink, ...]:
                 end=_int_from_data(item["end"], "memory.end"),
             )
         )
-    # ProofMemory performs the semantic duplicate/ambiguity validation.
     ProofMemory(tuple(result))
     return tuple(result)
 
@@ -705,10 +706,7 @@ def _symbols_to_data(symbols: tuple[tuple[str, int], ...]) -> list[list[object]]
 def _substitutions_to_data(
     substitutions: tuple[ExpectedSubstitution, ...],
 ) -> list[dict]:
-    return [
-        {"path": list(item.path), "link": item.link}
-        for item in substitutions
-    ]
+    return [{"path": list(item.path), "link": item.link} for item in substitutions]
 
 
 def _aliases_to_data(aliases: tuple[ExpectedAlias, ...]) -> list[dict]:
@@ -790,6 +788,214 @@ def proof_v03_to_data(proof: ProofObjectV03) -> dict:
 def canonical_proof_v03_json(proof: ProofObjectV03) -> str:
     return json.dumps(
         proof_v03_to_data(proof),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+# v0.4 extends the same trusted module with exactly one accepted composite
+# certificate relation.  Existing v0.2/v0.3 APIs and semantics above remain
+# independent and unchanged.
+CONTRACT_VERSION_V04 = "mts-contract/v0.4"
+PROOF_SCHEMA_V04 = "mts-proof/v0.4"
+
+
+@dataclass(frozen=True)
+class DefinitionOpeningPathJudgment:
+    scopes: tuple[DefinitionScopeSnapshot, ...]
+    lookup_scope: tuple[int, ...]
+    start_target: Form
+    edges: tuple[OpeningPathEdge, ...]
+    final_body: Expression
+    relation: str = "DefinitionOpeningPath"
+
+
+V04Judgment: TypeAlias = V03Judgment | DefinitionOpeningPathJudgment
+
+
+@dataclass(frozen=True)
+class ProofObjectV04:
+    judgments: tuple[V04Judgment, ...]
+    contract_version: str = CONTRACT_VERSION_V04
+    proof_version: str = PROOF_SCHEMA_V04
+
+
+def _canonical_expression_from_data(value: object, label: str) -> Expression:
+    if not isinstance(value, str):
+        raise ValueError(f"{label} must be a string")
+    expression = parse_formula(value)
+    if format_expression(expression) != value:
+        raise ValueError(f"{label} must use canonical format_expression transport")
+    return expression
+
+
+def _opening_path_judgment_from_data(data: object) -> DefinitionOpeningPathJudgment:
+    if not isinstance(data, dict):
+        raise ValueError("DefinitionOpeningPath judgment must be an object")
+    _require_exact_keys(
+        data,
+        {"relation", "scopes", "lookupScope", "startTarget", "edges", "finalBody"},
+        "DefinitionOpeningPath",
+    )
+    if data["relation"] != "DefinitionOpeningPath":
+        raise ValueError("invalid DefinitionOpeningPath relation")
+    if not isinstance(data["startTarget"], str):
+        raise ValueError("startTarget must be a string")
+    if not isinstance(data["edges"], list) or not data["edges"]:
+        raise ValueError("edges must be a non-empty array")
+
+    edges: list[OpeningPathEdge] = []
+    for index, edge_data in enumerate(data["edges"]):
+        if not isinstance(edge_data, dict):
+            raise ValueError("opening path edge must be an object")
+        _require_exact_keys(
+            edge_data,
+            {"target", "definitionId", "body"},
+            "opening path edge",
+        )
+        if not isinstance(edge_data["target"], str):
+            raise ValueError("opening path edge target must be a string")
+        expected_id = _definition_id_from_data(edge_data["definitionId"])
+        edges.append(
+            OpeningPathEdge(
+                target=_parse_definition_target(edge_data["target"]),
+                definition_id=DefinitionId(
+                    expected_id.scope_path,
+                    expected_id.ordinal,
+                ),
+                body=_canonical_expression_from_data(
+                    edge_data["body"],
+                    f"opening path edge[{index}].body",
+                ),
+            )
+        )
+
+    return DefinitionOpeningPathJudgment(
+        scopes=_scopes_from_data(data["scopes"]),
+        lookup_scope=_path_from_data(data["lookupScope"], "lookupScope"),
+        start_target=_parse_definition_target(data["startTarget"]),
+        edges=tuple(edges),
+        final_body=_canonical_expression_from_data(data["finalBody"], "finalBody"),
+    )
+
+
+def check_definition_opening_path(judgment: DefinitionOpeningPathJudgment) -> bool:
+    """Replay one accepted finite opening-path certificate exactly once."""
+
+    if judgment.relation != "DefinitionOpeningPath":
+        return False
+    try:
+        _validate_path(judgment.lookup_scope)
+        environments = _build_definition_environments(judgment.scopes)
+        environment = environments.get(judgment.lookup_scope)
+        if environment is None:
+            return False
+        witness = OpeningPathWitness(
+            start_target=judgment.start_target,
+            edges=judgment.edges,
+            final_body=judgment.final_body,
+        )
+        return verify_opening_path(witness, environment).accepted
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def check_v04_judgment(judgment: V04Judgment) -> bool:
+    if isinstance(judgment, DefinitionOpeningPathJudgment):
+        return check_definition_opening_path(judgment)
+    return check_v03_judgment(judgment)
+
+
+def check_proof_v04(proof: ProofObjectV04) -> bool:
+    """Replay six accepted v0.4 relations; array order has no dependency meaning."""
+
+    if (
+        proof.proof_version != PROOF_SCHEMA_V04
+        or proof.contract_version != CONTRACT_VERSION_V04
+    ):
+        return False
+    return all(check_v04_judgment(judgment) for judgment in proof.judgments)
+
+
+def _v04_judgment_from_data(data: object) -> V04Judgment:
+    if isinstance(data, dict) and data.get("relation") == "DefinitionOpeningPath":
+        return _opening_path_judgment_from_data(data)
+    return _judgment_from_data(data)
+
+
+def proof_v04_from_data(data: object) -> ProofObjectV04:
+    """Strictly parse one portable mts-proof/v0.4 JSON-shaped artifact."""
+
+    if not isinstance(data, dict):
+        raise ValueError("proof must be an object")
+    _require_exact_keys(
+        data,
+        {"proofVersion", "contractVersion", "judgments"},
+        "proof",
+    )
+    if data["proofVersion"] != PROOF_SCHEMA_V04:
+        raise ValueError("unsupported proofVersion")
+    if data["contractVersion"] != CONTRACT_VERSION_V04:
+        raise ValueError("unsupported contractVersion")
+    if not isinstance(data["judgments"], list):
+        raise ValueError("judgments must be an array")
+    return ProofObjectV04(
+        judgments=tuple(_v04_judgment_from_data(item) for item in data["judgments"]),
+    )
+
+
+def check_proof_v04_data(data: object) -> bool:
+    """Strictly parse then independently replay one portable v0.4 artifact."""
+
+    try:
+        return check_proof_v04(proof_v04_from_data(data))
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def _opening_path_judgment_to_data(judgment: DefinitionOpeningPathJudgment) -> dict:
+    return {
+        "relation": judgment.relation,
+        "scopes": _scopes_to_data(judgment.scopes),
+        "lookupScope": list(judgment.lookup_scope),
+        "startTarget": format_expression(judgment.start_target),
+        "edges": [
+            {
+                "target": format_expression(edge.target),
+                "definitionId": {
+                    "scopePath": list(edge.definition_id.scope_path),
+                    "ordinal": edge.definition_id.ordinal,
+                },
+                "body": format_expression(edge.body),
+            }
+            for edge in judgment.edges
+        ],
+        "finalBody": format_expression(judgment.final_body),
+    }
+
+
+def _v04_judgment_to_data(judgment: V04Judgment) -> dict:
+    if isinstance(judgment, DefinitionOpeningPathJudgment):
+        return _opening_path_judgment_to_data(judgment)
+    return _judgment_to_data(judgment)
+
+
+def proof_v04_to_data(proof: ProofObjectV04) -> dict:
+    """Serialize one valid typed v0.4 proof object to canonical portable data."""
+
+    if not check_proof_v04(proof):
+        raise ValueError("cannot serialize invalid v0.4 proof object")
+    return {
+        "proofVersion": proof.proof_version,
+        "contractVersion": proof.contract_version,
+        "judgments": [_v04_judgment_to_data(item) for item in proof.judgments],
+    }
+
+
+def canonical_proof_v04_json(proof: ProofObjectV04) -> str:
+    return json.dumps(
+        proof_v04_to_data(proof),
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
