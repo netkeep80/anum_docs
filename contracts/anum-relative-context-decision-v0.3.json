@@ -1,0 +1,143 @@
+{
+  "schema": "anum-relative-context-decision/v0.3",
+  "status": "candidate-decision",
+  "dependsOn": [
+    "anum-recursive-denotation/v0.2",
+    "anum-relative-context-challenge/v0.3"
+  ],
+  "issue": 123,
+  "acceptedContractLinkAllowed": false,
+  "productionRelativeSemanticsChangeAllowed": false,
+  "purpose": "Choose the next executable model for relative Anum context without changing accepted root/quote semantics or inventing L4 identity.",
+  "evidence": {
+    "acceptedL1": "finite CarrierGraph of LinkNode(start,end), with cycles and sharing allowed",
+    "acceptedL2Context": "ContextFrame parent ascent is explicit ↑ and therefore must not be reused for structural start/end descent",
+    "acceptedL3Relative": "RAW only in v0.2",
+    "historicalNonNormative": "old research issue #61 described [[ as start-of-start and ]] as end-of-end, but its old root 0/1 orientation is superseded and is not imported as semantics"
+  },
+  "models": [
+    {
+      "id": "A",
+      "name": "single-opaque-anchor",
+      "verdict": "reject-as-general-relative-context",
+      "accepted": false,
+      "reason": "One opaque anchor has no typed start/end topology, so bracket roles would require hidden conventions or an external lookup API."
+    },
+    {
+      "id": "B",
+      "name": "ordered-start-end-anchor-pair",
+      "verdict": "defer-as-shallow-subset",
+      "accepted": false,
+      "reason": "Makes one binary level explicit but cannot represent arbitrary nested relative traversal, cycles or sharing without recursively growing a second carrier model."
+    },
+    {
+      "id": "C",
+      "name": "parented-binary-relative-frame",
+      "verdict": "reject-as-structural-model",
+      "accepted": false,
+      "reason": "A parent pointer models context ancestry, while relative bracket nesting is being challenged as descent through start/end roles. Reusing parent would conflate L3 structure with L2 ↑ context ascent."
+    },
+    {
+      "id": "D",
+      "name": "external-AnumDenotation-with-focus",
+      "verdict": "defer-for-occurrence-tree-subsets",
+      "accepted": false,
+      "reason": "Current structural AnumDenotation is topological occurrence-tree IR and intentionally rejects shared/cyclic node references, so it is too narrow as the general relative context carrier."
+    },
+    {
+      "id": "E",
+      "name": "persistent-LinkRef-context",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Persistent/backend link identity belongs to L4 and would violate storage-neutral L3 denotation."
+    },
+    {
+      "id": "F",
+      "name": "focused-finite-L1-carrier",
+      "verdict": "preferred-candidate",
+      "accepted": false,
+      "shape": "RelativeCarrierContext(graph: CarrierGraph, focus: node-index)",
+      "reason": "Reuses the already accepted finite cyclic L1 topology. Start/end traversal is explicit, cycles and sharing need no unfolding, focus is description-local, and no L4 backend identity is introduced."
+    }
+  ],
+  "preferredCandidate": {
+    "context": {
+      "graph": "finite accepted L1 CarrierGraph",
+      "focus": "valid description-local node index in graph",
+      "persistentIdentity": false,
+      "ownsGraph": false
+    },
+    "firstChallengeSubset": {
+      "rawAlphabet": ["[", "]"],
+      "readDirection": "left-to-right from current focus",
+      "candidateStep": {
+        "[": "focus := graph.nodes[focus].start",
+        "]": "focus := graph.nodes[focus].end"
+      },
+      "examplesToChallenge": {
+        "[": "start(focus)",
+        "]": "end(focus)",
+        "[[": "start(start(focus))",
+        "]]": "end(end(focus))",
+        "[]": "end(start(focus))",
+        "][": "start(end(focus))"
+      },
+      "terminatesByRawLength": true,
+      "cycleUnfoldingRequired": false,
+      "accepted": false
+    },
+    "explicitlyDeferred": [
+      "relative meaning of 0",
+      "relative meaning of 1",
+      "mixed bracket/0/1 carriers",
+      "whether a relative result is a selected node, selected rooted subcarrier, or another denotation type",
+      "whether traversal path is semantic or only provenance",
+      "canonical inverse when multiple paths in a cyclic/shared carrier select the same node"
+    ]
+  },
+  "identityBoundary": {
+    "focusNodeIndexIsDescriptionLocal": true,
+    "focusNodeIndexIsPersistentLinkId": false,
+    "equalSubgraphsNeedNotIntern": true,
+    "carrierIsomorphismIsNotL2Equality": true,
+    "displayGlyphIsIdentity": false
+  },
+  "contextSeparation": {
+    "relativeStructuralTraversalUsesL2ContextFrameParent": false,
+    "relativeStructuralTraversalUsesMemoryView": false,
+    "relativeStructuralTraversalMayMaterialize": false,
+    "rootOpeningCollapseAppliesToRelativeCandidate": false,
+    "quoteEnvelopeRemovalAppliesToRelativeCandidate": false
+  },
+  "inverseBoundary": {
+    "canonicalInverseAccepted": false,
+    "reason": "cycles/sharing can make multiple finite bracket paths select the same node; challenge must decide whether path is part of denotation before choosing an inverse",
+    "mustNotChooseShortestPathImplicitly": true,
+    "mustNotUseBackendIdentityToDisambiguate": true
+  },
+  "nextGate": {
+    "artifact": "anum-relative-carrier-path-challenge/v0.3",
+    "status": "candidate-challenge",
+    "mustNotChangeProductionRelativeSemantics": true,
+    "requiredVectors": [
+      "single [ and ] over focused finite carrier",
+      "[[ and ]] as two explicit role steps",
+      "[] and ][ role composition",
+      "cycles terminate by finite raw path without graph unfolding",
+      "sharing may make distinct raw paths select the same node without declaring those raw paths identical",
+      "invalid focus is typed failure",
+      "0/1 and mixed carriers stay explicitly unresolved in this challenge subset",
+      "root and quote observations remain unchanged",
+      "current production RELATIVE remains RAW",
+      "no L4 reads, LinkRef identity or materialization",
+      "inverse ambiguity is reported rather than guessed"
+    ]
+  },
+  "releaseGate": [
+    "pass focused-carrier path challenge",
+    "decide result type and path/provenance boundary",
+    "decide inverse domain explicitly",
+    "publish language-neutral positive/negative conformance",
+    "accept a versioned relative-denotation contract before changing production RELATIVE behavior"
+  ]
+}
