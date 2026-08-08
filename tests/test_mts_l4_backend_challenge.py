@@ -95,7 +95,7 @@ def assignments() -> list[dict[str, int]]:
     return corpus()["handleAssignmentsForReferenceChallenge"]
 
 
-def _exact_pair_observation(assignment: dict[str, int]) -> dict:
+def _exact_pair_observation(assignment: dict[str, int]) -> tuple[dict, int]:
     harness = ReferenceHarness(assignment)
     before = harness.store.snapshot()
 
@@ -106,7 +106,7 @@ def _exact_pair_observation(assignment: dict[str, int]) -> dict:
         "pair",
         harness.realize_link(harness.ref("zero"), harness.ref("one")),
     )
-    return {
+    observation = {
         "pairPoles": tuple(harness.name(ref) for ref in harness.poles(pair)),
         "findPair": harness.name(
             harness.find_link(harness.ref("zero"), harness.ref("one"))
@@ -115,6 +115,7 @@ def _exact_pair_observation(assignment: dict[str, int]) -> dict:
         "incomingOne": harness.names(harness.incoming(harness.ref("one"))),
         "allLinks": harness.names(harness.all_links()),
     }
+    return observation, pair
 
 
 def test_challenge_and_corpus_are_non_normative_and_follow_decision_gate():
@@ -154,8 +155,11 @@ def test_portable_corpus_uses_symbolic_topology_not_expected_backend_handles():
 
 
 def test_opaque_handle_renaming_preserves_all_normalized_pair_observations():
-    observed = [_exact_pair_observation(item) for item in assignments()]
+    results = [_exact_pair_observation(item) for item in assignments()]
+    observed = [observation for observation, _ref in results]
+    pair_refs = [ref for _observation, ref in results]
 
+    assert pair_refs[0] != pair_refs[1]
     assert len({item["pairPoles"] for item in observed}) == 1
     assert observed[0] == observed[1]
     assert observed[0] == {
@@ -165,10 +169,6 @@ def test_opaque_handle_renaming_preserves_all_normalized_pair_observations():
         "incomingOne": ("one", "pair"),
         "allLinks": ("one", "pair", "root", "zero"),
     }
-
-    first_pair = ReferenceHarness(assignments()[0]).store._next_ref
-    second_pair = ReferenceHarness(assignments()[1]).store._next_ref
-    assert first_pair != second_pair
 
 
 def test_find_poles_and_incidence_are_read_only_and_ordered_where_required():
