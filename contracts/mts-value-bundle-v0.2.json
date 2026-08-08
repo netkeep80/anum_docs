@@ -1,0 +1,155 @@
+{
+  "schema": "mts-value-bundle/v0.2",
+  "status": "candidate-contract",
+  "accepted": false,
+  "acceptedContractLinkAllowed": false,
+  "dependsOn": [
+    "mts-contract/v0.2",
+    "mts-bundle-decision/v0.2",
+    "mts-bundle-elaboration-challenge/v0.2",
+    "mts-bundle-algebra-challenge/v0.2",
+    "mts-bundle-expansion-challenge/v0.2"
+  ],
+  "scope": {
+    "valueBundle": "flat only",
+    "constraintBundle": "existing accepted behavior unchanged",
+    "nestedValueBundle": "rejected/deferred",
+    "materialization": "out-of-scope",
+    "persistentStorage": "out-of-scope"
+  },
+  "syntax": {
+    "glyph": "{...}",
+    "surfaceNode": "CurlySyntax",
+    "surfaceNodeIsSemanticType": false,
+    "sourceOrderPreserved": true,
+    "sourceMultiplicityPreserved": true,
+    "sourceOccurrencePathsPreserved": true
+  },
+  "elaboration": {
+    "phase": "static-before-interpretation",
+    "runtimeRoleGuessing": false,
+    "outputs": [
+      "ConstraintBundle",
+      "ValueBundle"
+    ],
+    "rules": [
+      {
+        "when": "all non-empty direct items are Judgments",
+        "result": "ConstraintBundle"
+      },
+      {
+        "when": "all non-empty direct items are non-bundle Forms",
+        "result": "ValueBundle"
+      },
+      {
+        "when": "direct items mix Judgment and Form evidence",
+        "result": "static-error:mixed-bundle-role-evidence"
+      },
+      {
+        "when": "empty {} occurs in statically Form-required position",
+        "result": "ValueBundle"
+      },
+      {
+        "when": "empty {} is the constraint interpretation entry expression",
+        "result": "ConstraintBundle"
+      },
+      {
+        "when": "empty {} is a definition RHS with no stronger Form evidence",
+        "result": "ConstraintBundle"
+      },
+      {
+        "when": "empty {} has no static role context",
+        "result": "static-error:ambiguous-empty-bundle-role"
+      },
+      {
+        "when": "a ValueBundle directly contains another ValueBundle/CurlySyntax item",
+        "result": "static-error:nested-value-bundle-not-supported"
+      }
+    ],
+    "rootRegression": {
+      "currentTenDefinitionsMustElaborateIdentically": true,
+      "valueBundleMayAppearInCurrentRoot": false
+    }
+  },
+  "runtimeValueModel": {
+    "scalar": {
+      "kind": "link",
+      "identity": "resolved L1 LinkRef"
+    },
+    "bundle": {
+      "kind": "bundle",
+      "identity": "extensional set of unique resolved L1 LinkRefs",
+      "occurrenceProvenanceSeparate": true
+    },
+    "crossKindEquality": false,
+    "crossKindInequality": true,
+    "globalRewrite": false,
+    "equality": "local contextual value comparison"
+  },
+  "elementResolution": {
+    "eachOccurrenceResolvedIndependently": true,
+    "deduplicateBeforeResolution": false,
+    "anonymousSquareIdentity": "ast-occurrence-path",
+    "unresolvedAnonymousOccurrence": "evaluation-unresolved/failure; never choose an arbitrary LinkRef",
+    "resolvedOccurrenceTraceRequired": true,
+    "semanticSetBuiltAfterResolution": true,
+    "semanticOrderRelevant": false,
+    "semanticDuplicateCountRelevant": false
+  },
+  "flatValueAlgebra": {
+    "idempotentAfterResolution": true,
+    "commutativeAfterResolution": true,
+    "sourceOrderStillObservableAsProvenance": true,
+    "sourceDuplicateOccurrencesStillObservableAsProvenance": true,
+    "historicalAnonymousClaim": {
+      "source": "{[], []} = {[]}",
+      "unconditional": false,
+      "conditional": "true only when independently resolved identity sets are equal"
+    }
+  },
+  "expansionQuery": {
+    "trigger": "Sequence/juxtaposition with at least one statically elaborated ValueBundle operand",
+    "result": "flat ValueBundle of existing Link identities",
+    "readOnly": true,
+    "endpointDomains": {
+      "scalar": "singleton resolved identity",
+      "nonEmptyBundle": "resolved extensional identity set",
+      "emptyBundle": "wildcard only in expansion endpoint position"
+    },
+    "operations": {
+      "scalarToEmpty": "all existing outgoing links",
+      "emptyToScalar": "all existing incoming links",
+      "emptyToEmpty": "all existing links in selected memory view",
+      "constrainedToConstrained": "existing exact links whose ordered poles belong to the two endpoint domains"
+    },
+    "missingPair": "omit",
+    "implicitRealize": false,
+    "implicitDelete": false
+  },
+  "effects": {
+    "interpretMayReadMemory": true,
+    "interpretMayRealize": false,
+    "interpretMayDelete": false,
+    "bundleLiteralIsCommand": false,
+    "expansionIsCommand": false
+  },
+  "deferred": {
+    "nestedValueBundleSemantics": [
+      "first-class nested collection",
+      "flatten/union",
+      "other construction"
+    ],
+    "syntheticMissingLinkForms": "not part of current candidate",
+    "explicitBundleMaterialization": "separate L4 operation if ever needed"
+  },
+  "acceptanceGate": {
+    "requires": [
+      "candidate conformance corpus",
+      "single reference elaborator/value evaluator in core",
+      "all current root/conformance tests green",
+      "explicit proof that no current ConstraintBundle behavior changes",
+      "downstream aprover repin and conformance after upstream acceptance"
+    ],
+    "mustVersionIfAccepted": true
+  }
+}
