@@ -1,4 +1,4 @@
-"""Conformance tests for contextual L3 Anum protocol v0.1."""
+"""Conformance tests for contextual L3 Anum protocol v0.2."""
 
 import pytest
 
@@ -13,23 +13,24 @@ from core.anum_protocol import (
 )
 
 
-def test_root_context_projects_container_to_experimental_zero():
+def test_root_context_projects_open_close_to_canonical_link_value():
     projection = project_anum(parse_raw_quaternary("[]"), ProjectionContext.ROOT)
 
     assert projection.kind is ProjectionKind.PROTOCOL_VALUE
     assert projection.source == "[]"
-    assert projection.arrow_form == "α ⟼ β"
-    assert projection.protocol_value == "0"
-    assert "experimental" in projection.note
+    assert projection.arrow_form == "♀∞ ⟼ ∞♂"
+    assert projection.protocol_value == "1"
+    assert "accepted MTS v0.2" in projection.note
 
 
-def test_root_context_projects_bridge_to_experimental_one():
+def test_root_context_projects_close_open_to_canonical_unlink_value():
     projection = project_anum(parse_raw_quaternary("]["), ProjectionContext.ROOT)
 
     assert projection.kind is ProjectionKind.PROTOCOL_VALUE
     assert projection.source == "]["
-    assert projection.arrow_form == "β ⟼ α"
-    assert projection.protocol_value == "1"
+    assert projection.arrow_form == "∞♂ ⟼ ♀∞"
+    assert projection.protocol_value == "0"
+    assert "accepted MTS v0.2" in projection.note
 
 
 def test_open_open_and_close_close_remain_boundary_forms_without_value():
@@ -37,11 +38,11 @@ def test_open_open_and_close_close_remain_boundary_forms_without_value():
     close_close = project_anum(parse_raw_quaternary("]]"), ProjectionContext.ROOT)
 
     assert open_open.kind is ProjectionKind.BOUNDARY_FORM
-    assert open_open.arrow_form == "α ⟼ α"
+    assert open_open.arrow_form == "♀∞ ⟼ ♀∞"
     assert open_open.protocol_value is None
 
     assert close_close.kind is ProjectionKind.BOUNDARY_FORM
-    assert close_close.arrow_form == "β ⟼ β"
+    assert close_close.arrow_form == "∞♂ ⟼ ∞♂"
     assert close_close.protocol_value is None
 
 
