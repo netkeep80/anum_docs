@@ -1,0 +1,50 @@
+{
+  "schema": "anum-boundary-projection/v0.2",
+  "status": "accepted-subset",
+  "dependsOn": "mts-contract/v0.2",
+  "context": "root",
+  "orientation": {
+    "open": "♀∞",
+    "close": "∞♂"
+  },
+  "projection": [
+    {
+      "raw": "[[",
+      "form": "♀∞ ⟼ ♀∞",
+      "kind": "boundary-form",
+      "protocolValue": null
+    },
+    {
+      "raw": "[]",
+      "form": "♀∞ ⟼ ∞♂",
+      "kind": "protocol-value",
+      "protocolValue": "1"
+    },
+    {
+      "raw": "][",
+      "form": "∞♂ ⟼ ♀∞",
+      "kind": "protocol-value",
+      "protocolValue": "0"
+    },
+    {
+      "raw": "]]",
+      "form": "∞♂ ⟼ ∞♂",
+      "kind": "boundary-form",
+      "protocolValue": null
+    }
+  ],
+  "scope": {
+    "absoluteRule": false,
+    "quoteContextApplies": false,
+    "relativeContextApplies": false,
+    "generalRawDenotationDefined": false
+  },
+  "derivation": [
+    "([) : (♀∞)",
+    "(]) : (∞♂)",
+    "(⟼) : (♀∞ ⟼ ∞♂)",
+    "(↛) : (∞♂ ⟼ ♀∞)",
+    "[1] : (⟼)",
+    "[0] : (↛)"
+  ]
+}
