@@ -60,6 +60,18 @@ class ReferenceL4BackendDriver:
         "crash-recovery": False,
     }
 
+    STATEFUL_OPERATIONS = {
+        "snapshot",
+        "poles",
+        "find_link",
+        "outgoing",
+        "incoming",
+        "all_links",
+        "realize_link",
+        "realize_structural_denotation",
+        "delete_link",
+    }
+
     def __init__(
         self,
         seed_handle_assignment: Mapping[str, int] | None = None,
@@ -119,6 +131,8 @@ class ReferenceL4BackendDriver:
             return self._create(args)
         if op in {"close", "reopen"}:
             raise DriverRequestError("capability-not-supported")
+        if op not in self.STATEFUL_OPERATIONS:
+            raise DriverRequestError("invalid-request", f"unknown operation: {op}")
 
         store = self._require_store()
         if op == "snapshot":
@@ -161,7 +175,7 @@ class ReferenceL4BackendDriver:
             self._require_exact_fields(args, {"ref"})
             store.delete_link(self._bound_ref(self._required_name(args, "ref")))
             return {}
-        raise DriverRequestError("invalid-request", f"unknown operation: {op}")
+        raise AssertionError(f"validated stateful operation was not dispatched: {op}")
 
     def _create(self, args: dict) -> dict:
         self._require_exact_fields(args, {"seedGraph"})
