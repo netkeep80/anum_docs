@@ -1,0 +1,61 @@
+{
+  "schema": "anum-denotation/v0.2",
+  "status": "candidate",
+  "dependsOn": [
+    "mts-contract/v0.2",
+    "anum-boundary-projection/v0.2"
+  ],
+  "purpose": "storage-neutral L3-to-L4 structural denotation handoff",
+  "resultKinds": [
+    "structural",
+    "raw",
+    "quoted-raw"
+  ],
+  "referenceKinds": [
+    "anchor",
+    "node"
+  ],
+  "structural": {
+    "anchors": "sorted unique non-empty opaque string keys",
+    "nodes": "ordered nodes with contiguous ids 0..N-1",
+    "node": {
+      "id": "description-local integer",
+      "start": "DenotationRef",
+      "end": "DenotationRef"
+    },
+    "root": "DenotationRef",
+    "topology": "a node reference may target only an earlier node",
+    "sharing": "reusing one earlier node reference preserves explicit sharing"
+  },
+  "identity": {
+    "displayLabelIsIdentity": false,
+    "rawSpellingIsRuntimeIdentity": false,
+    "nodeIdentity": "description-local node id",
+    "anchorIdentity": "opaque external context key resolved only by L4 adapter",
+    "persistentLinkIdAllowed": false
+  },
+  "nonDenoting": {
+    "raw": "canonical or source raw payload retained without structural claim",
+    "quoted-raw": "description-level payload retained without structural claim"
+  },
+  "effects": {
+    "mayReadMemory": false,
+    "mayMutateMemory": false,
+    "mayRealize": false
+  },
+  "canonicalJson": {
+    "utf8": true,
+    "sortObjectKeys": true,
+    "compactSeparators": true,
+    "anchorsSorted": true,
+    "nodesInIdOrder": true
+  },
+  "explicitlyOutOfScope": [
+    "raw parser",
+    "recursive Anum decode grammar",
+    "persistent LinkId allocation",
+    "find",
+    "realize",
+    "delete"
+  ]
+}
