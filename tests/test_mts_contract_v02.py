@@ -14,6 +14,7 @@ ANUM_RAW_CARRIER = ROOT / "contracts/anum-raw-carrier-v0.2.json"
 ANUM_BOUNDARY = ROOT / "contracts/anum-boundary-projection-v0.2.json"
 ANUM_DENOTATION = ROOT / "contracts/anum-denotation-v0.2.json"
 ANUM_PAIR_DENOTATION = ROOT / "contracts/anum-pair-denotation-v0.2.json"
+ANUM_RECURSIVE_DENOTATION = ROOT / "contracts/anum-recursive-denotation-v0.2.json"
 ROOT_PROGRAM = ROOT / "tests/mtc_formulas.mtc"
 
 
@@ -48,14 +49,18 @@ def test_contract_is_accepted_v02_and_points_to_canonical_artifacts():
     assert contract["anum"]["acceptedPairDenotationSubset"] == (
         "contracts/anum-pair-denotation-v0.2.json"
     )
-    assert contract["anum"]["rawCarrierIssue"] == 99
-    assert contract["anum"]["recursiveDenotationIssue"] == 95
+    assert contract["anum"]["acceptedRecursiveDenotationSubset"] == (
+        "contracts/anum-recursive-denotation-v0.2.json"
+    )
+    assert contract["anum"]["recursiveDenotationIssue"] == 101
     assert contract["anum"]["generalDenotationIssue"] == 89
+    assert "leading run" in contract["anum"]["rootOpeningCollapse"]
     assert CONFORMANCE.is_file()
     assert ANUM_RAW_CARRIER.is_file()
     assert ANUM_BOUNDARY.is_file()
     assert ANUM_DENOTATION.is_file()
     assert ANUM_PAIR_DENOTATION.is_file()
+    assert ANUM_RECURSIVE_DENOTATION.is_file()
 
     corpus = json.loads(CONFORMANCE.read_text(encoding="utf-8"))
     assert corpus["contract"] == contract["schema"]
@@ -79,8 +84,17 @@ def test_contract_is_accepted_v02_and_points_to_canonical_artifacts():
     pair = json.loads(ANUM_PAIR_DENOTATION.read_text(encoding="utf-8"))
     assert pair["status"] == "accepted"
     assert contract["schema"] in pair["dependsOn"]
-    assert pair["unsupported"]["recursiveBrackets"] == "issue #95"
+    assert pair["outsideThisSubset"]["recursiveBrackets"] == (
+        "contracts/anum-recursive-denotation-v0.2.json"
+    )
     assert pair["effects"]["mayRealize"] is False
+
+    recursive = json.loads(ANUM_RECURSIVE_DENOTATION.read_text(encoding="utf-8"))
+    assert recursive["status"] == "accepted"
+    assert contract["schema"] in recursive["dependsOn"]
+    assert recursive["challenge"]["exhaustiveBinaryTreeDepth"] == 3
+    assert recursive["inverse"]["explicitSharedNodeReferencesAccepted"] is False
+    assert recursive["effects"]["mayRealize"] is False
 
 
 def test_contract_exposes_exactly_two_atomic_non_bracket_context_pronouns():
