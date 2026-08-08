@@ -1,0 +1,134 @@
+{
+  "schema": "mts-l4-backend-conformance/v0.3",
+  "status": "candidate-challenge-corpus",
+  "dependsOn": "mts-l4-backend-challenge/v0.3",
+  "handlePolicy": {
+    "all link names are symbolic scenario bindings",
+    "backend refs are opaque and never serialized as expected values",
+    "native enumeration order is normalized away"
+  },
+  "seedGraph": {
+    "links": {
+      "root": {"start": "root", "end": "root"},
+      "zero": {"start": "zero", "end": "root"},
+      "one": {"start": "root", "end": "one"}
+    },
+    "anchors": {
+      "protocol:0": "zero",
+      "protocol:1": "one"
+    }
+  },
+  "handleAssignmentsForReferenceChallenge": [
+    {"root": 0, "zero": 1, "one": 2},
+    {"root": 10, "zero": 20, "one": 30}
+  ],
+  "scenarios": [
+    {
+      "id": "read-missing-pair",
+      "operations": [
+        {"op": "snapshot", "bind": "before"},
+        {"op": "find_link", "start": "zero", "end": "one", "expect": null},
+        {"op": "snapshot", "bind": "after"}
+      ],
+      "expect": {"snapshotsEqual": ["before", "after"]}
+    },
+    {
+      "id": "realize-exact-pair",
+      "operations": [
+        {"op": "realize_link", "start": "zero", "end": "one", "bind": "pair"},
+        {"op": "find_link", "start": "zero", "end": "one", "expectBinding": "pair"},
+        {"op": "poles", "ref": "pair", "expect": ["zero", "one"]},
+        {"op": "outgoing", "ref": "zero", "expectSet": ["zero", "pair"]},
+        {"op": "incoming", "ref": "one", "expectSet": ["one", "pair"]}
+      ]
+    },
+    {
+      "id": "realize-idempotent",
+      "operations": [
+        {"op": "realize_link", "start": "zero", "end": "one", "bind": "pair"},
+        {"op": "snapshot", "bind": "afterFirst"},
+        {"op": "realize_link", "start": "zero", "end": "one", "expectBinding": "pair"},
+        {"op": "snapshot", "bind": "afterSecond"}
+      ],
+      "expect": {"snapshotsEqual": ["afterFirst", "afterSecond"]}
+    },
+    {
+      "id": "delete-safety",
+      "operations": [
+        {"op": "realize_link", "start": "zero", "end": "one", "bind": "inner"},
+        {"op": "realize_link", "start": "inner", "end": "one", "bind": "outer"},
+        {"op": "snapshot", "bind": "beforeRejectedDelete"},
+        {"op": "delete_link", "ref": "inner", "expectError": "link-in-use"},
+        {"op": "snapshot", "bind": "afterRejectedDelete"},
+        {"op": "delete_link", "ref": "outer"},
+        {"op": "delete_link", "ref": "inner"},
+        {"op": "find_link", "start": "zero", "end": "one", "expect": null}
+      ],
+      "expect": {"snapshotsEqual": ["beforeRejectedDelete", "afterRejectedDelete"]}
+    },
+    {
+      "id": "closed-cycle-bootstrap",
+      "operations": [
+        {"op": "poles", "ref": "root", "expect": ["root", "root"]},
+        {"op": "poles", "ref": "zero", "expect": ["zero", "root"]},
+        {"op": "poles", "ref": "one", "expect": ["root", "one"]}
+      ]
+    },
+    {
+      "id": "structural-denotation-atomicity",
+      "denotation": {
+        "sourceRaw": "[01]1",
+        "context": "root"
+      },
+      "operations": [
+        {"op": "snapshot", "bind": "beforeMissingAnchor"},
+        {
+          "op": "realize_structural_denotation",
+          "anchors": {"protocol:0": "zero"},
+          "expectError": "missing-anchor"
+        },
+        {"op": "snapshot", "bind": "afterMissingAnchor"},
+        {
+          "op": "realize_structural_denotation",
+          "anchors": {"protocol:0": "zero", "protocol:1": "one"},
+          "bind": "denotationRoot"
+        },
+        {"op": "snapshot", "bind": "afterFirstRealize"},
+        {
+          "op": "realize_structural_denotation",
+          "anchors": {"protocol:0": "zero", "protocol:1": "one"},
+          "expectBinding": "denotationRoot"
+        },
+        {"op": "snapshot", "bind": "afterSecondRealize"}
+      ],
+      "expect": {
+        "snapshotsEqual": [
+          ["beforeMissingAnchor", "afterMissingAnchor"],
+          ["afterFirstRealize", "afterSecondRealize"]
+        ]
+      }
+    }
+  ],
+  "persistentOnlyScenarios": [
+    {
+      "id": "clean-reopen",
+      "requires": "persistence",
+      "expect": "normalized topology and exact-pair relations survive close/open"
+    },
+    {
+      "id": "realize-after-reopen",
+      "requires": "persistence",
+      "expect": "realizing an already persisted exact pair is idempotent after handle normalization"
+    },
+    {
+      "id": "index-consistency-after-reopen",
+      "requires": "persistence",
+      "expect": "poles/outgoing/incoming/find_link describe one consistent normalized topology"
+    },
+    {
+      "id": "interrupted-atomic-commit",
+      "requires": "crash-recovery",
+      "expect": "recovery exposes committed pre-state or committed post-state, never a partially realized structural denotation"
+    }
+  ]
+}
