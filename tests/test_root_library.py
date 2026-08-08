@@ -1,9 +1,9 @@
-"""Tests for the typed canonical MTS v0.2 root library."""
+"""Tests for the typed canonical MTS root library."""
 
 from pathlib import Path
 
-from core.mtc_ast import Definition, RoundForm
-from core.reference_model import StatementStatus
+from core.mtc_ast import Definition, RoundForm, format_expression
+from core.mtc_definitions import DefinitionLookupKind, open_definition
 from core.root_library import FormulaKind, SQUARE_ABIT_FORMS, load_root_library
 from core.validate_root import validate_root_library
 
@@ -58,18 +58,31 @@ def test_root_contains_only_canonical_named_definitions():
     assert "{} != []" not in texts
 
 
-def test_difference_registry_matches_canonical_definition_surface():
-    registry = load_root_library(ROOT_FORMULAS).registry
+def test_definition_environment_matches_canonical_definition_surface():
+    library = load_root_library(ROOT_FORMULAS)
+    entries = library.definitions.entries()
 
-    assert set(registry.symbols()) == set(CANONICAL_DEFINITIONS)
-    assert registry.duplicates() == []
+    assert set(library.definition_targets()) == set(CANONICAL_DEFINITIONS)
+    assert library.definitions.conflicts() == ()
+    assert len(entries) == 10
 
-    for symbol, introduction in CANONICAL_DEFINITIONS.items():
-        entry = registry.lookup(symbol)
-        assert entry is not None
-        assert entry.status is StatementStatus.DEFINITION
-        assert entry.introduction == introduction
-        assert isinstance(entry.source_formula.ast, Definition)
+    by_target = {
+        format_expression(entry.definition.target): entry
+        for entry in entries
+    }
+    for ordinal, (target, introduction) in enumerate(CANONICAL_DEFINITIONS.items()):
+        entry = by_target[target]
+        assert entry.identity.scope_path == ()
+        assert entry.identity.ordinal == ordinal
+        assert format_expression(entry.definition.value) == introduction
+        assert isinstance(entry.definition, Definition)
+        assert entry.provenance.source_path is not None
+        assert entry.provenance.line_no is not None
+
+        opening = open_definition(entry.definition.target, library.definitions)
+        assert opening.kind is DefinitionLookupKind.MATCH
+        assert opening.definition_id == entry.identity
+        assert opening.body is entry.definition.value
 
 
 def test_square_abit_forms_are_exactly_four_and_infinity_is_not_one():
@@ -95,14 +108,18 @@ def test_colon_inside_round_form_is_not_registered_as_top_level_definition(tmp_p
     assert library.formulas[0].kind is FormulaKind.EXPRESSION
     assert isinstance(library.formulas[0].ast, RoundForm)
     assert isinstance(library.formulas[0].ast.content, Definition)
-    assert library.registry.symbols() == []
+    assert library.definitions.entries() == ()
 
 
 def test_literal_square_abit_definitions_keep_canonical_text():
-    registry = load_root_library(ROOT_FORMULAS).registry
+    library = load_root_library(ROOT_FORMULAS)
+    by_target = {
+        format_expression(entry.definition.target): entry
+        for entry in library.definitions.entries()
+    }
 
-    assert registry.lookup("([)").introduction == "(♀∞)"
-    assert registry.lookup("(])").introduction == "(∞♂)"
+    assert format_expression(by_target["([)"].definition.value) == "(♀∞)"
+    assert format_expression(by_target["(])"].definition.value) == "(∞♂)"
 
 
 def test_root_library_validates():
@@ -123,6 +140,16 @@ def test_duplicate_definitions_are_reported(tmp_path):
 
     assert not result.is_valid
     assert any("Повторное введение различия" in message for message in result.messages)
+
+
+def test_non_addressable_root_definition_is_reported(tmp_path):
+    formula_path = tmp_path / "non_addressable.mtc"
+    formula_path.write_text("[] : a\n", encoding="utf-8")
+
+    result = validate_root_library(formula_path)
+
+    assert not result.is_valid
+    assert any("Неадресуемая левая часть" in message for message in result.messages)
 
 
 def test_parser_errors_are_aggregated_with_source_location(tmp_path):
