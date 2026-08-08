@@ -1,0 +1,48 @@
+{
+  "schema": "mts-proof/v0.2",
+  "status": "candidate",
+  "dependsOn": "mts-contract/v0.2",
+  "purpose": "trusted replay of accepted contextual interpretation; no additional inference rules",
+  "proofObject": {
+    "contractVersion": "mts-contract/v0.2",
+    "steps": "ordered InterpretStep[]"
+  },
+  "interpretStep": {
+    "rule": "interpret",
+    "expression": "canonical MTS v0.2 source",
+    "context": {
+      "start": "LinkRef",
+      "end": "LinkRef",
+      "parent": "optional recursive ContextFrame"
+    },
+    "symbols": "name -> LinkRef",
+    "distinguishedMemory": "array of {id,start,end}",
+    "expected": {
+      "success": "boolean",
+      "substitutions": "array of {path:int[],link:LinkRef}",
+      "aliases": "array of {path:int[],targetPath:int[]}"
+    }
+  },
+  "checker": {
+    "trustedRuleSet": ["interpret"],
+    "replaysCanonicalInterpreter": true,
+    "usesDisplayLabelsAsIdentity": false,
+    "mayMaterialize": false,
+    "checks": [
+      "contractVersion",
+      "rule",
+      "success",
+      "substitutions",
+      "aliases"
+    ]
+  },
+  "explicitlyNotTrusted": [
+    "lowercase-metavariables",
+    "global-textual-substitution",
+    "global-equality-rewrite",
+    "symmetry",
+    "transitivity",
+    "congruence",
+    "modus-ponens"
+  ]
+}
