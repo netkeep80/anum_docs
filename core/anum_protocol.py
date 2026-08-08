@@ -1,9 +1,16 @@
-"""Contextual L3 Anum protocol v0.1.
+"""Contextual L3 Anum protocol v0.2 boundary subset.
 
-The protocol keeps raw syntax, validation and projection separate. The current
-``[] -> 0`` / ``][ -> 1`` root projection remains the experimental issue #61
-projection; this module makes the context and unresolved boundary forms explicit
-rather than silently normalizing them.
+Raw syntax, validation and projection remain separate.  The root projection for
+the four two-boundary carriers is derived from the accepted MTS v0.2 root
+program instead of the superseded issue #61 orientation:
+
+``[`` -> ``♀∞``
+``]`` -> ``∞♂``
+``[]`` -> ``♀∞ ⟼ ∞♂`` -> protocol value ``1``
+``][`` -> ``∞♂ ⟼ ♀∞`` -> protocol value ``0``
+
+This is a root-context projection only.  Quote and relative contexts keep their
+own behavior, and general raw denotation is deliberately not invented here.
 """
 
 from core.anum_model import (
@@ -18,29 +25,29 @@ from core.anum_model import (
 from core.anum_parser import FORMAT_STRING, normalize_raw_form, parse_raw_quaternary
 
 
-ALPHA = "α"
-BETA = "β"
+OPEN_FORM = "♀∞"
+CLOSE_FORM = "∞♂"
 
 _BOUNDARY_PROJECTIONS = {
     (Abit.OPEN, Abit.OPEN): (
-        f"{ALPHA} ⟼ {ALPHA}",
+        f"{OPEN_FORM} ⟼ {OPEN_FORM}",
         None,
-        "open-open boundary form; no root protocol value is assigned in v0.1",
+        "open-open boundary form; no root protocol value is assigned in v0.2",
     ),
     (Abit.OPEN, Abit.CLOSE): (
-        f"{ALPHA} ⟼ {BETA}",
-        "0",
-        "experimental root container / non-materializing projection",
+        f"{OPEN_FORM} ⟼ {CLOSE_FORM}",
+        "1",
+        "root-context link projection derived from accepted MTS v0.2",
     ),
     (Abit.CLOSE, Abit.OPEN): (
-        f"{BETA} ⟼ {ALPHA}",
-        "1",
-        "experimental root bridge / materializing-transition projection",
+        f"{CLOSE_FORM} ⟼ {OPEN_FORM}",
+        "0",
+        "root-context unlink projection derived from accepted MTS v0.2",
     ),
     (Abit.CLOSE, Abit.CLOSE): (
-        f"{BETA} ⟼ {BETA}",
+        f"{CLOSE_FORM} ⟼ {CLOSE_FORM}",
         None,
-        "close-close boundary form; no root protocol value is assigned in v0.1",
+        "close-close boundary form; no root protocol value is assigned in v0.2",
     ),
 }
 
@@ -83,10 +90,10 @@ def validate_anum(
 ) -> AnumValidation:
     """Validate a parsed raw carrier for one explicit context.
 
-    V0.1 intentionally adds no hidden root-start or bracket-balance restrictions:
+    V0.2 intentionally adds no hidden root-start or bracket-balance restrictions:
     every sequence already accepted by the raw quaternary parser is a valid raw
-    carrier. Context-specific semantic restrictions can be added only after they
-    are accepted by the protocol specification.
+    carrier. Context-specific semantic restrictions require an accepted protocol
+    rule rather than a parser heuristic.
     """
 
     if not isinstance(context, ProjectionContext):
@@ -134,7 +141,7 @@ def project_anum(
             source=normalize_raw_form(form),
             kind=ProjectionKind.RAW,
             projected=form,
-            note="relative semantics are intentionally preserved as raw in v0.1",
+            note="relative semantics are intentionally preserved as raw in v0.2",
         )
 
     return _project_root(form)
@@ -200,5 +207,5 @@ def _project_root(form: AnumForm) -> AnumProjection:
         source=source,
         kind=ProjectionKind.RAW,
         projected=form,
-        note="no general root denotation is assigned to this raw carrier in v0.1",
+        note="no general root denotation is assigned beyond the v0.2 boundary subset",
     )
