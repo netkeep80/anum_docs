@@ -1,0 +1,49 @@
+{
+  "schema": "anum-pair-denotation/v0.2",
+  "status": "accepted",
+  "dependsOn": [
+    "mts-contract/v0.2",
+    "anum-boundary-projection/v0.2",
+    "anum-denotation/v0.2"
+  ],
+  "conformanceCorpus": "contracts/anum-pair-denotation-conformance-v0.2.json",
+  "context": "root",
+  "protocolAnchors": {
+    "0": "protocol:0",
+    "1": "protocol:1"
+  },
+  "rules": [
+    "root protocol value 0 denotes anchor protocol:0",
+    "root protocol value 1 denotes anchor protocol:1",
+    "exactly two direct protocol atoms ab denote one ordered Link(a,b)",
+    "root boundary aliases use their accepted projected protocol value",
+    "all other root carriers remain raw in this subset"
+  ],
+  "canonicalInverse": {
+    "protocol:0": "0",
+    "protocol:1": "1",
+    "singlePair": "concatenate canonical start and end protocol atoms",
+    "sourcePreserving": false,
+    "aliases": {
+      "][": "0",
+      "[]": "1"
+    }
+  },
+  "unsupported": {
+    "recursiveBrackets": "issue #95",
+    "relativeDenotation": true,
+    "openOpenBoundaryDenotation": true,
+    "closeCloseBoundaryDenotation": true,
+    "longerDirectSequences": true
+  },
+  "effects": {
+    "mayReadMemory": false,
+    "mayMutateMemory": false,
+    "mayRealize": false
+  },
+  "evidence": {
+    "readOnlyResearch": "docs/research/Исходные мысли МТС.md",
+    "sequenceRule": "an achislo implicitly starts at ∞; deserializing ∞ab produces a⟼b while the loaded sequence itself does not contain a⟼b",
+    "scopeDecision": "apply that rule only where both a and b are already accepted direct protocol atoms 0/1"
+  }
+}

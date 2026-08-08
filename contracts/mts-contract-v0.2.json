@@ -62,6 +62,8 @@
     "alphabet": ["[", "]", "1", "0"],
     "rootBoundaryProjection": "contracts/anum-boundary-projection-v0.2.json",
     "denotationHandoff": "contracts/anum-denotation-v0.2.json",
+    "acceptedPairDenotationSubset": "contracts/anum-pair-denotation-v0.2.json",
+    "recursiveDenotationIssue": 95,
     "generalDenotationIssue": 89
   },
   "memory": {
