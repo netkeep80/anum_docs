@@ -1,0 +1,155 @@
+{
+  "schema": "mts-l4-backend-driver/v0.3",
+  "status": "candidate-challenge",
+  "issue": 141,
+  "parentIssue": 124,
+  "dependsOn": [
+    "mts-l4-backend-decision/v0.3",
+    "mts-l4-backend-challenge/v0.3",
+    "mts-l4-backend-conformance/v0.3",
+    "anum-denotation/v0.2"
+  ],
+  "conformanceCorpus": "contracts/mts-l4-backend-driver-conformance-v0.3.json",
+  "acceptedContractLinkAllowed": false,
+  "productionBackendContractAccepted": false,
+  "purpose": "Define a language-neutral conformance-driver boundary so the exact #130 symbolic traces can be replayed against Python AnumMemory, a future PMM adapter, and other backends without putting L2/L3 semantics or physical identity into the storage driver.",
+  "architecture": {
+    "layers": [
+      "canonical #130 trace corpus",
+      "common conformance runner",
+      "L3 fixture compiler only when a trace references sourceRaw/context",
+      "language-neutral driver request/response protocol",
+      "backend adapter",
+      "storage engine"
+    ],
+    "driverParsesRawAnum": false,
+    "driverRunsL2Interpreter": false,
+    "driverReceivesOnlyStructuralDenotationIR": true,
+    "fixtureCompilerUsesCanonicalL3": true,
+    "backendSpecificVocabularyAllowedInCanonicalCorpus": false
+  },
+  "wire": {
+    "transportCandidate": "deterministic UTF-8 JSON objects; JSONL process framing is the first external-driver candidate",
+    "request": {
+      "required": ["id", "op"],
+      "optional": ["args"],
+      "id": "caller-chosen opaque string used only to correlate response",
+      "op": "one operation from operationSurface"
+    },
+    "successResponse": {"required": ["id", "ok", "result"], "ok": true},
+    "errorResponse": {"required": ["id", "ok", "error"], "ok": false},
+    "deterministicEncoding": true,
+    "backendHandleMayAppear": false,
+    "physicalAddressMayAppear": false
+  },
+  "capabilities": {
+    "requiredCore": [
+      "exact-pair",
+      "incidence",
+      "explicit-delete",
+      "atomic-multi-link-realize"
+    ],
+    "optional": [
+      "enumeration",
+      "persistence",
+      "crash-recovery"
+    ],
+    "negotiation": "hello response returns booleans for the complete known capability set",
+    "missingOptionalCapabilityIsPass": false,
+    "persistentAcceptanceRequiresPersistenceCapability": true,
+    "crashRecoveryVectorRequiresCrashRecoveryCapability": true
+  },
+  "operationSurface": {
+    "hello": "return protocol schema and capabilities; no state mutation",
+    "create": "initialize one workspace from a closed symbolic seed graph",
+    "snapshot": "return normalized symbolic live topology; no backend handles",
+    "poles": "read ordered symbolic start/end names",
+    "find_link": "read exact pair; return symbolic binding or null; never realize",
+    "outgoing": "read normalized set of symbolic link names",
+    "incoming": "read normalized set of symbolic link names",
+    "all_links": "optional normalized enumeration",
+    "realize_link": "explicit exact-pair realization and scenario-local symbolic bind",
+    "realize_structural_denotation": "explicit atomic realization from anum-denotation/v0.2 structural IR, external anchor-name bindings and deterministic scenario-local node bindings",
+    "delete_link": "explicit non-cascading delete",
+    "close": "persistent capability only",
+    "reopen": "persistent capability only"
+  },
+  "symbolicBinding": {
+    "scope": "one conformance scenario/workspace",
+    "meaning": "driver-side alias from scenario-local name to opaque backend handle",
+    "semanticIdentity": false,
+    "persistentIdentity": false,
+    "multipleNamesMayAliasOneHandle": true,
+    "normalizedRef": "lexicographically smallest currently bound scenario name for a live handle",
+    "unboundLiveHandleInObservation": "driver-protocol-error"
+  },
+  "snapshotNormalization": {
+    "shape": "sorted array of {ref,start,end} using normalized symbolic names",
+    "sortKey": "ref then start then end as Unicode strings",
+    "nativeEnumerationOrderSemantic": false,
+    "backendHandleValueSemantic": false,
+    "rawStorePayloadIncluded": false
+  },
+  "structuralDenotationBoundary": {
+    "wireInput": "canonical data shape from anum-denotation/v0.2 with kind=structural",
+    "sourceRawAllowedOnDriverWire": false,
+    "projectionContextAllowedOnDriverWire": false,
+    "commonRunnerMayCompileSourceFixture": true,
+    "compilePipeline": "parse_raw_quaternary -> denotate_recursive_anum(explicit context) -> canonical structural IR before driver dispatch",
+    "nodeBindings": "request supplies deterministic scenario-local names for every description-local node id so newly realized internal links are observable without exposing backend handles",
+    "rootBinding": "request may add a scenario-local alias for the resolved denotation root",
+    "atomicity": "backend adapter must not expose partial new links if validation/anchor resolution/write fails"
+  },
+  "normalizedErrors": [
+    "invalid-request",
+    "workspace-not-open",
+    "capability-not-supported",
+    "unknown-binding",
+    "binding-conflict",
+    "unknown-link",
+    "link-in-use",
+    "missing-anchor",
+    "non-structural-denotation",
+    "driver-protocol-error",
+    "backend-error"
+  ],
+  "lifecycle": {
+    "referenceAnumMemory": {
+      "persistence": false,
+      "crashRecovery": false,
+      "closeReopenImplemented": false
+    },
+    "persistentDriver": {
+      "workspacePathIsExplicitInput": true,
+      "closeFlushSemanticsOwnedByBackendAdapter": true,
+      "reopenMayReturnDifferentOpaqueHandles": true,
+      "normalizedTopologyMustRemainEquivalent": true
+    }
+  },
+  "referenceImplementation": {
+    "path": "converters/l4_backend_driver.py",
+    "backend": "core.anum_memory.AnumMemory",
+    "purpose": "challenge protocol and normalization only; not a second L4 semantics",
+    "sameCoreCorpusRequired": true,
+    "differentOpaqueSeedAssignmentsRequired": true
+  },
+  "vetoes": [
+    "raw [ ] 1 0 appears on driver request wire",
+    "ProjectionContext appears on driver request wire",
+    "driver reparses Anum",
+    "driver contains L2 interpretation semantics",
+    "raw backend handle appears in normalized response",
+    "physical pointer/offset/record id becomes expected identity",
+    "read operation implicitly realizes",
+    "test harness fakes persistence for a non-persistent backend",
+    "driver buffers writes so backend partial-commit bugs are hidden from crash-recovery tests",
+    "PMM-specific field is added to canonical #130 traces"
+  ],
+  "nextGate": {
+    "artifact": "PMM-backed external driver using this protocol",
+    "mustReplaySameCoreCorpus": true,
+    "mustReplayPersistentOnlyVectors": true,
+    "mayRequestGenericPmmPrimitiveOnlyAfterConcreteFailure": true,
+    "mustNotChangeCanonicalContractToFitPmmInternals": true
+  }
+}
