@@ -1,0 +1,68 @@
+{
+  "schema": "anum-recursive-denotation/v0.2",
+  "status": "accepted",
+  "dependsOn": [
+    "mts-contract/v0.2",
+    "anum-raw-carrier/v0.2",
+    "anum-boundary-projection/v0.2",
+    "anum-denotation/v0.2",
+    "anum-pair-denotation/v0.2"
+  ],
+  "conformanceCorpus": "contracts/anum-recursive-denotation-conformance-v0.2.json",
+  "context": "root",
+  "grammarAfterRootOpenRestoration": {
+    "Atom": "0 | 1",
+    "Value": "Atom | '[' Pair ']'",
+    "Pair": "Value Value",
+    "Root": "Atom | Pair"
+  },
+  "semantics": {
+    "0": "Anchor(protocol:0)",
+    "1": "Anchor(protocol:1)",
+    "pair": "Link(D(start), D(end))",
+    "nodePolicy": "occurrence-preserving postorder nodes; no structural interning/global identity"
+  },
+  "specialBoundaryPrecedence": [
+    "[]",
+    "][",
+    "[[",
+    "]]"
+  ],
+  "rootOpeningCollapse": {
+    "encode": "if expanded root encoding begins with N>1 consecutive '[' characters, replace that leading run with exactly one '['",
+    "decode": "for a root candidate beginning with '[', if total bracket balance is negative, prepend exactly -balance virtual '[' characters before parsing",
+    "canonicalityVeto": "after decode, re-encode with root-opening collapse and require exact equality with input raw"
+  },
+  "contextIsolation": {
+    "root": "recursive structural grammar enabled after accepted boundary cases",
+    "quote": "existing quote projection only; recursive structural grammar disabled",
+    "relative": "raw only; recursive structural grammar disabled"
+  },
+  "inverse": {
+    "scope": "structural occurrence-tree denotations emitted by this decoder",
+    "explicitSharedNodeReferencesAccepted": false,
+    "unusedNodesAccepted": false,
+    "externalAnchorsAccepted": false,
+    "canonical": true,
+    "sourcePreserving": false
+  },
+  "effects": {
+    "mayReadMemory": false,
+    "mayMutateMemory": false,
+    "mayRealize": false
+  },
+  "challenge": {
+    "exhaustiveBinaryTreeDepth": 3,
+    "requiredProperties": [
+      "distinct occurrence trees have distinct collapsed canonical raw encodings",
+      "decode(encode(tree)) equals tree",
+      "encode(decode(raw)) equals raw for every accepted canonical vector"
+    ]
+  },
+  "unsupported": {
+    "relativeDenotation": true,
+    "contextFreeBracketMeaning": true,
+    "globalNodeIdentity": true,
+    "nonCanonicalEquivalentSpellings": true
+  }
+}
