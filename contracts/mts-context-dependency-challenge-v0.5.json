@@ -1,0 +1,118 @@
+{
+  "schema": "mts-context-dependency-challenge/v0.5",
+  "status": "candidate-challenge",
+  "issue": 156,
+  "dependsOn": [
+    "mts-deictic-context-challenge/v0.5",
+    "mts-definition-opening/v0.3",
+    "mts-contract/v0.4"
+  ],
+  "acceptedContractLinkAllowed": false,
+  "productionSemanticChangeAllowed": false,
+  "purpose": "Separate direct deictic dependence of current L2 expressions from domain-bounded replay evidence and from candidate transitive dependence through explicit definition-opening graphs.",
+  "interpreterBoundary": {
+    "interpreterIsALink": true,
+    "interpreterIdentityIsHiddenEvalInput": false,
+    "analysisStartsAfterExplicitContextProjection": true,
+    "semanticContextInput": "ContextFrame(start,end,parent?)",
+    "securityPolicyIsSemanticEffect": false
+  },
+  "currentProductionFacts": {
+    "interpretAutomaticallyOpensDefinitions": false,
+    "openDefinitionIsSeparateOneStepOperation": true,
+    "contextPronounIsOnlyCurrentAcceptedDirectDeicticPrimitive": true,
+    "proofV03HasContextInvariantRelation": false,
+    "globalContextInvarianceTheoremAccepted": false
+  },
+  "researchVocabulary": {
+    "directDeictic": "typed AST contains ContextPronoun; exact source spelling/span is irrelevant",
+    "noDirectDeictic": "typed AST contains no ContextPronoun; this is not a theorem of global context invariance",
+    "candidateIndirectDeictic": "an explicitly requested finite definition-opening dependency closure reaches a body containing ContextPronoun",
+    "observableInvariantOnDomain": "independent replay is equal for every explicitly enumerated challenged ContextFrame while all other inputs are fixed",
+    "observableSensitive": "there exists an explicit challenged context pair with different replay result",
+    "unknown": "available accepted operations/evidence do not justify either invariance or dependence claim"
+  },
+  "candidateModels": [
+    {
+      "id": "direct-typed-ast-scan",
+      "verdict": "challenge",
+      "accepted": false,
+      "soundClaimBoundary": "may detect direct ContextPronoun occurrence only; may not conclude universal context invariance from absence"
+    },
+    {
+      "id": "explicit-definition-opening-closure",
+      "verdict": "challenge",
+      "accepted": false,
+      "soundClaimBoundary": "follows only canonical open_definition edges in a finite explicit DefinitionEnvironment; this models a possible future composition dependency and is not current interpret semantics"
+    },
+    {
+      "id": "finite-replay-domain",
+      "verdict": "challenge",
+      "accepted": false,
+      "soundClaimBoundary": "may establish sensitivity by counterexample or invariance only over the explicitly serialized finite context domain"
+    },
+    {
+      "id": "hidden-interpreter-or-policy-effect",
+      "verdict": "reject",
+      "accepted": false,
+      "soundClaimBoundary": "interpreter/session/security metadata is not a hidden semantic dependency"
+    }
+  ],
+  "definitionDependencyBoundary": {
+    "automaticDefinitionReferenceSemanticsAccepted": false,
+    "analysisMustUseExplicitOpening": true,
+    "openingImpliesEquality": false,
+    "openingImpliesEvaluation": false,
+    "recursiveUnfoldingAllowed": false,
+    "finiteStateKey": "DefinitionId(scopePath,ordinal)",
+    "cycleMeansInfiniteEffect": false,
+    "externalUnopenedSymbolMayRemainNonContextInput": true
+  },
+  "observableReplayBoundary": {
+    "nonContextInputsFixed": [
+      "typed expression",
+      "symbol bindings",
+      "MemoryView snapshot"
+    ],
+    "resultComparison": "success + grounded holes + aliases; trace text is diagnostic and not required as semantic identity",
+    "differentInterpreterLabelsAllowed": true,
+    "interpreterLabelMayChangeResultWithSameExplicitInputs": false,
+    "finiteDomainInvarianceImpliesUniversalInvariance": false,
+    "oneCounterexampleEstablishesSensitivityOnItsDeclaredInputDomain": true
+  },
+  "requiredVectors": [
+    "[] = [] has no direct ContextPronoun and replays identically for at least two distinct explicit ContextFrames",
+    "◁ = a is direct-deictic and has an explicit replay counterexample across two frames",
+    "↑◁ = a is direct-deictic with parent-depth one",
+    "definition a : b and b : ◁ yields candidate indirect deictic dependence only through explicit one-step opening closure",
+    "self definition a : a terminates by DefinitionId cycle detection",
+    "mutual definitions a : b and b : a terminate by finite DefinitionId graph",
+    "missing initial definition target yields unknown rather than invariant",
+    "whitespace and SourceSpan changes do not change direct effect classification",
+    "same explicit context and non-context inputs replay identically under different test-only interpreter labels",
+    "analysis and replay do not mutate L4 or DefinitionEnvironment"
+  ],
+  "vetoes": [
+    "no pronoun implies universal context invariance",
+    "automatic definition unfolding inside current interpret semantics",
+    "global textual substitution",
+    "infinite definition unfolding",
+    "source span or display text as semantic identity",
+    "interpreter identity as hidden effect input",
+    "security policy as semantic dependence",
+    "new trusted ContextInvariant proof relation before acceptance",
+    "editing published v0.3/v0.4 contracts in place",
+    "changing the ten root definitions"
+  ],
+  "nextGate": {
+    "artifact": "mts-context-dependency-decision/v0.5",
+    "mustDecide": [
+      "whether direct typed-AST deictic detection becomes a normative analysis operation",
+      "whether definition dependency analysis waits for accepted L5 composition or is accepted as a separate static relation",
+      "the exact domain and equality notion for any ContextInvariant claim",
+      "whether Unknown is mandatory for unresolved future composition dependencies",
+      "whether any dependency result belongs in trusted proof artifacts"
+    ],
+    "mustNotChangeProductionBeforeDecision": true
+  }
+}
