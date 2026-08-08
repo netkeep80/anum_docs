@@ -1,0 +1,54 @@
+{
+  "schema": "anum-raw-carrier/v0.2",
+  "status": "accepted",
+  "dependsOn": [
+    "mts-contract/v0.2"
+  ],
+  "conformanceCorpus": "contracts/anum-raw-carrier-conformance-v0.2.json",
+  "purpose": "storage-neutral structural description of raw Anum transport carrier",
+  "roles": [
+    "root",
+    "abit:[",
+    "abit:]",
+    "abit:1",
+    "abit:0"
+  ],
+  "construction": {
+    "initial": "current = role:root",
+    "step": "for each raw abit x in order: node[i] = Link(current, role:abit:x); current = node[i]",
+    "root": "current after the final step, or role:root for the empty carrier"
+  },
+  "identity": {
+    "rolesAreProtocolPositionsNotGlobalObjects": true,
+    "displayLabelsAreIdentity": false,
+    "nodeIdentity": "description-local sequential position",
+    "persistentLinkIdAllowed": false,
+    "classicalGraphNodeIdentityClaimed": false
+  },
+  "separation": {
+    "rawAbitRoles": ["abit:[", "abit:]", "abit:1", "abit:0"],
+    "denotationProtocolAnchors": ["protocol:1", "protocol:0"],
+    "rawCarrierIsDenotation": false
+  },
+  "effects": {
+    "mayReadMemory": false,
+    "mayMutateMemory": false,
+    "mayRealize": false
+  },
+  "canonicalJson": {
+    "utf8": true,
+    "sortObjectKeys": true,
+    "compactSeparators": true,
+    "nodesInSequenceOrder": true
+  },
+  "explicitlyOutOfScope": [
+    "context projection",
+    "denotation",
+    "quote interpretation",
+    "recursive bracket interpretation",
+    "persistent identity",
+    "find",
+    "realize",
+    "delete"
+  ]
+}

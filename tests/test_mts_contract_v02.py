@@ -10,6 +10,7 @@ from core.mtc_parser import parse_formula
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "contracts/mts-contract-v0.2.json"
 CONFORMANCE = ROOT / "contracts/mts-conformance-v0.2.json"
+ANUM_RAW_CARRIER = ROOT / "contracts/anum-raw-carrier-v0.2.json"
 ANUM_BOUNDARY = ROOT / "contracts/anum-boundary-projection-v0.2.json"
 ANUM_DENOTATION = ROOT / "contracts/anum-denotation-v0.2.json"
 ANUM_PAIR_DENOTATION = ROOT / "contracts/anum-pair-denotation-v0.2.json"
@@ -35,6 +36,9 @@ def test_contract_is_accepted_v02_and_points_to_canonical_artifacts():
     assert contract["status"] == "accepted"
     assert contract["rootProgram"] == "tests/mtc_formulas.mtc"
     assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.2.json"
+    assert contract["anum"]["rawCarrierDescription"] == (
+        "contracts/anum-raw-carrier-v0.2.json"
+    )
     assert contract["anum"]["rootBoundaryProjection"] == (
         "contracts/anum-boundary-projection-v0.2.json"
     )
@@ -44,9 +48,11 @@ def test_contract_is_accepted_v02_and_points_to_canonical_artifacts():
     assert contract["anum"]["acceptedPairDenotationSubset"] == (
         "contracts/anum-pair-denotation-v0.2.json"
     )
+    assert contract["anum"]["rawCarrierIssue"] == 99
     assert contract["anum"]["recursiveDenotationIssue"] == 95
     assert contract["anum"]["generalDenotationIssue"] == 89
     assert CONFORMANCE.is_file()
+    assert ANUM_RAW_CARRIER.is_file()
     assert ANUM_BOUNDARY.is_file()
     assert ANUM_DENOTATION.is_file()
     assert ANUM_PAIR_DENOTATION.is_file()
@@ -54,6 +60,12 @@ def test_contract_is_accepted_v02_and_points_to_canonical_artifacts():
     corpus = json.loads(CONFORMANCE.read_text(encoding="utf-8"))
     assert corpus["contract"] == contract["schema"]
     assert corpus["status"] == "accepted"
+
+    raw_carrier = json.loads(ANUM_RAW_CARRIER.read_text(encoding="utf-8"))
+    assert raw_carrier["status"] == "accepted"
+    assert contract["schema"] in raw_carrier["dependsOn"]
+    assert raw_carrier["separation"]["rawCarrierIsDenotation"] is False
+    assert raw_carrier["effects"]["mayRealize"] is False
 
     boundary = json.loads(ANUM_BOUNDARY.read_text(encoding="utf-8"))
     assert boundary["dependsOn"] == contract["schema"]

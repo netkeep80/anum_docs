@@ -60,9 +60,11 @@
   "anum": {
     "operations": ["serialize", "deserialize"],
     "alphabet": ["[", "]", "1", "0"],
+    "rawCarrierDescription": "contracts/anum-raw-carrier-v0.2.json",
     "rootBoundaryProjection": "contracts/anum-boundary-projection-v0.2.json",
     "denotationHandoff": "contracts/anum-denotation-v0.2.json",
     "acceptedPairDenotationSubset": "contracts/anum-pair-denotation-v0.2.json",
+    "rawCarrierIssue": 99,
     "recursiveDenotationIssue": 95,
     "generalDenotationIssue": 89
   },
