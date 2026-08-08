@@ -5,6 +5,7 @@
     "mts-contract/v0.2",
     "anum-boundary-projection/v0.2"
   ],
+  "conformanceCorpus": "contracts/anum-denotation-conformance-v0.2.json",
   "purpose": "storage-neutral L3-to-L4 structural denotation handoff",
   "resultKinds": [
     "structural",
