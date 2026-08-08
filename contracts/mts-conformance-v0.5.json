@@ -1,0 +1,66 @@
+{
+  "schema": "mts-conformance/v0.5",
+  "status": "accepted",
+  "contract": "mts-contract/v0.5",
+  "composition": "all referenced accepted corpora are required; no prior vector is copied, weakened or replaced",
+  "requiredCorpora": [
+    {
+      "role": "base-v0.4",
+      "path": "contracts/mts-conformance-v0.4.json",
+      "schema": "mts-conformance/v0.4",
+      "contract": "mts-contract/v0.4"
+    },
+    {
+      "role": "opening-path-v0.4",
+      "path": "contracts/mts-opening-path-conformance-v0.4.json",
+      "schema": "mts-opening-path-conformance/v0.4",
+      "contract": "mts-opening-path/v0.4"
+    },
+    {
+      "role": "proof-v0.4",
+      "path": "contracts/mts-proof-conformance-v0.4.json",
+      "schema": "mts-proof-conformance/v0.4",
+      "contract": "mts-proof/v0.4"
+    },
+    {
+      "role": "direct-deixis-v0.5",
+      "path": "contracts/mts-direct-deixis-conformance-v0.5.json",
+      "schema": "mts-direct-deixis-conformance/v0.5",
+      "contract": "mts-direct-deixis/v0.5"
+    }
+  ],
+  "releaseAssertions": {
+    "allRequiredCorporaMustPass": true,
+    "mtsContractV04RemainsImmutable": true,
+    "mtsProofV04IsExactDependency": true,
+    "openingPathV04IsExactDependency": true,
+    "directDeixisV05IsExactDependency": true,
+    "rootProgramRemainsTenDefinitions": true,
+    "allSixProofRelationsReplay": true,
+    "definitionOpeningPathRemainsOperationalCertificate": true,
+    "proofSearchRemainsUntrusted": true,
+    "genericCompositionAccepted": false,
+    "judgmentOrderImpliesDependency": false,
+    "openingPathImpliesEquality": false,
+    "openingPathFeedsContextuallySatisfies": false,
+    "directDeixisImpliesContextSensitive": false,
+    "noDirectDeixisImpliesContextInvariant": false,
+    "interpreterIsALink": true,
+    "interpreterIdentityUsedAsHiddenInput": false,
+    "separateSubjectOntologyRequired": false,
+    "interpreterFocusBindingAccepted": false,
+    "relativeProductionRemainsRaw": true,
+    "persistentBackendAccepted": false,
+    "pmmCanonicalDependency": false
+  },
+  "downstreamAssertions": {
+    "aproverMayPinMtsContractV05": true,
+    "aproverMustPinMtsProofV04": true,
+    "aproverMustReplayAllSixRelationsIndependently": true,
+    "aproverMaySearchDefinitionOpeningPaths": true,
+    "aproverSearchRemainsUntrusted": true,
+    "aproverMustNotInventAdditionalComposition": true,
+    "aproverMustNotPromoteDirectDeixisToSensitivity": true,
+    "aproverMustNotUseHiddenInterpreterIdentity": true
+  }
+}
