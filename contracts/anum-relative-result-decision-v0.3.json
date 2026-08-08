@@ -1,0 +1,96 @@
+{
+  "schema": "anum-relative-result-decision/v0.3",
+  "status": "candidate-decision",
+  "issue": 123,
+  "dependsOn": [
+    "anum-relative-context-decision/v0.3",
+    "anum-relative-carrier-path-challenge/v0.3"
+  ],
+  "acceptedContractLinkAllowed": false,
+  "productionRelativeSemanticsChangeAllowed": false,
+  "question": "What is the typed result of bracket-only relative traversal, and what inverse is justified on cyclic/shared carriers?",
+  "models": [
+    {
+      "id": "A",
+      "name": "raw-node-index",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Description-local node numbers are not portable identity."
+    },
+    {
+      "id": "B",
+      "name": "selected-node-with-semantic-path",
+      "verdict": "reject-as-identity-model",
+      "accepted": false,
+      "reason": "The carrier-path challenge shows distinct paths may select one node; promoting path spelling into semantic identity would make source route rather than selected structure the denotation."
+    },
+    {
+      "id": "C",
+      "name": "focused-rooted-l1-carrier-with-separate-provenance",
+      "verdict": "preferred-candidate",
+      "accepted": false,
+      "reason": "Reuse the accepted finite L1 carrier with root reset to the selected focus. Preserve the consumed raw path separately as source/replay provenance, not denotation identity."
+    },
+    {
+      "id": "D",
+      "name": "persistent-linkref-result",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Persistent/backend identity belongs to L4 and cannot define storage-neutral L3 relative denotation."
+    }
+  ],
+  "preferredCandidate": {
+    "result": {
+      "kind": "relative-focused-carrier",
+      "denotationPayload": "same finite L1 CarrierGraph viewed with root = selected focus",
+      "sourceProvenance": "consumed raw bracket path",
+      "pathParticipatesInDenotationIdentity": false,
+      "nodeIndexParticipatesInCrossLanguageIdentity": false,
+      "persistentIdentity": false
+    },
+    "equivalenceForConformance": "focus-rooted carrier topology must be isomorphic under ordered start/end edges; this is an engineering conformance equivalence, not L2 equality",
+    "sameFocusDifferentPaths": "same denotation payload, distinct provenance",
+    "unreachableContextNodes": "not observable through the focus-rooted denotation payload"
+  },
+  "inverseDecision": {
+    "generalCanonicalSemanticInverse": "undefined in this candidate",
+    "reason": "cyclic/shared carriers can have multiple finite bracket paths selecting the same focused carrier; the denotation payload does not determine one path",
+    "sourcePreservingReplaySerialization": "allowed only when path provenance is retained",
+    "sourceReplayIsCanonicalSemanticInverse": false,
+    "shortestPathSelection": "forbidden unless separately justified and accepted",
+    "lexicographicPathSelection": "forbidden unless separately justified and accepted",
+    "backendIdentityDisambiguation": false
+  },
+  "scope": {
+    "bracketOnlyForwardTraversal": true,
+    "relative0": "deferred",
+    "relative1": "deferred",
+    "mixedBracketBitCarriers": "deferred",
+    "relativeEquality": "deferred",
+    "productionRelativeRemainsRaw": true
+  },
+  "semanticSeparation": {
+    "rawPathIsDenotation": false,
+    "rawPathIsProvenance": true,
+    "carrierIsomorphismIsL2Equality": false,
+    "resultMayMaterialize": false,
+    "resultUsesMemoryView": false,
+    "resultUsesContextFrameParent": false
+  },
+  "nextGate": {
+    "artifact": "anum-relative-result-inverse-challenge/v0.3",
+    "status": "candidate-challenge",
+    "mustNotChangeProductionRelativeSemantics": true,
+    "requiredVectors": [
+      "same symbolic carrier under two local index assignments yields isomorphic focused result",
+      "[] and ][ selecting one focus yield same denotation payload but distinct path provenance",
+      "source replay reproduces each original bracket path when provenance exists",
+      "dropping provenance makes general inverse explicitly undefined",
+      "no shortest or lexicographic path is synthesized",
+      "cycles and sharing stay finite",
+      "0/1 and mixed carriers remain unresolved",
+      "production RELATIVE remains RAW",
+      "no L4 or persistent identity"
+    ]
+  }
+}
