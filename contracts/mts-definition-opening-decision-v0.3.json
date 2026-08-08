@@ -1,0 +1,151 @@
+{
+  "schema": "mts-definition-opening-decision/v0.3",
+  "status": "candidate-decision",
+  "dependsOn": [
+    "mts-contract/v0.2",
+    "mts-definition-environment-decision/v0.3",
+    "mts-definition-environment-challenge/v0.3"
+  ],
+  "issue": 121,
+  "acceptedContractLinkAllowed": false,
+  "productionInterpreterChangeAllowed": false,
+  "proofRuleAccepted": false,
+  "purpose": "Choose the exact one-step meaning of controlled definition opening after identity/scope/addressability have been challenged, without conflating opening with equality, interpretation, proof or recursive normalization.",
+  "models": [
+    {
+      "id": "A",
+      "name": "lookup-and-return-typed-body",
+      "verdict": "preferred-candidate",
+      "accepted": false,
+      "operation": "open_definition(target, environment) -> match(definitionId, body, provenance) | no-match | conflict | non-addressable",
+      "reason": "A one-step opening exposes exactly the typed RHS introduced by ':' and stops. It neither evaluates that body nor rewrites arbitrary caller syntax, so contextual interpretation and proof remain explicit later operations."
+    },
+    {
+      "id": "B",
+      "name": "lookup-and-immediately-interpret-body-in-caller-context",
+      "verdict": "reject-as-opening-operation",
+      "accepted": false,
+      "reason": "Conflates definition lookup with L2 interpretation, cannot uniformly handle RHS Form versus constraint Expression, and makes a ContextFrame hidden input to what should be a stable definition lookup. A caller may explicitly interpret a returned body later where that operation is defined."
+    },
+    {
+      "id": "C",
+      "name": "definition-becomes-equality",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "A : F does not assert unrestricted A = F and must not authorize substitution by equality."
+    },
+    {
+      "id": "D",
+      "name": "global-ast-replacement",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Opening one definition must not replace every structurally similar occurrence or erase occurrence/scope identity."
+    },
+    {
+      "id": "E",
+      "name": "recursive-normalize-until-no-definitions",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Self-closed root definitions are intentionally recursive; a single opening step must terminate without searching for a global normal form."
+    }
+  ],
+  "preferredOperation": {
+    "name": "open_definition",
+    "inputs": [
+      "addressable target Form",
+      "explicit DefinitionEnvironment / lexical scope"
+    ],
+    "doesNotTake": [
+      "ContextFrame",
+      "MemoryView",
+      "symbol-to-LinkRef bindings",
+      "proof state"
+    ],
+    "results": [
+      "match(definitionId, typedBody, provenance)",
+      "no-match(targetKey)",
+      "conflict(targetKey, definitionIds)",
+      "non-addressable(target)"
+    ],
+    "typedBody": "the registered Definition.value Expression unchanged by interpretation or normalization",
+    "oneStep": true,
+    "recursive": false,
+    "rewritesCallerAst": false,
+    "returnsEquality": false,
+    "returnsProofArtifact": false,
+    "readsL4": false,
+    "mutatesL4": false
+  },
+  "contextBoundary": {
+    "definitionLookupDependsOnContextFrame": false,
+    "openingResolvesContextPronouns": false,
+    "openingEvaluatesBody": false,
+    "bodyMayContainContextPronouns": true,
+    "bodyMayContainConstraintBundle": true,
+    "bodyMayBeForm": true,
+    "laterInterpretationMayUseExplicitCallerContextWhereApplicable": true,
+    "laterInterpretationIsPartOfOpening": false,
+    "importantExample": "opening ∞ returns the typed body {◁ = ∞, ▷ = ∞}; ◁ and ▷ remain unresolved until a separate explicit contextual operation"
+  },
+  "addressabilityBoundary": {
+    "inheritsFindingFrom": "mts-definition-environment-challenge/v0.3",
+    "rawStructuralKeyIsUniversalDefinitionAddress": false,
+    "currentCandidateAddressableSubset": "closed targets with no occurrence-local anonymous [] and no ContextPronoun",
+    "anonymousSquareTarget": "non-addressable in this candidate rather than globalized by structural shape",
+    "contextPronounTarget": "non-addressable in this candidate rather than promoted to a global definition name",
+    "acceptedProductionRule": false
+  },
+  "recursionBoundary": {
+    "selfDefinition": "a : a opens once to body a and stops",
+    "mutualDefinition": "a : b opens once to body b and stops; a later explicit opening of b is a separate step",
+    "singleStepNeedsCycleMarker": false,
+    "multiStepTraversalMustTrackDefinitionId": true,
+    "contextSensitiveTraversalStateDefinedHere": false,
+    "reason": "Cycle handling belongs to an explicit multi-step traversal/proof/search layer, not to a one-step lookup-and-return operation."
+  },
+  "identityBoundary": {
+    "matchCarriesDefinitionId": true,
+    "DefinitionIdIsPersistentStorageIdentity": false,
+    "targetStructuralKeyIsSemanticEquality": false,
+    "provenanceParticipatesInIdentity": false,
+    "displayTextParticipatesInIdentity": false
+  },
+  "negativeConsequences": [
+    "successful opening does not prove target = body",
+    "successful opening does not rewrite all target occurrences",
+    "successful opening does not recursively open body symbols",
+    "successful opening does not bind or evaluate ContextPronoun",
+    "successful opening does not read or realize associative memory",
+    "successful opening does not become a trusted mts-proof rule"
+  ],
+  "rootProgramGate": {
+    "definitionsUnchanged": true,
+    "allTenCurrentTargetsMustRemainAddressableByCandidate": true,
+    "eachRootOpeningReturnsExactlyItsParsedTypedRhs": true,
+    "infinityOpeningMustPreserveUnresolvedContextPronouns": true
+  },
+  "nextGate": {
+    "artifact": "mts-definition-opening-challenge/v0.3",
+    "status": "candidate-challenge",
+    "mustNotChangeProductionSemantics": true,
+    "requiredVectors": [
+      "all ten root definitions one-step open to their exact typed RHS",
+      "infinity body keeps ContextPronoun nodes unresolved",
+      "Form RHS and constraint-bundle RHS are both returned without evaluation",
+      "self and mutual definitions terminate after exactly one opening",
+      "same target in child scope opens nearest definition and carries distinct DefinitionId",
+      "missing target is no-match",
+      "anonymous [] target is not silently globalized",
+      "ContextPronoun target is not silently globalized",
+      "opening API has no ContextFrame or MemoryView input",
+      "no equality/proof/AST-rewrite/L4 effect is produced"
+    ]
+  },
+  "releaseGate": [
+    "pass the executable one-step opening challenge",
+    "publish language-neutral positive and negative opening conformance",
+    "make an explicit Accepted semantic contract decision",
+    "only then integrate the accepted operation into the single production path",
+    "only after production semantics are accepted evaluate a candidate L5 definition-opening proof rule"
+  ]
+}
