@@ -43,8 +43,8 @@ def test_cli_project_outputs_contextual_root_projection(tmp_path):
     assert "context: root" in result.stdout
     assert "input: []" in result.stdout
     assert "kind: protocol-value" in result.stdout
-    assert "protocol_value: 0" in result.stdout
-    assert "arrow_form: α ⟼ β" in result.stdout
+    assert "protocol_value: 1" in result.stdout
+    assert "arrow_form: ♀∞ ⟼ ∞♂" in result.stdout
 
 
 def test_cli_quote_and_unquote_use_real_quaternary_envelope(tmp_path):
