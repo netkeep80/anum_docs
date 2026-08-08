@@ -1,8 +1,8 @@
 {
   "schema": "mts-value-bundle/v0.2",
-  "status": "candidate-contract",
-  "accepted": false,
-  "acceptedContractLinkAllowed": false,
+  "status": "accepted",
+  "accepted": true,
+  "acceptedContractLinkAllowed": true,
   "dependsOn": [
     "mts-contract/v0.2",
     "mts-bundle-decision/v0.2",
@@ -164,17 +164,22 @@
     "bundleValuedDefinitions": "requires a tagged value environment/binding contract",
     "bundleProjectionOrInversion": "requires an explicit lifting rule or rejection in a later version",
     "bundleAsExplicitLinkFormPole": "requires a separate lifting decision; current expansion uses juxtaposition only",
-    "syntheticMissingLinkForms": "not part of current candidate",
+    "syntheticMissingLinkForms": "not part of current contract",
     "explicitBundleMaterialization": "separate L4 operation if ever needed"
   },
-  "acceptanceGate": {
-    "requires": [
-      "candidate conformance corpus",
-      "single reference elaborator/value evaluator in core",
-      "all current root/conformance tests green",
-      "explicit proof that no current ConstraintBundle behavior changes",
-      "downstream aprover repin and conformance after upstream acceptance"
-    ],
-    "mustVersionIfAccepted": true
+  "acceptanceEvidence": {
+    "decision": "contracts/mts-bundle-decision-v0.2.json",
+    "staticElaborationChallenge": "contracts/mts-bundle-elaboration-challenge-v0.2.json",
+    "resolvedIdentityAlgebraChallenge": "contracts/mts-bundle-algebra-challenge-v0.2.json",
+    "readOnlyExpansionChallenge": "contracts/mts-bundle-expansion-challenge-v0.2.json",
+    "referenceCore": "core/mtc_value_bundle.py",
+    "conformanceCorpus": "contracts/mts-value-bundle-conformance-v0.2.json",
+    "rootRegression": "tests/mtc_formulas.mtc",
+    "constraintBundleRegression": "tests/test_mtc_value_bundle_reference.py"
+  },
+  "downstream": {
+    "aproverRepinRequired": true,
+    "consumerMustExecuteConformance": true,
+    "compatibilityImplementationAllowed": false
   }
 }
