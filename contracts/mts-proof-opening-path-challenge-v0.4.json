@@ -1,0 +1,137 @@
+{
+  "schema": "mts-proof-opening-path-challenge/v0.4",
+  "status": "candidate-challenge",
+  "issue": 165,
+  "dependsOn": [
+    "mts-contract/v0.4",
+    "mts-proof/v0.3",
+    "mts-opening-path/v0.4"
+  ],
+  "conformanceCorpus": "contracts/mts-proof-v0.4-conformance-candidate.json",
+  "acceptedContractLinkAllowed": false,
+  "productionCheckerChangeAllowed": false,
+  "proofV03ChangeAllowed": false,
+  "candidateProof": {
+    "proofVersion": "mts-proof/v0.4",
+    "contractVersion": "mts-contract/v0.4",
+    "requiredTopLevelFields": ["proofVersion", "contractVersion", "judgments"],
+    "judgmentOrderImpliesDependency": false,
+    "emptyJudgmentArrayAllowed": true
+  },
+  "trustedRelationsCandidate": [
+    "ContextuallySatisfies",
+    "Opens",
+    "NoVisibleDefinition",
+    "DefinitionConflict",
+    "NonAddressableDefinitionTarget",
+    "DefinitionOpeningPath"
+  ],
+  "baseRelationReuse": {
+    "firstFiveShapesIdenticalToV03": true,
+    "firstFiveTrustedMeaningIdenticalToV03": true,
+    "mustDelegateCanonicalExistingReplay": true,
+    "mayReinterpretV03Artifacts": false,
+    "mayAddDependencyBetweenTopLevelJudgments": false
+  },
+  "openingPathJudgment": {
+    "relation": "DefinitionOpeningPath",
+    "required": ["relation", "scopes", "lookupScope", "startTarget", "edges", "finalBody"],
+    "scopes": "same strict explicit lexical snapshot as v0.3 definition relations",
+    "lookupScope": "one serialized scope path naming the environment passed to verify_opening_path",
+    "startTarget": "parseable Form source; structural identity, equivalent whitespace allowed",
+    "edges": {
+      "minimum": 1,
+      "requiredFields": ["target", "definitionId", "body"],
+      "target": "parseable Form source; structural identity, equivalent whitespace allowed",
+      "definitionId": "exact non-negative replay-local DefinitionId(scopePath,ordinal)",
+      "body": "canonical format_expression transport parsed to typed Expression"
+    },
+    "finalBody": "canonical format_expression transport parsed to typed Expression",
+    "trustedReplay": "construct OpeningPathWitness and invoke canonical verify_opening_path exactly once",
+    "autoContinue": false
+  },
+  "transportBoundary": {
+    "unexpectedTopLevelFieldsRejected": true,
+    "unexpectedJudgmentFieldsRejected": true,
+    "unexpectedEdgeFieldsRejected": true,
+    "unknownRelationsRejected": true,
+    "wrongVersionsRejected": true,
+    "noncanonicalExpectedBodyTransportRejected": true,
+    "noncanonicalFinalBodyTransportRejected": true,
+    "targetWhitespaceCanonicalizationRequired": false,
+    "sourceSpanIdentity": false
+  },
+  "compositionBoundary": {
+    "DefinitionOpeningPathInternallyComposesEdges": true,
+    "genericJudgmentCompositionAccepted": false,
+    "openingPathFeedsContextuallySatisfiesImplicitly": false,
+    "openingPathImpliesEquality": false,
+    "openingPathImpliesEquivalence": false,
+    "openingPathImpliesNormalization": false,
+    "transitivityAccepted": false,
+    "symmetryAccepted": false,
+    "congruenceAccepted": false,
+    "modusPonensAccepted": false,
+    "globalSubstitutionAccepted": false,
+    "proofDagDependencyAccepted": false
+  },
+  "searchCheckerBoundary": {
+    "searchTrusted": false,
+    "searchTraceSerializedIntoTrustedMeaning": false,
+    "checkerMustReplayWithoutSearch": true,
+    "checkerMayAutoExtendPath": false,
+    "certificateTrustedWithoutReplay": false
+  },
+  "effectsBoundary": {
+    "openingPathReadsMemory": false,
+    "openingPathReadsContextFrame": false,
+    "openingPathReadsInterpreterIdentity": false,
+    "openingPathMaterializes": false,
+    "openingPathDeletes": false
+  },
+  "v03Regression": {
+    "schemaRemains": "mts-proof/v0.3",
+    "contractVersionRemains": "mts-contract/v0.3",
+    "trustedRelationsRemainExactlyFive": true,
+    "existingPortableArtifactsRemainStrictlyReplayable": true,
+    "retroactiveReinterpretation": false
+  },
+  "requiredCoverage": [
+    "all v0.3 valid base judgments lift and replay with identical trusted meaning",
+    "all v0.3 base forgeries remain rejected when lifted",
+    "all v0.3 invalid artifacts remain rejected by the v0.3 API",
+    "all accepted opening-path valid vectors lift and replay",
+    "all opening-path invalid vectors reject",
+    "wrong proofVersion and contractVersion reject",
+    "unknown relation rejects",
+    "unexpected proof/judgment/edge fields reject",
+    "noncanonical edge body and final body transport reject",
+    "lookupScope absent from serialized scopes rejects",
+    "mixed base/opening-path judgment order does not create dependency semantics",
+    "hidden root/duplicate scope/noncanonical scope forgeries remain rejected",
+    "ten root definitions remain unchanged"
+  ],
+  "vetoes": [
+    "editing mts-proof/v0.3 in place",
+    "copying alternate base-relation semantics",
+    "opening path implies equality",
+    "opening path implies contextual satisfaction",
+    "generic top-level judgment composition",
+    "generic proof DAG",
+    "global substitution",
+    "recursive normalization",
+    "hidden root injection",
+    "ambient interpreter/focus/session state",
+    "MemoryView effects for opening path",
+    "auto extending serialized opening paths",
+    "aprover inventing additional rules before upstream acceptance"
+  ],
+  "nextGate": {
+    "directProductionAllowedIfChallengeFindsNoArtifactAmbiguity": true,
+    "artifact": "mts-proof/v0.4",
+    "mustUseSingleTrustedModule": "core/proof_checker.py",
+    "mustReuseOpeningPathVerifier": "core/mtc_opening_path.py::verify_opening_path",
+    "mustKeepV03Api": true,
+    "mustAddNoOtherCompositionRule": true
+  }
+}
