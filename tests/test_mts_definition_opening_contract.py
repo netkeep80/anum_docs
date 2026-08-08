@@ -21,7 +21,7 @@ def contract() -> dict:
     return json.loads(CONTRACT.read_text(encoding="utf-8"))
 
 
-def test_contract_is_normatively_accepted_but_does_not_retrofit_v02_umbrellas():
+def test_contract_is_accepted_integrated_but_does_not_retrofit_v02_umbrellas():
     data = contract()
     mts_v02 = MTS_V02.read_text(encoding="utf-8")
     proof_v02 = PROOF_V02.read_text(encoding="utf-8")
@@ -29,12 +29,23 @@ def test_contract_is_normatively_accepted_but_does_not_retrofit_v02_umbrellas():
     assert data["schema"] == "mts-definition-opening/v0.3"
     assert data["status"] == "accepted"
     assert data["accepted"] is True
-    assert data["integrationStatus"]["semanticContractAccepted"] is True
-    assert data["integrationStatus"]["productionReferenceCoreImplemented"] is False
-    assert data["integrationStatus"]["singleProductionInterpreterIntegrated"] is False
-    assert data["integrationStatus"]["mtsContractV03Published"] is False
-    assert data["integrationStatus"]["trustedL5RuleAccepted"] is False
-    assert data["integrationStatus"]["aproverRepinAllowed"] is False
+    status = data["integrationStatus"]
+    assert status["semanticContractAccepted"] is True
+    assert status["productionReferenceCoreImplemented"] is True
+    assert status["canonicalRootLibraryUsesDefinitionEnvironment"] is True
+    assert status["productionConformancePresent"] is True
+    assert status["mtsContractV03Published"] is False
+    assert status["trustedL5RuleAccepted"] is False
+    assert status["aproverRepinAllowed"] is False
+
+    integration = data["productionIntegration"]
+    assert integration["referenceCore"] == "core/mtc_definitions.py"
+    assert integration["rootLibrary"] == "core/root_library.py"
+    assert integration["rootValidator"] == "core/validate_root.py"
+    assert integration["productionConformance"] == "tests/test_mts_definition_opening_reference.py"
+    assert integration["legacyDifferenceRegistryRetained"] is False
+    assert integration["challengeOnlyEnvironmentCloneRetained"] is False
+    assert integration["interpretConstraintsExecutesDefinition"] is False
 
     assert "mts-definition-opening/v0.3" not in mts_v02
     assert "mts-definition-opening/v0.3" not in proof_v02
@@ -105,10 +116,11 @@ def test_definition_environment_identity_scope_and_shadowing_are_normative():
     assert environment["ContextFrameAffectsLookup"] is False
 
 
-def test_occurrence_local_and_deictic_targets_are_not_globalized():
+def test_occurrence_local_deictic_and_bundle_targets_are_not_globalized():
     addressability = contract()["addressability"]
     assert addressability["anonymousEmptySquareTarget"] == "non-addressable"
     assert addressability["ContextPronounTarget"] == "non-addressable"
+    assert addressability["bundleTarget"] == "non-addressable under the accepted scalar definition-target boundary"
     assert addressability["structuralLookupDiscriminantImpliesSemanticEquality"] is False
 
     anonymous = parse_formula("[] : a")
@@ -132,7 +144,8 @@ def test_root_program_is_still_exactly_ten_definitions_and_acceptance_does_not_c
         "allCurrentTargetsAddressable": True,
         "allOpenToExactTypedRhs": True,
     }
-    assert len(library.formulas) == 10
+    assert len(library.formulas) == len(library.definitions.entries()) == 10
+    assert library.definitions.conflicts() == ()
     assert all(isinstance(formula.ast, Definition) for formula in library.formulas)
 
     expected = [
@@ -173,15 +186,16 @@ def test_recursion_is_normatively_single_step_not_global_normalization():
     }
 
 
-def test_next_gate_requires_one_production_core_before_v03_umbrella_or_l5():
+def test_next_gate_is_v03_umbrella_then_separate_l5_work():
     gate = contract()["nextGate"]
     downstream = contract()["downstream"]
 
-    assert gate["goal"].startswith("implement the accepted DefinitionEnvironment/open_definition operation once")
+    assert gate["goal"].startswith("publish mts-contract/v0.3 umbrella")
     assert "do not add a second parser or interpreter" in gate["constraints"]
     assert "do not turn Definition into Equality" in gate["constraints"]
-    assert gate["afterProductionConformance"].startswith("publish mts-contract/v0.3 umbrella")
+    assert "keep mts-proof/v0.2 trusted rule set unchanged until a separate L5 decision" in gate["constraints"]
+    assert gate["afterUmbrella"].startswith("start #122 proof-judgment/calculus challenge")
 
-    assert downstream["directRuntimePinBeforeProductionIntegration"] is False
+    assert downstream["directRuntimePinBeforeV03Umbrella"] is False
     assert downstream["aproverMustNotInventLocalOpeningSemantics"] is True
     assert downstream["futureConsumerMustUseVersionedV03Umbrella"] is True
