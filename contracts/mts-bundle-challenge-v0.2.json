@@ -1,0 +1,176 @@
+{
+  "schema": "mts-bundle-challenge/v0.2",
+  "status": "candidate-challenge",
+  "dependsOn": "mts-contract/v0.2",
+  "issue": 50,
+  "acceptedConstraintBundle": {
+    "ast": "BundleForm",
+    "interpreter": "interpret_constraints",
+    "semantics": "ordered evaluation of contained constraints in one local interpretation state",
+    "effect": "none",
+    "emptyBundle": {
+      "source": "{}",
+      "meaning": "empty constraint bundle",
+      "expectedSuccess": true
+    },
+    "rootDefinitionsUsingConstraintBundles": [
+      "∞ : {◁ = ∞, ▷ = ∞}",
+      "(=) : {♀◁ = ♀▷, ◁♂ = ▷♂}"
+    ],
+    "identityInvariant": "anonymous [] identity remains AST-occurrence-path inside a bundle"
+  },
+  "candidateValueBundleIntegrationModels": [
+    {
+      "id": "context-sensitive-overload",
+      "accepted": false,
+      "question": "Can the same BundleForm glyph be classified as constraint/value solely from typed context without runtime guessing?"
+    },
+    {
+      "id": "distinct-typed-ast-same-glyph",
+      "accepted": false,
+      "question": "Can parser grammar produce separate ConstraintBundle/ValueBundle nodes unambiguously while preserving current root syntax?"
+    },
+    {
+      "id": "distinct-value-bundle-notation",
+      "accepted": false,
+      "question": "Should accepted constraint {...} remain unchanged and a future value bundle use a different explicit constructor/glyph?"
+    },
+    {
+      "id": "no-separate-value-bundle",
+      "accepted": false,
+      "question": "Can existing LinkForm, Sequence, anonymous patterns and L4 indices express the required queries without a new semantic value?"
+    }
+  ],
+  "valueAlgebraModelsAfterCollisionResolution": [
+    {
+      "id": "extensional-set-like",
+      "commutative": true,
+      "duplicateIdempotent": true,
+      "accepted": false
+    },
+    {
+      "id": "ordered",
+      "commutative": false,
+      "duplicateIdempotent": false,
+      "accepted": false
+    },
+    {
+      "id": "multibundle",
+      "commutative": true,
+      "duplicateIdempotent": false,
+      "accepted": false
+    },
+    {
+      "id": "occurrence-preserving",
+      "commutative": null,
+      "duplicateIdempotent": null,
+      "accepted": false,
+      "note": "syntax occurrences retain identity; any extensional equality would be a separate relation"
+    }
+  ],
+  "syntaxCases": [
+    {
+      "source": "{}",
+      "canonical": "{}",
+      "structuralKey": ["bundle", []],
+      "currentInterpreter": "accepted-empty-constraint-bundle"
+    },
+    {
+      "source": "{x}",
+      "canonical": "{x}",
+      "structuralKey": ["bundle", [["symbol", "x"]]],
+      "currentInterpreter": "unsupported-as-value"
+    },
+    {
+      "source": "{x,x}",
+      "canonical": "{x, x}",
+      "structuralKey": ["bundle", [["symbol", "x"], ["symbol", "x"]]],
+      "currentInterpreter": "unsupported-as-value"
+    },
+    {
+      "source": "{x,y}",
+      "canonical": "{x, y}",
+      "structuralKey": ["bundle", [["symbol", "x"], ["symbol", "y"]]],
+      "currentInterpreter": "unsupported-as-value"
+    },
+    {
+      "source": "{y,x}",
+      "canonical": "{y, x}",
+      "structuralKey": ["bundle", [["symbol", "y"], ["symbol", "x"]]],
+      "currentInterpreter": "unsupported-as-value"
+    },
+    {
+      "source": "a{x,y}",
+      "canonical": "a{x, y}",
+      "structuralKey": ["sequence", [["symbol", "a"], ["bundle", [["symbol", "x"], ["symbol", "y"]]]]],
+      "currentInterpreter": "unsupported-sequence"
+    },
+    {
+      "source": "{x,y}a",
+      "canonical": "{x, y}a",
+      "structuralKey": ["sequence", [["bundle", [["symbol", "x"], ["symbol", "y"]]], ["symbol", "a"]]],
+      "currentInterpreter": "unsupported-sequence"
+    },
+    {
+      "source": "{x,y}{a,b}",
+      "canonical": "{x, y}{a, b}",
+      "structuralKey": ["sequence", [["bundle", [["symbol", "x"], ["symbol", "y"]]], ["bundle", [["symbol", "a"], ["symbol", "b"]]]]],
+      "currentInterpreter": "unsupported-sequence"
+    },
+    {
+      "source": "{[],[]}",
+      "canonical": "{[], []}",
+      "structuralKey": ["bundle", [["square", null], ["square", null]]],
+      "currentInterpreter": "unsupported-as-value"
+    }
+  ],
+  "constraintNonRegressionCases": [
+    {
+      "source": "{}",
+      "context": {"start": 1, "end": 2},
+      "symbols": {},
+      "expected": {"success": true, "substitutions": [], "aliases": []}
+    },
+    {
+      "source": "{◁ = ∞, ▷ = ∞}",
+      "context": {"start": 1, "end": 1},
+      "symbols": {"∞": 1},
+      "expected": {"success": true, "substitutions": [], "aliases": []}
+    },
+    {
+      "source": "{◁ = ∞, ▷ = ∞}",
+      "context": {"start": 1, "end": 2},
+      "symbols": {"∞": 1},
+      "expected": {"success": false, "substitutions": [], "aliases": []}
+    },
+    {
+      "source": "{[] = ◁, [] = ▷}",
+      "context": {"start": 10, "end": 12},
+      "symbols": {},
+      "expected": {
+        "success": true,
+        "substitutions": [
+          {"path": [0, 0], "link": 10},
+          {"path": [1, 0], "link": 12}
+        ],
+        "aliases": []
+      }
+    }
+  ],
+  "effectVeto": {
+    "ordinaryBundleMayRealize": false,
+    "ordinaryBundleMayDelete": false,
+    "emptyBundleMayDelete": false,
+    "descriptionIsCommand": false,
+    "interpretEqualsRealize": false
+  },
+  "rootProgramMustRemainUnchanged": true,
+  "acceptedContractLinkAllowed": false,
+  "releaseGate": [
+    "resolve constraint/value semantic collision",
+    "choose or reject a value algebra model",
+    "publish an accepted semantic contract and conformance corpus",
+    "extend the single existing parser/interpreter path only after acceptance",
+    "repin downstream consumers only after accepted contract changes"
+  ]
+}
