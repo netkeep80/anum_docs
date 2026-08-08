@@ -1,0 +1,42 @@
+{
+  "schema": "mts-conformance/v0.4",
+  "status": "accepted",
+  "contract": "mts-contract/v0.4",
+  "composition": "all referenced accepted corpora are required; no prior vector is copied, weakened or replaced",
+  "requiredCorpora": [
+    {
+      "role": "base-v0.3",
+      "path": "contracts/mts-conformance-v0.3.json",
+      "schema": "mts-conformance/v0.3",
+      "contract": "mts-contract/v0.3"
+    },
+    {
+      "role": "proof-v0.3",
+      "path": "contracts/mts-proof-conformance-v0.3.json",
+      "schema": "mts-proof-conformance/v0.3",
+      "contract": "mts-proof/v0.3"
+    }
+  ],
+  "releaseAssertions": {
+    "allRequiredCorporaMustPass": true,
+    "mtsContractV03RemainsImmutable": true,
+    "mtsProofV03IsExactDependency": true,
+    "rootProgramRemainsTenDefinitions": true,
+    "allFiveBaseProofRelationsReplay": true,
+    "proofSearchRemainsUntrusted": true,
+    "genericCompositionAccepted": false,
+    "openingImpliesEquality": false,
+    "ambientInterpreterIdentityUsed": false,
+    "subjectFocusExtensionAccepted": false,
+    "relativeProductionRemainsRaw": true,
+    "persistentBackendAccepted": false,
+    "pmmCanonicalDependency": false
+  },
+  "downstreamAssertions": {
+    "aproverMayPinMtsContractV04": true,
+    "aproverMustPinMtsProofV03": true,
+    "aproverMustReplayBaseRelationsIndependently": true,
+    "aproverMustNotInventComposition": true,
+    "aproverMustNotAddSubjectFocusSemantics": true
+  }
+}
