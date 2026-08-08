@@ -59,7 +59,9 @@
   },
   "anum": {
     "operations": ["serialize", "deserialize"],
-    "alphabet": ["[", "]", "1", "0"]
+    "alphabet": ["[", "]", "1", "0"],
+    "rootBoundaryProjection": "contracts/anum-boundary-projection-v0.2.json",
+    "generalDenotationIssue": 89
   },
   "memory": {
     "readOperations": [
