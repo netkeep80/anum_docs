@@ -203,7 +203,8 @@ core/anum_pair_denotation.py    direct pair subset
 core/anum_raw_carrier.py        structural raw carrier description
 core/anum_recursive_denotation.py
                                recursive root decode + canonical inverse
-core/anum_memory.py             временный L4 test-double до production apamemory #72
+core/anum_memory.py             canonical indexed in-memory L4 store
+core/proof_checker.py           replay-only trusted L5 checker
 
 converters/anum_cli.py
 converters/text_to_anum.py
@@ -230,6 +231,32 @@ normalized resolution trace kinds
 Python reference runtime обязан проходить этот corpus в CI. Другие consumers, включая `aprover`, должны проходить тот же файл, а не копировать правила вручную.
 
 L3 имеет отдельные language-neutral corpora для raw carrier, denotation IR, pair subset и recursive root denotation. Downstream L4/AVM adapters должны потреблять typed результаты этих контрактов и не дублировать quaternary grammar.
+
+## Сквозной vertical slice v0.2
+
+Один integration test связывает production APIs без mock/legacy обходов:
+
+```text
+raw Anum
+→ parse
+→ RawCarrierDescription
+→ accepted recursive AnumDenotation
+→ L4 load/find/realize/find
+→ canonical inverse
+
+materialized LinkRef
+→ L2 structural interpretation
+→ mts-proof/v0.2
+→ independent L5 replay
+```
+
+Запуск:
+
+```bash
+python -m pytest tests/test_mts_v02_end_to_end.py -v
+```
+
+В этом же suite проверяется отрицательный путь: noncanonical `010` остаётся `RAW`, quote остаётся `QUOTED_RAW`, и ни один из них не превращается в скрытую команду materialization.
 
 ## Интеграция с визуальным апрувером
 
