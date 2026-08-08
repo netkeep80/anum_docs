@@ -13,7 +13,6 @@ from collections.abc import Mapping
 import json
 
 from core.anum_denotation import (
-    AnumDenotation,
     DenotationRef,
     DenotationRefKind,
     canonical_denotation_json,
@@ -126,8 +125,8 @@ class ReferenceL4BackendDriver:
             self._require_no_args(args)
             return {"links": self._normalized_snapshot(store)}
         if op == "poles":
-            ref = self._bound_ref(self._required_name(args, "ref"))
             self._require_exact_fields(args, {"ref"})
+            ref = self._bound_ref(self._required_name(args, "ref"))
             start, end = store.poles(ref)
             return {"poles": [self._normalized_name(start), self._normalized_name(end)]}
         if op == "find_link":
@@ -152,6 +151,7 @@ class ReferenceL4BackendDriver:
             start = self._bound_ref(self._required_name(args, "start"))
             end = self._bound_ref(self._required_name(args, "end"))
             bind = self._required_name(args, "bind")
+            self._preflight_pair_binding(store, bind, start, end)
             ref = store.intern_link(start, end)
             self._bind(bind, ref)
             return {"ref": bind}
@@ -200,6 +200,23 @@ class ReferenceL4BackendDriver:
         self._bindings = dict(assignment)
         return {"created": True}
 
+    def _preflight_pair_binding(
+        self,
+        store: AnumMemory,
+        bind: str,
+        start: int,
+        end: int,
+    ) -> None:
+        existing_binding = self._bindings.get(bind)
+        if existing_binding is None:
+            return
+        existing_pair = store.find_link(start, end)
+        if existing_pair is None or existing_pair != existing_binding:
+            raise DriverRequestError(
+                "binding-conflict",
+                f"binding {bind!r} already denotes another backend link",
+            )
+
     def _realize_structural_denotation(self, store: AnumMemory, args: dict) -> dict:
         self._require_exact_fields(
             args,
@@ -238,20 +255,28 @@ class ReferenceL4BackendDriver:
                 "invalid-request", "nodeBindings must name every structural node exactly"
             )
         root_bind = self._required_name(args, "bind")
+        requested_names = list(node_bindings.values()) + [root_bind]
+        if len(set(requested_names)) != len(requested_names):
+            raise DriverRequestError(
+                "invalid-request", "structural node/root binding names must be distinct"
+            )
 
+        self._preflight_structural_bindings(
+            store,
+            denotation,
+            anchor_refs,
+            node_bindings,
+            root_bind,
+        )
         root = store.realize_denotation(denotation, anchor_refs)
-        local_nodes: dict[int, int] = {}
-        for node in denotation.structural.nodes:
-            start = self._resolve_denotation_ref(node.start, anchor_refs, local_nodes)
-            end = self._resolve_denotation_ref(node.end, anchor_refs, local_nodes)
-            ref = store.find_link(start, end)
-            if ref is None:
-                raise DriverRequestError(
-                    "driver-protocol-error", "realized structural node cannot be found"
-                )
-            local_nodes[node.id] = ref
-            self._bind(node_bindings[str(node.id)], ref)
+        local_nodes = self._resolve_existing_structural_nodes(store, denotation, anchor_refs)
+        if local_nodes is None:
+            raise DriverRequestError(
+                "driver-protocol-error", "realized structural nodes cannot be reconstructed"
+            )
 
+        for node_id, ref in local_nodes.items():
+            self._bind(node_bindings[str(node_id)], ref)
         resolved_root = self._resolve_denotation_ref(
             denotation.structural.root,
             anchor_refs,
@@ -261,6 +286,54 @@ class ReferenceL4BackendDriver:
             raise DriverRequestError("driver-protocol-error", "backend returned wrong denotation root")
         self._bind(root_bind, root)
         return {"ref": root_bind}
+
+    def _preflight_structural_bindings(
+        self,
+        store: AnumMemory,
+        denotation,
+        anchor_refs: Mapping[str, int],
+        node_bindings: Mapping[str, str],
+        root_bind: str,
+    ) -> None:
+        requested = list(node_bindings.values()) + [root_bind]
+        if not any(name in self._bindings for name in requested):
+            return
+
+        existing_root = store.find_denotation(denotation, anchor_refs)
+        if existing_root is None:
+            raise DriverRequestError(
+                "binding-conflict",
+                "existing symbolic binding cannot be reused for a not-yet-realized denotation",
+            )
+        local_nodes = self._resolve_existing_structural_nodes(store, denotation, anchor_refs)
+        if local_nodes is None:
+            raise DriverRequestError("driver-protocol-error")
+
+        for node_id, name in node_bindings.items():
+            existing = self._bindings.get(name)
+            if existing is not None and existing != local_nodes[int(node_id)]:
+                raise DriverRequestError("binding-conflict")
+        existing = self._bindings.get(root_bind)
+        if existing is not None and existing != existing_root:
+            raise DriverRequestError("binding-conflict")
+
+    def _resolve_existing_structural_nodes(
+        self,
+        store: AnumMemory,
+        denotation,
+        anchor_refs: Mapping[str, int],
+    ) -> dict[int, int] | None:
+        structural = denotation.structural
+        assert structural is not None
+        local_nodes: dict[int, int] = {}
+        for node in structural.nodes:
+            start = self._resolve_denotation_ref(node.start, anchor_refs, local_nodes)
+            end = self._resolve_denotation_ref(node.end, anchor_refs, local_nodes)
+            ref = store.find_link(start, end)
+            if ref is None:
+                return None
+            local_nodes[node.id] = ref
+        return local_nodes
 
     @staticmethod
     def _resolve_denotation_ref(
