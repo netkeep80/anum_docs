@@ -1,0 +1,158 @@
+{
+  "schema": "mts-definition-environment-challenge/v0.3",
+  "status": "candidate-challenge",
+  "dependsOn": [
+    "mts-contract/v0.2",
+    "mts-definition-resolution-challenge/v0.3",
+    "mts-definition-environment-decision/v0.3"
+  ],
+  "issue": 121,
+  "acceptedContractLinkAllowed": false,
+  "productionInterpreterChangeAllowed": false,
+  "purpose": "Executable challenge of the selected scoped DefinitionEnvironment identity/lookup/cycle model before any accepted colon semantics.",
+  "modelUnderChallenge": {
+    "definitionId": "DefinitionId(scopePath, ordinal)",
+    "targetKey": "source-span-independent typed structural key used only as lookup discriminant for addressable targets",
+    "scope": "explicit lexical scope tree",
+    "sameScopeDuplicate": "conflict",
+    "childSameTarget": "nearest-scope shadowing",
+    "lookupOrder": "current scope then lexical parents",
+    "contextFrameAffectsLookup": false,
+    "cycleStateKey": "DefinitionId",
+    "activeRepeat": "cycle-ref",
+    "completedRepeat": "reuse-node"
+  },
+  "challengeFinding": {
+    "genericStructuralKeyForEveryFormIsSufficient": false,
+    "reason": "Occurrence-local anonymous [] forms intentionally share the same source-span-independent structural shape while remaining distinct occurrences, so a raw structural_key cannot become a global address for every possible Definition target.",
+    "refinement": "Only addressable closed targets may receive a structural lookup discriminant in this challenge. Targets containing occurrence-local anonymous [] or deictic ContextPronoun nodes are rejected by the challenge environment rather than silently globalized.",
+    "acceptedProductionRule": false
+  },
+  "identityVeto": {
+    "displayTextIsDefinitionIdentity": false,
+    "sourceSpanIsDefinitionIdentity": false,
+    "targetStructuralKeyIsDefinitionIdentity": false,
+    "l1LinkRefIsDefinitionIdentity": false,
+    "definitionIdIsPersistentStorageIdentity": false,
+    "structuralKeyImpliesSemanticEquality": false,
+    "anonymousOccurrenceMayBecomeGlobalByStructuralShape": false,
+    "contextPronounMayBecomeGlobalDefinitionName": false
+  },
+  "semanticVeto": {
+    "lookupImpliesEquality": false,
+    "lookupImpliesProofStep": false,
+    "lookupRewritesCallerAst": false,
+    "resolutionMayRealize": false,
+    "resolutionMayDelete": false,
+    "globalTextualSubstitution": false,
+    "eagerRecursiveNormalization": false
+  },
+  "requiredVectors": [
+    {
+      "id": "root-ten-distinct-ids",
+      "expect": "the ten canonical root Definition nodes register as ten distinct DefinitionId values and all current root targets are addressable"
+    },
+    {
+      "id": "same-scope-conflict",
+      "definitions": ["a : b", "a : c"],
+      "expect": "conflict"
+    },
+    {
+      "id": "child-shadowing",
+      "rootDefinitions": ["a : b"],
+      "childDefinitions": ["a : c"],
+      "lookupScope": "child",
+      "target": "a",
+      "expectBody": "c"
+    },
+    {
+      "id": "lexical-parent-fallback",
+      "rootDefinitions": ["a : b"],
+      "childDefinitions": [],
+      "lookupScope": "child",
+      "target": "a",
+      "expectBody": "b"
+    },
+    {
+      "id": "missing-target",
+      "rootDefinitions": ["a : b"],
+      "lookupScope": "root",
+      "target": "z",
+      "expect": "no-match"
+    },
+    {
+      "id": "anonymous-target-not-globalized",
+      "definitions": ["[] : a", "[] : b"],
+      "expect": "typed non-addressable-target rejection before structural-key collision can become definition lookup identity"
+    },
+    {
+      "id": "deictic-target-not-globalized",
+      "definitions": ["◁ : a", "▷ : b"],
+      "expect": "typed non-addressable-target rejection; ContextPronoun remains contextual rather than a global definition name"
+    },
+    {
+      "id": "self-cycle",
+      "definitions": ["a : a"],
+      "start": "a",
+      "expectVisited": ["a"],
+      "expectCycleRefs": ["a"]
+    },
+    {
+      "id": "mutual-cycle",
+      "definitions": ["a : b", "b : a"],
+      "start": "a",
+      "expectVisited": ["a", "b"],
+      "expectCycleRefs": ["a"]
+    },
+    {
+      "id": "finite-chain",
+      "definitions": ["a : b", "b : c", "c : d"],
+      "start": "a",
+      "expectVisited": ["a", "b", "c"],
+      "expectExternalLeaves": ["d"]
+    }
+  ],
+  "contextVectors": {
+    "sameLookupAcrossFrames": [
+      {"start": 1, "end": 2},
+      {"start": 10, "end": 20},
+      {"start": 100, "end": 200, "parent": {"start": 1, "end": 2}}
+    ],
+    "expect": "identical DefinitionId for identical environment and addressable target",
+    "contextFrameIsNotDefinitionScope": true
+  },
+  "provenanceVectors": {
+    "sameAddressableTargetDifferentSourceSpansRemainLookupEquivalent": true,
+    "sameAddressableTargetDifferentScopesRemainDistinctIntroductions": true,
+    "sourceSpanMayBeRecordedForDiagnostics": true,
+    "sourceSpanMayAffectIdentity": false,
+    "anonymousOccurrenceIdentityCannotBeRecoveredFromSourceSpan": true
+  },
+  "recursionBoundary": {
+    "challengeDependencySubset": "Symbol-only RHS dependency lookup",
+    "generalStructuralBodyDependencyMatchingAccepted": false,
+    "bodyInterpretationAgainstCallerContextAccepted": false,
+    "reason": "This gate validates finite identity/cycle state without smuggling a general rewrite or proof relation into the environment model."
+  },
+  "effectGate": {
+    "memoryReadsRequired": false,
+    "memoryWritesAllowed": false,
+    "realizeAllowed": false,
+    "deleteAllowed": false
+  },
+  "determinismGate": {
+    "sameScopeTreeAndRegistrationOrderProduceSameDefinitionIds": true,
+    "sameLookupProducesSameNearestDefinition": true,
+    "finiteGraphReplayProducesSameVisitedAndCycleRefs": true
+  },
+  "rootProgramMustRemainUnchanged": true,
+  "releaseGate": [
+    "challenge passes against current root program",
+    "carry the addressable-target refinement into the next candidate semantic contract instead of treating raw structural_key as a universal definition address",
+    "define exact body-resolution/context relation without treating lookup as equality",
+    "publish language-neutral positive and negative conformance corpus",
+    "make explicit Accepted decision in a versioned semantic contract",
+    "only then change the single production interpreter",
+    "only after accepted interpreter semantics expose a candidate L5 proof rule"
+  ]
+}
