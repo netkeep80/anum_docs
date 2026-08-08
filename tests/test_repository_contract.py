@@ -17,6 +17,8 @@ MTS_CONTRACT_V03 = ROOT / "contracts/mts-contract-v0.3.json"
 MTS_CONFORMANCE_V03 = ROOT / "contracts/mts-conformance-v0.3.json"
 MTS_CONTRACT_V04 = ROOT / "contracts/mts-contract-v0.4.json"
 MTS_CONFORMANCE_V04 = ROOT / "contracts/mts-conformance-v0.4.json"
+MTS_CONTRACT_V05 = ROOT / "contracts/mts-contract-v0.5.json"
+MTS_CONFORMANCE_V05 = ROOT / "contracts/mts-conformance-v0.5.json"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md", "Пучки связей МТС.md"}
 ACTIVE_SPECS = {
     "Reference model МТС v0.2.md",
@@ -103,6 +105,8 @@ def test_versioned_machine_contract_and_conformance_chain_is_exact():
         MTS_CONFORMANCE_V03,
         MTS_CONTRACT_V04,
         MTS_CONFORMANCE_V04,
+        MTS_CONTRACT_V05,
+        MTS_CONFORMANCE_V05,
     ):
         assert path.is_file()
 
@@ -112,6 +116,8 @@ def test_versioned_machine_contract_and_conformance_chain_is_exact():
     v03_corpus = json.loads(MTS_CONFORMANCE_V03.read_text(encoding="utf-8"))
     v04 = json.loads(MTS_CONTRACT_V04.read_text(encoding="utf-8"))
     v04_corpus = json.loads(MTS_CONFORMANCE_V04.read_text(encoding="utf-8"))
+    v05 = json.loads(MTS_CONTRACT_V05.read_text(encoding="utf-8"))
+    v05_corpus = json.loads(MTS_CONFORMANCE_V05.read_text(encoding="utf-8"))
 
     assert v02["schema"] == "mts-contract/v0.2"
     assert v02["status"] == "accepted"
@@ -151,13 +157,47 @@ def test_versioned_machine_contract_and_conformance_chain_is_exact():
     assert required_v04["proof-v0.3"]["schema"] == "mts-proof-conformance/v0.3"
     assert required_v04["proof-v0.3"]["contract"] == "mts-proof/v0.3"
 
+    assert v05["schema"] == "mts-contract/v0.5"
+    assert v05["status"] == "accepted"
+    assert v05["extends"] == v04["schema"]
+    assert v05["baseContract"] == "contracts/mts-contract-v0.4.json"
+    assert v05["rootProgram"] == v04["rootProgram"]
+    assert v05["conformanceCorpus"] == "contracts/mts-conformance-v0.5.json"
+    assert v05["dependsOn"] == [
+        v04["schema"],
+        "mts-opening-path/v0.4",
+        "mts-proof/v0.4",
+        "mts-direct-deixis/v0.5",
+    ]
+    assert v05_corpus["schema"] == "mts-conformance/v0.5"
+    assert v05_corpus["contract"] == v05["schema"]
+    assert v05_corpus["status"] == "accepted"
+    required_v05 = {item["role"]: item for item in v05_corpus["requiredCorpora"]}
+    assert set(required_v05) == {
+        "base-v0.4",
+        "opening-path-v0.4",
+        "proof-v0.4",
+        "direct-deixis-v0.5",
+    }
+    assert required_v05["base-v0.4"]["schema"] == v04_corpus["schema"]
+    assert required_v05["base-v0.4"]["contract"] == v04_corpus["contract"]
+    assert required_v05["opening-path-v0.4"]["contract"] == "mts-opening-path/v0.4"
+    assert required_v05["proof-v0.4"]["contract"] == "mts-proof/v0.4"
+    assert required_v05["direct-deixis-v0.5"]["contract"] == "mts-direct-deixis/v0.5"
+
     contract_files = sorted((ROOT / "contracts").glob("mts-contract-*.json"))
     conformance_files = sorted((ROOT / "contracts").glob("mts-conformance-*.json"))
-    assert contract_files == [MTS_CONTRACT_V02, MTS_CONTRACT_V03, MTS_CONTRACT_V04]
+    assert contract_files == [
+        MTS_CONTRACT_V02,
+        MTS_CONTRACT_V03,
+        MTS_CONTRACT_V04,
+        MTS_CONTRACT_V05,
+    ]
     assert conformance_files == [
         MTS_CONFORMANCE_V02,
         MTS_CONFORMANCE_V03,
         MTS_CONFORMANCE_V04,
+        MTS_CONFORMANCE_V05,
     ]
 
 

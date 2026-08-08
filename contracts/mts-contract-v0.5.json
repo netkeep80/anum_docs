@@ -1,0 +1,142 @@
+{
+  "schema": "mts-contract/v0.5",
+  "status": "accepted",
+  "accepted": true,
+  "issue": 168,
+  "dependsOn": [
+    "mts-contract/v0.4",
+    "mts-opening-path/v0.4",
+    "mts-proof/v0.4",
+    "mts-direct-deixis/v0.5"
+  ],
+  "extends": "mts-contract/v0.4",
+  "baseContract": "contracts/mts-contract-v0.4.json",
+  "conformanceCorpus": "contracts/mts-conformance-v0.5.json",
+  "releaseModel": "additive publication umbrella over immutable v0.4; publishes already accepted opening-path, proof-v0.4 and direct-deixis surfaces without semantic promotion",
+  "rootProgram": "tests/mtc_formulas.mtc",
+  "rootDefinitionCount": 10,
+  "preservedSurface": {
+    "allV04SemanticsUnchanged": true,
+    "definitionOpeningV03Unchanged": true,
+    "valueBundlesV02Unchanged": true,
+    "rootAndQuoteAnumV02Unchanged": true,
+    "relativeAnumProductionRaw": true,
+    "persistentL4Accepted": false,
+    "interpretMayRealize": false,
+    "openingPathMayRealize": false,
+    "globalRewrite": false,
+    "displayLabelIsIdentity": false
+  },
+  "l5": {
+    "proofContract": "contracts/mts-proof-v0.4.json",
+    "proofSchema": "mts-proof/v0.4",
+    "contractVersion": "mts-contract/v0.4",
+    "trustedCheckerModule": "core/proof_checker.py",
+    "trustedRelations": [
+      "ContextuallySatisfies",
+      "Opens",
+      "NoVisibleDefinition",
+      "DefinitionConflict",
+      "NonAddressableDefinitionTarget",
+      "DefinitionOpeningPath"
+    ],
+    "definitionOpeningPathContract": "contracts/mts-opening-path-v0.4.json",
+    "definitionOpeningPathClassification": "operational-composite-certificate",
+    "searchTrusted": false,
+    "checkerTrusted": true,
+    "genericCompositionAccepted": false,
+    "judgmentOrderImpliesDependency": false,
+    "openingPathImpliesEquality": false,
+    "openingPathImpliesEquivalence": false,
+    "openingPathImpliesNormalization": false,
+    "openingPathFeedsContextuallySatisfiesImplicitly": false,
+    "transitivityAccepted": false,
+    "symmetryAccepted": false,
+    "congruenceAccepted": false,
+    "modusPonensAccepted": false,
+    "globalSubstitutionAccepted": false,
+    "proofDagDependencyAccepted": false
+  },
+  "contextAnalysis": {
+    "directDeixisContract": "contracts/mts-direct-deixis-v0.5.json",
+    "operation": "analyze_direct_deixis",
+    "meaning": "reports explicit ContextPronoun occurrences in one typed L2 Expression",
+    "positiveImpliesContextSensitive": false,
+    "emptyImpliesContextInvariant": false,
+    "opensDefinitions": false,
+    "readsMemory": false,
+    "readsContextFrame": false,
+    "readsInterpreterIdentity": false,
+    "readsSecurityPolicy": false,
+    "trustedProofRelationAdded": false
+  },
+  "interpreterBoundary": {
+    "interpreterIsALink": true,
+    "separateSubjectOntologyRequired": false,
+    "acceptedEvaluationContext": "explicit ContextFrame(start,end,parent?)",
+    "interpreterLinkIdentityIsHiddenEvalInput": false,
+    "currentFocusBindingSemanticsAccepted": false,
+    "currentFocusLinkRefObservable": false,
+    "contextMayBeVirtual": true,
+    "securityPolicyChangesPronounMeaning": false,
+    "researchIssue": 148
+  },
+  "versionBoundaries": {
+    "v02ModifiedInPlace": false,
+    "v03ModifiedInPlace": false,
+    "v04ModifiedInPlace": false,
+    "proofV03ModifiedInPlace": false,
+    "proofV04ModifiedToFitUmbrella": false,
+    "openingPathV04ModifiedToFitUmbrella": false,
+    "directDeixisV05ModifiedToFitUmbrella": false,
+    "compatibilitySemanticLayerAllowed": false
+  },
+  "excludedFromThisRelease": [
+    "generic proof DAG or top-level judgment dependency semantics",
+    "opening-path to equality/equivalence/normalization/contextual-satisfaction bridge",
+    "unrestricted equality transitivity, symmetry or congruence",
+    "modus ponens or global substitution",
+    "universal ContextInvariant theorem",
+    "indirect definition dependency as current interpret semantics",
+    "interpreter-focus identity/lifecycle semantics",
+    "observable current-focus LinkRef primitive",
+    "relative Anum candidate semantics",
+    "persistent L4 backend acceptance",
+    "PMM as canonical dependency",
+    "implicit realization"
+  ],
+  "downstream": {
+    "genericConsumerMayPinV05": true,
+    "aproverProofRepinAllowed": true,
+    "requiredProofSchema": "mts-proof/v0.4",
+    "requiredProofContractVersion": "mts-contract/v0.4",
+    "consumerMustReplayIndependently": true,
+    "consumerMaySearchDefinitionOpeningPaths": true,
+    "consumerSearchTrusted": false,
+    "consumerMayInventAdditionalCompositionRules": false,
+    "consumerMayInferContextSensitivityFromDirectDeixis": false,
+    "consumerMayUseHiddenInterpreterIdentity": false
+  },
+  "nextGates": {
+    "proofComposition": {
+      "issue": 122,
+      "status": "DefinitionOpeningPath accepted; broader calculus remains open"
+    },
+    "interpreterFocus": {
+      "issue": 148,
+      "status": "research; explicit ContextFrame remains accepted boundary"
+    },
+    "contextInvariance": {
+      "issue": 156,
+      "status": "direct deixis accepted; universal/indirect claims remain deferred"
+    },
+    "relativeAnum": {
+      "issue": 123,
+      "status": "candidate research only"
+    },
+    "persistentL4": {
+      "issue": 124,
+      "status": "persistent backend conformance required"
+    }
+  }
+}
