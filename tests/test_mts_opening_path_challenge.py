@@ -231,9 +231,24 @@ def test_chain_may_end_in_bundle_without_evaluating_it():
     assert vector["finalBody"] == "{◁ = x, ▷ = y}"
 
     final = read(CHALLENGE)["finalBody"]
-    assert final["mayBeNonFormExpression"] is True
     assert final["automaticallyEvaluated"] is False
     assert final["automaticallyContextuallySatisfied"] is False
+
+
+def test_chain_may_end_in_non_form_expression_but_cannot_continue_through_it():
+    vectors = {item["id"]: item for item in read(CORPUS)["validPaths"]}
+    invalid = {item["id"]: item for item in read(CORPUS)["invalidPaths"]}
+
+    terminal = vectors["ends-in-non-form-judgment"]
+    continuation = invalid["continue-after-non-form"]
+
+    assert verify_candidate_path(terminal)
+    assert not isinstance(parse_formula(terminal["finalBody"]), Form)
+    assert not verify_candidate_path(continuation)
+
+    final = read(CHALLENGE)["finalBody"]
+    assert final["mayBeNonFormExpression"] is True
+    assert final["automaticallyEvaluated"] is False
 
 
 def test_candidate_verifier_has_no_memory_context_or_effect_input():
