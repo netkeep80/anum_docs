@@ -1,0 +1,68 @@
+{
+  "schema": "anum-relative-carrier-path-conformance/v0.3",
+  "status": "candidate-challenge-corpus",
+  "dependsOn": "anum-relative-carrier-path-challenge/v0.3",
+  "symbolicCarrier": {
+    "focus": "F",
+    "nodes": {
+      "F": {"start": "S", "end": "E"},
+      "S": {"start": "SS", "end": "F"},
+      "E": {"start": "F", "end": "EE"},
+      "SS": {"start": "SS", "end": "S"},
+      "EE": {"start": "E", "end": "EE"}
+    }
+  },
+  "indexAssignments": [
+    {"F": 0, "S": 1, "E": 2, "SS": 3, "EE": 4},
+    {"F": 3, "S": 4, "E": 0, "SS": 1, "EE": 2}
+  ],
+  "positivePaths": [
+    {"raw": "[", "selected": "S"},
+    {"raw": "]", "selected": "E"},
+    {"raw": "[[", "selected": "SS"},
+    {"raw": "]]", "selected": "EE"},
+    {"raw": "[]", "selected": "F"},
+    {"raw": "][", "selected": "F"},
+    {"raw": "[][]", "selected": "F"},
+    {"raw": "[[[[", "selected": "SS"},
+    {"raw": "]]]]", "selected": "EE"}
+  ],
+  "unresolvedPaths": [
+    "0",
+    "1",
+    "[0",
+    "0]",
+    "[1]",
+    "10"
+  ],
+  "negativeCases": [
+    {"id": "focus-below-zero", "focus": -1, "expect": "invalid-focus"},
+    {"id": "focus-past-end", "focus": 99, "expect": "invalid-focus"}
+  ],
+  "ambiguityCases": [
+    {
+      "paths": ["[]", "][", "[][]"],
+      "selected": "F",
+      "finding": "same selected node does not identify one canonical source path"
+    }
+  ],
+  "productionIsolationVectors": [
+    "[",
+    "]",
+    "[[",
+    "]]",
+    "[]",
+    "][",
+    "0",
+    "1",
+    "[0",
+    "0]"
+  ],
+  "nonObservables": [
+    "raw integer node index",
+    "persistent LinkRef",
+    "physical address",
+    "MemoryView state",
+    "L2 ContextFrame parent"
+  ]
+}
