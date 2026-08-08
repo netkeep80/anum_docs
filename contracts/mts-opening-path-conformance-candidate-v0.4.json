@@ -14,6 +14,16 @@
       "finalBody": "b"
     },
     {
+      "id": "ends-in-non-form-judgment",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b = c"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b = c"}
+      ],
+      "finalBody": "b = c"
+    },
+    {
       "id": "two-edge",
       "scopes": [{"path": [], "parent": null, "definitions": ["a : b", "b : c"]}],
       "lookupScope": [],
