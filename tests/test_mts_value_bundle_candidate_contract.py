@@ -1,4 +1,4 @@
-"""Consistency gates for the non-normative flat ValueBundle candidate contract."""
+"""Проверки согласованности принятого контракта плоских пучков значений."""
 
 import json
 from pathlib import Path
@@ -20,23 +20,27 @@ def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_candidate_is_versioned_but_not_accepted_or_linked_from_mts_contract():
+def test_value_bundle_contract_is_accepted_and_linked_from_mts_contract():
     contract = load(CONTRACT)
     conformance = load(CONFORMANCE)
-    accepted_text = MTS_CONTRACT.read_text(encoding="utf-8")
+    mts = load(MTS_CONTRACT)
 
     assert contract["schema"] == "mts-value-bundle/v0.2"
-    assert contract["status"] == "candidate-contract"
-    assert contract["accepted"] is False
-    assert contract["acceptedContractLinkAllowed"] is False
+    assert contract["status"] == "accepted"
+    assert contract["accepted"] is True
+    assert contract["acceptedContractLinkAllowed"] is True
     assert conformance["schema"] == "mts-value-bundle-conformance/v0.2"
-    assert conformance["status"] == "candidate-conformance"
+    assert conformance["status"] == "accepted"
     assert conformance["contract"] == contract["schema"]
-    assert conformance["accepted"] is False
-    assert "mts-value-bundle" not in accepted_text
+    assert conformance["accepted"] is True
+    assert mts["formalNotation"]["valueBundle"]["contract"] == "contracts/mts-value-bundle-v0.2.json"
+    assert (
+        mts["formalNotation"]["valueBundle"]["conformanceCorpus"]
+        == "contracts/mts-value-bundle-conformance-v0.2.json"
+    )
 
 
-def test_candidate_depends_on_all_three_passed_semantic_challenges():
+def test_accepted_contract_keeps_all_three_semantic_challenges_as_evidence():
     contract = load(CONTRACT)
     elaboration = load(ELABORATION)
     algebra = load(ALGEBRA)
@@ -49,12 +53,16 @@ def test_candidate_depends_on_all_three_passed_semantic_challenges():
         algebra["schema"],
         expansion["schema"],
     ]
+    evidence = contract["acceptanceEvidence"]
+    assert evidence["staticElaborationChallenge"] == "contracts/mts-bundle-elaboration-challenge-v0.2.json"
+    assert evidence["resolvedIdentityAlgebraChallenge"] == "contracts/mts-bundle-algebra-challenge-v0.2.json"
+    assert evidence["readOnlyExpansionChallenge"] == "contracts/mts-bundle-expansion-challenge-v0.2.json"
     assert elaboration["status"] == "candidate-challenge"
     assert algebra["status"] == "candidate-challenge"
     assert expansion["status"] == "candidate-challenge"
 
 
-def test_candidate_is_flat_only_and_does_not_smuggle_nested_semantics():
+def test_accepted_scope_is_flat_only_and_does_not_smuggle_nested_semantics():
     contract = load(CONTRACT)
     conformance = load(CONFORMANCE)
 
@@ -153,7 +161,7 @@ def test_anonymous_occurrences_remain_independent_until_resolution():
     assert cases["anonymous-same-bindings"]["equal"] is True
 
 
-def test_current_ten_root_definitions_remain_parseable_and_candidate_cannot_enter_root():
+def test_current_ten_root_definitions_remain_parseable_and_value_bundle_cannot_enter_root():
     contract = load(CONTRACT)
     sources = [
         line.strip()
@@ -185,10 +193,15 @@ def test_effect_veto_preserves_interpret_not_realize_boundary():
     assert conformance["veto"]["globalRewrite"] is False
 
 
-def test_acceptance_gate_requires_reference_core_before_normative_linking():
-    gate = load(CONTRACT)["acceptanceGate"]
+def test_acceptance_evidence_requires_single_core_and_downstream_repin():
+    contract = load(CONTRACT)
+    evidence = contract["acceptanceEvidence"]
+    downstream = contract["downstream"]
 
-    assert "single reference elaborator/value evaluator in core" in gate["requires"]
-    assert "explicit proof that no current ConstraintBundle behavior changes" in gate["requires"]
-    assert "downstream aprover repin and conformance after upstream acceptance" in gate["requires"]
-    assert gate["mustVersionIfAccepted"] is True
+    assert evidence["referenceCore"] == "core/mtc_value_bundle.py"
+    assert evidence["conformanceCorpus"] == "contracts/mts-value-bundle-conformance-v0.2.json"
+    assert evidence["rootRegression"] == "tests/mtc_formulas.mtc"
+    assert evidence["constraintBundleRegression"] == "tests/test_mtc_value_bundle_reference.py"
+    assert downstream["aproverRepinRequired"] is True
+    assert downstream["consumerMustExecuteConformance"] is True
+    assert downstream["compatibilityImplementationAllowed"] is False
