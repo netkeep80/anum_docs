@@ -16,10 +16,14 @@
 | [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md) | нормативное чтение 10 root definitions |
 | [Reference model МТС v0.2](docs/specs/Reference%20model%20МТС%20v0.2.md) | границы L0–L5 и инженерная semantics |
 | [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) | typed L2 syntax и interpretation |
-| [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | L3 `*.anum`, raw parser и serialization |
+| [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | L3 `*.anum`, raw carrier, denotation и serialization |
 | [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md) | contextual L3 projection и quote semantics |
 | [MTS contract v0.2](contracts/mts-contract-v0.2.json) | language-neutral normative contract |
+| [Anum raw carrier v0.2](contracts/anum-raw-carrier-v0.2.json) | storage-neutral описание raw-последовательности абитов |
 | [Anum boundary projection v0.2](contracts/anum-boundary-projection-v0.2.json) | принятый root-context boundary subset L3 |
+| [Anum denotation v0.2](contracts/anum-denotation-v0.2.json) | storage-neutral structural handoff L3→L4 |
+| [Anum pair denotation v0.2](contracts/anum-pair-denotation-v0.2.json) | прямой structural subset `0/1` и двух protocol atoms |
+| [Anum recursive denotation v0.2](contracts/anum-recursive-denotation-v0.2.json) | принятая рекурсивная root grammar и canonical inverse |
 | [MTS conformance v0.2](contracts/mts-conformance-v0.2.json) | cross-language executable compatibility corpus |
 | [Корневая программа](tests/mtc_formulas.mtc) | единственный машинный root definitions source |
 
@@ -145,30 +149,61 @@ interpret ≠ realize
 ][ → 0
 ```
 
-`[[` и `]]` остаются boundary forms без protocol value. Общая structural denotation произвольного raw carrier и relative denotation остаются открытыми в #89.
+После boundary/protocol слоя принят storage-neutral structural handoff и два denoting subset:
+
+```text
+0 / 1
+00 / 01 / 10 / 11
+```
+
+а также рекурсивная root grammar:
+
+```text
+Atom  = 0 | 1
+Value = Atom | '[' Pair ']'
+Pair  = Value Value
+Root  = Atom | Pair
+```
+
+Для корневой записи действует проверяемое схлопывание ведущих открывающих абитов: decoder принимает structural reading только если повторное canonical encode в точности восстанавливает исходный raw carrier. Поэтому неоднозначные или неканонические строки не угадываются, а остаются typed `RAW`.
+
+`[[` и `]]` по-прежнему имеют специальный boundary status и не получают structural denotation. `quote` и `relative` не наследуют рекурсивную root grammar автоматически: quote сохраняет свой отдельный уровень описания, relative остаётся raw до отдельного принятого контракта.
 
 ## Рабочие инструменты
 
 ```text
-core/reference_model.py   декларативный contract L0–L5
-core/semantic_carrier.py  конечный cyclic Link carrier L1
-core/mtc_ast.py           typed AST L2
-core/mtc_parser.py        tokenizer + Pratt parser L2
-core/mtc_interpreter.py   read-only contextual interpreter L2/L4 boundary
-core/root_library.py      загрузка canonical root definitions
-core/validate_root.py     structural root validation
+core/reference_model.py         декларативный contract L0–L5
+core/semantic_carrier.py        конечный cyclic Link carrier L1
+core/mtc_ast.py                 typed AST L2
+core/mtc_parser.py              tokenizer + Pratt parser L2
+core/mtc_interpreter.py         read-only contextual interpreter L2/L4 boundary
+core/root_library.py            загрузка canonical root definitions
+core/validate_root.py           structural root validation
 
 contracts/mts-contract-v0.2.json
-                         versioned language-neutral contract
+                               versioned language-neutral contract
+contracts/anum-raw-carrier-v0.2.json
+                               storage-neutral raw carrier
 contracts/anum-boundary-projection-v0.2.json
-                         accepted root-context Anum boundary vectors
+                               accepted root-context boundary projection
+contracts/anum-denotation-v0.2.json
+                               storage-neutral L3→L4 structural IR
+contracts/anum-pair-denotation-v0.2.json
+                               accepted direct protocol/pair subset
+contracts/anum-recursive-denotation-v0.2.json
+                               accepted recursive root denotation
 contracts/mts-conformance-v0.2.json
-                         versioned cross-language conformance vectors
+                               cross-language formal-language corpus
 
-core/anum_model.py        typed L3 contexts/results
-core/anum_parser.py       raw parse + incremental decoder + serialization
-core/anum_protocol.py     validate/project/quote/unquote/dictionary
-core/anum_memory.py       временный L4 test-double до production apamemory #72
+core/anum_model.py              typed L3 contexts/results
+core/anum_parser.py             raw parse + incremental decoder + serialization
+core/anum_protocol.py           validate/project/quote/unquote/dictionary
+core/anum_denotation.py         storage-neutral denotation IR
+core/anum_pair_denotation.py    direct pair subset
+core/anum_raw_carrier.py        structural raw carrier description
+core/anum_recursive_denotation.py
+                               recursive root decode + canonical inverse
+core/anum_memory.py             временный L4 test-double до production apamemory #72
 
 converters/anum_cli.py
 converters/text_to_anum.py
@@ -193,6 +228,8 @@ normalized resolution trace kinds
 ```
 
 Python reference runtime обязан проходить этот corpus в CI. Другие consumers, включая `aprover`, должны проходить тот же файл, а не копировать правила вручную.
+
+L3 имеет отдельные language-neutral corpora для raw carrier, denotation IR, pair subset и recursive root denotation. Downstream L4/AVM adapters должны потреблять typed результаты этих контрактов и не дублировать quaternary grammar.
 
 ## Интеграция с визуальным апрувером
 
