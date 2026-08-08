@@ -14,6 +14,8 @@
     "valueBundle": "flat only",
     "constraintBundle": "existing accepted behavior unchanged",
     "nestedValueBundle": "rejected/deferred",
+    "bundleValuedDefinition": "rejected/deferred",
+    "scalarOperatorLifting": "rejected/deferred",
     "materialization": "out-of-scope",
     "persistentStorage": "out-of-scope"
   },
@@ -32,13 +34,25 @@
       "ConstraintBundle",
       "ValueBundle"
     ],
+    "operatorDomains": {
+      "constraintEntry": "ConstraintBundle or existing Judgment semantics",
+      "standaloneValueEntry": "flat ValueBundle allowed when value context is explicit",
+      "equalityOperands": "LinkValue or flat ValueBundle",
+      "inequalityOperands": "LinkValue or flat ValueBundle",
+      "sequenceWithBundleOperand": "bundle expansion query",
+      "linkFormOperands": "scalar LinkValue only",
+      "projectionOperand": "scalar LinkValue only",
+      "inversionOperand": "scalar LinkValue only",
+      "definitionTarget": "scalar LinkValue form only",
+      "definitionRhs": "existing scalar Form or ConstraintBundle only; ValueBundle deferred"
+    },
     "rules": [
       {
         "when": "all non-empty direct items are Judgments",
         "result": "ConstraintBundle"
       },
       {
-        "when": "all non-empty direct items are non-bundle Forms",
+        "when": "all non-empty direct items are non-bundle Forms in a value-capable context",
         "result": "ValueBundle"
       },
       {
@@ -46,7 +60,7 @@
         "result": "static-error:mixed-bundle-role-evidence"
       },
       {
-        "when": "empty {} occurs in statically Form-required position",
+        "when": "empty {} occurs in a statically value-capable position",
         "result": "ValueBundle"
       },
       {
@@ -54,8 +68,16 @@
         "result": "ConstraintBundle"
       },
       {
-        "when": "empty {} is a definition RHS with no stronger Form evidence",
+        "when": "empty {} is a definition RHS",
         "result": "ConstraintBundle"
+      },
+      {
+        "when": "non-empty ValueBundle is a definition RHS",
+        "result": "static-error:bundle-valued-definition-deferred"
+      },
+      {
+        "when": "ValueBundle appears under scalar-only ⟼/♀/♂/¬ operand position",
+        "result": "static-error:bundle-not-supported-in-scalar-operator"
       },
       {
         "when": "empty {} has no static role context",
@@ -108,7 +130,7 @@
     }
   },
   "expansionQuery": {
-    "trigger": "Sequence/juxtaposition with at least one statically elaborated ValueBundle operand",
+    "trigger": "Sequence/juxtaposition with exactly two endpoints and at least one statically elaborated ValueBundle operand",
     "result": "flat ValueBundle of existing Link identities",
     "readOnly": true,
     "endpointDomains": {
@@ -139,6 +161,9 @@
       "flatten/union",
       "other construction"
     ],
+    "bundleValuedDefinitions": "requires a tagged value environment/binding contract",
+    "bundleProjectionOrInversion": "requires an explicit lifting rule or rejection in a later version",
+    "bundleAsExplicitLinkFormPole": "requires a separate lifting decision; current expansion uses juxtaposition only",
     "syntheticMissingLinkForms": "not part of current candidate",
     "explicitBundleMaterialization": "separate L4 operation if ever needed"
   },
