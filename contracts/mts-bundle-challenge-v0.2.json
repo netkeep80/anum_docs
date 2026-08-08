@@ -100,6 +100,24 @@
       "currentInterpreter": "unsupported-as-value"
     },
     {
+      "source": "{x,y} = {x,y}",
+      "canonical": "{x, y} = {x, y}",
+      "structuralKey": ["equality", ["bundle", [["symbol", "x"], ["symbol", "y"]]], ["bundle", [["symbol", "x"], ["symbol", "y"]]]],
+      "currentInterpreter": "unsupported-bundle-form-operand"
+    },
+    {
+      "source": "{x,y} ⟼ a",
+      "canonical": "{x, y} ⟼ a",
+      "structuralKey": ["link", ["bundle", [["symbol", "x"], ["symbol", "y"]]], ["symbol", "a"]],
+      "currentInterpreter": "unsupported-top-level-form"
+    },
+    {
+      "source": "a ⟼ {x,y}",
+      "canonical": "a ⟼ {x, y}",
+      "structuralKey": ["link", ["symbol", "a"], ["bundle", [["symbol", "x"], ["symbol", "y"]]]],
+      "currentInterpreter": "unsupported-top-level-form"
+    },
+    {
       "source": "a{x,y}",
       "canonical": "a{x, y}",
       "structuralKey": ["sequence", [["symbol", "a"], ["bundle", [["symbol", "x"], ["symbol", "y"]]]]],
