@@ -234,6 +234,20 @@ def _intrinsic_bundle_evidence(bundle: BundleForm) -> str | None:
     return next(iter(evidence), None)
 
 
+def _contains_bundle(expression: Expression) -> bool:
+    if isinstance(expression, BundleForm):
+        return True
+    if isinstance(expression, Sequence):
+        return any(_contains_bundle(item) for item in expression.items)
+    if isinstance(expression, LinkForm):
+        return _contains_bundle(expression.left) or _contains_bundle(expression.right)
+    if isinstance(expression, (StartProjection, EndProjection, Inversion)):
+        return _contains_bundle(expression.value)
+    if isinstance(expression, RoundForm) and expression.content is not None:
+        return _contains_bundle(expression.content)
+    return False
+
+
 def _elaborate_bundle(
     bundle: BundleForm,
     path: OccurrencePath,
@@ -309,6 +323,10 @@ def _elaborate_expression(
     if isinstance(expression, Sequence):
         if expected is ExpectedRole.CONSTRAINT:
             raise BundleElaborationError("expression-role-mismatch", path)
+        if expected is ExpectedRole.SCALAR and _contains_bundle(expression):
+            raise BundleElaborationError("bundle-not-supported-in-scalar-operator", path)
+        if expected is ExpectedRole.DEFINITION_RHS and _contains_bundle(expression):
+            raise BundleElaborationError("bundle-valued-definition-deferred", path)
         for index, item in enumerate(expression.items):
             _elaborate_expression(item, path + (index,), ExpectedRole.VALUE, roles)
         return
