@@ -1,6 +1,6 @@
 {
   "schema": "anum-denotation/v0.2",
-  "status": "candidate",
+  "status": "accepted",
   "dependsOn": [
     "mts-contract/v0.2",
     "anum-boundary-projection/v0.2"
