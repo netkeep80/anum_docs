@@ -124,7 +124,7 @@ def test_candidate_boundary_graph_is_finite_closed_exact_pair_unique_and_oriente
     assert pairs["OO"] == (ref["O"], ref["O"])
     assert pairs["CC"] == (ref["C"], ref["C"])
     assert len(set(pairs.values())) == len(pairs)
-    assert memory.all_links() == frozenset(ref.values())
+    assert memory.all_links() == tuple(sorted(ref.values()))
     assert ref["O"] != ref["C"]
     assert ref["L"] != ref["U"]
 
