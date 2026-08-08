@@ -3,9 +3,9 @@
   "status": "candidate-challenge-corpus",
   "dependsOn": "mts-l4-backend-challenge/v0.3",
   "handlePolicy": {
-    "all link names are symbolic scenario bindings",
-    "backend refs are opaque and never serialized as expected values",
-    "native enumeration order is normalized away"
+    "all link names are symbolic scenario bindings": true,
+    "backend refs are opaque and never serialized as expected values": "opaque refs are bound only to symbolic scenario names",
+    "native enumeration order is normalized away": true
   },
   "seedGraph": {
     "links": {
