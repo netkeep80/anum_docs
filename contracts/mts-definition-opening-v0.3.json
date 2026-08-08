@@ -124,25 +124,25 @@
     "productionReferenceCoreImplemented": true,
     "canonicalRootLibraryUsesDefinitionEnvironment": true,
     "productionConformancePresent": true,
-    "mtsContractV03Published": false,
+    "mtsContractV03Published": true,
     "trustedL5RuleAccepted": false,
     "aproverRepinAllowed": false
   },
   "nextGate": {
-    "goal": "publish mts-contract/v0.3 umbrella over the accepted and production-conformant definition-opening operation without changing v0.2 contracts in place",
+    "issue": 122,
+    "goal": "define a typed MTS proof judgment and challenge the minimal trusted calculus without treating opening as equality",
     "constraints": [
-      "do not add a second parser or interpreter",
-      "do not modify the ten root definitions",
-      "do not turn Definition into Equality",
-      "do not add implicit ContextFrame evaluation",
-      "do not add L4 reads/effects",
-      "keep mts-proof/v0.2 trusted rule set unchanged until a separate L5 decision"
-    ],
-    "afterUmbrella": "start #122 proof-judgment/calculus challenge; only an explicitly accepted L5 contract may add a trusted definition-opening rule"
+      "keep mts-proof/v0.2 unchanged and interpret-only",
+      "do not turn successful open_definition into A = F",
+      "do not add global textual substitution",
+      "do not add trusted rules without executable soundness evidence",
+      "keep search untrusted and checker independently replayable"
+    ]
   },
   "downstream": {
-    "directRuntimePinBeforeV03Umbrella": false,
+    "genericL2ConsumerMayPinMtsContractV03": true,
+    "aproverProofRepinAllowed": false,
     "aproverMustNotInventLocalOpeningSemantics": true,
-    "futureConsumerMustUseVersionedV03Umbrella": true
+    "futureProofConsumerMustWaitForVersionedL5Acceptance": true
   }
 }
