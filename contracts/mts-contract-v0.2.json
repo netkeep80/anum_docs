@@ -64,8 +64,9 @@
     "rootBoundaryProjection": "contracts/anum-boundary-projection-v0.2.json",
     "denotationHandoff": "contracts/anum-denotation-v0.2.json",
     "acceptedPairDenotationSubset": "contracts/anum-pair-denotation-v0.2.json",
-    "rawCarrierIssue": 99,
-    "recursiveDenotationIssue": 95,
+    "acceptedRecursiveDenotationSubset": "contracts/anum-recursive-denotation-v0.2.json",
+    "rootOpeningCollapse": "recursive root encoding collapses a leading run of opening abits to one physical '[' and restores it only through canonical decode/re-encode validation",
+    "recursiveDenotationIssue": 101,
     "generalDenotationIssue": 89
   },
   "memory": {

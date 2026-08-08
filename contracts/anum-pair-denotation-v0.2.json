@@ -17,7 +17,7 @@
     "root protocol value 1 denotes anchor protocol:1",
     "exactly two direct protocol atoms ab denote one ordered Link(a,b)",
     "root boundary aliases use their accepted projected protocol value",
-    "all other root carriers remain raw in this subset"
+    "all other root carriers remain outside this minimal pair subset"
   ],
   "canonicalInverse": {
     "protocol:0": "0",
@@ -29,12 +29,12 @@
       "[]": "1"
     }
   },
-  "unsupported": {
-    "recursiveBrackets": "issue #95",
+  "outsideThisSubset": {
+    "recursiveBrackets": "contracts/anum-recursive-denotation-v0.2.json",
     "relativeDenotation": true,
     "openOpenBoundaryDenotation": true,
     "closeCloseBoundaryDenotation": true,
-    "longerDirectSequences": true
+    "longerUnstructuredDirectSequences": true
   },
   "effects": {
     "mayReadMemory": false,
@@ -44,6 +44,6 @@
   "evidence": {
     "readOnlyResearch": "docs/research/Исходные мысли МТС.md",
     "sequenceRule": "an achislo implicitly starts at ∞; deserializing ∞ab produces a⟼b while the loaded sequence itself does not contain a⟼b",
-    "scopeDecision": "apply that rule only where both a and b are already accepted direct protocol atoms 0/1"
+    "scopeDecision": "apply that rule here only where both a and b are accepted direct protocol atoms 0/1; recursive composition is owned by the recursive-denotation contract"
   }
 }
