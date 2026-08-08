@@ -11,8 +11,10 @@ from core.validate_root import validate_root_library
 
 ROOT = Path(__file__).resolve().parents[1]
 ROOT_FIXTURE = ROOT / "tests/mtc_formulas.mtc"
-MTS_CONTRACT = ROOT / "contracts/mts-contract-v0.2.json"
-MTS_CONFORMANCE = ROOT / "contracts/mts-conformance-v0.2.json"
+MTS_CONTRACT_V02 = ROOT / "contracts/mts-contract-v0.2.json"
+MTS_CONFORMANCE_V02 = ROOT / "contracts/mts-conformance-v0.2.json"
+MTS_CONTRACT_V03 = ROOT / "contracts/mts-contract-v0.3.json"
+MTS_CONFORMANCE_V03 = ROOT / "contracts/mts-conformance-v0.3.json"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md", "Пучки связей МТС.md"}
 ACTIVE_SPECS = {
     "Reference model МТС v0.2.md",
@@ -91,29 +93,45 @@ def test_root_fixture_is_exact_and_excludes_protocol_hypotheses():
     assert len([line for line in formula_text.splitlines() if line]) == 10
 
 
-def test_v02_machine_contract_and_conformance_are_single_active_pair():
-    assert MTS_CONTRACT.is_file()
-    assert MTS_CONFORMANCE.is_file()
+def test_versioned_machine_contract_and_conformance_chain_is_exact():
+    for path in (
+        MTS_CONTRACT_V02,
+        MTS_CONFORMANCE_V02,
+        MTS_CONTRACT_V03,
+        MTS_CONFORMANCE_V03,
+    ):
+        assert path.is_file()
 
-    contract = json.loads(MTS_CONTRACT.read_text(encoding="utf-8"))
-    corpus = json.loads(MTS_CONFORMANCE.read_text(encoding="utf-8"))
+    v02 = json.loads(MTS_CONTRACT_V02.read_text(encoding="utf-8"))
+    v02_corpus = json.loads(MTS_CONFORMANCE_V02.read_text(encoding="utf-8"))
+    v03 = json.loads(MTS_CONTRACT_V03.read_text(encoding="utf-8"))
+    v03_corpus = json.loads(MTS_CONFORMANCE_V03.read_text(encoding="utf-8"))
 
-    assert contract["schema"] == "mts-contract/v0.2"
-    assert contract["status"] == "accepted"
-    assert contract["rootProgram"] == "tests/mtc_formulas.mtc"
-    assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.2.json"
-    assert contract["formalNotation"]["context"]["atomicPronouns"] is True
-    assert contract["formalNotation"]["context"]["bracketOverloading"] is False
-    assert contract["formalNotation"]["valueBundle"]["contract"] == "contracts/mts-value-bundle-v0.2.json"
+    assert v02["schema"] == "mts-contract/v0.2"
+    assert v02["status"] == "accepted"
+    assert v02["rootProgram"] == "tests/mtc_formulas.mtc"
+    assert v02["conformanceCorpus"] == "contracts/mts-conformance-v0.2.json"
+    assert v02["formalNotation"]["context"]["atomicPronouns"] is True
+    assert v02["formalNotation"]["context"]["bracketOverloading"] is False
+    assert v02["formalNotation"]["valueBundle"]["contract"] == "contracts/mts-value-bundle-v0.2.json"
+    assert v02_corpus["schema"] == "mts-conformance/v0.2"
+    assert v02_corpus["contract"] == v02["schema"]
+    assert v02_corpus["status"] == "accepted"
 
-    assert corpus["schema"] == "mts-conformance/v0.2"
-    assert corpus["contract"] == contract["schema"]
-    assert corpus["status"] == "accepted"
+    assert v03["schema"] == "mts-contract/v0.3"
+    assert v03["status"] == "accepted"
+    assert v03["extends"] == v02["schema"]
+    assert v03["baseContract"] == "contracts/mts-contract-v0.2.json"
+    assert v03["rootProgram"] == v02["rootProgram"]
+    assert v03["conformanceCorpus"] == "contracts/mts-conformance-v0.3.json"
+    assert v03_corpus["schema"] == "mts-conformance/v0.3"
+    assert v03_corpus["contract"] == v03["schema"]
+    assert v03_corpus["status"] == "accepted"
 
     contract_files = sorted((ROOT / "contracts").glob("mts-contract-*.json"))
     conformance_files = sorted((ROOT / "contracts").glob("mts-conformance-*.json"))
-    assert contract_files == [MTS_CONTRACT]
-    assert conformance_files == [MTS_CONFORMANCE]
+    assert contract_files == [MTS_CONTRACT_V02, MTS_CONTRACT_V03]
+    assert conformance_files == [MTS_CONFORMANCE_V02, MTS_CONFORMANCE_V03]
 
 
 def test_candidate_runtime_fixture_and_reference_paths_are_removed_after_promotion():
@@ -121,6 +139,7 @@ def test_candidate_runtime_fixture_and_reference_paths_are_removed_after_promoti
     assert leftovers == []
     assert (ROOT / "core/mtc_interpreter.py").is_file()
     assert (ROOT / "core/mtc_value_bundle.py").is_file()
+    assert (ROOT / "core/mtc_definitions.py").is_file()
     assert (ROOT / "tests/test_mtc_interpreter.py").is_file()
 
 
