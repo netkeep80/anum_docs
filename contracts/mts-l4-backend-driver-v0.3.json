@@ -81,7 +81,9 @@
     "persistentIdentity": false,
     "multipleNamesMayAliasOneHandle": true,
     "normalizedRef": "lexicographically smallest currently bound scenario name for a live handle",
-    "unboundLiveHandleInObservation": "driver-protocol-error"
+    "unboundLiveHandleInObservation": "driver-protocol-error",
+    "bindingConflictMustBeDetectedBeforeBackendMutation": true,
+    "reason": "harness metadata must never create a backend write that is later reported as a protocol-level binding failure"
   },
   "snapshotNormalization": {
     "shape": "sorted array of {ref,start,end} using normalized symbolic names",
@@ -98,6 +100,7 @@
     "compilePipeline": "parse_raw_quaternary -> denotate_recursive_anum(explicit context) -> canonical structural IR before driver dispatch",
     "nodeBindings": "request supplies deterministic scenario-local names for every description-local node id so newly realized internal links are observable without exposing backend handles",
     "rootBinding": "request may add a scenario-local alias for the resolved denotation root",
+    "bindingPreflight": "existing scenario names are validated against an already-complete read-only denotation lookup before realization; inconsistent metadata fails before write",
     "atomicity": "backend adapter must not expose partial new links if validation/anchor resolution/write fails"
   },
   "normalizedErrors": [
@@ -141,6 +144,7 @@
     "raw backend handle appears in normalized response",
     "physical pointer/offset/record id becomes expected identity",
     "read operation implicitly realizes",
+    "binding conflict is detected only after a backend write",
     "test harness fakes persistence for a non-persistent backend",
     "driver buffers writes so backend partial-commit bugs are hidden from crash-recovery tests",
     "PMM-specific field is added to canonical #130 traces"
