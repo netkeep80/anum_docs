@@ -13,14 +13,16 @@ from dataclasses import dataclass
 import json
 from typing import TypeAlias
 
-from core.mtc_ast import Definition, Form, format_expression
+from core.mtc_ast import Definition, Expression, Form, format_expression
 from core.mtc_definitions import (
     DefinitionEnvironment,
+    DefinitionId,
     DefinitionLookupKind,
     DefinitionRegistrationKind,
     open_definition,
 )
 from core.mtc_interpreter import ContextFrame, MemoryView, interpret_constraints
+from core.mtc_opening_path import OpeningPathEdge, OpeningPathWitness, verify_opening_path
 from core.mtc_parser import parse_formula
 
 
@@ -477,7 +479,6 @@ def _memory_from_data(data: object) -> tuple[DistinguishedLink, ...]:
                 end=_int_from_data(item["end"], "memory.end"),
             )
         )
-    # ProofMemory performs the semantic duplicate/ambiguity validation.
     ProofMemory(tuple(result))
     return tuple(result)
 
@@ -705,10 +706,7 @@ def _symbols_to_data(symbols: tuple[tuple[str, int], ...]) -> list[list[object]]
 def _substitutions_to_data(
     substitutions: tuple[ExpectedSubstitution, ...],
 ) -> list[dict]:
-    return [
-        {"path": list(item.path), "link": item.link}
-        for item in substitutions
-    ]
+    return [{"path": list(item.path), "link": item.link} for item in substitutions]
 
 
 def _aliases_to_data(aliases: tuple[ExpectedAlias, ...]) -> list[dict]:
@@ -799,11 +797,6 @@ def canonical_proof_v03_json(proof: ProofObjectV03) -> str:
 # v0.4 extends the same trusted module with exactly one accepted composite
 # certificate relation.  Existing v0.2/v0.3 APIs and semantics above remain
 # independent and unchanged.
-from core.mtc_ast import Expression
-from core.mtc_definitions import DefinitionId
-from core.mtc_opening_path import OpeningPathEdge, OpeningPathWitness, verify_opening_path
-
-
 CONTRACT_VERSION_V04 = "mts-contract/v0.4"
 PROOF_SCHEMA_V04 = "mts-proof/v0.4"
 
