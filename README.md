@@ -19,6 +19,7 @@
 | [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | L3 `*.anum`, raw parser и serialization |
 | [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md) | contextual L3 projection и quote semantics |
 | [MTS contract v0.2](contracts/mts-contract-v0.2.json) | language-neutral normative contract |
+| [Anum boundary projection v0.2](contracts/anum-boundary-projection-v0.2.json) | принятый root-context boundary subset L3 |
 | [MTS conformance v0.2](contracts/mts-conformance-v0.2.json) | cross-language executable compatibility corpus |
 | [Корневая программа](tests/mtc_formulas.mtc) | единственный машинный root definitions source |
 
@@ -135,7 +136,16 @@ interpret ≠ realize
 
 В L2 квадратные скобки являются формальной нотацией. Их видимое совпадение с L3-абитами не создаёт автоматического тождества.
 
-Рабочая проекция issue #61 остаётся experimental.
+Принятый root-context boundary subset L3 выводится из root definitions МТС v0.2:
+
+```text
+[  → ♀∞
+]  → ∞♂
+[] → 1
+][ → 0
+```
+
+`[[` и `]]` остаются boundary forms без protocol value. Общая structural denotation произвольного raw carrier и relative denotation остаются открытыми в #89.
 
 ## Рабочие инструменты
 
@@ -150,6 +160,8 @@ core/validate_root.py     structural root validation
 
 contracts/mts-contract-v0.2.json
                          versioned language-neutral contract
+contracts/anum-boundary-projection-v0.2.json
+                         accepted root-context Anum boundary vectors
 contracts/mts-conformance-v0.2.json
                          versioned cross-language conformance vectors
 
