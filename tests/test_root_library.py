@@ -129,6 +129,24 @@ def test_root_library_validates():
     assert result.status == "valid"
 
 
+def test_validator_requires_all_ten_canonical_definitions(tmp_path):
+    formula_path = tmp_path / "missing_not_equal.mtc"
+    formula_path.write_text(
+        "\n".join(
+            f"{target} : {value}"
+            for target, value in CANONICAL_DEFINITIONS.items()
+            if target != "(!=)"
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result = validate_root_library(formula_path)
+
+    assert not result.is_valid
+    assert "Не найдено корневое различие: (!=)" in result.messages
+
+
 def test_duplicate_definitions_are_reported(tmp_path):
     formula_path = tmp_path / "duplicate_defs.mtc"
     formula_path.write_text(
