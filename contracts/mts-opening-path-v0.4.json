@@ -1,0 +1,141 @@
+{
+  "schema": "mts-opening-path/v0.4",
+  "status": "accepted",
+  "accepted": true,
+  "issue": 161,
+  "dependsOn": [
+    "mts-opening-path-decision/v0.4",
+    "mts-opening-path-challenge/v0.4",
+    "mts-definition-opening/v0.3",
+    "mts-derivation-base/v0.3",
+    "mts-proof/v0.3"
+  ],
+  "conformanceCorpus": "contracts/mts-opening-path-conformance-v0.4.json",
+  "scope": "normative read-only verification of one finite self-contained DefinitionOpeningPath operational composite certificate; no equality, normalization, evaluation, generic composition, memory or context effects",
+  "relation": {
+    "name": "DefinitionOpeningPath",
+    "classification": "operational-composite-certificate",
+    "minimumEdges": 1,
+    "sharedDefinitionEnvironment": true,
+    "sharedLookupScope": true,
+    "replaysExactlyWitnessEdges": true,
+    "autoContinues": false
+  },
+  "typedCore": {
+    "module": "core/mtc_opening_path.py",
+    "verifier": "verify_opening_path",
+    "environmentArgument": "DefinitionEnvironment already representing the explicit lookup scope",
+    "witness": {
+      "startTarget": "Form",
+      "edges": "ordered non-empty tuple[OpeningPathEdge,...]",
+      "finalBody": "Expression"
+    },
+    "edge": {
+      "target": "Form",
+      "definitionId": "DefinitionId(scopePath,ordinal)",
+      "body": "Expression"
+    },
+    "comparison": "typed structural_key equality; SourceSpan/display text are not semantic identity",
+    "singleCanonicalImplementation": true
+  },
+  "portableCertificate": {
+    "sharedFields": ["scopes", "lookupScope", "startTarget", "edges", "finalBody"],
+    "scopes": "same explicit lexical snapshot semantics as mts-proof/v0.3 definition relations",
+    "lookupScope": "one exact serialized scope path used for every edge",
+    "startTarget": "parseable Form source; structural identity after parsing",
+    "edges": {
+      "target": "parseable Form source; structural identity after parsing; equivalent whitespace allowed",
+      "definitionId": "exact replay-local DefinitionId",
+      "body": "canonical format_expression transport of the expected replay body"
+    },
+    "finalBody": "canonical format_expression transport of the final expected replay body",
+    "transportDecoderOwnedByCoreVerifier": false,
+    "reason": "transport/version validation belongs to the consuming artifact layer; every consumer must construct the same typed witness and invoke the one canonical verifier"
+  },
+  "verificationOrder": [
+    "reject empty path",
+    "check first edge target structurally matches startTarget",
+    "for each later edge require previous replay body is Form and structurally equals next target",
+    "replay open_definition(target, environment)",
+    "require kind=match",
+    "require exact replay-local DefinitionId",
+    "reject repeated replayed DefinitionId",
+    "require replay body structurally equals expected typed edge body",
+    "after exact serialized edge count require last replay body structurally equals finalBody"
+  ],
+  "failureCodes": [
+    "empty-path",
+    "start-target-mismatch",
+    "previous-body-not-form",
+    "adjacency-mismatch",
+    "opening-not-match",
+    "definition-id-mismatch",
+    "repeated-definition-id",
+    "body-mismatch",
+    "final-body-mismatch"
+  ],
+  "cycleCanonicality": {
+    "definitionIdMayAppearAtMostOnce": true,
+    "selfCycleCanonicalWitness": "one edge",
+    "mutualCycleCanonicalWitness": "one edge per distinct DefinitionId until repetition",
+    "repeatedDefinitionIdMeansSemanticFalse": false,
+    "repeatedDefinitionIdMeansInvalidCertificate": true
+  },
+  "terminalBoundary": {
+    "finalBodyMayBeAnyExpression": true,
+    "nonFormFinalBodyAllowed": true,
+    "nonAddressableFormFinalBodyAllowed": true,
+    "continuationRequiresPreviousBodyIsForm": true,
+    "continuationRequiresNextOpenDefinitionMatch": true,
+    "finalBodyEvaluated": false
+  },
+  "meaningBoundary": {
+    "impliesEquality": false,
+    "impliesEquivalence": false,
+    "impliesNormalization": false,
+    "impliesContextualSatisfaction": false,
+    "impliesGenericTransitivity": false,
+    "opensOnlySerializedEdges": true,
+    "evaluatesBodies": false,
+    "readsMemory": false,
+    "readsContextFrame": false,
+    "readsInterpreterIdentity": false,
+    "materializes": false,
+    "deletes": false
+  },
+  "searchCheckerBoundary": {
+    "searchTrusted": false,
+    "searchMayExploreDefinitionGraph": true,
+    "searchMayUseVisitedDefinitionIds": true,
+    "certificateTrustedWithoutReplay": false,
+    "checkerMustInvokeCanonicalVerifier": true,
+    "searchTracePartOfTrustedMeaning": false
+  },
+  "proofBoundary": {
+    "trustedProofRelationAddedByThisContract": false,
+    "eligibleForFutureProofRelation": true,
+    "futureRelationName": "DefinitionOpeningPath",
+    "futureTrustedMeaningMustEqualThisVerifier": true,
+    "mtsProofV03Modified": false,
+    "genericCompositionAccepted": false,
+    "openingPathPlusContextuallySatisfiesAccepted": false
+  },
+  "productionIntegration": {
+    "referenceCore": "core/mtc_opening_path.py",
+    "productionConformance": "tests/test_mts_opening_path_reference.py",
+    "challengeCorpus": "contracts/mts-opening-path-conformance-candidate-v0.4.json",
+    "acceptedConformance": "contracts/mts-opening-path-conformance-v0.4.json"
+  },
+  "versioning": {
+    "mtsContractV04Modified": false,
+    "mtsProofV03Modified": false,
+    "publishedThroughUmbrella": false,
+    "futureUmbrellaMustBeAdditive": true
+  },
+  "nextBoundary": {
+    "proofV04MayConsumeThisRelationAfterSeparateAcceptance": true,
+    "otherCompositionRulesAccepted": false,
+    "compositionIssue": 122,
+    "aproverMayInventAdditionalRules": false
+  }
+}
