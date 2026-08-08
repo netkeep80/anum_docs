@@ -12,17 +12,24 @@ from core.anum_denotation import (
     DenotationRef,
     StructuralDenotation,
     canonical_denotation_json,
+    denotation_from_data,
 )
 
 
-CONTRACT = Path(__file__).parents[1] / "contracts" / "anum-denotation-v0.2.json"
-SOURCE = Path(__file__).parents[1] / "core" / "anum_denotation.py"
+ROOT = Path(__file__).parents[1]
+CONTRACT = ROOT / "contracts/anum-denotation-v0.2.json"
+CORPUS = ROOT / "contracts/anum-denotation-conformance-v0.2.json"
+SOURCE = ROOT / "core/anum_denotation.py"
 
 
-def test_machine_contract_is_storage_neutral_and_non_materializing():
+def test_machine_contract_is_storage_neutral_non_materializing_and_accepted():
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
 
     assert contract["schema"] == "anum-denotation/v0.2"
+    assert contract["status"] == "accepted"
+    assert contract["conformanceCorpus"] == (
+        "contracts/anum-denotation-conformance-v0.2.json"
+    )
     assert contract["effects"] == {
         "mayReadMemory": False,
         "mayMutateMemory": False,
@@ -37,6 +44,28 @@ def test_reference_module_does_not_import_or_name_storage_backends():
 
     for forbidden in ("LinkStore", "PersistentLinkStore", "database", "sqlite", "realize("):
         assert forbidden not in source
+
+
+def test_language_neutral_conformance_corpus_round_trips_through_reference_model():
+    corpus = json.loads(CORPUS.read_text(encoding="utf-8"))
+
+    assert corpus["schema"] == "anum-denotation-conformance/v0.2"
+    assert corpus["contract"] == "anum-denotation/v0.2"
+    assert corpus["status"] == "accepted"
+
+    names = []
+    for case in corpus["cases"]:
+        names.append(case["name"])
+        value = denotation_from_data(case["value"])
+        assert canonical_denotation_json(value) == case["canonicalJson"]
+
+    assert names == [
+        "anchor-only",
+        "nested-link",
+        "shared-substructure",
+        "unresolved-raw",
+        "quoted-raw",
+    ]
 
 
 def test_anchor_only_structural_denotation():
@@ -106,7 +135,7 @@ def test_missing_anchor_is_rejected():
         )
 
 
-def test_forward_or_self_node_reference_is_rejected():
+def test_forward_self_duplicate_and_non_contiguous_node_ids_are_rejected():
     with pytest.raises(ValueError, match="earlier node"):
         StructuralDenotation(
             anchors=("a",),
@@ -120,15 +149,18 @@ def test_forward_or_self_node_reference_is_rejected():
             root=DenotationRef.node_ref(0),
         )
 
-
-def test_duplicate_or_non_contiguous_node_ids_are_rejected():
     with pytest.raises(ValueError, match="contiguous"):
         StructuralDenotation(
             anchors=("a",),
             nodes=(
                 DenotationNode(
-                    id=1,
+                    id=0,
                     start=DenotationRef.anchor_ref("a"),
+                    end=DenotationRef.anchor_ref("a"),
+                ),
+                DenotationNode(
+                    id=0,
+                    start=DenotationRef.node_ref(0),
                     end=DenotationRef.anchor_ref("a"),
                 ),
             ),
@@ -156,6 +188,29 @@ def test_anchor_keys_must_be_sorted_unique_and_non_empty():
             anchors=("",),
             nodes=(),
             root=DenotationRef.anchor_ref(""),
+        )
+
+
+def test_data_parser_rejects_mixed_ref_shape_and_unexpected_fields():
+    with pytest.raises(ValueError, match="exactly one anchor or node"):
+        denotation_from_data(
+            {
+                "kind": "structural",
+                "anchors": ["a"],
+                "nodes": [],
+                "root": {"anchor": "a", "node": 0},
+            }
+        )
+
+    with pytest.raises(ValueError, match="unexpected or missing fields"):
+        denotation_from_data(
+            {
+                "kind": "structural",
+                "anchors": ["a"],
+                "nodes": [],
+                "root": {"anchor": "a"},
+                "linkId": 42,
+            }
         )
 
 
