@@ -1,4 +1,4 @@
-"""Executable evidence for the non-normative deictic context/focus challenge v0.5."""
+"""Executable evidence for the non-normative deictic interpreter-focus challenge v0.5."""
 
 import inspect
 import json
@@ -114,16 +114,16 @@ def test_pronoun_bearing_formula_can_depend_on_explicit_context():
     assert different.success is False
 
 
-def test_same_explicit_frame_replays_identically_under_different_test_only_host_labels():
+def test_same_explicit_frame_replays_identically_under_different_interpreter_labels():
     frame = ContextFrame(start=3, end=4)
 
-    def run_under_host(_host_id: str):
-        # Host identity is deliberately not forwarded: current production
-        # semantics has no such input.
+    def run_under_interpreter(_interpreter_id: str):
+        # Interpreter identity is deliberately not forwarded: current production
+        # semantics has only the explicit ContextFrame at this boundary.
         return replay("{◁ = a, ▷ = b}", frame, symbols={"a": 3, "b": 4})
 
-    first = run_under_host("host-A")
-    second = run_under_host("host-B")
+    first = run_under_interpreter("interpreter-A")
+    second = run_under_interpreter("interpreter-B")
 
     assert result_shape(first) == result_shape(second)
     assert first.success is True
@@ -175,25 +175,25 @@ def test_parent_ascent_uses_only_the_explicit_parent_chain():
 
 
 def test_missing_parent_fails_explicitly_instead_of_falling_back_to_hidden_global_context():
-    with pytest.raises(ValueError, match="Context ascent escapes the available parent chain"):
+    with pytest.raises(ValueError, match="выше корневого контекста"):
         replay("↑◁ = a", ContextFrame(start=1, end=2), symbols={"a": 1})
 
     baseline = read(CHALLENGE)["currentAcceptedBaseline"]
     assert baseline["missingParentCurrentBehavior"].startswith("ValueError")
 
 
-def test_current_production_interpreter_has_no_subject_host_or_current_linkref_input():
+def test_current_production_interpreter_has_only_explicit_frame_not_hidden_interpreter_identity():
     parameters = inspect.signature(interpret_constraints).parameters
 
-    assert list(parameters) == ["expression", "context", "memory", "symbols"]
-    assert "subject" not in parameters
+    assert list(parameters) == ["expression", "frame", "memory", "symbols"]
+    assert "interpreter" not in parameters
     assert "host" not in parameters
     assert "session" not in parameters
     assert "focus" not in parameters
     assert "current_link" not in parameters
 
     baseline = read(CHALLENGE)["currentAcceptedBaseline"]
-    assert baseline["subjectIdentityObservable"] is False
+    assert baseline["separateSubjectConceptIntroduced"] is False
     assert baseline["interpreterIdentityObservable"] is False
     assert baseline["currentRelationIdentityObservable"] is False
 
@@ -211,11 +211,14 @@ def test_root_program_remains_exactly_ten_definitions_and_challenge_adds_no_new_
     assert "adding a current-link pronoun before challenge" in challenge["vetoes"]
 
 
-def test_next_gate_is_a_decision_about_subject_focus_identity_and_parent_lifecycle():
+def test_next_gate_is_a_decision_about_interpreter_focus_identity_and_parent_lifecycle():
     gate = read(CHALLENGE)["nextGate"]
 
     assert gate["artifact"] == "mts-deictic-context-decision/v0.5"
     assert gate["mustNotChangeProductionBeforeDecision"] is True
-    assert "whether subject is a formal MTS concept at all" in gate["mustDecide"]
+    assert (
+        "whether Focus(interpreterLink,currentFocus) belongs to MTS or only interpreter/runtime integration"
+        in gate["mustDecide"]
+    )
     assert "whether current focus has observable identity beyond its roles" in gate["mustDecide"]
     assert "the lifecycle/meaning of parent focus" in gate["mustDecide"]
