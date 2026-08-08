@@ -1,0 +1,108 @@
+{
+  "schema": "mts-contract/v0.4",
+  "status": "accepted",
+  "accepted": true,
+  "issue": 153,
+  "dependsOn": [
+    "mts-contract/v0.3",
+    "mts-proof/v0.3"
+  ],
+  "extends": "mts-contract/v0.3",
+  "baseContract": "contracts/mts-contract-v0.3.json",
+  "conformanceCorpus": "contracts/mts-conformance-v0.4.json",
+  "releaseModel": "additive proof-publication umbrella; v0.3 remains immutable and independently replayable",
+  "rootProgram": "tests/mtc_formulas.mtc",
+  "rootDefinitionCount": 10,
+  "preservedSurface": {
+    "l0ToL4": "all accepted mts-contract/v0.3 semantics remain unchanged",
+    "definitionOpening": "mts-definition-opening/v0.3 unchanged",
+    "valueBundles": "accepted v0.2 flat ValueBundle semantics unchanged",
+    "rootAndQuoteAnum": "accepted v0.2 semantics unchanged",
+    "relativeAnum": "RAW in production",
+    "inMemoryL4": "accepted v0.2 semantics unchanged",
+    "persistentL4Accepted": false,
+    "interpretMayRealize": false,
+    "openDefinitionMayRealize": false,
+    "globalRewrite": false,
+    "displayLabelIsIdentity": false
+  },
+  "l5": {
+    "proofContract": "contracts/mts-proof-v0.3.json",
+    "proofSchema": "mts-proof/v0.3",
+    "contractVersion": "mts-contract/v0.3",
+    "trustedCheckerModule": "core/proof_checker.py",
+    "trustedRelations": [
+      "ContextuallySatisfies",
+      "Opens",
+      "NoVisibleDefinition",
+      "DefinitionConflict",
+      "NonAddressableDefinitionTarget"
+    ],
+    "searchTrusted": false,
+    "checkerTrusted": true,
+    "genericCompositionAccepted": false,
+    "judgmentOrderImpliesDependency": false,
+    "openingImpliesEquality": false,
+    "globalSubstitutionAccepted": false,
+    "transitivityAccepted": false,
+    "symmetryAccepted": false,
+    "congruenceAccepted": false,
+    "modusPonensAccepted": false
+  },
+  "contextBoundary": {
+    "acceptedContextInput": "explicit ContextFrame(start,end,parent?)",
+    "ambientInterpreterIdentity": false,
+    "subjectIdentity": false,
+    "currentFocusLinkRefIdentity": false,
+    "deicticSubjectFocusExtensionAccepted": false,
+    "futureResearchIssue": 148,
+    "futureResearchVersion": "v0.5+"
+  },
+  "versionBoundaries": {
+    "v02ModifiedInPlace": false,
+    "v03ModifiedInPlace": false,
+    "v03ConformanceReplaced": false,
+    "proofV03ModifiedToFitUmbrella": false,
+    "v04ConformanceComposesPriorCorpora": true,
+    "compatibilitySemanticLayerAllowed": false
+  },
+  "excludedFromThisRelease": [
+    "multi-step proof composition or DAG dependency semantics",
+    "new inference rules beyond accepted base relation replay",
+    "subject/focus/deictic context extension from issue #148",
+    "current-focus LinkRef identity",
+    "relative Anum candidate semantics",
+    "persistent/high-performance L4 backend acceptance",
+    "PMM as canonical dependency",
+    "global textual substitution",
+    "unrestricted equality rewrite",
+    "implicit realization"
+  ],
+  "downstream": {
+    "genericConsumerMayPinV04": true,
+    "aproverProofRepinAllowed": true,
+    "requiredProofSchema": "mts-proof/v0.3",
+    "requiredProofContractVersion": "mts-contract/v0.3",
+    "consumerMustReplayIndependently": true,
+    "consumerMayInventCompositionRules": false,
+    "consumerMayUseSubjectFocusSemantics": false
+  },
+  "nextGates": {
+    "proofComposition": {
+      "issue": 122,
+      "status": "research/challenge required"
+    },
+    "deicticSubjectFocus": {
+      "issue": 148,
+      "status": "v0.5+ research"
+    },
+    "relativeAnum": {
+      "issue": 123,
+      "status": "candidate research only"
+    },
+    "persistentL4": {
+      "issue": 124,
+      "status": "persistent backend conformance required"
+    }
+  }
+}
