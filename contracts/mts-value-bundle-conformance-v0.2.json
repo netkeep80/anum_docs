@@ -1,8 +1,8 @@
 {
   "schema": "mts-value-bundle-conformance/v0.2",
-  "status": "candidate-conformance",
+  "status": "accepted",
   "contract": "mts-value-bundle/v0.2",
-  "accepted": false,
+  "accepted": true,
   "elaboration": [
     {
       "id": "constraint-nonempty",

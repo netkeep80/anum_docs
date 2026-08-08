@@ -143,6 +143,11 @@ class AnumMemory:
         self._require_ref(end)
         return tuple(sorted(self._incoming.get(end, ())))
 
+    def all_links(self) -> tuple[LinkRef, ...]:
+        """Read-only enumeration of all materialized LinkRefs in canonical order."""
+
+        return tuple(sorted(self._links))
+
     def find_denotation(
         self,
         denotation: AnumDenotation,

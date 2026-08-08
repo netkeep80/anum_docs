@@ -1,14 +1,14 @@
-"""Reference core for the *candidate* flat ValueBundle v0.2 semantics.
+"""Canonical reference core for accepted flat ValueBundle v0.2 semantics.
 
-This module is intentionally not wired into the accepted MTS interpreter yet.
-It provides one executable candidate implementation for the versioned
-``mts-value-bundle/v0.2`` contract:
+The module implements the versioned ``mts-value-bundle/v0.2`` contract:
 
 * static elaboration of curly syntax into ConstraintBundle or ValueBundle;
 * flat ValueBundle resolution and tagged value comparison;
 * read-only expansion queries over an explicit query-memory protocol.
 
-No function here can realize or delete links.
+ConstraintBundle execution remains the existing ``interpret_constraints`` path;
+this module owns the distinct ValueBundle role and the shared static role
+classification. No function here can realize or delete links.
 """
 
 from collections.abc import Callable
@@ -143,7 +143,7 @@ def evaluate_flat_value_bundle(
     occurrences: list[ResolvedOccurrence] = []
     for index, item in enumerate(bundle.items):
         if isinstance(item, BundleForm):
-            raise BundleEvaluationError("nested ValueBundle is not supported in v0.2 candidate")
+            raise BundleEvaluationError("nested ValueBundle is not supported in flat v0.2")
         if not isinstance(item, Form) or isinstance(item, Judgment):
             raise BundleEvaluationError("ValueBundle item must be a Form")
         item_path = path + (index,)
@@ -178,7 +178,7 @@ def expand_bundle_query(
     """Evaluate a two-endpoint bundle expansion as a read-only L4 query."""
 
     if len(sequence.items) != 2:
-        raise BundleEvaluationError("bundle expansion requires exactly two endpoints in v0.2 candidate")
+        raise BundleEvaluationError("bundle expansion requires exactly two endpoints in flat v0.2")
 
     left_expr, right_expr = sequence.items
     if not isinstance(left_expr, BundleForm) and not isinstance(right_expr, BundleForm):

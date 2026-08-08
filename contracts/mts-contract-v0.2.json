@@ -55,6 +55,26 @@
     },
     "aroot": {
       "definition": "∞ : {◁ = ∞, ▷ = ∞}"
+    },
+    "valueBundle": {
+      "contract": "contracts/mts-value-bundle-v0.2.json",
+      "conformanceCorpus": "contracts/mts-value-bundle-conformance-v0.2.json",
+      "surface": "{...}",
+      "staticRoles": [
+        "ConstraintBundle",
+        "ValueBundle"
+      ],
+      "runtimeRoleGuessing": false,
+      "valueScope": "flat-only",
+      "semanticIdentity": "extensional-set-of-resolved-link-identities",
+      "sourceOccurrenceProvenance": true,
+      "crossKindSingletonCoercion": false,
+      "nestedValueBundle": false,
+      "bundleValuedDefinition": false,
+      "scalarOperatorLifting": false,
+      "expansionReadOnly": true,
+      "interpretMayRealize": false,
+      "interpretMayDelete": false
     }
   },
   "anum": {
@@ -75,7 +95,10 @@
       "poles",
       "findLink",
       "findStartProjection",
-      "findEndProjection"
+      "findEndProjection",
+      "outgoing",
+      "incoming",
+      "allLinks"
     ],
     "effectOperations": ["realize", "delete"],
     "interpretMayMaterialize": false

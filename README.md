@@ -14,11 +14,15 @@
 |---|---|
 | [Основания МТС](docs/theory/Основания%20МТС.md) | онтологические основания |
 | [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md) | нормативное чтение 10 root definitions |
+| [Пучки связей МТС](docs/theory/Пучки%20связей%20МТС.md) | теоретический смысл ConstraintBundle / flat ValueBundle |
 | [Reference model МТС v0.2](docs/specs/Reference%20model%20МТС%20v0.2.md) | границы L0–L5 и инженерная semantics |
 | [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) | typed L2 syntax и interpretation |
+| [Пучки значений МТС v0.2](docs/specs/Пучки%20значений%20МТС%20v0.2.md) | static elaboration, flat algebra и read-only expansion |
 | [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | L3 `*.anum`, raw carrier, denotation и serialization |
 | [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md) | contextual L3 projection и quote semantics |
 | [MTS contract v0.2](contracts/mts-contract-v0.2.json) | language-neutral normative contract |
+| [ValueBundle contract v0.2](contracts/mts-value-bundle-v0.2.json) | accepted flat bundle semantics |
+| [ValueBundle conformance v0.2](contracts/mts-value-bundle-conformance-v0.2.json) | executable bundle compatibility corpus |
 | [Anum raw carrier v0.2](contracts/anum-raw-carrier-v0.2.json) | storage-neutral описание raw-последовательности абитов |
 | [Anum boundary projection v0.2](contracts/anum-boundary-projection-v0.2.json) | принятый root-context boundary subset L3 |
 | [Anum denotation v0.2](contracts/anum-denotation-v0.2.json) | storage-neutral structural handoff L3→L4 |
@@ -130,6 +134,37 @@ L4: find / realize / delete
 interpret ≠ realize
 ```
 
+## Пучки связей v0.2
+
+Фигурная запись `{...}` статически различается на две семантические роли:
+
+```text
+ConstraintBundle
+ValueBundle
+```
+
+Корневые `{◁ = ∞, ▷ = ∞}` и `{♀◁ = ♀▷, ◁♂ = ▷♂}` остаются `ConstraintBundle` и не изменяют 10 root definitions.
+
+Плоский `ValueBundle` представляет экстенсиональный набор **уже разрешённых** связей. Source occurrences сохраняются раздельно, поэтому одинаковые `[]` нельзя схлопывать по glyph до resolution. После resolution порядок и повторы не входят в семантическое равенство пучка.
+
+Read-only expansion использует пучок как множество допустимых полюсов:
+
+```text
+a{b,c}
+{a,b}c
+{a,b}{c,d}
+```
+
+В expansion-position пустой пучок является wildcard endpoint:
+
+```text
+a{}   — существующие outgoing links
+{}b   — существующие incoming links
+{}{}  — существующие links рассматриваемой памяти
+```
+
+Отсутствующие links не создаются. Nested ValueBundle, bundle-valued definitions и lifting scalar operators на bundle в v0.2 не приняты.
+
 ## L2 и L3 не смешиваются
 
 В L3 базовый Anum-алфавит:
@@ -176,12 +211,17 @@ core/reference_model.py         декларативный contract L0–L5
 core/semantic_carrier.py        конечный cyclic Link carrier L1
 core/mtc_ast.py                 typed AST L2
 core/mtc_parser.py              tokenizer + Pratt parser L2
-core/mtc_interpreter.py         read-only contextual interpreter L2/L4 boundary
+core/mtc_interpreter.py         read-only contextual ConstraintBundle interpreter
+core/mtc_value_bundle.py        canonical flat ValueBundle elaboration/value/query core
 core/root_library.py            загрузка canonical root definitions
 core/validate_root.py           structural root validation
 
 contracts/mts-contract-v0.2.json
                                versioned language-neutral contract
+contracts/mts-value-bundle-v0.2.json
+                               accepted flat ValueBundle contract
+contracts/mts-value-bundle-conformance-v0.2.json
+                               accepted bundle conformance corpus
 contracts/anum-raw-carrier-v0.2.json
                                storage-neutral raw carrier
 contracts/anum-boundary-projection-v0.2.json
@@ -214,7 +254,7 @@ converters/ascii_unicode.py
 
 `carrier_isomorphic()` — техническое сравнение finite carrier topology и не является L2 `=`.
 
-`core/mtc_interpreter.py` — единственный active formal interpreter. Candidate/legacy copies после promotion не сохраняются.
+`core/mtc_interpreter.py` остаётся единственным active ConstraintBundle interpreter; `core/mtc_value_bundle.py` исполняет отдельную принятую ValueBundle role. Candidate/legacy copies после promotion не сохраняются.
 
 ## Cross-language conformance
 
@@ -229,6 +269,8 @@ normalized resolution trace kinds
 ```
 
 Python reference runtime обязан проходить этот corpus в CI. Другие consumers, включая `aprover`, должны проходить тот же файл, а не копировать правила вручную.
+
+Flat ValueBundle имеет отдельный accepted corpus `contracts/mts-value-bundle-conformance-v0.2.json`; downstream consumers обязаны исполнять его после repin, а не выводить bundle semantics из UI или legacy prover behavior.
 
 L3 имеет отдельные language-neutral corpora для raw carrier, denotation IR, pair subset и recursive root denotation. Downstream L4/AVM adapters должны потреблять typed результаты этих контрактов и не дублировать quaternary grammar.
 
@@ -263,6 +305,8 @@ python -m pytest tests/test_mts_v02_end_to_end.py -v
 `anum_docs` остаётся единственным normative source МТС.
 
 `aprover` потребляет versioned contract и conformance corpus отсюда. Display labels не являются runtime identity: визуально одинаковые occurrences могут иметь разные `HoleId`/`LinkRef`.
+
+После изменения accepted contract downstream `aprover` обязан repin-ить exact upstream snapshot и исполнить новый bundle conformance corpus до добавления собственной UI semantics.
 
 ## Проверка
 

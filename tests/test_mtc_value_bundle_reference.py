@@ -1,4 +1,4 @@
-"""Execute the candidate flat ValueBundle corpus through one reference core."""
+"""Исполняет принятый корпус плоских пучков значений через единое ядро."""
 
 import json
 from pathlib import Path
@@ -11,7 +11,6 @@ from core.mtc_interpreter import ContextFrame, interpret_constraints
 from core.mtc_parser import parse_formula
 from core.mtc_value_bundle import (
     BundleElaborationError,
-    BundleQueryMemory,
     BundleRole,
     BundleValue,
     ExpectedRole,
@@ -28,6 +27,7 @@ CORPUS = ROOT / "contracts" / "mts-value-bundle-conformance-v0.2.json"
 CONTRACT = ROOT / "contracts" / "mts-value-bundle-v0.2.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 INTERPRETER = ROOT / "core" / "mtc_interpreter.py"
+REFERENCE_CORE = ROOT / "core" / "mtc_value_bundle.py"
 
 
 def corpus() -> dict:
@@ -57,7 +57,7 @@ def _resolver(symbols: dict[str, int], holes: dict[str, int]):
             if key not in holes:
                 raise ValueError(f"unbound anonymous occurrence: {key}")
             return holes[key]
-        raise ValueError(f"unsupported candidate test form: {type(form).__name__}")
+        raise ValueError(f"unsupported value-bundle test form: {type(form).__name__}")
 
     return resolve
 
@@ -75,36 +75,20 @@ def _bundle_value(source: str, symbols: dict[str, int], holes: dict[str, int]) -
     )
 
 
-class QueryView(BundleQueryMemory):
-    def __init__(self, memory: AnumMemory):
-        self.memory = memory
-
-    def find_link(self, start: int, end: int) -> int | None:
-        return self.memory.find_link(start, end)
-
-    def outgoing(self, start: int) -> tuple[int, ...]:
-        return self.memory.outgoing(start)
-
-    def incoming(self, end: int) -> tuple[int, ...]:
-        return self.memory.incoming(end)
-
-    def all_links(self) -> tuple[int, ...]:
-        return tuple(ref for ref, _record in self.memory.snapshot().links)
-
-
-def _query_fixture() -> tuple[AnumMemory, QueryView, dict[str, int]]:
+def _query_fixture() -> tuple[AnumMemory, dict[str, int]]:
     fixture = corpus()["expansionMemory"]
     initial = {int(ref): tuple(pair) for ref, pair in fixture["links"].items()}
-    memory = AnumMemory(initial_links=initial)
-    return memory, QueryView(memory), fixture["symbols"]
+    return AnumMemory(initial_links=initial), fixture["symbols"]
 
 
-def test_reference_module_is_still_candidate_and_not_wired_into_accepted_interpreter():
+def test_reference_module_is_accepted_single_value_bundle_core():
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
     interpreter_source = INTERPRETER.read_text(encoding="utf-8")
 
-    assert contract["status"] == "candidate-contract"
-    assert contract["accepted"] is False
+    assert contract["status"] == "accepted"
+    assert contract["accepted"] is True
+    assert contract["acceptanceEvidence"]["referenceCore"] == "core/mtc_value_bundle.py"
+    assert REFERENCE_CORE.is_file()
     assert "mtc_value_bundle" not in interpreter_source
 
 
@@ -162,28 +146,27 @@ def test_unresolved_anonymous_value_occurrence_never_selects_an_arbitrary_identi
         )
 
 
-def test_expansion_corpus_uses_read_only_l4_query_surface_and_never_realizes():
-    memory, query_view, symbols = _query_fixture()
+def test_expansion_corpus_uses_canonical_read_only_l4_surface_and_never_realizes():
+    memory, symbols = _query_fixture()
     before = memory.snapshot()
     resolver = _resolver(symbols, {})
 
     for case in corpus()["expansion"]:
         ast = parse_formula(case["source"])
         assert isinstance(ast, Sequence), case["id"]
-        elaboration = elaborate_bundles(ast)
         value = expand_bundle_query(
             ast,
             path=(),
-            elaboration=elaboration,
+            elaboration=elaborate_bundles(ast),
             resolve_form=resolver,
-            memory=query_view,
+            memory=memory,
         )
         assert list(value.identities) == case["expectedLinks"], case["id"]
         assert memory.snapshot() == before, case["id"]
 
 
 def test_missing_expansion_pair_is_not_materialized():
-    memory, query_view, symbols = _query_fixture()
+    memory, symbols = _query_fixture()
     before = memory.snapshot()
     before_count = memory.link_count
     ast = parse_formula("a{e}")
@@ -194,7 +177,7 @@ def test_missing_expansion_pair_is_not_materialized():
         path=(),
         elaboration=elaborate_bundles(ast),
         resolve_form=_resolver(symbols, {}),
-        memory=query_view,
+        memory=memory,
     )
 
     assert value.identities == ()
