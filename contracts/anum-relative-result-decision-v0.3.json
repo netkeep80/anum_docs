@@ -26,10 +26,10 @@
     },
     {
       "id": "C",
-      "name": "focused-rooted-l1-carrier-with-separate-provenance",
+      "name": "canonical-focused-rooted-l1-subcarrier-with-separate-provenance",
       "verdict": "preferred-candidate",
       "accepted": false,
-      "reason": "Reuse the accepted finite L1 carrier with root reset to the selected focus. Preserve the consumed raw path separately as source/replay provenance, not denotation identity."
+      "reason": "After traversal, keep only nodes reachable from the selected focus and deterministically reindex them by ordered BFS (root, then start/end). This removes context nodes that are no longer semantically observable and yields a portable finite rooted payload. Preserve the consumed raw path separately as source/replay provenance, not denotation identity."
     },
     {
       "id": "D",
@@ -42,19 +42,20 @@
   "preferredCandidate": {
     "result": {
       "kind": "relative-focused-carrier",
-      "denotationPayload": "same finite L1 CarrierGraph viewed with root = selected focus",
+      "denotationPayload": "canonical reachable rooted L1 subcarrier from selected focus",
+      "canonicalization": "deterministic BFS from selected focus, visiting start before end; drop unreachable context nodes; reindex visited nodes from 0; result root is 0",
       "sourceProvenance": "consumed raw bracket path",
       "pathParticipatesInDenotationIdentity": false,
-      "nodeIndexParticipatesInCrossLanguageIdentity": false,
+      "originalNodeIndexParticipatesInCrossLanguageIdentity": false,
       "persistentIdentity": false
     },
-    "equivalenceForConformance": "focus-rooted carrier topology must be isomorphic under ordered start/end edges; this is an engineering conformance equivalence, not L2 equality",
-    "sameFocusDifferentPaths": "same denotation payload, distinct provenance",
-    "unreachableContextNodes": "not observable through the focus-rooted denotation payload"
+    "equivalenceForConformance": "canonical payloads must be exactly equal after deterministic rooted reindex; rooted carrier isomorphism is a supporting engineering check, not L2 equality",
+    "sameFocusDifferentPaths": "same canonical denotation payload, distinct provenance",
+    "unreachableContextNodes": "removed from canonical denotation payload"
   },
   "inverseDecision": {
     "generalCanonicalSemanticInverse": "undefined in this candidate",
-    "reason": "cyclic/shared carriers can have multiple finite bracket paths selecting the same focused carrier; the denotation payload does not determine one path",
+    "reason": "cyclic/shared carriers can have multiple finite bracket paths selecting the same canonical focused carrier; the denotation payload does not determine one path",
     "sourcePreservingReplaySerialization": "allowed only when path provenance is retained",
     "sourceReplayIsCanonicalSemanticInverse": false,
     "shortestPathSelection": "forbidden unless separately justified and accepted",
@@ -82,12 +83,13 @@
     "status": "candidate-challenge",
     "mustNotChangeProductionRelativeSemantics": true,
     "requiredVectors": [
-      "same symbolic carrier under two local index assignments yields isomorphic focused result",
-      "[] and ][ selecting one focus yield same denotation payload but distinct path provenance",
+      "same symbolic carrier under two local index assignments yields byte-equivalent canonical focused payload",
+      "unreachable context nodes are removed by deterministic rooted canonicalization",
+      "[] and ][ selecting one focus yield same canonical denotation payload but distinct path provenance",
       "source replay reproduces each original bracket path when provenance exists",
       "dropping provenance makes general inverse explicitly undefined",
       "no shortest or lexicographic path is synthesized",
-      "cycles and sharing stay finite",
+      "cycles and sharing stay finite and preserve topology",
       "0/1 and mixed carriers remain unresolved",
       "production RELATIVE remains RAW",
       "no L4 or persistent identity"
