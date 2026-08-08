@@ -1,0 +1,111 @@
+{
+  "schema": "mts-derivation-base/v0.3",
+  "status": "accepted",
+  "accepted": true,
+  "issue": 122,
+  "dependsOn": [
+    "mts-contract/v0.3",
+    "mts-proof-domain-decision/v0.3",
+    "mts-proof-lifting-challenge/v0.3"
+  ],
+  "conformanceCorpus": "contracts/mts-derivation-base-conformance-v0.3.json",
+  "scope": "accepted primitive typed derivation relations backed by independent replay of already accepted canonical operations; no multi-step composition rules",
+  "judgmentShape": {
+    "relation": "explicit tagged relation name",
+    "subject": "all operation inputs required by the relation",
+    "evidence": "validated OperationalReplayClaim for the exact accepted canonical operation",
+    "hiddenGlobalStateAllowed": false,
+    "globalTruthPredicateIntroduced": false
+  },
+  "relations": [
+    {
+      "id": "ContextuallySatisfies",
+      "sourceOperation": "interpret",
+      "precondition": "independent replay returns success=true",
+      "arguments": ["expression", "ContextFrame", "symbol bindings", "finite MemoryView snapshot"],
+      "meaning": "the expression satisfies the accepted contextual interpretation semantics under exactly these replay inputs",
+      "globalTruth": false,
+      "materializes": false
+    },
+    {
+      "id": "Opens",
+      "sourceOperation": "open_definition",
+      "precondition": "independent replay returns kind=match",
+      "arguments": ["DefinitionEnvironment snapshot", "target", "DefinitionId", "exact typed RHS"],
+      "meaning": "the visible definition selected by this exact lexical environment opens the target once to this exact RHS",
+      "impliesEquality": false,
+      "evaluatesRhs": false,
+      "materializes": false
+    },
+    {
+      "id": "NoVisibleDefinition",
+      "sourceOperation": "open_definition",
+      "precondition": "independent replay returns kind=no-match",
+      "arguments": ["DefinitionEnvironment snapshot", "target"],
+      "meaning": "no visible definition for the target exists in this exact finite lexical environment snapshot",
+      "globalAbsence": false,
+      "closedWorldBeyondSnapshot": false
+    },
+    {
+      "id": "DefinitionConflict",
+      "sourceOperation": "open_definition",
+      "precondition": "independent replay returns kind=conflict",
+      "arguments": ["DefinitionEnvironment snapshot", "target"],
+      "meaning": "the nearest relevant lexical scope in this environment contains a same-target definition conflict",
+      "impliesBodyEquality": false
+    },
+    {
+      "id": "NonAddressableDefinitionTarget",
+      "sourceOperation": "open_definition",
+      "precondition": "independent replay returns kind=non-addressable",
+      "arguments": ["target"],
+      "meaning": "the target is outside the accepted v0.3 definition-addressability subset",
+      "globalSemanticInvalidity": false
+    }
+  ],
+  "evidenceBoundary": {
+    "replayCertificateIsTrustedWithoutReplay": false,
+    "checkerMustReplayCanonicalOperation": true,
+    "searchTraceIsEvidence": false,
+    "uiStateIsEvidence": false,
+    "sourceSpanIsSemanticIdentity": false,
+    "persistentBackendIdentityIsSemanticIdentity": false
+  },
+  "negativeRelationBoundary": {
+    "negativeRelationsAccepted": [
+      "NoVisibleDefinition",
+      "DefinitionConflict",
+      "NonAddressableDefinitionTarget"
+    ],
+    "reason": "each accepted negative relation names the exact finite scope/subset in which the negative result was replayed; no global absence or closed-world conclusion is introduced"
+  },
+  "compositionBoundary": {
+    "genericCompositionAccepted": false,
+    "transitivityAccepted": false,
+    "symmetryAccepted": false,
+    "congruenceAccepted": false,
+    "modusPonensAccepted": false,
+    "globalSubstitutionAccepted": false,
+    "openingToEqualityAccepted": false,
+    "recursiveNormalizationAccepted": false
+  },
+  "proofVersionBoundary": {
+    "mtsProofV02Modified": false,
+    "mtsProofV02TrustedRuleSet": ["interpret"],
+    "mtsProofV03Published": false,
+    "productionV03CheckerImplemented": false,
+    "aproverProofRepinAllowed": false
+  },
+  "nextGate": {
+    "goal": "define a versioned mts-proof/v0.3 artifact/checker that can independently validate these accepted base relations while preserving v0.2 replay compatibility",
+    "requirements": [
+      "each step names one accepted relation",
+      "step contains complete explicit replay substrate",
+      "checker independently replays the corresponding canonical operation",
+      "forged relation/arguments/results are rejected",
+      "no generic step composition yet",
+      "no proof-search dependency",
+      "cycles remain finite"
+    ]
+  }
+}
