@@ -1,0 +1,29 @@
+{
+  "schema": "mts-direct-deixis-conformance/v0.5",
+  "status": "accepted",
+  "accepted": true,
+  "contract": "mts-direct-deixis/v0.5",
+  "sourceCorpus": "contracts/mts-direct-deixis-conformance-candidate-v0.5.json",
+  "selection": {
+    "vectors": "all",
+    "equivalentSpellings": "all",
+    "negativeClaims": "all"
+  },
+  "promotion": {
+    "copiesVectors": false,
+    "changesChallengeEvidence": false,
+    "reason": "the accepted conformance selects the already challenged portable vectors without duplicating them"
+  },
+  "releaseAssertions": {
+    "allPortableVectorsReplayInProductionCore": true,
+    "allEquivalentSpellingsMatch": true,
+    "directPresenceDoesNotMeanContextSensitive": true,
+    "emptyResultDoesNotMeanContextInvariant": true,
+    "noMemoryDependency": true,
+    "noDefinitionEnvironmentDependency": true,
+    "noContextFrameDependency": true,
+    "noInterpreterIdentityDependency": true,
+    "noProofSemanticChange": true,
+    "tenRootDefinitionsUnchanged": true
+  }
+}
