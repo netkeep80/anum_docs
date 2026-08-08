@@ -1,0 +1,29 @@
+{
+  "schema": "mts-derivation-base-conformance/v0.3",
+  "status": "accepted",
+  "accepted": true,
+  "contract": "mts-derivation-base/v0.3",
+  "sourceChallenge": "contracts/mts-proof-lifting-conformance-v0.3.json",
+  "acceptedVectors": {
+    "ContextuallySatisfies": ["contextual-satisfaction-positive"],
+    "Opens": ["opening-match"],
+    "NoVisibleDefinition": ["no-match-local", "same-target-other-environment"],
+    "DefinitionConflict": ["same-scope-conflict"],
+    "NonAddressableDefinitionTarget": ["anonymous-target"]
+  },
+  "requiredCounterexamples": [
+    "contextual-satisfaction-countercontext",
+    "same-target-other-environment",
+    "same-scope-conflict"
+  ],
+  "releaseAssertions": {
+    "contextualSatisfactionIsContextScoped": true,
+    "openingDoesNotImplyEquality": true,
+    "openingDoesNotEvaluateRhs": true,
+    "noVisibleDefinitionIsEnvironmentScoped": true,
+    "conflictDoesNotImplyBodyEquality": true,
+    "negativeRelationsDoNotCreateGlobalClosedWorld": true,
+    "allRelationsRequireIndependentReplay": true,
+    "genericCompositionStillForbidden": true
+  }
+}
