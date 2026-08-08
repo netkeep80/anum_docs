@@ -185,7 +185,7 @@ def test_canonical_opening_primitive_remains_the_trusted_edge_substrate():
     result = open_definition(target, environment)
 
     assert result.kind is DefinitionLookupKind.MATCH
-    assert result.definition_id == registration.entry.id
+    assert result.definition_id == registration.entry.identity
     assert result.body is not None
     assert format_expression(result.body) == "b"
 
