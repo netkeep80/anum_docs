@@ -1,0 +1,52 @@
+{
+  "schema": "mts-opening-path-conformance/v0.4",
+  "status": "accepted",
+  "accepted": true,
+  "contract": "mts-opening-path/v0.4",
+  "sourceCorpus": "contracts/mts-opening-path-conformance-candidate-v0.4.json",
+  "selection": {
+    "validPaths": "all",
+    "invalidPaths": "all"
+  },
+  "transportAssertions": {
+    "targetSourcesParsedBeforeStructuralComparison": true,
+    "equivalentTargetWhitespaceAllowed": true,
+    "edgeBodyMustBeCanonicalFormatExpression": true,
+    "finalBodyMustBeCanonicalFormatExpression": true,
+    "definitionIdMustReplayExactly": true,
+    "sharedEnvironmentAndLookupScope": true
+  },
+  "coreAssertions": {
+    "allValidPathsAcceptedByCanonicalVerifier": true,
+    "allInvalidPathsRejectedByCanonicalVerifierOrStrictTransportAdapter": true,
+    "emptyPathRejected": true,
+    "startAndAdjacencyCheckedStructurally": true,
+    "everyEdgeIndependentlyOpened": true,
+    "repeatedDefinitionIdRejected": true,
+    "nonFormAndNonAddressableTerminalBodiesAllowed": true,
+    "continuationAcrossNonFormOrNonAddressableBodyRejected": true,
+    "noAutoContinuation": true
+  },
+  "meaningAssertions": {
+    "impliesEquality": false,
+    "impliesEquivalence": false,
+    "impliesNormalization": false,
+    "impliesContextualSatisfaction": false,
+    "genericCompositionAccepted": false
+  },
+  "effectsAssertions": {
+    "readsMemory": false,
+    "readsContextFrame": false,
+    "readsInterpreterIdentity": false,
+    "materializes": false,
+    "deletes": false,
+    "mutatesDefinitionEnvironment": false
+  },
+  "releaseAssertions": {
+    "mtsProofV03Unchanged": true,
+    "mtsContractV04Unchanged": true,
+    "tenRootDefinitionsUnchanged": true,
+    "standaloneRelationOnly": true,
+    "proofV04StillRequiresSeparateAcceptance": true
+  }
+}
