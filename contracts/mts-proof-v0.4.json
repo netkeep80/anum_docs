@@ -1,0 +1,136 @@
+{
+  "schema": "mts-proof/v0.4",
+  "status": "accepted",
+  "accepted": true,
+  "issue": 165,
+  "dependsOn": [
+    "mts-contract/v0.4",
+    "mts-proof/v0.3",
+    "mts-opening-path/v0.4",
+    "mts-proof-opening-path-challenge/v0.4"
+  ],
+  "conformanceCorpus": "contracts/mts-proof-conformance-v0.4.json",
+  "purpose": "Trusted independent replay of the five accepted v0.3 base relations plus the accepted finite DefinitionOpeningPath operational composite certificate; no other composition or inference rule is accepted.",
+  "proofObject": {
+    "required": ["proofVersion", "contractVersion", "judgments"],
+    "proofVersion": "mts-proof/v0.4",
+    "contractVersion": "mts-contract/v0.4",
+    "judgments": "ordered V04Judgment[]; array order is artifact order only and has no generic premise/dependency meaning"
+  },
+  "trustedRelations": [
+    "ContextuallySatisfies",
+    "Opens",
+    "NoVisibleDefinition",
+    "DefinitionConflict",
+    "NonAddressableDefinitionTarget",
+    "DefinitionOpeningPath"
+  ],
+  "baseRelations": {
+    "shapesIdenticalToV03": true,
+    "trustedMeaningIdenticalToV03": true,
+    "checkerPath": "core/proof_checker.py::check_v03_judgment",
+    "reimplementedForV04": false,
+    "proofV03ArtifactsReinterpretedAsV04": false
+  },
+  "definitionOpeningPath": {
+    "required": ["relation", "scopes", "lookupScope", "startTarget", "edges", "finalBody"],
+    "relation": "DefinitionOpeningPath",
+    "scopes": "same explicit canonical lexical snapshot semantics as v0.3 definition judgments",
+    "lookupScope": "one exact serialized scope path used for every opening edge",
+    "startTarget": "parseable Form source; structural identity after parsing; equivalent whitespace permitted",
+    "edges": {
+      "minimum": 1,
+      "required": ["target", "definitionId", "body"],
+      "target": "parseable Form source; structural identity after parsing; equivalent whitespace permitted",
+      "definitionId": "exact non-negative replay-local DefinitionId(scopePath,ordinal)",
+      "body": "exact canonical format_expression transport parsed into typed Expression"
+    },
+    "finalBody": "exact canonical format_expression transport parsed into typed Expression",
+    "typedWitness": "OpeningPathWitness",
+    "trustedReplay": "core/mtc_opening_path.py::verify_opening_path",
+    "autoContinues": false,
+    "searchTraceTrusted": false
+  },
+  "transportBoundary": {
+    "wrongOrMissingVersionsRejected": true,
+    "unexpectedProofFieldsRejected": true,
+    "unexpectedJudgmentFieldsRejected": true,
+    "unexpectedOpeningEdgeFieldsRejected": true,
+    "unknownRelationsRejected": true,
+    "noncanonicalExpectedBodyTransportRejected": true,
+    "noncanonicalFinalBodyTransportRejected": true,
+    "targetWhitespaceCanonicalizationRequired": false,
+    "sourceSpanIdentity": false
+  },
+  "checker": {
+    "module": "core/proof_checker.py",
+    "singleTrustedModuleForV02V03V04": true,
+    "baseRelationsDelegateExistingV03Replay": true,
+    "openingPathDelegatesCanonicalVerifier": true,
+    "trustsSerializedOpeningBodyWithoutReplay": false,
+    "trustsSerializedDefinitionIdWithoutReplay": false,
+    "trustsSearchTrace": false,
+    "mayAutoExtendOpeningPath": false,
+    "mayReadAmbientInterpreterState": false,
+    "mayInjectCanonicalRootDefinitions": false,
+    "mayMaterialize": false,
+    "mayDelete": false
+  },
+  "compositionBoundary": {
+    "DefinitionOpeningPathInternallyComposesOpeningEdges": true,
+    "judgmentOrderImpliesDependency": false,
+    "genericCompositionAccepted": false,
+    "openingPathFeedsContextuallySatisfiesImplicitly": false,
+    "openingPathImpliesEquality": false,
+    "openingPathImpliesEquivalence": false,
+    "openingPathImpliesNormalization": false,
+    "transitivityAccepted": false,
+    "symmetryAccepted": false,
+    "congruenceAccepted": false,
+    "modusPonensAccepted": false,
+    "globalSubstitutionAccepted": false,
+    "proofDagDependencyAccepted": false
+  },
+  "effectsBoundary": {
+    "openingPathReadsMemory": false,
+    "openingPathReadsContextFrame": false,
+    "openingPathReadsInterpreterIdentity": false,
+    "openingPathMaterializes": false,
+    "openingPathDeletes": false
+  },
+  "v03Compatibility": {
+    "mtsProofV03Modified": false,
+    "mtsProofV03Schema": "mts-proof/v0.3",
+    "mtsProofV03ContractVersion": "mts-contract/v0.3",
+    "trustedRelationsRemainExactlyFive": true,
+    "existingV03ArtifactsReplayByExistingApi": true,
+    "retroactiveReinterpretation": false
+  },
+  "serialization": {
+    "typedApi": [
+      "proof_v04_from_data",
+      "check_proof_v04",
+      "check_proof_v04_data",
+      "proof_v04_to_data",
+      "canonical_proof_v04_json"
+    ],
+    "canonicalTargetSerialization": "format_expression; decoder additionally accepts structurally equivalent target whitespace",
+    "canonicalBodySerialization": "format_expression",
+    "roundTripRequired": true
+  },
+  "rootProgram": {
+    "definitionCount": 10,
+    "mustRemainUnchanged": true
+  },
+  "versioning": {
+    "mtsContractV04Modified": false,
+    "publishedThroughUmbrella": false,
+    "futureUmbrella": "mts-contract/v0.5",
+    "futureUmbrellaMustBeAdditive": true
+  },
+  "downstream": {
+    "directAproverRepinAllowedBeforeUmbrella": false,
+    "reason": "publish the full new context/proof surface through additive mts-contract/v0.5 before downstream exact pin",
+    "aproverMayInventAdditionalRules": false
+  }
+}
