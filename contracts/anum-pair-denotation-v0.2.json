@@ -1,0 +1,55 @@
+{
+  "schema": "anum-pair-denotation/v0.2",
+  "status": "accepted-subset",
+  "dependsOn": [
+    "mts-contract/v0.2",
+    "anum-boundary-projection/v0.2",
+    "anum-denotation/v0.2"
+  ],
+  "conformanceCorpus": "contracts/anum-pair-denotation-conformance-v0.2.json",
+  "scope": {
+    "context": "root",
+    "recursiveBracketGrammar": false,
+    "relativeDenotation": false,
+    "boundaryOpenOpenDenotation": false,
+    "boundaryCloseCloseDenotation": false
+  },
+  "protocolAnchors": {
+    "0": "protocol:0",
+    "1": "protocol:1"
+  },
+  "rootGrammar": {
+    "atom": ["0", "1"],
+    "pair": "exactly two direct protocol atoms",
+    "boundaryAliases": {
+      "][": "0",
+      "[]": "1"
+    },
+    "unsupportedResult": "raw"
+  },
+  "denotation": {
+    "atom": "structural anchor root",
+    "pair": "one structural Link node from first protocol anchor to second protocol anchor",
+    "boundaryAlias": "same structural anchor denotation as projected canonical atom"
+  },
+  "canonicalInverse": {
+    "anchor:protocol:0": "0",
+    "anchor:protocol:1": "1",
+    "oneNodePair": "concatenate canonical start/end protocol atoms",
+    "sourcePreservingAliases": false
+  },
+  "otherContexts": {
+    "quote": "quoted-raw after canonical one-envelope quote projection",
+    "relative": "raw"
+  },
+  "effects": {
+    "mayReadMemory": false,
+    "mayMutateMemory": false,
+    "mayRealize": false,
+    "persistentLinkIdAllowed": false
+  },
+  "deferredToIssue": {
+    "recursiveBracketDenotation": 95,
+    "generalDenotation": 89
+  }
+}
