@@ -6,6 +6,8 @@
 
 Language-neutral контракт для внешних реализаций: [`contracts/mts-contract-v0.2.json`](../../contracts/mts-contract-v0.2.json).
 
+Принятый L3 boundary subset: [`contracts/anum-boundary-projection-v0.2.json`](../../contracts/anum-boundary-projection-v0.2.json).
+
 Этот документ фиксирует инженерную reference model, относительно которой работают parser, interpreter, протокол ачисел, будущая апамять и апрувер. Он не подменяет [Основания МТС](../theory/Основания%20МТС.md) и не объявляет Python-представление окончательной «природой связи».
 
 ## 1. Архитектурные уровни
@@ -238,7 +240,7 @@ Round grouping сохраняется в AST и canonical printer, но проз
 
 Каноническая root-программа: [`tests/mtc_formulas.mtc`](../../tests/mtc_formulas.mtc).
 
-Она содержит только 10 именованных определений. Parser/conformance-примеры последовательностей и пучков не являются корневыми аксиомами.
+Она содержит только 10 именованных definitions. Parser/conformance-примеры последовательностей и пучков не являются корневыми аксиомами.
 
 Ключевые определения:
 
@@ -266,14 +268,29 @@ parse_raw_quaternary
 → deterministic serialize
 ```
 
-Рабочая проекция issue #61:
+Принятые root definitions v0.2 фиксируют boundary orientation:
 
 ```text
-[] → 0
-][ → 1
+([) : (♀∞)
+(]) : (∞♂)
+(⟼) : (♀∞ ⟼ ∞♂)
+(↛) : (∞♂ ⟼ ♀∞)
+[1] : (⟼)
+[0] : (↛)
 ```
 
-остаётся **experimental**. Принятие L2 v0.2 не повышает её статус.
+Поэтому в **root context** принят boundary subset:
+
+```text
+[  → ♀∞
+]  → ∞♂
+[] → 1
+][ → 0
+```
+
+`[[` и `]]` остаются `boundary-form` без protocol value. Это contextual root projection, а не абсолютное переписывание raw carrier: quote и relative contexts его не применяют.
+
+Общая structural denotation произвольного raw carrier, recursive decode и inverse denotation serialization остаются открытым dependency gate #89.
 
 ## 6. L4 — исполнение
 
@@ -308,7 +325,7 @@ ContextFrame(
 
 ```text
 load
- decode
+decode
 project
 find
 realize
@@ -328,7 +345,7 @@ realize(...) — единственная явная materializing operation
 
 ## 7. L5 — теория вывода
 
-L5 ещё не содержит принятого полного trusted proof kernel.
+L5 имеет replay-only candidate trusted proof kernel, который доверяет только повторному исполнению принятой read-only `interpret` semantics. Полный набор правил вывода и proof search остаются отдельной задачей.
 
 Будущий апрувер обязан разделять:
 
@@ -361,14 +378,16 @@ context ascent ↑;
 occurrence-local anonymous [];
 локальная interpretation semantics;
 structural LinkForm matching;
-contextual equality.
+contextual equality;
+root Anum boundary orientation [] → 1, ][ → 0.
 ```
 
-Явно experimental остаются как минимум:
+Явно не завершены как минимум:
 
 ```text
-issue #61 L3 projection;
-trusted L5 proof rules.
+general L3 raw denotation и inverse denotation serialization (#89);
+relative L3 denotation;
+полный trusted L5 inference kernel.
 ```
 
 ## 9. Жизненный цикл фундаментального решения
@@ -391,7 +410,7 @@ Deferred
 Superseded
 ```
 
-Формальная нотация v0.2 прошла Candidate → Challenged → Modeled в PR #84; нормативный contract фиксируется отдельной promotion-миграцией.
+Формальная нотация v0.2 прошла Candidate → Challenged → Modeled в PR #84 и затем была принята в единственный active contract.
 
 ## 10. Единственные активные реализации
 
@@ -403,6 +422,7 @@ L2 tokenizer/parser                    core/mtc_parser.py
 L2 interpreter                         core/mtc_interpreter.py
 L2 root library                        core/root_library.py
 L3 Anum protocol                       core/anum_protocol.py
+L3 boundary contract                   contracts/anum-boundary-projection-v0.2.json
 versioned external contract            contracts/mts-contract-v0.2.json
 ```
 
