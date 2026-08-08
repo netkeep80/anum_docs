@@ -107,7 +107,7 @@ class NoMemory:
         raise AssertionError(f"unexpected L4 access: {name}")
 
 
-def test_challenge_and_corpus_remain_historical_non_normative_evidence():
+def test_challenge_remains_historical_while_its_vectors_are_promoted_to_conformance():
     data = challenge()
     vectors = corpus()
     selected = decision()["nextGate"]
@@ -117,7 +117,9 @@ def test_challenge_and_corpus_remain_historical_non_normative_evidence():
     assert data["schema"] == "mts-definition-opening-challenge/v0.3"
     assert data["status"] == "candidate-challenge"
     assert vectors["schema"] == "mts-definition-opening-conformance/v0.3"
-    assert vectors["status"] == "candidate-challenge-corpus"
+    assert vectors["status"] == "accepted"
+    assert vectors["accepted"] is True
+    assert vectors["contract"] == "mts-definition-opening/v0.3"
     assert selected["artifact"] == data["schema"]
     assert data["conformanceCorpus"] == "contracts/mts-definition-opening-conformance-v0.3.json"
     assert data["acceptedContractLinkAllowed"] is False
