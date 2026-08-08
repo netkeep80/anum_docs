@@ -1,0 +1,220 @@
+{
+  "schema": "mts-opening-path-conformance-candidate/v0.4",
+  "status": "candidate-challenge-corpus",
+  "contract": "mts-opening-path-challenge/v0.4",
+  "validPaths": [
+    {
+      "id": "one-edge",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"}
+      ],
+      "finalBody": "b"
+    },
+    {
+      "id": "ends-in-non-form-judgment",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b = c"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b = c"}
+      ],
+      "finalBody": "b = c"
+    },
+    {
+      "id": "two-edge",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b", "b : c"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"},
+        {"target": "b", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "c"}
+      ],
+      "finalBody": "c"
+    },
+    {
+      "id": "ends-in-constraint-bundle",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b", "b : {◁ = x, ▷ = y}"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"},
+        {"target": "b", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "{◁ = x, ▷ = y}"}
+      ],
+      "finalBody": "{◁ = x, ▷ = y}"
+    },
+    {
+      "id": "child-shadowing",
+      "scopes": [
+        {"path": [], "parent": null, "definitions": ["a : root", "b : rootEnd"]},
+        {"path": [0], "parent": [], "definitions": ["a : b", "b : childEnd"]}
+      ],
+      "lookupScope": [0],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [0], "ordinal": 0}, "body": "b"},
+        {"target": "b", "definitionId": {"scopePath": [0], "ordinal": 1}, "body": "childEnd"}
+      ],
+      "finalBody": "childEnd"
+    },
+    {
+      "id": "self-cycle-one-edge",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : a"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "a"}
+      ],
+      "finalBody": "a"
+    },
+    {
+      "id": "mutual-cycle-two-edges",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b", "b : a"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"},
+        {"target": "b", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "a"}
+      ],
+      "finalBody": "a"
+    },
+    {
+      "id": "structural-adjacency-whitespace",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : (b)", "(b) : c"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "(b)"},
+        {"target": "( b )", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "c"}
+      ],
+      "finalBody": "c"
+    }
+  ],
+  "invalidPaths": [
+    {
+      "id": "zero-edge",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [],
+      "finalBody": "a"
+    },
+    {
+      "id": "repeated-definition-id",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b", "b : a"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"},
+        {"target": "b", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "a"},
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"}
+      ],
+      "finalBody": "b"
+    },
+    {
+      "id": "forged-body",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "c"}
+      ],
+      "finalBody": "c"
+    },
+    {
+      "id": "forged-definition-id",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 9}, "body": "b"}
+      ],
+      "finalBody": "b"
+    },
+    {
+      "id": "next-target-mismatch",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b", "c : d"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"},
+        {"target": "c", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "d"}
+      ],
+      "finalBody": "d"
+    },
+    {
+      "id": "start-target-mismatch",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b", "x : y"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "x", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "y"}
+      ],
+      "finalBody": "y"
+    },
+    {
+      "id": "continue-after-non-form",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b = c", "x : y"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b = c"},
+        {"target": "x", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "y"}
+      ],
+      "finalBody": "y"
+    },
+    {
+      "id": "continue-after-non-addressable-form",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : {◁ = x}"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "{◁ = x}"},
+        {"target": "{ ◁ = x }", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "z"}
+      ],
+      "finalBody": "z"
+    },
+    {
+      "id": "no-match-edge",
+      "scopes": [{"path": [], "parent": null, "definitions": []}],
+      "lookupScope": [],
+      "startTarget": "missing",
+      "edges": [
+        {"target": "missing", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "x"}
+      ],
+      "finalBody": "x"
+    },
+    {
+      "id": "conflict-edge",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b", "a : c"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"}
+      ],
+      "finalBody": "b"
+    },
+    {
+      "id": "non-addressable-edge",
+      "scopes": [{"path": [], "parent": null, "definitions": []}],
+      "lookupScope": [],
+      "startTarget": "[]",
+      "edges": [
+        {"target": "[]", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "x"}
+      ],
+      "finalBody": "x"
+    },
+    {
+      "id": "forged-final-body",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"}
+      ],
+      "finalBody": "c"
+    }
+  ]
+}

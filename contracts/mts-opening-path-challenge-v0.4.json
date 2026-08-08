@@ -1,0 +1,129 @@
+{
+  "schema": "mts-opening-path-challenge/v0.4",
+  "status": "candidate-challenge",
+  "issue": 161,
+  "dependsOn": [
+    "mts-definition-opening/v0.3",
+    "mts-derivation-base/v0.3",
+    "mts-proof/v0.3"
+  ],
+  "conformanceCorpus": "contracts/mts-opening-path-conformance-candidate-v0.4.json",
+  "acceptedContractLinkAllowed": false,
+  "productionProofChangeAllowed": false,
+  "trustedRuleChangeAllowed": false,
+  "purpose": "Challenge a finite self-contained DefinitionOpeningPath witness composed only from independently replayable successful open_definition edges, without equality, normalization or implicit recursive evaluation.",
+  "candidateRelation": {
+    "name": "DefinitionOpeningPath",
+    "artifactInputs": [
+      "one explicit lexical DefinitionEnvironment snapshot",
+      "one explicit lookupScope",
+      "one startTarget",
+      "one or more ordered successful opening edges",
+      "one finalBody"
+    ],
+    "sharedEnvironment": true,
+    "sharedLookupScope": true,
+    "environmentSwitchPerEdgeRepresentable": false,
+    "zeroEdgePathAllowed": false
+  },
+  "edge": {
+    "required": ["target", "definitionId", "body"],
+    "target": "parseable typed Form source; replay/adjacency identity is structural and does not require canonical whitespace",
+    "definitionId": "exact replay-local DefinitionId(scopePath,ordinal)",
+    "body": "exact canonical format_expression of replayed Definition.value",
+    "mustReplayKind": "match",
+    "negativeOpeningKindsAllowedAsEdges": false
+  },
+  "adjacency": {
+    "firstEdgeTargetMustMatchStartTargetStructurally": true,
+    "nextEdgeTargetMustMatchPreviousReplayedBodyStructurally": true,
+    "intermediateBodyMustBeForm": true,
+    "nextTargetMustReplaySuccessfully": true,
+    "canonicalDisplayTextIsIdentity": false,
+    "sourceSpanIsIdentity": false,
+    "textualSubstitution": false
+  },
+  "transportBoundary": {
+    "targetSourceMayUseEquivalentWhitespace": true,
+    "bodyMustUseCanonicalFormatExpression": true,
+    "reason": "targets are parsed before structural comparison; bodies are replay results serialized deterministically, not lookup identity strings"
+  },
+  "finalBody": {
+    "mustEqualLastReplayedBodyCanonicalFormat": true,
+    "mayBeNonFormExpression": true,
+    "automaticallyEvaluated": false,
+    "automaticallyContextuallySatisfied": false,
+    "normalFormClaimed": false
+  },
+  "cycleBoundary": {
+    "definitionIdMayAppearAtMostOnce": true,
+    "selfDefinition": "a:a is represented by one edge and may end again at a",
+    "mutualDefinition": "a:b,b:a is represented by two distinct DefinitionIds and may end again at a",
+    "repeatedDefinitionIdRejected": true,
+    "reason": "finite canonical witness boundary; rejection of repetition is not rejection of the semantic cycle"
+  },
+  "meaningBoundary": {
+    "impliesEquality": false,
+    "impliesEquivalence": false,
+    "impliesTransitiveEquality": false,
+    "impliesGlobalRewrite": false,
+    "impliesNormalization": false,
+    "evaluatesAnyBody": false,
+    "readsMemory": false,
+    "readsContextFrame": false,
+    "materializes": false,
+    "deletes": false
+  },
+  "checkerBoundary": {
+    "replaysExactlySerializedEdgeCount": true,
+    "autoContinuesUntilTerminal": false,
+    "trustsSerializedDefinitionId": false,
+    "trustsSerializedBody": false,
+    "trustsSearchTrace": false,
+    "replaysEveryEdgeWithCanonicalOpenDefinition": true,
+    "checksTypedStructuralAdjacency": true
+  },
+  "requiredCoverage": [
+    "one-edge path",
+    "two-edge finite chain",
+    "chain ending in non-Form constraint bundle",
+    "child-scope shadowing",
+    "self cycle in one edge",
+    "mutual cycle in two edges",
+    "repeated DefinitionId rejected",
+    "zero-edge path rejected",
+    "forged body rejected",
+    "forged DefinitionId rejected",
+    "next-target mismatch rejected",
+    "intermediate non-Form continuation rejected",
+    "no-match/conflict/non-addressable cannot be successful edges",
+    "whitespace/source-span differences do not break structural adjacency",
+    "no MemoryView/ContextFrame/L4 effects"
+  ],
+  "vetoes": [
+    "opening path implies equality",
+    "opening path implies normal form",
+    "unrestricted transitivity",
+    "global textual substitution",
+    "recursive textual normalization",
+    "hidden root injection",
+    "per-edge environment switching",
+    "per-edge lookupScope switching",
+    "repeated DefinitionId unfolding",
+    "MemoryView or L4 effects",
+    "ContextFrame dependence",
+    "editing mts-proof/v0.3 in place",
+    "aprover inventing the rule before upstream acceptance"
+  ],
+  "nextGate": {
+    "artifact": "mts-opening-path-decision/v0.4",
+    "mustNotChangeProductionProofBeforeDecision": true,
+    "mustDecide": [
+      "whether DefinitionOpeningPath is admitted as a derivation relation or only an operational composite certificate",
+      "whether proof-v0.4 stores self-contained edges or references prior Opens judgments",
+      "whether duplicate DefinitionId rejection is normative canonicality",
+      "whether an opening path may later compose with ContextuallySatisfies without asserting equality",
+      "exact checker serialization and forgery boundary"
+    ]
+  }
+}
