@@ -54,6 +54,31 @@
       "source": "{x, y}",
       "context": "constraint-entry",
       "error": "bundle-role-mismatch"
+    },
+    {
+      "id": "bundle-valued-definition-deferred",
+      "source": "b : {x, y}",
+      "error": "bundle-valued-definition-deferred"
+    },
+    {
+      "id": "bundle-explicit-link-pole-deferred",
+      "source": "{x, y} ⟼ z",
+      "error": "bundle-not-supported-in-scalar-operator"
+    },
+    {
+      "id": "bundle-projection-deferred",
+      "source": "♀{x, y}",
+      "error": "bundle-not-supported-in-scalar-operator"
+    },
+    {
+      "id": "bundle-inversion-deferred",
+      "source": "¬{x, y}",
+      "error": "bundle-not-supported-in-scalar-operator"
+    },
+    {
+      "id": "bundle-expansion-as-explicit-link-pole-deferred",
+      "source": "a{b, c} ⟼ z",
+      "error": "bundle-not-supported-in-scalar-operator"
     }
   ],
   "valueEquality": [
@@ -187,6 +212,8 @@
     "constraintBundleBehaviorChanged": false,
     "deduplicateSourceOccurrences": false,
     "nestedValueBundleAccepted": false,
+    "bundleValuedDefinitionAccepted": false,
+    "scalarOperatorLiftingAccepted": false,
     "interpretMayRealize": false,
     "interpretMayDelete": false,
     "globalRewrite": false
