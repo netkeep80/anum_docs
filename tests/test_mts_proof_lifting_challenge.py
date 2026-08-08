@@ -5,8 +5,9 @@ from pathlib import Path
 
 from core.mtc_ast import Definition, Form, format_expression
 from core.mtc_definitions import DefinitionEnvironment, DefinitionLookupKind, open_definition
-from core.mtc_interpreter import ContextFrame, DistinguishedMemory, interpret_constraints
+from core.mtc_interpreter import ContextFrame, interpret_constraints
 from core.mtc_parser import parse_formula
+from core.proof_checker import DistinguishedLink, ProofMemory
 
 
 ROOT = Path(__file__).parents[1]
@@ -45,8 +46,11 @@ def opening_data(definitions: list[str], target_source: str) -> dict:
 
 
 def interpret_success(vector: dict) -> bool:
-    memory = DistinguishedMemory(
-        {item["id"]: (item["start"], item["end"]) for item in vector["memory"]}
+    memory = ProofMemory(
+        tuple(
+            DistinguishedLink(id=item["id"], start=item["start"], end=item["end"])
+            for item in vector["memory"]
+        )
     )
     result = interpret_constraints(
         parse_formula(vector["expression"]),
