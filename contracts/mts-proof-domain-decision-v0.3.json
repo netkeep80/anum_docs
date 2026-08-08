@@ -1,0 +1,152 @@
+{
+  "schema": "mts-proof-domain-decision/v0.3",
+  "status": "candidate-decision",
+  "issue": 122,
+  "dependsOn": [
+    "mts-contract/v0.3",
+    "mts-proof-judgment-decision/v0.3",
+    "mts-proof-judgment-challenge/v0.3",
+    "mts-proof/v0.2"
+  ],
+  "acceptedContractLinkAllowed": false,
+  "productionProofChangeAllowed": false,
+  "trustedRuleChangeAllowed": false,
+  "question": "Does exact replayability itself make an operation result a proof judgment, or must operational certificates be separated from MTS derivation judgments?",
+  "evidence": {
+    "challengeFinding": "#139 independently replays exact interpret/open-definition results, including negative results, and rejects forged results",
+    "currentProofKernel": "mts-proof/v0.2 replays only interpret steps",
+    "definitionOpening": "successful open_definition returns an exact RHS but explicitly does not assert equality or produce a proof step",
+    "negativeResults": ["interpret failure", "no-match", "conflict", "non-addressable"]
+  },
+  "models": [
+    {
+      "id": "A",
+      "name": "every-exact-replay-result-is-proof-judgment",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Replayability proves that an operation returned a result. It does not by itself define what MTS proposition or derivation relation that result establishes."
+    },
+    {
+      "id": "B",
+      "name": "only-operation-success-is-proof-judgment",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Generic success/match is operation-specific and still does not define a theorem relation. In particular open-definition match is not A = F."
+    },
+    {
+      "id": "C",
+      "name": "two-layer-operational-certificate-and-derivation-judgment",
+      "verdict": "preferred-candidate",
+      "accepted": false,
+      "reason": "Keep exact operation replay as a typed certificate layer. Define MTS derivation judgments separately and require an explicit accepted lifting/inference rule before operational evidence can establish a derivation claim."
+    },
+    {
+      "id": "D",
+      "name": "reuse-classical-theorem-judgment",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Importing a conventional theorem/truth judgment would bypass the still-open MTS-specific semantics of goals, premises, equality and composition."
+    }
+  ],
+  "preferredCandidate": {
+    "operationalReplayClaim": {
+      "role": "exact certificate of one accepted canonical operation result",
+      "includesNegativeResults": true,
+      "examples": [
+        "InterpretResult(expression, context, memory, symbols, success/substitutions/aliases)",
+        "OpenDefinitionResult(environment, target, match/no-match/conflict/non-addressable, optional DefinitionId/RHS)"
+      ],
+      "trustedValidation": "independent replay of the referenced accepted canonical operation",
+      "compositionSemantics": "none",
+      "isTheoremByItself": false,
+      "isDerivationPremiseByItself": false
+    },
+    "derivationJudgment": {
+      "role": "future MTS-specific claim established by accepted lifting/inference rules",
+      "acceptedInThisDecision": false,
+      "mustHaveExplicitTypedSubject": true,
+      "mustHaveExplicitRelation": true,
+      "mustNotDefaultToGlobalTruth": true,
+      "mayReferenceReplayCertificateOnlyThroughAcceptedRule": true
+    },
+    "boundary": "certificate validity and derivation validity are different questions"
+  },
+  "v02Compatibility": {
+    "mtsProofV02FileNameUnchanged": true,
+    "mtsProofV02TrustedRuleSetUnchanged": ["interpret"],
+    "interpretStepMayBeViewedAsOperationalCertificate": true,
+    "reinterpretV02InterpretAsGeneralTheorem": false,
+    "retroactiveArtifactRewriteRequired": false
+  },
+  "definitionOpeningBoundary": {
+    "openingMatchCanBeCertified": true,
+    "openingNegativeResultCanBeCertified": true,
+    "openingMatchEstablishesEquality": false,
+    "openingMatchEstablishesGlobalRewrite": false,
+    "openingMatchIsTrustedDerivationRule": false,
+    "returnedRhsEvaluationImplicit": false
+  },
+  "negativeResultBoundary": {
+    "negativeReplayClaimCanBeValid": true,
+    "negativeReplayClaimAutomaticallyBecomesTheorem": false,
+    "absenceOrConflictCanBeUsedAsPremiseWithoutRule": false,
+    "reason": "Exact knowledge that an operation failed/missed/conflicted is operational evidence; how such evidence participates in MTS derivation requires its own rule."
+  },
+  "futureDerivationShapeConstraints": {
+    "genericGammaTurnstileImported": false,
+    "globalFormulaTruthImported": false,
+    "goalMustNameItsRelation": true,
+    "premisesMustNameAcceptedEvidenceOrJudgments": true,
+    "contextAndMemoryMustNotBeHidden": true,
+    "proofSearchTraceIsNotPremise": true,
+    "cyclesMustRemainFinite": true
+  },
+  "candidateLiftFamiliesForNextChallenge": [
+    {
+      "id": "interpret-result-relation",
+      "question": "Can a verified interpret replay establish a typed relation such as Interprets(input,result) without turning successful interpretation into global formula truth?",
+      "accepted": false
+    },
+    {
+      "id": "definition-opening-relation",
+      "question": "Can a verified opening replay establish Opens(environment,target,result) while remaining distinct from equality and RHS evaluation?",
+      "accepted": false
+    },
+    {
+      "id": "constraint-satisfaction-lift",
+      "question": "Under which exact preconditions, if any, can successful contextual interpretation establish a derivation-level constraint-satisfaction judgment?",
+      "accepted": false
+    },
+    {
+      "id": "negative-evidence-lift",
+      "question": "Can no-match/conflict/failure evidence participate in derivation, and under what explicit relation, without closed-world assumptions?",
+      "accepted": false
+    }
+  ],
+  "stillRejectedOrDeferred": [
+    "successful opening implies equality",
+    "all successful operations are theorems",
+    "all replayable negative results are theorems",
+    "global textual substitution",
+    "unrestricted symmetry",
+    "unrestricted transitivity",
+    "unrestricted congruence",
+    "modus ponens",
+    "generic proof DAG composition",
+    "proof by recursive textual normalization"
+  ],
+  "nextGate": {
+    "artifact": "mts-proof-lifting-challenge/v0.3",
+    "status": "candidate-challenge",
+    "mustNotChangeProductionProofSemantics": true,
+    "requiredQuestions": [
+      "exact typed subject/relation for an interpret-derived judgment",
+      "exact typed subject/relation for an opening-derived judgment",
+      "whether successful interpretation means anything beyond a replayed operation result",
+      "whether negative evidence requires an explicit open-world/closed-world premise",
+      "how a replay certificate is referenced without trusting search trace",
+      "how self/mutual recursion and cyclic carriers remain finite",
+      "which proposed lifts have counterexamples on small finite carriers"
+    ]
+  }
+}
