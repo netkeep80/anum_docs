@@ -15,7 +15,7 @@
 | [Основания МТС](docs/theory/Основания%20МТС.md) | онтологические основания |
 | [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md) | нормативное чтение 10 root definitions |
 | [Reference model МТС v0.2](docs/specs/Reference%20model%20МТС%20v0.2.md) | границы L0–L5 и инженерная semantics |
-| [Формальная нотация МТС](docs/specs/Формальная%20нотацияция%20МТС.md) | typed L2 syntax и interpretation |
+| [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) | typed L2 syntax и interpretation |
 | [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | L3 `*.anum`, raw carrier, denotation и serialization |
 | [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md) | contextual L3 projection и quote semantics |
 | [MTS contract v0.2](contracts/mts-contract-v0.2.json) | language-neutral normative contract |
