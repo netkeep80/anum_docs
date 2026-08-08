@@ -1,0 +1,150 @@
+{
+  "schema": "mts-context-dependency-decision/v0.5",
+  "status": "candidate-decision",
+  "issue": 156,
+  "dependsOn": [
+    "mts-context-dependency-challenge/v0.5",
+    "mts-deictic-context-challenge/v0.5",
+    "mts-definition-opening/v0.3",
+    "mts-contract/v0.4"
+  ],
+  "acceptedContractLinkAllowed": false,
+  "productionSemanticChangeAllowed": false,
+  "trustedProofChangeAllowed": false,
+  "question": "Which context-dependency claims are justified now without turning direct syntax, finite replay samples, or definition opening into a stronger semantics than MTS currently accepts?",
+  "evidence": {
+    "directDeixis": "#157 shows ContextPronoun occurrence is a source-span-independent typed-AST fact",
+    "finiteReplay": "#157 shows one explicit context pair can witness sensitivity while equal results on finitely many frames establish only finite-domain observational invariance",
+    "definitionClosure": "#157 builds a terminating DefinitionId graph only by explicit open_definition calls; current interpret_constraints never performs that traversal automatically",
+    "interpreterBoundary": "the interpreter is a link but only its explicit ContextFrame projection enters current evaluation semantics"
+  },
+  "models": [
+    {
+      "id": "A",
+      "name": "no-direct-pronoun-means-universal-context-invariance",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Absence of ContextPronoun is a local typed-AST fact. Future accepted composition or explicitly opened definitions may carry context dependence, and no universal quantification over contexts has been justified."
+    },
+    {
+      "id": "B",
+      "name": "finite-replay-sampling-proves-universal-context-invariance",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Equal replay on a finite serialized context set proves only observational invariance on that declared set."
+    },
+    {
+      "id": "C",
+      "name": "typed-direct-deixis-plus-scoped-observational-evidence",
+      "verdict": "preferred-candidate",
+      "accepted": false,
+      "reason": "Expose direct typed-AST deixis as a precise static fact; keep replay sensitivity/invariance explicitly scoped to its context domain; never silently promote either to universal theoremhood."
+    },
+    {
+      "id": "D",
+      "name": "definition-opening-closure-is-current-evaluation-semantics",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "open_definition is an accepted separate one-step operation and interpret_constraints does not automatically open or recursively evaluate definitions."
+    },
+    {
+      "id": "E",
+      "name": "definition-dependency-is-separate-static-relation",
+      "verdict": "defer",
+      "accepted": false,
+      "reason": "A finite DefinitionId dependency graph is technically viable, but its normative meaning must be coordinated with accepted composition/dependency semantics rather than masquerading as current evaluation."
+    }
+  ],
+  "preferredCandidate": {
+    "directAnalysis": {
+      "relation": "DirectDeictic(expression)",
+      "meaning": "the typed AST contains at least one ContextPronoun occurrence",
+      "resultMayInclude": [
+        "occurrence path",
+        "parent ascent depth",
+        "context pole"
+      ],
+      "sourceSpanPartOfIdentity": false,
+      "displayTextPartOfIdentity": false,
+      "readsMemory": false,
+      "readsInterpreterIdentity": false,
+      "impliesContextSensitivity": false,
+      "negationImpliesUniversalInvariance": false
+    },
+    "replayEvidence": {
+      "sensitivity": "different canonical replay result for the same non-context inputs on an explicitly named pair/domain of ContextFrames",
+      "finiteDomainInvariance": "equal canonical replay result for all explicitly named frames in one finite domain",
+      "universalInvarianceAccepted": false,
+      "resultEquality": "success + grounded holes + aliases; trace remains diagnostic"
+    },
+    "unknown": {
+      "requiredWhen": [
+        "a claimed dependency requires unaccepted composition semantics",
+        "a referenced definition/dependency cannot be resolved under the declared analysis substrate",
+        "finite replay evidence is being asked to justify an unbounded invariance claim"
+      ],
+      "mustNotBeCollapsedIntoInvariant": true,
+      "mustNotBeCollapsedIntoSensitive": true
+    }
+  },
+  "definitionBoundary": {
+    "candidateDependencyGraphUsesCanonicalOpening": true,
+    "graphIdentity": "DefinitionId(scopePath,ordinal)",
+    "cyclesRemainFinite": true,
+    "graphTraversalIsCurrentInterpretSemantics": false,
+    "openingImpliesEvaluation": false,
+    "openingImpliesEquality": false,
+    "normativeIndirectDependencyAcceptedHere": false,
+    "coordinationIssue": 122
+  },
+  "interpreterBoundary": {
+    "interpreterIsALink": true,
+    "interpreterLinkIdentityIsImplicitEvalInput": false,
+    "explicitContextFrameIsCurrentSemanticBoundary": true,
+    "securityPolicyDefinesEffect": false,
+    "separateSubjectConceptRequired": false
+  },
+  "proofBoundary": {
+    "ContextInvariantTrustedRelationAccepted": false,
+    "DirectDeicticTrustedRelationAccepted": false,
+    "finiteReplayEvidenceAutomaticallyTheorem": false,
+    "proofV03Modified": false,
+    "futureProofUseRequiresSeparateLiftingOrRuleAcceptance": true
+  },
+  "productionCandidateForNextGate": {
+    "scope": "read-only direct typed-AST deictic analysis only",
+    "mayReturnNoDirectDeictic": true,
+    "mayReturnUniversalContextInvariant": false,
+    "mayTraverseDefinitionEnvironment": false,
+    "mayReadMemory": false,
+    "mayReadInterpreterIdentity": false,
+    "mustHaveLanguageNeutralConformance": true
+  },
+  "stillRejectedOrDeferred": [
+    "no pronoun => universal context invariance",
+    "finite sampling => universal context invariance",
+    "implicit definition unfolding during interpret",
+    "definition opening => equality",
+    "definition opening => evaluation",
+    "hidden interpreter/session/policy dependency",
+    "global textual substitution",
+    "recursive textual normalization",
+    "trusted ContextInvariant proof relation",
+    "trusted generic dependency composition"
+  ],
+  "nextGate": {
+    "artifact": "mts-direct-deixis-challenge/v0.5",
+    "status": "candidate-challenge",
+    "mustNotChangeInterpretSemantics": true,
+    "mustNotChangeProofSemantics": true,
+    "requiredQuestions": [
+      "exact typed traversal over every current AST node",
+      "stable occurrence paths independent of SourceSpan/whitespace",
+      "whether Definition target and RHS are both traversed when analyzing a Definition AST itself",
+      "deterministic ordering of multiple pronouns",
+      "round/grouping path behavior",
+      "proof that the operation reads no MemoryView, DefinitionEnvironment, interpreter identity or policy",
+      "portable conformance vectors for zero/one/multiple/current/parent pronouns"
+    ]
+  }
+}
