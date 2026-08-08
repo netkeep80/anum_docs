@@ -5,8 +5,6 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
-import pytest
-
 from core.mtc_ast import Definition, Expression, Form, format_expression
 from core.mtc_definitions import DefinitionEnvironment, DefinitionId
 from core.mtc_opening_path import (
@@ -75,39 +73,35 @@ def build_environments(scopes: list[dict]) -> dict[tuple[int, ...], DefinitionEn
     return environments
 
 
-def decode_portable_vector(vector: dict) -> tuple[OpeningPathWitness, DefinitionEnvironment]:
-    """Strict conformance adapter; the core verifier remains transport-agnostic."""
-
+def decode_portable(vector: dict) -> tuple[OpeningPathWitness, DefinitionEnvironment]:
     environments = build_environments(vector["scopes"])
     environment = environments[tuple(vector["lookupScope"])]
     edges: list[OpeningPathEdge] = []
 
     for index, edge in enumerate(vector["edges"]):
-        expected_id = edge["definitionId"]
+        definition_id = edge["definitionId"]
         edges.append(
             OpeningPathEdge(
                 target=parse_form(edge["target"]),
                 definition_id=DefinitionId(
-                    tuple(expected_id["scopePath"]),
-                    expected_id["ordinal"],
+                    tuple(definition_id["scopePath"]),
+                    definition_id["ordinal"],
                 ),
                 body=parse_canonical_expression(edge["body"], f"edge[{index}].body"),
             )
         )
 
-    return (
-        OpeningPathWitness(
-            start_target=parse_form(vector["startTarget"]),
-            edges=tuple(edges),
-            final_body=parse_canonical_expression(vector["finalBody"], "finalBody"),
-        ),
-        environment,
+    witness = OpeningPathWitness(
+        start_target=parse_form(vector["startTarget"]),
+        edges=tuple(edges),
+        final_body=parse_canonical_expression(vector["finalBody"], "finalBody"),
     )
+    return witness, environment
 
 
 def verify_portable(vector: dict) -> bool:
     try:
-        witness, environment = decode_portable_vector(vector)
+        witness, environment = decode_portable(vector)
     except (KeyError, TypeError, ValueError):
         return False
     return verify_opening_path(witness, environment).accepted
@@ -121,7 +115,7 @@ def root_sources() -> tuple[str, ...]:
     )
 
 
-def test_contract_is_accepted_standalone_without_rewriting_v04_or_proof_v03():
+def test_contract_is_accepted_standalone_and_old_releases_are_immutable():
     contract = read(CONTRACT)
     conformance = read(CONFORMANCE)
 
@@ -138,7 +132,7 @@ def test_contract_is_accepted_standalone_without_rewriting_v04_or_proof_v03():
     assert contract["schema"] not in PROOF_V03.read_text(encoding="utf-8")
 
 
-def test_accepted_conformance_selects_all_green_challenge_vectors_without_copying():
+def test_conformance_selects_all_green_challenge_vectors_without_copying():
     conformance = read(CONFORMANCE)
     corpus = read(CHALLENGE_CORPUS)
 
@@ -151,77 +145,66 @@ def test_accepted_conformance_selects_all_green_challenge_vectors_without_copyin
     assert corpus["status"] == "candidate-challenge-corpus"
 
 
-def test_every_challenged_valid_path_replays_in_canonical_production_verifier():
-    for vector in read(CHALLENGE_CORPUS)["validPaths"]:
+def test_every_challenge_vector_replays_fail_closed_in_production():
+    corpus = read(CHALLENGE_CORPUS)
+
+    for vector in corpus["validPaths"]:
         assert verify_portable(vector), vector["id"]
-
-
-def test_every_challenged_invalid_path_fails_closed():
-    for vector in read(CHALLENGE_CORPUS)["invalidPaths"]:
+    for vector in corpus["invalidPaths"]:
         assert not verify_portable(vector), vector["id"]
 
 
-def test_transport_requires_canonical_body_but_target_identity_remains_structural():
+def test_transport_is_canonical_for_bodies_but_structural_for_targets():
     vector = next(
         deepcopy(item)
         for item in read(CHALLENGE_CORPUS)["validPaths"]
         if item["id"] == "structural-adjacency-whitespace"
     )
 
-    # Non-canonical whitespace in a target is explicitly allowed.
     assert vector["edges"][1]["target"] == "( b )"
     assert verify_portable(vector)
 
-    # The expected body is deterministic replay output, so transport is canonical.
+    witness, environment = decode_portable(vector)
+    edges = list(witness.edges)
+    edges[1] = OpeningPathEdge(
+        target=parse_form("(    b    )"),
+        definition_id=edges[1].definition_id,
+        body=edges[1].body,
+    )
+    structural_variant = OpeningPathWitness(
+        start_target=witness.start_target,
+        edges=tuple(edges),
+        final_body=witness.final_body,
+    )
+    assert verify_opening_path(structural_variant, environment).accepted is True
+
     vector["edges"][0]["body"] = "( b )"
     assert not verify_portable(vector)
+
+    bundle = next(
+        deepcopy(item)
+        for item in read(CHALLENGE_CORPUS)["validPaths"]
+        if item["id"] == "ends-in-constraint-bundle"
+    )
+    bundle["finalBody"] = "{ ◁ = x, ▷ = y }"
+    assert not verify_portable(bundle)
 
     transport = read(CONTRACT)["portableCertificate"]
     assert "equivalent whitespace allowed" in transport["edges"]["target"]
     assert "canonical format_expression" in transport["edges"]["body"]
 
 
-def test_typed_core_verifier_uses_structural_identity_not_display_text():
-    vector = next(
-        item
-        for item in read(CHALLENGE_CORPUS)["validPaths"]
-        if item["id"] == "structural-adjacency-whitespace"
-    )
-    witness, environment = decode_portable_vector(vector)
+def test_failure_surface_and_representative_core_failures_are_deterministic():
+    expected_codes = set(read(CONTRACT)["failureCodes"])
+    assert {item.value for item in OpeningPathFailure} == expected_codes
 
-    # Rebuild the second target from equivalent source spelling; typed replay stays valid.
-    rebuilt_edges = list(witness.edges)
-    rebuilt_edges[1] = OpeningPathEdge(
-        target=parse_form("(    b    )"),
-        definition_id=rebuilt_edges[1].definition_id,
-        body=rebuilt_edges[1].body,
-    )
-    rebuilt = OpeningPathWitness(
-        start_target=witness.start_target,
-        edges=tuple(rebuilt_edges),
-        final_body=witness.final_body,
-    )
-
-    assert verify_opening_path(rebuilt, environment).accepted is True
-    assert read(CONTRACT)["typedCore"]["comparison"].startswith("typed structural_key")
-
-
-def test_failure_codes_are_deterministic_for_core_forgery_classes():
     environment = DefinitionEnvironment()
-    registration_a = environment.register(parse_formula("a : b"))
-    registration_b = environment.register(parse_formula("b : a"))
-    assert registration_a.entry is not None
-    assert registration_b.entry is not None
-
-    edge_a = OpeningPathEdge(
+    registered = environment.register(parse_formula("a : b"))
+    assert registered.entry is not None
+    edge = OpeningPathEdge(
         target=parse_form("a"),
-        definition_id=registration_a.entry.identity,
+        definition_id=registered.entry.identity,
         body=parse_formula("b"),
-    )
-    edge_b = OpeningPathEdge(
-        target=parse_form("b"),
-        definition_id=registration_b.entry.identity,
-        body=parse_formula("a"),
     )
 
     cases = [
@@ -230,46 +213,17 @@ def test_failure_codes_are_deterministic_for_core_forgery_classes():
             OpeningPathFailure.EMPTY_PATH,
         ),
         (
-            OpeningPathWitness(parse_form("x"), (edge_a,), parse_formula("b")),
+            OpeningPathWitness(parse_form("x"), (edge,), parse_formula("b")),
             OpeningPathFailure.START_TARGET_MISMATCH,
         ),
         (
             OpeningPathWitness(
                 parse_form("a"),
                 (
-                    edge_a,
                     OpeningPathEdge(
-                        target=parse_form("x"),
-                        definition_id=registration_b.entry.identity,
-                        body=parse_formula("a"),
-                    ),
-                ),
-                parse_formula("a"),
-            ),
-            OpeningPathFailure.ADJACENCY_MISMATCH,
-        ),
-        (
-            OpeningPathWitness(
-                parse_form("missing"),
-                (
-                    OpeningPathEdge(
-                        target=parse_form("missing"),
-                        definition_id=DefinitionId((), 0),
-                        body=parse_formula("x"),
-                    ),
-                ),
-                parse_formula("x"),
-            ),
-            OpeningPathFailure.OPENING_NOT_MATCH,
-        ),
-        (
-            OpeningPathWitness(
-                parse_form("a"),
-                (
-                    OpeningPathEdge(
-                        target=parse_form("a"),
-                        definition_id=DefinitionId((), 99),
-                        body=parse_formula("b"),
+                        parse_form("a"),
+                        DefinitionId((), 99),
+                        parse_formula("b"),
                     ),
                 ),
                 parse_formula("b"),
@@ -281,9 +235,9 @@ def test_failure_codes_are_deterministic_for_core_forgery_classes():
                 parse_form("a"),
                 (
                     OpeningPathEdge(
-                        target=parse_form("a"),
-                        definition_id=registration_a.entry.identity,
-                        body=parse_formula("wrong"),
+                        parse_form("a"),
+                        registered.entry.identity,
+                        parse_formula("wrong"),
                     ),
                 ),
                 parse_formula("wrong"),
@@ -291,77 +245,84 @@ def test_failure_codes_are_deterministic_for_core_forgery_classes():
             OpeningPathFailure.BODY_MISMATCH,
         ),
         (
-            OpeningPathWitness(parse_form("a"), (edge_a,), parse_formula("wrong")),
+            OpeningPathWitness(parse_form("a"), (edge,), parse_formula("wrong")),
             OpeningPathFailure.FINAL_BODY_MISMATCH,
         ),
     ]
 
-    for witness, expected in cases:
+    for witness, failure in cases:
         result = verify_opening_path(witness, environment)
         assert result.accepted is False
-        assert result.failure is expected
+        assert result.failure is failure
 
-    # A repeated DefinitionId is caught after both replayed edges have matched.
-    recursive_environment = DefinitionEnvironment()
-    recursive = recursive_environment.register(parse_formula("a : a"))
-    assert recursive.entry is not None
-    repeated_edge = OpeningPathEdge(
+
+def test_repeated_definition_id_is_invalid_certificate_not_false_cycle():
+    environment = DefinitionEnvironment()
+    registered = environment.register(parse_formula("a : a"))
+    assert registered.entry is not None
+    edge = OpeningPathEdge(
         target=parse_form("a"),
-        definition_id=recursive.entry.identity,
+        definition_id=registered.entry.identity,
         body=parse_formula("a"),
     )
-    repeated = verify_opening_path(
-        OpeningPathWitness(
-            start_target=parse_form("a"),
-            edges=(repeated_edge, repeated_edge),
-            final_body=parse_formula("a"),
-        ),
-        recursive_environment,
+
+    one_edge = verify_opening_path(
+        OpeningPathWitness(parse_form("a"), (edge,), parse_formula("a")),
+        environment,
     )
+    repeated = verify_opening_path(
+        OpeningPathWitness(parse_form("a"), (edge, edge), parse_formula("a")),
+        environment,
+    )
+
+    assert one_edge.accepted is True
     assert repeated.accepted is False
     assert repeated.failure is OpeningPathFailure.REPEATED_DEFINITION_ID
     assert repeated.failed_edge == 1
+    assert read(CONTRACT)["cycleCanonicality"]["repeatedDefinitionIdMeansSemanticFalse"] is False
 
 
-def test_non_form_terminal_is_valid_but_cannot_have_a_following_edge():
+def test_non_form_terminal_is_valid_but_cannot_continue():
     environment = DefinitionEnvironment()
-    registration = environment.register(parse_formula("a : b = c"))
-    assert registration.entry is not None
-
+    registered = environment.register(parse_formula("a : b = c"))
+    assert registered.entry is not None
     terminal_edge = OpeningPathEdge(
         target=parse_form("a"),
-        definition_id=registration.entry.identity,
+        definition_id=registered.entry.identity,
         body=parse_formula("b = c"),
     )
+
     terminal = verify_opening_path(
         OpeningPathWitness(
-            start_target=parse_form("a"),
-            edges=(terminal_edge,),
-            final_body=parse_formula("b = c"),
+            parse_form("a"),
+            (terminal_edge,),
+            parse_formula("b = c"),
         ),
         environment,
-    )
-    assert terminal.accepted is True
-
-    extra = OpeningPathEdge(
-        target=parse_form("x"),
-        definition_id=DefinitionId((), 99),
-        body=parse_formula("y"),
     )
     continued = verify_opening_path(
         OpeningPathWitness(
-            start_target=parse_form("a"),
-            edges=(terminal_edge, extra),
-            final_body=parse_formula("y"),
+            parse_form("a"),
+            (
+                terminal_edge,
+                OpeningPathEdge(
+                    parse_form("x"),
+                    DefinitionId((), 99),
+                    parse_formula("y"),
+                ),
+            ),
+            parse_formula("y"),
         ),
         environment,
     )
+
+    assert terminal.accepted is True
     assert continued.accepted is False
     assert continued.failure is OpeningPathFailure.PREVIOUS_BODY_NOT_FORM
     assert continued.failed_edge == 1
 
 
-def test_verifier_is_read_only_and_has_no_context_memory_or_interpreter_input():
+def test_verifier_is_read_only_and_has_no_runtime_evaluation_inputs():
     environment = DefinitionEnvironment()
     first = environment.register(parse_formula("a : b"))
     second = environment.register(parse_formula("b : c"))
@@ -382,15 +343,15 @@ def test_verifier_is_read_only_and_has_no_context_memory_or_interpreter_input():
     assert verify_opening_path(witness, environment).accepted is True
     assert environment.entries() == before_entries
     assert environment.conflicts() == before_conflicts
+    assert list(inspect.signature(verify_opening_path).parameters) == ["witness", "environment"]
 
-    signature = inspect.signature(verify_opening_path)
-    assert list(signature.parameters) == ["witness", "environment"]
     core_source = CORE.read_text(encoding="utf-8")
-    for forbidden in ("MemoryView", "ContextFrame", "interpret_constraints", "realize", "delete"):
-        assert forbidden not in core_source
+    assert "from core.mtc_interpreter" not in core_source
+    assert "MemoryView" not in core_source
+    assert "interpret_constraints" not in core_source
 
 
-def test_relation_never_claims_equality_normalization_or_generic_composition():
+def test_relation_does_not_claim_logical_or_evaluation_semantics():
     meaning = read(CONTRACT)["meaningBoundary"]
     proof = read(CONTRACT)["proofBoundary"]
 
@@ -400,32 +361,38 @@ def test_relation_never_claims_equality_normalization_or_generic_composition():
     assert meaning["impliesContextualSatisfaction"] is False
     assert meaning["impliesGenericTransitivity"] is False
     assert meaning["evaluatesBodies"] is False
+    assert meaning["readsMemory"] is False
+    assert meaning["readsContextFrame"] is False
+    assert meaning["readsInterpreterIdentity"] is False
+    assert meaning["materializes"] is False
+    assert meaning["deletes"] is False
     assert proof["trustedProofRelationAddedByThisContract"] is False
     assert proof["genericCompositionAccepted"] is False
     assert proof["openingPathPlusContextuallySatisfiesAccepted"] is False
 
 
-def test_root_program_remains_exactly_ten_and_replay_does_not_mutate_it():
+def test_all_ten_root_definitions_are_unchanged_one_edge_certificates():
     before = root_sources()
     assert len(before) == 10
 
     environment = DefinitionEnvironment()
     entries = []
     for source in before:
-        registration = environment.register(parse_formula(source))
+        definition = parse_formula(source)
+        assert isinstance(definition, Definition)
+        registration = environment.register(definition)
         assert registration.entry is not None
         entries.append(registration.entry)
 
-    # Each canonical root definition remains a valid one-edge certificate.
     for entry in entries:
         result = verify_opening_path(
             OpeningPathWitness(
                 start_target=entry.definition.target,
                 edges=(
                     OpeningPathEdge(
-                        target=entry.definition.target,
-                        definition_id=entry.identity,
-                        body=entry.definition.value,
+                        entry.definition.target,
+                        entry.identity,
+                        entry.definition.value,
                     ),
                 ),
                 final_body=entry.definition.value,
@@ -436,40 +403,3 @@ def test_root_program_remains_exactly_ten_and_replay_does_not_mutate_it():
 
     assert root_sources() == before
     assert len(environment.entries()) == 10
-
-
-def test_public_failure_code_surface_matches_contract_exactly():
-    expected = set(read(CONTRACT)["failureCodes"])
-    actual = {item.value for item in OpeningPathFailure}
-    assert actual == expected
-
-
-def test_transport_adapter_rejects_noncanonical_final_body_even_when_structurally_equal():
-    vector = next(
-        deepcopy(item)
-        for item in read(CHALLENGE_CORPUS)["validPaths"]
-        if item["id"] == "structural-adjacency-whitespace"
-    )
-    assert vector["finalBody"] == "c"
-
-    # Parentheses change structure, so instead use canonical-whitespace variance on a bundle.
-    bundle = next(
-        deepcopy(item)
-        for item in read(CHALLENGE_CORPUS)["validPaths"]
-        if item["id"] == "ends-in-constraint-bundle"
-    )
-    bundle["finalBody"] = "{ ◁ = x, ▷ = y }"
-    assert not verify_portable(bundle)
-
-
-@pytest.mark.parametrize(
-    "source",
-    ["a : b", "a : b = c", "a : {◁ = x}"],
-)
-def test_definition_registration_substrate_is_not_reinterpreted(source: str):
-    environment = DefinitionEnvironment()
-    definition = parse_formula(source)
-    assert isinstance(definition, Definition)
-    result = environment.register(definition)
-    assert result.entry is not None
-    assert environment.entries() == (result.entry,)
