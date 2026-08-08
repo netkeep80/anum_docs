@@ -1,0 +1,129 @@
+{
+  "schema": "mts-proof/v0.3",
+  "status": "accepted",
+  "accepted": true,
+  "issue": 147,
+  "dependsOn": [
+    "mts-contract/v0.3",
+    "mts-derivation-base/v0.3",
+    "mts-proof/v0.2"
+  ],
+  "conformanceCorpus": "contracts/mts-proof-conformance-v0.3.json",
+  "purpose": "Trusted independent replay of the five accepted base derivation relations; no multi-step composition or proof-search semantics.",
+  "proofObject": {
+    "required": ["proofVersion", "contractVersion", "judgments"],
+    "proofVersion": "mts-proof/v0.3",
+    "contractVersion": "mts-contract/v0.3",
+    "judgments": "ordered BaseJudgment[]; ordering is artifact order only and has no inference/composition meaning"
+  },
+  "trustedRelations": [
+    "ContextuallySatisfies",
+    "Opens",
+    "NoVisibleDefinition",
+    "DefinitionConflict",
+    "NonAddressableDefinitionTarget"
+  ],
+  "contextuallySatisfies": {
+    "required": ["relation", "expression", "context", "symbols", "memory", "expected"],
+    "context": {
+      "start": "LinkRef",
+      "end": "LinkRef",
+      "parent": "optional recursive explicit ContextFrame"
+    },
+    "expected": {
+      "substitutions": "exact sorted array of {path:int[],link:LinkRef}",
+      "aliases": "exact sorted array of {path:int[],targetPath:int[]}"
+    },
+    "replay": "canonical interpret_constraints with success required to be true",
+    "globalTruth": false,
+    "hiddenInterpreterIdentity": false,
+    "subjectOrFocusIdentity": false,
+    "materializes": false
+  },
+  "definitionEnvironment": {
+    "scope": {
+      "required": ["path", "parent", "definitions"],
+      "path": "non-negative int[]",
+      "parent": "null for root or exact parent path",
+      "definitions": "ordered canonical L2 Definition source strings"
+    },
+    "scopeOrder": "canonical order by (path length, lexicographic path)",
+    "rootScopeRequired": true,
+    "duplicateScopeRejected": true,
+    "hiddenRootInjection": false,
+    "definitionId": "replay-local DefinitionId(scopePath, successful registration ordinal)",
+    "sourceSpanIdentity": false,
+    "persistentIdentity": false
+  },
+  "opens": {
+    "required": ["relation", "scopes", "lookupScope", "target", "expected"],
+    "expected": {
+      "definitionId": {"scopePath": "int[]", "ordinal": "non-negative int"},
+      "body": "exact canonical format_expression output"
+    },
+    "replay": "open_definition exactly once and require kind=match",
+    "impliesEquality": false,
+    "evaluatesRhs": false,
+    "materializes": false
+  },
+  "noVisibleDefinition": {
+    "required": ["relation", "scopes", "lookupScope", "target"],
+    "replay": "open_definition exactly once and require kind=no-match",
+    "globalAbsence": false,
+    "closedWorldBeyondSnapshot": false
+  },
+  "definitionConflict": {
+    "required": ["relation", "scopes", "lookupScope", "target"],
+    "replay": "open_definition exactly once and require kind=conflict",
+    "impliesBodyEquality": false
+  },
+  "nonAddressableDefinitionTarget": {
+    "required": ["relation", "target"],
+    "replay": "open_definition against a fresh empty DefinitionEnvironment and require kind=non-addressable",
+    "globalSemanticInvalidity": false
+  },
+  "checker": {
+    "module": "core/proof_checker.py",
+    "singleTrustedModuleForV02AndV03": true,
+    "replaysCanonicalInterpreter": true,
+    "replaysCanonicalDefinitionOpening": true,
+    "trustsSerializedExpectedResultWithoutReplay": false,
+    "mayReadAmbientInterpreterState": false,
+    "mayInjectCanonicalRootDefinitions": false,
+    "mayMaterialize": false,
+    "mayDelete": false,
+    "unknownRelationRejected": true,
+    "wrongOrMissingVersionRejected": true,
+    "unexpectedFieldsRejected": true
+  },
+  "compositionBoundary": {
+    "judgmentOrderImpliesDependency": false,
+    "genericCompositionAccepted": false,
+    "transitivityAccepted": false,
+    "symmetryAccepted": false,
+    "congruenceAccepted": false,
+    "modusPonensAccepted": false,
+    "globalSubstitutionAccepted": false,
+    "openingToEqualityAccepted": false,
+    "recursiveNormalizationAccepted": false
+  },
+  "v02Compatibility": {
+    "mtsProofV02Modified": false,
+    "mtsProofV02Schema": "mts-proof/v0.2",
+    "mtsProofV02ContractVersion": "mts-contract/v0.2",
+    "mtsProofV02TrustedRuleSet": ["interpret"],
+    "existingV02ArtifactsReplayedByExistingApi": true,
+    "retroactiveReinterpretation": false
+  },
+  "contextVersionBoundary": {
+    "explicitContextFrameOnly": true,
+    "subjectFocusResearchIssue": 148,
+    "subjectOrFocusAddedToV03Artifact": false,
+    "futureContextSemanticsMustUseAdditiveContract": true
+  },
+  "downstream": {
+    "proofSemanticsAccepted": true,
+    "aproverRepinAllowedDirectlyFromMtsContractV03": false,
+    "reason": "mts-contract/v0.3 is immutable and predates mts-proof/v0.3 publication; downstream repin requires a later additive umbrella contract"
+  }
+}
