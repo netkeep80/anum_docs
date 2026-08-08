@@ -1,0 +1,183 @@
+{
+  "schema": "mts-definition-environment-decision/v0.3",
+  "status": "candidate-decision",
+  "dependsOn": [
+    "mts-contract/v0.2",
+    "mts-definition-resolution-challenge/v0.3"
+  ],
+  "issue": 121,
+  "acceptedContractLinkAllowed": false,
+  "productionInterpreterChangeAllowed": false,
+  "purpose": "Choose a typed identity/scope model for controlled definition lookup and finite recursion before any accepted MTS v0.3 semantics.",
+  "nonNormativeUntil": "A separate versioned semantic contract and cross-language conformance corpus are accepted and linked from mts-contract.",
+  "preservedBoundaries": {
+    "colonIsDefinitionIntroductionNotAssignment": true,
+    "definitionResolutionIsEquality": false,
+    "definitionResolutionIsProofStep": false,
+    "definitionResolutionMayRealize": false,
+    "definitionResolutionMayDelete": false,
+    "globalTextualSubstitution": false,
+    "eagerRecursiveNormalization": false,
+    "rootDefinitionsMustRemainUnchanged": true,
+    "currentProductionDifferenceRegistryRemainsUntouchedByThisDecision": true
+  },
+  "identityModels": [
+    {
+      "id": "A",
+      "name": "canonical-display-string-as-definition-identity",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "Formatting is presentation. Equal-looking occurrences must not become one semantic introduction merely because they print the same way."
+    },
+    {
+      "id": "B",
+      "name": "source-span-as-definition-identity",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "SourceSpan is provenance/debug data and changes under harmless source edits."
+    },
+    {
+      "id": "C",
+      "name": "target-structural-key-as-definition-identity",
+      "verdict": "reject-as-identity-keep-as-lookup-key",
+      "accepted": false,
+      "reason": "A source-span-independent structural target key is useful for deterministic lookup but it identifies the requested target shape, not the introduction event. Child scopes may intentionally introduce the same target key with a distinct identity."
+    },
+    {
+      "id": "D",
+      "name": "resolved-L1-link-as-definition-identity",
+      "verdict": "reject-for-L2-environment",
+      "accepted": false,
+      "reason": "Definition lookup must remain possible without L4 reads or materialization and before the target has an L1 realization."
+    },
+    {
+      "id": "E",
+      "name": "scoped-introduction-id-plus-structural-lookup-key",
+      "verdict": "preferred-candidate",
+      "accepted": false,
+      "reason": "Separates introduction identity from target matching, permits finite recursive state keyed by introduction identity, and keeps provenance non-semantic.",
+      "definitionId": {
+        "shape": "DefinitionId(scopeId, ordinal)",
+        "meaning": "deterministic replay-local identity of one registered introduction",
+        "persistentStorageIdentity": false,
+        "derivedFromDisplayText": false,
+        "derivedFromSourceSpan": false,
+        "derivedFromL1LinkRef": false
+      },
+      "targetKey": {
+        "shape": "source-span-independent typed target structure",
+        "role": "lookup discriminant only",
+        "semanticEquality": false,
+        "runtimeIdentity": false,
+        "note": "The current Python structural_key helper is a suitable challenge instrument only because it is explicitly not semantic equality."
+      },
+      "provenance": {
+        "mayContain": [
+          "source path",
+          "line number",
+          "AST occurrence path",
+          "source span"
+        ],
+        "participatesInDefinitionIdentity": false,
+        "participatesInTargetLookup": false
+      }
+    }
+  ],
+  "scopeModel": {
+    "verdict": "preferred-candidate",
+    "accepted": false,
+    "kind": "explicit-lexical-scope-tree",
+    "scopeId": "deterministic replay-local scope identity",
+    "sameScopeDuplicateTargetPolicy": "conflict",
+    "childScopeSameTargetPolicy": "explicit-shadowing",
+    "lookupOrder": "current scope then lexical parents",
+    "lookupResult": "nearest matching DefinitionId or no-match",
+    "implicitGlobalScopeFromSpelling": false,
+    "contextFrameIsDefinitionScope": false,
+    "reason": "ContextFrame is a binary interpretation-role environment, not a symbol table. Definition scope must be explicit so context pronouns never become global variables by accident."
+  },
+  "contextModel": {
+    "definitionLookupDependsOnContextFrame": false,
+    "definitionLookupMayReadContextPoles": false,
+    "resolvedBodyInterpretationMayUseCallerContextFrame": true,
+    "resolvedBodyInterpretationRuleAccepted": false,
+    "note": "This decision only chooses lookup separation. How a resolved body is interpreted against the caller/introduced context remains a challenge gate."
+  },
+  "duplicateAndShadowingExamples": [
+    {
+      "scopes": [
+        {"id": "root", "definitions": ["a : b", "a : c"]}
+      ],
+      "result": "same-scope-conflict"
+    },
+    {
+      "scopes": [
+        {"id": "root", "definitions": ["a : b"]},
+        {"id": "root/0", "parent": "root", "definitions": ["a : c"]}
+      ],
+      "lookup": {"scope": "root/0", "target": "a"},
+      "result": "child-definition-id"
+    },
+    {
+      "scopes": [
+        {"id": "root", "definitions": ["a : b"]},
+        {"id": "root/0", "parent": "root", "definitions": []}
+      ],
+      "lookup": {"scope": "root/0", "target": "a"},
+      "result": "root-definition-id"
+    }
+  ],
+  "finiteRecursionModel": {
+    "verdict": "preferred-candidate",
+    "accepted": false,
+    "stateKey": "DefinitionId",
+    "activeState": "ordered stack of DefinitionId",
+    "completedState": "set of DefinitionId",
+    "repeatActiveDefinition": "emit explicit cycle reference to the active DefinitionId",
+    "repeatCompletedDefinition": "reuse completed graph node",
+    "termination": "finite for a finite registered DefinitionEnvironment graph",
+    "textualUnfolding": false,
+    "normalFormRequired": false,
+    "importantBoundary": "Dependency/form matching that creates graph edges is not accepted by this decision; only the identity of graph states is chosen."
+  },
+  "resolutionResultCandidate": {
+    "variants": [
+      "match(definitionId, body, provenance)",
+      "no-match(targetKey)",
+      "conflict(targetKey, definitionIds)",
+      "cycle-ref(definitionId)"
+    ],
+    "returnsEquality": false,
+    "returnsProofArtifact": false,
+    "mutatesMemory": false,
+    "rewritesCallerAst": false
+  },
+  "negativeVetoes": [
+    "same printed target means same DefinitionId",
+    "SourceSpan determines DefinitionId",
+    "ContextFrame doubles as definition symbol table",
+    "successful lookup implies A = F",
+    "successful lookup rewrites all A occurrences",
+    "definition lookup realizes missing L4 links",
+    "cycle handling recursively expands until a normal form appears"
+  ],
+  "nextGate": {
+    "artifact": "mts-definition-environment-challenge/v0.3",
+    "status": "candidate-challenge",
+    "mustNotChangeProductionSemantics": true,
+    "requiredVectors": [
+      "all ten canonical root definitions register with ten distinct DefinitionId values",
+      "same structural target in one scope is conflict",
+      "same structural target in child scope has distinct DefinitionId and explicit nearest-scope shadowing",
+      "lookup falls back to lexical parent",
+      "display formatting and SourceSpan do not determine DefinitionId",
+      "structural target key is lookup-only and never semantic equality",
+      "nested ContextFrame does not affect definition lookup",
+      "self recursion emits cycle-ref by DefinitionId",
+      "mutual recursion emits finite cycle-ref graph by DefinitionId",
+      "missing target returns no-match",
+      "no L4 reads, realize or delete",
+      "deterministic replay for identical scope/registration order"
+    ]
+  }
+}
