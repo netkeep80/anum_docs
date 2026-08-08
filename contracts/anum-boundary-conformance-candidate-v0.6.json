@@ -1,0 +1,141 @@
+{
+  "schema": "anum-boundary-conformance-candidate/v0.6",
+  "status": "candidate-challenge-corpus",
+  "accepted": false,
+  "issue": 181,
+  "dependsOn": [
+    "mts-foundation-direction-decision/v0.6",
+    "mts-current-link-equality-decision/v0.6",
+    "anum-boundary-projection/v0.2",
+    "anum-recursive-denotation/v0.2"
+  ],
+  "candidateRootRefs": {
+    "R": 0,
+    "O": 1,
+    "C": 2,
+    "L": 3,
+    "U": 4,
+    "OO": 5,
+    "CC": 6
+  },
+  "candidatePairs": {
+    "R": [0, 0],
+    "O": [1, 0],
+    "C": [0, 2],
+    "L": [1, 2],
+    "U": [2, 1],
+    "OO": [1, 1],
+    "CC": [2, 2]
+  },
+  "rootMeanings": {
+    "∞": "R",
+    "([)": "O",
+    "(])": "C",
+    "(⟼)": "L",
+    "(↛)": "U"
+  },
+  "protocolProjection": [
+    {
+      "raw": "[",
+      "meaning": "O",
+      "kind": "boundary-anchor",
+      "protocolValue": null
+    },
+    {
+      "raw": "]",
+      "meaning": "C",
+      "kind": "boundary-anchor",
+      "protocolValue": null
+    },
+    {
+      "raw": "1",
+      "meaning": "L",
+      "kind": "protocol-value",
+      "protocolValue": "1",
+      "denotationAnchor": "protocol:1"
+    },
+    {
+      "raw": "0",
+      "meaning": "U",
+      "kind": "protocol-value",
+      "protocolValue": "0",
+      "denotationAnchor": "protocol:0"
+    }
+  ],
+  "specialBoundaryVectors": [
+    {
+      "raw": "[[",
+      "meaning": "OO",
+      "pair": ["O", "O"],
+      "protocolValue": null,
+      "recursiveDenotation": "raw"
+    },
+    {
+      "raw": "[]",
+      "meaning": "L",
+      "pair": ["O", "C"],
+      "protocolValue": "1",
+      "recursiveDenotation": "protocol:1"
+    },
+    {
+      "raw": "][",
+      "meaning": "U",
+      "pair": ["C", "O"],
+      "protocolValue": "0",
+      "recursiveDenotation": "protocol:0"
+    },
+    {
+      "raw": "]]",
+      "meaning": "CC",
+      "pair": ["C", "C"],
+      "protocolValue": null,
+      "recursiveDenotation": "raw"
+    }
+  ],
+  "protocolAnchorBindings": {
+    "protocol:1": "L",
+    "protocol:0": "U"
+  },
+  "historicalBridge": {
+    "oldOpenForm": "♀∞",
+    "oldCloseForm": "∞♂",
+    "candidateOpenForm": "([)",
+    "candidateCloseForm": "(])",
+    "individualOpenCarrierTopologyPreserved": true,
+    "individualCloseCarrierTopologyPreserved": true,
+    "compoundSharingTopologyPreserved": false,
+    "compoundSharingDifference": "historical engineering link_carrier copies operand carriers into disjoint occurrence spaces; candidate exact-pair root uses one shared R substrate",
+    "compoundSharingDifferenceIsL2EqualityDecision": false,
+    "reason": "carrier_isomorphic is explicitly an engineering topology check, not accepted L2 equality"
+  },
+  "recursiveCompatibility": {
+    "historicalCorpus": "contracts/anum-recursive-denotation-conformance-v0.2.json",
+    "rawGrammarChanged": false,
+    "specialBoundaryPrecedenceChanged": false,
+    "protocolAnchorNamesChanged": false,
+    "rootOpeningCollapseChanged": false,
+    "canonicalInverseChanged": false,
+    "occurrencePreservingNodePolicyChanged": false,
+    "quoteContextChanged": false,
+    "relativeContextChanged": false,
+    "memoryDependencyAdded": false,
+    "claim": "candidate changes how protocol anchors are derived from the root network, not the recursive occurrence-tree grammar"
+  },
+  "roundRootA2": {
+    "requiredForThisAnumBoundaryCorpus": false,
+    "removingA2ChangesROCLU": false,
+    "foundationNeedStillOpen": true
+  },
+  "expected": {
+    "candidatePairsAllExactUnique": true,
+    "candidateGraphFiniteClosed": true,
+    "openCloseDistinct": true,
+    "oneZeroDistinct": true,
+    "emptySquareAliasesOne": true,
+    "closeOpenAliasesZero": true,
+    "openOpenStaysRaw": true,
+    "closeCloseStaysRaw": true,
+    "allAcceptedRecursiveV02VectorsReplayUnchanged": true,
+    "allCanonicalRecursiveInversesReplayUnchanged": true
+  }
+}

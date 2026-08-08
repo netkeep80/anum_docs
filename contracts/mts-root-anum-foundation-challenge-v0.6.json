@@ -1,0 +1,136 @@
+{
+  "schema": "mts-root-anum-foundation-challenge/v0.6",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 181,
+  "dependsOn": [
+    "mts-foundation-direction-decision/v0.6",
+    "mts-current-link-equality-decision/v0.6",
+    "mts-constructor-destructor-foundation-challenge/v0.6",
+    "anum-boundary-projection/v0.2",
+    "anum-recursive-denotation/v0.2"
+  ],
+  "conformanceCorpus": "contracts/anum-boundary-conformance-candidate-v0.6.json",
+  "purpose": "Challenge a revised explicit root and Anum boundary under raw-pole destructor semantics while replaying all accepted recursive Anum v0.2 syntax/canonicality properties unchanged and explicitly classifying the root-sharing topology delta.",
+  "candidateRootSubset": [
+    "∞ : ∞ ⟼ ∞",
+    "([) : ([) ⟼ ∞",
+    "(]) : ∞ ⟼ (])",
+    "(⟼) : ([) ⟼ (])",
+    "(↛) : (]) ⟼ ([)",
+    "[1] : (⟼)",
+    "[0] : (↛)"
+  ],
+  "candidateCarrier": {
+    "R": "(R,R)",
+    "O": "(O,R)",
+    "C": "(R,C)",
+    "L": "(O,C)",
+    "U": "(C,O)",
+    "finite": true,
+    "closed": true,
+    "exactPairUnique": true
+  },
+  "boundaryDecisionUnderChallenge": {
+    "open": "([)",
+    "close": "(])",
+    "one": "(⟼)",
+    "zero": "(↛)",
+    "openPair": "O=(O,R)",
+    "closePair": "C=(R,C)",
+    "onePair": "L=(O,C)",
+    "zeroPair": "U=(C,O)",
+    "accepted": false
+  },
+  "specialBoundary": {
+    "[[": "Link(O,O), stays outside recursive grammar",
+    "[]": "Link(O,C)=L, aliases protocol:1",
+    "][": "Link(C,O)=U, aliases protocol:0",
+    "]]": "Link(C,C), stays outside recursive grammar"
+  },
+  "historicalCarrierComparison": {
+    "open": {
+      "historical": "start_carrier(root)",
+      "candidate": "O=(O,R)",
+      "exactRootedTopologyIsomorphic": true
+    },
+    "close": {
+      "historical": "end_carrier(root)",
+      "candidate": "C=(R,C)",
+      "exactRootedTopologyIsomorphic": true
+    },
+    "one": {
+      "historical": "link_carrier(start_carrier(root), end_carrier(root))",
+      "candidate": "L=(O,C) over one shared R",
+      "exactRootedTopologyIsomorphic": false,
+      "difference": "historical engineering helper preserves operand occurrences by copying them into disjoint spaces; candidate root gives O and C one shared semantic R"
+    },
+    "zero": {
+      "historical": "link_carrier(end_carrier(root), start_carrier(root))",
+      "candidate": "U=(C,O) over one shared R",
+      "exactRootedTopologyIsomorphic": false,
+      "difference": "same occurrence-copy versus shared-root distinction with reversed ordered poles"
+    },
+    "carrierIsomorphicIsL2Equality": false,
+    "sharingDeltaAutomaticallyRejected": false,
+    "sharingDeltaAutomaticallyAccepted": false,
+    "classification": "intentional foundation candidate delta; L3 recursive denotation is occurrence-preserving above opaque protocol anchors and does not inspect anchor-internal sharing"
+  },
+  "protocolAnchorBoundary": {
+    "protocol:1": "L",
+    "protocol:0": "U",
+    "anchorNamesChanged": false,
+    "anchorDerivationChanged": true,
+    "recursiveDenotationReadsAnchorInternalCarrier": false
+  },
+  "preservedRecursiveSemantics": {
+    "rawAlphabet": ["[", "]", "1", "0"],
+    "rootGrammarChanged": false,
+    "rootOpeningCollapseChanged": false,
+    "canonicalInverseChanged": false,
+    "specialBoundaryPrecedenceChanged": false,
+    "occurrencePreservingPostorderNodesChanged": false,
+    "explicitSharedNodeReferencesAccepted": false,
+    "quoteContextChanged": false,
+    "relativeContextChanged": false,
+    "memoryReadAdded": false,
+    "memoryMutationAdded": false,
+    "realizationAdded": false
+  },
+  "candidateInterpretation": {
+    "summary": "L3 raw syntax and recursive occurrence-tree denotation remain stable; only the root-level semantic construction of open/close/one/zero anchors is replaced by explicit ordinary links",
+    "acceptedAsFoundation": false,
+    "requiresNoNewRawAbit": true,
+    "requiresNoRecursiveGrammarFork": true
+  },
+  "roundFormA2": {
+    "requiredForCandidateAnumBoundary": false,
+    "removalWouldChangeROCLUCarrier": false,
+    "minimalRootDecisionDeferred": true
+  },
+  "effectsBoundary": {
+    "challengeReadsProductionL4ForExactPairParity": true,
+    "recursiveDenotationReadsL4": false,
+    "interpretMayRealize": false,
+    "implicitRealization": false,
+    "historicalContractsMutated": false,
+    "historicalRootFixtureMutated": false
+  },
+  "challengeQuestions": [
+    "Does the explicit R/O/C/L/U graph preserve the intended ordered open/close/link/unlink roles?",
+    "Do O and C reproduce the exact historical individual boundary carrier topologies?",
+    "Is the L/U shared-root topology delta explicit rather than silently treated as old carrier isomorphism?",
+    "Can every accepted recursive v0.2 corpus vector replay byte-for-byte at the raw/canonical boundary with protocol:0/1 anchor names unchanged?",
+    "Do [] and ][ retain protocol aliases while [[ and ]] remain outside recursive grammar?",
+    "Does any accepted recursive property require constructive ♀/♂ wrappers rather than opaque protocol anchors?",
+    "Is A2 () required by Anum after the explicit boundary roots exist?"
+  ],
+  "releaseVeto": {
+    "productionRootChangeAllowed": false,
+    "productionAnumChangeAllowed": false,
+    "acceptedContractLinkAllowed": false,
+    "aproverRepinAllowed": false,
+    "sharingDeltaMayBeHidden": false,
+    "nextGateAfterChallenge": "Gate A decision classifying preserved recursive semantics and the explicit shared-root boundary model"
+  }
+}
