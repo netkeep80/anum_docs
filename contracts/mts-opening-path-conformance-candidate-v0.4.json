@@ -72,7 +72,7 @@
     },
     {
       "id": "structural-adjacency-whitespace",
-      "scopes": [{"path": [], "parent": null, "definitions": ["a : (b)", "b : c"]}],
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : (b)", "(b) : c"]}],
       "lookupScope": [],
       "startTarget": "a",
       "edges": [
