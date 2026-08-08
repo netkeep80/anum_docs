@@ -1,4 +1,4 @@
-"""Typed data model for the L3 Anum protocol v0.1."""
+"""Typed data model for the contextual L3 Anum protocol v0.2."""
 
 from dataclasses import dataclass
 from enum import Enum

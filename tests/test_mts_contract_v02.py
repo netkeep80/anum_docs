@@ -10,6 +10,7 @@ from core.mtc_parser import parse_formula
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "contracts/mts-contract-v0.2.json"
 CONFORMANCE = ROOT / "contracts/mts-conformance-v0.2.json"
+ANUM_BOUNDARY = ROOT / "contracts/anum-boundary-projection-v0.2.json"
 ROOT_PROGRAM = ROOT / "tests/mtc_formulas.mtc"
 
 
@@ -32,11 +33,20 @@ def test_contract_is_accepted_v02_and_points_to_canonical_artifacts():
     assert contract["status"] == "accepted"
     assert contract["rootProgram"] == "tests/mtc_formulas.mtc"
     assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.2.json"
+    assert contract["anum"]["rootBoundaryProjection"] == (
+        "contracts/anum-boundary-projection-v0.2.json"
+    )
+    assert contract["anum"]["generalDenotationIssue"] == 89
     assert CONFORMANCE.is_file()
+    assert ANUM_BOUNDARY.is_file()
 
     corpus = json.loads(CONFORMANCE.read_text(encoding="utf-8"))
     assert corpus["contract"] == contract["schema"]
     assert corpus["status"] == "accepted"
+
+    boundary = json.loads(ANUM_BOUNDARY.read_text(encoding="utf-8"))
+    assert boundary["dependsOn"] == contract["schema"]
+    assert boundary["scope"]["generalRawDenotationDefined"] is False
 
 
 def test_contract_exposes_exactly_two_atomic_non_bracket_context_pronouns():

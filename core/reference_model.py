@@ -194,10 +194,10 @@ CONCEPTS = (
         "Базовый четверичный алфавит использует [ ] 1 0.",
     ),
     ConceptSpec(
-        "issue-61-projection",
+        "anum-root-boundary-projection",
         Layer.SERIALIZATION,
-        StatementStatus.EXPERIMENTAL,
-        "Проекция []→0 и ][→1 остаётся рабочей L3-гипотезой issue #61.",
+        StatementStatus.DEFINITION,
+        "В root context принятый v0.2 boundary subset задаёт [→♀∞, ]→∞♂, []→1 и ][→0; общая raw denotation остаётся открытой в #89.",
     ),
     ConceptSpec(
         "formal-interpretation",
@@ -478,8 +478,11 @@ def validate_reference_model() -> tuple[str, ...]:
     if not operator("{...}").variadic:
         errors.append("bundle container must accept a variadic expression list")
 
-    if concept("issue-61-projection").status is not StatementStatus.EXPERIMENTAL:
-        errors.append("issue #61 protocol projection must remain experimental")
+    boundary = concept("anum-root-boundary-projection")
+    if boundary.status is not StatementStatus.DEFINITION:
+        errors.append("MTS v0.2 root Anum boundary projection must be accepted")
+    if "[]→1" not in boundary.description or "][→0" not in boundary.description:
+        errors.append("root Anum boundary projection must follow accepted link/unlink orientation")
     if concept("equality-meaning").status is not StatementStatus.DEFINITION:
         errors.append("contextual equality must be accepted in v0.2")
     if any(item.issue == 79 for item in OPEN_QUESTIONS):
