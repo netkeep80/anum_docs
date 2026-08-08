@@ -194,7 +194,7 @@ def test_inverse_rejects_nested_or_non_protocol_structural_values():
 def test_inverse_rejects_extra_unused_anchors():
     malformed_subset = AnumDenotation.structural_result(
         StructuralDenotation(
-            anchors=(PROTOCOL_ONE_ANCHOR, PROTOCOL_ZERO_ANCHOR),
+            anchors=(PROTOCOL_ZERO_ANCHOR, PROTOCOL_ONE_ANCHOR),
             nodes=(),
             root=DenotationRef.anchor_ref(PROTOCOL_ZERO_ANCHOR),
         )
