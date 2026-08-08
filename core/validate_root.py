@@ -50,7 +50,18 @@ def validate_root_library(path: str | Path) -> RootValidationResult:
         )
 
     targets = set(library.definition_targets())
-    required_symbols = ("∞", "()", "([)", "(])", "(⟼)", "(↛)", "[1]", "[0]", "(=)")
+    required_symbols = (
+        "∞",
+        "()",
+        "([)",
+        "(])",
+        "(⟼)",
+        "(↛)",
+        "[1]",
+        "[0]",
+        "(=)",
+        "(!=)",
+    )
     for symbol in required_symbols:
         if symbol not in targets:
             messages.append(f"Не найдено корневое различие: {symbol}")
