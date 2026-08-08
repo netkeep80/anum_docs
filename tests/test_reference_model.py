@@ -77,10 +77,13 @@ def test_l2_square_form_does_not_claim_identity_with_l3_abits_or_context_pronoun
     assert "не перегруж" in square
 
 
-def test_issue_61_projection_remains_experimental():
-    projection = concept("issue-61-projection")
+def test_anum_root_boundary_projection_is_accepted_without_claiming_general_denotation():
+    projection = concept("anum-root-boundary-projection")
     assert projection.layer is Layer.SERIALIZATION
-    assert projection.status is StatementStatus.EXPERIMENTAL
+    assert projection.status is StatementStatus.DEFINITION
+    assert "[]→1" in projection.description
+    assert "][→0" in projection.description
+    assert "#89" in projection.description
 
 
 def test_interpret_is_read_only_and_non_materializing():
