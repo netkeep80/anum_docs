@@ -1,0 +1,13 @@
+{
+  "schema": "anum-pair-denotation-conformance/v0.2",
+  "contract": "anum-pair-denotation/v0.2",
+  "status": "accepted",
+  "cases": [
+    {"name":"zero","raw":"0","context":"root","expected":{"kind":"structural","anchors":["protocol:0"],"nodes":[],"root":{"anchor":"protocol:0"}},"canonicalRaw":"0"},
+    {"name":"one","raw":"1","context":"root","expected":{"kind":"structural","anchors":["protocol:1"],"nodes":[],"root":{"anchor":"protocol:1"}},"canonicalRaw":"1"},
+    {"name":"pair-00","raw":"00","context":"root","expected":{"kind":"structural","anchors":["protocol:0"],"nodes":[{"id":0,"start":{"anchor":"protocol:0"},"end":{"anchor":"protocol:0"}}],"root":{"node":0}},"canonicalRaw":"00"},
+    {"name":"pair-01","raw":"01","context":"root","expected":{"kind":"structural","anchors":["protocol:0","protocol:1"],"nodes":[{"id":0,"start":{"anchor":"protocol:0"},"end":{"anchor":"protocol:1"}}],"root":{"node":0}},"canonicalRaw":"01"},
+    {"name":"pair-10","raw":"10","context":"root","expected":{"kind":"structural","anchors":["protocol:0","protocol:1"],"nodes":[{"id":0,"start":{"anchor":"protocol:1"},"end":{"anchor":"protocol:0"}}],"root":{"node":0}},"canonicalRaw":"10"},
+    {"name":"pair-11","raw":"11","context":"root","expected":{"kind":"structural","anchors":["protocol:1"],"nodes":[{"id":0,"start":{"anchor":"protocol:1"},"end":{"anchor":"protocol:1"}}],"root":{"node":0}},"canonicalRaw":"11"}
+  ]
+}
