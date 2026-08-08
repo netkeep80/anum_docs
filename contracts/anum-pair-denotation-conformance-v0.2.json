@@ -1,0 +1,187 @@
+{
+  "schema": "anum-pair-denotation-conformance/v0.2",
+  "contract": "anum-pair-denotation/v0.2",
+  "status": "accepted-subset",
+  "cases": [
+    {
+      "name": "protocol-zero",
+      "context": "root",
+      "raw": "0",
+      "denotation": {
+        "kind": "structural",
+        "anchors": ["protocol:0"],
+        "nodes": [],
+        "root": {"anchor": "protocol:0"}
+      },
+      "canonicalRaw": "0"
+    },
+    {
+      "name": "protocol-one",
+      "context": "root",
+      "raw": "1",
+      "denotation": {
+        "kind": "structural",
+        "anchors": ["protocol:1"],
+        "nodes": [],
+        "root": {"anchor": "protocol:1"}
+      },
+      "canonicalRaw": "1"
+    },
+    {
+      "name": "boundary-zero-alias",
+      "context": "root",
+      "raw": "][",
+      "denotation": {
+        "kind": "structural",
+        "anchors": ["protocol:0"],
+        "nodes": [],
+        "root": {"anchor": "protocol:0"}
+      },
+      "canonicalRaw": "0"
+    },
+    {
+      "name": "boundary-one-alias",
+      "context": "root",
+      "raw": "[]",
+      "denotation": {
+        "kind": "structural",
+        "anchors": ["protocol:1"],
+        "nodes": [],
+        "root": {"anchor": "protocol:1"}
+      },
+      "canonicalRaw": "1"
+    },
+    {
+      "name": "pair-00",
+      "context": "root",
+      "raw": "00",
+      "denotation": {
+        "kind": "structural",
+        "anchors": ["protocol:0"],
+        "nodes": [
+          {"id": 0, "start": {"anchor": "protocol:0"}, "end": {"anchor": "protocol:0"}}
+        ],
+        "root": {"node": 0}
+      },
+      "canonicalRaw": "00"
+    },
+    {
+      "name": "pair-01",
+      "context": "root",
+      "raw": "01",
+      "denotation": {
+        "kind": "structural",
+        "anchors": ["protocol:0", "protocol:1"],
+        "nodes": [
+          {"id": 0, "start": {"anchor": "protocol:0"}, "end": {"anchor": "protocol:1"}}
+        ],
+        "root": {"node": 0}
+      },
+      "canonicalRaw": "01"
+    },
+    {
+      "name": "pair-10",
+      "context": "root",
+      "raw": "10",
+      "denotation": {
+        "kind": "structural",
+        "anchors": ["protocol:0", "protocol:1"],
+        "nodes": [
+          {"id": 0, "start": {"anchor": "protocol:1"}, "end": {"anchor": "protocol:0"}}
+        ],
+        "root": {"node": 0}
+      },
+      "canonicalRaw": "10"
+    },
+    {
+      "name": "pair-11",
+      "context": "root",
+      "raw": "11",
+      "denotation": {
+        "kind": "structural",
+        "anchors": ["protocol:1"],
+        "nodes": [
+          {"id": 0, "start": {"anchor": "protocol:1"}, "end": {"anchor": "protocol:1"}}
+        ],
+        "root": {"node": 0}
+      },
+      "canonicalRaw": "11"
+    },
+    {
+      "name": "open-open-remains-raw",
+      "context": "root",
+      "raw": "[[",
+      "denotation": {"kind": "raw", "raw": "[["},
+      "canonicalRaw": null
+    },
+    {
+      "name": "close-close-remains-raw",
+      "context": "root",
+      "raw": "]]",
+      "denotation": {"kind": "raw", "raw": "]]"},
+      "canonicalRaw": null
+    },
+    {
+      "name": "longer-root-remains-raw",
+      "context": "root",
+      "raw": "010",
+      "denotation": {"kind": "raw", "raw": "010"},
+      "canonicalRaw": null
+    },
+    {
+      "name": "mixed-root-remains-raw",
+      "context": "root",
+      "raw": "[01]",
+      "denotation": {"kind": "raw", "raw": "[01]"},
+      "canonicalRaw": null
+    },
+    {
+      "name": "quote-one-level",
+      "context": "quote",
+      "raw": "[01]",
+      "denotation": {"kind": "quoted-raw", "raw": "01"},
+      "canonicalRaw": null
+    },
+    {
+      "name": "quote-two-levels",
+      "context": "quote",
+      "raw": "[[01]]",
+      "denotation": {"kind": "quoted-raw", "raw": "[01]"},
+      "canonicalRaw": null
+    },
+    {
+      "name": "relative-pair-remains-raw",
+      "context": "relative",
+      "raw": "01",
+      "denotation": {"kind": "raw", "raw": "01"},
+      "canonicalRaw": null
+    },
+    {
+      "name": "relative-boundary-alias-remains-raw",
+      "context": "relative",
+      "raw": "[]",
+      "denotation": {"kind": "raw", "raw": "[]"},
+      "canonicalRaw": null
+    }
+  ],
+  "challenge": [
+    {
+      "name": "one-alias-is-many-to-one",
+      "sources": ["1", "[]"],
+      "sameDenotation": true,
+      "canonicalRaw": "1"
+    },
+    {
+      "name": "zero-alias-is-many-to-one",
+      "sources": ["0", "]["],
+      "sameDenotation": true,
+      "canonicalRaw": "0"
+    },
+    {
+      "name": "recursive-grammar-not-guessed",
+      "raw": "[01]01",
+      "requiredKind": "raw",
+      "deferredToIssue": 95
+    }
+  ]
+}
