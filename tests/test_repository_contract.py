@@ -13,12 +13,13 @@ ROOT = Path(__file__).resolve().parents[1]
 ROOT_FIXTURE = ROOT / "tests/mtc_formulas.mtc"
 MTS_CONTRACT = ROOT / "contracts/mts-contract-v0.2.json"
 MTS_CONFORMANCE = ROOT / "contracts/mts-conformance-v0.2.json"
-ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md"}
+ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md", "Пучки связей МТС.md"}
 ACTIVE_SPECS = {
     "Reference model МТС v0.2.md",
     "Формальная нотация МТС.md",
     "Ачисла и сериализация.md",
     "Протокол абитов ачисел.md",
+    "Пучки значений МТС v0.2.md",
 }
 ACTIVE_MARKDOWN = (
     ROOT / "README.md",
@@ -103,6 +104,7 @@ def test_v02_machine_contract_and_conformance_are_single_active_pair():
     assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.2.json"
     assert contract["formalNotation"]["context"]["atomicPronouns"] is True
     assert contract["formalNotation"]["context"]["bracketOverloading"] is False
+    assert contract["formalNotation"]["valueBundle"]["contract"] == "contracts/mts-value-bundle-v0.2.json"
 
     assert corpus["schema"] == "mts-conformance/v0.2"
     assert corpus["contract"] == contract["schema"]
@@ -118,6 +120,7 @@ def test_candidate_runtime_fixture_and_reference_paths_are_removed_after_promoti
     leftovers = [path for path in FORBIDDEN_CANDIDATE_PATHS if (ROOT / path).exists()]
     assert leftovers == []
     assert (ROOT / "core/mtc_interpreter.py").is_file()
+    assert (ROOT / "core/mtc_value_bundle.py").is_file()
     assert (ROOT / "tests/test_mtc_interpreter.py").is_file()
 
 
