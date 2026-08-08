@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from core.mtc_ast import Definition, format_expression
+from core.mtc_definitions import definition_target_key
 from core.root_library import RootLibrary, SQUARE_ABIT_FORMS, load_root_library
 
 
@@ -30,17 +32,38 @@ def validate_root_library(path: str | Path) -> RootValidationResult:
                 f"{formula.source_path}:{formula.line_no}:"
                 f"{diagnostic.span.start}: {diagnostic.message}"
             )
+        if isinstance(formula.ast, Definition) and definition_target_key(formula.ast.target) is None:
+            messages.append(
+                f"Неадресуемая левая часть корневого определения "
+                f"{format_expression(formula.ast.target)}: "
+                f"{formula.source_path}:{formula.line_no}"
+            )
 
-    for symbol, first, second in library.registry.duplicates():
+    for conflict in library.definitions.conflicts():
+        first = conflict.first.provenance
+        second = conflict.duplicate_provenance
+        symbol = format_expression(conflict.first.definition.target)
         messages.append(
             f"Повторное введение различия {symbol}: "
-            f"{first.source_formula.source_path}:{first.source_formula.line_no} и "
-            f"{second.source_formula.source_path}:{second.source_formula.line_no}"
+            f"{first.source_path}:{first.line_no} и "
+            f"{second.source_path}:{second.line_no}"
         )
 
-    required_symbols = ("∞", "()", "([)", "(])", "(⟼)", "(↛)", "[1]", "[0]", "(=)")
+    targets = set(library.definition_targets())
+    required_symbols = (
+        "∞",
+        "()",
+        "([)",
+        "(])",
+        "(⟼)",
+        "(↛)",
+        "[1]",
+        "[0]",
+        "(=)",
+        "(!=)",
+    )
     for symbol in required_symbols:
-        if library.registry.lookup(symbol) is None:
+        if symbol not in targets:
             messages.append(f"Не найдено корневое различие: {symbol}")
 
     square_abits = set(library.square_abits())

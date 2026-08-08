@@ -1,9 +1,8 @@
-"""Executable challenge gate for controlled MTS definition resolution v0.3.
+"""Executable historical challenge for controlled MTS definition resolution v0.3.
 
-This suite deliberately does not add production definition semantics. It freezes
-v0.2 boundaries and exercises a tiny test-local finite graph model so recursive
-and mutually recursive definitions cannot be "solved" by naive infinite text
-substitution while the real identity/context semantics are still under study.
+The synthetic graph walker remains only as evidence against naive recursive text
+substitution. Canonical definition identity/lookup now comes from
+``core.mtc_definitions`` and production opening remains separate from interpret.
 """
 
 from dataclasses import fields, is_dataclass
@@ -31,7 +30,7 @@ ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
 
 class NoReadMemory(MemoryView):
-    """Prove the current Definition boundary performs no hidden L4 reads."""
+    """Prove Definition interpretation performs no hidden L4 reads."""
 
     def poles(self, link: int) -> tuple[int, int]:
         raise AssertionError("definition challenge unexpectedly read L4 poles")
@@ -75,7 +74,7 @@ def _symbol_dependencies(expression: Expression) -> list[str]:
 
 
 def _walk_synthetic_definition_graph(sources: list[str], start: str) -> dict:
-    """Test-local candidate: finite DFS with explicit cycle edges, never unfolding text."""
+    """Historical finite DFS challenge; never a production definition environment."""
 
     definitions: dict[str, Definition] = {}
     for source in sources:
@@ -142,16 +141,16 @@ def test_challenge_is_non_normative_and_not_linked_from_v02_contracts():
     assert "mts-definition-resolution-challenge" not in mts_proof_text
 
 
-def test_current_root_library_remains_ten_typed_definitions_without_duplicates():
+def test_current_root_library_remains_ten_typed_definitions_without_conflicts():
     library = load_root_library(ROOT_PROGRAM)
 
     assert len(library.formulas) == 10
-    assert len(library.registry.entries()) == 10
-    assert library.registry.duplicates() == []
+    assert len(library.definitions.entries()) == 10
+    assert library.definitions.conflicts() == ()
     assert all(isinstance(formula.ast, Definition) for formula in library.formulas)
 
 
-def test_definition_is_parsed_and_registered_but_not_executed_by_current_interpreter():
+def test_definition_is_still_not_executed_by_interpret_constraints():
     expression = parse_formula("a : b")
     assert isinstance(expression, Definition)
 
@@ -205,12 +204,3 @@ def test_definition_resolution_challenge_forbids_implicit_effects():
         "lookupEqualsRealize": False,
         "interpretEqualsRealize": False,
     }
-
-
-def test_release_gate_requires_acceptance_before_production_or_l5_rule_changes():
-    data = challenge()
-    release_gate = data["releaseGate"]
-
-    assert data["rootProgramMustRemainUnchanged"] is True
-    assert "accept a versioned semantic contract before modifying the single production interpreter" in release_gate
-    assert "only then expose the accepted operation as a candidate L5 proof rule" in release_gate

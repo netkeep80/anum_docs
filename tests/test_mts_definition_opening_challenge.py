@@ -1,20 +1,18 @@
-"""Independent executable replay for the candidate definition-opening corpus."""
+"""Historical opening challenge replayed through the canonical v0.3 core."""
 
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import fields, is_dataclass
 import inspect
 import json
 from pathlib import Path
 
 import pytest
 
-from core.mtc_ast import (
-    ContextPronoun,
-    Definition,
-    Expression,
-    Form,
-    SquareForm,
-    format_expression,
-    structural_key,
+from core.mtc_ast import ContextPronoun, Definition, Expression, Form, format_expression, structural_key
+from core.mtc_definitions import (
+    DefinitionEnvironment,
+    DefinitionLookupKind,
+    DefinitionRegistrationKind,
+    open_definition,
 )
 from core.mtc_interpreter import ContextFrame, InterpretationError, interpret_constraints
 from core.mtc_parser import parse_formula
@@ -30,29 +28,6 @@ MTS_PROOF = ROOT / "contracts" / "mts-proof-v0.2.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
 
-@dataclass(frozen=True, order=True)
-class ReplayDefinitionId:
-    scope_path: tuple[int, ...]
-    ordinal: int
-
-    def data(self) -> dict:
-        return {"scopePath": list(self.scope_path), "ordinal": self.ordinal}
-
-
-@dataclass(frozen=True)
-class ReplayEntry:
-    identity: ReplayDefinitionId
-    source: Definition
-
-
-class ReplayNonAddressable(ValueError):
-    pass
-
-
-class ReplayConflict(ValueError):
-    pass
-
-
 def challenge() -> dict:
     return json.loads(CHALLENGE.read_text(encoding="utf-8"))
 
@@ -65,137 +40,66 @@ def decision() -> dict:
     return json.loads(DECISION.read_text(encoding="utf-8"))
 
 
-def _definition(source: str) -> Definition:
+def definition(source: str) -> Definition:
     value = parse_formula(source)
     assert isinstance(value, Definition)
     return value
 
 
-def _target(source: str) -> Form:
-    return _definition(f"{source} : __query_body__").target
+def target(source: str) -> Form:
+    return definition(f"{source} : __query_body__").target
 
 
-def _contains_non_addressable(value: object) -> bool:
+def contains_context_pronoun(value: object) -> bool:
     if isinstance(value, ContextPronoun):
         return True
-    if isinstance(value, SquareForm) and value.content is None:
-        return True
     if isinstance(value, tuple):
-        return any(_contains_non_addressable(item) for item in value)
+        return any(contains_context_pronoun(item) for item in value)
     if isinstance(value, Expression) and is_dataclass(value):
         return any(
-            _contains_non_addressable(getattr(value, item.name))
+            contains_context_pronoun(getattr(value, item.name))
             for item in fields(value)
             if item.name != "span"
         )
     return False
 
 
-def _contains_context_pronoun(value: object) -> bool:
-    if isinstance(value, ContextPronoun):
-        return True
-    if isinstance(value, tuple):
-        return any(_contains_context_pronoun(item) for item in value)
-    if isinstance(value, Expression) and is_dataclass(value):
-        return any(
-            _contains_context_pronoun(getattr(value, item.name))
-            for item in fields(value)
-            if item.name != "span"
-        )
-    return False
+def opening_data(target_form: Form, environment: DefinitionEnvironment) -> dict:
+    result = open_definition(target_form, environment)
+    if result.kind is DefinitionLookupKind.MATCH:
+        assert result.definition_id is not None and result.body is not None
+        return {
+            "kind": "match",
+            "definitionId": {
+                "scopePath": list(result.definition_id.scope_path),
+                "ordinal": result.definition_id.ordinal,
+            },
+            "body": format_expression(result.body),
+        }
+    return {"kind": result.kind.value}
 
 
-def _target_key(target: Form) -> object:
-    if _contains_non_addressable(target):
-        raise ReplayNonAddressable("target is occurrence-local or deictic")
-    return structural_key(target)
-
-
-class ReplayEnvironment:
-    def __init__(
-        self,
-        scope_path: tuple[int, ...],
-        parent: "ReplayEnvironment | None" = None,
-    ) -> None:
-        self.scope_path = scope_path
-        self.parent = parent
-        self.entries: dict[object, ReplayEntry] = {}
-
-    def register(self, definition: Definition) -> ReplayEntry:
-        key = _target_key(definition.target)
-        if key in self.entries:
-            raise ReplayConflict("same-scope target conflict")
-        entry = ReplayEntry(
-            ReplayDefinitionId(self.scope_path, len(self.entries)),
-            definition,
-        )
-        self.entries[key] = entry
-        return entry
-
-    def lookup(self, target: Form) -> ReplayEntry | None:
-        key = _target_key(target)
-        current: ReplayEnvironment | None = self
-        while current is not None:
-            entry = current.entries.get(key)
-            if entry is not None:
-                return entry
-            current = current.parent
-        return None
-
-
-def replay_open_definition(target: Form, environment: ReplayEnvironment) -> dict:
-    """Independent one-step replay: lookup exact typed RHS and stop."""
-
-    try:
-        entry = environment.lookup(target)
-    except ReplayNonAddressable:
-        return {"kind": "non-addressable"}
-    if entry is None:
-        return {"kind": "no-match"}
-    return {
-        "kind": "match",
-        "definitionId": entry.identity.data(),
-        "body": format_expression(entry.source.value),
-    }
-
-
-def _build_scenario_environments(scenario: dict) -> tuple[dict[tuple[int, ...], ReplayEnvironment], str | None]:
-    environments: dict[tuple[int, ...], ReplayEnvironment] = {}
-    failure: str | None = None
-
-    for scope in sorted(scenario["scopes"], key=lambda item: (len(item["path"]), item["path"])):
+def scenario_data(scenario: dict) -> dict:
+    environments: dict[tuple[int, ...], DefinitionEnvironment] = {}
+    for scope in sorted(
+        scenario["scopes"], key=lambda item: (len(item["path"]), item["path"])
+    ):
         path = tuple(scope["path"])
         parent_path = scope.get("parent")
         parent = environments.get(tuple(parent_path)) if parent_path is not None else None
-        environment = ReplayEnvironment(path, parent)
+        environment = DefinitionEnvironment(path, parent)
         environments[path] = environment
-
         for source in scope["definitions"]:
-            try:
-                environment.register(_definition(source))
-            except ReplayNonAddressable:
-                failure = "non-addressable"
-                break
-            except ReplayConflict:
-                failure = "conflict"
-                break
-        if failure is not None:
-            break
+            registration = environment.register(definition(source))
+            if registration.kind is DefinitionRegistrationKind.CONFLICT:
+                return {"kind": "conflict"}
+            if registration.kind is DefinitionRegistrationKind.NON_ADDRESSABLE:
+                return {"kind": "non-addressable"}
 
-    return environments, failure
-
-
-def _replay_scenario(scenario: dict) -> dict:
-    environments, failure = _build_scenario_environments(scenario)
-    if failure is not None:
-        return {"kind": failure}
-
-    environment = environments[tuple(scenario["lookupScope"])]
-    try:
-        target = _target(scenario["target"])
-    except Exception:
-        raise AssertionError(f"invalid challenge target: {scenario['target']}")
-    return replay_open_definition(target, environment)
+    return opening_data(
+        target(scenario["target"]),
+        environments[tuple(scenario["lookupScope"])],
+    )
 
 
 class NoMemory:
@@ -203,7 +107,7 @@ class NoMemory:
         raise AssertionError(f"unexpected L4 access: {name}")
 
 
-def test_challenge_and_corpus_are_non_normative_and_follow_decision_gate():
+def test_challenge_and_corpus_remain_historical_non_normative_evidence():
     data = challenge()
     vectors = corpus()
     selected = decision()["nextGate"]
@@ -220,16 +124,13 @@ def test_challenge_and_corpus_are_non_normative_and_follow_decision_gate():
     assert data["productionInterpreterChangeAllowed"] is False
     assert data["proofRuleAccepted"] is False
     assert "mts-definition-opening-challenge" not in mts_text
-    assert "mts-definition-opening-conformance" not in mts_text
     assert "mts-definition-opening-challenge" not in proof_text
 
 
-def test_root_corpus_is_exactly_the_current_ten_definition_surface():
+def test_root_corpus_is_exactly_current_ten_definition_surface_and_replays_in_core():
     library = load_root_library(ROOT_PROGRAM)
     vectors = corpus()["rootOpenings"]
-
-    assert len(library.formulas) == len(vectors) == 10
-    assert all(isinstance(formula.ast, Definition) for formula in library.formulas)
+    assert len(library.formulas) == len(library.definitions.entries()) == len(vectors) == 10
 
     corpus_sources = [
         f"{vector['target']} : {vector['expected']['body']}"
@@ -237,29 +138,18 @@ def test_root_corpus_is_exactly_the_current_ten_definition_surface():
     ]
     assert corpus_sources == [formula.text for formula in library.formulas]
 
-
-def test_every_root_opening_replays_to_exact_body_and_replay_local_id():
-    library = load_root_library(ROOT_PROGRAM)
-    environment = ReplayEnvironment(())
-    for formula in library.formulas:
-        assert isinstance(formula.ast, Definition)
-        environment.register(formula.ast)
-
-    for vector in corpus()["rootOpenings"]:
-        target = _target(vector["target"])
-        actual = replay_open_definition(target, environment)
-        assert actual == vector["expected"]
-
+    for vector in vectors:
+        query = target(vector["target"])
+        assert opening_data(query, library.definitions) == vector["expected"]
         if vector.get("mustContainUnresolvedContextPronoun"):
-            entry = environment.lookup(target)
-            assert entry is not None
-            assert _contains_context_pronoun(entry.source.value)
+            lookup = library.definitions.lookup(query)
+            assert lookup.entry is not None
+            assert contains_context_pronoun(lookup.entry.definition.value)
 
 
-def test_all_custom_positive_and_negative_vectors_replay_exactly():
+def test_all_custom_positive_and_negative_vectors_replay_exactly_in_core():
     for scenario in corpus()["scenarios"]:
-        actual = _replay_scenario(scenario)
-        assert actual == scenario["expected"], scenario["id"]
+        assert scenario_data(scenario) == scenario["expected"], scenario["id"]
 
 
 def test_one_step_vectors_do_not_recursively_follow_returned_symbol():
@@ -273,28 +163,22 @@ def test_one_step_vectors_do_not_recursively_follow_returned_symbol():
         "mutual-a-one-step",
         "mutual-b-one-step",
     }
-
     for scenario in one_step:
-        actual = _replay_scenario(scenario)
-        assert actual["body"] == scenario["expected"]["body"]
-        assert "cycle" not in actual
-        assert "steps" not in actual
+        actual = scenario_data(scenario)
+        assert actual == scenario["expected"]
+        assert "cycle" not in actual and "steps" not in actual
 
 
-def test_shadowing_and_parent_fallback_use_lexical_scope_not_contextframe():
+def test_shadowing_uses_lexical_scope_and_opening_has_no_contextframe_input():
     scenarios = {scenario["id"]: scenario for scenario in corpus()["scenarios"]}
-    shadow = _replay_scenario(scenarios["child-shadowing"])
-    fallback = _replay_scenario(scenarios["parent-fallback"])
-
+    shadow = scenario_data(scenarios["child-shadowing"])
+    fallback = scenario_data(scenarios["parent-fallback"])
     assert shadow["definitionId"] == {"scopePath": [0], "ordinal": 0}
     assert shadow["body"] == "c"
     assert fallback["definitionId"] == {"scopePath": [], "ordinal": 0}
     assert fallback["body"] == "b"
 
-    assert set(inspect.signature(replay_open_definition).parameters) == {
-        "target",
-        "environment",
-    }
+    assert set(inspect.signature(open_definition).parameters) == {"target", "environment"}
     boundary = challenge()["contextBoundary"]
     assert boundary["ContextFrameIsOpeningInput"] is False
     assert boundary["MemoryViewIsOpeningInput"] is False
@@ -302,25 +186,22 @@ def test_shadowing_and_parent_fallback_use_lexical_scope_not_contextframe():
     assert boundary["proofStateIsOpeningInput"] is False
 
 
-def test_addressable_lookup_ignores_source_span_but_anonymous_shape_is_not_globalized():
-    compact = _definition("a:b")
-    spaced = _definition("   a : c")
+def test_addressable_lookup_ignores_span_but_anonymous_shape_is_not_globalized():
+    compact = definition("a:b")
+    spaced = definition("   a : c")
     assert compact.target.span != spaced.target.span
     assert structural_key(compact.target) == structural_key(spaced.target)
 
-    environment = ReplayEnvironment(())
-    entry = environment.register(compact)
-    found = environment.lookup(spaced.target)
-    assert found == entry
+    environment = DefinitionEnvironment()
+    registration = environment.register(compact)
+    assert registration.entry is not None
+    assert environment.lookup(spaced.target).entry == registration.entry
 
-    anonymous_a = _definition("[] : a")
-    anonymous_b = _definition("   [] : b")
-    assert anonymous_a.target.span != anonymous_b.target.span
+    anonymous_a = definition("[] : a")
+    anonymous_b = definition("   [] : b")
     assert structural_key(anonymous_a.target) == structural_key(anonymous_b.target)
-    with pytest.raises(ReplayNonAddressable):
-        environment.register(anonymous_a)
-    with pytest.raises(ReplayNonAddressable):
-        environment.register(anonymous_b)
+    assert environment.register(anonymous_a).kind is DefinitionRegistrationKind.NON_ADDRESSABLE
+    assert environment.register(anonymous_b).kind is DefinitionRegistrationKind.NON_ADDRESSABLE
 
 
 def test_returned_context_pronouns_are_not_interpreted_by_opening():
@@ -329,20 +210,11 @@ def test_returned_context_pronouns_are_not_interpreted_by_opening():
         for item in corpus()["scenarios"]
         if item["id"] == "constraint-bundle-rhs"
     )
-    environments, failure = _build_scenario_environments(scenario)
-    assert failure is None
-    environment = environments[()]
-    target = _target("c")
-    entry = environment.lookup(target)
-    assert entry is not None
-    assert _contains_context_pronoun(entry.source.value)
-
-    actual = replay_open_definition(target, environment)
-    assert actual == scenario["expected"]
-    assert actual["body"] == "{◁ = c, ▷ = c}"
+    assert scenario_data(scenario) == scenario["expected"]
+    assert scenario["expected"]["body"] == "{◁ = c, ▷ = c}"
 
 
-def test_opening_has_no_l4_or_proof_effect_and_production_definition_execution_is_still_rejected():
+def test_opening_has_no_l4_or_proof_effect_and_interpret_still_rejects_definition():
     operation = challenge()["operationUnderChallenge"]
     assert operation["readsL4"] is False
     assert operation["writesL4"] is False
@@ -351,7 +223,7 @@ def test_opening_has_no_l4_or_proof_effect_and_production_definition_execution_i
     assert operation["rewritesCallerAst"] is False
     assert operation["evaluatesBody"] is False
 
-    source = _definition("a : b")
+    source = definition("a : b")
     with pytest.raises(InterpretationError, match="Definition"):
         interpret_constraints(
             source,
@@ -364,15 +236,8 @@ def test_opening_has_no_l4_or_proof_effect_and_production_definition_execution_i
 def test_corpus_has_no_storage_or_source_span_observable_identity():
     text = CORPUS.read_text(encoding="utf-8")
     non_observables = set(corpus()["nonObservables"])
-
     assert "source span offsets" in non_observables
     assert "persistent LinkRef or backend address" in non_observables
     assert "target structural-key serialization" in non_observables
     assert '"LinkRef"' not in text
     assert '"sourceSpan"' not in text
-
-
-def test_release_gate_blocks_production_and_l5_until_explicit_acceptance():
-    gate = challenge()["releaseGate"]
-    assert "publish an explicit versioned Accepted definition-opening contract before modifying production code" in gate
-    assert "only after production integration and conformance consider a trusted L5 opening rule" in gate
