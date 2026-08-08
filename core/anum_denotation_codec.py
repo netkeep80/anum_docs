@@ -11,8 +11,8 @@ small:
   quote projection;
 * relative and every unsupported root carrier remain typed ``raw``.
 
-No memory backend, persistent LinkId, ``find`` or ``realize`` operation is used
-here. Recursive bracket denotation is intentionally left to issue #95.
+No memory backend, storage-assigned LinkId, ``find`` or ``realize`` operation is
+used here. Recursive bracket denotation is intentionally left to issue #95.
 """
 
 from core.anum_denotation import (
@@ -101,7 +101,9 @@ def canonical_anum_from_denotation(value: AnumDenotation) -> str:
 
     start = _atom_from_anchor_ref(node.start)
     end = _atom_from_anchor_ref(node.end)
-    expected_anchors = tuple(sorted({_PROTOCOL_ANCHOR_BY_ATOM[start], _PROTOCOL_ANCHOR_BY_ATOM[end]}))
+    expected_anchors = tuple(
+        sorted({_PROTOCOL_ANCHOR_BY_ATOM[start], _PROTOCOL_ANCHOR_BY_ATOM[end]})
+    )
     if structural.anchors != expected_anchors:
         raise ValueError("direct-pair denotation contains anchors outside the accepted subset")
     return start + end
