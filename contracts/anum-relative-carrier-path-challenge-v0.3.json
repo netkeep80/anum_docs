@@ -1,0 +1,117 @@
+{
+  "schema": "anum-relative-carrier-path-challenge/v0.3",
+  "status": "candidate-challenge",
+  "dependsOn": [
+    "anum-relative-context-decision/v0.3",
+    "anum-recursive-denotation/v0.2"
+  ],
+  "issue": 123,
+  "conformanceCorpus": "contracts/anum-relative-carrier-path-conformance-v0.3.json",
+  "acceptedContractLinkAllowed": false,
+  "productionRelativeSemanticsChangeAllowed": false,
+  "purpose": "Challenge bracket-only relative traversal over a focused finite L1 carrier while keeping production RELATIVE raw and leaving result/inverse semantics unaccepted.",
+  "contextUnderChallenge": {
+    "shape": "RelativeCarrierContext(graph: CarrierGraph, focus: description-local node)",
+    "graph": "finite accepted L1 Link carrier with cycles/sharing allowed",
+    "focusMustExist": true,
+    "focusIsPersistentIdentity": false,
+    "usesMemoryView": false,
+    "usesL2ContextFrameParent": false
+  },
+  "pathSubset": {
+    "accepted": false,
+    "alphabet": ["[", "]"],
+    "readDirection": "left-to-right",
+    "steps": {
+      "[": "current := start(current)",
+      "]": "current := end(current)"
+    },
+    "terminationMeasure": "remaining raw token count",
+    "graphUnfolding": false,
+    "examples": {
+      "[": "start(focus)",
+      "]": "end(focus)",
+      "[[": "start(start(focus))",
+      "]]": "end(end(focus))",
+      "[]": "end(start(focus))",
+      "][": "start(end(focus))"
+    }
+  },
+  "portableObservation": {
+    "nodeIndicesAreNormative": false,
+    "symbolicScenarioNodeNamesAreNormative": true,
+    "sameSymbolicCarrierWithDifferentIndexAssignmentsMustObserveSameSelection": true,
+    "pathSpellingRemainsObservableInput": true,
+    "equalSelectedNodeDoesNotMakeTwoRawPathsIdentical": true
+  },
+  "resultModels": [
+    {
+      "id": "A",
+      "name": "selected-node-only",
+      "accepted": false,
+      "disposition": "challenge",
+      "strength": "minimal forward observation relative to an explicit context",
+      "problem": "multiple finite paths can select the same node, so selected node alone cannot reconstruct source path"
+    },
+    {
+      "id": "B",
+      "name": "selected-node-plus-path-provenance",
+      "accepted": false,
+      "disposition": "challenge",
+      "strength": "replay/source preservation without requiring a graph search",
+      "problem": "must decide whether path is semantic denotation data or non-semantic provenance before defining equality/inverse"
+    },
+    {
+      "id": "C",
+      "name": "selected-rooted-subcarrier",
+      "accepted": false,
+      "disposition": "defer",
+      "reason": "a cyclic/shared rooted subcarrier can include the whole reachable graph and does not by itself solve path identity/inverse ambiguity"
+    }
+  ],
+  "explicitlyUnresolved": [
+    "relative meaning of 0",
+    "relative meaning of 1",
+    "mixed bracket/0/1 raw carriers",
+    "whether selected node alone is the relative denotation",
+    "whether traversal path is semantic or provenance",
+    "canonical inverse when multiple paths select the same node",
+    "relative equality between contexts or selected nodes"
+  ],
+  "negativeVetoes": [
+    "do not import root 0/1 aliases into relative context",
+    "do not apply root-opening-collapse to relative traversal",
+    "do not treat quote envelope removal as relative traversal",
+    "do not use L2 parent context as structural start/end navigation",
+    "do not compare raw integer node indices as cross-language identity",
+    "do not use persistent LinkRef/physical address",
+    "do not materialize or mutate L4",
+    "do not choose a shortest/lexicographic inverse path implicitly"
+  ],
+  "requiredProperties": [
+    "[ and ] select start/end of focus",
+    "[[ and ]] compose exactly two role steps",
+    "[] and ][ compose ordered roles left-to-right",
+    "finite paths terminate on cyclic carriers without unfolding cycles",
+    "isomorphic symbolic carriers with different local node indices have identical normalized observations",
+    "distinct raw paths may select one node without becoming the same raw carrier",
+    "invalid focus is typed failure",
+    "0/1 and mixed carriers are typed unresolved in this subset",
+    "current production RELATIVE remains RAW",
+    "root and quote behavior remain unchanged",
+    "no MemoryView/L4 dependency or effect"
+  ],
+  "inverseFindingGate": {
+    "canonicalInverseAccepted": false,
+    "selectedNodeOnlySufficientForInverse": false,
+    "pathPreservingReplayIsCanonicalSemanticInverse": false,
+    "reason": "challenge deliberately distinguishes forward selection, source-path provenance and canonical inverse"
+  },
+  "releaseGate": [
+    "portable challenge passes on at least two index assignments of the same symbolic cyclic/shared carrier",
+    "choose a typed result model",
+    "decide whether path is semantic or provenance",
+    "define inverse domain or explicit undefined result",
+    "publish accepted relative-denotation contract before changing production RELATIVE"
+  ]
+}
