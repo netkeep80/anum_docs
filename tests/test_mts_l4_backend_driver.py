@@ -95,8 +95,11 @@ def run_core_scenario(scenario: dict, assignment: dict[str, int]) -> dict:
             }
         elif op == "realize_structural_denotation":
             assert compiled_denotation is not None and node_bindings is not None
-            bind = operation.get("bind") or operation.get("expectBinding")
-            assert isinstance(bind, str)
+            bind = (
+                operation.get("bind")
+                or operation.get("expectBinding")
+                or f"@{scenario['id']}:root"
+            )
             args = {
                 "denotation": deepcopy(compiled_denotation),
                 "anchors": deepcopy(operation["anchors"]),
