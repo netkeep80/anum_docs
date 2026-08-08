@@ -1,0 +1,180 @@
+{
+  "schema": "mts-foundation-direction-decision/v0.6",
+  "status": "candidate-decision",
+  "accepted": false,
+  "issue": 179,
+  "dependsOn": [
+    "mts-current-link-foundation-challenge/v0.6",
+    "mts-interpretation-act-network-challenge/v0.6",
+    "mts-pole-projection-foundation-challenge/v0.6",
+    "mts-constructor-destructor-foundation-challenge/v0.6"
+  ],
+  "purpose": "Select one preferred research direction after the foundation reset without accepting or migrating production semantics yet.",
+  "historicalBoundary": {
+    "publishedContractsV02ThroughV05RemainImmutable": true,
+    "historicalReplayRemainsValid": true,
+    "historicalRootFixtureRemainsUnchanged": true,
+    "historicalRootDefinitionCount": 10,
+    "historicalContextModel": "ContextFrame(start,end,parent?) + primitive ◁/▷ + ↑ ascent",
+    "historicalContextModelStillPreferredFoundation": false,
+    "historicalProjectionMeaning": "♀/♂ resolve semantic self-closed projection-form links rather than raw poles",
+    "historicalProjectionMeaningStillPreferredFoundation": false
+  },
+  "preferredDirection": {
+    "ontology": "everything is a link",
+    "linkConstructor": {
+      "symbol": "⟼",
+      "meaning": "construct/describe one ordered binary link with raw start and end poles"
+    },
+    "rawStartDestructor": {
+      "symbol": "♀",
+      "meaning": "read the raw start pole of one already distinguished link"
+    },
+    "rawEndDestructor": {
+      "symbol": "♂",
+      "meaning": "read the raw end pole of one already distinguished link"
+    },
+    "currentLinkDeixis": {
+      "symbol": "↑",
+      "meaning": "the one currently distinguished semantic link/value",
+      "mayBeVirtual": true,
+      "requiresL4LinkRef": false
+    },
+    "derivedCurrentStart": "♀↑",
+    "derivedCurrentEnd": "↑♂",
+    "primitiveCurrentPolePronouns": false,
+    "parentAscentPrimitive": false,
+    "genericConstructiveProjectionWrapper": false,
+    "contextFrameOntology": false,
+    "separateSubjectOntology": false
+  },
+  "operatorOrthogonality": {
+    "constructor": "⟼",
+    "destructors": ["♀", "♂"],
+    "deixis": "↑",
+    "inversion": "¬",
+    "definitionIntroduction": ":",
+    "judgments": ["=", "!="],
+    "sameOperatorMustNotCarryBothRawDestructorAndWrapperConstructorSemantics": true
+  },
+  "selfClosedWrapperPolicy": {
+    "genericOperatorSemanticsRequired": false,
+    "ifNeededUseOrdinaryRecursiveLinks": [
+      "S : S ⟼ F",
+      "E : F ⟼ E"
+    ],
+    "realNeedStillRequiresGateEvidence": true
+  },
+  "preferredCandidateRoot": [
+    "∞ : ∞ ⟼ ∞",
+    "() : ♀() ⟼ ()♂",
+    "([) : ([) ⟼ ∞",
+    "(]) : ∞ ⟼ (])",
+    "(⟼) : ([) ⟼ (])",
+    "(↛) : (]) ⟼ ([)",
+    "[1] : (⟼)",
+    "[0] : (↛)",
+    "(=) : {♀(♀↑) = ♀(↑♂), (♀↑)♂ = (↑♂)♂}",
+    "(!=) : ¬(=)"
+  ],
+  "rootBoundary": {
+    "candidateAroot": "∞ : ∞ ⟼ ∞",
+    "arootUsesDeixis": false,
+    "rootCountIsFundamentalVeto": false,
+    "roundFormA2StillRequired": "challenged",
+    "candidateRootAccepted": false
+  },
+  "candidateRootCarrier": {
+    "R": "(R,R)",
+    "O": "(O,R)",
+    "C": "(R,C)",
+    "L": "(O,C)",
+    "U": "(C,O)",
+    "finite": true,
+    "closed": true,
+    "exactPairUnique": true,
+    "acceptedAsProductionRoot": false
+  },
+  "anumDirection": {
+    "candidateOpen": "([)",
+    "candidateClose": "(])",
+    "candidateOne": "(⟼)",
+    "candidateZero": "(↛)",
+    "productionBoundaryChanged": false,
+    "requiresGate": 181
+  },
+  "contextAdapterBoundary": {
+    "legacyContextFrameMayTemporarilyAdaptCurrentLink": true,
+    "legacyAdapterShape": "VirtualCurrentLink(start,end) <-> ContextFrame(start,end)",
+    "legacyParentFieldPreferredOntology": false,
+    "adapterMayDefineNewSemantics": false,
+    "adapterIsNotFoundation": true
+  },
+  "fullActBoundary": {
+    "preferredOuterResearchShape": "Act = S_before ⟼ S_after",
+    "fullActOntologyImpliesFullActObservability": false,
+    "currentLinkAnchorMayStayLocal": true,
+    "genericIncomingSearchMeansCurrentAct": false,
+    "nestingMustStartFromOrdinaryActStateLinks": true,
+    "requiresGate": 182
+  },
+  "equalityBoundary": {
+    "candidateForCurrentXEqualAB": "{♀(♀↑) = ♀(↑♂), (♀↑)♂ = (↑♂)♂}",
+    "materializedExactPairObservationAvailable": true,
+    "virtualRecursiveEqualityAccepted": false,
+    "genericGraphIsomorphismAcceptedAsEquality": false,
+    "requiresGate": 180
+  },
+  "demotedFromPreferredFoundation": [
+    "ContextFrame as an ontological primitive",
+    "primitive ContextPronoun START/END forms",
+    "↑ as a host parent-depth counter",
+    "♀/♂ as generic constructive self-closed projection-wrapper operators",
+    "ten root definitions as a fundamental veto"
+  ],
+  "nextGates": {
+    "E": {
+      "issue": 180,
+      "goal": "storage-neutral virtual current-link and finite equality semantics"
+    },
+    "A": {
+      "issue": 181,
+      "goal": "revised root carrier and Anum boundary conformance"
+    },
+    "N": {
+      "issue": 182,
+      "goal": "nesting and continuation without host ContextFrame.parent"
+    }
+  },
+  "effectsBoundary": {
+    "interpretMayRealize": false,
+    "findMayRealize": false,
+    "foundationDecisionMutatesL4": false
+  },
+  "migrationBoundary": {
+    "productionMigrationAllowed": false,
+    "acceptedContractLinkAllowed": false,
+    "aproverRepinAllowed": false,
+    "dualProjectionSemanticCompatibilityLayerAllowed": false,
+    "dualMeaningOfUpAllowed": false,
+    "ifLaterAcceptedUseOneCanonicalParserInterpreterPath": true,
+    "deleteSupersededSemanticPathAfterConsumerMigration": true
+  },
+  "acceptanceGate": {
+    "directionChosen": true,
+    "foundationAccepted": false,
+    "requiresAllGates": [180, 181, 182],
+    "requiresExecutableVerticalSlice": true,
+    "requiredVerticalSlice": [
+      "finite link carrier",
+      "link constructor and raw pole destructors",
+      "storage-neutral current-link ↑",
+      "revised root",
+      "finite equality",
+      "revised Anum orientation",
+      "read-only interpretation",
+      "optional explicit L4 realization",
+      "deterministic proof replay boundary"
+    ]
+  }
+}
