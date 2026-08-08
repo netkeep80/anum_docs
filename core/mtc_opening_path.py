@@ -64,8 +64,8 @@ def verify_opening_path(
     """Independently replay exactly one finite definition-opening path.
 
     ``environment`` is already the explicit lexical lookup scope chosen by the
-    caller.  The verifier never walks beyond the serialized edge count, never
-    evaluates an RHS, and never touches ContextFrame or associative memory.
+    caller.  The verifier never walks beyond the serialized edge count and
+    never evaluates an RHS or reads any runtime evaluation substrate.
     """
 
     if not witness.edges:
