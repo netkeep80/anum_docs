@@ -1,0 +1,71 @@
+{
+  "schema": "mts-proof-lifting-conformance/v0.3",
+  "status": "candidate-challenge-corpus",
+  "contract": "mts-proof-lifting-challenge/v0.3",
+  "vectors": [
+    {
+      "id": "contextual-satisfaction-positive",
+      "lift": "contextual-satisfaction",
+      "expression": "{◁ = ∞, ▷ = ∞}",
+      "symbols": [["∞", 1]],
+      "memory": [],
+      "context": {"start": 1, "end": 1},
+      "expectInterpretSuccess": true
+    },
+    {
+      "id": "contextual-satisfaction-countercontext",
+      "lift": "contextual-satisfaction",
+      "expression": "{◁ = ∞, ▷ = ∞}",
+      "symbols": [["∞", 1]],
+      "memory": [],
+      "context": {"start": 1, "end": 2},
+      "expectInterpretSuccess": false,
+      "counterexampleTo": "global formula truth"
+    },
+    {
+      "id": "opening-match",
+      "lift": "definition-opens",
+      "definitions": ["a : b"],
+      "target": "a",
+      "expect": {"kind": "match", "body": "b"},
+      "mustNotAssertEquality": true
+    },
+    {
+      "id": "no-match-local",
+      "lift": "no-visible-definition",
+      "definitions": [],
+      "target": "a",
+      "expect": {"kind": "no-match"}
+    },
+    {
+      "id": "same-target-other-environment",
+      "definitions": ["a : b"],
+      "target": "a",
+      "expect": {"kind": "match", "body": "b"},
+      "counterexampleTo": "no-match implies global absence"
+    },
+    {
+      "id": "same-scope-conflict",
+      "lift": "definition-conflict",
+      "definitions": ["a : b", "a : c"],
+      "target": "a",
+      "expect": {"kind": "conflict"},
+      "mustNotAssertBodyEquality": true
+    },
+    {
+      "id": "anonymous-target",
+      "lift": "non-addressable-target",
+      "definitions": [],
+      "target": "[]",
+      "expect": {"kind": "non-addressable"}
+    }
+  ],
+  "forbiddenConclusions": [
+    "contextual satisfaction under one context implies satisfaction under all contexts",
+    "definition opening match implies equality",
+    "definition opening match evaluates the body",
+    "no-match in one environment implies global absence",
+    "definition conflict implies duplicate bodies are equal",
+    "a challenged lift is a trusted rule before acceptance"
+  ]
+}
