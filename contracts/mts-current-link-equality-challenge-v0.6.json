@@ -1,0 +1,124 @@
+{
+  "schema": "mts-current-link-equality-challenge/v0.6",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 180,
+  "dependsOn": [
+    "mts-foundation-direction-decision/v0.6",
+    "mts-constructor-destructor-foundation-challenge/v0.6"
+  ],
+  "purpose": "Challenge whether one finite storage-neutral current-link snapshot is sufficient for raw-pole deixis and a local equality/unification model without ContextFrame ontology, L4 realization, recursive graph-isomorphism equality or global rewriting.",
+  "currentLinkCarrier": {
+    "type": "VirtualLinkSnapshot",
+    "node": "VirtualLinkNode(localRef,start,end)",
+    "current": "one localRef inside the finite closed snapshot",
+    "storageNeutral": true,
+    "requiresL4LinkRef": false,
+    "requiresContextFrame": false,
+    "supportsSelfCycle": true,
+    "supportsMutualCycle": true,
+    "localRefsArePersistentIdentity": false,
+    "sourceSpanIsIdentity": false,
+    "displayLabelIsIdentity": false
+  },
+  "rawProjectionCandidate": {
+    "current": "↑ -> snapshot.current",
+    "start": "♀↑ -> nodes[current].start",
+    "end": "↑♂ -> nodes[current].end",
+    "readsOnly": true,
+    "wrapperProjectionLookupUsed": false,
+    "materializationRequired": false
+  },
+  "equalityLayers": {
+    "localRefConstraint": {
+      "meaning": "after explicit local alias resolution, two already resolved semantic refs satisfy one atomic equality constraint iff their representatives are the same local ref",
+      "globalRewrite": false,
+      "recursiveGraphComparison": false,
+      "substitutionScope": "one interpretation state only"
+    },
+    "linkComparisonConcept": {
+      "currentContext": "X=(A,B)",
+      "definitionShape": "{♀A = ♀B, A♂ = B♂}",
+      "candidateL2": "{♀(♀↑) = ♀(↑♂), (♀↑)♂ = (↑♂)♂}",
+      "meaning": "compare the two raw pole refs of A and B through local equality constraints",
+      "comparesAAndBLocalRefDirectly": false,
+      "genericBisimulation": false,
+      "globalCongruenceRule": false,
+      "accepted": false
+    }
+  },
+  "criticalDistinctions": {
+    "virtualOccurrenceIdentityVsPairEquality": "two distinct virtual node occurrences may have the same ordered pole refs; the link-comparison concept may classify them equal without globally merging their occurrence identities",
+    "sameTopologyVsLocalEquality": "two separately named recursive subgraphs that are merely isomorphic are not automatically equal when corresponding raw pole refs differ",
+    "materializedExactPair": "current L4 canonical exact-pair storage may map one ordered pair to one LinkRef; this is parity evidence, not the ontology of virtual links",
+    "anonymousHole": "occurrence-local [] remains a separate local unification mechanism and is not replaced by current-link deixis"
+  },
+  "candidateModels": [
+    {
+      "id": "E0-host-contextframe",
+      "accepted": false,
+      "status": "historical-baseline",
+      "summary": "ContextFrame supplies start/end roles externally"
+    },
+    {
+      "id": "E1-current-link-local-ref-equality",
+      "accepted": false,
+      "status": "preferred-challenge-candidate",
+      "summary": "finite virtual current-link snapshot + raw destructors + local alias/identity constraints; link equality concept compares immediate pole representatives"
+    },
+    {
+      "id": "E2-recursive-graph-isomorphism-equality",
+      "accepted": false,
+      "status": "reject-as-implicit-default",
+      "summary": "automatically recurse through whole reachable graphs until isomorphism/bisimulation",
+      "problem": "smuggles a much stronger external equality relation into one local = constraint and recreates issue #79 style global/meta assumptions"
+    },
+    {
+      "id": "E3-l4-linkref-only-current",
+      "accepted": false,
+      "status": "reject-as-foundation",
+      "summary": "↑ must be a materialized L4 LinkRef",
+      "problem": "violates virtual/read-only context and interpret != realize"
+    }
+  ],
+  "challengeVectors": [
+    "ordinary current X=(A,B) exposes A/B through one anchor",
+    "self-cycle X=(X,X) stays finite",
+    "mutual-cycle snapshot stays finite",
+    "virtual and materialized representations with the same observable ordered poles give the same local raw-pole observations without asserting identity between representations",
+    "two virtual node occurrences with the same ordered pole refs can satisfy the derived link-comparison concept while remaining different occurrence refs",
+    "two merely isomorphic subgraphs with different corresponding local refs do not become equal by hidden recursion",
+    "explicit interpretation-local aliases may make corresponding pole refs equal without global mutation",
+    "current exact-pair L4 remains idempotent for materialized parity",
+    "no ContextFrame parent or hidden interpreter/session input is needed",
+    "no L4 write is performed by the virtual challenge"
+  ],
+  "issue79Boundary": {
+    "anonymousSquareOccurrenceLocal": true,
+    "equalityIsLocalConstraint": true,
+    "equalityIsGlobalTextualRewrite": false,
+    "sourceTextCreatesGlobalCoreference": false,
+    "genericSubstitutivityAccepted": false,
+    "genericCongruenceAccepted": false
+  },
+  "effectsBoundary": {
+    "readsProductionL4ForParityOnly": true,
+    "virtualInterpretationReadsL4": false,
+    "realizes": false,
+    "deletes": false,
+    "mutatesHistoricalContracts": false
+  },
+  "decisionQuestions": [
+    "Can VirtualLinkSnapshot replace ContextFrame for local current-link observations?",
+    "Is local representative equality sufficient as the atomic = substrate for the derived link-comparison concept?",
+    "Do self/mutual cycles require any recursive equality mechanism beyond explicit local refs/aliases?",
+    "Does any required vector force ↑ to expose L4 identity?"
+  ],
+  "releaseVeto": {
+    "productionParserChangeAllowed": false,
+    "productionInterpreterChangeAllowed": false,
+    "acceptedContractLinkAllowed": false,
+    "aproverRepinAllowed": false,
+    "nextGateAfterChallenge": "Gate E decision; equality remains candidate until the challenge evidence is classified"
+  }
+}
