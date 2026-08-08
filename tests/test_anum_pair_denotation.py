@@ -42,8 +42,10 @@ def test_pair_contract_is_accepted_bounded_and_non_materializing():
         "0": PROTOCOL_ZERO_ANCHOR,
         "1": PROTOCOL_ONE_ANCHOR,
     }
-    assert contract["unsupported"]["recursiveBrackets"] == "issue #95"
-    assert contract["unsupported"]["relativeDenotation"] is True
+    assert contract["outsideThisSubset"]["recursiveBrackets"] == (
+        "contracts/anum-recursive-denotation-v0.2.json"
+    )
+    assert contract["outsideThisSubset"]["relativeDenotation"] is True
     assert contract["effects"] == {
         "mayReadMemory": False,
         "mayMutateMemory": False,
@@ -133,7 +135,7 @@ def test_root_boundary_aliases_have_atomic_canonical_inverse():
     assert canonical_pair_anum(unlink_alias) == "0"
 
 
-def test_longer_and_bracket_structures_are_not_guessed():
+def test_longer_and_bracket_structures_are_not_guessed_by_pair_layer():
     for raw in ("010", "1011", "[0]", "[01]", "[][]", "[[", "]]"):
         result = denotate_anum_pair_subset(
             parse_raw_quaternary(raw), ProjectionContext.ROOT
