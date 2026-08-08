@@ -5,9 +5,18 @@
   "cases": [
     {"name":"zero","raw":"0","context":"root","expected":{"kind":"structural","anchors":["protocol:0"],"nodes":[],"root":{"anchor":"protocol:0"}},"canonicalRaw":"0"},
     {"name":"one","raw":"1","context":"root","expected":{"kind":"structural","anchors":["protocol:1"],"nodes":[],"root":{"anchor":"protocol:1"}},"canonicalRaw":"1"},
+    {"name":"root-link-alias","raw":"[]","context":"root","expected":{"kind":"structural","anchors":["protocol:1"],"nodes":[],"root":{"anchor":"protocol:1"}},"canonicalRaw":"1"},
+    {"name":"root-unlink-alias","raw":"][","context":"root","expected":{"kind":"structural","anchors":["protocol:0"],"nodes":[],"root":{"anchor":"protocol:0"}},"canonicalRaw":"0"},
     {"name":"pair-00","raw":"00","context":"root","expected":{"kind":"structural","anchors":["protocol:0"],"nodes":[{"id":0,"start":{"anchor":"protocol:0"},"end":{"anchor":"protocol:0"}}],"root":{"node":0}},"canonicalRaw":"00"},
     {"name":"pair-01","raw":"01","context":"root","expected":{"kind":"structural","anchors":["protocol:0","protocol:1"],"nodes":[{"id":0,"start":{"anchor":"protocol:0"},"end":{"anchor":"protocol:1"}}],"root":{"node":0}},"canonicalRaw":"01"},
     {"name":"pair-10","raw":"10","context":"root","expected":{"kind":"structural","anchors":["protocol:0","protocol:1"],"nodes":[{"id":0,"start":{"anchor":"protocol:1"},"end":{"anchor":"protocol:0"}}],"root":{"node":0}},"canonicalRaw":"10"},
-    {"name":"pair-11","raw":"11","context":"root","expected":{"kind":"structural","anchors":["protocol:1"],"nodes":[{"id":0,"start":{"anchor":"protocol:1"},"end":{"anchor":"protocol:1"}}],"root":{"node":0}},"canonicalRaw":"11"}
+    {"name":"pair-11","raw":"11","context":"root","expected":{"kind":"structural","anchors":["protocol:1"],"nodes":[{"id":0,"start":{"anchor":"protocol:1"},"end":{"anchor":"protocol:1"}}],"root":{"node":0}},"canonicalRaw":"11"},
+    {"name":"open-open-raw","raw":"[[","context":"root","expected":{"kind":"raw","raw":"[["},"canonicalRaw":null},
+    {"name":"close-close-raw","raw":"]]","context":"root","expected":{"kind":"raw","raw":"]]"},"canonicalRaw":null},
+    {"name":"long-sequence-raw","raw":"010","context":"root","expected":{"kind":"raw","raw":"010"},"canonicalRaw":null},
+    {"name":"bracket-composition-raw","raw":"[0]","context":"root","expected":{"kind":"raw","raw":"[0]"},"canonicalRaw":null},
+    {"name":"quote-envelope","raw":"[01]","context":"quote","expected":{"kind":"quoted-raw","raw":"01"},"canonicalRaw":null},
+    {"name":"quote-unwrapped","raw":"01","context":"quote","expected":{"kind":"quoted-raw","raw":"01"},"canonicalRaw":null},
+    {"name":"relative-pair","raw":"01","context":"relative","expected":{"kind":"raw","raw":"01"},"canonicalRaw":null}
   ]
 }
