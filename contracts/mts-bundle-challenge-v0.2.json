@@ -6,7 +6,8 @@
   "acceptedConstraintBundle": {
     "ast": "BundleForm",
     "interpreter": "interpret_constraints",
-    "semantics": "ordered evaluation of contained constraints in one local interpretation state",
+    "semantics": "shared-state conjunction of contained constraints",
+    "referenceTraversal": "current reference interpreter visits items in source order; no algebraic significance of order is claimed here",
     "effect": "none",
     "emptyBundle": {
       "source": "{}",
