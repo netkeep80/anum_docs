@@ -99,6 +99,55 @@ def validate_structural_denotation(value: StructuralDenotation) -> None:
     _validate_ref(value.root, anchors, available_nodes=len(value.nodes))
 
 
+def denotation_from_data(data: dict) -> AnumDenotation:
+    """Parse canonical IR-shaped data without invoking the raw Anum parser."""
+
+    if not isinstance(data, dict) or "kind" not in data:
+        raise ValueError("denotation data must be an object with kind")
+
+    try:
+        kind = DenotationKind(data["kind"])
+    except (TypeError, ValueError) as exc:
+        raise ValueError("unknown denotation kind") from exc
+
+    if kind is not DenotationKind.STRUCTURAL:
+        if set(data) != {"kind", "raw"} or not isinstance(data["raw"], str):
+            raise ValueError("raw denotation data must contain exactly kind and raw string")
+        if kind is DenotationKind.RAW:
+            return AnumDenotation.raw_result(data["raw"])
+        return AnumDenotation.quoted_raw_result(data["raw"])
+
+    if set(data) != {"kind", "anchors", "nodes", "root"}:
+        raise ValueError("structural denotation data has unexpected or missing fields")
+    if not isinstance(data["anchors"], list) or not all(
+        isinstance(anchor, str) for anchor in data["anchors"]
+    ):
+        raise ValueError("structural anchors must be a string list")
+    if not isinstance(data["nodes"], list):
+        raise ValueError("structural nodes must be a list")
+
+    nodes: list[DenotationNode] = []
+    for node_data in data["nodes"]:
+        if not isinstance(node_data, dict) or set(node_data) != {"id", "start", "end"}:
+            raise ValueError("denotation node must contain exactly id, start and end")
+        if not isinstance(node_data["id"], int) or isinstance(node_data["id"], bool):
+            raise ValueError("denotation node id must be an integer")
+        nodes.append(
+            DenotationNode(
+                id=node_data["id"],
+                start=_ref_from_data(node_data["start"]),
+                end=_ref_from_data(node_data["end"]),
+            )
+        )
+
+    structural = StructuralDenotation(
+        anchors=tuple(data["anchors"]),
+        nodes=tuple(nodes),
+        root=_ref_from_data(data["root"]),
+    )
+    return AnumDenotation.structural_result(structural)
+
+
 def canonical_denotation_json(value: AnumDenotation) -> str:
     """Serialize one validated denotation to deterministic compact JSON."""
 
@@ -145,6 +194,20 @@ def _denotation_to_data(value: AnumDenotation) -> dict:
 
     assert value.raw is not None
     return {"kind": value.kind.value, "raw": value.raw}
+
+
+def _ref_from_data(data: object) -> DenotationRef:
+    if not isinstance(data, dict):
+        raise ValueError("denotation reference must be an object")
+    if set(data) == {"anchor"} and isinstance(data["anchor"], str):
+        return DenotationRef.anchor_ref(data["anchor"])
+    if (
+        set(data) == {"node"}
+        and isinstance(data["node"], int)
+        and not isinstance(data["node"], bool)
+    ):
+        return DenotationRef.node_ref(data["node"])
+    raise ValueError("denotation reference must contain exactly one anchor or node")
 
 
 def _ref_to_data(ref: DenotationRef) -> dict:
