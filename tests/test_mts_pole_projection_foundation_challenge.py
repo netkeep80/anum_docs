@@ -200,12 +200,6 @@ def test_non_degenerate_semantic_projection_forms_preserve_root_orientation():
 
 def test_mechanical_deictic_rewrite_selects_projection_fixed_point_under_identity_reading():
     challenge = read(CHALLENGE)["deicticCandidate"]
-    non_degenerate = {
-        0: (0, 0),
-        1: (1, 0),
-        2: (0, 2),
-    }
-
     current = 0
     semantic_start = 1
     semantic_end = 2
