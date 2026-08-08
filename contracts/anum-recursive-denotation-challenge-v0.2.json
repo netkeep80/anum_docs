@@ -1,0 +1,113 @@
+{
+  "schema": "anum-recursive-denotation-challenge/v0.2",
+  "status": "challenged",
+  "dependsOn": [
+    "anum-boundary-projection/v0.2",
+    "anum-denotation/v0.2",
+    "anum-pair-denotation/v0.2"
+  ],
+  "parentIssues": [89, 95],
+  "purpose": "freeze ambiguities and non-regression constraints before any recursive production decoder is accepted",
+  "acceptedBaseline": {
+    "rootStructural": ["0", "1", "00", "01", "10", "11"],
+    "rootAliases": {
+      "][": "0",
+      "[]": "1"
+    },
+    "canonicalAliasInverse": {
+      "][": "0",
+      "[]": "1"
+    }
+  },
+  "directSequenceChallenges": [
+    {
+      "raw": "000",
+      "requiredCurrentKind": "raw",
+      "competingAssociationShapes": ["Link(Link(0,0),0)", "Link(0,Link(0,0))"]
+    },
+    {
+      "raw": "001",
+      "requiredCurrentKind": "raw",
+      "competingAssociationShapes": ["Link(Link(0,0),1)", "Link(0,Link(0,1))"]
+    },
+    {
+      "raw": "010",
+      "requiredCurrentKind": "raw",
+      "competingAssociationShapes": ["Link(Link(0,1),0)", "Link(0,Link(1,0))"]
+    },
+    {
+      "raw": "011",
+      "requiredCurrentKind": "raw",
+      "competingAssociationShapes": ["Link(Link(0,1),1)", "Link(0,Link(1,1))"]
+    },
+    {
+      "raw": "100",
+      "requiredCurrentKind": "raw",
+      "competingAssociationShapes": ["Link(Link(1,0),0)", "Link(1,Link(0,0))"]
+    },
+    {
+      "raw": "101",
+      "requiredCurrentKind": "raw",
+      "competingAssociationShapes": ["Link(Link(1,0),1)", "Link(1,Link(0,1))"]
+    },
+    {
+      "raw": "110",
+      "requiredCurrentKind": "raw",
+      "competingAssociationShapes": ["Link(Link(1,1),0)", "Link(1,Link(1,0))"]
+    },
+    {
+      "raw": "111",
+      "requiredCurrentKind": "raw",
+      "competingAssociationShapes": ["Link(Link(1,1),1)", "Link(1,Link(1,1))"]
+    }
+  ],
+  "bracketChallenges": [
+    {
+      "raw": "[01]",
+      "rootRequiredCurrentKind": "raw",
+      "reason": "ordinary-looking brackets are not a recursive denotation rule by themselves"
+    },
+    {
+      "raw": "[01]0",
+      "rootRequiredCurrentKind": "raw",
+      "reason": "left nested candidate has no accepted root grammar"
+    },
+    {
+      "raw": "0[10]",
+      "rootRequiredCurrentKind": "raw",
+      "reason": "right nested candidate has no accepted root grammar"
+    },
+    {
+      "raw": "[01][10]",
+      "rootRequiredCurrentKind": "raw",
+      "reason": "two bracketed candidates have no accepted composition rule"
+    },
+    {
+      "raw": "[[01]]",
+      "rootRequiredCurrentKind": "raw",
+      "reason": "root recursive meaning must not be inferred from quote-envelope syntax"
+    }
+  ],
+  "contextSeparation": {
+    "root": "recursive structural semantics not accepted beyond baseline",
+    "quote": "existing one-envelope quote semantics remains separate",
+    "relative": "remains raw until separately accepted"
+  },
+  "identityConstraints": {
+    "displayLabelIsIdentity": false,
+    "rawSpellingIsRuntimeIdentity": false,
+    "persistentLinkIdAllowed": false,
+    "structuralNodeIdentity": "description-local"
+  },
+  "futureAcceptanceGates": [
+    "unique parse for every newly accepted raw carrier",
+    "no change to accepted 0/1 direct-pair denotations",
+    "explicit root/quote/relative context separation",
+    "storage-neutral DenotationIR only",
+    "deterministic canonical inverse",
+    "decode(canonical_encode(D)) = D on accepted recursive subset",
+    "canonical_encode(decode(raw)) = canonical(raw) on accepted recursive subset",
+    "negative corpus remains explicit for unsupported carriers",
+    "production decoder extends the existing single path instead of creating a compatibility decoder"
+  ]
+}
