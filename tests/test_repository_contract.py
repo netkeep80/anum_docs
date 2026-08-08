@@ -15,6 +15,8 @@ MTS_CONTRACT_V02 = ROOT / "contracts/mts-contract-v0.2.json"
 MTS_CONFORMANCE_V02 = ROOT / "contracts/mts-conformance-v0.2.json"
 MTS_CONTRACT_V03 = ROOT / "contracts/mts-contract-v0.3.json"
 MTS_CONFORMANCE_V03 = ROOT / "contracts/mts-conformance-v0.3.json"
+MTS_CONTRACT_V04 = ROOT / "contracts/mts-contract-v0.4.json"
+MTS_CONFORMANCE_V04 = ROOT / "contracts/mts-conformance-v0.4.json"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md", "Пучки связей МТС.md"}
 ACTIVE_SPECS = {
     "Reference model МТС v0.2.md",
@@ -99,6 +101,8 @@ def test_versioned_machine_contract_and_conformance_chain_is_exact():
         MTS_CONFORMANCE_V02,
         MTS_CONTRACT_V03,
         MTS_CONFORMANCE_V03,
+        MTS_CONTRACT_V04,
+        MTS_CONFORMANCE_V04,
     ):
         assert path.is_file()
 
@@ -106,6 +110,8 @@ def test_versioned_machine_contract_and_conformance_chain_is_exact():
     v02_corpus = json.loads(MTS_CONFORMANCE_V02.read_text(encoding="utf-8"))
     v03 = json.loads(MTS_CONTRACT_V03.read_text(encoding="utf-8"))
     v03_corpus = json.loads(MTS_CONFORMANCE_V03.read_text(encoding="utf-8"))
+    v04 = json.loads(MTS_CONTRACT_V04.read_text(encoding="utf-8"))
+    v04_corpus = json.loads(MTS_CONFORMANCE_V04.read_text(encoding="utf-8"))
 
     assert v02["schema"] == "mts-contract/v0.2"
     assert v02["status"] == "accepted"
@@ -128,10 +134,31 @@ def test_versioned_machine_contract_and_conformance_chain_is_exact():
     assert v03_corpus["contract"] == v03["schema"]
     assert v03_corpus["status"] == "accepted"
 
+    assert v04["schema"] == "mts-contract/v0.4"
+    assert v04["status"] == "accepted"
+    assert v04["extends"] == v03["schema"]
+    assert v04["baseContract"] == "contracts/mts-contract-v0.3.json"
+    assert v04["rootProgram"] == v03["rootProgram"]
+    assert v04["conformanceCorpus"] == "contracts/mts-conformance-v0.4.json"
+    assert v04["dependsOn"] == [v03["schema"], "mts-proof/v0.3"]
+    assert v04_corpus["schema"] == "mts-conformance/v0.4"
+    assert v04_corpus["contract"] == v04["schema"]
+    assert v04_corpus["status"] == "accepted"
+    required_v04 = {item["role"]: item for item in v04_corpus["requiredCorpora"]}
+    assert set(required_v04) == {"base-v0.3", "proof-v0.3"}
+    assert required_v04["base-v0.3"]["schema"] == v03_corpus["schema"]
+    assert required_v04["base-v0.3"]["contract"] == v03_corpus["contract"]
+    assert required_v04["proof-v0.3"]["schema"] == "mts-proof-conformance/v0.3"
+    assert required_v04["proof-v0.3"]["contract"] == "mts-proof/v0.3"
+
     contract_files = sorted((ROOT / "contracts").glob("mts-contract-*.json"))
     conformance_files = sorted((ROOT / "contracts").glob("mts-conformance-*.json"))
-    assert contract_files == [MTS_CONTRACT_V02, MTS_CONTRACT_V03]
-    assert conformance_files == [MTS_CONFORMANCE_V02, MTS_CONFORMANCE_V03]
+    assert contract_files == [MTS_CONTRACT_V02, MTS_CONTRACT_V03, MTS_CONTRACT_V04]
+    assert conformance_files == [
+        MTS_CONFORMANCE_V02,
+        MTS_CONFORMANCE_V03,
+        MTS_CONFORMANCE_V04,
+    ]
 
 
 def test_candidate_runtime_fixture_and_reference_paths_are_removed_after_promotion():
