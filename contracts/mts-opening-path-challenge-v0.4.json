@@ -28,7 +28,7 @@
   },
   "edge": {
     "required": ["target", "definitionId", "body"],
-    "target": "canonical typed Form source used for this edge's open_definition replay",
+    "target": "parseable typed Form source; replay/adjacency identity is structural and does not require canonical whitespace",
     "definitionId": "exact replay-local DefinitionId(scopePath,ordinal)",
     "body": "exact canonical format_expression of replayed Definition.value",
     "mustReplayKind": "match",
@@ -42,6 +42,11 @@
     "canonicalDisplayTextIsIdentity": false,
     "sourceSpanIsIdentity": false,
     "textualSubstitution": false
+  },
+  "transportBoundary": {
+    "targetSourceMayUseEquivalentWhitespace": true,
+    "bodyMustUseCanonicalFormatExpression": true,
+    "reason": "targets are parsed before structural comparison; bodies are replay results serialized deterministically, not lookup identity strings"
   },
   "finalBody": {
     "mustEqualLastReplayedBodyCanonicalFormat": true,
