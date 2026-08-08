@@ -205,10 +205,13 @@ def base_by_id() -> dict[str, dict]:
 
 
 def forge_base(vector: dict) -> dict:
-    if "judgment" in vector:
-        return deepcopy(vector["judgment"])
+    if "sourceJudgment" in vector:
+        source = base_by_id()[vector["sourceJudgment"]]
+    elif "judgment" in vector:
+        source = vector["judgment"]
+    else:
+        raise ValueError("forgery vector must provide sourceJudgment or judgment")
 
-    source = base_by_id()[vector["sourceJudgment"]]
     result = patch_dotted(source, vector.get("patch", {}))
     if "replaceRelation" in vector:
         result["relation"] = vector["replaceRelation"]
@@ -313,8 +316,8 @@ def test_opening_path_transport_delegates_to_accepted_relation_not_search_trace(
     challenge = read(CHALLENGE)
     opening = read(OPENING_CONTRACT)
 
-    assert challenge["openingPathJudgment"]["trustedReplay"].endswith(
-        "canonical verify_opening_path exactly once"
+    assert challenge["openingPathJudgment"]["trustedReplay"] == (
+        "construct OpeningPathWitness and invoke canonical verify_opening_path exactly once"
     )
     assert opening["typedCore"]["verifier"] == "verify_opening_path"
     assert challenge["searchCheckerBoundary"]["searchTrusted"] is False
