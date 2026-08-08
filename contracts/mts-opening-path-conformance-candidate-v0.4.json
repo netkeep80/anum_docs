@@ -146,14 +146,25 @@
     },
     {
       "id": "continue-after-non-form",
-      "scopes": [{"path": [], "parent": null, "definitions": ["a : {◁ = x}", "b : c"]}],
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : b = c", "x : y"]}],
+      "lookupScope": [],
+      "startTarget": "a",
+      "edges": [
+        {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b = c"},
+        {"target": "x", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "y"}
+      ],
+      "finalBody": "y"
+    },
+    {
+      "id": "continue-after-non-addressable-form",
+      "scopes": [{"path": [], "parent": null, "definitions": ["a : {◁ = x}"]}],
       "lookupScope": [],
       "startTarget": "a",
       "edges": [
         {"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "{◁ = x}"},
-        {"target": "b", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "c"}
+        {"target": "{ ◁ = x }", "definitionId": {"scopePath": [], "ordinal": 1}, "body": "z"}
       ],
-      "finalBody": "c"
+      "finalBody": "z"
     },
     {
       "id": "no-match-edge",
