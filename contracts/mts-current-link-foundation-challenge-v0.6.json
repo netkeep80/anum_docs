@@ -1,0 +1,125 @@
+{
+  "schema": "mts-current-link-foundation-challenge/v0.6",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 171,
+  "trigger": "issue #148 observation: ◁ ?= ♀↑ and ▷ ?= ↑♂",
+  "dependsOnHistoricalSnapshots": [
+    "mts-contract/v0.5",
+    "mts-direct-deixis/v0.5"
+  ],
+  "purpose": "Challenge whether the current ContextFrame + two atomic pole pronouns + parent-ascent model is a minimal/fundamental L2 basis once L0 all-is-link is applied to the interpretation context itself.",
+  "currentSnapshot": {
+    "contextCarrier": "ContextFrame(start,end,parent?)",
+    "astPrimitive": "ContextPronoun(up,pole)",
+    "currentStart": "◁",
+    "currentEnd": "▷",
+    "parentAccess": "↑◁ / ↑▷ / repeated ↑",
+    "standaloneUpIsForm": false,
+    "contextMayBeVirtual": true,
+    "productionParserChangeAllowedByThisChallenge": false,
+    "productionInterpreterChangeAllowedByThisChallenge": false
+  },
+  "foundationObservation": {
+    "l0": "everything is a link",
+    "candidateCurrentAnchor": "↑ denotes the current relation/focus itself",
+    "candidateDerivedStart": "♀↑",
+    "candidateDerivedEnd": "↑♂",
+    "claimAccepted": false,
+    "reason": "the claim is not valid under the current operational projection implementation without first deciding what ♀/♂ mean relative to direct link poles"
+  },
+  "criticalDistinction": {
+    "directPole": {
+      "operation": "MemoryView.poles(F)",
+      "meaningUnderTest": "the structural start/end links of F"
+    },
+    "projectionForm": {
+      "startOperation": "MemoryView.find_start_projection(F)",
+      "endOperation": "MemoryView.find_end_projection(F)",
+      "meaningUnderCurrentInterpreter": "a separately distinguished projection-form link associated with F"
+    },
+    "mustNotConflate": true,
+    "theoryRuntimeAlignmentRequired": true
+  },
+  "candidateModels": [
+    {
+      "id": "A-context-frame-three-glyph",
+      "description": "Historical accepted computational snapshot: ContextFrame(start,end,parent?) with atomic ◁/▷ and ↑ ascent.",
+      "accepted": false,
+      "challengeStatus": "historical-baseline",
+      "foundationalMinimalityProven": false
+    },
+    {
+      "id": "B-current-link-plus-direct-poles",
+      "description": "One deictic Form ↑ denotes current relation X; ordinary pole operations derive X.start and X.end.",
+      "accepted": false,
+      "challengeStatus": "preferred-research-candidate",
+      "requires": [
+        "standalone ↑ becomes a Form",
+        "exact semantics of ♀/♂ as direct pole access or an equivalent derivation",
+        "parent/nesting derived from link-only act structure instead of hidden host field"
+      ]
+    },
+    {
+      "id": "C-current-link-plus-current-projection-form-runtime",
+      "description": "One deictic Form ↑ denotes current relation X while existing find_start_projection/find_end_projection semantics are used unchanged.",
+      "accepted": false,
+      "challengeStatus": "counterexample-required",
+      "expectedProblem": "for finite graphs projection-form refs can differ from X.start/X.end, so old ◁/▷ are not automatically equal to ♀↑/↑♂"
+    },
+    {
+      "id": "D-full-act-link-network",
+      "description": "Current anchor is a position in a finite self-contained link-only interpretation-act network; other observations are ordinary structural traversals/projections.",
+      "accepted": false,
+      "challengeStatus": "next-gate",
+      "requires": "finite link-only reconstruction of interpreter, command/form, current focus, available environment/memory, result/next state and nesting/continuation"
+    }
+  ],
+  "executableQuestions": [
+    "Does production parser reject standalone ↑ while accepting ◁, ▷, ↑◁ and ↑▷?",
+    "For a finite focus X=(A,B), do current ◁/▷ resolve exactly to A/B?",
+    "Can find_start_projection(X) and find_end_projection(X) be different from A/B?",
+    "Does that counterexample invalidate a silent equation ◁=♀↑ and ▷=↑♂ under current runtime semantics?",
+    "Can a test-local virtual current-link value reproduce current-pole access with one anchor and direct structural poles without L4 mutation?"
+  ],
+  "rootBoundary": {
+    "historicalRootDefinitionCount": 10,
+    "historicalFixtureImmutable": true,
+    "historicalFixtureIsFundamentalVeto": false,
+    "candidateRewriteMayBeStudied": true,
+    "candidateAroot": "∞ : {♀↑ = ∞, ↑♂ = ∞}",
+    "candidateArootAccepted": false,
+    "equalityRootRewriteDeferred": true,
+    "reason": "operator precedence and the exact semantics of nested pole projections must be decided first"
+  },
+  "parentBoundary": {
+    "currentParentFieldAcceptedAsFundamental": false,
+    "oldAscentSyntaxAutomaticallyPreserved": false,
+    "reason": "if ↑ becomes current-link deixis, host-side parent ascent collides with its new role and must be reconstructed from the link-only interpretation act"
+  },
+  "fullActGate": {
+    "researchMetanotationOnly": "Act(I,F,X,M,R,...)",
+    "nAryActIsOntology": false,
+    "requiredOutcome": "finite network containing only links, from which the minimal deictic anchors are derived rather than postulated",
+    "mustAnswer": [
+      "whether current focus alone is a sufficient anchor",
+      "whether interpreter-link must ever be directly observable",
+      "whether current-act reference is required",
+      "how nesting/continuation/parent is represented as links",
+      "which context glyphs are primitive, derived, or display sugar"
+    ]
+  },
+  "effectsVeto": {
+    "readsMayInspectFiniteMemory": true,
+    "materializes": false,
+    "deletes": false,
+    "mutatesHistoricalContracts": false,
+    "mutatesRootFixture": false
+  },
+  "releaseVeto": {
+    "acceptedContractLinkAllowed": false,
+    "productionSemanticPromotionAllowed": false,
+    "aproverSemanticRepinAllowedFromThisChallenge": false,
+    "nextGate": "finite link-only interpretation-act model and decision on direct pole vs projection-form semantics"
+  }
+}
