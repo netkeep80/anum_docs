@@ -1,0 +1,133 @@
+{
+  "schema": "mts-deictic-context-challenge/v0.5",
+  "status": "candidate-challenge",
+  "issue": 148,
+  "dependsOn": [
+    "mts-contract/v0.4",
+    "mts-proof/v0.3"
+  ],
+  "acceptedContractLinkAllowed": false,
+  "productionSemanticChangeAllowed": false,
+  "purpose": "Separate the already accepted explicit ContextFrame semantics from candidate interpreter-focus/deictic runtime bindings before introducing any new pronoun, focus identity or interpreter introspection.",
+  "currentAcceptedBaseline": {
+    "semanticInput": "explicit ContextFrame(start,end,parent?)",
+    "startPronoun": "◁ reads current ContextFrame.start",
+    "endPronoun": "▷ reads current ContextFrame.end",
+    "parentAscent": "↑ traverses the explicit parent chain one frame per prefix",
+    "contextMustBeMaterialized": false,
+    "currentRelationIdentityObservable": false,
+    "interpreterIdentityObservable": false,
+    "ambientSessionStateObservable": false,
+    "separateSubjectConceptIntroduced": false,
+    "proofReplayUsesExplicitContext": true,
+    "missingParentCurrentBehavior": "ValueError; challenged, not promoted as final v0.5 semantics"
+  },
+  "requiredDistinctions": [
+    "interpreter/runtime as a link",
+    "focus/current relation",
+    "explicit semantic ContextFrame",
+    "security/capability policy"
+  ],
+  "candidateModels": [
+    {
+      "id": "hidden-interpreter-introspection",
+      "verdict": "reject",
+      "accepted": false,
+      "shape": "formula may inspect arbitrary interpreter/host/session state",
+      "reason": "introduces hidden replay inputs and ties semantics to runtime implementation"
+    },
+    {
+      "id": "explicit-contextframe-only",
+      "verdict": "accepted-baseline",
+      "accepted": false,
+      "shape": "formula observes only explicit ContextFrame roles and ancestors",
+      "reason": "this is already the versioned v0.3/v0.4 baseline, not a new v0.5 decision"
+    },
+    {
+      "id": "interpreter-focus-binds-context",
+      "verdict": "challenge",
+      "accepted": false,
+      "shape": "Focus(interpreterLink,currentFocus) is a separate binding relation; formula still consumes only explicit ContextFrame",
+      "reason": "models the interpreter itself as a link and explains where runtime context comes from without exposing arbitrary interpreter state"
+    },
+    {
+      "id": "capability-scoped-deictic-environment",
+      "verdict": "challenge",
+      "accepted": false,
+      "shape": "interpreter exposes current/ancestor focus frames through an explicit capability boundary",
+      "reason": "may model access restrictions while keeping semantic meaning separate from policy"
+    }
+  ],
+  "contextDependence": {
+    "contextSensitive": "there exist explicit contexts C1,C2 for which replay of the same formula and other inputs differs",
+    "contextInvariant": "replay result is equal for the challenged contexts when all non-context inputs are fixed",
+    "syntacticNoPronounImpliesGlobalInvariance": false,
+    "reason": "absence of direct pronouns is useful static evidence but indirect definition dependencies may still depend on context; do not promote a syntactic theorem prematurely"
+  },
+  "focusIdentityQuestion": {
+    "pairOfRolesEqualsRelationIdentity": false,
+    "virtualContextAllowedByBaseline": true,
+    "materializedLinkRefRequired": false,
+    "candidateCurrentLinkRefPronounAccepted": false,
+    "nextQuestion": "whether current focus needs its own observable identity in addition to start/end roles"
+  },
+  "parentFocusQuestion": {
+    "acceptedMeaning": "↑ reads an explicitly supplied parent ContextFrame",
+    "parentLifecycleAccepted": false,
+    "unresolvedSources": [
+      "recursive form entry",
+      "explicit interpreter focus change",
+      "formula invocation",
+      "interpreter/runtime policy"
+    ],
+    "ambientGlobalFallbackAllowed": false
+  },
+  "securityBoundary": {
+    "policyDefinesPronounMeaning": false,
+    "policyMayControlWhichContextFramesAreExposed": true,
+    "hiddenParentInjectionAllowed": false,
+    "semanticReplayMustContainAllObservedFrames": true
+  },
+  "proofBoundary": {
+    "mtsProofV03ModifiedByThisChallenge": false,
+    "explicitContextFrameRemainsReplaySubstrate": true,
+    "hostOrInterpreterIdentityMayAffectReplay": false,
+    "separateSubjectConceptRequired": false,
+    "futureFocusBindingMustBeVersionedAdditively": true
+  },
+  "requiredVectors": [
+    "context-independent baseline example gives identical replay under distinct explicit frames",
+    "pronoun-bearing example gives different replay under distinct explicit frames",
+    "same explicit frame replays identically under different test-only interpreter labels",
+    "virtual frame and frame constructed from a materialized relation's poles are equivalent while relation identity is unobservable",
+    "single and repeated parent ascent follow only the explicit parent chain",
+    "missing parent does not fall back to a hidden global frame",
+    "production interpret signature contains no interpreter/host/current-LinkRef semantic input beyond explicit frame",
+    "replay does not mutate MemoryView"
+  ],
+  "vetoes": [
+    "hidden arbitrary interpreter introspection",
+    "introducing a separate subject ontology for this context model",
+    "treating ◁/▷ as global variables",
+    "equating security policy with semantic meaning",
+    "equating (start,end) with current relation identity without a new contract",
+    "requiring ContextFrame materialization",
+    "injecting an ambient canonical interpreter or focus",
+    "changing the ten root definitions",
+    "editing v0.3/v0.4 contracts in place",
+    "adding a current-link pronoun before challenge",
+    "making proof replay depend on ambient user/session/process identity"
+  ],
+  "nextGate": {
+    "artifact": "mts-deictic-context-decision/v0.5",
+    "mustDecide": [
+      "whether Focus(interpreterLink,currentFocus) belongs to MTS or only interpreter/runtime integration",
+      "whether current focus has observable identity beyond its roles",
+      "the lifecycle/meaning of parent focus",
+      "typed semantics for unavailable parent/context",
+      "whether a static context-invariance analysis is sound",
+      "whether any explicit focus-switch operator is needed"
+    ],
+    "mustNotChangeProductionBeforeDecision": true
+  }
+}
