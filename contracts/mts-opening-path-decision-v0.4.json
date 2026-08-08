@@ -1,0 +1,156 @@
+{
+  "schema": "mts-opening-path-decision/v0.4",
+  "status": "candidate-decision",
+  "issue": 161,
+  "dependsOn": [
+    "mts-opening-path-challenge/v0.4",
+    "mts-definition-opening/v0.3",
+    "mts-derivation-base/v0.3",
+    "mts-proof/v0.3"
+  ],
+  "acceptedContractLinkAllowed": false,
+  "productionProofChangeAllowed": false,
+  "trustedRuleChangeAllowed": false,
+  "question": "What is the narrowest sound multi-step meaning justified by the green DefinitionOpeningPath challenge without importing equality, generic transitivity, normalization, or hidden proof-DAG semantics?",
+  "models": [
+    {
+      "id": "A",
+      "name": "opening-path-as-equality-transitivity",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "a:b and b:c establish two definition-opening facts, not a=c, equivalence, substitution, or normalization"
+    },
+    {
+      "id": "B",
+      "name": "opening-path-as-search-trace-only",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "the challenged path has independently replayable semantics and therefore is stronger than an untrusted search trace"
+    },
+    {
+      "id": "C",
+      "name": "opening-path-as-operational-composite-certificate",
+      "verdict": "preferred-candidate",
+      "accepted": false,
+      "reason": "its complete meaning is exactly a finite ordered sequence of successful canonical open_definition replays under one explicit environment and lookup scope, plus structural adjacency and finite-cycle canonicality"
+    },
+    {
+      "id": "D",
+      "name": "generic-proof-composition-from-opening-path",
+      "verdict": "reject",
+      "accepted": false,
+      "reason": "one sound composite certificate does not justify symmetry, transitivity, congruence, modus ponens, global substitution, or arbitrary proof-DAG composition"
+    }
+  ],
+  "preferredCandidate": {
+    "relation": "DefinitionOpeningPath",
+    "classification": "operational-composite-certificate",
+    "meaning": "the exact serialized finite edge sequence independently replays as successful open_definition steps in one explicit lexical environment/lookup scope and every adjacent target matches the previous replayed body structurally",
+    "minimumEdges": 1,
+    "environmentSharedByAllEdges": true,
+    "lookupScopeSharedByAllEdges": true,
+    "replayExactSerializedEdgeCount": true,
+    "autoContinueToNormalForm": false,
+    "finalBodyMayBeAnyExpression": true,
+    "impliesEquality": false,
+    "impliesEquivalence": false,
+    "impliesNormalization": false,
+    "impliesContextualSatisfaction": false,
+    "materializes": false
+  },
+  "artifactDecision": {
+    "proofV04Representation": "self-contained path substrate",
+    "referencesPriorJudgmentIndexes": false,
+    "storesSharedScopesOnce": true,
+    "storesSharedLookupScopeOnce": true,
+    "storesStartTargetOnce": true,
+    "storesOrderedEdges": true,
+    "storesFinalBody": true,
+    "reason": "self-contained substrate preserves portable independent replay and does not introduce general proof-DAG dependency semantics prematurely"
+  },
+  "edgeDecision": {
+    "fields": ["target", "definitionId", "body"],
+    "targetIdentity": "typed structural Form identity after parsing; equivalent whitespace allowed",
+    "definitionId": "exact replay-local DefinitionId(scopePath,ordinal)",
+    "bodyTransport": "exact canonical format_expression of independently replayed Definition.value",
+    "bodyIdentityForAdjacency": "typed structural identity after parsing replayed body and next target",
+    "negativeOpeningsAllowed": false,
+    "trustSerializedBodyWithoutReplay": false,
+    "trustSerializedDefinitionIdWithoutReplay": false
+  },
+  "cycleDecision": {
+    "definitionIdMayAppearAtMostOnce": true,
+    "status": "candidate-normative-canonicality",
+    "selfCycleCanonicalWitness": "one edge",
+    "mutualCycleCanonicalWitness": "one edge per distinct DefinitionId until the target repeats",
+    "repeatedDefinitionIdMeansSemanticFalse": false,
+    "reason": "the artifact is a finite simple opening path; rejection of repeated DefinitionId prevents infinite-unfold encodings without denying recursive definitions"
+  },
+  "terminalDecision": {
+    "nonFormFinalBodyAllowed": true,
+    "nonAddressableFormFinalBodyAllowed": true,
+    "continuationRequiresPreviousBodyIsForm": true,
+    "continuationStillRequiresCanonicalOpenDefinitionMatch": true,
+    "terminalBodyAutomaticallyEvaluated": false
+  },
+  "proofLiftingDecision": {
+    "eligibleForFutureTrustedRelation": true,
+    "futureRelationName": "DefinitionOpeningPath",
+    "trustedMeaningMustEqualCertificateReplay": true,
+    "proofV03Modified": false,
+    "genericCompositionAccepted": false,
+    "searchTraceTrusted": false,
+    "checkerMustReplayWithoutSearchOrUi": true
+  },
+  "compositionWithContextualSatisfaction": {
+    "acceptedHere": false,
+    "openingPathImpliesStartTargetSatisfiesFinalBody": false,
+    "futureCandidate": "a separately challenged operational relation may serialize both a verified opening path and an explicit ContextuallySatisfies replay of its terminal body",
+    "mustNotUseEqualityBridge": true
+  },
+  "searchBoundary": {
+    "searchTrusted": false,
+    "searchMayExploreDefinitionGraph": true,
+    "searchMayStopOnRepeatedDefinitionId": true,
+    "artifactTrustedWithoutReplay": false,
+    "checkerIndependentFromSearch": true
+  },
+  "interpreterAndEffectBoundary": {
+    "readsContextFrame": false,
+    "readsInterpreterIdentity": false,
+    "readsMemory": false,
+    "realizes": false,
+    "deletes": false
+  },
+  "stillRejected": [
+    "opening path implies equality",
+    "opening path implies equivalence",
+    "opening path implies normal form",
+    "opening path implies contextual satisfaction",
+    "unrestricted transitivity",
+    "symmetry",
+    "congruence",
+    "modus ponens",
+    "global substitution",
+    "recursive textual normalization",
+    "hidden root injection",
+    "general proof-DAG dependency semantics"
+  ],
+  "nextGate": {
+    "artifact": "mts-opening-path/v0.4",
+    "goal": "publish a standalone accepted operational certificate contract, canonical production verifier, and language-neutral conformance before proof-v0.4 consumes the relation",
+    "mustNotChangeProofV03": true,
+    "mustNotAddOtherCompositionRules": true,
+    "requiredProductionProperties": [
+      "one canonical verifier implementation",
+      "strict typed path/witness data model",
+      "independent replay of every edge",
+      "structural adjacency",
+      "unique DefinitionId canonicality",
+      "exact terminal body check",
+      "no MemoryView/ContextFrame/interpreter effects",
+      "all challenge valid vectors accepted",
+      "all challenge invalid vectors rejected"
+    ]
+  }
+}
