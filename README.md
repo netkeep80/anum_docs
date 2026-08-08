@@ -13,23 +13,23 @@
 | Артефакт | Роль |
 |---|---|
 | [Основания МТС](docs/theory/Основания%20МТС.md) | онтологические основания |
-| [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md) | нормативное чтение 10 root definitions |
-| [Пучки связей МТС](docs/theory/Пучки%20связей%20МТС.md) | теоретический смысл ConstraintBundle / flat ValueBundle |
-| [Reference model МТС v0.2](docs/specs/Reference%20model%20МТС%20v0.2.md) | границы L0–L5 и инженерная semantics |
-| [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) | typed L2 syntax и interpretation |
-| [Пучки значений МТС v0.2](docs/specs/Пучки%20значений%20МТС%20v0.2.md) | static elaboration, flat algebra и read-only expansion |
-| [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | L3 `*.anum`, raw carrier, denotation и serialization |
-| [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md) | contextual L3 projection и quote semantics |
-| [MTS contract v0.2](contracts/mts-contract-v0.2.json) | language-neutral normative contract |
-| [ValueBundle contract v0.2](contracts/mts-value-bundle-v0.2.json) | accepted flat bundle semantics |
-| [ValueBundle conformance v0.2](contracts/mts-value-bundle-conformance-v0.2.json) | executable bundle compatibility corpus |
-| [Anum raw carrier v0.2](contracts/anum-raw-carrier-v0.2.json) | storage-neutral описание raw-последовательности абитов |
-| [Anum boundary projection v0.2](contracts/anum-boundary-projection-v0.2.json) | принятый root-context boundary subset L3 |
-| [Anum denotation v0.2](contracts/anum-denotation-v0.2.json) | storage-neutral structural handoff L3→L4 |
-| [Anum pair denotation v0.2](contracts/anum-pair-denotation-v0.2.json) | прямой structural subset `0/1` и двух protocol atoms |
-| [Anum recursive denotation v0.2](contracts/anum-recursive-denotation-v0.2.json) | принятая рекурсивная root grammar и canonical inverse |
-| [MTS conformance v0.2](contracts/mts-conformance-v0.2.json) | cross-language executable compatibility corpus |
-| [Корневая программа](tests/mtc_formulas.mtc) | единственный машинный root definitions source |
+| [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md) | нормативное чтение 10 корневых определений |
+| [Пучки связей МТС](docs/theory/Пучки%20связей%20МТС.md) | теоретический смысл пучков условий и плоских пучков значений |
+| [Эталонная модель МТС v0.2](docs/specs/Reference%20model%20МТС%20v0.2.md) | границы L0–L5 и инженерная семантика |
+| [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) | типизированный синтаксис L2 и интерпретация |
+| [Пучки значений МТС v0.2](docs/specs/Пучки%20значений%20МТС%20v0.2.md) | статическое уточнение роли, плоская алгебра и раскрытие только чтением |
+| [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) | L3 `*.anum`, исходный носитель, денотация и сериализация |
+| [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md) | контекстная проекция L3 и семантика цитирования |
+| [Контракт МТС v0.2](contracts/mts-contract-v0.2.json) | независимый от языка реализации нормативный контракт |
+| [Контракт пучков значений v0.2](contracts/mts-value-bundle-v0.2.json) | принятая семантика плоских пучков |
+| [Корпус соответствия пучков v0.2](contracts/mts-value-bundle-conformance-v0.2.json) | исполнимая межъязыковая проверка пучковой семантики |
+| [Описание исходного носителя ачисла v0.2](contracts/anum-raw-carrier-v0.2.json) | не зависящее от хранилища описание последовательности абитов |
+| [Граничная проекция ачисла v0.2](contracts/anum-boundary-projection-v0.2.json) | принятый корневой поднабор граничной проекции L3 |
+| [Денотация ачисла v0.2](contracts/anum-denotation-v0.2.json) | не зависящая от хранилища структурная передача L3→L4 |
+| [Парная денотация ачисла v0.2](contracts/anum-pair-denotation-v0.2.json) | прямой структурный поднабор `0/1` и двух атомов протокола |
+| [Рекурсивная денотация ачисла v0.2](contracts/anum-recursive-denotation-v0.2.json) | принятая рекурсивная корневая грамматика и каноническое обратное преобразование |
+| [Корпус соответствия МТС v0.2](contracts/mts-conformance-v0.2.json) | межъязыковая исполнимая проверка формального языка |
+| [Корневая программа](tests/mtc_formulas.mtc) | единственный машинный источник корневых определений |
 
 `docs/research/` содержит ненормативные исходные заметки и не определяет активную систему.
 
@@ -37,14 +37,14 @@
 
 ```text
 L0  онтология
-L1  семантическая reference model
+L1  семантическая эталонная модель
 L2  формальный язык
 L3  сериализация ачисел
 L4  исполнение и апамять
 L5  теория вывода
 ```
 
-Совпадение glyph на разных уровнях не означает тождества объектов.
+Совпадение знака на разных уровнях не означает тождества объектов.
 
 ## Формальная нотация v0.2
 
@@ -53,11 +53,13 @@ L5  теория вывода
 У бинарного интерпретационного контекста ровно две роли и два атомарных односимвольных местоимения:
 
 ```text
-◁  — start текущего ContextFrame
-▷  — end текущего ContextFrame
+◁  — начало текущего контекста
+▷  — конец текущего контекста
 ```
 
-Подъём к родителю отделён:
+В машинном API такой контекст представлен типом `ContextFrame`, но имя программного типа не является понятием теории.
+
+Подъём к внешнему контексту отделён:
 
 ```text
 ↑◁
@@ -65,25 +67,25 @@ L5  теория вывода
 ↑↑◁
 ```
 
-Квадратные скобки не участвуют в context syntax.
+Квадратные скобки не участвуют в контекстной нотации.
 
 ```text
 ◁[]▷
 ```
 
-всегда токенизируется как:
+всегда разбирается как четыре независимых знака:
 
 ```text
 ◁  [  ]  ▷
 ```
 
-### Anonymous form
+### Анонимная форма
 
 ```text
 []
 ```
 
-в L2 interpreter является occurrence-local anonymous Link form. Два одинаковых `[]` — два разных AST occurrences, пока локальная интерпретация явно их не свяжет.
+В L2 `[]` является анонимной формой связи, локальной для конкретного вхождения. Два одинаково записанных `[]` — два разных вхождения дерева разбора, пока локальная интерпретация явно их не свяжет.
 
 ### Равенство
 
@@ -91,7 +93,7 @@ L5  теория вывода
 (=) : {♀◁ = ♀▷, ◁♂ = ▷♂}
 ```
 
-`=` — локальное identity/unification constraint, а не глобальная текстовая подстановка.
+`=` — локальное условие тождества и унификации, а не глобальная текстовая подстановка.
 
 ### Акорень
 
@@ -99,16 +101,18 @@ L5  теория вывода
 ∞ : {◁ = ∞, ▷ = ∞}
 ```
 
-На L1 этому соответствует конечный self-cycle:
+На L1 этому соответствует конечное самозамыкание:
 
 ```text
-root.start = root
-root.end = root
+начало акорня = акорень
+конец акорня = акорень
 ```
+
+В программной эталонной модели оно может быть представлено циклической ссылкой; это способ вычисления, а не дополнительное понятие МТС.
 
 ## Формальная нотация как запрос к асети
 
-`LinkForm` является не только синтаксическим конструктором, но и structural pattern.
+Форма связи, представленная в ядре типом `LinkForm`, является не только синтаксическим конструктором, но и структурным образцом.
 
 Например:
 
@@ -116,22 +120,22 @@ root.end = root
 10 = [] ⟼ []
 ```
 
-при `poles(10) = (2,3)` возвращает два локальных substitutions.
+при полюсах связи `10`, равных `(2,3)`, возвращает две локальные подстановки для двух независимых анонимных вхождений.
 
-Вложенные patterns декомпозируются рекурсивно без materialization.
+Вложенные структурные образцы разбираются рекурсивно без материализации.
 
 Это задаёт границу:
 
 ```text
-L2: parse / interpret
-L3: serialize / deserialize
-L4: find / realize / delete
+L2: разобрать / интерпретировать
+L3: сериализовать / десериализовать
+L4: найти / материализовать / удалить
 ```
 
-Главный invariant:
+Главный инвариант:
 
 ```text
-interpret ≠ realize
+интерпретация ≠ материализация
 ```
 
 ## Пучки связей v0.2
@@ -139,15 +143,17 @@ interpret ≠ realize
 Фигурная запись `{...}` статически различается на две семантические роли:
 
 ```text
-ConstraintBundle
-ValueBundle
+пучок условий
+пучок значений
 ```
 
-Корневые `{◁ = ∞, ▷ = ∞}` и `{♀◁ = ♀▷, ◁♂ = ▷♂}` остаются `ConstraintBundle` и не изменяют 10 root definitions.
+В машинных контрактах этим ролям соответствуют имена `ConstraintBundle` и `ValueBundle`.
 
-Плоский `ValueBundle` представляет экстенсиональный набор **уже разрешённых** связей. Source occurrences сохраняются раздельно, поэтому одинаковые `[]` нельзя схлопывать по glyph до resolution. После resolution порядок и повторы не входят в семантическое равенство пучка.
+Корневые `{◁ = ∞, ▷ = ∞}` и `{♀◁ = ♀▷, ◁♂ = ▷♂}` остаются пучками условий и не изменяют 10 корневых определений.
 
-Read-only expansion использует пучок как множество допустимых полюсов:
+Плоский пучок значений представляет экстенсиональный набор **уже разрешённых** связей. Исходные вхождения сохраняются раздельно, поэтому одинаковые `[]` нельзя схлопывать по внешнему виду до разрешения. После разрешения порядок и повторы не входят в семантическое равенство пучка.
+
+Раскрытие только чтением использует пучок как множество допустимых полюсов:
 
 ```text
 a{b,c}
@@ -155,19 +161,19 @@ a{b,c}
 {a,b}{c,d}
 ```
 
-В expansion-position пустой пучок является wildcard endpoint:
+В позиции полюса раскрытия пустой пучок означает отсутствие ограничения по соответствующему полюсу:
 
 ```text
-a{}   — существующие outgoing links
-{}b   — существующие incoming links
-{}{}  — существующие links рассматриваемой памяти
+a{}   — существующие исходящие связи из a
+{}b   — существующие входящие связи в b
+{}{}  — все существующие связи рассматриваемой памяти
 ```
 
-Отсутствующие links не создаются. Nested ValueBundle, bundle-valued definitions и lifting scalar operators на bundle в v0.2 не приняты.
+Отсутствующие связи не создаются. Вложенные пучки значений, определения через непустой пучок и автоматическое распространение операций одиночной связи на пучок в v0.2 не приняты.
 
 ## L2 и L3 не смешиваются
 
-В L3 базовый Anum-алфавит:
+В L3 базовый алфавит ачисел:
 
 ```text
 [ ] 1 0
@@ -175,7 +181,7 @@ a{}   — существующие outgoing links
 
 В L2 квадратные скобки являются формальной нотацией. Их видимое совпадение с L3-абитами не создаёт автоматического тождества.
 
-Принятый root-context boundary subset L3 выводится из root definitions МТС v0.2:
+Принятый корневой граничный поднабор L3 выводится из корневых определений МТС v0.2:
 
 ```text
 [  → ♀∞
@@ -184,14 +190,14 @@ a{}   — существующие outgoing links
 ][ → 0
 ```
 
-После boundary/protocol слоя принят storage-neutral structural handoff и два denoting subset:
+После граничного и протокольного слоя принята не зависящая от хранилища структурная передача и два денотирующих поднабора:
 
 ```text
 0 / 1
 00 / 01 / 10 / 11
 ```
 
-а также рекурсивная root grammar:
+а также рекурсивная корневая грамматика:
 
 ```text
 Atom  = 0 | 1
@@ -200,51 +206,53 @@ Pair  = Value Value
 Root  = Atom | Pair
 ```
 
-Для корневой записи действует проверяемое схлопывание ведущих открывающих абитов: decoder принимает structural reading только если повторное canonical encode в точности восстанавливает исходный raw carrier. Поэтому неоднозначные или неканонические строки не угадываются, а остаются typed `RAW`.
+Имена нетерминалов здесь являются обозначениями машинной грамматики. Теоретически это атом, значение, пара и корневая запись.
 
-`[[` и `]]` по-прежнему имеют специальный boundary status и не получают structural denotation. `quote` и `relative` не наследуют рекурсивную root grammar автоматически: quote сохраняет свой отдельный уровень описания, relative остаётся raw до отдельного принятого контракта.
+Для корневой записи действует проверяемое схлопывание ведущих открывающих абитов: декодер принимает структурное чтение только если повторное каноническое кодирование в точности восстанавливает исходную последовательность. Поэтому неоднозначные или неканонические строки не угадываются, а остаются явно неинтерпретированными (`RAW`).
+
+`[[` и `]]` по-прежнему имеют специальный граничный статус и не получают структурной денотации. Контексты `quote` и `relative` являются буквальными именами машинных режимов и не наследуют рекурсивную корневую грамматику автоматически: цитирование сохраняет отдельный уровень описания, относительный режим остаётся неинтерпретированным до отдельного принятого контракта.
 
 ## Рабочие инструменты
 
 ```text
-core/reference_model.py         декларативный contract L0–L5
-core/semantic_carrier.py        конечный cyclic Link carrier L1
-core/mtc_ast.py                 typed AST L2
-core/mtc_parser.py              tokenizer + Pratt parser L2
-core/mtc_interpreter.py         read-only contextual ConstraintBundle interpreter
-core/mtc_value_bundle.py        canonical flat ValueBundle elaboration/value/query core
-core/root_library.py            загрузка canonical root definitions
-core/validate_root.py           structural root validation
+core/reference_model.py         декларативный контракт уровней L0–L5
+core/semantic_carrier.py        конечный циклический носитель связей L1
+core/mtc_ast.py                 типизированное дерево разбора L2
+core/mtc_parser.py              лексический и синтаксический анализатор L2
+core/mtc_interpreter.py         интерпретатор пучков условий только для чтения
+core/mtc_value_bundle.py        каноническое ядро плоских пучков значений и запросов
+core/root_library.py            загрузка канонических корневых определений
+core/validate_root.py           структурная проверка корневой системы
 
 contracts/mts-contract-v0.2.json
-                               versioned language-neutral contract
+                               версионированный независимый от языка контракт
 contracts/mts-value-bundle-v0.2.json
-                               accepted flat ValueBundle contract
+                               принятый контракт плоских пучков значений
 contracts/mts-value-bundle-conformance-v0.2.json
-                               accepted bundle conformance corpus
+                               принятый корпус соответствия пучков
 contracts/anum-raw-carrier-v0.2.json
-                               storage-neutral raw carrier
+                               не зависящий от хранилища исходный носитель
 contracts/anum-boundary-projection-v0.2.json
-                               accepted root-context boundary projection
+                               принятая корневая граничная проекция
 contracts/anum-denotation-v0.2.json
-                               storage-neutral L3→L4 structural IR
+                               структурная передача L3→L4 без привязки к хранилищу
 contracts/anum-pair-denotation-v0.2.json
-                               accepted direct protocol/pair subset
+                               принятый прямой поднабор протокольных пар
 contracts/anum-recursive-denotation-v0.2.json
-                               accepted recursive root denotation
+                               принятая рекурсивная корневая денотация
 contracts/mts-conformance-v0.2.json
-                               cross-language formal-language corpus
+                               межъязыковой корпус формальной нотации
 
-core/anum_model.py              typed L3 contexts/results
-core/anum_parser.py             raw parse + incremental decoder + serialization
-core/anum_protocol.py           validate/project/quote/unquote/dictionary
-core/anum_denotation.py         storage-neutral denotation IR
-core/anum_pair_denotation.py    direct pair subset
-core/anum_raw_carrier.py        structural raw carrier description
+core/anum_model.py              типизированные контексты и результаты L3
+core/anum_parser.py             разбор исходной записи + потоковый декодер + сериализация
+core/anum_protocol.py           проверка, проекция, цитирование, словарь
+core/anum_denotation.py         не зависящее от хранилища описание денотации
+core/anum_pair_denotation.py    прямой поднабор парной денотации
+core/anum_raw_carrier.py        структурное описание исходного носителя
 core/anum_recursive_denotation.py
-                               recursive root decode + canonical inverse
-core/anum_memory.py             canonical indexed in-memory L4 store
-core/proof_checker.py           replay-only trusted L5 checker
+                               рекурсивное корневое декодирование + обратное преобразование
+core/anum_memory.py             каноническая индексированная память L4
+core/proof_checker.py           доверенная проверка доказательства воспроизведением L5
 
 converters/anum_cli.py
 converters/text_to_anum.py
@@ -252,44 +260,46 @@ converters/anum_to_text.py
 converters/ascii_unicode.py
 ```
 
-`carrier_isomorphic()` — техническое сравнение finite carrier topology и не является L2 `=`.
+`carrier_isomorphic()` — буквальное имя технической функции сравнения топологии конечных носителей; такое сравнение не является L2-равенством `=`.
 
-`core/mtc_interpreter.py` остаётся единственным active ConstraintBundle interpreter; `core/mtc_value_bundle.py` исполняет отдельную принятую ValueBundle role. Candidate/legacy copies после promotion не сохраняются.
+`core/mtc_interpreter.py` остаётся единственным исполнителем пучков условий. `core/mtc_value_bundle.py` исполняет отдельную принятую роль пучка значений. Кандидатные и устаревшие копии после принятия не сохраняются.
 
-## Cross-language conformance
+## Межъязыковая проверка соответствия
 
 `contracts/mts-conformance-v0.2.json` содержит одинаковые входы и ожидаемые результаты для любой реализации МТС v0.2:
 
 ```text
-lexing cases
-canonicalization cases
-ContextFrame + memory fixtures
-expected local substitutions / aliases
-normalized resolution trace kinds
+случаи лексического разбора
+случаи канонизации
+контексты и наборы связей
+ожидаемые локальные подстановки и связи вхождений
+виды шагов разрешения
 ```
 
-Python reference runtime обязан проходить этот corpus в CI. Другие consumers, включая `aprover`, должны проходить тот же файл, а не копировать правила вручную.
+Буквальные имена полей машинного корпуса сохраняются в JSON; здесь приведён их смысл по-русски.
 
-Flat ValueBundle имеет отдельный accepted corpus `contracts/mts-value-bundle-conformance-v0.2.json`; downstream consumers обязаны исполнять его после repin, а не выводить bundle semantics из UI или legacy prover behavior.
+Эталонное ядро на Python обязано проходить этот корпус в CI. Другие потребители, включая `aprover`, должны проходить тот же файл, а не копировать правила вручную.
 
-L3 имеет отдельные language-neutral corpora для raw carrier, denotation IR, pair subset и recursive root denotation. Downstream L4/AVM adapters должны потреблять typed результаты этих контрактов и не дублировать quaternary grammar.
+Для плоских пучков значений принят отдельный корпус `contracts/mts-value-bundle-conformance-v0.2.json`; зависимые потребители обязаны исполнять его после обновления точной копии контракта, а не выводить пучковую семантику из интерфейса пользователя или старой логики доказателя.
 
-## Сквозной vertical slice v0.2
+L3 имеет отдельные независимые от языка реализации корпуса для исходного носителя, денотации, парного поднабора и рекурсивной корневой денотации. Адаптеры L4/AVM должны потреблять типизированные результаты этих контрактов и не дублировать четверичную грамматику.
 
-Один integration test связывает production APIs без mock/legacy обходов:
+## Сквозной сценарий v0.2
+
+Один интеграционный тест связывает рабочие интерфейсы ядра без подмен и устаревших обходов:
 
 ```text
-raw Anum
-→ parse
-→ RawCarrierDescription
-→ accepted recursive AnumDenotation
-→ L4 load/find/realize/find
-→ canonical inverse
+исходное ачисло
+→ разбор
+→ описание исходного носителя
+→ принятая рекурсивная денотация ачисла
+→ L4: загрузить / найти / материализовать / найти
+→ каноническое обратное преобразование
 
-materialized LinkRef
-→ L2 structural interpretation
-→ mts-proof/v0.2
-→ independent L5 replay
+материализованная связь (`LinkRef`)
+→ структурная интерпретация L2
+→ доказательство `mts-proof/v0.2`
+→ независимое воспроизведение L5
 ```
 
 Запуск:
@@ -298,15 +308,15 @@ materialized LinkRef
 python -m pytest tests/test_mts_v02_end_to_end.py -v
 ```
 
-В этом же suite проверяется отрицательный путь: noncanonical `010` остаётся `RAW`, quote остаётся `QUOTED_RAW`, и ни один из них не превращается в скрытую команду materialization.
+В этом же наборе проверяется отрицательный путь: неканоническое `010` остаётся `RAW`, контекст `quote` возвращает `QUOTED_RAW`, и ни один из этих результатов не превращается в скрытую команду материализации.
 
 ## Интеграция с визуальным апрувером
 
-`anum_docs` остаётся единственным normative source МТС.
+`anum_docs` остаётся единственным нормативным источником МТС.
 
-`aprover` потребляет versioned contract и conformance corpus отсюда. Display labels не являются runtime identity: визуально одинаковые occurrences могут иметь разные `HoleId`/`LinkRef`.
+`aprover` потребляет версионированные контракты и корпуса соответствия отсюда. Отображаемые метки не являются тождеством при исполнении: визуально одинаковые вхождения могут иметь разные машинные идентификаторы `HoleId`/`LinkRef`.
 
-После изменения accepted contract downstream `aprover` обязан repin-ить exact upstream snapshot и исполнить новый bundle conformance corpus до добавления собственной UI semantics.
+После изменения принятого контракта `aprover` обязан закрепить точную новую версию исходных файлов и исполнить новый корпус соответствия до добавления собственной интерфейсной логики.
 
 ## Проверка
 
