@@ -57,7 +57,8 @@
       "start": "a",
       "expectedVisited": ["a"],
       "expectedCycleEdges": [],
-      "expectedMissing": []
+      "expectedExternalLeaves": ["b"],
+      "expectedMissingStart": false
     },
     {
       "id": "finite-chain",
@@ -65,7 +66,8 @@
       "start": "a",
       "expectedVisited": ["a", "b"],
       "expectedCycleEdges": [],
-      "expectedMissing": []
+      "expectedExternalLeaves": ["c"],
+      "expectedMissingStart": false
     },
     {
       "id": "self-reference",
@@ -73,7 +75,8 @@
       "start": "a",
       "expectedVisited": ["a"],
       "expectedCycleEdges": [["a", "a"]],
-      "expectedMissing": []
+      "expectedExternalLeaves": [],
+      "expectedMissingStart": false
     },
     {
       "id": "mutual-recursion",
@@ -81,7 +84,8 @@
       "start": "a",
       "expectedVisited": ["a", "b"],
       "expectedCycleEdges": [["b", "a"]],
-      "expectedMissing": []
+      "expectedExternalLeaves": [],
+      "expectedMissingStart": false
     },
     {
       "id": "missing-start",
@@ -89,15 +93,8 @@
       "start": "z",
       "expectedVisited": [],
       "expectedCycleEdges": [],
-      "expectedMissing": ["z"]
-    },
-    {
-      "id": "missing-dependency",
-      "definitions": ["a : b"],
-      "start": "a",
-      "expectedVisited": ["a"],
-      "expectedCycleEdges": [],
-      "expectedMissing": ["b"]
+      "expectedExternalLeaves": [],
+      "expectedMissingStart": true
     }
   ],
   "identityVeto": {
