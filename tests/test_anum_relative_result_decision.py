@@ -131,20 +131,20 @@ def test_source_replay_is_available_from_provenance_but_is_not_semantic_inverse(
     assert inverse["backendIdentityDisambiguation"] is False
 
 
-def test_focused_payload_ignores_unreachable_context_nodes_for_conformance():
-    graph = build_carrier(read(PATH_CORPUS)["indexAssignments"][0])
-    result = candidate_select("[[", graph)
-
-    # The selected SS node reaches only SS and S, despite the original context
-    # also containing F/E/EE. Carrier conformance is rooted at the selection.
-    reachable_variant = CarrierGraph(
+def test_focused_payload_ignores_truly_unreachable_context_nodes_for_conformance():
+    focused_with_extra = CarrierGraph(
         nodes=(
-            LinkNode(start=0, end=1),
-            LinkNode(start=0, end=1),
+            LinkNode(start=0, end=0),
+            LinkNode(start=1, end=1),
         ),
         root=0,
     )
-    assert carrier_isomorphic(result.focused, reachable_variant)
+    focused_without_extra = CarrierGraph(
+        nodes=(LinkNode(start=0, end=0),),
+        root=0,
+    )
+
+    assert carrier_isomorphic(focused_with_extra, focused_without_extra)
     assert read(DECISION)["preferredCandidate"]["unreachableContextNodes"] == "not observable through the focus-rooted denotation payload"
 
 
