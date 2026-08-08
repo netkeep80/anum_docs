@@ -1,0 +1,156 @@
+{
+  "schema": "mts-constructor-destructor-foundation-challenge/v0.6",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 177,
+  "dependsOn": [
+    "mts-pole-projection-foundation-challenge/v0.6",
+    "mts-interpretation-act-network-challenge/v0.6"
+  ],
+  "purpose": "Challenge a smaller L2 foundation where link construction, raw pole destruction and current-link deixis are orthogonal: ⟼ constructs, ♀/♂ destruct raw poles, ↑ denotes only the current link, while self-closed start/end wrapper forms are expressed by ordinary recursive definitions when needed.",
+  "candidatePrimitiveRoles": {
+    "linkConstructor": "A ⟼ B",
+    "rawStartDestructor": "♀F",
+    "rawEndDestructor": "F♂",
+    "currentLinkDeixis": "↑",
+    "derivedCurrentStart": "♀↑",
+    "derivedCurrentEnd": "↑♂",
+    "atomicLeftRightPronounsRequired": false,
+    "hostParentAscentRequired": false
+  },
+  "constructorDestructorLawsUnderChallenge": [
+    "♀(A ⟼ B) = A",
+    "(A ⟼ B)♂ = B",
+    "F = ♀F ⟼ F♂ for one already distinguished concrete binary link F"
+  ],
+  "semanticWrapperBoundary": {
+    "oldGenericStartWrapper": "start(F)=S where S=(S,F)",
+    "oldGenericEndWrapper": "end(F)=E where E=(F,E)",
+    "candidateOperatorMeaning": "♀/♂ no longer construct these wrappers",
+    "candidateReplacementWhenAWrapperIsActuallyNeeded": [
+      "S : S ⟼ F",
+      "E : F ⟼ E"
+    ],
+    "genericWrapperConstructorStillRequired": "challenged"
+  },
+  "candidateRootProgram": [
+    "∞ : ∞ ⟼ ∞",
+    "() : ♀() ⟼ ()♂",
+    "([) : ([) ⟼ ∞",
+    "(]) : ∞ ⟼ (])",
+    "(⟼) : ([) ⟼ (])",
+    "(↛) : (]) ⟼ ([)",
+    "[1] : (⟼)",
+    "[0] : (↛)",
+    "(=) : {♀(♀↑) = ♀(↑♂), (♀↑)♂ = (↑♂)♂}",
+    "(!=) : ¬(=)"
+  ],
+  "rootCarrierCandidate": {
+    "R": "(R,R)",
+    "O": "(O,R)",
+    "C": "(R,C)",
+    "L": "(O,C)",
+    "U": "(C,O)",
+    "interpretation": {
+      "R": "associative root",
+      "O": "meaning of ([)",
+      "C": "meaning of (])",
+      "L": "meaning of (⟼)",
+      "U": "meaning of (↛)"
+    },
+    "allExactPairsDistinct": true,
+    "finiteClosed": true
+  },
+  "historicalTopologyPreservation": {
+    "OHasHistoricalStartRootEquation": "O.start=O; O.end=R",
+    "CHasHistoricalEndRootEquation": "C.start=R; C.end=C",
+    "difference": "the topology is introduced by explicit root definitions rather than by generic constructive semantics of ♀/♂",
+    "acceptedEquivalenceClaim": false
+  },
+  "deicticBoundary": {
+    "current": "↑ -> X",
+    "forXEqualLinkAB": ["♀↑ -> A", "↑♂ -> B"],
+    "ContextFrameRequiredByCandidateOntology": false,
+    "ContextFrameMayRemainHistoricalAdapter": true,
+    "outerOrParentAccess": "deferred to ordinary act/state links from issue #173 unless a finite counterexample requires another anchor"
+  },
+  "arootBoundary": {
+    "candidate": "∞ : ∞ ⟼ ∞",
+    "usesDeixis": false,
+    "rawCarrier": "R=(R,R)",
+    "historicalA1": "∞ : {◁ = ∞, ▷ = ∞}",
+    "historicalRawConditionReproducible": true,
+    "semanticEquivalenceAccepted": false
+  },
+  "anumBoundaryCandidate": {
+    "open": "([)",
+    "close": "(])",
+    "one": "(⟼)",
+    "zero": "(↛)",
+    "carrier": ["O=(O,R)", "C=(R,C)", "L=(O,C)", "U=(C,O)"],
+    "preservesOrientationStructurally": true,
+    "replacesAcceptedV02BoundaryInProduction": false
+  },
+  "equalityCandidate": {
+    "currentContextLink": "X=(A,B)",
+    "derivedOperands": ["A=♀↑", "B=↑♂"],
+    "candidateBody": "{♀(♀↑) = ♀(↑♂), (♀↑)♂ = (↑♂)♂}",
+    "materializedExactPairObservation": "if A and B are canonical materialized links, equal raw ordered poles imply the same exact-pair LinkRef",
+    "virtualRecursiveEqualitySolved": false,
+    "accepted": false
+  },
+  "roundFormA2": {
+    "candidate": "() : ♀() ⟼ ()♂",
+    "underRawDestructors": "structural reconstruction law for a binary link",
+    "mayBeDerivedOrTautological": true,
+    "keepInMinimalRoot": "challenged"
+  },
+  "impactInventory": {
+    "productionCoreFilesThatEncodeOldProjectionMeaning": [
+      "core/mtc_ast.py",
+      "core/mtc_parser.py",
+      "core/mtc_interpreter.py",
+      "core/mtc_definitions.py",
+      "core/mtc_value_bundle.py",
+      "core/mtc_context_analysis.py"
+    ],
+    "acceptedContractsAffectedIfPromoted": [
+      "mts-contract/v0.2",
+      "anum-boundary-projection/v0.2",
+      "mts-direct-deixis/v0.5"
+    ],
+    "historicalArtifactsMustRemainImmutable": true,
+    "futureMigrationMustUseOneCanonicalPath": true,
+    "compatibilityDualProjectionSemanticsAllowed": false
+  },
+  "challengeAssertions": [
+    "finite R/O/C/L/U carrier is closed and exact-pair unique",
+    "raw destructors recover expected oriented poles",
+    "derived current roles need only one current-link anchor",
+    "candidate root A1 gives direct finite self-cycle without ContextFrame",
+    "explicit O/C root definitions reproduce the local historical start(root)/end(root) equations",
+    "L/U remain structurally distinct and L4 representable",
+    "same exact poles are idempotent in current materialized L4",
+    "current production parser still rejects standalone ↑ and therefore is not silently migrated by this challenge",
+    "candidate equality remains research for virtual/recursive forms"
+  ],
+  "veto": {
+    "productionParserChanged": false,
+    "productionInterpreterChanged": false,
+    "productionRootChanged": false,
+    "productionAnumChanged": false,
+    "historicalContractChanged": false,
+    "acceptedContractLinkAllowed": false,
+    "noSecondProjectionMeaningCompatibilityLayer": true
+  },
+  "nextGate": {
+    "ifChallengeGreen": "compare candidate against all required current use-cases, then write a foundation decision rather than immediately changing production",
+    "mustResolve": [
+      "whether generic semantic start/end wrappers are needed beyond root-specific recursive forms",
+      "whether () remains primitive/defined/derived",
+      "virtual and recursive equality under raw destructors",
+      "outer/nesting access without host ↑ ascent",
+      "new Anum boundary conformance before any production migration"
+    ]
+  }
+}
