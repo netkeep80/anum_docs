@@ -5,8 +5,12 @@ from enum import Enum
 from pathlib import Path
 
 from core.mtc_ast import Definition, Equality, Expression, Inequality, format_expression
+from core.mtc_definitions import (
+    DefinitionEnvironment,
+    DefinitionProvenance,
+    DefinitionRegistrationKind,
+)
 from core.mtc_parser import ParseDiagnostic, parse_formula, parse_formula_result
-from core.reference_model import StatementStatus
 
 
 INFINITY_SYMBOL = "∞"
@@ -39,62 +43,26 @@ class RootFormula:
 
 
 @dataclass(frozen=True)
-class DifferenceEntry:
-    """Difference introduced by a top-level ``target : expression``."""
-
-    symbol: str
-    introduction: str
-    status: StatementStatus
-    source_formula: RootFormula
-
-
-class DifferenceRegistry:
-    """Registry built only from typed top-level ``Definition`` nodes."""
-
-    def __init__(self):
-        self._entries: dict[str, DifferenceEntry] = {}
-        self._duplicates: list[
-            tuple[str, DifferenceEntry, DifferenceEntry]
-        ] = []
-
-    def register(self, entry: DifferenceEntry) -> None:
-        existing = self._entries.get(entry.symbol)
-        if existing is not None:
-            self._duplicates.append((entry.symbol, existing, entry))
-            return
-        self._entries[entry.symbol] = entry
-
-    def lookup(self, symbol: str) -> DifferenceEntry | None:
-        return self._entries.get(symbol)
-
-    def symbols(self) -> list[str]:
-        return list(self._entries)
-
-    def entries(self) -> list[DifferenceEntry]:
-        return list(self._entries.values())
-
-    def duplicates(self) -> list[tuple[str, DifferenceEntry, DifferenceEntry]]:
-        return list(self._duplicates)
-
-
-@dataclass(frozen=True)
 class RootLibrary:
     """Loaded canonical root-library surface."""
 
     formulas: tuple[RootFormula, ...]
-    registry: DifferenceRegistry
+    definitions: DefinitionEnvironment
 
     def texts(self) -> list[str]:
         return [formula.text for formula in self.formulas]
 
+    def definition_targets(self) -> list[str]:
+        return [
+            format_expression(entry.definition.target)
+            for entry in self.definitions.entries()
+        ]
+
     def square_abits(self) -> list[str]:
         """Return the four L2 forms that introduce square abits."""
 
-        return [
-            symbol
-            for symbol in SQUARE_ABIT_FORMS
-            if self.registry.lookup(symbol) is not None
-        ]
+        targets = set(self.definition_targets())
+        return [symbol for symbol in SQUARE_ABIT_FORMS if symbol in targets]
 
 
 def load_root_library(path: str | Path) -> RootLibrary:
@@ -124,30 +92,33 @@ def load_root_library(path: str | Path) -> RootLibrary:
     formula_tuple = tuple(formulas)
     return RootLibrary(
         formulas=formula_tuple,
-        registry=build_difference_registry(formula_tuple),
+        definitions=build_definition_environment(formula_tuple),
     )
 
 
-def build_difference_registry(
+def build_definition_environment(
     formulas: tuple[RootFormula, ...] | list[RootFormula],
-) -> DifferenceRegistry:
-    """Build the registry from actual ``Definition`` AST nodes only."""
+) -> DefinitionEnvironment:
+    """Build the root lexical environment from top-level typed definitions only."""
 
-    registry = DifferenceRegistry()
+    environment = DefinitionEnvironment()
     for formula in formulas:
         if not isinstance(formula.ast, Definition):
             continue
 
-        registry.register(
-            DifferenceEntry(
-                symbol=format_expression(formula.ast.target),
-                introduction=format_expression(formula.ast.value),
-                status=StatementStatus.DEFINITION,
-                source_formula=formula,
-            )
+        result = environment.register(
+            formula.ast,
+            provenance=DefinitionProvenance(
+                source_path=formula.source_path,
+                line_no=formula.line_no,
+            ),
         )
+        if result.kind is DefinitionRegistrationKind.NON_ADDRESSABLE:
+            # Root loading preserves the parsed formula; validation reports the
+            # non-addressable introduction as an invalid root definition.
+            continue
 
-    return registry
+    return environment
 
 
 def classify_formula_kind(expression: Expression | str | None) -> FormulaKind:
