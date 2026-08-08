@@ -12,7 +12,7 @@
   ],
   "conformanceCorpus": "contracts/mts-definition-opening-conformance-v0.3.json",
   "issue": 121,
-  "scope": "normative one-step read-only definition opening semantics; production integration and trusted proof rules are separate later gates",
+  "scope": "normative one-step read-only definition opening semantics; trusted proof rules remain a separate later gate",
   "definitionEnvironment": {
     "identity": {
       "definitionId": "replay-local pair (scopePath, ordinal)",
@@ -28,11 +28,12 @@
     "ContextFrameAffectsLookup": false
   },
   "addressability": {
-    "rule": "a definition target is addressable only when its typed Form contains neither occurrence-local anonymous empty [] nor ContextPronoun nodes",
+    "rule": "a definition target is addressable only when its typed scalar Form contains neither occurrence-local anonymous empty [] nor ContextPronoun nodes",
     "ordinaryClosedTypedFormsUse": "source-span-independent structural lookup discriminant",
     "structuralLookupDiscriminantImpliesSemanticEquality": false,
     "anonymousEmptySquareTarget": "non-addressable",
     "ContextPronounTarget": "non-addressable",
+    "bundleTarget": "non-addressable under the accepted scalar definition-target boundary",
     "reason": "occurrence-local/deictic forms must not become global definition names merely because two ASTs have the same structural spelling"
   },
   "operation": {
@@ -50,8 +51,8 @@
     "results": {
       "match": ["DefinitionId", "exact typed Definition.value", "provenance"],
       "no-match": "no visible definition for addressable target",
-      "conflict": "same-scope duplicate target made environment invalid for that introduction",
-      "non-addressable": "target is occurrence-local/deictic under the accepted v0.3 subset"
+      "conflict": "same-scope duplicate target makes that nearest lexical target conflicting rather than falling back to a parent",
+      "non-addressable": "target is outside the accepted addressable subset"
     },
     "oneStep": true,
     "recursive": false,
@@ -108,28 +109,39 @@
     "conformanceCorpus": "contracts/mts-definition-opening-conformance-v0.3.json",
     "rootRegression": "tests/mtc_formulas.mtc"
   },
+  "productionIntegration": {
+    "referenceCore": "core/mtc_definitions.py",
+    "rootLibrary": "core/root_library.py",
+    "rootValidator": "core/validate_root.py",
+    "productionConformance": "tests/test_mts_definition_opening_reference.py",
+    "legacyDifferenceRegistryRetained": false,
+    "challengeOnlyEnvironmentCloneRetained": false,
+    "interpretConstraintsExecutesDefinition": false,
+    "reasonInterpretRemainsSeparate": "accepted opening is a definition operation, not a new interpretation branch"
+  },
   "integrationStatus": {
     "semanticContractAccepted": true,
-    "productionReferenceCoreImplemented": false,
-    "singleProductionInterpreterIntegrated": false,
+    "productionReferenceCoreImplemented": true,
+    "canonicalRootLibraryUsesDefinitionEnvironment": true,
+    "productionConformancePresent": true,
     "mtsContractV03Published": false,
     "trustedL5RuleAccepted": false,
     "aproverRepinAllowed": false
   },
   "nextGate": {
-    "goal": "implement the accepted DefinitionEnvironment/open_definition operation once in canonical production core and prove it against the existing language-neutral corpus",
+    "goal": "publish mts-contract/v0.3 umbrella over the accepted and production-conformant definition-opening operation without changing v0.2 contracts in place",
     "constraints": [
       "do not add a second parser or interpreter",
       "do not modify the ten root definitions",
       "do not turn Definition into Equality",
       "do not add implicit ContextFrame evaluation",
       "do not add L4 reads/effects",
-      "delete challenge-only duplicate runtime model once production conformance no longer needs it as independent replay evidence"
+      "keep mts-proof/v0.2 trusted rule set unchanged until a separate L5 decision"
     ],
-    "afterProductionConformance": "publish mts-contract/v0.3 umbrella and only then evaluate a candidate L5 definition-opening proof rule"
+    "afterUmbrella": "start #122 proof-judgment/calculus challenge; only an explicitly accepted L5 contract may add a trusted definition-opening rule"
   },
   "downstream": {
-    "directRuntimePinBeforeProductionIntegration": false,
+    "directRuntimePinBeforeV03Umbrella": false,
     "aproverMustNotInventLocalOpeningSemantics": true,
     "futureConsumerMustUseVersionedV03Umbrella": true
   }
