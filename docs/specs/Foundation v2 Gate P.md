@@ -27,17 +27,18 @@ Docs current MTS surface                       #261/#263
 Anum sequence → апамять materialization        #242/#264
 ```
 
-После merge #264 semantic candidate #242 считается завершённым Gate-P evidence. Текущий следующий release blocker:
+Текущий единственный L4/release gate:
 
 ```text
-#124  persistent L4/backend contract
+#265 persistent exact-occurrence апамять
 ```
 
-Остаток release chain:
+Historical #124 закрыт как superseded для Foundation v2: его pair uniqueness/idempotent realize semantics относится к старому v0.3 challenge и противоречит exact-occurrence multiplicity.
+
+После #265 release chain:
 
 ```text
-#124 persistent L4/backend
-→ historical compatibility classification
+historical compatibility classification
 → atomic production cutover / old semantic-path deletion
 → versioned integrated conformance corpus
 → explicit Foundation-v2 acceptance
@@ -83,7 +84,7 @@ snapshot slot
 physical backend address
 ```
 
-`core/exact_link_network.py` теперь также поддерживает **additive persistent evolution**: новое immutable state может сохранять те же exact refs старых occurrences и append-ить новые occurrences без изменения `before`.
+`core/exact_link_network.py` поддерживает additive immutable evolution: новое runtime state сохраняет те же exact refs старых occurrences и append-ит новые occurrences без изменения `before`.
 
 ---
 
@@ -128,13 +129,7 @@ trusted deterministic replay
 accept / reject
 ```
 
-Replay:
-
-- не ищет candidate;
-- не выбирает rule;
-- не materialize-ит отсутствующие links;
-- не доверяет shape equality;
-- не зависит от legacy parser/proof checker.
+Replay не ищет candidate, не выбирает Rule, не доверяет shape equality и не materialize-ит отсутствующие links.
 
 ---
 
@@ -181,23 +176,13 @@ Equal_K(a,b)
 ⇔ rep_K(a) is rep_K(b)
 ```
 
-Не встроены:
-
-```text
-global substitution
-congruence
-transitive alias closure
-recursive decomposition
-union-find semantics
-```
+Не встроены global substitution, congruence, transitive alias closure, recursive decomposition или union-find semantics.
 
 ---
 
 # 7. Actual acts и Run
 
 `I` и конкретный `A` различаются.
-
-Последовательность acts:
 
 ```text
 Run_0     = R
@@ -216,13 +201,11 @@ Run фиксирует order/provenance, но не создаёт логичес
 
 # 8. Proof rule и integrated checker
 
-Первый proof-rule candidate существует только через admission:
+Первый proof-rule candidate существует только через:
 
 ```text
 T ⟼ Rule
 ```
-
-и одношагово decomposes истинное local equality завершённых links.
 
 Integrated P9 artifact:
 
@@ -255,7 +238,7 @@ READ SIDE
 read / find / enumerate / resolve / replay
 
 EFFECT SIDE
-materialize / define / delete / persist transition
+materialize / define / persist transition
 ```
 
 Главный инвариант:
@@ -270,23 +253,9 @@ find / replay != materialize
 
 ---
 
-# 10. #242 — sequence materialization
+# 10. #242/#264 — sequence materialization
 
-Исторический Anum raw/source carrier может хранить элементы будущей связи **несвязанными**.
-
-Например:
-
-```text
-carrier(∞ a b)
-```
-
-не обязан содержать:
-
-```text
-a ⟼ b
-```
-
-Foundation-v2 candidate определяет sequence effect:
+Foundation-v2 candidate определяет explicit sequence effect:
 
 ```text
 ∞ A B C
@@ -299,26 +268,9 @@ Root `∞` — sentinel и не участвует в adjacency.
 Nested group:
 
 ```text
-[A B]
-→ X = A ⟼ B
-→ return exact X as one outer value
+[A]   → exact A
+[A B] → X = A ⟼ B, return exact X
 ```
-
-Поэтому:
-
-```text
-∞ [A B] C
-→ X = A ⟼ B
-→ Y = X ⟼ C
-```
-
-Singleton:
-
-```text
-[A] → exact A
-```
-
-без нового link.
 
 Полный пример:
 
@@ -326,7 +278,7 @@ Singleton:
 ∞[window][cursor][position][[[x][int]][point]]
 ```
 
-даёт nested-first candidate relations:
+даёт nested-first relations:
 
 ```text
 XI = X ⟼ I
@@ -336,91 +288,173 @@ CP = Cursor ⟼ Position
 PQ = Position ⟼ Q
 ```
 
-#242 после merge #264 больше не является открытым semantic gap: sequence materialization имеет executable contract, tests и replay boundary. Он остаётся candidate частью будущей Foundation v2 до общего acceptance.
-
----
-
-# 11. Materialization identity policy
-
-#242 не использует historical `AnumMemory.intern_link`.
-
-Каждая adjacency materialization создаёт **новый exact occurrence**:
-
-```text
-old = A ⟼ B
-new = A ⟼ B
-old ≠ new
-```
-
-Если executor хочет reuse, это должно быть отдельным explicit planning decision; pair equality сама по себе reuse не разрешает.
-
-Persistent before/after lineage:
-
-```text
-before
-→ explicit effect
-→ after
-```
-
-сохраняет exact identity старых refs и immutable old links.
-
-Independent snapshot reload по-прежнему создаёт fresh runtime identity scope.
-
----
-
-# 12. Sequence replay boundary
-
-Production-facing candidate:
-
-```text
-core/foundation_v2_materialization.py
-```
-
-Machine contract:
-
-```text
-contracts/mts-anum-sequence-materialization-v0.7.json
-```
-
-Trusted replay проверяет:
-
-```text
-exact root
-base identity preserved
-old links unchanged
-exact created count/order
-nested adjacency poles
-exact result
-no extra links
-before/after snapshots unchanged during replay
-```
-
-Read-only `find_links` отдельно доказывает отсутствие hidden materialization.
+Каждая adjacency создаёт **новый exact occurrence**. Historical `AnumMemory.intern_link` не наследуется.
 
 Подробнее: [Ачисла и сериализация](Ачисла%20и%20сериализация.md).
 
 ---
 
-# 13. Persistent L4 gap #124
+# 11. Почему historical L4 #124 superseded
 
-Текущий следующий Gate-P blocker — доказать те же свойства на persistent backend:
+Старый v0.3 challenge требовал:
 
 ```text
-multiplicity
-cycles
-sharing
-persistent state transitions
-read-only find/replay
-explicit materialization
-portable evidence
-backend address != semantic identity
+exact pair uniqueness
+idempotent realize_link(A,B)
 ```
 
-In-memory same-lineage `OccurrenceRef` не должен превращаться в universal persistent identity.
+Foundation v2 требует:
+
+```text
+P1 = materialize(A,B)
+P2 = materialize(A,B)
+P1 ≠ P2
+```
+
+Поэтому #124 нельзя использовать как production backend contract следующей версии без semantic fork.
+
+Его contracts/tests остаются historical evidence, а новый L4 выводится отдельно в #265.
 
 ---
 
-# 14. Historical compatibility
+# 12. Persistent identity #265
+
+Foundation v2 L4 различает:
+
+```text
+runtime OccurrenceRef
+persistent dataset-local logical occurrence id
+portable snapshot-local slot
+backend physical address / record id
+```
+
+Reference logical id:
+
+```text
+PersistentOccurrenceId(lineage, local)
+```
+
+Reopen того же dataset сохраняет `lineage/local`, но runtime refs могут быть новыми host objects.
+
+Fresh import той же topology создаёт новый lineage:
+
+```text
+same topology != same persistent exact identity
+```
+
+Physical address никогда не является MTS identity.
+
+---
+
+# 13. Persistent effect semantics
+
+Persistent controller предоставляет read-only:
+
+```text
+poles
+find
+outgoing
+incoming
+all_occurrences
+snapshot
+```
+
+и explicit effects:
+
+```text
+materialize
+materialize_batch
+```
+
+`materialize(A,B)` всегда создаёт новый exact persistent occurrence.
+
+`materialize_batch` сначала выделяет logical ids всей партии, поэтому может представить self/mutual cycles через `BatchRef`, затем atomically публикует весь state.
+
+Наблюдаемая atomicity:
+
+```text
+либо весь post-state
+либо исходный pre-state
+```
+
+---
+
+# 14. Persistence vectors
+
+Gate #265 требует пережить clean reopen без semantic collapse:
+
+```text
+duplicate A⟼B occurrences
+self-cycle
+mutual cycle
+sharing
+root logical identity
+sequence materialization evidence
+```
+
+При этом:
+
+```text
+find remains read-only
+runtime refs may be reconstructed
+snapshot slot is not global identity
+physical address is not semantic identity
+```
+
+Reference executable backend: `core/foundation_v2_persistent.py`.
+
+Machine contract: `contracts/mts-foundation-v2-persistent-l4-v0.7.json`.
+
+Подробнее: [Foundation v2 Persistent L4](Foundation%20v2%20Persistent%20L4.md).
+
+---
+
+# 15. Sequence replay после reopen
+
+Persistent L4 не копирует Anum grammar.
+
+```text
+persistent store
+→ reconstruct runtime exact network
+→ foundation_v2_materialization.py
+→ normalize created edges to persistent ids
+→ atomic persistent batch
+```
+
+После reopen persistent evidence снова реконструирует runtime before/after lineage и вызывает тот же `replay_sequence_materialization`.
+
+Storage layer не становится вторым sequence interpreter.
+
+---
+
+# 16. JSON reference backend boundary
+
+`JsonExactLinkStore` — executable persistence evidence, а не нормативный storage format.
+
+Production implementation может быть:
+
+```text
+PersistMemoryManager adapter
+custom mmap store
+transactional DB
+another exact-link backend
+```
+
+если observable semantics совпадает.
+
+Правильная зависимость:
+
+```text
+Foundation-v2 L4 contract
+        ↑ implemented by
+backend adapter
+```
+
+а не наоборот.
+
+---
+
+# 17. Historical compatibility
 
 Accepted v0.2–v0.5 остаются reproducible historical contracts.
 
@@ -431,6 +465,7 @@ mtc_parser / typed AST / ContextFrame
 historical root program
 recursive Anum v0.2
 historical AnumMemory pair interning
+historical L4 v0.3 pair-unique challenge
 ```
 
 не удаляются задним числом.
@@ -439,7 +474,7 @@ historical AnumMemory pair interning
 
 ---
 
-# 15. Acceptance criterion
+# 18. Acceptance criterion
 
 Следующая версия МТС принимается только как одна интегрированная система:
 
@@ -449,9 +484,11 @@ exact occurrence network
 + relation/:/=
 + proof/Run/checker
 + sequence materialization
-+ persistent L4
++ persistent exact-occurrence L4
 + cutover
 + versioned conformance
 ```
+
+После закрытия #265 следующий фокус — **compatibility classification и atomic cutover**, а не новый параллельный semantic subsystem.
 
 До explicit acceptance все Foundation-v2 contracts остаются candidate evidence, а `aprover` не repin-ится.
