@@ -1,0 +1,82 @@
+{
+  "schema": "mts-foundation-v2-integration-readiness/v0.7",
+  "status": "research-direction-ready-for-gate-p",
+  "accepted": false,
+  "issue": 202,
+  "purpose": "Record that the Foundation-v2 semantic research chain is coherent enough to stop spawning foundation alternatives and begin one production/reference migration design gate, without publishing a new accepted production MTS contract yet.",
+  "evidenceFiles": [
+    "contracts/mts-semantic-root-kernel-challenge-v0.7.json",
+    "contracts/anum-streaming-interpreter-challenge-v0.7.json",
+    "contracts/anum-self-closed-context-challenge-v0.7.json",
+    "contracts/mts-four-binding-forms-challenge-v0.7.json",
+    "contracts/anum-root-relative-meaning-challenge-v0.7.json",
+    "contracts/mts-pointed-aset-meaning-boundary-challenge-v0.7.json",
+    "contracts/string-anum-byte-protocol-challenge-v0.7.json",
+    "contracts/astring-link-topology-challenge-v0.7.json",
+    "contracts/mts-scoped-link-dictionary-challenge-v0.7.json",
+    "contracts/mts-explicit-theory-network-challenge-v0.7.json",
+    "contracts/mts-integrated-interpreter-act-challenge-v0.7.json",
+    "contracts/mts-interpreter-role-vocabulary-challenge-v0.7.json",
+    "contracts/mts-multistep-interpreter-run-challenge-v0.7.json",
+    "contracts/mts-colon-definition-effects-challenge-v0.7.json",
+    "contracts/mts-foundation-v2-local-equality-challenge-v0.7.json",
+    "contracts/mts-source-sequence-challenge-v0.7.json"
+  ],
+  "foundationDirection": {
+    "ontology": "all semantic entities are links or explicit networks of links; host classes may implement/check but do not define semantic identity",
+    "root": "distinguished R/O/C/L/U bootstrap with R=R⟼R; topology relative to exact distinguished occurrences, not shape-global uniqueness",
+    "meaningBoundary": "exact referent + optional root-relative Anum structural view + explicit contextual D/T/act relations; no Meaning(x) payload primitive",
+    "anum": "finite root-relative occurrence-tree structural description on its accepted domain; not universal identity for arbitrary shared/cyclic asets",
+    "relationForms": "self-closure is ostensive structural form; construction/projection/check/search are resolution directions under explicit bindings",
+    "context": "persistent explicit K with current selected through the interpreter act; no hidden parent stack or process-global current",
+    "source": "UTF-8 bytes → canonical byte links → canonical astring content C + exact source occurrence S",
+    "language": "selected segmentation and grammar/theory membership are explicit replay evidence; no token enum/AST opcode semantic identity",
+    "dictionary": "explicit scoped link network; source/content and form remain distinct",
+    "theory": "explicit membership/admission network; axiom membership does not imply unrestricted rewrite",
+    "act": "I and actual A are distinct occurrences; finite structural bootstrap identifies role vocabulary/context boundary; extensible roles are dictionary-resolved",
+    "run": "exact adjacent persistent contexts chain acts; adjacency is not logical transitivity",
+    "definition": "colon effect is explicit persistent scoped dictionary change with distinct occurrence evidence",
+    "equality": "context-local representative constraint; relation decomposition only via separately admitted one-step rule; no automatic congruence/substitution/transitivity",
+    "search": "candidate enumeration/ranking untrusted; exact selected evidence replayed read-only"
+  },
+  "historicalDiagramIntegration": {
+    "supportsRelationOfRelationsIntuition": true,
+    "supportsSelfClosureAndOpenFormIntuition": true,
+    "supportsLabelsPredicatesAsLinksIntuition": true,
+    "changesNormativeEqualityBoundaries": false,
+    "treatedAsAxioms": false
+  },
+  "supersededDirections": [
+    "v0.6 raw ♀/♂ destructor foundation",
+    "AST-first semantic ownership",
+    "hidden ContextFrame/parent-stack ontology",
+    "global structural equality/congruence",
+    "source spelling equals semantic identity",
+    "host dictionary/token enum as foundation"
+  ],
+  "gatePRequirements": [
+    "define one production-facing typed/storage-neutral link and exact-occurrence substrate",
+    "define one parser/source front-end that preserves the selected Foundation-v2 source→D/G/T→act boundary",
+    "implement one reference interpreter/replay path over explicit K/D/T/A without parallel legacy semantic modes",
+    "classify every historical accepted behavior as preserved, intentionally changed, or historical replay-only",
+    "define explicit L4 mapping without making persistent numeric/address identity semantic identity",
+    "publish integrated conformance vectors before production cutover",
+    "migrate consumers atomically enough to delete obsolete semantic paths in the same program",
+    "only after accepted production contract allow aprover/AVM MTS-dependent repin"
+  ],
+  "productionAcceptance": {
+    "newAcceptedMtsVersionPublished": false,
+    "productionMigrationAllowedNow": false,
+    "gatePDesignAllowedNow": true,
+    "historicalContractsRemainReplayable": true,
+    "legacyCompatibilitySemanticModesAllowedAfterCutover": false,
+    "aproverRepinAllowedNow": false,
+    "mtsDependentAvmRepinAllowedNow": false
+  },
+  "issueLifecycleDecision": {
+    "issue202MayCloseAfterThisReviewMerges": true,
+    "freshGatePReplacesIssues194To199": true,
+    "issues194To199ShouldCloseAsSupersededAfterGatePCreation": true,
+    "noNewParallelFoundationGateWithoutNewFalsification": true
+  }
+}
