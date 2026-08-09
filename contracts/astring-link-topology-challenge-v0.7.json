@@ -1,0 +1,111 @@
+{
+  "schema": "astring-link-topology-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 213,
+  "dependsOn": [
+    "string-anum-byte-protocol-challenge/v0.7",
+    "mts-scoped-link-dictionary-challenge/v0.7",
+    "mts-pointed-aset-meaning-boundary-challenge/v0.7"
+  ],
+  "purpose": "Challenge one canonical link-only associative-string topology above the exact [bbbbbbbb] byte transport while preserving the distinction between canonical source content, exact source occurrence and dictionary-resolved form.",
+  "byteLayer": {
+    "transport": "[bbbbbbbb]",
+    "byteCarrierLink": "B = fold(R, [ open, bit0..bit7, close ]) over exact R/O/C/L/U abit refs",
+    "canonicalWithinNetwork": true,
+    "all256ValuesRequired": true,
+    "unicodeNormalization": "none",
+    "invalidUtf8Representable": true,
+    "acceptedForFoundationV2UpperLayerAfterChallenge": false
+  },
+  "candidateA": {
+    "name": "nested-byte-history-with-source-occurrence",
+    "emptyContent": "R under explicit astring protocol",
+    "contentStep": "H_(n+1) = H_n ⟼ B_n",
+    "content": "C = fold(R, canonical byte refs in source order)",
+    "sourceOccurrence": "S = S ⟼ C",
+    "dictionaryKey": "C",
+    "actSourceIdentity": "exact S occurrence",
+    "preferredAfterChallenge": true,
+    "accepted": false,
+    "reason": "byte boundaries remain explicit subrelations, identical byte content has one reusable lexical key, and repeated source occurrences remain distinguishable without a host string/list object"
+  },
+  "candidateB": {
+    "name": "flat-abit-history",
+    "shape": "fold(R, every physical abit of concatenated [bbbbbbbb] carriers)",
+    "roundTripPossible": true,
+    "usedPreviouslyAsChallengeScaffold": true,
+    "preferredAfterChallenge": false,
+    "concern": "it flattens the already-established byte carrier level, so string sequencing is not expressed over explicit byte relations and source occurrence remains conflated with canonical content"
+  },
+  "identityBoundary": {
+    "sameBytesSameCanonicalContentRefWithinOneExactPairNetwork": true,
+    "sameBytesRequireSameSourceOccurrence": false,
+    "sourceOccurrenceEqualsCanonicalContent": false,
+    "sourceOccurrenceEqualsSemanticForm": false,
+    "canonicalContentEqualsArbitraryLinkSemanticIdentity": false,
+    "crossBackendNumericRefIdentityRequired": false,
+    "physicalAddressIsSemanticIdentity": false
+  },
+  "emptyBoundary": {
+    "emptyCanonicalContentUsesRAsProtocolSeed": true,
+    "emptySourceOccurrenceEqualsR": false,
+    "emptySourceOccurrenceMayHaveSameSelfClosedShapeClassAsRootDerivedForms": true,
+    "shapeAloneAssignsAstringRole": false
+  },
+  "dictionaryBoundary": {
+    "canonicalLexicalKey": "content C",
+    "exactSourceOccurrenceCarriedSeparatelyByAct": true,
+    "twoOccurrencesWithSameContentReuseOneDictionaryEntry": true,
+    "occurrenceSpecificSemanticsMayBeRepresentedByAdditionalExplicitRelations": true,
+    "hostStringMapRequired": false
+  },
+  "decodeBoundary": {
+    "stringHistoryTerminatesOnlyAtExactR": true,
+    "stringCycleRejects": true,
+    "eachHistoryEndMustDecodeAsCanonicalByteCarrier": true,
+    "byteHistoryTerminatesOnlyAtExactR": true,
+    "byteCarrierMustHaveExactlyTenAbits": true,
+    "textDecodeIsSeparateUtf8Step": true
+  },
+  "requiredAssertions": [
+    "all 256 bytes have distinct canonical link carriers and round-trip through exact [bbbbbbbb] topology",
+    "arbitrary byte sequences round-trip through a nested byte-history content carrier",
+    "empty content is represented by the exact R protocol seed while an empty source occurrence remains a distinct self-closed link",
+    "prefix strings such as A and AB have different canonical content refs",
+    "the immediate sequence elements are canonical byte refs rather than flattened physical abits",
+    "the same byte sequence reconstructed twice reuses one canonical content ref inside one exact-pair network",
+    "two source occurrences over that same content are exact-occurrence-distinct",
+    "dictionary lookup keys canonical content so two same-content occurrences can reuse one entry without erasing occurrence identity",
+    "same Unicode appearance with distinct UTF-8 bytes remains distinct when caller supplies distinct bytes",
+    "invalid UTF-8 remains representable as byte content and fails only at strict text decode",
+    "malformed byte histories, non-byte string elements and cyclic string histories reject finitely",
+    "source occurrence role is explicit in the act/context and is not inferred from self-closed shape",
+    "flat-abit history remains round-trippable historical scaffold but is not selected as canonical astring topology",
+    "no Link gains string/content/type/address metadata and no production parser/interpreter changes"
+  ],
+  "decisionCandidate": {
+    "wording": "An associative string has canonical byte content represented by an R-seeded history of canonical [bbbbbbbb] byte-link carriers. A concrete source occurrence is a separate self-closed link S=S⟼C. Lexical dictionaries key canonical content C; interpretation acts carry the exact S occurrence when occurrence identity matters.",
+    "preferredAfterChallenge": true,
+    "accepted": false
+  },
+  "notDecided": [
+    "production API/module names for astring values",
+    "whether occurrence-specific source relations are exposed in surface syntax",
+    "tokenization of multi-glyph formal notation above astring content",
+    "production L4 storage representation",
+    "production migration"
+  ],
+  "veto": {
+    "hostStringListAsSemanticFoundationAllowed": false,
+    "flatRawAbitHistoryAsCanonicalAstringAllowed": false,
+    "sourceOccurrenceContentCollapseAllowed": false,
+    "sourceContentFormCollapseAllowed": false,
+    "hiddenUnicodeNormalizationAllowed": false,
+    "physicalAddressAsContentIdentityAllowed": false,
+    "recursiveAnumGrammarChangeAllowed": false,
+    "productionChangeAllowed": false,
+    "historicalContractMutationAllowed": false,
+    "aproverRepinAllowed": false
+  }
+}
