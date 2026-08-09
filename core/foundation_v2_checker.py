@@ -32,7 +32,7 @@ class IntegratedCheckerError(ValueError):
 class ProofGoalEvidence:
     """Transport selection of the exact claim occurrences the proof must establish.
 
-    This dataclass is not a new MTS ontological type or a claim-kind tag.  The
+    This dataclass is not a new MTS ontological type or a claim-kind tag. The
     semantic content remains the two already-existing exact link occurrences.
     """
 
@@ -41,13 +41,27 @@ class ProofGoalEvidence:
 
 
 @dataclass(frozen=True)
+class ProofJudgmentEvidence:
+    """Transport selection of one exact Foundation-v2 proof judgment.
+
+    ``theory`` and ``context`` are already-existing exact occurrences. ``goal``
+    selects exact claim occurrences. The dataclass adds no Gamma-like global
+    premise store and no new semantic tag to primitive links.
+    """
+
+    theory: OccurrenceRef
+    context: OccurrenceRef
+    goal: ProofGoalEvidence
+
+
+@dataclass(frozen=True)
 class IntegratedProofEvidence:
-    """One selected exact Foundation-v2 proof artifact."""
+    """Evidence offered for one explicitly selected exact proof judgment."""
 
     source: SourceFrontEndEvidence
     rule_application: DecomposeEqualityEvidence
     run: RunEvidence
-    goal: ProofGoalEvidence
+    judgment: ProofJudgmentEvidence
 
 
 def replay_integrated_proof(
@@ -55,20 +69,28 @@ def replay_integrated_proof(
     evidence: IntegratedProofEvidence,
     byte_refs: Mapping[int, OccurrenceRef],
 ) -> tuple[OccurrenceRef, OccurrenceRef]:
-    """Replay one source-selected rule proof for one exact selected goal.
+    """Replay one source-selected rule proof for one exact selected judgment.
 
-    Search is outside the trusted boundary.  Success means that trusted replay
-    produces the same exact claim occurrences, in the same roles, that were
-    selected as the goal.  Same-shape or same-pole substitute occurrences do
-    not satisfy the goal.
+    Search is outside the trusted boundary. Success requires all nested evidence
+    to use the judgment's exact theory and context, and trusted replay must
+    produce the same exact goal-claim occurrences in the same roles. Same-shape
+    or same-pole substitutes do not satisfy the judgment.
     """
 
     before_snapshot = network.snapshot()
     try:
+        judgment = evidence.judgment
         rule = evidence.rule_application.rule
-        theory = evidence.rule_application.theory
         premise = evidence.rule_application.premise
-        context = premise.context
+
+        if evidence.rule_application.theory is not judgment.theory:
+            raise IntegratedCheckerError(
+                "proof application uses another exact theory than selected judgment"
+            )
+        if premise.context is not judgment.context:
+            raise IntegratedCheckerError(
+                "equality premise uses another exact context than selected judgment"
+            )
 
         try:
             selected_forms = replay_source_front_end(network, evidence.source, byte_refs)
@@ -78,9 +100,9 @@ def replay_integrated_proof(
             raise IntegratedCheckerError(
                 "source must select exactly the same exact Rule used by proof application"
             )
-        if evidence.source.theory is not theory:
+        if evidence.source.theory is not judgment.theory:
             raise IntegratedCheckerError(
-                "source admission and proof application use different exact theories"
+                "source admission uses another exact theory than selected judgment"
             )
 
         try:
@@ -90,9 +112,9 @@ def replay_integrated_proof(
         if not premise_result:
             raise IntegratedCheckerError("integrated proof equality premise is false")
 
-        if evidence.rule_application.before_context is not context:
+        if evidence.rule_application.before_context is not judgment.context:
             raise IntegratedCheckerError("proof application uses another exact K")
-        if evidence.rule_application.after_context is not context:
+        if evidence.rule_application.after_context is not judgment.context:
             raise IntegratedCheckerError("observational proof rule changed exact K")
 
         try:
@@ -100,12 +122,12 @@ def replay_integrated_proof(
         except ProofRuleReplayError as exc:
             raise IntegratedCheckerError("invalid admitted proof-rule application") from exc
 
-        _verify_exact_goal(evidence.goal, claims)
+        _verify_exact_goal(judgment.goal, claims)
 
         expected_acts = (premise.act, evidence.rule_application.act)
-        if evidence.run.initial_context is not context:
+        if evidence.run.initial_context is not judgment.context:
             raise IntegratedCheckerError("run starts from another exact K")
-        if evidence.run.terminal_context is not context:
+        if evidence.run.terminal_context is not judgment.context:
             raise IntegratedCheckerError("run terminates at another exact K")
         try:
             selected_acts = replay_run(network, evidence.run)
