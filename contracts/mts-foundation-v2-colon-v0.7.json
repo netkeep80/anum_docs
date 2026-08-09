@@ -1,0 +1,82 @@
+{
+  "schema": "mts-foundation-v2-colon/v0.7",
+  "status": "gate-p-candidate",
+  "accepted": false,
+  "issue": 249,
+  "parent": 237,
+  "researchDecision": 224,
+  "dependsOn": [
+    "mts-exact-occurrence-link-network/v0.7",
+    "mts-foundation-v2-state/v0.7",
+    "mts-foundation-v2-source/v0.7",
+    "mts-foundation-v2-interpreter-replay/v0.7"
+  ],
+  "scope": {
+    "before": "D_before = D_before ⟼ (parentScope ⟼ H_before)",
+    "entry": "Entry = sourceContent ⟼ form",
+    "occurrence": "Occurrence = D_before ⟼ Entry",
+    "historyAppend": "H_after = H_before ⟼ Occurrence",
+    "after": "D_after = D_after ⟼ (sameParentScope ⟼ H_after)",
+    "persistent": true,
+    "parentImmutable": true
+  },
+  "lookup": {
+    "order": "local history first, then explicit parent scope",
+    "selectedEvidence": "exact historical definition occurrence visible from current D",
+    "sameLocalSourceSameForm": "one mapping, multiple declaration occurrences allowed",
+    "distinctLocalForms": "conflict",
+    "childLocalMapping": "shadows parent",
+    "childMiss": "falls through to parent",
+    "lastWriteWins": false,
+    "globalScanCountsAsVisibility": false
+  },
+  "colonReplay": {
+    "sameInterpreterModule": true,
+    "sourceOccurrenceTopology": "S = S ⟼ sourceContent",
+    "entryVerified": true,
+    "occurrenceBoundToExactBeforeScope": true,
+    "oneExactHistoryAppendVerified": true,
+    "afterScopeSameParentVerified": true,
+    "newOccurrenceVisibleInAfter": true,
+    "newOccurrenceNotRetroactivelyVisibleInBefore": true,
+    "snapshotStable": true,
+    "rhsRecursiveEvaluation": false,
+    "impliesEquality": false,
+    "impliesTheorem": false,
+    "implicitL4Materialization": false
+  },
+  "actualAct": {
+    "header": "A uses existing Gate-R I/D_roles/K header; colon may keep K unchanged",
+    "requiredRoles": [
+      "source",
+      "source-content",
+      "form",
+      "before-dictionary",
+      "entry",
+      "definition-occurrence",
+      "history-before",
+      "history-after",
+      "after-dictionary",
+      "context"
+    ],
+    "roleRefsExact": true
+  },
+  "migration": {
+    "flatDictionaryProductionPathRetained": false,
+    "sourceFrontEndUsesScopedVisibility": true,
+    "theoryGrammarMembershipRemainsSeparate": true,
+    "parallelDefinitionInterpreterAdded": false
+  },
+  "requiredVectors": [
+    "one persistent definition replays read-only",
+    "repeated identical definition keeps distinct occurrences but one mapping",
+    "distinct local forms conflict",
+    "child mapping shadows parent",
+    "child miss falls through to parent",
+    "unreachable global occurrence is not visible",
+    "wrong D_before rejects",
+    "wrong history predecessor rejects",
+    "changed parent in D_after rejects"
+  ],
+  "nextGate": "integrate local exact representative equality decision #225 into this same replay engine"
+}
