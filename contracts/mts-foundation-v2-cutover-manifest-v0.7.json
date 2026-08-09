@@ -2,26 +2,40 @@
   "schema": "mts-foundation-v2-cutover-manifest/v0.7",
   "status": "gate-p-cutover-manifest",
   "accepted": false,
-  "issue": 272,
+  "issue": 274,
   "parent": 271,
   "umbrella": 237,
-  "baseMainCommit": "38488fdcbce999a54726f56ad01ac358d28a9e1a",
+  "baseMainCommit": "884ce13d5528ac35d7e95c257711b9b4d7087e17",
   "cutoverPerformed": false,
   "foundationV2Accepted": false,
   "downstreamRepinAllowed": false,
-  "purpose": "Freeze the exact current Foundation-v2 release-candidate owners before migrating any historical live consumer or deleting any superseded semantic path.",
+  "purpose": "Freeze the exact current Foundation-v2 release-candidate owners while cutover migrates historical live consumers without introducing a second semantic runtime.",
   "owners": {
+    "publicEntrySurface": {
+      "modules": ["core/foundation_v2.py"],
+      "contracts": ["contracts/mts-foundation-v2-root-v0.7.json"],
+      "schemas": ["mts-foundation-v2-root/v0.7"],
+      "compatibilityMode": false,
+      "legacyDispatcher": false
+    },
     "exactOccurrenceSubstrate": {
       "modules": ["core/exact_link_network.py"],
       "contracts": ["contracts/mts-exact-occurrence-link-network-v0.7.json"],
       "schemas": ["mts-exact-occurrence-link-network/v0.7"]
     },
     "rootBootstrapEvidence": {
-      "modules": [],
-      "contracts": ["contracts/mts-semantic-root-kernel-challenge-v0.7.json"],
-      "schemas": ["mts-semantic-root-kernel-challenge/v0.7"],
+      "modules": ["core/foundation_v2_root.py"],
+      "contracts": [
+        "contracts/mts-foundation-v2-root-v0.7.json",
+        "contracts/mts-semantic-root-kernel-challenge-v0.7.json"
+      ],
+      "schemas": [
+        "mts-foundation-v2-root/v0.7",
+        "mts-semantic-root-kernel-challenge/v0.7"
+      ],
       "readerFacingOwners": ["README.md", "docs/theory/Основания МТС.md", "docs/theory/Система аксиом МТС.md"],
-      "liveProductionEntrypointReady": false,
+      "liveProductionEntrypointReady": true,
+      "implementedByIssue": 274,
       "cutoverPhase": "C3",
       "requiredOstensiveForms": ["∞", "♂e = S = S ⟼ e", "b♀ = E = b ⟼ E", "b ⟼ e"]
     },
@@ -105,5 +119,5 @@
     "legacyContextFrameMayBackFoundationV2K": false,
     "legacyPairInterningMayBackFoundationV2Materialization": false
   },
-  "next": "complete the exact consumer matrix, then begin C2/C3 public-entry/root cutover only after #272 decision"
+  "next": "continue C4/C5/C6 consumer isolation and migration; no deletion, acceptance or downstream repin until the later atomic cutover/release gates"
 }
