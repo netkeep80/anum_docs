@@ -1,0 +1,151 @@
+{
+  "schema": "mts-nesting-continuation-foundation-challenge/v0.6",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 182,
+  "dependsOn": [
+    "mts-foundation-direction-decision/v0.6",
+    "mts-current-link-equality-decision/v0.6",
+    "mts-root-anum-foundation-decision/v0.6",
+    "mts-interpretation-act-network-challenge/v0.6"
+  ],
+  "purpose": "Challenge whether nested interpretation, explicit call data and continuation can be represented entirely by ordinary finite links while L2 exposes only one current-link deictic anchor ↑ and has no host ContextFrame.parent or parent-ascent primitive.",
+  "hypothesis": {
+    "onlyDeicticAnchor": "↑ -> current semantic link",
+    "additionalDeicticAnchors": [],
+    "outerDataPolicy": "data needed by a child is explicitly included in the child's current link/state graph",
+    "continuationPolicy": "child result is explicitly included in the continuation current link/state graph",
+    "nestingPolicy": "call/history/continuation are ordinary links between act/state links",
+    "hostParentFieldRequired": false,
+    "implicitCallerLookupRequired": false,
+    "accepted": false
+  },
+  "finiteScenario": {
+    "outerFocus": "O",
+    "localArgument": "L",
+    "childResult": "R",
+    "grandchildArgument": "G",
+    "childCurrent": "XC=(O,L)",
+    "grandchildCurrent": "XG=(XC,G)",
+    "continuationCurrent": "XR=(O,R)",
+    "childAct": "AC=SC_before -> SC_after",
+    "grandchildAct": "AG=SG_before -> SG_after",
+    "parentAct": "AP=SP_before -> SP_after",
+    "callRelations": ["CallParentChild=(AP,AC)", "CallChildGrandchild=(AC,AG)"],
+    "historyRelation": "History=(AC,AP)",
+    "allCarriers": "binary links only"
+  },
+  "deicticObservations": [
+    {
+      "context": "XC=(O,L)",
+      "current": "↑=XC",
+      "observations": ["♀↑=O", "↑♂=L"]
+    },
+    {
+      "context": "XG=(XC,G)",
+      "current": "↑=XG",
+      "observations": ["♀↑=XC", "↑♂=G", "♀(♀↑)=O", "(♀↑)♂=L"]
+    },
+    {
+      "context": "XR=(O,R)",
+      "current": "↑=XR",
+      "observations": ["♀↑=O", "↑♂=R"]
+    }
+  ],
+  "explicitPassingBoundary": {
+    "outerFocusAutomaticallyVisibleToChild": false,
+    "outerFocusCanBePassedAsChildCurrentPole": true,
+    "arbitraryNeededStructureCanBePackedIntoBinaryLinks": true,
+    "passingDataCreatesNewDeicticPrimitive": false,
+    "childMayObserveOnlyWhatItsExplicitCurrentStructureExposes": true
+  },
+  "actBoundary": {
+    "outerShape": "Act=S_before ⟼ S_after",
+    "commandAndActualActDistinct": true,
+    "resultIsHiddenReturnValue": false,
+    "callIsHostStackFrame": false,
+    "continuationIsHostReturnAddress": false,
+    "fullActOntologyImpliesFormulaActIntrospection": false
+  },
+  "incomingSearchBoundary": {
+    "genericIncomingSearchMayReturnManyLinks": true,
+    "incomingSearchDefinesCaller": false,
+    "incomingSearchDefinesParent": false,
+    "currentActMayBeRecoveredOnlyThroughExplicitAcceptedRoleRelation": true,
+    "suchRoleRelationAcceptedHere": false
+  },
+  "deterministicReplay": {
+    "serializedCarrier": "sorted finite mapping localRef -> [start,end] plus explicit current ref per replay step",
+    "hostParentStackSerialized": false,
+    "ambientInterpreterIdentitySerialized": false,
+    "sameSerializedGraphAndCurrentProducesSameRawPoleObservations": true
+  },
+  "counterexampleSearch": {
+    "requiredVectorsNeedingOuterDataSolvedByExplicitPassing": true,
+    "requiredVectorsNeedingContinuationSolvedByExplicitLinks": true,
+    "requiredVectorsNeedingDeepNestingSolvedByNestedCurrentLinkStructure": true,
+    "minimalCounterexampleRequiringSecondDeicticAnchorFound": false,
+    "universalClaimThatNoFutureCounterexampleExists": false,
+    "policy": "do not add another deictic primitive until one finite semantic requirement cannot be represented by explicit current-link/state structure"
+  },
+  "historicalAscent": {
+    "ContextFrameParentPreferredOntology": false,
+    "upAsParentDepthPreferred": false,
+    "oldForms": ["↑◁", "↑▷", "↑↑◁", "↑↑▷"],
+    "automaticallyPreserved": false,
+    "migrationCandidate": "replace hidden outer-frame reads with explicit data links passed into the current semantic link/state"
+  },
+  "candidateModels": [
+    {
+      "id": "N0-host-parent-chain",
+      "accepted": false,
+      "status": "historical-baseline",
+      "summary": "ContextFrame.parent plus ↑ depth counter"
+    },
+    {
+      "id": "N1-one-current-link-explicit-passing",
+      "accepted": false,
+      "status": "preferred-challenge-candidate",
+      "summary": "one ↑ anchor; outer/local/result data are explicit components of current/state links"
+    },
+    {
+      "id": "N2-implicit-incoming-caller-search",
+      "accepted": false,
+      "status": "reject-as-default",
+      "summary": "derive parent/caller by arbitrary incoming-link search",
+      "problem": "incoming relation is generally non-unique and would create hidden contextual meaning"
+    },
+    {
+      "id": "N3-second-parent-pronoun",
+      "accepted": false,
+      "status": "not-justified-by-current-evidence",
+      "summary": "add a second primitive that directly observes caller/outer focus",
+      "problem": "no finite required vector currently forces it"
+    }
+  ],
+  "challengeAssertions": [
+    "all scenario nodes are binary links",
+    "child receives outer/local data through XC and needs only ↑ plus raw destructors",
+    "grandchild can receive a nested explicit current structure without parent ascent",
+    "continuation receives outer/result data through XR and no hidden return address",
+    "call/history relations are ordinary links",
+    "generic incoming search from a current link is ambiguous in the fixture",
+    "serialized finite graph plus explicit current ref deterministically replays observations",
+    "no required vector produces evidence for a second deictic anchor"
+  ],
+  "effectsBoundary": {
+    "usesProductionL4": false,
+    "materializes": false,
+    "deletes": false,
+    "readsAmbientSession": false,
+    "mutatesHistoricalContracts": false
+  },
+  "releaseVeto": {
+    "productionParserChangeAllowed": false,
+    "productionInterpreterChangeAllowed": false,
+    "acceptedContractLinkAllowed": false,
+    "aproverRepinAllowed": false,
+    "secondDeicticPrimitiveAllowedWithoutCounterexample": false,
+    "nextGateAfterChallenge": "Gate N decision; then integrated v0.6 foundation vertical-slice challenge"
+  }
+}
