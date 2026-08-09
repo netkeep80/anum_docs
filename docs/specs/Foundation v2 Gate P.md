@@ -1,128 +1,192 @@
-# Foundation v2 — Gate P candidate
+# Foundation v2 — Gate P
 
 Статус: **production/reference candidate**, не accepted release.
 
-Главный epic: #237. Завершены exact-occurrence substrate #240/#241, state/apamemory #243/#244, source front-end #245/#246, relation replay #247/#248, persistent scoped `D` + `:` #249/#250 и local `=` #251/#252. Текущий слой: exact multistep run #253. Sequence-deserialization: #242. Persistent L4 backend: #124.
+Главный epic: #237.
 
-Цель Gate P — собрать **один** production/reference semantic path, затем опубликовать следующую версию МТС, которую сможет точно потреблять `aprover`.
+Цель Gate P — собрать **один** link-only production/reference semantic path, удалить конкурирующие старые semantic paths при cutover и только затем опубликовать следующую accepted версию МТС для downstream consumers, прежде всего `aprover`.
 
-## 1. Каноническая лестница Foundation v2
+---
 
-```text
-binary link ontology
-→ distinguished R/O/C/L/U bootstrap
-→ exact-occurrence finite link networks
-→ root-relative Anum descriptions where defined
-→ canonical UTF-8/astring source content
-→ exact source occurrence
-→ selected exact segmentation
-→ scoped D + explicit G/T evidence
-→ explicit K/current
-→ one trusted interpreter/replay engine
-→ relation / : / = acts
-→ exact ordered run of actual acts
-→ separately admitted theory-rule/proof replay
-→ accepted contract
-→ aprover
-```
+# 1. Текущее состояние
 
-Ключевые границы:
+Foundation v2 уже прошла основные semantic gates:
 
 ```text
-source != semantic form
-form != theory membership
-structure != exact occurrence identity
-read/find/replay != materialize
-candidate search != trusted replay
-local equality != global rewrite system
-act adjacency != logical transitivity
+P0  production semantic surface audit
+P1  exact-occurrence binary-link substrate
+P2  link-only K / D / G / T / I / A state
+P3  canonical source front-end
+P4  unified relation interpreter/replay
+P5  persistent scoped D + `:`
+P6  local representative `=`
+P7  exact multistep Run
+P8  separately T-admitted proof rule
+P9  integrated source → Rule → equality → proof → Run replay
 ```
 
-## 2. Production substrate
-
-Foundation-v2 substrate:
+Ключевые завершённые issues/PRs:
 
 ```text
-OccurrenceRef
-Link(start,end)
-LinkNetwork
+#238/#239  production semantic surface audit
+#240/#241  exact-occurrence substrate
+#243/#244  Foundation-v2 state / apamemory roles
+#245/#246  source front-end
+#247/#248  interpreter/replay
+#249/#250  scoped D + `:`
+#251/#252  local `=`
+#253/#254  exact Run
+#255/#256  first T-admitted proof rule
+#257/#262  integrated proof/checker conformance
 ```
 
-`Link` имеет только `start/end`; sharing и cycles являются native конечной структурой.
+Сейчас semantic proof/checker core считается **готовым к release-hardening**, но Foundation v2 ещё не принята.
+
+Оставшиеся крупные blockers:
 
 ```text
-X1 = a ⟼ b
-X2 = a ⟼ b
-X1 != X2
+#261  current documentation refresh
+#242  Anum sequence → апамять executable materialization
+#124  persistent L4/backend contract
+historical compatibility classification
+atomic production cutover / legacy semantic-path deletion
+versioned integrated conformance corpus
+explicit Foundation-v2 acceptance
+published next MTS version
+aprover repin
 ```
 
-Shape/isomorphism и physical backend address не определяют semantic identity.
+---
 
-## 3. Source, context и actual act — тоже связи
+# 2. Базовый substrate
 
-Source content и occurrence:
+Единственный primitive semantic shape:
 
 ```text
-C0 = R
-C(n+1) = Cn ⟼ B(byte_n)
-S = S ⟼ C
+Link(start, end)
 ```
 
-Context:
+При этом identity находится не в паре полюсов, а в exact occurrence.
+
+```text
+P1 = A ⟼ B
+P2 = A ⟼ B
+
+P1 ≠ P2
+```
+
+Substrate обязан поддерживать:
+
+- duplicate pairs;
+- multiple self-cycles;
+- arbitrary finite cycles;
+- sharing;
+- exact root selection;
+- portable topology snapshot без объявления snapshot slot универсальной identity.
+
+Не принимаются как semantic identity:
+
+```text
+graph isomorphism
+pair interning
+physical memory address
+persistent backend handle
+AST path
+source spelling
+```
+
+Production-facing implementation: `core/exact_link_network.py`.
+
+---
+
+# 3. Bootstrap R/O/C/L/U
+
+Foundation v2 использует небольшой набор distinguished exact occurrences:
+
+```text
+R / O / C / L / U
+```
+
+Их назначение bootstrap-уровня определяется exact selection, а не глобальным shape classifier.
+
+Например две связи:
+
+```text
+R = R ⟼ R
+X = X ⟼ X
+```
+
+остаются различными exact occurrences.
+
+Поэтому нельзя восстанавливать semantic role только из self-closed shape.
+
+---
+
+# 4. Context K
+
+Persistent context выражается обычными связями:
 
 ```text
 P = parent ⟼ current
 K = K ⟼ P
-↑ = current from exact active K
 ```
 
-Actual act:
+`K` — exact snapshot.
+
+Текущий focus:
 
 ```text
-P0 = D_roles ⟼ K_after
-H  = I ⟼ P0
-A  = A ⟼ H
-
-Field = roleRef ⟼ value
-A ⟼ Field
+↑ = current(K)
 ```
 
-Host field names — checker API, а semantic role identity задаётся exact refs.
+не требует скрытого global current или `ContextFrame` stack.
 
-## 4. Один source front-end
+Переход:
 
 ```text
-raw bytes
-→ canonical C
-→ exact S
-→ untrusted candidate segmentation
-→ selected exact spans
-→ visible scoped-D declaration occurrences
-→ ordered exact forms
+K_before → K_after
+```
+
+должен иметь explicit evidence в actual act.
+
+---
+
+# 5. Source pipeline
+
+Foundation v2 source path:
+
+```text
+raw UTF-8
+→ canonical byte carriers
+→ canonical astring content C
+→ exact source occurrence S
+→ selected exact segmentation
+→ scoped D resolution
 → explicit G/T admission
-→ read-only replay
+→ exact semantic form(s)
 ```
 
-Selected slice:
+Главная граница:
 
 ```text
-Span = sourcePrefix(start) ⟼ sourcePrefix(end)
-SliceEvidence = Span ⟼ sliceContent
-Lexeme = S ⟼ SliceEvidence
-Resolution = Lexeme ⟼ form
-Selection = visibleDefinitionOccurrence ⟼ Resolution
+source occurrence != canonical content != semantic form != theory admission
 ```
 
-UTF-8 `⟼` может быть одним многобайтным selected slice. Candidate search может использовать любые эвристики, но trusted replay проверяет selected exact evidence.
+Trusted replay не обязан доверять tokenizer-у, longest-match или AST class.
 
-## 5. Persistent scoped dictionary D
+Production-facing implementation: `core/foundation_v2_source.py`.
+
+---
+
+# 6. Persistent scoped dictionary D
+
+Canonical D topology:
 
 ```text
-ScopePayload = parentScope ⟼ localHistory
-D = D ⟼ ScopePayload
+D = D ⟼ (parentScope ⟼ localHistory)
 ```
 
-Definition effect:
+Definition:
 
 ```text
 Entry      = sourceContent ⟼ form
@@ -131,277 +195,407 @@ H_after    = H_before ⟼ Occurrence
 D_after    = D_after ⟼ (sameParentScope ⟼ H_after)
 ```
 
-Lookup:
+Свойства:
+
+- old scope не мутирует;
+- local mapping может shadow parent;
+- local miss использует parent;
+- duplicate same mapping может сохраняться как provenance;
+- conflicting local resolution не разрешается «last write wins» молча.
+
+---
+
+# 7. `:` как explicit effect
+
+`:` — persistent dictionary effect.
+
+Он не является:
 
 ```text
-local first
-local mapping shadows parent
-local miss falls through to parent
-same local source + same form = one mapping, many declaration occurrences allowed
-distinct local forms = conflict
-no last-write-wins
+equality
+host assignment
+theorem assertion
 ```
 
-Arbitrary global `D_old⟼Entry` is not visible without exact history/parent reachability.
+Executor/materializer может создать требуемые exact links.
 
-## 6. Один interpreter/replay engine
-
-### 6.1. Relation-resolution act
+Trusted replay только проверяет уже предъявленный transition:
 
 ```text
-exact source evidence
-→ selected partial F
-→ exact K/current
-→ binding = ↑
-→ structural pole resolution
-→ exact result X
-→ persistent K_after
-→ actual A
+D_before
+→ exact definition occurrence
+→ H_after
+→ D_after
 ```
 
+без мутации проверяемой сети.
+
+---
+
+# 8. Relation resolution
+
+Самозамкнутый один полюс формы является структурой, а не opcode.
+
 ```text
-F = F ⟼ e  => X = current ⟼ e
-F = b ⟼ F  => X = b ⟼ current
+F = F ⟼ X
 ```
 
-Direction comes from exact form structure, not glyph/AST/opcode.
-
-### 6.2. Persistent `:`
-
-The same engine verifies:
+или:
 
 ```text
-S = S ⟼ sourceContent
-Entry = sourceContent ⟼ form
-Occurrence = D_before ⟼ Entry
-H_after = H_before ⟼ Occurrence
-parent(D_after) = parent(D_before)
-history(D_after) = H_after
+F = X ⟼ F
 ```
 
-```text
-: != =
-: != theorem assertion
-: != recursive RHS evaluation
-```
+Operation возникает при selected form + exact binding from `K`.
 
-### 6.3. Local exact representative `=`
+Trusted replay проверяет exact result и новый `K`, но не materialize-ит их.
+
+Production-facing implementation: `core/foundation_v2_interpreter.py`.
+
+---
+
+# 9. Local `=`
+
+Foundation v2 equality candidate:
 
 ```text
-K = K ⟼ (parent ⟼ current)
-Pair = member ⟼ representative
+Pair    = member ⟼ representative
 Binding = K ⟼ Pair
 ```
 
 ```text
-rep_K(x) = one explicit local representative, else x
-Equal_K(a,b) iff rep_K(a) and rep_K(b) are the same exact occurrence
+Equal_K(a,b)
+⇔ rep_K(a) is rep_K(b)
 ```
 
-Only one hop is used. Duplicate same-representative occurrences are unambiguous provenance; distinct representatives conflict.
+Только local exact representative и только один hop.
 
-No automatic transitivity, substitution, congruence, global rewrite or graph-shape equality is imported. Equality evaluation is itself an actual `A`; host boolean is only convenience.
-
-Relation decomposition is not built into `=` and may only appear later as a separately admitted one-step `T` rule.
-
-## 7. Exact multistep run
-
-Gate #253 adds the production run-continuity layer needed by `aprover` without inventing a new proof calculus.
-
-### 7.1. Ordered run container
+Не встроены:
 
 ```text
-Run_0 = R
+global structural equality
+transitive alias closure
+substitution
+congruence
+recursive decomposition
+union-find semantics
+```
+
+Это решение предотвращает collapse различений exact-occurrence сети.
+
+---
+
+# 10. Actual act A
+
+Foundation v2 различает:
+
+```text
+I — interpreter / capability
+A — actual occurrence конкретного действия
+```
+
+Actual act содержит role-addressed exact evidence, например:
+
+```text
+source
+form
+D
+G
+T
+K_before
+binding
+result
+K_after
+```
+
+Roles также представлены ordinary link occurrences, а не enum field внутри `Link`.
+
+---
+
+# 11. Exact Run
+
+Многошаговый artifact:
+
+```text
+Run_0     = R
 Run_(i+1) = Run_i ⟼ A_i
 ```
 
-The final exact `Run_n` identifies the selected run. Host array order is not semantic authority: trusted replay walks the exact run links backwards and confirms every exact `A_i` in order.
-
-### 7.2. Generic act boundaries
-
-Each selected step supplies exact role refs for:
+Continuity:
 
 ```text
-A ⟼ (beforeRole ⟼ K_before)
-A ⟼ (afterRole  ⟼ K_after)
+A_i.after is A_(i+1).before
 ```
 
-and the Gate-R act header must also select the same exact `K_after`.
+Exact identity обязательна: shape-equivalent `K_copy` не подходит.
 
-For an observational/no-context-change act:
-
-```text
-K_before = K_after
-```
-
-This permits relation, `:`, `=` and later admitted theory-rule acts to share one run protocol without the run checker reimplementing their operator semantics.
-
-### 7.3. Exact continuity
-
-The semantic invariant is:
+Run не создаёт:
 
 ```text
-A_i.after = K_(i+1)
-A_(i+1).before = K_(i+1)
-```
-
-using **the same exact occurrence ref**.
-
-Two contexts with the same parent/current topology are not interchangeable:
-
-```text
-K1  = K1  ⟼ (P ⟼ X)
-K1' = K1' ⟼ (P ⟼ X)
-K1 != K1'
-```
-
-So:
-
-```text
-A0.after = K1
-A1.before = K1'
-```
-
-is a broken run even though the snapshots look the same.
-
-### 7.4. Cycles, branches and repeated acts
-
-Finite returns are ordinary finite runs:
-
-```text
-K0 --A0--> K1 --A1--> K0
-```
-
-No recursive graph unfolding is needed.
-
-Two candidate branches may coexist:
-
-```text
-          A1 → K1
-K0 ──────┤
-          A2 → K2
-```
-
-Trusted replay validates only the exact selected run. Branch discovery/ranking belongs to untrusted proof search.
-
-Otherwise-identical no-op acts can remain different exact occurrences:
-
-```text
-K0 --A0--> K0 --A1--> K0
-A0 != A1
-```
-
-and the run chain preserves their exact order.
-
-### 7.5. What adjacency does not mean
-
-From:
-
-```text
-K0 --A0--> K1 --A1--> K2
-```
-
-the run checker does **not** infer or materialize:
-
-```text
-K0 → K2
-```
-
-and does not derive:
-
-```text
+K0 → Kn shortcut
 logical transitivity
-modus ponens
-theorem status
-substitution
-congruence
+theorem closure
 ```
 
-Run continuity is execution/provenance structure, not a logical rule.
+Он фиксирует exact order/provenance actual acts.
 
-### 7.6. Layered trust boundary for aprover
+Production-facing implementation: `core/foundation_v2_run.py`.
+
+---
+
+# 12. Separately admitted proof rule
+
+Первый proof-rule candidate специально вынесен за пределы `=`.
+
+Premise:
 
 ```text
-untrusted proof search
-→ selected exact acts + Run_n
-→ replay each act with the unified interpreter engine
-→ replay exact run continuity
-→ replay separately admitted T rules
+Equal_K(L,R) = true
 ```
 
-This separation means the algorithm that *found* a proof does not need to be trusted if the chosen proof can be replayed deterministically.
-
-## 8. Апамять как controller сети
-
-Подробно: [Апамять и управление сетью связей](Апамять%20и%20управление%20сетью%20связей.md).
+Links:
 
 ```text
-read / find / enumerate / replay != materialize / delete
+L = ls ⟼ le
+R = rs ⟼ re
 ```
 
-Therefore:
+Admission:
 
 ```text
-source carrier != result network
-query description != queried fact
-replay evidence != application effect
+T ⟼ Rule
 ```
 
-Context, dictionary scopes, local equality bindings, actual acts and run containers are all ordinary link-network evidence. This is the practical value of apamemory: program state and proof provenance can live in the same exact relational substrate as application data without becoming hidden host metadata.
-
-## 9. Ачисло и future sequence deserialization
-
-Recursive Anum is already a root-relative structural description on its occurrence-tree domain, but full sequence materialization remains #242.
-
-Candidate historical principle:
+One-step conclusions:
 
 ```text
-∞ A B C
+C_start = ls ⟼ rs
+C_end   = le ⟼ re
 ```
 
-may explicitly materialize:
+Claims не materialize-ят equality bindings и nested relations не decomposed автоматически.
+
+Production-facing implementation: `core/foundation_v2_proof.py`.
+
+Подробнее: [Foundation v2 Proof replay](Foundation%20v2%20Proof%20replay.md).
+
+---
+
+# 13. Integrated checker P9
+
+Первый целостный trusted artifact:
 
 ```text
-A ⟼ B
-B ⟼ C
+source `decompose`
+        ↓
+canonical C / exact S
+        ↓
+selected segmentation
+        ↓
+scoped D
+        ↓
+exact Rule + G/T source admission
+        ↓
+true local equality A_eq in exact K
+        ↓
+exact direct T ⟼ Rule
+        ↓
+one-step A_rule
+        ↓
+exact Run[A_eq, A_rule]
+        ↓
+read-only integrated replay
 ```
 
-with nested-context semantics, but only after executable #242 acceptance.
-
-We keep separate:
+Integrated checker требует сквозное exact тождество:
 
 ```text
-source front-end   = read/resolve source evidence
-interpreter replay = validate selected semantic act
-run replay         = validate exact act order/K continuity
-Anum→апамять       = explicit result-network materialization
+source-selected Rule is proof Rule
+source T is proof T
+premise K is proof K is Run K
+Run acts are exactly (A_eq, A_rule)
 ```
 
-## 10. Next proof gate
+Он не:
 
-After #253, the next step toward `aprover` is **separately admitted theory-rule replay**, not another global operator semantics.
+- tokenizes source;
+- ищет proof;
+- ранжирует rules;
+- выводит equality по shape;
+- выбирает T;
+- materialize-ит claims;
+- вызывает legacy proof checker.
 
-In particular, relation decomposition may be represented as an explicit `T`-admitted one-step rule that emits local pole constraints, but it must not become a hidden built-in consequence of `=` and must not recurse automatically.
+Production-facing implementation: `core/foundation_v2_checker.py`.
 
-## 11. Remaining release path
+Research record: [P9 integrated proof conformance](../research/Foundation%20v2%20P9%20integrated%20proof%20conformance.md).
+
+---
+
+# 14. Апамять как прикладной смысл Gate P
+
+Foundation v2 становится особенно наглядной, если смотреть на неё как на теорию **контроллера сетей связей**.
+
+Апамять предоставляет две принципиально разные группы действий:
 
 ```text
-exact multistep run #253
-→ separately admitted theory-rule/proof replay
-→ sequence-to-apamemory #242
-→ persistent L4 boundary #124
-→ historical compatibility classification
-→ integrated end-to-end conformance
-→ explicit acceptance decision
-→ atomic production cutover
-→ publish next MTS version
-→ repin aprover
+READ SIDE
+find
+select
+enumerate
+resolve
+replay
+
+EFFECT SIDE
+materialize
+define
+delete
+persist
 ```
 
-Forbidden final state:
+Их нельзя смешивать.
+
+В одной exact network могут существовать:
 
 ```text
-legacy semantics + Foundation-v2 semantics selectable by flag
+application data
+source carrier
+K contexts
+D histories
+G/T admissions
+actual acts
+proof claims
+Runs
 ```
 
-After acceptance the active production tree must contain one canonical semantic path; Git preserves history.
+Поиск может использовать эффективные индексы, кэши, эвристики и backend-specific handles. Но trusted semantics принимает только exact evidence network.
+
+Подробнее: [Апамять и управление сетью связей](Апамять%20и%20управление%20сетью%20связей.md).
+
+---
+
+# 15. Ачисло и materialization gap #242
+
+Recursive Anum пока является structural description, а не готовым universal materializer arbitrary exact network.
+
+Нужен explicit executable bridge:
+
+```text
+Anum/source sequence
+→ selected structural interpretation
+→ materialization plan
+→ exact links before/after
+→ replayable effect evidence
+```
+
+Особенно важны:
+
+- nested structures;
+- exact occurrence multiplicity;
+- sharing policy;
+- cycles;
+- duplicate pair policy;
+- source provenance;
+- round-trip boundary;
+- отсутствие скрытых writes во время decode.
+
+Это следующий semantic release blocker #242 после docs gate #261.
+
+---
+
+# 16. Persistent L4 gap #124
+
+In-memory `OccurrenceRef` не должен превращаться в universal persistent identity.
+
+Persistent backend contract обязан отделить:
+
+```text
+semantic exact occurrence identity
+portable snapshot/local identity
+backend physical address/handle
+```
+
+и доказать сохранение:
+
+- multiplicity;
+- cycles;
+- sharing;
+- root selection;
+- read/find no-mutation guarantees;
+- explicit materialization;
+- portable replay evidence.
+
+Только после этого production cutover может зависеть от реального persistent storage.
+
+---
+
+# 17. Historical compatibility boundary
+
+Accepted v0.2–v0.5 path содержит:
+
+```text
+mtc_parser.py
+mtc_ast.py
+mtc_interpreter.py
+ContextFrame
+TokenKind
+historical root program
+bundle semantics
+old proof contracts
+```
+
+Git сохраняет историю; поэтому Gate P не должен оставлять после cutover два равноправных semantic cores.
+
+Для каждого legacy consumer должно быть принято одно решение:
+
+```text
+migrate
+preserve as historical-only artifact
+or remove from production path
+```
+
+Временный adapter не должен становиться новой постоянной semantics.
+
+---
+
+# 18. Acceptance gate
+
+Foundation v2 может стать следующей accepted версией только после одного интегрированного решения:
+
+```text
+exact-occurrence substrate
++ source/D/G/T
++ K/A
++ relation/:/=
++ proof/Run/checker
++ Anum materialization
++ persistent L4
++ compatibility cutover
++ versioned conformance corpus
+```
+
+После этого:
+
+1. публикуется новый versioned MTS contract;
+2. candidate-маркировки снимаются;
+3. старый production semantic path удаляется/архивируется согласно решению;
+4. downstream consumers pin-ятся на новый contract;
+5. `aprover` получает право на repin.
+
+До этого момента закрытые Gate-P issues являются **evidence направления**, но не отдельными accepted версиями МТС.
+
+---
+
+# 19. Канонический принцип Gate P
+
+```text
+одна сеть связей
++ exact occurrence identity
++ explicit state/evidence
++ untrusted discovery
++ deterministic trusted replay
++ explicit materialization
++ one production semantic path
+```
+
+Если новый механизм требует скрытого metadata-object, второго semantic core или доверия к поисковой эвристике, он должен считаться архитектурным подозрением и проходить отдельный gate.
