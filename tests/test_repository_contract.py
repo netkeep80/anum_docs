@@ -110,44 +110,119 @@ def test_versioned_machine_contract_and_conformance_chain_is_exact():
         MTS_CONTRACT_V05,
         MTS_CONFORMANCE_V05,
     ):
-        assert path.exists()
+        assert path.is_file()
 
     v02 = json.loads(MTS_CONTRACT_V02.read_text(encoding="utf-8"))
-    c02 = json.loads(MTS_CONFORMANCE_V02.read_text(encoding="utf-8"))
+    v02_corpus = json.loads(MTS_CONFORMANCE_V02.read_text(encoding="utf-8"))
     v03 = json.loads(MTS_CONTRACT_V03.read_text(encoding="utf-8"))
-    c03 = json.loads(MTS_CONFORMANCE_V03.read_text(encoding="utf-8"))
+    v03_corpus = json.loads(MTS_CONFORMANCE_V03.read_text(encoding="utf-8"))
     v04 = json.loads(MTS_CONTRACT_V04.read_text(encoding="utf-8"))
-    c04 = json.loads(MTS_CONFORMANCE_V04.read_text(encoding="utf-8"))
+    v04_corpus = json.loads(MTS_CONFORMANCE_V04.read_text(encoding="utf-8"))
     v05 = json.loads(MTS_CONTRACT_V05.read_text(encoding="utf-8"))
-    c05 = json.loads(MTS_CONFORMANCE_V05.read_text(encoding="utf-8"))
+    v05_corpus = json.loads(MTS_CONFORMANCE_V05.read_text(encoding="utf-8"))
 
-    assert v02["version"] == "0.2"
-    assert c02["contractVersion"] == "0.2"
-    assert v03["version"] == "0.3"
-    assert c03["contractVersion"] == "0.3"
-    assert v04["version"] == "0.4"
-    assert c04["contractVersion"] == "0.4"
-    assert v05["version"] == "0.5"
-    assert c05["contractVersion"] == "0.5"
+    assert v02["schema"] == "mts-contract/v0.2"
+    assert v02["status"] == "accepted"
+    assert v02["rootProgram"] == "tests/mtc_formulas.mtc"
+    assert v02["conformanceCorpus"] == "contracts/mts-conformance-v0.2.json"
+    assert v02["formalNotation"]["context"]["atomicPronouns"] is True
+    assert v02["formalNotation"]["context"]["bracketOverloading"] is False
+    assert v02["formalNotation"]["valueBundle"]["contract"] == "contracts/mts-value-bundle-v0.2.json"
+    assert v02_corpus["schema"] == "mts-conformance/v0.2"
+    assert v02_corpus["contract"] == v02["schema"]
+    assert v02_corpus["status"] == "accepted"
 
-    assert v03["baseContract"] == "mts-contract-v0.2.json"
-    assert v04["baseContract"] == "mts-contract-v0.3.json"
-    assert v05["baseContract"] == "mts-contract-v0.4.json"
+    assert v03["schema"] == "mts-contract/v0.3"
+    assert v03["status"] == "accepted"
+    assert v03["extends"] == v02["schema"]
+    assert v03["baseContract"] == "contracts/mts-contract-v0.2.json"
+    assert v03["rootProgram"] == v02["rootProgram"]
+    assert v03["conformanceCorpus"] == "contracts/mts-conformance-v0.3.json"
+    assert v03_corpus["schema"] == "mts-conformance/v0.3"
+    assert v03_corpus["contract"] == v03["schema"]
+    assert v03_corpus["status"] == "accepted"
+
+    assert v04["schema"] == "mts-contract/v0.4"
+    assert v04["status"] == "accepted"
+    assert v04["extends"] == v03["schema"]
+    assert v04["baseContract"] == "contracts/mts-contract-v0.3.json"
+    assert v04["rootProgram"] == v03["rootProgram"]
+    assert v04["conformanceCorpus"] == "contracts/mts-conformance-v0.4.json"
+    assert v04["dependsOn"] == [v03["schema"], "mts-proof/v0.3"]
+    assert v04_corpus["schema"] == "mts-conformance/v0.4"
+    assert v04_corpus["contract"] == v04["schema"]
+    assert v04_corpus["status"] == "accepted"
+    required_v04 = {item["role"]: item for item in v04_corpus["requiredCorpora"]}
+    assert set(required_v04) == {"base-v0.3", "proof-v0.3"}
+    assert required_v04["base-v0.3"]["schema"] == v03_corpus["schema"]
+    assert required_v04["base-v0.3"]["contract"] == v03_corpus["contract"]
+    assert required_v04["proof-v0.3"]["schema"] == "mts-proof-conformance/v0.3"
+    assert required_v04["proof-v0.3"]["contract"] == "mts-proof/v0.3"
+
+    assert v05["schema"] == "mts-contract/v0.5"
+    assert v05["status"] == "accepted"
+    assert v05["extends"] == v04["schema"]
+    assert v05["baseContract"] == "contracts/mts-contract-v0.4.json"
+    assert v05["rootProgram"] == v04["rootProgram"]
+    assert v05["conformanceCorpus"] == "contracts/mts-conformance-v0.5.json"
+    assert v05["dependsOn"] == [
+        v04["schema"],
+        "mts-opening-path/v0.4",
+        "mts-proof/v0.4",
+        "mts-direct-deixis/v0.5",
+    ]
+    assert v05_corpus["schema"] == "mts-conformance/v0.5"
+    assert v05_corpus["contract"] == v05["schema"]
+    assert v05_corpus["status"] == "accepted"
+    required_v05 = {item["role"]: item for item in v05_corpus["requiredCorpora"]}
+    assert set(required_v05) == {
+        "base-v0.4",
+        "opening-path-v0.4",
+        "proof-v0.4",
+        "direct-deixis-v0.5",
+    }
+    assert required_v05["base-v0.4"]["schema"] == v04_corpus["schema"]
+    assert required_v05["base-v0.4"]["contract"] == v04_corpus["contract"]
+    assert required_v05["opening-path-v0.4"]["contract"] == "mts-opening-path/v0.4"
+    assert required_v05["proof-v0.4"]["contract"] == "mts-proof/v0.4"
+    assert required_v05["direct-deixis-v0.5"]["contract"] == "mts-direct-deixis/v0.5"
+
+    contract_files = sorted((ROOT / "contracts").glob("mts-contract-*.json"))
+    conformance_files = sorted((ROOT / "contracts").glob("mts-conformance-*.json"))
+    assert contract_files == [
+        MTS_CONTRACT_V02,
+        MTS_CONTRACT_V03,
+        MTS_CONTRACT_V04,
+        MTS_CONTRACT_V05,
+    ]
+    assert conformance_files == [
+        MTS_CONFORMANCE_V02,
+        MTS_CONFORMANCE_V03,
+        MTS_CONFORMANCE_V04,
+        MTS_CONFORMANCE_V05,
+    ]
 
 
 def test_candidate_runtime_fixture_and_reference_paths_are_removed_after_promotion():
-    assert all(not (ROOT / path).exists() for path in FORBIDDEN_CANDIDATE_PATHS)
+    leftovers = [path for path in FORBIDDEN_CANDIDATE_PATHS if (ROOT / path).exists()]
+    assert leftovers == []
+    assert (ROOT / "core/mtc_interpreter.py").is_file()
+    assert (ROOT / "core/mtc_value_bundle.py").is_file()
+    assert (ROOT / "core/mtc_definitions.py").is_file()
+    assert (ROOT / "tests/test_mtc_interpreter.py").is_file()
 
 
 def test_anum_protocol_has_one_active_projection_and_quote_path():
-    source = (ROOT / "core/anum_protocol.py").read_text(encoding="utf-8")
-    assert "def project_anum(" in source
-    assert "def quote_anum(" in source
-    assert "def unquote_anum(" in source
-    assert "project_root" not in source
-    assert "project_quote" not in source
+    assert not (ROOT / "core/anum_projector.py").exists()
+
+    memory_text = (ROOT / "core/anum_memory.py").read_text(encoding="utf-8")
+    cli_text = (ROOT / "converters/anum_cli.py").read_text(encoding="utf-8")
+
+    assert "class Quote" not in memory_text
+    assert '"realize"' not in cli_text
+    assert (ROOT / "core/anum_protocol.py").is_file()
 
 
 def test_root_library_validates():
     result = validate_root_library(ROOT_FIXTURE)
-    assert result.ok
+    assert result.is_valid, result.messages
