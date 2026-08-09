@@ -1,0 +1,129 @@
+{
+  "schema": "mts-foundation-v2-local-equality-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 225,
+  "dependsOn": [
+    "mts-foundation-v2-integrated-direction-decision/v0.7",
+    "mts-four-binding-forms-challenge/v0.7",
+    "anum-self-closed-context-challenge/v0.7",
+    "mts-explicit-theory-network-challenge/v0.7"
+  ],
+  "purpose": "Re-derive equality after the foundation reset as an explicit context-local representative constraint, with relation decomposition available only through a separately admitted theory rule and never as implicit recursive graph equality.",
+  "candidateAtomic": {
+    "name": "explicit-context-local-representative-equality",
+    "aliasBinding": "K ⟼ (member ⟼ representative)",
+    "unboundRepresentative": "member itself",
+    "resolutionDepth": "one explicit local binding only",
+    "equal": "representative(left,K) == representative(right,K)",
+    "globalMutation": false,
+    "globalRewrite": false,
+    "transitiveClosure": false,
+    "preferredAfterChallenge": false,
+    "accepted": false
+  },
+  "candidateDecomposition": {
+    "name": "theory-admitted-one-step-relation-decomposition",
+    "requiresExplicitRuleMembership": "T ⟼ F_decompose",
+    "input": "X=(b1,e1), Y=(b2,e2)",
+    "output": [
+      "constraint(b1,b2)",
+      "constraint(e1,e2)"
+    ],
+    "recursiveEvaluation": false,
+    "cycleTraversal": false,
+    "impliesCongruence": false,
+    "preferredAfterChallenge": false,
+    "accepted": false
+  },
+  "equalityDataBoundary": {
+    "equalityShapedRelationMayExistAsOrdinaryData": true,
+    "activeConstraintRequiresSelectedRuleAndReplay": true,
+    "astNodeExecutionRequired": false
+  },
+  "identityBoundaries": {
+    "sameRefSucceedsAtomically": true,
+    "explicitSameRepresentativeMaySucceedLocally": true,
+    "sameShapeImpliesSameRef": false,
+    "selfClosedShapeImpliesUniqueOccurrence": false,
+    "graphIsomorphismImpliesEquality": false,
+    "bisimulationImpliesEquality": false,
+    "rootLikeSelfCycleImpliesRootIdentity": false
+  },
+  "trustedReplay": {
+    "atomicFields": [
+      "occurrenceRef",
+      "theoryRef",
+      "ruleRef",
+      "contextRef",
+      "leftRef",
+      "rightRef",
+      "leftRepresentativeRef",
+      "rightRepresentativeRef",
+      "outcome"
+    ],
+    "decompositionFields": [
+      "occurrenceRef",
+      "theoryRef",
+      "ruleRef",
+      "contextRef",
+      "leftRelationRef",
+      "rightRelationRef",
+      "generatedConstraints"
+    ],
+    "checksExactOccurrence": true,
+    "checksExactTheoryMembership": true,
+    "checksExactContext": true,
+    "checksExactRepresentatives": true,
+    "checksExactOneStepDecomposition": true,
+    "checkerReadOnly": true,
+    "searchRankingTrusted": false
+  },
+  "historicalBoundaryCarriedForward": {
+    "equalityIsLocalConstraint": true,
+    "anonymousHoleOccurrencesRemainIndependent": true,
+    "globalTextualRewrite": false,
+    "genericSubstitutivity": false,
+    "genericCongruence": false,
+    "recursiveGraphIsomorphism": false
+  },
+  "requiredAssertions": [
+    "same exact ref succeeds under an admitted atomic equality rule",
+    "different unaliased refs fail even when their self-closed shapes are observationally the same",
+    "two refs explicitly mapped to one representative under K satisfy the local atomic constraint",
+    "changing K can change the atomic equality outcome without mutating either compared relation",
+    "conflicting local representative bindings reject replay rather than choosing one",
+    "alias chaining is not followed implicitly and does not create hidden transitivity",
+    "an equality-shaped relation stored as ordinary data performs no action by itself",
+    "relation decomposition requires an exact T membership for the selected decomposition rule",
+    "one decomposition step emits exactly two pole constraints and does not recursively evaluate them",
+    "self-closed partial forms are not silently treated as complete pairs for decomposition",
+    "a root-like distinct self-cycle does not collapse to the unique root ref",
+    "shared/cyclic relation inputs remain finite because decomposition is one step over exact refs",
+    "local equality does not materialize substitution into unrelated relations",
+    "equality/decomposition replay is bound to one explicit link occurrence, so editing T/rule/K/operands on the recorded occurrence rejects",
+    "forged T, rule, K, representative, result or decomposition evidence rejects",
+    "trusted replay is read-only"
+  ],
+  "notDecided": [
+    "whether the atomic candidate becomes the canonical foundation equality relation",
+    "whether one-step decomposition is admitted by the core interpreter theory or an optional higher theory",
+    "syntax/source form for equality after grammar reset",
+    "anonymous-hole interaction beyond the preserved occurrence-local boundary",
+    "general proof transitivity/substitution/congruence rules",
+    "production migration"
+  ],
+  "veto": {
+    "globalStructuralEqualityAllowed": false,
+    "graphBisimulationAsIdentityAllowed": false,
+    "automaticSubstitutivityAllowed": false,
+    "automaticCongruenceAllowed": false,
+    "automaticTransitivityAllowed": false,
+    "recursiveEqualityTraversalAllowed": false,
+    "equalityAstOpcodeAllowed": false,
+    "selfClosedShapeUniquenessAssumed": false,
+    "productionChangeAllowed": false,
+    "historicalContractMutationAllowed": false,
+    "aproverRepinAllowed": false
+  }
+}
