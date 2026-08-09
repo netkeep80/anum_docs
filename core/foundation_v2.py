@@ -14,6 +14,7 @@ from .exact_link_network import Link, LinkNetwork, LinkNetworkBuilder, Occurrenc
 from .foundation_v2_checker import (
     IntegratedProofEvidence,
     ProofGoalEvidence,
+    ProofJudgmentEvidence,
     replay_integrated_proof,
 )
 from .foundation_v2_interpreter import (
@@ -81,6 +82,7 @@ __all__ = [
     "PersistentSequenceGroup",
     "PersistentSequenceMaterialization",
     "ProofGoalEvidence",
+    "ProofJudgmentEvidence",
     "RelationStepEvidence",
     "RunEvidence",
     "SequenceAtom",
