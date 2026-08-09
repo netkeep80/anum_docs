@@ -1,0 +1,97 @@
+{
+  "schema": "anum-link-context-state-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 205,
+  "dependsOn": [
+    "mts-semantic-root-kernel-challenge/v0.7",
+    "anum-streaming-interpreter-challenge/v0.7"
+  ],
+  "purpose": "Challenge link-only representations of recursive Anum interpreter state and determine whether the current-link pronoun can be derived from the top context rather than stored as ambient host state.",
+  "kernelBindings": {
+    "R": "∞",
+    "O": "[",
+    "C": "]",
+    "L": "1",
+    "U": "0"
+  },
+  "candidateA": {
+    "name": "marked-frame-with-ostensive-partial-current",
+    "frameTopology": {
+      "marker": "M = parentFrame ⟼ O",
+      "frame": "K = M ⟼ current",
+      "rootParentSentinel": "R"
+    },
+    "currentBuilder": {
+      "empty": "R",
+      "oneBoundValue": "E = value ⟼ E",
+      "complete": "X = start ⟼ end"
+    },
+    "openTransition": "newFrame(oldFrame, R)",
+    "closeTransition": "take complete inner current, recover parentFrame, feed inner current as one value into parent current",
+    "currentPronounCandidate": "↑ resolves to current by matching top frame K = (parentFrame ⟼ O) ⟼ current",
+    "usesOnlyBinaryLinks": true,
+    "usesExternalRoleTags": false,
+    "usesRootOpenMeaningAsFrameMarker": true,
+    "requiresL4": false,
+    "accepted": false
+  },
+  "candidateB": {
+    "name": "interpreted-prefix-history-spine",
+    "topology": "H_next = H_prev ⟼ abitMeaning, starting H_0 = R",
+    "property": "finite link-only state and exact replay source are available",
+    "currentPronounCandidate": "current builder is derivable only by replaying the spine; it is not a local pole of H",
+    "usesOnlyBinaryLinks": true,
+    "accepted": false
+  },
+  "criticalQuestions": [
+    "does candidate A reproduce all accepted recursive Anum results without a host PairFrame ontology",
+    "does a newly opened recursive context consistently have current R while its parent frame remains recoverable",
+    "does one-bound state naturally use the ostensive self-closed-end form instead of a semantic stage tag",
+    "is the O frame marker justified by its root meaning or merely a convenient protocol tag",
+    "does candidate B prove that link-only state alone is weaker than locally observable current-link state",
+    "can ↑ be a derived binding from explicit state rather than an ambient variable"
+  ],
+  "scopeBoundary": {
+    "recursiveTreeSubsetOnly": true,
+    "generalSelfClosedPayloadsCovered": false,
+    "generalCyclesCovered": false,
+    "formalNotationCovered": false,
+    "rootBoundaryPrecedenceRemainsSeparate": true
+  },
+  "requiredAssertions": [
+    "candidate A state graph contains only links with start/end refs",
+    "candidate A exact-pair graph stays finite and pair-unique for the challenge corpus",
+    "opening nested context preserves the previous frame and sets new current to R",
+    "one consumed value is represented by a self-closed-end current E=(value,E)",
+    "two consumed values replace the partial current with the completed pair",
+    "closing nested context returns the completed inner pair to the parent builder",
+    "candidate A final tree matches accepted recursive Anum denotation",
+    "candidate A top frame locally determines current and parent frame by relation matching",
+    "candidate B preserves source history but local current requires replay",
+    "root boundary ][ is still not explained as a POP transition",
+    "no Meaning node, ContextFrame object, parent field, or L4 LinkRef is required"
+  ],
+  "counterexamplesRequired": [
+    "untagged state K=parent⟼R with R as both root sentinel and empty current collapses at the root self-cycle",
+    "empty and one-bound states must not be conflated",
+    "completed recursive tree pair must not be mistaken for the one-bound self-closed-end builder state",
+    "history-spine state must not claim a direct ↑ value without replay"
+  ],
+  "notDecided": [
+    "candidate A acceptance",
+    "whether O is the canonical context-frame marker",
+    "whether general MTS interpretation uses the same partial-current representation",
+    "whether self-closure is always an incomplete-binding form during interpretation",
+    "meaning derivation for arbitrary cyclic/shared links",
+    "formal-notation pronoun syntax"
+  ],
+  "veto": {
+    "productionChangeAllowed": false,
+    "historicalContractMutationAllowed": false,
+    "implicitGlobalCurrentAllowed": false,
+    "semanticMeaningTagAllowed": false,
+    "l4IdentityRequired": false,
+    "aproverRepinAllowed": false
+  }
+}
