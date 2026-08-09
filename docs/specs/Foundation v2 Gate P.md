@@ -2,7 +2,7 @@
 
 Статус: **production/reference candidate**, не accepted release.
 
-Главный epic: #237. Завершены exact-occurrence substrate #240/#241 и state/apamemory layer #243/#244. Текущий слой: source front-end #245. Sequence-deserialization: #242. Persistent L4 backend: #124.
+Главный epic: #237. Завершены exact-occurrence substrate #240/#241, state/apamemory layer #243/#244 и source front-end #245/#246. Текущий слой: unified interpreter/replay #247. Sequence-deserialization: #242. Persistent L4 backend: #124.
 
 Цель Gate P — превратить завершённые research-решения Foundation v2 в **один** reference/production path, после чего опубликовать следующую версию МТС, которую сможет точно потреблять `aprover`.
 
@@ -19,6 +19,7 @@ binary link ontology
 → explicit selected source segmentation
 → explicit D/G/T relations
 → explicit K/current
+→ structural relation resolution
 → actual interpretation acts A
 → trusted exact replay
 → proof checker / aprover
@@ -231,7 +232,212 @@ source resolution/replay != materialization
 
 Это критично для апрувера: исходник и proof evidence можно проверять, не делая доказываемое истинным самим фактом чтения.
 
-## 5. Апамять
+## 5. Один interpreter/replay spine
+
+После #245 интерпретатор больше не должен повторно превращать source в свои token/AST objects. Он получает уже replayable exact source evidence и продолжает **ту же связевую цепочку**.
+
+Первый production-facing vertical slice #247 намеренно минимален:
+
+```text
+exact source evidence
+        ↓
+selected one-pole form F
+        ↓
+exact active K
+        ↓
+↑ = current
+        ↓
+structural pole resolution
+        ↓
+exact result X
+        ↓
+persistent K_after
+        ↓
+actual act A
+```
+
+### 5.1. Направление операции не является opcode
+
+Если выбранная exact form имеет самозамкнутое начало:
+
+```text
+F = F ⟼ e
+```
+
+то начало ещё не различено внешним binding, а конец уже различён. В текущем act:
+
+```text
+binding = ↑
+X = binding ⟼ e
+```
+
+Для симметричной формы:
+
+```text
+F = b ⟼ F
+```
+
+получаем:
+
+```text
+binding = ↑
+X = b ⟼ binding
+```
+
+То есть interpreter не спрашивает:
+
+```text
+if token == "♂": ...
+if ast.kind == START_PROJECTION: ...
+```
+
+Он читает структуру выбранной exact form и explicit K. Операционное направление является следствием того, какой полюс уже различён в данном акте.
+
+### 5.2. `↑` не ambient state
+
+До акта:
+
+```text
+P_before = parent ⟼ current
+K_before = K_before ⟼ P_before
+```
+
+Trusted replay получает **конкретный exact K_before** и выводит:
+
+```text
+↑ = current
+binding = current
+```
+
+После проверенного результата:
+
+```text
+P_after = sameParent ⟼ X
+K_after = K_after ⟼ P_after
+```
+
+Старый K не мутирует. Новый K — новая exact occurrence persistent state.
+
+### 5.3. Результат выбирается exact occurrence, а не формой пары
+
+Пусть в апамяти существуют:
+
+```text
+X1 = a ⟼ b
+X2 = a ⟼ b
+X1 != X2
+```
+
+Trusted act может выбрать `X2`. Проверка обязана подтвердить:
+
+```text
+poles(X2) = (a,b)
+K_after.current = X2
+A.result = X2
+```
+
+но не имеет права сказать «пара `(a,b)` уникальна, значит X1=X2».
+
+Это связывает interpreter semantics с exact-occurrence моделью апамяти и сохраняет provenance отдельных актов/результатов.
+
+### 5.4. Actual act является проверяемой сетью
+
+Заголовок:
+
+```text
+P0 = D_roles ⟼ K_after
+H  = I ⟼ P0
+A  = A ⟼ H
+```
+
+Минимальные role-addressed fields первого vertical slice:
+
+```text
+source
+source-selection
+form-sequence
+dictionary
+grammar
+theory
+form
+before-context
+binding
+result
+after-context
+```
+
+Каждое поле:
+
+```text
+Field = roleRef ⟼ value
+A ⟼ Field
+```
+
+Trusted replay требует ровно одно согласованное значение каждой обязательной роли. Дублированное/конфликтующее evidence отклоняется.
+
+Host dataclass с удобными именами полей допустим как checker API, но не определяет ontology: semantic role identity задаётся exact `roleRef` из явного `D_roles`.
+
+### 5.5. Replay и исполнение апамяти пока разведены
+
+Текущий interpreter slice является **read-only**:
+
+```text
+replay(source,K,A)
+→ проверить выбранные exact relations
+→ вернуть exact result ref
+```
+
+Он не делает:
+
+```text
+materialize(result poles)
+materialize(K_after)
+materialize(A)
+```
+
+Эти occurrences уже должны входить в проверяемую сеть/evidence.
+
+Это намеренно. Сначала фиксируется trusted semantics, затем отдельный effect/L4 слой сможет создавать структуру, которую тот же replay независимо проверяет.
+
+Такой разрыв особенно важен для апрувера:
+
+```text
+proof search / executor
+    может строить candidate evidence
+
+trusted replay
+    только проверяет candidate evidence
+```
+
+и сам факт проверки не изменяет предмет доказательства.
+
+### 5.6. `:` и `=` должны расширить этот же engine
+
+После #247 нельзя создавать отдельный `DefinitionInterpreter`, `EqualityInterpreter` и ещё один общий evaluator с разными скрытыми состояниями.
+
+Принятые research decisions должны стать следующими режимами **одной replay architecture**:
+
+```text
+relation-resolution act
+colon definition effect/replay
+local equality constraint/replay
+```
+
+Для `:` уже выбран persistent scope snapshot:
+
+```text
+D = D ⟼ (parentScope ⟼ localHistory)
+Entry = S ⟼ F
+Occurrence = D_before ⟼ Entry
+history' = history ⟼ Occurrence
+D_after = new persistent scope snapshot
+```
+
+Для `=` выбран local exact representative constraint, без global congruence/substitution.
+
+Их интеграция должна переиспользовать exact source, K/D/G/T, actual A и общий replay boundary, а не создавать parallel semantics.
+
+## 6. Апамять
 
 Foundation v2 рассматривает апамять как **контроллер сети exact link occurrences**.
 
@@ -251,7 +457,7 @@ materialize / delete
 
 Это позволяет описывать и искать связь, не создавая её самим фактом запроса.
 
-## 6. Ачисло и будущая sequence deserialization
+## 7. Ачисло и будущая sequence deserialization
 
 Recursive Anum уже является root-relative structural description на принятой occurrence-tree области, но это ещё не полная operational semantics произвольной последовательности.
 
@@ -272,42 +478,47 @@ B ⟼ C
 
 До этого challenge нельзя молча расширять pair-only recursive grammar или делать `[`/`]` безусловными PUSH/POP opcode-ами.
 
-Важно не смешивать #245 и #242:
+Важно не смешивать #245/#247 и #242:
 
 ```text
 #245 source front-end
     читает/разрешает/проверяет source evidence
     без application effects
 
+#247 interpreter replay
+    проверяет selected semantic act над exact evidence
+    без application effects
+
 #242 Anum→апамять
     исследует явный materialization результирующей сети
 ```
 
-## 7. Что должна получить следующая версия для aprover
+## 8. Что должна получить следующая версия для aprover
 
 `aprover` должен потреблять опубликованный versioned contract и conformance corpus, а не повторно определять семантику МТС.
 
-Минимальная trusted цепочка будущего checker-а:
+Минимальная trusted цепочка будущего checker-а теперь становится конкретной:
 
 ```text
 exact source/evidence
 → selected dictionary/grammar/theory relations
 → exact active K
-→ selected declarative form + bindings
-→ actual act A
+→ selected declarative form + binding
+→ structural relation resolution
 → exact result / K_after
+→ actual act A
 → deterministic read-only replay
 ```
 
 Proof search, ranking и UI могут быть сложными и эвристическими. Валидность доказательства определяется replay выбранных exact relations.
 
-## 8. Что ещё блокирует release
+## 9. Что ещё блокирует release
 
 До repin `aprover` остаются как минимум:
 
 ```text
-source front-end #245
-→ one interpreter/replay engine
+interpreter/replay spine #247
+→ integrate `:` and local `=` into the same engine
 → sequence-to-apamemory gate #242
 → historical compatibility classification
 → explicit persistent L4 boundary #124
