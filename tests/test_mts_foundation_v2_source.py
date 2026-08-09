@@ -284,7 +284,7 @@ def test_occurrence_not_visible_from_selected_dictionary_is_rejected() -> None:
     network = builder.freeze(root)
 
     with pytest.raises(SourceReplayError, match="scoped dictionary evidence"):
-        replay_source_front_end(network, forged, byte_refs)
+        replay_source_front_end(network, evidence, byte_refs)
 
 
 def test_forged_grammar_or_theory_admission_is_rejected() -> None:
