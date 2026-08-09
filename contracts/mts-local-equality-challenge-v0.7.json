@@ -1,0 +1,102 @@
+{
+  "schema": "mts-local-equality-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 226,
+  "dependsOn": [
+    "mts-foundation-v2-integrated-direction-decision/v0.7",
+    "mts-four-binding-forms-challenge/v0.7",
+    "mts-explicit-theory-network-challenge/v0.7"
+  ],
+  "purpose": "Reconstruct equality as a local relation-resolution constraint under explicit context/aliases and optional theory-admitted one-step decomposition, without restoring global structural equality or rewrite semantics.",
+  "localEqualityCandidate": {
+    "sameRef": "equal",
+    "explicitLocalAlias": "equal only in the supplied alias scope",
+    "differentUnaliasedRefs": "not equal",
+    "structuralIsomorphismAlone": "not equal",
+    "aliasSymmetricForOneRecordedPair": true,
+    "aliasTransitiveByDefault": false,
+    "globalSubstitutivity": false
+  },
+  "aliasScope": {
+    "scope": "B is an explicit ordinary link-network ref",
+    "membership": "B ⟼ (left ⟼ right)",
+    "contextBinding": "K ⟼ B",
+    "globalAliasEnvironment": false
+  },
+  "decompositionCandidate": {
+    "availability": "T ⟼ Rule_decompose",
+    "input": "X=(b1,e1), Y=(b2,e2)",
+    "oneStepOutput": "(b1=b2, e1=e2) as an explicit finite constraint package",
+    "recursiveByDefault": false,
+    "selfClosedRelationsAllowedAsInputs": true,
+    "cyclesUnfolded": false,
+    "ruleAdmissionRequired": true
+  },
+  "identityBoundaries": {
+    "sameSelfClosedShapeImpliesSameOccurrence": false,
+    "sameDistinguishedPoleImpliesSameOccurrence": false,
+    "rootShapeImpliesRootIdentity": false,
+    "patternMatchEqualsSemanticIdentity": false
+  },
+  "replay": {
+    "checkerReadOnly": true,
+    "fields": [
+      "theoryRef",
+      "ruleMembershipRef",
+      "ruleRef",
+      "contextRef",
+      "aliasScopeRef",
+      "leftRef",
+      "rightRef",
+      "resultRef"
+    ],
+    "mustVerifyTheoryRule": true,
+    "mustVerifyContextAliasScope": true,
+    "mustVerifyExactOneStepOutput": true,
+    "mustRejectForgedTheory": true,
+    "mustRejectForgedRule": true,
+    "mustRejectForgedContext": true,
+    "mustRejectForgedAliasScope": true,
+    "mustRejectForgedOperands": true,
+    "mustRejectForgedResult": true
+  },
+  "requiredAssertions": [
+    "same ref succeeds without consulting graph shape",
+    "one explicit local alias pair succeeds in either orientation",
+    "the same refs can be equal in one alias scope and unequal in another",
+    "two structurally isomorphic but distinct refs are unequal without explicit alias",
+    "alias chains do not imply transitive equality",
+    "local alias equality does not materialize substituted relations elsewhere",
+    "two self-closed-start occurrences with the same distinguished end remain distinct",
+    "two full-self-closed occurrences remain distinct from the root unless explicitly aliased",
+    "one theory-admitted decomposition step produces exactly two pole constraints",
+    "without T membership the decomposition replay rejects",
+    "decomposing self-closed relations is finite and does not recursively compare their self refs",
+    "root decomposition is finite and does not prove uniqueness of root-shaped occurrences",
+    "an equality-shaped constraint may exist as ordinary data without execution",
+    "trusted replay rejects forged T/rule/K/alias/operand/result evidence",
+    "no global transitivity, congruence, substitutivity or bisimulation is introduced"
+  ],
+  "notDecided": [
+    "whether exact-ref-plus-local-alias is the final primitive equality relation",
+    "which decomposition/equality forms are admitted by the canonical theory",
+    "whether any explicit transitivity/congruence rules should exist at higher theory levels",
+    "formal surface syntax and binding behavior of equality after grammar reset",
+    "proof lifting from equality-resolution acts",
+    "production migration"
+  ],
+  "veto": {
+    "globalStructuralEqualityAllowed": false,
+    "graphBisimulationEqualsIdentityAllowed": false,
+    "automaticSubstitutivityAllowed": false,
+    "automaticCongruenceAllowed": false,
+    "automaticTransitivityAllowed": false,
+    "infiniteRecursiveComparisonAllowed": false,
+    "equalityAstOpcodeAcceptedAsSemantics": false,
+    "selfClosedShapeUniquenessAllowed": false,
+    "productionChangeAllowed": false,
+    "historicalContractMutationAllowed": false,
+    "aproverRepinAllowed": false
+  }
+}
