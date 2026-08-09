@@ -47,18 +47,18 @@ def semantic_kernel(refs: dict[str, int]) -> KernelGraph:
     assert set(refs) == required
     assert len(set(refs.values())) == 5
 
-    r = refs["R"]
-    o = refs["O"]
-    c = refs["C"]
-    l = refs["L"]
-    u = refs["U"]
+    root_ref = refs["R"]
+    open_ref = refs["O"]
+    close_ref = refs["C"]
+    link_ref = refs["L"]
+    unlink_ref = refs["U"]
     graph = KernelGraph(
         {
-            r: Link(r, r),
-            o: Link(o, r),
-            c: Link(r, c),
-            l: Link(o, c),
-            u: Link(c, o),
+            root_ref: Link(root_ref, root_ref),
+            open_ref: Link(open_ref, root_ref),
+            close_ref: Link(root_ref, close_ref),
+            link_ref: Link(open_ref, close_ref),
+            unlink_ref: Link(close_ref, open_ref),
         }
     )
     graph.validate_closed_unique_pairs()
