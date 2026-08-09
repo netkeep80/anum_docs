@@ -2,11 +2,13 @@
 
 Статус: **Gate P candidate**, не accepted proof calculus и не разрешение на repin `aprover`.
 
-Связанные задачи: Gate P #237, local `=` #251/#252, exact run #253/#254, текущий proof-rule gate #255, future sequence→апамять #242, persistent L4 #124.
+Связанные задачи: Gate P #237, local `=` #251/#252, exact run #253/#254, proof-rule gate #255/#256, integrated checker #257/#262, future sequence→апамять #242, persistent L4 #124.
+
+> Proof-rule слой уже не является отдельной незавершённой веткой: он merged в `main` и включён в P9 integrated source→proof→Run replay. Candidate-статус сохраняется до общей Foundation-v2 acceptance.
 
 ## 1. Зачем нужен отдельный proof-rule слой
 
-Foundation v2 уже различает:
+Foundation v2 различает:
 
 ```text
 поиск candidate
@@ -166,7 +168,7 @@ K_after = K_before
 3. verify exact T ⟼ Rule membership
 4. verify L/R are complete exact links
 5. verify C_start = L.start ⟼ R.start
-6. verify C_end   = L.end   ⟼ R.end
+6. verify C_end   = L.end ⟼ R.end
 7. verify exact application A header/fields
 8. require exact K_before is K_after
 9. require network snapshot unchanged
@@ -179,8 +181,8 @@ K_after = K_before
 Если полюса сами являются связями:
 
 ```text
-L.start  = a ⟼ b
-R.start  = c ⟼ d
+L.start = a ⟼ b
+R.start = c ⟼ d
 ```
 
 первое применение выдаёт только:
@@ -234,6 +236,8 @@ replay selected exact evidence
 
 Поэтому можно построить быстрый эвристический `aprover`, не включая алгоритм поиска в trusted computing base.
 
+Подробнее: [Апамять и управление сетью связей](Апамять%20и%20управление%20сетью%20связей.md).
+
 ## 9. Что намеренно запрещено
 
 ```text
@@ -250,7 +254,7 @@ proof AST as ontology
 
 Rule identity, theory admission, operands, claims и actual application — exact link occurrences.
 
-## 10. Ожидаемая архитектура aprover
+## 10. Архитектура aprover
 
 ```text
                     untrusted
@@ -280,21 +284,53 @@ Rule identity, theory admission, operands, claims и actual application — exac
                 proof accepted
 ```
 
-Именно versioned contracts + conformance corpus `anum_docs` должны стать источником этой trusted semantics. `aprover` после Foundation-v2 acceptance должен потреблять их, а не реализовывать собственное толкование МТС.
+Versioned contracts + conformance corpus `anum_docs` должны стать источником этой trusted semantics. `aprover` после Foundation-v2 acceptance должен потреблять их, а не реализовывать собственное толкование МТС.
 
-## 11. Следующий gate
+## 11. P9 integrated proof/checker уже закрыт
 
-После #255 нужен уже не ещё один одиночный operator, а integrated proof/checker conformance:
+После proof-rule gate был реализован P9 integrated artifact:
 
 ```text
-source
-+ scoped D
-+ explicit G/T
-+ K/local equality
-+ actual acts
-+ admitted rule
-+ exact Run
-→ one replayable proof artifact
+source `decompose`
+→ scoped D
+→ explicit G/T
+→ exact Rule
+→ true equality A_eq in exact K
+→ direct T ⟼ Rule
+→ A_rule
+→ exact Run[A_eq,A_rule]
+→ read-only integrated replay
 ```
 
-Только после такой интеграции имеет смысл двигаться к sequence→апамять #242, persistent L4 #124, production cutover и публикации следующей accepted версии МТС.
+`core/foundation_v2_checker.py` проверяет сквозное exact identity:
+
+```text
+source Rule is proof Rule
+source T is proof T
+premise K is proof K is Run K
+Run acts are exactly A_eq then A_rule
+```
+
+Он не вводит новый proof language и не ищет proof сам.
+
+Research record: [Foundation v2 P9 integrated proof conformance](../research/Foundation%20v2%20P9%20integrated%20proof%20conformance.md).
+
+## 12. Что остаётся до accepted версии
+
+После P9 дальнейшее расширение proof operators **не является текущим приоритетом**.
+
+Release chain:
+
+```text
+#261  main documentation refresh
+#242  Anum sequence → апамять materialization
+#124  persistent L4/backend contract
+historical compatibility classification
+atomic production cutover
+versioned integrated conformance corpus
+explicit Foundation-v2 acceptance
+next published MTS version
+aprover repin
+```
+
+До этого proof layer остаётся production-facing candidate и evidence следующей архитектуры, но не отдельной accepted версией.
