@@ -19,7 +19,7 @@ MTS_CONTRACT_V04 = ROOT / "contracts/mts-contract-v0.4.json"
 MTS_CONFORMANCE_V04 = ROOT / "contracts/mts-conformance-v0.4.json"
 MTS_CONTRACT_V05 = ROOT / "contracts/mts-contract-v0.5.json"
 MTS_CONFORMANCE_V05 = ROOT / "contracts/mts-conformance-v0.5.json"
-ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md", "Пучки связей МТС.md"}
+ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md"}
 ACTIVE_SPECS = {
     "Reference model МТС v0.2.md",
     "Формальная нотация МТС.md",
