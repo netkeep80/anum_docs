@@ -1,0 +1,72 @@
+{
+  "schema": "mts-foundation-v2-root/v0.7",
+  "status": "gate-p-production-root-candidate",
+  "accepted": false,
+  "issue": 274,
+  "parent": 271,
+  "umbrella": 237,
+  "dependsOn": [
+    "mts-exact-occurrence-link-network/v0.7",
+    "mts-semantic-root-kernel-challenge/v0.7"
+  ],
+  "ostensivePrimary": {
+    "root": "∞",
+    "startSelfClosed": "♂e = S = S ⟼ e",
+    "endSelfClosed": "b♀ = E = b ⟼ E",
+    "complete": "b ⟼ e"
+  },
+  "kernel": {
+    "R": "R = R ⟼ R",
+    "O": "O = O ⟼ R",
+    "C": "C = R ⟼ C",
+    "L": "L = O ⟼ C",
+    "U": "U = C ⟼ O",
+    "exactOccurrenceCount": 5,
+    "networkRoot": "exact R",
+    "pairInterning": false,
+    "semanticTagsOnLink": false
+  },
+  "rootVocabulary": {
+    "∞": "exact R",
+    "[": "exact O",
+    "]": "exact C",
+    "1": "exact L",
+    "0": "exact U",
+    "glyphSpellingRecognizesKernelRole": false,
+    "mappingAppliesAfterExactKernelConstruction": true,
+    "rootAbitsIdenticalToFormalMaleFemaleGlyphOccurrences": false
+  },
+  "identity": {
+    "rootRecognizedBySelfClosedShapeSearch": false,
+    "rootRecognizedByGraphIsomorphism": false,
+    "suppliedExactRefsAndTopologyRequired": true,
+    "anotherSelfClosedOccurrenceIsRoot": false,
+    "samePoleDuplicateIsSameOccurrence": false,
+    "freshBuildCreatesFreshRuntimeIdentityScope": true
+  },
+  "implementation": {
+    "rootModule": "core/foundation_v2_root.py",
+    "publicEntrySurface": "core/foundation_v2.py",
+    "substrate": "core/exact_link_network.py",
+    "historicalRootLibraryDependency": false,
+    "historicalRootValidatorDependency": false,
+    "legacyParserDependency": false,
+    "legacyAstDependency": false,
+    "referenceModelDependency": false,
+    "contextFrameDependency": false,
+    "compatibilityMode": false
+  },
+  "historicalBoundary": {
+    "tenFormulaRootProgramModified": false,
+    "historicalAcceptedContractsModified": false,
+    "rootLibraryDeleted": false,
+    "validateRootDeleted": false,
+    "historicalReplayStillSeparate": true
+  },
+  "releaseBoundary": {
+    "cutoverComplete": false,
+    "foundationV2Accepted": false,
+    "aproverRepinAllowed": false,
+    "next": "migrate/isolate remaining source/interpreter/proof/L4 consumers, then atomic deletion and integrated release conformance"
+  }
+}
