@@ -8,65 +8,76 @@
 L = A ⟼ B
 ```
 
-означает: связь `L` имеет начало `A` и конец `B`.
-
-Главная идея МТС предельно проста:
+Главный постулат:
 
 ```text
 всё есть связь
 ```
 
-В частности, контекст, словарь, теория, исходный текст, акт интерпретации, доказательство и состояние памяти не обязаны быть внешними объектами или метаданными — они сами могут быть представлены сетями связей.
+Контекст, словарь, теория, source, actual act, доказательство и состояние памяти не обязаны быть внешними объектами — они сами могут быть представлены сетями связей.
 
 ---
 
-## Текущий статус
+# Текущий статус
 
-В репозитории одновременно существуют два слоя, которые важно не смешивать.
+В репозитории существуют два явно разделённых слоя.
 
-### Принятые версии v0.2–v0.5
+## Historical accepted v0.2–v0.5
 
-Контракты `v0.2`–`v0.5` остаются **принятыми историческими версиями** и сохраняются как воспроизводимая база совместимости. Они включают старую формальную нотацию, typed AST, `ContextFrame`, корневую программу и соответствующие conformance-корпуса.
+Versioned contracts v0.2–v0.5 остаются принятыми и воспроизводимыми. Они сохраняют historical parser/typed-AST/`ContextFrame`, десятиформульную root program, старые Anum denotation contracts и conformance corpus.
 
-Они не удалены и не переписаны задним числом.
+Они не переписываются задним числом.
 
-### Foundation v2 — следующая версия МТС
+## Foundation v2 — candidate следующей версии
 
 Текущее развитие идёт через [Foundation v2 Gate P](docs/specs/Foundation%20v2%20Gate%20P.md).
 
-Foundation v2 уже имеет production-facing executable candidate для:
+Уже существует executable production/reference candidate для:
 
 ```text
 exact-occurrence binary links
 → explicit K / D / G / T / I / A
 → canonical source evidence
 → read-only interpreter replay
-→ persistent scoped dictionary `:`
-→ local representative equality `=`
-→ exact multistep Run
-→ explicitly T-admitted proof rule
-→ integrated trusted proof replay
+→ persistent scoped `:`
+→ local representative `=`
+→ exact Run
+→ T-admitted proof rule
+→ integrated proof checker
+→ Anum nested sequence materialization
 ```
 
-Но **Foundation v2 ещё не опубликована как новая accepted версия МТС**. До этого должны быть закрыты materialization, persistent L4, cutover и итоговый versioned conformance gate.
+Foundation v2 **ещё не является accepted release**. Следующий большой blocker после sequence gate — persistent L4 #124, затем cutover/versioned conformance/acceptance.
 
 ---
 
-# 1. Что существует в МТС
+# 1. Онтология
 
-Минимальная онтология — бинарная ориентированная связь:
+Примитивная семантическая форма:
 
 ```text
-Link = start ⟼ end
+Link(start, end)
 ```
 
-У связи нет обязательного внешнего типа, имени, класса или набора свойств. Всё дополнительное содержание должно быть выражено отношениями самой сети либо явно вынесено в уровень реализации.
+У primitive `Link` нет обязательных semantic tags вроде:
+
+```text
+type
+context
+meaning
+rule
+source
+```
+
+Если роль существенна, она выражается связями.
 
 Подробнее: [Основания МТС](docs/theory/Основания%20МТС.md).
 
-## Exact occurrence важнее формы
+---
 
-Одинаковая структура не означает тождество сущностей.
+# 2. Exact occurrence identity
+
+Одинаковая форма не означает тождество:
 
 ```text
 P1 = A ⟼ B
@@ -75,9 +86,7 @@ P2 = A ⟼ B
 P1 ≠ P2
 ```
 
-`P1` и `P2` могут быть двумя разными точными вхождениями одной и той же пары полюсов.
-
-То же относится к самозамкнутым связям:
+Также:
 
 ```text
 R = R ⟼ R
@@ -86,241 +95,217 @@ X = X ⟼ X
 R ≠ X
 ```
 
-Поэтому Foundation v2 не использует:
+Foundation v2 поэтому не принимает как universal identity:
 
 ```text
-графовый изоморфизм = семантическое тождество
-адрес backend-а       = универсальное семантическое имя
-одинаковая пара       = одна автоматически интернированная связь
+pair interning
+graph isomorphism
+AST path
+source spelling
+snapshot slot
+physical backend address
 ```
 
-Эта граница принципиальна для циклов, sharing, provenance и доказательств.
+Exact occurrence identity необходима для multiplicity, cycles, sharing, provenance и proof acts.
 
 ---
 
-# 2. Корень и самозамыкание
+# 3. Explicit context K
 
-МТС допускает самозамыкание как обычную структуру связи:
-
-```text
-R = R ⟼ R
-```
-
-Самозамыкание само по себе не является скрытым opcode и не задаёт глобальный класс всех объектов такой формы.
-
-Foundation v2 использует небольшой набор **различённых exact occurrences** bootstrap-уровня (`R/O/C/L/U`). Это опорные элементы конкретной системы, а не правило вида «любая связь такой формы автоматически означает X».
-
-Историческая десятиформульная корневая программа v0.2–v0.5 сохранена отдельно и рассматривается как принятый предыдущий контракт, а не как повод переносить старую `ContextFrame`-семантику в новую foundation.
-
-Подробнее: [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md).
-
----
-
-# 3. Контекст — тоже сеть связей
-
-Foundation v2 не требует скрытого стека `ContextFrame`.
-
-Минимальный persistent context представим как:
+Контекст хранится сетью:
 
 ```text
 P = parent ⟼ current
 K = K ⟼ P
 ```
 
-Тогда `K` — exact occurrence текущего снимка контекста, а `current` извлекается из предъявленного `K`.
-
-Смена текущего объекта создаёт новый снимок:
+`K` — exact snapshot.
 
 ```text
-K0 → K1 → K2
+↑ = current(K)
 ```
 
-а не мутирует невидимое глобальное состояние.
+не является hidden global variable или ambient `ContextFrame` stack.
 
-Это даёт важное свойство: любой акт можно повторно проверить, если предъявлены exact `K_before` и `K_after`.
+Старые ContextFrame/`◁`/`▷` остаются historical v0.2 semantics.
 
 ---
 
-# 4. Исходный текст не является семантикой
+# 4. Source не равен смыслу
 
-Текст программы или доказательства — это входной носитель, а не identity смысловой сущности.
-
-Текущая Foundation-v2 цепочка выглядит так:
+Foundation-v2 source path:
 
 ```text
 raw UTF-8
-→ canonical astring content C
+→ canonical content C
 → exact source occurrence S
-→ selected exact segmentation
-→ scoped dictionary D
-→ explicit grammar G / theory T admission
-→ resolved exact form
+→ selected segmentation
+→ scoped D
+→ explicit G/T admission
+→ exact form
 ```
 
-Один и тот же набор байтов может разрешаться по-разному в разных словарях или теориях. Поэтому нельзя считать host-token, AST-класс или spelling семантической идентичностью.
+Поэтому:
+
+```text
+same bytes != same source occurrence
+source occurrence != semantic form
+semantic form != theory admission
+```
+
+Token/AST class не является semantic authority.
 
 Подробнее: [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md).
 
 ---
 
-# 5. Словарь `D` — persistent scoped сеть
+# 5. Persistent dictionary D
 
-Словарь не является глобальным `dict<string, object>`.
-
-Концептуально Foundation v2 использует persistent scope/history:
+Dictionary state также является сетью:
 
 ```text
-ScopePayload = parentScope ⟼ localHistory
-D            = D ⟼ ScopePayload
-
-Entry        = sourceContent ⟼ form
-Occurrence   = D_before ⟼ Entry
-H_after      = H_before ⟼ Occurrence
-D_after      = D_after ⟼ (parentScope ⟼ H_after)
+D = D ⟼ (parentScope ⟼ localHistory)
 ```
 
-Определение через `:` — явный effect, создающий новое состояние словаря.
-
-При этом чтение остаётся чтением:
+Definition effect:
 
 ```text
-lookup / find / replay ≠ materialize
+Entry      = sourceContent ⟼ form
+Occurrence = D_before ⟼ Entry
+H_after    = H_before ⟼ Occurrence
+D_after    = D_after ⟼ (sameParent ⟼ H_after)
 ```
 
-Это различие проходит через всю Foundation v2.
+`:` — explicit persistent effect, а не host assignment и не theorem assertion.
 
 ---
 
-# 6. Интерпретатор и actual act
+# 6. Read/replay не materialize-ит
+
+Фундаментальный operational split:
+
+```text
+READ SIDE
+read / find / enumerate / resolve / replay
+
+EFFECT SIDE
+materialize / define / delete / persist transition
+```
+
+Главный инвариант:
+
+```text
+find / replay != materialize
+```
+
+Если описание связи само создаёт искомую связь, ассоциативный поиск теряет смысл.
+
+---
+
+# 7. Local `=`
+
+Текущее Foundation-v2 equality — local representative constraint:
+
+```text
+K ⟼ (member ⟼ representative)
+```
+
+```text
+Equal_K(a,b)
+⇔ rep_K(a) is rep_K(b)
+```
+
+Нет автоматических:
+
+```text
+transitivity chains
+substitution
+congruence
+recursive rewriting
+global union-find
+```
+
+Логический вывод требует отдельного `T`-admitted rule.
+
+---
+
+# 8. Actual act и Run
 
 МТС различает:
 
 ```text
-описание интерпретатора I
-и
-фактически произошедший акт A
+I — interpreter / capability
+A — конкретный actual act
 ```
 
-`A` содержит exact evidence того, что было выбрано и проверено: source, форму, словарь, теорию, контекст, binding, result и другие необходимые роли.
+Actual act хранит exact evidence выбранного случая.
 
-Trusted replay не обязан доверять тому, кто нашёл этот акт. Он повторно проверяет предъявленную сеть.
-
-Отсюда фундаментальное разделение:
-
-```text
-untrusted search / ranking
-        ↓ candidate
-trusted exact replay
-        ↓
-accept / reject
-```
-
-Именно эта граница нужна будущему `aprover`.
-
----
-
-# 7. Локальное равенство, а не глобальная подстановка
-
-Foundation v2 отказалась от идеи, что `=` автоматически создаёт глобальную конгруэнтность или rewrite-систему.
-
-Локальное representative-ограничение может быть представлено так:
-
-```text
-Pair    = member ⟼ representative
-Binding = K ⟼ Pair
-```
-
-Тогда:
-
-```text
-rep_K(x) = явный локальный representative,
-           иначе сам x
-
-Equal_K(a,b)
-⇔ rep_K(a) и rep_K(b) — один exact occurrence
-```
-
-Это **одношаговая локальная** семантика.
-
-Из
-
-```text
-a → b
-b → c
-```
-
-не появляется автоматически:
-
-```text
-a → c
-```
-
-Нет скрытой транзитивности, substitution, congruence или глобального union-find.
-
-Если требуется логическое правило — оно должно быть отдельно предъявлено и допущено теорией `T`.
-
----
-
-# 8. Proof rules и Run
-
-Последовательность actual acts сама является сетью:
+Многошаговый provenance:
 
 ```text
 Run_0     = R
 Run_(i+1) = Run_i ⟼ A_i
 ```
 
-Соседние шаги обязаны иметь exact continuity контекста:
+с exact continuity:
 
 ```text
 A_i.after is A_(i+1).before
 ```
 
-Но adjacency не означает логическую транзитивность и не создаёт shortcut `K0 → Kn`.
+Run фиксирует order, но не создаёт logical transitivity.
 
-Первый Foundation-v2 proof-rule candidate — отдельно допущенная теорией одношаговая decomposition истинного локального равенства двух завершённых связей:
+---
+
+# 9. Proof и будущий aprover
+
+Первый proof-rule candidate существует только через:
 
 ```text
-Equal_K(L,R) = true
-
-L = ls ⟼ le
-R = rs ⟼ re
-
 T ⟼ Rule
-
-Rule(L,R)
-→ ls ⟼ rs
-→ le ⟼ re
 ```
 
-Это правило не встроено в `=` и не запускается рекурсивно само.
+и одношагово decomposes истинное local equality завершённых links.
+
+Integrated checker уже replay-ит:
+
+```text
+source `decompose`
+→ scoped D/G/T
+→ exact Rule
+→ true equality A_eq
+→ T ⟼ Rule
+→ A_rule
+→ Run[A_eq,A_rule]
+→ accept / reject
+```
+
+Ключевая архитектура `aprover`:
+
+```text
+untrusted proof search / indices / heuristics
+                  ↓ candidate
+trusted exact replay
+                  ↓
+             accept / reject
+```
+
+Поисковый алгоритм может быть сложным и недоверенным, если selected evidence проверяется маленьким trusted core.
 
 Подробнее: [Foundation v2 Proof replay](docs/specs/Foundation%20v2%20Proof%20replay.md).
 
 ---
 
-# 9. Апамять — контроллер сетей связей
+# 10. Апамять — controller сети связей
 
-Один из наиболее наглядных прикладных результатов МТС — архитектура **апамяти**.
+Апамять — прикладная operational форма МТС.
 
-Апамять лучше понимать не как «базу объектов», а как контроллер exact-occurrence сети связей:
-
-```text
-создать связь
-найти связи по полюсам
-перечислить exact occurrences
-сохранить sharing и циклы
-вести persistent состояния
-проверять selected evidence
-явно materialize-ить effect
-```
-
-При этом данные и управляющая структура могут находиться в одной и той же онтологии:
+Она хранит и обслуживает exact network:
 
 ```text
 application links
 K contexts
-D dictionaries
+D histories
 G/T admissions
 source evidence
 actual acts
@@ -328,101 +313,230 @@ proof claims
 Runs
 ```
 
-Например запись ачислового/структурного выражения:
+Индекс может быстро вернуть candidates, но не определяет истину.
 
 ```text
-∞[window][cursor][position][[[x][int]][point]]
+find(A,B) -> exact occurrences
 ```
 
-может рассматриваться не просто как строка для парсера, а как инструкция/описание того, какие отношения должны быть разрешены, найдены или материализованы в сети.
+не создаёт отсутствующую связь.
 
-Ключевой принцип:
-
-```text
-find / read / replay
-        ≠
-materialize / delete
-```
-
-Это позволяет использовать быстрые индексы и эвристики для поиска, не делая их частью доверенной семантики.
+Только explicit materialization создаёт новый occurrence.
 
 Подробнее: [Апамять и управление сетью связей](docs/specs/Апамять%20и%20управление%20сетью%20связей.md).
 
 ---
 
-# 10. Ачисла
+# 11. Ачисла: source sequence и result network
 
-Ачисло — рекурсивное структурное описание, исторически использующее четыре абита:
+Historical Anum использует четыре абита:
 
 ```text
 [ ] 0 1
 ```
 
-Для Foundation v2 важно уточнение: рекурсивное ачисло не объявляется универсальной identity произвольной асети.
+Historical recursive denotation v0.2 остаётся accepted occurrence-tree contract.
 
-Оно является **root-relative structural description** на своей области применимости, прежде всего для occurrence-tree представлений. Для сетей с sharing и произвольными циклами требуется exact occurrence identity.
+Foundation v2 уточняет более общий sequence mode:
 
-Документы:
+```text
+source carrier != target network
+```
 
-- [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md)
-- [Протокол абитов ачисел](docs/specs/Протокол%20абитов%20ачисел.md)
+Например source carrier:
 
-Следующий release gate #242 должен связать последовательность ачисла с явной materialization-семантикой апамяти.
+```text
+∞ A B
+```
+
+не обязан уже содержать:
+
+```text
+A ⟼ B
+```
+
+Explicit sequence materialization создаёт target relation только на effect side.
 
 ---
 
-# 11. Что уже является executable Foundation v2
+# 12. Foundation-v2 sequence materialization #242
 
-Production-facing candidate modules сейчас разделены по обязанностям:
+Machine contract candidate:
+
+```text
+contracts/mts-anum-sequence-materialization-v0.7.json
+```
+
+Production-facing module:
+
+```text
+core/foundation_v2_materialization.py
+```
+
+Semantics:
+
+```text
+∞ A B C
+→ new exact A⟼B
+→ new exact B⟼C
+```
+
+Root `∞` — sentinel, а не первый adjacency operand.
+
+Nested group:
+
+```text
+[A]   → exact A
+[A B] → X = A ⟼ B, return exact X
+```
+
+Поэтому:
+
+```text
+∞ [A B] C
+→ X = A ⟼ B
+→ Y = X ⟼ C
+```
+
+Вложенный context возвращает построенную relation как один элемент внешней последовательности.
+
+---
+
+# 13. Наглядный Anum/apamemory пример
+
+```text
+∞[window][cursor][position][[[x][int]][point]]
+```
+
+Sequence candidate строит:
+
+```text
+XI = X ⟼ Int
+Q  = XI ⟼ Point
+WC = Window ⟼ Cursor
+CP = Cursor ⟼ Position
+PQ = Position ⟼ Q
+```
+
+```text
+Window ─────▶ Cursor ─────▶ Position
+                              │
+                              ▼
+                              Q
+                             / \
+                            /   \
+                          XI   Point
+                         /  \
+                        X   Int
+```
+
+До explicit effect source carrier не обязан содержать эти target relations.
+
+Это наглядно показывает, зачем МТС различает описание, поиск и materialization.
+
+Подробнее: [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md).
+
+---
+
+# 14. Materialization не наследует pair interning
+
+Старый historical `core/anum_memory.py` использовал canonical pair interning.
+
+Foundation v2 не наследует эту semantics.
+
+Если уже существует:
+
+```text
+P1 = A ⟼ B
+```
+
+новый explicit sequence effect может создать:
+
+```text
+P2 = A ⟼ B
+```
+
+при этом:
+
+```text
+P1 ≠ P2
+```
+
+Каждая adjacency sequence effect создаёт новый exact occurrence. Возможный reuse должен быть отдельным explicit planning decision, а не скрытым следствием одинаковой пары.
+
+---
+
+# 15. Persistent before/after state
+
+Foundation-v2 exact network поддерживает additive evolution:
+
+```text
+before
+  ↓ explicit effect
+ after
+```
+
+В одном runtime lineage:
+
+- старые exact refs сохраняются;
+- старые links не изменяются;
+- новые occurrences append-ятся;
+- duplicate pairs разрешены;
+- root сохраняется.
+
+Independent snapshot reload создаёт fresh runtime identity scope, поэтому snapshot slot не становится universal identity.
+
+---
+
+# 16. Текущие Foundation-v2 modules
 
 ```text
 core/exact_link_network.py
-    exact-occurrence binary-link substrate
+    exact-occurrence substrate + additive evolution
 
 core/foundation_v2_state.py
-    K / scoped D / memberships / actual-act state
+    K / scoped D / memberships / A
 
 core/foundation_v2_source.py
     canonical source and selected segmentation replay
 
 core/foundation_v2_interpreter.py
-    relation / `:` / `=` trusted replay
+    relation / `:` / `=` replay
 
 core/foundation_v2_run.py
     exact ordered actual-act Run
 
 core/foundation_v2_proof.py
-    separately T-admitted proof-rule replay
+    T-admitted proof-rule replay
 
 core/foundation_v2_checker.py
-    integrated source → proof → Run replay
+    integrated source→proof→Run replay
+
+core/foundation_v2_materialization.py
+    nested Anum sequence explicit materialization/replay
 ```
 
-Это всё ещё **candidate следующей версии**, а не разрешение удалить старые accepted contracts.
+Все они пока candidate следующей версии.
 
 ---
 
-# 12. Путь к следующей версии МТС
+# 17. Путь к accepted Foundation v2
 
-После завершения semantic proof/checker core фокус должен идти по release chain:
+После sequence gate #242 основной release chain:
 
 ```text
-#261  обновление главной документации
-  ↓
-#242  Anum sequence → апамять materialization
-  ↓
-#124  persistent L4/backend contract
-  ↓
+#124 persistent L4/backend contract
+↓
 historical compatibility classification
-  ↓
-atomic production cutover + удаление старого semantic path
-  ↓
+↓
+atomic production cutover + old semantic-path deletion
+↓
 versioned integrated conformance corpus
-  ↓
+↓
 explicit Foundation-v2 acceptance
-  ↓
+↓
 следующая опубликованная версия МТС
-  ↓
+↓
 aprover repin
 ```
 
@@ -430,9 +544,9 @@ aprover repin
 
 ---
 
-# 13. Как читать репозиторий сейчас
+# 18. Как читать репозиторий
 
-Для понимания **текущей** МТС рекомендуется такой порядок:
+Для текущей МТС:
 
 1. [Основания МТС](docs/theory/Основания%20МТС.md)
 2. [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md)
@@ -442,27 +556,23 @@ aprover repin
 6. [Foundation v2 Proof replay](docs/specs/Foundation%20v2%20Proof%20replay.md)
 7. [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md)
 
-Для воспроизведения **исторически принятых** версий:
+Для historical accepted behavior:
 
 - [Reference model МТС v0.2](docs/specs/Reference%20model%20МТС%20v0.2.md)
-- `contracts/mts-contract-v0.2.json` … `contracts/mts-contract-v0.5.json`
-- соответствующие conformance-корпуса
-- `tests/mtc_formulas.mtc` — неизменяемая корневая программа исторической линии
-
-`docs/research/` содержит исследовательские записи и provenance решений; они не заменяют активные спецификации.
+- versioned `contracts/mts-contract-v0.2.json` … `v0.5`
+- historical conformance corpora.
 
 ---
 
-## Главный инвариант текущей работы
+## Главный инвариант
 
 ```text
 одна онтология связей
 + exact occurrence identity
-+ явное состояние
-+ явное evidence
-+ недоверенный поиск
-+ доверенное replay
-+ явная materialization
++ explicit state/evidence
++ untrusted discovery
++ deterministic trusted replay
++ explicit materialization
 ```
 
-Именно из этой комбинации МТС превращается из абстрактной теории связей в основу для ассоциативной памяти, интерпретатора и проверяемого доказателя.
+Эта комбинация связывает фундаментальную МТС с ассоциативной памятью и проверяемым `aprover`.
