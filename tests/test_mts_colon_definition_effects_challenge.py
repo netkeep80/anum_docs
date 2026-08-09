@@ -1,4 +1,4 @@
-"""Non-normative colon-definition effect challenge for issue #225.
+"""Non-normative colon-definition effect challenge for issue #224.
 
 Candidate C models a persistent lexical scope snapshot entirely with links:
 D = D -> (parentScope -> localHistory), where local history records actual
@@ -159,8 +159,9 @@ def define(
     before = read_scope(graph, before_scope_ref)
     source_ref = add_source(graph, source_carrier)
     entry_ref = graph.intern(source_ref, form_ref)
-    occurrence_ref = graph.intern(before.history_ref, entry_ref)
-    after_scope_ref = make_scope(graph, before.parent_ref, occurrence_ref)
+    occurrence_ref = graph.intern(before_scope_ref, entry_ref)
+    history_ref = graph.intern(before.history_ref, occurrence_ref)
+    after_scope_ref = make_scope(graph, before.parent_ref, history_ref)
     return DefinitionEvidence(
         before_scope_ref=before_scope_ref,
         source_carrier=source_carrier,
@@ -183,7 +184,8 @@ def local_entries(graph: LinkGraph, history_ref: int) -> tuple[int, ...]:
             raise ValueError("local history cycle")
         seen.add(current)
         cell = graph.links[current]
-        reverse_entries.append(cell.end)
+        occurrence = graph.links[cell.end]
+        reverse_entries.append(occurrence.end)
         current = cell.start
     return tuple(reversed(reverse_entries))
 
@@ -237,12 +239,14 @@ def check_definition_effect(graph: LinkGraph, evidence: DefinitionEvidence) -> b
         ):
             return False
         if graph.links.get(evidence.occurrence_ref) != Link(
-            before.history_ref, evidence.entry_ref
+            evidence.before_scope_ref, evidence.entry_ref
         ):
             return False
         if after.parent_ref != before.parent_ref:
             return False
-        if after.history_ref != evidence.occurrence_ref:
+        if graph.links.get(after.history_ref) != Link(
+            before.history_ref, evidence.occurrence_ref
+        ):
             return False
         try:
             resolved = lookup(
@@ -261,7 +265,7 @@ def test_contract_is_non_normative_and_rederives_old_environment():
     assert value["schema"] == "mts-colon-definition-effects-challenge/v0.7"
     assert value["status"] == "candidate-challenge"
     assert value["accepted"] is False
-    assert value["issue"] == 225
+    assert value["issue"] == 224
     assert value["candidateC"]["preferredAfterChallenge"] is False
     assert value["veto"]["mutableHostLexicalMapAccepted"] is False
     assert value["veto"]["definitionImpliesEquality"] is False
@@ -415,7 +419,7 @@ def test_definition_effect_creates_no_equality_or_theorem_relation():
     assert challenge()["veto"]["definitionImpliesEquality"] is False
 
 
-def test_occurrence_identity_is_history_cell_not_globally_reused_entry_pair():
+def test_occurrence_identity_binds_before_scope_not_globally_reused_entry_pair():
     graph = LinkGraph()
     scope = root_scope(graph)
     carrier = encode_text("x")
@@ -424,8 +428,12 @@ def test_occurrence_identity_is_history_cell_not_globally_reused_entry_pair():
 
     assert first.entry_ref == second.entry_ref
     assert first.occurrence_ref != second.occurrence_ref
-    assert graph.links[first.occurrence_ref].end == first.entry_ref
-    assert graph.links[second.occurrence_ref].end == second.entry_ref
+    assert graph.links[first.occurrence_ref] == Link(
+        first.before_scope_ref, first.entry_ref
+    )
+    assert graph.links[second.occurrence_ref] == Link(
+        second.before_scope_ref, second.entry_ref
+    )
 
 
 def test_effect_replay_is_read_only_and_rejects_forged_evidence():
