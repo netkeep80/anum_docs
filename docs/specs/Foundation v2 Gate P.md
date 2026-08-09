@@ -24,21 +24,19 @@ P7  exact multistep Run                        #253/#254
 P8  separately T-admitted proof rule           #255/#256
 P9  integrated source→proof→Run checker        #257/#262
 Docs current MTS surface                       #261/#263
+Anum sequence → апамять materialization        #242/#264
 ```
 
-Текущий Gate-P release blocker:
+После merge #264 semantic candidate #242 считается завершённым Gate-P evidence. Текущий следующий release blocker:
 
 ```text
-#242  Anum sequence → апамять materialization
+#124  persistent L4/backend contract
 ```
-
-В этой ветке #242 получает executable candidate; после его merge следующая крупная зависимость — persistent L4 #124.
 
 Остаток release chain:
 
 ```text
-#242 sequence materialization
-→ #124 persistent L4/backend
+#124 persistent L4/backend
 → historical compatibility classification
 → atomic production cutover / old semantic-path deletion
 → versioned integrated conformance corpus
@@ -338,6 +336,8 @@ CP = Cursor ⟼ Position
 PQ = Position ⟼ Q
 ```
 
+#242 после merge #264 больше не является открытым semantic gap: sequence materialization имеет executable contract, tests и replay boundary. Он остаётся candidate частью будущей Foundation v2 до общего acceptance.
+
 ---
 
 # 11. Materialization identity policy
@@ -403,7 +403,7 @@ Read-only `find_links` отдельно доказывает отсутстви�
 
 # 13. Persistent L4 gap #124
 
-После #242 остаётся доказать те же свойства на persistent backend:
+Текущий следующий Gate-P blocker — доказать те же свойства на persistent backend:
 
 ```text
 multiplicity
