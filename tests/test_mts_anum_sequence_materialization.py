@@ -126,6 +126,49 @@ def test_source_carrier_for_infinity_ab_does_not_contain_target_before_effect() 
     assert evidence.after.link(evidence.result).end is b
 
 
+def test_same_carrier_can_be_passed_as_value_or_deserialized_to_target() -> None:
+    builder = LinkNetworkBuilder()
+    root = builder.reserve()
+    a = builder.reserve()
+    b = builder.reserve()
+    prefix = builder.reserve()
+    source_a = builder.reserve()
+    carrier = builder.reserve()
+    builder.define(root, root, root)
+    for ref in (a, b, prefix):
+        builder.define(ref, ref, ref)
+    builder.define(source_a, root, a)
+    builder.define(carrier, source_a, b)
+    before = builder.freeze(root)
+
+    before_snapshot = before.snapshot()
+    assert find_links(before, start=a, end=b) == ()
+
+    carrier_value = materialize_sequence(
+        before,
+        _description(root, _atom(prefix), _group(_atom(carrier))),
+    )
+    assert len(carrier_value.created) == 1
+    carrier_outer = carrier_value.created[0]
+    assert carrier_outer.start is prefix
+    assert carrier_outer.end is carrier
+    assert find_links(carrier_value.after, start=a, end=b) == ()
+    assert carrier_value.after.link(carrier) is before.link(carrier)
+
+    deserialized_value = materialize_sequence(
+        before,
+        _description(root, _atom(prefix), _group(_atom(a), _atom(b))),
+    )
+    assert len(deserialized_value.created) == 2
+    target, target_outer = deserialized_value.created
+    assert (target.start, target.end) == (a, b)
+    assert target.ref is not carrier
+    assert target_outer.start is prefix
+    assert target_outer.end is target.ref
+    assert deserialized_value.after.link(carrier) is before.link(carrier)
+    assert before.snapshot() == before_snapshot
+
+
 def test_infinity_abc_creates_adjacent_relations_and_returns_last_edge() -> None:
     before, root, refs = _base_network(("a", "b", "c"))
     evidence = materialize_sequence(
