@@ -53,7 +53,7 @@
       "path": "core/mtc_parser.py",
       "role": "historical tokenizer/precedence parser and typed-AST constructor with semantic-looking TokenKind dispatch",
       "action": "HISTORICAL_REPLAY_ONLY",
-      "expectedCoreImports": ["core.mtc_ast"],
+      "expectedCoreImports": ["core.mtc_ast", "core.reference_model"],
       "replacementOwner": "core/foundation_v2_source.py",
       "precondition": "All new live semantic consumers use canonical source occurrence + selected segmentation + D/G/T evidence.",
       "postCutover": "May remain only inside the historical replay island; any reusable editor parser must be split into NON_SEMANTIC_TOOLING explicitly."
@@ -127,6 +127,7 @@
     "core/validate_root.py": ["core.mtc_ast", "core.mtc_definitions", "core.root_library"],
     "core/proof_checker.py": ["core.mtc_ast", "core.mtc_definitions", "core.mtc_interpreter", "core.mtc_opening_path", "core.mtc_parser"],
     "core/mtc_opening_path.py": ["core.mtc_ast", "core.mtc_definitions"],
+    "core/mtc_parser.py": ["core.mtc_ast", "core.reference_model"],
     "converters/l4_backend_driver.py": ["core.anum_denotation", "core.anum_memory", "core.anum_model", "core.anum_parser", "core.anum_recursive_denotation"]
   },
   "trustedFoundationV2Modules": [
