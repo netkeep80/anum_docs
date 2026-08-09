@@ -1,0 +1,156 @@
+{
+  "schema": "mts-foundation-v2-consumer-matrix/v0.7",
+  "status": "gate-p-cutover-consumer-audit",
+  "accepted": false,
+  "issue": 272,
+  "parent": 271,
+  "baseMainCommit": "38488fdcbce999a54726f56ad01ac358d28a9e1a",
+  "allowedActions": [
+    "MIGRATE_TO_FOUNDATION_V2",
+    "HISTORICAL_REPLAY_ONLY",
+    "DELETE_WITH_OWNER",
+    "NON_SEMANTIC_TOOLING"
+  ],
+  "unknownAllowed": false,
+  "rows": [
+    {
+      "path": "core/root_library.py",
+      "role": "historical ten-formula root loader currently used as a root-facing entry surface",
+      "action": "MIGRATE_TO_FOUNDATION_V2",
+      "expectedCoreImports": ["core.mtc_ast", "core.mtc_definitions", "core.mtc_parser"],
+      "replacementOwner": "C3 distinguished exact R/O/C/L/U bootstrap",
+      "precondition": "A live Foundation-v2 root/bootstrap entrypoint exists and no live consumer needs typed root AST identity.",
+      "postCutover": "Historical root loading may remain only as explicitly version-scoped replay tooling or be deleted if tag/Git replay is sufficient."
+    },
+    {
+      "path": "core/validate_root.py",
+      "role": "historical typed ten-formula root validator",
+      "action": "MIGRATE_TO_FOUNDATION_V2",
+      "expectedCoreImports": ["core.mtc_ast", "core.mtc_definitions", "core.root_library"],
+      "replacementOwner": "C3 Foundation-v2 bootstrap/conformance validator",
+      "precondition": "The five-link bootstrap and ostensive invariants have executable release-candidate validation.",
+      "postCutover": "Historical ten-formula validation must not be the new live root authority."
+    },
+    {
+      "path": "core/proof_checker.py",
+      "role": "accepted historical v0.2-v0.4 proof replay island",
+      "action": "HISTORICAL_REPLAY_ONLY",
+      "expectedCoreImports": ["core.mtc_ast", "core.mtc_definitions", "core.mtc_interpreter", "core.mtc_opening_path", "core.mtc_parser"],
+      "replacementOwner": "core/foundation_v2_checker.py for new production proofs",
+      "precondition": "New production proof entrypoints consume only the Foundation-v2 integrated checker.",
+      "postCutover": "No Foundation-v2 proof validity may dispatch to this historical checker. C5 may later delete the historical runtime if Git/tag replay is selected."
+    },
+    {
+      "path": "core/mtc_opening_path.py",
+      "role": "historical v0.4 DefinitionOpeningPath replay over typed AST and DefinitionEnvironment",
+      "action": "HISTORICAL_REPLAY_ONLY",
+      "expectedCoreImports": ["core.mtc_ast", "core.mtc_definitions"],
+      "replacementOwner": "No live Foundation-v2 opening primitive; persistent scoped D and explicit T-admitted rules own new behavior.",
+      "precondition": "No new-production proof/source path imports DefinitionOpeningPath replay.",
+      "postCutover": "Historical-only dependency of old proof versions or removable with that replay island."
+    },
+    {
+      "path": "core/mtc_parser.py",
+      "role": "historical tokenizer/precedence parser and typed-AST constructor with semantic-looking TokenKind dispatch",
+      "action": "HISTORICAL_REPLAY_ONLY",
+      "expectedCoreImports": ["core.mtc_ast"],
+      "replacementOwner": "core/foundation_v2_source.py",
+      "precondition": "All new live semantic consumers use canonical source occurrence + selected segmentation + D/G/T evidence.",
+      "postCutover": "May remain only inside the historical replay island; any reusable editor parser must be split into NON_SEMANTIC_TOOLING explicitly."
+    },
+    {
+      "path": "core/mtc_ast.py",
+      "role": "historical typed syntax/formatting structure whose classes currently carry semantic-looking distinctions",
+      "action": "HISTORICAL_REPLAY_ONLY",
+      "expectedCoreImports": [],
+      "replacementOwner": "exact source/form occurrences and Foundation-v2 evidence",
+      "precondition": "No trusted/new-production semantic module uses AST class or AST path as identity.",
+      "postCutover": "Historical replay only unless a separately isolated NON_SEMANTIC_TOOLING formatting layer is retained."
+    },
+    {
+      "path": "core/mtc_interpreter.py",
+      "role": "historical ContextFrame/MemoryView AST-driven read-only interpreter",
+      "action": "HISTORICAL_REPLAY_ONLY",
+      "expectedCoreImports": ["core.mtc_ast"],
+      "replacementOwner": "core/foundation_v2_interpreter.py",
+      "precondition": "Every new live interpretation entrypoint supplies exact K/D/G/T/A evidence.",
+      "postCutover": "No Foundation-v2 validity path may call ContextFrame, resolve_context_pronoun, projection lookup or interpret_constraints. C5 may delete the island with historical runtime replay."
+    },
+    {
+      "path": "core/mtc_definitions.py",
+      "role": "historical host lexical DefinitionEnvironment and definition opening",
+      "action": "HISTORICAL_REPLAY_ONLY",
+      "expectedCoreImports": ["core.mtc_ast"],
+      "replacementOwner": "core/foundation_v2_state.py + core/foundation_v2_interpreter.py persistent scoped D/colon",
+      "precondition": "All new source/definition consumers use exact persistent D history/evidence.",
+      "postCutover": "No new live dictionary semantics may use host DefinitionEnvironment."
+    },
+    {
+      "path": "core/reference_model.py",
+      "role": "historical live machine-readable operator/reference authority tied to typed AST and ContextFrame concepts",
+      "action": "DELETE_WITH_OWNER",
+      "expectedCoreImports": [],
+      "replacementOwner": "future accepted Foundation-v2 contract after C8/C9",
+      "precondition": "A new accepted versioned Foundation-v2 contract exists and all live consumers have repointed.",
+      "postCutover": "Delete from live semantic authority; immutable historical JSON contracts/Git retain the previous release record."
+    },
+    {
+      "path": "core/anum_memory.py",
+      "role": "historical v0.2 in-memory L4 with exact ordered-pair interning and idempotent intern/realize behavior",
+      "action": "HISTORICAL_REPLAY_ONLY",
+      "expectedCoreImports": ["core.anum_denotation", "core.anum_raw_carrier"],
+      "replacementOwner": "core/foundation_v2_persistent.py + core/foundation_v2_materialization.py",
+      "precondition": "Every new live L4/materialization consumer accepts exact occurrence multiplicity and persistent logical identity.",
+      "postCutover": "No Foundation-v2 materialization or persistence path may use pair interning as semantic identity."
+    },
+    {
+      "path": "converters/l4_backend_driver.py",
+      "role": "historical v0.3 language-neutral backend driver delegating to pair-interning AnumMemory",
+      "action": "HISTORICAL_REPLAY_ONLY",
+      "expectedCoreImports": ["core.anum_denotation", "core.anum_memory", "core.anum_model", "core.anum_parser", "core.anum_recursive_denotation"],
+      "replacementOwner": "Foundation-v2 persistent exact-occurrence backend/conformance boundary",
+      "precondition": "C6/C8 provide one exact-occurrence persistent driver/release corpus if an external backend driver remains required.",
+      "postCutover": "Historical backend conformance only; not a new live L4 authority."
+    },
+    {
+      "path": "core/semantic_carrier.py",
+      "role": "finite graph/topology engineering utility with explicit non-equality warning",
+      "action": "NON_SEMANTIC_TOOLING",
+      "expectedCoreImports": [],
+      "replacementOwner": "core/exact_link_network.py for live exact-occurrence semantics",
+      "precondition": "No trusted Foundation-v2 module imports CarrierGraph/LinkNode as semantic identity.",
+      "postCutover": "May remain only as structural tooling/research utility."
+    }
+  ],
+  "verifiedHistoricalDependencyIsland": {
+    "core/root_library.py": ["core.mtc_ast", "core.mtc_definitions", "core.mtc_parser"],
+    "core/validate_root.py": ["core.mtc_ast", "core.mtc_definitions", "core.root_library"],
+    "core/proof_checker.py": ["core.mtc_ast", "core.mtc_definitions", "core.mtc_interpreter", "core.mtc_opening_path", "core.mtc_parser"],
+    "core/mtc_opening_path.py": ["core.mtc_ast", "core.mtc_definitions"],
+    "converters/l4_backend_driver.py": ["core.anum_denotation", "core.anum_memory", "core.anum_model", "core.anum_parser", "core.anum_recursive_denotation"]
+  },
+  "trustedFoundationV2Modules": [
+    "core/exact_link_network.py",
+    "core/foundation_v2_state.py",
+    "core/foundation_v2_source.py",
+    "core/foundation_v2_interpreter.py",
+    "core/foundation_v2_run.py",
+    "core/foundation_v2_proof.py",
+    "core/foundation_v2_checker.py",
+    "core/foundation_v2_materialization.py",
+    "core/foundation_v2_persistent.py"
+  ],
+  "forbiddenHistoricalImportsInTrustedFoundationV2": [
+    "core.mtc_parser",
+    "core.mtc_ast",
+    "core.mtc_interpreter",
+    "core.mtc_definitions",
+    "core.mtc_opening_path",
+    "core.proof_checker",
+    "core.root_library",
+    "core.reference_model",
+    "core.anum_memory"
+  ],
+  "cutoverPerformed": false,
+  "downstreamRepinAllowed": false
+}
