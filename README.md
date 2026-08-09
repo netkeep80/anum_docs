@@ -45,9 +45,10 @@ exact-occurrence binary links
 → T-admitted proof rule
 → integrated proof checker
 → Anum nested sequence materialization
+→ persistent exact-occurrence L4 reference backend
 ```
 
-Foundation v2 **ещё не является accepted release**. Следующий большой blocker после sequence gate — persistent L4 #124, затем cutover/versioned conformance/acceptance.
+Foundation v2 **ещё не является accepted release**. Persistent L4 сейчас проходит Gate #265; после него останутся compatibility/cutover, versioned integrated conformance и explicit acceptance перед repin `aprover`.
 
 ---
 
@@ -189,7 +190,7 @@ READ SIDE
 read / find / enumerate / resolve / replay
 
 EFFECT SIDE
-materialize / define / delete / persist transition
+materialize / define / persist transition
 ```
 
 Главный инвариант:
@@ -267,7 +268,7 @@ T ⟼ Rule
 
 и одношагово decomposes истинное local equality завершённых links.
 
-Integrated checker уже replay-ит:
+Integrated checker replay-ит:
 
 ```text
 source `decompose`
@@ -359,7 +360,7 @@ Explicit sequence materialization создаёт target relation только н
 
 ---
 
-# 12. Foundation-v2 sequence materialization #242
+# 12. Foundation-v2 sequence materialization #242/#264
 
 Machine contract candidate:
 
@@ -398,7 +399,7 @@ Nested group:
 → Y = X ⟼ C
 ```
 
-Вложенный context возвращает построенную relation как один элемент внешней последовательности.
+Подробнее: [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md).
 
 ---
 
@@ -432,17 +433,9 @@ Window ─────▶ Cursor ─────▶ Position
 
 До explicit effect source carrier не обязан содержать эти target relations.
 
-Это наглядно показывает, зачем МТС различает описание, поиск и materialization.
-
-Подробнее: [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md).
-
 ---
 
 # 14. Materialization не наследует pair interning
-
-Старый historical `core/anum_memory.py` использовал canonical pair interning.
-
-Foundation v2 не наследует эту semantics.
 
 Если уже существует:
 
@@ -450,7 +443,7 @@ Foundation v2 не наследует эту semantics.
 P1 = A ⟼ B
 ```
 
-новый explicit sequence effect может создать:
+новый explicit effect может создать:
 
 ```text
 P2 = A ⟼ B
@@ -462,33 +455,91 @@ P2 = A ⟼ B
 P1 ≠ P2
 ```
 
-Каждая adjacency sequence effect создаёт новый exact occurrence. Возможный reuse должен быть отдельным explicit planning decision, а не скрытым следствием одинаковой пары.
+Каждая adjacency sequence effect создаёт новый exact occurrence. Возможный reuse — отдельное explicit planning decision, а не скрытое следствие одинаковой пары.
+
+Именно поэтому historical L4 #124 с pair uniqueness/idempotent realize закрыт как superseded, а Foundation-v2 persistent L4 заново выводится в #265.
 
 ---
 
-# 15. Persistent before/after state
+# 15. Persistent exact-occurrence L4 #265
 
-Foundation-v2 exact network поддерживает additive evolution:
+Persistent апамять должна сохранить exact occurrence semantics после close/reopen, не объявляя физический адрес identity.
+
+Foundation v2 различает:
 
 ```text
-before
-  ↓ explicit effect
- after
+runtime OccurrenceRef
+persistent dataset-local logical occurrence id
+snapshot-local slot
+backend physical address
 ```
 
-В одном runtime lineage:
+Reference persistent identity:
 
-- старые exact refs сохраняются;
-- старые links не изменяются;
-- новые occurrences append-ятся;
-- duplicate pairs разрешены;
-- root сохраняется.
+```text
+PersistentOccurrenceId(lineage, local)
+```
 
-Independent snapshot reload создаёт fresh runtime identity scope, поэтому snapshot slot не становится universal identity.
+Для одного dataset:
+
+```text
+close → reopen
+```
+
+сохраняет `lineage/local`, но runtime refs строятся заново.
+
+Импорт той же topology в независимый dataset получает новый lineage:
+
+```text
+same topology != same persistent exact identity
+```
 
 ---
 
-# 16. Текущие Foundation-v2 modules
+# 16. Persistent multiplicity, cycles и sharing
+
+Persistent `materialize(A,B)` всегда создаёт **новый** logical occurrence.
+
+```text
+P1 = materialize(A,B)
+P2 = materialize(A,B)
+P1 ≠ P2
+```
+
+Оба должны пережить reopen и вернуться через:
+
+```text
+find(A,B) -> (P1,P2)
+```
+
+Atomic batch поддерживает self/mutual cycles и sharing через batch-local refs, не раскрывая циклы рекурсивно.
+
+Подробнее: [Foundation v2 Persistent L4](docs/specs/Foundation%20v2%20Persistent%20L4.md).
+
+---
+
+# 17. Sequence effect после reopen
+
+Persistent L4 не копирует Anum grammar.
+
+Правильная цепочка:
+
+```text
+persistent store
+→ reconstruct runtime exact network
+→ foundation_v2_materialization.py
+→ runtime effect evidence
+→ normalize to persistent ids
+→ atomic persistent batch
+```
+
+После reopen persistent evidence снова преобразуется в runtime before/after lineage и проверяется обычным trusted replay #242.
+
+То есть storage меняется, а semantic sequence checker остаётся один.
+
+---
+
+# 18. Текущие Foundation-v2 modules
 
 ```text
 core/exact_link_network.py
@@ -513,19 +564,22 @@ core/foundation_v2_checker.py
     integrated source→proof→Run replay
 
 core/foundation_v2_materialization.py
-    nested Anum sequence explicit materialization/replay
+    nested Anum sequence materialization/replay
+
+core/foundation_v2_persistent.py
+    persistent exact-occurrence L4 reference backend and sequence bridge
 ```
 
 Все они пока candidate следующей версии.
 
 ---
 
-# 17. Путь к accepted Foundation v2
+# 19. Путь к accepted Foundation v2
 
-После sequence gate #242 основной release chain:
+Текущий Gate-P release chain:
 
 ```text
-#124 persistent L4/backend contract
+#265 persistent exact-occurrence L4
 ↓
 historical compatibility classification
 ↓
@@ -540,11 +594,13 @@ explicit Foundation-v2 acceptance
 aprover repin
 ```
 
+Reference JSON store в #265 — только executable persistence evidence. Production backend может быть PMM или другой storage, если он проходит тот же observable contract.
+
 До explicit acceptance Foundation v2 нельзя называть новой принятой версией.
 
 ---
 
-# 18. Как читать репозиторий
+# 20. Как читать репозиторий
 
 Для текущей МТС:
 
@@ -553,8 +609,9 @@ aprover repin
 3. [Foundation v2 Gate P](docs/specs/Foundation%20v2%20Gate%20P.md)
 4. [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md)
 5. [Апамять и управление сетью связей](docs/specs/Апамять%20и%20управление%20сетью%20связей.md)
-6. [Foundation v2 Proof replay](docs/specs/Foundation%20v2%20Proof%20replay.md)
-7. [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md)
+6. [Foundation v2 Persistent L4](docs/specs/Foundation%20v2%20Persistent%20L4.md)
+7. [Foundation v2 Proof replay](docs/specs/Foundation%20v2%20Proof%20replay.md)
+8. [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md)
 
 Для historical accepted behavior:
 
@@ -573,6 +630,7 @@ aprover repin
 + untrusted discovery
 + deterministic trusted replay
 + explicit materialization
++ persistent logical identity independent of physical storage
 ```
 
-Эта комбинация связывает фундаментальную МТС с ассоциативной памятью и проверяемым `aprover`.
+Эта комбинация связывает фундаментальную МТС с долговременной ассоциативной памятью и проверяемым `aprover`.
