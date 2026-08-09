@@ -13,6 +13,7 @@ from __future__ import annotations
 from .exact_link_network import Link, LinkNetwork, LinkNetworkBuilder, OccurrenceRef
 from .foundation_v2_checker import (
     IntegratedProofEvidence,
+    ProofGoalEvidence,
     replay_integrated_proof,
 )
 from .foundation_v2_interpreter import (
@@ -79,6 +80,7 @@ __all__ = [
     "PersistentSequenceDescription",
     "PersistentSequenceGroup",
     "PersistentSequenceMaterialization",
+    "ProofGoalEvidence",
     "RelationStepEvidence",
     "RunEvidence",
     "SequenceAtom",

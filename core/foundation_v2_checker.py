@@ -29,12 +29,25 @@ class IntegratedCheckerError(ValueError):
 
 
 @dataclass(frozen=True)
+class ProofGoalEvidence:
+    """Transport selection of the exact claim occurrences the proof must establish.
+
+    This dataclass is not a new MTS ontological type or a claim-kind tag.  The
+    semantic content remains the two already-existing exact link occurrences.
+    """
+
+    start_claim: OccurrenceRef
+    end_claim: OccurrenceRef
+
+
+@dataclass(frozen=True)
 class IntegratedProofEvidence:
     """One selected exact Foundation-v2 proof artifact."""
 
     source: SourceFrontEndEvidence
     rule_application: DecomposeEqualityEvidence
     run: RunEvidence
+    goal: ProofGoalEvidence
 
 
 def replay_integrated_proof(
@@ -42,7 +55,13 @@ def replay_integrated_proof(
     evidence: IntegratedProofEvidence,
     byte_refs: Mapping[int, OccurrenceRef],
 ) -> tuple[OccurrenceRef, OccurrenceRef]:
-    """Replay one source-selected rule proof without search or materialization."""
+    """Replay one source-selected rule proof for one exact selected goal.
+
+    Search is outside the trusted boundary.  Success means that trusted replay
+    produces the same exact claim occurrences, in the same roles, that were
+    selected as the goal.  Same-shape or same-pole substitute occurrences do
+    not satisfy the goal.
+    """
 
     before_snapshot = network.snapshot()
     try:
@@ -81,6 +100,8 @@ def replay_integrated_proof(
         except ProofRuleReplayError as exc:
             raise IntegratedCheckerError("invalid admitted proof-rule application") from exc
 
+        _verify_exact_goal(evidence.goal, claims)
+
         expected_acts = (premise.act, evidence.rule_application.act)
         if evidence.run.initial_context is not context:
             raise IntegratedCheckerError("run starts from another exact K")
@@ -99,3 +120,13 @@ def replay_integrated_proof(
     finally:
         if network.snapshot() != before_snapshot:
             raise IntegratedCheckerError("integrated proof replay mutated the network")
+
+
+def _verify_exact_goal(
+    goal: ProofGoalEvidence,
+    claims: tuple[OccurrenceRef, OccurrenceRef],
+) -> None:
+    if claims[0] is not goal.start_claim or claims[1] is not goal.end_claim:
+        raise IntegratedCheckerError(
+            "replayed proof does not establish the exact selected goal"
+        )
