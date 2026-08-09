@@ -3,6 +3,7 @@
   "status": "gate-p-candidate",
   "accepted": false,
   "issue": 243,
+  "refinedByIssue": 249,
   "parent": 237,
   "substrate": "mts-exact-occurrence-link-network/v0.7",
   "principle": "higher semantic roles are ordinary exact link occurrences; Link itself has only start/end",
@@ -20,13 +21,24 @@
     "persistentUpdateRequired": true
   },
   "dictionary": {
+    "scopeTopology": "D = D ⟼ (parentScope ⟼ localHistory)",
+    "rootScopeCandidate": "D0 = D0 ⟼ (R ⟼ R)",
     "entryTopology": "Entry = sourceContent ⟼ form",
-    "membershipTopology": "Membership = D ⟼ Entry",
+    "definitionOccurrenceTopology": "Occurrence = D_before ⟼ Entry",
+    "historyAppendTopology": "H_after = H_before ⟼ Occurrence",
+    "afterScopeTopology": "D_after = D_after ⟼ (sameParentScope ⟼ H_after)",
+    "lookup": "local history first, then explicit parent scope",
+    "sameLocalSourceSameFormIsIdempotentMapping": true,
+    "distinctLocalFormsConflict": true,
+    "localMappingShadowsParent": true,
+    "lastWriteWins": false,
+    "flatDirectMembershipIsCanonicalProductionModel": false,
     "sameSourceMayResolveDifferentlyUnderDifferentDictionaries": true,
     "hostGlobalSymbolMapAllowedAsSemanticAuthority": false
   },
   "theoryAndGrammar": {
     "membershipTopology": "container ⟼ admitted exact occurrence",
+    "separateFromDictionaryScopeSemantics": true,
     "isAxiomTag": false,
     "tokenOrAstKindSemanticIdentity": false,
     "searchRankingTrusted": false,
@@ -43,7 +55,7 @@
       "Field = roleRef ⟼ value",
       "Attachment = A ⟼ Field"
     ],
-    "roleNamesResolvedThroughExplicitDictionary": true,
+    "roleNamesResolvedThroughExplicitScopedDictionary": true,
     "hostRoleEnumIsSemanticIdentity": false,
     "twoActsWithSameVisibleFieldsMayRemainDistinctOccurrences": true
   },
@@ -66,5 +78,5 @@
     "anumSequenceMaterializationAccepted": false,
     "aproverRepinAllowed": false
   },
-  "nextGate": "single source/interpreter production path over this explicit state layer; sequence-to-apamemory materialization remains issue #242 before final L4 cutover"
+  "nextGate": "integrate scoped dictionary definition/effect replay and then local equality in the same trusted engine before cutover"
 }
