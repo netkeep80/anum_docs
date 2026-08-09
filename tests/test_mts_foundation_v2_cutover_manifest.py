@@ -15,6 +15,7 @@ ALLOWED_ACTIONS = {
     "NON_SEMANTIC_TOOLING",
 }
 EXPECTED_OWNER_KEYS = {
+    "publicEntrySurface",
     "exactOccurrenceSubstrate",
     "rootBootstrapEvidence",
     "state",
@@ -64,10 +65,10 @@ def test_manifest_freezes_nonaccepting_release_candidate() -> None:
     assert manifest["schema"] == "mts-foundation-v2-cutover-manifest/v0.7"
     assert manifest["status"] == "gate-p-cutover-manifest"
     assert manifest["accepted"] is False
-    assert manifest["issue"] == 272
+    assert manifest["issue"] == 274
     assert manifest["parent"] == 271
     assert manifest["umbrella"] == 237
-    assert manifest["baseMainCommit"] == "38488fdcbce999a54726f56ad01ac358d28a9e1a"
+    assert manifest["baseMainCommit"] == "884ce13d5528ac35d7e95c257711b9b4d7087e17"
     assert manifest["cutoverPerformed"] is False
     assert manifest["foundationV2Accepted"] is False
     assert manifest["downstreamRepinAllowed"] is False
@@ -93,10 +94,13 @@ def test_every_frozen_owner_path_and_contract_exists_with_exact_schema() -> None
             assert read(contract_path)["schema"] == schema, (name, path, schema)
 
 
-def test_manifest_keeps_root_bootstrap_honest_and_ostensive() -> None:
-    root = read(MANIFEST)["owners"]["rootBootstrapEvidence"]
-    assert root["liveProductionEntrypointReady"] is False
+def test_manifest_promotes_exact_root_without_legacy_dispatch() -> None:
+    manifest = read(MANIFEST)
+    root = manifest["owners"]["rootBootstrapEvidence"]
+    assert root["liveProductionEntrypointReady"] is True
+    assert root["implementedByIssue"] == 274
     assert root["cutoverPhase"] == "C3"
+    assert root["modules"] == ["core/foundation_v2_root.py"]
     assert root["requiredOstensiveForms"] == [
         "∞",
         "♂e = S = S ⟼ e",
@@ -104,13 +108,20 @@ def test_manifest_keeps_root_bootstrap_honest_and_ostensive() -> None:
         "b ⟼ e",
     ]
     assert "core/root_library.py" not in root["modules"]
+    assert "core/validate_root.py" not in root["modules"]
 
-    guard = read(MANIFEST)["owners"]["ostensiveRegressionGuard"]
+    public = manifest["owners"]["publicEntrySurface"]
+    assert public["modules"] == ["core/foundation_v2.py"]
+    assert public["contracts"] == ["contracts/mts-foundation-v2-root-v0.7.json"]
+    assert public["compatibilityMode"] is False
+    assert public["legacyDispatcher"] is False
+
+    guard = manifest["owners"]["ostensiveRegressionGuard"]
     assert guard["decisionIssue"] == 267
     assert guard["mergedPr"] == 268
     assert guard["releaseVeto"] is True
 
-    compatibility = read(MANIFEST)["owners"]["compatibilityClassification"]
+    compatibility = manifest["owners"]["compatibilityClassification"]
     assert compatibility["decisionIssue"] == 269
     assert compatibility["mergedPr"] == 270
 
@@ -120,8 +131,9 @@ def test_consumer_matrix_is_total_and_has_no_unknown_action() -> None:
     assert matrix["schema"] == "mts-foundation-v2-consumer-matrix/v0.7"
     assert matrix["status"] == "gate-p-cutover-consumer-audit"
     assert matrix["accepted"] is False
-    assert matrix["issue"] == 272
+    assert matrix["issue"] == 274
     assert matrix["parent"] == 271
+    assert matrix["baseMainCommit"] == "884ce13d5528ac35d7e95c257711b9b4d7087e17"
     assert set(matrix["allowedActions"]) == ALLOWED_ACTIONS
     assert matrix["unknownAllowed"] is False
     assert matrix["cutoverPerformed"] is False
@@ -170,6 +182,8 @@ def test_foundation_v2_trusted_modules_do_not_import_historical_semantics() -> N
     matrix = read(MATRIX)
     forbidden = set(matrix["forbiddenHistoricalImportsInTrustedFoundationV2"])
 
+    assert "core/foundation_v2_root.py" in matrix["trustedFoundationV2Modules"]
+    assert "core/foundation_v2.py" in matrix["trustedFoundationV2Modules"]
     for path in matrix["trustedFoundationV2Modules"]:
         imports = set(core_imports(path))
         overlap = imports & forbidden
@@ -196,12 +210,21 @@ def test_delete_with_owner_rows_have_a_real_acceptance_precondition() -> None:
         assert "delete" in row["postCutover"].lower(), row["path"]
 
 
-def test_root_and_new_proof_roles_are_not_left_on_historical_live_authority() -> None:
+def test_historical_root_and_proof_are_no_longer_new_live_authorities() -> None:
     by_path = {row["path"]: row for row in read(MATRIX)["rows"]}
-    assert by_path["core/root_library.py"]["action"] == "MIGRATE_TO_FOUNDATION_V2"
-    assert by_path["core/validate_root.py"]["action"] == "MIGRATE_TO_FOUNDATION_V2"
-    assert by_path["core/proof_checker.py"]["action"] == "HISTORICAL_REPLAY_ONLY"
-    assert by_path["core/proof_checker.py"]["replacementOwner"] == (
+
+    root = by_path["core/root_library.py"]
+    validator = by_path["core/validate_root.py"]
+    proof = by_path["core/proof_checker.py"]
+
+    assert root["action"] == "HISTORICAL_REPLAY_ONLY"
+    assert root["replacementOwner"] == "core/foundation_v2_root.py"
+    assert validator["action"] == "HISTORICAL_REPLAY_ONLY"
+    assert validator["replacementOwner"].startswith(
+        "core/foundation_v2_root.py::validate_root_kernel"
+    )
+    assert proof["action"] == "HISTORICAL_REPLAY_ONLY"
+    assert proof["replacementOwner"] == (
         "core/foundation_v2_checker.py for new production proofs"
     )
 
@@ -227,4 +250,4 @@ def test_manifest_does_not_authorize_cutover_or_acceptance_by_itself() -> None:
         "legacyContextFrameMayBackFoundationV2K": False,
         "legacyPairInterningMayBackFoundationV2Materialization": False,
     }
-    assert "C2/C3" in manifest["next"]
+    assert "C4/C5/C6" in manifest["next"]
