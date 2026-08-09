@@ -182,6 +182,10 @@ def act_values(
 
     values: list[OccurrenceRef] = []
     for attachment_ref in network.refs:
+        if attachment_ref is act:
+            # A itself is start-self-closed and therefore also has start == A.
+            # It is the finite bootstrap header occurrence, not a role field.
+            continue
         attachment = network.link(attachment_ref)
         if attachment.start is not act:
             continue
