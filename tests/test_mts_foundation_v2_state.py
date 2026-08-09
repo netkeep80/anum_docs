@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from core.exact_link_network import LinkNetworkBuilder
+from core.foundation_v2_relative import RelativeAnumError, replay_relative_bracket_path
 from core.foundation_v2_state import (
     FoundationStateError,
     act_header,
@@ -28,6 +29,12 @@ def _anchor(builder: LinkNetworkBuilder):
     return ref
 
 
+def _link(builder: LinkNetworkBuilder, start, end):
+    ref = builder.reserve()
+    builder.define(ref, start, end)
+    return ref
+
+
 def test_explicit_context_resolves_current_without_ambient_stack() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
@@ -39,6 +46,89 @@ def test_explicit_context_resolves_current_without_ambient_stack() -> None:
     before = network.snapshot()
     assert parent_of_context(network, context) is parent
     assert current_of_context(network, context) is current
+    assert network.snapshot() == before
+
+
+def test_relative_bracket_path_traverses_exact_focus_start_and_end() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    ll, lr, rl, rr = (_anchor(builder) for _ in range(4))
+    left = _link(builder, ll, lr)
+    right = _link(builder, rl, rr)
+    focus = _link(builder, left, right)
+    context = define_context(builder, _anchor(builder), focus)
+    network = builder.freeze(root)
+
+    before = network.snapshot()
+    assert replay_relative_bracket_path(network, context, "") is focus
+    assert replay_relative_bracket_path(network, context, "[") is left
+    assert replay_relative_bracket_path(network, context, "]") is right
+    assert replay_relative_bracket_path(network, context, "[[") is ll
+    assert replay_relative_bracket_path(network, context, "[]") is lr
+    assert replay_relative_bracket_path(network, context, "][") is rl
+    assert replay_relative_bracket_path(network, context, "]]" ) is rr
+    assert network.snapshot() == before
+
+
+def test_relative_bracket_path_does_not_walk_context_parent_chain() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    parent_left = _anchor(builder)
+    parent_right = _anchor(builder)
+    parent_focus = _link(builder, parent_left, parent_right)
+    parent_context = define_context(builder, root, parent_focus)
+
+    focus_left = _anchor(builder)
+    focus_right = _anchor(builder)
+    focus = _link(builder, focus_left, focus_right)
+    context = define_context(builder, parent_context, focus)
+    network = builder.freeze(root)
+
+    assert parent_of_context(network, context) is parent_context
+    assert current_of_context(network, parent_context) is parent_focus
+    assert replay_relative_bracket_path(network, context, "[") is focus_left
+    assert replay_relative_bracket_path(network, context, "[") is not parent_focus
+
+
+def test_relative_bracket_path_preserves_exact_focus_identity() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    start = _anchor(builder)
+    end = _anchor(builder)
+    focus_one = _link(builder, start, end)
+    focus_two = _link(builder, start, end)
+    parent = _anchor(builder)
+    context_one = define_context(builder, parent, focus_one)
+    context_two = define_context(builder, parent, focus_two)
+    network = builder.freeze(root)
+
+    assert focus_one is not focus_two
+    assert network.link(focus_one) == network.link(focus_two)
+    assert replay_relative_bracket_path(network, context_one, "") is focus_one
+    assert replay_relative_bracket_path(network, context_two, "") is focus_two
+
+
+def test_relative_bracket_path_is_finite_on_self_closed_cycle() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    context = define_context(builder, root, root)
+    network = builder.freeze(root)
+
+    before = network.snapshot()
+    assert replay_relative_bracket_path(network, context, "[[]]][[]]") is root
+    assert network.snapshot() == before
+
+
+def test_relative_bracket_subset_rejects_zero_one_and_noncanonical_text() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    context = define_context(builder, root, root)
+    network = builder.freeze(root)
+    before = network.snapshot()
+
+    for carrier in ("0", "1", "[0]", "[1]", "[ ]", "x"):
+        with pytest.raises(RelativeAnumError, match="only '\\[' and '\\]'"):
+            replay_relative_bracket_path(network, context, carrier)
     assert network.snapshot() == before
 
 
