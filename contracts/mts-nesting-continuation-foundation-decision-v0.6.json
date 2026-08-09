@@ -1,0 +1,126 @@
+{
+  "schema": "mts-nesting-continuation-foundation-decision/v0.6",
+  "status": "candidate-decision",
+  "accepted": false,
+  "gateResolved": true,
+  "issue": 182,
+  "dependsOn": [
+    "mts-foundation-direction-decision/v0.6",
+    "mts-current-link-equality-decision/v0.6",
+    "mts-root-anum-foundation-decision/v0.6",
+    "mts-nesting-continuation-foundation-challenge/v0.6"
+  ],
+  "purpose": "Resolve Foundation Gate N at decision quality: remove host parent-chain semantics from the preferred v0.6 foundation and represent nested data flow, call/history and continuation explicitly as ordinary links while retaining exactly one current-link deictic anchor ↑.",
+  "deicticDecision": {
+    "primitiveAnchors": ["↑"],
+    "currentMeaning": "↑ -> one current semantic link",
+    "secondParentOrOuterAnchor": false,
+    "secondAnchorPermanentlyForbidden": false,
+    "secondAnchorRequiresFutureFiniteCounterexample": true,
+    "oldUpAsDepthCounter": false,
+    "primitiveCurrentPolePronouns": false,
+    "derivedCurrentStart": "♀↑",
+    "derivedCurrentEnd": "↑♂",
+    "decision": "preferred-for-v0.6-foundation-candidate"
+  },
+  "nestingDecision": {
+    "outerDataPolicy": "data required by a child is explicitly included in the child's current semantic link or reachable explicit state structure",
+    "deepNestingPolicy": "nested current structures are ordinary binary links and are navigated with the same raw pole destructors",
+    "continuationPolicy": "result and continuation inputs are explicit links in after-state/current-state structure",
+    "callPolicy": "calls are ordinary relations between explicit act/state links",
+    "historyPolicy": "history/continuation order is represented by ordinary links",
+    "hostContextFrameParent": false,
+    "hostReturnAddress": false,
+    "hiddenCallStack": false,
+    "implicitCallerSearch": false
+  },
+  "actDecision": {
+    "outerShape": "Act = S_before ⟼ S_after",
+    "commandAndActualActDistinct": true,
+    "resultIsExplicitInGraph": true,
+    "fullActOntologyImpliesFullActObservability": false,
+    "formulaAutomaticallyObservesCallerAct": false,
+    "formulaAutomaticallyObservesInterpreterIdentity": false
+  },
+  "explicitPassingDecision": {
+    "childExample": "XC=(O,L) gives ♀↑=O and ↑♂=L",
+    "grandchildExample": "XG=(XC,G) allows ♀(♀↑)=O and (♀↑)♂=L",
+    "continuationExample": "XR=(O,R) gives outer data and explicit child result",
+    "unpassedOuterDataVisible": false,
+    "arbitraryFiniteDataMayBePackedIntoBinaryLinks": true,
+    "passingDataCreatesNewPrimitive": false
+  },
+  "incomingSearchDecision": {
+    "genericIncomingSearchMayBeAmbiguous": true,
+    "genericIncomingSearchDefinesParent": false,
+    "genericIncomingSearchDefinesCaller": false,
+    "implicitAssociativeSearchMayChangeDeicticMeaning": false,
+    "futureCallerObservationRequiresExplicitAcceptedRelation": true
+  },
+  "historicalBoundary": {
+    "ContextFrameParentPreferredOntology": false,
+    "oldParentAscentForms": ["↑◁", "↑▷", "↑↑◁", "↑↑▷"],
+    "oldParentAscentAutomaticallyPreserved": false,
+    "historicalV02ThroughV05ReplayImmutable": true,
+    "migrationDirection": "replace hidden outer-frame reads with explicit link data passed into current/state structure"
+  },
+  "proofReplayBoundary": {
+    "nestedReplayInputs": "finite serialized act/state graph plus explicit current ref per replay step",
+    "serializeHostParentStack": false,
+    "readAmbientSession": false,
+    "readAmbientInterpreterIdentity": false,
+    "sameSerializedGraphAndCurrentDeterministic": true,
+    "newParentProofRuleAccepted": false
+  },
+  "counterexamplePolicy": {
+    "currentRequiredCorpusNeedsSecondAnchor": false,
+    "universalTheoremNoSecondAnchorEverNeeded": false,
+    "futureExtensionRule": "a new deictic primitive requires the smallest finite semantic counterexample that cannot be represented by explicit current/state links under the existing constructor/destructor algebra",
+    "convenienceIsSufficientJustification": false
+  },
+  "rejectedDefaults": [
+    {
+      "model": "ContextFrame.parent as fundamental context topology",
+      "reason": "required nested data can be represented explicitly as links and replayed without a host parent chain"
+    },
+    {
+      "model": "↑ simultaneously means current link and parent ascent",
+      "reason": "dual meaning breaks operator orthogonality and makes replay context-sensitive to hidden stack structure"
+    },
+    {
+      "model": "generic incoming-link search identifies caller/parent",
+      "reason": "incoming relations are non-unique without an explicit role relation"
+    },
+    {
+      "model": "second parent pronoun added preemptively",
+      "reason": "no finite required vector currently needs it"
+    }
+  ],
+  "gateOutcome": {
+    "hostParentRemovedFromPreferredFoundation": true,
+    "oneAnchorSufficientForRequiredNestedCorpus": true,
+    "explicitPassingDirectionResolved": true,
+    "continuationDirectionResolved": true,
+    "allIsolatedFoundationGatesResolved": true,
+    "foundationAccepted": false,
+    "nextRequiredGate": "integrated-v0.6-foundation-vertical-slice"
+  },
+  "veto": {
+    "acceptedContractLinkAllowed": false,
+    "productionParserChangeAllowed": false,
+    "productionInterpreterChangeAllowed": false,
+    "aproverRepinAllowed": false,
+    "hiddenParentStackAllowed": false,
+    "dualMeaningOfUpAllowed": false,
+    "secondDeicticPrimitiveAllowedWithoutCounterexample": false
+  },
+  "nextDependencies": {
+    "foundationDirectionIssue": 179,
+    "integratedSliceMustCompose": [
+      "mts-current-link-equality-decision/v0.6",
+      "mts-root-anum-foundation-decision/v0.6",
+      "mts-nesting-continuation-foundation-decision/v0.6"
+    ],
+    "productionMigrationBeforeIntegratedSlice": false
+  }
+}
