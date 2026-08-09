@@ -1,0 +1,75 @@
+{
+  "schema": "anum-streaming-interpreter-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 201,
+  "dependsOn": ["mts-semantic-root-kernel-challenge/v0.7"],
+  "purpose": "Challenge whether accepted recursive Anum denotation can be reproduced by a finite streaming context-stack machine while preserving root boundary precedence and without treating [/] as unconditional host opcodes.",
+  "acceptedBaseline": {
+    "implicitRootContext": true,
+    "recursiveGrammar": "root := value value; value := 0 | 1 | '[' value value ']'",
+    "rootBoundaryPrecedence": {
+      "[]": "protocol:1",
+      "][": "protocol:0",
+      "[[": "RAW",
+      "]]": "RAW"
+    },
+    "rootOpeningCollapsePreserved": true,
+    "recursiveGrammarForkAllowed": false
+  },
+  "streamingCoreCandidate": {
+    "initialFrame": "implicit root pair frame",
+    "atom0": "emit protocol:0 into current frame",
+    "atom1": "emit protocol:1 into current frame",
+    "open": "push nested pair frame",
+    "close": "require exactly two values, build one link, pop frame, emit link into parent",
+    "finish": "require exactly two root values and build root link",
+    "buildsStorageNeutralDenotationDirectly": true,
+    "recursiveAstRequiredForExecution": false
+  },
+  "criticalBoundary": {
+    "naiveUnconditionalPushPopRejected": true,
+    "reason": "the accepted root carrier ][ means protocol:0 although unconditional ]=POP would underflow at root",
+    "primaryAbitMeaningMustPrecedeOpcodeReading": true,
+    "pushPopMayBeContextualOperationalManifestation": true
+  },
+  "rootCollapseBoundary": {
+    "physicalRawMayOmitLeadingRootOpens": true,
+    "acceptedRestoreRuleReusedByChallenge": true,
+    "streamingExplanationOfCollapseSolvedHere": false
+  },
+  "contextQuestion": {
+    "stackFrameIsOperationalContext": true,
+    "stackFrameIsAlreadyProvenToBeOntologicalLink": false,
+    "currentPronounDerivedHere": false,
+    "nextQuestion": "represent equivalent frame/current state as a finite link-only network and derive the exact referent of ↑"
+  },
+  "requiredAssertions": [
+    "streaming core matches accepted recursive denotation on all accepted recursive structural vectors",
+    "streaming core emits storage-neutral nodes directly without RecursiveAnumTree",
+    "[ increases nested frame depth and ] decreases it only in recursive grammar context",
+    "] closes only a frame containing exactly two values",
+    "root frame ends with exactly two values",
+    "root-opening collapse remains byte/canonical compatible",
+    "[] and ][ are handled by root boundary precedence rather than recursive stack parsing",
+    "a naive unconditional bracket opcode machine fails on ][",
+    "known malformed/noncanonical recursive carriers remain rejected",
+    "no L4 materialization occurs"
+  ],
+  "notDecided": [
+    "link-only representation of the context stack",
+    "whether a newly opened context starts from ∞ as an ontological current relation",
+    "how outer and inner current relations combine on close",
+    "exact current-link pronoun ↑",
+    "general dictionary-driven interpreter",
+    "formal notation execution semantics"
+  ],
+  "veto": {
+    "productionAnumChangeAllowed": false,
+    "productionParserChangeAllowed": false,
+    "productionInterpreterChangeAllowed": false,
+    "acceptedContractLinkAllowed": false,
+    "l4EffectsAllowed": false,
+    "historicalContractsMutable": false
+  }
+}
