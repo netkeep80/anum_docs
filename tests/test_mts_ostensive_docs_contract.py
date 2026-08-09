@@ -14,7 +14,15 @@ APAMEMORY = ROOT / "docs" / "specs" / "Апамять и управление с
 BUNDLES = ROOT / "docs" / "specs" / "Пучки значений МТС v0.2.md"
 
 ACTIVE_OSTENSIVE_DOCS = (README, FOUNDATIONS, AXIOMS, NOTATION)
-RUSSIAN_NORMATIVE_DOCS = (README, NOTATION, ANUM, APAMEMORY, BUNDLES)
+RUSSIAN_NORMATIVE_DOCS = (
+    README,
+    FOUNDATIONS,
+    AXIOMS,
+    NOTATION,
+    ANUM,
+    APAMEMORY,
+    BUNDLES,
+)
 _ALLOWED_LATIN_PROSE = {"API", "Git", "GitHub", "JSON", "UTF"}
 
 
