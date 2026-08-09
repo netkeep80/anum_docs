@@ -1,0 +1,79 @@
+{
+  "policy_format_version": "0.3.0",
+  "repository_kind": "documentation",
+  "enforcement": {
+    "mode": "blocking"
+  },
+  "paths": {
+    "forbidden": [
+      "legacy/**",
+      "archive/**",
+      "old/**",
+      "deprecated/**",
+      "*.bak",
+      "*.tmp",
+      "*.orig"
+    ],
+    "canonical_docs": [
+      "README.md",
+      "docs/theory/Основания МТС.md",
+      "docs/theory/Система аксиом МТС.md",
+      "docs/specs/Формальная нотация МТС.md",
+      "docs/specs/Ачисла и сериализация.md",
+      "docs/specs/Апамять и управление сетью связей.md",
+      "docs/specs/Пучки значений МТС v0.2.md"
+    ],
+    "governance_paths": [
+      "repo-policy.json",
+      ".github/workflows/repo-guard.yml",
+      ".github/workflows/ci.yml"
+    ],
+    "operational_paths": []
+  },
+  "diff_rules": {
+    "max_new_docs": 0,
+    "max_new_files": 3,
+    "max_net_added_lines": 800
+  },
+  "size_rules": [
+    {
+      "id": "contracts-file-count-no-growth",
+      "scope": "directory",
+      "metric": "files",
+      "glob": "contracts/**",
+      "max": 1000,
+      "max_growth": 0,
+      "count": "all_tracked",
+      "level": "blocking"
+    },
+    {
+      "id": "tests-file-count-no-growth",
+      "scope": "directory",
+      "metric": "files",
+      "glob": "tests/**",
+      "max": 1000,
+      "max_growth": 0,
+      "count": "all_tracked",
+      "level": "blocking"
+    }
+  ],
+  "content_rules": [
+    {
+      "id": "readme-russian-first",
+      "glob": "README.md",
+      "mode": "markdown_language",
+      "language": "ru",
+      "allow_words": ["API", "ASCII", "CI", "CLI", "Git", "GitHub", "JSON", "Python", "TypeScript", "UTF"],
+      "max_unapproved_latin_words_per_line": 1
+    },
+    {
+      "id": "mts-docs-russian-first",
+      "glob": "docs/**/*.md",
+      "mode": "markdown_language",
+      "language": "ru",
+      "allow_words": ["API", "ASCII", "CI", "CLI", "Git", "GitHub", "JSON", "Python", "TypeScript", "UTF"],
+      "max_unapproved_latin_words_per_line": 1
+    }
+  ],
+  "cochange_rules": []
+}
