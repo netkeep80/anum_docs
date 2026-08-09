@@ -1,0 +1,109 @@
+{
+  "schema": "mts-explicit-theory-network-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 216,
+  "dependsOn": [
+    "mts-scoped-link-dictionary-challenge/v0.7",
+    "mts-four-binding-forms-challenge/v0.7",
+    "mts-semantic-root-kernel-challenge/v0.7"
+  ],
+  "purpose": "Challenge theory-relative axiom/rule admission as explicit binary links and independently replay one selected directional resolution without global rewrite or intrinsic axiom tags.",
+  "theoryCandidate": {
+    "membership": "M = T ⟼ F",
+    "theoryIsOrdinaryLink": true,
+    "formHasIntrinsicAxiomFlag": false,
+    "sameFormMayBelongToMultipleTheories": true,
+    "sameFormMayBeOrdinaryPayloadOutsideTheory": true,
+    "globalTheoremDatabaseRequired": false
+  },
+  "resolutionCandidate": {
+    "selectedFormKinds": [
+      "start-open: S = S ⟼ e",
+      "end-open: E = b ⟼ E"
+    ],
+    "directionEnumRequired": false,
+    "directionDerivedFromSelfClosedPole": true,
+    "endOpenResolution": "E=(b,E) + explicit e -> X=(b,e)",
+    "startOpenResolution": "S=(S,e) + explicit b -> X=(b,e)",
+    "partialFormMutated": false,
+    "searchStrategyTrusted": false,
+    "selectedReplayTrustedCandidate": true
+  },
+  "interpretationEvidence": {
+    "fields": [
+      "theoryRef",
+      "membershipRef",
+      "formRef",
+      "bindingRef",
+      "resultRef"
+    ],
+    "checkerReadOnly": true,
+    "mustVerifyTheoryMembership": true,
+    "mustVerifyFormShape": true,
+    "mustVerifyBindingDirectionFromForm": true,
+    "mustVerifyExactResultPair": true,
+    "mustRejectWrongTheory": true,
+    "mustRejectMissingMembership": true,
+    "mustRejectWrongForm": true,
+    "mustRejectWrongBinding": true,
+    "mustRejectWrongResult": true
+  },
+  "searchBoundary": {
+    "multipleApplicableMembershipsAllowed": true,
+    "candidateEnumerationIsPolicy": true,
+    "trustedReplayChecksOnlySelectedMembership": true,
+    "membershipOrderHasSemanticMeaning": false
+  },
+  "dictionaryTheorySeparation": {
+    "sourceStringAnum": "S",
+    "resolvedForm": "F",
+    "dictionaryRelation": "D ⟼ (S ⟼ F)",
+    "theoryRelation": "T ⟼ F",
+    "sourceEqualsForm": false,
+    "dictionaryMembershipEqualsTheoryMembership": false
+  },
+  "bootstrapSelfDescription": {
+    "rootKernelExistsBeforeTheoryText": true,
+    "rootDescriptionSourceMayBeAddedLater": true,
+    "rootDescriptionFormMayBeAdmittedByTheory": true,
+    "removingTheoryAdmissionMayDestroyRootKernel": false,
+    "textCreatesRootKernel": false
+  },
+  "requiredAssertions": [
+    "T, F and T⟼F are ordinary binary links with no axiom tag",
+    "duplicate exact theory membership is idempotent",
+    "one F may be admitted by two theories through distinct membership links",
+    "F may be ordinary payload outside every theory",
+    "missing T⟼F membership rejects trusted replay",
+    "end-open admitted form resolves an explicit end binding to the exact complete pair",
+    "start-open admitted form resolves an explicit start binding to the exact complete pair",
+    "both partial directions can converge to the same complete relation",
+    "selected resolution does not mutate the admitted partial form",
+    "trusted replay is read-only and rejects forged theory/membership/form/binding/result",
+    "two applicable admitted forms may be enumerated while replay verifies only the selected one",
+    "theory membership order does not determine selection semantics",
+    "source string, dictionary entry, resolved form and theory membership remain distinct relations",
+    "admitting a root-description form does not create or own the already-existing root kernel",
+    "theory ref itself may be ordinary payload elsewhere"
+  ],
+  "notDecided": [
+    "general inference/composition between admitted forms",
+    "whether colon definitions can create new dictionary/theory relations",
+    "how equality-shaped forms resolve under foundation v2",
+    "how an interpreter chooses among multiple applicable forms",
+    "how active context K/current ↑ is serialized into a full interpretation act",
+    "production proof/interpreter migration"
+  ],
+  "veto": {
+    "isAxiomTagAllowed": false,
+    "globalTheoryAllowed": false,
+    "automaticGlobalRewriteAllowed": false,
+    "sourceFormAxiomIdentityCollapseAllowed": false,
+    "colonImplicitMutationAllowed": false,
+    "searchRankingTrusted": false,
+    "productionChangeAllowed": false,
+    "historicalProofContractsMutable": false,
+    "aproverRepinAllowed": false
+  }
+}
