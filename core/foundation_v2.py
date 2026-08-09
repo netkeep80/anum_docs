@@ -32,6 +32,7 @@ from .foundation_v2_materialization import (
     SequenceMaterialization,
     find_links,
     materialize_sequence,
+    replay_resolved_sequence_grouping,
     replay_sequence_materialization,
 )
 from .foundation_v2_persistent import (
@@ -101,6 +102,7 @@ __all__ = [
     "replay_integrated_proof",
     "replay_persistent_sequence_materialization",
     "replay_relation_step",
+    "replay_resolved_sequence_grouping",
     "replay_run",
     "replay_sequence_materialization",
     "replay_source_front_end",

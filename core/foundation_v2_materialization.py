@@ -1,10 +1,15 @@
 """Foundation-v2 Anum sequence materialization over exact-occurrence networks.
 
-The source/Anum front-end and this module are deliberately separate. Brackets,
-tokens and parser nodes are not interpreted here. The trusted input is an
-already-selected nested sequence description whose leaves are arbitrary exact
-existing link occurrences. A leaf may itself be a complete non-self-closed
-relation; it is not required to be an "atomic" value in the MTS ontology.
+The source/Anum front-end and this module are deliberately separate. Raw glyphs,
+tokens and parser nodes are not semantic identity here. After source replay has
+selected an ordered tuple of exact forms, ``replay_resolved_sequence_grouping``
+may interpret two explicitly selected exact occurrences as open/close delimiters
+for sequence-deserialization mode. Delimiter meaning is therefore contextual;
+the link shape alone never makes an occurrence a bracket command.
+
+The resulting nested sequence description has arbitrary exact existing link
+occurrences as leaves. A leaf may itself be a complete non-self-closed relation;
+it is not required to be an "atomic" value in the MTS ontology.
 
 A nested group is a host-side handle for a nested invocation of the same
 sequence-deserialization semantics. Its exact result is returned as one value
@@ -101,6 +106,59 @@ class SequenceMaterialization:
     result: OccurrenceRef
 
 
+def replay_resolved_sequence_grouping(
+    network: LinkNetwork,
+    forms: tuple[OccurrenceRef, ...],
+    *,
+    open_form: OccurrenceRef,
+    close_form: OccurrenceRef,
+) -> SequenceDescription:
+    """Replay nested grouping over already-resolved exact forms without effects.
+
+    ``open_form`` and ``close_form`` are explicit role selections for this one
+    sequence-deserialization mode. Only those exact occurrences delimit groups;
+    another occurrence with the same poles is an ordinary sequence value.
+
+    This function does not define the raw-carrier/root-opening-collapse mapping.
+    It starts after source/D replay has already produced exact forms in order.
+    """
+
+    before = network.snapshot()
+    try:
+        network.link(open_form)
+        network.link(close_form)
+        if open_form is close_form:
+            raise SequenceMaterializationError(
+                "open and close sequence delimiters must be exact-distinct"
+            )
+        if not forms:
+            raise SequenceMaterializationError("resolved sequence cannot be empty")
+        for form in forms:
+            network.link(form)
+
+        items, position = _group_resolved_forms(
+            forms,
+            0,
+            open_form=open_form,
+            close_form=close_form,
+            inside_group=False,
+        )
+        if position != len(forms):
+            raise SequenceMaterializationError(
+                "resolved sequence grouping left unconsumed forms"
+            )
+        return SequenceDescription(root=network.root, items=items)
+    except LinkNetworkError as exc:
+        raise SequenceMaterializationError(
+            "resolved sequence contains a foreign exact occurrence"
+        ) from exc
+    finally:
+        if network.snapshot() != before:
+            raise SequenceMaterializationError(
+                "resolved sequence grouping mutated the network"
+            )
+
+
 def find_links(
     network: LinkNetwork,
     *,
@@ -191,6 +249,50 @@ def replay_sequence_materialization(
             raise SequenceMaterializationError("replay mutated the before network")
         if evidence.after.snapshot() != after_snapshot:
             raise SequenceMaterializationError("replay mutated the after network")
+
+
+def _group_resolved_forms(
+    forms: tuple[OccurrenceRef, ...],
+    position: int,
+    *,
+    open_form: OccurrenceRef,
+    close_form: OccurrenceRef,
+    inside_group: bool,
+) -> tuple[tuple[SequenceItem, ...], int]:
+    items: list[SequenceItem] = []
+
+    while position < len(forms):
+        form = forms[position]
+        if form is close_form:
+            if not inside_group:
+                raise SequenceMaterializationError(
+                    "unexpected close delimiter in resolved sequence"
+                )
+            if not items:
+                raise SequenceMaterializationError(
+                    "resolved sequence group cannot be empty"
+                )
+            return tuple(items), position + 1
+
+        if form is open_form:
+            nested, position = _group_resolved_forms(
+                forms,
+                position + 1,
+                open_form=open_form,
+                close_form=close_form,
+                inside_group=True,
+            )
+            items.append(SequenceGroup(nested))
+            continue
+
+        items.append(SequenceAtom(form))
+        position += 1
+
+    if inside_group:
+        raise SequenceMaterializationError(
+            "resolved sequence group is missing close delimiter"
+        )
+    return tuple(items), position
 
 
 def _require_description_root(
