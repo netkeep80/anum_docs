@@ -2,10 +2,20 @@
 
 The source/Anum front-end and this module are deliberately separate. Brackets,
 tokens and parser nodes are not interpreted here. The trusted input is an
-already-selected nested sequence description whose leaves are exact existing
-occurrences. Materialization is an explicit persistent effect: the immutable
-``before`` network is preserved and an ``after`` state in the same runtime
-identity lineage is produced with newly appended exact link occurrences.
+already-selected nested sequence description whose leaves are arbitrary exact
+existing link occurrences. A leaf may itself be a complete non-self-closed
+relation; it is not required to be an "atomic" value in the MTS ontology.
+
+A nested group is a host-side handle for a nested invocation of the same
+sequence-deserialization semantics. Its exact result is returned as one value
+to the surrounding sequence. Therefore the resolved semantic value domain is
+closed over links:
+
+``ExactLink | NestedSequence -> ExactLink``.
+
+Materialization is an explicit persistent effect: the immutable ``before``
+network is preserved and an ``after`` state in the same runtime identity lineage
+is produced with newly appended exact link occurrences.
 
 Sequence semantics:
 
@@ -33,14 +43,22 @@ class SequenceMaterializationError(ValueError):
 
 @dataclass(frozen=True)
 class SequenceAtom:
-    """One already-resolved exact occurrence used as a sequence value."""
+    """One already-resolved exact link occurrence used as a sequence value.
+
+    ``Atom`` is only transport terminology. ``value`` may itself denote any
+    existing relation occurrence, including a complete ``A⟼B`` link.
+    """
 
     value: OccurrenceRef
 
 
 @dataclass(frozen=True)
 class SequenceGroup:
-    """One nested sequence; host nesting is a checker handle, not semantic ID."""
+    """Nested sequence invocation returning one exact link to the outer level.
+
+    Host nesting is a checker handle, not semantic identity and not a second
+    kind of MTS entity.
+    """
 
     items: tuple["SequenceItem", ...]
 
