@@ -133,6 +133,7 @@ def test_role_addressed_act_fields_are_additive_link_data() -> None:
     before = network.snapshot()
     assert act_values(network, act, role_source) == (source,)
     assert act_values(network, act, role_theory) == (theory,)
+    assert act_values(network, act, interpreter) == ()
     assert network.snapshot() == before
 
 
