@@ -9,8 +9,11 @@ from core.exact_link_network import LinkNetworkBuilder
 from core.foundation_v2_materialization import (
     SequenceAtom,
     SequenceDescription,
+    SequenceGroup,
     materialize_sequence,
+    replay_resolved_sequence_grouping,
 )
+from core.foundation_v2_root import build_root_kernel
 from core.foundation_v2_source import (
     SegmentSpec,
     SourceFrontEndBuilder,
@@ -181,6 +184,75 @@ def test_dictionary_resolved_exact_link_is_direct_sequence_value() -> None:
     assert outer.start is prefix
     assert outer.end is existing
     assert materialized.after.link(existing) is network.link(existing)
+    assert network.snapshot() == before
+
+
+def test_source_root_brackets_drive_nested_sequence_deserialization() -> None:
+    kernel = build_root_kernel()
+    builder = kernel.network.evolve()
+    root = kernel.refs.root
+    opening = kernel.refs.opening
+    closing = kernel.refs.closing
+    byte_refs = _byte_vocabulary(builder)
+    front_end = SourceFrontEndBuilder(builder, root, byte_refs)
+    grammar = _anchor(builder)
+    theory = _anchor(builder)
+    a = _anchor(builder)
+    b = _anchor(builder)
+    c = _anchor(builder)
+
+    raw = b"[ab]c"
+    source = front_end.source_occurrence(raw)
+    dictionary, occurrences = _dictionary_with(
+        builder,
+        root,
+        front_end,
+        (
+            (b"[", opening),
+            (b"a", a),
+            (b"b", b),
+            (b"]", closing),
+            (b"c", c),
+        ),
+    )
+    evidence = front_end.build_selected_evidence(
+        source,
+        tuple(
+            SegmentSpec(index, index + 1, form, occurrences[index])
+            for index, form in enumerate((opening, a, b, closing, c))
+        ),
+        dictionary=dictionary,
+        grammar=grammar,
+        theory=theory,
+    )
+    network = builder.freeze()
+
+    before = network.snapshot()
+    resolved = replay_source_front_end(network, evidence, byte_refs)
+    assert resolved == (opening, a, b, closing, c)
+
+    description = replay_resolved_sequence_grouping(
+        network,
+        resolved,
+        open_form=opening,
+        close_form=closing,
+    )
+    assert description == SequenceDescription(
+        root=root,
+        items=(
+            SequenceGroup((SequenceAtom(a), SequenceAtom(b))),
+            SequenceAtom(c),
+        ),
+    )
+    assert network.snapshot() == before
+
+    materialized = materialize_sequence(network, description)
+    assert len(materialized.created) == 2
+    nested, outer = materialized.created
+    assert (nested.start, nested.end) == (a, b)
+    assert outer.start is nested.ref
+    assert outer.end is c
+    assert materialized.result is outer.ref
     assert network.snapshot() == before
 
 
