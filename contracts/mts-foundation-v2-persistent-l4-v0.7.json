@@ -1,0 +1,95 @@
+{
+  "schema": "mts-foundation-v2-persistent-l4/v0.7",
+  "status": "gate-p-candidate",
+  "accepted": false,
+  "issue": 265,
+  "parent": 237,
+  "supersedesForFoundationV2": [
+    "mts-l4-backend-challenge/v0.3",
+    "mts-l4-backend-driver/v0.3"
+  ],
+  "historicalContractsRemainReproducible": true,
+  "dependsOn": [
+    "mts-exact-occurrence-link-network/v0.7",
+    "mts-anum-sequence-materialization/v0.7"
+  ],
+  "identity": {
+    "runtimeOccurrenceRef": "ephemeral exact runtime identity inside one reconstructed runtime lineage",
+    "persistentOccurrenceId": "stable opaque dataset-local logical identity = dataset lineage + local occurrence id",
+    "snapshotSlot": "transport-local topology coordinate only",
+    "physicalBackendAddress": "implementation detail only",
+    "sameDatasetReopenPreservesPersistentIdentity": true,
+    "sameDatasetReopenRequiresSameRuntimeObjectIdentity": false,
+    "freshTopologyImportCreatesFreshLineage": true,
+    "crossDatasetExactIdentityInferredFromEqualTopology": false,
+    "physicalAddressIsSemanticIdentity": false,
+    "snapshotSlotIsUniversalSemanticIdentity": false
+  },
+  "surface": {
+    "lifecycle": ["create", "open", "close", "lineage_id", "snapshot"],
+    "read": ["poles", "find", "outgoing", "incoming", "all_occurrences"],
+    "effect": ["materialize", "materialize_batch"],
+    "bridge": [
+      "runtime_network",
+      "materialize_persistent_sequence",
+      "replay_persistent_sequence_materialization"
+    ]
+  },
+  "materialization": {
+    "everyCallCreatesFreshOccurrence": true,
+    "samePairMayHaveMultipleOccurrences": true,
+    "pairInterning": false,
+    "idempotentMaterializeByPair": false,
+    "batchSupportsSelfAndMutualCycles": true,
+    "batchCommitAtomic": true,
+    "failedBatchExposesPreState": true,
+    "hiddenReusePolicy": false
+  },
+  "readBoundary": {
+    "findIsReadOnly": true,
+    "polesIsReadOnly": true,
+    "outgoingIncomingAreReadOnly": true,
+    "replayIsReadOnly": true,
+    "missingPairLookupMaterializes": false
+  },
+  "persistence": {
+    "duplicatePairsSurviveReopen": true,
+    "cyclesSurviveReopen": true,
+    "sharingSurvivesReopen": true,
+    "rootLogicalIdentitySurvivesReopen": true,
+    "normalizedTopologySurvivesReopen": true,
+    "runtimeRefsMayBeReconstructed": true,
+    "sequenceEffectCanReplayAfterReopen": true
+  },
+  "backendNeutrality": {
+    "rawAnumTokensAcceptedByBackend": false,
+    "parserAstAcceptedByBackend": false,
+    "l2InterpreterAcceptedByBackend": false,
+    "jsonReferenceFileFormatNormative": false,
+    "pmmApiNormative": false,
+    "referenceBackendPurpose": "executable persistence evidence only"
+  },
+  "requiredVectors": [
+    "two A-to-B exact occurrences survive reopen as distinct persistent ids",
+    "find after reopen returns both duplicate occurrences without mutation",
+    "self-cycle and mutual cycle survive reopen",
+    "shared endpoint remains one logical occurrence after reopen",
+    "root persistent id survives clean reopen",
+    "invalid batch leaves memory and file at pre-state",
+    "simulated commit failure leaves memory and file at pre-state",
+    "fresh import of identical topology receives another lineage",
+    "runtime reconstruction after reopen preserves topology but creates new runtime refs",
+    "persistent sequence materialization delegates to Gate-P sequence semantics",
+    "persistent sequence evidence replays read-only after clean reopen",
+    "backend source has no Anum parser, MTC parser/AST or old pair-interning dependency"
+  ],
+  "outOfScope": [
+    "production PMM adapter",
+    "crash recovery stronger than atomic file replacement reference evidence",
+    "delete semantics",
+    "cross-dataset replication identity",
+    "aprover repin"
+  ],
+  "nextGate": "historical compatibility classification and atomic Foundation-v2 production cutover planning",
+  "aproverRepinAllowed": false
+}
