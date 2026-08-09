@@ -135,3 +135,15 @@ def test_docs_reject_projection_opcode_reading() -> None:
     assert "не являются командами взять начало или конец" in _text(README)
     assert "не означают сами по себе" in foundations
     assert "не являются встроенными командами получения полюсов" in notation
+
+
+def test_nonlink_is_a_meaning_carried_by_links_not_a_second_ontology() -> None:
+    foundations = _text(FOUNDATIONS)
+    anum = _text(ANUM)
+    for text in (foundations, anum):
+        assert "1 → L = O ⟼ C" in text
+        assert "0 → U = C ⟼ O" in text
+        assert "0 ≠ DELETE_LINK" in text
+    assert "несвязь не вводится как отдельный вид существующего" in foundations
+    assert "описание само является связевой структурой, но не тождественно своему денотату" in anum
+    assert "описать несвязь ≠ сделать несвязь сущностью" in anum
