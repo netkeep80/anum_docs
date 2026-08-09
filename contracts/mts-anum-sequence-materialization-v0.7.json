@@ -1,0 +1,65 @@
+{
+  "schema": "mts-anum-sequence-materialization/v0.7",
+  "status": "gate-p-candidate",
+  "accepted": false,
+  "issue": 242,
+  "parent": 237,
+  "dependsOn": [
+    "mts-exact-occurrence-link-network/v0.7",
+    "mts-foundation-v2-state/v0.7"
+  ],
+  "sourceBoundary": {
+    "input": "already-selected root-relative nested sequence description over exact existing occurrences",
+    "rawBracketsAreHostOpcodes": false,
+    "tokenOrAstIdentityIsSemantic": false,
+    "sourceCarrierEqualsTargetNetwork": false,
+    "rootSentinelParticipatesInAdjacency": false
+  },
+  "sequenceSemantics": {
+    "topLevel": "∞ A B C -> create A⟼B and B⟼C",
+    "singleton": "one item returns that exact item and creates no relation",
+    "nestedGroup": "recursively materialize the group and return its last created relation as one outer value",
+    "multiItemResult": "the last exact adjacency relation created by the sequence",
+    "emptySequenceAllowed": false
+  },
+  "effectBoundary": {
+    "beforeImmutable": true,
+    "afterSameRuntimeIdentityLineage": true,
+    "existingRefsPreservedByExactIdentity": true,
+    "existingLinksImmutable": true,
+    "newOccurrencesAppended": true,
+    "everyAdjacencyCreatesNewExactOccurrence": true,
+    "samePairImpliesReuse": false,
+    "pairInterning": false,
+    "replayReadOnly": true,
+    "findReadOnly": true
+  },
+  "identityBoundary": {
+    "sameLineageBeforeAfterMayShareExactRefs": true,
+    "independentSnapshotReloadCreatesFreshRuntimeIdentity": true,
+    "snapshotSlotIsUniversalSemanticIdentity": false,
+    "backendAddressIsSemanticIdentity": false,
+    "structuralEqualityImpliesExactIdentity": false
+  },
+  "requiredVectors": [
+    "source carrier for ∞ab lacks a⟼b before materialization",
+    "∞ab creates exactly one new a⟼b occurrence",
+    "∞abc creates exactly a⟼b then b⟼c and returns b⟼c",
+    "∞[ab]c creates inner a⟼b then outer (a⟼b)⟼c",
+    "∞[window][cursor][position][[[x][int]][point]] creates XI, Q, W⟼C, C⟼P, P⟼Q in deterministic nested-first order",
+    "singleton nested group returns its exact item without a new link",
+    "existing equal-pair occurrence is not implicitly reused",
+    "find of absent target does not mutate before state",
+    "replay rejects forged poles, extra occurrences, wrong result or changed base topology",
+    "snapshot round-trip preserves topology but not cross-load runtime identity",
+    "historical v0.2 recursive denotation contracts remain unchanged and are not silently replaced"
+  ],
+  "compatibility": {
+    "historicalV02PairDenotationStillAccepted": true,
+    "historicalAnumMemoryPairInterningInherited": false,
+    "sequenceModeReplacesRecursivePairGrammar": false,
+    "sequenceModeIsFoundationV2MaterializationCandidate": true
+  },
+  "nextGate": "persistent L4/backend contract #124, then integrated release conformance and cutover",
+  "aproverRepinAllowed": false
+}
