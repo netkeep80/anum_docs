@@ -1,0 +1,137 @@
+{
+  "schema": "mts-foundation-v2-isolation/v0.7",
+  "status": "gate-p-historical-isolation",
+  "accepted": false,
+  "issue": 276,
+  "parent": 271,
+  "umbrella": 237,
+  "baseMainCommit": "89ffd525f888354a85dde06012001997d117adc0",
+  "cutoverPerformed": false,
+  "foundationV2Accepted": false,
+  "downstreamRepinAllowed": false,
+  "classes": [
+    "FOUNDATION_V2_LIVE",
+    "HISTORICAL_SEMANTIC_ISLAND",
+    "HISTORICAL_ENTRYPOINT",
+    "NON_SEMANTIC_TOOLING",
+    "PRESERVED_NEUTRAL"
+  ],
+  "foundationV2Live": [
+    "core/exact_link_network.py",
+    "core/foundation_v2.py",
+    "core/foundation_v2_root.py",
+    "core/foundation_v2_state.py",
+    "core/foundation_v2_source.py",
+    "core/foundation_v2_interpreter.py",
+    "core/foundation_v2_run.py",
+    "core/foundation_v2_proof.py",
+    "core/foundation_v2_checker.py",
+    "core/foundation_v2_materialization.py",
+    "core/foundation_v2_persistent.py"
+  ],
+  "historicalSemanticIsland": [
+    {
+      "path": "core/mtc_parser.py",
+      "historicalOwner": "mts-contract/v0.2-v0.5 source/parser replay",
+      "replacementLiveOwner": "core/foundation_v2_source.py",
+      "deleteInC7": true,
+      "deletePrecondition": "No retained historical entrypoint requires executable typed parser replay in current main."
+    },
+    {
+      "path": "core/mtc_ast.py",
+      "historicalOwner": "mts-contract/v0.2-v0.5 typed syntax replay",
+      "replacementLiveOwner": "exact source/form occurrences + Foundation-v2 evidence",
+      "deleteInC7": true,
+      "deletePrecondition": "Any useful formatting/span behavior is either no longer required or isolated into non-semantic tooling."
+    },
+    {
+      "path": "core/mtc_interpreter.py",
+      "historicalOwner": "mts-contract/v0.2-v0.5 ContextFrame interpretation replay",
+      "replacementLiveOwner": "core/foundation_v2_interpreter.py",
+      "deleteInC7": true,
+      "deletePrecondition": "No current-main historical entrypoint is required to execute ContextFrame semantics."
+    },
+    {
+      "path": "core/mtc_definitions.py",
+      "historicalOwner": "historical DefinitionEnvironment/opening replay",
+      "replacementLiveOwner": "core/foundation_v2_state.py + core/foundation_v2_interpreter.py persistent scoped D",
+      "deleteInC7": true,
+      "deletePrecondition": "No retained historical entrypoint requires host lexical DefinitionEnvironment."
+    },
+    {
+      "path": "core/mtc_opening_path.py",
+      "historicalOwner": "mts-opening-path/v0.4 + mts-proof/v0.4 replay",
+      "replacementLiveOwner": "no Foundation-v2 primitive; explicit D/T/rule evidence",
+      "deleteInC7": true,
+      "deletePrecondition": "Historical proof runtime replay is not retained as current-main production capability."
+    },
+    {
+      "path": "core/root_library.py",
+      "historicalOwner": "ten-formula root program loader",
+      "replacementLiveOwner": "core/foundation_v2_root.py",
+      "deleteInC7": true,
+      "deletePrecondition": "Historical root contract remains available as immutable data/Git history without requiring this live loader."
+    },
+    {
+      "path": "core/validate_root.py",
+      "historicalOwner": "ten-formula typed root validator",
+      "replacementLiveOwner": "core/foundation_v2_root.py::validate_root_kernel",
+      "deleteInC7": true,
+      "deletePrecondition": "Foundation-v2 root conformance remains green and historical root fixture is preserved as immutable evidence."
+    },
+    {
+      "path": "core/reference_model.py",
+      "historicalOwner": "historical typed operator/reference authority",
+      "replacementLiveOwner": "versioned Foundation-v2 contracts + core/foundation_v2.py",
+      "deleteInC7": true,
+      "deletePrecondition": "No historical parser entrypoint remains in current main requiring the old operator table."
+    },
+    {
+      "path": "core/proof_checker.py",
+      "historicalOwner": "mts-proof/v0.2-v0.4 executable replay",
+      "replacementLiveOwner": "core/foundation_v2_checker.py",
+      "deleteInC7": true,
+      "deletePrecondition": "Accepted historical proof JSON remains an immutable release artifact even if its old Python runtime is removed."
+    },
+    {
+      "path": "core/anum_memory.py",
+      "historicalOwner": "historical v0.2-v0.3 pair-interning L4",
+      "replacementLiveOwner": "core/foundation_v2_materialization.py + core/foundation_v2_persistent.py",
+      "deleteInC7": true,
+      "deletePrecondition": "No retained current-main converter requires idempotent pair-interning L4 behavior."
+    }
+  ],
+  "historicalEntrypoints": [
+    {
+      "path": "converters/l4_backend_driver.py",
+      "historicalOwner": "historical v0.3 L4 backend conformance driver",
+      "dependsOnIsland": ["core.anum_memory"],
+      "deleteInC7": true,
+      "deletePrecondition": "Foundation-v2 persistent/exact-occurrence release corpus no longer needs the pair-interning driver."
+    }
+  ],
+  "nonSemanticTooling": [
+    "core/semantic_carrier.py"
+  ],
+  "preservedNeutralRules": {
+    "defaultForOtherCoreAndConverters": true,
+    "mayImportHistoricalSemanticIsland": false,
+    "mayBeImportedByFoundationV2Live": true,
+    "notes": "Neutral does not mean semantic authority. It only means the module is not part of the superseded MTS runtime island and does not import it directly."
+  },
+  "preservedSemanticBoundaries": {
+    "recursiveAnumModule": "core/anum_recursive_denotation.py",
+    "recursiveAnumIsHistoricalL4": false,
+    "ostensivePrimary": ["∞", "♂e = S = S ⟼ e", "b♀ = E = b ⟼ E", "b ⟼ e"],
+    "publicFoundationEntry": "core/foundation_v2.py",
+    "compatibilityModeAllowed": false
+  },
+  "repositoryScan": {
+    "roots": ["core", "converters"],
+    "extensions": [".py"],
+    "testsExcludedFromProductionClassification": true,
+    "unknownAllowed": false,
+    "unexpectedHistoricalConsumerIsFailure": true
+  },
+  "next": "C7 atomic deletion of the now-isolated historical runtime set, then C8 integrated release conformance; no acceptance or repin yet"
+}
