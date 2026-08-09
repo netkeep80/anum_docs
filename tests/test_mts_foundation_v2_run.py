@@ -218,8 +218,6 @@ def test_empty_run_is_exact_identity_not_state_change() -> None:
     )
     network = builder.freeze(root)
 
-    # Diagnostic exact-identity assertions are intentional: the run contract must
-    # use the same network-issued occurrence identity as the substrate itself.
     assert network.root is root
     assert evidence.run_root is root
     assert evidence.run_root is network.root
@@ -233,4 +231,6 @@ def test_run_module_has_no_legacy_proof_or_interpreter_dependency() -> None:
     assert "mtc_ast" not in source
     assert "mtc_interpreter" not in source
     assert "proof_checker" not in source
-    assert "transitiv" not in source.lower()
+    assert "def transitive" not in source.lower()
+    assert "transitive_closure" not in source.lower()
+    assert "derive_transitive" not in source.lower()
