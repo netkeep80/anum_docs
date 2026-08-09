@@ -2,10 +2,12 @@
 
 The source/Anum front-end and this module are deliberately separate. Raw glyphs,
 tokens and parser nodes are not semantic identity here. After source replay has
-selected an ordered tuple of exact forms, ``replay_resolved_sequence_grouping``
-may interpret two explicitly selected exact occurrences as open/close delimiters
-for sequence-deserialization mode. Delimiter meaning is therefore contextual;
-the link shape alone never makes an occurrence a bracket command.
+selected an ordered tuple of exact forms, an explicitly selected root-opening
+restoration may first expand collapsed leading-open usage. Then
+``replay_resolved_sequence_grouping`` may interpret two explicitly selected
+exact occurrences as open/close delimiters for sequence-deserialization mode.
+Delimiter meaning is contextual; the link shape alone never makes an occurrence
+a bracket command.
 
 The resulting nested sequence description has arbitrary exact existing link
 occurrences as leaves. A leaf may itself be a complete non-self-closed relation;
@@ -106,6 +108,55 @@ class SequenceMaterialization:
     result: OccurrenceRef
 
 
+def replay_root_opening_restoration(
+    network: LinkNetwork,
+    forms: tuple[OccurrenceRef, ...],
+    *,
+    open_form: OccurrenceRef,
+    close_form: OccurrenceRef,
+) -> tuple[OccurrenceRef, ...]:
+    """Restore root-collapsed leading opens over exact resolved forms.
+
+    This is the exact-occurrence analogue of the historical Anum beginning rule.
+    Restoration is eligible only when the represented carrier already begins
+    with the exact selected ``open_form``. If exact closes outnumber exact opens,
+    the deficit is prepended as repeated *uses of the same open occurrence*.
+    No link is created and no group is interpreted here.
+
+    Same-shape occurrences do not contribute to the balance unless they are the
+    exact selected delimiter refs. A caller must run grouping separately, so a
+    malformed restored sequence still fails closed at the next trusted layer.
+    """
+
+    before = network.snapshot()
+    try:
+        _validate_resolved_grouping_inputs(
+            network,
+            forms,
+            open_form=open_form,
+            close_form=close_form,
+        )
+        if forms[0] is not open_form:
+            return forms
+
+        balance = sum(
+            1 if form is open_form else -1 if form is close_form else 0
+            for form in forms
+        )
+        if balance >= 0:
+            return forms
+        return (open_form,) * (-balance) + forms
+    except LinkNetworkError as exc:
+        raise SequenceMaterializationError(
+            "resolved sequence contains a foreign exact occurrence"
+        ) from exc
+    finally:
+        if network.snapshot() != before:
+            raise SequenceMaterializationError(
+                "root opening restoration mutated the network"
+            )
+
+
 def replay_resolved_sequence_grouping(
     network: LinkNetwork,
     forms: tuple[OccurrenceRef, ...],
@@ -119,22 +170,19 @@ def replay_resolved_sequence_grouping(
     sequence-deserialization mode. Only those exact occurrences delimit groups;
     another occurrence with the same poles is an ordinary sequence value.
 
-    This function does not define the raw-carrier/root-opening-collapse mapping.
-    It starts after source/D replay has already produced exact forms in order.
+    This function starts after source/D replay. If root-opening collapse belongs
+    to the selected carrier protocol, call ``replay_root_opening_restoration``
+    explicitly before grouping; grouping itself never guesses missing opens.
     """
 
     before = network.snapshot()
     try:
-        network.link(open_form)
-        network.link(close_form)
-        if open_form is close_form:
-            raise SequenceMaterializationError(
-                "open and close sequence delimiters must be exact-distinct"
-            )
-        if not forms:
-            raise SequenceMaterializationError("resolved sequence cannot be empty")
-        for form in forms:
-            network.link(form)
+        _validate_resolved_grouping_inputs(
+            network,
+            forms,
+            open_form=open_form,
+            close_form=close_form,
+        )
 
         items, position = _group_resolved_forms(
             forms,
@@ -249,6 +297,25 @@ def replay_sequence_materialization(
             raise SequenceMaterializationError("replay mutated the before network")
         if evidence.after.snapshot() != after_snapshot:
             raise SequenceMaterializationError("replay mutated the after network")
+
+
+def _validate_resolved_grouping_inputs(
+    network: LinkNetwork,
+    forms: tuple[OccurrenceRef, ...],
+    *,
+    open_form: OccurrenceRef,
+    close_form: OccurrenceRef,
+) -> None:
+    network.link(open_form)
+    network.link(close_form)
+    if open_form is close_form:
+        raise SequenceMaterializationError(
+            "open and close sequence delimiters must be exact-distinct"
+        )
+    if not forms:
+        raise SequenceMaterializationError("resolved sequence cannot be empty")
+    for form in forms:
+        network.link(form)
 
 
 def _group_resolved_forms(
