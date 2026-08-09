@@ -218,6 +218,12 @@ def test_empty_run_is_exact_identity_not_state_change() -> None:
     )
     network = builder.freeze(root)
 
+    # Diagnostic exact-identity assertions are intentional: the run contract must
+    # use the same network-issued occurrence identity as the substrate itself.
+    assert network.root is root
+    assert evidence.run_root is root
+    assert evidence.run_root is network.root
+    assert evidence.initial_context is evidence.terminal_context
     assert replay_run(network, evidence) == ()
 
 
