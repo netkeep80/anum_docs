@@ -287,7 +287,7 @@ def test_replay_rejects_extra_after_occurrence() -> None:
         )
 
 
-def test_replay_rejects_changed_base_topology_from_independent_reload() -> None:
+def test_replay_rejects_independent_reload_as_fresh_identity_lineage() -> None:
     before, root, refs = _base_network(("a", "b"))
     evidence = materialize_sequence(
         before,
@@ -295,7 +295,9 @@ def test_replay_rejects_changed_base_topology_from_independent_reload() -> None:
     )
     reloaded = LinkNetwork.from_snapshot(evidence.after.snapshot())
 
-    with pytest.raises(SequenceMaterializationError, match="preserve exact base"):
+    assert reloaded.snapshot() == evidence.after.snapshot()
+    assert reloaded.root is not before.root
+    with pytest.raises(SequenceMaterializationError, match="changed the exact root"):
         replay_sequence_materialization(
             before,
             replace(evidence, after=reloaded),
