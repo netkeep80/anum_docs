@@ -1,0 +1,92 @@
+{
+  "schema": "mts-four-binding-forms-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 208,
+  "dependsOn": [
+    "mts-semantic-root-kernel-challenge/v0.7",
+    "anum-link-context-state-challenge/v0.7"
+  ],
+  "purpose": "Challenge whether full self-closure, start self-closure, end self-closure and ordinary linkage are four structural states of pole distinction/resolution without redefining the ostensive signs as functions or opcodes.",
+  "forms": {
+    "fullyOpen": "R = R ⟼ R",
+    "startOpen": "S = S ⟼ e",
+    "endOpen": "E = b ⟼ E",
+    "complete": "X = b ⟼ e"
+  },
+  "researchReading": {
+    "fullyOpen": "no external pole distinguished in this resolution act; root meaning remains semantically primary",
+    "startOpen": "end e distinguished while start remains self-closed/open",
+    "endOpen": "start b distinguished while end remains self-closed/open",
+    "complete": "both external poles distinguished",
+    "shapeAloneImpliesIncompleteGlobally": false
+  },
+  "resolutionCandidate": {
+    "bindStart": "startOpen(e) + b -> complete(b,e)",
+    "bindEnd": "endOpen(b) + e -> complete(b,e)",
+    "readKnownComplete": "known X=(b,e) resolves b and e directly from the same relation",
+    "readStartOpen": "known S=(S,e) resolves the already distinguished e",
+    "readEndOpen": "known E=(b,E) resolves the already distinguished b",
+    "mutatesPartialRelation": false,
+    "operationIsPropertyOfResolutionAct": true
+  },
+  "inversionCandidate": {
+    "fullyOpenFixed": true,
+    "startOpenEndOpenSwapByForm": true,
+    "completeSwapsPoles": true,
+    "sameRefPairSwapRequired": false
+  },
+  "multiplicityBoundary": {
+    "partialFormIsAQueryPatternNotAFunction": true,
+    "multipleSelfClosedOccurrencesForSameKnownPoleAllowed": true,
+    "globalUniquenessOfPartialResolutionRejected": true,
+    "exactPairUniquenessStillPreserved": true
+  },
+  "distinctionOrderCandidate": {
+    "edges": [
+      "R -> startOpen(e)",
+      "R -> endOpen(b)",
+      "startOpen(e) -> complete(b,e)",
+      "endOpen(b) -> complete(b,e)"
+    ],
+    "startOpenAndEndOpenComparableWithoutAdditionalBinding": false,
+    "externalSetOrBitmaskOrderAllowed": false
+  },
+  "rootBoundary": {
+    "rootIsOnlyAParserSentinel": false,
+    "rootMeaningOfMeaningRemainsPrimary": true,
+    "usingRootAsFullyOpenResolutionStateAcceptedHere": false,
+    "reason": "this challenge tests compatibility of that interpretation but does not reduce root semantics to interpreter state"
+  },
+  "requiredAssertions": [
+    "start-open and end-open forms are finite cyclic binary links",
+    "both partial branches resolve to one exact complete pair for the same b/e bindings",
+    "resolution does not mutate either partial relation",
+    "form inversion maps start-open(e) to an end-open form over e and vice versa",
+    "complete inversion swaps b/e",
+    "known complete relation exposes its two poles without redefining self-closure glyphs as projections",
+    "known start-open exposes its distinguished end and known end-open exposes its distinguished start",
+    "multiple start-open refs may satisfy the same known end shape",
+    "multiple end-open refs may satisfy the same known start shape",
+    "partial-form multiplicity does not violate exact-pair uniqueness",
+    "a legitimate self-closed relation is not globally marked incomplete",
+    "no semantic stage tag, Meaning node, or host Optional/Pair ontology is embedded in Link"
+  ],
+  "notDecided": [
+    "whether the four forms are accepted universal interpretation semantics",
+    "whether R is the canonical fully-open state for every interpretation act",
+    "whether root abits are instances of these forms or serialization meanings derived from them",
+    "general associative-memory query language for partial forms",
+    "formal notation syntax for relation solving",
+    "production migration"
+  ],
+  "veto": {
+    "rawProjectionSemanticsForSelfClosureGlyphsAllowed": false,
+    "stageTagAllowed": false,
+    "selfClosedShapeGloballyMeansIncomplete": false,
+    "partialPatternFunctionUniquenessAssumed": false,
+    "productionChangeAllowed": false,
+    "historicalContractMutationAllowed": false,
+    "aproverRepinAllowed": false
+  }
+}
