@@ -1,0 +1,63 @@
+{
+  "schema": "mts-foundation-v2-integrated-proof/v0.7",
+  "status": "gate-p-candidate",
+  "accepted": false,
+  "issue": 257,
+  "parent": 237,
+  "dependsOn": [
+    "mts-foundation-v2-source/v0.7",
+    "mts-foundation-v2-state/v0.7",
+    "mts-foundation-v2-equality/v0.7",
+    "mts-foundation-v2-proof-rule/v0.7",
+    "mts-foundation-v2-run/v0.7"
+  ],
+  "artifact": {
+    "source": "one exact source occurrence selecting exactly one Rule through scoped D and explicit G/T source admission",
+    "premise": "one replayable true local equality actual act A_eq in exact K",
+    "ruleAdmission": "one exact direct T ⟼ Rule membership",
+    "application": "one replayable admitted one-step rule actual act A_rule",
+    "run": "exact ordered Run = [A_eq, A_rule]",
+    "claims": "exact first-level start/end equality claim links"
+  },
+  "integratedReplay": [
+    "replay source front-end evidence",
+    "require selected source form is exact proof Rule",
+    "require source and proof application share exact T",
+    "replay equality premise and require true",
+    "require proof application shares exact premise K",
+    "replay exact admitted proof rule",
+    "replay exact Run continuity",
+    "require Run acts are exactly A_eq then A_rule",
+    "require one shared exact K across premise/application/run",
+    "require network snapshot unchanged"
+  ],
+  "trustBoundary": {
+    "searchOrRankingTrusted": false,
+    "sourceRetokenizedByIntegratedChecker": false,
+    "operatorSemanticsReimplemented": false,
+    "ruleInferredFromHostEnum": false,
+    "equalityInferredByShape": false,
+    "proofReconstructedByHeuristic": false,
+    "implicitMaterialization": false,
+    "legacyParserInterpreterProofCheckerDependency": false
+  },
+  "requiredVectors": [
+    "valid source-selected Rule -> true equality -> admitted rule -> exact two-act Run",
+    "valid source selecting another exact Rule rejects cross-layer identity",
+    "valid source admitted under another exact theory rejects cross-layer identity",
+    "invalid equality premise rejects",
+    "swapped Run order rejects",
+    "different exact K at Run boundary rejects",
+    "snapshot remains unchanged"
+  ],
+  "remainingReleaseBlockers": [
+    242,
+    124,
+    "historical compatibility classification",
+    "versioned accepted integrated conformance corpus",
+    "atomic production cutover",
+    "explicit Foundation-v2 acceptance"
+  ],
+  "aproverRepinAllowed": false,
+  "nextGate": "return to deferred sequence-to-apamemory executable semantics #242, then persistent L4 #124, before release hardening"
+}
