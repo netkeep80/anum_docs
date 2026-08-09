@@ -1,16 +1,20 @@
 # Reference model МТС v0.2
 
-Статус: **актуальное, нормативное**.
+Статус: **historical accepted reference model v0.2**.
 
-Машинный контракт: [`core/reference_model.py`](../../core/reference_model.py).
+> Этот документ остаётся нормативным **только для контракта МТС v0.2 и совместимой historical-линии v0.2–v0.5**. Он больше не является описанием текущей целевой архитектуры Foundation v2.
+>
+> Для текущего развития начинайте с [Оснований МТС](../theory/Основания%20МТС.md), [Foundation v2 Gate P](Foundation%20v2%20Gate%20P.md) и [Формальной нотации МТС](Формальная%20нотация%20МТС.md).
 
-Language-neutral контракт для внешних реализаций: [`contracts/mts-contract-v0.2.json`](../../contracts/mts-contract-v0.2.json).
+Машинный historical contract: [`core/reference_model.py`](../../core/reference_model.py).
+
+Language-neutral accepted v0.2 contract: [`contracts/mts-contract-v0.2.json`](../../contracts/mts-contract-v0.2.json).
 
 Принятый L3 boundary subset: [`contracts/anum-boundary-projection-v0.2.json`](../../contracts/anum-boundary-projection-v0.2.json).
 
-Этот документ фиксирует инженерную reference model, относительно которой работают parser, interpreter, протокол ачисел, будущая апамять и апрувер. Он не подменяет [Основания МТС](../theory/Основания%20МТС.md) и не объявляет Python-представление окончательной «природой связи».
+Этот документ фиксирует инженерную reference model v0.2, относительно которой воспроизводятся historical parser/interpreter/protocol behavior и conformance corpus. Такие конструкции, как typed AST, `ContextFrame`, `◁/▷` и AST-path `HoleId`, являются частью принятой v0.2 модели, но **не переносятся автоматически в Foundation v2**.
 
-## 1. Архитектурные уровни
+## 1. Архитектурные уровни v0.2
 
 ```text
 L0  Онтология
@@ -29,7 +33,9 @@ L5  Теория вывода
 описание состояния не является командой изменения состояния.
 ```
 
-## 2. L0 — онтология
+Эти общие границы остаются полезными и в Foundation v2, хотя конкретные v0.2 representations ниже являются historical.
+
+## 2. L0 — онтология v0.2
 
 ```text
 всё есть связь;
@@ -41,9 +47,11 @@ L5  Теория вывода
 
 L0 не зависит от Python, графов, `*.anum`, конкретных скобок или алгоритма доказательства.
 
-## 3. L1 — конечный Link carrier
+Текущая Foundation-v2 формулировка уточняет эту основу exact-occurrence identity; см. [Основания МТС](../theory/Основания%20МТС.md).
 
-Исполнимая reference-структура различённой связи:
+## 3. L1 — finite Link carrier v0.2
+
+Исполнимая historical reference-структура различённой связи:
 
 ```text
 Link(start, end)
@@ -88,11 +96,11 @@ invert(Link(a, b)) = Link(b, a)
 
 `core/semantic_carrier.py` содержит `carrier_isomorphic(A, B)` для проверки topology конечных carrier.
 
-Это инженерная операция и **не** синтаксический оператор L2 `=`.
+Это инженерная операция и **не** синтаксический оператор L2 `=`. Foundation v2 дополнительно фиксирует, что graph isomorphism не является semantic exact identity.
 
-## 4. L2 — формальный язык v0.2
+## 4. L2 — formal language v0.2
 
-L2 имеет typed AST:
+L2 historical model имеет typed AST:
 
 ```text
 Expression
@@ -103,7 +111,7 @@ Expression
 
 ### Два атомарных местоимения контекста
 
-У каждого бинарного `ContextFrame` ровно две роли:
+У каждого historical `ContextFrame` ровно две роли:
 
 ```text
 ◁  current.start
@@ -120,7 +128,7 @@ Expression
 ↑↑◁   grandparent.start
 ```
 
-Инвариант lexer-а:
+Инвариант lexer-а v0.2:
 
 ```text
 atomicPronouns = true
@@ -133,13 +141,13 @@ bracketOverloading = false
 ◁[]▷
 ```
 
-всегда лексически разбирается как четыре независимых токена:
+лексически разбирается как:
 
 ```text
 ◁  [  ]  ▷
 ```
 
-### `[]` — anonymous form
+### `[]` — anonymous form v0.2
 
 Пустая квадратная форма:
 
@@ -147,35 +155,19 @@ bracketOverloading = false
 []
 ```
 
-в исполняемой формальной нотации означает **анонимное вхождение формы связи**, а не одну глобальную Link-константу для всего исходного текста.
+в historical исполняемой нотации означает анонимное вхождение формы связи, а не одну глобальную Link-константу.
 
-Каждое AST-вхождение имеет собственный `HoleId`.
-
-Identity определяется структурным путём в typed AST:
+Каждое AST-вхождение имеет собственный `HoleId`:
 
 ```text
 HoleId := AST occurrence path
 ```
 
-а не:
+Это было важным historical шагом к различению одинаково записанных occurrences. Foundation v2 переносит сам принцип различённости глубже — в exact occurrence network — и больше не использует AST path как semantic identity.
 
-```text
-не display label;
-не SourceSpan;
-не Python/JS object identity.
-```
+### `=` — local constraint v0.2
 
-Поэтому два одинаково записанных `[]` сначала различны:
-
-```text
-{[] = ◁, [] = ▷}
-```
-
-и получают два независимых локальных замещения.
-
-### `=` — локальное constraint
-
-Нормативная форма смысла равенства:
+Historical нормативная форма:
 
 ```text
 (=) : {♀◁ = ♀▷, ◁♂ = ▷♂}
@@ -183,17 +175,17 @@ HoleId := AST occurrence path
 
 Если `ContextFrame(start=A, end=B)`, сравниваются соответствующие формы начала и конца `A` и `B`.
 
-Ключевое ограничение:
+Даже v0.2 запрещала понимать:
 
 ```text
 A = B
 ```
 
-не создаёт глобальное rewrite-rule для всех одинаковых glyph во всех формулах.
+как глобальное rewrite-rule для всех одинаковых glyph.
 
-`=` исполняется как локальное identity/unification constraint одного запуска `interpret`.
+Foundation v2 далее заменяет эту модель explicit local representative evidence in `K`.
 
-### `⟼` — одновременно форма и структурный pattern
+### `⟼` — form и structural pattern v0.2
 
 Синтаксически:
 
@@ -203,7 +195,7 @@ A ⟼ B
 
 — `LinkForm(A, B)`.
 
-При interpret полностью заданная LinkForm может искать существующую связь, а LinkForm с anonymous forms может **декомпозировать** уже известный `LinkRef`.
+Historical interpreter мог искать существующую связь или декомпозировать известный `LinkRef` через anonymous forms.
 
 Пример:
 
@@ -217,39 +209,37 @@ A ⟼ B
 poles(10) = (2, 3)
 ```
 
-даёт локальные substitutions:
+давал local substitutions:
 
 ```text
 hole₀ → 2
 hole₁ → 3
 ```
 
-Вложенные patterns разбираются рекурсивно:
+Вложенные patterns разбирались рекурсивно без materialization новых связей.
 
-```text
-20 = ([] ⟼ []) ⟼ []
-```
-
-без materialization новых связей.
+Foundation v2 не принимает эту automatic decomposition как встроенную equality semantics; proof decomposition существует только как отдельно `T`-admitted rule.
 
 ### Круглые скобки
 
-Round grouping сохраняется в AST и canonical printer, но прозрачен для structural matcher.
+Round grouping сохраняется в historical AST и canonical printer, но прозрачен для structural matcher.
 
-### Корневая система
+### Historical корневая система
 
 Каноническая root-программа: [`tests/mtc_formulas.mtc`](../../tests/mtc_formulas.mtc).
 
-Она содержит только 10 именованных definitions. Parser/conformance-примеры последовательностей и пучков не являются корневыми аксиомами.
+Она содержит 10 именованных definitions и остаётся immutable accepted evidence v0.2–v0.5.
 
-Ключевые определения:
+Ключевые historical определения:
 
 ```text
 ∞   : {◁ = ∞, ▷ = ∞}
 (=) : {♀◁ = ♀▷, ◁♂ = ▷♂}
 ```
 
-## 5. L3 — сериализация Anum
+Они не являются текущим определением Foundation-v2 `K` и local representative `=`.
+
+## 5. L3 — сериализация Anum v0.2
 
 L3 отвечает за сериализацию/десериализацию и использует четверичный алфавит:
 
@@ -259,7 +249,7 @@ L3 отвечает за сериализацию/десериализацию �
 
 Квадратные glyph L2 и абиты L3 не тождественны автоматически.
 
-Canonical pipeline:
+Historical pipeline:
 
 ```text
 parse_raw_quaternary
@@ -279,7 +269,7 @@ parse_raw_quaternary
 [0] : (↛)
 ```
 
-Поэтому в **root context** принят boundary subset:
+Поэтому в root context принят boundary subset:
 
 ```text
 [  → ♀∞
@@ -288,15 +278,15 @@ parse_raw_quaternary
 ][ → 0
 ```
 
-`[[` и `]]` остаются `boundary-form` без protocol value. Это contextual root projection, а не абсолютное переписывание raw carrier: quote и relative contexts его не применяют.
+`[[` и `]]` сохраняют historical boundary status.
 
-Общая structural denotation произвольного raw carrier, recursive decode и inverse denotation serialization остаются открытым dependency gate #89.
+Foundation v2 дополнительно отделяет recursive Anum structural description от universal exact identity arbitrary shared/cyclic networks и требует отдельного materialization gate #242.
 
-## 6. L4 — исполнение
+## 6. L4 — historical execution model
 
-Две разные группы операций должны оставаться разделены.
+Две группы операций уже в v0.2 должны были оставаться разделены.
 
-### Формальная нотация
+### Формальная нотация v0.2
 
 ```text
 parse(source) → typed AST
@@ -307,7 +297,7 @@ interpret(AST, ContextFrame, MemoryView)
     → resolution trace
 ```
 
-`ContextFrame` виртуален:
+`ContextFrame` historical model:
 
 ```text
 ContextFrame(
@@ -317,11 +307,9 @@ ContextFrame(
 )
 ```
 
-Для интерпретации `A = B` не требуется сначала материализовать служебную связь `A ⟼ B`.
-
 `interpret` read-only.
 
-### Anum / память
+### Anum / память v0.2
 
 ```text
 load
@@ -332,7 +320,7 @@ realize
 delete
 ```
 
-Инварианты:
+Historical invariants:
 
 ```text
 load(A) не создаёт den(A)
@@ -340,14 +328,22 @@ decode(A) не меняет память
 project(A) не меняет память
 find(A) не создаёт den(A)
 interpret(F) не материализует связи
-realize(...) — единственная явная materializing operation
+realize(...) — явная materializing operation
 ```
 
-## 7. L5 — теория вывода
+Foundation v2 сохраняет и усиливает общий принцип:
 
-L5 имеет replay-only candidate trusted proof kernel, который доверяет только повторному исполнению принятой read-only `interpret` semantics. Полный набор правил вывода и proof search остаются отдельной задачей.
+```text
+read / find / replay != materialize
+```
 
-Будущий апрувер обязан разделять:
+см. [Апамять и управление сетью связей](Апамять%20и%20управление%20сетью%20связей.md).
+
+## 7. L5 — historical proof direction
+
+Historical L5 развивала replay-only trusted proof kernel поверх v0.2 interpret semantics.
+
+Уже здесь была важная архитектурная идея:
 
 ```text
 proof search
@@ -355,40 +351,30 @@ proof object
 proof checker / trusted kernel
 ```
 
-Visual UI не является trusted kernel.
+должны быть разделены.
 
-`aprover` должен потреблять versioned contract и conformance vectors из `anum_docs`, а не содержать вторую независимую семантику МТС.
+Foundation v2 реализует эту идею заново на exact-occurrence substrate: actual acts, exact Run, explicit `T ⟼ Rule` и integrated read-only checker без legacy parser/proof semantics.
 
-## 8. Статусы
+См. [Foundation v2 Proof replay](Foundation%20v2%20Proof%20replay.md).
 
-```text
-primitive
-definition
-derived
-conformance
-experimental
-```
+## 8. Accepted status v0.2
 
-В v0.2 приняты:
+В v0.2 были приняты:
 
 ```text
 finite cyclic Link carrier;
-атомарные context pronouns ◁/▷;
+atomic context pronouns ◁/▷;
 context ascent ↑;
 occurrence-local anonymous [];
-локальная interpretation semantics;
+local interpretation semantics;
 structural LinkForm matching;
 contextual equality;
 root Anum boundary orientation [] → 1, ][ → 0.
 ```
 
-Явно не завершены как минимум:
+Это остаётся правдой **о версии v0.2**.
 
-```text
-general L3 raw denotation и inverse denotation serialization (#89);
-relative L3 denotation;
-полный trusted L5 inference kernel.
-```
+Это не означает, что перечисленные host/syntax mechanisms являются primitives следующей Foundation v2.
 
 ## 9. Жизненный цикл фундаментального решения
 
@@ -410,20 +396,45 @@ Deferred
 Superseded
 ```
 
-Формальная нотация v0.2 прошла Candidate → Challenged → Modeled в PR #84 и затем была принята в единственный active contract.
+Именно этот lifecycle означает, что accepted historical v0.2 нельзя переписать задним числом, а Foundation v2 нельзя объявить accepted до собственного release gate.
 
-## 10. Единственные активные реализации
+## 10. Historical implementation surface
+
+Для воспроизведения v0.2 сохраняются:
 
 ```text
-L0–L5 declarative contract             core/reference_model.py
-finite cyclic L1 carrier               core/semantic_carrier.py
-L2 typed AST                           core/mtc_ast.py
-L2 tokenizer/parser                    core/mtc_parser.py
-L2 interpreter                         core/mtc_interpreter.py
-L2 root library                        core/root_library.py
-L3 Anum protocol                       core/anum_protocol.py
-L3 boundary contract                   contracts/anum-boundary-projection-v0.2.json
-versioned external contract            contracts/mts-contract-v0.2.json
+core/reference_model.py
+core/semantic_carrier.py
+core/mtc_ast.py
+core/mtc_parser.py
+core/mtc_interpreter.py
+core/root_library.py
+core/anum_protocol.py
+contracts/mts-contract-v0.2.json
 ```
 
-После migration параллельные candidate/legacy implementations не сохраняются: история экспериментов находится в Git.
+Текущий Foundation-v2 production/reference candidate находится в отдельных exact-evidence modules:
+
+```text
+core/exact_link_network.py
+core/foundation_v2_state.py
+core/foundation_v2_source.py
+core/foundation_v2_interpreter.py
+core/foundation_v2_run.py
+core/foundation_v2_proof.py
+core/foundation_v2_checker.py
+```
+
+После будущего cutover Git должен хранить историю, а production tree не должен сохранять два конкурирующих semantic cores без явной historical-only причины.
+
+---
+
+## Правило чтения этого документа сегодня
+
+```text
+если вопрос: «как точно работала accepted v0.2?»
+    этот документ является правильной reference model;
+
+если вопрос: «какой должна стать следующая МТС?»
+    используйте Foundation v2 docs и executable Gate-P contracts.
+```
