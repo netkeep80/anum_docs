@@ -1,14 +1,19 @@
 """Storage-neutral exact-occurrence binary-link network for Foundation-v2 Gate P.
 
-This module is intentionally smaller than the MTS language.  A semantic link has
-exactly two fields, ``start`` and ``end``.  Context, dictionary, theory, act,
+This module is intentionally smaller than the MTS language. A semantic link has
+exactly two fields, ``start`` and ``end``. Context, dictionary, theory, act,
 source, equality, token and AST roles are *not* link tags; higher layers may
 represent those roles with ordinary link occurrences.
 
-``OccurrenceRef`` is network-local identity.  A portable snapshot stores local
-slots, but loading it creates a fresh identity scope.  Consequently a backend
-address, a snapshot slot and a runtime occurrence ref are deliberately not one
-universal identifier.
+``OccurrenceRef`` is network-lineage-local identity. A portable snapshot stores
+local slots, but loading it creates a fresh identity scope. Consequently a
+backend address, a snapshot slot and a runtime occurrence ref are deliberately
+not one universal identifier.
+
+An immutable network may be evolved into a new immutable state in the *same*
+runtime identity lineage. Existing occurrence objects and links are preserved
+exactly; only newly reserved occurrences may be added. This is the substrate
+boundary needed by explicit Foundation-v2 materialization effects.
 """
 from __future__ import annotations
 
@@ -95,6 +100,16 @@ class LinkNetwork:
             root=self._root.slot,
         )
 
+    def evolve(self) -> "LinkNetworkEvolutionBuilder":
+        """Create an additive builder for a new state in this identity lineage.
+
+        The original network stays immutable. Existing ``OccurrenceRef`` objects
+        are retained by identity in the evolved state; only new occurrences may
+        be reserved and defined. No pair interning is performed.
+        """
+
+        return LinkNetworkEvolutionBuilder(self)
+
     @classmethod
     def from_snapshot(cls, snapshot: NetworkSnapshot) -> "LinkNetwork":
         """Load topology into a fresh identity scope."""
@@ -135,7 +150,7 @@ class LinkNetworkBuilder:
     """Host construction utility for finite cyclic/shared exact networks.
 
     Reservation exists solely so cyclic endpoints can refer to occurrences that
-    are defined later.  It is construction machinery, not an ontological link
+    are defined later. It is construction machinery, not an ontological link
     state or a semantic notion of an "undefined link".
     """
 
@@ -200,3 +215,91 @@ class LinkNetworkBuilder:
     def _require_mutable(self) -> None:
         if self._frozen:
             raise LinkNetworkError("builder is already frozen")
+
+
+class LinkNetworkEvolutionBuilder:
+    """Additive persistent-state builder preserving existing exact identity.
+
+    This builder represents an explicit effect boundary. It never mutates the
+    base network. Existing occurrences are immutable and keep the exact same
+    ``OccurrenceRef`` objects in the returned state. Newly reserved occurrences
+    are appended in the same runtime identity scope and may point to old or new
+    occurrences. Duplicate pole pairs are deliberately allowed.
+    """
+
+    def __init__(self, base: LinkNetwork) -> None:
+        self._base = base
+        self._scope = base._scope
+        self._refs: list[OccurrenceRef] = list(base._refs)
+        self._links: list[Link | None] = list(base._links)
+        self._base_count = len(self._refs)
+        self._frozen = False
+
+    @property
+    def base_count(self) -> int:
+        """Number of exact occurrences inherited from the immutable base state."""
+
+        return self._base_count
+
+    def reserve(self) -> OccurrenceRef:
+        self._require_mutable()
+        ref = OccurrenceRef(self._scope, len(self._refs))
+        self._refs.append(ref)
+        self._links.append(None)
+        return ref
+
+    def define(
+        self,
+        ref: OccurrenceRef,
+        start: OccurrenceRef,
+        end: OccurrenceRef,
+    ) -> None:
+        self._require_mutable()
+        self._validate_reserved(ref)
+        self._validate_reserved(start)
+        self._validate_reserved(end)
+        if ref.slot < self._base_count:
+            raise LinkNetworkError("base occurrence is immutable during evolution")
+        if self._links[ref.slot] is not None:
+            raise LinkNetworkError("occurrence is already defined")
+        self._links[ref.slot] = Link(start, end)
+
+    def define_many(
+        self,
+        definitions: Iterable[tuple[OccurrenceRef, OccurrenceRef, OccurrenceRef]],
+    ) -> None:
+        for ref, start, end in definitions:
+            self.define(ref, start, end)
+
+    def freeze(self, root: OccurrenceRef | None = None) -> LinkNetwork:
+        """Return a new immutable state in the same exact-identity lineage."""
+
+        self._require_mutable()
+        selected_root = self._base.root if root is None else root
+        self._validate_reserved(selected_root)
+        missing = [
+            ref.slot
+            for ref, link in zip(self._refs[self._base_count :], self._links[self._base_count :])
+            if link is None
+        ]
+        if missing:
+            raise LinkNetworkError(f"unbound evolved occurrences: {missing}")
+
+        refs = tuple(self._refs)
+        links = tuple(link for link in self._links if link is not None)
+        self._frozen = True
+        return LinkNetwork(self._scope, refs, links, selected_root)
+
+    def _validate_reserved(self, ref: OccurrenceRef) -> None:
+        if not isinstance(ref, OccurrenceRef):
+            raise LinkNetworkError("expected OccurrenceRef")
+        if ref._scope is not self._scope:
+            raise LinkNetworkError("foreign occurrence reference")
+        if ref.slot < 0 or ref.slot >= len(self._refs):
+            raise LinkNetworkError("occurrence was not reserved in this lineage")
+        if self._refs[ref.slot] is not ref:
+            raise LinkNetworkError("occurrence reference was not issued by this lineage")
+
+    def _require_mutable(self) -> None:
+        if self._frozen:
+            raise LinkNetworkError("evolution builder is already frozen")
