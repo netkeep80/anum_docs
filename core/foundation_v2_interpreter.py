@@ -7,7 +7,8 @@ it does not tokenize, parse, search, rank or materialize application links.
 The same engine currently replays:
 
 - one-pole relation resolution against exact K/current;
-- one persistent scoped-dictionary ``:`` effect.
+- one persistent scoped-dictionary ``:`` effect;
+- one local exact-representative ``=`` evaluation.
 
 Python dataclasses below are checker/transport API only. Semantic identity lives
 in the exact link occurrences they reference.
@@ -26,9 +27,11 @@ from .foundation_v2_source import (
 from .foundation_v2_state import (
     DictionaryLookupError,
     FoundationStateError,
+    RepresentativeConflictError,
     act_header,
     act_values,
     current_of_context,
+    local_representative,
     lookup_scoped_dictionary,
     parent_of_context,
     read_dictionary_scope,
@@ -108,6 +111,32 @@ class ColonEffectEvidence:
     roles: ColonRoleRefs
 
 
+@dataclass(frozen=True)
+class EqualityRoleRefs:
+    """Exact role refs required to replay one local equality evaluation."""
+
+    context: OccurrenceRef
+    left: OccurrenceRef
+    right: OccurrenceRef
+    left_representative: OccurrenceRef
+    right_representative: OccurrenceRef
+
+
+@dataclass(frozen=True)
+class EqualityEvaluationEvidence:
+    """Checker handle for one exact local equality-evaluation act."""
+
+    interpreter: OccurrenceRef
+    context: OccurrenceRef
+    left: OccurrenceRef
+    right: OccurrenceRef
+    left_representative: OccurrenceRef
+    right_representative: OccurrenceRef
+    act: OccurrenceRef
+    role_dictionary: OccurrenceRef
+    roles: EqualityRoleRefs
+
+
 def replay_relation_step(
     network: LinkNetwork,
     evidence: RelationStepEvidence,
@@ -160,13 +189,7 @@ def replay_colon_effect(
     network: LinkNetwork,
     evidence: ColonEffectEvidence,
 ) -> OccurrenceRef:
-    """Replay one persistent scoped-dictionary definition effect read-only.
-
-    The relation ``sourceContent ⟼ form`` is dictionary data, not equality or a
-    theorem. The exact declaration occurrence is bound to ``D_before`` and
-    appended once to its local history; ``D_after`` is a fresh persistent scope
-    snapshot with the same lexical parent.
-    """
+    """Replay one persistent scoped-dictionary definition effect read-only."""
 
     before_snapshot = network.snapshot()
     try:
@@ -228,9 +251,6 @@ def replay_colon_effect(
                 "new definition is not a valid visible mapping in D_after"
             ) from exc
 
-        # The newly created declaration occurrence must not retroactively become
-        # visible from the immutable predecessor snapshot, even when an older
-        # identical mapping already exists there.
         try:
             verify_visible_dictionary_occurrence(
                 network,
@@ -252,6 +272,40 @@ def replay_colon_effect(
     finally:
         if network.snapshot() != before_snapshot:
             raise InterpreterReplayError("colon replay mutated the network")
+
+
+def replay_equality_evaluation(
+    network: LinkNetwork,
+    evidence: EqualityEvaluationEvidence,
+) -> bool:
+    """Replay one local exact-representative equality evaluation read-only.
+
+    The host boolean is only a convenience result. The exact actual act ``A``
+    records the evaluated context, operands and one-hop representatives.
+    """
+
+    before_snapshot = network.snapshot()
+    try:
+        try:
+            current_of_context(network, evidence.context)
+            left_rep = local_representative(network, evidence.context, evidence.left)
+            right_rep = local_representative(network, evidence.context, evidence.right)
+        except RepresentativeConflictError as exc:
+            raise InterpreterReplayError("conflicting local representative") from exc
+        except FoundationStateError as exc:
+            raise InterpreterReplayError("invalid equality context") from exc
+
+        if evidence.left_representative is not left_rep:
+            raise InterpreterReplayError("forged left representative evidence")
+        if evidence.right_representative is not right_rep:
+            raise InterpreterReplayError("forged right representative evidence")
+
+        _verify_equality_act_header(network, evidence)
+        _verify_equality_act_fields(network, evidence)
+        return left_rep is right_rep
+    finally:
+        if network.snapshot() != before_snapshot:
+            raise InterpreterReplayError("equality replay mutated the network")
 
 
 def _replay_source(
@@ -370,6 +424,43 @@ def _verify_colon_act_fields(
             "after-dictionary",
         ),
         (evidence.roles.context, evidence.context, "context"),
+    )
+    _verify_exact_act_fields(network, evidence.act, expected)
+
+
+def _verify_equality_act_header(
+    network: LinkNetwork,
+    evidence: EqualityEvaluationEvidence,
+) -> None:
+    try:
+        header = act_header(network, evidence.act)
+    except FoundationStateError as exc:
+        raise InterpreterReplayError("invalid equality actual-act header") from exc
+    expected = (evidence.interpreter, evidence.role_dictionary, evidence.context)
+    if header != expected:
+        raise InterpreterReplayError(
+            "equality actual-act header does not match I/D_roles/K"
+        )
+
+
+def _verify_equality_act_fields(
+    network: LinkNetwork,
+    evidence: EqualityEvaluationEvidence,
+) -> None:
+    expected = (
+        (evidence.roles.context, evidence.context, "context"),
+        (evidence.roles.left, evidence.left, "left"),
+        (evidence.roles.right, evidence.right, "right"),
+        (
+            evidence.roles.left_representative,
+            evidence.left_representative,
+            "left-representative",
+        ),
+        (
+            evidence.roles.right_representative,
+            evidence.right_representative,
+            "right-representative",
+        ),
     )
     _verify_exact_act_fields(network, evidence.act, expected)
 
