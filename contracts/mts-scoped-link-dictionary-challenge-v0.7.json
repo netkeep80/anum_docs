@@ -1,0 +1,110 @@
+{
+  "schema": "mts-scoped-link-dictionary-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 215,
+  "dependsOn": [
+    "string-anum-byte-protocol-challenge/v0.7",
+    "mts-semantic-root-kernel-challenge/v0.7"
+  ],
+  "purpose": "Challenge a scoped dictionary represented only by binary links, resolving exact string-Anum source carriers to declarative form refs without a host symbol map or global vocabulary.",
+  "sourceIdentityCandidate": {
+    "input": "exact quaternary byte/string carrier from issue 213",
+    "spine": "H0=R; H(n+1)=Hn ⟼ abitMeaning(token_n); S=Hlast",
+    "rootAbitMeanings": {
+      "[": "O",
+      "]": "C",
+      "1": "L",
+      "0": "U"
+    },
+    "accepted": false,
+    "reason": "the challenge needs an explicit link ref for a physical source carrier; whether this spine is the canonical semantic astring topology remains open"
+  },
+  "dictionaryCandidate": {
+    "entry": "E = S ⟼ F",
+    "membership": "M = D ⟼ E",
+    "lookupPattern": "D ⟼ (S ⟼ ?F)",
+    "dictionaryIsOrdinaryLink": true,
+    "entryIsOrdinaryLink": true,
+    "membershipIsOrdinaryLink": true,
+    "globalDictionaryRequired": false
+  },
+  "resolutionOutcomes": {
+    "zeroMatches": "unknown",
+    "oneDistinctForm": "resolved",
+    "multipleDistinctForms": "conflict",
+    "duplicateExactMembership": "idempotent"
+  },
+  "scopeBoundary": {
+    "sameSourceMayResolveDifferentlyUnderDifferentDictionaries": true,
+    "multipleSourcesMayResolveToSameForm": true,
+    "sourceCarrierEqualsForm": false,
+    "dictionaryMembershipMakesFormAnAxiom": false,
+    "lastWriteWinsAllowed": false
+  },
+  "replayEvidence": {
+    "fields": [
+      "sourceCarrier",
+      "dictionaryRef",
+      "sourceRef",
+      "entryRef",
+      "membershipRef",
+      "formRef"
+    ],
+    "checkerReadOnly": true,
+    "mustRejectForgedSource": true,
+    "mustRejectForgedDictionary": true,
+    "mustRejectForgedEntry": true,
+    "mustRejectForgedMembership": true,
+    "mustRejectForgedForm": true,
+    "mustRejectConflictAsUniqueResolution": true
+  },
+  "formalBootstrapVectors": [
+    "∞",
+    "♂",
+    "♀",
+    "⟼",
+    "↑",
+    ":",
+    "=",
+    "[",
+    "]",
+    "0",
+    "1"
+  ],
+  "requiredAssertions": [
+    "source glyphs are encoded through the exact UTF-8 byte carrier candidate from issue 213",
+    "source refs are reconstructed from their carrier using only the root four-abit meanings",
+    "dictionary lookup after graph construction uses only binary link topology",
+    "one source in one dictionary resolves one form",
+    "unknown source returns unknown",
+    "duplicate identical declaration is idempotent under exact-pair identity",
+    "two different forms for one source in one dictionary produce conflict",
+    "the same source may resolve to different forms in D1 and D2",
+    "two different source spellings may resolve to the same form",
+    "adding a vocabulary entry extends lookup without changing resolver code",
+    "dictionary ref may be ordinary payload elsewhere",
+    "resolution replay is read-only and validates exact source/dictionary/entry/membership/form evidence",
+    "forged evidence and conflicted unique resolution are rejected",
+    "no AST class or host string-to-form map participates in trusted lookup"
+  ],
+  "notDecided": [
+    "whether the source history spine is the canonical astring link topology",
+    "whether dictionary membership is created by executing a colon definition",
+    "how multi-character identifiers and tokenization compose dictionary lookup",
+    "how forms are executed after resolution",
+    "how theory/axiom membership is represented",
+    "production migration"
+  ],
+  "veto": {
+    "hostStringFormMapAllowed": false,
+    "globalDictionarySingletonAllowed": false,
+    "lastWriteWinsAllowed": false,
+    "sourceEqualsFormAllowed": false,
+    "astClassDefinesGlyphMeaning": false,
+    "colonImplicitWriteAllowed": false,
+    "productionChangeAllowed": false,
+    "historicalContractMutationAllowed": false,
+    "aproverRepinAllowed": false
+  }
+}
