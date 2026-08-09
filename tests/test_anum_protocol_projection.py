@@ -11,6 +11,51 @@ from core.anum_protocol import (
     unquote_anum,
     validate_anum,
 )
+from core.foundation_v2_materialization import (
+    SequenceAtom,
+    SequenceDescription,
+    SequenceGroup,
+    find_links,
+    materialize_sequence,
+    replay_resolved_sequence_grouping,
+)
+from core.foundation_v2_root import build_root_kernel
+from core.foundation_v2_source import (
+    SegmentSpec,
+    SourceFrontEndBuilder,
+    replay_source_front_end,
+)
+from core.foundation_v2_state import define_dictionary_effect, define_dictionary_scope
+
+
+def _anchor(builder):
+    ref = builder.reserve()
+    builder.define(ref, ref, ref)
+    return ref
+
+
+def _byte_vocabulary(builder):
+    return {value: _anchor(builder) for value in range(256)}
+
+
+def _dictionary_with(builder, root, front_end, mappings):
+    dictionary = define_dictionary_scope(builder, root, root)
+    parent = root
+    history = root
+    occurrences = []
+    for raw_slice, form in mappings:
+        effect = define_dictionary_effect(
+            builder,
+            dictionary,
+            parent,
+            history,
+            front_end.content_ref(raw_slice),
+            form,
+        )
+        occurrences.append(effect.occurrence)
+        dictionary = effect.after_scope
+        history = effect.history_after
+    return dictionary, tuple(occurrences)
 
 
 def test_root_context_projects_open_close_to_canonical_link_value():
@@ -81,6 +126,117 @@ def test_real_quote_envelope_raises_description_level_one_step():
 
     assert normalize_raw_form(first.projected) == "[][]"
     assert normalize_raw_form(second.projected) == "]["
+
+
+def test_quote_envelope_can_select_carrier_or_deserialized_denotation() -> None:
+    historical_pair = parse_raw_quaternary("01")
+    assert normalize_raw_form(quote_anum(historical_pair)) == "[01]"
+
+    kernel = build_root_kernel()
+    builder = kernel.network.evolve()
+    root = kernel.refs.root
+    opening = kernel.refs.opening
+    closing = kernel.refs.closing
+    unlinked = kernel.refs.unlinked
+    linked = kernel.refs.linked
+
+    carrier_head = builder.reserve()
+    carrier = builder.reserve()
+    builder.define(carrier_head, root, unlinked)
+    builder.define(carrier, carrier_head, linked)
+
+    byte_refs = _byte_vocabulary(builder)
+    front_end = SourceFrontEndBuilder(builder, root, byte_refs)
+    source = front_end.source_occurrence(b"[01]")
+    dictionary, occurrences = _dictionary_with(
+        builder,
+        root,
+        front_end,
+        (
+            (b"[", opening),
+            (b"0", unlinked),
+            (b"1", linked),
+            (b"01", carrier),
+            (b"]", closing),
+        ),
+    )
+
+    deserialize_grammar = _anchor(builder)
+    deserialize_theory = _anchor(builder)
+    carrier_grammar = _anchor(builder)
+    carrier_theory = _anchor(builder)
+
+    deserialize_evidence = front_end.build_selected_evidence(
+        source,
+        (
+            SegmentSpec(0, 1, opening, occurrences[0]),
+            SegmentSpec(1, 2, unlinked, occurrences[1]),
+            SegmentSpec(2, 3, linked, occurrences[2]),
+            SegmentSpec(3, 4, closing, occurrences[4]),
+        ),
+        dictionary=dictionary,
+        grammar=deserialize_grammar,
+        theory=deserialize_theory,
+    )
+    carrier_evidence = front_end.build_selected_evidence(
+        source,
+        (
+            SegmentSpec(0, 1, opening, occurrences[0]),
+            SegmentSpec(1, 3, carrier, occurrences[3]),
+            SegmentSpec(3, 4, closing, occurrences[4]),
+        ),
+        dictionary=dictionary,
+        grammar=carrier_grammar,
+        theory=carrier_theory,
+    )
+    network = builder.freeze()
+    before = network.snapshot()
+
+    assert find_links(network, start=unlinked, end=linked) == ()
+
+    deserialize_forms = replay_source_front_end(
+        network, deserialize_evidence, byte_refs
+    )
+    carrier_forms = replay_source_front_end(network, carrier_evidence, byte_refs)
+    assert deserialize_forms == (opening, unlinked, linked, closing)
+    assert carrier_forms == (opening, carrier, closing)
+
+    deserialize_description = replay_resolved_sequence_grouping(
+        network,
+        deserialize_forms,
+        open_form=opening,
+        close_form=closing,
+    )
+    carrier_description = replay_resolved_sequence_grouping(
+        network,
+        carrier_forms,
+        open_form=opening,
+        close_form=closing,
+    )
+    assert deserialize_description == SequenceDescription(
+        root=root,
+        items=(SequenceGroup((SequenceAtom(unlinked), SequenceAtom(linked))),),
+    )
+    assert carrier_description == SequenceDescription(
+        root=root,
+        items=(SequenceGroup((SequenceAtom(carrier),)),),
+    )
+    assert network.snapshot() == before
+
+    deserialized = materialize_sequence(network, deserialize_description)
+    passed_carrier = materialize_sequence(network, carrier_description)
+
+    assert len(deserialized.created) == 1
+    assert deserialized.created[0].start is unlinked
+    assert deserialized.created[0].end is linked
+    assert deserialized.result is deserialized.created[0].ref
+    assert deserialized.result is not carrier
+
+    assert passed_carrier.created == ()
+    assert passed_carrier.result is carrier
+    assert find_links(passed_carrier.after, start=unlinked, end=linked) == ()
+    assert passed_carrier.after.link(carrier) is network.link(carrier)
+    assert network.snapshot() == before
 
 
 def test_unquote_requires_explicit_outer_envelope():
