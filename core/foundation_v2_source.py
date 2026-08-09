@@ -1,12 +1,13 @@
 """Foundation-v2 source front-end over exact-occurrence link networks.
 
-The trusted operation in this module is *replay of selected evidence*.  Candidate
-segmentation/token search is intentionally outside the trusted core.  A caller
+The trusted operation in this module is *replay of selected evidence*. Candidate
+segmentation/token search is intentionally outside the trusted core. A caller
 supplies exact byte-protocol refs, an exact source occurrence, selected spans,
-explicit dictionary memberships and explicit grammar/theory admission.
+exact visible scoped-dictionary declaration occurrences and explicit
+grammar/theory admission.
 
-Host byte offsets and dataclasses are transport/checker machinery.  They are not
-semantic identity.  The semantic evidence is represented by ordinary links.
+Host byte offsets and dataclasses are transport/checker machinery. They are not
+semantic identity. The semantic evidence is represented by ordinary links.
 No function here materializes the application relation described by source text.
 """
 from __future__ import annotations
@@ -15,7 +16,12 @@ from dataclasses import dataclass
 from typing import Mapping, Sequence
 
 from .exact_link_network import LinkNetwork, LinkNetworkBuilder, OccurrenceRef
-from .foundation_v2_state import define_membership, define_source_occurrence
+from .foundation_v2_state import (
+    DictionaryLookupError,
+    define_membership,
+    define_source_occurrence,
+    verify_visible_dictionary_occurrence,
+)
 
 
 class SourceReplayError(ValueError):
@@ -38,7 +44,7 @@ class SegmentSpec:
     start: int
     end: int
     form: OccurrenceRef
-    dictionary_membership: OccurrenceRef
+    dictionary_occurrence: OccurrenceRef
 
 
 @dataclass(frozen=True)
@@ -52,7 +58,7 @@ class SegmentEvidence:
     slice_evidence: OccurrenceRef
     lexeme: OccurrenceRef
     resolution: OccurrenceRef
-    dictionary_membership: OccurrenceRef
+    dictionary_occurrence: OccurrenceRef
     selection: OccurrenceRef
     form: OccurrenceRef
 
@@ -78,7 +84,7 @@ class SourceFrontEndBuilder:
     """Untrusted construction helper for canonical source/evidence fixtures.
 
     ``byte_refs`` are the exact occurrences selected by the lower canonical byte
-    protocol.  This layer does not redefine the ``[bbbbbbbb]`` carrier; it folds
+    protocol. This layer does not redefine the ``[bbbbbbbb]`` carrier; it folds
     those exact byte refs into canonical source-content histories.
     """
 
@@ -136,8 +142,9 @@ class SourceFrontEndBuilder:
         """Build exact evidence for one caller-selected segmentation.
 
         The function does not choose spans, perform longest-match, parse glyphs or
-        invent dictionary entries.  ``SegmentSpec.dictionary_membership`` must
-        already identify the dictionary evidence that trusted replay will check.
+        invent dictionary definitions. ``SegmentSpec.dictionary_occurrence`` must
+        already identify exact declaration evidence that trusted scoped lookup
+        will prove visible from ``dictionary``.
         """
 
         if self._sources.get(source.source) != source:
@@ -156,7 +163,7 @@ class SourceFrontEndBuilder:
             slice_evidence = self._new_link(span, slice_content)
             lexeme = self._new_link(source.source, slice_evidence)
             resolution = self._new_link(lexeme, spec.form)
-            selection = self._new_link(spec.dictionary_membership, resolution)
+            selection = self._new_link(spec.dictionary_occurrence, resolution)
             segment_evidence.append(
                 SegmentEvidence(
                     start=spec.start,
@@ -166,7 +173,7 @@ class SourceFrontEndBuilder:
                     slice_evidence=slice_evidence,
                     lexeme=lexeme,
                     resolution=resolution,
-                    dictionary_membership=spec.dictionary_membership,
+                    dictionary_occurrence=spec.dictionary_occurrence,
                     selection=selection,
                     form=spec.form,
                 )
@@ -210,9 +217,9 @@ def replay_source_front_end(
     evidence: SourceFrontEndEvidence,
     byte_refs: Mapping[int, OccurrenceRef],
 ) -> tuple[OccurrenceRef, ...]:
-    """Replay selected UTF-8/astring → D/G/T evidence without effects.
+    """Replay selected UTF-8/astring → scoped D/G/T evidence without effects.
 
-    Returns the exact resolved forms in source order.  This function does not
+    Returns the exact resolved forms in source order. This function does not
     search for alternative segmentations and does not create any link.
     """
 
@@ -270,17 +277,20 @@ def replay_source_front_end(
         if resolution.start is not segment.lexeme or resolution.end is not segment.form:
             raise SourceReplayError("forged lexeme resolution")
 
-        _verify_dictionary_membership(
-            network,
-            segment.dictionary_membership,
-            evidence.dictionary,
-            segment.slice_content,
-            segment.form,
-        )
+        try:
+            verify_visible_dictionary_occurrence(
+                network,
+                evidence.dictionary,
+                segment.dictionary_occurrence,
+                segment.slice_content,
+                segment.form,
+            )
+        except DictionaryLookupError as exc:
+            raise SourceReplayError("selected scoped dictionary evidence is invalid") from exc
 
         selection = network.link(segment.selection)
         if (
-            selection.start is not segment.dictionary_membership
+            selection.start is not segment.dictionary_occurrence
             or selection.end is not segment.resolution
         ):
             raise SourceReplayError("forged selected dictionary evidence")
@@ -379,21 +389,6 @@ def _decode_content(
         bytes(reversed(reversed_bytes)),
         tuple(reversed(reversed_prefix_refs)),
     )
-
-
-def _verify_dictionary_membership(
-    network: LinkNetwork,
-    membership_ref: OccurrenceRef,
-    dictionary: OccurrenceRef,
-    slice_content: OccurrenceRef,
-    form: OccurrenceRef,
-) -> None:
-    membership = network.link(membership_ref)
-    if membership.start is not dictionary:
-        raise SourceReplayError("dictionary membership belongs to another dictionary")
-    entry = network.link(membership.end)
-    if entry.start is not slice_content or entry.end is not form:
-        raise SourceReplayError("dictionary entry does not resolve selected slice to selected form")
 
 
 def _verify_direct_membership(
