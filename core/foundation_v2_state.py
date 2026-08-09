@@ -1,22 +1,56 @@
 """Foundation-v2 higher-layer state over the exact-occurrence link substrate.
 
-This module deliberately adds no semantic fields to :class:`Link`.  Contexts,
+This module deliberately adds no semantic fields to :class:`Link`. Contexts,
 dictionaries, theories, grammar evidence and interpretation acts are represented
-only by ordinary exact link occurrences.  The Python functions below are
+only by ordinary exact link occurrences. The Python functions below are
 construction/read helpers for the candidate topology; their function names are
 not MTS ontology.
 
-The module is intentionally storage-neutral and read-only after a network has
-been frozen.  It does not materialize persistent L4 links and does not define
-Anum sequence deserialization (tracked separately by issue #242).
+Foundation-v2 dictionaries use one persistent lexical-scope model. A dictionary
+snapshot is start-self-closed and points to ``parentScope ⟼ localHistory``.
+Definitions append exact occurrences to that history; lookup replays the explicit
+history/parent links rather than consulting a mutable host map.
+
+The module is storage-neutral and read-only after a network has been frozen. It
+does not materialize persistent L4 links and does not define Anum sequence
+deserialization (tracked separately by issue #242).
 """
 from __future__ import annotations
+
+from dataclasses import dataclass
 
 from .exact_link_network import LinkNetwork, LinkNetworkBuilder, OccurrenceRef
 
 
 class FoundationStateError(ValueError):
     """The supplied exact occurrences do not match the candidate topology."""
+
+
+class DictionaryLookupError(FoundationStateError):
+    """A scoped dictionary cannot be replayed or resolved consistently."""
+
+
+class DictionaryConflictError(DictionaryLookupError):
+    """One lexical scope contains distinct forms for the same source content."""
+
+
+@dataclass(frozen=True)
+class DictionaryEffectRefs:
+    """Construction handles for one persistent definition effect."""
+
+    entry: OccurrenceRef
+    occurrence: OccurrenceRef
+    history_after: OccurrenceRef
+    after_scope: OccurrenceRef
+
+
+@dataclass(frozen=True)
+class ScopedDictionaryResolution:
+    """Exact visible occurrences supporting one scoped dictionary resolution."""
+
+    scope: OccurrenceRef
+    form: OccurrenceRef
+    occurrences: tuple[OccurrenceRef, ...]
 
 
 def define_source_occurrence(
@@ -64,37 +98,149 @@ def parent_of_context(network: LinkNetwork, context: OccurrenceRef) -> Occurrenc
     return pair.start
 
 
-def define_dictionary_membership(
+def define_dictionary_scope(
     builder: LinkNetworkBuilder,
-    dictionary: OccurrenceRef,
+    parent_scope: OccurrenceRef,
+    local_history: OccurrenceRef,
+) -> OccurrenceRef:
+    """Create ``D = D ⟼ (parentScope ⟼ localHistory)``."""
+
+    payload = builder.reserve()
+    scope = builder.reserve()
+    builder.define(payload, parent_scope, local_history)
+    builder.define(scope, scope, payload)
+    return scope
+
+
+def define_dictionary_effect(
+    builder: LinkNetworkBuilder,
+    before_scope: OccurrenceRef,
+    parent_scope: OccurrenceRef,
+    history_before: OccurrenceRef,
     source_content: OccurrenceRef,
     form: OccurrenceRef,
-) -> tuple[OccurrenceRef, OccurrenceRef]:
-    """Create ``entry=source⟼form`` and ``membership=D⟼entry``."""
+) -> DictionaryEffectRefs:
+    """Construct one persistent ``:``-style dictionary update.
+
+    The helper is construction-only; trusted replay later verifies that the
+    supplied parent/history really belong to ``before_scope``.
+    """
 
     entry = builder.reserve()
-    membership = builder.reserve()
+    occurrence = builder.reserve()
+    history_after = builder.reserve()
     builder.define(entry, source_content, form)
-    builder.define(membership, dictionary, entry)
-    return entry, membership
+    builder.define(occurrence, before_scope, entry)
+    builder.define(history_after, history_before, occurrence)
+    after_scope = define_dictionary_scope(builder, parent_scope, history_after)
+    return DictionaryEffectRefs(
+        entry=entry,
+        occurrence=occurrence,
+        history_after=history_after,
+        after_scope=after_scope,
+    )
 
 
-def dictionary_forms(
+def read_dictionary_scope(
+    network: LinkNetwork,
+    dictionary: OccurrenceRef,
+) -> tuple[OccurrenceRef, OccurrenceRef]:
+    """Return exact ``(parentScope, localHistory)`` for one dictionary snapshot."""
+
+    if dictionary is network.root:
+        raise DictionaryLookupError("exact root is a dictionary sentinel, not a scope")
+    scope = network.link(dictionary)
+    if scope.start is not dictionary:
+        raise DictionaryLookupError("dictionary scope is not start-self-closed")
+    payload = network.link(scope.end)
+    return payload.start, payload.end
+
+
+def lookup_scoped_dictionary(
     network: LinkNetwork,
     dictionary: OccurrenceRef,
     source_content: OccurrenceRef,
-) -> tuple[OccurrenceRef, ...]:
-    """Return exact forms admitted by matching dictionary membership links."""
+) -> ScopedDictionaryResolution | None:
+    """Resolve source content using local-history-first lexical scope semantics."""
 
-    forms: list[OccurrenceRef] = []
-    for membership_ref in network.refs:
-        membership = network.link(membership_ref)
-        if membership.start is not dictionary:
-            continue
-        entry = network.link(membership.end)
+    visited_scopes: set[OccurrenceRef] = set()
+    current_scope = dictionary
+    while current_scope is not network.root:
+        if current_scope in visited_scopes:
+            raise DictionaryLookupError("dictionary parent cycle")
+        visited_scopes.add(current_scope)
+
+        parent, _ = read_dictionary_scope(network, current_scope)
+        local = _local_dictionary_matches(network, current_scope, source_content)
+        if local:
+            forms = {form for _, form in local}
+            if len(forms) != 1:
+                raise DictionaryConflictError(
+                    "dictionary scope contains distinct local forms for one source"
+                )
+            form = next(iter(forms))
+            return ScopedDictionaryResolution(
+                scope=current_scope,
+                form=form,
+                occurrences=tuple(occurrence for occurrence, _ in local),
+            )
+        current_scope = parent
+    return None
+
+
+def verify_visible_dictionary_occurrence(
+    network: LinkNetwork,
+    dictionary: OccurrenceRef,
+    occurrence: OccurrenceRef,
+    source_content: OccurrenceRef,
+    form: OccurrenceRef,
+) -> None:
+    """Verify an exact declaration occurrence is the visible scoped resolution."""
+
+    resolution = lookup_scoped_dictionary(network, dictionary, source_content)
+    if resolution is None:
+        raise DictionaryLookupError("source content is not visible in dictionary")
+    if resolution.form is not form:
+        raise DictionaryLookupError("visible dictionary form differs from selected form")
+    if occurrence not in resolution.occurrences:
+        raise DictionaryLookupError(
+            "selected declaration occurrence is not visible from current dictionary"
+        )
+
+
+def _local_dictionary_matches(
+    network: LinkNetwork,
+    dictionary: OccurrenceRef,
+    source_content: OccurrenceRef,
+) -> list[tuple[OccurrenceRef, OccurrenceRef]]:
+    parent, history = read_dictionary_scope(network, dictionary)
+    matches: list[tuple[OccurrenceRef, OccurrenceRef]] = []
+    visited_history: set[OccurrenceRef] = set()
+
+    while history is not network.root:
+        if history in visited_history:
+            raise DictionaryLookupError("dictionary local-history cycle")
+        visited_history.add(history)
+
+        cell = network.link(history)
+        previous_history = cell.start
+        occurrence = cell.end
+        occurrence_link = network.link(occurrence)
+        before_scope = occurrence_link.start
+        entry_ref = occurrence_link.end
+
+        before_parent, before_history = read_dictionary_scope(network, before_scope)
+        if before_parent is not parent or before_history is not previous_history:
+            raise DictionaryLookupError(
+                "definition occurrence is not bound to the exact predecessor snapshot"
+            )
+
+        entry = network.link(entry_ref)
         if entry.start is source_content:
-            forms.append(entry.end)
-    return tuple(forms)
+            matches.append((occurrence, entry.end))
+        history = previous_history
+
+    return matches
 
 
 def define_membership(
@@ -114,7 +260,7 @@ def has_exact_membership(
     container: OccurrenceRef,
     value: OccurrenceRef,
 ) -> bool:
-    """Check direct membership without structural equality or materialization."""
+    """Check direct G/T-style membership without equality or materialization."""
 
     return any(
         network.link(ref).start is container and network.link(ref).end is value
