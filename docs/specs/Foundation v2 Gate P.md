@@ -4,13 +4,99 @@
 
 Главный epic: #237.
 
-Цель Gate P — собрать **один** link-only production/reference semantic path и только затем опубликовать следующую accepted версию МТС для `aprover` и других downstream consumers.
+Цель Gate P — собрать **один** production/reference semantic path, сохраняющий фундаментальную остенсивную МТС, и только затем опубликовать следующую accepted версию для `aprover` и других downstream consumers.
 
 ---
 
-# 1. Текущая лестница Gate P
+# 1. Неприкосновенный semantic invariant
 
-Завершённые semantic/docs gates:
+Production implementation может использовать opaque refs, dataclasses, storage records и индексы, но не имеет права подменить ими фундаментальную нотацию МТС.
+
+Первичный reader-facing слой Foundation v2:
+
+```text
+∞        fully self-closed акорень
+♂e       S = S ⟼ e
+b♀       E = b ⟼ E
+b ⟼ e    X = b ⟼ e
+```
+
+То есть:
+
+```text
+ostensive form
+→ exact structural occurrence
+→ implementation carrier
+```
+
+а не наоборот.
+
+`Link(start,end)` — machine/reference representation, не замена `∞ / ♂e / b♀ / b⟼e`.
+
+---
+
+# 2. Root bootstrap
+
+Foundation-v2 semantic kernel:
+
+```text
+R = ∞
+R = R ⟼ R
+O = O ⟼ R
+C = R ⟼ C
+L = O ⟼ C
+U = C ⟼ O
+```
+
+Root vocabulary:
+
+```text
+∞ → R
+[ → O
+] → C
+1 → L
+0 → U
+```
+
+Остенсивно:
+
+```text
+O = O ⟼ R ≡ ♂∞
+C = R ⟼ C ≡ ∞♀
+```
+
+`[ ] 1 0` — distinguished root-derived Anum meanings. `♂/♀` — formal ostensive signs self-closure. Эти source vocabularies связаны, но не тождественны.
+
+---
+
+# 3. Four-form decision
+
+Accepted Foundation-v2 direction from #208/#209:
+
+```text
+R = R ⟼ R      # ∞
+S = S ⟼ e      # start self-closed / ♂e
+E = b ⟼ E      # end self-closed / b♀
+X = b ⟼ e      # complete
+```
+
+Permanent boundaries:
+
+- self-closed shape alone does not mean `incomplete`;
+- another `Q=Q⟼Q` is not root `∞` by shape;
+- multiple `♂e`-shaped S occurrences may coexist;
+- multiple `b♀`-shaped E occurrences may coexist;
+- missing-pole resolution does not mutate the partial relation;
+- inversion swaps the two one-pole forms;
+- constructor/destructor/check/search belong to explicit resolution act, not a second meaning of glyphs.
+
+Historical v0.2 projection-oriented `♀F / F♂` remains historical-only and must not be restored as Foundation-v2 self-closure semantics.
+
+---
+
+# 4. Gate-P implementation ladder
+
+Завершённые gates:
 
 ```text
 P0  production semantic surface audit          #238/#239
@@ -25,17 +111,18 @@ P8  separately T-admitted proof rule           #255/#256
 P9  integrated source→proof→Run checker        #257/#262
 Docs current MTS surface                       #261/#263
 Anum sequence → апамять materialization        #242/#264
+Persistent exact-occurrence L4                 #265/#266
 ```
 
-Текущий единственный L4/release gate:
+Docs regression #267 восстанавливает и защищает остенсивный root surface, который был чрезмерно упрощён в #263.
 
-```text
-#265 persistent exact-occurrence апамять
-```
+---
 
-Historical #124 закрыт как superseded для Foundation v2: его pair uniqueness/idempotent realize semantics относится к старому v0.3 challenge и противоречит exact-occurrence multiplicity.
+# 5. Текущая release-фаза
 
-После #265 release chain:
+Persistent L4 больше не является открытым blocker-ом.
+
+Следующий путь:
 
 ```text
 historical compatibility classification
@@ -46,17 +133,28 @@ historical compatibility classification
 → aprover repin
 ```
 
+До explicit acceptance все Foundation-v2 machine contracts остаются candidate evidence.
+
 ---
 
-# 2. Базовый substrate
+# 6. Exact occurrence substrate
 
-Примитив:
+Machine primitive:
 
 ```text
-Link(start, end)
+Link(start,end)
 ```
 
-Identity принадлежит exact occurrence, а не паре полюсов:
+должен реализовывать, среди прочего, остенсивные shapes:
+
+```text
+∞   ↔ Link(R,R)
+♂e  ↔ Link(S,e) where S is the relation itself
+b♀  ↔ Link(b,E) where E is the relation itself
+b⟼e ↔ Link(b,e)
+```
+
+Identity принадлежит exact occurrence:
 
 ```text
 P1 = A ⟼ B
@@ -84,65 +182,76 @@ snapshot slot
 physical backend address
 ```
 
-`core/exact_link_network.py` поддерживает additive immutable evolution: новое runtime state сохраняет те же exact refs старых occurrences и append-ит новые occurrences без изменения `before`.
+---
+
+# 7. Explicit context K
+
+```text
+P = parent ⟼ current
+K = K ⟼ P
+↑ = current(K)
+```
+
+`current` может быть exact occurrence любой structural form:
+
+```text
+∞
+♂e
+b♀
+b⟼e
+```
+
+Нет ambient current, hidden parent stack или raw-projection pronoun semantics.
 
 ---
 
-# 3. Explicit state и source
-
-Foundation v2 выражает обычными связями:
+# 8. Source / form / theory separation
 
 ```text
-K  context
-D  scoped dictionary
-G  grammar admission
-T  theory admission
-I  interpreter
-A  actual act
-```
-
-Source path:
-
-```text
-UTF-8
-→ canonical content C
+raw UTF-8
+→ canonical astring content C
 → exact source occurrence S
 → selected segmentation
 → scoped D
 → G/T admission
-→ exact form
+→ exact semantic form F
 ```
 
-Token/AST class не является semantic authority.
+В частности UTF-8 glyph `♂` не является self-closure occurrence сам по себе.
+
+Dictionary/theory evidence связывает source с form.
+
+```text
+source != form != theory membership
+```
 
 ---
 
-# 4. Trusted replay
+# 9. Trusted replay
 
-Основное разделение:
+Архитектурное разделение:
 
 ```text
-untrusted search / ranking / execution planning
+untrusted search / ranking / planning
              ↓ selected exact evidence
 trusted deterministic replay
              ↓
 accept / reject
 ```
 
-Replay не ищет candidate, не выбирает Rule, не доверяет shape equality и не materialize-ит отсутствующие links.
+Replay:
+
+- не выбирает candidate;
+- не ищет «похожую» relation по shape как замену exact evidence;
+- не превращает `♂/♀` в host opcodes;
+- не materialize-ит отсутствующие links;
+- не зависит от old AST semantics.
 
 ---
 
-# 5. Persistent K и D
+# 10. Persistent D и `:`
 
-Context:
-
-```text
-P = parent ⟼ current
-K = K ⟼ P
-```
-
-Dictionary:
+Dictionary snapshot:
 
 ```text
 D = D ⟼ (parentScope ⟼ localHistory)
@@ -157,18 +266,15 @@ H_after    = H_before ⟼ Occurrence
 D_after    = D_after ⟼ (sameParent ⟼ H_after)
 ```
 
-Старые `K`/`D` не мутируют.
+`:` — explicit dictionary effect after form resolution, не host assignment.
 
 ---
 
-# 6. `:` и `=`
-
-`:` — explicit persistent dictionary effect.
-
-`=` — local one-hop representative constraint:
+# 11. Local `=`
 
 ```text
-K ⟼ (member ⟼ representative)
+Pair    = member ⟼ representative
+Binding = K ⟼ Pair
 ```
 
 ```text
@@ -176,13 +282,20 @@ Equal_K(a,b)
 ⇔ rep_K(a) is rep_K(b)
 ```
 
-Не встроены global substitution, congruence, transitive alias closure, recursive decomposition или union-find semantics.
+Одинаковая ostensive shape не создаёт equality.
+
+```text
+S1 = S1⟼e
+S2 = S2⟼e
+```
+
+могут оба читаться как pattern `♂e`, но exact `S1 != S2` без representative evidence.
 
 ---
 
-# 7. Actual acts и Run
+# 12. Actual acts и Run
 
-`I` и конкретный `A` различаются.
+`I` и actual `A` различны.
 
 ```text
 Run_0     = R
@@ -195,115 +308,72 @@ Exact continuity:
 A_i.after is A_(i+1).before
 ```
 
-Run фиксирует order/provenance, но не создаёт логическую транзитивность.
+Act фиксирует, какая ostensive/structural form, binding и exact result реально были выбраны.
 
 ---
 
-# 8. Proof rule и integrated checker
+# 13. Proof layer
 
-Первый proof-rule candidate существует только через:
+Первый proof rule существует только через explicit admission:
 
 ```text
 T ⟼ Rule
 ```
 
-Integrated P9 artifact:
+Integrated checker:
 
 ```text
-source `decompose`
-→ scoped D / G / T
+source
+→ D/G/T
 → exact Rule
-→ true equality A_eq in exact K
-→ direct T ⟼ Rule
+→ equality A_eq
+→ T ⟼ Rule
 → A_rule
-→ Run[A_eq, A_rule]
-→ read-only trusted replay
+→ Run[A_eq,A_rule]
+→ trusted replay
 ```
 
-Production-facing modules:
-
-```text
-core/foundation_v2_proof.py
-core/foundation_v2_checker.py
-```
+Никакой AST class не является proof opcode по факту своего host type.
 
 ---
 
-# 9. Апамять как controller
+# 14. Anum sequence materialization
 
-Foundation v2 operationally разделяет:
-
-```text
-READ SIDE
-read / find / enumerate / resolve / replay
-
-EFFECT SIDE
-materialize / define / persist transition
-```
-
-Главный инвариант:
-
-```text
-find / replay != materialize
-```
-
-Индексы и эвристики могут быть backend-specific и недоверенными; semantic acceptance определяется exact evidence.
-
-Подробнее: [Апамять и управление сетью связей](Апамять%20и%20управление%20сетью%20связей.md).
-
----
-
-# 10. #242/#264 — sequence materialization
-
-Foundation-v2 candidate определяет explicit sequence effect:
+Source carrier и result network различны:
 
 ```text
 ∞ A B C
-→ create new exact A⟼B
-→ create new exact B⟼C
+→ new exact A⟼B
+→ new exact B⟼C
 ```
 
-Root `∞` — sentinel и не участвует в adjacency.
-
-Nested group:
+Nested value:
 
 ```text
 [A]   → exact A
-[A B] → X = A ⟼ B, return exact X
+[A B] → X = A⟼B
 ```
 
-Полный пример:
-
-```text
-∞[window][cursor][position][[[x][int]][point]]
-```
-
-даёт nested-first relations:
-
-```text
-XI = X ⟼ I
-Q  = XI ⟼ Point
-WC = Window ⟼ Cursor
-CP = Cursor ⟼ Position
-PQ = Position ⟼ Q
-```
-
-Каждая adjacency создаёт **новый exact occurrence**. Historical `AnumMemory.intern_link` не наследуется.
-
-Подробнее: [Ачисла и сериализация](Ачисла%20и%20сериализация.md).
+`∞` здесь protocol/root sentinel sequence layer, но это operational использование не отменяет его первичного смысла акорня `∞=∞⟼∞`.
 
 ---
 
-# 11. Почему historical L4 #124 superseded
+# 15. Persistent exact-occurrence L4
 
-Старый v0.3 challenge требовал:
+#265/#266 established candidate persistent boundary:
 
 ```text
-exact pair uniqueness
-idempotent realize_link(A,B)
+runtime OccurrenceRef
+persistent dataset-local logical occurrence id
+snapshot-local slot
+physical address
 ```
 
-Foundation v2 требует:
+Same dataset close/reopen preserves logical occurrence lineage.
+
+Fresh topology import creates fresh lineage.
+
+Materialization preserves multiplicity:
 
 ```text
 P1 = materialize(A,B)
@@ -311,184 +381,57 @@ P2 = materialize(A,B)
 P1 ≠ P2
 ```
 
-Поэтому #124 нельзя использовать как production backend contract следующей версии без semantic fork.
-
-Его contracts/tests остаются historical evidence, а новый L4 выводится отдельно в #265.
+Cycles/sharing survive reopen.
 
 ---
 
-# 12. Persistent identity #265
+# 16. Historical compatibility policy
 
-Foundation v2 L4 различает:
+Accepted v0.2–v0.5 remain replayable history.
+
+Historical-only surfaces include:
 
 ```text
-runtime OccurrenceRef
-persistent dataset-local logical occurrence id
-portable snapshot-local slot
-backend physical address / record id
+mtc_parser typed semantic tokens
+AST-class semantic dispatch
+ContextFrame ontology
+historical ♀F / F♂ projections
+historical pair-interning AnumMemory
 ```
 
-Reference logical id:
+Cutover must not preserve them as a second competing Foundation-v2 semantic core.
+
+Each consumer must be:
 
 ```text
-PersistentOccurrenceId(lineage, local)
-```
-
-Reopen того же dataset сохраняет `lineage/local`, но runtime refs могут быть новыми host objects.
-
-Fresh import той же topology создаёт новый lineage:
-
-```text
-same topology != same persistent exact identity
-```
-
-Physical address никогда не является MTS identity.
-
----
-
-# 13. Persistent effect semantics
-
-Persistent controller предоставляет read-only:
-
-```text
-poles
-find
-outgoing
-incoming
-all_occurrences
-snapshot
-```
-
-и explicit effects:
-
-```text
-materialize
-materialize_batch
-```
-
-`materialize(A,B)` всегда создаёт новый exact persistent occurrence.
-
-`materialize_batch` сначала выделяет logical ids всей партии, поэтому может представить self/mutual cycles через `BatchRef`, затем atomically публикует весь state.
-
-Наблюдаемая atomicity:
-
-```text
-либо весь post-state
-либо исходный pre-state
+migrated
+or
+historical-replay-only
+or
+removed from production path
 ```
 
 ---
 
-# 14. Persistence vectors
-
-Gate #265 требует пережить clean reopen без semantic collapse:
-
-```text
-duplicate A⟼B occurrences
-self-cycle
-mutual cycle
-sharing
-root logical identity
-sequence materialization evidence
-```
-
-При этом:
-
-```text
-find remains read-only
-runtime refs may be reconstructed
-snapshot slot is not global identity
-physical address is not semantic identity
-```
-
-Reference executable backend: `core/foundation_v2_persistent.py`.
-
-Machine contract: `contracts/mts-foundation-v2-persistent-l4-v0.7.json`.
-
-Подробнее: [Foundation v2 Persistent L4](Foundation%20v2%20Persistent%20L4.md).
-
----
-
-# 15. Sequence replay после reopen
-
-Persistent L4 не копирует Anum grammar.
-
-```text
-persistent store
-→ reconstruct runtime exact network
-→ foundation_v2_materialization.py
-→ normalize created edges to persistent ids
-→ atomic persistent batch
-```
-
-После reopen persistent evidence снова реконструирует runtime before/after lineage и вызывает тот же `replay_sequence_materialization`.
-
-Storage layer не становится вторым sequence interpreter.
-
----
-
-# 16. JSON reference backend boundary
-
-`JsonExactLinkStore` — executable persistence evidence, а не нормативный storage format.
-
-Production implementation может быть:
-
-```text
-PersistMemoryManager adapter
-custom mmap store
-transactional DB
-another exact-link backend
-```
-
-если observable semantics совпадает.
-
-Правильная зависимость:
-
-```text
-Foundation-v2 L4 contract
-        ↑ implemented by
-backend adapter
-```
-
-а не наоборот.
-
----
-
-# 17. Historical compatibility
-
-Accepted v0.2–v0.5 остаются reproducible historical contracts.
-
-В частности:
-
-```text
-mtc_parser / typed AST / ContextFrame
-historical root program
-recursive Anum v0.2
-historical AnumMemory pair interning
-historical L4 v0.3 pair-unique challenge
-```
-
-не удаляются задним числом.
-
-Но production cutover не должен оставить два равноправных semantic cores. Каждый legacy consumer должен быть migrated, preserved as historical-only, либо removed from production path.
-
----
-
-# 18. Acceptance criterion
+# 17. Acceptance criterion
 
 Следующая версия МТС принимается только как одна интегрированная система:
 
 ```text
-exact occurrence network
+ostensive root ∞ / ♂e / b♀ / b⟼e
++ distinguished ∞ [ ] 1 0 bootstrap
++ exact occurrence network
 + source/D/G/T/K/A
 + relation/:/=
 + proof/Run/checker
 + sequence materialization
-+ persistent exact-occurrence L4
-+ cutover
++ persistent L4
++ atomic cutover
 + versioned conformance
 ```
 
-После закрытия #265 следующий фокус — **compatibility classification и atomic cutover**, а не новый параллельный semantic subsystem.
+Особый veto для release:
 
-До explicit acceptance все Foundation-v2 contracts остаются candidate evidence, а `aprover` не repin-ится.
+> Foundation v2 нельзя считать корректно документированной или принятой, если executable implementation зелёная, но основная теория снова скрывает `∞ / ♂ / ♀` за одним только `Link(start,end)`.
+
+Остенсивность является частью semantic surface, которую production path обязан сохранять и объяснять.
