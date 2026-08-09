@@ -52,6 +52,7 @@
   },
   "trustedReplay": {
     "atomicFields": [
+      "occurrenceRef",
       "theoryRef",
       "ruleRef",
       "contextRef",
@@ -62,6 +63,7 @@
       "outcome"
     ],
     "decompositionFields": [
+      "occurrenceRef",
       "theoryRef",
       "ruleRef",
       "contextRef",
@@ -69,6 +71,7 @@
       "rightRelationRef",
       "generatedConstraints"
     ],
+    "checksExactOccurrence": true,
     "checksExactTheoryMembership": true,
     "checksExactContext": true,
     "checksExactRepresentatives": true,
@@ -98,6 +101,7 @@
     "a root-like distinct self-cycle does not collapse to the unique root ref",
     "shared/cyclic relation inputs remain finite because decomposition is one step over exact refs",
     "local equality does not materialize substitution into unrelated relations",
+    "equality/decomposition replay is bound to one explicit link occurrence, so editing T/rule/K/operands on the recorded occurrence rejects",
     "forged T, rule, K, representative, result or decomposition evidence rejects",
     "trusted replay is read-only"
   ],
