@@ -12,6 +12,7 @@ from core.foundation_v2_materialization import (
     SequenceGroup,
     materialize_sequence,
     replay_resolved_sequence_grouping,
+    replay_root_opening_restoration,
 )
 from core.foundation_v2_root import build_root_kernel
 from core.foundation_v2_source import (
@@ -256,6 +257,69 @@ def test_source_root_brackets_drive_nested_sequence_deserialization() -> None:
     assert network.snapshot() == before
 
 
+def test_root_opening_restoration_reuses_exact_opening_occurrence() -> None:
+    kernel = build_root_kernel()
+    builder = kernel.network.evolve()
+    opening = kernel.refs.opening
+    closing = kernel.refs.closing
+    a = _anchor(builder)
+    b = _anchor(builder)
+    c = _anchor(builder)
+    d = _anchor(builder)
+    same_poles_as_opening = builder.reserve()
+    builder.define(same_poles_as_opening, opening, kernel.refs.root)
+    network = builder.freeze()
+
+    before = network.snapshot()
+    collapsed = (opening, a, b, closing, c, closing, d)
+    restored = replay_root_opening_restoration(
+        network,
+        collapsed,
+        open_form=opening,
+        close_form=closing,
+    )
+    assert restored == (opening, opening, a, b, closing, c, closing, d)
+    assert restored[0] is opening and restored[1] is opening
+    assert network.snapshot() == before
+
+    description = replay_resolved_sequence_grouping(
+        network,
+        restored,
+        open_form=opening,
+        close_form=closing,
+    )
+    assert description == SequenceDescription(
+        root=kernel.refs.root,
+        items=(
+            SequenceGroup(
+                (
+                    SequenceGroup((SequenceAtom(a), SequenceAtom(b))),
+                    SequenceAtom(c),
+                )
+            ),
+            SequenceAtom(d),
+        ),
+    )
+
+    balanced = (opening, a, b, closing, c)
+    assert replay_root_opening_restoration(
+        network,
+        balanced,
+        open_form=opening,
+        close_form=closing,
+    ) == balanced
+
+    assert network.link(same_poles_as_opening) == network.link(opening)
+    shape_duplicate_carrier = (same_poles_as_opening, a, closing)
+    assert replay_root_opening_restoration(
+        network,
+        shape_duplicate_carrier,
+        open_form=opening,
+        close_form=closing,
+    ) == shape_duplicate_carrier
+    assert network.snapshot() == before
+
+
 def test_ambiguous_segmentations_are_both_replayable_without_longest_match() -> None:
     builder, root, byte_refs, front_end, grammar, theory = _base_fixture()
     form_a = _anchor(builder)
@@ -364,7 +428,10 @@ def test_forged_grammar_or_theory_admission_is_rejected() -> None:
     form = _anchor(builder)
     source = front_end.source_occurrence(b"x")
     dictionary, occurrences = _dictionary_with(
-        builder, root, front_end, ((b"x", form),)
+        builder,
+        root,
+        front_end,
+        ((b"x", form),),
     )
     evidence = front_end.build_selected_evidence(
         source,
