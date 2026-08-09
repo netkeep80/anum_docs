@@ -2,7 +2,7 @@
   "schema": "mts-multistep-interpreter-run-challenge/v0.7",
   "status": "candidate-challenge",
   "accepted": false,
-  "issue": 224,
+  "issue": 230,
   "dependsOn": [
     "mts-foundation-v2-integrated-direction-decision/v0.7",
     "mts-integrated-interpreter-act-challenge/v0.7",
