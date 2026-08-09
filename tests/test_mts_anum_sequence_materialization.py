@@ -15,6 +15,7 @@ from core.foundation_v2_materialization import (
     SequenceMaterializationError,
     find_links,
     materialize_sequence,
+    replay_resolved_sequence_grouping,
     replay_sequence_materialization,
 )
 
@@ -167,6 +168,96 @@ def test_same_carrier_can_be_passed_as_value_or_deserialized_to_target() -> None
     assert target_outer.end is target.ref
     assert deserialized_value.after.link(carrier) is before.link(carrier)
     assert before.snapshot() == before_snapshot
+
+
+def test_resolved_grouping_builds_nested_deserialization_without_effect() -> None:
+    before, _, refs = _base_network(("open", "close", "a", "b", "c"))
+    snapshot = before.snapshot()
+
+    description = replay_resolved_sequence_grouping(
+        before,
+        (
+            refs["open"],
+            refs["a"],
+            refs["b"],
+            refs["close"],
+            refs["c"],
+        ),
+        open_form=refs["open"],
+        close_form=refs["close"],
+    )
+
+    assert description == _description(
+        before.root,
+        _group(_atom(refs["a"]), _atom(refs["b"])),
+        _atom(refs["c"]),
+    )
+    assert before.snapshot() == snapshot
+
+    evidence = materialize_sequence(before, description)
+    assert len(evidence.created) == 2
+    nested, outer = evidence.created
+    assert (nested.start, nested.end) == (refs["a"], refs["b"])
+    assert outer.start is nested.ref
+    assert outer.end is refs["c"]
+
+
+def test_resolved_grouping_uses_exact_delimiter_identity_not_link_shape() -> None:
+    builder = LinkNetworkBuilder()
+    root = builder.reserve()
+    left = builder.reserve()
+    right = builder.reserve()
+    open_form = builder.reserve()
+    same_shape = builder.reserve()
+    close_form = builder.reserve()
+    value = builder.reserve()
+    builder.define(root, root, root)
+    builder.define(left, left, left)
+    builder.define(right, right, right)
+    builder.define(open_form, left, right)
+    builder.define(same_shape, left, right)
+    builder.define(close_form, close_form, close_form)
+    builder.define(value, value, value)
+    network = builder.freeze(root)
+
+    assert open_form is not same_shape
+    assert network.link(open_form) == network.link(same_shape)
+
+    description = replay_resolved_sequence_grouping(
+        network,
+        (same_shape, value),
+        open_form=open_form,
+        close_form=close_form,
+    )
+    assert description.items == (_atom(same_shape), _atom(value))
+
+
+def test_resolved_grouping_rejects_unbalanced_or_empty_groups() -> None:
+    before, _, refs = _base_network(("open", "close", "a"))
+
+    with pytest.raises(SequenceMaterializationError, match="unexpected close"):
+        replay_resolved_sequence_grouping(
+            before,
+            (refs["close"], refs["a"]),
+            open_form=refs["open"],
+            close_form=refs["close"],
+        )
+
+    with pytest.raises(SequenceMaterializationError, match="missing close"):
+        replay_resolved_sequence_grouping(
+            before,
+            (refs["open"], refs["a"]),
+            open_form=refs["open"],
+            close_form=refs["close"],
+        )
+
+    with pytest.raises(SequenceMaterializationError, match="cannot be empty"):
+        replay_resolved_sequence_grouping(
+            before,
+            (refs["open"], refs["close"]),
+            open_form=refs["open"],
+            close_form=refs["close"],
+        )
 
 
 def test_infinity_abc_creates_adjacent_relations_and_returns_last_edge() -> None:
