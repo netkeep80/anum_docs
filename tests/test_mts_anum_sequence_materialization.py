@@ -70,9 +70,7 @@ def test_evolution_preserves_base_exact_identity_and_keeps_before_immutable() ->
     assert before.snapshot() == before_snapshot
     assert after.root is root
     assert after.refs[: len(before.refs)] == before.refs
-    assert all(
-        after.refs[index] is ref for index, ref in enumerate(before.refs)
-    )
+    assert all(after.refs[index] is ref for index, ref in enumerate(before.refs))
     assert after.link(refs["a"]) is before.link(refs["a"])
     assert after.link(created).start is refs["a"]
     assert after.link(created).end is refs["b"]
@@ -160,6 +158,41 @@ def test_nested_ab_is_one_outer_value_in_infinity_group_ab_c() -> None:
     assert outer.start is inner.ref
     assert outer.end is refs["c"]
     assert evidence.result is outer.ref
+
+
+def test_existing_relation_and_nested_result_are_peer_sequence_values() -> None:
+    builder = LinkNetworkBuilder()
+    root = builder.reserve()
+    a = builder.reserve()
+    b = builder.reserve()
+    c = builder.reserve()
+    d = builder.reserve()
+    existing = builder.reserve()
+    builder.define(root, root, root)
+    for ref in (a, b, c, d):
+        builder.define(ref, ref, ref)
+    builder.define(existing, a, b)
+    before = builder.freeze(root)
+
+    before_snapshot = before.snapshot()
+    evidence = materialize_sequence(
+        before,
+        _description(
+            root,
+            _atom(existing),
+            _group(_atom(c), _atom(d)),
+        ),
+    )
+
+    assert before.snapshot() == before_snapshot
+    assert len(evidence.created) == 2
+    nested_result, outer = evidence.created
+    assert evidence.after.link(existing) is before.link(existing)
+    assert (nested_result.start, nested_result.end) == (c, d)
+    assert outer.start is existing
+    assert outer.end is nested_result.ref
+    assert evidence.result is outer.ref
+    assert replay_sequence_materialization(before, evidence) is outer.ref
 
 
 def test_singleton_group_returns_exact_item_without_materialization() -> None:
