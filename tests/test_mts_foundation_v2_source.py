@@ -6,6 +6,11 @@ from pathlib import Path
 import pytest
 
 from core.exact_link_network import LinkNetworkBuilder
+from core.foundation_v2_materialization import (
+    SequenceAtom,
+    SequenceDescription,
+    materialize_sequence,
+)
 from core.foundation_v2_source import (
     SegmentSpec,
     SourceFrontEndBuilder,
@@ -133,6 +138,52 @@ def test_same_bytes_can_resolve_differently_under_explicit_dictionaries() -> Non
     assert evidence_one.source is evidence_two.source
 
 
+def test_dictionary_resolved_exact_link_is_direct_sequence_value() -> None:
+    builder, root, byte_refs, front_end, grammar, theory = _base_fixture()
+    a = _anchor(builder)
+    b = _anchor(builder)
+    prefix = _anchor(builder)
+    existing = builder.reserve()
+    builder.define(existing, a, b)
+
+    raw = b"existing"
+    source = front_end.source_occurrence(raw)
+    dictionary, occurrences = _dictionary_with(
+        builder,
+        root,
+        front_end,
+        ((raw, existing),),
+    )
+    evidence = front_end.build_selected_evidence(
+        source,
+        (SegmentSpec(0, len(raw), existing, occurrences[0]),),
+        dictionary=dictionary,
+        grammar=grammar,
+        theory=theory,
+    )
+    network = builder.freeze(root)
+
+    before = network.snapshot()
+    resolved = replay_source_front_end(network, evidence, byte_refs)
+    assert resolved == (existing,)
+    assert network.snapshot() == before
+
+    materialized = materialize_sequence(
+        network,
+        SequenceDescription(
+            root=root,
+            items=(SequenceAtom(prefix), SequenceAtom(resolved[0])),
+        ),
+    )
+
+    assert len(materialized.created) == 1
+    outer = materialized.created[0]
+    assert outer.start is prefix
+    assert outer.end is existing
+    assert materialized.after.link(existing) is network.link(existing)
+    assert network.snapshot() == before
+
+
 def test_ambiguous_segmentations_are_both_replayable_without_longest_match() -> None:
     builder, root, byte_refs, front_end, grammar, theory = _base_fixture()
     form_a = _anchor(builder)
@@ -233,7 +284,7 @@ def test_occurrence_not_visible_from_selected_dictionary_is_rejected() -> None:
     network = builder.freeze(root)
 
     with pytest.raises(SourceReplayError, match="scoped dictionary evidence"):
-        replay_source_front_end(network, evidence, byte_refs)
+        replay_source_front_end(network, forged, byte_refs)
 
 
 def test_forged_grammar_or_theory_admission_is_rejected() -> None:
