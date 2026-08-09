@@ -1,0 +1,84 @@
+{
+  "schema": "mts-foundation-v2-source/v0.7",
+  "status": "gate-p-candidate",
+  "accepted": false,
+  "issue": 245,
+  "parent": 237,
+  "dependsOn": [
+    "mts-exact-occurrence-link-network/v0.7",
+    "mts-foundation-v2-state/v0.7",
+    "astring-link-topology-challenge/v0.7",
+    "mts-source-sequence-challenge/v0.7"
+  ],
+  "path": [
+    "raw bytes",
+    "canonical astring content C",
+    "exact source occurrence S",
+    "selected exact segmentation evidence",
+    "explicit D membership per slice",
+    "ordered resolved form sequence",
+    "explicit G membership",
+    "explicit T membership"
+  ],
+  "source": {
+    "contentTopology": "C_0=R; C_(n+1)=C_n ⟼ B(byte_n)",
+    "sourceOccurrenceTopology": "S = S ⟼ C",
+    "byteProtocolRefsAreSuppliedByLowerLayer": true,
+    "rawBytesAreSemanticIdentity": false,
+    "unicodeNormalization": "none",
+    "invalidUtf8ByteContentRepresentable": true
+  },
+  "selectedSegment": {
+    "spanTopology": "Span = sourcePrefix(start) ⟼ sourcePrefix(end)",
+    "sliceEvidenceTopology": "SliceEvidence = Span ⟼ sliceContent",
+    "lexemeOccurrenceTopology": "Lexeme = S ⟼ SliceEvidence",
+    "resolutionTopology": "Resolution = Lexeme ⟼ form",
+    "selectionTopology": "Selection = exactDictionaryMembership ⟼ Resolution",
+    "hostOffsetsAreTransportEvidenceNotSemanticIdentity": true
+  },
+  "dictionary": {
+    "entryTopology": "Entry = sliceContent ⟼ form",
+    "membershipTopology": "Membership = D ⟼ Entry",
+    "membershipMustBeExactSelectedEvidence": true,
+    "sameBytesMayResolveDifferentlyUnderDifferentDictionaries": true
+  },
+  "sequence": {
+    "selectionSequence": "fold(R, exact Selection occurrences in source order)",
+    "formSequence": "fold(R, resolved exact form occurrences in source order)",
+    "grammarMembership": "G ⟼ formSequence",
+    "theoryMembership": "T ⟼ formSequence",
+    "implicitLongestMatch": false,
+    "candidateSearchTrusted": false
+  },
+  "replay": {
+    "selectedBoundariesVerifiedAgainstCanonicalSourceHistory": true,
+    "sliceContentVerifiedAgainstExactSelectedBytes": true,
+    "dictionaryMembershipVerified": true,
+    "grammarMembershipVerified": true,
+    "theoryMembershipVerified": true,
+    "orderedSequencesVerified": true,
+    "readOnly": true,
+    "applicationLinkMaterialization": false
+  },
+  "productionBoundary": {
+    "legacyParserDependency": false,
+    "legacyAstDependency": false,
+    "tokenKindSemanticIdentity": false,
+    "perGlyphSemanticDispatch": false,
+    "sequenceToApamemorySemanticsOwnedByIssue": 242,
+    "persistentBackendOwnedByIssue": 124,
+    "interpreterMigrationDone": false,
+    "aproverRepinAllowed": false
+  },
+  "requiredVectors": [
+    "multi-byte UTF-8 glyph selected as one slice",
+    "same bytes under D1/D2 resolve differently",
+    "ambiguous split and whole-token segmentations both replay when explicitly admitted",
+    "forged span rejects",
+    "wrong dictionary rejects",
+    "forged G/T admission rejects",
+    "partial/non-contiguous partition rejects",
+    "read-only replay does not create described application links"
+  ],
+  "nextGate": "one interpreter/replay engine consuming this exact source evidence and explicit K/D/G/T/A state"
+}
