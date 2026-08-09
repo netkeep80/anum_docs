@@ -1,0 +1,165 @@
+{
+  "schema": "mts-foundation-integrated-challenge/v0.6",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 190,
+  "dependsOn": [
+    "mts-current-link-equality-decision/v0.6",
+    "mts-root-anum-foundation-decision/v0.6",
+    "mts-nesting-continuation-foundation-decision/v0.6"
+  ],
+  "purpose": "Execute one finite cross-boundary vertical slice that uses the same semantic refs for current-link deixis, raw destructors, local equality, shared-root Anum anchors and nested act/state passing, so compatibility is challenged rather than inferred from isolated green gates.",
+  "integratedAlgebra": {
+    "constructor": "A ⟼ B",
+    "rawStart": "♀F",
+    "rawEnd": "F♂",
+    "current": "↑",
+    "derivedCurrentStart": "♀↑",
+    "derivedCurrentEnd": "↑♂",
+    "primitiveLeftRightPronouns": false,
+    "parentAscent": false,
+    "constructiveProjectionWrapper": false
+  },
+  "sharedCarrier": {
+    "root": {
+      "R": "(R,R)",
+      "O": "(O,R)",
+      "C": "(R,C)",
+      "L": "(O,C)",
+      "U": "(C,O)"
+    },
+    "currents": {
+      "XEQ": "(L,L)",
+      "XNEQ": "(L,U)",
+      "XUNPASSED": "(U,U)",
+      "XC": "(XEQ,U)",
+      "XG": "(XC,O)",
+      "XR": "(XEQ,L)"
+    },
+    "actState": [
+      "AC=(SC_before,SC_after)",
+      "AG=(SG_before,SG_after)",
+      "AP=(SP_before,SP_after)",
+      "CallParentChild=(AP,AC)",
+      "CallChildGrandchild=(AC,AG)",
+      "History=(AC,AP)"
+    ],
+    "finite": true,
+    "closed": true,
+    "exactPairUnique": true,
+    "sameRefsUsedAcrossAllIntegratedVectors": true
+  },
+  "currentEqualityIntegration": {
+    "XEQ": {
+      "currentPoles": ["L", "L"],
+      "derivedLinkComparison": true
+    },
+    "XNEQ": {
+      "currentPoles": ["L", "U"],
+      "derivedLinkComparison": false
+    },
+    "comparisonMeaning": "compare immediate raw pole representatives of the two current operands only",
+    "recursiveGraphEquality": false,
+    "globalRewrite": false,
+    "l4IdentityRequired": false
+  },
+  "anumIntegration": {
+    "open": "O",
+    "close": "C",
+    "protocol:1": "L",
+    "protocol:0": "U",
+    "sameLAndURefsAsEqualityAndCurrentGraph": true,
+    "reuseRecursiveV02Denotation": true,
+    "recursiveGrammarFork": false,
+    "anchorInternalTopologyReadByRecursiveDenotation": false,
+    "canonicalInverseChanged": false,
+    "rootOpeningCollapseChanged": false
+  },
+  "nestingIntegration": {
+    "childCurrent": "XC=(XEQ,U)",
+    "grandchildCurrent": "XG=(XC,O)",
+    "continuationCurrent": "XR=(XEQ,L)",
+    "childObservations": ["♀↑=XEQ", "↑♂=U"],
+    "grandchildObservations": ["♀↑=XC", "↑♂=O", "♀(♀↑)=XEQ", "(♀↑)♂=U"],
+    "continuationObservations": ["♀↑=XEQ", "↑♂=L"],
+    "unpassedDataImplicitlyVisible": false,
+    "hostParentRequired": false,
+    "secondDeicticAnchorRequired": false
+  },
+  "serializationReplay": {
+    "packet": "canonical finite links + explicit current + explicit local aliases + raw Anum input",
+    "ambientContextIncluded": false,
+    "ambientInterpreterIdentityIncluded": false,
+    "hostParentStackIncluded": false,
+    "deterministic": true
+  },
+  "materializationBoundary": {
+    "virtualCarrierIsPrimarySemanticInput": true,
+    "optionalExactPairMaterializationSupported": true,
+    "materializationRequiredForInterpretation": false,
+    "sameNumericRefsRequiredAcrossVirtualAndL4Representations": false,
+    "implicitRealization": false
+  },
+  "preservedProperties": [
+    "L0 everything-is-link direction",
+    "finite cyclic carrier",
+    "interpret != realize",
+    "find != realize",
+    "local equality/no global rewrite boundary",
+    "accepted recursive Anum v0.2 raw grammar",
+    "accepted recursive Anum v0.2 canonical inverse",
+    "protocol:0/protocol:1 anchor names",
+    "special []/][ precedence",
+    "quote and relative Anum historical behavior",
+    "occurrence-local anonymous holes",
+    "deterministic explicit replay inputs"
+  ],
+  "intentionalDeltas": [
+    "♀/♂ preferred meaning changes from semantic wrapper lookup to raw pole destruction",
+    "↑ preferred meaning changes from parent-depth prefix to one current semantic link",
+    "◁/▷ are derived rather than primitive",
+    "ContextFrame is removed from preferred ontology",
+    "root self-cycle becomes explicit ∞ : ∞ ⟼ ∞",
+    "open/close/link/unlink become explicit shared R/O/C/L/U root meanings",
+    "historical compound occurrence-copy carrier topology is not semantic identity",
+    "host parent chain is replaced by explicit nested current/state links"
+  ],
+  "forbiddenHiddenBridges": [
+    "ContextFrame ontology",
+    "ContextPronoun START/END primitives",
+    "find_start_projection/find_end_projection semantics for candidate ♀/♂",
+    "host parent stack",
+    "ambient interpreter/session identity",
+    "graph isomorphism as implicit =",
+    "generic incoming search as caller meaning",
+    "implicit L4 realization",
+    "parallel recursive Anum grammar"
+  ],
+  "challengeAssertions": [
+    "one finite graph satisfies root/current/equality/nesting vectors together",
+    "XEQ succeeds and XNEQ fails under the same local equality implementation",
+    "L/U used as current operands are the same semantic refs bound to protocol:1/protocol:0",
+    "recursive Anum replay remains independent of L/U internal sharing",
+    "nested currents reuse the same raw destructors without parent semantics",
+    "unpassed values are not reachable from a local current",
+    "canonical serialized replay is deterministic",
+    "optional L4 exact-pair materialization preserves observed ordered poles without becoming required identity",
+    "historical artifacts remain immutable"
+  ],
+  "exitBoundary": {
+    "greenMeans": "candidate foundation is cross-boundary coherent enough to design one canonical production/reference migration",
+    "greenMeansAcceptedFoundation": false,
+    "greenAllowsProductionMigrationDesign": true,
+    "greenAllowsProductionSemanticChangeImmediately": false,
+    "greenAllowsAproverRepin": false,
+    "next": "integrated candidate-decision plus production migration/reference-model epic"
+  },
+  "veto": {
+    "acceptedContractLinkAllowed": false,
+    "productionParserChangeAllowed": false,
+    "productionInterpreterChangeAllowed": false,
+    "productionRootChangeAllowed": false,
+    "aproverRepinAllowed": false,
+    "historicalContractsMutable": false
+  }
+}
