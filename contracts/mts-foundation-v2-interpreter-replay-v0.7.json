@@ -3,32 +3,47 @@
   "status": "gate-p-candidate",
   "accepted": false,
   "issue": 247,
+  "refinedByIssue": 249,
   "parent": 237,
   "dependsOn": [
     "mts-exact-occurrence-link-network/v0.7",
     "mts-foundation-v2-state/v0.7",
     "mts-foundation-v2-source/v0.7",
-    "mts-integrated-interpreter-act-challenge/v0.7"
+    "mts-integrated-interpreter-act-challenge/v0.7",
+    "mts-foundation-v2-colon/v0.7"
   ],
-  "scope": "one read-only one-pole relation-resolution act",
-  "path": [
-    "replay exact selected source evidence",
-    "obtain exactly one selected form occurrence",
-    "read exact active K/current",
-    "bind current to the one open pole",
-    "verify exact result occurrence and poles",
-    "verify persistent K_after",
-    "verify actual act header and exact role-addressed fields"
-  ],
-  "resolution": {
+  "engine": {
+    "oneTrustedReplayPath": true,
+    "supportedActs": [
+      "one-pole relation resolution",
+      "persistent scoped dictionary colon effect"
+    ],
+    "parallelDefinitionInterpreter": false
+  },
+  "relationResolution": {
+    "path": [
+      "replay exact selected source evidence",
+      "obtain exactly one selected form occurrence",
+      "read exact active K/current",
+      "bind current to the one open pole",
+      "verify exact result occurrence and poles",
+      "verify persistent K_after",
+      "verify actual act header and exact role-addressed fields"
+    ],
     "startOpen": "F = F ⟼ e => result = current ⟼ e",
     "endOpen": "F = b ⟼ F => result = b ⟼ current",
     "directionFromExactFormStructure": true,
     "glyphOrOpcodeDispatch": false,
-    "completedFormAcceptedByThisSlice": false,
-    "fullySelfClosedFormAcceptedByThisSlice": false,
     "resultPairUniquenessRequired": false,
     "selectedResultOccurrenceMustBeExact": true
+  },
+  "colon": {
+    "contract": "mts-foundation-v2-colon/v0.7",
+    "dictionaryModel": "persistent scoped D only",
+    "sameReplayModule": true,
+    "impliesEquality": false,
+    "impliesTheorem": false,
+    "rhsRecursiveEvaluation": false
   },
   "context": {
     "before": "K_before = K_before ⟼ (parent ⟼ current)",
@@ -43,46 +58,21 @@
       "H = I ⟼ P0",
       "A = A ⟼ H"
     ],
-    "requiredRoleFields": [
-      "source",
-      "source-selection",
-      "form-sequence",
-      "dictionary",
-      "grammar",
-      "theory",
-      "form",
-      "before-context",
-      "binding",
-      "result",
-      "after-context"
-    ],
     "fieldTopology": "A ⟼ (roleRef ⟼ value)",
+    "roleDictionaryIsScoped": true,
     "roleRefsAreExact": true,
     "hostFieldNamesAreSemanticIdentity": false,
     "duplicateOrConflictingRequiredFieldRejects": true
   },
   "replay": {
-    "sourceFrontEndReplayed": true,
+    "sourceFrontEndReplayedForRelationActs": true,
     "checkerReadOnly": true,
     "networkSnapshotMustRemainEqual": true,
     "searchRankingTrusted": false,
     "applicationLinkMaterialization": false,
     "persistentBackendEffect": false
   },
-  "requiredVectors": [
-    "start-open form resolves using exact current",
-    "end-open form resolves symmetrically",
-    "selected exact result succeeds even when another occurrence has the same poles",
-    "forged binding rejects",
-    "substituting another same-pole result rejects when K_after/act select the original",
-    "completed form rejects in one-pole slice",
-    "forged source evidence rejects",
-    "conflicting actual-act field rejects",
-    "forged act header rejects",
-    "replay does not import legacy parser/AST/interpreter semantics"
-  ],
   "deferredSameEngineExtensions": {
-    "colonPersistentDictionaryEffect": 224,
     "localEqualityConstraint": 225,
     "multiStepRun": 230,
     "anumSequenceMaterialization": 242,
@@ -95,5 +85,5 @@
     "productionCutoverDone": false,
     "aproverRepinAllowed": false
   },
-  "nextGate": "extend this same trusted engine with the already-decided explicit colon/equality semantics before integrated conformance and cutover"
+  "nextGate": "integrate local equality decision #225 into this same trusted engine, then move toward multistep/integrated conformance"
 }
