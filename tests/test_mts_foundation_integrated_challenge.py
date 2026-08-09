@@ -1,9 +1,8 @@
 """Integrated non-normative MTS v0.6 foundation challenge for issue #190.
 
 One finite semantic graph is reused across raw projection, current-link deixis,
-local link comparison, Anum anchor binding and nested act/state vectors.  The
-model is deliberately test-local: green evidence authorizes migration design,
-not production semantics.
+local comparison, Anum anchor binding and nested act/state vectors.  Green
+results authorize migration design only, not production semantics.
 """
 
 from __future__ import annotations
@@ -110,7 +109,10 @@ class ReplayPacket:
     def from_json(cls, source: str) -> ReplayPacket:
         data = json.loads(source)
         return cls(
-            links={str(key): [int(value[0]), int(value[1])] for key, value in data["links"].items()},
+            links={
+                str(key): [int(value[0]), int(value[1])]
+                for key, value in data["links"].items()
+            },
             current=int(data["current"]),
             aliases=tuple((int(left), int(right)) for left, right in data["aliases"]),
             raw_anum=str(data["rawAnum"]),
@@ -343,16 +345,11 @@ def test_all_accepted_recursive_anum_v02_vectors_still_replay_over_opaque_protoc
 def test_nested_child_grandchild_and_continuation_reuse_only_the_same_raw_destructors():
     graph, ref = integrated_graph()
 
-    # XC=(XEQ,U): child receives explicit outer/current value and local U.
     assert graph.poles(ref["XC"]) == (ref["XEQ"], ref["U"])
-
-    # XG=(XC,O): grandchild can inspect nested explicitly passed structure.
     assert raw_start(graph, ref["XG"]) == ref["XC"]
     assert raw_end(graph, ref["XG"]) == ref["O"]
     assert raw_start(graph, raw_start(graph, ref["XG"])) == ref["XEQ"]
     assert raw_end(graph, raw_start(graph, ref["XG"])) == ref["U"]
-
-    # XR=(XEQ,L): continuation receives result/input explicitly.
     assert graph.poles(ref["XR"]) == (ref["XEQ"], ref["L"])
     assert ref["L"] in graph.closure(ref["SP_AFTER"])
 
@@ -364,7 +361,9 @@ def test_unpassed_current_does_not_gain_outer_values_by_ambient_or_incoming_magi
     assert ref["XEQ"] not in closure
     assert ref["L"] not in closure
     assert ref["AP"] not in closure
-    assert closure == frozenset({ref["XUNPASSED"], ref["U"], ref["C"], ref["O"], ref["R"]})
+    assert closure == frozenset(
+        {ref["XUNPASSED"], ref["U"], ref["C"], ref["O"], ref["R"]}
+    )
 
 
 def test_act_state_links_and_results_are_explicit_in_the_same_carrier():
@@ -387,7 +386,7 @@ def test_canonical_packet_replays_graph_current_aliases_and_anum_deterministical
         links=graph.canonical_links(),
         current=ref["XNEQ"],
         aliases=(),
-        raw_anum="10[01]",
+        raw_anum="[01][10]",
     )
     canonical = packet.canonical_json()
     replay_packet = ReplayPacket.from_json(canonical)
@@ -403,6 +402,14 @@ def test_canonical_packet_replays_graph_current_aliases_and_anum_deterministical
     )
     assert result.structural is not None
     assert canonical_recursive_anum(result) == replay_packet.raw_anum
+
+
+def test_integrated_replay_does_not_expand_recursive_anum_grammar():
+    raw = "10[01]"
+    result = denotate_recursive_anum(parse_raw_quaternary(raw), ProjectionContext.ROOT)
+
+    assert result.structural is None
+    assert result.raw == raw
 
 
 def test_optional_l4_materialization_preserves_observations_without_reusing_virtual_refs():
@@ -435,7 +442,6 @@ def test_integrated_candidate_has_no_hidden_old_semantic_bridge():
     assert "graph isomorphism as implicit =" in challenge["forbiddenHiddenBridges"]
     assert "parallel recursive Anum grammar" in challenge["forbiddenHiddenBridges"]
 
-    # Current production grammar remains untouched by the challenge.
     with pytest.raises(MTCParseError, match="После `↑` ожидается"):
         parse_formula("↑")
 
