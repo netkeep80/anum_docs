@@ -1,0 +1,121 @@
+{
+  "schema": "mts-colon-definition-effects-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 225,
+  "dependsOn": [
+    "mts-foundation-v2-integrated-direction-decision/v0.7",
+    "mts-scoped-link-dictionary-challenge/v0.7",
+    "mts-integrated-interpreter-act-challenge/v0.7"
+  ],
+  "purpose": "Re-derive colon-definition effects as explicit persistent link-network changes instead of inheriting the historical host DefinitionEnvironment by compatibility.",
+  "candidateA": {
+    "name": "same-dictionary-monotonic-membership",
+    "effect": "add D ⟼ (S ⟼ F) directly to the same D",
+    "problem": "persistent before/after state and lexical-scope identity are not explicit",
+    "preferred": false,
+    "accepted": false
+  },
+  "candidateB": {
+    "name": "one-child-dictionary-per-definition",
+    "effect": "D' has parent D and one local S ⟼ F",
+    "problem": "sequential definitions become nested shadowing and cannot represent same lexical scope conflicts",
+    "preferred": false,
+    "accepted": false
+  },
+  "candidateC": {
+    "name": "persistent-lexical-scope-snapshot",
+    "scope": "D = D ⟼ (parentScope ⟼ localHistory)",
+    "history": "H' = H ⟼ Entry; Entry = S ⟼ F",
+    "definitionEffect": "D' = D' ⟼ (sameParentScope ⟼ H')",
+    "enterChildScope": "Child = Child ⟼ (D ⟼ R)",
+    "lookup": "search local history; if no local match recurse to explicit parent scope",
+    "sameLocalDistinctForms": "conflict",
+    "sameLocalRepeatedIdenticalForm": "idempotent mapping with distinct definition-act occurrence history",
+    "childLocalMatchShadowsParent": true,
+    "parentImmutable": true,
+    "rhsEvaluation": false,
+    "preferredAfterChallenge": false,
+    "accepted": false
+  },
+  "definitionOccurrence": {
+    "entryIdentity": "Entry=S⟼F may be exact-pair reused",
+    "occurrenceIdentity": "history cell H'=H⟼Entry",
+    "sameDefinitionMayHaveMultipleActualOccurrences": true,
+    "occurrenceMultiplicityImpliesConflict": false
+  },
+  "historicalParityClassificationCandidate": {
+    "preserve": [
+      "child local definition shadows parent",
+      "different local forms for one source conflict",
+      "no hidden root definitions are injected",
+      "one-step lookup/opening does not evaluate RHS",
+      "definition/opening does not imply equality",
+      "self and mutual references terminate because stored form is not recursively normalized"
+    ],
+    "rederiveOrSupersede": [
+      "same-scope repeated identical definition automatically conflicts",
+      "DefinitionId(scopePath, ordinal) as the semantic identity model",
+      "AST-specific addressability of empty () and [] targets",
+      "host lexical scope tree as ontology"
+    ]
+  },
+  "effectReplay": {
+    "fields": [
+      "beforeScopeRef",
+      "sourceCarrier",
+      "sourceRef",
+      "formRef",
+      "entryRef",
+      "occurrenceRef",
+      "afterScopeRef"
+    ],
+    "checkerReadOnly": true,
+    "mustVerifySameLexicalParent": true,
+    "mustVerifyHistoryAppend": true,
+    "mustVerifyExactEntry": true,
+    "mustVerifyLookupAfterEffect": true,
+    "mustRejectForgedBefore": true,
+    "mustRejectForgedSource": true,
+    "mustRejectForgedForm": true,
+    "mustRejectForgedOccurrence": true,
+    "mustRejectForgedAfter": true
+  },
+  "requiredAssertions": [
+    "root lexical scope is a start-self-closed relation with parent R and empty local history R",
+    "definition execution creates a new persistent scope snapshot and does not mutate the prior scope",
+    "local history stores actual definition occurrences in order",
+    "repeating identical S:F creates a new occurrence but leaves unique lookup result F",
+    "adding S:F1 and S:F2 to the same lexical scope produces conflict",
+    "entering a child scope and defining S:F2 shadows parent S:F1 without mutating parent",
+    "missing child-local source falls through to explicit parent scope",
+    "one-step lookup returns exact stored F and does not evaluate it",
+    "self/mutual form refs may be stored and resolved without recursive normalization",
+    "no root definitions are implicitly injected into an empty root scope",
+    "definition effect does not create an equality/theorem relation",
+    "occurrence identity is the history cell, not the globally reusable Entry pair",
+    "read-only effect replay rejects forged evidence",
+    "old same-identical-definition conflict is recorded as a candidate semantic change rather than silently preserved",
+    "AST-specific empty-target addressability remains outside this gate"
+  ],
+  "notDecided": [
+    "whether candidate C is accepted as canonical lexical dictionary topology",
+    "whether repeated identical definitions should be semantically idempotent or conflict in final MTS",
+    "canonical source/form syntax for colon definitions after grammar reset",
+    "whether a definition effect also changes active interpreter context K",
+    "interaction with theory admission T",
+    "production migration"
+  ],
+  "veto": {
+    "parseAutomaticallyMutatesDictionary": false,
+    "mutableHostLexicalMapAccepted": false,
+    "globalDictionaryAllowed": false,
+    "lastWriteWinsAllowed": false,
+    "definitionImpliesEquality": false,
+    "rhsRecursiveEvaluationByDefault": false,
+    "oldEnvironmentCompatibilityLayerAllowed": false,
+    "productionChangeAllowed": false,
+    "historicalContractMutationAllowed": false,
+    "aproverRepinAllowed": false
+  }
+}
