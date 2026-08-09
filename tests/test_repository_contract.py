@@ -27,6 +27,7 @@ ACTIVE_SPECS = {
     "Протокол абитов ачисел.md",
     "Пучки значений МТС v0.2.md",
     "Foundation v2 Gate P.md",
+    "Foundation v2 Proof replay.md",
     "Апамять и управление сетью связей.md",
 }
 ACTIVE_MARKDOWN = (
