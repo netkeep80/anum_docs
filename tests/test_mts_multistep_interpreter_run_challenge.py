@@ -1,4 +1,4 @@
-"""Non-normative multi-step interpreter-run challenge for issue #224.
+"""Non-normative multi-step interpreter-run challenge for issue #230.
 
 The run links actual state-transition occurrences by exact persistent context
 refs.  This is deliberately not a generic logical transitivity rule.
@@ -257,7 +257,7 @@ def test_contract_is_non_normative_and_run_is_not_generic_transitivity():
     assert value["schema"] == "mts-multistep-interpreter-run-challenge/v0.7"
     assert value["status"] == "candidate-challenge"
     assert value["accepted"] is False
-    assert value["issue"] == 224
+    assert value["issue"] == 230
     assert value["runCandidate"]["genericLogicalTransitivityImplied"] is False
     assert value["trustedReplay"]["runIsProofDerivationAutomatically"] is False
     assert value["veto"]["productionChangeAllowed"] is False
