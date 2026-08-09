@@ -48,6 +48,7 @@ from .foundation_v2_proof import (
     DecomposeEqualityEvidence,
     replay_decompose_equal_relations,
 )
+from .foundation_v2_relative import RelativeAnumError, replay_relative_bracket_path
 from .foundation_v2_root import (
     FoundationRootKernel,
     FoundationRootRefs,
@@ -84,6 +85,7 @@ __all__ = [
     "ProofGoalEvidence",
     "ProofJudgmentEvidence",
     "RelationStepEvidence",
+    "RelativeAnumError",
     "RunEvidence",
     "SequenceAtom",
     "SequenceDescription",
@@ -101,6 +103,7 @@ __all__ = [
     "replay_integrated_proof",
     "replay_persistent_sequence_materialization",
     "replay_relation_step",
+    "replay_relative_bracket_path",
     "replay_run",
     "replay_sequence_materialization",
     "replay_source_front_end",
