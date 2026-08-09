@@ -15,12 +15,12 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 CHALLENGE = ROOT_DIR / "contracts/mts-pointed-aset-meaning-boundary-challenge-v0.7.json"
 ANUM_BOUNDARY = ROOT_DIR / "contracts/anum-root-relative-meaning-challenge-v0.7.json"
 
-R = 0
-O = 1
-C = 2
-L = 3
-U = 4
-KERNEL = frozenset({R, O, C, L, U})
+ROOT_REF = 0
+OPEN_REF = 1
+CLOSE_REF = 2
+LINK_REF = 3
+UNLINK_REF = 4
+KERNEL = frozenset({ROOT_REF, OPEN_REF, CLOSE_REF, LINK_REF, UNLINK_REF})
 
 
 @dataclass(frozen=True)
@@ -34,11 +34,11 @@ class ExactNetwork:
 
     def __init__(self) -> None:
         self.links: dict[int, Link] = {
-            R: Link(R, R),
-            O: Link(O, R),
-            C: Link(R, C),
-            L: Link(O, C),
-            U: Link(C, O),
+            ROOT_REF: Link(ROOT_REF, ROOT_REF),
+            OPEN_REF: Link(OPEN_REF, ROOT_REF),
+            CLOSE_REF: Link(ROOT_REF, CLOSE_REF),
+            LINK_REF: Link(OPEN_REF, CLOSE_REF),
+            UNLINK_REF: Link(CLOSE_REF, OPEN_REF),
         }
         self._next = 5
 
@@ -185,10 +185,10 @@ def test_link_has_only_two_poles_and_no_meaning_or_canonical_id_metadata():
 
 def test_context_selects_exact_referent_without_pointed_graph_ontology():
     graph = ExactNetwork()
-    x = graph.add(L, U)
-    other = graph.add(U, L)
-    kx = make_context(graph, R, x)
-    ko = make_context(graph, R, other)
+    x = graph.add(LINK_REF, UNLINK_REF)
+    other = graph.add(UNLINK_REF, LINK_REF)
+    kx = make_context(graph, ROOT_REF, x)
+    ko = make_context(graph, ROOT_REF, other)
 
     assert current_from_context(graph, kx) == x
     assert current_from_context(graph, ko) == other
@@ -204,20 +204,20 @@ def test_root_like_self_cycle_is_not_root_and_not_root_anchored_by_shape():
     root_like = graph.self_cycle()
 
     assert graph.links[root_like] == Link(root_like, root_like)
-    assert graph.links[R] == Link(R, R)
-    assert root_like != R
+    assert graph.links[ROOT_REF] == Link(ROOT_REF, ROOT_REF)
+    assert root_like != ROOT_REF
     assert exact_closure(graph, root_like) == frozenset({root_like})
     assert not root_anchored(graph, root_like)
 
 
 def test_start_self_closed_cycle_is_finite_and_root_anchored_without_unfolding():
     graph = ExactNetwork()
-    s = graph.start_self_closed(L)
+    s = graph.start_self_closed(LINK_REF)
 
     closure = exact_closure(graph, s)
     assert s in closure
-    assert L in closure
-    assert R in closure
+    assert LINK_REF in closure
+    assert ROOT_REF in closure
     assert root_anchored(graph, s)
     assert len(closure) <= len(graph.links)
     graph.validate()
@@ -227,11 +227,11 @@ def test_mutual_cycle_with_root_derived_outgoing_poles_has_finite_exact_closure(
     graph = ExactNetwork()
     a = graph.reserve()
     b = graph.reserve()
-    graph.define(a, b, L)
-    graph.define(b, a, U)
+    graph.define(a, b, LINK_REF)
+    graph.define(b, a, UNLINK_REF)
 
     closure = exact_closure(graph, a)
-    assert {a, b, L, U, O, C, R} <= closure
+    assert {a, b, LINK_REF, UNLINK_REF, OPEN_REF, CLOSE_REF, ROOT_REF} <= closure
     assert root_anchored(graph, a)
     assert len(closure) == 7
     graph.validate()
@@ -239,14 +239,14 @@ def test_mutual_cycle_with_root_derived_outgoing_poles_has_finite_exact_closure(
 
 def test_cycle_traversal_stops_on_exact_occurrence_not_equal_shape():
     graph = ExactNetwork()
-    s1 = graph.start_self_closed(L)
-    s2 = graph.start_self_closed(L)
+    s1 = graph.start_self_closed(LINK_REF)
+    s2 = graph.start_self_closed(LINK_REF)
     pair = graph.add(s1, s2)
 
     closure = exact_closure(graph, pair)
     assert s1 in closure and s2 in closure
     assert s1 != s2
-    assert graph.links[s1].end == graph.links[s2].end == L
+    assert graph.links[s1].end == graph.links[s2].end == LINK_REF
     assert len({s1, s2} & closure) == 2
 
 
@@ -256,11 +256,18 @@ def test_isomorphic_pointed_cycles_do_not_become_the_same_referent():
     f = first.self_cycle()
     s = second.self_cycle()
 
-    mapping = {R: R, O: O, C: C, L: L, U: U, f: s}
+    mapping = {
+        ROOT_REF: ROOT_REF,
+        OPEN_REF: OPEN_REF,
+        CLOSE_REF: CLOSE_REF,
+        LINK_REF: LINK_REF,
+        UNLINK_REF: UNLINK_REF,
+        f: s,
+    }
     assert_isomorphic_under(first, f, second, s, mapping)
 
-    k_first = make_context(first, R, f)
-    k_second = make_context(second, R, s)
+    k_first = make_context(first, ROOT_REF, f)
+    k_second = make_context(second, ROOT_REF, s)
     assert current_from_context(first, k_first) == f
     assert current_from_context(second, k_second) == s
     assert read(CHALLENGE)["identityBoundaries"]["graphIsomorphismImpliesIdentity"] is False
@@ -268,11 +275,11 @@ def test_isomorphic_pointed_cycles_do_not_become_the_same_referent():
 
 def test_same_exact_referent_can_resolve_differently_in_explicit_dictionaries():
     graph = ExactNetwork()
-    x = graph.add(L, U)
-    d1 = graph.end_self_closed(R)
-    d2 = graph.end_self_closed(O)
-    form1 = graph.start_self_closed(C)
-    form2 = graph.start_self_closed(U)
+    x = graph.add(LINK_REF, UNLINK_REF)
+    d1 = graph.end_self_closed(ROOT_REF)
+    d2 = graph.end_self_closed(OPEN_REF)
+    form1 = graph.start_self_closed(CLOSE_REF)
+    form2 = graph.start_self_closed(UNLINK_REF)
     add_dictionary_mapping(graph, d1, x, form1)
     add_dictionary_mapping(graph, d2, x, form2)
 
@@ -291,9 +298,9 @@ def test_root_anchoring_uses_exact_kernel_occurrences_not_kernel_like_shapes():
     assert exact_closure(graph, fake_open) == frozenset({fake_open, fake_root})
     assert not root_anchored(graph, fake_open)
 
-    real_open_like = graph.start_self_closed(R)
+    real_open_like = graph.start_self_closed(ROOT_REF)
     assert root_anchored(graph, real_open_like)
-    assert R in exact_closure(graph, real_open_like)
+    assert ROOT_REF in exact_closure(graph, real_open_like)
 
 
 def test_decision_candidate_keeps_three_surfaces_distinct():
