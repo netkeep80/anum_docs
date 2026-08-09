@@ -45,6 +45,13 @@
       "deletePrecondition": "Any useful formatting/span behavior is either no longer required or isolated into non-semantic tooling."
     },
     {
+      "path": "core/mtc_context_analysis.py",
+      "historicalOwner": "mts-direct-deixis/v0.5 typed-AST structural analysis",
+      "replacementLiveOwner": "no Foundation-v2 DirectDeictic primitive; source/form evidence owns new live semantics",
+      "deleteInC7": true,
+      "deletePrecondition": "Accepted v0.5 DirectDeictic contract remains immutable historical evidence and no current-main consumer requires AST-path/ContextPronoun analysis."
+    },
+    {
       "path": "core/mtc_interpreter.py",
       "historicalOwner": "mts-contract/v0.2-v0.5 ContextFrame interpretation replay",
       "replacementLiveOwner": "core/foundation_v2_interpreter.py",
