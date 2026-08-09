@@ -9,6 +9,7 @@ from core.exact_link_network import LinkNetworkBuilder
 from core.foundation_v2_checker import (
     IntegratedCheckerError,
     IntegratedProofEvidence,
+    ProofGoalEvidence,
     replay_integrated_proof,
 )
 from core.foundation_v2_interpreter import EqualityEvaluationEvidence, EqualityRoleRefs
@@ -158,7 +159,13 @@ def _fixture():
         terminal_context=context,
         steps=(eq_step, proof_step),
     )
-    evidence = IntegratedProofEvidence(source=source, rule_application=proof, run=run)
+    goal = ProofGoalEvidence(start_claim=start_claim, end_claim=end_claim)
+    evidence = IntegratedProofEvidence(
+        source=source,
+        rule_application=proof,
+        run=run,
+        goal=goal,
+    )
     return builder, root, byte_refs, evidence, rule, theory, context
 
 
@@ -168,10 +175,46 @@ def test_integrated_source_to_rule_to_run_replays_read_only() -> None:
     before = network.snapshot()
 
     assert replay_integrated_proof(network, evidence, byte_refs) == (
-        evidence.rule_application.start_claim,
-        evidence.rule_application.end_claim,
+        evidence.goal.start_claim,
+        evidence.goal.end_claim,
     )
     assert network.snapshot() == before
+
+
+def test_swapped_exact_goal_rejects() -> None:
+    builder, root, byte_refs, evidence, _, _, _ = _fixture()
+    forged = replace(
+        evidence,
+        goal=ProofGoalEvidence(
+            start_claim=evidence.goal.end_claim,
+            end_claim=evidence.goal.start_claim,
+        ),
+    )
+    network = builder.freeze(root)
+
+    with pytest.raises(IntegratedCheckerError, match="exact selected goal"):
+        replay_integrated_proof(network, forged, byte_refs)
+
+
+def test_same_shape_different_occurrence_does_not_satisfy_exact_goal() -> None:
+    builder, root, byte_refs, evidence, _, _, _ = _fixture()
+    network = builder.freeze(root)
+    original = network.link(evidence.goal.start_claim)
+
+    evolution = network.evolve()
+    duplicate = evolution.reserve()
+    evolution.define(duplicate, original.start, original.end)
+    evolved = evolution.freeze()
+
+    assert duplicate is not evidence.goal.start_claim
+    assert evolved.link(duplicate) == evolved.link(evidence.goal.start_claim)
+
+    forged = replace(
+        evidence,
+        goal=replace(evidence.goal, start_claim=duplicate),
+    )
+    with pytest.raises(IntegratedCheckerError, match="exact selected goal"):
+        replay_integrated_proof(evolved, forged, byte_refs)
 
 
 def test_valid_source_selecting_another_exact_rule_rejects_cross_layer() -> None:
