@@ -28,6 +28,7 @@ ACTIVE_SPECS = {
     "Пучки значений МТС v0.2.md",
     "Foundation v2 Gate P.md",
     "Foundation v2 Proof replay.md",
+    "Foundation v2 Persistent L4.md",
     "Апамять и управление сетью связей.md",
 }
 ACTIVE_MARKDOWN = (
