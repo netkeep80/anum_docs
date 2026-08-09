@@ -2,7 +2,7 @@
   "schema": "mts-colon-definition-effects-challenge/v0.7",
   "status": "candidate-challenge",
   "accepted": false,
-  "issue": 225,
+  "issue": 224,
   "dependsOn": [
     "mts-foundation-v2-integrated-direction-decision/v0.7",
     "mts-scoped-link-dictionary-challenge/v0.7",
@@ -26,7 +26,7 @@
   "candidateC": {
     "name": "persistent-lexical-scope-snapshot",
     "scope": "D = D ⟼ (parentScope ⟼ localHistory)",
-    "history": "H' = H ⟼ Entry; Entry = S ⟼ F",
+    "history": "Occ = D_before ⟼ Entry; H' = H ⟼ Occ; Entry = S ⟼ F",
     "definitionEffect": "D' = D' ⟼ (sameParentScope ⟼ H')",
     "enterChildScope": "Child = Child ⟼ (D ⟼ R)",
     "lookup": "search local history; if no local match recurse to explicit parent scope",
@@ -40,7 +40,7 @@
   },
   "definitionOccurrence": {
     "entryIdentity": "Entry=S⟼F may be exact-pair reused",
-    "occurrenceIdentity": "history cell H'=H⟼Entry",
+    "occurrenceIdentity": "Occ=D_before⟼Entry binds the exact before-scope occurrence; history cell H'=H⟼Occ preserves order",
     "sameDefinitionMayHaveMultipleActualOccurrences": true,
     "occurrenceMultiplicityImpliesConflict": false
   },
@@ -93,7 +93,7 @@
     "self/mutual form refs may be stored and resolved without recursive normalization",
     "no root definitions are implicitly injected into an empty root scope",
     "definition effect does not create an equality/theorem relation",
-    "occurrence identity is the history cell, not the globally reusable Entry pair",
+    "occurrence identity binds the exact before-scope snapshot to the reusable Entry pair, while a separate history cell preserves order",
     "read-only effect replay rejects forged evidence",
     "old same-identical-definition conflict is recorded as a candidate semantic change rather than silently preserved",
     "AST-specific empty-target addressability remains outside this gate"
