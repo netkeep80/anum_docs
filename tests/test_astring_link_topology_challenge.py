@@ -449,4 +449,6 @@ def test_source_content_and_semantic_form_remain_three_distinct_refs():
     assert len({source, content, form}) == 3
     assert resolve_source_occurrence(graph, dictionary, source) == form
     assert graph.links[source].end == content
-    assert read(CHALLENGE)["identityBoundary"]["sourceContentFormCollapseAllowed"] if False else True
+    veto = read(CHALLENGE)["veto"]
+    assert veto["sourceOccurrenceContentCollapseAllowed"] is False
+    assert veto["sourceContentFormCollapseAllowed"] is False
