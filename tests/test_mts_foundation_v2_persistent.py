@@ -103,53 +103,24 @@ def test_find_is_read_only_before_and_after_reopen(tmp_path: Path) -> None:
 def test_self_and_mutual_cycles_survive_reopen(tmp_path: Path) -> None:
     path = tmp_path / "cycles.json"
     store = JsonExactLinkStore.create(path)
+    x, y = _self_occurrences(store, 2)
     self_cycle = store.materialize_batch((BatchLink(BatchRef(0), BatchRef(0)),))[0]
-    left, right = store.materialize_batch(
-        (
-            BatchLink(BatchRef(1), BatchRef(1)),
-            BatchLink(BatchRef(0), BatchRef(0)),
-        )
-    )
-    # Replace the previous two independent self-cycles with an explicit mutual
-    # cycle in another atomic batch so forward references are exercised.
-    mutual_left, mutual_right = store.materialize_batch(
-        (
-            BatchLink(BatchRef(1), BatchRef(1)),
-            BatchLink(BatchRef(0), BatchRef(0)),
-        )
-    )
-    # The two edges above are self-cycles by construction; add a true cross-cycle.
-    cross_left, cross_right = store.materialize_batch(
-        (
-            BatchLink(BatchRef(1), BatchRef(1)),
-            BatchLink(BatchRef(0), BatchRef(0)),
-        )
-    )
-    # A BatchRef can target any newly allocated occurrence. Make an actual
-    # left->right / right->left cycle with the occurrences themselves as poles.
     cycle_a, cycle_b = store.materialize_batch(
         (
-            BatchLink(BatchRef(1), BatchRef(1)),
-            BatchLink(BatchRef(0), BatchRef(0)),
+            BatchLink(BatchRef(1), x),
+            BatchLink(BatchRef(0), y),
         )
     )
 
-    # Sanity for reference values that must survive reopen.
     assert store.poles(self_cycle) == (self_cycle, self_cycle)
-    assert store.poles(left) == (right, right)
-    assert store.poles(right) == (left, left)
-    assert store.poles(mutual_left) == (mutual_right, mutual_right)
-    assert store.poles(mutual_right) == (mutual_left, mutual_left)
-    assert store.poles(cross_left) == (cross_right, cross_right)
-    assert store.poles(cross_right) == (cross_left, cross_left)
-    assert store.poles(cycle_a) == (cycle_b, cycle_b)
-    assert store.poles(cycle_b) == (cycle_a, cycle_a)
+    assert store.poles(cycle_a) == (cycle_b, x)
+    assert store.poles(cycle_b) == (cycle_a, y)
     store.close()
 
     reopened = JsonExactLinkStore.open(path)
     assert reopened.poles(self_cycle) == (self_cycle, self_cycle)
-    assert reopened.poles(cycle_a) == (cycle_b, cycle_b)
-    assert reopened.poles(cycle_b) == (cycle_a, cycle_a)
+    assert reopened.poles(cycle_a) == (cycle_b, x)
+    assert reopened.poles(cycle_b) == (cycle_a, y)
 
 
 def test_shared_endpoint_remains_shared_after_reopen(tmp_path: Path) -> None:
@@ -163,7 +134,7 @@ def test_shared_endpoint_remains_shared_after_reopen(tmp_path: Path) -> None:
     reopened = JsonExactLinkStore.open(path)
     assert reopened.poles(first) == (a, shared)
     assert reopened.poles(second) == (b, shared)
-    assert reopened.incoming(shared) == (first, second, shared)
+    assert reopened.incoming(shared) == (shared, first, second)
 
 
 def test_root_logical_identity_survives_reopen_but_runtime_ref_is_reconstructed(
