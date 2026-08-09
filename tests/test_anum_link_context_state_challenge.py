@@ -28,7 +28,7 @@ CHALLENGE = ROOT / "contracts/anum-link-context-state-challenge-v0.7.json"
 RECURSIVE_CORPUS = ROOT / "contracts/anum-recursive-denotation-conformance-v0.2.json"
 
 R = 0
-O = 1
+OPEN_REF = 1
 C = 2
 L = 3
 U = 4
@@ -46,10 +46,10 @@ class LinkGraph:
     def __init__(self) -> None:
         self.links: dict[int, Link] = {
             R: Link(R, R),
-            O: Link(O, R),
+            OPEN_REF: Link(OPEN_REF, R),
             C: Link(R, C),
-            L: Link(O, C),
-            U: Link(C, O),
+            L: Link(OPEN_REF, C),
+            U: Link(C, OPEN_REF),
         }
         self._pair_index = {pair: ref for ref, pair in self.links.items()}
         self._next_ref = 5
@@ -107,14 +107,14 @@ def read(path: Path) -> dict:
 def make_frame(graph: LinkGraph, parent_frame: int, current: int) -> int:
     """K = (parentFrame ⟼ O) ⟼ current."""
 
-    marker = graph.intern(parent_frame, O)
+    marker = graph.intern(parent_frame, OPEN_REF)
     return graph.intern(marker, current)
 
 
 def read_frame(graph: LinkGraph, frame_ref: int) -> FrameView:
     frame = graph.links[frame_ref]
     marker = graph.links[frame.start]
-    if marker.end != O:
+    if marker.end != OPEN_REF:
         raise ValueError("not a candidate-A frame")
     return FrameView(parent=marker.start, current=frame.end)
 
@@ -239,7 +239,7 @@ def history_spine(raw: str) -> tuple[LinkGraph, int]:
 
     graph = LinkGraph()
     history = R
-    meanings = {"[": O, "]": C, "1": L, "0": U}
+    meanings = {"[": OPEN_REF, "]": C, "1": L, "0": U}
     for token in raw:
         history = graph.intern(history, meanings[token])
     graph.validate()
@@ -295,7 +295,7 @@ def test_one_bound_value_is_ostensive_self_closed_end_and_not_a_stage_tag():
 
     assert builder_stage(graph, current) == "one"
     assert graph.links[current] == Link(U, current)
-    assert current not in {R, O, C, L, U}
+    assert current not in {R, OPEN_REF, C, L, U}
 
 
 def test_second_value_resolves_partial_current_to_completed_pair():
@@ -372,7 +372,7 @@ def test_current_pronoun_candidate_is_locally_resolved_from_top_frame_pattern():
     frame_link = graph.links[top]
     marker_link = graph.links[frame_link.start]
 
-    assert marker_link.end == O
+    assert marker_link.end == OPEN_REF
     assert marker_link.start == R
     assert frame_link.end == view.current
     assert view.current == trace[-1].current_after
@@ -413,14 +413,14 @@ def test_history_spine_is_link_only_but_does_not_expose_builder_current_locally(
 
     assert history_graph.links[history].end == L
     assert graph_tree(state_graph, actual_current) == (("0", "1"), "1")
-    assert actual_current not in {R, O, C, L, U}
+    assert actual_current not in {R, OPEN_REF, C, L, U}
     assert history_graph.links[history].end != actual_current
 
 
 def test_history_spine_preserves_distinct_prefix_states_and_is_replayable():
     graph = LinkGraph()
     history = R
-    meanings = {"[": O, "]": C, "1": L, "0": U}
+    meanings = {"[": OPEN_REF, "]": C, "1": L, "0": U}
     refs = []
     for token in "[01]1":
         history = graph.intern(history, meanings[token])
