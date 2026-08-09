@@ -28,10 +28,12 @@ Sequence semantics:
 
 ``∞ A B C`` -> create ``A⟼B`` and ``B⟼C``.
 
-A nested group is evaluated recursively and returns one exact value to its
-outer sequence. A singleton group returns its contained value without creating
-a link. A group of two or more values creates every adjacent relation and
-returns the last created relation occurrence.
+Every sequence-deserialization context starts from the distinguished exact root.
+Therefore an empty sequence returns that same exact root without creating any
+occurrence. The rule is recursive: an empty nested group also returns the root
+as one value to its surrounding sequence. A singleton group returns its
+contained value without creating a link. A group of two or more values creates
+every adjacent relation and returns the last created relation occurrence.
 
 Every adjacency creates a *new* exact occurrence. Pair interning and implicit
 reuse are intentionally absent; a search/reuse policy belongs to the untrusted
@@ -64,14 +66,10 @@ class SequenceGroup:
     """Nested sequence invocation returning one exact link to the outer level.
 
     Host nesting is a checker handle, not semantic identity and not a second
-    kind of MTS entity.
+    kind of MTS entity. Empty ``items`` denotes the root-default nested context.
     """
 
     items: tuple["SequenceItem", ...]
-
-    def __post_init__(self) -> None:
-        if not self.items:
-            raise SequenceMaterializationError("nested sequence group cannot be empty")
 
 
 SequenceItem = SequenceAtom | SequenceGroup
@@ -79,14 +77,13 @@ SequenceItem = SequenceAtom | SequenceGroup
 
 @dataclass(frozen=True)
 class SequenceDescription:
-    """Selected root-relative sequence description for one materialization."""
+    """Selected root-relative sequence description for one materialization.
+
+    Empty ``items`` denotes the root-default top-level context.
+    """
 
     root: OccurrenceRef
     items: tuple[SequenceItem, ...]
-
-    def __post_init__(self) -> None:
-        if not self.items:
-            raise SequenceMaterializationError("top-level sequence cannot be empty")
 
 
 @dataclass(frozen=True)
@@ -136,7 +133,7 @@ def replay_root_opening_restoration(
             open_form=open_form,
             close_form=close_form,
         )
-        if forms[0] is not open_form:
+        if not forms or forms[0] is not open_form:
             return forms
 
         balance = sum(
@@ -173,6 +170,7 @@ def replay_resolved_sequence_grouping(
     This function starts after source/D replay. If root-opening collapse belongs
     to the selected carrier protocol, call ``replay_root_opening_restoration``
     explicitly before grouping; grouping itself never guesses missing opens.
+    Empty input and empty groups are valid root-default contexts.
     """
 
     before = network.snapshot()
@@ -312,8 +310,6 @@ def _validate_resolved_grouping_inputs(
         raise SequenceMaterializationError(
             "open and close sequence delimiters must be exact-distinct"
         )
-    if not forms:
-        raise SequenceMaterializationError("resolved sequence cannot be empty")
     for form in forms:
         network.link(form)
 
@@ -334,10 +330,6 @@ def _group_resolved_forms(
             if not inside_group:
                 raise SequenceMaterializationError(
                     "unexpected close delimiter in resolved sequence"
-                )
-            if not items:
-                raise SequenceMaterializationError(
-                    "resolved sequence group cannot be empty"
                 )
             return tuple(items), position + 1
 
@@ -378,6 +370,9 @@ def _materialize_items(
     items: tuple[SequenceItem, ...],
     created: list[MaterializedEdge],
 ) -> OccurrenceRef:
+    if not items:
+        return before.root
+
     values = tuple(
         _materialize_item(before, evolution, item, created) for item in items
     )
@@ -465,6 +460,9 @@ def _replay_items(
     items: tuple[SequenceItem, ...],
     cursor: _ReplayCursor,
 ) -> OccurrenceRef:
+    if not items:
+        return before.root
+
     values = tuple(_replay_item(before, after, item, cursor) for item in items)
     if len(values) == 1:
         return values[0]
