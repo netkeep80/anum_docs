@@ -288,11 +288,13 @@ def test_known_malformed_or_noncanonical_recursive_carriers_stay_rejected():
 def test_streaming_core_emits_denotation_nodes_directly_without_l4_effects():
     source = Path(__file__).read_text(encoding="utf-8")
     streamed, _ = stream_recursive_raw("0[10]")
+    recursive_tree_name = "Recursive" + "AnumTree"
+    memory_name = "Anum" + "Memory"
 
     assert streamed.structural is not None
     assert len(streamed.structural.nodes) == 2
-    assert "RecursiveAnumTree" not in source
-    assert "AnumMemory" not in source
+    assert recursive_tree_name not in source
+    assert memory_name not in source
     assert read(CHALLENGE)["streamingCoreCandidate"][
         "buildsStorageNeutralDenotationDirectly"
     ] is True
