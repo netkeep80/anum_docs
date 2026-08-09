@@ -1,4 +1,8 @@
-"""Non-production direction decision checks for foundation-v2 issue #221."""
+"""Non-production direction decision checks for foundation-v2 issue #221.
+
+The integrated interpreter-act dependency is supplied by merged prerequisite #220;
+this decision intentionally tests the composed main+decision surface.
+"""
 
 from __future__ import annotations
 
