@@ -1,0 +1,74 @@
+{
+  "schema": "mts-foundation-v2-equality/v0.7",
+  "status": "gate-p-candidate",
+  "accepted": false,
+  "issue": 251,
+  "parent": 237,
+  "researchDecision": 225,
+  "dependsOn": [
+    "mts-exact-occurrence-link-network/v0.7",
+    "mts-foundation-v2-state/v0.7",
+    "mts-foundation-v2-interpreter-replay/v0.7"
+  ],
+  "context": {
+    "topology": "K = K ⟼ (parent ⟼ current)",
+    "representativePair": "Pair = member ⟼ representative",
+    "representativeBinding": "Binding = K ⟼ Pair",
+    "contextOccurrenceIsNotABindingAttachment": true,
+    "hiddenGlobalK": false
+  },
+  "representative": {
+    "semantics": "one explicit local hop only; otherwise member represents itself",
+    "missingMapping": "rep_K(x) = x",
+    "singleMapping": "rep_K(x) = exact representative",
+    "duplicateSameRepresentativeOccurrences": "allowed as one unambiguous mapping with occurrence multiplicity",
+    "distinctRepresentatives": "conflict",
+    "aliasChaining": false,
+    "transitiveClosure": false,
+    "lastWriteWins": false
+  },
+  "equality": {
+    "definition": "Equal_K(a,b) iff rep_K(a) and rep_K(b) are the same exact occurrence ref",
+    "shapeEquality": false,
+    "graphIsomorphismEquality": false,
+    "bisimulationEquality": false,
+    "sourceSpellingEquality": false,
+    "backendAddressEquality": false,
+    "automaticSubstitution": false,
+    "automaticCongruence": false,
+    "automaticTransitivity": false,
+    "automaticRecursiveRewrite": false
+  },
+  "evaluationAct": {
+    "sameInterpreterModule": true,
+    "actualAIsExactEvaluationOccurrence": true,
+    "hostBooleanIsOnlyConvenienceReturn": true,
+    "requiredRoles": [
+      "context",
+      "left",
+      "right",
+      "left-representative",
+      "right-representative"
+    ],
+    "bothEqualAndNonEqualActsReplayable": true,
+    "snapshotStable": true,
+    "implicitMaterialization": false
+  },
+  "relationDecomposition": {
+    "builtIntoEquality": false,
+    "allowedOnlyAsSeparatelyAdmittedTheoryRule": true,
+    "recursiveApplicationImplicit": false
+  },
+  "requiredVectors": [
+    "two members with same exact representative evaluate equal",
+    "missing bindings fall back to exact operands and can evaluate non-equal",
+    "two same-shape self-closed occurrences remain non-equal by default",
+    "a->b and b->c remains one-hop and does not close transitively",
+    "duplicate same-representative bindings remain unambiguous",
+    "distinct local representatives conflict",
+    "forged representative evidence rejects",
+    "conflicting actual-act field rejects",
+    "replay is read-only and independent of shape comparator/legacy interpreter"
+  ],
+  "nextGate": "integrate exact multistep/proof adjacency and separately admitted inference rules over the same actual-act replay engine"
+}
