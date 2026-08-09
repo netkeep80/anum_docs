@@ -4,7 +4,7 @@
 
 > Этот документ остаётся нормативным **только для контракта МТС v0.2 и совместимой historical-линии v0.2–v0.5**. Он больше не является описанием текущей целевой архитектуры Foundation v2.
 >
-> Для текущего развития начинайте с [Оснований МТС](../theory/Основания%20МТС.md), [Foundation v2 Gate P](Foundation%20v2%20Gate%20P.md) и [Формальной нотации МТС](Формальная%20нотация%20МТС.md).
+> Для текущего развития начинайте с [Оснований МТС](../theory/Основания%20МТС.md), [Формальной нотации МТС](Формальная%20нотация%20МТС.md) и [Апамяти](Апамять%20и%20управление%20сетью%20связей.md).
 
 Машинный historical contract: [`core/reference_model.py`](../../core/reference_model.py).
 
@@ -355,7 +355,7 @@ proof checker / trusted kernel
 
 Foundation v2 реализует эту идею заново на exact-occurrence substrate: actual acts, exact Run, explicit `T ⟼ Rule` и integrated read-only checker без legacy parser/proof semantics.
 
-См. [Foundation v2 Proof replay](Foundation%20v2%20Proof%20replay.md).
+См. [Апамять и управление сетью связей](Апамять%20и%20управление%20сетью%20связей.md).
 
 ## 8. Accepted status v0.2
 
@@ -436,5 +436,5 @@ core/foundation_v2_checker.py
     этот документ является правильной reference model;
 
 если вопрос: «какой должна стать следующая МТС?»
-    используйте Foundation v2 docs и executable Gate-P contracts.
+    используйте Основания МТС, Формальную нотацию МТС и актуальные исполнимые модули.
 ```

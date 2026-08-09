@@ -26,8 +26,6 @@ ACTIVE_SPECS = {
     "Ачисла и сериализация.md",
     "Протокол абитов ачисел.md",
     "Пучки значений МТС v0.2.md",
-    "Foundation v2 Gate P.md",
-    "Foundation v2 Proof replay.md",
     "Foundation v2 Persistent L4.md",
     "Апамять и управление сетью связей.md",
 }
