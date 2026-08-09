@@ -1,0 +1,98 @@
+{
+  "schema": "mts-pointed-aset-meaning-boundary-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 206,
+  "parentIssue": 200,
+  "dependsOn": [
+    "mts-semantic-root-kernel-challenge/v0.7",
+    "anum-root-relative-meaning-challenge/v0.7",
+    "anum-self-closed-context-challenge/v0.7",
+    "mts-foundation-v2-local-equality-challenge/v0.7"
+  ],
+  "purpose": "Challenge the remaining arbitrary-aset meaning boundary without a Meaning primitive: exact referent identity comes from the explicitly selected link occurrence and its finite link network; canonical recursive Anum remains an optional root-relative structural description only on its occurrence-tree domain; dictionary/theory/context relations provide higher interpretation without replacing the referent by a serialization or graph canonicalization.",
+  "candidateComparison": {
+    "recursiveAnumAsUniversalMeaning": {
+      "survives": false,
+      "reason": "merged #210 already proves loss of explicit sharing identity and inability to directly encode general cycles"
+    },
+    "rootedGraphCanonicalizationAsSemanticIdentity": {
+      "survives": false,
+      "reason": "isomorphic or bisimilar occurrence-distinct cycles must not collapse; Gate = #225 preserves exact local occurrence identity"
+    },
+    "pointedExactNetworkPlusPartialAnumView": {
+      "survives": true,
+      "researchNotationOnly": "P=(G,current(K))",
+      "newPointedGraphOntologyRequired": false,
+      "newMeaningPrimitiveRequired": false
+    }
+  },
+  "semanticBoundary": {
+    "referent": "the exact link occurrence selected as current by explicit context/act evidence",
+    "network": "the finite exact start/end closure reachable from that occurrence; cycles stop by revisiting the same occurrence, not by shape equality",
+    "rootAnchoring": "a closure is root-anchored only by reaching exact distinguished R/O/C/L/U occurrences, never by merely matching their shapes",
+    "rootRelativeAnum": "partial structural description available only when the accepted recursive occurrence-tree domain applies",
+    "higherContextualMeaning": "explicit dictionary/theory/act relations over the same exact referent",
+    "meaningAsStoredPayload": false
+  },
+  "identityBoundaries": {
+    "exactOccurrenceIdentityPreserved": true,
+    "shapeEqualityImpliesIdentity": false,
+    "graphIsomorphismImpliesIdentity": false,
+    "bisimulationImpliesIdentity": false,
+    "canonicalAnumImpliesExactReferentIdentity": false,
+    "rootLikeSelfCycleImpliesRootIdentity": false,
+    "l4AddressIsSemanticIdentity": false
+  },
+  "cycleBoundary": {
+    "finiteNetworkRepresentationRequired": true,
+    "infiniteUnfoldingRequired": false,
+    "selfClosedCycleMayBeRepresentedDirectlyAsLinks": true,
+    "mutualCycleMayBeRepresentedDirectlyAsLinks": true,
+    "recursiveAnumRequiredForCycleIdentity": false,
+    "visitedSetIsCheckerMechanismNotOntology": true
+  },
+  "contextBoundary": {
+    "currentSelectedByExplicitKOrAct": true,
+    "sameReferentMayResolveDifferentlyUnderDifferentDOrT": true,
+    "differentContextualResolutionDoesNotMutateReferent": true,
+    "hostGlobalCurrentAllowed": false
+  },
+  "requiredAssertions": [
+    "the merged root-relative Anum contract remains explicit that recursive Anum is not general arbitrary-link meaning",
+    "a complete acyclic root-derived relation can use recursive Anum as a structural view without making the source spelling its identity",
+    "an exact self-cycle distinct from R remains a different occurrence even though it is shape-isomorphic to R",
+    "a start-self-closed cycle can be finitely root-anchored by an exact kernel occurrence without recursive unfolding",
+    "a mutual cycle with root-derived outgoing poles has a finite exact closure and does not require recursive Anum",
+    "an unanchored non-root self-cycle remains finite but has no root-relative structural anchor merely from its shape",
+    "explicit K selects one exact current occurrence without adding a host PointedGraph object to the ontology",
+    "two isomorphic cyclic pointed networks can have different exact referents and must not be collapsed by canonical graph labeling",
+    "the same exact referent can participate in two explicit dictionaries with different forms without changing its link structure",
+    "network traversal terminates on exact occurrence revisit and never uses shape equality as a cycle stop condition",
+    "no Meaning field, semantic tag, canonical graph id or L4 address is attached to Link"
+  ],
+  "decisionCandidate": {
+    "wording": "For Foundation v2, meaning is not a total function from Link to a canonical payload. The minimal referential substrate is the exact link occurrence selected in an explicit act/context together with its finite link relations. Recursive Anum is a root-relative structural view on the occurrence-tree subset. Sharing/cycles remain native network structure. Dictionaries and theories add explicit contextual resolution relations over the same substrate.",
+    "preferredAfterChallenge": true,
+    "accepted": false
+  },
+  "notDecided": [
+    "whether the word meaning should be used normatively for the whole relational substrate or reserved for contextual resolution",
+    "canonical source syntax for referring to arbitrary cyclic/shared occurrences",
+    "whether any future reference-capable Anum transport is needed",
+    "production L4 representation of occurrence identity",
+    "production migration"
+  ],
+  "veto": {
+    "meaningTagAllowed": false,
+    "universalAnumMeaningFunctionAllowed": false,
+    "graphCanonicalizationAsIdentityAllowed": false,
+    "bisimulationAsIdentityAllowed": false,
+    "infiniteCycleUnfoldingAllowed": false,
+    "newAnumGrammarForThisGateAllowed": false,
+    "l4PhysicalAddressAsMeaningAllowed": false,
+    "productionChangeAllowed": false,
+    "historicalContractMutationAllowed": false,
+    "aproverRepinAllowed": false
+  }
+}
