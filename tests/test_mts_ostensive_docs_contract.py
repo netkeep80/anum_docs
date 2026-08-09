@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 
@@ -12,9 +13,60 @@ GATE_P = ROOT / "docs" / "specs" / "Foundation v2 Gate P.md"
 
 ACTIVE_OSTENSIVE_DOCS = (README, FOUNDATIONS, AXIOMS, NOTATION, GATE_P)
 
+# Первый жёстко русифицированный документ. По мере сжатия репозитория сюда
+# добавляются остальные нормативные документы; исключения для старого долга
+# намеренно не накапливаются.
+RUSSIAN_NORMATIVE_DOCS = (README,)
+_ALLOWED_LATIN_PROSE = {
+    "API",
+    "Git",
+    "GitHub",
+    "JSON",
+    "UTF",
+}
+
 
 def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def _prose_lines(markdown: str):
+    in_fence = False
+    for line_no, raw_line in enumerate(markdown.splitlines(), start=1):
+        stripped = raw_line.strip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+
+        # Код, адреса ссылок и URL не являются естественным языком документа.
+        line = re.sub(r"`[^`]*`", "", raw_line)
+        line = re.sub(r"\]\([^)]*\)", "]", line)
+        line = re.sub(r"https?://\S+", "", line)
+        yield line_no, line
+
+
+def _unapproved_latin_words(line: str) -> list[str]:
+    words = re.findall(r"(?<![\w])([A-Za-z][A-Za-z-]{2,})(?![\w])", line)
+    return [word for word in words if word not in _ALLOWED_LATIN_PROSE]
+
+
+def test_normative_readme_is_russian_first() -> None:
+    """Не даём английскому объяснительному тексту снова расползтись по МТС."""
+    failures = []
+    for path in RUSSIAN_NORMATIVE_DOCS:
+        for line_no, line in _prose_lines(_text(path)):
+            latin = _unapproved_latin_words(line)
+            cyrillic = re.findall(r"[А-Яа-яЁё]{3,}", line)
+
+            # Один технический термин в русском предложении допустим. Два и
+            # более неразрешённых латинских слова уже требуют русской формулировки
+            # или переноса идентификаторов в `код`.
+            if len(latin) >= 2 or (latin and not cyrillic):
+                failures.append(f"{path.relative_to(ROOT)}:{line_no}: {', '.join(latin)}")
+
+    assert failures == [], "Англоязычный текст в нормативной МТС:\n" + "\n".join(failures)
 
 
 def test_active_foundation_surface_keeps_ostensive_root_signs() -> None:
@@ -28,8 +80,8 @@ def test_active_foundation_surface_keeps_ostensive_root_signs() -> None:
 
 def test_readme_presents_ostensive_forms_before_machine_link_carrier() -> None:
     text = _text(README)
-    ostensive = text.index("# 1. Остенсивный корень МТС")
-    machine = text.index("# 3. Машинное представление идёт после остенсивного")
+    ostensive = text.index("## 1. Остенсивный корень МТС")
+    machine = text.index("## 3. Машинное представление идёт после остенсивного")
     link_api = text.index("Link(start, end)")
 
     assert ostensive < machine < link_api
@@ -99,7 +151,7 @@ def test_docs_explicitly_reject_raw_projection_opcode_reading() -> None:
     notation = _text(NOTATION)
     gate = _text(GATE_P)
 
-    assert "не являются командами взять начало/конец" in _text(README)
+    assert "не являются командами взять начало или конец" in _text(README)
     assert "не означают сами по себе" in foundations
     assert "Это не primitive function" in notation
     assert "не превращает `♂/♀` в host opcodes" in gate
