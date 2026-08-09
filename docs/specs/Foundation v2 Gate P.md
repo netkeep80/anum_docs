@@ -96,7 +96,7 @@ Historical v0.2 projection-oriented `♀F / F♂` remains historical-only and mu
 
 # 4. Gate-P implementation ladder
 
-Завершённые gates:
+Завершённые executable/docs gates:
 
 ```text
 P0  production semantic surface audit          #238/#239
@@ -112,9 +112,10 @@ P9  integrated source→proof→Run checker        #257/#262
 Docs current MTS surface                       #261/#263
 Anum sequence → апамять materialization        #242/#264
 Persistent exact-occurrence L4                 #265/#266
+Ostensive docs regression guard                #267/#268
 ```
 
-Docs regression #267 восстанавливает и защищает остенсивный root surface, который был чрезмерно упрощён в #263.
+Этот P0–P9 список описывает последовательность уже выполненных implementation evidence gates. В umbrella #237 название **release phase P3** отдельно относится к historical compatibility classification; это не новая параллельная семантика.
 
 ---
 
@@ -122,12 +123,17 @@ Docs regression #267 восстанавливает и защищает осте
 
 Persistent L4 больше не является открытым blocker-ом.
 
-Следующий путь:
+Текущий gate:
 
 ```text
-historical compatibility classification
-→ atomic production cutover / old semantic-path deletion
-→ versioned integrated conformance corpus
+#269 historical compatibility classification
+```
+
+После его explicit decision:
+
+```text
+atomic production cutover planning / old live semantic-path deletion
+→ versioned integrated release conformance corpus
 → explicit Foundation-v2 acceptance
 → published next MTS version
 → aprover repin
@@ -385,35 +391,89 @@ Cycles/sharing survive reopen.
 
 ---
 
-# 16. Historical compatibility policy
+# 16. Historical compatibility classification — #269
 
-Accepted v0.2–v0.5 remain replayable history.
-
-Historical-only surfaces include:
+Machine-readable owner:
 
 ```text
-mtc_parser typed semantic tokens
-AST-class semantic dispatch
-ContextFrame ontology
-historical ♀F / F♂ projections
-historical pair-interning AnumMemory
+contracts/mts-foundation-v2-compatibility-classification-v0.7.json
 ```
 
-Cutover must not preserve them as a second competing Foundation-v2 semantic core.
-
-Each consumer must be:
+У каждой исторической observable surface теперь может быть только одно из четырёх состояний:
 
 ```text
-migrated
-or
-historical-replay-only
-or
-removed from production path
+PRESERVE
+INTENTIONAL_DELTA
+HISTORICAL_REPLAY_ONLY
+REMOVE_AS_SUPERSEDED
 ```
+
+Ключевые решения:
+
+| Surface | Решение Foundation v2 |
+|---|---|
+| recursive Anum root-domain + canonical inverse | `PRESERVE` в точной принятой области |
+| root-opening-collapse / explicit quote-relative boundary | `PRESERVE` |
+| occurrence-local distinction | `PRESERVE`, обобщается exact occurrence identity |
+| read/find/replay vs explicit effect | `PRESERVE` |
+| untrusted proof search → trusted replay | `PRESERVE` |
+| arbitrary outer Anum sequence materialization | `INTENTIONAL_DELTA` → #242/#264 |
+| ten-formula root as live Foundation-v2 authority | `HISTORICAL_REPLAY_ONLY` |
+| `ContextFrame`, `◁/▷`, parent-ascent `↑` | `HISTORICAL_REPLAY_ONLY`; live runtime path удаляется |
+| historical `♀F / F♂` projection semantics | `HISTORICAL_REPLAY_ONLY` |
+| Foundation-v2 `∞ / ♂e / b♀ / b⟼e` | `INTENTIONAL_DELTA`, primary ostensive layer |
+| historical equality implementation | `INTENTIONAL_DELTA` → exact local representative `=` |
+| DefinitionEnvironment/opening as live dictionary ontology | historical replay only → persistent scoped D/`:` |
+| historical proof relations | historical replay only → exact T/A/Run proof layer |
+| AST/token class as semantic authority | `REMOVE_AS_SUPERSEDED` |
+| v0.3 pair interning/idempotent realize | `HISTORICAL_REPLAY_ONLY` |
+| persistent `(lineage, local)` exact occurrence identity | `INTENTIONAL_DELTA` → #265/#266 |
+| backend address as semantic identity | rejected; explicit portable mapping replaces it |
+
+Важно:
+
+```text
+historical replay != compatibility runtime
+```
+
+Старые accepted contracts v0.2–v0.5 и их тесты остаются воспроизводимыми. Но новый production runtime не получает mode/flag/adaptor, который переключает его обратно на `ContextFrame`, AST semantics, raw projections или pair interning.
+
+Git хранит реализацию прошлого; active tree после cutover должен иметь одну live semantics.
+
+Classification #269 сама по себе **ничего не удаляет и ничего не принимает как release**. Она только делает последующий cutover однозначным.
 
 ---
 
-# 17. Acceptance criterion
+# 17. Cutover policy после P3
+
+После закрытия #269 разрешено проектировать один atomic migration program с явной таблицей consumers/deletions.
+
+Предпочтительный порядок:
+
+```text
+1. freeze integrated release candidate/conformance inputs
+2. migrate live source/parser consumers
+3. migrate live interpreter/state consumers
+4. migrate proof/checker consumers
+5. migrate root/Anum/L4 production integration
+6. delete superseded live semantic code in the same migration program
+7. run one versioned integrated corpus
+8. record explicit acceptance decision
+```
+
+Запрещённое конечное состояние:
+
+```text
+new Foundation-v2 runtime
++
+old ContextFrame/AST/pair-interning runtime behind compatibility switch
+```
+
+Historical replay tools may remain only when их versioned contract ownership explicit и они не участвуют в новой production validity.
+
+---
+
+# 18. Acceptance criterion
 
 Следующая версия МТС принимается только как одна интегрированная система:
 
@@ -426,6 +486,7 @@ ostensive root ∞ / ♂e / b♀ / b⟼e
 + proof/Run/checker
 + sequence materialization
 + persistent L4
++ explicit compatibility classification
 + atomic cutover
 + versioned conformance
 ```
