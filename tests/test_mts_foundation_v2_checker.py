@@ -10,6 +10,7 @@ from core.foundation_v2_checker import (
     IntegratedCheckerError,
     IntegratedProofEvidence,
     ProofGoalEvidence,
+    ProofJudgmentEvidence,
     replay_integrated_proof,
 )
 from core.foundation_v2_interpreter import EqualityEvaluationEvidence, EqualityRoleRefs
@@ -160,11 +161,12 @@ def _fixture():
         steps=(eq_step, proof_step),
     )
     goal = ProofGoalEvidence(start_claim=start_claim, end_claim=end_claim)
+    judgment = ProofJudgmentEvidence(theory=theory, context=context, goal=goal)
     evidence = IntegratedProofEvidence(
         source=source,
         rule_application=proof,
         run=run,
-        goal=goal,
+        judgment=judgment,
     )
     return builder, root, byte_refs, evidence, rule, theory, context
 
@@ -175,19 +177,23 @@ def test_integrated_source_to_rule_to_run_replays_read_only() -> None:
     before = network.snapshot()
 
     assert replay_integrated_proof(network, evidence, byte_refs) == (
-        evidence.goal.start_claim,
-        evidence.goal.end_claim,
+        evidence.judgment.goal.start_claim,
+        evidence.judgment.goal.end_claim,
     )
     assert network.snapshot() == before
 
 
 def test_swapped_exact_goal_rejects() -> None:
     builder, root, byte_refs, evidence, _, _, _ = _fixture()
+    goal = evidence.judgment.goal
     forged = replace(
         evidence,
-        goal=ProofGoalEvidence(
-            start_claim=evidence.goal.end_claim,
-            end_claim=evidence.goal.start_claim,
+        judgment=replace(
+            evidence.judgment,
+            goal=ProofGoalEvidence(
+                start_claim=goal.end_claim,
+                end_claim=goal.start_claim,
+            ),
         ),
     )
     network = builder.freeze(root)
@@ -199,22 +205,54 @@ def test_swapped_exact_goal_rejects() -> None:
 def test_same_shape_different_occurrence_does_not_satisfy_exact_goal() -> None:
     builder, root, byte_refs, evidence, _, _, _ = _fixture()
     network = builder.freeze(root)
-    original = network.link(evidence.goal.start_claim)
+    goal = evidence.judgment.goal
+    original = network.link(goal.start_claim)
 
     evolution = network.evolve()
     duplicate = evolution.reserve()
     evolution.define(duplicate, original.start, original.end)
     evolved = evolution.freeze()
 
-    assert duplicate is not evidence.goal.start_claim
-    assert evolved.link(duplicate) == evolved.link(evidence.goal.start_claim)
+    assert duplicate is not goal.start_claim
+    assert evolved.link(duplicate) == evolved.link(goal.start_claim)
 
     forged = replace(
         evidence,
-        goal=replace(evidence.goal, start_claim=duplicate),
+        judgment=replace(
+            evidence.judgment,
+            goal=replace(goal, start_claim=duplicate),
+        ),
     )
     with pytest.raises(IntegratedCheckerError, match="exact selected goal"):
         replay_integrated_proof(evolved, forged, byte_refs)
+
+
+def test_selected_judgment_theory_must_be_exact() -> None:
+    builder, root, byte_refs, evidence, _, theory, _ = _fixture()
+    other_theory = _anchor(builder)
+    forged = replace(
+        evidence,
+        judgment=replace(evidence.judgment, theory=other_theory),
+    )
+    network = builder.freeze(root)
+
+    assert other_theory is not theory
+    with pytest.raises(IntegratedCheckerError, match="selected judgment"):
+        replay_integrated_proof(network, forged, byte_refs)
+
+
+def test_selected_judgment_context_must_be_exact() -> None:
+    builder, root, byte_refs, evidence, _, _, context = _fixture()
+    other_context = define_context(builder, _anchor(builder), _anchor(builder))
+    forged = replace(
+        evidence,
+        judgment=replace(evidence.judgment, context=other_context),
+    )
+    network = builder.freeze(root)
+
+    assert other_context is not context
+    with pytest.raises(IntegratedCheckerError, match="selected judgment"):
+        replay_integrated_proof(network, forged, byte_refs)
 
 
 def test_valid_source_selecting_another_exact_rule_rejects_cross_layer() -> None:
@@ -237,7 +275,7 @@ def test_valid_source_under_another_exact_theory_rejects_cross_layer() -> None:
     network = builder.freeze(root)
 
     assert other_theory is not theory
-    with pytest.raises(IntegratedCheckerError, match="different exact theories"):
+    with pytest.raises(IntegratedCheckerError, match="source admission"):
         replay_integrated_proof(network, forged, byte_refs)
 
 
