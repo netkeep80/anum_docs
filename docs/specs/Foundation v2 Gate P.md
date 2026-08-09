@@ -2,9 +2,9 @@
 
 Статус: **production/reference candidate**, не accepted release.
 
-Главный epic: #237. Завершены exact-occurrence substrate #240/#241, state/apamemory layer #243/#244, source front-end #245/#246 и первый relation replay #247/#248. Текущий слой: persistent scoped dictionary + `:` #249. Sequence-deserialization: #242. Persistent L4 backend: #124.
+Главный epic: #237. Завершены exact-occurrence substrate #240/#241, state/apamemory #243/#244, source front-end #245/#246, relation replay #247/#248 и persistent scoped `D` + `:` #249/#250. Текущий слой: local exact representative `=` #251. Sequence-deserialization: #242. Persistent L4 backend: #124.
 
-Цель Gate P — собрать **один** production/reference semantic path, после чего опубликовать следующую версию МТС, которую сможет точно потреблять `aprover`.
+Цель Gate P — собрать **один** production/reference semantic path, затем опубликовать следующую версию МТС, которую сможет точно потреблять `aprover`.
 
 ## 1. Каноническая лестница Foundation v2
 
@@ -19,8 +19,8 @@ binary link ontology
 → scoped D + explicit G/T evidence
 → explicit K/current
 → one trusted interpreter/replay engine
-→ actual acts A
-→ multistep/proof replay
+→ relation / : / = acts
+→ exact multistep/proof replay
 → accepted contract
 → aprover
 ```
@@ -33,6 +33,7 @@ form != theory membership
 structure != exact occurrence identity
 read/find/replay != materialize
 candidate search != trusted replay
+local equality != global rewrite system
 ```
 
 ## 2. Production substrate
@@ -58,7 +59,7 @@ token
 astNode
 ```
 
-Sharing и cycles являются native конечной структурой. Два occurrences могут иметь одинаковые полюса и всё же оставаться различёнными:
+Sharing и cycles — native конечная структура. Два occurrences могут иметь одинаковые полюса и всё же оставаться различёнными:
 
 ```text
 X1 = a ⟼ b
@@ -66,7 +67,7 @@ X2 = a ⟼ b
 X1 != X2
 ```
 
-Поэтому shape/isomorphism и physical backend address не определяют semantic identity.
+Shape/isomorphism и physical backend address не определяют semantic identity.
 
 ## 3. Source, context и actual act — тоже связи
 
@@ -74,20 +75,14 @@ X1 != X2
 
 Lower byte protocol предоставляет exact refs `B(byte)`.
 
-Канонический astring content:
-
 ```text
 C0 = R
 C(n+1) = Cn ⟼ B(byte_n)
-```
 
-Конкретное появление исходника:
-
-```text
 S = S ⟼ C
 ```
 
-Поэтому одинаковые bytes могут разделять один canonical `C`, но иметь разные exact source occurrences `S1`, `S2`.
+Одинаковые bytes могут разделять canonical `C`, но иметь разные exact source occurrences `S1`, `S2`.
 
 ### 3.2. Контекст
 
@@ -97,7 +92,7 @@ K = K ⟼ P
 ↑ = current from exact active K
 ```
 
-`↑` не является process-global переменной. Trusted act обязан назвать конкретный exact `K`.
+`↑` не process-global variable. Trusted act обязан назвать exact `K`.
 
 ### 3.3. Actual act
 
@@ -116,11 +111,11 @@ Field = roleRef ⟼ value
 A ⟼ Field
 ```
 
-`roleRef` разрешается через явный scoped `D_roles`. Host enum может быть API-удобством, но не semantic identity роли.
+`roleRef` разрешается через explicit scoped `D_roles`. Host field name — checker API, не semantic identity.
 
 ## 4. Один source front-end
 
-Production-facing source path не доверяет lexer/token/AST classes как смыслу.
+Production source path не доверяет lexer/token/AST classes как смыслу:
 
 ```text
 raw bytes
@@ -134,22 +129,21 @@ raw bytes
 → read-only replay
 ```
 
-Кандидатный поиск может использовать trie, regex, индексы, longest-match или UI. Trusted replay проверяет **выбранное evidence**, а не алгоритм, который его предложил.
+Candidate search может использовать trie, regex, indices, longest-match или UI. Trusted replay проверяет **selected evidence**.
 
-### 4.1. Selected slice
+Selected slice:
 
 ```text
 Span = sourcePrefix(start) ⟼ sourcePrefix(end)
 SliceEvidence = Span ⟼ sliceContent
 Lexeme = S ⟼ SliceEvidence
 Resolution = Lexeme ⟼ form
+Selection = visibleDefinitionOccurrence ⟼ Resolution
 ```
 
-Host byte offsets — transport/checker coordinates. Семантическое evidence задаётся exact refs границ, source occurrence и slice content.
+UTF-8 `⟼` может быть одним многобайтным slice. Host byte offsets остаются transport/checker coordinates.
 
-UTF-8 `⟼` может быть одним многобайтным selected slice; trusted semantics не обязана дробить его на byte-sized tokens.
-
-### 4.2. Ordered result
+Порядок:
 
 ```text
 SelectedSequence = fold(R, Selection_0 ... Selection_n)
@@ -159,40 +153,16 @@ G ⟼ FormSequence
 T ⟼ FormSequence
 ```
 
-`G/T` membership остаётся отдельным от lexical dictionary semantics. То, что host parser построил какой-то AST, не означает admission формы.
-
 ## 5. Один persistent scoped dictionary D
 
-Ранний Gate-P candidate `D ⟼ Entry` оказался недостаточным после интеграции уже принятой семантики `:`. В production path теперь остаётся одна модель — persistent lexical scope snapshots.
-
-### 5.1. Scope snapshot
+Production path использует только persistent lexical scope snapshots:
 
 ```text
 ScopePayload = parentScope ⟼ localHistory
 D = D ⟼ ScopePayload
 ```
 
-Кандидат пустого root-scope:
-
-```text
-D0 = D0 ⟼ (R ⟼ R)
-```
-
-Кандидат пустого child-scope:
-
-```text
-Child0 = Child0 ⟼ (D_parent ⟼ R)
-```
-
-### 5.2. Definition occurrence
-
-Для:
-
-```text
-sourceContent : form
-```
-
-структура эффекта:
+Definition effect:
 
 ```text
 Entry      = sourceContent ⟼ form
@@ -201,25 +171,9 @@ H_after    = H_before ⟼ Occurrence
 D_after    = D_after ⟼ (sameParentScope ⟼ H_after)
 ```
 
-Здесь необходимо различать:
+Нужно различать `Entry` как mapping и `Occurrence` как конкретное declaration occurrence.
 
-```text
-Entry
-```
-
-как semantic mapping и:
-
-```text
-Occurrence
-```
-
-как конкретное occurrence объявления в конкретном snapshot.
-
-Два одинаковых объявления могут иметь один mapping, но разные declaration occurrences.
-
-### 5.3. Lookup
-
-Trusted lookup под текущим exact `D` идёт только по явно представленной структуре:
+Lookup:
 
 ```text
 D.localHistory
@@ -228,12 +182,7 @@ D.localHistory
 → exact Entry
 ```
 
-Если локального определения нет:
-
-```text
-D.parentScope
-→ lookup(parent)
-```
+Если локального mapping нет — explicit parent scope.
 
 Правила:
 
@@ -246,40 +195,17 @@ distinct local forms for same source = conflict
 no last-write-wins
 ```
 
-Особенно важно: произвольная связь где-то в сети
-
-```text
-D_old ⟼ Entry
-```
-
-не становится видимой только потому, что её можно найти глобальным scan. Trusted replay должен доказать достижимость exact declaration occurrence через `localHistory/parentScope` выбранного `D`.
-
-### 5.4. Source resolution использует historical occurrence
-
-Для selected lexeme:
-
-```text
-Resolution = Lexeme ⟼ form
-Selection  = visibleDefinitionOccurrence ⟼ Resolution
-```
-
-`visibleDefinitionOccurrence` может быть создано против более раннего snapshot `D_before`, но оставаться видимым в позднем `D_current`, если exact history chain это доказывает.
-
-Так source front-end и `:` используют **одну и ту же** dictionary semantics.
+Произвольное `D_old ⟼ Entry` где-то в сети не считается видимым без exact history/parent path.
 
 ## 6. Один interpreter/replay engine
 
-После source front-end интерпретатор не строит вторую semantic representation.
-
-Его trusted вход уже состоит из exact evidence.
+После source front-end интерпретатор не строит вторую semantic representation. Его trusted input уже состоит из exact evidence.
 
 ### 6.1. Relation-resolution act
 
-Первый vertical slice:
-
 ```text
 exact source evidence
-→ one selected partial form F
+→ selected partial form F
 → exact K/current
 → binding = ↑
 → structural pole resolution
@@ -288,71 +214,46 @@ exact source evidence
 → actual A
 ```
 
-Если:
+Для:
 
 ```text
 F = F ⟼ e
 ```
 
-то:
+получаем:
 
 ```text
 X = current ⟼ e
 ```
 
-Если:
+Для:
 
 ```text
 F = b ⟼ F
 ```
 
-то:
+получаем:
 
 ```text
 X = b ⟼ current
 ```
 
-Направление выводится из exact structural form, а не из `TokenKind`, glyph switch или AST opcode.
+Направление выводится из exact structural form, не из glyph/AST/opcode.
 
 ### 6.2. Exact result
 
-Если память содержит:
+Если:
 
 ```text
 X1 = a ⟼ b
 X2 = a ⟼ b
 ```
 
-act может выбрать `X2`. Replay проверяет:
-
-```text
-poles(X2) = (a,b)
-K_after.current = X2
-A.result = X2
-```
-
-и не схлопывает `X1/X2` по форме пары.
+act может выбрать `X2`. Replay проверяет exact `X2` через poles, `K_after.current` и `A.result`; pair uniqueness не предполагается.
 
 ### 6.3. Persistent `:` — тот же engine
 
-Gate #249 добавляет `:` не отдельным DefinitionInterpreter, а вторым replay act того же engine.
-
-Replay `:` проверяет уже присутствующее evidence:
-
-```text
-D_before
-source occurrence S
-sourceContent
-form
-Entry
-Occurrence
-H_before
-H_after
-D_after
-actual A
-```
-
-Он обязан подтвердить:
+`:` replay проверяет уже присутствующую candidate effect network:
 
 ```text
 S = S ⟼ sourceContent
@@ -363,9 +264,7 @@ parent(D_after) = parent(D_before)
 history(D_after) = H_after
 ```
 
-а затем проверить, что новый exact `Occurrence` видим из `D_after`, но не стал ретроактивно видимым из immutable `D_before`.
-
-При этом:
+Новый occurrence должен быть видим из `D_after`, но не ретроактивно из immutable `D_before`.
 
 ```text
 : != =
@@ -373,13 +272,151 @@ history(D_after) = H_after
 : != recursive RHS evaluation
 ```
 
-И replay остаётся read-only: он не создаёт `Entry`, `Occurrence`, history или `D_after`; он проверяет candidate effect network.
+Replay не materialize-ит Entry/history/D_after — он их проверяет.
 
-## 7. Апамять как controller сети
+## 7. Local exact representative `=` — тот же engine
+
+Gate #251 интегрирует `=` как **локальное отношение внутри exact K**, а не как глобальное свойство всей асети.
+
+Context topology сохраняется:
+
+```text
+K = K ⟼ (parent ⟼ current)
+```
+
+Дополнительный local representative constraint:
+
+```text
+Pair    = member ⟼ representative
+Binding = K ⟼ Pair
+```
+
+Важно: сам exact occurrence `K` является context topology и не считается equality binding, хотя его `start` тоже равен `K`.
+
+### 7.1. One-hop representative
+
+```text
+rep_K(x) = explicit local representative, если mapping однозначен
+         = x, если mapping отсутствует
+```
+
+И:
+
+```text
+Equal_K(a,b)
+iff
+rep_K(a) and rep_K(b) are the same exact occurrence
+```
+
+Никакого recursive alias chasing.
+
+Если:
+
+```text
+K: a → b
+K: b → c
+```
+
+то:
+
+```text
+rep_K(a) = b
+rep_K(b) = c
+```
+
+следовательно `Equal_K(a,b)` в таком состоянии **false**. Автоматическое транзитивное замыкание не выполняется.
+
+### 7.2. Duplicate и conflict
+
+Повторные exact bindings:
+
+```text
+K: a → r
+K: a → r
+```
+
+могут существовать как два occurrence provenance, но mapping остаётся однозначным:
+
+```text
+rep_K(a) = r
+```
+
+Если же:
+
+```text
+K: a → r1
+K: a → r2
+r1 != r2
+```
+
+lookup/replay отклоняется как local representative conflict. Last-write-wins отсутствует.
+
+### 7.3. Shape не создаёт equality
+
+Пусть:
+
+```text
+X1 = X1 ⟼ X1
+X2 = X2 ⟼ X2
+X1 != X2
+```
+
+Без local representative evidence:
+
+```text
+rep_K(X1) = X1
+rep_K(X2) = X2
+Equal_K(X1,X2) = false
+```
+
+То есть другой self-cycle не становится `∞` и две одинаковые формы не становятся равными только по graph isomorphism.
+
+### 7.4. Equality evaluation является actual act
+
+Результат проверки не должен существовать только как временный host boolean.
+
+Actual `A` фиксирует exact evidence ролей:
+
+```text
+context
+left
+right
+left-representative
+right-representative
+```
+
+Host API может вернуть `true/false` для удобства, но доверенная семантика — это replay exact `K`, exact representative bindings и actual `A`.
+
+И equal, и non-equal evaluation являются допустимыми actual acts.
+
+### 7.5. Чего `=` намеренно не делает
+
+Нет автоматических:
+
+```text
+transitivity
+substitution
+congruence
+global rewriting
+recursive rewriting
+shape/isomorphism equality
+bisimulation equality
+```
+
+Relation decomposition:
+
+```text
+(a⟼b) = (c⟼d)
+→ a=c, b=d
+```
+
+**не встроена в equality core**. Она допустима только как отдельно admitted one-step rule через `T` в последующем proof/inference gate и не запускается рекурсивно сама собой.
+
+## 8. Апамять как controller сети
 
 Подробно: [Апамять и управление сетью связей](Апамять%20и%20управление%20сетью%20связей.md).
 
-Ключевой operational split:
+Operational split:
 
 ```text
 read / find / enumerate / replay
@@ -391,10 +428,6 @@ materialize / delete
         └── явные effects
 ```
 
-Это не мелкая backend-деталь, а необходимая семантическая граница.
-
-Если описание искомой связи автоматически создаёт эту связь, запрос существования становится бессмысленным.
-
 Поэтому:
 
 ```text
@@ -403,109 +436,34 @@ query description != queried fact
 replay evidence != application effect
 ```
 
-### 7.1. Простой пример
+И local equality даёт ещё один прикладной пример: «равенство» не вычисляется скрытым comparator по всей памяти, а является explicit context-local relation, которую можно хранить, искать и replay-ить как часть сети.
 
-До:
+## 9. Ачисло и будущая sequence deserialization
 
-```text
-a       b
+Recursive Anum уже является root-relative structural description на occurrence-tree области, но это не полная operational semantics произвольной последовательности.
 
-нет exact occurrence a ⟼ b
-```
-
-`find(a,b)`:
-
-```text
-→ {}
-```
-
-и сеть остаётся той же.
-
-Только explicit effect:
-
-```text
-x = materialize(a,b)
-```
-
-даёт:
-
-```text
-a ─────x─────▶ b
-```
-
-### 7.2. Почему это важно для `:`
-
-Запись/описание:
-
-```text
-name : form
-```
-
-сама по себе не обязана менять dictionary state. Executor может построить candidate effect network, а trusted replay отдельно проверит:
-
-```text
-D_before → history append → D_after
-```
-
-Так semantic effect становится проверяемым объектом, а не скрытой мутацией host map.
-
-## 8. Ачисло и будущая sequence deserialization
-
-Recursive Anum уже является root-relative structural description на принятой occurrence-tree области, но это ещё не полная operational semantics произвольной последовательности.
-
-Отдельный gate #242 проверит более широкий исторический принцип:
+Отдельный gate #242 проверит исторический принцип:
 
 ```text
 ∞ A B C
 ```
 
-как последовательностное описание, которое после **явной** десериализации/materialization может построить:
+как последовательностное описание, которое после **явной** materialization может построить:
 
 ```text
 A ⟼ B
 B ⟼ C
 ```
 
-с корректной nested-context semantics.
+с nested-context semantics.
 
 Не смешиваем:
 
 ```text
-source front-end
-    read/resolve source evidence
-
-interpreter replay
-    validate selected semantic act
-
-Anum→апамять
-    explicit result-network materialization
+source front-end     = read/resolve source evidence
+interpreter replay   = validate selected semantic act
+Anum→апамять         = explicit result-network materialization
 ```
-
-Поэтому текущий Gate P не превращает `[`/`]` в безусловные host PUSH/POP opcodes и не расширяет pair-only recursive grammar одной красивой картинкой.
-
-## 9. Следующий слой: local `=`
-
-После закрытия #249 следующий semantic gate должен интегрировать уже принятое решение #225 **в этот же engine**.
-
-Минимальная equality semantics:
-
-```text
-K ⟼ (member ⟼ representative)
-rep_K(x) = one explicit local representative, else x
-Equal_K(a,b) iff rep_K(a) and rep_K(b) are the same exact ref
-```
-
-Без автоматических:
-
-```text
-transitivity
-substitution
-congruence
-global rewriting
-shape equality
-```
-
-Relation decomposition допустима только как отдельно admitted one-step theory rule.
 
 ## 10. Что должна получить следующая версия для aprover
 
@@ -516,21 +474,26 @@ Trusted checker path:
 ```text
 exact source/evidence
 → scoped D resolution + G/T admission
-→ exact active K
-→ selected form/bindings
+→ exact K/current/local representatives
 → selected act semantics
 → exact result/state transition
 → actual A
+→ exact multistep adjacency
 → deterministic read-only replay
 ```
 
-Proof search, ranking, индексы и UI могут быть эвристическими. Доверенная часть проверяет выбранные exact relations.
+Proof search, ranking, indices и UI могут быть эвристическими. Доверенная часть проверяет selected exact relations.
 
-## 11. Что ещё блокирует release
+## 11. Следующий слой после #251
+
+После local `=` следующий gate должен быть не ещё одним оператором, а **multistep/proof integration** над уже существующими actual acts.
+
+Нужно переиспользовать принятое exact-adjacency направление #230/#227 и затем отдельно admitted theory rules. Это будет непосредственный мост к новой версии МТС для `aprover`.
+
+## 12. Что ещё блокирует release
 
 ```text
-scoped D + `:` #249
-→ local `=` in same engine
+local `=` #251
 → multistep/proof integration
 → sequence-to-apamemory #242
 → persistent L4 boundary #124

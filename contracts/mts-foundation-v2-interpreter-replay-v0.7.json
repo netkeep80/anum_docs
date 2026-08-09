@@ -3,33 +3,27 @@
   "status": "gate-p-candidate",
   "accepted": false,
   "issue": 247,
-  "refinedByIssue": 249,
+  "refinedByIssues": [249, 251],
   "parent": 237,
   "dependsOn": [
     "mts-exact-occurrence-link-network/v0.7",
     "mts-foundation-v2-state/v0.7",
     "mts-foundation-v2-source/v0.7",
     "mts-integrated-interpreter-act-challenge/v0.7",
-    "mts-foundation-v2-colon/v0.7"
+    "mts-foundation-v2-colon/v0.7",
+    "mts-foundation-v2-equality/v0.7"
   ],
   "engine": {
     "oneTrustedReplayPath": true,
     "supportedActs": [
       "one-pole relation resolution",
-      "persistent scoped dictionary colon effect"
+      "persistent scoped dictionary colon effect",
+      "local exact-representative equality evaluation"
     ],
-    "parallelDefinitionInterpreter": false
+    "parallelDefinitionInterpreter": false,
+    "parallelEqualityInterpreter": false
   },
   "relationResolution": {
-    "path": [
-      "replay exact selected source evidence",
-      "obtain exactly one selected form occurrence",
-      "read exact active K/current",
-      "bind current to the one open pole",
-      "verify exact result occurrence and poles",
-      "verify persistent K_after",
-      "verify actual act header and exact role-addressed fields"
-    ],
     "startOpen": "F = F ⟼ e => result = current ⟼ e",
     "endOpen": "F = b ⟼ F => result = b ⟼ current",
     "directionFromExactFormStructure": true,
@@ -45,10 +39,21 @@
     "impliesTheorem": false,
     "rhsRecursiveEvaluation": false
   },
+  "equality": {
+    "contract": "mts-foundation-v2-equality/v0.7",
+    "sameReplayModule": true,
+    "representativeSemantics": "one explicit local hop only",
+    "hostBooleanOnlyConvenience": true,
+    "actualActRecordsEvaluation": true,
+    "shapeEquality": false,
+    "automaticTransitivity": false,
+    "automaticSubstitution": false,
+    "automaticCongruence": false,
+    "relationDecompositionBuiltIn": false
+  },
   "context": {
-    "before": "K_before = K_before ⟼ (parent ⟼ current)",
-    "binding": "binding = exact current resolved from K_before",
-    "after": "K_after = K_after ⟼ (sameParent ⟼ exactResult)",
+    "topology": "K = K ⟼ (parent ⟼ current)",
+    "localRepresentativeAttachment": "K ⟼ (member ⟼ representative)",
     "ambientCurrentAllowed": false,
     "inputMutationAllowed": false
   },
@@ -65,7 +70,6 @@
     "duplicateOrConflictingRequiredFieldRejects": true
   },
   "replay": {
-    "sourceFrontEndReplayedForRelationActs": true,
     "checkerReadOnly": true,
     "networkSnapshotMustRemainEqual": true,
     "searchRankingTrusted": false,
@@ -73,7 +77,6 @@
     "persistentBackendEffect": false
   },
   "deferredSameEngineExtensions": {
-    "localEqualityConstraint": 225,
     "multiStepRun": 230,
     "anumSequenceMaterialization": 242,
     "persistentL4": 124
@@ -85,5 +88,5 @@
     "productionCutoverDone": false,
     "aproverRepinAllowed": false
   },
-  "nextGate": "integrate local equality decision #225 into this same trusted engine, then move toward multistep/integrated conformance"
+  "nextGate": "integrate exact multistep/proof adjacency and separately admitted inference rules over the same actual-act replay engine"
 }

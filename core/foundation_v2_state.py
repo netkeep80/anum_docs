@@ -1,15 +1,19 @@
 """Foundation-v2 higher-layer state over the exact-occurrence link substrate.
 
 This module deliberately adds no semantic fields to :class:`Link`. Contexts,
-dictionaries, theories, grammar evidence and interpretation acts are represented
-only by ordinary exact link occurrences. The Python functions below are
-construction/read helpers for the candidate topology; their function names are
-not MTS ontology.
+dictionaries, theories, grammar evidence, local equality constraints and
+interpretation acts are represented only by ordinary exact link occurrences.
+The Python functions below are construction/read helpers for the candidate
+topology; their function names are not MTS ontology.
 
 Foundation-v2 dictionaries use one persistent lexical-scope model. A dictionary
 snapshot is start-self-closed and points to ``parentScope ⟼ localHistory``.
 Definitions append exact occurrences to that history; lookup replays the explicit
 history/parent links rather than consulting a mutable host map.
+
+Local equality is deliberately weaker: a context K may carry explicit one-hop
+``member ⟼ representative`` attachments. No global congruence, transitive alias
+closure or shape equality is provided here.
 
 The module is storage-neutral and read-only after a network has been frozen. It
 does not materialize persistent L4 links and does not define Anum sequence
@@ -34,6 +38,10 @@ class DictionaryConflictError(DictionaryLookupError):
     """One lexical scope contains distinct forms for the same source content."""
 
 
+class RepresentativeConflictError(FoundationStateError):
+    """One local context maps a member to distinct exact representatives."""
+
+
 @dataclass(frozen=True)
 class DictionaryEffectRefs:
     """Construction handles for one persistent definition effect."""
@@ -51,6 +59,15 @@ class ScopedDictionaryResolution:
     scope: OccurrenceRef
     form: OccurrenceRef
     occurrences: tuple[OccurrenceRef, ...]
+
+
+@dataclass(frozen=True)
+class LocalRepresentativeResolution:
+    """One-hop representative plus exact K-attachment occurrences supporting it."""
+
+    member: OccurrenceRef
+    representative: OccurrenceRef
+    bindings: tuple[OccurrenceRef, ...]
 
 
 def define_source_occurrence(
@@ -96,6 +113,79 @@ def parent_of_context(network: LinkNetwork, context: OccurrenceRef) -> Occurrenc
         raise FoundationStateError("context is not start-self-closed")
     pair = network.link(context_link.end)
     return pair.start
+
+
+def define_local_representative_binding(
+    builder: LinkNetworkBuilder,
+    context: OccurrenceRef,
+    member: OccurrenceRef,
+    representative: OccurrenceRef,
+) -> tuple[OccurrenceRef, OccurrenceRef]:
+    """Create ``Pair=member⟼representative`` and ``Binding=K⟼Pair``."""
+
+    pair = builder.reserve()
+    binding = builder.reserve()
+    builder.define(pair, member, representative)
+    builder.define(binding, context, pair)
+    return pair, binding
+
+
+def local_representative_resolution(
+    network: LinkNetwork,
+    context: OccurrenceRef,
+    member: OccurrenceRef,
+) -> LocalRepresentativeResolution:
+    """Resolve exactly one local representative value, without alias chaining.
+
+    Repeated exact binding occurrences to the same representative are tolerated
+    as one unambiguous mapping. Distinct representative values conflict.
+    Missing mapping falls back to the member itself and has no binding evidence.
+    """
+
+    # Validate the distinguished context occurrence before considering attachments.
+    current_of_context(network, context)
+
+    matches: list[tuple[OccurrenceRef, OccurrenceRef]] = []
+    for binding_ref in network.refs:
+        if binding_ref is context:
+            # K itself is start-self-closed context topology, not a representative
+            # attachment even though its start is also K.
+            continue
+        binding = network.link(binding_ref)
+        if binding.start is not context:
+            continue
+        pair = network.link(binding.end)
+        if pair.start is member:
+            matches.append((binding_ref, pair.end))
+
+    if not matches:
+        return LocalRepresentativeResolution(
+            member=member,
+            representative=member,
+            bindings=(),
+        )
+
+    representatives = {representative for _, representative in matches}
+    if len(representatives) != 1:
+        raise RepresentativeConflictError(
+            "context contains distinct local representatives for one member"
+        )
+    representative = next(iter(representatives))
+    return LocalRepresentativeResolution(
+        member=member,
+        representative=representative,
+        bindings=tuple(binding for binding, _ in matches),
+    )
+
+
+def local_representative(
+    network: LinkNetwork,
+    context: OccurrenceRef,
+    member: OccurrenceRef,
+) -> OccurrenceRef:
+    """Return the one-hop exact representative of ``member`` in exact ``K``."""
+
+    return local_representative_resolution(network, context, member).representative
 
 
 def define_dictionary_scope(
