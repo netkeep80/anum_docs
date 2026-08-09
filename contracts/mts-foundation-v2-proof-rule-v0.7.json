@@ -1,0 +1,87 @@
+{
+  "schema": "mts-foundation-v2-proof-rule/v0.7",
+  "status": "gate-p-candidate",
+  "accepted": false,
+  "issue": 255,
+  "parent": 237,
+  "dependsOn": [
+    "mts-foundation-v2-equality/v0.7",
+    "mts-foundation-v2-run/v0.7",
+    "mts-foundation-v2-interpreter-replay/v0.7"
+  ],
+  "firstRule": {
+    "name": "decompose-equal-complete-links-one-step",
+    "premise": "a replayed true local equality evaluation Equal_K(L,R)",
+    "left": "L = l_start ⟼ l_end, complete exact occurrence",
+    "right": "R = r_start ⟼ r_end, complete exact occurrence",
+    "startClaim": "C_start = l_start ⟼ r_start",
+    "endClaim": "C_end = l_end ⟼ r_end",
+    "recursive": false,
+    "claimsMutateEqualityContext": false,
+    "claimsAreTheoremClosure": false
+  },
+  "admission": {
+    "membership": "RuleMembership = T ⟼ Rule",
+    "exactMembershipOccurrenceVerified": true,
+    "hostRuleEnumIsSemanticAuthority": false,
+    "ruleInferredFromOperandShape": false
+  },
+  "premiseReplay": {
+    "usesExistingEqualityReplay": true,
+    "premiseActMustBeExact": true,
+    "premiseMustEvaluateTrue": true,
+    "leftRightMustBeSameExactOccurrencesAsPremise": true,
+    "shapeEquivalentSubstitutionAllowed": false
+  },
+  "applicationAct": {
+    "sameGateRActualActArchitecture": true,
+    "observational": true,
+    "beforeContextEqualsAfterContextByExactOccurrence": true,
+    "requiredRoles": [
+      "premise-equality-act",
+      "theory",
+      "rule",
+      "rule-membership",
+      "left-relation",
+      "right-relation",
+      "start-claim",
+      "end-claim",
+      "before-context",
+      "after-context"
+    ]
+  },
+  "trustBoundary": {
+    "proofSearchTrusted": false,
+    "ruleSelectionTrustedByDefault": false,
+    "selectedEvidenceReplayed": true,
+    "snapshotStable": true,
+    "implicitMaterialization": false,
+    "automaticRepresentativeBindings": false,
+    "automaticNestedRuleFiring": false,
+    "logicalTransitivityInferred": false,
+    "substitutionInferred": false,
+    "congruenceInferred": false,
+    "graphIsomorphismEquality": false
+  },
+  "requiredVectors": [
+    "true local equality plus exact T membership yields exactly two first-level claims",
+    "false equality premise rejects",
+    "membership from another theory rejects",
+    "shape-equal but exact-distinct premise operand substitution rejects",
+    "partial/self-closed relation rejects",
+    "forged start/end claim rejects",
+    "observational rule cannot change exact K",
+    "conflicting required actual-act field rejects",
+    "nested relation poles stay opaque and are not recursively decomposed",
+    "rule replay adds no local representative binding and does not mutate snapshot"
+  ],
+  "aproverLayering": [
+    "untrusted proof search proposes exact evidence",
+    "replay premise actual act",
+    "verify exact T rule admission",
+    "replay exact one-step rule application",
+    "compose application actual act in exact Run",
+    "later integrated conformance decides release"
+  ],
+  "nextGate": "integrated Foundation-v2 proof/checker conformance over source, scoped D/G/T, K, acts, runs and admitted rules"
+}
