@@ -94,16 +94,15 @@ def test_historical_projection_spelling_is_explicitly_not_foundation_v2() -> Non
     assert "Foundation v2 **не переносит** эту ориентацию" in notation
 
 
-def test_docs_do_not_redefine_ostensive_signs_as_raw_projection_opcodes() -> None:
-    joined = "\n".join(_text(path) for path in (FOUNDATIONS, AXIOMS, NOTATION, GATE_P))
-    forbidden = (
-        "♂ = getStart",
-        "♀ = getEnd",
-        "♂ = raw start projection",
-        "♀ = raw end projection",
-    )
-    for fragment in forbidden:
-        assert fragment not in joined
+def test_docs_explicitly_reject_raw_projection_opcode_reading() -> None:
+    foundations = _text(FOUNDATIONS)
+    notation = _text(NOTATION)
+    gate = _text(GATE_P)
+
+    assert "не являются командами взять начало/конец" in _text(README)
+    assert "не означают сами по себе" in foundations
+    assert "Это не primitive function" in notation
+    assert "не превращает `♂/♀` в host opcodes" in gate
 
 
 def test_gate_p_records_persistent_l4_as_completed_before_cutover() -> None:
