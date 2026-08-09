@@ -142,13 +142,13 @@ def test_round_trip_creates_fresh_identity_scope():
 
 
 def test_foreign_builder_refs_reject():
-    left = LinkNetworkBuilder()
-    right = LinkNetworkBuilder()
-    l = left.reserve()
-    r = right.reserve()
+    left_builder = LinkNetworkBuilder()
+    right_builder = LinkNetworkBuilder()
+    left_ref = left_builder.reserve()
+    right_ref = right_builder.reserve()
 
     with pytest.raises(LinkNetworkError, match="foreign occurrence reference"):
-        left.define(l, l, r)
+        left_builder.define(left_ref, left_ref, right_ref)
 
 
 def test_handcrafted_alias_ref_rejects_even_with_scope_and_slot():
