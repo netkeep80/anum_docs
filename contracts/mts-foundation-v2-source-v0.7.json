@@ -3,6 +3,7 @@
   "status": "gate-p-candidate",
   "accepted": false,
   "issue": 245,
+  "refinedByIssue": 249,
   "parent": 237,
   "dependsOn": [
     "mts-exact-occurrence-link-network/v0.7",
@@ -15,7 +16,7 @@
     "canonical astring content C",
     "exact source occurrence S",
     "selected exact segmentation evidence",
-    "explicit D membership per slice",
+    "exact visible scoped-D declaration occurrence per slice",
     "ordered resolved form sequence",
     "explicit G membership",
     "explicit T membership"
@@ -33,13 +34,18 @@
     "sliceEvidenceTopology": "SliceEvidence = Span ⟼ sliceContent",
     "lexemeOccurrenceTopology": "Lexeme = S ⟼ SliceEvidence",
     "resolutionTopology": "Resolution = Lexeme ⟼ form",
-    "selectionTopology": "Selection = exactDictionaryMembership ⟼ Resolution",
+    "selectionTopology": "Selection = exactVisibleDefinitionOccurrence ⟼ Resolution",
     "hostOffsetsAreTransportEvidenceNotSemanticIdentity": true
   },
   "dictionary": {
+    "scopeTopology": "D = D ⟼ (parentScope ⟼ localHistory)",
     "entryTopology": "Entry = sliceContent ⟼ form",
-    "membershipTopology": "Membership = D ⟼ Entry",
-    "membershipMustBeExactSelectedEvidence": true,
+    "definitionOccurrenceTopology": "Occurrence = D_before ⟼ Entry",
+    "selectedOccurrenceMustBeVisibleFromCurrentScope": true,
+    "visibilityProof": "walk exact local-history predecessors, then explicit parent scopes",
+    "localMappingShadowsParent": true,
+    "distinctLocalFormsConflict": true,
+    "flatDirectMembershipIsCanonical": false,
     "sameBytesMayResolveDifferentlyUnderDifferentDictionaries": true
   },
   "sequence": {
@@ -53,7 +59,7 @@
   "replay": {
     "selectedBoundariesVerifiedAgainstCanonicalSourceHistory": true,
     "sliceContentVerifiedAgainstExactSelectedBytes": true,
-    "dictionaryMembershipVerified": true,
+    "scopedDictionaryVisibilityVerified": true,
     "grammarMembershipVerified": true,
     "theoryMembershipVerified": true,
     "orderedSequencesVerified": true,
@@ -74,11 +80,12 @@
     "multi-byte UTF-8 glyph selected as one slice",
     "same bytes under D1/D2 resolve differently",
     "ambiguous split and whole-token segmentations both replay when explicitly admitted",
+    "visible historical declaration occurrence remains valid under later snapshot",
+    "unreachable declaration occurrence rejects",
     "forged span rejects",
-    "wrong dictionary rejects",
     "forged G/T admission rejects",
     "partial/non-contiguous partition rejects",
     "read-only replay does not create described application links"
   ],
-  "nextGate": "one interpreter/replay engine consuming this exact source evidence and explicit K/D/G/T/A state"
+  "nextGate": "same interpreter/replay engine with persistent scoped colon effect and then local equality"
 }

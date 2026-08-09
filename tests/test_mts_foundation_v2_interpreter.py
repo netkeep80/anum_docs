@@ -17,7 +17,8 @@ from core.foundation_v2_state import (
     define_act_field,
     define_act_header,
     define_context,
-    define_dictionary_membership,
+    define_dictionary_effect,
+    define_dictionary_scope,
 )
 
 
@@ -86,6 +87,13 @@ def _role_items(roles: RelationStepRoleRefs):
     )
 
 
+def _define_scoped_mapping(builder, root, before, history, source_content, form):
+    effect = define_dictionary_effect(
+        builder, before, root, history, source_content, form
+    )
+    return effect.after_scope, effect.history_after, effect.occurrence
+
+
 def _fixture(
     form_kind: str = "start-open",
     *,
@@ -97,11 +105,9 @@ def _fixture(
     byte_refs = _byte_vocabulary(builder)
     front_end = SourceFrontEndBuilder(builder, root, byte_refs)
 
-    dictionary = _anchor(builder)
     grammar = _anchor(builder)
     theory = _anchor(builder)
     interpreter = _anchor(builder)
-    role_dictionary = _anchor(builder)
     parent = _anchor(builder)
     binding = _anchor(builder)
     fixed_pole = _anchor(builder)
@@ -123,12 +129,13 @@ def _fixture(
 
     source = front_end.source_occurrence(b"x")
     slice_content = front_end.content_ref(b"x")
-    _, dictionary_membership = define_dictionary_membership(
-        builder, dictionary, slice_content, form
+    dictionary = define_dictionary_scope(builder, root, root)
+    dictionary, _, dictionary_occurrence = _define_scoped_mapping(
+        builder, root, dictionary, root, slice_content, form
     )
     source_evidence = front_end.build_selected_evidence(
         source,
-        (SegmentSpec(0, 1, form, dictionary_membership),),
+        (SegmentSpec(0, 1, form, dictionary_occurrence),),
         dictionary=dictionary,
         grammar=grammar,
         theory=theory,
@@ -143,10 +150,14 @@ def _fixture(
     after_context = define_context(builder, parent, result)
 
     roles = _roles(builder)
+    role_dictionary = define_dictionary_scope(builder, root, root)
+    role_history = root
     for role_name, role_ref in _role_items(roles):
-        define_dictionary_membership(
+        role_dictionary, role_history, _ = _define_scoped_mapping(
             builder,
+            root,
             role_dictionary,
+            role_history,
             front_end.content_ref(role_name.encode("utf-8")),
             role_ref,
         )

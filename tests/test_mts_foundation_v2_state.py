@@ -11,12 +11,14 @@ from core.foundation_v2_state import (
     define_act_field,
     define_act_header,
     define_context,
-    define_dictionary_membership,
+    define_dictionary_effect,
+    define_dictionary_scope,
     define_membership,
     define_source_occurrence,
-    dictionary_forms,
     has_exact_membership,
+    lookup_scoped_dictionary,
     parent_of_context,
+    verify_visible_dictionary_occurrence,
 )
 
 
@@ -40,21 +42,45 @@ def test_explicit_context_resolves_current_without_ambient_stack() -> None:
     assert network.snapshot() == before
 
 
-def test_same_source_can_resolve_differently_under_two_dictionaries() -> None:
+def test_same_source_can_resolve_differently_under_two_scoped_dictionaries() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     source_content = _anchor(builder)
     form_one = _anchor(builder)
     form_two = _anchor(builder)
-    dictionary_one = _anchor(builder)
-    dictionary_two = _anchor(builder)
 
-    define_dictionary_membership(builder, dictionary_one, source_content, form_one)
-    define_dictionary_membership(builder, dictionary_two, source_content, form_two)
+    base_one = define_dictionary_scope(builder, root, root)
+    effect_one = define_dictionary_effect(
+        builder, base_one, root, root, source_content, form_one
+    )
+    base_two = define_dictionary_scope(builder, root, root)
+    effect_two = define_dictionary_effect(
+        builder, base_two, root, root, source_content, form_two
+    )
     network = builder.freeze(root)
 
-    assert dictionary_forms(network, dictionary_one, source_content) == (form_one,)
-    assert dictionary_forms(network, dictionary_two, source_content) == (form_two,)
+    resolution_one = lookup_scoped_dictionary(
+        network, effect_one.after_scope, source_content
+    )
+    resolution_two = lookup_scoped_dictionary(
+        network, effect_two.after_scope, source_content
+    )
+    assert resolution_one is not None and resolution_one.form is form_one
+    assert resolution_two is not None and resolution_two.form is form_two
+    verify_visible_dictionary_occurrence(
+        network,
+        effect_one.after_scope,
+        effect_one.occurrence,
+        source_content,
+        form_one,
+    )
+    verify_visible_dictionary_occurrence(
+        network,
+        effect_two.after_scope,
+        effect_two.occurrence,
+        source_content,
+        form_two,
+    )
 
 
 def test_theory_and_grammar_membership_are_ordinary_exact_links() -> None:
@@ -98,7 +124,7 @@ def test_gate_r_header_keeps_two_actual_acts_occurrence_distinct() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     interpreter = _anchor(builder)
-    role_dictionary = _anchor(builder)
+    role_dictionary = define_dictionary_scope(builder, root, root)
     parent = _anchor(builder)
     result = _anchor(builder)
     after_context = define_context(builder, parent, result)
@@ -116,7 +142,7 @@ def test_role_addressed_act_fields_are_additive_link_data() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     interpreter = _anchor(builder)
-    role_dictionary = _anchor(builder)
+    role_dictionary = define_dictionary_scope(builder, root, root)
     parent = _anchor(builder)
     current = _anchor(builder)
     after_context = define_context(builder, parent, current)
@@ -137,24 +163,22 @@ def test_role_addressed_act_fields_are_additive_link_data() -> None:
     assert network.snapshot() == before
 
 
-def test_role_names_are_resolved_by_explicit_role_dictionary() -> None:
+def test_role_names_are_resolved_by_explicit_scoped_role_dictionary() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
-    role_dictionary = _anchor(builder)
     role_name_source = _anchor(builder)
     role_source = _anchor(builder)
     role_other = _anchor(builder)
-
-    define_dictionary_membership(
-        builder,
-        role_dictionary,
-        role_name_source,
-        role_source,
+    base = define_dictionary_scope(builder, root, root)
+    effect = define_dictionary_effect(
+        builder, base, root, root, role_name_source, role_source
     )
     network = builder.freeze(root)
 
-    assert dictionary_forms(network, role_dictionary, role_name_source) == (role_source,)
-    assert role_other not in dictionary_forms(network, role_dictionary, role_name_source)
+    resolution = lookup_scoped_dictionary(network, effect.after_scope, role_name_source)
+    assert resolution is not None
+    assert resolution.form is role_source
+    assert role_other is not resolution.form
 
 
 def test_non_context_and_non_act_shapes_reject_structural_readers() -> None:
