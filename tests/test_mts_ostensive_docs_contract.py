@@ -147,3 +147,21 @@ def test_nonlink_is_a_meaning_carried_by_links_not_a_second_ontology() -> None:
     assert "несвязь не вводится как отдельный вид существующего" in foundations
     assert "описание само является связевой структурой, но не тождественно своему денотату" in anum
     assert "описать несвязь ≠ сделать несвязь сущностью" in anum
+
+
+def test_readme_defines_core_associative_terms_without_new_ontology() -> None:
+    text = _text(README)
+    required = (
+        "Приставка **«а-»**",
+        "**Асеть**",
+        "**Акорень**",
+        "**Абит**",
+        "**Ачисло**",
+        "**Четверичное ачисло**",
+        "**Строковое ачисло**",
+        "**Апамять**",
+        "Строковый режим не вводит пятый вид абита",
+        "форма связи и её конкретное существование — разные уровни описания",
+    )
+    for fragment in required:
+        assert fragment in text, fragment
