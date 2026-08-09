@@ -1,0 +1,62 @@
+{
+  "schema": "mts-foundation-v2-run/v0.7",
+  "status": "gate-p-candidate",
+  "accepted": false,
+  "issue": 253,
+  "parent": 237,
+  "researchDecision": 230,
+  "dependsOn": [
+    "mts-exact-occurrence-link-network/v0.7",
+    "mts-foundation-v2-interpreter-replay/v0.7"
+  ],
+  "container": {
+    "base": "Run_0 = R",
+    "append": "Run_(i+1) = Run_i ⟼ A_i",
+    "finalExactOccurrenceIdentifiesSelectedRun": true,
+    "hostArrayIndexIsSemanticOrder": false
+  },
+  "stepBoundary": {
+    "beforeField": "A ⟼ (beforeRole ⟼ K_before)",
+    "afterField": "A ⟼ (afterRole ⟼ K_after)",
+    "actHeaderAfterMustMatch": true,
+    "noopAllowed": "K_before may be exact K_after"
+  },
+  "continuity": {
+    "rule": "A_i.after is the same exact occurrence as A_(i+1).before",
+    "shapeSimilarityEnough": false,
+    "graphIsomorphismEnough": false,
+    "persistentContexts": true,
+    "finiteContextReturnsAllowed": true
+  },
+  "trustBoundary": {
+    "selectedRunOnly": true,
+    "branchDiscoveryTrusted": false,
+    "branchRankingTrusted": false,
+    "individualActSemanticsReimplementedByRunChecker": false,
+    "logicalTransitivityInferred": false,
+    "theoremStatusInferred": false,
+    "substitutionInferred": false,
+    "congruenceInferred": false,
+    "contextShortcutMaterialized": false,
+    "replayReadOnly": true
+  },
+  "requiredVectors": [
+    "linear K0->K1->K2",
+    "reordered selected acts reject",
+    "shape-equivalent but occurrence-distinct K breaks continuity",
+    "two occurrence-distinct noop acts preserve exact order",
+    "finite K0->K1->K0 return",
+    "unselected branch candidate does not affect selected run",
+    "forged before/after field rejects",
+    "forged terminal rejects",
+    "run construction creates no K0->Kn shortcut",
+    "empty run is exact state identity"
+  ],
+  "productionBoundary": {
+    "legacyProofCheckerDependency": false,
+    "legacyInterpreterDependency": false,
+    "newLogicalCalculusIntroduced": false,
+    "aproverRepinAllowed": false
+  },
+  "nextGate": "separately admitted theory-rule/proof replay over selected exact acts and run continuity"
+}
