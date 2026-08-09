@@ -1,0 +1,70 @@
+{
+  "schema": "mts-foundation-v2-state/v0.7",
+  "status": "gate-p-candidate",
+  "accepted": false,
+  "issue": 243,
+  "parent": 237,
+  "substrate": "mts-exact-occurrence-link-network/v0.7",
+  "principle": "higher semantic roles are ordinary exact link occurrences; Link itself has only start/end",
+  "source": {
+    "contentAndOccurrenceDistinct": true,
+    "candidateOccurrenceTopology": "S = S ⟼ C",
+    "sourceSpellingIsSemanticIdentity": false
+  },
+  "context": {
+    "pairTopology": "P = parent ⟼ current",
+    "contextTopology": "K = K ⟼ P",
+    "currentPronounCandidate": "↑ resolves to P.end from the explicitly selected exact K",
+    "ambientCurrentAllowed": false,
+    "hiddenParentStackAllowed": false,
+    "persistentUpdateRequired": true
+  },
+  "dictionary": {
+    "entryTopology": "Entry = sourceContent ⟼ form",
+    "membershipTopology": "Membership = D ⟼ Entry",
+    "sameSourceMayResolveDifferentlyUnderDifferentDictionaries": true,
+    "hostGlobalSymbolMapAllowedAsSemanticAuthority": false
+  },
+  "theoryAndGrammar": {
+    "membershipTopology": "container ⟼ admitted exact occurrence",
+    "isAxiomTag": false,
+    "tokenOrAstKindSemanticIdentity": false,
+    "searchRankingTrusted": false,
+    "selectedEvidenceReplayRequired": true
+  },
+  "act": {
+    "interpreterAndActualActDistinct": true,
+    "finiteBootstrap": [
+      "P0 = D_roles ⟼ K_after",
+      "H = I ⟼ P0",
+      "A = A ⟼ H"
+    ],
+    "extensibleField": [
+      "Field = roleRef ⟼ value",
+      "Attachment = A ⟼ Field"
+    ],
+    "roleNamesResolvedThroughExplicitDictionary": true,
+    "hostRoleEnumIsSemanticIdentity": false,
+    "twoActsWithSameVisibleFieldsMayRemainDistinctOccurrences": true
+  },
+  "apamemoryBoundary": {
+    "description": "controller of an exact-occurrence link network and its indices/effects",
+    "readOperations": ["read/poles", "find", "enumerate", "snapshot/replay"],
+    "effectOperations": ["materialize", "delete"],
+    "readOrFindMayMaterialize": false,
+    "interpretOrReplayMayMaterializeImplicitly": false,
+    "sourceCarrierEqualsResultNetwork": false,
+    "backendPhysicalAddressIsPortableSemanticIdentity": false,
+    "persistentBackendOwnedByIssue": 124,
+    "sequenceDeserializationOwnedByIssue": 242
+  },
+  "productionBoundary": {
+    "parserModified": false,
+    "legacyInterpreterModified": false,
+    "contextFrameAdapterAdded": false,
+    "persistentBackendImplemented": false,
+    "anumSequenceMaterializationAccepted": false,
+    "aproverRepinAllowed": false
+  },
+  "nextGate": "single source/interpreter production path over this explicit state layer; sequence-to-apamemory materialization remains issue #242 before final L4 cutover"
+}
