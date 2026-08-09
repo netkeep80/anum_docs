@@ -1,0 +1,79 @@
+{
+  "schema": "anum-root-relative-meaning-challenge/v0.7",
+  "status": "candidate-challenge",
+  "accepted": false,
+  "issue": 206,
+  "dependsOn": [
+    "mts-semantic-root-kernel-challenge/v0.7",
+    "anum-streaming-interpreter-challenge/v0.7"
+  ],
+  "purpose": "Challenge whether recursive Anum is best understood as a root-relative structural meaning description, while exposing the exact boundaries where occurrence identity, sharing and cycles are not preserved.",
+  "rootVocabulary": {
+    "R": "∞",
+    "O": "[",
+    "C": "]",
+    "L": "1",
+    "U": "0"
+  },
+  "candidateReading": {
+    "sourceUsesFourAbits": true,
+    "semanticLeavesUseProtocolLAndU": true,
+    "bracketsCarryNestedContextStructure": true,
+    "rootIsImplicit": true,
+    "meaningPrimitiveRequired": false,
+    "claim": "within the accepted recursive occurrence-tree domain, canonical Anum is a finite root-relative structural description built from the root-derived vocabulary"
+  },
+  "criticalBoundary": {
+    "sourceStringEqualsSemanticLink": false,
+    "canonicalAnumPreservesOccurrenceTree": true,
+    "canonicalAnumPreservesExplicitSharingIdentity": false,
+    "canonicalAnumRepresentsGeneralCyclesDirectly": false,
+    "rootSelfCycleIsUnfoldedInfinitely": false,
+    "generalArbitraryLinkMeaningSolved": false
+  },
+  "sharing": {
+    "explicitSharedNodeInverseMustReject": true,
+    "occurrenceExpandedCopyCanEncode": true,
+    "reason": "the same recursive spelling can describe repeated equal-shaped occurrences but does not carry a node-sharing identity relation"
+  },
+  "cycles": {
+    "structuralDenotationNodesAreTopologicallyOrdered": true,
+    "nodeSelfReferenceAllowed": false,
+    "mutualNodeCycleAllowed": false,
+    "cycleSupportWouldRequireAnotherFiniteReferenceOrSelfClosureMechanism": true
+  },
+  "semanticLayeringCandidate": {
+    "rootStructuralMeaning": "root-relative recursive structure reconstructed from the four-abit protocol",
+    "sharingAndReferenceMeaning": "additional explicit link identity/reference relations outside the recursive occurrence-tree code",
+    "theoryContextMeaning": "future explicit dictionary/theory relations from issue 202",
+    "separateOntologiesRequired": false
+  },
+  "requiredAssertions": [
+    "all accepted recursive structural root vectors round-trip through canonical Anum",
+    "decoded structural leaves are only protocol:0/protocol:1 and can be interpreted as root-kernel U/L",
+    "canonical raw carriers use only 0/1/[ ]",
+    "brackets determine occurrence nesting but are not emitted as denotation leaf nodes",
+    "an explicit shared structural node is rejected by the canonical recursive inverse",
+    "an occurrence-expanded copy of the shared shape is encodable",
+    "StructuralDenotation rejects direct self-cycle node references",
+    "StructuralDenotation cannot encode a mutual node cycle because node refs may target only earlier nodes",
+    "root self-closure remains a finite external/root semantic fixed point, not an infinitely unfolded recursive tree",
+    "no Meaning metadata is added to denotation nodes"
+  ],
+  "notDecided": [
+    "whether to call canonical Anum the meaning of a link or only its root-relative structural description",
+    "the finite representation of arbitrary cyclic/shared asets",
+    "how self-closure signs integrate with general cycle serialization",
+    "how dictionaries/theories contribute higher contextual meaning",
+    "production serialization changes"
+  ],
+  "veto": {
+    "meaningTagAllowed": false,
+    "sharingLossMayBeHidden": false,
+    "infiniteCycleUnfoldingAllowed": false,
+    "newRecursiveGrammarAllowed": false,
+    "productionChangeAllowed": false,
+    "historicalContractMutationAllowed": false,
+    "aproverRepinAllowed": false
+  }
+}
