@@ -9,9 +9,10 @@ README = ROOT / "README.md"
 FOUNDATIONS = ROOT / "docs" / "theory" / "Основания МТС.md"
 AXIOMS = ROOT / "docs" / "theory" / "Система аксиом МТС.md"
 NOTATION = ROOT / "docs" / "specs" / "Формальная нотация МТС.md"
+APAMEMORY = ROOT / "docs" / "specs" / "Апамять и управление сетью связей.md"
 
 ACTIVE_OSTENSIVE_DOCS = (README, FOUNDATIONS, AXIOMS, NOTATION)
-RUSSIAN_NORMATIVE_DOCS = (README, NOTATION)
+RUSSIAN_NORMATIVE_DOCS = (README, NOTATION, APAMEMORY)
 _ALLOWED_LATIN_PROSE = {
     "API",
     "Git",
