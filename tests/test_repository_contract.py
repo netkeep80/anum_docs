@@ -26,6 +26,8 @@ ACTIVE_SPECS = {
     "Ачисла и сериализация.md",
     "Протокол абитов ачисел.md",
     "Пучки значений МТС v0.2.md",
+    "Foundation v2 Gate P.md",
+    "Апамять и управление сетью связей.md",
 }
 ACTIVE_MARKDOWN = (
     ROOT / "README.md",
