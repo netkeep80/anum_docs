@@ -138,6 +138,32 @@ def test_gate_r_header_keeps_two_actual_acts_occurrence_distinct() -> None:
     assert act_header(network, act_two) == (interpreter, role_dictionary, after_context)
 
 
+def test_exact_current_act_is_selected_by_explicit_context_not_global_now() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    interpreter = _anchor(builder)
+    role_dictionary = define_dictionary_scope(builder, root, root)
+    transition_parent = _anchor(builder)
+    result = _anchor(builder)
+    after_context = define_context(builder, transition_parent, result)
+
+    act_one = define_act_header(builder, interpreter, role_dictionary, after_context)
+    act_two = define_act_header(builder, interpreter, role_dictionary, after_context)
+
+    deictic_parent = _anchor(builder)
+    context_one = define_context(builder, deictic_parent, act_one)
+    context_two = define_context(builder, deictic_parent, act_two)
+    network = builder.freeze(root)
+
+    before = network.snapshot()
+    assert act_one is not act_two
+    assert act_header(network, act_one) == act_header(network, act_two)
+    assert current_of_context(network, context_one) is act_one
+    assert current_of_context(network, context_two) is act_two
+    assert context_one is not context_two
+    assert network.snapshot() == before
+
+
 def test_role_addressed_act_fields_are_additive_link_data() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
