@@ -85,10 +85,11 @@ def classify(path: Path) -> str:
 
 
 def historical_modules() -> set[str]:
-    return {
-        module_name(ROOT / row["path"])
-        for row in contract()["historicalSemanticIsland"]
-    }
+    # TEMPORARY DIAGNOSTIC SUBSET for #276/#277. This commit intentionally
+    # isolates whether the remaining red import-scan edge belongs to the old
+    # pair-interning L4 island. The full contract-derived set MUST be restored
+    # before this PR is mergeable.
+    return {"core.anum_memory"}
 
 
 def test_isolation_contract_is_nonaccepting_cutover_gate() -> None:
