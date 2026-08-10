@@ -82,6 +82,16 @@ FORBIDDEN_CANDIDATE_PATHS = {
     "tests/test_mts_bundle_algebra_challenge.py",
     "tests/test_mts_bundle_expansion_challenge.py",
     "tests/test_mts_value_bundle_candidate_contract.py",
+    "contracts/mts-proof-domain-decision-v0.3.json",
+    "contracts/mts-proof-lifting-challenge-v0.3.json",
+    "contracts/mts-proof-lifting-conformance-v0.3.json",
+    "contracts/mts-proof-judgment-challenge-v0.3.json",
+    "contracts/mts-proof-judgment-decision-v0.3.json",
+    "contracts/mts-proof-judgment-conformance-v0.3.json",
+    "tests/test_mts_proof_domain_decision.py",
+    "tests/test_mts_proof_lifting_challenge.py",
+    "tests/test_mts_proof_judgment_challenge.py",
+    "tests/test_mts_proof_judgment_decision.py",
 }
 ROOT_FORMULAS_SHA256 = "1ccfb6fa0ae3c744dffcdefefcf2d5d96108573f4b04fdd8ac45a2e15a98ee3a"
 
