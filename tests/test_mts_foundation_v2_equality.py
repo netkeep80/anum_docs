@@ -173,22 +173,28 @@ def test_alias_chain_is_deliberately_one_hop_not_transitive() -> None:
     assert replay_equality_evaluation(network, evidence) is False
 
 
-def test_duplicate_same_representative_bindings_are_unambiguous_not_last_write_wins() -> None:
+def test_repeated_same_representative_binding_is_canonical_and_unambiguous() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     context = define_context(builder, _anchor(builder), _anchor(builder))
     member = _anchor(builder)
     representative = _anchor(builder)
-    define_local_representative_binding(builder, context, member, representative)
-    define_local_representative_binding(builder, context, member, representative)
+    first_pair, first_binding = define_local_representative_binding(
+        builder, context, member, representative
+    )
+    second_pair, second_binding = define_local_representative_binding(
+        builder, context, member, representative
+    )
     evidence = _make_evidence(
         builder, root, context, member, representative, representative, representative
     )
     network = builder.freeze(root)
 
+    assert second_pair is first_pair
+    assert second_binding is first_binding
     resolution = local_representative_resolution(network, context, member)
     assert resolution.representative is representative
-    assert len(resolution.bindings) == 2
+    assert resolution.bindings == (first_binding,)
     assert replay_equality_evaluation(network, evidence) is True
 
 
