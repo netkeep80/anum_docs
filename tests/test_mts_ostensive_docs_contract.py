@@ -175,6 +175,7 @@ def test_nonlink_is_meaning_carried_by_links_not_second_ontology() -> None:
     assert "не вводится как отдельный вид существующего" in foundations
     assert "не является буквальным отсутствием связи" in foundations
     assert "командой удаления" in foundations
+    assert "0 ≠ DELETE_LINK" in foundations
 
 
 def test_readme_defines_core_associative_terms_without_new_ontology() -> None:
