@@ -257,7 +257,7 @@ def test_source_root_brackets_drive_nested_sequence_deserialization() -> None:
     assert network.snapshot() == before
 
 
-def test_root_opening_restoration_reuses_exact_opening_occurrence() -> None:
+def test_root_opening_restoration_reuses_canonical_opening_link() -> None:
     kernel = build_root_kernel()
     builder = kernel.network.evolve()
     opening = kernel.refs.opening
@@ -266,8 +266,7 @@ def test_root_opening_restoration_reuses_exact_opening_occurrence() -> None:
     b = _anchor(builder)
     c = _anchor(builder)
     d = _anchor(builder)
-    same_poles_as_opening = builder.reserve()
-    builder.define(same_poles_as_opening, opening, kernel.refs.root)
+    assert builder.ensure(opening, kernel.refs.root) is opening
     network = builder.freeze()
 
     before = network.snapshot()
@@ -308,15 +307,6 @@ def test_root_opening_restoration_reuses_exact_opening_occurrence() -> None:
         open_form=opening,
         close_form=closing,
     ) == balanced
-
-    assert network.link(same_poles_as_opening) == network.link(opening)
-    shape_duplicate_carrier = (same_poles_as_opening, a, closing)
-    assert replay_root_opening_restoration(
-        network,
-        shape_duplicate_carrier,
-        open_form=opening,
-        close_form=closing,
-    ) == shape_duplicate_carrier
     assert network.snapshot() == before
 
 
@@ -492,7 +482,7 @@ def test_duplicate_byte_refs_are_rejected_as_noncanonical_vocabulary() -> None:
     )
     network = builder.freeze(root)
 
-    with pytest.raises(SourceReplayError, match="occurrence-distinct"):
+    with pytest.raises(SourceReplayError, match="refs must be distinct"):
         replay_source_front_end(network, evidence, byte_refs)
 
 
