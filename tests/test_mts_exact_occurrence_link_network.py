@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import fields
-import json
-from pathlib import Path
 
 import pytest
 
@@ -16,14 +14,6 @@ from core.exact_link_network import (
 )
 
 
-ROOT = Path(__file__).resolve().parents[1]
-CONTRACT = ROOT / "contracts/mts-exact-occurrence-link-network-v0.7.json"
-
-
-def read_contract() -> dict:
-    return json.loads(CONTRACT.read_text(encoding="utf-8"))
-
-
 def build_reference_network():
     builder = LinkNetworkBuilder()
     root = builder.reserve()
@@ -31,8 +21,6 @@ def build_reference_network():
     shared = builder.reserve()
     left = builder.reserve()
     right = builder.reserve()
-    duplicate1 = builder.reserve()
-    duplicate2 = builder.reserve()
     mutual_a = builder.reserve()
     mutual_b = builder.reserve()
 
@@ -41,8 +29,6 @@ def build_reference_network():
     builder.define(shared, root, other_self)
     builder.define(left, shared, root)
     builder.define(right, shared, other_self)
-    builder.define(duplicate1, left, right)
-    builder.define(duplicate2, left, right)
     builder.define(mutual_a, mutual_b, root)
     builder.define(mutual_b, mutual_a, root)
     return builder.freeze(root), {
@@ -51,54 +37,63 @@ def build_reference_network():
         "shared": shared,
         "left": left,
         "right": right,
-        "duplicate1": duplicate1,
-        "duplicate2": duplicate2,
         "mutual_a": mutual_a,
         "mutual_b": mutual_b,
     }
 
 
-def test_contract_is_candidate_and_does_not_authorize_cutover():
-    contract = read_contract()
-    assert contract["schema"] == "mts-exact-occurrence-link-network/v0.7"
-    assert contract["status"] == "gate-p-candidate"
-    assert contract["accepted"] is False
-    assert contract["issue"] == 240
-    assert contract["historicalBoundary"]["productionCutover"] is False
-    assert contract["veto"]["downstreamRepin"] is False
-
-
 def test_link_primitive_has_exactly_start_and_end():
     assert [field.name for field in fields(Link)] == ["start", "end"]
-    contract = read_contract()
-    assert contract["primitive"]["linkFields"] == ["start", "end"]
-    assert contract["primitive"]["semanticTags"] == []
 
 
-def test_distinguished_root_is_exact_occurrence_not_self_closed_shape_search():
+def test_distinct_self_loops_are_allowed_when_their_actual_poles_differ():
     network, refs = build_reference_network()
     root = refs["root"]
     other = refs["other_self"]
 
-    assert network.root is root
+    assert root is not other
     assert network.link(root) == Link(root, root)
     assert network.link(other) == Link(other, other)
-    assert root != other
-    assert network.root != other
+    assert network.find(root, root) is root
+    assert network.find(other, other) is other
 
 
-def test_duplicate_equal_pairs_remain_distinct_occurrences():
-    network, refs = build_reference_network()
-    first = refs["duplicate1"]
-    second = refs["duplicate2"]
+def test_duplicate_equal_pair_definition_is_rejected():
+    builder = LinkNetworkBuilder()
+    root = builder.reserve()
+    left = builder.reserve()
+    right = builder.reserve()
+    first = builder.reserve()
+    duplicate = builder.reserve()
 
-    assert first != second
-    assert network.link(first) == network.link(second)
-    assert network.link(first).start is refs["left"]
-    assert network.link(first).end is refs["right"]
+    builder.define(root, root, root)
+    builder.define(left, left, root)
+    builder.define(right, root, right)
+    builder.define(first, left, right)
+
+    with pytest.raises(LinkNetworkError, match="duplicate semantic link pair"):
+        builder.define(duplicate, left, right)
 
 
-def test_sharing_is_preserved_by_exact_refs():
+def test_ensure_reuses_the_same_link_for_the_same_pair():
+    builder = LinkNetworkBuilder()
+    root = builder.reserve()
+    left = builder.reserve()
+    right = builder.reserve()
+    builder.define(root, root, root)
+    builder.define(left, left, root)
+    builder.define(right, root, right)
+
+    first = builder.ensure(left, right)
+    second = builder.ensure(left, right)
+    assert second is first
+
+    network = builder.freeze(root)
+    assert network.find(left, right) is first
+    assert len(network.refs) == 4
+
+
+def test_sharing_is_preserved_by_technical_handles():
     network, refs = build_reference_network()
     assert network.link(refs["left"]).start is refs["shared"]
     assert network.link(refs["right"]).start is refs["shared"]
@@ -114,7 +109,7 @@ def test_mutual_cycle_is_finite_and_direct():
     assert network.link(b).end is refs["root"]
 
 
-def test_snapshot_round_trip_preserves_topology_root_and_multiplicity():
+def test_snapshot_round_trip_preserves_canonical_topology_and_root():
     network, refs = build_reference_network()
     snapshot = network.snapshot()
     restored = LinkNetwork.from_snapshot(snapshot)
@@ -123,35 +118,37 @@ def test_snapshot_round_trip_preserves_topology_root_and_multiplicity():
     assert restored.root.slot == refs["root"].slot
     assert len(restored.refs) == len(network.refs)
 
-    first = restored.refs[refs["duplicate1"].slot]
-    second = restored.refs[refs["duplicate2"].slot]
-    assert first != second
-    assert restored.link(first) == restored.link(second)
+    for ref in restored.refs:
+        link = restored.link(ref)
+        assert restored.find(link.start, link.end) is ref
 
 
-def test_round_trip_creates_fresh_identity_scope():
+def test_round_trip_issues_fresh_runtime_handles_without_claiming_new_semantic_identity():
     network, refs = build_reference_network()
     restored = LinkNetwork.from_snapshot(network.snapshot())
 
+    # Runtime handles belong to different access scopes after loading. This is
+    # not a semantic MTS identity comparison; topology remains the same.
     assert restored.root != network.root
-    assert restored.refs[refs["shared"].slot] != refs["shared"]
-    with pytest.raises(LinkNetworkError, match="foreign occurrence reference"):
+    assert restored.snapshot() == network.snapshot()
+
+    with pytest.raises(LinkNetworkError, match="foreign network link handle"):
         restored.link(refs["shared"])
-    with pytest.raises(LinkNetworkError, match="foreign occurrence reference"):
+    with pytest.raises(LinkNetworkError, match="foreign network link handle"):
         network.link(restored.refs[refs["shared"].slot])
 
 
-def test_foreign_builder_refs_reject():
+def test_foreign_builder_handles_reject():
     left_builder = LinkNetworkBuilder()
     right_builder = LinkNetworkBuilder()
     left_ref = left_builder.reserve()
     right_ref = right_builder.reserve()
 
-    with pytest.raises(LinkNetworkError, match="foreign occurrence reference"):
+    with pytest.raises(LinkNetworkError, match="foreign reserved link handle"):
         left_builder.define(left_ref, left_ref, right_ref)
 
 
-def test_handcrafted_alias_ref_rejects_even_with_scope_and_slot():
+def test_handcrafted_alias_handle_rejects_even_with_scope_and_slot():
     network, refs = build_reference_network()
     original = refs["shared"]
     forged = OccurrenceRef(original._scope, original.slot)
@@ -167,7 +164,7 @@ def test_incomplete_builder_rejects_freeze_and_redefinition_rejects():
     other = builder.reserve()
     builder.define(root, root, root)
 
-    with pytest.raises(LinkNetworkError, match="unbound occurrences"):
+    with pytest.raises(LinkNetworkError, match="unbound reserved links"):
         builder.freeze(root)
 
     builder.define(other, other, root)
@@ -185,38 +182,45 @@ def test_builder_is_one_shot_after_freeze():
         builder.reserve()
 
 
-def test_invalid_snapshots_reject():
+def test_invalid_snapshots_reject_including_duplicate_physical_pair():
     invalid = [
         NetworkSnapshot(links=(), root=0),
         NetworkSnapshot(links=((0, 0),), root=1),
         NetworkSnapshot(links=((1, 0),), root=0),
         NetworkSnapshot(links=((-1, 0),), root=0),
+        NetworkSnapshot(links=((0, 0), (0, 0)), root=0),
     ]
     for snapshot in invalid:
         with pytest.raises(LinkNetworkError):
             LinkNetwork.from_snapshot(snapshot)
 
 
-def test_snapshot_slots_are_transport_local_not_runtime_refs():
+def test_snapshot_slots_are_transport_coordinates_not_semantic_identity():
     network, refs = build_reference_network()
     snapshot = network.snapshot()
     assert isinstance(snapshot.root, int)
     assert all(isinstance(slot, int) for pair in snapshot.links for slot in pair)
     assert snapshot.root == refs["root"].slot
-    assert read_contract()["identityBoundaries"]["snapshotSlotIsUniversalIdentity"] is False
 
 
-def test_no_pair_interning_or_graph_equality_api_is_part_of_primitive_network():
-    forbidden = {
-        "intern",
-        "find_or_create",
-        "isomorphic",
-        "equals",
-        "meaning",
-        "kind",
-    }
-    public = set(dir(LinkNetwork)) | set(dir(LinkNetworkBuilder)) | set(Link.__dataclass_fields__)
-    assert forbidden.isdisjoint(public)
-    identity = read_contract()["identityBoundaries"]
-    assert identity["samePairImpliesSameOccurrence"] is False
-    assert identity["isomorphismImpliesSemanticIdentity"] is False
+def test_evolution_ensure_reuses_base_pair_and_appends_new_pair_once():
+    network, refs = build_reference_network()
+    evolution = network.evolve()
+
+    existing = evolution.ensure(refs["left"], refs["right"])
+    same = evolution.ensure(refs["left"], refs["right"])
+    assert same is existing
+
+    # The pair was absent in the base, so it is appended exactly once.
+    after = evolution.freeze()
+    assert len(after.refs) == len(network.refs) + 1
+    assert after.find(refs["left"], refs["right"]) is existing
+
+
+def test_evolution_rejects_explicit_duplicate_of_base_pair():
+    network, refs = build_reference_network()
+    evolution = network.evolve()
+    duplicate = evolution.reserve()
+
+    with pytest.raises(LinkNetworkError, match="duplicate semantic link pair"):
+        evolution.define(duplicate, refs["shared"], refs["root"])
