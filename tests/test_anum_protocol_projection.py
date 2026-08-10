@@ -405,6 +405,105 @@ def test_grouping_preserves_depth_that_generic_materializer_does_not_encode() ->
     ) == ()
 
 
+def test_user_examples_decompose_into_pass_deserialize_encode_and_left_fold() -> None:
+    kernel = build_root_kernel()
+    builder = kernel.network.evolve()
+    root = kernel.refs.root
+    a = kernel.refs.unlinked
+    b = kernel.refs.linked
+
+    carrier_a = builder.reserve()
+    carrier_ab = builder.reserve()
+    builder.define(carrier_a, root, a)
+    builder.define(carrier_ab, carrier_a, b)
+    before = builder.freeze()
+
+    empty = materialize_sequence(before, SequenceDescription(root=root, items=()))
+    singleton = materialize_sequence(
+        before,
+        SequenceDescription(root=root, items=(SequenceAtom(a),)),
+    )
+    assert empty.result is root and empty.created == ()
+    assert singleton.result is a and singleton.created == ()
+
+    # P: pass an already-existing exact carrier as one value, with no effect.
+    passed = materialize_sequence(
+        before,
+        SequenceDescription(root=root, items=(SequenceAtom(carrier_ab),)),
+    )
+    assert passed.result is carrier_ab
+    assert passed.created == ()
+
+    # D: deserialize ab by the corrected left fold, without R as an operand.
+    deserialized = materialize_sequence(
+        before,
+        SequenceDescription(
+            root=root,
+            items=(SequenceAtom(a), SequenceAtom(b)),
+        ),
+    )
+    x = deserialized.result
+    assert len(deserialized.created) == 1
+    assert (deserialized.created[0].start, deserialized.created[0].end) == (a, b)
+
+    # E: encode one selected exact value as a carrier R⟼value.  This is an
+    # explicit link effect, not an intrinsic bracket opcode.
+    encoded_builder = deserialized.after.evolve()
+    carrier_x = encoded_builder.reserve()
+    carrier_carrier_ab = encoded_builder.reserve()
+    encoded_builder.define(carrier_x, root, x)
+    encoded_builder.define(carrier_carrier_ab, root, carrier_ab)
+    encoded = encoded_builder.freeze()
+
+    # User families:
+    #   [ab]   -> E(D(ab)) = C_X
+    #   [[ab]] -> E(P(C_ab)) = C(C_ab)
+    assert encoded.link(carrier_x).start is root
+    assert encoded.link(carrier_x).end is x
+    assert encoded.link(carrier_carrier_ab).start is root
+    assert encoded.link(carrier_carrier_ab).end is carrier_ab
+    assert carrier_x is not carrier_carrier_ab
+
+    # ab[ab] -> D(a,b,D(a,b)); inner and outer a⟼b are exact-distinct.
+    mixed = materialize_sequence(
+        before,
+        SequenceDescription(
+            root=root,
+            items=(
+                SequenceAtom(a),
+                SequenceAtom(b),
+                SequenceGroup((SequenceAtom(a), SequenceAtom(b))),
+            ),
+        ),
+    )
+    inner_ab, outer_ab, mixed_result = mixed.created
+    assert (inner_ab.start, inner_ab.end) == (a, b)
+    assert (outer_ab.start, outer_ab.end) == (a, b)
+    assert inner_ab.ref is not outer_ab.ref
+    assert mixed_result.start is outer_ab.ref
+    assert mixed_result.end is inner_ab.ref
+    assert mixed.result is mixed_result.ref
+
+    # [[ab]]ab -> D(E(P(C_ab)),a,b), using the literal second-level candidate.
+    outer = materialize_sequence(
+        encoded,
+        SequenceDescription(
+            root=root,
+            items=(
+                SequenceAtom(carrier_carrier_ab),
+                SequenceAtom(a),
+                SequenceAtom(b),
+            ),
+        ),
+    )
+    first, full = outer.created
+    assert first.start is carrier_carrier_ab
+    assert first.end is a
+    assert full.start is first.ref
+    assert full.end is b
+    assert outer.result is full.ref
+
+
 def test_mixed_ab_group_ab_preserves_duplicate_exact_pair_occurrences() -> None:
     kernel = build_root_kernel()
     root = kernel.refs.root
