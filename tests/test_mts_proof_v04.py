@@ -21,9 +21,8 @@ from core.proof_checker import (
 ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-proof-v0.4.json"
 CONFORMANCE = ROOT / "contracts" / "mts-proof-conformance-v0.4.json"
-CANDIDATE = ROOT / "contracts" / "mts-proof-v0.4-conformance-candidate.json"
 BASE_CORPUS = ROOT / "contracts" / "mts-proof-conformance-v0.3.json"
-OPENING_CORPUS = ROOT / "contracts" / "mts-opening-path-conformance-candidate-v0.4.json"
+OPENING_CONFORMANCE = ROOT / "contracts" / "mts-opening-path-conformance-v0.4.json"
 PROOF_V03 = ROOT / "contracts" / "mts-proof-v0.3.json"
 MTS_V04 = ROOT / "contracts" / "mts-contract-v0.4.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
@@ -124,21 +123,16 @@ def test_contract_is_accepted_with_exact_six_relation_surface():
     assert conformance["schema"] == "mts-proof-conformance/v0.4"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
+    assert contract["conformanceCorpus"] == "contracts/mts-proof-conformance-v0.4.json"
 
 
-def test_conformance_selects_green_source_corpora_without_semantic_vector_copy():
+def test_accepted_conformance_owns_v04_vectors_and_uses_only_accepted_dependencies():
     conformance = read(CONFORMANCE)
 
-    assert conformance["sourceCorpus"] == (
-        "contracts/mts-proof-v0.4-conformance-candidate.json"
-    )
     assert conformance["baseCorpus"] == "contracts/mts-proof-conformance-v0.3.json"
-    assert conformance["openingPathCorpus"] == (
-        "contracts/mts-opening-path-conformance-candidate-v0.4.json"
-    )
-    assert "validJudgments" not in conformance
-    assert "validPaths" not in conformance
-    assert "invalidPaths" not in conformance
+    assert conformance["openingPathCorpus"] == "contracts/mts-opening-path-conformance-v0.4.json"
+    assert conformance["invalidArtifacts"]
+    assert conformance["mixedArtifact"]["openingPathId"] == "two-edge"
 
 
 def test_every_v03_valid_base_judgment_replays_identically_when_lifted():
@@ -173,7 +167,7 @@ def test_every_existing_v03_invalid_artifact_remains_rejected_by_v03_api():
 
 
 def test_every_opening_path_valid_vector_lifts_to_trusted_v04_relation():
-    for vector in read(OPENING_CORPUS)["validPaths"]:
+    for vector in read(OPENING_CONFORMANCE)["validPaths"]:
         artifact = v04_artifact([opening_judgment(vector)])
         assert check_proof_v04_data(artifact), vector["id"]
         typed = proof_v04_from_data(artifact)
@@ -183,21 +177,21 @@ def test_every_opening_path_valid_vector_lifts_to_trusted_v04_relation():
 
 
 def test_every_opening_path_invalid_vector_rejects_when_lifted():
-    for vector in read(OPENING_CORPUS)["invalidPaths"]:
+    for vector in read(OPENING_CONFORMANCE)["invalidPaths"]:
         assert not check_proof_v04_data(v04_artifact([opening_judgment(vector)])), vector["id"]
 
 
 def test_every_v04_specific_transport_forgery_rejects():
-    for vector in read(CANDIDATE)["invalidArtifacts"]:
+    for vector in read(CONFORMANCE)["invalidArtifacts"]:
         assert not check_proof_v04_data(vector["artifact"]), vector["id"]
 
 
 def test_mixed_base_and_opening_path_judgment_order_has_no_dependency_meaning():
-    mixed = read(CANDIDATE)["mixedArtifact"]
+    mixed = read(CONFORMANCE)["mixedArtifact"]
     base = base_by_id()[mixed["baseJudgmentId"]]
     opening_vector = next(
         item
-        for item in read(OPENING_CORPUS)["validPaths"]
+        for item in read(OPENING_CONFORMANCE)["validPaths"]
         if item["id"] == mixed["openingPathId"]
     )
     opening = opening_judgment(opening_vector)
@@ -216,7 +210,7 @@ def test_mixed_base_and_opening_path_judgment_order_has_no_dependency_meaning():
 def test_v04_canonical_round_trip_is_deterministic_for_mixed_proof():
     base = base_by_id()["opens-direct"]
     opening_vector = next(
-        item for item in read(OPENING_CORPUS)["validPaths"] if item["id"] == "two-edge"
+        item for item in read(OPENING_CONFORMANCE)["validPaths"] if item["id"] == "two-edge"
     )
     source = v04_artifact([base, opening_judgment(opening_vector)])
 
@@ -235,7 +229,7 @@ def test_v04_canonical_round_trip_is_deterministic_for_mixed_proof():
 def test_target_transport_may_normalize_whitespace_on_serialization_without_changing_identity():
     vector = next(
         deepcopy(item)
-        for item in read(OPENING_CORPUS)["validPaths"]
+        for item in read(OPENING_CONFORMANCE)["validPaths"]
         if item["id"] == "structural-adjacency-whitespace"
     )
     artifact = v04_artifact([opening_judgment(vector)])
@@ -251,7 +245,7 @@ def test_target_transport_may_normalize_whitespace_on_serialization_without_chan
 def test_noncanonical_expected_body_and_final_body_are_transport_errors():
     vector = next(
         deepcopy(item)
-        for item in read(OPENING_CORPUS)["validPaths"]
+        for item in read(OPENING_CONFORMANCE)["validPaths"]
         if item["id"] == "structural-adjacency-whitespace"
     )
     judgment = opening_judgment(vector)
@@ -260,7 +254,7 @@ def test_noncanonical_expected_body_and_final_body_are_transport_errors():
 
     bundle = next(
         deepcopy(item)
-        for item in read(OPENING_CORPUS)["validPaths"]
+        for item in read(OPENING_CONFORMANCE)["validPaths"]
         if item["id"] == "ends-in-constraint-bundle"
     )
     judgment = opening_judgment(bundle)
