@@ -13,6 +13,7 @@ from core.foundation_v2_interpreter import (
     RelationStepEvidence,
     RelationStepRoleRefs,
     replay_flat_sequence_reading,
+    replay_flat_source_subselection_continuation,
     replay_flat_source_subselection_reading,
     replay_relation_step,
 )
@@ -640,6 +641,129 @@ def test_flat_subselection_reading_keeps_whole_source_in_actual_act() -> None:
             theory=alternate_theory,
             grammar_membership=alternate_grammar_membership,
             theory_membership=alternate_theory_membership,
+        )
+    assert network.snapshot() == snapshot
+
+
+def test_flat_subselection_continuation_starts_from_exact_current() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    byte_refs = _byte_vocabulary(builder)
+    front_end = SourceFrontEndBuilder(builder, root, byte_refs)
+
+    prefix = _anchor(builder)
+    a = _anchor(builder)
+    b = _anchor(builder)
+    prefix_a = _new_link(builder, prefix, a)
+    result = _new_link(builder, prefix_a, b)
+
+    source = front_end.source_occurrence(b"ab")
+    dictionary = define_dictionary_scope(builder, root, root)
+    history = root
+    occurrences = {}
+    for raw, form in ((b"a", a), (b"b", b)):
+        dictionary, history, occurrence = _define_scoped_mapping(
+            builder,
+            root,
+            dictionary,
+            history,
+            front_end.content_ref(raw),
+            form,
+        )
+        occurrences[raw] = occurrence
+
+    grammar = _anchor(builder)
+    theory = _anchor(builder)
+    source_evidence = front_end.build_selected_evidence(
+        source,
+        (
+            SegmentSpec(0, 1, a, occurrences[b"a"]),
+            SegmentSpec(1, 2, b, occurrences[b"b"]),
+        ),
+        dictionary=dictionary,
+        grammar=grammar,
+        theory=theory,
+    )
+
+    interpreter = _anchor(builder)
+    parent = _anchor(builder)
+    before_context = define_context(builder, parent, prefix)
+    after_context = define_context(builder, parent, result)
+    roles = _flat_roles(builder)
+    role_dictionary = define_dictionary_scope(builder, root, root)
+    role_history = root
+    for role_name, role_ref in _flat_role_items(roles):
+        role_dictionary, role_history, _ = _define_scoped_mapping(
+            builder,
+            root,
+            role_dictionary,
+            role_history,
+            front_end.content_ref(role_name.encode("utf-8")),
+            role_ref,
+        )
+
+    act = define_act_header(builder, interpreter, role_dictionary, after_context)
+    for role, value in (
+        (roles.source, source_evidence.source),
+        (roles.source_selection, source_evidence.selection_sequence),
+        (roles.form_sequence, source_evidence.form_sequence),
+        (roles.dictionary, source_evidence.dictionary),
+        (roles.grammar, source_evidence.grammar),
+        (roles.theory, source_evidence.theory),
+        (roles.before_context, before_context),
+        (roles.result, result),
+        (roles.after_context, after_context),
+    ):
+        define_act_field(builder, act, role, value)
+
+    evidence = FlatSequenceReadingEvidence(
+        source_evidence=source_evidence,
+        interpreter=interpreter,
+        before_context=before_context,
+        result=result,
+        after_context=after_context,
+        act=act,
+        role_dictionary=role_dictionary,
+        roles=roles,
+    )
+
+    wrong_prefix = _anchor(builder)
+    forged_before = define_context(builder, parent, wrong_prefix)
+    network = builder.freeze(root)
+    snapshot = network.snapshot()
+
+    assert replay_flat_source_subselection_continuation(
+        network,
+        evidence,
+        byte_refs,
+        start_segment=0,
+        end_segment=2,
+        selection_sequence=source_evidence.selection_sequence,
+        form_sequence=source_evidence.form_sequence,
+        grammar=source_evidence.grammar,
+        theory=source_evidence.theory,
+        grammar_membership=source_evidence.grammar_membership,
+        theory_membership=source_evidence.theory_membership,
+    ) is result
+    assert network.link(prefix_a).start is prefix
+    assert network.link(prefix_a).end is a
+    assert network.link(result).start is prefix_a
+    assert network.link(result).end is b
+
+    forged = replace(evidence, before_context=forged_before)
+    with pytest.raises(InterpreterReplayError, match="exact K current"):
+        replay_flat_source_subselection_continuation(
+            network,
+            forged,
+            byte_refs,
+            start_segment=0,
+            end_segment=2,
+            selection_sequence=source_evidence.selection_sequence,
+            form_sequence=source_evidence.form_sequence,
+            grammar=source_evidence.grammar,
+            theory=source_evidence.theory,
+            grammar_membership=source_evidence.grammar_membership,
+            theory_membership=source_evidence.theory_membership,
         )
     assert network.snapshot() == snapshot
 
