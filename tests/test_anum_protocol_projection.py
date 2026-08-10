@@ -25,7 +25,11 @@ from core.foundation_v2_source import (
     SourceFrontEndBuilder,
     replay_source_front_end,
 )
-from core.foundation_v2_state import define_dictionary_effect, define_dictionary_scope
+from core.foundation_v2_state import (
+    define_dictionary_effect,
+    define_dictionary_scope,
+    define_membership,
+)
 
 
 def _anchor(builder):
@@ -56,6 +60,15 @@ def _dictionary_with(builder, root, front_end, mappings):
         dictionary = effect.after_scope
         history = effect.history_after
     return dictionary, tuple(occurrences)
+
+
+def _fold(builder, root, values):
+    current = root
+    for value in values:
+        ref = builder.reserve()
+        builder.define(ref, current, value)
+        current = ref
+    return current
 
 
 def test_root_context_projects_open_close_to_canonical_link_value():
@@ -236,6 +249,101 @@ def test_quote_envelope_can_select_carrier_or_deserialized_denotation() -> None:
     assert passed_carrier.result is carrier
     assert find_links(passed_carrier.after, start=unlinked, end=linked) == ()
     assert passed_carrier.after.link(carrier) is network.link(carrier)
+    assert network.snapshot() == before
+
+
+def test_nested_body_selection_reuses_exact_segments_of_whole_source() -> None:
+    kernel = build_root_kernel()
+    builder = kernel.network.evolve()
+    root = kernel.refs.root
+    opening = kernel.refs.opening
+    closing = kernel.refs.closing
+    a = kernel.refs.unlinked
+    b = kernel.refs.linked
+
+    byte_refs = _byte_vocabulary(builder)
+    front_end = SourceFrontEndBuilder(builder, root, byte_refs)
+    source = front_end.source_occurrence(b"[ab]")
+    dictionary, occurrences = _dictionary_with(
+        builder,
+        root,
+        front_end,
+        (
+            (b"[", opening),
+            (b"a", a),
+            (b"b", b),
+            (b"]", closing),
+        ),
+    )
+    outer_grammar = _anchor(builder)
+    outer_theory = _anchor(builder)
+    outer = front_end.build_selected_evidence(
+        source,
+        (
+            SegmentSpec(0, 1, opening, occurrences[0]),
+            SegmentSpec(1, 2, a, occurrences[1]),
+            SegmentSpec(2, 3, b, occurrences[2]),
+            SegmentSpec(3, 4, closing, occurrences[3]),
+        ),
+        dictionary=dictionary,
+        grammar=outer_grammar,
+        theory=outer_theory,
+    )
+
+    # A nested reading does not need another semantic source kind. Its selected
+    # body can be witnessed by a normal R-seeded sequence of the already-exact
+    # segment selections and forms that belong to this same whole source.
+    body_segments = outer.segments[1:3]
+    body_selection = _fold(
+        builder,
+        root,
+        tuple(segment.selection for segment in body_segments),
+    )
+    body_forms = _fold(builder, root, (a, b))
+    body_grammar = _anchor(builder)
+    body_theory = _anchor(builder)
+    body_grammar_membership = define_membership(builder, body_grammar, body_forms)
+    body_theory_membership = define_membership(builder, body_theory, body_forms)
+    network = builder.freeze()
+    before = network.snapshot()
+
+    resolved = replay_source_front_end(network, outer, byte_refs)
+    assert resolved == (opening, a, b, closing)
+    assert replay_resolved_sequence_grouping(
+        network,
+        resolved,
+        open_form=opening,
+        close_form=closing,
+    ) == SequenceDescription(
+        root=root,
+        items=(SequenceGroup((SequenceAtom(a), SequenceAtom(b))),),
+    )
+
+    selection_tail = network.link(body_selection)
+    selection_head = network.link(selection_tail.start)
+    assert selection_head.start is root
+    assert selection_head.end is body_segments[0].selection
+    assert selection_tail.end is body_segments[1].selection
+
+    forms_tail = network.link(body_forms)
+    forms_head = network.link(forms_tail.start)
+    assert forms_head.start is root
+    assert forms_head.end is a
+    assert forms_tail.end is b
+
+    first_span = network.link(body_segments[0].span)
+    second_span = network.link(body_segments[1].span)
+    assert first_span.end is second_span.start
+    assert network.link(outer.segments[0].span).end is first_span.start
+    assert second_span.end is network.link(outer.segments[3].span).start
+
+    for segment in body_segments:
+        assert network.link(segment.lexeme).start is outer.source
+
+    assert network.link(body_grammar_membership).start is body_grammar
+    assert network.link(body_grammar_membership).end is body_forms
+    assert network.link(body_theory_membership).start is body_theory
+    assert network.link(body_theory_membership).end is body_forms
     assert network.snapshot() == before
 
 
