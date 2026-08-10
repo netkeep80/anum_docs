@@ -239,14 +239,16 @@ def test_persistent_sequence_materialization_replays_after_clean_reopen(
 
     evidence = materialize_persistent_sequence(store, description)
     assert len(evidence.created) == 5
-    xi, q, window_cursor, cursor_position, position_q = evidence.created
+    xi, q, window_cursor, window_cursor_position, full = evidence.created
     assert (xi.start, xi.end) == (x, integer)
     assert q.start == xi.ref
     assert q.end == point
     assert (window_cursor.start, window_cursor.end) == (window, cursor)
-    assert (cursor_position.start, cursor_position.end) == (cursor, position)
-    assert (position_q.start, position_q.end) == (position, q.ref)
-    assert evidence.result == position_q.ref
+    assert window_cursor_position.start == window_cursor.ref
+    assert window_cursor_position.end == position
+    assert full.start == window_cursor_position.ref
+    assert full.end == q.ref
+    assert evidence.result == full.ref
 
     snapshot_after = store.snapshot()
     assert replay_persistent_sequence_materialization(store, evidence) == evidence.result
@@ -257,6 +259,26 @@ def test_persistent_sequence_materialization_replays_after_clean_reopen(
     reopened_snapshot = reopened.snapshot()
     assert replay_persistent_sequence_materialization(reopened, evidence) == evidence.result
     assert reopened.snapshot() == reopened_snapshot
+
+
+def test_persistent_sequence_three_values_left_fold_prefix(tmp_path: Path) -> None:
+    path = tmp_path / "sequence-left-fold.json"
+    store = JsonExactLinkStore.create(path)
+    a, b, c = _self_occurrences(store, 3)
+    evidence = materialize_persistent_sequence(
+        store,
+        PersistentSequenceDescription(
+            root=store.root,
+            items=(_atom(a), _atom(b), _atom(c)),
+        ),
+    )
+
+    assert len(evidence.created) == 2
+    ab, abc = evidence.created
+    assert (ab.start, ab.end) == (a, b)
+    assert (abc.start, abc.end) == (ab.ref, c)
+    assert evidence.result == abc.ref
+    assert store.find(start=b, end=c) == ()
 
 
 def test_sequence_bridge_preserves_duplicate_pair_policy(tmp_path: Path) -> None:
