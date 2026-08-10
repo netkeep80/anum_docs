@@ -7,6 +7,7 @@ it does not tokenize, parse, search, rank or materialize application links.
 The same engine currently replays:
 
 - one-pole relation resolution against exact K/current;
+- one flat selected Anum sequence reading against exact source/D/G/T evidence;
 - one persistent scoped-dictionary ``:`` effect;
 - one local exact-representative ``=`` evaluation.
 
@@ -74,6 +75,40 @@ class RelationStepEvidence:
     act: OccurrenceRef
     role_dictionary: OccurrenceRef
     roles: RelationStepRoleRefs
+
+
+@dataclass(frozen=True)
+class FlatSequenceReadingRoleRefs:
+    """Exact roles required to replay one selected flat Anum reading act."""
+
+    source: OccurrenceRef
+    source_selection: OccurrenceRef
+    form_sequence: OccurrenceRef
+    dictionary: OccurrenceRef
+    grammar: OccurrenceRef
+    theory: OccurrenceRef
+    before_context: OccurrenceRef
+    result: OccurrenceRef
+    after_context: OccurrenceRef
+
+
+@dataclass(frozen=True)
+class FlatSequenceReadingEvidence:
+    """Checker handle for one read-only flat sequence reading.
+
+    The selected source front-end fixes exact source/D/G/T evidence and the
+    ordered form sequence. ``result`` must already exist and must be exactly the
+    left-fold denotation of that flat sequence. Replay never creates it.
+    """
+
+    source_evidence: SourceFrontEndEvidence
+    interpreter: OccurrenceRef
+    before_context: OccurrenceRef
+    result: OccurrenceRef
+    after_context: OccurrenceRef
+    act: OccurrenceRef
+    role_dictionary: OccurrenceRef
+    roles: FlatSequenceReadingRoleRefs
 
 
 @dataclass(frozen=True)
@@ -183,6 +218,47 @@ def replay_relation_step(
     finally:
         if network.snapshot() != before_snapshot:
             raise InterpreterReplayError("interpreter replay mutated the network")
+
+
+def replay_flat_sequence_reading(
+    network: LinkNetwork,
+    evidence: FlatSequenceReadingEvidence,
+    byte_refs: Mapping[int, OccurrenceRef],
+) -> OccurrenceRef:
+    """Replay one selected flat Anum sequence reading without effects.
+
+    This operation deliberately stops before O/C grouping. The source front-end
+    has already selected one exact flat form sequence under explicit D/G/T. The
+    result must be the exact existing left-fold denotation of those selected
+    forms: empty -> root, singleton -> the same occurrence, longer sequences ->
+    left-associated links. Search and creation remain outside replay.
+    """
+
+    before_snapshot = network.snapshot()
+    try:
+        forms = _replay_source(network, evidence.source_evidence, byte_refs)
+        _verify_flat_sequence_result(network, forms, evidence.result)
+
+        try:
+            parent = parent_of_context(network, evidence.before_context)
+            current_of_context(network, evidence.before_context)
+            after_parent = parent_of_context(network, evidence.after_context)
+            after_current = current_of_context(network, evidence.after_context)
+        except FoundationStateError as exc:
+            raise InterpreterReplayError("invalid flat-reading context") from exc
+        if after_parent is not parent:
+            raise InterpreterReplayError("flat reading changed the explicit parent")
+        if after_current is not evidence.result:
+            raise InterpreterReplayError(
+                "flat-reading after-context current is not the exact result"
+            )
+
+        _verify_flat_sequence_act_header(network, evidence)
+        _verify_flat_sequence_act_fields(network, evidence)
+        return evidence.result
+    finally:
+        if network.snapshot() != before_snapshot:
+            raise InterpreterReplayError("flat-reading replay mutated the network")
 
 
 def replay_colon_effect(
@@ -319,6 +395,36 @@ def _replay_source(
         raise InterpreterReplayError("invalid source-front-end evidence") from exc
 
 
+def _verify_flat_sequence_result(
+    network: LinkNetwork,
+    forms: tuple[OccurrenceRef, ...],
+    result: OccurrenceRef,
+) -> None:
+    if not forms:
+        if result is not network.root:
+            raise InterpreterReplayError("empty flat sequence result is not exact root")
+        return
+    if len(forms) == 1:
+        if result is not forms[0]:
+            raise InterpreterReplayError(
+                "singleton flat sequence result is not the exact selected form"
+            )
+        return
+
+    current = result
+    for expected_end in reversed(forms[1:]):
+        link = network.link(current)
+        if link.end is not expected_end:
+            raise InterpreterReplayError(
+                "flat sequence result does not match exact left-fold denotation"
+            )
+        current = link.start
+    if current is not forms[0]:
+        raise InterpreterReplayError(
+            "flat sequence result does not start from the first exact form"
+        )
+
+
 def _expected_result_poles(
     network: LinkNetwork,
     form: OccurrenceRef,
@@ -371,6 +477,48 @@ def _verify_relation_act_fields(
             "before-context",
         ),
         (evidence.roles.binding, evidence.binding, "binding"),
+        (evidence.roles.result, evidence.result, "result"),
+        (evidence.roles.after_context, evidence.after_context, "after-context"),
+    )
+    _verify_exact_act_fields(network, evidence.act, expected)
+
+
+def _verify_flat_sequence_act_header(
+    network: LinkNetwork,
+    evidence: FlatSequenceReadingEvidence,
+) -> None:
+    try:
+        header = act_header(network, evidence.act)
+    except FoundationStateError as exc:
+        raise InterpreterReplayError("invalid flat-reading actual-act header") from exc
+    expected = (evidence.interpreter, evidence.role_dictionary, evidence.after_context)
+    if header != expected:
+        raise InterpreterReplayError(
+            "flat-reading actual-act header does not match I/D_roles/K_after"
+        )
+
+
+def _verify_flat_sequence_act_fields(
+    network: LinkNetwork,
+    evidence: FlatSequenceReadingEvidence,
+) -> None:
+    source = evidence.source_evidence
+    expected = (
+        (evidence.roles.source, source.source, "source"),
+        (
+            evidence.roles.source_selection,
+            source.selection_sequence,
+            "source-selection",
+        ),
+        (evidence.roles.form_sequence, source.form_sequence, "form-sequence"),
+        (evidence.roles.dictionary, source.dictionary, "dictionary"),
+        (evidence.roles.grammar, source.grammar, "grammar"),
+        (evidence.roles.theory, source.theory, "theory"),
+        (
+            evidence.roles.before_context,
+            evidence.before_context,
+            "before-context",
+        ),
         (evidence.roles.result, evidence.result, "result"),
         (evidence.roles.after_context, evidence.after_context, "after-context"),
     )
