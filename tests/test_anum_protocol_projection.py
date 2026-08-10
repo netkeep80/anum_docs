@@ -23,7 +23,9 @@ from core.foundation_v2_root import build_root_kernel
 from core.foundation_v2_source import (
     SegmentSpec,
     SourceFrontEndBuilder,
+    SourceReplayError,
     replay_source_front_end,
+    replay_source_subselection,
 )
 from core.foundation_v2_state import (
     define_dictionary_effect,
@@ -304,6 +306,10 @@ def test_nested_body_selection_reuses_exact_segments_of_whole_source() -> None:
     body_theory = _anchor(builder)
     body_grammar_membership = define_membership(builder, body_grammar, body_forms)
     body_theory_membership = define_membership(builder, body_theory, body_forms)
+    empty_grammar = _anchor(builder)
+    empty_theory = _anchor(builder)
+    empty_grammar_membership = define_membership(builder, empty_grammar, root)
+    empty_theory_membership = define_membership(builder, empty_theory, root)
     network = builder.freeze()
     before = network.snapshot()
 
@@ -318,6 +324,62 @@ def test_nested_body_selection_reuses_exact_segments_of_whole_source() -> None:
         root=root,
         items=(SequenceGroup((SequenceAtom(a), SequenceAtom(b))),),
     )
+
+    assert replay_source_subselection(
+        network,
+        outer,
+        byte_refs,
+        start_segment=1,
+        end_segment=3,
+        selection_sequence=body_selection,
+        form_sequence=body_forms,
+        grammar=body_grammar,
+        theory=body_theory,
+        grammar_membership=body_grammar_membership,
+        theory_membership=body_theory_membership,
+    ) == (a, b)
+    assert replay_source_subselection(
+        network,
+        outer,
+        byte_refs,
+        start_segment=1,
+        end_segment=1,
+        selection_sequence=root,
+        form_sequence=root,
+        grammar=empty_grammar,
+        theory=empty_theory,
+        grammar_membership=empty_grammar_membership,
+        theory_membership=empty_theory_membership,
+    ) == ()
+
+    with pytest.raises(SourceReplayError, match="ordered sequence evidence"):
+        replay_source_subselection(
+            network,
+            outer,
+            byte_refs,
+            start_segment=1,
+            end_segment=3,
+            selection_sequence=outer.selection_sequence,
+            form_sequence=body_forms,
+            grammar=body_grammar,
+            theory=body_theory,
+            grammar_membership=body_grammar_membership,
+            theory_membership=body_theory_membership,
+        )
+    with pytest.raises(SourceReplayError, match="invalid source subselection"):
+        replay_source_subselection(
+            network,
+            outer,
+            byte_refs,
+            start_segment=3,
+            end_segment=2,
+            selection_sequence=root,
+            form_sequence=root,
+            grammar=empty_grammar,
+            theory=empty_theory,
+            grammar_membership=empty_grammar_membership,
+            theory_membership=empty_theory_membership,
+        )
 
     selection_tail = network.link(body_selection)
     selection_head = network.link(selection_tail.start)
