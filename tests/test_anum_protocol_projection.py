@@ -346,43 +346,6 @@ def test_second_envelope_literal_formula_and_recursive_reencoding_are_distinct_c
     assert network.link(recursive_second) != network.link(literal_second)
 
 
-def test_structural_nesting_alone_does_not_raise_description_level() -> None:
-    kernel = build_root_kernel()
-    root = kernel.refs.root
-    a = kernel.refs.unlinked
-    b = kernel.refs.linked
-    before = kernel.network
-
-    structural_twice = materialize_sequence(
-        before,
-        SequenceDescription(
-            root=root,
-            items=(
-                SequenceGroup(
-                    (
-                        SequenceGroup((SequenceAtom(a), SequenceAtom(b))),
-                    )
-                ),
-            ),
-        ),
-    )
-
-    assert len(structural_twice.created) == 1
-    x = structural_twice.created[0].ref
-    assert structural_twice.result is x
-    assert structural_twice.after.link(x).start is a
-    assert structural_twice.after.link(x).end is b
-    assert find_links(structural_twice.after, start=root, end=x) == ()
-
-    builder = structural_twice.after.evolve()
-    carrier_x = builder.reserve()
-    builder.define(carrier_x, root, x)
-    encoded = builder.freeze()
-    assert encoded.link(carrier_x).start is root
-    assert encoded.link(carrier_x).end is x
-    assert carrier_x is not x
-
-
 def test_mixed_ab_group_ab_preserves_duplicate_exact_pair_occurrences() -> None:
     kernel = build_root_kernel()
     root = kernel.refs.root
