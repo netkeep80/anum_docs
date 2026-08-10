@@ -24,18 +24,20 @@ Materialization is an explicit persistent effect: the immutable ``before``
 network is preserved and an ``after`` state in the same runtime identity lineage
 is produced with newly appended exact link occurrences.
 
-Sequence semantics:
+Sequence semantics are a left fold over resolved values:
 
-``∞ A B C`` -> create ``A⟼B`` and ``B⟼C``.
+``∞ A B C`` -> ``AB=A⟼B`` -> ``ABC=AB⟼C``.
 
 Every sequence-deserialization context starts from the distinguished exact root.
-Therefore an empty sequence returns that same exact root without creating any
-occurrence. The rule is recursive: an empty nested group also returns the root
-as one value to its surrounding sequence. A singleton group returns its
-contained value without creating a link. A group of two or more values creates
-every adjacent relation and returns the last created relation occurrence.
+The root marks the beginning of the sequence but is not an extra fold operand.
+An empty sequence returns that same exact root without creating any occurrence.
+The rule is recursive: an empty nested group also returns the root as one value
+to its surrounding sequence. A singleton group returns its contained value
+without creating a link. A group of two or more values repeatedly links the
+already accumulated exact prefix result to the next value and returns the final
+prefix occurrence.
 
-Every adjacency creates a *new* exact occurrence. Pair interning and implicit
+Every fold step creates a *new* exact occurrence. Pair interning and implicit
 reuse are intentionally absent; a search/reuse policy belongs to the untrusted
 planning side and must be explicit if introduced later.
 """
@@ -376,17 +378,13 @@ def _materialize_items(
     values = tuple(
         _materialize_item(before, evolution, item, created) for item in items
     )
-    if len(values) == 1:
-        return values[0]
-
-    last: OccurrenceRef | None = None
-    for start, end in zip(values, values[1:]):
+    current = values[0]
+    for end in values[1:]:
         ref = evolution.reserve()
-        evolution.define(ref, start, end)
-        created.append(MaterializedEdge(ref=ref, start=start, end=end))
-        last = ref
-    assert last is not None
-    return last
+        evolution.define(ref, current, end)
+        created.append(MaterializedEdge(ref=ref, start=current, end=end))
+        current = ref
+    return current
 
 
 def _materialize_item(
@@ -464,24 +462,20 @@ def _replay_items(
         return before.root
 
     values = tuple(_replay_item(before, after, item, cursor) for item in items)
-    if len(values) == 1:
-        return values[0]
-
-    last: OccurrenceRef | None = None
-    for start, end in zip(values, values[1:]):
+    current = values[0]
+    for end in values[1:]:
         edge = cursor.consume()
         link = after.link(edge.ref)
-        if edge.start is not start or edge.end is not end:
+        if edge.start is not current or edge.end is not end:
             raise SequenceMaterializationError(
-                "created edge evidence does not match sequence adjacency"
+                "created edge evidence does not match sequence left fold"
             )
-        if link.start is not start or link.end is not end:
+        if link.start is not current or link.end is not end:
             raise SequenceMaterializationError(
-                "after network link does not match sequence adjacency"
+                "after network link does not match sequence left fold"
             )
-        last = edge.ref
-    assert last is not None
-    return last
+        current = edge.ref
+    return current
 
 
 def _replay_item(
