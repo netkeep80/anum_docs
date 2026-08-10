@@ -14,7 +14,6 @@ MTS_V02 = ROOT / "contracts" / "mts-contract-v0.2.json"
 MTS_V03 = ROOT / "contracts" / "mts-contract-v0.3.json"
 PROOF_V02 = ROOT / "contracts" / "mts-proof-v0.2.json"
 CORPUS = ROOT / "contracts" / "mts-definition-opening-conformance-v0.3.json"
-CHALLENGE = ROOT / "contracts" / "mts-definition-opening-challenge-v0.3.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
 
@@ -37,7 +36,6 @@ def test_contract_is_accepted_integrated_and_published_only_through_v03_umbrella
     assert status["canonicalRootLibraryUsesDefinitionEnvironment"] is True
     assert status["productionConformancePresent"] is True
     assert status["mtsContractV03Published"] is True
-    assert status["trustedL5RuleAccepted"] is False
     assert status["aproverRepinAllowed"] is False
 
     integration = data["productionIntegration"]
@@ -54,25 +52,21 @@ def test_contract_is_accepted_integrated_and_published_only_through_v03_umbrella
     assert mts_v03["formalNotationExtensions"]["definitionOpening"]["contract"] == "contracts/mts-definition-opening-v0.3.json"
 
 
-def test_acceptance_depends_on_the_full_decision_and_challenge_chain():
+def test_acceptance_depends_only_on_normative_surface_and_self_contained_conformance():
     data = contract()
-    assert data["dependsOn"] == [
-        "mts-contract/v0.2",
-        "mts-definition-resolution-challenge/v0.3",
-        "mts-definition-environment-decision/v0.3",
-        "mts-definition-environment-challenge/v0.3",
-        "mts-definition-opening-decision/v0.3",
-        "mts-definition-opening-challenge/v0.3",
-    ]
-    assert data["conformanceCorpus"] == "contracts/mts-definition-opening-conformance-v0.3.json"
-
-    challenge = json.loads(CHALLENGE.read_text(encoding="utf-8"))
     corpus = json.loads(CORPUS.read_text(encoding="utf-8"))
-    assert challenge["status"] == "candidate-challenge"
+
+    assert data["dependsOn"] == ["mts-contract/v0.2"]
+    assert data["conformanceCorpus"] == "contracts/mts-definition-opening-conformance-v0.3.json"
     assert corpus["status"] == "accepted"
     assert corpus["accepted"] is True
     assert corpus["contract"] == data["schema"]
-    assert challenge["conformanceCorpus"] == "contracts/mts-definition-opening-conformance-v0.3.json"
+    assert corpus["rootOpenings"]
+    assert corpus["scenarios"]
+    serialized = json.dumps(data, ensure_ascii=False).lower()
+    assert "candidate-challenge" not in serialized
+    assert "candidate-decision" not in serialized
+    assert "acceptanceevidence" not in serialized
 
 
 def test_accepted_operation_is_exactly_one_step_and_effect_free():
@@ -191,17 +185,10 @@ def test_recursion_is_normatively_single_step_not_global_normalization():
     }
 
 
-def test_next_gate_is_separate_l5_judgment_challenge():
-    gate = contract()["nextGate"]
+def test_downstream_boundary_remains_explicit_without_historical_gate_notes():
     downstream = contract()["downstream"]
-
-    assert gate["issue"] == 122
-    assert gate["goal"].startswith("define a typed MTS proof judgment")
-    assert "keep mts-proof/v0.2 unchanged and interpret-only" in gate["constraints"]
-    assert "do not turn successful open_definition into A = F" in gate["constraints"]
-    assert "do not add trusted rules without executable soundness evidence" in gate["constraints"]
 
     assert downstream["genericL2ConsumerMayPinMtsContractV03"] is True
     assert downstream["aproverProofRepinAllowed"] is False
     assert downstream["aproverMustNotInventLocalOpeningSemantics"] is True
-    assert downstream["futureProofConsumerMustWaitForVersionedL5Acceptance"] is True
+    assert downstream["futureProofConsumerMustUseVersionedL5Acceptance"] is True
