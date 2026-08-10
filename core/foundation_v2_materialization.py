@@ -1,45 +1,31 @@
-"""Foundation-v2 Anum sequence materialization over exact-occurrence networks.
+"""Foundation-v2 Anum sequence materialization over the canonical MTS network.
 
 The source/Anum front-end and this module are deliberately separate. Raw glyphs,
 tokens and parser nodes are not semantic identity here. After source replay has
-selected an ordered tuple of exact forms, an explicitly selected root-opening
+selected an ordered tuple of resolved forms, an explicitly selected root-opening
 restoration may first expand collapsed leading-open usage. Then
-``replay_resolved_sequence_grouping`` may interpret two explicitly selected
-exact occurrences as open/close delimiters for sequence-deserialization mode.
-Delimiter meaning is contextual; the link shape alone never makes an occurrence
-a bracket command.
-
-The resulting nested sequence description has arbitrary exact existing link
-occurrences as leaves. A leaf may itself be a complete non-self-closed relation;
-it is not required to be an "atomic" value in the MTS ontology.
+``replay_resolved_sequence_grouping`` may interpret explicitly selected links as
+open/close delimiters for sequence-deserialization mode.
 
 A nested group is a host-side handle for a nested invocation of the same
-sequence-deserialization semantics. Its exact result is returned as one value
-to the surrounding sequence. Therefore the resolved semantic value domain is
-closed over links:
-
-``ExactLink | NestedSequence -> ExactLink``.
-
-Materialization is an explicit persistent effect: the immutable ``before``
-network is preserved and an ``after`` state in the same runtime identity lineage
-is produced with newly appended exact link occurrences.
+sequence-deserialization semantics. Its result is returned as one link value to
+the surrounding sequence. Empty top-level and nested contexts return the same
+distinguished root; a singleton returns its only value.
 
 Sequence semantics are a left fold over resolved values:
 
 ``∞ A B C`` -> ``AB=A⟼B`` -> ``ABC=AB⟼C``.
 
-Every sequence-deserialization context starts from the distinguished exact root.
-The root marks the beginning of the sequence but is not an extra fold operand.
-An empty sequence returns that same exact root without creating any occurrence.
-The rule is recursive: an empty nested group also returns the root as one value
-to its surrounding sequence. A singleton group returns its contained value
-without creating a link. A group of two or more values repeatedly links the
-already accumulated exact prefix result to the next value and returns the final
-prefix occurrence.
+Materialization is explicit, but MTS identity is canonical by ordered poles.
+Each fold step therefore obtains ``(current,end)`` through ``ensure``: an already
+materialized pair is reused, while an absent pair is appended exactly once.
+``SequenceMaterialization.created`` records only links actually appended by this
+effect. Reuse is a property of the operation, not a second semantic identity.
 
-Every fold step creates a *new* exact occurrence. Pair interning and implicit
-reuse are intentionally absent; a search/reuse policy belongs to the untrusted
-planning side and must be explicit if introduced later.
+The immutable ``before`` network is preserved and ``after`` remains in the same
+runtime access scope. Trusted replay is read-only and reconstructs the result
+from the canonical links of ``after`` while checking that every appended link is
+accounted for by the selected fold.
 """
 from __future__ import annotations
 
@@ -54,21 +40,17 @@ class SequenceMaterializationError(ValueError):
 
 @dataclass(frozen=True)
 class SequenceAtom:
-    """One already-resolved exact link occurrence used as a sequence value.
-
-    ``Atom`` is only transport terminology. ``value`` may itself denote any
-    existing relation occurrence, including a complete ``A⟼B`` link.
-    """
+    """One already-resolved link used as a sequence value."""
 
     value: OccurrenceRef
 
 
 @dataclass(frozen=True)
 class SequenceGroup:
-    """Nested sequence invocation returning one exact link to the outer level.
+    """Nested sequence invocation returning one link to the outer level.
 
-    Host nesting is a checker handle, not semantic identity and not a second
-    kind of MTS entity. Empty ``items`` denotes the root-default nested context.
+    Host nesting is checker machinery, not a second kind of MTS entity. Empty
+    ``items`` denotes a new root-default deserialization context.
     """
 
     items: tuple["SequenceItem", ...]
@@ -79,10 +61,7 @@ SequenceItem = SequenceAtom | SequenceGroup
 
 @dataclass(frozen=True)
 class SequenceDescription:
-    """Selected root-relative sequence description for one materialization.
-
-    Empty ``items`` denotes the root-default top-level context.
-    """
+    """Selected root-relative sequence description for one materialization."""
 
     root: OccurrenceRef
     items: tuple[SequenceItem, ...]
@@ -90,7 +69,7 @@ class SequenceDescription:
 
 @dataclass(frozen=True)
 class MaterializedEdge:
-    """One exact new occurrence created by the explicit sequence effect."""
+    """One link physically appended by the explicit sequence effect."""
 
     ref: OccurrenceRef
     start: OccurrenceRef
@@ -114,17 +93,11 @@ def replay_root_opening_restoration(
     open_form: OccurrenceRef,
     close_form: OccurrenceRef,
 ) -> tuple[OccurrenceRef, ...]:
-    """Restore root-collapsed leading opens over exact resolved forms.
+    """Restore root-collapsed leading opens over resolved forms.
 
-    This is the exact-occurrence analogue of the historical Anum beginning rule.
     Restoration is eligible only when the represented carrier already begins
-    with the exact selected ``open_form``. If exact closes outnumber exact opens,
-    the deficit is prepended as repeated *uses of the same open occurrence*.
-    No link is created and no group is interpreted here.
-
-    Same-shape occurrences do not contribute to the balance unless they are the
-    exact selected delimiter refs. A caller must run grouping separately, so a
-    malformed restored sequence still fails closed at the next trusted layer.
+    with the selected ``open_form``. If closes outnumber opens, the deficit is
+    prepended as repeated *uses of the same opening link*. No link is created.
     """
 
     before = network.snapshot()
@@ -147,7 +120,7 @@ def replay_root_opening_restoration(
         return (open_form,) * (-balance) + forms
     except LinkNetworkError as exc:
         raise SequenceMaterializationError(
-            "resolved sequence contains a foreign exact occurrence"
+            "resolved sequence contains a foreign link handle"
         ) from exc
     finally:
         if network.snapshot() != before:
@@ -163,15 +136,11 @@ def replay_resolved_sequence_grouping(
     open_form: OccurrenceRef,
     close_form: OccurrenceRef,
 ) -> SequenceDescription:
-    """Replay nested grouping over already-resolved exact forms without effects.
+    """Replay nested grouping over already-resolved forms without effects.
 
-    ``open_form`` and ``close_form`` are explicit role selections for this one
-    sequence-deserialization mode. Only those exact occurrences delimit groups;
-    another occurrence with the same poles is an ordinary sequence value.
-
-    This function starts after source/D replay. If root-opening collapse belongs
-    to the selected carrier protocol, call ``replay_root_opening_restoration``
-    explicitly before grouping; grouping itself never guesses missing opens.
+    ``open_form`` and ``close_form`` are explicit role selections for this
+    deserialization mode. Because the network is canonical, another semantic
+    link with the same poles cannot exist as a competing delimiter identity.
     Empty input and empty groups are valid root-default contexts.
     """
 
@@ -198,7 +167,7 @@ def replay_resolved_sequence_grouping(
         return SequenceDescription(root=network.root, items=items)
     except LinkNetworkError as exc:
         raise SequenceMaterializationError(
-            "resolved sequence contains a foreign exact occurrence"
+            "resolved sequence contains a foreign link handle"
         ) from exc
     finally:
         if network.snapshot() != before:
@@ -213,7 +182,7 @@ def find_links(
     start: OccurrenceRef | None = None,
     end: OccurrenceRef | None = None,
 ) -> tuple[OccurrenceRef, ...]:
-    """Read-only exact occurrence search; never materializes a missing pair."""
+    """Read-only link search; never materializes a missing pair."""
 
     before = network.snapshot()
     if start is not None:
@@ -236,18 +205,20 @@ def materialize_sequence(
     before: LinkNetwork,
     description: SequenceDescription,
 ) -> SequenceMaterialization:
-    """Explicitly materialize one nested sequence into a new immutable state."""
+    """Explicitly obtain one nested sequence in a new immutable network state."""
 
     before_snapshot = before.snapshot()
     _require_description_root(before, description)
     evolution = before.evolve()
     created: list[MaterializedEdge] = []
+    created_refs: set[OccurrenceRef] = set()
 
     result = _materialize_items(
         before,
         evolution,
         description.items,
         created,
+        created_refs,
     )
     after = evolution.freeze()
 
@@ -268,7 +239,7 @@ def replay_sequence_materialization(
     before: LinkNetwork,
     evidence: SequenceMaterialization,
 ) -> OccurrenceRef:
-    """Replay one already-materialized sequence effect without changing either state."""
+    """Replay one already-materialized sequence effect without changing state."""
 
     before_snapshot = before.snapshot()
     after_snapshot = evidence.after.snapshot()
@@ -276,22 +247,22 @@ def replay_sequence_materialization(
         _require_description_root(before, evidence.description)
         _verify_persistent_lineage(before, evidence.after, evidence.created)
 
-        cursor = _ReplayCursor(evidence.created)
+        tracker = _ReplayTracker(base_count=len(before.refs))
         result = _replay_items(
             before,
             evidence.after,
             evidence.description.items,
-            cursor,
+            tracker,
         )
-        if cursor.position != len(evidence.created):
+        if tuple(tracker.first_created_uses) != tuple(edge.ref for edge in evidence.created):
             raise SequenceMaterializationError(
-                "materialization contains extra created occurrences"
+                "created evidence does not match first use of appended fold links"
             )
         if result is not evidence.result:
-            raise SequenceMaterializationError("forged materialization result occurrence")
+            raise SequenceMaterializationError("forged materialization result link")
         return result
     except LinkNetworkError as exc:
-        raise SequenceMaterializationError("invalid exact occurrence evidence") from exc
+        raise SequenceMaterializationError("invalid link evidence") from exc
     finally:
         if before.snapshot() != before_snapshot:
             raise SequenceMaterializationError("replay mutated the before network")
@@ -310,7 +281,7 @@ def _validate_resolved_grouping_inputs(
     network.link(close_form)
     if open_form is close_form:
         raise SequenceMaterializationError(
-            "open and close sequence delimiters must be exact-distinct"
+            "open and close sequence delimiters must be distinct links"
         )
     for form in forms:
         network.link(form)
@@ -362,7 +333,7 @@ def _require_description_root(
 ) -> None:
     if description.root is not network.root:
         raise SequenceMaterializationError(
-            "sequence must be rooted at the exact distinguished network root"
+            "sequence must be rooted at the distinguished network root"
         )
 
 
@@ -371,18 +342,21 @@ def _materialize_items(
     evolution,
     items: tuple[SequenceItem, ...],
     created: list[MaterializedEdge],
+    created_refs: set[OccurrenceRef],
 ) -> OccurrenceRef:
     if not items:
         return before.root
 
     values = tuple(
-        _materialize_item(before, evolution, item, created) for item in items
+        _materialize_item(before, evolution, item, created, created_refs)
+        for item in items
     )
     current = values[0]
     for end in values[1:]:
-        ref = evolution.reserve()
-        evolution.define(ref, current, end)
-        created.append(MaterializedEdge(ref=ref, start=current, end=end))
+        ref = evolution.ensure(current, end)
+        if ref.slot >= evolution.base_count and ref not in created_refs:
+            created.append(MaterializedEdge(ref=ref, start=current, end=end))
+            created_refs.add(ref)
         current = ref
     return current
 
@@ -392,16 +366,17 @@ def _materialize_item(
     evolution,
     item: SequenceItem,
     created: list[MaterializedEdge],
+    created_refs: set[OccurrenceRef],
 ) -> OccurrenceRef:
     if isinstance(item, SequenceAtom):
         try:
             before.link(item.value)
         except LinkNetworkError as exc:
             raise SequenceMaterializationError(
-                "sequence atom is not an exact occurrence of the before network"
+                "sequence atom is not a link of the before network"
             ) from exc
         return item.value
-    return _materialize_items(before, evolution, item.items, created)
+    return _materialize_items(before, evolution, item.items, created, created_refs)
 
 
 def _verify_persistent_lineage(
@@ -415,12 +390,12 @@ def _verify_persistent_lineage(
             "after network cardinality does not match explicit created evidence"
         )
     if after.root is not before.root:
-        raise SequenceMaterializationError("materialization changed the exact root")
+        raise SequenceMaterializationError("materialization changed the root")
 
     for index, ref in enumerate(before.refs):
         if after.refs[index] is not ref:
             raise SequenceMaterializationError(
-                "after network does not preserve exact base occurrence identity"
+                "after network does not preserve base runtime handles"
             )
         if after.link(ref) is not before.link(ref):
             raise SequenceMaterializationError(
@@ -433,48 +408,49 @@ def _verify_persistent_lineage(
     for ref, edge in zip(appended, created, strict=True):
         if ref is not edge.ref:
             raise SequenceMaterializationError(
-                "created occurrence order differs from exact appended network order"
+                "created link order differs from appended network order"
             )
+        link = after.link(ref)
+        if link.start is not edge.start or link.end is not edge.end:
+            raise SequenceMaterializationError("forged created link poles")
 
 
 @dataclass
-class _ReplayCursor:
-    created: tuple[MaterializedEdge, ...]
-    position: int = 0
+class _ReplayTracker:
+    base_count: int
+    first_created_uses: list[OccurrenceRef] = None  # type: ignore[assignment]
+    seen_created: set[OccurrenceRef] = None  # type: ignore[assignment]
 
-    def consume(self) -> MaterializedEdge:
-        if self.position >= len(self.created):
-            raise SequenceMaterializationError(
-                "materialization is missing an expected sequence relation"
-            )
-        edge = self.created[self.position]
-        self.position += 1
-        return edge
+    def __post_init__(self) -> None:
+        self.first_created_uses = []
+        self.seen_created = set()
+
+    def observe(self, ref: OccurrenceRef) -> None:
+        if ref.slot < self.base_count or ref in self.seen_created:
+            return
+        self.seen_created.add(ref)
+        self.first_created_uses.append(ref)
 
 
 def _replay_items(
     before: LinkNetwork,
     after: LinkNetwork,
     items: tuple[SequenceItem, ...],
-    cursor: _ReplayCursor,
+    tracker: _ReplayTracker,
 ) -> OccurrenceRef:
     if not items:
         return before.root
 
-    values = tuple(_replay_item(before, after, item, cursor) for item in items)
+    values = tuple(_replay_item(before, after, item, tracker) for item in items)
     current = values[0]
     for end in values[1:]:
-        edge = cursor.consume()
-        link = after.link(edge.ref)
-        if edge.start is not current or edge.end is not end:
+        ref = after.find(current, end)
+        if ref is None:
             raise SequenceMaterializationError(
-                "created edge evidence does not match sequence left fold"
+                "after network is missing required canonical fold link"
             )
-        if link.start is not current or link.end is not end:
-            raise SequenceMaterializationError(
-                "after network link does not match sequence left fold"
-            )
-        current = edge.ref
+        tracker.observe(ref)
+        current = ref
     return current
 
 
@@ -482,10 +458,10 @@ def _replay_item(
     before: LinkNetwork,
     after: LinkNetwork,
     item: SequenceItem,
-    cursor: _ReplayCursor,
+    tracker: _ReplayTracker,
 ) -> OccurrenceRef:
     if isinstance(item, SequenceAtom):
         before.link(item.value)
         after.link(item.value)
         return item.value
-    return _replay_items(before, after, item.items, cursor)
+    return _replay_items(before, after, item.items, tracker)
