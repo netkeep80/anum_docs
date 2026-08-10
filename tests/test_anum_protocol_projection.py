@@ -253,8 +253,6 @@ def test_additional_envelope_candidate_reencodes_deserialized_result() -> None:
     before = builder.freeze()
     before_snapshot = before.snapshot()
 
-    # Capability proven by #308: an already existing carrier may be passed as a
-    # value without deserializing the relation that it describes.
     passed = materialize_sequence(
         before,
         SequenceDescription(root=root, items=(SequenceAtom(carrier_ab),)),
@@ -263,8 +261,6 @@ def test_additional_envelope_candidate_reencodes_deserialized_result() -> None:
     assert passed.result is carrier_ab
     assert find_links(before, start=a, end=b) == ()
 
-    # Additional-envelope candidate from the original MTS notes:
-    # first deserialize A=ab to X=a⟼b, then obtain an Anum that encodes X.
     inner = materialize_sequence(
         before,
         SequenceDescription(
@@ -288,9 +284,6 @@ def test_additional_envelope_candidate_reencodes_deserialized_result() -> None:
     second_builder.define(carrier_carrier_x, root, carrier_x)
     after_two_envelopes = second_builder.freeze()
 
-    # D(ab)=X; D([ab])=S(X); D([[ab]])=S(S(X)).  The additional envelope
-    # therefore raises the description level around the exact result, not around
-    # the original carrier C_ab.
     assert after_one_envelope.link(carrier_x).start is root
     assert after_one_envelope.link(carrier_x).end is x
     assert after_two_envelopes.link(carrier_carrier_x).start is root
@@ -323,8 +316,6 @@ def test_structural_nesting_alone_does_not_raise_description_level() -> None:
         ),
     )
 
-    # A second structural grouping layer is still only grouping. It returns the
-    # nested exact result and does not silently manufacture S(X).
     assert len(structural_twice.created) == 1
     x = structural_twice.created[0].ref
     assert structural_twice.result is x
@@ -332,7 +323,6 @@ def test_structural_nesting_alone_does_not_raise_description_level() -> None:
     assert structural_twice.after.link(x).end is b
     assert find_links(structural_twice.after, start=root, end=x) == ()
 
-    # Raising the description level is a different explicit effect.
     builder = structural_twice.after.evolve()
     carrier_x = builder.reserve()
     builder.define(carrier_x, root, x)
@@ -360,10 +350,10 @@ def test_mixed_ab_group_ab_preserves_duplicate_exact_pair_occurrences() -> None:
         ),
     )
 
-    # For the mixed source shape ab[ab], the nested pair and the outer a,b
-    # adjacency have the same poles but are distinct exact occurrences.
+    # Nested materialization runs first. The outer sequence then folds left:
+    # outer_ab=a⟼b, full=outer_ab⟼inner_ab.
     assert len(evidence.created) == 3
-    inner_ab, outer_ab, b_to_inner = evidence.created
+    inner_ab, outer_ab, full = evidence.created
     assert (inner_ab.start, inner_ab.end) == (a, b)
     assert (outer_ab.start, outer_ab.end) == (a, b)
     assert inner_ab.ref is not outer_ab.ref
@@ -373,9 +363,9 @@ def test_mixed_ab_group_ab_preserves_duplicate_exact_pair_occurrences() -> None:
         outer_ab.ref,
     )
 
-    assert b_to_inner.start is b
-    assert b_to_inner.end is inner_ab.ref
-    assert evidence.result is b_to_inner.ref
+    assert full.start is outer_ab.ref
+    assert full.end is inner_ab.ref
+    assert evidence.result is full.ref
 
 
 def test_reencoded_nested_value_can_participate_in_outer_sequence() -> None:
@@ -406,14 +396,12 @@ def test_reencoded_nested_value_can_participate_in_outer_sequence() -> None:
         ),
     )
 
-    # This is the exact topology needed when one extra envelope raises the first
-    # nested value to S(X), after which that carrier participates as an ordinary
-    # value in the surrounding sequence (the [[ab]]ab family of examples).
+    # Outer values fold as ((carrier_x⟼a)⟼b).
     assert len(outer.created) == 2
     first, second = outer.created
     assert first.start is carrier_x
     assert first.end is a
-    assert second.start is a
+    assert second.start is first.ref
     assert second.end is b
     assert outer.result is second.ref
 

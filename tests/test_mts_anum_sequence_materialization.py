@@ -58,6 +58,8 @@ def test_contract_is_candidate_and_does_not_authorize_aprover_repin() -> None:
     assert contract["issue"] == 242
     assert contract["aproverRepinAllowed"] is False
     assert contract["effectBoundary"]["pairInterning"] is False
+    assert contract["sequenceSemantics"]["emptySequenceAllowed"] is True
+    assert "left fold" in contract["sequenceSemantics"]["fold"]
 
 
 def test_evolution_preserves_base_exact_identity_and_keeps_before_immutable() -> None:
@@ -265,7 +267,7 @@ def test_resolved_grouping_keeps_structure_strict_but_empty_group_is_root() -> N
     assert evidence.after.snapshot() == before.snapshot()
 
 
-def test_infinity_abc_creates_adjacent_relations_and_returns_last_edge() -> None:
+def test_infinity_abc_is_exact_left_fold_and_returns_full_prefix() -> None:
     before, root, refs = _base_network(("a", "b", "c"))
     evidence = materialize_sequence(
         before,
@@ -273,11 +275,12 @@ def test_infinity_abc_creates_adjacent_relations_and_returns_last_edge() -> None
     )
 
     assert len(evidence.created) == 2
-    ab, bc = evidence.created
+    ab, abc = evidence.created
     assert (ab.start, ab.end) == (refs["a"], refs["b"])
-    assert (bc.start, bc.end) == (refs["b"], refs["c"])
-    assert evidence.result is bc.ref
-    assert replay_sequence_materialization(before, evidence) is bc.ref
+    assert (abc.start, abc.end) == (ab.ref, refs["c"])
+    assert evidence.result is abc.ref
+    assert replay_sequence_materialization(before, evidence) is abc.ref
+    assert find_links(evidence.after, start=refs["b"], end=refs["c"]) == ()
 
 
 def test_nested_ab_is_one_outer_value_in_infinity_group_ab_c() -> None:
@@ -367,7 +370,7 @@ def test_full_window_cursor_position_nested_example() -> None:
     evidence = materialize_sequence(before, description)
 
     assert len(evidence.created) == 5
-    xi, q, window_cursor, cursor_position, position_q = evidence.created
+    xi, q, window_cursor, window_cursor_position, full = evidence.created
 
     assert (xi.start, xi.end) == (refs["x"], refs["int"])
     assert q.start is xi.ref
@@ -376,14 +379,12 @@ def test_full_window_cursor_position_nested_example() -> None:
         refs["window"],
         refs["cursor"],
     )
-    assert (cursor_position.start, cursor_position.end) == (
-        refs["cursor"],
-        refs["position"],
-    )
-    assert position_q.start is refs["position"]
-    assert position_q.end is q.ref
-    assert evidence.result is position_q.ref
-    assert replay_sequence_materialization(before, evidence) is position_q.ref
+    assert window_cursor_position.start is window_cursor.ref
+    assert window_cursor_position.end is refs["position"]
+    assert full.start is window_cursor_position.ref
+    assert full.end is q.ref
+    assert evidence.result is full.ref
+    assert replay_sequence_materialization(before, evidence) is full.ref
 
 
 def test_find_is_read_only_for_present_and_absent_pairs() -> None:
@@ -435,7 +436,7 @@ def test_replay_rejects_forged_edge_poles_and_result() -> None:
     edge = evidence.created[0]
 
     forged_edge = replace(edge, end=refs["c"])
-    with pytest.raises(SequenceMaterializationError, match="adjacency"):
+    with pytest.raises(SequenceMaterializationError, match="left fold"):
         replay_sequence_materialization(
             before,
             replace(evidence, created=(forged_edge,)),
