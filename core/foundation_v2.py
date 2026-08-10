@@ -1,12 +1,9 @@
 """One public Python entry surface for the Foundation-v2 production candidate.
 
-This module is deliberately a thin facade over the already-tested Foundation-v2
-implementation modules.  It adds no semantic dispatch and no compatibility mode.
-In particular there is no legacy parser, AST, ContextFrame or pair-interning path
-behind this API.
-
-The facade is implementation API only; Python classes/functions are not new MTS
-ontological types.
+This module is deliberately a thin facade over the tested Foundation-v2
+implementation modules. It adds no semantic dispatch and no compatibility mode.
+Python handles exposed here are implementation coordinates, not additional MTS
+ontological identity.
 """
 from __future__ import annotations
 
@@ -37,8 +34,8 @@ from .foundation_v2_materialization import (
     replay_sequence_materialization,
 )
 from .foundation_v2_persistent import (
-    JsonExactLinkStore,
-    PersistentOccurrenceId,
+    JsonLinkStore,
+    PersistentLinkId,
     PersistentSequenceAtom,
     PersistentSequenceDescription,
     PersistentSequenceGroup,
@@ -73,12 +70,12 @@ __all__ = [
     "FoundationRootKernel",
     "FoundationRootRefs",
     "IntegratedProofEvidence",
-    "JsonExactLinkStore",
+    "JsonLinkStore",
     "Link",
     "LinkNetwork",
     "LinkNetworkBuilder",
     "OccurrenceRef",
-    "PersistentOccurrenceId",
+    "PersistentLinkId",
     "PersistentSequenceAtom",
     "PersistentSequenceDescription",
     "PersistentSequenceGroup",
