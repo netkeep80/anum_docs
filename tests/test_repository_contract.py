@@ -44,6 +44,7 @@ FORBIDDEN_CANDIDATE_PATHS = {
     "tests/test_root_v02_candidate.py",
     "tests/test_root_v02_execution_candidate.py",
     "docs/specs/Reference model МТС v0.1.md",
+    "docs/research/Foundation v2 P9 integrated proof conformance.md",
     "contracts/anum-boundary-conformance-candidate-v0.6.json",
     "contracts/mts-opening-path-challenge-v0.4.json",
     "contracts/mts-opening-path-decision-v0.4.json",
@@ -162,7 +163,7 @@ def test_versioned_machine_contract_and_conformance_chain_is_exact():
     v02 = json.loads(MTS_CONTRACT_V02.read_text(encoding="utf-8"))
     v02_corpus = json.loads(MTS_CONFORMANCE_V02.read_text(encoding="utf-8"))
     v03 = json.loads(MTS_CONTRACT_V03.read_text(encoding="utf-8"))
-    v03_corpus = json.loads(MTS_CONFORMANCE_V03.read_text(encoding="utf-8"))
+    v03_corpus = json.loads(MTS_CONformance_v03.read_text(encoding="utf-8"))
     v04 = json.loads(MTS_CONTRACT_V04.read_text(encoding="utf-8"))
     v04_corpus = json.loads(MTS_CONFORMANCE_V04.read_text(encoding="utf-8"))
     v05 = json.loads(MTS_CONTRACT_V05.read_text(encoding="utf-8"))
