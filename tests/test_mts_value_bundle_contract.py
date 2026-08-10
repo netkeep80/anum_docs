@@ -1,0 +1,130 @@
+"""Проверки согласованности принятого контракта плоских пучков значений."""
+
+import json
+from pathlib import Path
+
+from core.mtc_parser import parse_formula
+
+
+ROOT = Path(__file__).parents[1]
+CONTRACT = ROOT / "contracts" / "mts-value-bundle-v0.2.json"
+CONFORMANCE = ROOT / "contracts" / "mts-value-bundle-conformance-v0.2.json"
+MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.2.json"
+ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
+
+
+def load(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def test_value_bundle_contract_is_accepted_and_linked_from_mts_contract():
+    contract = load(CONTRACT)
+    conformance = load(CONFORMANCE)
+    mts = load(MTS_CONTRACT)
+
+    assert contract["schema"] == "mts-value-bundle/v0.2"
+    assert contract["status"] == "accepted"
+    assert contract["accepted"] is True
+    assert contract["acceptedContractLinkAllowed"] is True
+    assert contract["dependsOn"] == ["mts-contract/v0.2"]
+    assert conformance["schema"] == "mts-value-bundle-conformance/v0.2"
+    assert conformance["status"] == "accepted"
+    assert conformance["accepted"] is True
+    assert conformance["contract"] == contract["schema"]
+    assert mts["formalNotation"]["valueBundle"]["contract"] == "contracts/mts-value-bundle-v0.2.json"
+    assert mts["formalNotation"]["valueBundle"]["conformanceCorpus"] == (
+        "contracts/mts-value-bundle-conformance-v0.2.json"
+    )
+
+
+def test_accepted_conformance_is_self_contained_across_all_semantic_sections():
+    conformance = load(CONFORMANCE)
+    assert conformance["elaboration"]
+    assert conformance["staticRejections"]
+    assert conformance["valueEquality"]
+    assert conformance["crossKindComparison"]
+    assert conformance["expansionMemory"]
+    assert conformance["expansion"]
+    assert conformance["veto"]
+
+
+def test_accepted_scope_is_flat_only_and_does_not_smuggle_nested_semantics():
+    contract = load(CONTRACT)
+    conformance = load(CONFORMANCE)
+
+    assert contract["scope"]["valueBundle"] == "flat only"
+    assert contract["scope"]["nestedValueBundle"] == "rejected/deferred"
+    assert conformance["veto"]["nestedValueBundleAccepted"] is False
+    assert any(
+        case["error"] == "nested-value-bundle-not-supported"
+        for case in conformance["staticRejections"]
+    )
+    assert "nestedValueBundleSemantics" in contract["deferred"]
+
+
+def test_flat_value_model_is_extensional_only_after_occurrence_resolution():
+    contract = load(CONTRACT)
+    model = contract["runtimeValueModel"]
+    resolution = contract["elementResolution"]
+
+    assert model["scalar"]["kind"] == "link"
+    assert model["bundle"]["kind"] == "bundle"
+    assert model["crossKindEquality"] is False
+    assert model["crossKindInequality"] is True
+    assert resolution["eachOccurrenceResolvedIndependently"] is True
+    assert resolution["deduplicateBeforeResolution"] is False
+    assert resolution["anonymousSquareIdentity"] == "ast-occurrence-path"
+    assert resolution["semanticSetBuiltAfterResolution"] is True
+
+    cases = {case["id"]: case for case in load(CONFORMANCE)["valueEquality"]}
+    assert cases["anonymous-different-bindings"]["equal"] is False
+    assert cases["anonymous-same-bindings"]["equal"] is True
+
+
+def test_conformance_preserves_cross_kind_and_read_only_expansion_boundaries():
+    contract = load(CONTRACT)
+    conformance = load(CONFORMANCE)
+
+    for case in conformance["crossKindComparison"]:
+        assert case["equal"] is False
+        assert case["notEqual"] is True
+        assert case["bundleSet"] != case["scalarIdentity"]
+
+    assert contract["expansionQuery"]["readOnly"] is True
+    assert contract["expansionQuery"]["implicitRealize"] is False
+    assert contract["expansionQuery"]["implicitDelete"] is False
+    assert conformance["veto"]["interpretMayRealize"] is False
+    assert conformance["veto"]["interpretMayDelete"] is False
+    assert conformance["veto"]["globalRewrite"] is False
+
+
+def test_current_ten_root_definitions_remain_parseable_and_value_bundle_cannot_enter_root():
+    contract = load(CONTRACT)
+    sources = [
+        line.strip()
+        for line in ROOT_PROGRAM.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+
+    assert len(sources) == 10
+    for source in sources:
+        parse_formula(source)
+    regression = contract["elaboration"]["rootRegression"]
+    assert regression["currentTenDefinitionsMustElaborateIdentically"] is True
+    assert regression["valueBundleMayAppearInCurrentRoot"] is False
+
+
+def test_production_integration_and_downstream_boundary_are_explicit():
+    contract = load(CONTRACT)
+    integration = contract["productionIntegration"]
+    downstream = contract["downstream"]
+
+    assert integration == {
+        "referenceCore": "core/mtc_value_bundle.py",
+        "conformanceCorpus": "contracts/mts-value-bundle-conformance-v0.2.json",
+        "rootRegression": "tests/mtc_formulas.mtc",
+        "constraintBundleRegression": "tests/test_mtc_value_bundle_reference.py",
+    }
+    assert downstream["aproverRepinRequired"] is True
+    assert downstream["consumerMustExecuteConformance"] is True
+    assert downstream["compatibilityImplementationAllowed"] is False
