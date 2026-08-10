@@ -4,22 +4,29 @@ A semantic MTS link is completely determined by its ordered poles. Therefore one
 network state cannot contain two distinct semantic links with the same
 ``(start, end)`` pair.
 
+There is one additional root invariant that cannot be delegated to technical
+handle identity: the completely self-closed form is unique. If a link satisfies
+``X = X ⟼ X``, then it is the distinguished root ``R = ∞``. A second runtime
+handle cannot manufacture a second such semantic link, because using that handle
+to distinguish its own poles would be circular.
+
 ``OccurrenceRef`` remains temporarily as a *technical handle* issued by one
 runtime network/build scope. Its slot and Python object identity are useful for
 finite cyclic construction and safe access, but they are not an additional MTS
 identity field. Higher layers must not use a different handle as justification
-for a second link with equal poles.
+for a second link with equal poles or for a second completely self-closed link.
 
 The builder API deliberately separates two cases:
 
 * ``reserve`` + ``define`` is low-level construction machinery required for
-  cycles and self-reference; defining a duplicate pair is rejected;
+  cycles and self-reference; duplicate semantic forms are rejected;
 * ``ensure(start, end)`` is canonical materialization: it returns the already
   defined link for that pair or creates exactly one new link.
 
 Snapshots contain transport-local integer slots only. Loading a snapshot issues
 fresh runtime handles, but this says nothing about a new semantic identity: the
-restored MTS network is still canonical by ordered poles.
+restored MTS network is still canonical by ordered poles and has exactly one
+completely self-closed root.
 """
 from __future__ import annotations
 
@@ -56,7 +63,7 @@ class NetworkSnapshot:
 
 
 class LinkNetwork:
-    """Immutable finite MTS network with exactly one link per ordered pole pair."""
+    """Immutable finite MTS network with canonical pairs and one root self-loop."""
 
     def __init__(
         self,
@@ -76,6 +83,7 @@ class LinkNetwork:
         self._validate_ref(root)
 
         pair_index: dict[tuple[OccurrenceRef, OccurrenceRef], OccurrenceRef] = {}
+        fully_self_closed: list[OccurrenceRef] = []
         for ref, link in zip(refs, links, strict=True):
             if ref.slot < 0 or ref.slot >= len(refs):
                 raise LinkNetworkError("invalid link slot")
@@ -88,11 +96,18 @@ class LinkNetwork:
                     "duplicate semantic link pair is forbidden by MTS identity"
                 )
             pair_index[pair] = ref
+            if link.start is ref and link.end is ref:
+                fully_self_closed.append(ref)
+
+        if len(fully_self_closed) != 1 or fully_self_closed[0] is not root:
+            raise LinkNetworkError(
+                "the distinguished root must be the unique fully self-closed link"
+            )
         self._pair_index = pair_index
 
     @property
     def root(self) -> OccurrenceRef:
-        """Return the distinguished root through its runtime technical handle."""
+        """Return the distinguished unique fully self-closed root handle."""
 
         return self._root
 
@@ -129,7 +144,8 @@ class LinkNetwork:
         Existing runtime handles remain usable in the evolved state. New links
         may be added, but a pair already present in the base or the current
         evolution is always reused by :meth:`LinkNetworkEvolutionBuilder.ensure`
-        and cannot be defined a second time.
+        and cannot be defined a second time. The root remains the only completely
+        self-closed link.
         """
 
         return LinkNetworkEvolutionBuilder(self)
@@ -174,6 +190,10 @@ class LinkNetworkBuilder:
     Reservation exists solely so cyclic endpoints can refer to links that are
     defined later. A reserved handle is construction machinery, not an
     ontological "undefined link" and not a source of semantic identity.
+
+    The first definition of the form ``X = X ⟼ X`` establishes the only fully
+    self-closed candidate; freezing requires that candidate to be the selected
+    root. Any second such definition is rejected before publication.
     """
 
     def __init__(self) -> None:
@@ -183,6 +203,7 @@ class LinkNetworkBuilder:
         self._pair_index: dict[
             tuple[OccurrenceRef, OccurrenceRef], OccurrenceRef
         ] = {}
+        self._fully_self_closed: OccurrenceRef | None = None
         self._frozen = False
 
     def reserve(self) -> OccurrenceRef:
@@ -200,7 +221,7 @@ class LinkNetworkBuilder:
         start: OccurrenceRef,
         end: OccurrenceRef,
     ) -> None:
-        """Define one reserved link, rejecting an already-defined equal pair."""
+        """Define one reserved link under canonical MTS identity constraints."""
 
         self._require_mutable()
         self._validate_reserved(ref)
@@ -208,6 +229,13 @@ class LinkNetworkBuilder:
         self._validate_reserved(end)
         if self._links[ref.slot] is not None:
             raise LinkNetworkError("reserved link is already defined")
+
+        if start is ref and end is ref:
+            if self._fully_self_closed is not None and self._fully_self_closed is not ref:
+                raise LinkNetworkError(
+                    "fully self-closed link is unique; a second root-like link is forbidden"
+                )
+            self._fully_self_closed = ref
 
         pair = (start, end)
         existing = self._pair_index.get(pair)
@@ -246,6 +274,10 @@ class LinkNetworkBuilder:
             raise LinkNetworkError(f"unbound reserved links: {missing}")
         if not self._refs:
             raise LinkNetworkError("cannot freeze an empty network")
+        if self._fully_self_closed is not root:
+            raise LinkNetworkError(
+                "selected root must be the unique fully self-closed link"
+            )
 
         refs = tuple(self._refs)
         links = tuple(link for link in self._links if link is not None)
@@ -268,13 +300,7 @@ class LinkNetworkBuilder:
 
 
 class LinkNetworkEvolutionBuilder:
-    """Additive immutable-state builder with canonical pair reuse.
-
-    The base network is never mutated. Existing handles are retained only as
-    runtime access handles. New ``define`` calls cannot duplicate any ordered
-    pair; ``ensure`` reuses the existing link whenever the pair is already
-    materialized.
-    """
+    """Additive immutable-state builder with canonical pair and root reuse."""
 
     def __init__(self, base: LinkNetwork) -> None:
         self._base = base
@@ -308,7 +334,7 @@ class LinkNetworkEvolutionBuilder:
         start: OccurrenceRef,
         end: OccurrenceRef,
     ) -> None:
-        """Define a new reserved link; duplicate ordered pairs are rejected."""
+        """Define a new reserved link; duplicate semantic forms are rejected."""
 
         self._require_mutable()
         self._validate_reserved(ref)
@@ -318,6 +344,10 @@ class LinkNetworkEvolutionBuilder:
             raise LinkNetworkError("base link is immutable during evolution")
         if self._links[ref.slot] is not None:
             raise LinkNetworkError("reserved evolved link is already defined")
+        if start is ref and end is ref:
+            raise LinkNetworkError(
+                "fully self-closed link is unique; evolution cannot create another root"
+            )
 
         pair = (start, end)
         existing = self._pair_index.get(pair)
@@ -354,6 +384,8 @@ class LinkNetworkEvolutionBuilder:
         self._require_mutable()
         selected_root = self._base.root if root is None else root
         self._validate_reserved(selected_root)
+        if selected_root is not self._base.root:
+            raise LinkNetworkError("evolution cannot replace the distinguished root")
         missing = [
             ref.slot
             for ref, link in zip(self._refs[self._base_count :], self._links[self._base_count :])
