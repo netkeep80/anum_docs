@@ -302,6 +302,122 @@ def test_additional_envelope_candidate_reencodes_deserialized_result() -> None:
     assert before.snapshot() == before_snapshot
 
 
+def test_structural_nesting_alone_does_not_raise_description_level() -> None:
+    kernel = build_root_kernel()
+    root = kernel.refs.root
+    a = kernel.refs.unlinked
+    b = kernel.refs.linked
+    before = kernel.network
+
+    structural_twice = materialize_sequence(
+        before,
+        SequenceDescription(
+            root=root,
+            items=(
+                SequenceGroup(
+                    (
+                        SequenceGroup((SequenceAtom(a), SequenceAtom(b))),
+                    )
+                ),
+            ),
+        ),
+    )
+
+    # A second structural grouping layer is still only grouping. It returns the
+    # nested exact result and does not silently manufacture S(X).
+    assert len(structural_twice.created) == 1
+    x = structural_twice.created[0].ref
+    assert structural_twice.result is x
+    assert structural_twice.after.link(x).start is a
+    assert structural_twice.after.link(x).end is b
+    assert find_links(structural_twice.after, start=root, end=x) == ()
+
+    # Raising the description level is a different explicit effect.
+    builder = structural_twice.after.evolve()
+    carrier_x = builder.reserve()
+    builder.define(carrier_x, root, x)
+    encoded = builder.freeze()
+    assert encoded.link(carrier_x).start is root
+    assert encoded.link(carrier_x).end is x
+    assert carrier_x is not x
+
+
+def test_mixed_ab_group_ab_preserves_duplicate_exact_pair_occurrences() -> None:
+    kernel = build_root_kernel()
+    root = kernel.refs.root
+    a = kernel.refs.unlinked
+    b = kernel.refs.linked
+
+    evidence = materialize_sequence(
+        kernel.network,
+        SequenceDescription(
+            root=root,
+            items=(
+                SequenceAtom(a),
+                SequenceAtom(b),
+                SequenceGroup((SequenceAtom(a), SequenceAtom(b))),
+            ),
+        ),
+    )
+
+    # For the mixed source shape ab[ab], the nested pair and the outer a,b
+    # adjacency have the same poles but are distinct exact occurrences.
+    assert len(evidence.created) == 3
+    inner_ab, outer_ab, b_to_inner = evidence.created
+    assert (inner_ab.start, inner_ab.end) == (a, b)
+    assert (outer_ab.start, outer_ab.end) == (a, b)
+    assert inner_ab.ref is not outer_ab.ref
+    assert evidence.after.link(inner_ab.ref) == evidence.after.link(outer_ab.ref)
+    assert find_links(evidence.after, start=a, end=b) == (
+        inner_ab.ref,
+        outer_ab.ref,
+    )
+
+    assert b_to_inner.start is b
+    assert b_to_inner.end is inner_ab.ref
+    assert evidence.result is b_to_inner.ref
+
+
+def test_reencoded_nested_value_can_participate_in_outer_sequence() -> None:
+    kernel = build_root_kernel()
+    root = kernel.refs.root
+    a = kernel.refs.unlinked
+    b = kernel.refs.linked
+
+    inner = materialize_sequence(
+        kernel.network,
+        SequenceDescription(
+            root=root,
+            items=(SequenceAtom(a), SequenceAtom(b)),
+        ),
+    )
+    x = inner.result
+
+    builder = inner.after.evolve()
+    carrier_x = builder.reserve()
+    builder.define(carrier_x, root, x)
+    with_envelope_value = builder.freeze()
+
+    outer = materialize_sequence(
+        with_envelope_value,
+        SequenceDescription(
+            root=root,
+            items=(SequenceAtom(carrier_x), SequenceAtom(a), SequenceAtom(b)),
+        ),
+    )
+
+    # This is the exact topology needed when one extra envelope raises the first
+    # nested value to S(X), after which that carrier participates as an ordinary
+    # value in the surrounding sequence (the [[ab]]ab family of examples).
+    assert len(outer.created) == 2
+    first, second = outer.created
+    assert first.start is carrier_x
+    assert first.end is a
+    assert second.start is a
+    assert second.end is b
+    assert outer.result is second.ref
+
+
 def test_unquote_requires_explicit_outer_envelope():
     with pytest.raises(ValueError, match="quote-оболочку"):
         unquote_anum(parse_raw_quaternary("]["))
