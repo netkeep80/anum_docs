@@ -232,8 +232,8 @@ def test_resolved_grouping_uses_exact_delimiter_identity_not_link_shape() -> Non
     assert description.items == (_atom(same_shape), _atom(value))
 
 
-def test_resolved_grouping_rejects_unbalanced_or_empty_groups() -> None:
-    before, _, refs = _base_network(("open", "close", "a"))
+def test_resolved_grouping_keeps_structure_strict_but_empty_group_is_root() -> None:
+    before, root, refs = _base_network(("open", "close", "a"))
 
     with pytest.raises(SequenceMaterializationError, match="unexpected close"):
         replay_resolved_sequence_grouping(
@@ -251,13 +251,18 @@ def test_resolved_grouping_rejects_unbalanced_or_empty_groups() -> None:
             close_form=refs["close"],
         )
 
-    with pytest.raises(SequenceMaterializationError, match="cannot be empty"):
-        replay_resolved_sequence_grouping(
-            before,
-            (refs["open"], refs["close"]),
-            open_form=refs["open"],
-            close_form=refs["close"],
-        )
+    description = replay_resolved_sequence_grouping(
+        before,
+        (refs["open"], refs["close"]),
+        open_form=refs["open"],
+        close_form=refs["close"],
+    )
+    assert description == _description(root, _group())
+
+    evidence = materialize_sequence(before, description)
+    assert evidence.created == ()
+    assert evidence.result is root
+    assert evidence.after.snapshot() == before.snapshot()
 
 
 def test_infinity_abc_creates_adjacent_relations_and_returns_last_edge() -> None:
@@ -408,13 +413,17 @@ def test_wrong_root_and_foreign_atom_reject() -> None:
         )
 
 
-def test_empty_top_level_and_nested_sequences_reject() -> None:
+def test_empty_top_level_and_nested_contexts_return_exact_root() -> None:
     before, root, _ = _base_network(("a",))
-    with pytest.raises(SequenceMaterializationError, match="top-level"):
-        SequenceDescription(root=root, items=())
-    with pytest.raises(SequenceMaterializationError, match="nested"):
-        SequenceGroup(items=())
-    assert before.root is root
+
+    top_level = materialize_sequence(before, _description(root))
+    nested = materialize_sequence(before, _description(root, _group()))
+
+    for evidence in (top_level, nested):
+        assert evidence.created == ()
+        assert evidence.result is root
+        assert evidence.after.snapshot() == before.snapshot()
+        assert replay_sequence_materialization(before, evidence) is root
 
 
 def test_replay_rejects_forged_edge_poles_and_result() -> None:
