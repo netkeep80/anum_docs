@@ -44,6 +44,7 @@ FORBIDDEN_CANDIDATE_PATHS = {
     "tests/test_root_v02_candidate.py",
     "tests/test_root_v02_execution_candidate.py",
     "docs/specs/Reference model МТС v0.1.md",
+    "docs/research/Foundation v2 P9 integrated proof conformance.md",
     "contracts/anum-boundary-conformance-candidate-v0.6.json",
     "contracts/mts-opening-path-challenge-v0.4.json",
     "contracts/mts-opening-path-decision-v0.4.json",
