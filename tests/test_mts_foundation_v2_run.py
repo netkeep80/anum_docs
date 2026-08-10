@@ -542,6 +542,263 @@ def test_one_physical_bracketed_source_replays_nested_des_and_carrier_raise() ->
     assert network.snapshot() == before_snapshot
 
 
+def test_double_physical_envelope_can_select_inner_carrier_and_outer_closing() -> None:
+    kernel = build_root_kernel()
+    builder = kernel.network.evolve()
+    root = kernel.refs.root
+    opening = kernel.refs.opening
+    closing = kernel.refs.closing
+    byte_refs = _byte_vocabulary(builder)
+    front_end = SourceFrontEndBuilder(builder, root, byte_refs)
+
+    a = _anchor(builder)
+    b = _anchor(builder)
+    carrier_a = _new_link(builder, root, a)
+    carrier_ab = _new_link(builder, carrier_a, b)
+    result = _new_link(builder, root, carrier_ab)
+    both_closings = _new_link(builder, root, result)
+
+    source = front_end.source_occurrence(b"[[ab]]")
+    dictionary = define_dictionary_scope(builder, root, root)
+    history = root
+    occurrences = {}
+    for raw, form in (
+        (b"[", opening),
+        (b"a", a),
+        (b"b", b),
+        (b"ab", carrier_ab),
+        (b"]", closing),
+    ):
+        dictionary, history, occurrence = _define_scoped_mapping(
+            builder,
+            root,
+            dictionary,
+            history,
+            front_end.content_ref(raw),
+            form,
+        )
+        occurrences[raw] = occurrence
+
+    outer_grammar = _anchor(builder)
+    outer_theory = _anchor(builder)
+    outer = front_end.build_selected_evidence(
+        source,
+        (
+            SegmentSpec(0, 1, opening, occurrences[b"["]),
+            SegmentSpec(1, 2, opening, occurrences[b"["]),
+            SegmentSpec(2, 4, carrier_ab, occurrences[b"ab"]),
+            SegmentSpec(4, 5, closing, occurrences[b"]"]),
+            SegmentSpec(5, 6, closing, occurrences[b"]"]),
+        ),
+        dictionary=dictionary,
+        grammar=outer_grammar,
+        theory=outer_theory,
+    )
+
+    body_selection = _fold(builder, root, (outer.segments[2].selection,))
+    body_forms = _fold(builder, root, (carrier_ab,))
+    body_grammar = _anchor(builder)
+    body_theory = _anchor(builder)
+    body_grammar_membership = define_membership(builder, body_grammar, body_forms)
+    body_theory_membership = define_membership(builder, body_theory, body_forms)
+
+    outer_closing_selection = _fold(builder, root, (outer.segments[4].selection,))
+    outer_closing_forms = _fold(builder, root, (closing,))
+    closing_grammar = _anchor(builder)
+    closing_theory = _anchor(builder)
+    closing_grammar_membership = define_membership(
+        builder, closing_grammar, outer_closing_forms
+    )
+    closing_theory_membership = define_membership(
+        builder, closing_theory, outer_closing_forms
+    )
+
+    interpreter = _anchor(builder)
+    parent = _anchor(builder)
+    prior = _anchor(builder)
+    k0 = define_context(builder, parent, prior)
+    k1 = define_context(builder, parent, carrier_ab)
+    k2 = define_context(builder, parent, result)
+
+    role_refs = {
+        name: _anchor(builder)
+        for name in (
+            "source",
+            "source-selection",
+            "form-sequence",
+            "dictionary",
+            "grammar",
+            "theory",
+            "form",
+            "before-context",
+            "binding",
+            "result",
+            "after-context",
+        )
+    }
+    flat_roles = FlatSequenceReadingRoleRefs(
+        source=role_refs["source"],
+        source_selection=role_refs["source-selection"],
+        form_sequence=role_refs["form-sequence"],
+        dictionary=role_refs["dictionary"],
+        grammar=role_refs["grammar"],
+        theory=role_refs["theory"],
+        before_context=role_refs["before-context"],
+        result=role_refs["result"],
+        after_context=role_refs["after-context"],
+    )
+    relation_roles = RelationStepRoleRefs(
+        source=role_refs["source"],
+        source_selection=role_refs["source-selection"],
+        form_sequence=role_refs["form-sequence"],
+        dictionary=role_refs["dictionary"],
+        grammar=role_refs["grammar"],
+        theory=role_refs["theory"],
+        form=role_refs["form"],
+        before_context=role_refs["before-context"],
+        binding=role_refs["binding"],
+        result=role_refs["result"],
+        after_context=role_refs["after-context"],
+    )
+
+    role_dictionary = define_dictionary_scope(builder, root, root)
+    role_history = root
+    for name, role in role_refs.items():
+        role_dictionary, role_history, _ = _define_scoped_mapping(
+            builder,
+            root,
+            role_dictionary,
+            role_history,
+            front_end.content_ref(name.encode("utf-8")),
+            role,
+        )
+
+    body_act = define_act_header(builder, interpreter, role_dictionary, k1)
+    for role, value in (
+        (flat_roles.source, outer.source),
+        (flat_roles.source_selection, body_selection),
+        (flat_roles.form_sequence, body_forms),
+        (flat_roles.dictionary, outer.dictionary),
+        (flat_roles.grammar, body_grammar),
+        (flat_roles.theory, body_theory),
+        (flat_roles.before_context, k0),
+        (flat_roles.result, carrier_ab),
+        (flat_roles.after_context, k1),
+    ):
+        define_act_field(builder, body_act, role, value)
+
+    closing_act = define_act_header(builder, interpreter, role_dictionary, k2)
+    for role, value in (
+        (relation_roles.source, outer.source),
+        (relation_roles.source_selection, outer_closing_selection),
+        (relation_roles.form_sequence, outer_closing_forms),
+        (relation_roles.dictionary, outer.dictionary),
+        (relation_roles.grammar, closing_grammar),
+        (relation_roles.theory, closing_theory),
+        (relation_roles.form, closing),
+        (relation_roles.before_context, k1),
+        (relation_roles.binding, carrier_ab),
+        (relation_roles.result, result),
+        (relation_roles.after_context, k2),
+    ):
+        define_act_field(builder, closing_act, role, value)
+
+    steps = (
+        RunStepEvidence(
+            act=body_act,
+            before_context=k0,
+            after_context=k1,
+            before_role=role_refs["before-context"],
+            after_role=role_refs["after-context"],
+        ),
+        RunStepEvidence(
+            act=closing_act,
+            before_context=k1,
+            after_context=k2,
+            before_role=role_refs["before-context"],
+            after_role=role_refs["after-context"],
+        ),
+    )
+    run = _run(builder, root, steps, k0, k2)
+    network = builder.freeze()
+    snapshot = network.snapshot()
+
+    resolved = replay_source_front_end(network, outer, byte_refs)
+    assert resolved == (opening, opening, carrier_ab, closing, closing)
+    assert replay_resolved_sequence_grouping(
+        network,
+        resolved,
+        open_form=opening,
+        close_form=closing,
+    ) == SequenceDescription(
+        root=root,
+        items=(
+            SequenceGroup(
+                (SequenceGroup((SequenceAtom(carrier_ab),)),)
+            ),
+        ),
+    )
+
+    body_evidence = FlatSequenceReadingEvidence(
+        source_evidence=outer,
+        interpreter=interpreter,
+        before_context=k0,
+        result=carrier_ab,
+        after_context=k1,
+        act=body_act,
+        role_dictionary=role_dictionary,
+        roles=flat_roles,
+    )
+    closing_evidence = RelationStepEvidence(
+        source_evidence=outer,
+        interpreter=interpreter,
+        form=closing,
+        before_context=k1,
+        binding=carrier_ab,
+        result=result,
+        after_context=k2,
+        act=closing_act,
+        role_dictionary=role_dictionary,
+        roles=relation_roles,
+    )
+
+    assert replay_flat_source_subselection_reading(
+        network,
+        body_evidence,
+        byte_refs,
+        start_segment=2,
+        end_segment=3,
+        selection_sequence=body_selection,
+        form_sequence=body_forms,
+        grammar=body_grammar,
+        theory=body_theory,
+        grammar_membership=body_grammar_membership,
+        theory_membership=body_theory_membership,
+    ) is carrier_ab
+    assert replay_relation_source_subselection_step(
+        network,
+        closing_evidence,
+        byte_refs,
+        start_segment=4,
+        end_segment=5,
+        selection_sequence=outer_closing_selection,
+        form_sequence=outer_closing_forms,
+        grammar=closing_grammar,
+        theory=closing_theory,
+        grammar_membership=closing_grammar_membership,
+        theory_membership=closing_theory_membership,
+    ) is result
+    assert replay_run(network, run) == (body_act, closing_act)
+
+    assert outer.segments[3].selection is not outer.segments[4].selection
+    assert network.link(result).start is root
+    assert network.link(result).end is carrier_ab
+    assert network.link(both_closings).start is root
+    assert network.link(both_closings).end is result
+    assert both_closings is not result
+    assert network.snapshot() == snapshot
+
+
 def test_empty_run_is_exact_identity_not_state_change() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
