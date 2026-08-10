@@ -346,6 +346,65 @@ def test_second_envelope_literal_formula_and_recursive_reencoding_are_distinct_c
     assert network.link(recursive_second) != network.link(literal_second)
 
 
+def test_grouping_preserves_depth_that_generic_materializer_does_not_encode() -> None:
+    kernel = build_root_kernel()
+    root = kernel.refs.root
+    opening = kernel.refs.opening
+    closing = kernel.refs.closing
+    a = kernel.refs.unlinked
+    b = kernel.refs.linked
+    network = kernel.network
+
+    one_level = replay_resolved_sequence_grouping(
+        network,
+        (opening, a, b, closing),
+        open_form=opening,
+        close_form=closing,
+    )
+    two_levels = replay_resolved_sequence_grouping(
+        network,
+        (opening, opening, a, b, closing, closing),
+        open_form=opening,
+        close_form=closing,
+    )
+
+    assert one_level == SequenceDescription(
+        root=root,
+        items=(SequenceGroup((SequenceAtom(a), SequenceAtom(b))),),
+    )
+    assert two_levels == SequenceDescription(
+        root=root,
+        items=(
+            SequenceGroup(
+                (SequenceGroup((SequenceAtom(a), SequenceAtom(b))),)
+            ),
+        ),
+    )
+    assert one_level != two_levels
+
+    one_materialized = materialize_sequence(network, one_level)
+    two_materialized = materialize_sequence(network, two_levels)
+
+    # Grouping retained the second exact O/C nesting level, but the generic
+    # nested-sequence materializer has no rule that turns that depth into a
+    # carrier level: both paths currently create only one a⟼b relation.
+    assert len(one_materialized.created) == 1
+    assert len(two_materialized.created) == 1
+    assert (
+        one_materialized.created[0].start,
+        one_materialized.created[0].end,
+    ) == (a, b)
+    assert (
+        two_materialized.created[0].start,
+        two_materialized.created[0].end,
+    ) == (a, b)
+    assert find_links(
+        two_materialized.after,
+        start=root,
+        end=two_materialized.result,
+    ) == ()
+
+
 def test_mixed_ab_group_ab_preserves_duplicate_exact_pair_occurrences() -> None:
     kernel = build_root_kernel()
     root = kernel.refs.root
