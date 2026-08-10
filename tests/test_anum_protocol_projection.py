@@ -234,7 +234,6 @@ def test_quote_envelope_can_select_carrier_or_deserialized_denotation() -> None:
 
 def test_grouping_depth_is_syntactic_even_when_current_materializer_denotes_same_value() -> None:
     kernel = build_root_kernel()
-    root = kernel.refs.root
     opening = kernel.refs.opening
     closing = kernel.refs.closing
     a = kernel.refs.unlinked
@@ -314,8 +313,6 @@ def test_user_examples_use_canonical_reuse_instead_of_inner_outer_duplicate() ->
     assert carrier_ab is not carrier_x
     assert literal_second is not recursive_second
 
-    # ab[ab]: group and outer prefix request the same semantic a⟼b.  It is
-    # materialized once and reused; only Loop(x)=x⟼x is then new.
     mixed = materialize_sequence(
         before,
         SequenceDescription(
