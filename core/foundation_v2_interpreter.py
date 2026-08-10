@@ -24,6 +24,7 @@ from .foundation_v2_source import (
     SourceFrontEndEvidence,
     SourceReplayError,
     replay_source_front_end,
+    replay_source_subselection,
 )
 from .foundation_v2_state import (
     DictionaryLookupError,
@@ -237,28 +238,75 @@ def replay_flat_sequence_reading(
     before_snapshot = network.snapshot()
     try:
         forms = _replay_source(network, evidence.source_evidence, byte_refs)
-        _verify_flat_sequence_result(network, forms, evidence.result)
-
-        try:
-            parent = parent_of_context(network, evidence.before_context)
-            current_of_context(network, evidence.before_context)
-            after_parent = parent_of_context(network, evidence.after_context)
-            after_current = current_of_context(network, evidence.after_context)
-        except FoundationStateError as exc:
-            raise InterpreterReplayError("invalid flat-reading context") from exc
-        if after_parent is not parent:
-            raise InterpreterReplayError("flat reading changed the explicit parent")
-        if after_current is not evidence.result:
-            raise InterpreterReplayError(
-                "flat-reading after-context current is not the exact result"
-            )
-
-        _verify_flat_sequence_act_header(network, evidence)
-        _verify_flat_sequence_act_fields(network, evidence)
-        return evidence.result
+        return _replay_flat_selected_forms(
+            network,
+            evidence,
+            forms,
+            source_selection=evidence.source_evidence.selection_sequence,
+            form_sequence=evidence.source_evidence.form_sequence,
+            grammar=evidence.source_evidence.grammar,
+            theory=evidence.source_evidence.theory,
+        )
     finally:
         if network.snapshot() != before_snapshot:
             raise InterpreterReplayError("flat-reading replay mutated the network")
+
+
+def replay_flat_source_subselection_reading(
+    network: LinkNetwork,
+    evidence: FlatSequenceReadingEvidence,
+    byte_refs: Mapping[int, OccurrenceRef],
+    *,
+    start_segment: int,
+    end_segment: int,
+    selection_sequence: OccurrenceRef,
+    form_sequence: OccurrenceRef,
+    grammar: OccurrenceRef,
+    theory: OccurrenceRef,
+    grammar_membership: OccurrenceRef,
+    theory_membership: OccurrenceRef,
+) -> OccurrenceRef:
+    """Replay a flat reading of one trusted subselection of the same whole source.
+
+    ``evidence.source_evidence`` remains the whole exact source occurrence. The
+    selected source/form folds and G/T refs name only the requested contiguous
+    subselection. Segment indices are checker coordinates; actual-act identity
+    is carried by exact link fields. No nested source occurrence is introduced.
+    """
+
+    before_snapshot = network.snapshot()
+    try:
+        try:
+            forms = replay_source_subselection(
+                network,
+                evidence.source_evidence,
+                byte_refs,
+                start_segment=start_segment,
+                end_segment=end_segment,
+                selection_sequence=selection_sequence,
+                form_sequence=form_sequence,
+                grammar=grammar,
+                theory=theory,
+                grammar_membership=grammar_membership,
+                theory_membership=theory_membership,
+            )
+        except SourceReplayError as exc:
+            raise InterpreterReplayError("invalid source subselection evidence") from exc
+
+        return _replay_flat_selected_forms(
+            network,
+            evidence,
+            forms,
+            source_selection=selection_sequence,
+            form_sequence=form_sequence,
+            grammar=grammar,
+            theory=theory,
+        )
+    finally:
+        if network.snapshot() != before_snapshot:
+            raise InterpreterReplayError(
+                "flat source-subselection replay mutated the network"
+            )
 
 
 def replay_colon_effect(
@@ -395,6 +443,44 @@ def _replay_source(
         raise InterpreterReplayError("invalid source-front-end evidence") from exc
 
 
+def _replay_flat_selected_forms(
+    network: LinkNetwork,
+    evidence: FlatSequenceReadingEvidence,
+    forms: tuple[OccurrenceRef, ...],
+    *,
+    source_selection: OccurrenceRef,
+    form_sequence: OccurrenceRef,
+    grammar: OccurrenceRef,
+    theory: OccurrenceRef,
+) -> OccurrenceRef:
+    _verify_flat_sequence_result(network, forms, evidence.result)
+
+    try:
+        parent = parent_of_context(network, evidence.before_context)
+        current_of_context(network, evidence.before_context)
+        after_parent = parent_of_context(network, evidence.after_context)
+        after_current = current_of_context(network, evidence.after_context)
+    except FoundationStateError as exc:
+        raise InterpreterReplayError("invalid flat-reading context") from exc
+    if after_parent is not parent:
+        raise InterpreterReplayError("flat reading changed the explicit parent")
+    if after_current is not evidence.result:
+        raise InterpreterReplayError(
+            "flat-reading after-context current is not the exact result"
+        )
+
+    _verify_flat_sequence_act_header(network, evidence)
+    _verify_flat_sequence_act_fields(
+        network,
+        evidence,
+        source_selection=source_selection,
+        form_sequence=form_sequence,
+        grammar=grammar,
+        theory=theory,
+    )
+    return evidence.result
+
+
 def _verify_flat_sequence_result(
     network: LinkNetwork,
     forms: tuple[OccurrenceRef, ...],
@@ -501,19 +587,20 @@ def _verify_flat_sequence_act_header(
 def _verify_flat_sequence_act_fields(
     network: LinkNetwork,
     evidence: FlatSequenceReadingEvidence,
+    *,
+    source_selection: OccurrenceRef,
+    form_sequence: OccurrenceRef,
+    grammar: OccurrenceRef,
+    theory: OccurrenceRef,
 ) -> None:
     source = evidence.source_evidence
     expected = (
         (evidence.roles.source, source.source, "source"),
-        (
-            evidence.roles.source_selection,
-            source.selection_sequence,
-            "source-selection",
-        ),
-        (evidence.roles.form_sequence, source.form_sequence, "form-sequence"),
+        (evidence.roles.source_selection, source_selection, "source-selection"),
+        (evidence.roles.form_sequence, form_sequence, "form-sequence"),
         (evidence.roles.dictionary, source.dictionary, "dictionary"),
-        (evidence.roles.grammar, source.grammar, "grammar"),
-        (evidence.roles.theory, source.theory, "theory"),
+        (evidence.roles.grammar, grammar, "grammar"),
+        (evidence.roles.theory, theory, "theory"),
         (
             evidence.roles.before_context,
             evidence.before_context,
