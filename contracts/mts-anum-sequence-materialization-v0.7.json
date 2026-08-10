@@ -4,65 +4,62 @@
   "accepted": false,
   "issue": 242,
   "parent": 237,
+  "semanticReset": 343,
   "dependsOn": [
-    "mts-exact-occurrence-link-network/v0.7",
+    "mts-rooted-link-network/v0.7",
     "mts-foundation-v2-state/v0.7"
   ],
   "sourceBoundary": {
-    "input": "already-selected root-relative nested sequence description over exact existing occurrences",
+    "input": "already-selected root-relative nested sequence over existing distinguished links",
     "rawBracketsAreHostOpcodes": false,
     "tokenOrAstIdentityIsSemantic": false,
     "sourceCarrierEqualsTargetNetwork": false,
-    "rootSentinelParticipatesInFold": false
+    "rootParticipatesAsFifthAbit": false
   },
   "sequenceSemantics": {
-    "topLevel": "∞ A B C -> create AB=A⟼B then ABC=AB⟼C",
-    "fold": "left fold: current=A; for each next value V create current=current⟼V",
-    "singleton": "one item returns that exact item and creates no relation",
-    "nestedGroup": "recursively materialize the group and return its exact result as one outer value",
-    "multiItemResult": "the final exact prefix relation created by the left fold",
+    "topLevel": "∞ A B C -> ensure AB=A⟼B then ensure ABC=AB⟼C",
+    "fold": "left fold: current=A; for each next value V current=ensure(current,V)",
+    "singleton": "one item returns that item and creates no relation",
+    "nestedGroup": "recursively deserialize the group and return its result as one outer value",
+    "multiItemResult": "the final canonical prefix relation of the left fold",
     "emptySequenceAllowed": true,
-    "emptySequenceResult": "the distinguished exact root"
+    "emptySequenceResult": "R = ∞",
+    "emptyNestedGroupAllowed": true,
+    "emptyNestedGroupResult": "R = ∞"
   },
   "effectBoundary": {
     "beforeImmutable": true,
-    "afterSameRuntimeIdentityLineage": true,
-    "existingRefsPreservedByExactIdentity": true,
     "existingLinksImmutable": true,
-    "newOccurrencesAppended": true,
-    "everyFoldStepCreatesNewExactOccurrence": true,
-    "samePairImpliesReuse": false,
-    "pairInterning": false,
+    "samePairImpliesReuse": true,
+    "duplicateSemanticPairCreated": false,
+    "createdEvidenceContainsOnlyActuallyNewLinks": true,
     "replayReadOnly": true,
-    "findReadOnly": true
+    "findReadOnly": true,
+    "findMaterializes": false
   },
   "identityBoundary": {
-    "sameLineageBeforeAfterMayShareExactRefs": true,
-    "independentSnapshotReloadCreatesFreshRuntimeIdentity": true,
-    "snapshotSlotIsUniversalSemanticIdentity": false,
+    "semanticIdentity": "rooted structural identity by distinguished ordered poles",
+    "runtimeHandleIsSemanticIdentity": false,
+    "snapshotSlotIsSemanticIdentity": false,
     "backendAddressIsSemanticIdentity": false,
-    "structuralEqualityImpliesExactIdentity": false
+    "repeatedSequencePositionCreatesNewLink": false
   },
   "requiredVectors": [
-    "source carrier for ∞ab lacks a⟼b before materialization",
-    "∞ab creates exactly one new a⟼b occurrence",
-    "∞abc creates exactly a⟼b then (a⟼b)⟼c and returns (a⟼b)⟼c",
-    "∞[ab]c creates inner a⟼b then outer (a⟼b)⟼c",
-    "empty top-level and nested sequences return the distinguished exact root without creation",
-    "∞[window][cursor][position][[[x][int]][point]] creates XI, Q, W⟼C, (W⟼C)⟼P, ((W⟼C)⟼P)⟼Q in deterministic nested-first order",
-    "singleton nested group returns its exact item without a new link",
-    "existing equal-pair occurrence is not implicitly reused",
-    "find of absent target does not mutate before state",
-    "replay rejects forged poles, extra occurrences, wrong result or changed base topology",
-    "snapshot round-trip preserves topology but not cross-load runtime identity",
-    "historical v0.2 recursive denotation contracts remain unchanged and are not silently replaced"
+    "des(empty)=R and des([])=R without creation",
+    "source carrier for ab does not imply a⟼b before explicit materialization",
+    "ab materializes one a⟼b only when absent",
+    "existing a⟼b is reused without store growth",
+    "abc ensures a⟼b then (a⟼b)⟼c in left-fold order",
+    "[ab]c returns inner a⟼b as one outer value",
+    "repeating one semantic link in positions does not copy that link",
+    "replay rejects forged poles, wrong result or changed base topology",
+    "snapshot reload may issue fresh runtime handles without changing semantic topology"
   ],
   "compatibility": {
-    "historicalV02PairDenotationStillAccepted": true,
-    "historicalAnumMemoryPairInterningInherited": false,
-    "sequenceModeReplacesRecursivePairGrammar": false,
-    "sequenceModeIsFoundationV2MaterializationCandidate": true
+    "historicalV02ArtifactsRemainInGitHistory": true,
+    "historicalOccurrenceMultiplicityInherited": false,
+    "foundationV2Accepted": false
   },
-  "nextGate": "persistent L4/backend contract #124, then integrated release conformance and cutover",
+  "nextGate": "complete semantic reset #343 across active Foundation-v2 contracts/issues",
   "aproverRepinAllowed": false
 }
