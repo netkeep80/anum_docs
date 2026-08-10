@@ -36,9 +36,19 @@ ROLE_NAMES = (
 
 
 def _anchor(builder: LinkNetworkBuilder):
-    ref = builder.reserve()
-    builder.define(ref, ref, ref)
-    return ref
+    """Create a fresh structurally distinguished test value rooted at ∞."""
+
+    if not builder._refs:
+        return builder.ensure_root()
+    current = next(
+        ref
+        for ref, link in reversed(list(zip(builder._refs, builder._links)))
+        if link is not None
+    )
+    count = len(builder._refs)
+    while len(builder._refs) == count:
+        current = builder.ensure_start_self_closed(current)
+    return current
 
 
 def _roles(builder: LinkNetworkBuilder) -> EqualityRoleRefs:
@@ -141,18 +151,22 @@ def test_missing_mapping_falls_back_to_exact_member_and_can_be_false() -> None:
     assert replay_equality_evaluation(network, evidence) is False
 
 
-def test_two_same_shape_self_closed_occurrences_are_not_equal_by_shape() -> None:
+def test_start_self_closed_forms_with_distinct_ends_are_distinct() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     context = define_context(builder, _anchor(builder), _anchor(builder))
-    left = _anchor(builder)
-    right = _anchor(builder)
-    assert left is not right
+    left_end = _anchor(builder)
+    right_end = _anchor(builder)
+    left = builder.ensure_start_self_closed(left_end)
+    right = builder.ensure_start_self_closed(right_end)
     evidence = _make_evidence(builder, root, context, left, right, left, right)
     network = builder.freeze(root)
 
-    assert network.link(left).start is left and network.link(left).end is left
-    assert network.link(right).start is right and network.link(right).end is right
+    assert left is not right
+    assert network.link(left).start is left
+    assert network.link(left).end is left_end
+    assert network.link(right).start is right
+    assert network.link(right).end is right_end
     assert replay_equality_evaluation(network, evidence) is False
 
 
@@ -173,22 +187,28 @@ def test_alias_chain_is_deliberately_one_hop_not_transitive() -> None:
     assert replay_equality_evaluation(network, evidence) is False
 
 
-def test_duplicate_same_representative_bindings_are_unambiguous_not_last_write_wins() -> None:
+def test_repeated_same_representative_binding_is_canonical_and_unambiguous() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     context = define_context(builder, _anchor(builder), _anchor(builder))
     member = _anchor(builder)
     representative = _anchor(builder)
-    define_local_representative_binding(builder, context, member, representative)
-    define_local_representative_binding(builder, context, member, representative)
+    first_pair, first_binding = define_local_representative_binding(
+        builder, context, member, representative
+    )
+    second_pair, second_binding = define_local_representative_binding(
+        builder, context, member, representative
+    )
     evidence = _make_evidence(
         builder, root, context, member, representative, representative, representative
     )
     network = builder.freeze(root)
 
+    assert second_pair is first_pair
+    assert second_binding is first_binding
     resolution = local_representative_resolution(network, context, member)
     assert resolution.representative is representative
-    assert len(resolution.bindings) == 2
+    assert resolution.bindings == (first_binding,)
     assert replay_equality_evaluation(network, evidence) is True
 
 

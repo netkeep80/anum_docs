@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from core.exact_link_network import LinkNetworkBuilder
+from core.exact_link_network import LinkNetworkBuilder, LinkNetworkError
 from core.foundation_v2 import build_root_kernel as public_build_root_kernel
 from core.foundation_v2_root import (
     FoundationRootKernel,
@@ -100,6 +100,12 @@ def test_exact_five_link_root_topology() -> None:
     assert (closing.start, closing.end) == (refs.root, refs.closing)
     assert (linked.start, linked.end) == (refs.opening, refs.closing)
     assert (unlinked.start, unlinked.end) == (refs.closing, refs.opening)
+    assert network.find(refs.opening, refs.closing) is refs.linked
+    assert [
+        ref
+        for ref in network.refs
+        if network.link(ref).start is ref and network.link(ref).end is ref
+    ] == [refs.root]
     validate_root_kernel(kernel)
 
 
@@ -161,7 +167,7 @@ def test_validation_is_independent_of_allocation_slot_order() -> None:
     assert root_role_refs(kernel)["O"] is opening
 
 
-def test_equal_topology_in_two_builds_does_not_create_cross_network_identity() -> None:
+def test_equal_topology_in_two_builds_has_fresh_runtime_access_handles() -> None:
     first = build_root_kernel()
     second = build_root_kernel()
 
@@ -171,28 +177,25 @@ def test_equal_topology_in_two_builds_does_not_create_cross_network_identity() -
     assert first.refs.linked != second.refs.linked
 
 
-def test_another_self_closed_occurrence_is_not_root() -> None:
+def test_second_completely_self_closed_link_is_forbidden() -> None:
     kernel = build_root_kernel()
     evolution = kernel.network.evolve()
     other = evolution.reserve()
-    evolution.define(other, other, other)
-    after = evolution.freeze()
 
-    assert after.root is kernel.refs.root
-    assert other is not after.root
-    assert after.link(other).start is other
-    assert after.link(other).end is other
+    with pytest.raises(LinkNetworkError, match="fully self-closed link is unique"):
+        evolution.define(other, other, other)
 
 
-def test_duplicate_same_pole_occurrence_remains_distinct() -> None:
+def test_duplicate_same_pole_link_is_forbidden_and_ensure_reuses_linked() -> None:
     kernel = build_root_kernel()
     evolution = kernel.network.evolve()
     duplicate = evolution.reserve()
-    evolution.define(duplicate, kernel.refs.opening, kernel.refs.closing)
-    after = evolution.freeze()
 
-    assert duplicate is not kernel.refs.linked
-    assert after.link(duplicate) == after.link(kernel.refs.linked)
+    with pytest.raises(LinkNetworkError, match="duplicate semantic link pair"):
+        evolution.define(duplicate, kernel.refs.opening, kernel.refs.closing)
+
+    fresh = kernel.network.evolve()
+    assert fresh.ensure(kernel.refs.opening, kernel.refs.closing) is kernel.refs.linked
 
 
 def test_public_facade_uses_the_same_root_builder() -> None:
@@ -215,8 +218,6 @@ def test_root_and_public_modules_have_no_historical_semantic_imports() -> None:
         "carrier_isomorphic",
         "intern_link",
     ):
-        # Mentions in the module-level explanatory veto are acceptable; executable
-        # imports/calls are covered structurally above. Ensure no function call form.
         assert f"{forbidden}(" not in root_source
 
 

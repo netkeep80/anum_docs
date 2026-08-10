@@ -4,6 +4,7 @@
   "accepted": false,
   "issue": 255,
   "parent": 237,
+  "semanticReset": 343,
   "dependsOn": [
     "mts-foundation-v2-equality/v0.7",
     "mts-foundation-v2-run/v0.7",
@@ -11,77 +12,55 @@
   ],
   "firstRule": {
     "name": "decompose-equal-complete-links-one-step",
-    "premise": "a replayed true local equality evaluation Equal_K(L,R)",
-    "left": "L = l_start ⟼ l_end, complete exact occurrence",
-    "right": "R = r_start ⟼ r_end, complete exact occurrence",
-    "startClaim": "C_start = l_start ⟼ r_start",
-    "endClaim": "C_end = l_end ⟼ r_end",
+    "premise": "replayed true local equality Equal_K(L,R)",
+    "left": "L = l_start ⟼ l_end as one canonical complete link",
+    "right": "R = r_start ⟼ r_end as one canonical complete link",
+    "startClaim": "C_start = ensure(l_start,r_start)",
+    "endClaim": "C_end = ensure(l_end,r_end)",
     "recursive": false,
-    "claimsMutateEqualityContext": false,
-    "claimsAreTheoremClosure": false
+    "claimsMutateEqualityContext": false
   },
   "admission": {
     "membership": "RuleMembership = T ⟼ Rule",
-    "exactMembershipOccurrenceVerified": true,
-    "hostRuleEnumIsSemanticAuthority": false,
-    "ruleInferredFromOperandShape": false
+    "canonicalMembershipVerified": true,
+    "hostRuleEnumIsSemanticAuthority": false
   },
   "premiseReplay": {
     "usesExistingEqualityReplay": true,
-    "premiseActMustBeExact": true,
     "premiseMustEvaluateTrue": true,
-    "leftRightMustBeSameExactOccurrencesAsPremise": true,
-    "shapeEquivalentSubstitutionAllowed": false
+    "leftRightMustBeSameCanonicalLinksAsPremise": true,
+    "sameDistinguishedPolesCreateAlternativeOperand": false,
+    "runtimeHandleDifferenceCreatesSemanticSubstitution": false
   },
   "applicationAct": {
     "sameGateRActualActArchitecture": true,
     "observational": true,
-    "beforeContextEqualsAfterContextByExactOccurrence": true,
-    "requiredRoles": [
-      "premise-equality-act",
-      "theory",
-      "rule",
-      "rule-membership",
-      "left-relation",
-      "right-relation",
-      "start-claim",
-      "end-claim",
-      "before-context",
-      "after-context"
-    ]
+    "beforeContextEqualsAfterContextAsSameCanonicalK": true
   },
   "trustBoundary": {
     "proofSearchTrusted": false,
-    "ruleSelectionTrustedByDefault": false,
     "selectedEvidenceReplayed": true,
     "snapshotStable": true,
-    "implicitMaterialization": false,
+    "implicitMaterializationDuringReplay": false,
     "automaticRepresentativeBindings": false,
     "automaticNestedRuleFiring": false,
     "logicalTransitivityInferred": false,
     "substitutionInferred": false,
     "congruenceInferred": false,
-    "graphIsomorphismEquality": false
+    "technicalIdIsSemanticIdentity": false
   },
   "requiredVectors": [
-    "true local equality plus exact T membership yields exactly two first-level claims",
+    "true local equality plus canonical T membership yields two first-level claims",
     "false equality premise rejects",
     "membership from another theory rejects",
-    "shape-equal but exact-distinct premise operand substitution rejects",
+    "requesting the same relation pair returns the same operand",
+    "structurally different operand rejects",
     "partial/self-closed relation rejects",
-    "forged start/end claim rejects",
-    "observational rule cannot change exact K",
-    "conflicting required actual-act field rejects",
-    "nested relation poles stay opaque and are not recursively decomposed",
-    "rule replay adds no local representative binding and does not mutate snapshot"
+    "forged claim rejects",
+    "observational rule cannot change K",
+    "nested relation poles are not recursively decomposed",
+    "replay is read-only"
   ],
-  "aproverLayering": [
-    "untrusted proof search proposes exact evidence",
-    "replay premise actual act",
-    "verify exact T rule admission",
-    "replay exact one-step rule application",
-    "compose application actual act in exact Run",
-    "later integrated conformance decides release"
-  ],
-  "nextGate": "integrated Foundation-v2 proof/checker conformance over source, scoped D/G/T, K, acts, runs and admitted rules"
+  "aproverRepinAllowed": false,
+  "nextGate": "complete #343 and integrated conformance before Foundation-v2 acceptance"
 }

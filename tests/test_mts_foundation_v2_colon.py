@@ -39,9 +39,17 @@ ROLE_NAMES = (
 
 
 def _anchor(builder: LinkNetworkBuilder):
-    ref = builder.reserve()
-    builder.define(ref, ref, ref)
-    return ref
+    if not builder._refs:
+        return builder.ensure_root()
+    current = next(
+        ref
+        for ref, link in reversed(list(zip(builder._refs, builder._links)))
+        if link is not None
+    )
+    count = len(builder._refs)
+    while len(builder._refs) == count:
+        current = builder.ensure_start_self_closed(current)
+    return current
 
 
 def _roles(builder: LinkNetworkBuilder) -> ColonRoleRefs:
@@ -120,8 +128,7 @@ def _colon_fixture(
     if form is None:
         form = _anchor(builder)
 
-    source = builder.reserve()
-    builder.define(source, source, source_content)
+    source = builder.ensure_start_self_closed(source_content)
     effect = define_dictionary_effect(
         builder,
         before_dictionary,
@@ -187,7 +194,7 @@ def test_colon_replays_one_persistent_definition_without_mutation() -> None:
     assert network.snapshot() == before
 
 
-def test_repeated_identical_definition_keeps_two_occurrences_one_mapping() -> None:
+def test_repeated_identical_definition_in_new_history_has_two_structural_events() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     source_content = _anchor(builder)
@@ -207,6 +214,7 @@ def test_repeated_identical_definition_keeps_two_occurrences_one_mapping() -> No
     )
     network = builder.freeze(root)
 
+    assert second.occurrence is not first.occurrence
     assert replay_colon_effect(network, evidence) is second.after_scope
     resolution = lookup_scoped_dictionary(
         network, second.after_scope, source_content
@@ -275,9 +283,10 @@ def test_global_unreachable_occurrence_does_not_count_as_visibility() -> None:
     source_content = _anchor(builder)
     form = _anchor(builder)
     visible_base = define_dictionary_scope(builder, root, root)
-    other_base = define_dictionary_scope(builder, root, root)
+    other_history = _anchor(builder)
+    other_base = define_dictionary_scope(builder, root, other_history)
     other = define_dictionary_effect(
-        builder, other_base, root, root, source_content, form
+        builder, other_base, root, other_history, source_content, form
     )
     network = builder.freeze(root)
 
@@ -293,9 +302,9 @@ def test_global_unreachable_occurrence_does_not_count_as_visibility() -> None:
 
 def test_colon_rejects_occurrence_bound_to_wrong_before_snapshot() -> None:
     builder, root, evidence, _ = _colon_fixture()
-    wrong_before = define_dictionary_scope(builder, root, root)
-    forged_occurrence = builder.reserve()
-    builder.define(forged_occurrence, wrong_before, evidence.entry)
+    wrong_history = _anchor(builder)
+    wrong_before = define_dictionary_scope(builder, root, wrong_history)
+    forged_occurrence = builder.ensure(wrong_before, evidence.entry)
     forged = replace(evidence, definition_occurrence=forged_occurrence)
     network = builder.freeze(root)
 
@@ -319,8 +328,7 @@ def test_colon_rejects_changed_parent_in_after_scope() -> None:
 def test_colon_rejects_forged_history_append() -> None:
     builder, root, evidence, _ = _colon_fixture()
     unrelated = _anchor(builder)
-    forged_history = builder.reserve()
-    builder.define(forged_history, unrelated, evidence.definition_occurrence)
+    forged_history = builder.ensure(unrelated, evidence.definition_occurrence)
     forged = replace(evidence, history_after=forged_history)
     network = builder.freeze(root)
 

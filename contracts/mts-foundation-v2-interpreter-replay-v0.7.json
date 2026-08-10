@@ -5,8 +5,9 @@
   "issue": 247,
   "refinedByIssues": [249, 251],
   "parent": 237,
+  "semanticReset": 343,
   "dependsOn": [
-    "mts-exact-occurrence-link-network/v0.7",
+    "mts-rooted-link-network/v0.7",
     "mts-foundation-v2-state/v0.7",
     "mts-foundation-v2-source/v0.7",
     "mts-integrated-interpreter-act-challenge/v0.7",
@@ -15,59 +16,47 @@
   ],
   "engine": {
     "oneTrustedReplayPath": true,
+    "parallelOccurrenceCompatibilityPath": false,
     "supportedActs": [
       "one-pole relation resolution",
       "persistent scoped dictionary colon effect",
-      "local exact-representative equality evaluation"
-    ],
-    "parallelDefinitionInterpreter": false,
-    "parallelEqualityInterpreter": false
+      "local representative equality evaluation"
+    ]
   },
   "relationResolution": {
-    "startOpen": "F = F ⟼ e => result = current ⟼ e",
-    "endOpen": "F = b ⟼ F => result = b ⟼ current",
-    "directionFromExactFormStructure": true,
+    "startOpen": "F = F ⟼ e => result = ensure(current,e)",
+    "endOpen": "F = b ⟼ F => result = ensure(b,current)",
+    "directionFromFormStructure": true,
     "glyphOrOpcodeDispatch": false,
-    "resultPairUniquenessRequired": false,
-    "selectedResultOccurrenceMustBeExact": true
+    "resultPairUniquenessRequired": true,
+    "sameRequestedPolesSameResult": true,
+    "runtimeHandleDifferenceCreatesAlternativeResult": false
   },
   "colon": {
     "contract": "mts-foundation-v2-colon/v0.7",
     "dictionaryModel": "persistent scoped D only",
-    "sameReplayModule": true,
     "impliesEquality": false,
-    "impliesTheorem": false,
-    "rhsRecursiveEvaluation": false
+    "impliesTheorem": false
   },
   "equality": {
     "contract": "mts-foundation-v2-equality/v0.7",
-    "sameReplayModule": true,
     "representativeSemantics": "one explicit local hop only",
-    "hostBooleanOnlyConvenience": true,
-    "actualActRecordsEvaluation": true,
-    "shapeEquality": false,
     "automaticTransitivity": false,
     "automaticSubstitution": false,
-    "automaticCongruence": false,
-    "relationDecompositionBuiltIn": false
+    "automaticCongruence": false
   },
   "context": {
     "topology": "K = K ⟼ (parent ⟼ current)",
-    "localRepresentativeAttachment": "K ⟼ (member ⟼ representative)",
+    "sameParentCurrentSameContext": true,
     "ambientCurrentAllowed": false,
     "inputMutationAllowed": false
   },
   "act": {
-    "header": [
-      "P0 = D_roles ⟼ K_after",
-      "H = I ⟼ P0",
-      "A = A ⟼ H"
-    ],
+    "header": ["P0 = D_roles ⟼ K_after", "H = I ⟼ P0", "A = A ⟼ H"],
     "fieldTopology": "A ⟼ (roleRef ⟼ value)",
-    "roleDictionaryIsScoped": true,
-    "roleRefsAreExact": true,
+    "sameCompleteActFormSameAct": true,
     "hostFieldNamesAreSemanticIdentity": false,
-    "duplicateOrConflictingRequiredFieldRejects": true
+    "conflictingRequiredFieldRejects": true
   },
   "replay": {
     "checkerReadOnly": true,
@@ -76,17 +65,12 @@
     "applicationLinkMaterialization": false,
     "persistentBackendEffect": false
   },
-  "deferredSameEngineExtensions": {
-    "multiStepRun": 230,
-    "anumSequenceMaterialization": 242,
-    "persistentL4": 124
-  },
   "productionBoundary": {
     "legacyParserDependency": false,
     "legacyAstDependency": false,
     "legacyInterpreterDependency": false,
-    "productionCutoverDone": false,
+    "foundationV2Accepted": false,
     "aproverRepinAllowed": false
   },
-  "nextGate": "integrate exact multistep/proof adjacency and separately admitted inference rules over the same actual-act replay engine"
+  "nextGate": "complete semantic reset #343 before Foundation-v2 acceptance"
 }

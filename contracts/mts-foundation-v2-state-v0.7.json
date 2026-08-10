@@ -5,78 +5,63 @@
   "issue": 243,
   "refinedByIssue": 249,
   "parent": 237,
-  "substrate": "mts-exact-occurrence-link-network/v0.7",
-  "principle": "higher semantic roles are ordinary exact link occurrences; Link itself has only start/end",
+  "semanticReset": 343,
+  "substrate": "mts-rooted-link-network/v0.7",
+  "principle": "higher semantic roles are ordinary canonical MTS links; technical handles are not semantic identity",
   "source": {
-    "contentAndOccurrenceDistinct": true,
-    "candidateOccurrenceTopology": "S = S ⟼ C",
+    "contentAndUseDistinctStructurally": true,
+    "candidateTopology": "S = S ⟼ C",
+    "sameContentSameSourceForm": true,
     "sourceSpellingIsSemanticIdentity": false
   },
   "context": {
     "pairTopology": "P = parent ⟼ current",
     "contextTopology": "K = K ⟼ P",
-    "currentPronounCandidate": "↑ resolves to P.end from the explicitly selected exact K",
+    "sameParentCurrentSameContext": true,
+    "currentPronounCandidate": "↑ resolves to P.end from explicitly selected K",
     "ambientCurrentAllowed": false,
-    "hiddenParentStackAllowed": false,
-    "persistentUpdateRequired": true
+    "hiddenParentStackAllowed": false
   },
   "dictionary": {
     "scopeTopology": "D = D ⟼ (parentScope ⟼ localHistory)",
-    "rootScopeCandidate": "D0 = D0 ⟼ (R ⟼ R)",
     "entryTopology": "Entry = sourceContent ⟼ form",
-    "definitionOccurrenceTopology": "Occurrence = D_before ⟼ Entry",
-    "historyAppendTopology": "H_after = H_before ⟼ Occurrence",
+    "definitionTopology": "Definition = D_before ⟼ Entry",
+    "historyAppendTopology": "H_after = H_before ⟼ Definition",
     "afterScopeTopology": "D_after = D_after ⟼ (sameParentScope ⟼ H_after)",
-    "lookup": "local history first, then explicit parent scope",
-    "sameLocalSourceSameFormIsIdempotentMapping": true,
+    "sameLocalSourceSameFormIsCanonical": true,
+    "repeatedEventDistinguishedByHistory": true,
     "distinctLocalFormsConflict": true,
     "localMappingShadowsParent": true,
-    "lastWriteWins": false,
-    "flatDirectMembershipIsCanonicalProductionModel": false,
-    "sameSourceMayResolveDifferentlyUnderDifferentDictionaries": true,
-    "hostGlobalSymbolMapAllowedAsSemanticAuthority": false
+    "lastWriteWins": false
   },
   "theoryAndGrammar": {
-    "membershipTopology": "container ⟼ admitted exact occurrence",
-    "separateFromDictionaryScopeSemantics": true,
+    "membershipTopology": "container ⟼ admitted form",
     "isAxiomTag": false,
     "tokenOrAstKindSemanticIdentity": false,
-    "searchRankingTrusted": false,
     "selectedEvidenceReplayRequired": true
   },
   "act": {
-    "interpreterAndActualActDistinct": true,
-    "finiteBootstrap": [
-      "P0 = D_roles ⟼ K_after",
-      "H = I ⟼ P0",
-      "A = A ⟼ H"
-    ],
-    "extensibleField": [
-      "Field = roleRef ⟼ value",
-      "Attachment = A ⟼ Field"
-    ],
-    "roleNamesResolvedThroughExplicitScopedDictionary": true,
-    "hostRoleEnumIsSemanticIdentity": false,
-    "twoActsWithSameVisibleFieldsMayRemainDistinctOccurrences": true
+    "interpreterAndActDistinctStructurally": true,
+    "header": ["P0 = D_roles ⟼ K_after", "H = I ⟼ P0", "A = A ⟼ H"],
+    "fieldTopology": "A ⟼ (roleRef ⟼ value)",
+    "sameCompleteActFormSameAct": true,
+    "differentEventsRequireDifferentHistoryOrStructure": true,
+    "hostRoleEnumIsSemanticIdentity": false
   },
   "apamemoryBoundary": {
-    "description": "controller of an exact-occurrence link network and its indices/effects",
+    "description": "controller of a rooted canonical link network and explicit effects",
     "readOperations": ["read/poles", "find", "enumerate", "snapshot/replay"],
-    "effectOperations": ["materialize", "delete"],
+    "effectOperations": ["materialize"],
     "readOrFindMayMaterialize": false,
-    "interpretOrReplayMayMaterializeImplicitly": false,
-    "sourceCarrierEqualsResultNetwork": false,
-    "backendPhysicalAddressIsPortableSemanticIdentity": false,
-    "persistentBackendOwnedByIssue": 124,
-    "sequenceDeserializationOwnedByIssue": 242
+    "notFoundImpliesNonexistence": false,
+    "backendPhysicalAddressIsSemanticIdentity": false
   },
   "productionBoundary": {
-    "parserModified": false,
     "legacyInterpreterModified": false,
-    "contextFrameAdapterAdded": false,
-    "persistentBackendImplemented": false,
-    "anumSequenceMaterializationAccepted": false,
+    "compatibilityOccurrenceLayer": false,
+    "persistentBackendImplemented": true,
+    "foundationV2Accepted": false,
     "aproverRepinAllowed": false
   },
-  "nextGate": "integrate scoped dictionary definition/effect replay and then local equality in the same trusted engine before cutover"
+  "nextGate": "complete semantic reset #343 across dependent contracts and active issues"
 }

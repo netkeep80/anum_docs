@@ -31,15 +31,21 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _anchor(builder: LinkNetworkBuilder):
-    ref = builder.reserve()
-    builder.define(ref, ref, ref)
-    return ref
+    if not builder._refs:
+        return builder.ensure_root()
+    current = next(
+        ref
+        for ref, link in reversed(list(zip(builder._refs, builder._links)))
+        if link is not None
+    )
+    count = len(builder._refs)
+    while len(builder._refs) == count:
+        current = builder.ensure_start_self_closed(current)
+    return current
 
 
 def _link(builder: LinkNetworkBuilder, start, end):
-    ref = builder.reserve()
-    builder.define(ref, start, end)
-    return ref
+    return builder.ensure(start, end)
 
 
 def _equality_roles(builder: LinkNetworkBuilder) -> EqualityRoleRefs:
@@ -124,8 +130,6 @@ def _proof_evidence(
     rule_membership = rule_membership or define_membership(builder, theory, rule)
     left_link = None
     right_link = None
-    # Construction helper may be used with a deliberately partial operand. Only
-    # create default claims when both operands have ordinary accessible poles.
     try:
         left_link = builder._links[left.slot]  # type: ignore[attr-defined]
         right_link = builder._links[right.slot]  # type: ignore[attr-defined]
@@ -223,7 +227,6 @@ def test_true_equality_decomposes_once_under_exact_admitted_rule() -> None:
     assert network.link(evidence.end_claim).start is left_link.end
     assert network.link(evidence.end_claim).end is right_link.end
 
-    # Claims do not become local equality bindings merely by being conclusions.
     assert local_representative(network, context, left_link.start) is left_link.start
     assert local_representative(network, context, right_link.start) is right_link.start
 
@@ -262,16 +265,18 @@ def test_rule_membership_from_another_theory_rejects() -> None:
         replay_decompose_equal_relations(network, evidence)
 
 
-def test_exact_relation_substitution_rejects_even_when_shape_matches() -> None:
+def test_same_relation_pair_is_the_same_relation() -> None:
     builder, root, _, left, _, premise, _ = _true_fixture()
     left_link = builder._links[left.slot]  # type: ignore[attr-defined]
-    left_copy = _link(builder, left_link.start, left_link.end)
-    evidence = _proof_evidence(builder, root, premise, left=left_copy)
-    network = builder.freeze(root)
+    same_relation = _link(builder, left_link.start, left_link.end)
+    assert same_relation is left
 
-    assert left_copy is not left
-    with pytest.raises(ProofRuleReplayError, match="differs from equality premise"):
-        replay_decompose_equal_relations(network, evidence)
+    evidence = _proof_evidence(builder, root, premise, left=same_relation)
+    network = builder.freeze(root)
+    assert replay_decompose_equal_relations(network, evidence) == (
+        evidence.start_claim,
+        evidence.end_claim,
+    )
 
 
 def test_partial_relation_rejects_even_with_true_local_equality_premise() -> None:
@@ -279,8 +284,7 @@ def test_partial_relation_rejects_even_with_true_local_equality_premise() -> Non
     root = _anchor(builder)
     context = define_context(builder, _anchor(builder), _anchor(builder))
     fixed = _anchor(builder)
-    left = builder.reserve()
-    builder.define(left, left, fixed)
+    left = builder.ensure_start_self_closed(fixed)
     right = _link(builder, _anchor(builder), _anchor(builder))
     representative = _anchor(builder)
     define_local_representative_binding(builder, context, left, representative)
@@ -353,7 +357,6 @@ def test_nested_poles_produce_only_selected_first_level_claims() -> None:
     right_start = network.link(right).start
     assert network.link(evidence.start_claim).start is left_start
     assert network.link(evidence.start_claim).end is right_start
-    # The rule does not recurse into the nested start relations.
     nested_left = network.link(left_start)
     nested_right = network.link(right_start)
     assert not any(

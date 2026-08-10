@@ -5,8 +5,9 @@
   "issue": 274,
   "parent": 271,
   "umbrella": 237,
+  "semanticReset": 343,
   "dependsOn": [
-    "mts-exact-occurrence-link-network/v0.7",
+    "mts-rooted-link-network/v0.7",
     "mts-semantic-root-kernel-challenge/v0.7"
   ],
   "ostensivePrimary": {
@@ -21,52 +22,47 @@
     "C": "C = R ⟼ C",
     "L": "L = O ⟼ C",
     "U": "U = C ⟼ O",
-    "exactOccurrenceCount": 5,
-    "networkRoot": "exact R",
-    "pairInterning": false,
+    "semanticLinkCount": 5,
+    "fullySelfClosedLinkCount": 1,
+    "duplicateOrderedPolePairs": false,
     "semanticTagsOnLink": false
   },
   "rootVocabulary": {
-    "∞": "exact R",
-    "[": "exact O",
-    "]": "exact C",
-    "1": "exact L",
-    "0": "exact U",
+    "∞": "R",
+    "[": "O",
+    "]": "C",
+    "1": "L",
+    "0": "U",
     "glyphSpellingRecognizesKernelRole": false,
     "mappingAppliesAfterExactKernelConstruction": true,
-    "rootAbitsIdenticalToFormalMaleFemaleGlyphOccurrences": false
+    "rootAbitsIdenticalToFormalMaleFemaleGlyphOccurrences": false,
+    "transportAbitCount": 4,
+    "rootIsFifthAbit": false
   },
   "identity": {
-    "rootRecognizedBySelfClosedShapeSearch": false,
-    "rootRecognizedByGraphIsomorphism": false,
-    "suppliedExactRefsAndTopologyRequired": true,
-    "anotherSelfClosedOccurrenceIsRoot": false,
-    "samePoleDuplicateIsSameOccurrence": false,
-    "freshBuildCreatesFreshRuntimeIdentityScope": true
+    "primaryDistinction": "self-closure orientation and rooted connectedness",
+    "rootUniqueByFullSelfClosure": true,
+    "startSelfClosedUniquePerEnd": true,
+    "endSelfClosedUniquePerStart": true,
+    "sameDistinguishedPolesImplySameLink": true,
+    "runtimeHandleCreatesSemanticDistinction": false,
+    "snapshotSlotCreatesSemanticDistinction": false,
+    "freshBuildCreatesNewSemanticRoot": false
   },
   "implementation": {
     "rootModule": "core/foundation_v2_root.py",
     "publicEntrySurface": "core/foundation_v2.py",
     "substrate": "core/exact_link_network.py",
-    "historicalRootLibraryDependency": false,
-    "historicalRootValidatorDependency": false,
     "legacyParserDependency": false,
     "legacyAstDependency": false,
     "referenceModelDependency": false,
     "contextFrameDependency": false,
     "compatibilityMode": false
   },
-  "historicalBoundary": {
-    "tenFormulaRootProgramModified": false,
-    "historicalAcceptedContractsModified": false,
-    "rootLibraryDeleted": false,
-    "validateRootDeleted": false,
-    "historicalReplayStillSeparate": true
-  },
   "releaseBoundary": {
     "cutoverComplete": false,
     "foundationV2Accepted": false,
     "aproverRepinAllowed": false,
-    "next": "migrate/isolate remaining source/interpreter/proof/L4 consumers, then atomic deletion and integrated release conformance"
+    "next": "complete semantic reset #343 across active contracts/issues before Foundation-v2 acceptance"
   }
 }

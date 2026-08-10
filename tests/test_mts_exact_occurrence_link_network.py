@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import fields
-import json
-from pathlib import Path
 
 import pytest
 
@@ -16,105 +14,172 @@ from core.exact_link_network import (
 )
 
 
-ROOT = Path(__file__).resolve().parents[1]
-CONTRACT = ROOT / "contracts/mts-exact-occurrence-link-network-v0.7.json"
-
-
-def read_contract() -> dict:
-    return json.loads(CONTRACT.read_text(encoding="utf-8"))
-
-
 def build_reference_network():
     builder = LinkNetworkBuilder()
-    root = builder.reserve()
-    other_self = builder.reserve()
-    shared = builder.reserve()
-    left = builder.reserve()
-    right = builder.reserve()
-    duplicate1 = builder.reserve()
-    duplicate2 = builder.reserve()
-    mutual_a = builder.reserve()
-    mutual_b = builder.reserve()
-
-    builder.define(root, root, root)
-    builder.define(other_self, other_self, other_self)
-    builder.define(shared, root, other_self)
-    builder.define(left, shared, root)
-    builder.define(right, shared, other_self)
-    builder.define(duplicate1, left, right)
-    builder.define(duplicate2, left, right)
-    builder.define(mutual_a, mutual_b, root)
-    builder.define(mutual_b, mutual_a, root)
+    root = builder.ensure_root()
+    opening = builder.ensure_start_self_closed(root)
+    closing = builder.ensure_end_self_closed(root)
+    linked = builder.ensure(opening, closing)
+    unlinked = builder.ensure(closing, opening)
+    left = builder.ensure(linked, root)
+    right = builder.ensure(linked, closing)
+    loop_left = builder.ensure(left, left)
     return builder.freeze(root), {
         "root": root,
-        "other_self": other_self,
-        "shared": shared,
+        "opening": opening,
+        "closing": closing,
+        "linked": linked,
+        "unlinked": unlinked,
         "left": left,
         "right": right,
-        "duplicate1": duplicate1,
-        "duplicate2": duplicate2,
-        "mutual_a": mutual_a,
-        "mutual_b": mutual_b,
+        "loop_left": loop_left,
     }
-
-
-def test_contract_is_candidate_and_does_not_authorize_cutover():
-    contract = read_contract()
-    assert contract["schema"] == "mts-exact-occurrence-link-network/v0.7"
-    assert contract["status"] == "gate-p-candidate"
-    assert contract["accepted"] is False
-    assert contract["issue"] == 240
-    assert contract["historicalBoundary"]["productionCutover"] is False
-    assert contract["veto"]["downstreamRepin"] is False
 
 
 def test_link_primitive_has_exactly_start_and_end():
     assert [field.name for field in fields(Link)] == ["start", "end"]
-    contract = read_contract()
-    assert contract["primitive"]["linkFields"] == ["start", "end"]
-    assert contract["primitive"]["semanticTags"] == []
 
 
-def test_distinguished_root_is_exact_occurrence_not_self_closed_shape_search():
+def test_root_is_the_only_fully_self_closed_link():
     network, refs = build_reference_network()
     root = refs["root"]
-    other = refs["other_self"]
 
-    assert network.root is root
     assert network.link(root) == Link(root, root)
-    assert network.link(other) == Link(other, other)
-    assert root != other
-    assert network.root != other
+    assert network.find(root, root) is root
+    assert [
+        ref
+        for ref in network.refs
+        if network.link(ref).start is ref and network.link(ref).end is ref
+    ] == [root]
 
 
-def test_duplicate_equal_pairs_remain_distinct_occurrences():
+def test_four_ostensive_constructors_are_canonical():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    opening = builder.ensure_start_self_closed(root)
+    closing = builder.ensure_end_self_closed(root)
+    linked = builder.ensure(opening, closing)
+
+    assert builder.ensure_root() is root
+    assert builder.ensure_start_self_closed(root) is opening
+    assert builder.ensure_end_self_closed(root) is closing
+    assert builder.ensure(opening, closing) is linked
+
+    network = builder.freeze(root)
+    assert network.link(root) == Link(root, root)
+    assert network.link(opening) == Link(opening, root)
+    assert network.link(closing) == Link(root, closing)
+    assert network.link(linked) == Link(opening, closing)
+
+
+def test_pair_lookup_reuses_self_closed_forms_too():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    opening = builder.ensure_start_self_closed(root)
+    closing = builder.ensure_end_self_closed(root)
+
+    assert builder.ensure(root, root) is root
+    assert builder.ensure(opening, root) is opening
+    assert builder.ensure(root, closing) is closing
+
+
+def test_loop_is_not_full_self_closure():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    opening = builder.ensure_start_self_closed(root)
+    loop = builder.ensure(opening, opening)
+    network = builder.freeze(root)
+
+    assert loop is not opening
+    assert loop is not root
+    assert network.link(loop) == Link(opening, opening)
+    assert network.link(loop).start is not loop
+    assert network.link(loop).end is not loop
+
+
+def test_second_fully_self_closed_link_is_rejected_before_freeze():
+    builder = LinkNetworkBuilder()
+    builder.ensure_root()
+    other = builder.reserve()
+
+    with pytest.raises(LinkNetworkError, match="fully self-closed link is unique"):
+        builder.define(other, other, other)
+
+
+def test_same_start_self_closed_form_is_rejected_by_low_level_define():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    builder.ensure_start_self_closed(root)
+    duplicate = builder.reserve()
+
+    with pytest.raises(LinkNetworkError, match="start-self-closed form is unique"):
+        builder.define(duplicate, duplicate, root)
+
+
+def test_same_end_self_closed_form_is_rejected_by_low_level_define():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    builder.ensure_end_self_closed(root)
+    duplicate = builder.reserve()
+
+    with pytest.raises(LinkNetworkError, match="end-self-closed form is unique"):
+        builder.define(duplicate, root, duplicate)
+
+
+def test_duplicate_equal_pair_definition_is_rejected():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    left = builder.ensure_start_self_closed(root)
+    right = builder.ensure_end_self_closed(root)
+    builder.ensure(left, right)
+    duplicate = builder.reserve()
+
+    with pytest.raises(LinkNetworkError, match="duplicate semantic link pair"):
+        builder.define(duplicate, left, right)
+
+
+def test_non_self_pole_must_already_be_structurally_distinguished():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    a = builder.reserve()
+    b = builder.reserve()
+
+    with pytest.raises(LinkNetworkError, match="already be structurally distinguished"):
+        builder.define(a, b, root)
+
+
+def test_mutual_cycle_cannot_be_created_from_only_reserved_ids():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    a = builder.reserve()
+    b = builder.reserve()
+
+    with pytest.raises(LinkNetworkError, match="already be structurally distinguished"):
+        builder.define(a, b, root)
+
+
+def test_ensure_reuses_the_same_link_for_the_same_pair():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    left = builder.ensure_start_self_closed(root)
+    right = builder.ensure_end_self_closed(root)
+
+    first = builder.ensure(left, right)
+    second = builder.ensure(left, right)
+    assert second is first
+
+    network = builder.freeze(root)
+    assert network.find(left, right) is first
+    assert len(network.refs) == 4
+
+
+def test_sharing_is_preserved():
     network, refs = build_reference_network()
-    first = refs["duplicate1"]
-    second = refs["duplicate2"]
-
-    assert first != second
-    assert network.link(first) == network.link(second)
-    assert network.link(first).start is refs["left"]
-    assert network.link(first).end is refs["right"]
+    assert network.link(refs["left"]).start is refs["linked"]
+    assert network.link(refs["right"]).start is refs["linked"]
 
 
-def test_sharing_is_preserved_by_exact_refs():
-    network, refs = build_reference_network()
-    assert network.link(refs["left"]).start is refs["shared"]
-    assert network.link(refs["right"]).start is refs["shared"]
-
-
-def test_mutual_cycle_is_finite_and_direct():
-    network, refs = build_reference_network()
-    a = refs["mutual_a"]
-    b = refs["mutual_b"]
-    assert network.link(a).start is b
-    assert network.link(b).start is a
-    assert network.link(a).end is refs["root"]
-    assert network.link(b).end is refs["root"]
-
-
-def test_snapshot_round_trip_preserves_topology_root_and_multiplicity():
+def test_snapshot_round_trip_preserves_rooted_canonical_topology():
     network, refs = build_reference_network()
     snapshot = network.snapshot()
     restored = LinkNetwork.from_snapshot(snapshot)
@@ -123,37 +188,40 @@ def test_snapshot_round_trip_preserves_topology_root_and_multiplicity():
     assert restored.root.slot == refs["root"].slot
     assert len(restored.refs) == len(network.refs)
 
-    first = restored.refs[refs["duplicate1"].slot]
-    second = restored.refs[refs["duplicate2"].slot]
-    assert first != second
-    assert restored.link(first) == restored.link(second)
+    for ref in restored.refs:
+        link = restored.link(ref)
+        assert restored.find(link.start, link.end) is ref
 
 
-def test_round_trip_creates_fresh_identity_scope():
+def test_round_trip_issues_fresh_runtime_handles_without_new_semantic_identity():
     network, refs = build_reference_network()
     restored = LinkNetwork.from_snapshot(network.snapshot())
 
     assert restored.root != network.root
-    assert restored.refs[refs["shared"].slot] != refs["shared"]
-    with pytest.raises(LinkNetworkError, match="foreign occurrence reference"):
-        restored.link(refs["shared"])
-    with pytest.raises(LinkNetworkError, match="foreign occurrence reference"):
-        network.link(restored.refs[refs["shared"].slot])
+    assert restored.snapshot() == network.snapshot()
+
+    with pytest.raises(LinkNetworkError, match="foreign network link handle"):
+        restored.link(refs["linked"])
+    with pytest.raises(LinkNetworkError, match="foreign network link handle"):
+        network.link(restored.refs[refs["linked"].slot])
 
 
-def test_foreign_builder_refs_reject():
+def test_foreign_builder_handles_reject():
     left_builder = LinkNetworkBuilder()
     right_builder = LinkNetworkBuilder()
+    left_root = left_builder.ensure_root()
+    right_root = right_builder.ensure_root()
     left_ref = left_builder.reserve()
-    right_ref = right_builder.reserve()
 
-    with pytest.raises(LinkNetworkError, match="foreign occurrence reference"):
-        left_builder.define(left_ref, left_ref, right_ref)
+    with pytest.raises(LinkNetworkError, match="foreign reserved link handle"):
+        left_builder.define(left_ref, left_ref, right_root)
+
+    assert left_root is not right_root
 
 
-def test_handcrafted_alias_ref_rejects_even_with_scope_and_slot():
+def test_handcrafted_alias_handle_rejects_even_with_scope_and_slot():
     network, refs = build_reference_network()
-    original = refs["shared"]
+    original = refs["linked"]
     forged = OccurrenceRef(original._scope, original.slot)
     assert forged == original
     assert forged is not original
@@ -163,11 +231,10 @@ def test_handcrafted_alias_ref_rejects_even_with_scope_and_slot():
 
 def test_incomplete_builder_rejects_freeze_and_redefinition_rejects():
     builder = LinkNetworkBuilder()
-    root = builder.reserve()
+    root = builder.ensure_root()
     other = builder.reserve()
-    builder.define(root, root, root)
 
-    with pytest.raises(LinkNetworkError, match="unbound occurrences"):
+    with pytest.raises(LinkNetworkError, match="unbound reserved links"):
         builder.freeze(root)
 
     builder.define(other, other, root)
@@ -177,46 +244,60 @@ def test_incomplete_builder_rejects_freeze_and_redefinition_rejects():
 
 def test_builder_is_one_shot_after_freeze():
     builder = LinkNetworkBuilder()
-    root = builder.reserve()
-    builder.define(root, root, root)
+    root = builder.ensure_root()
     builder.freeze(root)
 
     with pytest.raises(LinkNetworkError, match="already frozen"):
         builder.reserve()
 
 
-def test_invalid_snapshots_reject():
+def test_invalid_snapshots_reject_unrooted_cycles_and_duplicate_forms():
     invalid = [
         NetworkSnapshot(links=(), root=0),
         NetworkSnapshot(links=((0, 0),), root=1),
         NetworkSnapshot(links=((1, 0),), root=0),
         NetworkSnapshot(links=((-1, 0),), root=0),
+        NetworkSnapshot(links=((0, 0), (0, 0)), root=0),
+        NetworkSnapshot(links=((0, 0), (1, 1)), root=0),
+        # two start-self-closed forms with the same distinguished end R
+        NetworkSnapshot(links=((0, 0), (1, 0), (2, 0)), root=0),
+        # unrooted mutual cycle: IDs alone do not distinguish 1 and 2
+        NetworkSnapshot(links=((0, 0), (2, 0), (1, 0)), root=0),
     ]
     for snapshot in invalid:
         with pytest.raises(LinkNetworkError):
             LinkNetwork.from_snapshot(snapshot)
 
 
-def test_snapshot_slots_are_transport_local_not_runtime_refs():
+def test_snapshot_slots_are_transport_coordinates_not_semantic_identity():
     network, refs = build_reference_network()
     snapshot = network.snapshot()
     assert isinstance(snapshot.root, int)
     assert all(isinstance(slot, int) for pair in snapshot.links for slot in pair)
     assert snapshot.root == refs["root"].slot
-    assert read_contract()["identityBoundaries"]["snapshotSlotIsUniversalIdentity"] is False
 
 
-def test_no_pair_interning_or_graph_equality_api_is_part_of_primitive_network():
-    forbidden = {
-        "intern",
-        "find_or_create",
-        "isomorphic",
-        "equals",
-        "meaning",
-        "kind",
-    }
-    public = set(dir(LinkNetwork)) | set(dir(LinkNetworkBuilder)) | set(Link.__dataclass_fields__)
-    assert forbidden.isdisjoint(public)
-    identity = read_contract()["identityBoundaries"]
-    assert identity["samePairImpliesSameOccurrence"] is False
-    assert identity["isomorphismImpliesSemanticIdentity"] is False
+def test_evolution_reuses_rooted_forms_and_adds_new_pair_once():
+    network, refs = build_reference_network()
+    evolution = network.evolve()
+
+    assert evolution.ensure_root() is refs["root"]
+    assert evolution.ensure_start_self_closed(refs["root"]) is refs["opening"]
+    assert evolution.ensure_end_self_closed(refs["root"]) is refs["closing"]
+
+    existing = evolution.ensure(refs["left"], refs["right"])
+    same = evolution.ensure(refs["left"], refs["right"])
+    assert same is existing
+
+    after = evolution.freeze()
+    assert len(after.refs) == len(network.refs) + 1
+    assert after.find(refs["left"], refs["right"]) is existing
+
+
+def test_evolution_cannot_create_second_fully_self_closed_link():
+    network, _ = build_reference_network()
+    evolution = network.evolve()
+    other = evolution.reserve()
+
+    with pytest.raises(LinkNetworkError, match="fully self-closed link is unique"):
+        evolution.define(other, other, other)

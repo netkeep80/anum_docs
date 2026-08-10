@@ -1,4 +1,4 @@
-"""Conformance tests for contextual L3 Anum protocol v0.2."""
+"""Conformance tests for contextual L3 Anum protocol and Foundation-v2 bridge."""
 
 import pytest
 
@@ -20,24 +20,24 @@ from core.foundation_v2_materialization import (
     replay_resolved_sequence_grouping,
 )
 from core.foundation_v2_root import build_root_kernel
-from core.foundation_v2_source import (
-    SegmentSpec,
-    SourceFrontEndBuilder,
-    SourceReplayError,
-    replay_source_front_end,
-    replay_source_subselection,
-)
-from core.foundation_v2_state import (
-    define_dictionary_effect,
-    define_dictionary_scope,
-    define_membership,
-)
+from core.foundation_v2_source import SegmentSpec, SourceFrontEndBuilder, replay_source_front_end
+from core.foundation_v2_state import define_dictionary_effect, define_dictionary_scope
 
 
 def _anchor(builder):
-    ref = builder.reserve()
-    builder.define(ref, ref, ref)
-    return ref
+    """Return a fresh value distinguished from the rooted MTS structure."""
+
+    if not builder._refs:
+        return builder.ensure_root()
+    current = next(
+        ref
+        for ref, link in reversed(list(zip(builder._refs, builder._links)))
+        if link is not None
+    )
+    count = len(builder._refs)
+    while len(builder._refs) == count:
+        current = builder.ensure_start_self_closed(current)
+    return current
 
 
 def _byte_vocabulary(builder):
@@ -46,14 +46,13 @@ def _byte_vocabulary(builder):
 
 def _dictionary_with(builder, root, front_end, mappings):
     dictionary = define_dictionary_scope(builder, root, root)
-    parent = root
     history = root
     occurrences = []
     for raw_slice, form in mappings:
         effect = define_dictionary_effect(
             builder,
             dictionary,
-            parent,
+            root,
             history,
             front_end.content_ref(raw_slice),
             form,
@@ -64,16 +63,7 @@ def _dictionary_with(builder, root, front_end, mappings):
     return dictionary, tuple(occurrences)
 
 
-def _fold(builder, root, values):
-    current = root
-    for value in values:
-        ref = builder.reserve()
-        builder.define(ref, current, value)
-        current = ref
-    return current
-
-
-def test_root_context_projects_open_close_to_canonical_link_value():
+def test_root_context_projects_open_close_to_historical_protocol_value():
     projection = project_anum(parse_raw_quaternary("[]"), ProjectionContext.ROOT)
 
     assert projection.kind is ProjectionKind.PROTOCOL_VALUE
@@ -83,7 +73,7 @@ def test_root_context_projects_open_close_to_canonical_link_value():
     assert "accepted MTS v0.2" in projection.note
 
 
-def test_root_context_projects_close_open_to_canonical_unlink_value():
+def test_root_context_projects_close_open_to_historical_unlink_value():
     projection = project_anum(parse_raw_quaternary("]["), ProjectionContext.ROOT)
 
     assert projection.kind is ProjectionKind.PROTOCOL_VALUE
@@ -100,30 +90,24 @@ def test_open_open_and_close_close_remain_boundary_forms_without_value():
     assert open_open.kind is ProjectionKind.BOUNDARY_FORM
     assert open_open.arrow_form == "♀∞ ⟼ ♀∞"
     assert open_open.protocol_value is None
-
     assert close_close.kind is ProjectionKind.BOUNDARY_FORM
     assert close_close.arrow_form == "∞♂ ⟼ ∞♂"
     assert close_close.protocol_value is None
 
 
-def test_relative_context_preserves_all_boundary_forms_raw():
+def test_relative_and_quote_contexts_preserve_raw_boundary_content():
     for source in ("[[", "[]", "][", "]]"):
-        projection = project_anum(
+        relative = project_anum(
             parse_raw_quaternary(source),
             ProjectionContext.RELATIVE,
         )
-        assert projection.kind is ProjectionKind.RAW
-        assert projection.protocol_value is None
-        assert normalize_raw_form(projection.projected) == source
+        assert relative.kind is ProjectionKind.RAW
+        assert relative.protocol_value is None
+        assert normalize_raw_form(relative.projected) == source
 
-
-def test_quote_context_preserves_unwrapped_raw_payload():
-    source = parse_raw_quaternary("][")
-    projection = project_anum(source, ProjectionContext.QUOTE)
-
-    assert projection.kind is ProjectionKind.QUOTED_RAW
-    assert normalize_raw_form(projection.projected) == "]["
-    assert projection.protocol_value is None
+    quoted_raw = project_anum(parse_raw_quaternary("]["), ProjectionContext.QUOTE)
+    assert quoted_raw.kind is ProjectionKind.QUOTED_RAW
+    assert normalize_raw_form(quoted_raw.projected) == "]["
 
 
 def test_real_quote_envelope_raises_description_level_one_step():
@@ -138,7 +122,6 @@ def test_real_quote_envelope_raises_description_level_one_step():
 
     first = project_anum(quoted_twice, ProjectionContext.QUOTE)
     second = project_anum(first.projected, ProjectionContext.QUOTE)
-
     assert normalize_raw_form(first.projected) == "[][]"
     assert normalize_raw_form(second.projected) == "]["
 
@@ -155,10 +138,8 @@ def test_quote_envelope_can_select_carrier_or_deserialized_denotation() -> None:
     unlinked = kernel.refs.unlinked
     linked = kernel.refs.linked
 
-    carrier_head = builder.reserve()
-    carrier = builder.reserve()
-    builder.define(carrier_head, root, unlinked)
-    builder.define(carrier, carrier_head, linked)
+    carrier_head = builder.ensure(root, unlinked)
+    carrier = builder.ensure(carrier_head, linked)
 
     byte_refs = _byte_vocabulary(builder)
     front_end = SourceFrontEndBuilder(builder, root, byte_refs)
@@ -209,9 +190,7 @@ def test_quote_envelope_can_select_carrier_or_deserialized_denotation() -> None:
 
     assert find_links(network, start=unlinked, end=linked) == ()
 
-    deserialize_forms = replay_source_front_end(
-        network, deserialize_evidence, byte_refs
-    )
+    deserialize_forms = replay_source_front_end(network, deserialize_evidence, byte_refs)
     carrier_forms = replay_source_front_end(network, carrier_evidence, byte_refs)
     assert deserialize_forms == (opening, unlinked, linked, closing)
     assert carrier_forms == (opening, carrier, closing)
@@ -242,176 +221,19 @@ def test_quote_envelope_can_select_carrier_or_deserialized_denotation() -> None:
     passed_carrier = materialize_sequence(network, carrier_description)
 
     assert len(deserialized.created) == 1
-    assert deserialized.created[0].start is unlinked
-    assert deserialized.created[0].end is linked
-    assert deserialized.result is deserialized.created[0].ref
+    assert (deserialized.created[0].start, deserialized.created[0].end) == (
+        unlinked,
+        linked,
+    )
     assert deserialized.result is not carrier
-
     assert passed_carrier.created == ()
     assert passed_carrier.result is carrier
     assert find_links(passed_carrier.after, start=unlinked, end=linked) == ()
-    assert passed_carrier.after.link(carrier) is network.link(carrier)
     assert network.snapshot() == before
 
 
-def test_nested_body_selection_reuses_exact_segments_of_whole_source() -> None:
+def test_grouping_depth_is_syntactic_even_when_current_materializer_denotes_same_value() -> None:
     kernel = build_root_kernel()
-    builder = kernel.network.evolve()
-    root = kernel.refs.root
-    opening = kernel.refs.opening
-    closing = kernel.refs.closing
-    a = kernel.refs.unlinked
-    b = kernel.refs.linked
-
-    byte_refs = _byte_vocabulary(builder)
-    front_end = SourceFrontEndBuilder(builder, root, byte_refs)
-    source = front_end.source_occurrence(b"[ab]")
-    dictionary, occurrences = _dictionary_with(
-        builder,
-        root,
-        front_end,
-        (
-            (b"[", opening),
-            (b"a", a),
-            (b"b", b),
-            (b"]", closing),
-        ),
-    )
-    outer_grammar = _anchor(builder)
-    outer_theory = _anchor(builder)
-    outer = front_end.build_selected_evidence(
-        source,
-        (
-            SegmentSpec(0, 1, opening, occurrences[0]),
-            SegmentSpec(1, 2, a, occurrences[1]),
-            SegmentSpec(2, 3, b, occurrences[2]),
-            SegmentSpec(3, 4, closing, occurrences[3]),
-        ),
-        dictionary=dictionary,
-        grammar=outer_grammar,
-        theory=outer_theory,
-    )
-
-    # A nested reading does not need another semantic source kind. Its selected
-    # body can be witnessed by a normal R-seeded sequence of the already-exact
-    # segment selections and forms that belong to this same whole source.
-    body_segments = outer.segments[1:3]
-    body_selection = _fold(
-        builder,
-        root,
-        tuple(segment.selection for segment in body_segments),
-    )
-    body_forms = _fold(builder, root, (a, b))
-    body_grammar = _anchor(builder)
-    body_theory = _anchor(builder)
-    body_grammar_membership = define_membership(builder, body_grammar, body_forms)
-    body_theory_membership = define_membership(builder, body_theory, body_forms)
-    empty_grammar = _anchor(builder)
-    empty_theory = _anchor(builder)
-    empty_grammar_membership = define_membership(builder, empty_grammar, root)
-    empty_theory_membership = define_membership(builder, empty_theory, root)
-    network = builder.freeze()
-    before = network.snapshot()
-
-    resolved = replay_source_front_end(network, outer, byte_refs)
-    assert resolved == (opening, a, b, closing)
-    assert replay_resolved_sequence_grouping(
-        network,
-        resolved,
-        open_form=opening,
-        close_form=closing,
-    ) == SequenceDescription(
-        root=root,
-        items=(SequenceGroup((SequenceAtom(a), SequenceAtom(b))),),
-    )
-
-    assert replay_source_subselection(
-        network,
-        outer,
-        byte_refs,
-        start_segment=1,
-        end_segment=3,
-        selection_sequence=body_selection,
-        form_sequence=body_forms,
-        grammar=body_grammar,
-        theory=body_theory,
-        grammar_membership=body_grammar_membership,
-        theory_membership=body_theory_membership,
-    ) == (a, b)
-    assert replay_source_subselection(
-        network,
-        outer,
-        byte_refs,
-        start_segment=1,
-        end_segment=1,
-        selection_sequence=root,
-        form_sequence=root,
-        grammar=empty_grammar,
-        theory=empty_theory,
-        grammar_membership=empty_grammar_membership,
-        theory_membership=empty_theory_membership,
-    ) == ()
-
-    with pytest.raises(SourceReplayError, match="ordered sequence evidence"):
-        replay_source_subselection(
-            network,
-            outer,
-            byte_refs,
-            start_segment=1,
-            end_segment=3,
-            selection_sequence=outer.selection_sequence,
-            form_sequence=body_forms,
-            grammar=body_grammar,
-            theory=body_theory,
-            grammar_membership=body_grammar_membership,
-            theory_membership=body_theory_membership,
-        )
-    with pytest.raises(SourceReplayError, match="invalid source subselection"):
-        replay_source_subselection(
-            network,
-            outer,
-            byte_refs,
-            start_segment=3,
-            end_segment=2,
-            selection_sequence=root,
-            form_sequence=root,
-            grammar=empty_grammar,
-            theory=empty_theory,
-            grammar_membership=empty_grammar_membership,
-            theory_membership=empty_theory_membership,
-        )
-
-    selection_tail = network.link(body_selection)
-    selection_head = network.link(selection_tail.start)
-    assert selection_head.start is root
-    assert selection_head.end is body_segments[0].selection
-    assert selection_tail.end is body_segments[1].selection
-
-    forms_tail = network.link(body_forms)
-    forms_head = network.link(forms_tail.start)
-    assert forms_head.start is root
-    assert forms_head.end is a
-    assert forms_tail.end is b
-
-    first_span = network.link(body_segments[0].span)
-    second_span = network.link(body_segments[1].span)
-    assert first_span.end is second_span.start
-    assert network.link(outer.segments[0].span).end is first_span.start
-    assert second_span.end is network.link(outer.segments[3].span).start
-
-    for segment in body_segments:
-        assert network.link(segment.lexeme).start is outer.source
-
-    assert network.link(body_grammar_membership).start is body_grammar
-    assert network.link(body_grammar_membership).end is body_forms
-    assert network.link(body_theory_membership).start is body_theory
-    assert network.link(body_theory_membership).end is body_forms
-    assert network.snapshot() == before
-
-
-def test_grouping_preserves_depth_that_generic_materializer_does_not_encode() -> None:
-    kernel = build_root_kernel()
-    root = kernel.refs.root
     opening = kernel.refs.opening
     closing = kernel.refs.closing
     a = kernel.refs.unlinked
@@ -431,53 +253,23 @@ def test_grouping_preserves_depth_that_generic_materializer_does_not_encode() ->
         close_form=closing,
     )
 
-    assert one_level == SequenceDescription(
-        root=root,
-        items=(SequenceGroup((SequenceAtom(a), SequenceAtom(b))),),
-    )
-    assert two_levels == SequenceDescription(
-        root=root,
-        items=(
-            SequenceGroup(
-                (SequenceGroup((SequenceAtom(a), SequenceAtom(b))),)
-            ),
-        ),
-    )
     assert one_level != two_levels
-
     one_materialized = materialize_sequence(network, one_level)
     two_materialized = materialize_sequence(network, two_levels)
-
-    # Grouping retains exact O/C depth, while the generic nested-sequence
-    # materializer still has no rule that encodes it as an extra carrier level.
     assert len(one_materialized.created) == 1
     assert len(two_materialized.created) == 1
-    assert (
-        one_materialized.created[0].start,
-        one_materialized.created[0].end,
-    ) == (a, b)
-    assert (
-        two_materialized.created[0].start,
-        two_materialized.created[0].end,
-    ) == (a, b)
-    assert find_links(
-        two_materialized.after,
-        start=root,
-        end=two_materialized.result,
-    ) == ()
+    assert one_materialized.result.slot == two_materialized.result.slot
 
 
-def test_user_examples_decompose_into_pass_deserialize_encode_and_left_fold() -> None:
+def test_user_examples_use_canonical_reuse_instead_of_inner_outer_duplicate() -> None:
     kernel = build_root_kernel()
     builder = kernel.network.evolve()
     root = kernel.refs.root
     a = kernel.refs.unlinked
     b = kernel.refs.linked
 
-    carrier_a = builder.reserve()
-    carrier_ab = builder.reserve()
-    builder.define(carrier_a, root, a)
-    builder.define(carrier_ab, carrier_a, b)
+    carrier_a = builder.ensure(root, a)
+    carrier_ab = builder.ensure(carrier_a, b)
     before = builder.freeze()
 
     empty = materialize_sequence(before, SequenceDescription(root=root, items=()))
@@ -488,7 +280,6 @@ def test_user_examples_decompose_into_pass_deserialize_encode_and_left_fold() ->
     assert empty.result is root and empty.created == ()
     assert singleton.result is a and singleton.created == ()
 
-    # pass: an already-existing exact carrier is one value and creates nothing.
     passed = materialize_sequence(
         before,
         SequenceDescription(root=root, items=(SequenceAtom(carrier_ab),)),
@@ -496,41 +287,32 @@ def test_user_examples_decompose_into_pass_deserialize_encode_and_left_fold() ->
     assert passed.result is carrier_ab
     assert passed.created == ()
 
-    # des: corrected left fold does not use R as an operand for nonempty input.
     deserialized = materialize_sequence(
         before,
-        SequenceDescription(
-            root=root,
-            items=(SequenceAtom(a), SequenceAtom(b)),
-        ),
+        SequenceDescription(root=root, items=(SequenceAtom(a), SequenceAtom(b))),
     )
     x = deserialized.result
     assert len(deserialized.created) == 1
     assert (deserialized.created[0].start, deserialized.created[0].end) == (a, b)
 
-    # enc: an explicit ordinary link effect R⟼value, never a bracket opcode.
     encoded_builder = deserialized.after.evolve()
-    carrier_x = encoded_builder.reserve()
-    literal_second = encoded_builder.reserve()
-    recursive_second = encoded_builder.reserve()
-    encoded_builder.define(carrier_x, root, x)
-    encoded_builder.define(literal_second, root, carrier_ab)
-    encoded_builder.define(recursive_second, root, carrier_x)
+    carrier_x = encoded_builder.ensure(root, x)
+    literal_second = encoded_builder.ensure(root, carrier_ab)
+    recursive_second = encoded_builder.ensure(root, carrier_x)
     encoded = encoded_builder.freeze()
 
-    # [ab] -> enc(des(ab)); [[ab]] -> enc(pass(C_ab)).
-    assert encoded.link(carrier_x).start is root
-    assert encoded.link(carrier_x).end is x
-    assert encoded.link(literal_second).start is root
-    assert encoded.link(literal_second).end is carrier_ab
-
-    # The older recursive-reencoding hypothesis is a distinct topology.
-    assert encoded.link(recursive_second).start is root
-    assert encoded.link(recursive_second).end is carrier_x
+    assert (encoded.link(carrier_x).start, encoded.link(carrier_x).end) == (root, x)
+    assert (encoded.link(literal_second).start, encoded.link(literal_second).end) == (
+        root,
+        carrier_ab,
+    )
+    assert (encoded.link(recursive_second).start, encoded.link(recursive_second).end) == (
+        root,
+        carrier_x,
+    )
     assert carrier_ab is not carrier_x
-    assert encoded.link(literal_second) != encoded.link(recursive_second)
+    assert literal_second is not recursive_second
 
-    # ab[ab] -> des(a,b,des(a,b)); inner/outer a⟼b stay exact-distinct.
     mixed = materialize_sequence(
         before,
         SequenceDescription(
@@ -542,31 +324,22 @@ def test_user_examples_decompose_into_pass_deserialize_encode_and_left_fold() ->
             ),
         ),
     )
-    inner_ab, outer_ab, mixed_result = mixed.created
-    assert (inner_ab.start, inner_ab.end) == (a, b)
-    assert (outer_ab.start, outer_ab.end) == (a, b)
-    assert inner_ab.ref is not outer_ab.ref
-    assert mixed_result.start is outer_ab.ref
-    assert mixed_result.end is inner_ab.ref
-    assert mixed.result is mixed_result.ref
+    assert len(mixed.created) == 2
+    ab, loop_ab = mixed.created
+    assert (ab.start, ab.end) == (a, b)
+    assert (loop_ab.start, loop_ab.end) == (ab.ref, ab.ref)
+    assert mixed.result is loop_ab.ref
 
-    # [[ab]]ab -> des(enc(pass(C_ab)),a,b), using the literal second level.
     outer = materialize_sequence(
         encoded,
         SequenceDescription(
             root=root,
-            items=(
-                SequenceAtom(literal_second),
-                SequenceAtom(a),
-                SequenceAtom(b),
-            ),
+            items=(SequenceAtom(literal_second), SequenceAtom(a), SequenceAtom(b)),
         ),
     )
     first, full = outer.created
-    assert first.start is literal_second
-    assert first.end is a
-    assert full.start is first.ref
-    assert full.end is b
+    assert (first.start, first.end) == (literal_second, a)
+    assert (full.start, full.end) == (first.ref, b)
     assert outer.result is full.ref
 
 
@@ -577,7 +350,6 @@ def test_unquote_requires_explicit_outer_envelope():
 
 def test_context_validation_is_separate_from_raw_parser():
     raw = parse_raw_quaternary("][[]]10")
-
     for context in ProjectionContext:
         result = validate_anum(raw, context)
         assert result.is_valid

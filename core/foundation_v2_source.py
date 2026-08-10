@@ -1,14 +1,14 @@
-"""Foundation-v2 source front-end over exact-occurrence link networks.
+"""Foundation-v2 source front-end over the canonical MTS link network.
 
 The trusted operation in this module is *replay of selected evidence*. Candidate
 segmentation/token search is intentionally outside the trusted core. A caller
-supplies exact byte-protocol refs, an exact source occurrence, selected spans,
-exact visible scoped-dictionary declaration occurrences and explicit
-grammar/theory admission.
+supplies byte-protocol refs, a source record, selected spans, visible scoped-
+dictionary declaration evidence and explicit grammar/theory admission.
 
 Host byte offsets and dataclasses are transport/checker machinery. They are not
-semantic identity. The semantic evidence is represented by ordinary links.
-No function here materializes the application relation described by source text.
+semantic identity. Every link whose poles are already known is obtained through
+the canonical pair operation; replay never materializes the application relation
+described by source text.
 """
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ class SourceReplayError(ValueError):
 
 @dataclass(frozen=True)
 class SourceOccurrence:
-    """Transport handle for one exact source occurrence and its canonical content."""
+    """Transport record for one source link and its canonical content."""
 
     raw_bytes: bytes
     content: OccurrenceRef
@@ -49,7 +49,7 @@ class SegmentSpec:
 
 @dataclass(frozen=True)
 class SegmentEvidence:
-    """Exact link evidence for one selected source slice."""
+    """Link evidence for one selected source slice."""
 
     start: int
     end: int
@@ -65,7 +65,7 @@ class SegmentEvidence:
 
 @dataclass(frozen=True)
 class SourceFrontEndEvidence:
-    """Replayable selected segmentation/resolution for one exact source occurrence."""
+    """Replayable selected segmentation/resolution for one source record."""
 
     raw_bytes: bytes
     content: OccurrenceRef
@@ -83,9 +83,9 @@ class SourceFrontEndEvidence:
 class SourceFrontEndBuilder:
     """Untrusted construction helper for canonical source/evidence fixtures.
 
-    ``byte_refs`` are the exact occurrences selected by the lower canonical byte
-    protocol. This layer does not redefine the ``[bbbbbbbb]`` carrier; it folds
-    those exact byte refs into canonical source-content histories.
+    ``byte_refs`` are the links selected by the lower canonical byte protocol.
+    This layer does not redefine the ``[bbbbbbbb]`` carrier; it folds those byte
+    refs into canonical source-content histories.
     """
 
     def __init__(
@@ -103,7 +103,7 @@ class SourceFrontEndBuilder:
         self._sources: dict[OccurrenceRef, SourceOccurrence] = {}
 
     def content_ref(self, data: bytes) -> OccurrenceRef:
-        """Return one canonical R-seeded history ref for exact bytes in this builder."""
+        """Return the canonical R-seeded history link for exact bytes."""
 
         data = bytes(data)
         if data in self._content_cache:
@@ -115,13 +115,16 @@ class SourceFrontEndBuilder:
                 continue
             previous = self._content_cache[prefix[:-1]]
             byte_ref = self._byte_refs[prefix[-1]]
-            current = self._builder.reserve()
-            self._builder.define(current, previous, byte_ref)
+            current = self._builder.ensure(previous, byte_ref)
             self._content_cache[prefix] = current
         return self._content_cache[data]
 
     def source_occurrence(self, data: bytes) -> SourceOccurrence:
-        """Create a fresh exact ``S = S ⟼ C`` occurrence over canonical content C."""
+        """Create source record ``S = S ⟼ C`` over canonical content C.
+
+        The self-reference makes separately constructed source records different
+        by their actual start pole; no duplicate equal-pole link is introduced.
+        """
 
         raw_bytes = bytes(data)
         content = self.content_ref(raw_bytes)
@@ -139,12 +142,12 @@ class SourceFrontEndBuilder:
         grammar: OccurrenceRef,
         theory: OccurrenceRef,
     ) -> SourceFrontEndEvidence:
-        """Build exact evidence for one caller-selected segmentation.
+        """Build canonical evidence for one caller-selected segmentation.
 
         The function does not choose spans, perform longest-match, parse glyphs or
         invent dictionary definitions. ``SegmentSpec.dictionary_occurrence`` must
-        already identify exact declaration evidence that trusted scoped lookup
-        will prove visible from ``dictionary``.
+        already identify declaration evidence that trusted scoped lookup will
+        prove visible from ``dictionary``.
         """
 
         if self._sources.get(source.source) != source:
@@ -201,9 +204,7 @@ class SourceFrontEndBuilder:
         )
 
     def _new_link(self, start: OccurrenceRef, end: OccurrenceRef) -> OccurrenceRef:
-        ref = self._builder.reserve()
-        self._builder.define(ref, start, end)
-        return ref
+        return self._builder.ensure(start, end)
 
     def _fold(self, values: tuple[OccurrenceRef, ...]) -> OccurrenceRef:
         current = self._root
@@ -219,8 +220,8 @@ def replay_source_front_end(
 ) -> tuple[OccurrenceRef, ...]:
     """Replay selected UTF-8/astring → scoped D/G/T evidence without effects.
 
-    Returns the exact resolved forms in source order. This function does not
-    search for alternative segmentations and does not create any link.
+    Returns resolved forms in source order. This function does not search for
+    alternative segmentations and does not create any link.
     """
 
     if set(byte_refs) != set(range(256)):
@@ -334,16 +335,11 @@ def replay_source_subselection(
     grammar_membership: OccurrenceRef,
     theory_membership: OccurrenceRef,
 ) -> tuple[OccurrenceRef, ...]:
-    """Replay one exact contiguous subselection of an already-replayed source.
+    """Replay one contiguous subselection of an already-replayed source.
 
     Segment indices are checker coordinates only. Semantic evidence remains the
-    exact segment ``selection`` occurrences, their R-seeded ordered fold, the
-    selected exact form fold and explicit G/T memberships. Empty ranges are
-    valid and therefore use the distinguished exact root for both folds.
-
-    This layer is intentionally bracket-agnostic: it does not decide whether a
-    selected range is a group body. A higher layer may independently verify O/C
-    boundaries around the same exact segment range.
+    segment selection links, their R-seeded ordered fold, the selected form fold
+    and explicit G/T memberships. Empty ranges use the distinguished root.
     """
 
     before = network.snapshot()
@@ -417,7 +413,7 @@ def _inverse_byte_vocabulary(
     inverse: dict[OccurrenceRef, int] = {}
     for value, ref in byte_refs.items():
         if ref in inverse:
-            raise SourceReplayError("byte vocabulary refs must be occurrence-distinct")
+            raise SourceReplayError("byte vocabulary refs must be distinct")
         inverse[ref] = value
     return inverse
 
@@ -477,7 +473,7 @@ def _verify_fold(
     for expected in reversed(values):
         link = network.link(current)
         if link.end is not expected:
-            raise SourceReplayError("ordered sequence evidence contains the wrong occurrence")
+            raise SourceReplayError("ordered sequence evidence contains the wrong link")
         current = link.start
     if current is not root:
-        raise SourceReplayError("ordered sequence evidence does not terminate at exact root")
+        raise SourceReplayError("ordered sequence evidence does not terminate at root")

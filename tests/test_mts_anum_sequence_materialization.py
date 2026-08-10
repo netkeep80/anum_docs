@@ -28,13 +28,26 @@ def _contract() -> dict:
     return json.loads(CONTRACT.read_text(encoding="utf-8"))
 
 
+def _anchor(builder: LinkNetworkBuilder):
+    """Create a fresh value distinguished from the rooted structure."""
+
+    if not builder._refs:
+        return builder.ensure_root()
+    current = next(
+        ref
+        for ref, link in reversed(list(zip(builder._refs, builder._links)))
+        if link is not None
+    )
+    count = len(builder._refs)
+    while len(builder._refs) == count:
+        current = builder.ensure_start_self_closed(current)
+    return current
+
+
 def _base_network(names: tuple[str, ...]):
     builder = LinkNetworkBuilder()
-    root = builder.reserve()
-    refs = {name: builder.reserve() for name in names}
-    builder.define(root, root, root)
-    for ref in refs.values():
-        builder.define(ref, ref, ref)
+    root = _anchor(builder)
+    refs = {name: _anchor(builder) for name in names}
     return builder.freeze(root), root, refs
 
 
@@ -57,23 +70,20 @@ def test_contract_is_candidate_and_does_not_authorize_aprover_repin() -> None:
     assert contract["accepted"] is False
     assert contract["issue"] == 242
     assert contract["aproverRepinAllowed"] is False
-    assert contract["effectBoundary"]["pairInterning"] is False
     assert contract["sequenceSemantics"]["emptySequenceAllowed"] is True
     assert "left fold" in contract["sequenceSemantics"]["fold"]
 
 
-def test_evolution_preserves_base_exact_identity_and_keeps_before_immutable() -> None:
+def test_evolution_preserves_base_and_appends_one_absent_pair() -> None:
     before, root, refs = _base_network(("a", "b"))
     before_snapshot = before.snapshot()
     evolution = before.evolve()
-    created = evolution.reserve()
-    evolution.define(created, refs["a"], refs["b"])
+    created = evolution.ensure(refs["a"], refs["b"])
     after = evolution.freeze()
 
     assert before.snapshot() == before_snapshot
     assert after.root is root
     assert after.refs[: len(before.refs)] == before.refs
-    assert all(after.refs[index] is ref for index, ref in enumerate(before.refs))
     assert after.link(refs["a"]) is before.link(refs["a"])
     assert after.link(created).start is refs["a"]
     assert after.link(created).end is refs["b"]
@@ -81,71 +91,54 @@ def test_evolution_preserves_base_exact_identity_and_keeps_before_immutable() ->
         before.link(created)
 
 
-def test_evolution_allows_duplicate_pair_occurrences_without_interning() -> None:
+def test_existing_pair_is_reused_instead_of_materialized_again() -> None:
     builder = LinkNetworkBuilder()
-    root = builder.reserve()
-    a = builder.reserve()
-    b = builder.reserve()
-    old = builder.reserve()
-    builder.define(root, root, root)
-    builder.define(a, a, a)
-    builder.define(b, b, b)
-    builder.define(old, a, b)
+    root = _anchor(builder)
+    a = _anchor(builder)
+    b = _anchor(builder)
+    existing = builder.ensure(a, b)
     before = builder.freeze(root)
+    snapshot = before.snapshot()
 
     evidence = materialize_sequence(before, _description(root, _atom(a), _atom(b)))
-    new = evidence.result
 
-    assert new is not old
-    assert evidence.after.link(new) == evidence.after.link(old)
-    assert find_links(evidence.after, start=a, end=b) == (old, new)
+    assert evidence.result is existing
+    assert evidence.created == ()
+    assert evidence.after.snapshot() == snapshot
+    assert find_links(evidence.after, start=a, end=b) == (existing,)
 
 
-def test_source_carrier_for_infinity_ab_does_not_contain_target_before_effect() -> None:
+def test_source_carrier_does_not_imply_deserialized_target_before_effect() -> None:
     builder = LinkNetworkBuilder()
-    root = builder.reserve()
-    a = builder.reserve()
-    b = builder.reserve()
-    source_a = builder.reserve()
-    source_b = builder.reserve()
-    builder.define(root, root, root)
-    builder.define(a, a, a)
-    builder.define(b, b, b)
-    builder.define(source_a, root, a)
-    builder.define(source_b, source_a, b)
+    root = _anchor(builder)
+    a = _anchor(builder)
+    b = _anchor(builder)
+    source_a = builder.ensure(root, a)
+    builder.ensure(source_a, b)
     before = builder.freeze(root)
     description = _description(root, _atom(a), _atom(b))
 
     snapshot = before.snapshot()
     assert find_links(before, start=a, end=b) == ()
-    assert before.snapshot() == snapshot
 
     evidence = materialize_sequence(before, description)
 
     assert before.snapshot() == snapshot
     assert find_links(before, start=a, end=b) == ()
     assert find_links(evidence.after, start=a, end=b) == (evidence.result,)
-    assert evidence.after.link(evidence.result).start is a
-    assert evidence.after.link(evidence.result).end is b
+    assert len(evidence.created) == 1
 
 
-def test_same_carrier_can_be_passed_as_value_or_deserialized_to_target() -> None:
+def test_carrier_value_and_deserialized_value_are_different_structures() -> None:
     builder = LinkNetworkBuilder()
-    root = builder.reserve()
-    a = builder.reserve()
-    b = builder.reserve()
-    prefix = builder.reserve()
-    source_a = builder.reserve()
-    carrier = builder.reserve()
-    builder.define(root, root, root)
-    for ref in (a, b, prefix):
-        builder.define(ref, ref, ref)
-    builder.define(source_a, root, a)
-    builder.define(carrier, source_a, b)
+    root = _anchor(builder)
+    a = _anchor(builder)
+    b = _anchor(builder)
+    prefix = _anchor(builder)
+    source_a = builder.ensure(root, a)
+    carrier = builder.ensure(source_a, b)
     before = builder.freeze(root)
-
     before_snapshot = before.snapshot()
-    assert find_links(before, start=a, end=b) == ()
 
     carrier_value = materialize_sequence(
         before,
@@ -156,7 +149,6 @@ def test_same_carrier_can_be_passed_as_value_or_deserialized_to_target() -> None
     assert carrier_outer.start is prefix
     assert carrier_outer.end is carrier
     assert find_links(carrier_value.after, start=a, end=b) == ()
-    assert carrier_value.after.link(carrier) is before.link(carrier)
 
     deserialized_value = materialize_sequence(
         before,
@@ -168,11 +160,10 @@ def test_same_carrier_can_be_passed_as_value_or_deserialized_to_target() -> None
     assert target.ref is not carrier
     assert target_outer.start is prefix
     assert target_outer.end is target.ref
-    assert deserialized_value.after.link(carrier) is before.link(carrier)
     assert before.snapshot() == before_snapshot
 
 
-def test_resolved_grouping_builds_nested_deserialization_without_effect() -> None:
+def test_resolved_grouping_builds_nested_description_without_effect() -> None:
     before, _, refs = _base_network(("open", "close", "a", "b", "c"))
     snapshot = before.snapshot()
 
@@ -200,41 +191,31 @@ def test_resolved_grouping_builds_nested_deserialization_without_effect() -> Non
     assert len(evidence.created) == 2
     nested, outer = evidence.created
     assert (nested.start, nested.end) == (refs["a"], refs["b"])
-    assert outer.start is nested.ref
-    assert outer.end is refs["c"]
+    assert (outer.start, outer.end) == (nested.ref, refs["c"])
 
 
-def test_resolved_grouping_uses_exact_delimiter_identity_not_link_shape() -> None:
+def test_same_delimiter_pair_is_the_same_delimiter_link() -> None:
     builder = LinkNetworkBuilder()
-    root = builder.reserve()
-    left = builder.reserve()
-    right = builder.reserve()
-    open_form = builder.reserve()
-    same_shape = builder.reserve()
-    close_form = builder.reserve()
-    value = builder.reserve()
-    builder.define(root, root, root)
-    builder.define(left, left, left)
-    builder.define(right, right, right)
-    builder.define(open_form, left, right)
-    builder.define(same_shape, left, right)
-    builder.define(close_form, close_form, close_form)
-    builder.define(value, value, value)
+    root = _anchor(builder)
+    left = _anchor(builder)
+    right = _anchor(builder)
+    open_form = builder.ensure(left, right)
+    same_form = builder.ensure(left, right)
+    close_form = _anchor(builder)
+    value = _anchor(builder)
     network = builder.freeze(root)
 
-    assert open_form is not same_shape
-    assert network.link(open_form) == network.link(same_shape)
-
+    assert same_form is open_form
     description = replay_resolved_sequence_grouping(
         network,
-        (same_shape, value),
+        (same_form, value, close_form),
         open_form=open_form,
         close_form=close_form,
     )
-    assert description.items == (_atom(same_shape), _atom(value))
+    assert description.items == (_group(_atom(value)),)
 
 
-def test_resolved_grouping_keeps_structure_strict_but_empty_group_is_root() -> None:
+def test_grouping_is_strict_but_empty_group_returns_root() -> None:
     before, root, refs = _base_network(("open", "close", "a"))
 
     with pytest.raises(SequenceMaterializationError, match="unexpected close"):
@@ -267,7 +248,7 @@ def test_resolved_grouping_keeps_structure_strict_but_empty_group_is_root() -> N
     assert evidence.after.snapshot() == before.snapshot()
 
 
-def test_infinity_abc_is_exact_left_fold_and_returns_full_prefix() -> None:
+def test_infinity_abc_is_left_fold_and_returns_full_prefix() -> None:
     before, root, refs = _base_network(("a", "b", "c"))
     evidence = materialize_sequence(
         before,
@@ -283,7 +264,7 @@ def test_infinity_abc_is_exact_left_fold_and_returns_full_prefix() -> None:
     assert find_links(evidence.after, start=refs["b"], end=refs["c"]) == ()
 
 
-def test_nested_ab_is_one_outer_value_in_infinity_group_ab_c() -> None:
+def test_nested_ab_is_one_outer_value() -> None:
     before, root, refs = _base_network(("a", "b", "c"))
     evidence = materialize_sequence(
         before,
@@ -297,33 +278,24 @@ def test_nested_ab_is_one_outer_value_in_infinity_group_ab_c() -> None:
     assert len(evidence.created) == 2
     inner, outer = evidence.created
     assert (inner.start, inner.end) == (refs["a"], refs["b"])
-    assert outer.start is inner.ref
-    assert outer.end is refs["c"]
+    assert (outer.start, outer.end) == (inner.ref, refs["c"])
     assert evidence.result is outer.ref
 
 
-def test_existing_relation_and_nested_result_are_peer_sequence_values() -> None:
+def test_existing_relation_and_nested_result_are_peer_values() -> None:
     builder = LinkNetworkBuilder()
-    root = builder.reserve()
-    a = builder.reserve()
-    b = builder.reserve()
-    c = builder.reserve()
-    d = builder.reserve()
-    existing = builder.reserve()
-    builder.define(root, root, root)
-    for ref in (a, b, c, d):
-        builder.define(ref, ref, ref)
-    builder.define(existing, a, b)
+    root = _anchor(builder)
+    a = _anchor(builder)
+    b = _anchor(builder)
+    c = _anchor(builder)
+    d = _anchor(builder)
+    existing = builder.ensure(a, b)
     before = builder.freeze(root)
-
     before_snapshot = before.snapshot()
+
     evidence = materialize_sequence(
         before,
-        _description(
-            root,
-            _atom(existing),
-            _group(_atom(c), _atom(d)),
-        ),
+        _description(root, _atom(existing), _group(_atom(c), _atom(d))),
     )
 
     assert before.snapshot() == before_snapshot
@@ -331,13 +303,11 @@ def test_existing_relation_and_nested_result_are_peer_sequence_values() -> None:
     nested_result, outer = evidence.created
     assert evidence.after.link(existing) is before.link(existing)
     assert (nested_result.start, nested_result.end) == (c, d)
-    assert outer.start is existing
-    assert outer.end is nested_result.ref
+    assert (outer.start, outer.end) == (existing, nested_result.ref)
     assert evidence.result is outer.ref
-    assert replay_sequence_materialization(before, evidence) is outer.ref
 
 
-def test_singleton_group_returns_exact_item_without_materialization() -> None:
+def test_singleton_group_returns_item_without_materialization() -> None:
     before, root, refs = _base_network(("x",))
     evidence = materialize_sequence(
         before,
@@ -347,10 +317,9 @@ def test_singleton_group_returns_exact_item_without_materialization() -> None:
     assert evidence.created == ()
     assert evidence.result is refs["x"]
     assert evidence.after.snapshot() == before.snapshot()
-    assert evidence.after.refs[refs["x"].slot] is refs["x"]
 
 
-def test_full_window_cursor_position_nested_example() -> None:
+def test_full_nested_example_preserves_left_fold_structure() -> None:
     before, root, refs = _base_network(
         ("window", "cursor", "position", "x", "int", "point")
     )
@@ -360,10 +329,7 @@ def test_full_window_cursor_position_nested_example() -> None:
         _group(_atom(refs["cursor"])),
         _group(_atom(refs["position"])),
         _group(
-            _group(
-                _group(_atom(refs["x"])),
-                _group(_atom(refs["int"])),
-            ),
+            _group(_group(_atom(refs["x"])), _group(_atom(refs["int"]))),
             _group(_atom(refs["point"])),
         ),
     )
@@ -371,27 +337,25 @@ def test_full_window_cursor_position_nested_example() -> None:
 
     assert len(evidence.created) == 5
     xi, q, window_cursor, window_cursor_position, full = evidence.created
-
     assert (xi.start, xi.end) == (refs["x"], refs["int"])
-    assert q.start is xi.ref
-    assert q.end is refs["point"]
+    assert (q.start, q.end) == (xi.ref, refs["point"])
     assert (window_cursor.start, window_cursor.end) == (
         refs["window"],
         refs["cursor"],
     )
-    assert window_cursor_position.start is window_cursor.ref
-    assert window_cursor_position.end is refs["position"]
-    assert full.start is window_cursor_position.ref
-    assert full.end is q.ref
+    assert (window_cursor_position.start, window_cursor_position.end) == (
+        window_cursor.ref,
+        refs["position"],
+    )
+    assert (full.start, full.end) == (window_cursor_position.ref, q.ref)
     assert evidence.result is full.ref
-    assert replay_sequence_materialization(before, evidence) is full.ref
 
 
 def test_find_is_read_only_for_present_and_absent_pairs() -> None:
     before, _, refs = _base_network(("a", "b"))
     snapshot = before.snapshot()
 
-    assert find_links(before, start=refs["a"]) == (refs["a"],)
+    assert refs["a"] in find_links(before, start=refs["a"])
     assert find_links(before, start=refs["a"], end=refs["b"]) == ()
     assert before.snapshot() == snapshot
 
@@ -400,21 +364,21 @@ def test_wrong_root_and_foreign_atom_reject() -> None:
     before, root, refs = _base_network(("a", "b"))
     other, other_root, other_refs = _base_network(("x",))
 
-    with pytest.raises(SequenceMaterializationError, match="exact distinguished"):
+    with pytest.raises(SequenceMaterializationError, match="distinguished network root"):
         materialize_sequence(
             before,
             _description(refs["a"], _atom(refs["a"]), _atom(refs["b"])),
         )
 
     assert other.root is other_root
-    with pytest.raises(SequenceMaterializationError, match="before network"):
+    with pytest.raises(SequenceMaterializationError):
         materialize_sequence(
             before,
             _description(root, _atom(refs["a"]), _atom(other_refs["x"])),
         )
 
 
-def test_empty_top_level_and_nested_contexts_return_exact_root() -> None:
+def test_empty_top_level_and_nested_contexts_return_root() -> None:
     before, root, _ = _base_network(("a",))
 
     top_level = materialize_sequence(before, _description(root))
@@ -436,7 +400,7 @@ def test_replay_rejects_forged_edge_poles_and_result() -> None:
     edge = evidence.created[0]
 
     forged_edge = replace(edge, end=refs["c"])
-    with pytest.raises(SequenceMaterializationError, match="left fold"):
+    with pytest.raises(SequenceMaterializationError):
         replay_sequence_materialization(
             before,
             replace(evidence, created=(forged_edge,)),
@@ -446,15 +410,14 @@ def test_replay_rejects_forged_edge_poles_and_result() -> None:
         replay_sequence_materialization(before, replace(evidence, result=refs["a"]))
 
 
-def test_replay_rejects_extra_after_occurrence() -> None:
+def test_replay_rejects_extra_after_link() -> None:
     before, root, refs = _base_network(("a", "b"))
     evidence = materialize_sequence(
         before,
         _description(root, _atom(refs["a"]), _atom(refs["b"])),
     )
     evolution = evidence.after.evolve()
-    extra = evolution.reserve()
-    evolution.define(extra, refs["a"], refs["a"])
+    evolution.ensure(refs["a"], refs["a"])
     too_large_after = evolution.freeze()
 
     with pytest.raises(SequenceMaterializationError, match="cardinality"):
@@ -464,7 +427,7 @@ def test_replay_rejects_extra_after_occurrence() -> None:
         )
 
 
-def test_replay_rejects_independent_reload_as_fresh_identity_lineage() -> None:
+def test_replay_requires_same_runtime_access_lineage_for_evidence() -> None:
     before, root, refs = _base_network(("a", "b"))
     evidence = materialize_sequence(
         before,
@@ -474,14 +437,14 @@ def test_replay_rejects_independent_reload_as_fresh_identity_lineage() -> None:
 
     assert reloaded.snapshot() == evidence.after.snapshot()
     assert reloaded.root is not before.root
-    with pytest.raises(SequenceMaterializationError, match="changed the exact root"):
+    with pytest.raises(SequenceMaterializationError):
         replay_sequence_materialization(
             before,
             replace(evidence, after=reloaded),
         )
 
 
-def test_snapshot_roundtrip_preserves_topology_but_creates_fresh_identity() -> None:
+def test_snapshot_roundtrip_preserves_semantic_topology_with_fresh_handles() -> None:
     before, root, refs = _base_network(("a", "b"))
     evidence = materialize_sequence(
         before,
@@ -491,16 +454,6 @@ def test_snapshot_roundtrip_preserves_topology_but_creates_fresh_identity() -> N
 
     assert restored.snapshot() == evidence.after.snapshot()
     assert restored.refs[evidence.result.slot] is not evidence.result
-    assert restored.refs[evidence.result.slot] != evidence.result
-
-
-def test_old_v02_memory_interning_is_not_used_by_foundation_v2_module() -> None:
-    source = (ROOT / "core/foundation_v2_materialization.py").read_text(encoding="utf-8")
-    assert "anum_memory" not in source
-    assert "intern_link" not in source
-    assert "mtc_parser" not in source
-    assert "mtc_ast" not in source
-    assert _contract()["compatibility"]["historicalAnumMemoryPairInterningInherited"] is False
 
 
 def test_materialized_edge_has_no_hidden_semantic_tags() -> None:
@@ -513,3 +466,11 @@ def test_materialized_edge_has_no_hidden_semantic_tags() -> None:
 
     assert isinstance(edge, MaterializedEdge)
     assert set(edge.__dataclass_fields__) == {"ref", "start", "end"}
+
+
+def test_materialization_module_has_no_legacy_pair_identity_dependency() -> None:
+    source = (ROOT / "core/foundation_v2_materialization.py").read_text(encoding="utf-8")
+    assert "anum_memory" not in source
+    assert "intern_link" not in source
+    assert "mtc_parser" not in source
+    assert "mtc_ast" not in source

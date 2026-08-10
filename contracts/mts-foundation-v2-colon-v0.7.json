@@ -5,8 +5,9 @@
   "issue": 249,
   "parent": 237,
   "researchDecision": 224,
+  "semanticReset": 343,
   "dependsOn": [
-    "mts-exact-occurrence-link-network/v0.7",
+    "mts-rooted-link-network/v0.7",
     "mts-foundation-v2-state/v0.7",
     "mts-foundation-v2-source/v0.7",
     "mts-foundation-v2-interpreter-replay/v0.7"
@@ -14,69 +15,44 @@
   "scope": {
     "before": "D_before = D_before ⟼ (parentScope ⟼ H_before)",
     "entry": "Entry = sourceContent ⟼ form",
-    "occurrence": "Occurrence = D_before ⟼ Entry",
-    "historyAppend": "H_after = H_before ⟼ Occurrence",
+    "definition": "Definition = D_before ⟼ Entry",
+    "historyAppend": "H_after = H_before ⟼ Definition",
     "after": "D_after = D_after ⟼ (sameParentScope ⟼ H_after)",
     "persistent": true,
     "parentImmutable": true
   },
   "lookup": {
     "order": "local history first, then explicit parent scope",
-    "selectedEvidence": "exact historical definition occurrence visible from current D",
-    "sameLocalSourceSameForm": "one mapping, multiple declaration occurrences allowed",
+    "sameLocalSourceSameForm": "same canonical Entry; repeated events differ only when history structure differs",
     "distinctLocalForms": "conflict",
     "childLocalMapping": "shadows parent",
     "childMiss": "falls through to parent",
-    "lastWriteWins": false,
-    "globalScanCountsAsVisibility": false
+    "lastWriteWins": false
   },
   "colonReplay": {
-    "sameInterpreterModule": true,
-    "sourceOccurrenceTopology": "S = S ⟼ sourceContent",
+    "sourceTopology": "S = S ⟼ sourceContent",
+    "sameSourceContentSameSourceForm": true,
     "entryVerified": true,
-    "occurrenceBoundToExactBeforeScope": true,
-    "oneExactHistoryAppendVerified": true,
+    "definitionBoundToBeforeScope": true,
+    "historyAppendVerified": true,
     "afterScopeSameParentVerified": true,
-    "newOccurrenceVisibleInAfter": true,
-    "newOccurrenceNotRetroactivelyVisibleInBefore": true,
     "snapshotStable": true,
-    "rhsRecursiveEvaluation": false,
     "impliesEquality": false,
     "impliesTheorem": false,
     "implicitL4Materialization": false
   },
-  "actualAct": {
-    "header": "A uses existing Gate-R I/D_roles/K header; colon may keep K unchanged",
-    "requiredRoles": [
-      "source",
-      "source-content",
-      "form",
-      "before-dictionary",
-      "entry",
-      "definition-occurrence",
-      "history-before",
-      "history-after",
-      "after-dictionary",
-      "context"
-    ],
-    "roleRefsExact": true
-  },
-  "migration": {
-    "flatDictionaryProductionPathRetained": false,
-    "sourceFrontEndUsesScopedVisibility": true,
-    "theoryGrammarMembershipRemainsSeparate": true,
-    "parallelDefinitionInterpreterAdded": false
+  "identity": {
+    "sameDistinguishedPolesSameLink": true,
+    "declarationOccurrenceIdIsSemanticIdentity": false,
+    "eventDifferenceMustBeStructural": true
   },
   "requiredVectors": [
     "one persistent definition replays read-only",
-    "repeated identical definition keeps distinct occurrences but one mapping",
+    "repeated identical definition may form a later event only through changed history",
     "distinct local forms conflict",
     "child mapping shadows parent",
-    "child miss falls through to parent",
-    "unreachable global occurrence is not visible",
-    "wrong D_before rejects",
-    "wrong history predecessor rejects",
-    "changed parent in D_after rejects"
+    "unreachable definition is not visible",
+    "wrong D_before/history/parent rejects"
   ],
-  "nextGate": "integrate local exact representative equality decision #225 into this same replay engine"
+  "nextGate": "complete semantic reset #343 before Foundation-v2 acceptance"
 }

@@ -1,14 +1,19 @@
-"""Foundation-v2 exact multistep run container and read-only replay.
+"""Foundation-v2 multistep run container and read-only replay.
 
-A run is an ordered chain of already-existing actual act occurrences:
+A run is an ordered chain of already-existing semantic acts:
 
     Run_0 = R
     Run_(i+1) = Run_i ⟼ A_i
 
-The trusted checker reconstructs that chain from exact links, validates explicit
-before/after context fields for every act and requires exact context continuity.
-It does not reimplement individual act semantics, choose branches, infer logical
-transitivity or materialize shortcut links.
+Every cell is obtained canonically from its already distinguished poles. A
+repeated act may therefore occur at several positions of the run, but this does
+not create another semantic copy of that act. Position is carried by the run
+prefix itself.
+
+The trusted checker reconstructs the selected chain, validates explicit
+before/after context fields for every act and requires structural context
+continuity. It does not choose branches, infer logical transitivity or
+materialize shortcut links during replay.
 """
 from __future__ import annotations
 
@@ -30,7 +35,7 @@ class RunReplayError(ValueError):
 
 @dataclass(frozen=True)
 class RunStepEvidence:
-    """Exact act boundary evidence used only for run composition."""
+    """Act boundary evidence used only for run composition."""
 
     act: OccurrenceRef
     before_context: OccurrenceRef
@@ -41,7 +46,7 @@ class RunStepEvidence:
 
 @dataclass(frozen=True)
 class RunEvidence:
-    """Checker handle for one exact ordered selected run."""
+    """Checker handle for one ordered selected run."""
 
     run_root: OccurrenceRef
     initial_context: OccurrenceRef
@@ -54,18 +59,16 @@ def define_run_chain(
     root: OccurrenceRef,
     acts: Sequence[OccurrenceRef],
 ) -> OccurrenceRef:
-    """Construct the exact ordered container ``fold(R, A_0 ... A_n)``."""
+    """Construct canonical ordered container ``fold(R, A_0 ... A_n)``."""
 
     current = root
     for act in acts:
-        cell = builder.reserve()
-        builder.define(cell, current, act)
-        current = cell
+        current = builder.ensure(current, act)
     return current
 
 
 def replay_run(network: LinkNetwork, evidence: RunEvidence) -> tuple[OccurrenceRef, ...]:
-    """Replay exact run ordering and persistent-context continuity read-only."""
+    """Replay run ordering and persistent-context continuity read-only."""
 
     before_snapshot = network.snapshot()
     try:
@@ -107,7 +110,7 @@ def _verify_run_chain(network: LinkNetwork, evidence: RunEvidence) -> None:
             raise RunReplayError("run chain ended before all selected acts")
         cell = network.link(current)
         if cell.end is not step.act:
-            raise RunReplayError("run chain order or exact act occurrence is forged")
+            raise RunReplayError("run chain order or selected act is forged")
         current = cell.start
     if current is not network.root:
         raise RunReplayError("run chain does not terminate at exact root")

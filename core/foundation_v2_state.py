@@ -1,23 +1,12 @@
-"""Foundation-v2 higher-layer state over the exact-occurrence link substrate.
+"""Foundation-v2 higher-layer state over rooted canonical MTS links.
 
-This module deliberately adds no semantic fields to :class:`Link`. Contexts,
-dictionaries, theories, grammar evidence, local equality constraints and
-interpretation acts are represented only by ordinary exact link occurrences.
-The Python functions below are construction/read helpers for the candidate
-topology; their function names are not MTS ontology.
+Contexts, dictionaries, source records and acts are ordinary links. One-sided
+self-closure is obtained through the semantic constructor rather than by issuing
+a fresh runtime handle and using that handle as identity.
 
-Foundation-v2 dictionaries use one persistent lexical-scope model. A dictionary
-snapshot is start-self-closed and points to ``parentScope ⟼ localHistory``.
-Definitions append exact occurrences to that history; lookup replays the explicit
-history/parent links rather than consulting a mutable host map.
-
-Local equality is deliberately weaker: a context K may carry explicit one-hop
-``member ⟼ representative`` attachments. No global congruence, transitive alias
-closure or shape equality is provided here.
-
-The module is storage-neutral and read-only after a network has been frozen. It
-does not materialize persistent L4 links and does not define Anum sequence
-deserialization (tracked separately by issue #242).
+Therefore repeated construction of the same ``S=S⟼e`` form returns the same
+semantic link. If two events using that form must be distinguished, the
+difference belongs in an explicit history/act structure.
 """
 from __future__ import annotations
 
@@ -27,7 +16,7 @@ from .exact_link_network import LinkNetwork, LinkNetworkBuilder, OccurrenceRef
 
 
 class FoundationStateError(ValueError):
-    """The supplied exact occurrences do not match the candidate topology."""
+    """The supplied links do not match the candidate state topology."""
 
 
 class DictionaryLookupError(FoundationStateError):
@@ -39,13 +28,11 @@ class DictionaryConflictError(DictionaryLookupError):
 
 
 class RepresentativeConflictError(FoundationStateError):
-    """One local context maps a member to distinct exact representatives."""
+    """One local context maps a member to distinct representatives."""
 
 
 @dataclass(frozen=True)
 class DictionaryEffectRefs:
-    """Construction handles for one persistent definition effect."""
-
     entry: OccurrenceRef
     occurrence: OccurrenceRef
     history_after: OccurrenceRef
@@ -54,8 +41,6 @@ class DictionaryEffectRefs:
 
 @dataclass(frozen=True)
 class ScopedDictionaryResolution:
-    """Exact visible occurrences supporting one scoped dictionary resolution."""
-
     scope: OccurrenceRef
     form: OccurrenceRef
     occurrences: tuple[OccurrenceRef, ...]
@@ -63,8 +48,6 @@ class ScopedDictionaryResolution:
 
 @dataclass(frozen=True)
 class LocalRepresentativeResolution:
-    """One-hop representative plus exact K-attachment occurrences supporting it."""
-
     member: OccurrenceRef
     representative: OccurrenceRef
     bindings: tuple[OccurrenceRef, ...]
@@ -74,11 +57,9 @@ def define_source_occurrence(
     builder: LinkNetworkBuilder,
     content: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Create exact source occurrence ``S = S ⟼ content``."""
+    """Return canonical source form ``S = S ⟼ content``."""
 
-    source = builder.reserve()
-    builder.define(source, source, content)
-    return source
+    return builder.ensure_start_self_closed(content)
 
 
 def define_context(
@@ -86,18 +67,13 @@ def define_context(
     parent: OccurrenceRef,
     current: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Create persistent context ``K = K ⟼ (parent ⟼ current)``."""
+    """Return canonical context ``K = K ⟼ (parent ⟼ current)``."""
 
-    pair = builder.reserve()
-    context = builder.reserve()
-    builder.define(pair, parent, current)
-    builder.define(context, context, pair)
-    return context
+    pair = builder.ensure(parent, current)
+    return builder.ensure_start_self_closed(pair)
 
 
 def current_of_context(network: LinkNetwork, context: OccurrenceRef) -> OccurrenceRef:
-    """Resolve ``↑`` from one explicitly selected exact context occurrence."""
-
     context_link = network.link(context)
     if context_link.start is not context:
         raise FoundationStateError("context is not start-self-closed")
@@ -106,8 +82,6 @@ def current_of_context(network: LinkNetwork, context: OccurrenceRef) -> Occurren
 
 
 def parent_of_context(network: LinkNetwork, context: OccurrenceRef) -> OccurrenceRef:
-    """Read the explicit parent carried by one context occurrence."""
-
     context_link = network.link(context)
     if context_link.start is not context:
         raise FoundationStateError("context is not start-self-closed")
@@ -121,12 +95,8 @@ def define_local_representative_binding(
     member: OccurrenceRef,
     representative: OccurrenceRef,
 ) -> tuple[OccurrenceRef, OccurrenceRef]:
-    """Create ``Pair=member⟼representative`` and ``Binding=K⟼Pair``."""
-
-    pair = builder.reserve()
-    binding = builder.reserve()
-    builder.define(pair, member, representative)
-    builder.define(binding, context, pair)
+    pair = builder.ensure(member, representative)
+    binding = builder.ensure(context, pair)
     return pair, binding
 
 
@@ -135,21 +105,11 @@ def local_representative_resolution(
     context: OccurrenceRef,
     member: OccurrenceRef,
 ) -> LocalRepresentativeResolution:
-    """Resolve exactly one local representative value, without alias chaining.
-
-    Repeated exact binding occurrences to the same representative are tolerated
-    as one unambiguous mapping. Distinct representative values conflict.
-    Missing mapping falls back to the member itself and has no binding evidence.
-    """
-
-    # Validate the distinguished context occurrence before considering attachments.
     current_of_context(network, context)
 
     matches: list[tuple[OccurrenceRef, OccurrenceRef]] = []
     for binding_ref in network.refs:
         if binding_ref is context:
-            # K itself is start-self-closed context topology, not a representative
-            # attachment even though its start is also K.
             continue
         binding = network.link(binding_ref)
         if binding.start is not context:
@@ -183,8 +143,6 @@ def local_representative(
     context: OccurrenceRef,
     member: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Return the one-hop exact representative of ``member`` in exact ``K``."""
-
     return local_representative_resolution(network, context, member).representative
 
 
@@ -193,13 +151,10 @@ def define_dictionary_scope(
     parent_scope: OccurrenceRef,
     local_history: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Create ``D = D ⟼ (parentScope ⟼ localHistory)``."""
+    """Return canonical ``D = D ⟼ (parentScope ⟼ localHistory)``."""
 
-    payload = builder.reserve()
-    scope = builder.reserve()
-    builder.define(payload, parent_scope, local_history)
-    builder.define(scope, scope, payload)
-    return scope
+    payload = builder.ensure(parent_scope, local_history)
+    return builder.ensure_start_self_closed(payload)
 
 
 def define_dictionary_effect(
@@ -210,18 +165,9 @@ def define_dictionary_effect(
     source_content: OccurrenceRef,
     form: OccurrenceRef,
 ) -> DictionaryEffectRefs:
-    """Construct one persistent ``:``-style dictionary update.
-
-    The helper is construction-only; trusted replay later verifies that the
-    supplied parent/history really belong to ``before_scope``.
-    """
-
-    entry = builder.reserve()
-    occurrence = builder.reserve()
-    history_after = builder.reserve()
-    builder.define(entry, source_content, form)
-    builder.define(occurrence, before_scope, entry)
-    builder.define(history_after, history_before, occurrence)
+    entry = builder.ensure(source_content, form)
+    occurrence = builder.ensure(before_scope, entry)
+    history_after = builder.ensure(history_before, occurrence)
     after_scope = define_dictionary_scope(builder, parent_scope, history_after)
     return DictionaryEffectRefs(
         entry=entry,
@@ -235,10 +181,8 @@ def read_dictionary_scope(
     network: LinkNetwork,
     dictionary: OccurrenceRef,
 ) -> tuple[OccurrenceRef, OccurrenceRef]:
-    """Return exact ``(parentScope, localHistory)`` for one dictionary snapshot."""
-
     if dictionary is network.root:
-        raise DictionaryLookupError("exact root is a dictionary sentinel, not a scope")
+        raise DictionaryLookupError("root is a dictionary sentinel, not a scope")
     scope = network.link(dictionary)
     if scope.start is not dictionary:
         raise DictionaryLookupError("dictionary scope is not start-self-closed")
@@ -251,8 +195,6 @@ def lookup_scoped_dictionary(
     dictionary: OccurrenceRef,
     source_content: OccurrenceRef,
 ) -> ScopedDictionaryResolution | None:
-    """Resolve source content using local-history-first lexical scope semantics."""
-
     visited_scopes: set[OccurrenceRef] = set()
     current_scope = dictionary
     while current_scope is not network.root:
@@ -285,8 +227,6 @@ def verify_visible_dictionary_occurrence(
     source_content: OccurrenceRef,
     form: OccurrenceRef,
 ) -> None:
-    """Verify an exact declaration occurrence is the visible scoped resolution."""
-
     resolution = lookup_scoped_dictionary(network, dictionary, source_content)
     if resolution is None:
         raise DictionaryLookupError("source content is not visible in dictionary")
@@ -294,7 +234,7 @@ def verify_visible_dictionary_occurrence(
         raise DictionaryLookupError("visible dictionary form differs from selected form")
     if occurrence not in resolution.occurrences:
         raise DictionaryLookupError(
-            "selected declaration occurrence is not visible from current dictionary"
+            "selected declaration is not visible from current dictionary"
         )
 
 
@@ -322,7 +262,7 @@ def _local_dictionary_matches(
         before_parent, before_history = read_dictionary_scope(network, before_scope)
         if before_parent is not parent or before_history is not previous_history:
             raise DictionaryLookupError(
-                "definition occurrence is not bound to the exact predecessor snapshot"
+                "definition is not bound to the exact predecessor snapshot"
             )
 
         entry = network.link(entry_ref)
@@ -338,11 +278,7 @@ def define_membership(
     container: OccurrenceRef,
     value: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Create direct theory/grammar-style membership ``container ⟼ value``."""
-
-    membership = builder.reserve()
-    builder.define(membership, container, value)
-    return membership
+    return builder.ensure(container, value)
 
 
 def has_exact_membership(
@@ -350,12 +286,7 @@ def has_exact_membership(
     container: OccurrenceRef,
     value: OccurrenceRef,
 ) -> bool:
-    """Check direct G/T-style membership without equality or materialization."""
-
-    return any(
-        network.link(ref).start is container and network.link(ref).end is value
-        for ref in network.refs
-    )
+    return network.find(container, value) is not None
 
 
 def define_act_header(
@@ -364,28 +295,17 @@ def define_act_header(
     role_dictionary: OccurrenceRef,
     after_context: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Create Gate-R finite header.
+    """Return canonical ``A = A ⟼ (I ⟼ (D_roles ⟼ K_after))``."""
 
-    ``P = D_roles ⟼ K_after``
-    ``H = I ⟼ P``
-    ``A = A ⟼ H``
-    """
-
-    pair = builder.reserve()
-    header = builder.reserve()
-    act = builder.reserve()
-    builder.define(pair, role_dictionary, after_context)
-    builder.define(header, interpreter, pair)
-    builder.define(act, act, header)
-    return act
+    pair = builder.ensure(role_dictionary, after_context)
+    header = builder.ensure(interpreter, pair)
+    return builder.ensure_start_self_closed(header)
 
 
 def act_header(
     network: LinkNetwork,
     act: OccurrenceRef,
 ) -> tuple[OccurrenceRef, OccurrenceRef, OccurrenceRef]:
-    """Return ``(I, D_roles, K_after)`` from the finite structural header."""
-
     act_link = network.link(act)
     if act_link.start is not act:
         raise FoundationStateError("act is not start-self-closed")
@@ -400,12 +320,8 @@ def define_act_field(
     role: OccurrenceRef,
     value: OccurrenceRef,
 ) -> tuple[OccurrenceRef, OccurrenceRef]:
-    """Create ``field=role⟼value`` and exact attachment ``act⟼field``."""
-
-    field = builder.reserve()
-    attachment = builder.reserve()
-    builder.define(field, role, value)
-    builder.define(attachment, act, field)
+    field = builder.ensure(role, value)
+    attachment = builder.ensure(act, field)
     return field, attachment
 
 
@@ -414,13 +330,9 @@ def act_values(
     act: OccurrenceRef,
     role: OccurrenceRef,
 ) -> tuple[OccurrenceRef, ...]:
-    """Read values attached to an act through one exact role ref."""
-
     values: list[OccurrenceRef] = []
     for attachment_ref in network.refs:
         if attachment_ref is act:
-            # A itself is start-self-closed and therefore also has start == A.
-            # It is the finite bootstrap header occurrence, not a role field.
             continue
         attachment = network.link(attachment_ref)
         if attachment.start is not act:
