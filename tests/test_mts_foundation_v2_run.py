@@ -11,6 +11,7 @@ from core.foundation_v2_interpreter import (
     FlatSequenceReadingRoleRefs,
     RelationStepEvidence,
     RelationStepRoleRefs,
+    replay_flat_source_subselection_continuation,
     replay_flat_source_subselection_reading,
     replay_relation_source_subselection_step,
 )
@@ -542,7 +543,7 @@ def test_one_physical_bracketed_source_replays_nested_des_and_carrier_raise() ->
     assert network.snapshot() == before_snapshot
 
 
-def test_double_physical_envelope_can_select_inner_carrier_and_outer_closing() -> None:
+def test_double_physical_envelope_can_continue_outer_suffix() -> None:
     kernel = build_root_kernel()
     builder = kernel.network.evolve()
     root = kernel.refs.root
@@ -555,10 +556,12 @@ def test_double_physical_envelope_can_select_inner_carrier_and_outer_closing() -
     b = _anchor(builder)
     carrier_a = _new_link(builder, root, a)
     carrier_ab = _new_link(builder, carrier_a, b)
-    result = _new_link(builder, root, carrier_ab)
-    both_closings = _new_link(builder, root, result)
+    envelope_result = _new_link(builder, root, carrier_ab)
+    both_closings = _new_link(builder, root, envelope_result)
+    envelope_a = _new_link(builder, envelope_result, a)
+    final_result = _new_link(builder, envelope_a, b)
 
-    source = front_end.source_occurrence(b"[[ab]]")
+    source = front_end.source_occurrence(b"[[ab]]ab")
     dictionary = define_dictionary_scope(builder, root, root)
     history = root
     occurrences = {}
@@ -589,6 +592,8 @@ def test_double_physical_envelope_can_select_inner_carrier_and_outer_closing() -
             SegmentSpec(2, 4, carrier_ab, occurrences[b"ab"]),
             SegmentSpec(4, 5, closing, occurrences[b"]"]),
             SegmentSpec(5, 6, closing, occurrences[b"]"]),
+            SegmentSpec(6, 7, a, occurrences[b"a"]),
+            SegmentSpec(7, 8, b, occurrences[b"b"]),
         ),
         dictionary=dictionary,
         grammar=outer_grammar,
@@ -613,12 +618,28 @@ def test_double_physical_envelope_can_select_inner_carrier_and_outer_closing() -
         builder, closing_theory, outer_closing_forms
     )
 
+    suffix_selection = _fold(
+        builder,
+        root,
+        (outer.segments[5].selection, outer.segments[6].selection),
+    )
+    suffix_forms = _fold(builder, root, (a, b))
+    suffix_grammar = _anchor(builder)
+    suffix_theory = _anchor(builder)
+    suffix_grammar_membership = define_membership(
+        builder, suffix_grammar, suffix_forms
+    )
+    suffix_theory_membership = define_membership(
+        builder, suffix_theory, suffix_forms
+    )
+
     interpreter = _anchor(builder)
     parent = _anchor(builder)
     prior = _anchor(builder)
     k0 = define_context(builder, parent, prior)
     k1 = define_context(builder, parent, carrier_ab)
-    k2 = define_context(builder, parent, result)
+    k2 = define_context(builder, parent, envelope_result)
+    k3 = define_context(builder, parent, final_result)
 
     role_refs = {
         name: _anchor(builder)
@@ -698,10 +719,24 @@ def test_double_physical_envelope_can_select_inner_carrier_and_outer_closing() -
         (relation_roles.form, closing),
         (relation_roles.before_context, k1),
         (relation_roles.binding, carrier_ab),
-        (relation_roles.result, result),
+        (relation_roles.result, envelope_result),
         (relation_roles.after_context, k2),
     ):
         define_act_field(builder, closing_act, role, value)
+
+    continuation_act = define_act_header(builder, interpreter, role_dictionary, k3)
+    for role, value in (
+        (flat_roles.source, outer.source),
+        (flat_roles.source_selection, suffix_selection),
+        (flat_roles.form_sequence, suffix_forms),
+        (flat_roles.dictionary, outer.dictionary),
+        (flat_roles.grammar, suffix_grammar),
+        (flat_roles.theory, suffix_theory),
+        (flat_roles.before_context, k2),
+        (flat_roles.result, final_result),
+        (flat_roles.after_context, k3),
+    ):
+        define_act_field(builder, continuation_act, role, value)
 
     steps = (
         RunStepEvidence(
@@ -718,13 +753,28 @@ def test_double_physical_envelope_can_select_inner_carrier_and_outer_closing() -
             before_role=role_refs["before-context"],
             after_role=role_refs["after-context"],
         ),
+        RunStepEvidence(
+            act=continuation_act,
+            before_context=k2,
+            after_context=k3,
+            before_role=role_refs["before-context"],
+            after_role=role_refs["after-context"],
+        ),
     )
-    run = _run(builder, root, steps, k0, k2)
+    run = _run(builder, root, steps, k0, k3)
     network = builder.freeze()
     snapshot = network.snapshot()
 
     resolved = replay_source_front_end(network, outer, byte_refs)
-    assert resolved == (opening, opening, carrier_ab, closing, closing)
+    assert resolved == (
+        opening,
+        opening,
+        carrier_ab,
+        closing,
+        closing,
+        a,
+        b,
+    )
     assert replay_resolved_sequence_grouping(
         network,
         resolved,
@@ -736,6 +786,8 @@ def test_double_physical_envelope_can_select_inner_carrier_and_outer_closing() -
             SequenceGroup(
                 (SequenceGroup((SequenceAtom(carrier_ab),)),)
             ),
+            SequenceAtom(a),
+            SequenceAtom(b),
         ),
     )
 
@@ -755,11 +807,21 @@ def test_double_physical_envelope_can_select_inner_carrier_and_outer_closing() -
         form=closing,
         before_context=k1,
         binding=carrier_ab,
-        result=result,
+        result=envelope_result,
         after_context=k2,
         act=closing_act,
         role_dictionary=role_dictionary,
         roles=relation_roles,
+    )
+    continuation_evidence = FlatSequenceReadingEvidence(
+        source_evidence=outer,
+        interpreter=interpreter,
+        before_context=k2,
+        result=final_result,
+        after_context=k3,
+        act=continuation_act,
+        role_dictionary=role_dictionary,
+        roles=flat_roles,
     )
 
     assert replay_flat_source_subselection_reading(
@@ -787,15 +849,32 @@ def test_double_physical_envelope_can_select_inner_carrier_and_outer_closing() -
         theory=closing_theory,
         grammar_membership=closing_grammar_membership,
         theory_membership=closing_theory_membership,
-    ) is result
-    assert replay_run(network, run) == (body_act, closing_act)
+    ) is envelope_result
+    assert replay_flat_source_subselection_continuation(
+        network,
+        continuation_evidence,
+        byte_refs,
+        start_segment=5,
+        end_segment=7,
+        selection_sequence=suffix_selection,
+        form_sequence=suffix_forms,
+        grammar=suffix_grammar,
+        theory=suffix_theory,
+        grammar_membership=suffix_grammar_membership,
+        theory_membership=suffix_theory_membership,
+    ) is final_result
+    assert replay_run(network, run) == (body_act, closing_act, continuation_act)
 
     assert outer.segments[3].selection is not outer.segments[4].selection
-    assert network.link(result).start is root
-    assert network.link(result).end is carrier_ab
+    assert network.link(envelope_result).start is root
+    assert network.link(envelope_result).end is carrier_ab
     assert network.link(both_closings).start is root
-    assert network.link(both_closings).end is result
-    assert both_closings is not result
+    assert network.link(both_closings).end is envelope_result
+    assert both_closings is not envelope_result
+    assert network.link(envelope_a).start is envelope_result
+    assert network.link(envelope_a).end is a
+    assert network.link(final_result).start is envelope_a
+    assert network.link(final_result).end is b
     assert network.snapshot() == snapshot
 
 
