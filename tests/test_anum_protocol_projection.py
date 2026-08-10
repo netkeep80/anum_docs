@@ -239,6 +239,69 @@ def test_quote_envelope_can_select_carrier_or_deserialized_denotation() -> None:
     assert network.snapshot() == before
 
 
+def test_additional_envelope_candidate_reencodes_deserialized_result() -> None:
+    kernel = build_root_kernel()
+    builder = kernel.network.evolve()
+    root = kernel.refs.root
+    a = kernel.refs.unlinked
+    b = kernel.refs.linked
+
+    carrier_head = builder.reserve()
+    carrier_ab = builder.reserve()
+    builder.define(carrier_head, root, a)
+    builder.define(carrier_ab, carrier_head, b)
+    before = builder.freeze()
+    before_snapshot = before.snapshot()
+
+    # Capability proven by #308: an already existing carrier may be passed as a
+    # value without deserializing the relation that it describes.
+    passed = materialize_sequence(
+        before,
+        SequenceDescription(root=root, items=(SequenceAtom(carrier_ab),)),
+    )
+    assert passed.created == ()
+    assert passed.result is carrier_ab
+    assert find_links(before, start=a, end=b) == ()
+
+    # Additional-envelope candidate from the original MTS notes:
+    # first deserialize A=ab to X=a⟼b, then obtain an Anum that encodes X.
+    inner = materialize_sequence(
+        before,
+        SequenceDescription(
+            root=root,
+            items=(SequenceAtom(a), SequenceAtom(b)),
+        ),
+    )
+    x = inner.result
+    assert len(inner.created) == 1
+    assert inner.after.link(x).start is a
+    assert inner.after.link(x).end is b
+    assert x is not carrier_ab
+
+    reencoded_builder = inner.after.evolve()
+    carrier_x = reencoded_builder.reserve()
+    reencoded_builder.define(carrier_x, root, x)
+    after_one_envelope = reencoded_builder.freeze()
+
+    second_builder = after_one_envelope.evolve()
+    carrier_carrier_x = second_builder.reserve()
+    second_builder.define(carrier_carrier_x, root, carrier_x)
+    after_two_envelopes = second_builder.freeze()
+
+    # D(ab)=X; D([ab])=S(X); D([[ab]])=S(S(X)).  The additional envelope
+    # therefore raises the description level around the exact result, not around
+    # the original carrier C_ab.
+    assert after_one_envelope.link(carrier_x).start is root
+    assert after_one_envelope.link(carrier_x).end is x
+    assert after_two_envelopes.link(carrier_carrier_x).start is root
+    assert after_two_envelopes.link(carrier_carrier_x).end is carrier_x
+
+    assert len({carrier_ab, x, carrier_x, carrier_carrier_x}) == 4
+    assert carrier_x is not carrier_ab
+    assert carrier_carrier_x is not carrier_ab
+    assert before.snapshot() == before_snapshot
+
+
 def test_unquote_requires_explicit_outer_envelope():
     with pytest.raises(ValueError, match="quote-оболочку"):
         unquote_anum(parse_raw_quaternary("]["))
