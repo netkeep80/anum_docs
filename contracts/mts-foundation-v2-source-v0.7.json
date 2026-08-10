@@ -5,8 +5,9 @@
   "issue": 245,
   "refinedByIssue": 249,
   "parent": 237,
+  "semanticReset": 343,
   "dependsOn": [
-    "mts-exact-occurrence-link-network/v0.7",
+    "mts-rooted-link-network/v0.7",
     "mts-foundation-v2-state/v0.7",
     "astring-link-topology-challenge/v0.7",
     "mts-source-sequence-challenge/v0.7"
@@ -14,78 +15,64 @@
   "path": [
     "raw bytes",
     "canonical astring content C",
-    "exact source occurrence S",
-    "selected exact segmentation evidence",
-    "exact visible scoped-D declaration occurrence per slice",
+    "canonical source form S",
+    "selected segmentation evidence",
+    "visible scoped-D definition per slice",
     "ordered resolved form sequence",
     "explicit G membership",
     "explicit T membership"
   ],
   "source": {
-    "contentTopology": "C_0=R; C_(n+1)=C_n ⟼ B(byte_n)",
-    "sourceOccurrenceTopology": "S = S ⟼ C",
+    "contentTopology": "C_0=R; C_(n+1)=ensure(C_n,B(byte_n))",
+    "sourceTopology": "S = S ⟼ C",
+    "sameContentSameSourceForm": true,
     "byteProtocolRefsAreSuppliedByLowerLayer": true,
     "rawBytesAreSemanticIdentity": false,
-    "unicodeNormalization": "none",
-    "invalidUtf8ByteContentRepresentable": true
+    "unicodeNormalization": "none"
   },
   "selectedSegment": {
     "spanTopology": "Span = sourcePrefix(start) ⟼ sourcePrefix(end)",
     "sliceEvidenceTopology": "SliceEvidence = Span ⟼ sliceContent",
-    "lexemeOccurrenceTopology": "Lexeme = S ⟼ SliceEvidence",
-    "resolutionTopology": "Resolution = Lexeme ⟼ form",
-    "selectionTopology": "Selection = exactVisibleDefinitionOccurrence ⟼ Resolution",
+    "resolutionTopology": "Resolution = sourceUse ⟼ form",
+    "selectionTopology": "Selection = visibleDefinition ⟼ Resolution",
     "hostOffsetsAreTransportEvidenceNotSemanticIdentity": true
   },
   "dictionary": {
     "scopeTopology": "D = D ⟼ (parentScope ⟼ localHistory)",
     "entryTopology": "Entry = sliceContent ⟼ form",
-    "definitionOccurrenceTopology": "Occurrence = D_before ⟼ Entry",
-    "selectedOccurrenceMustBeVisibleFromCurrentScope": true,
-    "visibilityProof": "walk exact local-history predecessors, then explicit parent scopes",
+    "selectedDefinitionMustBeVisibleFromCurrentScope": true,
     "localMappingShadowsParent": true,
     "distinctLocalFormsConflict": true,
-    "flatDirectMembershipIsCanonical": false,
     "sameBytesMayResolveDifferentlyUnderDifferentDictionaries": true
   },
   "sequence": {
-    "selectionSequence": "fold(R, exact Selection occurrences in source order)",
-    "formSequence": "fold(R, resolved exact form occurrences in source order)",
+    "selectionSequence": "canonical fold from R over selected values in source order",
+    "formSequence": "canonical fold from R over resolved forms in source order",
     "grammarMembership": "G ⟼ formSequence",
     "theoryMembership": "T ⟼ formSequence",
-    "implicitLongestMatch": false,
-    "candidateSearchTrusted": false
+    "repeatedValueCreatesNewSemanticLink": false,
+    "implicitLongestMatch": false
   },
   "replay": {
-    "selectedBoundariesVerifiedAgainstCanonicalSourceHistory": true,
-    "sliceContentVerifiedAgainstExactSelectedBytes": true,
+    "selectedBoundariesVerified": true,
     "scopedDictionaryVisibilityVerified": true,
     "grammarMembershipVerified": true,
     "theoryMembershipVerified": true,
-    "orderedSequencesVerified": true,
     "readOnly": true,
     "applicationLinkMaterialization": false
+  },
+  "identity": {
+    "semanticIdentity": "rooted structural identity",
+    "technicalSourceHandleIsSemanticIdentity": false,
+    "definitionStorageIdIsSemanticIdentity": false,
+    "sameDistinguishedPolesSameLink": true
   },
   "productionBoundary": {
     "legacyParserDependency": false,
     "legacyAstDependency": false,
     "tokenKindSemanticIdentity": false,
-    "perGlyphSemanticDispatch": false,
-    "sequenceToApamemorySemanticsOwnedByIssue": 242,
-    "persistentBackendOwnedByIssue": 124,
-    "interpreterMigrationDone": false,
+    "foundationV2Accepted": false,
     "aproverRepinAllowed": false
   },
-  "requiredVectors": [
-    "multi-byte UTF-8 glyph selected as one slice",
-    "same bytes under D1/D2 resolve differently",
-    "ambiguous split and whole-token segmentations both replay when explicitly admitted",
-    "visible historical declaration occurrence remains valid under later snapshot",
-    "unreachable declaration occurrence rejects",
-    "forged span rejects",
-    "forged G/T admission rejects",
-    "partial/non-contiguous partition rejects",
-    "read-only replay does not create described application links"
-  ],
-  "nextGate": "same interpreter/replay engine with persistent scoped colon effect and then local equality"
+  "nextGate": "complete semantic reset #343 across dependent contracts and active issues"
 }
