@@ -4,11 +4,7 @@
   "accepted": true,
   "issue": 156,
   "dependsOn": [
-    "mts-contract/v0.4",
-    "mts-deictic-context-challenge/v0.5",
-    "mts-context-dependency-challenge/v0.5",
-    "mts-context-dependency-decision/v0.5",
-    "mts-direct-deixis-challenge/v0.5"
+    "mts-contract/v0.4"
   ],
   "conformanceCorpus": "contracts/mts-direct-deixis-conformance-v0.5.json",
   "scope": "normative read-only structural detection of explicit ContextPronoun occurrences in one typed L2 Expression; no evaluation, dependency closure, sensitivity or invariance theorem",
@@ -76,14 +72,6 @@
     "definitionCount": 10,
     "mustRemainUnchanged": true,
     "analysisMayInspectWithoutMutation": true
-  },
-  "acceptanceEvidence": {
-    "deicticContextChallenge": "contracts/mts-deictic-context-challenge-v0.5.json",
-    "dependencyChallenge": "contracts/mts-context-dependency-challenge-v0.5.json",
-    "dependencyDecision": "contracts/mts-context-dependency-decision-v0.5.json",
-    "directChallenge": "contracts/mts-direct-deixis-challenge-v0.5.json",
-    "challengeCorpus": "contracts/mts-direct-deixis-conformance-candidate-v0.5.json",
-    "acceptedConformance": "contracts/mts-direct-deixis-conformance-v0.5.json"
   },
   "versioning": {
     "mtsContractV04Modified": false,
