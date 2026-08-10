@@ -347,6 +347,89 @@ def replay_flat_source_subselection_reading(
             )
 
 
+def replay_flat_source_subselection_continuation(
+    network: LinkNetwork,
+    evidence: FlatSequenceReadingEvidence,
+    byte_refs: Mapping[int, OccurrenceRef],
+    *,
+    start_segment: int,
+    end_segment: int,
+    selection_sequence: OccurrenceRef,
+    form_sequence: OccurrenceRef,
+    grammar: OccurrenceRef,
+    theory: OccurrenceRef,
+    grammar_membership: OccurrenceRef,
+    theory_membership: OccurrenceRef,
+) -> OccurrenceRef:
+    """Continue one exact left fold from ``K_before.current`` over a subselection.
+
+    This is sequence continuation, not bracket semantics. The selected source
+    suffix is trusted through the same source-subselection evidence as an
+    ordinary flat reading. Replay only verifies an already-existing exact result;
+    it never creates the intermediate or final links.
+    """
+
+    before_snapshot = network.snapshot()
+    try:
+        try:
+            forms = replay_source_subselection(
+                network,
+                evidence.source_evidence,
+                byte_refs,
+                start_segment=start_segment,
+                end_segment=end_segment,
+                selection_sequence=selection_sequence,
+                form_sequence=form_sequence,
+                grammar=grammar,
+                theory=theory,
+                grammar_membership=grammar_membership,
+                theory_membership=theory_membership,
+            )
+        except SourceReplayError as exc:
+            raise InterpreterReplayError(
+                "invalid continuation source subselection evidence"
+            ) from exc
+
+        try:
+            parent = parent_of_context(network, evidence.before_context)
+            prefix = current_of_context(network, evidence.before_context)
+            after_parent = parent_of_context(network, evidence.after_context)
+            after_current = current_of_context(network, evidence.after_context)
+        except FoundationStateError as exc:
+            raise InterpreterReplayError("invalid continuation context") from exc
+
+        _verify_flat_sequence_continuation_result(
+            network,
+            prefix,
+            forms,
+            evidence.result,
+        )
+        if after_parent is not parent:
+            raise InterpreterReplayError(
+                "flat continuation changed the explicit parent"
+            )
+        if after_current is not evidence.result:
+            raise InterpreterReplayError(
+                "flat-continuation after-context current is not the exact result"
+            )
+
+        _verify_flat_sequence_act_header(network, evidence)
+        _verify_flat_sequence_act_fields(
+            network,
+            evidence,
+            source_selection=selection_sequence,
+            form_sequence=form_sequence,
+            grammar=grammar,
+            theory=theory,
+        )
+        return evidence.result
+    finally:
+        if network.snapshot() != before_snapshot:
+            raise InterpreterReplayError(
+                "flat source-subselection continuation mutated the network"
+            )
+
+
 def replay_colon_effect(
     network: LinkNetwork,
     evidence: ColonEffectEvidence,
@@ -592,6 +675,26 @@ def _verify_flat_sequence_result(
     if current is not forms[0]:
         raise InterpreterReplayError(
             "flat sequence result does not start from the first exact form"
+        )
+
+
+def _verify_flat_sequence_continuation_result(
+    network: LinkNetwork,
+    prefix: OccurrenceRef,
+    forms: tuple[OccurrenceRef, ...],
+    result: OccurrenceRef,
+) -> None:
+    current = result
+    for expected_end in reversed(forms):
+        link = network.link(current)
+        if link.end is not expected_end:
+            raise InterpreterReplayError(
+                "flat continuation result does not match exact left fold"
+            )
+        current = link.start
+    if current is not prefix:
+        raise InterpreterReplayError(
+            "flat continuation result does not start from exact K current"
         )
 
 
