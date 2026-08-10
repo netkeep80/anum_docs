@@ -187,38 +187,76 @@ def replay_relation_step(
             raise InterpreterReplayError(
                 "relation-step source must select exactly the claimed form"
             )
-
-        try:
-            parent = parent_of_context(network, evidence.before_context)
-            current = current_of_context(network, evidence.before_context)
-        except FoundationStateError as exc:
-            raise InterpreterReplayError("invalid before-context") from exc
-        if evidence.binding is not current:
-            raise InterpreterReplayError("binding is not exact current resolved from K")
-
-        expected_start, expected_end = _expected_result_poles(
-            network, evidence.form, evidence.binding
+        return _replay_relation_selected_form(
+            network,
+            evidence,
+            source_selection=evidence.source_evidence.selection_sequence,
+            form_sequence=evidence.source_evidence.form_sequence,
+            grammar=evidence.source_evidence.grammar,
+            theory=evidence.source_evidence.theory,
         )
-        result_link = network.link(evidence.result)
-        if result_link.start is not expected_start or result_link.end is not expected_end:
-            raise InterpreterReplayError("result occurrence has forged poles")
-
-        try:
-            after_parent = parent_of_context(network, evidence.after_context)
-            after_current = current_of_context(network, evidence.after_context)
-        except FoundationStateError as exc:
-            raise InterpreterReplayError("invalid after-context") from exc
-        if after_parent is not parent:
-            raise InterpreterReplayError("after-context changed the explicit parent")
-        if after_current is not evidence.result:
-            raise InterpreterReplayError("after-context current is not the exact result")
-
-        _verify_relation_act_header(network, evidence)
-        _verify_relation_act_fields(network, evidence)
-        return evidence.result
     finally:
         if network.snapshot() != before_snapshot:
             raise InterpreterReplayError("interpreter replay mutated the network")
+
+
+def replay_relation_source_subselection_step(
+    network: LinkNetwork,
+    evidence: RelationStepEvidence,
+    byte_refs: Mapping[int, OccurrenceRef],
+    *,
+    start_segment: int,
+    end_segment: int,
+    selection_sequence: OccurrenceRef,
+    form_sequence: OccurrenceRef,
+    grammar: OccurrenceRef,
+    theory: OccurrenceRef,
+    grammar_membership: OccurrenceRef,
+    theory_membership: OccurrenceRef,
+) -> OccurrenceRef:
+    """Replay one-pole relation resolution from a trusted whole-source subselection.
+
+    The semantic source remains ``evidence.source_evidence.source``. The selected
+    source/form folds and G/T refs name one exact contiguous subselection of that
+    whole source. No secondary source occurrence or bracket-specific opcode is
+    introduced.
+    """
+
+    before_snapshot = network.snapshot()
+    try:
+        try:
+            forms = replay_source_subselection(
+                network,
+                evidence.source_evidence,
+                byte_refs,
+                start_segment=start_segment,
+                end_segment=end_segment,
+                selection_sequence=selection_sequence,
+                form_sequence=form_sequence,
+                grammar=grammar,
+                theory=theory,
+                grammar_membership=grammar_membership,
+                theory_membership=theory_membership,
+            )
+        except SourceReplayError as exc:
+            raise InterpreterReplayError("invalid relation source subselection") from exc
+        if forms != (evidence.form,):
+            raise InterpreterReplayError(
+                "relation-step subselection must select exactly the claimed form"
+            )
+        return _replay_relation_selected_form(
+            network,
+            evidence,
+            source_selection=selection_sequence,
+            form_sequence=form_sequence,
+            grammar=grammar,
+            theory=theory,
+        )
+    finally:
+        if network.snapshot() != before_snapshot:
+            raise InterpreterReplayError(
+                "relation source-subselection replay mutated the network"
+            )
 
 
 def replay_flat_sequence_reading(
@@ -443,6 +481,52 @@ def _replay_source(
         raise InterpreterReplayError("invalid source-front-end evidence") from exc
 
 
+def _replay_relation_selected_form(
+    network: LinkNetwork,
+    evidence: RelationStepEvidence,
+    *,
+    source_selection: OccurrenceRef,
+    form_sequence: OccurrenceRef,
+    grammar: OccurrenceRef,
+    theory: OccurrenceRef,
+) -> OccurrenceRef:
+    try:
+        parent = parent_of_context(network, evidence.before_context)
+        current = current_of_context(network, evidence.before_context)
+    except FoundationStateError as exc:
+        raise InterpreterReplayError("invalid before-context") from exc
+    if evidence.binding is not current:
+        raise InterpreterReplayError("binding is not exact current resolved from K")
+
+    expected_start, expected_end = _expected_result_poles(
+        network, evidence.form, evidence.binding
+    )
+    result_link = network.link(evidence.result)
+    if result_link.start is not expected_start or result_link.end is not expected_end:
+        raise InterpreterReplayError("result occurrence has forged poles")
+
+    try:
+        after_parent = parent_of_context(network, evidence.after_context)
+        after_current = current_of_context(network, evidence.after_context)
+    except FoundationStateError as exc:
+        raise InterpreterReplayError("invalid after-context") from exc
+    if after_parent is not parent:
+        raise InterpreterReplayError("after-context changed the explicit parent")
+    if after_current is not evidence.result:
+        raise InterpreterReplayError("after-context current is not the exact result")
+
+    _verify_relation_act_header(network, evidence)
+    _verify_relation_act_fields(
+        network,
+        evidence,
+        source_selection=source_selection,
+        form_sequence=form_sequence,
+        grammar=grammar,
+        theory=theory,
+    )
+    return evidence.result
+
+
 def _replay_flat_selected_forms(
     network: LinkNetwork,
     evidence: FlatSequenceReadingEvidence,
@@ -543,19 +627,20 @@ def _verify_relation_act_header(
 def _verify_relation_act_fields(
     network: LinkNetwork,
     evidence: RelationStepEvidence,
+    *,
+    source_selection: OccurrenceRef,
+    form_sequence: OccurrenceRef,
+    grammar: OccurrenceRef,
+    theory: OccurrenceRef,
 ) -> None:
     source = evidence.source_evidence
     expected = (
         (evidence.roles.source, source.source, "source"),
-        (
-            evidence.roles.source_selection,
-            source.selection_sequence,
-            "source-selection",
-        ),
-        (evidence.roles.form_sequence, source.form_sequence, "form-sequence"),
+        (evidence.roles.source_selection, source_selection, "source-selection"),
+        (evidence.roles.form_sequence, form_sequence, "form-sequence"),
         (evidence.roles.dictionary, source.dictionary, "dictionary"),
-        (evidence.roles.grammar, source.grammar, "grammar"),
-        (evidence.roles.theory, source.theory, "theory"),
+        (evidence.roles.grammar, grammar, "grammar"),
+        (evidence.roles.theory, theory, "theory"),
         (evidence.roles.form, evidence.form, "form"),
         (
             evidence.roles.before_context,
