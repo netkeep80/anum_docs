@@ -4,8 +4,6 @@
   "accepted": true,
   "issue": 161,
   "dependsOn": [
-    "mts-opening-path-decision/v0.4",
-    "mts-opening-path-challenge/v0.4",
     "mts-definition-opening/v0.3",
     "mts-derivation-base/v0.3",
     "mts-proof/v0.3"
@@ -123,7 +121,6 @@
   "productionIntegration": {
     "referenceCore": "core/mtc_opening_path.py",
     "productionConformance": "tests/test_mts_opening_path_reference.py",
-    "challengeCorpus": "contracts/mts-opening-path-conformance-candidate-v0.4.json",
     "acceptedConformance": "contracts/mts-opening-path-conformance-v0.4.json"
   },
   "versioning": {
