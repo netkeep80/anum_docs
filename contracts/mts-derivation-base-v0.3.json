@@ -4,9 +4,7 @@
   "accepted": true,
   "issue": 122,
   "dependsOn": [
-    "mts-contract/v0.3",
-    "mts-proof-domain-decision/v0.3",
-    "mts-proof-lifting-challenge/v0.3"
+    "mts-contract/v0.3"
   ],
   "conformanceCorpus": "contracts/mts-derivation-base-conformance-v0.3.json",
   "scope": "accepted primitive typed derivation relations backed by independent replay of already accepted canonical operations; no multi-step composition rules",
@@ -89,23 +87,16 @@
     "openingToEqualityAccepted": false,
     "recursiveNormalizationAccepted": false
   },
-  "proofVersionBoundary": {
-    "mtsProofV02Modified": false,
-    "mtsProofV02TrustedRuleSet": ["interpret"],
-    "mtsProofV03Published": false,
-    "productionV03CheckerImplemented": false,
-    "aproverProofRepinAllowed": false
+  "productionIntegration": {
+    "proofContract": "mts-proof/v0.3",
+    "proofConformance": "contracts/mts-proof-conformance-v0.3.json",
+    "checker": "core/proof_checker.py",
+    "acceptedRelationsPublished": true,
+    "proofSearchTrusted": false,
+    "genericCompositionAccepted": false
   },
-  "nextGate": {
-    "goal": "define a versioned mts-proof/v0.3 artifact/checker that can independently validate these accepted base relations while preserving v0.2 replay compatibility",
-    "requirements": [
-      "each step names one accepted relation",
-      "step contains complete explicit replay substrate",
-      "checker independently replays the corresponding canonical operation",
-      "forged relation/arguments/results are rejected",
-      "no generic step composition yet",
-      "no proof-search dependency",
-      "cycles remain finite"
-    ]
+  "downstream": {
+    "aproverProofRepinAllowed": false,
+    "reason": "downstream exact pin follows additive accepted umbrella contracts rather than this base relation contract directly"
   }
 }

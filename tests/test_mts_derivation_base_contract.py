@@ -7,29 +7,20 @@ from pathlib import Path
 ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-derivation-base-v0.3.json"
 CONFORMANCE = ROOT / "contracts" / "mts-derivation-base-conformance-v0.3.json"
-DOMAIN_DECISION = ROOT / "contracts" / "mts-proof-domain-decision-v0.3.json"
-LIFTING_CHALLENGE = ROOT / "contracts" / "mts-proof-lifting-challenge-v0.3.json"
-LIFTING_CORPUS = ROOT / "contracts" / "mts-proof-lifting-conformance-v0.3.json"
-PROOF_V02 = ROOT / "contracts" / "mts-proof-v0.2.json"
+PROOF_V03 = ROOT / "contracts" / "mts-proof-v0.3.json"
 
 
 def read(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_contract_is_accepted_only_after_domain_decision_and_lifting_challenge():
+def test_contract_is_accepted_and_depends_only_on_normative_v03_surface():
     contract = read(CONTRACT)
-    decision = read(DOMAIN_DECISION)
-    challenge = read(LIFTING_CHALLENGE)
 
     assert contract["schema"] == "mts-derivation-base/v0.3"
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
-    assert contract["dependsOn"] == [
-        "mts-contract/v0.3",
-        decision["schema"],
-        challenge["schema"],
-    ]
+    assert contract["dependsOn"] == ["mts-contract/v0.3"]
     assert contract["conformanceCorpus"] == "contracts/mts-derivation-base-conformance-v0.3.json"
 
 
@@ -54,26 +45,25 @@ def test_exact_five_relations_are_accepted_and_all_name_explicit_scope():
     assert relations["NonAddressableDefinitionTarget"]["globalSemanticInvalidity"] is False
 
 
-def test_accepted_conformance_selects_challenged_vectors_without_erasing_counterexamples():
+def test_accepted_conformance_owns_lifting_vectors_and_counterexamples():
     conformance = read(CONFORMANCE)
-    challenge_corpus = read(LIFTING_CORPUS)
-    challenge_ids = {item["id"] for item in challenge_corpus["vectors"]}
+    vector_ids = {item["id"] for item in conformance["vectors"]}
 
     assert conformance["schema"] == "mts-derivation-base-conformance/v0.3"
     assert conformance["status"] == "accepted"
     assert conformance["accepted"] is True
     assert conformance["contract"] == "mts-derivation-base/v0.3"
-    assert conformance["sourceChallenge"] == "contracts/mts-proof-lifting-conformance-v0.3.json"
 
     selected = {
         item
         for values in conformance["acceptedVectors"].values()
         for item in values
     }
-    assert selected.issubset(challenge_ids)
-    assert set(conformance["requiredCounterexamples"]).issubset(challenge_ids)
+    assert selected.issubset(vector_ids)
+    assert set(conformance["requiredCounterexamples"]).issubset(vector_ids)
     assert "contextual-satisfaction-countercontext" in conformance["requiredCounterexamples"]
     assert "same-target-other-environment" in conformance["requiredCounterexamples"]
+    assert conformance["forbiddenConclusions"]
 
 
 def test_independent_replay_remains_part_of_trusted_boundary():
@@ -113,19 +103,24 @@ def test_no_composition_or_classical_rule_is_accepted_by_base_contract():
     }
 
 
-def test_v02_proof_kernel_stays_unchanged_and_v03_checker_is_next_gate():
+def test_accepted_proof_v03_is_current_production_consumer_without_search_trust():
     contract = read(CONTRACT)
-    proof_v02 = read(PROOF_V02)
-    boundary = contract["proofVersionBoundary"]
+    proof = read(PROOF_V03)
+    integration = contract["productionIntegration"]
 
-    assert proof_v02["checker"]["trustedRuleSet"] == ["interpret"]
-    assert boundary["mtsProofV02Modified"] is False
-    assert boundary["mtsProofV02TrustedRuleSet"] == ["interpret"]
-    assert boundary["mtsProofV03Published"] is False
-    assert boundary["productionV03CheckerImplemented"] is False
-    assert boundary["aproverProofRepinAllowed"] is False
-
-    gate = contract["nextGate"]
-    assert gate["goal"].startswith("define a versioned mts-proof/v0.3 artifact/checker")
-    assert "no generic step composition yet" in gate["requirements"]
-    assert "no proof-search dependency" in gate["requirements"]
+    assert proof["schema"] == "mts-proof/v0.3"
+    assert proof["accepted"] is True
+    assert set(proof["trustedRelations"]) == {
+        "ContextuallySatisfies",
+        "Opens",
+        "NoVisibleDefinition",
+        "DefinitionConflict",
+        "NonAddressableDefinitionTarget",
+    }
+    assert integration["proofContract"] == "mts-proof/v0.3"
+    assert integration["proofConformance"] == "contracts/mts-proof-conformance-v0.3.json"
+    assert integration["checker"] == "core/proof_checker.py"
+    assert integration["acceptedRelationsPublished"] is True
+    assert integration["proofSearchTrusted"] is False
+    assert integration["genericCompositionAccepted"] is False
+    assert contract["downstream"]["aproverProofRepinAllowed"] is False
