@@ -1,19 +1,25 @@
-"""Storage-neutral exact-occurrence binary-link network for Foundation-v2 Gate P.
+"""Storage-neutral binary-link network for the MTS Foundation-v2 reset.
 
-This module is intentionally smaller than the MTS language. A semantic link has
-exactly two fields, ``start`` and ``end``. Context, dictionary, theory, act,
-source, equality, token and AST roles are *not* link tags; higher layers may
-represent those roles with ordinary link occurrences.
+A semantic MTS link is completely determined by its ordered poles. Therefore one
+network state cannot contain two distinct semantic links with the same
+``(start, end)`` pair.
 
-``OccurrenceRef`` is network-lineage-local identity. A portable snapshot stores
-local slots, but loading it creates a fresh identity scope. Consequently a
-backend address, a snapshot slot and a runtime occurrence ref are deliberately
-not one universal identifier.
+``OccurrenceRef`` remains temporarily as a *technical handle* issued by one
+runtime network/build scope. Its slot and Python object identity are useful for
+finite cyclic construction and safe access, but they are not an additional MTS
+identity field. Higher layers must not use a different handle as justification
+for a second link with equal poles.
 
-An immutable network may be evolved into a new immutable state in the *same*
-runtime identity lineage. Existing occurrence objects and links are preserved
-exactly; only newly reserved occurrences may be added. This is the substrate
-boundary needed by explicit Foundation-v2 materialization effects.
+The builder API deliberately separates two cases:
+
+* ``reserve`` + ``define`` is low-level construction machinery required for
+  cycles and self-reference; defining a duplicate pair is rejected;
+* ``ensure(start, end)`` is canonical materialization: it returns the already
+  defined link for that pair or creates exactly one new link.
+
+Snapshots contain transport-local integer slots only. Loading a snapshot issues
+fresh runtime handles, but this says nothing about a new semantic identity: the
+restored MTS network is still canonical by ordered poles.
 """
 from __future__ import annotations
 
@@ -22,12 +28,12 @@ from typing import Iterable
 
 
 class LinkNetworkError(ValueError):
-    """Invalid exact-occurrence network construction or access."""
+    """Invalid canonical binary-link network construction or access."""
 
 
 @dataclass(frozen=True)
 class OccurrenceRef:
-    """Opaque identity of one exact occurrence inside one network scope."""
+    """Network-local technical handle, not semantic identity of an MTS link."""
 
     _scope: object = field(repr=False)
     slot: int
@@ -35,7 +41,7 @@ class OccurrenceRef:
 
 @dataclass(frozen=True)
 class Link:
-    """The only primitive semantic shape: an ordered binary relation."""
+    """The primitive semantic shape: one ordered pair of link handles."""
 
     start: OccurrenceRef
     end: OccurrenceRef
@@ -50,7 +56,7 @@ class NetworkSnapshot:
 
 
 class LinkNetwork:
-    """Immutable finite network preserving exact occurrence multiplicity."""
+    """Immutable finite MTS network with exactly one link per ordered pole pair."""
 
     def __init__(
         self,
@@ -60,7 +66,7 @@ class LinkNetwork:
         root: OccurrenceRef,
     ) -> None:
         if not links:
-            raise LinkNetworkError("LinkNetwork must contain at least one occurrence")
+            raise LinkNetworkError("LinkNetwork must contain at least one link")
         if len(refs) != len(links):
             raise LinkNetworkError("reference/link cardinality mismatch")
         self._scope = scope
@@ -68,29 +74,46 @@ class LinkNetwork:
         self._links = links
         self._root = root
         self._validate_ref(root)
+
+        pair_index: dict[tuple[OccurrenceRef, OccurrenceRef], OccurrenceRef] = {}
         for ref, link in zip(refs, links, strict=True):
             if ref.slot < 0 or ref.slot >= len(refs):
-                raise LinkNetworkError("invalid occurrence slot")
+                raise LinkNetworkError("invalid link slot")
             self._validate_ref(link.start)
             self._validate_ref(link.end)
+            pair = (link.start, link.end)
+            existing = pair_index.get(pair)
+            if existing is not None and existing is not ref:
+                raise LinkNetworkError(
+                    "duplicate semantic link pair is forbidden by MTS identity"
+                )
+            pair_index[pair] = ref
+        self._pair_index = pair_index
 
     @property
     def root(self) -> OccurrenceRef:
-        """Return the distinguished root occurrence by exact reference."""
+        """Return the distinguished root through its runtime technical handle."""
 
         return self._root
 
     @property
     def refs(self) -> tuple[OccurrenceRef, ...]:
-        """Return all exact occurrence refs in deterministic local-slot order."""
+        """Return technical handles in deterministic local-slot order."""
 
         return self._refs
 
     def link(self, ref: OccurrenceRef) -> Link:
-        """Read one exact occurrence; foreign-network refs are rejected."""
+        """Read one link; foreign or forged runtime handles are rejected."""
 
         self._validate_ref(ref)
         return self._links[ref.slot]
+
+    def find(self, start: OccurrenceRef, end: OccurrenceRef) -> OccurrenceRef | None:
+        """Return the unique materialized link for ``(start,end)``, if present."""
+
+        self._validate_ref(start)
+        self._validate_ref(end)
+        return self._pair_index.get((start, end))
 
     def snapshot(self) -> NetworkSnapshot:
         """Return deterministic storage-neutral topology in local-slot form."""
@@ -101,21 +124,22 @@ class LinkNetwork:
         )
 
     def evolve(self) -> "LinkNetworkEvolutionBuilder":
-        """Create an additive builder for a new state in this identity lineage.
+        """Create an additive builder preserving the immutable base state.
 
-        The original network stays immutable. Existing ``OccurrenceRef`` objects
-        are retained by identity in the evolved state; only new occurrences may
-        be reserved and defined. No pair interning is performed.
+        Existing runtime handles remain usable in the evolved state. New links
+        may be added, but a pair already present in the base or the current
+        evolution is always reused by :meth:`LinkNetworkEvolutionBuilder.ensure`
+        and cannot be defined a second time.
         """
 
         return LinkNetworkEvolutionBuilder(self)
 
     @classmethod
     def from_snapshot(cls, snapshot: NetworkSnapshot) -> "LinkNetwork":
-        """Load topology into a fresh identity scope."""
+        """Load canonical topology and issue fresh runtime technical handles."""
 
         if not snapshot.links:
-            raise LinkNetworkError("snapshot must contain at least one occurrence")
+            raise LinkNetworkError("snapshot must contain at least one link")
         count = len(snapshot.links)
         if snapshot.root < 0 or snapshot.root >= count:
             raise LinkNetworkError("snapshot root slot is out of range")
@@ -135,32 +159,35 @@ class LinkNetwork:
 
     def _validate_ref(self, ref: OccurrenceRef) -> None:
         if not isinstance(ref, OccurrenceRef):
-            raise LinkNetworkError("expected OccurrenceRef")
+            raise LinkNetworkError("expected network link handle")
         if ref._scope is not self._scope:
-            raise LinkNetworkError("foreign occurrence reference")
+            raise LinkNetworkError("foreign network link handle")
         if ref.slot < 0 or ref.slot >= len(self._refs):
-            raise LinkNetworkError("occurrence slot is out of range")
+            raise LinkNetworkError("link handle slot is out of range")
         if self._refs[ref.slot] is not ref:
-            # Prevent hand-crafted refs with the right scope/slot from becoming
-            # aliases of the exact object issued by this network/builder.
-            raise LinkNetworkError("occurrence reference was not issued by this network")
+            raise LinkNetworkError("link handle was not issued by this network")
 
 
 class LinkNetworkBuilder:
-    """Host construction utility for finite cyclic/shared exact networks.
+    """Finite construction utility for canonical cyclic/shared MTS networks.
 
-    Reservation exists solely so cyclic endpoints can refer to occurrences that
-    are defined later. It is construction machinery, not an ontological link
-    state or a semantic notion of an "undefined link".
+    Reservation exists solely so cyclic endpoints can refer to links that are
+    defined later. A reserved handle is construction machinery, not an
+    ontological "undefined link" and not a source of semantic identity.
     """
 
     def __init__(self) -> None:
         self._scope = object()
         self._refs: list[OccurrenceRef] = []
         self._links: list[Link | None] = []
+        self._pair_index: dict[
+            tuple[OccurrenceRef, OccurrenceRef], OccurrenceRef
+        ] = {}
         self._frozen = False
 
     def reserve(self) -> OccurrenceRef:
+        """Reserve one technical handle for low-level cyclic construction."""
+
         self._require_mutable()
         ref = OccurrenceRef(self._scope, len(self._refs))
         self._refs.append(ref)
@@ -173,13 +200,36 @@ class LinkNetworkBuilder:
         start: OccurrenceRef,
         end: OccurrenceRef,
     ) -> None:
+        """Define one reserved link, rejecting an already-defined equal pair."""
+
         self._require_mutable()
         self._validate_reserved(ref)
         self._validate_reserved(start)
         self._validate_reserved(end)
         if self._links[ref.slot] is not None:
-            raise LinkNetworkError("occurrence is already defined")
+            raise LinkNetworkError("reserved link is already defined")
+
+        pair = (start, end)
+        existing = self._pair_index.get(pair)
+        if existing is not None and existing is not ref:
+            raise LinkNetworkError(
+                "duplicate semantic link pair is forbidden by MTS identity"
+            )
         self._links[ref.slot] = Link(start, end)
+        self._pair_index[pair] = ref
+
+    def ensure(self, start: OccurrenceRef, end: OccurrenceRef) -> OccurrenceRef:
+        """Return the canonical link for a pair, materializing it when absent."""
+
+        self._require_mutable()
+        self._validate_reserved(start)
+        self._validate_reserved(end)
+        existing = self._pair_index.get((start, end))
+        if existing is not None:
+            return existing
+        ref = self.reserve()
+        self.define(ref, start, end)
+        return ref
 
     def define_many(
         self,
@@ -193,7 +243,7 @@ class LinkNetworkBuilder:
         self._validate_reserved(root)
         missing = [ref.slot for ref, link in zip(self._refs, self._links) if link is None]
         if missing:
-            raise LinkNetworkError(f"unbound occurrences: {missing}")
+            raise LinkNetworkError(f"unbound reserved links: {missing}")
         if not self._refs:
             raise LinkNetworkError("cannot freeze an empty network")
 
@@ -204,13 +254,13 @@ class LinkNetworkBuilder:
 
     def _validate_reserved(self, ref: OccurrenceRef) -> None:
         if not isinstance(ref, OccurrenceRef):
-            raise LinkNetworkError("expected OccurrenceRef")
+            raise LinkNetworkError("expected reserved link handle")
         if ref._scope is not self._scope:
-            raise LinkNetworkError("foreign occurrence reference")
+            raise LinkNetworkError("foreign reserved link handle")
         if ref.slot < 0 or ref.slot >= len(self._refs):
-            raise LinkNetworkError("occurrence was not reserved by this builder")
+            raise LinkNetworkError("link handle was not reserved by this builder")
         if self._refs[ref.slot] is not ref:
-            raise LinkNetworkError("occurrence reference was not issued by this builder")
+            raise LinkNetworkError("link handle was not issued by this builder")
 
     def _require_mutable(self) -> None:
         if self._frozen:
@@ -218,13 +268,12 @@ class LinkNetworkBuilder:
 
 
 class LinkNetworkEvolutionBuilder:
-    """Additive persistent-state builder preserving existing exact identity.
+    """Additive immutable-state builder with canonical pair reuse.
 
-    This builder represents an explicit effect boundary. It never mutates the
-    base network. Existing occurrences are immutable and keep the exact same
-    ``OccurrenceRef`` objects in the returned state. Newly reserved occurrences
-    are appended in the same runtime identity scope and may point to old or new
-    occurrences. Duplicate pole pairs are deliberately allowed.
+    The base network is never mutated. Existing handles are retained only as
+    runtime access handles. New ``define`` calls cannot duplicate any ordered
+    pair; ``ensure`` reuses the existing link whenever the pair is already
+    materialized.
     """
 
     def __init__(self, base: LinkNetwork) -> None:
@@ -232,16 +281,21 @@ class LinkNetworkEvolutionBuilder:
         self._scope = base._scope
         self._refs: list[OccurrenceRef] = list(base._refs)
         self._links: list[Link | None] = list(base._links)
+        self._pair_index: dict[
+            tuple[OccurrenceRef, OccurrenceRef], OccurrenceRef
+        ] = dict(base._pair_index)
         self._base_count = len(self._refs)
         self._frozen = False
 
     @property
     def base_count(self) -> int:
-        """Number of exact occurrences inherited from the immutable base state."""
+        """Number of links inherited from the immutable base state."""
 
         return self._base_count
 
     def reserve(self) -> OccurrenceRef:
+        """Reserve a technical handle for a genuinely new cyclic link."""
+
         self._require_mutable()
         ref = OccurrenceRef(self._scope, len(self._refs))
         self._refs.append(ref)
@@ -254,15 +308,38 @@ class LinkNetworkEvolutionBuilder:
         start: OccurrenceRef,
         end: OccurrenceRef,
     ) -> None:
+        """Define a new reserved link; duplicate ordered pairs are rejected."""
+
         self._require_mutable()
         self._validate_reserved(ref)
         self._validate_reserved(start)
         self._validate_reserved(end)
         if ref.slot < self._base_count:
-            raise LinkNetworkError("base occurrence is immutable during evolution")
+            raise LinkNetworkError("base link is immutable during evolution")
         if self._links[ref.slot] is not None:
-            raise LinkNetworkError("occurrence is already defined")
+            raise LinkNetworkError("reserved evolved link is already defined")
+
+        pair = (start, end)
+        existing = self._pair_index.get(pair)
+        if existing is not None and existing is not ref:
+            raise LinkNetworkError(
+                "duplicate semantic link pair is forbidden by MTS identity"
+            )
         self._links[ref.slot] = Link(start, end)
+        self._pair_index[pair] = ref
+
+    def ensure(self, start: OccurrenceRef, end: OccurrenceRef) -> OccurrenceRef:
+        """Return the canonical link for a pair, appending it only when absent."""
+
+        self._require_mutable()
+        self._validate_reserved(start)
+        self._validate_reserved(end)
+        existing = self._pair_index.get((start, end))
+        if existing is not None:
+            return existing
+        ref = self.reserve()
+        self.define(ref, start, end)
+        return ref
 
     def define_many(
         self,
@@ -272,7 +349,7 @@ class LinkNetworkEvolutionBuilder:
             self.define(ref, start, end)
 
     def freeze(self, root: OccurrenceRef | None = None) -> LinkNetwork:
-        """Return a new immutable state in the same exact-identity lineage."""
+        """Return a new immutable canonical state in the same runtime scope."""
 
         self._require_mutable()
         selected_root = self._base.root if root is None else root
@@ -283,7 +360,7 @@ class LinkNetworkEvolutionBuilder:
             if link is None
         ]
         if missing:
-            raise LinkNetworkError(f"unbound evolved occurrences: {missing}")
+            raise LinkNetworkError(f"unbound evolved links: {missing}")
 
         refs = tuple(self._refs)
         links = tuple(link for link in self._links if link is not None)
@@ -292,13 +369,13 @@ class LinkNetworkEvolutionBuilder:
 
     def _validate_reserved(self, ref: OccurrenceRef) -> None:
         if not isinstance(ref, OccurrenceRef):
-            raise LinkNetworkError("expected OccurrenceRef")
+            raise LinkNetworkError("expected network link handle")
         if ref._scope is not self._scope:
-            raise LinkNetworkError("foreign occurrence reference")
+            raise LinkNetworkError("foreign network link handle")
         if ref.slot < 0 or ref.slot >= len(self._refs):
-            raise LinkNetworkError("occurrence was not reserved in this lineage")
+            raise LinkNetworkError("link handle was not reserved in this runtime scope")
         if self._refs[ref.slot] is not ref:
-            raise LinkNetworkError("occurrence reference was not issued by this lineage")
+            raise LinkNetworkError("link handle was not issued by this runtime scope")
 
     def _require_mutable(self) -> None:
         if self._frozen:
