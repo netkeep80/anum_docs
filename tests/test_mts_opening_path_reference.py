@@ -19,7 +19,6 @@ from core.mtc_parser import parse_formula
 ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-opening-path-v0.4.json"
 CONFORMANCE = ROOT / "contracts" / "mts-opening-path-conformance-v0.4.json"
-CHALLENGE_CORPUS = ROOT / "contracts" / "mts-opening-path-conformance-candidate-v0.4.json"
 MTS_V04 = ROOT / "contracts" / "mts-contract-v0.4.json"
 PROOF_V03 = ROOT / "contracts" / "mts-proof-v0.3.json"
 CORE = ROOT / "core" / "mtc_opening_path.py"
@@ -125,6 +124,7 @@ def test_contract_is_accepted_standalone_and_old_releases_are_immutable():
     assert conformance["schema"] == "mts-opening-path-conformance/v0.4"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
+    assert contract["conformanceCorpus"] == "contracts/mts-opening-path-conformance-v0.4.json"
     assert contract["versioning"]["mtsContractV04Modified"] is False
     assert contract["versioning"]["mtsProofV03Modified"] is False
     assert contract["versioning"]["publishedThroughUmbrella"] is False
@@ -132,32 +132,51 @@ def test_contract_is_accepted_standalone_and_old_releases_are_immutable():
     assert contract["schema"] not in PROOF_V03.read_text(encoding="utf-8")
 
 
-def test_conformance_selects_all_green_challenge_vectors_without_copying():
+def test_accepted_conformance_owns_complete_vector_corpus():
     conformance = read(CONFORMANCE)
-    corpus = read(CHALLENGE_CORPUS)
 
-    assert conformance["sourceCorpus"] == (
-        "contracts/mts-opening-path-conformance-candidate-v0.4.json"
-    )
-    assert conformance["selection"] == {"validPaths": "all", "invalidPaths": "all"}
-    assert "validPaths" not in conformance
-    assert "invalidPaths" not in conformance
-    assert corpus["status"] == "candidate-challenge-corpus"
+    assert conformance["validPaths"]
+    assert conformance["invalidPaths"]
+    assert {item["id"] for item in conformance["validPaths"]} == {
+        "one-edge",
+        "ends-in-non-form-judgment",
+        "two-edge",
+        "ends-in-constraint-bundle",
+        "child-shadowing",
+        "self-cycle-one-edge",
+        "mutual-cycle-two-edges",
+        "structural-adjacency-whitespace",
+    }
+    assert {item["id"] for item in conformance["invalidPaths"]} == {
+        "zero-edge",
+        "repeated-definition-id",
+        "forged-body",
+        "forged-definition-id",
+        "next-target-mismatch",
+        "start-target-mismatch",
+        "continue-after-non-form",
+        "continue-after-non-addressable-form",
+        "no-match-edge",
+        "conflict-edge",
+        "non-addressable-edge",
+        "forged-final-body",
+    }
 
 
-def test_every_challenge_vector_replays_fail_closed_in_production():
-    corpus = read(CHALLENGE_CORPUS)
+def test_every_accepted_vector_replays_fail_closed_in_production():
+    conformance = read(CONFORMANCE)
 
-    for vector in corpus["validPaths"]:
+    for vector in conformance["validPaths"]:
         assert verify_portable(vector), vector["id"]
-    for vector in corpus["invalidPaths"]:
+    for vector in conformance["invalidPaths"]:
         assert not verify_portable(vector), vector["id"]
 
 
 def test_transport_is_canonical_for_bodies_but_structural_for_targets():
+    conformance = read(CONFORMANCE)
     vector = next(
         deepcopy(item)
-        for item in read(CHALLENGE_CORPUS)["validPaths"]
+        for item in conformance["validPaths"]
         if item["id"] == "structural-adjacency-whitespace"
     )
 
@@ -183,7 +202,7 @@ def test_transport_is_canonical_for_bodies_but_structural_for_targets():
 
     bundle = next(
         deepcopy(item)
-        for item in read(CHALLENGE_CORPUS)["validPaths"]
+        for item in conformance["validPaths"]
         if item["id"] == "ends-in-constraint-bundle"
     )
     bundle["finalBody"] = "{ ◁ = x, ▷ = y }"
