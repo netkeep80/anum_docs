@@ -31,9 +31,17 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _anchor(builder: LinkNetworkBuilder):
-    ref = builder.reserve()
-    builder.define(ref, ref, ref)
-    return ref
+    if not builder._refs:
+        return builder.ensure_root()
+    current = next(
+        ref
+        for ref, link in reversed(list(zip(builder._refs, builder._links)))
+        if link is not None
+    )
+    count = len(builder._refs)
+    while len(builder._refs) == count:
+        current = builder.ensure_start_self_closed(current)
+    return current
 
 
 def _link(builder: LinkNetworkBuilder, start, end):
@@ -276,8 +284,7 @@ def test_partial_relation_rejects_even_with_true_local_equality_premise() -> Non
     root = _anchor(builder)
     context = define_context(builder, _anchor(builder), _anchor(builder))
     fixed = _anchor(builder)
-    left = builder.reserve()
-    builder.define(left, left, fixed)
+    left = builder.ensure_start_self_closed(fixed)
     right = _link(builder, _anchor(builder), _anchor(builder))
     representative = _anchor(builder)
     define_local_representative_binding(builder, context, left, representative)
