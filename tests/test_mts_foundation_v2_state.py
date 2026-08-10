@@ -23,9 +23,20 @@ from core.foundation_v2_state import (
 
 
 def _anchor(builder: LinkNetworkBuilder):
-    ref = builder.reserve()
-    builder.define(ref, ref, ref)
-    return ref
+    """Create a fresh *structurally* distinguished test value rooted at ∞."""
+
+    if not builder._refs:  # test fixture starts from the unique root
+        return builder.ensure_root()
+
+    current = next(
+        ref
+        for ref, link in reversed(list(zip(builder._refs, builder._links)))
+        if link is not None
+    )
+    count = len(builder._refs)
+    while len(builder._refs) == count:
+        current = builder.ensure_start_self_closed(current)
+    return current
 
 
 def test_explicit_context_resolves_current_without_ambient_stack() -> None:
@@ -104,7 +115,7 @@ def test_theory_and_grammar_membership_are_ordinary_exact_links() -> None:
     assert not has_exact_membership(network, theory, grammar_evidence)
 
 
-def test_source_occurrence_is_distinct_from_canonical_content() -> None:
+def test_same_source_content_has_one_canonical_start_self_closed_source() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     content = _anchor(builder)
@@ -113,14 +124,12 @@ def test_source_occurrence_is_distinct_from_canonical_content() -> None:
     network = builder.freeze(root)
 
     assert source_one is not content
-    assert source_two is not content
-    assert source_one is not source_two
+    assert source_two is source_one
     assert network.link(source_one).start is source_one
     assert network.link(source_one).end is content
-    assert network.link(source_two).end is content
 
 
-def test_gate_r_header_keeps_two_actual_acts_occurrence_distinct() -> None:
+def test_same_gate_r_header_is_one_canonical_act_form() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     interpreter = _anchor(builder)
@@ -133,12 +142,11 @@ def test_gate_r_header_keeps_two_actual_acts_occurrence_distinct() -> None:
     act_two = define_act_header(builder, interpreter, role_dictionary, after_context)
     network = builder.freeze(root)
 
-    assert act_one is not act_two
+    assert act_two is act_one
     assert act_header(network, act_one) == (interpreter, role_dictionary, after_context)
-    assert act_header(network, act_two) == (interpreter, role_dictionary, after_context)
 
 
-def test_exact_current_act_is_selected_by_explicit_context_not_global_now() -> None:
+def test_same_act_form_produces_same_explicit_deictic_context() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     interpreter = _anchor(builder)
@@ -156,11 +164,9 @@ def test_exact_current_act_is_selected_by_explicit_context_not_global_now() -> N
     network = builder.freeze(root)
 
     before = network.snapshot()
-    assert act_one is not act_two
-    assert act_header(network, act_one) == act_header(network, act_two)
+    assert act_two is act_one
+    assert context_two is context_one
     assert current_of_context(network, context_one) is act_one
-    assert current_of_context(network, context_two) is act_two
-    assert context_one is not context_two
     assert network.snapshot() == before
 
 
@@ -189,7 +195,7 @@ def test_role_addressed_act_fields_are_additive_link_data() -> None:
     assert network.snapshot() == before
 
 
-def test_same_source_can_have_two_exact_reading_acts_with_different_evidence() -> None:
+def test_same_source_can_have_two_structurally_distinct_reading_acts() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
     interpreter = _anchor(builder)
@@ -306,8 +312,7 @@ def test_non_context_and_non_act_shapes_reject_structural_readers() -> None:
     root = _anchor(builder)
     left = _anchor(builder)
     right = _anchor(builder)
-    ordinary = builder.reserve()
-    builder.define(ordinary, left, right)
+    ordinary = builder.ensure(left, right)
     network = builder.freeze(root)
 
     with pytest.raises(FoundationStateError):
