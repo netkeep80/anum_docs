@@ -422,7 +422,7 @@ def test_flat_subselection_reading_and_continuation_are_read_only() -> None:
         after_context = define_context(builder, parent, result)
         act = define_act_header(builder, interpreter, role_dictionary, after_context)
         values = (
-            source,
+            source.source,
             selection,
             forms,
             dictionary,
