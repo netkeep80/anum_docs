@@ -1,22 +1,22 @@
-"""Foundation-v2 persistent exact-occurrence apamemory reference backend.
+"""Canonical persistent apamemory reference backend for Foundation v2.
 
-The JSON file used here is deliberately only a reference persistence mechanism.
-Its format is not MTS ontology and is not the canonical high-performance storage
-layout. The semantic contract is the observable behavior:
+The JSON file is only a storage mechanism. Its lineage id and integer link ids
+are technical coordinates of one dataset; they are not MTS semantic identity.
+Semantic identity is reconstructed and validated by the rooted structural link
+network:
 
-* each materialization creates a fresh exact occurrence;
-* duplicate pole pairs survive as distinct logical occurrences;
-* one persistent dataset has an opaque lineage id;
-* reopening that dataset preserves lineage-local logical occurrence ids;
-* importing the same topology creates a fresh lineage;
-* physical file offsets/addresses and portable snapshot slots are not semantic
-  identity;
+* there is one fully self-closed root;
+* ``S = S ⟼ e`` is unique for a distinguished ``e``;
+* ``E = b ⟼ E`` is unique for a distinguished ``b``;
+* ``b ⟼ e`` is unique for distinguished ordered poles;
+* repeated materialization of an existing form returns the same stored link;
 * reads never materialize;
-* batches commit atomically or expose the previous state.
+* atomic batches may refer only to already distinguished links, earlier batch
+  results, or the current link as an explicit one-sided self-closure marker.
 
-The module also bridges the already-accepted Gate-P candidate sequence
-materializer to persistent ids without reimplementing its nested sequence
-semantics.
+Arbitrary address graphs and forward ID-only cycles are therefore not accepted
+as already-semantic MTS networks. They belong to a separate import and
+canonicalization boundary.
 """
 from __future__ import annotations
 
@@ -27,7 +27,12 @@ from pathlib import Path
 from typing import Iterable
 from uuid import uuid4
 
-from .exact_link_network import LinkNetwork, LinkNetworkBuilder, OccurrenceRef
+from .exact_link_network import (
+    LinkNetwork,
+    LinkNetworkError,
+    NetworkSnapshot,
+    OccurrenceRef,
+)
 from .foundation_v2_materialization import (
     MaterializedEdge,
     SequenceAtom,
@@ -43,12 +48,12 @@ PERSISTENT_SCHEMA = "mts-foundation-v2-persistent-reference/v0.7"
 
 
 class PersistentStoreError(ValueError):
-    """Persistent exact-occurrence store operation or evidence is invalid."""
+    """Persistent canonical-link store operation or evidence is invalid."""
 
 
 @dataclass(frozen=True, order=True)
-class PersistentOccurrenceId:
-    """Stable logical occurrence id inside exactly one persistent dataset lineage."""
+class PersistentLinkId:
+    """Dataset-local storage coordinate; never semantic MTS identity."""
 
     lineage: str
     local: int
@@ -56,17 +61,17 @@ class PersistentOccurrenceId:
 
 @dataclass(frozen=True)
 class BatchRef:
-    """Reference to an occurrence allocated by the current atomic batch."""
+    """Reference to the semantic result of one request in the current batch."""
 
     index: int
 
 
-BatchEndpoint = PersistentOccurrenceId | BatchRef
+BatchEndpoint = PersistentLinkId | BatchRef
 
 
 @dataclass(frozen=True)
 class BatchLink:
-    """One requested fresh exact occurrence in an atomic materialization batch."""
+    """One canonical link request in an atomic persistent batch."""
 
     start: BatchEndpoint
     end: BatchEndpoint
@@ -74,25 +79,23 @@ class BatchLink:
 
 @dataclass(frozen=True)
 class PersistentSnapshot:
-    """Normalized logical topology of one persistent dataset state."""
+    """Normalized stored topology of one dataset state."""
 
     lineage: str
-    root: PersistentOccurrenceId
-    links: tuple[tuple[PersistentOccurrenceId, PersistentOccurrenceId, PersistentOccurrenceId], ...]
+    root: PersistentLinkId
+    links: tuple[
+        tuple[PersistentLinkId, PersistentLinkId, PersistentLinkId], ...
+    ]
 
 
 @dataclass(frozen=True)
 class PersistentSequenceAtom:
-    value: PersistentOccurrenceId
+    value: PersistentLinkId
 
 
 @dataclass(frozen=True)
 class PersistentSequenceGroup:
     items: tuple["PersistentSequenceItem", ...]
-
-    def __post_init__(self) -> None:
-        if not self.items:
-            raise PersistentStoreError("persistent sequence group cannot be empty")
 
 
 PersistentSequenceItem = PersistentSequenceAtom | PersistentSequenceGroup
@@ -100,37 +103,33 @@ PersistentSequenceItem = PersistentSequenceAtom | PersistentSequenceGroup
 
 @dataclass(frozen=True)
 class PersistentSequenceDescription:
-    root: PersistentOccurrenceId
+    root: PersistentLinkId
     items: tuple[PersistentSequenceItem, ...]
-
-    def __post_init__(self) -> None:
-        if not self.items:
-            raise PersistentStoreError("persistent sequence cannot be empty")
 
 
 @dataclass(frozen=True)
 class PersistentMaterializedEdge:
-    ref: PersistentOccurrenceId
-    start: PersistentOccurrenceId
-    end: PersistentOccurrenceId
+    ref: PersistentLinkId
+    start: PersistentLinkId
+    end: PersistentLinkId
 
 
 @dataclass(frozen=True)
 class PersistentSequenceMaterialization:
-    """Portable persistent evidence for one sequence effect."""
+    """Portable persistent evidence for one explicit sequence effect."""
 
     description: PersistentSequenceDescription
     before_count: int
     created: tuple[PersistentMaterializedEdge, ...]
-    result: PersistentOccurrenceId
+    result: PersistentLinkId
 
     @property
     def after_count(self) -> int:
         return self.before_count + len(self.created)
 
 
-class JsonExactLinkStore:
-    """Small file-backed reference implementation of the Foundation-v2 L4 contract."""
+class JsonLinkStore:
+    """Small file-backed canonical MTS apamemory reference implementation."""
 
     def __init__(
         self,
@@ -147,8 +146,8 @@ class JsonExactLinkStore:
         self._validate_state()
 
     @classmethod
-    def create(cls, path: str | Path) -> "JsonExactLinkStore":
-        """Create a fresh persistent lineage with one exact self-closed root."""
+    def create(cls, path: str | Path) -> "JsonLinkStore":
+        """Create a new storage lineage containing only the unique root."""
 
         target = Path(path)
         if target.exists():
@@ -159,8 +158,8 @@ class JsonExactLinkStore:
         return store
 
     @classmethod
-    def open(cls, path: str | Path) -> "JsonExactLinkStore":
-        """Open an existing dataset preserving its logical lineage and ids."""
+    def open(cls, path: str | Path) -> "JsonLinkStore":
+        """Open and structurally validate an existing canonical dataset."""
 
         target = Path(path)
         try:
@@ -194,16 +193,29 @@ class JsonExactLinkStore:
         cls,
         path: str | Path,
         snapshot: PersistentSnapshot,
-    ) -> "JsonExactLinkStore":
-        """Import topology into a fresh lineage instead of claiming source identity."""
+    ) -> "JsonLinkStore":
+        """Import validated topology into a fresh *storage* lineage."""
 
         target = Path(path)
         if target.exists():
             raise PersistentStoreError("persistent dataset already exists")
         target.parent.mkdir(parents=True, exist_ok=True)
+        if not isinstance(snapshot, PersistentSnapshot):
+            raise PersistentStoreError("expected persistent snapshot")
+
         ordered = sorted(snapshot.links, key=lambda item: item[0].local)
         if [item[0].local for item in ordered] != list(range(len(ordered))):
             raise PersistentStoreError("snapshot local ids must be dense for import")
+        for ref, start, end in ordered:
+            if (
+                ref.lineage != snapshot.lineage
+                or start.lineage != snapshot.lineage
+                or end.lineage != snapshot.lineage
+            ):
+                raise PersistentStoreError("snapshot mixes storage lineages")
+        if snapshot.root.lineage != snapshot.lineage:
+            raise PersistentStoreError("snapshot root belongs to another lineage")
+
         links = [(start.local, end.local) for _ref, start, end in ordered]
         store = cls(target, uuid4().hex, links, snapshot.root.local)
         store._commit_candidate(store._links)
@@ -215,7 +227,7 @@ class JsonExactLinkStore:
         return self._lineage
 
     @property
-    def root(self) -> PersistentOccurrenceId:
+    def root(self) -> PersistentLinkId:
         self._require_open()
         return self._id(self._root_local)
 
@@ -225,14 +237,10 @@ class JsonExactLinkStore:
         return len(self._links)
 
     def close(self) -> None:
-        """Close this runtime handle; committed file state already persists."""
-
         self._require_open()
         self._closed = True
 
     def snapshot(self) -> PersistentSnapshot:
-        """Return normalized logical topology without backend physical addresses."""
-
         self._require_open()
         return PersistentSnapshot(
             lineage=self._lineage,
@@ -245,8 +253,8 @@ class JsonExactLinkStore:
 
     def poles(
         self,
-        ref: PersistentOccurrenceId,
-    ) -> tuple[PersistentOccurrenceId, PersistentOccurrenceId]:
+        ref: PersistentLinkId,
+    ) -> tuple[PersistentLinkId, PersistentLinkId]:
         self._require_open()
         local = self._validate_id(ref)
         start, end = self._links[local]
@@ -255,10 +263,10 @@ class JsonExactLinkStore:
     def find(
         self,
         *,
-        start: PersistentOccurrenceId | None = None,
-        end: PersistentOccurrenceId | None = None,
-    ) -> tuple[PersistentOccurrenceId, ...]:
-        """Read-only exact occurrence lookup preserving duplicate pairs."""
+        start: PersistentLinkId | None = None,
+        end: PersistentLinkId | None = None,
+    ) -> tuple[PersistentLinkId, ...]:
+        """Read-only lookup; a complete pole pair has at most one result."""
 
         self._require_open()
         start_local = self._validate_id(start) if start is not None else None
@@ -270,68 +278,135 @@ class JsonExactLinkStore:
             and (end_local is None or candidate_end == end_local)
         )
 
-    def outgoing(
-        self,
-        start: PersistentOccurrenceId,
-    ) -> tuple[PersistentOccurrenceId, ...]:
+    def outgoing(self, start: PersistentLinkId) -> tuple[PersistentLinkId, ...]:
         return self.find(start=start)
 
-    def incoming(
-        self,
-        end: PersistentOccurrenceId,
-    ) -> tuple[PersistentOccurrenceId, ...]:
+    def incoming(self, end: PersistentLinkId) -> tuple[PersistentLinkId, ...]:
         return self.find(end=end)
 
-    def all_occurrences(self) -> tuple[PersistentOccurrenceId, ...]:
+    def all_links(self) -> tuple[PersistentLinkId, ...]:
         self._require_open()
         return tuple(self._id(local) for local in range(len(self._links)))
 
     def materialize(
         self,
-        start: PersistentOccurrenceId,
-        end: PersistentOccurrenceId,
-    ) -> PersistentOccurrenceId:
-        """Create one fresh exact occurrence even if the same pair already exists."""
+        start: PersistentLinkId,
+        end: PersistentLinkId,
+    ) -> PersistentLinkId:
+        """Return the canonical stored ``start ⟼ end``, appending only if absent."""
 
-        return self.materialize_batch((BatchLink(start, end),))[0]
+        self._require_open()
+        start_local = self._validate_id(start)
+        end_local = self._validate_id(end)
+        existing = self._find_pair(self._links, start_local, end_local)
+        if existing is not None:
+            return self._id(existing)
+        candidate = [*self._links, (start_local, end_local)]
+        self._validate_links(candidate, self._root_local)
+        self._commit_candidate(candidate)
+        self._links = candidate
+        return self._id(len(candidate) - 1)
+
+    def materialize_start_self_closed(self, end: PersistentLinkId) -> PersistentLinkId:
+        """Return the unique ``S = S ⟼ end`` for an already stored ``end``."""
+
+        self._require_open()
+        end_local = self._validate_id(end)
+        existing = self._find_start_self_closed(self._links, end_local)
+        if existing is not None:
+            return self._id(existing)
+        local = len(self._links)
+        candidate = [*self._links, (local, end_local)]
+        self._validate_links(candidate, self._root_local)
+        self._commit_candidate(candidate)
+        self._links = candidate
+        return self._id(local)
+
+    def materialize_end_self_closed(self, start: PersistentLinkId) -> PersistentLinkId:
+        """Return the unique ``E = start ⟼ E`` for an already stored ``start``."""
+
+        self._require_open()
+        start_local = self._validate_id(start)
+        existing = self._find_end_self_closed(self._links, start_local)
+        if existing is not None:
+            return self._id(existing)
+        local = len(self._links)
+        candidate = [*self._links, (start_local, local)]
+        self._validate_links(candidate, self._root_local)
+        self._commit_candidate(candidate)
+        self._links = candidate
+        return self._id(local)
 
     def materialize_batch(
         self,
         links: Iterable[BatchLink],
-    ) -> tuple[PersistentOccurrenceId, ...]:
-        """Atomically append fresh exact occurrences, including cyclic batches."""
+    ) -> tuple[PersistentLinkId, ...]:
+        """Atomically resolve canonical link requests in dependency order.
+
+        ``BatchRef(j)`` with ``j < i`` names the semantic result of an earlier
+        request. ``BatchRef(i)`` is allowed only as the self pole of request
+        ``i``. Forward references are rejected: a technical future id cannot be
+        used to manufacture semantic distinction.
+        """
 
         self._require_open()
         requested = tuple(links)
         if not requested:
             return ()
-        base = len(self._links)
-        allocated = tuple(self._id(base + index) for index in range(len(requested)))
 
-        def resolve(endpoint: BatchEndpoint) -> int:
-            if isinstance(endpoint, PersistentOccurrenceId):
-                return self._validate_id(endpoint)
-            if not isinstance(endpoint, BatchRef):
-                raise PersistentStoreError("invalid batch endpoint")
-            if endpoint.index < 0 or endpoint.index >= len(allocated):
-                raise PersistentStoreError("batch reference is out of range")
-            return allocated[endpoint.index].local
+        candidate = list(self._links)
+        results: list[int] = []
 
-        additions = [(resolve(link.start), resolve(link.end)) for link in requested]
-        candidate = [*self._links, *additions]
+        for index, request in enumerate(requested):
+            if not isinstance(request, BatchLink):
+                raise PersistentStoreError("invalid batch link request")
+
+            start, start_self = self._resolve_batch_endpoint(
+                request.start, index, results
+            )
+            end, end_self = self._resolve_batch_endpoint(request.end, index, results)
+
+            if start_self and end_self:
+                result = self._root_local
+            elif start_self:
+                assert end is not None
+                existing = self._find_start_self_closed(candidate, end)
+                if existing is not None:
+                    result = existing
+                else:
+                    result = len(candidate)
+                    candidate.append((result, end))
+            elif end_self:
+                assert start is not None
+                existing = self._find_end_self_closed(candidate, start)
+                if existing is not None:
+                    result = existing
+                else:
+                    result = len(candidate)
+                    candidate.append((start, result))
+            else:
+                assert start is not None and end is not None
+                existing = self._find_pair(candidate, start, end)
+                if existing is not None:
+                    result = existing
+                else:
+                    result = len(candidate)
+                    candidate.append((start, end))
+
+            results.append(result)
+
         self._validate_links(candidate, self._root_local)
-
-        # Persist first. If this raises, in-memory observable state remains old.
-        self._commit_candidate(candidate)
-        self._links = candidate
-        return allocated
+        if candidate != self._links:
+            self._commit_candidate(candidate)
+            self._links = candidate
+        return tuple(self._id(local) for local in results)
 
     def runtime_network(
         self,
         *,
         count: int | None = None,
-    ) -> tuple[LinkNetwork, dict[PersistentOccurrenceId, OccurrenceRef]]:
-        """Reconstruct a fresh runtime exact network from a persistent prefix."""
+    ) -> tuple[LinkNetwork, dict[PersistentLinkId, OccurrenceRef]]:
+        """Reconstruct canonical runtime topology with fresh technical handles."""
 
         self._require_open()
         selected_count = len(self._links) if count is None else count
@@ -342,13 +417,17 @@ class JsonExactLinkStore:
                 raise PersistentStoreError(
                     "requested runtime prefix is not topologically closed"
                 )
-
-        builder = LinkNetworkBuilder()
-        refs = tuple(builder.reserve() for _ in range(selected_count))
-        for local, (start, end) in enumerate(self._links[:selected_count]):
-            builder.define(refs[local], refs[start], refs[end])
-        network = builder.freeze(refs[self._root_local])
-        mapping = {self._id(local): refs[local] for local in range(selected_count)}
+        snapshot = NetworkSnapshot(
+            links=tuple(self._links[:selected_count]),
+            root=self._root_local,
+        )
+        try:
+            network = LinkNetwork.from_snapshot(snapshot)
+        except LinkNetworkError as exc:
+            raise PersistentStoreError("persistent topology is not canonical MTS") from exc
+        mapping = {
+            self._id(local): network.refs[local] for local in range(selected_count)
+        }
         return network, mapping
 
     def runtime_materialization_lineage(
@@ -358,29 +437,67 @@ class JsonExactLinkStore:
     ) -> tuple[
         LinkNetwork,
         LinkNetwork,
-        dict[PersistentOccurrenceId, OccurrenceRef],
+        dict[PersistentLinkId, OccurrenceRef],
     ]:
-        """Reconstruct before/after runtime states sharing one exact identity scope."""
+        """Reconstruct before/after runtime states in one technical runtime scope."""
 
-        if after_count < before_count or after_count > len(self._links):
+        self._require_open()
+        if (
+            before_count <= self._root_local
+            or after_count < before_count
+            or after_count > len(self._links)
+        ):
             raise PersistentStoreError("invalid persistent materialization range")
-        before, mapping = self.runtime_network(count=before_count)
+
+        before, initial_mapping = self.runtime_network(count=before_count)
         evolution = before.evolve()
         refs: dict[int, OccurrenceRef] = {
-            persistent.local: runtime for persistent, runtime in mapping.items()
+            persistent.local: runtime
+            for persistent, runtime in initial_mapping.items()
         }
-        for local in range(before_count, after_count):
-            refs[local] = evolution.reserve()
+
         for local in range(before_count, after_count):
             start, end = self._links[local]
-            if start not in refs or end not in refs:
+            try:
+                if start == local and end == local:
+                    runtime = evolution.ensure_root()
+                elif start == local:
+                    runtime = evolution.ensure_start_self_closed(refs[end])
+                elif end == local:
+                    runtime = evolution.ensure_end_self_closed(refs[start])
+                else:
+                    runtime = evolution.ensure(refs[start], refs[end])
+            except (KeyError, LinkNetworkError) as exc:
                 raise PersistentStoreError(
-                    "persistent materialization range has unresolved endpoint"
+                    "persistent materialization is not dependency-ordered canonical MTS"
+                ) from exc
+            if runtime.slot != local:
+                raise PersistentStoreError(
+                    "persistent append duplicates an already canonical semantic link"
                 )
-            evolution.define(refs[local], refs[start], refs[end])
+            refs[local] = runtime
+
         after = evolution.freeze()
-        full_mapping = {self._id(local): refs[local] for local in range(after_count)}
-        return before, after, full_mapping
+        mapping = {self._id(local): refs[local] for local in range(after_count)}
+        return before, after, mapping
+
+    def _resolve_batch_endpoint(
+        self,
+        endpoint: BatchEndpoint,
+        current_index: int,
+        results: list[int],
+    ) -> tuple[int | None, bool]:
+        if isinstance(endpoint, PersistentLinkId):
+            return self._validate_id(endpoint), False
+        if not isinstance(endpoint, BatchRef):
+            raise PersistentStoreError("invalid batch endpoint")
+        if endpoint.index < 0 or endpoint.index > current_index:
+            raise PersistentStoreError(
+                "batch forward reference cannot create semantic distinction"
+            )
+        if endpoint.index == current_index:
+            return None, True
+        return results[endpoint.index], False
 
     def _validate_state(self) -> None:
         if not self._lineage:
@@ -394,19 +511,61 @@ class JsonExactLinkStore:
         if root_local < 0 or root_local >= len(links):
             raise PersistentStoreError("persistent root is out of range")
         for start, end in links:
-            if start < 0 or start >= len(links) or end < 0 or end >= len(links):
+            if (
+                not isinstance(start, int)
+                or not isinstance(end, int)
+                or start < 0
+                or start >= len(links)
+                or end < 0
+                or end >= len(links)
+            ):
                 raise PersistentStoreError("persistent endpoint is out of range")
+        try:
+            LinkNetwork.from_snapshot(
+                NetworkSnapshot(links=tuple(links), root=root_local)
+            )
+        except LinkNetworkError as exc:
+            raise PersistentStoreError(
+                "persistent topology is not rooted canonical MTS"
+            ) from exc
 
-    def _id(self, local: int) -> PersistentOccurrenceId:
-        return PersistentOccurrenceId(self._lineage, local)
+    @staticmethod
+    def _find_pair(
+        links: list[tuple[int, int]], start: int, end: int
+    ) -> int | None:
+        for local, pair in enumerate(links):
+            if pair == (start, end):
+                return local
+        return None
 
-    def _validate_id(self, ref: PersistentOccurrenceId) -> int:
-        if not isinstance(ref, PersistentOccurrenceId):
-            raise PersistentStoreError("expected persistent occurrence id")
+    @staticmethod
+    def _find_start_self_closed(
+        links: list[tuple[int, int]], end: int
+    ) -> int | None:
+        for local, (start, candidate_end) in enumerate(links):
+            if start == local and candidate_end == end and candidate_end != local:
+                return local
+        return None
+
+    @staticmethod
+    def _find_end_self_closed(
+        links: list[tuple[int, int]], start: int
+    ) -> int | None:
+        for local, (candidate_start, end) in enumerate(links):
+            if end == local and candidate_start == start and candidate_start != local:
+                return local
+        return None
+
+    def _id(self, local: int) -> PersistentLinkId:
+        return PersistentLinkId(self._lineage, local)
+
+    def _validate_id(self, ref: PersistentLinkId) -> int:
+        if not isinstance(ref, PersistentLinkId):
+            raise PersistentStoreError("expected persistent link id")
         if ref.lineage != self._lineage:
             raise PersistentStoreError("foreign persistent dataset lineage")
         if ref.local < 0 or ref.local >= len(self._links):
-            raise PersistentStoreError("persistent occurrence id is out of range")
+            raise PersistentStoreError("persistent link id is out of range")
         return ref.local
 
     def _payload(self, links: list[tuple[int, int]]) -> dict:
@@ -440,13 +599,14 @@ class JsonExactLinkStore:
 
 
 def materialize_persistent_sequence(
-    store: JsonExactLinkStore,
+    store: JsonLinkStore,
     description: PersistentSequenceDescription,
 ) -> PersistentSequenceMaterialization:
-    """Execute the existing Gate-P sequence semantics as one persistent batch."""
+    """Execute Gate-P sequence semantics and persist only newly materialized links."""
 
     if description.root != store.root:
-        raise PersistentStoreError("persistent sequence uses another exact root")
+        raise PersistentStoreError("persistent sequence uses another root")
+
     before_count = store.count
     before, persistent_to_runtime = store.runtime_network()
     runtime_description = _runtime_description(description, persistent_to_runtime)
@@ -459,33 +619,58 @@ def materialize_persistent_sequence(
         edge.ref: index for index, edge in enumerate(runtime_effect.created)
     }
 
-    def endpoint(ref: OccurrenceRef) -> BatchEndpoint:
+    def endpoint(ref: OccurrenceRef, current_index: int) -> BatchEndpoint:
         persistent = runtime_to_persistent.get(ref)
         if persistent is not None:
             return persistent
         index = created_index.get(ref)
         if index is None:
-            raise PersistentStoreError("runtime materialization endpoint is not normalized")
+            raise PersistentStoreError(
+                "runtime materialization endpoint cannot be normalized"
+            )
+        if index > current_index:
+            raise PersistentStoreError(
+                "runtime materialization contains an unresolved forward dependency"
+            )
         return BatchRef(index)
 
     batch = tuple(
-        BatchLink(start=endpoint(edge.start), end=endpoint(edge.end))
-        for edge in runtime_effect.created
+        BatchLink(
+            start=endpoint(edge.start, index),
+            end=endpoint(edge.end, index),
+        )
+        for index, edge in enumerate(runtime_effect.created)
     )
     persistent_refs = store.materialize_batch(batch)
     if len(persistent_refs) != len(runtime_effect.created):
         raise PersistentStoreError("persistent batch cardinality mismatch")
+    for index, persistent_ref in enumerate(persistent_refs):
+        if persistent_ref.local != before_count + index:
+            raise PersistentStoreError(
+                "runtime-created link unexpectedly reused persistent storage"
+            )
 
     created = tuple(
         PersistentMaterializedEdge(
             ref=persistent_ref,
-            start=_persistent_endpoint(edge.start, runtime_to_persistent, created_index, persistent_refs),
-            end=_persistent_endpoint(edge.end, runtime_to_persistent, created_index, persistent_refs),
+            start=_persistent_endpoint(
+                edge.start,
+                runtime_to_persistent,
+                created_index,
+                persistent_refs,
+            ),
+            end=_persistent_endpoint(
+                edge.end,
+                runtime_to_persistent,
+                created_index,
+                persistent_refs,
+            ),
         )
         for persistent_ref, edge in zip(
             persistent_refs, runtime_effect.created, strict=True
         )
     )
+
     if runtime_effect.result in runtime_to_persistent:
         result = runtime_to_persistent[runtime_effect.result]
     else:
@@ -502,10 +687,10 @@ def materialize_persistent_sequence(
 
 
 def replay_persistent_sequence_materialization(
-    store: JsonExactLinkStore,
+    store: JsonLinkStore,
     evidence: PersistentSequenceMaterialization,
-) -> PersistentOccurrenceId:
-    """Replay persisted sequence evidence, including after a clean reopen."""
+) -> PersistentLinkId:
+    """Replay persistent sequence evidence read-only, including after reopen."""
 
     snapshot_before = store.snapshot()
     if evidence.description.root.lineage != store.lineage_id:
@@ -518,19 +703,24 @@ def replay_persistent_sequence_materialization(
         evidence.after_count,
     )
     runtime_description = _runtime_description(evidence.description, mapping)
-    runtime_created = tuple(
-        MaterializedEdge(
-            ref=mapping[edge.ref],
-            start=mapping[edge.start],
-            end=mapping[edge.end],
+    try:
+        runtime_created = tuple(
+            MaterializedEdge(
+                ref=mapping[edge.ref],
+                start=mapping[edge.start],
+                end=mapping[edge.end],
+            )
+            for edge in evidence.created
         )
-        for edge in evidence.created
-    )
+        runtime_result = mapping[evidence.result]
+    except KeyError as exc:
+        raise PersistentStoreError("persistent sequence evidence references absent link") from exc
+
     runtime_evidence = SequenceMaterialization(
         description=runtime_description,
         after=after,
         created=runtime_created,
-        result=mapping[evidence.result],
+        result=runtime_result,
     )
     replay_sequence_materialization(before, runtime_evidence)
 
@@ -544,7 +734,7 @@ def replay_persistent_sequence_materialization(
 
 def _runtime_description(
     description: PersistentSequenceDescription,
-    mapping: dict[PersistentOccurrenceId, OccurrenceRef],
+    mapping: dict[PersistentLinkId, OccurrenceRef],
 ) -> SequenceDescription:
     try:
         root = mapping[description.root]
@@ -558,22 +748,24 @@ def _runtime_description(
 
 def _runtime_item(
     item: PersistentSequenceItem,
-    mapping: dict[PersistentOccurrenceId, OccurrenceRef],
+    mapping: dict[PersistentLinkId, OccurrenceRef],
 ):
     if isinstance(item, PersistentSequenceAtom):
         try:
             return SequenceAtom(mapping[item.value])
         except KeyError as exc:
             raise PersistentStoreError("persistent sequence atom is unavailable") from exc
-    return SequenceGroup(tuple(_runtime_item(child, mapping) for child in item.items))
+    if isinstance(item, PersistentSequenceGroup):
+        return SequenceGroup(tuple(_runtime_item(child, mapping) for child in item.items))
+    raise PersistentStoreError("invalid persistent sequence item")
 
 
 def _persistent_endpoint(
     runtime: OccurrenceRef,
-    old: dict[OccurrenceRef, PersistentOccurrenceId],
+    old: dict[OccurrenceRef, PersistentLinkId],
     created_index: dict[OccurrenceRef, int],
-    new: tuple[PersistentOccurrenceId, ...],
-) -> PersistentOccurrenceId:
+    new: tuple[PersistentLinkId, ...],
+) -> PersistentLinkId:
     persistent = old.get(runtime)
     if persistent is not None:
         return persistent
