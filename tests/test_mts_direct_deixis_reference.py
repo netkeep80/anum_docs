@@ -12,7 +12,6 @@ from core.mtc_parser import parse_formula
 ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-direct-deixis-v0.5.json"
 CONFORMANCE = ROOT / "contracts" / "mts-direct-deixis-conformance-v0.5.json"
-CHALLENGE_CORPUS = ROOT / "contracts" / "mts-direct-deixis-conformance-candidate-v0.5.json"
 MTS_V04 = ROOT / "contracts" / "mts-contract-v0.4.json"
 PROOF_V03 = ROOT / "contracts" / "mts-proof-v0.3.json"
 CORE = ROOT / "core" / "mtc_context_analysis.py"
@@ -59,39 +58,49 @@ def test_contract_is_accepted_but_not_retroactively_added_to_v04_umbrella():
     assert contract["schema"] == "mts-direct-deixis/v0.5"
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
+    assert contract["dependsOn"] == ["mts-contract/v0.4"]
     assert conformance["schema"] == "mts-direct-deixis-conformance/v0.5"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
+    assert contract["conformanceCorpus"] == "contracts/mts-direct-deixis-conformance-v0.5.json"
     assert contract["versioning"]["mtsContractV04Modified"] is False
     assert contract["versioning"]["publishedThroughUmbrella"] is False
     assert contract["schema"] not in MTS_V04.read_text(encoding="utf-8")
 
 
-def test_accepted_conformance_selects_challenge_corpus_without_copying_vectors():
+def test_accepted_conformance_owns_complete_portable_corpus():
     conformance = read(CONFORMANCE)
-    corpus = read(CHALLENGE_CORPUS)
 
-    assert conformance["sourceCorpus"] == (
-        "contracts/mts-direct-deixis-conformance-candidate-v0.5.json"
-    )
-    assert conformance["selection"] == {
-        "vectors": "all",
-        "equivalentSpellings": "all",
-        "negativeClaims": "all",
+    assert {item["id"] for item in conformance["vectors"]} == {
+        "none",
+        "current-start",
+        "current-end",
+        "parent-end",
+        "grandparent-grouped-start",
+        "bundle-order",
+        "projections",
+        "definition-target-and-body",
+        "sequence",
+        "nested-link",
     }
-    assert conformance["promotion"]["copiesVectors"] is False
-    assert "vectors" not in conformance
-    assert corpus["status"] == "candidate-challenge-corpus"
+    assert {item["id"] for item in conformance["equivalentSpellings"]} == {
+        "whitespace-current-start",
+        "whitespace-parent",
+    }
+    assert {item["id"] for item in conformance["negativeClaims"]} == {
+        "empty-does-not-mean-invariant",
+        "present-does-not-mean-sensitive",
+    }
 
 
-def test_every_challenged_portable_vector_replays_exactly_in_production_core():
-    for vector in read(CHALLENGE_CORPUS)["vectors"]:
+def test_every_accepted_portable_vector_replays_exactly_in_production_core():
+    for vector in read(CONFORMANCE)["vectors"]:
         result = analyze_direct_deixis(parse_formula(vector["source"]))
         assert portable(result) == vector["expected"], vector["id"]
 
 
 def test_every_equivalent_spelling_has_same_production_result():
-    for vector in read(CHALLENGE_CORPUS)["equivalentSpellings"]:
+    for vector in read(CONFORMANCE)["equivalentSpellings"]:
         observed = [
             portable(analyze_direct_deixis(parse_formula(source)))
             for source in vector["sources"]
@@ -174,6 +183,12 @@ def test_positive_direct_deixis_does_not_imply_semantic_context_sensitivity():
 def test_empty_direct_deixis_result_does_not_claim_context_invariance():
     assert analyze_direct_deixis(parse_formula("[] = []")) == ()
     assert read(CONTRACT)["meaningBoundary"]["emptyResultImpliesContextInvariance"] is False
+
+
+def test_accepted_negative_claims_preserve_semantic_non_implications():
+    negative = {item["id"]: item for item in read(CONFORMANCE)["negativeClaims"]}
+    assert negative["empty-does-not-mean-invariant"]["forbiddenConclusion"] == "ContextInvariant"
+    assert negative["present-does-not-mean-sensitive"]["forbiddenConclusion"] == "ContextSensitive"
 
 
 def test_proof_surface_is_unchanged_and_no_new_trusted_relation_exists():

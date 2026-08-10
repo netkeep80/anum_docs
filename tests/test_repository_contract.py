@@ -62,6 +62,15 @@ FORBIDDEN_CANDIDATE_PATHS = {
     "tests/test_mts_definition_environment_challenge.py",
     "tests/test_mts_definition_opening_decision.py",
     "tests/test_mts_definition_opening_challenge.py",
+    "contracts/mts-deictic-context-challenge-v0.5.json",
+    "contracts/mts-context-dependency-challenge-v0.5.json",
+    "contracts/mts-context-dependency-decision-v0.5.json",
+    "contracts/mts-direct-deixis-challenge-v0.5.json",
+    "contracts/mts-direct-deixis-conformance-candidate-v0.5.json",
+    "tests/test_mts_deictic_context_challenge.py",
+    "tests/test_mts_context_dependency_challenge.py",
+    "tests/test_mts_context_dependency_decision.py",
+    "tests/test_mts_direct_deixis_challenge.py",
 }
 ROOT_FORMULAS_SHA256 = "1ccfb6fa0ae3c744dffcdefefcf2d5d96108573f4b04fdd8ac45a2e15a98ee3a"
 
