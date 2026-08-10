@@ -44,6 +44,14 @@ FORBIDDEN_CANDIDATE_PATHS = {
     "tests/test_root_v02_candidate.py",
     "tests/test_root_v02_execution_candidate.py",
     "docs/specs/Reference model МТС v0.1.md",
+    "contracts/mts-opening-path-challenge-v0.4.json",
+    "contracts/mts-opening-path-decision-v0.4.json",
+    "contracts/mts-opening-path-conformance-candidate-v0.4.json",
+    "contracts/mts-proof-opening-path-challenge-v0.4.json",
+    "contracts/mts-proof-v0.4-conformance-candidate.json",
+    "tests/test_mts_opening_path_challenge.py",
+    "tests/test_mts_opening_path_decision.py",
+    "tests/test_mts_proof_v04_opening_path_challenge.py",
 }
 ROOT_FORMULAS_SHA256 = "1ccfb6fa0ae3c744dffcdefefcf2d5d96108573f4b04fdd8ac45a2e15a98ee3a"
 
