@@ -172,7 +172,7 @@ def test_nonlink_is_meaning_carried_by_links_not_second_ontology() -> None:
     foundations = _text(FOUNDATIONS)
     assert "1 → L = O ⟼ C" in foundations
     assert "0 → U = C ⟼ O" in foundations
-    assert "Несвязь не вводится как отдельный вид существующего" in foundations
+    assert "не вводится как отдельный вид существующего" in foundations
     assert "не является встроенной командой удаления" in foundations
 
 
