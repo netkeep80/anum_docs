@@ -14,15 +14,8 @@ APAMEMORY = ROOT / "docs" / "specs" / "Апамять и управление с
 BUNDLES = ROOT / "docs" / "specs" / "Пучки значений МТС v0.2.md"
 
 ACTIVE_OSTENSIVE_DOCS = (README, FOUNDATIONS, AXIOMS, NOTATION)
-RUSSIAN_NORMATIVE_DOCS = (
-    README,
-    FOUNDATIONS,
-    AXIOMS,
-    NOTATION,
-    ANUM,
-    APAMEMORY,
-    BUNDLES,
-)
+CURRENT_IDENTITY_DOCS = (README, FOUNDATIONS, AXIOMS, NOTATION, ANUM, APAMEMORY)
+RUSSIAN_NORMATIVE_DOCS = CURRENT_IDENTITY_DOCS + (BUNDLES,)
 _ALLOWED_LATIN_PROSE = {"API", "Git", "GitHub", "JSON", "UTF"}
 
 
@@ -72,7 +65,7 @@ def test_active_foundation_surface_keeps_ostensive_root_signs() -> None:
 def test_readme_presents_ostensive_forms_before_machine_link_carrier() -> None:
     text = _text(README)
     ostensive = text.index("## 1. Остенсивный корень МТС")
-    machine = text.index("## 3. Машинное представление идёт после остенсивного")
+    machine = text.index("## 3. Машинное представление вторично")
     link_api = text.index("Link(start, end)")
     assert ostensive < machine < link_api
     assert "♂e       начало самозамкнуто, конец e различён" in text
@@ -89,64 +82,98 @@ def test_foundation_v2_self_closure_orientation_is_exact() -> None:
     assert "b♀ = E = b ⟼ E" in notation
 
 
-def test_root_five_link_genealogy_remains_reader_visible() -> None:
-    required = (
+def test_root_five_link_genealogy_and_four_abit_transport_are_visible() -> None:
+    required_links = (
         "R = ∞",
         "R = R ⟼ R",
         "O = O ⟼ R",
         "C = R ⟼ C",
         "L = O ⟼ C",
         "U = C ⟼ O",
-        "∞ → R",
-        "[ → O",
-        "] → C",
-        "1 → L",
-        "0 → U",
     )
+    required_dictionary = ("[ → O", "] → C", "1 → L", "0 → U")
     for path in (README, FOUNDATIONS, AXIOMS):
         text = _text(path)
-        for fragment in required:
+        for fragment in required_links + required_dictionary:
             assert fragment in text, (path, fragment)
-
-
-def test_root_abits_and_formal_self_closure_glyphs_are_not_collapsed() -> None:
-    for path in (README, FOUNDATIONS, NOTATION):
-        text = _text(path)
         assert "[ ] 1 0" in text, path
-        assert "♂" in text and "♀" in text, path
-    foundations = _text(FOUNDATIONS)
-    assert "корневые абиты ачисел" in foundations
-    assert "знаки формальной нотации форм связи" in foundations
+
+
+def test_root_is_not_a_fifth_abit_and_empty_group_is_root() -> None:
+    for path in (README, FOUNDATIONS, ANUM):
+        text = _text(path)
+        assert "не является пятым абитом" in text, path
+    assert "des(\"[]\") = R" in _text(ANUM)
+    assert "Пустая группа `[]` **не является ошибкой**" in _text(ANUM)
+    assert "des([]) = R" in _text(README)
+
+
+def test_link_identity_is_by_ordered_poles_everywhere_current() -> None:
+    axiom = "(A ⟼ B) = (C ⟼ D)"
+    conclusion = "P1 = P2"
+    for path in CURRENT_IDENTITY_DOCS:
+        text = _text(path)
+        assert axiom in text, path
+        assert conclusion in text or "однозначна по (A,B)" in text, path
+
+
+def test_current_docs_do_not_restore_same_pair_occurrence_multiplicity() -> None:
+    forbidden = (
+        "P1 ≠ P2",
+        "одинаковая пара ≠ одно вхождение",
+        "одинаковая форма ≠ тождество",
+        "повторная материализация создаёт ещё одно вхождение",
+    )
+    for path in CURRENT_IDENTITY_DOCS:
+        text = _text(path)
+        for fragment in forbidden:
+            assert fragment not in text, (path, fragment)
+
+
+def test_repetition_and_history_are_structural_not_hidden_identity() -> None:
+    readme = _text(README)
+    anum = _text(ANUM)
+    apamemory = _text(APAMEMORY)
+    assert "[L, L, L, U]" in readme
+    assert "[L, L, L, U]" in anum
+    assert "Позиционная множественность хранится последовательностью" in anum
+    assert "разные акты получения одной связи" in apamemory
+    assert "разные экземпляры самой связи" in apamemory
+
+
+def test_find_materialize_boundary_survives_identity_reset() -> None:
+    for path in (README, AXIOMS, ANUM, APAMEMORY):
+        text = _text(path)
+        assert "не найдено" in text.lower(), path
+        assert "materializ" in text.lower() or "материализац" in text.lower(), path
+    assert "find ≠ materialize" in _text(README)
+    assert "find ≠ materialize" in _text(ANUM)
 
 
 def test_historical_projection_spelling_is_explicitly_separate() -> None:
     axioms = _text(AXIOMS)
     notation = _text(NOTATION)
+    foundations = _text(FOUNDATIONS)
     assert "♀F / F♂" in axioms
     assert "♀F" in notation and "F♂" in notation
-    assert "Текущий кандидат основания **не переносит** это чтение" in notation
+    assert "историческ" in notation.lower()
+    assert "историческ" in foundations.lower()
     assert "♂e = S = S ⟼ e" in notation
     assert "b♀ = E = b ⟼ E" in notation
 
 
-def test_docs_reject_projection_opcode_reading() -> None:
-    foundations = _text(FOUNDATIONS)
-    notation = _text(NOTATION)
+def test_self_closure_glyphs_are_not_projection_opcodes() -> None:
     assert "не являются командами взять начало или конец" in _text(README)
-    assert "не означают сами по себе" in foundations
-    assert "не являются встроенными командами получения полюсов" in notation
+    assert "не являются встроенными командами получения полюсов" in _text(NOTATION)
+    assert "не являются командами получения полюсов" in _text(FOUNDATIONS)
 
 
-def test_nonlink_is_a_meaning_carried_by_links_not_a_second_ontology() -> None:
+def test_nonlink_is_meaning_carried_by_links_not_second_ontology() -> None:
     foundations = _text(FOUNDATIONS)
-    anum = _text(ANUM)
-    for text in (foundations, anum):
-        assert "1 → L = O ⟼ C" in text
-        assert "0 → U = C ⟼ O" in text
-        assert "0 ≠ DELETE_LINK" in text
-    assert "несвязь не вводится как отдельный вид существующего" in foundations
-    assert "описание само является связевой структурой, но не тождественно своему денотату" in anum
-    assert "описать несвязь ≠ сделать несвязь сущностью" in anum
+    assert "1 → L = O ⟼ C" in foundations
+    assert "0 → U = C ⟼ O" in foundations
+    assert "Несвязь не вводится как отдельный вид существующего" in foundations
+    assert "не является встроенной командой удаления" in foundations
 
 
 def test_readme_defines_core_associative_terms_without_new_ontology() -> None:
@@ -158,10 +185,7 @@ def test_readme_defines_core_associative_terms_without_new_ontology() -> None:
         "**Абит**",
         "**Ачисло**",
         "**Четверичное ачисло**",
-        "**Строковое ачисло**",
         "**Апамять**",
-        "Строковый режим не вводит пятый вид абита",
-        "форма связи и её конкретное существование — разные уровни описания",
     )
     for fragment in required:
         assert fragment in text, fragment
