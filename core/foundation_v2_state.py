@@ -1,18 +1,12 @@
-"""Foundation-v2 higher-layer state over the canonical MTS link network.
+"""Foundation-v2 higher-layer state over rooted canonical MTS links.
 
-This module adds no semantic fields to :class:`Link`. Contexts, dictionaries,
-theories, grammar evidence, local representative relations and interpretation
-acts are represented only by ordinary links.
+Contexts, dictionaries, source records and acts are ordinary links. One-sided
+self-closure is obtained through the semantic constructor rather than by issuing
+a fresh runtime handle and using that handle as identity.
 
-The underlying network is canonical by ordered poles. Construction helpers
-therefore use ``ensure`` whenever the requested link is determined entirely by
-already-known poles. ``reserve`` + ``define`` remains only where a self-reference
-must be established before its own handle can be used as a pole.
-
-Runtime handles are technical access/build coordinates; they are not a third
-semantic component of a link and do not authorize duplicate equal-pole links.
-
-The module is storage-neutral and read-only after a network has been frozen.
+Therefore repeated construction of the same ``S=S⟼e`` form returns the same
+semantic link. If two events using that form must be distinguished, the
+difference belongs in an explicit history/act structure.
 """
 from __future__ import annotations
 
@@ -39,8 +33,6 @@ class RepresentativeConflictError(FoundationStateError):
 
 @dataclass(frozen=True)
 class DictionaryEffectRefs:
-    """Construction handles for one persistent definition effect."""
-
     entry: OccurrenceRef
     occurrence: OccurrenceRef
     history_after: OccurrenceRef
@@ -49,8 +41,6 @@ class DictionaryEffectRefs:
 
 @dataclass(frozen=True)
 class ScopedDictionaryResolution:
-    """Visible links supporting one scoped dictionary resolution."""
-
     scope: OccurrenceRef
     form: OccurrenceRef
     occurrences: tuple[OccurrenceRef, ...]
@@ -58,8 +48,6 @@ class ScopedDictionaryResolution:
 
 @dataclass(frozen=True)
 class LocalRepresentativeResolution:
-    """One-hop representative plus explicit K-attachments supporting it."""
-
     member: OccurrenceRef
     representative: OccurrenceRef
     bindings: tuple[OccurrenceRef, ...]
@@ -69,11 +57,9 @@ def define_source_occurrence(
     builder: LinkNetworkBuilder,
     content: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Create self-referential source record ``S = S ⟼ content``."""
+    """Return canonical source form ``S = S ⟼ content``."""
 
-    source = builder.reserve()
-    builder.define(source, source, content)
-    return source
+    return builder.ensure_start_self_closed(content)
 
 
 def define_context(
@@ -81,21 +67,13 @@ def define_context(
     parent: OccurrenceRef,
     current: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Create context ``K = K ⟼ (parent ⟼ current)``.
-
-    The payload pair is canonical. The outer self-reference requires a reserved
-    construction handle because ``K`` is itself one of its poles.
-    """
+    """Return canonical context ``K = K ⟼ (parent ⟼ current)``."""
 
     pair = builder.ensure(parent, current)
-    context = builder.reserve()
-    builder.define(context, context, pair)
-    return context
+    return builder.ensure_start_self_closed(pair)
 
 
 def current_of_context(network: LinkNetwork, context: OccurrenceRef) -> OccurrenceRef:
-    """Resolve ``↑`` from one explicitly selected context."""
-
     context_link = network.link(context)
     if context_link.start is not context:
         raise FoundationStateError("context is not start-self-closed")
@@ -104,8 +82,6 @@ def current_of_context(network: LinkNetwork, context: OccurrenceRef) -> Occurren
 
 
 def parent_of_context(network: LinkNetwork, context: OccurrenceRef) -> OccurrenceRef:
-    """Read the explicit parent carried by one context."""
-
     context_link = network.link(context)
     if context_link.start is not context:
         raise FoundationStateError("context is not start-self-closed")
@@ -119,8 +95,6 @@ def define_local_representative_binding(
     member: OccurrenceRef,
     representative: OccurrenceRef,
 ) -> tuple[OccurrenceRef, OccurrenceRef]:
-    """Ensure ``Pair=member⟼representative`` and ``Binding=K⟼Pair``."""
-
     pair = builder.ensure(member, representative)
     binding = builder.ensure(context, pair)
     return pair, binding
@@ -131,13 +105,6 @@ def local_representative_resolution(
     context: OccurrenceRef,
     member: OccurrenceRef,
 ) -> LocalRepresentativeResolution:
-    """Resolve one local representative value, without alias chaining.
-
-    Under pair-canonical identity one exact ``K ⟼ Pair`` attachment can occur at
-    most once. Distinct representative values still conflict. Missing mapping
-    falls back to the member itself and has no binding evidence.
-    """
-
     current_of_context(network, context)
 
     matches: list[tuple[OccurrenceRef, OccurrenceRef]] = []
@@ -176,8 +143,6 @@ def local_representative(
     context: OccurrenceRef,
     member: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Return the one-hop representative of ``member`` in ``K``."""
-
     return local_representative_resolution(network, context, member).representative
 
 
@@ -186,16 +151,10 @@ def define_dictionary_scope(
     parent_scope: OccurrenceRef,
     local_history: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Create ``D = D ⟼ (parentScope ⟼ localHistory)``.
-
-    In particular ``(R ⟼ R)`` is the already existing root link ``R``; no
-    second payload occurrence is created for an empty root/root scope.
-    """
+    """Return canonical ``D = D ⟼ (parentScope ⟼ localHistory)``."""
 
     payload = builder.ensure(parent_scope, local_history)
-    scope = builder.reserve()
-    builder.define(scope, scope, payload)
-    return scope
+    return builder.ensure_start_self_closed(payload)
 
 
 def define_dictionary_effect(
@@ -206,12 +165,6 @@ def define_dictionary_effect(
     source_content: OccurrenceRef,
     form: OccurrenceRef,
 ) -> DictionaryEffectRefs:
-    """Construct one persistent ``:``-style dictionary update.
-
-    Links whose poles are already known are canonicalized. Trusted replay later
-    verifies that the supplied parent/history belong to ``before_scope``.
-    """
-
     entry = builder.ensure(source_content, form)
     occurrence = builder.ensure(before_scope, entry)
     history_after = builder.ensure(history_before, occurrence)
@@ -228,8 +181,6 @@ def read_dictionary_scope(
     network: LinkNetwork,
     dictionary: OccurrenceRef,
 ) -> tuple[OccurrenceRef, OccurrenceRef]:
-    """Return ``(parentScope, localHistory)`` for one dictionary snapshot."""
-
     if dictionary is network.root:
         raise DictionaryLookupError("root is a dictionary sentinel, not a scope")
     scope = network.link(dictionary)
@@ -244,8 +195,6 @@ def lookup_scoped_dictionary(
     dictionary: OccurrenceRef,
     source_content: OccurrenceRef,
 ) -> ScopedDictionaryResolution | None:
-    """Resolve source content using local-history-first lexical scope semantics."""
-
     visited_scopes: set[OccurrenceRef] = set()
     current_scope = dictionary
     while current_scope is not network.root:
@@ -278,8 +227,6 @@ def verify_visible_dictionary_occurrence(
     source_content: OccurrenceRef,
     form: OccurrenceRef,
 ) -> None:
-    """Verify a selected declaration link is the visible scoped resolution."""
-
     resolution = lookup_scoped_dictionary(network, dictionary, source_content)
     if resolution is None:
         raise DictionaryLookupError("source content is not visible in dictionary")
@@ -331,8 +278,6 @@ def define_membership(
     container: OccurrenceRef,
     value: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Ensure direct theory/grammar-style membership ``container ⟼ value``."""
-
     return builder.ensure(container, value)
 
 
@@ -341,8 +286,6 @@ def has_exact_membership(
     container: OccurrenceRef,
     value: OccurrenceRef,
 ) -> bool:
-    """Check direct G/T-style membership without equality or materialization."""
-
     return network.find(container, value) is not None
 
 
@@ -352,26 +295,17 @@ def define_act_header(
     role_dictionary: OccurrenceRef,
     after_context: OccurrenceRef,
 ) -> OccurrenceRef:
-    """Create Gate-R finite header.
-
-    ``P = D_roles ⟼ K_after``
-    ``H = I ⟼ P``
-    ``A = A ⟼ H``
-    """
+    """Return canonical ``A = A ⟼ (I ⟼ (D_roles ⟼ K_after))``."""
 
     pair = builder.ensure(role_dictionary, after_context)
     header = builder.ensure(interpreter, pair)
-    act = builder.reserve()
-    builder.define(act, act, header)
-    return act
+    return builder.ensure_start_self_closed(header)
 
 
 def act_header(
     network: LinkNetwork,
     act: OccurrenceRef,
 ) -> tuple[OccurrenceRef, OccurrenceRef, OccurrenceRef]:
-    """Return ``(I, D_roles, K_after)`` from the finite structural header."""
-
     act_link = network.link(act)
     if act_link.start is not act:
         raise FoundationStateError("act is not start-self-closed")
@@ -386,8 +320,6 @@ def define_act_field(
     role: OccurrenceRef,
     value: OccurrenceRef,
 ) -> tuple[OccurrenceRef, OccurrenceRef]:
-    """Ensure ``field=role⟼value`` and attachment ``act⟼field``."""
-
     field = builder.ensure(role, value)
     attachment = builder.ensure(act, field)
     return field, attachment
@@ -398,8 +330,6 @@ def act_values(
     act: OccurrenceRef,
     role: OccurrenceRef,
 ) -> tuple[OccurrenceRef, ...]:
-    """Read values attached to an act through one role link."""
-
     values: list[OccurrenceRef] = []
     for attachment_ref in network.refs:
         if attachment_ref is act:
