@@ -32,15 +32,21 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _anchor(builder):
-    ref = builder.reserve()
-    builder.define(ref, ref, ref)
-    return ref
+    if not builder._refs:
+        return builder.ensure_root()
+    current = next(
+        ref
+        for ref, link in reversed(list(zip(builder._refs, builder._links)))
+        if link is not None
+    )
+    count = len(builder._refs)
+    while len(builder._refs) == count:
+        current = builder.ensure_start_self_closed(current)
+    return current
 
 
 def _link(builder, start, end):
-    ref = builder.reserve()
-    builder.define(ref, start, end)
-    return ref
+    return builder.ensure(start, end)
 
 
 def _byte_refs(builder):
@@ -183,7 +189,7 @@ def test_integrated_source_to_rule_to_run_replays_read_only() -> None:
     assert network.snapshot() == before
 
 
-def test_swapped_exact_goal_rejects() -> None:
+def test_swapped_goal_rejects() -> None:
     builder, root, byte_refs, evidence, _, _, _ = _fixture()
     goal = evidence.judgment.goal
     forged = replace(
@@ -202,38 +208,43 @@ def test_swapped_exact_goal_rejects() -> None:
         replay_integrated_proof(network, forged, byte_refs)
 
 
-def test_same_shape_different_occurrence_does_not_satisfy_exact_goal() -> None:
+def test_same_goal_pair_is_the_same_semantic_goal() -> None:
     builder, root, byte_refs, evidence, _, _, _ = _fixture()
-    network = builder.freeze(root)
     goal = evidence.judgment.goal
-    original = network.link(goal.start_claim)
+    original = builder._links[goal.start_claim.slot]  # type: ignore[attr-defined]
+    same_claim = builder.ensure(original.start, original.end)
+    assert same_claim is goal.start_claim
 
-    evolution = network.evolve()
-    duplicate = evolution.reserve()
-    evolution.define(duplicate, original.start, original.end)
-    evolved = evolution.freeze()
+    network = builder.freeze(root)
+    assert replay_integrated_proof(network, evidence, byte_refs) == (
+        goal.start_claim,
+        goal.end_claim,
+    )
 
-    assert duplicate is not goal.start_claim
-    assert evolved.link(duplicate) == evolved.link(goal.start_claim)
 
+def test_structurally_different_goal_rejects() -> None:
+    builder, root, byte_refs, evidence, _, _, _ = _fixture()
+    goal = evidence.judgment.goal
+    original = builder._links[goal.start_claim.slot]  # type: ignore[attr-defined]
+    different_end = _anchor(builder)
+    different_claim = builder.ensure(original.start, different_end)
     forged = replace(
         evidence,
         judgment=replace(
             evidence.judgment,
-            goal=replace(goal, start_claim=duplicate),
+            goal=replace(goal, start_claim=different_claim),
         ),
     )
+    network = builder.freeze(root)
+
     with pytest.raises(IntegratedCheckerError, match="exact selected goal"):
-        replay_integrated_proof(evolved, forged, byte_refs)
+        replay_integrated_proof(network, forged, byte_refs)
 
 
-def test_selected_judgment_theory_must_be_exact() -> None:
+def test_selected_judgment_theory_must_match() -> None:
     builder, root, byte_refs, evidence, _, theory, _ = _fixture()
     other_theory = _anchor(builder)
-    forged = replace(
-        evidence,
-        judgment=replace(evidence.judgment, theory=other_theory),
-    )
+    forged = replace(evidence, judgment=replace(evidence.judgment, theory=other_theory))
     network = builder.freeze(root)
 
     assert other_theory is not theory
@@ -241,13 +252,10 @@ def test_selected_judgment_theory_must_be_exact() -> None:
         replay_integrated_proof(network, forged, byte_refs)
 
 
-def test_selected_judgment_context_must_be_exact() -> None:
+def test_selected_judgment_context_must_match() -> None:
     builder, root, byte_refs, evidence, _, _, context = _fixture()
     other_context = define_context(builder, _anchor(builder), _anchor(builder))
-    forged = replace(
-        evidence,
-        judgment=replace(evidence.judgment, context=other_context),
-    )
+    forged = replace(evidence, judgment=replace(evidence.judgment, context=other_context))
     network = builder.freeze(root)
 
     assert other_context is not context
@@ -255,7 +263,7 @@ def test_selected_judgment_context_must_be_exact() -> None:
         replay_integrated_proof(network, forged, byte_refs)
 
 
-def test_valid_source_selecting_another_exact_rule_rejects_cross_layer() -> None:
+def test_valid_source_selecting_another_rule_rejects_cross_layer() -> None:
     builder, root, byte_refs, evidence, rule, theory, _ = _fixture()
     other_rule = _anchor(builder)
     other_source = _source_evidence(builder, root, byte_refs, other_rule, theory)
@@ -267,7 +275,7 @@ def test_valid_source_selecting_another_exact_rule_rejects_cross_layer() -> None
         replay_integrated_proof(network, forged, byte_refs)
 
 
-def test_valid_source_under_another_exact_theory_rejects_cross_layer() -> None:
+def test_valid_source_under_another_theory_rejects_cross_layer() -> None:
     builder, root, byte_refs, evidence, rule, theory, _ = _fixture()
     other_theory = _anchor(builder)
     other_source = _source_evidence(builder, root, byte_refs, rule, other_theory)
@@ -294,26 +302,24 @@ def test_invalid_equality_premise_rejects_integrated_artifact() -> None:
         replay_integrated_proof(network, forged, byte_refs)
 
 
-def test_swapped_exact_run_order_rejects() -> None:
+def test_swapped_run_order_rejects() -> None:
     builder, root, byte_refs, evidence, _, _, _ = _fixture()
     swapped = replace(evidence.run, steps=tuple(reversed(evidence.run.steps)))
-    forged = replace(evidence, run=swapped)
     network = builder.freeze(root)
 
     with pytest.raises(IntegratedCheckerError, match="invalid exact proof Run"):
-        replay_integrated_proof(network, forged, byte_refs)
+        replay_integrated_proof(network, replace(evidence, run=swapped), byte_refs)
 
 
-def test_another_exact_run_context_rejects_before_run_replay() -> None:
+def test_structurally_other_run_context_rejects_before_replay() -> None:
     builder, root, byte_refs, evidence, _, _, context = _fixture()
     other_context = define_context(builder, _anchor(builder), _anchor(builder))
     forged_run = replace(evidence.run, initial_context=other_context)
-    forged = replace(evidence, run=forged_run)
     network = builder.freeze(root)
 
     assert other_context is not context
     with pytest.raises(IntegratedCheckerError, match="another exact K"):
-        replay_integrated_proof(network, forged, byte_refs)
+        replay_integrated_proof(network, replace(evidence, run=forged_run), byte_refs)
 
 
 def test_integrated_checker_has_no_search_parser_or_legacy_proof_dependency() -> None:
