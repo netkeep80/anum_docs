@@ -299,6 +299,92 @@ def replay_sequence_materialization(
             raise SequenceMaterializationError("replay mutated the after network")
 
 
+def replay_sequence_level_fold(
+    network: LinkNetwork,
+    description: SequenceDescription,
+    *,
+    group_results: tuple[OccurrenceRef, ...],
+    fold_results: tuple[OccurrenceRef, ...],
+    result: OccurrenceRef,
+) -> OccurrenceRef:
+    """Replay one level after immediate groups have returned exact values.
+
+    ``SequenceAtom`` contributes its own exact value. Each immediate
+    ``SequenceGroup`` consumes one caller-selected exact result in source order.
+    How the group produced that result is deliberately outside this checker and
+    may be verified by a separate nested chain of acts. The resulting level
+    values are then checked as one existing exact left fold.
+
+    The operation is read-only: ``fold_results`` names already-existing exact
+    occurrences. No relation is searched for or created, and no semantic
+    ``value-sequence`` type is introduced.
+    """
+
+    before_snapshot = network.snapshot()
+    try:
+        _require_description_root(network, description)
+
+        values: list[OccurrenceRef] = []
+        group_cursor = 0
+        for item in description.items:
+            if isinstance(item, SequenceAtom):
+                network.link(item.value)
+                values.append(item.value)
+                continue
+
+            if group_cursor >= len(group_results):
+                raise SequenceMaterializationError("missing immediate group result")
+            group_result = group_results[group_cursor]
+            network.link(group_result)
+            values.append(group_result)
+            group_cursor += 1
+
+        if group_cursor != len(group_results):
+            raise SequenceMaterializationError("unconsumed immediate group result")
+
+        if not values:
+            if fold_results:
+                raise SequenceMaterializationError(
+                    "empty level cannot contain fold results"
+                )
+            expected = description.root
+        elif len(values) == 1:
+            if fold_results:
+                raise SequenceMaterializationError(
+                    "singleton level cannot contain fold results"
+                )
+            expected = values[0]
+        else:
+            if len(fold_results) != len(values) - 1:
+                raise SequenceMaterializationError(
+                    "wrong number of level fold results"
+                )
+            current = values[0]
+            for fold_ref, expected_end in zip(
+                fold_results,
+                values[1:],
+                strict=True,
+            ):
+                link = network.link(fold_ref)
+                if link.start is not current or link.end is not expected_end:
+                    raise SequenceMaterializationError(
+                        "sequence-level fold result has forged exact poles"
+                    )
+                current = fold_ref
+            expected = current
+
+        if result is not expected:
+            raise SequenceMaterializationError(
+                "sequence-level result is not exact fold result"
+            )
+        return result
+    except LinkNetworkError as exc:
+        raise SequenceMaterializationError("invalid exact occurrence evidence") from exc
+    finally:
+        if network.snapshot() != before_snapshot:
+            raise SequenceMaterializationError("sequence-level replay mutated the network")
+
+
 def _validate_resolved_grouping_inputs(
     network: LinkNetwork,
     forms: tuple[OccurrenceRef, ...],
