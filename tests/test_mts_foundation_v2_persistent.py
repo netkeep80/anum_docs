@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import json
 from pathlib import Path
 
 import pytest
 
 from core.foundation_v2_persistent import (
+    PERSISTENT_SCHEMA,
     BatchLink,
     BatchRef,
-    JsonExactLinkStore,
-    PERSISTENT_SCHEMA,
+    JsonLinkStore,
+    PersistentLinkId,
+    PersistentMaterializedEdge,
     PersistentSequenceAtom,
     PersistentSequenceDescription,
     PersistentSequenceGroup,
@@ -20,301 +23,377 @@ from core.foundation_v2_persistent import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTRACT = ROOT / "contracts/mts-foundation-v2-persistent-l4-v0.7.json"
 
 
-def _contract() -> dict:
-    return json.loads(CONTRACT.read_text(encoding="utf-8"))
+def _basis(store: JsonLinkStore):
+    root = store.root
+    opening = store.materialize_start_self_closed(root)
+    closing = store.materialize_end_self_closed(root)
+    linked = store.materialize(opening, closing)
+    unlinked = store.materialize(closing, opening)
+    return root, opening, closing, linked, unlinked
 
 
-def _self_occurrences(store: JsonExactLinkStore, count: int):
-    return store.materialize_batch(
-        tuple(BatchLink(BatchRef(index), BatchRef(index)) for index in range(count))
+def _local_topology(store: JsonLinkStore):
+    return tuple(
+        (ref.local, start.local, end.local)
+        for ref, start, end in store.snapshot().links
     )
 
 
-def _local_topology(store: JsonExactLinkStore):
+def test_create_starts_with_unique_root_and_root_pair_is_idempotent(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+    root = store.root
     snapshot = store.snapshot()
-    return (
-        snapshot.root.local,
-        tuple((ref.local, start.local, end.local) for ref, start, end in snapshot.links),
-    )
 
-
-def _atom(ref):
-    return PersistentSequenceAtom(ref)
-
-
-def _group(*items):
-    return PersistentSequenceGroup(tuple(items))
-
-
-def test_contract_is_candidate_and_supersedes_pair_interning_for_foundation_v2() -> None:
-    contract = _contract()
-    assert contract["schema"] == "mts-foundation-v2-persistent-l4/v0.7"
-    assert contract["status"] == "gate-p-candidate"
-    assert contract["accepted"] is False
-    assert contract["issue"] == 265
-    assert contract["materialization"]["pairInterning"] is False
-    assert contract["materialization"]["idempotentMaterializeByPair"] is False
-    assert contract["aproverRepinAllowed"] is False
-
-
-def test_duplicate_pair_occurrences_survive_clean_reopen(tmp_path: Path) -> None:
-    path = tmp_path / "store.json"
-    store = JsonExactLinkStore.create(path)
-    a, b = _self_occurrences(store, 2)
-    first = store.materialize(a, b)
-    second = store.materialize(a, b)
-    lineage = store.lineage_id
-
-    assert first is not second
-    assert first != second
-    assert store.find(start=a, end=b) == (first, second)
-    store.close()
-
-    reopened = JsonExactLinkStore.open(path)
-    assert reopened.lineage_id == lineage
-    assert reopened.find(start=a, end=b) == (first, second)
-    assert reopened.poles(first) == (a, b)
-    assert reopened.poles(second) == (a, b)
-
-
-def test_find_is_read_only_before_and_after_reopen(tmp_path: Path) -> None:
-    path = tmp_path / "store.json"
-    store = JsonExactLinkStore.create(path)
-    a, b = _self_occurrences(store, 2)
-    snapshot = store.snapshot()
-    file_before = path.read_bytes()
-
-    assert store.find(start=a, end=b) == ()
+    assert store.count == 1
+    assert store.poles(root) == (root, root)
+    assert store.materialize(root, root) == root
+    assert store.count == 1
     assert store.snapshot() == snapshot
-    assert path.read_bytes() == file_before
+
+
+def test_root_basis_is_constructed_by_ostensive_forms_and_reused(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+    root, opening, closing, linked, unlinked = _basis(store)
+    count = store.count
+
+    assert store.poles(opening) == (opening, root)
+    assert store.poles(closing) == (root, closing)
+    assert store.poles(linked) == (opening, closing)
+    assert store.poles(unlinked) == (closing, opening)
+
+    assert store.materialize_start_self_closed(root) == opening
+    assert store.materialize_end_self_closed(root) == closing
+    assert store.materialize(opening, closing) == linked
+    assert store.materialize(closing, opening) == unlinked
+    assert store.count == count
+
+
+def test_find_is_read_only_and_complete_pair_has_at_most_one_result(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+    _, opening, closing, linked, _ = _basis(store)
+    snapshot = store.snapshot()
+
+    assert store.find(start=opening, end=closing) == (linked,)
+    assert linked in store.outgoing(opening)
+    assert linked in store.incoming(closing)
+    assert store.snapshot() == snapshot
+
+
+def test_loop_is_not_full_self_closure(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+    _, opening, _, _, _ = _basis(store)
+    loop = store.materialize(opening, opening)
+
+    assert loop != opening
+    assert store.poles(loop) == (opening, opening)
+    assert store.materialize(opening, opening) == loop
+
+
+def test_basis_and_loop_survive_clean_reopen_with_same_storage_coordinates(tmp_path) -> None:
+    path = tmp_path / "apamemory.json"
+    store = JsonLinkStore.create(path)
+    root, opening, closing, linked, unlinked = _basis(store)
+    loop = store.materialize(opening, opening)
+    lineage = store.lineage_id
+    expected = _local_topology(store)
+    ids = (root, opening, closing, linked, unlinked, loop)
     store.close()
 
-    reopened = JsonExactLinkStore.open(path)
-    reopened_snapshot = reopened.snapshot()
-    reopened_file = path.read_bytes()
-    assert reopened.find(start=a, end=b) == ()
-    assert reopened.snapshot() == reopened_snapshot
-    assert path.read_bytes() == reopened_file
+    reopened = JsonLinkStore.open(path)
+    assert reopened.lineage_id == lineage
+    assert _local_topology(reopened) == expected
+    assert tuple(reopened.all_links()) == ids
+    assert reopened.poles(opening) == (opening, root)
+    assert reopened.poles(loop) == (opening, opening)
 
 
-def test_self_and_mutual_cycles_survive_reopen(tmp_path: Path) -> None:
-    path = tmp_path / "cycles.json"
-    store = JsonExactLinkStore.create(path)
-    x, y = _self_occurrences(store, 2)
-    self_cycle = store.materialize_batch((BatchLink(BatchRef(0), BatchRef(0)),))[0]
-    cycle_a, cycle_b = store.materialize_batch(
+def test_import_same_topology_creates_fresh_storage_lineage_not_new_semantics(tmp_path) -> None:
+    first = JsonLinkStore.create(tmp_path / "first.json")
+    _basis(first)
+    snapshot = first.snapshot()
+
+    imported = JsonLinkStore.import_topology(tmp_path / "second.json", snapshot)
+
+    assert imported.lineage_id != first.lineage_id
+    assert _local_topology(imported) == _local_topology(first)
+    runtime_first, _ = first.runtime_network()
+    runtime_imported, _ = imported.runtime_network()
+    assert runtime_first.snapshot().links == runtime_imported.snapshot().links
+
+
+def test_batch_can_construct_rooted_forms_in_dependency_order(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+    root = store.root
+
+    opening, closing, linked, unlinked = store.materialize_batch(
         (
-            BatchLink(BatchRef(1), x),
-            BatchLink(BatchRef(0), y),
+            BatchLink(BatchRef(0), root),
+            BatchLink(root, BatchRef(1)),
+            BatchLink(BatchRef(0), BatchRef(1)),
+            BatchLink(BatchRef(1), BatchRef(0)),
         )
     )
 
-    assert store.poles(self_cycle) == (self_cycle, self_cycle)
-    assert store.poles(cycle_a) == (cycle_b, x)
-    assert store.poles(cycle_b) == (cycle_a, y)
-    store.close()
-
-    reopened = JsonExactLinkStore.open(path)
-    assert reopened.poles(self_cycle) == (self_cycle, self_cycle)
-    assert reopened.poles(cycle_a) == (cycle_b, x)
-    assert reopened.poles(cycle_b) == (cycle_a, y)
+    assert store.poles(opening) == (opening, root)
+    assert store.poles(closing) == (root, closing)
+    assert store.poles(linked) == (opening, closing)
+    assert store.poles(unlinked) == (closing, opening)
 
 
-def test_shared_endpoint_remains_shared_after_reopen(tmp_path: Path) -> None:
-    path = tmp_path / "sharing.json"
-    store = JsonExactLinkStore.create(path)
-    a, b, shared = _self_occurrences(store, 3)
-    first = store.materialize(a, shared)
-    second = store.materialize(b, shared)
-    store.close()
-
-    reopened = JsonExactLinkStore.open(path)
-    assert reopened.poles(first) == (a, shared)
-    assert reopened.poles(second) == (b, shared)
-    assert reopened.incoming(shared) == (shared, first, second)
-
-
-def test_root_logical_identity_survives_reopen_but_runtime_ref_is_reconstructed(
-    tmp_path: Path,
-) -> None:
-    path = tmp_path / "root.json"
-    store = JsonExactLinkStore.create(path)
+def test_batch_full_self_closure_resolves_to_existing_root(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
     root = store.root
-    runtime_before, mapping_before = store.runtime_network()
-    runtime_root_before = mapping_before[root]
-    store.close()
+    count = store.count
 
-    reopened = JsonExactLinkStore.open(path)
-    assert reopened.root == root
-    runtime_after, mapping_after = reopened.runtime_network()
-    assert runtime_after.snapshot() == runtime_before.snapshot()
-    assert mapping_after[root] is not runtime_root_before
-    assert mapping_after[root] != runtime_root_before
+    assert store.materialize_batch(
+        (BatchLink(BatchRef(0), BatchRef(0)),)
+    ) == (root,)
+    assert store.count == count
 
 
-def test_invalid_batch_is_atomic_in_memory_and_on_disk(tmp_path: Path) -> None:
-    path = tmp_path / "atomic-invalid.json"
-    store = JsonExactLinkStore.create(path)
-    before_snapshot = store.snapshot()
-    before_file = path.read_bytes()
+def test_forward_id_only_cycle_is_rejected_without_state_change(tmp_path) -> None:
+    path = tmp_path / "apamemory.json"
+    store = JsonLinkStore.create(path)
+    root = store.root
+    before = store.snapshot()
+    file_before = path.read_bytes()
 
-    with pytest.raises(PersistentStoreError, match="out of range"):
-        store.materialize_batch((BatchLink(BatchRef(1), BatchRef(0)),))
+    with pytest.raises(PersistentStoreError, match="forward reference"):
+        store.materialize_batch(
+            (
+                BatchLink(BatchRef(1), root),
+                BatchLink(BatchRef(0), root),
+            )
+        )
 
-    assert store.snapshot() == before_snapshot
-    assert path.read_bytes() == before_file
+    assert store.snapshot() == before
+    assert path.read_bytes() == file_before
 
 
-def test_simulated_commit_failure_exposes_pre_state_only(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    path = tmp_path / "atomic-commit.json"
-    store = JsonExactLinkStore.create(path)
-    a, b = _self_occurrences(store, 2)
-    before_snapshot = store.snapshot()
-    before_file = path.read_bytes()
+def test_failed_commit_leaves_memory_and_file_at_pre_state(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "apamemory.json"
+    store = JsonLinkStore.create(path)
+    _, opening, closing, _, _ = _basis(store)
+    before = store.snapshot()
+    file_before = path.read_bytes()
 
-    def fail(_links):
+    def fail_commit(_links):
         raise OSError("simulated commit failure")
 
-    monkeypatch.setattr(store, "_commit_candidate", fail)
+    monkeypatch.setattr(store, "_commit_candidate", fail_commit)
     with pytest.raises(OSError, match="simulated"):
-        store.materialize(a, b)
+        store.materialize(opening, opening)
 
-    assert store.snapshot() == before_snapshot
-    assert path.read_bytes() == before_file
-
-
-def test_fresh_import_of_same_topology_creates_another_lineage(tmp_path: Path) -> None:
-    source_path = tmp_path / "source.json"
-    imported_path = tmp_path / "imported.json"
-    source = JsonExactLinkStore.create(source_path)
-    a, b = _self_occurrences(source, 2)
-    source.materialize(a, b)
-    snapshot = source.snapshot()
-
-    imported = JsonExactLinkStore.import_topology(imported_path, snapshot)
-
-    assert imported.lineage_id != source.lineage_id
-    assert _local_topology(imported) == _local_topology(source)
-    assert imported.root.local == source.root.local
-    assert imported.root != source.root
+    assert store.snapshot() == before
+    assert path.read_bytes() == file_before
+    assert store.find(start=opening, end=opening) == ()
+    assert store.find(start=opening, end=closing)
 
 
-def test_backend_file_has_logical_ids_only_not_runtime_objects(tmp_path: Path) -> None:
-    path = tmp_path / "wire.json"
-    store = JsonExactLinkStore.create(path)
-    a, b = _self_occurrences(store, 2)
-    store.materialize(a, b)
+def test_runtime_reconstruction_preserves_topology_but_uses_runtime_handles(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+    _basis(store)
+    network, mapping = store.runtime_network()
 
+    assert network.snapshot().links == tuple(
+        (start.local, end.local) for _ref, start, end in store.snapshot().links
+    )
+    assert mapping[store.root] is network.root
+    for persistent, runtime in mapping.items():
+        start, end = store.poles(persistent)
+        runtime_link = network.link(runtime)
+        assert runtime_link.start is mapping[start]
+        assert runtime_link.end is mapping[end]
+
+
+def test_open_rejects_duplicate_pair_second_root_and_unrooted_cycle(tmp_path) -> None:
+    cases = (
+        [[0, 0], [0, 0]],
+        [[0, 0], [1, 1]],
+        [[0, 0], [2, 0], [1, 0]],
+    )
+    for index, links in enumerate(cases):
+        path = tmp_path / f"invalid-{index}.json"
+        path.write_text(
+            json.dumps(
+                {
+                    "schema": PERSISTENT_SCHEMA,
+                    "lineage": f"bad-{index}",
+                    "root": 0,
+                    "links": links,
+                }
+            ),
+            encoding="utf-8",
+        )
+        with pytest.raises(PersistentStoreError, match="canonical|rooted"):
+            JsonLinkStore.open(path)
+
+
+def test_json_payload_contains_only_storage_coordinates(tmp_path) -> None:
+    path = tmp_path / "apamemory.json"
+    store = JsonLinkStore.create(path)
+    _basis(store)
     raw = json.loads(path.read_text(encoding="utf-8"))
+
     assert raw["schema"] == PERSISTENT_SCHEMA
-    assert set(raw) == {"schema", "lineage", "root", "links"}
-    assert all(isinstance(value, int) for pair in raw["links"] for value in pair)
-    assert "OccurrenceRef" not in path.read_text(encoding="utf-8")
+    assert isinstance(raw["lineage"], str)
+    assert isinstance(raw["root"], int)
+    assert all(
+        isinstance(value, int)
+        for pair in raw["links"]
+        for value in pair
+    )
 
 
-def test_persistent_sequence_materialization_replays_after_clean_reopen(
-    tmp_path: Path,
-) -> None:
-    path = tmp_path / "sequence.json"
-    store = JsonExactLinkStore.create(path)
-    window, cursor, position, x, integer, point = _self_occurrences(store, 6)
+def test_empty_sequence_and_empty_group_return_root_without_growth(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+    root = store.root
+    before = store.count
+
+    empty = materialize_persistent_sequence(
+        store,
+        PersistentSequenceDescription(root=root, items=()),
+    )
+    nested_empty = materialize_persistent_sequence(
+        store,
+        PersistentSequenceDescription(
+            root=root,
+            items=(PersistentSequenceGroup(()),),
+        ),
+    )
+
+    assert empty.result == root and empty.created == ()
+    assert nested_empty.result == root and nested_empty.created == ()
+    assert store.count == before
+
+
+def test_sequence_materialization_persists_only_absent_pair_and_then_reuses(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+    _, opening, closing, _, _ = _basis(store)
+    description = PersistentSequenceDescription(
+        root=store.root,
+        items=(PersistentSequenceAtom(opening), PersistentSequenceAtom(closing)),
+    )
+    # The root basis already contains O⟼C = L.
+    count = store.count
+    reused = materialize_persistent_sequence(store, description)
+    assert reused.created == ()
+    assert reused.result == store.find(start=opening, end=closing)[0]
+    assert store.count == count
+
+    a = store.materialize(opening, opening)
+    b = store.materialize(closing, closing)
+    new_description = PersistentSequenceDescription(
+        root=store.root,
+        items=(PersistentSequenceAtom(a), PersistentSequenceAtom(b)),
+    )
+    first = materialize_persistent_sequence(store, new_description)
+    after_first = store.count
+    second = materialize_persistent_sequence(store, new_description)
+
+    assert len(first.created) == 1
+    assert first.result == second.result
+    assert second.created == ()
+    assert store.count == after_first
+
+
+def test_three_value_sequence_persists_exact_left_fold_prefix(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+    _, opening, closing, linked, _ = _basis(store)
+    a = store.materialize(opening, opening)
+    b = store.materialize(closing, closing)
+    c = store.materialize(linked, linked)
     description = PersistentSequenceDescription(
         root=store.root,
         items=(
-            _group(_atom(window)),
-            _group(_atom(cursor)),
-            _group(_atom(position)),
-            _group(
-                _group(_group(_atom(x)), _group(_atom(integer))),
-                _group(_atom(point)),
-            ),
+            PersistentSequenceAtom(a),
+            PersistentSequenceAtom(b),
+            PersistentSequenceAtom(c),
         ),
     )
 
     evidence = materialize_persistent_sequence(store, description)
-    assert len(evidence.created) == 5
-    xi, q, window_cursor, window_cursor_position, full = evidence.created
-    assert (xi.start, xi.end) == (x, integer)
-    assert q.start == xi.ref
-    assert q.end == point
-    assert (window_cursor.start, window_cursor.end) == (window, cursor)
-    assert window_cursor_position.start == window_cursor.ref
-    assert window_cursor_position.end == position
-    assert full.start == window_cursor_position.ref
-    assert full.end == q.ref
-    assert evidence.result == full.ref
-
-    snapshot_after = store.snapshot()
-    assert replay_persistent_sequence_materialization(store, evidence) == evidence.result
-    assert store.snapshot() == snapshot_after
-    store.close()
-
-    reopened = JsonExactLinkStore.open(path)
-    reopened_snapshot = reopened.snapshot()
-    assert replay_persistent_sequence_materialization(reopened, evidence) == evidence.result
-    assert reopened.snapshot() == reopened_snapshot
-
-
-def test_persistent_sequence_three_values_left_fold_prefix(tmp_path: Path) -> None:
-    path = tmp_path / "sequence-left-fold.json"
-    store = JsonExactLinkStore.create(path)
-    a, b, c = _self_occurrences(store, 3)
-    evidence = materialize_persistent_sequence(
-        store,
-        PersistentSequenceDescription(
-            root=store.root,
-            items=(_atom(a), _atom(b), _atom(c)),
-        ),
-    )
 
     assert len(evidence.created) == 2
     ab, abc = evidence.created
     assert (ab.start, ab.end) == (a, b)
     assert (abc.start, abc.end) == (ab.ref, c)
     assert evidence.result == abc.ref
-    assert store.find(start=b, end=c) == ()
 
 
-def test_sequence_bridge_preserves_duplicate_pair_policy(tmp_path: Path) -> None:
-    path = tmp_path / "sequence-duplicate.json"
-    store = JsonExactLinkStore.create(path)
-    a, b = _self_occurrences(store, 2)
-    old = store.materialize(a, b)
+def test_persistent_sequence_evidence_replays_after_clean_reopen(tmp_path) -> None:
+    path = tmp_path / "apamemory.json"
+    store = JsonLinkStore.create(path)
+    _, opening, closing, _, _ = _basis(store)
+    a = store.materialize(opening, opening)
+    b = store.materialize(closing, closing)
     description = PersistentSequenceDescription(
         root=store.root,
-        items=(_atom(a), _atom(b)),
+        items=(PersistentSequenceAtom(a), PersistentSequenceAtom(b)),
+    )
+    evidence = materialize_persistent_sequence(store, description)
+    snapshot = store.snapshot()
+    store.close()
+
+    reopened = JsonLinkStore.open(path)
+    assert replay_persistent_sequence_materialization(reopened, evidence) == evidence.result
+    assert reopened.snapshot() == snapshot
+
+
+def test_forged_persistent_sequence_edge_rejects_read_only(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+    _, opening, closing, _, _ = _basis(store)
+    a = store.materialize(opening, opening)
+    b = store.materialize(closing, closing)
+    evidence = materialize_persistent_sequence(
+        store,
+        PersistentSequenceDescription(
+            root=store.root,
+            items=(PersistentSequenceAtom(a), PersistentSequenceAtom(b)),
+        ),
+    )
+    before = store.snapshot()
+    edge = evidence.created[0]
+    forged = replace(
+        evidence,
+        created=(
+            PersistentMaterializedEdge(
+                ref=edge.ref,
+                start=opening,
+                end=edge.end,
+            ),
+        ),
     )
 
-    evidence = materialize_persistent_sequence(store, description)
-    assert evidence.result != old
-    assert store.find(start=a, end=b) == (old, evidence.result)
+    with pytest.raises((PersistentStoreError, ValueError)):
+        replay_persistent_sequence_materialization(store, forged)
+    assert store.snapshot() == before
 
 
-def test_closed_handle_rejects_observation(tmp_path: Path) -> None:
-    path = tmp_path / "closed.json"
-    store = JsonExactLinkStore.create(path)
-    store.close()
+def test_foreign_storage_id_and_closed_handle_reject(tmp_path) -> None:
+    first = JsonLinkStore.create(tmp_path / "first.json")
+    second = JsonLinkStore.create(tmp_path / "second.json")
+
+    with pytest.raises(PersistentStoreError, match="foreign"):
+        first.poles(second.root)
+
+    first.close()
     with pytest.raises(PersistentStoreError, match="closed"):
-        _ = store.root
+        _ = first.count
 
 
-def test_backend_does_not_import_legacy_parser_or_pair_interning() -> None:
+def test_persistent_public_names_do_not_restore_occurrence_identity() -> None:
     source = (ROOT / "core/foundation_v2_persistent.py").read_text(encoding="utf-8")
-    for forbidden in (
-        "anum_memory",
-        "intern_link",
-        "anum_parser",
-        "mtc_parser",
-        "mtc_ast",
-        "mtc_interpreter",
-    ):
-        assert forbidden not in source
-    contract = _contract()
-    assert contract["backendNeutrality"]["jsonReferenceFileFormatNormative"] is False
-    assert contract["backendNeutrality"]["pmmApiNormative"] is False
+    assert "PersistentOccurrenceId" not in source
+    assert "JsonExactLinkStore" not in source
+    assert "all_occurrences" not in source
+    assert "samePairMayHaveMultipleOccurrences" not in source
+    assert "fresh exact occurrence" not in source
+
+
+def test_persistent_link_id_is_explicitly_only_storage_coordinate() -> None:
+    ref = PersistentLinkId("lineage", 7)
+    assert ref.lineage == "lineage"
+    assert ref.local == 7
