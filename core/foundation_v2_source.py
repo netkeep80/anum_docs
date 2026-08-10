@@ -320,6 +320,70 @@ def replay_source_front_end(
     return tuple(forms)
 
 
+def replay_source_subselection(
+    network: LinkNetwork,
+    evidence: SourceFrontEndEvidence,
+    byte_refs: Mapping[int, OccurrenceRef],
+    *,
+    start_segment: int,
+    end_segment: int,
+    selection_sequence: OccurrenceRef,
+    form_sequence: OccurrenceRef,
+    grammar: OccurrenceRef,
+    theory: OccurrenceRef,
+    grammar_membership: OccurrenceRef,
+    theory_membership: OccurrenceRef,
+) -> tuple[OccurrenceRef, ...]:
+    """Replay one exact contiguous subselection of an already-replayed source.
+
+    Segment indices are checker coordinates only. Semantic evidence remains the
+    exact segment ``selection`` occurrences, their R-seeded ordered fold, the
+    selected exact form fold and explicit G/T memberships. Empty ranges are
+    valid and therefore use the distinguished exact root for both folds.
+
+    This layer is intentionally bracket-agnostic: it does not decide whether a
+    selected range is a group body. A higher layer may independently verify O/C
+    boundaries around the same exact segment range.
+    """
+
+    before = network.snapshot()
+    forms = replay_source_front_end(network, evidence, byte_refs)
+    if (
+        start_segment < 0
+        or end_segment < start_segment
+        or end_segment > len(evidence.segments)
+    ):
+        raise SourceReplayError("invalid source subselection segment range")
+
+    segments = evidence.segments[start_segment:end_segment]
+    selected_forms = forms[start_segment:end_segment]
+    _verify_fold(
+        network,
+        selection_sequence,
+        tuple(segment.selection for segment in segments),
+        network.root,
+    )
+    _verify_fold(network, form_sequence, selected_forms, network.root)
+    _verify_direct_membership(
+        network,
+        grammar_membership,
+        grammar,
+        form_sequence,
+        "subselection grammar",
+    )
+    _verify_direct_membership(
+        network,
+        theory_membership,
+        theory,
+        form_sequence,
+        "subselection theory",
+    )
+
+    if network.snapshot() != before:
+        raise SourceReplayError("source subselection replay mutated the network")
+    return selected_forms
+
+
 def _validate_spans(raw_bytes: bytes, specs: Sequence[SegmentSpec]) -> None:
     boundaries = tuple((spec.start, spec.end) for spec in specs)
     _validate_boundaries(raw_bytes, boundaries)
