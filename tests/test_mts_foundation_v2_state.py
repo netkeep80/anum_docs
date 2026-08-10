@@ -189,6 +189,100 @@ def test_role_addressed_act_fields_are_additive_link_data() -> None:
     assert network.snapshot() == before
 
 
+def test_same_source_can_have_two_exact_reading_acts_with_different_evidence() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    interpreter = _anchor(builder)
+    role_dictionary = define_dictionary_scope(builder, root, root)
+
+    source_content = _anchor(builder)
+    source = define_source_occurrence(builder, source_content)
+    dictionary = define_dictionary_scope(builder, root, root)
+    before_parent = _anchor(builder)
+    before_current = _anchor(builder)
+    before_context = define_context(builder, before_parent, before_current)
+
+    open_form = _anchor(builder)
+    close_form = _anchor(builder)
+    grammar_one = _anchor(builder)
+    grammar_two = _anchor(builder)
+    theory_one = _anchor(builder)
+    theory_two = _anchor(builder)
+    form_sequence_one = _anchor(builder)
+    form_sequence_two = _anchor(builder)
+    result_one = _anchor(builder)
+    result_two = _anchor(builder)
+    after_one = define_context(builder, before_parent, result_one)
+    after_two = define_context(builder, before_parent, result_two)
+
+    roles = {
+        name: _anchor(builder)
+        for name in (
+            "source",
+            "dictionary",
+            "grammar",
+            "theory",
+            "form-sequence",
+            "open-form",
+            "close-form",
+            "before-context",
+            "result",
+        )
+    }
+
+    act_one = define_act_header(builder, interpreter, role_dictionary, after_one)
+    act_two = define_act_header(builder, interpreter, role_dictionary, after_two)
+
+    common_fields = (
+        (roles["source"], source),
+        (roles["dictionary"], dictionary),
+        (roles["open-form"], open_form),
+        (roles["close-form"], close_form),
+        (roles["before-context"], before_context),
+    )
+    for role, value in common_fields:
+        define_act_field(builder, act_one, role, value)
+        define_act_field(builder, act_two, role, value)
+
+    for role, value in (
+        (roles["grammar"], grammar_one),
+        (roles["theory"], theory_one),
+        (roles["form-sequence"], form_sequence_one),
+        (roles["result"], result_one),
+    ):
+        define_act_field(builder, act_one, role, value)
+    for role, value in (
+        (roles["grammar"], grammar_two),
+        (roles["theory"], theory_two),
+        (roles["form-sequence"], form_sequence_two),
+        (roles["result"], result_two),
+    ):
+        define_act_field(builder, act_two, role, value)
+
+    selecting_parent = _anchor(builder)
+    selection_one = define_context(builder, selecting_parent, act_one)
+    selection_two = define_context(builder, selecting_parent, act_two)
+    network = builder.freeze(root)
+    snapshot = network.snapshot()
+
+    assert act_one is not act_two
+    assert act_values(network, act_one, roles["source"]) == (source,)
+    assert act_values(network, act_two, roles["source"]) == (source,)
+    assert act_values(network, act_one, roles["before-context"]) == (before_context,)
+    assert act_values(network, act_two, roles["before-context"]) == (before_context,)
+    assert act_values(network, act_one, roles["grammar"]) == (grammar_one,)
+    assert act_values(network, act_two, roles["grammar"]) == (grammar_two,)
+    assert act_values(network, act_one, roles["theory"]) == (theory_one,)
+    assert act_values(network, act_two, roles["theory"]) == (theory_two,)
+    assert act_values(network, act_one, roles["form-sequence"]) == (form_sequence_one,)
+    assert act_values(network, act_two, roles["form-sequence"]) == (form_sequence_two,)
+    assert act_values(network, act_one, roles["result"]) == (result_one,)
+    assert act_values(network, act_two, roles["result"]) == (result_two,)
+    assert current_of_context(network, selection_one) is act_one
+    assert current_of_context(network, selection_two) is act_two
+    assert network.snapshot() == snapshot
+
+
 def test_role_names_are_resolved_by_explicit_scoped_role_dictionary() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
