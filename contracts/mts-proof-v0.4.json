@@ -6,8 +6,7 @@
   "dependsOn": [
     "mts-contract/v0.4",
     "mts-proof/v0.3",
-    "mts-opening-path/v0.4",
-    "mts-proof-opening-path-challenge/v0.4"
+    "mts-opening-path/v0.4"
   ],
   "conformanceCorpus": "contracts/mts-proof-conformance-v0.4.json",
   "purpose": "Trusted independent replay of the five accepted v0.3 base relations plus the accepted finite DefinitionOpeningPath operational composite certificate; no other composition or inference rule is accepted.",

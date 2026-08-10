@@ -3,9 +3,8 @@
   "status": "accepted",
   "accepted": true,
   "contract": "mts-proof/v0.4",
-  "sourceCorpus": "contracts/mts-proof-v0.4-conformance-candidate.json",
   "baseCorpus": "contracts/mts-proof-conformance-v0.3.json",
-  "openingPathCorpus": "contracts/mts-opening-path-conformance-candidate-v0.4.json",
+  "openingPathCorpus": "contracts/mts-opening-path-conformance-v0.4.json",
   "selection": {
     "baseValidJudgments": "all",
     "baseForgeries": "all",
@@ -14,6 +13,110 @@
     "openingPathInvalidPaths": "all",
     "v04InvalidArtifacts": "all",
     "mixedArtifact": "required"
+  },
+  "invalidArtifacts": [
+    {
+      "id": "wrong-proof-version",
+      "artifact": {"proofVersion": "mts-proof/v0.3", "contractVersion": "mts-contract/v0.4", "judgments": []}
+    },
+    {
+      "id": "wrong-contract-version",
+      "artifact": {"proofVersion": "mts-proof/v0.4", "contractVersion": "mts-contract/v0.3", "judgments": []}
+    },
+    {
+      "id": "unexpected-proof-field",
+      "artifact": {"proofVersion": "mts-proof/v0.4", "contractVersion": "mts-contract/v0.4", "judgments": [], "searchTrace": []}
+    },
+    {
+      "id": "unknown-relation",
+      "artifact": {
+        "proofVersion": "mts-proof/v0.4",
+        "contractVersion": "mts-contract/v0.4",
+        "judgments": [{"relation": "Equality", "left": "a", "right": "b"}]
+      }
+    },
+    {
+      "id": "opening-unexpected-field",
+      "artifact": {
+        "proofVersion": "mts-proof/v0.4",
+        "contractVersion": "mts-contract/v0.4",
+        "judgments": [{
+          "relation": "DefinitionOpeningPath",
+          "scopes": [{"path": [], "parent": null, "definitions": ["a : b"]}],
+          "lookupScope": [],
+          "startTarget": "a",
+          "edges": [{"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"}],
+          "finalBody": "b",
+          "searchTrace": []
+        }]
+      }
+    },
+    {
+      "id": "edge-unexpected-field",
+      "artifact": {
+        "proofVersion": "mts-proof/v0.4",
+        "contractVersion": "mts-contract/v0.4",
+        "judgments": [{
+          "relation": "DefinitionOpeningPath",
+          "scopes": [{"path": [], "parent": null, "definitions": ["a : b"]}],
+          "lookupScope": [],
+          "startTarget": "a",
+          "edges": [{"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b", "trusted": true}],
+          "finalBody": "b"
+        }]
+      }
+    },
+    {
+      "id": "noncanonical-edge-body",
+      "artifact": {
+        "proofVersion": "mts-proof/v0.4",
+        "contractVersion": "mts-contract/v0.4",
+        "judgments": [{
+          "relation": "DefinitionOpeningPath",
+          "scopes": [{"path": [], "parent": null, "definitions": ["a : (b)"]}],
+          "lookupScope": [],
+          "startTarget": "a",
+          "edges": [{"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "( b )"}],
+          "finalBody": "(b)"
+        }]
+      }
+    },
+    {
+      "id": "noncanonical-final-body",
+      "artifact": {
+        "proofVersion": "mts-proof/v0.4",
+        "contractVersion": "mts-contract/v0.4",
+        "judgments": [{
+          "relation": "DefinitionOpeningPath",
+          "scopes": [{"path": [], "parent": null, "definitions": ["a : {◁ = x}"]}],
+          "lookupScope": [],
+          "startTarget": "a",
+          "edges": [{"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "{◁ = x}"}],
+          "finalBody": "{ ◁ = x }"
+        }]
+      }
+    },
+    {
+      "id": "lookup-scope-not-serialized",
+      "artifact": {
+        "proofVersion": "mts-proof/v0.4",
+        "contractVersion": "mts-contract/v0.4",
+        "judgments": [{
+          "relation": "DefinitionOpeningPath",
+          "scopes": [{"path": [], "parent": null, "definitions": ["a : b"]}],
+          "lookupScope": [0],
+          "startTarget": "a",
+          "edges": [{"target": "a", "definitionId": {"scopePath": [], "ordinal": 0}, "body": "b"}],
+          "finalBody": "b"
+        }]
+      }
+    }
+  ],
+  "mixedArtifact": {
+    "baseJudgmentId": "opens-direct",
+    "openingPathId": "two-edge",
+    "requiredBothOrdersAccepted": true,
+    "orderImpliesDependency": false
   },
   "releaseAssertions": {
     "trustedRelationsExactlySix": true,
