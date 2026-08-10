@@ -295,6 +295,57 @@ def test_additional_envelope_candidate_reencodes_deserialized_result() -> None:
     assert before.snapshot() == before_snapshot
 
 
+def test_second_envelope_literal_formula_and_recursive_reencoding_are_distinct_candidates() -> None:
+    kernel = build_root_kernel()
+    builder = kernel.network.evolve()
+    root = kernel.refs.root
+    a = kernel.refs.unlinked
+    b = kernel.refs.linked
+
+    carrier_head = builder.reserve()
+    carrier_ab = builder.reserve()
+    builder.define(carrier_head, root, a)
+    builder.define(carrier_ab, carrier_head, b)
+    before = builder.freeze()
+
+    inner = materialize_sequence(
+        before,
+        SequenceDescription(
+            root=root,
+            items=(SequenceAtom(a), SequenceAtom(b)),
+        ),
+    )
+    x = inner.result
+
+    candidate_builder = inner.after.evolve()
+    carrier_x = candidate_builder.reserve()
+    recursive_second = candidate_builder.reserve()
+    literal_second = candidate_builder.reserve()
+    candidate_builder.define(carrier_x, root, x)
+    candidate_builder.define(recursive_second, root, carrier_x)
+    candidate_builder.define(literal_second, root, carrier_ab)
+    network = candidate_builder.freeze()
+
+    # Root self-closure means the ostensive prefix ∞⟼∞⟼∞ is still the
+    # distinguished R; it must not be replaced by fresh duplicate R⟼R links.
+    # Therefore Str(v)=R⟼v for one carried value.
+    assert network.link(carrier_x).start is root
+    assert network.link(carrier_x).end is x
+
+    # Competing double-envelope readings:
+    # H1: Str(Str(X)) = R⟼(R⟼X)
+    # H2: Str(C_ab)   = R⟼((R⟼a)⟼b), matching the literal user formula.
+    assert network.link(recursive_second).start is root
+    assert network.link(recursive_second).end is carrier_x
+    assert network.link(literal_second).start is root
+    assert network.link(literal_second).end is carrier_ab
+
+    assert carrier_ab is not carrier_x
+    assert network.link(carrier_ab) != network.link(carrier_x)
+    assert recursive_second is not literal_second
+    assert network.link(recursive_second) != network.link(literal_second)
+
+
 def test_structural_nesting_alone_does_not_raise_description_level() -> None:
     kernel = build_root_kernel()
     root = kernel.refs.root
