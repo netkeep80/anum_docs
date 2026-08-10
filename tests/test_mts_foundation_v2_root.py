@@ -101,6 +101,11 @@ def test_exact_five_link_root_topology() -> None:
     assert (linked.start, linked.end) == (refs.opening, refs.closing)
     assert (unlinked.start, unlinked.end) == (refs.closing, refs.opening)
     assert network.find(refs.opening, refs.closing) is refs.linked
+    assert [
+        ref
+        for ref in network.refs
+        if network.link(ref).start is ref and network.link(ref).end is ref
+    ] == [refs.root]
     validate_root_kernel(kernel)
 
 
@@ -172,17 +177,13 @@ def test_equal_topology_in_two_builds_has_fresh_runtime_access_handles() -> None
     assert first.refs.linked != second.refs.linked
 
 
-def test_another_self_closed_link_is_not_root_when_actual_pole_differs() -> None:
+def test_second_completely_self_closed_link_is_forbidden() -> None:
     kernel = build_root_kernel()
     evolution = kernel.network.evolve()
     other = evolution.reserve()
-    evolution.define(other, other, other)
-    after = evolution.freeze()
 
-    assert after.root is kernel.refs.root
-    assert other is not after.root
-    assert after.link(other).start is other
-    assert after.link(other).end is other
+    with pytest.raises(LinkNetworkError, match="fully self-closed link is unique"):
+        evolution.define(other, other, other)
 
 
 def test_duplicate_same_pole_link_is_forbidden_and_ensure_reuses_linked() -> None:
