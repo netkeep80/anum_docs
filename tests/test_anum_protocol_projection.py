@@ -239,113 +239,6 @@ def test_quote_envelope_can_select_carrier_or_deserialized_denotation() -> None:
     assert network.snapshot() == before
 
 
-def test_additional_envelope_candidate_reencodes_deserialized_result() -> None:
-    kernel = build_root_kernel()
-    builder = kernel.network.evolve()
-    root = kernel.refs.root
-    a = kernel.refs.unlinked
-    b = kernel.refs.linked
-
-    carrier_head = builder.reserve()
-    carrier_ab = builder.reserve()
-    builder.define(carrier_head, root, a)
-    builder.define(carrier_ab, carrier_head, b)
-    before = builder.freeze()
-    before_snapshot = before.snapshot()
-
-    passed = materialize_sequence(
-        before,
-        SequenceDescription(root=root, items=(SequenceAtom(carrier_ab),)),
-    )
-    assert passed.created == ()
-    assert passed.result is carrier_ab
-    assert find_links(before, start=a, end=b) == ()
-
-    inner = materialize_sequence(
-        before,
-        SequenceDescription(
-            root=root,
-            items=(SequenceAtom(a), SequenceAtom(b)),
-        ),
-    )
-    x = inner.result
-    assert len(inner.created) == 1
-    assert inner.after.link(x).start is a
-    assert inner.after.link(x).end is b
-    assert x is not carrier_ab
-
-    reencoded_builder = inner.after.evolve()
-    carrier_x = reencoded_builder.reserve()
-    reencoded_builder.define(carrier_x, root, x)
-    after_one_envelope = reencoded_builder.freeze()
-
-    second_builder = after_one_envelope.evolve()
-    carrier_carrier_x = second_builder.reserve()
-    second_builder.define(carrier_carrier_x, root, carrier_x)
-    after_two_envelopes = second_builder.freeze()
-
-    assert after_one_envelope.link(carrier_x).start is root
-    assert after_one_envelope.link(carrier_x).end is x
-    assert after_two_envelopes.link(carrier_carrier_x).start is root
-    assert after_two_envelopes.link(carrier_carrier_x).end is carrier_x
-
-    assert len({carrier_ab, x, carrier_x, carrier_carrier_x}) == 4
-    assert carrier_x is not carrier_ab
-    assert carrier_carrier_x is not carrier_ab
-    assert before.snapshot() == before_snapshot
-
-
-def test_second_envelope_literal_formula_and_recursive_reencoding_are_distinct_candidates() -> None:
-    kernel = build_root_kernel()
-    builder = kernel.network.evolve()
-    root = kernel.refs.root
-    a = kernel.refs.unlinked
-    b = kernel.refs.linked
-
-    carrier_head = builder.reserve()
-    carrier_ab = builder.reserve()
-    builder.define(carrier_head, root, a)
-    builder.define(carrier_ab, carrier_head, b)
-    before = builder.freeze()
-
-    inner = materialize_sequence(
-        before,
-        SequenceDescription(
-            root=root,
-            items=(SequenceAtom(a), SequenceAtom(b)),
-        ),
-    )
-    x = inner.result
-
-    candidate_builder = inner.after.evolve()
-    carrier_x = candidate_builder.reserve()
-    recursive_second = candidate_builder.reserve()
-    literal_second = candidate_builder.reserve()
-    candidate_builder.define(carrier_x, root, x)
-    candidate_builder.define(recursive_second, root, carrier_x)
-    candidate_builder.define(literal_second, root, carrier_ab)
-    network = candidate_builder.freeze()
-
-    # Root self-closure means the ostensive prefix ∞⟼∞⟼∞ is still the
-    # distinguished R; it must not be replaced by fresh duplicate R⟼R links.
-    # Therefore Str(v)=R⟼v for one carried value.
-    assert network.link(carrier_x).start is root
-    assert network.link(carrier_x).end is x
-
-    # Competing double-envelope readings:
-    # H1: Str(Str(X)) = R⟼(R⟼X)
-    # H2: Str(C_ab)   = R⟼((R⟼a)⟼b), matching the literal user formula.
-    assert network.link(recursive_second).start is root
-    assert network.link(recursive_second).end is carrier_x
-    assert network.link(literal_second).start is root
-    assert network.link(literal_second).end is carrier_ab
-
-    assert carrier_ab is not carrier_x
-    assert network.link(carrier_ab) != network.link(carrier_x)
-    assert recursive_second is not literal_second
-    assert network.link(recursive_second) != network.link(literal_second)
-
-
 def test_grouping_preserves_depth_that_generic_materializer_does_not_encode() -> None:
     kernel = build_root_kernel()
     root = kernel.refs.root
@@ -385,9 +278,8 @@ def test_grouping_preserves_depth_that_generic_materializer_does_not_encode() ->
     one_materialized = materialize_sequence(network, one_level)
     two_materialized = materialize_sequence(network, two_levels)
 
-    # Grouping retained the second exact O/C nesting level, but the generic
-    # nested-sequence materializer has no rule that turns that depth into a
-    # carrier level: both paths currently create only one a⟼b relation.
+    # Grouping retains exact O/C depth, while the generic nested-sequence
+    # materializer still has no rule that encodes it as an extra carrier level.
     assert len(one_materialized.created) == 1
     assert len(two_materialized.created) == 1
     assert (
@@ -426,7 +318,7 @@ def test_user_examples_decompose_into_pass_deserialize_encode_and_left_fold() ->
     assert empty.result is root and empty.created == ()
     assert singleton.result is a and singleton.created == ()
 
-    # P: pass an already-existing exact carrier as one value, with no effect.
+    # pass: an already-existing exact carrier is one value and creates nothing.
     passed = materialize_sequence(
         before,
         SequenceDescription(root=root, items=(SequenceAtom(carrier_ab),)),
@@ -434,7 +326,7 @@ def test_user_examples_decompose_into_pass_deserialize_encode_and_left_fold() ->
     assert passed.result is carrier_ab
     assert passed.created == ()
 
-    # D: deserialize ab by the corrected left fold, without R as an operand.
+    # des: corrected left fold does not use R as an operand for nonempty input.
     deserialized = materialize_sequence(
         before,
         SequenceDescription(
@@ -446,25 +338,29 @@ def test_user_examples_decompose_into_pass_deserialize_encode_and_left_fold() ->
     assert len(deserialized.created) == 1
     assert (deserialized.created[0].start, deserialized.created[0].end) == (a, b)
 
-    # E: encode one selected exact value as a carrier R⟼value.  This is an
-    # explicit link effect, not an intrinsic bracket opcode.
+    # enc: an explicit ordinary link effect R⟼value, never a bracket opcode.
     encoded_builder = deserialized.after.evolve()
     carrier_x = encoded_builder.reserve()
-    carrier_carrier_ab = encoded_builder.reserve()
+    literal_second = encoded_builder.reserve()
+    recursive_second = encoded_builder.reserve()
     encoded_builder.define(carrier_x, root, x)
-    encoded_builder.define(carrier_carrier_ab, root, carrier_ab)
+    encoded_builder.define(literal_second, root, carrier_ab)
+    encoded_builder.define(recursive_second, root, carrier_x)
     encoded = encoded_builder.freeze()
 
-    # User families:
-    #   [ab]   -> E(D(ab)) = C_X
-    #   [[ab]] -> E(P(C_ab)) = C(C_ab)
+    # [ab] -> enc(des(ab)); [[ab]] -> enc(pass(C_ab)).
     assert encoded.link(carrier_x).start is root
     assert encoded.link(carrier_x).end is x
-    assert encoded.link(carrier_carrier_ab).start is root
-    assert encoded.link(carrier_carrier_ab).end is carrier_ab
-    assert carrier_x is not carrier_carrier_ab
+    assert encoded.link(literal_second).start is root
+    assert encoded.link(literal_second).end is carrier_ab
 
-    # ab[ab] -> D(a,b,D(a,b)); inner and outer a⟼b are exact-distinct.
+    # The older recursive-reencoding hypothesis is a distinct topology.
+    assert encoded.link(recursive_second).start is root
+    assert encoded.link(recursive_second).end is carrier_x
+    assert carrier_ab is not carrier_x
+    assert encoded.link(literal_second) != encoded.link(recursive_second)
+
+    # ab[ab] -> des(a,b,des(a,b)); inner/outer a⟼b stay exact-distinct.
     mixed = materialize_sequence(
         before,
         SequenceDescription(
@@ -484,98 +380,24 @@ def test_user_examples_decompose_into_pass_deserialize_encode_and_left_fold() ->
     assert mixed_result.end is inner_ab.ref
     assert mixed.result is mixed_result.ref
 
-    # [[ab]]ab -> D(E(P(C_ab)),a,b), using the literal second-level candidate.
+    # [[ab]]ab -> des(enc(pass(C_ab)),a,b), using the literal second level.
     outer = materialize_sequence(
         encoded,
         SequenceDescription(
             root=root,
             items=(
-                SequenceAtom(carrier_carrier_ab),
+                SequenceAtom(literal_second),
                 SequenceAtom(a),
                 SequenceAtom(b),
             ),
         ),
     )
     first, full = outer.created
-    assert first.start is carrier_carrier_ab
+    assert first.start is literal_second
     assert first.end is a
     assert full.start is first.ref
     assert full.end is b
     assert outer.result is full.ref
-
-
-def test_mixed_ab_group_ab_preserves_duplicate_exact_pair_occurrences() -> None:
-    kernel = build_root_kernel()
-    root = kernel.refs.root
-    a = kernel.refs.unlinked
-    b = kernel.refs.linked
-
-    evidence = materialize_sequence(
-        kernel.network,
-        SequenceDescription(
-            root=root,
-            items=(
-                SequenceAtom(a),
-                SequenceAtom(b),
-                SequenceGroup((SequenceAtom(a), SequenceAtom(b))),
-            ),
-        ),
-    )
-
-    # Nested materialization runs first. The outer sequence then folds left:
-    # outer_ab=a⟼b, full=outer_ab⟼inner_ab.
-    assert len(evidence.created) == 3
-    inner_ab, outer_ab, full = evidence.created
-    assert (inner_ab.start, inner_ab.end) == (a, b)
-    assert (outer_ab.start, outer_ab.end) == (a, b)
-    assert inner_ab.ref is not outer_ab.ref
-    assert evidence.after.link(inner_ab.ref) == evidence.after.link(outer_ab.ref)
-    assert find_links(evidence.after, start=a, end=b) == (
-        inner_ab.ref,
-        outer_ab.ref,
-    )
-
-    assert full.start is outer_ab.ref
-    assert full.end is inner_ab.ref
-    assert evidence.result is full.ref
-
-
-def test_reencoded_nested_value_can_participate_in_outer_sequence() -> None:
-    kernel = build_root_kernel()
-    root = kernel.refs.root
-    a = kernel.refs.unlinked
-    b = kernel.refs.linked
-
-    inner = materialize_sequence(
-        kernel.network,
-        SequenceDescription(
-            root=root,
-            items=(SequenceAtom(a), SequenceAtom(b)),
-        ),
-    )
-    x = inner.result
-
-    builder = inner.after.evolve()
-    carrier_x = builder.reserve()
-    builder.define(carrier_x, root, x)
-    with_envelope_value = builder.freeze()
-
-    outer = materialize_sequence(
-        with_envelope_value,
-        SequenceDescription(
-            root=root,
-            items=(SequenceAtom(carrier_x), SequenceAtom(a), SequenceAtom(b)),
-        ),
-    )
-
-    # Outer values fold as ((carrier_x⟼a)⟼b).
-    assert len(outer.created) == 2
-    first, second = outer.created
-    assert first.start is carrier_x
-    assert first.end is a
-    assert second.start is first.ref
-    assert second.end is b
-    assert outer.result is second.ref
 
 
 def test_unquote_requires_explicit_outer_envelope():
