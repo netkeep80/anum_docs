@@ -7,9 +7,12 @@ import pytest
 
 from core.exact_link_network import LinkNetworkBuilder
 from core.foundation_v2_interpreter import (
+    FlatSequenceReadingEvidence,
+    FlatSequenceReadingRoleRefs,
     InterpreterReplayError,
     RelationStepEvidence,
     RelationStepRoleRefs,
+    replay_flat_sequence_reading,
     replay_relation_step,
 )
 from core.foundation_v2_source import SegmentSpec, SourceFrontEndBuilder
@@ -33,6 +36,17 @@ ROLE_NAMES = (
     "form",
     "before-context",
     "binding",
+    "result",
+    "after-context",
+)
+FLAT_ROLE_NAMES = (
+    "source",
+    "source-selection",
+    "form-sequence",
+    "dictionary",
+    "grammar",
+    "theory",
+    "before-context",
     "result",
     "after-context",
 )
@@ -82,6 +96,35 @@ def _role_items(roles: RelationStepRoleRefs):
         ("form", roles.form),
         ("before-context", roles.before_context),
         ("binding", roles.binding),
+        ("result", roles.result),
+        ("after-context", roles.after_context),
+    )
+
+
+def _flat_roles(builder: LinkNetworkBuilder) -> FlatSequenceReadingRoleRefs:
+    refs = {name: _anchor(builder) for name in FLAT_ROLE_NAMES}
+    return FlatSequenceReadingRoleRefs(
+        source=refs["source"],
+        source_selection=refs["source-selection"],
+        form_sequence=refs["form-sequence"],
+        dictionary=refs["dictionary"],
+        grammar=refs["grammar"],
+        theory=refs["theory"],
+        before_context=refs["before-context"],
+        result=refs["result"],
+        after_context=refs["after-context"],
+    )
+
+
+def _flat_role_items(roles: FlatSequenceReadingRoleRefs):
+    return (
+        ("source", roles.source),
+        ("source-selection", roles.source_selection),
+        ("form-sequence", roles.form_sequence),
+        ("dictionary", roles.dictionary),
+        ("grammar", roles.grammar),
+        ("theory", roles.theory),
+        ("before-context", roles.before_context),
         ("result", roles.result),
         ("after-context", roles.after_context),
     )
@@ -197,6 +240,110 @@ def _fixture(
     return network, byte_refs, evidence, duplicate, fixed_pole
 
 
+def _flat_reading_fixture(*, duplicate_pair_result_field: bool = False):
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    byte_refs = _byte_vocabulary(builder)
+    front_end = SourceFrontEndBuilder(builder, root, byte_refs)
+
+    a = _anchor(builder)
+    b = _anchor(builder)
+    carrier_a = _new_link(builder, root, a)
+    carrier_ab = _new_link(builder, carrier_a, b)
+    pair_result = _new_link(builder, a, b)
+
+    source = front_end.source_occurrence(b"ab")
+    dictionary = define_dictionary_scope(builder, root, root)
+    history = root
+    occurrences = {}
+    for raw, form in ((b"a", a), (b"b", b), (b"ab", carrier_ab)):
+        dictionary, history, occurrence = _define_scoped_mapping(
+            builder,
+            root,
+            dictionary,
+            history,
+            front_end.content_ref(raw),
+            form,
+        )
+        occurrences[raw] = occurrence
+
+    pair_grammar = _anchor(builder)
+    pair_theory = _anchor(builder)
+    carrier_grammar = _anchor(builder)
+    carrier_theory = _anchor(builder)
+    pair_source = front_end.build_selected_evidence(
+        source,
+        (
+            SegmentSpec(0, 1, a, occurrences[b"a"]),
+            SegmentSpec(1, 2, b, occurrences[b"b"]),
+        ),
+        dictionary=dictionary,
+        grammar=pair_grammar,
+        theory=pair_theory,
+    )
+    carrier_source = front_end.build_selected_evidence(
+        source,
+        (SegmentSpec(0, 2, carrier_ab, occurrences[b"ab"]),),
+        dictionary=dictionary,
+        grammar=carrier_grammar,
+        theory=carrier_theory,
+    )
+
+    interpreter = _anchor(builder)
+    parent = _anchor(builder)
+    prior = _anchor(builder)
+    before_context = define_context(builder, parent, prior)
+    pair_after = define_context(builder, parent, pair_result)
+    carrier_after = define_context(builder, parent, carrier_ab)
+
+    roles = _flat_roles(builder)
+    role_dictionary = define_dictionary_scope(builder, root, root)
+    role_history = root
+    for role_name, role_ref in _flat_role_items(roles):
+        role_dictionary, role_history, _ = _define_scoped_mapping(
+            builder,
+            root,
+            role_dictionary,
+            role_history,
+            front_end.content_ref(role_name.encode("utf-8")),
+            role_ref,
+        )
+
+    def reading(source_evidence, result, after_context):
+        act = define_act_header(builder, interpreter, role_dictionary, after_context)
+        fields = (
+            (roles.source, source_evidence.source),
+            (roles.source_selection, source_evidence.selection_sequence),
+            (roles.form_sequence, source_evidence.form_sequence),
+            (roles.dictionary, source_evidence.dictionary),
+            (roles.grammar, source_evidence.grammar),
+            (roles.theory, source_evidence.theory),
+            (roles.before_context, before_context),
+            (roles.result, result),
+            (roles.after_context, after_context),
+        )
+        for role, value in fields:
+            define_act_field(builder, act, role, value)
+        return FlatSequenceReadingEvidence(
+            source_evidence=source_evidence,
+            interpreter=interpreter,
+            before_context=before_context,
+            result=result,
+            after_context=after_context,
+            act=act,
+            role_dictionary=role_dictionary,
+            roles=roles,
+        )
+
+    pair_reading = reading(pair_source, pair_result, pair_after)
+    carrier_reading = reading(carrier_source, carrier_ab, carrier_after)
+    if duplicate_pair_result_field:
+        define_act_field(builder, pair_reading.act, roles.result, carrier_ab)
+
+    network = builder.freeze(root)
+    return network, byte_refs, pair_reading, carrier_reading, carrier_ab
+
+
 def test_start_open_relation_replays_from_exact_current_read_only() -> None:
     network, byte_refs, evidence, _, fixed_pole = _fixture("start-open")
     before = network.snapshot()
@@ -290,6 +437,45 @@ def test_forged_act_header_rejects() -> None:
 
     with pytest.raises(InterpreterReplayError, match="header does not match"):
         replay_relation_step(network, forged, byte_refs)
+
+
+def test_same_source_has_two_verified_flat_readings_without_hidden_mode() -> None:
+    network, byte_refs, pair_reading, carrier_reading, carrier_ab = (
+        _flat_reading_fixture()
+    )
+    before = network.snapshot()
+
+    assert pair_reading.source_evidence.source is carrier_reading.source_evidence.source
+    assert pair_reading.source_evidence.dictionary is carrier_reading.source_evidence.dictionary
+    assert pair_reading.source_evidence.form_sequence is not carrier_reading.source_evidence.form_sequence
+    assert pair_reading.source_evidence.grammar is not carrier_reading.source_evidence.grammar
+    assert pair_reading.source_evidence.theory is not carrier_reading.source_evidence.theory
+
+    pair_result = replay_flat_sequence_reading(network, pair_reading, byte_refs)
+    carrier_result = replay_flat_sequence_reading(network, carrier_reading, byte_refs)
+
+    pair_link = network.link(pair_result)
+    assert pair_link.start is not network.root
+    assert pair_result is not carrier_ab
+    assert carrier_result is carrier_ab
+    assert network.snapshot() == before
+
+
+def test_flat_reading_rejects_result_from_other_valid_segmentation() -> None:
+    network, byte_refs, pair_reading, _, carrier_ab = _flat_reading_fixture()
+    forged = replace(pair_reading, result=carrier_ab)
+
+    with pytest.raises(InterpreterReplayError, match="left-fold denotation"):
+        replay_flat_sequence_reading(network, forged, byte_refs)
+
+
+def test_flat_reading_rejects_duplicate_exact_act_result_field() -> None:
+    network, byte_refs, pair_reading, _, _ = _flat_reading_fixture(
+        duplicate_pair_result_field=True
+    )
+
+    with pytest.raises(InterpreterReplayError, match="field 'result'"):
+        replay_flat_sequence_reading(network, pair_reading, byte_refs)
 
 
 def test_interpreter_replay_has_no_legacy_parser_ast_or_interpreter_dependency() -> None:
