@@ -4,11 +4,7 @@
   "accepted": true,
   "acceptedContractLinkAllowed": true,
   "dependsOn": [
-    "mts-contract/v0.2",
-    "mts-bundle-decision/v0.2",
-    "mts-bundle-elaboration-challenge/v0.2",
-    "mts-bundle-algebra-challenge/v0.2",
-    "mts-bundle-expansion-challenge/v0.2"
+    "mts-contract/v0.2"
   ],
   "scope": {
     "valueBundle": "flat only",
@@ -167,11 +163,7 @@
     "syntheticMissingLinkForms": "not part of current contract",
     "explicitBundleMaterialization": "separate L4 operation if ever needed"
   },
-  "acceptanceEvidence": {
-    "decision": "contracts/mts-bundle-decision-v0.2.json",
-    "staticElaborationChallenge": "contracts/mts-bundle-elaboration-challenge-v0.2.json",
-    "resolvedIdentityAlgebraChallenge": "contracts/mts-bundle-algebra-challenge-v0.2.json",
-    "readOnlyExpansionChallenge": "contracts/mts-bundle-expansion-challenge-v0.2.json",
+  "productionIntegration": {
     "referenceCore": "core/mtc_value_bundle.py",
     "conformanceCorpus": "contracts/mts-value-bundle-conformance-v0.2.json",
     "rootRegression": "tests/mtc_formulas.mtc",

@@ -71,6 +71,17 @@ FORBIDDEN_CANDIDATE_PATHS = {
     "tests/test_mts_context_dependency_challenge.py",
     "tests/test_mts_context_dependency_decision.py",
     "tests/test_mts_direct_deixis_challenge.py",
+    "contracts/mts-bundle-challenge-v0.2.json",
+    "contracts/mts-bundle-decision-v0.2.json",
+    "contracts/mts-bundle-elaboration-challenge-v0.2.json",
+    "contracts/mts-bundle-algebra-challenge-v0.2.json",
+    "contracts/mts-bundle-expansion-challenge-v0.2.json",
+    "tests/test_mts_bundle_challenge.py",
+    "tests/test_mts_bundle_decision.py",
+    "tests/test_mts_bundle_elaboration_challenge.py",
+    "tests/test_mts_bundle_algebra_challenge.py",
+    "tests/test_mts_bundle_expansion_challenge.py",
+    "tests/test_mts_value_bundle_candidate_contract.py",
 }
 ROOT_FORMULAS_SHA256 = "1ccfb6fa0ae3c744dffcdefefcf2d5d96108573f4b04fdd8ac45a2e15a98ee3a"
 

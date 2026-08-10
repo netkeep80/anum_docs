@@ -87,7 +87,9 @@ def test_reference_module_is_accepted_single_value_bundle_core():
 
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
-    assert contract["acceptanceEvidence"]["referenceCore"] == "core/mtc_value_bundle.py"
+    integration = contract["productionIntegration"]
+    assert integration["referenceCore"] == "core/mtc_value_bundle.py"
+    assert integration["conformanceCorpus"] == "contracts/mts-value-bundle-conformance-v0.2.json"
     assert REFERENCE_CORE.is_file()
     assert "mtc_value_bundle" not in interpreter_source
 
