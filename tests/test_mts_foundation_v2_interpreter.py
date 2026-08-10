@@ -465,7 +465,7 @@ def test_flat_reading_rejects_result_from_other_valid_segmentation() -> None:
     network, byte_refs, pair_reading, _, carrier_ab = _flat_reading_fixture()
     forged = replace(pair_reading, result=carrier_ab)
 
-    with pytest.raises(InterpreterReplayError, match="left-fold denotation"):
+    with pytest.raises(InterpreterReplayError, match="does not start"):
         replay_flat_sequence_reading(network, forged, byte_refs)
 
 
