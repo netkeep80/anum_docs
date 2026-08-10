@@ -3,16 +3,11 @@
   "status": "accepted",
   "accepted": true,
   "dependsOn": [
-    "mts-contract/v0.2",
-    "mts-definition-resolution-challenge/v0.3",
-    "mts-definition-environment-decision/v0.3",
-    "mts-definition-environment-challenge/v0.3",
-    "mts-definition-opening-decision/v0.3",
-    "mts-definition-opening-challenge/v0.3"
+    "mts-contract/v0.2"
   ],
   "conformanceCorpus": "contracts/mts-definition-opening-conformance-v0.3.json",
   "issue": 121,
-  "scope": "normative one-step read-only definition opening semantics; trusted proof rules remain a separate later gate",
+  "scope": "normative one-step read-only definition opening semantics; trusted proof rules remain a separate versioned surface",
   "definitionEnvironment": {
     "identity": {
       "definitionId": "replay-local pair (scopePath, ordinal)",
@@ -100,15 +95,6 @@
     "allCurrentTargetsAddressable": true,
     "allOpenToExactTypedRhs": true
   },
-  "acceptanceEvidence": {
-    "initialResolutionChallenge": "contracts/mts-definition-resolution-challenge-v0.3.json",
-    "environmentDecision": "contracts/mts-definition-environment-decision-v0.3.json",
-    "environmentChallenge": "contracts/mts-definition-environment-challenge-v0.3.json",
-    "openingDecision": "contracts/mts-definition-opening-decision-v0.3.json",
-    "openingChallenge": "contracts/mts-definition-opening-challenge-v0.3.json",
-    "conformanceCorpus": "contracts/mts-definition-opening-conformance-v0.3.json",
-    "rootRegression": "tests/mtc_formulas.mtc"
-  },
   "productionIntegration": {
     "referenceCore": "core/mtc_definitions.py",
     "rootLibrary": "core/root_library.py",
@@ -125,24 +111,12 @@
     "canonicalRootLibraryUsesDefinitionEnvironment": true,
     "productionConformancePresent": true,
     "mtsContractV03Published": true,
-    "trustedL5RuleAccepted": false,
     "aproverRepinAllowed": false
-  },
-  "nextGate": {
-    "issue": 122,
-    "goal": "define a typed MTS proof judgment and challenge the minimal trusted calculus without treating opening as equality",
-    "constraints": [
-      "keep mts-proof/v0.2 unchanged and interpret-only",
-      "do not turn successful open_definition into A = F",
-      "do not add global textual substitution",
-      "do not add trusted rules without executable soundness evidence",
-      "keep search untrusted and checker independently replayable"
-    ]
   },
   "downstream": {
     "genericL2ConsumerMayPinMtsContractV03": true,
     "aproverProofRepinAllowed": false,
     "aproverMustNotInventLocalOpeningSemantics": true,
-    "futureProofConsumerMustWaitForVersionedL5Acceptance": true
+    "futureProofConsumerMustUseVersionedL5Acceptance": true
   }
 }

@@ -3,8 +3,6 @@
   "status": "accepted",
   "accepted": true,
   "contract": "mts-definition-opening/v0.3",
-  "dependsOn": "mts-definition-opening-challenge/v0.3",
-  "promotion": "same challenged vectors promoted after semantic acceptance and production conformance; vector contents are unchanged",
   "resultEncoding": {
     "match": {
       "kind": "match",

@@ -52,6 +52,16 @@ FORBIDDEN_CANDIDATE_PATHS = {
     "tests/test_mts_opening_path_challenge.py",
     "tests/test_mts_opening_path_decision.py",
     "tests/test_mts_proof_v04_opening_path_challenge.py",
+    "contracts/mts-definition-resolution-challenge-v0.3.json",
+    "contracts/mts-definition-environment-decision-v0.3.json",
+    "contracts/mts-definition-environment-challenge-v0.3.json",
+    "contracts/mts-definition-opening-decision-v0.3.json",
+    "contracts/mts-definition-opening-challenge-v0.3.json",
+    "tests/test_mts_definition_resolution_challenge.py",
+    "tests/test_mts_definition_environment_decision.py",
+    "tests/test_mts_definition_environment_challenge.py",
+    "tests/test_mts_definition_opening_decision.py",
+    "tests/test_mts_definition_opening_challenge.py",
 }
 ROOT_FORMULAS_SHA256 = "1ccfb6fa0ae3c744dffcdefefcf2d5d96108573f4b04fdd8ac45a2e15a98ee3a"
 
