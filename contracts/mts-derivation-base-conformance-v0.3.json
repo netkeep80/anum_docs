@@ -3,7 +3,64 @@
   "status": "accepted",
   "accepted": true,
   "contract": "mts-derivation-base/v0.3",
-  "sourceChallenge": "contracts/mts-proof-lifting-conformance-v0.3.json",
+  "vectors": [
+    {
+      "id": "contextual-satisfaction-positive",
+      "lift": "contextual-satisfaction",
+      "expression": "{◁ = ∞, ▷ = ∞}",
+      "symbols": [["∞", 1]],
+      "memory": [],
+      "context": {"start": 1, "end": 1},
+      "expectInterpretSuccess": true
+    },
+    {
+      "id": "contextual-satisfaction-countercontext",
+      "lift": "contextual-satisfaction",
+      "expression": "{◁ = ∞, ▷ = ∞}",
+      "symbols": [["∞", 1]],
+      "memory": [],
+      "context": {"start": 1, "end": 2},
+      "expectInterpretSuccess": false,
+      "counterexampleTo": "global formula truth"
+    },
+    {
+      "id": "opening-match",
+      "lift": "definition-opens",
+      "definitions": ["a : b"],
+      "target": "a",
+      "expect": {"kind": "match", "body": "b"},
+      "mustNotAssertEquality": true
+    },
+    {
+      "id": "no-match-local",
+      "lift": "no-visible-definition",
+      "definitions": [],
+      "target": "a",
+      "expect": {"kind": "no-match"}
+    },
+    {
+      "id": "same-target-other-environment",
+      "definitions": ["a : b"],
+      "target": "a",
+      "expect": {"kind": "match", "body": "b"},
+      "counterexampleTo": "no-match implies global absence"
+    },
+    {
+      "id": "same-scope-conflict",
+      "lift": "definition-conflict",
+      "definitions": ["a : b", "a : c"],
+      "target": "a",
+      "expect": {"kind": "conflict"},
+      "mustNotAssertBodyEquality": true
+    },
+    {
+      "id": "anonymous-target",
+      "lift": "non-addressable-target",
+      "definitions": [],
+      "target": "[]",
+      "expect": {"kind": "non-addressable"}
+    }
+  ],
   "acceptedVectors": {
     "ContextuallySatisfies": ["contextual-satisfaction-positive"],
     "Opens": ["opening-match"],
@@ -15,6 +72,13 @@
     "contextual-satisfaction-countercontext",
     "same-target-other-environment",
     "same-scope-conflict"
+  ],
+  "forbiddenConclusions": [
+    "contextual satisfaction under one context implies satisfaction under all contexts",
+    "definition opening match implies equality",
+    "definition opening match evaluates the body",
+    "no-match in one environment implies global absence",
+    "definition conflict implies duplicate bodies are equal"
   ],
   "releaseAssertions": {
     "contextualSatisfactionIsContextScoped": true,
