@@ -5,8 +5,9 @@
   "issue": 251,
   "parent": 237,
   "researchDecision": 225,
+  "semanticReset": 343,
   "dependsOn": [
-    "mts-exact-occurrence-link-network/v0.7",
+    "mts-rooted-link-network/v0.7",
     "mts-foundation-v2-state/v0.7",
     "mts-foundation-v2-interpreter-replay/v0.7"
   ],
@@ -14,61 +15,44 @@
     "topology": "K = K ⟼ (parent ⟼ current)",
     "representativePair": "Pair = member ⟼ representative",
     "representativeBinding": "Binding = K ⟼ Pair",
-    "contextOccurrenceIsNotABindingAttachment": true,
     "hiddenGlobalK": false
   },
   "representative": {
     "semantics": "one explicit local hop only; otherwise member represents itself",
     "missingMapping": "rep_K(x) = x",
-    "singleMapping": "rep_K(x) = exact representative",
-    "duplicateSameRepresentativeOccurrences": "allowed as one unambiguous mapping with occurrence multiplicity",
+    "sameRepresentativeBindingIsCanonical": true,
     "distinctRepresentatives": "conflict",
     "aliasChaining": false,
     "transitiveClosure": false,
     "lastWriteWins": false
   },
   "equality": {
-    "definition": "Equal_K(a,b) iff rep_K(a) and rep_K(b) are the same exact occurrence ref",
-    "shapeEquality": false,
+    "definition": "Equal_K(a,b) iff canonical rep_K(a) = canonical rep_K(b)",
+    "fundamentalLinkIdentity": "same already-distinguished ordered poles imply same MTS link",
+    "runtimeHandleEqualityIsSemanticAuthority": false,
     "graphIsomorphismEquality": false,
-    "bisimulationEquality": false,
     "sourceSpellingEquality": false,
     "backendAddressEquality": false,
     "automaticSubstitution": false,
     "automaticCongruence": false,
-    "automaticTransitivity": false,
-    "automaticRecursiveRewrite": false
+    "automaticTransitivity": false
   },
   "evaluationAct": {
-    "sameInterpreterModule": true,
-    "actualAIsExactEvaluationOccurrence": true,
+    "actualActMustBeStructurallyRepresented": true,
+    "sameCompleteActFormSameAct": true,
     "hostBooleanIsOnlyConvenienceReturn": true,
-    "requiredRoles": [
-      "context",
-      "left",
-      "right",
-      "left-representative",
-      "right-representative"
-    ],
     "bothEqualAndNonEqualActsReplayable": true,
     "snapshotStable": true,
     "implicitMaterialization": false
   },
-  "relationDecomposition": {
-    "builtIntoEquality": false,
-    "allowedOnlyAsSeparatelyAdmittedTheoryRule": true,
-    "recursiveApplicationImplicit": false
-  },
   "requiredVectors": [
-    "two members with same exact representative evaluate equal",
-    "missing bindings fall back to exact operands and can evaluate non-equal",
-    "two same-shape self-closed occurrences remain non-equal by default",
-    "a->b and b->c remains one-hop and does not close transitively",
-    "duplicate same-representative bindings remain unambiguous",
+    "two members with same representative evaluate equal",
+    "missing bindings fall back to operands and can evaluate non-equal",
+    "start-self-closed forms with distinct external ends are distinct",
+    "repeated same representative binding is canonical",
     "distinct local representatives conflict",
     "forged representative evidence rejects",
-    "conflicting actual-act field rejects",
-    "replay is read-only and independent of shape comparator/legacy interpreter"
+    "replay is read-only"
   ],
-  "nextGate": "integrate exact multistep/proof adjacency and separately admitted inference rules over the same actual-act replay engine"
+  "nextGate": "complete semantic reset #343 before Foundation-v2 acceptance"
 }
