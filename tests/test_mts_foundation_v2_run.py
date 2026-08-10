@@ -11,8 +11,14 @@ from core.foundation_v2_interpreter import (
     FlatSequenceReadingRoleRefs,
     RelationStepEvidence,
     RelationStepRoleRefs,
-    replay_flat_sequence_reading,
-    replay_relation_step,
+    replay_flat_source_subselection_reading,
+    replay_relation_source_subselection_step,
+)
+from core.foundation_v2_materialization import (
+    SequenceAtom,
+    SequenceDescription,
+    SequenceGroup,
+    replay_resolved_sequence_grouping,
 )
 from core.foundation_v2_root import build_root_kernel
 from core.foundation_v2_run import (
@@ -22,13 +28,18 @@ from core.foundation_v2_run import (
     define_run_chain,
     replay_run,
 )
-from core.foundation_v2_source import SegmentSpec, SourceFrontEndBuilder
+from core.foundation_v2_source import (
+    SegmentSpec,
+    SourceFrontEndBuilder,
+    replay_source_front_end,
+)
 from core.foundation_v2_state import (
     define_act_field,
     define_act_header,
     define_context,
     define_dictionary_effect,
     define_dictionary_scope,
+    define_membership,
 )
 
 
@@ -45,6 +56,13 @@ def _new_link(builder: LinkNetworkBuilder, start, end):
     ref = builder.reserve()
     builder.define(ref, start, end)
     return ref
+
+
+def _fold(builder: LinkNetworkBuilder, root, values):
+    current = root
+    for value in values:
+        current = _new_link(builder, current, value)
+    return current
 
 
 def _byte_vocabulary(builder: LinkNetworkBuilder):
@@ -234,10 +252,11 @@ def test_run_construction_does_not_materialize_context_shortcut() -> None:
     )
 
 
-def test_flat_des_then_root_closing_form_replays_carrier_raise_as_one_run() -> None:
+def test_one_physical_bracketed_source_replays_nested_des_and_carrier_raise() -> None:
     kernel = build_root_kernel()
     builder = kernel.network.evolve()
     root = kernel.refs.root
+    opening = kernel.refs.opening
     closing = kernel.refs.closing
     byte_refs = _byte_vocabulary(builder)
     front_end = SourceFrontEndBuilder(builder, root, byte_refs)
@@ -247,12 +266,16 @@ def test_flat_des_then_root_closing_form_replays_carrier_raise_as_one_run() -> N
     x = _new_link(builder, a, b)
     carrier_x = _new_link(builder, root, x)
 
-    source_ab = front_end.source_occurrence(b"ab")
-    source_close = front_end.source_occurrence(b"]")
+    source = front_end.source_occurrence(b"[ab]")
     dictionary = define_dictionary_scope(builder, root, root)
     history = root
     occurrences = {}
-    for raw, form in ((b"a", a), (b"b", b), (b"]", closing)):
+    for raw, form in (
+        (b"[", opening),
+        (b"a", a),
+        (b"b", b),
+        (b"]", closing),
+    ):
         dictionary, history, occurrence = _define_scoped_mapping(
             builder,
             root,
@@ -263,26 +286,41 @@ def test_flat_des_then_root_closing_form_replays_carrier_raise_as_one_run() -> N
         )
         occurrences[raw] = occurrence
 
-    flat_grammar = _anchor(builder)
-    flat_theory = _anchor(builder)
-    close_grammar = _anchor(builder)
-    close_theory = _anchor(builder)
-    flat_source = front_end.build_selected_evidence(
-        source_ab,
+    outer_grammar = _anchor(builder)
+    outer_theory = _anchor(builder)
+    outer = front_end.build_selected_evidence(
+        source,
         (
-            SegmentSpec(0, 1, a, occurrences[b"a"]),
-            SegmentSpec(1, 2, b, occurrences[b"b"]),
+            SegmentSpec(0, 1, opening, occurrences[b"["]),
+            SegmentSpec(1, 2, a, occurrences[b"a"]),
+            SegmentSpec(2, 3, b, occurrences[b"b"]),
+            SegmentSpec(3, 4, closing, occurrences[b"]"]),
         ),
         dictionary=dictionary,
-        grammar=flat_grammar,
-        theory=flat_theory,
+        grammar=outer_grammar,
+        theory=outer_theory,
     )
-    close_source = front_end.build_selected_evidence(
-        source_close,
-        (SegmentSpec(0, 1, closing, occurrences[b"]"]),),
-        dictionary=dictionary,
-        grammar=close_grammar,
-        theory=close_theory,
+
+    body_selection = _fold(
+        builder,
+        root,
+        (outer.segments[1].selection, outer.segments[2].selection),
+    )
+    body_forms = _fold(builder, root, (a, b))
+    body_grammar = _anchor(builder)
+    body_theory = _anchor(builder)
+    body_grammar_membership = define_membership(builder, body_grammar, body_forms)
+    body_theory_membership = define_membership(builder, body_theory, body_forms)
+
+    closing_selection = _fold(builder, root, (outer.segments[3].selection,))
+    closing_forms = _fold(builder, root, (closing,))
+    closing_grammar = _anchor(builder)
+    closing_theory = _anchor(builder)
+    closing_grammar_membership = define_membership(
+        builder, closing_grammar, closing_forms
+    )
+    closing_theory_membership = define_membership(
+        builder, closing_theory, closing_forms
     )
 
     interpreter = _anchor(builder)
@@ -293,19 +331,22 @@ def test_flat_des_then_root_closing_form_replays_carrier_raise_as_one_run() -> N
     k1_copy = define_context(builder, parent, x)
     k2 = define_context(builder, parent, carrier_x)
 
-    role_refs = {name: _anchor(builder) for name in (
-        "source",
-        "source-selection",
-        "form-sequence",
-        "dictionary",
-        "grammar",
-        "theory",
-        "form",
-        "before-context",
-        "binding",
-        "result",
-        "after-context",
-    )}
+    role_refs = {
+        name: _anchor(builder)
+        for name in (
+            "source",
+            "source-selection",
+            "form-sequence",
+            "dictionary",
+            "grammar",
+            "theory",
+            "form",
+            "before-context",
+            "binding",
+            "result",
+            "after-context",
+        )
+    }
     flat_roles = FlatSequenceReadingRoleRefs(
         source=role_refs["source"],
         source_selection=role_refs["source-selection"],
@@ -345,12 +386,12 @@ def test_flat_des_then_root_closing_form_replays_carrier_raise_as_one_run() -> N
 
     flat_act = define_act_header(builder, interpreter, role_dictionary, k1)
     for role, value in (
-        (flat_roles.source, flat_source.source),
-        (flat_roles.source_selection, flat_source.selection_sequence),
-        (flat_roles.form_sequence, flat_source.form_sequence),
-        (flat_roles.dictionary, flat_source.dictionary),
-        (flat_roles.grammar, flat_source.grammar),
-        (flat_roles.theory, flat_source.theory),
+        (flat_roles.source, outer.source),
+        (flat_roles.source_selection, body_selection),
+        (flat_roles.form_sequence, body_forms),
+        (flat_roles.dictionary, outer.dictionary),
+        (flat_roles.grammar, body_grammar),
+        (flat_roles.theory, body_theory),
         (flat_roles.before_context, k0),
         (flat_roles.result, x),
         (flat_roles.after_context, k1),
@@ -360,12 +401,12 @@ def test_flat_des_then_root_closing_form_replays_carrier_raise_as_one_run() -> N
     def close_act(before_context):
         act = define_act_header(builder, interpreter, role_dictionary, k2)
         for role, value in (
-            (relation_roles.source, close_source.source),
-            (relation_roles.source_selection, close_source.selection_sequence),
-            (relation_roles.form_sequence, close_source.form_sequence),
-            (relation_roles.dictionary, close_source.dictionary),
-            (relation_roles.grammar, close_source.grammar),
-            (relation_roles.theory, close_source.theory),
+            (relation_roles.source, outer.source),
+            (relation_roles.source_selection, closing_selection),
+            (relation_roles.form_sequence, closing_forms),
+            (relation_roles.dictionary, outer.dictionary),
+            (relation_roles.grammar, closing_grammar),
+            (relation_roles.theory, closing_theory),
             (relation_roles.form, closing),
             (relation_roles.before_context, before_context),
             (relation_roles.binding, x),
@@ -410,7 +451,7 @@ def test_flat_des_then_root_closing_form_replays_carrier_raise_as_one_run() -> N
     before_snapshot = network.snapshot()
 
     flat_evidence = FlatSequenceReadingEvidence(
-        source_evidence=flat_source,
+        source_evidence=outer,
         interpreter=interpreter,
         before_context=k0,
         result=x,
@@ -420,7 +461,7 @@ def test_flat_des_then_root_closing_form_replays_carrier_raise_as_one_run() -> N
         roles=flat_roles,
     )
     closing_evidence = RelationStepEvidence(
-        source_evidence=close_source,
+        source_evidence=outer,
         interpreter=interpreter,
         form=closing,
         before_context=k1,
@@ -437,14 +478,60 @@ def test_flat_des_then_root_closing_form_replays_carrier_raise_as_one_run() -> N
         act=same_shape_closing_act,
     )
 
+    resolved = replay_source_front_end(network, outer, byte_refs)
+    assert resolved == (opening, a, b, closing)
+    assert replay_resolved_sequence_grouping(
+        network,
+        resolved,
+        open_form=opening,
+        close_form=closing,
+    ) == SequenceDescription(
+        root=root,
+        items=(SequenceGroup((SequenceAtom(a), SequenceAtom(b))),),
+    )
+
+    assert replay_flat_source_subselection_reading(
+        network,
+        flat_evidence,
+        byte_refs,
+        start_segment=1,
+        end_segment=3,
+        selection_sequence=body_selection,
+        form_sequence=body_forms,
+        grammar=body_grammar,
+        theory=body_theory,
+        grammar_membership=body_grammar_membership,
+        theory_membership=body_theory_membership,
+    ) is x
+    assert replay_relation_source_subselection_step(
+        network,
+        closing_evidence,
+        byte_refs,
+        start_segment=3,
+        end_segment=4,
+        selection_sequence=closing_selection,
+        form_sequence=closing_forms,
+        grammar=closing_grammar,
+        theory=closing_theory,
+        grammar_membership=closing_grammar_membership,
+        theory_membership=closing_theory_membership,
+    ) is carrier_x
+    assert replay_relation_source_subselection_step(
+        network,
+        same_shape_closing_evidence,
+        byte_refs,
+        start_segment=3,
+        end_segment=4,
+        selection_sequence=closing_selection,
+        form_sequence=closing_forms,
+        grammar=closing_grammar,
+        theory=closing_theory,
+        grammar_membership=closing_grammar_membership,
+        theory_membership=closing_theory_membership,
+    ) is carrier_x
+
     assert network.link(closing).start is root
     assert network.link(closing).end is closing
-    assert replay_flat_sequence_reading(network, flat_evidence, byte_refs) is x
-    assert replay_relation_step(network, closing_evidence, byte_refs) is carrier_x
-    assert (
-        replay_relation_step(network, same_shape_closing_evidence, byte_refs)
-        is carrier_x
-    )
     assert network.link(carrier_x).start is root
     assert network.link(carrier_x).end is x
     assert replay_run(network, good) == (flat_act, closing_act)
