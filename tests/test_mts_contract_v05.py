@@ -116,12 +116,21 @@ def test_v05_keeps_l2_anonymous_form_distinct_from_l3_empty_group():
 def test_v05_memory_preserves_read_vs_effect_boundary():
     memory = _load(CONTRACT)["memory"]
 
-    assert "find" in memory["readOperations"]
-    assert "findLink" in memory["readOperations"]
-    assert memory["effectOperations"] == ["realize", "delete"]
+    assert memory["readOperations"] == [
+        "poles",
+        "find_link",
+        "find_start_projection",
+        "find_end_projection",
+        "outgoing",
+        "incoming",
+        "all_links",
+        "has_link",
+    ]
+    assert memory["effectOperations"] == ["intern_link", "delete_link"]
     assert memory["findEqualsMaterialize"] is False
     assert memory["notFoundImpliesNonExistence"] is False
     assert memory["readOperationsMayMaterialize"] is False
+    assert memory["importedAsetCarrierAdmissibilityDefined"] is False
 
 
 def test_v05_publishes_exact_six_relation_proof_surface_without_generic_composition():
