@@ -5,61 +5,15 @@
   "contract": "mts-contract/v0.5",
   "composition": "current accepted surfaces and production-core gates are required directly; historical umbrella corpora are not normative parents",
   "requiredAcceptedSurfaces": [
-    {
-      "role": "anum-stream-v0.3",
-      "contractPath": "contracts/anum-stream-deserialization-v0.3.json",
-      "schema": "anum-stream-deserialization/v0.3",
-      "conformance": "embedded"
-    },
-    {
-      "role": "value-bundle-v0.2",
-      "contractPath": "contracts/mts-value-bundle-v0.2.json",
-      "schema": "mts-value-bundle/v0.2",
-      "conformancePath": "contracts/mts-value-bundle-conformance-v0.2.json"
-    },
-    {
-      "role": "definition-opening-v0.3",
-      "contractPath": "contracts/mts-definition-opening-v0.3.json",
-      "schema": "mts-definition-opening/v0.3",
-      "conformancePath": "contracts/mts-definition-opening-conformance-v0.3.json"
-    },
-    {
-      "role": "derivation-base-v0.3",
-      "contractPath": "contracts/mts-derivation-base-v0.3.json",
-      "schema": "mts-derivation-base/v0.3",
-      "conformancePath": "contracts/mts-derivation-base-conformance-v0.3.json"
-    },
-    {
-      "role": "opening-path-v0.4",
-      "contractPath": "contracts/mts-opening-path-v0.4.json",
-      "schema": "mts-opening-path/v0.4",
-      "conformancePath": "contracts/mts-opening-path-conformance-v0.4.json"
-    },
-    {
-      "role": "proof-v0.4",
-      "contractPath": "contracts/mts-proof-v0.4.json",
-      "schema": "mts-proof/v0.4",
-      "conformancePath": "contracts/mts-proof-conformance-v0.4.json"
-    },
-    {
-      "role": "direct-deixis-v0.5",
-      "contractPath": "contracts/mts-direct-deixis-v0.5.json",
-      "schema": "mts-direct-deixis/v0.5",
-      "conformancePath": "contracts/mts-direct-deixis-conformance-v0.5.json"
-    }
+    {"role": "anum-stream-v0.3", "contractPath": "contracts/anum-stream-deserialization-v0.3.json", "schema": "anum-stream-deserialization/v0.3", "conformance": "embedded"},
+    {"role": "value-bundle-v0.2", "contractPath": "contracts/mts-value-bundle-v0.2.json", "schema": "mts-value-bundle/v0.2", "conformancePath": "contracts/mts-value-bundle-conformance-v0.2.json"},
+    {"role": "definition-opening-v0.3", "contractPath": "contracts/mts-definition-opening-v0.3.json", "schema": "mts-definition-opening/v0.3", "conformancePath": "contracts/mts-definition-opening-conformance-v0.3.json"},
+    {"role": "derivation-base-v0.3", "contractPath": "contracts/mts-derivation-base-v0.3.json", "schema": "mts-derivation-base/v0.3", "conformancePath": "contracts/mts-derivation-base-conformance-v0.3.json"},
+    {"role": "opening-path-v0.4", "contractPath": "contracts/mts-opening-path-v0.4.json", "schema": "mts-opening-path/v0.4", "conformancePath": "contracts/mts-opening-path-conformance-v0.4.json"},
+    {"role": "proof-v0.4", "contractPath": "contracts/mts-proof-v0.4.json", "schema": "mts-proof/v0.4", "conformancePath": "contracts/mts-proof-conformance-v0.4.json"},
+    {"role": "direct-deixis-v0.5", "contractPath": "contracts/mts-direct-deixis-v0.5.json", "schema": "mts-direct-deixis/v0.5", "conformancePath": "contracts/mts-direct-deixis-conformance-v0.5.json"}
   ],
-  "productionCoreGates": [
-    "tests/test_mtc_parser.py",
-    "tests/test_mtc_interpreter.py",
-    "tests/test_anum_memory.py",
-    "tests/test_mts_value_bundle_contract.py",
-    "tests/test_mts_definition_opening_reference.py",
-    "tests/test_mts_derivation_base_contract.py",
-    "tests/test_mts_opening_path_reference.py",
-    "tests/test_mts_proof_v04.py",
-    "tests/test_mts_direct_deixis_reference.py",
-    "tests/test_root_library.py"
-  ],
+  "productionCoreGates": ["tests/test_mtc_parser.py", "tests/test_mtc_interpreter.py", "tests/test_anum_memory.py", "tests/test_mts_value_bundle_contract.py", "tests/test_mts_definition_opening_reference.py", "tests/test_mts_derivation_base_contract.py", "tests/test_mts_opening_path_reference.py", "tests/test_mts_proof_v04.py", "tests/test_mts_direct_deixis_reference.py", "tests/test_root_library.py"],
   "legacyCoreRegressionCorpus": "contracts/mts-conformance-v0.2.json",
   "legacyCoreRegressionNormative": false,
   "releaseAssertions": {
