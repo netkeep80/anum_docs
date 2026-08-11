@@ -1,62 +1,153 @@
-"""Contextual L3 Anum protocol v0.2 boundary subset.
+"""Current pure L3 Anum stream deserialization.
 
-Raw syntax, validation and projection remain separate.  The root projection for
-the four two-boundary carriers is derived from the accepted MTS v0.2 root
-program instead of the superseded issue #61 orientation:
-
-``[`` -> ``♀∞``
-``]`` -> ``∞♂``
-``[]`` -> ``♀∞ ⟼ ∞♂`` -> protocol value ``1``
-``][`` -> ``∞♂ ⟼ ♀∞`` -> protocol value ``0``
-
-This is a root-context projection only.  Quote and relative contexts keep their
-own behavior, and general raw denotation is deliberately not invented here.
+Implements accepted ``anum-stream-deserialization/v0.3`` directly. The input is
+a raw/channel sequence over exactly four abits ``[ ] 1 0``. Root ``R`` is an
+implicit context basis, not a fifth transmitted value. This module performs no
+L4 lookup, materialization or deletion and does not implement historical v0.2
+boundary projection, quote or relative-context semantics.
 """
 
-from core.anum_model import (
-    Abit,
-    AnumForm,
-    AnumProjection,
-    AnumSource,
-    AnumValidation,
-    ProjectionContext,
-    ProjectionKind,
-)
+from dataclasses import dataclass
+
+from core.anum_model import Abit, AnumForm, AnumSource
 from core.anum_parser import FORMAT_STRING, normalize_raw_form, parse_raw_quaternary
 
 
-OPEN_FORM = "♀∞"
-CLOSE_FORM = "∞♂"
+ROOT = "R"
+OPENING = "O"
+CLOSING = "C"
+LINKED = "L"
+UNLINKED = "U"
 
-_BOUNDARY_PROJECTIONS = {
-    (Abit.OPEN, Abit.OPEN): (
-        f"{OPEN_FORM} ⟼ {OPEN_FORM}",
-        None,
-        "open-open boundary form; no root protocol value is assigned in v0.2",
-    ),
-    (Abit.OPEN, Abit.CLOSE): (
-        f"{OPEN_FORM} ⟼ {CLOSE_FORM}",
-        "1",
-        "root-context link projection derived from accepted MTS v0.2",
-    ),
-    (Abit.CLOSE, Abit.OPEN): (
-        f"{CLOSE_FORM} ⟼ {OPEN_FORM}",
-        "0",
-        "root-context unlink projection derived from accepted MTS v0.2",
-    ),
-    (Abit.CLOSE, Abit.CLOSE): (
-        f"{CLOSE_FORM} ⟼ {CLOSE_FORM}",
-        None,
-        "close-close boundary form; no root protocol value is assigned in v0.2",
-    ),
+_TRANSPORT_VALUE = {
+    Abit.LINK: LINKED,
+    Abit.UNLINK: UNLINKED,
+}
+_ROOT_PAIRS = {
+    (ROOT, ROOT): ROOT,
+    (OPENING, ROOT): OPENING,
+    (ROOT, CLOSING): CLOSING,
+    (OPENING, CLOSING): LINKED,
+    (CLOSING, OPENING): UNLINKED,
 }
 
 
-class AnumDictionary:
-    """Explicit string-name to quaternary-carrier dictionary.
+class StreamError(ValueError):
+    """Deterministic current-stream rejection with a contract error code."""
 
-    Names are not abits and are never encoded through UTF-8 implicitly. String
-    mode becomes quaternary only through this registry.
+    def __init__(self, code: str) -> None:
+        super().__init__(code)
+        self.code = code
+
+
+@dataclass(frozen=True)
+class StreamDenotation:
+    """Effect-free result of one complete stream deserialization."""
+
+    denotation: str
+    resolved_values: tuple[str, ...]
+    operations: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class StreamValidation:
+    """Validation result obtained by running the current stack boundary."""
+
+    is_valid: bool
+    error: str | None = None
+
+
+@dataclass
+class _Frame:
+    started: bool = False
+    current: str = ROOT
+
+
+def semantic_link(start: str, end: str) -> str:
+    """Return the canonical semantic link expression for one ordered pole pair.
+
+    The five root-basis links are reused rather than copied. Other complete
+    ordered pairs have one deterministic structural expression. This function
+    is pure and does not assert that any physical memory record exists.
+    """
+
+    return _ROOT_PAIRS.get((start, end), f"({start}⟼{end})")
+
+
+def _append(frame: _Frame, value: str) -> None:
+    if not frame.started:
+        frame.current = value
+        frame.started = True
+    else:
+        frame.current = semantic_link(frame.current, value)
+
+
+def deserialize_stream(source: str) -> StreamDenotation:
+    """Deserialize one compact raw/channel stream using the accepted stack machine."""
+
+    frames = [_Frame()]
+    operations: list[str] = []
+    resolved: list[str] = []
+
+    for token in source:
+        if token == Abit.OPEN.value:
+            frames.append(_Frame())
+            operations.append("OPEN")
+            continue
+
+        if token == Abit.CLOSE.value:
+            if len(frames) == 1:
+                raise StreamError("unexpected-close")
+            inner = frames.pop()
+            returned = ROOT if not inner.started else semantic_link(ROOT, inner.current)
+            _append(frames[-1], returned)
+            operations.append("CLOSE")
+            continue
+
+        if token in (Abit.LINK.value, Abit.UNLINK.value):
+            abit = Abit(token)
+            value = _TRANSPORT_VALUE[abit]
+            resolved.append(value)
+            _append(frames[-1], value)
+            operations.append("VALUE")
+            continue
+
+        raise StreamError("non-abit")
+
+    if len(frames) != 1:
+        raise StreamError("unclosed-open")
+
+    root_frame = frames[0]
+    result = root_frame.current if root_frame.started else ROOT
+    return StreamDenotation(
+        denotation=result,
+        resolved_values=tuple(resolved),
+        operations=tuple(operations),
+    )
+
+
+def deserialize_anum(form: AnumForm) -> StreamDenotation:
+    """Deserialize a parsed quaternary form without reinterpreting source offsets."""
+
+    return deserialize_stream(normalize_raw_form(form))
+
+
+def validate_anum(form: AnumForm) -> StreamValidation:
+    """Validate the current stack boundary without producing an L4 effect."""
+
+    try:
+        deserialize_anum(form)
+    except StreamError as exc:
+        return StreamValidation(is_valid=False, error=exc.code)
+    return StreamValidation(is_valid=True)
+
+
+class AnumDictionary:
+    """Explicit symbolic-name to raw quaternary transport dictionary.
+
+    Names are not abits and gain no semantics by themselves. Compilation only
+    produces a raw quaternary stream; current denotation remains a separate
+    explicit ``deserialize_anum`` operation.
     """
 
     def __init__(self):
@@ -82,130 +173,3 @@ class AnumDictionary:
         names = source.text.split()
         raw = "".join(normalize_raw_form(self.resolve(name)) for name in names)
         return parse_raw_quaternary(raw)
-
-
-def validate_anum(
-    form: AnumForm,
-    context: ProjectionContext,
-) -> AnumValidation:
-    """Validate a parsed raw carrier for one explicit context.
-
-    V0.2 intentionally adds no hidden root-start or bracket-balance restrictions:
-    every sequence already accepted by the raw quaternary parser is a valid raw
-    carrier. Context-specific semantic restrictions require an accepted protocol
-    rule rather than a parser heuristic.
-    """
-
-    if not isinstance(context, ProjectionContext):
-        raise TypeError("context должен быть ProjectionContext")
-    return AnumValidation(context=context, is_valid=True)
-
-
-def project_anum(
-    form: AnumForm,
-    context: ProjectionContext,
-) -> AnumProjection:
-    """Project a raw carrier in one explicit L3 context."""
-
-    validation = validate_anum(form, context)
-    if not validation.is_valid:
-        return AnumProjection(
-            context=context,
-            source=normalize_raw_form(form),
-            kind=ProjectionKind.RAW,
-            projected=form,
-            note="; ".join(validation.messages),
-        )
-
-    if context is ProjectionContext.QUOTE:
-        if has_quote_envelope(form):
-            projected = unquote_anum(form)
-            return AnumProjection(
-                context=context,
-                source=normalize_raw_form(form),
-                kind=ProjectionKind.QUOTED_RAW,
-                projected=projected,
-                note="one explicit quote envelope was removed",
-            )
-        return AnumProjection(
-            context=context,
-            source=normalize_raw_form(form),
-            kind=ProjectionKind.QUOTED_RAW,
-            projected=form,
-            note="quote context preserves raw payload without root projection",
-        )
-
-    if context is ProjectionContext.RELATIVE:
-        return AnumProjection(
-            context=context,
-            source=normalize_raw_form(form),
-            kind=ProjectionKind.RAW,
-            projected=form,
-            note="relative semantics are intentionally preserved as raw in v0.2",
-        )
-
-    return _project_root(form)
-
-
-def quote_anum(form: AnumForm) -> AnumForm:
-    """Add one real quaternary quote envelope ``[ ... ]``."""
-
-    return parse_raw_quaternary(f"[{normalize_raw_form(form)}]")
-
-
-def has_quote_envelope(form: AnumForm) -> bool:
-    return (
-        len(form.tokens) >= 2
-        and form.tokens[0].abit is Abit.OPEN
-        and form.tokens[-1].abit is Abit.CLOSE
-    )
-
-
-def unquote_anum(form: AnumForm) -> AnumForm:
-    """Remove exactly one quote envelope in an explicitly quoted context."""
-
-    if not has_quote_envelope(form):
-        raise ValueError("Ачисло не содержит внешнюю quote-оболочку [ ... ]")
-    inner = "".join(token.abit.value for token in form.tokens[1:-1])
-    return parse_raw_quaternary(inner)
-
-
-def _project_root(form: AnumForm) -> AnumProjection:
-    source = normalize_raw_form(form)
-
-    if len(form.tokens) == 1:
-        abit = form.tokens[0].abit
-        if abit in (Abit.LINK, Abit.UNLINK):
-            return AnumProjection(
-                context=ProjectionContext.ROOT,
-                source=source,
-                kind=ProjectionKind.PROTOCOL_VALUE,
-                protocol_value=abit.value,
-                note="explicit protocol-value abit",
-            )
-
-    if len(form.tokens) == 2:
-        left, right = (token.abit for token in form.tokens)
-        boundary = _BOUNDARY_PROJECTIONS.get((left, right))
-        if boundary is not None:
-            arrow_form, protocol_value, note = boundary
-            return AnumProjection(
-                context=ProjectionContext.ROOT,
-                source=source,
-                kind=(
-                    ProjectionKind.PROTOCOL_VALUE
-                    if protocol_value is not None
-                    else ProjectionKind.BOUNDARY_FORM
-                ),
-                protocol_value=protocol_value,
-                arrow_form=arrow_form,
-                note=note,
-            )
-
-    return AnumProjection(
-        context=ProjectionContext.ROOT,
-        source=source,
-        kind=ProjectionKind.RAW,
-        projected=form,
-        note="no general root denotation is assigned beyond the v0.2 boundary subset",
-    )
