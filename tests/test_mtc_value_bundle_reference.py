@@ -28,6 +28,7 @@ CONTRACT = ROOT / "contracts" / "mts-value-bundle-v0.2.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 INTERPRETER = ROOT / "core" / "mtc_interpreter.py"
 REFERENCE_CORE = ROOT / "core" / "mtc_value_bundle.py"
+MEMORY_CORE = ROOT / "core" / "anum_memory.py"
 
 
 def corpus() -> dict:
@@ -185,6 +186,24 @@ def test_missing_expansion_pair_is_not_materialized():
     assert value.identities == ()
     assert memory.link_count == before_count
     assert memory.snapshot() == before
+
+
+def test_l4_memory_stays_decoupled_from_superseded_anum_denotation_stack():
+    source = MEMORY_CORE.read_text(encoding="utf-8")
+
+    for forbidden in (
+        "anum_denotation",
+        "anum_raw_carrier",
+        "anum_pair_denotation",
+        "anum_recursive_denotation",
+        "load_raw",
+        "find_denotation",
+        "realize_denotation",
+    ):
+        assert forbidden not in source
+
+    assert "def intern_link(" in source
+    assert "def delete_link(" in source
 
 
 def test_current_root_program_elaborates_without_any_value_bundle_role():

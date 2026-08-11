@@ -34,6 +34,7 @@
   "anum": {
     "contract": "contracts/anum-stream-deserialization-v0.3.json",
     "schema": "anum-stream-deserialization/v0.3",
+    "referenceCore": "core/anum_protocol.py",
     "alphabet": ["[", "]", "1", "0"],
     "rootIsFifthAbit": false,
     "emptyStream": "R",
@@ -46,11 +47,13 @@
   },
   "memory": {
     "referenceCore": "core/anum_memory.py",
-    "readOperations": ["find", "poles", "findLink", "findStartProjection", "findEndProjection", "outgoing", "incoming", "allLinks"],
-    "effectOperations": ["realize", "delete"],
+    "model": "finite explicit local ordered-pair store; local LinkRef values are storage coordinates, not semantic identity",
+    "readOperations": ["poles", "find_link", "find_start_projection", "find_end_projection", "outgoing", "incoming", "all_links", "has_link"],
+    "effectOperations": ["intern_link", "delete_link"],
     "findEqualsMaterialize": false,
     "notFoundImpliesNonExistence": false,
-    "readOperationsMayMaterialize": false
+    "readOperationsMayMaterialize": false,
+    "importedAsetCarrierAdmissibilityDefined": false
   },
   "l5": {
     "proofContract": "contracts/mts-proof-v0.4.json",
@@ -99,8 +102,8 @@
   },
   "rootProgram": {"path": "tests/mtc_formulas.mtc", "definitionCount": 10, "validator": "core/validate_root.py", "library": "core/root_library.py"},
   "productionCore": {
-    "requiredModules": ["core/mtc_parser.py", "core/mtc_interpreter.py", "core/anum_memory.py", "core/mtc_definitions.py", "core/mtc_value_bundle.py", "core/mtc_opening_path.py", "core/mtc_context_analysis.py", "core/proof_checker.py", "core/root_library.py", "core/validate_root.py"],
-    "requiredExecutableGates": ["tests/test_mtc_parser.py", "tests/test_mtc_interpreter.py", "tests/test_anum_memory.py", "tests/test_mts_value_bundle_contract.py", "tests/test_mts_definition_opening_reference.py", "tests/test_mts_derivation_base_contract.py", "tests/test_mts_opening_path_reference.py", "tests/test_mts_proof_v04.py", "tests/test_mts_direct_deixis_reference.py", "tests/test_root_library.py"]
+    "requiredModules": ["core/mtc_parser.py", "core/mtc_interpreter.py", "core/anum_parser.py", "core/anum_protocol.py", "core/anum_memory.py", "core/mtc_definitions.py", "core/mtc_value_bundle.py", "core/mtc_opening_path.py", "core/mtc_context_analysis.py", "core/proof_checker.py", "core/root_library.py", "core/validate_root.py"],
+    "requiredExecutableGates": ["tests/test_mtc_parser.py", "tests/test_mtc_interpreter.py", "tests/test_anum_parser.py", "tests/test_anum_stream_deserialization_v03.py", "tests/test_anum_memory.py", "tests/test_mts_value_bundle_contract.py", "tests/test_mts_definition_opening_reference.py", "tests/test_mts_derivation_base_contract.py", "tests/test_mts_opening_path_reference.py", "tests/test_mts_proof_v04.py", "tests/test_mts_direct_deixis_reference.py", "tests/test_root_library.py"]
   },
   "excluded": ["same-pair semantic link multiplicity", "runtime handle or source position as semantic Link identity", "implicit realization by read-only operations", "generic proof DAG or top-level judgment dependency semantics", "opening-path to equality/equivalence/normalization/contextual-satisfaction bridge", "unrestricted equality transitivity, symmetry or congruence", "modus ponens or global substitution", "universal ContextInvariant theorem", "hidden interpreter-focus identity as evaluation input", "existing-aset ANUM carrier theorem before issue #333 acceptance", "persistent backend as canonical semantic dependency"]
 }

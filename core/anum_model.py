@@ -1,33 +1,20 @@
-"""Typed data model for the contextual L3 Anum protocol v0.2."""
+"""Typed transport model for current ``*.anum`` sources.
+
+The model deliberately contains no denotation or projection semantics. L3 stream
+meaning is defined only by ``core.anum_protocol`` / ``anum-stream-deserialization/v0.3``.
+"""
 
 from dataclasses import dataclass
 from enum import Enum
 
 
 class Abit(str, Enum):
-    """Four base abits of the quaternary anum protocol."""
+    """The four transmitted abits. Root is not an abit."""
 
     OPEN = "["
     CLOSE = "]"
     LINK = "1"
     UNLINK = "0"
-
-
-class ProjectionContext(str, Enum):
-    """Explicit context used when projecting one raw quaternary carrier."""
-
-    ROOT = "root"
-    QUOTE = "quote"
-    RELATIVE = "relative"
-
-
-class ProjectionKind(str, Enum):
-    """Result category of one L3 projection step."""
-
-    PROTOCOL_VALUE = "protocol-value"
-    BOUNDARY_FORM = "boundary-form"
-    QUOTED_RAW = "quoted-raw"
-    RAW = "raw"
 
 
 @dataclass(frozen=True)
@@ -40,7 +27,7 @@ class AnumSource:
 
 @dataclass(frozen=True)
 class AnumToken:
-    """One parsed quaternary abit and its absolute offset in the parsed stream."""
+    """One parsed quaternary abit and its absolute source offset."""
 
     abit: Abit
     offset: int
@@ -48,31 +35,9 @@ class AnumToken:
 
 @dataclass(frozen=True)
 class AnumForm:
-    """A raw quaternary carrier as a sequence of abits."""
+    """A raw quaternary stream as a sequence of four-valued transport abits."""
 
     tokens: tuple[AnumToken, ...]
 
     def values(self) -> tuple[str, ...]:
         return tuple(token.abit.value for token in self.tokens)
-
-
-@dataclass(frozen=True)
-class AnumValidation:
-    """Context validation result kept separate from raw syntax parsing."""
-
-    context: ProjectionContext
-    is_valid: bool
-    messages: tuple[str, ...] = ()
-
-
-@dataclass(frozen=True)
-class AnumProjection:
-    """One explicit context projection of a raw carrier."""
-
-    context: ProjectionContext
-    source: str
-    kind: ProjectionKind
-    protocol_value: str | None = None
-    arrow_form: str | None = None
-    projected: AnumForm | None = None
-    note: str = ""

@@ -13,7 +13,7 @@
     {"role": "proof-v0.4", "contractPath": "contracts/mts-proof-v0.4.json", "schema": "mts-proof/v0.4", "conformancePath": "contracts/mts-proof-conformance-v0.4.json"},
     {"role": "direct-deixis-v0.5", "contractPath": "contracts/mts-direct-deixis-v0.5.json", "schema": "mts-direct-deixis/v0.5", "conformancePath": "contracts/mts-direct-deixis-conformance-v0.5.json"}
   ],
-  "productionCoreGates": ["tests/test_mtc_parser.py", "tests/test_mtc_interpreter.py", "tests/test_anum_memory.py", "tests/test_mts_value_bundle_contract.py", "tests/test_mts_definition_opening_reference.py", "tests/test_mts_derivation_base_contract.py", "tests/test_mts_opening_path_reference.py", "tests/test_mts_proof_v04.py", "tests/test_mts_direct_deixis_reference.py", "tests/test_root_library.py"],
+  "productionCoreGates": ["tests/test_mtc_parser.py", "tests/test_mtc_interpreter.py", "tests/test_anum_parser.py", "tests/test_anum_stream_deserialization_v03.py", "tests/test_anum_memory.py", "tests/test_mts_value_bundle_contract.py", "tests/test_mts_definition_opening_reference.py", "tests/test_mts_derivation_base_contract.py", "tests/test_mts_opening_path_reference.py", "tests/test_mts_proof_v04.py", "tests/test_mts_direct_deixis_reference.py", "tests/test_root_library.py"],
   "releaseAssertions": {
     "historicalUmbrellaIsNormativeParent": false,
     "currentContractHasNoExtendsOrBaseContract": true,
