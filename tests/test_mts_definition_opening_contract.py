@@ -1,4 +1,4 @@
-"""Acceptance gate for normative one-step definition-opening semantics v0.3."""
+"""Acceptance gate for the self-contained one-step definition-opening semantics."""
 
 import json
 from pathlib import Path
@@ -10,9 +10,6 @@ from core.root_library import load_root_library
 
 ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-definition-opening-v0.3.json"
-MTS_V02 = ROOT / "contracts" / "mts-contract-v0.2.json"
-MTS_V03 = ROOT / "contracts" / "mts-contract-v0.3.json"
-PROOF_V02 = ROOT / "contracts" / "mts-proof-v0.2.json"
 CORPUS = ROOT / "contracts" / "mts-definition-opening-conformance-v0.3.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
@@ -21,22 +18,22 @@ def contract() -> dict:
     return json.loads(CONTRACT.read_text(encoding="utf-8"))
 
 
-def test_contract_is_accepted_integrated_and_published_only_through_v03_umbrella():
+def test_contract_is_accepted_integrated_and_not_inherited_from_historical_umbrella():
     data = contract()
-    mts_v02 = MTS_V02.read_text(encoding="utf-8")
-    mts_v03 = json.loads(MTS_V03.read_text(encoding="utf-8"))
-    proof_v02 = PROOF_V02.read_text(encoding="utf-8")
 
     assert data["schema"] == "mts-definition-opening/v0.3"
     assert data["status"] == "accepted"
     assert data["accepted"] is True
+    assert "dependsOn" not in data
+    assert "historical MTS umbrella" in data["foundation"]
+
     status = data["integrationStatus"]
-    assert status["semanticContractAccepted"] is True
-    assert status["productionReferenceCoreImplemented"] is True
-    assert status["canonicalRootLibraryUsesDefinitionEnvironment"] is True
-    assert status["productionConformancePresent"] is True
-    assert status["mtsContractV03Published"] is True
-    assert status["aproverRepinAllowed"] is False
+    assert status == {
+        "semanticContractAccepted": True,
+        "productionReferenceCoreImplemented": True,
+        "canonicalRootLibraryUsesDefinitionEnvironment": True,
+        "productionConformancePresent": True,
+    }
 
     integration = data["productionIntegration"]
     assert integration["referenceCore"] == "core/mtc_definitions.py"
@@ -47,16 +44,11 @@ def test_contract_is_accepted_integrated_and_published_only_through_v03_umbrella
     assert integration["challengeOnlyEnvironmentCloneRetained"] is False
     assert integration["interpretConstraintsExecutesDefinition"] is False
 
-    assert "mts-definition-opening/v0.3" not in mts_v02
-    assert "mts-definition-opening/v0.3" not in proof_v02
-    assert mts_v03["formalNotationExtensions"]["definitionOpening"]["contract"] == "contracts/mts-definition-opening-v0.3.json"
 
-
-def test_acceptance_depends_only_on_normative_surface_and_self_contained_conformance():
+def test_acceptance_depends_only_on_self_contained_contract_and_conformance():
     data = contract()
     corpus = json.loads(CORPUS.read_text(encoding="utf-8"))
 
-    assert data["dependsOn"] == ["mts-contract/v0.2"]
     assert data["conformanceCorpus"] == "contracts/mts-definition-opening-conformance-v0.3.json"
     assert corpus["status"] == "accepted"
     assert corpus["accepted"] is True
@@ -64,6 +56,7 @@ def test_acceptance_depends_only_on_normative_surface_and_self_contained_conform
     assert corpus["rootOpenings"]
     assert corpus["scenarios"]
     serialized = json.dumps(data, ensure_ascii=False).lower()
+    assert "mts-contract/v0.2" not in serialized
     assert "candidate-challenge" not in serialized
     assert "candidate-decision" not in serialized
     assert "acceptanceevidence" not in serialized
@@ -185,10 +178,10 @@ def test_recursion_is_normatively_single_step_not_global_normalization():
     }
 
 
-def test_downstream_boundary_remains_explicit_without_historical_gate_notes():
+def test_downstream_boundary_is_current_and_has_no_release_history_status():
     downstream = contract()["downstream"]
 
-    assert downstream["genericL2ConsumerMayPinMtsContractV03"] is True
-    assert downstream["aproverProofRepinAllowed"] is False
-    assert downstream["aproverMustNotInventLocalOpeningSemantics"] is True
-    assert downstream["futureProofConsumerMustUseVersionedL5Acceptance"] is True
+    assert downstream == {
+        "aproverMustNotInventLocalOpeningSemantics": True,
+        "proofUseRequiresExplicitAcceptedLift": True,
+    }

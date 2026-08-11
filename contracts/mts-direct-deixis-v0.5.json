@@ -3,10 +3,8 @@
   "status": "accepted",
   "accepted": true,
   "issue": 156,
-  "dependsOn": [
-    "mts-contract/v0.4"
-  ],
   "conformanceCorpus": "contracts/mts-direct-deixis-conformance-v0.5.json",
+  "foundation": "one typed L2 Expression; this structural analysis is self-contained below and does not inherit a historical MTS umbrella",
   "scope": "normative read-only structural detection of explicit ContextPronoun occurrences in one typed L2 Expression; no evaluation, dependency closure, sensitivity or invariance theorem",
   "operation": {
     "name": "analyze_direct_deixis",
@@ -57,7 +55,6 @@
     "trustedProofRelationAdded": false,
     "ContextInvariantAccepted": false,
     "ContextSensitiveAccepted": false,
-    "mtsProofV03Modified": false,
     "futureProofUseRequiresExplicitAcceptedLift": true
   },
   "productionIntegration": {
@@ -73,15 +70,9 @@
     "mustRemainUnchanged": true,
     "analysisMayInspectWithoutMutation": true
   },
-  "versioning": {
-    "mtsContractV04Modified": false,
-    "publishedThroughUmbrella": false,
-    "futureUmbrellaMustBeAdditive": true
-  },
-  "nextBoundary": {
+  "deferred": {
     "indirectDefinitionDependencyAccepted": false,
     "universalContextInvarianceAccepted": false,
-    "coordinationIssueForComposition": 122,
-    "interpreterFocusResearchIssue": 148
+    "interpreterFocusBindingAccepted": false
   }
 }

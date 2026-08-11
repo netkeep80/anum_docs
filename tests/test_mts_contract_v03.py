@@ -82,10 +82,12 @@ def test_v03_adds_only_the_production_conformant_one_step_opening_operation():
     extension = v03["formalNotationExtensions"]["definitionOpening"]
 
     assert opening["status"] == "accepted"
-    assert opening["integrationStatus"]["productionReferenceCoreImplemented"] is True
-    assert opening["integrationStatus"]["canonicalRootLibraryUsesDefinitionEnvironment"] is True
-    assert opening["integrationStatus"]["productionConformancePresent"] is True
-    assert opening["integrationStatus"]["mtsContractV03Published"] is True
+    assert opening["integrationStatus"] == {
+        "semanticContractAccepted": True,
+        "productionReferenceCoreImplemented": True,
+        "canonicalRootLibraryUsesDefinitionEnvironment": True,
+        "productionConformancePresent": True,
+    }
 
     assert extension["contract"] == "contracts/mts-definition-opening-v0.3.json"
     assert extension["conformanceCorpus"] == opening["conformanceCorpus"]

@@ -1,4 +1,4 @@
-"""Проверки согласованности принятого контракта плоских пучков значений."""
+"""Проверки самодостаточного принятого контракта плоских пучков значений."""
 
 import json
 from pathlib import Path
@@ -9,7 +9,6 @@ from core.mtc_parser import parse_formula
 ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-value-bundle-v0.2.json"
 CONFORMANCE = ROOT / "contracts" / "mts-value-bundle-conformance-v0.2.json"
-MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.2.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
 
@@ -17,24 +16,19 @@ def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_value_bundle_contract_is_accepted_and_linked_from_mts_contract():
+def test_value_bundle_contract_is_accepted_self_contained_and_conformant():
     contract = load(CONTRACT)
     conformance = load(CONFORMANCE)
-    mts = load(MTS_CONTRACT)
 
     assert contract["schema"] == "mts-value-bundle/v0.2"
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
-    assert contract["acceptedContractLinkAllowed"] is True
-    assert contract["dependsOn"] == ["mts-contract/v0.2"]
+    assert "dependsOn" not in contract
+    assert "historical MTS umbrella" in contract["foundation"]
     assert conformance["schema"] == "mts-value-bundle-conformance/v0.2"
     assert conformance["status"] == "accepted"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
-    assert mts["formalNotation"]["valueBundle"]["contract"] == "contracts/mts-value-bundle-v0.2.json"
-    assert mts["formalNotation"]["valueBundle"]["conformanceCorpus"] == (
-        "contracts/mts-value-bundle-conformance-v0.2.json"
-    )
 
 
 def test_accepted_conformance_is_self_contained_across_all_semantic_sections():
@@ -68,12 +62,13 @@ def test_flat_value_model_is_extensional_only_after_occurrence_resolution():
     resolution = contract["elementResolution"]
 
     assert model["scalar"]["kind"] == "link"
+    assert "canonical semantic Link" in model["scalar"]["identity"]
     assert model["bundle"]["kind"] == "bundle"
     assert model["crossKindEquality"] is False
     assert model["crossKindInequality"] is True
     assert resolution["eachOccurrenceResolvedIndependently"] is True
     assert resolution["deduplicateBeforeResolution"] is False
-    assert resolution["anonymousSquareIdentity"] == "ast-occurrence-path"
+    assert "syntactic-hole identity" in resolution["anonymousSquareIdentity"]
     assert resolution["semanticSetBuiltAfterResolution"] is True
 
     cases = {case["id"]: case for case in load(CONFORMANCE)["valueEquality"]}
@@ -114,7 +109,7 @@ def test_current_ten_root_definitions_remain_parseable_and_value_bundle_cannot_e
     assert regression["valueBundleMayAppearInCurrentRoot"] is False
 
 
-def test_production_integration_and_downstream_boundary_are_explicit():
+def test_production_integration_and_downstream_boundary_are_current_only():
     contract = load(CONTRACT)
     integration = contract["productionIntegration"]
     downstream = contract["downstream"]
@@ -125,6 +120,6 @@ def test_production_integration_and_downstream_boundary_are_explicit():
         "rootRegression": "tests/mtc_formulas.mtc",
         "constraintBundleRegression": "tests/test_mtc_value_bundle_reference.py",
     }
-    assert downstream["aproverRepinRequired"] is True
+    assert "aproverRepinRequired" not in downstream
     assert downstream["consumerMustExecuteConformance"] is True
     assert downstream["compatibilityImplementationAllowed"] is False

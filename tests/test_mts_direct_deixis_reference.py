@@ -1,4 +1,4 @@
-"""Production conformance for accepted mts-direct-deixis/v0.5."""
+"""Production conformance for self-contained accepted direct deixis."""
 
 import inspect
 import json
@@ -12,8 +12,6 @@ from core.mtc_parser import parse_formula
 ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-direct-deixis-v0.5.json"
 CONFORMANCE = ROOT / "contracts" / "mts-direct-deixis-conformance-v0.5.json"
-MTS_V04 = ROOT / "contracts" / "mts-contract-v0.4.json"
-PROOF_V03 = ROOT / "contracts" / "mts-proof-v0.3.json"
 CORE = ROOT / "core" / "mtc_context_analysis.py"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
@@ -51,21 +49,19 @@ def root_sources() -> tuple[str, ...]:
     )
 
 
-def test_contract_is_accepted_but_not_retroactively_added_to_v04_umbrella():
+def test_contract_is_accepted_self_contained_and_conformant():
     contract = read(CONTRACT)
     conformance = read(CONFORMANCE)
 
     assert contract["schema"] == "mts-direct-deixis/v0.5"
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
-    assert contract["dependsOn"] == ["mts-contract/v0.4"]
+    assert "dependsOn" not in contract
+    assert "mts-contract/v0." not in json.dumps(contract, ensure_ascii=False)
     assert conformance["schema"] == "mts-direct-deixis-conformance/v0.5"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
     assert contract["conformanceCorpus"] == "contracts/mts-direct-deixis-conformance-v0.5.json"
-    assert contract["versioning"]["mtsContractV04Modified"] is False
-    assert contract["versioning"]["publishedThroughUmbrella"] is False
-    assert contract["schema"] not in MTS_V04.read_text(encoding="utf-8")
 
 
 def test_accepted_conformance_owns_complete_portable_corpus():
@@ -154,6 +150,7 @@ def test_operation_has_no_runtime_definition_memory_or_interpreter_dependency():
     assert operation["readsContextFrame"] is False
     assert operation["readsInterpreterIdentity"] is False
     assert operation["readsSecurityPolicy"] is False
+    assert operation["writesAnything"] is False
 
 
 def test_positive_direct_deixis_does_not_imply_semantic_context_sensitivity():
@@ -191,14 +188,15 @@ def test_accepted_negative_claims_preserve_semantic_non_implications():
     assert negative["present-does-not-mean-sensitive"]["forbiddenConclusion"] == "ContextSensitive"
 
 
-def test_proof_surface_is_unchanged_and_no_new_trusted_relation_exists():
+def test_direct_deixis_does_not_add_any_trusted_proof_relation():
     contract = read(CONTRACT)
-    proof = read(PROOF_V03)
 
-    assert "DirectDeictic" not in proof["trustedRelations"]
-    assert "ContextInvariant" not in proof["trustedRelations"]
-    assert contract["proofBoundary"]["trustedProofRelationAdded"] is False
-    assert contract["proofBoundary"]["mtsProofV03Modified"] is False
+    assert contract["proofBoundary"] == {
+        "trustedProofRelationAdded": False,
+        "ContextInvariantAccepted": False,
+        "ContextSensitiveAccepted": False,
+        "futureProofUseRequiresExplicitAcceptedLift": True,
+    }
 
 
 def test_root_program_is_still_exactly_ten_and_analysis_is_repeatable():
