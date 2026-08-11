@@ -3,12 +3,13 @@
   "status": "accepted",
   "accepted": true,
   "contract": "mts-proof/v0.4",
-  "baseCorpus": "contracts/mts-proof-conformance-v0.3.json",
+  "baseSemanticCorpus": "contracts/mts-derivation-base-conformance-v0.3.json",
+  "legacyBaseRegressionCorpus": "contracts/mts-proof-conformance-v0.3.json",
+  "legacyBaseRegressionNormative": false,
   "openingPathCorpus": "contracts/mts-opening-path-conformance-v0.4.json",
   "selection": {
-    "baseValidJudgments": "all",
-    "baseForgeries": "all",
-    "baseInvalidArtifactsForV03Regression": "all",
+    "legacyBaseValidJudgments": "all",
+    "legacyBaseForgeries": "all",
     "openingPathValidPaths": "all",
     "openingPathInvalidPaths": "all",
     "v04InvalidArtifacts": "all",
@@ -120,17 +121,16 @@
   },
   "releaseAssertions": {
     "trustedRelationsExactlySix": true,
-    "fiveBaseRelationsReuseV03TrustedMeaning": true,
-    "allV03ValidBaseJudgmentsLift": true,
-    "allV03BaseForgeriesRemainRejected": true,
-    "allV03InvalidArtifactsRemainRejectedByV03Api": true,
+    "fiveBaseRelationsUseVersionNeutralReplay": true,
+    "legacyBaseRegressionIsNonNormative": true,
+    "allLegacyBaseValidJudgmentsLift": true,
+    "allLegacyBaseForgeriesRemainRejected": true,
     "allOpeningPathValidVectorsLift": true,
     "allOpeningPathInvalidVectorsReject": true,
     "allV04TransportForgeriesReject": true,
     "openingPathUsesCanonicalVerifier": true,
     "mixedJudgmentOrderDoesNotCreateDependency": true,
     "canonicalRoundTripRequired": true,
-    "mtsProofV03Unchanged": true,
     "genericCompositionAccepted": false,
     "tenRootDefinitionsUnchanged": true
   },
@@ -140,11 +140,5 @@
     "openingPathReadsInterpreterIdentity": false,
     "materializes": false,
     "deletes": false
-  },
-  "versioningAssertions": {
-    "proofVersion": "mts-proof/v0.4",
-    "contractVersion": "mts-contract/v0.4",
-    "publishedThroughUmbrella": false,
-    "futureUmbrella": "mts-contract/v0.5"
   }
 }
