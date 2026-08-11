@@ -102,12 +102,17 @@ def test_start_and_end_projection_have_opposite_fixity():
     assert isinstance(end.value, SquareForm)
 
 
-def test_arrow_is_left_associative_as_required_by_reference_model():
-    ast = parse_formula("[] ⟼ [] ⟼ []")
+def test_arrow_is_left_associative_and_explicit_right_grouping_stays_distinct():
+    left = parse_formula("[] ⟼ [] ⟼ []")
+    right = parse_formula("[] ⟼ ([] ⟼ [])")
 
-    assert isinstance(ast, LinkForm)
-    assert isinstance(ast.left, LinkForm)
-    assert isinstance(ast.right, SquareForm)
+    assert isinstance(left, LinkForm)
+    assert isinstance(left.left, LinkForm)
+    assert isinstance(left.right, SquareForm)
+    assert isinstance(right, LinkForm)
+    assert isinstance(right.right, RoundForm)
+    assert isinstance(right.right.content, LinkForm)
+    assert structural_key(left) != structural_key(right)
 
 
 def test_juxtaposition_builds_sequence_without_string_reinterpretation():
@@ -197,3 +202,8 @@ def test_root_fixture_round_trips_through_canonical_printer():
         canonical = format_expression(original)
         reparsed = parse_formula(canonical)
         assert structural_key(reparsed) == structural_key(original), (source, canonical)
+
+
+def test_closed_issue_challenge_files_are_not_active_test_surface():
+    leftovers = sorted(Path(__file__).parent.glob("test_issue_*_challenge.py"))
+    assert leftovers == []

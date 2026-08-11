@@ -155,6 +155,24 @@ def test_each_empty_square_occurrence_is_an_independent_local_hole():
     assert tuple(value for _, value in result.holes) == (10, 12)
 
 
+def test_local_hole_identity_is_independent_of_source_whitespace_and_offsets():
+    memory = equality_memory()
+    compact = interpret_constraints(
+        parse_formula("{[]=◁,[]=▷}"),
+        ContextFrame(start=10, end=12),
+        memory,
+    )
+    spaced = interpret_constraints(
+        parse_formula("{  [] = ◁ ,   [] = ▷  }"),
+        ContextFrame(start=10, end=12),
+        memory,
+    )
+
+    assert compact.success and spaced.success
+    assert compact.holes == spaced.holes
+    assert tuple(value for _, value in compact.holes) == (10, 12)
+
+
 def test_identical_empty_form_glyphs_do_not_bind_globally_between_calls():
     memory = equality_memory()
     first = interpret_constraints(
@@ -215,6 +233,25 @@ def test_ground_link_is_decomposed_into_anonymous_pattern_substitutions():
 
     assert result.success
     assert tuple(value for _, value in result.holes) == (2, 3)
+    assert "decompose:30->2,3" in result.trace
+    assert memory.links == before
+
+
+def test_nested_link_pattern_decomposes_existing_links_without_materialization():
+    memory = equality_memory()
+    memory.links[20] = (30, 1)
+    before = dict(memory.links)
+
+    result = interpret_constraints(
+        parse_formula("20 = ([] ⟼ []) ⟼ []"),
+        ContextFrame(start=10, end=10),
+        memory,
+        symbols={"20": 20},
+    )
+
+    assert result.success
+    assert tuple(value for _, value in result.holes) == (2, 3, 1)
+    assert "decompose:20->30,1" in result.trace
     assert "decompose:30->2,3" in result.trace
     assert memory.links == before
 
