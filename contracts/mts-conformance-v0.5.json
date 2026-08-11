@@ -3,7 +3,7 @@
   "status": "accepted",
   "accepted": true,
   "contract": "mts-contract/v0.5",
-  "composition": "current accepted surfaces and production-core gates define acceptance directly; the legacy core regression corpus may still execute as a regression oracle but is not an acceptance input or semantic parent",
+  "composition": "current accepted surfaces and production-core gates define acceptance directly; historical release corpora are not acceptance inputs or semantic parents",
   "requiredAcceptedSurfaces": [
     {"role": "anum-stream-v0.3", "contractPath": "contracts/anum-stream-deserialization-v0.3.json", "schema": "anum-stream-deserialization/v0.3", "conformance": "embedded"},
     {"role": "value-bundle-v0.2", "contractPath": "contracts/mts-value-bundle-v0.2.json", "schema": "mts-value-bundle/v0.2", "conformancePath": "contracts/mts-value-bundle-conformance-v0.2.json"},
@@ -14,8 +14,6 @@
     {"role": "direct-deixis-v0.5", "contractPath": "contracts/mts-direct-deixis-v0.5.json", "schema": "mts-direct-deixis/v0.5", "conformancePath": "contracts/mts-direct-deixis-conformance-v0.5.json"}
   ],
   "productionCoreGates": ["tests/test_mtc_parser.py", "tests/test_mtc_interpreter.py", "tests/test_anum_memory.py", "tests/test_mts_value_bundle_contract.py", "tests/test_mts_definition_opening_reference.py", "tests/test_mts_derivation_base_contract.py", "tests/test_mts_opening_path_reference.py", "tests/test_mts_proof_v04.py", "tests/test_mts_direct_deixis_reference.py", "tests/test_root_library.py"],
-  "legacyCoreRegressionCorpus": "contracts/mts-conformance-v0.2.json",
-  "legacyCoreRegressionNormative": false,
   "releaseAssertions": {
     "historicalUmbrellaIsNormativeParent": false,
     "currentContractHasNoExtendsOrBaseContract": true,
