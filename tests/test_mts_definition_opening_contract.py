@@ -72,7 +72,7 @@ def test_accepted_operation_is_exactly_one_step_and_effect_free():
     assert operation["doesNotTake"] == [
         "ContextFrame",
         "MemoryView",
-        "symbol-to-link bindings",
+        "symbol-to-LinkRef bindings",
         "proof state",
     ]
     assert set(operation["results"]) == {
