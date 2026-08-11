@@ -8,7 +8,7 @@
     "mts-opening-path/v0.4"
   ],
   "conformanceCorpus": "contracts/mts-proof-conformance-v0.4.json",
-  "foundation": "current trusted proof artifact over two self-contained semantic leaves: the five primitive derivation relations and the finite DefinitionOpeningPath verifier; no historical proof or umbrella release is a semantic parent",
+  "foundation": "current trusted proof artifact over two self-contained semantic leaves: the five primitive derivation relations and the finite DefinitionOpeningPath verifier; no historical proof or umbrella release is a semantic parent; proofObject.contractVersion remains only a transport discriminator and does not reintroduce an umbrella dependency",
   "purpose": "Trusted independent replay of exactly five primitive derivation relations plus the accepted finite DefinitionOpeningPath operational composite certificate; no other composition or inference rule is accepted.",
   "proofObject": {
     "required": ["proofVersion", "contractVersion", "judgments"],
