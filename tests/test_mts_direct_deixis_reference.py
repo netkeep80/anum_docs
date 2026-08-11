@@ -57,7 +57,7 @@ def test_contract_is_accepted_self_contained_and_conformant():
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
     assert "dependsOn" not in contract
-    assert "historical MTS umbrella" in contract["foundation"]
+    assert "mts-contract/v0." not in json.dumps(contract, ensure_ascii=False)
     assert conformance["schema"] == "mts-direct-deixis-conformance/v0.5"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
