@@ -25,7 +25,6 @@ from core.mtc_ast import (
     Symbol,
     validate_expression,
 )
-from core.reference_model import operator as reference_operator
 
 
 class TokenKind(Enum):
@@ -124,12 +123,14 @@ _FORM_STARTS = {
     TokenKind.START,
 }
 
-_PRECEDENCE_DEFINITION = reference_operator(":").precedence
-_PRECEDENCE_JUDGMENT = reference_operator("=").precedence
-_PRECEDENCE_LINK = reference_operator("⟼").precedence
+# Grammar-owned precedence table.  These values are parser syntax, not a second
+# semantic/reference-model API.
+_PRECEDENCE_DEFINITION = 10
+_PRECEDENCE_JUDGMENT = 20
+_PRECEDENCE_LINK = 40
 _PRECEDENCE_SEQUENCE = 50
-_PRECEDENCE_INVERSION = reference_operator("¬").precedence
-_PRECEDENCE_PROJECTION = reference_operator("♀").precedence
+_PRECEDENCE_INVERSION = 60
+_PRECEDENCE_PROJECTION = 70
 
 
 def tokenize(text: str) -> tuple[Token, ...]:
