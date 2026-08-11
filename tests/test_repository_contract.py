@@ -184,6 +184,15 @@ def test_historical_mts_release_chain_is_physically_absent():
     assert leftovers == []
 
 
+def test_contributor_guide_points_only_to_current_machine_surface():
+    text = (ROOT / "docs/CONTRIBUTING.md").read_text(encoding="utf-8")
+
+    assert "../contracts/mts-contract-v0.5.json" in text
+    assert "anum-stream-deserialization/v0.3" in text
+    assert "Reference model МТС v0.2" not in text
+    assert "mts-contract-v0.2" not in text
+
+
 def test_current_manifest_does_not_restore_superseded_anum_or_occurrence_link_identity():
     contract = json.loads(MTS_CONTRACT_CURRENT.read_text(encoding="utf-8"))
     serialized = json.dumps(contract, ensure_ascii=False)
