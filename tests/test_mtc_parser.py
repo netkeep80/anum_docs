@@ -202,3 +202,8 @@ def test_root_fixture_round_trips_through_canonical_printer():
         canonical = format_expression(original)
         reparsed = parse_formula(canonical)
         assert structural_key(reparsed) == structural_key(original), (source, canonical)
+
+
+def test_closed_issue_challenge_files_are_not_active_test_surface():
+    leftovers = sorted(Path(__file__).parent.glob("test_issue_*_challenge.py"))
+    assert leftovers == []
