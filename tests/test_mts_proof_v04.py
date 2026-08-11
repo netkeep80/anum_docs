@@ -8,7 +8,6 @@ from core.proof_checker import (
     CONTRACT_VERSION_V04,
     PROOF_SCHEMA_V04,
     DefinitionOpeningPathJudgment,
-    ProofObjectV04,
     canonical_proof_v04_json,
     check_proof_v04,
     check_proof_v04_data,
@@ -21,7 +20,6 @@ ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-proof-v0.4.json"
 CONFORMANCE = ROOT / "contracts" / "mts-proof-conformance-v0.4.json"
 BASE_SEMANTIC_CORPUS = ROOT / "contracts" / "mts-derivation-base-conformance-v0.3.json"
-LEGACY_BASE_REGRESSION = ROOT / "contracts" / "mts-proof-conformance-v0.3.json"
 OPENING_CONFORMANCE = ROOT / "contracts" / "mts-opening-path-conformance-v0.4.json"
 CHECKER = ROOT / "core" / "proof_checker.py"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
@@ -80,7 +78,7 @@ def patch_dotted(source: dict, patch: dict) -> dict:
 def base_by_id() -> dict[str, dict]:
     return {
         item["id"]: item["judgment"]
-        for item in read(LEGACY_BASE_REGRESSION)["validJudgments"]
+        for item in read(CONFORMANCE)["baseJudgments"]
     }
 
 
@@ -125,22 +123,21 @@ def test_contract_is_accepted_self_contained_with_exact_six_relation_surface():
     assert contract["conformanceCorpus"] == "contracts/mts-proof-conformance-v0.4.json"
 
 
-def test_conformance_uses_semantic_leaf_and_marks_historical_corpus_regression_only():
+def test_conformance_uses_current_semantic_leaf_and_owns_base_transport_vectors():
     conformance = read(CONFORMANCE)
     base_semantics = read(BASE_SEMANTIC_CORPUS)
 
     assert conformance["baseSemanticCorpus"] == "contracts/mts-derivation-base-conformance-v0.3.json"
     assert base_semantics["contract"] == "mts-derivation-base/v0.3"
-    assert conformance["legacyBaseRegressionCorpus"] == "contracts/mts-proof-conformance-v0.3.json"
-    assert conformance["legacyBaseRegressionNormative"] is False
     assert conformance["openingPathCorpus"] == "contracts/mts-opening-path-conformance-v0.4.json"
-    assert conformance["invalidArtifacts"]
-    assert conformance["mixedArtifact"]["openingPathId"] == "two-edge"
-    assert "versioningAssertions" not in conformance
+    assert {item["judgment"]["relation"] for item in conformance["baseJudgments"]} == BASE_RELATIONS
+    assert conformance["baseForgeries"]
+    assert "legacyBaseRegressionCorpus" not in conformance
+    assert "legacyBaseRegressionNormative" not in conformance
 
 
-def test_legacy_base_valid_judgments_replay_directly_in_current_v04():
-    for vector in read(LEGACY_BASE_REGRESSION)["validJudgments"]:
+def test_current_base_valid_judgments_replay_directly_in_v04():
+    for vector in read(CONFORMANCE)["baseJudgments"]:
         assert check_proof_v04_data(v04_artifact([vector["judgment"]])), vector["id"]
 
     base = read(CONTRACT)["baseRelations"]
@@ -153,10 +150,9 @@ def test_legacy_base_valid_judgments_replay_directly_in_current_v04():
     }
 
 
-def test_legacy_base_forgeries_are_rejected_directly_by_current_v04():
-    for vector in read(LEGACY_BASE_REGRESSION)["forgeries"]:
+def test_current_base_forgeries_are_rejected_directly_by_v04():
+    for vector in read(CONFORMANCE)["baseForgeries"]:
         forged = forged_base(vector)
-        assert vector["mustReject"] is True
         assert not check_proof_v04_data(v04_artifact([forged])), vector["id"]
 
 
@@ -307,12 +303,15 @@ def test_checker_and_effect_boundaries_are_current_and_explicit():
 
 def test_current_proof_has_no_historical_release_gate_or_compatibility_surface():
     contract = read(CONTRACT)
-    downstream = contract["downstream"]
+    conformance = read(CONFORMANCE)
+    source = CHECKER.read_text(encoding="utf-8")
 
     assert "v03Compatibility" not in contract
     assert "versioning" not in contract
     assert "futureUmbrella" not in json.dumps(contract, ensure_ascii=False)
-    assert downstream == {
+    assert "legacyBaseRegression" not in json.dumps(conformance, ensure_ascii=False)
+    assert "check_proof_v03_data" not in source
+    assert contract["downstream"] == {
         "aproverMayInventAdditionalRules": False,
         "proofSearchTrusted": False,
     }
