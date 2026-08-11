@@ -3,10 +3,12 @@
 v0.2 deliberately trusts only replay of the accepted read-only contextual
 ``interpret`` semantics.
 
-v0.3 adds replay of the five already accepted base derivation relations from
-``mts-derivation-base/v0.3``.  It still does not implement proof search,
-multi-step composition, global rewriting, classical inference rules, hidden
-root injection, or ambient interpreter/subject access.
+The five primitive derivation relations are implemented once as a
+version-neutral base replay core. v0.3 packages exactly those five relations;
+v0.4 packages the same five plus the accepted finite DefinitionOpeningPath
+certificate. No proof version implements proof search, generic composition,
+global rewriting, classical inference rules, hidden root injection, or ambient
+interpreter/subject access.
 """
 
 from dataclasses import dataclass
@@ -223,13 +225,14 @@ class NonAddressableDefinitionTargetJudgment:
     relation: str = "NonAddressableDefinitionTarget"
 
 
-V03Judgment: TypeAlias = (
+BaseJudgment: TypeAlias = (
     ContextuallySatisfiesJudgment
     | OpensJudgment
     | NoVisibleDefinitionJudgment
     | DefinitionConflictJudgment
     | NonAddressableDefinitionTargetJudgment
 )
+V03Judgment: TypeAlias = BaseJudgment
 
 
 @dataclass(frozen=True)
@@ -256,7 +259,7 @@ def _parse_definition(source: str) -> Definition:
 
 
 def _parse_definition_target(source: str) -> Form:
-    value = parse_formula(f"{source} : __proof_v03_query__")
+    value = parse_formula(f"{source} : __proof_query__")
     if not isinstance(value, Definition):
         raise ValueError("definition target must parse as Form")
     return value.target
@@ -408,7 +411,9 @@ def check_non_addressable_definition_target(
     return result.kind is DefinitionLookupKind.NON_ADDRESSABLE
 
 
-def check_v03_judgment(judgment: V03Judgment) -> bool:
+def check_base_judgment(judgment: BaseJudgment) -> bool:
+    """Replay one of the five primitive accepted derivation relations."""
+
     if isinstance(judgment, ContextuallySatisfiesJudgment):
         return check_contextually_satisfies(judgment)
     if isinstance(judgment, OpensJudgment):
@@ -430,7 +435,7 @@ def check_proof_v03(proof: ProofObjectV03) -> bool:
         or proof.contract_version != CONTRACT_VERSION_V03
     ):
         return False
-    return all(check_v03_judgment(judgment) for judgment in proof.judgments)
+    return all(check_base_judgment(judgment) for judgment in proof.judgments)
 
 
 def _require_exact_keys(data: dict, expected: set[str], label: str) -> None:
@@ -581,7 +586,7 @@ def _definition_id_from_data(data: object) -> ExpectedDefinitionId:
     )
 
 
-def _judgment_from_data(data: object) -> V03Judgment:
+def _base_judgment_from_data(data: object) -> BaseJudgment:
     if not isinstance(data, dict):
         raise ValueError("judgment must be an object")
     relation = data.get("relation")
@@ -651,7 +656,7 @@ def _judgment_from_data(data: object) -> V03Judgment:
             raise ValueError("target must be a string")
         return NonAddressableDefinitionTargetJudgment(target=data["target"])
 
-    raise ValueError("unknown v0.3 proof relation")
+    raise ValueError("unknown base proof relation")
 
 
 def proof_v03_from_data(data: object) -> ProofObjectV03:
@@ -671,7 +676,7 @@ def proof_v03_from_data(data: object) -> ProofObjectV03:
     if not isinstance(data["judgments"], list):
         raise ValueError("judgments must be an array")
     return ProofObjectV03(
-        judgments=tuple(_judgment_from_data(item) for item in data["judgments"]),
+        judgments=tuple(_base_judgment_from_data(item) for item in data["judgments"]),
     )
 
 
@@ -727,7 +732,7 @@ def _scopes_to_data(scopes: tuple[DefinitionScopeSnapshot, ...]) -> list[dict]:
     ]
 
 
-def _judgment_to_data(judgment: V03Judgment) -> dict:
+def _base_judgment_to_data(judgment: BaseJudgment) -> dict:
     if isinstance(judgment, ContextuallySatisfiesJudgment):
         return {
             "relation": judgment.relation,
@@ -770,7 +775,7 @@ def _judgment_to_data(judgment: V03Judgment) -> dict:
         }
     if isinstance(judgment, NonAddressableDefinitionTargetJudgment):
         return {"relation": judgment.relation, "target": judgment.target}
-    raise TypeError("unknown v0.3 proof judgment")
+    raise TypeError("unknown base proof judgment")
 
 
 def proof_v03_to_data(proof: ProofObjectV03) -> dict:
@@ -781,7 +786,7 @@ def proof_v03_to_data(proof: ProofObjectV03) -> dict:
     return {
         "proofVersion": proof.proof_version,
         "contractVersion": proof.contract_version,
-        "judgments": [_judgment_to_data(item) for item in proof.judgments],
+        "judgments": [_base_judgment_to_data(item) for item in proof.judgments],
     }
 
 
@@ -794,9 +799,9 @@ def canonical_proof_v03_json(proof: ProofObjectV03) -> str:
     )
 
 
-# v0.4 extends the same trusted module with exactly one accepted composite
-# certificate relation.  Existing v0.2/v0.3 APIs and semantics above remain
-# independent and unchanged.
+# v0.4 adds exactly one accepted composite certificate relation to the same
+# version-neutral primitive relation core. Existing v0.2/v0.3 artifact APIs do
+# not define or mediate v0.4 semantics.
 CONTRACT_VERSION_V04 = "mts-contract/v0.4"
 PROOF_SCHEMA_V04 = "mts-proof/v0.4"
 
@@ -811,7 +816,7 @@ class DefinitionOpeningPathJudgment:
     relation: str = "DefinitionOpeningPath"
 
 
-V04Judgment: TypeAlias = V03Judgment | DefinitionOpeningPathJudgment
+V04Judgment: TypeAlias = BaseJudgment | DefinitionOpeningPathJudgment
 
 
 @dataclass(frozen=True)
@@ -904,7 +909,7 @@ def check_definition_opening_path(judgment: DefinitionOpeningPathJudgment) -> bo
 def check_v04_judgment(judgment: V04Judgment) -> bool:
     if isinstance(judgment, DefinitionOpeningPathJudgment):
         return check_definition_opening_path(judgment)
-    return check_v03_judgment(judgment)
+    return check_base_judgment(judgment)
 
 
 def check_proof_v04(proof: ProofObjectV04) -> bool:
@@ -921,7 +926,7 @@ def check_proof_v04(proof: ProofObjectV04) -> bool:
 def _v04_judgment_from_data(data: object) -> V04Judgment:
     if isinstance(data, dict) and data.get("relation") == "DefinitionOpeningPath":
         return _opening_path_judgment_from_data(data)
-    return _judgment_from_data(data)
+    return _base_judgment_from_data(data)
 
 
 def proof_v04_from_data(data: object) -> ProofObjectV04:
@@ -978,7 +983,7 @@ def _opening_path_judgment_to_data(judgment: DefinitionOpeningPathJudgment) -> d
 def _v04_judgment_to_data(judgment: V04Judgment) -> dict:
     if isinstance(judgment, DefinitionOpeningPathJudgment):
         return _opening_path_judgment_to_data(judgment)
-    return _judgment_to_data(judgment)
+    return _base_judgment_to_data(judgment)
 
 
 def proof_v04_to_data(proof: ProofObjectV04) -> dict:
