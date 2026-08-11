@@ -8,6 +8,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "contracts/anum-stream-deserialization-v0.3.json"
+SUPERSEDED_SEQUENCE_CANDIDATE = ROOT / "contracts/mts-anum-sequence-materialization-v0.7.json"
 
 
 class StreamError(ValueError):
@@ -82,7 +83,9 @@ def test_contract_is_current_accepted_and_independent_of_foundation_v2_acceptanc
     assert contract["scope"]["effect"] == "none"
     assert contract["scope"]["existingAsetCarrierInputAccepted"] is False
     assert contract["downstream"]["aproverRepinAllowed"] is True
+    assert contract["versionBoundary"]["supersedesFoundationV2SequenceMaterializationCandidateV07"] is True
     assert contract["versionBoundary"]["foundationV2SequenceGroupSemanticsInherited"] is False
+    assert not SUPERSEDED_SEQUENCE_CANDIDATE.exists()
 
 
 def test_contract_preserves_four_abits_root_and_by_poles_identity() -> None:
