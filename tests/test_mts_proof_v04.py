@@ -1,4 +1,4 @@
-"""Production acceptance for mts-proof/v0.4 with DefinitionOpeningPath."""
+"""Production acceptance for self-contained mts-proof/v0.4."""
 
 import json
 from copy import deepcopy
@@ -10,7 +10,6 @@ from core.proof_checker import (
     DefinitionOpeningPathJudgment,
     ProofObjectV04,
     canonical_proof_v04_json,
-    check_proof_v03_data,
     check_proof_v04,
     check_proof_v04_data,
     proof_v04_from_data,
@@ -21,10 +20,10 @@ from core.proof_checker import (
 ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-proof-v0.4.json"
 CONFORMANCE = ROOT / "contracts" / "mts-proof-conformance-v0.4.json"
-BASE_CORPUS = ROOT / "contracts" / "mts-proof-conformance-v0.3.json"
+BASE_SEMANTIC_CORPUS = ROOT / "contracts" / "mts-derivation-base-conformance-v0.3.json"
+LEGACY_BASE_REGRESSION = ROOT / "contracts" / "mts-proof-conformance-v0.3.json"
 OPENING_CONFORMANCE = ROOT / "contracts" / "mts-opening-path-conformance-v0.4.json"
-PROOF_V03 = ROOT / "contracts" / "mts-proof-v0.3.json"
-MTS_V04 = ROOT / "contracts" / "mts-contract-v0.4.json"
+CHECKER = ROOT / "core" / "proof_checker.py"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
 BASE_RELATIONS = {
@@ -56,14 +55,6 @@ def v04_artifact(judgments: list[dict]) -> dict:
     }
 
 
-def v03_artifact(judgments: list[dict]) -> dict:
-    return {
-        "proofVersion": "mts-proof/v0.3",
-        "contractVersion": "mts-contract/v0.3",
-        "judgments": judgments,
-    }
-
-
 def opening_judgment(vector: dict) -> dict:
     return {
         "relation": "DefinitionOpeningPath",
@@ -89,7 +80,7 @@ def patch_dotted(source: dict, patch: dict) -> dict:
 def base_by_id() -> dict[str, dict]:
     return {
         item["id"]: item["judgment"]
-        for item in read(BASE_CORPUS)["validJudgments"]
+        for item in read(LEGACY_BASE_REGRESSION)["validJudgments"]
     }
 
 
@@ -109,13 +100,21 @@ def forged_base(vector: dict) -> dict:
     return result
 
 
-def test_contract_is_accepted_with_exact_six_relation_surface():
+def test_contract_is_accepted_self_contained_with_exact_six_relation_surface():
     contract = read(CONTRACT)
     conformance = read(CONFORMANCE)
 
     assert contract["schema"] == "mts-proof/v0.4"
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
+    assert contract["dependsOn"] == [
+        "mts-derivation-base/v0.3",
+        "mts-opening-path/v0.4",
+    ]
+    serialized = json.dumps(contract, ensure_ascii=False)
+    assert "mts-proof/v0.3" not in serialized
+    assert "v03Compatibility" not in contract
+    assert "versioning" not in contract
     assert contract["proofObject"]["proofVersion"] == PROOF_SCHEMA_V04
     assert contract["proofObject"]["contractVersion"] == CONTRACT_VERSION_V04
     assert set(contract["trustedRelations"]) == BASE_RELATIONS | {"DefinitionOpeningPath"}
@@ -126,44 +125,50 @@ def test_contract_is_accepted_with_exact_six_relation_surface():
     assert contract["conformanceCorpus"] == "contracts/mts-proof-conformance-v0.4.json"
 
 
-def test_accepted_conformance_owns_v04_vectors_and_uses_only_accepted_dependencies():
+def test_conformance_uses_semantic_leaf_and_marks_historical_corpus_regression_only():
     conformance = read(CONFORMANCE)
+    base_semantics = read(BASE_SEMANTIC_CORPUS)
 
-    assert conformance["baseCorpus"] == "contracts/mts-proof-conformance-v0.3.json"
+    assert conformance["baseSemanticCorpus"] == "contracts/mts-derivation-base-conformance-v0.3.json"
+    assert base_semantics["contract"] == "mts-derivation-base/v0.3"
+    assert conformance["legacyBaseRegressionCorpus"] == "contracts/mts-proof-conformance-v0.3.json"
+    assert conformance["legacyBaseRegressionNormative"] is False
     assert conformance["openingPathCorpus"] == "contracts/mts-opening-path-conformance-v0.4.json"
     assert conformance["invalidArtifacts"]
     assert conformance["mixedArtifact"]["openingPathId"] == "two-edge"
+    assert "versioningAssertions" not in conformance
 
 
-def test_every_v03_valid_base_judgment_replays_identically_when_lifted():
-    for vector in read(BASE_CORPUS)["validJudgments"]:
-        judgment = vector["judgment"]
-        assert check_proof_v03_data(v03_artifact([judgment])), vector["id"]
-        assert check_proof_v04_data(v04_artifact([judgment])), vector["id"]
+def test_legacy_base_valid_judgments_replay_directly_in_current_v04():
+    for vector in read(LEGACY_BASE_REGRESSION)["validJudgments"]:
+        assert check_proof_v04_data(v04_artifact([vector["judgment"]])), vector["id"]
 
     base = read(CONTRACT)["baseRelations"]
-    assert base["shapesIdenticalToV03"] is True
-    assert base["trustedMeaningIdenticalToV03"] is True
-    assert base["reimplementedForV04"] is False
+    assert base == {
+        "contract": "mts-derivation-base/v0.3",
+        "checkerPath": "core/proof_checker.py::check_base_judgment",
+        "parserPath": "core/proof_checker.py::_base_judgment_from_data",
+        "serializerPath": "core/proof_checker.py::_base_judgment_to_data",
+        "versionedProofDelegation": False,
+    }
 
 
-def test_every_v03_base_forgery_remains_rejected_by_both_versioned_paths():
-    for vector in read(BASE_CORPUS)["forgeries"]:
+def test_legacy_base_forgeries_are_rejected_directly_by_current_v04():
+    for vector in read(LEGACY_BASE_REGRESSION)["forgeries"]:
         forged = forged_base(vector)
         assert vector["mustReject"] is True
-        assert not check_proof_v03_data(v03_artifact([forged])), vector["id"]
         assert not check_proof_v04_data(v04_artifact([forged])), vector["id"]
 
 
-def test_every_existing_v03_invalid_artifact_remains_rejected_by_v03_api():
-    for vector in read(BASE_CORPUS)["invalidArtifacts"]:
-        assert not check_proof_v03_data(vector["artifact"]), vector["id"]
+def test_current_checker_has_no_versioned_v03_dispatch_path():
+    source = CHECKER.read_text(encoding="utf-8")
 
-    compatibility = read(CONTRACT)["v03Compatibility"]
-    assert compatibility["mtsProofV03Modified"] is False
-    assert compatibility["trustedRelationsRemainExactlyFive"] is True
-    assert compatibility["existingV03ArtifactsReplayByExistingApi"] is True
-    assert compatibility["retroactiveReinterpretation"] is False
+    assert "def check_base_judgment" in source
+    assert "def _base_judgment_from_data" in source
+    assert "def _base_judgment_to_data" in source
+    assert "def check_v03_judgment" not in source
+    assert "return check_v03_judgment(judgment)" not in source
+    assert "V04Judgment: TypeAlias = BaseJudgment | DefinitionOpeningPathJudgment" in source
 
 
 def test_every_opening_path_valid_vector_lifts_to_trusted_v04_relation():
@@ -277,13 +282,14 @@ def test_opening_path_relation_uses_no_equality_or_other_generic_rule():
     assert boundary["globalSubstitutionAccepted"] is False
 
 
-def test_checker_and_effect_boundaries_remain_explicit():
+def test_checker_and_effect_boundaries_are_current_and_explicit():
     checker = read(CONTRACT)["checker"]
     effects = read(CONTRACT)["effectsBoundary"]
 
     assert checker["module"] == "core/proof_checker.py"
-    assert checker["singleTrustedModuleForV02V03V04"] is True
-    assert checker["baseRelationsDelegateExistingV03Replay"] is True
+    assert checker["currentTrustedModule"] is True
+    assert checker["baseRelationsUseCanonicalReplayCore"] is True
+    assert checker["baseRelationsDelegateVersionedProof"] is False
     assert checker["openingPathDelegatesCanonicalVerifier"] is True
     assert checker["trustsSearchTrace"] is False
     assert checker["mayAutoExtendOpeningPath"] is False
@@ -299,26 +305,20 @@ def test_checker_and_effect_boundaries_remain_explicit():
     assert effects["openingPathDeletes"] is False
 
 
-def test_standalone_proof_release_waits_for_additive_v05_umbrella_before_aprover_repin():
-    versioning = read(CONTRACT)["versioning"]
-    downstream = read(CONTRACT)["downstream"]
+def test_current_proof_has_no_historical_release_gate_or_compatibility_surface():
+    contract = read(CONTRACT)
+    downstream = contract["downstream"]
 
-    assert versioning["mtsContractV04Modified"] is False
-    assert versioning["publishedThroughUmbrella"] is False
-    assert versioning["futureUmbrella"] == "mts-contract/v0.5"
-    assert downstream["directAproverRepinAllowedBeforeUmbrella"] is False
-    assert downstream["aproverMayInventAdditionalRules"] is False
-    assert "mts-proof/v0.4" not in MTS_V04.read_text(encoding="utf-8")
+    assert "v03Compatibility" not in contract
+    assert "versioning" not in contract
+    assert "futureUmbrella" not in json.dumps(contract, ensure_ascii=False)
+    assert downstream == {
+        "aproverMayInventAdditionalRules": False,
+        "proofSearchTrusted": False,
+    }
 
 
 def test_root_program_remains_exactly_ten_and_unchanged():
     before = root_sources()
     assert len(before) == 10
     assert root_sources() == before
-
-
-def test_v03_contract_artifact_is_still_the_original_five_relation_release():
-    v03 = read(PROOF_V03)
-    assert v03["schema"] == "mts-proof/v0.3"
-    assert len(v03["trustedRelations"]) == 5
-    assert "DefinitionOpeningPath" not in v03["trustedRelations"]
