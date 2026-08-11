@@ -32,7 +32,7 @@
   "operation": {
     "name": "open_definition",
     "inputs": ["typed addressable target Form", "explicit lexical DefinitionEnvironment"],
-    "doesNotTake": ["ContextFrame", "MemoryView", "symbol-to-link bindings", "proof state"],
+    "doesNotTake": ["ContextFrame", "MemoryView", "symbol-to-LinkRef bindings", "proof state"],
     "results": {
       "match": ["DefinitionId", "exact typed Definition.value", "provenance"],
       "no-match": "no visible definition for addressable target",
