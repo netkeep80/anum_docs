@@ -1,9 +1,15 @@
-from __future__ import annotations
-
 import json
 from pathlib import Path
 
 import pytest
+
+from core.anum_parser import parse_raw_quaternary
+from core.anum_protocol import (
+    StreamError,
+    deserialize_anum,
+    deserialize_stream,
+    semantic_link,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,65 +17,8 @@ CONTRACT_PATH = ROOT / "contracts/anum-stream-deserialization-v0.3.json"
 SUPERSEDED_SEQUENCE_CANDIDATE = ROOT / "contracts/mts-anum-sequence-materialization-v0.7.json"
 
 
-class StreamError(ValueError):
-    def __init__(self, code: str) -> None:
-        super().__init__(code)
-        self.code = code
-
-
 def _contract() -> dict:
     return json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
-
-
-def _link(start: str, end: str) -> str:
-    root_pairs = {
-        ("R", "R"): "R",
-        ("O", "R"): "O",
-        ("R", "C"): "C",
-        ("O", "C"): "L",
-        ("C", "O"): "U",
-    }
-    return root_pairs.get((start, end), f"({start}⟼{end})")
-
-
-def _append(frame: dict, value: str) -> None:
-    if not frame["started"]:
-        frame["current"] = value
-        frame["started"] = True
-    else:
-        frame["current"] = _link(frame["current"], value)
-
-
-def _deserialize(source: str) -> tuple[str, list[str], list[str]]:
-    frames = [{"started": False, "current": "R"}]
-    operations: list[str] = []
-    resolved: list[str] = []
-
-    for token in source:
-        if token == "[":
-            frames.append({"started": False, "current": "R"})
-            operations.append("OPEN")
-            continue
-        if token == "]":
-            if len(frames) == 1:
-                raise StreamError("unexpected-close")
-            inner = frames.pop()
-            returned = "R" if not inner["started"] else _link("R", inner["current"])
-            _append(frames[-1], returned)
-            operations.append("CLOSE")
-            continue
-        if token in "10":
-            value = "L" if token == "1" else "U"
-            resolved.append(value)
-            _append(frames[-1], value)
-            operations.append("VALUE")
-            continue
-        raise StreamError("non-abit")
-
-    if len(frames) != 1:
-        raise StreamError("unclosed-open")
-    result = frames[0]["current"] if frames[0]["started"] else "R"
-    return result, resolved, operations
 
 
 def test_contract_is_current_accepted_and_independent_of_foundation_v2_acceptance() -> None:
@@ -101,38 +50,41 @@ def test_contract_preserves_four_abits_root_and_by_poles_identity() -> None:
     assert contract["semanticIdentity"]["repeatedSourcePositionCreatesSecondSemanticLink"] is False
 
 
-def test_every_valid_conformance_vector_executes() -> None:
+def test_every_valid_conformance_vector_executes_in_production_core() -> None:
     corpus = _contract()["conformance"]
     assert corpus["schema"] == "anum-stream-deserialization-conformance/v0.3"
 
     for vector in corpus["valid"]:
-        result, resolved, operations = _deserialize(vector["source"])
-        assert result == vector["expectedDenotation"], vector["id"]
-        assert operations == vector["expectedOperations"], vector["id"]
+        result = deserialize_stream(vector["source"])
+        assert result.denotation == vector["expectedDenotation"], vector["id"]
+        assert list(result.operations) == vector["expectedOperations"], vector["id"]
         if "expectedResolvedValues" in vector:
-            assert resolved == vector["expectedResolvedValues"], vector["id"]
+            assert list(result.resolved_values) == vector["expectedResolvedValues"], vector["id"]
         if "expectedDistinctRootRefs" in vector:
-            assert sorted(set(resolved)) == sorted(vector["expectedDistinctRootRefs"]), vector["id"]
+            assert sorted(set(result.resolved_values)) == sorted(vector["expectedDistinctRootRefs"]), vector["id"]
+
+
+def test_parsed_transport_and_compact_stream_have_identical_denotation() -> None:
+    for source in ("", "[]", "1", "10", "[1]", "[[]]", "1110"):
+        assert deserialize_anum(parse_raw_quaternary(source)) == deserialize_stream(source)
 
 
 def test_every_invalid_conformance_vector_rejects_with_exact_boundary() -> None:
-    corpus = _contract()["conformance"]
-
-    for vector in corpus["invalid"]:
+    for vector in _contract()["conformance"]["invalid"]:
         with pytest.raises(StreamError) as caught:
-            _deserialize(vector["source"])
+            deserialize_stream(vector["source"])
         assert caught.value.code == vector["error"], vector["id"]
 
 
 def test_empty_groups_and_root_collapse_are_not_special_copies() -> None:
-    assert _deserialize("")[0] == "R"
-    assert _deserialize("[]")[0] == "R"
-    assert _deserialize("[][]")[0] == "R"
-    assert _link("R", "R") == "R"
+    assert deserialize_stream("").denotation == "R"
+    assert deserialize_stream("[]").denotation == "R"
+    assert deserialize_stream("[][]").denotation == "R"
+    assert semantic_link("R", "R") == "R"
 
 
 def test_physical_positions_do_not_duplicate_root_links() -> None:
-    result, resolved, _ = _deserialize("1110")
-    assert resolved == ["L", "L", "L", "U"]
-    assert set(resolved) == {"L", "U"}
-    assert result == "(((L⟼L)⟼L)⟼U)"
+    result = deserialize_stream("1110")
+    assert result.resolved_values == ("L", "L", "L", "U")
+    assert set(result.resolved_values) == {"L", "U"}
+    assert result.denotation == "(((L⟼L)⟼L)⟼U)"
