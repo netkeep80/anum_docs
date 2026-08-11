@@ -75,13 +75,13 @@ class AnumMemory:
 
     def find_start_projection(self, form: int) -> int | None:
         for link in self._incoming.get(form, ()):
-            if self._links.get(link) == (link, form):
+            if link != form and self._links.get(link) == (link, form):
                 return link
         return None
 
     def find_end_projection(self, form: int) -> int | None:
         for link in self._outgoing.get(form, ()):
-            if self._links.get(link) == (form, link):
+            if link != form and self._links.get(link) == (form, link):
                 return link
         return None
 
