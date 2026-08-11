@@ -1,4 +1,4 @@
-"""Acceptance checks for replay-backed primitive MTS derivation relations v0.3."""
+"""Acceptance checks for self-contained primitive MTS derivation relations."""
 
 import json
 from pathlib import Path
@@ -7,20 +7,22 @@ from pathlib import Path
 ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-derivation-base-v0.3.json"
 CONFORMANCE = ROOT / "contracts" / "mts-derivation-base-conformance-v0.3.json"
-PROOF_V03 = ROOT / "contracts" / "mts-proof-v0.3.json"
 
 
 def read(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_contract_is_accepted_and_depends_only_on_normative_v03_surface():
+def test_contract_is_accepted_self_contained_and_has_no_release_parent():
     contract = read(CONTRACT)
 
     assert contract["schema"] == "mts-derivation-base/v0.3"
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
-    assert contract["dependsOn"] == ["mts-contract/v0.3"]
+    assert "dependsOn" not in contract
+    serialized = json.dumps(contract, ensure_ascii=False)
+    assert "mts-contract/v0." not in serialized
+    assert "mts-proof/v0." not in serialized
     assert contract["conformanceCorpus"] == "contracts/mts-derivation-base-conformance-v0.3.json"
 
 
@@ -103,24 +105,12 @@ def test_no_composition_or_classical_rule_is_accepted_by_base_contract():
     }
 
 
-def test_accepted_proof_v03_is_current_production_consumer_without_search_trust():
-    contract = read(CONTRACT)
-    proof = read(PROOF_V03)
-    integration = contract["productionIntegration"]
+def test_production_integration_points_to_version_neutral_base_replay():
+    integration = read(CONTRACT)["productionIntegration"]
 
-    assert proof["schema"] == "mts-proof/v0.3"
-    assert proof["accepted"] is True
-    assert set(proof["trustedRelations"]) == {
-        "ContextuallySatisfies",
-        "Opens",
-        "NoVisibleDefinition",
-        "DefinitionConflict",
-        "NonAddressableDefinitionTarget",
+    assert integration == {
+        "checker": "core/proof_checker.py",
+        "canonicalReplay": "check_base_judgment",
+        "proofSearchTrusted": False,
+        "genericCompositionAccepted": False,
     }
-    assert integration["proofContract"] == "mts-proof/v0.3"
-    assert integration["proofConformance"] == "contracts/mts-proof-conformance-v0.3.json"
-    assert integration["checker"] == "core/proof_checker.py"
-    assert integration["acceptedRelationsPublished"] is True
-    assert integration["proofSearchTrusted"] is False
-    assert integration["genericCompositionAccepted"] is False
-    assert contract["downstream"]["aproverProofRepinAllowed"] is False
