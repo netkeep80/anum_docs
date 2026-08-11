@@ -1,4 +1,4 @@
-"""Production conformance for accepted mts-opening-path/v0.4."""
+"""Production conformance for self-contained accepted mts-opening-path/v0.4."""
 
 import inspect
 import json
@@ -19,8 +19,6 @@ from core.mtc_parser import parse_formula
 ROOT = Path(__file__).parents[1]
 CONTRACT = ROOT / "contracts" / "mts-opening-path-v0.4.json"
 CONFORMANCE = ROOT / "contracts" / "mts-opening-path-conformance-v0.4.json"
-MTS_V04 = ROOT / "contracts" / "mts-contract-v0.4.json"
-PROOF_V03 = ROOT / "contracts" / "mts-proof-v0.3.json"
 CORE = ROOT / "core" / "mtc_opening_path.py"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
@@ -114,22 +112,22 @@ def root_sources() -> tuple[str, ...]:
     )
 
 
-def test_contract_is_accepted_standalone_and_old_releases_are_immutable():
+def test_contract_is_accepted_self_contained_and_has_only_real_dependency():
     contract = read(CONTRACT)
     conformance = read(CONFORMANCE)
 
     assert contract["schema"] == "mts-opening-path/v0.4"
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
+    assert contract["dependsOn"] == ["mts-definition-opening/v0.3"]
+    serialized = json.dumps(contract, ensure_ascii=False)
+    assert "mts-contract/v0." not in serialized
+    assert "mts-proof/v0." not in serialized
+    assert "versioning" not in contract
     assert conformance["schema"] == "mts-opening-path-conformance/v0.4"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
     assert contract["conformanceCorpus"] == "contracts/mts-opening-path-conformance-v0.4.json"
-    assert contract["versioning"]["mtsContractV04Modified"] is False
-    assert contract["versioning"]["mtsProofV03Modified"] is False
-    assert contract["versioning"]["publishedThroughUmbrella"] is False
-    assert contract["schema"] not in MTS_V04.read_text(encoding="utf-8")
-    assert contract["schema"] not in PROOF_V03.read_text(encoding="utf-8")
 
 
 def test_accepted_conformance_owns_complete_vector_corpus():
@@ -385,9 +383,12 @@ def test_relation_does_not_claim_logical_or_evaluation_semantics():
     assert meaning["readsInterpreterIdentity"] is False
     assert meaning["materializes"] is False
     assert meaning["deletes"] is False
-    assert proof["trustedProofRelationAddedByThisContract"] is False
-    assert proof["genericCompositionAccepted"] is False
-    assert proof["openingPathPlusContextuallySatisfiesAccepted"] is False
+    assert proof == {
+        "trustedProofRelationAddedByThisContract": False,
+        "currentProofConsumerMustReplayExactVerifier": True,
+        "genericCompositionAccepted": False,
+        "openingPathPlusContextuallySatisfiesAccepted": False,
+    }
 
 
 def test_all_ten_root_definitions_are_unchanged_one_edge_certificates():
