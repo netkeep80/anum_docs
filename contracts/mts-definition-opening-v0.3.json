@@ -2,12 +2,10 @@
   "schema": "mts-definition-opening/v0.3",
   "status": "accepted",
   "accepted": true,
-  "dependsOn": [
-    "mts-contract/v0.2"
-  ],
-  "conformanceCorpus": "contracts/mts-definition-opening-conformance-v0.3.json",
   "issue": 121,
-  "scope": "normative one-step read-only definition opening semantics; trusted proof rules remain a separate versioned surface",
+  "conformanceCorpus": "contracts/mts-definition-opening-conformance-v0.3.json",
+  "foundation": "typed scalar Form plus explicit lexical DefinitionEnvironment; the accepted one-step operation is self-contained below and does not inherit a historical MTS umbrella",
+  "scope": "normative one-step read-only definition opening semantics; trusted proof rules remain a separate surface",
   "definitionEnvironment": {
     "identity": {
       "definitionId": "replay-local pair (scopePath, ordinal)",
@@ -33,16 +31,8 @@
   },
   "operation": {
     "name": "open_definition",
-    "inputs": [
-      "typed addressable target Form",
-      "explicit lexical DefinitionEnvironment"
-    ],
-    "doesNotTake": [
-      "ContextFrame",
-      "MemoryView",
-      "symbol-to-LinkRef bindings",
-      "proof state"
-    ],
+    "inputs": ["typed addressable target Form", "explicit lexical DefinitionEnvironment"],
+    "doesNotTake": ["ContextFrame", "MemoryView", "symbol-to-link bindings", "proof state"],
     "results": {
       "match": ["DefinitionId", "exact typed Definition.value", "provenance"],
       "no-match": "no visible definition for addressable target",
@@ -109,14 +99,10 @@
     "semanticContractAccepted": true,
     "productionReferenceCoreImplemented": true,
     "canonicalRootLibraryUsesDefinitionEnvironment": true,
-    "productionConformancePresent": true,
-    "mtsContractV03Published": true,
-    "aproverRepinAllowed": false
+    "productionConformancePresent": true
   },
   "downstream": {
-    "genericL2ConsumerMayPinMtsContractV03": true,
-    "aproverProofRepinAllowed": false,
     "aproverMustNotInventLocalOpeningSemantics": true,
-    "futureProofConsumerMustUseVersionedL5Acceptance": true
+    "proofUseRequiresExplicitAcceptedLift": true
   }
 }
