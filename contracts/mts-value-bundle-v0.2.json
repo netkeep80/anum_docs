@@ -2,10 +2,8 @@
   "schema": "mts-value-bundle/v0.2",
   "status": "accepted",
   "accepted": true,
-  "acceptedContractLinkAllowed": true,
-  "dependsOn": [
-    "mts-contract/v0.2"
-  ],
+  "issue": 109,
+  "foundation": "typed L2 Form plus explicit read-only MemoryView; the accepted flat-bundle operation is self-contained below and does not inherit a historical MTS umbrella",
   "scope": {
     "valueBundle": "flat only",
     "constraintBundle": "existing accepted behavior unchanged",
@@ -26,10 +24,7 @@
   "elaboration": {
     "phase": "static-before-interpretation",
     "runtimeRoleGuessing": false,
-    "outputs": [
-      "ConstraintBundle",
-      "ValueBundle"
-    ],
+    "outputs": ["ConstraintBundle", "ValueBundle"],
     "operatorDomains": {
       "constraintEntry": "ConstraintBundle or existing Judgment semantics",
       "standaloneValueEntry": "flat ValueBundle allowed when value context is explicit",
@@ -43,46 +38,16 @@
       "definitionRhs": "existing scalar Form or ConstraintBundle only; ValueBundle deferred"
     },
     "rules": [
-      {
-        "when": "all non-empty direct items are Judgments",
-        "result": "ConstraintBundle"
-      },
-      {
-        "when": "all non-empty direct items are non-bundle Forms in a value-capable context",
-        "result": "ValueBundle"
-      },
-      {
-        "when": "direct items mix Judgment and Form evidence",
-        "result": "static-error:mixed-bundle-role-evidence"
-      },
-      {
-        "when": "empty {} occurs in a statically value-capable position",
-        "result": "ValueBundle"
-      },
-      {
-        "when": "empty {} is the constraint interpretation entry expression",
-        "result": "ConstraintBundle"
-      },
-      {
-        "when": "empty {} is a definition RHS",
-        "result": "ConstraintBundle"
-      },
-      {
-        "when": "non-empty ValueBundle is a definition RHS",
-        "result": "static-error:bundle-valued-definition-deferred"
-      },
-      {
-        "when": "ValueBundle appears under scalar-only ⟼/♀/♂/¬ operand position",
-        "result": "static-error:bundle-not-supported-in-scalar-operator"
-      },
-      {
-        "when": "empty {} has no static role context",
-        "result": "static-error:ambiguous-empty-bundle-role"
-      },
-      {
-        "when": "a ValueBundle directly contains another ValueBundle/CurlySyntax item",
-        "result": "static-error:nested-value-bundle-not-supported"
-      }
+      {"when": "all non-empty direct items are Judgments", "result": "ConstraintBundle"},
+      {"when": "all non-empty direct items are non-bundle Forms in a value-capable context", "result": "ValueBundle"},
+      {"when": "direct items mix Judgment and Form evidence", "result": "static-error:mixed-bundle-role-evidence"},
+      {"when": "empty {} occurs in a statically value-capable position", "result": "ValueBundle"},
+      {"when": "empty {} is the constraint interpretation entry expression", "result": "ConstraintBundle"},
+      {"when": "empty {} is a definition RHS", "result": "ConstraintBundle"},
+      {"when": "non-empty ValueBundle is a definition RHS", "result": "static-error:bundle-valued-definition-deferred"},
+      {"when": "ValueBundle appears under scalar-only ⟼/♀/♂/¬ operand position", "result": "static-error:bundle-not-supported-in-scalar-operator"},
+      {"when": "empty {} has no static role context", "result": "static-error:ambiguous-empty-bundle-role"},
+      {"when": "a ValueBundle directly contains another ValueBundle/CurlySyntax item", "result": "static-error:nested-value-bundle-not-supported"}
     ],
     "rootRegression": {
       "currentTenDefinitionsMustElaborateIdentically": true,
@@ -92,12 +57,12 @@
   "runtimeValueModel": {
     "scalar": {
       "kind": "link",
-      "identity": "resolved L1 LinkRef"
+      "identity": "canonical semantic Link resolved by the runtime memory view"
     },
     "bundle": {
       "kind": "bundle",
-      "identity": "extensional set of unique resolved L1 LinkRefs",
-      "occurrenceProvenanceSeparate": true
+      "identity": "extensional set of unique resolved semantic Links",
+      "sourceOccurrenceProvenanceSeparate": true
     },
     "crossKindEquality": false,
     "crossKindInequality": true,
@@ -107,8 +72,8 @@
   "elementResolution": {
     "eachOccurrenceResolvedIndependently": true,
     "deduplicateBeforeResolution": false,
-    "anonymousSquareIdentity": "ast-occurrence-path",
-    "unresolvedAnonymousOccurrence": "evaluation-unresolved/failure; never choose an arbitrary LinkRef",
+    "anonymousSquareIdentity": "ast-occurrence-path as syntactic-hole identity only",
+    "unresolvedAnonymousOccurrence": "evaluation-unresolved/failure; never choose an arbitrary link",
     "resolvedOccurrenceTraceRequired": true,
     "semanticSetBuiltAfterResolution": true,
     "semanticOrderRelevant": false,
@@ -122,16 +87,16 @@
     "historicalAnonymousClaim": {
       "source": "{[], []} = {[]}",
       "unconditional": false,
-      "conditional": "true only when independently resolved identity sets are equal"
+      "conditional": "true only when independently resolved semantic-link sets are equal"
     }
   },
   "expansionQuery": {
     "trigger": "Sequence/juxtaposition with exactly two endpoints and at least one statically elaborated ValueBundle operand",
-    "result": "flat ValueBundle of existing Link identities",
+    "result": "flat ValueBundle of existing semantic Links",
     "readOnly": true,
     "endpointDomains": {
-      "scalar": "singleton resolved identity",
-      "nonEmptyBundle": "resolved extensional identity set",
+      "scalar": "singleton resolved semantic link",
+      "nonEmptyBundle": "resolved extensional semantic-link set",
       "emptyBundle": "wildcard only in expansion endpoint position"
     },
     "operations": {
@@ -152,13 +117,9 @@
     "expansionIsCommand": false
   },
   "deferred": {
-    "nestedValueBundleSemantics": [
-      "first-class nested collection",
-      "flatten/union",
-      "other construction"
-    ],
+    "nestedValueBundleSemantics": ["first-class nested collection", "flatten/union", "other construction"],
     "bundleValuedDefinitions": "requires a tagged value environment/binding contract",
-    "bundleProjectionOrInversion": "requires an explicit lifting rule or rejection in a later version",
+    "bundleProjectionOrInversion": "requires an explicit lifting rule or rejection in a later accepted surface",
     "bundleAsExplicitLinkFormPole": "requires a separate lifting decision; current expansion uses juxtaposition only",
     "syntheticMissingLinkForms": "not part of current contract",
     "explicitBundleMaterialization": "separate L4 operation if ever needed"
@@ -170,7 +131,6 @@
     "constraintBundleRegression": "tests/test_mtc_value_bundle_reference.py"
   },
   "downstream": {
-    "aproverRepinRequired": true,
     "consumerMustExecuteConformance": true,
     "compatibilityImplementationAllowed": false
   }
