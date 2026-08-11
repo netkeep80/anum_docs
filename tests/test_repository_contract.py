@@ -15,7 +15,6 @@ MTS_CONTRACT_CURRENT = ROOT / "contracts/mts-contract-v0.5.json"
 MTS_CONFORMANCE_CURRENT = ROOT / "contracts/mts-conformance-v0.5.json"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md"}
 ACTIVE_SPECS = {
-    "Reference model МТС v0.2.md",
     "Формальная нотация МТС.md",
     "Ачисла и сериализация.md",
     "Пучки значений МТС v0.2.md",
@@ -39,6 +38,7 @@ FORBIDDEN_HISTORICAL_MTS_RELEASES = {
     "contracts/mts-proof-v0.2.json",
     "contracts/mts-proof-v0.3.json",
     "contracts/mts-proof-conformance-v0.3.json",
+    "docs/specs/Reference model МТС v0.2.md",
 }
 FORBIDDEN_CANDIDATE_PATHS = {
     "core/context_interpreter_candidate.py",
