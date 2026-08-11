@@ -1,9 +1,10 @@
-"""Raw parsing and deterministic serialization for ``*.anum``.
+"""Raw parsing and deterministic transport serialization for ``*.anum``.
 
-This L3 module deliberately does not decide denotation. Raw syntax, contextual
-validation and projection are separate stages. The strict quaternary layer does
-not apply ordinary bracket-balance rules: ``][``, ``[[`` and ``]]`` are valid
-raw carriers.
+This module recognizes only the four transmitted abits and preserves absolute
+source offsets. It deliberately does not decide stream denotation. Bracket
+balance is a semantic stack boundary of ``core.anum_protocol``, not a lexical
+rule: raw inputs such as ``][`` or ``[[`` can therefore still be parsed before
+current deserialization accepts or rejects the complete stream.
 """
 
 from core.anum_model import Abit, AnumForm, AnumSource, AnumToken
@@ -18,12 +19,7 @@ _ABIT_BY_SYMBOL = {abit.value: abit for abit in Abit}
 
 
 class IncrementalQuaternaryDecoder:
-    """Stateful raw decoder whose result is equivalent to batch parsing.
-
-    Completion of higher-level anum forms is context-dependent and is therefore
-    not invented here. ``feed`` emits newly recognized abits and ``finish``
-    returns the complete raw carrier accumulated so far.
-    """
+    """Stateful lexical decoder equivalent to batch raw parsing."""
 
     def __init__(self):
         self._offset = 0
@@ -71,7 +67,7 @@ class IncrementalQuaternaryDecoder:
 
 
 def parse_raw_quaternary(text: str) -> AnumForm:
-    """Parse strict raw quaternary text into abits without semantic validation."""
+    """Parse strict raw quaternary text without stream-semantic validation."""
 
     decoder = IncrementalQuaternaryDecoder()
     decoder.feed(text)
@@ -96,7 +92,7 @@ def parse_anum_file(text: str) -> AnumForm | AnumSource:
 
 
 def normalize_raw_form(form: AnumForm) -> str:
-    """Return the compact quaternary representation of one raw carrier."""
+    """Return the compact four-abit representation of one raw stream."""
 
     return "".join(form.values())
 
@@ -106,7 +102,7 @@ def serialize_quaternary_anum(
     *,
     include_header: bool = False,
 ) -> str:
-    """Serialize a raw carrier deterministically."""
+    """Serialize a raw transport stream deterministically."""
 
     body = normalize_raw_form(form)
     if not include_header:
