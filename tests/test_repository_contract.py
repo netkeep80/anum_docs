@@ -15,7 +15,6 @@ MTS_CONTRACT_CURRENT = ROOT / "contracts/mts-contract-v0.5.json"
 MTS_CONFORMANCE_CURRENT = ROOT / "contracts/mts-conformance-v0.5.json"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md"}
 ACTIVE_SPECS = {
-    "Reference model МТС v0.2.md",
     "Формальная нотация МТС.md",
     "Ачисла и сериализация.md",
     "Пучки значений МТС v0.2.md",
@@ -29,6 +28,18 @@ ACTIVE_MARKDOWN = (
 )
 FORBIDDEN_DIRECTORIES = {"archive", "legacy", "old", "deprecated"}
 FORBIDDEN_PROTOCOL_FORMULAS = {"[ := ∞♀", "] := ♂∞", "[] := 0", "][ := 1"}
+FORBIDDEN_HISTORICAL_MTS_RELEASES = {
+    "contracts/mts-contract-v0.2.json",
+    "contracts/mts-conformance-v0.2.json",
+    "contracts/mts-contract-v0.3.json",
+    "contracts/mts-conformance-v0.3.json",
+    "contracts/mts-contract-v0.4.json",
+    "contracts/mts-conformance-v0.4.json",
+    "contracts/mts-proof-v0.2.json",
+    "contracts/mts-proof-v0.3.json",
+    "contracts/mts-proof-conformance-v0.3.json",
+    "docs/specs/Reference model МТС v0.2.md",
+}
 FORBIDDEN_CANDIDATE_PATHS = {
     "core/context_interpreter_candidate.py",
     "tests/fixtures/mtc_root_v02_candidate.mtc",
@@ -160,11 +171,26 @@ def test_current_machine_manifest_is_single_self_contained_v05_surface():
     assert conformance["status"] == "accepted"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
-    assert conformance["legacyCoreRegressionNormative"] is False
+    assert "legacyCoreRegressionCorpus" not in conformance
+    assert "legacyCoreRegressionNormative" not in conformance
 
     required = conformance["requiredAcceptedSurfaces"]
     assert [item["schema"] for item in required] == contract["dependsOn"]
     assert all((ROOT / item["contractPath"]).is_file() for item in required)
+
+
+def test_historical_mts_release_chain_is_physically_absent():
+    leftovers = sorted(path for path in FORBIDDEN_HISTORICAL_MTS_RELEASES if (ROOT / path).exists())
+    assert leftovers == []
+
+
+def test_contributor_guide_points_only_to_current_machine_surface():
+    text = (ROOT / "docs/CONTRIBUTING.md").read_text(encoding="utf-8")
+
+    assert "../contracts/mts-contract-v0.5.json" in text
+    assert "anum-stream-deserialization/v0.3" in text
+    assert "Reference model МТС v0.2" not in text
+    assert "mts-contract-v0.2" not in text
 
 
 def test_current_manifest_does_not_restore_superseded_anum_or_occurrence_link_identity():

@@ -1,14 +1,10 @@
-"""Trusted proof replay kernels for versioned MTS proof artifacts.
+"""Trusted replay core for the current MTS proof artifact.
 
-v0.2 deliberately trusts only replay of the accepted read-only contextual
-``interpret`` semantics.
-
-The five primitive derivation relations are implemented once as a
-version-neutral base replay core. v0.3 packages exactly those five relations;
-v0.4 packages the same five plus the accepted finite DefinitionOpeningPath
-certificate. No proof version implements proof search, generic composition,
-global rewriting, classical inference rules, hidden root injection, or ambient
-interpreter/subject access.
+Five primitive derivation relations share one version-neutral replay core.
+The current v0.4 proof artifact adds the accepted finite
+DefinitionOpeningPath certificate. The checker performs no proof search,
+generic composition, global rewriting, classical inference, hidden root
+injection, ambient interpreter access, materialization, or deletion.
 """
 
 from dataclasses import dataclass
@@ -28,12 +24,10 @@ from core.mtc_opening_path import OpeningPathEdge, OpeningPathWitness, verify_op
 from core.mtc_parser import parse_formula
 
 
-# Existing v0.2 public constants remain unchanged for compatibility.
-CONTRACT_VERSION = "mts-contract/v0.2"
-PROOF_SCHEMA = "mts-proof/v0.2"
-
-CONTRACT_VERSION_V03 = "mts-contract/v0.3"
-PROOF_SCHEMA_V03 = "mts-proof/v0.3"
+# Portable v0.4 artifact discriminator. The historical mts-contract/v0.4 file
+# is not a semantic dependency of the current checker.
+CONTRACT_VERSION_V04 = "mts-contract/v0.4"
+PROOF_SCHEMA_V04 = "mts-proof/v0.4"
 
 
 @dataclass(frozen=True)
@@ -69,27 +63,8 @@ class ExpectedAlias:
     target_path: tuple[int, ...]
 
 
-@dataclass(frozen=True)
-class InterpretProofStep:
-    expression: str
-    context: ProofContext
-    distinguished_memory: tuple[DistinguishedLink, ...] = ()
-    symbols: tuple[tuple[str, int], ...] = ()
-    expected_success: bool = True
-    expected_substitutions: tuple[ExpectedSubstitution, ...] = ()
-    expected_aliases: tuple[ExpectedAlias, ...] = ()
-    rule: str = "interpret"
-
-
-@dataclass(frozen=True)
-class ProofObject:
-    steps: tuple[InterpretProofStep, ...]
-    contract_version: str = CONTRACT_VERSION
-    schema: str = PROOF_SCHEMA
-
-
 class ProofMemory(MemoryView):
-    """Immutable memory snapshot reconstructed from a proof object."""
+    """Immutable replay snapshot; ids are local transport handles only."""
 
     def __init__(self, links: tuple[DistinguishedLink, ...]):
         by_id: dict[int, tuple[int, int]] = {}
@@ -126,47 +101,6 @@ class ProofMemory(MemoryView):
             if poles == (form, link):
                 return link
         return None
-
-
-def check_interpret_step(step: InterpretProofStep) -> bool:
-    """Replay one claimed interpretation step against an immutable snapshot."""
-
-    if step.rule != "interpret":
-        return False
-
-    try:
-        expression = parse_formula(step.expression)
-        memory = ProofMemory(step.distinguished_memory)
-        result = interpret_constraints(
-            expression,
-            step.context.to_runtime(),
-            memory,
-            symbols=dict(step.symbols),
-        )
-    except (KeyError, TypeError, ValueError):
-        return False
-
-    substitutions = tuple(
-        ExpectedSubstitution(path=hole.path, link=link) for hole, link in result.holes
-    )
-    aliases = tuple(
-        ExpectedAlias(path=hole.path, target_path=target.path)
-        for hole, target in result.aliases
-    )
-
-    return (
-        result.success == step.expected_success
-        and substitutions == tuple(sorted(step.expected_substitutions))
-        and aliases == tuple(sorted(step.expected_aliases))
-    )
-
-
-def check_proof(proof: ProofObject) -> bool:
-    """Independently replay every trusted v0.2 step in a proof object."""
-
-    if proof.schema != PROOF_SCHEMA or proof.contract_version != CONTRACT_VERSION:
-        return False
-    return all(check_interpret_step(step) for step in proof.steps)
 
 
 @dataclass(frozen=True)
@@ -232,14 +166,26 @@ BaseJudgment: TypeAlias = (
     | DefinitionConflictJudgment
     | NonAddressableDefinitionTargetJudgment
 )
-V03Judgment: TypeAlias = BaseJudgment
 
 
 @dataclass(frozen=True)
-class ProofObjectV03:
-    judgments: tuple[V03Judgment, ...]
-    contract_version: str = CONTRACT_VERSION_V03
-    proof_version: str = PROOF_SCHEMA_V03
+class DefinitionOpeningPathJudgment:
+    scopes: tuple[DefinitionScopeSnapshot, ...]
+    lookup_scope: tuple[int, ...]
+    start_target: Form
+    edges: tuple[OpeningPathEdge, ...]
+    final_body: Expression
+    relation: str = "DefinitionOpeningPath"
+
+
+V04Judgment: TypeAlias = BaseJudgment | DefinitionOpeningPathJudgment
+
+
+@dataclass(frozen=True)
+class ProofObjectV04:
+    judgments: tuple[V04Judgment, ...]
+    contract_version: str = CONTRACT_VERSION_V04
+    proof_version: str = PROOF_SCHEMA_V04
 
 
 def _is_non_negative_int(value: object) -> bool:
@@ -330,16 +276,30 @@ def check_contextually_satisfies(judgment: ContextuallySatisfiesJudgment) -> boo
 
     if judgment.relation != "ContextuallySatisfies":
         return False
-    step = InterpretProofStep(
-        expression=judgment.expression,
-        context=judgment.context,
-        distinguished_memory=judgment.distinguished_memory,
-        symbols=judgment.symbols,
-        expected_success=True,
-        expected_substitutions=judgment.expected_substitutions,
-        expected_aliases=judgment.expected_aliases,
+    try:
+        expression = parse_formula(judgment.expression)
+        memory = ProofMemory(judgment.distinguished_memory)
+        result = interpret_constraints(
+            expression,
+            judgment.context.to_runtime(),
+            memory,
+            symbols=dict(judgment.symbols),
+        )
+    except (KeyError, TypeError, ValueError):
+        return False
+
+    substitutions = tuple(
+        ExpectedSubstitution(path=hole.path, link=link) for hole, link in result.holes
     )
-    return check_interpret_step(step)
+    aliases = tuple(
+        ExpectedAlias(path=hole.path, target_path=target.path)
+        for hole, target in result.aliases
+    )
+    return (
+        result.success is True
+        and substitutions == tuple(sorted(judgment.expected_substitutions))
+        and aliases == tuple(sorted(judgment.expected_aliases))
+    )
 
 
 def check_opens(judgment: OpensJudgment) -> bool:
@@ -425,17 +385,6 @@ def check_base_judgment(judgment: BaseJudgment) -> bool:
     if isinstance(judgment, NonAddressableDefinitionTargetJudgment):
         return check_non_addressable_definition_target(judgment)
     return False
-
-
-def check_proof_v03(proof: ProofObjectV03) -> bool:
-    """Independently replay every v0.3 base judgment; order has no inference meaning."""
-
-    if (
-        proof.proof_version != PROOF_SCHEMA_V03
-        or proof.contract_version != CONTRACT_VERSION_V03
-    ):
-        return False
-    return all(check_base_judgment(judgment) for judgment in proof.judgments)
 
 
 def _require_exact_keys(data: dict, expected: set[str], label: str) -> None:
@@ -563,11 +512,7 @@ def _scopes_from_data(data: object) -> tuple[DefinitionScopeSnapshot, ...]:
         result.append(
             DefinitionScopeSnapshot(
                 path=_path_from_data(item["path"], "scope.path"),
-                parent=(
-                    _path_from_data(parent, "scope.parent")
-                    if parent is not None
-                    else None
-                ),
+                parent=_path_from_data(parent, "scope.parent") if parent is not None else None,
                 definitions=tuple(definitions),
             )
         )
@@ -590,6 +535,7 @@ def _base_judgment_from_data(data: object) -> BaseJudgment:
     if not isinstance(data, dict):
         raise ValueError("judgment must be an object")
     relation = data.get("relation")
+
     if relation == "ContextuallySatisfies":
         _require_exact_keys(
             data,
@@ -659,36 +605,6 @@ def _base_judgment_from_data(data: object) -> BaseJudgment:
     raise ValueError("unknown base proof relation")
 
 
-def proof_v03_from_data(data: object) -> ProofObjectV03:
-    """Strictly parse one portable mts-proof/v0.3 JSON-shaped artifact."""
-
-    if not isinstance(data, dict):
-        raise ValueError("proof must be an object")
-    _require_exact_keys(
-        data,
-        {"proofVersion", "contractVersion", "judgments"},
-        "proof",
-    )
-    if data["proofVersion"] != PROOF_SCHEMA_V03:
-        raise ValueError("unsupported proofVersion")
-    if data["contractVersion"] != CONTRACT_VERSION_V03:
-        raise ValueError("unsupported contractVersion")
-    if not isinstance(data["judgments"], list):
-        raise ValueError("judgments must be an array")
-    return ProofObjectV03(
-        judgments=tuple(_base_judgment_from_data(item) for item in data["judgments"]),
-    )
-
-
-def check_proof_v03_data(data: object) -> bool:
-    """Strictly parse then independently replay one portable v0.3 artifact."""
-
-    try:
-        return check_proof_v03(proof_v03_from_data(data))
-    except (KeyError, TypeError, ValueError):
-        return False
-
-
 def _context_to_data(context: ProofContext) -> dict:
     return {
         "start": context.start,
@@ -698,10 +614,7 @@ def _context_to_data(context: ProofContext) -> dict:
 
 
 def _memory_to_data(memory: tuple[DistinguishedLink, ...]) -> list[dict]:
-    return [
-        {"id": item.id, "start": item.start, "end": item.end}
-        for item in memory
-    ]
+    return [{"id": item.id, "start": item.start, "end": item.end} for item in memory]
 
 
 def _symbols_to_data(symbols: tuple[tuple[str, int], ...]) -> list[list[object]]:
@@ -776,54 +689,6 @@ def _base_judgment_to_data(judgment: BaseJudgment) -> dict:
     if isinstance(judgment, NonAddressableDefinitionTargetJudgment):
         return {"relation": judgment.relation, "target": judgment.target}
     raise TypeError("unknown base proof judgment")
-
-
-def proof_v03_to_data(proof: ProofObjectV03) -> dict:
-    """Serialize one typed v0.3 proof object to the canonical portable shape."""
-
-    if not check_proof_v03(proof):
-        raise ValueError("cannot serialize invalid v0.3 proof object")
-    return {
-        "proofVersion": proof.proof_version,
-        "contractVersion": proof.contract_version,
-        "judgments": [_base_judgment_to_data(item) for item in proof.judgments],
-    }
-
-
-def canonical_proof_v03_json(proof: ProofObjectV03) -> str:
-    return json.dumps(
-        proof_v03_to_data(proof),
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-
-
-# v0.4 adds exactly one accepted composite certificate relation to the same
-# version-neutral primitive relation core. Existing v0.2/v0.3 artifact APIs do
-# not define or mediate v0.4 semantics.
-CONTRACT_VERSION_V04 = "mts-contract/v0.4"
-PROOF_SCHEMA_V04 = "mts-proof/v0.4"
-
-
-@dataclass(frozen=True)
-class DefinitionOpeningPathJudgment:
-    scopes: tuple[DefinitionScopeSnapshot, ...]
-    lookup_scope: tuple[int, ...]
-    start_target: Form
-    edges: tuple[OpeningPathEdge, ...]
-    final_body: Expression
-    relation: str = "DefinitionOpeningPath"
-
-
-V04Judgment: TypeAlias = BaseJudgment | DefinitionOpeningPathJudgment
-
-
-@dataclass(frozen=True)
-class ProofObjectV04:
-    judgments: tuple[V04Judgment, ...]
-    contract_version: str = CONTRACT_VERSION_V04
-    proof_version: str = PROOF_SCHEMA_V04
 
 
 def _canonical_expression_from_data(value: object, label: str) -> Expression:
