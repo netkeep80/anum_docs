@@ -3,15 +3,13 @@
   "status": "accepted",
   "accepted": true,
   "issue": 122,
-  "dependsOn": [
-    "mts-contract/v0.3"
-  ],
   "conformanceCorpus": "contracts/mts-derivation-base-conformance-v0.3.json",
-  "scope": "accepted primitive typed derivation relations backed by independent replay of already accepted canonical operations; no multi-step composition rules",
+  "foundation": "self-contained primitive derivation relations defined by independent replay of the canonical operations named below; no historical MTS umbrella or proof release is part of relation identity",
+  "scope": "accepted primitive typed derivation relations backed by independent replay of canonical operations; no multi-step composition rules",
   "judgmentShape": {
     "relation": "explicit tagged relation name",
     "subject": "all operation inputs required by the relation",
-    "evidence": "validated OperationalReplayClaim for the exact accepted canonical operation",
+    "evidence": "validated OperationalReplayClaim for the exact canonical operation",
     "hiddenGlobalStateAllowed": false,
     "globalTruthPredicateIntroduced": false
   },
@@ -57,7 +55,7 @@
       "sourceOperation": "open_definition",
       "precondition": "independent replay returns kind=non-addressable",
       "arguments": ["target"],
-      "meaning": "the target is outside the accepted v0.3 definition-addressability subset",
+      "meaning": "the target is outside the accepted definition-addressability subset",
       "globalSemanticInvalidity": false
     }
   ],
@@ -88,15 +86,9 @@
     "recursiveNormalizationAccepted": false
   },
   "productionIntegration": {
-    "proofContract": "mts-proof/v0.3",
-    "proofConformance": "contracts/mts-proof-conformance-v0.3.json",
     "checker": "core/proof_checker.py",
-    "acceptedRelationsPublished": true,
+    "canonicalReplay": "check_base_judgment",
     "proofSearchTrusted": false,
     "genericCompositionAccepted": false
-  },
-  "downstream": {
-    "aproverProofRepinAllowed": false,
-    "reason": "downstream exact pin follows additive accepted umbrella contracts rather than this base relation contract directly"
   }
 }

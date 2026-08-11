@@ -4,11 +4,10 @@
   "accepted": true,
   "issue": 161,
   "dependsOn": [
-    "mts-definition-opening/v0.3",
-    "mts-derivation-base/v0.3",
-    "mts-proof/v0.3"
+    "mts-definition-opening/v0.3"
   ],
   "conformanceCorpus": "contracts/mts-opening-path-conformance-v0.4.json",
+  "foundation": "self-contained finite composition of the accepted one-step DefinitionOpening operation; historical proof or umbrella releases are not semantic dependencies",
   "scope": "normative read-only verification of one finite self-contained DefinitionOpeningPath operational composite certificate; no equality, normalization, evaluation, generic composition, memory or context effects",
   "relation": {
     "name": "DefinitionOpeningPath",
@@ -38,7 +37,7 @@
   },
   "portableCertificate": {
     "sharedFields": ["scopes", "lookupScope", "startTarget", "edges", "finalBody"],
-    "scopes": "same explicit lexical snapshot semantics as mts-proof/v0.3 definition relations",
+    "scopes": "explicit lexical DefinitionEnvironment snapshot used by the canonical one-step opening operation",
     "lookupScope": "one exact serialized scope path used for every edge",
     "startTarget": "parseable Form source; structural identity after parsing",
     "edges": {
@@ -48,7 +47,7 @@
     },
     "finalBody": "canonical format_expression transport of the final expected replay body",
     "transportDecoderOwnedByCoreVerifier": false,
-    "reason": "transport/version validation belongs to the consuming artifact layer; every consumer must construct the same typed witness and invoke the one canonical verifier"
+    "reason": "transport validation belongs to the consuming artifact layer; every consumer must construct the same typed witness and invoke the one canonical verifier"
   },
   "verificationOrder": [
     "reject empty path",
@@ -111,10 +110,7 @@
   },
   "proofBoundary": {
     "trustedProofRelationAddedByThisContract": false,
-    "eligibleForFutureProofRelation": true,
-    "futureRelationName": "DefinitionOpeningPath",
-    "futureTrustedMeaningMustEqualThisVerifier": true,
-    "mtsProofV03Modified": false,
+    "currentProofConsumerMustReplayExactVerifier": true,
     "genericCompositionAccepted": false,
     "openingPathPlusContextuallySatisfiesAccepted": false
   },
@@ -122,17 +118,5 @@
     "referenceCore": "core/mtc_opening_path.py",
     "productionConformance": "tests/test_mts_opening_path_reference.py",
     "acceptedConformance": "contracts/mts-opening-path-conformance-v0.4.json"
-  },
-  "versioning": {
-    "mtsContractV04Modified": false,
-    "mtsProofV03Modified": false,
-    "publishedThroughUmbrella": false,
-    "futureUmbrellaMustBeAdditive": true
-  },
-  "nextBoundary": {
-    "proofV04MayConsumeThisRelationAfterSeparateAcceptance": true,
-    "otherCompositionRulesAccepted": false,
-    "compositionIssue": 122,
-    "aproverMayInventAdditionalRules": false
   }
 }

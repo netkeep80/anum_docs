@@ -4,12 +4,12 @@
   "accepted": true,
   "issue": 165,
   "dependsOn": [
-    "mts-contract/v0.4",
-    "mts-proof/v0.3",
+    "mts-derivation-base/v0.3",
     "mts-opening-path/v0.4"
   ],
   "conformanceCorpus": "contracts/mts-proof-conformance-v0.4.json",
-  "purpose": "Trusted independent replay of the five accepted v0.3 base relations plus the accepted finite DefinitionOpeningPath operational composite certificate; no other composition or inference rule is accepted.",
+  "foundation": "current trusted proof artifact over two self-contained semantic leaves: the five primitive derivation relations and the finite DefinitionOpeningPath verifier; no historical proof or umbrella release is a semantic parent; proofObject.contractVersion remains only a transport discriminator and does not reintroduce an umbrella dependency",
+  "purpose": "Trusted independent replay of exactly five primitive derivation relations plus the accepted finite DefinitionOpeningPath operational composite certificate; no other composition or inference rule is accepted.",
   "proofObject": {
     "required": ["proofVersion", "contractVersion", "judgments"],
     "proofVersion": "mts-proof/v0.4",
@@ -25,16 +25,17 @@
     "DefinitionOpeningPath"
   ],
   "baseRelations": {
-    "shapesIdenticalToV03": true,
-    "trustedMeaningIdenticalToV03": true,
-    "checkerPath": "core/proof_checker.py::check_v03_judgment",
-    "reimplementedForV04": false,
-    "proofV03ArtifactsReinterpretedAsV04": false
+    "contract": "mts-derivation-base/v0.3",
+    "checkerPath": "core/proof_checker.py::check_base_judgment",
+    "parserPath": "core/proof_checker.py::_base_judgment_from_data",
+    "serializerPath": "core/proof_checker.py::_base_judgment_to_data",
+    "versionedProofDelegation": false
   },
   "definitionOpeningPath": {
+    "contract": "mts-opening-path/v0.4",
     "required": ["relation", "scopes", "lookupScope", "startTarget", "edges", "finalBody"],
     "relation": "DefinitionOpeningPath",
-    "scopes": "same explicit canonical lexical snapshot semantics as v0.3 definition judgments",
+    "scopes": "explicit canonical lexical DefinitionEnvironment snapshot",
     "lookupScope": "one exact serialized scope path used for every opening edge",
     "startTarget": "parseable Form source; structural identity after parsing; equivalent whitespace permitted",
     "edges": {
@@ -63,8 +64,9 @@
   },
   "checker": {
     "module": "core/proof_checker.py",
-    "singleTrustedModuleForV02V03V04": true,
-    "baseRelationsDelegateExistingV03Replay": true,
+    "currentTrustedModule": true,
+    "baseRelationsUseCanonicalReplayCore": true,
+    "baseRelationsDelegateVersionedProof": false,
     "openingPathDelegatesCanonicalVerifier": true,
     "trustsSerializedOpeningBodyWithoutReplay": false,
     "trustsSerializedDefinitionIdWithoutReplay": false,
@@ -97,14 +99,6 @@
     "openingPathMaterializes": false,
     "openingPathDeletes": false
   },
-  "v03Compatibility": {
-    "mtsProofV03Modified": false,
-    "mtsProofV03Schema": "mts-proof/v0.3",
-    "mtsProofV03ContractVersion": "mts-contract/v0.3",
-    "trustedRelationsRemainExactlyFive": true,
-    "existingV03ArtifactsReplayByExistingApi": true,
-    "retroactiveReinterpretation": false
-  },
   "serialization": {
     "typedApi": [
       "proof_v04_from_data",
@@ -121,15 +115,8 @@
     "definitionCount": 10,
     "mustRemainUnchanged": true
   },
-  "versioning": {
-    "mtsContractV04Modified": false,
-    "publishedThroughUmbrella": false,
-    "futureUmbrella": "mts-contract/v0.5",
-    "futureUmbrellaMustBeAdditive": true
-  },
   "downstream": {
-    "directAproverRepinAllowedBeforeUmbrella": false,
-    "reason": "publish the full new context/proof surface through additive mts-contract/v0.5 before downstream exact pin",
-    "aproverMayInventAdditionalRules": false
+    "aproverMayInventAdditionalRules": false,
+    "proofSearchTrusted": false
   }
 }
