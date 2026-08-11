@@ -36,7 +36,7 @@ def test_v05_is_current_only_manifest_without_historical_umbrella_parent():
     assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.5.json"
 
 
-def test_v05_conformance_requires_current_self_contained_surfaces():
+def test_v05_conformance_requires_only_current_self_contained_surfaces():
     contract = _load(CONTRACT)
     conformance = _load(CONFORMANCE)
 
@@ -44,8 +44,8 @@ def test_v05_conformance_requires_current_self_contained_surfaces():
     assert conformance["status"] == "accepted"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
-    assert conformance["legacyCoreRegressionCorpus"] == "contracts/mts-conformance-v0.2.json"
-    assert conformance["legacyCoreRegressionNormative"] is False
+    assert "legacyCoreRegressionCorpus" not in conformance
+    assert "legacyCoreRegressionNormative" not in conformance
 
     surfaces = conformance["requiredAcceptedSurfaces"]
     assert [item["schema"] for item in surfaces] == contract["dependsOn"]
