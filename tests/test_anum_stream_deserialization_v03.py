@@ -8,7 +8,6 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "contracts/anum-stream-deserialization-v0.3.json"
-CONFORMANCE_PATH = ROOT / "contracts/anum-stream-deserialization-conformance-v0.3.json"
 
 
 class StreamError(ValueError):
@@ -17,8 +16,8 @@ class StreamError(ValueError):
         self.code = code
 
 
-def _load(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+def _contract() -> dict:
+    return json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
 
 
 def _link(start: str, end: str) -> str:
@@ -73,7 +72,7 @@ def _deserialize(source: str) -> tuple[str, list[str], list[str]]:
 
 
 def test_contract_is_current_accepted_and_independent_of_foundation_v2_acceptance() -> None:
-    contract = _load(CONTRACT_PATH)
+    contract = _contract()
 
     assert contract["schema"] == "anum-stream-deserialization/v0.3"
     assert contract["status"] == "accepted"
@@ -83,10 +82,11 @@ def test_contract_is_current_accepted_and_independent_of_foundation_v2_acceptanc
     assert contract["scope"]["effect"] == "none"
     assert contract["scope"]["existingAsetCarrierInputAccepted"] is False
     assert contract["downstream"]["aproverRepinAllowed"] is True
+    assert contract["versionBoundary"]["foundationV2SequenceGroupSemanticsInherited"] is False
 
 
 def test_contract_preserves_four_abits_root_and_by_poles_identity() -> None:
-    contract = _load(CONTRACT_PATH)
+    contract = _contract()
 
     assert contract["alphabet"]["abits"] == ["[", "]", "1", "0"]
     assert contract["alphabet"]["rootIsFifthAbit"] is False
@@ -99,10 +99,8 @@ def test_contract_preserves_four_abits_root_and_by_poles_identity() -> None:
 
 
 def test_every_valid_conformance_vector_executes() -> None:
-    corpus = _load(CONFORMANCE_PATH)
+    corpus = _contract()["conformance"]
     assert corpus["schema"] == "anum-stream-deserialization-conformance/v0.3"
-    assert corpus["contract"] == "anum-stream-deserialization/v0.3"
-    assert corpus["accepted"] is True
 
     for vector in corpus["valid"]:
         result, resolved, operations = _deserialize(vector["source"])
@@ -115,7 +113,7 @@ def test_every_valid_conformance_vector_executes() -> None:
 
 
 def test_every_invalid_conformance_vector_rejects_with_exact_boundary() -> None:
-    corpus = _load(CONFORMANCE_PATH)
+    corpus = _contract()["conformance"]
 
     for vector in corpus["invalid"]:
         with pytest.raises(StreamError) as caught:
