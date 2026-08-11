@@ -1,42 +1,37 @@
 {
   "schema": "mts-conformance/v0.5",
   "status": "accepted",
+  "accepted": true,
   "contract": "mts-contract/v0.5",
-  "composition": "all referenced accepted corpora are required; no prior vector is copied, weakened or replaced",
-  "requiredCorpora": [
-    {
-      "role": "base-v0.4",
-      "path": "contracts/mts-conformance-v0.4.json",
-      "schema": "mts-conformance/v0.4",
-      "contract": "mts-contract/v0.4"
-    },
-    {
-      "role": "opening-path-v0.4",
-      "path": "contracts/mts-opening-path-conformance-v0.4.json",
-      "schema": "mts-opening-path-conformance/v0.4",
-      "contract": "mts-opening-path/v0.4"
-    },
-    {
-      "role": "proof-v0.4",
-      "path": "contracts/mts-proof-conformance-v0.4.json",
-      "schema": "mts-proof-conformance/v0.4",
-      "contract": "mts-proof/v0.4"
-    },
-    {
-      "role": "direct-deixis-v0.5",
-      "path": "contracts/mts-direct-deixis-conformance-v0.5.json",
-      "schema": "mts-direct-deixis-conformance/v0.5",
-      "contract": "mts-direct-deixis/v0.5"
-    }
+  "composition": "current accepted surfaces and production-core gates define acceptance directly; the legacy core regression corpus may still execute as a regression oracle but is not an acceptance input or semantic parent",
+  "requiredAcceptedSurfaces": [
+    {"role": "anum-stream-v0.3", "contractPath": "contracts/anum-stream-deserialization-v0.3.json", "schema": "anum-stream-deserialization/v0.3", "conformance": "embedded"},
+    {"role": "value-bundle-v0.2", "contractPath": "contracts/mts-value-bundle-v0.2.json", "schema": "mts-value-bundle/v0.2", "conformancePath": "contracts/mts-value-bundle-conformance-v0.2.json"},
+    {"role": "definition-opening-v0.3", "contractPath": "contracts/mts-definition-opening-v0.3.json", "schema": "mts-definition-opening/v0.3", "conformancePath": "contracts/mts-definition-opening-conformance-v0.3.json"},
+    {"role": "derivation-base-v0.3", "contractPath": "contracts/mts-derivation-base-v0.3.json", "schema": "mts-derivation-base/v0.3", "conformancePath": "contracts/mts-derivation-base-conformance-v0.3.json"},
+    {"role": "opening-path-v0.4", "contractPath": "contracts/mts-opening-path-v0.4.json", "schema": "mts-opening-path/v0.4", "conformancePath": "contracts/mts-opening-path-conformance-v0.4.json"},
+    {"role": "proof-v0.4", "contractPath": "contracts/mts-proof-v0.4.json", "schema": "mts-proof/v0.4", "conformancePath": "contracts/mts-proof-conformance-v0.4.json"},
+    {"role": "direct-deixis-v0.5", "contractPath": "contracts/mts-direct-deixis-v0.5.json", "schema": "mts-direct-deixis/v0.5", "conformancePath": "contracts/mts-direct-deixis-conformance-v0.5.json"}
   ],
+  "productionCoreGates": ["tests/test_mtc_parser.py", "tests/test_mtc_interpreter.py", "tests/test_anum_memory.py", "tests/test_mts_value_bundle_contract.py", "tests/test_mts_definition_opening_reference.py", "tests/test_mts_derivation_base_contract.py", "tests/test_mts_opening_path_reference.py", "tests/test_mts_proof_v04.py", "tests/test_mts_direct_deixis_reference.py", "tests/test_root_library.py"],
+  "legacyCoreRegressionCorpus": "contracts/mts-conformance-v0.2.json",
+  "legacyCoreRegressionNormative": false,
   "releaseAssertions": {
-    "allRequiredCorporaMustPass": true,
-    "mtsContractV04RemainsImmutable": true,
-    "mtsProofV04IsExactDependency": true,
-    "openingPathV04IsExactDependency": true,
-    "directDeixisV05IsExactDependency": true,
+    "historicalUmbrellaIsNormativeParent": false,
+    "currentContractHasNoExtendsOrBaseContract": true,
+    "allRequiredAcceptedSurfacesMustPass": true,
+    "allProductionCoreGatesMustPass": true,
+    "linkIdentityByOrderedPoles": true,
+    "runtimeHandleIsSemanticIdentity": false,
+    "rootIsUniqueFullySelfClosedLink": true,
+    "anumHasExactlyFourAbits": true,
+    "anumRootIsFifthAbit": false,
+    "anumEmptyStreamIsRoot": true,
+    "anumEmptyGroupIsRoot": true,
+    "readOnlyEqualsMaterialize": false,
+    "notFoundImpliesNonExistence": false,
     "rootProgramRemainsTenDefinitions": true,
-    "allSixProofRelationsReplay": true,
+    "trustedProofRelationsExactlySix": true,
     "definitionOpeningPathRemainsOperationalCertificate": true,
     "proofSearchRemainsUntrusted": true,
     "genericCompositionAccepted": false,
@@ -49,18 +44,7 @@
     "interpreterIdentityUsedAsHiddenInput": false,
     "separateSubjectOntologyRequired": false,
     "interpreterFocusBindingAccepted": false,
-    "relativeProductionRemainsRaw": true,
-    "persistentBackendAccepted": false,
-    "pmmCanonicalDependency": false
-  },
-  "downstreamAssertions": {
-    "aproverMayPinMtsContractV05": true,
-    "aproverMustPinMtsProofV04": true,
-    "aproverMustReplayAllSixRelationsIndependently": true,
-    "aproverMaySearchDefinitionOpeningPaths": true,
-    "aproverSearchRemainsUntrusted": true,
-    "aproverMustNotInventAdditionalComposition": true,
-    "aproverMustNotPromoteDirectDeixisToSensitivity": true,
-    "aproverMustNotUseHiddenInterpreterIdentity": true
+    "existingAsetAnumCarrierAccepted": false,
+    "persistentBackendIsCanonicalDependency": false
   }
 }

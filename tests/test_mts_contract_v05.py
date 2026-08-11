@@ -14,42 +14,122 @@ def _load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_v05_release_composes_only_accepted_surfaces():
+def test_v05_is_current_only_manifest_without_historical_umbrella_parent():
     contract = _load(CONTRACT)
-    conformance = _load(CONFORMANCE)
 
     assert contract["schema"] == "mts-contract/v0.5"
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
-    assert contract["extends"] == "mts-contract/v0.4"
-    assert contract["baseContract"] == "contracts/mts-contract-v0.4.json"
-    assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.5.json"
+    assert "extends" not in contract
+    assert "baseContract" not in contract
+    assert "versionBoundaries" not in contract
     assert contract["dependsOn"] == [
-        "mts-contract/v0.4",
+        "anum-stream-deserialization/v0.3",
+        "mts-value-bundle/v0.2",
+        "mts-definition-opening/v0.3",
+        "mts-derivation-base/v0.3",
         "mts-opening-path/v0.4",
         "mts-proof/v0.4",
         "mts-direct-deixis/v0.5",
     ]
-
-    required = {item["role"]: item for item in conformance["requiredCorpora"]}
-    assert set(required) == {
-        "base-v0.4",
-        "opening-path-v0.4",
-        "proof-v0.4",
-        "direct-deixis-v0.5",
-    }
-    assert required["base-v0.4"]["schema"] == "mts-conformance/v0.4"
-    assert required["opening-path-v0.4"]["schema"] == "mts-opening-path-conformance/v0.4"
-    assert required["proof-v0.4"]["schema"] == "mts-proof-conformance/v0.4"
-    assert required["direct-deixis-v0.5"]["schema"] == "mts-direct-deixis-conformance/v0.5"
+    assert not any(item.startswith("mts-contract/v0.") for item in contract["dependsOn"])
+    assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.5.json"
 
 
-def test_v05_publishes_exact_proof_surface_without_generic_composition():
+def test_v05_conformance_requires_current_self_contained_surfaces():
     contract = _load(CONTRACT)
-    l5 = contract["l5"]
+    conformance = _load(CONFORMANCE)
+
+    assert conformance["schema"] == "mts-conformance/v0.5"
+    assert conformance["status"] == "accepted"
+    assert conformance["accepted"] is True
+    assert conformance["contract"] == contract["schema"]
+    assert conformance["legacyCoreRegressionCorpus"] == "contracts/mts-conformance-v0.2.json"
+    assert conformance["legacyCoreRegressionNormative"] is False
+
+    surfaces = conformance["requiredAcceptedSurfaces"]
+    assert [item["schema"] for item in surfaces] == contract["dependsOn"]
+    assert len(surfaces) == 7
+
+    for surface in surfaces:
+        leaf = _load(ROOT / surface["contractPath"])
+        assert leaf["schema"] == surface["schema"]
+        assert leaf["status"] == "accepted"
+        assert leaf["accepted"] is True
+        if surface.get("conformance") == "embedded":
+            assert leaf["conformance"]["schema"] == "anum-stream-deserialization-conformance/v0.3"
+            assert leaf["conformance"]["valid"]
+            assert leaf["conformance"]["invalid"]
+        else:
+            corpus = _load(ROOT / surface["conformancePath"])
+            assert corpus["status"] == "accepted"
+            assert corpus["contract"] == surface["schema"]
+
+
+def test_v05_semantic_identity_and_anum_are_post_reset_current_semantics():
+    contract = _load(CONTRACT)
+    identity = contract["semanticIdentity"]
+    anum = contract["anum"]
+
+    assert identity["linkIdentity"] == "by ordered semantic poles"
+    assert identity["runtimeHandleIsSemanticIdentity"] is False
+    assert identity["sourcePositionIsSemanticIdentity"] is False
+    assert identity["samePairCreatesSecondSemanticLink"] is False
+    assert identity["root"] == "R = R ⟼ R"
+    assert identity["secondFullySelfClosedRootAllowed"] is False
+
+    assert anum["schema"] == "anum-stream-deserialization/v0.3"
+    assert anum["alphabet"] == ["[", "]", "1", "0"]
+    assert anum["rootIsFifthAbit"] is False
+    assert anum["emptyStream"] == "R"
+    assert anum["emptyGroup"] == "R"
+    assert anum["linkIdentityByOrderedPoles"] is True
+    assert anum["denotationEffect"] == "none"
+    assert anum["materializationAcceptedByThisOperation"] is False
+    assert anum["existingAsetCarrierSemanticsAccepted"] is False
+
+    serialized = json.dumps(contract, ensure_ascii=False)
+    assert "anum-raw-carrier-v0.2" not in serialized
+    assert "anum-boundary-projection-v0.2" not in serialized
+    assert "anum-denotation-v0.2" not in serialized
+    assert "anum-recursive-denotation-v0.2" not in serialized
+
+
+def test_v05_keeps_l2_anonymous_form_distinct_from_l3_empty_group():
+    notation = _load(CONTRACT)["formalNotation"]
+
+    assert notation["anonymousForm"] == {
+        "source": "[]",
+        "level": "L2",
+        "identity": "local syntactic occurrence within one interpretation",
+        "sameAsL3EmptyAnumGroup": False,
+    }
+    assert notation["context"]["roles"] == [
+        {"source": "◁", "role": "start"},
+        {"source": "▷", "role": "end"},
+    ]
+    assert notation["context"]["bracketOverloading"] is False
+    assert notation["operations"]["interpretMayMaterialize"] is False
+    assert notation["patternMatching"]["materializes"] is False
+
+
+def test_v05_memory_preserves_read_vs_effect_boundary():
+    memory = _load(CONTRACT)["memory"]
+
+    assert "find" in memory["readOperations"]
+    assert "findLink" in memory["readOperations"]
+    assert memory["effectOperations"] == ["realize", "delete"]
+    assert memory["findEqualsMaterialize"] is False
+    assert memory["notFoundImpliesNonExistence"] is False
+    assert memory["readOperationsMayMaterialize"] is False
+
+
+def test_v05_publishes_exact_six_relation_proof_surface_without_generic_composition():
+    l5 = _load(CONTRACT)["l5"]
 
     assert l5["proofSchema"] == "mts-proof/v0.4"
-    assert l5["contractVersion"] == "mts-contract/v0.4"
+    assert l5["proofContractVersionTransportTag"] == "mts-contract/v0.4"
+    assert l5["transportTagIsSemanticUmbrellaDependency"] is False
     assert l5["trustedRelations"] == [
         "ContextuallySatisfies",
         "Opens",
@@ -59,6 +139,8 @@ def test_v05_publishes_exact_proof_surface_without_generic_composition():
         "DefinitionOpeningPath",
     ]
     assert l5["definitionOpeningPathClassification"] == "operational-composite-certificate"
+    assert l5["searchTrusted"] is False
+    assert l5["checkerTrusted"] is True
     assert l5["genericCompositionAccepted"] is False
     assert l5["judgmentOrderImpliesDependency"] is False
     assert l5["openingPathImpliesEquality"] is False
@@ -93,24 +175,21 @@ def test_v05_models_interpreter_as_link_without_hidden_identity():
     assert boundary["securityPolicyChangesPronounMeaning"] is False
 
 
-def test_v05_downstream_boundary_allows_search_but_not_new_rules():
-    downstream = _load(CONTRACT)["downstream"]
-
-    assert downstream["aproverProofRepinAllowed"] is True
-    assert downstream["requiredProofSchema"] == "mts-proof/v0.4"
-    assert downstream["consumerMaySearchDefinitionOpeningPaths"] is True
-    assert downstream["consumerSearchTrusted"] is False
-    assert downstream["consumerMayInventAdditionalCompositionRules"] is False
-    assert downstream["consumerMayInferContextSensitivityFromDirectDeixis"] is False
-    assert downstream["consumerMayUseHiddenInterpreterIdentity"] is False
-
-
-def test_v05_preserves_root_program():
+def test_v05_production_core_paths_exist_and_root_program_is_exact():
     contract = _load(CONTRACT)
-    result = validate_root_library(ROOT_FIXTURE)
+    conformance = _load(CONFORMANCE)
+    core = contract["productionCore"]
 
-    assert contract["rootProgram"] == "tests/mtc_formulas.mtc"
-    assert contract["rootDefinitionCount"] == 10
+    for relative in core["requiredModules"]:
+        assert (ROOT / relative).is_file(), relative
+    assert conformance["productionCoreGates"] == core["requiredExecutableGates"]
+    for relative in core["requiredExecutableGates"]:
+        assert (ROOT / relative).is_file(), relative
+
+    root = contract["rootProgram"]
+    assert root["path"] == "tests/mtc_formulas.mtc"
+    assert root["definitionCount"] == 10
+    result = validate_root_library(ROOT_FIXTURE)
     assert result.is_valid, result.messages
     formulas = [
         line
