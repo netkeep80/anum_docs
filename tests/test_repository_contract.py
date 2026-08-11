@@ -40,6 +40,19 @@ FORBIDDEN_HISTORICAL_MTS_RELEASES = {
     "contracts/mts-proof-conformance-v0.3.json",
     "docs/specs/Reference model МТС v0.2.md",
 }
+FORBIDDEN_FOUNDATION_V2_GATE_CONTRACTS = {
+    "contracts/mts-rooted-link-network-v0.7.json",
+    "contracts/mts-foundation-v2-root-v0.7.json",
+    "contracts/mts-foundation-v2-source-v0.7.json",
+    "contracts/mts-foundation-v2-state-v0.7.json",
+    "contracts/mts-foundation-v2-colon-v0.7.json",
+    "contracts/mts-foundation-v2-equality-v0.7.json",
+    "contracts/mts-foundation-v2-proof-rule-v0.7.json",
+    "contracts/mts-foundation-v2-run-v0.7.json",
+    "contracts/mts-foundation-v2-interpreter-replay-v0.7.json",
+    "contracts/mts-foundation-v2-integrated-proof-v0.7.json",
+    "contracts/mts-foundation-v2-persistent-l4-v0.7.json",
+}
 FORBIDDEN_CANDIDATE_PATHS = {
     "core/context_interpreter_candidate.py",
     "tests/fixtures/mtc_root_v02_candidate.mtc",
@@ -182,6 +195,19 @@ def test_current_machine_manifest_is_single_self_contained_v05_surface():
 def test_historical_mts_release_chain_is_physically_absent():
     leftovers = sorted(path for path in FORBIDDEN_HISTORICAL_MTS_RELEASES if (ROOT / path).exists())
     assert leftovers == []
+
+
+def test_foundation_v2_candidate_has_one_runtime_path_without_gate_contract_ladder():
+    leftovers = sorted(
+        path for path in FORBIDDEN_FOUNDATION_V2_GATE_CONTRACTS if (ROOT / path).exists()
+    )
+    assert leftovers == []
+    assert (ROOT / "core/foundation_v2.py").is_file()
+
+    contract = json.loads(MTS_CONTRACT_CURRENT.read_text(encoding="utf-8"))
+    serialized = json.dumps(contract, ensure_ascii=False)
+    assert "foundation-v2" not in serialized
+    assert "mts-rooted-link-network/v0.7" not in serialized
 
 
 def test_contributor_guide_points_only_to_current_machine_surface():
