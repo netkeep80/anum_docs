@@ -20,7 +20,7 @@ from core.rooted_link_network import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFORMANCE = ROOT / "contracts/mts-conformance-v0.5.json"
+CONFORMANCE = ROOT / "contracts/mts-conformance-v0.6.json"
 
 
 def _fixture():
@@ -166,3 +166,18 @@ def test_non_rooted_carrier_and_wrong_vocabulary_fail_closed() -> None:
     with pytest.raises(CarrierInputError) as invalid_vocabulary:
         decode_carrier_stream(network, root, wrong)
     assert invalid_vocabulary.value.code == "invalid-vocabulary"
+
+
+def test_current_conformance_accepts_dual_transport_and_role_boundary() -> None:
+    corpus = _anum_corpus()
+    assert corpus["schema"] == "anum-deserialization-conformance/v0.4"
+    assert corpus["contract"] == "anum-deserialization/v0.4"
+    assert corpus["carrier"]["roleIsExplicit"] is True
+    assert corpus["carrier"]["readOnly"] is True
+    assert corpus["carrier"]["materializes"] is False
+    structural = {case["id"]: case for case in corpus["carrier"]["structural"]}
+    assert structural["root-empty-carrier"]["expectedSource"] == ""
+    assert structural["C-canonical-singleton-close"]["expectedSource"] == "]"
+    assert structural["U-explicit-carrier-role"]["expectedSource"] == "]["
+    assert corpus["equivalence"]["sameDenotation"] is True
+    assert corpus["equivalence"]["sameStackErrorCode"] is True

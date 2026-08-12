@@ -1,10 +1,9 @@
-"""Current pure L3 Anum stream deserialization.
+"""Accepted raw/channel stack engine for ``anum-deserialization/v0.4``.
 
-Implements accepted ``anum-stream-deserialization/v0.3`` directly. The input is
-a raw/channel sequence over exactly four abits ``[ ] 1 0``. Root ``R`` is an
-implicit context basis, not a fifth transmitted value. This module performs no
-L4 lookup, materialization or deletion and does not implement historical v0.2
-boundary projection, quote or relative-context semantics.
+The v0.4 surface preserves the raw semantics of historical v0.3 exactly and adds
+an existing-carrier transport in ``core.anum_carrier``. Both paths converge here
+before OPEN/CLOSE/VALUE execution. Root ``R`` is an implicit context basis, not
+a fifth transmitted value; this module performs no L4 lookup or materialization.
 """
 
 from dataclasses import dataclass

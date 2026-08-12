@@ -17,8 +17,8 @@ from core.proof_checker import (
 
 
 ROOT = Path(__file__).parents[1]
-MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.5.json"
-MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.5.json"
+MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.6.json"
+MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.6.json"
 CHECKER = ROOT / "core" / "proof_checker.py"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
@@ -141,9 +141,9 @@ def test_conformance_uses_current_semantic_leaf_and_owns_base_transport_vectors(
     conformance = _conformance()
     base_semantics = base_semantic_corpus()
 
-    assert conformance["baseSemanticCorpus"] == "mts-conformance/v0.5#corpora.derivationBase"
+    assert conformance["baseSemanticCorpus"] == "mts-conformance/v0.6#corpora.derivationBase"
     assert base_semantics["contract"] == "mts-derivation-base/v0.3"
-    assert conformance["openingPathCorpus"] == "mts-conformance/v0.5#corpora.openingPath"
+    assert conformance["openingPathCorpus"] == "mts-conformance/v0.6#corpora.openingPath"
     assert {item["judgment"]["relation"] for item in conformance["baseJudgments"]} == BASE_RELATIONS
     assert conformance["baseForgeries"]
     assert "legacyBaseRegressionCorpus" not in conformance
