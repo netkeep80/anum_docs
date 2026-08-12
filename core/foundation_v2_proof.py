@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .exact_link_network import LinkNetwork, OccurrenceRef
+from .rooted_link_network import LinkNetwork, LinkRef
 from .foundation_v2_interpreter import (
     EqualityEvaluationEvidence,
     InterpreterReplayError,
@@ -30,16 +30,16 @@ class ProofRuleReplayError(ValueError):
 class DecomposeEqualityRoleRefs:
     """Exact role refs used by one decomposition-rule actual act."""
 
-    premise_equality_act: OccurrenceRef
-    theory: OccurrenceRef
-    rule: OccurrenceRef
-    rule_membership: OccurrenceRef
-    left_relation: OccurrenceRef
-    right_relation: OccurrenceRef
-    start_claim: OccurrenceRef
-    end_claim: OccurrenceRef
-    before_context: OccurrenceRef
-    after_context: OccurrenceRef
+    premise_equality_act: LinkRef
+    theory: LinkRef
+    rule: LinkRef
+    rule_membership: LinkRef
+    left_relation: LinkRef
+    right_relation: LinkRef
+    start_claim: LinkRef
+    end_claim: LinkRef
+    before_context: LinkRef
+    after_context: LinkRef
 
 
 @dataclass(frozen=True)
@@ -47,25 +47,25 @@ class DecomposeEqualityEvidence:
     """Exact evidence for one admitted equality-decomposition application."""
 
     premise: EqualityEvaluationEvidence
-    interpreter: OccurrenceRef
-    theory: OccurrenceRef
-    rule: OccurrenceRef
-    rule_membership: OccurrenceRef
-    left_relation: OccurrenceRef
-    right_relation: OccurrenceRef
-    start_claim: OccurrenceRef
-    end_claim: OccurrenceRef
-    before_context: OccurrenceRef
-    after_context: OccurrenceRef
-    act: OccurrenceRef
-    role_dictionary: OccurrenceRef
+    interpreter: LinkRef
+    theory: LinkRef
+    rule: LinkRef
+    rule_membership: LinkRef
+    left_relation: LinkRef
+    right_relation: LinkRef
+    start_claim: LinkRef
+    end_claim: LinkRef
+    before_context: LinkRef
+    after_context: LinkRef
+    act: LinkRef
+    role_dictionary: LinkRef
     roles: DecomposeEqualityRoleRefs
 
 
 def replay_decompose_equal_relations(
     network: LinkNetwork,
     evidence: DecomposeEqualityEvidence,
-) -> tuple[OccurrenceRef, OccurrenceRef]:
+) -> tuple[LinkRef, LinkRef]:
     """Replay one explicitly admitted, non-recursive equality decomposition.
 
     Premise:
@@ -138,7 +138,7 @@ def _verify_rule_membership(
         raise ProofRuleReplayError("selected rule is not admitted by exact theory membership")
 
 
-def _complete_relation(network: LinkNetwork, ref: OccurrenceRef, label: str):
+def _complete_relation(network: LinkNetwork, ref: LinkRef, label: str):
     link = network.link(ref)
     if link.start is ref or link.end is ref:
         raise ProofRuleReplayError(f"{label} relation is partial/self-closed")

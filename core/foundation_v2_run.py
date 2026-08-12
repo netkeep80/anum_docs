@@ -20,7 +20,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence
 
-from .exact_link_network import LinkNetwork, LinkNetworkBuilder, OccurrenceRef
+from .rooted_link_network import LinkNetwork, LinkNetworkBuilder, LinkRef
 from .foundation_v2_state import (
     FoundationStateError,
     act_header,
@@ -37,28 +37,28 @@ class RunReplayError(ValueError):
 class RunStepEvidence:
     """Act boundary evidence used only for run composition."""
 
-    act: OccurrenceRef
-    before_context: OccurrenceRef
-    after_context: OccurrenceRef
-    before_role: OccurrenceRef
-    after_role: OccurrenceRef
+    act: LinkRef
+    before_context: LinkRef
+    after_context: LinkRef
+    before_role: LinkRef
+    after_role: LinkRef
 
 
 @dataclass(frozen=True)
 class RunEvidence:
     """Checker handle for one ordered selected run."""
 
-    run_root: OccurrenceRef
-    initial_context: OccurrenceRef
-    terminal_context: OccurrenceRef
+    run_root: LinkRef
+    initial_context: LinkRef
+    terminal_context: LinkRef
     steps: tuple[RunStepEvidence, ...]
 
 
 def define_run_chain(
     builder: LinkNetworkBuilder,
-    root: OccurrenceRef,
-    acts: Sequence[OccurrenceRef],
-) -> OccurrenceRef:
+    root: LinkRef,
+    acts: Sequence[LinkRef],
+) -> LinkRef:
     """Construct canonical ordered container ``fold(R, A_0 ... A_n)``."""
 
     current = root
@@ -67,7 +67,7 @@ def define_run_chain(
     return current
 
 
-def replay_run(network: LinkNetwork, evidence: RunEvidence) -> tuple[OccurrenceRef, ...]:
+def replay_run(network: LinkNetwork, evidence: RunEvidence) -> tuple[LinkRef, ...]:
     """Replay run ordering and persistent-context continuity read-only."""
 
     before_snapshot = network.snapshot()
@@ -81,8 +81,8 @@ def replay_run(network: LinkNetwork, evidence: RunEvidence) -> tuple[OccurrenceR
             _validate_context(network, evidence.initial_context, "initial")
             return ()
 
-        previous_after: OccurrenceRef | None = None
-        acts: list[OccurrenceRef] = []
+        previous_after: LinkRef | None = None
+        acts: list[LinkRef] = []
         for index, step in enumerate(evidence.steps):
             _validate_context(network, step.before_context, f"step {index} before")
             _validate_context(network, step.after_context, f"step {index} after")
@@ -116,7 +116,7 @@ def _verify_run_chain(network: LinkNetwork, evidence: RunEvidence) -> None:
         raise RunReplayError("run chain does not terminate at exact root")
 
 
-def _validate_context(network: LinkNetwork, context: OccurrenceRef, label: str) -> None:
+def _validate_context(network: LinkNetwork, context: LinkRef, label: str) -> None:
     try:
         current_of_context(network, context)
     except FoundationStateError as exc:

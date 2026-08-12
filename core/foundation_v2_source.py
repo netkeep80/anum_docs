@@ -15,7 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Mapping, Sequence
 
-from .exact_link_network import LinkNetwork, LinkNetworkBuilder, OccurrenceRef
+from .rooted_link_network import LinkNetwork, LinkNetworkBuilder, LinkRef
 from .foundation_v2_state import (
     DictionaryLookupError,
     define_membership,
@@ -33,8 +33,8 @@ class SourceOccurrence:
     """Transport record for one source link and its canonical content."""
 
     raw_bytes: bytes
-    content: OccurrenceRef
-    source: OccurrenceRef
+    content: LinkRef
+    source: LinkRef
 
 
 @dataclass(frozen=True)
@@ -43,8 +43,8 @@ class SegmentSpec:
 
     start: int
     end: int
-    form: OccurrenceRef
-    dictionary_occurrence: OccurrenceRef
+    form: LinkRef
+    dictionary_occurrence: LinkRef
 
 
 @dataclass(frozen=True)
@@ -53,14 +53,14 @@ class SegmentEvidence:
 
     start: int
     end: int
-    slice_content: OccurrenceRef
-    span: OccurrenceRef
-    slice_evidence: OccurrenceRef
-    lexeme: OccurrenceRef
-    resolution: OccurrenceRef
-    dictionary_occurrence: OccurrenceRef
-    selection: OccurrenceRef
-    form: OccurrenceRef
+    slice_content: LinkRef
+    span: LinkRef
+    slice_evidence: LinkRef
+    lexeme: LinkRef
+    resolution: LinkRef
+    dictionary_occurrence: LinkRef
+    selection: LinkRef
+    form: LinkRef
 
 
 @dataclass(frozen=True)
@@ -68,16 +68,16 @@ class SourceFrontEndEvidence:
     """Replayable selected segmentation/resolution for one source record."""
 
     raw_bytes: bytes
-    content: OccurrenceRef
-    source: OccurrenceRef
-    dictionary: OccurrenceRef
-    grammar: OccurrenceRef
-    theory: OccurrenceRef
+    content: LinkRef
+    source: LinkRef
+    dictionary: LinkRef
+    grammar: LinkRef
+    theory: LinkRef
     segments: tuple[SegmentEvidence, ...]
-    selection_sequence: OccurrenceRef
-    form_sequence: OccurrenceRef
-    grammar_membership: OccurrenceRef
-    theory_membership: OccurrenceRef
+    selection_sequence: LinkRef
+    form_sequence: LinkRef
+    grammar_membership: LinkRef
+    theory_membership: LinkRef
 
 
 class SourceFrontEndBuilder:
@@ -91,18 +91,18 @@ class SourceFrontEndBuilder:
     def __init__(
         self,
         builder: LinkNetworkBuilder,
-        root: OccurrenceRef,
-        byte_refs: Mapping[int, OccurrenceRef],
+        root: LinkRef,
+        byte_refs: Mapping[int, LinkRef],
     ) -> None:
         if set(byte_refs) != set(range(256)):
             raise SourceReplayError("byte vocabulary must contain exactly 0..255")
         self._builder = builder
         self._root = root
         self._byte_refs = dict(byte_refs)
-        self._content_cache: dict[bytes, OccurrenceRef] = {b"": root}
-        self._sources: dict[OccurrenceRef, SourceOccurrence] = {}
+        self._content_cache: dict[bytes, LinkRef] = {b"": root}
+        self._sources: dict[LinkRef, SourceOccurrence] = {}
 
-    def content_ref(self, data: bytes) -> OccurrenceRef:
+    def content_ref(self, data: bytes) -> LinkRef:
         """Return the canonical R-seeded history link for exact bytes."""
 
         data = bytes(data)
@@ -138,9 +138,9 @@ class SourceFrontEndBuilder:
         source: SourceOccurrence,
         specs: Sequence[SegmentSpec],
         *,
-        dictionary: OccurrenceRef,
-        grammar: OccurrenceRef,
-        theory: OccurrenceRef,
+        dictionary: LinkRef,
+        grammar: LinkRef,
+        theory: LinkRef,
     ) -> SourceFrontEndEvidence:
         """Build canonical evidence for one caller-selected segmentation.
 
@@ -203,10 +203,10 @@ class SourceFrontEndBuilder:
             theory_membership=theory_membership,
         )
 
-    def _new_link(self, start: OccurrenceRef, end: OccurrenceRef) -> OccurrenceRef:
+    def _new_link(self, start: LinkRef, end: LinkRef) -> LinkRef:
         return self._builder.ensure(start, end)
 
-    def _fold(self, values: tuple[OccurrenceRef, ...]) -> OccurrenceRef:
+    def _fold(self, values: tuple[LinkRef, ...]) -> LinkRef:
         current = self._root
         for value in values:
             current = self._new_link(current, value)
@@ -216,8 +216,8 @@ class SourceFrontEndBuilder:
 def replay_source_front_end(
     network: LinkNetwork,
     evidence: SourceFrontEndEvidence,
-    byte_refs: Mapping[int, OccurrenceRef],
-) -> tuple[OccurrenceRef, ...]:
+    byte_refs: Mapping[int, LinkRef],
+) -> tuple[LinkRef, ...]:
     """Replay selected UTF-8/astring → scoped D/G/T evidence without effects.
 
     Returns resolved forms in source order. This function does not search for
@@ -243,8 +243,8 @@ def replay_source_front_end(
         raise SourceReplayError("canonical source content does not match raw bytes")
     _validate_segment_evidence_spans(evidence.raw_bytes, evidence.segments)
 
-    forms: list[OccurrenceRef] = []
-    selections: list[OccurrenceRef] = []
+    forms: list[LinkRef] = []
+    selections: list[LinkRef] = []
     for segment in evidence.segments:
         expected_slice = evidence.raw_bytes[segment.start : segment.end]
         slice_bytes, _ = _decode_content(
@@ -324,17 +324,17 @@ def replay_source_front_end(
 def replay_source_subselection(
     network: LinkNetwork,
     evidence: SourceFrontEndEvidence,
-    byte_refs: Mapping[int, OccurrenceRef],
+    byte_refs: Mapping[int, LinkRef],
     *,
     start_segment: int,
     end_segment: int,
-    selection_sequence: OccurrenceRef,
-    form_sequence: OccurrenceRef,
-    grammar: OccurrenceRef,
-    theory: OccurrenceRef,
-    grammar_membership: OccurrenceRef,
-    theory_membership: OccurrenceRef,
-) -> tuple[OccurrenceRef, ...]:
+    selection_sequence: LinkRef,
+    form_sequence: LinkRef,
+    grammar: LinkRef,
+    theory: LinkRef,
+    grammar_membership: LinkRef,
+    theory_membership: LinkRef,
+) -> tuple[LinkRef, ...]:
     """Replay one contiguous subselection of an already-replayed source.
 
     Segment indices are checker coordinates only. Semantic evidence remains the
@@ -408,9 +408,9 @@ def _validate_boundaries(raw_bytes: bytes, boundaries: Sequence[tuple[int, int]]
 
 
 def _inverse_byte_vocabulary(
-    byte_refs: Mapping[int, OccurrenceRef],
-) -> dict[OccurrenceRef, int]:
-    inverse: dict[OccurrenceRef, int] = {}
+    byte_refs: Mapping[int, LinkRef],
+) -> dict[LinkRef, int]:
+    inverse: dict[LinkRef, int] = {}
     for value, ref in byte_refs.items():
         if ref in inverse:
             raise SourceReplayError("byte vocabulary refs must be distinct")
@@ -420,17 +420,17 @@ def _inverse_byte_vocabulary(
 
 def _decode_content(
     network: LinkNetwork,
-    content: OccurrenceRef,
-    root: OccurrenceRef,
-    inverse_bytes: Mapping[OccurrenceRef, int],
-) -> tuple[bytes, tuple[OccurrenceRef, ...]]:
+    content: LinkRef,
+    root: LinkRef,
+    inverse_bytes: Mapping[LinkRef, int],
+) -> tuple[bytes, tuple[LinkRef, ...]]:
     if content is root:
         return b"", (root,)
 
     reversed_bytes: list[int] = []
-    reversed_prefix_refs: list[OccurrenceRef] = [content]
+    reversed_prefix_refs: list[LinkRef] = [content]
     current = content
-    visited: set[OccurrenceRef] = set()
+    visited: set[LinkRef] = set()
 
     while current is not root:
         if current in visited:
@@ -453,9 +453,9 @@ def _decode_content(
 
 def _verify_direct_membership(
     network: LinkNetwork,
-    membership_ref: OccurrenceRef,
-    container: OccurrenceRef,
-    value: OccurrenceRef,
+    membership_ref: LinkRef,
+    container: LinkRef,
+    value: LinkRef,
     label: str,
 ) -> None:
     membership = network.link(membership_ref)
@@ -465,9 +465,9 @@ def _verify_direct_membership(
 
 def _verify_fold(
     network: LinkNetwork,
-    final: OccurrenceRef,
-    values: tuple[OccurrenceRef, ...],
-    root: OccurrenceRef,
+    final: LinkRef,
+    values: tuple[LinkRef, ...],
+    root: LinkRef,
 ) -> None:
     current = final
     for expected in reversed(values):
