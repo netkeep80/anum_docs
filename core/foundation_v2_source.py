@@ -15,7 +15,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Mapping, Sequence
 
-from .rooted_link_network import LinkNetwork, LinkNetworkBuilder, LinkRef
+from .rooted_link_network import (
+    LinkNetwork,
+    LinkNetworkBuilder,
+    LinkNetworkError,
+    LinkRef,
+    read_rooted_sequence,
+)
 from .foundation_v2_state import (
     DictionaryLookupError,
     define_membership,
@@ -424,31 +430,22 @@ def _decode_content(
     root: LinkRef,
     inverse_bytes: Mapping[LinkRef, int],
 ) -> tuple[bytes, tuple[LinkRef, ...]]:
-    if content is root:
-        return b"", (root,)
+    if root is not network.root:
+        raise SourceReplayError("source content root does not match network root")
+    try:
+        sequence = read_rooted_sequence(network, content)
+    except LinkNetworkError as exc:
+        raise SourceReplayError(
+            "source content is not a finite R-rooted sequence"
+        ) from exc
 
-    reversed_bytes: list[int] = []
-    reversed_prefix_refs: list[LinkRef] = [content]
-    current = content
-    visited: set[LinkRef] = set()
-
-    while current is not root:
-        if current in visited:
-            raise SourceReplayError("cyclic canonical source-content history")
-        visited.add(current)
-        link = network.link(current)
+    decoded: list[int] = []
+    for value_ref in sequence.values:
         try:
-            value = inverse_bytes[link.end]
+            decoded.append(inverse_bytes[value_ref])
         except KeyError as exc:
             raise SourceReplayError("source content contains a non-byte occurrence") from exc
-        reversed_bytes.append(value)
-        current = link.start
-        reversed_prefix_refs.append(current)
-
-    return (
-        bytes(reversed(reversed_bytes)),
-        tuple(reversed(reversed_prefix_refs)),
-    )
+    return bytes(decoded), sequence.prefixes
 
 
 def _verify_direct_membership(
