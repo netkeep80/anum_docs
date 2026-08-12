@@ -1,0 +1,116 @@
+{
+  "schema": "foundation-v2-c7-consumer-matrix/v0.1",
+  "issue": 395,
+  "baseline": {
+    "mainCommit": "449ebdfb1d4276ebfba3e2dccc2897de62eb2577",
+    "currentMtsContract": "mts-contract/v0.6",
+    "foundationV2Accepted": false,
+    "cutoverPerformed": false,
+    "downstreamRepinAllowed": false
+  },
+  "historicalDeletionSet": [
+    "core/mtc_ast.py",
+    "core/mtc_context_analysis.py",
+    "core/mtc_definitions.py",
+    "core/mtc_interpreter.py",
+    "core/mtc_opening_path.py",
+    "core/mtc_parser.py",
+    "core/mtc_value_bundle.py",
+    "core/proof_checker.py",
+    "core/root_library.py",
+    "core/validate_root.py"
+  ],
+  "pythonConsumers": {
+    "tests/test_context_pronouns.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_parser.py"],
+      "classification": "DELETE_WITH_OWNER",
+      "cutoverAction": "delete parser/AST-specific context-pronoun regression suite; rooted direct-deixis/source gates own the preserved semantics"
+    },
+    "tests/test_mtc_definitions.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_definitions.py", "core/mtc_parser.py"],
+      "classification": "DELETE_WITH_OWNER",
+      "cutoverAction": "delete historical DefinitionEnvironment unit suite; Foundation-v2 state/colon/source evidence owns replacement behavior"
+    },
+    "tests/test_mtc_interpreter.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_interpreter.py", "core/mtc_parser.py"],
+      "classification": "DELETE_WITH_OWNER",
+      "cutoverAction": "delete historical typed-AST interpreter suite; Foundation-v2 interpreter/run/checker gates replace it"
+    },
+    "tests/test_mtc_parser.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_parser.py"],
+      "classification": "DELETE_WITH_OWNER",
+      "cutoverAction": "delete historical semantic parser/AST conformance suite; selected Foundation-v2 source evidence replaces semantic parsing authority"
+    },
+    "tests/test_mtc_value_bundle_reference.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_interpreter.py", "core/mtc_parser.py", "core/mtc_value_bundle.py"],
+      "classification": "DELETE_WITH_OWNER",
+      "cutoverAction": "delete historical ValueBundle v0.2 reference suite after rooted ValueBundle migration is integrated into the new release"
+    },
+    "tests/test_mts_contract_v06.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_parser.py", "core/root_library.py", "core/validate_root.py"],
+      "classification": "HISTORICAL_REPLAY_ONLY",
+      "cutoverAction": "retain immutable v0.6 data-only replay evidence, but remove executable imports of deleted historical owners during the atomic cutover"
+    },
+    "tests/test_mts_definition_opening_reference.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_definitions.py", "core/mtc_interpreter.py", "core/mtc_parser.py", "core/root_library.py"],
+      "classification": "DELETE_WITH_OWNER",
+      "cutoverAction": "delete historical definition-opening reference replay; replacement is integrated Foundation-v2 state/colon/source evidence"
+    },
+    "tests/test_mts_direct_deixis_reference.py": {
+      "historicalOwners": ["core/mtc_context_analysis.py", "core/mtc_interpreter.py", "core/mtc_parser.py"],
+      "classification": "DELETE_WITH_OWNER",
+      "cutoverAction": "delete historical directDeixis v0.5 reference suite; rooted direct-deixis gate and next versioned surface preserve the observable result"
+    },
+    "tests/test_mts_foundation_v2_direct_deixis.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_parser.py"],
+      "classification": "MIGRATE_TO_FOUNDATION_V2",
+      "cutoverAction": "remove test-only typed-AST/parser projection and drive the rooted direct-deixis corpus directly through canonical skeleton fixtures"
+    },
+    "tests/test_mts_foundation_v2_value_bundle.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_parser.py"],
+      "classification": "MIGRATE_TO_FOUNDATION_V2",
+      "cutoverAction": "remove test-only typed-AST/parser projection and express static-role/resolved-bundle conformance directly as rooted fixtures"
+    },
+    "tests/test_mts_opening_path_reference.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_definitions.py", "core/mtc_opening_path.py", "core/mtc_parser.py"],
+      "classification": "DELETE_WITH_OWNER",
+      "cutoverAction": "delete historical opening-path reference suite after Foundation-v2 checker/proof replacement is integrated"
+    },
+    "tests/test_mts_proof_v04.py": {
+      "historicalOwners": ["core/proof_checker.py"],
+      "classification": "DELETE_WITH_OWNER",
+      "cutoverAction": "delete historical proof-v0.4 checker suite; Foundation-v2 proof/checker/run integrated gates replace trusted replay ownership"
+    },
+    "tests/test_repository_contract.py": {
+      "historicalOwners": ["core/validate_root.py"],
+      "classification": "MIGRATE_TO_FOUNDATION_V2",
+      "cutoverAction": "retain repository integrity gate but remove historical root validator ownership and assert the new Foundation-v2 candidate/current release surface"
+    },
+    "tests/test_root_library.py": {
+      "historicalOwners": ["core/mtc_ast.py", "core/mtc_definitions.py", "core/root_library.py", "core/validate_root.py"],
+      "classification": "DELETE_WITH_OWNER",
+      "cutoverAction": "delete historical ten-formula RootLibrary/validator suite; constructive Foundation-v2 root kernel owns production bootstrap"
+    }
+  },
+  "machineConsumers": {
+    "contracts/mts-contract-v0.6.json": {
+      "historicalOwnerPaths": ["core/mtc_context_analysis.py", "core/mtc_definitions.py", "core/mtc_interpreter.py", "core/mtc_opening_path.py", "core/mtc_parser.py", "core/mtc_value_bundle.py", "core/proof_checker.py", "core/root_library.py", "core/validate_root.py"],
+      "historicalConsumerTests": ["tests/test_mtc_interpreter.py", "tests/test_mtc_parser.py", "tests/test_mtc_value_bundle_reference.py", "tests/test_mts_contract_v06.py", "tests/test_mts_definition_opening_reference.py", "tests/test_mts_direct_deixis_reference.py", "tests/test_mts_opening_path_reference.py", "tests/test_mts_proof_v04.py", "tests/test_root_library.py"],
+      "classification": "MIGRATE_TO_FOUNDATION_V2",
+      "cutoverAction": "replace live-owner meaning atomically with the new current contract while preserving immutable v0.6 as data-only previous-release evidence"
+    },
+    "contracts/mts-conformance-v0.6.json": {
+      "historicalOwnerPaths": [],
+      "historicalConsumerTests": ["tests/test_mtc_interpreter.py", "tests/test_mtc_parser.py", "tests/test_mts_contract_v06.py", "tests/test_mts_definition_opening_reference.py", "tests/test_mts_direct_deixis_reference.py", "tests/test_mts_opening_path_reference.py", "tests/test_mts_proof_v04.py", "tests/test_root_library.py"],
+      "classification": "MIGRATE_TO_FOUNDATION_V2",
+      "cutoverAction": "supersede live conformance ownership in the atomic release; immutable v0.6 remains data-only history and no stale executable test path survives"
+    }
+  },
+  "finalCutover": {
+    "singleMergeRequired": true,
+    "stages": ["C7", "C8", "C9"],
+    "unknownConsumersAllowed": false,
+    "compatibilityRuntimeAllowed": false,
+    "oldAcceptedContractMayReferenceDeletedFiles": false
+  }
+}
