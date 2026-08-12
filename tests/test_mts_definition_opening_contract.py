@@ -9,13 +9,19 @@ from core.root_library import load_root_library
 
 
 ROOT = Path(__file__).parents[1]
-CONTRACT = ROOT / "contracts" / "mts-definition-opening-v0.3.json"
-CORPUS = ROOT / "contracts" / "mts-definition-opening-conformance-v0.3.json"
+MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.5.json"
+MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.5.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
 
 def contract() -> dict:
-    return json.loads(CONTRACT.read_text(encoding="utf-8"))
+    current = json.loads(MTS_CONTRACT.read_text(encoding="utf-8"))
+    return current["surfaces"]["definitionOpening"]
+
+
+def _corpus() -> dict:
+    current = json.loads(MTS_CONFORMANCE.read_text(encoding="utf-8"))
+    return current["corpora"]["definitionOpening"]
 
 
 def test_contract_is_accepted_integrated_and_not_inherited_from_historical_umbrella():
@@ -47,9 +53,9 @@ def test_contract_is_accepted_integrated_and_not_inherited_from_historical_umbre
 
 def test_acceptance_depends_only_on_self_contained_contract_and_conformance():
     data = contract()
-    corpus = json.loads(CORPUS.read_text(encoding="utf-8"))
+    corpus = _corpus()
 
-    assert data["conformanceCorpus"] == "contracts/mts-definition-opening-conformance-v0.3.json"
+    assert data["conformanceKey"] == "definitionOpening"
     assert corpus["status"] == "accepted"
     assert corpus["accepted"] is True
     assert corpus["contract"] == data["schema"]
@@ -127,7 +133,7 @@ def test_occurrence_local_deictic_and_bundle_targets_are_not_globalized():
 def test_root_program_is_still_exactly_ten_definitions_and_acceptance_does_not_change_it():
     data = contract()["rootProgram"]
     library = load_root_library(ROOT_PROGRAM)
-    corpus = json.loads(CORPUS.read_text(encoding="utf-8"))
+    corpus = _corpus()
 
     assert data == {
         "path": "tests/mtc_formulas.mtc",

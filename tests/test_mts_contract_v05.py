@@ -47,23 +47,38 @@ def test_v05_conformance_requires_only_current_self_contained_surfaces():
     assert "legacyCoreRegressionCorpus" not in conformance
     assert "legacyCoreRegressionNormative" not in conformance
 
-    surfaces = conformance["requiredAcceptedSurfaces"]
-    assert [item["schema"] for item in surfaces] == contract["dependsOn"]
-    assert len(surfaces) == 7
+    required = conformance["requiredAcceptedSurfaces"]
+    expected_keys = [
+        "anum",
+        "valueBundle",
+        "definitionOpening",
+        "derivationBase",
+        "openingPath",
+        "proof",
+        "directDeixis",
+    ]
+    assert [item["schema"] for item in required] == contract["dependsOn"]
+    assert [item["surfaceKey"] for item in required] == expected_keys
+    assert [item["conformanceKey"] for item in required] == expected_keys
+    assert list(contract["surfaces"]) == expected_keys
+    assert list(conformance["corpora"]) == expected_keys
 
-    for surface in surfaces:
-        leaf = _load(ROOT / surface["contractPath"])
-        assert leaf["schema"] == surface["schema"]
+    for item in required:
+        leaf = contract["surfaces"][item["surfaceKey"]]
+        corpus = conformance["corpora"][item["conformanceKey"]]
+        assert leaf["schema"] == item["schema"]
         assert leaf["status"] == "accepted"
         assert leaf["accepted"] is True
-        if surface.get("conformance") == "embedded":
-            assert leaf["conformance"]["schema"] == "anum-stream-deserialization-conformance/v0.3"
-            assert leaf["conformance"]["valid"]
-            assert leaf["conformance"]["invalid"]
+        assert leaf["conformanceKey"] == item["conformanceKey"]
+        assert corpus["schema"]
+        if item["surfaceKey"] == "anum":
+            assert corpus["schema"] == "anum-stream-deserialization-conformance/v0.3"
+            assert corpus["valid"]
+            assert corpus["invalid"]
         else:
-            corpus = _load(ROOT / surface["conformancePath"])
             assert corpus["status"] == "accepted"
-            assert corpus["contract"] == surface["schema"]
+            assert corpus["accepted"] is True
+            assert corpus["contract"] == item["schema"]
 
 
 def test_v05_semantic_identity_and_anum_are_post_reset_current_semantics():

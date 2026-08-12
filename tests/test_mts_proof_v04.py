@@ -17,10 +17,8 @@ from core.proof_checker import (
 
 
 ROOT = Path(__file__).parents[1]
-CONTRACT = ROOT / "contracts" / "mts-proof-v0.4.json"
-CONFORMANCE = ROOT / "contracts" / "mts-proof-conformance-v0.4.json"
-BASE_SEMANTIC_CORPUS = ROOT / "contracts" / "mts-derivation-base-conformance-v0.3.json"
-OPENING_CONFORMANCE = ROOT / "contracts" / "mts-opening-path-conformance-v0.4.json"
+MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.5.json"
+MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.5.json"
 CHECKER = ROOT / "core" / "proof_checker.py"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
@@ -35,6 +33,22 @@ BASE_RELATIONS = {
 
 def read(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _contract() -> dict:
+    return read(MTS_CONTRACT)["surfaces"]["proof"]
+
+
+def _conformance() -> dict:
+    return read(MTS_CONFORMANCE)["corpora"]["proof"]
+
+
+def base_semantic_corpus() -> dict:
+    return read(MTS_CONFORMANCE)["corpora"]["derivationBase"]
+
+
+def opening_conformance() -> dict:
+    return read(MTS_CONFORMANCE)["corpora"]["openingPath"]
 
 
 def root_sources() -> tuple[str, ...]:
@@ -78,7 +92,7 @@ def patch_dotted(source: dict, patch: dict) -> dict:
 def base_by_id() -> dict[str, dict]:
     return {
         item["id"]: item["judgment"]
-        for item in read(CONFORMANCE)["baseJudgments"]
+        for item in _conformance()["baseJudgments"]
     }
 
 
@@ -99,8 +113,8 @@ def forged_base(vector: dict) -> dict:
 
 
 def test_contract_is_accepted_self_contained_with_exact_six_relation_surface():
-    contract = read(CONTRACT)
-    conformance = read(CONFORMANCE)
+    contract = _contract()
+    conformance = _conformance()
 
     assert contract["schema"] == "mts-proof/v0.4"
     assert contract["status"] == "accepted"
@@ -120,16 +134,16 @@ def test_contract_is_accepted_self_contained_with_exact_six_relation_surface():
     assert conformance["schema"] == "mts-proof-conformance/v0.4"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
-    assert contract["conformanceCorpus"] == "contracts/mts-proof-conformance-v0.4.json"
+    assert contract["conformanceKey"] == "proof"
 
 
 def test_conformance_uses_current_semantic_leaf_and_owns_base_transport_vectors():
-    conformance = read(CONFORMANCE)
-    base_semantics = read(BASE_SEMANTIC_CORPUS)
+    conformance = _conformance()
+    base_semantics = base_semantic_corpus()
 
-    assert conformance["baseSemanticCorpus"] == "contracts/mts-derivation-base-conformance-v0.3.json"
+    assert conformance["baseSemanticCorpus"] == "mts-conformance/v0.5#corpora.derivationBase"
     assert base_semantics["contract"] == "mts-derivation-base/v0.3"
-    assert conformance["openingPathCorpus"] == "contracts/mts-opening-path-conformance-v0.4.json"
+    assert conformance["openingPathCorpus"] == "mts-conformance/v0.5#corpora.openingPath"
     assert {item["judgment"]["relation"] for item in conformance["baseJudgments"]} == BASE_RELATIONS
     assert conformance["baseForgeries"]
     assert "legacyBaseRegressionCorpus" not in conformance
@@ -137,10 +151,10 @@ def test_conformance_uses_current_semantic_leaf_and_owns_base_transport_vectors(
 
 
 def test_current_base_valid_judgments_replay_directly_in_v04():
-    for vector in read(CONFORMANCE)["baseJudgments"]:
+    for vector in _conformance()["baseJudgments"]:
         assert check_proof_v04_data(v04_artifact([vector["judgment"]])), vector["id"]
 
-    base = read(CONTRACT)["baseRelations"]
+    base = _contract()["baseRelations"]
     assert base == {
         "contract": "mts-derivation-base/v0.3",
         "checkerPath": "core/proof_checker.py::check_base_judgment",
@@ -151,7 +165,7 @@ def test_current_base_valid_judgments_replay_directly_in_v04():
 
 
 def test_current_base_forgeries_are_rejected_directly_by_v04():
-    for vector in read(CONFORMANCE)["baseForgeries"]:
+    for vector in _conformance()["baseForgeries"]:
         forged = forged_base(vector)
         assert not check_proof_v04_data(v04_artifact([forged])), vector["id"]
 
@@ -168,7 +182,7 @@ def test_current_checker_has_no_versioned_v03_dispatch_path():
 
 
 def test_every_opening_path_valid_vector_lifts_to_trusted_v04_relation():
-    for vector in read(OPENING_CONFORMANCE)["validPaths"]:
+    for vector in opening_conformance()["validPaths"]:
         artifact = v04_artifact([opening_judgment(vector)])
         assert check_proof_v04_data(artifact), vector["id"]
         typed = proof_v04_from_data(artifact)
@@ -178,21 +192,21 @@ def test_every_opening_path_valid_vector_lifts_to_trusted_v04_relation():
 
 
 def test_every_opening_path_invalid_vector_rejects_when_lifted():
-    for vector in read(OPENING_CONFORMANCE)["invalidPaths"]:
+    for vector in opening_conformance()["invalidPaths"]:
         assert not check_proof_v04_data(v04_artifact([opening_judgment(vector)])), vector["id"]
 
 
 def test_every_v04_specific_transport_forgery_rejects():
-    for vector in read(CONFORMANCE)["invalidArtifacts"]:
+    for vector in _conformance()["invalidArtifacts"]:
         assert not check_proof_v04_data(vector["artifact"]), vector["id"]
 
 
 def test_mixed_base_and_opening_path_judgment_order_has_no_dependency_meaning():
-    mixed = read(CONFORMANCE)["mixedArtifact"]
+    mixed = _conformance()["mixedArtifact"]
     base = base_by_id()[mixed["baseJudgmentId"]]
     opening_vector = next(
         item
-        for item in read(OPENING_CONFORMANCE)["validPaths"]
+        for item in opening_conformance()["validPaths"]
         if item["id"] == mixed["openingPathId"]
     )
     opening = opening_judgment(opening_vector)
@@ -202,7 +216,7 @@ def test_mixed_base_and_opening_path_judgment_order_has_no_dependency_meaning():
     assert mixed["requiredBothOrdersAccepted"] is True
     assert mixed["orderImpliesDependency"] is False
 
-    boundary = read(CONTRACT)["compositionBoundary"]
+    boundary = _contract()["compositionBoundary"]
     assert boundary["judgmentOrderImpliesDependency"] is False
     assert boundary["genericCompositionAccepted"] is False
     assert boundary["proofDagDependencyAccepted"] is False
@@ -211,7 +225,7 @@ def test_mixed_base_and_opening_path_judgment_order_has_no_dependency_meaning():
 def test_v04_canonical_round_trip_is_deterministic_for_mixed_proof():
     base = base_by_id()["opens-direct"]
     opening_vector = next(
-        item for item in read(OPENING_CONFORMANCE)["validPaths"] if item["id"] == "two-edge"
+        item for item in opening_conformance()["validPaths"] if item["id"] == "two-edge"
     )
     source = v04_artifact([base, opening_judgment(opening_vector)])
 
@@ -230,7 +244,7 @@ def test_v04_canonical_round_trip_is_deterministic_for_mixed_proof():
 def test_target_transport_may_normalize_whitespace_on_serialization_without_changing_identity():
     vector = next(
         deepcopy(item)
-        for item in read(OPENING_CONFORMANCE)["validPaths"]
+        for item in opening_conformance()["validPaths"]
         if item["id"] == "structural-adjacency-whitespace"
     )
     artifact = v04_artifact([opening_judgment(vector)])
@@ -246,7 +260,7 @@ def test_target_transport_may_normalize_whitespace_on_serialization_without_chan
 def test_noncanonical_expected_body_and_final_body_are_transport_errors():
     vector = next(
         deepcopy(item)
-        for item in read(OPENING_CONFORMANCE)["validPaths"]
+        for item in opening_conformance()["validPaths"]
         if item["id"] == "structural-adjacency-whitespace"
     )
     judgment = opening_judgment(vector)
@@ -255,7 +269,7 @@ def test_noncanonical_expected_body_and_final_body_are_transport_errors():
 
     bundle = next(
         deepcopy(item)
-        for item in read(OPENING_CONFORMANCE)["validPaths"]
+        for item in opening_conformance()["validPaths"]
         if item["id"] == "ends-in-constraint-bundle"
     )
     judgment = opening_judgment(bundle)
@@ -264,7 +278,7 @@ def test_noncanonical_expected_body_and_final_body_are_transport_errors():
 
 
 def test_opening_path_relation_uses_no_equality_or_other_generic_rule():
-    boundary = read(CONTRACT)["compositionBoundary"]
+    boundary = _contract()["compositionBoundary"]
 
     assert boundary["DefinitionOpeningPathInternallyComposesOpeningEdges"] is True
     assert boundary["openingPathFeedsContextuallySatisfiesImplicitly"] is False
@@ -279,8 +293,8 @@ def test_opening_path_relation_uses_no_equality_or_other_generic_rule():
 
 
 def test_checker_and_effect_boundaries_are_current_and_explicit():
-    checker = read(CONTRACT)["checker"]
-    effects = read(CONTRACT)["effectsBoundary"]
+    checker = _contract()["checker"]
+    effects = _contract()["effectsBoundary"]
 
     assert checker["module"] == "core/proof_checker.py"
     assert checker["currentTrustedModule"] is True
@@ -302,8 +316,8 @@ def test_checker_and_effect_boundaries_are_current_and_explicit():
 
 
 def test_current_proof_has_no_historical_release_gate_or_compatibility_surface():
-    contract = read(CONTRACT)
-    conformance = read(CONFORMANCE)
+    contract = _contract()
+    conformance = _conformance()
     source = CHECKER.read_text(encoding="utf-8")
 
     assert "v03Compatibility" not in contract

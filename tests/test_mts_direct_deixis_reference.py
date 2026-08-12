@@ -10,14 +10,22 @@ from core.mtc_parser import parse_formula
 
 
 ROOT = Path(__file__).parents[1]
-CONTRACT = ROOT / "contracts" / "mts-direct-deixis-v0.5.json"
-CONFORMANCE = ROOT / "contracts" / "mts-direct-deixis-conformance-v0.5.json"
+MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.5.json"
+MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.5.json"
 CORE = ROOT / "core" / "mtc_context_analysis.py"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
 
 def read(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _contract() -> dict:
+    return read(MTS_CONTRACT)["surfaces"]["directDeixis"]
+
+
+def _conformance() -> dict:
+    return read(MTS_CONFORMANCE)["corpora"]["directDeixis"]
 
 
 def portable(occurrences: tuple[DeicticOccurrence, ...]) -> list[dict]:
@@ -50,8 +58,8 @@ def root_sources() -> tuple[str, ...]:
 
 
 def test_contract_is_accepted_self_contained_and_conformant():
-    contract = read(CONTRACT)
-    conformance = read(CONFORMANCE)
+    contract = _contract()
+    conformance = _conformance()
 
     assert contract["schema"] == "mts-direct-deixis/v0.5"
     assert contract["status"] == "accepted"
@@ -61,11 +69,11 @@ def test_contract_is_accepted_self_contained_and_conformant():
     assert conformance["schema"] == "mts-direct-deixis-conformance/v0.5"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
-    assert contract["conformanceCorpus"] == "contracts/mts-direct-deixis-conformance-v0.5.json"
+    assert contract["conformanceKey"] == "directDeixis"
 
 
 def test_accepted_conformance_owns_complete_portable_corpus():
-    conformance = read(CONFORMANCE)
+    conformance = _conformance()
 
     assert {item["id"] for item in conformance["vectors"]} == {
         "none",
@@ -90,13 +98,13 @@ def test_accepted_conformance_owns_complete_portable_corpus():
 
 
 def test_every_accepted_portable_vector_replays_exactly_in_production_core():
-    for vector in read(CONFORMANCE)["vectors"]:
+    for vector in _conformance()["vectors"]:
         result = analyze_direct_deixis(parse_formula(vector["source"]))
         assert portable(result) == vector["expected"], vector["id"]
 
 
 def test_every_equivalent_spelling_has_same_production_result():
-    for vector in read(CONFORMANCE)["equivalentSpellings"]:
+    for vector in _conformance()["equivalentSpellings"]:
         observed = [
             portable(analyze_direct_deixis(parse_formula(source)))
             for source in vector["sources"]
@@ -124,7 +132,7 @@ def test_grouping_and_definition_target_body_paths_match_normative_contract():
         {"path": [1, 0, 0], "up": 0, "pole": "▷"},
         {"path": [1, 1, 0], "up": 1, "pole": "◁"},
     ]
-    assert read(CONTRACT)["pathSemantics"]["groupingTransparent"] is False
+    assert _contract()["pathSemantics"]["groupingTransparent"] is False
 
 
 def test_operation_has_no_runtime_definition_memory_or_interpreter_dependency():
@@ -144,7 +152,7 @@ def test_operation_has_no_runtime_definition_memory_or_interpreter_dependency():
     ):
         assert forbidden not in core_source
 
-    operation = read(CONTRACT)["operation"]
+    operation = _contract()["operation"]
     assert operation["readsMemory"] is False
     assert operation["readsDefinitionEnvironment"] is False
     assert operation["readsContextFrame"] is False
@@ -174,22 +182,22 @@ def test_positive_direct_deixis_does_not_imply_semantic_context_sensitivity():
         second.aliases,
     )
     assert first.success is True
-    assert read(CONTRACT)["meaningBoundary"]["positiveResultImpliesContextSensitivity"] is False
+    assert _contract()["meaningBoundary"]["positiveResultImpliesContextSensitivity"] is False
 
 
 def test_empty_direct_deixis_result_does_not_claim_context_invariance():
     assert analyze_direct_deixis(parse_formula("[] = []")) == ()
-    assert read(CONTRACT)["meaningBoundary"]["emptyResultImpliesContextInvariance"] is False
+    assert _contract()["meaningBoundary"]["emptyResultImpliesContextInvariance"] is False
 
 
 def test_accepted_negative_claims_preserve_semantic_non_implications():
-    negative = {item["id"]: item for item in read(CONFORMANCE)["negativeClaims"]}
+    negative = {item["id"]: item for item in _conformance()["negativeClaims"]}
     assert negative["empty-does-not-mean-invariant"]["forbiddenConclusion"] == "ContextInvariant"
     assert negative["present-does-not-mean-sensitive"]["forbiddenConclusion"] == "ContextSensitive"
 
 
 def test_direct_deixis_does_not_add_any_trusted_proof_relation():
-    contract = read(CONTRACT)
+    contract = _contract()
 
     assert contract["proofBoundary"] == {
         "trustedProofRelationAdded": False,
