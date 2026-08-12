@@ -4,7 +4,8 @@ This module is deliberately a thin facade over the tested Foundation-v2
 implementation modules. It adds no semantic dispatch and no compatibility mode.
 Python handles exposed here are implementation coordinates, not additional MTS
 ontological identity. In particular, ``LinkRef`` is a network-local technical
-access handle and never a third component of semantic Link identity.
+access handle and never a third component of semantic Link identity. No legacy
+naming aliases are exported by this facade.
 """
 from __future__ import annotations
 
