@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "cutover/foundation-v2-import-classification-v0.1.json"
+CANDIDATE = ROOT / "cutover/foundation-v2-cutover-candidate-v0.1.json"
 VALUE_BUNDLE_DECISION = ROOT / "cutover/value-bundle-rooted-migration-decision-v0.1.json"
 SURFACE_DIRS = (ROOT / "core", ROOT / "converters")
 HISTORICAL_CLASSES = {"HISTORICAL_SEMANTIC_ISLAND", "HISTORICAL_ENTRYPOINT"}
@@ -14,6 +15,10 @@ HISTORICAL_CLASSES = {"HISTORICAL_SEMANTIC_ISLAND", "HISTORICAL_ENTRYPOINT"}
 
 def load_manifest() -> dict:
     return json.loads(MANIFEST.read_text(encoding="utf-8"))
+
+
+def load_candidate() -> dict:
+    return json.loads(CANDIDATE.read_text(encoding="utf-8"))
 
 
 def discover_surface() -> set[str]:
@@ -254,3 +259,61 @@ def test_historical_reverse_consumers_have_no_foundation_v2_live_owner() -> None
         if classifications[consumer] == "FOUNDATION_V2_LIVE"
     ]
     assert violations == []
+
+
+def test_c0_candidate_freezes_exact_post_p3_owner_and_deletion_surface() -> None:
+    candidate = load_candidate()
+    manifest = load_manifest()
+
+    assert candidate["schema"] == "foundation-v2-cutover-candidate/v0.1"
+    assert candidate["issue"] == 394
+    assert candidate["parentIssue"] == 271
+    assert candidate["status"] == "frozen-candidate"
+    assert candidate["c7DeletionSet"] == manifest["c7DeletionSet"]
+    assert set(candidate["c7DeletionSet"]) == set(manifest["historicalDecisions"])
+
+    classifications = manifest["classifications"]
+    neutral = {"core/anum_protocol.py", "core/anum_carrier.py"}
+    for owner in candidate["owners"].values():
+        assert (ROOT / owner).is_file(), owner
+        if owner in neutral:
+            assert classifications[owner] == "PRESERVED_NEUTRAL"
+        else:
+            assert classifications[owner] == "FOUNDATION_V2_LIVE"
+        assert owner not in candidate["c7DeletionSet"]
+
+
+def test_c0_candidate_keeps_v06_frozen_and_does_not_smuggle_c9_acceptance() -> None:
+    candidate = load_candidate()
+    previous = candidate["previousAcceptedRelease"]
+    boundary = candidate["candidateBoundary"]
+
+    assert candidate["accepted"] is False
+    assert candidate["cutoverPerformed"] is False
+    assert candidate["downstreamRepinAllowed"] is False
+    assert previous == {
+        "contract": "contracts/mts-contract-v0.6.json",
+        "conformance": "contracts/mts-conformance-v0.6.json",
+        "immutable": True,
+        "remainsAcceptedUntilC9": True,
+        "isLiveOwnerManifestAfterC7": False,
+    }
+    assert boundary["acceptedMtsVersionAssignedHere"] is False
+    assert boundary["mustReferenceOnlyExistingPostC7Owners"] is True
+    assert candidate["stageOrder"][-1] == "C9-explicit-acceptance-and-downstream-repin"
+
+
+def test_c0_candidate_freezes_identity_and_read_only_vetoes() -> None:
+    veto = load_candidate()["veto"]
+    assert veto == {
+        "secondLiveSemanticRuntime": False,
+        "compatibilityOccurrenceMode": False,
+        "runtimeIdAsSemanticIdentity": False,
+        "sourcePositionAsSemanticIdentity": False,
+        "contextFrameDisguisedAsK": False,
+        "astOrTokenSemanticAuthority": False,
+        "readMayMaterialize": False,
+        "mutateMtsV06InPlace": False,
+        "deleteBeforeCandidateOwnerMigration": False,
+        "acceptInsideC7OrC8": False,
+    }
