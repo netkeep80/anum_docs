@@ -1,7 +1,7 @@
 """Typed transport model for current ``*.anum`` sources.
 
 The model deliberately contains no denotation or projection semantics. L3 stream
-meaning is defined only by ``core.anum_protocol`` / ``anum-stream-deserialization/v0.3``.
+raw transport meaning is executed by ``core.anum_protocol`` inside accepted ``anum-deserialization/v0.4``; the alternate existing-carrier transport is outside this source model.
 """
 
 from dataclasses import dataclass

@@ -1,10 +1,9 @@
-"""Read-only rooted-link carrier input for ANUM issue #333.
+"""Accepted read-only existing-carrier transport for ``anum-deserialization/v0.4``.
 
-This module does not change the accepted raw/channel
-``anum-stream-deserialization/v0.3`` surface.  It proves a second input path:
-an already-existing R-rooted link sequence is unfolded to the four transmitted
-abits and then delegated to the existing ``deserialize_stream`` stack machine.
-No second OPEN/CLOSE/VALUE semantics and no materialization are introduced.
+An explicitly selected finite R-rooted link sequence is unfolded to the four
+transmitted abits and delegated to the same ``deserialize_stream`` stack machine
+as raw/channel input. No second OPEN/CLOSE/VALUE semantics, hidden singleton
+shortcut, semantic Link identity, or materialization is introduced.
 """
 from __future__ import annotations
 

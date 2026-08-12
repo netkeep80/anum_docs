@@ -1,4 +1,4 @@
-"""CLI for the accepted pure ``anum-stream-deserialization/v0.3`` path."""
+"""CLI for the accepted pure ``anum-deserialization/v0.4`` path."""
 
 import argparse
 from pathlib import Path

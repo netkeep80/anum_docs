@@ -19,8 +19,8 @@ from core.root_library import load_root_library
 
 
 ROOT = Path(__file__).parents[1]
-MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.5.json"
-MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.5.json"
+MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.6.json"
+MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.6.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
 

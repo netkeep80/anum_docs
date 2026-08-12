@@ -23,8 +23,8 @@ from core.mtc_value_bundle import (
 
 
 ROOT = Path(__file__).parents[1]
-MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.5.json"
-MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.5.json"
+MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.6.json"
+MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.6.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 INTERPRETER = ROOT / "core" / "mtc_interpreter.py"
 REFERENCE_CORE = ROOT / "core" / "mtc_value_bundle.py"
@@ -96,7 +96,7 @@ def test_reference_module_is_accepted_single_value_bundle_core():
     assert contract["accepted"] is True
     integration = contract["productionIntegration"]
     assert integration["referenceCore"] == "core/mtc_value_bundle.py"
-    assert integration["conformanceCorpus"] == "mts-conformance/v0.5#corpora.valueBundle"
+    assert integration["conformanceCorpus"] == "mts-conformance/v0.6#corpora.valueBundle"
     assert REFERENCE_CORE.is_file()
     assert "mtc_value_bundle" not in interpreter_source
 

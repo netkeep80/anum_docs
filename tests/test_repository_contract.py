@@ -11,8 +11,8 @@ from core.validate_root import validate_root_library
 
 ROOT = Path(__file__).resolve().parents[1]
 ROOT_FIXTURE = ROOT / "tests/mtc_formulas.mtc"
-MTS_CONTRACT_CURRENT = ROOT / "contracts/mts-contract-v0.5.json"
-MTS_CONFORMANCE_CURRENT = ROOT / "contracts/mts-conformance-v0.5.json"
+MTS_CONTRACT_CURRENT = ROOT / "contracts/mts-contract-v0.6.json"
+MTS_CONFORMANCE_CURRENT = ROOT / "contracts/mts-conformance-v0.6.json"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md"}
 ACTIVE_SPECS = {
     "Формальная нотация МТС.md",
@@ -35,6 +35,8 @@ FORBIDDEN_HISTORICAL_MTS_RELEASES = {
     "contracts/mts-conformance-v0.3.json",
     "contracts/mts-contract-v0.4.json",
     "contracts/mts-conformance-v0.4.json",
+    "contracts/mts-contract-v0.5.json",
+    "contracts/mts-conformance-v0.5.json",
     "contracts/mts-proof-v0.2.json",
     "contracts/mts-proof-v0.3.json",
     "contracts/mts-proof-conformance-v0.3.json",
@@ -165,22 +167,22 @@ def test_root_fixture_is_exact_and_excludes_protocol_hypotheses():
     assert len([line for line in formula_text.splitlines() if line]) == 10
 
 
-def test_current_machine_manifest_is_single_self_contained_v05_surface():
+def test_current_machine_manifest_is_single_self_contained_v06_surface():
     assert MTS_CONTRACT_CURRENT.is_file()
     assert MTS_CONFORMANCE_CURRENT.is_file()
 
     contract = json.loads(MTS_CONTRACT_CURRENT.read_text(encoding="utf-8"))
     conformance = json.loads(MTS_CONFORMANCE_CURRENT.read_text(encoding="utf-8"))
 
-    assert contract["schema"] == "mts-contract/v0.5"
+    assert contract["schema"] == "mts-contract/v0.6"
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
     assert "extends" not in contract
     assert "baseContract" not in contract
     assert not any(item.startswith("mts-contract/v0.") for item in contract["dependsOn"])
-    assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.5.json"
+    assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.6.json"
 
-    assert conformance["schema"] == "mts-conformance/v0.5"
+    assert conformance["schema"] == "mts-conformance/v0.6"
     assert conformance["status"] == "accepted"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
@@ -197,8 +199,8 @@ def test_current_machine_manifest_is_single_self_contained_v05_surface():
         "directDeixis",
     ]
     assert {path.name for path in (ROOT / "contracts").glob("*.json")} == {
-        "mts-contract-v0.5.json",
-        "mts-conformance-v0.5.json",
+        "mts-contract-v0.6.json",
+        "mts-conformance-v0.6.json",
     }
     assert list(contract["surfaces"]) == expected_keys
     assert list(conformance["corpora"]) == expected_keys
@@ -237,8 +239,8 @@ def test_foundation_v2_candidate_has_one_runtime_path_without_gate_contract_ladd
 def test_contributor_guide_points_only_to_current_machine_surface():
     text = (ROOT / "docs/CONTRIBUTING.md").read_text(encoding="utf-8")
 
-    assert "../contracts/mts-contract-v0.5.json" in text
-    assert "anum-stream-deserialization/v0.3" in text
+    assert "../contracts/mts-contract-v0.6.json" in text
+    assert "anum-deserialization/v0.4" in text
     assert "Reference model МТС v0.2" not in text
     assert "mts-contract-v0.2" not in text
 
@@ -250,10 +252,14 @@ def test_current_manifest_does_not_restore_superseded_anum_or_occurrence_link_id
     assert contract["semanticIdentity"]["linkIdentity"] == "by ordered semantic poles"
     assert contract["semanticIdentity"]["runtimeHandleIsSemanticIdentity"] is False
     assert contract["semanticIdentity"]["samePairCreatesSecondSemanticLink"] is False
-    assert contract["anum"]["schema"] == "anum-stream-deserialization/v0.3"
+    assert contract["anum"]["schema"] == "anum-deserialization/v0.4"
     assert contract["anum"]["emptyStream"] == "R"
     assert contract["anum"]["emptyGroup"] == "R"
     assert contract["anum"]["rootIsFifthAbit"] is False
+    assert contract["anum"]["rawChannelInputAccepted"] is True
+    assert contract["anum"]["existingAsetCarrierSemanticsAccepted"] is True
+    assert contract["anum"]["carrierRoleIsExplicit"] is True
+    assert contract["anum"]["carrierReadOnly"] is True
     for forbidden in (
         "anum-raw-carrier-v0.2",
         "anum-boundary-projection-v0.2",
