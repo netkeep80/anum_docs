@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Mapping
 
-from .exact_link_network import LinkNetwork, OccurrenceRef
+from .rooted_link_network import LinkNetwork, LinkRef
 from .foundation_v2_interpreter import InterpreterReplayError, replay_equality_evaluation
 from .foundation_v2_proof import (
     DecomposeEqualityEvidence,
@@ -36,8 +36,8 @@ class ProofGoalEvidence:
     semantic content remains the two already-existing exact link occurrences.
     """
 
-    start_claim: OccurrenceRef
-    end_claim: OccurrenceRef
+    start_claim: LinkRef
+    end_claim: LinkRef
 
 
 @dataclass(frozen=True)
@@ -49,8 +49,8 @@ class ProofJudgmentEvidence:
     premise store and no new semantic tag to primitive links.
     """
 
-    theory: OccurrenceRef
-    context: OccurrenceRef
+    theory: LinkRef
+    context: LinkRef
     goal: ProofGoalEvidence
 
 
@@ -67,8 +67,8 @@ class IntegratedProofEvidence:
 def replay_integrated_proof(
     network: LinkNetwork,
     evidence: IntegratedProofEvidence,
-    byte_refs: Mapping[int, OccurrenceRef],
-) -> tuple[OccurrenceRef, OccurrenceRef]:
+    byte_refs: Mapping[int, LinkRef],
+) -> tuple[LinkRef, LinkRef]:
     """Replay one source-selected rule proof for one exact selected judgment.
 
     Search is outside the trusted boundary. Success requires all nested evidence
@@ -146,7 +146,7 @@ def replay_integrated_proof(
 
 def _verify_exact_goal(
     goal: ProofGoalEvidence,
-    claims: tuple[OccurrenceRef, OccurrenceRef],
+    claims: tuple[LinkRef, LinkRef],
 ) -> None:
     if claims[0] is not goal.start_claim or claims[1] is not goal.end_claim:
         raise IntegratedCheckerError(

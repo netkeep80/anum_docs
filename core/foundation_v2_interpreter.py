@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Mapping
 
-from .exact_link_network import LinkNetwork, OccurrenceRef
+from .rooted_link_network import LinkNetwork, LinkRef
 from .foundation_v2_source import (
     SourceFrontEndEvidence,
     SourceReplayError,
@@ -49,17 +49,17 @@ class InterpreterReplayError(ValueError):
 class RelationStepRoleRefs:
     """Exact role refs supplied by the explicit Gate-R role vocabulary."""
 
-    source: OccurrenceRef
-    source_selection: OccurrenceRef
-    form_sequence: OccurrenceRef
-    dictionary: OccurrenceRef
-    grammar: OccurrenceRef
-    theory: OccurrenceRef
-    form: OccurrenceRef
-    before_context: OccurrenceRef
-    binding: OccurrenceRef
-    result: OccurrenceRef
-    after_context: OccurrenceRef
+    source: LinkRef
+    source_selection: LinkRef
+    form_sequence: LinkRef
+    dictionary: LinkRef
+    grammar: LinkRef
+    theory: LinkRef
+    form: LinkRef
+    before_context: LinkRef
+    binding: LinkRef
+    result: LinkRef
+    after_context: LinkRef
 
 
 @dataclass(frozen=True)
@@ -67,14 +67,14 @@ class RelationStepEvidence:
     """Checker handle for one exact read-only relation-resolution act."""
 
     source_evidence: SourceFrontEndEvidence
-    interpreter: OccurrenceRef
-    form: OccurrenceRef
-    before_context: OccurrenceRef
-    binding: OccurrenceRef
-    result: OccurrenceRef
-    after_context: OccurrenceRef
-    act: OccurrenceRef
-    role_dictionary: OccurrenceRef
+    interpreter: LinkRef
+    form: LinkRef
+    before_context: LinkRef
+    binding: LinkRef
+    result: LinkRef
+    after_context: LinkRef
+    act: LinkRef
+    role_dictionary: LinkRef
     roles: RelationStepRoleRefs
 
 
@@ -82,15 +82,15 @@ class RelationStepEvidence:
 class FlatSequenceReadingRoleRefs:
     """Exact roles required to replay one selected flat Anum reading act."""
 
-    source: OccurrenceRef
-    source_selection: OccurrenceRef
-    form_sequence: OccurrenceRef
-    dictionary: OccurrenceRef
-    grammar: OccurrenceRef
-    theory: OccurrenceRef
-    before_context: OccurrenceRef
-    result: OccurrenceRef
-    after_context: OccurrenceRef
+    source: LinkRef
+    source_selection: LinkRef
+    form_sequence: LinkRef
+    dictionary: LinkRef
+    grammar: LinkRef
+    theory: LinkRef
+    before_context: LinkRef
+    result: LinkRef
+    after_context: LinkRef
 
 
 @dataclass(frozen=True)
@@ -103,12 +103,12 @@ class FlatSequenceReadingEvidence:
     """
 
     source_evidence: SourceFrontEndEvidence
-    interpreter: OccurrenceRef
-    before_context: OccurrenceRef
-    result: OccurrenceRef
-    after_context: OccurrenceRef
-    act: OccurrenceRef
-    role_dictionary: OccurrenceRef
+    interpreter: LinkRef
+    before_context: LinkRef
+    result: LinkRef
+    after_context: LinkRef
+    act: LinkRef
+    role_dictionary: LinkRef
     roles: FlatSequenceReadingRoleRefs
 
 
@@ -116,34 +116,34 @@ class FlatSequenceReadingEvidence:
 class ColonRoleRefs:
     """Exact role refs required to replay one persistent ``:`` effect."""
 
-    source: OccurrenceRef
-    source_content: OccurrenceRef
-    form: OccurrenceRef
-    before_dictionary: OccurrenceRef
-    entry: OccurrenceRef
-    definition_occurrence: OccurrenceRef
-    history_before: OccurrenceRef
-    history_after: OccurrenceRef
-    after_dictionary: OccurrenceRef
-    context: OccurrenceRef
+    source: LinkRef
+    source_content: LinkRef
+    form: LinkRef
+    before_dictionary: LinkRef
+    entry: LinkRef
+    definition_occurrence: LinkRef
+    history_before: LinkRef
+    history_after: LinkRef
+    after_dictionary: LinkRef
+    context: LinkRef
 
 
 @dataclass(frozen=True)
 class ColonEffectEvidence:
     """Checker handle for one already-materialized persistent definition effect."""
 
-    interpreter: OccurrenceRef
-    source: OccurrenceRef
-    source_content: OccurrenceRef
-    form: OccurrenceRef
-    before_dictionary: OccurrenceRef
-    entry: OccurrenceRef
-    definition_occurrence: OccurrenceRef
-    history_after: OccurrenceRef
-    after_dictionary: OccurrenceRef
-    context: OccurrenceRef
-    act: OccurrenceRef
-    role_dictionary: OccurrenceRef
+    interpreter: LinkRef
+    source: LinkRef
+    source_content: LinkRef
+    form: LinkRef
+    before_dictionary: LinkRef
+    entry: LinkRef
+    definition_occurrence: LinkRef
+    history_after: LinkRef
+    after_dictionary: LinkRef
+    context: LinkRef
+    act: LinkRef
+    role_dictionary: LinkRef
     roles: ColonRoleRefs
 
 
@@ -151,33 +151,33 @@ class ColonEffectEvidence:
 class EqualityRoleRefs:
     """Exact role refs required to replay one local equality evaluation."""
 
-    context: OccurrenceRef
-    left: OccurrenceRef
-    right: OccurrenceRef
-    left_representative: OccurrenceRef
-    right_representative: OccurrenceRef
+    context: LinkRef
+    left: LinkRef
+    right: LinkRef
+    left_representative: LinkRef
+    right_representative: LinkRef
 
 
 @dataclass(frozen=True)
 class EqualityEvaluationEvidence:
     """Checker handle for one exact local equality-evaluation act."""
 
-    interpreter: OccurrenceRef
-    context: OccurrenceRef
-    left: OccurrenceRef
-    right: OccurrenceRef
-    left_representative: OccurrenceRef
-    right_representative: OccurrenceRef
-    act: OccurrenceRef
-    role_dictionary: OccurrenceRef
+    interpreter: LinkRef
+    context: LinkRef
+    left: LinkRef
+    right: LinkRef
+    left_representative: LinkRef
+    right_representative: LinkRef
+    act: LinkRef
+    role_dictionary: LinkRef
     roles: EqualityRoleRefs
 
 
 def replay_relation_step(
     network: LinkNetwork,
     evidence: RelationStepEvidence,
-    byte_refs: Mapping[int, OccurrenceRef],
-) -> OccurrenceRef:
+    byte_refs: Mapping[int, LinkRef],
+) -> LinkRef:
     """Replay one selected Foundation-v2 relation-resolution act read-only."""
 
     before_snapshot = network.snapshot()
@@ -203,17 +203,17 @@ def replay_relation_step(
 def replay_relation_source_subselection_step(
     network: LinkNetwork,
     evidence: RelationStepEvidence,
-    byte_refs: Mapping[int, OccurrenceRef],
+    byte_refs: Mapping[int, LinkRef],
     *,
     start_segment: int,
     end_segment: int,
-    selection_sequence: OccurrenceRef,
-    form_sequence: OccurrenceRef,
-    grammar: OccurrenceRef,
-    theory: OccurrenceRef,
-    grammar_membership: OccurrenceRef,
-    theory_membership: OccurrenceRef,
-) -> OccurrenceRef:
+    selection_sequence: LinkRef,
+    form_sequence: LinkRef,
+    grammar: LinkRef,
+    theory: LinkRef,
+    grammar_membership: LinkRef,
+    theory_membership: LinkRef,
+) -> LinkRef:
     """Replay one-pole relation resolution from a trusted whole-source subselection.
 
     The semantic source remains ``evidence.source_evidence.source``. The selected
@@ -262,8 +262,8 @@ def replay_relation_source_subselection_step(
 def replay_flat_sequence_reading(
     network: LinkNetwork,
     evidence: FlatSequenceReadingEvidence,
-    byte_refs: Mapping[int, OccurrenceRef],
-) -> OccurrenceRef:
+    byte_refs: Mapping[int, LinkRef],
+) -> LinkRef:
     """Replay one selected flat Anum sequence reading without effects.
 
     This operation deliberately stops before O/C grouping. The source front-end
@@ -293,17 +293,17 @@ def replay_flat_sequence_reading(
 def replay_flat_source_subselection_reading(
     network: LinkNetwork,
     evidence: FlatSequenceReadingEvidence,
-    byte_refs: Mapping[int, OccurrenceRef],
+    byte_refs: Mapping[int, LinkRef],
     *,
     start_segment: int,
     end_segment: int,
-    selection_sequence: OccurrenceRef,
-    form_sequence: OccurrenceRef,
-    grammar: OccurrenceRef,
-    theory: OccurrenceRef,
-    grammar_membership: OccurrenceRef,
-    theory_membership: OccurrenceRef,
-) -> OccurrenceRef:
+    selection_sequence: LinkRef,
+    form_sequence: LinkRef,
+    grammar: LinkRef,
+    theory: LinkRef,
+    grammar_membership: LinkRef,
+    theory_membership: LinkRef,
+) -> LinkRef:
     """Replay a flat reading of one trusted subselection of the same whole source.
 
     ``evidence.source_evidence`` remains the whole exact source occurrence. The
@@ -350,17 +350,17 @@ def replay_flat_source_subselection_reading(
 def replay_flat_source_subselection_continuation(
     network: LinkNetwork,
     evidence: FlatSequenceReadingEvidence,
-    byte_refs: Mapping[int, OccurrenceRef],
+    byte_refs: Mapping[int, LinkRef],
     *,
     start_segment: int,
     end_segment: int,
-    selection_sequence: OccurrenceRef,
-    form_sequence: OccurrenceRef,
-    grammar: OccurrenceRef,
-    theory: OccurrenceRef,
-    grammar_membership: OccurrenceRef,
-    theory_membership: OccurrenceRef,
-) -> OccurrenceRef:
+    selection_sequence: LinkRef,
+    form_sequence: LinkRef,
+    grammar: LinkRef,
+    theory: LinkRef,
+    grammar_membership: LinkRef,
+    theory_membership: LinkRef,
+) -> LinkRef:
     """Continue one exact left fold from ``K_before.current`` over a subselection.
 
     This is sequence continuation, not bracket semantics. The selected source
@@ -433,7 +433,7 @@ def replay_flat_source_subselection_continuation(
 def replay_colon_effect(
     network: LinkNetwork,
     evidence: ColonEffectEvidence,
-) -> OccurrenceRef:
+) -> LinkRef:
     """Replay one persistent scoped-dictionary definition effect read-only."""
 
     before_snapshot = network.snapshot()
@@ -556,8 +556,8 @@ def replay_equality_evaluation(
 def _replay_source(
     network: LinkNetwork,
     source: SourceFrontEndEvidence,
-    byte_refs: Mapping[int, OccurrenceRef],
-) -> tuple[OccurrenceRef, ...]:
+    byte_refs: Mapping[int, LinkRef],
+) -> tuple[LinkRef, ...]:
     try:
         return replay_source_front_end(network, source, byte_refs)
     except SourceReplayError as exc:
@@ -568,11 +568,11 @@ def _replay_relation_selected_form(
     network: LinkNetwork,
     evidence: RelationStepEvidence,
     *,
-    source_selection: OccurrenceRef,
-    form_sequence: OccurrenceRef,
-    grammar: OccurrenceRef,
-    theory: OccurrenceRef,
-) -> OccurrenceRef:
+    source_selection: LinkRef,
+    form_sequence: LinkRef,
+    grammar: LinkRef,
+    theory: LinkRef,
+) -> LinkRef:
     try:
         parent = parent_of_context(network, evidence.before_context)
         current = current_of_context(network, evidence.before_context)
@@ -613,13 +613,13 @@ def _replay_relation_selected_form(
 def _replay_flat_selected_forms(
     network: LinkNetwork,
     evidence: FlatSequenceReadingEvidence,
-    forms: tuple[OccurrenceRef, ...],
+    forms: tuple[LinkRef, ...],
     *,
-    source_selection: OccurrenceRef,
-    form_sequence: OccurrenceRef,
-    grammar: OccurrenceRef,
-    theory: OccurrenceRef,
-) -> OccurrenceRef:
+    source_selection: LinkRef,
+    form_sequence: LinkRef,
+    grammar: LinkRef,
+    theory: LinkRef,
+) -> LinkRef:
     _verify_flat_sequence_result(network, forms, evidence.result)
 
     try:
@@ -650,8 +650,8 @@ def _replay_flat_selected_forms(
 
 def _verify_flat_sequence_result(
     network: LinkNetwork,
-    forms: tuple[OccurrenceRef, ...],
-    result: OccurrenceRef,
+    forms: tuple[LinkRef, ...],
+    result: LinkRef,
 ) -> None:
     if not forms:
         if result is not network.root:
@@ -680,9 +680,9 @@ def _verify_flat_sequence_result(
 
 def _verify_flat_sequence_continuation_result(
     network: LinkNetwork,
-    prefix: OccurrenceRef,
-    forms: tuple[OccurrenceRef, ...],
-    result: OccurrenceRef,
+    prefix: LinkRef,
+    forms: tuple[LinkRef, ...],
+    result: LinkRef,
 ) -> None:
     current = result
     for expected_end in reversed(forms):
@@ -700,9 +700,9 @@ def _verify_flat_sequence_continuation_result(
 
 def _expected_result_poles(
     network: LinkNetwork,
-    form: OccurrenceRef,
-    binding: OccurrenceRef,
-) -> tuple[OccurrenceRef, OccurrenceRef]:
+    form: LinkRef,
+    binding: LinkRef,
+) -> tuple[LinkRef, LinkRef]:
     form_link = network.link(form)
     start_open = form_link.start is form and form_link.end is not form
     end_open = form_link.end is form and form_link.start is not form
@@ -731,10 +731,10 @@ def _verify_relation_act_fields(
     network: LinkNetwork,
     evidence: RelationStepEvidence,
     *,
-    source_selection: OccurrenceRef,
-    form_sequence: OccurrenceRef,
-    grammar: OccurrenceRef,
-    theory: OccurrenceRef,
+    source_selection: LinkRef,
+    form_sequence: LinkRef,
+    grammar: LinkRef,
+    theory: LinkRef,
 ) -> None:
     source = evidence.source_evidence
     expected = (
@@ -776,10 +776,10 @@ def _verify_flat_sequence_act_fields(
     network: LinkNetwork,
     evidence: FlatSequenceReadingEvidence,
     *,
-    source_selection: OccurrenceRef,
-    form_sequence: OccurrenceRef,
-    grammar: OccurrenceRef,
-    theory: OccurrenceRef,
+    source_selection: LinkRef,
+    form_sequence: LinkRef,
+    grammar: LinkRef,
+    theory: LinkRef,
 ) -> None:
     source = evidence.source_evidence
     expected = (
@@ -818,7 +818,7 @@ def _verify_colon_act_header(
 def _verify_colon_act_fields(
     network: LinkNetwork,
     evidence: ColonEffectEvidence,
-    history_before: OccurrenceRef,
+    history_before: LinkRef,
 ) -> None:
     expected = (
         (evidence.roles.source, evidence.source, "source"),
@@ -890,8 +890,8 @@ def _verify_equality_act_fields(
 
 def _verify_exact_act_fields(
     network: LinkNetwork,
-    act: OccurrenceRef,
-    expected: tuple[tuple[OccurrenceRef, OccurrenceRef, str], ...],
+    act: LinkRef,
+    expected: tuple[tuple[LinkRef, LinkRef, str], ...],
 ) -> None:
     for role, value, label in expected:
         values = act_values(network, act, role)

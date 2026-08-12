@@ -22,11 +22,11 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Mapping
 
-from .exact_link_network import (
+from .rooted_link_network import (
     LinkNetwork,
     LinkNetworkBuilder,
     LinkNetworkError,
-    OccurrenceRef,
+    LinkRef,
 )
 
 
@@ -38,13 +38,13 @@ class FoundationRootError(ValueError):
 class FoundationRootRefs:
     """Technical access handles for the five structurally distinguished links."""
 
-    root: OccurrenceRef
-    opening: OccurrenceRef
-    closing: OccurrenceRef
-    linked: OccurrenceRef
-    unlinked: OccurrenceRef
+    root: LinkRef
+    opening: LinkRef
+    closing: LinkRef
+    linked: LinkRef
+    unlinked: LinkRef
 
-    def as_tuple(self) -> tuple[OccurrenceRef, ...]:
+    def as_tuple(self) -> tuple[LinkRef, ...]:
         return (self.root, self.opening, self.closing, self.linked, self.unlinked)
 
 
@@ -130,7 +130,7 @@ def validate_root_kernel(kernel: FoundationRootKernel) -> None:
         raise FoundationRootError("C⟼O must resolve to U")
 
 
-def root_vocabulary(kernel: FoundationRootKernel) -> Mapping[str, OccurrenceRef]:
+def root_vocabulary(kernel: FoundationRootKernel) -> Mapping[str, LinkRef]:
     """Return root protocol vocabulary over already-distinguished links."""
 
     validate_root_kernel(kernel)
@@ -146,7 +146,7 @@ def root_vocabulary(kernel: FoundationRootKernel) -> Mapping[str, OccurrenceRef]
     )
 
 
-def root_role_refs(kernel: FoundationRootKernel) -> Mapping[str, OccurrenceRef]:
+def root_role_refs(kernel: FoundationRootKernel) -> Mapping[str, LinkRef]:
     """Expose conventional R/O/C/L/U names as technical API/debug handles."""
 
     validate_root_kernel(kernel)

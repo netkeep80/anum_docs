@@ -21,8 +21,7 @@ The pair index therefore includes self-closed forms as well: after ``S=S⟼e``
 has been constructed, asking for the complete pair ``(S,e)`` returns ``S``.
 Likewise ``ensure(R,R)`` returns the root.
 
-``OccurrenceRef`` is retained temporarily as a network-local technical access
-handle. Its slot/object identity is not an MTS identity component.
+``LinkRef`` is a network-local technical access handle. Its slot/object identity is not an MTS identity component.
 """
 from __future__ import annotations
 
@@ -35,7 +34,7 @@ class LinkNetworkError(ValueError):
 
 
 @dataclass(frozen=True)
-class OccurrenceRef:
+class LinkRef:
     """Network-local technical handle, not semantic identity of an MTS link."""
 
     _scope: object = field(repr=False)
@@ -46,8 +45,8 @@ class OccurrenceRef:
 class Link:
     """Primitive binary view of one semantic MTS link."""
 
-    start: OccurrenceRef
-    end: OccurrenceRef
+    start: LinkRef
+    end: LinkRef
 
 
 @dataclass(frozen=True)
@@ -64,9 +63,9 @@ class LinkNetwork:
     def __init__(
         self,
         scope: object,
-        refs: tuple[OccurrenceRef, ...],
+        refs: tuple[LinkRef, ...],
         links: tuple[Link, ...],
-        root: OccurrenceRef,
+        root: LinkRef,
     ) -> None:
         if not links:
             raise LinkNetworkError("LinkNetwork must contain at least one link")
@@ -92,31 +91,31 @@ class LinkNetwork:
             )
 
         self._pair_index: dict[
-            tuple[OccurrenceRef, OccurrenceRef], OccurrenceRef
+            tuple[LinkRef, LinkRef], LinkRef
         ] = {}
-        self._start_self_index: dict[OccurrenceRef, OccurrenceRef] = {}
-        self._end_self_index: dict[OccurrenceRef, OccurrenceRef] = {}
+        self._start_self_index: dict[LinkRef, LinkRef] = {}
+        self._end_self_index: dict[LinkRef, LinkRef] = {}
         self._validate_rooted_canonical_structure()
 
     @property
-    def root(self) -> OccurrenceRef:
+    def root(self) -> LinkRef:
         """Return the distinguished unique fully self-closed root."""
 
         return self._root
 
     @property
-    def refs(self) -> tuple[OccurrenceRef, ...]:
+    def refs(self) -> tuple[LinkRef, ...]:
         """Return canonical semantic-link handles in local storage order."""
 
         return self._refs
 
-    def link(self, ref: OccurrenceRef) -> Link:
+    def link(self, ref: LinkRef) -> Link:
         """Read one link; foreign or forged runtime handles are rejected."""
 
         self._validate_ref(ref)
         return self._links[ref.slot]
 
-    def find(self, start: OccurrenceRef, end: OccurrenceRef) -> OccurrenceRef | None:
+    def find(self, start: LinkRef, end: LinkRef) -> LinkRef | None:
         """Return the unique materialized link for an already-distinguished pair."""
 
         self._validate_ref(start)
@@ -161,14 +160,14 @@ class LinkNetwork:
                 raise LinkNetworkError("snapshot endpoint slot is out of range")
 
         scope = object()
-        refs = tuple(OccurrenceRef(scope, slot) for slot in range(count))
+        refs = tuple(LinkRef(scope, slot) for slot in range(count))
         links = tuple(Link(refs[start], refs[end]) for start, end in snapshot.links)
         return cls(scope, refs, links, refs[snapshot.root])
 
     def _validate_rooted_canonical_structure(self) -> None:
         root = self._root
         unresolved = set(self._refs)
-        resolved: set[OccurrenceRef] = set()
+        resolved: set[LinkRef] = set()
 
         self._register_resolved(root)
         resolved.add(root)
@@ -208,7 +207,7 @@ class LinkNetwork:
                     f"unresolved slots: {slots}"
                 )
 
-    def _register_resolved(self, ref: OccurrenceRef) -> None:
+    def _register_resolved(self, ref: LinkRef) -> None:
         link = self._links[ref.slot]
         start_self = link.start is ref
         end_self = link.end is ref
@@ -239,8 +238,8 @@ class LinkNetwork:
             )
         self._pair_index[pair] = ref
 
-    def _validate_ref(self, ref: OccurrenceRef) -> None:
-        if not isinstance(ref, OccurrenceRef):
+    def _validate_ref(self, ref: LinkRef) -> None:
+        if not isinstance(ref, LinkRef):
             raise LinkNetworkError("expected network link handle")
         if ref._scope is not self._scope:
             raise LinkNetworkError("foreign network link handle")
@@ -268,26 +267,26 @@ class LinkNetworkBuilder:
 
     def __init__(self) -> None:
         self._scope = object()
-        self._refs: list[OccurrenceRef] = []
+        self._refs: list[LinkRef] = []
         self._links: list[Link | None] = []
         self._pair_index: dict[
-            tuple[OccurrenceRef, OccurrenceRef], OccurrenceRef
+            tuple[LinkRef, LinkRef], LinkRef
         ] = {}
-        self._start_self_index: dict[OccurrenceRef, OccurrenceRef] = {}
-        self._end_self_index: dict[OccurrenceRef, OccurrenceRef] = {}
-        self._root: OccurrenceRef | None = None
+        self._start_self_index: dict[LinkRef, LinkRef] = {}
+        self._end_self_index: dict[LinkRef, LinkRef] = {}
+        self._root: LinkRef | None = None
         self._frozen = False
 
-    def reserve(self) -> OccurrenceRef:
+    def reserve(self) -> LinkRef:
         """Reserve a technical handle; reservation alone has no semantic meaning."""
 
         self._require_mutable()
-        ref = OccurrenceRef(self._scope, len(self._refs))
+        ref = LinkRef(self._scope, len(self._refs))
         self._refs.append(ref)
         self._links.append(None)
         return ref
 
-    def ensure_root(self) -> OccurrenceRef:
+    def ensure_root(self) -> LinkRef:
         """Return the unique fully self-closed root, constructing it once."""
 
         self._require_mutable()
@@ -297,7 +296,7 @@ class LinkNetworkBuilder:
         self.define(root, root, root)
         return root
 
-    def ensure_start_self_closed(self, end: OccurrenceRef) -> OccurrenceRef:
+    def ensure_start_self_closed(self, end: LinkRef) -> LinkRef:
         """Return the unique ``S = S ⟼ end`` form for a distinguished ``end``."""
 
         self._require_mutable()
@@ -309,7 +308,7 @@ class LinkNetworkBuilder:
         self.define(ref, ref, end)
         return ref
 
-    def ensure_end_self_closed(self, start: OccurrenceRef) -> OccurrenceRef:
+    def ensure_end_self_closed(self, start: LinkRef) -> LinkRef:
         """Return the unique ``E = start ⟼ E`` form for a distinguished ``start``."""
 
         self._require_mutable()
@@ -323,9 +322,9 @@ class LinkNetworkBuilder:
 
     def define(
         self,
-        ref: OccurrenceRef,
-        start: OccurrenceRef,
-        end: OccurrenceRef,
+        ref: LinkRef,
+        start: LinkRef,
+        end: LinkRef,
     ) -> None:
         """Define one reserved link from already-distinguished external poles."""
 
@@ -377,7 +376,7 @@ class LinkNetworkBuilder:
         elif end_self:
             self._end_self_index[start] = ref
 
-    def ensure(self, start: OccurrenceRef, end: OccurrenceRef) -> OccurrenceRef:
+    def ensure(self, start: LinkRef, end: LinkRef) -> LinkRef:
         """Return the unique link for an already-distinguished ordered pair.
 
         This operation constructs the complete form only when the pair is absent.
@@ -398,14 +397,14 @@ class LinkNetworkBuilder:
 
     def define_many(
         self,
-        definitions: Iterable[tuple[OccurrenceRef, OccurrenceRef, OccurrenceRef]],
+        definitions: Iterable[tuple[LinkRef, LinkRef, LinkRef]],
     ) -> None:
         """Define in semantic dependency order; arbitrary forward cycles reject."""
 
         for ref, start, end in definitions:
             self.define(ref, start, end)
 
-    def freeze(self, root: OccurrenceRef | None = None) -> LinkNetwork:
+    def freeze(self, root: LinkRef | None = None) -> LinkNetwork:
         self._require_mutable()
         selected_root = self._root if root is None else root
         if selected_root is None:
@@ -424,8 +423,8 @@ class LinkNetworkBuilder:
         self._frozen = True
         return LinkNetwork(self._scope, refs, links, selected_root)
 
-    def _validate_reserved(self, ref: OccurrenceRef) -> None:
-        if not isinstance(ref, OccurrenceRef):
+    def _validate_reserved(self, ref: LinkRef) -> None:
+        if not isinstance(ref, LinkRef):
             raise LinkNetworkError("expected reserved link handle")
         if ref._scope is not self._scope:
             raise LinkNetworkError("foreign reserved link handle")
@@ -434,7 +433,7 @@ class LinkNetworkBuilder:
         if self._refs[ref.slot] is not ref:
             raise LinkNetworkError("link handle was not issued by this builder")
 
-    def _validate_defined(self, ref: OccurrenceRef) -> None:
+    def _validate_defined(self, ref: LinkRef) -> None:
         self._validate_reserved(ref)
         if self._links[ref.slot] is None:
             raise LinkNetworkError(
@@ -452,7 +451,7 @@ class LinkNetworkEvolutionBuilder:
     def __init__(self, base: LinkNetwork) -> None:
         self._base = base
         self._scope = base._scope
-        self._refs: list[OccurrenceRef] = list(base._refs)
+        self._refs: list[LinkRef] = list(base._refs)
         self._links: list[Link | None] = list(base._links)
         self._pair_index = dict(base._pair_index)
         self._start_self_index = dict(base._start_self_index)
@@ -464,20 +463,20 @@ class LinkNetworkEvolutionBuilder:
     def base_count(self) -> int:
         return self._base_count
 
-    def reserve(self) -> OccurrenceRef:
+    def reserve(self) -> LinkRef:
         self._require_mutable()
-        ref = OccurrenceRef(self._scope, len(self._refs))
+        ref = LinkRef(self._scope, len(self._refs))
         self._refs.append(ref)
         self._links.append(None)
         return ref
 
-    def ensure_root(self) -> OccurrenceRef:
+    def ensure_root(self) -> LinkRef:
         """Evolution preserves and returns the already-distinguished root."""
 
         self._require_mutable()
         return self._base.root
 
-    def ensure_start_self_closed(self, end: OccurrenceRef) -> OccurrenceRef:
+    def ensure_start_self_closed(self, end: LinkRef) -> LinkRef:
         self._require_mutable()
         self._validate_defined(end)
         existing = self._start_self_index.get(end)
@@ -487,7 +486,7 @@ class LinkNetworkEvolutionBuilder:
         self.define(ref, ref, end)
         return ref
 
-    def ensure_end_self_closed(self, start: OccurrenceRef) -> OccurrenceRef:
+    def ensure_end_self_closed(self, start: LinkRef) -> LinkRef:
         self._require_mutable()
         self._validate_defined(start)
         existing = self._end_self_index.get(start)
@@ -499,9 +498,9 @@ class LinkNetworkEvolutionBuilder:
 
     def define(
         self,
-        ref: OccurrenceRef,
-        start: OccurrenceRef,
-        end: OccurrenceRef,
+        ref: LinkRef,
+        start: LinkRef,
+        end: LinkRef,
     ) -> None:
         self._require_mutable()
         self._validate_reserved(ref)
@@ -550,7 +549,7 @@ class LinkNetworkEvolutionBuilder:
         elif end_self:
             self._end_self_index[start] = ref
 
-    def ensure(self, start: OccurrenceRef, end: OccurrenceRef) -> OccurrenceRef:
+    def ensure(self, start: LinkRef, end: LinkRef) -> LinkRef:
         self._require_mutable()
         self._validate_defined(start)
         self._validate_defined(end)
@@ -563,12 +562,12 @@ class LinkNetworkEvolutionBuilder:
 
     def define_many(
         self,
-        definitions: Iterable[tuple[OccurrenceRef, OccurrenceRef, OccurrenceRef]],
+        definitions: Iterable[tuple[LinkRef, LinkRef, LinkRef]],
     ) -> None:
         for ref, start, end in definitions:
             self.define(ref, start, end)
 
-    def freeze(self, root: OccurrenceRef | None = None) -> LinkNetwork:
+    def freeze(self, root: LinkRef | None = None) -> LinkNetwork:
         self._require_mutable()
         selected_root = self._base.root if root is None else root
         self._validate_defined(selected_root)
@@ -591,8 +590,8 @@ class LinkNetworkEvolutionBuilder:
         self._frozen = True
         return LinkNetwork(self._scope, refs, links, selected_root)
 
-    def _validate_reserved(self, ref: OccurrenceRef) -> None:
-        if not isinstance(ref, OccurrenceRef):
+    def _validate_reserved(self, ref: LinkRef) -> None:
+        if not isinstance(ref, LinkRef):
             raise LinkNetworkError("expected network link handle")
         if ref._scope is not self._scope:
             raise LinkNetworkError("foreign network link handle")
@@ -601,7 +600,7 @@ class LinkNetworkEvolutionBuilder:
         if self._refs[ref.slot] is not ref:
             raise LinkNetworkError("link handle was not issued by this runtime scope")
 
-    def _validate_defined(self, ref: OccurrenceRef) -> None:
+    def _validate_defined(self, ref: LinkRef) -> None:
         self._validate_reserved(ref)
         if self._links[ref.slot] is None:
             raise LinkNetworkError(

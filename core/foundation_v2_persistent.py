@@ -27,11 +27,11 @@ from pathlib import Path
 from typing import Iterable
 from uuid import uuid4
 
-from .exact_link_network import (
+from .rooted_link_network import (
     LinkNetwork,
     LinkNetworkError,
     NetworkSnapshot,
-    OccurrenceRef,
+    LinkRef,
 )
 from .foundation_v2_materialization import (
     MaterializedEdge,
@@ -405,7 +405,7 @@ class JsonLinkStore:
         self,
         *,
         count: int | None = None,
-    ) -> tuple[LinkNetwork, dict[PersistentLinkId, OccurrenceRef]]:
+    ) -> tuple[LinkNetwork, dict[PersistentLinkId, LinkRef]]:
         """Reconstruct canonical runtime topology with fresh technical handles."""
 
         self._require_open()
@@ -437,7 +437,7 @@ class JsonLinkStore:
     ) -> tuple[
         LinkNetwork,
         LinkNetwork,
-        dict[PersistentLinkId, OccurrenceRef],
+        dict[PersistentLinkId, LinkRef],
     ]:
         """Reconstruct before/after runtime states in one technical runtime scope."""
 
@@ -451,7 +451,7 @@ class JsonLinkStore:
 
         before, initial_mapping = self.runtime_network(count=before_count)
         evolution = before.evolve()
-        refs: dict[int, OccurrenceRef] = {
+        refs: dict[int, LinkRef] = {
             persistent.local: runtime
             for persistent, runtime in initial_mapping.items()
         }
@@ -619,7 +619,7 @@ def materialize_persistent_sequence(
         edge.ref: index for index, edge in enumerate(runtime_effect.created)
     }
 
-    def endpoint(ref: OccurrenceRef, current_index: int) -> BatchEndpoint:
+    def endpoint(ref: LinkRef, current_index: int) -> BatchEndpoint:
         persistent = runtime_to_persistent.get(ref)
         if persistent is not None:
             return persistent
@@ -734,7 +734,7 @@ def replay_persistent_sequence_materialization(
 
 def _runtime_description(
     description: PersistentSequenceDescription,
-    mapping: dict[PersistentLinkId, OccurrenceRef],
+    mapping: dict[PersistentLinkId, LinkRef],
 ) -> SequenceDescription:
     try:
         root = mapping[description.root]
@@ -748,7 +748,7 @@ def _runtime_description(
 
 def _runtime_item(
     item: PersistentSequenceItem,
-    mapping: dict[PersistentLinkId, OccurrenceRef],
+    mapping: dict[PersistentLinkId, LinkRef],
 ):
     if isinstance(item, PersistentSequenceAtom):
         try:
@@ -761,9 +761,9 @@ def _runtime_item(
 
 
 def _persistent_endpoint(
-    runtime: OccurrenceRef,
-    old: dict[OccurrenceRef, PersistentLinkId],
-    created_index: dict[OccurrenceRef, int],
+    runtime: LinkRef,
+    old: dict[LinkRef, PersistentLinkId],
+    created_index: dict[LinkRef, int],
     new: tuple[PersistentLinkId, ...],
 ) -> PersistentLinkId:
     persistent = old.get(runtime)

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from core.exact_link_network import LinkNetworkBuilder, LinkNetworkError
+from core.rooted_link_network import LinkNetworkBuilder, LinkNetworkError
 from core.foundation_v2 import build_root_kernel as public_build_root_kernel
 from core.foundation_v2_root import (
     FoundationRootKernel,

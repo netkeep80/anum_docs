@@ -4,7 +4,7 @@ from dataclasses import replace
 
 import pytest
 
-from core.exact_link_network import LinkNetworkBuilder
+from core.rooted_link_network import LinkNetworkBuilder
 from core.foundation_v2_interpreter import (
     ColonEffectEvidence,
     ColonRoleRefs,

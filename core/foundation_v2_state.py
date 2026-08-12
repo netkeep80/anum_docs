@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .exact_link_network import LinkNetwork, LinkNetworkBuilder, OccurrenceRef
+from .rooted_link_network import LinkNetwork, LinkNetworkBuilder, LinkRef
 
 
 class FoundationStateError(ValueError):
@@ -33,30 +33,30 @@ class RepresentativeConflictError(FoundationStateError):
 
 @dataclass(frozen=True)
 class DictionaryEffectRefs:
-    entry: OccurrenceRef
-    occurrence: OccurrenceRef
-    history_after: OccurrenceRef
-    after_scope: OccurrenceRef
+    entry: LinkRef
+    occurrence: LinkRef
+    history_after: LinkRef
+    after_scope: LinkRef
 
 
 @dataclass(frozen=True)
 class ScopedDictionaryResolution:
-    scope: OccurrenceRef
-    form: OccurrenceRef
-    occurrences: tuple[OccurrenceRef, ...]
+    scope: LinkRef
+    form: LinkRef
+    occurrences: tuple[LinkRef, ...]
 
 
 @dataclass(frozen=True)
 class LocalRepresentativeResolution:
-    member: OccurrenceRef
-    representative: OccurrenceRef
-    bindings: tuple[OccurrenceRef, ...]
+    member: LinkRef
+    representative: LinkRef
+    bindings: tuple[LinkRef, ...]
 
 
 def define_source_occurrence(
     builder: LinkNetworkBuilder,
-    content: OccurrenceRef,
-) -> OccurrenceRef:
+    content: LinkRef,
+) -> LinkRef:
     """Return canonical source form ``S = S ⟼ content``."""
 
     return builder.ensure_start_self_closed(content)
@@ -64,16 +64,16 @@ def define_source_occurrence(
 
 def define_context(
     builder: LinkNetworkBuilder,
-    parent: OccurrenceRef,
-    current: OccurrenceRef,
-) -> OccurrenceRef:
+    parent: LinkRef,
+    current: LinkRef,
+) -> LinkRef:
     """Return canonical context ``K = K ⟼ (parent ⟼ current)``."""
 
     pair = builder.ensure(parent, current)
     return builder.ensure_start_self_closed(pair)
 
 
-def current_of_context(network: LinkNetwork, context: OccurrenceRef) -> OccurrenceRef:
+def current_of_context(network: LinkNetwork, context: LinkRef) -> LinkRef:
     context_link = network.link(context)
     if context_link.start is not context:
         raise FoundationStateError("context is not start-self-closed")
@@ -81,7 +81,7 @@ def current_of_context(network: LinkNetwork, context: OccurrenceRef) -> Occurren
     return pair.end
 
 
-def parent_of_context(network: LinkNetwork, context: OccurrenceRef) -> OccurrenceRef:
+def parent_of_context(network: LinkNetwork, context: LinkRef) -> LinkRef:
     context_link = network.link(context)
     if context_link.start is not context:
         raise FoundationStateError("context is not start-self-closed")
@@ -91,10 +91,10 @@ def parent_of_context(network: LinkNetwork, context: OccurrenceRef) -> Occurrenc
 
 def define_local_representative_binding(
     builder: LinkNetworkBuilder,
-    context: OccurrenceRef,
-    member: OccurrenceRef,
-    representative: OccurrenceRef,
-) -> tuple[OccurrenceRef, OccurrenceRef]:
+    context: LinkRef,
+    member: LinkRef,
+    representative: LinkRef,
+) -> tuple[LinkRef, LinkRef]:
     pair = builder.ensure(member, representative)
     binding = builder.ensure(context, pair)
     return pair, binding
@@ -102,12 +102,12 @@ def define_local_representative_binding(
 
 def local_representative_resolution(
     network: LinkNetwork,
-    context: OccurrenceRef,
-    member: OccurrenceRef,
+    context: LinkRef,
+    member: LinkRef,
 ) -> LocalRepresentativeResolution:
     current_of_context(network, context)
 
-    matches: list[tuple[OccurrenceRef, OccurrenceRef]] = []
+    matches: list[tuple[LinkRef, LinkRef]] = []
     for binding_ref in network.refs:
         if binding_ref is context:
             continue
@@ -140,17 +140,17 @@ def local_representative_resolution(
 
 def local_representative(
     network: LinkNetwork,
-    context: OccurrenceRef,
-    member: OccurrenceRef,
-) -> OccurrenceRef:
+    context: LinkRef,
+    member: LinkRef,
+) -> LinkRef:
     return local_representative_resolution(network, context, member).representative
 
 
 def define_dictionary_scope(
     builder: LinkNetworkBuilder,
-    parent_scope: OccurrenceRef,
-    local_history: OccurrenceRef,
-) -> OccurrenceRef:
+    parent_scope: LinkRef,
+    local_history: LinkRef,
+) -> LinkRef:
     """Return canonical ``D = D ⟼ (parentScope ⟼ localHistory)``."""
 
     payload = builder.ensure(parent_scope, local_history)
@@ -159,11 +159,11 @@ def define_dictionary_scope(
 
 def define_dictionary_effect(
     builder: LinkNetworkBuilder,
-    before_scope: OccurrenceRef,
-    parent_scope: OccurrenceRef,
-    history_before: OccurrenceRef,
-    source_content: OccurrenceRef,
-    form: OccurrenceRef,
+    before_scope: LinkRef,
+    parent_scope: LinkRef,
+    history_before: LinkRef,
+    source_content: LinkRef,
+    form: LinkRef,
 ) -> DictionaryEffectRefs:
     entry = builder.ensure(source_content, form)
     occurrence = builder.ensure(before_scope, entry)
@@ -179,8 +179,8 @@ def define_dictionary_effect(
 
 def read_dictionary_scope(
     network: LinkNetwork,
-    dictionary: OccurrenceRef,
-) -> tuple[OccurrenceRef, OccurrenceRef]:
+    dictionary: LinkRef,
+) -> tuple[LinkRef, LinkRef]:
     if dictionary is network.root:
         raise DictionaryLookupError("root is a dictionary sentinel, not a scope")
     scope = network.link(dictionary)
@@ -192,10 +192,10 @@ def read_dictionary_scope(
 
 def lookup_scoped_dictionary(
     network: LinkNetwork,
-    dictionary: OccurrenceRef,
-    source_content: OccurrenceRef,
+    dictionary: LinkRef,
+    source_content: LinkRef,
 ) -> ScopedDictionaryResolution | None:
-    visited_scopes: set[OccurrenceRef] = set()
+    visited_scopes: set[LinkRef] = set()
     current_scope = dictionary
     while current_scope is not network.root:
         if current_scope in visited_scopes:
@@ -222,10 +222,10 @@ def lookup_scoped_dictionary(
 
 def verify_visible_dictionary_occurrence(
     network: LinkNetwork,
-    dictionary: OccurrenceRef,
-    occurrence: OccurrenceRef,
-    source_content: OccurrenceRef,
-    form: OccurrenceRef,
+    dictionary: LinkRef,
+    occurrence: LinkRef,
+    source_content: LinkRef,
+    form: LinkRef,
 ) -> None:
     resolution = lookup_scoped_dictionary(network, dictionary, source_content)
     if resolution is None:
@@ -240,12 +240,12 @@ def verify_visible_dictionary_occurrence(
 
 def _local_dictionary_matches(
     network: LinkNetwork,
-    dictionary: OccurrenceRef,
-    source_content: OccurrenceRef,
-) -> list[tuple[OccurrenceRef, OccurrenceRef]]:
+    dictionary: LinkRef,
+    source_content: LinkRef,
+) -> list[tuple[LinkRef, LinkRef]]:
     parent, history = read_dictionary_scope(network, dictionary)
-    matches: list[tuple[OccurrenceRef, OccurrenceRef]] = []
-    visited_history: set[OccurrenceRef] = set()
+    matches: list[tuple[LinkRef, LinkRef]] = []
+    visited_history: set[LinkRef] = set()
 
     while history is not network.root:
         if history in visited_history:
@@ -275,26 +275,26 @@ def _local_dictionary_matches(
 
 def define_membership(
     builder: LinkNetworkBuilder,
-    container: OccurrenceRef,
-    value: OccurrenceRef,
-) -> OccurrenceRef:
+    container: LinkRef,
+    value: LinkRef,
+) -> LinkRef:
     return builder.ensure(container, value)
 
 
 def has_exact_membership(
     network: LinkNetwork,
-    container: OccurrenceRef,
-    value: OccurrenceRef,
+    container: LinkRef,
+    value: LinkRef,
 ) -> bool:
     return network.find(container, value) is not None
 
 
 def define_act_header(
     builder: LinkNetworkBuilder,
-    interpreter: OccurrenceRef,
-    role_dictionary: OccurrenceRef,
-    after_context: OccurrenceRef,
-) -> OccurrenceRef:
+    interpreter: LinkRef,
+    role_dictionary: LinkRef,
+    after_context: LinkRef,
+) -> LinkRef:
     """Return canonical ``A = A ⟼ (I ⟼ (D_roles ⟼ K_after))``."""
 
     pair = builder.ensure(role_dictionary, after_context)
@@ -304,8 +304,8 @@ def define_act_header(
 
 def act_header(
     network: LinkNetwork,
-    act: OccurrenceRef,
-) -> tuple[OccurrenceRef, OccurrenceRef, OccurrenceRef]:
+    act: LinkRef,
+) -> tuple[LinkRef, LinkRef, LinkRef]:
     act_link = network.link(act)
     if act_link.start is not act:
         raise FoundationStateError("act is not start-self-closed")
@@ -316,10 +316,10 @@ def act_header(
 
 def define_act_field(
     builder: LinkNetworkBuilder,
-    act: OccurrenceRef,
-    role: OccurrenceRef,
-    value: OccurrenceRef,
-) -> tuple[OccurrenceRef, OccurrenceRef]:
+    act: LinkRef,
+    role: LinkRef,
+    value: LinkRef,
+) -> tuple[LinkRef, LinkRef]:
     field = builder.ensure(role, value)
     attachment = builder.ensure(act, field)
     return field, attachment
@@ -327,10 +327,10 @@ def define_act_field(
 
 def act_values(
     network: LinkNetwork,
-    act: OccurrenceRef,
-    role: OccurrenceRef,
-) -> tuple[OccurrenceRef, ...]:
-    values: list[OccurrenceRef] = []
+    act: LinkRef,
+    role: LinkRef,
+) -> tuple[LinkRef, ...]:
+    values: list[LinkRef] = []
     for attachment_ref in network.refs:
         if attachment_ref is act:
             continue

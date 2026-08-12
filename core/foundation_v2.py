@@ -7,7 +7,7 @@ ontological identity.
 """
 from __future__ import annotations
 
-from .exact_link_network import Link, LinkNetwork, LinkNetworkBuilder, OccurrenceRef
+from .rooted_link_network import Link, LinkNetwork, LinkNetworkBuilder, LinkRef
 from .foundation_v2_checker import (
     IntegratedProofEvidence,
     ProofGoalEvidence,
@@ -74,7 +74,7 @@ __all__ = [
     "Link",
     "LinkNetwork",
     "LinkNetworkBuilder",
-    "OccurrenceRef",
+    "LinkRef",
     "PersistentLinkId",
     "PersistentSequenceAtom",
     "PersistentSequenceDescription",

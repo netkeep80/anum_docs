@@ -4,13 +4,13 @@ from dataclasses import fields
 
 import pytest
 
-from core.exact_link_network import (
+from core.rooted_link_network import (
     Link,
     LinkNetwork,
     LinkNetworkBuilder,
     LinkNetworkError,
     NetworkSnapshot,
-    OccurrenceRef,
+    LinkRef,
 )
 
 
@@ -222,7 +222,7 @@ def test_foreign_builder_handles_reject():
 def test_handcrafted_alias_handle_rejects_even_with_scope_and_slot():
     network, refs = build_reference_network()
     original = refs["linked"]
-    forged = OccurrenceRef(original._scope, original.slot)
+    forged = LinkRef(original._scope, original.slot)
     assert forged == original
     assert forged is not original
     with pytest.raises(LinkNetworkError, match="not issued by this network"):

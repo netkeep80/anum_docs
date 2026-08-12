@@ -31,7 +31,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .exact_link_network import LinkNetwork, LinkNetworkError, OccurrenceRef
+from .rooted_link_network import LinkNetwork, LinkNetworkError, LinkRef
 
 
 class SequenceMaterializationError(ValueError):
@@ -42,7 +42,7 @@ class SequenceMaterializationError(ValueError):
 class SequenceAtom:
     """One already-resolved link used as a sequence value."""
 
-    value: OccurrenceRef
+    value: LinkRef
 
 
 @dataclass(frozen=True)
@@ -63,7 +63,7 @@ SequenceItem = SequenceAtom | SequenceGroup
 class SequenceDescription:
     """Selected root-relative sequence description for one materialization."""
 
-    root: OccurrenceRef
+    root: LinkRef
     items: tuple[SequenceItem, ...]
 
 
@@ -71,9 +71,9 @@ class SequenceDescription:
 class MaterializedEdge:
     """One link physically appended by the explicit sequence effect."""
 
-    ref: OccurrenceRef
-    start: OccurrenceRef
-    end: OccurrenceRef
+    ref: LinkRef
+    start: LinkRef
+    end: LinkRef
 
 
 @dataclass(frozen=True)
@@ -83,16 +83,16 @@ class SequenceMaterialization:
     description: SequenceDescription
     after: LinkNetwork
     created: tuple[MaterializedEdge, ...]
-    result: OccurrenceRef
+    result: LinkRef
 
 
 def replay_root_opening_restoration(
     network: LinkNetwork,
-    forms: tuple[OccurrenceRef, ...],
+    forms: tuple[LinkRef, ...],
     *,
-    open_form: OccurrenceRef,
-    close_form: OccurrenceRef,
-) -> tuple[OccurrenceRef, ...]:
+    open_form: LinkRef,
+    close_form: LinkRef,
+) -> tuple[LinkRef, ...]:
     """Restore root-collapsed leading opens over resolved forms.
 
     Restoration is eligible only when the represented carrier already begins
@@ -131,10 +131,10 @@ def replay_root_opening_restoration(
 
 def replay_resolved_sequence_grouping(
     network: LinkNetwork,
-    forms: tuple[OccurrenceRef, ...],
+    forms: tuple[LinkRef, ...],
     *,
-    open_form: OccurrenceRef,
-    close_form: OccurrenceRef,
+    open_form: LinkRef,
+    close_form: LinkRef,
 ) -> SequenceDescription:
     """Replay nested grouping over already-resolved forms without effects.
 
@@ -179,9 +179,9 @@ def replay_resolved_sequence_grouping(
 def find_links(
     network: LinkNetwork,
     *,
-    start: OccurrenceRef | None = None,
-    end: OccurrenceRef | None = None,
-) -> tuple[OccurrenceRef, ...]:
+    start: LinkRef | None = None,
+    end: LinkRef | None = None,
+) -> tuple[LinkRef, ...]:
     """Read-only link search; never materializes a missing pair."""
 
     before = network.snapshot()
@@ -211,7 +211,7 @@ def materialize_sequence(
     _require_description_root(before, description)
     evolution = before.evolve()
     created: list[MaterializedEdge] = []
-    created_refs: set[OccurrenceRef] = set()
+    created_refs: set[LinkRef] = set()
 
     result = _materialize_items(
         before,
@@ -238,7 +238,7 @@ def materialize_sequence(
 def replay_sequence_materialization(
     before: LinkNetwork,
     evidence: SequenceMaterialization,
-) -> OccurrenceRef:
+) -> LinkRef:
     """Replay one already-materialized sequence effect without changing state."""
 
     before_snapshot = before.snapshot()
@@ -272,10 +272,10 @@ def replay_sequence_materialization(
 
 def _validate_resolved_grouping_inputs(
     network: LinkNetwork,
-    forms: tuple[OccurrenceRef, ...],
+    forms: tuple[LinkRef, ...],
     *,
-    open_form: OccurrenceRef,
-    close_form: OccurrenceRef,
+    open_form: LinkRef,
+    close_form: LinkRef,
 ) -> None:
     network.link(open_form)
     network.link(close_form)
@@ -288,11 +288,11 @@ def _validate_resolved_grouping_inputs(
 
 
 def _group_resolved_forms(
-    forms: tuple[OccurrenceRef, ...],
+    forms: tuple[LinkRef, ...],
     position: int,
     *,
-    open_form: OccurrenceRef,
-    close_form: OccurrenceRef,
+    open_form: LinkRef,
+    close_form: LinkRef,
     inside_group: bool,
 ) -> tuple[tuple[SequenceItem, ...], int]:
     items: list[SequenceItem] = []
@@ -342,8 +342,8 @@ def _materialize_items(
     evolution,
     items: tuple[SequenceItem, ...],
     created: list[MaterializedEdge],
-    created_refs: set[OccurrenceRef],
-) -> OccurrenceRef:
+    created_refs: set[LinkRef],
+) -> LinkRef:
     if not items:
         return before.root
 
@@ -366,8 +366,8 @@ def _materialize_item(
     evolution,
     item: SequenceItem,
     created: list[MaterializedEdge],
-    created_refs: set[OccurrenceRef],
-) -> OccurrenceRef:
+    created_refs: set[LinkRef],
+) -> LinkRef:
     if isinstance(item, SequenceAtom):
         try:
             before.link(item.value)
@@ -418,14 +418,14 @@ def _verify_persistent_lineage(
 @dataclass
 class _ReplayTracker:
     base_count: int
-    first_created_uses: list[OccurrenceRef] = None  # type: ignore[assignment]
-    seen_created: set[OccurrenceRef] = None  # type: ignore[assignment]
+    first_created_uses: list[LinkRef] = None  # type: ignore[assignment]
+    seen_created: set[LinkRef] = None  # type: ignore[assignment]
 
     def __post_init__(self) -> None:
         self.first_created_uses = []
         self.seen_created = set()
 
-    def observe(self, ref: OccurrenceRef) -> None:
+    def observe(self, ref: LinkRef) -> None:
         if ref.slot < self.base_count or ref in self.seen_created:
             return
         self.seen_created.add(ref)
@@ -437,7 +437,7 @@ def _replay_items(
     after: LinkNetwork,
     items: tuple[SequenceItem, ...],
     tracker: _ReplayTracker,
-) -> OccurrenceRef:
+) -> LinkRef:
     if not items:
         return before.root
 
@@ -459,7 +459,7 @@ def _replay_item(
     after: LinkNetwork,
     item: SequenceItem,
     tracker: _ReplayTracker,
-) -> OccurrenceRef:
+) -> LinkRef:
     if isinstance(item, SequenceAtom):
         before.link(item.value)
         after.link(item.value)
