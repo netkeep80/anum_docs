@@ -1,0 +1,148 @@
+{
+  "schema": "foundation-v2-cutover-classification/v0.1",
+  "issue": 276,
+  "baseline": {
+    "currentMtsContract": "mts-contract/v0.6",
+    "foundationV2Accepted": false,
+    "cutoverPerformed": false,
+    "downstreamRepinAllowed": false
+  },
+  "consumerScope": "direct Python imports among core/*.py and converters/*.py; tests/docs are ownership evidence, not production consumers",
+  "classifications": {
+    "core/foundation_v2.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_checker.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_interpreter.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_materialization.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_persistent.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_proof.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_root.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_run.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_source.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_state.py": "FOUNDATION_V2_LIVE",
+    "core/rooted_link_network.py": "FOUNDATION_V2_LIVE",
+    "core/anum_carrier.py": "PRESERVED_NEUTRAL",
+    "core/anum_memory.py": "PRESERVED_NEUTRAL",
+    "core/anum_model.py": "PRESERVED_NEUTRAL",
+    "core/anum_parser.py": "PRESERVED_NEUTRAL",
+    "core/anum_protocol.py": "PRESERVED_NEUTRAL",
+    "core/mtc_ast.py": "HISTORICAL_SEMANTIC_ISLAND",
+    "core/mtc_context_analysis.py": "HISTORICAL_SEMANTIC_ISLAND",
+    "core/mtc_definitions.py": "HISTORICAL_SEMANTIC_ISLAND",
+    "core/mtc_interpreter.py": "HISTORICAL_SEMANTIC_ISLAND",
+    "core/mtc_opening_path.py": "HISTORICAL_SEMANTIC_ISLAND",
+    "core/mtc_parser.py": "HISTORICAL_SEMANTIC_ISLAND",
+    "core/mtc_value_bundle.py": "HISTORICAL_SEMANTIC_ISLAND",
+    "core/proof_checker.py": "HISTORICAL_SEMANTIC_ISLAND",
+    "core/root_library.py": "HISTORICAL_SEMANTIC_ISLAND",
+    "core/validate_root.py": "HISTORICAL_ENTRYPOINT",
+    "converters/__init__.py": "NON_SEMANTIC_TOOLING",
+    "converters/anum_cli.py": "NON_SEMANTIC_TOOLING",
+    "converters/anum_to_text.py": "NON_SEMANTIC_TOOLING",
+    "converters/ascii_unicode.py": "NON_SEMANTIC_TOOLING",
+    "converters/text_to_anum.py": "NON_SEMANTIC_TOOLING"
+  },
+  "historicalDecisions": {
+    "core/mtc_ast.py": {
+      "replacementLiveOwners": [
+        "core/foundation_v2_source.py"
+      ],
+      "deleteInC7": true,
+      "deletePrecondition": "all semantic parser/AST consumers migrate to selected source evidence; any surviving AST is reclassified NON_SEMANTIC_TOOLING"
+    },
+    "core/mtc_definitions.py": {
+      "replacementLiveOwners": [
+        "core/foundation_v2_state.py",
+        "core/foundation_v2_source.py"
+      ],
+      "deleteInC7": true,
+      "deletePrecondition": "definition/dictionary consumers migrate to rooted state/source evidence"
+    },
+    "core/mtc_interpreter.py": {
+      "replacementLiveOwners": [
+        "core/foundation_v2_interpreter.py",
+        "core/foundation_v2_run.py"
+      ],
+      "deleteInC7": true,
+      "deletePrecondition": "all trusted interpretation consumers use the Foundation-v2 replay path"
+    },
+    "core/mtc_opening_path.py": {
+      "replacementLiveOwners": [
+        "core/foundation_v2_checker.py",
+        "core/foundation_v2_proof.py"
+      ],
+      "deleteInC7": true,
+      "deletePrecondition": "opening-path behavior is either represented by accepted Foundation-v2 evidence or explicitly classified as an intentional delta"
+    },
+    "core/mtc_parser.py": {
+      "replacementLiveOwners": [
+        "core/foundation_v2_source.py"
+      ],
+      "deleteInC7": true,
+      "deletePrecondition": "semantic source consumers migrate; any parser kept for presentation is reclassified NON_SEMANTIC_TOOLING"
+    },
+    "core/proof_checker.py": {
+      "replacementLiveOwners": [
+        "core/foundation_v2_checker.py",
+        "core/foundation_v2_proof.py",
+        "core/foundation_v2_run.py"
+      ],
+      "deleteInC7": true,
+      "deletePrecondition": "trusted proof consumers migrate to the Foundation-v2 checker/replay path"
+    },
+    "core/root_library.py": {
+      "replacementLiveOwners": [
+        "core/foundation_v2_root.py"
+      ],
+      "deleteInC7": true,
+      "deletePrecondition": "root/bootstrap consumers use constructive rooted Foundation-v2 bootstrap"
+    },
+    "core/validate_root.py": {
+      "replacementLiveOwners": [
+        "core/foundation_v2_root.py"
+      ],
+      "deleteInC7": true,
+      "deletePrecondition": "historical ten-formula root validation is no longer a production gate"
+    },
+    "core/mtc_context_analysis.py": {
+      "replacementLiveOwners": [],
+      "deleteInC7": false,
+      "deletePrecondition": "requires an explicit P3 decision for current direct-deixis v0.5 before deletion; do not invent a Foundation-v2 replacement"
+    },
+    "core/mtc_value_bundle.py": {
+      "replacementLiveOwners": [],
+      "deleteInC7": false,
+      "deletePrecondition": "requires an explicit P3 decision for current value-bundle v0.2 before deletion; do not invent a Foundation-v2 replacement"
+    }
+  },
+  "publicFacadeDirectDeps": [
+    "core/rooted_link_network.py",
+    "core/foundation_v2_checker.py",
+    "core/foundation_v2_interpreter.py",
+    "core/foundation_v2_materialization.py",
+    "core/foundation_v2_persistent.py",
+    "core/foundation_v2_proof.py",
+    "core/foundation_v2_root.py",
+    "core/foundation_v2_run.py",
+    "core/foundation_v2_source.py"
+  ],
+  "c7DeletionSet": [
+    "core/mtc_ast.py",
+    "core/mtc_definitions.py",
+    "core/mtc_interpreter.py",
+    "core/mtc_opening_path.py",
+    "core/mtc_parser.py",
+    "core/proof_checker.py",
+    "core/root_library.py",
+    "core/validate_root.py"
+  ],
+  "rootedVetoTests": {
+    "tests/test_mts_rooted_link_network.py": [
+      "test_root_is_the_only_fully_self_closed_link",
+      "test_second_fully_self_closed_link_is_rejected_before_freeze",
+      "test_duplicate_equal_pair_definition_is_rejected",
+      "test_mutual_cycle_cannot_be_created_from_only_reserved_ids",
+      "test_ensure_reuses_the_same_link_for_the_same_pair",
+      "test_snapshot_slots_are_transport_coordinates_not_semantic_identity"
+    ]
+  }
+}
