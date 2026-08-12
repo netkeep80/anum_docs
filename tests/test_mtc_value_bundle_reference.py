@@ -1,12 +1,38 @@
 """Исполняет принятый корпус плоских пучков значений через единое ядро."""
 
+import inspect
 import json
 from pathlib import Path
 
 import pytest
 
 from core.anum_memory import AnumMemory
-from core.mtc_ast import BundleForm, Sequence, SquareForm, Symbol
+from core.foundation_v2_value_bundle import (
+    ExpectedRole as RootedExpectedRole,
+    ValueBundleReplayError,
+    ValueBundleSkeletonBuilder,
+    ValueBundleVocabulary,
+    build_value_bundle_vocabulary,
+    elaborate_bundle_skeleton,
+)
+from core.mtc_ast import (
+    BundleForm,
+    ContextPronoun,
+    Definition,
+    EndProjection,
+    Equality,
+    Form,
+    Inequality,
+    Inversion,
+    Judgment,
+    LinkForm,
+    Literal,
+    RoundForm,
+    Sequence,
+    SquareForm,
+    StartProjection,
+    Symbol,
+)
 from core.mtc_interpreter import ContextFrame, interpret_constraints
 from core.mtc_parser import parse_formula
 from core.mtc_value_bundle import (
@@ -20,6 +46,7 @@ from core.mtc_value_bundle import (
     expand_bundle_query,
     values_equal,
 )
+from core.rooted_link_network import LinkNetwork, LinkNetworkBuilder, LinkRef
 
 
 ROOT = Path(__file__).parents[1]
@@ -29,6 +56,7 @@ ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 INTERPRETER = ROOT / "core" / "mtc_interpreter.py"
 REFERENCE_CORE = ROOT / "core" / "mtc_value_bundle.py"
 MEMORY_CORE = ROOT / "core" / "anum_memory.py"
+ROOTED_VALUE_BUNDLE_CORE = ROOT / "core" / "foundation_v2_value_bundle.py"
 
 
 def corpus() -> dict:
@@ -256,3 +284,186 @@ def test_existing_constraint_bundle_interpreter_behavior_is_unchanged():
     assert same_poles.success is True
     assert empty.holes == ()
     assert same_poles.holes == ()
+
+
+# P3b challenge: the projection below is test-only differential evidence. The
+# candidate core never imports the historical parser/AST.
+
+def _rooted_entry(case: dict) -> RootedExpectedRole:
+    if case.get("context") == "constraint-entry":
+        return RootedExpectedRole.CONSTRAINT
+    if case.get("context") in {"form-required", "value-entry"}:
+        return RootedExpectedRole.VALUE
+    return RootedExpectedRole.NONE
+
+
+def _project_rooted_value_bundle(expression, skeleton: ValueBundleSkeletonBuilder) -> LinkRef:
+    if isinstance(expression, BundleForm):
+        return skeleton.bundle(
+            _project_rooted_value_bundle(item, skeleton) for item in expression.items
+        )
+    if isinstance(expression, Definition):
+        return skeleton.definition(
+            _project_rooted_value_bundle(expression.target, skeleton),
+            _project_rooted_value_bundle(expression.value, skeleton),
+        )
+    if isinstance(expression, (Equality, Inequality)):
+        return skeleton.comparison(
+            _project_rooted_value_bundle(expression.left, skeleton),
+            _project_rooted_value_bundle(expression.right, skeleton),
+        )
+    if isinstance(expression, Sequence):
+        return skeleton.sequence(
+            _project_rooted_value_bundle(item, skeleton) for item in expression.items
+        )
+    if isinstance(expression, LinkForm):
+        return skeleton.scalar_op(
+            (
+                _project_rooted_value_bundle(expression.left, skeleton),
+                _project_rooted_value_bundle(expression.right, skeleton),
+            )
+        )
+    if isinstance(expression, (StartProjection, EndProjection, Inversion)):
+        return skeleton.scalar_op(
+            (_project_rooted_value_bundle(expression.value, skeleton),)
+        )
+    if isinstance(expression, RoundForm):
+        child = (
+            None
+            if expression.content is None
+            else _project_rooted_value_bundle(expression.content, skeleton)
+        )
+        return skeleton.group(child)
+    if isinstance(expression, SquareForm):
+        return skeleton.form()
+    if isinstance(expression, (Symbol, Literal, ContextPronoun)):
+        return skeleton.form()
+    if isinstance(expression, Judgment):
+        return skeleton.judgment()
+    if isinstance(expression, Form):
+        return skeleton.form()
+    raise TypeError(f"unsupported challenge AST node: {type(expression).__name__}")
+
+
+def _build_rooted_value_bundle(source: str):
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    vocabulary = build_value_bundle_vocabulary(builder)
+    skeleton = ValueBundleSkeletonBuilder(builder, vocabulary)
+    carrier = _project_rooted_value_bundle(parse_formula(source), skeleton)
+    return builder.freeze(root), carrier, vocabulary
+
+
+def _remap_rooted_value_bundle_vocabulary(
+    network: LinkNetwork,
+    vocabulary: ValueBundleVocabulary,
+) -> ValueBundleVocabulary:
+    return ValueBundleVocabulary(
+        **{name: network.refs[ref.slot] for name, ref in vocabulary.__dict__.items()}
+    )
+
+
+def test_p3b_current_elaboration_corpus_factors_through_rooted_skeleton():
+    for case in corpus()["elaboration"]:
+        network, carrier, vocabulary = _build_rooted_value_bundle(case["source"])
+        before = network.snapshot()
+        elaboration = elaborate_bundle_skeleton(
+            network,
+            carrier,
+            vocabulary,
+            entry=_rooted_entry(case),
+        )
+        role = elaboration.role_at(_path(case))
+        assert role is not None, case["id"]
+        assert role.value == case["expectedRole"], case["id"]
+        assert network.snapshot() == before, case["id"]
+
+
+def test_p3b_current_static_rejections_keep_exact_error_codes():
+    for case in corpus()["staticRejections"]:
+        network, carrier, vocabulary = _build_rooted_value_bundle(case["source"])
+        before = network.snapshot()
+        with pytest.raises(ValueBundleReplayError) as caught:
+            elaborate_bundle_skeleton(
+                network,
+                carrier,
+                vocabulary,
+                entry=_rooted_entry(case),
+            )
+        assert caught.value.code == case["error"], case["id"]
+        assert network.snapshot() == before, case["id"]
+
+
+def test_p3b_operator_spelling_outside_observed_role_structure_is_not_authority():
+    eq_network, eq_carrier, eq_vocabulary = _build_rooted_value_bundle("{} = x")
+    ne_network, ne_carrier, ne_vocabulary = _build_rooted_value_bundle("{} != x")
+
+    left = elaborate_bundle_skeleton(eq_network, eq_carrier, eq_vocabulary)
+    right = elaborate_bundle_skeleton(ne_network, ne_carrier, ne_vocabulary)
+    assert left == right
+    assert left.role_at((0,)).value == "ValueBundle"
+
+
+def test_p3b_snapshot_reload_changes_handles_but_not_role_result():
+    network, carrier, vocabulary = _build_rooted_value_bundle("{x = y, y != z}")
+    expected = elaborate_bundle_skeleton(network, carrier, vocabulary)
+    restored = LinkNetwork.from_snapshot(network.snapshot())
+    restored_carrier = restored.refs[carrier.slot]
+    restored_vocabulary = _remap_rooted_value_bundle_vocabulary(restored, vocabulary)
+
+    assert restored_carrier != carrier
+    assert elaborate_bundle_skeleton(
+        restored,
+        restored_carrier,
+        restored_vocabulary,
+    ) == expected
+
+
+def test_p3b_repeated_positions_reuse_one_semantic_leaf():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    vocabulary = build_value_bundle_vocabulary(builder)
+    skeleton = ValueBundleSkeletonBuilder(builder, vocabulary)
+    form = skeleton.form()
+    carrier = skeleton.bundle((form, form))
+    network = builder.freeze(root)
+
+    result = elaborate_bundle_skeleton(network, carrier, vocabulary)
+    assert result.role_at(()) is not None
+    assert result.role_at(()).value == "ValueBundle"
+
+
+def test_p3b_non_rooted_structural_child_carrier_is_rejected_finitely():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    vocabulary = build_value_bundle_vocabulary(builder)
+    malformed = builder.ensure(vocabulary.bundle_tag, vocabulary.start_role)
+    network = builder.freeze(root)
+
+    with pytest.raises(ValueBundleReplayError) as caught:
+        elaborate_bundle_skeleton(network, malformed, vocabulary)
+    assert caught.value.code == "children-not-rooted"
+
+
+def test_p3b_core_has_no_historical_semantic_dependency_or_query_materialization():
+    source = ROOTED_VALUE_BUNDLE_CORE.read_text(encoding="utf-8")
+    query_source = inspect.getsource(elaborate_bundle_skeleton)
+
+    for forbidden in (
+        "mtc_ast",
+        "mtc_parser",
+        "mtc_interpreter",
+        "anum_memory",
+        "ContextFrame",
+        "MemoryView",
+        "FormResolver",
+    ):
+        assert forbidden not in source
+    assert "ensure(" not in query_source
+
+
+def test_p3b_current_value_bundle_contract_stays_accepted_and_unmodified():
+    surface = _contract()
+    assert surface["schema"] == "mts-value-bundle/v0.2"
+    assert surface["status"] == "accepted"
+    assert surface["accepted"] is True
