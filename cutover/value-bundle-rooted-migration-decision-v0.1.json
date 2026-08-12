@@ -1,0 +1,65 @@
+{
+  "schema": "value-bundle-rooted-migration-decision/v0.1",
+  "issue": 391,
+  "parentIssue": 382,
+  "evidence": {
+    "challengeIssue": 387,
+    "pullRequest": 389,
+    "mergeCommit": "775078f95995b1de6157ace10a033b36af496ab3",
+    "executableCorpusGate": "tests/test_mts_foundation_v2_value_bundle.py"
+  },
+  "decision": "PRESERVE_BY_ROOTED_MIGRATION",
+  "current": {
+    "outerContract": "mts-contract/v0.6",
+    "surface": "mts-value-bundle/v0.2",
+    "referenceCore": "core/mtc_value_bundle.py",
+    "mutateInPlace": false
+  },
+  "next": {
+    "surfaceCandidate": "mts-value-bundle/v0.3",
+    "referenceCore": "core/foundation_v2_value_bundle.py",
+    "staticInput": "explicit rooted kind-tag -> R-rooted(children...) role skeleton",
+    "resolvedInput": "canonical semantic Links plus ordered occurrence checker coordinates",
+    "observableStaticRolesChanged": false,
+    "observableStaticErrorCodesChanged": false,
+    "observableValueEqualityChanged": false,
+    "observableExpansionChanged": false,
+    "historicalTypedAstIsNormativeInput": false,
+    "sourceOffsetIsSemanticIdentity": false,
+    "runtimeHandleIsSemanticIdentity": false,
+    "occurrencePathIsSemanticIdentity": false,
+    "occurrencePathRole": "ordered provenance/checker coordinate only",
+    "bundleIdentity": "extensional set of resolved canonical semantic Links",
+    "occurrenceResolutionBeforeDedup": true,
+    "singletonBundleCoercion": false,
+    "expansionSearchOwner": "core/foundation_v2_materialization.py:find_links",
+    "readOnly": true,
+    "materializesMissingPairs": false
+  },
+  "preservedBoundaries": {
+    "nestedValueBundleAccepted": false,
+    "bundleValuedDefinitionAccepted": false,
+    "scalarOperatorLiftingAccepted": false,
+    "emptyBundleWildcardOnlyInExpansionEndpoint": true,
+    "missingPairOmitted": true,
+    "interpretMayRealize": false,
+    "interpretMayDelete": false,
+    "globalRewrite": false
+  },
+  "c7": {
+    "deleteOldOwner": true,
+    "deletePath": "core/mtc_value_bundle.py",
+    "replacementLiveOwner": "core/foundation_v2_value_bundle.py",
+    "deleteOnlyDuringAtomicCutover": true,
+    "currentContractsRemainUntilCutover": true
+  },
+  "veto": {
+    "compatibilityAstSemanticMode": false,
+    "valueBundleEqualsSequenceGroup": false,
+    "implicitWrites": false,
+    "dedupBeforeOccurrenceResolution": false,
+    "singletonBundleCoercion": false,
+    "technicalIdentitySemantics": false,
+    "currentV06Mutation": false
+  }
+}
