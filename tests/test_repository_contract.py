@@ -296,3 +296,12 @@ def test_anum_protocol_has_one_active_projection_and_quote_path():
 def test_root_library_validates():
     result = validate_root_library(ROOT_FIXTURE)
     assert result.is_valid, result.messages
+
+
+def test_superseded_semantic_carrier_runtime_is_physically_absent():
+    assert not (ROOT / "core/semantic_carrier.py").exists()
+    assert not (ROOT / "tests/test_semantic_carrier.py").exists()
+
+    rooted_source = (ROOT / "core/rooted_link_network.py").read_text(encoding="utf-8")
+    assert "class LinkNetwork" in rooted_source
+    assert "duplicate semantic link pair" in rooted_source
