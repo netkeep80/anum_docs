@@ -16,6 +16,15 @@ from .foundation_v2_checker import (
     ProofJudgmentEvidence,
     replay_integrated_proof,
 )
+from .foundation_v2_direct_deixis import (
+    DeicticOccurrence,
+    DeicticPole,
+    DirectDeixisReplayError,
+    DirectDeixisSkeletonBuilder,
+    DirectDeixisVocabulary,
+    analyze_direct_deixis_carrier,
+    build_direct_deixis_vocabulary,
+)
 from .foundation_v2_interpreter import (
     ColonEffectEvidence,
     EqualityEvaluationEvidence,
@@ -68,6 +77,11 @@ from .foundation_v2_source import (
 __all__ = [
     "ColonEffectEvidence",
     "DecomposeEqualityEvidence",
+    "DeicticOccurrence",
+    "DeicticPole",
+    "DirectDeixisReplayError",
+    "DirectDeixisSkeletonBuilder",
+    "DirectDeixisVocabulary",
     "EqualityEvaluationEvidence",
     "FoundationRootKernel",
     "FoundationRootRefs",
@@ -92,6 +106,8 @@ __all__ = [
     "SequenceMaterialization",
     "SourceFrontEndBuilder",
     "SourceFrontEndEvidence",
+    "analyze_direct_deixis_carrier",
+    "build_direct_deixis_vocabulary",
     "build_root_kernel",
     "find_links",
     "materialize_persistent_sequence",
