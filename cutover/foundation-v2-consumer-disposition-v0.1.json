@@ -53,16 +53,6 @@
       "disposition": "DELETE_WITH_OWNER",
       "reason": "superseded by rooted direct-deixis challenge and P3a decision"
     },
-    "tests/test_mts_foundation_v2_direct_deixis.py": {
-      "disposition": "MIGRATE_TO_FOUNDATION_V2",
-      "target": "core/foundation_v2_direct_deixis.py",
-      "reason": "keep rooted conformance but replace test-only historical AST/parser projection with explicit rooted fixtures"
-    },
-    "tests/test_mts_foundation_v2_value_bundle.py": {
-      "disposition": "MIGRATE_TO_FOUNDATION_V2",
-      "target": "core/foundation_v2_value_bundle.py",
-      "reason": "keep rooted conformance but replace test-only historical AST/parser projection with explicit rooted fixtures"
-    },
     "tests/test_mts_opening_path_reference.py": {
       "disposition": "DELETE_WITH_OWNER",
       "reason": "historical opening-path reference runtime is not a post-C7 live owner"
@@ -79,6 +69,22 @@
     "tests/test_root_library.py": {
       "disposition": "DELETE_WITH_OWNER",
       "reason": "historical root-library/parser semantics, including superseded projection notation, must leave the live tree"
+    }
+  },
+  "resolvedConsumers": {
+    "tests/test_mts_foundation_v2_direct_deixis.py": {
+      "disposition": "MIGRATE_TO_FOUNDATION_V2",
+      "target": "core/foundation_v2_direct_deixis.py",
+      "reason": "rooted conformance now uses explicit NODE/OPAQUE/PRONOUN evidence without historical AST/parser projection",
+      "resolvedByIssue": 400,
+      "currentHistoricalImports": false
+    },
+    "tests/test_mts_foundation_v2_value_bundle.py": {
+      "disposition": "MIGRATE_TO_FOUNDATION_V2",
+      "target": "core/foundation_v2_value_bundle.py",
+      "reason": "rooted conformance now uses explicit kind skeleton and resolved Link evidence without historical AST/parser projection",
+      "resolvedByIssue": 400,
+      "currentHistoricalImports": false
     }
   },
   "c7Rule": {

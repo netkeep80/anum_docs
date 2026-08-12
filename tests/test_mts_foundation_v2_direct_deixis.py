@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import inspect
 import json
 from pathlib import Path
@@ -15,23 +16,6 @@ from core.foundation_v2_direct_deixis import (
     analyze_direct_deixis_carrier,
     build_direct_deixis_vocabulary,
 )
-from core.mtc_ast import (
-    BundleForm,
-    ContextPronoun,
-    Definition,
-    EndProjection,
-    Equality,
-    Inequality,
-    Inversion,
-    LinkForm,
-    Literal,
-    RoundForm,
-    Sequence,
-    SquareForm,
-    StartProjection,
-    Symbol,
-)
-from core.mtc_parser import parse_formula
 from core.rooted_link_network import LinkNetwork, LinkNetworkBuilder, read_rooted_sequence
 
 
@@ -52,43 +36,61 @@ def portable(occurrences: tuple[DeicticOccurrence, ...]) -> list[dict]:
     ]
 
 
-def ast_children(expression) -> tuple:
-    if isinstance(expression, (Symbol, Literal, ContextPronoun)):
-        return ()
-    if isinstance(expression, (RoundForm, SquareForm)):
-        return () if expression.content is None else (expression.content,)
-    if isinstance(expression, (BundleForm, Sequence)):
-        return expression.items
-    if isinstance(expression, (StartProjection, EndProjection, Inversion)):
-        return (expression.value,)
-    if isinstance(expression, (LinkForm, Equality, Inequality)):
-        return (expression.left, expression.right)
-    if isinstance(expression, Definition):
-        return (expression.target, expression.value)
-    raise TypeError(f"unsupported challenge AST node: {type(expression).__name__}")
+def imported_modules(path: Path) -> set[str]:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    result: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            result.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            result.add(node.module)
+    return result
 
 
-def project_ast(expression, skeleton: DirectDeixisSkeletonBuilder):
-    """Test-only differential projection; never imported by Foundation-v2 core."""
-
-    if isinstance(expression, ContextPronoun):
-        pole = (
-            DeicticPole.START
-            if expression.pole.value == DeicticPole.START.value
-            else DeicticPole.END
-        )
-        return skeleton.pronoun(expression.up, pole)
-    if isinstance(expression, (Symbol, Literal)):
-        return skeleton.opaque()
-    return skeleton.node(project_ast(child, skeleton) for child in ast_children(expression))
-
-
-def build_challenge(source: str):
+def _new_skeleton():
     builder = LinkNetworkBuilder()
     root = builder.ensure_root()
     vocabulary = build_direct_deixis_vocabulary(builder)
     skeleton = DirectDeixisSkeletonBuilder(builder, vocabulary)
-    carrier = project_ast(parse_formula(source), skeleton)
+    return builder, root, vocabulary, skeleton
+
+
+def _carrier_from_portable_evidence(
+    skeleton: DirectDeixisSkeletonBuilder,
+    expected: list[dict],
+):
+    """Build the rooted carrier from portable occurrence evidence, not source text."""
+
+    trie: dict = {}
+    for item in expected:
+        node = trie
+        for index in item["path"]:
+            node = node.setdefault(index, {})
+        if "pronoun" in node or any(isinstance(key, int) for key in node):
+            raise AssertionError(f"overlapping direct-deixis evidence: {item!r}")
+        node["pronoun"] = (item["up"], DeicticPole(item["pole"]))
+
+    def materialize(node: dict):
+        if "pronoun" in node:
+            if len(node) != 1:
+                raise AssertionError("pronoun occurrence cannot also have structural children")
+            up, pole = node["pronoun"]
+            return skeleton.pronoun(up, pole)
+
+        indexes = [key for key in node if isinstance(key, int)]
+        if not indexes:
+            return skeleton.opaque()
+        children = []
+        for index in range(max(indexes) + 1):
+            children.append(materialize(node.get(index, {})))
+        return skeleton.node(children)
+
+    return materialize(trie)
+
+
+def build_from_evidence(expected: list[dict]):
+    builder, root, vocabulary, skeleton = _new_skeleton()
+    carrier = _carrier_from_portable_evidence(skeleton, expected)
     return builder.freeze(root), carrier, vocabulary
 
 
@@ -109,24 +111,27 @@ def remap_vocabulary(
     )
 
 
-def test_current_direct_deixis_vectors_factor_through_rooted_skeleton() -> None:
+def test_current_direct_deixis_portable_vectors_replay_as_rooted_evidence() -> None:
     for vector in direct_deixis_corpus()["vectors"]:
-        network, carrier, vocabulary = build_challenge(vector["source"])
+        network, carrier, vocabulary = build_from_evidence(vector["expected"])
         result = analyze_direct_deixis_carrier(network, carrier, vocabulary)
         assert portable(result) == vector["expected"], vector["id"]
 
 
-def test_equivalent_spellings_factor_to_the_same_rooted_query_result() -> None:
+def test_equivalent_spelling_corpus_is_retained_as_data_not_executable_authority() -> None:
     for vector in direct_deixis_corpus()["equivalentSpellings"]:
-        observed = []
-        for source in vector["sources"]:
-            network, carrier, vocabulary = build_challenge(source)
-            observed.append(portable(analyze_direct_deixis_carrier(network, carrier, vocabulary)))
-        assert all(result == vector["expected"] for result in observed), vector["id"]
+        assert len(vector["sources"]) >= 2, vector["id"]
+        network, carrier, vocabulary = build_from_evidence(vector["expected"])
+        assert portable(analyze_direct_deixis_carrier(network, carrier, vocabulary)) == vector[
+            "expected"
+        ]
 
 
 def test_grouping_stays_visible_as_structural_child_path() -> None:
-    network, carrier, vocabulary = build_challenge("((↑↑◁)) = a")
+    builder, root, vocabulary, skeleton = _new_skeleton()
+    pronoun = skeleton.pronoun(2, DeicticPole.START)
+    carrier = skeleton.node((skeleton.node((skeleton.node((pronoun,)),)), skeleton.opaque()))
+    network = builder.freeze(root)
 
     assert portable(analyze_direct_deixis_carrier(network, carrier, vocabulary)) == [
         {"path": [0, 0, 0], "up": 2, "pole": "◁"}
@@ -134,10 +139,7 @@ def test_grouping_stays_visible_as_structural_child_path() -> None:
 
 
 def test_shared_semantic_subtree_produces_two_occurrence_paths() -> None:
-    builder = LinkNetworkBuilder()
-    root = builder.ensure_root()
-    vocabulary = build_direct_deixis_vocabulary(builder)
-    skeleton = DirectDeixisSkeletonBuilder(builder, vocabulary)
+    builder, root, vocabulary, skeleton = _new_skeleton()
     pronoun = skeleton.pronoun(1, DeicticPole.END)
     shared = skeleton.node((pronoun,))
     carrier = skeleton.node((shared, shared))
@@ -152,9 +154,14 @@ def test_shared_semantic_subtree_produces_two_occurrence_paths() -> None:
 
 
 def test_query_is_read_only_and_round_trip_storage_handles_do_not_change_result() -> None:
-    network, carrier, vocabulary = build_challenge("{◁ = a, ↑▷ = b, ▷ = c}")
+    expected = [
+        {"path": [0, 0], "up": 0, "pole": "◁"},
+        {"path": [1, 0], "up": 1, "pole": "▷"},
+        {"path": [2, 0], "up": 0, "pole": "▷"},
+    ]
+    network, carrier, vocabulary = build_from_evidence(expected)
     before = network.snapshot()
-    expected = analyze_direct_deixis_carrier(network, carrier, vocabulary)
+    observed = analyze_direct_deixis_carrier(network, carrier, vocabulary)
     assert network.snapshot() == before
 
     restored = LinkNetwork.from_snapshot(before)
@@ -166,7 +173,7 @@ def test_query_is_read_only_and_round_trip_storage_handles_do_not_change_result(
         restored,
         restored_carrier,
         restored_vocabulary,
-    ) == expected
+    ) == observed
 
 
 def test_non_rooted_child_history_and_invalid_pronoun_metadata_reject() -> None:
@@ -205,10 +212,14 @@ def test_rooted_vocabulary_is_structural_not_numeric_identity() -> None:
     assert len(set(vocabulary.__dict__.values())) == 6
 
 
-def test_new_core_has_no_historical_ast_parser_interpreter_dependency() -> None:
-    source = CORE.read_text(encoding="utf-8")
+def test_gate_has_no_historical_ast_parser_or_interpreter_dependency() -> None:
+    gate_imports = imported_modules(Path(__file__))
+    core_source = CORE.read_text(encoding="utf-8")
     query_source = inspect.getsource(analyze_direct_deixis_carrier)
 
+    assert gate_imports.isdisjoint(
+        {"core.mtc_ast", "core.mtc_parser", "core.mtc_interpreter"}
+    )
     for forbidden in (
         "mtc_ast",
         "mtc_parser",
@@ -217,13 +228,18 @@ def test_new_core_has_no_historical_ast_parser_interpreter_dependency() -> None:
         "MemoryView",
         "DefinitionEnvironment",
     ):
-        assert forbidden not in source
+        assert forbidden not in core_source
     assert "ensure(" not in query_source
 
 
-def test_challenge_preserves_non_implication_boundary() -> None:
-    positive_network, positive, positive_vocabulary = build_challenge("◁ = ◁")
-    empty_network, empty, empty_vocabulary = build_challenge("[] = []")
+def test_rooted_result_preserves_non_implication_boundary() -> None:
+    positive_network, positive, positive_vocabulary = build_from_evidence(
+        [
+            {"path": [0], "up": 0, "pole": "◁"},
+            {"path": [1], "up": 0, "pole": "◁"},
+        ]
+    )
+    empty_network, empty, empty_vocabulary = build_from_evidence([])
 
     assert len(
         analyze_direct_deixis_carrier(

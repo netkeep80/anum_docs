@@ -46,9 +46,9 @@ def resolve_imports(path: Path) -> set[str]:
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
-                for module, owner in modules.items():
-                    if alias.name == module:
-                        found.add(owner)
+                owner = modules.get(alias.name)
+                if owner:
+                    found.add(owner)
             continue
         if not isinstance(node, ast.ImportFrom):
             continue
@@ -154,19 +154,50 @@ def test_matrix_exactly_classifies_every_current_historical_consumer() -> None:
         assert entry["cutoverAction"].strip(), consumer
 
 
-def test_python_classifications_refine_but_never_contradict_c1_disposition() -> None:
-    matrix = read(MATRIX)["pythonConsumers"]
-    c1 = read(DISPOSITION)["externalDirectConsumers"]
+def test_resolved_consumers_exist_and_no_longer_import_historical_owners() -> None:
+    matrix = read(MATRIX)["resolvedPythonConsumers"]
+    disposition = read(DISPOSITION)["resolvedConsumers"]
 
-    assert set(matrix) == set(c1)
-    for consumer, item in matrix.items():
-        assert item["classification"] == c1[consumer]["disposition"], consumer
+    assert set(matrix) == set(disposition)
+    for consumer, entry in matrix.items():
+        path = ROOT / consumer
+        assert path.is_file(), consumer
+        assert resolve_imports(path) == set(), consumer
+        assert entry["classification"] == "MIGRATE_TO_FOUNDATION_V2", consumer
+        assert entry["currentHistoricalImports"] is False, consumer
+        assert entry["resolvedByIssue"] == 400, consumer
+        assert (ROOT / entry["target"]).is_file(), consumer
+
+        c1 = disposition[consumer]
+        assert c1["disposition"] == entry["classification"], consumer
+        assert c1["target"] == entry["target"], consumer
+        assert c1["currentHistoricalImports"] is False, consumer
+        assert c1["resolvedByIssue"] == 400, consumer
+
+
+def test_current_and_resolved_consumer_sets_are_disjoint_and_match_c1_state() -> None:
+    matrix = read(MATRIX)
+    disposition = read(DISPOSITION)
+    current = set(matrix["pythonConsumers"])
+    resolved = set(matrix["resolvedPythonConsumers"])
+
+    assert current.isdisjoint(resolved)
+    assert current == set(disposition["externalDirectConsumers"])
+    assert resolved == set(disposition["resolvedConsumers"])
+    assert len(current) == 12
+    assert len(resolved) == 2
+
+    for consumer, item in matrix["pythonConsumers"].items():
+        assert (
+            item["classification"]
+            == disposition["externalDirectConsumers"][consumer]["disposition"]
+        ), consumer
 
 
 def test_preflight_does_not_claim_cutover_or_acceptance() -> None:
     baseline = read(MATRIX)["baseline"]
     assert baseline == {
-        "mainCommit": "449ebdfb1d4276ebfba3e2dccc2897de62eb2577",
+        "mainCommit": "6fc15830d137e93dcee3bc9ad11cb8b0ab637529",
         "currentMtsContract": "mts-contract/v0.6",
         "foundationV2Accepted": False,
         "cutoverPerformed": False,
