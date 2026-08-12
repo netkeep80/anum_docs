@@ -1,0 +1,91 @@
+{
+  "schema": "foundation-v2-consumer-disposition/v0.1",
+  "issue": 394,
+  "parentIssue": 271,
+  "historicalOwners": [
+    "core/mtc_ast.py",
+    "core/mtc_context_analysis.py",
+    "core/mtc_definitions.py",
+    "core/mtc_interpreter.py",
+    "core/mtc_opening_path.py",
+    "core/mtc_parser.py",
+    "core/mtc_value_bundle.py",
+    "core/proof_checker.py",
+    "core/root_library.py",
+    "core/validate_root.py"
+  ],
+  "allowedDispositions": [
+    "DELETE_WITH_OWNER",
+    "MIGRATE_TO_FOUNDATION_V2",
+    "HISTORICAL_REPLAY_ONLY",
+    "NON_SEMANTIC_TOOLING"
+  ],
+  "externalDirectConsumers": {
+    "tests/test_context_pronouns.py": {
+      "disposition": "DELETE_WITH_OWNER",
+      "reason": "typed parser/AST historical acceptance tests; source history remains in Git"
+    },
+    "tests/test_mtc_definitions.py": {
+      "disposition": "DELETE_WITH_OWNER",
+      "reason": "historical definition environment unit tests are owned by mtc_definitions"
+    },
+    "tests/test_mtc_interpreter.py": {
+      "disposition": "DELETE_WITH_OWNER",
+      "reason": "historical ContextFrame/MemoryView interpreter tests"
+    },
+    "tests/test_mtc_parser.py": {
+      "disposition": "DELETE_WITH_OWNER",
+      "reason": "historical typed parser/AST semantic front-end tests"
+    },
+    "tests/test_mtc_value_bundle_reference.py": {
+      "disposition": "DELETE_WITH_OWNER",
+      "reason": "superseded by rooted ValueBundle challenge and P3b decision"
+    },
+    "tests/test_mts_contract_v06.py": {
+      "disposition": "HISTORICAL_REPLAY_ONLY",
+      "reason": "v0.6 remains immutable accepted previous-release evidence; C7 must remove executable historical-core imports and retain data-only manifest checks"
+    },
+    "tests/test_mts_definition_opening_reference.py": {
+      "disposition": "DELETE_WITH_OWNER",
+      "reason": "historical definition-opening reference runtime; rooted owner evidence is frozen by cutover decisions"
+    },
+    "tests/test_mts_direct_deixis_reference.py": {
+      "disposition": "DELETE_WITH_OWNER",
+      "reason": "superseded by rooted direct-deixis challenge and P3a decision"
+    },
+    "tests/test_mts_foundation_v2_direct_deixis.py": {
+      "disposition": "MIGRATE_TO_FOUNDATION_V2",
+      "target": "core/foundation_v2_direct_deixis.py",
+      "reason": "keep rooted conformance but replace test-only historical AST/parser projection with explicit rooted fixtures"
+    },
+    "tests/test_mts_foundation_v2_value_bundle.py": {
+      "disposition": "MIGRATE_TO_FOUNDATION_V2",
+      "target": "core/foundation_v2_value_bundle.py",
+      "reason": "keep rooted conformance but replace test-only historical AST/parser projection with explicit rooted fixtures"
+    },
+    "tests/test_mts_opening_path_reference.py": {
+      "disposition": "DELETE_WITH_OWNER",
+      "reason": "historical opening-path reference runtime is not a post-C7 live owner"
+    },
+    "tests/test_mts_proof_v04.py": {
+      "disposition": "DELETE_WITH_OWNER",
+      "reason": "historical proof_checker acceptance runtime is replaced by Foundation-v2 proof/checker evidence"
+    },
+    "tests/test_repository_contract.py": {
+      "disposition": "MIGRATE_TO_FOUNDATION_V2",
+      "target": "core/foundation_v2.py",
+      "reason": "repository architecture gate must survive C7 but stop importing validate_root"
+    },
+    "tests/test_root_library.py": {
+      "disposition": "DELETE_WITH_OWNER",
+      "reason": "historical root-library/parser semantics, including superseded projection notation, must leave the live tree"
+    }
+  },
+  "c7Rule": {
+    "noExternalDirectHistoricalImportsAfterMigration": true,
+    "unknownConsumerAllowed": false,
+    "compatibilityFacadeAllowed": false,
+    "historicalRuntimeSelectableAfterC7": false,
+    "frozenV06MayImportDeletedRuntime": false
+  }
+}
