@@ -1,0 +1,75 @@
+{
+  "schema": "foundation-v2-cutover-contract/v0.1",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 394,
+  "parentIssue": 271,
+  "candidateManifest": "cutover/foundation-v2-cutover-candidate-v0.1.json",
+  "consumerDisposition": "cutover/foundation-v2-consumer-disposition-v0.1.json",
+  "consumerMatrix": "cutover/foundation-v2-c7-consumer-matrix-v0.1.json",
+  "conformance": "cutover/foundation-v2-cutover-conformance-v0.1.json",
+  "previousAcceptedRelease": "mts-contract/v0.6",
+  "acceptedMtsVersion": null,
+  "semanticIdentity": {
+    "linkIdentity": "by ordered semantic poles",
+    "axiom": "Link(A,B)=Link(C,D) iff A=C and B=D",
+    "runtimeHandleIsSemanticIdentity": false,
+    "sourcePositionIsSemanticIdentity": false,
+    "pathIsSemanticIdentity": false,
+    "samePairCreatesSecondSemanticLink": false,
+    "root": "R = R ⟼ R",
+    "secondFullySelfClosedRootAllowed": false
+  },
+  "transport": {
+    "abits": ["[", "]", "1", "0"],
+    "exactlyFour": true,
+    "rootIsFifthAbit": false,
+    "emptyStream": "R",
+    "emptyGroup": "R",
+    "rawAndExistingCarrierShareOneStackMachine": true,
+    "existingCarrierReadOnly": true
+  },
+  "owners": {
+    "publicFacade": "core/foundation_v2.py",
+    "rootedSubstrate": "core/rooted_link_network.py",
+    "root": "core/foundation_v2_root.py",
+    "source": "core/foundation_v2_source.py",
+    "state": "core/foundation_v2_state.py",
+    "interpreter": "core/foundation_v2_interpreter.py",
+    "run": "core/foundation_v2_run.py",
+    "proof": "core/foundation_v2_proof.py",
+    "checker": "core/foundation_v2_checker.py",
+    "directDeixis": "core/foundation_v2_direct_deixis.py",
+    "valueBundle": "core/foundation_v2_value_bundle.py",
+    "anumStreamDenotation": "core/anum_protocol.py",
+    "anumExistingCarrier": "core/anum_carrier.py",
+    "anumMaterialization": "core/foundation_v2_materialization.py",
+    "persistence": "core/foundation_v2_persistent.py"
+  },
+  "surfaces": {
+    "root": {"referenceCore": "core/foundation_v2_root.py", "effect": "construct/validate explicit rooted kernel"},
+    "source": {"referenceCore": "core/foundation_v2_source.py", "semanticAuthority": "rooted evidence, not AST/token identity"},
+    "state": {"referenceCore": "core/foundation_v2_state.py", "contextFrameAdapterAccepted": false},
+    "interpreter": {"referenceCore": "core/foundation_v2_interpreter.py", "readOnlyReplayMayMaterialize": false},
+    "run": {"referenceCore": "core/foundation_v2_run.py", "readOnlyReplayMayMaterialize": false},
+    "proof": {"referenceCore": "core/foundation_v2_proof.py", "trustedChecker": "core/foundation_v2_checker.py"},
+    "directDeixis": {"referenceCore": "core/foundation_v2_direct_deixis.py", "migrationDecision": "cutover/direct-deixis-rooted-migration-decision-v0.1.json"},
+    "valueBundle": {"referenceCore": "core/foundation_v2_value_bundle.py", "migrationDecision": "cutover/value-bundle-rooted-migration-decision-v0.1.json"},
+    "anum": {"streamReferenceCore": "core/anum_protocol.py", "carrierReferenceCore": "core/anum_carrier.py", "materializationReferenceCore": "core/foundation_v2_materialization.py"},
+    "persistence": {"referenceCore": "core/foundation_v2_persistent.py", "runtimeHandleIsPortableIdentity": false}
+  },
+  "effects": {
+    "findEqualsMaterialize": false,
+    "notFoundImpliesNonExistence": false,
+    "readMayMaterialize": false,
+    "replayMayMaterialize": false,
+    "explicitMaterializationMustReuseSamePair": true
+  },
+  "cutover": {
+    "foundationV2Accepted": false,
+    "cutoverPerformed": false,
+    "downstreamRepinAllowed": false,
+    "historicalRuntimeSelectableAfterC7": false,
+    "compatibilityOccurrenceMode": false
+  }
+}

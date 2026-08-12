@@ -16,6 +16,10 @@
   "candidateBoundary": {
     "contractSchema": "foundation-v2-cutover-contract/v0.1",
     "conformanceSchema": "foundation-v2-cutover-conformance/v0.1",
+    "contract": "cutover/foundation-v2-cutover-contract-v0.1.json",
+    "conformance": "cutover/foundation-v2-cutover-conformance-v0.1.json",
+    "consumerDisposition": "cutover/foundation-v2-consumer-disposition-v0.1.json",
+    "consumerMatrix": "cutover/foundation-v2-c7-consumer-matrix-v0.1.json",
     "acceptedMtsVersionAssignedHere": false,
     "mustReferenceOnlyExistingPostC7Owners": true
   },
