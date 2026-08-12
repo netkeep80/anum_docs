@@ -10,16 +10,9 @@ MATRIX = ROOT / "cutover/foundation-v2-c7-consumer-matrix-v0.1.json"
 CLASSIFICATION = ROOT / "cutover/foundation-v2-import-classification-v0.1.json"
 DISPOSITION = ROOT / "cutover/foundation-v2-consumer-disposition-v0.1.json"
 SCAN_DIRS = (ROOT / "core", ROOT / "converters", ROOT / "tests")
-MACHINE_FILES = (
-    ROOT / "contracts/mts-contract-v0.6.json",
-    ROOT / "contracts/mts-conformance-v0.6.json",
-)
-ALLOWED_ACTIONS = {
-    "MIGRATE_TO_FOUNDATION_V2",
-    "DELETE_WITH_OWNER",
-    "NON_SEMANTIC_TOOLING",
-    "HISTORICAL_REPLAY_ONLY",
-}
+MACHINE_FILES = (ROOT / "contracts/mts-contract-v0.6.json", ROOT / "contracts/mts-conformance-v0.6.json")
+ALLOWED_ACTIONS = {"MIGRATE_TO_FOUNDATION_V2", "DELETE_WITH_OWNER", "NON_SEMANTIC_TOOLING", "HISTORICAL_REPLAY_ONLY"}
+RESOLVED_ACTIONS = {"MIGRATE_TO_FOUNDATION_V2", "HISTORICAL_REPLAY_ONLY"}
 
 
 def read(path: Path) -> dict:
@@ -31,10 +24,7 @@ def historical_paths() -> set[str]:
 
 
 def historical_modules() -> dict[str, str]:
-    return {
-        path.removesuffix(".py").replace("/", "."): path
-        for path in historical_paths()
-    }
+    return {path.removesuffix(".py").replace("/", "."): path for path in historical_paths()}
 
 
 def resolve_imports(path: Path) -> set[str]:
@@ -42,7 +32,6 @@ def resolve_imports(path: Path) -> set[str]:
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     found: set[str] = set()
     relative_package = list(path.relative_to(ROOT).with_suffix("").parts[:-1])
-
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
@@ -52,7 +41,6 @@ def resolve_imports(path: Path) -> set[str]:
             continue
         if not isinstance(node, ast.ImportFrom):
             continue
-
         if node.level:
             keep = len(relative_package) - (node.level - 1)
             if keep < 0:
@@ -60,10 +48,7 @@ def resolve_imports(path: Path) -> set[str]:
             base = relative_package[:keep]
         else:
             base = []
-        if node.module:
-            imported = ".".join(base + node.module.split("."))
-        else:
-            imported = ".".join(base)
+        imported = ".".join(base + node.module.split(".")) if node.module else ".".join(base)
         owner = modules.get(imported)
         if owner:
             found.add(owner)
@@ -95,24 +80,15 @@ def strings(value):
             yield from strings(item)
 
 
-def discover_machine_consumers(
-    python_consumers: dict[str, list[str]],
-) -> dict[str, dict[str, list[str]]]:
+def discover_machine_consumers(python_consumers: dict[str, list[str]]) -> dict[str, dict[str, list[str]]]:
     historical = historical_paths()
     result = {}
     for path in MACHINE_FILES:
         values = set(strings(read(path)))
         owner_refs = sorted(historical & values)
-        test_refs = sorted(
-            consumer
-            for consumer in python_consumers
-            if consumer in values
-        )
+        test_refs = sorted(consumer for consumer in python_consumers if consumer in values)
         if owner_refs or test_refs:
-            result[path.relative_to(ROOT).as_posix()] = {
-                "historicalOwnerPaths": owner_refs,
-                "historicalConsumerTests": test_refs,
-            }
+            result[path.relative_to(ROOT).as_posix()] = {"historicalOwnerPaths": owner_refs, "historicalConsumerTests": test_refs}
     return result
 
 
@@ -120,32 +96,12 @@ def test_matrix_exactly_classifies_every_current_historical_consumer() -> None:
     matrix = read(MATRIX)
     discovered_python = discover_python_consumers()
     discovered_machine = discover_machine_consumers(discovered_python)
-
     assert matrix["schema"] == "foundation-v2-c7-consumer-matrix/v0.1"
     assert matrix["issue"] == 395
     assert matrix["historicalDeletionSet"] == sorted(historical_paths())
-
-    actual_python = matrix["pythonConsumers"]
-    assert set(actual_python) == set(discovered_python), (
-        "python consumer matrix mismatch\n"
-        f"missing={json.dumps(sorted(set(discovered_python) - set(actual_python)), ensure_ascii=False)}\n"
-        f"extra={json.dumps(sorted(set(actual_python) - set(discovered_python)), ensure_ascii=False)}\n"
-        f"discovered={json.dumps(discovered_python, ensure_ascii=False, sort_keys=True)}"
-    )
-    for consumer, owners in discovered_python.items():
-        entry = actual_python[consumer]
-        assert entry["historicalOwners"] == owners, consumer
-        assert entry["classification"] in ALLOWED_ACTIONS, consumer
-        assert entry["classification"] != "UNKNOWN", consumer
-        assert entry["cutoverAction"].strip(), consumer
-
+    assert matrix["pythonConsumers"] == discovered_python == {}
     actual_machine = matrix["machineConsumers"]
-    assert set(actual_machine) == set(discovered_machine), (
-        "machine consumer matrix mismatch\n"
-        f"missing={json.dumps(sorted(set(discovered_machine) - set(actual_machine)), ensure_ascii=False)}\n"
-        f"extra={json.dumps(sorted(set(actual_machine) - set(discovered_machine)), ensure_ascii=False)}\n"
-        f"discovered={json.dumps(discovered_machine, ensure_ascii=False, sort_keys=True)}"
-    )
+    assert set(actual_machine) == set(discovered_machine)
     for consumer, refs in discovered_machine.items():
         entry = actual_machine[consumer]
         assert entry["historicalOwnerPaths"] == refs["historicalOwnerPaths"], consumer
@@ -154,60 +110,74 @@ def test_matrix_exactly_classifies_every_current_historical_consumer() -> None:
         assert entry["cutoverAction"].strip(), consumer
 
 
+def test_deleted_consumers_and_owners_are_physically_absent_after_c7() -> None:
+    matrix = read(MATRIX)
+    disposition = read(DISPOSITION)
+    assert set(matrix["deletedPythonConsumers"]) == set(disposition["deletedConsumers"])
+    assert len(matrix["deletedPythonConsumers"]) == 10
+    for path in matrix["deletedPythonConsumers"]:
+        assert not (ROOT / path).exists(), path
+    for path in matrix["historicalDeletionSet"]:
+        assert not (ROOT / path).exists(), path
+
+
 def test_resolved_consumers_exist_and_no_longer_import_historical_owners() -> None:
     matrix = read(MATRIX)["resolvedPythonConsumers"]
     disposition = read(DISPOSITION)["resolvedConsumers"]
-
     assert set(matrix) == set(disposition)
     for consumer, entry in matrix.items():
         path = ROOT / consumer
         assert path.is_file(), consumer
         assert resolve_imports(path) == set(), consumer
-        assert entry["classification"] == "MIGRATE_TO_FOUNDATION_V2", consumer
+        assert entry["classification"] in RESOLVED_ACTIONS, consumer
         assert entry["currentHistoricalImports"] is False, consumer
-        assert entry["resolvedByIssue"] == 400, consumer
-        assert (ROOT / entry["target"]).is_file(), consumer
-
+        assert isinstance(entry["resolvedByIssue"], int) and entry["resolvedByIssue"] > 0, consumer
+        assert entry["cutoverAction"].strip(), consumer
         c1 = disposition[consumer]
         assert c1["disposition"] == entry["classification"], consumer
-        assert c1["target"] == entry["target"], consumer
         assert c1["currentHistoricalImports"] is False, consumer
-        assert c1["resolvedByIssue"] == 400, consumer
+        assert c1["resolvedByIssue"] == entry["resolvedByIssue"], consumer
+        assert c1["reason"].strip(), consumer
+        if entry["classification"] == "MIGRATE_TO_FOUNDATION_V2":
+            assert entry["target"] == c1["target"], consumer
+            assert (ROOT / entry["target"]).is_file(), consumer
+        else:
+            assert "target" not in entry and "target" not in c1, consumer
+        if "resolvedByPullRequest" in entry or "resolvedByPullRequest" in c1:
+            assert entry["resolvedByPullRequest"] == c1["resolvedByPullRequest"], consumer
 
 
-def test_current_and_resolved_consumer_sets_are_disjoint_and_match_c1_state() -> None:
+def test_post_c7_consumer_sets_are_closed() -> None:
     matrix = read(MATRIX)
     disposition = read(DISPOSITION)
-    current = set(matrix["pythonConsumers"])
-    resolved = set(matrix["resolvedPythonConsumers"])
-
-    assert current.isdisjoint(resolved)
-    assert current == set(disposition["externalDirectConsumers"])
-    assert resolved == set(disposition["resolvedConsumers"])
-    assert len(current) == 12
-    assert len(resolved) == 2
-
-    for consumer, item in matrix["pythonConsumers"].items():
-        assert (
-            item["classification"]
-            == disposition["externalDirectConsumers"][consumer]["disposition"]
-        ), consumer
+    assert matrix["pythonConsumers"] == {}
+    assert disposition["externalDirectConsumers"] == {}
+    assert len(matrix["resolvedPythonConsumers"]) == 4
+    assert set(matrix["resolvedPythonConsumers"]) == set(disposition["resolvedConsumers"])
+    assert disposition["c7Performed"] is True
 
 
-def test_preflight_does_not_claim_cutover_or_acceptance() -> None:
-    baseline = read(MATRIX)["baseline"]
-    assert baseline == {
-        "mainCommit": "6fc15830d137e93dcee3bc9ad11cb8b0ab637529",
+def test_v06_is_resolved_as_data_only_historical_replay() -> None:
+    matrix = read(MATRIX)["resolvedPythonConsumers"]["tests/test_mts_contract_v06.py"]
+    disposition = read(DISPOSITION)["resolvedConsumers"]["tests/test_mts_contract_v06.py"]
+    assert matrix["classification"] == "HISTORICAL_REPLAY_ONLY"
+    assert disposition["disposition"] == "HISTORICAL_REPLAY_ONLY"
+    assert matrix["currentHistoricalImports"] is False
+    assert disposition["currentHistoricalImports"] is False
+
+
+def test_preflight_records_c7_without_claiming_c9_acceptance() -> None:
+    assert read(MATRIX)["baseline"] == {
+        "mainCommit": "af01e7477e9cb3e573461e9cfce41eca5bcae62f",
         "currentMtsContract": "mts-contract/v0.6",
         "foundationV2Accepted": False,
-        "cutoverPerformed": False,
+        "cutoverPerformed": True,
         "downstreamRepinAllowed": False,
     }
 
 
 def test_final_cutover_is_one_merge_without_compatibility_runtime() -> None:
-    boundary = read(MATRIX)["finalCutover"]
-    assert boundary == {
+    assert read(MATRIX)["finalCutover"] == {
         "singleMergeRequired": True,
         "stages": ["C7", "C8", "C9"],
         "unknownConsumersAllowed": False,

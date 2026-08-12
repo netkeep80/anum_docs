@@ -1,10 +1,14 @@
 {
-  "schema": "foundation-v2-cutover-conformance/v0.1",
-  "status": "candidate",
-  "accepted": false,
-  "issue": 394,
-  "contract": "cutover/foundation-v2-cutover-contract-v0.1.json",
-  "candidateManifest": "cutover/foundation-v2-cutover-candidate-v0.1.json",
+  "schema": "mts-conformance/v0.7",
+  "status": "accepted",
+  "accepted": true,
+  "issue": 403,
+  "contract": "mts-contract/v0.7",
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.6",
+    "conformance": "mts-conformance/v0.6",
+    "immutable": true
+  },
   "requiredExecutableGates": [
     "tests/test_mts_rooted_link_network.py",
     "tests/test_mts_foundation_v2_root.py",
@@ -23,7 +27,8 @@
     "tests/test_mts_foundation_v2_persistent.py",
     "tests/test_foundation_v2_cutover_gate.py",
     "tests/test_foundation_v2_c7_preflight.py",
-    "tests/test_foundation_v2_c8_integrated.py"
+    "tests/test_foundation_v2_c8_integrated.py",
+    "tests/test_repository_contract.py"
   ],
   "integratedPath": [
     "root",
@@ -45,11 +50,10 @@
     "root-as-fifth-abit",
     "empty-group-rejected"
   ],
-  "migrationPrerequisite": {
-    "dispositionManifest": "cutover/foundation-v2-consumer-disposition-v0.1.json",
-    "consumerMatrix": "cutover/foundation-v2-c7-consumer-matrix-v0.1.json",
-    "allExternalHistoricalImportsMustBeResolvedBeforeC7": true,
-    "allMachineHistoricalReferencesMustBeSupersededAtAtomicRelease": true
+  "versionedSurfaces": {
+    "anum": "anum-deserialization/v0.4",
+    "directDeixis": "mts-direct-deixis/v0.6",
+    "valueBundle": "mts-value-bundle/v0.3"
   },
   "requiredInvariants": {
     "linkIdentityByOrderedPoles": true,
@@ -61,20 +65,28 @@
     "emptyGroupIsRoot": true,
     "rawAndCarrierAnumTransportsConverge": true,
     "directDeixisUsesRootedEvidence": true,
-    "valueBundleUsesRootedEvidence": true
+    "valueBundleUsesRootedEvidence": true,
+    "historicalAstOrParserIsSemanticAuthority": false,
+    "compatibilityRuntimeSelectable": false
+  },
+  "c7": {
+    "performed": true,
+    "historicalRuntimePresent": false,
+    "externalHistoricalConsumers": 0
   },
   "c8": {
     "performed": true,
     "integratedGate": "tests/test_foundation_v2_c8_integrated.py",
     "integratedPathPassed": true,
     "requiredNegativeVectorsPassed": true,
-    "historicalRuntimePresent": false,
     "compatibilityRuntimeUsed": false
   },
   "acceptance": {
-    "performedHere": false,
-    "acceptedMtsVersionAssignedHere": false,
-    "downstreamRepinAllowed": false,
-    "requiresSeparateC9": true
+    "performedHere": true,
+    "acceptedMtsVersion": "mts-contract/v0.7",
+    "acceptedMtsVersionAssignedHere": true,
+    "foundationV2Accepted": true,
+    "cutoverPerformed": true,
+    "downstreamRepinAllowed": true
   }
 }

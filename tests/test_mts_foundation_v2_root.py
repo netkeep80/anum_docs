@@ -185,11 +185,14 @@ def test_public_facade_uses_the_same_root_builder() -> None:
     assert root_vocabulary(kernel)["∞"] is kernel.network.root
 
 
-def test_public_facade_remains_explicitly_a_candidate() -> None:
+def test_public_facade_is_explicitly_the_accepted_v07_runtime() -> None:
     source = (ROOT / "core" / "foundation_v2.py").read_text(encoding="utf-8")
     module = ast.parse(source)
     docstring = ast.get_docstring(module) or ""
-    assert "candidate" in docstring.lower()
+    normalized = docstring.lower()
+    assert "accepted mts v0.7" in normalized
+    assert "candidate" not in normalized
+    assert "compatibility mode" in normalized
 
 
 def test_root_and_public_modules_have_no_historical_semantic_imports() -> None:
