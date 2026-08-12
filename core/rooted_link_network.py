@@ -249,6 +249,55 @@ class LinkNetwork:
             raise LinkNetworkError("link handle was not issued by this network")
 
 
+@dataclass(frozen=True)
+class RootedSequence:
+    """Read-only view of one finite start-history rooted in ``R``.
+
+    This is not a second Link kind.  It records a structural property of an
+    already-existing link selected as a sequence carrier.  ``prefixes`` starts
+    with ``R`` and ends with the selected carrier; ``values`` are the successive
+    end poles in forward order.
+    """
+
+    values: tuple[LinkRef, ...]
+    prefixes: tuple[LinkRef, ...]
+
+
+def read_rooted_sequence(network: LinkNetwork, final: LinkRef) -> RootedSequence:
+    """Unfold ``final`` through start poles until the distinguished root.
+
+    ``R`` denotes the empty sequence.  Every non-root carrier contributes its
+    end pole as the last value and continues through its start pole.  A
+    start-self-closed form (or any other non-terminating start history) is not a
+    finite rooted sequence and is rejected.  No link is created or modified.
+    """
+
+    root = network.root
+    if final is root:
+        return RootedSequence(values=(), prefixes=(root,))
+
+    reversed_values: list[LinkRef] = []
+    reversed_prefixes: list[LinkRef] = [final]
+    current = final
+    visited: set[LinkRef] = set()
+
+    while current is not root:
+        if current in visited:
+            raise LinkNetworkError(
+                "selected link does not encode a finite R-rooted start-history"
+            )
+        visited.add(current)
+        link = network.link(current)
+        reversed_values.append(link.end)
+        current = link.start
+        reversed_prefixes.append(current)
+
+    return RootedSequence(
+        values=tuple(reversed(reversed_values)),
+        prefixes=tuple(reversed(reversed_prefixes)),
+    )
+
+
 class LinkNetworkBuilder:
     """Construct a semantic network outward from self-closure and root.
 
