@@ -11,6 +11,7 @@
   "classifications": {
     "core/foundation_v2.py": "FOUNDATION_V2_LIVE",
     "core/foundation_v2_checker.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_direct_deixis.py": "FOUNDATION_V2_LIVE",
     "core/foundation_v2_interpreter.py": "FOUNDATION_V2_LIVE",
     "core/foundation_v2_materialization.py": "FOUNDATION_V2_LIVE",
     "core/foundation_v2_persistent.py": "FOUNDATION_V2_LIVE",
@@ -104,9 +105,11 @@
       "deletePrecondition": "historical ten-formula root validation is no longer a production gate"
     },
     "core/mtc_context_analysis.py": {
-      "replacementLiveOwners": [],
+      "replacementLiveOwners": [
+        "core/foundation_v2_direct_deixis.py"
+      ],
       "deleteInC7": false,
-      "deletePrecondition": "requires an explicit P3 decision for current direct-deixis v0.5 before deletion; do not invent a Foundation-v2 replacement"
+      "deletePrecondition": "P3a rooted skeleton challenge #383 must pass and a separate P3a decision must authorize current direct-deixis migration before deletion"
     },
     "core/mtc_value_bundle.py": {
       "replacementLiveOwners": [],
@@ -117,6 +120,7 @@
   "publicFacadeDirectDeps": [
     "core/rooted_link_network.py",
     "core/foundation_v2_checker.py",
+    "core/foundation_v2_direct_deixis.py",
     "core/foundation_v2_interpreter.py",
     "core/foundation_v2_materialization.py",
     "core/foundation_v2_persistent.py",
