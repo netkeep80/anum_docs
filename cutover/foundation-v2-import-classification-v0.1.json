@@ -116,8 +116,8 @@
       "replacementLiveOwners": [
         "core/foundation_v2_value_bundle.py"
       ],
-      "deleteInC7": false,
-      "deletePrecondition": "P3b rooted challenge #387 must pass and a separate P3b decision must authorize current value-bundle migration or intentional delta before deletion"
+      "deleteInC7": true,
+      "deletePrecondition": "P3b decision #391 preserves current ValueBundle through rooted quotient; delete old owner only during atomic C7 with the new versioned ValueBundle surface"
     }
   },
   "publicFacadeDirectDeps": [
@@ -140,6 +140,7 @@
     "core/mtc_interpreter.py",
     "core/mtc_opening_path.py",
     "core/mtc_parser.py",
+    "core/mtc_value_bundle.py",
     "core/proof_checker.py",
     "core/root_library.py",
     "core/validate_root.py"

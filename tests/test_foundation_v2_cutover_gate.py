@@ -144,7 +144,7 @@ def test_historical_deletion_decisions_are_complete_and_c7_set_is_exact() -> Non
     assert manifest["c7DeletionSet"] == expected_delete
     assert {
         path for path, decision in decisions.items() if not decision["deleteInC7"]
-    } == {"core/mtc_value_bundle.py"}
+    } == set()
 
 
 def test_gate_does_not_claim_cutover_acceptance_or_downstream_repin() -> None:
