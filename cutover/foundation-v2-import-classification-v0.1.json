@@ -50,6 +50,13 @@
       "deleteInC7": true,
       "deletePrecondition": "all semantic parser/AST consumers migrate to selected source evidence; any surviving AST is reclassified NON_SEMANTIC_TOOLING"
     },
+    "core/mtc_context_analysis.py": {
+      "replacementLiveOwners": [
+        "core/foundation_v2_direct_deixis.py"
+      ],
+      "deleteInC7": true,
+      "deletePrecondition": "P3a decision #385 preserves direct-deixis through rooted skeleton; delete old owner only during atomic C7 with the new versioned direct-deixis surface"
+    },
     "core/mtc_definitions.py": {
       "replacementLiveOwners": [
         "core/foundation_v2_state.py",
@@ -104,13 +111,6 @@
       "deleteInC7": true,
       "deletePrecondition": "historical ten-formula root validation is no longer a production gate"
     },
-    "core/mtc_context_analysis.py": {
-      "replacementLiveOwners": [
-        "core/foundation_v2_direct_deixis.py"
-      ],
-      "deleteInC7": false,
-      "deletePrecondition": "P3a rooted skeleton challenge #383 must pass and a separate P3a decision must authorize current direct-deixis migration before deletion"
-    },
     "core/mtc_value_bundle.py": {
       "replacementLiveOwners": [],
       "deleteInC7": false,
@@ -131,6 +131,7 @@
   ],
   "c7DeletionSet": [
     "core/mtc_ast.py",
+    "core/mtc_context_analysis.py",
     "core/mtc_definitions.py",
     "core/mtc_interpreter.py",
     "core/mtc_opening_path.py",
