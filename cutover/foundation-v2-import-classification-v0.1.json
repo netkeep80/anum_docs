@@ -20,6 +20,7 @@
     "core/foundation_v2_run.py": "FOUNDATION_V2_LIVE",
     "core/foundation_v2_source.py": "FOUNDATION_V2_LIVE",
     "core/foundation_v2_state.py": "FOUNDATION_V2_LIVE",
+    "core/foundation_v2_value_bundle.py": "FOUNDATION_V2_LIVE",
     "core/rooted_link_network.py": "FOUNDATION_V2_LIVE",
     "core/anum_carrier.py": "PRESERVED_NEUTRAL",
     "core/anum_memory.py": "PRESERVED_NEUTRAL",
@@ -112,9 +113,11 @@
       "deletePrecondition": "historical ten-formula root validation is no longer a production gate"
     },
     "core/mtc_value_bundle.py": {
-      "replacementLiveOwners": [],
+      "replacementLiveOwners": [
+        "core/foundation_v2_value_bundle.py"
+      ],
       "deleteInC7": false,
-      "deletePrecondition": "requires an explicit P3 decision for current value-bundle v0.2 before deletion; do not invent a Foundation-v2 replacement"
+      "deletePrecondition": "P3b rooted ValueBundle challenge #388 must pass and a separate P3b decision must authorize current value-bundle migration before deletion"
     }
   },
   "publicFacadeDirectDeps": [
@@ -127,7 +130,8 @@
     "core/foundation_v2_proof.py",
     "core/foundation_v2_root.py",
     "core/foundation_v2_run.py",
-    "core/foundation_v2_source.py"
+    "core/foundation_v2_source.py",
+    "core/foundation_v2_value_bundle.py"
   ],
   "c7DeletionSet": [
     "core/mtc_ast.py",
