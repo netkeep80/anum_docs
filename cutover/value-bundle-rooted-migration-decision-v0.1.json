@@ -1,0 +1,60 @@
+{
+  "schema": "value-bundle-rooted-migration-decision/v0.1",
+  "issue": 391,
+  "parentIssue": 382,
+  "evidence": {
+    "challengeIssue": 387,
+    "pullRequest": 389,
+    "mergeCommit": "775078f95995b1de6157ace10a033b36af496ab3",
+    "executableCorpusGate": "tests/test_mts_foundation_v2_value_bundle.py"
+  },
+  "decision": "PRESERVE_BY_ROOTED_MIGRATION",
+  "current": {
+    "outerContract": "mts-contract/v0.6",
+    "surface": "mts-value-bundle/v0.2",
+    "referenceCore": "core/mtc_value_bundle.py",
+    "mutateInPlace": false
+  },
+  "next": {
+    "surfaceCandidate": "mts-value-bundle/v0.3",
+    "referenceCore": "core/foundation_v2_value_bundle.py",
+    "staticInput": "explicit rooted role skeleton carrier",
+    "resolvedInput": "ordered occurrence evidence (path, canonical Link) with extensional bundle membership",
+    "observableResultSemanticsChanged": false,
+    "historicalTypedAstIsNormativeInput": false,
+    "runtimeHandleIsSemanticIdentity": false,
+    "sourcePositionIsSemanticIdentity": false,
+    "pathIsSemanticIdentity": false,
+    "pathRole": "checker coordinate induced by ordered occurrence evidence",
+    "expansionUsesSharedReadOnlyFindLinks": true,
+    "readOnlyQueries": true,
+    "materializesDuringQuery": false
+  },
+  "preservedBoundaries": {
+    "staticRolesExact": true,
+    "staticRejectionCodesExact": true,
+    "occurrencesResolvedBeforeDeduplication": true,
+    "bundleMembershipExtensional": true,
+    "scalarAndSingletonBundleRemainDistinct": true,
+    "emptyBundleExpansionEndpointIsWildcard": true,
+    "missingPairIsOmitted": true,
+    "unresolvedOrForeignOccurrenceFailsClosed": true,
+    "sharingCreatesSecondSemanticLink": false
+  },
+  "c7": {
+    "deleteOldOwner": true,
+    "deletePath": "core/mtc_value_bundle.py",
+    "replacementLiveOwner": "core/foundation_v2_value_bundle.py",
+    "deleteOnlyDuringAtomicCutover": true,
+    "currentContractsRemainUntilCutover": true
+  },
+  "veto": {
+    "compatibilityAstSemanticMode": false,
+    "identifyBundleWithSequenceGroup": false,
+    "implicitQueryWrites": false,
+    "deduplicateBeforeOccurrenceResolution": false,
+    "singletonBundleCoercion": false,
+    "numericOrRuntimeHandleIdentity": false,
+    "currentV06Mutation": false
+  }
+}

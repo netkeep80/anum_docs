@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "cutover/foundation-v2-import-classification-v0.1.json"
+VALUE_BUNDLE_DECISION = ROOT / "cutover/value-bundle-rooted-migration-decision-v0.1.json"
 SURFACE_DIRS = (ROOT / "core", ROOT / "converters")
 HISTORICAL_CLASSES = {"HISTORICAL_SEMANTIC_ISLAND", "HISTORICAL_ENTRYPOINT"}
 
@@ -144,7 +145,62 @@ def test_historical_deletion_decisions_are_complete_and_c7_set_is_exact() -> Non
     assert manifest["c7DeletionSet"] == expected_delete
     assert {
         path for path, decision in decisions.items() if not decision["deleteInC7"]
-    } == {"core/mtc_value_bundle.py"}
+    } == set()
+
+
+def test_p3b_value_bundle_decision_is_machine_readable_and_delete_ready() -> None:
+    decision = json.loads(VALUE_BUNDLE_DECISION.read_text(encoding="utf-8"))
+    manifest = load_manifest()
+
+    assert decision["schema"] == "value-bundle-rooted-migration-decision/v0.1"
+    assert decision["issue"] == 391
+    assert decision["parentIssue"] == 382
+    assert decision["decision"] == "PRESERVE_BY_ROOTED_MIGRATION"
+    assert decision["evidence"] == {
+        "challengeIssue": 387,
+        "pullRequest": 389,
+        "mergeCommit": "775078f95995b1de6157ace10a033b36af496ab3",
+        "executableCorpusGate": "tests/test_mts_foundation_v2_value_bundle.py",
+    }
+    assert decision["current"] == {
+        "outerContract": "mts-contract/v0.6",
+        "surface": "mts-value-bundle/v0.2",
+        "referenceCore": "core/mtc_value_bundle.py",
+        "mutateInPlace": False,
+    }
+
+    old_owner = manifest["historicalDecisions"]["core/mtc_value_bundle.py"]
+    assert old_owner["replacementLiveOwners"] == [
+        "core/foundation_v2_value_bundle.py"
+    ]
+    assert old_owner["deleteInC7"] is True
+    assert "core/mtc_value_bundle.py" in manifest["c7DeletionSet"]
+
+
+def test_p3b_decision_preserves_identity_and_read_only_vetoes() -> None:
+    decision = json.loads(VALUE_BUNDLE_DECISION.read_text(encoding="utf-8"))
+    next_surface = decision["next"]
+
+    assert next_surface["surfaceCandidate"] == "mts-value-bundle/v0.3"
+    assert next_surface["referenceCore"] == "core/foundation_v2_value_bundle.py"
+    assert next_surface["observableResultSemanticsChanged"] is False
+    assert next_surface["historicalTypedAstIsNormativeInput"] is False
+    assert next_surface["runtimeHandleIsSemanticIdentity"] is False
+    assert next_surface["sourcePositionIsSemanticIdentity"] is False
+    assert next_surface["pathIsSemanticIdentity"] is False
+    assert next_surface["expansionUsesSharedReadOnlyFindLinks"] is True
+    assert next_surface["readOnlyQueries"] is True
+    assert next_surface["materializesDuringQuery"] is False
+
+    assert decision["veto"] == {
+        "compatibilityAstSemanticMode": False,
+        "identifyBundleWithSequenceGroup": False,
+        "implicitQueryWrites": False,
+        "deduplicateBeforeOccurrenceResolution": False,
+        "singletonBundleCoercion": False,
+        "numericOrRuntimeHandleIdentity": False,
+        "currentV06Mutation": False,
+    }
 
 
 def test_gate_does_not_claim_cutover_acceptance_or_downstream_repin() -> None:
