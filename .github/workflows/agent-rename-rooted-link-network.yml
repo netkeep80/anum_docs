@@ -24,6 +24,7 @@ jobs:
           from pathlib import Path
 
           root = Path('.')
+          workflow = Path('.github/workflows/agent-rename-rooted-link-network.yml')
           old_module = Path('core/exact_link_network.py')
           new_module = Path('core/rooted_link_network.py')
           old_test = Path('tests/test_mts_exact_occurrence_link_network.py')
@@ -36,7 +37,7 @@ jobs:
 
           changed = []
           for path in sorted(root.rglob('*')):
-              if not path.is_file() or '.git' in path.parts:
+              if not path.is_file() or '.git' in path.parts or path == workflow:
                   continue
               try:
                   text = path.read_text(encoding='utf-8')
@@ -61,7 +62,7 @@ jobs:
           forbidden = ('OccurrenceRef', 'exact_link_network', 'test_mts_exact_occurrence_link_network')
           leftovers = []
           for path in sorted(root.rglob('*')):
-              if not path.is_file() or '.git' in path.parts:
+              if not path.is_file() or '.git' in path.parts or path == workflow:
                   continue
               try:
                   text = path.read_text(encoding='utf-8')
