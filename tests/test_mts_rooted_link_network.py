@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import fields
+from pathlib import Path
 
 import pytest
 
@@ -301,3 +302,22 @@ def test_evolution_cannot_create_second_fully_self_closed_link():
 
     with pytest.raises(LinkNetworkError, match="fully self-closed link is unique"):
         evolution.define(other, other, other)
+
+
+
+def test_old_occurrence_api_vocabulary_does_not_return() -> None:
+    root = Path(__file__).resolve().parents[1]
+    old_type = "Occurrence" + "Ref"
+    old_module = "exact_" + "link_network"
+    old_test = "test_mts_exact_" + "occurrence_link_network.py"
+
+    assert not (root / "core" / f"{old_module}.py").exists()
+    assert not (root / "tests" / old_test).exists()
+
+    for directory in (root / "core", root / "docs" / "specs", root / "tests"):
+        for source in directory.rglob("*"):
+            if not source.is_file() or source.suffix not in {".py", ".md"}:
+                continue
+            content = source.read_text(encoding="utf-8")
+            assert old_type not in content, source
+            assert old_module not in content, source
