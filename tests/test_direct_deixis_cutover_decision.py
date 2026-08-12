@@ -11,6 +11,10 @@ MANIFEST = ROOT / "cutover/foundation-v2-import-classification-v0.1.json"
 DISPOSITION = ROOT / "cutover/foundation-v2-consumer-disposition-v0.1.json"
 CONTRACT = ROOT / "contracts/mts-contract-v0.6.json"
 CONFORMANCE = ROOT / "contracts/mts-conformance-v0.6.json"
+CANDIDATE = ROOT / "cutover/foundation-v2-cutover-candidate-v0.1.json"
+CANDIDATE_CONTRACT = ROOT / "cutover/foundation-v2-cutover-contract-v0.1.json"
+CANDIDATE_CONFORMANCE = ROOT / "cutover/foundation-v2-cutover-conformance-v0.1.json"
+CONSUMER_MATRIX = ROOT / "cutover/foundation-v2-c7-consumer-matrix-v0.1.json"
 
 
 def read(path: Path) -> dict:
@@ -192,4 +196,92 @@ def test_c1_freezes_no_legacy_runtime_after_atomic_c7() -> None:
         "compatibilityFacadeAllowed": False,
         "historicalRuntimeSelectableAfterC7": False,
         "frozenV06MayImportDeletedRuntime": False,
+    }
+
+
+def test_candidate_artifacts_are_non_authoritative_cutover_evidence() -> None:
+    assert CANDIDATE_CONTRACT.parent == ROOT / "cutover"
+    assert CANDIDATE_CONFORMANCE.parent == ROOT / "cutover"
+    assert {path.name for path in (ROOT / "contracts").glob("*.json")} == {
+        "mts-contract-v0.6.json",
+        "mts-conformance-v0.6.json",
+    }
+
+
+def test_candidate_contract_is_nonaccepted_and_uses_only_frozen_candidate_owners() -> None:
+    candidate = read(CANDIDATE)
+    contract = read(CANDIDATE_CONTRACT)
+
+    assert contract["schema"] == "foundation-v2-cutover-contract/v0.1"
+    assert contract["status"] == "candidate"
+    assert contract["accepted"] is False
+    assert contract["acceptedMtsVersion"] is None
+    assert contract["owners"] == candidate["owners"]
+    assert contract["consumerMatrix"] == candidate["candidateBoundary"]["consumerMatrix"]
+    assert set(contract["owners"].values()).isdisjoint(candidate["c7DeletionSet"])
+    for owner in contract["owners"].values():
+        assert (ROOT / owner).is_file(), owner
+
+    cutover = contract["cutover"]
+    assert cutover["foundationV2Accepted"] is False
+    assert cutover["cutoverPerformed"] is False
+    assert cutover["downstreamRepinAllowed"] is False
+    assert cutover["historicalRuntimeSelectableAfterC7"] is False
+    assert cutover["compatibilityOccurrenceMode"] is False
+
+
+def test_candidate_contract_freezes_identity_transport_and_read_only_boundaries() -> None:
+    contract = read(CANDIDATE_CONTRACT)
+
+    assert contract["semanticIdentity"]["runtimeHandleIsSemanticIdentity"] is False
+    assert contract["semanticIdentity"]["sourcePositionIsSemanticIdentity"] is False
+    assert contract["semanticIdentity"]["pathIsSemanticIdentity"] is False
+    assert contract["semanticIdentity"]["samePairCreatesSecondSemanticLink"] is False
+    assert contract["semanticIdentity"]["secondFullySelfClosedRootAllowed"] is False
+
+    assert contract["transport"]["abits"] == ["[", "]", "1", "0"]
+    assert contract["transport"]["exactlyFour"] is True
+    assert contract["transport"]["rootIsFifthAbit"] is False
+    assert contract["transport"]["emptyStream"] == "R"
+    assert contract["transport"]["emptyGroup"] == "R"
+    assert contract["transport"]["rawAndExistingCarrierShareOneStackMachine"] is True
+    assert contract["transport"]["existingCarrierReadOnly"] is True
+
+    assert contract["effects"] == {
+        "findEqualsMaterialize": False,
+        "notFoundImpliesNonExistence": False,
+        "readMayMaterialize": False,
+        "replayMayMaterialize": False,
+        "explicitMaterializationMustReuseSamePair": True,
+    }
+
+
+def test_candidate_conformance_points_only_to_existing_executable_gates() -> None:
+    candidate = read(CANDIDATE)
+    contract = read(CANDIDATE_CONTRACT)
+    conformance = read(CANDIDATE_CONFORMANCE)
+
+    assert conformance["schema"] == "foundation-v2-cutover-conformance/v0.1"
+    assert conformance["status"] == "candidate"
+    assert conformance["accepted"] is False
+    assert conformance["contract"] == candidate["candidateBoundary"]["contract"]
+    assert contract["conformance"] == candidate["candidateBoundary"]["conformance"]
+    assert conformance["integratedPath"] == candidate["c8IntegratedPath"]
+    assert conformance["requiredNegativeVectors"] == candidate["requiredNegativeVectors"]
+    assert conformance["migrationPrerequisite"]["consumerMatrix"] == str(
+        CONSUMER_MATRIX.relative_to(ROOT)
+    )
+
+    assert len(conformance["requiredExecutableGates"]) == len(
+        set(conformance["requiredExecutableGates"])
+    )
+    for gate in conformance["requiredExecutableGates"]:
+        assert gate.startswith("tests/") and gate.endswith(".py"), gate
+        assert (ROOT / gate).is_file(), gate
+
+    assert conformance["acceptance"] == {
+        "performedHere": False,
+        "acceptedMtsVersionAssignedHere": False,
+        "downstreamRepinAllowed": False,
+        "requiresSeparateC9": True,
     }
