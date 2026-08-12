@@ -1,0 +1,43 @@
+name: agent-clarify-linkref-spec
+
+on:
+  push:
+    branches:
+      - agent/rename-rooted-link-network
+
+permissions:
+  contents: write
+
+jobs:
+  clarify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/rename-rooted-link-network
+          fetch-depth: 0
+      - name: Clarify LinkRef semantic boundary
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('docs/specs/Апамять и управление сетью связей.md')
+          text = path.read_text(encoding='utf-8')
+          old = 'Техническая ссылка допустима как инженерный механизм доступа, но не как скрытый третий параметр связи.'
+          new = ('Техническая ссылка (`LinkRef` в текущем candidate runtime) допустима как инженерный механизм доступа, '
+                 'но не как скрытый третий параметр связи. `LinkRef` локален для конкретного runtime/snapshot и сам по себе не различает смысловые связи.')
+          if text.count(old) != 1:
+              raise SystemExit('expected spec sentence not found exactly once')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          PY
+      - name: Remove one-shot workflow
+        run: rm .github/workflows/agent-clarify-linkref-spec.yml
+      - name: Commit clarification
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Уточнить техническую границу LinkRef"
+          git push origin HEAD:agent/rename-rooted-link-network
