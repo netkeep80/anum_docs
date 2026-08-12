@@ -23,8 +23,8 @@ from core.mtc_value_bundle import (
 
 
 ROOT = Path(__file__).parents[1]
-CORPUS = ROOT / "contracts" / "mts-value-bundle-conformance-v0.2.json"
-CONTRACT = ROOT / "contracts" / "mts-value-bundle-v0.2.json"
+MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.5.json"
+MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.5.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 INTERPRETER = ROOT / "core" / "mtc_interpreter.py"
 REFERENCE_CORE = ROOT / "core" / "mtc_value_bundle.py"
@@ -32,7 +32,13 @@ MEMORY_CORE = ROOT / "core" / "anum_memory.py"
 
 
 def corpus() -> dict:
-    return json.loads(CORPUS.read_text(encoding="utf-8"))
+    current = json.loads(MTS_CONFORMANCE.read_text(encoding="utf-8"))
+    return current["corpora"]["valueBundle"]
+
+
+def _contract() -> dict:
+    current = json.loads(MTS_CONTRACT.read_text(encoding="utf-8"))
+    return current["surfaces"]["valueBundle"]
 
 
 def _entry(case: dict) -> ExpectedRole:
@@ -83,14 +89,14 @@ def _query_fixture() -> tuple[AnumMemory, dict[str, int]]:
 
 
 def test_reference_module_is_accepted_single_value_bundle_core():
-    contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
+    contract = _contract()
     interpreter_source = INTERPRETER.read_text(encoding="utf-8")
 
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
     integration = contract["productionIntegration"]
     assert integration["referenceCore"] == "core/mtc_value_bundle.py"
-    assert integration["conformanceCorpus"] == "contracts/mts-value-bundle-conformance-v0.2.json"
+    assert integration["conformanceCorpus"] == "mts-conformance/v0.5#corpora.valueBundle"
     assert REFERENCE_CORE.is_file()
     assert "mtc_value_bundle" not in interpreter_source
 

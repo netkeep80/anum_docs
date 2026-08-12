@@ -19,17 +19,19 @@ from core.root_library import load_root_library
 
 
 ROOT = Path(__file__).parents[1]
-CONTRACT = ROOT / "contracts" / "mts-definition-opening-v0.3.json"
-CORPUS = ROOT / "contracts" / "mts-definition-opening-conformance-v0.3.json"
+MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.5.json"
+MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.5.json"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
 
 def contract() -> dict:
-    return json.loads(CONTRACT.read_text(encoding="utf-8"))
+    current = json.loads(MTS_CONTRACT.read_text(encoding="utf-8"))
+    return current["surfaces"]["definitionOpening"]
 
 
 def corpus() -> dict:
-    return json.loads(CORPUS.read_text(encoding="utf-8"))
+    current = json.loads(MTS_CONFORMANCE.read_text(encoding="utf-8"))
+    return current["corpora"]["definitionOpening"]
 
 
 def definition(source: str) -> Definition:

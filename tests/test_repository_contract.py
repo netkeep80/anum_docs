@@ -187,9 +187,33 @@ def test_current_machine_manifest_is_single_self_contained_v05_surface():
     assert "legacyCoreRegressionCorpus" not in conformance
     assert "legacyCoreRegressionNormative" not in conformance
 
+    expected_keys = [
+        "anum",
+        "valueBundle",
+        "definitionOpening",
+        "derivationBase",
+        "openingPath",
+        "proof",
+        "directDeixis",
+    ]
+    assert {path.name for path in (ROOT / "contracts").glob("*.json")} == {
+        "mts-contract-v0.5.json",
+        "mts-conformance-v0.5.json",
+    }
+    assert list(contract["surfaces"]) == expected_keys
+    assert list(conformance["corpora"]) == expected_keys
+
     required = conformance["requiredAcceptedSurfaces"]
     assert [item["schema"] for item in required] == contract["dependsOn"]
-    assert all((ROOT / item["contractPath"]).is_file() for item in required)
+    assert [item["surfaceKey"] for item in required] == expected_keys
+    assert [item["conformanceKey"] for item in required] == expected_keys
+    for item in required:
+        surface = contract["surfaces"][item["surfaceKey"]]
+        assert surface["schema"] == item["schema"]
+        assert surface["status"] == "accepted"
+        assert surface["accepted"] is True
+        assert surface["conformanceKey"] == item["conformanceKey"]
+        assert conformance["corpora"][item["conformanceKey"]]
 
 
 def test_historical_mts_release_chain_is_physically_absent():

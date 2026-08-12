@@ -13,12 +13,19 @@ from core.anum_protocol import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTRACT_PATH = ROOT / "contracts/anum-stream-deserialization-v0.3.json"
+MTS_CONTRACT_PATH = ROOT / "contracts/mts-contract-v0.5.json"
+MTS_CONFORMANCE_PATH = ROOT / "contracts/mts-conformance-v0.5.json"
 SUPERSEDED_SEQUENCE_CANDIDATE = ROOT / "contracts/mts-anum-sequence-materialization-v0.7.json"
 
 
 def _contract() -> dict:
-    return json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
+    current = json.loads(MTS_CONTRACT_PATH.read_text(encoding="utf-8"))
+    return current["surfaces"]["anum"]
+
+
+def _corpus() -> dict:
+    current = json.loads(MTS_CONFORMANCE_PATH.read_text(encoding="utf-8"))
+    return current["corpora"]["anum"]
 
 
 def test_contract_is_current_accepted_and_independent_of_foundation_v2_acceptance() -> None:
@@ -51,7 +58,7 @@ def test_contract_preserves_four_abits_root_and_by_poles_identity() -> None:
 
 
 def test_every_valid_conformance_vector_executes_in_production_core() -> None:
-    corpus = _contract()["conformance"]
+    corpus = _corpus()
     assert corpus["schema"] == "anum-stream-deserialization-conformance/v0.3"
 
     for vector in corpus["valid"]:
@@ -70,7 +77,7 @@ def test_parsed_transport_and_compact_stream_have_identical_denotation() -> None
 
 
 def test_every_invalid_conformance_vector_rejects_with_exact_boundary() -> None:
-    for vector in _contract()["conformance"]["invalid"]:
+    for vector in _corpus()["invalid"]:
         with pytest.raises(StreamError) as caught:
             deserialize_stream(vector["source"])
         assert caught.value.code == vector["error"], vector["id"]

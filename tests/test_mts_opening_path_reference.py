@@ -17,14 +17,22 @@ from core.mtc_parser import parse_formula
 
 
 ROOT = Path(__file__).parents[1]
-CONTRACT = ROOT / "contracts" / "mts-opening-path-v0.4.json"
-CONFORMANCE = ROOT / "contracts" / "mts-opening-path-conformance-v0.4.json"
+MTS_CONTRACT = ROOT / "contracts" / "mts-contract-v0.5.json"
+MTS_CONFORMANCE = ROOT / "contracts" / "mts-conformance-v0.5.json"
 CORE = ROOT / "core" / "mtc_opening_path.py"
 ROOT_PROGRAM = ROOT / "tests" / "mtc_formulas.mtc"
 
 
 def read(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _contract() -> dict:
+    return read(MTS_CONTRACT)["surfaces"]["openingPath"]
+
+
+def _conformance() -> dict:
+    return read(MTS_CONFORMANCE)["corpora"]["openingPath"]
 
 
 def parse_form(source: str) -> Form:
@@ -113,8 +121,8 @@ def root_sources() -> tuple[str, ...]:
 
 
 def test_contract_is_accepted_self_contained_and_has_only_real_dependency():
-    contract = read(CONTRACT)
-    conformance = read(CONFORMANCE)
+    contract = _contract()
+    conformance = _conformance()
 
     assert contract["schema"] == "mts-opening-path/v0.4"
     assert contract["status"] == "accepted"
@@ -127,11 +135,11 @@ def test_contract_is_accepted_self_contained_and_has_only_real_dependency():
     assert conformance["schema"] == "mts-opening-path-conformance/v0.4"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
-    assert contract["conformanceCorpus"] == "contracts/mts-opening-path-conformance-v0.4.json"
+    assert contract["conformanceKey"] == "openingPath"
 
 
 def test_accepted_conformance_owns_complete_vector_corpus():
-    conformance = read(CONFORMANCE)
+    conformance = _conformance()
 
     assert conformance["validPaths"]
     assert conformance["invalidPaths"]
@@ -162,7 +170,7 @@ def test_accepted_conformance_owns_complete_vector_corpus():
 
 
 def test_every_accepted_vector_replays_fail_closed_in_production():
-    conformance = read(CONFORMANCE)
+    conformance = _conformance()
 
     for vector in conformance["validPaths"]:
         assert verify_portable(vector), vector["id"]
@@ -171,7 +179,7 @@ def test_every_accepted_vector_replays_fail_closed_in_production():
 
 
 def test_transport_is_canonical_for_bodies_but_structural_for_targets():
-    conformance = read(CONFORMANCE)
+    conformance = _conformance()
     vector = next(
         deepcopy(item)
         for item in conformance["validPaths"]
@@ -206,13 +214,13 @@ def test_transport_is_canonical_for_bodies_but_structural_for_targets():
     bundle["finalBody"] = "{ ◁ = x, ▷ = y }"
     assert not verify_portable(bundle)
 
-    transport = read(CONTRACT)["portableCertificate"]
+    transport = _contract()["portableCertificate"]
     assert "equivalent whitespace allowed" in transport["edges"]["target"]
     assert "canonical format_expression" in transport["edges"]["body"]
 
 
 def test_failure_surface_and_representative_core_failures_are_deterministic():
-    expected_codes = set(read(CONTRACT)["failureCodes"])
+    expected_codes = set(_contract()["failureCodes"])
     assert {item.value for item in OpeningPathFailure} == expected_codes
 
     environment = DefinitionEnvironment()
@@ -296,7 +304,7 @@ def test_repeated_definition_id_is_invalid_certificate_not_false_cycle():
     assert repeated.accepted is False
     assert repeated.failure is OpeningPathFailure.REPEATED_DEFINITION_ID
     assert repeated.failed_edge == 1
-    assert read(CONTRACT)["cycleCanonicality"]["repeatedDefinitionIdMeansSemanticFalse"] is False
+    assert _contract()["cycleCanonicality"]["repeatedDefinitionIdMeansSemanticFalse"] is False
 
 
 def test_non_form_terminal_is_valid_but_cannot_continue():
@@ -369,8 +377,8 @@ def test_verifier_is_read_only_and_has_no_runtime_evaluation_inputs():
 
 
 def test_relation_does_not_claim_logical_or_evaluation_semantics():
-    meaning = read(CONTRACT)["meaningBoundary"]
-    proof = read(CONTRACT)["proofBoundary"]
+    meaning = _contract()["meaningBoundary"]
+    proof = _contract()["proofBoundary"]
 
     assert meaning["impliesEquality"] is False
     assert meaning["impliesEquivalence"] is False
