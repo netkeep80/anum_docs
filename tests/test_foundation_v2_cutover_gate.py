@@ -28,9 +28,7 @@ def _module_path(parts: list[str], discovered: set[str]) -> str | None:
     if candidate in discovered:
         return candidate
     package_init = "/".join(parts + ["__init__"]) + ".py"
-    if package_init in discovered:
-        return package_init
-    return None
+    return package_init if package_init in discovered else None
 
 
 def imported_surface(source: str, discovered: set[str]) -> set[str]:
@@ -45,26 +43,27 @@ def imported_surface(source: str, discovered: set[str]) -> set[str]:
                 target = _module_path(alias.name.split("."), discovered)
                 if target:
                     targets.add(target)
-        elif isinstance(node, ast.ImportFrom):
-            if node.level:
-                keep = len(package) - (node.level - 1)
-                if keep < 0:
-                    continue
-                base = package[:keep]
-            else:
-                base = []
+            continue
+        if not isinstance(node, ast.ImportFrom):
+            continue
 
-            if node.module:
-                parts = base + node.module.split(".")
-                target = _module_path(parts, discovered)
+        if node.level:
+            keep = len(package) - (node.level - 1)
+            if keep < 0:
+                continue
+            base = package[:keep]
+        else:
+            base = []
+
+        if node.module:
+            target = _module_path(base + node.module.split("."), discovered)
+            if target:
+                targets.add(target)
+        elif node.level:
+            for alias in node.names:
+                target = _module_path(base + alias.name.split("."), discovered)
                 if target:
                     targets.add(target)
-            elif node.level:
-                for alias in node.names:
-                    target = _module_path(base + alias.name.split("."), discovered)
-                    if target:
-                        targets.add(target)
-
     return targets
 
 
@@ -112,23 +111,20 @@ def test_manifest_classifies_the_entire_core_and_converter_surface() -> None:
 
 def test_foundation_v2_live_surface_cannot_reach_historical_semantics() -> None:
     manifest = load_manifest()
-    graph = import_graph()
-
-    assert historical_reachability(graph, manifest["classifications"]) == []
+    assert historical_reachability(import_graph(), manifest["classifications"]) == []
 
 
 def test_public_foundation_v2_facade_has_an_exact_direct_dependency_set() -> None:
     manifest = load_manifest()
-    graph = import_graph()
-
-    assert sorted(graph["core/foundation_v2.py"]) == sorted(manifest["publicFacadeDirectDeps"])
+    assert sorted(import_graph()["core/foundation_v2.py"]) == sorted(
+        manifest["publicFacadeDirectDeps"]
+    )
 
 
 def test_historical_deletion_decisions_are_complete_and_c7_set_is_exact() -> None:
     manifest = load_manifest()
     classifications = manifest["classifications"]
     decisions = manifest["historicalDecisions"]
-
     historical = {
         path
         for path, classification in classifications.items()
@@ -146,22 +142,13 @@ def test_historical_deletion_decisions_are_complete_and_c7_set_is_exact() -> Non
         path for path, decision in decisions.items() if decision["deleteInC7"]
     )
     assert manifest["c7DeletionSet"] == expected_delete
-
-    deferred = {
-        path
-        for path, decision in decisions.items()
-        if not decision["deleteInC7"]
-    }
-    assert deferred == {
-        "core/mtc_context_analysis.py",
-        "core/mtc_value_bundle.py",
-    }
+    assert {
+        path for path, decision in decisions.items() if not decision["deleteInC7"]
+    } == {"core/mtc_value_bundle.py"}
 
 
 def test_gate_does_not_claim_cutover_acceptance_or_downstream_repin() -> None:
-    baseline = load_manifest()["baseline"]
-
-    assert baseline == {
+    assert load_manifest()["baseline"] == {
         "currentMtsContract": "mts-contract/v0.6",
         "foundationV2Accepted": False,
         "cutoverPerformed": False,
@@ -170,9 +157,7 @@ def test_gate_does_not_claim_cutover_acceptance_or_downstream_repin() -> None:
 
 
 def test_rooted_identity_veto_tests_are_part_of_the_gate() -> None:
-    manifest = load_manifest()
-
-    for relative_path, required_names in manifest["rootedVetoTests"].items():
+    for relative_path, required_names in load_manifest()["rootedVetoTests"].items():
         path = ROOT / relative_path
         assert path.is_file()
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=relative_path)
@@ -191,7 +176,6 @@ def test_current_production_contract_remains_v06_not_foundation_v2() -> None:
     conformance = json.loads(
         (ROOT / "contracts/mts-conformance-v0.6.json").read_text(encoding="utf-8")
     )
-
     assert contract["schema"] == "mts-contract/v0.6"
     assert conformance["schema"] == "mts-conformance/v0.6"
     assert contract["accepted"] is True
@@ -203,14 +187,14 @@ def test_historical_reverse_consumers_have_no_foundation_v2_live_owner() -> None
     graph = import_graph()
     classifications = manifest["classifications"]
     reverse: dict[str, set[str]] = defaultdict(set)
-
     for consumer, dependencies in graph.items():
         for dependency in dependencies:
             reverse[dependency].add(consumer)
 
-    violations = []
-    for historical in manifest["historicalDecisions"]:
-        for consumer in reverse.get(historical, set()):
-            if classifications[consumer] == "FOUNDATION_V2_LIVE":
-                violations.append((consumer, historical))
+    violations = [
+        (consumer, historical)
+        for historical in manifest["historicalDecisions"]
+        for consumer in reverse.get(historical, set())
+        if classifications[consumer] == "FOUNDATION_V2_LIVE"
+    ]
     assert violations == []
