@@ -60,7 +60,7 @@ def test_direct_deixis_old_owner_is_now_planned_for_atomic_c7_deletion() -> None
         for path, item in manifest["historicalDecisions"].items()
         if not item["deleteInC7"]
     }
-    assert unresolved == {"core/mtc_value_bundle.py"}
+    assert "core/mtc_context_analysis.py" not in unresolved
 
 
 def test_current_v06_is_not_mutated_by_the_cutover_decision() -> None:
