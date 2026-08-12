@@ -1,0 +1,95 @@
+{
+  "schema": "foundation-v2-cutover-candidate/v0.1",
+  "issue": 394,
+  "parentIssue": 271,
+  "status": "frozen-candidate",
+  "accepted": false,
+  "cutoverPerformed": false,
+  "downstreamRepinAllowed": false,
+  "previousAcceptedRelease": {
+    "contract": "contracts/mts-contract-v0.6.json",
+    "conformance": "contracts/mts-conformance-v0.6.json",
+    "immutable": true,
+    "remainsAcceptedUntilC9": true,
+    "isLiveOwnerManifestAfterC7": false
+  },
+  "candidateBoundary": {
+    "contractSchema": "foundation-v2-cutover-contract/v0.1",
+    "conformanceSchema": "foundation-v2-cutover-conformance/v0.1",
+    "acceptedMtsVersionAssignedHere": false,
+    "mustReferenceOnlyExistingPostC7Owners": true
+  },
+  "owners": {
+    "publicFacade": "core/foundation_v2.py",
+    "rootedSubstrate": "core/rooted_link_network.py",
+    "root": "core/foundation_v2_root.py",
+    "source": "core/foundation_v2_source.py",
+    "state": "core/foundation_v2_state.py",
+    "interpreter": "core/foundation_v2_interpreter.py",
+    "run": "core/foundation_v2_run.py",
+    "proof": "core/foundation_v2_proof.py",
+    "checker": "core/foundation_v2_checker.py",
+    "directDeixis": "core/foundation_v2_direct_deixis.py",
+    "valueBundle": "core/foundation_v2_value_bundle.py",
+    "anumStreamDenotation": "core/anum_protocol.py",
+    "anumExistingCarrier": "core/anum_carrier.py",
+    "anumMaterialization": "core/foundation_v2_materialization.py",
+    "persistence": "core/foundation_v2_persistent.py"
+  },
+  "historicalClassification": "cutover/foundation-v2-import-classification-v0.1.json",
+  "p3Decisions": {
+    "directDeixis": "cutover/direct-deixis-rooted-migration-decision-v0.1.json",
+    "valueBundle": "cutover/value-bundle-rooted-migration-decision-v0.1.json"
+  },
+  "c7DeletionSet": [
+    "core/mtc_ast.py",
+    "core/mtc_context_analysis.py",
+    "core/mtc_definitions.py",
+    "core/mtc_interpreter.py",
+    "core/mtc_opening_path.py",
+    "core/mtc_parser.py",
+    "core/mtc_value_bundle.py",
+    "core/proof_checker.py",
+    "core/root_library.py",
+    "core/validate_root.py"
+  ],
+  "c8IntegratedPath": [
+    "root",
+    "source",
+    "D/G/T",
+    "K/A",
+    ":/=",
+    "Run/proof",
+    "Anum materialization",
+    "persistent close/reopen"
+  ],
+  "requiredNegativeVectors": [
+    "second-fully-self-closed-by-physical-id",
+    "duplicate-same-pair",
+    "same-form-distinguished-only-by-runtime-handle",
+    "id-only-mutual-cycle",
+    "read-or-replay-materializes",
+    "historical-female-F-or-F-male-projection-meaning",
+    "root-as-fifth-abit",
+    "empty-group-rejected"
+  ],
+  "veto": {
+    "secondLiveSemanticRuntime": false,
+    "compatibilityOccurrenceMode": false,
+    "runtimeIdAsSemanticIdentity": false,
+    "sourcePositionAsSemanticIdentity": false,
+    "contextFrameDisguisedAsK": false,
+    "astOrTokenSemanticAuthority": false,
+    "readMayMaterialize": false,
+    "mutateMtsV06InPlace": false,
+    "deleteBeforeCandidateOwnerMigration": false,
+    "acceptInsideC7OrC8": false
+  },
+  "stageOrder": [
+    "C0-freeze-candidate",
+    "C1-migrate-consumers-and-candidate-contract",
+    "C7-atomic-delete-historical-runtime",
+    "C8-integrated-conformance",
+    "C9-explicit-acceptance-and-downstream-repin"
+  ]
+}
