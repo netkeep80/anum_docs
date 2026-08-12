@@ -249,6 +249,15 @@ def test_candidate_runtime_fixture_and_reference_paths_are_removed_after_promoti
     assert (ROOT / "tests/test_mtc_interpreter.py").is_file()
 
 
+def test_declarative_reference_model_does_not_return_as_second_semantic_index():
+    assert not (ROOT / "core/reference_model.py").exists()
+    assert not (ROOT / "tests/test_reference_model.py").exists()
+
+    parser_text = (ROOT / "core/mtc_parser.py").read_text(encoding="utf-8")
+    assert "reference_model" not in parser_text
+    assert "reference_operator" not in parser_text
+
+
 def test_anum_protocol_has_one_active_projection_and_quote_path():
     assert not (ROOT / "core/anum_projector.py").exists()
 
