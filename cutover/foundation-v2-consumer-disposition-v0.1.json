@@ -2,6 +2,7 @@
   "schema": "foundation-v2-consumer-disposition/v0.1",
   "issue": 394,
   "parentIssue": 271,
+  "c7Performed": true,
   "historicalOwners": [
     "core/mtc_ast.py",
     "core/mtc_context_analysis.py",
@@ -14,78 +15,25 @@
     "core/root_library.py",
     "core/validate_root.py"
   ],
-  "allowedDispositions": [
-    "DELETE_WITH_OWNER",
-    "MIGRATE_TO_FOUNDATION_V2",
-    "HISTORICAL_REPLAY_ONLY",
-    "NON_SEMANTIC_TOOLING"
-  ],
-  "externalDirectConsumers": {
-    "tests/test_context_pronouns.py": {
-      "disposition": "DELETE_WITH_OWNER",
-      "reason": "typed parser/AST historical acceptance tests; source history remains in Git"
-    },
-    "tests/test_mtc_definitions.py": {
-      "disposition": "DELETE_WITH_OWNER",
-      "reason": "historical definition environment unit tests are owned by mtc_definitions"
-    },
-    "tests/test_mtc_interpreter.py": {
-      "disposition": "DELETE_WITH_OWNER",
-      "reason": "historical ContextFrame/MemoryView interpreter tests"
-    },
-    "tests/test_mtc_parser.py": {
-      "disposition": "DELETE_WITH_OWNER",
-      "reason": "historical typed parser/AST semantic front-end tests"
-    },
-    "tests/test_mtc_value_bundle_reference.py": {
-      "disposition": "DELETE_WITH_OWNER",
-      "reason": "superseded by rooted ValueBundle challenge and P3b decision"
-    },
-    "tests/test_mts_contract_v06.py": {
-      "disposition": "HISTORICAL_REPLAY_ONLY",
-      "reason": "v0.6 remains immutable accepted previous-release evidence; C7 must remove executable historical-core imports and retain data-only manifest checks"
-    },
-    "tests/test_mts_definition_opening_reference.py": {
-      "disposition": "DELETE_WITH_OWNER",
-      "reason": "historical definition-opening reference runtime; rooted owner evidence is frozen by cutover decisions"
-    },
-    "tests/test_mts_direct_deixis_reference.py": {
-      "disposition": "DELETE_WITH_OWNER",
-      "reason": "superseded by rooted direct-deixis challenge and P3a decision"
-    },
-    "tests/test_mts_opening_path_reference.py": {
-      "disposition": "DELETE_WITH_OWNER",
-      "reason": "historical opening-path reference runtime is not a post-C7 live owner"
-    },
-    "tests/test_mts_proof_v04.py": {
-      "disposition": "DELETE_WITH_OWNER",
-      "reason": "historical proof_checker acceptance runtime is replaced by Foundation-v2 proof/checker evidence"
-    },
-    "tests/test_repository_contract.py": {
-      "disposition": "MIGRATE_TO_FOUNDATION_V2",
-      "target": "core/foundation_v2.py",
-      "reason": "repository architecture gate must survive C7 but stop importing validate_root"
-    },
-    "tests/test_root_library.py": {
-      "disposition": "DELETE_WITH_OWNER",
-      "reason": "historical root-library/parser semantics, including superseded projection notation, must leave the live tree"
-    }
+  "allowedDispositions": ["DELETE_WITH_OWNER", "MIGRATE_TO_FOUNDATION_V2", "HISTORICAL_REPLAY_ONLY", "NON_SEMANTIC_TOOLING"],
+  "externalDirectConsumers": {},
+  "deletedConsumers": {
+    "tests/test_context_pronouns.py": {"disposition": "DELETE_WITH_OWNER", "reason": "removed with historical parser/AST owners"},
+    "tests/test_mtc_definitions.py": {"disposition": "DELETE_WITH_OWNER", "reason": "removed with historical definition owner"},
+    "tests/test_mtc_interpreter.py": {"disposition": "DELETE_WITH_OWNER", "reason": "removed with historical interpreter owner"},
+    "tests/test_mtc_parser.py": {"disposition": "DELETE_WITH_OWNER", "reason": "removed with historical parser/AST owners"},
+    "tests/test_mtc_value_bundle_reference.py": {"disposition": "DELETE_WITH_OWNER", "reason": "removed after rooted ValueBundle migration"},
+    "tests/test_mts_definition_opening_reference.py": {"disposition": "DELETE_WITH_OWNER", "reason": "removed after rooted state/source migration"},
+    "tests/test_mts_direct_deixis_reference.py": {"disposition": "DELETE_WITH_OWNER", "reason": "removed after rooted direct-deixis migration"},
+    "tests/test_mts_opening_path_reference.py": {"disposition": "DELETE_WITH_OWNER", "reason": "removed after Foundation-v2 checker/proof migration"},
+    "tests/test_mts_proof_v04.py": {"disposition": "DELETE_WITH_OWNER", "reason": "removed after Foundation-v2 proof/checker migration"},
+    "tests/test_root_library.py": {"disposition": "DELETE_WITH_OWNER", "reason": "removed after constructive rooted bootstrap migration"}
   },
   "resolvedConsumers": {
-    "tests/test_mts_foundation_v2_direct_deixis.py": {
-      "disposition": "MIGRATE_TO_FOUNDATION_V2",
-      "target": "core/foundation_v2_direct_deixis.py",
-      "reason": "rooted conformance now uses explicit NODE/OPAQUE/PRONOUN evidence without historical AST/parser projection",
-      "resolvedByIssue": 400,
-      "currentHistoricalImports": false
-    },
-    "tests/test_mts_foundation_v2_value_bundle.py": {
-      "disposition": "MIGRATE_TO_FOUNDATION_V2",
-      "target": "core/foundation_v2_value_bundle.py",
-      "reason": "rooted conformance now uses explicit kind skeleton and resolved Link evidence without historical AST/parser projection",
-      "resolvedByIssue": 400,
-      "currentHistoricalImports": false
-    }
+    "tests/test_mts_foundation_v2_direct_deixis.py": {"disposition": "MIGRATE_TO_FOUNDATION_V2", "target": "core/foundation_v2_direct_deixis.py", "reason": "native rooted evidence", "resolvedByIssue": 400, "currentHistoricalImports": false},
+    "tests/test_mts_foundation_v2_value_bundle.py": {"disposition": "MIGRATE_TO_FOUNDATION_V2", "target": "core/foundation_v2_value_bundle.py", "reason": "native rooted evidence", "resolvedByIssue": 400, "currentHistoricalImports": false},
+    "tests/test_repository_contract.py": {"disposition": "MIGRATE_TO_FOUNDATION_V2", "target": "core/foundation_v2.py", "reason": "constructive rooted architecture gate", "resolvedByIssue": 394, "resolvedByPullRequest": 401, "currentHistoricalImports": false},
+    "tests/test_mts_contract_v06.py": {"disposition": "HISTORICAL_REPLAY_ONLY", "reason": "immutable data-only previous-release evidence", "resolvedByIssue": 394, "resolvedByPullRequest": 401, "currentHistoricalImports": false}
   },
   "c7Rule": {
     "noExternalDirectHistoricalImportsAfterMigration": true,

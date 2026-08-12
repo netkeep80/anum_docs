@@ -1,0 +1,52 @@
+{
+  "schema": "foundation-v2-c9-acceptance/v0.1",
+  "issue": 403,
+  "parentIssue": 271,
+  "atomicPullRequest": 401,
+  "decision": "ACCEPT_MTS_V0_7",
+  "versionDecision": {
+    "previousAcceptedVersion": "mts-contract/v0.6",
+    "acceptedVersion": "mts-contract/v0.7",
+    "reason": "next sequential umbrella release after immutable v0.6; C7/C8 replaces production ownership with one rooted Foundation-v2 runtime"
+  },
+  "current": {
+    "contract": "contracts/mts-contract-v0.7.json",
+    "conformance": "contracts/mts-conformance-v0.7.json",
+    "publicFacade": "core/foundation_v2.py"
+  },
+  "previousReleaseEvidence": {
+    "contract": "contracts/mts-contract-v0.6.json",
+    "conformance": "contracts/mts-conformance-v0.6.json",
+    "immutable": true,
+    "liveRuntimeSelectable": false
+  },
+  "evidence": {
+    "c7DeletionCommit": "07f78c34cb2714110975d9952c22fc50ac4d5edc",
+    "c7GreenCommit": "3a7ed45c8dbb95c872c5b7afcdf90047fd8bb8dc",
+    "c8CandidateConformanceCommit": "af42c19cc364348e3d4434025ad2ee27bf3bef4b",
+    "c8IntegratedGate": "tests/test_foundation_v2_c8_integrated.py",
+    "c8IntegratedPathPassed": true,
+    "c8RequiredNegativeVectorsPassed": true
+  },
+  "acceptance": {
+    "foundationV2Accepted": true,
+    "cutoverPerformed": true,
+    "downstreamRepinAllowed": true,
+    "singleLiveSemanticRuntime": true,
+    "historicalRuntimeSelectable": false,
+    "compatibilityRuntimeAllowed": false
+  },
+  "versionedSurfaces": {
+    "anum": "anum-deserialization/v0.4",
+    "directDeixis": "mts-direct-deixis/v0.6",
+    "valueBundle": "mts-value-bundle/v0.3"
+  },
+  "veto": {
+    "mutateV06InPlace": false,
+    "restoreDeletedHistoricalRuntime": false,
+    "runtimeOrStorageIdAsSemanticIdentity": false,
+    "sourcePositionOrPathAsSemanticIdentity": false,
+    "readOrReplayMayMaterialize": false,
+    "secondLiveRuntime": false
+  }
+}

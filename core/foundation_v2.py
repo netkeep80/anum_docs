@@ -1,4 +1,4 @@
-"""One public Python entry surface for the Foundation-v2 production candidate.
+"""One public Python entry surface for the accepted MTS v0.7 rooted runtime.
 
 This module is deliberately a thin facade over the tested Foundation-v2
 implementation modules. It adds no semantic dispatch and no compatibility mode.

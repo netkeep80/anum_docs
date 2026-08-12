@@ -1,18 +1,26 @@
 # -*- coding: utf-8 -*-
-"""Architecture contract for the canonical active repository surface."""
+"""Repository architecture and current-release gate for the single rooted runtime."""
+from __future__ import annotations
 
-import hashlib
+import ast
 import json
 import re
 from pathlib import Path
 from urllib.parse import unquote
 
-from core.validate_root import validate_root_library
+from core.foundation_v2_root import build_root_kernel, root_role_refs, validate_root_kernel
+
 
 ROOT = Path(__file__).resolve().parents[1]
-ROOT_FIXTURE = ROOT / "tests/mtc_formulas.mtc"
-MTS_CONTRACT_CURRENT = ROOT / "contracts/mts-contract-v0.6.json"
-MTS_CONFORMANCE_CURRENT = ROOT / "contracts/mts-conformance-v0.6.json"
+CANDIDATE = ROOT / "cutover/foundation-v2-cutover-candidate-v0.1.json"
+CANDIDATE_CONTRACT = ROOT / "cutover/foundation-v2-cutover-contract-v0.1.json"
+CANDIDATE_CONFORMANCE = ROOT / "cutover/foundation-v2-cutover-conformance-v0.1.json"
+ACCEPTANCE = ROOT / "cutover/foundation-v2-c9-acceptance-v0.1.json"
+PREVIOUS_CONTRACT = ROOT / "contracts/mts-contract-v0.6.json"
+PREVIOUS_CONFORMANCE = ROOT / "contracts/mts-conformance-v0.6.json"
+CURRENT_CONTRACT = ROOT / "contracts/mts-contract-v0.7.json"
+CURRENT_CONFORMANCE = ROOT / "contracts/mts-conformance-v0.7.json"
+C8_GATE = ROOT / "tests/test_foundation_v2_c8_integrated.py"
 ACTIVE_THEORY = {"Основания МТС.md", "Система аксиом МТС.md"}
 ACTIVE_SPECS = {
     "Формальная нотация МТС.md",
@@ -27,112 +35,51 @@ ACTIVE_MARKDOWN = (
     *(ROOT / "docs/specs" / name for name in ACTIVE_SPECS),
 )
 FORBIDDEN_DIRECTORIES = {"archive", "legacy", "old", "deprecated"}
-FORBIDDEN_PROTOCOL_FORMULAS = {"[ := ∞♀", "] := ♂∞", "[] := 0", "][ := 1"}
-FORBIDDEN_HISTORICAL_MTS_RELEASES = {
-    "contracts/mts-contract-v0.2.json",
-    "contracts/mts-conformance-v0.2.json",
-    "contracts/mts-contract-v0.3.json",
-    "contracts/mts-conformance-v0.3.json",
-    "contracts/mts-contract-v0.4.json",
-    "contracts/mts-conformance-v0.4.json",
-    "contracts/mts-contract-v0.5.json",
-    "contracts/mts-conformance-v0.5.json",
-    "contracts/mts-proof-v0.2.json",
-    "contracts/mts-proof-v0.3.json",
-    "contracts/mts-proof-conformance-v0.3.json",
-    "docs/specs/Reference model МТС v0.2.md",
+DELETED_HISTORICAL_PATHS = {
+    "core/mtc_ast.py",
+    "core/mtc_context_analysis.py",
+    "core/mtc_definitions.py",
+    "core/mtc_interpreter.py",
+    "core/mtc_opening_path.py",
+    "core/mtc_parser.py",
+    "core/mtc_value_bundle.py",
+    "core/proof_checker.py",
+    "core/root_library.py",
+    "core/validate_root.py",
+    "tests/test_context_pronouns.py",
+    "tests/test_mtc_definitions.py",
+    "tests/test_mtc_interpreter.py",
+    "tests/test_mtc_parser.py",
+    "tests/test_mtc_value_bundle_reference.py",
+    "tests/test_mts_definition_opening_reference.py",
+    "tests/test_mts_direct_deixis_reference.py",
+    "tests/test_mts_opening_path_reference.py",
+    "tests/test_mts_proof_v04.py",
+    "tests/test_root_library.py",
 }
-FORBIDDEN_FOUNDATION_V2_GATE_CONTRACTS = {
-    "contracts/mts-rooted-link-network-v0.7.json",
-    "contracts/mts-foundation-v2-root-v0.7.json",
-    "contracts/mts-foundation-v2-source-v0.7.json",
-    "contracts/mts-foundation-v2-state-v0.7.json",
-    "contracts/mts-foundation-v2-colon-v0.7.json",
-    "contracts/mts-foundation-v2-equality-v0.7.json",
-    "contracts/mts-foundation-v2-proof-rule-v0.7.json",
-    "contracts/mts-foundation-v2-run-v0.7.json",
-    "contracts/mts-foundation-v2-interpreter-replay-v0.7.json",
-    "contracts/mts-foundation-v2-integrated-proof-v0.7.json",
-    "contracts/mts-foundation-v2-persistent-l4-v0.7.json",
-}
-FORBIDDEN_CANDIDATE_PATHS = {
-    "core/context_interpreter_candidate.py",
-    "tests/fixtures/mtc_root_v02_candidate.mtc",
-    "tests/fixtures/mts_contract_v02_candidate.json",
-    "tests/test_context_interpreter_candidate.py",
-    "tests/test_mts_contract_v02_candidate.py",
-    "tests/test_root_v02_candidate.py",
-    "tests/test_root_v02_execution_candidate.py",
-    "docs/specs/Reference model МТС v0.1.md",
-    "docs/research/Foundation v2 P9 integrated proof conformance.md",
-    "contracts/anum-boundary-conformance-candidate-v0.6.json",
-    "contracts/mts-opening-path-challenge-v0.4.json",
-    "contracts/mts-opening-path-decision-v0.4.json",
-    "contracts/mts-opening-path-conformance-candidate-v0.4.json",
-    "contracts/mts-proof-opening-path-challenge-v0.4.json",
-    "contracts/mts-proof-v0.4-conformance-candidate.json",
-    "tests/test_mts_opening_path_challenge.py",
-    "tests/test_mts_opening_path_decision.py",
-    "tests/test_mts_proof_v04_opening_path_challenge.py",
-    "contracts/mts-definition-resolution-challenge-v0.3.json",
-    "contracts/mts-definition-environment-decision-v0.3.json",
-    "contracts/mts-definition-environment-challenge-v0.3.json",
-    "contracts/mts-definition-opening-decision-v0.3.json",
-    "contracts/mts-definition-opening-challenge-v0.3.json",
-    "tests/test_mts_definition_resolution_challenge.py",
-    "tests/test_mts_definition_environment_decision.py",
-    "tests/test_mts_definition_environment_challenge.py",
-    "tests/test_mts_definition_opening_decision.py",
-    "tests/test_mts_definition_opening_challenge.py",
-    "contracts/mts-deictic-context-challenge-v0.5.json",
-    "contracts/mts-context-dependency-challenge-v0.5.json",
-    "contracts/mts-context-dependency-decision-v0.5.json",
-    "contracts/mts-direct-deixis-challenge-v0.5.json",
-    "contracts/mts-direct-deixis-conformance-candidate-v0.5.json",
-    "tests/test_mts_deictic_context_challenge.py",
-    "tests/test_mts_context_dependency_challenge.py",
-    "tests/test_mts_context_dependency_decision.py",
-    "tests/test_mts_direct_deixis_challenge.py",
-    "contracts/mts-bundle-challenge-v0.2.json",
-    "contracts/mts-bundle-decision-v0.2.json",
-    "contracts/mts-bundle-elaboration-challenge-v0.2.json",
-    "contracts/mts-bundle-algebra-challenge-v0.2.json",
-    "contracts/mts-bundle-expansion-challenge-v0.2.json",
-    "tests/test_mts_bundle_challenge.py",
-    "tests/test_mts_bundle_decision.py",
-    "tests/test_mts_bundle_elaboration_challenge.py",
-    "tests/test_mts_bundle_algebra_challenge.py",
-    "tests/test_mts_bundle_expansion_challenge.py",
-    "tests/test_mts_value_bundle_candidate_contract.py",
-    "contracts/mts-proof-domain-decision-v0.3.json",
-    "contracts/mts-proof-lifting-challenge-v0.3.json",
-    "contracts/mts-proof-lifting-conformance-v0.3.json",
-    "contracts/mts-proof-judgment-challenge-v0.3.json",
-    "contracts/mts-proof-judgment-decision-v0.3.json",
-    "contracts/mts-proof-judgment-conformance-v0.3.json",
-    "tests/test_mts_proof_domain_decision.py",
-    "tests/test_mts_proof_lifting_challenge.py",
-    "tests/test_mts_proof_judgment_challenge.py",
-    "tests/test_mts_proof_judgment_decision.py",
-}
-ROOT_FORMULAS_SHA256 = "1ccfb6fa0ae3c744dffcdefefcf2d5d96108573f4b04fdd8ac45a2e15a98ee3a"
 
 
-def root_formula_text() -> str:
-    lines = (
-        line.strip()
-        for line in ROOT_FIXTURE.read_text(encoding="utf-8").splitlines()
-        if line.strip() and not line.lstrip().startswith("#")
-    )
-    return "\n".join(lines) + "\n"
+def load(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_active_document_sets_are_exact():
+def strings(value):
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, list):
+        for item in value:
+            yield from strings(item)
+    elif isinstance(value, dict):
+        for item in value.values():
+            yield from strings(item)
+
+
+def test_active_document_sets_are_exact() -> None:
     assert {path.name for path in (ROOT / "docs/theory").glob("*.md")} == ACTIVE_THEORY
     assert {path.name for path in (ROOT / "docs/specs").glob("*.md")} == ACTIVE_SPECS
 
 
-def test_forbidden_archive_directories_do_not_exist():
+def test_forbidden_archive_directories_do_not_exist() -> None:
     forbidden = [
         path.relative_to(ROOT)
         for path in ROOT.rglob("*")
@@ -141,8 +88,8 @@ def test_forbidden_archive_directories_do_not_exist():
     assert forbidden == []
 
 
-def test_active_markdown_links_exist():
-    missing = []
+def test_active_markdown_links_exist() -> None:
+    missing: list[str] = []
     for document in ACTIVE_MARKDOWN:
         text = document.read_text(encoding="utf-8")
         for raw_target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", text):
@@ -154,160 +101,214 @@ def test_active_markdown_links_exist():
     assert missing == []
 
 
-def test_illustrations_are_preserved():
-    pictures = ROOT / "pics"
-    assert pictures.is_dir()
-    assert any(path.is_file() for path in pictures.iterdir())
+def test_root_kernel_is_constructive_canonical_five_link_basis() -> None:
+    kernel = build_root_kernel()
+    validate_root_kernel(kernel)
+    refs = root_role_refs(kernel)
+    assert set(refs) == {"R", "O", "C", "L", "U"}
+    assert len(kernel.network.refs) == 5
+    assert kernel.network.root is refs["R"]
+    assert kernel.network.find(refs["R"], refs["R"]) is refs["R"]
+    assert kernel.network.find(refs["O"], refs["R"]) is refs["O"]
+    assert kernel.network.find(refs["R"], refs["C"]) is refs["C"]
+    assert kernel.network.find(refs["O"], refs["C"]) is refs["L"]
+    assert kernel.network.find(refs["C"], refs["O"]) is refs["U"]
 
 
-def test_root_fixture_is_exact_and_excludes_protocol_hypotheses():
-    formula_text = root_formula_text()
-    assert hashlib.sha256(formula_text.encode("utf-8")).hexdigest() == ROOT_FORMULAS_SHA256
-    assert all(formula not in formula_text for formula in FORBIDDEN_PROTOCOL_FORMULAS)
-    assert len([line for line in formula_text.splitlines() if line]) == 10
+def test_cutover_candidate_uses_one_rooted_runtime_path() -> None:
+    candidate = load(CANDIDATE)
+    contract = load(CANDIDATE_CONTRACT)
+    conformance = load(CANDIDATE_CONFORMANCE)
+    assert candidate["schema"] == "foundation-v2-cutover-candidate/v0.1"
+    assert contract["schema"] == "foundation-v2-cutover-contract/v0.1"
+    assert conformance["schema"] == "foundation-v2-cutover-conformance/v0.1"
+    assert contract["owners"] == candidate["owners"]
+    assert set(contract["owners"].values()).isdisjoint(candidate["c7DeletionSet"])
+    for owner in contract["owners"].values():
+        assert (ROOT / owner).is_file(), owner
 
 
-def test_current_machine_manifest_is_single_self_contained_v06_surface():
-    assert MTS_CONTRACT_CURRENT.is_file()
-    assert MTS_CONFORMANCE_CURRENT.is_file()
+def test_previous_v06_release_is_frozen_data_not_candidate_owner_authority() -> None:
+    candidate = load(CANDIDATE)
+    previous = candidate["previousAcceptedRelease"]
+    assert previous["contract"] == "contracts/mts-contract-v0.6.json"
+    assert previous["conformance"] == "contracts/mts-conformance-v0.6.json"
+    assert previous["immutable"] is True
+    assert previous["isLiveOwnerManifestAfterC7"] is False
+    assert load(PREVIOUS_CONTRACT)["schema"] == "mts-contract/v0.6"
+    assert load(PREVIOUS_CONFORMANCE)["schema"] == "mts-conformance/v0.6"
 
-    contract = json.loads(MTS_CONTRACT_CURRENT.read_text(encoding="utf-8"))
-    conformance = json.loads(MTS_CONFORMANCE_CURRENT.read_text(encoding="utf-8"))
 
-    assert contract["schema"] == "mts-contract/v0.6"
+def test_cutover_contract_preserves_identity_and_four_abit_transport() -> None:
+    contract = load(CANDIDATE_CONTRACT)
+    identity = contract["semanticIdentity"]
+    transport = contract["transport"]
+    effects = contract["effects"]
+    assert identity["runtimeHandleIsSemanticIdentity"] is False
+    assert identity["sourcePositionIsSemanticIdentity"] is False
+    assert identity["pathIsSemanticIdentity"] is False
+    assert identity["samePairCreatesSecondSemanticLink"] is False
+    assert identity["secondFullySelfClosedRootAllowed"] is False
+    assert transport["abits"] == ["[", "]", "1", "0"]
+    assert transport["exactlyFour"] is True
+    assert transport["rootIsFifthAbit"] is False
+    assert transport["emptyStream"] == "R"
+    assert transport["emptyGroup"] == "R"
+    assert transport["rawAndExistingCarrierShareOneStackMachine"] is True
+    assert effects["findEqualsMaterialize"] is False
+    assert effects["notFoundImpliesNonExistence"] is False
+    assert effects["readMayMaterialize"] is False
+    assert effects["replayMayMaterialize"] is False
+
+
+def test_candidate_remains_nonaccepted_historical_cutover_evidence() -> None:
+    candidate = load(CANDIDATE)
+    contract = load(CANDIDATE_CONTRACT)
+    conformance = load(CANDIDATE_CONFORMANCE)
+    assert candidate["accepted"] is False
+    assert candidate["cutoverPerformed"] is False
+    assert candidate["downstreamRepinAllowed"] is False
+    assert contract["accepted"] is False
+    assert contract["acceptedMtsVersion"] is None
+    assert conformance["accepted"] is False
+    assert conformance["acceptance"]["performedHere"] is False
+    assert conformance["acceptance"]["downstreamRepinAllowed"] is False
+
+
+def test_c9_acceptance_selects_exactly_mts_v07_as_current() -> None:
+    acceptance = load(ACCEPTANCE)
+    assert acceptance["schema"] == "foundation-v2-c9-acceptance/v0.1"
+    assert acceptance["issue"] == 403
+    assert acceptance["decision"] == "ACCEPT_MTS_V0_7"
+    assert acceptance["versionDecision"]["previousAcceptedVersion"] == "mts-contract/v0.6"
+    assert acceptance["versionDecision"]["acceptedVersion"] == "mts-contract/v0.7"
+    assert acceptance["current"] == {
+        "contract": "contracts/mts-contract-v0.7.json",
+        "conformance": "contracts/mts-conformance-v0.7.json",
+        "publicFacade": "core/foundation_v2.py",
+    }
+    assert acceptance["acceptance"] == {
+        "foundationV2Accepted": True,
+        "cutoverPerformed": True,
+        "downstreamRepinAllowed": True,
+        "singleLiveSemanticRuntime": True,
+        "historicalRuntimeSelectable": False,
+        "compatibilityRuntimeAllowed": False,
+    }
+
+
+def test_v07_contract_and_conformance_are_accepted_and_cross_linked() -> None:
+    contract = load(CURRENT_CONTRACT)
+    conformance = load(CURRENT_CONFORMANCE)
+    assert contract["schema"] == "mts-contract/v0.7"
     assert contract["status"] == "accepted"
     assert contract["accepted"] is True
-    assert "extends" not in contract
-    assert "baseContract" not in contract
-    assert not any(item.startswith("mts-contract/v0.") for item in contract["dependsOn"])
-    assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.6.json"
-
-    assert conformance["schema"] == "mts-conformance/v0.6"
+    assert contract["acceptedMtsVersion"] == contract["schema"]
+    assert contract["conformanceCorpus"] == "contracts/mts-conformance-v0.7.json"
+    assert contract["currentPointer"] == "cutover/foundation-v2-c9-acceptance-v0.1.json"
+    assert conformance["schema"] == "mts-conformance/v0.7"
     assert conformance["status"] == "accepted"
     assert conformance["accepted"] is True
     assert conformance["contract"] == contract["schema"]
-    assert "legacyCoreRegressionCorpus" not in conformance
-    assert "legacyCoreRegressionNormative" not in conformance
+    assert conformance["acceptance"]["acceptedMtsVersion"] == contract["schema"]
+    assert conformance["acceptance"]["foundationV2Accepted"] is True
+    assert conformance["acceptance"]["downstreamRepinAllowed"] is True
 
-    expected_keys = [
-        "anum",
-        "valueBundle",
-        "definitionOpening",
-        "derivationBase",
-        "openingPath",
-        "proof",
-        "directDeixis",
-    ]
+
+def test_v07_owns_only_existing_post_c7_runtime_files() -> None:
+    contract = load(CURRENT_CONTRACT)
+    for role, path in contract["owners"].items():
+        assert (ROOT / path).is_file(), (role, path)
+        assert path not in DELETED_HISTORICAL_PATHS, (role, path)
+    live_strings = set(strings(contract)) | set(strings(load(CURRENT_CONFORMANCE)))
+    assert not (DELETED_HISTORICAL_PATHS & live_strings)
+    for path in DELETED_HISTORICAL_PATHS:
+        assert not (ROOT / path).exists(), path
+
+
+def test_v07_preserves_rooted_identity_and_read_only_vetoes() -> None:
+    contract = load(CURRENT_CONTRACT)
+    identity = contract["semanticIdentity"]
+    effects = contract["effects"]
+    assert identity["linkIdentity"] == "by ordered semantic poles"
+    assert identity["runtimeHandleIsSemanticIdentity"] is False
+    assert identity["sourcePositionIsSemanticIdentity"] is False
+    assert identity["pathIsSemanticIdentity"] is False
+    assert identity["samePairCreatesSecondSemanticLink"] is False
+    assert identity["secondFullySelfClosedRootAllowed"] is False
+    assert effects == {
+        "findEqualsMaterialize": False,
+        "notFoundImpliesNonExistence": False,
+        "readMayMaterialize": False,
+        "replayMayMaterialize": False,
+        "explicitMaterializationMustReuseSamePair": True,
+    }
+
+
+def test_v07_versioned_leaf_boundaries_match_completed_p3_decisions() -> None:
+    contract = load(CURRENT_CONTRACT)
+    conformance = load(CURRENT_CONFORMANCE)
+    assert contract["surfaces"]["directDeixis"]["schema"] == "mts-direct-deixis/v0.6"
+    assert contract["surfaces"]["directDeixis"]["observableResultSemanticsChangedFromV05"] is False
+    assert contract["surfaces"]["valueBundle"]["schema"] == "mts-value-bundle/v0.3"
+    assert contract["surfaces"]["valueBundle"]["observableResultSemanticsChangedFromV02"] is False
+    assert contract["surfaces"]["anum"]["schema"] == "anum-deserialization/v0.4"
+    assert conformance["versionedSurfaces"] == {
+        "anum": "anum-deserialization/v0.4",
+        "directDeixis": "mts-direct-deixis/v0.6",
+        "valueBundle": "mts-value-bundle/v0.3",
+    }
+
+
+def test_v07_requires_the_green_c8_integrated_gate() -> None:
+    conformance = load(CURRENT_CONFORMANCE)
+    assert C8_GATE.is_file()
+    assert "tests/test_foundation_v2_c8_integrated.py" in conformance["requiredExecutableGates"]
+    assert "tests/test_repository_contract.py" in conformance["requiredExecutableGates"]
+    assert conformance["c7"] == {
+        "performed": True,
+        "historicalRuntimePresent": False,
+        "externalHistoricalConsumers": 0,
+    }
+    assert conformance["c8"] == {
+        "performed": True,
+        "integratedGate": "tests/test_foundation_v2_c8_integrated.py",
+        "integratedPathPassed": True,
+        "requiredNegativeVectorsPassed": True,
+        "compatibilityRuntimeUsed": False,
+    }
+    for path in conformance["requiredExecutableGates"]:
+        assert (ROOT / path).is_file(), path
+
+
+def test_v06_remains_previous_release_evidence_not_current_pointer() -> None:
+    previous_contract = load(PREVIOUS_CONTRACT)
+    previous_conformance = load(PREVIOUS_CONFORMANCE)
+    acceptance = load(ACCEPTANCE)
+    assert previous_contract["schema"] == "mts-contract/v0.6"
+    assert previous_contract["accepted"] is True
+    assert previous_conformance["schema"] == "mts-conformance/v0.6"
+    assert previous_conformance["accepted"] is True
+    assert acceptance["previousReleaseEvidence"]["immutable"] is True
+    assert acceptance["previousReleaseEvidence"]["liveRuntimeSelectable"] is False
+    assert acceptance["current"]["contract"] != "contracts/mts-contract-v0.6.json"
+
+
+def test_contract_directory_contains_exactly_previous_and_current_release_pairs() -> None:
     assert {path.name for path in (ROOT / "contracts").glob("*.json")} == {
         "mts-contract-v0.6.json",
         "mts-conformance-v0.6.json",
+        "mts-contract-v0.7.json",
+        "mts-conformance-v0.7.json",
     }
-    assert list(contract["surfaces"]) == expected_keys
-    assert list(conformance["corpora"]) == expected_keys
-
-    required = conformance["requiredAcceptedSurfaces"]
-    assert [item["schema"] for item in required] == contract["dependsOn"]
-    assert [item["surfaceKey"] for item in required] == expected_keys
-    assert [item["conformanceKey"] for item in required] == expected_keys
-    for item in required:
-        surface = contract["surfaces"][item["surfaceKey"]]
-        assert surface["schema"] == item["schema"]
-        assert surface["status"] == "accepted"
-        assert surface["accepted"] is True
-        assert surface["conformanceKey"] == item["conformanceKey"]
-        assert conformance["corpora"][item["conformanceKey"]]
 
 
-def test_historical_mts_release_chain_is_physically_absent():
-    leftovers = sorted(path for path in FORBIDDEN_HISTORICAL_MTS_RELEASES if (ROOT / path).exists())
-    assert leftovers == []
-
-
-def test_foundation_v2_candidate_has_one_runtime_path_without_gate_contract_ladder():
-    leftovers = sorted(
-        path for path in FORBIDDEN_FOUNDATION_V2_GATE_CONTRACTS if (ROOT / path).exists()
-    )
-    assert leftovers == []
-    assert (ROOT / "core/foundation_v2.py").is_file()
-
-    contract = json.loads(MTS_CONTRACT_CURRENT.read_text(encoding="utf-8"))
-    serialized = json.dumps(contract, ensure_ascii=False)
-    assert "foundation-v2" not in serialized
-    assert "mts-rooted-link-network/v0.7" not in serialized
-
-
-def test_contributor_guide_points_only_to_current_machine_surface():
-    text = (ROOT / "docs/CONTRIBUTING.md").read_text(encoding="utf-8")
-
-    assert "../contracts/mts-contract-v0.6.json" in text
-    assert "anum-deserialization/v0.4" in text
-    assert "Reference model МТС v0.2" not in text
-    assert "mts-contract-v0.2" not in text
-
-
-def test_current_manifest_does_not_restore_superseded_anum_or_occurrence_link_identity():
-    contract = json.loads(MTS_CONTRACT_CURRENT.read_text(encoding="utf-8"))
-    serialized = json.dumps(contract, ensure_ascii=False)
-
-    assert contract["semanticIdentity"]["linkIdentity"] == "by ordered semantic poles"
-    assert contract["semanticIdentity"]["runtimeHandleIsSemanticIdentity"] is False
-    assert contract["semanticIdentity"]["samePairCreatesSecondSemanticLink"] is False
-    assert contract["anum"]["schema"] == "anum-deserialization/v0.4"
-    assert contract["anum"]["emptyStream"] == "R"
-    assert contract["anum"]["emptyGroup"] == "R"
-    assert contract["anum"]["rootIsFifthAbit"] is False
-    assert contract["anum"]["rawChannelInputAccepted"] is True
-    assert contract["anum"]["existingAsetCarrierSemanticsAccepted"] is True
-    assert contract["anum"]["carrierRoleIsExplicit"] is True
-    assert contract["anum"]["carrierReadOnly"] is True
-    for forbidden in (
-        "anum-raw-carrier-v0.2",
-        "anum-boundary-projection-v0.2",
-        "anum-denotation-v0.2",
-        "anum-pair-denotation-v0.2",
-        "anum-recursive-denotation-v0.2",
-    ):
-        assert forbidden not in serialized
-
-
-def test_candidate_runtime_fixture_and_reference_paths_are_removed_after_promotion():
-    leftovers = [path for path in FORBIDDEN_CANDIDATE_PATHS if (ROOT / path).exists()]
-    assert leftovers == []
-    assert (ROOT / "core/mtc_interpreter.py").is_file()
-    assert (ROOT / "core/mtc_value_bundle.py").is_file()
-    assert (ROOT / "core/mtc_definitions.py").is_file()
-    assert (ROOT / "tests/test_mtc_interpreter.py").is_file()
-
-
-def test_declarative_reference_model_does_not_return_as_second_semantic_index():
-    assert not (ROOT / "core/reference_model.py").exists()
-    assert not (ROOT / "tests/test_reference_model.py").exists()
-
-    parser_text = (ROOT / "core/mtc_parser.py").read_text(encoding="utf-8")
-    assert "reference_model" not in parser_text
-    assert "reference_operator" not in parser_text
-
-
-def test_anum_protocol_has_one_active_projection_and_quote_path():
-    assert not (ROOT / "core/anum_projector.py").exists()
-
-    memory_text = (ROOT / "core/anum_memory.py").read_text(encoding="utf-8")
-    cli_text = (ROOT / "converters/anum_cli.py").read_text(encoding="utf-8")
-
-    assert "class Quote" not in memory_text
-    assert '"realize"' not in cli_text
-    assert (ROOT / "core/anum_protocol.py").is_file()
-
-
-def test_root_library_validates():
-    result = validate_root_library(ROOT_FIXTURE)
-    assert result.is_valid, result.messages
-
-
-def test_superseded_semantic_carrier_runtime_is_physically_absent():
-    assert not (ROOT / "core/semantic_carrier.py").exists()
-    assert not (ROOT / "tests/test_semantic_carrier.py").exists()
-
-    rooted_source = (ROOT / "core/rooted_link_network.py").read_text(encoding="utf-8")
-    assert "class LinkNetwork" in rooted_source
-    assert "duplicate semantic link pair" in rooted_source
+def test_public_facade_and_contributing_point_to_accepted_v07() -> None:
+    source = (ROOT / "core/foundation_v2.py").read_text(encoding="utf-8")
+    docstring = ast.get_docstring(ast.parse(source)) or ""
+    assert "accepted MTS v0.7" in docstring
+    assert "candidate" not in docstring.lower()
+    contributing = (ROOT / "docs/CONTRIBUTING.md").read_text(encoding="utf-8")
+    assert "mts-contract/v0.7" in contributing
+    assert "mts-conformance/v0.7" in contributing
+    assert "текущей принятой версии" in contributing
