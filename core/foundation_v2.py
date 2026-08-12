@@ -75,25 +75,18 @@ from .foundation_v2_source import (
 from .foundation_v2_value_bundle import (
     BundleElaboration,
     BundleRole,
-    BundleValue,
     ExpectedRole,
-    ResolvedValueOccurrence,
-    ScalarValue,
     ValueBundleReplayError,
     ValueBundleSkeletonBuilder,
     ValueBundleVocabulary,
     build_value_bundle_vocabulary,
     elaborate_bundle_skeleton,
-    evaluate_resolved_bundle,
-    expand_bundle_query,
-    values_equal,
 )
 
 
 __all__ = [
     "BundleElaboration",
     "BundleRole",
-    "BundleValue",
     "ColonEffectEvidence",
     "DecomposeEqualityEvidence",
     "DeicticOccurrence",
@@ -119,9 +112,7 @@ __all__ = [
     "ProofGoalEvidence",
     "ProofJudgmentEvidence",
     "RelationStepEvidence",
-    "ResolvedValueOccurrence",
     "RunEvidence",
-    "ScalarValue",
     "SequenceAtom",
     "SequenceDescription",
     "SequenceGroup",
@@ -136,8 +127,6 @@ __all__ = [
     "build_root_kernel",
     "build_value_bundle_vocabulary",
     "elaborate_bundle_skeleton",
-    "evaluate_resolved_bundle",
-    "expand_bundle_query",
     "find_links",
     "materialize_persistent_sequence",
     "materialize_sequence",
@@ -155,5 +144,4 @@ __all__ = [
     "root_role_refs",
     "root_vocabulary",
     "validate_root_kernel",
-    "values_equal",
 ]
