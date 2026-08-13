@@ -53,6 +53,33 @@ def test_explicit_context_resolves_current_without_ambient_stack() -> None:
     assert network.snapshot() == before
 
 
+def test_unused_process_tag_does_not_change_rooted_event_selection() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    semantic_act = _anchor(builder)
+
+    first_position = builder.ensure(root, semantic_act)
+    second_position = builder.ensure(first_position, semantic_act)
+    assert first_position is not second_position
+
+    parent = _anchor(builder)
+    context = define_context(builder, parent, second_position)
+
+    process_role = _anchor(builder)
+    process_tag = builder.ensure(process_role, second_position)
+    network = builder.freeze(root)
+    snapshot = network.snapshot()
+
+    assert current_of_context(network, context) is second_position
+    assert network.link(first_position).end is semantic_act
+    assert network.link(second_position).start is first_position
+    assert network.link(second_position).end is semantic_act
+    assert network.link(process_tag).start is process_role
+    assert network.link(process_tag).end is second_position
+    assert process_tag is not second_position
+    assert network.snapshot() == snapshot
+
+
 def test_same_source_can_resolve_differently_under_two_scoped_dictionaries() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
