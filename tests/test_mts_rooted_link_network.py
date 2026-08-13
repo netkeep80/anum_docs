@@ -53,6 +53,32 @@ def ensure_positive_power_for_test(
     return result
 
 
+def shape_for_test(
+    network: LinkNetwork,
+    ref: LinkRef,
+    start: LinkRef,
+    end: LinkRef,
+) -> bool:
+    """Read-only executable form of Shape(X; A,B) for #339."""
+
+    link = network.link(ref)
+    network.link(start)
+    network.link(end)
+    return link.start is start and link.end is end
+
+
+def start_self_for_test(network: LinkNetwork, ref: LinkRef, end: LinkRef) -> bool:
+    return shape_for_test(network, ref, ref, end)
+
+
+def end_self_for_test(network: LinkNetwork, ref: LinkRef, start: LinkRef) -> bool:
+    return shape_for_test(network, ref, start, ref)
+
+
+def full_self_for_test(network: LinkNetwork, ref: LinkRef) -> bool:
+    return shape_for_test(network, ref, ref, ref)
+
+
 def test_link_primitive_has_exactly_start_and_end():
     assert [field.name for field in fields(Link)] == ["start", "end"]
 
@@ -183,6 +209,58 @@ def test_canonical_natural_row_uses_root_and_closing_link():
     assert network.link(naturals[1]) == Link(root, closing)
     for index in range(2, len(naturals)):
         assert network.link(naturals[index]) == Link(naturals[index - 1], closing)
+
+
+def test_shape_judgments_match_root_vocabulary():
+    network, refs = build_reference_network()
+    root = refs["root"]
+    opening = refs["opening"]
+    closing = refs["closing"]
+    linked = refs["linked"]
+    unlinked = refs["unlinked"]
+
+    assert full_self_for_test(network, root)
+    assert start_self_for_test(network, opening, root)
+    assert end_self_for_test(network, closing, root)
+    assert shape_for_test(network, linked, opening, closing)
+    assert shape_for_test(network, unlinked, closing, opening)
+
+
+def test_wrong_shape_is_false_and_does_not_materialize_absent_pair():
+    network, refs = build_reference_network()
+    opening = refs["opening"]
+    linked = refs["linked"]
+    before = network.snapshot()
+
+    assert network.find(opening, opening) is None
+    assert not shape_for_test(network, linked, opening, opening)
+    assert not start_self_for_test(network, linked, refs["closing"])
+    assert not end_self_for_test(network, linked, opening)
+    assert network.find(opening, opening) is None
+    assert network.snapshot() == before
+
+
+def test_full_self_judgment_holds_only_for_root():
+    network, _ = build_reference_network()
+
+    assert [
+        ref for ref in network.refs if full_self_for_test(network, ref)
+    ] == [network.root]
+
+
+def test_shape_judgment_rejects_foreign_expected_handle():
+    network, refs = build_reference_network()
+    other_network, other_refs = build_reference_network()
+
+    with pytest.raises(LinkNetworkError, match="foreign network link handle"):
+        shape_for_test(
+            network,
+            refs["linked"],
+            refs["opening"],
+            other_refs["closing"],
+        )
+
+    assert other_network.root is other_refs["root"]
 
 
 def test_second_fully_self_closed_link_is_rejected_before_freeze():
@@ -409,7 +487,6 @@ def test_evolution_cannot_create_second_fully_self_closed_link():
 
     with pytest.raises(LinkNetworkError, match="fully self-closed link is unique"):
         evolution.define(other, other, other)
-
 
 
 def test_old_occurrence_api_vocabulary_does_not_return() -> None:
