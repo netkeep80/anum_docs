@@ -182,8 +182,8 @@ export class Memory implements WriteMemory {
     const candidate = handle as Partial<InternalHandle>;
     if (
       candidate.owner !== this.owner ||
-      !Number.isInteger(candidate.slot) ||
       candidate.slot === undefined ||
+      !Number.isInteger(candidate.slot) ||
       candidate.slot < 0 ||
       this.handles[candidate.slot] !== handle
     ) {
