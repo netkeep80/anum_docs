@@ -19,7 +19,7 @@ _ABIT_BY_SYMBOL = {abit.value: abit for abit in Abit}
 
 
 class IncrementalQuaternaryDecoder:
-    """Stateful lexical decoder equivalent to batch raw parsing."""
+    """Stateful lexical decoder with transactional per-chunk commits."""
 
     def __init__(self):
         self._offset = 0
@@ -31,18 +31,26 @@ class IncrementalQuaternaryDecoder:
         return self._offset
 
     def feed(self, chunk: str) -> tuple[AnumToken, ...]:
+        """Decode one chunk atomically.
+
+        A successful call commits the whole chunk. If any character is invalid,
+        token, offset, and comment state remain exactly as they were before the
+        call so the caller may retry from the same absolute position.
+        """
+
         emitted: list[AnumToken] = []
+        in_comment = self._in_comment
 
         for index, char in enumerate(chunk):
             absolute_offset = self._offset + index
 
-            if self._in_comment:
+            if in_comment:
                 if char in "\r\n":
-                    self._in_comment = False
+                    in_comment = False
                 continue
 
             if char == "#":
-                self._in_comment = True
+                in_comment = True
                 continue
 
             if char.isspace():
@@ -55,10 +63,10 @@ class IncrementalQuaternaryDecoder:
                     f'{absolute_offset}: "{char}"'
                 )
 
-            token = AnumToken(abit=abit, offset=absolute_offset)
-            self._tokens.append(token)
-            emitted.append(token)
+            emitted.append(AnumToken(abit=abit, offset=absolute_offset))
 
+        self._tokens.extend(emitted)
+        self._in_comment = in_comment
         self._offset += len(chunk)
         return tuple(emitted)
 
