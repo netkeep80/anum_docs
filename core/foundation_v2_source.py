@@ -126,10 +126,10 @@ class SourceFrontEndBuilder:
         return self._content_cache[data]
 
     def source_occurrence(self, data: bytes) -> SourceOccurrence:
-        """Create source record ``S = S ⟼ C`` over canonical content C.
+        """Return canonical source form ``S = S ⟼ C`` for content C.
 
-        The self-reference makes separately constructed source records different
-        by their actual start pole; no duplicate equal-pole link is introduced.
+        Equal content reuses the same source link. Distinct source uses are
+        represented by selection/history evidence, not duplicate source links.
         """
 
         raw_bytes = bytes(data)
