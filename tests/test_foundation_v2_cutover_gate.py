@@ -66,14 +66,29 @@ def import_graph() -> dict[str, set[str]]:
     return {source: imported_surface(source, discovered) for source in sorted(discovered)}
 
 
-def test_post_c7_manifest_classifies_exactly_the_live_surface() -> None:
+def test_post_c7_manifest_preserves_live_owners_without_forcing_neutral_files_to_survive() -> None:
     manifest = read(MANIFEST)
+    classifications = manifest["classifications"]
+    current_surface = discover_surface()
+    classified_surface = set(classifications)
+
     assert manifest["schema"] == "foundation-v2-cutover-classification/v0.1"
     assert manifest["issue"] == 276
     assert manifest["c7Performed"] is True
-    assert set(manifest["classifications"]) == discover_surface()
-    assert "UNKNOWN" not in set(manifest["classifications"].values())
-    assert not ({"HISTORICAL_SEMANTIC_ISLAND", "HISTORICAL_ENTRYPOINT"} & set(manifest["classifications"].values()))
+    assert current_surface <= classified_surface
+    assert "UNKNOWN" not in set(classifications.values())
+    assert not ({"HISTORICAL_SEMANTIC_ISLAND", "HISTORICAL_ENTRYPOINT"} & set(classifications.values()))
+
+    retired_since_c7 = classified_surface - current_surface
+    assert all(
+        classifications[path] in {"PRESERVED_NEUTRAL", "NON_SEMANTIC_TOOLING"}
+        for path in retired_since_c7
+    )
+    assert all(
+        path in current_surface
+        for path, classification in classifications.items()
+        if classification == "FOUNDATION_V2_LIVE"
+    )
 
 
 def test_historical_decisions_are_preserved_as_audit_evidence_but_files_are_gone() -> None:
