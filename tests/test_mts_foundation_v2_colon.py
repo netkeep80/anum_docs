@@ -308,7 +308,7 @@ def test_colon_rejects_occurrence_bound_to_wrong_before_snapshot() -> None:
     forged = replace(evidence, definition_occurrence=forged_occurrence)
     network = builder.freeze(root)
 
-    with pytest.raises(InterpreterReplayError, match="exact D_before"):
+    with pytest.raises(InterpreterReplayError, match="definition history link is not bound to D_before"):
         replay_colon_effect(network, forged)
 
 
@@ -332,5 +332,5 @@ def test_colon_rejects_forged_history_append() -> None:
     forged = replace(evidence, history_after=forged_history)
     network = builder.freeze(root)
 
-    with pytest.raises(InterpreterReplayError, match="one exact append"):
+    with pytest.raises(InterpreterReplayError, match="one canonical append"):
         replay_colon_effect(network, forged)
