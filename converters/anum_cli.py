@@ -9,7 +9,7 @@ from core.anum_protocol import deserialize_anum, validate_anum
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Инструменты текущего потока ANUM v0.3")
+    parser = argparse.ArgumentParser(description="Инструменты текущего потока ANUM v0.4")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     parse_parser = subparsers.add_parser("parse", help="Лексически разобрать *.anum")
@@ -23,7 +23,7 @@ def main(argv: list[str] | None = None) -> int:
 
     deserialize_parser = subparsers.add_parser(
         "deserialize",
-        help="Выполнить чистую десериализацию ANUM v0.3",
+        help="Выполнить чистую десериализацию ANUM v0.4",
     )
     deserialize_parser.add_argument("file")
 

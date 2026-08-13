@@ -101,16 +101,16 @@ def extract_char_anums(anum: str) -> list:
 
 
 def anum_to_char(abits: str) -> str:
-    """Конвертация ачисла одного символа в UTF-8 символ.
+    """Конвертация ачисла одного символа в один UTF-8 символ.
 
     Args:
         abits: Строка абитов ('1' и '0'), кратная 8 по длине.
 
     Returns:
-        Декодированный UTF-8 символ.
+        Ровно один декодированный UTF-8 символ.
 
     Raises:
-        ValueError: При некорректной длине или содержимом.
+        ValueError: При некорректной длине, UTF-8 или числе символов.
     """
     if len(abits) % 8 != 0:
         raise ValueError(
@@ -119,7 +119,15 @@ def anum_to_char(abits: str) -> str:
     byte_values = []
     for i in range(0, len(abits), 8):
         byte_values.append(abits_to_byte(abits[i:i+8]))
-    return bytes(byte_values).decode('utf-8')
+    try:
+        char = bytes(byte_values).decode('utf-8')
+    except UnicodeDecodeError as exc:
+        raise ValueError('Ачисло символа содержит некорректную UTF-8 последовательность') from exc
+    if len(char) != 1:
+        raise ValueError(
+            f'Ожидается ровно один UTF-8 символ, декодировано: {len(char)}'
+        )
+    return char
 
 
 def anum_to_text(anum: str) -> str:
@@ -150,7 +158,7 @@ def anum_to_text_verbose(anum: str) -> list:
         byte_values = []
         for i in range(0, len(abits), 8):
             byte_values.append(abits_to_byte(abits[i:i+8]))
-        char = bytes(byte_values).decode('utf-8')
+        char = anum_to_char(abits)
         entry = {
             'anum': f'[{abits}]',
             'abits': abits,

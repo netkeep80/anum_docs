@@ -17,7 +17,8 @@ from converters.text_to_anum import (
     byte_to_abits, char_to_anum, text_to_anum, text_to_anum_verbose
 )
 from converters.anum_to_text import (
-    abits_to_byte, extract_char_anums, anum_to_char, anum_to_text
+    abits_to_byte, extract_char_anums, anum_to_char, anum_to_text,
+    anum_to_text_verbose
 )
 from converters.ascii_unicode import (
     unicode_to_ascii, ascii_to_unicode, abits_to_aprover, aprover_to_abits
@@ -40,6 +41,16 @@ class TestByteToAbits(unittest.TestCase):
     def test_ascii_a(self):
         # a = 0x61 = 01100001
         self.assertEqual(byte_to_abits(0x61), '01100001')
+
+    def test_rejects_out_of_byte_range(self):
+        for value in (-1, 256):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    byte_to_abits(value)
+
+    def test_rejects_bool_as_byte(self):
+        with self.assertRaises(ValueError):
+            byte_to_abits(True)
 
 
 class TestAbitsToByteRoundtrip(unittest.TestCase):
@@ -114,6 +125,28 @@ class TestTextToAnumRoundtrip(unittest.TestCase):
     def test_spaces_and_punctuation(self):
         text = 'hello, world!'
         self.assertEqual(anum_to_text(text_to_anum(text)), text)
+
+
+class TestAnumToCharBoundary(unittest.TestCase):
+    """Тесты явной границы одного UTF-8 символа."""
+
+    def test_rejects_empty_character_payload(self):
+        with self.assertRaises(ValueError):
+            anum_to_char('')
+
+    def test_rejects_two_characters_in_one_group(self):
+        abits = byte_to_abits(ord('A')) + byte_to_abits(ord('B'))
+        with self.assertRaises(ValueError):
+            anum_to_char(abits)
+
+    def test_verbose_rejects_two_characters_with_domain_error(self):
+        abits = byte_to_abits(ord('A')) + byte_to_abits(ord('B'))
+        with self.assertRaises(ValueError):
+            anum_to_text_verbose(f'[{abits}]')
+
+    def test_rejects_invalid_utf8_with_domain_error(self):
+        with self.assertRaises(ValueError):
+            anum_to_char('11111111')
 
 
 class TestExtractCharAnums(unittest.TestCase):
