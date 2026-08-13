@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100">
+  <defs>
+    <marker id="arrow-black" markerWidth="20" markerHeight="18" refX="18" refY="9" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 20 9 L 0 18 z" fill="#171717"/>
+    </marker>
+    <style>
+      .title { font: 700 30px 'DejaVu Sans', sans-serif; fill: #171717; }
+      .label { font: 34px 'DejaVu Sans', sans-serif; fill: #171717; }
+      .small { font: 25px 'DejaVu Sans', sans-serif; fill: #4a4a4a; }
+      .formula { font: 31px 'DejaVu Sans', sans-serif; fill: #171717; }
+      .link { fill: none; stroke: #171717; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-black); }
+      .panel { fill: none; stroke: #dedbd4; stroke-width: 2; rx: 20; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1100" fill="#faf9f5"/>
+
+  <rect class="panel" x="45" y="45" width="735" height="470"/>
+  <text class="title" x="80" y="100">1. Обычная связь</text>
+  <path class="link" d="M 190 280 L 645 280"/>
+  <text class="label" x="145" y="291">A</text>
+  <text class="label" x="669" y="291">B</text>
+  <text class="label" x="407" y="245">X</text>
+  <text class="formula" x="278" y="405">X = A ⟼ B</text>
+  <text class="small" x="220" y="452">внешнее начало · внешний конец</text>
+
+  <rect class="panel" x="820" y="45" width="735" height="470"/>
+  <text class="title" x="855" y="100">2. Самозамыкание начала</text>
+  <path class="link" d="M 1050 280 C 895 170 895 390 1050 280 L 1400 280"/>
+  <text class="label" x="1180" y="245">X</text>
+  <text class="label" x="1422" y="291">B</text>
+  <text class="formula" x="1098" y="405">X = ♂B</text>
+  <text class="small" x="984" y="452">start(X)=X · end(X)=B</text>
+
+  <rect class="panel" x="45" y="560" width="735" height="470"/>
+  <text class="title" x="80" y="615">3. Самозамыкание конца</text>
+  <path class="link" d="M 190 795 L 530 795 C 685 685 685 905 530 795"/>
+  <text class="label" x="145" y="806">A</text>
+  <text class="label" x="370" y="760">X</text>
+  <text class="formula" x="278" y="920">X = A♀</text>
+  <text class="small" x="205" y="967">start(X)=A · end(X)=X</text>
+
+  <rect class="panel" x="820" y="560" width="735" height="470"/>
+  <text class="title" x="855" y="615">4. Полное самозамыкание</text>
+  <path class="link" d="M 1050 795 C 895 685 895 905 1050 795 L 1325 795 C 1480 685 1480 905 1325 795"/>
+  <text class="label" x="1174" y="760">R</text>
+  <text class="formula" x="1105" y="920">R = ∞</text>
+  <text class="small" x="1010" y="967">start(R)=R · end(R)=R</text>
+</svg>
