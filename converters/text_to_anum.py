@@ -32,7 +32,12 @@ def byte_to_abits(byte_val: int) -> str:
 
     Returns:
         Строка из 8 символов '1' и '0'.
+
+    Raises:
+        ValueError: Если значение не является целым байтом 0–255.
     """
+    if type(byte_val) is not int or not 0 <= byte_val <= 255:
+        raise ValueError(f'Ожидается значение байта 0–255, получено: {byte_val!r}')
     binary = format(byte_val, '08b')
     return ''.join('1' if bit == '1' else '0' for bit in binary)
 
