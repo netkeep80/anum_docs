@@ -159,6 +159,26 @@ def test_mutual_cycle_cannot_be_created_from_only_reserved_ids():
         builder.define(a, b, root)
 
 
+def test_closed_male_female_pattern_cannot_survive_as_two_id_distinct_links():
+    # Ostensive system from #297:
+    #   y = y ⟼ x
+    #   x = y ⟼ x
+    # Both records claim the same ordered semantic poles. Distinct snapshot slots
+    # cannot make x and y semantically distinct; the algebraic form collapses to
+    # x = y and then to the unique fully self-closed root.
+    raw_two_id_form = NetworkSnapshot(
+        links=((0, 0), (1, 2), (1, 2)),
+        root=0,
+    )
+
+    with pytest.raises(LinkNetworkError, match="not structurally distinguishable"):
+        LinkNetwork.from_snapshot(raw_two_id_form)
+
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    assert builder.ensure(root, root) is root
+
+
 def test_ensure_reuses_the_same_link_for_the_same_pair():
     builder = LinkNetworkBuilder()
     root = builder.ensure_root()
