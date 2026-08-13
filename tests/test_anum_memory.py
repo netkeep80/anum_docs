@@ -1,4 +1,4 @@
-"""Current L4 invariants for the finite ordered-pair memory view."""
+"""Preserved-neutral L4 invariants for the auxiliary finite pair store."""
 
 import pytest
 
