@@ -16,6 +16,7 @@ from core.foundation_v2_persistent import (
     PersistentSequenceAtom,
     PersistentSequenceDescription,
     PersistentSequenceGroup,
+    PersistentSnapshot,
     PersistentStoreError,
     materialize_persistent_sequence,
     replay_persistent_sequence_materialization,
@@ -39,6 +40,15 @@ def _local_topology(store: JsonLinkStore):
         (ref.local, start.local, end.local)
         for ref, start, end in store.snapshot().links
     )
+
+
+def _unsafe_persistent_id(lineage: str, local: object) -> PersistentLinkId:
+    """Construct invalid test evidence without public constructor validation."""
+
+    ref = object.__new__(PersistentLinkId)
+    object.__setattr__(ref, "lineage", lineage)
+    object.__setattr__(ref, "local", local)
+    return ref
 
 
 def test_create_starts_with_unique_root_and_root_pair_is_idempotent(tmp_path) -> None:
@@ -229,6 +239,105 @@ def test_open_rejects_duplicate_pair_second_root_and_unrooted_cycle(tmp_path) ->
         )
         with pytest.raises(PersistentStoreError, match="canonical|rooted"):
             JsonLinkStore.open(path)
+
+
+@pytest.mark.parametrize("payload", [[], 42, None])
+def test_open_rejects_non_object_json_fail_closed(tmp_path, payload) -> None:
+    path = tmp_path / "invalid-shape.json"
+    before = json.dumps(payload).encode("utf-8")
+    path.write_bytes(before)
+
+    with pytest.raises(PersistentStoreError, match="dataset object"):
+        JsonLinkStore.open(path)
+
+    assert path.read_bytes() == before
+
+
+def test_open_rejects_bool_root_coordinate(tmp_path) -> None:
+    path = tmp_path / "invalid-root.json"
+    payload = {
+        "schema": PERSISTENT_SCHEMA,
+        "lineage": "bad-root",
+        "root": True,
+        "links": [[0, 0]],
+    }
+    before = json.dumps(payload).encode("utf-8")
+    path.write_bytes(before)
+
+    with pytest.raises(PersistentStoreError, match="root id"):
+        JsonLinkStore.open(path)
+
+    assert path.read_bytes() == before
+
+
+@pytest.mark.parametrize("links", [[[True, 0]], [[0, False]]])
+def test_open_rejects_bool_endpoint_coordinate(tmp_path, links) -> None:
+    path = tmp_path / "invalid-endpoint.json"
+    payload = {
+        "schema": PERSISTENT_SCHEMA,
+        "lineage": "bad-endpoint",
+        "root": 0,
+        "links": links,
+    }
+    before = json.dumps(payload).encode("utf-8")
+    path.write_bytes(before)
+
+    with pytest.raises(PersistentStoreError, match="link pair"):
+        JsonLinkStore.open(path)
+
+    assert path.read_bytes() == before
+
+
+def test_persistent_link_id_rejects_bool_local_coordinate() -> None:
+    with pytest.raises(PersistentStoreError, match="link id"):
+        PersistentLinkId("lineage", True)
+
+
+def test_runtime_boundaries_reject_bool_coordinates(tmp_path) -> None:
+    store = JsonLinkStore.create(tmp_path / "apamemory.json")
+
+    with pytest.raises(PersistentStoreError, match="runtime prefix count"):
+        store.runtime_network(count=True)
+    with pytest.raises(PersistentStoreError, match="materialization range"):
+        store.runtime_materialization_lineage(True, 1)
+
+
+def test_batch_bool_reference_rejects_without_state_change(tmp_path) -> None:
+    path = tmp_path / "apamemory.json"
+    store = JsonLinkStore.create(path)
+    before = store.snapshot()
+    file_before = path.read_bytes()
+
+    with pytest.raises(PersistentStoreError, match="batch reference"):
+        store.materialize_batch((BatchLink(BatchRef(True), store.root),))
+
+    assert store.snapshot() == before
+    assert path.read_bytes() == file_before
+
+
+def test_import_rejects_bool_storage_coordinates_without_creating_file(tmp_path) -> None:
+    lineage = "snapshot"
+    root = PersistentLinkId(lineage, 0)
+    bad_root = _unsafe_persistent_id(lineage, True)
+    bad_endpoint = _unsafe_persistent_id(lineage, False)
+
+    cases = (
+        PersistentSnapshot(
+            lineage=lineage,
+            root=bad_root,
+            links=((bad_root, bad_root, bad_root),),
+        ),
+        PersistentSnapshot(
+            lineage=lineage,
+            root=root,
+            links=((root, bad_endpoint, root),),
+        ),
+    )
+    for index, snapshot in enumerate(cases):
+        target = tmp_path / f"imported-{index}.json"
+        with pytest.raises(PersistentStoreError, match="snapshot link id"):
+            JsonLinkStore.import_topology(target, snapshot)
+        assert not target.exists()
 
 
 def test_json_payload_contains_only_storage_coordinates(tmp_path) -> None:

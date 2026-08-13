@@ -51,12 +51,24 @@ class PersistentStoreError(ValueError):
     """Persistent canonical-link store operation or evidence is invalid."""
 
 
+def _is_storage_coordinate(value: object) -> bool:
+    """Return whether ``value`` is a strict integer storage coordinate."""
+
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
 @dataclass(frozen=True, order=True)
 class PersistentLinkId:
     """Dataset-local storage coordinate; never semantic MTS identity."""
 
     lineage: str
     local: int
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.lineage, str) or not self.lineage:
+            raise PersistentStoreError("invalid persistent lineage id")
+        if not _is_storage_coordinate(self.local) or self.local < 0:
+            raise PersistentStoreError("invalid persistent link id")
 
 
 @dataclass(frozen=True)
@@ -166,6 +178,8 @@ class JsonLinkStore:
             raw = json.loads(target.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
             raise PersistentStoreError("cannot open persistent dataset") from exc
+        if not isinstance(raw, dict):
+            raise PersistentStoreError("invalid persistent dataset object")
         if raw.get("schema") != PERSISTENT_SCHEMA:
             raise PersistentStoreError("unsupported persistent dataset schema")
         lineage = raw.get("lineage")
@@ -173,7 +187,7 @@ class JsonLinkStore:
         links_raw = raw.get("links")
         if not isinstance(lineage, str) or not lineage:
             raise PersistentStoreError("invalid persistent lineage id")
-        if not isinstance(root, int):
+        if not _is_storage_coordinate(root):
             raise PersistentStoreError("invalid persistent root id")
         if not isinstance(links_raw, list):
             raise PersistentStoreError("invalid persistent links")
@@ -182,7 +196,7 @@ class JsonLinkStore:
             if (
                 not isinstance(pair, list)
                 or len(pair) != 2
-                or not all(isinstance(value, int) for value in pair)
+                or not all(_is_storage_coordinate(value) for value in pair)
             ):
                 raise PersistentStoreError("invalid persistent link pair")
             links.append((pair[0], pair[1]))
@@ -202,17 +216,26 @@ class JsonLinkStore:
         target.parent.mkdir(parents=True, exist_ok=True)
         if not isinstance(snapshot, PersistentSnapshot):
             raise PersistentStoreError("expected persistent snapshot")
+        if not isinstance(snapshot.lineage, str) or not snapshot.lineage:
+            raise PersistentStoreError("invalid snapshot lineage")
+        if not isinstance(snapshot.root, PersistentLinkId):
+            raise PersistentStoreError("invalid snapshot root")
+        cls._validate_snapshot_id(snapshot.root, snapshot.lineage)
+        if not isinstance(snapshot.links, tuple):
+            raise PersistentStoreError("invalid snapshot links")
+        for item in snapshot.links:
+            if (
+                not isinstance(item, tuple)
+                or len(item) != 3
+                or not all(isinstance(value, PersistentLinkId) for value in item)
+            ):
+                raise PersistentStoreError("invalid snapshot link")
+            for value in item:
+                cls._validate_snapshot_id(value, snapshot.lineage)
 
         ordered = sorted(snapshot.links, key=lambda item: item[0].local)
         if [item[0].local for item in ordered] != list(range(len(ordered))):
             raise PersistentStoreError("snapshot local ids must be dense for import")
-        for ref, start, end in ordered:
-            if (
-                ref.lineage != snapshot.lineage
-                or start.lineage != snapshot.lineage
-                or end.lineage != snapshot.lineage
-            ):
-                raise PersistentStoreError("snapshot mixes storage lineages")
         if snapshot.root.lineage != snapshot.lineage:
             raise PersistentStoreError("snapshot root belongs to another lineage")
 
@@ -409,6 +432,8 @@ class JsonLinkStore:
         """Reconstruct canonical runtime topology with fresh technical handles."""
 
         self._require_open()
+        if count is not None and not _is_storage_coordinate(count):
+            raise PersistentStoreError("invalid runtime prefix count")
         selected_count = len(self._links) if count is None else count
         if selected_count <= self._root_local or selected_count > len(self._links):
             raise PersistentStoreError("invalid runtime prefix count")
@@ -442,6 +467,10 @@ class JsonLinkStore:
         """Reconstruct before/after runtime states in one technical runtime scope."""
 
         self._require_open()
+        if not _is_storage_coordinate(before_count) or not _is_storage_coordinate(
+            after_count
+        ):
+            raise PersistentStoreError("invalid persistent materialization range")
         if (
             before_count <= self._root_local
             or after_count < before_count
@@ -491,6 +520,8 @@ class JsonLinkStore:
             return self._validate_id(endpoint), False
         if not isinstance(endpoint, BatchRef):
             raise PersistentStoreError("invalid batch endpoint")
+        if not _is_storage_coordinate(endpoint.index):
+            raise PersistentStoreError("invalid batch reference")
         if endpoint.index < 0 or endpoint.index > current_index:
             raise PersistentStoreError(
                 "batch forward reference cannot create semantic distinction"
@@ -505,15 +536,27 @@ class JsonLinkStore:
         self._validate_links(self._links, self._root_local)
 
     @staticmethod
+    def _validate_snapshot_id(ref: PersistentLinkId, lineage: str) -> int:
+        if not isinstance(ref, PersistentLinkId):
+            raise PersistentStoreError("invalid snapshot link id")
+        if ref.lineage != lineage:
+            raise PersistentStoreError("snapshot mixes storage lineages")
+        if not _is_storage_coordinate(ref.local) or ref.local < 0:
+            raise PersistentStoreError("invalid snapshot link id")
+        return ref.local
+
+    @staticmethod
     def _validate_links(links: list[tuple[int, int]], root_local: int) -> None:
         if not links:
             raise PersistentStoreError("persistent dataset cannot be empty")
+        if not _is_storage_coordinate(root_local):
+            raise PersistentStoreError("persistent root is out of range")
         if root_local < 0 or root_local >= len(links):
             raise PersistentStoreError("persistent root is out of range")
         for start, end in links:
             if (
-                not isinstance(start, int)
-                or not isinstance(end, int)
+                not _is_storage_coordinate(start)
+                or not _is_storage_coordinate(end)
                 or start < 0
                 or start >= len(links)
                 or end < 0
@@ -564,6 +607,8 @@ class JsonLinkStore:
             raise PersistentStoreError("expected persistent link id")
         if ref.lineage != self._lineage:
             raise PersistentStoreError("foreign persistent dataset lineage")
+        if not _is_storage_coordinate(ref.local):
+            raise PersistentStoreError("persistent link id is out of range")
         if ref.local < 0 or ref.local >= len(self._links):
             raise PersistentStoreError("persistent link id is out of range")
         return ref.local
