@@ -36,6 +36,22 @@ jobs:
         run: |
           ruff check converters/ core/ tests/ --ignore E501,F401
 
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install TypeScript toolchain
+        run: npm install --prefix ts --ignore-scripts --no-audit --no-fund
+
+      - name: Typecheck and test TypeScript core
+        run: npm --prefix ts run check
+
   check-file-limits:
     runs-on: ubuntu-latest
     steps:
