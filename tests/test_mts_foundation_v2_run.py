@@ -73,6 +73,36 @@ def _run(builder, root, steps, initial, terminal):
     )
 
 
+def _invertible_relative_fold_for_test(builder, prefix, forms):
+    """Materialize only the invertible rooted-relative subset from #123."""
+
+    current = prefix
+    path = [prefix]
+    for form in forms:
+        next_ref = builder.ensure(current, form)
+        if any(next_ref is prior for prior in path):
+            raise ValueError("relative continuation is not canonically invertible")
+        path.append(next_ref)
+        current = next_ref
+    return current
+
+
+def _read_relative_suffix_for_test(network, prefix, result):
+    """Read the unique suffix of a simple continuation chain without mutation."""
+
+    current = result
+    reverse_forms = []
+    visited = []
+    while current is not prefix:
+        if any(current is prior for prior in visited):
+            raise ValueError("relative continuation does not reach its prefix")
+        visited.append(current)
+        link = network.link(current)
+        reverse_forms.append(link.end)
+        current = link.start
+    return tuple(reversed(reverse_forms))
+
+
 def test_linear_run_replays_context_continuity_read_only() -> None:
     builder = LinkNetworkBuilder()
     root = _anchor(builder)
@@ -121,6 +151,54 @@ def test_same_context_form_is_the_same_context_and_preserves_continuity() -> Non
     network = builder.freeze(root)
 
     assert replay_run(network, evidence) == (step0.act, step1.act)
+
+
+def test_relative_anum_flat_suffix_round_trip_is_structural_and_read_only() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    parent = _anchor(builder)
+    prefix = _anchor(builder)
+    context = _context(builder, parent, prefix)
+    a = _anchor(builder)
+    b = _anchor(builder)
+
+    root_pair = builder.ensure(a, b)
+    relative_pair = _invertible_relative_fold_for_test(builder, prefix, (a, b))
+    repeated = _invertible_relative_fold_for_test(builder, prefix, (a, b, a))
+
+    carrier_a = builder.ensure(root, a)
+    carrier_ab = builder.ensure(carrier_a, b)
+    quoted_relative = _invertible_relative_fold_for_test(
+        builder,
+        prefix,
+        (carrier_ab,),
+    )
+
+    network = builder.freeze(root)
+    snapshot = network.snapshot()
+
+    assert current_of_context(network, context) is prefix
+    assert relative_pair is not root_pair
+    assert quoted_relative is not relative_pair
+    assert _read_relative_suffix_for_test(network, prefix, relative_pair) == (a, b)
+    assert _read_relative_suffix_for_test(network, prefix, repeated) == (a, b, a)
+    assert _read_relative_suffix_for_test(network, prefix, quoted_relative) == (
+        carrier_ab,
+    )
+    assert _read_relative_suffix_for_test(network, prefix, prefix) == ()
+    assert network.snapshot() == snapshot
+
+
+def test_relative_anum_inverse_rejects_stuttering_root_alias() -> None:
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+
+    with pytest.raises(ValueError, match="not canonically invertible"):
+        _invertible_relative_fold_for_test(builder, root, (root,))
+
+    network = builder.freeze(root)
+    assert network.refs == (root,)
+    assert _read_relative_suffix_for_test(network, root, root) == ()
 
 
 def test_same_act_can_occupy_two_run_positions_without_copying_act() -> None:
