@@ -78,6 +78,56 @@ def test_incremental_decoder_reports_absolute_error_offset():
         decoder.feed("  x")
 
 
+def test_incremental_decoder_rejected_chunk_rolls_back_tokens_and_offset():
+    decoder = IncrementalQuaternaryDecoder()
+
+    with pytest.raises(ValueError, match="позиции 2"):
+        decoder.feed("[0x")
+
+    assert decoder.offset == 0
+    assert decoder.finish().tokens == ()
+
+    emitted = decoder.feed("[01]")
+    assert [token.offset for token in emitted] == [0, 1, 2, 3]
+    assert decoder.offset == 4
+    assert decoder.finish().values() == ("[", "0", "1", "]")
+
+
+def test_incremental_decoder_rejected_later_chunk_preserves_prior_commit():
+    decoder = IncrementalQuaternaryDecoder()
+    decoder.feed("[")
+    before = decoder.finish()
+
+    with pytest.raises(ValueError, match="позиции 2"):
+        decoder.feed("0x")
+
+    assert decoder.offset == 1
+    assert decoder.finish() == before
+
+    decoder.feed("01]")
+    assert decoder.finish().values() == ("[", "0", "1", "]")
+    assert [token.offset for token in decoder.finish().tokens] == [0, 1, 2, 3]
+
+
+def test_incremental_decoder_rejected_chunk_rolls_back_comment_state():
+    decoder = IncrementalQuaternaryDecoder()
+    decoder.feed("# comment")
+    before_offset = decoder.offset
+
+    with pytest.raises(ValueError, match="Недопустимый символ"):
+        decoder.feed("\n0x")
+
+    assert decoder.offset == before_offset
+    assert decoder.finish().tokens == ()
+
+    decoder.feed("\n01")
+    assert decoder.finish().values() == ("0", "1")
+    assert [token.offset for token in decoder.finish().tokens] == [
+        before_offset + 1,
+        before_offset + 2,
+    ]
+
+
 def test_deterministic_quaternary_serialization_round_trip():
     original = parse_raw_quaternary(" [ 0 1 ] # comment\n][")
     serialized = serialize_quaternary_anum(original, include_header=True)
