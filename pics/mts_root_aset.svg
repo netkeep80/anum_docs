@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <marker id="arrow-r" markerWidth="20" markerHeight="18" refX="18" refY="9" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 20 9 L 0 18 z" fill="#c58b00"/>
+    </marker>
+    <marker id="arrow-oc" markerWidth="20" markerHeight="18" refX="18" refY="9" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 20 9 L 0 18 z" fill="#009fc7"/>
+    </marker>
+    <marker id="arrow-lu" markerWidth="20" markerHeight="18" refX="18" refY="9" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 20 9 L 0 18 z" fill="#7b2cbf"/>
+    </marker>
+    <style>
+      .heading { font: 700 34px 'DejaVu Sans', sans-serif; fill: #222; }
+      .name { font: 700 34px 'DejaVu Sans', sans-serif; }
+      .formula { font: 30px 'DejaVu Sans', sans-serif; }
+      .abit { font: 700 48px 'DejaVu Sans', sans-serif; }
+      .r { fill: none; stroke: #c58b00; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-r); }
+      .oc { fill: none; stroke: #009fc7; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-oc); }
+      .lu { fill: none; stroke: #7b2cbf; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-lu); }
+      .gold { fill: #a87400; }
+      .cyan { fill: #007f9f; }
+      .violet { fill: #6522a1; }
+      .note { font: 24px 'DejaVu Sans', sans-serif; fill: #555; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1200" fill="#faf9f5"/>
+  <text class="heading" x="800" y="70" text-anchor="middle">Корневая асеть МТС</text>
+
+  <!-- R: одна связь; её хвост и наконечник возвращаются в её собственное тело. -->
+  <path class="r" d="M 660 930 C 500 810 500 1050 660 930 L 940 930 C 1100 810 1100 1050 940 930"/>
+  <text class="name gold" x="800" y="1015" text-anchor="middle">R</text>
+  <text class="formula gold" x="800" y="1090" text-anchor="middle">R = ∞</text>
+
+  <!-- O = O ⟼ R: start-self-closure, arrowhead ends on R's body. -->
+  <path class="oc" d="M 475 505 C 300 365 300 645 475 505 L 695 930"/>
+  <text class="name cyan" x="500" y="650" text-anchor="middle">O</text>
+  <text class="abit cyan" x="260" y="330">[</text>
+  <text class="formula cyan" x="300" y="380">O = ♂R</text>
+
+  <!-- C = R ⟼ C: tail starts on R's body, arrowhead returns to C's body. -->
+  <path class="oc" d="M 905 930 L 1125 505 C 1300 365 1300 645 1125 505"/>
+  <text class="name cyan" x="1100" y="650" text-anchor="middle">C</text>
+  <text class="abit cyan" x="1320" y="330">]</text>
+  <text class="formula cyan" x="1195" y="380">C = R♀</text>
+
+  <!-- L and U terminate directly on the already existing O/C link bodies. -->
+  <path class="lu" d="M 535 620 C 690 300 910 300 1065 620"/>
+  <text class="name violet" x="800" y="305" text-anchor="middle">L</text>
+  <text class="abit violet" x="800" y="245" text-anchor="middle">1</text>
+  <text class="formula violet" x="800" y="355" text-anchor="middle">L = O ⟼ C</text>
+
+  <path class="lu" d="M 1025 700 C 910 835 690 835 575 700"/>
+  <text class="name violet" x="760" y="870" text-anchor="middle">U</text>
+  <text class="abit violet" x="840" y="870" text-anchor="middle">0</text>
+  <text class="formula violet" x="800" y="745" text-anchor="middle">U = C ⟼ O</text>
+
+  <text class="note" x="800" y="1155" text-anchor="middle">Вся цветная линия — связь; конец одной линии может попадать непосредственно в тело другой связи.</text>
+</svg>
