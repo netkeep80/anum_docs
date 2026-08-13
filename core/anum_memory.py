@@ -1,7 +1,11 @@
-"""Finite explicit L4 ordered-pair memory used by current MTS tests and queries.
+"""Preserved-neutral finite L4 ordered-pair store.
 
-This module is intentionally independent of ANUM stream denotation. It stores a
-caller-supplied finite snapshot of local LinkRef handles, offers read-only pair
+The Foundation-v2 cutover classifies this module as ``PRESERVED_NEUTRAL``: it
+is an auxiliary finite memory view, not the accepted semantic runtime owner or
+part of the public Foundation-v2 facade. It remains intentionally independent
+of ANUM stream denotation and preserves useful storage/query invariants.
+
+The store keeps caller-supplied local LinkRef handles, offers read-only pair
 queries, and exposes explicit ``intern_link`` / ``delete_link`` effects. Local
 handles are storage coordinates, not an additional source of semantic Link
 identity. Imported-carrier admissibility beyond this finite memory-view boundary
