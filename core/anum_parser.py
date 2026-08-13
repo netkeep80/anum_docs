@@ -19,7 +19,7 @@ _ABIT_BY_SYMBOL = {abit.value: abit for abit in Abit}
 
 
 class IncrementalQuaternaryDecoder:
-    """Stateful lexical decoder equivalent to batch raw parsing."""
+    """Stateful lexical decoder with transactional per-chunk commits."""
 
     def __init__(self):
         self._offset = 0
