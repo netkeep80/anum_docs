@@ -14,6 +14,7 @@ from core.foundation_v2_run import (
     replay_run,
 )
 from core.foundation_v2_state import (
+    current_of_context,
     define_act_field,
     define_act_header,
     define_context,
@@ -148,6 +149,52 @@ def test_same_act_can_occupy_two_run_positions_without_copying_act() -> None:
     assert head.end is step.act
     assert tail.end is step.act
     assert tail.start is not root
+
+
+def test_explicit_context_can_select_run_position_without_duplicate_act() -> None:
+    builder = LinkNetworkBuilder()
+    root = _anchor(builder)
+    k0 = _context(builder)
+    before_role = _anchor(builder)
+    after_role = _anchor(builder)
+    interpreter = _anchor(builder)
+    step = _step(
+        builder,
+        root,
+        k0,
+        k0,
+        interpreter=interpreter,
+        before_role=before_role,
+        after_role=after_role,
+    )
+
+    same_act = define_act_header(
+        builder,
+        interpreter,
+        builder._links[step.act.slot].start,
+        k0,
+    )
+    assert same_act is step.act
+
+    evidence = _run(builder, root, (step, step), k0, k0)
+    first_position = builder.ensure(root, step.act)
+    second_position = evidence.run_root
+    assert second_position is builder.ensure(first_position, step.act)
+    assert first_position is not second_position
+
+    deictic_parent = _anchor(builder)
+    first_current = _context(builder, deictic_parent, first_position)
+    second_current = _context(builder, deictic_parent, second_position)
+    network = builder.freeze(root)
+    snapshot = network.snapshot()
+
+    assert replay_run(network, evidence) == (step.act, step.act)
+    assert current_of_context(network, first_current) is first_position
+    assert current_of_context(network, second_current) is second_position
+    assert network.link(first_position).end is step.act
+    assert network.link(second_position).end is step.act
+    assert network.link(second_position).start is first_position
+    assert network.snapshot() == snapshot
 
 
 def test_finite_context_return_replays_without_recursive_unfolding() -> None:
