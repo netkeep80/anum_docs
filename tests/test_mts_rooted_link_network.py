@@ -37,6 +37,22 @@ def build_reference_network():
     }
 
 
+def ensure_positive_power_for_test(
+    builder: LinkNetworkBuilder,
+    base: LinkRef,
+    exponent: int,
+) -> LinkRef:
+    """Expand the derived finite metanotation from #341 through ensure()."""
+
+    if exponent < 1:
+        raise ValueError("positive finite iteration requires exponent >= 1")
+
+    result = base
+    for _ in range(1, exponent):
+        result = builder.ensure(result, base)
+    return result
+
+
 def test_link_primitive_has_exactly_start_and_end():
     assert [field.name for field in fields(Link)] == ["start", "end"]
 
@@ -96,6 +112,52 @@ def test_loop_is_not_full_self_closure():
     assert network.link(loop) == Link(opening, opening)
     assert network.link(loop).start is not loop
     assert network.link(loop).end is not loop
+
+
+def test_positive_finite_iteration_is_left_associative_and_canonical():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    base = builder.ensure_start_self_closed(root)
+
+    power1 = ensure_positive_power_for_test(builder, base, 1)
+    power2 = ensure_positive_power_for_test(builder, base, 2)
+    power3 = ensure_positive_power_for_test(builder, base, 3)
+    power4 = ensure_positive_power_for_test(builder, base, 4)
+
+    assert power1 is base
+    assert power2 is builder.ensure(base, base)
+    assert power3 is builder.ensure(power2, base)
+    assert power4 is builder.ensure(power3, base)
+    assert ensure_positive_power_for_test(builder, base, 4) is power4
+
+    assert power1 is not power2
+    assert power2 is not power3
+    assert power3 is not power4
+
+    network = builder.freeze(root)
+    assert network.link(power2) == Link(base, base)
+    assert network.link(power3) == Link(power2, base)
+    assert network.link(power4) == Link(power3, base)
+
+
+def test_root_positive_finite_iteration_is_a_fixed_point():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+
+    for exponent in range(1, 9):
+        assert ensure_positive_power_for_test(builder, root, exponent) is root
+
+    network = builder.freeze(root)
+    assert network.refs == (root,)
+
+
+def test_positive_finite_iteration_metanotation_has_no_zero_case():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    base = builder.ensure_start_self_closed(root)
+
+    with pytest.raises(ValueError, match="exponent >= 1"):
+        ensure_positive_power_for_test(builder, base, 0)
 
 
 def test_second_fully_self_closed_link_is_rejected_before_freeze():
