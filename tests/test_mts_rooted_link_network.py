@@ -13,7 +13,6 @@ from core.rooted_link_network import (
     NetworkSnapshot,
     LinkRef,
 )
-from core.rooted_shape_judgment import end_self, full_self, shape, start_self
 
 
 def build_reference_network():
@@ -52,6 +51,32 @@ def ensure_positive_power_for_test(
     for _ in range(1, exponent):
         result = builder.ensure(result, base)
     return result
+
+
+def shape_for_test(
+    network: LinkNetwork,
+    ref: LinkRef,
+    start: LinkRef,
+    end: LinkRef,
+) -> bool:
+    """Read-only executable form of Shape(X; A,B) for #339."""
+
+    link = network.link(ref)
+    network.link(start)
+    network.link(end)
+    return link.start is start and link.end is end
+
+
+def start_self_for_test(network: LinkNetwork, ref: LinkRef, end: LinkRef) -> bool:
+    return shape_for_test(network, ref, ref, end)
+
+
+def end_self_for_test(network: LinkNetwork, ref: LinkRef, start: LinkRef) -> bool:
+    return shape_for_test(network, ref, start, ref)
+
+
+def full_self_for_test(network: LinkNetwork, ref: LinkRef) -> bool:
+    return shape_for_test(network, ref, ref, ref)
 
 
 def test_link_primitive_has_exactly_start_and_end():
@@ -194,11 +219,11 @@ def test_shape_judgments_match_root_vocabulary():
     linked = refs["linked"]
     unlinked = refs["unlinked"]
 
-    assert full_self(network, root)
-    assert start_self(network, opening, root)
-    assert end_self(network, closing, root)
-    assert shape(network, linked, opening, closing)
-    assert shape(network, unlinked, closing, opening)
+    assert full_self_for_test(network, root)
+    assert start_self_for_test(network, opening, root)
+    assert end_self_for_test(network, closing, root)
+    assert shape_for_test(network, linked, opening, closing)
+    assert shape_for_test(network, unlinked, closing, opening)
 
 
 def test_wrong_shape_is_false_and_does_not_materialize_absent_pair():
@@ -208,9 +233,9 @@ def test_wrong_shape_is_false_and_does_not_materialize_absent_pair():
     before = network.snapshot()
 
     assert network.find(opening, opening) is None
-    assert not shape(network, linked, opening, opening)
-    assert not start_self(network, linked, refs["closing"])
-    assert not end_self(network, linked, opening)
+    assert not shape_for_test(network, linked, opening, opening)
+    assert not start_self_for_test(network, linked, refs["closing"])
+    assert not end_self_for_test(network, linked, opening)
     assert network.find(opening, opening) is None
     assert network.snapshot() == before
 
@@ -218,7 +243,9 @@ def test_wrong_shape_is_false_and_does_not_materialize_absent_pair():
 def test_full_self_judgment_holds_only_for_root():
     network, _ = build_reference_network()
 
-    assert [ref for ref in network.refs if full_self(network, ref)] == [network.root]
+    assert [
+        ref for ref in network.refs if full_self_for_test(network, ref)
+    ] == [network.root]
 
 
 def test_shape_judgment_rejects_foreign_expected_handle():
@@ -226,7 +253,7 @@ def test_shape_judgment_rejects_foreign_expected_handle():
     other_network, other_refs = build_reference_network()
 
     with pytest.raises(LinkNetworkError, match="foreign network link handle"):
-        shape(
+        shape_for_test(
             network,
             refs["linked"],
             refs["opening"],
