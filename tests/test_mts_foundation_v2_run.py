@@ -168,13 +168,8 @@ def test_explicit_context_can_select_run_position_without_duplicate_act() -> Non
         after_role=after_role,
     )
 
-    same_act = define_act_header(
-        builder,
-        interpreter,
-        builder._links[step.act.slot].start,
-        k0,
-    )
-    assert same_act is step.act
+    act_header = builder._links[step.act.slot].end
+    assert builder.ensure_start_self_closed(act_header) is step.act
 
     evidence = _run(builder, root, (step, step), k0, k0)
     first_position = builder.ensure(root, step.act)
