@@ -312,13 +312,13 @@ def test_structurally_different_forged_result_rejects() -> None:
 
 def test_forged_binding_rejects_even_when_source_is_valid() -> None:
     network, byte_refs, evidence, fixed = _relation_fixture("start-open")
-    with pytest.raises(InterpreterReplayError, match="binding is not exact current"):
+    with pytest.raises(InterpreterReplayError, match="binding is not current resolved from K"):
         replay_relation_step(network, replace(evidence, binding=fixed), byte_refs)
 
 
 def test_complete_form_is_not_silently_treated_as_partial() -> None:
     network, byte_refs, evidence, _ = _relation_fixture("complete")
-    with pytest.raises(InterpreterReplayError, match="not exactly one-pole"):
+    with pytest.raises(InterpreterReplayError, match="not one-pole self-closed"):
         replay_relation_step(network, evidence, byte_refs)
 
 
