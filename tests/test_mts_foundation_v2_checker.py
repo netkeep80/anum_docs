@@ -311,6 +311,28 @@ def test_swapped_run_order_rejects() -> None:
         replay_integrated_proof(network, replace(evidence, run=swapped), byte_refs)
 
 
+def test_extra_valid_run_act_does_not_become_implicit_proof_step() -> None:
+    builder, root, byte_refs, evidence, _, _, _ = _fixture()
+    premise_step, proof_step = evidence.run.steps
+    extended_run = RunEvidence(
+        run_root=define_run_chain(
+            builder,
+            root,
+            (premise_step.act, proof_step.act, proof_step.act),
+        ),
+        initial_context=evidence.run.initial_context,
+        terminal_context=evidence.run.terminal_context,
+        steps=(premise_step, proof_step, proof_step),
+    )
+    network = builder.freeze(root)
+
+    with pytest.raises(
+        IntegratedCheckerError,
+        match="exactly equality premise then rule application",
+    ):
+        replay_integrated_proof(network, replace(evidence, run=extended_run), byte_refs)
+
+
 def test_structurally_other_run_context_rejects_before_replay() -> None:
     builder, root, byte_refs, evidence, _, _, context = _fixture()
     other_context = define_context(builder, _anchor(builder), _anchor(builder))
@@ -330,3 +352,6 @@ def test_integrated_checker_has_no_search_parser_or_legacy_proof_dependency() ->
     assert "proof_checker" not in source
     assert "carrier_isomorphic" not in source
     assert "materialize(" not in source
+    assert "replay_colon_effect" not in source
+    assert "ColonEffectEvidence" not in source
+    assert "lookup_scoped_dictionary" not in source
