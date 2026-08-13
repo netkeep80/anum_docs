@@ -160,6 +160,31 @@ def test_positive_finite_iteration_metanotation_has_no_zero_case():
         ensure_positive_power_for_test(builder, base, 0)
 
 
+def test_canonical_natural_row_uses_root_and_closing_link():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    closing = builder.ensure_end_self_closed(root)
+
+    naturals = [root]
+    for _ in range(8):
+        naturals.append(builder.ensure(naturals[-1], closing))
+
+    assert naturals[1] is closing
+    assert builder.ensure(root, closing) is closing
+    assert len({id(ref) for ref in naturals}) == len(naturals)
+
+    for exponent in range(1, len(naturals)):
+        assert (
+            ensure_positive_power_for_test(builder, closing, exponent)
+            is naturals[exponent]
+        )
+
+    network = builder.freeze(root)
+    assert network.link(naturals[1]) == Link(root, closing)
+    for index in range(2, len(naturals)):
+        assert network.link(naturals[index]) == Link(naturals[index - 1], closing)
+
+
 def test_second_fully_self_closed_link_is_rejected_before_freeze():
     builder = LinkNetworkBuilder()
     builder.ensure_root()
