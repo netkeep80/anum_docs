@@ -1,18 +1,21 @@
 """Foundation-v2 read-only interpreter/replay spine.
 
-This module is the production-facing trusted replay spine after the exact-
-occurrence state and source gates. It consumes already-selected exact evidence;
-it does not tokenize, parse, search, rank or materialize application links.
+This module is the production-facing trusted replay spine after the rooted
+canonical state and source gates. It consumes already-selected structural
+evidence; it does not tokenize, parse, search, rank or materialize application
+links.
 
 The same engine currently replays:
 
-- one-pole relation resolution against exact K/current;
-- one flat selected Anum sequence reading against exact source/D/G/T evidence;
+- one-pole relation resolution against explicit K/current;
+- one flat selected Anum sequence reading against explicit source/D/G/T evidence;
 - one persistent scoped-dictionary ``:`` effect;
-- one local exact-representative ``=`` evaluation.
+- one local representative ``=`` evaluation.
 
 Python dataclasses below are checker/transport API only. Semantic identity lives
-in the exact link occurrences they reference.
+in canonical links determined by their already-distinguished ordered poles.
+``LinkRef`` values are local runtime access handles for those links, not an
+additional identity layer.
 """
 from __future__ import annotations
 
@@ -47,7 +50,7 @@ class InterpreterReplayError(ValueError):
 
 @dataclass(frozen=True)
 class RelationStepRoleRefs:
-    """Exact role refs supplied by the explicit Gate-R role vocabulary."""
+    """Role refs supplied by the explicit Gate-R role vocabulary."""
 
     source: LinkRef
     source_selection: LinkRef
@@ -64,7 +67,7 @@ class RelationStepRoleRefs:
 
 @dataclass(frozen=True)
 class RelationStepEvidence:
-    """Checker handle for one exact read-only relation-resolution act."""
+    """Checker handle for one selected read-only relation-resolution act."""
 
     source_evidence: SourceFrontEndEvidence
     interpreter: LinkRef
@@ -80,7 +83,7 @@ class RelationStepEvidence:
 
 @dataclass(frozen=True)
 class FlatSequenceReadingRoleRefs:
-    """Exact roles required to replay one selected flat Anum reading act."""
+    """Roles required to replay one selected flat Anum reading act."""
 
     source: LinkRef
     source_selection: LinkRef
@@ -97,9 +100,10 @@ class FlatSequenceReadingRoleRefs:
 class FlatSequenceReadingEvidence:
     """Checker handle for one read-only flat sequence reading.
 
-    The selected source front-end fixes exact source/D/G/T evidence and the
-    ordered form sequence. ``result`` must already exist and must be exactly the
-    left-fold denotation of that flat sequence. Replay never creates it.
+    The selected source front-end fixes explicit source/D/G/T evidence and the
+    ordered form sequence. ``result`` must already exist and must be the
+    canonical left-fold denotation of that flat sequence. Replay never creates
+    it.
     """
 
     source_evidence: SourceFrontEndEvidence
@@ -114,7 +118,7 @@ class FlatSequenceReadingEvidence:
 
 @dataclass(frozen=True)
 class ColonRoleRefs:
-    """Exact role refs required to replay one persistent ``:`` effect."""
+    """Role refs required to replay one persistent ``:`` effect."""
 
     source: LinkRef
     source_content: LinkRef
@@ -149,7 +153,7 @@ class ColonEffectEvidence:
 
 @dataclass(frozen=True)
 class EqualityRoleRefs:
-    """Exact role refs required to replay one local equality evaluation."""
+    """Role refs required to replay one local equality evaluation."""
 
     context: LinkRef
     left: LinkRef
@@ -160,7 +164,7 @@ class EqualityRoleRefs:
 
 @dataclass(frozen=True)
 class EqualityEvaluationEvidence:
-    """Checker handle for one exact local equality-evaluation act."""
+    """Checker handle for one local equality-evaluation act."""
 
     interpreter: LinkRef
     context: LinkRef
@@ -217,8 +221,8 @@ def replay_relation_source_subselection_step(
     """Replay one-pole relation resolution from a trusted whole-source subselection.
 
     The semantic source remains ``evidence.source_evidence.source``. The selected
-    source/form folds and G/T refs name one exact contiguous subselection of that
-    whole source. No secondary source occurrence or bracket-specific opcode is
+    source/form folds and G/T refs name one contiguous subselection of that whole
+    source. No secondary semantic source identity or bracket-specific opcode is
     introduced.
     """
 
@@ -267,9 +271,9 @@ def replay_flat_sequence_reading(
     """Replay one selected flat Anum sequence reading without effects.
 
     This operation deliberately stops before O/C grouping. The source front-end
-    has already selected one exact flat form sequence under explicit D/G/T. The
-    result must be the exact existing left-fold denotation of those selected
-    forms: empty -> root, singleton -> the same occurrence, longer sequences ->
+    has already selected one flat form sequence under explicit D/G/T. The result
+    must be the existing canonical left-fold denotation of those selected forms:
+    empty -> root, singleton -> the same semantic link, longer sequences ->
     left-associated links. Search and creation remain outside replay.
     """
 
@@ -306,10 +310,11 @@ def replay_flat_source_subselection_reading(
 ) -> LinkRef:
     """Replay a flat reading of one trusted subselection of the same whole source.
 
-    ``evidence.source_evidence`` remains the whole exact source occurrence. The
+    ``evidence.source_evidence`` remains the whole semantic source carrier. The
     selected source/form folds and G/T refs name only the requested contiguous
-    subselection. Segment indices are checker coordinates; actual-act identity
-    is carried by exact link fields. No nested source occurrence is introduced.
+    subselection. Segment indices are checker coordinates, not semantic identity;
+    the act and result are canonical links described by explicit link fields. No
+    nested source identity is introduced.
     """
 
     before_snapshot = network.snapshot()
@@ -361,12 +366,12 @@ def replay_flat_source_subselection_continuation(
     grammar_membership: LinkRef,
     theory_membership: LinkRef,
 ) -> LinkRef:
-    """Continue one exact left fold from ``K_before.current`` over a subselection.
+    """Continue one canonical left fold from ``K_before.current`` over a subselection.
 
     This is sequence continuation, not bracket semantics. The selected source
     suffix is trusted through the same source-subselection evidence as an
-    ordinary flat reading. Replay only verifies an already-existing exact result;
-    it never creates the intermediate or final links.
+    ordinary flat reading. Replay only verifies an already-existing canonical
+    result; it never creates the intermediate or final links.
     """
 
     before_snapshot = network.snapshot()
@@ -410,7 +415,7 @@ def replay_flat_source_subselection_continuation(
             )
         if after_current is not evidence.result:
             raise InterpreterReplayError(
-                "flat-continuation after-context current is not the exact result"
+                "flat-continuation after-context current is not the canonical result"
             )
 
         _verify_flat_sequence_act_header(network, evidence)
@@ -462,7 +467,7 @@ def replay_colon_effect(
             or occurrence.end is not evidence.entry
         ):
             raise InterpreterReplayError(
-                "definition occurrence is not bound to exact D_before and Entry"
+                "definition history link is not bound to D_before and Entry"
             )
 
         history_after = network.link(evidence.history_after)
@@ -470,7 +475,7 @@ def replay_colon_effect(
             history_after.start is not history_before
             or history_after.end is not evidence.definition_occurrence
         ):
-            raise InterpreterReplayError("colon history is not one exact append")
+            raise InterpreterReplayError("colon history is not one canonical append")
 
         try:
             parent_after, selected_history_after = read_dictionary_scope(
@@ -481,7 +486,7 @@ def replay_colon_effect(
         if parent_after is not parent_before:
             raise InterpreterReplayError("colon effect changed lexical parent scope")
         if selected_history_after is not evidence.history_after:
-            raise InterpreterReplayError("D_after does not select exact appended history")
+            raise InterpreterReplayError("D_after does not select appended history")
 
         try:
             verify_visible_dictionary_occurrence(
@@ -508,7 +513,7 @@ def replay_colon_effect(
             pass
         else:
             raise InterpreterReplayError(
-                "new definition occurrence is retroactively visible from D_before"
+                "new definition history link is retroactively visible from D_before"
             )
 
         _verify_colon_act_header(network, evidence)
@@ -523,9 +528,9 @@ def replay_equality_evaluation(
     network: LinkNetwork,
     evidence: EqualityEvaluationEvidence,
 ) -> bool:
-    """Replay one local exact-representative equality evaluation read-only.
+    """Replay one local representative equality evaluation read-only.
 
-    The host boolean is only a convenience result. The exact actual act ``A``
+    The host boolean is only a convenience result. The canonical act ``A``
     records the evaluated context, operands and one-hop representatives.
     """
 
@@ -579,14 +584,14 @@ def _replay_relation_selected_form(
     except FoundationStateError as exc:
         raise InterpreterReplayError("invalid before-context") from exc
     if evidence.binding is not current:
-        raise InterpreterReplayError("binding is not exact current resolved from K")
+        raise InterpreterReplayError("binding is not current resolved from K")
 
     expected_start, expected_end = _expected_result_poles(
         network, evidence.form, evidence.binding
     )
     result_link = network.link(evidence.result)
     if result_link.start is not expected_start or result_link.end is not expected_end:
-        raise InterpreterReplayError("result occurrence has forged poles")
+        raise InterpreterReplayError("result link has forged poles")
 
     try:
         after_parent = parent_of_context(network, evidence.after_context)
@@ -596,7 +601,7 @@ def _replay_relation_selected_form(
     if after_parent is not parent:
         raise InterpreterReplayError("after-context changed the explicit parent")
     if after_current is not evidence.result:
-        raise InterpreterReplayError("after-context current is not the exact result")
+        raise InterpreterReplayError("after-context current is not the canonical result")
 
     _verify_relation_act_header(network, evidence)
     _verify_relation_act_fields(
@@ -633,7 +638,7 @@ def _replay_flat_selected_forms(
         raise InterpreterReplayError("flat reading changed the explicit parent")
     if after_current is not evidence.result:
         raise InterpreterReplayError(
-            "flat-reading after-context current is not the exact result"
+            "flat-reading after-context current is not the canonical result"
         )
 
     _verify_flat_sequence_act_header(network, evidence)
@@ -655,12 +660,12 @@ def _verify_flat_sequence_result(
 ) -> None:
     if not forms:
         if result is not network.root:
-            raise InterpreterReplayError("empty flat sequence result is not exact root")
+            raise InterpreterReplayError("empty flat sequence result is not the root")
         return
     if len(forms) == 1:
         if result is not forms[0]:
             raise InterpreterReplayError(
-                "singleton flat sequence result is not the exact selected form"
+                "singleton flat sequence result is not the selected semantic link"
             )
         return
 
@@ -669,12 +674,12 @@ def _verify_flat_sequence_result(
         link = network.link(current)
         if link.end is not expected_end:
             raise InterpreterReplayError(
-                "flat sequence result does not match exact left-fold denotation"
+                "flat sequence result does not match canonical left-fold denotation"
             )
         current = link.start
     if current is not forms[0]:
         raise InterpreterReplayError(
-            "flat sequence result does not start from the first exact form"
+            "flat sequence result does not start from the first selected form"
         )
 
 
@@ -689,12 +694,12 @@ def _verify_flat_sequence_continuation_result(
         link = network.link(current)
         if link.end is not expected_end:
             raise InterpreterReplayError(
-                "flat continuation result does not match exact left fold"
+                "flat continuation result does not match canonical left fold"
             )
         current = link.start
     if current is not prefix:
         raise InterpreterReplayError(
-            "flat continuation result does not start from exact K current"
+            "flat continuation result does not start from K current"
         )
 
 
@@ -711,7 +716,7 @@ def _expected_result_poles(
         return binding, form_link.end
     if end_open:
         return form_link.start, binding
-    raise InterpreterReplayError("selected form is not exactly one-pole self-closed")
+    raise InterpreterReplayError("selected form is not one-pole self-closed")
 
 
 def _verify_relation_act_header(
@@ -721,10 +726,10 @@ def _verify_relation_act_header(
     try:
         header = act_header(network, evidence.act)
     except FoundationStateError as exc:
-        raise InterpreterReplayError("invalid actual-act header") from exc
+        raise InterpreterReplayError("invalid selected-act header") from exc
     expected = (evidence.interpreter, evidence.role_dictionary, evidence.after_context)
     if header != expected:
-        raise InterpreterReplayError("actual-act header does not match I/D_roles/K_after")
+        raise InterpreterReplayError("selected-act header does not match I/D_roles/K_after")
 
 
 def _verify_relation_act_fields(
@@ -764,11 +769,11 @@ def _verify_flat_sequence_act_header(
     try:
         header = act_header(network, evidence.act)
     except FoundationStateError as exc:
-        raise InterpreterReplayError("invalid flat-reading actual-act header") from exc
+        raise InterpreterReplayError("invalid flat-reading selected-act header") from exc
     expected = (evidence.interpreter, evidence.role_dictionary, evidence.after_context)
     if header != expected:
         raise InterpreterReplayError(
-            "flat-reading actual-act header does not match I/D_roles/K_after"
+            "flat-reading selected-act header does not match I/D_roles/K_after"
         )
 
 
@@ -807,11 +812,11 @@ def _verify_colon_act_header(
     try:
         header = act_header(network, evidence.act)
     except FoundationStateError as exc:
-        raise InterpreterReplayError("invalid colon actual-act header") from exc
+        raise InterpreterReplayError("invalid colon selected-act header") from exc
     expected = (evidence.interpreter, evidence.role_dictionary, evidence.context)
     if header != expected:
         raise InterpreterReplayError(
-            "colon actual-act header does not match I/D_roles/K"
+            "colon selected-act header does not match I/D_roles/K"
         )
 
 
@@ -858,11 +863,11 @@ def _verify_equality_act_header(
     try:
         header = act_header(network, evidence.act)
     except FoundationStateError as exc:
-        raise InterpreterReplayError("invalid equality actual-act header") from exc
+        raise InterpreterReplayError("invalid equality selected-act header") from exc
     expected = (evidence.interpreter, evidence.role_dictionary, evidence.context)
     if header != expected:
         raise InterpreterReplayError(
-            "equality actual-act header does not match I/D_roles/K"
+            "equality selected-act header does not match I/D_roles/K"
         )
 
 
@@ -897,5 +902,5 @@ def _verify_exact_act_fields(
         values = act_values(network, act, role)
         if values != (value,):
             raise InterpreterReplayError(
-                f"actual-act field {label!r} is missing, duplicated or forged"
+                f"selected-act field {label!r} is missing, duplicated or forged"
             )
