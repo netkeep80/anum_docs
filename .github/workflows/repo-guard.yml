@@ -2,7 +2,7 @@ name: repo-guard policy check
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: ["**"]
 
 permissions:
@@ -27,7 +27,7 @@ jobs:
           mode: check-pr
           enforcement: blocking
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
 
       - name: Publish repo-guard summary
         if: always()
