@@ -1,11 +1,17 @@
 import type { LinkHandle, ReadMemory } from "./memory.js";
 import {
+  readSourceForm,
   replaySelectedSourceEvidence,
   replaySourceSubselection,
   type SourceFrontEndEvidence,
   type SourceSubselectionEvidence,
 } from "./source.js";
 import { readContext } from "./state.js";
+import {
+  DictionaryError,
+  readDictionaryScope,
+  verifyVisibleDictionaryOccurrence,
+} from "./dictionary.js";
 import { readRequiredSingle, verifyHeader } from "./structural-readers.js";
 
 export interface RelationRoles {
@@ -32,7 +38,7 @@ export interface RelationReplayEvidence {
 
 export class InterpreterReplayError extends Error {
   override readonly name = "InterpreterReplayError";
-  constructor(readonly code: "invalid-relation-evidence" | "invalid-flat-evidence") { super(code); }
+  constructor(readonly code: "invalid-relation-evidence" | "invalid-flat-evidence" | "invalid-colon-evidence") { super(code); }
 }
 
 interface SelectedRelationEvidence {
@@ -290,4 +296,79 @@ export function replayFlatSubselectionContinuation(
   subselection: SourceSubselectionEvidence,
 ): LinkHandle {
   return replayFlatSubselection(memory, byteRefs, evidence, subselection, true);
+}
+
+export interface ColonRoles {
+  readonly source: LinkHandle;
+  readonly sourceContent: LinkHandle;
+  readonly form: LinkHandle;
+  readonly beforeDictionary: LinkHandle;
+  readonly entry: LinkHandle;
+  readonly definitionOccurrence: LinkHandle;
+  readonly historyBefore: LinkHandle;
+  readonly historyAfter: LinkHandle;
+  readonly afterDictionary: LinkHandle;
+  readonly context: LinkHandle;
+}
+
+export interface ColonReplayEvidence {
+  readonly act: LinkHandle;
+  readonly roles: ColonRoles;
+  readonly interpreter: LinkHandle;
+  readonly roleDictionary: LinkHandle;
+}
+
+function invalidColon(): never {
+  throw new InterpreterReplayError("invalid-colon-evidence");
+}
+
+export function replayColonEffect(
+  memory: ReadMemory,
+  evidence: ColonReplayEvidence,
+): LinkHandle {
+  try {
+    const beforeCount = memory.linkCount;
+    const { act, roles } = evidence;
+    const field = (role: LinkHandle) => readRequiredSingle(memory, act, role);
+    const source = field(roles.source);
+    const sourceContent = field(roles.sourceContent);
+    const form = field(roles.form);
+    const beforeDictionary = field(roles.beforeDictionary);
+    const entry = field(roles.entry);
+    const occurrence = field(roles.definitionOccurrence);
+    const historyBefore = field(roles.historyBefore);
+    const historyAfter = field(roles.historyAfter);
+    const afterDictionary = field(roles.afterDictionary);
+    const context = field(roles.context);
+
+    if (readSourceForm(memory, source) !== sourceContent) invalidColon();
+    const before = readDictionaryScope(memory, beforeDictionary);
+    if (before.localHistory !== historyBefore) invalidColon();
+    const entryPoles = memory.poles(entry);
+    if (entryPoles.start !== sourceContent || entryPoles.end !== form) invalidColon();
+    const occurrencePoles = memory.poles(occurrence);
+    if (occurrencePoles.start !== beforeDictionary || occurrencePoles.end !== entry) invalidColon();
+    const historyPoles = memory.poles(historyAfter);
+    if (historyPoles.start !== historyBefore || historyPoles.end !== occurrence) invalidColon();
+    const after = readDictionaryScope(memory, afterDictionary);
+    if (after.parentScope !== before.parentScope || after.localHistory !== historyAfter) invalidColon();
+
+    verifyVisibleDictionaryOccurrence(memory, afterDictionary, occurrence, sourceContent, form);
+    try {
+      verifyVisibleDictionaryOccurrence(memory, beforeDictionary, occurrence, sourceContent, form);
+      invalidColon();
+    } catch (error) {
+      if (!(error instanceof DictionaryError)) throw error;
+    }
+    verifyHeader(memory, act, {
+      interpreter: evidence.interpreter,
+      roleDictionary: evidence.roleDictionary,
+      afterContext: context,
+    });
+    if (memory.linkCount !== beforeCount) invalidColon();
+    return afterDictionary;
+  } catch (error) {
+    if (error instanceof InterpreterReplayError && error.code === "invalid-colon-evidence") throw error;
+    throw new InterpreterReplayError("invalid-colon-evidence");
+  }
 }
