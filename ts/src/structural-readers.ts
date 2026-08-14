@@ -1,4 +1,4 @@
-import type { LinkHandle, ReadMemory } from "./memory.js";
+import type { LinkHandle, ReadMemory, WriteMemory } from "./memory.js";
 
 export type StructuralReadErrorCode =
   | "invalid-act-header"
@@ -18,6 +18,27 @@ export class StructuralReadError extends Error {
   constructor(readonly code: StructuralReadErrorCode) {
     super(code);
   }
+}
+
+export function defineActHeader(
+  memory: WriteMemory,
+  interpreter: LinkHandle,
+  roleDictionary: LinkHandle,
+  afterContext: LinkHandle,
+): LinkHandle {
+  const roleAndContext = memory.ensure(roleDictionary, afterContext);
+  const header = memory.ensure(interpreter, roleAndContext);
+  return memory.ensureStartSelfClosed(header);
+}
+
+export function defineActField(
+  memory: WriteMemory,
+  act: LinkHandle,
+  role: LinkHandle,
+  value: LinkHandle,
+): LinkHandle {
+  const field = memory.ensure(role, value);
+  return memory.ensure(act, field);
 }
 
 export function readActHeader(
