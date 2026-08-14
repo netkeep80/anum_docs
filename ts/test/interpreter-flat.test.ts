@@ -246,22 +246,25 @@ const pair = fullCase(2);
 }
 
 {
-  const { memory, source, vocabulary, forms, parent, interpreter, roleDictionary } = pair;
+  const {
+    memory, source, vocabulary, forms, parent, interpreter, roleDictionary,
+    beforeContext: flatBeforeContext,
+  } = pair;
   const [prefix, other] = anchors(memory, 2);
   assert(prefix && other && forms[0] && forms[1], "subselection refs");
   const whole = subselection(memory, source.evidence, 0, 2, forms);
-  const beforeContext = defineContext(memory, parent, prefix);
   const flatResult = leftFold(memory, forms);
   const flatAfter = defineContext(memory, parent, flatResult);
   const flatEvidence = act(memory, {
     sourceEvidence: source.evidence, selected: whole, roles: vocabulary,
-    interpreter, roleDictionary, beforeContext, result: flatResult, afterContext: flatAfter,
+    interpreter, roleDictionary, beforeContext: flatBeforeContext, result: flatResult, afterContext: flatAfter,
   });
   same(
     replayFlatSubselectionReading(memory, source.byteRefs, flatEvidence, whole),
     pair.result, "whole-range subselection equals full reading",
   );
 
+  const beforeContext = defineContext(memory, parent, prefix);
   const continuationResult = continuedFold(memory, prefix, forms);
   const continuationAfter = defineContext(memory, parent, continuationResult);
   const continuationEvidence = act(memory, {
