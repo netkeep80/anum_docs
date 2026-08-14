@@ -9,6 +9,10 @@ import {
   type LinkHandle,
   type ReadMemory,
 } from "./memory.js";
+import {
+  RootedSequenceError,
+  readRootedSequence,
+} from "./rooted-sequence.js";
 
 export type CarrierInputErrorCode =
   | "invalid-vocabulary"
@@ -20,11 +24,6 @@ export interface AnumCarrierVocabulary {
   readonly closing: LinkHandle;
   readonly linked: LinkHandle;
   readonly unlinked: LinkHandle;
-}
-
-export interface RootedSequence {
-  readonly values: readonly LinkHandle[];
-  readonly prefixes: readonly LinkHandle[];
 }
 
 export class CarrierInputError extends Error {
@@ -84,57 +83,23 @@ export function validateCarrierVocabulary(
   }
 }
 
-export function readRootedSequence(
-  memory: ReadMemory,
-  final: LinkHandle,
-): RootedSequence {
-  const { root } = memory;
-  if (final === root) {
-    return Object.freeze({
-      values: Object.freeze([]),
-      prefixes: Object.freeze([root]),
-    });
-  }
-
-  const reversedValues: LinkHandle[] = [];
-  const reversedPrefixes: LinkHandle[] = [final];
-  const visited = new Set<LinkHandle>();
-  let current = final;
-
-  try {
-    while (current !== root) {
-      if (visited.has(current)) {
-        throw new CarrierInputError("not-rooted-sequence");
-      }
-      visited.add(current);
-      const link = memory.poles(current);
-      reversedValues.push(link.end);
-      current = link.start;
-      reversedPrefixes.push(current);
-    }
-  } catch (error) {
-    if (error instanceof CarrierInputError) {
-      throw error;
-    }
-    if (error instanceof MemoryError) {
-      throw new CarrierInputError("not-rooted-sequence");
-    }
-    throw error;
-  }
-
-  return Object.freeze({
-    values: Object.freeze([...reversedValues].reverse()),
-    prefixes: Object.freeze([...reversedPrefixes].reverse()),
-  });
-}
-
 function decodeCarrierAbits(
   memory: ReadMemory,
   carrier: LinkHandle,
   vocabulary: AnumCarrierVocabulary,
 ): readonly Abit[] {
   validateCarrierVocabulary(memory, vocabulary);
-  const sequence = readRootedSequence(memory, carrier);
+
+  let sequence;
+  try {
+    sequence = readRootedSequence(memory, carrier);
+  } catch (error) {
+    if (error instanceof RootedSequenceError) {
+      throw new CarrierInputError("not-rooted-sequence");
+    }
+    throw error;
+  }
+
   const inverse = new Map<LinkHandle, Abit>([
     [vocabulary.opening, "["],
     [vocabulary.closing, "]"],
