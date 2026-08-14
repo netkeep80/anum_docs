@@ -128,7 +128,10 @@ assertSame(memory.linkCount, beforeContextReads, "context reads must not materia
 
 const ordinary = memory.ensure(ordinaryLeft, ordinaryRight);
 expectStateError(() => readContext(memory, ordinary), "invalid-context");
-const foreignContext = defineContext(new Memory(), new Memory().root, new Memory().root);
+const foreignMemory = new Memory();
+const foreignParent = foreignMemory.ensureStartSelfClosed(foreignMemory.root);
+const foreignCurrent = foreignMemory.ensureEndSelfClosed(foreignMemory.root);
+const foreignContext = defineContext(foreignMemory, foreignParent, foreignCurrent);
 expectStateError(() => readContext(memory, foreignContext), "invalid-context");
 
 const fallback = localRepresentativeResolution(memory, context, member);
