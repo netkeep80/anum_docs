@@ -247,8 +247,9 @@ const pair = fullCase(2);
   reject(() => replayFlatReading(memory, source.byteRefs, wrongHeader));
 }
 
+const cleanPair = fullCase(2);
 {
-  const { memory, source, vocabulary, forms, parent, interpreter, roleDictionary } = pair;
+  const { memory, source, vocabulary, forms, parent, interpreter, roleDictionary } = cleanPair;
   const [prefix, other] = anchors(memory, 2);
   assert(prefix && other && forms[0] && forms[1], "subselection refs");
   const whole: SourceSubselectionEvidence = Object.freeze({
@@ -262,8 +263,8 @@ const pair = fullCase(2);
     theoryMembership: source.evidence.theoryMembership,
   });
   same(
-    replayFlatSubselectionReading(memory, source.byteRefs, pair.evidence, whole),
-    pair.result, "whole-range subselection equals full reading",
+    replayFlatSubselectionReading(memory, source.byteRefs, cleanPair.evidence, whole),
+    cleanPair.result, "whole-range subselection equals full reading",
   );
 
   const beforeContext = defineContext(memory, parent, prefix);
@@ -302,5 +303,5 @@ const pair = fullCase(2);
   const forgedSelection: SourceSubselectionEvidence = Object.freeze({
     ...whole, formSequence: empty.formSequence,
   });
-  reject(() => replayFlatSubselectionReading(memory, source.byteRefs, pair.evidence, forgedSelection));
+  reject(() => replayFlatSubselectionReading(memory, source.byteRefs, cleanPair.evidence, forgedSelection));
 }
