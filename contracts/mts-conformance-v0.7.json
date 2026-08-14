@@ -1,9 +1,9 @@
 {
   "schema": "mts-conformance/v0.7",
   "status": "accepted",
-  "accepted": true,
+  "accepted": false,
   "issue": 403,
-  "contract": "mts-contract/v0.7",
+  "contract": "mts-contract/v0.6",
   "previousAcceptedRelease": {
     "contract": "mts-contract/v0.6",
     "conformance": "mts-conformance/v0.6",
@@ -28,7 +28,8 @@
     "tests/test_foundation_v2_cutover_gate.py",
     "tests/test_foundation_v2_c7_preflight.py",
     "tests/test_foundation_v2_c8_integrated.py",
-    "tests/test_repository_contract.py"
+    "tests/test_repository_contract.py",
+    "tests/repo-guard-negative-probe-missing.py"
   ],
   "integratedPath": [
     "root",
@@ -48,7 +49,8 @@
     "read-or-replay-materializes",
     "historical-female-F-or-F-male-projection-meaning",
     "root-as-fifth-abit",
-    "empty-group-rejected"
+    "empty-group-rejected",
+    "repo-guard-negative-probe-missing-vector"
   ],
   "versionedSurfaces": {
     "anum": "anum-deserialization/v0.4",
