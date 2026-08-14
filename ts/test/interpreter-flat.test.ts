@@ -146,9 +146,7 @@ function act(memory: Memory, options: ActOptions): FlatReadingEvidence {
     interpreter: options.interpreter, roleDictionary: options.roleDictionary,
   });
 }
-function full(evidence: SourceFrontEndEvidence): Selected {
-  return evidence;
-}
+function full(evidence: SourceFrontEndEvidence): Selected { return evidence; }
 function subselection(
   memory: Memory,
   evidence: SourceFrontEndEvidence,
@@ -156,8 +154,9 @@ function subselection(
   end: number,
   forms: readonly LinkHandle[],
 ): SourceSubselectionEvidence {
-  const selectedSegments = evidence.segments.slice(start, end);
-  const selectionSequence = rootedFold(memory, selectedSegments.map((item) => item.selection));
+  const selectionSequence = rootedFold(
+    memory, evidence.segments.slice(start, end).map((item) => item.selection),
+  );
   const formSequence = rootedFold(memory, forms);
   return Object.freeze({
     startSegment: start, endSegment: end, selectionSequence, formSequence,
@@ -198,7 +197,10 @@ function fullCase(formsCount: number) {
   const before = memory.linkCount;
   same(replayFlatReading(new Probe(memory), source.byteRefs, evidence), result, `full flat ${formsCount}`);
   same(memory.linkCount, before, "full flat replay read-only");
-  return { memory, source, vocabulary, forms, parent, current, interpreter, roleDictionary, beforeContext, result, afterContext };
+  return {
+    memory, source, vocabulary, forms, parent, current, interpreter, roleDictionary,
+    beforeContext, result, afterContext, evidence,
+  };
 }
 
 fullCase(0);
@@ -246,21 +248,21 @@ const pair = fullCase(2);
 }
 
 {
-  const {
-    memory, source, vocabulary, forms, parent, interpreter, roleDictionary,
-    beforeContext: flatBeforeContext,
-  } = pair;
+  const { memory, source, vocabulary, forms, parent, interpreter, roleDictionary } = pair;
   const [prefix, other] = anchors(memory, 2);
   assert(prefix && other && forms[0] && forms[1], "subselection refs");
-  const whole = subselection(memory, source.evidence, 0, 2, forms);
-  const flatResult = leftFold(memory, forms);
-  const flatAfter = defineContext(memory, parent, flatResult);
-  const flatEvidence = act(memory, {
-    sourceEvidence: source.evidence, selected: whole, roles: vocabulary,
-    interpreter, roleDictionary, beforeContext: flatBeforeContext, result: flatResult, afterContext: flatAfter,
+  const whole: SourceSubselectionEvidence = Object.freeze({
+    startSegment: 0,
+    endSegment: source.evidence.segments.length,
+    selectionSequence: source.evidence.selectionSequence,
+    formSequence: source.evidence.formSequence,
+    grammar: source.evidence.grammar,
+    theory: source.evidence.theory,
+    grammarMembership: source.evidence.grammarMembership,
+    theoryMembership: source.evidence.theoryMembership,
   });
   same(
-    replayFlatSubselectionReading(memory, source.byteRefs, flatEvidence, whole),
+    replayFlatSubselectionReading(memory, source.byteRefs, pair.evidence, whole),
     pair.result, "whole-range subselection equals full reading",
   );
 
@@ -300,5 +302,5 @@ const pair = fullCase(2);
   const forgedSelection: SourceSubselectionEvidence = Object.freeze({
     ...whole, formSequence: empty.formSequence,
   });
-  reject(() => replayFlatSubselectionReading(memory, source.byteRefs, flatEvidence, forgedSelection));
+  reject(() => replayFlatSubselectionReading(memory, source.byteRefs, pair.evidence, forgedSelection));
 }
