@@ -1,5 +1,7 @@
 import {
   StructuralReadError,
+  defineActField,
+  defineActHeader,
   readActHeader,
   readOptionalMany,
   readRequiredSingle,
@@ -10,6 +12,7 @@ import {
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
+  type WriteMemory,
 } from "../src/memory.js";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -55,27 +58,6 @@ function anchors(memory: Memory, count: number): LinkHandle[] {
   return result;
 }
 
-function defineActHeader(
-  memory: Memory,
-  interpreter: LinkHandle,
-  roleDictionary: LinkHandle,
-  afterContext: LinkHandle,
-): LinkHandle {
-  const roleAndContext = memory.ensure(roleDictionary, afterContext);
-  const header = memory.ensure(interpreter, roleAndContext);
-  return memory.ensureStartSelfClosed(header);
-}
-
-function defineActField(
-  memory: Memory,
-  act: LinkHandle,
-  role: LinkHandle,
-  value: LinkHandle,
-): LinkHandle {
-  const field = memory.ensure(role, value);
-  return memory.ensure(act, field);
-}
-
 class IndexedReadProbe implements ReadMemory {
   outgoingCalls = 0;
 
@@ -108,10 +90,12 @@ class IndexedReadProbe implements ReadMemory {
 }
 
 const memory = new Memory();
+const writable: WriteMemory = memory;
 const [
   interpreter,
   roleDictionary,
   afterContext,
+  secondAfterContext,
   roleSource,
   roleTheory,
   roleMany,
@@ -120,12 +104,13 @@ const [
   valueOne,
   valueTwo,
   mismatch,
-] = anchors(memory, 11);
+] = anchors(memory, 12);
 
 assert(
   interpreter !== undefined &&
   roleDictionary !== undefined &&
   afterContext !== undefined &&
+  secondAfterContext !== undefined &&
   roleSource !== undefined &&
   roleTheory !== undefined &&
   roleMany !== undefined &&
@@ -137,16 +122,27 @@ assert(
   "fixture anchors must exist",
 );
 
-const act = defineActHeader(memory, interpreter, roleDictionary, afterContext);
-defineActField(memory, act, roleSource, source);
-defineActField(memory, act, roleTheory, theory);
-defineActField(memory, act, roleMany, valueOne);
-defineActField(memory, act, roleMany, valueTwo);
+const act = defineActHeader(writable, interpreter, roleDictionary, afterContext);
+const repeatedAct = defineActHeader(writable, interpreter, roleDictionary, afterContext);
+assertSame(repeatedAct, act, "same header topology must reuse the canonical act");
+
+const secondAct = defineActHeader(writable, interpreter, roleDictionary, secondAfterContext);
+assert(secondAct !== act, "different after-context must produce a structurally different act");
+
+defineActField(writable, act, roleSource, source);
+defineActField(writable, act, roleTheory, theory);
+defineActField(writable, act, roleMany, valueOne);
+defineActField(writable, act, roleMany, valueTwo);
+defineActField(writable, secondAct, roleSource, source);
 
 // Repeating the same semantic attachment does not manufacture another field.
-const repeatedOne = defineActField(memory, act, roleSource, source);
-const repeatedTwo = defineActField(memory, act, roleSource, source);
+const repeatedOne = defineActField(writable, act, roleSource, source);
+const repeatedTwo = defineActField(writable, act, roleSource, source);
 assertSame(repeatedOne, repeatedTwo, "same act/role/value attachment must be canonical");
+
+// Python membership wrappers add no observable beyond the canonical pair API.
+const membership = writable.ensure(interpreter, theory);
+assertSame(memory.find(interpreter, theory), membership, "ordinary ensure/find is exact membership");
 
 // Add unrelated topology to prove role reads are local to indexed outgoing(A).
 let noise = mismatch;
@@ -163,6 +159,14 @@ verifyHeader(memory, act, { interpreter, roleDictionary, afterContext });
 expectStructuralError(
   () => verifyHeader(memory, act, { interpreter: mismatch, roleDictionary, afterContext }),
   "act-header-mismatch",
+);
+
+const secondHeader = readActHeader(memory, secondAct);
+assertSame(secondHeader.afterContext, secondAfterContext, "second act after-context");
+assertDeepEqual(
+  readOptionalMany(memory, secondAct, roleSource),
+  [source],
+  "same source link may participate in a different structural act",
 );
 
 const probe = new IndexedReadProbe(memory);
@@ -186,7 +190,7 @@ expectStructuralError(
   "multiple-field-values",
 );
 
-const ordinary = memory.ensure(interpreter, theory);
+const ordinary = memory.ensure(roleDictionary, theory);
 expectStructuralError(() => readActHeader(memory, ordinary), "invalid-act-header");
 
 assertSame(memory.linkCount, beforeReads + 1, "only explicit fixture construction may add a link");
