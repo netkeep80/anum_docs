@@ -1,4 +1,8 @@
-import type { LinkHandle, ReadMemory } from "./memory.js";
+import type {
+  EnumerableReadMemory,
+  LinkHandle,
+  ReadMemory,
+} from "./memory.js";
 import { readRootedSequence } from "./rooted-sequence.js";
 
 export type OccurrencePath = readonly number[];
@@ -32,6 +36,24 @@ export interface ValueBundleVocabulary {
   readonly kindSeed: LinkHandle;
   readonly kindTags: readonly LinkHandle[];
 }
+
+export interface ResolvedOccurrence {
+  readonly path: OccurrencePath;
+  readonly link: LinkHandle;
+}
+
+export interface LinkValue {
+  readonly kind: "link";
+  readonly link: LinkHandle;
+}
+
+export interface BundleValue {
+  readonly kind: "bundle";
+  readonly links: ReadonlySet<LinkHandle>;
+  readonly occurrences: readonly ResolvedOccurrence[];
+}
+
+export type MtsValue = LinkValue | BundleValue;
 
 export class ValueBundleReplayError extends Error {
   override readonly name = "ValueBundleReplayError";
@@ -302,4 +324,114 @@ export function bundleRoleAt(elaboration: BundleElaboration, path: OccurrencePat
   return elaboration.roles.find((item) =>
     item.path.length === path.length && item.path.every((part, index) => part === path[index])
   )?.role;
+}
+
+function validatedOccurrence(
+  memory: ReadMemory,
+  occurrence: ResolvedOccurrence,
+): ResolvedOccurrence {
+  if (
+    typeof occurrence !== "object" || occurrence === null ||
+    !Array.isArray(occurrence.path)
+  ) invalid();
+  memory.poles(occurrence.link);
+  return Object.freeze({
+    path: Object.freeze([...occurrence.path]),
+    link: occurrence.link,
+  });
+}
+
+function bundleValue(
+  links: Iterable<LinkHandle>,
+  occurrences: readonly ResolvedOccurrence[] = [],
+): BundleValue {
+  return Object.freeze({
+    kind: "bundle" as const,
+    links: new Set(links) as ReadonlySet<LinkHandle>,
+    occurrences: Object.freeze([...occurrences]),
+  });
+}
+
+export function resolveFlatBundle(
+  memory: ReadMemory,
+  occurrences: readonly ResolvedOccurrence[],
+): BundleValue {
+  const before = memory.linkCount;
+  try {
+    if (!Array.isArray(occurrences)) invalid();
+    const resolved = occurrences.map((occurrence) => validatedOccurrence(memory, occurrence));
+    const result = bundleValue(resolved.map((occurrence) => occurrence.link), resolved);
+    if (memory.linkCount !== before) invalid();
+    return result;
+  } catch (error) {
+    if (error instanceof ValueBundleReplayError) throw error;
+    throw new ValueBundleReplayError("invalid-value-bundle-evidence");
+  }
+}
+
+export function valuesEqual(left: MtsValue, right: MtsValue): boolean {
+  if (left.kind !== right.kind) return false;
+  if (left.kind === "link" && right.kind === "link") return left.link === right.link;
+  if (left.kind !== "bundle" || right.kind !== "bundle") return false;
+  if (left.links.size !== right.links.size) return false;
+  for (const link of left.links) {
+    if (!right.links.has(link)) return false;
+  }
+  return true;
+}
+
+function validateValue(memory: ReadMemory, value: MtsValue): void {
+  if (value.kind === "link") {
+    memory.poles(value.link);
+    return;
+  }
+  if (value.kind !== "bundle") invalid();
+  for (const link of value.links) memory.poles(link);
+  for (const occurrence of value.occurrences) validatedOccurrence(memory, occurrence);
+}
+
+function endpointDomain(value: MtsValue): ReadonlySet<LinkHandle> | undefined {
+  if (value.kind === "link") return new Set([value.link]);
+  return value.links.size === 0 ? undefined : value.links;
+}
+
+export function expandResolvedBundleQuery(
+  memory: EnumerableReadMemory,
+  left: MtsValue,
+  right: MtsValue,
+): BundleValue {
+  const before = memory.linkCount;
+  try {
+    if (left.kind !== "bundle" && right.kind !== "bundle") invalid();
+    validateValue(memory, left);
+    validateValue(memory, right);
+    const leftDomain = endpointDomain(left);
+    const rightDomain = endpointDomain(right);
+    const found = new Set<LinkHandle>();
+
+    if (leftDomain === undefined && rightDomain === undefined) {
+      for (const ref of memory.allLinks()) found.add(ref);
+    } else if (leftDomain === undefined) {
+      for (const end of rightDomain!) {
+        for (const ref of memory.incoming(end)) found.add(ref);
+      }
+    } else if (rightDomain === undefined) {
+      for (const start of leftDomain) {
+        for (const ref of memory.outgoing(start)) found.add(ref);
+      }
+    } else {
+      for (const start of leftDomain) {
+        for (const end of rightDomain) {
+          const ref = memory.find(start, end);
+          if (ref !== undefined) found.add(ref);
+        }
+      }
+    }
+
+    if (memory.linkCount !== before) invalid();
+    return bundleValue(found);
+  } catch (error) {
+    if (error instanceof ValueBundleReplayError) throw error;
+    throw new ValueBundleReplayError("invalid-value-bundle-evidence");
+  }
 }
