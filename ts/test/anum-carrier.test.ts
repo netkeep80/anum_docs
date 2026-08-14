@@ -2,9 +2,12 @@ import {
   CarrierInputError,
   decodeCarrierStream,
   deserializeCarrier,
-  readRootedSequence,
   type AnumCarrierVocabulary,
 } from "../src/anum-carrier.js";
+import {
+  RootedSequenceError,
+  readRootedSequence,
+} from "../src/rooted-sequence.js";
 import {
   StreamError,
   deserializeStream,
@@ -41,6 +44,17 @@ function expectCarrierError(effect: () => unknown, code: CarrierInputError["code
     return;
   }
   throw new Error(`expected CarrierInputError(${code})`);
+}
+
+function expectRootedSequenceError(effect: () => unknown): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(error instanceof RootedSequenceError, `expected RootedSequenceError, got ${String(error)}`);
+    assertSame(error.code, "not-rooted-sequence", "rooted-sequence error code");
+    return;
+  }
+  throw new Error("expected RootedSequenceError(not-rooted-sequence)");
 }
 
 function expectStreamError(effect: () => unknown, code: StreamError["code"]): void {
@@ -107,8 +121,9 @@ function fixture(): Fixture {
 
   assert(openingCarrier !== vocabulary.opening, "carrier '[' is distinct from vocabulary O");
   assertSame(decodeCarrierStream(read, openingCarrier, vocabulary), "[", "explicit '[' carrier");
+  expectRootedSequenceError(() => readRootedSequence(read, vocabulary.opening));
   expectCarrierError(
-    () => readRootedSequence(read, vocabulary.opening),
+    () => decodeCarrierStream(read, vocabulary.opening, vocabulary),
     "not-rooted-sequence",
   );
   assertSame(memory.linkCount, before, "rooted sequence reads must not materialize");
@@ -117,11 +132,7 @@ function fixture(): Fixture {
 {
   const { read, vocabulary, carrier } = fixture();
   assertSame(decodeCarrierStream(read, carrier("0"), vocabulary), "0", "single zero carrier");
-  assertSame(
-    carrier("]["),
-    vocabulary.unlinked,
-    "canonical U can have explicit carrier role for ][",
-  );
+  assertSame(carrier("]["), vocabulary.unlinked, "canonical U can have explicit carrier role for ][");
   assertSame(
     decodeCarrierStream(read, vocabulary.unlinked, vocabulary),
     "][",
@@ -150,10 +161,7 @@ for (const vector of [
 ] as const) {
   const { read, vocabulary, carrier } = fixture();
   const selected = carrier(vector.source);
-  expectStreamError(
-    () => deserializeStream(vector.source, symbolicStackAlgebra),
-    vector.error,
-  );
+  expectStreamError(() => deserializeStream(vector.source, symbolicStackAlgebra), vector.error);
   expectStreamError(
     () => deserializeCarrier(read, selected, vocabulary, symbolicStackAlgebra),
     vector.error,
@@ -165,10 +173,7 @@ for (const vector of [
   const other = memory.ensureStartSelfClosed(vocabulary.linked);
   const carrier = memory.ensure(root, other);
   const before = memory.linkCount;
-  expectCarrierError(
-    () => decodeCarrierStream(read, carrier, vocabulary),
-    "non-abit",
-  );
+  expectCarrierError(() => decodeCarrierStream(read, carrier, vocabulary), "non-abit");
   assertSame(memory.linkCount, before, "non-abit rejection must not materialize");
 }
 
@@ -186,10 +191,7 @@ for (const vector of [
 {
   const { read, vocabulary, root } = fixture();
   const foreignRoot = new Memory().root;
-  const foreign: AnumCarrierVocabulary = {
-    ...vocabulary,
-    opening: foreignRoot,
-  };
+  const foreign: AnumCarrierVocabulary = { ...vocabulary, opening: foreignRoot };
   expectCarrierError(() => decodeCarrierStream(read, root, foreign), "invalid-vocabulary");
 }
 
