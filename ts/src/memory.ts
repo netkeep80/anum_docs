@@ -23,6 +23,15 @@ export interface ReadMemory {
   incoming(end: LinkHandle): readonly LinkHandle[];
 }
 
+/**
+ * Narrow opt-in capability for operations whose accepted result is the whole
+ * selected memory (for example an explicit all-links wildcard). Ordinary
+ * replay/checkers should continue to depend on ReadMemory only.
+ */
+export interface EnumerableReadMemory extends ReadMemory {
+  allLinks(): readonly LinkHandle[];
+}
+
 export interface WriteMemory extends ReadMemory {
   ensureRoot(): LinkHandle;
   ensureStartSelfClosed(end: LinkHandle): LinkHandle;
@@ -42,7 +51,7 @@ export class MemoryError extends Error {
   override readonly name = "MemoryError";
 }
 
-export class Memory implements WriteMemory {
+export class Memory implements WriteMemory, EnumerableReadMemory {
   private readonly owner = Symbol("mts.memory.owner");
   private readonly handles: InternalHandle[] = [];
   private readonly links: LinkPoles[] = [];
@@ -142,6 +151,12 @@ export class Memory implements WriteMemory {
   incoming(end: LinkHandle): readonly LinkHandle[] {
     const canonicalEnd = this.requireHandle(end);
     return [...(this.incomingIndex.get(canonicalEnd) ?? [])];
+  }
+
+  allLinks(): readonly LinkHandle[] {
+    // Return a frozen copy: enumeration exposes issued handles, never the
+    // mutable registry itself. Allocation order is iteration order only.
+    return Object.freeze([...this.handles]);
   }
 
   private allocateHandle(): InternalHandle {
