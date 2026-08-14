@@ -6,7 +6,7 @@ import {
   type SourceFrontEndEvidence,
   type SourceSubselectionEvidence,
 } from "./source.js";
-import { readContext } from "./state.js";
+import { localRepresentative, readContext } from "./state.js";
 import {
   DictionaryError,
   readDictionaryScope,
@@ -38,7 +38,7 @@ export interface RelationReplayEvidence {
 
 export class InterpreterReplayError extends Error {
   override readonly name = "InterpreterReplayError";
-  constructor(readonly code: "invalid-relation-evidence" | "invalid-flat-evidence" | "invalid-colon-evidence") { super(code); }
+  constructor(readonly code: "invalid-relation-evidence" | "invalid-flat-evidence" | "invalid-colon-evidence" | "invalid-equality-evidence") { super(code); }
 }
 
 interface SelectedRelationEvidence {
@@ -370,5 +370,57 @@ export function replayColonEffect(
   } catch (error) {
     if (error instanceof InterpreterReplayError && error.code === "invalid-colon-evidence") throw error;
     throw new InterpreterReplayError("invalid-colon-evidence");
+  }
+}
+
+export interface EqualityRoles {
+  readonly context: LinkHandle;
+  readonly left: LinkHandle;
+  readonly right: LinkHandle;
+  readonly leftRepresentative: LinkHandle;
+  readonly rightRepresentative: LinkHandle;
+}
+
+export interface EqualityReplayEvidence {
+  readonly act: LinkHandle;
+  readonly roles: EqualityRoles;
+  readonly interpreter: LinkHandle;
+  readonly roleDictionary: LinkHandle;
+}
+
+export function replayEqualityEvaluation(
+  memory: ReadMemory,
+  evidence: EqualityReplayEvidence,
+): boolean {
+  try {
+    const before = memory.linkCount;
+    const { act, roles } = evidence;
+    const field = (role: LinkHandle) => readRequiredSingle(memory, act, role);
+    const context = field(roles.context);
+    const left = field(roles.left);
+    const right = field(roles.right);
+    const claimedLeft = field(roles.leftRepresentative);
+    const claimedRight = field(roles.rightRepresentative);
+
+    // localRepresentative owns the accepted one-hop, context-local lookup and
+    // conflict detection; equality replay must not build a transitive closure.
+    readContext(memory, context);
+    const leftRepresentative = localRepresentative(memory, context, left);
+    const rightRepresentative = localRepresentative(memory, context, right);
+    if (claimedLeft !== leftRepresentative || claimedRight !== rightRepresentative) {
+      throw new InterpreterReplayError("invalid-equality-evidence");
+    }
+    verifyHeader(memory, act, {
+      interpreter: evidence.interpreter,
+      roleDictionary: evidence.roleDictionary,
+      afterContext: context,
+    });
+    if (memory.linkCount !== before) {
+      throw new InterpreterReplayError("invalid-equality-evidence");
+    }
+    return leftRepresentative === rightRepresentative;
+  } catch (error) {
+    if (error instanceof InterpreterReplayError && error.code === "invalid-equality-evidence") throw error;
+    throw new InterpreterReplayError("invalid-equality-evidence");
   }
 }
