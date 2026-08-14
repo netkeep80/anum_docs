@@ -19,7 +19,8 @@ export type SourceErrorCode =
   | "invalid-selected-partition"
   | "invalid-source-evidence"
   | "invalid-dictionary-evidence"
-  | "invalid-admission-evidence";
+  | "invalid-admission-evidence"
+  | "invalid-subselection";
 
 export interface SourceContent {
   readonly bytes: Uint8Array;
@@ -51,6 +52,17 @@ export interface SourceFrontEndEvidence {
   readonly segments: readonly SelectedSegmentEvidence[];
   readonly selectionSequence: LinkHandle;
   readonly formSequence: LinkHandle;
+  readonly grammarMembership: LinkHandle;
+  readonly theoryMembership: LinkHandle;
+}
+
+export interface SourceSubselectionEvidence {
+  readonly startSegment: number;
+  readonly endSegment: number;
+  readonly selectionSequence: LinkHandle;
+  readonly formSequence: LinkHandle;
+  readonly grammar: LinkHandle;
+  readonly theory: LinkHandle;
   readonly grammarMembership: LinkHandle;
   readonly theoryMembership: LinkHandle;
 }
@@ -408,4 +420,55 @@ export function replaySelectedSourceEvidence(
     throw new SourceError("invalid-source-evidence");
   }
   return Object.freeze(forms);
+}
+
+export function replaySourceSubselection(
+  memory: ReadMemory,
+  byteRefs: readonly LinkHandle[],
+  evidence: SourceFrontEndEvidence,
+  subselection: SourceSubselectionEvidence,
+): readonly LinkHandle[] {
+  const before = memory.linkCount;
+  const forms = replaySelectedSourceEvidence(memory, byteRefs, evidence);
+  if (
+    !Number.isInteger(subselection.startSegment) ||
+    !Number.isInteger(subselection.endSegment) ||
+    subselection.startSegment < 0 ||
+    subselection.endSegment < subselection.startSegment ||
+    subselection.endSegment > evidence.segments.length
+  ) {
+    throw new SourceError("invalid-subselection");
+  }
+
+  const segments = evidence.segments.slice(
+    subselection.startSegment,
+    subselection.endSegment,
+  );
+  const selectedForms = forms.slice(
+    subselection.startSegment,
+    subselection.endSegment,
+  );
+  verifyFold(
+    memory,
+    subselection.selectionSequence,
+    segments.map((segment) => segment.selection),
+  );
+  verifyFold(memory, subselection.formSequence, selectedForms);
+  verifyMembership(
+    memory,
+    subselection.grammarMembership,
+    subselection.grammar,
+    subselection.formSequence,
+  );
+  verifyMembership(
+    memory,
+    subselection.theoryMembership,
+    subselection.theory,
+    subselection.formSequence,
+  );
+
+  if (memory.linkCount !== before) {
+    throw new SourceError("invalid-source-evidence");
+  }
+  return Object.freeze([...selectedForms]);
 }
