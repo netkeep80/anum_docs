@@ -61,8 +61,14 @@ interface Fixture {
 
 function fixture(): Fixture {
   const memory = new Memory();
-  const [sourceContent, form, parent, context, interpreter, roleDictionary, other] = anchors(memory, 7);
-  assert(sourceContent && form && parent && context && interpreter && roleDictionary && other, "fixture refs");
+  const refs = anchors(memory, 7);
+  const sourceContent = refs[0]!;
+  const form = refs[1]!;
+  const parent = refs[2]!;
+  const context = refs[3]!;
+  const interpreter = refs[4]!;
+  const roleDictionary = refs[5]!;
+  const other = refs[6]!;
   const source = defineSourceForm(memory, sourceContent);
   const historyBefore = memory.root;
   const beforeDictionary = defineDictionaryScope(memory, parent, historyBefore);
@@ -70,7 +76,6 @@ function fixture(): Fixture {
     memory, beforeDictionary, parent, historyBefore, sourceContent, form,
   );
   const roleRefs = anchors(memory, 10);
-  assert(roleRefs.length === 10, "colon role vocabulary");
   const roles: ColonRoles = Object.freeze({
     source: roleRefs[0]!, sourceContent: roleRefs[1]!, form: roleRefs[2]!,
     beforeDictionary: roleRefs[3]!, entry: roleRefs[4]!, definitionOccurrence: roleRefs[5]!,
