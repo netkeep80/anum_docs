@@ -5,7 +5,7 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node dist/test/memory.test.js && node dist/test/anum.test.js && node dist/test/anum-carrier.test.js && node dist/test/structural-readers.test.js && node dist/test/state.test.js",
+    "test": "npm run build && node dist/test/memory.test.js && node dist/test/anum.test.js && node dist/test/anum-carrier.test.js && node dist/test/structural-readers.test.js && node dist/test/state.test.js && node dist/test/dictionary.test.js",
     "check": "npm run typecheck && npm test"
   },
   "devDependencies": {
