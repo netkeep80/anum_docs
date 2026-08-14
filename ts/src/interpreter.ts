@@ -32,7 +32,7 @@ export interface RelationReplayEvidence {
 
 export class InterpreterReplayError extends Error {
   override readonly name = "InterpreterReplayError";
-  constructor(readonly code: "invalid-relation-evidence") { super(code); }
+  constructor(readonly code: "invalid-relation-evidence" | "invalid-flat-evidence") { super(code); }
 }
 
 interface SelectedRelationEvidence {
@@ -152,4 +152,142 @@ export function replayRelationSubselectionStep(
     if (memory.linkCount !== before) invalid();
     return result;
   });
+}
+
+export interface FlatReadingRoles {
+  readonly source: LinkHandle;
+  readonly sourceSelection: LinkHandle;
+  readonly formSequence: LinkHandle;
+  readonly dictionary: LinkHandle;
+  readonly grammar: LinkHandle;
+  readonly theory: LinkHandle;
+  readonly beforeContext: LinkHandle;
+  readonly result: LinkHandle;
+  readonly afterContext: LinkHandle;
+}
+
+export interface FlatReadingEvidence {
+  readonly sourceEvidence: SourceFrontEndEvidence;
+  readonly act: LinkHandle;
+  readonly roles: FlatReadingRoles;
+  readonly interpreter: LinkHandle;
+  readonly roleDictionary: LinkHandle;
+}
+
+interface FlatSelection {
+  readonly selectionSequence: LinkHandle;
+  readonly formSequence: LinkHandle;
+  readonly grammar: LinkHandle;
+  readonly theory: LinkHandle;
+}
+
+function invalidFlat(): never {
+  throw new InterpreterReplayError("invalid-flat-evidence");
+}
+
+function verifyFold(
+  memory: ReadMemory,
+  forms: readonly LinkHandle[],
+  result: LinkHandle,
+  prefix?: LinkHandle,
+): void {
+  if (forms.length === 0) {
+    if (result !== (prefix ?? memory.root)) invalidFlat();
+    return;
+  }
+  if (prefix === undefined && forms.length === 1) {
+    if (result !== forms[0]) invalidFlat();
+    return;
+  }
+  let cursor = result;
+  const first = prefix === undefined ? 1 : 0;
+  for (let index = forms.length - 1; index >= first; index -= 1) {
+    const poles = memory.poles(cursor);
+    if (poles.end !== forms[index]) invalidFlat();
+    cursor = poles.start;
+  }
+  const base = prefix ?? forms[0];
+  if (cursor !== base) invalidFlat();
+}
+
+function replaySelectedFlat(
+  memory: ReadMemory,
+  evidence: FlatReadingEvidence,
+  selected: FlatSelection,
+  forms: readonly LinkHandle[],
+  continuation: boolean,
+): LinkHandle {
+  const before = memory.linkCount;
+  const { act, roles, sourceEvidence } = evidence;
+  const field = (role: LinkHandle) => readRequiredSingle(memory, act, role);
+  if (
+    field(roles.source) !== sourceEvidence.source ||
+    field(roles.sourceSelection) !== selected.selectionSequence ||
+    field(roles.formSequence) !== selected.formSequence ||
+    field(roles.dictionary) !== sourceEvidence.dictionary ||
+    field(roles.grammar) !== selected.grammar || field(roles.theory) !== selected.theory
+  ) invalidFlat();
+  const beforeContext = readContext(memory, field(roles.beforeContext));
+  const result = field(roles.result);
+  const afterContextRef = field(roles.afterContext);
+  verifyFold(memory, forms, result, continuation ? beforeContext.current : undefined);
+  const afterContext = readContext(memory, afterContextRef);
+  if (afterContext.parent !== beforeContext.parent || afterContext.current !== result) invalidFlat();
+  verifyHeader(memory, act, {
+    interpreter: evidence.interpreter,
+    roleDictionary: evidence.roleDictionary,
+    afterContext: afterContextRef,
+  });
+  if (memory.linkCount !== before) invalidFlat();
+  return result;
+}
+
+function normalizeFlat<T>(effect: () => T): T {
+  try { return effect(); }
+  catch (error) {
+    if (error instanceof InterpreterReplayError && error.code === "invalid-flat-evidence") throw error;
+    throw new InterpreterReplayError("invalid-flat-evidence");
+  }
+}
+
+export function replayFlatReading(
+  memory: ReadMemory,
+  byteRefs: readonly LinkHandle[],
+  evidence: FlatReadingEvidence,
+): LinkHandle {
+  return normalizeFlat(() => replaySelectedFlat(
+    memory, evidence, evidence.sourceEvidence,
+    replaySelectedSourceEvidence(memory, byteRefs, evidence.sourceEvidence), false,
+  ));
+}
+
+function replayFlatSubselection(
+  memory: ReadMemory,
+  byteRefs: readonly LinkHandle[],
+  evidence: FlatReadingEvidence,
+  subselection: SourceSubselectionEvidence,
+  continuation: boolean,
+): LinkHandle {
+  return normalizeFlat(() => replaySelectedFlat(
+    memory, evidence, subselection,
+    replaySourceSubselection(memory, byteRefs, evidence.sourceEvidence, subselection), continuation,
+  ));
+}
+
+export function replayFlatSubselectionReading(
+  memory: ReadMemory,
+  byteRefs: readonly LinkHandle[],
+  evidence: FlatReadingEvidence,
+  subselection: SourceSubselectionEvidence,
+): LinkHandle {
+  return replayFlatSubselection(memory, byteRefs, evidence, subselection, false);
+}
+
+export function replayFlatSubselectionContinuation(
+  memory: ReadMemory,
+  byteRefs: readonly LinkHandle[],
+  evidence: FlatReadingEvidence,
+  subselection: SourceSubselectionEvidence,
+): LinkHandle {
+  return replayFlatSubselection(memory, byteRefs, evidence, subselection, true);
 }
