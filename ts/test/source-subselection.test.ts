@@ -137,8 +137,8 @@ function subselection(
     endSegment,
     selectionSequence,
     formSequence,
-    grammar,
-    theory,
+    grammar: grammar!,
+    theory: theory!,
     grammarMembership,
     theoryMembership,
   });
