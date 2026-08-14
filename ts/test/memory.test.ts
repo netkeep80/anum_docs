@@ -2,6 +2,7 @@ import {
   Memory,
   MemoryError,
   ensureRootBasis,
+  type EnumerableReadMemory,
   type LinkHandle,
   type ReadMemory,
 } from "../src/memory.js";
@@ -46,12 +47,28 @@ function observeOnly(
   return memory.linkCount;
 }
 
+const freshEnumerable: EnumerableReadMemory = new Memory();
+const freshLinks = freshEnumerable.allLinks();
+assertSame(freshLinks.length, 1, "fresh enumeration must contain only R");
+assertSame(freshLinks[0], freshEnumerable.root, "fresh enumeration must contain R");
+assert(Object.isFrozen(freshLinks), "enumeration result must be frozen");
+
 const memory = new Memory();
 const { R, O, C, L, U } = ensureRootBasis(memory);
 
 assertSame(memory.linkCount, 5, "root basis must contain exactly five Links");
 assertSame(memory.ensureRoot(), R, "ensureRoot must reuse R");
 assertSame(memory.ensure(R, R), R, "R -> R must resolve to R");
+
+const enumeratedBasis = memory.allLinks();
+assertSame(enumeratedBasis.length, memory.linkCount, "enumeration count must match linkCount");
+for (const ref of [R, O, C, L, U]) {
+  assertIncludes(enumeratedBasis, ref, "enumeration must contain every basis Link");
+}
+assertSame(new Set(enumeratedBasis).size, enumeratedBasis.length, "enumeration must not duplicate Links");
+const beforeEnumeration = memory.linkCount;
+assertSame(memory.allLinks().length, beforeEnumeration, "enumeration must be read-only");
+assertSame(memory.linkCount, beforeEnumeration, "enumeration must preserve linkCount");
 
 const rootPoles = memory.poles(R);
 assertSame(rootPoles.start, R, "R start must be R");
@@ -99,6 +116,10 @@ const loopPoles = memory.poles(loop);
 assertSame(loopPoles.start, L, "Loop(L) start must be L");
 assertSame(loopPoles.end, L, "Loop(L) end must be L");
 assertSame(memory.ensure(L, L), loop, "ordinary loop pair must be canonical");
+const afterLoop = memory.allLinks();
+assertSame(afterLoop.length, memory.linkCount, "new Link must appear once in enumeration");
+assertIncludes(afterLoop, loop, "enumeration must include newly materialized Link");
+assertSame(new Set(afterLoop).size, afterLoop.length, "same-pair reuse must not duplicate enumeration");
 
 const foreignRoot = new Memory().root;
 assertMemoryError(
