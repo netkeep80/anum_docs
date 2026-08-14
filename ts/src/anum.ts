@@ -25,7 +25,7 @@ export interface StreamDenotation<T> {
 }
 
 export class StreamError extends Error {
-  override readonly name = "StreamError";
+  override readonly name: string = "StreamError";
 
   constructor(readonly code: StreamErrorCode) {
     super(code);
@@ -33,7 +33,7 @@ export class StreamError extends Error {
 }
 
 export class QuaternaryDecodeError extends StreamError {
-  override readonly name = "QuaternaryDecodeError";
+  override readonly name: string = "QuaternaryDecodeError";
 
   constructor(
     readonly offset: number,
