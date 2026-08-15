@@ -12,37 +12,21 @@
         "path": ".github/workflows/ci.yml",
         "role": "ci_gate",
         "expect": {
-          "events": [
-            "pull_request"
-          ],
+          "events": ["pull_request"],
           "enforcement": "blocking",
-          "disallow": [
-            "continue_on_error"
-          ]
+          "disallow": ["continue_on_error"]
         }
       }
     ]
   },
   "contract_conformance": {
     "current": {
-      "contract": {
-        "path": "contracts/mts-contract-v0.7.json",
-        "format": "json"
-      },
-      "conformance": {
-        "path": "contracts/mts-conformance-v0.7.json",
-        "format": "json"
-      }
+      "contract": {"path": "contracts/mts-contract-v0.8.json", "format": "json"},
+      "conformance": {"path": "contracts/mts-conformance-v0.8.json", "format": "json"}
     },
     "previous": {
-      "contract": {
-        "path": "contracts/mts-contract-v0.6.json",
-        "format": "json"
-      },
-      "conformance": {
-        "path": "contracts/mts-conformance-v0.6.json",
-        "format": "json"
-      }
+      "contract": {"path": "contracts/mts-contract-v0.7.json", "format": "json"},
+      "conformance": {"path": "contracts/mts-conformance-v0.7.json", "format": "json"}
     },
     "pair_fields": {
       "contract_id": "/schema",
@@ -53,44 +37,22 @@
       "contract_accepted": "/accepted",
       "conformance_accepted": "/accepted"
     },
-    "accepted_state": {
-      "status": "accepted",
-      "accepted": true
-    },
+    "accepted_state": {"status": "accepted", "accepted": true},
     "acceptance": {
-      "document": {
-        "path": "cutover/foundation-v2-c9-acceptance-v0.1.json",
-        "format": "json"
-      },
+      "document": {"path": "cutover/typescript-c1-acceptance-v0.1.json", "format": "json"},
       "current_contract_path": "/current/contract",
       "current_conformance_path": "/current/conformance"
     },
     "required_paths": [
-      {
-        "document": "current.contract",
-        "pointer": "/owners",
-        "projection": "object_values"
-      },
-      {
-        "document": "current.conformance",
-        "pointer": "/requiredExecutableGates",
-        "projection": "array_items"
-      },
-      {
-        "document": "acceptance",
-        "pointer": "/current",
-        "projection": "object_values"
-      }
+      {"document": "current.contract", "pointer": "/owners", "projection": "object_values"},
+      {"document": "current.conformance", "pointer": "/requiredExecutableGates", "projection": "array_items"},
+      {"document": "acceptance", "pointer": "/current", "projection": "object_values"}
     ],
-    "cochange": [
-      "current.contract",
-      "current.conformance",
-      "acceptance"
-    ],
+    "cochange": ["current.contract", "current.conformance", "acceptance"],
     "control_paths": [
       "contracts/mts-contract-v*.json",
       "contracts/mts-conformance-v*.json",
-      "cutover/foundation-v2-c9-acceptance-v*.json"
+      "cutover/typescript-c1-acceptance-v*.json"
     ]
   },
   "evidence_bindings": [
@@ -104,9 +66,7 @@
         "type": "repository_path_set"
       },
       "workflow": "project-ci",
-      "covers": [
-        "tests/**"
-      ]
+      "covers": ["ts/test/**"]
     },
     {
       "id": "negative-vectors-have-test-evidence",
@@ -126,23 +86,15 @@
         "sources": [
           {
             "kind": "regex",
-            "glob": "tests/**",
-            "pattern": "executed\\.add\\(\"([^\"]+)\"\\)"
+            "glob": "ts/test/release-cutover.test.ts",
+            "pattern": "negativeVector\\(\"([^\"]+)\""
           }
         ]
       }
     }
   },
   "paths": {
-    "forbidden": [
-      "legacy/**",
-      "archive/**",
-      "old/**",
-      "deprecated/**",
-      "*.bak",
-      "*.tmp",
-      "*.orig"
-    ],
+    "forbidden": ["legacy/**", "archive/**", "old/**", "deprecated/**", "*.bak", "*.tmp", "*.orig"],
     "canonical_docs": [
       "README.md",
       "docs/theory/Основания МТС.md",
@@ -152,11 +104,7 @@
       "docs/specs/Апамять и управление сетью связей.md",
       "docs/specs/Пучки значений МТС v0.2.md"
     ],
-    "governance_paths": [
-      "repo-policy.json",
-      ".github/workflows/repo-guard.yml",
-      ".github/workflows/ci.yml"
-    ],
+    "governance_paths": ["repo-policy.json", ".github/workflows/repo-guard.yml", ".github/workflows/ci.yml"],
     "operational_paths": []
   },
   "diff_rules": {
@@ -171,17 +119,17 @@
       "metric": "files",
       "glob": "contracts/**",
       "max": 4,
-      "max_growth": 2,
+      "max_growth": 0,
       "count": "all_tracked",
       "level": "blocking"
     },
     {
-      "id": "tests-file-count-no-growth",
+      "id": "typescript-tests-controlled-growth",
       "scope": "directory",
       "metric": "files",
-      "glob": "tests/**",
+      "glob": "ts/test/**",
       "max": 1000,
-      "max_growth": 0,
+      "max_growth": 1,
       "count": "all_tracked",
       "level": "blocking"
     }
