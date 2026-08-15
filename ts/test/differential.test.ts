@@ -42,6 +42,16 @@ import {
   readDictionaryScope,
   verifyVisibleDictionaryOccurrence,
 } from "../src/dictionary.js";
+import {
+  InterpreterReplayError,
+  replayFlatReading,
+  replayRelationStep,
+  type FlatReadingEvidence,
+  type FlatReadingRoles,
+  type RelationReplayEvidence,
+  type RelationRoles,
+} from "../src/interpreter.js";
+import { defineActField, defineActHeader } from "../src/structural-readers.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -50,7 +60,7 @@ function assert(condition: unknown, message: string): asserts condition {
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 interface DifferentialCase {
   readonly id: string;
-  readonly category: "topology" | "anum" | "persistence" | "source" | "state" | "dictionary" | "selection";
+  readonly category: "topology" | "anum" | "persistence" | "source" | "state" | "dictionary" | "selection" | "relation" | "flat";
   readonly input: Record<string, Json>;
 }
 interface Corpus {
@@ -73,7 +83,6 @@ function canonical(value: Json): Json {
   }
   return value;
 }
-
 function sameJson(left: Json, right: Json): boolean {
   return JSON.stringify(canonical(left)) === JSON.stringify(canonical(right));
 }
@@ -82,10 +91,8 @@ function topologyObservable(memory: Memory): Json {
   const topology = exportTopology(memory);
   return { root: topology.root, links: topology.links.map(([start, end]) => [start, end]) };
 }
-
 function storageImage(input: Record<string, Json>): StorageTopologyImage {
-  const root = input.root;
-  const links = input.links;
+  const root = input.root; const links = input.links;
   assert(typeof root === "number" && Array.isArray(links), "invalid topology fixture");
   return {
     schema: STORAGE_TOPOLOGY_SCHEMA,
@@ -98,10 +105,8 @@ function storageImage(input: Record<string, Json>): StorageTopologyImage {
     }),
   };
 }
-
 function runTopology(test: DifferentialCase): Result {
-  const operation = test.input.operation;
-  assert(typeof operation === "string", "topology fixture needs operation");
+  const operation = test.input.operation; assert(typeof operation === "string", "topology fixture needs operation");
   try {
     if (operation === "basis-loop") {
       const memory = new Memory(); const { L } = ensureRootBasis(memory); memory.ensure(L, L);
@@ -111,16 +116,13 @@ function runTopology(test: DifferentialCase): Result {
       const memory = new Memory(); const { O, C, L } = ensureRootBasis(memory); const before = memory.linkCount; const reused = memory.ensure(O, C);
       return { id: test.id, accepted: true, observable: { ...(topologyObservable(memory) as Record<string, Json>), countBefore: before, countAfter: memory.linkCount, reused: reused === L } };
     }
-    if (operation === "restore") {
-      return { id: test.id, accepted: true, observable: topologyObservable(restoreTopology(storageImage(test.input))) };
-    }
+    if (operation === "restore") return { id: test.id, accepted: true, observable: topologyObservable(restoreTopology(storageImage(test.input))) };
     throw new Error(`unknown topology fixture operation: ${operation}`);
   } catch (error) {
     if (error instanceof PersistenceTopologyError) return { id: test.id, accepted: false, error: "invalid-topology" };
     throw error;
   }
 }
-
 function runAnum(test: DifferentialCase): Result {
   const source = test.input.source; assert(typeof source === "string", "ANUM fixture needs source");
   try {
@@ -132,9 +134,7 @@ function runAnum(test: DifferentialCase): Result {
   }
 }
 
-function cloneDataset(dataset: StoredDataset): StoredDataset {
-  return JSON.parse(JSON.stringify(dataset)) as StoredDataset;
-}
+function cloneDataset(dataset: StoredDataset): StoredDataset { return JSON.parse(JSON.stringify(dataset)) as StoredDataset; }
 class MemoryBackend implements PersistentTopologyBackend {
   constructor(public dataset?: StoredDataset) {}
   load(): StoredDataset | undefined { return this.dataset === undefined ? undefined : cloneDataset(this.dataset); }
@@ -176,6 +176,11 @@ function byteVocabulary(memory: Memory): readonly LinkHandle[] {
   const refs: LinkHandle[] = []; let current = memory.root;
   for (let value = 0; value < 256; value += 1) { current = memory.ensureStartSelfClosed(current); refs.push(current); }
   return Object.freeze(refs);
+}
+function anchorChain(memory: Memory, start: LinkHandle, count: number): { readonly refs: readonly LinkHandle[]; readonly last: LinkHandle } {
+  const refs: LinkHandle[] = []; let current = start;
+  for (let index = 0; index < count; index += 1) { current = memory.ensureStartSelfClosed(current); refs.push(current); }
+  return { refs: Object.freeze(refs), last: current };
 }
 function sourceBytes(input: Record<string, Json>): Uint8Array {
   const raw = input.bytes; assert(Array.isArray(raw), "source fixture needs byte array");
@@ -254,8 +259,7 @@ function runDictionary(test: DifferentialCase): Result {
 
 type SegmentTuple = readonly [number, number, number];
 function segmentTuples(input: Record<string, Json>, byteLength: number): readonly SegmentTuple[] {
-  const raw = input.segments ?? [[0, byteLength, 0]];
-  assert(Array.isArray(raw), "selection fixture needs segments");
+  const raw = input.segments ?? [[0, byteLength, 0]]; assert(Array.isArray(raw), "selection fixture needs segments");
   return raw.map((item) => {
     assert(Array.isArray(item) && item.length === 3, "invalid selection segment fixture");
     const [start, end, form] = item; assert(typeof start === "number" && typeof end === "number" && typeof form === "number", "invalid selection segment values");
@@ -300,13 +304,98 @@ function runSelection(test: DifferentialCase): Result {
   } else if (operation !== "selected") throw new Error(`unknown selection operation: ${operation}`);
   const before = memory.linkCount;
   try {
-    const resolved = replaySelectedSourceEvidence(memory, fixture.refs, evidence); const after = memory.linkCount;
-    const expected = segments.map(([, , index]) => fixture.forms[index]);
+    const resolved = replaySelectedSourceEvidence(memory, fixture.refs, evidence); const after = memory.linkCount; const expected = segments.map(([, , index]) => fixture.forms[index]);
     return { id: test.id, accepted: true, observable: { formCount: resolved.length, formsMatchExpected: resolved.every((form, index) => form === expected[index]), readOnlyCountStable: before === after } };
   } catch (error) {
     if (operation === "forged-resolution" && error instanceof SourceError) return { id: test.id, accepted: false, error: "invalid-source-evidence" };
     throw error;
   }
+}
+
+function relationRoles(memory: Memory, cursor: LinkHandle): { readonly roles: RelationRoles; readonly last: LinkHandle } {
+  const chain = anchorChain(memory, cursor, 11); const r = chain.refs;
+  return { roles: Object.freeze({ source: r[0]!, sourceSelection: r[1]!, formSequence: r[2]!, dictionary: r[3]!, grammar: r[4]!, theory: r[5]!, form: r[6]!, beforeContext: r[7]!, binding: r[8]!, result: r[9]!, afterContext: r[10]! }), last: chain.last };
+}
+function flatRoles(memory: Memory, cursor: LinkHandle): { readonly roles: FlatReadingRoles; readonly last: LinkHandle } {
+  const chain = anchorChain(memory, cursor, 9); const r = chain.refs;
+  return { roles: Object.freeze({ source: r[0]!, sourceSelection: r[1]!, formSequence: r[2]!, dictionary: r[3]!, grammar: r[4]!, theory: r[5]!, beforeContext: r[6]!, result: r[7]!, afterContext: r[8]! }), last: chain.last };
+}
+function relationAct(memory: Memory, sourceEvidence: SourceFrontEndEvidence, roles: RelationRoles, interpreter: LinkHandle, roleDictionary: LinkHandle, form: LinkHandle, beforeContext: LinkHandle, binding: LinkHandle, result: LinkHandle, afterContext: LinkHandle): RelationReplayEvidence {
+  const act = defineActHeader(memory, interpreter, roleDictionary, afterContext);
+  const fields: readonly [LinkHandle, LinkHandle][] = [[roles.source, sourceEvidence.source], [roles.sourceSelection, sourceEvidence.selectionSequence], [roles.formSequence, sourceEvidence.formSequence], [roles.dictionary, sourceEvidence.dictionary], [roles.grammar, sourceEvidence.grammar], [roles.theory, sourceEvidence.theory], [roles.form, form], [roles.beforeContext, beforeContext], [roles.binding, binding], [roles.result, result], [roles.afterContext, afterContext]];
+  for (const [role, value] of fields) defineActField(memory, act, role, value);
+  return Object.freeze({ sourceEvidence, act, roles, interpreter, roleDictionary });
+}
+function runRelation(test: DifferentialCase): Result {
+  const operation = test.input.operation; assert(typeof operation === "string", "relation fixture needs operation");
+  const memory = new Memory(); const byteRefs = byteVocabulary(memory); let cursor = byteRefs[255]!; const base = anchorChain(memory, cursor, 6); cursor = base.last;
+  const [fixed, parent, binding, interpreter, roleDictionary, forged] = base.refs; assert(fixed && parent && binding && interpreter && roleDictionary && forged, "relation refs");
+  let form: LinkHandle; let resultStart: LinkHandle; let resultEnd: LinkHandle;
+  if (["start-open", "forged-result", "forged-binding", "forged-dgt", "forged-act"].includes(operation)) { form = memory.ensureStartSelfClosed(fixed); resultStart = binding; resultEnd = fixed; }
+  else if (operation === "end-open") { form = memory.ensureEndSelfClosed(fixed); resultStart = fixed; resultEnd = binding; }
+  else if (operation === "complete-form") { const next = memory.ensureStartSelfClosed(cursor); cursor = next; form = memory.ensure(fixed, next); resultStart = binding; resultEnd = next; }
+  else throw new Error(`unknown relation operation: ${operation}`);
+  const grammar = memory.ensureStartSelfClosed(form); const theory = memory.ensureStartSelfClosed(grammar); cursor = theory;
+  const content = materializeSourceContent(memory, byteRefs, new Uint8Array([120])); const source = defineSourceForm(memory, content); let dictionary = defineDictionaryScope(memory, memory.root, memory.root);
+  const effect = defineDictionaryEffect(memory, dictionary, memory.root, memory.root, content, form); dictionary = effect.afterScope;
+  const sourceEvidence = buildSelectedSourceEvidence(memory, byteRefs, source, [{ start: 0, end: 1, form, dictionaryOccurrence: effect.occurrence }], { dictionary, grammar, theory });
+  const beforeContext = defineContext(memory, parent, binding); const expected = memory.ensure(resultStart, resultEnd); const afterContext = defineContext(memory, parent, expected);
+  const roleFixture = relationRoles(memory, cursor); cursor = roleFixture.last; let actBinding = binding; let actResult = expected; let evidenceSource = sourceEvidence; let evidenceRoleDictionary = roleDictionary;
+  if (operation === "forged-binding") actBinding = fixed;
+  if (operation === "forged-result") { const wrongEnd = memory.ensureStartSelfClosed(cursor); actResult = memory.ensure(binding, wrongEnd); }
+  let evidence = relationAct(memory, sourceEvidence, roleFixture.roles, interpreter, roleDictionary, form, beforeContext, actBinding, actResult, afterContext);
+  if (operation === "forged-dgt") { evidenceSource = Object.freeze({ ...sourceEvidence, grammar: forged }); evidence = Object.freeze({ ...evidence, sourceEvidence: evidenceSource }); }
+  if (operation === "forged-act") { evidenceRoleDictionary = forged; evidence = Object.freeze({ ...evidence, roleDictionary: evidenceRoleDictionary }); }
+  const before = memory.linkCount;
+  try {
+    const result = replayRelationStep(memory, byteRefs, evidence); const after = memory.linkCount;
+    return { id: test.id, accepted: true, observable: { resultMatchesExpected: result === expected, readOnlyCountStable: before === after } };
+  } catch (error) {
+    if (error instanceof InterpreterReplayError) return { id: test.id, accepted: false, error: "invalid-relation-evidence" };
+    throw error;
+  }
+}
+
+function flatAct(memory: Memory, sourceEvidence: SourceFrontEndEvidence, roles: FlatReadingRoles, interpreter: LinkHandle, roleDictionary: LinkHandle, beforeContext: LinkHandle, result: LinkHandle, afterContext: LinkHandle): FlatReadingEvidence {
+  const act = defineActHeader(memory, interpreter, roleDictionary, afterContext);
+  const fields: readonly [LinkHandle, LinkHandle][] = [[roles.source, sourceEvidence.source], [roles.sourceSelection, sourceEvidence.selectionSequence], [roles.formSequence, sourceEvidence.formSequence], [roles.dictionary, sourceEvidence.dictionary], [roles.grammar, sourceEvidence.grammar], [roles.theory, sourceEvidence.theory], [roles.beforeContext, beforeContext], [roles.result, result], [roles.afterContext, afterContext]];
+  for (const [role, value] of fields) defineActField(memory, act, role, value);
+  return Object.freeze({ sourceEvidence, act, roles, interpreter, roleDictionary });
+}
+function runFlat(test: DifferentialCase): Result {
+  const operation = test.input.operation; assert(typeof operation === "string", "flat fixture needs operation");
+  if (operation === "distinct-readings") return runFlatDistinct(test);
+  const count = operation === "single" ? 1 : 2; const memory = new Memory(); const byteRefs = byteVocabulary(memory); let cursor = byteRefs[255]!; const formChain = anchorChain(memory, cursor, count); cursor = formChain.last; const forms = formChain.refs;
+  const grammar = memory.ensureStartSelfClosed(cursor); const theory = memory.ensureStartSelfClosed(grammar); cursor = theory; let dictionary = defineDictionaryScope(memory, memory.root, memory.root); let history = memory.root; const specs: SelectedSegmentSpec[] = []; const bytes = new Uint8Array(count);
+  for (let index = 0; index < count; index += 1) { const form = forms[index]!; const value = 97 + index; bytes[index] = value; const content = materializeSourceContent(memory, byteRefs, new Uint8Array([value])); const effect = defineDictionaryEffect(memory, dictionary, memory.root, history, content, form); dictionary = effect.afterScope; history = effect.historyAfter; specs.push(Object.freeze({ start: index, end: index + 1, form, dictionaryOccurrence: effect.occurrence })); }
+  const source = defineSourceForm(memory, materializeSourceContent(memory, byteRefs, bytes)); const sourceEvidence = buildSelectedSourceEvidence(memory, byteRefs, source, specs, { dictionary, grammar, theory });
+  const base = anchorChain(memory, cursor, 5); cursor = base.last; const [interpreter, roleDictionary, parent, current, forged] = base.refs; assert(interpreter && roleDictionary && parent && current && forged, "flat refs");
+  const expected = count === 1 ? forms[0]! : memory.ensure(forms[0]!, forms[1]!); const beforeContext = defineContext(memory, parent, current); const afterContext = defineContext(memory, parent, expected); const roleFixture = flatRoles(memory, cursor); cursor = roleFixture.last;
+  let actResult = expected; if (operation === "forged-result") { const wrong = memory.ensure(forms[0]!, memory.ensureStartSelfClosed(cursor)); actResult = wrong; }
+  let evidence = flatAct(memory, sourceEvidence, roleFixture.roles, interpreter, roleDictionary, beforeContext, actResult, afterContext);
+  if (operation === "forged-dgt") evidence = Object.freeze({ ...evidence, sourceEvidence: Object.freeze({ ...sourceEvidence, theory: forged }) });
+  else if (operation === "forged-act") evidence = Object.freeze({ ...evidence, roleDictionary: forged });
+  else if (!["single", "multi", "forged-result"].includes(operation)) throw new Error(`unknown flat operation: ${operation}`);
+  const before = memory.linkCount;
+  try {
+    const result = replayFlatReading(memory, byteRefs, evidence); const after = memory.linkCount;
+    return { id: test.id, accepted: true, observable: { formCount: count, resultMatchesExpected: result === expected, readOnlyCountStable: before === after } };
+  } catch (error) {
+    if (error instanceof InterpreterReplayError) return { id: test.id, accepted: false, error: "invalid-flat-evidence" };
+    throw error;
+  }
+}
+function runFlatDistinct(test: DifferentialCase): Result {
+  const memory = new Memory(); const byteRefs = byteVocabulary(memory); let cursor = byteRefs[255]!; const formChain = anchorChain(memory, cursor, 2); cursor = formChain.last; const [a, b] = formChain.refs; assert(a && b, "distinct form refs");
+  const carrierA = memory.ensure(memory.root, a); const carrierAB = memory.ensure(carrierA, b); const pairResult = memory.ensure(a, b); let dictionary = defineDictionaryScope(memory, memory.root, memory.root); let history = memory.root; const occurrences = new Map<string, LinkHandle>();
+  for (const [key, raw, form] of [["a", new Uint8Array([97]), a], ["b", new Uint8Array([98]), b], ["ab", new Uint8Array([97, 98]), carrierAB]] as const) { const effect = defineDictionaryEffect(memory, dictionary, memory.root, history, materializeSourceContent(memory, byteRefs, raw), form); dictionary = effect.afterScope; history = effect.historyAfter; occurrences.set(key, effect.occurrence); }
+  const source = defineSourceForm(memory, materializeSourceContent(memory, byteRefs, new Uint8Array([97, 98]))); const dgt = anchorChain(memory, cursor, 4); cursor = dgt.last; const [pairG, pairT, carrierG, carrierT] = dgt.refs; assert(pairG && pairT && carrierG && carrierT, "distinct DGT refs");
+  const pairSource = buildSelectedSourceEvidence(memory, byteRefs, source, [{ start: 0, end: 1, form: a, dictionaryOccurrence: occurrences.get("a")! }, { start: 1, end: 2, form: b, dictionaryOccurrence: occurrences.get("b")! }], { dictionary, grammar: pairG, theory: pairT });
+  const carrierSource = buildSelectedSourceEvidence(memory, byteRefs, source, [{ start: 0, end: 2, form: carrierAB, dictionaryOccurrence: occurrences.get("ab")! }], { dictionary, grammar: carrierG, theory: carrierT });
+  const base = anchorChain(memory, cursor, 4); cursor = base.last; const [interpreter, roleDictionary, parent, current] = base.refs; assert(interpreter && roleDictionary && parent && current, "distinct act refs"); const beforeContext = defineContext(memory, parent, current); const roleFixture = flatRoles(memory, cursor);
+  const pairAfter = defineContext(memory, parent, pairResult); const carrierAfter = defineContext(memory, parent, carrierAB); const first = flatAct(memory, pairSource, roleFixture.roles, interpreter, roleDictionary, beforeContext, pairResult, pairAfter); const second = flatAct(memory, carrierSource, roleFixture.roles, interpreter, roleDictionary, beforeContext, carrierAB, carrierAfter);
+  const before = memory.linkCount; const firstResult = replayFlatReading(memory, byteRefs, first); const secondResult = replayFlatReading(memory, byteRefs, second); const after = memory.linkCount;
+  return { id: test.id, accepted: true, observable: { sameSource: pairSource.source === carrierSource.source, readingsDistinct: firstResult !== secondResult, resultsMatchExpected: firstResult === pairResult && secondResult === carrierAB, readOnlyCountStable: before === after } };
 }
 
 const repoRoot = resolve(process.cwd(), "..");
@@ -317,15 +406,7 @@ assert(corpus.contract === "mts-contract/v0.7", "differential fixtures must sele
 const python = spawnSync("python3", ["differential/python_oracle.py", "differential/fixtures-v0.7.json"], { cwd: repoRoot, encoding: "utf8" });
 assert(python.status === 0, `frozen Python oracle adapter failed: ${python.stderr || python.stdout}`);
 const expected = JSON.parse(python.stdout) as Result[];
-const runners: Record<DifferentialCase["category"], (test: DifferentialCase) => Result> = {
-  topology: runTopology,
-  anum: runAnum,
-  persistence: runPersistence,
-  source: runSource,
-  state: runState,
-  dictionary: runDictionary,
-  selection: runSelection,
-};
+const runners: Record<DifferentialCase["category"], (test: DifferentialCase) => Result> = { topology: runTopology, anum: runAnum, persistence: runPersistence, source: runSource, state: runState, dictionary: runDictionary, selection: runSelection, relation: runRelation, flat: runFlat };
 const actual = corpus.cases.map((test) => runners[test.category](test));
 assert(expected.length === actual.length, "differential result cardinality mismatch");
 expected.forEach((pythonResult, index) => {
