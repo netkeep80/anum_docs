@@ -219,8 +219,9 @@ function run(
   const k0 = context(fx, fx.beforeRole);
   const selected = step(fx, k0, k0);
   const evidence = run(fx, [selected], k0, k0);
-  const extra = fx.memory.ensure(evidence.runRoot, fx.afterRole);
-  assertRunError("run-chain-extra-prefix", () => replayRun(fx.memory, { ...evidence, runRoot: extra }));
+  const extraPrefix = fx.memory.ensure(fx.R, fx.afterRole);
+  const forgedRoot = fx.memory.ensure(extraPrefix, selected.act);
+  assertRunError("run-chain-extra-prefix", () => replayRun(fx.memory, { ...evidence, runRoot: forgedRoot }));
   assertRunError("run-chain-ended-early", () => replayRun(fx.memory, { ...evidence, runRoot: fx.R }));
 }
 
