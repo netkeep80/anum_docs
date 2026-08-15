@@ -3,6 +3,7 @@ import { defineContext, defineLocalRepresentativeBinding } from "../src/state.js
 import {
   defineActField,
   defineActHeader,
+  readRequiredSingle,
 } from "../src/structural-readers.js";
 import {
   type EqualityReplayEvidence,
@@ -116,15 +117,9 @@ function proofEvidence(
   premise: EqualityReplayEvidence,
   options: ProofOptions = {},
 ): DecomposeEqualityEvidence {
-  const premiseContext = fx.memory.poles(fx.memory.outgoing(premise.act)
-    .map((attachment) => fx.memory.poles(attachment).end)
-    .find((field) => fx.memory.poles(field).start === premise.roles.context)!).end;
-  const premiseLeft = fx.memory.poles(fx.memory.outgoing(premise.act)
-    .map((attachment) => fx.memory.poles(attachment).end)
-    .find((field) => fx.memory.poles(field).start === premise.roles.left)!).end;
-  const premiseRight = fx.memory.poles(fx.memory.outgoing(premise.act)
-    .map((attachment) => fx.memory.poles(attachment).end)
-    .find((field) => fx.memory.poles(field).start === premise.roles.right)!).end;
+  const premiseContext = readRequiredSingle(fx.memory, premise.act, premise.roles.context);
+  const premiseLeft = readRequiredSingle(fx.memory, premise.act, premise.roles.left);
+  const premiseRight = readRequiredSingle(fx.memory, premise.act, premise.roles.right);
 
   const theory = options.theory ?? fx.fresh();
   const rule = options.rule ?? fx.fresh();
@@ -182,9 +177,10 @@ function trueFixture(nested = false) {
   const evidence = proofEvidence(fx, premise);
   const before = fx.memory.linkCount;
   const claims = replayDecomposeEqualRelations(fx.memory, evidence);
-  const startClaim = fx.memory.poles(fx.memory.poles(fx.memory.outgoing(evidence.act)
-    .find((attachment) => fx.memory.poles(fx.memory.poles(attachment).end).start === evidence.roles.startClaim)!).end).end;
+  const startClaim = readRequiredSingle(fx.memory, evidence.act, evidence.roles.startClaim);
+  const endClaim = readRequiredSingle(fx.memory, evidence.act, evidence.roles.endClaim);
   assertSame(claims[0], startClaim, "must return exact start claim");
+  assertSame(claims[1], endClaim, "must return exact end claim");
   assertSame(fx.memory.linkCount, before, "proof replay must be read-only");
 }
 
