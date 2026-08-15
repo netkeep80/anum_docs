@@ -102,10 +102,11 @@ export function replayRun(
 ): readonly LinkHandle[] {
   const before = memory.linkCount;
   try {
-    verifyRunChain(memory, evidence);
-
     if (evidence.steps.length === 0) {
       if (evidence.runRoot !== memory.root) {
+        // Validate ownership before reporting the semantic root mismatch so a
+        // foreign/forged technical handle still fails at the Memory boundary.
+        memory.poles(evidence.runRoot);
         fail("empty-run-root-mismatch");
       }
       if (evidence.initialContext !== evidence.terminalContext) {
@@ -121,6 +122,8 @@ export function replayRun(
       }
       return Object.freeze([]);
     }
+
+    verifyRunChain(memory, evidence);
 
     const acts: LinkHandle[] = [];
     let previousAfter: LinkHandle | undefined;
