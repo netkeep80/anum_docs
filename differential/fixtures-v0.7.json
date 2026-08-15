@@ -30,6 +30,21 @@
     {"id":"state-context","category":"state","input":{"operation":"context"}},
     {"id":"state-representative-default","category":"state","input":{"operation":"representative-default"}},
     {"id":"state-representative-binding","category":"state","input":{"operation":"representative-binding"}},
-    {"id":"state-representative-conflict","category":"state","input":{"operation":"representative-conflict"}}
+    {"id":"state-representative-conflict","category":"state","input":{"operation":"representative-conflict"}},
+
+    {"id":"dictionary-single","category":"dictionary","input":{"operation":"single"}},
+    {"id":"dictionary-parent","category":"dictionary","input":{"operation":"parent-visible"}},
+    {"id":"dictionary-shadow","category":"dictionary","input":{"operation":"shadow"}},
+    {"id":"dictionary-conflict","category":"dictionary","input":{"operation":"conflict"}},
+    {"id":"dictionary-root-sentinel","category":"dictionary","input":{"operation":"root-sentinel"}},
+    {"id":"dictionary-forged-occurrence","category":"dictionary","input":{"operation":"forged-occurrence"}},
+
+    {"id":"selection-single","category":"selection","input":{"operation":"selected","bytes":[97],"segments":[[0,1,0]]}},
+    {"id":"selection-multi","category":"selection","input":{"operation":"selected","bytes":[97,98],"segments":[[0,1,0],[1,2,1]]}},
+    {"id":"selection-utf8-slice","category":"selection","input":{"operation":"selected","bytes":[97,226,159,188,98],"segments":[[0,1,0],[1,4,1],[4,5,2]]}},
+    {"id":"selection-dictionary-choice","category":"selection","input":{"operation":"dictionary-choice","bytes":[120]}},
+    {"id":"selection-gap","category":"selection","input":{"operation":"invalid-partition","bytes":[97,98],"segments":[[0,1,0]]}},
+    {"id":"selection-overlap","category":"selection","input":{"operation":"invalid-partition","bytes":[97,98],"segments":[[0,2,0],[1,2,1]]}},
+    {"id":"selection-forged-resolution","category":"selection","input":{"operation":"forged-resolution","bytes":[97]}}
   ]
 }
