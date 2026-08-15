@@ -1,23 +1,22 @@
-import { Memory, ensureRootBasis } from "../src/memory.js";
 import {
+  Memory,
+  PersistentStore,
   deserializeAnum,
+  ensureRootBasis,
   normalizeRawForm,
   parseRawQuaternary,
   symbolicStackAlgebra,
-} from "../src/anum.js";
-import {
-  PersistentStore,
   type PersistentTopologyBackend,
   type StoredDataset,
-} from "../src/persistent-store.js";
+} from "../src/public.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`browser-core-smoke: ${message}`);
 }
 
 // Этот entry намеренно browser-neutral: только global ECMAScript и production TS core.
-// Если import graph случайно потянет NodeJsonFileBackend/node:fs, esbuild platform=browser
-// должен упасть ещё до выполнения этих проверок.
+// Если public import graph случайно потянет NodeJsonFileBackend/node:fs, esbuild
+// platform=browser должен упасть ещё до выполнения этих проверок.
 const memory = new Memory();
 const { R, O, C, L, U } = ensureRootBasis(memory);
 assert(memory.root === R, "root basis must reuse Memory.root");
@@ -56,4 +55,4 @@ const runtime = store.runtimeMemory();
 assert(runtime.linkCount === store.count, "storage-neutral persistence must reconstruct the same core Memory topology");
 
 // Node executes the browser-target bundle as a deterministic CI smoke after esbuild has
-// already proved that the import graph is browser-resolvable. No DOM semantics are added.
+// already proved that the public import graph is browser-resolvable. No DOM semantics are added.
