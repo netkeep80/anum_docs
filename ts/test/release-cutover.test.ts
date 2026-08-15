@@ -2,6 +2,11 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { Memory, ensureRootBasis } from "../src/memory.js";
 import { deserializeStream, symbolicStackAlgebra, StreamError } from "../src/anum.js";
+import {
+  PersistenceTopologyError,
+  STORAGE_TOPOLOGY_SCHEMA,
+  restoreTopology,
+} from "../src/persistence-topology.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`release-cutover: ${message}`);
@@ -9,6 +14,15 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function negativeVector(id: string, condition: boolean): void {
   assert(condition, `negative vector failed: ${id}`);
+}
+
+function rejectsTopology(links: readonly (readonly [number, number])[]): boolean {
+  try {
+    restoreTopology({ schema: STORAGE_TOPOLOGY_SCHEMA, root: 0, links });
+    return false;
+  } catch (error) {
+    return error instanceof PersistenceTopologyError;
+  }
 }
 
 const repoRoot = resolve(process.cwd(), "..");
@@ -57,15 +71,26 @@ assert(memory.poles(basis.C).start === basis.R && memory.poles(basis.C).end === 
 assert(memory.poles(basis.L).start === basis.O && memory.poles(basis.L).end === basis.C, "L basis mismatch");
 assert(memory.poles(basis.U).start === basis.C && memory.poles(basis.U).end === basis.O, "U basis mismatch");
 
-negativeVector("second-fully-self-closed-by-physical-id", memory.ensure(basis.R, basis.R) === basis.R);
-const pair = memory.ensure(basis.L, basis.U);
-negativeVector("duplicate-same-pair", memory.ensure(basis.L, basis.U) === pair);
+negativeVector(
+  "second-fully-self-closed-by-physical-id",
+  rejectsTopology([[0, 0], [1, 1]]),
+);
+negativeVector(
+  "duplicate-same-pair",
+  rejectsTopology([[0, 0], [1, 0], [0, 2], [1, 2], [1, 2]]),
+);
 
+const pair = memory.ensure(basis.L, basis.U);
+assert(memory.ensure(basis.L, basis.U) === pair, "same semantic pair must be reused");
 const rebuilt = new Memory();
 const rebuiltBasis = ensureRootBasis(rebuilt);
 negativeVector(
   "same-form-distinguished-only-by-runtime-handle",
   rebuiltBasis.R !== basis.R && rebuilt.poles(rebuiltBasis.L).start === rebuiltBasis.O,
+);
+negativeVector(
+  "id-only-mutual-cycle",
+  rejectsTopology([[0, 0], [2, 0], [1, 0]]),
 );
 
 const countBeforeRead = memory.linkCount;
@@ -82,7 +107,3 @@ try {
 }
 negativeVector("root-as-fifth-abit", rootRejected);
 negativeVector("empty-group-rejected", deserializeStream("[]", symbolicStackAlgebra).denotation === "R");
-
-// ID-only cycles are rejected by topology/persistence restore tests; this anchor keeps
-// the release veto bound to current executable TS coverage rather than old Python C8.
-negativeVector("id-only-mutual-cycle", true);
