@@ -32,18 +32,12 @@
 *.out
 *.app
 
-*.pyc
-__pycache__/
-*.egg-info/
-*.egg
 dist/
 build/
-.venv/
-venv/
 .env
-.pytest_cache/
-.ruff_cache/
-.mypy_cache/
+
+# Node / TypeScript
+node_modules/
 
 # IDE
 .idea/
