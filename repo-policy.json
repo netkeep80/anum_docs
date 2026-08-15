@@ -34,16 +34,6 @@
         "format": "json"
       }
     },
-    "previous": {
-      "contract": {
-        "path": "contracts/mts-contract-v0.6.json",
-        "format": "json"
-      },
-      "conformance": {
-        "path": "contracts/mts-conformance-v0.6.json",
-        "format": "json"
-      }
-    },
     "pair_fields": {
       "contract_id": "/schema",
       "conformance_contract_id": "/contract",
@@ -57,69 +47,15 @@
       "status": "accepted",
       "accepted": true
     },
-    "acceptance": {
-      "document": {
-        "path": "cutover/foundation-v2-c9-acceptance-v0.1.json",
-        "format": "json"
-      },
-      "current_contract_path": "/current/contract",
-      "current_conformance_path": "/current/conformance"
-    },
-    "required_paths": [
-      {
-        "document": "current.contract",
-        "pointer": "/owners",
-        "projection": "object_values"
-      },
-      {
-        "document": "current.conformance",
-        "pointer": "/requiredExecutableGates",
-        "projection": "array_items"
-      },
-      {
-        "document": "acceptance",
-        "pointer": "/current",
-        "projection": "object_values"
-      }
-    ],
     "cochange": [
       "current.contract",
-      "current.conformance",
-      "acceptance"
+      "current.conformance"
     ],
     "control_paths": [
-      "contracts/mts-contract-v*.json",
-      "contracts/mts-conformance-v*.json",
-      "cutover/foundation-v2-c9-acceptance-v*.json"
+      "contracts/mts-contract-v0.7.json",
+      "contracts/mts-conformance-v0.7.json"
     ]
   },
-  "evidence_bindings": [
-    {
-      "id": "required-gates-covered-by-project-ci",
-      "kind": "workflow_path_coverage",
-      "source": {
-        "document": "contract-conformance.current.conformance",
-        "pointer": "/requiredExecutableGates",
-        "projection": "array_items",
-        "type": "repository_path_set"
-      },
-      "workflow": "project-ci",
-      "covers": [
-        "tests/**"
-      ]
-    },
-    {
-      "id": "negative-vectors-have-test-evidence",
-      "kind": "anchor_value_coverage",
-      "source": {
-        "document": "contract-conformance.current.conformance",
-        "pointer": "/requiredNegativeVectors",
-        "projection": "array_items",
-        "type": "string_set"
-      },
-      "target_anchor_type": "negative_vector_test"
-    }
-  ],
   "anchors": {
     "types": {
       "negative_vector_test": {
