@@ -394,7 +394,8 @@ def flat_distinct_fixture():
         after_context = define_context(builder, parent, result); act = define_act_header(builder, interpreter, role_dictionary, after_context)
         values = (source_evidence.source, source_evidence.selection_sequence, source_evidence.form_sequence, dictionary, source_evidence.grammar, source_evidence.theory, before_context, result, after_context); add_act_fields(builder, act, roles, values)
         return FlatSequenceReadingEvidence(source_evidence, interpreter, before_context, result, after_context, act, role_dictionary, roles)
-    return builder.freeze(root), byte_refs, reading(pair_source, pair_result), reading(carrier_source, carrier_ab), pair_result, carrier_ab
+    first = reading(pair_source, pair_result); second = reading(carrier_source, carrier_ab); network = builder.freeze(root)
+    return network, byte_refs, first, second, pair_result, carrier_ab
 
 
 def run_flat(case: dict) -> dict:
