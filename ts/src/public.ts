@@ -56,3 +56,100 @@ export type {
   PersistentSequenceItem,
   PersistentSequenceMaterialization,
 } from "./persistent-sequence.js";
+
+// M12b exports only operations that are meaningful at the consumer boundary.
+// The role schemas they verify remain implementation vocabulary rather than
+// standalone package entrypoints; callers use the top-level evidence shapes.
+export {
+  InterpreterReplayError,
+  replayColonEffect,
+  replayEqualityEvaluation,
+  replayFlatReading,
+  replayFlatSubselectionContinuation,
+  replayFlatSubselectionReading,
+  replayRelationStep,
+  replayRelationSubselectionStep,
+} from "./interpreter.js";
+export type {
+  ColonReplayEvidence,
+  EqualityReplayEvidence,
+  FlatReadingEvidence,
+  RelationReplayEvidence,
+} from "./interpreter.js";
+
+export {
+  SequenceReplayError,
+  materializeSequence,
+  replayResolvedSequenceGrouping,
+  replayRootOpeningRestoration,
+  replaySequenceMaterialization,
+} from "./sequence.js";
+export type {
+  MaterializedEdge,
+  SequenceDescription,
+  SequenceItem,
+  SequenceMaterializationEffect,
+} from "./sequence.js";
+
+export {
+  DirectDeixisReplayError,
+  analyzeDirectDeixisCarrier,
+} from "./direct-deixis.js";
+export type {
+  DeicticOccurrence,
+  DeicticPole,
+  DirectDeixisVocabulary,
+} from "./direct-deixis.js";
+
+export {
+  BUNDLE_KIND_ORDER,
+  BundleElaborationError,
+  ValueBundleReplayError,
+  bundleRoleAt,
+  elaborateBundleRoles,
+  resolveFlatBundle,
+  valuesEqual,
+} from "./value-bundle.js";
+export type {
+  BundleElaboration,
+  BundleNodeKind,
+  BundleRole,
+  BundleRoleAt,
+  BundleValue,
+  ExpectedRole,
+  LinkValue,
+  MtsValue,
+  OccurrencePath,
+  ResolvedOccurrence,
+  ValueBundleVocabulary,
+} from "./value-bundle.js";
+
+export {
+  RunReplayError,
+  replayRun,
+} from "./run.js";
+export type {
+  RunEvidence,
+  RunReplayErrorCode,
+  RunStepSelection,
+} from "./run.js";
+
+export {
+  ProofRuleReplayError,
+  replayDecomposeEqualRelations,
+} from "./proof.js";
+export type {
+  DecomposeEqualityEvidence,
+  ProofRuleReplayErrorCode,
+} from "./proof.js";
+
+export {
+  IntegratedCheckerError,
+  replayIntegratedProof,
+} from "./checker.js";
+export type {
+  IntegratedCheckerErrorCode,
+  IntegratedProofEvidence,
+  ProofGoalSelection,
+  ProofJudgmentSelection,
+} from "./checker.js";
