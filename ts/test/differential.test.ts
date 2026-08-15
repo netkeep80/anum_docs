@@ -24,6 +24,7 @@ import {
   readSourceContent,
   readSourceForm,
   replaySelectedSourceEvidence,
+  replaySourceSubselection,
   type SelectedSegmentSpec,
   type SourceFrontEndEvidence,
 } from "../src/source.js";
@@ -66,7 +67,7 @@ function assert(condition: unknown, message: string): asserts condition {
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 interface DifferentialCase {
   readonly id: string;
-  readonly category: "topology" | "anum" | "persistence" | "source" | "state" | "dictionary" | "selection" | "relation" | "flat" | "colon" | "equality";
+  readonly category: "topology" | "anum" | "persistence" | "source" | "state" | "dictionary" | "selection" | "subselection" | "relation" | "flat" | "colon" | "equality";
   readonly input: Record<string, Json>;
 }
 interface Corpus {
@@ -318,6 +319,37 @@ function runSelection(test: DifferentialCase): Result {
   }
 }
 
+function foldHandles(memory: Memory, values: readonly LinkHandle[]): LinkHandle {
+  let current = memory.root;
+  for (const value of values) current = memory.ensure(current, value);
+  return current;
+}
+function runSubselection(test: DifferentialCase): Result {
+  const operation = test.input.operation; const start = test.input.start; const end = test.input.end;
+  assert(typeof operation === "string" && typeof start === "number" && typeof end === "number", "subselection fixture needs operation/start/end");
+  const memory = new Memory(); const segments: readonly SegmentTuple[] = [[0, 1, 0], [1, 2, 1], [2, 3, 2]]; const fixture = selectedFixture(memory, new Uint8Array([97, 98, 99]), segments);
+  let evidence = buildSelectedSourceEvidence(memory, fixture.refs, fixture.source, fixture.specs, { dictionary: fixture.dictionary, grammar: fixture.grammar, theory: fixture.theory });
+  const validRange = Number.isInteger(start) && Number.isInteger(end) && start >= 0 && end >= start && end <= 3; const selectedStart = validRange ? start : 1; const selectedEnd = validRange ? end : 2;
+  const selectedSegments = evidence.segments.slice(selectedStart, selectedEnd); const selectedForms = fixture.forms.slice(selectedStart, selectedEnd); let selectionSequence = foldHandles(memory, selectedSegments.map((segment) => segment.selection)); let formSequence = foldHandles(memory, selectedForms);
+  let grammarMembership = memory.ensure(fixture.grammar, formSequence); let theoryMembership = memory.ensure(fixture.theory, formSequence);
+  if (operation === "forged-selection-fold") selectionSequence = evidence.selectionSequence;
+  else if (operation === "forged-form-fold") formSequence = evidence.formSequence;
+  else if (operation === "forged-grammar") grammarMembership = memory.ensure(fixture.grammar, memory.root);
+  else if (operation === "forged-theory") theoryMembership = memory.ensure(fixture.theory, memory.root);
+  else if (operation === "forged-whole-source") {
+    const first = evidence.segments[0]; assert(first !== undefined, "whole source fixture requires first segment");
+    evidence = Object.freeze({ ...evidence, segments: Object.freeze([Object.freeze({ ...first, resolution: memory.root }), ...evidence.segments.slice(1)]) }) as SourceFrontEndEvidence;
+  } else if (operation !== "range" && operation !== "invalid-range") throw new Error(`unknown subselection operation: ${operation}`);
+  const before = memory.linkCount;
+  try {
+    const resolved = replaySourceSubselection(memory, fixture.refs, evidence, { startSegment: start, endSegment: end, selectionSequence, formSequence, grammar: fixture.grammar, theory: fixture.theory, grammarMembership, theoryMembership }); const after = memory.linkCount; const expected = fixture.forms.slice(start, end);
+    return { id: test.id, accepted: true, observable: { formCount: resolved.length, formsMatchExpected: resolved.every((form, index) => form === expected[index]), wholeSourcePreserved: evidence.source === fixture.source, emptyUsesRootFolds: start === end ? selectionSequence === memory.root && formSequence === memory.root : false, readOnlyCountStable: before === after } };
+  } catch (error) {
+    if (error instanceof SourceError) return { id: test.id, accepted: false, error: error.code };
+    throw error;
+  }
+}
+
 function relationRoles(memory: Memory, cursor: LinkHandle): { readonly roles: RelationRoles; readonly last: LinkHandle } {
   const chain = anchorChain(memory, cursor, 11); const r = chain.refs;
   return { roles: Object.freeze({ source: r[0]!, sourceSelection: r[1]!, formSequence: r[2]!, dictionary: r[3]!, grammar: r[4]!, theory: r[5]!, form: r[6]!, beforeContext: r[7]!, binding: r[8]!, result: r[9]!, afterContext: r[10]! }), last: chain.last };
@@ -504,7 +536,7 @@ assert(corpus.contract === "mts-contract/v0.7", "differential fixtures must sele
 const python = spawnSync("python3", ["differential/python_oracle.py", "differential/fixtures-v0.7.json"], { cwd: repoRoot, encoding: "utf8" });
 assert(python.status === 0, `frozen Python oracle adapter failed: ${python.stderr || python.stdout}`);
 const expected = JSON.parse(python.stdout) as Result[];
-const runners: Record<DifferentialCase["category"], (test: DifferentialCase) => Result> = { topology: runTopology, anum: runAnum, persistence: runPersistence, source: runSource, state: runState, dictionary: runDictionary, selection: runSelection, relation: runRelation, flat: runFlat, colon: runColon, equality: runEquality };
+const runners: Record<DifferentialCase["category"], (test: DifferentialCase) => Result> = { topology: runTopology, anum: runAnum, persistence: runPersistence, source: runSource, state: runState, dictionary: runDictionary, selection: runSelection, subselection: runSubselection, relation: runRelation, flat: runFlat, colon: runColon, equality: runEquality };
 const actual = corpus.cases.map((test) => runners[test.category](test));
 assert(expected.length === actual.length, "differential result cardinality mismatch");
 expected.forEach((pythonResult, index) => {
