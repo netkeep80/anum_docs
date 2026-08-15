@@ -32,6 +32,7 @@ from core.foundation_v2_state import (
     local_representative_resolution,
     lookup_scoped_dictionary,
     parent_of_context,
+    read_dictionary_scope,
     verify_visible_dictionary_occurrence,
 )
 from core.rooted_link_network import (
@@ -215,7 +216,7 @@ def run_state(case: dict) -> dict:
 
 
 def dictionary_fixture():
-    builder = LinkNetworkBuilder(); root, opening, closing, linked, unlinked = state_basis(builder)
+    builder = LinkNetworkBuilder(); root, opening, _closing, linked, unlinked = state_basis(builder)
     content = builder.ensure(linked, linked); form_one = next_anchor(builder, unlinked); form_two = next_anchor(builder, form_one)
     return builder, root, content, form_one, form_two, opening
 
@@ -224,7 +225,7 @@ def run_dictionary(case: dict) -> dict:
     operation = case["input"]["operation"]; builder, root, content, form_one, form_two, forged = dictionary_fixture()
     if operation == "root-sentinel":
         network = builder.freeze(root)
-        try: lookup_scoped_dictionary(network, root, content)
+        try: read_dictionary_scope(network, root)
         except DictionaryLookupError: return {"id": case["id"], "accepted": False, "error": "invalid-dictionary"}
         raise RuntimeError("root dictionary sentinel was unexpectedly accepted")
 
