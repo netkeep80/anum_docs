@@ -40,12 +40,26 @@ function pythonFiles(directory: string): string[] {
   return result;
 }
 
+interface PackageExportTarget {
+  readonly types?: string;
+  readonly default?: string;
+}
+
 const packageJson = JSON.parse(readFileSync(join(repoRoot, "ts/package.json"), "utf8")) as {
   readonly name?: string;
-  readonly exports?: Record<string, unknown>;
+  readonly types?: string;
+  readonly exports?: Record<string, string | PackageExportTarget>;
 };
 assert(packageJson.name === "@mts/core", "canonical package must be @mts/core");
-assert(packageJson.exports?.["."] === "./dist/src/public.js", "package root must be public.ts build output");
+assert(packageJson.types === "./dist/src/public.d.ts", "package root declarations must be public.ts build output");
+const rootExport = packageJson.exports?.["."];
+assert(
+  typeof rootExport === "object"
+    && rootExport !== null
+    && rootExport.types === "./dist/src/public.d.ts"
+    && rootExport.default === "./dist/src/public.js",
+  "package root must expose matching declaration and runtime outputs",
+);
 
 const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.8.json"), "utf8")) as {
   readonly schema?: string;

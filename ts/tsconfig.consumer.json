@@ -4,15 +4,14 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
+    "types": [],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "declaration": true,
-    "rootDir": ".",
-    "outDir": "dist"
+    "skipLibCheck": false,
+    "noEmit": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["consumer/package-consumer.ts"]
 }
