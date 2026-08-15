@@ -146,6 +146,27 @@ const description = (memory: Memory, ...items: SequenceItem[]): SequenceDescript
 
 {
   const m = new Memory();
+  const [a, b, c] = anchors(m, 3);
+  assert(a && b && c, "exact effect refs");
+  const effect = materializeSequence(m, description(m, atom(a), atom(b), atom(c)));
+  same(effect.created.length, 2, "exact effect creates two folds");
+
+  const omitted = Object.freeze({
+    ...effect,
+    created: Object.freeze([]),
+    linkCountAfter: effect.linkCountBefore,
+  });
+  reject(() => replaySequenceMaterialization(m, omitted));
+
+  const reordered = Object.freeze({
+    ...effect,
+    created: Object.freeze([...effect.created].reverse()),
+  });
+  reject(() => replaySequenceMaterialization(m, reordered));
+}
+
+{
+  const m = new Memory();
   const [a, b] = anchors(m, 2);
   assert(a && b, "missing pair refs");
   const fake: SequenceMaterializationEffect = Object.freeze({
