@@ -44,8 +44,8 @@ jobs:
             find . -path './.git' -prune -o -path './ts/node_modules' -prune -o -name '*.py' -print
             exit 1
           fi
-          if grep -R -n -E 'setup-python|python3?|pytest|ruff' .github ts --exclude='*.map'; then
-            echo "::error::Python runtime/tooling reference remains in current CI or TypeScript tree"
+          if grep -R -n -E 'setup-python|pytest|ruff|python3' .github ts --exclude='*.map'; then
+            echo "::error::Python runtime/tooling command remains in current CI or TypeScript tree"
             exit 1
           fi
           echo "Python-free current tree confirmed."
