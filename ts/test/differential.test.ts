@@ -27,6 +27,7 @@ import {
   replaySourceSubselection,
   type SelectedSegmentSpec,
   type SourceFrontEndEvidence,
+  type SourceSubselectionEvidence,
 } from "../src/source.js";
 import {
   StateError,
@@ -48,7 +49,10 @@ import {
   replayColonEffect,
   replayEqualityEvaluation,
   replayFlatReading,
+  replayFlatSubselectionContinuation,
+  replayFlatSubselectionReading,
   replayRelationStep,
+  replayRelationSubselectionStep,
   type ColonReplayEvidence,
   type ColonRoles,
   type EqualityReplayEvidence,
@@ -67,7 +71,7 @@ function assert(condition: unknown, message: string): asserts condition {
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 interface DifferentialCase {
   readonly id: string;
-  readonly category: "topology" | "anum" | "persistence" | "source" | "state" | "dictionary" | "selection" | "subselection" | "relation" | "flat" | "colon" | "equality";
+  readonly category: "topology" | "anum" | "persistence" | "source" | "state" | "dictionary" | "selection" | "subselection" | "relation" | "flat" | "interpreter-subselection" | "colon" | "equality";
   readonly input: Record<string, Json>;
 }
 interface Corpus {
@@ -358,9 +362,9 @@ function flatRoles(memory: Memory, cursor: LinkHandle): { readonly roles: FlatRe
   const chain = anchorChain(memory, cursor, 9); const r = chain.refs;
   return { roles: Object.freeze({ source: r[0]!, sourceSelection: r[1]!, formSequence: r[2]!, dictionary: r[3]!, grammar: r[4]!, theory: r[5]!, beforeContext: r[6]!, result: r[7]!, afterContext: r[8]! }), last: chain.last };
 }
-function relationAct(memory: Memory, sourceEvidence: SourceFrontEndEvidence, roles: RelationRoles, interpreter: LinkHandle, roleDictionary: LinkHandle, form: LinkHandle, beforeContext: LinkHandle, binding: LinkHandle, result: LinkHandle, afterContext: LinkHandle): RelationReplayEvidence {
+function relationAct(memory: Memory, sourceEvidence: SourceFrontEndEvidence, roles: RelationRoles, interpreter: LinkHandle, roleDictionary: LinkHandle, form: LinkHandle, beforeContext: LinkHandle, binding: LinkHandle, result: LinkHandle, afterContext: LinkHandle, selected: { readonly selectionSequence: LinkHandle; readonly formSequence: LinkHandle; readonly grammar: LinkHandle; readonly theory: LinkHandle } = sourceEvidence): RelationReplayEvidence {
   const act = defineActHeader(memory, interpreter, roleDictionary, afterContext);
-  const fields: readonly [LinkHandle, LinkHandle][] = [[roles.source, sourceEvidence.source], [roles.sourceSelection, sourceEvidence.selectionSequence], [roles.formSequence, sourceEvidence.formSequence], [roles.dictionary, sourceEvidence.dictionary], [roles.grammar, sourceEvidence.grammar], [roles.theory, sourceEvidence.theory], [roles.form, form], [roles.beforeContext, beforeContext], [roles.binding, binding], [roles.result, result], [roles.afterContext, afterContext]];
+  const fields: readonly [LinkHandle, LinkHandle][] = [[roles.source, sourceEvidence.source], [roles.sourceSelection, selected.selectionSequence], [roles.formSequence, selected.formSequence], [roles.dictionary, sourceEvidence.dictionary], [roles.grammar, selected.grammar], [roles.theory, selected.theory], [roles.form, form], [roles.beforeContext, beforeContext], [roles.binding, binding], [roles.result, result], [roles.afterContext, afterContext]];
   for (const [role, value] of fields) defineActField(memory, act, role, value);
   return Object.freeze({ sourceEvidence, act, roles, interpreter, roleDictionary });
 }
@@ -394,9 +398,9 @@ function runRelation(test: DifferentialCase): Result {
   }
 }
 
-function flatAct(memory: Memory, sourceEvidence: SourceFrontEndEvidence, roles: FlatReadingRoles, interpreter: LinkHandle, roleDictionary: LinkHandle, beforeContext: LinkHandle, result: LinkHandle, afterContext: LinkHandle): FlatReadingEvidence {
+function flatAct(memory: Memory, sourceEvidence: SourceFrontEndEvidence, roles: FlatReadingRoles, interpreter: LinkHandle, roleDictionary: LinkHandle, beforeContext: LinkHandle, result: LinkHandle, afterContext: LinkHandle, selected: { readonly selectionSequence: LinkHandle; readonly formSequence: LinkHandle; readonly grammar: LinkHandle; readonly theory: LinkHandle } = sourceEvidence): FlatReadingEvidence {
   const act = defineActHeader(memory, interpreter, roleDictionary, afterContext);
-  const fields: readonly [LinkHandle, LinkHandle][] = [[roles.source, sourceEvidence.source], [roles.sourceSelection, sourceEvidence.selectionSequence], [roles.formSequence, sourceEvidence.formSequence], [roles.dictionary, sourceEvidence.dictionary], [roles.grammar, sourceEvidence.grammar], [roles.theory, sourceEvidence.theory], [roles.beforeContext, beforeContext], [roles.result, result], [roles.afterContext, afterContext]];
+  const fields: readonly [LinkHandle, LinkHandle][] = [[roles.source, sourceEvidence.source], [roles.sourceSelection, selected.selectionSequence], [roles.formSequence, selected.formSequence], [roles.dictionary, sourceEvidence.dictionary], [roles.grammar, selected.grammar], [roles.theory, selected.theory], [roles.beforeContext, beforeContext], [roles.result, result], [roles.afterContext, afterContext]];
   for (const [role, value] of fields) defineActField(memory, act, role, value);
   return Object.freeze({ sourceEvidence, act, roles, interpreter, roleDictionary });
 }
@@ -434,6 +438,53 @@ function runFlatDistinct(test: DifferentialCase): Result {
   const pairAfter = defineContext(memory, parent, pairResult); const carrierAfter = defineContext(memory, parent, carrierAB); const first = flatAct(memory, pairSource, roleFixture.roles, interpreter, roleDictionary, beforeContext, pairResult, pairAfter); const second = flatAct(memory, carrierSource, roleFixture.roles, interpreter, roleDictionary, beforeContext, carrierAB, carrierAfter);
   const before = memory.linkCount; const firstResult = replayFlatReading(memory, byteRefs, first); const secondResult = replayFlatReading(memory, byteRefs, second); const after = memory.linkCount;
   return { id: test.id, accepted: true, observable: { sameSource: pairSource.source === carrierSource.source, readingsDistinct: firstResult !== secondResult, resultsMatchExpected: firstResult === pairResult && secondResult === carrierAB, readOnlyCountStable: before === after } };
+}
+
+function continuedHandles(memory: Memory, prefix: LinkHandle, forms: readonly LinkHandle[]): LinkHandle {
+  let current = prefix;
+  for (const form of forms) current = memory.ensure(current, form);
+  return current;
+}
+function interpreterSubselectionFixture() {
+  const memory = new Memory(); const byteRefs = byteVocabulary(memory); let cursor = byteRefs[255]!; const base = anchorChain(memory, cursor, 8); cursor = base.last;
+  const [left, fixed, right, parent, prefix, interpreter, roleDictionary, other] = base.refs; assert(left && fixed && right && parent && prefix && interpreter && roleDictionary && other, "interpreter subselection refs");
+  const relationForm = memory.ensureStartSelfClosed(fixed); const forms = Object.freeze([left, relationForm, right]); const grammar = memory.ensureStartSelfClosed(cursor); const theory = memory.ensureStartSelfClosed(grammar); cursor = theory;
+  let dictionary = defineDictionaryScope(memory, memory.root, memory.root); let history = memory.root; const specs: SelectedSegmentSpec[] = [];
+  for (let index = 0; index < forms.length; index += 1) { const form = forms[index]!; const raw = new Uint8Array([97 + index]); const effect = defineDictionaryEffect(memory, dictionary, memory.root, history, materializeSourceContent(memory, byteRefs, raw), form); dictionary = effect.afterScope; history = effect.historyAfter; specs.push(Object.freeze({ start: index, end: index + 1, form, dictionaryOccurrence: effect.occurrence })); }
+  const source = defineSourceForm(memory, materializeSourceContent(memory, byteRefs, new Uint8Array([97, 98, 99]))); const sourceEvidence = buildSelectedSourceEvidence(memory, byteRefs, source, specs, { dictionary, grammar, theory });
+  return { memory, byteRefs, source, sourceEvidence, forms, fixed, parent, prefix, interpreter, roleDictionary, other, cursor };
+}
+function makeInterpreterSubselection(memory: Memory, evidence: SourceFrontEndEvidence, forms: readonly LinkHandle[], start: number, end: number): { readonly evidence: SourceSubselectionEvidence; readonly forms: readonly LinkHandle[] } {
+  const selectedForms = forms.slice(start, end); const formSequence = foldHandles(memory, selectedForms); const selectionSequence = foldHandles(memory, evidence.segments.slice(start, end).map((segment) => segment.selection));
+  return { forms: Object.freeze(selectedForms), evidence: Object.freeze({ startSegment: start, endSegment: end, selectionSequence, formSequence, grammar: evidence.grammar, theory: evidence.theory, grammarMembership: memory.ensure(evidence.grammar, formSequence), theoryMembership: memory.ensure(evidence.theory, formSequence) }) };
+}
+function runInterpreterSubselection(test: DifferentialCase): Result {
+  const operation = test.input.operation; assert(typeof operation === "string", "interpreter subselection fixture needs operation"); const fixture = interpreterSubselectionFixture(); const { memory, byteRefs, source, sourceEvidence, forms, fixed, parent, prefix, interpreter, roleDictionary, other } = fixture; let cursor = fixture.cursor; const isRelation = operation.startsWith("relation-"); const isContinuation = operation.startsWith("continuation-");
+  let start: number; let end: number;
+  if (isRelation) { if (operation === "relation-empty") [start, end] = [1, 1]; else if (operation === "relation-multi") [start, end] = [0, 2]; else [start, end] = [1, 2]; }
+  else if (operation === "flat-single") [start, end] = [1, 2];
+  else if (operation === "flat-multi" || operation === "flat-forged-result") [start, end] = [1, 3];
+  else if (operation === "flat-empty") [start, end] = [1, 1];
+  else if (operation === "continuation-suffix" || operation === "continuation-forged-result" || operation === "continuation-forged-fold") [start, end] = [1, 3];
+  else if (operation === "continuation-empty") [start, end] = [2, 2];
+  else throw new Error(`unknown interpreter subselection operation: ${operation}`);
+  const selectedFixture = makeInterpreterSubselection(memory, sourceEvidence, forms, start, end); let selected = selectedFixture.evidence; const selectedForms = selectedFixture.forms;
+  if (operation === "relation-forged-fold" || operation === "continuation-forged-fold") selected = Object.freeze({ ...selected, formSequence: sourceEvidence.formSequence });
+  if (isRelation) {
+    const relationForm = forms[1]!; const binding = prefix; const beforeContext = defineContext(memory, parent, binding); const expected = memory.ensure(binding, fixed); const afterContext = defineContext(memory, parent, expected); const roleFixture = relationRoles(memory, cursor); cursor = roleFixture.last; const evidence = relationAct(memory, sourceEvidence, roleFixture.roles, interpreter, roleDictionary, relationForm, beforeContext, binding, expected, afterContext, selected); const before = memory.linkCount;
+    try { const result = replayRelationSubselectionStep(memory, byteRefs, evidence, selected); const after = memory.linkCount; return { id: test.id, accepted: true, observable: { resultMatchesExpected: result === expected, wholeSourcePreserved: evidence.sourceEvidence.source === source, selectedFormCount: selectedForms.length, readOnlyCountStable: before === after } }; }
+    catch (error) { if (error instanceof InterpreterReplayError) return { id: test.id, accepted: false, error: "invalid-relation-evidence" }; throw error; }
+  }
+  const beforeContext = defineContext(memory, parent, prefix); const expected = isContinuation ? continuedHandles(memory, prefix, selectedForms) : selectedForms.length === 0 ? memory.root : selectedForms.length === 1 ? selectedForms[0]! : continuedHandles(memory, selectedForms[0]!, selectedForms.slice(1)); let result = expected;
+  if (operation === "flat-forged-result" || operation === "continuation-forged-result") result = memory.ensure(prefix, other);
+  const afterContext = defineContext(memory, parent, result); const roleFixture = flatRoles(memory, cursor); cursor = roleFixture.last; const evidence = flatAct(memory, sourceEvidence, roleFixture.roles, interpreter, roleDictionary, beforeContext, result, afterContext, selected); const before = memory.linkCount;
+  try {
+    const actual = isContinuation ? replayFlatSubselectionContinuation(memory, byteRefs, evidence, selected) : replayFlatSubselectionReading(memory, byteRefs, evidence, selected); const after = memory.linkCount; const beforeState = readContext(memory, beforeContext); const afterState = readContext(memory, afterContext);
+    return { id: test.id, accepted: true, observable: { resultMatchesExpected: actual === expected, wholeSourcePreserved: evidence.sourceEvidence.source === source, selectedFormCount: selectedForms.length, prefixPreserved: beforeState.current === prefix, parentPreserved: afterState.parent === parent, emptyReturnsPrefix: isContinuation && selectedForms.length === 0 ? actual === prefix : false, readOnlyCountStable: before === after } };
+  } catch (error) {
+    if (error instanceof InterpreterReplayError) return { id: test.id, accepted: false, error: "invalid-flat-evidence" };
+    throw error;
+  }
 }
 
 interface ColonFields {
@@ -536,7 +587,7 @@ assert(corpus.contract === "mts-contract/v0.7", "differential fixtures must sele
 const python = spawnSync("python3", ["differential/python_oracle.py", "differential/fixtures-v0.7.json"], { cwd: repoRoot, encoding: "utf8" });
 assert(python.status === 0, `frozen Python oracle adapter failed: ${python.stderr || python.stdout}`);
 const expected = JSON.parse(python.stdout) as Result[];
-const runners: Record<DifferentialCase["category"], (test: DifferentialCase) => Result> = { topology: runTopology, anum: runAnum, persistence: runPersistence, source: runSource, state: runState, dictionary: runDictionary, selection: runSelection, subselection: runSubselection, relation: runRelation, flat: runFlat, colon: runColon, equality: runEquality };
+const runners: Record<DifferentialCase["category"], (test: DifferentialCase) => Result> = { topology: runTopology, anum: runAnum, persistence: runPersistence, source: runSource, state: runState, dictionary: runDictionary, selection: runSelection, subselection: runSubselection, relation: runRelation, flat: runFlat, "interpreter-subselection": runInterpreterSubselection, colon: runColon, equality: runEquality };
 const actual = corpus.cases.map((test) => runners[test.category](test));
 assert(expected.length === actual.length, "differential result cardinality mismatch");
 expected.forEach((pythonResult, index) => {
