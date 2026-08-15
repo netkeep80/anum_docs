@@ -28,6 +28,13 @@ jobs:
       - name: Install TypeScript toolchain
         run: npm install --prefix ts --ignore-scripts --no-audit --no-fund
 
+      - name: Export generated lockfile for reproducibility fix
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-package-lock
+          path: ts/package-lock.json
+          if-no-files-found: error
+
       - name: Typecheck, test and browser-check current MTS core
         run: npm --prefix ts run check
 
