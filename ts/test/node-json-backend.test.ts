@@ -23,7 +23,9 @@ function assertSame<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), message);
 }
 
-function assertThrows(effect: () => unknown, type: typeof Error, message: string): void {
+type ErrorClass = abstract new (...args: any[]) => Error;
+
+function assertThrows(effect: () => unknown, type: ErrorClass, message: string): void {
   try {
     effect();
   } catch (error) {
