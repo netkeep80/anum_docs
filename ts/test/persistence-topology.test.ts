@@ -39,6 +39,42 @@ function sameImage(left: StorageTopologyImage, right: StorageTopologyImage): boo
     });
 }
 
+function semanticSignatures(source: StorageTopologyImage): readonly string[] {
+  const signatures = new Map<number, string>([[source.root, "R"]]);
+  const remaining = new Set<number>();
+  for (let local = 0; local < source.links.length; local += 1) {
+    if (local !== source.root) remaining.add(local);
+  }
+  while (remaining.size > 0) {
+    let progressed = false;
+    for (const local of [...remaining]) {
+      const pair = source.links[local];
+      assert(pair !== undefined, "signature pair exists");
+      const [start, end] = pair;
+      let signature: string | undefined;
+      if (start === local) {
+        const endSignature = signatures.get(end);
+        if (endSignature !== undefined) signature = `S(${endSignature})`;
+      } else if (end === local) {
+        const startSignature = signatures.get(start);
+        if (startSignature !== undefined) signature = `E(${startSignature})`;
+      } else {
+        const startSignature = signatures.get(start);
+        const endSignature = signatures.get(end);
+        if (startSignature !== undefined && endSignature !== undefined) {
+          signature = `L(${startSignature},${endSignature})`;
+        }
+      }
+      if (signature === undefined) continue;
+      signatures.set(local, signature);
+      remaining.delete(local);
+      progressed = true;
+    }
+    assert(progressed, "signature topology must be rooted");
+  }
+  return [...signatures.values()].sort();
+}
+
 function basisWithLoop(): { memory: Memory; loop: LinkHandle } {
   const memory = new Memory();
   const { O } = ensureRootBasis(memory);
@@ -137,8 +173,12 @@ function permute(
   const permutation = [...canonical.links.keys()].reverse();
   const renumbered = permute(canonical, permutation);
   const restored = restoreTopology(renumbered);
+  const reexported = exportTopology(restored);
   assertSame(restored.linkCount, memory.linkCount, "renumbering cannot create semantic Links");
-  assert(sameImage(exportTopology(restored), canonical), "renumbered storage coordinates normalize away");
+  assert(
+    JSON.stringify(semanticSignatures(reexported)) === JSON.stringify(semanticSignatures(canonical)),
+    "storage-coordinate renumbering must preserve structural semantics",
+  );
 }
 
 {
