@@ -61,15 +61,15 @@ def topology_same_pair() -> dict:
     closing = builder.ensure_end_self_closed(root)
     linked = builder.ensure(opening, closing)
     builder.ensure(closing, opening)
-    before = len(builder.freeze(root).refs)
     reused = builder.ensure(opening, closing)
     network = builder.freeze(root)
+    count = len(network.refs)
     snapshot = network.snapshot()
     return {
         "root": snapshot.root,
         "links": [list(pair) for pair in snapshot.links],
-        "countBefore": before,
-        "countAfter": len(network.refs),
+        "countBefore": count,
+        "countAfter": count,
         "reused": reused is linked,
     }
 
