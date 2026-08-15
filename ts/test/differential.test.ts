@@ -6,7 +6,7 @@ import {
   deserializeStream,
   symbolicStackAlgebra,
 } from "../src/anum.js";
-import { Memory, ensureRootBasis } from "../src/memory.js";
+import { Memory, ensureRootBasis, type LinkHandle } from "../src/memory.js";
 import {
   PersistenceTopologyError,
   STORAGE_TOPOLOGY_SCHEMA,
@@ -20,6 +20,20 @@ import {
   type PersistentTopologyBackend,
   type StoredDataset,
 } from "../src/persistent-store.js";
+import {
+  SourceError,
+  defineSourceForm,
+  materializeSourceContent,
+  readSourceContent,
+  readSourceForm,
+} from "../src/source.js";
+import {
+  StateError,
+  defineContext,
+  defineLocalRepresentativeBinding,
+  localRepresentativeResolution,
+  readContext,
+} from "../src/state.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -28,7 +42,7 @@ function assert(condition: unknown, message: string): asserts condition {
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 interface DifferentialCase {
   readonly id: string;
-  readonly category: "topology" | "anum" | "persistence";
+  readonly category: "topology" | "anum" | "persistence" | "source" | "state";
   readonly input: Record<string, Json>;
 }
 interface Corpus {
@@ -212,6 +226,137 @@ function runPersistence(test: DifferentialCase): Result {
   }
 }
 
+function byteVocabulary(memory: Memory): readonly LinkHandle[] {
+  const refs: LinkHandle[] = [];
+  let current = memory.root;
+  for (let value = 0; value < 256; value += 1) {
+    current = memory.ensureStartSelfClosed(current);
+    refs.push(current);
+  }
+  return Object.freeze(refs);
+}
+
+function sourceBytes(input: Record<string, Json>): Uint8Array {
+  const raw = input.bytes;
+  assert(Array.isArray(raw), "source fixture needs byte array");
+  const values = raw.map((value) => {
+    assert(typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 255, "invalid source byte fixture");
+    return value;
+  });
+  return new Uint8Array(values);
+}
+
+function runSource(test: DifferentialCase): Result {
+  const operation = test.input.operation;
+  assert(typeof operation === "string", "source fixture needs operation");
+  const memory = new Memory();
+  const bytes = sourceBytes(test.input);
+  if (operation === "invalid-vocabulary") {
+    try {
+      materializeSourceContent(memory, [], bytes);
+    } catch (error) {
+      if (error instanceof SourceError) return { id: test.id, accepted: false, error: "invalid-source" };
+      throw error;
+    }
+    throw new Error("invalid source vocabulary was unexpectedly accepted");
+  }
+  if (operation !== "round-trip") throw new Error(`unknown source fixture operation: ${operation}`);
+
+  const refs = byteVocabulary(memory);
+  const content = materializeSourceContent(memory, refs, bytes);
+  const repeatedContent = materializeSourceContent(memory, refs, bytes);
+  const source = defineSourceForm(memory, content);
+  const repeatedSource = defineSourceForm(memory, content);
+  const before = memory.linkCount;
+  const decoded = readSourceContent(memory, refs, content);
+  const selectedContent = readSourceForm(memory, source);
+  const sourcePoles = memory.poles(source);
+  const after = memory.linkCount;
+  assert(selectedContent === content, "source fixture selected unexpected content");
+  return {
+    id: test.id,
+    accepted: true,
+    observable: {
+      bytes: [...decoded.bytes],
+      contentIsRoot: content === memory.root,
+      contentReused: repeatedContent === content,
+      sourceReused: repeatedSource === source,
+      sourceStartSelfClosed: sourcePoles.start === source && sourcePoles.end === content,
+      readOnlyCountStable: before === after,
+    },
+  };
+}
+
+function runState(test: DifferentialCase): Result {
+  const operation = test.input.operation;
+  assert(typeof operation === "string", "state fixture needs operation");
+  const memory = new Memory();
+  const { O, C, L, U } = ensureRootBasis(memory);
+  const context = defineContext(memory, O, C);
+
+  if (operation === "context") {
+    const repeated = defineContext(memory, O, C);
+    const before = memory.linkCount;
+    const state = readContext(memory, context);
+    const after = memory.linkCount;
+    return {
+      id: test.id,
+      accepted: true,
+      observable: {
+        parentMatches: state.parent === O,
+        currentMatches: state.current === C,
+        contextReused: repeated === context,
+        readOnlyCountStable: before === after,
+      },
+    };
+  }
+  if (operation === "representative-default") {
+    const before = memory.linkCount;
+    const resolution = localRepresentativeResolution(memory, context, L);
+    const after = memory.linkCount;
+    return {
+      id: test.id,
+      accepted: true,
+      observable: {
+        representativeMatches: resolution.representative === L,
+        bindingCount: resolution.bindings.length,
+        readOnlyCountStable: before === after,
+      },
+    };
+  }
+  if (operation === "representative-binding") {
+    const binding = defineLocalRepresentativeBinding(memory, context, L, U);
+    const repeated = defineLocalRepresentativeBinding(memory, context, L, U);
+    const before = memory.linkCount;
+    const resolution = localRepresentativeResolution(memory, context, L);
+    const after = memory.linkCount;
+    return {
+      id: test.id,
+      accepted: true,
+      observable: {
+        representativeMatches: resolution.representative === U,
+        bindingCount: resolution.bindings.length,
+        bindingReused: repeated === binding,
+        readOnlyCountStable: before === after,
+      },
+    };
+  }
+  if (operation === "representative-conflict") {
+    defineLocalRepresentativeBinding(memory, context, L, O);
+    defineLocalRepresentativeBinding(memory, context, L, C);
+    try {
+      localRepresentativeResolution(memory, context, L);
+    } catch (error) {
+      if (error instanceof StateError && error.code === "representative-conflict") {
+        return { id: test.id, accepted: false, error: "representative-conflict" };
+      }
+      throw error;
+    }
+    throw new Error("representative conflict was unexpectedly accepted");
+  }
+  throw new Error(`unknown state fixture operation: ${operation}`);
+}
+
 const repoRoot = resolve(process.cwd(), "..");
 const fixturePath = resolve(repoRoot, "differential/fixtures-v0.7.json");
 const corpus = JSON.parse(readFileSync(fixturePath, "utf8")) as Corpus;
@@ -228,7 +373,9 @@ const expected = JSON.parse(python.stdout) as Result[];
 const actual = corpus.cases.map((test) => {
   if (test.category === "topology") return runTopology(test);
   if (test.category === "anum") return runAnum(test);
-  return runPersistence(test);
+  if (test.category === "persistence") return runPersistence(test);
+  if (test.category === "source") return runSource(test);
+  return runState(test);
 });
 
 assert(expected.length === actual.length, "differential result cardinality mismatch");
