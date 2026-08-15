@@ -45,6 +45,21 @@
     {"id":"selection-dictionary-choice","category":"selection","input":{"operation":"dictionary-choice","bytes":[120]}},
     {"id":"selection-gap","category":"selection","input":{"operation":"invalid-partition","bytes":[97,98],"segments":[[0,1,0]]}},
     {"id":"selection-overlap","category":"selection","input":{"operation":"invalid-partition","bytes":[97,98],"segments":[[0,2,0],[1,2,1]]}},
-    {"id":"selection-forged-resolution","category":"selection","input":{"operation":"forged-resolution","bytes":[97]}}
+    {"id":"selection-forged-resolution","category":"selection","input":{"operation":"forged-resolution","bytes":[97]}},
+
+    {"id":"relation-start-open","category":"relation","input":{"operation":"start-open"}},
+    {"id":"relation-end-open","category":"relation","input":{"operation":"end-open"}},
+    {"id":"relation-complete-form","category":"relation","input":{"operation":"complete-form"}},
+    {"id":"relation-forged-result","category":"relation","input":{"operation":"forged-result"}},
+    {"id":"relation-forged-binding","category":"relation","input":{"operation":"forged-binding"}},
+    {"id":"relation-forged-dgt","category":"relation","input":{"operation":"forged-dgt"}},
+    {"id":"relation-forged-act","category":"relation","input":{"operation":"forged-act"}},
+
+    {"id":"flat-single","category":"flat","input":{"operation":"single"}},
+    {"id":"flat-multi","category":"flat","input":{"operation":"multi"}},
+    {"id":"flat-distinct-readings","category":"flat","input":{"operation":"distinct-readings"}},
+    {"id":"flat-forged-result","category":"flat","input":{"operation":"forged-result"}},
+    {"id":"flat-forged-dgt","category":"flat","input":{"operation":"forged-dgt"}},
+    {"id":"flat-forged-act","category":"flat","input":{"operation":"forged-act"}}
   ]
 }
