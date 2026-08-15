@@ -286,7 +286,9 @@ def analyze(case: dict) -> dict:
             store._commit_candidate = fail_commit
             threw = False
             try:
-                store.materialize(opening, opening)
+                # opening⟼opening and closing⟼closing were already materialized above;
+                # linked⟼linked is still absent, so this must exercise the commit path.
+                store.materialize(linked, linked)
             except OSError:
                 threw = True
             return {
@@ -296,7 +298,7 @@ def analyze(case: dict) -> dict:
                     "threw": threw,
                     "countStable": store.count == count_before,
                     "bytesStable": path.read_bytes() == target_before,
-                    "failedLinkAbsent": store.find(start=opening, end=opening) == (),
+                    "failedLinkAbsent": store.find(start=linked, end=linked) == (),
                 },
             }
 
