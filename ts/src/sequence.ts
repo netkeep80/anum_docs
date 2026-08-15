@@ -1,4 +1,4 @@
-import type { LinkHandle, ReadMemory, WriteMemory } from "./memory.js";
+import type { AppendOnlyReadMemory, LinkHandle, ReadMemory, WriteMemory } from "./memory.js";
 
 export type SequenceItem =
   | { readonly kind: "atom"; readonly value: LinkHandle }
@@ -58,6 +58,12 @@ function validateDescription(memory: ReadMemory, description: SequenceDescriptio
     }
   };
   visit(description.items);
+}
+
+function appendOnlyReplayMemory(memory: ReadMemory): AppendOnlyReadMemory {
+  const candidate = memory as Partial<AppendOnlyReadMemory>;
+  if (typeof candidate.issuanceIndex !== "function") invalid();
+  return memory as AppendOnlyReadMemory;
 }
 
 export function replayRootOpeningRestoration(
@@ -178,9 +184,22 @@ export function replaySequenceMaterialization(
   memory: ReadMemory,
   effect: SequenceMaterializationEffect,
 ): LinkHandle {
+  const replayMemory = appendOnlyReplayMemory(memory);
   const before = memory.linkCount;
   validateDescription(memory, effect.description);
-  const required = new Set<LinkHandle>();
+  if (
+    !Number.isInteger(effect.linkCountBefore)
+    || !Number.isInteger(effect.linkCountAfter)
+    || effect.linkCountBefore < 0
+    || effect.linkCountAfter < effect.linkCountBefore
+    || effect.linkCountAfter !== memory.linkCount
+    || effect.linkCountAfter !== effect.linkCountBefore + effect.created.length
+  ) invalid();
+
+  // The mutable host already contains the after-state. Append-order is used only
+  // to reconstruct the exact write interval; it never changes semantic identity.
+  const firstCreatedUses: LinkHandle[] = [];
+  const seenCreatedUses = new Set<LinkHandle>();
   const collect = (items: readonly SequenceItem[]): LinkHandle => {
     const values = items.map((item) => item.kind === "atom" ? item.value : collect(item.items));
     if (values.length === 0) return memory.root;
@@ -188,24 +207,31 @@ export function replaySequenceMaterialization(
     for (let index = 1; index < values.length; index += 1) {
       const ref = memory.find(result, values[index]!);
       if (ref === undefined) invalid();
-      required.add(ref);
+      const issued = replayMemory.issuanceIndex(ref);
+      if (issued >= effect.linkCountAfter) invalid();
+      if (issued >= effect.linkCountBefore && !seenCreatedUses.has(ref)) {
+        seenCreatedUses.add(ref);
+        firstCreatedUses.push(ref);
+      }
       result = ref;
     }
     return result;
   };
   const result = collect(effect.description.items);
   if (result !== effect.result) invalid();
+  if (firstCreatedUses.length !== effect.created.length) invalid();
 
   const seen = new Set<LinkHandle>();
-  for (const edge of effect.created) {
+  for (let index = 0; index < effect.created.length; index += 1) {
+    const edge = effect.created[index]!;
     validateHandle(memory, edge.ref);
-    if (seen.has(edge.ref) || !required.has(edge.ref)) invalid();
+    if (seen.has(edge.ref) || edge.ref !== firstCreatedUses[index]) invalid();
     seen.add(edge.ref);
+    if (replayMemory.issuanceIndex(edge.ref) !== effect.linkCountBefore + index) invalid();
     const poles = memory.poles(edge.ref);
     if (poles.start !== edge.start || poles.end !== edge.end) invalid();
     if (memory.find(edge.start, edge.end) !== edge.ref) invalid();
   }
-  if (effect.linkCountAfter !== effect.linkCountBefore + effect.created.length) invalid();
   if (memory.linkCount !== before) invalid();
   return result;
 }
