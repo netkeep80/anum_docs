@@ -25,7 +25,7 @@ from core.foundation_v2_state import (
     define_local_representative_binding,
     define_membership,
 )
-from core.rooted_link_network import LinkNetworkBuilder
+from core.rooted_link_network import LinkNetworkBuilder, LinkNetworkError
 from python_oracle import git_blob_sha, verify_freeze
 
 
@@ -289,7 +289,7 @@ def analyze(case: dict) -> dict:
     before = network.snapshot()
     try:
         claims = replay_decompose_equal_relations(network, evidence)
-    except ProofRuleReplayError:
+    except (ProofRuleReplayError, LinkNetworkError):
         return {"id": case["id"], "accepted": False, "error": "invalid-proof-evidence"}
 
     labels = {evidence.start_claim: "start", evidence.end_claim: "end"}
