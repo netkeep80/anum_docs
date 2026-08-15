@@ -71,27 +71,15 @@ assert(memory.poles(basis.C).start === basis.R && memory.poles(basis.C).end === 
 assert(memory.poles(basis.L).start === basis.O && memory.poles(basis.L).end === basis.C, "L basis mismatch");
 assert(memory.poles(basis.U).start === basis.C && memory.poles(basis.U).end === basis.O, "U basis mismatch");
 
-negativeVector(
-  "second-fully-self-closed-by-physical-id",
-  rejectsTopology([[0, 0], [1, 1]]),
-);
-negativeVector(
-  "duplicate-same-pair",
-  rejectsTopology([[0, 0], [1, 0], [0, 2], [1, 2], [1, 2]]),
-);
+negativeVector("second-fully-self-closed-by-physical-id", rejectsTopology([[0, 0], [1, 1]]));
+negativeVector("duplicate-same-pair", rejectsTopology([[0, 0], [1, 0], [0, 2], [1, 2], [1, 2]]));
 
 const pair = memory.ensure(basis.L, basis.U);
 assert(memory.ensure(basis.L, basis.U) === pair, "same semantic pair must be reused");
 const rebuilt = new Memory();
 const rebuiltBasis = ensureRootBasis(rebuilt);
-negativeVector(
-  "same-form-distinguished-only-by-runtime-handle",
-  rebuiltBasis.R !== basis.R && rebuilt.poles(rebuiltBasis.L).start === rebuiltBasis.O,
-);
-negativeVector(
-  "id-only-mutual-cycle",
-  rejectsTopology([[0, 0], [2, 0], [1, 0]]),
-);
+negativeVector("same-form-distinguished-only-by-runtime-handle", rebuiltBasis.R !== basis.R && rebuilt.poles(rebuiltBasis.L).start === rebuiltBasis.O);
+negativeVector("id-only-mutual-cycle", rejectsTopology([[0, 0], [2, 0], [1, 0]]));
 
 const countBeforeRead = memory.linkCount;
 memory.find(basis.L, basis.U);
