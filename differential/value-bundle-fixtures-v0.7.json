@@ -1,0 +1,24 @@
+{
+  "schema": "mts-value-bundle-differential-fixtures/v0.1",
+  "contract": "mts-contract/v0.7",
+  "pythonOracleSha": "ef42d91a868bbc5b7004acc325006ad27db3bb68",
+  "cases": [
+    {"id":"bundle-role-constraint","operation":"role-constraint"},
+    {"id":"bundle-role-value","operation":"role-value"},
+    {"id":"bundle-role-empty-constraint","operation":"role-empty-constraint"},
+    {"id":"bundle-role-shared-paths","operation":"role-shared-paths"},
+    {"id":"bundle-error-mixed","operation":"error-mixed"},
+    {"id":"bundle-error-ambiguous","operation":"error-ambiguous"},
+    {"id":"bundle-error-nested-value","operation":"error-nested-value"},
+    {"id":"bundle-error-role-mismatch","operation":"error-role-mismatch"},
+    {"id":"bundle-error-definition-deferred","operation":"error-definition-deferred"},
+    {"id":"bundle-error-scalar-operator","operation":"error-scalar-operator"},
+    {"id":"bundle-error-malformed-arity","operation":"error-malformed-arity"},
+    {"id":"bundle-resolved-provenance","operation":"resolved-provenance"},
+    {"id":"bundle-resolved-equality","operation":"resolved-equality"},
+    {"id":"bundle-resolved-foreign","operation":"resolved-foreign"},
+    {"id":"bundle-expansion-matrix","operation":"expansion-matrix"},
+    {"id":"bundle-expansion-scalar-scalar","operation":"expansion-scalar-scalar"},
+    {"id":"bundle-expansion-foreign","operation":"expansion-foreign"}
+  ]
+}
