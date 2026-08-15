@@ -15,7 +15,7 @@ function sortedTests(directory: string, suffix: string): string[] {
 const sourceDirectory = resolve("test");
 const builtDirectory = resolve("dist/test");
 const sourceTests = sortedTests(sourceDirectory, ".test.ts")
-  .map((name) => name.slice(0, -3) + "js");
+  .map((name) => name.replace(/\.ts$/, ".js"));
 const builtTests = sortedTests(builtDirectory, ".test.js");
 
 if (JSON.stringify(sourceTests) !== JSON.stringify(builtTests)) {
