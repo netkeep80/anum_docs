@@ -70,15 +70,15 @@ export function replayRootOpeningRestoration(
   validateInputs(memory, forms, openForm, closeForm);
   if (forms.length === 0 || forms[0] !== openForm) return forms;
 
+  // Frozen v0.7 restores only an overall delimiter deficit. A temporary prefix
+  // deficit compensated by later opens stays malformed for grouping to reject.
   let balance = 0;
-  let minimum = 0;
   for (const form of forms) {
     if (form === openForm) balance += 1;
     else if (form === closeForm) balance -= 1;
-    minimum = Math.min(minimum, balance);
   }
-  const result = minimum < 0
-    ? Object.freeze([...Array<LinkHandle>(-minimum).fill(openForm), ...forms])
+  const result = balance < 0
+    ? Object.freeze([...Array<LinkHandle>(-balance).fill(openForm), ...forms])
     : forms;
   if (memory.linkCount !== before) invalid();
   return result;

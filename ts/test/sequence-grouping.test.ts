@@ -94,6 +94,16 @@ function group(item: SequenceItem | undefined, length: number, message: string):
   same(deficit[0], open, "restored repeated opening");
   same(deficit[1], open, "original opening retained");
 
+  // Frozen Python restores only a final close/open deficit. A temporary prefix
+  // deficit that is compensated later must remain malformed for grouping to reject.
+  const recoveredPrefixDeficit = [open, close, close, open] as const;
+  same(
+    replayRootOpeningRestoration(m, recoveredPrefixDeficit, open, close),
+    recoveredPrefixDeficit,
+    "recovered prefix deficit must remain unchanged",
+  );
+  reject(() => replayResolvedSequenceGrouping(m, recoveredPrefixDeficit, open, close));
+
   const ineligible = [a, close] as const;
   same(replayRootOpeningRestoration(m, ineligible, open, close), ineligible, "non-leading open unchanged");
   same(m.linkCount, before, "restoration must be read-only");
