@@ -34,6 +34,7 @@ from core.foundation_v2_source import (
     SourceFrontEndBuilder,
     SourceReplayError,
     replay_source_front_end,
+    replay_source_subselection,
 )
 from core.foundation_v2_state import (
     DictionaryConflictError,
@@ -317,6 +318,38 @@ def run_selection(case: dict) -> dict:
     return {"id": case["id"], "accepted": True, "observable": {"formCount": len(resolved), "formsMatchExpected": resolved == expected, "readOnlyCountStable": len(before.links) == len(after.links)}}
 
 
+def fold_links(builder: LinkNetworkBuilder, root, values):
+    current = root
+    for value in values:
+        current = builder.ensure(current, value)
+    return current
+
+
+def run_subselection(case: dict) -> dict:
+    operation = case["input"]["operation"]; start = case["input"]["start"]; end = case["input"]["end"]
+    builder = LinkNetworkBuilder(); root = builder.ensure_root(); segments = ((0, 1, 0), (1, 2, 1), (2, 3, 2))
+    refs, front_end, source, forms, dictionary, grammar, theory, specs = selection_fixture(builder, root, b"abc", segments)
+    evidence = front_end.build_selected_evidence(source, tuple(specs), dictionary=dictionary, grammar=grammar, theory=theory)
+    selected_start, selected_end = (start, end) if 0 <= start <= end <= 3 else (1, 2)
+    selected_segments = evidence.segments[selected_start:selected_end]; selected_forms = tuple(forms[index] for index in range(selected_start, selected_end))
+    selection_sequence = fold_links(builder, root, tuple(segment.selection for segment in selected_segments)); form_sequence = fold_links(builder, root, selected_forms)
+    grammar_membership = builder.ensure(grammar, form_sequence); theory_membership = builder.ensure(theory, form_sequence)
+    if operation == "forged-selection-fold": selection_sequence = evidence.selection_sequence
+    elif operation == "forged-form-fold": form_sequence = evidence.form_sequence
+    elif operation == "forged-grammar": grammar_membership = builder.ensure(grammar, root)
+    elif operation == "forged-theory": theory_membership = builder.ensure(theory, root)
+    elif operation == "forged-whole-source": evidence = replace(evidence, segments=(replace(evidence.segments[0], resolution=root), *evidence.segments[1:]))
+    elif operation not in ("range", "invalid-range"): raise RuntimeError(f"unknown subselection operation: {operation}")
+    network = builder.freeze(root); before = network.snapshot()
+    try:
+        resolved = replay_source_subselection(network, evidence, refs, start_segment=start, end_segment=end, selection_sequence=selection_sequence, form_sequence=form_sequence, grammar=grammar, theory=theory, grammar_membership=grammar_membership, theory_membership=theory_membership)
+    except SourceReplayError:
+        error = "invalid-subselection" if operation == "invalid-range" else "invalid-admission-evidence" if operation in ("forged-grammar", "forged-theory") else "invalid-source-evidence"
+        return {"id": case["id"], "accepted": False, "error": error}
+    after = network.snapshot(); expected = tuple(forms[index] for index in range(start, end))
+    return {"id": case["id"], "accepted": True, "observable": {"formCount": len(resolved), "formsMatchExpected": resolved == expected, "wholeSourcePreserved": evidence.source is source.source, "emptyUsesRootFolds": (selection_sequence is root and form_sequence is root) if start == end else False, "readOnlyCountStable": before == after}}
+
+
 def relation_roles(builder, cursor):
     refs, cursor = anchors(builder, cursor, 11)
     return RelationStepRoleRefs(*refs), cursor
@@ -512,7 +545,7 @@ def run_equality(case: dict) -> dict:
 def main() -> int:
     if len(sys.argv) != 2: raise SystemExit("usage: python_oracle.py FIXTURES.json")
     corpus = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8")); verify_freeze(corpus); results = []
-    runners = {"topology": run_topology, "anum": run_anum, "persistence": run_persistence, "source": run_source, "state": run_state, "dictionary": run_dictionary, "selection": run_selection, "relation": run_relation, "flat": run_flat, "colon": run_colon, "equality": run_equality}
+    runners = {"topology": run_topology, "anum": run_anum, "persistence": run_persistence, "source": run_source, "state": run_state, "dictionary": run_dictionary, "selection": run_selection, "subselection": run_subselection, "relation": run_relation, "flat": run_flat, "colon": run_colon, "equality": run_equality}
     for case in corpus["cases"]:
         runner = runners.get(case["category"])
         if runner is None: raise RuntimeError(f"unknown differential category: {case['category']}")
