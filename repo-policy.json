@@ -47,6 +47,7 @@
       "status": "accepted",
       "accepted": true
     },
+    "required_paths": [],
     "cochange": [
       "current.contract",
       "current.conformance"
