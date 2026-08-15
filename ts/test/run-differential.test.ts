@@ -178,18 +178,18 @@ function run(test: RunCase): Result {
   const before = fx.memory.linkCount;
   try {
     const acts = replayRun(fx.memory, evidence);
-    return {
-      id: test.id,
-      accepted: true,
-      observable: {
-        acts: acts.map((act) => {
-          const label = labels.get(act);
-          assert(label !== undefined, "missing portable Run act label");
-          return label;
-        }),
-        readOnlyCountStable: before === fx.memory.linkCount,
-      },
+    const observable: { acts: string[]; readOnlyCountStable: boolean; shortcutAbsent?: boolean } = {
+      acts: acts.map((act) => {
+        const label = labels.get(act);
+        assert(label !== undefined, "missing portable Run act label");
+        return label;
+      }),
+      readOnlyCountStable: before === fx.memory.linkCount,
     };
+    if (test.operation === "linear") {
+      observable.shortcutAbsent = fx.memory.find(k0, k2) === undefined;
+    }
+    return { id: test.id, accepted: true, observable };
   } catch (error) {
     if (error instanceof RunReplayError) {
       return { id: test.id, accepted: false, error: "invalid-run-evidence" };
