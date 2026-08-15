@@ -60,6 +60,22 @@
     {"id":"flat-distinct-readings","category":"flat","input":{"operation":"distinct-readings"}},
     {"id":"flat-forged-result","category":"flat","input":{"operation":"forged-result"}},
     {"id":"flat-forged-dgt","category":"flat","input":{"operation":"forged-dgt"}},
-    {"id":"flat-forged-act","category":"flat","input":{"operation":"forged-act"}}
+    {"id":"flat-forged-act","category":"flat","input":{"operation":"forged-act"}},
+
+    {"id":"colon-valid","category":"colon","input":{"operation":"valid"}},
+    {"id":"colon-repeated-event","category":"colon","input":{"operation":"repeated-event"}},
+    {"id":"colon-conflict","category":"colon","input":{"operation":"conflict"}},
+    {"id":"colon-forged-occurrence","category":"colon","input":{"operation":"forged-occurrence"}},
+    {"id":"colon-forged-history","category":"colon","input":{"operation":"forged-history"}},
+    {"id":"colon-forged-act","category":"colon","input":{"operation":"forged-act"}},
+
+    {"id":"equality-identical","category":"equality","input":{"operation":"identical"}},
+    {"id":"equality-distinct","category":"equality","input":{"operation":"distinct"}},
+    {"id":"equality-shared-representative","category":"equality","input":{"operation":"shared-representative"}},
+    {"id":"equality-one-hop","category":"equality","input":{"operation":"one-hop"}},
+    {"id":"equality-non-transitive","category":"equality","input":{"operation":"non-transitive"}},
+    {"id":"equality-conflict","category":"equality","input":{"operation":"conflict"}},
+    {"id":"equality-forged-representative","category":"equality","input":{"operation":"forged-representative"}},
+    {"id":"equality-forged-act","category":"equality","input":{"operation":"forged-act"}}
   ]
 }

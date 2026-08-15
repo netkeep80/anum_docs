@@ -14,11 +14,17 @@ if str(ROOT) not in sys.path:
 
 from core.anum_protocol import StreamError, deserialize_stream
 from core.foundation_v2_interpreter import (
+    ColonEffectEvidence,
+    ColonRoleRefs,
+    EqualityEvaluationEvidence,
+    EqualityRoleRefs,
     FlatSequenceReadingEvidence,
     FlatSequenceReadingRoleRefs,
     InterpreterReplayError,
     RelationStepEvidence,
     RelationStepRoleRefs,
+    replay_colon_effect,
+    replay_equality_evaluation,
     replay_flat_sequence_reading,
     replay_relation_step,
 )
@@ -412,10 +418,101 @@ def run_flat(case: dict) -> dict:
     return {"id": case["id"], "accepted": True, "observable": {"formCount": count, "resultMatchesExpected": result is expected, "readOnlyCountStable": before == after}}
 
 
+def colon_roles(builder, cursor):
+    refs, cursor = anchors(builder, cursor, 10)
+    return ColonRoleRefs(*refs), cursor
+
+
+def make_colon_evidence(builder, root, *, before_dictionary=None, parent=None, history_before=None, source_content=None, form=None):
+    cursor = root
+    seed, cursor = anchors(builder, cursor, 5)
+    default_content, default_form, interpreter, role_dictionary, context_current = seed
+    if parent is None: parent = root
+    if history_before is None: history_before = root
+    if source_content is None: source_content = default_content
+    if form is None: form = default_form
+    if before_dictionary is None: before_dictionary = define_dictionary_scope(builder, parent, history_before)
+    source = builder.ensure_start_self_closed(source_content)
+    effect = define_dictionary_effect(builder, before_dictionary, parent, history_before, source_content, form)
+    context = define_context(builder, root, context_current)
+    roles, cursor = colon_roles(builder, cursor)
+    act = define_act_header(builder, interpreter, role_dictionary, context)
+    values = (source, source_content, form, before_dictionary, effect.entry, effect.occurrence, history_before, effect.history_after, effect.after_scope, context)
+    add_act_fields(builder, act, roles, values)
+    evidence = ColonEffectEvidence(interpreter, source, source_content, form, before_dictionary, effect.entry, effect.occurrence, effect.history_after, effect.after_scope, context, act, role_dictionary, roles)
+    return evidence, effect, cursor
+
+
+def run_colon(case: dict) -> dict:
+    operation = case["input"]["operation"]; builder = LinkNetworkBuilder(); root = builder.ensure_root()
+    if operation == "repeated-event":
+        content = next_anchor(builder, root); form = next_anchor(builder, content); base = define_dictionary_scope(builder, root, root)
+        first = define_dictionary_effect(builder, base, root, root, content, form)
+        evidence, second, _ = make_colon_evidence(builder, root, before_dictionary=first.after_scope, parent=root, history_before=first.history_after, source_content=content, form=form)
+        expected_distinct = second.occurrence is not first.occurrence
+    elif operation == "conflict":
+        content = next_anchor(builder, root); form_one = next_anchor(builder, content); form_two = next_anchor(builder, form_one); base = define_dictionary_scope(builder, root, root)
+        first = define_dictionary_effect(builder, base, root, root, content, form_one)
+        evidence, _effect, _ = make_colon_evidence(builder, root, before_dictionary=first.after_scope, parent=root, history_before=first.history_after, source_content=content, form=form_two)
+        network = builder.freeze(root)
+        try: replay_colon_effect(network, evidence)
+        except InterpreterReplayError: return {"id": case["id"], "accepted": False, "error": "invalid-colon-evidence"}
+        raise RuntimeError("colon conflict was unexpectedly accepted")
+    else:
+        evidence, effect, cursor = make_colon_evidence(builder, root)
+        expected_distinct = False
+        if operation == "forged-occurrence": evidence = replace(evidence, definition_occurrence=next_anchor(builder, cursor))
+        elif operation == "forged-history": evidence = replace(evidence, history_after=builder.ensure(next_anchor(builder, cursor), evidence.definition_occurrence))
+        elif operation == "forged-act": evidence = replace(evidence, role_dictionary=next_anchor(builder, cursor))
+        elif operation != "valid": raise RuntimeError(f"unknown colon operation: {operation}")
+    network = builder.freeze(root); before = network.snapshot()
+    try: result = replay_colon_effect(network, evidence)
+    except InterpreterReplayError:
+        return {"id": case["id"], "accepted": False, "error": "invalid-colon-evidence"}
+    after = network.snapshot(); before_parent, history_before = read_dictionary_scope(network, evidence.before_dictionary); after_parent, _ = read_dictionary_scope(network, evidence.after_dictionary)
+    resolution = lookup_scoped_dictionary(network, evidence.after_dictionary, evidence.source_content); before_resolution = lookup_scoped_dictionary(network, evidence.before_dictionary, evidence.source_content)
+    history_link = network.link(evidence.history_after)
+    observable = {"resultMatchesExpected": result is evidence.after_dictionary, "occurrenceVisibleAfter": resolution is not None and evidence.definition_occurrence in resolution.occurrences, "occurrenceInvisibleBefore": before_resolution is None or evidence.definition_occurrence not in before_resolution.occurrences, "parentPreserved": before_parent is after_parent, "historyAppended": history_link.start is history_before and history_link.end is evidence.definition_occurrence, "structuralEventDistinct": expected_distinct, "readOnlyCountStable": before == after}
+    return {"id": case["id"], "accepted": True, "observable": observable}
+
+
+def equality_roles(builder, cursor):
+    refs, cursor = anchors(builder, cursor, 5)
+    return EqualityRoleRefs(*refs), cursor
+
+
+def run_equality(case: dict) -> dict:
+    operation = case["input"]["operation"]; builder = LinkNetworkBuilder(); root = builder.ensure_root(); refs, cursor = anchors(builder, root, 7)
+    parent, current, left, right, representative, interpreter, role_dictionary = refs; context = define_context(builder, parent, current)
+    left_rep = left; right_rep = right; expected = False
+    if operation == "identical": right = left; right_rep = left; expected = True
+    elif operation == "distinct": pass
+    elif operation == "shared-representative":
+        define_local_representative_binding(builder, context, left, representative); define_local_representative_binding(builder, context, right, representative); left_rep = representative; right_rep = representative; expected = True
+    elif operation == "one-hop":
+        define_local_representative_binding(builder, context, left, right); left_rep = right; right_rep = right; expected = True
+    elif operation == "non-transitive":
+        define_local_representative_binding(builder, context, left, right); define_local_representative_binding(builder, context, right, representative); left_rep = right; right_rep = representative; expected = False
+    elif operation == "conflict":
+        define_local_representative_binding(builder, context, left, right); define_local_representative_binding(builder, context, left, representative); left_rep = right
+    elif operation == "forged-representative": left_rep = representative
+    elif operation == "forged-act": pass
+    else: raise RuntimeError(f"unknown equality operation: {operation}")
+    roles, cursor = equality_roles(builder, cursor); act = define_act_header(builder, interpreter, role_dictionary, context); values = (context, left, right, left_rep, right_rep); add_act_fields(builder, act, roles, values)
+    evidence = EqualityEvaluationEvidence(interpreter, context, left, right, left_rep, right_rep, act, role_dictionary, roles)
+    if operation == "forged-act": evidence = replace(evidence, role_dictionary=next_anchor(builder, cursor))
+    network = builder.freeze(root); before = network.snapshot()
+    try: result = replay_equality_evaluation(network, evidence)
+    except (InterpreterReplayError, RepresentativeConflictError):
+        return {"id": case["id"], "accepted": False, "error": "invalid-equality-evidence"}
+    after = network.snapshot()
+    return {"id": case["id"], "accepted": True, "observable": {"equal": result, "resultMatchesExpected": result is expected, "readOnlyCountStable": before == after}}
+
+
 def main() -> int:
     if len(sys.argv) != 2: raise SystemExit("usage: python_oracle.py FIXTURES.json")
     corpus = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8")); verify_freeze(corpus); results = []
-    runners = {"topology": run_topology, "anum": run_anum, "persistence": run_persistence, "source": run_source, "state": run_state, "dictionary": run_dictionary, "selection": run_selection, "relation": run_relation, "flat": run_flat}
+    runners = {"topology": run_topology, "anum": run_anum, "persistence": run_persistence, "source": run_source, "state": run_state, "dictionary": run_dictionary, "selection": run_selection, "relation": run_relation, "flat": run_flat, "colon": run_colon, "equality": run_equality}
     for case in corpus["cases"]:
         runner = runners.get(case["category"])
         if runner is None: raise RuntimeError(f"unknown differential category: {case['category']}")

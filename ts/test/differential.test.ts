@@ -44,8 +44,14 @@ import {
 } from "../src/dictionary.js";
 import {
   InterpreterReplayError,
+  replayColonEffect,
+  replayEqualityEvaluation,
   replayFlatReading,
   replayRelationStep,
+  type ColonReplayEvidence,
+  type ColonRoles,
+  type EqualityReplayEvidence,
+  type EqualityRoles,
   type FlatReadingEvidence,
   type FlatReadingRoles,
   type RelationReplayEvidence,
@@ -60,7 +66,7 @@ function assert(condition: unknown, message: string): asserts condition {
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 interface DifferentialCase {
   readonly id: string;
-  readonly category: "topology" | "anum" | "persistence" | "source" | "state" | "dictionary" | "selection" | "relation" | "flat";
+  readonly category: "topology" | "anum" | "persistence" | "source" | "state" | "dictionary" | "selection" | "relation" | "flat" | "colon" | "equality";
   readonly input: Record<string, Json>;
 }
 interface Corpus {
@@ -398,6 +404,98 @@ function runFlatDistinct(test: DifferentialCase): Result {
   return { id: test.id, accepted: true, observable: { sameSource: pairSource.source === carrierSource.source, readingsDistinct: firstResult !== secondResult, resultsMatchExpected: firstResult === pairResult && secondResult === carrierAB, readOnlyCountStable: before === after } };
 }
 
+interface ColonFields {
+  readonly source: LinkHandle;
+  readonly sourceContent: LinkHandle;
+  readonly form: LinkHandle;
+  readonly beforeDictionary: LinkHandle;
+  readonly entry: LinkHandle;
+  readonly definitionOccurrence: LinkHandle;
+  readonly historyBefore: LinkHandle;
+  readonly historyAfter: LinkHandle;
+  readonly afterDictionary: LinkHandle;
+  readonly context: LinkHandle;
+}
+function colonRoles(memory: Memory, cursor: LinkHandle): { readonly roles: ColonRoles; readonly last: LinkHandle } {
+  const chain = anchorChain(memory, cursor, 10); const r = chain.refs;
+  return { roles: Object.freeze({ source: r[0]!, sourceContent: r[1]!, form: r[2]!, beforeDictionary: r[3]!, entry: r[4]!, definitionOccurrence: r[5]!, historyBefore: r[6]!, historyAfter: r[7]!, afterDictionary: r[8]!, context: r[9]! }), last: chain.last };
+}
+function colonEvidence(memory: Memory, fields: ColonFields, roles: ColonRoles, interpreter: LinkHandle, roleDictionary: LinkHandle): ColonReplayEvidence {
+  const act = defineActHeader(memory, interpreter, roleDictionary, fields.context);
+  const values: readonly [LinkHandle, LinkHandle][] = [[roles.source, fields.source], [roles.sourceContent, fields.sourceContent], [roles.form, fields.form], [roles.beforeDictionary, fields.beforeDictionary], [roles.entry, fields.entry], [roles.definitionOccurrence, fields.definitionOccurrence], [roles.historyBefore, fields.historyBefore], [roles.historyAfter, fields.historyAfter], [roles.afterDictionary, fields.afterDictionary], [roles.context, fields.context]];
+  for (const [role, value] of values) defineActField(memory, act, role, value);
+  return Object.freeze({ act, roles, interpreter, roleDictionary });
+}
+function makeColonFixture(memory: Memory, options: { readonly beforeDictionary?: LinkHandle; readonly parent?: LinkHandle; readonly historyBefore?: LinkHandle; readonly sourceContent?: LinkHandle; readonly form?: LinkHandle } = {}) {
+  let cursor = memory.root; const seed = anchorChain(memory, cursor, 5); cursor = seed.last; const [defaultContent, defaultForm, interpreter, roleDictionary, contextCurrent] = seed.refs; assert(defaultContent && defaultForm && interpreter && roleDictionary && contextCurrent, "colon seed");
+  const parent = options.parent ?? memory.root; const historyBefore = options.historyBefore ?? memory.root; const sourceContent = options.sourceContent ?? defaultContent; const form = options.form ?? defaultForm; const beforeDictionary = options.beforeDictionary ?? defineDictionaryScope(memory, parent, historyBefore);
+  const source = defineSourceForm(memory, sourceContent); const effect = defineDictionaryEffect(memory, beforeDictionary, parent, historyBefore, sourceContent, form); const context = defineContext(memory, memory.root, contextCurrent); const roleFixture = colonRoles(memory, cursor);
+  const fields: ColonFields = Object.freeze({ source, sourceContent, form, beforeDictionary, entry: effect.entry, definitionOccurrence: effect.occurrence, historyBefore, historyAfter: effect.historyAfter, afterDictionary: effect.afterScope, context });
+  return { fields, effect, roles: roleFixture.roles, interpreter, roleDictionary, last: roleFixture.last };
+}
+function runColon(test: DifferentialCase): Result {
+  const operation = test.input.operation; assert(typeof operation === "string", "colon fixture needs operation"); const memory = new Memory(); let fields: ColonFields; let roles: ColonRoles; let interpreter: LinkHandle; let roleDictionary: LinkHandle; let forgedRoleDictionary: LinkHandle | undefined; let structuralEventDistinct = false;
+  if (operation === "repeated-event") {
+    const content = memory.ensureStartSelfClosed(memory.root); const form = memory.ensureStartSelfClosed(content); const base = defineDictionaryScope(memory, memory.root, memory.root); const first = defineDictionaryEffect(memory, base, memory.root, memory.root, content, form); const fixture = makeColonFixture(memory, { beforeDictionary: first.afterScope, parent: memory.root, historyBefore: first.historyAfter, sourceContent: content, form });
+    ({ fields, roles, interpreter, roleDictionary } = fixture); structuralEventDistinct = fixture.effect.occurrence !== first.occurrence;
+  } else if (operation === "conflict") {
+    const content = memory.ensureStartSelfClosed(memory.root); const formOne = memory.ensureStartSelfClosed(content); const formTwo = memory.ensureStartSelfClosed(formOne); const base = defineDictionaryScope(memory, memory.root, memory.root); const first = defineDictionaryEffect(memory, base, memory.root, memory.root, content, formOne); const fixture = makeColonFixture(memory, { beforeDictionary: first.afterScope, parent: memory.root, historyBefore: first.historyAfter, sourceContent: content, form: formTwo });
+    const evidence = colonEvidence(memory, fixture.fields, fixture.roles, fixture.interpreter, fixture.roleDictionary);
+    try { replayColonEffect(memory, evidence); }
+    catch (error) { if (error instanceof InterpreterReplayError) return { id: test.id, accepted: false, error: "invalid-colon-evidence" }; throw error; }
+    throw new Error("colon conflict was unexpectedly accepted");
+  } else {
+    const fixture = makeColonFixture(memory); ({ fields, roles, interpreter, roleDictionary } = fixture);
+    if (operation === "forged-occurrence") fields = Object.freeze({ ...fields, definitionOccurrence: memory.ensureStartSelfClosed(fixture.last) });
+    else if (operation === "forged-history") fields = Object.freeze({ ...fields, historyAfter: memory.ensure(memory.ensureStartSelfClosed(fixture.last), fields.definitionOccurrence) });
+    else if (operation === "forged-act") forgedRoleDictionary = memory.ensureStartSelfClosed(fixture.last);
+    else if (operation !== "valid") throw new Error(`unknown colon operation: ${operation}`);
+  }
+  let evidence = colonEvidence(memory, fields, roles, interpreter, roleDictionary);
+  if (forgedRoleDictionary !== undefined) evidence = Object.freeze({ ...evidence, roleDictionary: forgedRoleDictionary });
+  const before = memory.linkCount;
+  try {
+    const result = replayColonEffect(memory, evidence); const after = memory.linkCount; const beforeScope = readDictionaryScope(memory, fields.beforeDictionary); const afterScope = readDictionaryScope(memory, fields.afterDictionary); const resolution = lookupScopedDictionary(memory, fields.afterDictionary, fields.sourceContent); const beforeResolution = lookupScopedDictionary(memory, fields.beforeDictionary, fields.sourceContent); const history = memory.poles(fields.historyAfter);
+    return { id: test.id, accepted: true, observable: { resultMatchesExpected: result === fields.afterDictionary, occurrenceVisibleAfter: resolution !== undefined && resolution.occurrences.includes(fields.definitionOccurrence), occurrenceInvisibleBefore: beforeResolution === undefined || !beforeResolution.occurrences.includes(fields.definitionOccurrence), parentPreserved: beforeScope.parentScope === afterScope.parentScope, historyAppended: history.start === fields.historyBefore && history.end === fields.definitionOccurrence, structuralEventDistinct, readOnlyCountStable: before === after } };
+  } catch (error) {
+    if (error instanceof InterpreterReplayError) return { id: test.id, accepted: false, error: "invalid-colon-evidence" };
+    throw error;
+  }
+}
+
+function equalityRoles(memory: Memory, cursor: LinkHandle): { readonly roles: EqualityRoles; readonly last: LinkHandle } {
+  const chain = anchorChain(memory, cursor, 5); const r = chain.refs;
+  return { roles: Object.freeze({ context: r[0]!, left: r[1]!, right: r[2]!, leftRepresentative: r[3]!, rightRepresentative: r[4]! }), last: chain.last };
+}
+function equalityEvidence(memory: Memory, roles: EqualityRoles, interpreter: LinkHandle, roleDictionary: LinkHandle, context: LinkHandle, left: LinkHandle, right: LinkHandle, leftRepresentative: LinkHandle, rightRepresentative: LinkHandle): EqualityReplayEvidence {
+  const act = defineActHeader(memory, interpreter, roleDictionary, context); const values: readonly [LinkHandle, LinkHandle][] = [[roles.context, context], [roles.left, left], [roles.right, right], [roles.leftRepresentative, leftRepresentative], [roles.rightRepresentative, rightRepresentative]];
+  for (const [role, value] of values) defineActField(memory, act, role, value);
+  return Object.freeze({ act, roles, interpreter, roleDictionary });
+}
+function runEquality(test: DifferentialCase): Result {
+  const operation = test.input.operation; assert(typeof operation === "string", "equality fixture needs operation"); const memory = new Memory(); const base = anchorChain(memory, memory.root, 7); let cursor = base.last; const [parent, current, originalLeft, originalRight, representative, interpreter, roleDictionary] = base.refs; assert(parent && current && originalLeft && originalRight && representative && interpreter && roleDictionary, "equality refs");
+  const context = defineContext(memory, parent, current); let left = originalLeft; let right = originalRight; let leftRepresentative = left; let rightRepresentative = right; let forgedRoleDictionary: LinkHandle | undefined; let expected = false;
+  if (operation === "identical") { right = left; rightRepresentative = left; expected = true; }
+  else if (operation === "distinct") {}
+  else if (operation === "shared-representative") { defineLocalRepresentativeBinding(memory, context, left, representative); defineLocalRepresentativeBinding(memory, context, right, representative); leftRepresentative = representative; rightRepresentative = representative; expected = true; }
+  else if (operation === "one-hop") { defineLocalRepresentativeBinding(memory, context, left, right); leftRepresentative = right; rightRepresentative = right; expected = true; }
+  else if (operation === "non-transitive") { defineLocalRepresentativeBinding(memory, context, left, right); defineLocalRepresentativeBinding(memory, context, right, representative); leftRepresentative = right; rightRepresentative = representative; expected = false; }
+  else if (operation === "conflict") { defineLocalRepresentativeBinding(memory, context, left, right); defineLocalRepresentativeBinding(memory, context, left, representative); leftRepresentative = right; }
+  else if (operation === "forged-representative") { leftRepresentative = representative; }
+  else if (operation === "forged-act") forgedRoleDictionary = memory.ensureStartSelfClosed(cursor);
+  else throw new Error(`unknown equality operation: ${operation}`);
+  const roleFixture = equalityRoles(memory, cursor); cursor = roleFixture.last; let evidence = equalityEvidence(memory, roleFixture.roles, interpreter, roleDictionary, context, left, right, leftRepresentative, rightRepresentative);
+  if (forgedRoleDictionary !== undefined) evidence = Object.freeze({ ...evidence, roleDictionary: forgedRoleDictionary });
+  const before = memory.linkCount;
+  try {
+    const equal = replayEqualityEvaluation(memory, evidence); const after = memory.linkCount;
+    return { id: test.id, accepted: true, observable: { equal, resultMatchesExpected: equal === expected, readOnlyCountStable: before === after } };
+  } catch (error) {
+    if (error instanceof InterpreterReplayError || (error instanceof StateError && error.code === "representative-conflict")) return { id: test.id, accepted: false, error: "invalid-equality-evidence" };
+    throw error;
+  }
+}
+
 const repoRoot = resolve(process.cwd(), "..");
 const fixturePath = resolve(repoRoot, "differential/fixtures-v0.7.json");
 const corpus = JSON.parse(readFileSync(fixturePath, "utf8")) as Corpus;
@@ -406,7 +504,7 @@ assert(corpus.contract === "mts-contract/v0.7", "differential fixtures must sele
 const python = spawnSync("python3", ["differential/python_oracle.py", "differential/fixtures-v0.7.json"], { cwd: repoRoot, encoding: "utf8" });
 assert(python.status === 0, `frozen Python oracle adapter failed: ${python.stderr || python.stdout}`);
 const expected = JSON.parse(python.stdout) as Result[];
-const runners: Record<DifferentialCase["category"], (test: DifferentialCase) => Result> = { topology: runTopology, anum: runAnum, persistence: runPersistence, source: runSource, state: runState, dictionary: runDictionary, selection: runSelection, relation: runRelation, flat: runFlat };
+const runners: Record<DifferentialCase["category"], (test: DifferentialCase) => Result> = { topology: runTopology, anum: runAnum, persistence: runPersistence, source: runSource, state: runState, dictionary: runDictionary, selection: runSelection, relation: runRelation, flat: runFlat, colon: runColon, equality: runEquality };
 const actual = corpus.cases.map((test) => runners[test.category](test));
 assert(expected.length === actual.length, "differential result cardinality mismatch");
 expected.forEach((pythonResult, index) => {
