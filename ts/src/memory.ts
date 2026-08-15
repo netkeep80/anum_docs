@@ -24,6 +24,15 @@ export interface ReadMemory {
 }
 
 /**
+ * Narrow opt-in capability for replay that must prove an exact append-only
+ * before→after effect. The returned position is checker bookkeeping only: it
+ * never participates in semantic Link identity or ordered-pair canonicality.
+ */
+export interface AppendOnlyReadMemory extends ReadMemory {
+  issuanceIndex(link: LinkHandle): number;
+}
+
+/**
  * Narrow opt-in capability for operations whose accepted result is the whole
  * selected memory (for example an explicit all-links wildcard). Ordinary
  * replay/checkers should continue to depend on ReadMemory only.
@@ -51,7 +60,7 @@ export class MemoryError extends Error {
   override readonly name = "MemoryError";
 }
 
-export class Memory implements WriteMemory, EnumerableReadMemory {
+export class Memory implements WriteMemory, AppendOnlyReadMemory, EnumerableReadMemory {
   private readonly owner = Symbol("mts.memory.owner");
   private readonly handles: InternalHandle[] = [];
   private readonly links: LinkPoles[] = [];
@@ -151,6 +160,10 @@ export class Memory implements WriteMemory, EnumerableReadMemory {
   incoming(end: LinkHandle): readonly LinkHandle[] {
     const canonicalEnd = this.requireHandle(end);
     return [...(this.incomingIndex.get(canonicalEnd) ?? [])];
+  }
+
+  issuanceIndex(link: LinkHandle): number {
+    return this.requireHandle(link).slot;
   }
 
   allLinks(): readonly LinkHandle[] {
