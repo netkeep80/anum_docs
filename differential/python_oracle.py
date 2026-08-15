@@ -6,12 +6,16 @@ from pathlib import Path
 import sys
 import tempfile
 
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from core.anum_protocol import StreamError, deserialize_stream
 from core.foundation_v2_persistent import JsonLinkStore, PERSISTENT_SCHEMA, PersistentStoreError
 from core.rooted_link_network import LinkNetwork, LinkNetworkBuilder, LinkNetworkError, NetworkSnapshot
 
 
-ROOT = Path(__file__).resolve().parents[1]
 FROZEN_ORACLE_SHA = "ef42d91a868bbc5b7004acc325006ad27db3bb68"
 FROZEN_BLOBS = {
     "core/rooted_link_network.py": "e914e6f70628f82484bcde43fabdf29a93300a6b",
