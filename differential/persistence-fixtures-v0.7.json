@@ -1,0 +1,22 @@
+{
+  "schema": "mts-persistence-differential-fixtures/v0.1",
+  "contract": "mts-contract/v0.7",
+  "pythonOracleSha": "ef42d91a868bbc5b7004acc325006ad27db3bb68",
+  "cases": [
+    {"id":"persistence-fresh-root","operation":"fresh-root"},
+    {"id":"persistence-basis-loop","operation":"basis-loop"},
+    {"id":"persistence-reopen","operation":"reopen"},
+    {"id":"persistence-fresh-lineage","operation":"fresh-lineage"},
+    {"id":"persistence-read-only","operation":"read-only"},
+    {"id":"persistence-batch-dependency","operation":"batch-dependency"},
+    {"id":"persistence-batch-double-self","operation":"batch-double-self"},
+    {"id":"persistence-runtime-prefix","operation":"runtime-prefix"},
+    {"id":"persistence-forward-batch","operation":"forward-batch"},
+    {"id":"persistence-foreign-id","operation":"foreign-id"},
+    {"id":"persistence-invalid-coordinate","operation":"invalid-coordinate"},
+    {"id":"persistence-second-root","operation":"second-root"},
+    {"id":"persistence-duplicate-pair","operation":"duplicate-pair"},
+    {"id":"persistence-forward-cycle","operation":"forward-cycle"},
+    {"id":"persistence-commit-failure","operation":"commit-failure"}
+  ]
+}
