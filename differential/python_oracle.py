@@ -13,6 +13,15 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from core.anum_protocol import StreamError, deserialize_stream
+from core.foundation_v2_interpreter import (
+    FlatSequenceReadingEvidence,
+    FlatSequenceReadingRoleRefs,
+    InterpreterReplayError,
+    RelationStepEvidence,
+    RelationStepRoleRefs,
+    replay_flat_sequence_reading,
+    replay_relation_step,
+)
 from core.foundation_v2_persistent import JsonLinkStore, PERSISTENT_SCHEMA, PersistentStoreError
 from core.foundation_v2_source import (
     SegmentSpec,
@@ -25,6 +34,8 @@ from core.foundation_v2_state import (
     DictionaryLookupError,
     RepresentativeConflictError,
     current_of_context,
+    define_act_field,
+    define_act_header,
     define_context,
     define_dictionary_effect,
     define_dictionary_scope,
@@ -54,6 +65,7 @@ FROZEN_BLOBS = {
     "core/foundation_v2_materialization.py": "ff894030ec06f15acb8530cda8fe2143ecabbed3",
     "core/foundation_v2_source.py": "12c764f2ab0d7b2b98078cccb6325d0663be5996",
     "core/foundation_v2_state.py": "70e7ae5eece7f347d0879ba73edc3477cf91f8b7",
+    "core/foundation_v2_interpreter.py": "851fc6bb8050ebfe55d9c89b26df42aa90b2ec37",
 }
 
 
@@ -171,6 +183,13 @@ def next_anchor(builder: LinkNetworkBuilder, current):
     return builder.ensure_start_self_closed(current)
 
 
+def anchors(builder: LinkNetworkBuilder, current, count: int):
+    refs = []
+    for _ in range(count):
+        current = next_anchor(builder, current); refs.append(current)
+    return refs, current
+
+
 def run_source(case: dict) -> dict:
     operation = case["input"]["operation"]
     builder = LinkNetworkBuilder(); root = builder.ensure_root()
@@ -228,26 +247,19 @@ def run_dictionary(case: dict) -> dict:
         try: read_dictionary_scope(network, root)
         except DictionaryLookupError: return {"id": case["id"], "accepted": False, "error": "invalid-dictionary"}
         raise RuntimeError("root dictionary sentinel was unexpectedly accepted")
-
     scope = define_dictionary_scope(builder, root, root)
-    first = define_dictionary_effect(builder, scope, root, root, content, form_one)
-    repeated = define_dictionary_effect(builder, scope, root, root, content, form_one)
+    first = define_dictionary_effect(builder, scope, root, root, content, form_one); repeated = define_dictionary_effect(builder, scope, root, root, content, form_one)
     selected = first.after_scope; expected_form = form_one; expected_occurrence = first.occurrence
-    if operation == "parent-visible":
-        selected = define_dictionary_scope(builder, first.after_scope, root)
+    if operation == "parent-visible": selected = define_dictionary_scope(builder, first.after_scope, root)
     elif operation == "shadow":
-        child = define_dictionary_scope(builder, first.after_scope, root)
-        second = define_dictionary_effect(builder, child, first.after_scope, root, content, form_two)
+        child = define_dictionary_scope(builder, first.after_scope, root); second = define_dictionary_effect(builder, child, first.after_scope, root, content, form_two)
         selected = second.after_scope; expected_form = form_two; expected_occurrence = second.occurrence
     elif operation == "conflict":
-        second = define_dictionary_effect(builder, first.after_scope, root, first.history_after, content, form_two)
-        network = builder.freeze(root)
+        second = define_dictionary_effect(builder, first.after_scope, root, first.history_after, content, form_two); network = builder.freeze(root)
         try: lookup_scoped_dictionary(network, second.after_scope, content)
         except DictionaryConflictError: return {"id": case["id"], "accepted": False, "error": "local-form-conflict"}
         raise RuntimeError("dictionary local conflict was unexpectedly accepted")
-    elif operation not in ("single", "forged-occurrence"):
-        raise RuntimeError(f"unknown dictionary operation: {operation}")
-
+    elif operation not in ("single", "forged-occurrence"): raise RuntimeError(f"unknown dictionary operation: {operation}")
     network = builder.freeze(root); before = network.snapshot(); resolution = lookup_scoped_dictionary(network, selected, content)
     if resolution is None: raise RuntimeError("dictionary fixture did not resolve")
     if operation == "forged-occurrence":
@@ -261,15 +273,13 @@ def run_dictionary(case: dict) -> dict:
 def selection_fixture(builder, root, data, segments):
     refs = byte_vocabulary(builder, root); front_end = SourceFrontEndBuilder(builder, root, refs); source = front_end.source_occurrence(data)
     cursor = refs[255]; forms = []
-    for _ in segments:
-        cursor = next_anchor(builder, cursor); forms.append(cursor)
+    for _ in segments: cursor = next_anchor(builder, cursor); forms.append(cursor)
     grammar = next_anchor(builder, cursor); theory = next_anchor(builder, grammar)
     dictionary = define_dictionary_scope(builder, root, root); history = root; specs = []
     for start, end, form_index in segments:
         slice_content = front_end.content_ref(data[start:end]); form = forms[form_index]
         effect = define_dictionary_effect(builder, dictionary, root, history, slice_content, form)
-        dictionary = effect.after_scope; history = effect.history_after
-        specs.append(SegmentSpec(start, end, form, effect.occurrence))
+        dictionary = effect.after_scope; history = effect.history_after; specs.append(SegmentSpec(start, end, form, effect.occurrence))
     return refs, front_end, source, forms, dictionary, grammar, theory, specs
 
 
@@ -284,7 +294,6 @@ def run_selection(case: dict) -> dict:
         ev2 = front_end.build_selected_evidence(source, (SegmentSpec(0, len(data), form_two, e2.occurrence),), dictionary=e2.after_scope, grammar=grammar, theory=theory)
         network = builder.freeze(root); before = network.snapshot(); r1 = replay_source_front_end(network, ev1, refs); r2 = replay_source_front_end(network, ev2, refs); after = network.snapshot()
         return {"id": case["id"], "accepted": True, "observable": {"firstMatches": r1 == (form_one,), "secondMatches": r2 == (form_two,), "formsDistinct": form_one is not form_two, "sourceShared": ev1.source is ev2.source, "contentShared": ev1.content is ev2.content, "readOnlyCountStable": len(before.links) == len(after.links)}}
-
     segments = [tuple(item) for item in case["input"].get("segments", [[0, len(data), 0]])]
     refs, front_end, source, forms, dictionary, grammar, theory, specs = selection_fixture(builder, root, data, segments)
     if operation == "invalid-partition":
@@ -292,8 +301,7 @@ def run_selection(case: dict) -> dict:
         except SourceReplayError: return {"id": case["id"], "accepted": False, "error": "invalid-selected-partition"}
         raise RuntimeError("invalid selected partition was unexpectedly accepted")
     evidence = front_end.build_selected_evidence(source, tuple(specs), dictionary=dictionary, grammar=grammar, theory=theory)
-    if operation == "forged-resolution":
-        evidence = replace(evidence, segments=(replace(evidence.segments[0], resolution=root),))
+    if operation == "forged-resolution": evidence = replace(evidence, segments=(replace(evidence.segments[0], resolution=root),))
     network = builder.freeze(root); before = network.snapshot()
     try: resolved = replay_source_front_end(network, evidence, refs)
     except SourceReplayError:
@@ -303,10 +311,111 @@ def run_selection(case: dict) -> dict:
     return {"id": case["id"], "accepted": True, "observable": {"formCount": len(resolved), "formsMatchExpected": resolved == expected, "readOnlyCountStable": len(before.links) == len(after.links)}}
 
 
+def relation_roles(builder, cursor):
+    refs, cursor = anchors(builder, cursor, 11)
+    return RelationStepRoleRefs(*refs), cursor
+
+
+def flat_roles(builder, cursor):
+    refs, cursor = anchors(builder, cursor, 9)
+    return FlatSequenceReadingRoleRefs(*refs), cursor
+
+
+def add_act_fields(builder, act, roles, values):
+    for role, value in zip(roles.__dict__.values(), values, strict=True): define_act_field(builder, act, role, value)
+
+
+def relation_fixture(operation: str):
+    builder = LinkNetworkBuilder(); root = builder.ensure_root(); byte_refs = byte_vocabulary(builder, root); front = SourceFrontEndBuilder(builder, root, byte_refs); cursor = byte_refs[255]
+    base, cursor = anchors(builder, cursor, 6); fixed, parent, binding, interpreter, role_dictionary, forged = base
+    if operation in ("start-open", "forged-result", "forged-binding", "forged-dgt", "forged-act"): form = builder.ensure_start_self_closed(fixed); expected_poles = (binding, fixed)
+    elif operation == "end-open": form = builder.ensure_end_self_closed(fixed); expected_poles = (fixed, binding)
+    elif operation == "complete-form":
+        other = next_anchor(builder, cursor); cursor = other; form = builder.ensure(fixed, other); expected_poles = (binding, other)
+    else: raise RuntimeError(f"unknown relation operation: {operation}")
+    grammar = next_anchor(builder, form); theory = next_anchor(builder, grammar); cursor = theory
+    source = front.source_occurrence(b"x"); dictionary = define_dictionary_scope(builder, root, root)
+    effect = define_dictionary_effect(builder, dictionary, root, root, front.content_ref(b"x"), form); dictionary = effect.after_scope
+    source_evidence = front.build_selected_evidence(source, (SegmentSpec(0, 1, form, effect.occurrence),), dictionary=dictionary, grammar=grammar, theory=theory)
+    before_context = define_context(builder, parent, binding); result = builder.ensure(*expected_poles); after_context = define_context(builder, parent, result)
+    roles, cursor = relation_roles(builder, cursor); act = define_act_header(builder, interpreter, role_dictionary, after_context)
+    values = (source_evidence.source, source_evidence.selection_sequence, source_evidence.form_sequence, dictionary, grammar, theory, form, before_context, binding, result, after_context)
+    add_act_fields(builder, act, roles, values)
+    wrong_end = next_anchor(builder, cursor); wrong_result = builder.ensure(binding, wrong_end)
+    evidence = RelationStepEvidence(source_evidence, interpreter, form, before_context, binding, result, after_context, act, role_dictionary, roles)
+    if operation == "forged-result": evidence = replace(evidence, result=wrong_result)
+    elif operation == "forged-binding": evidence = replace(evidence, binding=fixed)
+    elif operation == "forged-dgt": evidence = replace(evidence, source_evidence=replace(source_evidence, grammar=forged))
+    elif operation == "forged-act": evidence = replace(evidence, role_dictionary=forged)
+    return builder.freeze(root), byte_refs, evidence, result
+
+
+def run_relation(case: dict) -> dict:
+    operation = case["input"]["operation"]; network, byte_refs, evidence, expected = relation_fixture(operation); before = network.snapshot()
+    try: result = replay_relation_step(network, evidence, byte_refs)
+    except InterpreterReplayError:
+        return {"id": case["id"], "accepted": False, "error": "invalid-relation-evidence"}
+    after = network.snapshot()
+    return {"id": case["id"], "accepted": True, "observable": {"resultMatchesExpected": result is expected, "readOnlyCountStable": before == after}}
+
+
+def flat_standard_fixture(operation: str):
+    count = 1 if operation == "single" else 2
+    builder = LinkNetworkBuilder(); root = builder.ensure_root(); byte_refs = byte_vocabulary(builder, root); front = SourceFrontEndBuilder(builder, root, byte_refs); cursor = byte_refs[255]
+    forms, cursor = anchors(builder, cursor, count); grammar = next_anchor(builder, cursor); theory = next_anchor(builder, grammar); cursor = theory
+    dictionary = define_dictionary_scope(builder, root, root); history = root; specs = []; data = bytes(97 + index for index in range(count))
+    for index, form in enumerate(forms):
+        effect = define_dictionary_effect(builder, dictionary, root, history, front.content_ref(bytes([97 + index])), form)
+        dictionary = effect.after_scope; history = effect.history_after; specs.append(SegmentSpec(index, index + 1, form, effect.occurrence))
+    source = front.source_occurrence(data); source_evidence = front.build_selected_evidence(source, tuple(specs), dictionary=dictionary, grammar=grammar, theory=theory)
+    base, cursor = anchors(builder, cursor, 5); interpreter, role_dictionary, parent, current, forged = base
+    result = forms[0] if count == 1 else builder.ensure(forms[0], forms[1]); before_context = define_context(builder, parent, current); after_context = define_context(builder, parent, result)
+    roles, cursor = flat_roles(builder, cursor); act = define_act_header(builder, interpreter, role_dictionary, after_context)
+    values = (source_evidence.source, source_evidence.selection_sequence, source_evidence.form_sequence, dictionary, grammar, theory, before_context, result, after_context)
+    add_act_fields(builder, act, roles, values)
+    wrong = builder.ensure(forms[0], next_anchor(builder, cursor)); evidence = FlatSequenceReadingEvidence(source_evidence, interpreter, before_context, result, after_context, act, role_dictionary, roles)
+    if operation == "forged-result": evidence = replace(evidence, result=wrong)
+    elif operation == "forged-dgt": evidence = replace(evidence, source_evidence=replace(source_evidence, theory=forged))
+    elif operation == "forged-act": evidence = replace(evidence, role_dictionary=forged)
+    return builder.freeze(root), byte_refs, evidence, result, count
+
+
+def flat_distinct_fixture():
+    builder = LinkNetworkBuilder(); root = builder.ensure_root(); byte_refs = byte_vocabulary(builder, root); front = SourceFrontEndBuilder(builder, root, byte_refs); cursor = byte_refs[255]
+    refs, cursor = anchors(builder, cursor, 2); a, b = refs; carrier_a = builder.ensure(root, a); carrier_ab = builder.ensure(carrier_a, b); pair_result = builder.ensure(a, b)
+    dictionary = define_dictionary_scope(builder, root, root); history = root; occurrences = {}
+    for raw, form in ((b"a", a), (b"b", b), (b"ab", carrier_ab)):
+        effect = define_dictionary_effect(builder, dictionary, root, history, front.content_ref(raw), form); dictionary = effect.after_scope; history = effect.history_after; occurrences[raw] = effect.occurrence
+    source = front.source_occurrence(b"ab"); dgt, cursor = anchors(builder, cursor, 4); pair_g, pair_t, carrier_g, carrier_t = dgt
+    pair_source = front.build_selected_evidence(source, (SegmentSpec(0, 1, a, occurrences[b"a"]), SegmentSpec(1, 2, b, occurrences[b"b"])), dictionary=dictionary, grammar=pair_g, theory=pair_t)
+    carrier_source = front.build_selected_evidence(source, (SegmentSpec(0, 2, carrier_ab, occurrences[b"ab"]),), dictionary=dictionary, grammar=carrier_g, theory=carrier_t)
+    base, cursor = anchors(builder, cursor, 4); interpreter, role_dictionary, parent, current = base; before_context = define_context(builder, parent, current); roles, cursor = flat_roles(builder, cursor)
+    def reading(source_evidence, result):
+        after_context = define_context(builder, parent, result); act = define_act_header(builder, interpreter, role_dictionary, after_context)
+        values = (source_evidence.source, source_evidence.selection_sequence, source_evidence.form_sequence, dictionary, source_evidence.grammar, source_evidence.theory, before_context, result, after_context); add_act_fields(builder, act, roles, values)
+        return FlatSequenceReadingEvidence(source_evidence, interpreter, before_context, result, after_context, act, role_dictionary, roles)
+    first = reading(pair_source, pair_result); second = reading(carrier_source, carrier_ab); network = builder.freeze(root)
+    return network, byte_refs, first, second, pair_result, carrier_ab
+
+
+def run_flat(case: dict) -> dict:
+    operation = case["input"]["operation"]
+    if operation == "distinct-readings":
+        network, byte_refs, first, second, first_expected, second_expected = flat_distinct_fixture(); before = network.snapshot()
+        first_result = replay_flat_sequence_reading(network, first, byte_refs); second_result = replay_flat_sequence_reading(network, second, byte_refs); after = network.snapshot()
+        return {"id": case["id"], "accepted": True, "observable": {"sameSource": first.source_evidence.source is second.source_evidence.source, "readingsDistinct": first_result is not second_result, "resultsMatchExpected": first_result is first_expected and second_result is second_expected, "readOnlyCountStable": before == after}}
+    network, byte_refs, evidence, expected, count = flat_standard_fixture(operation); before = network.snapshot()
+    try: result = replay_flat_sequence_reading(network, evidence, byte_refs)
+    except InterpreterReplayError:
+        return {"id": case["id"], "accepted": False, "error": "invalid-flat-evidence"}
+    after = network.snapshot()
+    return {"id": case["id"], "accepted": True, "observable": {"formCount": count, "resultMatchesExpected": result is expected, "readOnlyCountStable": before == after}}
+
+
 def main() -> int:
     if len(sys.argv) != 2: raise SystemExit("usage: python_oracle.py FIXTURES.json")
     corpus = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8")); verify_freeze(corpus); results = []
-    runners = {"topology": run_topology, "anum": run_anum, "persistence": run_persistence, "source": run_source, "state": run_state, "dictionary": run_dictionary, "selection": run_selection}
+    runners = {"topology": run_topology, "anum": run_anum, "persistence": run_persistence, "source": run_source, "state": run_state, "dictionary": run_dictionary, "selection": run_selection, "relation": run_relation, "flat": run_flat}
     for case in corpus["cases"]:
         runner = runners.get(case["category"])
         if runner is None: raise RuntimeError(f"unknown differential category: {case['category']}")
