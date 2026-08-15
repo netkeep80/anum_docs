@@ -20,6 +20,16 @@
     {"id":"persistence-basis-loop-reopen","category":"persistence","input":{"operation":"basis-loop-reopen"}},
     {"id":"persistence-same-pair","category":"persistence","input":{"operation":"same-pair"}},
     {"id":"persistence-second-root","category":"persistence","input":{"operation":"open-topology","root":0,"links":[[0,0],[1,1]]}},
-    {"id":"persistence-id-cycle","category":"persistence","input":{"operation":"open-topology","root":0,"links":[[0,0],[2,0],[1,0]]}}
+    {"id":"persistence-id-cycle","category":"persistence","input":{"operation":"open-topology","root":0,"links":[[0,0],[2,0],[1,0]]}},
+
+    {"id":"source-empty","category":"source","input":{"operation":"round-trip","bytes":[]}},
+    {"id":"source-ascii","category":"source","input":{"operation":"round-trip","bytes":[97,98]}},
+    {"id":"source-utf8-arrow","category":"source","input":{"operation":"round-trip","bytes":[97,226,159,188,98]}},
+    {"id":"source-invalid-vocabulary","category":"source","input":{"operation":"invalid-vocabulary","bytes":[97]}},
+
+    {"id":"state-context","category":"state","input":{"operation":"context"}},
+    {"id":"state-representative-default","category":"state","input":{"operation":"representative-default"}},
+    {"id":"state-representative-binding","category":"state","input":{"operation":"representative-binding"}},
+    {"id":"state-representative-conflict","category":"state","input":{"operation":"representative-conflict"}}
   ]
 }
