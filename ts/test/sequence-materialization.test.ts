@@ -1,4 +1,4 @@
-import { Memory, type LinkHandle, type LinkPoles, type ReadMemory } from "../src/memory.js";
+import { Memory, type AppendOnlyReadMemory, type LinkHandle, type LinkPoles } from "../src/memory.js";
 import {
   SequenceReplayError,
   materializeSequence,
@@ -181,12 +181,13 @@ const description = (memory: Memory, ...items: SequenceItem[]): SequenceDescript
   same(m.linkCount, before, "missing replay pair not materialized");
 }
 
-class Probe implements ReadMemory {
-  constructor(private readonly source: ReadMemory) {}
+class Probe implements AppendOnlyReadMemory {
+  constructor(private readonly source: AppendOnlyReadMemory) {}
   get root(): LinkHandle { return this.source.root; }
   get linkCount(): number { return this.source.linkCount; }
   poles(link: LinkHandle): LinkPoles { return this.source.poles(link); }
   find(start: LinkHandle, end: LinkHandle): LinkHandle | undefined { return this.source.find(start, end); }
+  issuanceIndex(link: LinkHandle): number { return this.source.issuanceIndex(link); }
   outgoing(): readonly LinkHandle[] { throw new Error("materialization replay must not scan outgoing"); }
   incoming(): readonly LinkHandle[] { throw new Error("materialization replay must not scan incoming"); }
 }
