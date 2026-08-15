@@ -1,3 +1,4 @@
+import type { LinkHandle } from "./memory.js";
 import {
   STORAGE_TOPOLOGY_SCHEMA,
   exportTopology,
@@ -30,6 +31,11 @@ export type BatchEndpoint = PersistentLinkId | BatchRef;
 export interface BatchLink {
   readonly start: BatchEndpoint;
   readonly end: BatchEndpoint;
+}
+
+export interface PersistentRuntimeView {
+  readonly memory: ReturnType<typeof restoreTopology>;
+  readonly refs: readonly LinkHandle[];
 }
 
 export class PersistentStoreError extends Error {
@@ -162,6 +168,24 @@ export class PersistentStore {
 
   runtimeMemory() {
     return restoreTopology(this.dataset.topology);
+  }
+
+  runtimeView(count = this.count): PersistentRuntimeView {
+    if (!coordinate(count) || count <= this.dataset.topology.root || count > this.count) {
+      invalid("invalid persistent runtime prefix count");
+    }
+    const links = this.dataset.topology.links.slice(0, count);
+    for (const [start, end] of links) {
+      if (start >= count || end >= count) invalid("persistent runtime prefix is not topologically closed");
+    }
+    const memory = restoreTopology(Object.freeze({
+      schema: STORAGE_TOPOLOGY_SCHEMA,
+      root: this.dataset.topology.root,
+      links: Object.freeze(links),
+    }));
+    const refs = memory.allLinks();
+    if (refs.length !== count) invalid("persistent runtime prefix cardinality mismatch");
+    return Object.freeze({ memory, refs: Object.freeze([...refs]) });
   }
 
   materialize(start: PersistentLinkId, end: PersistentLinkId): PersistentLinkId {
