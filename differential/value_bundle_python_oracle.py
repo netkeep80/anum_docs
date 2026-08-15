@@ -86,6 +86,12 @@ def expansion_fixture():
     return network, root, one, two, three, labels
 
 
+def foreign_network():
+    builder = LinkNetworkBuilder()
+    root = builder.ensure_root()
+    return builder.freeze(root)
+
+
 def occurrence(path, link):
     return ResolvedOccurrence(path=tuple(path), link=link)
 
@@ -185,7 +191,7 @@ def analyze(case: dict) -> dict:
 
     if operation == "resolved-foreign":
         network, _root, _one, _two, _three, _labels = expansion_fixture()
-        other = LinkNetworkBuilder().freeze()
+        other = foreign_network()
         try:
             resolve_flat_bundle(network, (occurrence((0,), other.root),))
         except ValueBundleReplayError:
@@ -193,7 +199,7 @@ def analyze(case: dict) -> dict:
         raise RuntimeError("foreign resolved occurrence unexpectedly accepted")
 
     if operation == "expansion-matrix":
-        network, root, one, two, three, labels = expansion_fixture()
+        network, root, one, two, _three, labels = expansion_fixture()
         before = network.snapshot()
         cases = (
             ("single-to-bundle", scalar_value(root), bundle_value(network, root, one)),
@@ -227,7 +233,7 @@ def analyze(case: dict) -> dict:
 
     if operation == "expansion-foreign":
         network, _root, one, _two, _three, _labels = expansion_fixture()
-        other = LinkNetworkBuilder().freeze()
+        other = foreign_network()
         forged = BundleValue(links=frozenset({other.root}))
         try:
             expand_resolved_bundle_query(network, forged, scalar_value(one))
