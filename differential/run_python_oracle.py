@@ -213,14 +213,13 @@ def analyze(case: dict) -> dict:
         acts = replay_run(network, evidence)
     except RunReplayError:
         return {"id": case["id"], "accepted": False, "error": "invalid-run-evidence"}
-    return {
-        "id": case["id"],
-        "accepted": True,
-        "observable": {
-            "acts": [labels[act] for act in acts],
-            "readOnlyCountStable": before == network.snapshot(),
-        },
+    observable = {
+        "acts": [labels[act] for act in acts],
+        "readOnlyCountStable": before == network.snapshot(),
     }
+    if operation == "linear":
+        observable["shortcutAbsent"] = network.find(k0, k2) is None
+    return {"id": case["id"], "accepted": True, "observable": observable}
 
 
 def main() -> int:
