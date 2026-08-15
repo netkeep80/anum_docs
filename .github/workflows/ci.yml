@@ -91,16 +91,20 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Check root directory cleanliness
+        shell: bash
         run: |
           echo "Checking root directory..."
-          ALLOWED_FILES="README.md LICENSE .gitignore .gitkeep"
-          for file in *; do
-            if [ -f "$file" ]; then
-              if ! echo "$ALLOWED_FILES" | grep -qw "$file"; then
-                echo "::warning::Unexpected file in root: $file"
-              fi
+          allowed='README.md|LICENSE|PORTFOLIO.md|repo-policy.json|.gitignore|.gitkeep'
+          unexpected=0
+          while IFS= read -r file; do
+            if ! grep -Eq "^(${allowed})$" <<< "$file"; then
+              echo "::error::Unexpected file in root: $file"
+              unexpected=1
             fi
-          done
+          done < <(find . -maxdepth 1 -type f -printf '%f\n' | sort)
+          if [ "$unexpected" -ne 0 ]; then
+            exit 1
+          fi
           echo "Root directory check complete."
 
       - name: Check required directories exist
