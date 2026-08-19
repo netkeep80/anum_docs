@@ -1,0 +1,85 @@
+{
+  "schema": "mts-conformance/v0.10",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 680,
+  "candidateLifecycleIssue": 663,
+  "contract": "mts-contract/v0.10",
+  "semanticBase": "mts-conformance/v0.9",
+  "observableSemanticDelta": true,
+  "acceptanceReady": false,
+  "coverageState": "incomplete",
+  "coverageStateMeaning": "semantic candidate boundary is explicit; required v0.10 executable evidence is not yet complete",
+  "acceptedCurrent": {
+    "contract": "mts-contract/v0.9",
+    "conformance": "mts-conformance/v0.9"
+  },
+  "requiredExecutableGates": [],
+  "plannedExecutableGates": [
+    "11-sign closed axiom-aset including dot",
+    "canonical byte carrier for dot",
+    "dot/colon pole-swap evidence",
+    "root and one-sided contextual-dot binding",
+    "nested lexical dot scope",
+    "negative contextual-dot boundaries"
+  ],
+  "requiredFoundationVectors": [
+    "v010-internal-sign-registry-has-eleven-signs",
+    "v010-dot-self-introduction",
+    "v010-colon-meaning-preserved",
+    "v010-dot-root-projection-is-L-to-R",
+    "v010-dot-is-not-new-root-primitive"
+  ],
+  "requiredContextVectors": [
+    "v010-root-dot-dot-resolves-to-root",
+    "v010-start-dot-resolves-to-O",
+    "v010-end-dot-resolves-to-C",
+    "v010-generic-start-dot-binds-current-whole",
+    "v010-generic-end-dot-binds-current-whole",
+    "v010-nested-dot-uses-nearest-lexical-binding"
+  ],
+  "requiredInversionVectors": [
+    "v010-dot-is-pole-swap-of-colon",
+    "v010-colon-is-pole-swap-of-dot"
+  ],
+  "requiredNegativeVectors": [
+    "v010-free-dot-has-no-ambient-current",
+    "v010-dot-is-not-parent-navigation",
+    "v010-dot-is-not-runtime-current",
+    "v010-dot-is-not-read-begin",
+    "v010-dot-is-not-read-end",
+    "v010-dot-is-not-storage-dereference",
+    "v010-dot-is-not-arbitrary-rewrite",
+    "v010-nonroot-full-dot-selfclosure-rejected"
+  ],
+  "evidenceState": {
+    "foundation": "planned",
+    "context": "planned",
+    "inversion": "planned",
+    "negative": "planned",
+    "runtimeMapping": "planned"
+  },
+  "implementationSlices": {
+    "candidateBoundary": {
+      "issue": 680,
+      "status": "candidate-defined",
+      "requiredForAcceptance": true
+    },
+    "executionReconciliation": {
+      "issues": [666, 668],
+      "status": "pending-dot-reconciliation",
+      "requiredForAcceptance": true
+    },
+    "runtimeMapping": {
+      "issue": 669,
+      "status": "pending",
+      "requiredForAcceptance": true
+    }
+  },
+  "acceptanceBlockers": [
+    "no v0.10 executable evidence gate exists yet",
+    "closed execution research still references superseded dot predecessor notation in places",
+    "TypeScript I/K/Act/Run mapping for scoped dot is not complete",
+    "candidate has not passed an explicit acceptance cutover"
+  ]
+}
