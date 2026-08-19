@@ -26,10 +26,11 @@ function expectRuleError(code: StructuralRuleError["code"], effect: () => unknow
 }
 function anchors(memory: Memory, count: number): LinkHandle[] {
   const result: LinkHandle[] = [];
-  let current = memory.root;
+  const seed = memory.ensureEndSelfClosed(memory.root);
+  let tag = memory.ensureStartSelfClosed(memory.root);
   for (let index = 0; index < count; index += 1) {
-    current = memory.ensureStartSelfClosed(current);
-    result.push(current);
+    tag = memory.ensureStartSelfClosed(tag);
+    result.push(memory.ensure(seed, tag));
   }
   return result;
 }
@@ -94,6 +95,7 @@ function defineRuleFixture(
   const fixture = defineRuleFixture(memory, expectedInterpreter, [fixedRole, bindingRole, parentRole], body);
   const form = memory.ensureStartSelfClosed(fixed);
   const result = memory.ensure(binding, fixed);
+  assert(result !== binding && result !== fixed, "relation result fixture must be non-degenerate");
   const beforeContext = defineContext(memory, parent, binding);
   const afterContext = defineContext(memory, parent, result);
   const claimedBody = materializeExactSequence(memory, [form, result, beforeContext, afterContext]);
