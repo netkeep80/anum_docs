@@ -7,15 +7,16 @@
   "contract": "mts-contract/v0.9",
   "semanticBase": "mts-conformance/v0.8",
   "observableSemanticDelta": true,
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "coverageState": "complete",
-  "coverageStateMeaning": "all currently required v0.9 executable vectors are mapped to green evidence; semantic closure and acceptance remain separate gates",
+  "coverageStateMeaning": "all required v0.9 executable vectors and the closed F1 semantic gate are green; explicit release acceptance remains a separate #610 action",
   "requiredExecutableGates": [
     "ts/test/v09-structural-carriers.test.ts",
     "ts/test/v09-byte-carrier.test.ts",
     "ts/test/v09-structural-rules.test.ts",
     "ts/test/v09-context-integration.test.ts",
-    "ts/test/v09-readiness.test.ts"
+    "ts/test/v09-readiness.test.ts",
+    "ts/test/v09-f1-axiom-aset.test.ts"
   ],
   "implementedEvidence": {
     "606": {
@@ -89,6 +90,22 @@
       "identicalUnboundEqualityUsesMemberRepresentative": true,
       "wrongBeforeContextRejected": true,
       "readOnlyReconciliationReplay": true
+    },
+    "594": {
+      "test": "ts/test/v09-f1-axiom-aset.test.ts",
+      "document": "docs/research/MTS v0.9 F1 — замкнутый axiom-aset.md",
+      "internalSignCount": 10,
+      "exactCarrierPerInternalSign": true,
+      "distinctSignEntryAcrossMeaningCollisions": true,
+      "recursiveMeaningDependenciesClosed": true,
+      "colonSelfIntroduction": true,
+      "formalArrowSelfIntroduction": true,
+      "ordinaryTheoryLink": true,
+      "explicitQAndFormalInterpreters": true,
+      "hostBootstrapOrderUsed": false,
+      "hiddenClassicalEqualityUsed": false,
+      "readOnlyClosureVerification": true,
+      "simultaneousSolutionProofDeferredTo": [582, 583]
     }
   },
   "requiredNegativeVectors": [
@@ -178,6 +195,17 @@
     "close-recovers-explicit-lexical-parent",
     "run-carries-time-not-context-parent",
     "same-semantic-value-repeated-with-distinct-occurrence-evidence"
+  ],
+  "requiredFoundationVectors": [
+    "minimal-internal-sign-registry-exact",
+    "recursive-sign-dependencies-closed",
+    "sign-entry-distinct-from-meaning",
+    "colon-self-introducing-axiom",
+    "formal-arrow-self-introducing-axiom",
+    "axiom-aset-is-ordinary-theory-link",
+    "q-formal-context-selection-explicit",
+    "meta-deferred-signs-excluded",
+    "f1-closure-read-only-verification"
   ],
   "vectorEvidence": {
     "negative": {
@@ -302,7 +330,27 @@
       "ts/test/v09-readiness.test.ts": [
         "same-semantic-value-repeated-with-distinct-occurrence-evidence"
       ]
+    },
+    "foundation": {
+      "ts/test/v09-f1-axiom-aset.test.ts": [
+        "minimal-internal-sign-registry-exact",
+        "recursive-sign-dependencies-closed",
+        "sign-entry-distinct-from-meaning",
+        "colon-self-introducing-axiom",
+        "formal-arrow-self-introducing-axiom",
+        "axiom-aset-is-ordinary-theory-link",
+        "q-formal-context-selection-explicit",
+        "meta-deferred-signs-excluded",
+        "f1-closure-read-only-verification"
+      ]
     }
+  },
+  "semanticClosure": {
+    "ownerIssue": 594,
+    "document": "docs/research/MTS v0.9 F1 — замкнутый axiom-aset.md",
+    "evidence": "ts/test/v09-f1-axiom-aset.test.ts",
+    "complete": true,
+    "simultaneousSolutionProofDeferredTo": [582, 583]
   },
   "baselineV08Invariants": {
     "linkIdentityByOrderedPoles": true,
@@ -321,7 +369,8 @@
     "608": {"status": "candidate-green", "requiredForAcceptance": true},
     "609": {"status": "candidate-green", "requiredForAcceptance": true},
     "597": {"status": "candidate-green", "requiredForAcceptance": true},
-    "610": {"status": "blocked", "requiredForAcceptance": true}
+    "594": {"status": "candidate-green", "requiredForAcceptance": true},
+    "610": {"status": "ready", "requiredForAcceptance": true}
   },
   "acceptance": {
     "performedHere": false,
@@ -331,6 +380,6 @@
     "observableSemanticDelta": true,
     "typeScriptCandidate": true,
     "candidateRuntimeSelectable": false,
-    "acceptanceReady": false
+    "acceptanceReady": true
   }
 }
