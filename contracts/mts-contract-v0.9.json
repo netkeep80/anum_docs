@@ -41,7 +41,8 @@
     "structuralRuleEvidence": "ts/test/v09-structural-rules.test.ts",
     "contextIntegration": "ts/src/context-integration.ts",
     "contextIntegrationEvidence": "ts/test/v09-context-integration.test.ts",
-    "machineReadinessEvidence": "ts/test/v09-readiness.test.ts"
+    "machineReadinessEvidence": "ts/test/v09-readiness.test.ts",
+    "f1AxiomAsetEvidence": "ts/test/v09-f1-axiom-aset.test.ts"
   },
   "semanticIdentity": {
     "acceptedV08TargetPreserved": true,
@@ -70,7 +71,21 @@
     "singleFormalArrow": "⟼",
     "canonicalSourceFullyContextual": true,
     "implicitPrecedenceIsFoundationPrimitive": false,
-    "dedicatedStringQuoteSignRequired": false
+    "dedicatedStringQuoteSignRequired": false,
+    "closedAxiomAset": {
+      "ownerIssue": 594,
+      "document": "docs/research/MTS v0.9 F1 — замкнутый axiom-aset.md",
+      "evidence": "ts/test/v09-f1-axiom-aset.test.ts",
+      "internalSignCount": 10,
+      "signEntry": "E_g = c_g ⟼ m_g",
+      "axiomForm": "A_g = ExactSequence(c_g,E_:,ExactSequence(m_start,E_⟼,m_end))",
+      "theory": "T_F1 = T_F1 ⟼ ExactSequence(A_g...)",
+      "simultaneousSelfIntroduction": true,
+      "hostBootstrapOrderIsSemanticAuthority": false,
+      "hiddenClassicalEqualityPrimitive": false,
+      "semanticClosureComplete": true,
+      "simultaneousSolutionProofDeferredTo": [582, 583]
+    }
   },
   "canonicalStringQuaternaryCarrier": {
     "ownerIssue": 602,
@@ -202,8 +217,9 @@
     "ownerIssue": 597,
     "evidence": "ts/test/v09-readiness.test.ts",
     "executableCoverageComplete": true,
-    "semanticClosureComplete": false,
+    "semanticClosureComplete": true,
     "semanticClosureOwner": 594,
+    "semanticClosureEvidence": "ts/test/v09-f1-axiom-aset.test.ts",
     "acceptedV08Preserved": true,
     "candidateAcceptanceAuthorized": false
   },
@@ -219,6 +235,8 @@
     {"issue": 607, "name": "per-byte carrier and canonical byte vocabulary", "status": "candidate-green"},
     {"issue": 608, "name": "structural interpreter/rule and generic replay", "status": "candidate-green"},
     {"issue": 609, "name": "FORMAL contexts and cross-context integration", "status": "candidate-green"},
+    {"issue": 597, "name": "machine reconciliation and executable evidence completeness", "status": "candidate-green"},
+    {"issue": 594, "name": "closed self-introducing F1 axiom-aset", "status": "candidate-green"},
     {"issue": 610, "name": "acceptance cutover and governance debt repayment", "status": "blocked"}
   ]
 }
