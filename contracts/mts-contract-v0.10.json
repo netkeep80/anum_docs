@@ -1,0 +1,100 @@
+{
+  "schema": "mts-contract/v0.10",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 680,
+  "candidateLifecycleIssue": 663,
+  "semanticBase": "mts-contract/v0.9",
+  "observableSemanticDelta": true,
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.9",
+    "conformance": "mts-conformance/v0.9",
+    "immutable": true,
+    "liveRuntimeSelectable": true
+  },
+  "conformanceCorpus": "contracts/mts-conformance-v0.10.json",
+  "acceptedCurrent": "mts-contract/v0.9",
+  "acceptanceReady": false,
+  "implementation": {
+    "language": "TypeScript",
+    "singleLiveSemanticRuntime": true,
+    "candidateRuntimeSelectable": false,
+    "implementationComplete": false
+  },
+  "foundation": {
+    "minimalInternalSigns": ["∞", "[", "]", "1", "0", "(", ")", "⟼", ":", "=", "."],
+    "internalSignCount": 11,
+    "supersededResearchSigns": ["↑"],
+    "singleFormalArrow": "⟼",
+    "dotIntroduced": true,
+    "dotIsNewRootPrimitive": false
+  },
+  "signMeaningEquations": {
+    "∞": "m∞ = m∞ ⟼ m∞",
+    "[": "m[ = m[ ⟼ m∞",
+    "]": "m] = m∞ ⟼ m]",
+    "1": "m1 = m[ ⟼ m]",
+    "0": "m0 = m] ⟼ m[",
+    "(": "m( = m( ⟼ m∞",
+    ")": "m) = m∞ ⟼ m)",
+    "⟼": "m⟼ = m( ⟼ m)",
+    ":": "m: = m∞ ⟼ m⟼",
+    "=": "m= = m= ⟼ m=",
+    ".": "m. = m⟼ ⟼ m∞"
+  },
+  "expectedRootMeaningProjection": {
+    "∞": "R",
+    "[": "O",
+    "]": "C",
+    "1": "L",
+    "0": "U",
+    "(": "O",
+    ")": "C",
+    "⟼": "L",
+    ":": "R ⟼ L",
+    "=": "R",
+    ".": "L ⟼ R"
+  },
+  "contextualDuality": {
+    "ownerIssue": 658,
+    "researchSliceIssue": 673,
+    "notationIssue": 662,
+    "colonRole": "external unity -> internal oriented duality",
+    "dotRole": "bound internal position -> current contextual whole",
+    "bindingForm": "A : E",
+    "resolution": "resolve_A(.) = A",
+    "nestedBinding": "nearest lexical A : E binds dot occurrences in E",
+    "freeDotOutsideBindingAllowed": false,
+    "ambientRuntimeCurrentIsSemanticAuthority": false,
+    "parentNavigationIsDotMeaning": false,
+    "readBeginIsDotMeaning": false,
+    "readEndIsDotMeaning": false,
+    "storageDereferenceIsDotMeaning": false,
+    "arbitraryRewriteIsDotMeaning": false
+  },
+  "requiredSemanticLaws": {
+    "fullMeaning": "∞ : . ⟼ . -> ∞ = ∞ ⟼ ∞",
+    "startMeaning": "O : . ⟼ ∞ -> O = O ⟼ R",
+    "endMeaning": "C : ∞ ⟼ . -> C = R ⟼ C",
+    "genericStart": "A : . ⟼ B -> A = A ⟼ B",
+    "genericEnd": "A : B ⟼ . -> A = B ⟼ A",
+    "fullSelfClosureUniqueness": "A : . ⟼ . is grounded as A only when A = R",
+    "dotColonPoleSwap": "m. = Inv(m:)",
+    "colonDotPoleSwap": "Inv(m.) = m:"
+  },
+  "structuralDerivedResults": {
+    "write": "A[B] -> A ⟼ B",
+    "readBegin": "readBegin(A ⟼ B) = A",
+    "readEnd": "readEnd(A ⟼ B) = B",
+    "roundTrip": "construct(readBegin(X), readEnd(X)) = X",
+    "inversion": "Inv(A ⟼ B) = B ⟼ A",
+    "inversionIsRecursiveMirror": false
+  },
+  "candidateState": {
+    "theoryResearchComplete": true,
+    "contractBoundaryEstablished": true,
+    "executableEvidenceComplete": false,
+    "runtimeMappingComplete": false,
+    "acceptedV09Mutated": false
+  }
+}

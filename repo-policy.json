@@ -64,6 +64,14 @@
       "candidate-v09-conformance": {
         "path": "contracts/mts-conformance-v0.9.json",
         "format": "json"
+      },
+      "candidate-v010-contract": {
+        "path": "contracts/mts-contract-v0.10.json",
+        "format": "json"
+      },
+      "candidate-v010-conformance": {
+        "path": "contracts/mts-conformance-v0.10.json",
+        "format": "json"
       }
     },
     "rules": [
@@ -102,6 +110,90 @@
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v09-conformance", "pointer": "/acceptanceReady", "type": "boolean"},
         "value": true
+      },
+      {
+        "id": "v010-contract-schema",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-contract", "pointer": "/schema", "type": "string"},
+        "value": "mts-contract/v0.10"
+      },
+      {
+        "id": "v010-conformance-contract",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-conformance", "pointer": "/contract", "type": "string"},
+        "value": "mts-contract/v0.10"
+      },
+      {
+        "id": "v010-contract-corpus",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-contract", "pointer": "/conformanceCorpus", "type": "string"},
+        "value": "contracts/mts-conformance-v0.10.json"
+      },
+      {
+        "id": "v010-contract-semantic-base-v09",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-contract", "pointer": "/semanticBase", "type": "string"},
+        "value": "mts-contract/v0.9"
+      },
+      {
+        "id": "v010-conformance-semantic-base-v09",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-conformance", "pointer": "/semanticBase", "type": "string"},
+        "value": "mts-conformance/v0.9"
+      },
+      {
+        "id": "v010-contract-status-candidate",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-contract", "pointer": "/status", "type": "string"},
+        "value": "candidate"
+      },
+      {
+        "id": "v010-conformance-status-candidate",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-conformance", "pointer": "/status", "type": "string"},
+        "value": "candidate"
+      },
+      {
+        "id": "v010-contract-not-accepted",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-contract", "pointer": "/accepted", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v010-conformance-not-accepted",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-conformance", "pointer": "/accepted", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v010-contract-not-ready",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-contract", "pointer": "/acceptanceReady", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v010-conformance-not-ready",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-conformance", "pointer": "/acceptanceReady", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v010-contract-is-semantic-delta",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-contract", "pointer": "/observableSemanticDelta", "type": "boolean"},
+        "value": true
+      },
+      {
+        "id": "v010-conformance-is-semantic-delta",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-conformance", "pointer": "/observableSemanticDelta", "type": "boolean"},
+        "value": true
+      },
+      {
+        "id": "v010-conformance-incomplete",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v010-conformance", "pointer": "/coverageState", "type": "string"},
+        "value": "incomplete"
       }
     ]
   },
