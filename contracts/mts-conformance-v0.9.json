@@ -11,7 +11,8 @@
   "coverageState": "partial",
   "requiredExecutableGates": [
     "ts/test/v09-structural-carriers.test.ts",
-    "ts/test/v09-byte-carrier.test.ts"
+    "ts/test/v09-byte-carrier.test.ts",
+    "ts/test/v09-structural-rules.test.ts"
   ],
   "implementedEvidence": {
     "606": {
@@ -32,6 +33,27 @@
       "invalidUtf8CarrierAllowedBelowTextLayer": true,
       "unicodeNormalizationApplied": false,
       "acceptedV08PublicToolingPreserved": true
+    },
+    "608": {
+      "test": "ts/test/v09-structural-rules.test.ts",
+      "structuralInterpreter": "I = D ⟼ (G ⟼ T)",
+      "structuralRoleDictionary": "DR = DR ⟼ ExactSequence(roles)",
+      "structuralRule": "Rule = DR ⟼ Body",
+      "explicitTheoryAdmission": "T ⟼ Rule",
+      "genericRuleReplayReadOnly": true,
+      "exactOneBindingPerDeclaredRole": true,
+      "undeclaredRoleBindingRejected": true,
+      "hostCallbackIdentityUsedForRuleSelection": false,
+      "typeScriptRolePropertyUsedForRoleIdentity": false,
+      "relationPilot": true,
+      "colonEffectCorePilot": true,
+      "stableParentContextTransitionPilot": true,
+      "forgedInterpreterRejected": true,
+      "forgedRoleDictionaryRejected": true,
+      "unadmittedRuleRejected": true,
+      "wrongRuleBodyRejected": true,
+      "missingRoleRejected": true,
+      "multipleRoleBindingRejected": true
     }
   },
   "requiredNegativeVectors": [
@@ -49,6 +71,7 @@
     "rule-not-admitted-by-theory",
     "rule-missing-required-role",
     "rule-conflicting-role-binding",
+    "rule-undeclared-role-binding",
     "rule-wrong-result",
     "rule-wrong-before-context",
     "rule-wrong-after-context",
@@ -135,7 +158,7 @@
   "implementationSlices": {
     "606": {"status": "candidate-green", "requiredForAcceptance": true},
     "607": {"status": "candidate-green", "requiredForAcceptance": true},
-    "608": {"status": "planned", "requiredForAcceptance": true},
+    "608": {"status": "candidate-green", "requiredForAcceptance": true},
     "609": {"status": "planned", "requiredForAcceptance": true},
     "610": {"status": "blocked", "requiredForAcceptance": true}
   },
