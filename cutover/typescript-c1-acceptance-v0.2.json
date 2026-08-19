@@ -28,6 +28,7 @@
     "f1ClosureIssue": 594,
     "readinessIssue": 638,
     "cutoverIssue": 610,
+    "atomicCutoverAuthorizationIssue": 642,
     "preAcceptanceReadyMainSha": "db46b78188b01dd43134aa6c7f8cd349bb292198",
     "migrationHistoryInGitOnly": true
   },
