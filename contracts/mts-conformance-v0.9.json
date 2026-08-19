@@ -8,8 +8,19 @@
   "semanticBase": "mts-conformance/v0.8",
   "observableSemanticDelta": true,
   "acceptanceReady": false,
-  "coverageState": "scaffold-unimplemented",
-  "requiredExecutableGates": [],
+  "coverageState": "partial",
+  "requiredExecutableGates": [
+    "ts/test/v09-structural-carriers.test.ts"
+  ],
+  "implementedEvidence": {
+    "606": {
+      "test": "ts/test/v09-structural-carriers.test.ts",
+      "exactSequenceExhaustiveCount": 781,
+      "quaternaryDifferentialCount": 21845,
+      "acceptedQuaternaryDenotationPreserved": true,
+      "readOnlyStructuralReads": true
+    }
+  },
   "requiredNegativeVectors": [
     "exact-sequence-empty-vs-single-root",
     "exact-sequence-leading-root-loss",
@@ -109,7 +120,7 @@
     "compatibilityRuntimeSelectable": false
   },
   "implementationSlices": {
-    "606": {"status": "planned", "requiredForAcceptance": true},
+    "606": {"status": "candidate-green", "requiredForAcceptance": true},
     "607": {"status": "planned", "requiredForAcceptance": true},
     "608": {"status": "planned", "requiredForAcceptance": true},
     "609": {"status": "planned", "requiredForAcceptance": true},
