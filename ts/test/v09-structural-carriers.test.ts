@@ -175,7 +175,7 @@ function currentQ(
     root: basis.R,
     linked: basis.L,
     unlinked: basis.U,
-    link: (start, end) => memory.ensure(start, end),
+    link: (start: LinkHandle, end: LinkHandle) => memory.ensure(start, end),
   });
   return executeAbits(source as Iterable<Abit>, algebra).denotation;
 }
