@@ -158,6 +158,16 @@
           "projection": "object_values",
           "type": "repository_path_set"
         }
+      },
+      {
+        "id": "v09-candidate-gate-paths-exist",
+        "kind": "referenced_paths_exist",
+        "source": {
+          "document": "candidate-v09-conformance",
+          "pointer": "/requiredExecutableGates",
+          "projection": "array_items",
+          "type": "repository_path_set"
+        }
       }
     ]
   },
