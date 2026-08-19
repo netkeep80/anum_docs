@@ -38,7 +38,9 @@
     "byteCarrier": "ts/src/byte-carrier.ts",
     "byteCarrierEvidence": "ts/test/v09-byte-carrier.test.ts",
     "structuralRule": "ts/src/structural-rule.ts",
-    "structuralRuleEvidence": "ts/test/v09-structural-rules.test.ts"
+    "structuralRuleEvidence": "ts/test/v09-structural-rules.test.ts",
+    "contextIntegration": "ts/src/context-integration.ts",
+    "contextIntegrationEvidence": "ts/test/v09-context-integration.test.ts"
   },
   "semanticIdentity": {
     "acceptedV08TargetPreserved": true,
@@ -152,6 +154,9 @@
     "implementationIssue": 608,
     "implementationOwner": "ts/src/structural-rule.ts",
     "evidence": "ts/test/v09-structural-rules.test.ts",
+    "contextIntegrationIssue": 609,
+    "contextIntegrationOwner": "ts/src/context-integration.ts",
+    "contextIntegrationEvidence": "ts/test/v09-context-integration.test.ts",
     "interpreter": "I = D ⟼ (G ⟼ T)",
     "context": "K = K ⟼ (parent ⟼ current)",
     "contextUse": "I ⟼ K",
@@ -168,20 +173,29 @@
     "contextParentCarriesLexicalNesting": true,
     "hostModeEnumIsSemanticAuthority": false,
     "hostCallbackIdentityIsSemanticAuthority": false,
-    "candidateStructuralRuleKernelImplemented": true
+    "formalCurrentUsesExactSequence": true,
+    "closeMutatesLexicalParent": false,
+    "parentContinuationIsSeparateTransition": true,
+    "returnedRootPreservedAsExactPosition": true,
+    "qFormalReentryUsesExplicitContext": true,
+    "formalCloseUsesStructuralRuleAdmission": true,
+    "formalEqualityUsesContextLocalRepresentative": true,
+    "formalEqualityUsesGlobalTransitiveClosure": false,
+    "candidateStructuralRuleKernelImplemented": true,
+    "candidateCrossContextIntegrationImplemented": true
   },
   "semanticRules": {
-    "Q_OPEN": {"implementationStatus": "planned", "issue": 609},
+    "Q_OPEN": {"implementationStatus": "candidate-implemented", "issue": 609},
     "Q_VALUE": {"implementationStatus": "candidate-implemented", "issue": 606},
-    "Q_CLOSE": {"implementationStatus": "planned", "issue": 609},
+    "Q_CLOSE": {"implementationStatus": "candidate-implemented", "issue": 609},
     "Q_FINALIZE": {"implementationStatus": "candidate-implemented", "issue": 606},
-    "FORMAL_OPEN": {"implementationStatus": "planned", "issue": 609},
-    "FORMAL_GROUP": {"implementationStatus": "planned", "issue": 609},
+    "FORMAL_OPEN": {"implementationStatus": "candidate-implemented", "issue": 609},
+    "FORMAL_GROUP": {"implementationStatus": "candidate-implemented", "issue": 609},
     "FORMAL_LINK": {"implementationStatus": "candidate-implemented", "issue": 608},
     "FORMAL_COLON": {"implementationStatus": "candidate-implemented", "issue": 608},
-    "FORMAL_EQUAL": {"implementationStatus": "planned", "issue": 609},
-    "FORMAL_CLOSE": {"implementationStatus": "planned", "issue": 609},
-    "PARENT_CONTINUE": {"implementationStatus": "planned", "issue": 609}
+    "FORMAL_EQUAL": {"implementationStatus": "candidate-implemented", "issue": 609},
+    "FORMAL_CLOSE": {"implementationStatus": "candidate-implemented", "issue": 609},
+    "PARENT_CONTINUE": {"implementationStatus": "candidate-implemented", "issue": 609}
   },
   "effects": {
     "findEqualsMaterialize": false,
@@ -194,7 +208,7 @@
     {"issue": 606, "name": "root-safe exact sequence and structural QState", "status": "candidate-green"},
     {"issue": 607, "name": "per-byte carrier and canonical byte vocabulary", "status": "candidate-green"},
     {"issue": 608, "name": "structural interpreter/rule and generic replay", "status": "candidate-green"},
-    {"issue": 609, "name": "FORMAL contexts and cross-context integration", "status": "planned"},
+    {"issue": 609, "name": "FORMAL contexts and cross-context integration", "status": "candidate-green"},
     {"issue": 610, "name": "acceptance cutover and governance debt repayment", "status": "blocked"}
   ]
 }

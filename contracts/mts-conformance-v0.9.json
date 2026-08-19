@@ -12,7 +12,8 @@
   "requiredExecutableGates": [
     "ts/test/v09-structural-carriers.test.ts",
     "ts/test/v09-byte-carrier.test.ts",
-    "ts/test/v09-structural-rules.test.ts"
+    "ts/test/v09-structural-rules.test.ts",
+    "ts/test/v09-context-integration.test.ts"
   ],
   "implementedEvidence": {
     "606": {
@@ -54,6 +55,27 @@
       "wrongRuleBodyRejected": true,
       "missingRoleRejected": true,
       "multipleRoleBindingRejected": true
+    },
+    "609": {
+      "test": "ts/test/v09-context-integration.test.ts",
+      "typedContextAdmission": "I ⟼ K",
+      "immutableContextLifecycle": true,
+      "formalCurrentUsesExactSequence": true,
+      "returnedRootPositionPreserved": true,
+      "qFormalNestedReentry": true,
+      "formalCloseUsesStructuralRuleAdmission": true,
+      "relationWithoutPrecedence": true,
+      "nestedRelationGroupingDistinct": true,
+      "oneFormGroupingExplicitlyAdmitted": true,
+      "emptyFormalRejected": true,
+      "colonRuleIntegrated": true,
+      "signUseIdentityPreservedAcrossMeaningCollisions": true,
+      "localRepresentativeEquality": true,
+      "globalEqualityClosureUsed": false,
+      "wrongLexicalParentRejected": true,
+      "wrongInterpreterRejected": true,
+      "replayReadOnly": true,
+      "runTemporalOrderIndependentOfLexicalParent": true
     }
   },
   "requiredNegativeVectors": [
@@ -159,7 +181,7 @@
     "606": {"status": "candidate-green", "requiredForAcceptance": true},
     "607": {"status": "candidate-green", "requiredForAcceptance": true},
     "608": {"status": "candidate-green", "requiredForAcceptance": true},
-    "609": {"status": "planned", "requiredForAcceptance": true},
+    "609": {"status": "candidate-green", "requiredForAcceptance": true},
     "610": {"status": "blocked", "requiredForAcceptance": true}
   },
   "acceptance": {
