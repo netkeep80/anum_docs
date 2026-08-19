@@ -8,12 +8,14 @@
   "semanticBase": "mts-conformance/v0.8",
   "observableSemanticDelta": true,
   "acceptanceReady": false,
-  "coverageState": "partial",
+  "coverageState": "complete",
+  "coverageStateMeaning": "all currently required v0.9 executable vectors are mapped to green evidence; semantic closure and acceptance remain separate gates",
   "requiredExecutableGates": [
     "ts/test/v09-structural-carriers.test.ts",
     "ts/test/v09-byte-carrier.test.ts",
     "ts/test/v09-structural-rules.test.ts",
-    "ts/test/v09-context-integration.test.ts"
+    "ts/test/v09-context-integration.test.ts",
+    "ts/test/v09-readiness.test.ts"
   ],
   "implementedEvidence": {
     "606": {
@@ -76,6 +78,17 @@
       "wrongInterpreterRejected": true,
       "replayReadOnly": true,
       "runTemporalOrderIndependentOfLexicalParent": true
+    },
+    "597": {
+      "test": "ts/test/v09-readiness.test.ts",
+      "restrictedRootedFoldCounterexample": true,
+      "exactSequencePredecessorCycleRejected": true,
+      "repeatedSemanticValueUsesDistinctStructuralPositions": true,
+      "hostStartedShadowIsNotSemanticAuthority": true,
+      "nonemptyQuaternaryCloseIntegrated": true,
+      "identicalUnboundEqualityUsesMemberRepresentative": true,
+      "wrongBeforeContextRejected": true,
+      "readOnlyReconciliationReplay": true
     }
   },
   "requiredNegativeVectors": [
@@ -166,6 +179,131 @@
     "run-carries-time-not-context-parent",
     "same-semantic-value-repeated-with-distinct-occurrence-evidence"
   ],
+  "vectorEvidence": {
+    "negative": {
+      "ts/test/v09-structural-carriers.test.ts": [
+        "exact-sequence-empty-vs-single-root",
+        "exact-sequence-leading-root-loss",
+        "exact-sequence-malformed-cell"
+      ],
+      "ts/test/v09-byte-carrier.test.ts": [
+        "canonical-string-carrier-codepoint-envelope",
+        "canonical-byte-opaque-runtime-id"
+      ],
+      "ts/test/v09-structural-rules.test.ts": [
+        "forged-interpreter-configuration",
+        "interpreter-components-disagree-with-evidence",
+        "forged-role-dictionary",
+        "rule-not-admitted-by-theory",
+        "rule-missing-required-role",
+        "rule-conflicting-role-binding",
+        "rule-undeclared-role-binding",
+        "rule-wrong-result",
+        "rule-wrong-after-context"
+      ],
+      "ts/test/v09-context-integration.test.ts": [
+        "context-close-wrong-parent",
+        "parent-continuation-wrong-interpreter",
+        "returned-root-disappears-from-exact-parent-sequence",
+        "noncanonical-unparenthesized-formal-relation",
+        "empty-formal-context-admitted",
+        "read-or-replay-materializes"
+      ],
+      "ts/test/v09-readiness.test.ts": [
+        "restricted-rooted-sequence-admits-root",
+        "exact-sequence-predecessor-cycle",
+        "q-state-hidden-started-disagrees",
+        "rule-wrong-before-context"
+      ]
+    },
+    "carrier": {
+      "ts/test/v09-byte-carrier.test.ts": [
+        "empty-bytes",
+        "ascii-A",
+        "ascii-0",
+        "ascii-1",
+        "ascii-open-square",
+        "ascii-close-square",
+        "ascii-open-round",
+        "ascii-close-round",
+        "ascii-colon",
+        "ascii-equals",
+        "utf8-cyrillic-M",
+        "utf8-infinity",
+        "utf8-formal-arrow",
+        "utf8-four-byte-codepoint",
+        "combining-sequence-distinct-from-precomposed",
+        "invalid-utf8-ff-carrier",
+        "invalid-utf8-truncated-carrier",
+        "repeated-byte-carrier",
+        "string-open-square-distinct-from-raw-q-open-use"
+      ]
+    },
+    "sequence": {
+      "ts/test/v09-structural-carriers.test.ts": [
+        "exact-empty",
+        "exact-single-root",
+        "exact-single-linked",
+        "exact-root-linked",
+        "exact-linked-root",
+        "exact-root-root",
+        "exact-linked-linked",
+        "exact-root-linked-root",
+        "q-empty-stream",
+        "q-one",
+        "q-zero",
+        "q-one-zero",
+        "q-empty-group",
+        "q-one-group",
+        "q-zero-group",
+        "q-nested-empty-group",
+        "q-one-then-empty-group",
+        "q-empty-group-then-one"
+      ]
+    },
+    "semanticRule": {
+      "ts/test/v09-structural-carriers.test.ts": [
+        "q-first-value",
+        "q-next-value",
+        "q-first-returned-root",
+        "q-finalize-empty",
+        "q-finalize-nonempty"
+      ],
+      "ts/test/v09-context-integration.test.ts": [
+        "q-open-child-has-explicit-parent-and-empty-state",
+        "q-close-empty",
+        "q-close-nested-empty",
+        "formal-open-explicit-child-context",
+        "formal-one-form-group-if-admitted",
+        "formal-link-binary",
+        "formal-left-right-grouping-distinct",
+        "colon-source-content-to-form",
+        "colon-replay-read-only",
+        "equality-shared-local-representative",
+        "equality-distinct-representative",
+        "formal-close-to-exact-parent",
+        "formal-close-returned-root",
+        "parent-consumes-child-result",
+        "parent-preserves-returned-root-position"
+      ],
+      "ts/test/v09-readiness.test.ts": [
+        "q-close-nonempty",
+        "equality-identical-unbound"
+      ]
+    },
+    "context": {
+      "ts/test/v09-context-integration.test.ts": [
+        "formal-nested-right",
+        "formal-nested-left",
+        "formal-q-nested-empty",
+        "close-recovers-explicit-lexical-parent",
+        "run-carries-time-not-context-parent"
+      ],
+      "ts/test/v09-readiness.test.ts": [
+        "same-semantic-value-repeated-with-distinct-occurrence-evidence"
+      ]
+    }
+  },
   "baselineV08Invariants": {
     "linkIdentityByOrderedPoles": true,
     "rootIsOnlyFullySelfClosedLink": true,
@@ -182,6 +320,7 @@
     "607": {"status": "candidate-green", "requiredForAcceptance": true},
     "608": {"status": "candidate-green", "requiredForAcceptance": true},
     "609": {"status": "candidate-green", "requiredForAcceptance": true},
+    "597": {"status": "candidate-green", "requiredForAcceptance": true},
     "610": {"status": "blocked", "requiredForAcceptance": true}
   },
   "acceptance": {
