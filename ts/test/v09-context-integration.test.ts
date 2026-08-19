@@ -106,8 +106,9 @@ const relationRule = rule(memory, formalI, [leftRole, rightRole], materializeExa
 function relation(parent: TypedContext, parentOwner: IFix, left: LinkHandle, right: LinkHandle): LinkHandle {
   const child = formalChild(parent, parentOwner, [left, arrowUse, right]); const result = memory.ensure(left, right);
   const selectedAct = act(memory, formalI, relationRule, parent.context, [[leftRole, left], [rightRole, right]]);
+  const replayEvidence = evidence(child, parent, parentOwner, result, relationRule, selectedAct);
   const before = memory.linkCount; const probe = new ReplayProbe(memory);
-  same(replayFormalClose(probe, evidence(child, parent, parentOwner, result, relationRule, selectedAct)).result, result, "relation result");
+  same(replayFormalClose(probe, replayEvidence).result, result, "relation result");
   same(memory.linkCount, before, "relation replay read-only"); assert(probe.outgoingCalls > 0, "Act fields read structurally"); return result;
 }
 const p0 = parentContext(memory, rootI, marker0); const ab0 = relation(p0, rootI, A, B);
@@ -185,8 +186,8 @@ function equalityEvidence(parent: TypedContext, context: LinkHandle, leftRep: Li
 {
   const context = defineContext(memory, memory.root, marker7);
   defineLocalRepresentativeBinding(memory, context, A, representative); defineLocalRepresentativeBinding(memory, context, B, representative);
-  const parent = parentContext(memory, rootI, marker7); const before = memory.linkCount;
-  replayFormalEquality(new ReplayProbe(memory), equalityEvidence(parent, context, representative, representative));
+  const parent = parentContext(memory, rootI, marker7); const replayEvidence = equalityEvidence(parent, context, representative, representative);
+  const before = memory.linkCount; replayFormalEquality(new ReplayProbe(memory), replayEvidence);
   same(memory.linkCount, before, "equality replay read-only");
   const distinct = defineContext(memory, memory.root, marker8);
   defineLocalRepresentativeBinding(memory, distinct, A, representative); defineLocalRepresentativeBinding(memory, distinct, B, otherRep);
