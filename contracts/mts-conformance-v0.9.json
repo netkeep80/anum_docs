@@ -10,7 +10,8 @@
   "acceptanceReady": false,
   "coverageState": "partial",
   "requiredExecutableGates": [
-    "ts/test/v09-structural-carriers.test.ts"
+    "ts/test/v09-structural-carriers.test.ts",
+    "ts/test/v09-byte-carrier.test.ts"
   ],
   "implementedEvidence": {
     "606": {
@@ -19,6 +20,18 @@
       "quaternaryDifferentialCount": 21845,
       "acceptedQuaternaryDenotationPreserved": true,
       "readOnlyStructuralReads": true
+    },
+    "607": {
+      "test": "ts/test/v09-byte-carrier.test.ts",
+      "canonicalPhysicalByteCount": 256,
+      "canonicalByteSemanticLinkCount": 256,
+      "acceptedQuaternaryByteDifferentialCount": 256,
+      "readOnlyStructuralByteInverse": true,
+      "exactByteSequenceUsesExactSequence": true,
+      "repeatedByteReusesSemanticLink": true,
+      "invalidUtf8CarrierAllowedBelowTextLayer": true,
+      "unicodeNormalizationApplied": false,
+      "acceptedV08PublicToolingPreserved": true
     }
   },
   "requiredNegativeVectors": [
@@ -121,7 +134,7 @@
   },
   "implementationSlices": {
     "606": {"status": "candidate-green", "requiredForAcceptance": true},
-    "607": {"status": "planned", "requiredForAcceptance": true},
+    "607": {"status": "candidate-green", "requiredForAcceptance": true},
     "608": {"status": "planned", "requiredForAcceptance": true},
     "609": {"status": "planned", "requiredForAcceptance": true},
     "610": {"status": "blocked", "requiredForAcceptance": true}
