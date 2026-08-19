@@ -304,14 +304,6 @@
       "must_change_any": ["contracts/mts-contract-v0.9.json"]
     },
     {
-      "if_changed": ["contracts/mts-contract-v0.10.json"],
-      "must_change_any": ["contracts/mts-conformance-v0.10.json"]
-    },
-    {
-      "if_changed": ["contracts/mts-conformance-v0.10.json"],
-      "must_change_any": ["contracts/mts-contract-v0.10.json"]
-    },
-    {
       "if_changed": [
         "contracts/mts-contract-v*.json",
         "contracts/mts-conformance-v*.json",
