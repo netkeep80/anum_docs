@@ -1,13 +1,21 @@
 {
   "schema": "mts-contract/v0.9",
-  "status": "candidate",
-  "accepted": false,
-  "issue": 597,
+  "status": "accepted",
+  "accepted": true,
+  "issue": 610,
   "candidateLifecycleIssue": 605,
   "semanticBase": "mts-contract/v0.8",
   "observableSemanticDelta": true,
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.8",
+    "conformance": "mts-conformance/v0.8",
+    "immutable": true,
+    "liveRuntimeSelectable": false
+  },
   "conformanceCorpus": "contracts/mts-conformance-v0.9.json",
-  "acceptedCurrent": "mts-contract/v0.8",
+  "currentPointer": "cutover/typescript-c1-acceptance-v0.2.json",
+  "acceptedMtsVersion": "mts-contract/v0.9",
+  "acceptedCurrent": "mts-contract/v0.9",
   "acceptanceReady": true,
   "implementation": {
     "language": "TypeScript",
@@ -17,6 +25,29 @@
     "singleLiveSemanticRuntime": true,
     "pythonRuntimePresent": false,
     "compatibilityRuntimeSelectable": false
+  },
+  "owners": {
+    "publicFacade": "ts/src/public.ts",
+    "memory": "ts/src/memory.ts",
+    "anum": "ts/src/anum.ts",
+    "source": "ts/src/source.ts",
+    "state": "ts/src/state.ts",
+    "dictionary": "ts/src/dictionary.ts",
+    "interpreter": "ts/src/interpreter.ts",
+    "sequence": "ts/src/sequence.ts",
+    "run": "ts/src/run.ts",
+    "proof": "ts/src/proof.ts",
+    "checker": "ts/src/checker.ts",
+    "directDeixis": "ts/src/direct-deixis.ts",
+    "valueBundle": "ts/src/value-bundle.ts",
+    "persistenceTopology": "ts/src/persistence-topology.ts",
+    "persistenceStore": "ts/src/persistent-store.ts",
+    "persistenceSequence": "ts/src/persistent-sequence.ts",
+    "exactSequence": "ts/src/exact-sequence.ts",
+    "quaternaryState": "ts/src/quaternary-state.ts",
+    "byteCarrier": "ts/src/byte-carrier.ts",
+    "structuralRule": "ts/src/structural-rule.ts",
+    "contextIntegration": "ts/src/context-integration.ts"
   },
   "baselineOwners": {
     "publicFacade": "ts/src/public.ts",
@@ -221,7 +252,7 @@
     "semanticClosureOwner": 594,
     "semanticClosureEvidence": "ts/test/v09-f1-axiom-aset.test.ts",
     "acceptedV08Preserved": true,
-    "candidateAcceptanceAuthorized": false
+    "candidateAcceptanceAuthorized": true
   },
   "effects": {
     "findEqualsMaterialize": false,
@@ -237,6 +268,6 @@
     {"issue": 609, "name": "FORMAL contexts and cross-context integration", "status": "candidate-green"},
     {"issue": 597, "name": "machine reconciliation and executable evidence completeness", "status": "candidate-green"},
     {"issue": 594, "name": "closed self-introducing F1 axiom-aset", "status": "candidate-green"},
-    {"issue": 610, "name": "acceptance cutover and governance debt repayment", "status": "ready"}
+    {"issue": 610, "name": "acceptance cutover and governance debt repayment", "status": "accepted"}
   ]
 }
