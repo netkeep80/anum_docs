@@ -1,0 +1,166 @@
+{
+  "schema": "mts-contract/v0.9",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 597,
+  "candidateLifecycleIssue": 605,
+  "semanticBase": "mts-contract/v0.8",
+  "observableSemanticDelta": true,
+  "conformanceCorpus": "contracts/mts-conformance-v0.9.json",
+  "acceptedCurrent": "mts-contract/v0.8",
+  "acceptanceReady": false,
+  "implementation": {
+    "language": "TypeScript",
+    "package": "@mts/core",
+    "packageManifest": "ts/package.json",
+    "publicFacade": "ts/src/public.ts",
+    "singleLiveSemanticRuntime": true,
+    "pythonRuntimePresent": false,
+    "compatibilityRuntimeSelectable": false
+  },
+  "baselineOwners": {
+    "publicFacade": "ts/src/public.ts",
+    "memory": "ts/src/memory.ts",
+    "anum": "ts/src/anum.ts",
+    "source": "ts/src/source.ts",
+    "state": "ts/src/state.ts",
+    "dictionary": "ts/src/dictionary.ts",
+    "interpreter": "ts/src/interpreter.ts",
+    "sequence": "ts/src/sequence.ts",
+    "run": "ts/src/run.ts",
+    "proof": "ts/src/proof.ts",
+    "checker": "ts/src/checker.ts"
+  },
+  "semanticIdentity": {
+    "acceptedV08TargetPreserved": true,
+    "runtimeHandleIsSemanticIdentity": false,
+    "storageIdIsSemanticIdentity": false,
+    "sourcePositionIsSemanticIdentity": false,
+    "occurrenceIsSemanticIdentity": false,
+    "pathIsSemanticIdentity": false,
+    "sameGroundedFormCreatesSecondSemanticLink": false,
+    "root": "R = R ⟼ R",
+    "secondFullySelfClosedRootAllowed": false,
+    "internalGroundedSolutionProofOwner": 582,
+    "noInstanceProofOwner": 583
+  },
+  "rootBasisTarget": {
+    "R": "R = R ⟼ R",
+    "O": "O = O ⟼ R",
+    "C": "C = R ⟼ C",
+    "L": "L = O ⟼ C",
+    "U": "U = C ⟼ O"
+  },
+  "foundation": {
+    "minimalInternalSigns": ["∞", "[", "]", "1", "0", "(", ")", "⟼", ":", "="],
+    "deferredSigns": ["≡", "♂", "♀", "↑", "{", "}", "¬", "↛"],
+    "metaOnlySigns": ["∧", "⇔", "⇒", "≠", "→"],
+    "singleFormalArrow": "⟼",
+    "canonicalSourceFullyContextual": true,
+    "implicitPrecedenceIsFoundationPrimitive": false,
+    "dedicatedStringQuoteSignRequired": false
+  },
+  "canonicalStringQuaternaryCarrier": {
+    "ownerIssue": 602,
+    "stringValue": "exact finite byte content",
+    "canonicalUnit": "byte",
+    "byteEnvelope": "[bbbbbbbb]",
+    "bitsPerEnvelope": 8,
+    "bitOrder": "MSB-first",
+    "empty": "empty quaternary carrier",
+    "unicodeNormalization": false,
+    "unicodeSegmentationIsFoundation": false,
+    "invalidUtf8CarrierAllowed": true,
+    "byteSemanticBridge": "Byte(p) := Denote_Q([p]) for exactly eight bits p",
+    "representationEqualsInterpretation": false
+  },
+  "signMeaningEquations": {
+    "∞": "m∞ = m∞ ⟼ m∞",
+    "[": "m[ = m[ ⟼ m∞",
+    "]": "m] = m∞ ⟼ m]",
+    "1": "m1 = m[ ⟼ m]",
+    "0": "m0 = m] ⟼ m[",
+    "(": "m( = m( ⟼ m∞",
+    ")": "m) = m∞ ⟼ m)",
+    "⟼": "m⟼ = m( ⟼ m)",
+    ":": "m: = m∞ ⟼ m⟼",
+    "=": "m= = m= ⟼ m="
+  },
+  "expectedRootMeaningProjection": {
+    "∞": "R",
+    "=": "R",
+    "[": "O",
+    "(": "O",
+    "]": "C",
+    ")": "C",
+    "1": "L",
+    "⟼": "L",
+    "0": "U",
+    ":": "R ⟼ L",
+    "proofDeferredTo": [582, 583]
+  },
+  "sequenceSemantics": {
+    "classes": ["EXACT_SEQUENCE", "FOLD_RESULT", "RESTRICTED_ROOTED_SEQUENCE"],
+    "exactSequence": {
+      "ownerIssue": 604,
+      "empty": "R",
+      "append": "Cell(prev,value)=startSelfClosed(prev ⟼ value)",
+      "positionsContainingRootPreserved": true,
+      "runtimePositionIdAllowed": false
+    },
+    "foldResult": {
+      "injectiveSequenceIdentityRequired": false
+    },
+    "restrictedRootedSequence": {
+      "requiresRootExcludedValueDomain": true
+    }
+  },
+  "quaternaryState": {
+    "ownerIssue": 604,
+    "empty": "R",
+    "nonEmpty": "QNonEmpty(x)=startSelfClosed(x)",
+    "hostStartedBooleanIsSemanticAuthority": false,
+    "acceptedV08DenotationPreserved": true
+  },
+  "contextSemantics": {
+    "ownerIssue": 601,
+    "interpreter": "I = D ⟼ (G ⟼ T)",
+    "context": "K = K ⟼ (parent ⟼ current)",
+    "contextUse": "I ⟼ K",
+    "roleDictionary": "DR = DR ⟼ RoleSequence",
+    "rule": "Rule = DR ⟼ Body",
+    "ruleAdmission": "T ⟼ Rule",
+    "actField": "Act ⟼ (role ⟼ value)",
+    "runCarriesTemporalOrder": true,
+    "contextParentCarriesLexicalNesting": true,
+    "hostModeEnumIsSemanticAuthority": false,
+    "hostCallbackIdentityIsSemanticAuthority": false
+  },
+  "semanticRules": {
+    "Q_OPEN": {"implementationStatus": "planned", "issue": 609},
+    "Q_VALUE": {"implementationStatus": "planned", "issue": 606},
+    "Q_CLOSE": {"implementationStatus": "planned", "issue": 609},
+    "Q_FINALIZE": {"implementationStatus": "planned", "issue": 606},
+    "FORMAL_OPEN": {"implementationStatus": "planned", "issue": 609},
+    "FORMAL_GROUP": {"implementationStatus": "planned", "issue": 609},
+    "FORMAL_LINK": {"implementationStatus": "planned", "issue": 608},
+    "FORMAL_COLON": {"implementationStatus": "planned", "issue": 608},
+    "FORMAL_EQUAL": {"implementationStatus": "planned", "issue": 608},
+    "FORMAL_CLOSE": {"implementationStatus": "planned", "issue": 609},
+    "PARENT_CONTINUE": {"implementationStatus": "planned", "issue": 609}
+  },
+  "effects": {
+    "findEqualsMaterialize": false,
+    "notFoundImpliesNonExistence": false,
+    "readMayMaterialize": false,
+    "replayMayMaterialize": false,
+    "explicitMaterializationMustReuseSameGroundedForm": true
+  },
+  "migrationSlices": [
+    {"issue": 606, "name": "root-safe exact sequence and structural QState"},
+    {"issue": 607, "name": "per-byte carrier and canonical byte vocabulary"},
+    {"issue": 608, "name": "structural interpreter/rule and generic replay"},
+    {"issue": 609, "name": "FORMAL contexts and cross-context integration"},
+    {"issue": 610, "name": "acceptance cutover and governance debt repayment"}
+  ]
+}
