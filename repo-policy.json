@@ -210,6 +210,30 @@
     {
       "if_changed": ["contracts/mts-conformance-v0.9.json"],
       "must_change_any": ["contracts/mts-contract-v0.9.json"]
+    },
+    {
+      "if_changed": [
+        "contracts/mts-contract-v*.json",
+        "contracts/mts-conformance-v*.json",
+        "cutover/typescript-c1-acceptance-v*.json"
+      ],
+      "must_change_any": ["README.md"]
+    },
+    {
+      "if_changed": [
+        "contracts/mts-contract-v*.json",
+        "contracts/mts-conformance-v*.json",
+        "cutover/typescript-c1-acceptance-v*.json"
+      ],
+      "must_change_any": ["docs/theory/Основания МТС.md"]
+    },
+    {
+      "if_changed": [
+        "contracts/mts-contract-v*.json",
+        "contracts/mts-conformance-v*.json",
+        "cutover/typescript-c1-acceptance-v*.json"
+      ],
+      "must_change_any": ["docs/theory/Система аксиом МТС.md"]
     }
   ]
 }
