@@ -9,26 +9,26 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "semantic candidate boundary is explicit; required v0.10 executable evidence is not yet complete",
+  "coverageStateMeaning": "foundation, contextual-dot and negative boundaries have executable evidence; acceptance readiness remains pending",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.9",
     "conformance": "mts-conformance/v0.9"
   },
-  "requiredExecutableGates": [],
-  "plannedExecutableGates": [
-    "11-sign closed axiom-aset including dot",
-    "canonical byte carrier for dot",
-    "dot/colon pole-swap evidence",
-    "root and one-sided contextual-dot binding",
-    "nested lexical dot scope",
-    "negative contextual-dot boundaries"
+  "requiredExecutableGates": [
+    "ts/test/v010-foundation.test.ts",
+    "ts/test/v010-contextual-dot.test.ts",
+    "ts/test/v010-contextual-dot-negative.test.ts"
   ],
   "requiredFoundationVectors": [
     "v010-internal-sign-registry-has-eleven-signs",
     "v010-dot-self-introduction",
     "v010-colon-meaning-preserved",
     "v010-dot-root-projection-is-L-to-R",
-    "v010-dot-is-not-new-root-primitive"
+    "v010-dot-is-not-new-root-primitive",
+    "v010-dot-byte-carrier-is-00101110",
+    "v010-dot-entry-distinct-from-meaning",
+    "v010-eleven-sign-axiom-aset-closed",
+    "v010-eleven-sign-closure-read-only"
   ],
   "requiredContextVectors": [
     "v010-root-dot-dot-resolves-to-root",
@@ -52,12 +52,55 @@
     "v010-dot-is-not-arbitrary-rewrite",
     "v010-nonroot-full-dot-selfclosure-rejected"
   ],
+  "vectorEvidence": {
+    "foundation": {
+      "ts/test/v010-foundation.test.ts": [
+        "v010-internal-sign-registry-has-eleven-signs",
+        "v010-dot-self-introduction",
+        "v010-colon-meaning-preserved",
+        "v010-dot-root-projection-is-L-to-R",
+        "v010-dot-is-not-new-root-primitive",
+        "v010-dot-byte-carrier-is-00101110",
+        "v010-dot-entry-distinct-from-meaning",
+        "v010-eleven-sign-axiom-aset-closed",
+        "v010-eleven-sign-closure-read-only"
+      ]
+    },
+    "inversion": {
+      "ts/test/v010-foundation.test.ts": [
+        "v010-dot-is-pole-swap-of-colon",
+        "v010-colon-is-pole-swap-of-dot"
+      ]
+    },
+    "context": {
+      "ts/test/v010-contextual-dot.test.ts": [
+        "v010-root-dot-dot-resolves-to-root",
+        "v010-start-dot-resolves-to-O",
+        "v010-end-dot-resolves-to-C",
+        "v010-generic-start-dot-binds-current-whole",
+        "v010-generic-end-dot-binds-current-whole",
+        "v010-nested-dot-uses-nearest-lexical-binding"
+      ]
+    },
+    "negative": {
+      "ts/test/v010-contextual-dot-negative.test.ts": [
+        "v010-free-dot-has-no-ambient-current",
+        "v010-dot-is-not-parent-navigation",
+        "v010-dot-is-not-runtime-current",
+        "v010-dot-is-not-read-begin",
+        "v010-dot-is-not-read-end",
+        "v010-dot-is-not-storage-dereference",
+        "v010-dot-is-not-arbitrary-rewrite",
+        "v010-nonroot-full-dot-selfclosure-rejected"
+      ]
+    }
+  },
   "evidenceState": {
-    "foundation": "planned",
-    "context": "planned",
-    "inversion": "planned",
-    "negative": "planned",
-    "runtimeMapping": "planned"
+    "foundation": "green",
+    "context": "green",
+    "inversion": "green",
+    "negative": "green",
+    "runtimeMapping": "research-reconciled"
   },
   "implementationSlices": {
     "candidateBoundary": {
@@ -65,21 +108,37 @@
       "status": "candidate-defined",
       "requiredForAcceptance": true
     },
+    "foundationEvidence": {
+      "issue": 682,
+      "test": "ts/test/v010-foundation.test.ts",
+      "status": "green",
+      "requiredForAcceptance": true
+    },
+    "contextualDotEvidence": {
+      "issue": 683,
+      "test": "ts/test/v010-contextual-dot.test.ts",
+      "status": "green",
+      "requiredForAcceptance": true
+    },
+    "negativeBoundaryEvidence": {
+      "issue": 684,
+      "test": "ts/test/v010-contextual-dot-negative.test.ts",
+      "status": "green",
+      "requiredForAcceptance": true
+    },
     "executionReconciliation": {
       "issues": [666, 668],
-      "status": "pending-dot-reconciliation",
+      "status": "dot-reconciled",
       "requiredForAcceptance": true
     },
     "runtimeMapping": {
       "issue": 669,
-      "status": "pending",
+      "status": "research-complete",
       "requiredForAcceptance": true
     }
   },
   "acceptanceBlockers": [
-    "no v0.10 executable evidence gate exists yet",
-    "closed execution research still references superseded dot predecessor notation in places",
-    "TypeScript I/K/Act/Run mapping for scoped dot is not complete",
+    "candidate readiness has not been reviewed as a complete release boundary",
     "candidate has not passed an explicit acceptance cutover"
   ]
 }
