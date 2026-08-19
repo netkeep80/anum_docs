@@ -128,16 +128,16 @@
         "value": true
       },
       {
-        "id": "v09-contract-not-ready",
+        "id": "v09-contract-ready",
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v09-contract", "pointer": "/acceptanceReady", "type": "boolean"},
-        "value": false
+        "value": true
       },
       {
-        "id": "v09-conformance-not-ready",
+        "id": "v09-conformance-ready",
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v09-conformance", "pointer": "/acceptanceReady", "type": "boolean"},
-        "value": false
+        "value": true
       },
       {
         "id": "v09-baseline-owner-paths-exist",
