@@ -57,11 +57,11 @@
   },
   "document_relations": {
     "documents": {
-      "accepted-v09-contract": {
+      "candidate-v09-contract": {
         "path": "contracts/mts-contract-v0.9.json",
         "format": "json"
       },
-      "accepted-v09-conformance": {
+      "candidate-v09-conformance": {
         "path": "contracts/mts-conformance-v0.9.json",
         "format": "json"
       },
@@ -78,37 +78,37 @@
       {
         "id": "v09-contract-semantic-base-v08",
         "kind": "scalar_equals_literal",
-        "source": {"document": "accepted-v09-contract", "pointer": "/semanticBase", "type": "string"},
+        "source": {"document": "candidate-v09-contract", "pointer": "/semanticBase", "type": "string"},
         "value": "mts-contract/v0.8"
       },
       {
         "id": "v09-conformance-semantic-base-v08",
         "kind": "scalar_equals_literal",
-        "source": {"document": "accepted-v09-conformance", "pointer": "/semanticBase", "type": "string"},
+        "source": {"document": "candidate-v09-conformance", "pointer": "/semanticBase", "type": "string"},
         "value": "mts-conformance/v0.8"
       },
       {
         "id": "v09-contract-is-semantic-delta",
         "kind": "scalar_equals_literal",
-        "source": {"document": "accepted-v09-contract", "pointer": "/observableSemanticDelta", "type": "boolean"},
+        "source": {"document": "candidate-v09-contract", "pointer": "/observableSemanticDelta", "type": "boolean"},
         "value": true
       },
       {
         "id": "v09-conformance-is-semantic-delta",
         "kind": "scalar_equals_literal",
-        "source": {"document": "accepted-v09-conformance", "pointer": "/observableSemanticDelta", "type": "boolean"},
+        "source": {"document": "candidate-v09-conformance", "pointer": "/observableSemanticDelta", "type": "boolean"},
         "value": true
       },
       {
         "id": "v09-contract-ready",
         "kind": "scalar_equals_literal",
-        "source": {"document": "accepted-v09-contract", "pointer": "/acceptanceReady", "type": "boolean"},
+        "source": {"document": "candidate-v09-contract", "pointer": "/acceptanceReady", "type": "boolean"},
         "value": true
       },
       {
         "id": "v09-conformance-ready",
         "kind": "scalar_equals_literal",
-        "source": {"document": "accepted-v09-conformance", "pointer": "/acceptanceReady", "type": "boolean"},
+        "source": {"document": "candidate-v09-conformance", "pointer": "/acceptanceReady", "type": "boolean"},
         "value": true
       },
       {
