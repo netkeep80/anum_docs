@@ -138,30 +138,35 @@ function defineRuleFixture(
     expectedInterpreter, expectedAfterContext: afterContext,
   }));
 
-  const missingRoleAct = defineAct(memory, fixture.interpreter, fixture.roleDictionary, afterContext, [
+  // Same (I,DR,K_after) denotes the same semantic Act. Malformed variants therefore
+  // use structurally distinct K_after values rather than pretending to be instances.
+  const missingAfter = defineContext(memory, other, binding);
+  const missingRoleAct = defineAct(memory, fixture.interpreter, fixture.roleDictionary, missingAfter, [
     [fixedRole, fixed], [bindingRole, binding],
   ]);
   expectRuleError("missing-role-binding", () => replayStructuralRule(memory, {
     act: missingRoleAct, rule: fixture.rule, ruleAdmission: fixture.admission, claimedBody,
-    expectedInterpreter, expectedAfterContext: afterContext,
+    expectedInterpreter, expectedAfterContext: missingAfter,
   }));
 
-  const multipleRoleAct = defineAct(memory, fixture.interpreter, fixture.roleDictionary, afterContext, [
+  const multipleAfter = defineContext(memory, parent, other);
+  const multipleRoleAct = defineAct(memory, fixture.interpreter, fixture.roleDictionary, multipleAfter, [
     [fixedRole, fixed], [fixedRole, other], [bindingRole, binding], [parentRole, parent],
   ]);
   expectRuleError("multiple-role-bindings", () => replayStructuralRule(memory, {
     act: multipleRoleAct, rule: fixture.rule, ruleAdmission: fixture.admission, claimedBody,
-    expectedInterpreter, expectedAfterContext: afterContext,
+    expectedInterpreter, expectedAfterContext: multipleAfter,
   }));
 
-  const [undeclaredRole] = anchors(memory, 1);
-  assert(undeclaredRole, "undeclared role");
-  const extraRoleAct = defineAct(memory, fixture.interpreter, fixture.roleDictionary, afterContext, [
+  const [undeclaredRole, extraCurrent] = anchors(memory, 2);
+  assert(undeclaredRole && extraCurrent, "undeclared role refs");
+  const extraAfter = defineContext(memory, extraCurrent, other);
+  const extraRoleAct = defineAct(memory, fixture.interpreter, fixture.roleDictionary, extraAfter, [
     [fixedRole, fixed], [bindingRole, binding], [parentRole, parent], [undeclaredRole, other],
   ]);
   expectRuleError("undeclared-role-binding", () => replayStructuralRule(memory, {
     act: extraRoleAct, rule: fixture.rule, ruleAdmission: fixture.admission, claimedBody,
-    expectedInterpreter, expectedAfterContext: afterContext,
+    expectedInterpreter, expectedAfterContext: extraAfter,
   }));
 
   const forgedRoleDictionary = defineStructuralRoleDictionary(memory, [fixedRole, bindingRole, undeclaredRole]);
