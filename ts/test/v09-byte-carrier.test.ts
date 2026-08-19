@@ -194,7 +194,7 @@ class PolesOnlyProbe implements ReadMemory {
   expectByteCarrierError("invalid-unicode-text", () => textToUtf8Bytes("\ud800"));
 }
 
-// v0.8 public tooling remains untouched: its code-point envelope is explicitly legacy.
+// Accepted v0.8 public tooling stays unchanged; the candidate delta remains explicit until cutover.
 {
   const legacy = charToAnum("∞");
   const canonical = encodeBytesToQuaternary(textToUtf8Bytes("∞"));
