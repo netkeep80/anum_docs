@@ -8,7 +8,7 @@
   "observableSemanticDelta": true,
   "conformanceCorpus": "contracts/mts-conformance-v0.9.json",
   "acceptedCurrent": "mts-contract/v0.8",
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "implementation": {
     "language": "TypeScript",
     "package": "@mts/core",
@@ -237,6 +237,6 @@
     {"issue": 609, "name": "FORMAL contexts and cross-context integration", "status": "candidate-green"},
     {"issue": 597, "name": "machine reconciliation and executable evidence completeness", "status": "candidate-green"},
     {"issue": 594, "name": "closed self-introducing F1 axiom-aset", "status": "candidate-green"},
-    {"issue": 610, "name": "acceptance cutover and governance debt repayment", "status": "blocked"}
+    {"issue": 610, "name": "acceptance cutover and governance debt repayment", "status": "ready"}
   ]
 }
