@@ -34,7 +34,9 @@
   "candidateOwners": {
     "exactSequence": "ts/src/exact-sequence.ts",
     "quaternaryState": "ts/src/quaternary-state.ts",
-    "structuralCarrierEvidence": "ts/test/v09-structural-carriers.test.ts"
+    "structuralCarrierEvidence": "ts/test/v09-structural-carriers.test.ts",
+    "byteCarrier": "ts/src/byte-carrier.ts",
+    "byteCarrierEvidence": "ts/test/v09-byte-carrier.test.ts"
   },
   "semanticIdentity": {
     "acceptedV08TargetPreserved": true,
@@ -67,6 +69,9 @@
   },
   "canonicalStringQuaternaryCarrier": {
     "ownerIssue": 602,
+    "implementationIssue": 607,
+    "implementationOwner": "ts/src/byte-carrier.ts",
+    "evidence": "ts/test/v09-byte-carrier.test.ts",
     "stringValue": "exact finite byte content",
     "canonicalUnit": "byte",
     "byteEnvelope": "[bbbbbbbb]",
@@ -77,7 +82,12 @@
     "unicodeSegmentationIsFoundation": false,
     "invalidUtf8CarrierAllowed": true,
     "byteSemanticBridge": "Byte(p) := Denote_Q([p]) for exactly eight bits p",
-    "representationEqualsInterpretation": false
+    "byteVocabularySize": 256,
+    "sourceContentCarrier": "ExactSequence<Byte(p)>",
+    "runtimeByteIdIsSemanticIdentity": false,
+    "acceptedV08PublicToolingPreservedUntilCutover": true,
+    "representationEqualsInterpretation": false,
+    "candidateImplemented": true
   },
   "signMeaningEquations": {
     "∞": "m∞ = m∞ ⟼ m∞",
@@ -171,7 +181,7 @@
   },
   "migrationSlices": [
     {"issue": 606, "name": "root-safe exact sequence and structural QState", "status": "candidate-green"},
-    {"issue": 607, "name": "per-byte carrier and canonical byte vocabulary", "status": "planned"},
+    {"issue": 607, "name": "per-byte carrier and canonical byte vocabulary", "status": "candidate-green"},
     {"issue": 608, "name": "structural interpreter/rule and generic replay", "status": "planned"},
     {"issue": 609, "name": "FORMAL contexts and cross-context integration", "status": "planned"},
     {"issue": 610, "name": "acceptance cutover and governance debt repayment", "status": "blocked"}
