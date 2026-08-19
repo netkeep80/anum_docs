@@ -40,7 +40,8 @@
     "structuralRule": "ts/src/structural-rule.ts",
     "structuralRuleEvidence": "ts/test/v09-structural-rules.test.ts",
     "contextIntegration": "ts/src/context-integration.ts",
-    "contextIntegrationEvidence": "ts/test/v09-context-integration.test.ts"
+    "contextIntegrationEvidence": "ts/test/v09-context-integration.test.ts",
+    "machineReadinessEvidence": "ts/test/v09-readiness.test.ts"
   },
   "semanticIdentity": {
     "acceptedV08TargetPreserved": true,
@@ -196,6 +197,15 @@
     "FORMAL_EQUAL": {"implementationStatus": "candidate-implemented", "issue": 609},
     "FORMAL_CLOSE": {"implementationStatus": "candidate-implemented", "issue": 609},
     "PARENT_CONTINUE": {"implementationStatus": "candidate-implemented", "issue": 609}
+  },
+  "machineReconciliation": {
+    "ownerIssue": 597,
+    "evidence": "ts/test/v09-readiness.test.ts",
+    "executableCoverageComplete": true,
+    "semanticClosureComplete": false,
+    "semanticClosureOwner": 594,
+    "acceptedV08Preserved": true,
+    "candidateAcceptanceAuthorized": false
   },
   "effects": {
     "findEqualsMaterialize": false,
