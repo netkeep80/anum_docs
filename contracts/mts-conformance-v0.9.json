@@ -1,15 +1,20 @@
 {
   "schema": "mts-conformance/v0.9",
-  "status": "candidate",
-  "accepted": false,
-  "issue": 597,
+  "status": "accepted",
+  "accepted": true,
+  "issue": 610,
   "candidateLifecycleIssue": 605,
   "contract": "mts-contract/v0.9",
   "semanticBase": "mts-conformance/v0.8",
   "observableSemanticDelta": true,
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.8",
+    "conformance": "mts-conformance/v0.8",
+    "immutable": true
+  },
   "acceptanceReady": true,
   "coverageState": "complete",
-  "coverageStateMeaning": "all required v0.9 executable vectors and the closed F1 semantic gate are green; candidate is acceptance-ready and the accepted cutover remains a separate #610 M6-B action",
+  "coverageStateMeaning": "all required v0.9 executable vectors and the closed F1 semantic gate are green; v0.9 is the accepted current release",
   "requiredExecutableGates": [
     "ts/test/v09-structural-carriers.test.ts",
     "ts/test/v09-byte-carrier.test.ts",
@@ -370,16 +375,18 @@
     "609": {"status": "candidate-green", "requiredForAcceptance": true},
     "597": {"status": "candidate-green", "requiredForAcceptance": true},
     "594": {"status": "candidate-green", "requiredForAcceptance": true},
-    "610": {"status": "ready", "requiredForAcceptance": true}
+    "610": {"status": "accepted", "requiredForAcceptance": true}
   },
   "acceptance": {
-    "performedHere": false,
-    "acceptedMtsVersion": "mts-contract/v0.8",
+    "performedHere": true,
+    "acceptedMtsVersion": "mts-contract/v0.9",
+    "previousAcceptedMtsVersion": "mts-contract/v0.8",
     "candidateMtsVersion": "mts-contract/v0.9",
     "semanticBase": "mts-contract/v0.8",
     "observableSemanticDelta": true,
-    "typeScriptCandidate": true,
+    "typeScriptAccepted": true,
     "candidateRuntimeSelectable": false,
-    "acceptanceReady": true
+    "acceptanceReady": true,
+    "cutoverIssue": 610
   }
 }
