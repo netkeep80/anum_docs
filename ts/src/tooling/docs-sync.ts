@@ -5,14 +5,16 @@ import { fileURLToPath } from "node:url";
 export const PROJECTION_START = "<!-- mts-current-projection:start -->";
 export const PROJECTION_END = "<!-- mts-current-projection:end -->";
 
+/**
+ * Только документы, которые сами объявляют текущее состояние МТС.
+ * Специализированные specs не получают копию release manifest: это сохраняет
+ * принцип #278 «main = current state без аддитивного дублирования».
+ */
 export const CANONICAL_DOCS = [
   "README.md",
   "docs/CONTRIBUTING.md",
   "docs/theory/Основания МТС.md",
   "docs/theory/Система аксиом МТС.md",
-  "docs/specs/Формальная нотация МТС.md",
-  "docs/specs/Ачисла и сериализация.md",
-  "docs/specs/Апамять и управление сетью связей.md",
 ] as const;
 
 type JsonObject = Record<string, unknown>;
