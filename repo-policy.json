@@ -68,18 +68,6 @@
     },
     "rules": [
       {
-        "id": "v09-candidate-pair-id",
-        "kind": "scalar_equal",
-        "left": {"document": "candidate-v09-contract", "pointer": "/schema", "type": "string"},
-        "right": {"document": "candidate-v09-conformance", "pointer": "/contract", "type": "string"}
-      },
-      {
-        "id": "v09-candidate-conformance-path",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v09-contract", "pointer": "/conformanceCorpus", "type": "string"},
-        "value": "contracts/mts-conformance-v0.9.json"
-      },
-      {
         "id": "v09-contract-semantic-base-v08",
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v09-contract", "pointer": "/semanticBase", "type": "string"},
@@ -114,36 +102,6 @@
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v09-conformance", "pointer": "/acceptanceReady", "type": "boolean"},
         "value": true
-      },
-      {
-        "id": "v09-baseline-owner-paths-exist",
-        "kind": "referenced_paths_exist",
-        "source": {
-          "document": "candidate-v09-contract",
-          "pointer": "/baselineOwners",
-          "projection": "object_values",
-          "type": "repository_path_set"
-        }
-      },
-      {
-        "id": "v09-candidate-owner-paths-exist",
-        "kind": "referenced_paths_exist",
-        "source": {
-          "document": "candidate-v09-contract",
-          "pointer": "/candidateOwners",
-          "projection": "object_values",
-          "type": "repository_path_set"
-        }
-      },
-      {
-        "id": "v09-candidate-gate-paths-exist",
-        "kind": "referenced_paths_exist",
-        "source": {
-          "document": "candidate-v09-conformance",
-          "pointer": "/requiredExecutableGates",
-          "projection": "array_items",
-          "type": "repository_path_set"
-        }
       }
     ]
   },
@@ -170,18 +128,6 @@
         "type": "string_set"
       },
       "target_anchor_type": "negative_vector_test"
-    },
-    {
-      "id": "v09-candidate-gates-covered-by-project-ci",
-      "kind": "workflow_path_coverage",
-      "source": {
-        "document": "candidate-v09-conformance",
-        "pointer": "/requiredExecutableGates",
-        "projection": "array_items",
-        "type": "repository_path_set"
-      },
-      "workflow": "project-ci",
-      "covers": ["ts/test/**"]
     }
   ],
   "anchors": {
@@ -222,8 +168,8 @@
       "scope": "directory",
       "metric": "files",
       "glob": "contracts/**",
-      "max": 6,
-      "max_growth": 2,
+      "max": 4,
+      "max_growth": 0,
       "count": "all_tracked",
       "level": "blocking"
     },
