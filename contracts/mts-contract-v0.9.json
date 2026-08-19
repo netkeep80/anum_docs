@@ -31,6 +31,11 @@
     "proof": "ts/src/proof.ts",
     "checker": "ts/src/checker.ts"
   },
+  "candidateOwners": {
+    "exactSequence": "ts/src/exact-sequence.ts",
+    "quaternaryState": "ts/src/quaternary-state.ts",
+    "structuralCarrierEvidence": "ts/test/v09-structural-carriers.test.ts"
+  },
   "semanticIdentity": {
     "acceptedV08TargetPreserved": true,
     "runtimeHandleIsSemanticIdentity": false,
@@ -103,10 +108,14 @@
     "classes": ["EXACT_SEQUENCE", "FOLD_RESULT", "RESTRICTED_ROOTED_SEQUENCE"],
     "exactSequence": {
       "ownerIssue": 604,
+      "implementationIssue": 606,
+      "implementationOwner": "ts/src/exact-sequence.ts",
+      "evidence": "ts/test/v09-structural-carriers.test.ts",
       "empty": "R",
       "append": "Cell(prev,value)=startSelfClosed(prev ⟼ value)",
       "positionsContainingRootPreserved": true,
-      "runtimePositionIdAllowed": false
+      "runtimePositionIdAllowed": false,
+      "candidateImplemented": true
     },
     "foldResult": {
       "injectiveSequenceIdentityRequired": false
@@ -117,10 +126,14 @@
   },
   "quaternaryState": {
     "ownerIssue": 604,
+    "implementationIssue": 606,
+    "implementationOwner": "ts/src/quaternary-state.ts",
+    "evidence": "ts/test/v09-structural-carriers.test.ts",
     "empty": "R",
     "nonEmpty": "QNonEmpty(x)=startSelfClosed(x)",
     "hostStartedBooleanIsSemanticAuthority": false,
-    "acceptedV08DenotationPreserved": true
+    "acceptedV08DenotationPreserved": true,
+    "candidateImplemented": true
   },
   "contextSemantics": {
     "ownerIssue": 601,
@@ -138,9 +151,9 @@
   },
   "semanticRules": {
     "Q_OPEN": {"implementationStatus": "planned", "issue": 609},
-    "Q_VALUE": {"implementationStatus": "planned", "issue": 606},
+    "Q_VALUE": {"implementationStatus": "candidate-implemented", "issue": 606},
     "Q_CLOSE": {"implementationStatus": "planned", "issue": 609},
-    "Q_FINALIZE": {"implementationStatus": "planned", "issue": 606},
+    "Q_FINALIZE": {"implementationStatus": "candidate-implemented", "issue": 606},
     "FORMAL_OPEN": {"implementationStatus": "planned", "issue": 609},
     "FORMAL_GROUP": {"implementationStatus": "planned", "issue": 609},
     "FORMAL_LINK": {"implementationStatus": "planned", "issue": 608},
@@ -157,10 +170,10 @@
     "explicitMaterializationMustReuseSameGroundedForm": true
   },
   "migrationSlices": [
-    {"issue": 606, "name": "root-safe exact sequence and structural QState"},
-    {"issue": 607, "name": "per-byte carrier and canonical byte vocabulary"},
-    {"issue": 608, "name": "structural interpreter/rule and generic replay"},
-    {"issue": 609, "name": "FORMAL contexts and cross-context integration"},
-    {"issue": 610, "name": "acceptance cutover and governance debt repayment"}
+    {"issue": 606, "name": "root-safe exact sequence and structural QState", "status": "candidate-green"},
+    {"issue": 607, "name": "per-byte carrier and canonical byte vocabulary", "status": "planned"},
+    {"issue": 608, "name": "structural interpreter/rule and generic replay", "status": "planned"},
+    {"issue": 609, "name": "FORMAL contexts and cross-context integration", "status": "planned"},
+    {"issue": 610, "name": "acceptance cutover and governance debt repayment", "status": "blocked"}
   ]
 }

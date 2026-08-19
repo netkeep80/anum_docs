@@ -148,6 +148,26 @@
           "projection": "object_values",
           "type": "repository_path_set"
         }
+      },
+      {
+        "id": "v09-candidate-owner-paths-exist",
+        "kind": "referenced_paths_exist",
+        "source": {
+          "document": "candidate-v09-contract",
+          "pointer": "/candidateOwners",
+          "projection": "object_values",
+          "type": "repository_path_set"
+        }
+      },
+      {
+        "id": "v09-candidate-gate-paths-exist",
+        "kind": "referenced_paths_exist",
+        "source": {
+          "document": "candidate-v09-conformance",
+          "pointer": "/requiredExecutableGates",
+          "projection": "array_items",
+          "type": "repository_path_set"
+        }
       }
     ]
   },
@@ -174,6 +194,18 @@
         "type": "string_set"
       },
       "target_anchor_type": "negative_vector_test"
+    },
+    {
+      "id": "v09-candidate-gates-covered-by-project-ci",
+      "kind": "workflow_path_coverage",
+      "source": {
+        "document": "candidate-v09-conformance",
+        "pointer": "/requiredExecutableGates",
+        "projection": "array_items",
+        "type": "repository_path_set"
+      },
+      "workflow": "project-ci",
+      "covers": ["ts/test/**"]
     }
   ],
   "anchors": {
