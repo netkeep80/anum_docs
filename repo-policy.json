@@ -55,6 +55,102 @@
       "cutover/typescript-c1-acceptance-v*.json"
     ]
   },
+  "document_relations": {
+    "documents": {
+      "candidate-v09-contract": {
+        "path": "contracts/mts-contract-v0.9.json",
+        "format": "json"
+      },
+      "candidate-v09-conformance": {
+        "path": "contracts/mts-conformance-v0.9.json",
+        "format": "json"
+      }
+    },
+    "rules": [
+      {
+        "id": "v09-candidate-pair-id",
+        "kind": "scalar_equal",
+        "left": {"document": "candidate-v09-contract", "pointer": "/schema", "type": "string"},
+        "right": {"document": "candidate-v09-conformance", "pointer": "/contract", "type": "string"}
+      },
+      {
+        "id": "v09-candidate-conformance-path",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-contract", "pointer": "/conformanceCorpus", "type": "string"},
+        "value": "contracts/mts-conformance-v0.9.json"
+      },
+      {
+        "id": "v09-contract-status-candidate",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-contract", "pointer": "/status", "type": "string"},
+        "value": "candidate"
+      },
+      {
+        "id": "v09-conformance-status-candidate",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-conformance", "pointer": "/status", "type": "string"},
+        "value": "candidate"
+      },
+      {
+        "id": "v09-contract-not-accepted",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-contract", "pointer": "/accepted", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v09-conformance-not-accepted",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-conformance", "pointer": "/accepted", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v09-contract-semantic-base-v08",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-contract", "pointer": "/semanticBase", "type": "string"},
+        "value": "mts-contract/v0.8"
+      },
+      {
+        "id": "v09-conformance-semantic-base-v08",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-conformance", "pointer": "/semanticBase", "type": "string"},
+        "value": "mts-conformance/v0.8"
+      },
+      {
+        "id": "v09-contract-is-semantic-delta",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-contract", "pointer": "/observableSemanticDelta", "type": "boolean"},
+        "value": true
+      },
+      {
+        "id": "v09-conformance-is-semantic-delta",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-conformance", "pointer": "/observableSemanticDelta", "type": "boolean"},
+        "value": true
+      },
+      {
+        "id": "v09-contract-not-ready",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-contract", "pointer": "/acceptanceReady", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v09-conformance-not-ready",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v09-conformance", "pointer": "/acceptanceReady", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v09-baseline-owner-paths-exist",
+        "kind": "referenced_paths_exist",
+        "source": {
+          "document": "candidate-v09-contract",
+          "pointer": "/baselineOwners",
+          "projection": "object_values",
+          "type": "repository_path_set"
+        }
+      }
+    ]
+  },
   "evidence_bindings": [
     {
       "id": "required-gates-covered-by-project-ci",
@@ -152,5 +248,14 @@
       "max_unapproved_latin_words_per_line": 1
     }
   ],
-  "cochange_rules": []
+  "cochange_rules": [
+    {
+      "if_changed": ["contracts/mts-contract-v0.9.json"],
+      "must_change_any": ["contracts/mts-conformance-v0.9.json"]
+    },
+    {
+      "if_changed": ["contracts/mts-conformance-v0.9.json"],
+      "must_change_any": ["contracts/mts-contract-v0.9.json"]
+    }
+  ]
 }
