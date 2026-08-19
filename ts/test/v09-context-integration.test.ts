@@ -19,11 +19,7 @@ import {
   type ReadMemory,
 } from "../src/memory.js";
 import { replayRun } from "../src/run.js";
-import {
-  defineContext,
-  defineLocalRepresentativeBinding,
-  readContext,
-} from "../src/state.js";
+import { defineContext, defineLocalRepresentativeBinding, readContext } from "../src/state.js";
 import { defineActField, defineActHeader } from "../src/structural-readers.js";
 import {
   admitStructuralRule,
@@ -68,6 +64,11 @@ function anchors(memory: Memory, count: number): LinkHandle[] {
   }
   return result;
 }
+function required(values: readonly LinkHandle[], index: number, name: string): LinkHandle {
+  const value = values[index];
+  assert(value !== undefined, `missing fixture ${name}`);
+  return value;
+}
 
 class ReplayProbe implements ReadMemory {
   outgoingCalls = 0;
@@ -89,8 +90,9 @@ interface InterpreterFixture {
 }
 function interpreter(memory: Memory): InterpreterFixture {
   const refs = anchors(memory, 3);
-  const [dictionary, grammar, theory] = refs;
-  assert(dictionary && grammar && theory, "interpreter refs");
+  const dictionary = required(refs, 0, "dictionary");
+  const grammar = required(refs, 1, "grammar");
+  const theory = required(refs, 2, "theory");
   const structure = Object.freeze({ dictionary, grammar, theory });
   return Object.freeze({
     handle: defineStructuralInterpreter(memory, dictionary, grammar, theory),
@@ -119,19 +121,15 @@ function rule(
 function act(
   memory: Memory,
   owner: InterpreterFixture,
-  ruleFixture: RuleFixture,
+  selected: RuleFixture,
   after: LinkHandle,
   fields: readonly (readonly [LinkHandle, LinkHandle])[],
 ): LinkHandle {
-  const result = defineActHeader(memory, owner.handle, ruleFixture.roleDictionary, after);
-  for (const [role, value] of fields) defineActField(memory, result, role, value);
+  const result = defineActHeader(memory, owner.handle, selected.roleDictionary, after);
+  for (const [roleRef, value] of fields) defineActField(memory, result, roleRef, value);
   return result;
 }
-function parentContext(
-  memory: Memory,
-  owner: InterpreterFixture,
-  marker: LinkHandle,
-): TypedContext {
+function parentContext(memory: Memory, owner: InterpreterFixture, marker: LinkHandle): TypedContext {
   return defineTypedContext(
     memory,
     owner.handle,
@@ -171,38 +169,60 @@ const basis = ensureRootBasis(memory);
 const rootI = interpreter(memory);
 const formalI = interpreter(memory);
 const qI = interpreter(memory);
-const refs = anchors(memory, 30);
-const [
-  marker0, marker1, marker2, marker3, A, B, C,
-  arrowCarrier, oneCarrier, equalCarrier, infinityCarrier, colonCarrier,
-  leftRole, rightRole, valueRole, contextRole, leftRepresentativeRole,
-  rightRepresentativeRole, sourceRole, formRole, beforeRole, afterRole,
-  representative, otherRepresentative, runValue0, runValue1, runValue2,
-] = refs;
-assert(
-  marker0 && marker1 && marker2 && marker3 && A && B && C && arrowCarrier && oneCarrier &&
-  equalCarrier && infinityCarrier && colonCarrier && leftRole && rightRole && valueRole &&
-  contextRole && leftRepresentativeRole && rightRepresentativeRole && sourceRole && formRole &&
-  beforeRole && afterRole && representative && otherRepresentative && runValue0 && runValue1 && runValue2,
-  "M5 refs",
-);
+const refs = anchors(memory, 40);
+const marker0 = required(refs, 0, "marker0");
+const marker1 = required(refs, 1, "marker1");
+const marker2 = required(refs, 2, "marker2");
+const marker3 = required(refs, 3, "marker3");
+const marker4 = required(refs, 4, "marker4");
+const marker5 = required(refs, 5, "marker5");
+const marker6 = required(refs, 6, "marker6");
+const marker7 = required(refs, 7, "marker7");
+const marker8 = required(refs, 8, "marker8");
+const marker9 = required(refs, 9, "marker9");
+const marker10 = required(refs, 10, "marker10");
+const A = required(refs, 11, "A");
+const B = required(refs, 12, "B");
+const C = required(refs, 13, "C");
+const arrowCarrier = required(refs, 14, "arrowCarrier");
+const oneCarrier = required(refs, 15, "oneCarrier");
+const equalCarrier = required(refs, 16, "equalCarrier");
+const infinityCarrier = required(refs, 17, "infinityCarrier");
+const colonCarrier = required(refs, 18, "colonCarrier");
+const leftRole = required(refs, 19, "leftRole");
+const rightRole = required(refs, 20, "rightRole");
+const valueRole = required(refs, 21, "valueRole");
+const contextRole = required(refs, 22, "contextRole");
+const leftRepresentativeRole = required(refs, 23, "leftRepresentativeRole");
+const rightRepresentativeRole = required(refs, 24, "rightRepresentativeRole");
+const sourceRole = required(refs, 25, "sourceRole");
+const formRole = required(refs, 26, "formRole");
+const beforeRole = required(refs, 27, "beforeRole");
+const afterRole = required(refs, 28, "afterRole");
+const representative = required(refs, 29, "representative");
+const otherRepresentative = required(refs, 30, "otherRepresentative");
+const runValue0 = required(refs, 31, "runValue0");
+const runValue1 = required(refs, 32, "runValue1");
+const runValue2 = required(refs, 33, "runValue2");
 
-// Carrier/use identity is retained even when root meanings intentionally collide.
+// Same root meaning does not erase sign/carrier/use identity.
 const arrowUse = memory.ensure(arrowCarrier, basis.L);
 const abitOneUse = memory.ensure(oneCarrier, basis.L);
 const equalUse = memory.ensure(equalCarrier, basis.R);
 const infinityUse = memory.ensure(infinityCarrier, basis.R);
-const colonMeaning = memory.ensure(basis.R, basis.L);
-const colonUse = memory.ensure(colonCarrier, colonMeaning);
-assert(arrowUse !== abitOneUse, "FORMAL arrow use must not flatten into quaternary 1 use");
-assert(equalUse !== infinityUse, "FORMAL = use must not flatten into infinity use");
+const colonUse = memory.ensure(colonCarrier, memory.ensure(basis.R, basis.L));
+assert(arrowUse !== abitOneUse, "FORMAL arrow must stay distinct from quaternary 1 use");
+assert(equalUse !== infinityUse, "FORMAL = must stay distinct from infinity use");
 
-// Admitted relation Rule: exact FORMAL sequence, no precedence or associativity primitive.
+// Relation Rule admits exactly `(left ⟼ right)` and returns `left ⟼ right`.
 const relationTemplateForm = materializeExactSequence(memory, [leftRole, arrowUse, rightRole]);
 const relationTemplateResult = memory.ensure(leftRole, rightRole);
-const relationBody = materializeExactSequence(memory, [relationTemplateForm, relationTemplateResult]);
-const relationRule = rule(memory, formalI, [leftRole, rightRole], relationBody);
-
+const relationRule = rule(
+  memory,
+  formalI,
+  [leftRole, rightRole],
+  materializeExactSequence(memory, [relationTemplateForm, relationTemplateResult]),
+);
 function evaluateRelation(
   parent: TypedContext,
   parentOwner: InterpreterFixture,
@@ -214,46 +234,51 @@ function evaluateRelation(
   child = continueFormalContext(memory, child, formalI.structure, arrowUse);
   child = continueFormalContext(memory, child, formalI.structure, right);
   const result = memory.ensure(left, right);
-  const claimedBody = materializeExactSequence(memory, [readContext(memory, child.context).current, result]);
-  const selectedAct = act(memory, formalI, relationRule, parent.context, [
-    [leftRole, left], [rightRole, right],
-  ]);
+  const claimed = materializeExactSequence(memory, [readContext(memory, child.context).current, result]);
+  const selectedAct = act(memory, formalI, relationRule, parent.context, [[leftRole, left], [rightRole, right]]);
   const probe = new ReplayProbe(memory);
   const before = memory.linkCount;
-  const replayed = replayFormalClose(
-    probe,
-    closeEvidence(child, parent, formalI, parentOwner, result, relationRule, selectedAct, claimedBody),
+  same(
+    replayFormalClose(probe, closeEvidence(child, parent, formalI, parentOwner, result, relationRule, selectedAct, claimed)).result,
+    result,
+    "relation close result",
   );
-  same(replayed.result, result, "relation close result");
   same(memory.linkCount, before, "relation close replay is read-only");
-  assert(probe.outgoingCalls > 0, "relation close uses structural Act fields");
+  assert(probe.outgoingCalls > 0, "relation close reads structural Act fields");
   return result;
 }
 
 const relationParent = parentContext(memory, rootI, marker0);
 const relation = evaluateRelation(relationParent, rootI, A, B);
 same(relation, memory.ensure(A, B), "(A ⟼ B)");
-const relationParentStateBefore = readContext(memory, relationParent.context);
-const relationParentAfter = continueFormalContext(memory, relationParent, rootI.structure, relation);
-same(readContext(memory, relationParent.context).current, relationParentStateBefore.current, "CLOSE does not mutate parent");
-same(readContext(memory, relationParentAfter.context).parent, relationParentStateBefore.parent, "PARENT_CONTINUE preserves lexical parent");
-const continuedValues = readExactSequence(memory, readContext(memory, relationParentAfter.context).current).values;
-same(continuedValues.at(-1), relation, "PARENT_CONTINUE appends result");
+const beforeParentState = readContext(memory, relationParent.context);
+const afterParent = continueFormalContext(memory, relationParent, rootI.structure, relation);
+same(readContext(memory, relationParent.context).current, beforeParentState.current, "CLOSE leaves parent-before immutable");
+same(readContext(memory, afterParent.context).parent, beforeParentState.parent, "PARENT_CONTINUE preserves lexical parent");
+const continued = readExactSequence(memory, readContext(memory, afterParent.context).current).values;
+same(continued[continued.length - 1], relation, "PARENT_CONTINUE appends semantic result");
 
-// Right and left nested FORMAL groups stay structurally distinct.
+// `(A ⟼ (B ⟼ C))` and `((A ⟼ B) ⟼ C)` remain different exact trees.
 const rightParent = parentContext(memory, rootI, marker1);
 let rightOuter = openFormalContext(memory, rightParent, rootI.structure, formalI.handle);
 rightOuter = continueFormalContext(memory, rightOuter, formalI.structure, A);
 rightOuter = continueFormalContext(memory, rightOuter, formalI.structure, arrowUse);
 const bc = evaluateRelation(rightOuter, formalI, B, C);
 rightOuter = continueFormalContext(memory, rightOuter, formalI.structure, bc);
-const rightNested = (() => {
-  const result = memory.ensure(A, bc);
-  const claimed = materializeExactSequence(memory, [readContext(memory, rightOuter.context).current, result]);
-  const selectedAct = act(memory, formalI, relationRule, rightParent.context, [[leftRole, A], [rightRole, bc]]);
-  replayFormalClose(memory, closeEvidence(rightOuter, rightParent, formalI, rootI, result, relationRule, selectedAct, claimed));
-  return result;
-})();
+const rightNested = memory.ensure(A, bc);
+replayFormalClose(
+  memory,
+  closeEvidence(
+    rightOuter,
+    rightParent,
+    formalI,
+    rootI,
+    rightNested,
+    relationRule,
+    act(memory, formalI, relationRule, rightParent.context, [[leftRole, A], [rightRole, bc]]),
+    materializeExactSequence(memory, [readContext(memory, rightOuter.context).current, rightNested]),
+  ),
+);
 
 const leftParent = parentContext(memory, rootI, marker2);
 let leftOuter = openFormalContext(memory, leftParent, rootI.structure, formalI.handle);
@@ -261,41 +286,47 @@ const ab = evaluateRelation(leftOuter, formalI, A, B);
 leftOuter = continueFormalContext(memory, leftOuter, formalI.structure, ab);
 leftOuter = continueFormalContext(memory, leftOuter, formalI.structure, arrowUse);
 leftOuter = continueFormalContext(memory, leftOuter, formalI.structure, C);
-const leftNested = (() => {
-  const result = memory.ensure(ab, C);
-  const claimed = materializeExactSequence(memory, [readContext(memory, leftOuter.context).current, result]);
-  const selectedAct = act(memory, formalI, relationRule, leftParent.context, [[leftRole, ab], [rightRole, C]]);
-  replayFormalClose(memory, closeEvidence(leftOuter, leftParent, formalI, rootI, result, relationRule, selectedAct, claimed));
-  return result;
-})();
-assert(rightNested !== leftNested, "(A ⟼ (B ⟼ C)) must differ from ((A ⟼ B) ⟼ C)");
+const leftNested = memory.ensure(ab, C);
+replayFormalClose(
+  memory,
+  closeEvidence(
+    leftOuter,
+    leftParent,
+    formalI,
+    rootI,
+    leftNested,
+    relationRule,
+    act(memory, formalI, relationRule, leftParent.context, [[leftRole, ab], [rightRole, C]]),
+    materializeExactSequence(memory, [readContext(memory, leftOuter.context).current, leftNested]),
+  ),
+);
+assert(rightNested !== leftNested, "right and left nested relation trees must differ");
 
-// Bare A ⟼ B ⟼ C has no admitted foundation relation shape.
+// No precedence/associativity shortcut admits bare `A ⟼ B ⟼ C`.
 {
   const parent = parentContext(memory, rootI, marker3);
   let bare = openFormalContext(memory, parent, rootI.structure, formalI.handle);
   for (const value of [A, arrowUse, B, arrowUse, C]) {
     bare = continueFormalContext(memory, bare, formalI.structure, value);
   }
-  const result = memory.ensure(memory.ensure(A, B), C);
-  const claimed = materializeExactSequence(memory, [readContext(memory, bare.context).current, result]);
+  const result = memory.ensure(ab, C);
   const selectedAct = act(memory, formalI, relationRule, parent.context, [[leftRole, A], [rightRole, B]]);
+  const claimed = materializeExactSequence(memory, [readContext(memory, bare.context).current, result]);
   expectRuleError("template-mismatch", () => replayFormalClose(
     memory,
     closeEvidence(bare, parent, formalI, rootI, result, relationRule, selectedAct, claimed),
   ));
 }
 
-// Explicit one-value grouping Rule is admitted; empty FORMAL remains unadmitted.
-const oneTemplateForm = materializeExactSequence(memory, [valueRole]);
-const oneBody = materializeExactSequence(memory, [oneTemplateForm, valueRole]);
-const oneRule = rule(memory, formalI, [valueRole], oneBody);
+// A one-value group is admitted explicitly; `()` itself is not.
+const oneTemplate = materializeExactSequence(memory, [valueRole]);
+const oneRule = rule(memory, formalI, [valueRole], materializeExactSequence(memory, [oneTemplate, valueRole]));
 {
-  const parent = parentContext(memory, rootI, anchors(memory, 1)[0] ?? memory.root);
+  const parent = parentContext(memory, rootI, marker4);
   let child = openFormalContext(memory, parent, rootI.structure, formalI.handle);
   child = continueFormalContext(memory, child, formalI.structure, A);
-  const claimed = materializeExactSequence(memory, [readContext(memory, child.context).current, A]);
   const selectedAct = act(memory, formalI, oneRule, parent.context, [[valueRole, A]]);
+  const claimed = materializeExactSequence(memory, [readContext(memory, child.context).current, A]);
   replayFormalClose(memory, closeEvidence(child, parent, formalI, rootI, A, oneRule, selectedAct, claimed));
 
   const empty = openFormalContext(memory, parent, rootI.structure, formalI.handle);
@@ -305,73 +336,73 @@ const oneRule = rule(memory, formalI, [valueRole], oneBody);
   ));
 }
 
-// Q OPEN/CLOSE re-entry: [] -> R; [ [] ] also returns R, but parent FORMAL keeps the explicit position.
+// `[]`, `[[]]`, `([[]])`: Q result R survives as an explicit FORMAL position.
 {
-  const parent = parentContext(memory, rootI, anchors(memory, 1)[0] ?? memory.root);
+  const parent = parentContext(memory, rootI, marker5);
   let formal = openFormalContext(memory, parent, rootI.structure, formalI.handle);
   const emptyQ = openQuaternaryContext(memory, formal, formalI.structure, qI.handle);
   const before = memory.linkCount;
-  same(replayQuaternaryClose(memory, emptyQ, qI.structure, formal, formalI.structure, memory.root), memory.root, "[] closes to R");
+  same(replayQuaternaryClose(memory, emptyQ, qI.structure, formal, formalI.structure, memory.root), memory.root, "[] -> R");
   same(memory.linkCount, before, "Q close replay is read-only");
   formal = continueFormalContext(memory, formal, formalI.structure, memory.root);
-  const values = readExactSequence(memory, readContext(memory, formal.context).current).values;
-  same(values.length, 1, "returned R is one FORMAL position");
-  same(values[0], memory.root, "returned R position value");
+  const returnedRoot = readExactSequence(memory, readContext(memory, formal.context).current).values;
+  same(returnedRoot.length, 1, "returned R is one exact FORMAL position");
+  same(returnedRoot[0], memory.root, "returned R position value");
 
   let outerQ = openQuaternaryContext(memory, formal, formalI.structure, qI.handle);
   const innerQ = openQuaternaryContext(memory, outerQ, qI.structure, qI.handle);
   const innerResult = replayQuaternaryClose(memory, innerQ, qI.structure, outerQ, qI.structure, memory.root);
   outerQ = continueQuaternaryContext(memory, outerQ, qI.structure, innerResult);
   const outerResult = replayQuaternaryClose(memory, outerQ, qI.structure, formal, formalI.structure, memory.root);
-  same(outerResult, memory.root, "[[]] closes canonically to R");
+  same(outerResult, memory.root, "[[]] -> R");
 
   let wrapper = openFormalContext(memory, parent, rootI.structure, formalI.handle);
   wrapper = continueFormalContext(memory, wrapper, formalI.structure, outerResult);
-  const claimed = materializeExactSequence(memory, [readContext(memory, wrapper.context).current, memory.root]);
   const selectedAct = act(memory, formalI, oneRule, parent.context, [[valueRole, memory.root]]);
+  const claimed = materializeExactSequence(memory, [readContext(memory, wrapper.context).current, memory.root]);
   replayFormalClose(memory, closeEvidence(wrapper, parent, formalI, rootI, memory.root, oneRule, selectedAct, claimed));
-  same(readExactSequence(memory, readContext(memory, wrapper.context).current).values.length, 1, "([[]]) contains one R before close");
+  same(readExactSequence(memory, readContext(memory, wrapper.context).current).values.length, 1, "([[]]) has one root-valued form");
 }
 
-// Colon is a distinct admitted FORMAL use even though its meaning is itself structural.
+// `:` is admitted as its own sign/use and yields carrier -> form Entry structurally.
 {
-  const parent = parentContext(memory, rootI, anchors(memory, 1)[0] ?? memory.root);
+  const parent = parentContext(memory, rootI, marker6);
   let child = openFormalContext(memory, parent, rootI.structure, formalI.handle);
-  child = continueFormalContext(memory, child, formalI.structure, A);
-  child = continueFormalContext(memory, child, formalI.structure, colonUse);
-  child = continueFormalContext(memory, child, formalI.structure, B);
-  const templateForm = materializeExactSequence(memory, [sourceRole, colonUse, formRole]);
-  const templateEntry = memory.ensure(sourceRole, formRole);
-  const selectedRule = rule(memory, formalI, [sourceRole, formRole], materializeExactSequence(memory, [templateForm, templateEntry]));
+  for (const value of [A, colonUse, B]) child = continueFormalContext(memory, child, formalI.structure, value);
+  const template = materializeExactSequence(memory, [sourceRole, colonUse, formRole]);
+  const entryTemplate = memory.ensure(sourceRole, formRole);
+  const selectedRule = rule(memory, formalI, [sourceRole, formRole], materializeExactSequence(memory, [template, entryTemplate]));
   const entry = memory.ensure(A, B);
-  const claimed = materializeExactSequence(memory, [readContext(memory, child.context).current, entry]);
   const selectedAct = act(memory, formalI, selectedRule, parent.context, [[sourceRole, A], [formRole, B]]);
+  const claimed = materializeExactSequence(memory, [readContext(memory, child.context).current, entry]);
   replayFormalClose(memory, closeEvidence(child, parent, formalI, rootI, entry, selectedRule, selectedAct, claimed));
 }
 
-// FORMAL `=`: structural Rule first, then one-hop context-local representative judgment.
-const equalityTemplateForm = materializeExactSequence(memory, [leftRole, equalUse, rightRole]);
-const equalityBody = materializeExactSequence(memory, [equalityTemplateForm, memory.root]);
+// `=`: admitted structural Rule + one-hop context-local representative evidence.
+const equalityTemplate = materializeExactSequence(memory, [leftRole, equalUse, rightRole]);
 const equalityRule = rule(
   memory,
   formalI,
   [contextRole, leftRole, rightRole, leftRepresentativeRole, rightRepresentativeRole],
-  equalityBody,
+  materializeExactSequence(memory, [equalityTemplate, memory.root]),
 );
-{
-  const resolutionContext = defineContext(memory, memory.root, anchors(memory, 1)[0] ?? memory.root);
-  defineLocalRepresentativeBinding(memory, resolutionContext, A, representative);
-  defineLocalRepresentativeBinding(memory, resolutionContext, B, representative);
-  const parent = parentContext(memory, rootI, anchors(memory, 1)[0] ?? memory.root);
+function equalityChild(parent: TypedContext): TypedContext {
   let child = openFormalContext(memory, parent, rootI.structure, formalI.handle);
   child = continueFormalContext(memory, child, formalI.structure, A);
   child = continueFormalContext(memory, child, formalI.structure, equalUse);
-  child = continueFormalContext(memory, child, formalI.structure, B);
-  const claimed = materializeExactSequence(memory, [readContext(memory, child.context).current, memory.root]);
+  return continueFormalContext(memory, child, formalI.structure, B);
+}
+{
+  const resolutionContext = defineContext(memory, memory.root, marker7);
+  defineLocalRepresentativeBinding(memory, resolutionContext, A, representative);
+  defineLocalRepresentativeBinding(memory, resolutionContext, B, representative);
+  const parent = parentContext(memory, rootI, marker7);
+  const child = equalityChild(parent);
   const selectedAct = act(memory, formalI, equalityRule, parent.context, [
     [contextRole, resolutionContext], [leftRole, A], [rightRole, B],
     [leftRepresentativeRole, representative], [rightRepresentativeRole, representative],
   ]);
+  const claimed = materializeExactSequence(memory, [readContext(memory, child.context).current, memory.root]);
   const before = memory.linkCount;
   replayFormalEquality(new ReplayProbe(memory), {
     ...closeEvidence(child, parent, formalI, rootI, memory.root, equalityRule, selectedAct, claimed),
@@ -384,21 +415,17 @@ const equalityRule = rule(
   });
   same(memory.linkCount, before, "equality replay is read-only");
 
-  const distinctContext = defineContext(memory, memory.root, anchors(memory, 1)[0] ?? memory.root);
+  const distinctContext = defineContext(memory, memory.root, marker8);
   defineLocalRepresentativeBinding(memory, distinctContext, A, representative);
   defineLocalRepresentativeBinding(memory, distinctContext, B, otherRepresentative);
-  // Even if representative itself has a local binding, equality does not compute transitive closure.
   defineLocalRepresentativeBinding(memory, distinctContext, representative, otherRepresentative);
-  const distinctParent = parentContext(memory, rootI, anchors(memory, 1)[0] ?? memory.root);
-  let distinctChild = openFormalContext(memory, distinctParent, rootI.structure, formalI.handle);
-  distinctChild = continueFormalContext(memory, distinctChild, formalI.structure, A);
-  distinctChild = continueFormalContext(memory, distinctChild, formalI.structure, equalUse);
-  distinctChild = continueFormalContext(memory, distinctChild, formalI.structure, B);
-  const distinctClaim = materializeExactSequence(memory, [readContext(memory, distinctChild.context).current, memory.root]);
+  const distinctParent = parentContext(memory, rootI, marker8);
+  const distinctChild = equalityChild(distinctParent);
   const distinctAct = act(memory, formalI, equalityRule, distinctParent.context, [
     [contextRole, distinctContext], [leftRole, A], [rightRole, B],
     [leftRepresentativeRole, representative], [rightRepresentativeRole, otherRepresentative],
   ]);
+  const distinctClaim = materializeExactSequence(memory, [readContext(memory, distinctChild.context).current, memory.root]);
   expectContextError("equality-distinguished", () => replayFormalEquality(memory, {
     ...closeEvidence(distinctChild, distinctParent, formalI, rootI, memory.root, equalityRule, distinctAct, distinctClaim),
     resolutionContext: distinctContext,
@@ -410,10 +437,10 @@ const equalityRule = rule(
   }));
 }
 
-// Negative lifecycle evidence: wrong parent, wrong I and wrong continuation I all reject.
+// Wrong lexical parent / wrong I / wrong continuation I reject.
 {
-  const parent = parentContext(memory, rootI, anchors(memory, 1)[0] ?? memory.root);
-  const otherParent = parentContext(memory, rootI, anchors(memory, 1)[0] ?? memory.root);
+  const parent = parentContext(memory, rootI, marker9);
+  const otherParent = parentContext(memory, rootI, marker10);
   let child = openFormalContext(memory, parent, rootI.structure, formalI.handle);
   child = continueFormalContext(memory, child, formalI.structure, A);
   const claimed = materializeExactSequence(memory, [readContext(memory, child.context).current, A]);
@@ -422,22 +449,16 @@ const equalityRule = rule(
     memory,
     closeEvidence(child, otherParent, formalI, rootI, A, oneRule, selectedAct, claimed),
   ));
-
   expectContextError("context-interpreter-mismatch", () => replayFormalClose(memory, {
     ...closeEvidence(child, parent, formalI, rootI, A, oneRule, selectedAct, claimed),
     expectedChildInterpreter: qI.structure,
   }));
-  expectContextError("context-interpreter-mismatch", () => continueFormalContext(
-    memory,
-    parent,
-    qI.structure,
-    A,
-  ));
+  expectContextError("context-interpreter-mismatch", () => continueFormalContext(memory, parent, qI.structure, A));
 }
 
-// Run is temporal order; K.parent remains lexical structure and does not encode the step sequence.
+// Run owns temporal order; K.parent independently remains lexical nesting.
 {
-  const lexicalParent = defineContext(memory, memory.root, anchors(memory, 1)[0] ?? memory.root);
+  const lexicalParent = defineContext(memory, memory.root, required(refs, 34, "lexicalParentCurrent"));
   const k0 = defineContext(memory, lexicalParent, runValue0);
   const k1 = defineContext(memory, lexicalParent, runValue1);
   const k2 = defineContext(memory, lexicalParent, runValue2);
@@ -450,16 +471,12 @@ const equalityRule = rule(
   defineActField(memory, secondAct, afterRole, k2);
   const run1 = memory.ensure(memory.root, firstAct);
   const run2 = memory.ensure(run1, secondAct);
-  const acts = replayRun(memory, {
+  same(replayRun(memory, {
     runRoot: run2,
     initialContext: k0,
     terminalContext: k2,
-    steps: [
-      { act: firstAct, beforeRole, afterRole },
-      { act: secondAct, beforeRole, afterRole },
-    ],
-  });
-  same(acts.length, 2, "Run preserves two temporal steps");
+    steps: [{ act: firstAct, beforeRole, afterRole }, { act: secondAct, beforeRole, afterRole }],
+  }).length, 2, "Run preserves two temporal steps");
   same(readContext(memory, k0).parent, lexicalParent, "k0 lexical parent");
   same(readContext(memory, k1).parent, lexicalParent, "k1 lexical parent");
   same(readContext(memory, k2).parent, lexicalParent, "k2 lexical parent");
