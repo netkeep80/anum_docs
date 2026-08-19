@@ -8,7 +8,7 @@
   "observableSemanticDelta": true,
   "conformanceCorpus": "contracts/mts-conformance-v0.9.json",
   "acceptedCurrent": "mts-contract/v0.8",
-  "acceptanceReady": true,
+  "acceptanceReady": false,
   "implementation": {
     "language": "TypeScript",
     "package": "@mts/core",
@@ -42,7 +42,6 @@
     "contextIntegration": "ts/src/context-integration.ts",
     "contextIntegrationEvidence": "ts/test/v09-context-integration.test.ts",
     "machineReadinessEvidence": "ts/test/v09-readiness.test.ts",
-    "f1AxiomAsetDocument": "docs/research/MTS v0.9 F1 — замкнутый axiom-aset.md",
     "f1AxiomAsetEvidence": "ts/test/v09-f1-axiom-aset.test.ts"
   },
   "semanticIdentity": {
@@ -238,6 +237,6 @@
     {"issue": 609, "name": "FORMAL contexts and cross-context integration", "status": "candidate-green"},
     {"issue": 597, "name": "machine reconciliation and executable evidence completeness", "status": "candidate-green"},
     {"issue": 594, "name": "closed self-introducing F1 axiom-aset", "status": "candidate-green"},
-    {"issue": 610, "name": "acceptance cutover and governance debt repayment", "status": "ready"}
+    {"issue": 610, "name": "acceptance cutover and governance debt repayment", "status": "blocked"}
   ]
 }
