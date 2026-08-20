@@ -14,12 +14,12 @@
   },
   "conformanceCorpus": "contracts/mts-conformance-v0.10.json",
   "acceptedCurrent": "mts-contract/v0.9",
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "implementation": {
     "language": "TypeScript",
     "singleLiveSemanticRuntime": true,
     "candidateRuntimeSelectable": false,
-    "implementationComplete": false
+    "implementationComplete": true
   },
   "foundation": {
     "minimalInternalSigns": ["∞", "[", "]", "1", "0", "(", ")", "⟼", ":", "=", "."],
@@ -93,8 +93,8 @@
   "candidateState": {
     "theoryResearchComplete": true,
     "contractBoundaryEstablished": true,
-    "executableEvidenceComplete": false,
-    "runtimeMappingComplete": false,
+    "executableEvidenceComplete": true,
+    "runtimeMappingComplete": true,
     "acceptedV09Mutated": false
   }
 }
