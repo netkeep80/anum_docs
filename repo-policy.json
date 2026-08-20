@@ -39,12 +39,12 @@
     },
     "accepted_state": {"status": "accepted", "accepted": true},
     "acceptance": {
-      "document": {"path": "cutover/typescript-c1-acceptance-v0.2.json", "format": "json"},
+      "document": {"path": "cutover/typescript-c1-acceptance-v0.3.json", "format": "json"},
       "current_contract_path": "/current/contract",
       "current_conformance_path": "/current/conformance"
     },
     "required_paths": [
-      {"document": "current.contract", "pointer": "/foundation", "projection": "object_values"},
+      {"document": "current.contract", "pointer": "/owners", "projection": "object_values"},
       {"document": "current.conformance", "pointer": "/requiredExecutableGates", "projection": "array_items"},
       {"document": "acceptance", "pointer": "/current", "projection": "object_values"}
     ],
@@ -258,7 +258,7 @@
       "glob": "README.md",
       "mode": "markdown_language",
       "language": "ru",
-      "allow_words": ["API", "ASCII", "CI", "CLI", "Git", "GitHub", "JSON", "Python", "TypeScript", "UTF"],
+      "allow_words": ["API", "ASCII", "CI", "CLI", "Git", "GitHub", "JSON", "Python", "TypeScript", "UTF", "WRITE", "READ"],
       "max_unapproved_latin_words_per_line": 1
     },
     {
