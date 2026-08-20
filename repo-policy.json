@@ -21,12 +21,12 @@
   },
   "contract_conformance": {
     "current": {
-      "contract": {"path": "contracts/mts-contract-v0.9.json", "format": "json"},
-      "conformance": {"path": "contracts/mts-conformance-v0.9.json", "format": "json"}
+      "contract": {"path": "contracts/mts-contract-v0.10.json", "format": "json"},
+      "conformance": {"path": "contracts/mts-conformance-v0.10.json", "format": "json"}
     },
     "previous": {
-      "contract": {"path": "contracts/mts-contract-v0.8.json", "format": "json"},
-      "conformance": {"path": "contracts/mts-conformance-v0.8.json", "format": "json"}
+      "contract": {"path": "contracts/mts-contract-v0.9.json", "format": "json"},
+      "conformance": {"path": "contracts/mts-conformance-v0.9.json", "format": "json"}
     },
     "pair_fields": {
       "contract_id": "/schema",
@@ -44,7 +44,7 @@
       "current_conformance_path": "/current/conformance"
     },
     "required_paths": [
-      {"document": "current.contract", "pointer": "/owners", "projection": "object_values"},
+      {"document": "current.contract", "pointer": "/foundation", "projection": "object_values"},
       {"document": "current.conformance", "pointer": "/requiredExecutableGates", "projection": "array_items"},
       {"document": "acceptance", "pointer": "/current", "projection": "object_values"}
     ],
