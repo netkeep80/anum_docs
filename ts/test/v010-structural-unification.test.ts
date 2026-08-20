@@ -1,5 +1,6 @@
 import {
   Memory,
+  ensureRootBasis,
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
@@ -64,20 +65,20 @@ function bindingValue(
   return found.value;
 }
 
-function distinct(memory: Memory, count: number): LinkHandle[] {
-  const result: LinkHandle[] = [];
-  let cursor = memory.ensureStartSelfClosed(memory.root);
-  for (let index = 0; index < count; index += 1) {
-    cursor = memory.ensureStartSelfClosed(cursor);
-    result.push(cursor);
-  }
-  return result;
-}
-
 const memory = new Memory();
-const refs = distinct(memory, 8);
-const [beginRole, endRole, A, B, E, fixed, other, spare] = refs;
-assert(beginRole && endRole && A && B && E && fixed && other && spare, "fixture refs");
+const basis = ensureRootBasis(memory);
+
+// Independent anchors contain only root-basis Links. None contains another
+// anchor, so a declared role cannot accidentally occur inside a grounded
+// constant merely because of fixture construction order.
+const beginRole = memory.ensure(basis.O, basis.O);
+const endRole = memory.ensure(basis.C, basis.C);
+const A = memory.ensure(basis.L, basis.L);
+const B = memory.ensure(basis.U, basis.U);
+const E = memory.ensure(basis.O, basis.L);
+const fixed = memory.ensure(basis.C, basis.U);
+const other = memory.ensure(basis.L, basis.O);
+const spare = memory.ensure(basis.U, basis.C);
 
 const pairTemplate = memory.ensure(beginRole, endRole);
 const ordinary = memory.ensure(A, B);
