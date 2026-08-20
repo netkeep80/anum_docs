@@ -18,6 +18,8 @@
   "implementation": {
     "language": "TypeScript",
     "singleLiveSemanticRuntime": true,
+    "pythonRuntimePresent": false,
+    "compatibilityRuntimeSelectable": false,
     "candidateRuntimeSelectable": false,
     "implementationComplete": true
   },
