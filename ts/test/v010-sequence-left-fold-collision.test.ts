@@ -8,6 +8,17 @@ import {
   type LinkHandle,
 } from "../src/memory.js";
 import {
+  PersistentStore,
+  type PersistentLinkId,
+  type PersistentTopologyBackend,
+  type StoredDataset,
+} from "../src/persistent-store.js";
+import {
+  materializePersistentSequence,
+  replayPersistentSequenceMaterialization,
+  type PersistentSequenceDescription,
+} from "../src/persistent-sequence.js";
+import {
   materializeSequence,
   replaySequenceMaterialization,
   type SequenceDescription,
@@ -20,6 +31,13 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
+}
+
+function sameId(actual: PersistentLinkId, expected: PersistentLinkId, message: string): void {
+  assert(
+    actual.lineage === expected.lineage && actual.local === expected.local,
+    `${message}: (${actual.lineage},${actual.local}) !== (${expected.lineage},${expected.local})`,
+  );
 }
 
 const atom = (value: LinkHandle): SequenceItem => Object.freeze({ kind: "atom", value });
@@ -73,3 +91,57 @@ const ordinary = materializeSequence(memory, description(memory, atom(L), atom(U
 same(ordinary.created.length, 1, "ordinary two-value fold creates one missing pair");
 same(memory.poles(ordinary.result).start, L, "ordinary fold start");
 same(memory.poles(ordinary.result).end, U, "ordinary fold end");
+
+// Persistent sequence deliberately reuses the same generic left-fold operation.
+// Its final result is therefore equally non-injective, while the operation
+// evidence still carries the exact host description and write-effect boundary.
+function clone(dataset: StoredDataset): StoredDataset {
+  return JSON.parse(JSON.stringify(dataset)) as StoredDataset;
+}
+
+class Backend implements PersistentTopologyBackend {
+  dataset: StoredDataset | undefined;
+  commits = 0;
+  load(): StoredDataset | undefined {
+    return this.dataset === undefined ? undefined : clone(this.dataset);
+  }
+  commit(dataset: StoredDataset): void {
+    this.dataset = clone(dataset);
+    this.commits += 1;
+  }
+}
+
+const backend = new Backend();
+const store = PersistentStore.create(backend, "left-fold-collision");
+const pR = store.root;
+const pO = store.materializeStartSelfClosed(pR);
+const pC = store.materializeEndSelfClosed(pR);
+const pL = store.materialize(pO, pC);
+store.materialize(pC, pO); // complete the ordinary root basis
+const pB = pL;
+const pA = store.materializeStartSelfClosed(pB);
+
+const persistent = (...values: PersistentLinkId[]): PersistentSequenceDescription =>
+  Object.freeze({
+    root: store.root,
+    items: Object.freeze(values.map((value) => Object.freeze({ kind: "atom" as const, value }))),
+  });
+
+const pSingleton = materializePersistentSequence(store, persistent(pA));
+const pPair = materializePersistentSequence(store, persistent(pA, pB));
+sameId(pSingleton.result, pA, "persistent singleton result");
+sameId(pPair.result, pA, "persistent [A,B] shares singleton result");
+same(pSingleton.created.length, 0, "persistent singleton creates no fold edge");
+same(pPair.created.length, 0, "persistent A->B reuses existing selfclosed A");
+same(pSingleton.description.items.length, 1, "persistent evidence keeps singleton description");
+same(pPair.description.items.length, 2, "persistent evidence keeps two-position description");
+
+const countBeforePersistentReplay = store.count;
+const commitsBeforePersistentReplay = backend.commits;
+sameId(
+  replayPersistentSequenceMaterialization(store, pPair),
+  pA,
+  "persistent trusted replay accepts exact zero-write effect",
+);
+same(store.count, countBeforePersistentReplay, "persistent replay stays read-only");
+same(backend.commits, commitsBeforePersistentReplay, "persistent replay does not commit");
