@@ -13,7 +13,7 @@
     "liveRuntimeSelectable": false
   },
   "conformanceCorpus": "contracts/mts-conformance-v0.10.json",
-  "currentPointer": "cutover/typescript-c1-acceptance-v0.2.json",
+  "currentPointer": "cutover/typescript-c1-acceptance-v0.3.json",
   "acceptedMtsVersion": "mts-contract/v0.10",
   "acceptedCurrent": "mts-contract/v0.10",
   "acceptanceReady": true,
@@ -27,6 +27,29 @@
     "compatibilityRuntimeSelectable": false,
     "candidateRuntimeSelectable": false,
     "implementationComplete": true
+  },
+  "owners": {
+    "publicFacade": "ts/src/public.ts",
+    "memory": "ts/src/memory.ts",
+    "anum": "ts/src/anum.ts",
+    "source": "ts/src/source.ts",
+    "state": "ts/src/state.ts",
+    "dictionary": "ts/src/dictionary.ts",
+    "interpreter": "ts/src/interpreter.ts",
+    "sequence": "ts/src/sequence.ts",
+    "run": "ts/src/run.ts",
+    "proof": "ts/src/proof.ts",
+    "checker": "ts/src/checker.ts",
+    "directDeixis": "ts/src/direct-deixis.ts",
+    "valueBundle": "ts/src/value-bundle.ts",
+    "persistenceTopology": "ts/src/persistence-topology.ts",
+    "persistenceStore": "ts/src/persistent-store.ts",
+    "persistenceSequence": "ts/src/persistent-sequence.ts",
+    "exactSequence": "ts/src/exact-sequence.ts",
+    "quaternaryState": "ts/src/quaternary-state.ts",
+    "byteCarrier": "ts/src/byte-carrier.ts",
+    "structuralRule": "ts/src/structural-rule.ts",
+    "contextIntegration": "ts/src/context-integration.ts"
   },
   "rootBasisTarget": {
     "R": "R = R ⟼ R",
