@@ -237,3 +237,61 @@ function makeHarness(): Harness {
   }
   assert(rejected, "forged representative must not be accepted");
 }
+
+// #726: один member не может иметь два A6-различных представителя в одном K.
+// Повтор той же структурной пары безвреден, а конфликт обязан отклоняться
+// независимо от порядка предъявления; выбирать «первый» или «последний» нельзя.
+for (const reverseOrder of [false, true] as const) {
+  const h = makeHarness();
+  const { memory } = h;
+  const basis = ensureRootBasis(memory);
+  const X = memory.ensure(basis.O, basis.L);
+  const Y = memory.ensure(basis.C, basis.U);
+  const representativeA = memory.ensure(basis.L, basis.C);
+  const representativeB = memory.ensure(basis.U, basis.O);
+  assert(representativeA !== representativeB, "conflicting representatives must differ by semantic identity");
+
+  const first = reverseOrder ? representativeB : representativeA;
+  const second = reverseOrder ? representativeA : representativeB;
+  const context = defineContext(memory, basis.R, basis.O);
+
+  const firstBinding = defineLocalRepresentativeBinding(memory, context, X, first);
+  const repeatedBinding = defineLocalRepresentativeBinding(memory, context, X, first);
+  same(repeatedBinding, firstBinding, "repeated identical representative binding is canonical");
+  defineLocalRepresentativeBinding(memory, context, Y, first);
+  same(h.evaluate(context, X, Y, first, first), true,
+    "duplicate same representative does not make Eq_K ambiguous");
+
+  defineLocalRepresentativeBinding(memory, context, X, second);
+
+  const act = defineActHeader(memory, h.interpreter, h.roleDictionary, context);
+  for (const [role, value] of [
+    [h.roles.context, context],
+    [h.roles.left, X],
+    [h.roles.right, Y],
+    [h.roles.leftRepresentative, first],
+    [h.roles.rightRepresentative, first],
+  ] as const) {
+    defineActField(memory, act, role, value);
+  }
+  const evidence: EqualityReplayEvidence = Object.freeze({
+    act, roles: h.roles, interpreter: h.interpreter, roleDictionary: h.roleDictionary,
+  });
+
+  const before = memory.linkCount;
+  const probe = new ReadProbe(memory);
+  let rejected = false;
+  try {
+    replayEqualityEvaluation(probe, evidence);
+  } catch (error) {
+    rejected = true;
+    assert(error instanceof InterpreterReplayError,
+      "same-K representative conflict must reject equality evidence");
+    same(error.code, "invalid-equality-evidence",
+      "same-K representative conflict error code");
+  }
+  assert(rejected, "same-K representative conflict must not yield a boolean Eq_K result");
+  same(memory.linkCount, before, "same-K representative conflict replay is read-only");
+  assert(probe.outgoingCalls >= 1,
+    "same-K representative conflict is detected by explicit context-local structural reading");
+}
