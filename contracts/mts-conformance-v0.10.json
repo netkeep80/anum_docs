@@ -1,18 +1,23 @@
 {
   "schema": "mts-conformance/v0.10",
-  "status": "candidate",
-  "accepted": false,
-  "issue": 680,
+  "status": "accepted",
+  "accepted": true,
+  "issue": 701,
   "candidateLifecycleIssue": 663,
   "contract": "mts-contract/v0.10",
   "semanticBase": "mts-conformance/v0.9",
   "observableSemanticDelta": true,
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.9",
+    "conformance": "mts-conformance/v0.9",
+    "immutable": true
+  },
   "acceptanceReady": true,
   "coverageState": "complete",
-  "coverageStateMeaning": "all required v0.10 foundation, contextual-dot, fixed-point, inversion and negative boundaries are bound to green executable evidence; runtime mapping is reconciled",
+  "coverageStateMeaning": "all required v0.10 foundation, contextual-dot, fixed-point, inversion and negative boundaries are bound to green executable evidence; v0.10 is the accepted current release",
   "acceptedCurrent": {
-    "contract": "mts-contract/v0.9",
-    "conformance": "mts-conformance/v0.9"
+    "contract": "mts-contract/v0.10",
+    "conformance": "mts-conformance/v0.10"
   },
   "requiredExecutableGates": [
     "ts/test/v010-foundation.test.ts",
@@ -156,9 +161,19 @@
       "issue": 697,
       "status": "ready",
       "requiredForAcceptance": true
+    },
+    "acceptedCutover": {
+      "issue": 701,
+      "status": "accepted",
+      "requiredForAcceptance": true
     }
   },
-  "acceptanceBlockers": [
-    "candidate has not passed an explicit acceptance cutover"
-  ]
+  "acceptance": {
+    "performedHere": true,
+    "acceptedMtsVersion": "mts-contract/v0.10",
+    "previousAcceptedVersion": "mts-contract/v0.9",
+    "readinessIssue": 697,
+    "cutoverIssue": 701
+  },
+  "acceptanceBlockers": []
 }
