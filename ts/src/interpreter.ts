@@ -117,12 +117,11 @@ function normalizeReplay<T>(effect: () => T): T {
 
 export function replayRelationStep(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
   evidence: RelationReplayEvidence,
 ): LinkHandle {
   return normalizeReplay(() => {
     const before = memory.linkCount;
-    const forms = replaySelectedSourceEvidence(memory, byteRefs, evidence.sourceEvidence);
+    const forms = replaySelectedSourceEvidence(memory, evidence.sourceEvidence);
     const form = forms.length === 1 ? forms[0] : undefined;
     if (form === undefined) invalid();
     const result = replaySelectedRelation(memory, evidence, {
@@ -139,13 +138,12 @@ export function replayRelationStep(
 
 export function replayRelationSubselectionStep(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
   evidence: RelationReplayEvidence,
   subselection: SourceSubselectionEvidence,
 ): LinkHandle {
   return normalizeReplay(() => {
     const before = memory.linkCount;
-    const forms = replaySourceSubselection(memory, byteRefs, evidence.sourceEvidence, subselection);
+    const forms = replaySourceSubselection(memory, evidence.sourceEvidence, subselection);
     const form = forms.length === 1 ? forms[0] : undefined;
     if (form === undefined) invalid();
     const result = replaySelectedRelation(memory, evidence, {
@@ -258,44 +256,40 @@ function normalizeFlat<T>(effect: () => T): T {
 
 export function replayFlatReading(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
   evidence: FlatReadingEvidence,
 ): LinkHandle {
   return normalizeFlat(() => replaySelectedFlat(
     memory, evidence, evidence.sourceEvidence,
-    replaySelectedSourceEvidence(memory, byteRefs, evidence.sourceEvidence), false,
+    replaySelectedSourceEvidence(memory, evidence.sourceEvidence), false,
   ));
 }
 
 function replayFlatSubselection(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
   evidence: FlatReadingEvidence,
   subselection: SourceSubselectionEvidence,
   continuation: boolean,
 ): LinkHandle {
   return normalizeFlat(() => replaySelectedFlat(
     memory, evidence, subselection,
-    replaySourceSubselection(memory, byteRefs, evidence.sourceEvidence, subselection), continuation,
+    replaySourceSubselection(memory, evidence.sourceEvidence, subselection), continuation,
   ));
 }
 
 export function replayFlatSubselectionReading(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
   evidence: FlatReadingEvidence,
   subselection: SourceSubselectionEvidence,
 ): LinkHandle {
-  return replayFlatSubselection(memory, byteRefs, evidence, subselection, false);
+  return replayFlatSubselection(memory, evidence, subselection, false);
 }
 
 export function replayFlatSubselectionContinuation(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
   evidence: FlatReadingEvidence,
   subselection: SourceSubselectionEvidence,
 ): LinkHandle {
-  return replayFlatSubselection(memory, byteRefs, evidence, subselection, true);
+  return replayFlatSubselection(memory, evidence, subselection, true);
 }
 
 export interface ColonRoles {
