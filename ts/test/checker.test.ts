@@ -1,9 +1,4 @@
-import {
-  Memory,
-  ensureRootBasis,
-  type LinkHandle,
-  type RootBasis,
-} from "../src/memory.js";
+import { Memory, ensureRootBasis, type LinkHandle } from "../src/memory.js";
 import { defineContext, defineLocalRepresentativeBinding } from "../src/state.js";
 import { defineDictionaryEffect, defineDictionaryScope } from "../src/dictionary.js";
 import {
@@ -50,7 +45,6 @@ function assertCheckerError(
 interface Fixture {
   readonly memory: Memory;
   readonly R: LinkHandle;
-  readonly basis: RootBasis;
   readonly evidence: IntegratedProofEvidence;
   readonly rule: LinkHandle;
   readonly theory: LinkHandle;
@@ -85,12 +79,11 @@ function proofRoles(fresh: () => LinkHandle): DecomposeEqualityRoles {
 
 function sourceEvidence(
   memory: Memory,
-  basis: RootBasis,
   rule: LinkHandle,
   theory: LinkHandle,
   fresh: () => LinkHandle,
 ): SourceFrontEndEvidence {
-  const content = materializeSourceContent(memory, basis, new Uint8Array([7]));
+  const content = materializeSourceContent(memory, new Uint8Array([7]));
   const source = defineSourceForm(memory, content);
   const beforeDictionary = defineDictionaryScope(memory, memory.root, memory.root);
   const definition = defineDictionaryEffect(
@@ -103,7 +96,6 @@ function sourceEvidence(
   );
   return buildSelectedSourceEvidence(
     memory,
-    basis,
     source,
     [{ start: 0, end: 1, form: rule, dictionaryOccurrence: definition.occurrence }],
     { dictionary: definition.afterScope, grammar: fresh(), theory },
@@ -112,8 +104,7 @@ function sourceEvidence(
 
 function makeFixture(): Fixture {
   const memory = new Memory();
-  const basis = ensureRootBasis(memory);
-  const { R, U } = basis;
+  const { R, U } = ensureRootBasis(memory);
   let cursor = U;
   const fresh = (): LinkHandle => {
     cursor = memory.ensure(cursor, R);
@@ -122,7 +113,7 @@ function makeFixture(): Fixture {
   const context = defineContext(memory, fresh(), fresh());
   const theory = fresh();
   const rule = fresh();
-  const source = sourceEvidence(memory, basis, rule, theory, fresh);
+  const source = sourceEvidence(memory, rule, theory, fresh);
 
   const leftStart = fresh();
   const leftEnd = fresh();
@@ -208,7 +199,7 @@ function makeFixture(): Fixture {
       goal: { startClaim, endClaim },
     },
   };
-  return { memory, R, basis, evidence, rule, theory, context, fresh };
+  return { memory, R, evidence, rule, theory, context, fresh };
 }
 
 {
@@ -259,14 +250,14 @@ function makeFixture(): Fixture {
 {
   const fx = makeFixture();
   const otherRule = fx.fresh();
-  const otherSource = sourceEvidence(fx.memory, fx.basis, otherRule, fx.theory, fx.fresh);
+  const otherSource = sourceEvidence(fx.memory, otherRule, fx.theory, fx.fresh);
   assertCheckerError("source-rule-mismatch", () => replayIntegratedProof(
     fx.memory,
     { ...fx.evidence, source: otherSource },
   ));
 
   const otherTheory = fx.fresh();
-  const otherTheorySource = sourceEvidence(fx.memory, fx.basis, fx.rule, otherTheory, fx.fresh);
+  const otherTheorySource = sourceEvidence(fx.memory, fx.rule, otherTheory, fx.fresh);
   assertCheckerError("source-theory-mismatch", () => replayIntegratedProof(
     fx.memory,
     { ...fx.evidence, source: otherTheorySource },
