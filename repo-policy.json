@@ -142,30 +142,6 @@
         "value": "mts-conformance/v0.9"
       },
       {
-        "id": "v010-contract-status-candidate",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v010-contract", "pointer": "/status", "type": "string"},
-        "value": "candidate"
-      },
-      {
-        "id": "v010-conformance-status-candidate",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v010-conformance", "pointer": "/status", "type": "string"},
-        "value": "candidate"
-      },
-      {
-        "id": "v010-contract-not-accepted",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v010-contract", "pointer": "/accepted", "type": "boolean"},
-        "value": false
-      },
-      {
-        "id": "v010-conformance-not-accepted",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v010-conformance", "pointer": "/accepted", "type": "boolean"},
-        "value": false
-      },
-      {
         "id": "v010-contract-ready",
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v010-contract", "pointer": "/acceptanceReady", "type": "boolean"},
