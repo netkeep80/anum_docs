@@ -258,7 +258,7 @@
       "glob": "README.md",
       "mode": "markdown_language",
       "language": "ru",
-      "allow_words": ["API", "ASCII", "CI", "CLI", "Git", "GitHub", "JSON", "Python", "TypeScript", "UTF", "WRITE", "READ"],
+      "allow_words": ["API", "ASCII", "CI", "CLI", "Git", "GitHub", "JSON", "Python", "TypeScript", "UTF"],
       "max_unapproved_latin_words_per_line": 1
     },
     {
