@@ -7,9 +7,9 @@
   "contract": "mts-contract/v0.10",
   "semanticBase": "mts-conformance/v0.9",
   "observableSemanticDelta": true,
-  "acceptanceReady": false,
-  "coverageState": "incomplete",
-  "coverageStateMeaning": "foundation, contextual-dot, fixed-point and negative boundaries have executable evidence; acceptance readiness remains pending",
+  "acceptanceReady": true,
+  "coverageState": "complete",
+  "coverageStateMeaning": "all required v0.10 foundation, contextual-dot, fixed-point, inversion and negative boundaries are bound to green executable evidence; runtime mapping is reconciled",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.9",
     "conformance": "mts-conformance/v0.9"
@@ -110,7 +110,7 @@
     "fixedPointLaws": "green",
     "inversion": "green",
     "negative": "green",
-    "runtimeMapping": "research-reconciled"
+    "runtimeMapping": "green-reconciled"
   },
   "implementationSlices": {
     "candidateBoundary": {
@@ -149,12 +149,16 @@
     },
     "runtimeMapping": {
       "issue": 669,
-      "status": "research-complete",
+      "status": "complete",
+      "requiredForAcceptance": true
+    },
+    "readinessReview": {
+      "issue": 697,
+      "status": "ready",
       "requiredForAcceptance": true
     }
   },
   "acceptanceBlockers": [
-    "candidate readiness has not been reviewed as a complete release boundary",
     "candidate has not passed an explicit acceptance cutover"
   ]
 }
