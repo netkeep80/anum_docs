@@ -37,11 +37,11 @@ function expectStructuralReadError(
   try {
     effect();
   } catch (error) {
-    assert(error instanceof StructuralReadError, `expected StructuralReadError, got ${String(error)}`);
-    assertSame(error.code, code, "structural read error code");
+    assert(error instanceof StructuralReadError, `ожидался StructuralReadError, получено ${String(error)}`);
+    assertSame(error.code, code, "код ошибки structural reader");
     return;
   }
-  throw new Error(`expected StructuralReadError(${code})`);
+  throw new Error(`ожидался StructuralReadError(${code})`);
 }
 
 function expectStructuralRuleError(
@@ -51,11 +51,11 @@ function expectStructuralRuleError(
   try {
     effect();
   } catch (error) {
-    assert(error instanceof StructuralRuleError, `expected StructuralRuleError, got ${String(error)}`);
-    assertSame(error.code, code, "structural rule error code");
+    assert(error instanceof StructuralRuleError, `ожидался StructuralRuleError, получено ${String(error)}`);
+    assertSame(error.code, code, "код ошибки structural rule");
     return;
   }
-  throw new Error(`expected StructuralRuleError(${code})`);
+  throw new Error(`ожидался StructuralRuleError(${code})`);
 }
 
 function anchors(memory: Memory, count: number): LinkHandle[] {
@@ -73,19 +73,20 @@ const [dictionary, grammar, theory, afterContext, ordinaryRole, ordinaryValue] =
 assert(
   dictionary !== undefined && grammar !== undefined && theory !== undefined &&
   afterContext !== undefined && ordinaryRole !== undefined && ordinaryValue !== undefined,
-  "fixture anchors must exist",
+  "опорные связи fixture должны существовать",
 );
 
 const interpreter = defineStructuralInterpreter(memory, dictionary, grammar, theory);
 
-// Exact collision from #732:
+// Каноническая коллизия #732:
 //
-//   Q = DR -> K
-//   H = I -> Q
-//   A = START(H) = A -> H
+//   Q = DR ⟼ K
+//   H = I ⟼ Q
+//   A = START(H) = A ⟼ H
 //
-// With declared role=I and value=Q, Field=I->Q is the same semantic H.
-// Therefore Attachment=A->Field is the same semantic A as the header carrier.
+// При объявленной роли I и значении Q поле I⟼Q является тем же H, а
+// attachment A⟼H — тем же A. Это не требует второй semantic occurrence:
+// один A одновременно исполняет header-use и field-use в контексте DR=[I].
 const collisionRoleDictionary = defineStructuralRoleDictionary(memory, [interpreter]);
 const roleAndContext = memory.ensure(collisionRoleDictionary, afterContext);
 const header = memory.ensure(interpreter, roleAndContext);
@@ -95,34 +96,69 @@ const collisionAct = defineActHeader(
   collisionRoleDictionary,
   afterContext,
 );
-assertSame(memory.poles(collisionAct).end, header, "Act must carry the exact reconstructed header");
+assertSame(memory.poles(collisionAct).end, header, "Act должен нести точный header");
+
+// Binding уже предъявлен структурой A и выбранной role I. Host-вызов
+// defineActField не является отдельным semantic событием и не должен быть
+// нужен reader-у, чтобы увидеть существующую relation A⟼(I⟼Q).
+assertDeepEqual(
+  readOptionalMany(memory, collisionAct, interpreter),
+  [roleAndContext],
+  "self-link Act должен читаться как field в явно выбранной роли I",
+);
+assertSame(
+  readRequiredSingle(memory, collisionAct, interpreter),
+  roleAndContext,
+  "dual-use binding должен удовлетворять required-single",
+);
 
 const outgoingBefore = [...memory.outgoing(collisionAct)];
 const countBefore = memory.linkCount;
 const collisionAttachment = defineActField(memory, collisionAct, interpreter, roleAndContext);
-
-assertSame(collisionAttachment, collisionAct, "header-shaped field attachment collapses to the Act itself");
-assertSame(memory.linkCount, countBefore, "declaring the colliding field adds no structural evidence");
+assertSame(collisionAttachment, collisionAct, "header-shaped attachment канонически является самим Act");
+assertSame(memory.linkCount, countBefore, "повторная материализация dual-use binding не создаёт Link");
 assertDeepEqual(
   memory.outgoing(collisionAct),
   outgoingBefore,
-  "Act topology is identical before and after the colliding defineActField call",
+  "идемпотентный defineActField не меняет topology",
 );
 assertDeepEqual(
   readOptionalMany(memory, collisionAct, interpreter),
-  [],
-  "reader skips the self-link header carrier and loses the colliding role field",
+  [roleAndContext],
+  "идемпотентная конструкция не создаёт multiplicity",
+);
+
+// DR действительно объявляет I placeholder-роль, поэтому generic Rule replay
+// обязан получить rho(I)=Q из того же self-link A и сопоставить body I с Q.
+const collisionRule = defineStructuralRule(memory, collisionRoleDictionary, interpreter);
+const collisionAdmission = admitStructuralRule(memory, theory, collisionRule);
+const collisionReplay = replayStructuralRule(memory, {
+  act: collisionAct,
+  rule: collisionRule,
+  ruleAdmission: collisionAdmission,
+  claimedBody: roleAndContext,
+  expectedInterpreter: { dictionary, grammar, theory },
+  expectedAfterContext: afterContext,
+});
+assertDeepEqual(
+  collisionReplay.bindings,
+  [{ role: interpreter, value: roleAndContext }],
+  "generic Rule должен получить ровно один dual-use binding",
+);
+
+// Отличное второе значение для той же роли остаётся настоящим конфликтом
+// cardinality: self-link даёт Q, отдельный attachment даёт ordinaryValue.
+defineActField(memory, collisionAct, interpreter, ordinaryValue);
+const conflictingValues = readOptionalMany(memory, collisionAct, interpreter);
+assertSame(conflictingValues.length, 2, "два отличных значения роли должны быть видимы");
+assert(
+  conflictingValues.includes(roleAndContext) && conflictingValues.includes(ordinaryValue),
+  "оба конфликтующих значения должны сохраняться структурно",
 );
 expectStructuralReadError(
   () => readRequiredSingle(memory, collisionAct, interpreter),
-  "missing-required-field",
+  "multiple-field-values",
 );
-
-// The same loss propagates to generic structural Rule replay. The DR genuinely
-// declares I as a role, but the accepted field constructor cannot leave a
-// distinguishable binding rho(I)=Q in the Act topology.
-const collisionRule = defineStructuralRule(memory, collisionRoleDictionary, interpreter);
-const collisionAdmission = admitStructuralRule(memory, theory, collisionRule);
 expectStructuralRuleError(
   () => replayStructuralRule(memory, {
     act: collisionAct,
@@ -132,25 +168,25 @@ expectStructuralRuleError(
     expectedInterpreter: { dictionary, grammar, theory },
     expectedAfterContext: afterContext,
   }),
-  "missing-role-binding",
+  "multiple-role-bindings",
 );
 
-// Control vector: the existing representation remains exact when Field != H.
+// Контроль: обычный Field != H по-прежнему читается прежним exact способом.
 const ordinaryRoleDictionary = defineStructuralRoleDictionary(memory, [ordinaryRole]);
 const ordinaryAct = defineActHeader(memory, interpreter, ordinaryRoleDictionary, afterContext);
 const ordinaryField = memory.ensure(ordinaryRole, ordinaryValue);
 assert(
   ordinaryField !== memory.poles(ordinaryAct).end,
-  "control fixture must not accidentally reproduce the header collision",
+  "контрольный fixture не должен случайно воспроизводить header collision",
 );
 defineActField(memory, ordinaryAct, ordinaryRole, ordinaryValue);
 assertDeepEqual(
   readOptionalMany(memory, ordinaryAct, ordinaryRole),
   [ordinaryValue],
-  "ordinary non-colliding field remains readable",
+  "обычное non-colliding поле остаётся читаемым",
 );
 assertSame(
   readRequiredSingle(memory, ordinaryAct, ordinaryRole),
   ordinaryValue,
-  "ordinary required field remains exact",
+  "обычное required поле остаётся exact",
 );
