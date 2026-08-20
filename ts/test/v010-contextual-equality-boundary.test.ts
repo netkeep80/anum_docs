@@ -227,10 +227,13 @@ function makeHarness(): Harness {
   defineLocalRepresentativeBinding(memory, context, X, representative);
   defineLocalRepresentativeBinding(memory, context, Y, representative);
 
+  let rejected = false;
   try {
     h.evaluate(context, X, Y, forged, representative);
   } catch (error) {
+    rejected = true;
     assert(error instanceof InterpreterReplayError, "forged representative must reject as equality evidence");
     same(error.code, "invalid-equality-evidence", "forged representative error code");
   }
+  assert(rejected, "forged representative must not be accepted");
 }
