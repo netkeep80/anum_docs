@@ -53,10 +53,9 @@ function expectStateError(effect: () => unknown, code: StateError["code"]): void
 //   Pair    = member -> representative
 //   Binding = K -> Pair
 //
-// Therefore member=parent and representative=current makes Pair=P and
-// Binding=K. The context carrier and the local-binding carrier become the same
-// semantic Link; there is no occurrence/host-call identity available to tell
-// those two uses apart.
+// member=parent and representative=current makes Pair=P and raw Binding=K.
+// K is already the context header, so the canonical network contains no
+// separate attachment that could witness a local-binding use-role.
 {
   const memory = new Memory();
   const [parent, current, otherRepresentative] = anchors(memory, 3);
@@ -69,30 +68,38 @@ function expectStateError(effect: () => unknown, code: StateError["code"]): void
   same(contextPoles.start, context, "K is START(payload)");
   same(contextPoles.end, payload, "K payload is parent->current");
 
-  // Before any explicit local-binding constructor call the context already has
-  // exactly the topology K -> (parent -> current).
-  const beforeBindingCall = memory.linkCount;
+  // The raw ordered pair K->P is already K itself. This proves the collision
+  // without assigning semantic meaning to a host constructor invocation.
+  const beforeRawCollision = memory.linkCount;
+  const rawSelfAttachment = memory.ensure(context, payload);
+  same(rawSelfAttachment, context, "raw K->payload canonicalizes to K");
+  same(memory.linkCount, beforeRawCollision, "raw collision creates no occurrence");
+
+  // Context topology alone is header evidence, not an implicit Eq_K binding.
   const beforeResolution = localRepresentativeResolution(memory, context, parent);
-  same(beforeResolution.representative, parent, "current reader treats K self-link as header-only");
-  deepSame(beforeResolution.bindings, [], "no local binding is reported before constructor call");
+  same(beforeResolution.representative, parent, "K self-link remains header-only");
+  deepSame(beforeResolution.bindings, [], "context header is not reported as local binding");
   same(localRepresentative(memory, context, current), current, "current itself falls back to itself");
   assert(
     localRepresentative(memory, context, parent) !== localRepresentative(memory, context, current),
-    "current runtime does not make Eq_K(parent,current) true from context topology alone",
+    "context existence alone must not imply Eq_K(parent,current)",
   );
 
-  const selfBinding = defineLocalRepresentativeBinding(memory, context, parent, current);
-  same(selfBinding, context, "canonical self-binding collapses to K");
-  same(memory.linkCount, beforeBindingCall, "explicit self-binding call creates no structural evidence");
+  // The constructor must fail closed. Returning K would falsely report success
+  // even though no distinguishable local-binding evidence was added.
+  const beforeRejectedBinding = memory.linkCount;
+  expectStateError(
+    () => defineLocalRepresentativeBinding(memory, context, parent, current),
+    "invalid-representative-binding",
+  );
+  same(memory.linkCount, beforeRejectedBinding, "rejected self-binding adds no Link");
 
-  // Because the memory is structurally identical before/after the constructor
-  // call, the reader still cannot observe the requested binding.
-  const afterResolution = localRepresentativeResolution(memory, context, parent);
-  same(afterResolution.representative, parent, "constructed parent->current binding is lost by reader");
-  deepSame(afterResolution.bindings, [], "constructed self-binding has no reported evidence handle");
+  const afterRejected = localRepresentativeResolution(memory, context, parent);
+  same(afterRejected.representative, parent, "rejection preserves fallback representative");
+  deepSame(afterRejected.bindings, [], "rejection does not invent binding evidence");
 
-  // Add an ordinary distinct binding for the same member. The resolver sees
-  // only that attachment and silently ignores the canonical self-binding K.
+  // A normal distinct attachment for the same member remains valid and is not
+  // confused with the context header.
   const ordinaryBinding = defineLocalRepresentativeBinding(
     memory,
     context,
@@ -100,21 +107,14 @@ function expectStateError(effect: () => unknown, code: StateError["code"]): void
     otherRepresentative,
   );
   assert(ordinaryBinding !== context, "ordinary binding must be a distinct attachment");
-
-  const mixed = localRepresentativeResolution(memory, context, parent);
-  same(mixed.representative, otherRepresentative, "self-binding is ignored in favor of distinct attachment");
-  deepSame(mixed.bindings, [ordinaryBinding], "only distinct attachment is reported");
-
-  // If K self-link were counted by RepSet_K, current and otherRepresentative
-  // would be A6-distinct representatives and this exact state would be a
-  // representative-conflict. Current runtime does not report that conflict.
-  assert(current !== otherRepresentative, "mixed representatives are semantically distinct");
+  const ordinary = localRepresentativeResolution(memory, context, parent);
+  same(ordinary.representative, otherRepresentative, "ordinary binding still resolves");
+  deepSame(ordinary.bindings, [ordinaryBinding], "ordinary binding evidence is preserved");
 }
 
-// H0 feasibility control: rejecting the self-colliding orientation does not
-// make Eq_K(parent,current) inexpressible. A distinct reverse binding
-// current->parent gives both references the same one-hop representative while
-// keeping the context header out of RepSet.
+// Rejecting the colliding orientation does not make Eq_K(parent,current)=true
+// inexpressible. A distinct reverse binding current->parent gives both
+// references the same one-hop representative while K remains header-only.
 {
   const memory = new Memory();
   const [parent, current] = anchors(memory, 2);
@@ -128,12 +128,12 @@ function expectStateError(effect: () => unknown, code: StateError["code"]): void
   same(
     localRepresentative(memory, context, parent),
     localRepresentative(memory, context, current),
-    "Eq_K(parent,current) remains expressible without self-colliding binding",
+    "Eq_K(parent,current) remains expressible through distinct evidence",
   );
 }
 
-// Control: ordinary non-colliding local bindings keep the accepted one-hop and
-// conflict behavior. #740 must not weaken that existing boundary.
+// Ordinary non-colliding local bindings keep the accepted one-hop/conflict
+// behavior from #726/#727.
 {
   const memory = new Memory();
   const [parent, current, member, representativeA, representativeB] = anchors(memory, 5);
