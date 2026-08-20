@@ -13,6 +13,7 @@ import {
 } from "../src/dictionary.js";
 import {
   Memory,
+  ensureRootBasis,
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
@@ -56,7 +57,6 @@ function anchors(memory: Memory, count: number): LinkHandle[] {
 
 class ChainOnlyProbe implements ReadMemory {
   constructor(private readonly source: ReadMemory) {}
-
   get root(): LinkHandle { return this.source.root; }
   get linkCount(): number { return this.source.linkCount; }
   poles(link: LinkHandle): LinkPoles { return this.source.poles(link); }
@@ -81,12 +81,12 @@ function spec(
 }
 
 const memory = new Memory();
-const refs = anchors(memory, 264);
-const byteRefs = refs.slice(0, 256);
-const [formA, formB, formC, grammar, theory, unrelated] = refs.slice(256, 262);
+const basis = ensureRootBasis(memory);
+const refs = anchors(memory, 8);
+const [formA, formB, formC, grammar, theory, unrelated] = refs;
 assert(
-  byteRefs.length === 256 && formA !== undefined && formB !== undefined &&
-  formC !== undefined && grammar !== undefined && theory !== undefined && unrelated !== undefined,
+  formA !== undefined && formB !== undefined && formC !== undefined &&
+  grammar !== undefined && theory !== undefined && unrelated !== undefined,
   "subselection fixture refs",
 );
 
@@ -94,15 +94,8 @@ let history = memory.root;
 let dictionary = defineDictionaryScope(memory, memory.root, history);
 const occurrences: LinkHandle[] = [];
 for (const [value, form] of [[0x61, formA], [0x62, formB], [0x63, formC]] as const) {
-  const content = materializeSourceContent(memory, byteRefs, new Uint8Array([value]));
-  const effect = defineDictionaryEffect(
-    memory,
-    dictionary,
-    memory.root,
-    history,
-    content,
-    form,
-  );
+  const content = materializeSourceContent(memory, basis, new Uint8Array([value]));
+  const effect = defineDictionaryEffect(memory, dictionary, memory.root, history, content, form);
   occurrences.push(effect.occurrence);
   history = effect.historyAfter;
   dictionary = effect.afterScope;
@@ -110,11 +103,11 @@ for (const [value, form] of [[0x61, formA], [0x62, formB], [0x63, formC]] as con
 
 const source = defineSourceForm(
   memory,
-  materializeSourceContent(memory, byteRefs, new Uint8Array([0x61, 0x62, 0x63])),
+  materializeSourceContent(memory, basis, new Uint8Array([0x61, 0x62, 0x63])),
 );
 const evidence = buildSelectedSourceEvidence(
   memory,
-  byteRefs,
+  basis,
   source,
   [
     spec(0, 1, formA, occurrences[0]!),
@@ -137,8 +130,8 @@ function subselection(
     endSegment,
     selectionSequence,
     formSequence,
-    grammar: grammar!,
-    theory: theory!,
+    grammar,
+    theory,
     grammarMembership,
     theoryMembership,
   });
@@ -153,7 +146,7 @@ const middle = subselection(1, 2, middleSelection, middleForms, middleGrammar, m
 {
   const before = memory.linkCount;
   assertDeepEqual(
-    replaySourceSubselection(new ChainOnlyProbe(memory), byteRefs, evidence, middle),
+    replaySourceSubselection(new ChainOnlyProbe(memory), evidence, middle),
     [formB],
     "middle contiguous subselection",
   );
@@ -163,7 +156,6 @@ const middle = subselection(1, 2, middleSelection, middleForms, middleGrammar, m
 assertDeepEqual(
   replaySourceSubselection(
     memory,
-    byteRefs,
     evidence,
     subselection(
       0,
@@ -183,7 +175,6 @@ const emptyTheory = memory.ensure(theory, memory.root);
 assertDeepEqual(
   replaySourceSubselection(
     memory,
-    byteRefs,
     evidence,
     subselection(1, 1, memory.root, memory.root, emptyGrammar, emptyTheory),
   ),
@@ -195,7 +186,6 @@ for (const [start, end] of [[-1, 1], [2, 1], [0, 4]] as const) {
   expectSourceError(
     () => replaySourceSubselection(
       memory,
-      byteRefs,
       evidence,
       subselection(start, end, middleSelection, middleForms, middleGrammar, middleTheory),
     ),
@@ -206,7 +196,6 @@ for (const [start, end] of [[-1, 1], [2, 1], [0, 4]] as const) {
 expectSourceError(
   () => replaySourceSubselection(
     memory,
-    byteRefs,
     evidence,
     subselection(1, 2, evidence.selectionSequence, middleForms, middleGrammar, middleTheory),
   ),
@@ -215,7 +204,6 @@ expectSourceError(
 expectSourceError(
   () => replaySourceSubselection(
     memory,
-    byteRefs,
     evidence,
     subselection(1, 2, middleSelection, evidence.formSequence, middleGrammar, middleTheory),
   ),
@@ -226,7 +214,6 @@ const forgedMembership = memory.ensure(grammar, unrelated);
 expectSourceError(
   () => replaySourceSubselection(
     memory,
-    byteRefs,
     evidence,
     subselection(1, 2, middleSelection, middleForms, forgedMembership, middleTheory),
   ),
@@ -235,7 +222,6 @@ expectSourceError(
 expectSourceError(
   () => replaySourceSubselection(
     memory,
-    byteRefs,
     evidence,
     subselection(1, 2, middleSelection, middleForms, middleGrammar, forgedMembership),
   ),
