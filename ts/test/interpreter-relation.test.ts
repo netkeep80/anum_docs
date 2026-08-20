@@ -21,7 +21,6 @@ import { defineContext } from "../src/state.js";
 import { defineActField, defineActHeader } from "../src/structural-readers.js";
 import {
   Memory,
-  ensureRootBasis,
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
@@ -76,7 +75,6 @@ interface SourceFixture {
 }
 
 function sourceFixture(memory: Memory, forms: readonly LinkHandle[]): SourceFixture {
-  const basis = ensureRootBasis(memory);
   const [grammar, theory] = anchors(memory, 2);
   assert(grammar !== undefined && theory !== undefined, "source fixture refs");
 
@@ -94,7 +92,7 @@ function sourceFixture(memory: Memory, forms: readonly LinkHandle[]): SourceFixt
       dictionary,
       memory.root,
       history,
-      materializeSourceContent(memory, basis, new Uint8Array([value])),
+      materializeSourceContent(memory, new Uint8Array([value])),
       form,
     );
     occurrences.push(effect.occurrence);
@@ -102,10 +100,9 @@ function sourceFixture(memory: Memory, forms: readonly LinkHandle[]): SourceFixt
     dictionary = effect.afterScope;
   }
 
-  const source = defineSourceForm(memory, materializeSourceContent(memory, basis, bytes));
+  const source = defineSourceForm(memory, materializeSourceContent(memory, bytes));
   const evidence = buildSelectedSourceEvidence(
     memory,
-    basis,
     source,
     forms.map((form, index) => spec(index, index + 1, form, occurrences[index]!)),
     { dictionary, grammar, theory },
