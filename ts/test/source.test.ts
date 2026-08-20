@@ -15,6 +15,7 @@ import {
 } from "../src/dictionary.js";
 import {
   Memory,
+  ensureRootBasis,
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
@@ -68,33 +69,31 @@ class ChainOnlyProbe implements ReadMemory {
 }
 
 const memory = new Memory();
-const vocabularyAndFixtures = anchors(memory, 260);
-const byteRefs = vocabularyAndFixtures.slice(0, 256);
-const nonByte = vocabularyAndFixtures[256];
-const other = vocabularyAndFixtures[257];
-assert(byteRefs.length === 256 && nonByte !== undefined && other !== undefined, "fixture anchors must exist");
+const basis = ensureRootBasis(memory);
+const [nonByte, other] = anchors(memory, 2);
+assert(nonByte !== undefined && other !== undefined, "fixture anchors must exist");
 
 {
-  const before = memory.linkCount;
-  const empty = materializeSourceContent(memory, byteRefs, new Uint8Array());
+  const empty = materializeSourceContent(memory, new Uint8Array());
   assertSame(empty, memory.root, "empty source content must be root");
-  const read = readSourceContent(new ChainOnlyProbe(memory), byteRefs, empty);
+  const before = memory.linkCount;
+  const read = readSourceContent(new ChainOnlyProbe(memory), basis, empty);
   assertDeepEqual(Array.from(read.bytes), [], "empty bytes");
   assertDeepEqual(read.prefixes, [memory.root], "empty prefixes");
   assertSame(memory.linkCount, before, "empty source read must not materialize");
 }
 
 const utf8 = new Uint8Array([0x61, 0xe2, 0x9f, 0xbc, 0x62]);
-const content = materializeSourceContent(memory, byteRefs, utf8);
+const content = materializeSourceContent(memory, utf8);
 assertSame(
-  materializeSourceContent(memory, byteRefs, new Uint8Array(utf8)),
+  materializeSourceContent(memory, new Uint8Array(utf8)),
   content,
   "equal bytes must reuse canonical content",
 );
 
 {
   const before = memory.linkCount;
-  const read = readSourceContent(new ChainOnlyProbe(memory), byteRefs, content);
+  const read = readSourceContent(new ChainOnlyProbe(memory), basis, content);
   assertDeepEqual(Array.from(read.bytes), Array.from(utf8), "source bytes round-trip exactly");
   assertSame(read.prefixes[0], memory.root, "source prefixes start at root");
   assertSame(read.prefixes.at(-1), content, "source prefixes end at content");
@@ -110,26 +109,26 @@ assertSame(defineSourceForm(memory, content), source, "same content must reuse c
   assertSame(memory.linkCount, before, "source form read must not materialize");
 }
 
-const distinctContent = materializeSourceContent(memory, byteRefs, new Uint8Array([0x61, 0x62]));
+const distinctContent = materializeSourceContent(memory, new Uint8Array([0x61, 0x62]));
 const distinctSource = defineSourceForm(memory, distinctContent);
 assert(distinctContent !== content, "different bytes must have different content");
 assert(distinctSource !== source, "different content must have different source form");
 
 const nonByteContent = memory.ensure(memory.root, nonByte);
 expectSourceError(
-  () => readSourceContent(memory, byteRefs, nonByteContent),
+  () => readSourceContent(memory, basis, nonByteContent),
   "invalid-source-content",
 );
 
 const cyclicContent = memory.ensureStartSelfClosed(other);
 expectSourceError(
-  () => readSourceContent(memory, byteRefs, cyclicContent),
+  () => readSourceContent(memory, basis, cyclicContent),
   "invalid-source-content",
 );
 
 const foreign = new Memory();
 expectSourceError(
-  () => readSourceContent(memory, byteRefs, foreign.root),
+  () => readSourceContent(memory, basis, foreign.root),
   "invalid-source-content",
 );
 expectSourceError(
@@ -141,21 +140,11 @@ const ordinary = memory.ensure(nonByte, other);
 expectSourceError(() => readSourceForm(memory, ordinary), "invalid-source");
 expectSourceError(() => readSourceForm(memory, foreign.root), "invalid-source");
 
+// Basis is carried evidence, therefore forged poles are rejected through the
+// same narrow source-content error without expanding read capabilities.
 expectSourceError(
-  () => materializeSourceContent(memory, byteRefs.slice(0, 255), new Uint8Array([0])),
-  "invalid-byte-vocabulary",
-);
-const duplicatedVocabulary = [...byteRefs];
-duplicatedVocabulary[255] = duplicatedVocabulary[0]!;
-expectSourceError(
-  () => readSourceContent(memory, duplicatedVocabulary, content),
-  "invalid-byte-vocabulary",
-);
-const foreignVocabulary = [...byteRefs];
-foreignVocabulary[255] = foreign.root;
-expectSourceError(
-  () => readSourceContent(memory, foreignVocabulary, content),
-  "invalid-byte-vocabulary",
+  () => readSourceContent(memory, { ...basis, L: basis.U }, content),
+  "invalid-source-content",
 );
 
 interface DictionaryFixture {
@@ -165,7 +154,6 @@ interface DictionaryFixture {
 
 function dictionaryWith(
   target: Memory,
-  vocabulary: readonly LinkHandle[],
   mappings: readonly (readonly [Uint8Array, LinkHandle])[],
 ): DictionaryFixture {
   const root = target.root;
@@ -178,7 +166,7 @@ function dictionaryWith(
       dictionary,
       root,
       history,
-      materializeSourceContent(target, vocabulary, bytes),
+      materializeSourceContent(target, bytes),
       form,
     );
     occurrences.push(effect.occurrence);
@@ -199,24 +187,17 @@ function spec(
 
 {
   const target = new Memory();
-  const refs = anchors(target, 264);
-  const bytes = refs.slice(0, 256);
-  const [formA, formArrow, formB, grammar, theory] = refs.slice(256, 261);
-  assert(
-    bytes.length === 256 && formA !== undefined && formArrow !== undefined &&
-    formB !== undefined && grammar !== undefined && theory !== undefined,
-    "front-end fixture refs",
-  );
+  const [formA, formArrow, formB, grammar, theory] = anchors(target, 5);
+  assert(formA && formArrow && formB && grammar && theory, "front-end fixture refs");
   const raw = new Uint8Array([0x61, 0xe2, 0x9f, 0xbc, 0x62]);
-  const sourceForm = defineSourceForm(target, materializeSourceContent(target, bytes, raw));
-  const dictionary = dictionaryWith(target, bytes, [
+  const sourceForm = defineSourceForm(target, materializeSourceContent(target, raw));
+  const dictionary = dictionaryWith(target, [
     [new Uint8Array([0x61]), formA],
     [new Uint8Array([0xe2, 0x9f, 0xbc]), formArrow],
     [new Uint8Array([0x62]), formB],
   ]);
   const evidence = buildSelectedSourceEvidence(
     target,
-    bytes,
     sourceForm,
     [
       spec(0, 1, formA, dictionary.occurrences[0]!),
@@ -228,7 +209,7 @@ function spec(
 
   const before = target.linkCount;
   assertDeepEqual(
-    replaySelectedSourceEvidence(new ChainOnlyProbe(target), bytes, evidence),
+    replaySelectedSourceEvidence(new ChainOnlyProbe(target), evidence),
     [formA, formArrow, formB],
     "multibyte arrow is one caller-selected segment",
   );
@@ -239,43 +220,39 @@ function spec(
 
 {
   const target = new Memory();
-  const refs = anchors(target, 262);
-  const bytes = refs.slice(0, 256);
-  const [formOne, formTwo, grammar, theory] = refs.slice(256, 260);
-  assert(bytes.length === 256 && formOne && formTwo && grammar && theory, "dictionary fixture refs");
+  const [formOne, formTwo, grammar, theory] = anchors(target, 4);
+  assert(formOne && formTwo && grammar && theory, "dictionary fixture refs");
   const raw = new Uint8Array([0x78]);
-  const sourceForm = defineSourceForm(target, materializeSourceContent(target, bytes, raw));
-  const one = dictionaryWith(target, bytes, [[raw, formOne]]);
-  const two = dictionaryWith(target, bytes, [[raw, formTwo]]);
+  const sourceForm = defineSourceForm(target, materializeSourceContent(target, raw));
+  const one = dictionaryWith(target, [[raw, formOne]]);
+  const two = dictionaryWith(target, [[raw, formTwo]]);
   const evidenceOne = buildSelectedSourceEvidence(
-    target, bytes, sourceForm, [spec(0, 1, formOne, one.occurrences[0]!)],
+    target, sourceForm, [spec(0, 1, formOne, one.occurrences[0]!)],
     { dictionary: one.dictionary, grammar, theory },
   );
   const evidenceTwo = buildSelectedSourceEvidence(
-    target, bytes, sourceForm, [spec(0, 1, formTwo, two.occurrences[0]!)],
+    target, sourceForm, [spec(0, 1, formTwo, two.occurrences[0]!)],
     { dictionary: two.dictionary, grammar, theory },
   );
   assertSame(evidenceOne.content, evidenceTwo.content, "same bytes share content");
   assertSame(evidenceOne.source, evidenceTwo.source, "same bytes share source form");
-  assertDeepEqual(replaySelectedSourceEvidence(target, bytes, evidenceOne), [formOne], "dictionary one");
-  assertDeepEqual(replaySelectedSourceEvidence(target, bytes, evidenceTwo), [formTwo], "dictionary two");
+  assertDeepEqual(replaySelectedSourceEvidence(target, evidenceOne), [formOne], "dictionary one");
+  assertDeepEqual(replaySelectedSourceEvidence(target, evidenceTwo), [formTwo], "dictionary two");
 }
 
 {
   const target = new Memory();
-  const refs = anchors(target, 265);
-  const bytes = refs.slice(0, 256);
-  const [left, right, grammar, theory, unrelated] = refs.slice(256, 261);
-  assert(bytes.length === 256 && left && right && grammar && theory && unrelated, "semantic form fixture refs");
+  const [left, right, grammar, theory, unrelated] = anchors(target, 5);
+  assert(left && right && grammar && theory && unrelated, "semantic form fixture refs");
   const existingForm = target.ensure(left, right);
   const raw = new Uint8Array([0x78]);
-  const sourceForm = defineSourceForm(target, materializeSourceContent(target, bytes, raw));
-  const dictionary = dictionaryWith(target, bytes, [[raw, existingForm]]);
+  const sourceForm = defineSourceForm(target, materializeSourceContent(target, raw));
+  const dictionary = dictionaryWith(target, [[raw, existingForm]]);
   const evidence = buildSelectedSourceEvidence(
-    target, bytes, sourceForm, [spec(0, 1, existingForm, dictionary.occurrences[0]!)],
+    target, sourceForm, [spec(0, 1, existingForm, dictionary.occurrences[0]!)],
     { dictionary: dictionary.dictionary, grammar, theory },
   );
-  assertSame(replaySelectedSourceEvidence(target, bytes, evidence)[0], existingForm, "existing Link is direct resolved form");
+  assertSame(replaySelectedSourceEvidence(target, evidence)[0], existingForm, "existing Link is direct resolved form");
 
   const forgedSpan = target.ensureStartSelfClosed(unrelated);
   const forgedSpanEvidence: SourceFrontEndEvidence = Object.freeze({
@@ -285,7 +262,7 @@ function spec(
     ]),
   });
   expectSourceError(
-    () => replaySelectedSourceEvidence(target, bytes, forgedSpanEvidence),
+    () => replaySelectedSourceEvidence(target, forgedSpanEvidence),
     "invalid-source-evidence",
   );
 
@@ -294,90 +271,80 @@ function spec(
     grammarMembership: target.ensure(grammar, unrelated),
   });
   expectSourceError(
-    () => replaySelectedSourceEvidence(target, bytes, forgedGrammar),
+    () => replaySelectedSourceEvidence(target, forgedGrammar),
     "invalid-admission-evidence",
   );
 }
 
 {
   const target = new Memory();
-  const refs = anchors(target, 264);
-  const bytes = refs.slice(0, 256);
-  const [formA, formB, formAB, grammar, theory] = refs.slice(256, 261);
-  assert(bytes.length === 256 && formA && formB && formAB && grammar && theory, "ambiguous fixture refs");
+  const [formA, formB, formAB, grammar, theory] = anchors(target, 5);
+  assert(formA && formB && formAB && grammar && theory, "ambiguous fixture refs");
   const a = new Uint8Array([0x61]);
   const b = new Uint8Array([0x62]);
   const ab = new Uint8Array([0x61, 0x62]);
-  const sourceForm = defineSourceForm(target, materializeSourceContent(target, bytes, ab));
-  const dictionary = dictionaryWith(target, bytes, [[a, formA], [b, formB], [ab, formAB]]);
+  const sourceForm = defineSourceForm(target, materializeSourceContent(target, ab));
+  const dictionary = dictionaryWith(target, [[a, formA], [b, formB], [ab, formAB]]);
   const split = buildSelectedSourceEvidence(
-    target, bytes, sourceForm,
+    target, sourceForm,
     [spec(0, 1, formA, dictionary.occurrences[0]!), spec(1, 2, formB, dictionary.occurrences[1]!)],
     { dictionary: dictionary.dictionary, grammar, theory },
   );
   const whole = buildSelectedSourceEvidence(
-    target, bytes, sourceForm,
+    target, sourceForm,
     [spec(0, 2, formAB, dictionary.occurrences[2]!)],
     { dictionary: dictionary.dictionary, grammar, theory },
   );
-  assertDeepEqual(replaySelectedSourceEvidence(target, bytes, split), [formA, formB], "split segmentation");
-  assertDeepEqual(replaySelectedSourceEvidence(target, bytes, whole), [formAB], "whole segmentation");
+  assertDeepEqual(replaySelectedSourceEvidence(target, split), [formA, formB], "split segmentation");
+  assertDeepEqual(replaySelectedSourceEvidence(target, whole), [formAB], "whole segmentation");
 }
 
 {
   const target = new Memory();
-  const refs = anchors(target, 264);
-  const bytes = refs.slice(0, 256);
-  const [formX, formY, grammar, theory] = refs.slice(256, 260);
-  assert(bytes.length === 256 && formX && formY && grammar && theory, "history fixture refs");
+  const [formX, formY, grammar, theory] = anchors(target, 4);
+  assert(formX && formY && grammar && theory, "history fixture refs");
   const x = new Uint8Array([0x78]);
   const y = new Uint8Array([0x79]);
-  const sourceForm = defineSourceForm(target, materializeSourceContent(target, bytes, x));
-  const dictionary = dictionaryWith(target, bytes, [[x, formX], [y, formY]]);
+  const sourceForm = defineSourceForm(target, materializeSourceContent(target, x));
+  const dictionary = dictionaryWith(target, [[x, formX], [y, formY]]);
   const evidence = buildSelectedSourceEvidence(
-    target, bytes, sourceForm, [spec(0, 1, formX, dictionary.occurrences[0]!)],
+    target, sourceForm, [spec(0, 1, formX, dictionary.occurrences[0]!)],
     { dictionary: dictionary.dictionary, grammar, theory },
   );
-  assertDeepEqual(replaySelectedSourceEvidence(target, bytes, evidence), [formX], "earlier visible occurrence remains valid");
+  assertDeepEqual(replaySelectedSourceEvidence(target, evidence), [formX], "earlier visible occurrence remains valid");
 }
 
 {
   const target = new Memory();
-  const refs = anchors(target, 266);
-  const bytes = refs.slice(0, 256);
-  const [form, otherForm, grammar, theory] = refs.slice(256, 260);
-  assert(bytes.length === 256 && form && otherForm && grammar && theory, "foreign dictionary fixture refs");
+  const [form, otherForm, grammar, theory] = anchors(target, 4);
+  assert(form && otherForm && grammar && theory, "foreign dictionary fixture refs");
   const x = new Uint8Array([0x78]);
   const y = new Uint8Array([0x79]);
-  const sourceForm = defineSourceForm(target, materializeSourceContent(target, bytes, x));
-  const primary = dictionaryWith(target, bytes, [[x, form]]);
-  const structurallyOther = dictionaryWith(target, bytes, [[y, otherForm], [x, form]]);
+  const sourceForm = defineSourceForm(target, materializeSourceContent(target, x));
+  const primary = dictionaryWith(target, [[x, form]]);
+  const structurallyOther = dictionaryWith(target, [[y, otherForm], [x, form]]);
   const evidence = buildSelectedSourceEvidence(
     target,
-    bytes,
     sourceForm,
     [spec(0, 1, form, structurallyOther.occurrences[1]!)],
     { dictionary: primary.dictionary, grammar, theory },
   );
   expectSourceError(
-    () => replaySelectedSourceEvidence(target, bytes, evidence),
+    () => replaySelectedSourceEvidence(target, evidence),
     "invalid-dictionary-evidence",
   );
 }
 
 {
   const target = new Memory();
-  const refs = anchors(target, 260);
-  const bytes = refs.slice(0, 256);
-  const [form, grammar, theory] = refs.slice(256, 259);
-  assert(bytes.length === 256 && form && grammar && theory, "partition fixture refs");
+  const [form, grammar, theory] = anchors(target, 3);
+  assert(form && grammar && theory, "partition fixture refs");
   const ab = new Uint8Array([0x61, 0x62]);
-  const sourceForm = defineSourceForm(target, materializeSourceContent(target, bytes, ab));
-  const dictionary = dictionaryWith(target, bytes, [[new Uint8Array([0x62]), form]]);
+  const sourceForm = defineSourceForm(target, materializeSourceContent(target, ab));
+  const dictionary = dictionaryWith(target, [[new Uint8Array([0x62]), form]]);
   expectSourceError(
     () => buildSelectedSourceEvidence(
       target,
-      bytes,
       sourceForm,
       [spec(1, 2, form, dictionary.occurrences[0]!)],
       { dictionary: dictionary.dictionary, grammar, theory },
