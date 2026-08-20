@@ -111,6 +111,27 @@ function expectStateError(effect: () => unknown, code: StateError["code"]): void
   assert(current !== otherRepresentative, "mixed representatives are semantically distinct");
 }
 
+// H0 feasibility control: rejecting the self-colliding orientation does not
+// make Eq_K(parent,current) inexpressible. A distinct reverse binding
+// current->parent gives both references the same one-hop representative while
+// keeping the context header out of RepSet.
+{
+  const memory = new Memory();
+  const [parent, current] = anchors(memory, 2);
+  assert(parent && current && parent !== current, "reverse-binding anchors");
+
+  const context = defineContext(memory, parent, current);
+  const reverseBinding = defineLocalRepresentativeBinding(memory, context, current, parent);
+  assert(reverseBinding !== context, "reverse binding is a distinct attachment");
+  same(localRepresentative(memory, context, parent), parent, "parent remains fallback representative");
+  same(localRepresentative(memory, context, current), parent, "current resolves one hop to parent");
+  same(
+    localRepresentative(memory, context, parent),
+    localRepresentative(memory, context, current),
+    "Eq_K(parent,current) remains expressible without self-colliding binding",
+  );
+}
+
 // Control: ordinary non-colliding local bindings keep the accepted one-hop and
 // conflict behavior. #740 must not weaken that existing boundary.
 {
