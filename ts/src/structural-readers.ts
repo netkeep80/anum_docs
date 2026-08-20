@@ -46,7 +46,9 @@ export function readActHeader(
   act: LinkHandle,
 ): ActHeader {
   const actLink = memory.poles(act);
-  if (actLink.start !== act) {
+  // Act имеет именно однополюсную форму START(header). Полностью
+  // самозамкнутый ROOT не является альтернативной кодировкой Act.
+  if (actLink.start !== act || actLink.end === act) {
     throw new StructuralReadError("invalid-act-header");
   }
 
