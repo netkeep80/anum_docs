@@ -63,6 +63,7 @@ export type {
 export {
   InterpreterReplayError,
   replayColonEffect,
+  replayColonEffect as replayDefinitionEffect,
   replayEqualityEvaluation,
   replayFlatReading,
   replayFlatSubselectionContinuation,
@@ -72,6 +73,7 @@ export {
 } from "./interpreter.js";
 export type {
   ColonReplayEvidence,
+  ColonReplayEvidence as DefinitionReplayEvidence,
   EqualityReplayEvidence,
   FlatReadingEvidence,
   RelationReplayEvidence,
