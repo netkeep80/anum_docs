@@ -168,7 +168,9 @@ export function readSourceForm(
 ): LinkHandle {
   try {
     const link = memory.poles(source);
-    if (link.start !== source) {
+    // SourceForm имеет именно однополюсную форму START(content). ROOT может
+    // быть пустым content, но не альтернативным source-wrapper для него.
+    if (link.start !== source || link.end === source) {
       throw new SourceError("invalid-source");
     }
     return link.end;

@@ -143,7 +143,9 @@ export function readStructuralRoleDictionary(
 ): StructuralRoleDictionary {
   try {
     const dictionary = memory.poles(roleDictionary);
-    if (dictionary.start !== roleDictionary) {
+    // DR имеет именно форму START(RoleSequence); ROOT не является вторым
+    // представлением пустого словаря ролей.
+    if (dictionary.start !== roleDictionary || dictionary.end === roleDictionary) {
       throw new StructuralRuleError("invalid-role-dictionary");
     }
     const sequence = readExactSequence(memory, dictionary.end);
