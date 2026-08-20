@@ -62,13 +62,11 @@ function continuedFold(memory: Memory, prefix: LinkHandle, values: readonly Link
 
 interface SourceFixture {
   readonly evidence: SourceFrontEndEvidence;
-  readonly byteRefs: readonly LinkHandle[];
 }
 function segment(start: number, form: LinkHandle, dictionaryOccurrence: LinkHandle): SelectedSegmentSpec {
   return Object.freeze({ start, end: start + 1, form, dictionaryOccurrence });
 }
 function sourceFixture(memory: Memory, forms: readonly LinkHandle[]): SourceFixture {
-  const byteRefs = anchors(memory, 256);
   const [grammar, theory] = anchors(memory, 2);
   assert(grammar && theory, "source vocabulary");
   let history = memory.root;
@@ -81,17 +79,16 @@ function sourceFixture(memory: Memory, forms: readonly LinkHandle[]): SourceFixt
     bytes[i] = value;
     const effect = defineDictionaryEffect(
       memory, dictionary, memory.root, history,
-      materializeSourceContent(memory, byteRefs, new Uint8Array([value])), form,
+      materializeSourceContent(memory, new Uint8Array([value])), form,
     );
     specs.push(segment(i, form, effect.occurrence));
     history = effect.historyAfter;
     dictionary = effect.afterScope;
   }
-  const source = defineSourceForm(memory, materializeSourceContent(memory, byteRefs, bytes));
+  const source = defineSourceForm(memory, materializeSourceContent(memory, bytes));
   return Object.freeze({
-    byteRefs: Object.freeze(byteRefs),
     evidence: buildSelectedSourceEvidence(
-      memory, byteRefs, source, specs, { dictionary, grammar, theory },
+      memory, source, specs, { dictionary, grammar, theory },
     ),
   });
 }
@@ -195,7 +192,7 @@ function fullCase(formsCount: number) {
     interpreter, roleDictionary, beforeContext, result, afterContext,
   });
   const before = memory.linkCount;
-  same(replayFlatReading(new Probe(memory), source.byteRefs, evidence), result, `full flat ${formsCount}`);
+  same(replayFlatReading(new Probe(memory), evidence), result, `full flat ${formsCount}`);
   same(memory.linkCount, before, "full flat replay read-only");
   return {
     memory, source, vocabulary, forms, parent, current, interpreter, roleDictionary,
@@ -217,34 +214,34 @@ const pair = fullCase(2);
     sourceEvidence: source.evidence, selected: full(source.evidence), roles: vocabulary,
     interpreter, roleDictionary, beforeContext, result: wrong, afterContext: wrongAfter,
   });
-  reject(() => replayFlatReading(memory, source.byteRefs, forged));
+  reject(() => replayFlatReading(memory, forged));
 
   const missing = act(memory, {
     sourceEvidence: source.evidence, selected: full(source.evidence), roles: vocabulary,
     interpreter, roleDictionary, beforeContext, result: wrong, afterContext: wrongAfter, omitResult: true,
   });
-  reject(() => replayFlatReading(memory, source.byteRefs, missing));
+  reject(() => replayFlatReading(memory, missing));
 
   const multiple = act(memory, {
     sourceEvidence: source.evidence, selected: full(source.evidence), roles: vocabulary,
     interpreter, roleDictionary, beforeContext, result: pair.result, afterContext: pair.afterContext,
     extraResult: wrong,
   });
-  reject(() => replayFlatReading(memory, source.byteRefs, multiple));
+  reject(() => replayFlatReading(memory, multiple));
 
   const driftContext = defineContext(memory, otherParent, pair.result);
   const drift = act(memory, {
     sourceEvidence: source.evidence, selected: full(source.evidence), roles: vocabulary,
     interpreter, roleDictionary, beforeContext, result: pair.result, afterContext: driftContext,
   });
-  reject(() => replayFlatReading(memory, source.byteRefs, drift));
+  reject(() => replayFlatReading(memory, drift));
 
   const wrongHeader = act(memory, {
     sourceEvidence: source.evidence, selected: full(source.evidence), roles: vocabulary,
     interpreter, roleDictionary, beforeContext, result: pair.result, afterContext: pair.afterContext,
     headerAfterContext: beforeContext,
   });
-  reject(() => replayFlatReading(memory, source.byteRefs, wrongHeader));
+  reject(() => replayFlatReading(memory, wrongHeader));
 }
 
 const cleanPair = fullCase(2);
@@ -263,7 +260,7 @@ const cleanPair = fullCase(2);
     theoryMembership: source.evidence.theoryMembership,
   });
   same(
-    replayFlatSubselectionReading(memory, source.byteRefs, cleanPair.evidence, whole),
+    replayFlatSubselectionReading(memory, cleanPair.evidence, whole),
     cleanPair.result, "whole-range subselection equals full reading",
   );
 
@@ -276,7 +273,7 @@ const cleanPair = fullCase(2);
   });
   const before = memory.linkCount;
   same(
-    replayFlatSubselectionContinuation(new Probe(memory), source.byteRefs, continuationEvidence, whole),
+    replayFlatSubselectionContinuation(new Probe(memory), continuationEvidence, whole),
     continuationResult, "continuation exact left fold",
   );
   same(memory.linkCount, before, "continuation read-only");
@@ -288,7 +285,7 @@ const cleanPair = fullCase(2);
     interpreter, roleDictionary, beforeContext, result: prefix, afterContext: emptyAfter,
   });
   same(
-    replayFlatSubselectionContinuation(memory, source.byteRefs, emptyEvidence, empty),
+    replayFlatSubselectionContinuation(memory, emptyEvidence, empty),
     prefix, "empty continuation returns prefix",
   );
 
@@ -298,10 +295,10 @@ const cleanPair = fullCase(2);
     sourceEvidence: source.evidence, selected: whole, roles: vocabulary,
     interpreter, roleDictionary, beforeContext, result: forgedResult, afterContext: forgedAfter,
   });
-  reject(() => replayFlatSubselectionContinuation(memory, source.byteRefs, forged, whole));
+  reject(() => replayFlatSubselectionContinuation(memory, forged, whole));
 
   const forgedSelection: SourceSubselectionEvidence = Object.freeze({
     ...whole, formSequence: empty.formSequence,
   });
-  reject(() => replayFlatSubselectionReading(memory, source.byteRefs, cleanPair.evidence, forgedSelection));
+  reject(() => replayFlatSubselectionReading(memory, cleanPair.evidence, forgedSelection));
 }

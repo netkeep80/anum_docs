@@ -7,7 +7,7 @@ import {
   materializeSourceContent,
   type SourceFrontEndEvidence,
 } from "../src/source.js";
-import { defineActField, defineActHeader, readRequiredSingle } from "../src/structural-readers.js";
+import { defineActField, defineActHeader } from "../src/structural-readers.js";
 import { type EqualityReplayEvidence, type EqualityRoles } from "../src/interpreter.js";
 import {
   type DecomposeEqualityEvidence,
@@ -45,7 +45,6 @@ function assertCheckerError(
 interface Fixture {
   readonly memory: Memory;
   readonly R: LinkHandle;
-  readonly byteRefs: readonly LinkHandle[];
   readonly evidence: IntegratedProofEvidence;
   readonly rule: LinkHandle;
   readonly theory: LinkHandle;
@@ -80,12 +79,11 @@ function proofRoles(fresh: () => LinkHandle): DecomposeEqualityRoles {
 
 function sourceEvidence(
   memory: Memory,
-  byteRefs: readonly LinkHandle[],
   rule: LinkHandle,
   theory: LinkHandle,
   fresh: () => LinkHandle,
 ): SourceFrontEndEvidence {
-  const content = materializeSourceContent(memory, byteRefs, new Uint8Array([7]));
+  const content = materializeSourceContent(memory, new Uint8Array([7]));
   const source = defineSourceForm(memory, content);
   const beforeDictionary = defineDictionaryScope(memory, memory.root, memory.root);
   const definition = defineDictionaryEffect(
@@ -98,7 +96,6 @@ function sourceEvidence(
   );
   return buildSelectedSourceEvidence(
     memory,
-    byteRefs,
     source,
     [{ start: 0, end: 1, form: rule, dictionaryOccurrence: definition.occurrence }],
     { dictionary: definition.afterScope, grammar: fresh(), theory },
@@ -113,11 +110,10 @@ function makeFixture(): Fixture {
     cursor = memory.ensure(cursor, R);
     return cursor;
   };
-  const byteRefs = Object.freeze(Array.from({ length: 256 }, () => fresh()));
   const context = defineContext(memory, fresh(), fresh());
   const theory = fresh();
   const rule = fresh();
-  const source = sourceEvidence(memory, byteRefs, rule, theory, fresh);
+  const source = sourceEvidence(memory, rule, theory, fresh);
 
   const leftStart = fresh();
   const leftEnd = fresh();
@@ -203,13 +199,13 @@ function makeFixture(): Fixture {
       goal: { startClaim, endClaim },
     },
   };
-  return { memory, R, byteRefs, evidence, rule, theory, context, fresh };
+  return { memory, R, evidence, rule, theory, context, fresh };
 }
 
 {
   const fx = makeFixture();
   const before = fx.memory.linkCount;
-  const result = replayIntegratedProof(fx.memory, fx.byteRefs, fx.evidence);
+  const result = replayIntegratedProof(fx.memory, fx.evidence);
   assertSame(result[0], fx.evidence.judgment.goal.startClaim, "exact start goal");
   assertSame(result[1], fx.evidence.judgment.goal.endClaim, "exact end goal");
   assertSame(fx.memory.linkCount, before, "integrated replay must be read-only");
@@ -220,7 +216,6 @@ function makeFixture(): Fixture {
   const goal = fx.evidence.judgment.goal;
   assertCheckerError("goal-mismatch", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     { ...fx.evidence, judgment: { ...fx.evidence.judgment, goal: {
       startClaim: goal.endClaim,
       endClaim: goal.startClaim,
@@ -230,12 +225,11 @@ function makeFixture(): Fixture {
   const startPoles = fx.memory.poles(goal.startClaim);
   const same = fx.memory.ensure(startPoles.start, startPoles.end);
   assertSame(same, goal.startClaim, "same goal pair must reuse semantic Link");
-  replayIntegratedProof(fx.memory, fx.byteRefs, fx.evidence);
+  replayIntegratedProof(fx.memory, fx.evidence);
 
   const different = fx.memory.ensure(startPoles.start, fx.fresh());
   assertCheckerError("goal-mismatch", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     { ...fx.evidence, judgment: { ...fx.evidence.judgment, goal: { ...goal, startClaim: different } } },
   ));
 }
@@ -244,13 +238,11 @@ function makeFixture(): Fixture {
   const fx = makeFixture();
   assertCheckerError("judgment-theory-mismatch", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     { ...fx.evidence, judgment: { ...fx.evidence.judgment, theory: fx.fresh() } },
   ));
   const otherContext = defineContext(fx.memory, fx.fresh(), fx.fresh());
   assertCheckerError("judgment-context-mismatch", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     { ...fx.evidence, judgment: { ...fx.evidence.judgment, context: otherContext } },
   ));
 }
@@ -258,18 +250,16 @@ function makeFixture(): Fixture {
 {
   const fx = makeFixture();
   const otherRule = fx.fresh();
-  const otherSource = sourceEvidence(fx.memory, fx.byteRefs, otherRule, fx.theory, fx.fresh);
+  const otherSource = sourceEvidence(fx.memory, otherRule, fx.theory, fx.fresh);
   assertCheckerError("source-rule-mismatch", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     { ...fx.evidence, source: otherSource },
   ));
 
   const otherTheory = fx.fresh();
-  const otherTheorySource = sourceEvidence(fx.memory, fx.byteRefs, fx.rule, otherTheory, fx.fresh);
+  const otherTheorySource = sourceEvidence(fx.memory, fx.rule, otherTheory, fx.fresh);
   assertCheckerError("source-theory-mismatch", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     { ...fx.evidence, source: otherTheorySource },
   ));
 }
@@ -280,7 +270,6 @@ function makeFixture(): Fixture {
   defineActField(fx.memory, premise.act, premise.roles.leftRepresentative, fx.fresh());
   assertCheckerError("invalid-equality-premise", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     fx.evidence,
   ));
 }
@@ -293,7 +282,6 @@ function makeFixture(): Fixture {
   };
   assertCheckerError("invalid-run", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     { ...fx.evidence, run: swapped },
   ));
 }
@@ -311,7 +299,6 @@ function makeFixture(): Fixture {
   };
   assertCheckerError("run-acts-mismatch", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     { ...fx.evidence, run: extended },
   ));
 }
@@ -321,7 +308,6 @@ function makeFixture(): Fixture {
   const otherContext = defineContext(fx.memory, fx.fresh(), fx.fresh());
   assertCheckerError("run-context-mismatch", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     { ...fx.evidence, run: { ...fx.evidence.run, initialContext: otherContext } },
   ));
 }
@@ -333,7 +319,6 @@ function makeFixture(): Fixture {
   defineActField(fx.memory, proof.act, proof.roles.afterContext, otherContext);
   assertCheckerError("invalid-integrated-evidence", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     fx.evidence,
   ));
 }
@@ -343,7 +328,6 @@ function makeFixture(): Fixture {
   const foreign = new Memory().root;
   assertCheckerError("invalid-integrated-evidence", () => replayIntegratedProof(
     fx.memory,
-    fx.byteRefs,
     { ...fx.evidence, ruleApplication: { ...fx.evidence.ruleApplication, act: foreign } },
   ));
 }

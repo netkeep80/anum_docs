@@ -86,7 +86,6 @@ function field(
 
 export function replayIntegratedProof(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
   evidence: IntegratedProofEvidence,
 ): readonly [LinkHandle, LinkHandle] {
   const beforeCount = memory.linkCount;
@@ -113,7 +112,7 @@ export function replayIntegratedProof(
 
     let selectedForms: readonly LinkHandle[];
     try {
-      selectedForms = replaySelectedSourceEvidence(memory, byteRefs, evidence.source);
+      selectedForms = replaySelectedSourceEvidence(memory, evidence.source);
     } catch (error) {
       if (error instanceof SourceError || error instanceof MemoryError) {
         fail("invalid-source-evidence");

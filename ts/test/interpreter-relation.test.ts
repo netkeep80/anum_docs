@@ -72,16 +72,11 @@ function spec(
 
 interface SourceFixture {
   readonly evidence: SourceFrontEndEvidence;
-  readonly byteRefs: readonly LinkHandle[];
 }
 
-function sourceFixture(
-  memory: Memory,
-  forms: readonly LinkHandle[],
-): SourceFixture {
-  const byteRefs = anchors(memory, 256);
+function sourceFixture(memory: Memory, forms: readonly LinkHandle[]): SourceFixture {
   const [grammar, theory] = anchors(memory, 2);
-  assert(byteRefs.length === 256 && grammar !== undefined && theory !== undefined, "source fixture refs");
+  assert(grammar !== undefined && theory !== undefined, "source fixture refs");
 
   let history = memory.root;
   let dictionary = defineDictionaryScope(memory, memory.root, history);
@@ -97,7 +92,7 @@ function sourceFixture(
       dictionary,
       memory.root,
       history,
-      materializeSourceContent(memory, byteRefs, new Uint8Array([value])),
+      materializeSourceContent(memory, new Uint8Array([value])),
       form,
     );
     occurrences.push(effect.occurrence);
@@ -105,15 +100,14 @@ function sourceFixture(
     dictionary = effect.afterScope;
   }
 
-  const source = defineSourceForm(memory, materializeSourceContent(memory, byteRefs, bytes));
+  const source = defineSourceForm(memory, materializeSourceContent(memory, bytes));
   const evidence = buildSelectedSourceEvidence(
     memory,
-    byteRefs,
     source,
     forms.map((form, index) => spec(index, index + 1, form, occurrences[index]!)),
     { dictionary, grammar, theory },
   );
-  return Object.freeze({ evidence, byteRefs: Object.freeze(byteRefs) });
+  return Object.freeze({ evidence });
 }
 
 function relationRoles(memory: Memory): RelationRoles {
@@ -200,7 +194,6 @@ function fullSelected(evidence: SourceFrontEndEvidence, form: LinkHandle) {
 
 class ReadOnlyProbe implements ReadMemory {
   outgoingCalls = 0;
-
   constructor(private readonly source: ReadMemory) {}
   get root(): LinkHandle { return this.source.root; }
   get linkCount(): number { return this.source.linkCount; }
@@ -239,7 +232,7 @@ function validRelation(
   });
   const before = memory.linkCount;
   const probe = new ReadOnlyProbe(memory);
-  assertSame(replayRelationStep(probe, source.byteRefs, evidence), result, "relation result");
+  assertSame(replayRelationStep(probe, evidence), result, "relation result");
   assertSame(memory.linkCount, before, "relation replay must be read-only");
   assert(probe.outgoingCalls > 0, "act fields must use indexed outgoing(act)");
   return { memory, source, roles, form, fixed, parent, binding, interpreter, roleDictionary, beforeContext, result, afterContext };
@@ -273,7 +266,7 @@ validRelation(
     result: wrongResult,
     afterContext,
   });
-  expectReplayError(() => replayRelationStep(memory, source.byteRefs, forged));
+  expectReplayError(() => replayRelationStep(memory, forged));
 
   const wrongBinding = relationAct(memory, {
     sourceEvidence: source.evidence,
@@ -286,7 +279,7 @@ validRelation(
     result: wrongResult,
     afterContext,
   });
-  expectReplayError(() => replayRelationStep(memory, source.byteRefs, wrongBinding));
+  expectReplayError(() => replayRelationStep(memory, wrongBinding));
 
   const changedParentContext = defineContext(memory, other, wrongResult);
   const changedParent = relationAct(memory, {
@@ -300,7 +293,7 @@ validRelation(
     result: wrongResult,
     afterContext: changedParentContext,
   });
-  expectReplayError(() => replayRelationStep(memory, source.byteRefs, changedParent));
+  expectReplayError(() => replayRelationStep(memory, changedParent));
 
   for (const header of [
     { headerInterpreter: other },
@@ -319,7 +312,7 @@ validRelation(
       afterContext,
       ...header,
     });
-    expectReplayError(() => replayRelationStep(memory, source.byteRefs, forgedHeader));
+    expectReplayError(() => replayRelationStep(memory, forgedHeader));
   }
 
   const missingResult = relationAct(memory, {
@@ -334,7 +327,7 @@ validRelation(
     afterContext,
     omitResult: true,
   });
-  expectReplayError(() => replayRelationStep(memory, source.byteRefs, missingResult));
+  expectReplayError(() => replayRelationStep(memory, missingResult));
 
   const secondResult = memory.ensure(binding, other);
   const multipleResult = relationAct(memory, {
@@ -349,15 +342,13 @@ validRelation(
     afterContext,
     extraResult: secondResult,
   });
-  expectReplayError(() => replayRelationStep(memory, source.byteRefs, multipleResult));
+  expectReplayError(() => replayRelationStep(memory, multipleResult));
 
   const forgedSource: SourceFrontEndEvidence = Object.freeze({
     ...source.evidence,
     grammarMembership: memory.ensure(source.evidence.grammar, other),
   });
-  expectReplayError(() => replayRelationStep(memory, source.byteRefs, Object.freeze({ ...forged, sourceEvidence: forgedSource })));
-
-  // Keep the original fixture parent live in this block and prove no implicit context selection exists.
+  expectReplayError(() => replayRelationStep(memory, Object.freeze({ ...forged, sourceEvidence: forgedSource })));
   assert(parent !== other, "explicit parent fixture must be distinct");
 }
 
@@ -385,7 +376,7 @@ for (const makeForm of [
     result,
     afterContext,
   });
-  expectReplayError(() => replayRelationStep(memory, source.byteRefs, evidence));
+  expectReplayError(() => replayRelationStep(memory, evidence));
 }
 
 {
@@ -424,7 +415,7 @@ for (const makeForm of [
   });
   const before = memory.linkCount;
   assertSame(
-    replayRelationSubselectionStep(memory, source.byteRefs, evidence, subselection),
+    replayRelationSubselectionStep(memory, evidence, subselection),
     result,
     "single relation subselection",
   );
@@ -440,11 +431,11 @@ for (const makeForm of [
     grammarMembership: source.evidence.grammarMembership,
     theoryMembership: source.evidence.theoryMembership,
   });
-  expectReplayError(() => replayRelationSubselectionStep(memory, source.byteRefs, evidence, all));
+  expectReplayError(() => replayRelationSubselectionStep(memory, evidence, all));
 
   const forged: SourceSubselectionEvidence = Object.freeze({
     ...subselection,
     formSequence: source.evidence.formSequence,
   });
-  expectReplayError(() => replayRelationSubselectionStep(memory, source.byteRefs, evidence, forged));
+  expectReplayError(() => replayRelationSubselectionStep(memory, evidence, forged));
 }

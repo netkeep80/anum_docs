@@ -1,6 +1,13 @@
 import {
+  ByteCarrierError,
+  materializeCanonicalByteSequence,
+  readCanonicalByteSequence,
+} from "./byte-carrier.js";
+import {
+  ensureRootBasis,
   type LinkHandle,
   type ReadMemory,
+  type RootBasis,
   type WriteMemory,
 } from "./memory.js";
 import {
@@ -13,7 +20,6 @@ import {
 } from "./rooted-sequence.js";
 
 export type SourceErrorCode =
-  | "invalid-byte-vocabulary"
   | "invalid-source-content"
   | "invalid-source"
   | "invalid-selected-partition"
@@ -44,6 +50,8 @@ export interface SelectedSegmentEvidence extends SelectedSegmentSpec {
 }
 
 export interface SourceFrontEndEvidence {
+  /** Canonical root basis carried as evidence and verified from defining poles. */
+  readonly basis: RootBasis;
   readonly content: LinkHandle;
   readonly source: LinkHandle;
   readonly dictionary: LinkHandle;
@@ -75,83 +83,76 @@ export class SourceError extends Error {
   }
 }
 
-function byteVocabulary(
+/**
+ * RootBasis is evidence, not host authority: replay verifies every defining
+ * equation through poles() and never needs a 256-entry injected byte table,
+ * find(), incoming(), outgoing() or materialization.
+ */
+function verifyRootBasis(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
-): ReadonlyMap<LinkHandle, number> {
-  if (byteRefs.length !== 256 || new Set(byteRefs).size !== 256) {
-    throw new SourceError("invalid-byte-vocabulary");
-  }
-
-  const inverse = new Map<LinkHandle, number>();
-  for (let value = 0; value < byteRefs.length; value += 1) {
-    const ref = byteRefs[value];
-    // Этот compatibility carrier — restricted root-starting fold. ROOT не
-    // может быть его value: R ⟼ R = R стирает позицию и делает [R] = [].
-    // Это локальное ограничение byteRefs, не запрет ROOT в ExactSequence.
-    if (ref === undefined || ref === memory.root) {
-      throw new SourceError("invalid-byte-vocabulary");
+  basis: RootBasis,
+): RootBasis {
+  try {
+    const { R, O, C, L, U } = basis;
+    if (R !== memory.root) {
+      throw new SourceError("invalid-source-content");
     }
-    try {
-      memory.poles(ref);
-    } catch {
-      throw new SourceError("invalid-byte-vocabulary");
+    const root = memory.poles(R);
+    const open = memory.poles(O);
+    const close = memory.poles(C);
+    const one = memory.poles(L);
+    const zero = memory.poles(U);
+    if (
+      root.start !== R || root.end !== R ||
+      open.start !== O || open.end !== R ||
+      close.start !== R || close.end !== C ||
+      one.start !== O || one.end !== C ||
+      zero.start !== C || zero.end !== O
+    ) {
+      throw new SourceError("invalid-source-content");
     }
-    inverse.set(ref, value);
+    return basis;
+  } catch (error) {
+    if (error instanceof SourceError) throw error;
+    throw new SourceError("invalid-source-content");
   }
-  return inverse;
 }
 
+/** Materializes the accepted source carrier ExactSequence<Byte(p)>. */
 export function materializeSourceContent(
   memory: WriteMemory,
-  byteRefs: readonly LinkHandle[],
   bytes: Uint8Array,
 ): LinkHandle {
-  byteVocabulary(memory, byteRefs);
-  let current = memory.root;
-  for (const value of bytes) {
-    const byteRef = byteRefs[value];
-    if (byteRef === undefined) {
-      throw new SourceError("invalid-byte-vocabulary");
-    }
-    current = memory.ensure(current, byteRef);
-  }
-  return current;
+  const basis = ensureRootBasis(memory);
+  return materializeCanonicalByteSequence(memory, basis, bytes);
 }
 
+/**
+ * Reads only the accepted canonical byte carrier. Source boundaries reuse the
+ * ExactSequence positions directly: [R, ...cells].
+ */
 export function readSourceContent(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
+  basis: RootBasis,
   content: LinkHandle,
 ): SourceContent {
-  const inverse = byteVocabulary(memory, byteRefs);
-  let sequence;
   try {
-    sequence = readRootedSequence(memory, content);
+    const canonical = readCanonicalByteSequence(
+      memory,
+      verifyRootBasis(memory, basis),
+      content,
+    );
+    return Object.freeze({
+      bytes: canonical.bytes,
+      prefixes: Object.freeze([memory.root, ...canonical.cells]),
+    });
   } catch (error) {
-    if (error instanceof RootedSequenceError) {
+    if (error instanceof SourceError) throw error;
+    if (error instanceof ByteCarrierError) {
       throw new SourceError("invalid-source-content");
     }
-    throw error;
+    throw new SourceError("invalid-source-content");
   }
-
-  const bytes = new Uint8Array(sequence.values.length);
-  for (let index = 0; index < sequence.values.length; index += 1) {
-    const value = sequence.values[index];
-    if (value === undefined) {
-      throw new SourceError("invalid-source-content");
-    }
-    const byte = inverse.get(value);
-    if (byte === undefined) {
-      throw new SourceError("invalid-source-content");
-    }
-    bytes[index] = byte;
-  }
-
-  return Object.freeze({
-    bytes,
-    prefixes: Object.freeze([...sequence.prefixes]),
-  });
 }
 
 export function defineSourceForm(
@@ -224,7 +225,6 @@ function fold(memory: WriteMemory, values: readonly LinkHandle[]): LinkHandle {
 
 export function buildSelectedSourceEvidence(
   memory: WriteMemory,
-  byteRefs: readonly LinkHandle[],
   source: LinkHandle,
   specs: readonly SelectedSegmentSpec[],
   options: {
@@ -233,8 +233,9 @@ export function buildSelectedSourceEvidence(
     readonly theory: LinkHandle;
   },
 ): SourceFrontEndEvidence {
+  const basis = ensureRootBasis(memory);
   const content = readSourceForm(memory, source);
-  const sourceContent = readSourceContent(memory, byteRefs, content);
+  const sourceContent = readSourceContent(memory, basis, content);
   validatePartition(sourceContent.bytes.length, specs);
 
   const segments: SelectedSegmentEvidence[] = [];
@@ -246,7 +247,6 @@ export function buildSelectedSourceEvidence(
     }
     const sliceContent = materializeSourceContent(
       memory,
-      byteRefs,
       sourceContent.bytes.slice(spec.start, spec.end),
     );
     const span = memory.ensure(startPrefix, endPrefix);
@@ -271,6 +271,7 @@ export function buildSelectedSourceEvidence(
   const theoryMembership = memory.ensure(options.theory, formSequence);
 
   return Object.freeze({
+    basis,
     content,
     source,
     dictionary: options.dictionary,
@@ -333,7 +334,6 @@ function verifyMembership(
 
 export function replaySelectedSourceEvidence(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
   evidence: SourceFrontEndEvidence,
 ): readonly LinkHandle[] {
   const before = memory.linkCount;
@@ -341,7 +341,7 @@ export function replaySelectedSourceEvidence(
   if (content !== evidence.content) {
     throw new SourceError("invalid-source-evidence");
   }
-  const sourceContent = readSourceContent(memory, byteRefs, evidence.content);
+  const sourceContent = readSourceContent(memory, evidence.basis, evidence.content);
   validatePartition(sourceContent.bytes.length, evidence.segments);
 
   const forms: LinkHandle[] = [];
@@ -353,7 +353,7 @@ export function replaySelectedSourceEvidence(
       throw new SourceError("invalid-source-evidence");
     }
 
-    const slice = readSourceContent(memory, byteRefs, segment.sliceContent);
+    const slice = readSourceContent(memory, evidence.basis, segment.sliceContent);
     if (!sameBytes(slice.bytes, sourceContent.bytes.slice(segment.start, segment.end))) {
       throw new SourceError("invalid-source-evidence");
     }
@@ -429,12 +429,11 @@ export function replaySelectedSourceEvidence(
 
 export function replaySourceSubselection(
   memory: ReadMemory,
-  byteRefs: readonly LinkHandle[],
   evidence: SourceFrontEndEvidence,
   subselection: SourceSubselectionEvidence,
 ): readonly LinkHandle[] {
   const before = memory.linkCount;
-  const forms = replaySelectedSourceEvidence(memory, byteRefs, evidence);
+  const forms = replaySelectedSourceEvidence(memory, evidence);
   if (
     !Number.isInteger(subselection.startSegment) ||
     !Number.isInteger(subselection.endSegment) ||
