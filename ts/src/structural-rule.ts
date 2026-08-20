@@ -230,13 +230,23 @@ function readExactActBindings(
 
   try {
     for (const attachment of memory.outgoing(act)) {
-      // The start-selfclosed Act itself carries ActHeader and is not a field.
-      if (attachment === act) continue;
       const attachmentPoles = memory.poles(attachment);
       if (attachmentPoles.start !== act) {
         throw new StructuralRuleError("invalid-act");
       }
       const field = memory.poles(attachmentPoles.end);
+
+      if (attachment === act) {
+        // Self-link A всегда несёт ActHeader, но тот же semantic Link может
+        // одновременно быть field attachment, если DR явно объявляет роль
+        // field.start. Без такого объявления это только header-use, поэтому
+        // interpreter Link не становится скрытым undeclared binding.
+        if (roleSet.has(field.start)) {
+          values.get(field.start)?.push(field.end);
+        }
+        continue;
+      }
+
       if (!roleSet.has(field.start)) {
         throw new StructuralRuleError("undeclared-role-binding");
       }
