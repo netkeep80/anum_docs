@@ -142,10 +142,7 @@ const countBeforeRead = memory.linkCount;
 memory.find(basis.L, basis.U);
 memory.outgoing(basis.L);
 memory.incoming(basis.U);
-negativeVector(
-  "read-or-replay-materializes",
-  memory.linkCount === countBeforeRead && mappedNegativeVector(previousConformance, "read-or-replay-materializes"),
-);
+negativeVector("read-or-replay-materializes", memory.linkCount === countBeforeRead && mappedNegativeVector(previousConformance, "read-or-replay-materializes"));
 
 let rootRejected = false;
 try {
