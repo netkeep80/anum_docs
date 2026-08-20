@@ -1,8 +1,8 @@
 {
   "schema": "mts-contract/v0.10",
-  "status": "candidate",
-  "accepted": false,
-  "issue": 680,
+  "status": "accepted",
+  "accepted": true,
+  "issue": 701,
   "candidateLifecycleIssue": 663,
   "semanticBase": "mts-contract/v0.9",
   "observableSemanticDelta": true,
@@ -10,10 +10,10 @@
     "contract": "mts-contract/v0.9",
     "conformance": "mts-conformance/v0.9",
     "immutable": true,
-    "liveRuntimeSelectable": true
+    "liveRuntimeSelectable": false
   },
   "conformanceCorpus": "contracts/mts-conformance-v0.10.json",
-  "acceptedCurrent": "mts-contract/v0.9",
+  "acceptedCurrent": "mts-contract/v0.10",
   "acceptanceReady": true,
   "implementation": {
     "language": "TypeScript",
@@ -90,11 +90,12 @@
     "inversion": "Inv(A ⟼ B) = B ⟼ A",
     "inversionIsRecursiveMirror": false
   },
-  "candidateState": {
+  "releaseState": {
     "theoryResearchComplete": true,
     "contractBoundaryEstablished": true,
     "executableEvidenceComplete": true,
     "runtimeMappingComplete": true,
-    "acceptedV09Mutated": false
+    "acceptedV09Mutated": false,
+    "acceptedCurrent": true
   }
 }
