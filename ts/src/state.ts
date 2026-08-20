@@ -41,7 +41,9 @@ export function readContext(
 ): ContextState {
   try {
     const contextLink = memory.poles(context);
-    if (contextLink.start !== context) {
+    // Явный K имеет однополюсную форму START(payload). Полностью
+    // самозамкнутый ROOT не является альтернативной кодировкой того же K.
+    if (contextLink.start !== context || contextLink.end === context) {
       throw new StateError("invalid-context");
     }
     const payload = memory.poles(contextLink.end);

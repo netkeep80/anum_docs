@@ -10,6 +10,7 @@ import {
 } from "../src/state.js";
 import {
   Memory,
+  ensureRootBasis,
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
@@ -80,6 +81,42 @@ class IndexedContextProbe implements ReadMemory {
   incoming(): readonly LinkHandle[] {
     throw new Error("local representative resolution must not use incoming scan");
   }
+}
+
+// #728: ROOT и START(payload) — разные grounded recursive forms. Для
+// parent=current=R payload схлопывается в R, но сам явный K остаётся O=START(R).
+// ROOT не должен приниматься как alias K и тем самым открывать root topology
+// для ложного чтения local bindings.
+{
+  const rootMemory = new Memory();
+  const basis = ensureRootBasis(rootMemory);
+  const rootContext = defineContext(rootMemory, basis.R, basis.R);
+
+  assertSame(rootContext, basis.O, "canonical (R,R) context is START(R)=O");
+  assertDeepEqual(
+    readContext(rootMemory, rootContext),
+    { parent: basis.R, current: basis.R },
+    "canonical root-state context payload",
+  );
+  const decoded = readContext(rootMemory, rootContext);
+  assertSame(
+    defineContext(rootMemory, decoded.parent, decoded.current),
+    rootContext,
+    "canonical context decode/encode round-trip",
+  );
+
+  expectStateError(() => readContext(rootMemory, basis.R), "invalid-context");
+
+  const probe = new IndexedContextProbe(rootMemory);
+  expectStateError(
+    () => localRepresentativeResolution(probe, basis.R, basis.R),
+    "invalid-context",
+  );
+  assertSame(
+    probe.outgoingCalls,
+    0,
+    "invalid ROOT-as-context is rejected before scanning ordinary root topology",
+  );
 }
 
 const memory = new Memory();
