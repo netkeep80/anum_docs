@@ -84,9 +84,8 @@ const interpreter = defineStructuralInterpreter(memory, dictionary, grammar, the
 //   H = I ⟼ Q
 //   A = START(H) = A ⟼ H
 //
-// При объявленной роли I и значении Q поле I⟼Q является тем же H, а
-// attachment A⟼H — тем же A. Это не требует второй semantic occurrence:
-// один A одновременно исполняет header-use и field-use в контексте DR=[I].
+// При DR=[I] тот же A допускает две use-role: header carrier и structural
+// binding attachment A⟼(I⟼Q). Для этого не создаётся вторая semantic Link.
 const collisionRoleDictionary = defineStructuralRoleDictionary(memory, [interpreter]);
 const roleAndContext = memory.ensure(collisionRoleDictionary, afterContext);
 const header = memory.ensure(interpreter, roleAndContext);
@@ -98,38 +97,29 @@ const collisionAct = defineActHeader(
 );
 assertSame(memory.poles(collisionAct).end, header, "Act должен нести точный header");
 
-// Binding уже предъявлен структурой A и выбранной role I. Host-вызов
-// defineActField не является отдельным semantic событием и не должен быть
-// нужен reader-у, чтобы увидеть существующую relation A⟼(I⟼Q).
+// Старый specialized field-reader не имеет DR и поэтому сохраняет accepted
+// compatibility boundary: self-link A для него только header-use.
 assertDeepEqual(
   readOptionalMany(memory, collisionAct, interpreter),
-  [roleAndContext],
-  "self-link Act должен читаться как field в явно выбранной роли I",
+  [],
+  "legacy role reader не должен сам выводить dual-use без DR",
 );
-assertSame(
-  readRequiredSingle(memory, collisionAct, interpreter),
-  roleAndContext,
-  "dual-use binding должен удовлетворять required-single",
+expectStructuralReadError(
+  () => readRequiredSingle(memory, collisionAct, interpreter),
+  "missing-required-field",
 );
 
+// Повторный host-вызов не является отдельным semantic событием: нужная
+// canonical relation уже совпадает с A, поэтому topology остаётся прежней.
 const outgoingBefore = [...memory.outgoing(collisionAct)];
 const countBefore = memory.linkCount;
 const collisionAttachment = defineActField(memory, collisionAct, interpreter, roleAndContext);
 assertSame(collisionAttachment, collisionAct, "header-shaped attachment канонически является самим Act");
-assertSame(memory.linkCount, countBefore, "повторная материализация dual-use binding не создаёт Link");
-assertDeepEqual(
-  memory.outgoing(collisionAct),
-  outgoingBefore,
-  "идемпотентный defineActField не меняет topology",
-);
-assertDeepEqual(
-  readOptionalMany(memory, collisionAct, interpreter),
-  [roleAndContext],
-  "идемпотентная конструкция не создаёт multiplicity",
-);
+assertSame(memory.linkCount, countBefore, "повторная материализация collision не создаёт Link");
+assertDeepEqual(memory.outgoing(collisionAct), outgoingBefore, "collision не меняет topology");
 
-// DR действительно объявляет I placeholder-роль, поэтому generic Rule replay
-// обязан получить rho(I)=Q из того же self-link A и сопоставить body I с Q.
+// Generic StructuralRule, напротив, имеет exact DR. Поэтому DR=[I] задаёт
+// контекст use-role и self-link обязан дать rho(I)=Q.
 const collisionRule = defineStructuralRule(memory, collisionRoleDictionary, interpreter);
 const collisionAdmission = admitStructuralRule(memory, theory, collisionRule);
 const collisionReplay = replayStructuralRule(memory, {
@@ -143,22 +133,12 @@ const collisionReplay = replayStructuralRule(memory, {
 assertDeepEqual(
   collisionReplay.bindings,
   [{ role: interpreter, value: roleAndContext }],
-  "generic Rule должен получить ровно один dual-use binding",
+  "DR должен извлечь ровно один dual-use binding",
 );
 
-// Отличное второе значение для той же роли остаётся настоящим конфликтом
-// cardinality: self-link даёт Q, отдельный attachment даёт ordinaryValue.
+// Отличное второе значение той же DR-роли остаётся настоящим конфликтом:
+// self-link даёт Q, а отдельный attachment — ordinaryValue.
 defineActField(memory, collisionAct, interpreter, ordinaryValue);
-const conflictingValues = readOptionalMany(memory, collisionAct, interpreter);
-assertSame(conflictingValues.length, 2, "два отличных значения роли должны быть видимы");
-assert(
-  conflictingValues.includes(roleAndContext) && conflictingValues.includes(ordinaryValue),
-  "оба конфликтующих значения должны сохраняться структурно",
-);
-expectStructuralReadError(
-  () => readRequiredSingle(memory, collisionAct, interpreter),
-  "multiple-field-values",
-);
 expectStructuralRuleError(
   () => replayStructuralRule(memory, {
     act: collisionAct,
@@ -171,7 +151,20 @@ expectStructuralRuleError(
   "multiple-role-bindings",
 );
 
-// Контроль: обычный Field != H по-прежнему читается прежним exact способом.
+// Legacy reader продолжает видеть только отдельный field attachment и тем
+// самым не меняет semantics существующих relation/colon/equality replay API.
+assertDeepEqual(
+  readOptionalMany(memory, collisionAct, interpreter),
+  [ordinaryValue],
+  "legacy reader должен игнорировать header-use и видеть отдельный field",
+);
+assertSame(
+  readRequiredSingle(memory, collisionAct, interpreter),
+  ordinaryValue,
+  "legacy required-single сохраняет прежнее поведение",
+);
+
+// Контроль: обычный Field != H читается прежним exact способом и generic DR.
 const ordinaryRoleDictionary = defineStructuralRoleDictionary(memory, [ordinaryRole]);
 const ordinaryAct = defineActHeader(memory, interpreter, ordinaryRoleDictionary, afterContext);
 const ordinaryField = memory.ensure(ordinaryRole, ordinaryValue);
