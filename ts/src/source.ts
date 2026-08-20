@@ -86,7 +86,10 @@ function byteVocabulary(
   const inverse = new Map<LinkHandle, number>();
   for (let value = 0; value < byteRefs.length; value += 1) {
     const ref = byteRefs[value];
-    if (ref === undefined) {
+    // Этот compatibility carrier — restricted root-starting fold. ROOT не
+    // может быть его value: R ⟼ R = R стирает позицию и делает [R] = [].
+    // Это локальное ограничение byteRefs, не запрет ROOT в ExactSequence.
+    if (ref === undefined || ref === memory.root) {
       throw new SourceError("invalid-byte-vocabulary");
     }
     try {
