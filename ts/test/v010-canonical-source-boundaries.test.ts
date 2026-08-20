@@ -11,6 +11,8 @@ import {
   Memory,
   ensureRootBasis,
   type LinkHandle,
+  type ReadMemory,
+  type RootBasis,
 } from "../src/memory.js";
 import {
   SourceError,
@@ -45,9 +47,40 @@ function expectSourceError(effect: () => unknown, code: SourceError["code"]): vo
   throw new Error(`expected SourceError(${code})`);
 }
 
-function canonicalPrefixes(memory: Memory, carrier: LinkHandle): readonly LinkHandle[] {
+function canonicalPrefixes(memory: ReadMemory, carrier: LinkHandle): readonly LinkHandle[] {
   const exact = readExactSequence(memory, carrier);
   return Object.freeze([memory.root, ...exact.cells]);
+}
+
+// Research-only inverse of ensureRootBasis. The important property for #736 is
+// that replay does not need another trusted host vocabulary: accepted R/O/C/L/U
+// can be selected from existing structure using ReadMemory only.
+function readRootBasisStructurally(memory: ReadMemory): RootBasis {
+  const R = memory.root;
+  const root = memory.poles(R);
+  assert(root.start === R && root.end === R, "ROOT must be fully self-closed");
+
+  const starts = memory.incoming(R).filter((candidate) => {
+    if (candidate === R) return false;
+    const poles = memory.poles(candidate);
+    return poles.start === candidate && poles.end === R;
+  });
+  same(starts.length, 1, "exactly one canonical START(R) basis link");
+  const O = starts[0]!;
+
+  const ends = memory.outgoing(R).filter((candidate) => {
+    if (candidate === R) return false;
+    const poles = memory.poles(candidate);
+    return poles.start === R && poles.end === candidate;
+  });
+  same(ends.length, 1, "exactly one canonical END(R) basis link");
+  const C = ends[0]!;
+
+  const L = memory.find(O, C);
+  const U = memory.find(C, O);
+  assert(L !== undefined, "canonical L=O->C must exist");
+  assert(U !== undefined, "canonical U=C->O must exist");
+  return Object.freeze({ R, O, C, L, U });
 }
 
 const memory = new Memory();
@@ -55,19 +88,31 @@ const basis = ensureRootBasis(memory);
 const byteRefs = materializeByteVocabulary(memory, basis);
 assert(byteRefs.every((ref) => ref !== memory.root), "canonical Byte(p) vocabulary excludes ROOT");
 
+// Root basis is recoverable read-only from structural equations; a future
+// canonical replay therefore need not replace byteRefs with a trusted host
+// RootBasis parameter.
+const countBeforeBasisRead = memory.linkCount;
+const derivedBasis = readRootBasisStructurally(memory);
+same(derivedBasis.R, basis.R, "derived R");
+same(derivedBasis.O, basis.O, "derived O");
+same(derivedBasis.C, basis.C, "derived C");
+same(derivedBasis.L, basis.L, "derived L");
+same(derivedBasis.U, basis.U, "derived U");
+same(memory.linkCount, countBeforeBasisRead, "root-basis reconstruction is read-only");
+
 // Canonical accepted source content keeps physical bytes in ExactSequence cells.
 // Repeated semantic byte values reuse Byte(p), while positions remain distinct.
 const bytes = new Uint8Array([0x41, 0x41, 0x00, 0xff]);
 const canonicalContent = materializeCanonicalByteSequence(memory, basis, bytes);
-const canonical = readCanonicalByteSequence(memory, basis, canonicalContent);
-deepSame(Array.from(canonical.bytes), Array.from(bytes), "canonical bytes round-trip");
+const canonical = readCanonicalByteSequence(memory, derivedBasis, canonicalContent);
+deepSame(Array.from(canonical.bytes), Array.from(bytes), "canonical bytes round-trip with structurally derived basis");
 same(canonical.cells.length, bytes.length, "one exact cell per byte position");
 assert(canonical.byteLinks[0] === canonical.byteLinks[1], "repeated 0x41 reuses one semantic Byte(p)");
 assert(canonical.cells[0] !== canonical.cells[1], "repeated 0x41 keeps two structural positions");
 
-// Legacy source selection uses [R, ...prefixes] as its boundary coordinate set.
+// Legacy source selection uses an ordered prefix-boundary coordinate set.
 // ExactSequence already supplies the same role without any new identity concept:
-// [R, ...cells]. Each segment can therefore keep span=startBoundary⟼endBoundary.
+// [R, ...cells]. Each segment can therefore keep span=startBoundary->endBoundary.
 const prefixes = canonicalPrefixes(memory, canonicalContent);
 same(prefixes.length, bytes.length + 1, "canonical boundary count");
 same(prefixes[0], memory.root, "empty canonical prefix is ROOT");
@@ -87,12 +132,12 @@ same(firstEnd, canonical.cells[1]!, "first segment ends at second exact cell");
 same(secondStart, firstEnd, "adjacent segments share one structural boundary");
 same(secondEnd, canonicalContent, "last segment ends at whole-content boundary");
 deepSame(
-  Array.from(readCanonicalByteSequence(memory, basis, firstSlice).bytes),
+  Array.from(readCanonicalByteSequence(memory, derivedBasis, firstSlice).bytes),
   [0x41, 0x41],
   "first canonical slice",
 );
 deepSame(
-  Array.from(readCanonicalByteSequence(memory, basis, secondSlice).bytes),
+  Array.from(readCanonicalByteSequence(memory, derivedBasis, secondSlice).bytes),
   [0x00, 0xff],
   "second canonical slice",
 );
