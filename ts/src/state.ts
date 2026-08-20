@@ -5,7 +5,10 @@ import {
   type WriteMemory,
 } from "./memory.js";
 
-export type StateErrorCode = "invalid-context" | "representative-conflict";
+export type StateErrorCode =
+  | "invalid-context"
+  | "invalid-representative-binding"
+  | "representative-conflict";
 
 export interface ContextState {
   readonly parent: LinkHandle;
@@ -80,7 +83,14 @@ export function defineLocalRepresentativeBinding(
   representative: LinkHandle,
 ): LinkHandle {
   const pair = memory.ensure(member, representative);
-  return memory.ensure(context, pair);
+  const binding = memory.ensure(context, pair);
+  // K self-link is the context header. Канонизация не создаёт отдельное
+  // вхождение/use-role, поэтому host-вызов не может превратить сам K в
+  // предъявленное local-binding evidence.
+  if (binding === context) {
+    throw new StateError("invalid-representative-binding");
+  }
+  return binding;
 }
 
 export function localRepresentativeResolution(
