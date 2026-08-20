@@ -166,18 +166,6 @@
         "value": false
       },
       {
-        "id": "v010-contract-not-ready",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v010-contract", "pointer": "/acceptanceReady", "type": "boolean"},
-        "value": false
-      },
-      {
-        "id": "v010-conformance-not-ready",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v010-conformance", "pointer": "/acceptanceReady", "type": "boolean"},
-        "value": false
-      },
-      {
         "id": "v010-contract-is-semantic-delta",
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v010-contract", "pointer": "/observableSemanticDelta", "type": "boolean"},
