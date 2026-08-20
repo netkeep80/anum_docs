@@ -11,6 +11,7 @@ import {
   Memory,
   ensureRootBasis,
   type LinkHandle,
+  type LinkPoles,
   type ReadMemory,
   type RootBasis,
 } from "../src/memory.js";
@@ -52,35 +53,33 @@ function canonicalPrefixes(memory: ReadMemory, carrier: LinkHandle): readonly Li
   return Object.freeze([memory.root, ...exact.cells]);
 }
 
-// Research-only inverse of ensureRootBasis. The important property for #736 is
-// that replay does not need another trusted host vocabulary: accepted R/O/C/L/U
-// can be selected from existing structure using ReadMemory only.
-function readRootBasisStructurally(memory: ReadMemory): RootBasis {
-  const R = memory.root;
+// A carried RootBasis is structural evidence, not host authority, when every
+// component is checked against its defining poles. This uses only poles(), so
+// selected replay need not widen its current read capability to find/incoming.
+function verifyRootBasisStructurally(memory: ReadMemory, basis: RootBasis): RootBasis {
+  const { R, O, C, L, U } = basis;
+  same(R, memory.root, "basis R must be current ROOT");
   const root = memory.poles(R);
-  assert(root.start === R && root.end === R, "ROOT must be fully self-closed");
+  const open = memory.poles(O);
+  const close = memory.poles(C);
+  const one = memory.poles(L);
+  const zero = memory.poles(U);
+  assert(root.start === R && root.end === R, "R=R->R");
+  assert(open.start === O && open.end === R, "O=O->R");
+  assert(close.start === R && close.end === C, "C=R->C");
+  assert(one.start === O && one.end === C, "L=O->C");
+  assert(zero.start === C && zero.end === O, "U=C->O");
+  return basis;
+}
 
-  const starts = memory.incoming(R).filter((candidate) => {
-    if (candidate === R) return false;
-    const poles = memory.poles(candidate);
-    return poles.start === candidate && poles.end === R;
-  });
-  same(starts.length, 1, "exactly one canonical START(R) basis link");
-  const O = starts[0]!;
-
-  const ends = memory.outgoing(R).filter((candidate) => {
-    if (candidate === R) return false;
-    const poles = memory.poles(candidate);
-    return poles.start === R && poles.end === candidate;
-  });
-  same(ends.length, 1, "exactly one canonical END(R) basis link");
-  const C = ends[0]!;
-
-  const L = memory.find(O, C);
-  const U = memory.find(C, O);
-  assert(L !== undefined, "canonical L=O->C must exist");
-  assert(U !== undefined, "canonical U=C->O must exist");
-  return Object.freeze({ R, O, C, L, U });
+class PolesOnlyProbe implements ReadMemory {
+  constructor(private readonly source: ReadMemory) {}
+  get root(): LinkHandle { return this.source.root; }
+  get linkCount(): number { return this.source.linkCount; }
+  poles(link: LinkHandle): LinkPoles { return this.source.poles(link); }
+  find(): LinkHandle | undefined { throw new Error("canonical source verification must not use find"); }
+  outgoing(): readonly LinkHandle[] { throw new Error("canonical source verification must not use outgoing"); }
+  incoming(): readonly LinkHandle[] { throw new Error("canonical source verification must not use incoming"); }
 }
 
 const memory = new Memory();
@@ -88,24 +87,25 @@ const basis = ensureRootBasis(memory);
 const byteRefs = materializeByteVocabulary(memory, basis);
 assert(byteRefs.every((ref) => ref !== memory.root), "canonical Byte(p) vocabulary excludes ROOT");
 
-// Root basis is recoverable read-only from structural equations; a future
-// canonical replay therefore need not replace byteRefs with a trusted host
-// RootBasis parameter.
+// Canonical basis can be carried by source evidence and verified read-only using
+// only its equations. No arbitrary byteRefs table and no whole-network lookup is
+// needed during replay.
 const countBeforeBasisRead = memory.linkCount;
-const derivedBasis = readRootBasisStructurally(memory);
-same(derivedBasis.R, basis.R, "derived R");
-same(derivedBasis.O, basis.O, "derived O");
-same(derivedBasis.C, basis.C, "derived C");
-same(derivedBasis.L, basis.L, "derived L");
-same(derivedBasis.U, basis.U, "derived U");
-same(memory.linkCount, countBeforeBasisRead, "root-basis reconstruction is read-only");
+const narrowRead = new PolesOnlyProbe(memory);
+const verifiedBasis = verifyRootBasisStructurally(narrowRead, basis);
+same(verifiedBasis.R, basis.R, "verified R");
+same(verifiedBasis.O, basis.O, "verified O");
+same(verifiedBasis.C, basis.C, "verified C");
+same(verifiedBasis.L, basis.L, "verified L");
+same(verifiedBasis.U, basis.U, "verified U");
+same(memory.linkCount, countBeforeBasisRead, "root-basis verification is read-only");
 
 // Canonical accepted source content keeps physical bytes in ExactSequence cells.
 // Repeated semantic byte values reuse Byte(p), while positions remain distinct.
 const bytes = new Uint8Array([0x41, 0x41, 0x00, 0xff]);
 const canonicalContent = materializeCanonicalByteSequence(memory, basis, bytes);
-const canonical = readCanonicalByteSequence(memory, derivedBasis, canonicalContent);
-deepSame(Array.from(canonical.bytes), Array.from(bytes), "canonical bytes round-trip with structurally derived basis");
+const canonical = readCanonicalByteSequence(narrowRead, verifiedBasis, canonicalContent);
+deepSame(Array.from(canonical.bytes), Array.from(bytes), "canonical bytes round-trip with verified basis");
 same(canonical.cells.length, bytes.length, "one exact cell per byte position");
 assert(canonical.byteLinks[0] === canonical.byteLinks[1], "repeated 0x41 reuses one semantic Byte(p)");
 assert(canonical.cells[0] !== canonical.cells[1], "repeated 0x41 keeps two structural positions");
@@ -113,7 +113,7 @@ assert(canonical.cells[0] !== canonical.cells[1], "repeated 0x41 keeps two struc
 // Legacy source selection uses an ordered prefix-boundary coordinate set.
 // ExactSequence already supplies the same role without any new identity concept:
 // [R, ...cells]. Each segment can therefore keep span=startBoundary->endBoundary.
-const prefixes = canonicalPrefixes(memory, canonicalContent);
+const prefixes = canonicalPrefixes(narrowRead, canonicalContent);
 same(prefixes.length, bytes.length + 1, "canonical boundary count");
 same(prefixes[0], memory.root, "empty canonical prefix is ROOT");
 same(prefixes[prefixes.length - 1], canonicalContent, "last canonical prefix is whole content");
@@ -132,12 +132,12 @@ same(firstEnd, canonical.cells[1]!, "first segment ends at second exact cell");
 same(secondStart, firstEnd, "adjacent segments share one structural boundary");
 same(secondEnd, canonicalContent, "last segment ends at whole-content boundary");
 deepSame(
-  Array.from(readCanonicalByteSequence(memory, derivedBasis, firstSlice).bytes),
+  Array.from(readCanonicalByteSequence(narrowRead, verifiedBasis, firstSlice).bytes),
   [0x41, 0x41],
   "first canonical slice",
 );
 deepSame(
-  Array.from(readCanonicalByteSequence(memory, derivedBasis, secondSlice).bytes),
+  Array.from(readCanonicalByteSequence(narrowRead, verifiedBasis, secondSlice).bytes),
   [0x00, 0xff],
   "second canonical slice",
 );
@@ -151,9 +151,9 @@ same(memory.poles(secondSpan).end, secondEnd, "second span end boundary");
 // root-exclusion from #734/#735 must therefore stay carrier-local.
 const exactRootValue = materializeExactSequence(memory, [memory.root]);
 assert(exactRootValue !== memory.root, "ExactSequence([R]) differs from ExactSequence([])");
-const exactRootDecoded = readExactSequence(memory, exactRootValue);
+const exactRootDecoded = readExactSequence(narrowRead, exactRootValue);
 deepSame(exactRootDecoded.values, [memory.root], "ExactSequence preserves ROOT value");
-deepSame(canonicalPrefixes(memory, exactRootValue), [memory.root, exactRootValue], "ROOT value gets an explicit exact position");
+deepSame(canonicalPrefixes(narrowRead, exactRootValue), [memory.root, exactRootValue], "ROOT value gets an explicit exact position");
 
 // Current compatibility source API still materializes another topology even if
 // the injected vocabulary itself is the canonical Byte(p) vocabulary.
