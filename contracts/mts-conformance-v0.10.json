@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "foundation, contextual-dot and negative boundaries have executable evidence; acceptance readiness remains pending",
+  "coverageStateMeaning": "foundation, contextual-dot, fixed-point and negative boundaries have executable evidence; acceptance readiness remains pending",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.9",
     "conformance": "mts-conformance/v0.9"
@@ -17,7 +17,8 @@
   "requiredExecutableGates": [
     "ts/test/v010-foundation.test.ts",
     "ts/test/v010-contextual-dot.test.ts",
-    "ts/test/v010-contextual-dot-negative.test.ts"
+    "ts/test/v010-contextual-dot-negative.test.ts",
+    "ts/test/v010-contextual-fixed-point.test.ts"
   ],
   "requiredFoundationVectors": [
     "v010-internal-sign-registry-has-eleven-signs",
@@ -36,7 +37,10 @@
     "v010-end-dot-resolves-to-C",
     "v010-generic-start-dot-binds-current-whole",
     "v010-generic-end-dot-binds-current-whole",
-    "v010-nested-dot-uses-nearest-lexical-binding"
+    "v010-nested-dot-uses-nearest-lexical-binding",
+    "v010-generic-start-fixed-point-law",
+    "v010-generic-end-fixed-point-law",
+    "v010-generic-fixed-point-laws-read-only"
   ],
   "requiredInversionVectors": [
     "v010-dot-is-pole-swap-of-colon",
@@ -80,6 +84,11 @@
         "v010-generic-start-dot-binds-current-whole",
         "v010-generic-end-dot-binds-current-whole",
         "v010-nested-dot-uses-nearest-lexical-binding"
+      ],
+      "ts/test/v010-contextual-fixed-point.test.ts": [
+        "v010-generic-start-fixed-point-law",
+        "v010-generic-end-fixed-point-law",
+        "v010-generic-fixed-point-laws-read-only"
       ]
     },
     "negative": {
@@ -98,6 +107,7 @@
   "evidenceState": {
     "foundation": "green",
     "context": "green",
+    "fixedPointLaws": "green",
     "inversion": "green",
     "negative": "green",
     "runtimeMapping": "research-reconciled"
@@ -123,6 +133,12 @@
     "negativeBoundaryEvidence": {
       "issue": 684,
       "test": "ts/test/v010-contextual-dot-negative.test.ts",
+      "status": "green",
+      "requiredForAcceptance": true
+    },
+    "genericFixedPointEvidence": {
+      "issue": 690,
+      "test": "ts/test/v010-contextual-fixed-point.test.ts",
       "status": "green",
       "requiredForAcceptance": true
     },
