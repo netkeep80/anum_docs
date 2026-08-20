@@ -176,12 +176,6 @@
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v010-conformance", "pointer": "/observableSemanticDelta", "type": "boolean"},
         "value": true
-      },
-      {
-        "id": "v010-conformance-incomplete",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v010-conformance", "pointer": "/coverageState", "type": "string"},
-        "value": "incomplete"
       }
     ]
   },
