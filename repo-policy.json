@@ -21,12 +21,12 @@
   },
   "contract_conformance": {
     "current": {
-      "contract": {"path": "contracts/mts-contract-v0.9.json", "format": "json"},
-      "conformance": {"path": "contracts/mts-conformance-v0.9.json", "format": "json"}
+      "contract": {"path": "contracts/mts-contract-v0.10.json", "format": "json"},
+      "conformance": {"path": "contracts/mts-conformance-v0.10.json", "format": "json"}
     },
     "previous": {
-      "contract": {"path": "contracts/mts-contract-v0.8.json", "format": "json"},
-      "conformance": {"path": "contracts/mts-conformance-v0.8.json", "format": "json"}
+      "contract": {"path": "contracts/mts-contract-v0.9.json", "format": "json"},
+      "conformance": {"path": "contracts/mts-conformance-v0.9.json", "format": "json"}
     },
     "pair_fields": {
       "contract_id": "/schema",
@@ -39,7 +39,7 @@
     },
     "accepted_state": {"status": "accepted", "accepted": true},
     "acceptance": {
-      "document": {"path": "cutover/typescript-c1-acceptance-v0.2.json", "format": "json"},
+      "document": {"path": "cutover/typescript-c1-acceptance-v0.3.json", "format": "json"},
       "current_contract_path": "/current/contract",
       "current_conformance_path": "/current/conformance"
     },
