@@ -68,10 +68,14 @@ export function readOptionalMany(
 ): readonly LinkHandle[] {
   const values: LinkHandle[] = [];
 
-  // Один semantic Link может иметь несколько use-role. Если self-link Act
-  // одновременно имеет форму A⟼(role⟼value), выбранный role обязан видеть
-  // этот же Link как field attachment; отдельная occurrence для этого не нужна.
+  // ReadMemory exposes the indexed outgoing surface directly. This avoids the
+  // Python-era whole-network scan and keeps the reader independent of storage.
   for (const attachment of memory.outgoing(act)) {
+    if (attachment === act) {
+      // A is start-self-closed, therefore A itself is in outgoing(A), but it is
+      // the header carrier rather than a role-field attachment.
+      continue;
+    }
     const attachmentLink = memory.poles(attachment);
     if (attachmentLink.start !== act) {
       continue;
