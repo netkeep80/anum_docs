@@ -1,7 +1,6 @@
 import {
-  materializeByteVocabulary,
-  materializeCanonicalByteSequence,
-  readCanonicalByteSequence,
+  materializeByteLink,
+  readByteLink,
 } from "../src/byte-carrier.js";
 import {
   materializeExactSequence,
@@ -16,7 +15,6 @@ import {
   type RootBasis,
 } from "../src/memory.js";
 import {
-  SourceError,
   defineSourceForm,
   materializeSourceContent,
   readSourceContent,
@@ -37,25 +35,11 @@ function deepSame(actual: unknown, expected: unknown, message: string): void {
   );
 }
 
-function expectSourceError(effect: () => unknown, code: SourceError["code"]): void {
-  try {
-    effect();
-  } catch (error) {
-    assert(error instanceof SourceError, `expected SourceError, got ${String(error)}`);
-    same(error.code, code, "source error code");
-    return;
-  }
-  throw new Error(`expected SourceError(${code})`);
-}
-
 function canonicalPrefixes(memory: ReadMemory, carrier: LinkHandle): readonly LinkHandle[] {
   const exact = readExactSequence(memory, carrier);
   return Object.freeze([memory.root, ...exact.cells]);
 }
 
-// A carried RootBasis is structural evidence, not host authority, when every
-// component is checked against its defining poles. This uses only poles(), so
-// selected replay need not widen its current read capability to find/incoming.
 function verifyRootBasisStructurally(memory: ReadMemory, basis: RootBasis): RootBasis {
   const { R, O, C, L, U } = basis;
   same(R, memory.root, "basis R must be current ROOT");
@@ -84,97 +68,60 @@ class PolesOnlyProbe implements ReadMemory {
 
 const memory = new Memory();
 const basis = ensureRootBasis(memory);
-const byteRefs = materializeByteVocabulary(memory, basis);
-assert(byteRefs.every((ref) => ref !== memory.root), "canonical Byte(p) vocabulary excludes ROOT");
-
-// Canonical basis can be carried by source evidence and verified read-only using
-// only its equations. No arbitrary byteRefs table and no whole-network lookup is
-// needed during replay.
-const countBeforeBasisRead = memory.linkCount;
 const narrowRead = new PolesOnlyProbe(memory);
+const countBeforeBasisRead = memory.linkCount;
 const verifiedBasis = verifyRootBasisStructurally(narrowRead, basis);
-same(verifiedBasis.R, basis.R, "verified R");
-same(verifiedBasis.O, basis.O, "verified O");
-same(verifiedBasis.C, basis.C, "verified C");
-same(verifiedBasis.L, basis.L, "verified L");
-same(verifiedBasis.U, basis.U, "verified U");
 same(memory.linkCount, countBeforeBasisRead, "root-basis verification is read-only");
 
-// Canonical accepted source content keeps physical bytes in ExactSequence cells.
-// Repeated semantic byte values reuse Byte(p), while positions remain distinct.
+// Source content now uses the accepted ExactSequence<Byte(p)> carrier directly.
 const bytes = new Uint8Array([0x41, 0x41, 0x00, 0xff]);
-const canonicalContent = materializeCanonicalByteSequence(memory, basis, bytes);
-const canonical = readCanonicalByteSequence(narrowRead, verifiedBasis, canonicalContent);
-deepSame(Array.from(canonical.bytes), Array.from(bytes), "canonical bytes round-trip with verified basis");
-same(canonical.cells.length, bytes.length, "one exact cell per byte position");
-assert(canonical.byteLinks[0] === canonical.byteLinks[1], "repeated 0x41 reuses one semantic Byte(p)");
-assert(canonical.cells[0] !== canonical.cells[1], "repeated 0x41 keeps two structural positions");
+const sourceContent = materializeSourceContent(memory, bytes);
+const sourceRead = readSourceContent(narrowRead, verifiedBasis, sourceContent);
+deepSame(Array.from(sourceRead.bytes), Array.from(bytes), "source bytes round-trip canonically");
 
-// Legacy source selection uses an ordered prefix-boundary coordinate set.
-// ExactSequence already supplies the same role without any new identity concept:
-// [R, ...cells]. Each segment can therefore keep span=startBoundary->endBoundary.
-const prefixes = canonicalPrefixes(narrowRead, canonicalContent);
-same(prefixes.length, bytes.length + 1, "canonical boundary count");
-same(prefixes[0], memory.root, "empty canonical prefix is ROOT");
-same(prefixes[prefixes.length - 1], canonicalContent, "last canonical prefix is whole content");
+const exact = readExactSequence(narrowRead, sourceContent);
+same(exact.cells.length, bytes.length, "one ExactSequence cell per physical byte position");
+assert(exact.values[0] === exact.values[1], "repeated 0x41 reuses one semantic Byte(p)");
+assert(exact.cells[0] !== exact.cells[1], "repeated 0x41 keeps distinct structural positions");
+same(readByteLink(narrowRead, verifiedBasis, exact.values[0]!), 0x41, "first byte is canonical Byte(0x41)");
+same(readByteLink(narrowRead, verifiedBasis, exact.values[2]!), 0x00, "third byte is canonical Byte(0x00)");
+same(readByteLink(narrowRead, verifiedBasis, exact.values[3]!), 0xff, "fourth byte is canonical Byte(0xff)");
 
-const firstStart = prefixes[0]!;
-const firstEnd = prefixes[2]!;
-const secondStart = prefixes[2]!;
-const secondEnd = prefixes[4]!;
+// Source selection boundaries are exactly [R, ...cells], preserving the old
+// span relation without source offsets, UUIDs or semantic value copies.
+deepSame(sourceRead.prefixes, [memory.root, ...exact.cells], "source exposes canonical boundary positions");
+const firstStart = sourceRead.prefixes[0]!;
+const firstEnd = sourceRead.prefixes[2]!;
+const secondStart = sourceRead.prefixes[2]!;
+const secondEnd = sourceRead.prefixes[4]!;
 const firstSpan = memory.ensure(firstStart, firstEnd);
 const secondSpan = memory.ensure(secondStart, secondEnd);
-const firstSlice = materializeCanonicalByteSequence(memory, basis, bytes.slice(0, 2));
-const secondSlice = materializeCanonicalByteSequence(memory, basis, bytes.slice(2, 4));
-
 same(firstStart, memory.root, "first segment begins at empty-prefix boundary");
-same(firstEnd, canonical.cells[1]!, "first segment ends at second exact cell");
-same(secondStart, firstEnd, "adjacent segments share one structural boundary");
-same(secondEnd, canonicalContent, "last segment ends at whole-content boundary");
-deepSame(
-  Array.from(readCanonicalByteSequence(narrowRead, verifiedBasis, firstSlice).bytes),
-  [0x41, 0x41],
-  "first canonical slice",
-);
-deepSame(
-  Array.from(readCanonicalByteSequence(narrowRead, verifiedBasis, secondSlice).bytes),
-  [0x00, 0xff],
-  "second canonical slice",
-);
-same(memory.poles(firstSpan).start, firstStart, "first span start boundary");
-same(memory.poles(firstSpan).end, firstEnd, "first span end boundary");
-same(memory.poles(secondSpan).start, secondStart, "second span start boundary");
-same(memory.poles(secondSpan).end, secondEnd, "second span end boundary");
+same(firstEnd, exact.cells[1]!, "first segment ends at second exact cell");
+same(secondStart, firstEnd, "adjacent segments share one exact boundary");
+same(secondEnd, sourceContent, "last segment ends at whole source content");
+same(memory.poles(firstSpan).start, firstStart, "first span start");
+same(memory.poles(firstSpan).end, firstEnd, "first span end");
+same(memory.poles(secondSpan).start, secondStart, "second span start");
+same(memory.poles(secondSpan).end, secondEnd, "second span end");
 
-// ROOT remains a legal ExactSequence value generally; positions are carried by
-// the self-closed Cell, so [R] is not confused with []. The legacy source
-// root-exclusion from #734/#735 must therefore stay carrier-local.
+const firstSlice = materializeSourceContent(memory, bytes.slice(0, 2));
+const secondSlice = materializeSourceContent(memory, bytes.slice(2, 4));
+deepSame(Array.from(readSourceContent(narrowRead, verifiedBasis, firstSlice).bytes), [0x41, 0x41], "first source slice");
+deepSame(Array.from(readSourceContent(narrowRead, verifiedBasis, secondSlice).bytes), [0x00, 0xff], "second source slice");
+
+// ROOT remains legal in ExactSequence generally; #734/#735 was a property of
+// the removed legacy restricted byte fold, not a global sequence restriction.
 const exactRootValue = materializeExactSequence(memory, [memory.root]);
 assert(exactRootValue !== memory.root, "ExactSequence([R]) differs from ExactSequence([])");
-const exactRootDecoded = readExactSequence(narrowRead, exactRootValue);
-deepSame(exactRootDecoded.values, [memory.root], "ExactSequence preserves ROOT value");
-deepSame(canonicalPrefixes(narrowRead, exactRootValue), [memory.root, exactRootValue], "ROOT value gets an explicit exact position");
+deepSame(readExactSequence(narrowRead, exactRootValue).values, [memory.root], "ExactSequence preserves ROOT value");
+deepSame(canonicalPrefixes(narrowRead, exactRootValue), [memory.root, exactRootValue], "ROOT value has an explicit position");
 
-// Current compatibility source API still materializes another topology even if
-// the injected vocabulary itself is the canonical Byte(p) vocabulary.
-const legacyContent = materializeSourceContent(memory, byteRefs, bytes);
-assert(legacyContent !== canonicalContent, "legacy rooted fold and canonical ExactSequence are distinct carriers");
-deepSame(
-  Array.from(readSourceContent(memory, byteRefs, legacyContent).bytes),
-  Array.from(bytes),
-  "legacy-valid fixture keeps the same physical byte content",
-);
+// Byte(p) itself remains the accepted Q-derived value, independent of source position.
+const byteZero = materializeByteLink(memory, basis, 0x00);
+assert(byteZero !== memory.root, "Byte(0x00) is not ROOT");
+same(readByteLink(narrowRead, verifiedBasis, byteZero), 0x00, "Byte(0x00) round-trip");
 
-// This is the executable post-cutover gap owned by #736: the accepted canonical
-// carrier is readable by byte-carrier.ts but rejected by source.ts, so current
-// selected replay cannot consume canonical source evidence without migration.
-expectSourceError(
-  () => readSourceContent(memory, byteRefs, canonicalContent),
-  "invalid-source-content",
-);
-
-// SourceForm itself is carrier-agnostic and can already wrap canonical content;
-// the migration boundary is therefore source content decoding/selection, not a
-// new SourceForm semantic primitive.
-const canonicalSource = defineSourceForm(memory, canonicalContent);
-same(memory.poles(canonicalSource).end, canonicalContent, "SourceForm wraps canonical content unchanged");
+// SourceForm remains carrier-agnostic and wraps canonical content unchanged.
+const source = defineSourceForm(memory, sourceContent);
+same(memory.poles(source).end, sourceContent, "SourceForm wraps canonical source content");
