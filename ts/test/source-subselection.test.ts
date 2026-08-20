@@ -13,7 +13,6 @@ import {
 } from "../src/dictionary.js";
 import {
   Memory,
-  ensureRootBasis,
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
@@ -81,7 +80,6 @@ function spec(
 }
 
 const memory = new Memory();
-const basis = ensureRootBasis(memory);
 const refs = anchors(memory, 8);
 const [formA, formB, formC, grammar, theory, unrelated] = refs;
 assert(
@@ -94,7 +92,7 @@ let history = memory.root;
 let dictionary = defineDictionaryScope(memory, memory.root, history);
 const occurrences: LinkHandle[] = [];
 for (const [value, form] of [[0x61, formA], [0x62, formB], [0x63, formC]] as const) {
-  const content = materializeSourceContent(memory, basis, new Uint8Array([value]));
+  const content = materializeSourceContent(memory, new Uint8Array([value]));
   const effect = defineDictionaryEffect(memory, dictionary, memory.root, history, content, form);
   occurrences.push(effect.occurrence);
   history = effect.historyAfter;
@@ -103,11 +101,10 @@ for (const [value, form] of [[0x61, formA], [0x62, formB], [0x63, formC]] as con
 
 const source = defineSourceForm(
   memory,
-  materializeSourceContent(memory, basis, new Uint8Array([0x61, 0x62, 0x63])),
+  materializeSourceContent(memory, new Uint8Array([0x61, 0x62, 0x63])),
 );
 const evidence = buildSelectedSourceEvidence(
   memory,
-  basis,
   source,
   [
     spec(0, 1, formA, occurrences[0]!),
@@ -130,8 +127,8 @@ function subselection(
     endSegment,
     selectionSequence,
     formSequence,
-    grammar,
-    theory,
+    grammar: grammar!,
+    theory: theory!,
     grammarMembership,
     theoryMembership,
   });
