@@ -2,6 +2,7 @@ import * as publicApi from "../src/public.js";
 import type {
   AnumForm,
   DecomposeEqualityEvidence,
+  DefinitionReplayEvidence,
   DirectDeixisVocabulary,
   IntegratedProofEvidence,
   LinkHandle,
@@ -60,6 +61,7 @@ const expectedRuntimeExports = [
   "normalizeRawForm",
   "parseRawQuaternary",
   "replayColonEffect",
+  "replayDefinitionEffect",
   "replayDecomposeEqualRelations",
   "replayEqualityEvaluation",
   "replayFlatReading",
@@ -82,6 +84,10 @@ assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
 );
+assert(
+  publicApi.replayDefinitionEffect === publicApi.replayColonEffect,
+  "definition replay must be a behavior-preserving alias of legacy colon replay",
+);
 
 // Compile-time smoke for the intended consumer concepts. The top-level evidence
 // shapes are public because callers must provide them, while their nested role
@@ -96,6 +102,7 @@ const dataset: StoredDataset | undefined = undefined;
 const persistentSequence: PersistentSequenceDescription | undefined = undefined;
 const sequence: SequenceDescription | undefined = undefined;
 const relation: RelationReplayEvidence | undefined = undefined;
+const definition: DefinitionReplayEvidence | undefined = undefined;
 const deixis: DirectDeixisVocabulary | undefined = undefined;
 const value: MtsValue | undefined = undefined;
 const run: RunEvidence | undefined = undefined;
@@ -112,6 +119,7 @@ void [
   persistentSequence,
   sequence,
   relation,
+  definition,
   deixis,
   value,
   run,
