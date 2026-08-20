@@ -13,23 +13,54 @@
     "liveRuntimeSelectable": false
   },
   "conformanceCorpus": "contracts/mts-conformance-v0.10.json",
+  "currentPointer": "cutover/typescript-c1-acceptance-v0.2.json",
+  "acceptedMtsVersion": "mts-contract/v0.10",
   "acceptedCurrent": "mts-contract/v0.10",
   "acceptanceReady": true,
   "implementation": {
     "language": "TypeScript",
+    "package": "@mts/core",
+    "packageManifest": "ts/package.json",
+    "publicFacade": "ts/src/public.ts",
     "singleLiveSemanticRuntime": true,
     "pythonRuntimePresent": false,
     "compatibilityRuntimeSelectable": false,
     "candidateRuntimeSelectable": false,
     "implementationComplete": true
   },
+  "rootBasisTarget": {
+    "R": "R = R ⟼ R",
+    "O": "O = O ⟼ R",
+    "C": "C = R ⟼ C",
+    "L": "L = O ⟼ C",
+    "U": "U = C ⟼ O"
+  },
   "foundation": {
     "minimalInternalSigns": ["∞", "[", "]", "1", "0", "(", ")", "⟼", ":", "=", "."],
+    "deferredSigns": ["≡", "♂", "♀", "↑", "{", "}", "¬", "↛"],
+    "metaOnlySigns": ["∧", "⇔", "⇒", "≠", "→"],
     "internalSignCount": 11,
     "supersededResearchSigns": ["↑"],
     "singleFormalArrow": "⟼",
     "dotIntroduced": true,
     "dotIsNewRootPrimitive": false
+  },
+  "canonicalStringQuaternaryCarrier": {
+    "canonicalUnit": "byte",
+    "byteEnvelope": "[bbbbbbbb]",
+    "bitsPerEnvelope": 8,
+    "bitOrder": "MSB-first",
+    "unicodeNormalization": false,
+    "invalidUtf8CarrierAllowed": true,
+    "runtimeByteIdIsSemanticIdentity": false,
+    "representationEqualsInterpretation": false
+  },
+  "effects": {
+    "findEqualsMaterialize": false,
+    "notFoundImpliesNonExistence": false,
+    "readMayMaterialize": false,
+    "replayMayMaterialize": false,
+    "explicitMaterializationMustReuseSameGroundedForm": true
   },
   "signMeaningEquations": {
     "∞": "m∞ = m∞ ⟼ m∞",
