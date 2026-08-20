@@ -17,13 +17,7 @@ import {
 import { defineDictionaryEffect, defineDictionaryScope } from "../src/dictionary.js";
 import { defineContext } from "../src/state.js";
 import { defineActField, defineActHeader } from "../src/structural-readers.js";
-import {
-  Memory,
-  ensureRootBasis,
-  type LinkHandle,
-  type LinkPoles,
-  type ReadMemory,
-} from "../src/memory.js";
+import { Memory, type LinkHandle, type LinkPoles, type ReadMemory } from "../src/memory.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -73,7 +67,6 @@ function segment(start: number, form: LinkHandle, dictionaryOccurrence: LinkHand
   return Object.freeze({ start, end: start + 1, form, dictionaryOccurrence });
 }
 function sourceFixture(memory: Memory, forms: readonly LinkHandle[]): SourceFixture {
-  const basis = ensureRootBasis(memory);
   const [grammar, theory] = anchors(memory, 2);
   assert(grammar && theory, "source vocabulary");
   let history = memory.root;
@@ -86,16 +79,16 @@ function sourceFixture(memory: Memory, forms: readonly LinkHandle[]): SourceFixt
     bytes[i] = value;
     const effect = defineDictionaryEffect(
       memory, dictionary, memory.root, history,
-      materializeSourceContent(memory, basis, new Uint8Array([value])), form,
+      materializeSourceContent(memory, new Uint8Array([value])), form,
     );
     specs.push(segment(i, form, effect.occurrence));
     history = effect.historyAfter;
     dictionary = effect.afterScope;
   }
-  const source = defineSourceForm(memory, materializeSourceContent(memory, basis, bytes));
+  const source = defineSourceForm(memory, materializeSourceContent(memory, bytes));
   return Object.freeze({
     evidence: buildSelectedSourceEvidence(
-      memory, basis, source, specs, { dictionary, grammar, theory },
+      memory, source, specs, { dictionary, grammar, theory },
     ),
   });
 }
