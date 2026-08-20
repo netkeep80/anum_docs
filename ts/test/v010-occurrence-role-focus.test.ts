@@ -216,6 +216,21 @@ function replayFocus(
   });
 }
 
+function negativeFixture() {
+  const memory = new Memory();
+  const next = refFactory(memory);
+  const focus = defineFocusRule(memory, next, "left");
+  return Object.freeze({
+    memory,
+    focus,
+    X: next(),
+    Y: next(),
+    other: next(),
+    parent: next(),
+    otherParent: next(),
+  });
+}
+
 // Two occurrences of the same semantic X are distinguishable by role position.
 // The left-focused and right-focused Rules receive identical semantic values but
 // derive different after states without any occurrence ID or numeric host path.
@@ -251,41 +266,41 @@ function replayFocus(
   same(rightPoles.end, Y, "right-focused occurrence replaced");
 }
 
-// A single-occurrence Rule rejects claims that silently rewrite the other equal
-// occurrence, bind the selected role to another semantic value, or change scope.
+// Forged/destructive vectors use separate Memories because an Act is canonical
+// by (interpreter, role dictionary, K_after) and its role facts are additive.
 {
-  const memory = new Memory();
-  const next = refFactory(memory);
-  const focus = defineFocusRule(memory, next, "left");
-  const X = next();
-  const Y = next();
-  const other = next();
-  const parent = next();
-  const otherParent = next();
-
-  const rewriteBoth = makeFocusStep(memory, focus, X, Y, X, parent, {
-    afterCurrent: memory.ensure(Y, Y),
+  const f = negativeFixture();
+  const step = makeFocusStep(f.memory, f.focus, f.X, f.Y, f.X, f.parent, {
+    afterCurrent: f.memory.ensure(f.Y, f.Y),
   });
-  rejectRule(() => replayFocus(memory, focus, rewriteBoth), "template-mismatch");
-
-  const wrongSelected = makeFocusStep(memory, focus, X, Y, X, parent, {
-    selectedBinding: other,
+  rejectRule(() => replayFocus(f.memory, f.focus, step), "template-mismatch");
+}
+{
+  const f = negativeFixture();
+  const step = makeFocusStep(f.memory, f.focus, f.X, f.Y, f.X, f.parent, {
+    selectedBinding: f.other,
   });
-  rejectRule(() => replayFocus(memory, focus, wrongSelected), "template-mismatch");
-
-  const wrongUntouched = makeFocusStep(memory, focus, X, Y, X, parent, {
-    untouchedBinding: other,
+  rejectRule(() => replayFocus(f.memory, f.focus, step), "template-mismatch");
+}
+{
+  const f = negativeFixture();
+  const step = makeFocusStep(f.memory, f.focus, f.X, f.Y, f.X, f.parent, {
+    untouchedBinding: f.other,
   });
-  rejectRule(() => replayFocus(memory, focus, wrongUntouched), "template-mismatch");
-
-  const changedParent = makeFocusStep(memory, focus, X, Y, X, parent, {
-    afterParent: otherParent,
+  rejectRule(() => replayFocus(f.memory, f.focus, step), "template-mismatch");
+}
+{
+  const f = negativeFixture();
+  const step = makeFocusStep(f.memory, f.focus, f.X, f.Y, f.X, f.parent, {
+    afterParent: f.otherParent,
   });
-  rejectRule(() => replayFocus(memory, focus, changedParent), "template-mismatch");
-
-  const valid = makeFocusStep(memory, focus, X, Y, X, parent);
-  const forgedAdmission = memory.ensure(other, focus.rule);
-  rejectRule(() => replayFocus(memory, focus, valid, forgedAdmission), "rule-not-admitted");
+  rejectRule(() => replayFocus(f.memory, f.focus, step), "template-mismatch");
+}
+{
+  const f = negativeFixture();
+  const step = makeFocusStep(f.memory, f.focus, f.X, f.Y, f.X, f.parent);
+  const forgedAdmission = f.memory.ensure(f.other, f.focus.rule);
+  rejectRule(() => replayFocus(f.memory, f.focus, step, forgedAdmission), "rule-not-admitted");
 }
 
 // The template itself can identify a finite deep occurrence. Here the outer X
