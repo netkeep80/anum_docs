@@ -4,6 +4,11 @@ import {
   readCanonicalByteSequence,
 } from "./byte-carrier.js";
 import {
+  ExactSequenceError,
+  materializeExactSequence,
+  readExactSequence,
+} from "./exact-sequence.js";
+import {
   ensureRootBasis,
   type LinkHandle,
   type ReadMemory,
@@ -266,7 +271,9 @@ export function buildSelectedSourceEvidence(
   }
 
   const selectionSequence = fold(memory, segments.map((segment) => segment.selection));
-  const formSequence = fold(memory, segments.map((segment) => segment.form));
+  // Forms are position-sensitive evidence and ROOT is a legal semantic value,
+  // therefore the restricted rooted fold is not a valid carrier here.
+  const formSequence = materializeExactSequence(memory, segments.map((segment) => segment.form));
   const grammarMembership = memory.ensure(options.grammar, formSequence);
   const theoryMembership = memory.ensure(options.theory, formSequence);
 
@@ -307,6 +314,30 @@ function verifyFold(
       throw error;
     }
     if (error instanceof RootedSequenceError) {
+      throw new SourceError("invalid-source-evidence");
+    }
+    throw error;
+  }
+}
+
+function verifyExactSequence(
+  memory: ReadMemory,
+  final: LinkHandle,
+  values: readonly LinkHandle[],
+): void {
+  try {
+    const sequence = readExactSequence(memory, final);
+    if (
+      sequence.values.length !== values.length ||
+      sequence.values.some((value, index) => value !== values[index])
+    ) {
+      throw new SourceError("invalid-source-evidence");
+    }
+  } catch (error) {
+    if (error instanceof SourceError) {
+      throw error;
+    }
+    if (error instanceof ExactSequenceError) {
       throw new SourceError("invalid-source-evidence");
     }
     throw error;
@@ -417,7 +448,7 @@ export function replaySelectedSourceEvidence(
   }
 
   verifyFold(memory, evidence.selectionSequence, selections);
-  verifyFold(memory, evidence.formSequence, forms);
+  verifyExactSequence(memory, evidence.formSequence, forms);
   verifyMembership(memory, evidence.grammarMembership, evidence.grammar, evidence.formSequence);
   verifyMembership(memory, evidence.theoryMembership, evidence.theory, evidence.formSequence);
 
@@ -457,7 +488,7 @@ export function replaySourceSubselection(
     subselection.selectionSequence,
     segments.map((segment) => segment.selection),
   );
-  verifyFold(memory, subselection.formSequence, selectedForms);
+  verifyExactSequence(memory, subselection.formSequence, selectedForms);
   verifyMembership(
     memory,
     subselection.grammarMembership,
