@@ -312,12 +312,6 @@
         "value": "supported-c1"
       },
       {
-        "id": "v011-c2-under-falsification",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v011-contract", "pointer": "/foundation/minimalSignBasisStatus", "type": "string"},
-        "value": "under-falsification-c2"
-      },
-      {
         "id": "v011-production-behavior-unchanged-in-m1",
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v011-contract", "pointer": "/implementation/productionBehaviorChanged", "type": "boolean"},
