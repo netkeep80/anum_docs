@@ -125,7 +125,9 @@ function sourceEvidence(
 }
 
 function roles(memory: Memory): TopLevelContextualReadingRoles {
-  const r = anchors(memory, 10);
+  // Keep the Act field vocabulary disjoint from fixture semantic values so a
+  // canonical Link cannot accidentally play both host-schema and value roles.
+  const r = anchors(memory, 20).slice(10);
   assert(r.length === 10, "role vocabulary");
   return Object.freeze({
     source: r[0]!,
