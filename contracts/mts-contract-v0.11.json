@@ -38,7 +38,7 @@
     "dotIsQAbit": false,
     "colonIsQAbit": false,
     "newPrimitiveExpected": false,
-    "minimalSignBasisStatus": "under-falsification-c2"
+    "minimalSignBasisStatus": "classified-c2-semantic-derived-presentation-cycle-retained"
   },
   "zeroContextGenesis": {
     "zeroContextualWhole": "A₀ = R = ∞",
@@ -69,7 +69,22 @@
     "dotMeaningIsInverseOfColonMeaning": true,
     "colonMeaningEqualsDotDotFold": false,
     "semanticValuesPreservedFromV010": true,
-    "independentSignIntroductionSimplification": "under-falsification-c2"
+    "independentSignIntroductionSimplification": "classified-c2-semantic-derived-presentation-cycle-retained",
+    "c2Classification": {
+      "semanticMeaningsDerivedWithoutIndependentSignPrimitives": true,
+      "colonMeaningIndependentPrimitiveRequired": false,
+      "dotMeaningIndependentPrimitiveRequired": false,
+      "representationSignsRetained": [":", "."],
+      "selfHostedPresentationCycleRemains": true,
+      "colonDeclarationSelfReferencesOwnEntry": true,
+      "dotDeclarationSelfReferencesOwnEntry": false,
+      "executableEvidence": "ts/test/research-minimal-sign-basis-c2.test.ts",
+      "evidenceIssue": 769,
+      "evidencePullRequest": 770,
+      "evidenceHead": "7fe5fd744cd97c3aace79a40cabf2fad5b4fd4e6",
+      "ciRun": 3143,
+      "repoGuardRun": 621
+    }
   },
   "contextualDuality": {
     "bindingForm": "A : E",
@@ -120,7 +135,7 @@
     "researchGenesisComplete": true,
     "contractBoundaryEstablished": true,
     "physicalDotBootstrapComplete": true,
-    "minimalSignBasisFalsificationComplete": false,
+    "minimalSignBasisFalsificationComplete": true,
     "executableEvidenceComplete": false,
     "runtimeImplementationComplete": false,
     "acceptedV010Mutated": false
