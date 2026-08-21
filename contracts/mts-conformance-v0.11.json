@@ -9,16 +9,16 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "the v0.11 candidate boundary and C1 physical-dot admission are explicit and green; C2 minimal-sign-basis falsification and production implementation remain incomplete",
+  "coverageStateMeaning": "the v0.11 candidate boundary plus C1 physical-dot admission and C2 minimal-sign-basis classification are explicit and green; production implementation remains incomplete",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.10",
     "conformance": "mts-conformance/v0.10"
   },
   "requiredExecutableGates": [
-    "ts/test/research-physical-dot-bootstrap.test.ts"
+    "ts/test/research-physical-dot-bootstrap.test.ts",
+    "ts/test/research-minimal-sign-basis-c2.test.ts"
   ],
   "plannedExecutableGates": [
-    "C2 F1/minimal-sign-basis falsification evidence",
     "top-level astrika root-binding implementation evidence",
     "exact two-dot occurrence preservation and fold production evidence",
     "nested explicit A:E production compatibility evidence",
@@ -35,6 +35,12 @@
     "v011-colon-meaning-remains-R-to-L",
     "v011-dot-meaning-remains-L-to-R",
     "v011-dot-occurrence-role-is-not-dot-meaning-link"
+  ],
+  "requiredC2ClassificationVectors": [
+    "v011-c2-semantic-simplification-supported",
+    "v011-c2-self-hosted-presentation-cycle-remains",
+    "v011-c2-representation-signs-retained",
+    "v011-c2-dot-declaration-does-not-self-reference-own-entry"
   ],
   "requiredCompatibilityVectors": [
     "v011-nested-explicit-binding-remains-nearest-structural"
@@ -76,6 +82,12 @@
       "no hidden literal ROOT source prefix is inserted",
       "Pair(A,A)!=A for non-root A",
       "dot remains outside Q alphabet"
+    ],
+    "ts/test/research-minimal-sign-basis-c2.test.ts": [
+      "semantic ColonMeaning and DotMeaning are derived from R through O,C,L without independent sign primitives",
+      "physical ':' and '.' carriers and Entries remain distinct representation obligations",
+      "the current self-hosted colon declaration contains its own colonEntry and therefore retains a presentation cycle",
+      "the dot declaration uses colonEntry and arrowEntry but does not self-reference dotEntry"
     ]
   },
   "vectorEvidence": {
@@ -95,13 +107,21 @@
         "v011-dot-is-not-q-abit",
         "v011-host-stack-is-not-semantic-authority"
       ]
+    },
+    "c2": {
+      "ts/test/research-minimal-sign-basis-c2.test.ts": [
+        "v011-c2-semantic-simplification-supported",
+        "v011-c2-self-hosted-presentation-cycle-remains",
+        "v011-c2-representation-signs-retained",
+        "v011-c2-dot-declaration-does-not-self-reference-own-entry"
+      ]
     }
   },
   "evidenceState": {
     "researchGenesis": "green-existing",
     "candidateContractBoundary": "defined",
     "physicalDotBootstrapC1": "green-supported",
-    "minimalSignBasisC2": "under-falsification",
+    "minimalSignBasisC2": "green-classified",
     "topLevelProductionImplementation": "not-started",
     "nestedBindingCompatibility": "research-green-production-planned",
     "qBoundary": "declared",
@@ -121,20 +141,20 @@
       "requiredForAcceptance": true
     },
     "minimalSignBasisFalsification": {
-      "issue": 755,
+      "issue": 769,
       "stage": "C2",
-      "status": "under-falsification",
+      "test": "ts/test/research-minimal-sign-basis-c2.test.ts",
+      "status": "classified",
       "requiredForAcceptance": true
     },
     "productionImplementation": {
       "issue": 755,
       "stage": "C3",
-      "status": "blocked-by-C2",
+      "status": "ready-for-c3",
       "requiredForAcceptance": true
     }
   },
   "acceptanceBlockers": [
-    "C2 independent sign-introduction simplification has not been falsified or accepted",
     "top-level astrika ROOT binding is not implemented in production TypeScript",
     "remaining required v0.11 executable vectors are not yet bound to green production evidence",
     "v0.11 has not passed an explicit acceptance cutover",
