@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "the v0.11 candidate boundary, C1 physical-dot admission, C2 minimal-sign-basis classification and C3 top-level production ROOT binding are explicit and green; C4 nested production compatibility, remaining Q-boundary compatibility and acceptance remain incomplete",
+  "coverageStateMeaning": "the v0.11 candidate boundary, C1 physical-dot admission, C2 minimal-sign-basis classification, C3 top-level production ROOT binding and C4 nested explicit binding compatibility are explicit and green; remaining Q-boundary compatibility and acceptance remain incomplete",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.10",
     "conformance": "mts-conformance/v0.10"
@@ -17,10 +17,10 @@
   "requiredExecutableGates": [
     "ts/test/research-physical-dot-bootstrap.test.ts",
     "ts/test/research-minimal-sign-basis-c2.test.ts",
-    "ts/test/v011-top-level-root-binding.test.ts"
+    "ts/test/v011-top-level-root-binding.test.ts",
+    "ts/test/v011-nested-explicit-binding-compatibility.test.ts"
   ],
   "plannedExecutableGates": [
-    "nested explicit A:E production compatibility evidence",
     "Q-boundary production compatibility evidence"
   ],
   "requiredGenesisVectors": [
@@ -107,6 +107,25 @@
         "non-root context, forged result, parent drift, wrong admission and malformed contextual-role evidence reject",
         "canonical Act identity boundary #732 remains preserved"
       ]
+    },
+    "ts/test/v011-nested-explicit-binding-compatibility.test.ts": {
+      "issue": 787,
+      "pullRequest": 788,
+      "head": "51d40adaa4ab5a4d57605e047347a217d1f15540",
+      "ciRun": 3196,
+      "repoGuardRun": 645,
+      "mergeSha": "1a5ea4344d70b1ede954c4e668ec5fb1f1331c39",
+      "observations": [
+        "physical 0x2E remains explicitly admitted to Role_ctx",
+        "Role_ctx remains distinct from DotMeaning and outside Q",
+        "outer explicit context resolves dot to A",
+        "inner explicit context with parent=outer context resolves dot to B",
+        "nearest structural binder shadows the outer binder",
+        "outer context cannot claim the inner contextual whole",
+        "top-level ROOT wrapper rejects a non-root inner context",
+        "replay and rejection are read-only",
+        "no ambient find()/incoming() semantic authority is used"
+      ]
     }
   },
   "vectorEvidence": {
@@ -149,6 +168,15 @@
         "v011-dot-is-not-q-abit",
         "v011-host-stack-is-not-semantic-authority"
       ]
+    },
+    "c4": {
+      "ts/test/v011-nested-explicit-binding-compatibility.test.ts": [
+        "v011-nested-explicit-binding-remains-nearest-structural",
+        "v011-dot-occurrence-role-is-not-dot-meaning-link",
+        "v011-dot-is-not-ambient-runtime-current",
+        "v011-dot-is-not-q-abit",
+        "v011-host-stack-is-not-semantic-authority"
+      ]
     }
   },
   "evidenceState": {
@@ -157,7 +185,7 @@
     "physicalDotBootstrapC1": "green-supported",
     "minimalSignBasisC2": "green-classified",
     "topLevelProductionImplementation": "green-implemented",
-    "nestedBindingCompatibility": "research-green-production-planned",
+    "nestedBindingCompatibility": "green-production-compatible",
     "qBoundary": "declared-production-compatibility-planned",
     "acceptance": "blocked"
   },
@@ -192,10 +220,21 @@
       "mergeSha": "c6984ef101670732920859c4a990b62d5bb579de",
       "status": "implemented-green",
       "requiredForAcceptance": true
+    },
+    "nestedExplicitBindingCompatibility": {
+      "issue": 787,
+      "stage": "C4",
+      "test": "ts/test/v011-nested-explicit-binding-compatibility.test.ts",
+      "pullRequest": 788,
+      "head": "51d40adaa4ab5a4d57605e047347a217d1f15540",
+      "ciRun": 3196,
+      "repoGuardRun": 645,
+      "mergeSha": "1a5ea4344d70b1ede954c4e668ec5fb1f1331c39",
+      "status": "production-compatible-green",
+      "requiredForAcceptance": true
     }
   },
   "acceptanceBlockers": [
-    "nested explicit A:E production compatibility evidence remains unbound",
     "Q-boundary production compatibility evidence remains unbound",
     "v0.11 has not passed an explicit acceptance cutover",
     "temporary 6/2 contract budget debt has not been repaid"
