@@ -179,17 +179,22 @@ export interface FlatReadingEvidence {
 }
 
 /**
- * v0.11 top-level contextual reading keeps source admission and contextual
- * binding separate. The host schema names the Act field; the admitted
- * Role_ctx value itself is explicit Act evidence, not host-only authority.
+ * v0.11 contextual reading keeps source admission and contextual binding
+ * separate. The Act names both the explicit K and the admitted Role_ctx;
+ * neither glyph shape nor ambient host state is semantic authority.
  */
-export interface TopLevelContextualReadingRoles extends FlatReadingRoles {
+export interface ContextualReadingRoles extends FlatReadingRoles {
   readonly contextualRole: LinkHandle;
 }
 
-export interface TopLevelContextualReadingEvidence extends Omit<FlatReadingEvidence, "roles"> {
-  readonly roles: TopLevelContextualReadingRoles;
+export interface ContextualReadingEvidence extends Omit<FlatReadingEvidence, "roles"> {
+  readonly roles: ContextualReadingRoles;
 }
+
+// The top-level operation has the same evidence shape; its extra invariant is
+// checked by replayTopLevelContextualReading rather than encoded as a host type.
+export type TopLevelContextualReadingRoles = ContextualReadingRoles;
+export type TopLevelContextualReadingEvidence = ContextualReadingEvidence;
 
 interface FlatSelection {
   readonly selectionSequence: LinkHandle;
@@ -277,47 +282,67 @@ export function replayFlatReading(
   ));
 }
 
+function replayExplicitContextualReading(
+  memory: ReadMemory,
+  evidence: ContextualReadingEvidence,
+  topLevelOnly: boolean,
+): LinkHandle {
+  const before = memory.linkCount;
+  const forms = replaySelectedSourceEvidence(memory, evidence.sourceEvidence);
+  const beforeContextRef = readRequiredSingle(
+    memory,
+    evidence.act,
+    evidence.roles.beforeContext,
+  );
+  const contextualRole = readRequiredSingle(
+    memory,
+    evidence.act,
+    evidence.roles.contextualRole,
+  );
+  const context = readContext(memory, beforeContextRef);
+  if (topLevelOnly && (context.parent !== memory.root || context.current !== memory.root)) {
+    invalidFlat();
+  }
+  if (!forms.includes(contextualRole)) invalidFlat();
+
+  const resolvedForms = Object.freeze(forms.map((form) =>
+    form === contextualRole ? context.current : form
+  ));
+  const result = replaySelectedFlat(
+    memory,
+    evidence,
+    evidence.sourceEvidence,
+    resolvedForms,
+    false,
+  );
+  if (memory.linkCount !== before) invalidFlat();
+  return result;
+}
+
 /**
- * Candidate v0.11 TopBind(R,S) replay. The Act must name the canonical
- * top-level K with explicit `parent=R,current=R`; K itself remains O=START(R).
- * Only forms equal to the explicitly evidenced contextual Role_ctx are
- * substituted. The existing flat verifier still owns fold/result/context/header
- * checks, so this adds no second fold or context engine.
+ * Replays an admitted contextual occurrence against the K explicitly named by
+ * the Act. This is the production boundary for accepted `A:E` compatibility:
+ * Role_ctx resolves to that K.current only. Parent traversal, ambient current,
+ * host stack discovery and a second fold engine are deliberately absent.
+ */
+export function replayContextualReading(
+  memory: ReadMemory,
+  evidence: ContextualReadingEvidence,
+): LinkHandle {
+  return normalizeFlat(() => replayExplicitContextualReading(memory, evidence, false));
+}
+
+/**
+ * Candidate v0.11 TopBind(R,S) replay. It reuses the same explicit-context
+ * kernel but additionally requires `parent(K)=R,current(K)=R`; K itself remains
+ * O=START(R). A nested A:E context therefore cannot be captured by this
+ * automatic top-level rule.
  */
 export function replayTopLevelContextualReading(
   memory: ReadMemory,
   evidence: TopLevelContextualReadingEvidence,
 ): LinkHandle {
-  return normalizeFlat(() => {
-    const before = memory.linkCount;
-    const forms = replaySelectedSourceEvidence(memory, evidence.sourceEvidence);
-    const beforeContextRef = readRequiredSingle(
-      memory,
-      evidence.act,
-      evidence.roles.beforeContext,
-    );
-    const contextualRole = readRequiredSingle(
-      memory,
-      evidence.act,
-      evidence.roles.contextualRole,
-    );
-    const top = readContext(memory, beforeContextRef);
-    if (top.parent !== memory.root || top.current !== memory.root) invalidFlat();
-    if (!forms.includes(contextualRole)) invalidFlat();
-
-    const resolvedForms = Object.freeze(forms.map((form) =>
-      form === contextualRole ? top.current : form
-    ));
-    const result = replaySelectedFlat(
-      memory,
-      evidence,
-      evidence.sourceEvidence,
-      resolvedForms,
-      false,
-    );
-    if (memory.linkCount !== before) invalidFlat();
-    return result;
-  });
+  return normalizeFlat(() => replayExplicitContextualReading(memory, evidence, true));
 }
 
 function replayFlatSubselection(
