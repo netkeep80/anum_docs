@@ -31,6 +31,7 @@ import {
   defineActHeader,
   readActHeader,
   readRequiredSingle,
+  verifyHeader,
 } from "../src/structural-readers.js";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -269,6 +270,11 @@ const header = readActHeader(singleProbe, singleEvidence.act);
 same(header.interpreter, interpreter, "preflight Act interpreter");
 same(header.roleDictionary, roleDictionary, "preflight Act role dictionary");
 same(header.afterContext, topContext, "preflight Act afterContext");
+verifyHeader(singleProbe, singleEvidence.act, {
+  interpreter: singleEvidence.interpreter,
+  roleDictionary: singleEvidence.roleDictionary,
+  afterContext: topContext,
+});
 
 const beforeSingle = memory.linkCount;
 same(
