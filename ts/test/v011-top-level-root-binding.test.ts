@@ -15,24 +15,22 @@ import {
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
+  type RootBasis,
 } from "../src/memory.js";
 import {
   buildSelectedSourceEvidence,
   defineSourceForm,
   materializeSourceContent,
   readSourceContent,
-  replaySelectedSourceEvidence,
   type SelectedSegmentSpec,
   type SourceFrontEndEvidence,
 } from "../src/source.js";
 import { defineContext, readContext } from "../src/state.js";
+import { defineActField, defineActHeader } from "../src/structural-readers.js";
 import {
-  defineActField,
-  defineActHeader,
-  readActHeader,
-  readRequiredSingle,
-  verifyHeader,
-} from "../src/structural-readers.js";
+  defineStructuralInterpreter,
+  defineStructuralRoleDictionary,
+} from "../src/structural-rule.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.11 top-level ROOT binding: ${message}`);
@@ -132,8 +130,6 @@ function sourceEvidence(
 }
 
 function roles(memory: Memory): TopLevelContextualReadingRoles {
-  // Keep the Act field vocabulary disjoint from fixture semantic values so a
-  // canonical Link cannot accidentally play both host-schema and value roles.
   const r = anchors(memory, 20).slice(10);
   assert(r.length === 10, "role vocabulary");
   return Object.freeze({
@@ -150,11 +146,80 @@ function roles(memory: Memory): TopLevelContextualReadingRoles {
   });
 }
 
+function roleList(value: TopLevelContextualReadingRoles): readonly LinkHandle[] {
+  return Object.freeze([
+    value.source,
+    value.sourceSelection,
+    value.formSequence,
+    value.dictionary,
+    value.grammar,
+    value.theory,
+    value.beforeContext,
+    value.contextualRole,
+    value.result,
+    value.afterContext,
+  ]);
+}
+
+interface Fixture {
+  readonly memory: Memory;
+  readonly basis: RootBasis;
+  readonly dotRole: LinkHandle;
+  readonly otherRole: LinkHandle;
+  readonly A: LinkHandle;
+  readonly otherParent: LinkHandle;
+  readonly grammar: LinkHandle;
+  readonly theory: LinkHandle;
+  readonly vocabulary: TopLevelContextualReadingRoles;
+  readonly topContext: LinkHandle;
+  readonly dotContent: LinkHandle;
+  readonly admittedDot: DictionaryFixture;
+}
+
+function fixture(): Fixture {
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  const pool = anchors(memory, 10);
+  const dotRole = pool[0];
+  const otherRole = pool[1];
+  const A = pool[2];
+  const otherParent = pool[3];
+  const grammar = pool[4];
+  const theory = pool[5];
+  assert(dotRole && otherRole && A && otherParent && grammar && theory, "fixture anchors");
+
+  const dotMeaning = memory.ensure(basis.L, basis.R);
+  assert(dotRole !== dotMeaning, "Role_ctx must remain distinct from DotMeaning=L⟼R");
+  assert(![basis.O, basis.C, basis.L, basis.U].includes(dotRole), "Role_ctx must not enter Q=[ ]10");
+
+  const dotContent = materializeSourceContent(memory, new Uint8Array([0x2e]));
+  const admittedDot = oneEntryDictionary(memory, dotContent, dotRole);
+  const vocabulary = roles(memory);
+  const topContext = defineContext(memory, memory.root, memory.root);
+  same(topContext, basis.O, "K0 must remain O=START(R), not R");
+  assert(topContext !== memory.root, "zero whole A0=R must differ from execution frame K0=O");
+  const top = readContext(memory, topContext);
+  same(top.parent, memory.root, "K0 parent must be R");
+  same(top.current, memory.root, "K0 current whole must be R");
+
+  return Object.freeze({
+    memory,
+    basis,
+    dotRole,
+    otherRole,
+    A,
+    otherParent,
+    grammar,
+    theory,
+    vocabulary,
+    topContext,
+    dotContent,
+    admittedDot,
+  });
+}
+
 interface ActOptions {
   readonly sourceEvidence: SourceFrontEndEvidence;
-  readonly roles: TopLevelContextualReadingRoles;
-  readonly interpreter: LinkHandle;
-  readonly roleDictionary: LinkHandle;
   readonly beforeContext: LinkHandle;
   readonly contextualRole: LinkHandle;
   readonly result: LinkHandle;
@@ -163,276 +228,218 @@ interface ActOptions {
   readonly extraContextualRole?: LinkHandle;
 }
 
-function act(memory: Memory, options: ActOptions): TopLevelContextualReadingEvidence {
-  const value = defineActHeader(
+function act(f: Fixture, options: ActOptions): TopLevelContextualReadingEvidence {
+  const { memory, vocabulary } = f;
+  const interpreter = defineStructuralInterpreter(
     memory,
-    options.interpreter,
-    options.roleDictionary,
-    options.afterContext,
+    options.sourceEvidence.dictionary,
+    options.sourceEvidence.grammar,
+    options.sourceEvidence.theory,
   );
+  const roleDictionary = defineStructuralRoleDictionary(memory, roleList(vocabulary));
+  const value = defineActHeader(memory, interpreter, roleDictionary, options.afterContext);
   const fields: readonly [LinkHandle, LinkHandle][] = [
-    [options.roles.source, options.sourceEvidence.source],
-    [options.roles.sourceSelection, options.sourceEvidence.selectionSequence],
-    [options.roles.formSequence, options.sourceEvidence.formSequence],
-    [options.roles.dictionary, options.sourceEvidence.dictionary],
-    [options.roles.grammar, options.sourceEvidence.grammar],
-    [options.roles.theory, options.sourceEvidence.theory],
-    [options.roles.beforeContext, options.beforeContext],
-    [options.roles.result, options.result],
-    [options.roles.afterContext, options.afterContext],
+    [vocabulary.source, options.sourceEvidence.source],
+    [vocabulary.sourceSelection, options.sourceEvidence.selectionSequence],
+    [vocabulary.formSequence, options.sourceEvidence.formSequence],
+    [vocabulary.dictionary, options.sourceEvidence.dictionary],
+    [vocabulary.grammar, options.sourceEvidence.grammar],
+    [vocabulary.theory, options.sourceEvidence.theory],
+    [vocabulary.beforeContext, options.beforeContext],
+    [vocabulary.result, options.result],
+    [vocabulary.afterContext, options.afterContext],
   ];
   for (const [role, fieldValue] of fields) defineActField(memory, value, role, fieldValue);
   if (!options.omitContextualRole) {
-    defineActField(memory, value, options.roles.contextualRole, options.contextualRole);
+    defineActField(memory, value, vocabulary.contextualRole, options.contextualRole);
   }
   if (options.extraContextualRole !== undefined) {
-    defineActField(memory, value, options.roles.contextualRole, options.extraContextualRole);
+    defineActField(memory, value, vocabulary.contextualRole, options.extraContextualRole);
   }
   return Object.freeze({
     sourceEvidence: options.sourceEvidence,
     act: value,
-    roles: options.roles,
-    interpreter: options.interpreter,
-    roleDictionary: options.roleDictionary,
+    roles: vocabulary,
+    interpreter,
+    roleDictionary,
   });
 }
 
-const memory = new Memory();
-const basis = ensureRootBasis(memory);
-const pool = anchors(memory, 10);
-const dotRole = pool[0];
-const otherRole = pool[1];
-const A = pool[2];
-const otherParent = pool[3];
-const grammar = pool[4];
-const theory = pool[5];
-const interpreter = pool[6];
-const roleDictionary = pool[7];
-assert(
-  dotRole && otherRole && A && otherParent && grammar && theory && interpreter && roleDictionary,
-  "fixture anchors",
-);
-
-const dotMeaning = memory.ensure(basis.L, basis.R);
-assert(dotRole !== dotMeaning, "Role_ctx must remain distinct from DotMeaning=L⟼R");
-assert(![basis.O, basis.C, basis.L, basis.U].includes(dotRole), "Role_ctx must not enter Q=[ ]10");
-
-const dotContent = materializeSourceContent(memory, new Uint8Array([0x2e]));
-const admittedDot = oneEntryDictionary(memory, dotContent, dotRole);
-const vocabulary = roles(memory);
-const topContext = defineContext(memory, memory.root, memory.root);
-same(topContext, basis.O, "K0 must remain O=START(R), not R");
-assert(topContext !== memory.root, "zero whole A0=R must differ from execution frame K0=O");
-
-// Production single-dot path: source admission supplies Role_ctx; the explicit
-// top-level K supplies its value R. No hidden ROOT source byte is introduced.
-const single = sourceEvidence(
-  memory,
-  new Uint8Array([0x2e]),
-  dotRole,
-  admittedDot,
-  grammar,
-  theory,
-);
-const singleEvidence = act(memory, {
-  sourceEvidence: single,
-  roles: vocabulary,
-  interpreter,
-  roleDictionary,
-  beforeContext: topContext,
-  contextualRole: dotRole,
-  result: memory.root,
-  afterContext: topContext,
-});
-
-// Preflight the same accepted readers used by production replay. These checks
-// keep failure localization explicit without weakening or duplicating semantics.
-const singleProbe = new Probe(memory);
-deepSame(
-  replaySelectedSourceEvidence(singleProbe, single),
-  [dotRole],
-  "preflight source admission resolves exactly Role_ctx",
-);
-same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.source), single.source, "preflight source field");
-same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.sourceSelection), single.selectionSequence, "preflight selection field");
-same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.formSequence), single.formSequence, "preflight form sequence field");
-same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.dictionary), single.dictionary, "preflight dictionary field");
-same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.grammar), single.grammar, "preflight grammar field");
-same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.theory), single.theory, "preflight theory field");
-same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.beforeContext), topContext, "preflight beforeContext field");
-same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.contextualRole), dotRole, "preflight contextualRole field");
-same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.result), memory.root, "preflight result field");
-same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.afterContext), topContext, "preflight afterContext field");
-const topState = readContext(singleProbe, topContext);
-same(topState.parent, memory.root, "preflight K0 parent=R");
-same(topState.current, memory.root, "preflight K0 current=R");
-const header = readActHeader(singleProbe, singleEvidence.act);
-same(header.interpreter, interpreter, "preflight Act interpreter");
-same(header.roleDictionary, roleDictionary, "preflight Act role dictionary");
-same(header.afterContext, topContext, "preflight Act afterContext");
-verifyHeader(singleProbe, singleEvidence.act, {
-  interpreter: singleEvidence.interpreter,
-  roleDictionary: singleEvidence.roleDictionary,
-  afterContext: topContext,
-});
-
-const beforeSingle = memory.linkCount;
-same(
-  replayTopLevelContextualReading(new Probe(memory), singleEvidence),
-  memory.root,
-  "v011-production-top-level-dot-resolves-root",
-);
-same(memory.linkCount, beforeSingle, "single-dot production replay must be read-only");
-deepSame(
-  Array.from(readSourceContent(new Probe(memory), basis, single.content).bytes),
-  [0x2e],
-  "single physical source remains exact dot byte",
-);
-
-// Two equal physical bytes remain two source/form positions before the semantic
-// fixed point Pair(R,R)=R collapses only the final Link value.
-const dotDot = sourceEvidence(
-  memory,
-  new Uint8Array([0x2e, 0x2e]),
-  dotRole,
-  admittedDot,
-  grammar,
-  theory,
-);
-const dotDotEvidence = act(memory, {
-  sourceEvidence: dotDot,
-  roles: vocabulary,
-  interpreter,
-  roleDictionary,
-  beforeContext: topContext,
-  contextualRole: dotRole,
-  result: memory.root,
-  afterContext: topContext,
-});
-const beforeDotDot = memory.linkCount;
-same(
-  replayTopLevelContextualReading(new Probe(memory), dotDotEvidence),
-  memory.root,
-  "v011-production-top-level-dot-dot-folds-root",
-);
-same(memory.linkCount, beforeDotDot, "two-dot production replay must be read-only");
-deepSame(
-  Array.from(readSourceContent(new Probe(memory), basis, dotDot.content).bytes),
-  [0x2e, 0x2e],
-  "v011-production-no-hidden-root-prefix",
-);
-deepSame(
-  readExactSequence(new Probe(memory), dotDot.formSequence).values,
-  [dotRole, dotRole],
-  "v011-production-top-level-dot-dot-preserves-two-source-occurrences",
-);
-same(dotDot.segments[0]?.start, 0, "first dot start");
-same(dotDot.segments[0]?.end, 1, "first dot end");
-same(dotDot.segments[1]?.start, 1, "second dot start");
-same(dotDot.segments[1]?.end, 2, "second dot end");
-assert(dotDot.segments[0]?.span !== dotDot.segments[1]?.span, "equal dots must retain distinct spans");
-
-// An unrelated context can exist, but the replay has no ambient-current path:
-// Probe rejects find()/incoming() and only the Act-named K is authoritative.
-defineContext(memory, memory.root, A);
-same(
-  replayTopLevelContextualReading(new Probe(memory), dotDotEvidence),
-  memory.root,
-  "unrelated context must not affect top-level binding",
-);
-
-const nonRootContext = defineContext(memory, memory.root, A);
-const nonRootAfter = defineContext(memory, memory.root, A);
-reject("non-root K must not be accepted as TopBind(R,S)", () =>
-  replayTopLevelContextualReading(new Probe(memory), act(memory, {
+// One semantic Act per isolated fixture: repeated host construction with an
+// identical header is not a new event (#732), so independent cases must not
+// accumulate fields onto one canonical Act.
+{
+  const f = fixture();
+  const single = sourceEvidence(
+    f.memory,
+    new Uint8Array([0x2e]),
+    f.dotRole,
+    f.admittedDot,
+    f.grammar,
+    f.theory,
+  );
+  const evidence = act(f, {
     sourceEvidence: single,
-    roles: vocabulary,
-    interpreter,
-    roleDictionary,
-    beforeContext: nonRootContext,
-    contextualRole: dotRole,
-    result: A,
-    afterContext: nonRootAfter,
-  }))
-);
+    beforeContext: f.topContext,
+    contextualRole: f.dotRole,
+    result: f.memory.root,
+    afterContext: f.topContext,
+  });
 
-const forgedResultAfter = defineContext(memory, memory.root, A);
-reject("forged semantic result must fail", () =>
-  replayTopLevelContextualReading(new Probe(memory), act(memory, {
-    sourceEvidence: single,
-    roles: vocabulary,
-    interpreter,
-    roleDictionary,
-    beforeContext: topContext,
-    contextualRole: dotRole,
-    result: A,
-    afterContext: forgedResultAfter,
-  }))
-);
+  // An unrelated context may exist, but it is not semantic authority. Probe
+  // also rejects find()/incoming(), so only the Act-named K can bind Role_ctx.
+  defineContext(f.memory, f.memory.root, f.A);
+  const before = f.memory.linkCount;
+  same(
+    replayTopLevelContextualReading(new Probe(f.memory), evidence),
+    f.memory.root,
+    "v011-production-top-level-dot-resolves-root",
+  );
+  same(f.memory.linkCount, before, "single-dot production replay must be read-only");
+  // Replaying the same immutable Act is stable and must remain read-only.
+  same(replayTopLevelContextualReading(new Probe(f.memory), evidence), f.memory.root, "repeated replay is stable");
+  same(f.memory.linkCount, before, "repeated replay must not materialize");
+  deepSame(
+    Array.from(readSourceContent(new Probe(f.memory), f.basis, single.content).bytes),
+    [0x2e],
+    "single physical source remains exact dot byte",
+  );
+}
 
-const driftAfter = defineContext(memory, otherParent, memory.root);
-reject("after-context parent drift must fail", () =>
-  replayTopLevelContextualReading(new Probe(memory), act(memory, {
-    sourceEvidence: single,
-    roles: vocabulary,
-    interpreter,
-    roleDictionary,
-    beforeContext: topContext,
-    contextualRole: dotRole,
-    result: memory.root,
-    afterContext: driftAfter,
-  }))
-);
+{
+  const f = fixture();
+  const dotDot = sourceEvidence(
+    f.memory,
+    new Uint8Array([0x2e, 0x2e]),
+    f.dotRole,
+    f.admittedDot,
+    f.grammar,
+    f.theory,
+  );
+  const evidence = act(f, {
+    sourceEvidence: dotDot,
+    beforeContext: f.topContext,
+    contextualRole: f.dotRole,
+    result: f.memory.root,
+    afterContext: f.topContext,
+  });
+  const before = f.memory.linkCount;
+  same(
+    replayTopLevelContextualReading(new Probe(f.memory), evidence),
+    f.memory.root,
+    "v011-production-top-level-dot-dot-folds-root",
+  );
+  same(f.memory.linkCount, before, "two-dot production replay must be read-only");
+  deepSame(
+    Array.from(readSourceContent(new Probe(f.memory), f.basis, dotDot.content).bytes),
+    [0x2e, 0x2e],
+    "v011-production-no-hidden-root-prefix",
+  );
+  deepSame(
+    readExactSequence(new Probe(f.memory), dotDot.formSequence).values,
+    [f.dotRole, f.dotRole],
+    "v011-production-top-level-dot-dot-preserves-two-source-occurrences",
+  );
+  same(dotDot.segments[0]?.start, 0, "first dot start");
+  same(dotDot.segments[0]?.end, 1, "first dot end");
+  same(dotDot.segments[1]?.start, 1, "second dot start");
+  same(dotDot.segments[1]?.end, 2, "second dot end");
+  assert(dotDot.segments[0]?.span !== dotDot.segments[1]?.span, "equal dots must retain distinct spans");
+}
 
-// The same physical byte admitted to another form is not a dot occurrence merely
-// because its carrier is 0x2E. Role_ctx must be present in both source admission
-// and the explicit Act field.
-const admittedOther = oneEntryDictionary(memory, dotContent, otherRole);
-const alternative = sourceEvidence(
-  memory,
-  new Uint8Array([0x2e]),
-  otherRole,
-  admittedOther,
-  grammar,
-  theory,
-);
-reject("different source admission must not be reinterpreted as dot", () =>
-  replayTopLevelContextualReading(new Probe(memory), act(memory, {
-    sourceEvidence: alternative,
-    roles: vocabulary,
-    interpreter,
-    roleDictionary,
-    beforeContext: topContext,
-    contextualRole: dotRole,
-    result: memory.root,
-    afterContext: topContext,
-  }))
-);
+{
+  const f = fixture();
+  const single = sourceEvidence(f.memory, new Uint8Array([0x2e]), f.dotRole, f.admittedDot, f.grammar, f.theory);
+  const nonRoot = defineContext(f.memory, f.memory.root, f.A);
+  reject("non-root K must not be accepted as TopBind(R,S)", () =>
+    replayTopLevelContextualReading(new Probe(f.memory), act(f, {
+      sourceEvidence: single,
+      beforeContext: nonRoot,
+      contextualRole: f.dotRole,
+      result: f.A,
+      afterContext: nonRoot,
+    }))
+  );
+}
 
-reject("missing contextual-role Act evidence must fail", () =>
-  replayTopLevelContextualReading(new Probe(memory), act(memory, {
-    sourceEvidence: single,
-    roles: vocabulary,
-    interpreter,
-    roleDictionary,
-    beforeContext: topContext,
-    contextualRole: dotRole,
-    result: memory.root,
-    afterContext: topContext,
-    omitContextualRole: true,
-  }))
-);
+{
+  const f = fixture();
+  const single = sourceEvidence(f.memory, new Uint8Array([0x2e]), f.dotRole, f.admittedDot, f.grammar, f.theory);
+  const forgedAfter = defineContext(f.memory, f.memory.root, f.A);
+  reject("forged semantic result must fail", () =>
+    replayTopLevelContextualReading(new Probe(f.memory), act(f, {
+      sourceEvidence: single,
+      beforeContext: f.topContext,
+      contextualRole: f.dotRole,
+      result: f.A,
+      afterContext: forgedAfter,
+    }))
+  );
+}
 
-reject("multiple contextual-role Act evidence must fail", () =>
-  replayTopLevelContextualReading(new Probe(memory), act(memory, {
-    sourceEvidence: single,
-    roles: vocabulary,
-    interpreter,
-    roleDictionary,
-    beforeContext: topContext,
-    contextualRole: dotRole,
-    result: memory.root,
-    afterContext: topContext,
-    extraContextualRole: otherRole,
-  }))
-);
+{
+  const f = fixture();
+  const single = sourceEvidence(f.memory, new Uint8Array([0x2e]), f.dotRole, f.admittedDot, f.grammar, f.theory);
+  const driftAfter = defineContext(f.memory, f.otherParent, f.memory.root);
+  reject("after-context parent drift must fail", () =>
+    replayTopLevelContextualReading(new Probe(f.memory), act(f, {
+      sourceEvidence: single,
+      beforeContext: f.topContext,
+      contextualRole: f.dotRole,
+      result: f.memory.root,
+      afterContext: driftAfter,
+    }))
+  );
+}
+
+{
+  const f = fixture();
+  const admittedOther = oneEntryDictionary(f.memory, f.dotContent, f.otherRole);
+  const alternative = sourceEvidence(
+    f.memory,
+    new Uint8Array([0x2e]),
+    f.otherRole,
+    admittedOther,
+    f.grammar,
+    f.theory,
+  );
+  reject("different source admission must not be reinterpreted as dot", () =>
+    replayTopLevelContextualReading(new Probe(f.memory), act(f, {
+      sourceEvidence: alternative,
+      beforeContext: f.topContext,
+      contextualRole: f.dotRole,
+      result: f.memory.root,
+      afterContext: f.topContext,
+    }))
+  );
+}
+
+{
+  const f = fixture();
+  const single = sourceEvidence(f.memory, new Uint8Array([0x2e]), f.dotRole, f.admittedDot, f.grammar, f.theory);
+  reject("missing contextual-role Act evidence must fail", () =>
+    replayTopLevelContextualReading(new Probe(f.memory), act(f, {
+      sourceEvidence: single,
+      beforeContext: f.topContext,
+      contextualRole: f.dotRole,
+      result: f.memory.root,
+      afterContext: f.topContext,
+      omitContextualRole: true,
+    }))
+  );
+}
+
+{
+  const f = fixture();
+  const single = sourceEvidence(f.memory, new Uint8Array([0x2e]), f.dotRole, f.admittedDot, f.grammar, f.theory);
+  reject("multiple contextual-role Act evidence must fail", () =>
+    replayTopLevelContextualReading(new Probe(f.memory), act(f, {
+      sourceEvidence: single,
+      beforeContext: f.topContext,
+      contextualRole: f.dotRole,
+      result: f.memory.root,
+      afterContext: f.topContext,
+      extraContextualRole: f.otherRole,
+    }))
+  );
+}
