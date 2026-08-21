@@ -72,6 +72,14 @@
       "candidate-v010-conformance": {
         "path": "contracts/mts-conformance-v0.10.json",
         "format": "json"
+      },
+      "candidate-v011-contract": {
+        "path": "contracts/mts-contract-v0.11.json",
+        "format": "json"
+      },
+      "candidate-v011-conformance": {
+        "path": "contracts/mts-conformance-v0.11.json",
+        "format": "json"
       }
     },
     "rules": [
@@ -170,6 +178,150 @@
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v010-conformance", "pointer": "/coverageState", "type": "string"},
         "value": "complete"
+      },
+      {
+        "id": "v011-contract-schema",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/schema", "type": "string"},
+        "value": "mts-contract/v0.11"
+      },
+      {
+        "id": "v011-conformance-contract",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-conformance", "pointer": "/contract", "type": "string"},
+        "value": "mts-contract/v0.11"
+      },
+      {
+        "id": "v011-contract-corpus",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/conformanceCorpus", "type": "string"},
+        "value": "contracts/mts-conformance-v0.11.json"
+      },
+      {
+        "id": "v011-contract-semantic-base-v010",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/semanticBase", "type": "string"},
+        "value": "mts-contract/v0.10"
+      },
+      {
+        "id": "v011-conformance-semantic-base-v010",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-conformance", "pointer": "/semanticBase", "type": "string"},
+        "value": "mts-conformance/v0.10"
+      },
+      {
+        "id": "v011-contract-status-candidate",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/status", "type": "string"},
+        "value": "candidate"
+      },
+      {
+        "id": "v011-conformance-status-candidate",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-conformance", "pointer": "/status", "type": "string"},
+        "value": "candidate"
+      },
+      {
+        "id": "v011-contract-not-accepted",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/accepted", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v011-conformance-not-accepted",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-conformance", "pointer": "/accepted", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v011-contract-not-ready",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/acceptanceReady", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v011-conformance-not-ready",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-conformance", "pointer": "/acceptanceReady", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v011-contract-is-semantic-delta",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/observableSemanticDelta", "type": "boolean"},
+        "value": true
+      },
+      {
+        "id": "v011-conformance-is-semantic-delta",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-conformance", "pointer": "/observableSemanticDelta", "type": "boolean"},
+        "value": true
+      },
+      {
+        "id": "v011-conformance-incomplete",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-conformance", "pointer": "/coverageState", "type": "string"},
+        "value": "incomplete"
+      },
+      {
+        "id": "v011-top-bind-is-root-structural-binding",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/zeroContextGenesis/topLevelBinding", "type": "string"},
+        "value": "TopBind(R,S)"
+      },
+      {
+        "id": "v011-top-dot-resolves-root",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/zeroContextGenesis/topLevelDotResolution", "type": "string"},
+        "value": "resolve_top(.) = R"
+      },
+      {
+        "id": "v011-zero-whole-not-frame",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/zeroContextGenesis/wholeEqualsExecutionFrame", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v011-no-ambient-runtime-current",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/zeroContextGenesis/ambientRuntimeCurrentIsSemanticAuthority", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v011-no-hidden-root-prefix",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/zeroContextGenesis/hiddenLiteralRootPrefixInserted", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v011-dot-not-q-abit",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/foundation/dotIsQAbit", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v011-colon-not-q-abit",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/foundation/colonIsQAbit", "type": "boolean"},
+        "value": false
+      },
+      {
+        "id": "v011-c1-unresolved",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/representationBootstrap/firstPhysicalDotAdmissionStatus", "type": "string"},
+        "value": "unresolved-c1"
+      },
+      {
+        "id": "v011-c2-under-falsification",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/foundation/minimalSignBasisStatus", "type": "string"},
+        "value": "under-falsification-c2"
+      },
+      {
+        "id": "v011-production-behavior-unchanged-in-m1",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/implementation/productionBehaviorChanged", "type": "boolean"},
+        "value": false
       }
     ]
   },
