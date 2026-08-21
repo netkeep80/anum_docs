@@ -322,6 +322,18 @@
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v011-contract", "pointer": "/implementation/implementationComplete", "type": "boolean"},
         "value": true
+      },
+      {
+        "id": "v011-executable-evidence-complete-after-c5",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/candidateState/executableEvidenceComplete", "type": "boolean"},
+        "value": true
+      },
+      {
+        "id": "v011-conformance-complete-after-c5",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-conformance", "pointer": "/coverageState", "type": "string"},
+        "value": "complete"
       }
     ]
   },

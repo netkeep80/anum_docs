@@ -42,6 +42,18 @@
       "ciRun": 3196,
       "repoGuardRun": 645,
       "mergeSha": "1a5ea4344d70b1ede954c4e668ec5fb1f1331c39"
+    },
+    "c5QBoundaryEvidence": {
+      "stage": "C5",
+      "test": "ts/test/v011-q-boundary-compatibility.test.ts",
+      "issue": 791,
+      "pullRequest": 792,
+      "head": "9c1923dbac2ead950347b9c72d27f78a0bf3961b",
+      "ciRun": 3217,
+      "repoGuardRun": 657,
+      "mergeSha": "5c746e816f4beabadf2c99e5fa8659ce42d6bc8d",
+      "runtimeDeltaRequired": false,
+      "evidenceOnly": true
     }
   },
   "rootBasisTarget": {
@@ -140,7 +152,9 @@
     "alphabet": ["[", "]", "1", "0"],
     "dotAdmitted": false,
     "colonAdmitted": false,
-    "dotInsideQFormsAdmitted": false
+    "dotInsideQFormsAdmitted": false,
+    "contextualBinderInheritanceIntoQ": false,
+    "productionCompatibilityStatus": "green-c5-evidence-only"
   },
   "requiredSemanticLaws": {
     "topLevelDot": ". -> R under TopBind(R,S)",
@@ -157,7 +171,8 @@
     "physicalDotBootstrapComplete": true,
     "minimalSignBasisFalsificationComplete": true,
     "topLevelProductionImplementationComplete": true,
-    "executableEvidenceComplete": false,
+    "qBoundaryCompatibilityComplete": true,
+    "executableEvidenceComplete": true,
     "runtimeImplementationComplete": true,
     "acceptedV010Mutated": false
   }
