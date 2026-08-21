@@ -21,11 +21,17 @@ import {
   defineSourceForm,
   materializeSourceContent,
   readSourceContent,
+  replaySelectedSourceEvidence,
   type SelectedSegmentSpec,
   type SourceFrontEndEvidence,
 } from "../src/source.js";
-import { defineContext } from "../src/state.js";
-import { defineActField, defineActHeader } from "../src/structural-readers.js";
+import { defineContext, readContext } from "../src/state.js";
+import {
+  defineActField,
+  defineActHeader,
+  readActHeader,
+  readRequiredSingle,
+} from "../src/structural-readers.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.11 top-level ROOT binding: ${message}`);
@@ -237,6 +243,33 @@ const singleEvidence = act(memory, {
   result: memory.root,
   afterContext: topContext,
 });
+
+// Preflight the same accepted readers used by production replay. These checks
+// keep failure localization explicit without weakening or duplicating semantics.
+const singleProbe = new Probe(memory);
+deepSame(
+  replaySelectedSourceEvidence(singleProbe, single),
+  [dotRole],
+  "preflight source admission resolves exactly Role_ctx",
+);
+same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.source), single.source, "preflight source field");
+same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.sourceSelection), single.selectionSequence, "preflight selection field");
+same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.formSequence), single.formSequence, "preflight form sequence field");
+same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.dictionary), single.dictionary, "preflight dictionary field");
+same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.grammar), single.grammar, "preflight grammar field");
+same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.theory), single.theory, "preflight theory field");
+same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.beforeContext), topContext, "preflight beforeContext field");
+same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.contextualRole), dotRole, "preflight contextualRole field");
+same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.result), memory.root, "preflight result field");
+same(readRequiredSingle(singleProbe, singleEvidence.act, vocabulary.afterContext), topContext, "preflight afterContext field");
+const topState = readContext(singleProbe, topContext);
+same(topState.parent, memory.root, "preflight K0 parent=R");
+same(topState.current, memory.root, "preflight K0 current=R");
+const header = readActHeader(singleProbe, singleEvidence.act);
+same(header.interpreter, interpreter, "preflight Act interpreter");
+same(header.roleDictionary, roleDictionary, "preflight Act role dictionary");
+same(header.afterContext, topContext, "preflight Act afterContext");
+
 const beforeSingle = memory.linkCount;
 same(
   replayTopLevelContextualReading(new Probe(memory), singleEvidence),
