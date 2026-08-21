@@ -1,0 +1,118 @@
+{
+  "schema": "mts-contract/v0.11",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 758,
+  "candidateLifecycleIssue": 755,
+  "semanticBase": "mts-contract/v0.10",
+  "observableSemanticDelta": true,
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.10",
+    "conformance": "mts-conformance/v0.10",
+    "immutable": true,
+    "liveRuntimeSelectable": true
+  },
+  "conformanceCorpus": "contracts/mts-conformance-v0.11.json",
+  "acceptedCurrent": "mts-contract/v0.10",
+  "acceptanceReady": false,
+  "implementation": {
+    "language": "TypeScript",
+    "package": "@mts/core",
+    "publicFacade": "ts/src/public.ts",
+    "singleLiveSemanticRuntime": true,
+    "candidateRuntimeSelectable": false,
+    "implementationComplete": false,
+    "productionBehaviorChanged": false
+  },
+  "rootBasisTarget": {
+    "R": "R = R ⟼ R",
+    "O": "O = O ⟼ R",
+    "C": "C = R ⟼ C",
+    "L": "L = O ⟼ C",
+    "U": "U = C ⟼ O"
+  },
+  "foundation": {
+    "inheritedInternalSigns": ["∞", "[", "]", "1", "0", "(", ")", "⟼", ":", "=", "."],
+    "qAlphabet": ["[", "]", "1", "0"],
+    "qAlphabetCount": 4,
+    "dotIsQAbit": false,
+    "colonIsQAbit": false,
+    "newPrimitiveExpected": false,
+    "minimalSignBasisStatus": "under-falsification-c2"
+  },
+  "zeroContextGenesis": {
+    "zeroContextualWhole": "A₀ = R = ∞",
+    "canonicalExecutionFrame": "K₀ = O = START(R)",
+    "wholeEqualsExecutionFrame": false,
+    "topLevelBinding": "TopBind(R,S)",
+    "topLevelDotResolution": "resolve_top(.) = R",
+    "topLevelBindingIsStructural": true,
+    "globallyFreeDotAllowed": false,
+    "ambientRuntimeCurrentIsSemanticAuthority": false,
+    "hiddenLiteralRootPrefixInserted": false
+  },
+  "dotPairGenesis": {
+    "physicalSource": "..",
+    "exactOccurrenceCount": 2,
+    "resolvedValuesAtRoot": ["R", "R"],
+    "exactSequencePreservesBothPositions": true,
+    "semanticFoldAtRoot": "Pair(R,R) = R",
+    "genericFold": "Dots(A) = Pair(A,A)",
+    "nonRootFixedPointAllowed": false
+  },
+  "signMeaningDerivation": {
+    "startOfRoot": "START(R) = O",
+    "endOfRoot": "END(R) = C",
+    "orientedInternalDuality": "Pair(O,C) = L",
+    "colonMeaning": "Pair(R,L) = R ⟼ L",
+    "dotMeaning": "Pair(L,R) = L ⟼ R",
+    "dotMeaningIsInverseOfColonMeaning": true,
+    "colonMeaningEqualsDotDotFold": false,
+    "semanticValuesPreservedFromV010": true,
+    "independentSignIntroductionSimplification": "under-falsification-c2"
+  },
+  "contextualDuality": {
+    "bindingForm": "A : E",
+    "explicitResolution": "resolve_A(.) = A",
+    "nestedBinding": "nearest structural A : E binds dot occurrences in E",
+    "topLevelAstrikaSuppliesRootBinding": true,
+    "dotOccurrenceRole": "present current contextual whole",
+    "dotMeaningLink": "L ⟼ R",
+    "occurrenceRoleEqualsDotMeaningLink": false,
+    "colonRole": "structural binder/view scope over internal oriented duality",
+    "colonPushPopLifecycle": false,
+    "ambientRuntimeCurrentIsSemanticAuthority": false,
+    "hostStackIsSemanticAuthority": false
+  },
+  "representationBootstrap": {
+    "physicalDotCarrier": ".",
+    "carrierShapeIsSemanticAuthority": false,
+    "firstPhysicalDotAdmissionStatus": "unresolved-c1",
+    "hiddenParserMagicAllowed": false,
+    "occurrenceRoleMustBeExplicitlyDeclared": true
+  },
+  "qBoundary": {
+    "alphabet": ["[", "]", "1", "0"],
+    "dotAdmitted": false,
+    "colonAdmitted": false,
+    "dotInsideQFormsAdmitted": false
+  },
+  "requiredSemanticLaws": {
+    "topLevelDot": ". -> R under TopBind(R,S)",
+    "topLevelDotDot": ".. -> ExactSequence([R,R]) -> Pair(R,R) = R",
+    "explicitBindingCompatibility": "A:E keeps resolve_A(.) = A",
+    "nonRootSelfPair": "Pair(A,A) = A only when A = R",
+    "rootFrameBoundary": "R is not execution-frame K; K₀ = O",
+    "colonMeaning": "m: = R ⟼ L",
+    "dotMeaning": "m. = L ⟼ R"
+  },
+  "candidateState": {
+    "researchGenesisComplete": true,
+    "contractBoundaryEstablished": true,
+    "physicalDotBootstrapComplete": false,
+    "minimalSignBasisFalsificationComplete": false,
+    "executableEvidenceComplete": false,
+    "runtimeImplementationComplete": false,
+    "acceptedV010Mutated": false
+  }
+}
