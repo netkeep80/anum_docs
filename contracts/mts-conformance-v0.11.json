@@ -1,18 +1,23 @@
 {
   "schema": "mts-conformance/v0.11",
-  "status": "candidate",
-  "accepted": false,
-  "issue": 758,
+  "status": "accepted",
+  "accepted": true,
+  "issue": 804,
   "candidateLifecycleIssue": 755,
   "contract": "mts-contract/v0.11",
   "semanticBase": "mts-conformance/v0.10",
   "observableSemanticDelta": true,
   "acceptanceReady": true,
   "coverageState": "complete",
-  "coverageStateMeaning": "the v0.11 candidate boundary and required C1-C5 executable evidence are explicit and green; acceptance cutover and temporary contract-budget repayment remain separate C6 obligations",
-  "acceptedCurrent": {
+  "coverageStateMeaning": "the accepted v0.11 current release has complete C1-C5 executable evidence; post-acceptance removal of the oldest active v0.9 pair and repayment of the temporary contract budget remain separate C6-B2 repository-maintenance obligations",
+  "previousAcceptedRelease": {
     "contract": "mts-contract/v0.10",
-    "conformance": "mts-conformance/v0.10"
+    "conformance": "mts-conformance/v0.10",
+    "immutable": true
+  },
+  "acceptedCurrent": {
+    "contract": "mts-contract/v0.11",
+    "conformance": "mts-conformance/v0.11"
   },
   "requiredExecutableGates": [
     "ts/test/research-physical-dot-bootstrap.test.ts",
@@ -214,7 +219,7 @@
     "topLevelProductionImplementation": "green-implemented",
     "nestedBindingCompatibility": "green-production-compatible",
     "qBoundary": "green-production-compatible-evidence-only",
-    "acceptance": "blocked"
+    "acceptance": "accepted"
   },
   "implementationSlices": {
     "candidateBoundary": {
@@ -272,10 +277,26 @@
       "status": "production-compatible-green-evidence-only",
       "runtimeDeltaRequired": false,
       "requiredForAcceptance": true
+    },
+    "readinessReview": {
+      "issue": 800,
+      "pullRequest": 801,
+      "status": "ready",
+      "requiredForAcceptance": true
+    },
+    "acceptedCutover": {
+      "issue": 804,
+      "status": "accepted",
+      "requiredForAcceptance": true
     }
   },
-  "acceptanceBlockers": [
-    "v0.11 has not passed an explicit acceptance cutover",
-    "temporary 6/2 contract budget debt has not been repaid"
-  ]
+  "acceptance": {
+    "performedHere": true,
+    "acceptedMtsVersion": "mts-contract/v0.11",
+    "previousAcceptedVersion": "mts-contract/v0.10",
+    "readinessIssue": 800,
+    "acceptedFlipBridgeIssue": 802,
+    "cutoverIssue": 804
+  },
+  "acceptanceBlockers": []
 }
