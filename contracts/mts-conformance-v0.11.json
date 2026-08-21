@@ -9,19 +9,20 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "the v0.11 semantic candidate boundary is explicit, while C1 physical-dot admission, C2 minimal-sign-basis falsification and production implementation remain incomplete",
+  "coverageStateMeaning": "the v0.11 candidate boundary and C1 physical-dot admission are explicit and green; C2 minimal-sign-basis falsification and production implementation remain incomplete",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.10",
     "conformance": "mts-conformance/v0.10"
   },
-  "requiredExecutableGates": [],
+  "requiredExecutableGates": [
+    "ts/test/research-physical-dot-bootstrap.test.ts"
+  ],
   "plannedExecutableGates": [
-    "C1 explicit physical-dot source/representation admission evidence",
     "C2 F1/minimal-sign-basis falsification evidence",
     "top-level astrika root-binding implementation evidence",
-    "exact two-dot occurrence preservation and fold evidence",
-    "nested explicit A:E compatibility evidence",
-    "Q-boundary and ambient-current negative evidence"
+    "exact two-dot occurrence preservation and fold production evidence",
+    "nested explicit A:E production compatibility evidence",
+    "Q-boundary and ambient-current production negative evidence"
   ],
   "requiredGenesisVectors": [
     "v011-top-level-astrika-supplies-root-binding",
@@ -63,16 +64,46 @@
       "DotMeaning=Pair(L,R)",
       "dot occurrence-role is distinct from DotMeaning",
       "Q alphabet remains [ ] 1 0"
+    ],
+    "ts/test/research-physical-dot-bootstrap.test.ts": [
+      "physical UTF-8 dot is exact byte 0x2E with canonical byte carrier",
+      "exact source occurrence is explicitly admitted by dictionary to contextual Role_ctx",
+      "physical carrier, exact occurrence, Role_ctx and DotMeaning remain distinct",
+      "source admission alone creates no ambient current",
+      "TopBind(R,S) can resolve admitted Role_ctx to R through the existing explicit structural binding kernel",
+      "nested explicit binding remains nearest and structural",
+      "two dot bytes preserve two exact source positions before Pair(R,R)=R",
+      "no hidden literal ROOT source prefix is inserted",
+      "Pair(A,A)!=A for non-root A",
+      "dot remains outside Q alphabet"
     ]
   },
-  "vectorEvidence": {},
+  "vectorEvidence": {
+    "c1": {
+      "ts/test/research-physical-dot-bootstrap.test.ts": [
+        "v011-top-level-astrika-supplies-root-binding",
+        "v011-top-level-dot-resolves-to-root",
+        "v011-top-level-dot-dot-preserves-two-occurrences",
+        "v011-top-level-dot-dot-folds-to-root",
+        "v011-zero-whole-is-not-execution-frame",
+        "v011-dot-occurrence-role-is-not-dot-meaning-link",
+        "v011-nested-explicit-binding-remains-nearest-structural",
+        "v011-root-is-not-execution-frame",
+        "v011-dot-is-not-ambient-runtime-current",
+        "v011-top-bind-does-not-insert-hidden-root-glyph",
+        "v011-nonroot-pair-A-A-is-not-A",
+        "v011-dot-is-not-q-abit",
+        "v011-host-stack-is-not-semantic-authority"
+      ]
+    }
+  },
   "evidenceState": {
     "researchGenesis": "green-existing",
     "candidateContractBoundary": "defined",
-    "physicalDotBootstrapC1": "unresolved",
+    "physicalDotBootstrapC1": "green-supported",
     "minimalSignBasisC2": "under-falsification",
     "topLevelProductionImplementation": "not-started",
-    "nestedBindingCompatibility": "planned",
+    "nestedBindingCompatibility": "research-green-production-planned",
     "qBoundary": "declared",
     "acceptance": "blocked"
   },
@@ -83,9 +114,10 @@
       "requiredForAcceptance": true
     },
     "physicalDotBootstrap": {
-      "issue": 755,
+      "issue": 762,
       "stage": "C1",
-      "status": "unresolved",
+      "test": "ts/test/research-physical-dot-bootstrap.test.ts",
+      "status": "supported",
       "requiredForAcceptance": true
     },
     "minimalSignBasisFalsification": {
@@ -97,15 +129,14 @@
     "productionImplementation": {
       "issue": 755,
       "stage": "C3",
-      "status": "blocked-by-C1-C2",
+      "status": "blocked-by-C2",
       "requiredForAcceptance": true
     }
   },
   "acceptanceBlockers": [
-    "C1 physical UTF-8 dot carrier admission rule is not yet explicit",
     "C2 independent sign-introduction simplification has not been falsified or accepted",
     "top-level astrika ROOT binding is not implemented in production TypeScript",
-    "required v0.11 executable vectors are not yet bound to green evidence",
+    "remaining required v0.11 executable vectors are not yet bound to green production evidence",
     "v0.11 has not passed an explicit acceptance cutover",
     "temporary 6/2 contract budget debt has not been repaid"
   ]
