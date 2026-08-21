@@ -17,6 +17,7 @@ import {
   defineDictionaryEffect,
   defineDictionaryScope,
 } from "../src/dictionary.js";
+import { materializeExactSequence } from "../src/exact-sequence.js";
 import { defineContext } from "../src/state.js";
 import { defineActField, defineActHeader } from "../src/structural-readers.js";
 import {
@@ -388,7 +389,7 @@ for (const makeForm of [
   const roles = relationRoles(memory);
   const segment = source.evidence.segments[1]!;
   const selectionSequence = fold(memory, [segment.selection]);
-  const formSequence = fold(memory, [form]);
+  const formSequence = materializeExactSequence(memory, [form]);
   const subselection: SourceSubselectionEvidence = Object.freeze({
     startSegment: 1,
     endSegment: 2,

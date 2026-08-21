@@ -11,6 +11,7 @@ import {
   defineDictionaryEffect,
   defineDictionaryScope,
 } from "../src/dictionary.js";
+import { materializeExactSequence } from "../src/exact-sequence.js";
 import {
   Memory,
   type LinkHandle,
@@ -135,7 +136,7 @@ function subselection(
 }
 
 const middleSelection = fold(memory, [evidence.segments[1]!.selection]);
-const middleForms = fold(memory, [formB]);
+const middleForms = materializeExactSequence(memory, [formB]);
 const middleGrammar = memory.ensure(grammar, middleForms);
 const middleTheory = memory.ensure(theory, middleForms);
 const middle = subselection(1, 2, middleSelection, middleForms, middleGrammar, middleTheory);
@@ -176,7 +177,7 @@ assertDeepEqual(
     subselection(1, 1, memory.root, memory.root, emptyGrammar, emptyTheory),
   ),
   [],
-  "empty subselection uses root folds",
+  "empty subselection uses root carriers",
 );
 
 for (const [start, end] of [[-1, 1], [2, 1], [0, 4]] as const) {
