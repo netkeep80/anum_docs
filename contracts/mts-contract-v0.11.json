@@ -21,7 +21,7 @@
     "publicFacade": "ts/src/public.ts",
     "singleLiveSemanticRuntime": true,
     "candidateRuntimeSelectable": false,
-    "implementationComplete": false,
+    "implementationComplete": true,
     "productionBehaviorChanged": true,
     "c3ProductionEvidence": {
       "stage": "C3",
@@ -32,6 +32,16 @@
       "ciRun": 3181,
       "repoGuardRun": 639,
       "mergeSha": "c6984ef101670732920859c4a990b62d5bb579de"
+    },
+    "c4ProductionEvidence": {
+      "stage": "C4",
+      "test": "ts/test/v011-nested-explicit-binding-compatibility.test.ts",
+      "issue": 787,
+      "pullRequest": 788,
+      "head": "51d40adaa4ab5a4d57605e047347a217d1f15540",
+      "ciRun": 3196,
+      "repoGuardRun": 645,
+      "mergeSha": "1a5ea4344d70b1ede954c4e668ec5fb1f1331c39"
     }
   },
   "rootBasisTarget": {
@@ -148,7 +158,7 @@
     "minimalSignBasisFalsificationComplete": true,
     "topLevelProductionImplementationComplete": true,
     "executableEvidenceComplete": false,
-    "runtimeImplementationComplete": false,
+    "runtimeImplementationComplete": true,
     "acceptedV010Mutated": false
   }
 }
