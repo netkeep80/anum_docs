@@ -86,8 +86,18 @@
   },
   "representationBootstrap": {
     "physicalDotCarrier": ".",
+    "physicalDotByteHex": "2E",
     "carrierShapeIsSemanticAuthority": false,
-    "firstPhysicalDotAdmissionStatus": "unresolved-c1",
+    "firstPhysicalDotAdmissionStatus": "supported-c1",
+    "firstPhysicalDotAdmissionRule": "Byte(0x2E) -> exact source occurrence -> explicit dictionary-visible Role_ctx -> nearest structural binder",
+    "topLevelAdmissionResolution": "TopBind(R,S) resolves Role_ctx to R",
+    "nestedAdmissionResolution": "nearest explicit A:E resolves Role_ctx to A",
+    "executableEvidence": "ts/test/research-physical-dot-bootstrap.test.ts",
+    "evidenceIssue": 762,
+    "evidencePullRequest": 763,
+    "evidenceHead": "f7cccc964fd845c13911ffef22c05bbafc0fb533",
+    "ciRun": 3118,
+    "repoGuardRun": 612,
     "hiddenParserMagicAllowed": false,
     "occurrenceRoleMustBeExplicitlyDeclared": true
   },
@@ -109,7 +119,7 @@
   "candidateState": {
     "researchGenesisComplete": true,
     "contractBoundaryEstablished": true,
-    "physicalDotBootstrapComplete": false,
+    "physicalDotBootstrapComplete": true,
     "minimalSignBasisFalsificationComplete": false,
     "executableEvidenceComplete": false,
     "runtimeImplementationComplete": false,
