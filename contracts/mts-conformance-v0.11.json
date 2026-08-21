@@ -8,8 +8,8 @@
   "semanticBase": "mts-conformance/v0.10",
   "observableSemanticDelta": true,
   "acceptanceReady": false,
-  "coverageState": "incomplete",
-  "coverageStateMeaning": "the v0.11 candidate boundary, C1 physical-dot admission, C2 minimal-sign-basis classification, C3 top-level production ROOT binding and C4 nested explicit binding compatibility are explicit and green; remaining Q-boundary compatibility and acceptance remain incomplete",
+  "coverageState": "complete",
+  "coverageStateMeaning": "the v0.11 candidate boundary and required C1-C5 executable evidence are explicit and green; acceptance cutover and temporary contract-budget repayment remain separate C6 obligations",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.10",
     "conformance": "mts-conformance/v0.10"
@@ -18,11 +18,10 @@
     "ts/test/research-physical-dot-bootstrap.test.ts",
     "ts/test/research-minimal-sign-basis-c2.test.ts",
     "ts/test/v011-top-level-root-binding.test.ts",
-    "ts/test/v011-nested-explicit-binding-compatibility.test.ts"
+    "ts/test/v011-nested-explicit-binding-compatibility.test.ts",
+    "ts/test/v011-q-boundary-compatibility.test.ts"
   ],
-  "plannedExecutableGates": [
-    "Q-boundary production compatibility evidence"
-  ],
+  "plannedExecutableGates": [],
   "requiredGenesisVectors": [
     "v011-top-level-astrika-supplies-root-binding",
     "v011-top-level-dot-resolves-to-root",
@@ -126,6 +125,26 @@
         "replay and rejection are read-only",
         "no ambient find()/incoming() semantic authority is used"
       ]
+    },
+    "ts/test/v011-q-boundary-compatibility.test.ts": {
+      "issue": 791,
+      "pullRequest": 792,
+      "head": "9c1923dbac2ead950347b9c72d27f78a0bf3961b",
+      "ciRun": 3217,
+      "repoGuardRun": 657,
+      "mergeSha": "5c746e816f4beabadf2c99e5fa8659ce42d6bc8d",
+      "runtimeDeltaRequired": false,
+      "evidenceOnly": true,
+      "observations": [
+        "Q alphabet remains exactly [ ] 1 0",
+        "dot rejects as a non-abit before Q execution",
+        "colon rejects as a non-abit before Q execution",
+        "dot-bearing bracket forms reject rather than inheriting contextual admission",
+        "contextual binding defines no inherited Q binder",
+        "legal empty, bit and nested Q forms remain accepted",
+        "incremental non-abit rejection is deterministic and transactional",
+        "no ts/src production delta was required"
+      ]
     }
   },
   "vectorEvidence": {
@@ -177,6 +196,14 @@
         "v011-dot-is-not-q-abit",
         "v011-host-stack-is-not-semantic-authority"
       ]
+    },
+    "c5": {
+      "ts/test/v011-q-boundary-compatibility.test.ts": [
+        "v011-q-alphabet-remains-four-abits",
+        "v011-dot-is-not-q-abit",
+        "v011-colon-is-not-q-abit",
+        "v011-host-stack-is-not-semantic-authority"
+      ]
     }
   },
   "evidenceState": {
@@ -186,7 +213,7 @@
     "minimalSignBasisC2": "green-classified",
     "topLevelProductionImplementation": "green-implemented",
     "nestedBindingCompatibility": "green-production-compatible",
-    "qBoundary": "declared-production-compatibility-planned",
+    "qBoundary": "green-production-compatible-evidence-only",
     "acceptance": "blocked"
   },
   "implementationSlices": {
@@ -232,10 +259,22 @@
       "mergeSha": "1a5ea4344d70b1ede954c4e668ec5fb1f1331c39",
       "status": "production-compatible-green",
       "requiredForAcceptance": true
+    },
+    "qBoundaryCompatibility": {
+      "issue": 791,
+      "stage": "C5",
+      "test": "ts/test/v011-q-boundary-compatibility.test.ts",
+      "pullRequest": 792,
+      "head": "9c1923dbac2ead950347b9c72d27f78a0bf3961b",
+      "ciRun": 3217,
+      "repoGuardRun": 657,
+      "mergeSha": "5c746e816f4beabadf2c99e5fa8659ce42d6bc8d",
+      "status": "production-compatible-green-evidence-only",
+      "runtimeDeltaRequired": false,
+      "requiredForAcceptance": true
     }
   },
   "acceptanceBlockers": [
-    "Q-boundary production compatibility evidence remains unbound",
     "v0.11 has not passed an explicit acceptance cutover",
     "temporary 6/2 contract budget debt has not been repaid"
   ]
