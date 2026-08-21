@@ -7,7 +7,7 @@
   "contract": "mts-contract/v0.11",
   "semanticBase": "mts-conformance/v0.10",
   "observableSemanticDelta": true,
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "coverageState": "complete",
   "coverageStateMeaning": "the v0.11 candidate boundary and required C1-C5 executable evidence are explicit and green; acceptance cutover and temporary contract-budget repayment remain separate C6 obligations",
   "acceptedCurrent": {

@@ -14,7 +14,7 @@
   },
   "conformanceCorpus": "contracts/mts-conformance-v0.11.json",
   "acceptedCurrent": "mts-contract/v0.10",
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "implementation": {
     "language": "TypeScript",
     "package": "@mts/core",
