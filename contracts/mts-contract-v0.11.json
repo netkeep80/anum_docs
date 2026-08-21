@@ -22,7 +22,17 @@
     "singleLiveSemanticRuntime": true,
     "candidateRuntimeSelectable": false,
     "implementationComplete": false,
-    "productionBehaviorChanged": false
+    "productionBehaviorChanged": true,
+    "c3ProductionEvidence": {
+      "stage": "C3",
+      "test": "ts/test/v011-top-level-root-binding.test.ts",
+      "issue": 775,
+      "pullRequest": 782,
+      "head": "30a25ed5820cdbea039238ff021f47cacd301014",
+      "ciRun": 3181,
+      "repoGuardRun": 639,
+      "mergeSha": "c6984ef101670732920859c4a990b62d5bb579de"
+    }
   },
   "rootBasisTarget": {
     "R": "R = R ⟼ R",
@@ -136,6 +146,7 @@
     "contractBoundaryEstablished": true,
     "physicalDotBootstrapComplete": true,
     "minimalSignBasisFalsificationComplete": true,
+    "topLevelProductionImplementationComplete": true,
     "executableEvidenceComplete": false,
     "runtimeImplementationComplete": false,
     "acceptedV010Mutated": false
