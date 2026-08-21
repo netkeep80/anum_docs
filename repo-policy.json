@@ -322,6 +322,12 @@
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v011-contract", "pointer": "/implementation/productionBehaviorChanged", "type": "boolean"},
         "value": true
+      },
+      {
+        "id": "v011-runtime-implementation-complete-after-c4",
+        "kind": "scalar_equals_literal",
+        "source": {"document": "candidate-v011-contract", "pointer": "/implementation/implementationComplete", "type": "boolean"},
+        "value": true
       }
     ]
   },
