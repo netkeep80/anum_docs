@@ -178,6 +178,15 @@ export interface FlatReadingEvidence {
   readonly roleDictionary: LinkHandle;
 }
 
+/**
+ * v0.11 top-level contextual reading keeps source admission and contextual
+ * binding separate. `contextualRole` is the explicitly admitted Role_ctx; the
+ * physical glyph/byte never reaches this boundary as semantic authority.
+ */
+export interface TopLevelContextualReadingEvidence extends FlatReadingEvidence {
+  readonly contextualRole: LinkHandle;
+}
+
 interface FlatSelection {
   readonly selectionSequence: LinkHandle;
   readonly formSequence: LinkHandle;
@@ -262,6 +271,42 @@ export function replayFlatReading(
     memory, evidence, evidence.sourceEvidence,
     replaySelectedSourceEvidence(memory, evidence.sourceEvidence), false,
   ));
+}
+
+/**
+ * Candidate v0.11 TopBind(R,S) replay. The Act must name the canonical
+ * top-level K with explicit `parent=R,current=R`; K itself remains O=START(R).
+ * Only forms equal to the admitted contextual Role_ctx are substituted. The
+ * existing flat verifier still owns fold/result/after-context/header checks.
+ */
+export function replayTopLevelContextualReading(
+  memory: ReadMemory,
+  evidence: TopLevelContextualReadingEvidence,
+): LinkHandle {
+  return normalizeFlat(() => {
+    const before = memory.linkCount;
+    const forms = replaySelectedSourceEvidence(memory, evidence.sourceEvidence);
+    const beforeContextRef = readRequiredSingle(
+      memory,
+      evidence.act,
+      evidence.roles.beforeContext,
+    );
+    const top = readContext(memory, beforeContextRef);
+    if (top.parent !== memory.root || top.current !== memory.root) invalidFlat();
+
+    const resolvedForms = Object.freeze(forms.map((form) =>
+      form === evidence.contextualRole ? top.current : form
+    ));
+    const result = replaySelectedFlat(
+      memory,
+      evidence,
+      evidence.sourceEvidence,
+      resolvedForms,
+      false,
+    );
+    if (memory.linkCount !== before) invalidFlat();
+    return result;
+  });
 }
 
 function replayFlatSubselection(
