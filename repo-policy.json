@@ -306,10 +306,10 @@
         "value": false
       },
       {
-        "id": "v011-c1-unresolved",
+        "id": "v011-c1-supported",
         "kind": "scalar_equals_literal",
         "source": {"document": "candidate-v011-contract", "pointer": "/representationBootstrap/firstPhysicalDotAdmissionStatus", "type": "string"},
-        "value": "unresolved-c1"
+        "value": "supported-c1"
       },
       {
         "id": "v011-c2-under-falsification",
