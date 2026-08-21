@@ -1,0 +1,112 @@
+{
+  "schema": "mts-conformance/v0.11",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 758,
+  "candidateLifecycleIssue": 755,
+  "contract": "mts-contract/v0.11",
+  "semanticBase": "mts-conformance/v0.10",
+  "observableSemanticDelta": true,
+  "acceptanceReady": false,
+  "coverageState": "incomplete",
+  "coverageStateMeaning": "the v0.11 semantic candidate boundary is explicit, while C1 physical-dot admission, C2 minimal-sign-basis falsification and production implementation remain incomplete",
+  "acceptedCurrent": {
+    "contract": "mts-contract/v0.10",
+    "conformance": "mts-conformance/v0.10"
+  },
+  "requiredExecutableGates": [],
+  "plannedExecutableGates": [
+    "C1 explicit physical-dot source/representation admission evidence",
+    "C2 F1/minimal-sign-basis falsification evidence",
+    "top-level astrika root-binding implementation evidence",
+    "exact two-dot occurrence preservation and fold evidence",
+    "nested explicit A:E compatibility evidence",
+    "Q-boundary and ambient-current negative evidence"
+  ],
+  "requiredGenesisVectors": [
+    "v011-top-level-astrika-supplies-root-binding",
+    "v011-top-level-dot-resolves-to-root",
+    "v011-top-level-dot-dot-preserves-two-occurrences",
+    "v011-top-level-dot-dot-folds-to-root",
+    "v011-zero-whole-is-not-execution-frame"
+  ],
+  "requiredMeaningVectors": [
+    "v011-colon-meaning-remains-R-to-L",
+    "v011-dot-meaning-remains-L-to-R",
+    "v011-dot-occurrence-role-is-not-dot-meaning-link"
+  ],
+  "requiredCompatibilityVectors": [
+    "v011-nested-explicit-binding-remains-nearest-structural"
+  ],
+  "requiredNegativeVectors": [
+    "v011-root-is-not-execution-frame",
+    "v011-dot-is-not-ambient-runtime-current",
+    "v011-top-bind-does-not-insert-hidden-root-glyph",
+    "v011-nonroot-pair-A-A-is-not-A",
+    "v011-colon-meaning-is-not-dot-dot-fold",
+    "v011-q-alphabet-remains-four-abits",
+    "v011-dot-is-not-q-abit",
+    "v011-colon-is-not-q-abit",
+    "v011-host-stack-is-not-semantic-authority"
+  ],
+  "existingResearchEvidence": {
+    "ts/test/research-zero-context-genesis.test.ts": [
+      "A₀=R is distinct from K₀=O",
+      "R is invalid as an execution frame",
+      "ExactSequence([R,R]) preserves two positions",
+      "Pair(R,R)=R",
+      "Pair(A,A)!=A for non-root A",
+      "START(R)=O",
+      "END(R)=C",
+      "Pair(O,C)=L",
+      "ColonMeaning=Pair(R,L)",
+      "DotMeaning=Pair(L,R)",
+      "dot occurrence-role is distinct from DotMeaning",
+      "Q alphabet remains [ ] 1 0"
+    ]
+  },
+  "vectorEvidence": {},
+  "evidenceState": {
+    "researchGenesis": "green-existing",
+    "candidateContractBoundary": "defined",
+    "physicalDotBootstrapC1": "unresolved",
+    "minimalSignBasisC2": "under-falsification",
+    "topLevelProductionImplementation": "not-started",
+    "nestedBindingCompatibility": "planned",
+    "qBoundary": "declared",
+    "acceptance": "blocked"
+  },
+  "implementationSlices": {
+    "candidateBoundary": {
+      "issue": 758,
+      "status": "candidate-defined",
+      "requiredForAcceptance": true
+    },
+    "physicalDotBootstrap": {
+      "issue": 755,
+      "stage": "C1",
+      "status": "unresolved",
+      "requiredForAcceptance": true
+    },
+    "minimalSignBasisFalsification": {
+      "issue": 755,
+      "stage": "C2",
+      "status": "under-falsification",
+      "requiredForAcceptance": true
+    },
+    "productionImplementation": {
+      "issue": 755,
+      "stage": "C3",
+      "status": "blocked-by-C1-C2",
+      "requiredForAcceptance": true
+    }
+  },
+  "acceptanceBlockers": [
+    "C1 physical UTF-8 dot carrier admission rule is not yet explicit",
+    "C2 independent sign-introduction simplification has not been falsified or accepted",
+    "top-level astrika ROOT binding is not implemented in production TypeScript",
+    "required v0.11 executable vectors are not yet bound to green evidence",
+    "v0.11 has not passed an explicit acceptance cutover",
+    "temporary 6/2 contract budget debt has not been repaid"
+  ]
+}
