@@ -180,11 +180,15 @@ export interface FlatReadingEvidence {
 
 /**
  * v0.11 top-level contextual reading keeps source admission and contextual
- * binding separate. `contextualRole` is the explicitly admitted Role_ctx; the
- * physical glyph/byte never reaches this boundary as semantic authority.
+ * binding separate. The host schema names the Act field; the admitted
+ * Role_ctx value itself is explicit Act evidence, not host-only authority.
  */
-export interface TopLevelContextualReadingEvidence extends FlatReadingEvidence {
+export interface TopLevelContextualReadingRoles extends FlatReadingRoles {
   readonly contextualRole: LinkHandle;
+}
+
+export interface TopLevelContextualReadingEvidence extends Omit<FlatReadingEvidence, "roles"> {
+  readonly roles: TopLevelContextualReadingRoles;
 }
 
 interface FlatSelection {
@@ -276,8 +280,9 @@ export function replayFlatReading(
 /**
  * Candidate v0.11 TopBind(R,S) replay. The Act must name the canonical
  * top-level K with explicit `parent=R,current=R`; K itself remains O=START(R).
- * Only forms equal to the admitted contextual Role_ctx are substituted. The
- * existing flat verifier still owns fold/result/after-context/header checks.
+ * Only forms equal to the explicitly evidenced contextual Role_ctx are
+ * substituted. The existing flat verifier still owns fold/result/context/header
+ * checks, so this adds no second fold or context engine.
  */
 export function replayTopLevelContextualReading(
   memory: ReadMemory,
@@ -291,11 +296,17 @@ export function replayTopLevelContextualReading(
       evidence.act,
       evidence.roles.beforeContext,
     );
+    const contextualRole = readRequiredSingle(
+      memory,
+      evidence.act,
+      evidence.roles.contextualRole,
+    );
     const top = readContext(memory, beforeContextRef);
     if (top.parent !== memory.root || top.current !== memory.root) invalidFlat();
+    if (!forms.includes(contextualRole)) invalidFlat();
 
     const resolvedForms = Object.freeze(forms.map((form) =>
-      form === evidence.contextualRole ? top.current : form
+      form === contextualRole ? top.current : form
     ));
     const result = replaySelectedFlat(
       memory,
