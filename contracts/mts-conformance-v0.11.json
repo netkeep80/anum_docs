@@ -9,20 +9,19 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "the v0.11 candidate boundary plus C1 physical-dot admission and C2 minimal-sign-basis classification are explicit and green; production implementation remains incomplete",
+  "coverageStateMeaning": "the v0.11 candidate boundary, C1 physical-dot admission, C2 minimal-sign-basis classification and C3 top-level production ROOT binding are explicit and green; C4 nested production compatibility, remaining Q-boundary compatibility and acceptance remain incomplete",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.10",
     "conformance": "mts-conformance/v0.10"
   },
   "requiredExecutableGates": [
     "ts/test/research-physical-dot-bootstrap.test.ts",
-    "ts/test/research-minimal-sign-basis-c2.test.ts"
+    "ts/test/research-minimal-sign-basis-c2.test.ts",
+    "ts/test/v011-top-level-root-binding.test.ts"
   ],
   "plannedExecutableGates": [
-    "top-level astrika root-binding implementation evidence",
-    "exact two-dot occurrence preservation and fold production evidence",
     "nested explicit A:E production compatibility evidence",
-    "Q-boundary and ambient-current production negative evidence"
+    "Q-boundary production compatibility evidence"
   ],
   "requiredGenesisVectors": [
     "v011-top-level-astrika-supplies-root-binding",
@@ -90,6 +89,26 @@
       "the dot declaration uses colonEntry and arrowEntry but does not self-reference dotEntry"
     ]
   },
+  "productionEvidence": {
+    "ts/test/v011-top-level-root-binding.test.ts": {
+      "issue": 775,
+      "pullRequest": 782,
+      "head": "30a25ed5820cdbea039238ff021f47cacd301014",
+      "ciRun": 3181,
+      "repoGuardRun": 639,
+      "mergeSha": "c6984ef101670732920859c4a990b62d5bb579de",
+      "observations": [
+        "single admitted top-level contextual dot resolves to R through explicit K₀",
+        "two physical dot occurrences remain two exact source positions before Pair(R,R)=R",
+        "K₀ remains O=START(R) while A₀ remains R",
+        "physical source remains exact with no hidden ROOT prefix",
+        "Role_ctx remains distinct from DotMeaning and outside Q",
+        "replay is read-only and does not use find()/incoming() as ambient authority",
+        "non-root context, forged result, parent drift, wrong admission and malformed contextual-role evidence reject",
+        "canonical Act identity boundary #732 remains preserved"
+      ]
+    }
+  },
   "vectorEvidence": {
     "c1": {
       "ts/test/research-physical-dot-bootstrap.test.ts": [
@@ -115,6 +134,21 @@
         "v011-c2-representation-signs-retained",
         "v011-c2-dot-declaration-does-not-self-reference-own-entry"
       ]
+    },
+    "c3": {
+      "ts/test/v011-top-level-root-binding.test.ts": [
+        "v011-top-level-astrika-supplies-root-binding",
+        "v011-top-level-dot-resolves-to-root",
+        "v011-top-level-dot-dot-preserves-two-occurrences",
+        "v011-top-level-dot-dot-folds-to-root",
+        "v011-zero-whole-is-not-execution-frame",
+        "v011-dot-occurrence-role-is-not-dot-meaning-link",
+        "v011-root-is-not-execution-frame",
+        "v011-dot-is-not-ambient-runtime-current",
+        "v011-top-bind-does-not-insert-hidden-root-glyph",
+        "v011-dot-is-not-q-abit",
+        "v011-host-stack-is-not-semantic-authority"
+      ]
     }
   },
   "evidenceState": {
@@ -122,9 +156,9 @@
     "candidateContractBoundary": "defined",
     "physicalDotBootstrapC1": "green-supported",
     "minimalSignBasisC2": "green-classified",
-    "topLevelProductionImplementation": "not-started",
+    "topLevelProductionImplementation": "green-implemented",
     "nestedBindingCompatibility": "research-green-production-planned",
-    "qBoundary": "declared",
+    "qBoundary": "declared-production-compatibility-planned",
     "acceptance": "blocked"
   },
   "implementationSlices": {
@@ -148,15 +182,21 @@
       "requiredForAcceptance": true
     },
     "productionImplementation": {
-      "issue": 755,
+      "issue": 775,
       "stage": "C3",
-      "status": "ready-for-c3",
+      "test": "ts/test/v011-top-level-root-binding.test.ts",
+      "pullRequest": 782,
+      "head": "30a25ed5820cdbea039238ff021f47cacd301014",
+      "ciRun": 3181,
+      "repoGuardRun": 639,
+      "mergeSha": "c6984ef101670732920859c4a990b62d5bb579de",
+      "status": "implemented-green",
       "requiredForAcceptance": true
     }
   },
   "acceptanceBlockers": [
-    "top-level astrika ROOT binding is not implemented in production TypeScript",
-    "remaining required v0.11 executable vectors are not yet bound to green production evidence",
+    "nested explicit A:E production compatibility evidence remains unbound",
+    "Q-boundary production compatibility evidence remains unbound",
     "v0.11 has not passed an explicit acceptance cutover",
     "temporary 6/2 contract budget debt has not been repaid"
   ]
