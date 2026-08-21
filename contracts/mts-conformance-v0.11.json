@@ -175,7 +175,8 @@
         "v011-c2-semantic-simplification-supported",
         "v011-c2-self-hosted-presentation-cycle-remains",
         "v011-c2-representation-signs-retained",
-        "v011-c2-dot-declaration-does-not-self-reference-own-entry"
+        "v011-c2-dot-declaration-does-not-self-reference-own-entry",
+        "v011-colon-meaning-is-not-dot-dot-fold"
       ]
     },
     "c3": {
