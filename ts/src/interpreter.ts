@@ -288,36 +288,34 @@ export function replayTopLevelContextualReading(
   memory: ReadMemory,
   evidence: TopLevelContextualReadingEvidence,
 ): LinkHandle {
-  return normalizeFlat(() => {
-    const before = memory.linkCount;
-    const forms = replaySelectedSourceEvidence(memory, evidence.sourceEvidence);
-    const beforeContextRef = readRequiredSingle(
-      memory,
-      evidence.act,
-      evidence.roles.beforeContext,
-    );
-    const contextualRole = readRequiredSingle(
-      memory,
-      evidence.act,
-      evidence.roles.contextualRole,
-    );
-    const top = readContext(memory, beforeContextRef);
-    if (top.parent !== memory.root || top.current !== memory.root) invalidFlat();
-    if (!forms.includes(contextualRole)) invalidFlat();
+  const before = memory.linkCount;
+  const forms = replaySelectedSourceEvidence(memory, evidence.sourceEvidence);
+  const beforeContextRef = readRequiredSingle(
+    memory,
+    evidence.act,
+    evidence.roles.beforeContext,
+  );
+  const contextualRole = readRequiredSingle(
+    memory,
+    evidence.act,
+    evidence.roles.contextualRole,
+  );
+  const top = readContext(memory, beforeContextRef);
+  if (top.parent !== memory.root || top.current !== memory.root) invalidFlat();
+  if (!forms.includes(contextualRole)) invalidFlat();
 
-    const resolvedForms = Object.freeze(forms.map((form) =>
-      form === contextualRole ? top.current : form
-    ));
-    const result = replaySelectedFlat(
-      memory,
-      evidence,
-      evidence.sourceEvidence,
-      resolvedForms,
-      false,
-    );
-    if (memory.linkCount !== before) invalidFlat();
-    return result;
-  });
+  const resolvedForms = Object.freeze(forms.map((form) =>
+    form === contextualRole ? top.current : form
+  ));
+  const result = replaySelectedFlat(
+    memory,
+    evidence,
+    evidence.sourceEvidence,
+    resolvedForms,
+    false,
+  );
+  if (memory.linkCount !== before) invalidFlat();
+  return result;
 }
 
 function replayFlatSubselection(
