@@ -20,6 +20,8 @@ import type {
   PortableStructuralDerivationSourceProvenance,
   PortableStructuralDerivationWithAssumptionsArtifact,
   PortableStructuralDerivationWithAssumptionsContentDigest,
+  PortableStructuralDerivationWithAssumptionsProvenanceClaim,
+  PortableStructuralDerivationWithAssumptionsProvenanceDigest,
   PortableStructuralDerivationWithAssumptionsReplayResult,
   ReadMemory,
   RelationReplayEvidence,
@@ -53,6 +55,8 @@ type InternalCanonicalPortableStructuralDerivationV02Json = typeof import("../sr
 type InternalCanonicalPortableStructuralDerivationWithAssumptionsV01Json = typeof import("../src/public.js").canonicalPortableStructuralDerivationWithAssumptionsV01Json;
 // @ts-expect-error P6k keeps provenance canonical JSON normalization internal.
 type InternalCanonicalPortableStructuralDerivationProvenanceClaimJson = typeof import("../src/public.js").canonicalPortableStructuralDerivationProvenanceClaimJson;
+// @ts-expect-error P6s keeps conditional provenance canonical JSON normalization internal.
+type InternalCanonicalPortableStructuralDerivationWithAssumptionsProvenanceClaimJson = typeof import("../src/public.js").canonicalPortableStructuralDerivationWithAssumptionsProvenanceClaimJson;
 // @ts-expect-error P3b keeps assumption construction internal; consumers submit materialized evidence.
 type InternalAssumptionContextConstructor = typeof import("../src/public.js").defineStructuralAssumptionContext;
 
@@ -75,6 +79,8 @@ const expectedRuntimeExports = [
   "PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA",
   "PORTABLE_STRUCTURAL_DERIVATION_SCHEMA",
   "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME",
+  "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_DIGEST_SCHEME",
+  "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_SCHEMA",
   "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_SCHEMA",
   "PersistentStore",
   "PersistentStoreError",
@@ -96,7 +102,9 @@ const expectedRuntimeExports = [
   "computePortableStructuralDerivationContentDigest",
   "computePortableStructuralDerivationProvenanceDigest",
   "computePortableStructuralDerivationWithAssumptionsContentDigest",
+  "computePortableStructuralDerivationWithAssumptionsProvenanceDigest",
   "createPortableStructuralDerivationProvenanceClaim",
+  "createPortableStructuralDerivationWithAssumptionsProvenanceClaim",
   "deserializeAnum",
   "deserializeStream",
   "elaborateBundleRoles",
@@ -134,9 +142,10 @@ const expectedRuntimeExports = [
   "symbolicStackAlgebra",
   "valuesEqual",
   "verifyPortableStructuralDerivationProvenanceClaim",
+  "verifyPortableStructuralDerivationWithAssumptionsProvenanceClaim",
 ].sort();
 
-assert(expectedRuntimeExports.length === 73, "P6q runtime export budget must be exactly 73");
+assert(expectedRuntimeExports.length === 78, "P6s runtime export budget must be exactly 78");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
@@ -177,6 +186,16 @@ assert(
   publicApi.PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_DIGEST_SCHEME ===
     "mts-portable-structural-derivation-provenance/sha-256/v0.1",
   "portable derivation provenance digest scheme must stay pinned",
+);
+assert(
+  publicApi.PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_SCHEMA ===
+    "mts-portable-structural-derivation-with-assumptions-provenance/v0.1",
+  "portable conditional derivation provenance schema must stay pinned",
+);
+assert(
+  publicApi.PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_DIGEST_SCHEME ===
+    "mts-portable-structural-derivation-with-assumptions-provenance/sha-256/v0.1",
+  "portable conditional derivation provenance digest scheme must stay pinned",
 );
 
 // Compile-time smoke for the intended consumer concepts. The top-level evidence
@@ -221,10 +240,15 @@ const provenanceSource: PortableStructuralDerivationSourceProvenance | undefined
 const provenanceProducer: PortableStructuralDerivationProducerProvenance | undefined = undefined;
 const provenanceClaim: PortableStructuralDerivationProvenanceClaim | undefined = undefined;
 const provenanceDigest: PortableStructuralDerivationProvenanceDigest | undefined = undefined;
+const provenanceConditionalClaim: PortableStructuralDerivationWithAssumptionsProvenanceClaim | undefined = undefined;
+const provenanceConditionalDigest: PortableStructuralDerivationWithAssumptionsProvenanceDigest | undefined = undefined;
 const provenanceErrorCode: PortableStructuralDerivationProvenanceErrorCode | undefined = undefined;
 const createProvenance: (artifact: unknown, source: PortableStructuralDerivationSourceProvenance, producer: PortableStructuralDerivationProducerProvenance) => Promise<PortableStructuralDerivationProvenanceClaim> = publicApi.createPortableStructuralDerivationProvenanceClaim;
 const digestProvenance: (input: unknown) => Promise<PortableStructuralDerivationProvenanceDigest> = publicApi.computePortableStructuralDerivationProvenanceDigest;
 const verifyProvenance: (artifact: unknown, input: unknown) => Promise<PortableStructuralDerivationProvenanceClaim> = publicApi.verifyPortableStructuralDerivationProvenanceClaim;
+const createConditionalProvenance: (artifact: unknown, source: PortableStructuralDerivationSourceProvenance, producer: PortableStructuralDerivationProducerProvenance) => Promise<PortableStructuralDerivationWithAssumptionsProvenanceClaim> = publicApi.createPortableStructuralDerivationWithAssumptionsProvenanceClaim;
+const digestConditionalProvenance: (input: unknown) => Promise<PortableStructuralDerivationWithAssumptionsProvenanceDigest> = publicApi.computePortableStructuralDerivationWithAssumptionsProvenanceDigest;
+const verifyConditionalProvenance: (artifact: unknown, input: unknown) => Promise<PortableStructuralDerivationWithAssumptionsProvenanceClaim> = publicApi.verifyPortableStructuralDerivationWithAssumptionsProvenanceClaim;
 void [
   read,
   write,
@@ -263,8 +287,13 @@ void [
   provenanceProducer,
   provenanceClaim,
   provenanceDigest,
+  provenanceConditionalClaim,
+  provenanceConditionalDigest,
   provenanceErrorCode,
   createProvenance,
   digestProvenance,
   verifyProvenance,
+  createConditionalProvenance,
+  digestConditionalProvenance,
+  verifyConditionalProvenance,
 ];
