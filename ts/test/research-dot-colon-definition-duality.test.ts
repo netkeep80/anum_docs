@@ -300,12 +300,7 @@ for (const [label, witness] of [
   assert(witness.start !== witness.end, `${label}: START(A) and END(A) roles remain distinct`);
 }
 
-// The interpreter/subject is not a hidden host observer in this research model.
-// It is an ordinary Link in the same Memory/aset. ExactSequence already gives a
-// structural predecessor chain for two equal Я occurrences; direct and inverse
-// traversals are then ordinary Links over those occurrence cells. Method is also
-// an ordinary Pair(Interpreter,Traversal), so changing direction does not replace
-// either Я or the interpreter itself.
+// Interpreter, traversal and method are ordinary Links in the same aset.
 const rootSelfForMethod = readExactSequence(memory, rootSelfSequence);
 same(rootSelfForMethod.cells.length, 2, "ЯЯ method witness has two structural cells");
 const firstSelfCell = rootSelfForMethod.cells[0];
@@ -334,14 +329,8 @@ const directMethod = memory.ensure(interpreter, directTraversal);
 const inverseMethod = memory.ensure(interpreter, inverseTraversal);
 assert(directMethod !== inverseMethod, "same interpreter with inverse traversal yields another method Link");
 
-// H2e: use an admitted generic StructuralRule as MTS data, not a host callback.
-// Its template simultaneously verifies:
-//   Method = Pair(I, Pair(FROM,TO))
-//   S = Pair(S,A)  i.e. S is START(A)
-//   E = Pair(A,E)  i.e. E is END(A)
-// and then relates FROM -> S, TO -> E. Because Pair(S,A) is matched directly
-// against the claimed S Link (and Pair(A,E) directly against E), arbitrary
-// role labels cannot fake the one-sided fixed-point equations.
+// H2e generic rule checks Method=I⟼(FROM⟼TO), S=S⟼A and E=A⟼E,
+// then relates FROM⟼S and TO⟼E; role names alone cannot fake the equations.
 const methodRoleCarrier = materializeExactSequence(
   memory,
   [generic, generic, generic, generic, generic, generic],
@@ -438,9 +427,7 @@ const inversePoleClaim = materializeMethodPoleClaim(
   C,
 );
 
-// Genericity is tested on a non-root whole whose raw endpoint VALUES are equal.
-// The self-reference stays pole-free; only the explicit traversal chooses which
-// occurrence has the relative START/END use-role.
+// Non-root genericity includes a whole with equal raw endpoint values.
 const equalSelfSequence = materializeExactSequence(
   memory,
   [equalRawPoleWhole, equalRawPoleWhole],
@@ -475,8 +462,7 @@ const equalPoleClaim = materializeMethodPoleClaim(
   equalRawPoleWitness.end,
 );
 
-// Negative bodies are fully materialized before replay. Verification below is
-// read-only, including all failure cases.
+// Negative bodies are materialized before read-only replay.
 const wrongTraversal = memory.ensure(firstSelfCell, firstSelfCell);
 const wrongMethod = memory.ensure(interpreter, wrongTraversal);
 const wrongTraversalClaim = materializeMethodPoleClaim(
@@ -517,10 +503,7 @@ const forgedStartClaim = materializeMethodPoleClaim(
   C,
 );
 
-// All construction ends here. The actual witness verification below has only
-// read authority and must leave memory unchanged.
 const beforeRead = memory.linkCount;
-
 const directReplay = replayStructuralRule(memory, {
   act: directAct,
   rule: methodPoleRule,
@@ -531,7 +514,6 @@ const directReplay = replayStructuralRule(memory, {
 });
 same(directReplay.claimedBody, directPoleClaim, "H2e direct method derives relative pole claim");
 same(memory.linkCount, beforeRead, "H2e direct replay is read-only");
-
 const inverseReplay = replayStructuralRule(memory, {
   act: inverseAct,
   rule: methodPoleRule,
@@ -542,7 +524,6 @@ const inverseReplay = replayStructuralRule(memory, {
 });
 same(inverseReplay.claimedBody, inversePoleClaim, "H2e inverse method derives covariant swapped claim");
 same(memory.linkCount, beforeRead, "H2e inverse replay is read-only");
-
 const equalReplay = replayStructuralRule(memory, {
   act: equalAct,
   rule: methodPoleRule,
@@ -553,7 +534,6 @@ const equalReplay = replayStructuralRule(memory, {
 });
 same(equalReplay.claimedBody, equalPoleClaim, "H2e works when raw endpoint values are equal");
 same(memory.linkCount, beforeRead, "H2e non-root replay is read-only");
-
 const hostOrderReplay = replayStructuralRule(memory, {
   act: hostOrderAct,
   rule: methodPoleRule,
@@ -600,7 +580,6 @@ expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory
 same(memory.linkCount, beforeRead, "H2e negative replay corpus is read-only");
 
 const probe = new ReadProbe(memory);
-
 for (const [label, witness] of witnesses) {
   verifyDefinition(probe, witness, label);
 }
@@ -675,11 +654,7 @@ same(probe.poles(U).start, C, "root inverse orientation U begins at END(R)=C");
 same(probe.poles(U).end, O, "root inverse orientation U ends at START(R)=O");
 assert(L !== U, "root direct and inverse orientations remain distinct");
 
-// H2e classification: the method does not magically define an absolute global
-// direction. Instead, an admitted generic MTS rule states the covariant relation
-// between an explicit selected traversal and relative START/END occurrence roles.
-// The same rule accepts the inverse traversal with swapped occurrences, rejects
-// forged direction/start evidence, and needs no intrinsic Я_start/Я_end subtype.
+// H2e: one admitted generic rule derives covariance relative to selected method.
 const H1_GENERIC_UNIFIED_DEFINITION_SUPPORTED = true;
 const ROOT_DEICTIC_SELF_FIXED_POINT_SUPPORTED = true;
 const H2_ROLE_EXPLICIT_SEQUENTIAL_FACTORIZATION_SUPPORTED = true;
