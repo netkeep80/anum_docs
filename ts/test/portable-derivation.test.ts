@@ -162,13 +162,17 @@ function siblingFixture(reverse: boolean): Memory {
   return memory;
 }
 
-// Current output is v0.2 replay-support topology. A real three-node branching
-// proof crosses the owner boundary, reconstructs fresh and replays read-only.
+// The package marker remains pinned to v0.1 for compatibility, while current
+// artifact output is the versioned v0.2 replay-support transport.
 {
   const fx = branchFixture();
   const beforeExport = fx.memory.linkCount;
   const artifact = exportPortableStructuralDerivation(fx.memory, fx.evidence);
-  same(artifact.schema, PORTABLE_STRUCTURAL_DERIVATION_SCHEMA, "current portable schema constant");
+  same(
+    PORTABLE_STRUCTURAL_DERIVATION_SCHEMA,
+    "mts-portable-structural-derivation/v0.1",
+    "public package compatibility marker remains pinned",
+  );
   same(artifact.schema, "mts-portable-structural-derivation/v0.2", "current output must be v0.2");
   same(fx.memory.linkCount, beforeExport, "portable export is source read-only");
   same(artifact.nodes.length, 3, "complete branching node closure transported");
