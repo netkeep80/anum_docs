@@ -285,14 +285,20 @@ interface VerifiedDerivationNode {
   readonly premiseTemplates: readonly LinkHandle[];
 }
 
+interface StructuralDerivationReplayOptions {
+  readonly assumptionClaimsByOccurrence?: ReadonlyMap<LinkHandle, LinkHandle>;
+  readonly usedAssumptions?: Set<LinkHandle>;
+}
+
 /**
- * Read-only replay of the exact dependency closure selected by targetOccurrence.
- * `nodes[]` is transport only: it is indexed by structural ProofOccurrence Links,
- * while premise order comes from two structural ExactSequence values.
+ * The single trusted dependency replay core. Ordinary P2 calls it without an
+ * assumption resolver. P3b supplies a structural occurrence->Claim map that was
+ * independently reconstructed from one explicit assumption context.
  */
-export function replayStructuralDerivation(
+function replayStructuralDerivationCore(
   memory: ReadMemory,
   evidence: StructuralDerivationEvidence,
+  options?: StructuralDerivationReplayOptions,
 ): StructuralDerivationReplayResult {
   const beforeCount = memory.linkCount;
   try {
@@ -413,7 +419,24 @@ export function replayStructuralDerivation(
             throw error;
           }
 
-          const dependency = verifyNode(dependencyOccurrence);
+          const proofDependency = nodes.has(dependencyOccurrence);
+          const assumptionClaim = options?.assumptionClaimsByOccurrence?.get(dependencyOccurrence);
+          if (proofDependency && assumptionClaim !== undefined) {
+            assumptionFail("ambiguous-dependency");
+          }
+
+          let dependencyClaim: LinkHandle;
+          if (proofDependency) {
+            dependencyClaim = verifyNode(dependencyOccurrence).judgment.judgment.claim;
+          } else if (assumptionClaim !== undefined) {
+            options?.usedAssumptions?.add(dependencyOccurrence);
+            dependencyClaim = assumptionClaim;
+          } else if (options?.assumptionClaimsByOccurrence !== undefined) {
+            assumptionFail("dependency-not-resolved");
+          } else {
+            derivationFail("dependency-occurrence-not-found");
+          }
+
           const template = derivationRule.premiseTemplates[index];
           if (template === undefined) {
             derivationFail("extra-premise");
@@ -422,7 +445,7 @@ export function replayStructuralDerivation(
             matchStructuralTemplate(
               memory,
               template,
-              dependency.judgment.judgment.claim,
+              dependencyClaim,
               judgment.application.bindings,
             );
           } catch (error) {
@@ -461,7 +484,12 @@ export function replayStructuralDerivation(
       occurrenceCount: verified.size,
     });
   } catch (error) {
-    if (error instanceof StructuralDerivationReplayError) throw error;
+    if (
+      error instanceof StructuralDerivationReplayError ||
+      error instanceof StructuralAssumptionReplayError
+    ) {
+      throw error;
+    }
     if (error instanceof MemoryError || error instanceof ExactSequenceError) {
       throw new StructuralDerivationReplayError("invalid-derivation-evidence");
     }
@@ -469,6 +497,204 @@ export function replayStructuralDerivation(
   } finally {
     if (memory.linkCount !== beforeCount) {
       throw new StructuralDerivationReplayError("derivation-replay-wrote");
+    }
+  }
+}
+
+/**
+ * Read-only replay of the exact dependency closure selected by targetOccurrence.
+ * `nodes[]` is transport only: it is indexed by structural ProofOccurrence Links,
+ * while premise order comes from two structural ExactSequence values.
+ */
+export function replayStructuralDerivation(
+  memory: ReadMemory,
+  evidence: StructuralDerivationEvidence,
+): StructuralDerivationReplayResult {
+  return replayStructuralDerivationCore(memory, evidence);
+}
+
+export interface StructuralDerivationWithAssumptionsEvidence {
+  readonly derivation: StructuralDerivationEvidence;
+  readonly assumptionContext: LinkHandle;
+}
+
+export interface StructuralDerivationWithAssumptionsReplayResult {
+  readonly derivation: StructuralDerivationReplayResult;
+  readonly assumptionContext: LinkHandle;
+  readonly declaredAssumptionClaims: readonly LinkHandle[];
+  readonly declaredAssumptionOccurrences: readonly LinkHandle[];
+  readonly usedAssumptionOccurrences: readonly LinkHandle[];
+}
+
+export type StructuralAssumptionReplayErrorCode =
+  | "invalid-assumption-context"
+  | "assumption-theory-mismatch"
+  | "duplicate-assumption"
+  | "missing-assumption-occurrence"
+  | "ambiguous-dependency"
+  | "dependency-not-resolved"
+  | "invalid-assumption-derivation"
+  | "assumption-replay-wrote";
+
+export class StructuralAssumptionReplayError extends Error {
+  override readonly name = "StructuralAssumptionReplayError";
+
+  constructor(readonly code: StructuralAssumptionReplayErrorCode) {
+    super(code);
+  }
+}
+
+function assumptionFail(code: StructuralAssumptionReplayErrorCode): never {
+  throw new StructuralAssumptionReplayError(code);
+}
+
+/**
+ * Internal construction vocabulary for tests/importers inside the package.
+ * The package root intentionally does not expose this helper: a consumer must
+ * submit already-materialized structural evidence to the replay boundary.
+ */
+export function defineStructuralAssumptionContext(
+  memory: WriteMemory,
+  theory: LinkHandle,
+  claims: readonly LinkHandle[],
+): LinkHandle {
+  const scope = materializeExactSequence(memory, [theory, ...claims]);
+  for (const claim of claims) {
+    memory.ensure(scope, claim);
+  }
+  return scope;
+}
+
+interface ReadStructuralAssumptionContextResult {
+  readonly theory: LinkHandle;
+  readonly claims: readonly LinkHandle[];
+  readonly occurrences: readonly LinkHandle[];
+  readonly claimsByOccurrence: ReadonlyMap<LinkHandle, LinkHandle>;
+}
+
+function readStructuralAssumptionContext(
+  memory: ReadMemory,
+  assumptionContext: LinkHandle,
+): ReadStructuralAssumptionContextResult {
+  let values: readonly LinkHandle[];
+  try {
+    values = readExactSequence(memory, assumptionContext).values;
+  } catch (error) {
+    if (error instanceof ExactSequenceError || error instanceof MemoryError) {
+      assumptionFail("invalid-assumption-context");
+    }
+    throw error;
+  }
+
+  const theory = values[0];
+  if (theory === undefined) {
+    assumptionFail("invalid-assumption-context");
+  }
+  const claims = values.slice(1);
+  const unique = new Set<LinkHandle>();
+  const occurrences: LinkHandle[] = [];
+  const claimsByOccurrence = new Map<LinkHandle, LinkHandle>();
+
+  for (const claim of claims) {
+    try {
+      memory.poles(claim);
+    } catch (error) {
+      if (error instanceof MemoryError) {
+        assumptionFail("invalid-assumption-context");
+      }
+      throw error;
+    }
+    if (unique.has(claim)) {
+      assumptionFail("duplicate-assumption");
+    }
+    unique.add(claim);
+
+    let occurrence: LinkHandle | undefined;
+    try {
+      occurrence = memory.find(assumptionContext, claim);
+    } catch (error) {
+      if (error instanceof MemoryError) {
+        assumptionFail("invalid-assumption-context");
+      }
+      throw error;
+    }
+    if (occurrence === undefined) {
+      assumptionFail("missing-assumption-occurrence");
+    }
+    occurrences.push(occurrence);
+    claimsByOccurrence.set(occurrence, claim);
+  }
+
+  return Object.freeze({
+    theory,
+    claims: Object.freeze([...claims]),
+    occurrences: Object.freeze([...occurrences]),
+    claimsByOccurrence,
+  });
+}
+
+/**
+ * Read-only conditional derivation replay. Assumptions are scoped structural
+ * roots, never fake Acts, zero-premise proofs, or Theory admissions. The same
+ * P2 replay core verifies all actual rule applications and template matches.
+ */
+export function replayStructuralDerivationWithAssumptions(
+  memory: ReadMemory,
+  evidence: StructuralDerivationWithAssumptionsEvidence,
+): StructuralDerivationWithAssumptionsReplayResult {
+  const beforeCount = memory.linkCount;
+  try {
+    let context: ReadStructuralAssumptionContextResult;
+    try {
+      context = readStructuralAssumptionContext(memory, evidence.assumptionContext);
+    } catch (error) {
+      if (error instanceof StructuralAssumptionReplayError) throw error;
+      if (error instanceof MemoryError || error instanceof ExactSequenceError) {
+        assumptionFail("invalid-assumption-context");
+      }
+      throw error;
+    }
+
+    if (context.theory !== evidence.derivation.theory) {
+      assumptionFail("assumption-theory-mismatch");
+    }
+
+    const used = new Set<LinkHandle>();
+    let derivation: StructuralDerivationReplayResult;
+    try {
+      derivation = replayStructuralDerivationCore(memory, evidence.derivation, {
+        assumptionClaimsByOccurrence: context.claimsByOccurrence,
+        usedAssumptions: used,
+      });
+    } catch (error) {
+      if (error instanceof StructuralAssumptionReplayError) throw error;
+      if (error instanceof StructuralDerivationReplayError || error instanceof MemoryError) {
+        assumptionFail("invalid-assumption-derivation");
+      }
+      throw error;
+    }
+
+    const usedAssumptionOccurrences = context.occurrences.filter((occurrence) => used.has(occurrence));
+    if (memory.linkCount !== beforeCount) {
+      assumptionFail("assumption-replay-wrote");
+    }
+
+    return Object.freeze({
+      derivation,
+      assumptionContext: evidence.assumptionContext,
+      declaredAssumptionClaims: context.claims,
+      declaredAssumptionOccurrences: context.occurrences,
+      usedAssumptionOccurrences: Object.freeze([...usedAssumptionOccurrences]),
+    });
+  } catch (error) {
+    if (error instanceof StructuralAssumptionReplayError) throw error;
+    if (error instanceof MemoryError || error instanceof ExactSequenceError) {
+      throw new StructuralAssumptionReplayError("invalid-assumption-context");
+    }
+    throw error;
+  } finally {
+    if (memory.linkCount !== beforeCount) {
+      throw new StructuralAssumptionReplayError("assumption-replay-wrote");
     }
   }
 }
