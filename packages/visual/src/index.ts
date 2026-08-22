@@ -99,3 +99,5 @@ export function normalizeVisualLinkNetwork(network: VisualLinkNetwork): VisualLi
     .map(cloneVisualLink);
   return Object.freeze({ links: Object.freeze(links) });
 }
+
+export * from "./blueprint-geometry.js";

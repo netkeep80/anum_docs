@@ -1,3 +1,5 @@
+import "./blueprint-geometry.test.js";
+
 import {
   VisualNetworkError,
   normalizeVisualLinkNetwork,
