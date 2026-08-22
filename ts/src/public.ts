@@ -183,6 +183,14 @@ export type {
 } from "./portable-derivation.js";
 
 export {
+  PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME,
+  computePortableStructuralDerivationContentDigest,
+} from "./portable-derivation-digest.js";
+export type {
+  PortableStructuralDerivationContentDigest,
+} from "./portable-derivation-digest.js";
+
+export {
   ProofRuleReplayError,
   replayDecomposeEqualRelations,
 } from "./proof.js";
