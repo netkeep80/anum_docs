@@ -176,18 +176,14 @@ function siblingFixture(reverse: boolean): Memory {
   same(imported.replay.occurrenceCount, 3, "fresh replay preserves dependency closure");
   same(imported.memory.linkCount, artifact.topology.links.length, "fresh topology remains read-only after replay");
 
+  let foreignRejected = false;
   try {
     imported.memory.poles(fx.evidence.theory);
   } catch (error) {
     assert(error instanceof MemoryError, "source handles must remain foreign to imported Memory");
+    foreignRejected = true;
   }
-  let acceptedForeign = true;
-  try {
-    imported.memory.poles(fx.evidence.theory);
-  } catch {
-    acceptedForeign = false;
-  }
-  assert(!acceptedForeign, "portable replay must not reuse source owner handles");
+  assert(foreignRejected, "portable replay must not reuse source owner handles");
 
   const reexported = exportPortableStructuralDerivation(imported.memory, imported.evidence);
   same(JSON.stringify(reexported), JSON.stringify(artifact), "portable import/re-export is stable");
