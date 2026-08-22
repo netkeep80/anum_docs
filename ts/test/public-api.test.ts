@@ -18,6 +18,8 @@ import type {
   PortableStructuralDerivationProvenanceErrorCode,
   PortableStructuralDerivationReplayResult,
   PortableStructuralDerivationSourceProvenance,
+  PortableStructuralDerivationWithAssumptionsArtifact,
+  PortableStructuralDerivationWithAssumptionsReplayResult,
   ReadMemory,
   RelationReplayEvidence,
   RunEvidence,
@@ -69,6 +71,7 @@ const expectedRuntimeExports = [
   "PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_DIGEST_SCHEME",
   "PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA",
   "PORTABLE_STRUCTURAL_DERIVATION_SCHEMA",
+  "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_SCHEMA",
   "PersistentStore",
   "PersistentStoreError",
   "PortableStructuralDerivationError",
@@ -95,6 +98,7 @@ const expectedRuntimeExports = [
   "ensureRootBasis",
   "executeAbits",
   "exportPortableStructuralDerivation",
+  "exportPortableStructuralDerivationWithAssumptions",
   "materializePersistentSequence",
   "materializeSequence",
   "normalizeRawForm",
@@ -109,6 +113,7 @@ const expectedRuntimeExports = [
   "replayIntegratedProof",
   "replayPersistentSequenceMaterialization",
   "replayPortableStructuralDerivation",
+  "replayPortableStructuralDerivationWithAssumptions",
   "replayRelationStep",
   "replayRelationSubselectionStep",
   "replayResolvedSequenceGrouping",
@@ -126,7 +131,7 @@ const expectedRuntimeExports = [
   "verifyPortableStructuralDerivationProvenanceClaim",
 ].sort();
 
-assert(expectedRuntimeExports.length === 68, "P6k runtime export budget must be exactly 68");
+assert(expectedRuntimeExports.length === 71, "P6o runtime export budget must be exactly 71");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
@@ -138,6 +143,11 @@ assert(
 assert(
   publicApi.PORTABLE_STRUCTURAL_DERIVATION_SCHEMA === "mts-portable-structural-derivation/v0.1",
   "portable derivation schema must stay pinned",
+);
+assert(
+  publicApi.PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_SCHEMA ===
+    "mts-portable-structural-derivation-with-assumptions/v0.1",
+  "portable conditional derivation schema must stay pinned",
 );
 assert(
   publicApi.PORTABLE_MTS_SEMANTIC_BASE === "mts-contract/v0.11",
@@ -185,9 +195,13 @@ const judgment: StructuralJudgmentEvidence | undefined = undefined;
 const proof: DecomposeEqualityEvidence | undefined = undefined;
 const integrated: IntegratedProofEvidence | undefined = undefined;
 const portableArtifact: PortableStructuralDerivationArtifact | undefined = undefined;
+const portableConditionalArtifact: PortableStructuralDerivationWithAssumptionsArtifact | undefined = undefined;
 const portableDigest: PortableStructuralDerivationContentDigest | undefined = undefined;
 const portableErrorCode: PortableStructuralDerivationErrorCode | undefined = undefined;
 const portableReplay: PortableStructuralDerivationReplayResult | undefined = undefined;
+const portableConditionalReplay: PortableStructuralDerivationWithAssumptionsReplayResult | undefined = undefined;
+const exportPortableConditional: (memory: ReadMemory, evidence: StructuralDerivationWithAssumptionsEvidence) => PortableStructuralDerivationWithAssumptionsArtifact = publicApi.exportPortableStructuralDerivationWithAssumptions;
+const replayPortableConditional: (input: unknown) => PortableStructuralDerivationWithAssumptionsReplayResult = publicApi.replayPortableStructuralDerivationWithAssumptions;
 const portableDigestFunction: (input: unknown) => Promise<PortableStructuralDerivationContentDigest> =
   publicApi.computePortableStructuralDerivationContentDigest;
 const provenanceSource: PortableStructuralDerivationSourceProvenance | undefined = undefined;
@@ -222,9 +236,13 @@ void [
   proof,
   integrated,
   portableArtifact,
+  portableConditionalArtifact,
   portableDigest,
   portableErrorCode,
   portableReplay,
+  portableConditionalReplay,
+  exportPortableConditional,
+  replayPortableConditional,
   portableDigestFunction,
   provenanceSource,
   provenanceProducer,
