@@ -137,20 +137,25 @@ export type {
 } from "./run.js";
 
 export {
+  StructuralAssumptionReplayError,
   StructuralDerivationReplayError,
   StructuralJudgmentReplayError,
   StructuralTheoremReplayError,
   StructuralTheoremReuseReplayError,
   replayStructuralDerivation,
+  replayStructuralDerivationWithAssumptions,
   replayStructuralDerivationWithTheorems,
   replayStructuralJudgment,
   replayStructuralTheorem,
 } from "./derivation.js";
 export type {
+  StructuralAssumptionReplayErrorCode,
   StructuralDerivationEvidence,
   StructuralDerivationNodeEvidence,
   StructuralDerivationReplayErrorCode,
   StructuralDerivationReplayResult,
+  StructuralDerivationWithAssumptionsEvidence,
+  StructuralDerivationWithAssumptionsReplayResult,
   StructuralDerivationWithTheoremsEvidence,
   StructuralDerivationWithTheoremsReplayResult,
   StructuralJudgment,
