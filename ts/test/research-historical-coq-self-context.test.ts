@@ -27,7 +27,11 @@ import {
   type SourceFrontEndEvidence,
 } from "../src/source.js";
 import { defineContext } from "../src/state.js";
-import { defineActField, defineActHeader } from "../src/structural-readers.js";
+import {
+  defineActField,
+  defineActHeader,
+  readOptionalMany,
+} from "../src/structural-readers.js";
 import {
   defineStructuralInterpreter,
   defineStructuralRoleDictionary,
@@ -308,7 +312,10 @@ reject("wrong explicit context cannot resolve self to another current", () =>
 );
 same(memory.linkCount, afterWrongContextConstruction, "wrong-context rejection must be read-only");
 
-// Missing the explicit K binding is underdetermined and fails closed.
+// Missing the explicit K binding is underdetermined and fails closed. Use a
+// fresh header context so this malformed Act cannot canonicalize to an earlier
+// fully populated Act and accidentally inherit its attachments.
+const missingHeaderContext = defineContext(memory, O, U);
 const missingContextEvidence = contextualEvidence(
   memory,
   source,
@@ -316,8 +323,14 @@ const missingContextEvidence = contextualEvidence(
   dotRole,
   rootContext,
   R,
-  rootContext,
+  missingHeaderContext,
   true,
+);
+assert(missingContextEvidence.act !== rootEvidence.act, "malformed Act must be structurally fresh");
+same(
+  readOptionalMany(memory, missingContextEvidence.act, vocabulary.beforeContext).length,
+  0,
+  "malformed Act must truly omit beforeContext",
 );
 const afterMissingContextConstruction = memory.linkCount;
 reject("missing explicit context binding", () =>
