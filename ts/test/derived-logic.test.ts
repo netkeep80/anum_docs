@@ -58,7 +58,7 @@ function logicFixture() {
   let cursor = U;
   const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
   const dictionary = fresh(), grammar = fresh(), theory = fresh(), weakTheory = fresh();
-  const pRole = fresh(), qRole = fresh(), impTag = fresh();
+  const impTag = fresh(), pRole = fresh(), qRole = fresh();
   const p = fresh(), q = fresh(), r = fresh();
 
   const environment = (selectedTheory: LinkHandle) => {
