@@ -201,10 +201,15 @@ export type {
 export {
   PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_DIGEST_SCHEME,
   PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA,
+  PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_DIGEST_SCHEME,
+  PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_SCHEMA,
   PortableStructuralDerivationProvenanceError,
   computePortableStructuralDerivationProvenanceDigest,
+  computePortableStructuralDerivationWithAssumptionsProvenanceDigest,
   createPortableStructuralDerivationProvenanceClaim,
+  createPortableStructuralDerivationWithAssumptionsProvenanceClaim,
   verifyPortableStructuralDerivationProvenanceClaim,
+  verifyPortableStructuralDerivationWithAssumptionsProvenanceClaim,
 } from "./portable-derivation-provenance.js";
 export type {
   PortableStructuralDerivationProducerProvenance,
@@ -212,6 +217,8 @@ export type {
   PortableStructuralDerivationProvenanceDigest,
   PortableStructuralDerivationProvenanceErrorCode,
   PortableStructuralDerivationSourceProvenance,
+  PortableStructuralDerivationWithAssumptionsProvenanceClaim,
+  PortableStructuralDerivationWithAssumptionsProvenanceDigest,
 } from "./portable-derivation-provenance.js";
 
 export {
