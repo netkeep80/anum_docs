@@ -280,6 +280,7 @@ function replayReject(memory: ReadMemory, evidence: StructuralDerivationEvidence
 {
   const fx = fixture();
   const foreign = new Memory();
+  let rejected = false;
   try {
     exportStructuralDerivationSupportTopology(fx.memory, {
       ...fx.evidence,
@@ -290,10 +291,10 @@ function replayReject(memory: ReadMemory, evidence: StructuralDerivationEvidence
       error instanceof StructuralDerivationSupportTopologyError,
       "foreign evidence handle must fail as support-topology error",
     );
-    // Executable P6f classification:
-    // CANONICAL_REPLAY_SUPPORT_TOPOLOGY_SUPPORTED
-    void error;
-    return;
+    rejected = true;
   }
-  throw new Error("foreign evidence handle must reject support construction");
+  assert(rejected, "foreign evidence handle must reject support construction");
 }
+
+// Executable P6f classification:
+// CANONICAL_REPLAY_SUPPORT_TOPOLOGY_SUPPORTED
