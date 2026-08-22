@@ -966,8 +966,20 @@ function assumptionFixture(claims: readonly LinkHandle[]) {
 // Any write during assumption resolution is detected even when the structural result would otherwise match.
 {
   const fx = derivationFixture();
-  const root = fx.rootLeft();
-  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, []);
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.left]);
+  const assumption = fx.memory.find(assumptionContext, fx.left);
+  assert(assumption !== undefined, "write-detection assumption occurrence");
+  const targetContext = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.leftRole,
+    fx.left,
+    [fx.leftRole],
+    [assumption],
+    targetContext,
+  );
   let injected = false;
   const malicious: ReadMemory = {
     get root() { return fx.memory.root; },
@@ -986,7 +998,7 @@ function assumptionFixture(claims: readonly LinkHandle[]) {
   expectAssumptionError("assumption-replay-wrote", () => replayStructuralDerivationWithAssumptions(
     malicious,
     {
-      derivation: { theory: fx.theory, targetOccurrence: root.occurrence, nodes: [root.node] },
+      derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
       assumptionContext,
     },
   ));
