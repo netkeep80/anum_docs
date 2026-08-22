@@ -172,14 +172,19 @@ export type {
 export {
   PORTABLE_MTS_SEMANTIC_BASE,
   PORTABLE_STRUCTURAL_DERIVATION_SCHEMA,
+  PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_SCHEMA,
   PortableStructuralDerivationError,
   exportPortableStructuralDerivation,
+  exportPortableStructuralDerivationWithAssumptions,
   replayPortableStructuralDerivation,
+  replayPortableStructuralDerivationWithAssumptions,
 } from "./portable-derivation.js";
 export type {
   PortableStructuralDerivationArtifact,
   PortableStructuralDerivationErrorCode,
   PortableStructuralDerivationReplayResult,
+  PortableStructuralDerivationWithAssumptionsArtifact,
+  PortableStructuralDerivationWithAssumptionsReplayResult,
 } from "./portable-derivation.js";
 
 export {
