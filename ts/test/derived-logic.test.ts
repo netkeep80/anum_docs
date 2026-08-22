@@ -351,10 +351,12 @@ const fx = logicFixture();
     derivationRuleAdmission: fx.memory.ensure(fx.fresh(), derivationRule),
     premiseOccurrenceSequence: materializeExactSequence(fx.memory, []),
   };
+  const hostLabelled: StructuralDerivationNodeEvidence & {
+    readonly logicalPrinciple: string;
+  } = { ...node, logicalPrinciple: "excluded-middle" };
   expectError(StructuralDerivationReplayError, "invalid-node-judgment", () =>
     replayStructuralDerivation(fx.memory, {
-      theory: fx.theory, targetOccurrence: occurrence,
-      nodes: [{ ...node, logicalPrinciple: "excluded-middle" }],
+      theory: fx.theory, targetOccurrence: occurrence, nodes: [hostLabelled],
     }),
   );
 }
