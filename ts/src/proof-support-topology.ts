@@ -149,12 +149,15 @@ function collectReplaySupportWithAssumptions(
 ): ReadonlySet<LinkHandle> {
   const support = new Set(collectReplaySupport(memory, evidence.derivation));
 
-  // Conditional replay reads the declaration sequence and then performs an exact
-  // lookup Pair(assumptionContext, claim) for every declaration, including unused
+  // Conditional replay reads [Theory, ...Claims], then performs the exact lookup
+  // Pair(assumptionContext, claim) for every declared claim, including unused
   // assumptions. Those lookup witnesses are replay evidence, not expendable junk.
   includePoleClosure(memory, support, [evidence.assumptionContext]);
-  const declarations = readExactSequence(memory, evidence.assumptionContext).values;
-  for (const claim of declarations) {
+  const values = readExactSequence(memory, evidence.assumptionContext).values;
+  if (values[0] === undefined) {
+    throw new StructuralDerivationSupportTopologyError("assumption context has no theory");
+  }
+  for (const claim of values.slice(1)) {
     const occurrence = memory.find(evidence.assumptionContext, claim);
     if (occurrence === undefined) {
       throw new StructuralDerivationSupportTopologyError(
