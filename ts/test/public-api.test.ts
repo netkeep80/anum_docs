@@ -23,6 +23,7 @@ import type {
   PortableStructuralDerivationWithAssumptionsProvenanceClaim,
   PortableStructuralDerivationWithAssumptionsProvenanceDigest,
   PortableStructuralDerivationWithAssumptionsReplayResult,
+  PortableStructuralProofReplayResult,
   ReadMemory,
   RelationReplayEvidence,
   RunEvidence,
@@ -127,6 +128,7 @@ const expectedRuntimeExports = [
   "replayPersistentSequenceMaterialization",
   "replayPortableStructuralDerivation",
   "replayPortableStructuralDerivationWithAssumptions",
+  "replayPortableStructuralProof",
   "replayRelationStep",
   "replayRelationSubselectionStep",
   "replayResolvedSequenceGrouping",
@@ -145,7 +147,7 @@ const expectedRuntimeExports = [
   "verifyPortableStructuralDerivationWithAssumptionsProvenanceClaim",
 ].sort();
 
-assert(expectedRuntimeExports.length === 78, "P6s runtime export budget must be exactly 78");
+assert(expectedRuntimeExports.length === 79, "P7b runtime export budget must be exactly 79");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
@@ -230,8 +232,10 @@ const portableConditionalDigest: PortableStructuralDerivationWithAssumptionsCont
 const portableErrorCode: PortableStructuralDerivationErrorCode | undefined = undefined;
 const portableReplay: PortableStructuralDerivationReplayResult | undefined = undefined;
 const portableConditionalReplay: PortableStructuralDerivationWithAssumptionsReplayResult | undefined = undefined;
+const portableUnifiedReplay: PortableStructuralProofReplayResult | undefined = undefined;
 const exportPortableConditional: (memory: ReadMemory, evidence: StructuralDerivationWithAssumptionsEvidence) => PortableStructuralDerivationWithAssumptionsArtifact = publicApi.exportPortableStructuralDerivationWithAssumptions;
 const replayPortableConditional: (input: unknown) => PortableStructuralDerivationWithAssumptionsReplayResult = publicApi.replayPortableStructuralDerivationWithAssumptions;
+const replayPortableUnified: (input: unknown) => PortableStructuralProofReplayResult = publicApi.replayPortableStructuralProof;
 const portableDigestFunction: (input: unknown) => Promise<PortableStructuralDerivationContentDigest> =
   publicApi.computePortableStructuralDerivationContentDigest;
 const portableConditionalDigestFunction: (input: unknown) => Promise<PortableStructuralDerivationWithAssumptionsContentDigest> =
@@ -279,8 +283,10 @@ void [
   portableErrorCode,
   portableReplay,
   portableConditionalReplay,
+  portableUnifiedReplay,
   exportPortableConditional,
   replayPortableConditional,
+  replayPortableUnified,
   portableDigestFunction,
   portableConditionalDigestFunction,
   provenanceSource,

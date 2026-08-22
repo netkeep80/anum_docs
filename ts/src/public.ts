@@ -188,6 +188,13 @@ export type {
 } from "./portable-derivation.js";
 
 export {
+  replayPortableStructuralProof,
+} from "./portable-proof-replay.js";
+export type {
+  PortableStructuralProofReplayResult,
+} from "./portable-proof-replay.js";
+
+export {
   PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME,
   PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME,
   computePortableStructuralDerivationContentDigest,
