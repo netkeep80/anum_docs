@@ -15,6 +15,7 @@ import type {
   SequenceDescription,
   StackAlgebra,
   StoredDataset,
+  StructuralDerivationEvidence,
   StructuralJudgmentEvidence,
   WriteMemory,
 } from "../src/public.js";
@@ -49,6 +50,7 @@ const expectedRuntimeExports = [
   "RunReplayError",
   "SequenceReplayError",
   "StreamError",
+  "StructuralDerivationReplayError",
   "StructuralJudgmentReplayError",
   "ValueBundleReplayError",
   "analyzeDirectDeixisCarrier",
@@ -77,6 +79,7 @@ const expectedRuntimeExports = [
   "replayRootOpeningRestoration",
   "replayRun",
   "replaySequenceMaterialization",
+  "replayStructuralDerivation",
   "replayStructuralJudgment",
   "resolveFlatBundle",
   "symbolicStackAlgebra",
@@ -109,6 +112,7 @@ const definition: DefinitionReplayEvidence | undefined = undefined;
 const deixis: DirectDeixisVocabulary | undefined = undefined;
 const value: MtsValue | undefined = undefined;
 const run: RunEvidence | undefined = undefined;
+const derivation: StructuralDerivationEvidence | undefined = undefined;
 const judgment: StructuralJudgmentEvidence | undefined = undefined;
 const proof: DecomposeEqualityEvidence | undefined = undefined;
 const integrated: IntegratedProofEvidence | undefined = undefined;
@@ -127,6 +131,7 @@ void [
   deixis,
   value,
   run,
+  derivation,
   judgment,
   proof,
   integrated,
