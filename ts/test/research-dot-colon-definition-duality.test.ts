@@ -134,6 +134,15 @@ function poleValue(
   return occurrence.pole === "start" ? witness.start : witness.end;
 }
 
+function exactCellPredecessor(
+  memory: ReadMemory,
+  cell: LinkHandle,
+): LinkHandle {
+  const cellPoles = memory.poles(cell);
+  same(cellPoles.start, cell, "ExactSequence cell is start-selfclosed");
+  return memory.poles(cellPoles.end).start;
+}
+
 const memory = new Memory();
 const basis = ensureRootBasis(memory);
 const { R, O, C, L, U } = basis;
@@ -215,6 +224,47 @@ assert(orientedCarrier !== reversedCarrier, "opposite explicit pole sequences ne
 const reverseRootDefinition = memory.ensure(R, U);
 assert(reverseRootDefinition !== colonMeaning, "Pair(R,U) must differ from ColonMeaning=Pair(R,L)");
 
+// H2d: asymmetry is not inequality of the raw values at A.start/A.end. An
+// ordinary Pair(X,X) has equal raw pole values, while the two one-sided roles
+// START(A) and END(A) remain structurally different. This is the machine witness
+// for the stronger foundation claim that ordered pole ROLES, not endpoint-value
+// inequality, are the source of orientation.
+const equalRawPoleWhole = memory.ensure(L, L);
+const equalRawPoleWitness = materializeDefinition(memory, equalRawPoleWhole);
+const equalRawPoles = memory.poles(equalRawPoleWhole);
+same(equalRawPoles.start, L, "equal-raw-pole witness starts at L");
+same(equalRawPoles.end, L, "equal-raw-pole witness ends at the same L");
+for (const [label, witness] of [
+  ...witnesses,
+  ["Pair(L,L)", equalRawPoleWitness] as const,
+]) {
+  assert(witness.start !== witness.end, `${label}: START(A) and END(A) roles remain distinct`);
+}
+
+// The interpreter/subject is not a hidden host observer in this research model.
+// It is an ordinary Link in the same Memory/aset. ExactSequence already gives a
+// structural predecessor chain for two equal Я occurrences; direct and inverse
+// traversals are then ordinary Links over those occurrence cells. Method is also
+// an ordinary Pair(Interpreter,Traversal), so changing direction does not replace
+// either Я or the interpreter itself.
+const rootSelfForMethod = readExactSequence(memory, rootSelfSequence);
+same(rootSelfForMethod.cells.length, 2, "ЯЯ method witness has two structural cells");
+const firstSelfCell = rootSelfForMethod.cells[0];
+const secondSelfCell = rootSelfForMethod.cells[1];
+assert(firstSelfCell !== undefined, "first Я occurrence cell exists");
+assert(secondSelfCell !== undefined, "second Я occurrence cell exists");
+same(exactCellPredecessor(memory, firstSelfCell), R, "first Я cell follows sequence root");
+same(exactCellPredecessor(memory, secondSelfCell), firstSelfCell, "second Я cell follows first Я cell");
+
+const directTraversal = memory.ensure(firstSelfCell, secondSelfCell);
+const inverseTraversal = memory.ensure(secondSelfCell, firstSelfCell);
+assert(directTraversal !== inverseTraversal, "direct and inverse traversals are distinct Links");
+
+const interpreter = memory.ensure(colonMeaning, dotMeaning);
+const directMethod = memory.ensure(interpreter, directTraversal);
+const inverseMethod = memory.ensure(interpreter, inverseTraversal);
+assert(directMethod !== inverseMethod, "same interpreter with inverse traversal yields another method Link");
+
 // All construction ends here. The actual witness verification below has only
 // ReadMemory authority and must leave memory unchanged.
 const beforeRead = memory.linkCount;
@@ -223,11 +273,14 @@ const probe = new ReadProbe(memory);
 for (const [label, witness] of witnesses) {
   verifyDefinition(probe, witness, label);
 }
+verifyDefinition(probe, equalRawPoleWitness, "Pair(L,L)");
 
 const exactRootSelf = readExactSequence(probe, rootSelfSequence);
 same(exactRootSelf.values.length, 2, "ЯЯ has two exact positions");
 same(exactRootSelf.values[0], R, "first Я resolves to root whole");
 same(exactRootSelf.values[1], R, "second Я resolves to root whole");
+same(exactRootSelf.cells[0], firstSelfCell, "read-only first Я occurrence identity preserved");
+same(exactRootSelf.cells[1], secondSelfCell, "read-only second Я occurrence identity preserved");
 
 same(probe.poles(rootWitness.definition).start, R, "root definition whole pole");
 same(probe.poles(rootWitness.definition).end, L, "root definition dual pole");
@@ -273,13 +326,38 @@ same(probe.poles(reverseRootDefinition).start, R, "reversed unified root form st
 same(probe.poles(reverseRootDefinition).end, U, "reversed unified root form ends at U");
 assert(reverseRootDefinition !== colonMeaning, "reversed explicit orientation must not define colon");
 
-// Executable research classification. Sequential/unified equivalence is
-// supported only when the two self-occurrences carry explicit opposite pole
-// roles. Bare ЯЯ and occurrence order alone are insufficient.
+// H2d structural directness is now explicit and wholly inside the aset.
+same(exactCellPredecessor(probe, firstSelfCell), R, "directness first boundary remains structural");
+same(exactCellPredecessor(probe, secondSelfCell), firstSelfCell, "directness second boundary remains structural");
+same(probe.poles(directTraversal).start, firstSelfCell, "direct traversal begins at first occurrence");
+same(probe.poles(directTraversal).end, secondSelfCell, "direct traversal ends at next occurrence");
+same(probe.poles(inverseTraversal).start, secondSelfCell, "inverse traversal begins at second occurrence");
+same(probe.poles(inverseTraversal).end, firstSelfCell, "inverse traversal ends at first occurrence");
+same(probe.poles(directMethod).start, interpreter, "direct method contains interpreter Link");
+same(probe.poles(directMethod).end, directTraversal, "direct method contains direct traversal Link");
+same(probe.poles(inverseMethod).start, interpreter, "inverse method keeps the same interpreter Link");
+same(probe.poles(inverseMethod).end, inverseTraversal, "inverse method changes only traversal Link");
+
+same(probe.poles(L).start, O, "root direct orientation L begins at START(R)=O");
+same(probe.poles(L).end, C, "root direct orientation L ends at END(R)=C");
+same(probe.poles(U).start, C, "root inverse orientation U begins at END(R)=C");
+same(probe.poles(U).end, O, "root inverse orientation U ends at START(R)=O");
+assert(L !== U, "root direct and inverse orientations remain distinct");
+
+// Executable research classification. The current substrate proves structural
+// pole-role asymmetry, pole-free repeated Я occurrences, an interpreter that is
+// itself a Link, and an explicit directed traversal/method encoded only by Links.
+// What this witness deliberately does NOT smuggle in is a host rule saying
+// "first => START, next => END". A generic MTS relation/rule deriving relative
+// pole roles from DirectMethod remains the exact next proof obligation.
 const H1_GENERIC_UNIFIED_DEFINITION_SUPPORTED = true;
 const ROOT_DEICTIC_SELF_FIXED_POINT_SUPPORTED = true;
 const H2_ROLE_EXPLICIT_SEQUENTIAL_FACTORIZATION_SUPPORTED = true;
 const ORDER_ONLY_POLE_DERIVATION_SUPPORTED = false;
+const H2D_STRUCTURAL_POLE_ROLE_ASYMMETRY_SUPPORTED = true;
+const H2D_INTERPRETER_IS_LINK_SUPPORTED = true;
+const H2D_STRUCTURAL_DIRECT_METHOD_CARRIER_SUPPORTED = true;
+const H2D_METHOD_TO_POLE_ROLE_DERIVATION_ESTABLISHED = false;
 const BARE_SELF_FOLD_EQUALS_UNIFIED_DEFINITION = false;
 const H3_LITERAL_DOT_DOT_REINTERPRETATION_REQUIRED = false;
 
@@ -287,6 +365,10 @@ assert(H1_GENERIC_UNIFIED_DEFINITION_SUPPORTED, "H1 classification");
 assert(ROOT_DEICTIC_SELF_FIXED_POINT_SUPPORTED, "root ЯЯ=Я classification");
 assert(H2_ROLE_EXPLICIT_SEQUENTIAL_FACTORIZATION_SUPPORTED, "role-explicit H2 factorization");
 assert(!ORDER_ONLY_POLE_DERIVATION_SUPPORTED, "equal paths with opposite poles falsify order-only orientation");
+assert(H2D_STRUCTURAL_POLE_ROLE_ASYMMETRY_SUPPORTED, "ordered START/END role asymmetry classification");
+assert(H2D_INTERPRETER_IS_LINK_SUPPORTED, "interpreter is represented inside the aset as a Link");
+assert(H2D_STRUCTURAL_DIRECT_METHOD_CARRIER_SUPPORTED, "direct/inverse methods are explicit Links");
+assert(!H2D_METHOD_TO_POLE_ROLE_DERIVATION_ESTABLISHED, "method-to-pole theorem must not be invented by host order");
 assert(!BARE_SELF_FOLD_EQUALS_UNIFIED_DEFINITION, "bare ЯЯ must remain distinct from Def(A)");
 assert(!H3_LITERAL_DOT_DOT_REINTERPRETATION_REQUIRED, "accepted literal `..` must remain unchanged");
 
