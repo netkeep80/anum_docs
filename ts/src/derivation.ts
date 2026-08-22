@@ -472,3 +472,201 @@ export function replayStructuralDerivation(
     }
   }
 }
+
+export interface StructuralTheorem {
+  readonly claim: LinkHandle;
+  readonly theory: LinkHandle;
+}
+
+export interface StructuralTheoremEvidence {
+  readonly theorem: LinkHandle;
+  readonly proof: StructuralDerivationEvidence;
+}
+
+export interface StructuralTheoremReplayResult {
+  readonly theorem: LinkHandle;
+  readonly identity: StructuralTheorem;
+  readonly proof: StructuralDerivationReplayResult;
+}
+
+export type StructuralTheoremReplayErrorCode =
+  | "invalid-theorem-evidence"
+  | "theorem-proof-theory-mismatch"
+  | "invalid-theorem-proof"
+  | "theorem-claim-mismatch"
+  | "theorem-replay-wrote";
+
+export class StructuralTheoremReplayError extends Error {
+  override readonly name = "StructuralTheoremReplayError";
+
+  constructor(readonly code: StructuralTheoremReplayErrorCode) {
+    super(code);
+  }
+}
+
+function theoremFail(code: StructuralTheoremReplayErrorCode): never {
+  throw new StructuralTheoremReplayError(code);
+}
+
+/**
+ * Derived theorem identity = Pair(Claim, Theory). The Claim-first orientation
+ * keeps theorem metadata out of outgoing(Theory), which is reserved for
+ * explicit theory admissions. The Link alone has no proof authority.
+ */
+export function defineStructuralTheorem(
+  memory: WriteMemory,
+  claim: LinkHandle,
+  theory: LinkHandle,
+): LinkHandle {
+  return memory.ensure(claim, theory);
+}
+
+export function readStructuralTheorem(
+  memory: ReadMemory,
+  theorem: LinkHandle,
+): StructuralTheorem {
+  try {
+    const poles = memory.poles(theorem);
+    return Object.freeze({ claim: poles.start, theory: poles.end });
+  } catch (error) {
+    if (error instanceof MemoryError) {
+      theoremFail("invalid-theorem-evidence");
+    }
+    throw error;
+  }
+}
+
+/**
+ * Read-only proof-carrying theorem replay. The theorem Link is only structural
+ * identity; truth is established every time by replaying its complete P2 proof.
+ */
+export function replayStructuralTheorem(
+  memory: ReadMemory,
+  evidence: StructuralTheoremEvidence,
+): StructuralTheoremReplayResult {
+  const beforeCount = memory.linkCount;
+  try {
+    const identity = readStructuralTheorem(memory, evidence.theorem);
+    if (evidence.proof.theory !== identity.theory) {
+      theoremFail("theorem-proof-theory-mismatch");
+    }
+
+    let proof: StructuralDerivationReplayResult;
+    try {
+      proof = replayStructuralDerivation(memory, evidence.proof);
+    } catch (error) {
+      if (error instanceof StructuralDerivationReplayError || error instanceof MemoryError) {
+        theoremFail("invalid-theorem-proof");
+      }
+      throw error;
+    }
+
+    if (proof.target.judgment.claim !== identity.claim) {
+      theoremFail("theorem-claim-mismatch");
+    }
+    if (memory.linkCount !== beforeCount) {
+      theoremFail("theorem-replay-wrote");
+    }
+
+    return Object.freeze({ theorem: evidence.theorem, identity, proof });
+  } catch (error) {
+    if (error instanceof StructuralTheoremReplayError) throw error;
+    if (error instanceof MemoryError) {
+      throw new StructuralTheoremReplayError("invalid-theorem-evidence");
+    }
+    throw error;
+  } finally {
+    if (memory.linkCount !== beforeCount) {
+      throw new StructuralTheoremReplayError("theorem-replay-wrote");
+    }
+  }
+}
+
+export interface StructuralDerivationWithTheoremsEvidence {
+  readonly derivation: StructuralDerivationEvidence;
+  readonly theorems: readonly StructuralTheoremEvidence[];
+}
+
+export interface StructuralDerivationWithTheoremsReplayResult {
+  readonly derivation: StructuralDerivationReplayResult;
+  readonly theorems: readonly StructuralTheoremReplayResult[];
+}
+
+export type StructuralTheoremReuseReplayErrorCode =
+  | "invalid-reused-theorem"
+  | "theorem-reuse-theory-mismatch"
+  | "theorem-reuse-replay-wrote";
+
+export class StructuralTheoremReuseReplayError extends Error {
+  override readonly name = "StructuralTheoremReuseReplayError";
+
+  constructor(readonly code: StructuralTheoremReuseReplayErrorCode) {
+    super(code);
+  }
+}
+
+function theoremReuseFail(code: StructuralTheoremReuseReplayErrorCode): never {
+  throw new StructuralTheoremReuseReplayError(code);
+}
+
+/**
+ * Proof-carrying theorem reuse by expansion. Reusable theorem proofs are first
+ * replayed independently, then their complete P2 nodes are grafted into the
+ * consuming derivation and the final exact target closure is replayed again.
+ * No theorem/cache/hash boolean can replace the proof nodes.
+ */
+export function replayStructuralDerivationWithTheorems(
+  memory: ReadMemory,
+  evidence: StructuralDerivationWithTheoremsEvidence,
+): StructuralDerivationWithTheoremsReplayResult {
+  const beforeCount = memory.linkCount;
+  try {
+    const theoremResults: StructuralTheoremReplayResult[] = [];
+    const theoremNodes: StructuralDerivationNodeEvidence[] = [];
+
+    for (const theoremEvidence of evidence.theorems) {
+      let theorem: StructuralTheoremReplayResult;
+      try {
+        theorem = replayStructuralTheorem(memory, theoremEvidence);
+      } catch (error) {
+        if (error instanceof StructuralTheoremReplayError || error instanceof MemoryError) {
+          theoremReuseFail("invalid-reused-theorem");
+        }
+        throw error;
+      }
+      if (theorem.identity.theory !== evidence.derivation.theory) {
+        theoremReuseFail("theorem-reuse-theory-mismatch");
+      }
+      theoremResults.push(theorem);
+      theoremNodes.push(...theoremEvidence.proof.nodes);
+    }
+
+    const derivation = replayStructuralDerivation(memory, {
+      ...evidence.derivation,
+      nodes: Object.freeze([...evidence.derivation.nodes, ...theoremNodes]),
+    });
+
+    if (memory.linkCount !== beforeCount) {
+      theoremReuseFail("theorem-reuse-replay-wrote");
+    }
+    return Object.freeze({
+      derivation,
+      theorems: Object.freeze([...theoremResults]),
+    });
+  } catch (error) {
+    if (
+      error instanceof StructuralTheoremReuseReplayError ||
+      error instanceof StructuralDerivationReplayError
+    ) {
+      throw error;
+    }
+    if (error instanceof MemoryError) {
+      throw new StructuralTheoremReuseReplayError("invalid-reused-theorem");
+    }
+    throw error;
+  } finally {
+    if (memory.linkCount !== beforeCount) {
+      throw new StructuralTheoremReuseReplayError("theorem-reuse-replay-wrote");
+    }
+  }
+}

@@ -16,7 +16,9 @@ import type {
   StackAlgebra,
   StoredDataset,
   StructuralDerivationEvidence,
+  StructuralDerivationWithTheoremsEvidence,
   StructuralJudgmentEvidence,
+  StructuralTheoremEvidence,
   WriteMemory,
 } from "../src/public.js";
 
@@ -52,6 +54,8 @@ const expectedRuntimeExports = [
   "StreamError",
   "StructuralDerivationReplayError",
   "StructuralJudgmentReplayError",
+  "StructuralTheoremReplayError",
+  "StructuralTheoremReuseReplayError",
   "ValueBundleReplayError",
   "analyzeDirectDeixisCarrier",
   "bundleRoleAt",
@@ -80,7 +84,9 @@ const expectedRuntimeExports = [
   "replayRun",
   "replaySequenceMaterialization",
   "replayStructuralDerivation",
+  "replayStructuralDerivationWithTheorems",
   "replayStructuralJudgment",
+  "replayStructuralTheorem",
   "resolveFlatBundle",
   "symbolicStackAlgebra",
   "valuesEqual",
@@ -113,6 +119,8 @@ const deixis: DirectDeixisVocabulary | undefined = undefined;
 const value: MtsValue | undefined = undefined;
 const run: RunEvidence | undefined = undefined;
 const derivation: StructuralDerivationEvidence | undefined = undefined;
+const derivationWithTheorems: StructuralDerivationWithTheoremsEvidence | undefined = undefined;
+const theorem: StructuralTheoremEvidence | undefined = undefined;
 const judgment: StructuralJudgmentEvidence | undefined = undefined;
 const proof: DecomposeEqualityEvidence | undefined = undefined;
 const integrated: IntegratedProofEvidence | undefined = undefined;
@@ -132,6 +140,8 @@ void [
   value,
   run,
   derivation,
+  derivationWithTheorems,
+  theorem,
   judgment,
   proof,
   integrated,

@@ -12,11 +12,16 @@ import {
 import {
   StructuralDerivationReplayError,
   StructuralJudgmentReplayError,
+  StructuralTheoremReplayError,
+  StructuralTheoremReuseReplayError,
   admitStructuralDerivationRule,
   defineStructuralDerivationRule,
   defineStructuralProofOccurrence,
+  defineStructuralTheorem,
   replayStructuralDerivation,
+  replayStructuralDerivationWithTheorems,
   replayStructuralJudgment,
+  replayStructuralTheorem,
   type StructuralJudgmentEvidence,
 } from "../src/derivation.js";
 
@@ -54,6 +59,34 @@ function expectDerivationError(
     return;
   }
   throw new Error(`${code}: expected StructuralDerivationReplayError`);
+}
+
+function expectTheoremError(
+  code: StructuralTheoremReplayError["code"],
+  effect: () => unknown,
+): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(error instanceof StructuralTheoremReplayError, `${code}: wrong error type`);
+    same(error.code, code, `${code}: wrong error code`);
+    return;
+  }
+  throw new Error(`${code}: expected StructuralTheoremReplayError`);
+}
+
+function expectTheoremReuseError(
+  code: StructuralTheoremReuseReplayError["code"],
+  effect: () => unknown,
+): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(error instanceof StructuralTheoremReuseReplayError, `${code}: wrong error type`);
+    same(error.code, code, `${code}: wrong error code`);
+    return;
+  }
+  throw new Error(`${code}: expected StructuralTheoremReuseReplayError`);
 }
 
 interface Fixture {
@@ -276,7 +309,7 @@ function derivationFixture() {
     );
     return { l, r, target, evidence: { theory, targetOccurrence: target.occurrence, nodes: [target.node, r.node, l.node] } };
   };
-  return { memory, fresh, theory, leftRole, rightRole, left, right, main, environment, node, rootLeft, branch };
+  return { memory, fresh, theory, leftRole, rightRole, left, right, main, environment, node, rootLeft, rootRight, branch };
 }
 
 // Positive P2: zero-premise root, linear reuse, branching, host-order independence, read-only replay.
@@ -384,4 +417,211 @@ function derivationFixture() {
 
   const foreign = new Memory().root;
   expectDerivationError("invalid-derivation-evidence", () => replayStructuralDerivation(fx.memory, { theory: fx.theory, targetOccurrence: foreign, nodes: [fx.rootLeft().node] }));
+}
+
+// P3a theorem identity is Claim-under-Theory while proof history remains replayable evidence.
+{
+  const fx = derivationFixture();
+  const first = fx.rootLeft();
+  const theorem = defineStructuralTheorem(fx.memory, fx.left, fx.theory);
+  const firstProof = { theory: fx.theory, targetOccurrence: first.occurrence, nodes: [first.node] };
+  const before = fx.memory.linkCount;
+  const firstResult = replayStructuralTheorem(fx.memory, { theorem, proof: firstProof });
+  same(firstResult.identity.claim, fx.left, "theorem exact claim");
+  same(firstResult.identity.theory, fx.theory, "theorem exact theory");
+  same(firstResult.proof.targetOccurrence, first.occurrence, "theorem proof target");
+  same(fx.memory.linkCount, before, "theorem replay read-only");
+
+  const secondContext = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const second = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.leftRole,
+    fx.left,
+    [],
+    [],
+    secondContext,
+  );
+  assert(first.occurrence !== second.occurrence, "same theorem must allow distinct proof histories");
+  const secondResult = replayStructuralTheorem(fx.memory, {
+    theorem,
+    proof: { theory: fx.theory, targetOccurrence: second.occurrence, nodes: [second.node] },
+  });
+  same(secondResult.theorem, firstResult.theorem, "proof history must not change theorem identity");
+}
+
+// Branching P2 proof is a valid proof-carrying theorem without theorem-specific replay.
+{
+  const fx = derivationFixture();
+  const b = fx.branch();
+  const theorem = defineStructuralTheorem(fx.memory, b.target.claim, fx.theory);
+  const before = fx.memory.linkCount;
+  const result = replayStructuralTheorem(fx.memory, { theorem, proof: b.evidence });
+  same(result.proof.occurrenceCount, 3, "branching theorem closure");
+  same(result.identity.claim, b.target.claim, "branching theorem target");
+  same(fx.memory.linkCount, before, "branching theorem replay read-only");
+}
+
+// Later proof reuses theorem only by expanding its complete P2 proof closure.
+{
+  const fx = derivationFixture();
+  const lemma = fx.rootLeft();
+  const lemmaTheorem = defineStructuralTheorem(fx.memory, fx.left, fx.theory);
+  const lemmaEvidence = {
+    theorem: lemmaTheorem,
+    proof: { theory: fx.theory, targetOccurrence: lemma.occurrence, nodes: [lemma.node] },
+  };
+  const right = fx.rootRight();
+  const targetClaim = fx.memory.ensure(fx.left, fx.right);
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole, fx.rightRole],
+    [[fx.leftRole, fx.left], [fx.rightRole, fx.right]],
+    fx.memory.ensure(fx.leftRole, fx.rightRole),
+    targetClaim,
+    [fx.leftRole, fx.rightRole],
+    [lemma.occurrence, right.occurrence],
+  );
+  const before = fx.memory.linkCount;
+  const result = replayStructuralDerivationWithTheorems(fx.memory, {
+    derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node, right.node] },
+    theorems: [lemmaEvidence],
+  });
+  same(result.derivation.target.judgment.claim, targetClaim, "lemma reuse target");
+  same(result.derivation.occurrenceCount, 3, "expanded theorem closure");
+  same(result.theorems.length, 1, "one replayed theorem");
+  same(fx.memory.linkCount, before, "theorem reuse read-only");
+}
+
+// One theorem target may satisfy multiple explicit premise positions of an admitted rule.
+{
+  const fx = derivationFixture();
+  const lemma = fx.rootLeft();
+  const theorem = defineStructuralTheorem(fx.memory, fx.left, fx.theory);
+  const targetContext = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.leftRole,
+    fx.left,
+    [fx.leftRole, fx.leftRole],
+    [lemma.occurrence, lemma.occurrence],
+    targetContext,
+  );
+  const result = replayStructuralDerivationWithTheorems(fx.memory, {
+    derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
+    theorems: [{ theorem, proof: { theory: fx.theory, targetOccurrence: lemma.occurrence, nodes: [lemma.node] } }],
+  });
+  same(result.derivation.occurrenceCount, 2, "shared theorem dependency counted once");
+}
+
+// Theorem-record host order is transport only when both theorem proofs are structurally required.
+{
+  const fx = derivationFixture();
+  const left = fx.rootLeft();
+  const right = fx.rootRight();
+  const leftTheorem = {
+    theorem: defineStructuralTheorem(fx.memory, fx.left, fx.theory),
+    proof: { theory: fx.theory, targetOccurrence: left.occurrence, nodes: [left.node] },
+  };
+  const rightTheorem = {
+    theorem: defineStructuralTheorem(fx.memory, fx.right, fx.theory),
+    proof: { theory: fx.theory, targetOccurrence: right.occurrence, nodes: [right.node] },
+  };
+  const claim = fx.memory.ensure(fx.left, fx.right);
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole, fx.rightRole],
+    [[fx.leftRole, fx.left], [fx.rightRole, fx.right]],
+    fx.memory.ensure(fx.leftRole, fx.rightRole),
+    claim,
+    [fx.leftRole, fx.rightRole],
+    [left.occurrence, right.occurrence],
+  );
+  const derivation = { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] };
+  const first = replayStructuralDerivationWithTheorems(fx.memory, { derivation, theorems: [leftTheorem, rightTheorem] });
+  const second = replayStructuralDerivationWithTheorems(fx.memory, { derivation, theorems: [rightTheorem, leftTheorem] });
+  same(first.derivation.target.judgment.claim, second.derivation.target.judgment.claim, "theorem host order non-semantic");
+  same(first.derivation.occurrenceCount, 3, "two theorem closures expanded");
+}
+
+// A theorem Link is identity only: forged/missing/wrong proof evidence never grants truth.
+{
+  const fx = derivationFixture();
+  const root = fx.rootLeft();
+  const theorem = defineStructuralTheorem(fx.memory, fx.left, fx.theory);
+  expectTheoremError("invalid-theorem-proof", () => replayStructuralTheorem(fx.memory, {
+    theorem,
+    proof: { theory: fx.theory, targetOccurrence: root.occurrence, nodes: [] },
+  }));
+
+  const wrongClaimTheorem = defineStructuralTheorem(fx.memory, fx.right, fx.theory);
+  expectTheoremError("theorem-claim-mismatch", () => replayStructuralTheorem(fx.memory, {
+    theorem: wrongClaimTheorem,
+    proof: { theory: fx.theory, targetOccurrence: root.occurrence, nodes: [root.node] },
+  }));
+
+  const otherTheory = fx.fresh();
+  const wrongTheoryTheorem = defineStructuralTheorem(fx.memory, fx.left, otherTheory);
+  expectTheoremError("theorem-proof-theory-mismatch", () => replayStructuralTheorem(fx.memory, {
+    theorem: wrongTheoryTheorem,
+    proof: { theory: fx.theory, targetOccurrence: root.occurrence, nodes: [root.node] },
+  }));
+
+  const foreignTheorem = new Memory().root;
+  expectTheoremError("invalid-theorem-evidence", () => replayStructuralTheorem(fx.memory, {
+    theorem: foreignTheorem,
+    proof: { theory: fx.theory, targetOccurrence: root.occurrence, nodes: [root.node] },
+  }));
+}
+
+// Reuse is exact same-theory expansion: missing, unsupplied and unused theorem evidence fail closed.
+{
+  const fx = derivationFixture();
+  const lemma = fx.rootLeft();
+  const theoremEvidence = {
+    theorem: defineStructuralTheorem(fx.memory, fx.left, fx.theory),
+    proof: { theory: fx.theory, targetOccurrence: lemma.occurrence, nodes: [lemma.node] },
+  };
+  const targetContext = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.leftRole,
+    fx.left,
+    [fx.leftRole],
+    [lemma.occurrence],
+    targetContext,
+  );
+
+  expectDerivationError("dependency-occurrence-not-found", () => replayStructuralDerivationWithTheorems(fx.memory, {
+    derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
+    theorems: [],
+  }));
+
+  const unrelated = fx.rootRight();
+  expectDerivationError("unreachable-node", () => replayStructuralDerivationWithTheorems(fx.memory, {
+    derivation: { theory: fx.theory, targetOccurrence: unrelated.occurrence, nodes: [unrelated.node] },
+    theorems: [theoremEvidence],
+  }));
+
+  const otherTheory = fx.fresh();
+  const other = fx.environment(otherTheory);
+  const otherRoot = fx.node(other, [fx.leftRole], [[fx.leftRole, fx.left]], fx.leftRole, fx.left);
+  expectTheoremReuseError("theorem-reuse-theory-mismatch", () => replayStructuralDerivationWithTheorems(fx.memory, {
+    derivation: { theory: otherTheory, targetOccurrence: otherRoot.occurrence, nodes: [otherRoot.node] },
+    theorems: [theoremEvidence],
+  }));
+
+  const incompleteTheorem = {
+    ...theoremEvidence,
+    proof: { ...theoremEvidence.proof, nodes: [] },
+  };
+  expectTheoremReuseError("invalid-reused-theorem", () => replayStructuralDerivationWithTheorems(fx.memory, {
+    derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
+    theorems: [incompleteTheorem],
+  }));
 }

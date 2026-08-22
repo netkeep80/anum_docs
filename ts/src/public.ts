@@ -139,18 +139,29 @@ export type {
 export {
   StructuralDerivationReplayError,
   StructuralJudgmentReplayError,
+  StructuralTheoremReplayError,
+  StructuralTheoremReuseReplayError,
   replayStructuralDerivation,
+  replayStructuralDerivationWithTheorems,
   replayStructuralJudgment,
+  replayStructuralTheorem,
 } from "./derivation.js";
 export type {
   StructuralDerivationEvidence,
   StructuralDerivationNodeEvidence,
   StructuralDerivationReplayErrorCode,
   StructuralDerivationReplayResult,
+  StructuralDerivationWithTheoremsEvidence,
+  StructuralDerivationWithTheoremsReplayResult,
   StructuralJudgment,
   StructuralJudgmentEvidence,
   StructuralJudgmentReplayErrorCode,
   StructuralJudgmentReplayResult,
+  StructuralTheorem,
+  StructuralTheoremEvidence,
+  StructuralTheoremReplayErrorCode,
+  StructuralTheoremReplayResult,
+  StructuralTheoremReuseReplayErrorCode,
 } from "./derivation.js";
 
 export {
