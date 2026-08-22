@@ -35,6 +35,8 @@ import type {
   StructuralDerivationWithAssumptionsReplayResult,
   StructuralDerivationWithTheoremsEvidence,
   StructuralJudgmentEvidence,
+  StructuralScopedDerivationEvidence,
+  StructuralScopedDerivationReplayResult,
   StructuralTheoremEvidence,
   WriteMemory,
 } from "../src/public.js";
@@ -95,6 +97,7 @@ const expectedRuntimeExports = [
   "StructuralAssumptionReplayError",
   "StructuralDerivationReplayError",
   "StructuralJudgmentReplayError",
+  "StructuralScopedDerivationReplayError",
   "StructuralTheoremReplayError",
   "StructuralTheoremReuseReplayError",
   "ValueBundleReplayError",
@@ -139,6 +142,7 @@ const expectedRuntimeExports = [
   "replayStructuralDerivationWithAssumptions",
   "replayStructuralDerivationWithTheorems",
   "replayStructuralJudgment",
+  "replayStructuralScopedDerivation",
   "replayStructuralTheorem",
   "resolveFlatBundle",
   "symbolicStackAlgebra",
@@ -147,7 +151,7 @@ const expectedRuntimeExports = [
   "verifyPortableStructuralDerivationWithAssumptionsProvenanceClaim",
 ].sort();
 
-assert(expectedRuntimeExports.length === 79, "P7b runtime export budget must be exactly 79");
+assert(expectedRuntimeExports.length === 81, "P9a1 runtime export budget must be exactly 81");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
@@ -221,6 +225,8 @@ const derivation: StructuralDerivationEvidence | undefined = undefined;
 const derivationWithAssumptions: StructuralDerivationWithAssumptionsEvidence | undefined = undefined;
 const derivationWithAssumptionsResult: StructuralDerivationWithAssumptionsReplayResult | undefined = undefined;
 const derivationWithTheorems: StructuralDerivationWithTheoremsEvidence | undefined = undefined;
+const scopedDerivation: StructuralScopedDerivationEvidence | undefined = undefined;
+const scopedDerivationResult: StructuralScopedDerivationReplayResult | undefined = undefined;
 const theorem: StructuralTheoremEvidence | undefined = undefined;
 const judgment: StructuralJudgmentEvidence | undefined = undefined;
 const proof: DecomposeEqualityEvidence | undefined = undefined;
@@ -272,6 +278,8 @@ void [
   derivationWithAssumptions,
   derivationWithAssumptionsResult,
   derivationWithTheorems,
+  scopedDerivation,
+  scopedDerivationResult,
   theorem,
   judgment,
   proof,
