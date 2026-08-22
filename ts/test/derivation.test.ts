@@ -17,8 +17,6 @@ import {
   defineStructuralProofOccurrence,
   replayStructuralDerivation,
   replayStructuralJudgment,
-  type StructuralDerivationEvidence,
-  type StructuralDerivationNodeEvidence,
   type StructuralJudgmentEvidence,
 } from "../src/derivation.js";
 
@@ -192,51 +190,13 @@ function fixture(): Fixture {
   ));
 }
 
-interface DerivationEnvironment {
-  readonly theory: LinkHandle;
-  readonly interpreter: LinkHandle;
-  readonly expectedInterpreter: StructuralInterpreter;
-}
+type Binding = readonly [LinkHandle, LinkHandle];
 
-interface DerivationNodeFixture {
-  readonly node: StructuralDerivationNodeEvidence;
-  readonly occurrence: LinkHandle;
-  readonly act: LinkHandle;
-  readonly claim: LinkHandle;
-  readonly derivationRule: LinkHandle;
-}
-
-interface DerivationFixture {
-  readonly memory: Memory;
-  readonly fresh: () => LinkHandle;
-  readonly theory: LinkHandle;
-  readonly context: LinkHandle;
-  readonly leftRole: LinkHandle;
-  readonly rightRole: LinkHandle;
-  readonly left: LinkHandle;
-  readonly right: LinkHandle;
-  readonly mainEnvironment: DerivationEnvironment;
-  readonly environment: (theory: LinkHandle) => DerivationEnvironment;
-  readonly node: (
-    environment: DerivationEnvironment,
-    roles: readonly LinkHandle[],
-    bindings: readonly (readonly [LinkHandle, LinkHandle])[],
-    template: LinkHandle,
-    claim: LinkHandle,
-    premiseTemplates: readonly LinkHandle[],
-    premiseOccurrences: readonly LinkHandle[],
-  ) => DerivationNodeFixture;
-}
-
-function derivationFixture(): DerivationFixture {
+function derivationFixture() {
   const memory = new Memory();
   const { R, U } = ensureRootBasis(memory);
   let cursor = U;
-  const fresh = (): LinkHandle => {
-    cursor = memory.ensure(cursor, R);
-    return cursor;
-  };
-
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
   const dictionary = fresh();
   const grammar = fresh();
   const theory = fresh();
@@ -246,418 +206,141 @@ function derivationFixture(): DerivationFixture {
   const left = fresh();
   const right = fresh();
 
-  const environment = (selectedTheory: LinkHandle): DerivationEnvironment => {
-    const expectedInterpreter: StructuralInterpreter = Object.freeze({
-      dictionary,
-      grammar,
+  const environment = (selectedTheory: LinkHandle) => {
+    const expectedInterpreter: StructuralInterpreter = { dictionary, grammar, theory: selectedTheory };
+    return {
       theory: selectedTheory,
-    });
-    return Object.freeze({
-      theory: selectedTheory,
-      interpreter: defineStructuralInterpreter(memory, dictionary, grammar, selectedTheory),
       expectedInterpreter,
-    });
+      interpreter: defineStructuralInterpreter(memory, dictionary, grammar, selectedTheory),
+    };
   };
-
-  const mainEnvironment = environment(theory);
+  const main = environment(theory);
 
   const node = (
-    selectedEnvironment: DerivationEnvironment,
+    env: ReturnType<typeof environment>,
     roles: readonly LinkHandle[],
-    bindings: readonly (readonly [LinkHandle, LinkHandle])[],
+    bindings: readonly Binding[],
     template: LinkHandle,
     claim: LinkHandle,
-    premiseTemplates: readonly LinkHandle[],
-    premiseOccurrences: readonly LinkHandle[],
-  ): DerivationNodeFixture => {
+    premiseTemplates: readonly LinkHandle[] = [],
+    premiseOccurrences: readonly LinkHandle[] = [],
+  ) => {
     const roleDictionary = defineStructuralRoleDictionary(memory, roles);
     const rule = defineStructuralRule(memory, roleDictionary, template);
-    const ruleAdmission = admitStructuralRule(memory, selectedEnvironment.theory, rule);
-    const act = defineActHeader(
-      memory,
-      selectedEnvironment.interpreter,
-      roleDictionary,
-      context,
-    );
-    for (const [role, value] of bindings) {
-      defineActField(memory, act, role, value);
-    }
-
-    const judgment: StructuralJudgmentEvidence = Object.freeze({
-      application: Object.freeze({
+    const ruleAdmission = admitStructuralRule(memory, env.theory, rule);
+    const act = defineActHeader(memory, env.interpreter, roleDictionary, context);
+    bindings.forEach(([role, value]) => defineActField(memory, act, role, value));
+    const judgment: StructuralJudgmentEvidence = {
+      application: {
         act,
         rule,
         ruleAdmission,
         claimedBody: claim,
-        expectedInterpreter: selectedEnvironment.expectedInterpreter,
+        expectedInterpreter: env.expectedInterpreter,
         expectedAfterContext: context,
-      }),
-      judgment: Object.freeze({
-        theory: selectedEnvironment.theory,
-        context,
-        claim,
-      }),
-    });
-
+      },
+      judgment: { theory: env.theory, context, claim },
+    };
     const occurrence = defineStructuralProofOccurrence(memory, act, claim);
     const derivationRule = defineStructuralDerivationRule(memory, rule, premiseTemplates);
-    const derivationRuleAdmission = admitStructuralDerivationRule(
-      memory,
-      selectedEnvironment.theory,
+    return {
+      act,
+      claim,
+      occurrence,
       derivationRule,
-    );
-    const premiseOccurrenceSequence = materializeExactSequence(memory, premiseOccurrences);
-
-    return Object.freeze({
-      node: Object.freeze({
+      node: {
         occurrence,
         judgment,
         derivationRule,
-        derivationRuleAdmission,
-        premiseOccurrenceSequence,
-      }),
-      occurrence,
-      act,
+        derivationRuleAdmission: admitStructuralDerivationRule(memory, env.theory, derivationRule),
+        premiseOccurrenceSequence: materializeExactSequence(memory, premiseOccurrences),
+      },
+    };
+  };
+
+  const rootLeft = () => node(main, [leftRole], [[leftRole, left]], leftRole, left);
+  const rootRight = () => node(main, [rightRole], [[rightRole, right]], rightRole, right);
+  const branch = () => {
+    const l = rootLeft();
+    const r = rootRight();
+    const claim = memory.ensure(left, right);
+    const target = node(
+      main,
+      [leftRole, rightRole],
+      [[leftRole, left], [rightRole, right]],
+      memory.ensure(leftRole, rightRole),
       claim,
-      derivationRule,
-    });
+      [leftRole, rightRole],
+      [l.occurrence, r.occurrence],
+    );
+    return { l, r, target, evidence: { theory, targetOccurrence: target.occurrence, nodes: [target.node, r.node, l.node] } };
   };
-
-  return {
-    memory,
-    fresh,
-    theory,
-    context,
-    leftRole,
-    rightRole,
-    left,
-    right,
-    mainEnvironment,
-    environment,
-    node,
-  };
+  return { memory, fresh, theory, leftRole, rightRole, left, right, main, environment, node, rootLeft, branch };
 }
 
-function zeroLeft(fx: DerivationFixture): DerivationNodeFixture {
-  return fx.node(
-    fx.mainEnvironment,
-    [fx.leftRole],
-    [[fx.leftRole, fx.left]],
-    fx.leftRole,
-    fx.left,
-    [],
-    [],
-  );
-}
-
-function zeroRight(fx: DerivationFixture): DerivationNodeFixture {
-  return fx.node(
-    fx.mainEnvironment,
-    [fx.rightRole],
-    [[fx.rightRole, fx.right]],
-    fx.rightRole,
-    fx.right,
-    [],
-    [],
-  );
-}
-
-function branchEvidence(fx: DerivationFixture): {
-  readonly leftRoot: DerivationNodeFixture;
-  readonly rightRoot: DerivationNodeFixture;
-  readonly target: DerivationNodeFixture;
-  readonly evidence: StructuralDerivationEvidence;
-} {
-  const leftRoot = zeroLeft(fx);
-  const rightRoot = zeroRight(fx);
-  const targetClaim = fx.memory.ensure(fx.left, fx.right);
-  const targetTemplate = fx.memory.ensure(fx.leftRole, fx.rightRole);
-  const target = fx.node(
-    fx.mainEnvironment,
-    [fx.leftRole, fx.rightRole],
-    [[fx.leftRole, fx.left], [fx.rightRole, fx.right]],
-    targetTemplate,
-    targetClaim,
-    [fx.leftRole, fx.rightRole],
-    [leftRoot.occurrence, rightRoot.occurrence],
-  );
-  return {
-    leftRoot,
-    rightRoot,
-    target,
-    evidence: Object.freeze({
-      theory: fx.theory,
-      targetOccurrence: target.occurrence,
-      nodes: Object.freeze([target.node, rightRoot.node, leftRoot.node]),
-    }),
-  };
-}
-
-// Zero-premise admitted DerivationRule is an explicit structural proof root.
+// Positive P2: zero-premise root, linear reuse, branching, host-order independence, read-only replay.
 {
   const fx = derivationFixture();
-  const root = zeroLeft(fx);
-  const before = fx.memory.linkCount;
-  const result = replayStructuralDerivation(fx.memory, {
-    theory: fx.theory,
-    targetOccurrence: root.occurrence,
-    nodes: [root.node],
-  });
-  same(result.targetOccurrence, root.occurrence, "zero-premise target occurrence");
-  same(result.target.judgment.claim, fx.left, "zero-premise target claim");
-  same(result.occurrenceCount, 1, "zero-premise closure size");
-  same(fx.memory.linkCount, before, "derivation replay must be read-only");
+  const root = fx.rootLeft();
+  const beforeRoot = fx.memory.linkCount;
+  same(replayStructuralDerivation(fx.memory, { theory: fx.theory, targetOccurrence: root.occurrence, nodes: [root.node] }).occurrenceCount, 1, "root closure");
+  same(fx.memory.linkCount, beforeRoot, "root replay read-only");
+
+  const step = fx.node(fx.main, [fx.leftRole], [[fx.leftRole, fx.left]], fx.leftRole, fx.left, [fx.leftRole], [root.occurrence]);
+  assert(step.act !== root.act && step.occurrence !== root.occurrence, "same Claim must allow distinct proof histories");
+  same(step.claim, root.claim, "proof history != theorem identity");
+  same(replayStructuralDerivation(fx.memory, { theory: fx.theory, targetOccurrence: step.occurrence, nodes: [step.node, root.node] }).occurrenceCount, 2, "linear closure");
+
+  const b = fx.branch();
+  const beforeBranch = fx.memory.linkCount;
+  const a = replayStructuralDerivation(fx.memory, b.evidence);
+  const reordered = replayStructuralDerivation(fx.memory, { ...b.evidence, nodes: [b.l.node, b.target.node, b.r.node] });
+  same(a.target.judgment.claim, b.target.claim, "branch target");
+  same(reordered.occurrenceCount, 3, "host node order non-semantic");
+  same(fx.memory.linkCount, beforeBranch, "branch replay read-only");
 }
 
-// Linear proof: two different Acts can be distinct proof histories for one Claim.
+// Exact dependency closure, premise cardinality/order, occurrence identity, admission and reachability.
 {
   const fx = derivationFixture();
-  const root = zeroLeft(fx);
-  const step = fx.node(
-    fx.mainEnvironment,
-    [fx.leftRole],
-    [[fx.leftRole, fx.left]],
-    fx.leftRole,
-    fx.left,
-    [fx.leftRole],
-    [root.occurrence],
-  );
-  assert(step.act !== root.act, "linear proof must use a second Act occurrence");
-  assert(step.occurrence !== root.occurrence, "same Claim with different Acts must have distinct occurrences");
-  same(step.claim, root.claim, "proof history must not redefine Claim identity");
-  const result = replayStructuralDerivation(fx.memory, {
-    theory: fx.theory,
-    targetOccurrence: step.occurrence,
-    nodes: [step.node, root.node],
-  });
-  same(result.occurrenceCount, 2, "linear closure size");
-}
+  const b = fx.branch();
+  expectDerivationError("dependency-occurrence-not-found", () => replayStructuralDerivation(fx.memory, { ...b.evidence, nodes: [b.target.node, b.l.node] }));
 
-// Branching proof and outer host node order are independent.
-{
-  const fx = derivationFixture();
-  const branch = branchEvidence(fx);
-  const before = fx.memory.linkCount;
-  const first = replayStructuralDerivation(fx.memory, branch.evidence);
-  const reordered = replayStructuralDerivation(fx.memory, {
-    ...branch.evidence,
-    nodes: [branch.leftRoot.node, branch.target.node, branch.rightRoot.node],
-  });
-  same(first.target.judgment.claim, branch.target.claim, "branch target claim");
-  same(reordered.target.judgment.claim, branch.target.claim, "reordered host transport target");
-  same(first.occurrenceCount, 3, "branch closure size");
-  same(reordered.occurrenceCount, 3, "reordered branch closure size");
-  same(fx.memory.linkCount, before, "host reorder replay must be read-only");
-}
+  const missing = materializeExactSequence(fx.memory, [b.l.occurrence]);
+  expectDerivationError("missing-premise", () => replayStructuralDerivation(fx.memory, { ...b.evidence, nodes: [{ ...b.target.node, premiseOccurrenceSequence: missing }, b.l.node, b.r.node] }));
+  const extra = materializeExactSequence(fx.memory, [b.l.occurrence, b.r.occurrence, b.l.occurrence]);
+  expectDerivationError("extra-premise", () => replayStructuralDerivation(fx.memory, { ...b.evidence, nodes: [{ ...b.target.node, premiseOccurrenceSequence: extra }, b.l.node, b.r.node] }));
+  const swapped = materializeExactSequence(fx.memory, [b.r.occurrence, b.l.occurrence]);
+  expectDerivationError("premise-claim-mismatch", () => replayStructuralDerivation(fx.memory, { ...b.evidence, nodes: [{ ...b.target.node, premiseOccurrenceSequence: swapped }, b.r.node, b.l.node] }));
 
-// Missing dependency node cannot be repaired by a valid target application.
-{
-  const fx = derivationFixture();
-  const branch = branchEvidence(fx);
-  expectDerivationError("dependency-occurrence-not-found", () => replayStructuralDerivation(
-    fx.memory,
-    { ...branch.evidence, nodes: [branch.target.node, branch.leftRoot.node] },
-  ));
-}
-
-// Premise occurrence cardinality is exact against the admitted DerivationRule schema.
-{
-  const fx = derivationFixture();
-  const branch = branchEvidence(fx);
-  const missingSequence = materializeExactSequence(fx.memory, [branch.leftRoot.occurrence]);
-  expectDerivationError("missing-premise", () => replayStructuralDerivation(
-    fx.memory,
-    {
-      ...branch.evidence,
-      nodes: [
-        { ...branch.target.node, premiseOccurrenceSequence: missingSequence },
-        branch.leftRoot.node,
-        branch.rightRoot.node,
-      ],
-    },
-  ));
-
-  const extraSequence = materializeExactSequence(
-    fx.memory,
-    [branch.leftRoot.occurrence, branch.rightRoot.occurrence, branch.leftRoot.occurrence],
-  );
-  expectDerivationError("extra-premise", () => replayStructuralDerivation(
-    fx.memory,
-    {
-      ...branch.evidence,
-      nodes: [
-        { ...branch.target.node, premiseOccurrenceSequence: extraSequence },
-        branch.leftRoot.node,
-        branch.rightRoot.node,
-      ],
-    },
-  ));
-}
-
-// Premise order comes from structural ExactSequence, not host nodes[].
-{
-  const fx = derivationFixture();
-  const branch = branchEvidence(fx);
-  const swapped = materializeExactSequence(
-    fx.memory,
-    [branch.rightRoot.occurrence, branch.leftRoot.occurrence],
-  );
-  expectDerivationError("premise-claim-mismatch", () => replayStructuralDerivation(
-    fx.memory,
-    {
-      ...branch.evidence,
-      nodes: [
-        { ...branch.target.node, premiseOccurrenceSequence: swapped },
-        branch.rightRoot.node,
-        branch.leftRoot.node,
-      ],
-    },
-  ));
-}
-
-// ProofOccurrence must structurally equal Pair(Act, Claim).
-{
-  const fx = derivationFixture();
-  const root = zeroLeft(fx);
   const forgedOccurrence = fx.memory.ensure(fx.fresh(), fx.fresh());
-  expectDerivationError("occurrence-mismatch", () => replayStructuralDerivation(
-    fx.memory,
-    {
-      theory: fx.theory,
-      targetOccurrence: forgedOccurrence,
-      nodes: [{ ...root.node, occurrence: forgedOccurrence }],
-    },
-  ));
+  expectDerivationError("occurrence-mismatch", () => replayStructuralDerivation(fx.memory, { theory: fx.theory, targetOccurrence: forgedOccurrence, nodes: [{ ...b.l.node, occurrence: forgedOccurrence }] }));
+  expectDerivationError("duplicate-occurrence", () => replayStructuralDerivation(fx.memory, { theory: fx.theory, targetOccurrence: b.l.occurrence, nodes: [b.l.node, b.l.node] }));
+
+  const forgedAdmission = fx.memory.ensure(fx.fresh(), b.l.derivationRule);
+  expectDerivationError("derivation-rule-not-admitted", () => replayStructuralDerivation(fx.memory, { theory: fx.theory, targetOccurrence: b.l.occurrence, nodes: [{ ...b.l.node, derivationRuleAdmission: forgedAdmission }] }));
+  const unrelated = fx.rootLeft();
+  expectDerivationError("unreachable-node", () => replayStructuralDerivation(fx.memory, { ...b.evidence, nodes: [...b.evidence.nodes, unrelated.node] }));
 }
 
-// Structural occurrence identity is unique in the transport set.
+// Cross-theory dependencies, cycles and foreign handles fail closed.
 {
   const fx = derivationFixture();
-  const root = zeroLeft(fx);
-  expectDerivationError("duplicate-occurrence", () => replayStructuralDerivation(
-    fx.memory,
-    {
-      theory: fx.theory,
-      targetOccurrence: root.occurrence,
-      nodes: [root.node, root.node],
-    },
-  ));
-}
+  const other = fx.environment(fx.fresh());
+  const cross = fx.node(other, [fx.leftRole], [[fx.leftRole, fx.left]], fx.leftRole, fx.left);
+  const target = fx.node(fx.main, [fx.leftRole], [[fx.leftRole, fx.left]], fx.leftRole, fx.left, [fx.leftRole], [cross.occurrence]);
+  expectDerivationError("cross-theory-node", () => replayStructuralDerivation(fx.memory, { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node, cross.node] }));
 
-// A DerivationRule requires its own exact T ⟼ DerivationRule admission.
-{
-  const fx = derivationFixture();
-  const root = zeroLeft(fx);
-  const forgedAdmission = fx.memory.ensure(fx.fresh(), root.derivationRule);
-  expectDerivationError("derivation-rule-not-admitted", () => replayStructuralDerivation(
-    fx.memory,
-    {
-      theory: fx.theory,
-      targetOccurrence: root.occurrence,
-      nodes: [{ ...root.node, derivationRuleAdmission: forgedAdmission }],
-    },
-  ));
-}
-
-// A valid node from another Theory cannot satisfy a dependency in this derivation.
-{
-  const fx = derivationFixture();
-  const otherTheory = fx.fresh();
-  const otherEnvironment = fx.environment(otherTheory);
-  const foreignTheoryRoot = fx.node(
-    otherEnvironment,
-    [fx.leftRole],
-    [[fx.leftRole, fx.left]],
-    fx.leftRole,
-    fx.left,
-    [],
-    [],
-  );
-  const target = fx.node(
-    fx.mainEnvironment,
-    [fx.leftRole],
-    [[fx.leftRole, fx.left]],
-    fx.leftRole,
-    fx.left,
-    [fx.leftRole],
-    [foreignTheoryRoot.occurrence],
-  );
-  expectDerivationError("cross-theory-node", () => replayStructuralDerivation(
-    fx.memory,
-    {
-      theory: fx.theory,
-      targetOccurrence: target.occurrence,
-      nodes: [target.node, foreignTheoryRoot.node],
-    },
-  ));
-}
-
-// Cyclic dependencies fail closed; recursive proof semantics is not implicit.
-{
-  const fx = derivationFixture();
-  const first = fx.node(
-    fx.mainEnvironment,
-    [fx.leftRole],
-    [[fx.leftRole, fx.left]],
-    fx.leftRole,
-    fx.left,
-    [fx.leftRole],
-    [],
-  );
-  const second = fx.node(
-    fx.mainEnvironment,
-    [fx.leftRole],
-    [[fx.leftRole, fx.left]],
-    fx.leftRole,
-    fx.left,
-    [fx.leftRole],
-    [],
-  );
+  const first = fx.node(fx.main, [fx.leftRole], [[fx.leftRole, fx.left]], fx.leftRole, fx.left, [fx.leftRole]);
+  const second = fx.node(fx.main, [fx.leftRole], [[fx.leftRole, fx.left]], fx.leftRole, fx.left, [fx.leftRole]);
   const firstDeps = materializeExactSequence(fx.memory, [second.occurrence]);
   const secondDeps = materializeExactSequence(fx.memory, [first.occurrence]);
-  expectDerivationError("cyclic-dependency", () => replayStructuralDerivation(
-    fx.memory,
-    {
-      theory: fx.theory,
-      targetOccurrence: first.occurrence,
-      nodes: [
-        { ...first.node, premiseOccurrenceSequence: firstDeps },
-        { ...second.node, premiseOccurrenceSequence: secondDeps },
-      ],
-    },
-  ));
-}
+  expectDerivationError("cyclic-dependency", () => replayStructuralDerivation(fx.memory, {
+    theory: fx.theory,
+    targetOccurrence: first.occurrence,
+    nodes: [{ ...first.node, premiseOccurrenceSequence: firstDeps }, { ...second.node, premiseOccurrenceSequence: secondDeps }],
+  }));
 
-// Supplied evidence must be the exact target closure; unrelated valid nodes are rejected.
-{
-  const fx = derivationFixture();
-  const branch = branchEvidence(fx);
-  const unrelated = fx.node(
-    fx.mainEnvironment,
-    [fx.leftRole],
-    [[fx.leftRole, fx.left]],
-    fx.leftRole,
-    fx.left,
-    [],
-    [],
-  );
-  expectDerivationError("unreachable-node", () => replayStructuralDerivation(
-    fx.memory,
-    { ...branch.evidence, nodes: [...branch.evidence.nodes, unrelated.node] },
-  ));
-}
-
-// Foreign target handles fail at the Memory boundary rather than becoming host IDs.
-{
-  const fx = derivationFixture();
-  const root = zeroLeft(fx);
   const foreign = new Memory().root;
-  expectDerivationError("invalid-derivation-evidence", () => replayStructuralDerivation(
-    fx.memory,
-    {
-      theory: fx.theory,
-      targetOccurrence: foreign,
-      nodes: [root.node],
-    },
-  ));
+  expectDerivationError("invalid-derivation-evidence", () => replayStructuralDerivation(fx.memory, { theory: fx.theory, targetOccurrence: foreign, nodes: [fx.rootLeft().node] }));
 }
