@@ -170,6 +170,16 @@ export type {
 } from "./derivation.js";
 
 export {
+  StructuralScopedDerivationReplayError,
+  replayStructuralScopedDerivation,
+} from "./scoped-derivation.js";
+export type {
+  StructuralScopedDerivationEvidence,
+  StructuralScopedDerivationReplayErrorCode,
+  StructuralScopedDerivationReplayResult,
+} from "./scoped-derivation.js";
+
+export {
   PORTABLE_MTS_SEMANTIC_BASE,
   PORTABLE_STRUCTURAL_DERIVATION_SCHEMA,
   PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_SCHEMA,
