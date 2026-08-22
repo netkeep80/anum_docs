@@ -1,5 +1,11 @@
 import { materializeExactSequence } from "../src/exact-sequence.js";
-import { Memory, ensureRootBasis, type LinkHandle } from "../src/memory.js";
+import {
+  Memory,
+  ensureRootBasis,
+  type LinkHandle,
+  type ReadMemory,
+  type StructuralDerivationEvidence,
+} from "../src/public.js";
 import { defineContext } from "../src/state.js";
 import { defineActField, defineActHeader } from "../src/structural-readers.js";
 import {
@@ -10,15 +16,18 @@ import {
   type StructuralInterpreter,
 } from "../src/structural-rule.js";
 import {
+  StructuralAssumptionReplayError,
   StructuralDerivationReplayError,
   StructuralJudgmentReplayError,
   StructuralTheoremReplayError,
   StructuralTheoremReuseReplayError,
   admitStructuralDerivationRule,
+  defineStructuralAssumptionContext,
   defineStructuralDerivationRule,
   defineStructuralProofOccurrence,
   defineStructuralTheorem,
   replayStructuralDerivation,
+  replayStructuralDerivationWithAssumptions,
   replayStructuralDerivationWithTheorems,
   replayStructuralJudgment,
   replayStructuralTheorem,
@@ -87,6 +96,20 @@ function expectTheoremReuseError(
     return;
   }
   throw new Error(`${code}: expected StructuralTheoremReuseReplayError`);
+}
+
+function expectAssumptionError(
+  code: StructuralAssumptionReplayError["code"],
+  effect: () => unknown,
+): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(error instanceof StructuralAssumptionReplayError, `${code}: wrong error type`);
+    same(error.code, code, `${code}: wrong error code`);
+    return;
+  }
+  throw new Error(`${code}: expected StructuralAssumptionReplayError`);
 }
 
 interface Fixture {
@@ -624,4 +647,347 @@ function derivationFixture() {
     derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
     theorems: [incompleteTheorem],
   }));
+}
+
+function assumptionFixture(claims: readonly LinkHandle[]) {
+  const fx = derivationFixture();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, claims);
+  const occurrences = claims.map((claim) => {
+    const occurrence = fx.memory.find(assumptionContext, claim);
+    assert(occurrence !== undefined, "assumption occurrence must be materialized");
+    return occurrence;
+  });
+  return { ...fx, assumptionContext, occurrences };
+}
+
+// P3b: one scoped assumption satisfies an explicit premise without a fake proof Act.
+{
+  const fx = derivationFixture();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.left]);
+  const assumption = fx.memory.find(assumptionContext, fx.left);
+  assert(assumption !== undefined, "left assumption occurrence");
+  const targetContext = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.leftRole,
+    fx.left,
+    [fx.leftRole],
+    [assumption],
+    targetContext,
+  );
+  const derivation = { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] };
+
+  expectDerivationError("dependency-occurrence-not-found", () => replayStructuralDerivation(fx.memory, derivation));
+  const before = fx.memory.linkCount;
+  const result = replayStructuralDerivationWithAssumptions(fx.memory, { derivation, assumptionContext });
+  same(result.derivation.target.judgment.claim, fx.left, "conditional target");
+  same(result.declaredAssumptionClaims.length, 1, "one declared assumption");
+  same(result.usedAssumptionOccurrences.length, 1, "one used assumption");
+  same(result.usedAssumptionOccurrences[0], assumption, "exact used assumption occurrence");
+  same(fx.memory.linkCount, before, "assumption replay read-only");
+}
+
+// Two assumptions satisfy an ordered multi-premise rule; declaration order remains structural.
+{
+  const fx = derivationFixture();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.left, fx.right]);
+  const leftAssumption = fx.memory.find(assumptionContext, fx.left);
+  const rightAssumption = fx.memory.find(assumptionContext, fx.right);
+  assert(leftAssumption !== undefined && rightAssumption !== undefined, "two assumption occurrences");
+  const claim = fx.memory.ensure(fx.left, fx.right);
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole, fx.rightRole],
+    [[fx.leftRole, fx.left], [fx.rightRole, fx.right]],
+    fx.memory.ensure(fx.leftRole, fx.rightRole),
+    claim,
+    [fx.leftRole, fx.rightRole],
+    [leftAssumption, rightAssumption],
+  );
+  const result = replayStructuralDerivationWithAssumptions(fx.memory, {
+    derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
+    assumptionContext,
+  });
+  same(result.usedAssumptionOccurrences.length, 2, "two used assumptions");
+  same(result.usedAssumptionOccurrences[0], leftAssumption, "declared order left");
+  same(result.usedAssumptionOccurrences[1], rightAssumption, "declared order right");
+}
+
+// Mixed dependency: one proven P2 occurrence and one scoped assumption use the same matcher.
+{
+  const fx = derivationFixture();
+  const proven = fx.rootLeft();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.right]);
+  const assumed = fx.memory.find(assumptionContext, fx.right);
+  assert(assumed !== undefined, "right assumption occurrence");
+  const claim = fx.memory.ensure(fx.left, fx.right);
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole, fx.rightRole],
+    [[fx.leftRole, fx.left], [fx.rightRole, fx.right]],
+    fx.memory.ensure(fx.leftRole, fx.rightRole),
+    claim,
+    [fx.leftRole, fx.rightRole],
+    [proven.occurrence, assumed],
+  );
+  const result = replayStructuralDerivationWithAssumptions(fx.memory, {
+    derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node, proven.node] },
+    assumptionContext,
+  });
+  same(result.derivation.occurrenceCount, 2, "only proof nodes count as occurrences");
+  same(result.usedAssumptionOccurrences[0], assumed, "mixed proof uses assumption");
+}
+
+// One declared assumption can satisfy multiple explicit premise positions.
+{
+  const fx = derivationFixture();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.left]);
+  const assumed = fx.memory.find(assumptionContext, fx.left);
+  assert(assumed !== undefined, "reused assumption occurrence");
+  const targetContext = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.leftRole,
+    fx.left,
+    [fx.leftRole, fx.leftRole],
+    [assumed, assumed],
+    targetContext,
+  );
+  const result = replayStructuralDerivationWithAssumptions(fx.memory, {
+    derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
+    assumptionContext,
+  });
+  same(result.usedAssumptionOccurrences.length, 1, "reused assumption reported once");
+}
+
+// Unused declared assumptions are context weakening, not unreachable proof evidence.
+{
+  const fx = derivationFixture();
+  const root = fx.rootLeft();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.right]);
+  const before = fx.memory.linkCount;
+  const result = replayStructuralDerivationWithAssumptions(fx.memory, {
+    derivation: { theory: fx.theory, targetOccurrence: root.occurrence, nodes: [root.node] },
+    assumptionContext,
+  });
+  same(result.declaredAssumptionClaims.length, 1, "unused assumption remains declared");
+  same(result.usedAssumptionOccurrences.length, 0, "unused assumption not promoted to dependency");
+  same(fx.memory.linkCount, before, "weakening replay read-only");
+}
+
+// Empty assumption context reduces to ordinary P2 for a fully proven derivation.
+{
+  const fx = derivationFixture();
+  const b = fx.branch();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, []);
+  const ordinary = replayStructuralDerivation(fx.memory, b.evidence);
+  const conditional = replayStructuralDerivationWithAssumptions(fx.memory, {
+    derivation: b.evidence,
+    assumptionContext,
+  });
+  same(conditional.derivation.target.judgment.claim, ordinary.target.judgment.claim, "empty assumptions preserve target");
+  same(conditional.derivation.occurrenceCount, ordinary.occurrenceCount, "empty assumptions preserve closure");
+  same(conditional.declaredAssumptionClaims.length, 0, "empty logical context");
+}
+
+// Assumption context is exact Theory-scoped ordered data and duplicates are rejected.
+{
+  const fx = derivationFixture();
+  const root = fx.rootLeft();
+  const derivation = { theory: fx.theory, targetOccurrence: root.occurrence, nodes: [root.node] };
+  const otherTheory = fx.fresh();
+  const wrongTheoryContext = defineStructuralAssumptionContext(fx.memory, otherTheory, [fx.left]);
+  expectAssumptionError("assumption-theory-mismatch", () => replayStructuralDerivationWithAssumptions(
+    fx.memory,
+    { derivation, assumptionContext: wrongTheoryContext },
+  ));
+
+  const duplicateContext = materializeExactSequence(fx.memory, [fx.theory, fx.left, fx.left]);
+  fx.memory.ensure(duplicateContext, fx.left);
+  expectAssumptionError("duplicate-assumption", () => replayStructuralDerivationWithAssumptions(
+    fx.memory,
+    { derivation, assumptionContext: duplicateContext },
+  ));
+
+  const foreignContext = new Memory().root;
+  expectAssumptionError("invalid-assumption-context", () => replayStructuralDerivationWithAssumptions(
+    fx.memory,
+    { derivation, assumptionContext: foreignContext },
+  ));
+}
+
+// Every declared assumption requires an existing scoped Pair(scope, Claim); replay never materializes it.
+{
+  const fx = derivationFixture();
+  const root = fx.rootLeft();
+  const missingOccurrenceContext = materializeExactSequence(fx.memory, [fx.theory, fx.left]);
+  expectAssumptionError("missing-assumption-occurrence", () => replayStructuralDerivationWithAssumptions(
+    fx.memory,
+    {
+      derivation: { theory: fx.theory, targetOccurrence: root.occurrence, nodes: [root.node] },
+      assumptionContext: missingOccurrenceContext,
+    },
+  ));
+}
+
+// Undeclared assumption references and wrong assumed Claims fail closed.
+{
+  const fx = derivationFixture();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.left]);
+  const undeclared = fx.memory.ensure(assumptionContext, fx.right);
+  const unresolvedTarget = fx.node(
+    fx.main,
+    [fx.rightRole],
+    [[fx.rightRole, fx.right]],
+    fx.rightRole,
+    fx.right,
+    [fx.rightRole],
+    [undeclared],
+  );
+  expectAssumptionError("dependency-not-resolved", () => replayStructuralDerivationWithAssumptions(
+    fx.memory,
+    {
+      derivation: { theory: fx.theory, targetOccurrence: unresolvedTarget.occurrence, nodes: [unresolvedTarget.node] },
+      assumptionContext,
+    },
+  ));
+
+  const rightContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.right]);
+  const rightAssumption = fx.memory.find(rightContext, fx.right);
+  assert(rightAssumption !== undefined, "wrong-template assumption occurrence");
+  const wrongTemplateTarget = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.leftRole,
+    fx.left,
+    [fx.leftRole],
+    [rightAssumption],
+  );
+  expectAssumptionError("invalid-assumption-derivation", () => replayStructuralDerivationWithAssumptions(
+    fx.memory,
+    {
+      derivation: { theory: fx.theory, targetOccurrence: wrongTemplateTarget.occurrence, nodes: [wrongTemplateTarget.node] },
+      assumptionContext: rightContext,
+    },
+  ));
+}
+
+// Structural collision between proof and assumption dependency is rejected as ambiguous.
+{
+  const fx = derivationFixture();
+  const roleDictionary = defineStructuralRoleDictionary(fx.memory, [fx.leftRole]);
+  const rule = defineStructuralRule(fx.memory, roleDictionary, fx.leftRole);
+  const ruleAdmission = admitStructuralRule(fx.memory, fx.theory, rule);
+  const actContext = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const act = defineActHeader(fx.memory, fx.main.interpreter, roleDictionary, actContext);
+
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [act]);
+  defineActField(fx.memory, act, fx.leftRole, assumptionContext);
+  const collidedOccurrence = fx.memory.find(assumptionContext, act);
+  assert(collidedOccurrence !== undefined, "collided assumption occurrence");
+  same(defineStructuralProofOccurrence(fx.memory, act, assumptionContext), collidedOccurrence, "proof/assumption structural collision");
+
+  const collidingRule = defineStructuralDerivationRule(fx.memory, rule, []);
+  const collidingNode = {
+    occurrence: collidedOccurrence,
+    judgment: {
+      application: {
+        act,
+        rule,
+        ruleAdmission,
+        claimedBody: assumptionContext,
+        expectedInterpreter: fx.main.expectedInterpreter,
+        expectedAfterContext: actContext,
+      },
+      judgment: { theory: fx.theory, context: actContext, claim: assumptionContext },
+    },
+    derivationRule: collidingRule,
+    derivationRuleAdmission: admitStructuralDerivationRule(fx.memory, fx.theory, collidingRule),
+    premiseOccurrenceSequence: materializeExactSequence(fx.memory, []),
+  };
+
+  const targetContext = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, assumptionContext]],
+    fx.leftRole,
+    assumptionContext,
+    [fx.leftRole],
+    [collidedOccurrence],
+    targetContext,
+  );
+  expectAssumptionError("ambiguous-dependency", () => replayStructuralDerivationWithAssumptions(
+    fx.memory,
+    {
+      derivation: {
+        theory: fx.theory,
+        targetOccurrence: target.occurrence,
+        nodes: [target.node, collidingNode],
+      },
+      assumptionContext,
+    },
+  ));
+}
+
+// Conditional evidence cannot be smuggled into the unconditional P3a theorem boundary.
+{
+  const fx = derivationFixture();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.left]);
+  const assumed = fx.memory.find(assumptionContext, fx.left);
+  assert(assumed !== undefined, "conditional theorem assumption");
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.leftRole,
+    fx.left,
+    [fx.leftRole],
+    [assumed],
+  );
+  const conditionalEvidence = {
+    derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
+    assumptionContext,
+  };
+  replayStructuralDerivationWithAssumptions(fx.memory, conditionalEvidence);
+
+  const theorem = defineStructuralTheorem(fx.memory, fx.left, fx.theory);
+  expectTheoremError("theorem-proof-theory-mismatch", () => replayStructuralTheorem(fx.memory, {
+    theorem,
+    proof: conditionalEvidence as unknown as StructuralDerivationEvidence,
+  }));
+}
+
+// Any write during assumption resolution is detected even when the structural result would otherwise match.
+{
+  const fx = derivationFixture();
+  const root = fx.rootLeft();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, []);
+  let injected = false;
+  const malicious: ReadMemory = {
+    get root() { return fx.memory.root; },
+    get linkCount() { return fx.memory.linkCount; },
+    poles(link) { return fx.memory.poles(link); },
+    find(start, end) {
+      if (!injected) {
+        injected = true;
+        fx.memory.ensure(fx.fresh(), fx.fresh());
+      }
+      return fx.memory.find(start, end);
+    },
+    outgoing(start) { return fx.memory.outgoing(start); },
+    incoming(end) { return fx.memory.incoming(end); },
+  };
+  expectAssumptionError("assumption-replay-wrote", () => replayStructuralDerivationWithAssumptions(
+    malicious,
+    {
+      derivation: { theory: fx.theory, targetOccurrence: root.occurrence, nodes: [root.node] },
+      assumptionContext,
+    },
+  ));
 }
