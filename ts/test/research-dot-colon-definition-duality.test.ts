@@ -15,6 +15,17 @@ import {
   type ReadMemory,
   type WriteMemory,
 } from "../src/memory.js";
+import { defineContext } from "../src/state.js";
+import { defineActField, defineActHeader } from "../src/structural-readers.js";
+import {
+  StructuralRuleError,
+  admitStructuralRule,
+  defineStructuralInterpreter,
+  defineStructuralRoleDictionary,
+  defineStructuralRule,
+  replayStructuralRule,
+  type StructuralInterpreter,
+} from "../src/structural-rule.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`dot/colon definition duality: ${message}`);
@@ -29,6 +40,20 @@ function sameJson(actual: unknown, expected: unknown, message: string): void {
     JSON.stringify(actual) === JSON.stringify(expected),
     `${message}: ${JSON.stringify(actual)} !== ${JSON.stringify(expected)}`,
   );
+}
+
+function expectStructuralRuleError(
+  code: StructuralRuleError["code"],
+  effect: () => unknown,
+): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(error instanceof StructuralRuleError, `${code}: wrong error type`);
+    same(error.code, code, `${code}: wrong error code`);
+    return;
+  }
+  throw new Error(`dot/colon definition duality: ${code}: expected StructuralRuleError`);
 }
 
 class ReadProbe implements ReadMemory {
@@ -141,6 +166,40 @@ function exactCellPredecessor(
   const cellPoles = memory.poles(cell);
   same(cellPoles.start, cell, "ExactSequence cell is start-selfclosed");
   return memory.poles(cellPoles.end).start;
+}
+
+function materializeMethodPoleClaim(
+  memory: WriteMemory,
+  method: LinkHandle,
+  fromOccurrence: LinkHandle,
+  toOccurrence: LinkHandle,
+  start: LinkHandle,
+  end: LinkHandle,
+): LinkHandle {
+  const occurrenceRoles = memory.ensure(
+    memory.ensure(fromOccurrence, start),
+    memory.ensure(toOccurrence, end),
+  );
+  return memory.ensure(
+    method,
+    memory.ensure(start, memory.ensure(end, occurrenceRoles)),
+  );
+}
+
+type MethodPoleBinding = readonly [LinkHandle, LinkHandle];
+
+function materializeMethodPoleAct(
+  memory: WriteMemory,
+  interpreter: LinkHandle,
+  roleDictionary: LinkHandle,
+  afterContext: LinkHandle,
+  bindings: readonly MethodPoleBinding[],
+  reverseHostInsertion = false,
+): LinkHandle {
+  const act = defineActHeader(memory, interpreter, roleDictionary, afterContext);
+  const ordered = reverseHostInsertion ? [...bindings].reverse() : bindings;
+  for (const [role, value] of ordered) defineActField(memory, act, role, value);
+  return act;
 }
 
 const memory = new Memory();
@@ -260,14 +319,286 @@ const directTraversal = memory.ensure(firstSelfCell, secondSelfCell);
 const inverseTraversal = memory.ensure(secondSelfCell, firstSelfCell);
 assert(directTraversal !== inverseTraversal, "direct and inverse traversals are distinct Links");
 
-const interpreter = memory.ensure(colonMeaning, dotMeaning);
+const methodInterpreterStructure: StructuralInterpreter = Object.freeze({
+  dictionary: colonMeaning,
+  grammar: dotMeaning,
+  theory: generic,
+});
+const interpreter = defineStructuralInterpreter(
+  memory,
+  methodInterpreterStructure.dictionary,
+  methodInterpreterStructure.grammar,
+  methodInterpreterStructure.theory,
+);
 const directMethod = memory.ensure(interpreter, directTraversal);
 const inverseMethod = memory.ensure(interpreter, inverseTraversal);
 assert(directMethod !== inverseMethod, "same interpreter with inverse traversal yields another method Link");
 
+// H2e: use an admitted generic StructuralRule as MTS data, not a host callback.
+// Its template simultaneously verifies:
+//   Method = Pair(I, Pair(FROM,TO))
+//   S = Pair(S,A)  i.e. S is START(A)
+//   E = Pair(A,E)  i.e. E is END(A)
+// and then relates FROM -> S, TO -> E. Because Pair(S,A) is matched directly
+// against the claimed S Link (and Pair(A,E) directly against E), arbitrary
+// role labels cannot fake the one-sided fixed-point equations.
+const methodRoleCarrier = materializeExactSequence(
+  memory,
+  [generic, generic, generic, generic, generic, generic],
+);
+const methodRoles = readExactSequence(memory, methodRoleCarrier).cells;
+same(methodRoles.length, 6, "H2e rule has six exact structural roles");
+const wholeRole = methodRoles[0]!;
+const interpreterRole = methodRoles[1]!;
+const fromRole = methodRoles[2]!;
+const toRole = methodRoles[3]!;
+const startRole = methodRoles[4]!;
+const endRole = methodRoles[5]!;
+assert(new Set(methodRoles).size === methodRoles.length, "H2e structural roles are distinct");
+
+const methodRoleDictionary = defineStructuralRoleDictionary(memory, methodRoles);
+const methodTemplate = memory.ensure(
+  interpreterRole,
+  memory.ensure(fromRole, toRole),
+);
+const startEquationTemplate = memory.ensure(startRole, wholeRole);
+const endEquationTemplate = memory.ensure(wholeRole, endRole);
+const relativeRolesTemplate = memory.ensure(
+  memory.ensure(fromRole, startRole),
+  memory.ensure(toRole, endRole),
+);
+const methodPoleTemplate = memory.ensure(
+  methodTemplate,
+  memory.ensure(
+    startEquationTemplate,
+    memory.ensure(endEquationTemplate, relativeRolesTemplate),
+  ),
+);
+const methodPoleRule = defineStructuralRule(memory, methodRoleDictionary, methodPoleTemplate);
+const methodPoleAdmission = admitStructuralRule(
+  memory,
+  methodInterpreterStructure.theory,
+  methodPoleRule,
+);
+const methodContext = defineContext(memory, colonMeaning, dotMeaning);
+const hostOrderContext = defineContext(memory, dotMeaning, colonMeaning);
+
+const directBindings: readonly MethodPoleBinding[] = Object.freeze([
+  [wholeRole, R],
+  [interpreterRole, interpreter],
+  [fromRole, firstSelfCell],
+  [toRole, secondSelfCell],
+  [startRole, O],
+  [endRole, C],
+]);
+const inverseBindings: readonly MethodPoleBinding[] = Object.freeze([
+  [wholeRole, R],
+  [interpreterRole, interpreter],
+  [fromRole, secondSelfCell],
+  [toRole, firstSelfCell],
+  [startRole, O],
+  [endRole, C],
+]);
+const directAct = materializeMethodPoleAct(
+  memory,
+  interpreter,
+  methodRoleDictionary,
+  methodContext,
+  directBindings,
+);
+const inverseAct = materializeMethodPoleAct(
+  memory,
+  interpreter,
+  methodRoleDictionary,
+  methodContext,
+  inverseBindings,
+);
+const hostOrderAct = materializeMethodPoleAct(
+  memory,
+  interpreter,
+  methodRoleDictionary,
+  hostOrderContext,
+  directBindings,
+  true,
+);
+const directPoleClaim = materializeMethodPoleClaim(
+  memory,
+  directMethod,
+  firstSelfCell,
+  secondSelfCell,
+  O,
+  C,
+);
+const inversePoleClaim = materializeMethodPoleClaim(
+  memory,
+  inverseMethod,
+  secondSelfCell,
+  firstSelfCell,
+  O,
+  C,
+);
+
+// Genericity is tested on a non-root whole whose raw endpoint VALUES are equal.
+// The self-reference stays pole-free; only the explicit traversal chooses which
+// occurrence has the relative START/END use-role.
+const equalSelfSequence = materializeExactSequence(
+  memory,
+  [equalRawPoleWhole, equalRawPoleWhole],
+);
+const equalSelf = readExactSequence(memory, equalSelfSequence);
+same(equalSelf.cells.length, 2, "non-root H2e witness has two occurrences");
+const equalFirstCell = equalSelf.cells[0]!;
+const equalSecondCell = equalSelf.cells[1]!;
+const equalTraversal = memory.ensure(equalFirstCell, equalSecondCell);
+const equalMethod = memory.ensure(interpreter, equalTraversal);
+const equalBindings: readonly MethodPoleBinding[] = Object.freeze([
+  [wholeRole, equalRawPoleWhole],
+  [interpreterRole, interpreter],
+  [fromRole, equalFirstCell],
+  [toRole, equalSecondCell],
+  [startRole, equalRawPoleWitness.start],
+  [endRole, equalRawPoleWitness.end],
+]);
+const equalAct = materializeMethodPoleAct(
+  memory,
+  interpreter,
+  methodRoleDictionary,
+  methodContext,
+  equalBindings,
+);
+const equalPoleClaim = materializeMethodPoleClaim(
+  memory,
+  equalMethod,
+  equalFirstCell,
+  equalSecondCell,
+  equalRawPoleWitness.start,
+  equalRawPoleWitness.end,
+);
+
+// Negative bodies are fully materialized before replay. Verification below is
+// read-only, including all failure cases.
+const wrongTraversal = memory.ensure(firstSelfCell, firstSelfCell);
+const wrongMethod = memory.ensure(interpreter, wrongTraversal);
+const wrongTraversalClaim = materializeMethodPoleClaim(
+  memory,
+  wrongMethod,
+  firstSelfCell,
+  secondSelfCell,
+  O,
+  C,
+);
+const forgedInverseClaim = materializeMethodPoleClaim(
+  memory,
+  directMethod,
+  secondSelfCell,
+  firstSelfCell,
+  O,
+  C,
+);
+const missingMethodClaim = memory.ensure(
+  R,
+  memory.ensure(
+    O,
+    memory.ensure(
+      C,
+      memory.ensure(
+        memory.ensure(firstSelfCell, O),
+        memory.ensure(secondSelfCell, C),
+      ),
+    ),
+  ),
+);
+const forgedStartClaim = materializeMethodPoleClaim(
+  memory,
+  directMethod,
+  firstSelfCell,
+  secondSelfCell,
+  L,
+  C,
+);
+
 // All construction ends here. The actual witness verification below has only
-// ReadMemory authority and must leave memory unchanged.
+// read authority and must leave memory unchanged.
 const beforeRead = memory.linkCount;
+
+const directReplay = replayStructuralRule(memory, {
+  act: directAct,
+  rule: methodPoleRule,
+  ruleAdmission: methodPoleAdmission,
+  claimedBody: directPoleClaim,
+  expectedInterpreter: methodInterpreterStructure,
+  expectedAfterContext: methodContext,
+});
+same(directReplay.claimedBody, directPoleClaim, "H2e direct method derives relative pole claim");
+same(memory.linkCount, beforeRead, "H2e direct replay is read-only");
+
+const inverseReplay = replayStructuralRule(memory, {
+  act: inverseAct,
+  rule: methodPoleRule,
+  ruleAdmission: methodPoleAdmission,
+  claimedBody: inversePoleClaim,
+  expectedInterpreter: methodInterpreterStructure,
+  expectedAfterContext: methodContext,
+});
+same(inverseReplay.claimedBody, inversePoleClaim, "H2e inverse method derives covariant swapped claim");
+same(memory.linkCount, beforeRead, "H2e inverse replay is read-only");
+
+const equalReplay = replayStructuralRule(memory, {
+  act: equalAct,
+  rule: methodPoleRule,
+  ruleAdmission: methodPoleAdmission,
+  claimedBody: equalPoleClaim,
+  expectedInterpreter: methodInterpreterStructure,
+  expectedAfterContext: methodContext,
+});
+same(equalReplay.claimedBody, equalPoleClaim, "H2e works when raw endpoint values are equal");
+same(memory.linkCount, beforeRead, "H2e non-root replay is read-only");
+
+const hostOrderReplay = replayStructuralRule(memory, {
+  act: hostOrderAct,
+  rule: methodPoleRule,
+  ruleAdmission: methodPoleAdmission,
+  claimedBody: directPoleClaim,
+  expectedInterpreter: methodInterpreterStructure,
+  expectedAfterContext: hostOrderContext,
+});
+same(hostOrderReplay.claimedBody, directPoleClaim, "host field insertion order has no pole authority");
+same(memory.linkCount, beforeRead, "H2e host-order replay is read-only");
+
+expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory, {
+  act: directAct,
+  rule: methodPoleRule,
+  ruleAdmission: methodPoleAdmission,
+  claimedBody: wrongTraversalClaim,
+  expectedInterpreter: methodInterpreterStructure,
+  expectedAfterContext: methodContext,
+}));
+expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory, {
+  act: inverseAct,
+  rule: methodPoleRule,
+  ruleAdmission: methodPoleAdmission,
+  claimedBody: forgedInverseClaim,
+  expectedInterpreter: methodInterpreterStructure,
+  expectedAfterContext: methodContext,
+}));
+expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory, {
+  act: directAct,
+  rule: methodPoleRule,
+  ruleAdmission: methodPoleAdmission,
+  claimedBody: missingMethodClaim,
+  expectedInterpreter: methodInterpreterStructure,
+  expectedAfterContext: methodContext,
+}));
+expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory, {
+  act: directAct,
+  rule: methodPoleRule,
+  ruleAdmission: methodPoleAdmission,
+  claimedBody: forgedStartClaim,
+  expectedInterpreter: methodInterpreterStructure,
+  expectedAfterContext: methodContext,
+}));
+same(memory.linkCount, beforeRead, "H2e negative replay corpus is read-only");
+
 const probe = new ReadProbe(memory);
 
 for (const [label, witness] of witnesses) {
@@ -326,7 +657,7 @@ same(probe.poles(reverseRootDefinition).start, R, "reversed unified root form st
 same(probe.poles(reverseRootDefinition).end, U, "reversed unified root form ends at U");
 assert(reverseRootDefinition !== colonMeaning, "reversed explicit orientation must not define colon");
 
-// H2d structural directness is now explicit and wholly inside the aset.
+// H2d structural directness is explicit and wholly inside the aset.
 same(exactCellPredecessor(probe, firstSelfCell), R, "directness first boundary remains structural");
 same(exactCellPredecessor(probe, secondSelfCell), firstSelfCell, "directness second boundary remains structural");
 same(probe.poles(directTraversal).start, firstSelfCell, "direct traversal begins at first occurrence");
@@ -344,12 +675,11 @@ same(probe.poles(U).start, C, "root inverse orientation U begins at END(R)=C");
 same(probe.poles(U).end, O, "root inverse orientation U ends at START(R)=O");
 assert(L !== U, "root direct and inverse orientations remain distinct");
 
-// Executable research classification. The current substrate proves structural
-// pole-role asymmetry, pole-free repeated Я occurrences, an interpreter that is
-// itself a Link, and an explicit directed traversal/method encoded only by Links.
-// What this witness deliberately does NOT smuggle in is a host rule saying
-// "first => START, next => END". A generic MTS relation/rule deriving relative
-// pole roles from DirectMethod remains the exact next proof obligation.
+// H2e classification: the method does not magically define an absolute global
+// direction. Instead, an admitted generic MTS rule states the covariant relation
+// between an explicit selected traversal and relative START/END occurrence roles.
+// The same rule accepts the inverse traversal with swapped occurrences, rejects
+// forged direction/start evidence, and needs no intrinsic Я_start/Я_end subtype.
 const H1_GENERIC_UNIFIED_DEFINITION_SUPPORTED = true;
 const ROOT_DEICTIC_SELF_FIXED_POINT_SUPPORTED = true;
 const H2_ROLE_EXPLICIT_SEQUENTIAL_FACTORIZATION_SUPPORTED = true;
@@ -357,7 +687,8 @@ const ORDER_ONLY_POLE_DERIVATION_SUPPORTED = false;
 const H2D_STRUCTURAL_POLE_ROLE_ASYMMETRY_SUPPORTED = true;
 const H2D_INTERPRETER_IS_LINK_SUPPORTED = true;
 const H2D_STRUCTURAL_DIRECT_METHOD_CARRIER_SUPPORTED = true;
-const H2D_METHOD_TO_POLE_ROLE_DERIVATION_ESTABLISHED = false;
+const H2D_METHOD_TO_POLE_ROLE_DERIVATION_ESTABLISHED = true;
+const H2E_DERIVED_METHOD_TO_RELATIVE_POLES_SUPPORTED = true;
 const BARE_SELF_FOLD_EQUALS_UNIFIED_DEFINITION = false;
 const H3_LITERAL_DOT_DOT_REINTERPRETATION_REQUIRED = false;
 
@@ -368,7 +699,8 @@ assert(!ORDER_ONLY_POLE_DERIVATION_SUPPORTED, "equal paths with opposite poles f
 assert(H2D_STRUCTURAL_POLE_ROLE_ASYMMETRY_SUPPORTED, "ordered START/END role asymmetry classification");
 assert(H2D_INTERPRETER_IS_LINK_SUPPORTED, "interpreter is represented inside the aset as a Link");
 assert(H2D_STRUCTURAL_DIRECT_METHOD_CARRIER_SUPPORTED, "direct/inverse methods are explicit Links");
-assert(!H2D_METHOD_TO_POLE_ROLE_DERIVATION_ESTABLISHED, "method-to-pole theorem must not be invented by host order");
+assert(H2D_METHOD_TO_POLE_ROLE_DERIVATION_ESTABLISHED, "generic admitted rule derives method-relative pole roles");
+assert(H2E_DERIVED_METHOD_TO_RELATIVE_POLES_SUPPORTED, "H2e exit A: derived method-to-relative-poles");
 assert(!BARE_SELF_FOLD_EQUALS_UNIFIED_DEFINITION, "bare ЯЯ must remain distinct from Def(A)");
 assert(!H3_LITERAL_DOT_DOT_REINTERPRETATION_REQUIRED, "accepted literal `..` must remain unchanged");
 
