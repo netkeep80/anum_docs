@@ -23,15 +23,17 @@ import {
   exportStructuralDerivationSupportTopology,
 } from "./proof-support-topology.js";
 
-const PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_1 =
-  "mts-portable-structural-derivation/v0.1" as const;
+// Package compatibility marker introduced with P6c/P6d. The public API contract
+// pins this literal to v0.1; current artifacts carry their own v0.2 schema value.
 export const PORTABLE_STRUCTURAL_DERIVATION_SCHEMA =
+  "mts-portable-structural-derivation/v0.1" as const;
+const PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_2 =
   "mts-portable-structural-derivation/v0.2" as const;
 export const PORTABLE_MTS_SEMANTIC_BASE = "mts-contract/v0.11" as const;
 
 type PortableStructuralDerivationSchema =
-  | typeof PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_1
-  | typeof PORTABLE_STRUCTURAL_DERIVATION_SCHEMA;
+  | typeof PORTABLE_STRUCTURAL_DERIVATION_SCHEMA
+  | typeof PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_2;
 
 export interface PortableStructuralInterpreterCoordinates {
   readonly dictionary: number;
@@ -68,7 +70,7 @@ export interface PortableStructuralDerivationNode {
 }
 
 export interface PortableStructuralDerivationArtifact {
-  readonly schema: typeof PORTABLE_STRUCTURAL_DERIVATION_SCHEMA;
+  readonly schema: typeof PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_2;
   readonly mtsSemanticBase: typeof PORTABLE_MTS_SEMANTIC_BASE;
   readonly topology: StorageTopologyImage;
   readonly theoryCoordinate: number;
@@ -228,10 +230,10 @@ function parseArtifact(input: unknown): ParsedPortableStructuralDerivationArtifa
     "nodes",
   ]);
   let schema: PortableStructuralDerivationSchema;
-  if (item.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_1) {
-    schema = PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_1;
-  } else if (item.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA) {
+  if (item.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA) {
     schema = PORTABLE_STRUCTURAL_DERIVATION_SCHEMA;
+  } else if (item.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_2) {
+    schema = PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_2;
   } else {
     fail("unsupported-schema");
   }
@@ -328,7 +330,7 @@ export function exportPortableStructuralDerivation(
     }
     if (memory.linkCount !== before) fail("invalid-envelope");
     return Object.freeze({
-      schema: PORTABLE_STRUCTURAL_DERIVATION_SCHEMA,
+      schema: PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_2,
       mtsSemanticBase: PORTABLE_MTS_SEMANTIC_BASE,
       topology: support.topology,
       theoryCoordinate: c(evidence.theory),
@@ -447,7 +449,7 @@ export function replayPortableStructuralDerivation(
   // Transport canonicality never establishes proof truth. Generic replay runs
   // first; this v0.2-only gate can only reject an otherwise valid proof whose
   // canonical topology contains replay-irrelevant ambient baggage.
-  if (artifact.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA) {
+  if (artifact.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_2) {
     verifyCurrentSupportTopology(restored.memory, evidence, artifact.topology);
   }
   if (restored.memory.linkCount !== beforeReplay) fail("invalid-envelope");
