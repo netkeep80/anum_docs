@@ -191,6 +191,22 @@ export type {
 } from "./portable-derivation-digest.js";
 
 export {
+  PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_DIGEST_SCHEME,
+  PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA,
+  PortableStructuralDerivationProvenanceError,
+  computePortableStructuralDerivationProvenanceDigest,
+  createPortableStructuralDerivationProvenanceClaim,
+  verifyPortableStructuralDerivationProvenanceClaim,
+} from "./portable-derivation-provenance.js";
+export type {
+  PortableStructuralDerivationProducerProvenance,
+  PortableStructuralDerivationProvenanceClaim,
+  PortableStructuralDerivationProvenanceDigest,
+  PortableStructuralDerivationProvenanceErrorCode,
+  PortableStructuralDerivationSourceProvenance,
+} from "./portable-derivation-provenance.js";
+
+export {
   ProofRuleReplayError,
   replayDecomposeEqualRelations,
 } from "./proof.js";
