@@ -9,6 +9,9 @@ import type {
   MtsValue,
   PersistentSequenceDescription,
   PersistentTopologyBackend,
+  PortableStructuralDerivationArtifact,
+  PortableStructuralDerivationErrorCode,
+  PortableStructuralDerivationReplayResult,
   ReadMemory,
   RelationReplayEvidence,
   RunEvidence,
@@ -33,6 +36,8 @@ import type { AppendOnlyReadMemory } from "../src/public.js";
 import type { EnumerableReadMemory } from "../src/public.js";
 // @ts-expect-error Consumers use RelationReplayEvidence, not standalone role plumbing.
 import type { RelationRoles } from "../src/public.js";
+// @ts-expect-error P6d keeps nested portable transport coordinate plumbing internal.
+import type { PortableStructuralDerivationNode } from "../src/public.js";
 // @ts-expect-error P3b keeps assumption construction internal; consumers submit materialized evidence.
 type InternalAssumptionContextConstructor = typeof import("../src/public.js").defineStructuralAssumptionContext;
 
@@ -49,8 +54,11 @@ const expectedRuntimeExports = [
   "InterpreterReplayError",
   "Memory",
   "MemoryError",
+  "PORTABLE_MTS_SEMANTIC_BASE",
+  "PORTABLE_STRUCTURAL_DERIVATION_SCHEMA",
   "PersistentStore",
   "PersistentStoreError",
+  "PortableStructuralDerivationError",
   "ProofRuleReplayError",
   "QuaternaryDecodeError",
   "RunReplayError",
@@ -69,6 +77,7 @@ const expectedRuntimeExports = [
   "elaborateBundleRoles",
   "ensureRootBasis",
   "executeAbits",
+  "exportPortableStructuralDerivation",
   "materializePersistentSequence",
   "materializeSequence",
   "normalizeRawForm",
@@ -82,6 +91,7 @@ const expectedRuntimeExports = [
   "replayFlatSubselectionReading",
   "replayIntegratedProof",
   "replayPersistentSequenceMaterialization",
+  "replayPortableStructuralDerivation",
   "replayRelationStep",
   "replayRelationSubselectionStep",
   "replayResolvedSequenceGrouping",
@@ -105,6 +115,14 @@ assert(
 assert(
   publicApi.replayDefinitionEffect === publicApi.replayColonEffect,
   "definition replay must be a behavior-preserving alias of legacy colon replay",
+);
+assert(
+  publicApi.PORTABLE_STRUCTURAL_DERIVATION_SCHEMA === "mts-portable-structural-derivation/v0.1",
+  "portable derivation schema must stay pinned",
+);
+assert(
+  publicApi.PORTABLE_MTS_SEMANTIC_BASE === "mts-contract/v0.11",
+  "portable derivation semantic base must stay pinned",
 );
 
 // Compile-time smoke for the intended consumer concepts. The top-level evidence
@@ -132,6 +150,9 @@ const theorem: StructuralTheoremEvidence | undefined = undefined;
 const judgment: StructuralJudgmentEvidence | undefined = undefined;
 const proof: DecomposeEqualityEvidence | undefined = undefined;
 const integrated: IntegratedProofEvidence | undefined = undefined;
+const portableArtifact: PortableStructuralDerivationArtifact | undefined = undefined;
+const portableErrorCode: PortableStructuralDerivationErrorCode | undefined = undefined;
+const portableReplay: PortableStructuralDerivationReplayResult | undefined = undefined;
 void [
   read,
   write,
@@ -155,4 +176,7 @@ void [
   judgment,
   proof,
   integrated,
+  portableArtifact,
+  portableErrorCode,
+  portableReplay,
 ];
