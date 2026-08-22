@@ -1,3 +1,4 @@
+import { exportCanonicalTopology } from "../src/canonical-topology.js";
 import { materializeExactSequence } from "../src/exact-sequence.js";
 import {
   Memory,
@@ -155,6 +156,7 @@ const sourceHandles = explicitEvidenceHandles(fx.evidence);
 const beforeA = fx.memory.linkCount;
 const sourceReplayA = replayStructuralDerivation(fx.memory, fx.evidence);
 const artifactA = exportPortableStructuralDerivation(fx.memory, fx.evidence);
+const fullTopologyA = exportCanonicalTopology(fx.memory).topology;
 const importedA = replayPortableStructuralDerivation(artifactA);
 same(fx.memory.linkCount, beforeA, "baseline replay/export must be source read-only");
 same(sourceReplayA.theory, sourceTheory, "baseline source Theory selection");
@@ -179,12 +181,13 @@ assert(fx.memory.linkCount > countBeforeJunk, "ambient semantic growth must add 
 assert(junkA !== fx.act && junkB !== fx.act, "ambient Links must not replace the Act");
 sameHandles([...fx.memory.outgoing(fx.act)], outgoingBefore, "ambient growth must not alter outgoing(act)");
 
-// The same source evidence still proves the same selected Theory/target, but the
-// P6c full-Memory portable bytes change. Therefore full Memory is transport state,
-// not stable proof-content identity and must not be hashed as theorem truth.
+// The same source evidence still proves the same selected Theory/target. The
+// canonical topology of the whole selected Memory changes, independently of how
+// a current/future portable exporter chooses its replay-support transport subset.
 const beforeB = fx.memory.linkCount;
 const sourceReplayB = replayStructuralDerivation(fx.memory, fx.evidence);
 const artifactB = exportPortableStructuralDerivation(fx.memory, fx.evidence);
+const fullTopologyB = exportCanonicalTopology(fx.memory).topology;
 const importedB = replayPortableStructuralDerivation(artifactB);
 same(fx.memory.linkCount, beforeB, "post-growth replay/export must be source read-only");
 same(fx.evidence.theory, sourceTheory, "ambient growth must not mutate evidence Theory handle");
@@ -196,10 +199,12 @@ same(sourceReplayB.occurrenceCount, sourceReplayA.occurrenceCount, "source depen
 same(importedB.replay.occurrenceCount, importedA.replay.occurrenceCount, "portable proof result stays fixed");
 same(importedB.memory.linkCount, artifactB.topology.links.length, "post-growth imported replay read-only");
 assert(
-  JSON.stringify(artifactA) !== JSON.stringify(artifactB),
-  "full-Memory portable artifact must expose ambient topology sensitivity",
+  JSON.stringify(fullTopologyA) !== JSON.stringify(fullTopologyB),
+  "full selected-Memory canonical topology must expose ambient topology sensitivity",
 );
 
-// Executable P6e classifications:
+// Executable P6e classifications remain historical facts independent of the
+// current exporter policy:
 // FULL_MEMORY_PORTABLE_ARTIFACT_NOT_STABLE_PROOF_IDENTITY
 // NAIVE_POLE_CLOSURE_NOT_REPLAY_COMPLETE
+// P6E_HISTORICAL_FALSIFICATION_DECOUPLED_FROM_CURRENT_EXPORTER
