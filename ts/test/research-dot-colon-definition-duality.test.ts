@@ -1,4 +1,9 @@
 import {
+  analyzeDirectDeixisCarrier,
+  type DeicticOccurrence,
+  type DirectDeixisVocabulary,
+} from "../src/direct-deixis.js";
+import {
   materializeExactSequence,
   readExactSequence,
 } from "../src/exact-sequence.js";
@@ -17,6 +22,13 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
+}
+
+function sameJson(actual: unknown, expected: unknown, message: string): void {
+  assert(
+    JSON.stringify(actual) === JSON.stringify(expected),
+    `${message}: ${JSON.stringify(actual)} !== ${JSON.stringify(expected)}`,
+  );
 }
 
 class ReadProbe implements ReadMemory {
@@ -83,6 +95,45 @@ function verifyDefinition(
   same(recursivePoles.end, witness.whole, `${label}: ЯЯ ends at Я`);
 }
 
+function rootedSequence(
+  memory: WriteMemory,
+  values: readonly LinkHandle[],
+): LinkHandle {
+  let current = memory.root;
+  for (const value of values) current = memory.ensure(current, value);
+  return current;
+}
+
+function deicticPronoun(
+  memory: WriteMemory,
+  vocabulary: DirectDeixisVocabulary,
+  pole: "start" | "end",
+): LinkHandle {
+  const marker = pole === "start" ? vocabulary.startPole : vocabulary.endPole;
+  return memory.ensure(
+    vocabulary.pronounTag,
+    rootedSequence(memory, [marker]),
+  );
+}
+
+function deicticNode(
+  memory: WriteMemory,
+  vocabulary: DirectDeixisVocabulary,
+  children: readonly LinkHandle[],
+): LinkHandle {
+  return memory.ensure(
+    vocabulary.nodeTag,
+    rootedSequence(memory, children),
+  );
+}
+
+function poleValue(
+  witness: DefinitionWitness,
+  occurrence: DeicticOccurrence,
+): LinkHandle {
+  return occurrence.pole === "start" ? witness.start : witness.end;
+}
+
 const memory = new Memory();
 const basis = ensureRootBasis(memory);
 const { R, O, C, L, U } = basis;
@@ -106,6 +157,8 @@ const witnesses = samples.map(([label, whole]) => [
 
 const rootWitness = witnesses[0]?.[1];
 assert(rootWitness !== undefined, "root witness must exist");
+const nonRootWitness = witnesses.find(([label]) => label === "L")?.[1];
+assert(nonRootWitness !== undefined, "non-root L witness must exist");
 
 // Root specialization of the generic definition recovers the already accepted
 // sign-meaning derivation exactly.
@@ -142,6 +195,26 @@ assert(dotMeaning !== colonMeaning, "DotMeaning and ColonMeaning remain oriented
 const colonPoles = memory.poles(colonMeaning);
 same(memory.ensure(colonPoles.end, colonPoles.start), dotMeaning, "DotMeaning remains Inv(ColonMeaning)");
 
+// H2 uses the already accepted Direct Deixis vocabulary as a structural analogue
+// for metanotational Я. It does NOT identify PRONOUN with physical '.' or with
+// DotMeaning. Pole meaning is explicit carrier evidence, never inferred from path.
+const deicticVocabulary: DirectDeixisVocabulary = Object.freeze({
+  nodeTag: L,
+  opaqueTag: U,
+  pronounTag: generic,
+  upStep: memory.ensure(U, L),
+  startPole: O,
+  endPole: C,
+});
+const yaStart = deicticPronoun(memory, deicticVocabulary, "start");
+const yaEnd = deicticPronoun(memory, deicticVocabulary, "end");
+const orientedCarrier = deicticNode(memory, deicticVocabulary, [yaStart, yaEnd]);
+const reversedCarrier = deicticNode(memory, deicticVocabulary, [yaEnd, yaStart]);
+assert(orientedCarrier !== reversedCarrier, "opposite explicit pole sequences need distinct carriers");
+
+const reverseRootDefinition = memory.ensure(R, U);
+assert(reverseRootDefinition !== colonMeaning, "Pair(R,U) must differ from ColonMeaning=Pair(R,L)");
+
 // All construction ends here. The actual witness verification below has only
 // ReadMemory authority and must leave memory unchanged.
 const beforeRead = memory.linkCount;
@@ -161,16 +234,60 @@ same(probe.poles(rootWitness.definition).end, L, "root definition dual pole");
 same(probe.poles(rootWitness.recursiveSelfForm).start, R, "root ЯЯ start");
 same(probe.poles(rootWitness.recursiveSelfForm).end, R, "root ЯЯ end");
 
-// Executable classification of this first slice only. H2 (an exact structural
-// sequential factorization of Def(A)) remains deliberately unresolved.
+// H2a/H2b: the same two structural positions may carry opposite explicit pole
+// evidence. This is the executable distinction between order and orientation.
+const oriented = analyzeDirectDeixisCarrier(probe, orientedCarrier, deicticVocabulary);
+const reversed = analyzeDirectDeixisCarrier(probe, reversedCarrier, deicticVocabulary);
+same(oriented.length, 2, "oriented Я_start Я_end arity");
+same(reversed.length, 2, "reversed Я_end Я_start arity");
+sameJson(oriented.map(({ path }) => path), [[0], [1]], "oriented occurrence paths");
+sameJson(reversed.map(({ path }) => path), [[0], [1]], "reversed occurrence paths stay identical");
+sameJson(oriented.map(({ pole }) => pole), ["start", "end"], "oriented explicit poles");
+sameJson(reversed.map(({ pole }) => pole), ["end", "start"], "reversed explicit poles");
+sameJson(oriented.map(({ up }) => up), [0, 0], "oriented occurrences are direct self-deixis");
+sameJson(reversed.map(({ up }) => up), [0, 0], "reversed occurrences are direct self-deixis");
+
+const rootSeqStart = poleValue(rootWitness, oriented[0]!);
+const rootSeqEnd = poleValue(rootWitness, oriented[1]!);
+same(rootSeqStart, O, "explicit Я_start(R) selects START(R)=O");
+same(rootSeqEnd, C, "explicit Я_end(R) selects END(R)=C");
+same(probe.poles(rootWitness.dual).start, rootSeqStart, "SeqDual(R) start matches Dual(R)");
+same(probe.poles(rootWitness.dual).end, rootSeqEnd, "SeqDual(R) end matches Dual(R)");
+same(rootWitness.dual, L, "SeqDual(R)=Pair(O,C)=L");
+same(rootWitness.definition, colonMeaning, "SeqDef(R)=Def(R)=ColonMeaning");
+
+// The factorization is generic in the selected whole, not a ROOT-only glyph trick.
+const nonRootSeqStart = poleValue(nonRootWitness, oriented[0]!);
+const nonRootSeqEnd = poleValue(nonRootWitness, oriented[1]!);
+same(probe.poles(nonRootWitness.dual).start, nonRootSeqStart, "SeqDual(L) start matches Dual(L)");
+same(probe.poles(nonRootWitness.dual).end, nonRootSeqEnd, "SeqDual(L) end matches Dual(L)");
+same(probe.poles(nonRootWitness.definition).end, nonRootWitness.dual, "SeqDef(L)=Def(L)");
+
+const reverseRootStart = poleValue(rootWitness, reversed[0]!);
+const reverseRootEnd = poleValue(rootWitness, reversed[1]!);
+same(reverseRootStart, C, "reversed first Я explicitly selects END(R)=C");
+same(reverseRootEnd, O, "reversed second Я explicitly selects START(R)=O");
+same(probe.poles(U).start, reverseRootStart, "reversed root dual starts at C");
+same(probe.poles(U).end, reverseRootEnd, "reversed root dual ends at O");
+same(probe.poles(reverseRootDefinition).start, R, "reversed unified root form starts at R");
+same(probe.poles(reverseRootDefinition).end, U, "reversed unified root form ends at U");
+assert(reverseRootDefinition !== colonMeaning, "reversed explicit orientation must not define colon");
+
+// Executable research classification. Sequential/unified equivalence is
+// supported only when the two self-occurrences carry explicit opposite pole
+// roles. Bare ЯЯ and occurrence order alone are insufficient.
 const H1_GENERIC_UNIFIED_DEFINITION_SUPPORTED = true;
 const ROOT_DEICTIC_SELF_FIXED_POINT_SUPPORTED = true;
-const H2_SEQUENTIAL_UNIFIED_EQUIVALENCE_ESTABLISHED = false;
+const H2_ROLE_EXPLICIT_SEQUENTIAL_FACTORIZATION_SUPPORTED = true;
+const ORDER_ONLY_POLE_DERIVATION_SUPPORTED = false;
+const BARE_SELF_FOLD_EQUALS_UNIFIED_DEFINITION = false;
 const H3_LITERAL_DOT_DOT_REINTERPRETATION_REQUIRED = false;
 
 assert(H1_GENERIC_UNIFIED_DEFINITION_SUPPORTED, "H1 classification");
 assert(ROOT_DEICTIC_SELF_FIXED_POINT_SUPPORTED, "root ЯЯ=Я classification");
-assert(!H2_SEQUENTIAL_UNIFIED_EQUIVALENCE_ESTABLISHED, "H2 must remain open after H1 witness");
+assert(H2_ROLE_EXPLICIT_SEQUENTIAL_FACTORIZATION_SUPPORTED, "role-explicit H2 factorization");
+assert(!ORDER_ONLY_POLE_DERIVATION_SUPPORTED, "equal paths with opposite poles falsify order-only orientation");
+assert(!BARE_SELF_FOLD_EQUALS_UNIFIED_DEFINITION, "bare ЯЯ must remain distinct from Def(A)");
 assert(!H3_LITERAL_DOT_DOT_REINTERPRETATION_REQUIRED, "accepted literal `..` must remain unchanged");
 
 same(memory.linkCount, beforeRead, "research verification is read-only");
