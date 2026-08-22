@@ -170,6 +170,19 @@ export type {
 } from "./derivation.js";
 
 export {
+  PORTABLE_MTS_SEMANTIC_BASE,
+  PORTABLE_STRUCTURAL_DERIVATION_SCHEMA,
+  PortableStructuralDerivationError,
+  exportPortableStructuralDerivation,
+  replayPortableStructuralDerivation,
+} from "./portable-derivation.js";
+export type {
+  PortableStructuralDerivationArtifact,
+  PortableStructuralDerivationErrorCode,
+  PortableStructuralDerivationReplayResult,
+} from "./portable-derivation.js";
+
+export {
   ProofRuleReplayError,
   replayDecomposeEqualRelations,
 } from "./proof.js";
