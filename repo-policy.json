@@ -57,14 +57,6 @@
   },
   "document_relations": {
     "documents": {
-      "candidate-v09-contract": {
-        "path": "contracts/mts-contract-v0.9.json",
-        "format": "json"
-      },
-      "candidate-v09-conformance": {
-        "path": "contracts/mts-conformance-v0.9.json",
-        "format": "json"
-      },
       "candidate-v010-contract": {
         "path": "contracts/mts-contract-v0.10.json",
         "format": "json"
@@ -83,42 +75,6 @@
       }
     },
     "rules": [
-      {
-        "id": "v09-contract-semantic-base-v08",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v09-contract", "pointer": "/semanticBase", "type": "string"},
-        "value": "mts-contract/v0.8"
-      },
-      {
-        "id": "v09-conformance-semantic-base-v08",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v09-conformance", "pointer": "/semanticBase", "type": "string"},
-        "value": "mts-conformance/v0.8"
-      },
-      {
-        "id": "v09-contract-is-semantic-delta",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v09-contract", "pointer": "/observableSemanticDelta", "type": "boolean"},
-        "value": true
-      },
-      {
-        "id": "v09-conformance-is-semantic-delta",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v09-conformance", "pointer": "/observableSemanticDelta", "type": "boolean"},
-        "value": true
-      },
-      {
-        "id": "v09-contract-ready",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v09-contract", "pointer": "/acceptanceReady", "type": "boolean"},
-        "value": true
-      },
-      {
-        "id": "v09-conformance-ready",
-        "kind": "scalar_equals_literal",
-        "source": {"document": "candidate-v09-conformance", "pointer": "/acceptanceReady", "type": "boolean"},
-        "value": true
-      },
       {
         "id": "v010-contract-schema",
         "kind": "scalar_equals_literal",
@@ -411,14 +367,6 @@
     }
   ],
   "cochange_rules": [
-    {
-      "if_changed": ["contracts/mts-contract-v0.9.json"],
-      "must_change_any": ["contracts/mts-conformance-v0.9.json"]
-    },
-    {
-      "if_changed": ["contracts/mts-conformance-v0.9.json"],
-      "must_change_any": ["contracts/mts-contract-v0.9.json"]
-    },
     {
       "if_changed": [
         "contracts/mts-contract-v*.json",
