@@ -189,10 +189,13 @@ export type {
 
 export {
   PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME,
+  PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME,
   computePortableStructuralDerivationContentDigest,
+  computePortableStructuralDerivationWithAssumptionsContentDigest,
 } from "./portable-derivation-digest.js";
 export type {
   PortableStructuralDerivationContentDigest,
+  PortableStructuralDerivationWithAssumptionsContentDigest,
 } from "./portable-derivation-digest.js";
 
 export {

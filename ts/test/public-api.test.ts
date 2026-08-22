@@ -19,6 +19,7 @@ import type {
   PortableStructuralDerivationReplayResult,
   PortableStructuralDerivationSourceProvenance,
   PortableStructuralDerivationWithAssumptionsArtifact,
+  PortableStructuralDerivationWithAssumptionsContentDigest,
   PortableStructuralDerivationWithAssumptionsReplayResult,
   ReadMemory,
   RelationReplayEvidence,
@@ -48,6 +49,8 @@ import type { RelationRoles } from "../src/public.js";
 import type { PortableStructuralDerivationNode } from "../src/public.js";
 // @ts-expect-error P6i keeps portable canonical JSON normalization internal.
 type InternalCanonicalPortableStructuralDerivationV02Json = typeof import("../src/public.js").canonicalPortableStructuralDerivationV02Json;
+// @ts-expect-error P6q keeps conditional portable canonical JSON normalization internal.
+type InternalCanonicalPortableStructuralDerivationWithAssumptionsV01Json = typeof import("../src/public.js").canonicalPortableStructuralDerivationWithAssumptionsV01Json;
 // @ts-expect-error P6k keeps provenance canonical JSON normalization internal.
 type InternalCanonicalPortableStructuralDerivationProvenanceClaimJson = typeof import("../src/public.js").canonicalPortableStructuralDerivationProvenanceClaimJson;
 // @ts-expect-error P3b keeps assumption construction internal; consumers submit materialized evidence.
@@ -71,6 +74,7 @@ const expectedRuntimeExports = [
   "PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_DIGEST_SCHEME",
   "PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA",
   "PORTABLE_STRUCTURAL_DERIVATION_SCHEMA",
+  "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME",
   "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_SCHEMA",
   "PersistentStore",
   "PersistentStoreError",
@@ -91,6 +95,7 @@ const expectedRuntimeExports = [
   "bundleRoleAt",
   "computePortableStructuralDerivationContentDigest",
   "computePortableStructuralDerivationProvenanceDigest",
+  "computePortableStructuralDerivationWithAssumptionsContentDigest",
   "createPortableStructuralDerivationProvenanceClaim",
   "deserializeAnum",
   "deserializeStream",
@@ -131,7 +136,7 @@ const expectedRuntimeExports = [
   "verifyPortableStructuralDerivationProvenanceClaim",
 ].sort();
 
-assert(expectedRuntimeExports.length === 71, "P6o runtime export budget must be exactly 71");
+assert(expectedRuntimeExports.length === 73, "P6q runtime export budget must be exactly 73");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
@@ -157,6 +162,11 @@ assert(
   publicApi.PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME ===
     "mts-portable-structural-derivation-content/sha-256/v0.1",
   "portable derivation content digest scheme must stay pinned",
+);
+assert(
+  publicApi.PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME ===
+    "mts-portable-structural-derivation-with-assumptions-content/sha-256/v0.1",
+  "portable conditional derivation content digest scheme must stay pinned",
 );
 assert(
   publicApi.PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA ===
@@ -197,6 +207,7 @@ const integrated: IntegratedProofEvidence | undefined = undefined;
 const portableArtifact: PortableStructuralDerivationArtifact | undefined = undefined;
 const portableConditionalArtifact: PortableStructuralDerivationWithAssumptionsArtifact | undefined = undefined;
 const portableDigest: PortableStructuralDerivationContentDigest | undefined = undefined;
+const portableConditionalDigest: PortableStructuralDerivationWithAssumptionsContentDigest | undefined = undefined;
 const portableErrorCode: PortableStructuralDerivationErrorCode | undefined = undefined;
 const portableReplay: PortableStructuralDerivationReplayResult | undefined = undefined;
 const portableConditionalReplay: PortableStructuralDerivationWithAssumptionsReplayResult | undefined = undefined;
@@ -204,6 +215,8 @@ const exportPortableConditional: (memory: ReadMemory, evidence: StructuralDeriva
 const replayPortableConditional: (input: unknown) => PortableStructuralDerivationWithAssumptionsReplayResult = publicApi.replayPortableStructuralDerivationWithAssumptions;
 const portableDigestFunction: (input: unknown) => Promise<PortableStructuralDerivationContentDigest> =
   publicApi.computePortableStructuralDerivationContentDigest;
+const portableConditionalDigestFunction: (input: unknown) => Promise<PortableStructuralDerivationWithAssumptionsContentDigest> =
+  publicApi.computePortableStructuralDerivationWithAssumptionsContentDigest;
 const provenanceSource: PortableStructuralDerivationSourceProvenance | undefined = undefined;
 const provenanceProducer: PortableStructuralDerivationProducerProvenance | undefined = undefined;
 const provenanceClaim: PortableStructuralDerivationProvenanceClaim | undefined = undefined;
@@ -238,12 +251,14 @@ void [
   portableArtifact,
   portableConditionalArtifact,
   portableDigest,
+  portableConditionalDigest,
   portableErrorCode,
   portableReplay,
   portableConditionalReplay,
   exportPortableConditional,
   replayPortableConditional,
   portableDigestFunction,
+  portableConditionalDigestFunction,
   provenanceSource,
   provenanceProducer,
   provenanceClaim,
