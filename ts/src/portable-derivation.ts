@@ -416,6 +416,23 @@ function reconstructEvidence(
   });
 }
 
+function verifyCurrentSupportTopology(
+  memory: Memory,
+  evidence: StructuralDerivationEvidence,
+  supplied: StorageTopologyImage,
+): void {
+  let support;
+  try {
+    support = exportStructuralDerivationSupportTopology(memory, evidence);
+  } catch (error) {
+    if (error instanceof StructuralDerivationSupportTopologyError) fail("invalid-topology");
+    throw error;
+  }
+  if (!sameTopology(support.topology, supplied)) {
+    fail("noncanonical-support-topology");
+  }
+}
+
 export function replayPortableStructuralDerivation(
   input: unknown,
 ): PortableStructuralDerivationReplayResult {
@@ -423,22 +440,18 @@ export function replayPortableStructuralDerivation(
   const restored = restoreCanonicalTopology(artifact.topology);
   const evidence = reconstructEvidence(artifact, restored.refs);
 
-  if (artifact.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA) {
-    let support;
-    try {
-      support = exportStructuralDerivationSupportTopology(restored.memory, evidence);
-    } catch (error) {
-      if (error instanceof StructuralDerivationSupportTopologyError) fail("invalid-topology");
-      throw error;
-    }
-    if (!sameTopology(support.topology, artifact.topology)) {
-      fail("noncanonical-support-topology");
-    }
-  }
-
   const beforeReplay = restored.memory.linkCount;
   const replay = replayStructuralDerivation(restored.memory, evidence);
   if (restored.memory.linkCount !== beforeReplay) fail("invalid-envelope");
+
+  // Transport canonicality never establishes proof truth. Generic replay runs
+  // first; this v0.2-only gate can only reject an otherwise valid proof whose
+  // canonical topology contains replay-irrelevant ambient baggage.
+  if (artifact.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA) {
+    verifyCurrentSupportTopology(restored.memory, evidence, artifact.topology);
+  }
+  if (restored.memory.linkCount !== beforeReplay) fail("invalid-envelope");
+
   return Object.freeze({
     memory: restored.memory,
     evidence,
