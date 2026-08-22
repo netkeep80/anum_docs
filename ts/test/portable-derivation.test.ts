@@ -8,6 +8,7 @@ import {
 } from "../src/memory.js";
 import { exportTopology } from "../src/persistence-topology.js";
 import {
+  PORTABLE_STRUCTURAL_DERIVATION_SCHEMA,
   PortableStructuralDerivationError,
   exportPortableStructuralDerivation,
   replayPortableStructuralDerivation,
@@ -29,6 +30,8 @@ import {
   type StructuralDerivationEvidence,
   type StructuralJudgmentEvidence,
 } from "../src/derivation.js";
+
+const LEGACY_SCHEMA = "mts-portable-structural-derivation/v0.1" as const;
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -159,12 +162,18 @@ function siblingFixture(reverse: boolean): Memory {
   return memory;
 }
 
-// A real three-node branching P2 proof crosses the owner boundary through
-// canonical coordinates, reconstructs in a fresh Memory and replays read-only.
+// The package marker remains pinned to v0.1 for compatibility, while current
+// artifact output is the versioned v0.2 replay-support transport.
 {
   const fx = branchFixture();
   const beforeExport = fx.memory.linkCount;
   const artifact = exportPortableStructuralDerivation(fx.memory, fx.evidence);
+  same(
+    PORTABLE_STRUCTURAL_DERIVATION_SCHEMA,
+    "mts-portable-structural-derivation/v0.1",
+    "public package compatibility marker remains pinned",
+  );
+  same(artifact.schema, "mts-portable-structural-derivation/v0.2", "current output must be v0.2");
   same(fx.memory.linkCount, beforeExport, "portable export is source read-only");
   same(artifact.nodes.length, 3, "complete branching node closure transported");
   assert(
@@ -186,10 +195,10 @@ function siblingFixture(reverse: boolean): Memory {
   assert(foreignRejected, "portable replay must not reuse source owner handles");
 
   const reexported = exportPortableStructuralDerivation(imported.memory, imported.evidence);
-  same(JSON.stringify(reexported), JSON.stringify(artifact), "portable import/re-export is stable");
+  same(JSON.stringify(reexported), JSON.stringify(artifact), "v0.2 import/re-export is byte-stable");
 }
 
-// P2 host nodes[] order is transport-only: opposite source order emits the same artifact.
+// P2 host nodes[] order remains transport-only.
 {
   const fx = branchFixture();
   const a = exportPortableStructuralDerivation(fx.memory, fx.evidence);
@@ -198,6 +207,63 @@ function siblingFixture(reverse: boolean): Memory {
     nodes: [...fx.evidence.nodes].reverse(),
   });
   same(JSON.stringify(a), JSON.stringify(b), "source node order has no portable authority");
+}
+
+// P6f adoption removes unrelated selected-Memory topology from current bytes.
+{
+  const fx = branchFixture();
+  const before = exportPortableStructuralDerivation(fx.memory, fx.evidence);
+  const countBeforeJunk = fx.memory.linkCount;
+  const junkA = fx.memory.ensure(fx.evidence.theory, fx.evidence.theory);
+  const junkB = fx.memory.ensure(junkA, fx.evidence.theory);
+  assert(fx.memory.linkCount > countBeforeJunk, "ambient witness must grow selected Memory");
+
+  const after = exportPortableStructuralDerivation(fx.memory, fx.evidence);
+  same(JSON.stringify(after), JSON.stringify(before), "unrelated ambient growth must not change v0.2 bytes");
+  const full = exportCanonicalTopology(fx.memory).topology;
+  assert(
+    after.topology.links.length < full.links.length,
+    "v0.2 support topology must be smaller than ambient full-Memory topology",
+  );
+  void junkB;
+}
+
+// v0.1 remains a real compatibility contract. Add one canonical START-self Link
+// over the old final coordinate: it is a new later round and not outgoing(any Act).
+// Legacy v0.1 accepts this canonical baggage; current v0.2 rejects it, and a
+// current re-export from the legacy reconstruction strips it deterministically.
+{
+  const fx = branchFixture();
+  const artifact = exportPortableStructuralDerivation(fx.memory, fx.evidence);
+  const next = artifact.topology.links.length;
+  const last = next - 1;
+  assert(last >= 0, "portable topology must be non-empty");
+  const expandedTopology = Object.freeze({
+    ...artifact.topology,
+    links: Object.freeze([
+      ...artifact.topology.links,
+      Object.freeze([next, last] as const),
+    ]),
+  });
+
+  const legacy = {
+    ...artifact,
+    schema: LEGACY_SCHEMA,
+    topology: expandedTopology,
+  };
+  const legacyImported = replayPortableStructuralDerivation(legacy);
+  same(legacyImported.replay.occurrenceCount, 3, "legacy v0.1 canonical baggage remains accepted");
+
+  expectPortable("noncanonical-support-topology", () => replayPortableStructuralDerivation({
+    ...artifact,
+    topology: expandedTopology,
+  }));
+
+  const normalized = exportPortableStructuralDerivation(legacyImported.memory, legacyImported.evidence);
+  same(JSON.stringify(normalized), JSON.stringify(artifact), "legacy baggage normalizes to exact current v0.2");
+
+  const minimalLegacy = replayPortableStructuralDerivation({ ...artifact, schema: LEGACY_SCHEMA });
+  same(minimalLegacy.replay.occurrenceCount, 3, "support-minimal v0.1 input also remains accepted");
 }
 
 // Strict envelope validation is fail-closed before structural replay.
@@ -258,8 +324,27 @@ function siblingFixture(reverse: boolean): Memory {
   }));
 }
 
-// Once transport is structurally valid, forged coordinates do not gain authority:
-// the existing generic derivation kernel rejects the reconstructed proof.
+// Hostile outgoing evidence remains inside v0.2 support. Export does not decide
+// truth; reconstructed generic replay still rejects the undeclared binding.
+{
+  const fx = branchFixture();
+  const valid = exportPortableStructuralDerivation(fx.memory, fx.evidence);
+  const targetAct = fx.evidence.nodes[0]!.judgment.application.act;
+  const badRole = fx.memory.ensure(fx.evidence.theory, fx.evidence.theory);
+  const badField = fx.memory.ensure(badRole, fx.evidence.theory);
+  const hostileAttachment = fx.memory.ensure(targetAct, badField);
+  assert(fx.memory.outgoing(targetAct).includes(hostileAttachment), "hostile attachment must be outgoing(target Act)");
+
+  const hostile = exportPortableStructuralDerivation(fx.memory, fx.evidence);
+  assert(
+    hostile.topology.links.length > valid.topology.links.length,
+    "hostile outgoing evidence must enlarge exact replay support",
+  );
+  expectReplayReject(() => replayPortableStructuralDerivation(hostile));
+}
+
+// Once transport is structurally valid, forged proof coordinates do not gain
+// authority: the existing generic derivation kernel rejects first.
 {
   const fx = branchFixture();
   const artifact = exportPortableStructuralDerivation(fx.memory, fx.evidence);
@@ -284,4 +369,7 @@ function siblingFixture(reverse: boolean): Memory {
     ...artifact,
     nodes: forgedNodes,
   }));
+
+  // Executable P6g classification:
+  // PORTABLE_REPLAY_SUPPORT_V02_SUPPORTED
 }
