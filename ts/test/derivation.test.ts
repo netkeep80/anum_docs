@@ -1003,3 +1003,297 @@ function assumptionFixture(claims: readonly LinkHandle[]) {
     },
   ));
 }
+
+// P4a: existing RoleDictionary + Act bindings are finite structural substitution.
+{
+  const fx = derivationFixture();
+  const template = fx.memory.ensure(fx.leftRole, fx.leftRole);
+  const claim = fx.memory.ensure(fx.left, fx.left);
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    template,
+    claim,
+  );
+  const before = fx.memory.linkCount;
+  const result = replayStructuralDerivation(fx.memory, {
+    theory: fx.theory,
+    targetOccurrence: target.occurrence,
+    nodes: [target.node],
+  });
+  same(result.target.judgment.claim, claim, "P4a repeated Role substitution");
+  same(fx.memory.linkCount, before, "P4a repeated Role replay read-only");
+}
+
+{
+  const fx = derivationFixture();
+  const template = fx.memory.ensure(
+    fx.leftRole,
+    fx.memory.ensure(fx.rightRole, fx.leftRole),
+  );
+  const claim = fx.memory.ensure(
+    fx.left,
+    fx.memory.ensure(fx.right, fx.left),
+  );
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole, fx.rightRole],
+    [[fx.leftRole, fx.left], [fx.rightRole, fx.right]],
+    template,
+    claim,
+  );
+  const result = replayStructuralDerivation(fx.memory, {
+    theory: fx.theory,
+    targetOccurrence: target.occurrence,
+    nodes: [target.node],
+  });
+  same(result.target.judgment.claim, claim, "P4a nested two-Role substitution");
+}
+
+{
+  const fx = derivationFixture();
+  const premise = fx.rootLeft();
+  const context = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const template = fx.memory.ensure(
+    fx.leftRole,
+    fx.memory.ensure(fx.rightRole, fx.leftRole),
+  );
+  const claim = fx.memory.ensure(
+    fx.left,
+    fx.memory.ensure(fx.right, fx.left),
+  );
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole, fx.rightRole],
+    [[fx.leftRole, fx.left], [fx.rightRole, fx.right]],
+    template,
+    claim,
+    [fx.leftRole],
+    [premise.occurrence],
+    context,
+  );
+  const before = fx.memory.linkCount;
+  const result = replayStructuralDerivation(fx.memory, {
+    theory: fx.theory,
+    targetOccurrence: target.occurrence,
+    nodes: [target.node, premise.node],
+  });
+  same(result.target.judgment.claim, claim, "P4a shared Role across P2 premise and conclusion");
+  same(fx.memory.linkCount, before, "P4a P2 substitution replay read-only");
+}
+
+{
+  const fx = derivationFixture();
+  const assumptionContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.left]);
+  const assumed = fx.memory.find(assumptionContext, fx.left);
+  assert(assumed !== undefined, "P4a scoped assumption occurrence");
+  const context = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const claim = fx.memory.ensure(fx.left, fx.left);
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.memory.ensure(fx.leftRole, fx.leftRole),
+    claim,
+    [fx.leftRole],
+    [assumed],
+    context,
+  );
+  const before = fx.memory.linkCount;
+  const result = replayStructuralDerivationWithAssumptions(fx.memory, {
+    derivation: {
+      theory: fx.theory,
+      targetOccurrence: target.occurrence,
+      nodes: [target.node],
+    },
+    assumptionContext,
+  });
+  same(result.derivation.target.judgment.claim, claim, "P4a assumption uses same rho");
+  same(fx.memory.linkCount, before, "P4a assumption substitution replay read-only");
+}
+
+{
+  const fx = derivationFixture();
+  const lemma = fx.rootLeft();
+  const theorem = defineStructuralTheorem(fx.memory, fx.left, fx.theory);
+  const context = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const claim = fx.memory.ensure(fx.left, fx.left);
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.memory.ensure(fx.leftRole, fx.leftRole),
+    claim,
+    [fx.leftRole, fx.leftRole],
+    [lemma.occurrence, lemma.occurrence],
+    context,
+  );
+  const before = fx.memory.linkCount;
+  const result = replayStructuralDerivationWithTheorems(fx.memory, {
+    derivation: {
+      theory: fx.theory,
+      targetOccurrence: target.occurrence,
+      nodes: [target.node],
+    },
+    theorems: [{
+      theorem,
+      proof: {
+        theory: fx.theory,
+        targetOccurrence: lemma.occurrence,
+        nodes: [lemma.node],
+      },
+    }],
+  });
+  same(result.derivation.target.judgment.claim, claim, "P4a theorem reuse uses same rho twice");
+  same(result.derivation.occurrenceCount, 2, "P4a repeated theorem dependency canonical");
+  same(fx.memory.linkCount, before, "P4a theorem substitution replay read-only");
+}
+
+// P4a negatives: substitution authority is exact structural Role identity and Act data.
+{
+  const fx = derivationFixture();
+  const bad = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.memory.ensure(fx.leftRole, fx.leftRole),
+    fx.memory.ensure(fx.left, fx.right),
+  );
+  expectDerivationError("invalid-node-judgment", () => replayStructuralDerivation(fx.memory, {
+    theory: fx.theory,
+    targetOccurrence: bad.occurrence,
+    nodes: [bad.node],
+  }));
+}
+
+{
+  const fx = derivationFixture();
+  const wrongPremise = fx.rootRight();
+  const context = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const target = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.leftRole,
+    fx.left,
+    [fx.leftRole],
+    [wrongPremise.occurrence],
+    context,
+  );
+  expectDerivationError("premise-claim-mismatch", () => replayStructuralDerivation(fx.memory, {
+    theory: fx.theory,
+    targetOccurrence: target.occurrence,
+    nodes: [target.node, wrongPremise.node],
+  }));
+}
+
+{
+  const fx = derivationFixture();
+  const missing = fx.node(
+    fx.main,
+    [fx.leftRole, fx.rightRole],
+    [[fx.leftRole, fx.left]],
+    fx.memory.ensure(fx.leftRole, fx.rightRole),
+    fx.memory.ensure(fx.left, fx.right),
+  );
+  expectDerivationError("invalid-node-judgment", () => replayStructuralDerivation(fx.memory, {
+    theory: fx.theory,
+    targetOccurrence: missing.occurrence,
+    nodes: [missing.node],
+  }));
+}
+
+{
+  const fx = derivationFixture();
+  const duplicate = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left], [fx.leftRole, fx.right]],
+    fx.leftRole,
+    fx.left,
+  );
+  expectDerivationError("invalid-node-judgment", () => replayStructuralDerivation(fx.memory, {
+    theory: fx.theory,
+    targetOccurrence: duplicate.occurrence,
+    nodes: [duplicate.node],
+  }));
+}
+
+{
+  const fx = derivationFixture();
+  const undeclared = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left], [fx.rightRole, fx.right]],
+    fx.leftRole,
+    fx.left,
+  );
+  expectDerivationError("invalid-node-judgment", () => replayStructuralDerivation(fx.memory, {
+    theory: fx.theory,
+    targetOccurrence: undeclared.occurrence,
+    nodes: [undeclared.node],
+  }));
+}
+
+{
+  const fx = derivationFixture();
+  const { R, O } = ensureRootBasis(fx.memory);
+  const groundedMismatch = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.memory.ensure(R, fx.leftRole),
+    fx.memory.ensure(O, fx.left),
+  );
+  expectDerivationError("invalid-node-judgment", () => replayStructuralDerivation(fx.memory, {
+    theory: fx.theory,
+    targetOccurrence: groundedMismatch.occurrence,
+    nodes: [groundedMismatch.node],
+  }));
+}
+
+{
+  const fx = derivationFixture();
+  const valid = fx.node(
+    fx.main,
+    [fx.leftRole],
+    [[fx.leftRole, fx.left]],
+    fx.leftRole,
+    fx.left,
+  );
+  const hostOverride = {
+    ...valid.node.judgment.application,
+    claimedBody: fx.right,
+    hostBindingOverride: new Map([[fx.leftRole, fx.right]]),
+  };
+  expectJudgmentError("invalid-rule-application", () => replayStructuralJudgment(fx.memory, {
+    application: hostOverride,
+    judgment: {
+      ...valid.node.judgment.judgment,
+      claim: fx.right,
+    },
+  }));
+}
+
+{
+  const fx = derivationFixture();
+  let foreignRejected = false;
+  try {
+    fx.node(
+      fx.main,
+      [fx.leftRole],
+      [[fx.leftRole, new Memory().root]],
+      fx.leftRole,
+      fx.left,
+    );
+  } catch {
+    foreignRejected = true;
+  }
+  assert(foreignRejected, "P4a foreign-Memory binding must fail before replay");
+}
+
+const P4A_ROLE_BINDING_SUFFICIENT_FOR_TESTED_FINITE_SCHEMAS = true;
+const P4A_BINDER_CAPABILITY_REQUIRED_BY_THIS_CORPUS = false;
+assert(P4A_ROLE_BINDING_SUFFICIENT_FOR_TESTED_FINITE_SCHEMAS, "P4a classification");
+assert(!P4A_BINDER_CAPABILITY_REQUIRED_BY_THIS_CORPUS, "P4a binder boundary");
