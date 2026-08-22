@@ -281,12 +281,14 @@ function fixture(sameSemanticMember = false) {
   const fx = fixture();
   const proof = fx.proofFromDefinition();
   const theorem = defineStructuralTheorem(fx.memory, fx.countClaim, fx.theory);
-  const before = fx.memory.linkCount;
+  const beforeTheorem = fx.memory.linkCount;
   const checked = replayStructuralTheorem(fx.memory, { theorem, proof: proof.evidence });
   same(checked.identity.claim, fx.countClaim, "Count theorem claim");
   same(checked.proof.occurrenceCount, 4, "Count theorem carries full proof");
+  same(fx.memory.linkCount, beforeTheorem, "theorem replay must be read-only");
 
   const nonEmpty = fx.nonEmptyFrom(proof.count.occurrence);
+  const beforeReuse = fx.memory.linkCount;
   const reused = replayStructuralDerivationWithTheorems(fx.memory, {
     derivation: {
       theory: fx.theory,
@@ -297,7 +299,7 @@ function fixture(sameSemanticMember = false) {
   });
   same(reused.derivation.target.judgment.claim, fx.nonEmptyClaim, "NonEmpty lemma target");
   same(reused.derivation.occurrenceCount, 5, "lemma replay expands the Count proof closure");
-  same(fx.memory.linkCount, before, "theorem replay/reuse must be read-only");
+  same(fx.memory.linkCount, beforeReuse, "theorem reuse must be read-only");
 }
 
 // Count2 is exact structural data: one/three occurrences and a wrong mode fail closed.
