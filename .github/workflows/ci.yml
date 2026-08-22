@@ -31,6 +31,11 @@ jobs:
       - name: Typecheck, test and browser-check current MTS core
         run: npm --prefix ts run check
 
+      - name: Check renderer-neutral MTS visual package
+        run: |
+          ./ts/node_modules/.bin/tsc -p packages/visual/tsconfig.json
+          node packages/visual/dist/test/model.test.js
+
   no-python:
     runs-on: ubuntu-latest
     steps:
