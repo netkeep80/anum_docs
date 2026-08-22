@@ -241,17 +241,23 @@ const caseNode = (
   const p2 = fresh();
   const q2 = fresh();
   const scope2 = assumptions(p2, q2);
+  const left2 = introNode(orLeft, p2, q2, [scope2.occurrences[0]!]);
+  const right2 = introNode(orRight, p2, q2, [scope2.occurrences[1]!]);
   same(
     replayStructuralDerivationWithAssumptions(memory, {
-      derivation: {
-        theory,
-        targetOccurrence: introNode(orLeft, p2, q2, [scope2.occurrences[0]!]).occurrence,
-        nodes: [introNode(orLeft, p2, q2, [scope2.occurrences[0]!]).node],
-      },
+      derivation: { theory, targetOccurrence: left2.occurrence, nodes: [left2.node] },
       assumptionContext: scope2.context,
-    }).declaredAssumptionClaims.length,
-    2,
+    }).derivation.target.judgment.claim,
+    or(p2, q2),
     "LEFT schema substitutes",
+  );
+  same(
+    replayStructuralDerivationWithAssumptions(memory, {
+      derivation: { theory, targetOccurrence: right2.occurrence, nodes: [right2.node] },
+      assumptionContext: scope2.context,
+    }).derivation.target.judgment.claim,
+    or(p2, q2),
+    "RIGHT schema substitutes",
   );
 }
 
