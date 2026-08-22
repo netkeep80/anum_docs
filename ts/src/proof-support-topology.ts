@@ -2,7 +2,11 @@ import {
   CanonicalTopologyError,
   exportCanonicalTopology,
 } from "./canonical-topology.js";
-import type { StructuralDerivationEvidence } from "./derivation.js";
+import { ExactSequenceError, readExactSequence } from "./exact-sequence.js";
+import type {
+  StructuralDerivationEvidence,
+  StructuralDerivationWithAssumptionsEvidence,
+} from "./derivation.js";
 import {
   MemoryError,
   type EnumerableReadMemory,
@@ -105,59 +109,71 @@ class ReplaySupportView implements EnumerableReadMemory {
   }
 }
 
+function includePoleClosure(
+  memory: ReadMemory,
+  support: Set<LinkHandle>,
+  roots: readonly LinkHandle[],
+): void {
+  const pending = [...roots];
+  while (pending.length > 0) {
+    const link = pending.pop();
+    if (link === undefined || support.has(link)) continue;
+    // Validate owner/existence before the Link can enter builder bookkeeping.
+    const poles = memory.poles(link);
+    support.add(link);
+    pending.push(poles.start, poles.end);
+  }
+}
+
 function collectReplaySupport(
   memory: ReadMemory,
   evidence: StructuralDerivationEvidence,
 ): ReadonlySet<LinkHandle> {
   const support = new Set<LinkHandle>();
-  const pending: LinkHandle[] = [];
-
-  const include = (link: LinkHandle): void => {
-    if (support.has(link)) return;
-    // Validate owner/existence before the Link can enter builder bookkeeping.
-    memory.poles(link);
-    support.add(link);
-    pending.push(link);
-  };
-
-  const closePoles = (): void => {
-    while (pending.length > 0) {
-      const link = pending.pop();
-      if (link === undefined) continue;
-      const poles = memory.poles(link);
-      include(poles.start);
-      include(poles.end);
-    }
-  };
-
-  include(memory.root);
-  for (const link of explicitEvidenceHandles(evidence)) include(link);
-  closePoles();
+  includePoleClosure(memory, support, [memory.root, ...explicitEvidenceHandles(evidence)]);
 
   // Base derivation replay globally enumerates exactly these namespaces through
   // readExactActBindings(memory, act, ...). Preserve the complete outgoing set:
   // unexpected/duplicate attachments are negative evidence and must not vanish.
   const acts = new Set(evidence.nodes.map((node) => node.judgment.application.act));
   for (const act of acts) {
-    include(act);
-    for (const attachment of memory.outgoing(act)) include(attachment);
+    includePoleClosure(memory, support, [act, ...memory.outgoing(act)]);
   }
-  closePoles();
 
   return support;
 }
 
-/**
- * Canonicalizes only the graph surface observed by base StructuralDerivation
- * replay. This is transport-support construction, not proof validation or truth.
- */
-export function exportStructuralDerivationSupportTopology(
+function collectReplaySupportWithAssumptions(
   memory: ReadMemory,
-  evidence: StructuralDerivationEvidence,
+  evidence: StructuralDerivationWithAssumptionsEvidence,
+): ReadonlySet<LinkHandle> {
+  const support = new Set(collectReplaySupport(memory, evidence.derivation));
+
+  // Conditional replay reads the declaration sequence and then performs an exact
+  // lookup Pair(assumptionContext, claim) for every declaration, including unused
+  // assumptions. Those lookup witnesses are replay evidence, not expendable junk.
+  includePoleClosure(memory, support, [evidence.assumptionContext]);
+  const declarations = readExactSequence(memory, evidence.assumptionContext).values;
+  for (const claim of declarations) {
+    const occurrence = memory.find(evidence.assumptionContext, claim);
+    if (occurrence === undefined) {
+      throw new StructuralDerivationSupportTopologyError(
+        "declared assumption occurrence is missing from Memory",
+      );
+    }
+    includePoleClosure(memory, support, [occurrence]);
+  }
+
+  return support;
+}
+
+function exportSupportTopology(
+  memory: ReadMemory,
+  collect: () => ReadonlySet<LinkHandle>,
 ): StructuralDerivationSupportTopologyExport {
   const before = memory.linkCount;
   try {
-    const support = collectReplaySupport(memory, evidence);
+    const support = collect();
     const view = new ReplaySupportView(memory, support);
     const canonical = exportCanonicalTopology(view);
     const links = Object.freeze(
@@ -180,7 +196,11 @@ export function exportStructuralDerivationSupportTopology(
     });
   } catch (error) {
     if (error instanceof StructuralDerivationSupportTopologyError) throw error;
-    if (error instanceof MemoryError || error instanceof CanonicalTopologyError) {
+    if (
+      error instanceof MemoryError ||
+      error instanceof CanonicalTopologyError ||
+      error instanceof ExactSequenceError
+    ) {
       throw new StructuralDerivationSupportTopologyError("invalid structural derivation replay support");
     }
     throw error;
@@ -189,4 +209,27 @@ export function exportStructuralDerivationSupportTopology(
       throw new StructuralDerivationSupportTopologyError("support topology export mutated Memory");
     }
   }
+}
+
+/**
+ * Canonicalizes only the graph surface observed by base StructuralDerivation
+ * replay. This is transport-support construction, not proof validation or truth.
+ */
+export function exportStructuralDerivationSupportTopology(
+  memory: ReadMemory,
+  evidence: StructuralDerivationEvidence,
+): StructuralDerivationSupportTopologyExport {
+  return exportSupportTopology(memory, () => collectReplaySupport(memory, evidence));
+}
+
+/**
+ * Extends base replay support with the exact declaration/lookup surface observed
+ * by StructuralDerivationWithAssumptions replay. It validates support existence;
+ * it does not validate theorem truth or materialize missing assumption evidence.
+ */
+export function exportStructuralDerivationWithAssumptionsSupportTopology(
+  memory: ReadMemory,
+  evidence: StructuralDerivationWithAssumptionsEvidence,
+): StructuralDerivationSupportTopologyExport {
+  return exportSupportTopology(memory, () => collectReplaySupportWithAssumptions(memory, evidence));
 }
