@@ -9,8 +9,8 @@ import {
 } from "./derivation.js";
 import {
   Memory,
-  type EnumerableReadMemory,
   type LinkHandle,
+  type ReadMemory,
 } from "./memory.js";
 import {
   PersistenceTopologyError,
@@ -18,10 +18,20 @@ import {
   restoreTopology,
   type StorageTopologyImage,
 } from "./persistence-topology.js";
+import {
+  StructuralDerivationSupportTopologyError,
+  exportStructuralDerivationSupportTopology,
+} from "./proof-support-topology.js";
 
-export const PORTABLE_STRUCTURAL_DERIVATION_SCHEMA =
+const PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_1 =
   "mts-portable-structural-derivation/v0.1" as const;
+export const PORTABLE_STRUCTURAL_DERIVATION_SCHEMA =
+  "mts-portable-structural-derivation/v0.2" as const;
 export const PORTABLE_MTS_SEMANTIC_BASE = "mts-contract/v0.11" as const;
+
+type PortableStructuralDerivationSchema =
+  | typeof PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_1
+  | typeof PORTABLE_STRUCTURAL_DERIVATION_SCHEMA;
 
 export interface PortableStructuralInterpreterCoordinates {
   readonly dictionary: number;
@@ -66,12 +76,22 @@ export interface PortableStructuralDerivationArtifact {
   readonly nodes: readonly PortableStructuralDerivationNode[];
 }
 
+interface ParsedPortableStructuralDerivationArtifact {
+  readonly schema: PortableStructuralDerivationSchema;
+  readonly mtsSemanticBase: typeof PORTABLE_MTS_SEMANTIC_BASE;
+  readonly topology: StorageTopologyImage;
+  readonly theoryCoordinate: number;
+  readonly targetOccurrenceCoordinate: number;
+  readonly nodes: readonly PortableStructuralDerivationNode[];
+}
+
 export type PortableStructuralDerivationErrorCode =
   | "invalid-envelope"
   | "unsupported-schema"
   | "unsupported-semantic-base"
   | "invalid-topology"
   | "noncanonical-topology"
+  | "noncanonical-support-topology"
   | "invalid-coordinate"
   | "noncanonical-node-order";
 
@@ -198,7 +218,7 @@ function parseNode(value: unknown): PortableStructuralDerivationNode {
   });
 }
 
-function parseArtifact(input: unknown): PortableStructuralDerivationArtifact {
+function parseArtifact(input: unknown): ParsedPortableStructuralDerivationArtifact {
   const item = exactRecord(input, [
     "schema",
     "mtsSemanticBase",
@@ -207,7 +227,12 @@ function parseArtifact(input: unknown): PortableStructuralDerivationArtifact {
     "targetOccurrenceCoordinate",
     "nodes",
   ]);
-  if (item.schema !== PORTABLE_STRUCTURAL_DERIVATION_SCHEMA) {
+  let schema: PortableStructuralDerivationSchema;
+  if (item.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_1) {
+    schema = PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_1;
+  } else if (item.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA) {
+    schema = PORTABLE_STRUCTURAL_DERIVATION_SCHEMA;
+  } else {
     fail("unsupported-schema");
   }
   if (item.mtsSemanticBase !== PORTABLE_MTS_SEMANTIC_BASE) {
@@ -221,7 +246,7 @@ function parseArtifact(input: unknown): PortableStructuralDerivationArtifact {
     }
   }
   return Object.freeze({
-    schema: PORTABLE_STRUCTURAL_DERIVATION_SCHEMA,
+    schema,
     mtsSemanticBase: PORTABLE_MTS_SEMANTIC_BASE,
     topology: parseTopology(item.topology),
     theoryCoordinate: coordinate(item.theoryCoordinate),
@@ -286,15 +311,15 @@ function encodeNode(
 }
 
 export function exportPortableStructuralDerivation(
-  memory: EnumerableReadMemory,
+  memory: ReadMemory,
   evidence: StructuralDerivationEvidence,
 ): PortableStructuralDerivationArtifact {
   const before = memory.linkCount;
   try {
-    const canonical = exportCanonicalTopology(memory);
-    const c = (handle: LinkHandle): number => sourceCoordinate(canonical.coordinates, handle);
+    const support = exportStructuralDerivationSupportTopology(memory, evidence);
+    const c = (handle: LinkHandle): number => sourceCoordinate(support.coordinates, handle);
     const nodes = evidence.nodes
-      .map((node) => encodeNode(canonical.coordinates, node))
+      .map((node) => encodeNode(support.coordinates, node))
       .sort((left, right) => left.occurrence - right.occurrence);
     for (let index = 1; index < nodes.length; index += 1) {
       if (nodes[index - 1]!.occurrence === nodes[index]!.occurrence) {
@@ -305,14 +330,14 @@ export function exportPortableStructuralDerivation(
     return Object.freeze({
       schema: PORTABLE_STRUCTURAL_DERIVATION_SCHEMA,
       mtsSemanticBase: PORTABLE_MTS_SEMANTIC_BASE,
-      topology: canonical.topology,
+      topology: support.topology,
       theoryCoordinate: c(evidence.theory),
       targetOccurrenceCoordinate: c(evidence.targetOccurrence),
       nodes: Object.freeze(nodes),
     });
   } catch (error) {
     if (error instanceof PortableStructuralDerivationError) throw error;
-    if (error instanceof CanonicalTopologyError) fail("invalid-topology");
+    if (error instanceof StructuralDerivationSupportTopologyError) fail("invalid-topology");
     throw error;
   } finally {
     if (memory.linkCount !== before) fail("invalid-envelope");
@@ -355,13 +380,12 @@ function freshHandle(refs: ReadonlyMap<number, LinkHandle>, local: number): Link
   return handle;
 }
 
-export function replayPortableStructuralDerivation(
-  input: unknown,
-): PortableStructuralDerivationReplayResult {
-  const artifact = parseArtifact(input);
-  const restored = restoreCanonicalTopology(artifact.topology);
-  const h = (local: number): LinkHandle => freshHandle(restored.refs, local);
-  const evidence: StructuralDerivationEvidence = Object.freeze({
+function reconstructEvidence(
+  artifact: ParsedPortableStructuralDerivationArtifact,
+  refs: ReadonlyMap<number, LinkHandle>,
+): StructuralDerivationEvidence {
+  const h = (local: number): LinkHandle => freshHandle(refs, local);
+  return Object.freeze({
     theory: h(artifact.theoryCoordinate),
     targetOccurrence: h(artifact.targetOccurrenceCoordinate),
     nodes: Object.freeze(artifact.nodes.map((node) => Object.freeze({
@@ -390,6 +414,27 @@ export function replayPortableStructuralDerivation(
       premiseOccurrenceSequence: h(node.premiseOccurrenceSequence),
     }))),
   });
+}
+
+export function replayPortableStructuralDerivation(
+  input: unknown,
+): PortableStructuralDerivationReplayResult {
+  const artifact = parseArtifact(input);
+  const restored = restoreCanonicalTopology(artifact.topology);
+  const evidence = reconstructEvidence(artifact, restored.refs);
+
+  if (artifact.schema === PORTABLE_STRUCTURAL_DERIVATION_SCHEMA) {
+    let support;
+    try {
+      support = exportStructuralDerivationSupportTopology(restored.memory, evidence);
+    } catch (error) {
+      if (error instanceof StructuralDerivationSupportTopologyError) fail("invalid-topology");
+      throw error;
+    }
+    if (!sameTopology(support.topology, artifact.topology)) {
+      fail("noncanonical-support-topology");
+    }
+  }
 
   const beforeReplay = restored.memory.linkCount;
   const replay = replayStructuralDerivation(restored.memory, evidence);
