@@ -609,3 +609,9 @@ export function canonicalPortableStructuralDerivationV02Json(input: unknown): st
   }
   return JSON.stringify(artifact);
 }
+
+export function canonicalPortableStructuralDerivationWithAssumptionsV01Json(
+  input: unknown,
+): string {
+  return JSON.stringify(parseArtifactWithAssumptions(input));
+}
