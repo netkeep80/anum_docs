@@ -190,13 +190,16 @@ function derivationFail(code: StructuralDerivationReplayErrorCode): never {
   throw new StructuralDerivationReplayError(code);
 }
 
-/** Proof-history occurrence. Claim identity remains independent of proof history. */
+/**
+ * Proof-history occurrence = Pair(Claim, Act). Claim starts the relation so
+ * occurrence metadata cannot enter the structural outgoing(Act) field namespace.
+ */
 export function defineStructuralProofOccurrence(
   memory: WriteMemory,
   act: LinkHandle,
   claim: LinkHandle,
 ): LinkHandle {
-  return memory.ensure(act, claim);
+  return memory.ensure(claim, act);
 }
 
 export function readStructuralProofOccurrence(
@@ -205,7 +208,7 @@ export function readStructuralProofOccurrence(
 ): StructuralProofOccurrence {
   try {
     const poles = memory.poles(occurrence);
-    return Object.freeze({ act: poles.start, claim: poles.end });
+    return Object.freeze({ act: poles.end, claim: poles.start });
   } catch (error) {
     if (error instanceof MemoryError) {
       throw new StructuralDerivationReplayError("invalid-derivation-evidence");
