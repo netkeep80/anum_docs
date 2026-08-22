@@ -369,8 +369,12 @@ const methodPoleAdmission = admitStructuralRule(
   methodInterpreterStructure.theory,
   methodPoleRule,
 );
-const methodContext = defineContext(memory, colonMeaning, dotMeaning);
-const hostOrderContext = defineContext(memory, dotMeaning, colonMeaning);
+const directContext = defineContext(memory, colonMeaning, dotMeaning);
+const inverseContext = defineContext(memory, dotMeaning, colonMeaning);
+const equalContext = defineContext(memory, equalRawPoleWhole, generic);
+const hostOrderContext = defineContext(memory, generic, equalRawPoleWhole);
+assert(new Set([directContext, inverseContext, equalContext, hostOrderContext]).size === 4,
+  "H2e applications need distinct structural contexts");
 
 const directBindings: readonly MethodPoleBinding[] = Object.freeze([
   [wholeRole, R],
@@ -392,14 +396,14 @@ const directAct = materializeMethodPoleAct(
   memory,
   interpreter,
   methodRoleDictionary,
-  methodContext,
+  directContext,
   directBindings,
 );
 const inverseAct = materializeMethodPoleAct(
   memory,
   interpreter,
   methodRoleDictionary,
-  methodContext,
+  inverseContext,
   inverseBindings,
 );
 const hostOrderAct = materializeMethodPoleAct(
@@ -450,7 +454,7 @@ const equalAct = materializeMethodPoleAct(
   memory,
   interpreter,
   methodRoleDictionary,
-  methodContext,
+  equalContext,
   equalBindings,
 );
 const equalPoleClaim = materializeMethodPoleClaim(
@@ -510,7 +514,7 @@ const directReplay = replayStructuralRule(memory, {
   ruleAdmission: methodPoleAdmission,
   claimedBody: directPoleClaim,
   expectedInterpreter: methodInterpreterStructure,
-  expectedAfterContext: methodContext,
+  expectedAfterContext: directContext,
 });
 same(directReplay.claimedBody, directPoleClaim, "H2e direct method derives relative pole claim");
 same(memory.linkCount, beforeRead, "H2e direct replay is read-only");
@@ -520,7 +524,7 @@ const inverseReplay = replayStructuralRule(memory, {
   ruleAdmission: methodPoleAdmission,
   claimedBody: inversePoleClaim,
   expectedInterpreter: methodInterpreterStructure,
-  expectedAfterContext: methodContext,
+  expectedAfterContext: inverseContext,
 });
 same(inverseReplay.claimedBody, inversePoleClaim, "H2e inverse method derives covariant swapped claim");
 same(memory.linkCount, beforeRead, "H2e inverse replay is read-only");
@@ -530,7 +534,7 @@ const equalReplay = replayStructuralRule(memory, {
   ruleAdmission: methodPoleAdmission,
   claimedBody: equalPoleClaim,
   expectedInterpreter: methodInterpreterStructure,
-  expectedAfterContext: methodContext,
+  expectedAfterContext: equalContext,
 });
 same(equalReplay.claimedBody, equalPoleClaim, "H2e works when raw endpoint values are equal");
 same(memory.linkCount, beforeRead, "H2e non-root replay is read-only");
@@ -551,7 +555,7 @@ expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory
   ruleAdmission: methodPoleAdmission,
   claimedBody: wrongTraversalClaim,
   expectedInterpreter: methodInterpreterStructure,
-  expectedAfterContext: methodContext,
+  expectedAfterContext: directContext,
 }));
 expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory, {
   act: inverseAct,
@@ -559,7 +563,7 @@ expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory
   ruleAdmission: methodPoleAdmission,
   claimedBody: forgedInverseClaim,
   expectedInterpreter: methodInterpreterStructure,
-  expectedAfterContext: methodContext,
+  expectedAfterContext: inverseContext,
 }));
 expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory, {
   act: directAct,
@@ -567,7 +571,7 @@ expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory
   ruleAdmission: methodPoleAdmission,
   claimedBody: missingMethodClaim,
   expectedInterpreter: methodInterpreterStructure,
-  expectedAfterContext: methodContext,
+  expectedAfterContext: directContext,
 }));
 expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory, {
   act: directAct,
@@ -575,7 +579,7 @@ expectStructuralRuleError("template-mismatch", () => replayStructuralRule(memory
   ruleAdmission: methodPoleAdmission,
   claimedBody: forgedStartClaim,
   expectedInterpreter: methodInterpreterStructure,
-  expectedAfterContext: methodContext,
+  expectedAfterContext: directContext,
 }));
 same(memory.linkCount, beforeRead, "H2e negative replay corpus is read-only");
 
