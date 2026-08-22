@@ -4,7 +4,6 @@ import {
   ensureRootBasis,
   type LinkHandle,
   type ReadMemory,
-  type StructuralDerivationEvidence,
 } from "../src/public.js";
 import { defineContext } from "../src/state.js";
 import { defineActField, defineActHeader } from "../src/structural-readers.js";
@@ -35,117 +34,72 @@ import {
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
-
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
 }
-
-function expectDerivationError(
-  code: StructuralDerivationReplayError["code"],
+function expectError<C extends string>(
+  ctor: abstract new (...args: never[]) => { code: C },
+  code: C,
   effect: () => unknown,
 ): void {
   try {
     effect();
   } catch (error) {
-    assert(error instanceof StructuralDerivationReplayError, `${code}: wrong error type`);
+    assert(error instanceof ctor, `${code}: wrong error type`);
     same(error.code, code, `${code}: wrong error code`);
     return;
   }
-  throw new Error(`${code}: expected StructuralDerivationReplayError`);
+  throw new Error(`${code}: expected rejection`);
 }
-
-function expectAssumptionError(
-  code: StructuralAssumptionReplayError["code"],
-  effect: () => unknown,
-): void {
-  try {
-    effect();
-  } catch (error) {
-    assert(error instanceof StructuralAssumptionReplayError, `${code}: wrong error type`);
-    same(error.code, code, `${code}: wrong error code`);
-    return;
-  }
-  throw new Error(`${code}: expected StructuralAssumptionReplayError`);
-}
-
-function expectTheoremError(
-  code: StructuralTheoremReplayError["code"],
-  effect: () => unknown,
-): void {
-  try {
-    effect();
-  } catch (error) {
-    assert(error instanceof StructuralTheoremReplayError, `${code}: wrong error type`);
-    same(error.code, code, `${code}: wrong error code`);
-    return;
-  }
-  throw new Error(`${code}: expected StructuralTheoremReplayError`);
-}
-
-type Binding = readonly [LinkHandle, LinkHandle];
 
 function logicFixture() {
   const memory = new Memory();
   const { R, U } = ensureRootBasis(memory);
   let cursor = U;
   const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
-
-  const dictionary = fresh();
-  const grammar = fresh();
-  const theory = fresh();
-  const weakTheory = fresh();
-  const pRole = fresh();
-  const qRole = fresh();
-  const impTag = fresh();
-  const p = fresh();
-  const q = fresh();
-  const r = fresh();
+  const dictionary = fresh(), grammar = fresh(), theory = fresh(), weakTheory = fresh();
+  const pRole = fresh(), qRole = fresh(), impTag = fresh();
+  const p = fresh(), q = fresh(), r = fresh();
 
   const environment = (selectedTheory: LinkHandle) => {
     const expectedInterpreter: StructuralInterpreter = {
-      dictionary,
-      grammar,
-      theory: selectedTheory,
+      dictionary, grammar, theory: selectedTheory,
     };
     return {
       expectedInterpreter,
       interpreter: defineStructuralInterpreter(memory, dictionary, grammar, selectedTheory),
     };
   };
-  const main = environment(theory);
-  const weak = environment(weakTheory);
-
-  const imp = (left: LinkHandle, right: LinkHandle, tag: LinkHandle = impTag): LinkHandle =>
+  const main = environment(theory), weak = environment(weakTheory);
+  const imp = (left: LinkHandle, right: LinkHandle, tag = impTag) =>
     memory.ensure(tag, memory.ensure(left, right));
 
   const roleDictionary = defineStructuralRoleDictionary(memory, [pRole, qRole]);
   const mpRule = defineStructuralRule(memory, roleDictionary, qRole);
   const mpRuleAdmission = admitStructuralRule(memory, theory, mpRule);
-  const mpPremiseTemplates = [pRole, imp(pRole, qRole)] as const;
-  const mpDerivationRule = defineStructuralDerivationRule(memory, mpRule, mpPremiseTemplates);
-  const mpDerivationRuleAdmission = admitStructuralDerivationRule(memory, theory, mpDerivationRule);
+  const mpDerivationRule = defineStructuralDerivationRule(
+    memory, mpRule, [pRole, imp(pRole, qRole)],
+  );
+  const mpDerivationRuleAdmission =
+    admitStructuralDerivationRule(memory, theory, mpDerivationRule);
 
-  const makeMpNode = (
+  const mpNode = (
     selectedTheory: LinkHandle,
     env: ReturnType<typeof environment>,
     selectedP: LinkHandle,
     selectedQ: LinkHandle,
-    premiseOccurrences: readonly LinkHandle[],
-    context: LinkHandle,
-    ruleAdmission: LinkHandle = mpRuleAdmission,
-    derivationRuleAdmission: LinkHandle = mpDerivationRuleAdmission,
+    premises: readonly LinkHandle[],
+    ruleAdmission = mpRuleAdmission,
+    derivationAdmission = mpDerivationRuleAdmission,
   ) => {
+    const context = defineContext(memory, fresh(), fresh());
     const act = defineActHeader(memory, env.interpreter, roleDictionary, context);
     defineActField(memory, act, pRole, selectedP);
     defineActField(memory, act, qRole, selectedQ);
     const judgment: StructuralJudgmentEvidence = {
       application: {
-        act,
-        rule: mpRule,
-        ruleAdmission,
-        claimedBody: selectedQ,
-        expectedInterpreter: env.expectedInterpreter,
-        expectedAfterContext: context,
+        act, rule: mpRule, ruleAdmission, claimedBody: selectedQ,
+        expectedInterpreter: env.expectedInterpreter, expectedAfterContext: context,
       },
       judgment: { theory: selectedTheory, context, claim: selectedQ },
     };
@@ -154,10 +108,10 @@ function logicFixture() {
       occurrence,
       judgment,
       derivationRule: mpDerivationRule,
-      derivationRuleAdmission,
-      premiseOccurrenceSequence: materializeExactSequence(memory, premiseOccurrences),
+      derivationRuleAdmission: derivationAdmission,
+      premiseOccurrenceSequence: materializeExactSequence(memory, premises),
     };
-    return { act, occurrence, node };
+    return { occurrence, node };
   };
 
   const rootRole = fresh();
@@ -165,7 +119,8 @@ function logicFixture() {
   const rootRule = defineStructuralRule(memory, rootDictionary, rootRole);
   const rootRuleAdmission = admitStructuralRule(memory, theory, rootRule);
   const rootDerivationRule = defineStructuralDerivationRule(memory, rootRule, []);
-  const rootDerivationRuleAdmission = admitStructuralDerivationRule(memory, theory, rootDerivationRule);
+  const rootDerivationAdmission =
+    admitStructuralDerivationRule(memory, theory, rootDerivationRule);
   const rootClaim = (claim: LinkHandle) => {
     const context = defineContext(memory, fresh(), fresh());
     const act = defineActHeader(memory, main.interpreter, rootDictionary, context);
@@ -175,384 +130,239 @@ function logicFixture() {
       occurrence,
       judgment: {
         application: {
-          act,
-          rule: rootRule,
-          ruleAdmission: rootRuleAdmission,
-          claimedBody: claim,
-          expectedInterpreter: main.expectedInterpreter,
-          expectedAfterContext: context,
+          act, rule: rootRule, ruleAdmission: rootRuleAdmission, claimedBody: claim,
+          expectedInterpreter: main.expectedInterpreter, expectedAfterContext: context,
         },
         judgment: { theory, context, claim },
       },
       derivationRule: rootDerivationRule,
-      derivationRuleAdmission: rootDerivationRuleAdmission,
+      derivationRuleAdmission: rootDerivationAdmission,
       premiseOccurrenceSequence: materializeExactSequence(memory, []),
     };
     return { occurrence, node };
   };
 
+  const assume = (...claims: LinkHandle[]) => {
+    const context = defineStructuralAssumptionContext(memory, theory, claims);
+    const occurrences = claims.map((claim) => memory.find(context, claim));
+    assert(occurrences.every((value) => value !== undefined), "assumption occurrences");
+    return { context, occurrences: occurrences as LinkHandle[] };
+  };
+
   return {
-    memory,
-    fresh,
-    theory,
-    weakTheory,
-    main,
-    weak,
-    pRole,
-    qRole,
-    impTag,
-    p,
-    q,
-    r,
-    imp,
-    roleDictionary,
-    mpRule,
-    mpRuleAdmission,
-    mpDerivationRule,
-    mpDerivationRuleAdmission,
-    makeMpNode,
-    rootClaim,
+    memory, fresh, theory, weakTheory, main, weak, pRole, qRole, impTag, p, q, r,
+    imp, roleDictionary, mpRule, mpRuleAdmission, mpDerivationRule,
+    mpDerivationRuleAdmission, mpNode, rootClaim, assume,
   };
 }
 
-// P5 positive: Γ = [P, P→Q] derives Q using only Theory + admitted structural data.
+const fx = logicFixture();
+
+// Γ=[P, P→Q] derives Q; the same admitted rule works for another P/Q pair.
 {
-  const fx = logicFixture();
-  const implication = fx.imp(fx.p, fx.q);
-  const assumptions = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.p, implication]);
-  const pOccurrence = fx.memory.find(assumptions, fx.p);
-  const impOccurrence = fx.memory.find(assumptions, implication);
-  assert(pOccurrence !== undefined && impOccurrence !== undefined, "MP assumptions materialized");
-  const target = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    fx.p,
-    fx.q,
-    [pOccurrence, impOccurrence],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
-  );
+  const a = fx.assume(fx.p, fx.imp(fx.p, fx.q));
+  const target = fx.mpNode(fx.theory, fx.main, fx.p, fx.q, a.occurrences);
   const before = fx.memory.linkCount;
   const result = replayStructuralDerivationWithAssumptions(fx.memory, {
     derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
-    assumptionContext: assumptions,
+    assumptionContext: a.context,
   });
-  same(result.derivation.target.judgment.claim, fx.q, "MP conclusion Q");
-  same(result.usedAssumptionOccurrences.length, 2, "MP consumes two scoped premises");
+  same(result.derivation.target.judgment.claim, fx.q, "MP conclusion");
+  same(result.usedAssumptionOccurrences.length, 2, "MP premise count");
   same(fx.memory.linkCount, before, "MP replay read-only");
-}
 
-// The same exact MP rule is a schema over a second P/Q pair, not theorem-specific code.
-{
-  const fx = logicFixture();
-  const p2 = fx.fresh();
-  const q2 = fx.fresh();
-  const implication = fx.imp(p2, q2);
-  const assumptions = defineStructuralAssumptionContext(fx.memory, fx.theory, [p2, implication]);
-  const pOccurrence = fx.memory.find(assumptions, p2);
-  const impOccurrence = fx.memory.find(assumptions, implication);
-  assert(pOccurrence !== undefined && impOccurrence !== undefined, "second MP assumptions");
-  const target = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    p2,
-    q2,
-    [pOccurrence, impOccurrence],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
-  );
-  same(target.node.judgment.application.rule, fx.mpRule, "same MP StructuralRule");
-  same(target.node.derivationRule, fx.mpDerivationRule, "same MP derivation rule");
-  const result = replayStructuralDerivationWithAssumptions(fx.memory, {
-    derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
-    assumptionContext: assumptions,
+  const p2 = fx.fresh(), q2 = fx.fresh();
+  const b = fx.assume(p2, fx.imp(p2, q2));
+  const target2 = fx.mpNode(fx.theory, fx.main, p2, q2, b.occurrences);
+  same(target2.node.judgment.application.rule, fx.mpRule, "same MP rule");
+  const result2 = replayStructuralDerivationWithAssumptions(fx.memory, {
+    derivation: { theory: fx.theory, targetOccurrence: target2.occurrence, nodes: [target2.node] },
+    assumptionContext: b.context,
   });
-  same(result.derivation.target.judgment.claim, q2, "second MP conclusion");
+  same(result2.derivation.target.judgment.claim, q2, "second MP conclusion");
 }
 
-// One proved P plus one scoped implication use the same structural MP matcher.
+// Mixed proven/scoped premises and P3a theorem expansion use the same MP structure.
 {
-  const fx = logicFixture();
   const provenP = fx.rootClaim(fx.p);
-  const implication = fx.imp(fx.p, fx.q);
-  const assumptions = defineStructuralAssumptionContext(fx.memory, fx.theory, [implication]);
-  const impOccurrence = fx.memory.find(assumptions, implication);
-  assert(impOccurrence !== undefined, "mixed MP assumption");
-  const target = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    fx.p,
-    fx.q,
-    [provenP.occurrence, impOccurrence],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
+  const a = fx.assume(fx.imp(fx.p, fx.q));
+  const mixed = fx.mpNode(
+    fx.theory, fx.main, fx.p, fx.q, [provenP.occurrence, a.occurrences[0]!],
   );
-  const result = replayStructuralDerivationWithAssumptions(fx.memory, {
+  same(replayStructuralDerivationWithAssumptions(fx.memory, {
     derivation: {
-      theory: fx.theory,
-      targetOccurrence: target.occurrence,
-      nodes: [target.node, provenP.node],
+      theory: fx.theory, targetOccurrence: mixed.occurrence, nodes: [mixed.node, provenP.node],
     },
-    assumptionContext: assumptions,
-  });
-  same(result.derivation.target.judgment.claim, fx.q, "mixed MP conclusion");
-}
+    assumptionContext: a.context,
+  }).derivation.target.judgment.claim, fx.q, "mixed MP");
 
-// P3a theorem evidence grants a premise only by expanding its full proof closure.
-{
-  const fx = logicFixture();
   const proofP = fx.rootClaim(fx.p);
   const proofImp = fx.rootClaim(fx.imp(fx.p, fx.q));
   const theorem = defineStructuralTheorem(fx.memory, fx.p, fx.theory);
-  const target = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    fx.p,
-    fx.q,
-    [proofP.occurrence, proofImp.occurrence],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
+  const target = fx.mpNode(
+    fx.theory, fx.main, fx.p, fx.q, [proofP.occurrence, proofImp.occurrence],
   );
   const before = fx.memory.linkCount;
-  const result = replayStructuralDerivationWithTheorems(fx.memory, {
+  const reused = replayStructuralDerivationWithTheorems(fx.memory, {
     derivation: {
-      theory: fx.theory,
-      targetOccurrence: target.occurrence,
-      nodes: [target.node, proofImp.node],
+      theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node, proofImp.node],
     },
     theorems: [{
       theorem,
       proof: { theory: fx.theory, targetOccurrence: proofP.occurrence, nodes: [proofP.node] },
     }],
   });
-  same(result.derivation.target.judgment.claim, fx.q, "theorem-carried MP conclusion");
-  same(result.derivation.occurrenceCount, 3, "theorem closure expanded");
+  same(reused.derivation.target.judgment.claim, fx.q, "theorem-carried MP");
+  same(reused.derivation.occurrenceCount, 3, "theorem closure expanded");
   same(fx.memory.linkCount, before, "theorem MP replay read-only");
 }
 
-// Host node order is transport only; structural dependency evidence determines MP.
+// Host node order is transport only.
 {
-  const fx = logicFixture();
-  const proofP = fx.rootClaim(fx.p);
-  const proofImp = fx.rootClaim(fx.imp(fx.p, fx.q));
-  const target = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    fx.p,
-    fx.q,
-    [proofP.occurrence, proofImp.occurrence],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
+  const pProof = fx.rootClaim(fx.p);
+  const impProof = fx.rootClaim(fx.imp(fx.p, fx.q));
+  const target = fx.mpNode(
+    fx.theory, fx.main, fx.p, fx.q, [pProof.occurrence, impProof.occurrence],
   );
-  const a = replayStructuralDerivation(fx.memory, {
-    theory: fx.theory,
-    targetOccurrence: target.occurrence,
-    nodes: [target.node, proofImp.node, proofP.node],
-  });
-  const b = replayStructuralDerivation(fx.memory, {
-    theory: fx.theory,
-    targetOccurrence: target.occurrence,
-    nodes: [proofP.node, target.node, proofImp.node],
-  });
-  same(a.target.judgment.claim, b.target.judgment.claim, "host order cannot define MP");
+  const replay = (nodes: StructuralDerivationNodeEvidence[]) =>
+    replayStructuralDerivation(fx.memory, {
+      theory: fx.theory, targetOccurrence: target.occurrence, nodes,
+    }).target.judgment.claim;
+  same(
+    replay([target.node, impProof.node, pProof.node]),
+    replay([pProof.node, target.node, impProof.node]),
+    "host order has no logical authority",
+  );
 }
 
-// T_WEAK has the same formula data but no MP admission: host naming grants nothing.
+// Wrong theory/admission and forged admissions fail closed; a host rule name grants nothing.
 {
-  const fx = logicFixture();
-  const target = fx.makeMpNode(
-    fx.weakTheory,
-    fx.weak,
-    fx.p,
-    fx.q,
-    [],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
-  );
+  const weakTarget = fx.mpNode(fx.weakTheory, fx.weak, fx.p, fx.q, []);
   const hostNamed = {
-    ...target.node,
+    ...weakTarget.node,
     judgment: {
-      ...target.node.judgment,
-      application: { ...target.node.judgment.application, ruleKind: "modusPonens" },
+      ...weakTarget.node.judgment,
+      application: { ...weakTarget.node.judgment.application, ruleKind: "modusPonens" },
     },
   };
-  expectDerivationError("invalid-node-judgment", () => replayStructuralDerivation(fx.memory, {
-    theory: fx.weakTheory,
-    targetOccurrence: target.occurrence,
-    nodes: [hostNamed],
-  }));
-}
+  expectError(StructuralDerivationReplayError, "invalid-node-judgment", () =>
+    replayStructuralDerivation(fx.memory, {
+      theory: fx.weakTheory, targetOccurrence: weakTarget.occurrence, nodes: [hostNamed],
+    }),
+  );
 
-// Structural Rule admission and DerivationRule admission are independently theory-scoped.
-{
-  const fx = logicFixture();
   const weakRuleAdmission = admitStructuralRule(fx.memory, fx.weakTheory, fx.mpRule);
-  const target = fx.makeMpNode(
-    fx.weakTheory,
-    fx.weak,
-    fx.p,
-    fx.q,
-    [],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
-    weakRuleAdmission,
-    fx.mpDerivationRuleAdmission,
+  const weakRuleOnly = fx.mpNode(
+    fx.weakTheory, fx.weak, fx.p, fx.q, [], weakRuleAdmission,
   );
-  expectDerivationError("derivation-rule-not-admitted", () => replayStructuralDerivation(fx.memory, {
-    theory: fx.weakTheory,
-    targetOccurrence: target.occurrence,
-    nodes: [target.node],
-  }));
+  expectError(StructuralDerivationReplayError, "derivation-rule-not-admitted", () =>
+    replayStructuralDerivation(fx.memory, {
+      theory: fx.weakTheory, targetOccurrence: weakRuleOnly.occurrence, nodes: [weakRuleOnly.node],
+    }),
+  );
+
+  const forgedRule = fx.mpNode(
+    fx.theory, fx.main, fx.p, fx.q, [], fx.memory.ensure(fx.fresh(), fx.mpRule),
+  );
+  expectError(StructuralDerivationReplayError, "invalid-node-judgment", () =>
+    replayStructuralDerivation(fx.memory, {
+      theory: fx.theory, targetOccurrence: forgedRule.occurrence, nodes: [forgedRule.node],
+    }),
+  );
+
+  const forgedDerivation = fx.mpNode(
+    fx.theory, fx.main, fx.p, fx.q, [], fx.mpRuleAdmission,
+    fx.memory.ensure(fx.fresh(), fx.mpDerivationRule),
+  );
+  expectError(StructuralDerivationReplayError, "derivation-rule-not-admitted", () =>
+    replayStructuralDerivation(fx.memory, {
+      theory: fx.theory, targetOccurrence: forgedDerivation.occurrence,
+      nodes: [forgedDerivation.node],
+    }),
+  );
 }
 
-// Forged admissions fail closed before any logical interpretation is possible.
+// Missing premises, wrong consequent and a different grounded ImpTag all reject.
 {
-  const fx = logicFixture();
-  const forgedRuleAdmission = fx.memory.ensure(fx.fresh(), fx.mpRule);
-  const badRule = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    fx.p,
-    fx.q,
-    [],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
-    forgedRuleAdmission,
-  );
-  expectDerivationError("invalid-node-judgment", () => replayStructuralDerivation(fx.memory, {
-    theory: fx.theory,
-    targetOccurrence: badRule.occurrence,
-    nodes: [badRule.node],
-  }));
-
-  const forgedDerivationAdmission = fx.memory.ensure(fx.fresh(), fx.mpDerivationRule);
-  const badDerivation = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    fx.p,
-    fx.q,
-    [],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
-    fx.mpRuleAdmission,
-    forgedDerivationAdmission,
-  );
-  expectDerivationError("derivation-rule-not-admitted", () => replayStructuralDerivation(fx.memory, {
-    theory: fx.theory,
-    targetOccurrence: badDerivation.occurrence,
-    nodes: [badDerivation.node],
-  }));
-}
-
-// Missing either explicit MP dependency rejects; no premise is synthesized.
-{
-  const fx = logicFixture();
-  const implication = fx.imp(fx.p, fx.q);
-  const assumptions = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.p, implication]);
-  const pOccurrence = fx.memory.find(assumptions, fx.p);
-  const impOccurrence = fx.memory.find(assumptions, implication);
-  assert(pOccurrence !== undefined && impOccurrence !== undefined, "missing-premise assumptions");
-  for (const only of [[pOccurrence], [impOccurrence]] as const) {
-    const target = fx.makeMpNode(
-      fx.theory,
-      fx.main,
-      fx.p,
-      fx.q,
-      only,
-      defineContext(fx.memory, fx.fresh(), fx.fresh()),
-    );
-    expectAssumptionError("invalid-assumption-derivation", () => replayStructuralDerivationWithAssumptions(
-      fx.memory,
-      {
+  const valid = fx.assume(fx.p, fx.imp(fx.p, fx.q));
+  for (const premises of [[valid.occurrences[0]!], [valid.occurrences[1]!]]) {
+    const target = fx.mpNode(fx.theory, fx.main, fx.p, fx.q, premises);
+    expectError(StructuralAssumptionReplayError, "invalid-assumption-derivation", () =>
+      replayStructuralDerivationWithAssumptions(fx.memory, {
         derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
-        assumptionContext: assumptions,
-      },
-    ));
+        assumptionContext: valid.context,
+      }),
+    );
+  }
+
+  for (const wrongImp of [
+    fx.imp(fx.p, fx.r),
+    fx.imp(fx.p, fx.q, fx.fresh()),
+  ]) {
+    const a = fx.assume(fx.p, wrongImp);
+    const target = fx.mpNode(fx.theory, fx.main, fx.p, fx.q, a.occurrences);
+    expectError(StructuralAssumptionReplayError, "invalid-assumption-derivation", () =>
+      replayStructuralDerivationWithAssumptions(fx.memory, {
+        derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
+        assumptionContext: a.context,
+      }),
+    );
   }
 }
 
-// Wrong consequent or different grounded implication tag cannot match by host convention.
+// A conditional Γ|-Q replay cannot be submitted as an unconditional theorem proof.
 {
-  const fx = logicFixture();
-  const wrongImp = fx.imp(fx.p, fx.r);
-  const wrongContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.p, wrongImp]);
-  const pOccurrence = fx.memory.find(wrongContext, fx.p);
-  const wrongOccurrence = fx.memory.find(wrongContext, wrongImp);
-  assert(pOccurrence !== undefined && wrongOccurrence !== undefined, "wrong consequent assumptions");
-  const wrongTarget = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    fx.p,
-    fx.q,
-    [pOccurrence, wrongOccurrence],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
-  );
-  expectAssumptionError("invalid-assumption-derivation", () => replayStructuralDerivationWithAssumptions(
-    fx.memory,
-    {
-      derivation: { theory: fx.theory, targetOccurrence: wrongTarget.occurrence, nodes: [wrongTarget.node] },
-      assumptionContext: wrongContext,
-    },
-  ));
-
-  const impTag2 = fx.fresh();
-  const renamedImp = fx.imp(fx.p, fx.q, impTag2);
-  const renamedContext = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.p, renamedImp]);
-  const renamedP = fx.memory.find(renamedContext, fx.p);
-  const renamedOccurrence = fx.memory.find(renamedContext, renamedImp);
-  assert(renamedP !== undefined && renamedOccurrence !== undefined, "different-tag assumptions");
-  const renamedTarget = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    fx.p,
-    fx.q,
-    [renamedP, renamedOccurrence],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
-  );
-  expectAssumptionError("invalid-assumption-derivation", () => replayStructuralDerivationWithAssumptions(
-    fx.memory,
-    {
-      derivation: { theory: fx.theory, targetOccurrence: renamedTarget.occurrence, nodes: [renamedTarget.node] },
-      assumptionContext: renamedContext,
-    },
-  ));
-}
-
-// Conditional Γ |- Q evidence cannot be promoted to an unconditional theorem.
-{
-  const fx = logicFixture();
-  const implication = fx.imp(fx.p, fx.q);
-  const assumptions = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.p, implication]);
-  const pOccurrence = fx.memory.find(assumptions, fx.p);
-  const impOccurrence = fx.memory.find(assumptions, implication);
-  assert(pOccurrence !== undefined && impOccurrence !== undefined, "conditional theorem assumptions");
-  const target = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    fx.p,
-    fx.q,
-    [pOccurrence, impOccurrence],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
-  );
-  const conditional = {
+  const a = fx.assume(fx.p, fx.imp(fx.p, fx.q));
+  const target = fx.mpNode(fx.theory, fx.main, fx.p, fx.q, a.occurrences);
+  replayStructuralDerivationWithAssumptions(fx.memory, {
     derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
-    assumptionContext: assumptions,
-  };
-  replayStructuralDerivationWithAssumptions(fx.memory, conditional);
+    assumptionContext: a.context,
+  });
   const theorem = defineStructuralTheorem(fx.memory, fx.q, fx.theory);
-  expectTheoremError("theorem-proof-theory-mismatch", () => replayStructuralTheorem(fx.memory, {
-    theorem,
-    proof: conditional as unknown as StructuralDerivationEvidence,
-  }));
+  expectError(StructuralTheoremReplayError, "invalid-theorem-proof", () =>
+    replayStructuralTheorem(fx.memory, {
+      theorem,
+      proof: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
+    }),
+  );
 }
 
-// Read-only boundary detects a write even when MP structure itself is otherwise valid.
+// MP admission does not admit an unrelated host-labelled logical principle.
 {
-  const fx = logicFixture();
-  const implication = fx.imp(fx.p, fx.q);
-  const assumptions = defineStructuralAssumptionContext(fx.memory, fx.theory, [fx.p, implication]);
-  const pOccurrence = fx.memory.find(assumptions, fx.p);
-  const impOccurrence = fx.memory.find(assumptions, implication);
-  assert(pOccurrence !== undefined && impOccurrence !== undefined, "write-detection assumptions");
-  const target = fx.makeMpNode(
-    fx.theory,
-    fx.main,
-    fx.p,
-    fx.q,
-    [pOccurrence, impOccurrence],
-    defineContext(fx.memory, fx.fresh(), fx.fresh()),
+  const claim = fx.memory.ensure(fx.p, fx.q);
+  const role = fx.fresh();
+  const dictionary = defineStructuralRoleDictionary(fx.memory, [role]);
+  const rule = defineStructuralRule(fx.memory, dictionary, role);
+  const context = defineContext(fx.memory, fx.fresh(), fx.fresh());
+  const act = defineActHeader(fx.memory, fx.main.interpreter, dictionary, context);
+  defineActField(fx.memory, act, role, claim);
+  const occurrence = defineStructuralProofOccurrence(fx.memory, act, claim);
+  const derivationRule = defineStructuralDerivationRule(fx.memory, rule, []);
+  const node: StructuralDerivationNodeEvidence = {
+    occurrence,
+    judgment: {
+      application: {
+        act, rule, ruleAdmission: fx.memory.ensure(fx.fresh(), rule), claimedBody: claim,
+        expectedInterpreter: fx.main.expectedInterpreter, expectedAfterContext: context,
+      },
+      judgment: { theory: fx.theory, context, claim },
+    },
+    derivationRule,
+    derivationRuleAdmission: fx.memory.ensure(fx.fresh(), derivationRule),
+    premiseOccurrenceSequence: materializeExactSequence(fx.memory, []),
+  };
+  expectError(StructuralDerivationReplayError, "invalid-node-judgment", () =>
+    replayStructuralDerivation(fx.memory, {
+      theory: fx.theory, targetOccurrence: occurrence,
+      nodes: [{ ...node, logicalPrinciple: "excluded-middle" }],
+    }),
   );
+}
+
+// Read-only replay detects write injection.
+{
+  const a = fx.assume(fx.p, fx.imp(fx.p, fx.q));
+  const target = fx.mpNode(fx.theory, fx.main, fx.p, fx.q, a.occurrences);
   let injected = false;
   const malicious: ReadMemory = {
     get root() { return fx.memory.root; },
@@ -568,51 +378,12 @@ function logicFixture() {
     outgoing(start) { return fx.memory.outgoing(start); },
     incoming(end) { return fx.memory.incoming(end); },
   };
-  expectAssumptionError("assumption-replay-wrote", () => replayStructuralDerivationWithAssumptions(
-    malicious,
-    {
+  expectError(StructuralAssumptionReplayError, "assumption-replay-wrote", () =>
+    replayStructuralDerivationWithAssumptions(malicious, {
       derivation: { theory: fx.theory, targetOccurrence: target.occurrence, nodes: [target.node] },
-      assumptionContext: assumptions,
-    },
-  ));
-}
-
-// An unrelated host-labelled logical principle is not admitted by admitting MP.
-{
-  const fx = logicFixture();
-  const excludedMiddleLike = fx.memory.ensure(fx.p, fx.q);
-  const emRole = fx.fresh();
-  const emDictionary = defineStructuralRoleDictionary(fx.memory, [emRole]);
-  const emRule = defineStructuralRule(fx.memory, emDictionary, emRole);
-  const context = defineContext(fx.memory, fx.fresh(), fx.fresh());
-  const act = defineActHeader(fx.memory, fx.main.interpreter, emDictionary, context);
-  defineActField(fx.memory, act, emRole, excludedMiddleLike);
-  const forgedAdmission = fx.memory.ensure(fx.fresh(), emRule);
-  const occurrence = defineStructuralProofOccurrence(fx.memory, act, excludedMiddleLike);
-  const derivationRule = defineStructuralDerivationRule(fx.memory, emRule, []);
-  const node: StructuralDerivationNodeEvidence = {
-    occurrence,
-    judgment: {
-      application: {
-        act,
-        rule: emRule,
-        ruleAdmission: forgedAdmission,
-        claimedBody: excludedMiddleLike,
-        expectedInterpreter: fx.main.expectedInterpreter,
-        expectedAfterContext: context,
-      },
-      judgment: { theory: fx.theory, context, claim: excludedMiddleLike },
-    },
-    derivationRule,
-    derivationRuleAdmission: fx.memory.ensure(fx.fresh(), derivationRule),
-    premiseOccurrenceSequence: materializeExactSequence(fx.memory, []),
-  };
-  const hostLabelled = { ...node, logicalPrinciple: "excluded-middle" };
-  expectDerivationError("invalid-node-judgment", () => replayStructuralDerivation(fx.memory, {
-    theory: fx.theory,
-    targetOccurrence: occurrence,
-    nodes: [hostLabelled],
-  }));
+      assumptionContext: a.context,
+    }),
+  );
 }
 
 const P5_LOGIC_AS_DERIVED_THEORY_SUPPORTED = true;
