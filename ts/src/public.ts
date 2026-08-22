@@ -137,6 +137,17 @@ export type {
 } from "./run.js";
 
 export {
+  StructuralJudgmentReplayError,
+  replayStructuralJudgment,
+} from "./derivation.js";
+export type {
+  StructuralJudgment,
+  StructuralJudgmentEvidence,
+  StructuralJudgmentReplayErrorCode,
+  StructuralJudgmentReplayResult,
+} from "./derivation.js";
+
+export {
   ProofRuleReplayError,
   replayDecomposeEqualRelations,
 } from "./proof.js";
