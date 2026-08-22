@@ -137,10 +137,16 @@ export type {
 } from "./run.js";
 
 export {
+  StructuralDerivationReplayError,
   StructuralJudgmentReplayError,
+  replayStructuralDerivation,
   replayStructuralJudgment,
 } from "./derivation.js";
 export type {
+  StructuralDerivationEvidence,
+  StructuralDerivationNodeEvidence,
+  StructuralDerivationReplayErrorCode,
+  StructuralDerivationReplayResult,
   StructuralJudgment,
   StructuralJudgmentEvidence,
   StructuralJudgmentReplayErrorCode,
