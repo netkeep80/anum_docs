@@ -460,3 +460,11 @@ export function replayPortableStructuralDerivation(
     replay,
   });
 }
+
+export function canonicalPortableStructuralDerivationV02Json(input: unknown): string {
+  const artifact = parseArtifact(input);
+  if (artifact.schema !== PORTABLE_STRUCTURAL_DERIVATION_SCHEMA_V0_2) {
+    fail("unsupported-schema");
+  }
+  return JSON.stringify(artifact);
+}
