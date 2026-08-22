@@ -1,8 +1,8 @@
 {
   "schema": "mts-contract/v0.11",
-  "status": "candidate",
-  "accepted": false,
-  "issue": 758,
+  "status": "accepted",
+  "accepted": true,
+  "issue": 804,
   "candidateLifecycleIssue": 755,
   "semanticBase": "mts-contract/v0.10",
   "observableSemanticDelta": true,
@@ -10,16 +10,21 @@
     "contract": "mts-contract/v0.10",
     "conformance": "mts-conformance/v0.10",
     "immutable": true,
-    "liveRuntimeSelectable": true
+    "liveRuntimeSelectable": false
   },
   "conformanceCorpus": "contracts/mts-conformance-v0.11.json",
-  "acceptedCurrent": "mts-contract/v0.10",
+  "currentPointer": "cutover/typescript-c1-acceptance-v0.4.json",
+  "acceptedMtsVersion": "mts-contract/v0.11",
+  "acceptedCurrent": "mts-contract/v0.11",
   "acceptanceReady": true,
   "implementation": {
     "language": "TypeScript",
     "package": "@mts/core",
+    "packageManifest": "ts/package.json",
     "publicFacade": "ts/src/public.ts",
     "singleLiveSemanticRuntime": true,
+    "pythonRuntimePresent": false,
+    "compatibilityRuntimeSelectable": false,
     "candidateRuntimeSelectable": false,
     "implementationComplete": true,
     "productionBehaviorChanged": true,
@@ -56,6 +61,29 @@
       "evidenceOnly": true
     }
   },
+  "owners": {
+    "publicFacade": "ts/src/public.ts",
+    "memory": "ts/src/memory.ts",
+    "anum": "ts/src/anum.ts",
+    "source": "ts/src/source.ts",
+    "state": "ts/src/state.ts",
+    "dictionary": "ts/src/dictionary.ts",
+    "interpreter": "ts/src/interpreter.ts",
+    "sequence": "ts/src/sequence.ts",
+    "run": "ts/src/run.ts",
+    "proof": "ts/src/proof.ts",
+    "checker": "ts/src/checker.ts",
+    "directDeixis": "ts/src/direct-deixis.ts",
+    "valueBundle": "ts/src/value-bundle.ts",
+    "persistenceTopology": "ts/src/persistence-topology.ts",
+    "persistenceStore": "ts/src/persistent-store.ts",
+    "persistenceSequence": "ts/src/persistent-sequence.ts",
+    "exactSequence": "ts/src/exact-sequence.ts",
+    "quaternaryState": "ts/src/quaternary-state.ts",
+    "byteCarrier": "ts/src/byte-carrier.ts",
+    "structuralRule": "ts/src/structural-rule.ts",
+    "contextIntegration": "ts/src/context-integration.ts"
+  },
   "rootBasisTarget": {
     "R": "R = R ⟼ R",
     "O": "O = O ⟼ R",
@@ -64,6 +92,14 @@
     "U": "U = C ⟼ O"
   },
   "foundation": {
+    "minimalInternalSigns": ["∞", "[", "]", "1", "0", "(", ")", "⟼", ":", "=", "."],
+    "deferredSigns": ["≡", "♂", "♀", "↑", "{", "}", "¬", "↛"],
+    "metaOnlySigns": ["∧", "⇔", "⇒", "≠", "→"],
+    "internalSignCount": 11,
+    "supersededResearchSigns": ["↑"],
+    "singleFormalArrow": "⟼",
+    "dotIntroduced": true,
+    "dotIsNewRootPrimitive": false,
     "inheritedInternalSigns": ["∞", "[", "]", "1", "0", "(", ")", "⟼", ":", "=", "."],
     "qAlphabet": ["[", "]", "1", "0"],
     "qAlphabetCount": 4,
@@ -71,6 +107,49 @@
     "colonIsQAbit": false,
     "newPrimitiveExpected": false,
     "minimalSignBasisStatus": "classified-c2-semantic-derived-presentation-cycle-retained"
+  },
+  "canonicalStringQuaternaryCarrier": {
+    "canonicalUnit": "byte",
+    "byteEnvelope": "[bbbbbbbb]",
+    "bitsPerEnvelope": 8,
+    "bitOrder": "MSB-first",
+    "unicodeNormalization": false,
+    "invalidUtf8CarrierAllowed": true,
+    "runtimeByteIdIsSemanticIdentity": false,
+    "representationEqualsInterpretation": false
+  },
+  "effects": {
+    "findEqualsMaterialize": false,
+    "notFoundImpliesNonExistence": false,
+    "readMayMaterialize": false,
+    "replayMayMaterialize": false,
+    "explicitMaterializationMustReuseSameGroundedForm": true
+  },
+  "signMeaningEquations": {
+    "∞": "m∞ = m∞ ⟼ m∞",
+    "[": "m[ = m[ ⟼ m∞",
+    "]": "m] = m∞ ⟼ m]",
+    "1": "m1 = m[ ⟼ m]",
+    "0": "m0 = m] ⟼ m[",
+    "(": "m( = m( ⟼ m∞",
+    ")": "m) = m∞ ⟼ m)",
+    "⟼": "m⟼ = m( ⟼ m)",
+    ":": "m: = m∞ ⟼ m⟼",
+    "=": "m= = m= ⟼ m=",
+    ".": "m. = m⟼ ⟼ m∞"
+  },
+  "expectedRootMeaningProjection": {
+    "∞": "R",
+    "[": "O",
+    "]": "C",
+    "1": "L",
+    "0": "U",
+    "(": "O",
+    ")": "C",
+    "⟼": "L",
+    ":": "R ⟼ L",
+    "=": "R",
+    ".": "L ⟼ R"
   },
   "zeroContextGenesis": {
     "zeroContextualWhole": "A₀ = R = ∞",
@@ -165,6 +244,14 @@
     "colonMeaning": "m: = R ⟼ L",
     "dotMeaning": "m. = L ⟼ R"
   },
+  "structuralDerivedResults": {
+    "write": "A[B] -> A ⟼ B",
+    "readBegin": "readBegin(A ⟼ B) = A",
+    "readEnd": "readEnd(A ⟼ B) = B",
+    "roundTrip": "construct(readBegin(X), readEnd(X)) = X",
+    "inversion": "Inv(A ⟼ B) = B ⟼ A",
+    "inversionIsRecursiveMirror": false
+  },
   "candidateState": {
     "researchGenesisComplete": true,
     "contractBoundaryEstablished": true,
@@ -175,5 +262,14 @@
     "executableEvidenceComplete": true,
     "runtimeImplementationComplete": true,
     "acceptedV010Mutated": false
+  },
+  "releaseState": {
+    "theoryResearchComplete": true,
+    "contractBoundaryEstablished": true,
+    "executableEvidenceComplete": true,
+    "runtimeMappingComplete": true,
+    "acceptedV010Mutated": false,
+    "acceptedCurrent": true,
+    "postAcceptanceDebtRepaymentPending": true
   }
 }

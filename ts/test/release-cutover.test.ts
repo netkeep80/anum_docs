@@ -51,16 +51,18 @@ interface ConformanceBoundary {
   readonly acceptanceReady?: boolean;
   readonly requiredExecutableGates?: readonly string[];
   readonly requiredNegativeVectors?: readonly string[];
-  readonly vectorEvidence?: {
-    readonly negative?: Readonly<Record<string, readonly string[]>>;
-  };
+  readonly vectorEvidence?: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>;
 }
 
 function mappedNegativeVector(conformance: ConformanceBoundary, id: string): boolean {
   if (!conformance.requiredNegativeVectors?.includes(id)) return false;
   const requiredGates = new Set(conformance.requiredExecutableGates ?? []);
-  const evidence = conformance.vectorEvidence?.negative ?? {};
-  return Object.entries(evidence).some(([testPath, ids]) => requiredGates.has(testPath) && ids.includes(id));
+  for (const evidenceGroup of Object.values(conformance.vectorEvidence ?? {})) {
+    if (Object.entries(evidenceGroup).some(([testPath, ids]) => requiredGates.has(testPath) && ids.includes(id))) {
+      return true;
+    }
+  }
+  return false;
 }
 
 const packageJson = JSON.parse(readFileSync(join(repoRoot, "ts/package.json"), "utf8")) as {
@@ -79,7 +81,7 @@ assert(
   "package root must expose matching declaration and runtime outputs",
 );
 
-const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.10.json"), "utf8")) as {
+const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.11.json"), "utf8")) as {
   readonly schema?: string;
   readonly status?: string;
   readonly accepted?: boolean;
@@ -93,28 +95,29 @@ const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-
     readonly compatibilityRuntimeSelectable?: boolean;
   };
 };
-assert(contract.schema === "mts-contract/v0.10", "current contract must be v0.10");
-assert(contract.status === "accepted" && contract.accepted === true, "current v0.10 contract must be accepted");
-assert(contract.semanticBase === "mts-contract/v0.9", "v0.10 semantic base must be accepted v0.9");
-assert(contract.observableSemanticDelta === true, "v0.10 must retain its explicit semantic delta");
-assert(contract.acceptanceReady === true, "accepted v0.10 must retain proven readiness");
+assert(contract.schema === "mts-contract/v0.11", "current contract must be v0.11");
+assert(contract.status === "accepted" && contract.accepted === true, "current v0.11 contract must be accepted");
+assert(contract.semanticBase === "mts-contract/v0.10", "v0.11 semantic base must be accepted v0.10");
+assert(contract.observableSemanticDelta === true, "v0.11 must retain its explicit semantic delta");
+assert(contract.acceptanceReady === true, "accepted v0.11 must retain proven readiness");
 assert(contract.implementation?.language === "TypeScript", "current implementation must be TypeScript");
 assert(contract.implementation?.pythonRuntimePresent === false, "current contract must reject Python runtime ownership");
 assert(contract.implementation?.singleLiveSemanticRuntime === true, "accepted runtime must remain single");
 assert(contract.implementation?.compatibilityRuntimeSelectable === false, "compatibility runtime must remain unavailable");
 
 const conformance = JSON.parse(
+  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.11.json"), "utf8"),
+) as ConformanceBoundary;
+assert(conformance.status === "accepted" && conformance.accepted === true, "current v0.11 conformance must be accepted");
+assert(conformance.acceptanceReady === true, "accepted v0.11 conformance must retain proven readiness");
+
+// Keep the immediately previous accepted release independently checkable while
+// the trusted-base current/previous pair rotates from v0.10/v0.9 to v0.11/v0.10.
+const previousConformance = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-conformance-v0.10.json"), "utf8"),
 ) as ConformanceBoundary;
-assert(conformance.status === "accepted" && conformance.accepted === true, "current v0.10 conformance must be accepted");
-assert(conformance.acceptanceReady === true, "accepted v0.10 conformance must retain proven readiness");
-
-// Trusted base policy still evaluates the same PR head while v0.9 is current.
-// Keep its negative-vector bindings independently checkable during rotation.
-const previousConformance = JSON.parse(
-  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.9.json"), "utf8"),
-) as ConformanceBoundary;
-assert(previousConformance.status === "accepted" && previousConformance.accepted === true, "previous v0.9 conformance must remain accepted evidence");
+assert(previousConformance.status === "accepted" && previousConformance.accepted === true, "previous v0.10 conformance must remain accepted evidence");
+assert(previousConformance.acceptanceReady === true, "previous v0.10 conformance must retain proven readiness");
 
 const currentPython = pythonFiles(repoRoot);
 negativeVector("python-runtime-present", currentPython.length === 0);
@@ -142,7 +145,7 @@ const countBeforeRead = memory.linkCount;
 memory.find(basis.L, basis.U);
 memory.outgoing(basis.L);
 memory.incoming(basis.U);
-negativeVector("read-or-replay-materializes", memory.linkCount === countBeforeRead && mappedNegativeVector(previousConformance, "read-or-replay-materializes"));
+negativeVector("read-or-replay-materializes", memory.linkCount === countBeforeRead);
 
 let rootRejected = false;
 try {
@@ -153,38 +156,25 @@ try {
 negativeVector("root-as-fifth-abit", rootRejected);
 negativeVector("empty-group-rejected", deserializeStream("[]", symbolicStackAlgebra).denotation === "R");
 
-// Retain every accepted-v0.9 literal anchor for trusted base policy.
-negativeVector("exact-sequence-empty-vs-single-root", mappedNegativeVector(previousConformance, "exact-sequence-empty-vs-single-root"));
-negativeVector("exact-sequence-leading-root-loss", mappedNegativeVector(previousConformance, "exact-sequence-leading-root-loss"));
-negativeVector("restricted-rooted-sequence-admits-root", mappedNegativeVector(previousConformance, "restricted-rooted-sequence-admits-root"));
-negativeVector("exact-sequence-malformed-cell", mappedNegativeVector(previousConformance, "exact-sequence-malformed-cell"));
-negativeVector("exact-sequence-predecessor-cycle", mappedNegativeVector(previousConformance, "exact-sequence-predecessor-cycle"));
-negativeVector("q-state-hidden-started-disagrees", mappedNegativeVector(previousConformance, "q-state-hidden-started-disagrees"));
-negativeVector("canonical-string-carrier-codepoint-envelope", mappedNegativeVector(previousConformance, "canonical-string-carrier-codepoint-envelope"));
-negativeVector("canonical-byte-opaque-runtime-id", mappedNegativeVector(previousConformance, "canonical-byte-opaque-runtime-id"));
-negativeVector("forged-interpreter-configuration", mappedNegativeVector(previousConformance, "forged-interpreter-configuration"));
-negativeVector("interpreter-components-disagree-with-evidence", mappedNegativeVector(previousConformance, "interpreter-components-disagree-with-evidence"));
-negativeVector("forged-role-dictionary", mappedNegativeVector(previousConformance, "forged-role-dictionary"));
-negativeVector("rule-not-admitted-by-theory", mappedNegativeVector(previousConformance, "rule-not-admitted-by-theory"));
-negativeVector("rule-missing-required-role", mappedNegativeVector(previousConformance, "rule-missing-required-role"));
-negativeVector("rule-conflicting-role-binding", mappedNegativeVector(previousConformance, "rule-conflicting-role-binding"));
-negativeVector("rule-undeclared-role-binding", mappedNegativeVector(previousConformance, "rule-undeclared-role-binding"));
-negativeVector("rule-wrong-result", mappedNegativeVector(previousConformance, "rule-wrong-result"));
-negativeVector("rule-wrong-before-context", mappedNegativeVector(previousConformance, "rule-wrong-before-context"));
-negativeVector("rule-wrong-after-context", mappedNegativeVector(previousConformance, "rule-wrong-after-context"));
-negativeVector("context-close-wrong-parent", mappedNegativeVector(previousConformance, "context-close-wrong-parent"));
-negativeVector("parent-continuation-wrong-interpreter", mappedNegativeVector(previousConformance, "parent-continuation-wrong-interpreter"));
-negativeVector("returned-root-disappears-from-exact-parent-sequence", mappedNegativeVector(previousConformance, "returned-root-disappears-from-exact-parent-sequence"));
-negativeVector("noncanonical-unparenthesized-formal-relation", mappedNegativeVector(previousConformance, "noncanonical-unparenthesized-formal-relation"));
-negativeVector("empty-formal-context-admitted", mappedNegativeVector(previousConformance, "empty-formal-context-admitted"));
+// Retain every accepted-v0.10 required negative as a literal trusted-base anchor.
+negativeVector("v010-free-dot-has-no-ambient-current", mappedNegativeVector(previousConformance, "v010-free-dot-has-no-ambient-current"));
+negativeVector("v010-dot-is-not-parent-navigation", mappedNegativeVector(previousConformance, "v010-dot-is-not-parent-navigation"));
+negativeVector("v010-dot-is-not-runtime-current", mappedNegativeVector(previousConformance, "v010-dot-is-not-runtime-current"));
+negativeVector("v010-dot-is-not-read-begin", mappedNegativeVector(previousConformance, "v010-dot-is-not-read-begin"));
+negativeVector("v010-dot-is-not-read-end", mappedNegativeVector(previousConformance, "v010-dot-is-not-read-end"));
+negativeVector("v010-dot-is-not-storage-dereference", mappedNegativeVector(previousConformance, "v010-dot-is-not-storage-dereference"));
+negativeVector("v010-dot-is-not-arbitrary-rewrite", mappedNegativeVector(previousConformance, "v010-dot-is-not-arbitrary-rewrite"));
+negativeVector("v010-nonroot-full-dot-selfclosure-rejected", mappedNegativeVector(previousConformance, "v010-nonroot-full-dot-selfclosure-rejected"));
 
-// New current-v0.10 anchors prove that every required negative boundary is
-// backed by one of the exact executable gates run by full CI.
-negativeVector("v010-free-dot-has-no-ambient-current", mappedNegativeVector(conformance, "v010-free-dot-has-no-ambient-current"));
-negativeVector("v010-dot-is-not-parent-navigation", mappedNegativeVector(conformance, "v010-dot-is-not-parent-navigation"));
-negativeVector("v010-dot-is-not-runtime-current", mappedNegativeVector(conformance, "v010-dot-is-not-runtime-current"));
-negativeVector("v010-dot-is-not-read-begin", mappedNegativeVector(conformance, "v010-dot-is-not-read-begin"));
-negativeVector("v010-dot-is-not-read-end", mappedNegativeVector(conformance, "v010-dot-is-not-read-end"));
-negativeVector("v010-dot-is-not-storage-dereference", mappedNegativeVector(conformance, "v010-dot-is-not-storage-dereference"));
-negativeVector("v010-dot-is-not-arbitrary-rewrite", mappedNegativeVector(conformance, "v010-dot-is-not-arbitrary-rewrite"));
-negativeVector("v010-nonroot-full-dot-selfclosure-rejected", mappedNegativeVector(conformance, "v010-nonroot-full-dot-selfclosure-rejected"));
+// Current-v0.11 anchors must each map through one of the exact C1-C5 gates
+// required by the accepted current conformance. Evidence-group names are not
+// semantic, so the helper traverses every group rather than assuming "negative".
+negativeVector("v011-root-is-not-execution-frame", mappedNegativeVector(conformance, "v011-root-is-not-execution-frame"));
+negativeVector("v011-dot-is-not-ambient-runtime-current", mappedNegativeVector(conformance, "v011-dot-is-not-ambient-runtime-current"));
+negativeVector("v011-top-bind-does-not-insert-hidden-root-glyph", mappedNegativeVector(conformance, "v011-top-bind-does-not-insert-hidden-root-glyph"));
+negativeVector("v011-nonroot-pair-A-A-is-not-A", mappedNegativeVector(conformance, "v011-nonroot-pair-A-A-is-not-A"));
+negativeVector("v011-colon-meaning-is-not-dot-dot-fold", mappedNegativeVector(conformance, "v011-colon-meaning-is-not-dot-dot-fold"));
+negativeVector("v011-q-alphabet-remains-four-abits", mappedNegativeVector(conformance, "v011-q-alphabet-remains-four-abits"));
+negativeVector("v011-dot-is-not-q-abit", mappedNegativeVector(conformance, "v011-dot-is-not-q-abit"));
+negativeVector("v011-colon-is-not-q-abit", mappedNegativeVector(conformance, "v011-colon-is-not-q-abit"));
+negativeVector("v011-host-stack-is-not-semantic-authority", mappedNegativeVector(conformance, "v011-host-stack-is-not-semantic-authority"));

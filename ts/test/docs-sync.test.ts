@@ -39,13 +39,14 @@ expectThrow(
 
 const repositoryRoot = findRepositoryRoot();
 const projection = loadCurrentProjection(repositoryRoot);
-assert.equal(projection.currentContract, "mts-contract/v0.10");
-assert.equal(projection.previousContract, "mts-contract/v0.9");
+assert.equal(projection.currentContract, "mts-contract/v0.11");
+assert.equal(projection.previousContract, "mts-contract/v0.10");
 assert.deepEqual(projection.internalSigns, ["∞", "[", "]", "1", "0", "(", ")", "⟼", ":", "=", "."]);
 assert.equal(projection.readMayMaterialize, false);
 assert.equal(projection.notFoundImpliesNonExistence, false);
 
 const rendered = renderCurrentProjection(projection);
+assert.ok(rendered.includes("mts-contract/v0.11"));
 assert.ok(rendered.includes("mts-contract/v0.10"));
 assert.ok(rendered.includes("∞ [ ] 1 0 ( ) ⟼ : = ."));
 assert.ok(rendered.includes(PROJECTION_START));
@@ -61,14 +62,14 @@ try {
     writeFileSync(target, readFileSync(resolve(repositoryRoot, path), "utf8"), "utf8");
   };
   copy("repo-policy.json");
+  copy("contracts/mts-contract-v0.11.json");
+  copy("contracts/mts-conformance-v0.11.json");
   copy("contracts/mts-contract-v0.10.json");
   copy("contracts/mts-conformance-v0.10.json");
-  copy("contracts/mts-contract-v0.9.json");
-  copy("contracts/mts-conformance-v0.9.json");
   for (const path of CANONICAL_DOCS) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
-  writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.10", "mts-contract/v0.X"), "utf8");
+  writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.11", "mts-contract/v0.X"), "utf8");
   assert.deepEqual(checkRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "устаревший блок должен обнаруживаться");
   assert.deepEqual(syncRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "синхронизация должна исправлять только устаревший файл");
   assert.deepEqual(checkRepositoryDocs(tempRoot), []);
