@@ -218,9 +218,9 @@ async function main(): Promise<void> {
   );
 
   const baseArtifact = exportPortableStructuralDerivation(fx.memory, fx.evidence.derivation);
-  await expectPortable("unsupported-schema", () =>
+  await expectPortable("invalid-envelope", () =>
     computePortableStructuralDerivationWithAssumptionsContentDigest(baseArtifact));
-  await expectPortable("unsupported-schema", () =>
+  await expectPortable("invalid-envelope", () =>
     computePortableStructuralDerivationContentDigest(artifact));
   await expectPortable("unsupported-schema", () =>
     computePortableStructuralDerivationWithAssumptionsContentDigest({ ...artifact, schema: "unknown" }));
