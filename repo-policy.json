@@ -332,8 +332,8 @@
       "scope": "directory",
       "metric": "files",
       "glob": "contracts/**",
-      "max": 6,
-      "max_growth": 2,
+      "max": 4,
+      "max_growth": 0,
       "count": "all_tracked",
       "level": "blocking"
     },
