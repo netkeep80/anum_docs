@@ -16,6 +16,8 @@ import type {
   StackAlgebra,
   StoredDataset,
   StructuralDerivationEvidence,
+  StructuralDerivationWithAssumptionsEvidence,
+  StructuralDerivationWithAssumptionsReplayResult,
   StructuralDerivationWithTheoremsEvidence,
   StructuralJudgmentEvidence,
   StructuralTheoremEvidence,
@@ -31,6 +33,8 @@ import type { AppendOnlyReadMemory } from "../src/public.js";
 import type { EnumerableReadMemory } from "../src/public.js";
 // @ts-expect-error Consumers use RelationReplayEvidence, not standalone role plumbing.
 import type { RelationRoles } from "../src/public.js";
+// @ts-expect-error P3b keeps assumption construction internal; consumers submit materialized evidence.
+type InternalAssumptionContextConstructor = typeof import("../src/public.js").defineStructuralAssumptionContext;
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`public-api: ${message}`);
@@ -52,6 +56,7 @@ const expectedRuntimeExports = [
   "RunReplayError",
   "SequenceReplayError",
   "StreamError",
+  "StructuralAssumptionReplayError",
   "StructuralDerivationReplayError",
   "StructuralJudgmentReplayError",
   "StructuralTheoremReplayError",
@@ -84,6 +89,7 @@ const expectedRuntimeExports = [
   "replayRun",
   "replaySequenceMaterialization",
   "replayStructuralDerivation",
+  "replayStructuralDerivationWithAssumptions",
   "replayStructuralDerivationWithTheorems",
   "replayStructuralJudgment",
   "replayStructuralTheorem",
@@ -119,6 +125,8 @@ const deixis: DirectDeixisVocabulary | undefined = undefined;
 const value: MtsValue | undefined = undefined;
 const run: RunEvidence | undefined = undefined;
 const derivation: StructuralDerivationEvidence | undefined = undefined;
+const derivationWithAssumptions: StructuralDerivationWithAssumptionsEvidence | undefined = undefined;
+const derivationWithAssumptionsResult: StructuralDerivationWithAssumptionsReplayResult | undefined = undefined;
 const derivationWithTheorems: StructuralDerivationWithTheoremsEvidence | undefined = undefined;
 const theorem: StructuralTheoremEvidence | undefined = undefined;
 const judgment: StructuralJudgmentEvidence | undefined = undefined;
@@ -140,6 +148,8 @@ void [
   value,
   run,
   derivation,
+  derivationWithAssumptions,
+  derivationWithAssumptionsResult,
   derivationWithTheorems,
   theorem,
   judgment,
