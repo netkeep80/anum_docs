@@ -189,7 +189,11 @@ function fixture() {
     env: Environment = main,
     ruleAdmission: LinkHandle = p.ruleAdmission,
   ): Built {
-    const act = defineActHeader(memory, env.interpreter, p.roleDictionary, K);
+    // Structural proof execution context is independent from object-logic K,
+    // which remains explicit in claim templates and role bindings.
+    void K;
+    const proofContext = defineContext(memory, fresh(), fresh());
+    const act = defineActHeader(memory, env.interpreter, p.roleDictionary, proofContext);
     for (const [role, value] of bindings) defineActField(memory, act, role, value);
     const judgment: StructuralJudgmentEvidence = {
       application: {
@@ -198,9 +202,9 @@ function fixture() {
         ruleAdmission,
         claimedBody: claim,
         expectedInterpreter: env.expectedInterpreter,
-        expectedAfterContext: K,
+        expectedAfterContext: proofContext,
       },
-      judgment: { theory: selectedTheory, context: K, claim },
+      judgment: { theory: selectedTheory, context: proofContext, claim },
     };
     const occurrence = defineStructuralProofOccurrence(memory, act, claim);
     return Object.freeze({
