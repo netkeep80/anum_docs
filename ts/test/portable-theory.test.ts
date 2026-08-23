@@ -53,7 +53,8 @@ async function expectTheory(
     await effect();
   } catch (error) {
     assert(error instanceof PortableStructuralTheoryError, `${code}: wrong error type`);
-    same(error.code, code, `${code}: wrong error code`);
+    const theoryError = error as { readonly code: string };
+    same(theoryError.code, code, `${code}: wrong error code`);
     return;
   }
   throw new Error(`${code}: expected exact Theory boundary rejection`);
@@ -209,12 +210,16 @@ async function main(): Promise<void> {
   const derivationBefore = await computePortableStructuralTheoryRevision(
     exportPortableStructuralTheory(derivationChanged.memory, derivationChanged.theory),
   );
-  const extraDerivationRule = defineStructuralDerivationRule(
+  const additionalDerivationRule = defineStructuralDerivationRule(
     derivationChanged.memory,
     derivationChanged.rule,
     [derivationChanged.role],
   );
-  admitStructuralDerivationRule(derivationChanged.memory, derivationChanged.theory, extraDerivationRule);
+  admitStructuralDerivationRule(
+    derivationChanged.memory,
+    derivationChanged.theory,
+    additionalDerivationRule,
+  );
   const derivationAfter = await computePortableStructuralTheoryRevision(
     exportPortableStructuralTheory(derivationChanged.memory, derivationChanged.theory),
   );
