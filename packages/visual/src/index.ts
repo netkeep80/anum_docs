@@ -104,3 +104,4 @@ export * from "./blueprint-geometry.js";
 export * from "./blueprint-svg.js";
 export * from "./blueprint-interaction.js";
 export * from "./geometry3d.js";
+export * from "./physics3d.js";
