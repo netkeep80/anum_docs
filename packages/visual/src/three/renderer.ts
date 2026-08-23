@@ -351,11 +351,16 @@ function pointerRect(state: MountedRenderer, live: LiveBinding): Readonly<{
   width: number;
   height: number;
 }> {
-  const raw = live.element.getBoundingClientRect?.() ?? state.container.getBoundingClientRect();
+  const raw = (live.element.getBoundingClientRect?.() ?? state.container.getBoundingClientRect()) as {
+    readonly left?: number;
+    readonly top?: number;
+    readonly width: number;
+    readonly height: number;
+  };
   const width = Number.isFinite(raw.width) && raw.width > 0 ? raw.width : state.width;
   const height = Number.isFinite(raw.height) && raw.height > 0 ? raw.height : state.height;
-  const left = "left" in raw && Number.isFinite(raw.left) ? raw.left ?? 0 : 0;
-  const top = "top" in raw && Number.isFinite(raw.top) ? raw.top ?? 0 : 0;
+  const left = typeof raw.left === "number" && Number.isFinite(raw.left) ? raw.left : 0;
+  const top = typeof raw.top === "number" && Number.isFinite(raw.top) ? raw.top : 0;
   return { left, top, width: Math.max(1, width), height: Math.max(1, height) };
 }
 
