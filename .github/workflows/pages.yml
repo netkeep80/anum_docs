@@ -1,0 +1,82 @@
+name: Contract Observatory Pages
+
+on:
+  pull_request:
+    branches: ["**"]
+    paths:
+      - "contracts/**"
+      - "cutover/**"
+      - "repo-policy.json"
+      - "web/contract-observatory/**"
+      - ".github/workflows/pages.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "contracts/**"
+      - "cutover/**"
+      - "repo-policy.json"
+      - "web/contract-observatory/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: contract-observatory-pages
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install TypeScript toolchain
+        run: npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+
+      - name: Compile Contract Observatory
+        run: ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
+
+      - name: Verify Contract Observatory evidence and static site
+        run: |
+          node web/contract-observatory/dist/test/contract-index.test.js
+          node web/contract-observatory/dist/test/site.test.js
+
+      - name: Materialize Pages artifact
+        run: |
+          node web/contract-observatory/dist/src/build-site.js . _site
+          test -s _site/index.html
+          test -f _site/.nojekyll
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Deploy Contract Observatory
+        id: deployment
+        uses: actions/deploy-pages@v4
