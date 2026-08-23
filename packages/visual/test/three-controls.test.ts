@@ -196,6 +196,57 @@ try {
 same(invalidCode, "invalid-physics-option", "negative charge is validated by accepted V2e/V2d boundary");
 same(JSON.stringify(snapshotLivePhysics3D(controller)), beforeInvalid, "rejected physics patch leaves live state untouched");
 
+const { attachVisualThreeLiveController, buildVisualThreeSceneData } = await import("../src/three/index.js");
+const replacementController = createLivePhysics3D(network, initial, { settleWindow: 1 });
+sleepLivePhysics3D(controller);
+sleepLivePhysics3D(replacementController);
+frames.clear();
+const replacementPositions = JSON.stringify(snapshotLivePhysics3D(replacementController).state.positions);
+const reattachOptions = {
+  controlsFactory: () => ({
+    enabled: true,
+    target: { copy() { return this; } },
+    update() {},
+    addEventListener() {},
+    removeEventListener() {},
+    dispose() {},
+  }),
+  requestFrame(callback: (timestamp: number) => void) {
+    const id = nextFrame++;
+    frames.set(id, callback);
+    return id;
+  },
+  cancelFrame(id: number) { frames.delete(id); },
+} as never;
+same(
+  attachVisualThreeLiveController(
+    rendererHost as never,
+    replacementController,
+    (state) => buildVisualThreeSceneData(network, state),
+    reattachOptions,
+  ),
+  true,
+  "public reattach replaces current V2e controller",
+);
+same(setVisualThreeLivePhysicsOptions(rendererHost as never, { charge: 4 }), true, "D patch accepted after public reattach");
+same(snapshotLivePhysics3D(replacementController).awake, true, "D patch targets current reattached V2e controller");
+same(snapshotLivePhysics3D(controller).awake, false, "D patch does not wake stale former V2e controller");
+same(
+  JSON.stringify(snapshotLivePhysics3D(replacementController).state.positions),
+  replacementPositions,
+  "D patch preserves current controller coordinates after reattach",
+);
+same(
+  attachVisualThreeLiveController(
+    rendererHost as never,
+    controller,
+    (state) => buildVisualThreeSceneData(network, state),
+    reattachOptions,
+  ),
+  true,
+  "original controller restored for remaining control-bar checks",
+);
+
 const controlHost = host();
 const root = node("controls");
 const chargeInput = input("charge");
