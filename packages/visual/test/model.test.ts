@@ -8,6 +8,7 @@ import "./three-scene.test.js";
 import "./three-renderer.test.js";
 import "./three-controls.test.js";
 import "./presentation.test.js";
+import "./three-presentation.test.js";
 
 import {
   VisualNetworkError,
