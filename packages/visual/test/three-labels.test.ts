@@ -24,7 +24,11 @@ function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
 }
 
-type FakeElement = { parentNode?: FakeContainer | null };
+type FakeElement = {
+  parentNode?: FakeContainer | null;
+  addEventListener?: (type: string, listener: (...args: never[]) => void) => void;
+  removeEventListener?: (type: string, listener: (...args: never[]) => void) => void;
+};
 type FakeContainer = {
   clientWidth: number;
   clientHeight: number;
@@ -168,7 +172,12 @@ const liveState: Physics3DState = {
   velocities: [{ key: "R", vector: { x: 0, y: 0, z: 0 } }],
 };
 const controller = createLivePhysics3D(liveNetwork, liveState, { settleWindow: 1 });
-const liveSurface: SurfaceProbe = { domElement: { parentNode: null }, setSize() {}, render() {}, dispose() {} };
+const liveSurface: SurfaceProbe = {
+  domElement: { parentNode: null, addEventListener() {}, removeEventListener() {} },
+  setSize() {},
+  render() {},
+  dispose() {},
+};
 createVisualThreeLiveRenderer(liveHost as never, liveNetwork, controller, {
   surfaceFactory: () => liveSurface as never,
   resizeObserverFactory: () => ({ disconnect() {} }),
