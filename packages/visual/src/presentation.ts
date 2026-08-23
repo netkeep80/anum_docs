@@ -1,4 +1,4 @@
-import type { VisualKey, VisualLinkNetwork } from "./index.js";
+import type { VisualKey } from "./index.js";
 
 export interface VisualHaloPresentation {
   readonly color: number;
@@ -17,6 +17,10 @@ export interface VisualLinkPresentation {
 
 export interface VisualPresentationState {
   readonly links: readonly VisualLinkPresentation[];
+}
+
+export interface VisualPresentationKeySpace {
+  readonly links: readonly Readonly<{ key: VisualKey }>[];
 }
 
 export type VisualPresentationErrorCode =
@@ -60,10 +64,10 @@ function validateHalo(key: VisualKey, halo: VisualHaloPresentation): void {
 }
 
 export function validateVisualPresentationState(
-  network: VisualLinkNetwork,
+  keySpace: VisualPresentationKeySpace,
   state: VisualPresentationState,
 ): void {
-  const knownKeys = new Set(network.links.map((link) => link.key));
+  const knownKeys = new Set(keySpace.links.map((link) => link.key));
   const seenKeys = new Set<VisualKey>();
 
   for (const entry of state.links) {
@@ -105,10 +109,10 @@ function normalizeEntry(entry: VisualLinkPresentation): VisualLinkPresentation {
 }
 
 export function normalizeVisualPresentationState(
-  network: VisualLinkNetwork,
+  keySpace: VisualPresentationKeySpace,
   state: VisualPresentationState,
 ): VisualPresentationState {
-  validateVisualPresentationState(network, state);
+  validateVisualPresentationState(keySpace, state);
   const links = state.links
     .map(normalizeEntry)
     .sort((left, right) => (left.key < right.key ? -1 : left.key > right.key ? 1 : 0));
