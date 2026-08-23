@@ -1,6 +1,5 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { buildContractObservatoryIndex } from "./contract-index.js";
 import { renderContractObservatoryHtml } from "./site.js";
@@ -71,7 +70,6 @@ function runCli(): void {
   console.log(`Contract Observatory materialized: ${result.indexPath} (${result.indexBytes} bytes)`);
 }
 
-const invokedPath = process.argv[1];
-if (invokedPath !== undefined && resolve(invokedPath) === fileURLToPath(import.meta.url)) {
+if (require.main === module) {
   runCli();
 }
