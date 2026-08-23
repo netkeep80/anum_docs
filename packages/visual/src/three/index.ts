@@ -1,3 +1,5 @@
+export * from "./renderer.js";
+
 import {
   buildVisualGeometry3D,
   normalizeVisualLinkNetwork,
