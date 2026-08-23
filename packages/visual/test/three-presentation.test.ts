@@ -3,7 +3,6 @@ import {
   VisualPresentationError,
   validateVisualPresentationState,
   type Physics3DState,
-  type Point3D,
   type VisualLinkNetwork,
 } from "../src/index.js";
 import { createLivePhysics3D, snapshotLivePhysics3D } from "../src/live-physics3d.js";
