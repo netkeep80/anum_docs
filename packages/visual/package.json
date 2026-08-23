@@ -8,6 +8,10 @@
     ".": {
       "types": "./dist/src/index.d.ts",
       "default": "./dist/src/index.js"
+    },
+    "./three": {
+      "types": "./dist/src/three/index.d.ts",
+      "default": "./dist/src/three/index.js"
     }
   },
   "files": [
@@ -17,5 +21,8 @@
     "build": "tsc -p tsconfig.json",
     "test": "npm run build --silent && node dist/test/model.test.js",
     "check": "npm test"
+  },
+  "dependencies": {
+    "three": "0.185.1"
   }
 }
