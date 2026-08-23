@@ -4,6 +4,7 @@ import "./blueprint-interaction.test.js";
 import "./geometry3d.test.js";
 import "./physics3d.test.js";
 import "./live-physics3d.test.js";
+import "./three-scene.test.js";
 
 import {
   VisualNetworkError,
