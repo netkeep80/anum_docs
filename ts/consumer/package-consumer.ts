@@ -1,15 +1,24 @@
 import {
   Memory,
   PORTABLE_MTS_SEMANTIC_BASE,
+  PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME,
+  PORTABLE_STRUCTURAL_THEORY_SCHEMA,
+  computePortableStructuralTheoryRevision,
   ensureRootBasis,
+  exportPortableStructuralTheory,
   replayPortableStructuralDerivation,
   replayPortableStructuralDerivationWithAssumptions,
+  replayPortableStructuralTheory,
   replayStructuralDerivation,
   replayStructuralDerivationWithAssumptions,
   replayStructuralScopedDerivation,
+  verifyPortableStructuralProofTheoryRevision,
   type LinkHandle,
   type PortableStructuralDerivationReplayResult,
   type PortableStructuralDerivationWithAssumptionsReplayResult,
+  type PortableStructuralTheoryArtifact,
+  type PortableStructuralTheoryReplayResult,
+  type PortableStructuralTheoryRevision,
   type ReadMemory,
 } from "@mts/core";
 import { textToAnum } from "@mts/core/tooling/payload";
@@ -32,6 +41,18 @@ const portableAssumptionReplay: (
   input: unknown,
 ) => PortableStructuralDerivationWithAssumptionsReplayResult =
   replayPortableStructuralDerivationWithAssumptions;
+
+// Exact Theory selection is separately package-root consumable and remains
+// identity/provenance evidence rather than a substitute for proof replay.
+const theory = memory.ensure(basis.L, basis.U);
+const theoryArtifact: PortableStructuralTheoryArtifact = exportPortableStructuralTheory(memory, theory);
+const theoryReplay: PortableStructuralTheoryReplayResult = replayPortableStructuralTheory(theoryArtifact);
+const theoryRevision: Promise<PortableStructuralTheoryRevision> =
+  computePortableStructuralTheoryRevision(theoryArtifact);
+const theorySchema: "mts-portable-structural-theory/v0.1" = PORTABLE_STRUCTURAL_THEORY_SCHEMA;
+const theoryRevisionScheme: "mts-portable-structural-theory-revision/sha-256/v0.1" =
+  PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME;
+const verifyTheoryRevision = verifyPortableStructuralProofTheoryRevision;
 void [
   read,
   link,
@@ -39,6 +60,12 @@ void [
   semanticBase,
   portableReplay,
   portableAssumptionReplay,
+  theoryArtifact,
+  theoryReplay,
+  theoryRevision,
+  theorySchema,
+  theoryRevisionScheme,
+  verifyTheoryRevision,
   replayStructuralDerivation,
   replayStructuralDerivationWithAssumptions,
   replayStructuralScopedDerivation,
