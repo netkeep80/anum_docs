@@ -11,9 +11,21 @@ import {
   type VisualKey,
   type VisualLinkNetwork,
 } from "../index.js";
+import {
+  snapshotLivePhysics3D,
+  type LivePhysics3DController,
+} from "../live-physics3d.js";
+import {
+  attachVisualThreeLiveController,
+  createVisualThreeRenderer,
+  destroyVisualThreeRenderer,
+  type VisualThreeContainer,
+  type VisualThreeLiveRendererOptions,
+  type VisualThreeRendererSnapshot,
+} from "./renderer.js";
 
 // Explicit browser-companion presentation data. Geometry authority remains V2c.
-// Three/WebGL renderer lifecycle enters only in V2f-B.
+// Renderer lifecycle is V2f-B; V2f-C only schedules accepted V2e snapshots over it.
 
 export const VISUAL_THREE_COLORS = Object.freeze({
   startOuter: 0xff0000,
@@ -91,4 +103,29 @@ export function buildVisualThreeSceneData(
     nodes: Object.freeze(nodes),
     arcs: Object.freeze(arcs),
   });
+}
+
+export function createVisualThreeLiveRenderer(
+  container: VisualThreeContainer,
+  network: VisualLinkNetwork,
+  controller: LivePhysics3DController,
+  options: VisualThreeLiveRendererOptions = {},
+): VisualThreeRendererSnapshot {
+  const current = snapshotLivePhysics3D(controller);
+  const renderer = createVisualThreeRenderer(
+    container,
+    buildVisualThreeSceneData(network, current.state),
+    options,
+  );
+  const attached = attachVisualThreeLiveController(
+    container,
+    controller,
+    (state) => buildVisualThreeSceneData(network, state),
+    options,
+  );
+  if (!attached) {
+    destroyVisualThreeRenderer(container);
+    throw new Error("@mts/visual/three: failed to attach live controller");
+  }
+  return renderer;
 }
