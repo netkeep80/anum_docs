@@ -56,11 +56,11 @@ function container(): FakeContainer {
   return host;
 }
 
-function network(rootLabel = "∞", ordinaryLabel: string | undefined = "ordinary"): VisualLinkNetwork {
+function network(rootLabel = "∞", ordinaryLabel: string | null = "ordinary"): VisualLinkNetwork {
   return {
     links: [
       { key: "R", startKey: "R", endKey: "R", label: rootLabel, tags: ["root"] },
-      { key: "O", startKey: "O", endKey: "R", ...(ordinaryLabel === undefined ? {} : { label: ordinaryLabel }) },
+      { key: "O", startKey: "O", endKey: "R", ...(ordinaryLabel === null ? {} : { label: ordinaryLabel }) },
     ],
   };
 }
@@ -78,7 +78,7 @@ function physics(rootX = 0, ordinaryX = 2): Physics3DState {
   };
 }
 
-function data(rootLabel = "∞", ordinaryLabel: string | undefined = "ordinary", rootX = 0): VisualThreeSceneData {
+function data(rootLabel = "∞", ordinaryLabel: string | null = "ordinary", rootX = 0): VisualThreeSceneData {
   return buildVisualThreeSceneData(network(rootLabel, ordinaryLabel), physics(rootX));
 }
 
@@ -142,7 +142,7 @@ same(scene.children.filter((object) => object.userData.kind === "link-center").l
 same(setVisualThreePresentation(host as never, { links: [{ key: "R", visible: false, labelVisible: true }] }), true, "whole-Link visibility dominates label");
 same(label(scene, "R")?.visible, false, "visible=false hides label");
 
-same(updateVisualThreeRenderer(host as never, data("ROOT", undefined, 4)), true, "scene update refreshes label source and position");
+same(updateVisualThreeRenderer(host as never, data("ROOT", null, 4)), true, "scene update refreshes label source and position");
 const moved = label(scene, "R");
 assert(moved !== undefined, "root label survives same-key scene update");
 same(moved.userData.text, "ROOT", "same key uses refreshed exact label text");
