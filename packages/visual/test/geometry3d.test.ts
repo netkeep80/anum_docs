@@ -90,10 +90,10 @@ const ordinaryPositionsBefore = JSON.stringify(ordinaryPositions);
 const ordinary = buildVisualGeometry3D(ordinaryNetwork, ordinaryPositions) as VisualGeometry3DProbe;
 const x = linkByKey(ordinary, "X");
 
-samePoint(centerlinePoint3D(x.start, 0), ordinaryPositions[0].point, "start arc begins at start Link center");
-samePoint(centerlinePoint3D(x.start, 1), ordinaryPositions[2].point, "start arc ends at GREEN center");
-samePoint(centerlinePoint3D(x.end, 0), ordinaryPositions[2].point, "end arc begins at GREEN center");
-samePoint(centerlinePoint3D(x.end, 1), ordinaryPositions[1].point, "end arc ends at end Link center");
+samePoint(centerlinePoint3D(x.start, 0), ordinaryPositions[0]!.point, "start arc begins at start Link center");
+samePoint(centerlinePoint3D(x.start, 1), ordinaryPositions[2]!.point, "start arc ends at GREEN center");
+samePoint(centerlinePoint3D(x.end, 0), ordinaryPositions[2]!.point, "end arc begins at GREEN center");
+samePoint(centerlinePoint3D(x.end, 1), ordinaryPositions[1]!.point, "end arc ends at end Link center");
 assert(x.start.role === "start", "start role preserved");
 assert(x.start.semanticOrientation === "outer-to-green", "start orientation is RED-to-GREEN capable");
 assert(x.end.role === "end", "end role preserved");
@@ -179,8 +179,8 @@ const linkOfLinks = linkByKey(
   buildVisualGeometry3D(linkOfLinksNetwork, linkOfLinksPositions) as VisualGeometry3DProbe,
   "X",
 );
-samePoint(centerlinePoint3D(linkOfLinks.start, 0), linkOfLinksPositions[0].point, "link-of-links start anchor");
-samePoint(centerlinePoint3D(linkOfLinks.end, 1), linkOfLinksPositions[1].point, "link-of-links end anchor");
+samePoint(centerlinePoint3D(linkOfLinks.start, 0), linkOfLinksPositions[0]!.point, "link-of-links start anchor");
+samePoint(centerlinePoint3D(linkOfLinks.end, 1), linkOfLinksPositions[1]!.point, "link-of-links end anchor");
 
 expectCode(
   () => buildVisualGeometry3D(ordinaryNetwork, ordinaryPositions.slice(0, 2)),
@@ -198,12 +198,12 @@ expectCode(
   "duplicate position",
 );
 expectCode(
-  () => buildVisualGeometry3D(ordinaryNetwork, [ordinaryPositions[0], ordinaryPositions[1], position("X", Number.NaN, 0, 0)]),
+  () => buildVisualGeometry3D(ordinaryNetwork, [ordinaryPositions[0]!, ordinaryPositions[1]!, position("X", Number.NaN, 0, 0)]),
   "non-finite-position",
   "NaN position",
 );
 expectCode(
-  () => buildVisualGeometry3D(ordinaryNetwork, [ordinaryPositions[0], ordinaryPositions[1], position("X", 0, Number.POSITIVE_INFINITY, 0)]),
+  () => buildVisualGeometry3D(ordinaryNetwork, [ordinaryPositions[0]!, ordinaryPositions[1]!, position("X", 0, Number.POSITIVE_INFINITY, 0)]),
   "non-finite-position",
   "Infinity position",
 );
