@@ -5,11 +5,12 @@ import {
   movePinnedLivePhysics3D,
   pinLivePhysics3D,
   releaseLivePhysics3D,
+  setLivePhysics3DOptions,
   snapshotLivePhysics3D,
   stepLivePhysics3D,
   type LivePhysics3DController,
 } from "../live-physics3d.js";
-import type { Physics3DState } from "../physics3d.js";
+import type { Physics3DOptions, Physics3DState } from "../physics3d.js";
 import type { VisualKey } from "../index.js";
 import type { VisualThreeArcData, VisualThreeSceneData } from "./index.js";
 
@@ -65,6 +66,8 @@ export interface VisualThreeRendererSnapshot {
   readonly height: number;
   readonly cameraPosition: Point3D;
 }
+
+export type VisualThreeLivePhysicsPatch = Pick<Physics3DOptions, "charge" | "springStiffness">;
 
 type PresentationObject = THREE.Mesh | THREE.Line;
 type SceneProjector = (state: Physics3DState) => VisualThreeSceneData;
@@ -591,6 +594,24 @@ export function attachVisualThreeLiveController(
   element.addEventListener("pointercancel", live.onPointerCancel);
   controls.addEventListener("change", live.onControlsChange);
   syncControls(state);
+  scheduleLiveFrame(state);
+  return true;
+}
+
+export function hasVisualThreeLiveController(container: VisualThreeContainer): boolean {
+  const live = mounts.get(container)?.live;
+  return !!live && !live.destroyed;
+}
+
+export function setVisualThreeLivePhysicsOptions(
+  container: VisualThreeContainer,
+  patch: VisualThreeLivePhysicsPatch,
+): boolean {
+  const state = mounts.get(container);
+  const live = state?.live;
+  if (!state || !live || live.destroyed) return false;
+  setLivePhysics3DOptions(live.controller, patch);
+  live.paused = false;
   scheduleLiveFrame(state);
   return true;
 }
