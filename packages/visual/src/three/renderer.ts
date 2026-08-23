@@ -117,9 +117,9 @@ interface LiveBinding {
   readonly onControlsChange: () => void;
   paused: boolean;
   destroyed: boolean;
-  frameHandle?: number;
-  candidate?: DragCandidate;
-  active?: DragCandidate;
+  frameHandle: number | undefined;
+  candidate: DragCandidate | undefined;
+  active: DragCandidate | undefined;
 }
 
 interface MountedRenderer {
@@ -133,7 +133,7 @@ interface MountedRenderer {
   readonly fitPoints: THREE.Vector3[];
   readonly target: THREE.Vector3;
   observer?: VisualThreeResizeObserver;
-  live?: LiveBinding;
+  live: LiveBinding | undefined;
   nodeCount: number;
   arcCount: number;
   arrowCount: number;
@@ -517,6 +517,7 @@ export function createVisualThreeRenderer(
     objects: [],
     fitPoints: [],
     target: new THREE.Vector3(),
+    live: undefined,
     nodeCount: 0,
     arcCount: 0,
     arrowCount: 0,
@@ -569,6 +570,9 @@ export function attachVisualThreeLiveController(
     pointer: new THREE.Vector2(),
     paused: false,
     destroyed: false,
+    frameHandle: undefined,
+    candidate: undefined,
+    active: undefined,
     onPointerDown: (event: VisualThreePointerEvent) => { beginCandidate(state, event); },
     onPointerMove: (event: VisualThreePointerEvent) => { continueCandidate(state, event); },
     onPointerUp: (event: VisualThreePointerEvent) => { finishCandidate(state, event, true); },
