@@ -100,6 +100,7 @@ export function normalizeVisualLinkNetwork(network: VisualLinkNetwork): VisualLi
   return Object.freeze({ links: Object.freeze(links) });
 }
 
+export * from "./presentation.js";
 export * from "./blueprint-geometry.js";
 export * from "./blueprint-svg.js";
 export * from "./blueprint-interaction.js";
