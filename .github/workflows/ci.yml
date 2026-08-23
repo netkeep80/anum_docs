@@ -31,6 +31,9 @@ jobs:
       - name: Typecheck, test and browser-check current MTS core
         run: npm --prefix ts run check
 
+      - name: Install MTS visual browser companion dependencies
+        run: npm ci --prefix packages/visual --ignore-scripts --no-audit --no-fund
+
       - name: Check renderer-neutral MTS visual package
         run: |
           ./ts/node_modules/.bin/tsc -p packages/visual/tsconfig.json
