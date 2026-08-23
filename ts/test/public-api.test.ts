@@ -85,10 +85,13 @@ const expectedRuntimeExports = [
   "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_DIGEST_SCHEME",
   "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_SCHEMA",
   "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_SCHEMA",
+  "PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME",
+  "PORTABLE_STRUCTURAL_THEORY_SCHEMA",
   "PersistentStore",
   "PersistentStoreError",
   "PortableStructuralDerivationError",
   "PortableStructuralDerivationProvenanceError",
+  "PortableStructuralTheoryError",
   "ProofRuleReplayError",
   "QuaternaryDecodeError",
   "RunReplayError",
@@ -107,6 +110,7 @@ const expectedRuntimeExports = [
   "computePortableStructuralDerivationProvenanceDigest",
   "computePortableStructuralDerivationWithAssumptionsContentDigest",
   "computePortableStructuralDerivationWithAssumptionsProvenanceDigest",
+  "computePortableStructuralTheoryRevision",
   "createPortableStructuralDerivationProvenanceClaim",
   "createPortableStructuralDerivationWithAssumptionsProvenanceClaim",
   "deserializeAnum",
@@ -116,6 +120,7 @@ const expectedRuntimeExports = [
   "executeAbits",
   "exportPortableStructuralDerivation",
   "exportPortableStructuralDerivationWithAssumptions",
+  "exportPortableStructuralTheory",
   "materializePersistentSequence",
   "materializeSequence",
   "normalizeRawForm",
@@ -132,6 +137,7 @@ const expectedRuntimeExports = [
   "replayPortableStructuralDerivation",
   "replayPortableStructuralDerivationWithAssumptions",
   "replayPortableStructuralProof",
+  "replayPortableStructuralTheory",
   "replayRelationStep",
   "replayRelationSubselectionStep",
   "replayResolvedSequenceGrouping",
@@ -149,9 +155,10 @@ const expectedRuntimeExports = [
   "valuesEqual",
   "verifyPortableStructuralDerivationProvenanceClaim",
   "verifyPortableStructuralDerivationWithAssumptionsProvenanceClaim",
+  "verifyPortableStructuralProofTheoryRevision",
 ].sort();
 
-assert(expectedRuntimeExports.length === 81, "P9a1 runtime export budget must be exactly 81");
+assert(expectedRuntimeExports.length === 88, "R3 Theory lock runtime export budget must be exactly 88");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
