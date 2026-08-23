@@ -189,11 +189,7 @@ function fixture() {
     env: Environment = main,
     ruleAdmission: LinkHandle = p.ruleAdmission,
   ): Built {
-    // Structural proof execution context is independent from object-logic K,
-    // which remains explicit in claim templates and role bindings.
-    void K;
-    const proofContext = defineContext(memory, fresh(), fresh());
-    const act = defineActHeader(memory, env.interpreter, p.roleDictionary, proofContext);
+    const act = defineActHeader(memory, env.interpreter, p.roleDictionary, K);
     for (const [role, value] of bindings) defineActField(memory, act, role, value);
     const judgment: StructuralJudgmentEvidence = {
       application: {
@@ -202,9 +198,9 @@ function fixture() {
         ruleAdmission,
         claimedBody: claim,
         expectedInterpreter: env.expectedInterpreter,
-        expectedAfterContext: proofContext,
+        expectedAfterContext: K,
       },
-      judgment: { theory: selectedTheory, context: proofContext, claim },
+      judgment: { theory: selectedTheory, context: K, claim },
     };
     const occurrence = defineStructuralProofOccurrence(memory, act, claim);
     return Object.freeze({
@@ -225,23 +221,25 @@ function fixture() {
     return node(localRoot, [[role, claim]], claim, [], K);
   };
 
-  const pRole = fresh(), qRole = fresh(), rRole = fresh();
-  const mp = pack(theory, [pRole, qRole], qRole, [pRole, pair(pRole, qRole)]);
+  const mpP = fresh(), mpQ = fresh();
+  const mp = pack(theory, [mpP, mpQ], mpQ, [mpP, pair(mpP, mpQ)]);
   const mpNode = (P: LinkHandle, Q: LinkHandle, premises: readonly LinkHandle[], K: LinkHandle) =>
-    node(mp, [[pRole, P], [qRole, Q]], Q, premises, K);
+    node(mp, [[mpP, P], [mpQ, Q]], Q, premises, K);
 
-  const andIntro = pack(theory, [pRole, qRole], and(pRole, qRole), [pRole, qRole]);
-  const andLeft = pack(theory, [pRole, qRole], pRole, [and(pRole, qRole)]);
+  const andP = fresh(), andQ = fresh();
+  const andIntro = pack(theory, [andP, andQ], and(andP, andQ), [andP, andQ]);
+  const andLeft = pack(theory, [andP, andQ], andP, [and(andP, andQ)]);
   const andIntroNode = (P: LinkHandle, Q: LinkHandle, premises: readonly LinkHandle[], K: LinkHandle) =>
-    node(andIntro, [[pRole, P], [qRole, Q]], and(P, Q), premises, K);
+    node(andIntro, [[andP, P], [andQ, Q]], and(P, Q), premises, K);
   const andLeftNode = (P: LinkHandle, Q: LinkHandle, premise: LinkHandle, K: LinkHandle) =>
-    node(andLeft, [[pRole, P], [qRole, Q]], P, [premise], K);
+    node(andLeft, [[andP, P], [andQ, Q]], P, [premise], K);
 
-  const orRoles = defineStructuralRoleDictionary(memory, [pRole, qRole]);
-  const orRule = defineStructuralRule(memory, orRoles, or(pRole, qRole));
+  const orP = fresh(), orQ = fresh(), orR = fresh();
+  const orRoles = defineStructuralRoleDictionary(memory, [orP, orQ]);
+  const orRule = defineStructuralRule(memory, orRoles, or(orP, orQ));
   const orRuleAdmission = admitStructuralRule(memory, theory, orRule);
-  const orLeftDerivationRule = defineStructuralDerivationRule(memory, orRule, [pRole]);
-  const orRightDerivationRule = defineStructuralDerivationRule(memory, orRule, [qRole]);
+  const orLeftDerivationRule = defineStructuralDerivationRule(memory, orRule, [orP]);
+  const orRightDerivationRule = defineStructuralDerivationRule(memory, orRule, [orQ]);
   const orLeft: Pack = Object.freeze({
     roleDictionary: orRoles,
     rule: orRule,
@@ -262,12 +260,12 @@ function fixture() {
     Q: LinkHandle,
     premise: LinkHandle,
     K: LinkHandle,
-  ) => node(p, [[pRole, P], [qRole, Q]], or(P, Q), [premise], K);
+  ) => node(p, [[orP, P], [orQ, Q]], or(P, Q), [premise], K);
   const orCase = pack(
     theory,
-    [pRole, qRole, rRole],
-    rRole,
-    [or(pRole, qRole), pair(pRole, rRole), pair(qRole, rRole)],
+    [orP, orQ, orR],
+    orR,
+    [or(orP, orQ), pair(orP, orR), pair(orQ, orR)],
   );
   const orCaseNode = (
     P: LinkHandle,
@@ -275,7 +273,7 @@ function fixture() {
     R0: LinkHandle,
     premises: readonly LinkHandle[],
     K: LinkHandle,
-  ) => node(orCase, [[pRole, P], [qRole, Q], [rRole, R0]], R0, premises, K);
+  ) => node(orCase, [[orP, P], [orQ, Q], [orR, R0]], R0, premises, K);
 
   const kRole = fresh(), aRole = fresh(), bRole = fresh(), raRole = fresh(), rbRole = fresh();
   const equalityRoles: EqualityRoles = Object.freeze({
