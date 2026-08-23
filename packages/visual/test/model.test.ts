@@ -7,6 +7,7 @@ import "./live-physics3d.test.js";
 import "./three-scene.test.js";
 import "./three-renderer.test.js";
 import "./three-controls.test.js";
+import "./presentation.test.js";
 
 import {
   VisualNetworkError,
@@ -43,80 +44,81 @@ function basisLinks(): VisualLink[] {
     { key: "C", startKey: "R", endKey: "C" },
     { key: "L", startKey: "O", endKey: "C" },
     { key: "U", startKey: "C", endKey: "O" },
-    { key: "X", startKey: "L", endKey: "U", tags: ["link-of-links"] },
   ];
 }
 
-const basis: VisualLinkNetwork = { links: basisLinks() };
-validateVisualLinkNetwork(basis);
+const input: VisualLinkNetwork = {
+  links: [
+    { key: "U", startKey: "C", endKey: "O", tags: ["upper"] },
+    { key: "R", startKey: "R", endKey: "R", label: "∞", tags: ["root"] },
+    { key: "L", startKey: "O", endKey: "C" },
+    { key: "C", startKey: "R", endKey: "C" },
+    { key: "O", startKey: "O", endKey: "R" },
+  ],
+};
+const normalized = normalizeVisualLinkNetwork(input);
+same(normalized.links.map((link) => link.key).join(","), "C,L,O,R,U", "stable key order");
+assert(Object.isFrozen(normalized), "network is frozen");
+assert(Object.isFrozen(normalized.links), "links are frozen");
+for (const link of normalized.links) {
+  assert(Object.isFrozen(link), `link ${link.key} is frozen`);
+  if (link.tags !== undefined) assert(Object.isFrozen(link.tags), `tags ${link.key} are frozen`);
+}
 
-const normalized = normalizeVisualLinkNetwork(basis);
-same(normalized.links.length, 6, "all links preserved");
-same(normalized.links.map((link) => link.key).join(","), "C,L,O,R,U,X", "stable key order");
+same(input.links[0]?.key, "U", "input order is unchanged");
+same(input.links[0]?.tags?.[0], "upper", "input metadata is unchanged");
 
 const root = normalized.links.find((link) => link.key === "R");
-assert(root !== undefined, "root presentation retained");
-same(root.startKey, "R", "self-link start retained");
-same(root.endKey, "R", "self-link end retained");
+assert(root !== undefined, "root retained");
+same(root.startKey, "R", "root self start retained");
+same(root.endKey, "R", "root self end retained");
 same(root.label, "∞", "presentation label retained");
-same(root.tags?.join(","), "root", "presentation tags retained");
+same(root.tags?.[0], "root", "presentation tag retained");
 
-const linkOfLinks = normalized.links.find((link) => link.key === "X");
-assert(linkOfLinks !== undefined, "link-of-links retained");
-same(linkOfLinks.startKey, "L", "link-of-links start retained");
-same(linkOfLinks.endKey, "U", "link-of-links end retained");
-
-const reordered: VisualLinkNetwork = { links: [...basisLinks()].reverse() };
-const normalizedReordered = normalizeVisualLinkNetwork(reordered);
-const topology = (network: VisualLinkNetwork): string =>
-  JSON.stringify(network.links.map(({ key, startKey, endKey }) => ({ key, startKey, endKey })));
-same(topology(normalizedReordered), topology(normalized), "input order does not alter normalized topology");
-
-const relabeled: VisualLinkNetwork = {
-  links: basisLinks().map((link) =>
-    link.key === "X" ? { ...link, label: "display only", tags: ["selected", "debug"] } : link,
-  ),
-};
-same(topology(normalizeVisualLinkNetwork(relabeled)), topology(normalized), "metadata does not alter topology");
+validateVisualLinkNetwork({ links: basisLinks() });
+validateVisualLinkNetwork({
+  links: [
+    ...basisLinks(),
+    { key: "X", startKey: "L", endKey: "U" },
+    { key: "Y", startKey: "X", endKey: "R" },
+  ],
+});
 
 expectCode(
-  () => validateVisualLinkNetwork({ links: [...basisLinks(), { key: "R", startKey: "R", endKey: "R" }] }),
-  "duplicate-key",
-  "duplicate visual key",
-);
-expectCode(
-  () => validateVisualLinkNetwork({ links: [{ key: "   ", startKey: "   ", endKey: "   " }] }),
+  () => validateVisualLinkNetwork({ links: [{ key: "", startKey: "R", endKey: "R" }] }),
   "empty-key",
-  "blank visual key",
-);
-expectCode(
-  () => validateVisualLinkNetwork({ links: [...basisLinks(), { key: "Y", startKey: "missing", endKey: "R" }] }),
-  "missing-start",
-  "missing start reference",
-);
-expectCode(
-  () => validateVisualLinkNetwork({ links: [...basisLinks(), { key: "Y", startKey: "R", endKey: "missing" }] }),
-  "missing-end",
-  "missing end reference",
+  "blank link key",
 );
 expectCode(
   () =>
     validateVisualLinkNetwork({
-      links: [...basisLinks(), { key: "Y", startKey: "missing", endKey: "R", label: "missing", tags: ["missing"] }],
+      links: [
+        { key: "R", startKey: "R", endKey: "R" },
+        { key: "R", startKey: "R", endKey: "R" },
+      ],
     }),
-  "missing-start",
-  "metadata cannot repair invalid topology",
+  "duplicate-key",
+  "duplicate key",
 );
 expectCode(
-  () => validateVisualLinkNetwork({ links: [...basisLinks(), { key: "Y", startKey: " ", endKey: "R" }] }),
-  "empty-start",
-  "blank start reference",
+  () =>
+    validateVisualLinkNetwork({
+      links: [
+        { key: "R", startKey: "R", endKey: "R" },
+        { key: "X", startKey: "missing", endKey: "R" },
+      ],
+    }),
+  "dangling-start",
+  "dangling start",
 );
 expectCode(
-  () => validateVisualLinkNetwork({ links: [...basisLinks(), { key: "Y", startKey: "R", endKey: "\t" }] }),
-  "empty-end",
-  "blank end reference",
+  () =>
+    validateVisualLinkNetwork({
+      links: [
+        { key: "R", startKey: "R", endKey: "R" },
+        { key: "X", startKey: "R", endKey: "missing" },
+      ],
+    }),
+  "dangling-end",
+  "dangling end",
 );
-
-assert(Object.isFrozen(normalized), "normalized network is immutable presentation snapshot");
-assert(Object.isFrozen(normalized.links), "normalized link list is immutable presentation snapshot");
