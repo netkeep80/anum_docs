@@ -1,5 +1,16 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { sampleCenterline3D, type Point3D } from "../geometry3d.js";
+import {
+  movePinnedLivePhysics3D,
+  pinLivePhysics3D,
+  releaseLivePhysics3D,
+  snapshotLivePhysics3D,
+  stepLivePhysics3D,
+  type LivePhysics3DController,
+} from "../live-physics3d.js";
+import type { Physics3DState } from "../physics3d.js";
+import type { VisualKey } from "../index.js";
 import type { VisualThreeArcData, VisualThreeSceneData } from "./index.js";
 
 export interface VisualThreeContainer {
@@ -29,6 +40,22 @@ export interface VisualThreeRendererOptions {
   readonly resizeObserverFactory?: (callback: () => void) => VisualThreeResizeObserver;
 }
 
+export interface VisualThreeControls {
+  enabled: boolean;
+  readonly target: { copy(value: THREE.Vector3): unknown };
+  update(): void;
+  addEventListener(type: "change", listener: () => void): void;
+  removeEventListener(type: "change", listener: () => void): void;
+  dispose(): void;
+}
+
+export interface VisualThreeLiveRendererOptions extends VisualThreeRendererOptions {
+  readonly requestFrame?: (callback: (timestamp: number) => void) => number;
+  readonly cancelFrame?: (handle: number) => void;
+  readonly controlsFactory?: (camera: THREE.PerspectiveCamera, element: Node) => VisualThreeControls;
+  readonly dragThreshold?: number;
+}
+
 export interface VisualThreeRendererSnapshot {
   readonly mounted: true;
   readonly nodeCount: number;
@@ -40,6 +67,60 @@ export interface VisualThreeRendererSnapshot {
 }
 
 type PresentationObject = THREE.Mesh | THREE.Line;
+type SceneProjector = (state: Physics3DState) => VisualThreeSceneData;
+
+interface VisualThreePointerEvent {
+  readonly button: number;
+  readonly pointerId: number;
+  readonly clientX: number;
+  readonly clientY: number;
+  preventDefault(): void;
+}
+
+interface VisualThreePointerSurface {
+  addEventListener(type: string, listener: (event: VisualThreePointerEvent) => void): void;
+  removeEventListener(type: string, listener: (event: VisualThreePointerEvent) => void): void;
+  setPointerCapture?(pointerId: number): void;
+  releasePointerCapture?(pointerId: number): void;
+  hasPointerCapture?(pointerId: number): boolean;
+  getBoundingClientRect?(): {
+    readonly left?: number;
+    readonly top?: number;
+    readonly width: number;
+    readonly height: number;
+  };
+}
+
+interface DragCandidate {
+  readonly key: VisualKey;
+  readonly pointerId: number;
+  readonly startX: number;
+  readonly startY: number;
+  readonly plane: THREE.Plane;
+  readonly offset: THREE.Vector3;
+}
+
+interface LiveBinding {
+  readonly controller: LivePhysics3DController;
+  readonly project: SceneProjector;
+  readonly requestFrame: (callback: (timestamp: number) => void) => number;
+  readonly cancelFrame: (handle: number) => void;
+  readonly controls: VisualThreeControls;
+  readonly element: VisualThreePointerSurface;
+  readonly dragThreshold: number;
+  readonly raycaster: THREE.Raycaster;
+  readonly pointer: THREE.Vector2;
+  readonly onPointerDown: (event: VisualThreePointerEvent) => void;
+  readonly onPointerMove: (event: VisualThreePointerEvent) => void;
+  readonly onPointerUp: (event: VisualThreePointerEvent) => void;
+  readonly onPointerCancel: (event: VisualThreePointerEvent) => void;
+  readonly onControlsChange: () => void;
+  paused: boolean;
+  destroyed: boolean;
+  frameHandle?: number;
+  candidate?: DragCandidate;
+  active?: DragCandidate;
+}
 
 interface MountedRenderer {
   readonly container: VisualThreeContainer;
@@ -52,6 +133,7 @@ interface MountedRenderer {
   readonly fitPoints: THREE.Vector3[];
   readonly target: THREE.Vector3;
   observer?: VisualThreeResizeObserver;
+  live?: LiveBinding;
   nodeCount: number;
   arcCount: number;
   arrowCount: number;
@@ -106,6 +188,10 @@ function clearPresentation(state: MountedRenderer): void {
 
 function threePoint(point: Point3D): THREE.Vector3 {
   return new THREE.Vector3(point.x, point.y, point.z);
+}
+
+function point3D(point: THREE.Vector3): Point3D {
+  return Object.freeze({ x: point.x, y: point.y, z: point.z });
 }
 
 function addNode(state: MountedRenderer, node: VisualThreeSceneData["nodes"][number]): void {
@@ -189,6 +275,30 @@ function defaultSurface(): VisualThreeRenderingSurface {
   return new THREE.WebGLRenderer({ antialias: true });
 }
 
+function defaultControls(camera: THREE.PerspectiveCamera, element: Node): VisualThreeControls {
+  const controls = new OrbitControls(camera, element as HTMLElement);
+  return {
+    get enabled() { return controls.enabled; },
+    set enabled(value: boolean) { controls.enabled = value; },
+    target: controls.target,
+    update: () => { controls.update(); },
+    addEventListener: (_type, listener) => { controls.addEventListener("change", listener as never); },
+    removeEventListener: (_type, listener) => { controls.removeEventListener("change", listener as never); },
+    dispose: () => { controls.dispose(); },
+  };
+}
+
+function browserRequestFrame(callback: (timestamp: number) => void): number {
+  if (typeof requestAnimationFrame === "undefined") {
+    throw new Error("@mts/visual/three: requestAnimationFrame is unavailable");
+  }
+  return requestAnimationFrame(callback);
+}
+
+function browserCancelFrame(handle: number): void {
+  if (typeof cancelAnimationFrame !== "undefined") cancelAnimationFrame(handle);
+}
+
 function snapshot(state: MountedRenderer): VisualThreeRendererSnapshot {
   return Object.freeze({
     mounted: true as const,
@@ -199,6 +309,192 @@ function snapshot(state: MountedRenderer): VisualThreeRendererSnapshot {
     height: state.height,
     cameraPosition: Object.freeze({ x: state.camera.position.x, y: state.camera.position.y, z: state.camera.position.z }),
   });
+}
+
+function liveProject(state: MountedRenderer, physicsState?: Physics3DState): void {
+  const live = state.live;
+  if (!live || live.destroyed) return;
+  const current = physicsState ?? snapshotLivePhysics3D(live.controller).state;
+  populate(state, live.project(current));
+  render(state);
+}
+
+function scheduleLiveFrame(state: MountedRenderer): void {
+  const live = state.live;
+  if (!live || live.destroyed || live.frameHandle !== undefined) return;
+  const current = snapshotLivePhysics3D(live.controller);
+  if (!live.active && (live.paused || !current.awake)) return;
+  live.frameHandle = live.requestFrame(() => { runLiveFrame(state); });
+}
+
+function runLiveFrame(state: MountedRenderer): void {
+  const live = state.live;
+  if (!live || live.destroyed) return;
+  live.frameHandle = undefined;
+  if (!live.paused) {
+    const current = snapshotLivePhysics3D(live.controller);
+    if (current.awake) {
+      const stepped = stepLivePhysics3D(live.controller);
+      liveProject(state, stepped.state);
+    } else if (live.active) render(state);
+  } else if (live.active) render(state);
+  scheduleLiveFrame(state);
+}
+
+function pointerSurface(state: MountedRenderer): VisualThreePointerSurface {
+  return state.surface.domElement as unknown as VisualThreePointerSurface;
+}
+
+function pointerRect(state: MountedRenderer, live: LiveBinding): Readonly<{
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}> {
+  const raw = live.element.getBoundingClientRect?.() ?? state.container.getBoundingClientRect();
+  const width = Number.isFinite(raw.width) && raw.width > 0 ? raw.width : state.width;
+  const height = Number.isFinite(raw.height) && raw.height > 0 ? raw.height : state.height;
+  const left = "left" in raw && Number.isFinite(raw.left) ? raw.left ?? 0 : 0;
+  const top = "top" in raw && Number.isFinite(raw.top) ? raw.top ?? 0 : 0;
+  return { left, top, width: Math.max(1, width), height: Math.max(1, height) };
+}
+
+function setPointerRay(state: MountedRenderer, live: LiveBinding, event: VisualThreePointerEvent): void {
+  const rect = pointerRect(state, live);
+  live.pointer.set(
+    ((event.clientX - rect.left) / rect.width) * 2 - 1,
+    -((event.clientY - rect.top) / rect.height) * 2 + 1,
+  );
+  state.camera.updateMatrixWorld();
+  state.scene.updateMatrixWorld(true);
+  live.raycaster.setFromCamera(live.pointer, state.camera);
+}
+
+function centerMeshes(state: MountedRenderer): THREE.Mesh[] {
+  return state.objects.filter((object): object is THREE.Mesh =>
+    object instanceof THREE.Mesh && object.userData.kind === "link-center");
+}
+
+function currentPoint(controller: LivePhysics3DController, key: VisualKey): Point3D | undefined {
+  return snapshotLivePhysics3D(controller).state.positions.find((entry) => entry.key === key)?.point;
+}
+
+function beginCandidate(state: MountedRenderer, event: VisualThreePointerEvent): void {
+  const live = state.live;
+  if (!live || live.destroyed || event.button !== 0 || live.candidate || live.active) return;
+  setPointerRay(state, live, event);
+  const hit = live.raycaster.intersectObjects(centerMeshes(state), false)[0];
+  if (!hit) return;
+  const mesh = hit.object as THREE.Mesh;
+  const key = mesh.userData.key;
+  if (typeof key !== "string") return;
+  const normal = state.camera.getWorldDirection(new THREE.Vector3());
+  if (normal.lengthSq() <= 1e-24) return;
+  const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(normal.normalize(), mesh.position);
+  const intersection = live.raycaster.ray.intersectPlane(plane, new THREE.Vector3());
+  if (!intersection) return;
+  live.candidate = {
+    key,
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    plane,
+    offset: mesh.position.clone().sub(intersection),
+  };
+}
+
+function activateCandidate(state: MountedRenderer, live: LiveBinding, candidate: DragCandidate): boolean {
+  const current = currentPoint(live.controller, candidate.key);
+  if (!current) return false;
+  pinLivePhysics3D(live.controller, candidate.key, current);
+  live.active = candidate;
+  live.controls.enabled = false;
+  live.element.setPointerCapture?.(candidate.pointerId);
+  return true;
+}
+
+function moveActive(state: MountedRenderer, event: VisualThreePointerEvent): boolean {
+  const live = state.live;
+  const active = live?.active;
+  if (!live || !active || active.pointerId !== event.pointerId) return false;
+  setPointerRay(state, live, event);
+  const intersection = live.raycaster.ray.intersectPlane(active.plane, new THREE.Vector3());
+  if (!intersection) return false;
+  const target = intersection.add(active.offset);
+  movePinnedLivePhysics3D(live.controller, active.key, point3D(target));
+  liveProject(state);
+  event.preventDefault();
+  scheduleLiveFrame(state);
+  return true;
+}
+
+function continueCandidate(state: MountedRenderer, event: VisualThreePointerEvent): void {
+  const live = state.live;
+  const candidate = live?.candidate;
+  if (!live || !candidate || candidate.pointerId !== event.pointerId) return;
+  if (!live.active) {
+    const distance = Math.hypot(event.clientX - candidate.startX, event.clientY - candidate.startY);
+    if (distance < live.dragThreshold || !activateCandidate(state, live, candidate)) return;
+  }
+  moveActive(state, event);
+}
+
+function releaseCapture(live: LiveBinding, pointerId: number): void {
+  if (!live.element.hasPointerCapture || live.element.hasPointerCapture(pointerId)) {
+    live.element.releasePointerCapture?.(pointerId);
+  }
+}
+
+function finishCandidate(state: MountedRenderer, event: VisualThreePointerEvent, finalMove: boolean): void {
+  const live = state.live;
+  const candidate = live?.candidate;
+  if (!live || !candidate || candidate.pointerId !== event.pointerId) return;
+  const active = live.active;
+  if (active) {
+    if (finalMove) moveActive(state, event);
+    if (snapshotLivePhysics3D(live.controller).pinnedKeys.includes(active.key)) {
+      releaseLivePhysics3D(live.controller, active.key);
+    }
+    live.controls.enabled = true;
+    releaseCapture(live, active.pointerId);
+    live.active = undefined;
+    liveProject(state);
+    scheduleLiveFrame(state);
+  }
+  live.candidate = undefined;
+}
+
+function detachLive(state: MountedRenderer): void {
+  const live = state.live;
+  if (!live) return;
+  live.destroyed = true;
+  if (live.frameHandle !== undefined) {
+    live.cancelFrame(live.frameHandle);
+    live.frameHandle = undefined;
+  }
+  if (live.active) {
+    if (snapshotLivePhysics3D(live.controller).pinnedKeys.includes(live.active.key)) {
+      releaseLivePhysics3D(live.controller, live.active.key);
+    }
+    releaseCapture(live, live.active.pointerId);
+    live.active = undefined;
+  }
+  live.candidate = undefined;
+  live.controls.enabled = true;
+  live.element.removeEventListener("pointerdown", live.onPointerDown);
+  live.element.removeEventListener("pointermove", live.onPointerMove);
+  live.element.removeEventListener("pointerup", live.onPointerUp);
+  live.element.removeEventListener("pointercancel", live.onPointerCancel);
+  live.controls.removeEventListener("change", live.onControlsChange);
+  live.controls.dispose();
+  state.live = undefined;
+}
+
+function syncControls(state: MountedRenderer): void {
+  const live = state.live;
+  if (!live || live.destroyed) return;
+  live.controls.target.copy(state.target);
+  live.controls.update();
 }
 
 export function createVisualThreeRenderer(
@@ -243,6 +539,66 @@ export function createVisualThreeRenderer(
   return snapshot(state);
 }
 
+export function attachVisualThreeLiveController(
+  container: VisualThreeContainer,
+  controller: LivePhysics3DController,
+  project: SceneProjector,
+  options: VisualThreeLiveRendererOptions = {},
+): boolean {
+  const state = mounts.get(container);
+  if (!state) return false;
+  detachLive(state);
+  const element = pointerSurface(state);
+  if (typeof element.addEventListener !== "function" || typeof element.removeEventListener !== "function") {
+    throw new Error("@mts/visual/three: rendering surface does not support pointer events");
+  }
+  const controls = options.controlsFactory?.(state.camera, state.surface.domElement)
+    ?? defaultControls(state.camera, state.surface.domElement);
+  const requestFrame = options.requestFrame ?? browserRequestFrame;
+  const cancelFrame = options.cancelFrame ?? browserCancelFrame;
+  const live = {} as LiveBinding;
+  Object.assign(live, {
+    controller,
+    project,
+    requestFrame,
+    cancelFrame,
+    controls,
+    element,
+    dragThreshold: positiveFinite(options.dragThreshold, 4),
+    raycaster: new THREE.Raycaster(),
+    pointer: new THREE.Vector2(),
+    paused: false,
+    destroyed: false,
+    onPointerDown: (event: VisualThreePointerEvent) => { beginCandidate(state, event); },
+    onPointerMove: (event: VisualThreePointerEvent) => { continueCandidate(state, event); },
+    onPointerUp: (event: VisualThreePointerEvent) => { finishCandidate(state, event, true); },
+    onPointerCancel: (event: VisualThreePointerEvent) => { finishCandidate(state, event, false); },
+    onControlsChange: () => { if (state.live === live && !live.destroyed) render(state); },
+  } satisfies Partial<LiveBinding>);
+  state.live = live;
+  element.addEventListener("pointerdown", live.onPointerDown);
+  element.addEventListener("pointermove", live.onPointerMove);
+  element.addEventListener("pointerup", live.onPointerUp);
+  element.addEventListener("pointercancel", live.onPointerCancel);
+  controls.addEventListener("change", live.onControlsChange);
+  syncControls(state);
+  scheduleLiveFrame(state);
+  return true;
+}
+
+export function setVisualThreeLivePaused(container: VisualThreeContainer, paused: boolean): boolean {
+  const state = mounts.get(container);
+  const live = state?.live;
+  if (!state || !live || live.destroyed) return false;
+  live.paused = paused;
+  if (paused && live.frameHandle !== undefined) {
+    live.cancelFrame(live.frameHandle);
+    live.frameHandle = undefined;
+  }
+  scheduleLiveFrame(state);
+  return true;
+}
+
 export function updateVisualThreeRenderer(container: VisualThreeContainer, data: VisualThreeSceneData): boolean {
   const state = mounts.get(container);
   if (!state) return false;
@@ -277,6 +633,7 @@ export function fitVisualThreeRenderer(container: VisualThreeContainer, padding 
   state.camera.position.set(center.x, center.y, center.z + distance);
   state.camera.lookAt(center);
   state.camera.updateMatrixWorld();
+  syncControls(state);
   render(state);
   return true;
 }
@@ -301,6 +658,7 @@ export function getVisualThreeRendererSnapshot(container: VisualThreeContainer):
 export function destroyVisualThreeRenderer(container: VisualThreeContainer): boolean {
   const state = mounts.get(container);
   if (!state) return false;
+  detachLive(state);
   state.observer?.disconnect();
   clearPresentation(state);
   if (container.contains(state.surface.domElement)) container.removeChild(state.surface.domElement);
