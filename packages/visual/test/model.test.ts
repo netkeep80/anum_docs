@@ -1,4 +1,5 @@
 import "./blueprint-geometry.test.js";
+import "./blueprint-svg.test.js";
 
 import {
   VisualNetworkError,
