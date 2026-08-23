@@ -215,9 +215,11 @@ function fixture() {
     });
   }
 
-  const rootRole = fresh();
-  const root = pack(theory, [rootRole], rootRole, []);
-  const prove = (claim: LinkHandle, K: LinkHandle) => node(root, [[rootRole, claim]], claim, [], K);
+  const prove = (claim: LinkHandle, K: LinkHandle) => {
+    const role = fresh();
+    const localRoot = pack(theory, [role], role, []);
+    return node(localRoot, [[role, claim]], claim, [], K);
+  };
 
   const pRole = fresh(), qRole = fresh(), rRole = fresh();
   const mp = pack(theory, [pRole, qRole], qRole, [pRole, pair(pRole, qRole)]);
