@@ -1,4 +1,5 @@
 export * from "./renderer.js";
+export * from "./controls.js";
 
 import {
   buildVisualGeometry3D,
@@ -16,9 +17,14 @@ import {
   type LivePhysics3DController,
 } from "../live-physics3d.js";
 import {
+  bindVisualThreeLiveController,
+  destroyVisualThreeControlBar,
+  unbindVisualThreeLiveController,
+} from "./controls.js";
+import {
   attachVisualThreeLiveController,
   createVisualThreeRenderer,
-  destroyVisualThreeRenderer,
+  destroyVisualThreeRenderer as destroyRenderer,
   type VisualThreeContainer,
   type VisualThreeLiveRendererOptions,
   type VisualThreeRendererSnapshot,
@@ -26,6 +32,7 @@ import {
 
 // Explicit browser-companion presentation data. Geometry authority remains V2c.
 // Renderer lifecycle is V2f-B; V2f-C only schedules accepted V2e snapshots over it.
+// V2f-D composes presentation controls without changing renderer or physics authority.
 
 export const VISUAL_THREE_COLORS = Object.freeze({
   startOuter: 0xff0000,
@@ -124,8 +131,18 @@ export function createVisualThreeLiveRenderer(
     options,
   );
   if (!attached) {
-    destroyVisualThreeRenderer(container);
+    destroyRenderer(container);
     throw new Error("@mts/visual/three: failed to attach live controller");
   }
+  if (!bindVisualThreeLiveController(container, controller)) {
+    destroyRenderer(container);
+    throw new Error("@mts/visual/three: failed to bind V2f-D live controls");
+  }
   return renderer;
+}
+
+export function destroyVisualThreeRenderer(container: VisualThreeContainer): boolean {
+  destroyVisualThreeControlBar(container);
+  unbindVisualThreeLiveController(container);
+  return destroyRenderer(container);
 }
