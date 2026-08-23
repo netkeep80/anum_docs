@@ -216,6 +216,26 @@ export type {
 } from "./portable-derivation-digest.js";
 
 export {
+  PORTABLE_STRUCTURAL_THEORY_SCHEMA,
+  PortableStructuralTheoryError,
+  exportPortableStructuralTheory,
+  replayPortableStructuralTheory,
+  verifyPortableStructuralProofTheoryRevision,
+} from "./portable-theory.js";
+export type {
+  PortableStructuralTheoryArtifact,
+  PortableStructuralTheoryErrorCode,
+  PortableStructuralTheoryReplayResult,
+} from "./portable-theory.js";
+export {
+  PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME,
+  computePortableStructuralTheoryRevision,
+} from "./portable-theory-digest.js";
+export type {
+  PortableStructuralTheoryRevision,
+} from "./portable-theory-digest.js";
+
+export {
   PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_DIGEST_SCHEME,
   PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA,
   PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_DIGEST_SCHEME,
