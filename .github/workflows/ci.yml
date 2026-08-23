@@ -40,6 +40,7 @@ jobs:
         run: |
           ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
           node web/contract-observatory/dist/test/contract-index.test.js
+          node web/contract-observatory/dist/test/site.test.js
 
   no-python:
     runs-on: ubuntu-latest
