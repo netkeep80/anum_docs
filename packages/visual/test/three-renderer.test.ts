@@ -313,3 +313,10 @@ same(resizeVisualThreeRenderer(host as never), false, "resize missing mount is s
 same(fitVisualThreeRenderer(host as never), false, "fit missing mount is safe false");
 same(zoomVisualThreeRenderer(host as never, 1.1), false, "zoom missing mount is safe false");
 same(updateVisualThreeRenderer(host as never, initialScene), false, "update missing mount is safe false");
+
+import {
+  createVisualThreeLiveRenderer,
+  setVisualThreeLivePaused,
+} from "../src/three/index.js";
+void createVisualThreeLiveRenderer;
+void setVisualThreeLivePaused;
