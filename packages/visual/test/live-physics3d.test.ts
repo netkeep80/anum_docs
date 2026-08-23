@@ -21,6 +21,7 @@ import {
   snapshotLivePhysics3D,
   stepLivePhysics3D,
   wakeLivePhysics3D,
+  type LivePhysics3DController,
 } from "../src/live-physics3d.js";
 
 type LiveErrorCode =
@@ -74,7 +75,7 @@ function state(
   return { positions, velocities };
 }
 
-function snapshot(controller: unknown): SnapshotProbe {
+function snapshot(controller: LivePhysics3DController): SnapshotProbe {
   return snapshotLivePhysics3D(controller) as SnapshotProbe;
 }
 
