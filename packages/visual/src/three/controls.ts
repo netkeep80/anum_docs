@@ -1,16 +1,10 @@
 import {
-  setLivePhysics3DOptions,
-  type LivePhysics3DController,
-} from "../live-physics3d.js";
-import type { Physics3DOptions } from "../physics3d.js";
-import {
   getVisualThreeRendererSnapshot,
+  hasVisualThreeLiveController,
   resizeVisualThreeRenderer,
-  setVisualThreeLivePaused,
+  setVisualThreeLivePhysicsOptions,
   type VisualThreeContainer,
 } from "./renderer.js";
-
-export type VisualThreeLivePhysicsPatch = Pick<Physics3DOptions, "charge" | "springStiffness">;
 
 type Listener = () => void;
 
@@ -74,7 +68,6 @@ interface MountedControlBar {
   destroyed: boolean;
 }
 
-const liveControllers = new WeakMap<object, LivePhysics3DController>();
 const controlBars = new WeakMap<object, MountedControlBar>();
 
 function key(container: VisualThreeContainer): object {
@@ -156,31 +149,6 @@ function syncFullscreen(state: MountedControlBar, resize: boolean): void {
   if (resize) resizeVisualThreeRenderer(state.container);
 }
 
-export function bindVisualThreeLiveController(
-  container: VisualThreeContainer,
-  controller: LivePhysics3DController,
-): boolean {
-  if (!getVisualThreeRendererSnapshot(container)) return false;
-  liveControllers.set(key(container), controller);
-  return true;
-}
-
-export function unbindVisualThreeLiveController(container: VisualThreeContainer): boolean {
-  return liveControllers.delete(key(container));
-}
-
-export function setVisualThreeLivePhysicsOptions(
-  container: VisualThreeContainer,
-  patch: VisualThreeLivePhysicsPatch,
-): boolean {
-  if (!getVisualThreeRendererSnapshot(container)) return false;
-  const controller = liveControllers.get(key(container));
-  if (!controller) return false;
-  setLivePhysics3DOptions(controller, patch);
-  setVisualThreeLivePaused(container, false);
-  return true;
-}
-
 export function createVisualThreeControlBar(
   container: VisualThreeContainer,
   host: VisualThreeControlHost,
@@ -189,7 +157,7 @@ export function createVisualThreeControlBar(
   if (!getVisualThreeRendererSnapshot(container)) {
     throw new Error("@mts/visual/three: cannot mount controls without renderer");
   }
-  if (!liveControllers.has(key(container))) {
+  if (!hasVisualThreeLiveController(container)) {
     throw new Error("@mts/visual/three: cannot mount live controls without V2e controller");
   }
   if (controlBars.has(key(container))) {
