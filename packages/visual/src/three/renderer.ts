@@ -11,6 +11,11 @@ import {
   type LivePhysics3DController,
 } from "../live-physics3d.js";
 import type { Physics3DOptions, Physics3DState } from "../physics3d.js";
+import {
+  normalizeVisualPresentationState,
+  type VisualPresentationKeySpace,
+  type VisualPresentationState,
+} from "../presentation.js";
 import type { VisualKey } from "../index.js";
 import type { VisualThreeArcData, VisualThreeSceneData } from "./index.js";
 
@@ -55,6 +60,7 @@ export interface VisualThreeLiveRendererOptions extends VisualThreeRendererOptio
   readonly cancelFrame?: (handle: number) => void;
   readonly controlsFactory?: (camera: THREE.PerspectiveCamera, element: Node) => VisualThreeControls;
   readonly dragThreshold?: number;
+  readonly onActivateKey?: (key: VisualKey) => void;
 }
 
 export interface VisualThreeRendererSnapshot {
@@ -101,6 +107,7 @@ interface DragCandidate {
   readonly startY: number;
   readonly plane: THREE.Plane;
   readonly offset: THREE.Vector3;
+  crossedThreshold: boolean;
 }
 
 interface LiveBinding {
@@ -111,6 +118,7 @@ interface LiveBinding {
   readonly controls: VisualThreeControls;
   readonly element: VisualThreePointerSurface;
   readonly dragThreshold: number;
+  readonly onActivateKey: ((key: VisualKey) => void) | undefined;
   readonly raycaster: THREE.Raycaster;
   readonly pointer: THREE.Vector2;
   readonly onPointerDown: (event: VisualThreePointerEvent) => void;
@@ -133,10 +141,13 @@ interface MountedRenderer {
   readonly samples: number;
   readonly nodeRadius: number;
   readonly objects: PresentationObject[];
+  readonly halos: THREE.Mesh[];
   readonly fitPoints: THREE.Vector3[];
   readonly target: THREE.Vector3;
   observer?: VisualThreeResizeObserver;
   live: LiveBinding | undefined;
+  presentation: VisualPresentationState;
+  keySpace: VisualPresentationKeySpace;
   nodeCount: number;
   arcCount: number;
   arrowCount: number;
@@ -146,6 +157,7 @@ interface MountedRenderer {
 
 const mounts = new WeakMap<object, MountedRenderer>();
 const UP = new THREE.Vector3(0, 1, 0);
+const EMPTY_PRESENTATION: VisualPresentationState = Object.freeze({ links: Object.freeze([]) });
 
 function positiveFinite(value: number | undefined, fallback: number): number {
   return value !== undefined && Number.isFinite(value) && value > 0 ? value : fallback;
@@ -177,7 +189,16 @@ function disposeObject(object: PresentationObject): void {
   for (const material of materialList(object.material)) material.dispose();
 }
 
+function clearHalos(state: MountedRenderer): void {
+  for (const halo of state.halos) {
+    state.scene.remove(halo);
+    disposeObject(halo);
+  }
+  state.halos.length = 0;
+}
+
 function clearPresentation(state: MountedRenderer): void {
+  clearHalos(state);
   for (const object of state.objects) {
     state.scene.remove(object);
     disposeObject(object);
@@ -265,13 +286,63 @@ function addEndArrow(state: MountedRenderer, arc: VisualThreeArcData, points: re
   state.arrowCount += 1;
 }
 
+function reconcilePresentation(state: MountedRenderer, data: VisualThreeSceneData): void {
+  const knownKeys = new Set(data.nodes.map((node) => node.key));
+  state.keySpace = Object.freeze({ links: data.nodes });
+  const retained = state.presentation.links.filter((entry) => knownKeys.has(entry.key));
+  if (retained.length !== state.presentation.links.length) {
+    state.presentation = Object.freeze({ links: Object.freeze(retained) });
+  }
+}
+
+function applyPresentation(state: MountedRenderer): void {
+  clearHalos(state);
+  const byKey = new Map(state.presentation.links.map((entry) => [entry.key, entry] as const));
+  const centers = new Map<VisualKey, THREE.Mesh>();
+
+  for (const object of state.objects) {
+    const key = object.userData.key;
+    if (typeof key !== "string") continue;
+    const entry = byKey.get(key);
+    object.visible = entry?.visible ?? true;
+    if (object instanceof THREE.Mesh && object.userData.kind === "link-center") {
+      object.scale.setScalar(entry?.emphasis ?? 1);
+      centers.set(key, object);
+    }
+  }
+
+  for (const entry of state.presentation.links) {
+    if (!entry.selected && entry.halo === undefined) continue;
+    const center = centers.get(entry.key);
+    if (!center) continue;
+    const halo = entry.halo;
+    const geometry = new THREE.SphereGeometry(state.nodeRadius, 12, 8);
+    const material = new THREE.MeshBasicMaterial({
+      color: halo?.color ?? 0xffffff,
+      wireframe: true,
+      transparent: true,
+      opacity: halo?.opacity ?? 0.22,
+      depthWrite: false,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.copy(center.position);
+    mesh.scale.setScalar(halo?.scale ?? 1.55);
+    mesh.visible = entry.visible ?? true;
+    mesh.userData = { kind: "presentation-halo", key: entry.key };
+    state.scene.add(mesh);
+    state.halos.push(mesh);
+  }
+}
+
 function populate(state: MountedRenderer, data: VisualThreeSceneData): void {
+  reconcilePresentation(state, data);
   clearPresentation(state);
   for (const node of data.nodes) addNode(state, node);
   for (const arc of data.arcs) {
     const points = addArc(state, arc);
     addEndArrow(state, arc, points);
   }
+  applyPresentation(state);
 }
 
 function defaultSurface(): VisualThreeRenderingSurface {
@@ -408,6 +479,7 @@ function beginCandidate(state: MountedRenderer, event: VisualThreePointerEvent):
     startY: event.clientY,
     plane,
     offset: mesh.position.clone().sub(intersection),
+    crossedThreshold: false,
   };
 }
 
@@ -442,7 +514,9 @@ function continueCandidate(state: MountedRenderer, event: VisualThreePointerEven
   if (!live || !candidate || candidate.pointerId !== event.pointerId) return;
   if (!live.active) {
     const distance = Math.hypot(event.clientX - candidate.startX, event.clientY - candidate.startY);
-    if (distance < live.dragThreshold || !activateCandidate(state, live, candidate)) return;
+    if (distance < live.dragThreshold) return;
+    candidate.crossedThreshold = true;
+    if (!activateCandidate(state, live, candidate)) return;
   }
   moveActive(state, event);
 }
@@ -458,6 +532,8 @@ function finishCandidate(state: MountedRenderer, event: VisualThreePointerEvent,
   const candidate = live?.candidate;
   if (!live || !candidate || candidate.pointerId !== event.pointerId) return;
   const active = live.active;
+  const shouldActivate = finalMove && !active && !candidate.crossedThreshold;
+  const onActivateKey = live.onActivateKey;
   if (active) {
     if (finalMove) moveActive(state, event);
     if (snapshotLivePhysics3D(live.controller).pinnedKeys.includes(active.key)) {
@@ -470,6 +546,7 @@ function finishCandidate(state: MountedRenderer, event: VisualThreePointerEvent,
     scheduleLiveFrame(state);
   }
   live.candidate = undefined;
+  if (shouldActivate && onActivateKey) onActivateKey(candidate.key);
 }
 
 function detachLive(state: MountedRenderer): void {
@@ -523,9 +600,12 @@ export function createVisualThreeRenderer(
     samples: segmentCount(options.samples),
     nodeRadius: positiveFinite(options.nodeRadius, 0.12),
     objects: [],
+    halos: [],
     fitPoints: [],
     target: new THREE.Vector3(),
     live: undefined,
+    presentation: EMPTY_PRESENTATION,
+    keySpace: Object.freeze({ links: Object.freeze([]) }),
     nodeCount: 0,
     arcCount: 0,
     arrowCount: 0,
@@ -574,6 +654,7 @@ export function attachVisualThreeLiveController(
     controls,
     element,
     dragThreshold: positiveFinite(options.dragThreshold, 4),
+    onActivateKey: options.onActivateKey,
     raycaster: new THREE.Raycaster(),
     pointer: new THREE.Vector2(),
     paused: false,
@@ -626,6 +707,19 @@ export function setVisualThreeLivePaused(container: VisualThreeContainer, paused
     live.frameHandle = undefined;
   }
   scheduleLiveFrame(state);
+  return true;
+}
+
+export function setVisualThreePresentation(
+  container: VisualThreeContainer,
+  presentation: VisualPresentationState,
+): boolean {
+  const state = mounts.get(container);
+  if (!state) return false;
+  const normalized = normalizeVisualPresentationState(state.keySpace, presentation);
+  state.presentation = normalized;
+  applyPresentation(state);
+  render(state);
   return true;
 }
 
