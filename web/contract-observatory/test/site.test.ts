@@ -1,3 +1,8 @@
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+import { materializeContractObservatorySite } from "../src/build-site.js";
 import {
   buildContractObservatoryIndex,
   type ContractObservatoryIndex,
@@ -6,11 +11,21 @@ import {
 import { renderContractObservatoryHtml } from "../src/site.js";
 
 function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) throw new Error(`Contract Observatory V3b: ${message}`);
+  if (!condition) throw new Error(`Contract Observatory V3b/V3c: ${message}`);
 }
 
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
+}
+
+function throws(action: () => void, message: string): void {
+  let rejected = false;
+  try {
+    action();
+  } catch {
+    rejected = true;
+  }
+  assert(rejected, message);
 }
 
 function count(haystack: string, needle: string): number {
@@ -141,4 +156,36 @@ assert(syntheticHtml.includes("#66"), "optional lifecycle issue rendered when pr
 same(count(syntheticHtml, "Candidate lifecycle issue"), 1, "missing optional lifecycle fields are omitted");
 same(renderContractObservatoryHtml(synthetic), syntheticHtml, "synthetic rendering is deterministic");
 
-console.log("Contract Observatory V3b static UI checks passed.");
+const sourcePath = join(repositoryRoot, realIndex.currentContractPath);
+const sourceBefore = readFileSync(sourcePath, "utf8");
+const temporaryRoot = mkdtempSync(join(tmpdir(), "mts-contract-observatory-"));
+const materializedDirectory = join(temporaryRoot, "nested", "site");
+try {
+  const first = materializeContractObservatorySite(repositoryRoot, materializedDirectory);
+  assert(existsSync(first.indexPath), "materialized index.html exists");
+  assert(existsSync(first.noJekyllPath), "materialized .nojekyll exists");
+  same(readFileSync(first.indexPath, "utf8"), realHtml, "materialized HTML equals pure renderer bytes");
+  same(readFileSync(first.noJekyllPath, "utf8"), "", ".nojekyll is empty");
+  same(first.indexBytes, Buffer.byteLength(realHtml, "utf8"), "reported byte size is deterministic");
+
+  const second = materializeContractObservatorySite(repositoryRoot, materializedDirectory);
+  same(readFileSync(second.indexPath, "utf8"), realHtml, "repeated materialization is byte-identical");
+  same(readFileSync(sourcePath, "utf8"), sourceBefore, "materialization does not mutate current contract source");
+} finally {
+  rmSync(temporaryRoot, { recursive: true, force: true });
+}
+
+for (const unsafeTarget of [
+  repositoryRoot,
+  join(repositoryRoot, "contracts", "generated-site"),
+  join(repositoryRoot, "cutover", "generated-site"),
+  join(repositoryRoot, "ts", "src", "generated-site"),
+  join(repositoryRoot, "ts", "test", "generated-site"),
+]) {
+  throws(
+    () => materializeContractObservatorySite(repositoryRoot, unsafeTarget),
+    `unsafe materialization target rejects: ${unsafeTarget}`,
+  );
+}
+
+console.log("Contract Observatory V3b/V3c static UI and materialization checks passed.");
