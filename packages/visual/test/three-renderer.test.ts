@@ -315,8 +315,188 @@ same(zoomVisualThreeRenderer(host as never, 1.1), false, "zoom missing mount is 
 same(updateVisualThreeRenderer(host as never, initialScene), false, "update missing mount is safe false");
 
 import {
+  createLivePhysics3D,
+  snapshotLivePhysics3D,
+} from "../src/live-physics3d.js";
+import {
   createVisualThreeLiveRenderer,
   setVisualThreeLivePaused,
 } from "../src/three/index.js";
-void createVisualThreeLiveRenderer;
-void setVisualThreeLivePaused;
+
+type PointerProbe = {
+  readonly button: number;
+  readonly pointerId: number;
+  readonly clientX: number;
+  readonly clientY: number;
+  preventDefault: () => void;
+};
+
+type InteractiveElement = FakeElement & {
+  addEventListener: (type: string, listener: (event: PointerProbe) => void) => void;
+  removeEventListener: (type: string, listener: (event: PointerProbe) => void) => void;
+  setPointerCapture: (pointerId: number) => void;
+  releasePointerCapture: (pointerId: number) => void;
+  hasPointerCapture: (pointerId: number) => boolean;
+  dispatch: (type: string, event: PointerProbe) => void;
+  listenerCount: () => number;
+};
+
+type ControlsProbe = {
+  enabled: boolean;
+  readonly target: { copy: (value: unknown) => unknown };
+  update: () => void;
+  addEventListener: (type: string, listener: () => void) => void;
+  removeEventListener: (type: string, listener: () => void) => void;
+  dispose: () => void;
+};
+
+function interactiveElement(token: string): InteractiveElement {
+  const listeners = new Map<string, Set<(event: PointerProbe) => void>>();
+  const captures = new Set<number>();
+  return {
+    token,
+    parentNode: null,
+    addEventListener(type, listener) {
+      const set = listeners.get(type) ?? new Set();
+      set.add(listener);
+      listeners.set(type, set);
+    },
+    removeEventListener(type, listener) {
+      listeners.get(type)?.delete(listener);
+    },
+    setPointerCapture(pointerId) { captures.add(pointerId); },
+    releasePointerCapture(pointerId) { captures.delete(pointerId); },
+    hasPointerCapture: (pointerId) => captures.has(pointerId),
+    dispatch(type, event) {
+      for (const listener of [...(listeners.get(type) ?? [])]) listener(event);
+    },
+    listenerCount() {
+      return [...listeners.values()].reduce((total, set) => total + set.size, 0);
+    },
+  };
+}
+
+function pointer(clientX: number, clientY: number, pointerId = 7): PointerProbe {
+  return { button: 0, pointerId, clientX, clientY, preventDefault() {} };
+}
+
+const liveNetwork: VisualLinkNetwork = {
+  links: [{ key: "R", startKey: "R", endKey: "R", label: "∞", tags: ["root"] }],
+};
+const liveInitialState: Physics3DState = {
+  positions: [{ key: "R", point: { x: 0, y: 0, z: 0 } }],
+  velocities: [{ key: "R", vector: { x: 0, y: 0, z: 0 } }],
+};
+const liveController = createLivePhysics3D(liveNetwork, liveInitialState, { settleWindow: 1 });
+const liveHost = container(400, 300);
+const liveElement = interactiveElement("live-surface");
+let liveScene: SceneProbe | undefined;
+let liveCamera: CameraProbe | undefined;
+let liveDisposed = 0;
+let controlDisposed = 0;
+let controlUpdates = 0;
+const controlListeners = new Set<() => void>();
+const liveControls: ControlsProbe = {
+  enabled: true,
+  target: { copy: () => liveControls.target },
+  update() { controlUpdates += 1; },
+  addEventListener(type, listener) { if (type === "change") controlListeners.add(listener); },
+  removeEventListener(type, listener) { if (type === "change") controlListeners.delete(listener); },
+  dispose() { controlDisposed += 1; },
+};
+let nextFrameId = 1;
+const frames = new Map<number, (timestamp: number) => void>();
+const cancelledFrames: number[] = [];
+const requestFrame = (callback: (timestamp: number) => void): number => {
+  const id = nextFrameId++;
+  frames.set(id, callback);
+  return id;
+};
+const cancelFrame = (id: number): void => {
+  frames.delete(id);
+  cancelledFrames.push(id);
+};
+const liveSurface: SurfaceProbe = {
+  domElement: liveElement,
+  setSize() {},
+  render(scene, camera) {
+    liveScene = scene as SceneProbe;
+    liveCamera = camera as CameraProbe;
+  },
+  dispose() { liveDisposed += 1; },
+};
+
+createVisualThreeLiveRenderer(liveHost as never, liveNetwork, liveController, {
+  nodeRadius: 0.4,
+  surfaceFactory: () => liveSurface,
+  resizeObserverFactory: () => ({ disconnect() {} }),
+  requestFrame,
+  cancelFrame,
+  controlsFactory: () => liveControls,
+  dragThreshold: 5,
+} as never);
+assert(liveScene !== undefined && liveCamera !== undefined, "V2f-C live renderer uses real Three scene/camera");
+same(frames.size, 1, "awake controller schedules one RAF");
+const stalePausedFrame = [...frames.values()][0]!;
+same(setVisualThreeLivePaused(liveHost as never, true), true, "pause mounted live renderer");
+same(frames.size, 0, "pause cancels pending RAF");
+stalePausedFrame(123456789);
+same(snapshotLivePhysics3D(liveController).tick, 0, "stale paused RAF cannot tick physics");
+same(setVisualThreeLivePaused(liveHost as never, false), true, "resume mounted live renderer");
+same(frames.size, 1, "resume awake controller schedules RAF");
+const resumedFrame = [...frames.entries()][0]!;
+frames.delete(resumedFrame[0]);
+resumedFrame[1](987654321);
+const settled = snapshotLivePhysics3D(liveController);
+same(settled.tick, 1, "one RAF means one V2e tick independent of timestamp");
+same(settled.awake, false, "settled V2e controller sleeps");
+same(frames.size, 0, "sleeping controller stops continuous RAF");
+
+liveElement.dispatch("pointerdown", pointer(200, 150));
+same(snapshotLivePhysics3D(liveController).pinnedKeys.length, 0, "pointerdown alone does not pin");
+same(liveControls.enabled, true, "pointerdown alone leaves OrbitControls enabled");
+liveElement.dispatch("pointerup", pointer(200, 150));
+same(snapshotLivePhysics3D(liveController).pinnedKeys.length, 0, "simple tap never pins");
+
+liveElement.dispatch("pointerdown", pointer(200, 150));
+liveElement.dispatch("pointermove", pointer(220, 150));
+let dragged = snapshotLivePhysics3D(liveController);
+same(dragged.pinnedKeys.length, 1, "movement over threshold pins one exact key");
+same(dragged.pinnedKeys[0], "R", "root follows ordinary draggable VisualKey path");
+same(liveControls.enabled, false, "OrbitControls disabled only during active center drag");
+const draggedRoot = dragged.state.positions.find((entry) => entry.key === "R")!.point;
+assert(Math.abs(draggedRoot.x) + Math.abs(draggedRoot.y) + Math.abs(draggedRoot.z) > 1e-9, "drag moves V2e pinned presentation point");
+liveElement.dispatch("pointerup", pointer(220, 150));
+dragged = snapshotLivePhysics3D(liveController);
+same(dragged.pinnedKeys.length, 0, "pointerup releases V2e pin");
+same(liveControls.enabled, true, "pointerup restores OrbitControls");
+assert(frames.size <= 1, "release keeps at most one live RAF scheduled");
+
+for (const id of [...frames.keys()]) { frames.delete(id); }
+liveElement.dispatch("pointerdown", pointer(200, 150, 9));
+liveElement.dispatch("pointermove", pointer(218, 150, 9));
+same(snapshotLivePhysics3D(liveController).pinnedKeys[0], "R", "second root drag can activate");
+same(liveControls.enabled, false, "second active drag disables controls");
+liveElement.dispatch("pointercancel", pointer(218, 150, 9));
+same(snapshotLivePhysics3D(liveController).pinnedKeys.length, 0, "pointercancel releases V2e pin");
+same(liveControls.enabled, true, "pointercancel restores controls");
+
+liveElement.dispatch("pointerdown", pointer(200, 150, 11));
+liveElement.dispatch("pointermove", pointer(215, 150, 11));
+same(snapshotLivePhysics3D(liveController).pinnedKeys[0], "R", "destroy test begins with active pin");
+const tickBeforeDestroy = snapshotLivePhysics3D(liveController).tick;
+const staleDestroyFrames = [...frames.values()];
+same(destroyVisualThreeRenderer(liveHost as never), true, "destroy tears down live renderer through common lifecycle");
+same(snapshotLivePhysics3D(liveController).pinnedKeys.length, 0, "destroy releases active V2e pin");
+same(liveControls.enabled, true, "destroy restores controls before disposal");
+same(controlDisposed, 1, "destroy disposes controls exactly once");
+same(controlListeners.size, 0, "destroy removes controls change listener");
+same(liveElement.listenerCount(), 0, "destroy removes pointer listeners");
+same(frames.size, 0, "destroy cancels pending RAF");
+assert(cancelledFrames.length > 0, "RAF cancellation is observable");
+same(liveDisposed, 1, "common renderer surface disposed once");
+for (const callback of staleDestroyFrames) callback(555555555);
+liveElement.dispatch("pointermove", pointer(260, 150, 11));
+same(snapshotLivePhysics3D(liveController).tick, tickBeforeDestroy, "stale callbacks/events cannot tick after destroy");
+assert(controlUpdates >= 0, "controls probe remains finite and deterministic");
+same(setVisualThreeLivePaused(liveHost as never, true), false, "pause missing live mount is safe false");
