@@ -9,7 +9,7 @@ import {
   createVisualThreeLiveRenderer,
   createVisualThreeRenderer,
   destroyVisualThreeRenderer,
-  getVisualThreeSnapshot,
+  getVisualThreeRendererSnapshot,
   setVisualThreeLivePaused,
   setVisualThreePresentation,
   updateVisualThreeRenderer,
@@ -123,7 +123,7 @@ createVisualThreeRenderer(host as never, data(), {
 assert(scene !== undefined, "renderer exposes scene");
 same(label(scene, "R"), undefined, "labels are quiet by default");
 
-const countsBefore = getVisualThreeSnapshot(host as never);
+const countsBefore = getVisualThreeRendererSnapshot(host as never);
 same(setVisualThreePresentation(host as never, { links: [{ key: "R", selected: true, emphasis: 1.4 }] }), true, "selection applies without label");
 same(label(scene, "R"), undefined, "selection/emphasis do not imply label visibility");
 
@@ -133,10 +133,10 @@ assert(rootLabel !== undefined, "root label sprite created");
 same(rootLabel.userData.text, "∞", "label text comes from exact VisualLink.label");
 same(created.at(-1), "R:∞", "factory receives exact key and label");
 assert(rootLabel.position.y > 0, "label has presentation-only center offset");
-const countsWithLabel = getVisualThreeSnapshot(host as never);
-same(countsWithLabel.nodeCount, countsBefore.nodeCount, "label does not change node count");
-same(countsWithLabel.arcCount, countsBefore.arcCount, "label does not change arc count");
-same(countsWithLabel.arrowCount, countsBefore.arrowCount, "label does not change arrow count");
+const countsWithLabel = getVisualThreeRendererSnapshot(host as never);
+same(countsWithLabel?.nodeCount, countsBefore?.nodeCount, "label does not change node count");
+same(countsWithLabel?.arcCount, countsBefore?.arcCount, "label does not change arc count");
+same(countsWithLabel?.arrowCount, countsBefore?.arrowCount, "label does not change arrow count");
 same(scene.children.filter((object) => object.userData.kind === "link-center").length, 2, "label is not a link-center picking target");
 
 same(setVisualThreePresentation(host as never, { links: [{ key: "R", visible: false, labelVisible: true }] }), true, "whole-Link visibility dominates label");
