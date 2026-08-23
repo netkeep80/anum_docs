@@ -5,10 +5,33 @@ import {
   centerlinePoint3D,
   dotVec3,
   sampleCenterline3D,
-  type Point3D,
-  type VisualGeometry3D,
-  type VisualPosition3D,
 } from "../src/geometry3d.js";
+
+type Point3D = Readonly<{ x: number; y: number; z: number }>;
+type VisualPosition3D = Readonly<{ key: string; point: Point3D }>;
+type GeometryErrorCode =
+  | "missing-position"
+  | "extra-position"
+  | "duplicate-position"
+  | "non-finite-position";
+
+type CenterlineProbe = Readonly<{
+  role: "start" | "end";
+  semanticOrientation: "outer-to-green" | "green-to-outer";
+  greenOutwardTangent: Point3D;
+  loop: boolean;
+  controlPoints: readonly Point3D[];
+}>;
+
+type LinkGeometryProbe = Readonly<{
+  key: string;
+  start: CenterlineProbe;
+  end: CenterlineProbe;
+}>;
+
+type VisualGeometry3DProbe = Readonly<{
+  links: readonly LinkGeometryProbe[];
+}>;
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`@mts/visual V2c: ${message}`);
@@ -28,8 +51,8 @@ function finitePoint(point: Point3D): boolean {
   return Number.isFinite(point.x) && Number.isFinite(point.y) && Number.isFinite(point.z);
 }
 
-function linkByKey(geometry: VisualGeometry3D, key: string) {
-  const link = geometry.links.find((candidate) => candidate.key === key);
+function linkByKey(geometry: VisualGeometry3DProbe, key: string): LinkGeometryProbe {
+  const link = geometry.links.find((candidate: LinkGeometryProbe) => candidate.key === key);
   assert(link !== undefined, `missing geometry for ${key}`);
   return link;
 }
@@ -38,16 +61,13 @@ function position(key: string, x: number, y: number, z: number): VisualPosition3
   return { key, point: { x, y, z } };
 }
 
-function expectCode(
-  effect: () => unknown,
-  code: VisualGeometry3DError["code"],
-  message: string,
-): void {
+function expectCode(effect: () => unknown, code: GeometryErrorCode, message: string): void {
   try {
     effect();
   } catch (error) {
     assert(error instanceof VisualGeometry3DError, `${message}: wrong error type`);
-    assert(error.code === code, `${message}: ${error.code} !== ${code}`);
+    const coded = error as { readonly code?: unknown };
+    assert(coded.code === code, `${message}: ${String(coded.code)} !== ${code}`);
     return;
   }
   throw new Error(`@mts/visual V2c: ${message}: expected rejection`);
@@ -67,7 +87,7 @@ const ordinaryPositions: VisualPosition3D[] = [
 ];
 const ordinaryTopologyBefore = JSON.stringify(ordinaryNetwork);
 const ordinaryPositionsBefore = JSON.stringify(ordinaryPositions);
-const ordinary = buildVisualGeometry3D(ordinaryNetwork, ordinaryPositions);
+const ordinary = buildVisualGeometry3D(ordinaryNetwork, ordinaryPositions) as VisualGeometry3DProbe;
 const x = linkByKey(ordinary, "X");
 
 samePoint(centerlinePoint3D(x.start, 0), ordinaryPositions[0].point, "start arc begins at start Link center");
@@ -86,13 +106,13 @@ assert(JSON.stringify(ordinaryPositions) === ordinaryPositionsBefore, "geometry 
 const reordered = buildVisualGeometry3D(
   { links: [...ordinaryNetwork.links].reverse() },
   [...ordinaryPositions].reverse(),
-);
+) as VisualGeometry3DProbe;
 assert(JSON.stringify(reordered) === JSON.stringify(ordinary), "input order does not alter normalized 3D geometry");
 
 const degenerate = buildVisualGeometry3D(
   ordinaryNetwork,
   [position("A", 0, 0, 0), position("B", 0, 0, 0), position("X", 0, 0, 0)],
-);
+) as VisualGeometry3DProbe;
 const degenerateX = linkByKey(degenerate, "X");
 for (const point of [...sampleCenterline3D(degenerateX.start, 24), ...sampleCenterline3D(degenerateX.end, 24)]) {
   assert(finitePoint(point), "coincident geometry remains finite");
@@ -110,7 +130,7 @@ const startSelfNetwork: VisualLinkNetwork = {
   ],
 };
 const startSelf = linkByKey(
-  buildVisualGeometry3D(startSelfNetwork, [position("B", 3, 1, 2), position("X", 0, 0, 0)]),
+  buildVisualGeometry3D(startSelfNetwork, [position("B", 3, 1, 2), position("X", 0, 0, 0)]) as VisualGeometry3DProbe,
   "X",
 );
 assert(startSelf.start.loop === true, "start self-reference becomes a finite loop");
@@ -124,7 +144,7 @@ const endSelfNetwork: VisualLinkNetwork = {
   ],
 };
 const endSelf = linkByKey(
-  buildVisualGeometry3D(endSelfNetwork, [position("A", -2, 5, 1), position("X", 0, 0, 0)]),
+  buildVisualGeometry3D(endSelfNetwork, [position("A", -2, 5, 1), position("X", 0, 0, 0)]) as VisualGeometry3DProbe,
   "X",
 );
 assert(endSelf.end.loop === true, "end self-reference becomes a finite loop");
@@ -132,7 +152,10 @@ for (const point of sampleCenterline3D(endSelf.end, 32)) assert(finitePoint(poin
 approx(dotVec3(endSelf.start.greenOutwardTangent, endSelf.end.greenOutwardTangent), -1, "end self-loop 180 degrees");
 
 const rootNetwork: VisualLinkNetwork = { links: [{ key: "R", startKey: "R", endKey: "R" }] };
-const root = linkByKey(buildVisualGeometry3D(rootNetwork, [position("R", 1, -2, 4)]), "R");
+const root = linkByKey(
+  buildVisualGeometry3D(rootNetwork, [position("R", 1, -2, 4)]) as VisualGeometry3DProbe,
+  "R",
+);
 assert(root.start.loop === true && root.end.loop === true, "double self-link has two loops");
 assert(JSON.stringify(root.start.controlPoints) !== JSON.stringify(root.end.controlPoints), "double self-loops are distinct");
 for (const point of [...sampleCenterline3D(root.start, 32), ...sampleCenterline3D(root.end, 32)]) {
@@ -152,7 +175,10 @@ const linkOfLinksPositions = [
   position("U", 4, -1, 5),
   position("X", 0, 0, 2),
 ];
-const linkOfLinks = linkByKey(buildVisualGeometry3D(linkOfLinksNetwork, linkOfLinksPositions), "X");
+const linkOfLinks = linkByKey(
+  buildVisualGeometry3D(linkOfLinksNetwork, linkOfLinksPositions) as VisualGeometry3DProbe,
+  "X",
+);
 samePoint(centerlinePoint3D(linkOfLinks.start, 0), linkOfLinksPositions[0].point, "link-of-links start anchor");
 samePoint(centerlinePoint3D(linkOfLinks.end, 1), linkOfLinksPositions[1].point, "link-of-links end anchor");
 
