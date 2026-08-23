@@ -44,6 +44,7 @@ export interface VisualThreeRendererOptions {
   readonly nodeRadius?: number;
   readonly surfaceFactory?: () => VisualThreeRenderingSurface;
   readonly resizeObserverFactory?: (callback: () => void) => VisualThreeResizeObserver;
+  readonly labelSpriteFactory?: (text: string, key: VisualKey) => THREE.Sprite;
 }
 
 export interface VisualThreeControls {
@@ -140,14 +141,17 @@ interface MountedRenderer {
   readonly surface: VisualThreeRenderingSurface;
   readonly samples: number;
   readonly nodeRadius: number;
+  readonly labelSpriteFactory: (text: string, key: VisualKey) => THREE.Sprite;
   readonly objects: PresentationObject[];
   readonly halos: THREE.Mesh[];
+  readonly labels: THREE.Sprite[];
   readonly fitPoints: THREE.Vector3[];
   readonly target: THREE.Vector3;
   observer?: VisualThreeResizeObserver;
   live: LiveBinding | undefined;
   presentation: VisualPresentationState;
   keySpace: VisualPresentationKeySpace;
+  nodes: VisualThreeSceneData["nodes"];
   nodeCount: number;
   arcCount: number;
   arrowCount: number;
@@ -158,6 +162,7 @@ interface MountedRenderer {
 const mounts = new WeakMap<object, MountedRenderer>();
 const UP = new THREE.Vector3(0, 1, 0);
 const EMPTY_PRESENTATION: VisualPresentationState = Object.freeze({ links: Object.freeze([]) });
+const EMPTY_NODES: VisualThreeSceneData["nodes"] = Object.freeze([]);
 
 function positiveFinite(value: number | undefined, fallback: number): number {
   return value !== undefined && Number.isFinite(value) && value > 0 ? value : fallback;
@@ -189,6 +194,11 @@ function disposeObject(object: PresentationObject): void {
   for (const material of materialList(object.material)) material.dispose();
 }
 
+function disposeLabel(sprite: THREE.Sprite): void {
+  sprite.material.map?.dispose();
+  sprite.material.dispose();
+}
+
 function clearHalos(state: MountedRenderer): void {
   for (const halo of state.halos) {
     state.scene.remove(halo);
@@ -197,8 +207,17 @@ function clearHalos(state: MountedRenderer): void {
   state.halos.length = 0;
 }
 
+function clearLabels(state: MountedRenderer): void {
+  for (const label of state.labels) {
+    state.scene.remove(label);
+    disposeLabel(label);
+  }
+  state.labels.length = 0;
+}
+
 function clearPresentation(state: MountedRenderer): void {
   clearHalos(state);
+  clearLabels(state);
   for (const object of state.objects) {
     state.scene.remove(object);
     disposeObject(object);
@@ -297,6 +316,7 @@ function reconcilePresentation(state: MountedRenderer, data: VisualThreeSceneDat
 
 function applyPresentation(state: MountedRenderer): void {
   clearHalos(state);
+  clearLabels(state);
   const byKey = new Map(state.presentation.links.map((entry) => [entry.key, entry] as const));
   const centers = new Map<VisualKey, THREE.Mesh>();
 
@@ -332,11 +352,24 @@ function applyPresentation(state: MountedRenderer): void {
     state.scene.add(mesh);
     state.halos.push(mesh);
   }
+
+  for (const node of state.nodes) {
+    const entry = byKey.get(node.key);
+    if (entry?.labelVisible !== true || node.label === undefined) continue;
+    const sprite = state.labelSpriteFactory(node.label, node.key);
+    sprite.position.set(node.position.x, node.position.y + state.nodeRadius * 2.2, node.position.z);
+    sprite.scale.set(state.nodeRadius * 4, state.nodeRadius * 1.5, 1);
+    sprite.visible = entry.visible ?? true;
+    sprite.userData = { ...sprite.userData, kind: "presentation-label", key: node.key };
+    state.scene.add(sprite);
+    state.labels.push(sprite);
+  }
 }
 
 function populate(state: MountedRenderer, data: VisualThreeSceneData): void {
   reconcilePresentation(state, data);
   clearPresentation(state);
+  state.nodes = data.nodes;
   for (const node of data.nodes) addNode(state, node);
   for (const arc of data.arcs) {
     const points = addArc(state, arc);
@@ -347,6 +380,32 @@ function populate(state: MountedRenderer, data: VisualThreeSceneData): void {
 
 function defaultSurface(): VisualThreeRenderingSurface {
   return new THREE.WebGLRenderer({ antialias: true });
+}
+
+function defaultLabelSpriteFactory(text: string, _key: VisualKey): THREE.Sprite {
+  if (typeof document === "undefined") {
+    throw new Error("@mts/visual/three: document is unavailable for label rendering");
+  }
+  const canvas = document.createElement("canvas");
+  const measureContext = canvas.getContext("2d");
+  if (!measureContext) {
+    throw new Error("@mts/visual/three: canvas 2D context is unavailable for label rendering");
+  }
+  measureContext.font = "48px sans-serif";
+  canvas.width = Math.max(64, Math.ceil(measureContext.measureText(text).width) + 24);
+  canvas.height = 64;
+  const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error("@mts/visual/three: canvas 2D context is unavailable for label rendering");
+  }
+  context.font = "48px sans-serif";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillStyle = "#ffffff";
+  context.fillText(text, canvas.width / 2, canvas.height / 2);
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false });
+  return new THREE.Sprite(material);
 }
 
 function defaultControls(camera: THREE.PerspectiveCamera, element: Node): VisualThreeControls {
@@ -599,13 +658,16 @@ export function createVisualThreeRenderer(
     surface,
     samples: segmentCount(options.samples),
     nodeRadius: positiveFinite(options.nodeRadius, 0.12),
+    labelSpriteFactory: options.labelSpriteFactory ?? defaultLabelSpriteFactory,
     objects: [],
     halos: [],
+    labels: [],
     fitPoints: [],
     target: new THREE.Vector3(),
     live: undefined,
     presentation: EMPTY_PRESENTATION,
     keySpace: Object.freeze({ links: Object.freeze([]) }),
+    nodes: EMPTY_NODES,
     nodeCount: 0,
     arcCount: 0,
     arrowCount: 0,
