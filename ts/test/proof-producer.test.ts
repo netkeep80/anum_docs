@@ -89,8 +89,7 @@ const evidence: core.StructuralDerivationEvidence = Object.freeze({
 const beforeExport = memory.linkCount;
 const artifact = core.exportPortableStructuralDerivation(memory, evidence);
 same(memory.linkCount, beforeExport, "portable export must stay source read-only");
-const imported = core.replayPortableStructuralProof(artifact);
-assert("replay" in imported, "plain producer artifact must select plain trusted replay");
+const imported = core.replayPortableStructuralProof(artifact) as core.PortableStructuralDerivationReplayResult;
 same(imported.replay.occurrenceCount, 1, "trusted replay must verify one candidate node");
 same(
   imported.replay.target.judgment.claim,
