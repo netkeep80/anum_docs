@@ -6,7 +6,20 @@ import {
   exportPortableStructuralDerivation,
   exportPortableStructuralDerivationWithAssumptions,
 } from "../src/portable-derivation.js";
-import { replayPortableStructuralProof } from "../src/portable-proof-replay.js";
+import { computePortableStructuralDerivationWithTheoremsContentDigest } from "../src/portable-derivation-digest.js";
+import {
+  createPortableStructuralDerivationWithTheoremsProvenanceClaim,
+  verifyPortableStructuralDerivationWithTheoremsProvenanceClaim,
+} from "../src/portable-derivation-provenance.js";
+import {
+  exportPortableStructuralDerivationWithTheorems,
+  replayPortableStructuralProof,
+} from "../src/portable-proof-replay.js";
+import { computePortableStructuralTheoryRevision } from "../src/portable-theory-digest.js";
+import {
+  exportPortableStructuralTheory,
+  verifyPortableStructuralProofTheoryRevision,
+} from "../src/portable-theory.js";
 import { defineContext } from "../src/state.js";
 import { defineActField, defineActHeader } from "../src/structural-readers.js";
 import {
@@ -23,9 +36,11 @@ import {
   defineStructuralAssumptionContext,
   defineStructuralDerivationRule,
   defineStructuralProofOccurrence,
+  defineStructuralTheorem,
   type StructuralDerivationEvidence,
   type StructuralDerivationNodeEvidence,
   type StructuralDerivationWithAssumptionsEvidence,
+  type StructuralDerivationWithTheoremsEvidence,
   type StructuralJudgmentEvidence,
 } from "../src/derivation.js";
 
@@ -70,6 +85,16 @@ function expectAssumptionReject(code: string, effect: () => unknown): void {
     return;
   }
   throw new Error("expected generic assumption rejection");
+}
+
+function expectReject(effect: () => unknown): void {
+  try { effect(); } catch { return; }
+  throw new Error("expected rejection");
+}
+
+async function expectAsyncReject(effect: () => Promise<unknown>): Promise<void> {
+  try { await effect(); } catch { return; }
+  throw new Error("expected async rejection");
 }
 
 interface Fixture {
@@ -183,10 +208,7 @@ const conditionalArtifact = exportPortableStructuralDerivationWithAssumptions(
   );
 }
 
-// R3 RED: the versioned theorem-reuse schema must select its own exact parser
-// before generic base fallback. The envelope is intentionally incomplete, so a
-// correct router reaches the new parser and reports invalid-envelope; current
-// baseline instead reports unsupported-schema from the base family.
+// R3 router reaches the exact theorem parser rather than plain fallback.
 {
   expectPortable("invalid-envelope", () => replayPortableStructuralProof({
     ...baseArtifact,
@@ -237,5 +259,91 @@ const conditionalArtifact = exportPortableStructuralDerivationWithAssumptions(
   }));
 }
 
-// Executable P7a classification:
-// SINGLE_PORTABLE_TRUSTED_REPLAY_BOUNDARY_SUPPORTED
+function theoremFixture(): {
+  memory: Memory;
+  theory: LinkHandle;
+  evidence: StructuralDerivationWithTheoremsEvidence;
+} {
+  const memory = new Memory();
+  const { R, U } = ensureRootBasis(memory);
+  let cursor = U;
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
+  const dictionary = fresh(); const grammar = fresh(); const theory = fresh(); const role = fresh();
+  const lemmaClaim = fresh();
+  const expectedInterpreter: StructuralInterpreter = { dictionary, grammar, theory };
+  const interpreter = defineStructuralInterpreter(memory, dictionary, grammar, theory);
+  const roleDictionary = defineStructuralRoleDictionary(memory, [role]);
+  const make = (body: LinkHandle, claim: LinkHandle, templates: readonly LinkHandle[], premises: readonly LinkHandle[]) => {
+    const rule = defineStructuralRule(memory, roleDictionary, body);
+    const context = defineContext(memory, fresh(), fresh());
+    const act = defineActHeader(memory, interpreter, roleDictionary, context);
+    defineActField(memory, act, role, lemmaClaim);
+    const judgment: StructuralJudgmentEvidence = {
+      application: { act, rule, ruleAdmission: admitStructuralRule(memory, theory, rule), claimedBody: claim, expectedInterpreter, expectedAfterContext: context },
+      judgment: { theory, context, claim },
+    };
+    const occurrence = defineStructuralProofOccurrence(memory, act, claim);
+    const derivationRule = defineStructuralDerivationRule(memory, rule, templates);
+    return { occurrence, node: { occurrence, judgment, derivationRule, derivationRuleAdmission: admitStructuralDerivationRule(memory, theory, derivationRule), premiseOccurrenceSequence: materializeExactSequence(memory, premises) } };
+  };
+  const lemma = make(role, lemmaClaim, [], []);
+  const targetClaim = memory.ensure(lemmaClaim, lemmaClaim);
+  const target = make(memory.ensure(role, role), targetClaim, [role, role], [lemma.occurrence, lemma.occurrence]);
+  return {
+    memory,
+    theory,
+    evidence: {
+      derivation: { theory, targetOccurrence: target.occurrence, nodes: [target.node] },
+      theorems: [{ theorem: defineStructuralTheorem(memory, lemmaClaim, theory), proof: { theory, targetOccurrence: lemma.occurrence, nodes: [lemma.node] } }],
+    },
+  };
+}
+
+// R3 positive: one canonical topology carries the consuming derivation and full
+// theorem proof; generic theorem replay is the only proof authority.
+const tf = theoremFixture();
+const theoremArtifact = exportPortableStructuralDerivationWithTheorems(tf.memory, tf.evidence);
+{
+  const result = replayPortableStructuralProof(theoremArtifact);
+  assert("theorems" in result.evidence, "theorem transport route");
+  same(result.replay.derivation.occurrenceCount, 2, "reused theorem occurrence count");
+  same(result.memory.linkCount, theoremArtifact.topology.links.length, "theorem replay read-only");
+  const digestA = await computePortableStructuralDerivationWithTheoremsContentDigest(theoremArtifact);
+  const digestB = await computePortableStructuralDerivationWithTheoremsContentDigest(theoremArtifact);
+  same(digestA.value, digestB.value, "theorem content digest deterministic");
+  const theoryArtifact = exportPortableStructuralTheory(tf.memory, tf.theory);
+  const revision = await computePortableStructuralTheoryRevision(theoryArtifact);
+  await verifyPortableStructuralProofTheoryRevision(theoremArtifact, theoryArtifact, revision);
+}
+
+// The exact parser and generic kernel fail closed on incomplete, forged,
+// cross-Theory, dependency-tampered, ambient/noncanonical, or host-authority evidence.
+{
+  const reused = theoremArtifact.theorems[0]!;
+  const target = theoremArtifact.nodes[0]!;
+  expectPortable("invalid-envelope", () => replayPortableStructuralProof({ ...theoremArtifact, cacheKey: "trusted" }));
+  expectReject(() => replayPortableStructuralProof({ ...theoremArtifact, theorems: [{ theoremCoordinate: reused.theoremCoordinate }] }));
+  expectReject(() => replayPortableStructuralProof({ ...theoremArtifact, theorems: [{ ...reused, theoremCoordinate: theoremArtifact.theoryCoordinate }] }));
+  expectReject(() => replayPortableStructuralProof({ ...theoremArtifact, theoryCoordinate: 0 }));
+  expectReject(() => replayPortableStructuralProof({ ...theoremArtifact, theorems: [{ ...reused, proof: { ...reused.proof, theoryCoordinate: 0 } }] }));
+  expectReject(() => replayPortableStructuralProof({ ...theoremArtifact, theorems: [{ ...reused, proof: { ...reused.proof, nodes: [] } }] }));
+  expectReject(() => replayPortableStructuralProof({ ...theoremArtifact, nodes: [{ ...target, premiseOccurrenceSequence: theoremArtifact.targetOccurrenceCoordinate }] }));
+  expectReject(() => replayPortableStructuralProof({ ...theoremArtifact, topology: { ...theoremArtifact.topology, links: [...theoremArtifact.topology.links].reverse() } }));
+}
+
+// Provenance binds origin/content only: tamper is rejected, while freshly
+// re-provenancing invalid proof evidence does not make the proof true.
+{
+  const source = { locator: "github:netkeep80/anum_docs", revision: "exact", subject: "#925" };
+  const producer = { id: "@mts/core", version: "v0.11" };
+  const claim = await createPortableStructuralDerivationWithTheoremsProvenanceClaim(theoremArtifact, source, producer);
+  await verifyPortableStructuralDerivationWithTheoremsProvenanceClaim(theoremArtifact, claim);
+  await expectAsyncReject(() => verifyPortableStructuralDerivationWithTheoremsProvenanceClaim(theoremArtifact, { ...claim, contentDigest: { ...claim.contentDigest, value: "0".repeat(64) } }));
+  const invalid = { ...theoremArtifact, theoryCoordinate: 0 };
+  const freshClaim = await createPortableStructuralDerivationWithTheoremsProvenanceClaim(invalid, source, producer);
+  await verifyPortableStructuralDerivationWithTheoremsProvenanceClaim(invalid, freshClaim);
+  expectReject(() => replayPortableStructuralProof(invalid));
+}
+
+// Executable P7a/R3 classification:
+// SINGLE_PORTABLE_TRUSTED_REPLAY_BOUNDARY_WITH_THEOREMS_SUPPORTED
