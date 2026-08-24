@@ -4,10 +4,13 @@ import {
   PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME,
   PORTABLE_STRUCTURAL_THEORY_SCHEMA,
   computePortableStructuralTheoryRevision,
+  createStructuralProofProducer,
   ensureRootBasis,
+  exportPortableStructuralDerivation,
   exportPortableStructuralTheory,
   replayPortableStructuralDerivation,
   replayPortableStructuralDerivationWithAssumptions,
+  replayPortableStructuralProof,
   replayPortableStructuralTheory,
   replayStructuralDerivation,
   replayStructuralDerivationWithAssumptions,
@@ -16,10 +19,12 @@ import {
   type LinkHandle,
   type PortableStructuralDerivationReplayResult,
   type PortableStructuralDerivationWithAssumptionsReplayResult,
+  type PortableStructuralProofReplayResult,
   type PortableStructuralTheoryArtifact,
   type PortableStructuralTheoryReplayResult,
   type PortableStructuralTheoryRevision,
   type ReadMemory,
+  type StructuralDerivationEvidence,
 } from "@mts/core";
 import { textToAnum } from "@mts/core/tooling/payload";
 
@@ -31,9 +36,6 @@ const read: ReadMemory = memory;
 const link: LinkHandle = basis.L;
 const encoded: string = textToAnum("A");
 
-// Downstream approvers only need the public verification boundary to accept
-// untrusted portable evidence; producer/search construction may remain outside
-// the trusted package facade.
 const semanticBase: "mts-contract/v0.11" = PORTABLE_MTS_SEMANTIC_BASE;
 const portableReplay: (input: unknown) => PortableStructuralDerivationReplayResult =
   replayPortableStructuralDerivation;
@@ -41,6 +43,72 @@ const portableAssumptionReplay: (
   input: unknown,
 ) => PortableStructuralDerivationWithAssumptionsReplayResult =
   replayPortableStructuralDerivationWithAssumptions;
+
+// Untrusted search/importers construct existing structural candidate evidence
+// through one package-root facade. Construction itself has no proof authority:
+// the resulting portable artifact still crosses the ordinary trusted replay API.
+const producer = createStructuralProofProducer(memory);
+let producerCursor = basis.U;
+const freshProducerLink = (): LinkHandle =>
+  (producerCursor = memory.ensure(producerCursor, basis.R));
+const producerDictionary = freshProducerLink();
+const producerGrammar = freshProducerLink();
+const producerTheory = freshProducerLink();
+const producerContext = producer.defineContext(freshProducerLink(), freshProducerLink());
+const producerRole = freshProducerLink();
+const producerValue = freshProducerLink();
+const producerInterpreter = producer.defineInterpreter(
+  producerDictionary,
+  producerGrammar,
+  producerTheory,
+);
+const producerRoleDictionary = producer.defineRoleDictionary([producerRole]);
+const producerRule = producer.defineRule(producerRoleDictionary, producerRole);
+const producerRuleAdmission = producer.admitRule(producerTheory, producerRule);
+const producerAct = producer.defineAct(
+  producerInterpreter,
+  producerRoleDictionary,
+  producerContext,
+);
+producer.defineActField(producerAct, producerRole, producerValue);
+const producerOccurrence = producer.defineProofOccurrence(producerAct, producerValue);
+const producerDerivationRule = producer.defineDerivationRule(producerRule, []);
+const producerDerivationRuleAdmission = producer.admitDerivationRule(
+  producerTheory,
+  producerDerivationRule,
+);
+const producerEvidence: StructuralDerivationEvidence = {
+  theory: producerTheory,
+  targetOccurrence: producerOccurrence,
+  nodes: [{
+    occurrence: producerOccurrence,
+    judgment: {
+      application: {
+        act: producerAct,
+        rule: producerRule,
+        ruleAdmission: producerRuleAdmission,
+        claimedBody: producerValue,
+        expectedInterpreter: {
+          dictionary: producerDictionary,
+          grammar: producerGrammar,
+          theory: producerTheory,
+        },
+        expectedAfterContext: producerContext,
+      },
+      judgment: {
+        theory: producerTheory,
+        context: producerContext,
+        claim: producerValue,
+      },
+    },
+    derivationRule: producerDerivationRule,
+    derivationRuleAdmission: producerDerivationRuleAdmission,
+    premiseOccurrenceSequence: producer.definePremiseOccurrenceSequence([]),
+  }],
+};
+const producerArtifact = exportPortableStructuralDerivation(memory, producerEvidence);
+const producerTrustedReplay: PortableStructuralProofReplayResult =
+  replayPortableStructuralProof(producerArtifact);
 
 // Exact Theory selection is separately package-root consumable and remains
 // identity/provenance evidence rather than a substitute for proof replay.
@@ -60,6 +128,8 @@ void [
   semanticBase,
   portableReplay,
   portableAssumptionReplay,
+  producerArtifact,
+  producerTrustedReplay,
   theoryArtifact,
   theoryReplay,
   theoryRevision,
