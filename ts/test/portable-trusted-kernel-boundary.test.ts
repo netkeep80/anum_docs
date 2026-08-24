@@ -183,6 +183,17 @@ const conditionalArtifact = exportPortableStructuralDerivationWithAssumptions(
   );
 }
 
+// R3 RED: the versioned theorem-reuse schema must select its own exact parser
+// before generic base fallback. The envelope is intentionally incomplete, so a
+// correct router reaches the new parser and reports invalid-envelope; current
+// baseline instead reports unsupported-schema from the base family.
+{
+  expectPortable("invalid-envelope", () => replayPortableStructuralProof({
+    ...baseArtifact,
+    schema: "mts-portable-structural-derivation-with-theorems/v0.1",
+  }));
+}
+
 // Host callback/opcode/rule-name vocabulary has no dispatch authority. Known
 // family parsers reject every extra field as transport pollution.
 {
