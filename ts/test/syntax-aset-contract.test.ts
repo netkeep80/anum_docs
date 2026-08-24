@@ -25,7 +25,8 @@ function rejectContract(effect: () => unknown, code: SyntaxAsetContractError["co
     effect();
   } catch (error) {
     assert(error instanceof SyntaxAsetContractError, `expected SyntaxAsetContractError, got ${String(error)}`);
-    same(error.code, code, "SyntaxAset error code");
+    const contractError = error as SyntaxAsetContractError;
+    same(contractError.code, code, "SyntaxAset error code");
     return;
   }
   throw new Error(`expected SyntaxAset rejection: ${code}`);
