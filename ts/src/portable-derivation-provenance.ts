@@ -1,10 +1,13 @@
 import {
   PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME,
   PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME,
+  PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_CONTENT_DIGEST_SCHEME,
   computePortableStructuralDerivationContentDigest,
   computePortableStructuralDerivationWithAssumptionsContentDigest,
+  computePortableStructuralDerivationWithTheoremsContentDigest,
   type PortableStructuralDerivationContentDigest,
   type PortableStructuralDerivationWithAssumptionsContentDigest,
+  type PortableStructuralDerivationWithTheoremsContentDigest,
 } from "./portable-derivation-digest.js";
 
 export const PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA =
@@ -15,6 +18,10 @@ export const PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_SCHEMA =
   "mts-portable-structural-derivation-with-assumptions-provenance/v0.1" as const;
 export const PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_DIGEST_SCHEME =
   "mts-portable-structural-derivation-with-assumptions-provenance/sha-256/v0.1" as const;
+export const PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_PROVENANCE_SCHEMA =
+  "mts-portable-structural-derivation-with-theorems-provenance/v0.1" as const;
+export const PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_PROVENANCE_DIGEST_SCHEME =
+  "mts-portable-structural-derivation-with-theorems-provenance/sha-256/v0.1" as const;
 
 export interface PortableStructuralDerivationSourceProvenance {
   readonly locator: string;
@@ -51,6 +58,18 @@ export interface PortableStructuralDerivationWithAssumptionsProvenanceDigest {
   readonly value: string;
 }
 
+export interface PortableStructuralDerivationWithTheoremsProvenanceClaim {
+  readonly schema: typeof PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_PROVENANCE_SCHEMA;
+  readonly contentDigest: PortableStructuralDerivationWithTheoremsContentDigest;
+  readonly source: PortableStructuralDerivationSourceProvenance;
+  readonly producer: PortableStructuralDerivationProducerProvenance;
+}
+
+export interface PortableStructuralDerivationWithTheoremsProvenanceDigest {
+  readonly scheme: typeof PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_PROVENANCE_DIGEST_SCHEME;
+  readonly value: string;
+}
+
 export type PortableStructuralDerivationProvenanceErrorCode =
   | "invalid-envelope"
   | "unsupported-schema"
@@ -71,9 +90,7 @@ function fail(code: PortableStructuralDerivationProvenanceErrorCode): never {
 }
 
 function record(value: unknown): Record<string, unknown> {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    fail("invalid-envelope");
-  }
+  if (typeof value !== "object" || value === null || Array.isArray(value)) fail("invalid-envelope");
   return value as Record<string, unknown>;
 }
 
@@ -81,50 +98,26 @@ function exactRecord(value: unknown, keys: readonly string[]): Record<string, un
   const candidate = record(value);
   const actual = Object.keys(candidate).sort();
   const expected = [...keys].sort();
-  if (
-    actual.length !== expected.length ||
-    actual.some((key, index) => key !== expected[index])
-  ) {
+  if (actual.length !== expected.length || actual.some((key, index) => key !== expected[index])) {
     fail("invalid-envelope");
   }
   return candidate;
 }
 
 function exactText(value: unknown): string {
-  if (typeof value !== "string" || value.trim().length === 0) {
-    fail("invalid-provenance-string");
-  }
+  if (typeof value !== "string" || value.trim().length === 0) fail("invalid-provenance-string");
   return value;
 }
 
-function parseContentDigest(value: unknown): PortableStructuralDerivationContentDigest {
-  const digest = exactRecord(value, ["scheme", "value"]);
-  if (digest.scheme !== PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME) {
-    fail("invalid-content-digest");
-  }
-  if (typeof digest.value !== "string" || !/^[0-9a-f]{64}$/.test(digest.value)) {
-    fail("invalid-content-digest");
-  }
-  return Object.freeze({
-    scheme: PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME,
-    value: digest.value,
-  });
-}
-
-function parseContentDigestWithAssumptions(
+function parseContentDigest<T extends string>(
   value: unknown,
-): PortableStructuralDerivationWithAssumptionsContentDigest {
+  scheme: T,
+): Readonly<{ scheme: T; value: string }> {
   const digest = exactRecord(value, ["scheme", "value"]);
-  if (digest.scheme !== PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME) {
+  if (digest.scheme !== scheme || typeof digest.value !== "string" || !/^[0-9a-f]{64}$/.test(digest.value)) {
     fail("invalid-content-digest");
   }
-  if (typeof digest.value !== "string" || !/^[0-9a-f]{64}$/.test(digest.value)) {
-    fail("invalid-content-digest");
-  }
-  return Object.freeze({
-    scheme: PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME,
-    value: digest.value,
-  });
+  return Object.freeze({ scheme, value: digest.value });
 }
 
 function parseSource(value: unknown): PortableStructuralDerivationSourceProvenance {
@@ -138,20 +131,15 @@ function parseSource(value: unknown): PortableStructuralDerivationSourceProvenan
 
 function parseProducer(value: unknown): PortableStructuralDerivationProducerProvenance {
   const producer = exactRecord(value, ["id", "version"]);
-  return Object.freeze({
-    id: exactText(producer.id),
-    version: exactText(producer.version),
-  });
+  return Object.freeze({ id: exactText(producer.id), version: exactText(producer.version) });
 }
 
 function parseClaim(value: unknown): PortableStructuralDerivationProvenanceClaim {
   const claim = exactRecord(value, ["schema", "contentDigest", "source", "producer"]);
-  if (claim.schema !== PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA) {
-    fail("unsupported-schema");
-  }
+  if (claim.schema !== PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA) fail("unsupported-schema");
   return Object.freeze({
     schema: PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA,
-    contentDigest: parseContentDigest(claim.contentDigest),
+    contentDigest: parseContentDigest(claim.contentDigest, PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME),
     source: parseSource(claim.source),
     producer: parseProducer(claim.producer),
   });
@@ -161,20 +149,35 @@ function parseClaimWithAssumptions(
   value: unknown,
 ): PortableStructuralDerivationWithAssumptionsProvenanceClaim {
   const claim = exactRecord(value, ["schema", "contentDigest", "source", "producer"]);
-  if (claim.schema !== PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_SCHEMA) {
-    fail("unsupported-schema");
-  }
+  if (claim.schema !== PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_SCHEMA) fail("unsupported-schema");
   return Object.freeze({
     schema: PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_SCHEMA,
-    contentDigest: parseContentDigestWithAssumptions(claim.contentDigest),
+    contentDigest: parseContentDigest(
+      claim.contentDigest,
+      PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME,
+    ),
     source: parseSource(claim.source),
     producer: parseProducer(claim.producer),
   });
 }
 
-export function canonicalPortableStructuralDerivationProvenanceClaimJson(
-  input: unknown,
-): string {
+function parseClaimWithTheorems(
+  value: unknown,
+): PortableStructuralDerivationWithTheoremsProvenanceClaim {
+  const claim = exactRecord(value, ["schema", "contentDigest", "source", "producer"]);
+  if (claim.schema !== PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_PROVENANCE_SCHEMA) fail("unsupported-schema");
+  return Object.freeze({
+    schema: PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_PROVENANCE_SCHEMA,
+    contentDigest: parseContentDigest(
+      claim.contentDigest,
+      PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_CONTENT_DIGEST_SCHEME,
+    ),
+    source: parseSource(claim.source),
+    producer: parseProducer(claim.producer),
+  });
+}
+
+export function canonicalPortableStructuralDerivationProvenanceClaimJson(input: unknown): string {
   return JSON.stringify(parseClaim(input));
 }
 
@@ -184,15 +187,20 @@ export function canonicalPortableStructuralDerivationWithAssumptionsProvenanceCl
   return JSON.stringify(parseClaimWithAssumptions(input));
 }
 
+export function canonicalPortableStructuralDerivationWithTheoremsProvenanceClaimJson(
+  input: unknown,
+): string {
+  return JSON.stringify(parseClaimWithTheorems(input));
+}
+
 export async function createPortableStructuralDerivationProvenanceClaim(
   artifact: unknown,
   source: PortableStructuralDerivationSourceProvenance,
   producer: PortableStructuralDerivationProducerProvenance,
 ): Promise<PortableStructuralDerivationProvenanceClaim> {
-  const contentDigest = await computePortableStructuralDerivationContentDigest(artifact);
   return Object.freeze({
     schema: PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA,
-    contentDigest,
+    contentDigest: await computePortableStructuralDerivationContentDigest(artifact),
     source: parseSource(source),
     producer: parseProducer(producer),
   });
@@ -203,10 +211,22 @@ export async function createPortableStructuralDerivationWithAssumptionsProvenanc
   source: PortableStructuralDerivationSourceProvenance,
   producer: PortableStructuralDerivationProducerProvenance,
 ): Promise<PortableStructuralDerivationWithAssumptionsProvenanceClaim> {
-  const contentDigest = await computePortableStructuralDerivationWithAssumptionsContentDigest(artifact);
   return Object.freeze({
     schema: PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_SCHEMA,
-    contentDigest,
+    contentDigest: await computePortableStructuralDerivationWithAssumptionsContentDigest(artifact),
+    source: parseSource(source),
+    producer: parseProducer(producer),
+  });
+}
+
+export async function createPortableStructuralDerivationWithTheoremsProvenanceClaim(
+  artifact: unknown,
+  source: PortableStructuralDerivationSourceProvenance,
+  producer: PortableStructuralDerivationProducerProvenance,
+): Promise<PortableStructuralDerivationWithTheoremsProvenanceClaim> {
+  return Object.freeze({
+    schema: PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_PROVENANCE_SCHEMA,
+    contentDigest: await computePortableStructuralDerivationWithTheoremsContentDigest(artifact),
     source: parseSource(source),
     producer: parseProducer(producer),
   });
@@ -216,28 +236,42 @@ function lowercaseHex(bytes: Uint8Array): string {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+async function provenanceDigest<T extends string>(
+  scheme: T,
+  canonicalJson: string,
+): Promise<Readonly<{ scheme: T; value: string }>> {
+  const raw = await globalThis.crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(`${scheme}\n${canonicalJson}`),
+  );
+  return Object.freeze({ scheme, value: lowercaseHex(new Uint8Array(raw)) });
+}
+
 export async function computePortableStructuralDerivationProvenanceDigest(
   input: unknown,
 ): Promise<PortableStructuralDerivationProvenanceDigest> {
-  const canonicalJson = canonicalPortableStructuralDerivationProvenanceClaimJson(input);
-  const preimage = `${PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_DIGEST_SCHEME}\n${canonicalJson}`;
-  const raw = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(preimage));
-  return Object.freeze({
-    scheme: PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_DIGEST_SCHEME,
-    value: lowercaseHex(new Uint8Array(raw)),
-  });
+  return provenanceDigest(
+    PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_DIGEST_SCHEME,
+    canonicalPortableStructuralDerivationProvenanceClaimJson(input),
+  );
 }
 
 export async function computePortableStructuralDerivationWithAssumptionsProvenanceDigest(
   input: unknown,
 ): Promise<PortableStructuralDerivationWithAssumptionsProvenanceDigest> {
-  const canonicalJson = canonicalPortableStructuralDerivationWithAssumptionsProvenanceClaimJson(input);
-  const preimage = `${PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_DIGEST_SCHEME}\n${canonicalJson}`;
-  const raw = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(preimage));
-  return Object.freeze({
-    scheme: PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_DIGEST_SCHEME,
-    value: lowercaseHex(new Uint8Array(raw)),
-  });
+  return provenanceDigest(
+    PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_DIGEST_SCHEME,
+    canonicalPortableStructuralDerivationWithAssumptionsProvenanceClaimJson(input),
+  );
+}
+
+export async function computePortableStructuralDerivationWithTheoremsProvenanceDigest(
+  input: unknown,
+): Promise<PortableStructuralDerivationWithTheoremsProvenanceDigest> {
+  return provenanceDigest(
+    PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_PROVENANCE_DIGEST_SCHEME,
+    canonicalPortableStructuralDerivationWithTheoremsProvenanceClaimJson(input),
+  );
 }
 
 export async function verifyPortableStructuralDerivationProvenanceClaim(
@@ -256,6 +290,16 @@ export async function verifyPortableStructuralDerivationWithAssumptionsProvenanc
 ): Promise<PortableStructuralDerivationWithAssumptionsProvenanceClaim> {
   const claim = parseClaimWithAssumptions(input);
   const actual = await computePortableStructuralDerivationWithAssumptionsContentDigest(artifact);
+  if (actual.value !== claim.contentDigest.value) fail("content-digest-mismatch");
+  return claim;
+}
+
+export async function verifyPortableStructuralDerivationWithTheoremsProvenanceClaim(
+  artifact: unknown,
+  input: unknown,
+): Promise<PortableStructuralDerivationWithTheoremsProvenanceClaim> {
+  const claim = parseClaimWithTheorems(input);
+  const actual = await computePortableStructuralDerivationWithTheoremsContentDigest(artifact);
   if (actual.value !== claim.contentDigest.value) fail("content-digest-mismatch");
   return claim;
 }
