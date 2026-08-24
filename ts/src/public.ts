@@ -170,6 +170,13 @@ export type {
 } from "./derivation.js";
 
 export {
+  createStructuralProofProducer,
+} from "./proof-producer.js";
+export type {
+  StructuralProofProducer,
+} from "./proof-producer.js";
+
+export {
   StructuralScopedDerivationReplayError,
   replayStructuralScopedDerivation,
 } from "./scoped-derivation.js";
