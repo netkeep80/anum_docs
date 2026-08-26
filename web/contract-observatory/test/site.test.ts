@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -188,4 +189,10 @@ for (const unsafeTarget of [
   );
 }
 
-console.log("Contract Observatory V3b/V3c static UI and materialization checks passed.");
+execFileSync(
+  process.execPath,
+  [join(repositoryRoot, "web", "contract-observatory", "test", "visual-consumer.test.mjs")],
+  { cwd: repositoryRoot, stdio: "inherit" },
+);
+
+console.log("Contract Observatory V3b/V3c static UI, materialization and V4a visual consumer checks passed.");

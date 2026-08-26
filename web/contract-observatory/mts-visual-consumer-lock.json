@@ -1,0 +1,29 @@
+{
+  "schema": "anum-docs-observatory-mts-visual-consumer-lock/v0.1",
+  "repository": "netkeep80/mts_visual",
+  "commit": "6722702cb4bb6948e890135c85bc9d778c8cd571",
+  "package": {
+    "root": ".",
+    "name": "@mts/visual",
+    "version": "0.1.0",
+    "private": true,
+    "manifest": {
+      "path": "package.json",
+      "gitBlobSha": "b9285f256696f9c5259909ae993e13815be9677d"
+    },
+    "lockfile": {
+      "path": "package-lock.json",
+      "gitBlobSha": "dd1800f7a9db83e9555a98268b383871c5f8bbf7",
+      "lockfileVersion": 3
+    },
+    "dependencies": {
+      "three": "0.185.1"
+    }
+  },
+  "authority": {
+    "floatingRefAllowed": false,
+    "deepSourceImportAllowed": false,
+    "semanticAcceptanceClaimed": false,
+    "semanticCoreLockIndependent": true
+  }
+}
