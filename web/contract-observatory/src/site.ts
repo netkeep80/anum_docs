@@ -1,12 +1,23 @@
 import type { ContractObservatoryIndex, ContractVersionSummary } from "./contract-index.js";
+import {
+  METHODOLOGY_STAGE_ORDER,
+  buildInteractiveMethodologyModel,
+  type ObservatoryInteractionState,
+} from "./interaction.js";
+import type { MethodologyProjection, MethodologyVersionProjection } from "./methodology-projection.js";
 
-export function renderContractObservatoryHtml(index: ContractObservatoryIndex): string {
+export function renderContractObservatoryHtml(
+  index: ContractObservatoryIndex,
+  methodology?: MethodologyProjection,
+): string {
+  const interactive = methodology !== undefined;
   const timeline = index.versions
-    .map((version, ordinal) => renderTimelineItem(version, ordinal))
+    .map((version, ordinal) => renderTimelineItem(version, ordinal, interactive))
     .join("\n");
   const versions = index.versions
     .map((version, ordinal) => renderVersionSection(version, ordinal))
     .join("\n");
+  const methodologyMap = methodology === undefined ? "" : renderMethodologyMap(methodology);
 
   return `<!doctype html>
 <html lang="ru">
@@ -19,30 +30,53 @@ export function renderContractObservatoryHtml(index: ContractObservatoryIndex): 
     * { box-sizing: border-box; }
     body { margin: 0; background: Canvas; color: CanvasText; }
     a { color: LinkText; }
-    a:focus-visible, summary:focus-visible { outline: 3px solid Highlight; outline-offset: 3px; }
+    a:focus-visible, summary:focus-visible, button:focus-visible { outline: 3px solid Highlight; outline-offset: 3px; }
+    button { font: inherit; color: inherit; }
     .shell { width: min(1120px, calc(100% - 2rem)); margin: 0 auto; padding: 2rem 0 4rem; }
     .hero { display: grid; gap: .8rem; margin-bottom: 2rem; }
     .eyebrow { margin: 0; font-size: .8rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; opacity: .7; }
     h1 { margin: 0; font-size: clamp(2rem, 6vw, 4.5rem); line-height: .95; max-width: 12ch; }
     .lede { margin: 0; max-width: 72ch; line-height: 1.6; opacity: .82; }
     .provenance { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin: 1.5rem 0 2rem; }
-    .provenance div, .version-card { border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 1rem; background: color-mix(in srgb, Canvas 94%, CanvasText 6%); }
+    .provenance div, .version-card, .methodology-map { border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 1rem; background: color-mix(in srgb, Canvas 94%, CanvasText 6%); }
     .provenance div { padding: .9rem 1rem; min-width: 0; }
     dt { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
     dd { margin: .35rem 0 0; overflow-wrap: anywhere; }
+    .methodology-map { padding: 1.2rem; margin: 0 0 2.5rem; }
+    .methodology-heading { display: grid; gap: .5rem; margin-bottom: 1rem; }
+    .methodology-heading h2 { margin: 0; font-size: 1.7rem; }
+    .methodology-heading p { margin: 0; max-width: 80ch; line-height: 1.5; opacity: .8; }
+    .methodology-authority { display: flex; flex-wrap: wrap; gap: .5rem; margin: .8rem 0 1rem; font-size: .82rem; }
+    .methodology-authority span { padding: .35rem .55rem; border: 1px solid color-mix(in srgb, CanvasText 22%, transparent); border-radius: .6rem; }
+    .methodology-controls { display: grid; gap: .8rem; margin-bottom: 1rem; }
+    .stage-controls, .filter-controls { display: flex; flex-wrap: wrap; gap: .45rem; }
+    .stage-controls button, .filter-controls button, .version-select { cursor: pointer; border: 1px solid color-mix(in srgb, CanvasText 24%, transparent); border-radius: .65rem; background: Canvas; padding: .5rem .7rem; }
+    .stage-controls button:hover, .filter-controls button:hover, .version-select:hover { border-color: color-mix(in srgb, CanvasText 60%, transparent); }
+    .stage-controls button[aria-pressed="true"], .filter-controls button[aria-pressed="true"], .version-select[aria-pressed="true"] { border-width: 2px; font-weight: 800; }
+    .methodology-grid { display: grid; gap: .65rem; overflow-x: auto; padding-bottom: .25rem; }
+    .methodology-lane { min-width: 780px; display: grid; grid-template-columns: minmax(190px, 1.4fr) repeat(7, minmax(72px, 1fr)); gap: .35rem; align-items: stretch; padding: .5rem; border: 1px solid color-mix(in srgb, CanvasText 15%, transparent); border-radius: .8rem; }
+    .methodology-lane.selected, .methodology-lane.selection-synced { border-width: 2px; }
+    .lane-version { display: grid; gap: .3rem; align-content: center; min-width: 0; }
+    .version-select { text-align: left; overflow-wrap: anywhere; }
+    .lane-classification { font-size: .72rem; font-weight: 800; letter-spacing: .05em; }
+    .stage-cell { display: grid; place-items: center; min-height: 4.25rem; border: 1px dashed color-mix(in srgb, CanvasText 16%, transparent); border-radius: .65rem; padding: .35rem; text-align: center; font-size: .72rem; opacity: .45; }
+    .stage-cell.present { border-style: solid; opacity: 1; }
+    .stage-cell.stage-selected { border-width: 2px; font-weight: 800; }
+    .stage-evidence { display: block; margin-top: .2rem; font-size: .65rem; opacity: .7; }
+    .methodology-status { margin: .8rem 0 0; min-height: 1.3em; font-size: .82rem; opacity: .75; }
     .timeline { margin: 0 0 2.5rem; }
     .timeline h2, .versions h2 { margin: 0 0 1rem; font-size: 1.5rem; }
     .timeline ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .8rem; padding: 0; margin: 0; list-style: none; }
     .timeline a { display: grid; gap: .5rem; min-height: 8rem; padding: 1rem; border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 1rem; color: inherit; text-decoration: none; background: color-mix(in srgb, Canvas 96%, CanvasText 4%); }
     .timeline a:hover { border-color: color-mix(in srgb, CanvasText 45%, transparent); }
-    .timeline .current { border-width: 2px; }
+    .timeline .current, .timeline .selection-synced { border-width: 2px; }
     .timeline-id { font-weight: 800; overflow-wrap: anywhere; }
     .badges { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
     .badge { display: inline-flex; align-items: center; min-height: 1.7rem; padding: .2rem .55rem; border: 1px solid currentColor; border-radius: 999px; font-size: .72rem; font-weight: 800; letter-spacing: .04em; }
     .badge-muted { opacity: .65; }
     .version-list { display: grid; gap: 1rem; }
     .version-card { overflow: hidden; }
-    .version-card.current { border-width: 2px; }
+    .version-card.current, .version-card.selection-synced { border-width: 2px; }
     .version-card summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: .7rem; justify-content: space-between; align-items: center; padding: 1rem 1.2rem; font-weight: 800; }
     .version-body { padding: 0 1.2rem 1.2rem; }
     .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .7rem; margin: .4rem 0 1rem; }
@@ -56,6 +90,7 @@ export function renderContractObservatoryHtml(index: ContractObservatoryIndex): 
     @media (max-width: 680px) {
       .shell { width: min(100% - 1rem, 1120px); padding-top: 1rem; }
       .provenance { grid-template-columns: 1fr; }
+      .methodology-map { padding: .8rem; }
       th, td { display: block; width: 100%; padding-left: 0; padding-right: 0; }
       th { border-bottom: 0; padding-bottom: .2rem; }
       td { border-top: 0; padding-top: 0; }
@@ -76,6 +111,8 @@ export function renderContractObservatoryHtml(index: ContractObservatoryIndex): 
       ${renderDefinition("Current contract", index.currentContractPath)}
       ${renderDefinition("Previous contract", index.previousContractPath)}
     </dl>
+
+${methodologyMap}
 
     <nav class="timeline" aria-labelledby="timeline-title">
       <h2 id="timeline-title">Timeline</h2>
@@ -98,12 +135,196 @@ ${versions}
 `;
 }
 
-function renderTimelineItem(version: ContractVersionSummary, ordinal: number): string {
+function renderMethodologyMap(projection: MethodologyProjection): string {
+  const selectedVersionId = projection.versions.find((entry) => entry.isCurrent)?.contractId
+    ?? projection.versions[0]?.contractId
+    ?? null;
+  const state: ObservatoryInteractionState = Object.freeze({
+    selectedVersionId,
+    selectedStage: null,
+    selectedItemId: null,
+    filters: Object.freeze([]),
+    viewport: Object.freeze({ x: 0, y: 0, scale: 1 }),
+  });
+  const model = buildInteractiveMethodologyModel(projection, state);
+  const stageControls = model.stages
+    .map((entry) => `      <button type="button" data-methodology-stage="${entry.stage}" aria-pressed="false">${escapeHtml(entry.stage)}</button>`)
+    .join("\n");
+  const lanes = model.versions
+    .map((entry, ordinal) => renderMethodologyLane(projection.versions[ordinal]!, entry))
+    .join("\n");
+  const controllerData = projection.versions.map((version, ordinal) => ({
+    id: version.contractId,
+    classification: model.versions[ordinal]!.classification.toLowerCase(),
+  }));
+
+  return `    <section class="methodology-map" aria-labelledby="methodology-title">
+      <div class="methodology-heading">
+        <p class="eyebrow">Primary explanatory view · derived methodology</p>
+        <h2 id="methodology-title">Methodology map + version lifecycle lanes</h2>
+        <p>Связывает исследование, проблему, candidate/challenge/model/accept/release и версии контракта только по производным evidence-проекциям.</p>
+      </div>
+      <div class="methodology-authority" aria-label="Relation authority">
+        <span>Method/lifecycle relation: derived presentation relation</span>
+        <span>Semantic topology Link: not rendered in this view</span>
+      </div>
+      <div class="methodology-controls">
+        <div class="stage-controls" role="group" aria-label="Methodology stages">
+${stageControls}
+        </div>
+        <div class="filter-controls" role="group" aria-label="Version filters">
+          ${renderFilterButton("current", "CURRENT")}
+          ${renderFilterButton("previous", "PREVIOUS")}
+          ${renderFilterButton("candidate", "CANDIDATE")}
+          ${renderFilterButton("accepted", "ACCEPTED")}
+        </div>
+      </div>
+      <div class="methodology-grid">
+${lanes}
+      </div>
+      <p class="methodology-status" aria-live="polite"></p>
+    </section>
+${renderMethodologyController(controllerData, selectedVersionId)}`;
+}
+
+function renderMethodologyLane(
+  projection: MethodologyVersionProjection,
+  model: ReturnType<typeof buildInteractiveMethodologyModel>["versions"][number],
+): string {
+  const evidenceByStage = new Map(projection.lifecycle.map((entry) => [entry.stage, entry.evidence.length] as const));
+  const stages = model.stageStates.map((entry) => {
+    const evidenceCount = evidenceByStage.get(entry.stage) ?? 0;
+    return `        <div class="stage-cell${entry.present ? " present" : ""}" data-lane-stage="${entry.stage}">
+          <span>${escapeHtml(entry.stage)}</span>
+          <span class="stage-evidence">${entry.present ? `${evidenceCount} evidence` : "—"}</span>
+        </div>`;
+  }).join("\n");
+
+  return `      <div class="methodology-lane${model.selected ? " selected" : ""}" data-version-lane="${escapeAttribute(model.contractId)}" data-classification="${model.classification.toLowerCase()}">
+        <div class="lane-version">
+          <button type="button" class="version-select" data-version-id="${escapeAttribute(model.contractId)}" aria-pressed="${model.selected ? "true" : "false"}">${escapeHtml(model.contractId)}</button>
+          <span class="lane-classification">${model.classification}</span>
+        </div>
+${stages}
+      </div>`;
+}
+
+function renderFilterButton(filter: string, label: string): string {
+  return `<button type="button" data-methodology-filter="${filter}" aria-pressed="false">${label}</button>`;
+}
+
+function renderMethodologyController(
+  versions: readonly { readonly id: string; readonly classification: string }[],
+  defaultVersionId: string | null,
+): string {
+  const data = escapeJsonForScript(JSON.stringify({
+    versions,
+    stages: METHODOLOGY_STAGE_ORDER,
+    defaultVersionId,
+    filters: ["accepted", "candidate", "current", "previous"],
+  }));
+  return `    <script>
+(() => {
+  "use strict";
+  const map = document.querySelector(".methodology-map");
+  if (!map) return;
+  const config = ${data};
+  const versionIds = new Set(config.versions.map((entry) => entry.id));
+  const stages = new Set(config.stages);
+  const filters = new Set(config.filters);
+
+  const readState = () => {
+    const params = new URLSearchParams(location.hash.startsWith("#") ? location.hash.slice(1) : location.hash);
+    const requestedVersion = params.get("v");
+    const requestedStage = params.get("s");
+    return {
+      versionId: versionIds.has(requestedVersion) ? requestedVersion : config.defaultVersionId,
+      stage: stages.has(requestedStage) ? requestedStage : null,
+      filters: [...new Set(params.getAll("f").filter((value) => filters.has(value)))].sort(),
+    };
+  };
+
+  const writeState = (mutate) => {
+    const params = new URLSearchParams(location.hash.startsWith("#") ? location.hash.slice(1) : location.hash);
+    mutate(params);
+    const next = params.toString();
+    location.hash = next ? `#${next}` : "#";
+  };
+
+  const apply = () => {
+    const state = readState();
+    map.querySelectorAll("[data-methodology-stage]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.methodologyStage === state.stage));
+    });
+    map.querySelectorAll("[data-methodology-filter]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(state.filters.includes(button.dataset.methodologyFilter)));
+    });
+    map.querySelectorAll("[data-version-lane]").forEach((lane) => {
+      const selected = lane.dataset.versionLane === state.versionId;
+      const visible = state.filters.length === 0 || state.filters.includes(lane.dataset.classification);
+      lane.hidden = !visible;
+      lane.classList.toggle("selected", selected);
+      lane.querySelector("[data-version-id]")?.setAttribute("aria-pressed", String(selected));
+      lane.querySelectorAll("[data-lane-stage]").forEach((cell) => {
+        cell.classList.toggle("stage-selected", cell.dataset.laneStage === state.stage);
+      });
+    });
+    document.querySelectorAll("[data-overview-version-id]").forEach((node) => {
+      node.classList.toggle("selection-synced", node.dataset.overviewVersionId === state.versionId);
+    });
+    const status = map.querySelector(".methodology-status");
+    if (status) status.textContent = `Selected: ${state.versionId ?? "none"}; stage: ${state.stage ?? "all"}; filters: ${state.filters.join(", ") || "none"}.`;
+  };
+
+  map.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target.closest("button") : null;
+    if (!(target instanceof HTMLButtonElement)) return;
+    if (target.dataset.methodologyStage) {
+      const stage = target.dataset.methodologyStage;
+      const active = target.getAttribute("aria-pressed") === "true";
+      writeState((params) => active ? params.delete("s") : params.set("s", stage));
+    } else if (target.dataset.versionId) {
+      writeState((params) => params.set("v", target.dataset.versionId));
+    } else if (target.dataset.methodologyFilter) {
+      const filter = target.dataset.methodologyFilter;
+      writeState((params) => {
+        const values = new Set(params.getAll("f").filter((value) => filters.has(value)));
+        values.has(filter) ? values.delete(filter) : values.add(filter);
+        params.delete("f");
+        [...values].sort().forEach((value) => params.append("f", value));
+      });
+    }
+  });
+
+  map.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
+    const target = event.target;
+    if (!(target instanceof HTMLButtonElement)) return;
+    const buttons = [...map.querySelectorAll("button:not([hidden])")].filter((button) => !button.closest("[hidden]"));
+    const current = buttons.indexOf(target);
+    if (current < 0 || buttons.length === 0) return;
+    event.preventDefault();
+    let next = current;
+    if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = buttons.length - 1;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (current - 1 + buttons.length) % buttons.length;
+    else next = (current + 1) % buttons.length;
+    buttons[next]?.focus();
+  });
+
+  window.addEventListener("hashchange", apply);
+  apply();
+})();
+    </script>`;
+}
+
+function renderTimelineItem(version: ContractVersionSummary, ordinal: number, interactive: boolean): string {
   const anchor = anchorId(ordinal);
   const classification = classify(version);
   const semanticDelta = version.observableSemanticDelta ? "SEMANTIC DELTA" : "NO SEMANTIC DELTA";
+  const href = interactive ? `#v=${encodeURIComponent(version.contractId)}` : `#${anchor}`;
   return `        <li>
-          <a href="#${anchor}" class="${version.isCurrent ? "current" : ""}"${version.isCurrent ? " aria-current=\"page\"" : ""}>
+          <a href="${href}" class="${version.isCurrent ? "current" : ""}" data-overview-version-id="${escapeAttribute(version.contractId)}"${version.isCurrent ? " aria-current=\"page\"" : ""}>
             <span class="timeline-id">${escapeHtml(version.contractId)}</span>
             <span class="badges">
               ${badge(classification, false)}
@@ -124,7 +345,7 @@ function renderVersionSection(version: ContractVersionSummary, ordinal: number):
       : renderRow("Candidate lifecycle issue", `#${version.candidateLifecycleIssue}`),
   ].filter(Boolean).join("\n");
 
-  return `        <section id="${anchor}" class="version-card${version.isCurrent ? " current" : ""}" aria-labelledby="${anchor}-title">
+  return `        <section id="${anchor}" class="version-card${version.isCurrent ? " current" : ""}" data-overview-version-id="${escapeAttribute(version.contractId)}" aria-labelledby="${anchor}-title">
           <details${version.isCurrent ? " open" : ""}>
             <summary>
               <span id="${anchor}-title">${escapeHtml(version.contractId)}</span>
@@ -183,6 +404,14 @@ function yesNo(value: boolean): string {
 
 function anchorId(ordinal: number): string {
   return `version-${ordinal + 1}`;
+}
+
+function escapeAttribute(value: string): string {
+  return escapeHtml(value);
+}
+
+function escapeJsonForScript(value: string): string {
+  return value.replaceAll("<", "\\u003c").replaceAll(">", "\\u003e").replaceAll("&", "\\u0026");
 }
 
 function escapeHtml(value: string): string {
