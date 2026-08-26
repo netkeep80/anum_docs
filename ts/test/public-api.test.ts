@@ -120,6 +120,7 @@ const expectedRuntimeExports = [
   "createPortableStructuralDerivationProvenanceClaim",
   "createPortableStructuralDerivationWithAssumptionsProvenanceClaim",
   "createPortableStructuralDerivationWithTheoremsProvenanceClaim",
+  "createStructuralProofProducer",
   "deserializeAnum",
   "deserializeStream",
   "elaborateBundleRoles",
@@ -168,7 +169,7 @@ const expectedRuntimeExports = [
   "verifyPortableStructuralProofTheoryRevision",
 ].sort();
 
-assert(expectedRuntimeExports.length === 98, "R3 theorem transport runtime export budget must be exactly 98");
+assert(expectedRuntimeExports.length === 99, "R3 theorem transport + producer runtime export budget must be exactly 99");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
