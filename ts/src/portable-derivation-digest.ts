@@ -2,11 +2,16 @@ import {
   canonicalPortableStructuralDerivationV02Json,
   canonicalPortableStructuralDerivationWithAssumptionsV01Json,
 } from "./portable-derivation.js";
+import {
+  canonicalPortableStructuralDerivationWithTheoremsV01Json,
+} from "./portable-proof-replay.js";
 
 export const PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME =
   "mts-portable-structural-derivation-content/sha-256/v0.1" as const;
 export const PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME =
   "mts-portable-structural-derivation-with-assumptions-content/sha-256/v0.1" as const;
+export const PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_CONTENT_DIGEST_SCHEME =
+  "mts-portable-structural-derivation-with-theorems-content/sha-256/v0.1" as const;
 
 export interface PortableStructuralDerivationContentDigest {
   readonly scheme: typeof PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME;
@@ -15,6 +20,11 @@ export interface PortableStructuralDerivationContentDigest {
 
 export interface PortableStructuralDerivationWithAssumptionsContentDigest {
   readonly scheme: typeof PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME;
+  readonly value: string;
+}
+
+export interface PortableStructuralDerivationWithTheoremsContentDigest {
+  readonly scheme: typeof PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_CONTENT_DIGEST_SCHEME;
   readonly value: string;
 }
 
@@ -50,6 +60,19 @@ export async function computePortableStructuralDerivationWithAssumptionsContentD
     scheme: PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME,
     value: await digestCanonicalJson(
       PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_CONTENT_DIGEST_SCHEME,
+      canonicalJson,
+    ),
+  });
+}
+
+export async function computePortableStructuralDerivationWithTheoremsContentDigest(
+  input: unknown,
+): Promise<PortableStructuralDerivationWithTheoremsContentDigest> {
+  const canonicalJson = canonicalPortableStructuralDerivationWithTheoremsV01Json(input);
+  return Object.freeze({
+    scheme: PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_CONTENT_DIGEST_SCHEME,
+    value: await digestCanonicalJson(
+      PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_CONTENT_DIGEST_SCHEME,
       canonicalJson,
     ),
   });

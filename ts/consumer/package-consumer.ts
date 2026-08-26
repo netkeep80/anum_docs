@@ -1,24 +1,31 @@
 import {
   Memory,
   PORTABLE_MTS_SEMANTIC_BASE,
+  PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_SCHEMA,
   PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME,
   PORTABLE_STRUCTURAL_THEORY_SCHEMA,
+  computePortableStructuralDerivationWithTheoremsContentDigest,
   computePortableStructuralTheoryRevision,
+  createPortableStructuralDerivationWithTheoremsProvenanceClaim,
   createStructuralProofProducer,
   ensureRootBasis,
   exportPortableStructuralDerivation,
+  exportPortableStructuralDerivationWithTheorems,
   exportPortableStructuralTheory,
   replayPortableStructuralDerivation,
   replayPortableStructuralDerivationWithAssumptions,
+  replayPortableStructuralDerivationWithTheorems,
   replayPortableStructuralProof,
   replayPortableStructuralTheory,
   replayStructuralDerivation,
   replayStructuralDerivationWithAssumptions,
   replayStructuralScopedDerivation,
+  verifyPortableStructuralDerivationWithTheoremsProvenanceClaim,
   verifyPortableStructuralProofTheoryRevision,
   type LinkHandle,
   type PortableStructuralDerivationReplayResult,
   type PortableStructuralDerivationWithAssumptionsReplayResult,
+  type PortableStructuralDerivationWithTheoremsReplayResult,
   type PortableStructuralProofReplayResult,
   type PortableStructuralTheoryArtifact,
   type PortableStructuralTheoryReplayResult,
@@ -43,6 +50,17 @@ const portableAssumptionReplay: (
   input: unknown,
 ) => PortableStructuralDerivationWithAssumptionsReplayResult =
   replayPortableStructuralDerivationWithAssumptions;
+const theoremSchema: "mts-portable-structural-derivation-with-theorems/v0.1" =
+  PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_SCHEMA;
+const portableTheoremReplay: (
+  input: unknown,
+) => PortableStructuralDerivationWithTheoremsReplayResult =
+  replayPortableStructuralDerivationWithTheorems;
+const portableTheoremExport = exportPortableStructuralDerivationWithTheorems;
+const portableProofReplay = replayPortableStructuralProof;
+const portableTheoremDigest = computePortableStructuralDerivationWithTheoremsContentDigest;
+const portableTheoremProvenance = createPortableStructuralDerivationWithTheoremsProvenanceClaim;
+const verifyPortableTheoremProvenance = verifyPortableStructuralDerivationWithTheoremsProvenanceClaim;
 
 // Untrusted search/importers construct existing structural candidate evidence
 // through one package-root facade. Construction itself has no proof authority:
@@ -128,6 +146,13 @@ void [
   semanticBase,
   portableReplay,
   portableAssumptionReplay,
+  theoremSchema,
+  portableTheoremReplay,
+  portableTheoremExport,
+  portableProofReplay,
+  portableTheoremDigest,
+  portableTheoremProvenance,
+  verifyPortableTheoremProvenance,
   producerArtifact,
   producerTrustedReplay,
   theoryArtifact,

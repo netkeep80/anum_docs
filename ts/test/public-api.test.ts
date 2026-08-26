@@ -85,6 +85,10 @@ const expectedRuntimeExports = [
   "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_DIGEST_SCHEME",
   "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_PROVENANCE_SCHEMA",
   "PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_SCHEMA",
+  "PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_CONTENT_DIGEST_SCHEME",
+  "PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_PROVENANCE_DIGEST_SCHEME",
+  "PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_PROVENANCE_SCHEMA",
+  "PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_SCHEMA",
   "PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME",
   "PORTABLE_STRUCTURAL_THEORY_SCHEMA",
   "PersistentStore",
@@ -110,9 +114,12 @@ const expectedRuntimeExports = [
   "computePortableStructuralDerivationProvenanceDigest",
   "computePortableStructuralDerivationWithAssumptionsContentDigest",
   "computePortableStructuralDerivationWithAssumptionsProvenanceDigest",
+  "computePortableStructuralDerivationWithTheoremsContentDigest",
+  "computePortableStructuralDerivationWithTheoremsProvenanceDigest",
   "computePortableStructuralTheoryRevision",
   "createPortableStructuralDerivationProvenanceClaim",
   "createPortableStructuralDerivationWithAssumptionsProvenanceClaim",
+  "createPortableStructuralDerivationWithTheoremsProvenanceClaim",
   "createStructuralProofProducer",
   "deserializeAnum",
   "deserializeStream",
@@ -121,6 +128,7 @@ const expectedRuntimeExports = [
   "executeAbits",
   "exportPortableStructuralDerivation",
   "exportPortableStructuralDerivationWithAssumptions",
+  "exportPortableStructuralDerivationWithTheorems",
   "exportPortableStructuralTheory",
   "materializePersistentSequence",
   "materializeSequence",
@@ -137,6 +145,7 @@ const expectedRuntimeExports = [
   "replayPersistentSequenceMaterialization",
   "replayPortableStructuralDerivation",
   "replayPortableStructuralDerivationWithAssumptions",
+  "replayPortableStructuralDerivationWithTheorems",
   "replayPortableStructuralProof",
   "replayPortableStructuralTheory",
   "replayRelationStep",
@@ -156,10 +165,11 @@ const expectedRuntimeExports = [
   "valuesEqual",
   "verifyPortableStructuralDerivationProvenanceClaim",
   "verifyPortableStructuralDerivationWithAssumptionsProvenanceClaim",
+  "verifyPortableStructuralDerivationWithTheoremsProvenanceClaim",
   "verifyPortableStructuralProofTheoryRevision",
 ].sort();
 
-assert(expectedRuntimeExports.length === 89, "R3 Theory lock runtime export budget must be exactly 89");
+assert(expectedRuntimeExports.length === 99, "R3 theorem transport + producer runtime export budget must be exactly 99");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
