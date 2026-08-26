@@ -248,7 +248,7 @@ function renderMethodologyController(
     const params = new URLSearchParams(location.hash.startsWith("#") ? location.hash.slice(1) : location.hash);
     mutate(params);
     const next = params.toString();
-    location.hash = next ? `#${next}` : "#";
+    location.hash = next ? "#" + next : "#";
   };
 
   const apply = () => {
@@ -273,7 +273,7 @@ function renderMethodologyController(
       node.classList.toggle("selection-synced", node.dataset.overviewVersionId === state.versionId);
     });
     const status = map.querySelector(".methodology-status");
-    if (status) status.textContent = `Selected: ${state.versionId ?? "none"}; stage: ${state.stage ?? "all"}; filters: ${state.filters.join(", ") || "none"}.`;
+    if (status) status.textContent = "Selected: " + (state.versionId ?? "none") + "; stage: " + (state.stage ?? "all") + "; filters: " + (state.filters.join(", ") || "none") + ".";
   };
 
   map.addEventListener("click", (event) => {
