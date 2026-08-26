@@ -1,21 +1,29 @@
 import {
   Memory,
   PORTABLE_MTS_SEMANTIC_BASE,
+  PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_SCHEMA,
   PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME,
   PORTABLE_STRUCTURAL_THEORY_SCHEMA,
+  computePortableStructuralDerivationWithTheoremsContentDigest,
   computePortableStructuralTheoryRevision,
+  createPortableStructuralDerivationWithTheoremsProvenanceClaim,
   ensureRootBasis,
+  exportPortableStructuralDerivationWithTheorems,
   exportPortableStructuralTheory,
   replayPortableStructuralDerivation,
   replayPortableStructuralDerivationWithAssumptions,
+  replayPortableStructuralDerivationWithTheorems,
+  replayPortableStructuralProof,
   replayPortableStructuralTheory,
   replayStructuralDerivation,
   replayStructuralDerivationWithAssumptions,
   replayStructuralScopedDerivation,
+  verifyPortableStructuralDerivationWithTheoremsProvenanceClaim,
   verifyPortableStructuralProofTheoryRevision,
   type LinkHandle,
   type PortableStructuralDerivationReplayResult,
   type PortableStructuralDerivationWithAssumptionsReplayResult,
+  type PortableStructuralDerivationWithTheoremsReplayResult,
   type PortableStructuralTheoryArtifact,
   type PortableStructuralTheoryReplayResult,
   type PortableStructuralTheoryRevision,
@@ -41,6 +49,17 @@ const portableAssumptionReplay: (
   input: unknown,
 ) => PortableStructuralDerivationWithAssumptionsReplayResult =
   replayPortableStructuralDerivationWithAssumptions;
+const theoremSchema: "mts-portable-structural-derivation-with-theorems/v0.1" =
+  PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_SCHEMA;
+const portableTheoremReplay: (
+  input: unknown,
+) => PortableStructuralDerivationWithTheoremsReplayResult =
+  replayPortableStructuralDerivationWithTheorems;
+const portableTheoremExport = exportPortableStructuralDerivationWithTheorems;
+const portableProofReplay = replayPortableStructuralProof;
+const portableTheoremDigest = computePortableStructuralDerivationWithTheoremsContentDigest;
+const portableTheoremProvenance = createPortableStructuralDerivationWithTheoremsProvenanceClaim;
+const verifyPortableTheoremProvenance = verifyPortableStructuralDerivationWithTheoremsProvenanceClaim;
 
 // Exact Theory selection is separately package-root consumable and remains
 // identity/provenance evidence rather than a substitute for proof replay.
@@ -60,6 +79,13 @@ void [
   semanticBase,
   portableReplay,
   portableAssumptionReplay,
+  theoremSchema,
+  portableTheoremReplay,
+  portableTheoremExport,
+  portableProofReplay,
+  portableTheoremDigest,
+  portableTheoremProvenance,
+  verifyPortableTheoremProvenance,
   theoryArtifact,
   theoryReplay,
   theoryRevision,
