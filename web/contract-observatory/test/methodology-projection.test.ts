@@ -45,4 +45,3 @@ same(
   "same repository evidence serializes byte-identically",
 );
 assert(!serialized.includes("semanticLink"), "methodology projection does not claim MTS semantic Link identity");
-
