@@ -306,6 +306,7 @@ const theoremArtifact = exportPortableStructuralDerivationWithTheorems(tf.memory
 {
   const result = replayPortableStructuralProof(theoremArtifact);
   assert("theorems" in result.evidence, "theorem transport route");
+  assert("theorems" in result.replay, "theorem replay route");
   same(result.replay.derivation.occurrenceCount, 2, "reused theorem occurrence count");
   same(result.memory.linkCount, theoremArtifact.topology.links.length, "theorem replay read-only");
   const digestA = await computePortableStructuralDerivationWithTheoremsContentDigest(theoremArtifact);
