@@ -9,10 +9,12 @@ import {
   type ContractObservatoryIndex,
   type ContractVersionSummary,
 } from "../src/contract-index.js";
+import { buildMethodologyProjection } from "../src/methodology-projection.js";
 import { renderContractObservatoryHtml } from "../src/site.js";
+import "./interaction.test.js";
 
 function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) throw new Error(`Contract Observatory V3b/V3c: ${message}`);
+  if (!condition) throw new Error(`Contract Observatory V3b/V3c/V4c: ${message}`);
 }
 
 function same<T>(actual: T, expected: T, message: string): void {
@@ -75,25 +77,34 @@ function index(versions: readonly ContractVersionSummary[]): ContractObservatory
 
 const repositoryRoot = process.cwd();
 const realIndex = buildContractObservatoryIndex(repositoryRoot);
-const realHtml = renderContractObservatoryHtml(realIndex);
+const realProjection = buildMethodologyProjection(repositoryRoot, realIndex);
+const realHtml = renderContractObservatoryHtml(realIndex, realProjection);
 
 same(realIndex.versions.length, 2, "real repository still exposes two live versions");
 assert(realHtml.startsWith("<!doctype html>\n<html lang=\"ru\">"), "browser document baseline");
 assert(realHtml.includes("<meta charset=\"utf-8\">"), "UTF-8 metadata");
 assert(realHtml.includes("name=\"viewport\""), "viewport metadata");
 same(count(realHtml, "<h1>"), 1, "exactly one h1");
-assert(realHtml.includes("<nav class=\"timeline\""), "timeline landmark");
-assert(realHtml.includes("<main class=\"versions\""), "main landmark");
+assert(realHtml.includes("<nav class=\"timeline\""), "timeline landmark retained");
+assert(realHtml.includes("<main class=\"versions\""), "V3 version overview retained");
 assert(realHtml.includes(":focus-visible"), "visible keyboard focus styling");
 assert(realHtml.includes("@media (max-width: 680px)"), "responsive baseline");
-assert(!realHtml.includes("<script"), "no client script runtime");
 assert(!realHtml.includes("http://") && !realHtml.includes("https://"), "no external network dependency");
+
+assert(realHtml.includes("<section class=\"methodology-map\""), "V4c methodology map is rendered as the primary explanatory view");
+assert(realHtml.includes("aria-label=\"Methodology stages\""), "methodology stages expose a semantic keyboard-navigation group");
+assert(realHtml.includes("data-methodology-stage=\"challenged\""), "methodology stage controls carry deterministic stage identity");
+assert(realHtml.includes("data-version-id=\"mts-contract/v0.11\""), "version lane carries exact projected contract identity");
+assert(realHtml.includes("CURRENT"), "current classification remains explicit in V4c");
+assert(realHtml.includes("PREVIOUS"), "previous classification remains explicit in V4c");
+assert(realHtml.includes("Method/lifecycle relation"), "methodology relation authority is textually distinguished");
+assert(realHtml.includes("Semantic topology Link: not rendered in this view"), "methodology view cannot be mistaken for MTS semantic Links");
+assert(realHtml.includes("addEventListener(\"hashchange\""), "deep-link back/forward restoration is wired in the client controller");
+assert(realHtml.includes("addEventListener(\"keydown\""), "keyboard stage/version activation is wired in the client controller");
 
 const v010Position = realHtml.indexOf("mts-contract/v0.10");
 const v011Position = realHtml.indexOf("mts-contract/v0.11");
 assert(v010Position >= 0 && v011Position > v010Position, "timeline preserves V3a natural order");
-assert(realHtml.includes("CURRENT"), "current marker visible");
-assert(realHtml.includes("PREVIOUS"), "previous marker visible");
 assert(realHtml.includes(realIndex.acceptancePath), "acceptance provenance visible");
 assert(realHtml.includes(realIndex.currentContractPath), "current contract provenance visible");
 assert(realHtml.includes(realIndex.previousContractPath), "previous contract provenance visible");
@@ -106,7 +117,7 @@ assert(realHtml.includes(String(current.requiredExecutableGateCount)), "current 
 assert(realHtml.includes(String(current.requiredNegativeVectorCount)), "current negative-vector count rendered");
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(current) + 1}\" class=\"version-card current\"`), "current section classified");
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(previous) + 1}\" class=\"version-card\"`), "previous section preserves order");
-same(renderContractObservatoryHtml(realIndex), realHtml, "real repository rendering is deterministic");
+same(renderContractObservatoryHtml(realIndex, realProjection), realHtml, "real repository rendering is deterministic");
 
 const malicious = `<script>alert('x')</script>&\" >`;
 const synthetic = index([
@@ -195,4 +206,4 @@ execFileSync(
   { cwd: repositoryRoot, stdio: "inherit" },
 );
 
-console.log("Contract Observatory V3b/V3c static UI, materialization and V4a visual consumer checks passed.");
+console.log("Contract Observatory V3b/V3c static UI, materialization and V4a/V4c interaction checks passed.");
