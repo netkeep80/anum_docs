@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve, sep } from "node:path";
 
 import { buildContractObservatoryIndex } from "./contract-index.js";
+import { buildMethodologyProjection } from "./methodology-projection.js";
 import { renderContractObservatoryHtml } from "./site.js";
 
 export interface MaterializedContractObservatorySite {
@@ -20,7 +21,8 @@ export function materializeContractObservatorySite(
   assertSafeOutputPath(repositoryPath, outputPath);
 
   const index = buildContractObservatoryIndex(repositoryPath);
-  const html = renderContractObservatoryHtml(index);
+  const methodology = buildMethodologyProjection(repositoryPath, index);
+  const html = renderContractObservatoryHtml(index, methodology);
   const indexPath = resolve(outputPath, "index.html");
   const noJekyllPath = resolve(outputPath, ".nojekyll");
 

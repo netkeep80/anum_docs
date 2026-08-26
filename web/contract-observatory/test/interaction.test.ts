@@ -1,0 +1,131 @@
+import {
+  METHODOLOGY_STAGE_ORDER,
+  buildInteractiveMethodologyModel,
+  decodeObservatoryHash,
+  encodeObservatoryHash,
+  reduceInteractionState,
+  type ObservatoryInteractionState,
+} from "../src/interaction.js";
+import type { MethodologyProjection, MethodologyVersionProjection } from "../src/methodology-projection.js";
+
+function assert(condition: unknown, message: string): asserts condition {
+  if (!condition) throw new Error(`Contract Observatory V4c: ${message}`);
+}
+
+function same<T>(actual: T, expected: T, message: string): void {
+  assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
+}
+
+function projectedVersion(overrides: Partial<MethodologyVersionProjection> = {}): MethodologyVersionProjection {
+  return Object.freeze({
+    contractId: "mts-contract/v1.0",
+    conformanceId: "mts-conformance/v1.0",
+    contractPath: "contracts/mts-contract-v1.0.json",
+    conformancePath: "contracts/mts-conformance-v1.0.json",
+    status: "accepted",
+    accepted: true,
+    acceptanceReady: true,
+    isCurrent: false,
+    isPrevious: false,
+    theoryReferences: Object.freeze([]),
+    contractReferences: Object.freeze([]),
+    positiveVectors: Object.freeze([]),
+    negativeVectors: Object.freeze([]),
+    executableGates: Object.freeze([]),
+    evidenceReferences: Object.freeze([]),
+    acceptanceReferences: Object.freeze([]),
+    lifecycle: Object.freeze([
+      Object.freeze({ stage: "candidate", evidence: Object.freeze(["contracts/mts-contract-v1.0.json"]) }),
+      Object.freeze({ stage: "challenged", evidence: Object.freeze(["contracts/mts-conformance-v1.0.json"]) }),
+      Object.freeze({ stage: "accepted", evidence: Object.freeze(["contracts/mts-contract-v1.0.json"]) }),
+    ]),
+    traceability: Object.freeze([]),
+    unresolvedRelations: Object.freeze([]),
+    ...overrides,
+  });
+}
+
+const projection: MethodologyProjection = Object.freeze({
+  schema: "mts-contract-methodology-projection/v0.1",
+  versions: Object.freeze([
+    projectedVersion({
+      contractId: "mts-contract/v0.10",
+      conformanceId: "mts-conformance/v0.10",
+      isPrevious: true,
+    }),
+    projectedVersion({
+      contractId: "mts-contract/v0.11",
+      conformanceId: "mts-conformance/v0.11",
+      isCurrent: true,
+      lifecycle: Object.freeze([
+        Object.freeze({ stage: "research", evidence: Object.freeze(["issue:758"]) }),
+        Object.freeze({ stage: "problem", evidence: Object.freeze(["issue:759"]) }),
+        Object.freeze({ stage: "candidate", evidence: Object.freeze(["contracts/mts-contract-v0.11.json"]) }),
+        Object.freeze({ stage: "challenged", evidence: Object.freeze(["contracts/mts-conformance-v0.11.json"]) }),
+        Object.freeze({ stage: "modeled", evidence: Object.freeze(["contracts/mts-conformance-v0.11.json"]) }),
+        Object.freeze({ stage: "accepted", evidence: Object.freeze(["contracts/mts-contract-v0.11.json"]) }),
+        Object.freeze({ stage: "released", evidence: Object.freeze(["pointer:current"]) }),
+      ]),
+    }),
+    projectedVersion({
+      contractId: "mts-contract/v0.12-candidate",
+      conformanceId: "mts-conformance/v0.12-candidate",
+      status: "candidate",
+      accepted: false,
+      acceptanceReady: false,
+      lifecycle: Object.freeze([
+        Object.freeze({ stage: "candidate", evidence: Object.freeze(["contracts/mts-contract-v0.12-candidate.json"]) }),
+      ]),
+    }),
+  ]),
+});
+
+same(
+  METHODOLOGY_STAGE_ORDER.join(","),
+  "research,problem,candidate,challenged,modeled,accepted,released",
+  "methodology stage order remains explicit and deterministic",
+);
+
+const initial: ObservatoryInteractionState = Object.freeze({
+  selectedVersionId: "mts-contract/v0.11",
+  selectedStage: null,
+  selectedItemId: null,
+  filters: Object.freeze([]),
+  viewport: Object.freeze({ x: 0, y: 0, scale: 1 }),
+});
+
+const initialModel = buildInteractiveMethodologyModel(projection, initial);
+same(initialModel.versions.length, 3, "all projected versions render exactly once");
+same(initialModel.versions.filter((entry) => entry.isCurrent).length, 1, "CURRENT derives only from projection state");
+same(initialModel.versions.find((entry) => entry.isCurrent)?.contractId, "mts-contract/v0.11", "current version preserved");
+same(initialModel.versions.find((entry) => entry.contractId.includes("candidate"))?.classification, "CANDIDATE", "candidate is textually distinct from accepted");
+same(initialModel.versions.find((entry) => entry.contractId === "mts-contract/v0.11")?.classification, "CURRENT", "current classification is explicit");
+
+const stageSelected = reduceInteractionState(initial, { type: "select-stage", stage: "challenged" });
+same(stageSelected.selectedStage, "challenged", "stage selection is observable state");
+const stageModel = buildInteractiveMethodologyModel(projection, stageSelected);
+assert(stageModel.stages.find((entry) => entry.stage === "challenged")?.selected === true, "selected stage is emphasized");
+assert(stageModel.versions.every((entry) => entry.stageStates.some((stage) => stage.stage === "challenged")), "stage state is synchronized across version lanes");
+
+const versionSelected = reduceInteractionState(stageSelected, { type: "select-version", versionId: "mts-contract/v0.10" });
+same(versionSelected.selectedVersionId, "mts-contract/v0.10", "version selection is synchronized state");
+
+const encoded = encodeObservatoryHash(versionSelected);
+assert(encoded.startsWith("#v="), "deep link is a stable hash");
+const decoded = decodeObservatoryHash(encoded, projection);
+same(decoded.selectedVersionId, versionSelected.selectedVersionId, "hash restores selected version");
+same(decoded.selectedStage, versionSelected.selectedStage, "hash restores selected stage");
+same(encodeObservatoryHash(decoded), encoded, "hash round-trip is deterministic");
+
+const unknown = decodeObservatoryHash("#v=missing&s=unknown&item=%3Cscript%3E", projection);
+same(unknown.selectedVersionId, "mts-contract/v0.11", "unknown version fails closed to projected current version");
+same(unknown.selectedStage, null, "unknown methodology stage is not fabricated");
+same(unknown.selectedItemId, "<script>", "item identity remains data and is not interpreted as markup");
+
+same(
+  JSON.stringify(buildInteractiveMethodologyModel(projection, versionSelected)),
+  JSON.stringify(buildInteractiveMethodologyModel(projection, versionSelected)),
+  "same projection and interaction state produce deterministic rendered model",
+);
+
+console.log("Contract Observatory V4c interaction-model specification passed.");
