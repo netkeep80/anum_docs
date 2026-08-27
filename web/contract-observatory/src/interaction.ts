@@ -2,6 +2,7 @@ import type {
   MethodologyProjection,
   MethodologyStage,
   MethodologyVersionProjection,
+  TraceabilityRelation,
 } from "./methodology-projection.js";
 
 export const METHODOLOGY_STAGE_ORDER: readonly MethodologyStage[] = Object.freeze([
@@ -61,6 +62,20 @@ export interface InteractiveMethodologyModel {
   readonly versions: readonly InteractiveMethodologyVersion[];
 }
 
+export interface EvidenceAnatomyModel {
+  readonly versionId: string | null;
+  readonly selectedItemId: string | null;
+  readonly positiveVectorIds: readonly string[];
+  readonly negativeVectorIds: readonly string[];
+  readonly executableGateIds: readonly string[];
+  readonly evidenceIds: readonly string[];
+  readonly acceptanceIds: readonly string[];
+  readonly highlightedItemIds: readonly string[];
+  readonly sourcePaths: readonly string[];
+  readonly relations: readonly TraceabilityRelation[];
+  readonly unresolvedRelations: readonly string[];
+}
+
 const DEFAULT_VIEWPORT: ObservatoryViewport = Object.freeze({ x: 0, y: 0, scale: 1 });
 
 export function reduceInteractionState(
@@ -93,6 +108,73 @@ export function buildInteractiveMethodologyModel(
   return Object.freeze({
     stages: Object.freeze(stages),
     versions: Object.freeze(versions),
+  });
+}
+
+export function buildEvidenceAnatomyModel(
+  projection: MethodologyProjection,
+  state: ObservatoryInteractionState,
+): EvidenceAnatomyModel {
+  const version = projection.versions.find((entry) => entry.contractId === state.selectedVersionId)
+    ?? projection.versions.find((entry) => entry.isCurrent)
+    ?? projection.versions[0];
+  if (version === undefined) {
+    return Object.freeze({
+      versionId: null,
+      selectedItemId: null,
+      positiveVectorIds: Object.freeze([]),
+      negativeVectorIds: Object.freeze([]),
+      executableGateIds: Object.freeze([]),
+      evidenceIds: Object.freeze([]),
+      acceptanceIds: Object.freeze([]),
+      highlightedItemIds: Object.freeze([]),
+      sourcePaths: Object.freeze([]),
+      relations: Object.freeze([]),
+      unresolvedRelations: Object.freeze([]),
+    });
+  }
+
+  const knownItemIds = new Set<string>([
+    ...version.theoryReferences.map((entry) => `theory:${entry.id}`),
+    ...version.contractReferences.map((entry) => `contract:${entry.id}`),
+    ...version.positiveVectors.map((entry) => `vector:${entry.id}`),
+    ...version.negativeVectors.map((entry) => `vector:${entry.id}`),
+    ...version.executableGates.map((entry) => entry.id),
+    ...version.evidenceReferences.map((entry) => entry.id),
+    ...version.acceptanceReferences.map((entry) => entry.id),
+  ]);
+  const selectedItemId = state.selectedItemId !== null && knownItemIds.has(state.selectedItemId)
+    ? state.selectedItemId
+    : null;
+  const highlighted = new Set<string>();
+  if (selectedItemId !== null) {
+    highlighted.add(selectedItemId);
+    for (const relation of version.traceability) {
+      if (relation.from === selectedItemId) highlighted.add(relation.to);
+      if (relation.to === selectedItemId) highlighted.add(relation.from);
+    }
+  }
+  const sourcePaths = uniqueSorted([
+    version.contractPath,
+    version.conformancePath,
+    ...version.contractReferences.map((entry) => entry.path),
+    ...version.executableGates.map((entry) => entry.path),
+    ...version.evidenceReferences.map((entry) => entry.sourcePath),
+    ...version.acceptanceReferences.map((entry) => entry.sourcePath),
+  ]);
+
+  return Object.freeze({
+    versionId: version.contractId,
+    selectedItemId,
+    positiveVectorIds: Object.freeze(version.positiveVectors.map((entry) => entry.id)),
+    negativeVectorIds: Object.freeze(version.negativeVectors.map((entry) => entry.id)),
+    executableGateIds: Object.freeze(version.executableGates.map((entry) => entry.id)),
+    evidenceIds: Object.freeze(version.evidenceReferences.map((entry) => entry.id)),
+    acceptanceIds: Object.freeze(version.acceptanceReferences.map((entry) => entry.id)),
+    highlightedItemIds: Object.freeze([...highlighted].sort((left, right) => left.localeCompare(right))),
+    sourcePaths,
+    relations: Object.freeze([...version.traceability]),
+    unresolvedRelations: Object.freeze([...version.unresolvedRelations]),
   });
 }
 
