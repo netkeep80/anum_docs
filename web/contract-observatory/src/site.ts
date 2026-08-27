@@ -1,7 +1,9 @@
 import type { ContractObservatoryIndex, ContractVersionSummary } from "./contract-index.js";
 import {
   METHODOLOGY_STAGE_ORDER,
+  buildEvidenceAnatomyModel,
   buildInteractiveMethodologyModel,
+  type EvidenceAnatomyModel,
   type ObservatoryInteractionState,
 } from "./interaction.js";
 import type { MethodologyProjection, MethodologyVersionProjection } from "./methodology-projection.js";
@@ -47,9 +49,9 @@ export function renderContractObservatoryHtml(
     .methodology-authority { display: flex; flex-wrap: wrap; gap: .5rem; margin: .8rem 0 1rem; font-size: .82rem; }
     .methodology-authority span { padding: .35rem .55rem; border: 1px solid color-mix(in srgb, CanvasText 22%, transparent); border-radius: .6rem; }
     .methodology-controls { display: grid; gap: .8rem; margin-bottom: 1rem; }
-    .stage-controls, .filter-controls, .viewport-controls, .evidence-items { display: flex; flex-wrap: wrap; gap: .45rem; }
-    .stage-controls button, .filter-controls button, .viewport-controls button, .version-select, .evidence-items button { cursor: pointer; border: 1px solid color-mix(in srgb, CanvasText 24%, transparent); border-radius: .65rem; background: Canvas; padding: .5rem .7rem; }
-    button[aria-pressed="true"] { border-width: 2px; font-weight: 800; }
+    .stage-controls, .filter-controls, .viewport-controls, .evidence-items, .anatomy-items { display: flex; flex-wrap: wrap; gap: .45rem; }
+    .stage-controls button, .filter-controls button, .viewport-controls button, .version-select, .evidence-items button, .anatomy-items button { cursor: pointer; border: 1px solid color-mix(in srgb, CanvasText 24%, transparent); border-radius: .65rem; background: Canvas; padding: .5rem .7rem; }
+    button[aria-pressed="true"], button.trace-highlighted { border-width: 2px; font-weight: 800; }
     .methodology-grid { display: grid; gap: .65rem; overflow: auto; padding-bottom: .25rem; }
     .methodology-lane { min-width: 780px; display: grid; grid-template-columns: minmax(190px, 1.4fr) repeat(7, minmax(72px, 1fr)); gap: .35rem; align-items: stretch; padding: .5rem; border: 1px solid color-mix(in srgb, CanvasText 15%, transparent); border-radius: .8rem; }
     .methodology-lane.selected, .methodology-lane.selection-synced { border-width: 2px; }
@@ -61,7 +63,12 @@ export function renderContractObservatoryHtml(
     .stage-cell.stage-selected { border-width: 2px; font-weight: 800; }
     .stage-evidence { display: block; margin-top: .2rem; font-size: .65rem; opacity: .7; }
     .evidence-items { grid-column: 1 / -1; padding-top: .25rem; }
-    .evidence-items button { padding: .3rem .5rem; font-size: .7rem; overflow-wrap: anywhere; }
+    .evidence-items button, .anatomy-items button { padding: .3rem .5rem; font-size: .7rem; overflow-wrap: anywhere; }
+    .evidence-anatomy { display: grid; gap: .7rem; margin-top: 1rem; padding: .8rem; border: 1px solid color-mix(in srgb, CanvasText 15%, transparent); border-radius: .8rem; }
+    .evidence-anatomy h3 { margin: 0; font-size: 1rem; }
+    .anatomy-group { display: grid; gap: .35rem; }
+    .anatomy-group strong { font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; }
+    .anatomy-provenance, .anatomy-unresolved { margin: 0; padding-left: 1.2rem; font-size: .75rem; overflow-wrap: anywhere; }
     .methodology-status { margin: .8rem 0 0; min-height: 1.3em; font-size: .82rem; opacity: .75; }
     .timeline { margin: 0 0 2.5rem; }
     .timeline h2, .versions h2 { margin: 0 0 1rem; font-size: 1.5rem; }
@@ -110,7 +117,13 @@ function renderMethodologyMap(projection: MethodologyProjection): string {
   const model = buildInteractiveMethodologyModel(projection, state);
   const stageControls = model.stages.map((entry) => `<button type="button" data-methodology-stage="${entry.stage}" aria-pressed="false" title="Lifecycle stage: ${entry.stage}; derived presentation state">${escapeHtml(entry.stage)}</button>`).join("\n");
   const lanes = model.versions.map((entry, ordinal) => renderMethodologyLane(projection.versions[ordinal]!, entry)).join("\n");
-  const controllerData = projection.versions.map((version, ordinal) => ({ id: version.contractId, classification: model.versions[ordinal]!.classification.toLowerCase(), itemIds: methodologyItemIds(version) }));
+  const anatomies = projection.versions.map((version) => buildEvidenceAnatomyModel(projection, Object.freeze({ ...state, selectedVersionId: version.contractId }))).map(renderEvidenceAnatomy).join("\n");
+  const controllerData = projection.versions.map((version, ordinal) => ({
+    id: version.contractId,
+    classification: model.versions[ordinal]!.classification.toLowerCase(),
+    itemIds: methodologyItemIds(version),
+    relations: version.traceability.map((relation) => ({ from: relation.from, to: relation.to })),
+  }));
 
   return `    <section class="methodology-map" aria-labelledby="methodology-title">
       <div class="methodology-heading"><p class="eyebrow">Primary explanatory view · derived methodology</p><h2 id="methodology-title">Methodology map + version lifecycle lanes</h2><p>Две координированные, но не тождественные структуры: метод разработки и состояние жизненного цикла версии.</p></div>
@@ -122,6 +135,7 @@ function renderMethodologyMap(projection: MethodologyProjection): string {
         <div class="viewport-controls" role="group" aria-label="Map viewport"><button type="button" data-viewport-action="zoom-out" aria-label="Zoom out">−</button><button type="button" data-viewport-action="reset">Reset viewport</button><button type="button" data-viewport-action="zoom-in" aria-label="Zoom in">+</button></div>
       </div>
       <div class="methodology-grid" tabindex="0" aria-label="Version lifecycle lanes">${lanes}</div>
+      <div class="evidence-anatomies" aria-label="Contract anatomy and evidence traceability">${anatomies}</div>
       <p class="methodology-status" aria-live="polite"></p>
     </section>
 ${renderMethodologyController(controllerData, selectedVersionId)}`;
@@ -135,8 +149,25 @@ function renderMethodologyLane(projection: MethodologyVersionProjection, model: 
   return `<div class="methodology-lane${model.selected ? " selected" : ""}" data-version-lane="${escapeAttribute(model.contractId)}" data-categories="${categories}"><div class="lane-version"><button type="button" class="version-select" data-version-id="${escapeAttribute(model.contractId)}" aria-pressed="${model.selected ? "true" : "false"}" title="Select version and synchronize Observatory views">${escapeHtml(model.contractId)}</button><span class="lane-classification">${model.classification}</span></div>${stages}<div class="evidence-items" aria-label="Evidence references for ${escapeAttribute(model.contractId)}">${evidenceItems || "<span>No linked evidence references</span>"}</div></div>`;
 }
 
+function renderEvidenceAnatomy(anatomy: EvidenceAnatomyModel): string {
+  const versionId = anatomy.versionId ?? "none";
+  return `<section class="evidence-anatomy" data-anatomy-version="${escapeAttribute(versionId)}"${anatomy.versionId === null ? " hidden" : ""}><h3>Contract anatomy · ${escapeHtml(versionId)}</h3>${renderAnatomyGroup("Positive obligations", anatomy.positiveVectorIds.map((id) => `vector:${id}`))}${renderAnatomyGroup("Negative / veto obligations", anatomy.negativeVectorIds.map((id) => `vector:${id}`))}${renderAnatomyGroup("Executable gates", anatomy.executableGateIds)}${renderAnatomyGroup("Evidence", anatomy.evidenceIds)}${renderAnatomyGroup("Acceptance", anatomy.acceptanceIds)}<div class="anatomy-group"><strong>Raw provenance</strong><ul class="anatomy-provenance">${anatomy.sourcePaths.map((path) => `<li data-source-path="${escapeAttribute(path)}"><code>${escapeHtml(path)}</code></li>`).join("")}</ul></div><div class="anatomy-group"><strong>Unresolved traceability</strong><ul class="anatomy-unresolved">${anatomy.unresolvedRelations.length > 0 ? anatomy.unresolvedRelations.map((item) => `<li>${escapeHtml(item)}</li>`).join("") : "<li>none</li>"}</ul></div></section>`;
+}
+
+function renderAnatomyGroup(label: string, ids: readonly string[]): string {
+  return `<div class="anatomy-group"><strong>${escapeHtml(label)}</strong><div class="anatomy-items">${ids.length > 0 ? ids.map((id) => `<button type="button" data-item-id="${escapeAttribute(id)}" aria-pressed="false">${escapeHtml(id)}</button>`).join("") : "<span>none</span>"}</div></div>`;
+}
+
 function methodologyItemIds(version: MethodologyVersionProjection): string[] {
-  return [...new Set([...version.theoryReferences.map((entry) => entry.id), ...version.contractReferences.map((entry) => entry.id), ...version.positiveVectors.map((entry) => entry.id), ...version.negativeVectors.map((entry) => entry.id), ...version.evidenceReferences.map((entry) => entry.id), ...version.acceptanceReferences.map((entry) => entry.id)])].sort((a, b) => a.localeCompare(b));
+  return [...new Set([
+    ...version.theoryReferences.map((entry) => `theory:${entry.id}`),
+    ...version.contractReferences.map((entry) => `contract:${entry.id}`),
+    ...version.positiveVectors.map((entry) => `vector:${entry.id}`),
+    ...version.negativeVectors.map((entry) => `vector:${entry.id}`),
+    ...version.executableGates.map((entry) => entry.id),
+    ...version.evidenceReferences.map((entry) => entry.id),
+    ...version.acceptanceReferences.map((entry) => entry.id),
+  ])].sort((a, b) => a.localeCompare(b));
 }
 
 function methodologyCategories(version: MethodologyVersionProjection, classification: string): string[] {
@@ -150,7 +181,7 @@ function methodologyCategories(version: MethodologyVersionProjection, classifica
 
 function renderFilterButton(filter: string, label: string): string { return `<button type="button" data-methodology-filter="${filter}" aria-pressed="false">${label}</button>`; }
 
-function renderMethodologyController(versions: readonly { readonly id: string; readonly classification: string; readonly itemIds: readonly string[] }[], defaultVersionId: string | null): string {
+function renderMethodologyController(versions: readonly { readonly id: string; readonly classification: string; readonly itemIds: readonly string[]; readonly relations: readonly { readonly from: string; readonly to: string }[] }[], defaultVersionId: string | null): string {
   const data = escapeJsonForScript(JSON.stringify({ versions, stages: METHODOLOGY_STAGE_ORDER, defaultVersionId, filters: ["accepted", "candidate", "current", "evidence", "negative", "positive", "previous"] }));
   return `    <script>
 (() => {
@@ -176,14 +207,18 @@ function renderMethodologyController(versions: readonly { readonly id: string; r
 
   const apply = () => {
     const state = readState();
+    const activeVersion = config.versions.find((entry) => entry.id === state.versionId);
+    const highlighted = new Set(state.item ? [state.item] : []);
+    if (state.item && activeVersion) for (const relation of activeVersion.relations) { if (relation.from === state.item) highlighted.add(relation.to); if (relation.to === state.item) highlighted.add(relation.from); }
     map.querySelectorAll("[data-methodology-stage]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.methodologyStage === state.stage)));
     map.querySelectorAll("[data-methodology-filter]").forEach((button) => button.setAttribute("aria-pressed", String(state.filters.includes(button.dataset.methodologyFilter))));
-    map.querySelectorAll("[data-item-id]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.itemId === state.item)));
+    map.querySelectorAll("[data-item-id]").forEach((button) => { button.setAttribute("aria-pressed", String(button.dataset.itemId === state.item)); button.classList.toggle("trace-highlighted", highlighted.has(button.dataset.itemId)); });
     map.querySelectorAll("[data-version-lane]").forEach((lane) => { const selected = lane.dataset.versionLane === state.versionId; const categories = (lane.dataset.categories || "").split(" "); const visible = state.filters.length === 0 || state.filters.every((value) => categories.includes(value)); lane.hidden = !visible; lane.classList.toggle("selected", selected); lane.querySelector("[data-version-id]")?.setAttribute("aria-pressed", String(selected)); lane.querySelectorAll("[data-lane-stage]").forEach((cell) => cell.classList.toggle("stage-selected", cell.dataset.laneStage === state.stage)); });
+    map.querySelectorAll("[data-anatomy-version]").forEach((panel) => { panel.hidden = panel.dataset.anatomyVersion !== state.versionId; });
     document.querySelectorAll("[data-overview-version-id]").forEach((node) => node.classList.toggle("selection-synced", node.dataset.overviewVersionId === state.versionId));
     if (grid) { grid.style.zoom = String(state.z); grid.scrollLeft = state.x; grid.scrollTop = state.y; }
     const status = map.querySelector(".methodology-status");
-    if (status) status.textContent = "Selected: " + (state.versionId ?? "none") + "; stage: " + (state.stage ?? "all") + "; item: " + (state.item ?? "none") + "; filters: " + (state.filters.join(", ") || "none") + "; zoom: " + state.z + ".";
+    if (status) status.textContent = "Selected: " + (state.versionId ?? "none") + "; stage: " + (state.stage ?? "all") + "; item: " + (state.item ?? "none") + "; linked: " + ([...highlighted].join(", ") || "none") + "; filters: " + (state.filters.join(", ") || "none") + "; zoom: " + state.z + ".";
   };
 
   map.addEventListener("click", (event) => {
