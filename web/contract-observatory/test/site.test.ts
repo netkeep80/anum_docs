@@ -12,9 +12,10 @@ import {
 import { buildMethodologyProjection } from "../src/methodology-projection.js";
 import { renderContractObservatoryHtml } from "../src/site.js";
 import "./interaction.test.js";
+import "./evidence-anatomy.test.js";
 
 function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) throw new Error(`Contract Observatory V3b/V3c/V4c: ${message}`);
+  if (!condition) throw new Error(`Contract Observatory V3b/V3c/V4c/V4d: ${message}`);
 }
 
 function same<T>(actual: T, expected: T, message: string): void {
@@ -101,6 +102,15 @@ assert(realHtml.includes("Method/lifecycle relation"), "methodology relation aut
 assert(realHtml.includes("Semantic topology Link: not rendered in this view"), "methodology view cannot be mistaken for MTS semantic Links");
 assert(realHtml.includes("addEventListener(\"hashchange\""), "deep-link back/forward restoration is wired in the client controller");
 assert(realHtml.includes("addEventListener(\"keydown\""), "keyboard stage/version activation is wired in the client controller");
+
+assert(realHtml.includes("aria-label=\"Contract anatomy and evidence traceability\""), "V4d anatomy has an explicit landmark");
+assert(realHtml.includes("Contract anatomy · mts-contract/v0.11"), "current contract anatomy is rendered");
+assert(realHtml.includes("Positive obligations"), "positive obligations are separately visible");
+assert(realHtml.includes("Negative / veto obligations"), "negative/veto obligations are separately visible");
+assert(realHtml.includes("Raw provenance"), "raw provenance is visible from the anatomy view");
+assert(realHtml.includes("Unresolved traceability"), "missing traceability remains explicit");
+assert(realHtml.includes("trace-highlighted"), "client controller carries explicit cross-highlighting state");
+assert(realHtml.includes("data-source-path="), "raw provenance keeps source path identity in rendered output");
 
 const v010Position = realHtml.indexOf("mts-contract/v0.10");
 const v011Position = realHtml.indexOf("mts-contract/v0.11");
@@ -206,4 +216,4 @@ execFileSync(
   { cwd: repositoryRoot, stdio: "inherit" },
 );
 
-console.log("Contract Observatory V3b/V3c static UI, materialization and V4a/V4c interaction checks passed.");
+console.log("Contract Observatory V3b/V3c static UI, materialization and V4a/V4c/V4d interaction checks passed.");
