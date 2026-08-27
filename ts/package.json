@@ -34,7 +34,7 @@
     "package:check": "tsc -p tsconfig.consumer.json --noEmit",
     "package:artifact": "npm run build --silent && npm pack",
     "browser:typecheck": "tsc -p tsconfig.browser.json",
-    "browser:check": "npm run browser:typecheck && esbuild browser/core-smoke.ts --bundle --platform=browser --format=esm --target=es2022 --outfile=dist/browser/core-smoke.js && esbuild browser/indexeddb-dataset-repository.ts --bundle --platform=browser --format=esm --target=es2022 --outfile=dist/browser/indexeddb-dataset-repository.js && node dist/browser/core-smoke.js && node dist/browser/indexeddb-dataset-repository.test.js",
+    "browser:check": "npm run browser:typecheck && esbuild browser/core-smoke.ts --bundle --platform=browser --format=esm --target=es2022 --outfile=dist/browser/core-smoke.js && esbuild browser/indexeddb-dataset-repository.ts --bundle --platform=browser --format=esm --target=es2022 --outfile=dist/browser/indexeddb-dataset-repository.js && esbuild browser/indexeddb-dataset-repository.test.ts --bundle --platform=node --format=esm --target=node24 --outfile=dist/browser/indexeddb-dataset-repository.test.js && node dist/browser/core-smoke.js && node dist/browser/indexeddb-dataset-repository.test.js",
     "test": "npm run build && npm run package:check && node dist/src/tooling/test-runner.js",
     "docs:sync": "npm run build --silent && node dist/src/tooling/docs-sync.js --write",
     "docs:check": "npm run build --silent && node dist/src/tooling/docs-sync.js --check",
