@@ -19,6 +19,10 @@
     "./tooling/notation": {
       "types": "./dist/src/tooling/notation.d.ts",
       "default": "./dist/src/tooling/notation.js"
+    },
+    "./tooling/syntax-aset": {
+      "types": "./dist/src/tooling/syntax-aset.d.ts",
+      "default": "./dist/src/tooling/syntax-aset.js"
     }
   },
   "bin": {
