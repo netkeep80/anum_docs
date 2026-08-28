@@ -1,9 +1,4 @@
 import {
-  ExactSequenceError,
-  materializeExactSequence,
-  readExactSequence,
-} from "./exact-sequence.js";
-import {
   MemoryError,
   type LinkHandle,
   type ReadMemory,
@@ -46,6 +41,12 @@ export interface SyntaxAsetRead {
   readonly occurrences: readonly SyntaxAsetOccurrence[];
 }
 
+interface TriadRead {
+  readonly relation: LinkHandle;
+  readonly subject: LinkHandle;
+  readonly object: LinkHandle;
+}
+
 function contractError(code: SyntaxAsetContractErrorCode): never {
   throw new SyntaxAsetContractError(code);
 }
@@ -57,21 +58,67 @@ function isChildRole(
   return vocabulary.childRoles.some((candidate) => candidate === role);
 }
 
-function readSequenceOrReject(
+function materializeTriad(
+  memory: WriteMemory,
+  relation: LinkHandle,
+  subject: LinkHandle,
+  object: LinkHandle,
+): LinkHandle {
+  return memory.ensure(relation, memory.ensure(subject, object));
+}
+
+function readTriad(
   memory: ReadMemory,
-  final: LinkHandle,
+  entity: LinkHandle,
   code: "invalid-field-sequence" | "invalid-occurrence-sequence",
-) {
+): TriadRead {
   try {
-    return readExactSequence(memory, final);
+    const vertical = memory.poles(entity);
+    const horizontal = memory.poles(vertical.end);
+    return Object.freeze({
+      relation: vertical.start,
+      subject: horizontal.start,
+      object: horizontal.end,
+    });
   } catch (error) {
-    if (error instanceof ExactSequenceError || error instanceof MemoryError) {
-      return contractError(code);
-    }
+    if (error instanceof MemoryError) return contractError(code);
     throw error;
   }
 }
 
+function readFieldChain(
+  memory: ReadMemory,
+  final: LinkHandle,
+): readonly SyntaxAsetField[] {
+  const reversed: SyntaxAsetField[] = [];
+  const visited = new Set<LinkHandle>();
+  let current = final;
+
+  while (current !== memory.root) {
+    if (visited.has(current)) return contractError("invalid-field-sequence");
+    visited.add(current);
+    const fact = readTriad(memory, current, "invalid-field-sequence");
+    reversed.push(Object.freeze({ role: fact.relation, value: fact.object }));
+    current = fact.subject;
+  }
+
+  return Object.freeze(reversed.reverse());
+}
+
+/**
+ * Canonical syntax-only chained-triad topology selected by #970:
+ *
+ *   T(r, s, o) = r ⟼ (s ⟼ o)
+ *   F0 = R
+ *   Fi = T(role_i, F(i-1), value_i)
+ *   O0 = R
+ *   Oi = T(kind_i, O(i-1), Fi)
+ *   SyntaxAset = SyntaxTag ⟼ O_last
+ *
+ * The previous field/occurrence entity is part of the next entity's poles, so
+ * equal-looking repeated fields and occurrences stay structurally distinct
+ * without UUIDs, source offsets, host indexes or visual keys.
+ */
 export class SyntaxAsetBuilder {
   private occurrenceOrder: LinkHandle;
   private readonly occurrences = new Set<LinkHandle>();
@@ -92,18 +139,20 @@ export class SyntaxAsetBuilder {
       return contractError("invalid-aset");
     }
 
-    const fieldLinks = fields.map(({ role, value }) => {
+    let fieldOrder = this.memory.root;
+    for (const { role, value } of fields) {
       if (isChildRole(this.vocabulary, role) && !this.occurrences.has(value)) {
         return contractError("invalid-child-occurrence");
       }
-      return this.memory.ensure(role, value);
-    });
+      fieldOrder = materializeTriad(this.memory, role, fieldOrder, value);
+    }
 
-    const fieldSequence = materializeExactSequence(this.memory, fieldLinks);
-    const descriptor = this.memory.ensure(kind, fieldSequence);
-    const payload = this.memory.ensure(this.occurrenceOrder, descriptor);
-    const occurrence = this.memory.ensureStartSelfClosed(payload);
-
+    const occurrence = materializeTriad(
+      this.memory,
+      kind,
+      this.occurrenceOrder,
+      fieldOrder,
+    );
     this.occurrenceOrder = occurrence;
     this.occurrences.add(occurrence);
     return occurrence;
@@ -119,8 +168,7 @@ export class SyntaxAsetBuilder {
     }
 
     this.finished = true;
-    const header = this.memory.ensure(this.occurrenceOrder, root);
-    return this.memory.ensure(this.vocabulary.tag, header);
+    return this.memory.ensure(this.vocabulary.tag, this.occurrenceOrder);
   }
 }
 
@@ -129,7 +177,6 @@ export function readSyntaxAset(
   aset: LinkHandle,
   vocabulary: SyntaxAsetVocabulary,
 ): SyntaxAsetRead {
-  let occurrenceOrder: LinkHandle;
   let declaredRoot: LinkHandle;
 
   try {
@@ -137,9 +184,7 @@ export function readSyntaxAset(
     if (wrapper.start !== vocabulary.tag) {
       return contractError("invalid-aset");
     }
-    const header = memory.poles(wrapper.end);
-    occurrenceOrder = header.start;
-    declaredRoot = header.end;
+    declaredRoot = wrapper.end;
   } catch (error) {
     if (error instanceof MemoryError) {
       return contractError("invalid-aset");
@@ -147,73 +192,35 @@ export function readSyntaxAset(
     throw error;
   }
 
-  const sequence = readSequenceOrReject(
-    memory,
-    occurrenceOrder,
-    "invalid-occurrence-sequence",
-  );
-
-  const finalOccurrence = sequence.cells.at(-1);
-  if (finalOccurrence === undefined || declaredRoot !== finalOccurrence) {
-    return contractError("root-not-final");
+  if (declaredRoot === memory.root) {
+    return contractError("invalid-occurrence-sequence");
   }
 
+  const reversed: SyntaxAsetOccurrence[] = [];
+  const visited = new Set<LinkHandle>();
+  let current = declaredRoot;
+
+  while (current !== memory.root) {
+    if (visited.has(current)) return contractError("invalid-occurrence-sequence");
+    visited.add(current);
+    const occurrence = readTriad(memory, current, "invalid-occurrence-sequence");
+    reversed.push(Object.freeze({
+      occurrence: current,
+      kind: occurrence.relation,
+      fields: readFieldChain(memory, occurrence.object),
+    }));
+    current = occurrence.subject;
+  }
+
+  const occurrences = [...reversed].reverse();
   const priorOccurrences = new Set<LinkHandle>();
-  const occurrences: SyntaxAsetOccurrence[] = [];
-
-  for (let index = 0; index < sequence.values.length; index += 1) {
-    const descriptor = sequence.values[index];
-    const occurrence = sequence.cells[index];
-    if (descriptor === undefined || occurrence === undefined) {
-      return contractError("invalid-occurrence-sequence");
-    }
-
-    let kind: LinkHandle;
-    let fieldSequence: LinkHandle;
-    try {
-      const descriptorPoles = memory.poles(descriptor);
-      kind = descriptorPoles.start;
-      fieldSequence = descriptorPoles.end;
-    } catch (error) {
-      if (error instanceof MemoryError) {
-        return contractError("invalid-field-sequence");
-      }
-      throw error;
-    }
-
-    const fieldLinks = readSequenceOrReject(
-      memory,
-      fieldSequence,
-      "invalid-field-sequence",
-    ).values;
-
-    const fields: SyntaxAsetField[] = [];
-    for (const fieldLink of fieldLinks) {
-      let role: LinkHandle;
-      let value: LinkHandle;
-      try {
-        const poles = memory.poles(fieldLink);
-        role = poles.start;
-        value = poles.end;
-      } catch (error) {
-        if (error instanceof MemoryError) {
-          return contractError("invalid-field-sequence");
-        }
-        throw error;
-      }
-
-      if (isChildRole(vocabulary, role) && !priorOccurrences.has(value)) {
+  for (const occurrence of occurrences) {
+    for (const field of occurrence.fields) {
+      if (isChildRole(vocabulary, field.role) && !priorOccurrences.has(field.value)) {
         return contractError("invalid-child-occurrence");
       }
-      fields.push(Object.freeze({ role, value }));
     }
-
-    occurrences.push(Object.freeze({
-      occurrence,
-      kind,
-      fields: Object.freeze(fields),
-    }));
-    priorOccurrences.add(occurrence);
+    priorOccurrences.add(occurrence.occurrence);
   }
 
   return Object.freeze({
