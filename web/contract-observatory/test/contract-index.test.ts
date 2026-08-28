@@ -1,4 +1,5 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -230,3 +231,30 @@ fixtureCase(({ root }) => {
   });
   expectCode(() => buildContractObservatoryIndex(root), "invalid-schema-version", "ambiguous schema version");
 });
+
+const sourceTestDirectory = join(repositoryRoot, "web", "contract-observatory", "test");
+const compiledTestDirectory = join(repositoryRoot, "web", "contract-observatory", "dist", "test");
+const sourceTests = readdirSync(sourceTestDirectory)
+  .filter((name) => name.endsWith(".test.ts"))
+  .map((name) => name.replace(/\.ts$/, ".js"))
+  .sort();
+const compiledTests = readdirSync(compiledTestDirectory)
+  .filter((name) => name.endsWith(".test.js"))
+  .sort();
+
+same(
+  sourceTests.join("\n"),
+  compiledTests.join("\n"),
+  "every TypeScript test source has exactly one compiled executable",
+);
+
+for (const testName of compiledTests) {
+  if (testName === "contract-index.test.js") continue;
+  console.log(`Contract Observatory V3a suite runner: ${testName}`);
+  execFileSync(process.execPath, [join(compiledTestDirectory, testName)], {
+    cwd: repositoryRoot,
+    stdio: "inherit",
+  });
+}
+
+console.log(`Contract Observatory V3a suite runner covered ${compiledTests.length} compiled TypeScript tests.`);

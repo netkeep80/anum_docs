@@ -112,9 +112,14 @@ function projectVersion(
 ): MethodologyVersionProjection {
   const contract = readJson(join(repoRoot, summary.contractPath));
   const conformance = readJson(join(repoRoot, summary.conformancePath));
-  const vectorEvidence = readVectorEvidence(conformance);
   const positiveIds = collectPositiveVectorIds(conformance);
-  const negativeIds = stringArray(conformance.requiredNegativeVectors);
+  const negativeIds = [...stringArray(conformance.requiredNegativeVectors)];
+  validateVectorIds([...positiveIds, ...negativeIds]);
+  positiveIds.sort((a, b) => a.localeCompare(b));
+  negativeIds.sort((a, b) => a.localeCompare(b));
+
+  const knownVectorIds = new Set([...positiveIds, ...negativeIds]);
+  const vectorEvidence = readVectorEvidence(conformance, knownVectorIds);
   const positiveVectors = positiveIds.map((id) => vector(id, "positive", vectorEvidence));
   const negativeVectors = negativeIds.map((id) => vector(id, "negative", vectorEvidence));
   const gatePaths = uniqueSorted(stringArray(conformance.requiredExecutableGates));
@@ -123,6 +128,7 @@ function projectVersion(
     id: `gate:${path}`,
     path,
   }));
+  const theoryReferences: TheoryReference[] = [];
   const evidenceReferences = collectEvidenceReferences(conformance, vectorEvidence);
   const acceptanceReferences = collectAcceptanceReferences(index, acceptance, summary);
   const traceability = collectTraceability(
@@ -132,11 +138,17 @@ function projectVersion(
     summary,
   );
   const unresolvedRelations = collectUnresolved(
+    theoryReferences,
     positiveVectors,
     negativeVectors,
     executableGates,
     acceptanceReferences,
   );
+
+  // semanticBase is intentionally not promoted to TheoryReference. It is a
+  // contract-version dependency and no current authoritative document exposes
+  // a machine-addressable normative theory reference for this projection.
+  requireString(contract.semanticBase, `${summary.contractPath}#/semanticBase`);
 
   return Object.freeze({
     contractId: summary.contractId,
@@ -148,10 +160,7 @@ function projectVersion(
     acceptanceReady: summary.acceptanceReady,
     isCurrent: summary.isCurrent,
     isPrevious: summary.isPrevious,
-    theoryReferences: Object.freeze([Object.freeze({
-      authority: "theory-reference" as const,
-      id: requireString(contract.semanticBase, `${summary.contractPath}#/semanticBase`),
-    })]),
+    theoryReferences: Object.freeze(theoryReferences),
     contractReferences: Object.freeze([Object.freeze({
       authority: "contract" as const,
       id: summary.contractId,
@@ -162,22 +171,34 @@ function projectVersion(
     executableGates: Object.freeze(executableGates),
     evidenceReferences: Object.freeze(evidenceReferences),
     acceptanceReferences: Object.freeze(acceptanceReferences),
-    lifecycle: Object.freeze(buildLifecycle(summary, contract, positiveVectors, negativeVectors, executableGates)),
+    lifecycle: Object.freeze(buildLifecycle(summary, acceptanceReferences)),
     traceability: Object.freeze(traceability),
     unresolvedRelations: Object.freeze(unresolvedRelations),
   });
 }
 
-function collectPositiveVectorIds(conformance: JsonRecord): readonly string[] {
+function collectPositiveVectorIds(conformance: JsonRecord): string[] {
   const ids: string[] = [];
   for (const key of Object.keys(conformance).sort()) {
     if (!key.startsWith("required") || !key.endsWith("Vectors") || key === "requiredNegativeVectors") continue;
     ids.push(...stringArray(conformance[key]));
   }
-  return uniqueSorted(ids);
+  return ids;
 }
 
-function readVectorEvidence(conformance: JsonRecord): ReadonlyMap<string, readonly string[]> {
+function validateVectorIds(ids: readonly string[]): void {
+  const seen = new Set<string>();
+  for (const id of ids) {
+    if (id.length === 0) throw new Error("Contract Observatory V4b: empty vector id");
+    if (seen.has(id)) throw new Error(`Contract Observatory V4b: duplicate vector id: ${id}`);
+    seen.add(id);
+  }
+}
+
+function readVectorEvidence(
+  conformance: JsonRecord,
+  knownVectorIds: ReadonlySet<string>,
+): ReadonlyMap<string, readonly string[]> {
   const result = new Map<string, string[]>();
   const root = optionalRecord(conformance.vectorEvidence);
   if (root === undefined) return result;
@@ -186,6 +207,9 @@ function readVectorEvidence(conformance: JsonRecord): ReadonlyMap<string, readon
     if (bindings === undefined) continue;
     for (const sourcePath of Object.keys(bindings).sort()) {
       for (const vectorId of stringArray(bindings[sourcePath])) {
+        if (!knownVectorIds.has(vectorId)) {
+          throw new Error(`Contract Observatory V4b: evidence references unknown vector: ${vectorId}`);
+        }
         const paths = result.get(vectorId) ?? [];
         paths.push(sourcePath);
         result.set(vectorId, paths);
@@ -249,26 +273,21 @@ function collectAcceptanceReferences(
 
 function buildLifecycle(
   summary: ContractVersionSummary,
-  contract: JsonRecord,
-  positive: readonly ConformanceVector[],
-  negative: readonly ConformanceVector[],
-  gates: readonly ExecutableGate[],
+  acceptance: readonly AcceptanceReference[],
 ): MethodologyStageReference[] {
   const stages: MethodologyStageReference[] = [];
-  const candidateIssue = optionalInteger(contract.candidateLifecycleIssue);
-  if (candidateIssue !== undefined) stages.push(stage("research", [`issue:${candidateIssue}`]));
-  const issue = optionalInteger(contract.issue);
-  if (issue !== undefined) stages.push(stage("problem", [`issue:${issue}`]));
-  if (summary.status === "candidate" || summary.acceptanceReady || summary.accepted) {
+
+  // Lifecycle stages are source-derived, not reconstructed from nearby evidence.
+  // A generic issue number, vector/gate presence or coverageState cannot prove a
+  // historical research/problem/challenge/model stage.
+  if (summary.status === "candidate") {
     stages.push(stage("candidate", [summary.contractPath]));
   }
-  if (positive.length > 0 || negative.length > 0 || gates.length > 0) {
-    stages.push(stage("challenged", [summary.conformancePath]));
+  if (summary.accepted) {
+    stages.push(stage("accepted", [summary.contractPath, summary.conformancePath]));
   }
-  if (summary.coverageState === "complete") stages.push(stage("modeled", [summary.conformancePath]));
-  if (summary.accepted) stages.push(stage("accepted", [summary.contractPath, summary.conformancePath]));
-  if (summary.accepted && (summary.isCurrent || summary.isPrevious)) {
-    stages.push(stage("released", [summary.isCurrent ? "pointer:current" : "pointer:previous"]));
+  if (summary.accepted && acceptance.length > 0) {
+    stages.push(stage("released", acceptance.map((reference) => reference.id)));
   }
   return stages;
 }
@@ -306,6 +325,7 @@ function collectTraceability(
 }
 
 function collectUnresolved(
+  theory: readonly TheoryReference[],
   positive: readonly ConformanceVector[],
   negative: readonly ConformanceVector[],
   gates: readonly ExecutableGate[],
@@ -314,6 +334,7 @@ function collectUnresolved(
   const unresolved = [...positive, ...negative]
     .filter((item) => item.evidence.length === 0)
     .map((item) => `vector-evidence:${item.id}`);
+  if (theory.length === 0) unresolved.push("theory-reference");
   if (gates.length === 0) unresolved.push("executable-gates");
   if (acceptance.length === 0) unresolved.push("acceptance-reference");
   return uniqueSorted(unresolved);
@@ -345,10 +366,6 @@ function requireString(value: unknown, source: string): string {
     throw new Error(`Contract Observatory V4b: expected string: ${source}`);
   }
   return value;
-}
-
-function optionalInteger(value: unknown): number | undefined {
-  return typeof value === "number" && Number.isSafeInteger(value) ? value : undefined;
 }
 
 function uniqueSorted(values: readonly string[]): string[] {
