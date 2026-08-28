@@ -143,30 +143,66 @@ function readFieldChain(
 }
 
 /**
- * Detect an occurrence-shaped carrier without confusing arbitrary Links whose
- * first pole merely happens to be a syntax kind. A real occurrence belongs to
- * the recursive O-chain selected by #970, so its triad subject is either R or
- * another occurrence-shaped Link. Cycles/self-closures fail this test.
+ * Test explicit SyntaxAset membership without treating mere pole resemblance as
+ * syntax identity. Every complete SyntaxAset is structurally rooted by
+ * `tag ⟼ O_last`; membership is recovered by walking that O-chain only.
  */
-function isOccurrenceShaped(
+function occurrenceChainContains(
+  memory: ReadMemory,
+  head: LinkHandle,
+  target: LinkHandle,
+  vocabulary: SyntaxAsetVocabulary,
+): boolean {
+  const visited = new Set<LinkHandle>();
+  let current = head;
+
+  while (current !== memory.root) {
+    if (current === target) return true;
+    if (visited.has(current)) return false;
+    visited.add(current);
+
+    try {
+      const vertical = memory.poles(current);
+      if (kindRuleOrUndefined(vocabulary, vertical.start) === undefined) return false;
+      const horizontal = memory.poles(vertical.end);
+      current = horizontal.start;
+    } catch (error) {
+      if (error instanceof MemoryError) return false;
+      throw error;
+    }
+  }
+
+  return false;
+}
+
+function isOwnedSyntaxOccurrence(
   memory: ReadMemory,
   value: LinkHandle,
   vocabulary: SyntaxAsetVocabulary,
-  visited: Set<LinkHandle> = new Set<LinkHandle>(),
 ): boolean {
-  if (visited.has(value)) return false;
-  visited.add(value);
-
+  let wrappers: readonly LinkHandle[];
   try {
-    const vertical = memory.poles(value);
-    if (kindRuleOrUndefined(vocabulary, vertical.start) === undefined) return false;
-    const horizontal = memory.poles(vertical.end);
-    return horizontal.start === memory.root ||
-      isOccurrenceShaped(memory, horizontal.start, vocabulary, visited);
+    wrappers = memory.outgoing(vocabulary.tag);
   } catch (error) {
     if (error instanceof MemoryError) return false;
     throw error;
   }
+
+  for (const wrapper of wrappers) {
+    try {
+      const poles = memory.poles(wrapper);
+      if (
+        poles.start === vocabulary.tag &&
+        occurrenceChainContains(memory, poles.end, value, vocabulary)
+      ) {
+        return true;
+      }
+    } catch (error) {
+      if (!(error instanceof MemoryError)) throw error;
+    }
+  }
+
+  return false;
 }
 
 function validateTarget(
@@ -181,7 +217,7 @@ function validateTarget(
     return;
   }
 
-  if (priorOccurrences.has(value) || isOccurrenceShaped(memory, value, vocabulary)) {
+  if (priorOccurrences.has(value) || isOwnedSyntaxOccurrence(memory, value, vocabulary)) {
     contractError("invalid-carrier-target");
   }
 }
