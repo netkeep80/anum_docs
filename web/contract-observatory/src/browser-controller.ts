@@ -15,6 +15,10 @@ export interface ObservatoryBrowserClassList {
   toggle(name: string, force?: boolean): void;
 }
 
+export interface ObservatoryBrowserNodeCollection extends Iterable<ObservatoryBrowserNode> {
+  forEach(callback: (node: ObservatoryBrowserNode) => void): void;
+}
+
 export interface ObservatoryBrowserNode {
   readonly dataset: Record<string, string | undefined>;
   hidden?: boolean;
@@ -26,7 +30,7 @@ export interface ObservatoryBrowserNode {
   setAttribute(name: string, value: string): void;
   getAttribute(name: string): string | null;
   querySelector(selector: string): ObservatoryBrowserNode | null;
-  querySelectorAll(selector: string): readonly ObservatoryBrowserNode[];
+  querySelectorAll(selector: string): ObservatoryBrowserNodeCollection;
   closest?(selector: string): ObservatoryBrowserNode | null;
   focus?(): void;
   click?(): void;
@@ -36,7 +40,7 @@ export interface ObservatoryBrowserNode {
 export interface ObservatoryBrowserDocument {
   activeElement?: ObservatoryBrowserNode | null;
   querySelector(selector: string): ObservatoryBrowserNode | null;
-  querySelectorAll(selector: string): readonly ObservatoryBrowserNode[];
+  querySelectorAll(selector: string): ObservatoryBrowserNodeCollection;
 }
 
 export interface ObservatoryBrowserLocation {
@@ -84,8 +88,8 @@ export function installObservatoryBrowserController(
   const grid = map.querySelector(".methodology-grid");
   let state = kernel.decode(environment.location.hash);
 
-  const visibleButtons = (): readonly ObservatoryBrowserNode[] => map
-    .querySelectorAll("button")
+  const visibleButtons = (): readonly ObservatoryBrowserNode[] => Array.from(map
+    .querySelectorAll("button"))
     .filter((button) => button.hidden !== true && button.closest?.("[hidden]") == null);
 
   const apply = (): void => {
