@@ -142,16 +142,27 @@ function readFieldChain(
   return Object.freeze(reversed.reverse());
 }
 
+/**
+ * Detect an occurrence-shaped carrier without confusing arbitrary Links whose
+ * first pole merely happens to be a syntax kind. A real occurrence belongs to
+ * the recursive O-chain selected by #970, so its triad subject is either R or
+ * another occurrence-shaped Link. Cycles/self-closures fail this test.
+ */
 function isOccurrenceShaped(
   memory: ReadMemory,
   value: LinkHandle,
   vocabulary: SyntaxAsetVocabulary,
+  visited: Set<LinkHandle> = new Set<LinkHandle>(),
 ): boolean {
+  if (visited.has(value)) return false;
+  visited.add(value);
+
   try {
     const vertical = memory.poles(value);
     if (kindRuleOrUndefined(vocabulary, vertical.start) === undefined) return false;
-    memory.poles(vertical.end);
-    return true;
+    const horizontal = memory.poles(vertical.end);
+    return horizontal.start === memory.root ||
+      isOccurrenceShaped(memory, horizontal.start, vocabulary, visited);
   } catch (error) {
     if (error instanceof MemoryError) return false;
     throw error;
