@@ -8,6 +8,7 @@ import {
   SyntaxAsetBuilder,
   SyntaxAsetContractError,
   readSyntaxAset,
+  type SyntaxAsetFieldRule,
   type SyntaxAsetVocabulary,
 } from "../src/syntax-aset-contract.js";
 
@@ -67,25 +68,68 @@ function fixture(): Fixture {
   const nameRole = next();
   const bodyRole = next();
   const itemRole = next();
+  const leafKind = next();
+  const linkKind = next();
+  const definitionKind = next();
+  const sequenceKind = next();
+  const carrierX = next();
+  const carrierName = next();
+
+  const rule = (
+    role: LinkHandle,
+    target: SyntaxAsetFieldRule["target"],
+    min: number,
+    max: number | null,
+  ): SyntaxAsetFieldRule => Object.freeze({ role, target, min, max });
+
   const vocabulary: SyntaxAsetVocabulary = Object.freeze({
     tag: syntaxTag,
+    knownRoles: Object.freeze([
+      carrierRole,
+      startRole,
+      endRole,
+      nameRole,
+      bodyRole,
+      itemRole,
+    ]),
+    rules: Object.freeze([
+      Object.freeze({ kind: leafKind, fields: Object.freeze([rule(carrierRole, "carrier", 0, 1)]) }),
+      Object.freeze({
+        kind: linkKind,
+        fields: Object.freeze([
+          rule(startRole, "child", 1, 1),
+          rule(endRole, "child", 1, 1),
+        ]),
+      }),
+      Object.freeze({
+        kind: definitionKind,
+        fields: Object.freeze([
+          rule(nameRole, "carrier", 1, 1),
+          rule(bodyRole, "child", 1, 1),
+        ]),
+      }),
+      Object.freeze({
+        kind: sequenceKind,
+        fields: Object.freeze([rule(itemRole, "child", 1, null)]),
+      }),
+    ]),
     childRoles: Object.freeze([startRole, endRole, bodyRole, itemRole]),
   });
   return Object.freeze({
     memory,
     vocabulary,
-    leafKind: next(),
-    linkKind: next(),
-    definitionKind: next(),
-    sequenceKind: next(),
+    leafKind,
+    linkKind,
+    definitionKind,
+    sequenceKind,
     carrierRole,
     startRole,
     endRole,
     nameRole,
     bodyRole,
     itemRole,
-    carrierX: next(),
-    carrierName: next(),
+    carrierX,
+    carrierName,
   });
 }
 
@@ -118,7 +162,7 @@ function wrapSyntaxAset(memory: Memory, tag: LinkHandle, rootOccurrence: LinkHan
   return memory.ensure(tag, rootOccurrence);
 }
 
-// Equal syntax descriptors remain distinct occurrences because the previous
+// Equal-looking structures remain distinct occurrences because the previous
 // occurrence is structurally embedded in each chained triad.
 {
   const f = fixture();
@@ -216,7 +260,10 @@ function wrapSyntaxAset(memory: Memory, tag: LinkHandle, rootOccurrence: LinkHan
   otherBuilder.finish(foreign);
   const builder = new SyntaxAsetBuilder(f.memory, f.vocabulary);
   rejectContract(
-    () => builder.addOccurrence(f.linkKind, [{ role: f.startRole, value: foreign }]),
+    () => builder.addOccurrence(f.linkKind, [
+      { role: f.startRole, value: foreign },
+      { role: f.endRole, value: foreign },
+    ]),
     "invalid-child-occurrence",
   );
 }
@@ -228,8 +275,9 @@ function wrapSyntaxAset(memory: Memory, tag: LinkHandle, rootOccurrence: LinkHan
   const foreign = foreignBuilder.addOccurrence(f.leafKind, []);
   foreignBuilder.finish(foreign);
 
-  const field = triad(f.memory, f.startRole, f.memory.root, foreign);
-  const localOccurrence = triad(f.memory, f.linkKind, f.memory.root, field);
+  const start = triad(f.memory, f.startRole, f.memory.root, foreign);
+  const end = triad(f.memory, f.endRole, start, foreign);
+  const localOccurrence = triad(f.memory, f.linkKind, f.memory.root, end);
   const aset = wrapSyntaxAset(f.memory, f.vocabulary.tag, localOccurrence);
   rejectContract(() => readSyntaxAset(f.memory, aset, f.vocabulary), "invalid-child-occurrence");
 }
@@ -251,6 +299,8 @@ function wrapSyntaxAset(memory: Memory, tag: LinkHandle, rootOccurrence: LinkHan
   const aset = builder.finish(leaf);
   const wrongVocabulary: SyntaxAsetVocabulary = Object.freeze({
     tag: f.carrierX,
+    knownRoles: f.vocabulary.knownRoles,
+    rules: f.vocabulary.rules,
     childRoles: f.vocabulary.childRoles,
   });
   rejectContract(() => readSyntaxAset(f.memory, aset, wrongVocabulary), "invalid-aset");
