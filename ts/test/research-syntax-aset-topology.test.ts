@@ -152,6 +152,7 @@ function triadFixture(): {
   const s0Cost = s0.memory.linkCount - s0.baseline;
   const triadCost = triads.memory.linkCount - triads.baseline;
   assert(triadCost < s0Cost, `chained triad should use fewer corpus Links: triad=${triadCost}, S0=${s0Cost}`);
+  console.log(`[research-syntax-aset] corpus links after shared vocabulary/carriers: S0=${s0Cost}, chained-triad=${triadCost}`);
 }
 
 // Equivalent construction in independent Memories yields the same normalized
@@ -168,6 +169,70 @@ function triadFixture(): {
     JSON.stringify(normalizeResearchRead(bRead, b.vocabulary, b.builder.carrierA, b.builder.carrierB)),
     "equivalent Memories produce identical normalized syntax",
   );
+}
+
+// Unrelated host allocation cannot change canonical syntax structure: it may
+// change opaque handles/slots, but no topology relation or normalized read.
+{
+  const a = triadFixture();
+  const b = triadFixture();
+  const junk = b.memory.ensureStartSelfClosed(b.builder.carrierA);
+  b.memory.ensure(junk, b.builder.carrierB);
+  const aAset = a.builder.finish(buildResearchCorpus(a.builder));
+  const bAset = b.builder.finish(buildResearchCorpus(b.builder));
+  const aRead = readChainedTriadSyntaxAset(a.memory, aAset, a.vocabulary);
+  const bRead = readChainedTriadSyntaxAset(b.memory, bAset, b.vocabulary);
+  same(
+    JSON.stringify(normalizeResearchRead(aRead, a.vocabulary, a.builder.carrierA, a.builder.carrierB)),
+    JSON.stringify(normalizeResearchRead(bRead, b.vocabulary, b.builder.carrierA, b.builder.carrierB)),
+    "unrelated allocation does not change normalized syntax",
+  );
+}
+
+// Swapping the RM-style vertical/horizontal orientation is not an alternative
+// canonical encoding: the reader sees an unknown kind and fails closed.
+{
+  const f = triadFixture();
+  const field = triad(f.memory, f.vocabulary.roles.value, f.memory.root, f.builder.carrierA);
+  const horizontal = f.memory.ensure(f.memory.root, field);
+  const dualizedOccurrence = f.memory.ensure(horizontal, f.vocabulary.kinds.Literal);
+  const aset = f.memory.ensure(f.vocabulary.tag, dualizedOccurrence);
+  reject(() => readChainedTriadSyntaxAset(f.memory, aset, f.vocabulary), "unknown-kind");
+}
+
+// The same fail-closed rule applies inside a field chain: a swapped field pair
+// cannot be reinterpreted heuristically as the intended role(subject,object).
+{
+  const f = triadFixture();
+  const horizontal = f.memory.ensure(f.memory.root, f.builder.carrierA);
+  const dualizedField = f.memory.ensure(horizontal, f.vocabulary.roles.value);
+  const occurrence = triad(f.memory, f.vocabulary.kinds.Literal, f.memory.root, dualizedField);
+  const aset = f.memory.ensure(f.vocabulary.tag, occurrence);
+  reject(() => readChainedTriadSyntaxAset(f.memory, aset, f.vocabulary), "unknown-role");
+}
+
+// Provenance remains external metadata. Different source coordinates attached
+// to the same occurrence cannot alter the SyntaxAset topology or normalized read.
+{
+  const f = triadFixture();
+  const root = buildResearchCorpus(f.builder);
+  const aset = f.builder.finish(root);
+  const before = normalizeResearchRead(
+    readChainedTriadSyntaxAset(f.memory, aset, f.vocabulary),
+    f.vocabulary,
+    f.builder.carrierA,
+    f.builder.carrierB,
+  );
+  const provenanceA = new Map([[root, Object.freeze({ source: "a.mts", start: 0, end: 1 })]]);
+  const provenanceB = new Map([[root, Object.freeze({ source: "b.mts", start: 90, end: 120 })]]);
+  assert(provenanceA.get(root)?.source !== provenanceB.get(root)?.source, "research provenance differs");
+  const after = normalizeResearchRead(
+    readChainedTriadSyntaxAset(f.memory, aset, f.vocabulary),
+    f.vocabulary,
+    f.builder.carrierA,
+    f.builder.carrierB,
+  );
+  same(JSON.stringify(after), JSON.stringify(before), "external provenance cannot change topology");
 }
 
 // Reader is a ReadMemory-only trust boundary and must reject a child occurrence
