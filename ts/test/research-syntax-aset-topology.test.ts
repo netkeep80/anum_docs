@@ -1,15 +1,15 @@
 import { Memory, type LinkHandle, type LinkPoles, type ReadMemory } from "../src/memory.js";
 import {
-  SyntaxAsetBuilder,
   materializeSyntaxAsetVocabulary,
-  readSyntaxAset,
 } from "../src/tooling/syntax-aset.js";
 import {
   ChainedTriadSyntaxAsetBuilder,
+  LegacyS0SyntaxAsetBuilder,
   ResearchSyntaxAsetError,
   buildResearchCorpus,
   normalizeResearchRead,
   readChainedTriadSyntaxAset,
+  readLegacyS0SyntaxAset,
   triad,
   type ResearchBuilder,
 } from "../research/syntax-aset-topology.js";
@@ -52,7 +52,7 @@ class ReadProbe implements ReadMemory {
 function s0Fixture(): {
   readonly memory: Memory;
   readonly vocabulary: ReturnType<typeof materializeSyntaxAsetVocabulary>;
-  readonly builder: ResearchBuilder;
+  readonly builder: LegacyS0SyntaxAsetBuilder;
   readonly baseline: number;
 } {
   const memory = new Memory();
@@ -61,15 +61,7 @@ function s0Fixture(): {
   const carrierA = memory.ensure(vocabulary.tag, vocabulary.kinds.Literal);
   const carrierB = memory.ensure(vocabulary.tag, vocabulary.kinds.ContextPronoun);
   const baseline = memory.linkCount;
-  const delegate = new SyntaxAsetBuilder(memory, vocabulary);
-  const builder: ResearchBuilder = {
-    memory,
-    vocabulary,
-    carrierA,
-    carrierB,
-    addOccurrence: (kind, fields) => delegate.addOccurrence(kind, fields),
-    finish: (root) => delegate.finish(root),
-  };
+  const builder = new LegacyS0SyntaxAsetBuilder(memory, vocabulary, carrierA, carrierB);
   return Object.freeze({ memory, vocabulary, builder, baseline });
 }
 
@@ -145,8 +137,8 @@ function triadFixture(): {
   same(read.occurrences[0]?.fields.length, 0, "empty Round has an empty structural field chain");
 }
 
-// The same full corpus must round-trip through S0 and the chained-triad
-// candidate to the same syntax-level normalized structure.
+// The historical S0 control and the chained-triad candidate must normalize to
+// the same syntax-level corpus, while the selected candidate remains smaller.
 {
   const s0 = s0Fixture();
   const triads = triadFixture();
@@ -154,7 +146,7 @@ function triadFixture(): {
   const triadRoot = buildResearchCorpus(triads.builder);
   const s0Aset = s0.builder.finish(s0Root);
   const triadAset = triads.builder.finish(triadRoot);
-  const s0Read = readSyntaxAset(s0.memory, s0Aset, s0.vocabulary);
+  const s0Read = readLegacyS0SyntaxAset(s0.memory, s0Aset, s0.vocabulary);
   const triadRead = readChainedTriadSyntaxAset(triads.memory, triadAset, triads.vocabulary);
 
   const s0Normalized = normalizeResearchRead(s0Read, s0.vocabulary, s0.builder.carrierA, s0.builder.carrierB);

@@ -22,13 +22,13 @@ function same<T>(actual: T, expected: T, message: string): void {
 
 function rejectContract(
   effect: () => unknown,
-  code: SyntaxAsetContractError["code"],
+  code: string,
 ): void {
   try {
     effect();
   } catch (error) {
     assert(error instanceof SyntaxAsetContractError, `expected SyntaxAsetContractError, got ${String(error)}`);
-    same(error.code, code, "SyntaxAset error code");
+    same(String(error.code), code, "SyntaxAset error code");
     return;
   }
   throw new Error(`expected SyntaxAset rejection: ${code}`);
@@ -113,7 +113,7 @@ class ReadProbe implements ReadMemory {
   same(firstMemory.linkCount, before, "vocabulary rematerialization is idempotent");
 }
 
-// Public tooling reuses S0 occurrence identity and explicit child roles.
+// Public tooling preserves occurrence identity and explicit structural roles.
 {
   const memory = new Memory();
   const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
@@ -141,9 +141,11 @@ class ReadProbe implements ReadMemory {
 {
   const memory = new Memory();
   const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
-  const nameCarrier = memory.ensureStartSelfClosed(vocabulary.kinds.Definition);
   const valueCarrier = memory.ensureEndSelfClosed(vocabulary.kinds.Literal);
   const builder = new SyntaxAsetBuilder(memory, vocabulary);
+  const name = builder.addOccurrence(vocabulary.kinds.Literal, [
+    { role: vocabulary.roles.value, value: memory.ensureStartSelfClosed(vocabulary.kinds.Definition) },
+  ]);
   const value = builder.addOccurrence(vocabulary.kinds.Literal, [
     { role: vocabulary.roles.value, value: valueCarrier },
   ]);
@@ -155,20 +157,20 @@ class ReadProbe implements ReadMemory {
     { role: vocabulary.roles.operand, value: sequence },
   ]);
   const definition = builder.addOccurrence(vocabulary.kinds.Definition, [
-    { role: vocabulary.roles.name, value: nameCarrier },
+    { role: vocabulary.roles.name, value: name },
     { role: vocabulary.roles.body, value: unary },
   ]);
   const statement = builder.addOccurrence(vocabulary.kinds.Statement, [
     { role: vocabulary.roles.expression, value: definition },
   ]);
   const read = readSyntaxAset(memory, builder.finish(statement), vocabulary);
-  same(read.occurrences[1]?.fields.length, 2, "repeated ordered items remain two structural fields");
-  same(read.occurrences[1]?.fields[0]?.value, value, "first ordered item retained");
-  same(read.occurrences[1]?.fields[1]?.value, value, "second ordered item retained");
-  same(read.occurrences[2]?.fields[0]?.role, vocabulary.roles.operand, "unary operand role retained");
-  same(read.occurrences[3]?.fields[0]?.role, vocabulary.roles.name, "definition name role retained");
-  same(read.occurrences[3]?.fields[1]?.role, vocabulary.roles.body, "definition body role retained");
-  same(read.occurrences[4]?.fields[0]?.role, vocabulary.roles.expression, "statement expression role retained");
+  same(read.occurrences[2]?.fields.length, 2, "repeated ordered items remain two structural fields");
+  same(read.occurrences[2]?.fields[0]?.value, value, "first ordered item retained");
+  same(read.occurrences[2]?.fields[1]?.value, value, "second ordered item retained");
+  same(read.occurrences[3]?.fields[0]?.role, vocabulary.roles.operand, "unary operand role retained");
+  same(read.occurrences[4]?.fields[0]?.role, vocabulary.roles.name, "definition name role retained");
+  same(read.occurrences[4]?.fields[1]?.role, vocabulary.roles.body, "definition body role retained");
+  same(read.occurrences[5]?.fields[0]?.role, vocabulary.roles.expression, "statement expression role retained");
 }
 
 // Child-bearing roles remain fail-closed and cannot point at arbitrary carrier
@@ -191,8 +193,11 @@ class ReadProbe implements ReadMemory {
 {
   const memory = new Memory();
   const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
+  const carrier = memory.ensureStartSelfClosed(vocabulary.kinds.Literal);
   const builder = new SyntaxAsetBuilder(memory, vocabulary);
-  const leaf = builder.addOccurrence(vocabulary.kinds.Literal, []);
+  const leaf = builder.addOccurrence(vocabulary.kinds.Literal, [
+    { role: vocabulary.roles.value, value: carrier },
+  ]);
   const aset = builder.finish(leaf);
   const provenanceA = new Map([[leaf, { source: "a.mts", start: 0, end: 1 }]]);
   const provenanceB = new Map([[leaf, { source: "b.mts", start: 30, end: 50 }]]);
@@ -204,4 +209,127 @@ class ReadProbe implements ReadMemory {
   same(first.root, second.root, "repeat read is deterministic");
   same(memory.linkCount, before, "read and provenance lookup do not materialize Links");
   assert(probe.polesCalls > 0, "reader inspects structural topology");
+}
+
+// #970 selected the chained-triad form as the production target. A single
+// Literal occurrence must therefore be encoded directly as:
+//
+//   F1 = valueRole ⟼ (R ⟼ carrier)
+//   O1 = LiteralKind ⟼ (R ⟼ F1)
+//   A  = SyntaxTag ⟼ O1
+{
+  const memory = new Memory();
+  const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
+  const carrier = memory.ensureStartSelfClosed(vocabulary.tag);
+  const builder = new SyntaxAsetBuilder(memory, vocabulary);
+  const occurrence = builder.addOccurrence(vocabulary.kinds.Literal, [
+    { role: vocabulary.roles.value, value: carrier },
+  ]);
+  const aset = builder.finish(occurrence);
+
+  const fieldHorizontal = memory.find(memory.root, carrier);
+  assert(fieldHorizontal !== undefined, "field horizontal Link exists");
+  const field = memory.find(vocabulary.roles.value, fieldHorizontal);
+  assert(field !== undefined, "field triad exists");
+  const occurrenceHorizontal = memory.find(memory.root, field);
+  assert(occurrenceHorizontal !== undefined, "occurrence horizontal Link exists");
+  const expectedOccurrence = memory.find(vocabulary.kinds.Literal, occurrenceHorizontal);
+  assert(expectedOccurrence !== undefined, "occurrence triad exists");
+  same(occurrence, expectedOccurrence, "production occurrence uses chained-triad topology");
+  same(memory.find(vocabulary.tag, occurrence), aset, "SyntaxAset wrapper points directly at final occurrence");
+}
+
+// #973 closes the syntax language: a Literal is exactly one value carrier.
+{
+  const memory = new Memory();
+  const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
+  const builder = new SyntaxAsetBuilder(memory, vocabulary);
+  rejectContract(
+    () => builder.addOccurrence(vocabulary.kinds.Literal, []),
+    "invalid-grammar",
+  );
+  const carrier = memory.ensureStartSelfClosed(vocabulary.tag);
+  rejectContract(
+    () => builder.addOccurrence(vocabulary.kinds.Literal, [
+      { role: vocabulary.roles.value, value: carrier },
+      { role: vocabulary.roles.value, value: carrier },
+    ]),
+    "invalid-grammar",
+  );
+}
+
+// The finite grammar rejects unknown kinds/roles instead of accepting any
+// structurally readable Link as syntax vocabulary.
+{
+  const memory = new Memory();
+  const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
+  const builder = new SyntaxAsetBuilder(memory, vocabulary);
+  const carrier = memory.ensureStartSelfClosed(vocabulary.tag);
+  const unknownKind = memory.ensureStartSelfClosed(carrier);
+  const unknownRole = memory.ensureEndSelfClosed(carrier);
+  rejectContract(
+    () => builder.addOccurrence(unknownKind, [
+      { role: vocabulary.roles.value, value: carrier },
+    ]),
+    "unknown-kind",
+  );
+  rejectContract(
+    () => builder.addOccurrence(vocabulary.kinds.Literal, [
+      { role: unknownRole, value: carrier },
+    ]),
+    "unknown-role",
+  );
+}
+
+// Definition.name is a syntax child in the actual parser grammar, not a free
+// carrier. This is the old global-childRoles gap that #973 must close.
+{
+  const memory = new Memory();
+  const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
+  const builder = new SyntaxAsetBuilder(memory, vocabulary);
+  const carrier = memory.ensureStartSelfClosed(vocabulary.kinds.Definition);
+  const body = builder.addOccurrence(vocabulary.kinds.Literal, [
+    { role: vocabulary.roles.value, value: memory.ensureEndSelfClosed(carrier) },
+  ]);
+  rejectContract(
+    () => builder.addOccurrence(vocabulary.kinds.Definition, [
+      { role: vocabulary.roles.name, value: carrier },
+      { role: vocabulary.roles.body, value: body },
+    ]),
+    "invalid-child-occurrence",
+  );
+}
+
+// Cardinality is per kind: Sequence exists only for 2+ adjacent forms, while
+// empty File/Set and empty Round/Square are valid source syntax.
+{
+  const memory = new Memory();
+  const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
+  const builder = new SyntaxAsetBuilder(memory, vocabulary);
+  const carrier = memory.ensureStartSelfClosed(vocabulary.kinds.Literal);
+  const child = builder.addOccurrence(vocabulary.kinds.Literal, [
+    { role: vocabulary.roles.value, value: carrier },
+  ]);
+  rejectContract(
+    () => builder.addOccurrence(vocabulary.kinds.Sequence, [
+      { role: vocabulary.roles.item, value: child },
+    ]),
+    "invalid-grammar",
+  );
+}
+
+{
+  const memory = new Memory();
+  const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
+  const fileBuilder = new SyntaxAsetBuilder(memory, vocabulary);
+  const file = fileBuilder.addOccurrence(vocabulary.kinds.File, []);
+  same(readSyntaxAset(memory, fileBuilder.finish(file), vocabulary).root, file, "empty File accepted");
+}
+
+{
+  const memory = new Memory();
+  const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
+  const roundBuilder = new SyntaxAsetBuilder(memory, vocabulary);
+  const round = roundBuilder.addOccurrence(vocabulary.kinds.Round, []);
+  same(readSyntaxAset(memory, roundBuilder.finish(round), vocabulary).root, round, "empty Round accepted");
 }
