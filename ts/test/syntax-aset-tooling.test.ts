@@ -205,3 +205,34 @@ class ReadProbe implements ReadMemory {
   same(memory.linkCount, before, "read and provenance lookup do not materialize Links");
   assert(probe.polesCalls > 0, "reader inspects structural topology");
 }
+
+// #970 selected the chained-triad form as the production target. A single
+// Literal occurrence must therefore be encoded directly as:
+//
+//   F1 = valueRole ⟼ (R ⟼ carrier)
+//   O1 = LiteralKind ⟼ (R ⟼ F1)
+//   A  = SyntaxTag ⟼ O1
+//
+// This test intentionally names only the public structural equation; no
+// research helper is imported into production tooling.
+{
+  const memory = new Memory();
+  const vocabulary = materializeSyntaxAsetVocabulary(memory, vocabularySeed(memory));
+  const carrier = memory.ensureStartSelfClosed(vocabulary.tag);
+  const builder = new SyntaxAsetBuilder(memory, vocabulary);
+  const occurrence = builder.addOccurrence(vocabulary.kinds.Literal, [
+    { role: vocabulary.roles.value, value: carrier },
+  ]);
+  const aset = builder.finish(occurrence);
+
+  const fieldHorizontal = memory.find(memory.root, carrier);
+  assert(fieldHorizontal !== undefined, "field horizontal Link exists");
+  const field = memory.find(vocabulary.roles.value, fieldHorizontal);
+  assert(field !== undefined, "field triad exists");
+  const occurrenceHorizontal = memory.find(memory.root, field);
+  assert(occurrenceHorizontal !== undefined, "occurrence horizontal Link exists");
+  const expectedOccurrence = memory.find(vocabulary.kinds.Literal, occurrenceHorizontal);
+  assert(expectedOccurrence !== undefined, "occurrence triad exists");
+  same(occurrence, expectedOccurrence, "production occurrence uses chained-triad topology");
+  same(memory.find(vocabulary.tag, occurrence), aset, "SyntaxAset wrapper points directly at final occurrence");
+}
