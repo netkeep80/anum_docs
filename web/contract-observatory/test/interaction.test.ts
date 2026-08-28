@@ -117,10 +117,24 @@ same(decoded.selectedVersionId, versionSelected.selectedVersionId, "hash restore
 same(decoded.selectedStage, versionSelected.selectedStage, "hash restores selected stage");
 same(encodeObservatoryHash(decoded), encoded, "hash round-trip is deterministic");
 
-const unknown = decodeObservatoryHash("#v=missing&s=unknown&item=%3Cscript%3E", projection);
+const unknown = decodeObservatoryHash(
+  "#v=missing&s=unknown&item=%3Cscript%3E&f=negative&f=unknown&f=negative&x=NaN&y=Infinity&z=99",
+  projection,
+);
 same(unknown.selectedVersionId, "mts-contract/v0.11", "unknown version fails closed to projected current version");
 same(unknown.selectedStage, null, "unknown methodology stage is not fabricated");
-same(unknown.selectedItemId, "<script>", "item identity remains data and is not interpreted as markup");
+same(unknown.selectedItemId, null, "unknown item fails closed rather than surviving as opaque browser-only state");
+same(unknown.filters.join(","), "negative", "unknown filters are dropped and known duplicates normalize");
+same(unknown.viewport.x, 0, "invalid x fails closed");
+same(unknown.viewport.y, 0, "invalid y fails closed");
+same(unknown.viewport.scale, 1.8, "zoom is clamped to the canonical maximum");
+
+const lowZoom = decodeObservatoryHash("#z=-5", projection);
+same(lowZoom.viewport.scale, 0.7, "zoom is clamped to the canonical minimum");
+
+const unorderedFilters = decodeObservatoryHash("#f=previous&f=accepted", projection);
+same(unorderedFilters.filters.join(","), "accepted,previous", "known filters normalize to canonical order");
+same(encodeObservatoryHash(unorderedFilters), "#v=mts-contract%2Fv0.11&f=accepted&f=previous", "canonical hash re-encodes normalized filters deterministically");
 
 same(
   JSON.stringify(buildInteractiveMethodologyModel(projection, versionSelected)),
