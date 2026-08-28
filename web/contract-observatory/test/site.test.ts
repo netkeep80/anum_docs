@@ -11,7 +11,6 @@ import {
 } from "../src/contract-index.js";
 import { buildMethodologyProjection } from "../src/methodology-projection.js";
 import { renderContractObservatoryHtml } from "../src/site.js";
-import "./interaction.test.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Contract Observatory V3b/V3c/V4c: ${message}`);
@@ -99,8 +98,8 @@ assert(realHtml.includes("CURRENT"), "current classification remains explicit in
 assert(realHtml.includes("PREVIOUS"), "previous classification remains explicit in V4c");
 assert(realHtml.includes("Method/lifecycle relation"), "methodology relation authority is textually distinguished");
 assert(realHtml.includes("Semantic topology Link: not rendered in this view"), "methodology view cannot be mistaken for MTS semantic Links");
-assert(realHtml.includes("addEventListener(\"hashchange\""), "deep-link back/forward restoration is wired in the client controller");
-assert(realHtml.includes("addEventListener(\"keydown\""), "keyboard stage/version activation is wired in the client controller");
+assert(realHtml.includes("data-observatory-controller=\"shared-kernel\""), "static page embeds the shared canonical interaction kernel controller");
+assert(!realHtml.includes("const readState ="), "static page no longer owns the old handwritten hash parser");
 
 const v010Position = realHtml.indexOf("mts-contract/v0.10");
 const v011Position = realHtml.indexOf("mts-contract/v0.11");
