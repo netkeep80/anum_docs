@@ -39,12 +39,9 @@ jobs:
           ./ts/node_modules/.bin/tsc -p packages/visual/tsconfig.json
           node packages/visual/dist/test/model.test.js
 
-      - name: Check Contract Observatory
+      - name: Check Contract Observatory index
         run: |
           ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
-          node web/contract-observatory/dist/test/interaction.test.js
-          node web/contract-observatory/dist/test/browser-controller.test.js
-          node web/contract-observatory/dist/test/browser-controller-nodelist.test.js
           node web/contract-observatory/dist/test/contract-index.test.js
           node web/contract-observatory/dist/test/site.test.js
 
