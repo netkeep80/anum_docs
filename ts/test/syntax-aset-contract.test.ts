@@ -1,4 +1,3 @@
-import { materializeExactSequence } from "../src/exact-sequence.js";
 import {
   Memory,
   type LinkHandle,
@@ -106,21 +105,21 @@ class ReadProbe implements ReadMemory {
   incoming(end: LinkHandle): readonly LinkHandle[] { return this.source.incoming(end); }
 }
 
-function appendOccurrenceCell(memory: Memory, previous: LinkHandle, descriptor: LinkHandle): LinkHandle {
-  return memory.ensureStartSelfClosed(memory.ensure(previous, descriptor));
-}
-
-function wrapSyntaxAset(
+function triad(
   memory: Memory,
-  tag: LinkHandle,
-  occurrenceOrder: LinkHandle,
-  rootOccurrence: LinkHandle,
+  relation: LinkHandle,
+  subject: LinkHandle,
+  object: LinkHandle,
 ): LinkHandle {
-  return memory.ensure(tag, memory.ensure(occurrenceOrder, rootOccurrence));
+  return memory.ensure(relation, memory.ensure(subject, object));
 }
 
-// Equal syntax descriptors remain distinct occurrences because occurrence identity
-// is the structural ExactSequence Cell, never descriptor identity or host index.
+function wrapSyntaxAset(memory: Memory, tag: LinkHandle, rootOccurrence: LinkHandle): LinkHandle {
+  return memory.ensure(tag, rootOccurrence);
+}
+
+// Equal syntax descriptors remain distinct occurrences because the previous
+// occurrence is structurally embedded in each chained triad.
 {
   const f = fixture();
   const builder = new SyntaxAsetBuilder(f.memory, f.vocabulary);
@@ -209,7 +208,7 @@ function wrapSyntaxAset(
 }
 
 // A child-bearing role may reference only an already-issued occurrence in this
-// builder's post-order sequence; a foreign occurrence cannot become local syntax.
+// builder's post-order chain; a foreign occurrence cannot become local syntax.
 {
   const f = fixture();
   const otherBuilder = new SyntaxAsetBuilder(f.memory, f.vocabulary);
@@ -222,48 +221,26 @@ function wrapSyntaxAset(
   );
 }
 
-// Reader rejects a child reference that is not a prior occurrence of this Aset.
+// Reader applies the same prior-membership rule to arbitrary chained-triad input.
 {
   const f = fixture();
   const foreignBuilder = new SyntaxAsetBuilder(f.memory, f.vocabulary);
   const foreign = foreignBuilder.addOccurrence(f.leafKind, []);
   foreignBuilder.finish(foreign);
 
-  const field = f.memory.ensure(f.startRole, foreign);
-  const fieldSequence = materializeExactSequence(f.memory, [field]);
-  const descriptor = f.memory.ensure(f.linkKind, fieldSequence);
-  const localOccurrence = appendOccurrenceCell(f.memory, f.memory.root, descriptor);
-  const aset = wrapSyntaxAset(f.memory, f.vocabulary.tag, localOccurrence, localOccurrence);
+  const field = triad(f.memory, f.startRole, f.memory.root, foreign);
+  const localOccurrence = triad(f.memory, f.linkKind, f.memory.root, field);
+  const aset = wrapSyntaxAset(f.memory, f.vocabulary.tag, localOccurrence);
   rejectContract(() => readSyntaxAset(f.memory, aset, f.vocabulary), "invalid-child-occurrence");
 }
 
-// Exact-sequence shape is mandatory for descriptor fields.
+// The explicit root supplied to the builder must be the final occurrence.
 {
   const f = fixture();
-  const notAFieldSequence = f.memory.ensure(f.leafKind, f.carrierX);
-  const descriptor = f.memory.ensure(f.leafKind, notAFieldSequence);
-  const occurrence = appendOccurrenceCell(f.memory, f.memory.root, descriptor);
-  const aset = wrapSyntaxAset(f.memory, f.vocabulary.tag, occurrence, occurrence);
-  rejectContract(() => readSyntaxAset(f.memory, aset, f.vocabulary), "invalid-field-sequence");
-}
-
-// Exact-sequence shape is mandatory for occurrence order.
-{
-  const f = fixture();
-  const notAnOccurrenceSequence = f.memory.ensure(f.leafKind, f.carrierX);
-  const fakeRoot = f.memory.ensureStartSelfClosed(f.carrierX);
-  const aset = wrapSyntaxAset(f.memory, f.vocabulary.tag, notAnOccurrenceSequence, fakeRoot);
-  rejectContract(() => readSyntaxAset(f.memory, aset, f.vocabulary), "invalid-occurrence-sequence");
-}
-
-// The explicit root in the header must be the final structural occurrence Cell.
-{
-  const f = fixture();
-  const descriptor = f.memory.ensure(f.leafKind, materializeExactSequence(f.memory, []));
-  const first = appendOccurrenceCell(f.memory, f.memory.root, descriptor);
-  const second = appendOccurrenceCell(f.memory, first, descriptor);
-  const aset = wrapSyntaxAset(f.memory, f.vocabulary.tag, second, first);
-  rejectContract(() => readSyntaxAset(f.memory, aset, f.vocabulary), "root-not-final");
+  const builder = new SyntaxAsetBuilder(f.memory, f.vocabulary);
+  const first = builder.addOccurrence(f.leafKind, []);
+  builder.addOccurrence(f.leafKind, []);
+  rejectContract(() => builder.finish(first), "root-not-final");
 }
 
 // Syntax tag and Link ownership are checked structurally, not by scalar IDs.
