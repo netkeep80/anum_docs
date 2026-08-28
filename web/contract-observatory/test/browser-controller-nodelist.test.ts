@@ -76,7 +76,7 @@ const kernel: ObservatoryInteractionKernel = Object.freeze({
   initialState: () => state,
   decode: () => state,
   encode: () => "#",
-  reduce: (current) => current,
+  reduce: (current: ObservatoryInteractionState) => current,
   isVersionVisible: () => true,
 });
 
