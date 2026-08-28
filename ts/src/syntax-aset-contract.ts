@@ -10,6 +10,11 @@ export type SyntaxAsetContractErrorCode =
   | "invalid-field-sequence"
   | "invalid-occurrence-sequence"
   | "invalid-child-occurrence"
+  | "invalid-carrier-target"
+  | "unknown-kind"
+  | "unknown-role"
+  | "invalid-grammar"
+  | "unreachable-occurrence"
   | "root-not-final";
 
 export class SyntaxAsetContractError extends Error {
@@ -20,8 +25,28 @@ export class SyntaxAsetContractError extends Error {
   }
 }
 
+export type SyntaxAsetTargetClass = "child" | "carrier";
+
+export interface SyntaxAsetFieldRule {
+  readonly role: LinkHandle;
+  readonly target: SyntaxAsetTargetClass;
+  readonly min: number;
+  readonly max: number | null;
+}
+
+export interface SyntaxAsetKindRule {
+  readonly kind: LinkHandle;
+  readonly fields: readonly SyntaxAsetFieldRule[];
+}
+
 export interface SyntaxAsetVocabulary {
   readonly tag: LinkHandle;
+  readonly knownRoles: readonly LinkHandle[];
+  readonly rules: readonly SyntaxAsetKindRule[];
+  /**
+   * Derived convenience for research/inspection only. Production validation
+   * is per-kind through `rules`; this global list is not grammar authority.
+   */
   readonly childRoles: readonly LinkHandle[];
 }
 
@@ -51,11 +76,23 @@ function contractError(code: SyntaxAsetContractErrorCode): never {
   throw new SyntaxAsetContractError(code);
 }
 
-function isChildRole(
+function includesHandle(values: readonly LinkHandle[], candidate: LinkHandle): boolean {
+  return values.some((value) => value === candidate);
+}
+
+function kindRule(
   vocabulary: SyntaxAsetVocabulary,
-  role: LinkHandle,
-): boolean {
-  return vocabulary.childRoles.some((candidate) => candidate === role);
+  kind: LinkHandle,
+): SyntaxAsetKindRule {
+  const rule = vocabulary.rules.find((candidate) => candidate.kind === kind);
+  return rule ?? contractError("unknown-kind");
+}
+
+function kindRuleOrUndefined(
+  vocabulary: SyntaxAsetVocabulary,
+  kind: LinkHandle,
+): SyntaxAsetKindRule | undefined {
+  return vocabulary.rules.find((candidate) => candidate.kind === kind);
 }
 
 function materializeTriad(
@@ -105,6 +142,101 @@ function readFieldChain(
   return Object.freeze(reversed.reverse());
 }
 
+function isOccurrenceShaped(
+  memory: ReadMemory,
+  value: LinkHandle,
+  vocabulary: SyntaxAsetVocabulary,
+): boolean {
+  try {
+    const vertical = memory.poles(value);
+    if (kindRuleOrUndefined(vocabulary, vertical.start) === undefined) return false;
+    memory.poles(vertical.end);
+    return true;
+  } catch (error) {
+    if (error instanceof MemoryError) return false;
+    throw error;
+  }
+}
+
+function validateTarget(
+  memory: ReadMemory,
+  vocabulary: SyntaxAsetVocabulary,
+  targetClass: SyntaxAsetTargetClass,
+  value: LinkHandle,
+  priorOccurrences: ReadonlySet<LinkHandle>,
+): void {
+  if (targetClass === "child") {
+    if (!priorOccurrences.has(value)) contractError("invalid-child-occurrence");
+    return;
+  }
+
+  if (priorOccurrences.has(value) || isOccurrenceShaped(memory, value, vocabulary)) {
+    contractError("invalid-carrier-target");
+  }
+}
+
+function validateGrammar(
+  memory: ReadMemory,
+  vocabulary: SyntaxAsetVocabulary,
+  kind: LinkHandle,
+  fields: readonly SyntaxAsetField[],
+  priorOccurrences: ReadonlySet<LinkHandle>,
+): void {
+  const rule = kindRule(vocabulary, kind);
+
+  for (const field of fields) {
+    if (!includesHandle(vocabulary.knownRoles, field.role)) {
+      contractError("unknown-role");
+    }
+  }
+
+  let fieldIndex = 0;
+  for (const fieldRule of rule.fields) {
+    let count = 0;
+    while (
+      fieldIndex < fields.length &&
+      fields[fieldIndex]?.role === fieldRule.role &&
+      (fieldRule.max === null || count < fieldRule.max)
+    ) {
+      const field = fields[fieldIndex];
+      if (field === undefined) contractError("invalid-grammar");
+      validateTarget(memory, vocabulary, fieldRule.target, field.value, priorOccurrences);
+      count += 1;
+      fieldIndex += 1;
+    }
+    if (count < fieldRule.min) contractError("invalid-grammar");
+  }
+
+  if (fieldIndex !== fields.length) contractError("invalid-grammar");
+}
+
+function validateReachability(
+  root: LinkHandle,
+  occurrences: readonly SyntaxAsetOccurrence[],
+  vocabulary: SyntaxAsetVocabulary,
+): void {
+  const byHandle = new Map<LinkHandle, SyntaxAsetOccurrence>(
+    occurrences.map((occurrence) => [occurrence.occurrence, occurrence]),
+  );
+  const reachable = new Set<LinkHandle>();
+  const pending: LinkHandle[] = [root];
+
+  while (pending.length > 0) {
+    const handle = pending.pop();
+    if (handle === undefined || reachable.has(handle)) continue;
+    const occurrence = byHandle.get(handle);
+    if (occurrence === undefined) contractError("invalid-child-occurrence");
+    reachable.add(handle);
+    const rule = kindRule(vocabulary, occurrence.kind);
+    for (const field of occurrence.fields) {
+      const fieldRule = rule.fields.find((candidate) => candidate.role === field.role);
+      if (fieldRule?.target === "child") pending.push(field.value);
+    }
+  }
+
+  if (reachable.size !== occurrences.length) contractError("unreachable-occurrence");
+}
+
 /**
  * Canonical syntax-only chained-triad topology selected by #970:
  *
@@ -122,6 +254,7 @@ function readFieldChain(
 export class SyntaxAsetBuilder {
   private occurrenceOrder: LinkHandle;
   private readonly occurrences = new Set<LinkHandle>();
+  private readonly occurrenceReads: SyntaxAsetOccurrence[] = [];
   private finished = false;
 
   constructor(
@@ -139,11 +272,10 @@ export class SyntaxAsetBuilder {
       return contractError("invalid-aset");
     }
 
+    validateGrammar(this.memory, this.vocabulary, kind, fields, this.occurrences);
+
     let fieldOrder = this.memory.root;
     for (const { role, value } of fields) {
-      if (isChildRole(this.vocabulary, role) && !this.occurrences.has(value)) {
-        return contractError("invalid-child-occurrence");
-      }
       fieldOrder = materializeTriad(this.memory, role, fieldOrder, value);
     }
 
@@ -155,6 +287,11 @@ export class SyntaxAsetBuilder {
     );
     this.occurrenceOrder = occurrence;
     this.occurrences.add(occurrence);
+    this.occurrenceReads.push(Object.freeze({
+      occurrence,
+      kind,
+      fields: Object.freeze([...fields]),
+    }));
     return occurrence;
   }
 
@@ -167,6 +304,7 @@ export class SyntaxAsetBuilder {
       return contractError("root-not-final");
     }
 
+    validateReachability(root, this.occurrenceReads, this.vocabulary);
     this.finished = true;
     return this.memory.ensure(this.vocabulary.tag, this.occurrenceOrder);
   }
@@ -204,6 +342,7 @@ export function readSyntaxAset(
     if (visited.has(current)) return contractError("invalid-occurrence-sequence");
     visited.add(current);
     const occurrence = readTriad(memory, current, "invalid-occurrence-sequence");
+    kindRule(vocabulary, occurrence.relation);
     reversed.push(Object.freeze({
       occurrence: current,
       kind: occurrence.relation,
@@ -215,13 +354,16 @@ export function readSyntaxAset(
   const occurrences = [...reversed].reverse();
   const priorOccurrences = new Set<LinkHandle>();
   for (const occurrence of occurrences) {
-    for (const field of occurrence.fields) {
-      if (isChildRole(vocabulary, field.role) && !priorOccurrences.has(field.value)) {
-        return contractError("invalid-child-occurrence");
-      }
-    }
+    validateGrammar(
+      memory,
+      vocabulary,
+      occurrence.kind,
+      occurrence.fields,
+      priorOccurrences,
+    );
     priorOccurrences.add(occurrence.occurrence);
   }
+  validateReachability(declaredRoot, occurrences, vocabulary);
 
   return Object.freeze({
     root: declaredRoot,
