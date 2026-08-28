@@ -14,6 +14,18 @@ export const METHODOLOGY_STAGE_ORDER: readonly MethodologyStage[] = Object.freez
   "released",
 ]);
 
+export const OBSERVATORY_FILTERS = Object.freeze([
+  "accepted",
+  "candidate",
+  "current",
+  "evidence",
+  "negative",
+  "positive",
+  "previous",
+] as const);
+
+export type ObservatoryFilter = typeof OBSERVATORY_FILTERS[number];
+
 export interface ObservatoryViewport {
   readonly x: number;
   readonly y: number;
@@ -33,7 +45,10 @@ export type ObservatoryInteractionAction =
   | { readonly type: "select-stage"; readonly stage: MethodologyStage | null }
   | { readonly type: "select-item"; readonly itemId: string | null }
   | { readonly type: "set-filters"; readonly filters: readonly string[] }
-  | { readonly type: "set-viewport"; readonly viewport: ObservatoryViewport };
+  | { readonly type: "toggle-filter"; readonly filter: string }
+  | { readonly type: "set-viewport"; readonly viewport: ObservatoryViewport }
+  | { readonly type: "zoom"; readonly delta: number }
+  | { readonly type: "reset-viewport" };
 
 export interface InteractiveMethodologyStageState {
   readonly stage: MethodologyStage;
@@ -61,24 +76,187 @@ export interface InteractiveMethodologyModel {
   readonly versions: readonly InteractiveMethodologyVersion[];
 }
 
-const DEFAULT_VIEWPORT: ObservatoryViewport = Object.freeze({ x: 0, y: 0, scale: 1 });
+export interface ObservatoryInteractionVersionConfig {
+  readonly id: string;
+  readonly categories: readonly string[];
+  readonly itemIds: readonly string[];
+}
+
+export interface ObservatoryInteractionConfig {
+  readonly versions: readonly ObservatoryInteractionVersionConfig[];
+  readonly defaultVersionId: string | null;
+  readonly stages: readonly MethodologyStage[];
+  readonly filters: readonly string[];
+  readonly minScale: number;
+  readonly maxScale: number;
+  readonly zoomStep: number;
+}
+
+export interface ObservatoryInteractionKernel {
+  readonly initialState: () => ObservatoryInteractionState;
+  readonly decode: (hash: string) => ObservatoryInteractionState;
+  readonly encode: (state: ObservatoryInteractionState) => string;
+  readonly reduce: (
+    state: ObservatoryInteractionState,
+    action: ObservatoryInteractionAction,
+  ) => ObservatoryInteractionState;
+  readonly isVersionVisible: (
+    versionId: string,
+    state: ObservatoryInteractionState,
+  ) => boolean;
+}
+
+export function buildObservatoryInteractionConfig(
+  projection: MethodologyProjection,
+): ObservatoryInteractionConfig {
+  const versions = projection.versions.map((version) => Object.freeze({
+    id: version.contractId,
+    categories: Object.freeze(methodologyCategories(version)),
+    itemIds: Object.freeze(methodologyItemIds(version)),
+  }));
+  return Object.freeze({
+    versions: Object.freeze(versions),
+    defaultVersionId: defaultVersionId(projection),
+    stages: METHODOLOGY_STAGE_ORDER,
+    filters: OBSERVATORY_FILTERS,
+    minScale: 0.7,
+    maxScale: 1.8,
+    zoomStep: 0.1,
+  });
+}
+
+/**
+ * Browser-safe interaction policy. Keep every helper inside this function:
+ * the same compiled function body is embedded into the generated static page.
+ */
+export function createObservatoryInteractionKernel(
+  config: ObservatoryInteractionConfig,
+): ObservatoryInteractionKernel {
+  const versionIds = new Set(config.versions.map((entry) => entry.id));
+  const itemIds = new Set(config.versions.flatMap((entry) => entry.itemIds));
+  const stages = new Set<string>(config.stages);
+  const filters = new Set(config.filters);
+  const categoriesByVersion = new Map(
+    config.versions.map((entry) => [entry.id, new Set(entry.categories)] as const),
+  );
+
+  const uniqueSortedAllowed = (values: readonly string[], allowed: Set<string>): readonly string[] =>
+    Object.freeze([...new Set(values.filter((value) => allowed.has(value)))].sort((a, b) => a.localeCompare(b)));
+
+  const finite = (value: number, fallback: number): number => Number.isFinite(value) ? value : fallback;
+  const clampScale = (value: number): number => {
+    const finiteScale = finite(value, 1);
+    return Math.min(config.maxScale, Math.max(config.minScale, finiteScale));
+  };
+  const normalizeViewport = (viewport: ObservatoryViewport): ObservatoryViewport => Object.freeze({
+    x: finite(viewport.x, 0),
+    y: finite(viewport.y, 0),
+    scale: clampScale(viewport.scale),
+  });
+  const finiteParam = (value: string | null, fallback: number): number => {
+    if (value === null || value.trim() === "") return fallback;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  };
+  const validVersion = (value: string | null): string | null =>
+    value !== null && versionIds.has(value) ? value : config.defaultVersionId;
+  const validStage = (value: string | null): MethodologyStage | null =>
+    value !== null && stages.has(value) ? value as MethodologyStage : null;
+  const validItem = (value: string | null): string | null =>
+    value !== null && itemIds.has(value) ? value : null;
+  const normalizeState = (state: ObservatoryInteractionState): ObservatoryInteractionState => Object.freeze({
+    selectedVersionId: validVersion(state.selectedVersionId),
+    selectedStage: validStage(state.selectedStage),
+    selectedItemId: validItem(state.selectedItemId),
+    filters: uniqueSortedAllowed(state.filters, filters),
+    viewport: normalizeViewport(state.viewport),
+  });
+
+  const decode = (hash: string): ObservatoryInteractionState => {
+    const params = new URLSearchParams(hash.startsWith("#") ? hash.slice(1) : hash);
+    return normalizeState({
+      selectedVersionId: params.get("v"),
+      selectedStage: validStage(params.get("s")),
+      selectedItemId: params.get("item"),
+      filters: params.getAll("f"),
+      viewport: {
+        x: finiteParam(params.get("x"), 0),
+        y: finiteParam(params.get("y"), 0),
+        scale: finiteParam(params.get("z"), 1),
+      },
+    });
+  };
+
+  const encode = (state: ObservatoryInteractionState): string => {
+    const normalized = normalizeState(state);
+    const params = new URLSearchParams();
+    if (normalized.selectedVersionId !== null) params.set("v", normalized.selectedVersionId);
+    if (normalized.selectedStage !== null) params.set("s", normalized.selectedStage);
+    if (normalized.selectedItemId !== null) params.set("item", normalized.selectedItemId);
+    for (const filter of normalized.filters) params.append("f", filter);
+    if (normalized.viewport.x !== 0 || normalized.viewport.y !== 0 || normalized.viewport.scale !== 1) {
+      params.set("x", String(normalized.viewport.x));
+      params.set("y", String(normalized.viewport.y));
+      params.set("z", String(normalized.viewport.scale));
+    }
+    return `#${params.toString()}`;
+  };
+
+  const reduce = (
+    state: ObservatoryInteractionState,
+    action: ObservatoryInteractionAction,
+  ): ObservatoryInteractionState => {
+    const current = normalizeState(state);
+    switch (action.type) {
+      case "select-version":
+        return normalizeState({ ...current, selectedVersionId: action.versionId });
+      case "select-stage":
+        return normalizeState({ ...current, selectedStage: action.stage });
+      case "select-item":
+        return normalizeState({ ...current, selectedItemId: action.itemId });
+      case "set-filters":
+        return normalizeState({ ...current, filters: action.filters });
+      case "toggle-filter": {
+        if (!filters.has(action.filter)) return current;
+        const next = new Set(current.filters);
+        next.has(action.filter) ? next.delete(action.filter) : next.add(action.filter);
+        return normalizeState({ ...current, filters: [...next] });
+      }
+      case "set-viewport":
+        return normalizeState({ ...current, viewport: action.viewport });
+      case "zoom": {
+        const scale = Math.round((current.viewport.scale + action.delta) * 1000) / 1000;
+        return normalizeState({ ...current, viewport: { ...current.viewport, scale } });
+      }
+      case "reset-viewport":
+        return normalizeState({ ...current, viewport: { x: 0, y: 0, scale: 1 } });
+    }
+  };
+
+  const isVersionVisible = (
+    versionId: string,
+    state: ObservatoryInteractionState,
+  ): boolean => {
+    const categories = categoriesByVersion.get(versionId);
+    if (categories === undefined) return false;
+    return normalizeState(state).filters.every((filter) => categories.has(filter));
+  };
+
+  return Object.freeze({
+    initialState: () => decode("#"),
+    decode,
+    encode,
+    reduce,
+    isVersionVisible,
+  });
+}
 
 export function reduceInteractionState(
   state: ObservatoryInteractionState,
   action: ObservatoryInteractionAction,
+  projection: MethodologyProjection,
 ): ObservatoryInteractionState {
-  switch (action.type) {
-    case "select-version":
-      return freezeState({ ...state, selectedVersionId: action.versionId });
-    case "select-stage":
-      return freezeState({ ...state, selectedStage: action.stage });
-    case "select-item":
-      return freezeState({ ...state, selectedItemId: action.itemId });
-    case "set-filters":
-      return freezeState({ ...state, filters: uniqueSorted(action.filters) });
-    case "set-viewport":
-      return freezeState({ ...state, viewport: normalizeViewport(action.viewport) });
-  }
+  return createObservatoryInteractionKernel(buildObservatoryInteractionConfig(projection)).reduce(state, action);
 }
 
 export function buildInteractiveMethodologyModel(
@@ -96,39 +274,18 @@ export function buildInteractiveMethodologyModel(
   });
 }
 
-export function encodeObservatoryHash(state: ObservatoryInteractionState): string {
-  const params = new URLSearchParams();
-  if (state.selectedVersionId !== null) params.set("v", state.selectedVersionId);
-  if (state.selectedStage !== null) params.set("s", state.selectedStage);
-  if (state.selectedItemId !== null) params.set("item", state.selectedItemId);
-  for (const filter of uniqueSorted(state.filters)) params.append("f", filter);
-  if (!isDefaultViewport(state.viewport)) {
-    params.set("x", String(state.viewport.x));
-    params.set("y", String(state.viewport.y));
-    params.set("z", String(state.viewport.scale));
-  }
-  return `#${params.toString()}`;
+export function encodeObservatoryHash(
+  state: ObservatoryInteractionState,
+  projection: MethodologyProjection,
+): string {
+  return createObservatoryInteractionKernel(buildObservatoryInteractionConfig(projection)).encode(state);
 }
 
 export function decodeObservatoryHash(
   hash: string,
   projection: MethodologyProjection,
 ): ObservatoryInteractionState {
-  const params = new URLSearchParams(hash.startsWith("#") ? hash.slice(1) : hash);
-  const requestedVersion = params.get("v");
-  const selectedVersionId = hasVersion(projection, requestedVersion)
-    ? requestedVersion
-    : defaultVersionId(projection);
-  const requestedStage = params.get("s");
-  const selectedStage = isMethodologyStage(requestedStage) ? requestedStage : null;
-  const selectedItemId = params.get("item");
-  const filters = uniqueSorted(params.getAll("f"));
-  const viewport = normalizeViewport({
-    x: finiteNumber(params.get("x"), 0),
-    y: finiteNumber(params.get("y"), 0),
-    scale: finiteNumber(params.get("z"), 1),
-  });
-  return freezeState({ selectedVersionId, selectedStage, selectedItemId, filters, viewport });
+  return createObservatoryInteractionKernel(buildObservatoryInteractionConfig(projection)).decode(hash);
 }
 
 function projectVersion(
@@ -166,41 +323,22 @@ function defaultVersionId(projection: MethodologyProjection): string | null {
     ?? null;
 }
 
-function hasVersion(projection: MethodologyProjection, value: string | null): value is string {
-  return value !== null && projection.versions.some((entry) => entry.contractId === value);
+function methodologyItemIds(version: MethodologyVersionProjection): string[] {
+  return [...new Set([
+    ...version.theoryReferences.map((entry) => entry.id),
+    ...version.contractReferences.map((entry) => entry.id),
+    ...version.positiveVectors.map((entry) => entry.id),
+    ...version.negativeVectors.map((entry) => entry.id),
+    ...version.evidenceReferences.map((entry) => entry.id),
+    ...version.acceptanceReferences.map((entry) => entry.id),
+  ])].sort((a, b) => a.localeCompare(b));
 }
 
-function isMethodologyStage(value: string | null): value is MethodologyStage {
-  return value !== null && (METHODOLOGY_STAGE_ORDER as readonly string[]).includes(value);
-}
-
-function normalizeViewport(viewport: ObservatoryViewport): ObservatoryViewport {
-  const scale = Number.isFinite(viewport.scale) && viewport.scale > 0 ? viewport.scale : 1;
-  const x = Number.isFinite(viewport.x) ? viewport.x : 0;
-  const y = Number.isFinite(viewport.y) ? viewport.y : 0;
-  return Object.freeze({ x, y, scale });
-}
-
-function finiteNumber(value: string | null, fallback: number): number {
-  if (value === null || value.trim() === "") return fallback;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
-}
-
-function isDefaultViewport(viewport: ObservatoryViewport): boolean {
-  return viewport.x === 0 && viewport.y === 0 && viewport.scale === 1;
-}
-
-function uniqueSorted(values: readonly string[]): readonly string[] {
-  return Object.freeze([...new Set(values)].sort((left, right) => left.localeCompare(right)));
-}
-
-function freezeState(state: ObservatoryInteractionState): ObservatoryInteractionState {
-  return Object.freeze({
-    selectedVersionId: state.selectedVersionId,
-    selectedStage: state.selectedStage,
-    selectedItemId: state.selectedItemId,
-    filters: Object.freeze([...state.filters]),
-    viewport: normalizeViewport(state.viewport),
-  });
+function methodologyCategories(version: MethodologyVersionProjection): string[] {
+  const values = [classify(version).toLowerCase()];
+  if (version.accepted) values.push("accepted");
+  if (version.positiveVectors.length > 0) values.push("positive");
+  if (version.negativeVectors.length > 0) values.push("negative");
+  if (version.evidenceReferences.length > 0) values.push("evidence");
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
 }

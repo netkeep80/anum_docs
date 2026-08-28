@@ -1,8 +1,11 @@
+import { renderObservatoryBrowserControllerScript } from "./browser-controller.js";
 import type { ContractObservatoryIndex, ContractVersionSummary } from "./contract-index.js";
 import {
-  METHODOLOGY_STAGE_ORDER,
+  OBSERVATORY_FILTERS,
   buildInteractiveMethodologyModel,
-  type ObservatoryInteractionState,
+  buildObservatoryInteractionConfig,
+  createObservatoryInteractionKernel,
+  type ObservatoryInteractionVersionConfig,
 } from "./interaction.js";
 import type { MethodologyProjection, MethodologyVersionProjection } from "./methodology-projection.js";
 
@@ -105,12 +108,16 @@ ${methodologyMap}
 }
 
 function renderMethodologyMap(projection: MethodologyProjection): string {
-  const selectedVersionId = projection.versions.find((entry) => entry.isCurrent)?.contractId ?? projection.versions[0]?.contractId ?? null;
-  const state: ObservatoryInteractionState = Object.freeze({ selectedVersionId, selectedStage: null, selectedItemId: null, filters: Object.freeze([]), viewport: Object.freeze({ x: 0, y: 0, scale: 1 }) });
+  const config = buildObservatoryInteractionConfig(projection);
+  const state = createObservatoryInteractionKernel(config).initialState();
   const model = buildInteractiveMethodologyModel(projection, state);
   const stageControls = model.stages.map((entry) => `<button type="button" data-methodology-stage="${entry.stage}" aria-pressed="false" title="Lifecycle stage: ${entry.stage}; derived presentation state">${escapeHtml(entry.stage)}</button>`).join("\n");
-  const lanes = model.versions.map((entry, ordinal) => renderMethodologyLane(projection.versions[ordinal]!, entry)).join("\n");
-  const controllerData = projection.versions.map((version, ordinal) => ({ id: version.contractId, classification: model.versions[ordinal]!.classification.toLowerCase(), itemIds: methodologyItemIds(version) }));
+  const filterControls = OBSERVATORY_FILTERS.map((filter) => renderFilterButton(filter, filter.toUpperCase())).join("");
+  const lanes = model.versions.map((entry, ordinal) => renderMethodologyLane(
+    projection.versions[ordinal]!,
+    entry,
+    config.versions[ordinal]!,
+  )).join("\n");
 
   return `    <section class="methodology-map" aria-labelledby="methodology-title">
       <div class="methodology-heading"><p class="eyebrow">Primary explanatory view · derived methodology</p><h2 id="methodology-title">Methodology map + version lifecycle lanes</h2><p>Две координированные, но не тождественные структуры: метод разработки и состояние жизненного цикла версии.</p></div>
@@ -118,90 +125,27 @@ function renderMethodologyMap(projection: MethodologyProjection): string {
       <div class="methodology-authority" aria-label="Relation authority"><span>Method/lifecycle relation: derived presentation relation</span><span>Traceability/evidence relation: source-derived reference</span><span>Semantic topology Link: not rendered in this view</span></div>
       <div class="methodology-controls">
         <div class="stage-controls" role="group" aria-label="Methodology stages">${stageControls}</div>
-        <div class="filter-controls" role="group" aria-label="Version and evidence filters">${renderFilterButton("current", "CURRENT")}${renderFilterButton("previous", "PREVIOUS")}${renderFilterButton("candidate", "CANDIDATE")}${renderFilterButton("accepted", "ACCEPTED")}${renderFilterButton("positive", "POSITIVE")}${renderFilterButton("negative", "NEGATIVE")}${renderFilterButton("evidence", "EVIDENCE")}</div>
+        <div class="filter-controls" role="group" aria-label="Version and evidence filters">${filterControls}</div>
         <div class="viewport-controls" role="group" aria-label="Map viewport"><button type="button" data-viewport-action="zoom-out" aria-label="Zoom out">−</button><button type="button" data-viewport-action="reset">Reset viewport</button><button type="button" data-viewport-action="zoom-in" aria-label="Zoom in">+</button></div>
       </div>
       <div class="methodology-grid" tabindex="0" aria-label="Version lifecycle lanes">${lanes}</div>
       <p class="methodology-status" aria-live="polite"></p>
     </section>
-${renderMethodologyController(controllerData, selectedVersionId)}`;
+${renderObservatoryBrowserControllerScript(config)}`;
 }
 
-function renderMethodologyLane(projection: MethodologyVersionProjection, model: ReturnType<typeof buildInteractiveMethodologyModel>["versions"][number]): string {
+function renderMethodologyLane(
+  projection: MethodologyVersionProjection,
+  model: ReturnType<typeof buildInteractiveMethodologyModel>["versions"][number],
+  config: ObservatoryInteractionVersionConfig,
+): string {
   const evidenceByStage = new Map(projection.lifecycle.map((entry) => [entry.stage, entry.evidence.length] as const));
   const stages = model.stageStates.map((entry) => `<div class="stage-cell${entry.present ? " present" : ""}" data-lane-stage="${entry.stage}" title="${entry.stage}: ${entry.present ? "source evidence present" : "no linked source evidence"}"><span>${escapeHtml(entry.stage)}</span><span class="stage-evidence">${entry.present ? `${evidenceByStage.get(entry.stage) ?? 0} evidence` : "—"}</span></div>`).join("\n");
-  const categories = methodologyCategories(projection, model.classification.toLowerCase()).join(" ");
-  const evidenceItems = methodologyItemIds(projection).slice(0, 6).map((id) => `<button type="button" data-item-id="${escapeAttribute(id)}" aria-pressed="false" title="Traceability/evidence reference; presentation-only">${escapeHtml(id)}</button>`).join("");
-  return `<div class="methodology-lane${model.selected ? " selected" : ""}" data-version-lane="${escapeAttribute(model.contractId)}" data-categories="${categories}"><div class="lane-version"><button type="button" class="version-select" data-version-id="${escapeAttribute(model.contractId)}" aria-pressed="${model.selected ? "true" : "false"}" title="Select version and synchronize Observatory views">${escapeHtml(model.contractId)}</button><span class="lane-classification">${model.classification}</span></div>${stages}<div class="evidence-items" aria-label="Evidence references for ${escapeAttribute(model.contractId)}">${evidenceItems || "<span>No linked evidence references</span>"}</div></div>`;
-}
-
-function methodologyItemIds(version: MethodologyVersionProjection): string[] {
-  return [...new Set([...version.theoryReferences.map((entry) => entry.id), ...version.contractReferences.map((entry) => entry.id), ...version.positiveVectors.map((entry) => entry.id), ...version.negativeVectors.map((entry) => entry.id), ...version.evidenceReferences.map((entry) => entry.id), ...version.acceptanceReferences.map((entry) => entry.id)])].sort((a, b) => a.localeCompare(b));
-}
-
-function methodologyCategories(version: MethodologyVersionProjection, classification: string): string[] {
-  const values = [classification];
-  if (version.accepted) values.push("accepted");
-  if (version.positiveVectors.length > 0) values.push("positive");
-  if (version.negativeVectors.length > 0) values.push("negative");
-  if (version.evidenceReferences.length > 0) values.push("evidence");
-  return [...new Set(values)].sort();
+  const evidenceItems = config.itemIds.slice(0, 6).map((id) => `<button type="button" data-item-id="${escapeAttribute(id)}" aria-pressed="false" title="Traceability/evidence reference; presentation-only">${escapeHtml(id)}</button>`).join("");
+  return `<div class="methodology-lane${model.selected ? " selected" : ""}" data-version-lane="${escapeAttribute(model.contractId)}"><div class="lane-version"><button type="button" class="version-select" data-version-id="${escapeAttribute(model.contractId)}" aria-pressed="${model.selected ? "true" : "false"}" title="Select version and synchronize Observatory views">${escapeHtml(model.contractId)}</button><span class="lane-classification">${model.classification}</span></div>${stages}<div class="evidence-items" aria-label="Evidence references for ${escapeAttribute(model.contractId)}">${evidenceItems || "<span>No linked evidence references</span>"}</div></div>`;
 }
 
 function renderFilterButton(filter: string, label: string): string { return `<button type="button" data-methodology-filter="${filter}" aria-pressed="false">${label}</button>`; }
-
-function renderMethodologyController(versions: readonly { readonly id: string; readonly classification: string; readonly itemIds: readonly string[] }[], defaultVersionId: string | null): string {
-  const data = escapeJsonForScript(JSON.stringify({ versions, stages: METHODOLOGY_STAGE_ORDER, defaultVersionId, filters: ["accepted", "candidate", "current", "evidence", "negative", "positive", "previous"] }));
-  return `    <script>
-(() => {
-  "use strict";
-  const map = document.querySelector(".methodology-map");
-  if (!map) return;
-  const grid = map.querySelector(".methodology-grid");
-  const config = ${data};
-  const versionIds = new Set(config.versions.map((entry) => entry.id));
-  const itemIds = new Set(config.versions.flatMap((entry) => entry.itemIds));
-  const stages = new Set(config.stages);
-  const filters = new Set(config.filters);
-  const number = (value, fallback) => { const parsed = Number(value); return Number.isFinite(parsed) ? parsed : fallback; };
-
-  const readState = () => {
-    const params = new URLSearchParams(location.hash.startsWith("#") ? location.hash.slice(1) : location.hash);
-    const requestedVersion = params.get("v");
-    const requestedStage = params.get("s");
-    const requestedItem = params.get("item");
-    return { versionId: versionIds.has(requestedVersion) ? requestedVersion : config.defaultVersionId, stage: stages.has(requestedStage) ? requestedStage : null, item: itemIds.has(requestedItem) ? requestedItem : null, filters: [...new Set(params.getAll("f").filter((value) => filters.has(value)))].sort(), x: number(params.get("x"), 0), y: number(params.get("y"), 0), z: Math.min(1.8, Math.max(.7, number(params.get("z"), 1))) };
-  };
-  const writeState = (mutate, replace = false) => { const params = new URLSearchParams(location.hash.startsWith("#") ? location.hash.slice(1) : location.hash); mutate(params); const next = params.toString(); if (replace) history.replaceState(null, "", location.pathname + location.search + (next ? "#" + next : "#")); else location.hash = next ? "#" + next : "#"; };
-
-  const apply = () => {
-    const state = readState();
-    map.querySelectorAll("[data-methodology-stage]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.methodologyStage === state.stage)));
-    map.querySelectorAll("[data-methodology-filter]").forEach((button) => button.setAttribute("aria-pressed", String(state.filters.includes(button.dataset.methodologyFilter))));
-    map.querySelectorAll("[data-item-id]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.itemId === state.item)));
-    map.querySelectorAll("[data-version-lane]").forEach((lane) => { const selected = lane.dataset.versionLane === state.versionId; const categories = (lane.dataset.categories || "").split(" "); const visible = state.filters.length === 0 || state.filters.every((value) => categories.includes(value)); lane.hidden = !visible; lane.classList.toggle("selected", selected); lane.querySelector("[data-version-id]")?.setAttribute("aria-pressed", String(selected)); lane.querySelectorAll("[data-lane-stage]").forEach((cell) => cell.classList.toggle("stage-selected", cell.dataset.laneStage === state.stage)); });
-    document.querySelectorAll("[data-overview-version-id]").forEach((node) => node.classList.toggle("selection-synced", node.dataset.overviewVersionId === state.versionId));
-    if (grid) { grid.style.zoom = String(state.z); grid.scrollLeft = state.x; grid.scrollTop = state.y; }
-    const status = map.querySelector(".methodology-status");
-    if (status) status.textContent = "Selected: " + (state.versionId ?? "none") + "; stage: " + (state.stage ?? "all") + "; item: " + (state.item ?? "none") + "; filters: " + (state.filters.join(", ") || "none") + "; zoom: " + state.z + ".";
-  };
-
-  map.addEventListener("click", (event) => {
-    const target = event.target instanceof Element ? event.target.closest("button") : null;
-    if (!(target instanceof HTMLButtonElement)) return;
-    if (target.dataset.methodologyStage) { const stage = target.dataset.methodologyStage; const active = target.getAttribute("aria-pressed") === "true"; writeState((params) => active ? params.delete("s") : params.set("s", stage)); }
-    else if (target.dataset.versionId) writeState((params) => params.set("v", target.dataset.versionId));
-    else if (target.dataset.itemId) writeState((params) => params.set("item", target.dataset.itemId));
-    else if (target.dataset.methodologyFilter) { const filter = target.dataset.methodologyFilter; writeState((params) => { const values = new Set(params.getAll("f").filter((value) => filters.has(value))); values.has(filter) ? values.delete(filter) : values.add(filter); params.delete("f"); [...values].sort().forEach((value) => params.append("f", value)); }); }
-    else if (target.dataset.viewportAction) writeState((params) => { const state = readState(); if (target.dataset.viewportAction === "reset") { params.delete("x"); params.delete("y"); params.delete("z"); } else params.set("z", String(Math.min(1.8, Math.max(.7, state.z + (target.dataset.viewportAction === "zoom-in" ? .1 : -.1))))); });
-  });
-  map.addEventListener("keydown", (event) => { if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "Enter"].includes(event.key)) return; const target = event.target; if (!(target instanceof HTMLButtonElement)) return; if (event.key === "Enter") { target.click(); return; } const buttons = [...map.querySelectorAll("button:not([hidden])")].filter((button) => !button.closest("[hidden]")); const current = buttons.indexOf(target); if (current < 0 || buttons.length === 0) return; event.preventDefault(); let next = current; if (event.key === "Home") next = 0; else if (event.key === "End") next = buttons.length - 1; else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (current - 1 + buttons.length) % buttons.length; else next = (current + 1) % buttons.length; buttons[next]?.focus(); });
-  grid?.addEventListener("scroll", () => writeState((params) => { if (grid.scrollLeft) params.set("x", String(Math.round(grid.scrollLeft))); else params.delete("x"); if (grid.scrollTop) params.set("y", String(Math.round(grid.scrollTop))); else params.delete("y"); }, true));
-  window.addEventListener("hashchange", apply);
-  apply();
-})();
-    </script>`;
-}
 
 function renderTimelineItem(version: ContractVersionSummary, ordinal: number, interactive: boolean): string {
   const anchor = anchorId(ordinal); const classification = classify(version); const semanticDelta = version.observableSemanticDelta ? "SEMANTIC DELTA" : "NO SEMANTIC DELTA"; const href = interactive ? `#v=${encodeURIComponent(version.contractId)}` : `#${anchor}`;
@@ -221,5 +165,4 @@ function classify(version: ContractVersionSummary): string { if (version.isCurre
 function yesNo(value: boolean): string { return value ? "YES" : "NO"; }
 function anchorId(ordinal: number): string { return `version-${ordinal + 1}`; }
 function escapeAttribute(value: string): string { return escapeHtml(value); }
-function escapeJsonForScript(value: string): string { return value.replaceAll("<", "\\u003c").replaceAll(">", "\\u003e").replaceAll("&", "\\u0026"); }
 function escapeHtml(value: string): string { return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;").replaceAll("'", "&#39;"); }

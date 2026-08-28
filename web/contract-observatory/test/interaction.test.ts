@@ -1,6 +1,8 @@
 import {
   METHODOLOGY_STAGE_ORDER,
   buildInteractiveMethodologyModel,
+  buildObservatoryInteractionConfig,
+  createObservatoryInteractionKernel,
   decodeObservatoryHash,
   encodeObservatoryHash,
   reduceInteractionState,
@@ -57,6 +59,12 @@ const projection: MethodologyProjection = Object.freeze({
       contractId: "mts-contract/v0.11",
       conformanceId: "mts-conformance/v0.11",
       isCurrent: true,
+      contractReferences: Object.freeze([
+        Object.freeze({ authority: "contract", id: "mts-contract/v0.11", path: "contracts/mts-contract-v0.11.json" }),
+      ]),
+      negativeVectors: Object.freeze([
+        Object.freeze({ authority: "conformance-vector", id: "negative:edge", polarity: "negative", evidence: Object.freeze([]) }),
+      ]),
       lifecycle: Object.freeze([
         Object.freeze({ stage: "research", evidence: Object.freeze(["issue:758"]) }),
         Object.freeze({ stage: "problem", evidence: Object.freeze(["issue:759"]) }),
@@ -101,21 +109,21 @@ same(initialModel.versions.find((entry) => entry.isCurrent)?.contractId, "mts-co
 same(initialModel.versions.find((entry) => entry.contractId.includes("candidate"))?.classification, "CANDIDATE", "candidate is textually distinct from accepted");
 same(initialModel.versions.find((entry) => entry.contractId === "mts-contract/v0.11")?.classification, "CURRENT", "current classification is explicit");
 
-const stageSelected = reduceInteractionState(initial, { type: "select-stage", stage: "challenged" });
+const stageSelected = reduceInteractionState(initial, { type: "select-stage", stage: "challenged" }, projection);
 same(stageSelected.selectedStage, "challenged", "stage selection is observable state");
 const stageModel = buildInteractiveMethodologyModel(projection, stageSelected);
 assert(stageModel.stages.find((entry) => entry.stage === "challenged")?.selected === true, "selected stage is emphasized");
 assert(stageModel.versions.every((entry) => entry.stageStates.some((stage) => stage.stage === "challenged")), "stage state is synchronized across version lanes");
 
-const versionSelected = reduceInteractionState(stageSelected, { type: "select-version", versionId: "mts-contract/v0.10" });
+const versionSelected = reduceInteractionState(stageSelected, { type: "select-version", versionId: "mts-contract/v0.10" }, projection);
 same(versionSelected.selectedVersionId, "mts-contract/v0.10", "version selection is synchronized state");
 
-const encoded = encodeObservatoryHash(versionSelected);
+const encoded = encodeObservatoryHash(versionSelected, projection);
 assert(encoded.startsWith("#v="), "deep link is a stable hash");
 const decoded = decodeObservatoryHash(encoded, projection);
 same(decoded.selectedVersionId, versionSelected.selectedVersionId, "hash restores selected version");
 same(decoded.selectedStage, versionSelected.selectedStage, "hash restores selected stage");
-same(encodeObservatoryHash(decoded), encoded, "hash round-trip is deterministic");
+same(encodeObservatoryHash(decoded, projection), encoded, "hash round-trip is deterministic");
 
 const unknown = decodeObservatoryHash(
   "#v=missing&s=unknown&item=%3Cscript%3E&f=negative&f=unknown&f=negative&x=NaN&y=Infinity&z=99",
@@ -129,12 +137,22 @@ same(unknown.viewport.x, 0, "invalid x fails closed");
 same(unknown.viewport.y, 0, "invalid y fails closed");
 same(unknown.viewport.scale, 1.8, "zoom is clamped to the canonical maximum");
 
+const knownItem = decodeObservatoryHash("#item=mts-contract%2Fv0.11", projection);
+same(knownItem.selectedItemId, "mts-contract/v0.11", "known projected item survives canonical decoding");
+
 const lowZoom = decodeObservatoryHash("#z=-5", projection);
 same(lowZoom.viewport.scale, 0.7, "zoom is clamped to the canonical minimum");
 
 const unorderedFilters = decodeObservatoryHash("#f=previous&f=accepted", projection);
 same(unorderedFilters.filters.join(","), "accepted,previous", "known filters normalize to canonical order");
-same(encodeObservatoryHash(unorderedFilters), "#v=mts-contract%2Fv0.11&f=accepted&f=previous", "canonical hash re-encodes normalized filters deterministically");
+same(encodeObservatoryHash(unorderedFilters, projection), "#v=mts-contract%2Fv0.11&f=accepted&f=previous", "canonical hash re-encodes normalized filters deterministically");
+
+const kernel = createObservatoryInteractionKernel(buildObservatoryInteractionConfig(projection));
+const conjunctive = kernel.reduce(initial, { type: "set-filters", filters: ["current", "accepted", "negative"] });
+assert(kernel.isVersionVisible("mts-contract/v0.11", conjunctive), "CURRENT + ACCEPTED + NEGATIVE uses explicit conjunctive filter semantics");
+assert(!kernel.isVersionVisible("mts-contract/v0.10", conjunctive), "version missing any active category is hidden");
+const unknownFilter = kernel.reduce(conjunctive, { type: "toggle-filter", filter: "invented" });
+same(unknownFilter.filters.join(","), conjunctive.filters.join(","), "unknown UI filter action is inert");
 
 same(
   JSON.stringify(buildInteractiveMethodologyModel(projection, versionSelected)),
