@@ -133,6 +133,18 @@ function triadFixture(): {
   same(sequenceRead.fields[2]?.value, second, "third child retained");
 }
 
+// Empty grammar containers need no synthetic field marker: R is the empty
+// field-chain sentinel while the occurrence itself remains a non-root triad.
+{
+  const f = triadFixture();
+  const emptyRound = f.builder.addOccurrence(f.vocabulary.kinds.Round, []);
+  const aset = f.builder.finish(emptyRound);
+  const read = readChainedTriadSyntaxAset(f.memory, aset, f.vocabulary);
+  same(read.occurrences.length, 1, "empty Round remains one occurrence");
+  same(read.occurrences[0]?.occurrence, emptyRound, "empty Round occurrence retained");
+  same(read.occurrences[0]?.fields.length, 0, "empty Round has an empty structural field chain");
+}
+
 // The same full corpus must round-trip through S0 and the chained-triad
 // candidate to the same syntax-level normalized structure.
 {
