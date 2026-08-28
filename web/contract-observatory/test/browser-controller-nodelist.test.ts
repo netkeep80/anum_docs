@@ -41,7 +41,7 @@ const button: ObservatoryBrowserNode = {
   setAttribute: () => undefined,
   getAttribute: () => null,
   querySelector: () => null,
-  querySelectorAll: () => emptyNodes as unknown as readonly ObservatoryBrowserNode[],
+  querySelectorAll: () => emptyNodes,
   closest: (selector) => selector === "button" ? button : null,
   focus: () => undefined,
 };
@@ -54,9 +54,7 @@ const map: ObservatoryBrowserNode = {
   setAttribute: () => undefined,
   getAttribute: () => null,
   querySelector: () => null,
-  querySelectorAll: (selector) => (
-    selector === "button" ? buttonNodes : emptyNodes
-  ) as unknown as readonly ObservatoryBrowserNode[],
+  querySelectorAll: (selector) => selector === "button" ? buttonNodes : emptyNodes,
   addEventListener: (type, listener) => {
     const entries = listeners.get(type) ?? [];
     entries.push(listener);
@@ -84,7 +82,7 @@ const environment: ObservatoryBrowserEnvironment = {
   document: {
     activeElement: null,
     querySelector: (selector) => selector === ".methodology-map" ? map : null,
-    querySelectorAll: () => emptyNodes as unknown as readonly ObservatoryBrowserNode[],
+    querySelectorAll: () => emptyNodes,
   },
   location: {
     hash: "#",
