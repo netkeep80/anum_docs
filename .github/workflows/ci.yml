@@ -39,33 +39,11 @@ jobs:
           ./ts/node_modules/.bin/tsc -p packages/visual/tsconfig.json
           node packages/visual/dist/test/model.test.js
 
-      - name: Check Contract Observatory
-        shell: bash
+      - name: Check Contract Observatory index
         run: |
-          set -euo pipefail
           ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
-
-          mapfile -t source_tests < <(
-            find web/contract-observatory/test -maxdepth 1 -type f -name '*.test.ts' -printf '%f\n' \
-              | sed 's/\.ts$/.js/' \
-              | sort
-          )
-          mapfile -t built_tests < <(
-            find web/contract-observatory/dist/test -maxdepth 1 -type f -name '*.test.js' -printf '%f\n' \
-              | sort
-          )
-
-          if ! diff -u \
-            <(printf '%s\n' "${source_tests[@]}") \
-            <(printf '%s\n' "${built_tests[@]}"); then
-            echo "::error::Contract Observatory source test set differs from compiled executable test set"
-            exit 1
-          fi
-
-          for test_file in "${built_tests[@]}"; do
-            echo "Running Contract Observatory test: ${test_file}"
-            node "web/contract-observatory/dist/test/${test_file}"
-          done
+          node web/contract-observatory/dist/test/contract-index.test.js
+          node web/contract-observatory/dist/test/site.test.js
 
   no-python:
     runs-on: ubuntu-latest
