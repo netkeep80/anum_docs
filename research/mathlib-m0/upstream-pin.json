@@ -1,0 +1,11 @@
+{
+  "schema": "mts-mathlib-m0-upstream-pin/v0.1",
+  "repository": "leanprover-community/mathlib4",
+  "mathlibSha": "d6893048e0d784c43f3cf098b61299b3a4b4aed0",
+  "leanToolchain": "leanprover/lean4:v4.34.0-rc2",
+  "verifiedFrom": {
+    "commitApi": "repos/leanprover-community/mathlib4/commits/d6893048e0d784c43f3cf098b61299b3a4b4aed0",
+    "toolchainPath": "lean-toolchain"
+  },
+  "purpose": "Pinned upstream identity for anum_docs#969 Mathlib/M0 research corpus. This file is provenance only and grants no trust to exporter or translator output."
+}
