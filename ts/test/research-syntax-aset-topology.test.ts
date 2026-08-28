@@ -12,7 +12,7 @@ import {
   readChainedTriadSyntaxAset,
   triad,
   type ResearchBuilder,
-} from "./research-syntax-aset-topology-support.js";
+} from "../research/syntax-aset-topology.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
