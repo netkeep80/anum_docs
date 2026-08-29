@@ -68,14 +68,75 @@ same(digestA.scheme, "mts-mathlib-m0-transport/sha-256/v0.1", "digest scheme");
 same(digestA.value, digestB.value, "canonical transport digest must replay");
 assert(/^[0-9a-f]{64}$/.test(digestA.value), "digest must be lowercase SHA-256");
 
+const changedTargetDigest = await computeMathlibM0TransportBundleDigest({
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
+    {
+      ...bundle.declarations[1],
+      kernel: {
+        ...bundle.declarations[1].kernel,
+        type: "M0.Base -> Sort 0",
+      },
+    },
+  ],
+});
+assert(changedTargetDigest.value !== digestA.value, "changed theorem target must change transport identity");
+
+const changedProofDigest = await computeMathlibM0TransportBundleDigest({
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
+    {
+      ...bundle.declarations[1],
+      kernel: {
+        ...bundle.declarations[1].kernel,
+        value: "fun _ => M0.Base",
+      },
+    },
+  ],
+});
+assert(changedProofDigest.value !== digestA.value, "changed theorem value must change transport identity");
+
+expectReject("unsupported-schema", {
+  ...bundle,
+  schema: "mts-mathlib-m0-transport/v9.9",
+});
+
 expectReject("invalid-upstream", {
   ...bundle,
   upstream: { ...PIN, mathlibSha: "main" },
 });
 
+expectReject("invalid-upstream", {
+  ...bundle,
+  upstream: { ...PIN, leanToolchain: "" },
+});
+
+expectReject("invalid-declaration", {
+  ...bundle,
+  declarations: [],
+});
+
 expectReject("duplicate-declaration", {
   ...bundle,
   declarations: [bundle.declarations[0], bundle.declarations[0]],
+});
+
+expectReject("invalid-declaration", {
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
+    { ...bundle.declarations[1], dependencies: ["M0.Base", "M0.Base"] },
+  ],
+});
+
+expectReject("invalid-declaration", {
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
+    { ...bundle.declarations[1], dependencies: ["M0.Identity"] },
+  ],
 });
 
 expectReject("missing-dependency", {
@@ -106,6 +167,31 @@ expectReject("unsupported-kernel-form", {
 expectReject("invalid-envelope", {
   ...bundle,
   translatorTrusted: true,
+});
+
+expectReject("invalid-envelope", {
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
+    {
+      ...bundle.declarations[1],
+      approved: true,
+    },
+  ],
+});
+
+expectReject("invalid-envelope", {
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
+    {
+      ...bundle.declarations[1],
+      kernel: {
+        ...bundle.declarations[1].kernel,
+        trusted: true,
+      },
+    },
+  ],
 });
 
 console.log("mathlib-m0-transport.test.ts: ok");
