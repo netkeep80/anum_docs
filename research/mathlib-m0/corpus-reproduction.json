@@ -1,0 +1,60 @@
+{
+  "schema": "mts-mathlib-m0-corpus-reproduction/v0.1",
+  "upstream": {
+    "repository": "leanprover-community/mathlib4",
+    "mathlibSha": "d6893048e0d784c43f3cf098b61299b3a4b4aed0",
+    "leanToolchain": "leanprover/lean4:v4.34.0-rc2"
+  },
+  "source": {
+    "module": "Mathlib.Logic.Pairwise",
+    "path": "Mathlib/Logic/Pairwise.lean",
+    "blobSha": "7a2f0dc7819c5656049e1d99f6ba0be56f1e04ca"
+  },
+  "seed": "research/mathlib-m0/corpus-seed.json",
+  "selection": {
+    "minimumDeclarations": 10,
+    "maximumDeclarations": 100,
+    "roots": [
+      "Pairwise",
+      "Pairwise.mono",
+      "Pairwise.eq",
+      "Subsingleton.pairwise",
+      "Function.injective_iff_pairwise_ne",
+      "Function.Injective.pairwise_ne",
+      "Pairwise.comp_of_injective",
+      "Pairwise.of_comp_of_surjective",
+      "Function.Bijective.pairwise_comp_iff",
+      "pairwise_fin_succ_iff",
+      "pairwise_fin_succ_iff_of_isSymm",
+      "Set.Pairwise",
+      "Set.pairwise_of_forall",
+      "Set.Pairwise.imp_on",
+      "Set.Pairwise.imp",
+      "Set.Pairwise.eq",
+      "Set.pairwise_iff_of_refl",
+      "Set.Pairwise.forall₂",
+      "Set.Pairwise.of_forall₂",
+      "Set.Pairwise.on_injective",
+      "Pairwise.set_pairwise"
+    ]
+  },
+  "export": {
+    "stage": "post-elaboration-kernel-environment",
+    "dependencyClosure": "recursive-constant-references",
+    "dependencyPolicy": "every non-primitive referenced declaration must either appear earlier in the emitted corpus or be classified explicitly as external-kernel/runtime support",
+    "ordering": "dependency-topological-then-qualified-name",
+    "identity": "qualified-name-plus-kernel-type-and-value-under-exact-upstream-pin",
+    "outputSchema": "mts-mathlib-m0-transport/v0.1",
+    "outputPath": "research/mathlib-m0/corpus-export.json"
+  },
+  "failClosed": {
+    "rejectFloatingRevision": true,
+    "rejectSourceOnlyApproximation": true,
+    "rejectMissingDependency": true,
+    "rejectDuplicateDeclaration": true,
+    "rejectDependencyCycle": true,
+    "rejectUnsupportedKernelForm": true,
+    "translatorOutputTrusted": false
+  },
+  "acceptanceBoundary": "This manifest makes the corpus selection and export contract reproducible but is not itself corpus evidence. Acceptance still requires the generated 10-100 declaration post-elaboration corpus, MTS evidence encoding, and trusted approval/replay for every admitted declaration."
+}
