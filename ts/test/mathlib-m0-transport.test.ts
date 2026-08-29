@@ -75,7 +75,7 @@ const changedTargetDigest = await computeMathlibM0TransportBundleDigest({
     {
       ...bundle.declarations[1],
       kernel: {
-        ...bundle.declarations[1].kernel,
+        ...bundle.declarations[1]!.kernel,
         type: "M0.Base -> Sort 0",
       },
     },
@@ -90,7 +90,7 @@ const changedProofDigest = await computeMathlibM0TransportBundleDigest({
     {
       ...bundle.declarations[1],
       kernel: {
-        ...bundle.declarations[1].kernel,
+        ...bundle.declarations[1]!.kernel,
         value: "fun _ => M0.Base",
       },
     },
@@ -187,7 +187,7 @@ expectReject("invalid-envelope", {
     {
       ...bundle.declarations[1],
       kernel: {
-        ...bundle.declarations[1].kernel,
+        ...bundle.declarations[1]!.kernel,
         trusted: true,
       },
     },
