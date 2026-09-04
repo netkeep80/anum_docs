@@ -41,6 +41,15 @@ assert(
   [".zero", ".param", ".succ"].every((form) => source.includes(`| ${form}`)),
   "exporter must structurally traverse the supported Lean Level forms",
 );
+assert(
+  source.includes("collectDependencyClosure") &&
+    source.includes("collectDependencyClosure env corpusRoots"),
+  "corpus roots must seed a recursive post-elaboration dependency closure",
+);
+assert(
+  !/corpusRoots\.mapM\s*\(buildNode env corpusRoots\)/.test(source),
+  "exporter must not treat the source roots themselves as the dependency-closed corpus",
+);
 
 const workflowPath = resolve("..", ".github", "workflows", "mathlib-m0-export.yml");
 assert(existsSync(workflowPath), "Mathlib M0 pinned export workflow must exist");
