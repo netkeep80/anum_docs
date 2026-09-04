@@ -96,5 +96,14 @@ const config: ObservatoryInteractionConfig = Object.freeze({
 const browserScript = renderObservatoryBrowserControllerScript(config);
 assert(browserScript.includes("Выбрано:"), "dynamic browser status is Russian");
 assert(!browserScript.includes("Selected:"), "legacy English dynamic browser status is absent");
+for (const marker of [
+  'case "accepted": return "Принято"',
+  'case "released": return "Выпущено"',
+  'case "current": return "текущие"',
+  'case "evidence": return "со свидетельствами"',
+  'case "negative": return "отрицательные"',
+]) {
+  assert(browserScript.includes(marker), `dynamic status enum presentation is localized: ${marker}`);
+}
 
 console.log("Contract Observatory Russian presentation specification passed.");
