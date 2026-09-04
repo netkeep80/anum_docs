@@ -68,12 +68,12 @@ assert(html.includes("/requiredSemanticLaws/topLevelDot"), "exact contract JSON 
 assert(html.includes(". -&gt; R under TopBind(R,S)"), "resolved contract law is visible without becoming UI authority");
 assert(html.includes("traceability/mts-v0.11.json"), "traceability manifest provenance is visible");
 for (const label of [
-  "Genesis vectors",
-  "Meaning vectors",
-  "C2 classification vectors",
-  "Compatibility vectors",
-  "Negative vectors",
-  "Executable gates",
+  "Векторы генезиса",
+  "Векторы смысла",
+  "Векторы классификации C2",
+  "Векторы совместимости",
+  "Отрицательные векторы",
+  "Исполняемые проверки",
 ]) {
   assert(html.includes(label), `invariant anatomy exposes ${label}`);
 }
@@ -103,8 +103,8 @@ const dotMeaningStart = html.indexOf('data-invariant-id="dotMeaning"');
 const dotMeaningEnd = html.indexOf('data-invariant-id="', dotMeaningStart + 1);
 const dotMeaningHtml = html.slice(dotMeaningStart, dotMeaningEnd < 0 ? undefined : dotMeaningEnd);
 assert(dotMeaningStart >= 0, "dotMeaning anatomy card exists");
-assert(dotMeaningHtml.includes("Negative vectors"), "dotMeaning keeps the empty negative category visible");
-assert(dotMeaningHtml.includes("none"), "explicit absence is rendered instead of guessed evidence");
+assert(dotMeaningHtml.includes("Отрицательные векторы"), "dotMeaning keeps the empty negative category visible");
+assert(dotMeaningHtml.includes("нет"), "explicit absence is rendered instead of guessed evidence");
 assert(!dotMeaningHtml.includes("v011-q-alphabet-remains-four-abits"), "UI does not guess C5/Q evidence into dotMeaning");
 
 const maliciousLaw = `<img src=x onerror="alert('mts')">`;
