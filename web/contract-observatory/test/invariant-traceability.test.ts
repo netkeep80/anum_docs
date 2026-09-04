@@ -27,8 +27,8 @@ same(
 );
 same(
   topLevelDot.negative.requiredNegativeVectors.join(","),
-  "v011-dot-is-not-ambient-runtime-current,v011-top-bind-does-not-insert-hidden-root-glyph,v011-host-stack-is-not-semantic-authority",
-  "negative vectors stay separate and source-ordered deterministically",
+  "v011-dot-is-not-ambient-runtime-current,v011-host-stack-is-not-semantic-authority,v011-top-bind-does-not-insert-hidden-root-glyph",
+  "negative vectors stay separate and normalize deterministically",
 );
 same(
   topLevelDot.requiredExecutableGates.join(","),
