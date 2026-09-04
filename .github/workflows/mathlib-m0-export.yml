@@ -1,0 +1,124 @@
+name: Mathlib M0 pinned export
+
+on:
+  workflow_dispatch:
+    inputs:
+      research_ref:
+        description: Exact anum_docs research ref containing the M0 exporter and pin
+        required: true
+        default: research/969-mathlib-m0
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact anum_docs research ref
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ inputs.research_ref }}
+          path: anum_docs-research
+          persist-credentials: false
+
+      - name: Resolve immutable upstream pin
+        id: pin
+        shell: bash
+        env:
+          RESEARCH_REF: ${{ inputs.research_ref }}
+        run: |
+          set -euo pipefail
+          pin_path="anum_docs-research/research/mathlib-m0/upstream-pin.json"
+          test -f "$pin_path"
+          mathlib_sha="$(jq -er '.mathlibSha | select(type == "string" and test("^[0-9a-f]{40}$"))' "$pin_path")"
+          lean_toolchain="$(jq -er '.leanToolchain | select(type == "string" and length > 0)' "$pin_path")"
+          research_sha="$(git -C anum_docs-research rev-parse HEAD)"
+          printf 'mathlib_sha=%s\n' "$mathlib_sha" >> "$GITHUB_OUTPUT"
+          printf 'lean_toolchain=%s\n' "$lean_toolchain" >> "$GITHUB_OUTPUT"
+          printf 'research_sha=%s\n' "$research_sha" >> "$GITHUB_OUTPUT"
+          printf 'Research ref %s resolved to %s\n' "$RESEARCH_REF" "$research_sha"
+
+      - name: Checkout exact mathlib revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: leanprover-community/mathlib4
+          ref: ${{ steps.pin.outputs.mathlib_sha }}
+          path: mathlib
+          persist-credentials: false
+
+      - name: Verify upstream revision and Lean toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C mathlib rev-parse HEAD)" = "${{ steps.pin.outputs.mathlib_sha }}"
+          actual_toolchain="$(tr -d '\r\n' < mathlib/lean-toolchain)"
+          test "$actual_toolchain" = "${{ steps.pin.outputs.lean_toolchain }}"
+
+      - name: Install exact Lean toolchain
+        uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          lake-package-directory: mathlib
+          auto-config: "false"
+          build: "false"
+          test: "false"
+          lint: "false"
+          use-mathlib-cache: "false"
+          use-github-cache: "false"
+
+      - name: Materialize pinned mathlib cache
+        shell: bash
+        working-directory: mathlib
+        run: |
+          set -euo pipefail
+          lake exe cache get
+
+      - name: Run post-elaboration exporter twice and verify determinism
+        shell: bash
+        working-directory: mathlib
+        env:
+          RESEARCH_REF: ${{ inputs.research_ref }}
+          RESEARCH_SHA: ${{ steps.pin.outputs.research_sha }}
+          MATHLIB_SHA: ${{ steps.pin.outputs.mathlib_sha }}
+          LEAN_TOOLCHAIN: ${{ steps.pin.outputs.lean_toolchain }}
+        run: |
+          set -euo pipefail
+          exporter="$GITHUB_WORKSPACE/anum_docs-research/research/mathlib-m0/lean/Export.lean"
+          artifact_dir="$GITHUB_WORKSPACE/mathlib-m0-artifacts"
+          test -f "$exporter"
+          mkdir -p "$artifact_dir"
+          for pass in 1 2; do
+            MATHLIB_M0_OUTPUT="$artifact_dir/corpus-export-$pass.json" \
+            MATHLIB_M0_MATHLIB_SHA="$MATHLIB_SHA" \
+            MATHLIB_M0_LEAN_TOOLCHAIN="$LEAN_TOOLCHAIN" \
+              lake env lean "$exporter"
+            test -s "$artifact_dir/corpus-export-$pass.json"
+          done
+          cmp "$artifact_dir/corpus-export-1.json" "$artifact_dir/corpus-export-2.json"
+          jq -e --arg sha "$MATHLIB_SHA" --arg toolchain "$LEAN_TOOLCHAIN" '
+            .upstream.mathlibSha == $sha and
+            .upstream.leanToolchain == $toolchain and
+            (.declarations | type == "array") and
+            ((.declarations | length) >= 10) and
+            ((.declarations | length) <= 100)
+          ' "$artifact_dir/corpus-export-1.json" >/dev/null
+          mv "$artifact_dir/corpus-export-1.json" "$artifact_dir/corpus-export.json"
+          rm "$artifact_dir/corpus-export-2.json"
+          jq -n \
+            --arg researchRef "$RESEARCH_REF" \
+            --arg researchSha "$RESEARCH_SHA" \
+            --arg mathlibSha "$MATHLIB_SHA" \
+            --arg leanToolchain "$LEAN_TOOLCHAIN" \
+            '{researchRef:$researchRef,researchSha:$researchSha,mathlibSha:$mathlibSha,leanToolchain:$leanToolchain,trust:"untrusted-export-evidence"}' \
+            > "$artifact_dir/run-metadata.json"
+          test -z "$(git -C "$GITHUB_WORKSPACE/anum_docs-research" status --porcelain)"
+
+      - name: Upload untrusted export evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mathlib-m0-export-${{ github.run_id }}
+          path: mathlib-m0-artifacts/
+          if-no-files-found: error
+          retention-days: 14
