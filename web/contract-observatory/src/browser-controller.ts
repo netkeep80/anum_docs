@@ -125,7 +125,7 @@ export function installObservatoryBrowserController(
     }
     const status = map.querySelector(".methodology-status");
     if (status !== null) {
-      status.textContent = `Selected: ${state.selectedVersionId ?? "none"}; stage: ${state.selectedStage ?? "all"}; item: ${state.selectedItemId ?? "none"}; filters: ${state.filters.join(", ") || "none"}; zoom: ${state.viewport.scale}.`;
+      status.textContent = `Выбрано: версия ${state.selectedVersionId ?? "нет"}; стадия: ${state.selectedStage ?? "все"}; элемент: ${state.selectedItemId ?? "нет"}; фильтры: ${state.filters.join(", ") || "нет"}; масштаб: ${state.viewport.scale}.`;
     }
     const active = environment.document.activeElement;
     if (active?.closest?.("[hidden]") != null) visibleButtons()[0]?.focus?.();
