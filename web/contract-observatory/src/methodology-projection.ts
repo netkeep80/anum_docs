@@ -40,10 +40,24 @@ export interface ExecutableGate {
   readonly path: string;
 }
 
+export type EvidenceIdentifierKind =
+  | "issue"
+  | "pullRequest"
+  | "head"
+  | "ciRun"
+  | "repoGuardRun"
+  | "mergeSha";
+
+export interface EvidenceIdentifier {
+  readonly kind: EvidenceIdentifierKind;
+  readonly value: string;
+}
+
 export interface EvidenceReference {
   readonly authority: "evidence";
   readonly id: string;
   readonly sourcePath: string;
+  readonly identifiers: readonly EvidenceIdentifier[];
 }
 
 export interface AcceptanceReference {
@@ -116,6 +130,15 @@ interface TraceabilityManifestSelection {
   readonly path: string;
   readonly value: JsonRecord;
 }
+
+const EVIDENCE_IDENTIFIER_KINDS: readonly EvidenceIdentifierKind[] = Object.freeze([
+  "issue",
+  "pullRequest",
+  "head",
+  "ciRun",
+  "repoGuardRun",
+  "mergeSha",
+]);
 
 export function buildMethodologyProjection(
   repoRoot: string,
@@ -401,15 +424,41 @@ function collectEvidenceReferences(
 ): EvidenceReference[] {
   const refs = new Map<string, EvidenceReference>();
   for (const paths of vectorEvidence.values()) {
-    for (const path of paths) refs.set(path, Object.freeze({ authority: "evidence", id: `evidence:${path}`, sourcePath: path }));
+    for (const path of paths) refs.set(path, evidenceReference(path, []));
   }
   const production = optionalRecord(conformance.productionEvidence);
   if (production !== undefined) {
     for (const path of Object.keys(production).sort()) {
-      refs.set(path, Object.freeze({ authority: "evidence", id: `evidence:${path}`, sourcePath: path }));
+      refs.set(path, evidenceReference(path, productionEvidenceIdentifiers(production[path], path)));
     }
   }
   return [...refs.values()].sort((a, b) => a.id.localeCompare(b.id));
+}
+
+function evidenceReference(path: string, identifiers: readonly EvidenceIdentifier[]): EvidenceReference {
+  return Object.freeze({
+    authority: "evidence",
+    id: `evidence:${path}`,
+    sourcePath: path,
+    identifiers: Object.freeze([...identifiers]),
+  });
+}
+
+function productionEvidenceIdentifiers(value: unknown, path: string): readonly EvidenceIdentifier[] {
+  const record = optionalRecord(value);
+  if (record === undefined) {
+    throw new Error(`Contract Observatory V4d: expected production evidence object: ${path}`);
+  }
+  const identifiers: EvidenceIdentifier[] = [];
+  for (const kind of EVIDENCE_IDENTIFIER_KINDS) {
+    const raw = record[kind];
+    if (raw === undefined) continue;
+    if (typeof raw !== "string" && typeof raw !== "number") {
+      throw new Error(`Contract Observatory V4d: invalid production evidence identifier: ${path}#/${kind}`);
+    }
+    identifiers.push(Object.freeze({ kind, value: String(raw) }));
+  }
+  return Object.freeze(identifiers);
 }
 
 function collectAcceptanceReferences(
