@@ -1,5 +1,6 @@
 import { buildContractObservatoryIndex } from "../src/contract-index.js";
 import { buildMethodologyProjection } from "../src/methodology-projection.js";
+import { renderContractObservatoryHtml } from "../src/site.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Contract Observatory V4d: ${message}`);
@@ -10,7 +11,8 @@ function same<T>(actual: T, expected: T, message: string): void {
 }
 
 const repositoryRoot = process.cwd();
-const projection = buildMethodologyProjection(repositoryRoot, buildContractObservatoryIndex(repositoryRoot));
+const index = buildContractObservatoryIndex(repositoryRoot);
+const projection = buildMethodologyProjection(repositoryRoot, index);
 const current = projection.versions.find((version) => version.isCurrent);
 assert(current !== undefined, "current version exists");
 
@@ -48,3 +50,41 @@ const previous = projection.versions.find((version) => version.isPrevious);
 assert(previous !== undefined, "previous version exists");
 same(previous.semanticInvariants.length, 0, "version without a matching traceability manifest stays unlinked");
 assert(previous.unresolvedRelations.includes("traceability-manifest"), "missing manifest remains explicit");
+
+const html = renderContractObservatoryHtml(index, projection);
+assert(html.includes('data-invariant-id="topLevelDot"'), "topLevelDot has a visible source-derived anatomy card");
+assert(html.includes('data-item-id="invariant:topLevelDot"'), "invariant identity participates in shared cross-highlighting");
+assert(html.includes("/requiredSemanticLaws/topLevelDot"), "exact contract JSON Pointer is visible");
+assert(html.includes(". -&gt; R under TopBind(R,S)"), "resolved contract law is visible without becoming UI authority");
+assert(html.includes("traceability/mts-v0.11.json"), "traceability manifest provenance is visible");
+for (const label of [
+  "Genesis vectors",
+  "Meaning vectors",
+  "C2 classification vectors",
+  "Compatibility vectors",
+  "Negative vectors",
+  "Executable gates",
+]) {
+  assert(html.includes(label), `invariant anatomy exposes ${label}`);
+}
+assert(
+  html.includes('data-item-id="vector:v011-top-level-dot-resolves-to-root"'),
+  "manifest-declared positive vector is an interactive source-linked endpoint",
+);
+assert(
+  html.includes('data-item-id="vector:v011-dot-is-not-ambient-runtime-current"'),
+  "manifest-declared negative vector is an interactive source-linked endpoint",
+);
+assert(
+  html.includes('data-item-id="gate:ts/test/v011-top-level-root-binding.test.ts"'),
+  "manifest-declared executable gate is an interactive source-linked endpoint",
+);
+const dotMeaningStart = html.indexOf('data-invariant-id="dotMeaning"');
+const dotMeaningEnd = html.indexOf('data-invariant-id="', dotMeaningStart + 1);
+const dotMeaningHtml = html.slice(dotMeaningStart, dotMeaningEnd < 0 ? undefined : dotMeaningEnd);
+assert(dotMeaningStart >= 0, "dotMeaning anatomy card exists");
+assert(dotMeaningHtml.includes("Negative vectors"), "dotMeaning keeps the empty negative category visible");
+assert(dotMeaningHtml.includes("none"), "explicit absence is rendered instead of guessed evidence");
+assert(!dotMeaningHtml.includes("v011-q-alphabet-remains-four-abits"), "UI does not guess C5/Q evidence into dotMeaning");
+
+console.log("Contract Observatory V4d invariant traceability and anatomy specification passed.");
