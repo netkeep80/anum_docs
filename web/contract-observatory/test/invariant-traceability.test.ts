@@ -107,4 +107,21 @@ assert(dotMeaningHtml.includes("Negative vectors"), "dotMeaning keeps the empty 
 assert(dotMeaningHtml.includes("none"), "explicit absence is rendered instead of guessed evidence");
 assert(!dotMeaningHtml.includes("v011-q-alphabet-remains-four-abits"), "UI does not guess C5/Q evidence into dotMeaning");
 
+const maliciousLaw = `<img src=x onerror="alert('mts')">`;
+const maliciousProjection = Object.freeze({
+  ...projection,
+  versions: Object.freeze(projection.versions.map((version) => version !== current ? version : Object.freeze({
+    ...version,
+    semanticInvariants: Object.freeze(version.semanticInvariants.map((invariant) => invariant.id !== "topLevelDot"
+      ? invariant
+      : Object.freeze({ ...invariant, contractValue: maliciousLaw }))),
+  }))),
+});
+const maliciousHtml = renderContractObservatoryHtml(index, maliciousProjection);
+assert(!maliciousHtml.includes(maliciousLaw), "malicious invariant source text never survives as raw markup");
+assert(
+  maliciousHtml.includes("&lt;img src=x onerror=&quot;alert(&#39;mts&#39;)&quot;&gt;"),
+  "malicious invariant source text is escaped in anatomy",
+);
+
 console.log("Contract Observatory V4d invariant traceability and anatomy specification passed.");
