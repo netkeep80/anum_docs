@@ -53,6 +53,7 @@ export function renderContractObservatoryHtml(
     .stage-controls, .filter-controls, .viewport-controls, .evidence-items { display: flex; flex-wrap: wrap; gap: .45rem; }
     .stage-controls button, .filter-controls button, .viewport-controls button, .version-select, .evidence-items button { cursor: pointer; border: 1px solid color-mix(in srgb, CanvasText 24%, transparent); border-radius: .65rem; background: Canvas; padding: .5rem .7rem; }
     button[aria-pressed="true"] { border-width: 2px; font-weight: 800; }
+    .trace-highlighted { outline: 2px solid Highlight; outline-offset: 2px; }
     .methodology-grid { display: grid; gap: .65rem; overflow: auto; padding-bottom: .25rem; }
     .methodology-lane { min-width: 780px; display: grid; grid-template-columns: minmax(190px, 1.4fr) repeat(7, minmax(72px, 1fr)); gap: .35rem; align-items: stretch; padding: .5rem; border: 1px solid color-mix(in srgb, CanvasText 15%, transparent); border-radius: .8rem; }
     .methodology-lane.selected, .methodology-lane.selection-synced { border-width: 2px; }
@@ -65,6 +66,27 @@ export function renderContractObservatoryHtml(
     .stage-evidence { display: block; margin-top: .2rem; font-size: .65rem; opacity: .7; }
     .evidence-items { grid-column: 1 / -1; padding-top: .25rem; }
     .evidence-items button { padding: .3rem .5rem; font-size: .7rem; overflow-wrap: anywhere; }
+    .invariant-anatomy { margin-top: 1rem; padding: .9rem; border: 1px solid color-mix(in srgb, CanvasText 16%, transparent); border-radius: .8rem; }
+    .invariant-anatomy h3 { margin: 0 0 .35rem; }
+    .invariant-anatomy > p { margin: 0 0 .7rem; opacity: .75; }
+    .invariant-cards { display: grid; gap: .7rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .invariant-card { min-width: 0; padding: .8rem; border: 1px solid color-mix(in srgb, CanvasText 15%, transparent); border-radius: .75rem; background: color-mix(in srgb, Canvas 97%, CanvasText 3%); }
+    .invariant-card h4 { margin: 0 0 .6rem; }
+    .invariant-select, .trace-node { cursor: pointer; border: 1px solid color-mix(in srgb, CanvasText 24%, transparent); border-radius: .55rem; background: Canvas; padding: .35rem .5rem; overflow-wrap: anywhere; text-align: left; }
+    .invariant-meta { display: grid; grid-template-columns: minmax(8rem, .7fr) minmax(0, 1.8fr); gap: .35rem .7rem; margin: 0 0 .7rem; font-size: .8rem; }
+    .invariant-meta dt { opacity: .7; }
+    .invariant-meta dd { margin: 0; }
+    .trace-group { margin-top: .55rem; }
+    .trace-group h5 { margin: 0 0 .3rem; font-size: .78rem; }
+    .trace-list { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; }
+    .trace-node { font-size: .72rem; }
+    .trace-none { font-size: .74rem; font-style: italic; opacity: .62; }
+    .raw-provenance { margin-top: .65rem; font-size: .78rem; }
+    .raw-provenance summary { cursor: pointer; font-weight: 700; }
+    .traceability-table { margin-top: .8rem; }
+    .traceability-table summary { cursor: pointer; font-weight: 800; }
+    .traceability-table table { margin-top: .5rem; font-size: .78rem; }
+    .traceability-table th { width: auto; }
     .methodology-status { margin: .8rem 0 0; min-height: 1.3em; font-size: .82rem; opacity: .75; }
     .timeline { margin: 0 0 2.5rem; }
     .timeline h2, .versions h2 { margin: 0 0 1rem; font-size: 1.5rem; }
@@ -90,7 +112,7 @@ export function renderContractObservatoryHtml(
     td { overflow-wrap: anywhere; }
     .footer { margin-top: 2.5rem; font-size: .85rem; opacity: .7; }
     @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
-    @media (max-width: 680px) { .shell { width: min(100% - 1rem, 1120px); padding-top: 1rem; } .provenance { grid-template-columns: 1fr; } .methodology-map { padding: .8rem; } th, td { display: block; width: 100%; padding-left: 0; padding-right: 0; } th { border-bottom: 0; padding-bottom: .2rem; } td { border-top: 0; padding-top: 0; } }
+    @media (max-width: 680px) { .shell { width: min(100% - 1rem, 1120px); padding-top: 1rem; } .provenance { grid-template-columns: 1fr; } .methodology-map { padding: .8rem; } .invariant-meta { grid-template-columns: 1fr; } th, td { display: block; width: 100%; padding-left: 0; padding-right: 0; } th { border-bottom: 0; padding-bottom: .2rem; } td { border-top: 0; padding-top: 0; } }
   </style>
 </head>
 <body>
@@ -118,6 +140,7 @@ function renderMethodologyMap(projection: MethodologyProjection): string {
     entry,
     config.versions[ordinal]!,
   )).join("\n");
+  const anatomy = projection.versions.map(renderInvariantAnatomy).join("\n");
 
   return `    <section class="methodology-map" aria-labelledby="methodology-title">
       <div class="methodology-heading"><p class="eyebrow">Primary explanatory view · derived methodology</p><h2 id="methodology-title">Methodology map + version lifecycle lanes</h2><p>Две координированные, но не тождественные структуры: метод разработки и состояние жизненного цикла версии.</p></div>
@@ -129,6 +152,7 @@ function renderMethodologyMap(projection: MethodologyProjection): string {
         <div class="viewport-controls" role="group" aria-label="Map viewport"><button type="button" data-viewport-action="zoom-out" aria-label="Zoom out">−</button><button type="button" data-viewport-action="reset">Reset viewport</button><button type="button" data-viewport-action="zoom-in" aria-label="Zoom in">+</button></div>
       </div>
       <div class="methodology-grid" tabindex="0" aria-label="Version lifecycle lanes">${lanes}</div>
+${anatomy}
       <p class="methodology-status" aria-live="polite"></p>
     </section>
 ${renderObservatoryBrowserControllerScript(config)}`;
@@ -143,6 +167,82 @@ function renderMethodologyLane(
   const stages = model.stageStates.map((entry) => `<div class="stage-cell${entry.present ? " present" : ""}" data-lane-stage="${entry.stage}" title="${entry.stage}: ${entry.present ? "source evidence present" : "no linked source evidence"}"><span>${escapeHtml(entry.stage)}</span><span class="stage-evidence">${entry.present ? `${evidenceByStage.get(entry.stage) ?? 0} evidence` : "—"}</span></div>`).join("\n");
   const evidenceItems = config.itemIds.slice(0, 6).map((id) => `<button type="button" data-item-id="${escapeAttribute(id)}" aria-pressed="false" title="Traceability/evidence reference; presentation-only">${escapeHtml(id)}</button>`).join("");
   return `<div class="methodology-lane${model.selected ? " selected" : ""}" data-version-lane="${escapeAttribute(model.contractId)}"><div class="lane-version"><button type="button" class="version-select" data-version-id="${escapeAttribute(model.contractId)}" aria-pressed="${model.selected ? "true" : "false"}" title="Select version and synchronize Observatory views">${escapeHtml(model.contractId)}</button><span class="lane-classification">${model.classification}</span></div>${stages}<div class="evidence-items" aria-label="Evidence references for ${escapeAttribute(model.contractId)}">${evidenceItems || "<span>No linked evidence references</span>"}</div></div>`;
+}
+
+function renderInvariantAnatomy(version: MethodologyVersionProjection): string {
+  const manifest = version.traceabilityManifestPath ?? "none";
+  const cards = version.semanticInvariants.map((invariant) => renderInvariantCard(version, invariant)).join("\n");
+  const missing = version.semanticInvariants.length === 0
+    ? `<p class="trace-none">No source-linked semantic invariants. Traceability manifest: ${escapeHtml(manifest)}.</p>`
+    : "";
+  return `      <section class="invariant-anatomy" data-traceability-version="${escapeAttribute(version.contractId)}" aria-label="Invariant anatomy for ${escapeAttribute(version.contractId)}"><h3>Invariant anatomy · ${escapeHtml(version.contractId)}</h3><p>Source-derived provenance view. Traceability manifest: ${escapeHtml(manifest)}. Missing relations remain explicit.</p>${missing}<div class="invariant-cards">${cards}</div>${renderTraceabilityTable(version)}</section>`;
+}
+
+function renderInvariantCard(
+  version: MethodologyVersionProjection,
+  invariant: MethodologyVersionProjection["semanticInvariants"][number],
+): string {
+  const vectorIds = invariantVectorIds(invariant);
+  const evidencePaths = linkedEvidencePaths(version, vectorIds);
+  const acceptance = version.acceptanceReferences.map((reference) => Object.freeze({ id: reference.id, label: `${reference.id} · ${reference.sourcePath}` }));
+  return `<article class="invariant-card" data-invariant-id="${escapeAttribute(invariant.id)}"><h4><button type="button" class="invariant-select" data-item-id="invariant:${escapeAttribute(invariant.id)}" aria-pressed="false">${escapeHtml(invariant.id)}</button></h4><dl class="invariant-meta"><dt>Contract path</dt><dd>${escapeHtml(version.contractPath)}</dd><dt>Contract JSON Pointer</dt><dd>${escapeHtml(invariant.contractPointer)}</dd><dt>Contract law</dt><dd>${escapeHtml(invariant.contractValue)}</dd><dt>Conformance path</dt><dd>${escapeHtml(version.conformancePath)}</dd><dt>Theory reference</dt><dd>none (no invariant-scoped source relation)</dd></dl>${renderTraceGroup("Genesis vectors", invariant.positive.requiredGenesisVectors, "vector")}${renderTraceGroup("Meaning vectors", invariant.positive.requiredMeaningVectors, "vector")}${renderTraceGroup("C2 classification vectors", invariant.positive.requiredC2ClassificationVectors, "vector")}${renderTraceGroup("Compatibility vectors", invariant.positive.requiredCompatibilityVectors, "vector")}${renderTraceGroup("Negative vectors", invariant.negative.requiredNegativeVectors, "vector")}${renderTraceGroup("Executable gates", invariant.requiredExecutableGates, "gate")}${renderTraceGroup("Existing evidence", evidencePaths, "evidence")}${renderReferenceGroup("Acceptance provenance", acceptance)}<details class="raw-provenance"><summary>Raw provenance</summary><dl class="invariant-meta"><dt>Invariant ID</dt><dd>${escapeHtml(invariant.id)}</dd><dt>Traceability source</dt><dd>${escapeHtml(invariant.traceabilitySourcePath)}</dd><dt>Contract source</dt><dd>${escapeHtml(version.contractPath)}#${escapeHtml(invariant.contractPointer)}</dd><dt>Conformance source</dt><dd>${escapeHtml(version.conformancePath)}</dd></dl></details></article>`;
+}
+
+function renderTraceGroup(label: string, values: readonly string[], prefix: "vector" | "gate" | "evidence"): string {
+  const nodes = values.map((value) => `<button type="button" class="trace-node" data-item-id="${escapeAttribute(`${prefix}:${value}`)}" aria-pressed="false">${escapeHtml(value)}</button>`).join("");
+  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">none</span>"}</div></div>`;
+}
+
+function renderReferenceGroup(label: string, values: readonly Readonly<{ id: string; label: string }>[] ): string {
+  const nodes = values.map((value) => `<button type="button" class="trace-node" data-item-id="${escapeAttribute(value.id)}" aria-pressed="false">${escapeHtml(value.label)}</button>`).join("");
+  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">none</span>"}</div></div>`;
+}
+
+function invariantVectorIds(invariant: MethodologyVersionProjection["semanticInvariants"][number]): readonly string[] {
+  return uniqueSorted([
+    ...invariant.positive.requiredGenesisVectors,
+    ...invariant.positive.requiredMeaningVectors,
+    ...invariant.positive.requiredC2ClassificationVectors,
+    ...invariant.positive.requiredCompatibilityVectors,
+    ...invariant.negative.requiredNegativeVectors,
+  ]);
+}
+
+function linkedEvidencePaths(version: MethodologyVersionProjection, vectorIds: readonly string[]): readonly string[] {
+  const selected = new Set(vectorIds);
+  return uniqueSorted([...version.positiveVectors, ...version.negativeVectors]
+    .filter((vector) => selected.has(vector.id))
+    .flatMap((vector) => vector.evidence));
+}
+
+function renderTraceabilityTable(version: MethodologyVersionProjection): string {
+  if (version.traceability.length === 0) {
+    return `<details class="traceability-table"><summary>Source-derived traceability relations</summary><p class="trace-none">none</p></details>`;
+  }
+  const rows = version.traceability.map((relation) => {
+    const presentation = relationPresentation(relation);
+    return `<tr data-relation="${escapeAttribute(relation.relation)}"><td>${renderTraceEndpoint(presentation.source)}</td><td>${escapeHtml(presentation.label)}</td><td>${renderTraceEndpoint(presentation.target)}</td></tr>`;
+  }).join("\n");
+  return `<details class="traceability-table"><summary>Source-derived traceability relations</summary><table><thead><tr><th>Evidence/source endpoint</th><th>Relation</th><th>Obligation/target endpoint</th></tr></thead><tbody>${rows}</tbody></table></details>`;
+}
+
+function relationPresentation(
+  relation: MethodologyVersionProjection["traceability"][number],
+): Readonly<{ source: string; target: string; label: string }> {
+  switch (relation.relation) {
+    case "supported-by": return Object.freeze({ source: relation.to, target: relation.from, label: "supports" });
+    case "challenged-by": return Object.freeze({ source: relation.to, target: relation.from, label: "challenges" });
+    case "verified-by": return Object.freeze({ source: relation.to, target: relation.from, label: "verifies" });
+    case "accepted-by": return Object.freeze({ source: relation.to, target: relation.from, label: "accepts" });
+  }
+}
+
+function renderTraceEndpoint(id: string): string {
+  return `<button type="button" class="trace-node" data-item-id="${escapeAttribute(id)}" aria-pressed="false">${escapeHtml(id)}</button>`;
+}
+
+function uniqueSorted(values: readonly string[]): string[] {
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
 }
 
 function renderFilterButton(filter: string, label: string): string { return `<button type="button" data-methodology-filter="${filter}" aria-pressed="false">${label}</button>`; }
