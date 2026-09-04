@@ -247,8 +247,7 @@ function findTraceabilityManifest(
   for (const name of readdirSync(directory).filter((entry) => entry.endsWith(".json")).sort()) {
     const path = `traceability/${name}`;
     const value = readJson(join(repoRoot, path));
-    const schema = typeof value.schema === "string" ? value.schema : "";
-    if (!schema.startsWith("mts-traceability/")) continue;
+    if (value.schema !== "mts-traceability/v0.1") continue;
     if (value.contract === summary.contractPath && value.conformance === summary.conformancePath) {
       matches.push(Object.freeze({ path, value }));
     }
@@ -487,9 +486,19 @@ function buildLifecycle(
   acceptance: readonly AcceptanceReference[],
 ): MethodologyStageReference[] {
   const stages: MethodologyStageReference[] = [];
-  if (summary.status === "candidate") stages.push(stage("candidate", [summary.contractPath]));
-  if (summary.accepted) stages.push(stage("accepted", [summary.contractPath, summary.conformancePath]));
-  if (summary.accepted && acceptance.length > 0) stages.push(stage("released", acceptance.map((reference) => reference.id)));
+
+  // Lifecycle stages are source-derived, not reconstructed from nearby evidence.
+  // A generic issue number, vector/gate presence or coverageState cannot prove a
+  // historical research/problem/challenge/model stage.
+  if (summary.status === "candidate") {
+    stages.push(stage("candidate", [summary.contractPath]));
+  }
+  if (summary.accepted) {
+    stages.push(stage("accepted", [summary.contractPath, summary.conformancePath]));
+  }
+  if (summary.accepted && acceptance.length > 0) {
+    stages.push(stage("released", acceptance.map((reference) => reference.id)));
+  }
   return stages;
 }
 
