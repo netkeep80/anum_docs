@@ -42,4 +42,28 @@ assert(
   "exporter must structurally traverse the supported Lean Level forms",
 );
 
+const workflowPath = resolve("..", ".github", "workflows", "mathlib-m0-export.yml");
+assert(existsSync(workflowPath), "Mathlib M0 pinned export workflow must exist");
+const workflow = readFileSync(workflowPath, "utf8");
+assert(
+  workflow.includes("- ts/src/mathlib-m0-transport.ts"),
+  "live export gate must rerun when the TypeScript transport validator changes",
+);
+assert(
+  workflow.includes("- .github/workflows/mathlib-m0-export.yml"),
+  "live export gate must rerun when its own validation contract changes",
+);
+assert(
+  workflow.includes("parseMathlibM0TransportBundle"),
+  "live Lean output must pass through the TypeScript transport parser",
+);
+assert(
+  workflow.includes("npm run build --silent"),
+  "live export gate must build the exact research-head TypeScript validator",
+);
+assert(
+  workflow.includes("mathlib-m0-artifacts/corpus-export.json"),
+  "TypeScript transport validation must consume the actual live Lean artifact",
+);
+
 console.log("mathlib-m0-export-contract.test.ts: ok");
