@@ -1,0 +1,162 @@
+{
+  "schema": "mts-traceability/v0.1",
+  "contract": "contracts/mts-contract-v0.11.json",
+  "conformance": "contracts/mts-conformance-v0.11.json",
+  "acceptance": "cutover/typescript-c1-acceptance-v0.4.json",
+  "invariants": {
+    "topLevelDot": {
+      "contractPointer": "/requiredSemanticLaws/topLevelDot",
+      "positive": {
+        "requiredGenesisVectors": [
+          "v011-top-level-astrika-supplies-root-binding",
+          "v011-top-level-dot-resolves-to-root"
+        ],
+        "requiredMeaningVectors": [
+          "v011-dot-occurrence-role-is-not-dot-meaning-link"
+        ],
+        "requiredC2ClassificationVectors": [],
+        "requiredCompatibilityVectors": []
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v011-dot-is-not-ambient-runtime-current",
+          "v011-top-bind-does-not-insert-hidden-root-glyph",
+          "v011-host-stack-is-not-semantic-authority"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-physical-dot-bootstrap.test.ts",
+        "ts/test/v011-top-level-root-binding.test.ts"
+      ]
+    },
+    "topLevelDotDot": {
+      "contractPointer": "/requiredSemanticLaws/topLevelDotDot",
+      "positive": {
+        "requiredGenesisVectors": [
+          "v011-top-level-dot-dot-preserves-two-occurrences",
+          "v011-top-level-dot-dot-folds-to-root"
+        ],
+        "requiredMeaningVectors": [],
+        "requiredC2ClassificationVectors": [],
+        "requiredCompatibilityVectors": []
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v011-nonroot-pair-A-A-is-not-A"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-physical-dot-bootstrap.test.ts",
+        "ts/test/v011-top-level-root-binding.test.ts"
+      ]
+    },
+    "explicitBindingCompatibility": {
+      "contractPointer": "/requiredSemanticLaws/explicitBindingCompatibility",
+      "positive": {
+        "requiredGenesisVectors": [],
+        "requiredMeaningVectors": [
+          "v011-dot-occurrence-role-is-not-dot-meaning-link"
+        ],
+        "requiredC2ClassificationVectors": [],
+        "requiredCompatibilityVectors": [
+          "v011-nested-explicit-binding-remains-nearest-structural"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v011-dot-is-not-ambient-runtime-current",
+          "v011-host-stack-is-not-semantic-authority"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-physical-dot-bootstrap.test.ts",
+        "ts/test/v011-nested-explicit-binding-compatibility.test.ts"
+      ]
+    },
+    "nonRootSelfPair": {
+      "contractPointer": "/requiredSemanticLaws/nonRootSelfPair",
+      "positive": {
+        "requiredGenesisVectors": [],
+        "requiredMeaningVectors": [],
+        "requiredC2ClassificationVectors": [],
+        "requiredCompatibilityVectors": []
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v011-nonroot-pair-A-A-is-not-A"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-physical-dot-bootstrap.test.ts"
+      ]
+    },
+    "rootFrameBoundary": {
+      "contractPointer": "/requiredSemanticLaws/rootFrameBoundary",
+      "positive": {
+        "requiredGenesisVectors": [
+          "v011-zero-whole-is-not-execution-frame"
+        ],
+        "requiredMeaningVectors": [],
+        "requiredC2ClassificationVectors": [],
+        "requiredCompatibilityVectors": []
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v011-root-is-not-execution-frame"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-physical-dot-bootstrap.test.ts",
+        "ts/test/v011-top-level-root-binding.test.ts"
+      ]
+    },
+    "colonMeaning": {
+      "contractPointer": "/requiredSemanticLaws/colonMeaning",
+      "positive": {
+        "requiredGenesisVectors": [],
+        "requiredMeaningVectors": [
+          "v011-colon-meaning-remains-R-to-L"
+        ],
+        "requiredC2ClassificationVectors": [
+          "v011-c2-semantic-simplification-supported",
+          "v011-c2-self-hosted-presentation-cycle-remains",
+          "v011-c2-representation-signs-retained"
+        ],
+        "requiredCompatibilityVectors": []
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v011-colon-meaning-is-not-dot-dot-fold"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-minimal-sign-basis-c2.test.ts"
+      ]
+    },
+    "dotMeaning": {
+      "contractPointer": "/requiredSemanticLaws/dotMeaning",
+      "positive": {
+        "requiredGenesisVectors": [],
+        "requiredMeaningVectors": [
+          "v011-dot-meaning-remains-L-to-R",
+          "v011-dot-occurrence-role-is-not-dot-meaning-link"
+        ],
+        "requiredC2ClassificationVectors": [
+          "v011-c2-semantic-simplification-supported",
+          "v011-c2-representation-signs-retained",
+          "v011-c2-dot-declaration-does-not-self-reference-own-entry"
+        ],
+        "requiredCompatibilityVectors": []
+      },
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-physical-dot-bootstrap.test.ts",
+        "ts/test/research-minimal-sign-basis-c2.test.ts",
+        "ts/test/v011-top-level-root-binding.test.ts",
+        "ts/test/v011-nested-explicit-binding-compatibility.test.ts"
+      ]
+    }
+  }
+}
