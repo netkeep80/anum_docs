@@ -303,12 +303,14 @@ export function parseMathlibM0TransportBundle(input: unknown): MathlibM0Transpor
     ]);
     const qualifiedName = declarationText(candidate.qualifiedName);
     if (seen.has(qualifiedName)) fail("duplicate-declaration");
-    if (!Array.isArray(candidate.dependencies) || !Array.isArray(candidate.externalDependencies)) {
+    const rawDependencies = candidate.dependencies;
+    const rawExternalDependencies = candidate.externalDependencies;
+    if (!Array.isArray(rawDependencies) || !Array.isArray(rawExternalDependencies)) {
       fail("invalid-declaration");
     }
 
-    const dependencies = sortedUniqueDeclarationTexts(candidate.dependencies);
-    const externalDependencies = sortedUniqueDeclarationTexts(candidate.externalDependencies);
+    const dependencies = sortedUniqueDeclarationTexts(rawDependencies);
+    const externalDependencies = sortedUniqueDeclarationTexts(rawExternalDependencies);
     if (
       dependencies.includes(qualifiedName) ||
       externalDependencies.includes(qualifiedName) ||
