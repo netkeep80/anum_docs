@@ -65,18 +65,63 @@ private def insertNode (node : ExportNode) : List ExportNode → List ExportNode
 private def sortNodes (nodes : List ExportNode) : List ExportNode :=
   nodes.foldl (fun acc node => insertNode node acc) []
 
+private def supportedKernel? (info : ConstantInfo) : Option (String × Expr × Option Expr) :=
+  match info with
+  | .axiomInfo value =>
+      some ("axiom", value.type, none)
+  | .thmInfo value =>
+      some ("theorem", value.type, some value.value)
+  | .defnInfo value =>
+      some ("definition", value.type, some value.value)
+  | _ =>
+      none
+
 private def supportedKernel
     (qualifiedName : Name)
     (info : ConstantInfo) : Except String (String × Expr × Option Expr) :=
-  match info with
-  | .axiomInfo value =>
-      .ok ("axiom", value.type, none)
-  | .thmInfo value =>
-      .ok ("theorem", value.type, some value.value)
-  | .defnInfo value =>
-      .ok ("definition", value.type, some value.value)
-  | _ =>
-      .error s!"unsupported kernel form for selected declaration {qualifiedName}"
+  match supportedKernel? info with
+  | some kernel => .ok kernel
+  | none => .error s!"unsupported kernel form for selected declaration {qualifiedName}"
+
+private def kernelReferences (typeExpr : Expr) (valueExpr? : Option Expr) : List Name :=
+  let exprs := typeExpr :: valueExpr?.toList
+  sortUniqueNames <| exprs.flatMap fun expr => expr.getUsedConstants.toList
+
+private partial def collectDependencyClosureAux
+    (env : Environment)
+    (roots : List Name)
+    (pending : List Name)
+    (visited : List Name)
+    (selected : List Name) : Except String (List Name) := do
+  match pending with
+  | [] =>
+      .ok (sortUniqueNames selected)
+  | qualifiedName :: tail =>
+      if visited.contains qualifiedName then
+        collectDependencyClosureAux env roots tail visited selected
+      else
+        let visited := insertName qualifiedName visited
+        let some info := env.find? qualifiedName
+          | .error s!"referenced declaration not found in elaborated environment: {qualifiedName}"
+        match supportedKernel? info with
+        | none =>
+            if roots.contains qualifiedName then
+              .error s!"unsupported kernel form for corpus root {qualifiedName}"
+            else
+              collectDependencyClosureAux env roots tail visited selected
+        | some (_, typeExpr, valueExpr?) =>
+            let selected := insertName qualifiedName selected
+            if selected.length > 100 then
+              .error s!"Mathlib M0 exportable dependency closure exceeds 100 declarations ({selected.length})"
+            else
+              let referenced := kernelReferences typeExpr valueExpr?
+              let pending := sortUniqueNames (tail ++ referenced)
+              collectDependencyClosureAux env roots pending visited selected
+
+private def collectDependencyClosure
+    (env : Environment)
+    (roots : List Name) : Except String (List Name) :=
+  collectDependencyClosureAux env roots (sortUniqueNames roots) [] []
 
 private partial def levelJson (level : Level) : Except String Json :=
   match level with
@@ -189,8 +234,7 @@ private def buildNode
   let some info := env.find? qualifiedName
     | .error s!"selected declaration not found in elaborated environment: {qualifiedName}"
   let (kind, typeExpr, valueExpr?) ← supportedKernel qualifiedName info
-  let exprs := typeExpr :: valueExpr?.toList
-  let referenced := sortUniqueNames <| exprs.flatMap fun expr => expr.getUsedConstants.toList
+  let referenced := kernelReferences typeExpr valueExpr?
   if referenced.contains qualifiedName then
     .error s!"selected declaration has a self dependency: {qualifiedName}"
   else
@@ -212,8 +256,9 @@ private def buildNode
       valueJson?
     }
 
-private def buildNodes (env : Environment) : Except String (List ExportNode) :=
-  corpusRoots.mapM (buildNode env corpusRoots)
+private def buildNodes (env : Environment) : Except String (List ExportNode) := do
+  let selected ← collectDependencyClosure env corpusRoots
+  selected.mapM (buildNode env selected)
 
 private def topoSortAux : Nat → List ExportNode → List Name → Except String (List ExportNode)
   | 0, pending, _ =>
