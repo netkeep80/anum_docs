@@ -117,7 +117,8 @@ private def topoSortAux : Nat → List ExportNode → List Name → Except Strin
         | [] =>
             .error s!"dependency cycle in selected Mathlib M0 corpus ({pending.length} declarations remain)"
         | next :: _ => do
-            let tail ← topoSortAux fuel (pending.erase next) (emitted ++ [next.qualifiedName])
+            let remaining := pending.filter fun node => node.qualifiedName != next.qualifiedName
+            let tail ← topoSortAux fuel remaining (emitted ++ [next.qualifiedName])
             .ok (next :: tail)
 
 private def topoSort (nodes : List ExportNode) : Except String (List ExportNode) :=
