@@ -76,6 +76,7 @@ const kernel: ObservatoryInteractionKernel = Object.freeze({
   encode: () => "#",
   reduce: (current: ObservatoryInteractionState) => current,
   isVersionVisible: () => true,
+  highlightedItemIds: () => Object.freeze([]),
 });
 
 const environment: ObservatoryBrowserEnvironment = {
