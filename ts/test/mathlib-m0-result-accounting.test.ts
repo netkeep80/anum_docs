@@ -34,16 +34,19 @@ const bundle = {
     {
       qualifiedName: "M0.Base",
       dependencies: [],
+      externalDependencies: ["Sort"],
       kernel: { kind: "axiom", type: "Sort 0" },
     },
     {
       qualifiedName: "M0.Rejected",
       dependencies: ["M0.Base"],
+      externalDependencies: [],
       kernel: { kind: "theorem", type: "M0.Base", value: "proof" },
     },
     {
       qualifiedName: "M0.Blocked",
       dependencies: ["M0.Rejected"],
+      externalDependencies: [],
       kernel: { kind: "definition", type: "M0.Base", value: "value" },
     },
   ],
@@ -104,6 +107,25 @@ const changedDigest = await computeMathlibM0DeclarationTransportDigest(
   "M0.Rejected",
 );
 assert(changedDigest !== replayDigest, "changed declaration target must change per-declaration transport identity");
+
+const changedExternalDigest = await computeMathlibM0DeclarationTransportDigest(
+  {
+    ...bundle,
+    declarations: [
+      bundle.declarations[0],
+      {
+        ...bundle.declarations[1],
+        externalDependencies: ["Classical.choice"],
+      },
+      bundle.declarations[2],
+    ],
+  },
+  "M0.Rejected",
+);
+assert(
+  changedExternalDigest !== replayDigest,
+  "changed external support must change per-declaration transport identity",
+);
 
 await expectReject("dependency-identity-mismatch", () =>
   buildMathlibM0ResultReport(bundle, [
