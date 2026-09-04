@@ -36,12 +36,12 @@ const invariantHighlights = kernel.highlightedItemIds(invariantState);
 includes(invariantHighlights, "invariant:topLevelDot", "selected invariant highlights itself");
 includes(
   invariantHighlights,
-  "v011-top-level-dot-resolves-to-root",
+  "vector:v011-top-level-dot-resolves-to-root",
   "invariant highlights its manifest-declared positive vector",
 );
 includes(
   invariantHighlights,
-  "v011-dot-is-not-ambient-runtime-current",
+  "vector:v011-dot-is-not-ambient-runtime-current",
   "invariant highlights its manifest-declared negative vector",
 );
 includes(
@@ -55,7 +55,7 @@ includes(
   "invariant follows vectorEvidence forward to existing executable evidence",
 );
 assert(
-  !invariantHighlights.includes("v011-q-alphabet-remains-four-abits"),
+  !invariantHighlights.includes("vector:v011-q-alphabet-remains-four-abits"),
   "forward highlighting never guesses unrelated Q-boundary evidence",
 );
 
@@ -67,7 +67,7 @@ const evidenceHighlights = kernel.highlightedItemIds(evidenceState);
 includes(evidenceHighlights, "evidence:ts/test/v011-top-level-root-binding.test.ts", "selected evidence highlights itself");
 includes(
   evidenceHighlights,
-  "v011-top-level-dot-resolves-to-root",
+  "vector:v011-top-level-dot-resolves-to-root",
   "evidence walks the explicit relation graph backwards to its vector",
 );
 includes(
