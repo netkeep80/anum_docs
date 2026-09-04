@@ -76,10 +76,16 @@ export interface InteractiveMethodologyModel {
   readonly versions: readonly InteractiveMethodologyVersion[];
 }
 
+export interface ObservatoryInteractionRelationConfig {
+  readonly from: string;
+  readonly to: string;
+}
+
 export interface ObservatoryInteractionVersionConfig {
   readonly id: string;
   readonly categories: readonly string[];
   readonly itemIds: readonly string[];
+  readonly relations: readonly ObservatoryInteractionRelationConfig[];
 }
 
 export interface ObservatoryInteractionConfig {
@@ -104,6 +110,7 @@ export interface ObservatoryInteractionKernel {
     versionId: string,
     state: ObservatoryInteractionState,
   ) => boolean;
+  readonly highlightedItemIds: (state: ObservatoryInteractionState) => readonly string[];
 }
 
 export function buildObservatoryInteractionConfig(
@@ -113,6 +120,10 @@ export function buildObservatoryInteractionConfig(
     id: version.contractId,
     categories: Object.freeze(methodologyCategories(version)),
     itemIds: Object.freeze(methodologyItemIds(version)),
+    relations: Object.freeze(version.traceability.map((relation) => Object.freeze({
+      from: relation.from,
+      to: relation.to,
+    }))),
   }));
   return Object.freeze({
     versions: Object.freeze(versions),
@@ -138,6 +149,12 @@ export function createObservatoryInteractionKernel(
   const filters = new Set(config.filters);
   const categoriesByVersion = new Map(
     config.versions.map((entry) => [entry.id, new Set(entry.categories)] as const),
+  );
+  const itemIdsByVersion = new Map(
+    config.versions.map((entry) => [entry.id, new Set(entry.itemIds)] as const),
+  );
+  const relationsByVersion = new Map(
+    config.versions.map((entry) => [entry.id, entry.relations] as const),
   );
 
   const uniqueSortedAllowed = (values: readonly string[], allowed: Set<string>): readonly string[] =>
@@ -242,12 +259,46 @@ export function createObservatoryInteractionKernel(
     return normalizeState(state).filters.every((filter) => categories.has(filter));
   };
 
+  const directionalClosure = (
+    root: string,
+    relations: readonly ObservatoryInteractionRelationConfig[],
+    direction: "forward" | "reverse",
+  ): readonly string[] => {
+    const visited = new Set<string>([root]);
+    const queue = [root];
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      for (const relation of relations) {
+        const next = direction === "forward"
+          ? relation.from === current ? relation.to : null
+          : relation.to === current ? relation.from : null;
+        if (next !== null && !visited.has(next)) {
+          visited.add(next);
+          queue.push(next);
+        }
+      }
+    }
+    return [...visited];
+  };
+
+  const highlightedItemIds = (state: ObservatoryInteractionState): readonly string[] => {
+    const normalized = normalizeState(state);
+    if (normalized.selectedVersionId === null || normalized.selectedItemId === null) return Object.freeze([]);
+    const versionItems = itemIdsByVersion.get(normalized.selectedVersionId);
+    if (versionItems === undefined || !versionItems.has(normalized.selectedItemId)) return Object.freeze([]);
+    const relations = relationsByVersion.get(normalized.selectedVersionId) ?? [];
+    const forward = directionalClosure(normalized.selectedItemId, relations, "forward");
+    const reverse = directionalClosure(normalized.selectedItemId, relations, "reverse");
+    return Object.freeze([...new Set([...forward, ...reverse])].sort((a, b) => a.localeCompare(b)));
+  };
+
   return Object.freeze({
     initialState: () => decode("#"),
     decode,
     encode,
     reduce,
     isVersionVisible,
+    highlightedItemIds,
   });
 }
 
@@ -327,10 +378,13 @@ function methodologyItemIds(version: MethodologyVersionProjection): string[] {
   return [...new Set([
     ...version.theoryReferences.map((entry) => entry.id),
     ...version.contractReferences.map((entry) => entry.id),
+    ...version.semanticInvariants.map((entry) => `invariant:${entry.id}`),
     ...version.positiveVectors.map((entry) => entry.id),
     ...version.negativeVectors.map((entry) => entry.id),
+    ...version.executableGates.map((entry) => entry.id),
     ...version.evidenceReferences.map((entry) => entry.id),
     ...version.acceptanceReferences.map((entry) => entry.id),
+    ...version.traceability.flatMap((entry) => [entry.from, entry.to]),
   ])].sort((a, b) => a.localeCompare(b));
 }
 

@@ -99,8 +99,11 @@ export function installObservatoryBrowserController(
     map.querySelectorAll("[data-methodology-filter]").forEach((button) => {
       button.setAttribute("aria-pressed", String(state.filters.includes(button.dataset.methodologyFilter ?? "")));
     });
+    const highlightedItemIds = new Set(kernel.highlightedItemIds(state));
     map.querySelectorAll("[data-item-id]").forEach((button) => {
-      button.setAttribute("aria-pressed", String(button.dataset.itemId === state.selectedItemId));
+      const itemId = button.dataset.itemId ?? "";
+      button.setAttribute("aria-pressed", String(itemId === state.selectedItemId));
+      button.classList?.toggle("trace-highlighted", highlightedItemIds.has(itemId));
     });
     map.querySelectorAll("[data-version-lane]").forEach((lane) => {
       const versionId = lane.dataset.versionLane ?? "";

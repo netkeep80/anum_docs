@@ -107,6 +107,34 @@ withSyntheticRepository(({ repoRoot, syntheticIndex, writeAcceptance }) => {
   assert(version.unresolvedRelations.includes("acceptance-reference"), "missing acceptance pointer stays explicit");
 });
 
+withSyntheticRepository(({ repoRoot, syntheticIndex, writeContract, writeConformance, writeTraceability }) => {
+  writeContract({ requiredSemanticLaws: { law: "synthetic law" } });
+  writeConformance({ requiredAlphaVectors: [] });
+  writeTraceability({
+    schema: "mts-traceability/v9.9",
+    contract: "contracts/mts-contract-v9.1.json",
+    conformance: "contracts/mts-conformance-v9.1.json",
+    acceptance: "cutover/acceptance.json",
+    invariants: {
+      law: {
+        contractPointer: "/requiredSemanticLaws/law",
+        positive: {
+          requiredGenesisVectors: [],
+          requiredMeaningVectors: [],
+          requiredC2ClassificationVectors: [],
+          requiredCompatibilityVectors: [],
+        },
+        negative: { requiredNegativeVectors: [] },
+        requiredExecutableGates: [],
+      },
+    },
+  });
+  const version = buildMethodologyProjection(repoRoot, syntheticIndex()).versions[0]!;
+  same(version.semanticInvariants.length, 0, "unsupported future traceability schema is not interpreted as v0.1");
+  same(version.traceabilityManifestPath, null, "unsupported future traceability schema is not selected");
+  assert(version.unresolvedRelations.includes("traceability-manifest"), "unsupported future schema remains explicitly unresolved");
+});
+
 withSyntheticRepository(({ repoRoot, syntheticIndex, writeConformance }) => {
   writeConformance({
     requiredAlphaVectors: ["duplicate", "duplicate"],
@@ -193,6 +221,7 @@ interface SyntheticRepository {
   readonly writeContract: (overrides?: Record<string, unknown>) => void;
   readonly writeConformance: (overrides?: Record<string, unknown>) => void;
   readonly writeAcceptance: (value: Record<string, unknown>) => void;
+  readonly writeTraceability: (value: Record<string, unknown>) => void;
 }
 
 function withSyntheticRepository(action: (repository: SyntheticRepository) => void): void {
@@ -202,6 +231,7 @@ function withSyntheticRepository(action: (repository: SyntheticRepository) => vo
   const acceptancePath = "cutover/acceptance.json";
   mkdirSync(join(repoRoot, "contracts"), { recursive: true });
   mkdirSync(join(repoRoot, "cutover"), { recursive: true });
+  mkdirSync(join(repoRoot, "traceability"), { recursive: true });
 
   const baseContract: Record<string, unknown> = {
     schema: "mts-contract/v9.1",
@@ -229,6 +259,9 @@ function withSyntheticRepository(action: (repository: SyntheticRepository) => vo
   };
   const writeAcceptance = (value: Record<string, unknown>): void => {
     writeFileSync(join(repoRoot, acceptancePath), `${JSON.stringify(value, null, 2)}\n`, "utf8");
+  };
+  const writeTraceability = (value: Record<string, unknown>): void => {
+    writeFileSync(join(repoRoot, "traceability", "synthetic.json"), `${JSON.stringify(value, null, 2)}\n`, "utf8");
   };
 
   writeContract();
@@ -263,7 +296,7 @@ function withSyntheticRepository(action: (repository: SyntheticRepository) => vo
   });
 
   try {
-    action({ repoRoot, syntheticIndex, writeContract, writeConformance, writeAcceptance });
+    action({ repoRoot, syntheticIndex, writeContract, writeConformance, writeAcceptance, writeTraceability });
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }

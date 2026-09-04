@@ -31,6 +31,8 @@ function projectedVersion(overrides: Partial<MethodologyVersionProjection> = {})
     isPrevious: false,
     theoryReferences: Object.freeze([]),
     contractReferences: Object.freeze([]),
+    semanticInvariants: Object.freeze([]),
+    traceabilityManifestPath: null,
     positiveVectors: Object.freeze([]),
     negativeVectors: Object.freeze([]),
     executableGates: Object.freeze([]),
