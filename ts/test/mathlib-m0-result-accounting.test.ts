@@ -24,6 +24,10 @@ async function expectReject(code: MathlibM0ResultError["code"], work: () => Prom
   throw new Error(`${code}: expected result rejection`);
 }
 
+const SORT_ZERO = Object.freeze({ kind: "sort", level: { kind: "zero" } });
+const BASE = Object.freeze({ kind: "const", name: "M0.Base", levels: [] });
+const REJECTED = Object.freeze({ kind: "const", name: "M0.Rejected", levels: [] });
+
 const bundle = {
   schema: MATHLIB_M0_TRANSPORT_SCHEMA,
   upstream: {
@@ -34,20 +38,20 @@ const bundle = {
     {
       qualifiedName: "M0.Base",
       dependencies: [],
-      externalDependencies: ["Sort"],
-      kernel: { kind: "axiom", type: "Sort 0" },
+      externalDependencies: [],
+      kernel: { kind: "axiom", type: SORT_ZERO },
     },
     {
       qualifiedName: "M0.Rejected",
       dependencies: ["M0.Base"],
       externalDependencies: [],
-      kernel: { kind: "theorem", type: "M0.Base", value: "proof" },
+      kernel: { kind: "theorem", type: BASE, value: BASE },
     },
     {
       qualifiedName: "M0.Blocked",
       dependencies: ["M0.Rejected"],
       externalDependencies: [],
-      kernel: { kind: "definition", type: "M0.Base", value: "value" },
+      kernel: { kind: "definition", type: REJECTED, value: REJECTED },
     },
   ],
 } as const;
@@ -99,7 +103,10 @@ const changedDigest = await computeMathlibM0DeclarationTransportDigest(
       bundle.declarations[0],
       {
         ...bundle.declarations[1],
-        kernel: { ...bundle.declarations[1].kernel, type: "Sort 0" },
+        kernel: {
+          ...bundle.declarations[1].kernel,
+          type: { kind: "const", name: "M0.Base", levels: [{ kind: "zero" }] },
+        },
       },
       bundle.declarations[2],
     ],
@@ -116,6 +123,14 @@ const changedExternalDigest = await computeMathlibM0DeclarationTransportDigest(
       {
         ...bundle.declarations[1],
         externalDependencies: ["Classical.choice"],
+        kernel: {
+          ...bundle.declarations[1].kernel,
+          value: {
+            kind: "app",
+            fn: { kind: "const", name: "Classical.choice", levels: [] },
+            arg: BASE,
+          },
+        },
       },
       bundle.declarations[2],
     ],
