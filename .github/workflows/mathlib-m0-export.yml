@@ -8,19 +8,26 @@ on:
         required: true
         default: research/969-mathlib-m0
         type: string
+  pull_request:
+    paths:
+      - research/mathlib-m0/lean/**
+      - research/mathlib-m0/upstream-pin.json
+      - research/mathlib-m0/corpus-seed.json
+      - research/mathlib-m0/corpus-reproduction.json
 
 permissions:
   contents: read
 
 jobs:
   export:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - name: Checkout exact anum_docs research ref
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
-          ref: ${{ inputs.research_ref }}
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.research_ref || github.event.pull_request.head.sha }}
           path: anum_docs-research
           persist-credentials: false
 
@@ -28,14 +35,16 @@ jobs:
         id: pin
         shell: bash
         env:
-          RESEARCH_REF: ${{ inputs.research_ref }}
+          RESEARCH_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.research_ref || github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
+          test -n "$RESEARCH_REF"
           pin_path="anum_docs-research/research/mathlib-m0/upstream-pin.json"
           test -f "$pin_path"
           mathlib_sha="$(jq -er '.mathlibSha | select(type == "string" and test("^[0-9a-f]{40}$"))' "$pin_path")"
           lean_toolchain="$(jq -er '.leanToolchain | select(type == "string" and length > 0)' "$pin_path")"
           research_sha="$(git -C anum_docs-research rev-parse HEAD)"
+          printf 'research_ref=%s\n' "$RESEARCH_REF" >> "$GITHUB_OUTPUT"
           printf 'mathlib_sha=%s\n' "$mathlib_sha" >> "$GITHUB_OUTPUT"
           printf 'lean_toolchain=%s\n' "$lean_toolchain" >> "$GITHUB_OUTPUT"
           printf 'research_sha=%s\n' "$research_sha" >> "$GITHUB_OUTPUT"
@@ -79,7 +88,7 @@ jobs:
         shell: bash
         working-directory: mathlib
         env:
-          RESEARCH_REF: ${{ inputs.research_ref }}
+          RESEARCH_REF: ${{ steps.pin.outputs.research_ref }}
           RESEARCH_SHA: ${{ steps.pin.outputs.research_sha }}
           MATHLIB_SHA: ${{ steps.pin.outputs.mathlib_sha }}
           LEAN_TOOLCHAIN: ${{ steps.pin.outputs.lean_toolchain }}
