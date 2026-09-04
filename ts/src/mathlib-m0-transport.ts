@@ -15,6 +15,7 @@ export type MathlibM0KernelForm =
 export interface MathlibM0TransportDeclaration {
   readonly qualifiedName: string;
   readonly dependencies: readonly string[];
+  readonly externalDependencies: readonly string[];
   readonly kernel: MathlibM0KernelForm;
 }
 
@@ -104,6 +105,13 @@ function parseKernel(value: unknown): MathlibM0KernelForm {
   fail("unsupported-kernel-form");
 }
 
+function declarationAppearsInBundle(declarations: readonly unknown[], qualifiedName: string): boolean {
+  return declarations.some((value) => {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+    return (value as Record<string, unknown>).qualifiedName === qualifiedName;
+  });
+}
+
 export function parseMathlibM0TransportBundle(input: unknown): MathlibM0TransportBundle {
   const bundle = exactRecord(input, ["schema", "upstream", "declarations"]);
   if (bundle.schema !== MATHLIB_M0_TRANSPORT_SCHEMA) fail("unsupported-schema");
@@ -113,22 +121,37 @@ export function parseMathlibM0TransportBundle(input: unknown): MathlibM0Transpor
   const declarations: MathlibM0TransportDeclaration[] = [];
 
   for (const rawDeclaration of bundle.declarations) {
-    const candidate = exactRecord(rawDeclaration, ["qualifiedName", "dependencies", "kernel"]);
+    const candidate = exactRecord(rawDeclaration, [
+      "qualifiedName",
+      "dependencies",
+      "externalDependencies",
+      "kernel",
+    ]);
     const qualifiedName = declarationText(candidate.qualifiedName);
     if (seen.has(qualifiedName)) fail("duplicate-declaration");
-    if (!Array.isArray(candidate.dependencies)) fail("invalid-declaration");
-
-    const dependencies = candidate.dependencies.map(declarationText);
-    if (new Set(dependencies).size !== dependencies.length || dependencies.includes(qualifiedName)) {
+    if (!Array.isArray(candidate.dependencies) || !Array.isArray(candidate.externalDependencies)) {
       fail("invalid-declaration");
     }
+
+    const dependencies = candidate.dependencies.map(declarationText);
+    const externalDependencies = candidate.externalDependencies.map(declarationText);
+    if (
+      new Set(dependencies).size !== dependencies.length ||
+      new Set(externalDependencies).size !== externalDependencies.length ||
+      dependencies.includes(qualifiedName) ||
+      externalDependencies.includes(qualifiedName) ||
+      externalDependencies.some((dependency) => dependencies.includes(dependency))
+    ) {
+      fail("invalid-declaration");
+    }
+
+    for (const externalDependency of externalDependencies) {
+      if (declarationAppearsInBundle(bundle.declarations, externalDependency)) fail("invalid-declaration");
+    }
+
     for (const dependency of dependencies) {
       if (!seen.has(dependency)) {
-        const appearsLater = bundle.declarations.some((value) => {
-          if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
-          return (value as Record<string, unknown>).qualifiedName === dependency;
-        });
-        fail(appearsLater ? "forward-dependency" : "missing-dependency");
+        fail(declarationAppearsInBundle(bundle.declarations, dependency) ? "forward-dependency" : "missing-dependency");
       }
     }
 
@@ -136,6 +159,7 @@ export function parseMathlibM0TransportBundle(input: unknown): MathlibM0Transpor
       Object.freeze({
         qualifiedName,
         dependencies: Object.freeze([...dependencies]),
+        externalDependencies: Object.freeze([...externalDependencies]),
         kernel: parseKernel(candidate.kernel),
       }),
     );
