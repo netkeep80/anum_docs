@@ -30,6 +30,24 @@ const PIN = Object.freeze({
   leanToolchain: "leanprover/lean4:v4.34.0-rc2",
 });
 
+const SORT_ZERO = Object.freeze({ kind: "sort", level: { kind: "zero" } });
+const BASE = Object.freeze({ kind: "const", name: "M0.Base", levels: [] });
+const EQ = Object.freeze({ kind: "const", name: "Eq", levels: [] });
+const IDENTITY_TYPE = Object.freeze({
+  kind: "forall",
+  binderName: "x",
+  binderType: BASE,
+  body: BASE,
+  binderInfo: "default",
+});
+const IDENTITY_VALUE = Object.freeze({
+  kind: "lam",
+  binderName: "x",
+  binderType: BASE,
+  body: { kind: "bvar", index: 0 },
+  binderInfo: "default",
+});
+
 const bundle = Object.freeze({
   schema: MATHLIB_M0_TRANSPORT_SCHEMA,
   upstream: PIN,
@@ -37,14 +55,14 @@ const bundle = Object.freeze({
     {
       qualifiedName: "M0.Base",
       dependencies: [],
-      externalDependencies: ["Sort"],
-      kernel: { kind: "axiom", type: "Sort 0" },
+      externalDependencies: [],
+      kernel: { kind: "axiom", type: SORT_ZERO },
     },
     {
       qualifiedName: "M0.Identity",
       dependencies: ["M0.Base"],
       externalDependencies: [],
-      kernel: { kind: "theorem", type: "M0.Base -> M0.Base", value: "fun x => x" },
+      kernel: { kind: "theorem", type: IDENTITY_TYPE, value: IDENTITY_VALUE },
     },
   ],
 });
@@ -54,7 +72,7 @@ same(parsed.schema, MATHLIB_M0_TRANSPORT_SCHEMA, "schema must be canonical");
 same(parsed.upstream.mathlibSha, PIN.mathlibSha, "mathlib pin must survive parsing");
 same(parsed.upstream.leanToolchain, PIN.leanToolchain, "Lean pin must survive parsing");
 same(parsed.declarations.length, 2, "dependency-closed corpus size");
-same(parsed.declarations[0]?.externalDependencies[0], "Sort", "external kernel support must remain explicit");
+same(parsed.declarations[0]?.kernel.type.kind, "sort", "kernel type must remain structural IR");
 same(parsed.declarations[1]?.dependencies[0], "M0.Base", "dependency identity must remain explicit");
 
 const canonicalA = canonicalMathlibM0TransportBundleJson(bundle);
@@ -77,9 +95,10 @@ const changedTargetDigest = await computeMathlibM0TransportBundleDigest({
     bundle.declarations[0],
     {
       ...bundle.declarations[1],
+      dependencies: ["M0.Base"],
       kernel: {
         ...bundle.declarations[1]!.kernel,
-        type: "M0.Base -> Sort 0",
+        type: { ...IDENTITY_TYPE, body: SORT_ZERO },
       },
     },
   ],
@@ -94,7 +113,7 @@ const changedProofDigest = await computeMathlibM0TransportBundleDigest({
       ...bundle.declarations[1],
       kernel: {
         ...bundle.declarations[1]!.kernel,
-        value: "fun _ => M0.Base",
+        value: { ...IDENTITY_VALUE, body: BASE },
       },
     },
   ],
@@ -104,11 +123,19 @@ assert(changedProofDigest.value !== digestA.value, "changed theorem value must c
 const changedExternalDigest = await computeMathlibM0TransportBundleDigest({
   ...bundle,
   declarations: [
+    bundle.declarations[0],
     {
-      ...bundle.declarations[0],
-      externalDependencies: ["Sort", "Nat"],
+      ...bundle.declarations[1],
+      externalDependencies: ["Eq"],
+      kernel: {
+        ...bundle.declarations[1]!.kernel,
+        value: {
+          kind: "app",
+          fn: { kind: "app", fn: EQ, arg: BASE },
+          arg: { kind: "bvar", index: 0 },
+        },
+      },
     },
-    bundle.declarations[1],
   ],
 });
 assert(changedExternalDigest.value !== digestA.value, "changed external support must change transport identity");
@@ -191,15 +218,40 @@ expectReject("forward-dependency", {
   declarations: [bundle.declarations[1], bundle.declarations[0]],
 });
 
+expectReject("dependency-identity-mismatch", {
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
+    { ...bundle.declarations[1], dependencies: [], externalDependencies: [] },
+  ],
+});
+
+expectReject("unsupported-kernel-expression", {
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
+    {
+      qualifiedName: "M0.Unsupported",
+      dependencies: [],
+      externalDependencies: [],
+      kernel: {
+        kind: "theorem",
+        type: { kind: "mvar", id: "?m.1" },
+        value: { kind: "bvar", index: 0 },
+      },
+    },
+  ],
+});
+
 expectReject("unsupported-kernel-form", {
   ...bundle,
   declarations: [
     bundle.declarations[0],
     {
       qualifiedName: "M0.Unsafe",
-      dependencies: ["M0.Base"],
+      dependencies: [],
       externalDependencies: [],
-      kernel: { kind: "opaque-bytecode", type: "M0.Base" },
+      kernel: { kind: "opaque-bytecode", type: SORT_ZERO },
     },
   ],
 });
