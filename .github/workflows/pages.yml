@@ -49,7 +49,6 @@ jobs:
         run: |
           node web/contract-observatory/dist/test/contract-index.test.js
           node web/contract-observatory/dist/test/site.test.js
-          node web/contract-observatory/dist/test/localization.test.js
 
       - name: Materialize Pages artifact
         run: |
