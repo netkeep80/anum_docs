@@ -154,8 +154,10 @@ const config: ObservatoryInteractionConfig = Object.freeze({
     Object.freeze({
       id: "current",
       categories: Object.freeze(["accepted", "current", "evidence", "negative"]),
-      itemIds: Object.freeze(["item:current"]),
-      relations: Object.freeze([]),
+      itemIds: Object.freeze(["item:current", "item:linked"]),
+      relations: Object.freeze([
+        Object.freeze({ from: "item:current", to: "item:linked" }),
+      ]),
     }),
     Object.freeze({
       id: "previous",
@@ -186,7 +188,8 @@ const currentLane = new FakeNode("div", [], { versionLane: "current" });
 const currentVersion = new FakeNode("button", [], { versionId: "current" });
 const currentCandidateCell = new FakeNode("div", [], { laneStage: "candidate" });
 const currentItem = new FakeNode("button", [], { itemId: "item:current" });
-currentLane.append(currentVersion, currentCandidateCell, currentItem);
+const currentLinkedItem = new FakeNode("button", [], { itemId: "item:linked" });
+currentLane.append(currentVersion, currentCandidateCell, currentItem, currentLinkedItem);
 const previousLane = new FakeNode("div", [], { versionLane: "previous" });
 const previousVersion = new FakeNode("button", [], { versionId: "previous" });
 const previousCandidateCell = new FakeNode("div", [], { laneStage: "candidate" });
@@ -230,6 +233,9 @@ same(controller.getState().selectedStage, "candidate", "stage click reduces thro
 same(stageCandidate.getAttribute("aria-pressed"), "true", "stage DOM state follows canonical state");
 currentItem.click();
 same(controller.getState().selectedItemId, "item:current", "known evidence item selection is canonical");
+assert(currentItem.classes.has("trace-highlighted"), "selected item receives trace highlight");
+assert(currentLinkedItem.classes.has("trace-highlighted"), "source-linked item receives trace highlight");
+assert(!previousItem.classes.has("trace-highlighted"), "unrelated version item is not highlighted");
 
 previousVersion.focus();
 filterCurrent.click();
@@ -279,4 +285,4 @@ assert(generated.includes("data-observatory-controller=\"shared-kernel\""), "gen
 assert(generated.includes("createKernel"), "generated page embeds the exact canonical kernel factory");
 assert(!generated.includes("const readState ="), "generated controller does not retain the old handwritten hash parser");
 
-console.log("Contract Observatory V4c executable browser-controller specification passed.");
+console.log("Contract Observatory V4c/V4d executable browser-controller specification passed.");
