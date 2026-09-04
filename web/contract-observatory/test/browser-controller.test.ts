@@ -155,11 +155,13 @@ const config: ObservatoryInteractionConfig = Object.freeze({
       id: "current",
       categories: Object.freeze(["accepted", "current", "evidence", "negative"]),
       itemIds: Object.freeze(["item:current"]),
+      relations: Object.freeze([]),
     }),
     Object.freeze({
       id: "previous",
       categories: Object.freeze(["accepted", "positive", "previous"]),
       itemIds: Object.freeze(["item:previous"]),
+      relations: Object.freeze([]),
     }),
   ]),
   defaultVersionId: "current",
