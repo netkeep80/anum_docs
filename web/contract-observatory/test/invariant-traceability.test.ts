@@ -38,6 +38,16 @@ same(
   "required gates come directly from manifest",
 );
 
+const topLevelProduction = current.evidenceReferences.find(
+  (reference) => reference.sourcePath === "ts/test/v011-top-level-root-binding.test.ts",
+);
+assert(topLevelProduction !== undefined, "top-level production evidence reference exists");
+same(
+  topLevelProduction.identifiers.map((entry) => `${entry.kind}=${entry.value}`).join(","),
+  "issue=775,pullRequest=782,head=30a25ed5820cdbea039238ff021f47cacd301014,ciRun=3181,repoGuardRun=639,mergeSha=c6984ef101670732920859c4a990b62d5bb579de",
+  "production evidence identifiers are preserved exactly from conformance",
+);
+
 const dotMeaning = current.semanticInvariants.find((invariant) => invariant.id === "dotMeaning");
 assert(dotMeaning !== undefined, "dotMeaning invariant exists");
 same(dotMeaning.negative.requiredNegativeVectors.length, 0, "explicit empty negative category remains empty");
@@ -79,6 +89,16 @@ assert(
   html.includes('data-item-id="gate:ts/test/v011-top-level-root-binding.test.ts"'),
   "manifest-declared executable gate is an interactive source-linked endpoint",
 );
+for (const exactIdentifier of [
+  "issue: 775",
+  "pullRequest: 782",
+  "head: 30a25ed5820cdbea039238ff021f47cacd301014",
+  "ciRun: 3181",
+  "repoGuardRun: 639",
+  "mergeSha: c6984ef101670732920859c4a990b62d5bb579de",
+]) {
+  assert(html.includes(exactIdentifier), `raw production evidence provenance is visible: ${exactIdentifier}`);
+}
 const dotMeaningStart = html.indexOf('data-invariant-id="dotMeaning"');
 const dotMeaningEnd = html.indexOf('data-invariant-id="', dotMeaningStart + 1);
 const dotMeaningHtml = html.slice(dotMeaningStart, dotMeaningEnd < 0 ? undefined : dotMeaningEnd);
