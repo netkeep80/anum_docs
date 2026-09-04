@@ -289,12 +289,13 @@ function sameStrings(left: readonly string[], right: readonly string[]): boolean
 export function parseMathlibM0TransportBundle(input: unknown): MathlibM0TransportBundle {
   const bundle = exactRecord(input, ["schema", "upstream", "declarations"]);
   if (bundle.schema !== MATHLIB_M0_TRANSPORT_SCHEMA) fail("unsupported-schema");
-  if (!Array.isArray(bundle.declarations) || bundle.declarations.length === 0) fail("invalid-declaration");
+  const rawDeclarations = bundle.declarations;
+  if (!Array.isArray(rawDeclarations) || rawDeclarations.length === 0) fail("invalid-declaration");
 
   const seen = new Set<string>();
   const declarations: MathlibM0TransportDeclaration[] = [];
 
-  for (const rawDeclaration of bundle.declarations) {
+  for (const rawDeclaration of rawDeclarations) {
     const candidate = exactRecord(rawDeclaration, [
       "qualifiedName",
       "dependencies",
@@ -320,12 +321,12 @@ export function parseMathlibM0TransportBundle(input: unknown): MathlibM0Transpor
     }
 
     for (const externalDependency of externalDependencies) {
-      if (declarationAppearsInBundle(bundle.declarations, externalDependency)) fail("invalid-declaration");
+      if (declarationAppearsInBundle(rawDeclarations, externalDependency)) fail("invalid-declaration");
     }
 
     for (const dependency of dependencies) {
       if (!seen.has(dependency)) {
-        fail(declarationAppearsInBundle(bundle.declarations, dependency) ? "forward-dependency" : "missing-dependency");
+        fail(declarationAppearsInBundle(rawDeclarations, dependency) ? "forward-dependency" : "missing-dependency");
       }
     }
 
@@ -333,10 +334,10 @@ export function parseMathlibM0TransportBundle(input: unknown): MathlibM0Transpor
     const references = kernelReferences(kernel);
     if (references.includes(qualifiedName)) fail("dependency-identity-mismatch");
     const derivedDependencies = references.filter((reference) =>
-      declarationAppearsInBundle(bundle.declarations, reference),
+      declarationAppearsInBundle(rawDeclarations, reference),
     );
     const derivedExternalDependencies = references.filter(
-      (reference) => !declarationAppearsInBundle(bundle.declarations, reference),
+      (reference) => !declarationAppearsInBundle(rawDeclarations, reference),
     );
     if (
       !sameStrings(dependencies, derivedDependencies) ||
