@@ -1,8 +1,11 @@
+import { renderObservatoryBrowserControllerScript } from "./browser-controller.js";
 import type { ContractObservatoryIndex, ContractVersionSummary } from "./contract-index.js";
 import {
-  METHODOLOGY_STAGE_ORDER,
+  OBSERVATORY_FILTERS,
   buildInteractiveMethodologyModel,
-  type ObservatoryInteractionState,
+  buildObservatoryInteractionConfig,
+  createObservatoryInteractionKernel,
+  type ObservatoryInteractionVersionConfig,
 } from "./interaction.js";
 import type { MethodologyProjection, MethodologyVersionProjection } from "./methodology-projection.js";
 
@@ -20,7 +23,7 @@ export function renderContractObservatoryHtml(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MTS Contract Observatory</title>
+  <title>Обозреватель контрактов МТС</title>
   <style>
     :root { color-scheme: light dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
     * { box-sizing: border-box; }
@@ -50,6 +53,7 @@ export function renderContractObservatoryHtml(
     .stage-controls, .filter-controls, .viewport-controls, .evidence-items { display: flex; flex-wrap: wrap; gap: .45rem; }
     .stage-controls button, .filter-controls button, .viewport-controls button, .version-select, .evidence-items button { cursor: pointer; border: 1px solid color-mix(in srgb, CanvasText 24%, transparent); border-radius: .65rem; background: Canvas; padding: .5rem .7rem; }
     button[aria-pressed="true"] { border-width: 2px; font-weight: 800; }
+    .trace-highlighted { outline: 2px solid Highlight; outline-offset: 2px; }
     .methodology-grid { display: grid; gap: .65rem; overflow: auto; padding-bottom: .25rem; }
     .methodology-lane { min-width: 780px; display: grid; grid-template-columns: minmax(190px, 1.4fr) repeat(7, minmax(72px, 1fr)); gap: .35rem; align-items: stretch; padding: .5rem; border: 1px solid color-mix(in srgb, CanvasText 15%, transparent); border-radius: .8rem; }
     .methodology-lane.selected, .methodology-lane.selection-synced { border-width: 2px; }
@@ -62,6 +66,30 @@ export function renderContractObservatoryHtml(
     .stage-evidence { display: block; margin-top: .2rem; font-size: .65rem; opacity: .7; }
     .evidence-items { grid-column: 1 / -1; padding-top: .25rem; }
     .evidence-items button { padding: .3rem .5rem; font-size: .7rem; overflow-wrap: anywhere; }
+    .invariant-anatomy { margin-top: 1rem; padding: .9rem; border: 1px solid color-mix(in srgb, CanvasText 16%, transparent); border-radius: .8rem; }
+    .invariant-anatomy h3 { margin: 0 0 .35rem; }
+    .invariant-anatomy > p { margin: 0 0 .7rem; opacity: .75; }
+    .invariant-cards { display: grid; gap: .7rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .invariant-card { min-width: 0; padding: .8rem; border: 1px solid color-mix(in srgb, CanvasText 15%, transparent); border-radius: .75rem; background: color-mix(in srgb, Canvas 97%, CanvasText 3%); }
+    .invariant-card h4 { margin: 0 0 .6rem; }
+    .invariant-select, .trace-node { cursor: pointer; border: 1px solid color-mix(in srgb, CanvasText 24%, transparent); border-radius: .55rem; background: Canvas; padding: .35rem .5rem; overflow-wrap: anywhere; text-align: left; }
+    .invariant-meta { display: grid; grid-template-columns: minmax(8rem, .7fr) minmax(0, 1.8fr); gap: .35rem .7rem; margin: 0 0 .7rem; font-size: .8rem; }
+    .invariant-meta dt { opacity: .7; }
+    .invariant-meta dd { margin: 0; }
+    .trace-group { margin-top: .55rem; }
+    .trace-group h5 { margin: 0 0 .3rem; font-size: .78rem; }
+    .trace-list { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; }
+    .trace-node { font-size: .72rem; }
+    .evidence-reference { display: grid; gap: .25rem; padding: .35rem; border: 1px dashed color-mix(in srgb, CanvasText 15%, transparent); border-radius: .55rem; }
+    .evidence-identifiers { display: flex; flex-wrap: wrap; gap: .25rem; font-size: .68rem; opacity: .78; }
+    .evidence-identifier { overflow-wrap: anywhere; }
+    .trace-none { font-size: .74rem; font-style: italic; opacity: .62; }
+    .raw-provenance { margin-top: .65rem; font-size: .78rem; }
+    .raw-provenance summary { cursor: pointer; font-weight: 700; }
+    .traceability-table { margin-top: .8rem; }
+    .traceability-table summary { cursor: pointer; font-weight: 800; }
+    .traceability-table table { margin-top: .5rem; font-size: .78rem; }
+    .traceability-table th { width: auto; }
     .methodology-status { margin: .8rem 0 0; min-height: 1.3em; font-size: .82rem; opacity: .75; }
     .timeline { margin: 0 0 2.5rem; }
     .timeline h2, .versions h2 { margin: 0 0 1rem; font-size: 1.5rem; }
@@ -87,17 +115,17 @@ export function renderContractObservatoryHtml(
     td { overflow-wrap: anywhere; }
     .footer { margin-top: 2.5rem; font-size: .85rem; opacity: .7; }
     @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
-    @media (max-width: 680px) { .shell { width: min(100% - 1rem, 1120px); padding-top: 1rem; } .provenance { grid-template-columns: 1fr; } .methodology-map { padding: .8rem; } th, td { display: block; width: 100%; padding-left: 0; padding-right: 0; } th { border-bottom: 0; padding-bottom: .2rem; } td { border-top: 0; padding-top: 0; } }
+    @media (max-width: 680px) { .shell { width: min(100% - 1rem, 1120px); padding-top: 1rem; } .provenance { grid-template-columns: 1fr; } .methodology-map { padding: .8rem; } .invariant-meta { grid-template-columns: 1fr; } th, td { display: block; width: 100%; padding-left: 0; padding-right: 0; } th { border-bottom: 0; padding-bottom: .2rem; } td { border-top: 0; padding-top: 0; } }
   </style>
 </head>
 <body>
   <div class="shell">
-    <header class="hero"><p class="eyebrow">MTS · derived evidence</p><h1>Contract Observatory</h1><p class="lede">Статическое представление contract/conformance evidence. Эта страница является производной навигацией и не является источником семантики МТС.</p></header>
-    <dl class="provenance" aria-label="Provenance">${renderDefinition("Index schema", index.schema)}${renderDefinition("Acceptance", index.acceptancePath)}${renderDefinition("Current contract", index.currentContractPath)}${renderDefinition("Previous contract", index.previousContractPath)}</dl>
+    <header class="hero"><p class="eyebrow">МТС · производные свидетельства</p><h1>Обозреватель контрактов МТС</h1><p class="lede">Статическое представление свидетельств контракта и корпуса соответствия. Эта страница является производной навигацией и не является источником семантики МТС.</p></header>
+    <dl class="provenance" aria-label="Происхождение данных">${renderDefinition("Схема индекса", index.schema)}${renderDefinition("Приёмка", index.acceptancePath)}${renderDefinition("Текущий контракт", index.currentContractPath)}${renderDefinition("Предыдущий контракт", index.previousContractPath)}</dl>
 ${methodologyMap}
-    <nav class="timeline" aria-labelledby="timeline-title"><h2 id="timeline-title">Timeline</h2><ol>${timeline}</ol></nav>
-    <main class="versions" aria-labelledby="versions-title"><h2 id="versions-title">Version Overview</h2><div class="version-list">${versions}</div></main>
-    <footer class="footer">Generated deterministically from ContractObservatoryIndex. Presentation is non-normative.</footer>
+    <nav class="timeline" aria-labelledby="timeline-title"><h2 id="timeline-title">Хронология</h2><ol>${timeline}</ol></nav>
+    <main class="versions" aria-labelledby="versions-title"><h2 id="versions-title">Обзор версий</h2><div class="version-list">${versions}</div></main>
+    <footer class="footer">Сгенерировано детерминированно из ContractObservatoryIndex. Представление ненормативно.</footer>
   </div>
 </body>
 </html>
@@ -105,121 +133,203 @@ ${methodologyMap}
 }
 
 function renderMethodologyMap(projection: MethodologyProjection): string {
-  const selectedVersionId = projection.versions.find((entry) => entry.isCurrent)?.contractId ?? projection.versions[0]?.contractId ?? null;
-  const state: ObservatoryInteractionState = Object.freeze({ selectedVersionId, selectedStage: null, selectedItemId: null, filters: Object.freeze([]), viewport: Object.freeze({ x: 0, y: 0, scale: 1 }) });
+  const config = buildObservatoryInteractionConfig(projection);
+  const state = createObservatoryInteractionKernel(config).initialState();
   const model = buildInteractiveMethodologyModel(projection, state);
-  const stageControls = model.stages.map((entry) => `<button type="button" data-methodology-stage="${entry.stage}" aria-pressed="false" title="Lifecycle stage: ${entry.stage}; derived presentation state">${escapeHtml(entry.stage)}</button>`).join("\n");
-  const lanes = model.versions.map((entry, ordinal) => renderMethodologyLane(projection.versions[ordinal]!, entry)).join("\n");
-  const controllerData = projection.versions.map((version, ordinal) => ({ id: version.contractId, classification: model.versions[ordinal]!.classification.toLowerCase(), itemIds: methodologyItemIds(version) }));
+  const stageControls = model.stages.map((entry) => `<button type="button" data-methodology-stage="${entry.stage}" aria-pressed="false" title="Стадия жизненного цикла: ${stageLabel(entry.stage)}; производное состояние представления">${escapeHtml(stageLabel(entry.stage))}</button>`).join("\n");
+  const filterControls = OBSERVATORY_FILTERS.map((filter) => renderFilterButton(filter, filterLabel(filter))).join("");
+  const lanes = model.versions.map((entry, ordinal) => renderMethodologyLane(
+    projection.versions[ordinal]!,
+    entry,
+    config.versions[ordinal]!,
+  )).join("\n");
+  const anatomy = projection.versions.map(renderInvariantAnatomy).join("\n");
 
   return `    <section class="methodology-map" aria-labelledby="methodology-title">
-      <div class="methodology-heading"><p class="eyebrow">Primary explanatory view · derived methodology</p><h2 id="methodology-title">Methodology map + version lifecycle lanes</h2><p>Две координированные, но не тождественные структуры: метод разработки и состояние жизненного цикла версии.</p></div>
-      <ol class="method-chain" aria-label="Method chain"><li>Theory</li><li>Contract</li><li>Conformance</li><li>Challenge</li><li>Model/Replay</li><li>Acceptance</li><li>Current</li></ol>
-      <div class="methodology-authority" aria-label="Relation authority"><span>Method/lifecycle relation: derived presentation relation</span><span>Traceability/evidence relation: source-derived reference</span><span>Semantic topology Link: not rendered in this view</span></div>
+      <div class="methodology-heading"><p class="eyebrow">Основное объясняющее представление · производная методология</p><h2 id="methodology-title">Карта методологии и жизненного цикла версий</h2><p>Две координированные, но не тождественные структуры: метод разработки и состояние жизненного цикла версии.</p></div>
+      <ol class="method-chain" aria-label="Цепочка метода"><li>Теория</li><li>Контракт</li><li>Соответствие</li><li>Проверка</li><li>Модель / воспроизведение</li><li>Приёмка</li><li>Текущая</li></ol>
+      <div class="methodology-authority" aria-label="Основания связей"><span>Связь метода и жизненного цикла: производная связь представления</span><span>Связь трассируемости и свидетельств: ссылка из исходных данных</span><span>Семантические Связи МТС: в этом представлении не отображаются</span></div>
       <div class="methodology-controls">
-        <div class="stage-controls" role="group" aria-label="Methodology stages">${stageControls}</div>
-        <div class="filter-controls" role="group" aria-label="Version and evidence filters">${renderFilterButton("current", "CURRENT")}${renderFilterButton("previous", "PREVIOUS")}${renderFilterButton("candidate", "CANDIDATE")}${renderFilterButton("accepted", "ACCEPTED")}${renderFilterButton("positive", "POSITIVE")}${renderFilterButton("negative", "NEGATIVE")}${renderFilterButton("evidence", "EVIDENCE")}</div>
-        <div class="viewport-controls" role="group" aria-label="Map viewport"><button type="button" data-viewport-action="zoom-out" aria-label="Zoom out">−</button><button type="button" data-viewport-action="reset">Reset viewport</button><button type="button" data-viewport-action="zoom-in" aria-label="Zoom in">+</button></div>
+        <div class="stage-controls" role="group" aria-label="Стадии методологии">${stageControls}</div>
+        <div class="filter-controls" role="group" aria-label="Фильтры версий и свидетельств">${filterControls}</div>
+        <div class="viewport-controls" role="group" aria-label="Область карты"><button type="button" data-viewport-action="zoom-out" aria-label="Уменьшить масштаб">−</button><button type="button" data-viewport-action="reset">Сбросить вид</button><button type="button" data-viewport-action="zoom-in" aria-label="Увеличить масштаб">+</button></div>
       </div>
-      <div class="methodology-grid" tabindex="0" aria-label="Version lifecycle lanes">${lanes}</div>
+      <div class="methodology-grid" tabindex="0" aria-label="Полосы жизненного цикла версий">${lanes}</div>
+${anatomy}
       <p class="methodology-status" aria-live="polite"></p>
     </section>
-${renderMethodologyController(controllerData, selectedVersionId)}`;
+${renderObservatoryBrowserControllerScript(config)}`;
 }
 
-function renderMethodologyLane(projection: MethodologyVersionProjection, model: ReturnType<typeof buildInteractiveMethodologyModel>["versions"][number]): string {
+function renderMethodologyLane(
+  projection: MethodologyVersionProjection,
+  model: ReturnType<typeof buildInteractiveMethodologyModel>["versions"][number],
+  config: ObservatoryInteractionVersionConfig,
+): string {
   const evidenceByStage = new Map(projection.lifecycle.map((entry) => [entry.stage, entry.evidence.length] as const));
-  const stages = model.stageStates.map((entry) => `<div class="stage-cell${entry.present ? " present" : ""}" data-lane-stage="${entry.stage}" title="${entry.stage}: ${entry.present ? "source evidence present" : "no linked source evidence"}"><span>${escapeHtml(entry.stage)}</span><span class="stage-evidence">${entry.present ? `${evidenceByStage.get(entry.stage) ?? 0} evidence` : "—"}</span></div>`).join("\n");
-  const categories = methodologyCategories(projection, model.classification.toLowerCase()).join(" ");
-  const evidenceItems = methodologyItemIds(projection).slice(0, 6).map((id) => `<button type="button" data-item-id="${escapeAttribute(id)}" aria-pressed="false" title="Traceability/evidence reference; presentation-only">${escapeHtml(id)}</button>`).join("");
-  return `<div class="methodology-lane${model.selected ? " selected" : ""}" data-version-lane="${escapeAttribute(model.contractId)}" data-categories="${categories}"><div class="lane-version"><button type="button" class="version-select" data-version-id="${escapeAttribute(model.contractId)}" aria-pressed="${model.selected ? "true" : "false"}" title="Select version and synchronize Observatory views">${escapeHtml(model.contractId)}</button><span class="lane-classification">${model.classification}</span></div>${stages}<div class="evidence-items" aria-label="Evidence references for ${escapeAttribute(model.contractId)}">${evidenceItems || "<span>No linked evidence references</span>"}</div></div>`;
+  const stages = model.stageStates.map((entry) => `<div class="stage-cell${entry.present ? " present" : ""}" data-lane-stage="${entry.stage}" title="${stageLabel(entry.stage)}: ${entry.present ? "есть связанные свидетельства" : "связанные свидетельства отсутствуют"}"><span>${escapeHtml(stageLabel(entry.stage))}</span><span class="stage-evidence">${entry.present ? `${evidenceByStage.get(entry.stage) ?? 0} свидетельств` : "—"}</span></div>`).join("\n");
+  const evidenceItems = config.itemIds.slice(0, 6).map((id) => `<button type="button" data-item-id="${escapeAttribute(id)}" aria-pressed="false" title="Ссылка трассируемости/свидетельства; только представление">${escapeHtml(id)}</button>`).join("");
+  return `<div class="methodology-lane${model.selected ? " selected" : ""}" data-version-lane="${escapeAttribute(model.contractId)}"><div class="lane-version"><button type="button" class="version-select" data-version-id="${escapeAttribute(model.contractId)}" aria-pressed="${model.selected ? "true" : "false"}" title="Выбрать версию и синхронизировать представления обозревателя">${escapeHtml(model.contractId)}</button><span class="lane-classification">${classificationLabel(model.classification)}</span></div>${stages}<div class="evidence-items" aria-label="Ссылки на свидетельства для ${escapeAttribute(model.contractId)}">${evidenceItems || "<span>Нет связанных ссылок на свидетельства</span>"}</div></div>`;
 }
 
-function methodologyItemIds(version: MethodologyVersionProjection): string[] {
-  return [...new Set([...version.theoryReferences.map((entry) => entry.id), ...version.contractReferences.map((entry) => entry.id), ...version.positiveVectors.map((entry) => entry.id), ...version.negativeVectors.map((entry) => entry.id), ...version.evidenceReferences.map((entry) => entry.id), ...version.acceptanceReferences.map((entry) => entry.id)])].sort((a, b) => a.localeCompare(b));
+function renderInvariantAnatomy(version: MethodologyVersionProjection): string {
+  const manifest = version.traceabilityManifestPath ?? "нет";
+  const cards = version.semanticInvariants.map((invariant) => renderInvariantCard(version, invariant)).join("\n");
+  const missing = version.semanticInvariants.length === 0
+    ? `<p class="trace-none">Нет семантических инвариантов, связанных с источником. Манифест трассируемости: ${escapeHtml(manifest)}.</p>`
+    : "";
+  return `      <section class="invariant-anatomy" data-traceability-version="${escapeAttribute(version.contractId)}" aria-label="Анатомия инвариантов для ${escapeAttribute(version.contractId)}"><h3>Анатомия инвариантов · ${escapeHtml(version.contractId)}</h3><p>Производное представление происхождения данных. Манифест трассируемости: ${escapeHtml(manifest)}. Отсутствующие связи показаны явно.</p>${missing}<div class="invariant-cards">${cards}</div>${renderTraceabilityTable(version)}</section>`;
 }
 
-function methodologyCategories(version: MethodologyVersionProjection, classification: string): string[] {
-  const values = [classification];
-  if (version.accepted) values.push("accepted");
-  if (version.positiveVectors.length > 0) values.push("positive");
-  if (version.negativeVectors.length > 0) values.push("negative");
-  if (version.evidenceReferences.length > 0) values.push("evidence");
-  return [...new Set(values)].sort();
+function renderInvariantCard(
+  version: MethodologyVersionProjection,
+  invariant: MethodologyVersionProjection["semanticInvariants"][number],
+): string {
+  const vectorIds = invariantVectorIds(invariant);
+  const evidenceReferences = linkedEvidenceReferences(version, vectorIds);
+  const acceptance = version.acceptanceReferences.map((reference) => Object.freeze({ id: reference.id, label: `${reference.id} · ${reference.sourcePath}` }));
+  return `<article class="invariant-card" data-invariant-id="${escapeAttribute(invariant.id)}"><h4><button type="button" class="invariant-select" data-item-id="invariant:${escapeAttribute(invariant.id)}" aria-pressed="false">${escapeHtml(invariant.id)}</button></h4><dl class="invariant-meta"><dt>Путь контракта</dt><dd>${escapeHtml(version.contractPath)}</dd><dt>JSON Pointer контракта</dt><dd>${escapeHtml(invariant.contractPointer)}</dd><dt>Закон контракта</dt><dd>${escapeHtml(invariant.contractValue)}</dd><dt>Путь корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd><dt>Ссылка на теорию</dt><dd>нет (нет исходной связи уровня инварианта)</dd></dl>${renderTraceGroup("Векторы генезиса", invariant.positive.requiredGenesisVectors, "vector")}${renderTraceGroup("Векторы смысла", invariant.positive.requiredMeaningVectors, "vector")}${renderTraceGroup("Векторы классификации C2", invariant.positive.requiredC2ClassificationVectors, "vector")}${renderTraceGroup("Векторы совместимости", invariant.positive.requiredCompatibilityVectors, "vector")}${renderTraceGroup("Отрицательные векторы", invariant.negative.requiredNegativeVectors, "vector")}${renderTraceGroup("Исполняемые проверки", invariant.requiredExecutableGates, "gate")}${renderEvidenceGroup("Существующие свидетельства", evidenceReferences)}${renderReferenceGroup("Происхождение приёмки", acceptance)}<details class="raw-provenance"><summary>Исходное происхождение данных</summary><dl class="invariant-meta"><dt>ID инварианта</dt><dd>${escapeHtml(invariant.id)}</dd><dt>Источник трассируемости</dt><dd>${escapeHtml(invariant.traceabilitySourcePath)}</dd><dt>Источник контракта</dt><dd>${escapeHtml(version.contractPath)}#${escapeHtml(invariant.contractPointer)}</dd><dt>Источник корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd></dl></details></article>`;
 }
 
-function renderFilterButton(filter: string, label: string): string { return `<button type="button" data-methodology-filter="${filter}" aria-pressed="false">${label}</button>`; }
-
-function renderMethodologyController(versions: readonly { readonly id: string; readonly classification: string; readonly itemIds: readonly string[] }[], defaultVersionId: string | null): string {
-  const data = escapeJsonForScript(JSON.stringify({ versions, stages: METHODOLOGY_STAGE_ORDER, defaultVersionId, filters: ["accepted", "candidate", "current", "evidence", "negative", "positive", "previous"] }));
-  return `    <script>
-(() => {
-  "use strict";
-  const map = document.querySelector(".methodology-map");
-  if (!map) return;
-  const grid = map.querySelector(".methodology-grid");
-  const config = ${data};
-  const versionIds = new Set(config.versions.map((entry) => entry.id));
-  const itemIds = new Set(config.versions.flatMap((entry) => entry.itemIds));
-  const stages = new Set(config.stages);
-  const filters = new Set(config.filters);
-  const number = (value, fallback) => { const parsed = Number(value); return Number.isFinite(parsed) ? parsed : fallback; };
-
-  const readState = () => {
-    const params = new URLSearchParams(location.hash.startsWith("#") ? location.hash.slice(1) : location.hash);
-    const requestedVersion = params.get("v");
-    const requestedStage = params.get("s");
-    const requestedItem = params.get("item");
-    return { versionId: versionIds.has(requestedVersion) ? requestedVersion : config.defaultVersionId, stage: stages.has(requestedStage) ? requestedStage : null, item: itemIds.has(requestedItem) ? requestedItem : null, filters: [...new Set(params.getAll("f").filter((value) => filters.has(value)))].sort(), x: number(params.get("x"), 0), y: number(params.get("y"), 0), z: Math.min(1.8, Math.max(.7, number(params.get("z"), 1))) };
-  };
-  const writeState = (mutate, replace = false) => { const params = new URLSearchParams(location.hash.startsWith("#") ? location.hash.slice(1) : location.hash); mutate(params); const next = params.toString(); if (replace) history.replaceState(null, "", location.pathname + location.search + (next ? "#" + next : "#")); else location.hash = next ? "#" + next : "#"; };
-
-  const apply = () => {
-    const state = readState();
-    map.querySelectorAll("[data-methodology-stage]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.methodologyStage === state.stage)));
-    map.querySelectorAll("[data-methodology-filter]").forEach((button) => button.setAttribute("aria-pressed", String(state.filters.includes(button.dataset.methodologyFilter))));
-    map.querySelectorAll("[data-item-id]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.itemId === state.item)));
-    map.querySelectorAll("[data-version-lane]").forEach((lane) => { const selected = lane.dataset.versionLane === state.versionId; const categories = (lane.dataset.categories || "").split(" "); const visible = state.filters.length === 0 || state.filters.every((value) => categories.includes(value)); lane.hidden = !visible; lane.classList.toggle("selected", selected); lane.querySelector("[data-version-id]")?.setAttribute("aria-pressed", String(selected)); lane.querySelectorAll("[data-lane-stage]").forEach((cell) => cell.classList.toggle("stage-selected", cell.dataset.laneStage === state.stage)); });
-    document.querySelectorAll("[data-overview-version-id]").forEach((node) => node.classList.toggle("selection-synced", node.dataset.overviewVersionId === state.versionId));
-    if (grid) { grid.style.zoom = String(state.z); grid.scrollLeft = state.x; grid.scrollTop = state.y; }
-    const status = map.querySelector(".methodology-status");
-    if (status) status.textContent = "Selected: " + (state.versionId ?? "none") + "; stage: " + (state.stage ?? "all") + "; item: " + (state.item ?? "none") + "; filters: " + (state.filters.join(", ") || "none") + "; zoom: " + state.z + ".";
-  };
-
-  map.addEventListener("click", (event) => {
-    const target = event.target instanceof Element ? event.target.closest("button") : null;
-    if (!(target instanceof HTMLButtonElement)) return;
-    if (target.dataset.methodologyStage) { const stage = target.dataset.methodologyStage; const active = target.getAttribute("aria-pressed") === "true"; writeState((params) => active ? params.delete("s") : params.set("s", stage)); }
-    else if (target.dataset.versionId) writeState((params) => params.set("v", target.dataset.versionId));
-    else if (target.dataset.itemId) writeState((params) => params.set("item", target.dataset.itemId));
-    else if (target.dataset.methodologyFilter) { const filter = target.dataset.methodologyFilter; writeState((params) => { const values = new Set(params.getAll("f").filter((value) => filters.has(value))); values.has(filter) ? values.delete(filter) : values.add(filter); params.delete("f"); [...values].sort().forEach((value) => params.append("f", value)); }); }
-    else if (target.dataset.viewportAction) writeState((params) => { const state = readState(); if (target.dataset.viewportAction === "reset") { params.delete("x"); params.delete("y"); params.delete("z"); } else params.set("z", String(Math.min(1.8, Math.max(.7, state.z + (target.dataset.viewportAction === "zoom-in" ? .1 : -.1))))); });
-  });
-  map.addEventListener("keydown", (event) => { if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "Enter"].includes(event.key)) return; const target = event.target; if (!(target instanceof HTMLButtonElement)) return; if (event.key === "Enter") { target.click(); return; } const buttons = [...map.querySelectorAll("button:not([hidden])")].filter((button) => !button.closest("[hidden]")); const current = buttons.indexOf(target); if (current < 0 || buttons.length === 0) return; event.preventDefault(); let next = current; if (event.key === "Home") next = 0; else if (event.key === "End") next = buttons.length - 1; else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (current - 1 + buttons.length) % buttons.length; else next = (current + 1) % buttons.length; buttons[next]?.focus(); });
-  grid?.addEventListener("scroll", () => writeState((params) => { if (grid.scrollLeft) params.set("x", String(Math.round(grid.scrollLeft))); else params.delete("x"); if (grid.scrollTop) params.set("y", String(Math.round(grid.scrollTop))); else params.delete("y"); }, true));
-  window.addEventListener("hashchange", apply);
-  apply();
-})();
-    </script>`;
+function renderTraceGroup(label: string, values: readonly string[], prefix: "vector" | "gate" | "evidence"): string {
+  const nodes = values.map((value) => `<button type="button" class="trace-node" data-item-id="${escapeAttribute(`${prefix}:${value}`)}" aria-pressed="false">${escapeHtml(value)}</button>`).join("");
+  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">нет</span>"}</div></div>`;
 }
+
+function renderEvidenceGroup(label: string, values: MethodologyVersionProjection["evidenceReferences"]): string {
+  const nodes = values.map((reference) => {
+    const identifiers = reference.identifiers
+      .map((entry) => `<span class="evidence-identifier">${escapeHtml(entry.kind)}: ${escapeHtml(entry.value)}</span>`)
+      .join("");
+    return `<div class="evidence-reference"><button type="button" class="trace-node" data-item-id="${escapeAttribute(reference.id)}" aria-pressed="false">${escapeHtml(reference.sourcePath)}</button><span class="evidence-identifiers">${identifiers || "<span class=\"trace-none\">идентификаторы: нет</span>"}</span></div>`;
+  }).join("");
+  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">нет</span>"}</div></div>`;
+}
+
+function renderReferenceGroup(label: string, values: readonly Readonly<{ id: string; label: string }>[] ): string {
+  const nodes = values.map((value) => `<button type="button" class="trace-node" data-item-id="${escapeAttribute(value.id)}" aria-pressed="false">${escapeHtml(value.label)}</button>`).join("");
+  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">нет</span>"}</div></div>`;
+}
+
+function invariantVectorIds(invariant: MethodologyVersionProjection["semanticInvariants"][number]): readonly string[] {
+  return uniqueSorted([
+    ...invariant.positive.requiredGenesisVectors,
+    ...invariant.positive.requiredMeaningVectors,
+    ...invariant.positive.requiredC2ClassificationVectors,
+    ...invariant.positive.requiredCompatibilityVectors,
+    ...invariant.negative.requiredNegativeVectors,
+  ]);
+}
+
+function linkedEvidenceReferences(
+  version: MethodologyVersionProjection,
+  vectorIds: readonly string[],
+): MethodologyVersionProjection["evidenceReferences"] {
+  const selected = new Set(vectorIds);
+  const paths = new Set([...version.positiveVectors, ...version.negativeVectors]
+    .filter((vector) => selected.has(vector.id))
+    .flatMap((vector) => vector.evidence));
+  return version.evidenceReferences.filter((reference) => paths.has(reference.sourcePath));
+}
+
+function renderTraceabilityTable(version: MethodologyVersionProjection): string {
+  if (version.traceability.length === 0) {
+    return `<details class="traceability-table"><summary>Исходные связи трассируемости</summary><p class="trace-none">нет</p></details>`;
+  }
+  const rows = version.traceability.map((relation) => {
+    const presentation = relationPresentation(relation);
+    return `<tr data-relation="${escapeAttribute(relation.relation)}"><td>${renderTraceEndpoint(presentation.source)}</td><td>${escapeHtml(presentation.label)}</td><td>${renderTraceEndpoint(presentation.target)}</td></tr>`;
+  }).join("\n");
+  return `<details class="traceability-table"><summary>Исходные связи трассируемости</summary><table><thead><tr><th>Конечная точка свидетельства/источника</th><th>Связь</th><th>Конечная точка обязательства/цели</th></tr></thead><tbody>${rows}</tbody></table></details>`;
+}
+
+function relationPresentation(
+  relation: MethodologyVersionProjection["traceability"][number],
+): Readonly<{ source: string; target: string; label: string }> {
+  switch (relation.relation) {
+    case "supported-by": return Object.freeze({ source: relation.to, target: relation.from, label: "подтверждает" });
+    case "challenged-by": return Object.freeze({ source: relation.to, target: relation.from, label: "оспаривает" });
+    case "verified-by": return Object.freeze({ source: relation.to, target: relation.from, label: "проверяет" });
+    case "accepted-by": return Object.freeze({ source: relation.to, target: relation.from, label: "принимает" });
+  }
+}
+
+function renderTraceEndpoint(id: string): string {
+  return `<button type="button" class="trace-node" data-item-id="${escapeAttribute(id)}" aria-pressed="false">${escapeHtml(id)}</button>`;
+}
+
+function uniqueSorted(values: readonly string[]): string[] {
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+}
+
+function renderFilterButton(filter: string, label: string): string { return `<button type="button" data-methodology-filter="${filter}" aria-pressed="false">${escapeHtml(label)}</button>`; }
 
 function renderTimelineItem(version: ContractVersionSummary, ordinal: number, interactive: boolean): string {
-  const anchor = anchorId(ordinal); const classification = classify(version); const semanticDelta = version.observableSemanticDelta ? "SEMANTIC DELTA" : "NO SEMANTIC DELTA"; const href = interactive ? `#v=${encodeURIComponent(version.contractId)}` : `#${anchor}`;
-  return `<li><a href="${href}" class="${version.isCurrent ? "current" : ""}" data-overview-version-id="${escapeAttribute(version.contractId)}"${version.isCurrent ? " aria-current=\"page\"" : ""}><span class="timeline-id">${escapeHtml(version.contractId)}</span><span class="badges">${badge(classification, false)}${badge(version.status.toUpperCase(), true)}${badge(version.accepted ? "ACCEPTED" : "NOT ACCEPTED", true)}${badge(semanticDelta, true)}</span></a></li>`;
+  const anchor = anchorId(ordinal); const classification = classify(version); const semanticDelta = version.observableSemanticDelta ? "СЕМАНТИЧЕСКОЕ ИЗМЕНЕНИЕ" : "БЕЗ СЕМАНТИЧЕСКОГО ИЗМЕНЕНИЯ"; const href = interactive ? `#v=${encodeURIComponent(version.contractId)}` : `#${anchor}`;
+  return `<li><a href="${href}" class="${version.isCurrent ? "current" : ""}" data-overview-version-id="${escapeAttribute(version.contractId)}"${version.isCurrent ? " aria-current=\"page\"" : ""}><span class="timeline-id">${escapeHtml(version.contractId)}</span><span class="badges">${badge(classification, false)}${badge(statusLabel(version.status), true)}${badge(version.accepted ? "ПРИНЯТ" : "НЕ ПРИНЯТ", true)}${badge(semanticDelta, true)}</span></a></li>`;
 }
 
 function renderVersionSection(version: ContractVersionSummary, ordinal: number): string {
-  const anchor = anchorId(ordinal); const issueRows = [version.issue === undefined ? "" : renderRow("Issue", `#${version.issue}`), version.candidateLifecycleIssue === undefined ? "" : renderRow("Candidate lifecycle issue", `#${version.candidateLifecycleIssue}`)].filter(Boolean).join("\n");
-  return `<section id="${anchor}" class="version-card${version.isCurrent ? " current" : ""}" data-overview-version-id="${escapeAttribute(version.contractId)}" aria-labelledby="${anchor}-title"><details${version.isCurrent ? " open" : ""}><summary><span id="${anchor}-title">${escapeHtml(version.contractId)}</span><span class="badges">${badge(classify(version), false)} ${badge(version.status.toUpperCase(), true)}</span></summary><div class="version-body"><div class="metric-grid">${metric("Accepted", yesNo(version.accepted))}${metric("Acceptance ready", yesNo(version.acceptanceReady))}${metric("Coverage", version.coverageState)}${metric("Executable gates", String(version.requiredExecutableGateCount))}${metric("Negative vectors", String(version.requiredNegativeVectorCount))}${metric("Observable semantic delta", yesNo(version.observableSemanticDelta))}</div><table><tbody>${renderRow("Contract", version.contractId)}${renderRow("Conformance", version.conformanceId)}${renderRow("Semantic base", version.semanticBase)}${renderRow("Contract path", version.contractPath)}${renderRow("Conformance path", version.conformancePath)}${renderRow("Classification", classify(version))}${issueRows}</tbody></table></div></details></section>`;
+  const anchor = anchorId(ordinal); const issueRows = [version.issue === undefined ? "" : renderRow("Задача GitHub", `#${version.issue}`), version.candidateLifecycleIssue === undefined ? "" : renderRow("Задача жизненного цикла кандидата", `#${version.candidateLifecycleIssue}`)].filter(Boolean).join("\n");
+  return `<section id="${anchor}" class="version-card${version.isCurrent ? " current" : ""}" data-overview-version-id="${escapeAttribute(version.contractId)}" aria-labelledby="${anchor}-title"><details${version.isCurrent ? " open" : ""}><summary><span id="${anchor}-title">${escapeHtml(version.contractId)}</span><span class="badges">${badge(classify(version), false)} ${badge(statusLabel(version.status), true)}</span></summary><div class="version-body"><div class="metric-grid">${metric("Принят", yesNo(version.accepted))}${metric("Готов к приёмке", yesNo(version.acceptanceReady))}${metric("Покрытие", coverageLabel(version.coverageState))}${metric("Исполняемые проверки", String(version.requiredExecutableGateCount))}${metric("Отрицательные векторы", String(version.requiredNegativeVectorCount))}${metric("Наблюдаемое семантическое изменение", yesNo(version.observableSemanticDelta))}</div><table><tbody>${renderRow("Контракт", version.contractId)}${renderRow("Корпус соответствия", version.conformanceId)}${renderRow("Семантическая база", version.semanticBase)}${renderRow("Путь контракта", version.contractPath)}${renderRow("Путь корпуса соответствия", version.conformancePath)}${renderRow("Классификация", classify(version))}${issueRows}</tbody></table></div></details></section>`;
 }
 
 function renderDefinition(label: string, value: string): string { return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`; }
 function renderRow(label: string, value: string): string { return `<tr><th scope="row">${escapeHtml(label)}</th><td>${escapeHtml(value)}</td></tr>`; }
 function metric(label: string, value: string): string { return `<div class="metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`; }
 function badge(value: string, muted: boolean): string { return `<span class="badge${muted ? " badge-muted" : ""}">${escapeHtml(value)}</span>`; }
-function classify(version: ContractVersionSummary): string { if (version.isCurrent) return "CURRENT"; if (version.isPrevious) return "PREVIOUS"; return "LIVE"; }
-function yesNo(value: boolean): string { return value ? "YES" : "NO"; }
+function classify(version: ContractVersionSummary): string { if (version.isCurrent) return "ТЕКУЩАЯ"; if (version.isPrevious) return "ПРЕДЫДУЩАЯ"; return "АКТИВНАЯ"; }
+function classificationLabel(value: string): string {
+  switch (value) {
+    case "CURRENT": return "ТЕКУЩАЯ";
+    case "PREVIOUS": return "ПРЕДЫДУЩАЯ";
+    case "CANDIDATE": return "КАНДИДАТ";
+    case "ACCEPTED": return "ПРИНЯТА";
+    default: return "АКТИВНАЯ";
+  }
+}
+function stageLabel(value: string): string {
+  switch (value) {
+    case "research": return "Исследование";
+    case "problem": return "Проблема";
+    case "candidate": return "Кандидат";
+    case "challenged": return "Проверка";
+    case "modeled": return "Модель / воспроизведение";
+    case "accepted": return "Принято";
+    case "released": return "Выпущено";
+    default: return value;
+  }
+}
+function filterLabel(value: string): string {
+  switch (value) {
+    case "accepted": return "Принятые";
+    case "candidate": return "Кандидаты";
+    case "current": return "Текущие";
+    case "evidence": return "Со свидетельствами";
+    case "negative": return "Отрицательные";
+    case "positive": return "Положительные";
+    case "previous": return "Предыдущие";
+    default: return value;
+  }
+}
+function statusLabel(value: string): string {
+  switch (value) {
+    case "accepted": return "ПРИНЯТ";
+    case "candidate": return "КАНДИДАТ";
+    case "current": return "ТЕКУЩИЙ";
+    case "released": return "ВЫПУЩЕН";
+    default: return value.toUpperCase();
+  }
+}
+function coverageLabel(value: string): string {
+  switch (value) {
+    case "complete": return "полное";
+    case "partial": return "частичное";
+    case "missing": return "отсутствует";
+    default: return value;
+  }
+}
+function yesNo(value: boolean): string { return value ? "ДА" : "НЕТ"; }
 function anchorId(ordinal: number): string { return `version-${ordinal + 1}`; }
 function escapeAttribute(value: string): string { return escapeHtml(value); }
-function escapeJsonForScript(value: string): string { return value.replaceAll("<", "\\u003c").replaceAll(">", "\\u003e").replaceAll("&", "\\u0026"); }
 function escapeHtml(value: string): string { return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;").replaceAll("'", "&#39;"); }

@@ -11,7 +11,6 @@ import {
 } from "../src/contract-index.js";
 import { buildMethodologyProjection } from "../src/methodology-projection.js";
 import { renderContractObservatoryHtml } from "../src/site.js";
-import "./interaction.test.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Contract Observatory V3b/V3c/V4c: ${message}`);
@@ -92,15 +91,15 @@ assert(realHtml.includes("@media (max-width: 680px)"), "responsive baseline");
 assert(!realHtml.includes("http://") && !realHtml.includes("https://"), "no external network dependency");
 
 assert(realHtml.includes("<section class=\"methodology-map\""), "V4c methodology map is rendered as the primary explanatory view");
-assert(realHtml.includes("aria-label=\"Methodology stages\""), "methodology stages expose a semantic keyboard-navigation group");
+assert(realHtml.includes("aria-label=\"Стадии методологии\""), "methodology stages expose a semantic keyboard-navigation group");
 assert(realHtml.includes("data-methodology-stage=\"challenged\""), "methodology stage controls carry deterministic stage identity");
 assert(realHtml.includes("data-version-id=\"mts-contract/v0.11\""), "version lane carries exact projected contract identity");
-assert(realHtml.includes("CURRENT"), "current classification remains explicit in V4c");
-assert(realHtml.includes("PREVIOUS"), "previous classification remains explicit in V4c");
-assert(realHtml.includes("Method/lifecycle relation"), "methodology relation authority is textually distinguished");
-assert(realHtml.includes("Semantic topology Link: not rendered in this view"), "methodology view cannot be mistaken for MTS semantic Links");
-assert(realHtml.includes("addEventListener(\"hashchange\""), "deep-link back/forward restoration is wired in the client controller");
-assert(realHtml.includes("addEventListener(\"keydown\""), "keyboard stage/version activation is wired in the client controller");
+assert(realHtml.includes("ТЕКУЩАЯ"), "current classification remains explicit in V4c");
+assert(realHtml.includes("ПРЕДЫДУЩАЯ"), "previous classification remains explicit in V4c");
+assert(realHtml.includes("Связь метода и жизненного цикла"), "methodology relation authority is textually distinguished");
+assert(realHtml.includes("Семантические Связи МТС: в этом представлении не отображаются"), "methodology view cannot be mistaken for MTS semantic Links");
+assert(realHtml.includes("data-observatory-controller=\"shared-kernel\""), "static page embeds the shared canonical interaction kernel controller");
+assert(!realHtml.includes("const readState ="), "static page no longer owns the old handwritten hash parser");
 
 const v010Position = realHtml.indexOf("mts-contract/v0.10");
 const v011Position = realHtml.indexOf("mts-contract/v0.11");
@@ -165,7 +164,7 @@ same(count(syntheticHtml, "aria-current=\"page\""), 1, "current marker derives f
 assert(syntheticHtml.includes("<details open>"), "current overview is open by default");
 assert(syntheticHtml.includes("#77"), "optional issue rendered when present");
 assert(syntheticHtml.includes("#66"), "optional lifecycle issue rendered when present");
-same(count(syntheticHtml, "Candidate lifecycle issue"), 1, "missing optional lifecycle fields are omitted");
+same(count(syntheticHtml, "Задача жизненного цикла кандидата"), 1, "missing optional lifecycle fields are omitted");
 same(renderContractObservatoryHtml(synthetic), syntheticHtml, "synthetic rendering is deterministic");
 
 const sourcePath = join(repositoryRoot, realIndex.currentContractPath);
