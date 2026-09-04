@@ -37,11 +37,13 @@ const bundle = Object.freeze({
     {
       qualifiedName: "M0.Base",
       dependencies: [],
+      externalDependencies: ["Sort"],
       kernel: { kind: "axiom", type: "Sort 0" },
     },
     {
       qualifiedName: "M0.Identity",
       dependencies: ["M0.Base"],
+      externalDependencies: [],
       kernel: { kind: "theorem", type: "M0.Base -> M0.Base", value: "fun x => x" },
     },
   ],
@@ -52,6 +54,7 @@ same(parsed.schema, MATHLIB_M0_TRANSPORT_SCHEMA, "schema must be canonical");
 same(parsed.upstream.mathlibSha, PIN.mathlibSha, "mathlib pin must survive parsing");
 same(parsed.upstream.leanToolchain, PIN.leanToolchain, "Lean pin must survive parsing");
 same(parsed.declarations.length, 2, "dependency-closed corpus size");
+same(parsed.declarations[0]?.externalDependencies[0], "Sort", "external kernel support must remain explicit");
 same(parsed.declarations[1]?.dependencies[0], "M0.Base", "dependency identity must remain explicit");
 
 const canonicalA = canonicalMathlibM0TransportBundleJson(bundle);
@@ -98,6 +101,18 @@ const changedProofDigest = await computeMathlibM0TransportBundleDigest({
 });
 assert(changedProofDigest.value !== digestA.value, "changed theorem value must change transport identity");
 
+const changedExternalDigest = await computeMathlibM0TransportBundleDigest({
+  ...bundle,
+  declarations: [
+    {
+      ...bundle.declarations[0],
+      externalDependencies: ["Sort", "Nat"],
+    },
+    bundle.declarations[1],
+  ],
+});
+assert(changedExternalDigest.value !== digestA.value, "changed external support must change transport identity");
+
 expectReject("unsupported-schema", {
   ...bundle,
   schema: "mts-mathlib-m0-transport/v9.9",
@@ -135,6 +150,30 @@ expectReject("invalid-declaration", {
   ...bundle,
   declarations: [
     bundle.declarations[0],
+    { ...bundle.declarations[1], externalDependencies: ["Nat", "Nat"] },
+  ],
+});
+
+expectReject("invalid-declaration", {
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
+    { ...bundle.declarations[1], externalDependencies: ["M0.Identity"] },
+  ],
+});
+
+expectReject("invalid-declaration", {
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
+    { ...bundle.declarations[1], dependencies: ["M0.Base"], externalDependencies: ["M0.Base"] },
+  ],
+});
+
+expectReject("invalid-declaration", {
+  ...bundle,
+  declarations: [
+    bundle.declarations[0],
     { ...bundle.declarations[1], dependencies: ["M0.Identity"] },
   ],
 });
@@ -159,6 +198,7 @@ expectReject("unsupported-kernel-form", {
     {
       qualifiedName: "M0.Unsafe",
       dependencies: ["M0.Base"],
+      externalDependencies: [],
       kernel: { kind: "opaque-bytecode", type: "M0.Base" },
     },
   ],
