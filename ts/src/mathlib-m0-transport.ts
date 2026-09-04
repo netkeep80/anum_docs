@@ -7,10 +7,46 @@ export interface MathlibM0UpstreamPin {
   readonly leanToolchain: string;
 }
 
+export type MathlibM0KernelLevel =
+  | Readonly<{ kind: "zero" }>
+  | Readonly<{ kind: "param"; name: string }>
+  | Readonly<{ kind: "succ"; level: MathlibM0KernelLevel }>;
+
+export type MathlibM0KernelBinderInfo =
+  | "default"
+  | "implicit"
+  | "strictImplicit"
+  | "instImplicit";
+
+export type MathlibM0KernelLiteral =
+  | Readonly<{ kind: "nat"; value: string }>
+  | Readonly<{ kind: "string"; value: string }>;
+
+export type MathlibM0KernelExpr =
+  | Readonly<{ kind: "bvar"; index: number }>
+  | Readonly<{ kind: "sort"; level: MathlibM0KernelLevel }>
+  | Readonly<{ kind: "const"; name: string; levels: readonly MathlibM0KernelLevel[] }>
+  | Readonly<{ kind: "app"; fn: MathlibM0KernelExpr; arg: MathlibM0KernelExpr }>
+  | Readonly<{
+      kind: "lam";
+      binderName: string;
+      binderType: MathlibM0KernelExpr;
+      body: MathlibM0KernelExpr;
+      binderInfo: MathlibM0KernelBinderInfo;
+    }>
+  | Readonly<{
+      kind: "forall";
+      binderName: string;
+      binderType: MathlibM0KernelExpr;
+      body: MathlibM0KernelExpr;
+      binderInfo: MathlibM0KernelBinderInfo;
+    }>
+  | Readonly<{ kind: "lit"; literal: MathlibM0KernelLiteral }>;
+
 export type MathlibM0KernelForm =
-  | Readonly<{ kind: "axiom"; type: string }>
-  | Readonly<{ kind: "theorem"; type: string; value: string }>
-  | Readonly<{ kind: "definition"; type: string; value: string }>;
+  | Readonly<{ kind: "axiom"; type: MathlibM0KernelExpr }>
+  | Readonly<{ kind: "theorem"; type: MathlibM0KernelExpr; value: MathlibM0KernelExpr }>
+  | Readonly<{ kind: "definition"; type: MathlibM0KernelExpr; value: MathlibM0KernelExpr }>;
 
 export interface MathlibM0TransportDeclaration {
   readonly qualifiedName: string;
@@ -38,7 +74,9 @@ export type MathlibM0TransportErrorCode =
   | "duplicate-declaration"
   | "missing-dependency"
   | "forward-dependency"
-  | "unsupported-kernel-form";
+  | "dependency-identity-mismatch"
+  | "unsupported-kernel-form"
+  | "unsupported-kernel-expression";
 
 export class MathlibM0TransportError extends Error {
   override readonly name = "MathlibM0TransportError";
@@ -72,6 +110,11 @@ function declarationText(value: unknown): string {
   return value;
 }
 
+function kernelText(value: unknown): string {
+  if (typeof value !== "string" || value.length === 0) fail("unsupported-kernel-expression");
+  return value;
+}
+
 function parseUpstream(value: unknown): MathlibM0UpstreamPin {
   const upstream = exactRecord(value, ["mathlibSha", "leanToolchain"]);
   if (
@@ -88,18 +131,111 @@ function parseUpstream(value: unknown): MathlibM0UpstreamPin {
   });
 }
 
+function parseKernelLevel(value: unknown): MathlibM0KernelLevel {
+  const candidate = record(value);
+  if (candidate.kind === "zero") {
+    exactRecord(candidate, ["kind"]);
+    return Object.freeze({ kind: "zero" });
+  }
+  if (candidate.kind === "param") {
+    const level = exactRecord(candidate, ["kind", "name"]);
+    return Object.freeze({ kind: "param", name: kernelText(level.name) });
+  }
+  if (candidate.kind === "succ") {
+    const level = exactRecord(candidate, ["kind", "level"]);
+    return Object.freeze({ kind: "succ", level: parseKernelLevel(level.level) });
+  }
+  fail("unsupported-kernel-expression");
+}
+
+function parseBinderInfo(value: unknown): MathlibM0KernelBinderInfo {
+  if (
+    value === "default" ||
+    value === "implicit" ||
+    value === "strictImplicit" ||
+    value === "instImplicit"
+  ) {
+    return value;
+  }
+  fail("unsupported-kernel-expression");
+}
+
+function parseKernelLiteral(value: unknown): MathlibM0KernelLiteral {
+  const candidate = record(value);
+  if (candidate.kind === "nat") {
+    const literal = exactRecord(candidate, ["kind", "value"]);
+    if (typeof literal.value !== "string" || !/^(0|[1-9][0-9]*)$/.test(literal.value)) {
+      fail("unsupported-kernel-expression");
+    }
+    return Object.freeze({ kind: "nat", value: literal.value });
+  }
+  if (candidate.kind === "string") {
+    const literal = exactRecord(candidate, ["kind", "value"]);
+    if (typeof literal.value !== "string") fail("unsupported-kernel-expression");
+    return Object.freeze({ kind: "string", value: literal.value });
+  }
+  fail("unsupported-kernel-expression");
+}
+
+function parseKernelExpr(value: unknown): MathlibM0KernelExpr {
+  const candidate = record(value);
+  if (candidate.kind === "bvar") {
+    const expr = exactRecord(candidate, ["kind", "index"]);
+    if (typeof expr.index !== "number" || !Number.isInteger(expr.index) || expr.index < 0) {
+      fail("unsupported-kernel-expression");
+    }
+    return Object.freeze({ kind: "bvar", index: expr.index });
+  }
+  if (candidate.kind === "sort") {
+    const expr = exactRecord(candidate, ["kind", "level"]);
+    return Object.freeze({ kind: "sort", level: parseKernelLevel(expr.level) });
+  }
+  if (candidate.kind === "const") {
+    const expr = exactRecord(candidate, ["kind", "name", "levels"]);
+    if (!Array.isArray(expr.levels)) fail("unsupported-kernel-expression");
+    return Object.freeze({
+      kind: "const",
+      name: kernelText(expr.name),
+      levels: Object.freeze(expr.levels.map(parseKernelLevel)),
+    });
+  }
+  if (candidate.kind === "app") {
+    const expr = exactRecord(candidate, ["kind", "fn", "arg"]);
+    return Object.freeze({
+      kind: "app",
+      fn: parseKernelExpr(expr.fn),
+      arg: parseKernelExpr(expr.arg),
+    });
+  }
+  if (candidate.kind === "lam" || candidate.kind === "forall") {
+    const expr = exactRecord(candidate, ["kind", "binderName", "binderType", "body", "binderInfo"]);
+    return Object.freeze({
+      kind: candidate.kind,
+      binderName: kernelText(expr.binderName),
+      binderType: parseKernelExpr(expr.binderType),
+      body: parseKernelExpr(expr.body),
+      binderInfo: parseBinderInfo(expr.binderInfo),
+    });
+  }
+  if (candidate.kind === "lit") {
+    const expr = exactRecord(candidate, ["kind", "literal"]);
+    return Object.freeze({ kind: "lit", literal: parseKernelLiteral(expr.literal) });
+  }
+  fail("unsupported-kernel-expression");
+}
+
 function parseKernel(value: unknown): MathlibM0KernelForm {
   const candidate = record(value);
   if (candidate.kind === "axiom") {
     const kernel = exactRecord(candidate, ["kind", "type"]);
-    return Object.freeze({ kind: "axiom", type: declarationText(kernel.type) });
+    return Object.freeze({ kind: "axiom", type: parseKernelExpr(kernel.type) });
   }
   if (candidate.kind === "theorem" || candidate.kind === "definition") {
     const kernel = exactRecord(candidate, ["kind", "type", "value"]);
     return Object.freeze({
       kind: candidate.kind,
-      type: declarationText(kernel.type),
-      value: declarationText(kernel.value),
+      type: parseKernelExpr(kernel.type),
+      value: parseKernelExpr(kernel.value),
     });
   }
   fail("unsupported-kernel-form");
@@ -110,6 +246,44 @@ function declarationAppearsInBundle(declarations: readonly unknown[], qualifiedN
     if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
     return (value as Record<string, unknown>).qualifiedName === qualifiedName;
   });
+}
+
+function collectKernelConstants(expr: MathlibM0KernelExpr, target: Set<string>): void {
+  switch (expr.kind) {
+    case "const":
+      target.add(expr.name);
+      return;
+    case "app":
+      collectKernelConstants(expr.fn, target);
+      collectKernelConstants(expr.arg, target);
+      return;
+    case "lam":
+    case "forall":
+      collectKernelConstants(expr.binderType, target);
+      collectKernelConstants(expr.body, target);
+      return;
+    case "bvar":
+    case "sort":
+    case "lit":
+      return;
+  }
+}
+
+function kernelReferences(kernel: MathlibM0KernelForm): readonly string[] {
+  const references = new Set<string>();
+  collectKernelConstants(kernel.type, references);
+  if (kernel.kind !== "axiom") collectKernelConstants(kernel.value, references);
+  return Object.freeze([...references].sort());
+}
+
+function sortedUniqueDeclarationTexts(value: readonly unknown[]): readonly string[] {
+  const parsed = value.map(declarationText);
+  if (new Set(parsed).size !== parsed.length) fail("invalid-declaration");
+  return Object.freeze([...parsed].sort());
+}
+
+function sameStrings(left: readonly string[], right: readonly string[]): boolean {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
 export function parseMathlibM0TransportBundle(input: unknown): MathlibM0TransportBundle {
@@ -133,11 +307,9 @@ export function parseMathlibM0TransportBundle(input: unknown): MathlibM0Transpor
       fail("invalid-declaration");
     }
 
-    const dependencies = candidate.dependencies.map(declarationText);
-    const externalDependencies = candidate.externalDependencies.map(declarationText);
+    const dependencies = sortedUniqueDeclarationTexts(candidate.dependencies);
+    const externalDependencies = sortedUniqueDeclarationTexts(candidate.externalDependencies);
     if (
-      new Set(dependencies).size !== dependencies.length ||
-      new Set(externalDependencies).size !== externalDependencies.length ||
       dependencies.includes(qualifiedName) ||
       externalDependencies.includes(qualifiedName) ||
       externalDependencies.some((dependency) => dependencies.includes(dependency))
@@ -155,12 +327,28 @@ export function parseMathlibM0TransportBundle(input: unknown): MathlibM0Transpor
       }
     }
 
+    const kernel = parseKernel(candidate.kernel);
+    const references = kernelReferences(kernel);
+    if (references.includes(qualifiedName)) fail("dependency-identity-mismatch");
+    const derivedDependencies = references.filter((reference) =>
+      declarationAppearsInBundle(bundle.declarations, reference),
+    );
+    const derivedExternalDependencies = references.filter(
+      (reference) => !declarationAppearsInBundle(bundle.declarations, reference),
+    );
+    if (
+      !sameStrings(dependencies, derivedDependencies) ||
+      !sameStrings(externalDependencies, derivedExternalDependencies)
+    ) {
+      fail("dependency-identity-mismatch");
+    }
+
     declarations.push(
       Object.freeze({
         qualifiedName,
-        dependencies: Object.freeze([...dependencies]),
-        externalDependencies: Object.freeze([...externalDependencies]),
-        kernel: parseKernel(candidate.kernel),
+        dependencies,
+        externalDependencies,
+        kernel,
       }),
     );
     seen.add(qualifiedName);
