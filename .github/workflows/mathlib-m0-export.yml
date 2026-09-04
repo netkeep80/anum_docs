@@ -10,10 +10,15 @@ on:
         type: string
   pull_request:
     paths:
+      - .github/workflows/mathlib-m0-export.yml
       - research/mathlib-m0/lean/**
       - research/mathlib-m0/upstream-pin.json
       - research/mathlib-m0/corpus-seed.json
       - research/mathlib-m0/corpus-reproduction.json
+      - ts/src/mathlib-m0-transport.ts
+      - ts/package.json
+      - ts/package-lock.json
+      - ts/tsconfig.json
 
 permissions:
   contents: read
@@ -123,6 +128,43 @@ jobs:
             '{researchRef:$researchRef,researchSha:$researchSha,mathlibSha:$mathlibSha,leanToolchain:$leanToolchain,trust:"untrusted-export-evidence"}' \
             > "$artifact_dir/run-metadata.json"
           test -z "$(git -C "$GITHUB_WORKSPACE/anum_docs-research" status --porcelain)"
+
+      - name: Validate live export through TypeScript transport contract
+        shell: bash
+        working-directory: anum_docs-research/ts
+        env:
+          MATHLIB_M0_LIVE_EXPORT: ${{ github.workspace }}/mathlib-m0-artifacts/corpus-export.json
+          MATHLIB_SHA: ${{ steps.pin.outputs.mathlib_sha }}
+          LEAN_TOOLCHAIN: ${{ steps.pin.outputs.lean_toolchain }}
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run build --silent
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          import {
+            computeMathlibM0TransportBundleDigest,
+            parseMathlibM0TransportBundle,
+          } from "./dist/src/mathlib-m0-transport.js";
+
+          const exportPath = process.env.MATHLIB_M0_LIVE_EXPORT;
+          if (!exportPath) throw new Error("MATHLIB_M0_LIVE_EXPORT is required");
+          const input = JSON.parse(readFileSync(exportPath, "utf8"));
+          const bundle = parseMathlibM0TransportBundle(input);
+          if (bundle.upstream.mathlibSha !== process.env.MATHLIB_SHA) {
+            throw new Error("live transport mathlib SHA mismatch");
+          }
+          if (bundle.upstream.leanToolchain !== process.env.LEAN_TOOLCHAIN) {
+            throw new Error("live transport Lean toolchain mismatch");
+          }
+          if (bundle.declarations.length < 10 || bundle.declarations.length > 100) {
+            throw new Error(`live transport corpus size out of range: ${bundle.declarations.length}`);
+          }
+          const digest = await computeMathlibM0TransportBundleDigest(bundle);
+          console.log(
+            `validated ${bundle.declarations.length} live declarations through parseMathlibM0TransportBundle; ${digest.scheme}=${digest.value}`,
+          );
+          NODE
 
       - name: Upload untrusted export evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
