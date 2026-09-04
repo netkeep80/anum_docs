@@ -26,5 +26,20 @@ assert(
   !source.includes("IO.FS.readFile"),
   "exporter must not derive kernel evidence by reading source text",
 );
+assert(
+  !/\btypeRepr\b|\bvalueRepr\??\b/.test(source) &&
+    !/reprStr\s+typeExpr|valueExpr\?\.map\s+reprStr/.test(source),
+  "exporter must not use reprStr-backed strings as the kernel type/value transport boundary",
+);
+assert(
+  [".bvar", ".sort", ".const", ".app", ".lam", ".forallE", ".lit"].every((form) =>
+    source.includes(`| ${form}`),
+  ),
+  "exporter must structurally traverse the supported Lean Expr forms",
+);
+assert(
+  [".zero", ".param", ".succ"].every((form) => source.includes(`| ${form}`)),
+  "exporter must structurally traverse the supported Lean Level forms",
+);
 
 console.log("mathlib-m0-export-contract.test.ts: ok");
