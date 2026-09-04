@@ -92,6 +92,33 @@ export function installObservatoryBrowserController(
     .querySelectorAll("button"))
     .filter((button) => button.hidden !== true && button.closest?.("[hidden]") == null);
 
+  const statusStageLabel = (value: string | null): string => {
+    switch (value) {
+      case null: return "все";
+      case "research": return "Исследование";
+      case "problem": return "Проблема";
+      case "candidate": return "Кандидат";
+      case "challenged": return "Проверка";
+      case "modeled": return "Модель / воспроизведение";
+      case "accepted": return "Принято";
+      case "released": return "Выпущено";
+      default: return value;
+    }
+  };
+
+  const statusFilterLabel = (value: string): string => {
+    switch (value) {
+      case "accepted": return "принятые";
+      case "candidate": return "кандидаты";
+      case "current": return "текущие";
+      case "evidence": return "со свидетельствами";
+      case "negative": return "отрицательные";
+      case "positive": return "положительные";
+      case "previous": return "предыдущие";
+      default: return value;
+    }
+  };
+
   const apply = (): void => {
     map.querySelectorAll("[data-methodology-stage]").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.methodologyStage === state.selectedStage));
@@ -125,7 +152,8 @@ export function installObservatoryBrowserController(
     }
     const status = map.querySelector(".methodology-status");
     if (status !== null) {
-      status.textContent = `Selected: ${state.selectedVersionId ?? "none"}; stage: ${state.selectedStage ?? "all"}; item: ${state.selectedItemId ?? "none"}; filters: ${state.filters.join(", ") || "none"}; zoom: ${state.viewport.scale}.`;
+      const filters = state.filters.map(statusFilterLabel).join(", ") || "нет";
+      status.textContent = `Выбрано: версия ${state.selectedVersionId ?? "нет"}; стадия: ${statusStageLabel(state.selectedStage)}; элемент: ${state.selectedItemId ?? "нет"}; фильтры: ${filters}; масштаб: ${state.viewport.scale}.`;
     }
     const active = environment.document.activeElement;
     if (active?.closest?.("[hidden]") != null) visibleButtons()[0]?.focus?.();

@@ -23,7 +23,7 @@ export function renderContractObservatoryHtml(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MTS Contract Observatory</title>
+  <title>Обозреватель контрактов МТС</title>
   <style>
     :root { color-scheme: light dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
     * { box-sizing: border-box; }
@@ -120,12 +120,12 @@ export function renderContractObservatoryHtml(
 </head>
 <body>
   <div class="shell">
-    <header class="hero"><p class="eyebrow">MTS · derived evidence</p><h1>Contract Observatory</h1><p class="lede">Статическое представление contract/conformance evidence. Эта страница является производной навигацией и не является источником семантики МТС.</p></header>
-    <dl class="provenance" aria-label="Provenance">${renderDefinition("Index schema", index.schema)}${renderDefinition("Acceptance", index.acceptancePath)}${renderDefinition("Current contract", index.currentContractPath)}${renderDefinition("Previous contract", index.previousContractPath)}</dl>
+    <header class="hero"><p class="eyebrow">МТС · производные свидетельства</p><h1>Обозреватель контрактов МТС</h1><p class="lede">Статическое представление свидетельств контракта и корпуса соответствия. Эта страница является производной навигацией и не является источником семантики МТС.</p></header>
+    <dl class="provenance" aria-label="Происхождение данных">${renderDefinition("Схема индекса", index.schema)}${renderDefinition("Приёмка", index.acceptancePath)}${renderDefinition("Текущий контракт", index.currentContractPath)}${renderDefinition("Предыдущий контракт", index.previousContractPath)}</dl>
 ${methodologyMap}
-    <nav class="timeline" aria-labelledby="timeline-title"><h2 id="timeline-title">Timeline</h2><ol>${timeline}</ol></nav>
-    <main class="versions" aria-labelledby="versions-title"><h2 id="versions-title">Version Overview</h2><div class="version-list">${versions}</div></main>
-    <footer class="footer">Generated deterministically from ContractObservatoryIndex. Presentation is non-normative.</footer>
+    <nav class="timeline" aria-labelledby="timeline-title"><h2 id="timeline-title">Хронология</h2><ol>${timeline}</ol></nav>
+    <main class="versions" aria-labelledby="versions-title"><h2 id="versions-title">Обзор версий</h2><div class="version-list">${versions}</div></main>
+    <footer class="footer">Сгенерировано детерминированно из ContractObservatoryIndex. Представление ненормативно.</footer>
   </div>
 </body>
 </html>
@@ -136,8 +136,8 @@ function renderMethodologyMap(projection: MethodologyProjection): string {
   const config = buildObservatoryInteractionConfig(projection);
   const state = createObservatoryInteractionKernel(config).initialState();
   const model = buildInteractiveMethodologyModel(projection, state);
-  const stageControls = model.stages.map((entry) => `<button type="button" data-methodology-stage="${entry.stage}" aria-pressed="false" title="Lifecycle stage: ${entry.stage}; derived presentation state">${escapeHtml(entry.stage)}</button>`).join("\n");
-  const filterControls = OBSERVATORY_FILTERS.map((filter) => renderFilterButton(filter, filter.toUpperCase())).join("");
+  const stageControls = model.stages.map((entry) => `<button type="button" data-methodology-stage="${entry.stage}" aria-pressed="false" title="Стадия жизненного цикла: ${stageLabel(entry.stage)}; производное состояние представления">${escapeHtml(stageLabel(entry.stage))}</button>`).join("\n");
+  const filterControls = OBSERVATORY_FILTERS.map((filter) => renderFilterButton(filter, filterLabel(filter))).join("");
   const lanes = model.versions.map((entry, ordinal) => renderMethodologyLane(
     projection.versions[ordinal]!,
     entry,
@@ -146,15 +146,15 @@ function renderMethodologyMap(projection: MethodologyProjection): string {
   const anatomy = projection.versions.map(renderInvariantAnatomy).join("\n");
 
   return `    <section class="methodology-map" aria-labelledby="methodology-title">
-      <div class="methodology-heading"><p class="eyebrow">Primary explanatory view · derived methodology</p><h2 id="methodology-title">Methodology map + version lifecycle lanes</h2><p>Две координированные, но не тождественные структуры: метод разработки и состояние жизненного цикла версии.</p></div>
-      <ol class="method-chain" aria-label="Method chain"><li>Theory</li><li>Contract</li><li>Conformance</li><li>Challenge</li><li>Model/Replay</li><li>Acceptance</li><li>Current</li></ol>
-      <div class="methodology-authority" aria-label="Relation authority"><span>Method/lifecycle relation: derived presentation relation</span><span>Traceability/evidence relation: source-derived reference</span><span>Semantic topology Link: not rendered in this view</span></div>
+      <div class="methodology-heading"><p class="eyebrow">Основное объясняющее представление · производная методология</p><h2 id="methodology-title">Карта методологии и жизненного цикла версий</h2><p>Две координированные, но не тождественные структуры: метод разработки и состояние жизненного цикла версии.</p></div>
+      <ol class="method-chain" aria-label="Цепочка метода"><li>Теория</li><li>Контракт</li><li>Соответствие</li><li>Проверка</li><li>Модель / воспроизведение</li><li>Приёмка</li><li>Текущая</li></ol>
+      <div class="methodology-authority" aria-label="Основания связей"><span>Связь метода и жизненного цикла: производная связь представления</span><span>Связь трассируемости и свидетельств: ссылка из исходных данных</span><span>Семантические Связи МТС: в этом представлении не отображаются</span></div>
       <div class="methodology-controls">
-        <div class="stage-controls" role="group" aria-label="Methodology stages">${stageControls}</div>
-        <div class="filter-controls" role="group" aria-label="Version and evidence filters">${filterControls}</div>
-        <div class="viewport-controls" role="group" aria-label="Map viewport"><button type="button" data-viewport-action="zoom-out" aria-label="Zoom out">−</button><button type="button" data-viewport-action="reset">Reset viewport</button><button type="button" data-viewport-action="zoom-in" aria-label="Zoom in">+</button></div>
+        <div class="stage-controls" role="group" aria-label="Стадии методологии">${stageControls}</div>
+        <div class="filter-controls" role="group" aria-label="Фильтры версий и свидетельств">${filterControls}</div>
+        <div class="viewport-controls" role="group" aria-label="Область карты"><button type="button" data-viewport-action="zoom-out" aria-label="Уменьшить масштаб">−</button><button type="button" data-viewport-action="reset">Сбросить вид</button><button type="button" data-viewport-action="zoom-in" aria-label="Увеличить масштаб">+</button></div>
       </div>
-      <div class="methodology-grid" tabindex="0" aria-label="Version lifecycle lanes">${lanes}</div>
+      <div class="methodology-grid" tabindex="0" aria-label="Полосы жизненного цикла версий">${lanes}</div>
 ${anatomy}
       <p class="methodology-status" aria-live="polite"></p>
     </section>
@@ -167,18 +167,18 @@ function renderMethodologyLane(
   config: ObservatoryInteractionVersionConfig,
 ): string {
   const evidenceByStage = new Map(projection.lifecycle.map((entry) => [entry.stage, entry.evidence.length] as const));
-  const stages = model.stageStates.map((entry) => `<div class="stage-cell${entry.present ? " present" : ""}" data-lane-stage="${entry.stage}" title="${entry.stage}: ${entry.present ? "source evidence present" : "no linked source evidence"}"><span>${escapeHtml(entry.stage)}</span><span class="stage-evidence">${entry.present ? `${evidenceByStage.get(entry.stage) ?? 0} evidence` : "—"}</span></div>`).join("\n");
-  const evidenceItems = config.itemIds.slice(0, 6).map((id) => `<button type="button" data-item-id="${escapeAttribute(id)}" aria-pressed="false" title="Traceability/evidence reference; presentation-only">${escapeHtml(id)}</button>`).join("");
-  return `<div class="methodology-lane${model.selected ? " selected" : ""}" data-version-lane="${escapeAttribute(model.contractId)}"><div class="lane-version"><button type="button" class="version-select" data-version-id="${escapeAttribute(model.contractId)}" aria-pressed="${model.selected ? "true" : "false"}" title="Select version and synchronize Observatory views">${escapeHtml(model.contractId)}</button><span class="lane-classification">${model.classification}</span></div>${stages}<div class="evidence-items" aria-label="Evidence references for ${escapeAttribute(model.contractId)}">${evidenceItems || "<span>No linked evidence references</span>"}</div></div>`;
+  const stages = model.stageStates.map((entry) => `<div class="stage-cell${entry.present ? " present" : ""}" data-lane-stage="${entry.stage}" title="${stageLabel(entry.stage)}: ${entry.present ? "есть связанные свидетельства" : "связанные свидетельства отсутствуют"}"><span>${escapeHtml(stageLabel(entry.stage))}</span><span class="stage-evidence">${entry.present ? `${evidenceByStage.get(entry.stage) ?? 0} свидетельств` : "—"}</span></div>`).join("\n");
+  const evidenceItems = config.itemIds.slice(0, 6).map((id) => `<button type="button" data-item-id="${escapeAttribute(id)}" aria-pressed="false" title="Ссылка трассируемости/свидетельства; только представление">${escapeHtml(id)}</button>`).join("");
+  return `<div class="methodology-lane${model.selected ? " selected" : ""}" data-version-lane="${escapeAttribute(model.contractId)}"><div class="lane-version"><button type="button" class="version-select" data-version-id="${escapeAttribute(model.contractId)}" aria-pressed="${model.selected ? "true" : "false"}" title="Выбрать версию и синхронизировать представления обозревателя">${escapeHtml(model.contractId)}</button><span class="lane-classification">${classificationLabel(model.classification)}</span></div>${stages}<div class="evidence-items" aria-label="Ссылки на свидетельства для ${escapeAttribute(model.contractId)}">${evidenceItems || "<span>Нет связанных ссылок на свидетельства</span>"}</div></div>`;
 }
 
 function renderInvariantAnatomy(version: MethodologyVersionProjection): string {
-  const manifest = version.traceabilityManifestPath ?? "none";
+  const manifest = version.traceabilityManifestPath ?? "нет";
   const cards = version.semanticInvariants.map((invariant) => renderInvariantCard(version, invariant)).join("\n");
   const missing = version.semanticInvariants.length === 0
-    ? `<p class="trace-none">No source-linked semantic invariants. Traceability manifest: ${escapeHtml(manifest)}.</p>`
+    ? `<p class="trace-none">Нет семантических инвариантов, связанных с источником. Манифест трассируемости: ${escapeHtml(manifest)}.</p>`
     : "";
-  return `      <section class="invariant-anatomy" data-traceability-version="${escapeAttribute(version.contractId)}" aria-label="Invariant anatomy for ${escapeAttribute(version.contractId)}"><h3>Invariant anatomy · ${escapeHtml(version.contractId)}</h3><p>Source-derived provenance view. Traceability manifest: ${escapeHtml(manifest)}. Missing relations remain explicit.</p>${missing}<div class="invariant-cards">${cards}</div>${renderTraceabilityTable(version)}</section>`;
+  return `      <section class="invariant-anatomy" data-traceability-version="${escapeAttribute(version.contractId)}" aria-label="Анатомия инвариантов для ${escapeAttribute(version.contractId)}"><h3>Анатомия инвариантов · ${escapeHtml(version.contractId)}</h3><p>Производное представление происхождения данных. Манифест трассируемости: ${escapeHtml(manifest)}. Отсутствующие связи показаны явно.</p>${missing}<div class="invariant-cards">${cards}</div>${renderTraceabilityTable(version)}</section>`;
 }
 
 function renderInvariantCard(
@@ -188,12 +188,12 @@ function renderInvariantCard(
   const vectorIds = invariantVectorIds(invariant);
   const evidenceReferences = linkedEvidenceReferences(version, vectorIds);
   const acceptance = version.acceptanceReferences.map((reference) => Object.freeze({ id: reference.id, label: `${reference.id} · ${reference.sourcePath}` }));
-  return `<article class="invariant-card" data-invariant-id="${escapeAttribute(invariant.id)}"><h4><button type="button" class="invariant-select" data-item-id="invariant:${escapeAttribute(invariant.id)}" aria-pressed="false">${escapeHtml(invariant.id)}</button></h4><dl class="invariant-meta"><dt>Contract path</dt><dd>${escapeHtml(version.contractPath)}</dd><dt>Contract JSON Pointer</dt><dd>${escapeHtml(invariant.contractPointer)}</dd><dt>Contract law</dt><dd>${escapeHtml(invariant.contractValue)}</dd><dt>Conformance path</dt><dd>${escapeHtml(version.conformancePath)}</dd><dt>Theory reference</dt><dd>none (no invariant-scoped source relation)</dd></dl>${renderTraceGroup("Genesis vectors", invariant.positive.requiredGenesisVectors, "vector")}${renderTraceGroup("Meaning vectors", invariant.positive.requiredMeaningVectors, "vector")}${renderTraceGroup("C2 classification vectors", invariant.positive.requiredC2ClassificationVectors, "vector")}${renderTraceGroup("Compatibility vectors", invariant.positive.requiredCompatibilityVectors, "vector")}${renderTraceGroup("Negative vectors", invariant.negative.requiredNegativeVectors, "vector")}${renderTraceGroup("Executable gates", invariant.requiredExecutableGates, "gate")}${renderEvidenceGroup("Existing evidence", evidenceReferences)}${renderReferenceGroup("Acceptance provenance", acceptance)}<details class="raw-provenance"><summary>Raw provenance</summary><dl class="invariant-meta"><dt>Invariant ID</dt><dd>${escapeHtml(invariant.id)}</dd><dt>Traceability source</dt><dd>${escapeHtml(invariant.traceabilitySourcePath)}</dd><dt>Contract source</dt><dd>${escapeHtml(version.contractPath)}#${escapeHtml(invariant.contractPointer)}</dd><dt>Conformance source</dt><dd>${escapeHtml(version.conformancePath)}</dd></dl></details></article>`;
+  return `<article class="invariant-card" data-invariant-id="${escapeAttribute(invariant.id)}"><h4><button type="button" class="invariant-select" data-item-id="invariant:${escapeAttribute(invariant.id)}" aria-pressed="false">${escapeHtml(invariant.id)}</button></h4><dl class="invariant-meta"><dt>Путь контракта</dt><dd>${escapeHtml(version.contractPath)}</dd><dt>JSON Pointer контракта</dt><dd>${escapeHtml(invariant.contractPointer)}</dd><dt>Закон контракта</dt><dd>${escapeHtml(invariant.contractValue)}</dd><dt>Путь корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd><dt>Ссылка на теорию</dt><dd>нет (нет исходной связи уровня инварианта)</dd></dl>${renderTraceGroup("Векторы генезиса", invariant.positive.requiredGenesisVectors, "vector")}${renderTraceGroup("Векторы смысла", invariant.positive.requiredMeaningVectors, "vector")}${renderTraceGroup("Векторы классификации C2", invariant.positive.requiredC2ClassificationVectors, "vector")}${renderTraceGroup("Векторы совместимости", invariant.positive.requiredCompatibilityVectors, "vector")}${renderTraceGroup("Отрицательные векторы", invariant.negative.requiredNegativeVectors, "vector")}${renderTraceGroup("Исполняемые проверки", invariant.requiredExecutableGates, "gate")}${renderEvidenceGroup("Существующие свидетельства", evidenceReferences)}${renderReferenceGroup("Происхождение приёмки", acceptance)}<details class="raw-provenance"><summary>Исходное происхождение данных</summary><dl class="invariant-meta"><dt>ID инварианта</dt><dd>${escapeHtml(invariant.id)}</dd><dt>Источник трассируемости</dt><dd>${escapeHtml(invariant.traceabilitySourcePath)}</dd><dt>Источник контракта</dt><dd>${escapeHtml(version.contractPath)}#${escapeHtml(invariant.contractPointer)}</dd><dt>Источник корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd></dl></details></article>`;
 }
 
 function renderTraceGroup(label: string, values: readonly string[], prefix: "vector" | "gate" | "evidence"): string {
   const nodes = values.map((value) => `<button type="button" class="trace-node" data-item-id="${escapeAttribute(`${prefix}:${value}`)}" aria-pressed="false">${escapeHtml(value)}</button>`).join("");
-  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">none</span>"}</div></div>`;
+  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">нет</span>"}</div></div>`;
 }
 
 function renderEvidenceGroup(label: string, values: MethodologyVersionProjection["evidenceReferences"]): string {
@@ -201,14 +201,14 @@ function renderEvidenceGroup(label: string, values: MethodologyVersionProjection
     const identifiers = reference.identifiers
       .map((entry) => `<span class="evidence-identifier">${escapeHtml(entry.kind)}: ${escapeHtml(entry.value)}</span>`)
       .join("");
-    return `<div class="evidence-reference"><button type="button" class="trace-node" data-item-id="${escapeAttribute(reference.id)}" aria-pressed="false">${escapeHtml(reference.sourcePath)}</button><span class="evidence-identifiers">${identifiers || "<span class=\"trace-none\">identifiers: none</span>"}</span></div>`;
+    return `<div class="evidence-reference"><button type="button" class="trace-node" data-item-id="${escapeAttribute(reference.id)}" aria-pressed="false">${escapeHtml(reference.sourcePath)}</button><span class="evidence-identifiers">${identifiers || "<span class=\"trace-none\">идентификаторы: нет</span>"}</span></div>`;
   }).join("");
-  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">none</span>"}</div></div>`;
+  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">нет</span>"}</div></div>`;
 }
 
 function renderReferenceGroup(label: string, values: readonly Readonly<{ id: string; label: string }>[] ): string {
   const nodes = values.map((value) => `<button type="button" class="trace-node" data-item-id="${escapeAttribute(value.id)}" aria-pressed="false">${escapeHtml(value.label)}</button>`).join("");
-  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">none</span>"}</div></div>`;
+  return `<div class="trace-group"><h5>${escapeHtml(label)}</h5><div class="trace-list">${nodes || "<span class=\"trace-none\">нет</span>"}</div></div>`;
 }
 
 function invariantVectorIds(invariant: MethodologyVersionProjection["semanticInvariants"][number]): readonly string[] {
@@ -234,23 +234,23 @@ function linkedEvidenceReferences(
 
 function renderTraceabilityTable(version: MethodologyVersionProjection): string {
   if (version.traceability.length === 0) {
-    return `<details class="traceability-table"><summary>Source-derived traceability relations</summary><p class="trace-none">none</p></details>`;
+    return `<details class="traceability-table"><summary>Исходные связи трассируемости</summary><p class="trace-none">нет</p></details>`;
   }
   const rows = version.traceability.map((relation) => {
     const presentation = relationPresentation(relation);
     return `<tr data-relation="${escapeAttribute(relation.relation)}"><td>${renderTraceEndpoint(presentation.source)}</td><td>${escapeHtml(presentation.label)}</td><td>${renderTraceEndpoint(presentation.target)}</td></tr>`;
   }).join("\n");
-  return `<details class="traceability-table"><summary>Source-derived traceability relations</summary><table><thead><tr><th>Evidence/source endpoint</th><th>Relation</th><th>Obligation/target endpoint</th></tr></thead><tbody>${rows}</tbody></table></details>`;
+  return `<details class="traceability-table"><summary>Исходные связи трассируемости</summary><table><thead><tr><th>Конечная точка свидетельства/источника</th><th>Связь</th><th>Конечная точка обязательства/цели</th></tr></thead><tbody>${rows}</tbody></table></details>`;
 }
 
 function relationPresentation(
   relation: MethodologyVersionProjection["traceability"][number],
 ): Readonly<{ source: string; target: string; label: string }> {
   switch (relation.relation) {
-    case "supported-by": return Object.freeze({ source: relation.to, target: relation.from, label: "supports" });
-    case "challenged-by": return Object.freeze({ source: relation.to, target: relation.from, label: "challenges" });
-    case "verified-by": return Object.freeze({ source: relation.to, target: relation.from, label: "verifies" });
-    case "accepted-by": return Object.freeze({ source: relation.to, target: relation.from, label: "accepts" });
+    case "supported-by": return Object.freeze({ source: relation.to, target: relation.from, label: "подтверждает" });
+    case "challenged-by": return Object.freeze({ source: relation.to, target: relation.from, label: "оспаривает" });
+    case "verified-by": return Object.freeze({ source: relation.to, target: relation.from, label: "проверяет" });
+    case "accepted-by": return Object.freeze({ source: relation.to, target: relation.from, label: "принимает" });
   }
 }
 
@@ -262,24 +262,74 @@ function uniqueSorted(values: readonly string[]): string[] {
   return [...new Set(values)].sort((a, b) => a.localeCompare(b));
 }
 
-function renderFilterButton(filter: string, label: string): string { return `<button type="button" data-methodology-filter="${filter}" aria-pressed="false">${label}</button>`; }
+function renderFilterButton(filter: string, label: string): string { return `<button type="button" data-methodology-filter="${filter}" aria-pressed="false">${escapeHtml(label)}</button>`; }
 
 function renderTimelineItem(version: ContractVersionSummary, ordinal: number, interactive: boolean): string {
-  const anchor = anchorId(ordinal); const classification = classify(version); const semanticDelta = version.observableSemanticDelta ? "SEMANTIC DELTA" : "NO SEMANTIC DELTA"; const href = interactive ? `#v=${encodeURIComponent(version.contractId)}` : `#${anchor}`;
-  return `<li><a href="${href}" class="${version.isCurrent ? "current" : ""}" data-overview-version-id="${escapeAttribute(version.contractId)}"${version.isCurrent ? " aria-current=\"page\"" : ""}><span class="timeline-id">${escapeHtml(version.contractId)}</span><span class="badges">${badge(classification, false)}${badge(version.status.toUpperCase(), true)}${badge(version.accepted ? "ACCEPTED" : "NOT ACCEPTED", true)}${badge(semanticDelta, true)}</span></a></li>`;
+  const anchor = anchorId(ordinal); const classification = classify(version); const semanticDelta = version.observableSemanticDelta ? "СЕМАНТИЧЕСКОЕ ИЗМЕНЕНИЕ" : "БЕЗ СЕМАНТИЧЕСКОГО ИЗМЕНЕНИЯ"; const href = interactive ? `#v=${encodeURIComponent(version.contractId)}` : `#${anchor}`;
+  return `<li><a href="${href}" class="${version.isCurrent ? "current" : ""}" data-overview-version-id="${escapeAttribute(version.contractId)}"${version.isCurrent ? " aria-current=\"page\"" : ""}><span class="timeline-id">${escapeHtml(version.contractId)}</span><span class="badges">${badge(classification, false)}${badge(statusLabel(version.status), true)}${badge(version.accepted ? "ПРИНЯТ" : "НЕ ПРИНЯТ", true)}${badge(semanticDelta, true)}</span></a></li>`;
 }
 
 function renderVersionSection(version: ContractVersionSummary, ordinal: number): string {
-  const anchor = anchorId(ordinal); const issueRows = [version.issue === undefined ? "" : renderRow("Issue", `#${version.issue}`), version.candidateLifecycleIssue === undefined ? "" : renderRow("Candidate lifecycle issue", `#${version.candidateLifecycleIssue}`)].filter(Boolean).join("\n");
-  return `<section id="${anchor}" class="version-card${version.isCurrent ? " current" : ""}" data-overview-version-id="${escapeAttribute(version.contractId)}" aria-labelledby="${anchor}-title"><details${version.isCurrent ? " open" : ""}><summary><span id="${anchor}-title">${escapeHtml(version.contractId)}</span><span class="badges">${badge(classify(version), false)} ${badge(version.status.toUpperCase(), true)}</span></summary><div class="version-body"><div class="metric-grid">${metric("Accepted", yesNo(version.accepted))}${metric("Acceptance ready", yesNo(version.acceptanceReady))}${metric("Coverage", version.coverageState)}${metric("Executable gates", String(version.requiredExecutableGateCount))}${metric("Negative vectors", String(version.requiredNegativeVectorCount))}${metric("Observable semantic delta", yesNo(version.observableSemanticDelta))}</div><table><tbody>${renderRow("Contract", version.contractId)}${renderRow("Conformance", version.conformanceId)}${renderRow("Semantic base", version.semanticBase)}${renderRow("Contract path", version.contractPath)}${renderRow("Conformance path", version.conformancePath)}${renderRow("Classification", classify(version))}${issueRows}</tbody></table></div></details></section>`;
+  const anchor = anchorId(ordinal); const issueRows = [version.issue === undefined ? "" : renderRow("Задача GitHub", `#${version.issue}`), version.candidateLifecycleIssue === undefined ? "" : renderRow("Задача жизненного цикла кандидата", `#${version.candidateLifecycleIssue}`)].filter(Boolean).join("\n");
+  return `<section id="${anchor}" class="version-card${version.isCurrent ? " current" : ""}" data-overview-version-id="${escapeAttribute(version.contractId)}" aria-labelledby="${anchor}-title"><details${version.isCurrent ? " open" : ""}><summary><span id="${anchor}-title">${escapeHtml(version.contractId)}</span><span class="badges">${badge(classify(version), false)} ${badge(statusLabel(version.status), true)}</span></summary><div class="version-body"><div class="metric-grid">${metric("Принят", yesNo(version.accepted))}${metric("Готов к приёмке", yesNo(version.acceptanceReady))}${metric("Покрытие", coverageLabel(version.coverageState))}${metric("Исполняемые проверки", String(version.requiredExecutableGateCount))}${metric("Отрицательные векторы", String(version.requiredNegativeVectorCount))}${metric("Наблюдаемое семантическое изменение", yesNo(version.observableSemanticDelta))}</div><table><tbody>${renderRow("Контракт", version.contractId)}${renderRow("Корпус соответствия", version.conformanceId)}${renderRow("Семантическая база", version.semanticBase)}${renderRow("Путь контракта", version.contractPath)}${renderRow("Путь корпуса соответствия", version.conformancePath)}${renderRow("Классификация", classify(version))}${issueRows}</tbody></table></div></details></section>`;
 }
 
 function renderDefinition(label: string, value: string): string { return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`; }
 function renderRow(label: string, value: string): string { return `<tr><th scope="row">${escapeHtml(label)}</th><td>${escapeHtml(value)}</td></tr>`; }
 function metric(label: string, value: string): string { return `<div class="metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`; }
 function badge(value: string, muted: boolean): string { return `<span class="badge${muted ? " badge-muted" : ""}">${escapeHtml(value)}</span>`; }
-function classify(version: ContractVersionSummary): string { if (version.isCurrent) return "CURRENT"; if (version.isPrevious) return "PREVIOUS"; return "LIVE"; }
-function yesNo(value: boolean): string { return value ? "YES" : "NO"; }
+function classify(version: ContractVersionSummary): string { if (version.isCurrent) return "ТЕКУЩАЯ"; if (version.isPrevious) return "ПРЕДЫДУЩАЯ"; return "АКТИВНАЯ"; }
+function classificationLabel(value: string): string {
+  switch (value) {
+    case "CURRENT": return "ТЕКУЩАЯ";
+    case "PREVIOUS": return "ПРЕДЫДУЩАЯ";
+    case "CANDIDATE": return "КАНДИДАТ";
+    case "ACCEPTED": return "ПРИНЯТА";
+    default: return "АКТИВНАЯ";
+  }
+}
+function stageLabel(value: string): string {
+  switch (value) {
+    case "research": return "Исследование";
+    case "problem": return "Проблема";
+    case "candidate": return "Кандидат";
+    case "challenged": return "Проверка";
+    case "modeled": return "Модель / воспроизведение";
+    case "accepted": return "Принято";
+    case "released": return "Выпущено";
+    default: return value;
+  }
+}
+function filterLabel(value: string): string {
+  switch (value) {
+    case "accepted": return "Принятые";
+    case "candidate": return "Кандидаты";
+    case "current": return "Текущие";
+    case "evidence": return "Со свидетельствами";
+    case "negative": return "Отрицательные";
+    case "positive": return "Положительные";
+    case "previous": return "Предыдущие";
+    default: return value;
+  }
+}
+function statusLabel(value: string): string {
+  switch (value) {
+    case "accepted": return "ПРИНЯТ";
+    case "candidate": return "КАНДИДАТ";
+    case "current": return "ТЕКУЩИЙ";
+    case "released": return "ВЫПУЩЕН";
+    default: return value.toUpperCase();
+  }
+}
+function coverageLabel(value: string): string {
+  switch (value) {
+    case "complete": return "полное";
+    case "partial": return "частичное";
+    case "missing": return "отсутствует";
+    default: return value;
+  }
+}
+function yesNo(value: boolean): string { return value ? "ДА" : "НЕТ"; }
 function anchorId(ordinal: number): string { return `version-${ordinal + 1}`; }
 function escapeAttribute(value: string): string { return escapeHtml(value); }
 function escapeHtml(value: string): string { return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;").replaceAll("'", "&#39;"); }
