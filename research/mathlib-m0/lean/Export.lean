@@ -38,8 +38,8 @@ private structure ExportNode where
   dependencies : List Name
   externalDependencies : List Name
   kind : String
-  typeRepr : String
-  valueRepr? : Option String
+  typeJson : Json
+  valueJson? : Option Json
 
 private def insertName (name : Name) : List Name → List Name
   | [] => [name]
@@ -78,6 +78,110 @@ private def supportedKernel
   | _ =>
       .error s!"unsupported kernel form for selected declaration {qualifiedName}"
 
+private partial def levelJson (level : Level) : Except String Json :=
+  match level with
+  | .zero =>
+      .ok <| Json.mkObj [("kind", Json.str "zero")]
+  | .param name =>
+      .ok <| Json.mkObj [
+        ("kind", Json.str "param"),
+        ("name", Json.str name.toString)
+      ]
+  | .succ inner => do
+      let innerJson ← levelJson inner
+      return Json.mkObj [
+        ("kind", Json.str "succ"),
+        ("level", innerJson)
+      ]
+  | .max _ _ =>
+      .error "unsupported kernel level form: max"
+  | .imax _ _ =>
+      .error "unsupported kernel level form: imax"
+  | .mvar _ =>
+      .error "unsupported kernel level form: mvar"
+
+private def binderInfoJson : BinderInfo → Json
+  | .default => Json.str "default"
+  | .implicit => Json.str "implicit"
+  | .strictImplicit => Json.str "strictImplicit"
+  | .instImplicit => Json.str "instImplicit"
+
+private def literalJson : Literal → Json
+  | .natVal value =>
+      Json.mkObj [
+        ("kind", Json.str "nat"),
+        ("value", Json.str (toString value))
+      ]
+  | .strVal value =>
+      Json.mkObj [
+        ("kind", Json.str "string"),
+        ("value", Json.str value)
+      ]
+
+private partial def exprJson (expr : Expr) : Except String Json :=
+  match expr with
+  | .bvar index =>
+      .ok <| Json.mkObj [
+        ("kind", Json.str "bvar"),
+        ("index", Json.num (JsonNumber.fromNat index))
+      ]
+  | .sort level => do
+      let levelJson ← levelJson level
+      return Json.mkObj [
+        ("kind", Json.str "sort"),
+        ("level", levelJson)
+      ]
+  | .const name levels => do
+      let levelsJson ← levels.mapM levelJson
+      return Json.mkObj [
+        ("kind", Json.str "const"),
+        ("name", Json.str name.toString),
+        ("levels", Json.arr levelsJson.toArray)
+      ]
+  | .app fn arg => do
+      let fnJson ← exprJson fn
+      let argJson ← exprJson arg
+      return Json.mkObj [
+        ("kind", Json.str "app"),
+        ("fn", fnJson),
+        ("arg", argJson)
+      ]
+  | .lam binderName binderType body binderInfo => do
+      let binderTypeJson ← exprJson binderType
+      let bodyJson ← exprJson body
+      return Json.mkObj [
+        ("kind", Json.str "lam"),
+        ("binderName", Json.str binderName.toString),
+        ("binderType", binderTypeJson),
+        ("body", bodyJson),
+        ("binderInfo", binderInfoJson binderInfo)
+      ]
+  | .forallE binderName binderType body binderInfo => do
+      let binderTypeJson ← exprJson binderType
+      let bodyJson ← exprJson body
+      return Json.mkObj [
+        ("kind", Json.str "forall"),
+        ("binderName", Json.str binderName.toString),
+        ("binderType", binderTypeJson),
+        ("body", bodyJson),
+        ("binderInfo", binderInfoJson binderInfo)
+      ]
+  | .lit literal =>
+      .ok <| Json.mkObj [
+        ("kind", Json.str "lit"),
+        ("literal", literalJson literal)
+      ]
+  | .fvar _ =>
+      .error "unsupported kernel expression form: fvar"
+  | .mvar _ =>
+      .error "unsupported kernel expression form: mvar"
+  | .letE _ _ _ _ _ =>
+      .error "unsupported kernel expression form: letE"
+  | .mdata _ _ =>
+      .error "unsupported kernel expression form: mdata"
+  | .proj _ _ _ =>
+      .error "unsupported kernel expression form: proj"
+
 private def buildNode
     (env : Environment)
     (selected : List Name)
@@ -92,13 +196,20 @@ private def buildNode
   else
     let dependencies := referenced.filter fun name => selected.contains name
     let externalDependencies := referenced.filter fun name => !selected.contains name
+    let typeJson ← exprJson typeExpr
+    let valueJson? ←
+      match valueExpr? with
+      | none => .ok none
+      | some value => do
+          let valueJson ← exprJson value
+          .ok (some valueJson)
     .ok {
       qualifiedName
       dependencies
       externalDependencies
       kind
-      typeRepr := reprStr typeExpr
-      valueRepr? := valueExpr?.map reprStr
+      typeJson
+      valueJson?
     }
 
 private def buildNodes (env : Environment) : Except String (List ExportNode) :=
@@ -130,11 +241,11 @@ private def namesJson (names : List Name) : Json :=
 private def kernelJson (node : ExportNode) : Json :=
   let fields := [
     ("kind", Json.str node.kind),
-    ("type", Json.str node.typeRepr)
+    ("type", node.typeJson)
   ]
-  match node.valueRepr? with
+  match node.valueJson? with
   | none => Json.mkObj fields
-  | some value => Json.mkObj (fields ++ [("value", Json.str value)])
+  | some value => Json.mkObj (fields ++ [("value", value)])
 
 private def declarationJson (node : ExportNode) : Json :=
   Json.mkObj [
