@@ -50,6 +50,11 @@ assert(
   !/corpusRoots\.mapM\s*\(buildNode env corpusRoots\)/.test(source),
   "exporter must not treat the source roots themselves as the dependency-closed corpus",
 );
+assert(
+  source.includes("diagnoseRootClosures") &&
+    source.includes("per-root exportable closures:"),
+  "aggregate closure overflow must report deterministic per-root closure sizes for corpus selection",
+);
 
 const workflowPath = resolve("..", ".github", "workflows", "mathlib-m0-export.yml");
 assert(existsSync(workflowPath), "Mathlib M0 pinned export workflow must exist");
