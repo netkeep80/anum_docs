@@ -184,11 +184,11 @@ async function main(): Promise<void> {
   same(applicationX.concrete.derivation.theory, theory, "application rho_X concrete theory");
   same(applicationX.concrete.derivation.target.judgment.claim, cx, "application rho_X target");
   same(memory.linkCount, beforeApplication, "application rho_X read-only");
-  same(
-    await computePortableStructuralTheoryRevision(exportPortableStructuralTheory(memory, theory)),
-    revisionBefore,
-    "application preserves exact T0 revision",
+  const revisionAfter = await computePortableStructuralTheoryRevision(
+    exportPortableStructuralTheory(memory, theory),
   );
+  same(revisionAfter.scheme, revisionBefore.scheme, "application preserves T0 revision scheme");
+  same(revisionAfter.value, revisionBefore.value, "application preserves exact T0 revision");
 
   const y = fresh();
   const by = fresh();
