@@ -211,6 +211,11 @@ jobs:
           if (JSON.stringify(actualBoundaryIdentity) !== JSON.stringify(expectedBoundaryIdentity)) {
             throw new Error("live boundary identity does not exactly match transport external references");
           }
+          if (boundary.entries.length !== 0) {
+            throw new Error(
+              `live transport is not dependency-closed: ${boundary.entries.length} external boundary entries`,
+            );
+          }
 
           const digest = await computeMathlibM0TransportBundleDigest(bundle);
           console.log(
