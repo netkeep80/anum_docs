@@ -64,6 +64,32 @@ assert(
   "aggregate closure overflow must report deterministic per-root closure sizes for corpus selection",
 );
 
+assert(
+  source.includes('requireEnv "MATHLIB_M0_BOUNDARY_OUTPUT"') &&
+    source.includes("mts-mathlib-m0-external-boundary/v0.1"),
+  "exporter must emit a separate workflow-provided external-boundary evidence artifact",
+);
+const constantInfoClassifier =
+  source.match(/private def constantInfoKind[\s\S]*?(?=\nprivate def )/)?.[0] ?? "";
+assert(
+  [
+    ".axiomInfo _ => \"axiom\"",
+    ".defnInfo _ => \"definition\"",
+    ".thmInfo _ => \"theorem\"",
+    ".opaqueInfo _ => \"opaque\"",
+    ".quotInfo _ => \"quotient\"",
+    ".inductInfo _ => \"inductive\"",
+    ".ctorInfo _ => \"constructor\"",
+    ".recInfo _ => \"recursor\"",
+  ].every((clause) => constantInfoClassifier.includes(clause)) &&
+    !/\|\s*_\s*=>/.test(constantInfoClassifier),
+  "external-boundary evidence must classify every pinned Lean ConstantInfo constructor exhaustively",
+);
+assert(
+  source.includes("referencedBy") && source.includes("externalDependencies"),
+  "external-boundary referencedBy identities must derive from exported nodes' externalDependencies",
+);
+
 const corpusSeedPath = resolve("..", "research", "mathlib-m0", "corpus-seed.json");
 const reproductionPath = resolve("..", "research", "mathlib-m0", "corpus-reproduction.json");
 assert(existsSync(corpusSeedPath), "Mathlib M0 corpus seed manifest must exist");
