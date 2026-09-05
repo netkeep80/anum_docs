@@ -118,12 +118,29 @@ assert(
   "live export gate must rerun when the TypeScript transport validator changes",
 );
 assert(
+  workflow.includes("- ts/src/mathlib-m0-external-boundary.ts"),
+  "live export gate must rerun when the TypeScript external-boundary validator changes",
+);
+assert(
   workflow.includes("- .github/workflows/mathlib-m0-export.yml"),
   "live export gate must rerun when its own validation contract changes",
 );
 assert(
+  workflow.includes("MATHLIB_M0_BOUNDARY_OUTPUT") &&
+    workflow.includes("external-boundary-$pass.json"),
+  "both live exporter passes must receive a deterministic external-boundary output path",
+);
+assert(
+  workflow.includes('cmp "$artifact_dir/external-boundary-1.json" "$artifact_dir/external-boundary-2.json"'),
+  "live boundary evidence must be byte-for-byte deterministic across both Lean exporter passes",
+);
+assert(
   workflow.includes("parseMathlibM0TransportBundle"),
   "live Lean output must pass through the TypeScript transport parser",
+);
+assert(
+  workflow.includes("parseMathlibM0ExternalBoundary"),
+  "live Lean boundary output must pass through the TypeScript external-boundary parser",
 );
 assert(
   workflow.includes("npm run build --silent"),
@@ -132,6 +149,10 @@ assert(
 assert(
   workflow.includes("mathlib-m0-artifacts/corpus-export.json"),
   "TypeScript transport validation must consume the actual live Lean artifact",
+);
+assert(
+  workflow.includes("mathlib-m0-artifacts/external-boundary.json"),
+  "TypeScript boundary validation must consume the actual live Lean boundary artifact",
 );
 
 console.log("mathlib-m0-export-contract.test.ts: ok");
