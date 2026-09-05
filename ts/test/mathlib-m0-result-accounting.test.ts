@@ -3,6 +3,7 @@ import {
   MathlibM0ResultError,
   buildMathlibM0ResultReport,
   computeMathlibM0DeclarationTransportDigest,
+  deriveMathlibM0BoundaryDispositions,
 } from "../src/mathlib-m0-result-accounting.js";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -22,6 +23,16 @@ async function expectReject(code: MathlibM0ResultError["code"], work: () => Prom
     return;
   }
   throw new Error(`${code}: expected result rejection`);
+}
+
+function expectBoundaryReject(work: () => unknown): void {
+  try {
+    work();
+  } catch (error) {
+    assert(error instanceof MathlibM0ResultError, "boundary mismatch must fail through result accounting");
+    return;
+  }
+  throw new Error("expected boundary disposition rejection");
 }
 
 const SORT_ZERO = Object.freeze({ kind: "sort", level: { kind: "zero" } });
@@ -170,6 +181,98 @@ await expectReject("invalid-dependency-result", () =>
       trustedApproverDigest: digest,
     },
   ]),
+);
+
+const boundaryTransport = {
+  schema: MATHLIB_M0_TRANSPORT_SCHEMA,
+  upstream: bundle.upstream,
+  declarations: [
+    {
+      qualifiedName: "M0.A",
+      dependencies: [],
+      externalDependencies: ["Eq"],
+      kernel: {
+        kind: "axiom",
+        type: { kind: "const", name: "Eq", levels: [] },
+      },
+    },
+    {
+      qualifiedName: "M0.B",
+      dependencies: ["M0.A"],
+      externalDependencies: [],
+      kernel: {
+        kind: "theorem",
+        type: { kind: "const", name: "M0.A", levels: [] },
+        value: { kind: "const", name: "M0.A", levels: [] },
+      },
+    },
+    {
+      qualifiedName: "M0.C",
+      dependencies: [],
+      externalDependencies: [],
+      kernel: { kind: "axiom", type: SORT_ZERO },
+    },
+  ],
+} as const;
+
+const boundaryEvidence = {
+  schema: "mts-mathlib-m0-external-boundary/v0.1",
+  upstream: bundle.upstream,
+  entries: [
+    {
+      qualifiedName: "Eq",
+      constantInfoKind: "inductive",
+      referencedBy: ["M0.A"],
+    },
+  ],
+} as const;
+
+const boundaryDispositions = deriveMathlibM0BoundaryDispositions(boundaryTransport, boundaryEvidence);
+same(boundaryDispositions.length, 3, "boundary audit must account for every transport declaration");
+same(boundaryDispositions[0]!.qualifiedName, "M0.A", "direct unsupported identity");
+same(boundaryDispositions[0]!.disposition, "unsupported", "direct external support must be unsupported");
+same(boundaryDispositions[0]!.unsupportedExternalDependencies[0], "Eq", "direct unsupported dependency identity");
+same(boundaryDispositions[1]!.qualifiedName, "M0.B", "blocked identity");
+same(boundaryDispositions[1]!.disposition, "blocked-by-dependency", "unsupported dependency must block dependent");
+same(boundaryDispositions[1]!.unsupportedExternalDependencies.length, 0, "blocked declaration has no direct unsupported names");
+same(boundaryDispositions[2]!.qualifiedName, "M0.C", "unblocked identity");
+same(boundaryDispositions[2]!.disposition, null, "boundary-clear declaration remains unclassified for future translation");
+
+expectBoundaryReject(() =>
+  deriveMathlibM0BoundaryDispositions(boundaryTransport, {
+    ...boundaryEvidence,
+    upstream: { ...boundaryEvidence.upstream, mathlibSha: "0".repeat(40) },
+  }),
+);
+expectBoundaryReject(() =>
+  deriveMathlibM0BoundaryDispositions(boundaryTransport, {
+    ...boundaryEvidence,
+    entries: [],
+  }),
+);
+expectBoundaryReject(() =>
+  deriveMathlibM0BoundaryDispositions(boundaryTransport, {
+    ...boundaryEvidence,
+    entries: [
+      boundaryEvidence.entries[0],
+      {
+        qualifiedName: "False",
+        constantInfoKind: "inductive",
+        referencedBy: ["M0.A"],
+      },
+    ],
+  }),
+);
+expectBoundaryReject(() =>
+  deriveMathlibM0BoundaryDispositions(boundaryTransport, {
+    ...boundaryEvidence,
+    entries: [
+      {
+        ...boundaryEvidence.entries[0],
+        referencedBy: ["M0.B"],
+      },
+    ],
+  }),
 );
 
 console.log("mathlib-m0-result-accounting.test.ts: ok");
