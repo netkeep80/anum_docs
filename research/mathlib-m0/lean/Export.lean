@@ -21,6 +21,11 @@ private structure ExportNode where
   typeJson : Json
   valueJson? : Option Json
 
+private structure BoundaryEntry where
+  qualifiedName : Name
+  constantInfoKind : String
+  referencedBy : List Name
+
 private def insertName (name : Name) : List Name → List Name
   | [] => [name]
   | head :: tail =>
@@ -44,6 +49,16 @@ private def insertNode (node : ExportNode) : List ExportNode → List ExportNode
 
 private def sortNodes (nodes : List ExportNode) : List ExportNode :=
   nodes.foldl (fun acc node => insertNode node acc) []
+
+private def constantInfoKind : ConstantInfo → String
+  | .axiomInfo _ => "axiom"
+  | .defnInfo _ => "definition"
+  | .thmInfo _ => "theorem"
+  | .opaqueInfo _ => "opaque"
+  | .quotInfo _ => "quotient"
+  | .inductInfo _ => "inductive"
+  | .ctorInfo _ => "constructor"
+  | .recInfo _ => "recursor"
 
 private def supportedKernel? (info : ConstantInfo) : Option (String × Expr × Option Expr) :=
   match info with
@@ -262,6 +277,30 @@ private def buildNodes (env : Environment) : Except String (List ExportNode) := 
         .error s!"{message}; per-root exportable closures: {diagnostics}"
   selected.mapM (buildNode env selected)
 
+private def boundaryReferencedBy (nodes : List ExportNode) (externalName : Name) : List Name :=
+  sortUniqueNames <| nodes.foldl (fun acc node =>
+    if node.externalDependencies.contains externalName then
+      node.qualifiedName :: acc
+    else
+      acc) []
+
+private def buildBoundaryEntries
+    (env : Environment)
+    (nodes : List ExportNode) : Except String (List BoundaryEntry) := do
+  let externalNames := sortUniqueNames <| nodes.flatMap fun node => node.externalDependencies
+  externalNames.mapM fun externalName => do
+    let some info := env.find? externalName
+      | .error s!"external dependency not found in elaborated environment: {externalName}"
+    let referencedBy := boundaryReferencedBy nodes externalName
+    if referencedBy.isEmpty then
+      .error s!"external dependency has no exported referrer: {externalName}"
+    else
+      .ok {
+        qualifiedName := externalName
+        constantInfoKind := constantInfoKind info
+        referencedBy
+      }
+
 private def topoSortAux : Nat → List ExportNode → List Name → Except String (List ExportNode)
   | 0, pending, _ =>
       .error s!"dependency cycle in selected Mathlib M0 corpus ({pending.length} declarations remain)"
@@ -302,6 +341,13 @@ private def declarationJson (node : ExportNode) : Json :=
     ("kernel", kernelJson node)
   ]
 
+private def boundaryEntryJson (entry : BoundaryEntry) : Json :=
+  Json.mkObj [
+    ("qualifiedName", Json.str entry.qualifiedName.toString),
+    ("constantInfoKind", Json.str entry.constantInfoKind),
+    ("referencedBy", namesJson entry.referencedBy)
+  ]
+
 private def requireEnv (name : String) : CommandElabM String := do
   let some value ← liftIO <| IO.getEnv name
     | throwError "required exporter environment variable is missing: {name}"
@@ -312,6 +358,7 @@ private def requireEnv (name : String) : CommandElabM String := do
 elab "#mathlib_m0_export" : command => do
   let env ← getEnv
   let outputPath ← requireEnv "MATHLIB_M0_OUTPUT"
+  let boundaryOutputPath ← requireEnv "MATHLIB_M0_BOUNDARY_OUTPUT"
   let mathlibSha ← requireEnv "MATHLIB_M0_MATHLIB_SHA"
   let leanToolchain ← requireEnv "MATHLIB_M0_LEAN_TOOLCHAIN"
 
@@ -328,6 +375,11 @@ elab "#mathlib_m0_export" : command => do
   unless 10 ≤ nodes.length && nodes.length ≤ 100 do
     throwError "Mathlib M0 corpus size outside 10-100 declaration boundary: {nodes.length}"
 
+  let boundaryEntries ←
+    match buildBoundaryEntries env nodes with
+    | .ok entries => pure entries
+    | .error message => throwError message
+
   let document := Json.mkObj [
     ("schema", Json.str "mts-mathlib-m0-transport/v0.1"),
     ("upstream", Json.mkObj [
@@ -337,6 +389,16 @@ elab "#mathlib_m0_export" : command => do
     ("declarations", Json.arr <| nodes.toArray.map declarationJson)
   ]
 
+  let boundaryDocument := Json.mkObj [
+    ("schema", Json.str "mts-mathlib-m0-external-boundary/v0.1"),
+    ("upstream", Json.mkObj [
+      ("mathlibSha", Json.str mathlibSha),
+      ("leanToolchain", Json.str leanToolchain)
+    ]),
+    ("entries", Json.arr <| boundaryEntries.toArray.map boundaryEntryJson)
+  ]
+
   liftIO <| IO.FS.writeFile outputPath document.compress
+  liftIO <| IO.FS.writeFile boundaryOutputPath boundaryDocument.compress
 
 #mathlib_m0_export
