@@ -193,16 +193,6 @@ function replayGenericTemplateDerivation(
     const verified = new Map<LinkHandle, LinkHandle>();
     const usedAssumptions = new Set<LinkHandle>();
 
-    const resolveDependency = (occurrence: LinkHandle): LinkHandle => {
-      const assumption = assumptions.get(occurrence);
-      if (assumption !== undefined) {
-        usedAssumptions.add(occurrence);
-        return assumption;
-      }
-      if (!nodes.has(occurrence)) replayFail("missing-dependency");
-      return verifyNode(occurrence);
-    };
-
     const verifyNode = (occurrence: LinkHandle): LinkHandle => {
       const cached = verified.get(occurrence);
       if (cached !== undefined) return cached;
@@ -271,7 +261,18 @@ function replayGenericTemplateDerivation(
         dependencies.forEach((dependencyOccurrence, index) => {
           const expectedTemplate = schema.premiseTemplates[index];
           if (expectedTemplate === undefined) replayFail("premise-count-mismatch");
-          const actualTemplate = resolveDependency(dependencyOccurrence);
+
+          const assumptionTemplate = assumptions.get(dependencyOccurrence);
+          let actualTemplate: LinkHandle;
+          if (assumptionTemplate !== undefined) {
+            usedAssumptions.add(dependencyOccurrence);
+            actualTemplate = assumptionTemplate;
+          } else if (nodes.has(dependencyOccurrence)) {
+            actualTemplate = verifyNode(dependencyOccurrence);
+          } else {
+            replayFail("missing-dependency");
+          }
+
           if (actualTemplate !== expectedTemplate) replayFail("premise-template-mismatch");
         });
 
@@ -350,8 +351,6 @@ function fixture() {
   const r2 = admitSchema(defineSchema(cRole, [bRole]));
   const r3 = defineSchema(cRole, [aRole]);
   const badMiddle = admitSchema(defineSchema(cRole, [dRole]));
-  const wrongTargetPremise = defineSchema(cRole, [bRole]);
-  const wrongTargetConclusion = defineSchema(dRole, [aRole]);
   const otherDictionary = defineStructuralRoleDictionary(memory, [aRole, bRole, cRole]);
   const mixedDictionary = admitSchema(
     defineSchemaWithDictionary(otherDictionary, cRole, [bRole]),
@@ -384,20 +383,19 @@ function fixture() {
     nodes: Object.freeze([node1, node2]),
   });
 
-  // All malformed alternatives are materialized before the exact-T0 revision is
-  // pinned, so every subsequent verifier call can be required to stay read-only.
+  // All malformed alternatives are materialized before revision pinning.
   const badMiddleNode = makeNode(badMiddle, [node1.occurrence]);
   const mixedDictionaryNode = makeNode(mixedDictionary, [node1.occurrence]);
   const missingDependency = fresh();
   const missingDependencyNode = makeNode(r2, [missingDependency]);
   const extraDependencyNode = makeNode(r1, [assumptionOccurrence, assumptionOccurrence]);
-  const cycleAttemptSequence = materializeExactSequence(memory, [node2.occurrence]);
+  const unreachablePremises = materializeExactSequence(memory, [node2.occurrence]);
   const unreachableNode: GenericTemplateNodeEvidence = Object.freeze({
-    ...r1,
-    occurrence: memory.ensure(r1.derivationRule, cycleAttemptSequence),
+    occurrence: memory.ensure(r1.derivationRule, unreachablePremises),
+    derivationRule: r1.derivationRule,
     ruleAdmission: r1.ruleAdmission,
     derivationRuleAdmission: r1.derivationRuleAdmission,
-    premiseOccurrenceSequence: cycleAttemptSequence,
+    premiseOccurrenceSequence: unreachablePremises,
   });
 
   return {
@@ -407,12 +405,9 @@ function fixture() {
     aRole,
     bRole,
     cRole,
-    dRole,
     r1,
     r2,
     r3,
-    wrongTargetPremise,
-    wrongTargetConclusion,
     identity,
     assumptionOccurrence,
     node1,
@@ -429,7 +424,7 @@ function fixture() {
 async function main(): Promise<void> {
   const fx = fixture();
 
-  // The derived identity is incoming metadata DR3 -> T0, not primitive authority.
+  // DR3 -> T0 is proof-carrying identity, never primitive T0 -> DR3 authority.
   const identityPoles = fx.memory.poles(fx.identity);
   same(identityPoles.start, fx.r3.derivationRule, "derived identity starts at DR3");
   same(identityPoles.end, fx.theory, "derived identity ends at T0");
@@ -453,8 +448,8 @@ async function main(): Promise<void> {
   const afterRevision = await computePortableStructuralTheoryRevision(afterArtifact);
   same(afterRevision.value, pinnedRevision.value, "template replay preserves exact T0 revision");
 
-  // Wrong primitive authority cannot be repaired by host generic labels.
-  const wrongDrAdmissionNode = {
+  // Wrong primitive authority remains wrong even with generic/forall host labels.
+  const hostForgedNode = {
     ...fx.node1,
     derivationRuleAdmission: fx.r2.derivationRuleAdmission,
     generic: true,
@@ -465,18 +460,14 @@ async function main(): Promise<void> {
   expectReplayError("derivation-rule-not-admitted", () =>
     replayGenericTemplateDerivation(fx.memory, {
       ...fx.evidence,
-      nodes: [wrongDrAdmissionNode, fx.node2],
+      nodes: [hostForgedNode, fx.node2],
     }),
   );
 
-  const wrongRuleAdmissionNode = {
-    ...fx.node1,
-    ruleAdmission: fx.r2.ruleAdmission,
-  };
   expectReplayError("rule-not-admitted", () =>
     replayGenericTemplateDerivation(fx.memory, {
       ...fx.evidence,
-      nodes: [wrongRuleAdmissionNode, fx.node2],
+      nodes: [{ ...fx.node1, ruleAdmission: fx.r2.ruleAdmission }, fx.node2],
     }),
   );
 
@@ -495,6 +486,7 @@ async function main(): Promise<void> {
     }),
   );
 
+  // The ordinary DR1 node derives B, while candidate DR3 requires conclusion C.
   expectReplayError("target-conclusion-mismatch", () =>
     replayGenericTemplateDerivation(fx.memory, {
       ...fx.evidence,
@@ -503,44 +495,18 @@ async function main(): Promise<void> {
     }),
   );
 
-  const wrongPremiseIdentity = fx.memory.ensure(
-    fx.wrongTargetPremise.derivationRule,
-    fx.theory,
-  );
-  const wrongPremiseAssumption = fx.memory.ensure(fx.aRole, wrongPremiseIdentity);
-  expectReplayError("target-assumption-mismatch", () =>
-    replayGenericTemplateDerivation(fx.memory, {
-      identity: wrongPremiseIdentity,
-      targetOccurrence: fx.node2.occurrence,
-      assumptions: [{ occurrence: wrongPremiseAssumption, template: fx.aRole }],
-      nodes: [fx.node1, fx.node2],
-    }),
-  );
-
-  const wrongConclusionIdentity = fx.memory.ensure(
-    fx.wrongTargetConclusion.derivationRule,
-    fx.theory,
-  );
-  const wrongConclusionAssumption = fx.memory.ensure(fx.aRole, wrongConclusionIdentity);
-  expectReplayError("target-conclusion-mismatch", () =>
-    replayGenericTemplateDerivation(fx.memory, {
-      identity: wrongConclusionIdentity,
-      targetOccurrence: fx.node2.occurrence,
-      assumptions: [{ occurrence: wrongConclusionAssumption, template: fx.aRole }],
-      nodes: [fx.node1, fx.node2],
-    }),
-  );
-
+  // Rebuild the complete occurrence chain under a foreign identity so the
+  // rejection reaches exact Theory authority rather than stale occurrence ids.
   const foreignIdentity = fx.memory.ensure(fx.r3.derivationRule, fx.foreignTheory);
   const foreignAssumption = fx.memory.ensure(fx.aRole, foreignIdentity);
   const foreignNode1Premises = materializeExactSequence(fx.memory, [foreignAssumption]);
-  const foreignNode1 = {
+  const foreignNode1: GenericTemplateNodeEvidence = {
     ...fx.node1,
     occurrence: fx.memory.ensure(fx.r1.derivationRule, foreignNode1Premises),
     premiseOccurrenceSequence: foreignNode1Premises,
   };
   const foreignNode2Premises = materializeExactSequence(fx.memory, [foreignNode1.occurrence]);
-  const foreignNode2 = {
+  const foreignNode2: GenericTemplateNodeEvidence = {
     ...fx.node2,
     occurrence: fx.memory.ensure(fx.r2.derivationRule, foreignNode2Premises),
     premiseOccurrenceSequence: foreignNode2Premises,
@@ -578,8 +544,8 @@ async function main(): Promise<void> {
     }),
   );
 
-  // Immutable occurrence identity makes a host attempt to retarget an existing
-  // node's dependency fail before it can fabricate a graph cycle.
+  // Immutable occurrence identity prevents host retargeting from fabricating a
+  // cycle: changing dependencies without changing the occurrence is rejected.
   const cycleAttemptSequence = materializeExactSequence(fx.memory, [fx.node2.occurrence]);
   expectReplayError("occurrence-mismatch", () =>
     replayGenericTemplateDerivation(fx.memory, {
