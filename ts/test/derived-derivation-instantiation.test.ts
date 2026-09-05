@@ -296,7 +296,7 @@ async function main(): Promise<void> {
     "host-only claim retargeting",
   );
 
-  const foreignTheory = fx.memory.ensure(fx.theory, fx.fresh());
+  const foreignTheory = fx.memory.ensure(fx.fresh(), fx.fresh());
   expectTrustedReject(
     () => replayStructuralDerivationWithAssumptions(fx.memory, {
       ...expansionX.evidence,
