@@ -32,10 +32,18 @@ assert(
   "exporter must not use reprStr-backed strings as the kernel type/value transport boundary",
 );
 assert(
-  [".bvar", ".sort", ".const", ".app", ".lam", ".forallE", ".lit"].every((form) =>
+  [".bvar", ".sort", ".const", ".app", ".lam", ".forallE", ".lit", ".proj"].every((form) =>
     source.includes(`| ${form}`),
   ),
   "exporter must structurally traverse the supported Lean Expr forms",
+);
+assert(
+  source.includes("| .proj typeName index struct => do") &&
+    source.includes('(\"typeName\", Json.str typeName.toString)') &&
+    source.includes('(\"index\", Json.num (JsonNumber.fromNat index))') &&
+    source.includes('(\"struct\", structJson)') &&
+    !source.includes('unsupported kernel expression form: proj'),
+  "exporter must serialize Lean Expr.proj structurally instead of rejecting it",
 );
 assert(
   [".zero", ".param", ".succ"].every((form) => source.includes(`| ${form}`)),

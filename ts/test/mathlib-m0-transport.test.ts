@@ -75,6 +75,57 @@ same(parsed.declarations.length, 2, "dependency-closed corpus size");
 same(parsed.declarations[0]?.kernel.type.kind, "sort", "kernel type must remain structural IR");
 same(parsed.declarations[1]?.dependencies[0], "M0.Base", "dependency identity must remain explicit");
 
+const projectionBundle = Object.freeze({
+  schema: MATHLIB_M0_TRANSPORT_SCHEMA,
+  upstream: PIN,
+  declarations: [
+    {
+      qualifiedName: "M0.ProjectionUse",
+      dependencies: [],
+      externalDependencies: ["M0.StructValue"],
+      kernel: {
+        kind: "theorem",
+        type: SORT_ZERO,
+        value: {
+          kind: "proj",
+          typeName: "M0.Struct",
+          index: 0,
+          struct: { kind: "const", name: "M0.StructValue", levels: [] },
+        },
+      },
+    },
+  ],
+});
+const parsedProjection = parseMathlibM0TransportBundle(projectionBundle);
+same(parsedProjection.declarations.length, 1, "projection transport declaration must parse");
+same(
+  parsedProjection.declarations[0]?.externalDependencies[0],
+  "M0.StructValue",
+  "projection dependencies must derive recursively from the projected structure expression",
+);
+assert(
+  canonicalMathlibM0TransportBundleJson(projectionBundle).includes(
+    '\"kind\":\"proj\",\"typeName\":\"M0.Struct\",\"index\":0,\"struct\"',
+  ),
+  "projection transport must preserve type name, field index and structure expression",
+);
+
+expectReject("unsupported-kernel-expression", {
+  ...projectionBundle,
+  declarations: [
+    {
+      ...projectionBundle.declarations[0],
+      kernel: {
+        ...projectionBundle.declarations[0]!.kernel,
+        value: {
+          ...projectionBundle.declarations[0]!.kernel.value,
+          index: -1,
+        },
+      },
+    },
+  ],
+});
+
 const canonicalA = canonicalMathlibM0TransportBundleJson(bundle);
 const canonicalB = canonicalMathlibM0TransportBundleJson({
   declarations: [...bundle.declarations],
