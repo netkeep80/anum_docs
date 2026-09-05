@@ -1,3 +1,4 @@
+import { parseMathlibM0ExternalBoundary } from "./mathlib-m0-external-boundary.js";
 import {
   MATHLIB_M0_TRANSPORT_DIGEST_SCHEME,
   type MathlibM0TransportBundle,
@@ -44,12 +45,20 @@ export interface MathlibM0ResultReport {
   readonly counts: MathlibM0ResultCounts;
 }
 
+export interface MathlibM0BoundaryDisposition {
+  readonly qualifiedName: string;
+  readonly disposition: "unsupported" | "blocked-by-dependency" | null;
+  readonly unsupportedExternalDependencies: readonly string[];
+}
+
 export type MathlibM0ResultErrorCode =
   | "result-set-mismatch"
   | "dependency-identity-mismatch"
   | "invalid-result-state"
   | "invalid-evidence-digest"
-  | "invalid-dependency-result";
+  | "invalid-dependency-result"
+  | "boundary-upstream-mismatch"
+  | "boundary-identity-mismatch";
 
 export class MathlibM0ResultError extends Error {
   override readonly name = "MathlibM0ResultError";
@@ -77,6 +86,71 @@ async function sha256(domain: string, value: unknown): Promise<string> {
 
 function validDigest(value: string | null): boolean {
   return value !== null && /^[0-9a-f]{64}$/.test(value);
+}
+
+export function deriveMathlibM0BoundaryDispositions(
+  transportInput: unknown,
+  boundaryInput: unknown,
+): readonly MathlibM0BoundaryDisposition[] {
+  const bundle = parseMathlibM0TransportBundle(transportInput);
+  const boundary = parseMathlibM0ExternalBoundary(boundaryInput);
+
+  if (
+    boundary.upstream.mathlibSha !== bundle.upstream.mathlibSha ||
+    boundary.upstream.leanToolchain !== bundle.upstream.leanToolchain
+  ) {
+    fail("boundary-upstream-mismatch");
+  }
+
+  const expectedReferences = new Map<string, Set<string>>();
+  for (const declaration of bundle.declarations) {
+    for (const externalName of declaration.externalDependencies) {
+      let referencedBy = expectedReferences.get(externalName);
+      if (referencedBy === undefined) {
+        referencedBy = new Set<string>();
+        expectedReferences.set(externalName, referencedBy);
+      }
+      referencedBy.add(declaration.qualifiedName);
+    }
+  }
+
+  const expectedIdentity = [...expectedReferences.entries()]
+    .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+    .map(([qualifiedName, referencedBy]) => ({
+      qualifiedName,
+      referencedBy: [...referencedBy].sort(),
+    }));
+  const actualIdentity = boundary.entries.map((entry) => ({
+    qualifiedName: entry.qualifiedName,
+    referencedBy: [...entry.referencedBy],
+  }));
+  if (JSON.stringify(actualIdentity) !== JSON.stringify(expectedIdentity)) {
+    fail("boundary-identity-mismatch");
+  }
+
+  const blocked = new Set<string>();
+  const dispositions: MathlibM0BoundaryDisposition[] = [];
+  for (const declaration of bundle.declarations) {
+    let disposition: MathlibM0BoundaryDisposition["disposition"] = null;
+    if (declaration.externalDependencies.length > 0) {
+      disposition = "unsupported";
+    } else if (declaration.dependencies.some((dependency) => blocked.has(dependency))) {
+      disposition = "blocked-by-dependency";
+    }
+
+    if (disposition !== null) blocked.add(declaration.qualifiedName);
+    dispositions.push(
+      Object.freeze({
+        qualifiedName: declaration.qualifiedName,
+        disposition,
+        unsupportedExternalDependencies: Object.freeze(
+          disposition === "unsupported" ? [...declaration.externalDependencies] : [],
+        ),
+      }),
+    );
+  }
+
+  return Object.freeze(dispositions);
 }
 
 export async function computeMathlibM0DeclarationTransportDigest(
