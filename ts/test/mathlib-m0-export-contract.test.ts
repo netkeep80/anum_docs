@@ -10,8 +10,9 @@ assert(existsSync(exporterPath), "Mathlib M0 post-elaboration exporter must exis
 
 const source = readFileSync(exporterPath, "utf8");
 assert(
-  source.includes("import Mathlib.Logic.Pairwise"),
-  "exporter must import the exact pinned corpus module",
+  source.includes("import Mathlib.Logic.Function.Basic") &&
+    !source.includes("import Mathlib.Logic.Pairwise"),
+  "exporter must import the approved Π/→ umbrella module",
 );
 assert(/\bgetEnv\b/.test(source), "exporter must read Lean's post-elaboration Environment");
 assert(
@@ -95,19 +96,84 @@ const reproductionPath = resolve("..", "research", "mathlib-m0", "corpus-reprodu
 assert(existsSync(corpusSeedPath), "Mathlib M0 corpus seed manifest must exist");
 assert(existsSync(reproductionPath), "Mathlib M0 corpus reproduction manifest must exist");
 
-const corpusSeed = JSON.parse(readFileSync(corpusSeedPath, "utf8")) as { roots?: unknown };
+type SourcePin = {
+  module: string;
+  path: string;
+  blobSha: string;
+};
+
+const corpusSeed = JSON.parse(readFileSync(corpusSeedPath, "utf8")) as {
+  roots?: unknown;
+  source?: unknown;
+  sources?: unknown;
+};
 const reproduction = JSON.parse(readFileSync(reproductionPath, "utf8")) as {
+  source?: unknown;
+  sources?: unknown;
   selection?: { roots?: unknown };
 };
-const expectedRoots = ["Pairwise.set_pairwise"];
+const expectedRoots = [
+  "Function.eval",
+  "hidden",
+  "Function.swap₂",
+  "Function.dcomp",
+  "Function.onFun",
+  "Function.swap",
+  "Function.bicompl",
+  "Function.bicompr",
+  "Pi.map",
+  "forall₃_imp",
+];
+const expectedSources: SourcePin[] = [
+  {
+    module: "Mathlib.Logic.Function.Basic",
+    path: "Mathlib/Logic/Function/Basic.lean",
+    blobSha: "e32127e286544f7ecdbd488c9787b85bee4548ba",
+  },
+  {
+    module: "Mathlib.Logic.Function.Defs",
+    path: "Mathlib/Logic/Function/Defs.lean",
+    blobSha: "565ae3df6b95fa084d60818ab13fab2e80874f3f",
+  },
+  {
+    module: "Mathlib.Basic.Logic.Basic",
+    path: "Mathlib/Basic/Logic/Basic.lean",
+    blobSha: "1b8251cc298129bb6613435742ca7cb9ab553df2",
+  },
+];
+const expectedLeanRoots = [
+  "``Function.eval",
+  "``hidden",
+  "``Function.swap₂",
+  "``Function.dcomp",
+  "``Function.onFun",
+  "``Function.swap",
+  "``Function.bicompl",
+  "``Function.bicompr",
+  "``Pi.map",
+  "``forall₃_imp",
+];
 assert(
   JSON.stringify(corpusSeed.roots) === JSON.stringify(expectedRoots) &&
     JSON.stringify(reproduction.selection?.roots) === JSON.stringify(expectedRoots),
-  "Mathlib M0 manifests must pin the measured minimal 10-declaration Pairwise.set_pairwise seed",
+  "Mathlib M0 manifests must pin the approved Π/→ source roots",
 );
 assert(
-  /private def corpusRoots : List Name := \[\s*``Pairwise\.set_pairwise\s*\]/m.test(source),
-  "Lean exporter must use the same measured minimal seed as the Mathlib M0 manifests",
+  JSON.stringify(corpusSeed.sources) === JSON.stringify(expectedSources) &&
+    JSON.stringify(reproduction.sources) === JSON.stringify(expectedSources),
+  "Mathlib M0 manifests must pin exact root-source provenance",
+);
+assert(
+  !("source" in corpusSeed) && !("source" in reproduction),
+  "multi-source Π/→ provenance must not retain the obsolete singular source field",
+);
+assert(
+  expectedLeanRoots.every((root) => source.includes(root)),
+  "Lean exporter must use every approved Π/→ source root",
+);
+assert(
+  !source.includes("``Pairwise.set_pairwise"),
+  "Lean exporter must not retain the falsified Pairwise root as active selection",
 );
 
 const workflowPath = resolve("..", ".github", "workflows", "mathlib-m0-export.yml");
