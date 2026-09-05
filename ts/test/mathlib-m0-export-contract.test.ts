@@ -220,5 +220,10 @@ assert(
   workflow.includes("mathlib-m0-artifacts/external-boundary.json"),
   "TypeScript boundary validation must consume the actual live Lean boundary artifact",
 );
+assert(
+  workflow.includes("if (boundary.entries.length !== 0)") &&
+    workflow.includes("live transport is not dependency-closed"),
+  "live Mathlib M0 gate must reject every non-empty external kernel boundary",
+);
 
 console.log("mathlib-m0-export-contract.test.ts: ok");
