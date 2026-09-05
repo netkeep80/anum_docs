@@ -1,13 +1,24 @@
+import { materializeExactSequence } from "../src/exact-sequence.js";
 import { Memory, type LinkHandle } from "../src/memory.js";
 import { ensureRootBasis } from "../src/public.js";
 import {
   StructuralRuleError,
+  admitStructuralRule,
   defineStructuralRoleDictionary,
+  defineStructuralRule,
   matchStructuralTemplate,
   readStructuralRoleDictionary,
   type StructuralRoleBinding,
 } from "../src/structural-rule.js";
 import { unifyStructuralTemplate } from "../src/structural-unification.js";
+import {
+  admitStructuralDerivationRule,
+  defineStructuralDerivationRule,
+} from "../src/derivation.js";
+import {
+  StructuralDerivedDerivationReplayError,
+  replayStructuralDerivedDerivationSchema,
+} from "../src/derived-derivation-schema.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -26,6 +37,17 @@ function expectRuleError(code: string, effect: () => unknown): void {
     return;
   }
   throw new Error(`${code}: expected StructuralRuleError`);
+}
+
+function expectDerivedError(code: string, effect: () => unknown): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(error instanceof StructuralDerivedDerivationReplayError, `${code}: wrong error type`);
+    same(error.code, code, `${code}: wrong error code`);
+    return;
+  }
+  throw new Error(`${code}: expected StructuralDerivedDerivationReplayError`);
 }
 
 function bindingValue(
@@ -230,6 +252,52 @@ function main(): void {
     local: true,
   });
   assert(hostMetadata.generic, "host metadata exists only as a non-authoritative test witness");
+
+  // Critical locality probe: the RoleDictionary data can represent an exact
+  // prefix extension [A] -> [A,B], but current generic-schema replay deliberately
+  // requires one exact shared RoleDictionary. A valid admitted outer schema does
+  // not thereby gain authority inside the wider generic scope.
+  const theory = memory.ensure(C, U);
+  const outerRule = defineStructuralRule(memory, outerDictionary, aRole);
+  const outerDerivationRule = defineStructuralDerivationRule(memory, outerRule, [aRole]);
+  const outerRuleAdmission = admitStructuralRule(memory, theory, outerRule);
+  const outerDerivationAdmission = admitStructuralDerivationRule(
+    memory,
+    theory,
+    outerDerivationRule,
+  );
+
+  const innerTargetRule = defineStructuralRule(memory, innerDictionary, aRole);
+  const innerTargetDerivationRule = defineStructuralDerivationRule(
+    memory,
+    innerTargetRule,
+    [aRole],
+  );
+  const identity = memory.ensure(innerTargetDerivationRule, theory);
+  const assumptionOccurrence = memory.ensure(aRole, identity);
+  const premiseOccurrenceSequence = materializeExactSequence(memory, [assumptionOccurrence]);
+  const nodeOccurrence = memory.ensure(outerDerivationRule, premiseOccurrenceSequence);
+
+  const beforeScopeProbe = memory.linkCount;
+  expectDerivedError("role-dictionary-mismatch", () =>
+    replayStructuralDerivedDerivationSchema(memory, {
+      identity,
+      targetOccurrence: nodeOccurrence,
+      assumptions: Object.freeze([
+        Object.freeze({ occurrence: assumptionOccurrence, template: aRole }),
+      ]),
+      nodes: Object.freeze([
+        Object.freeze({
+          occurrence: nodeOccurrence,
+          derivationRule: outerDerivationRule,
+          ruleAdmission: outerRuleAdmission,
+          derivationRuleAdmission: outerDerivationAdmission,
+          premiseOccurrenceSequence,
+        }),
+      ]),
+    }),
+  );
+  same(memory.linkCount, beforeScopeProbe, "cross-dictionary rejection remains read-only");
 
   assert(L !== U, "root basis sanity");
 }
