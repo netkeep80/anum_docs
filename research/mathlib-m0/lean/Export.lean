@@ -10,26 +10,6 @@ private def expectedLeanToolchain : String :=
   "leanprover/lean4:v4.34.0-rc2"
 
 private def corpusRoots : List Name := [
-  ``Pairwise,
-  ``Pairwise.mono,
-  ``Pairwise.eq,
-  ``Subsingleton.pairwise,
-  ``Function.injective_iff_pairwise_ne,
-  ``Function.Injective.pairwise_ne,
-  ``Pairwise.comp_of_injective,
-  ``Pairwise.of_comp_of_surjective,
-  ``Function.Bijective.pairwise_comp_iff,
-  ``pairwise_fin_succ_iff,
-  ``pairwise_fin_succ_iff_of_isSymm,
-  ``Set.Pairwise,
-  ``Set.pairwise_of_forall,
-  ``Set.Pairwise.imp_on,
-  ``Set.Pairwise.imp,
-  ``Set.Pairwise.eq,
-  ``Set.pairwise_iff_of_refl,
-  ``Set.Pairwise.forall₂,
-  ``Set.Pairwise.of_forall₂,
-  ``Set.Pairwise.on_injective,
   ``Pairwise.set_pairwise
 ]
 
