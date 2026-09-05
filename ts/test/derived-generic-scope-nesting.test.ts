@@ -299,6 +299,13 @@ function main(): void {
   );
   same(memory.linkCount, beforeScopeProbe, "cross-dictionary rejection remains read-only");
 
+  // N1 classification encoded by the executable corpus above:
+  // - nested/dependent role identity and capture are already structural;
+  // - exact-prefix dictionaries are representable as MTS data;
+  // - trusted cross-scope reuse is intentionally NOT implied by prefix shape.
+  // The latter is an N2 composition/authority question, not an N1 binder object.
+  assert(inner.roles[0] === outer.roles[0], "N1 exact-prefix identity witness");
+
   assert(L !== U, "root basis sanity");
 }
 
