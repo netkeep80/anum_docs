@@ -12,8 +12,10 @@ import {
 import {
   admitStructuralDerivationRule,
   defineStructuralDerivationRule,
+  defineStructuralProofOccurrence,
   replayStructuralDerivationWithAssumptions,
 } from "../src/derivation.js";
+import { defineActHeader } from "../src/structural-readers.js";
 import {
   replayStructuralDerivedDerivationSchema,
   type StructuralDerivedDerivationEvidence,
@@ -292,6 +294,43 @@ async function main(): Promise<void> {
       },
     }),
     "host-only claim retargeting",
+  );
+
+  const foreignTheory = fx.memory.ensure(fx.theory, fx.fresh());
+  expectTrustedReject(
+    () => replayStructuralDerivationWithAssumptions(fx.memory, {
+      ...expansionX.evidence,
+      derivation: { ...expansionX.evidence.derivation, theory: foreignTheory },
+    }),
+    "foreign Theory retargeting",
+  );
+
+  const wrongDictionary = defineStructuralRoleDictionary(
+    fx.memory,
+    [fx.aRole, fx.bRole, fx.fresh()],
+  );
+  const wrongAct = defineActHeader(fx.memory, fx.interpreter, wrongDictionary, fx.afterContext);
+  const wrongOccurrence = defineStructuralProofOccurrence(fx.memory, wrongAct, expansionX.targetClaim);
+  const wrongTarget = {
+    ...targetNode,
+    occurrence: wrongOccurrence,
+    judgment: {
+      ...targetNode.judgment,
+      application: { ...targetNode.judgment.application, act: wrongAct },
+    },
+  };
+  expectTrustedReject(
+    () => replayStructuralDerivationWithAssumptions(fx.memory, {
+      ...expansionX.evidence,
+      derivation: {
+        ...expansionX.evidence.derivation,
+        targetOccurrence: wrongOccurrence,
+        nodes: expansionX.evidence.derivation.nodes.map((node) =>
+          node.occurrence === targetNode.occurrence ? wrongTarget : node,
+        ),
+      },
+    }),
+    "wrong RoleDictionary Act",
   );
 
   assert(
