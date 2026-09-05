@@ -123,6 +123,17 @@ private def collectDependencyClosure
     (roots : List Name) : Except String (List Name) :=
   collectDependencyClosureAux env roots (sortUniqueNames roots) [] []
 
+private def joinRootDiagnostics : List String → String
+  | [] => ""
+  | head :: tail =>
+      tail.foldl (fun acc item => acc ++ "; " ++ item) head
+
+private def diagnoseRootClosures (env : Environment) (roots : List Name) : String :=
+  joinRootDiagnostics <| roots.map fun root =>
+    match collectDependencyClosure env [root] with
+    | .ok selected => s!"{root}={selected.length}"
+    | .error message => s!"{root}=error[{message}]"
+
 private partial def levelJson (level : Level) : Except String Json :=
   match level with
   | .zero =>
@@ -257,7 +268,12 @@ private def buildNode
     }
 
 private def buildNodes (env : Environment) : Except String (List ExportNode) := do
-  let selected ← collectDependencyClosure env corpusRoots
+  let selected ←
+    match collectDependencyClosure env corpusRoots with
+    | .ok selected => .ok selected
+    | .error message =>
+        let diagnostics := diagnoseRootClosures env corpusRoots
+        .error s!"{message}; per-root exportable closures: {diagnostics}"
   selected.mapM (buildNode env selected)
 
 private def topoSortAux : Nat → List ExportNode → List Name → Except String (List ExportNode)
