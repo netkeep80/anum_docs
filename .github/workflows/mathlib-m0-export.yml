@@ -16,6 +16,7 @@ on:
       - research/mathlib-m0/corpus-seed.json
       - research/mathlib-m0/corpus-reproduction.json
       - ts/src/mathlib-m0-transport.ts
+      - ts/src/mathlib-m0-external-boundary.ts
       - ts/package.json
       - ts/package-lock.json
       - ts/tsconfig.json
@@ -105,12 +106,15 @@ jobs:
           mkdir -p "$artifact_dir"
           for pass in 1 2; do
             MATHLIB_M0_OUTPUT="$artifact_dir/corpus-export-$pass.json" \
+            MATHLIB_M0_BOUNDARY_OUTPUT="$artifact_dir/external-boundary-$pass.json" \
             MATHLIB_M0_MATHLIB_SHA="$MATHLIB_SHA" \
             MATHLIB_M0_LEAN_TOOLCHAIN="$LEAN_TOOLCHAIN" \
               lake env lean "$exporter"
             test -s "$artifact_dir/corpus-export-$pass.json"
+            test -s "$artifact_dir/external-boundary-$pass.json"
           done
           cmp "$artifact_dir/corpus-export-1.json" "$artifact_dir/corpus-export-2.json"
+          cmp "$artifact_dir/external-boundary-1.json" "$artifact_dir/external-boundary-2.json"
           jq -e --arg sha "$MATHLIB_SHA" --arg toolchain "$LEAN_TOOLCHAIN" '
             .upstream.mathlibSha == $sha and
             .upstream.leanToolchain == $toolchain and
@@ -120,6 +124,8 @@ jobs:
           ' "$artifact_dir/corpus-export-1.json" >/dev/null
           mv "$artifact_dir/corpus-export-1.json" "$artifact_dir/corpus-export.json"
           rm "$artifact_dir/corpus-export-2.json"
+          mv "$artifact_dir/external-boundary-1.json" "$artifact_dir/external-boundary.json"
+          rm "$artifact_dir/external-boundary-2.json"
           jq -n \
             --arg researchRef "$RESEARCH_REF" \
             --arg researchSha "$RESEARCH_SHA" \
@@ -134,6 +140,7 @@ jobs:
         working-directory: anum_docs-research/ts
         env:
           MATHLIB_M0_LIVE_EXPORT: ${{ github.workspace }}/mathlib-m0-artifacts/corpus-export.json
+          MATHLIB_M0_LIVE_BOUNDARY: ${{ github.workspace }}/mathlib-m0-artifacts/external-boundary.json
           MATHLIB_SHA: ${{ steps.pin.outputs.mathlib_sha }}
           LEAN_TOOLCHAIN: ${{ steps.pin.outputs.lean_toolchain }}
         run: |
@@ -142,27 +149,72 @@ jobs:
           npm run build --silent
           node --input-type=module <<'NODE'
           import { readFileSync } from "node:fs";
+          import { parseMathlibM0ExternalBoundary } from "./dist/src/mathlib-m0-external-boundary.js";
           import {
             computeMathlibM0TransportBundleDigest,
             parseMathlibM0TransportBundle,
           } from "./dist/src/mathlib-m0-transport.js";
 
           const exportPath = process.env.MATHLIB_M0_LIVE_EXPORT;
+          const boundaryPath = process.env.MATHLIB_M0_LIVE_BOUNDARY;
           if (!exportPath) throw new Error("MATHLIB_M0_LIVE_EXPORT is required");
+          if (!boundaryPath) throw new Error("MATHLIB_M0_LIVE_BOUNDARY is required");
+
           const input = JSON.parse(readFileSync(exportPath, "utf8"));
+          const boundaryInput = JSON.parse(readFileSync(boundaryPath, "utf8"));
           const bundle = parseMathlibM0TransportBundle(input);
+          const boundary = parseMathlibM0ExternalBoundary(boundaryInput);
+
           if (bundle.upstream.mathlibSha !== process.env.MATHLIB_SHA) {
             throw new Error("live transport mathlib SHA mismatch");
           }
           if (bundle.upstream.leanToolchain !== process.env.LEAN_TOOLCHAIN) {
             throw new Error("live transport Lean toolchain mismatch");
           }
+          if (boundary.upstream.mathlibSha !== process.env.MATHLIB_SHA) {
+            throw new Error("live boundary mathlib SHA mismatch");
+          }
+          if (boundary.upstream.leanToolchain !== process.env.LEAN_TOOLCHAIN) {
+            throw new Error("live boundary Lean toolchain mismatch");
+          }
+          if (
+            boundary.upstream.mathlibSha !== bundle.upstream.mathlibSha ||
+            boundary.upstream.leanToolchain !== bundle.upstream.leanToolchain
+          ) {
+            throw new Error("live transport/boundary upstream mismatch");
+          }
           if (bundle.declarations.length < 10 || bundle.declarations.length > 100) {
             throw new Error(`live transport corpus size out of range: ${bundle.declarations.length}`);
           }
+
+          const expectedBoundary = new Map();
+          for (const declaration of bundle.declarations) {
+            for (const externalName of declaration.externalDependencies) {
+              let references = expectedBoundary.get(externalName);
+              if (!references) {
+                references = new Set();
+                expectedBoundary.set(externalName, references);
+              }
+              references.add(declaration.qualifiedName);
+            }
+          }
+          const expectedBoundaryIdentity = [...expectedBoundary.entries()]
+            .sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
+            .map(([qualifiedName, references]) => ({
+              qualifiedName,
+              referencedBy: [...references].sort(),
+            }));
+          const actualBoundaryIdentity = boundary.entries.map((entry) => ({
+            qualifiedName: entry.qualifiedName,
+            referencedBy: [...entry.referencedBy],
+          }));
+          if (JSON.stringify(actualBoundaryIdentity) !== JSON.stringify(expectedBoundaryIdentity)) {
+            throw new Error("live boundary identity does not exactly match transport external references");
+          }
+
           const digest = await computeMathlibM0TransportBundleDigest(bundle);
           console.log(
-            `validated ${bundle.declarations.length} live declarations through parseMathlibM0TransportBundle; ${digest.scheme}=${digest.value}`,
+            `validated ${bundle.declarations.length} live declarations and ${boundary.entries.length} external boundary entries; ${digest.scheme}=${digest.value}`,
           );
           NODE
 
