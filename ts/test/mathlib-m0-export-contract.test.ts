@@ -56,6 +56,26 @@ assert(
   "aggregate closure overflow must report deterministic per-root closure sizes for corpus selection",
 );
 
+const corpusSeedPath = resolve("..", "research", "mathlib-m0", "corpus-seed.json");
+const reproductionPath = resolve("..", "research", "mathlib-m0", "corpus-reproduction.json");
+assert(existsSync(corpusSeedPath), "Mathlib M0 corpus seed manifest must exist");
+assert(existsSync(reproductionPath), "Mathlib M0 corpus reproduction manifest must exist");
+
+const corpusSeed = JSON.parse(readFileSync(corpusSeedPath, "utf8")) as { roots?: unknown };
+const reproduction = JSON.parse(readFileSync(reproductionPath, "utf8")) as {
+  selection?: { roots?: unknown };
+};
+const expectedRoots = ["Pairwise.set_pairwise"];
+assert(
+  JSON.stringify(corpusSeed.roots) === JSON.stringify(expectedRoots) &&
+    JSON.stringify(reproduction.selection?.roots) === JSON.stringify(expectedRoots),
+  "Mathlib M0 manifests must pin the measured minimal 10-declaration Pairwise.set_pairwise seed",
+);
+assert(
+  /private def corpusRoots : List Name := \[\s*``Pairwise\.set_pairwise\s*\]/m.test(source),
+  "Lean exporter must use the same measured minimal seed as the Mathlib M0 manifests",
+);
+
 const workflowPath = resolve("..", ".github", "workflows", "mathlib-m0-export.yml");
 assert(existsSync(workflowPath), "Mathlib M0 pinned export workflow must exist");
 const workflow = readFileSync(workflowPath, "utf8");
