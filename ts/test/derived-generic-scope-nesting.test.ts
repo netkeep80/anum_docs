@@ -39,17 +39,28 @@ function bindingValue(
 
 function main(): void {
   const memory = new Memory();
-  const { R, L, U } = ensureRootBasis(memory);
-  let cursor = memory.ensure(U, R);
-  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
+  const { R, O, C, L, U } = ensureRootBasis(memory);
 
-  const aRole = fresh();
-  const bRole = fresh();
-  const aShadowRole = fresh();
-  const sourceRole = fresh();
-  const grounded = fresh();
-  const otherGrounded = fresh();
-  const undeclaredMarker = fresh();
+  // Role identities are deliberately constructed only from basis Links so no
+  // role accidentally contains another role in its own topology. Scope tests
+  // must measure declared role identity, not incidental fixture ancestry.
+  const aRole = memory.ensure(L, R);
+  const bRole = memory.ensure(U, R);
+  const aShadowRole = memory.ensure(R, L);
+  const sourceRole = memory.ensure(R, U);
+  assert(aRole !== bRole, "A/B role identity");
+  assert(aRole !== aShadowRole, "A/shadow role identity");
+  assert(bRole !== aShadowRole, "B/shadow role identity");
+  assert(sourceRole !== aRole, "source/A role identity");
+
+  // Grounded witnesses are basis Links whose topology cannot contain the role
+  // identities above. This makes groundedness a topology fact, not a host tag.
+  const grounded = O;
+  const otherGrounded = C;
+  const undeclaredMarker = L;
+
+  let cursor = memory.ensure(C, R);
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, C));
   const x = fresh();
   const y = fresh();
   const z = fresh();
@@ -220,8 +231,6 @@ function main(): void {
   });
   assert(hostMetadata.generic, "host metadata exists only as a non-authoritative test witness");
 
-  // Keep otherwise-unused root basis values semantically present in the fixture
-  // without giving them any role/scope authority.
   assert(L !== U, "root basis sanity");
 }
 
