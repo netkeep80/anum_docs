@@ -92,6 +92,19 @@ const expectedSources: SourcePin[] = [
   },
 ];
 
+const expectedLeanRoots = [
+  "``Function.eval",
+  "``hidden",
+  "``Function.swap₂",
+  "``Function.dcomp",
+  "``Function.onFun",
+  "``Function.swap",
+  "``Function.bicompl",
+  "``Function.bicompr",
+  "``Pi.map",
+  "``forall₃_imp",
+];
+
 assert(
   JSON.stringify(corpusSeed.roots) === JSON.stringify(expectedRoots) &&
     JSON.stringify(reproduction.selection?.roots) === JSON.stringify(expectedRoots),
@@ -112,7 +125,7 @@ assert(
   "exporter must import the approved Π/→ umbrella module",
 );
 assert(
-  expectedRoots.every((root) => source.includes(```${root}`)),
+  expectedLeanRoots.every((root) => source.includes(root)),
   "Lean exporter must use every approved Π/→ source root",
 );
 assert(
@@ -314,16 +327,18 @@ Record the exact research head SHA and confirm ordinary CI is GREEN. PR #983 mus
 
 - [ ] **Step 2: Trigger the pinned live export on the exact research head**
 
-Using GitHub CLI, equivalent API dispatch, or the repository connector, dispatch:
+From a checkout whose `HEAD` is the exact Task 2 commit, run:
 
 ```bash
+research_head="$(git rev-parse HEAD)"
+test -n "$research_head"
 gh workflow run mathlib-m0-export.yml \
   --repo netkeep80/anum_docs \
   --ref research/969-mathlib-m0 \
-  -f research_ref=<EXACT_RESEARCH_HEAD_SHA>
+  -f research_ref="$research_head"
 ```
 
-The `research_ref` value must be the exact commit SHA, not a floating branch name.
+The `research_ref` value must be the exact commit SHA, not a floating branch name. When using the GitHub connector instead of a local checkout, read PR #983 immediately before dispatch and pass its exact `head_sha` as `research_ref`.
 
 - [ ] **Step 3: Require the live workflow result to be GREEN before claiming closure**
 
@@ -345,7 +360,28 @@ If the workflow is RED because of a non-empty boundary, unsupported `Expr`/`Leve
 
 - [ ] **Step 4: Download and independently inspect the evidence artifact**
 
-Download the `mathlib-m0-export-<run_id>` artifact and inspect:
+Resolve the latest exact workflow-dispatch run and download it:
+
+```bash
+run_id="$(
+  gh run list \
+    --repo netkeep80/anum_docs \
+    --workflow mathlib-m0-export.yml \
+    --branch research/969-mathlib-m0 \
+    --event workflow_dispatch \
+    --limit 1 \
+    --json databaseId \
+    --jq '.[0].databaseId'
+)"
+test -n "$run_id"
+rm -rf mathlib-m0-live-evidence
+gh run download "$run_id" \
+  --repo netkeep80/anum_docs \
+  --dir mathlib-m0-live-evidence
+find mathlib-m0-live-evidence -type f -maxdepth 3 -print
+```
+
+Inspect the downloaded files named:
 
 ```text
 corpus-export.json
