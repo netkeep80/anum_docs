@@ -2,24 +2,24 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Produce deterministic, fail-closed evidence that classifies every external Lean `ConstantInfo` reference left by the 10-declaration Mathlib M0 transport corpus, validate that evidence independently in TypeScript, and derive `unsupported` / `blocked-by-dependency` research dispositions without expanding MTS semantics or pretending the corpus is dependency-closed.
+**Goal:** Produce deterministic, fail-closed evidence for every external Lean `ConstantInfo` reference left by the 10-declaration Mathlib M0 transport corpus, validate it independently in TypeScript, and derive research-only `unsupported` / `blocked-by-dependency` dispositions.
 
-**Architecture:** Keep `mts-mathlib-m0-transport/v0.1` byte/identity semantics unchanged. The untrusted Lean exporter emits a second research-only `mts-mathlib-m0-external-boundary/v0.1` JSON artifact from the same pinned `Environment`; a strict TypeScript parser validates it, the live workflow validates both artifacts, and a pure result-accounting helper derives only boundary-caused `unsupported` / `blocked-by-dependency` states while leaving otherwise eligible declarations unclassified for the future MTS encoder.
+**Architecture:** Keep `mts-mathlib-m0-transport/v0.1` and its digest identity unchanged. The untrusted Lean exporter emits a second `mts-mathlib-m0-external-boundary/v0.1` JSON artifact from the same pinned `Environment`; a strict TypeScript parser validates it; the live workflow validates both artifacts; a pure accounting helper derives only boundary-caused blocking states and never fabricates theorem acceptance.
 
-**Tech Stack:** Lean 4 `leanprover/lean4:v4.34.0-rc2`, pinned mathlib4 `d6893048e0d784c43f3cf098b61299b3a4b4aed0`, TypeScript/Node 24, GitHub Actions, existing MTS v0.11 core.
+**Tech Stack:** Lean 4 `leanprover/lean4:v4.34.0-rc2`, mathlib4 `d6893048e0d784c43f3cf098b61299b3a4b4aed0`, TypeScript/Node 24, GitHub Actions, accepted MTS v0.11.
 
 **Spec:** `docs/superpowers/specs/2026-09-05-mathlib-m0-external-boundary-design.md`
 
 ## Global Constraints
 
-- Accepted MTS remains v0.11; no v0.12 candidate is created or implied.
+- Accepted MTS stays v0.11; do not create or imply v0.12.
 - Do not modify `contracts/**`, `cutover/**`, `traceability/**`, or `repo-policy.json`.
-- Do not alter `mts-mathlib-m0-transport/v0.1` schema or its canonical digest scheme.
-- Lean exporter, TypeScript parser, and boundary classifier remain untrusted research tooling.
+- Do not change `mts-mathlib-m0-transport/v0.1` or its canonical digest scheme.
+- Exporter/parser/classifier are untrusted research tooling, never proof authority.
 - Do not add proof translation for `inductInfo`, `ctorInfo`, `recInfo`, `opaqueInfo`, or `quotInfo`.
-- Unknown or malformed boundary data must fail closed; no `unknown` success category.
-- Current exact pins remain mathlib `d6893048e0d784c43f3cf098b61299b3a4b4aed0` and Lean `leanprover/lean4:v4.34.0-rc2`.
-- PR #983 stays Draft throughout this slice; repo-guard SKIPPED is expected while Draft.
+- No `unknown` success category: malformed/new forms fail closed.
+- Exact pins remain mathlib `d6893048e0d784c43f3cf098b61299b3a4b4aed0` and Lean `leanprover/lean4:v4.34.0-rc2`.
+- PR #983 remains Draft throughout this slice.
 
 ---
 
@@ -30,13 +30,42 @@
 - Create: `ts/test/mathlib-m0-external-boundary.test.ts`
 
 **Interfaces:**
-- Consumes: JSON-compatible `unknown` values and the existing upstream pin shape `{ mathlibSha, leanToolchain }`.
-- Produces: `parseMathlibM0ExternalBoundary(input: unknown): MathlibM0ExternalBoundary`.
-- Produces constants/types: `MATHLIB_M0_EXTERNAL_BOUNDARY_SCHEMA`, `MathlibM0ConstantInfoKind`, `MathlibM0ExternalBoundaryEntry`, `MathlibM0ExternalBoundary`, `MathlibM0ExternalBoundaryError`.
 
-- [ ] **Step 1: Write the failing parser tests**
+```ts
+export const MATHLIB_M0_EXTERNAL_BOUNDARY_SCHEMA =
+  "mts-mathlib-m0-external-boundary/v0.1" as const;
 
-Create fixtures around this exact accepted shape:
+export type MathlibM0ConstantInfoKind =
+  | "axiom"
+  | "definition"
+  | "theorem"
+  | "opaque"
+  | "quotient"
+  | "inductive"
+  | "constructor"
+  | "recursor";
+
+export interface MathlibM0ExternalBoundaryEntry {
+  readonly qualifiedName: string;
+  readonly constantInfoKind: MathlibM0ConstantInfoKind;
+  readonly referencedBy: readonly string[];
+}
+
+export interface MathlibM0ExternalBoundary {
+  readonly schema: typeof MATHLIB_M0_EXTERNAL_BOUNDARY_SCHEMA;
+  readonly upstream: Readonly<{
+    mathlibSha: string;
+    leanToolchain: string;
+  }>;
+  readonly entries: readonly MathlibM0ExternalBoundaryEntry[];
+}
+
+export function parseMathlibM0ExternalBoundary(input: unknown): MathlibM0ExternalBoundary;
+```
+
+- [ ] **Step 1: Write test-only RED**
+
+Use this exact accepted fixture:
 
 ```ts
 const validBoundary = {
@@ -62,37 +91,27 @@ const validBoundary = {
 };
 ```
 
-Assert acceptance plus rejection of: wrong schema, non-40-hex SHA, empty toolchain, unknown `constantInfoKind`, duplicate/unsorted `qualifiedName`, duplicate/unsorted `referencedBy`, missing fields, and extra fields.
+Reject wrong schema, non-40-hex SHA, empty toolchain, unknown kind, duplicate/unsorted entry names, duplicate/unsorted `referencedBy`, missing keys, and extra keys.
 
-- [ ] **Step 2: Run the TypeScript suite and verify RED**
+- [ ] **Step 2: Commit RED**
 
-Run through repository CI (`npm --prefix ts run check` on the exact head). Expected: TypeScript/tests fail because `mathlib-m0-external-boundary.ts` and `parseMathlibM0ExternalBoundary` do not exist.
+Commit message: `test: require Mathlib M0 external boundary parser`.
 
-- [ ] **Step 3: Implement the minimal strict parser**
+- [ ] **Step 3: Verify RED in exact-head CI**
 
-Use the exact enum:
+Expected failure: TypeScript compile/test fails because `parseMathlibM0ExternalBoundary` does not exist. Other ordinary jobs remain GREEN.
 
-```ts
-export type MathlibM0ConstantInfoKind =
-  | "axiom"
-  | "definition"
-  | "theorem"
-  | "opaque"
-  | "quotient"
-  | "inductive"
-  | "constructor"
-  | "recursor";
-```
+- [ ] **Step 4: Implement minimal strict parser**
 
-The parser must require exact record keys, non-empty strings, exact upstream shape, sorted unique `entries` by `qualifiedName`, and sorted unique `referencedBy`. Return frozen data. Do not import proof/replay code.
+Follow existing transport parser patterns: exact records, explicit enum, sorted/unique checks, frozen results, no proof/replay imports.
 
-- [ ] **Step 4: Run the TypeScript suite and verify GREEN**
-
-Run `npm --prefix ts run check`. Expected: all existing and new tests pass.
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Commit GREEN candidate**
 
 Commit message: `feat: validate Mathlib M0 external boundary evidence`.
+
+- [ ] **Step 6: Verify ordinary CI GREEN**
+
+Run the repository CI on that exact head and require the TypeScript job to pass.
 
 ---
 
@@ -103,31 +122,15 @@ Commit message: `feat: validate Mathlib M0 external boundary evidence`.
 - Modify: `ts/test/mathlib-m0-export-contract.test.ts`
 
 **Interfaces:**
-- Consumes: the already-built topologically sorted `List ExportNode`, the pinned Lean `Environment`, and new required env variable `MATHLIB_M0_BOUNDARY_OUTPUT`.
-- Produces: a second JSON document with schema `mts-mathlib-m0-external-boundary/v0.1`.
-- Does not change: existing `corpus-export.json` structure or digest identity.
+- New required environment variable: `MATHLIB_M0_BOUNDARY_OUTPUT`.
+- Second output schema: `mts-mathlib-m0-external-boundary/v0.1`.
+- Existing transport output is untouched.
 
-- [ ] **Step 1: Add test-only RED contract assertions**
+- [ ] **Step 1: Add source-contract RED assertions**
 
-Require `Export.lean` to:
+Require `Export.lean` to read `MATHLIB_M0_BOUNDARY_OUTPUT`, emit the boundary schema, derive `referencedBy` from `ExportNode.externalDependencies`, and explicitly match all eight `ConstantInfo` cases.
 
-```text
-read MATHLIB_M0_BOUNDARY_OUTPUT
-classify every ConstantInfo constructor exhaustively
-emit schema mts-mathlib-m0-external-boundary/v0.1
-derive referencedBy from ExportNode.externalDependencies
-write the second JSON artifact
-```
-
-The source contract must explicitly require cases `.axiomInfo`, `.defnInfo`, `.thmInfo`, `.opaqueInfo`, `.quotInfo`, `.inductInfo`, `.ctorInfo`, `.recInfo` and must not accept a wildcard as an `unknown` classification.
-
-- [ ] **Step 2: Run CI and verify RED**
-
-Expected failure: `mathlib-m0-export-contract.test` reports missing external-boundary emission/classification. Existing transport tests remain otherwise unchanged.
-
-- [ ] **Step 3: Implement deterministic Lean boundary collection**
-
-Add an exhaustive classifier equivalent to:
+The production classifier must be exactly exhaustive in intent:
 
 ```lean
 private def constantInfoKind : ConstantInfo → String
@@ -141,27 +144,44 @@ private def constantInfoKind : ConstantInfo → String
   | .recInfo _ => "recursor"
 ```
 
-For each unique `externalDependencies` name, call `env.find?`; absence is an error. Build `referencedBy` from actual `ExportNode.qualifiedName` occurrences, sort/unique both axes, and emit:
+- [ ] **Step 2: Commit and verify RED**
+
+Commit message: `test: require Mathlib M0 boundary export evidence`.
+Expected failure: `mathlib-m0-export-contract.test` reports missing boundary emission/classification.
+
+- [ ] **Step 3: Implement deterministic boundary collection**
+
+For every unique external dependency in the built transport nodes:
+1. resolve it with `env.find?`, failing if absent;
+2. classify its `ConstantInfo` with the exhaustive function above;
+3. gather all referencing exported declaration names;
+4. sort/unique entries by external `qualifiedName` and `referencedBy` by name;
+5. emit one document with the same exact upstream pins.
+
+Concrete output for the currently known live boundary is expected to have the shape:
 
 ```json
 {
   "schema": "mts-mathlib-m0-external-boundary/v0.1",
-  "upstream": { "mathlibSha": "...", "leanToolchain": "..." },
+  "upstream": {
+    "mathlibSha": "d6893048e0d784c43f3cf098b61299b3a4b4aed0",
+    "leanToolchain": "leanprover/lean4:v4.34.0-rc2"
+  },
   "entries": [
-    { "qualifiedName": "...", "constantInfoKind": "...", "referencedBy": ["..."] }
+    { "qualifiedName": "Eq", "constantInfoKind": "inductive", "referencedBy": ["Ne"] }
   ]
 }
 ```
 
-Require `MATHLIB_M0_BOUNDARY_OUTPUT` using the existing `requireEnv` pattern and write it only after successful node construction/toposort. Do not add any boundary field to the existing transport document.
+Production code derives all entries from the `Environment`; it must not hard-code `Eq`, `False`, `Membership`, or `Membership.mk`.
 
-- [ ] **Step 4: Run CI and verify GREEN before live workflow changes**
-
-Expected: TypeScript source-contract test GREEN. Live workflow may still fail to supply `MATHLIB_M0_BOUNDARY_OUTPUT`; that is intentionally addressed in Task 3.
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit exporter GREEN candidate**
 
 Commit message: `feat: export Mathlib M0 external boundary evidence`.
+
+- [ ] **Step 5: Verify ordinary CI GREEN**
+
+Do not interpret the live exporter gate yet: until Task 3 wires the new env var, its failure is expected and is not evidence against the Lean implementation.
 
 ---
 
@@ -172,20 +192,21 @@ Commit message: `feat: export Mathlib M0 external boundary evidence`.
 - Modify: `ts/test/mathlib-m0-export-contract.test.ts`
 
 **Interfaces:**
-- Consumes: `parseMathlibM0TransportBundle()` and `parseMathlibM0ExternalBoundary()` from the exact research head.
-- Produces artifacts: `corpus-export.json`, `external-boundary.json`, `run-metadata.json` under `mathlib-m0-artifacts/`.
+- Inputs: exact-head exporter and `parseMathlibM0ExternalBoundary()`.
+- Uploaded outputs: `corpus-export.json`, `external-boundary.json`, `run-metadata.json`.
 
-- [ ] **Step 1: Add test-only RED workflow assertions**
+- [ ] **Step 1: Add workflow-contract RED**
 
-Require the workflow to watch `ts/src/mathlib-m0-external-boundary.ts`, set `MATHLIB_M0_BOUNDARY_OUTPUT` for both exporter passes, compare both boundary outputs byte-for-byte, and invoke `parseMathlibM0ExternalBoundary()` on the live boundary artifact.
+Require the workflow to watch `ts/src/mathlib-m0-external-boundary.ts`, provide `MATHLIB_M0_BOUNDARY_OUTPUT` on both exporter passes, byte-compare both boundary files, and invoke `parseMathlibM0ExternalBoundary()` on the live file.
 
-- [ ] **Step 2: Run CI and verify RED**
+- [ ] **Step 2: Commit and verify RED**
 
-Expected failure: workflow source contract reports missing boundary-output wiring/live parser validation.
+Commit message: `test: require live Mathlib M0 boundary validation`.
+Expected failure: TypeScript source-contract test reports missing workflow wiring.
 
 - [ ] **Step 3: Wire deterministic double export**
 
-For each pass set both:
+Use exactly:
 
 ```bash
 MATHLIB_M0_OUTPUT="$artifact_dir/corpus-export-$pass.json" \
@@ -195,35 +216,33 @@ MATHLIB_M0_LEAN_TOOLCHAIN="$LEAN_TOOLCHAIN" \
   lake env lean "$exporter"
 ```
 
-Then `cmp` both transport files and both boundary files, rename pass 1 to `corpus-export.json` / `external-boundary.json`, and remove pass 2.
+Then compare both pairs, keep pass 1 as `corpus-export.json` and `external-boundary.json`, and delete pass 2.
 
-- [ ] **Step 4: Validate the live boundary in TypeScript**
+- [ ] **Step 4: Extend live Node validation**
 
-Extend the existing Node validation step to load both files. After parsing, require boundary upstream pins to equal the transport/pinned values. Also verify every boundary `referencedBy` name exists in the transport declaration set and that every declared `externalDependencies` name appears in exactly one boundary entry.
+Parse both artifacts. Require identical upstream pins. Build the exact set of external names and `(externalName, referencedBy)` edges from the transport declarations; require the boundary artifact to describe exactly that set—no missing or stale entries.
 
-- [ ] **Step 5: Run ordinary CI and exact pinned live workflow**
-
-Expected ordinary CI: GREEN. Expected live workflow: deterministic Lean export GREEN, transport parser GREEN, boundary parser GREEN, artifact upload GREEN.
-
-- [ ] **Step 6: Download and independently inspect the exact-head artifact**
-
-Verify: 10 transport declarations; boundary entries sorted/unique; actual pinned classifications are derived rather than hard-coded. Record exact names/kinds/reference edges from the artifact.
-
-- [ ] **Step 7: Commit**
+- [ ] **Step 5: Commit workflow GREEN candidate**
 
 Commit message: `ci: validate Mathlib M0 external boundary artifact`.
 
+- [ ] **Step 6: Verify exact-head ordinary CI and pinned live workflow GREEN**
+
+Require deterministic double export, transport parser, boundary parser, and upload all GREEN on the same head.
+
+- [ ] **Step 7: Download and independently audit the live artifact**
+
+Verify transport declaration count is 10 and record the actual boundary names, kinds, and reference edges. If a new kind/name appears, stop and treat it as falsification evidence rather than widening support automatically.
+
 ---
 
-### Task 4: Derive fail-closed boundary dispositions without fake theorem results
+### Task 4: Derive boundary-caused result dispositions
 
 **Files:**
 - Modify: `ts/src/mathlib-m0-result-accounting.ts`
 - Modify: `ts/test/mathlib-m0-result-accounting.test.ts`
 
-**Interfaces:**
-- Consumes: parsed/parseable transport bundle and parsed/parseable external-boundary artifact.
-- Produces:
+**Interface:**
 
 ```ts
 export interface MathlibM0BoundaryDisposition {
@@ -238,72 +257,72 @@ export function deriveMathlibM0BoundaryDispositions(
 ): readonly MathlibM0BoundaryDisposition[];
 ```
 
-`null` means only “not blocked by this external-boundary audit”; it does NOT mean translated or approved.
+`null` means only “not blocked by this boundary audit”; it never means translated or approved.
 
-- [ ] **Step 1: Write failing propagation tests**
+- [ ] **Step 1: Write and commit RED**
 
-Construct a small topologically ordered transport fixture where declaration `A` directly references an external boundary entry, `B` depends on `A`, and `C` has neither. Assert:
+Fixture topology:
 
 ```text
-A -> unsupported
-B -> blocked-by-dependency
-C -> null
+A has external dependency Eq     -> unsupported
+B depends on A                   -> blocked-by-dependency
+C has neither                    -> null
 ```
 
-Also assert boundary/transport upstream mismatch, missing boundary entry for a declared external dependency, stale boundary entry not referenced by transport, and mismatched `referencedBy` all fail closed.
+Also reject upstream mismatch, missing boundary entry, stale boundary entry, and wrong `referencedBy` identity.
+Commit message: `test: require Mathlib M0 boundary disposition propagation`.
 
-- [ ] **Step 2: Run TypeScript tests and verify RED**
+- [ ] **Step 2: Verify RED in exact-head CI**
 
-Expected: `deriveMathlibM0BoundaryDispositions` is absent.
+Expected failure: helper absent.
 
-- [ ] **Step 3: Implement minimal propagation**
+- [ ] **Step 3: Implement exact identity validation and propagation**
 
-Parse both artifacts. Establish exact external-reference identity first. Iterate transport declarations in their validated topological order:
+After both parsers succeed, verify boundary entries exactly match transport external references. Iterate validated topological transport order:
 
 ```ts
-if (declaration.externalDependencies.length > 0) disposition = "unsupported";
-else if (declaration.dependencies.some(dep => blocked.has(dep))) disposition = "blocked-by-dependency";
-else disposition = null;
+if (declaration.externalDependencies.length > 0) {
+  disposition = "unsupported";
+} else if (declaration.dependencies.some((name) => blocked.has(name))) {
+  disposition = "blocked-by-dependency";
+} else {
+  disposition = null;
+}
 ```
 
-Record only the direct external names in `unsupportedExternalDependencies`; blocked declarations get an empty list. Never synthesize `translated`, MTS evidence digests, approver digests, `approved`, or `rejected` here.
+Only direct unsupported declarations carry their external names in `unsupportedExternalDependencies`. Never synthesize `translated`, evidence digests, approver digests, `approved`, or `rejected`.
 
-- [ ] **Step 4: Run TypeScript suite and verify GREEN**
-
-Expected: all result-accounting and transport tests pass.
-
-- [ ] **Step 5: Apply the helper to the downloaded live 10-declaration artifact**
-
-Record exact counts of direct `unsupported`, transitive `blocked-by-dependency`, and `null` declarations. Treat these as research evidence only.
-
-- [ ] **Step 6: Commit**
+- [ ] **Step 4: Commit GREEN candidate**
 
 Commit message: `feat: classify Mathlib M0 boundary-blocked declarations`.
 
+- [ ] **Step 5: Verify TypeScript/ordinary CI GREEN**
+
+- [ ] **Step 6: Apply helper to the downloaded live 10-declaration pair**
+
+Record exact counts for `unsupported`, `blocked-by-dependency`, and `null` as research evidence only.
+
 ---
 
-### Task 5: Audit evidence and governance checkpoint
+### Task 5: Governance checkpoint and research record
 
-**Files:**
-- No MTS semantic/control files.
-- Update only research documentation/PR/issue commentary if needed to record observed evidence.
+**Files/records:**
+- Do not edit MTS semantic/control files.
+- Add one top-level comment to issue #969 with exact evidence.
+- Update PR #983 body only if its “Current evidence / Still in progress” summary has become materially stale.
 
-**Interfaces:**
-- Consumes exact-head CI, exact pinned live workflow artifact, and Task 4 disposition output.
-- Produces a durable research checkpoint stating whether current corpus is dependency-closed and what exact unsupported kernel boundary prevents admission.
+- [ ] **Step 1: Re-read fresh `main`, #969, #983, `repo-policy.json`, and exact-head checks**
 
-- [ ] **Step 1: Run exact-head verification**
+Require PR still Draft and mergeable. Repo-guard SKIPPED is acceptable only because Draft.
 
-Require: ordinary CI GREEN; Mathlib M0 pinned export GREEN; repo-guard SKIPPED only because PR remains Draft; PR mergeable; base `main` unchanged or explicitly re-evaluated if it moved.
+- [ ] **Step 2: Compare PR against base and verify hard boundaries**
 
-- [ ] **Step 2: Verify hard boundaries by diff**
+Confirm no changes under `contracts/**`, `cutover/**`, `traceability/**`, or `repo-policy.json`; no change to transport v0.1 identity; no inductive/constructor proof translation.
 
-Confirm no changes under `contracts/**`, `cutover/**`, `traceability/**`, or `repo-policy.json`; transport v0.1 schema/digest identity unchanged; no inductive/constructor proof translation exists.
+- [ ] **Step 3: Record exact research evidence in #969**
 
-- [ ] **Step 3: Record the live boundary result**
-
-Add a concise #969 / PR #983 research note with: exact research head, exact upstream pins, 10-declaration transport count, exact boundary entries/kinds, derived unsupported/blocked counts, and explicit statement that the dependency-closed acceptance checkbox remains OPEN.
+The comment must include: research head SHA, exact upstream pins, transport count 10, exact boundary entries/kinds/reference edges, derived disposition counts, and an explicit statement that the “10–100 declaration dependency-closed corpus” checkbox remains OPEN.
 
 - [ ] **Step 4: Stop at the decision boundary**
 
-Do not add `inductInfo` / `ctorInfo` transport automatically. Use the live audit to decide separately between a different seed or a separately authorized minimal inductive/constructor structural slice.
+Do not add `inductInfo` or `ctorInfo` structural/proof transport in this plan. The next decision is separately evidence-driven: choose a different seed or authorize a new minimal inductive/constructor slice.
