@@ -52,26 +52,28 @@ External-boundary classification is deliberately NOT added to the transport enve
 
 The untrusted Lean exporter emits a second deterministic JSON artifact derived from the same pinned `Environment` and the same selected corpus.
 
-Proposed schema:
+Schema shape, shown with concrete pinned provenance and one source-known example entry:
 
 ```json
 {
   "schema": "mts-mathlib-m0-external-boundary/v0.1",
   "upstream": {
-    "mathlibSha": "<40-hex>",
-    "leanToolchain": "<exact toolchain>"
+    "mathlibSha": "d6893048e0d784c43f3cf098b61299b3a4b4aed0",
+    "leanToolchain": "leanprover/lean4:v4.34.0-rc2"
   },
   "entries": [
     {
       "qualifiedName": "Eq",
       "constantInfoKind": "inductive",
-      "referencedBy": ["..."]
+      "referencedBy": ["Ne"]
     }
   ]
 }
 ```
 
-`entries` are sorted by `qualifiedName`; `referencedBy` is sorted and unique. Every field is derived from the elaborated Lean `Environment`; no source parsing and no manually maintained kind table are allowed.
+The example is descriptive only. Production code derives every entry and kind from the pinned elaborated `Environment`; it does not hard-code the four currently observed names or their kinds.
+
+`entries` are sorted by `qualifiedName`; `referencedBy` is sorted and unique. Every field is derived from the elaborated Lean `Environment`; no source parsing and no manually maintained per-name kind table are allowed.
 
 ### 3. Exhaustive `ConstantInfo` classification
 
@@ -117,7 +119,16 @@ No external kind is implicitly allowlisted as a trusted primitive by this audit 
 
 The live audit is expected to classify the currently observed external names from the pinned environment, rather than hard-coding their classification into production code.
 
-The currently observed boundary is expected to contain four unique names:
+The currently observed direct external references in live run #23 are:
+
+```text
+Not                -> False
+Ne                 -> Eq
+Set.instMembership -> Membership, Membership.mk
+Membership.mem     -> Membership
+```
+
+Therefore the unique external boundary is exactly:
 
 ```text
 Eq
@@ -126,7 +137,7 @@ Membership
 Membership.mk
 ```
 
-The live artifact, not a fixture, decides their `ConstantInfo` kinds. The expected research consequence is that the present 10-declaration export remains useful transport evidence but does NOT yet satisfy the #969 dependency-closed acceptance checkbox.
+The live boundary-audit artifact, not a fixture, decides their `ConstantInfo` kinds. The expected research consequence is that the present 10-declaration export remains useful transport evidence but does NOT yet satisfy the #969 dependency-closed acceptance checkbox.
 
 ## Data flow
 
