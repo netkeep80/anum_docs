@@ -5,17 +5,38 @@
     "mathlibSha": "d6893048e0d784c43f3cf098b61299b3a4b4aed0",
     "leanToolchain": "leanprover/lean4:v4.34.0-rc2"
   },
-  "source": {
-    "module": "Mathlib.Logic.Pairwise",
-    "path": "Mathlib/Logic/Pairwise.lean",
-    "blobSha": "7a2f0dc7819c5656049e1d99f6ba0be56f1e04ca"
-  },
+  "sources": [
+    {
+      "module": "Mathlib.Logic.Function.Basic",
+      "path": "Mathlib/Logic/Function/Basic.lean",
+      "blobSha": "e32127e286544f7ecdbd488c9787b85bee4548ba"
+    },
+    {
+      "module": "Mathlib.Logic.Function.Defs",
+      "path": "Mathlib/Logic/Function/Defs.lean",
+      "blobSha": "565ae3df6b95fa084d60818ab13fab2e80874f3f"
+    },
+    {
+      "module": "Mathlib.Basic.Logic.Basic",
+      "path": "Mathlib/Basic/Logic/Basic.lean",
+      "blobSha": "1b8251cc298129bb6613435742ca7cb9ab553df2"
+    }
+  ],
   "seed": "research/mathlib-m0/corpus-seed.json",
   "selection": {
     "minimumDeclarations": 10,
     "maximumDeclarations": 100,
     "roots": [
-      "Pairwise.set_pairwise"
+      "Function.eval",
+      "hidden",
+      "Function.swap₂",
+      "Function.dcomp",
+      "Function.onFun",
+      "Function.swap",
+      "Function.bicompl",
+      "Function.bicompr",
+      "Pi.map",
+      "forall₃_imp"
     ]
   },
   "export": {
