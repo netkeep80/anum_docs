@@ -1,7 +1,8 @@
-import { Memory } from "../src/memory.js";
+import { materializeExactSequence } from "../src/exact-sequence.js";
+import { Memory, type LinkHandle } from "../src/memory.js";
+import { ensureRootBasis } from "../src/public.js";
 import {
   defineStructuralDerivationRule,
-  defineStructuralProofOccurrence,
   replayStructuralDerivationWithAssumptions,
 } from "../src/derivation.js";
 import {
@@ -10,7 +11,6 @@ import {
 } from "../src/derived-derivation-schema.js";
 import { instantiateStructuralDerivedDerivationSchema } from "../src/derived-derivation-instantiation.js";
 import { replayStructuralDerivedDerivationApplication } from "../src/derived-derivation-application.js";
-import { materializeExactSequence } from "../src/exact-sequence.js";
 import {
   admitStructuralRule,
   defineStructuralInterpreter,
@@ -24,9 +24,11 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function main(): void {
   const memory = new Memory();
-  const fresh = (): number => memory.ensure(memory.root, memory.ensure(memory.root, memory.root));
+  const { R, L, U } = ensureRootBasis(memory);
+  let cursor = memory.ensure(U, R);
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
 
-  const theory = fresh();
+  const theory = memory.ensure(L, U);
   const dictionary = fresh();
   const grammar = fresh();
   const interpreter = defineStructuralInterpreter(memory, dictionary, grammar, theory);
@@ -37,37 +39,31 @@ function main(): void {
   const roleC = fresh();
   const roleDictionary = defineStructuralRoleDictionary(memory, [roleA, roleB, roleC]);
 
-  const premise1 = memory.ensure(roleA, roleB);
-  const premise2 = memory.ensure(roleB, roleC);
+  const premise = memory.ensure(roleA, roleB);
   const conclusion = memory.ensure(roleA, roleC);
 
-  const rule1 = defineStructuralRule(memory, roleDictionary, premise1);
-  const rule2 = defineStructuralRule(memory, roleDictionary, conclusion);
-  const rule1Admission = admitStructuralRule(memory, theory, rule1);
-  const rule2Admission = admitStructuralRule(memory, theory, rule2);
+  const targetRule = defineStructuralRule(memory, roleDictionary, conclusion);
+  const targetRuleAdmission = admitStructuralRule(memory, theory, targetRule);
+  const targetDerivationRule = defineStructuralDerivationRule(memory, [premise], targetRule);
+  const targetDerivationRuleAdmission = memory.ensure(theory, targetDerivationRule);
 
-  const dr1 = defineStructuralDerivationRule(memory, [premise1], rule1);
-  const dr2 = defineStructuralDerivationRule(memory, [premise1], rule2);
-  const dr1Admission = memory.ensure(theory, dr1);
-  const dr2Admission = memory.ensure(theory, dr2);
-
-  const identity = memory.ensure(dr2, theory);
-  const assumptionOccurrence = memory.ensure(premise1, identity);
+  const identity = memory.ensure(targetDerivationRule, theory);
+  const assumptionOccurrence = memory.ensure(premise, identity);
   const dependencySequence = materializeExactSequence(memory, [assumptionOccurrence]);
-  const targetOccurrence = memory.ensure(dr2, dependencySequence);
+  const targetOccurrence = memory.ensure(targetDerivationRule, dependencySequence);
 
   const genericEvidence: StructuralDerivedDerivationEvidence = Object.freeze({
     identity,
     targetOccurrence,
     assumptions: Object.freeze([
-      Object.freeze({ occurrence: assumptionOccurrence, template: premise1 }),
+      Object.freeze({ occurrence: assumptionOccurrence, template: premise }),
     ]),
     nodes: Object.freeze([
       Object.freeze({
         occurrence: targetOccurrence,
-        derivationRule: dr2,
-        ruleAdmission: rule2Admission,
-        derivationRuleAdmission: dr2Admission,
+        derivationRule: targetDerivationRule,
+        ruleAdmission: targetRuleAdmission,
+        derivationRuleAdmission: targetDerivationRuleAdmission,
         premiseOccurrenceSequence: dependencySequence,
       }),
     ]),
@@ -105,10 +101,6 @@ function main(): void {
   assert(application.generic.theory === theory, "application generic theory");
   assert(application.concrete.derivation.theory === theory, "application concrete theory");
   assert(memory.linkCount === before, "application replay must be read-only");
-
-  void dr1;
-  void dr1Admission;
-  void defineStructuralProofOccurrence;
 }
 
 main();
