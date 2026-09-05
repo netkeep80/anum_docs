@@ -1,4 +1,4 @@
-import Mathlib.Logic.Pairwise
+import Mathlib.Logic.Function.Basic
 import Lean
 
 open Lean Elab Command
@@ -10,7 +10,16 @@ private def expectedLeanToolchain : String :=
   "leanprover/lean4:v4.34.0-rc2"
 
 private def corpusRoots : List Name := [
-  ``Pairwise.set_pairwise
+  ``Function.eval,
+  ``hidden,
+  ``Function.swap₂,
+  ``Function.dcomp,
+  ``Function.onFun,
+  ``Function.swap,
+  ``Function.bicompl,
+  ``Function.bicompr,
+  ``Pi.map,
+  ``forall₃_imp
 ]
 
 private structure ExportNode where
