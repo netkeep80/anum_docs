@@ -304,7 +304,7 @@ async function main(): Promise<void> {
   same(afterRevision.value, pinnedRevision.value, "generic replay/expansion/concrete replay preserve T0");
 
   const nested = fixture();
-  const grounded = nested.fresh();
+  const grounded = nested.theory;
   const aa = nested.memory.ensure(nested.aRole, nested.aRole);
   const bk = nested.memory.ensure(nested.bRole, grounded);
   const ck = nested.memory.ensure(nested.cRole, grounded);
