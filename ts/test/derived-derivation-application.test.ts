@@ -44,7 +44,7 @@ function main(): void {
 
   const targetRule = defineStructuralRule(memory, roleDictionary, conclusion);
   const targetRuleAdmission = admitStructuralRule(memory, theory, targetRule);
-  const targetDerivationRule = defineStructuralDerivationRule(memory, [premise], targetRule);
+  const targetDerivationRule = defineStructuralDerivationRule(memory, targetRule, [premise]);
   const targetDerivationRuleAdmission = memory.ensure(theory, targetDerivationRule);
 
   const identity = memory.ensure(targetDerivationRule, theory);
