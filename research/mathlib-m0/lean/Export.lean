@@ -207,6 +207,14 @@ private partial def exprJson (expr : Expr) : Except String Json :=
         ("kind", Json.str "lit"),
         ("literal", literalJson literal)
       ]
+  | .proj typeName index struct => do
+      let structJson ← exprJson struct
+      return Json.mkObj [
+        ("kind", Json.str "proj"),
+        ("typeName", Json.str typeName.toString),
+        ("index", Json.num (JsonNumber.fromNat index)),
+        ("struct", structJson)
+      ]
   | .fvar _ =>
       .error "unsupported kernel expression form: fvar"
   | .mvar _ =>
@@ -215,8 +223,6 @@ private partial def exprJson (expr : Expr) : Except String Json :=
       .error "unsupported kernel expression form: letE"
   | .mdata _ _ =>
       .error "unsupported kernel expression form: mdata"
-  | .proj _ _ _ =>
-      .error "unsupported kernel expression form: proj"
 
 private def buildNode
     (env : Environment)

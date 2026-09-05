@@ -41,7 +41,13 @@ export type MathlibM0KernelExpr =
       body: MathlibM0KernelExpr;
       binderInfo: MathlibM0KernelBinderInfo;
     }>
-  | Readonly<{ kind: "lit"; literal: MathlibM0KernelLiteral }>;
+  | Readonly<{ kind: "lit"; literal: MathlibM0KernelLiteral }>
+  | Readonly<{
+      kind: "proj";
+      typeName: string;
+      index: number;
+      struct: MathlibM0KernelExpr;
+    }>;
 
 export type MathlibM0KernelForm =
   | Readonly<{ kind: "axiom"; type: MathlibM0KernelExpr }>
@@ -115,6 +121,13 @@ function kernelText(value: unknown): string {
   return value;
 }
 
+function kernelIndex(value: unknown): number {
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+    fail("unsupported-kernel-expression");
+  }
+  return value;
+}
+
 function parseUpstream(value: unknown): MathlibM0UpstreamPin {
   const upstream = exactRecord(value, ["mathlibSha", "leanToolchain"]);
   if (
@@ -181,10 +194,7 @@ function parseKernelExpr(value: unknown): MathlibM0KernelExpr {
   const candidate = record(value);
   if (candidate.kind === "bvar") {
     const expr = exactRecord(candidate, ["kind", "index"]);
-    if (typeof expr.index !== "number" || !Number.isInteger(expr.index) || expr.index < 0) {
-      fail("unsupported-kernel-expression");
-    }
-    return Object.freeze({ kind: "bvar", index: expr.index });
+    return Object.freeze({ kind: "bvar", index: kernelIndex(expr.index) });
   }
   if (candidate.kind === "sort") {
     const expr = exactRecord(candidate, ["kind", "level"]);
@@ -220,6 +230,15 @@ function parseKernelExpr(value: unknown): MathlibM0KernelExpr {
   if (candidate.kind === "lit") {
     const expr = exactRecord(candidate, ["kind", "literal"]);
     return Object.freeze({ kind: "lit", literal: parseKernelLiteral(expr.literal) });
+  }
+  if (candidate.kind === "proj") {
+    const expr = exactRecord(candidate, ["kind", "typeName", "index", "struct"]);
+    return Object.freeze({
+      kind: "proj",
+      typeName: kernelText(expr.typeName),
+      index: kernelIndex(expr.index),
+      struct: parseKernelExpr(expr.struct),
+    });
   }
   fail("unsupported-kernel-expression");
 }
@@ -261,6 +280,9 @@ function collectKernelConstants(expr: MathlibM0KernelExpr, target: Set<string>):
     case "forall":
       collectKernelConstants(expr.binderType, target);
       collectKernelConstants(expr.body, target);
+      return;
+    case "proj":
+      collectKernelConstants(expr.struct, target);
       return;
     case "bvar":
     case "sort":
