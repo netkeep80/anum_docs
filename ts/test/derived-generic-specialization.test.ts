@@ -244,6 +244,16 @@ function main(): void {
   bad("grounded-target-role-capture", carrier(memory, theory, dSource, dTarget,
     [[b, n], [c, n], [b1, n1], [c1, n1]], [[a, n]]));
 
+  // A ground binding is opaque as a whole, but it may not contain an active target Role.
+  const nestedGround = memory.ensure(L, n);
+  const nestedGroundTarget = target(memory, theory, dn, [], unary(nestedGround));
+  expectError("grounded-target-role-capture", () =>
+    replayStructuralDerivedDerivationSpecialization(memory, evidence(
+      sourceGround.evidence,
+      carrier(memory, theory, dx, dn, [], [[x, nestedGround]]),
+      nestedGroundTarget,
+    )));
+
   // A source-grounded constant may not become generic merely because it is active in Ddst.
   const captureDictionary = defineStructuralRoleDictionary(memory, [L, n1]);
   const captureSource = admittedGeneric(memory, theory, dx, [], memory.ensure(L, x));
