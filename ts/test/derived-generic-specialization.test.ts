@@ -244,15 +244,15 @@ function main(): void {
   bad("grounded-target-role-capture", carrier(memory, theory, dSource, dTarget,
     [[b, n], [c, n], [b1, n1], [c1, n1]], [[a, n]]));
 
-  // A ground binding is opaque as a whole, but it may not contain an active target Role.
+  // An explicit ground replacement is exact and opaque, even if its own topology contains a target Role identity.
   const nestedGround = memory.ensure(L, n);
   const nestedGroundTarget = target(memory, theory, dn, [], unary(nestedGround));
-  expectError("grounded-target-role-capture", () =>
-    replayStructuralDerivedDerivationSpecialization(memory, evidence(
-      sourceGround.evidence,
-      carrier(memory, theory, dx, dn, [], [[x, nestedGround]]),
-      nestedGroundTarget,
-    )));
+  const nestedGroundReplay = replayStructuralDerivedDerivationSpecialization(memory, evidence(
+    sourceGround.evidence,
+    carrier(memory, theory, dx, dn, [], [[x, nestedGround]]),
+    nestedGroundTarget,
+  ));
+  same(nestedGroundReplay.targetConclusionTemplate, unary(nestedGround), "opaque ground identity");
 
   // A source-grounded constant may not become generic merely because it is active in Ddst.
   const captureDictionary = defineStructuralRoleDictionary(memory, [L, n1]);
