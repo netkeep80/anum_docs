@@ -82,25 +82,6 @@ function exactValues(memory: ReadMemory, sequence: LinkHandle, code: StructuralD
   catch { return fail(code); }
 }
 
-function containsTargetRole(
-  memory: ReadMemory,
-  root: LinkHandle,
-  targetRoles: ReadonlySet<LinkHandle>,
-): boolean {
-  const pending: LinkHandle[] = [root];
-  const visited = new Set<LinkHandle>();
-  while (pending.length > 0) {
-    const current = pending.pop();
-    if (current === undefined) continue;
-    if (targetRoles.has(current)) return true;
-    if (visited.has(current)) continue;
-    visited.add(current);
-    const poles = memory.poles(current);
-    pending.push(poles.start, poles.end);
-  }
-  return false;
-}
-
 function verifyMapped(
   memory: ReadMemory,
   source: LinkHandle,
@@ -202,12 +183,9 @@ function replayBody(
     if (seenGroundPartition.has(role)) fail("duplicate-source-role-binding");
     seenGroundPartition.add(role);
     if (seenRolePartition.has(role)) fail("binding-partition-overlap");
-    try {
-      if (containsTargetRole(memory, value, targetRoleSet)) fail("grounded-target-role-capture");
-    } catch (error) {
-      if (error instanceof StructuralDerivedDerivationSpecializationReplayError) throw error;
-      fail("invalid-specialization-carrier");
-    }
+    try { memory.poles(value); }
+    catch { fail("invalid-specialization-carrier"); }
+    if (targetRoleSet.has(value)) fail("grounded-target-role-capture");
     replacements.set(role, value);
     roleBindings.push(Object.freeze({ role, value }));
   }
