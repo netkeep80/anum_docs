@@ -222,11 +222,13 @@ function main(): void {
   same(replayStructuralDerivedDerivationSchema(memory, step.evidence).conclusionTemplate, pN1,
     "generic induction step control");
 
-  // N2b itself is independently GREEN in the exact scope relation required by IND.
+  // N2b itself is independently GREEN in both coordinate transports required by IND.
   const qContext = memory.ensure(O, U);
   const rContext = memory.ensure(C, L);
   const qN = memory.ensure(qContext, nRole);
   const rN = memory.ensure(rContext, nRole);
+  const qN1 = memory.ensure(qContext, n1Role);
+  const rN1 = memory.ensure(rContext, n1Role);
   const n2Source = admittedGeneric(memory, theory, dResult, [qN], rN);
   const n2Target = targetIdentity(memory, theory, dStep, [qN], rN);
   const muSame = morphism(memory, theory, dResult, dStep, [
@@ -239,10 +241,28 @@ function main(): void {
     morphism: muSame,
     targetIdentity: n2Target.identity,
   });
-  same(n2Replay.targetDerivationRule, n2Target.derivationRule, "N2b control target");
-  same(memory.linkCount, beforeN2, "N2b control is read-only");
+  same(n2Replay.targetDerivationRule, n2Target.derivationRule, "N2b same-role target");
+  same(memory.linkCount, beforeN2, "N2b same-role control is read-only");
   assert(memory.find(theory, n2Target.derivationRule) === undefined,
-    "N2b control must not admit mapped target DR");
+    "N2b same-role control must not admit mapped target DR");
+
+  // The actual successor-coordinate transport is also ordinary N2b:
+  // muNext(P)=P, muNext(N)=N1. This isolates IND from generic scope transport.
+  const n2NextTarget = targetIdentity(memory, theory, dStep, [qN1], rN1);
+  const muNext = morphism(memory, theory, dResult, dStep, [
+    [pRole, pRole],
+    [nRole, n1Role],
+  ]);
+  const beforeN2Next = memory.linkCount;
+  const n2NextReplay = replayStructuralDerivedDerivationCrossScopeApplication(memory, {
+    source: n2Source.evidence,
+    morphism: muNext,
+    targetIdentity: n2NextTarget.identity,
+  });
+  same(n2NextReplay.targetDerivationRule, n2NextTarget.derivationRule, "N2b next-role target");
+  same(memory.linkCount, beforeN2Next, "N2b next-role control is read-only");
+  assert(memory.find(theory, n2NextTarget.derivationRule) === undefined,
+    "N2b next-role control must not admit mapped target DR");
 
   // RESULT is structurally representable but deliberately not admitted:
   // Nat0(N) -> P[N]. Its StructuralRule shape may be known to Tnat, while its
@@ -350,6 +370,7 @@ function main(): void {
     step.identity,
     result.identity,
     muSame,
+    muNext,
     nat0Context,
     succContext,
     U,
