@@ -203,11 +203,24 @@ function main(): void {
   assert(memory.find(theory, result.derivationRule) === undefined,
     "closure replay must not promote RESULT into Theory authority");
 
-  // Host decorations grant no authority and do not alter the structural result.
+  const simple = (value: LinkHandle): LinkHandle => memory.ensure(O, value);
+  const simpleBase = admittedGeneric(memory, theory, dBase, [], simple(z));
+  const simpleStep = admittedGeneric(
+    memory, theory, dStep, [domainN, stepNN1, simple(n)], simple(n1),
+  );
+  const simpleResult = resultIdentity(memory, theory, dResult, [domainN], simple(n));
+  same(replayStructuralClosureApplication(memory, {
+    ...evidence, base: simpleBase.evidence, step: simpleStep.evidence,
+    resultIdentity: simpleResult.identity,
+  }).resultConclusionTemplate, simple(n), "simple structural claim closes");
+
+  // Host decorations, cached replay, and finite samples grant no authority.
   const decorated = {
     ...evidence,
     closure: true,
     induction: true,
+    cachedReplay: replay,
+    finiteSamples: materializeExactSequence(memory, [cZ, cN, cN1]),
     callback: (_value: LinkHandle) => true,
   };
   same(replayStructuralClosureApplication(memory, decorated).resultConclusionTemplate, cN,
@@ -238,6 +251,24 @@ function main(): void {
       authorityMorphism: partialAuthorityMorphism,
     }),
   );
+
+  const baseNode = base.evidence.nodes[0];
+  assert(baseNode !== undefined, "BASE node");
+  expectClosureError("invalid-base", () => replayStructuralClosureApplication(memory, {
+    ...evidence,
+    base: { ...base.evidence, nodes: [{ ...baseNode, derivationRuleAdmission: base.identity }] },
+  }));
+  const stepNode = step.evidence.nodes[0];
+  assert(stepNode !== undefined, "STEP node");
+  expectClosureError("invalid-step", () => replayStructuralClosureApplication(memory, {
+    ...evidence,
+    step: { ...step.evidence, nodes: [{ ...stepNode, derivationRuleAdmission: step.identity }] },
+  }));
+
+  const wideResult = resultIdentity(memory, theory, dStep, [domainN], cN);
+  expectClosureError("invalid-scope", () => replayStructuralClosureApplication(memory, {
+    ...evidence, resultIdentity: wideResult.identity,
+  }));
 
   const wrongGenerator = memory.ensure(C, L);
   expectClosureError("invalid-base-grounding", () =>
@@ -282,6 +313,21 @@ function main(): void {
   expectClosureError("next-conclusion-mismatch", () =>
     replayStructuralClosureApplication(memory, { ...evidence, nextMorphism: wrongNextMorphism }),
   );
+
+  const capturedDomainZ = memory.ensure(n, z);
+  const capturedDomainX = memory.ensure(n, x);
+  const capturedDomainX1 = memory.ensure(n, x1);
+  const capturedDomainN = memory.ensure(n, n);
+  const capturedAuthority = materializeExactSequence(memory, [
+    theory, dAuthority, z, capturedDomainZ, capturedDomainX, stepXX1, capturedDomainX1,
+  ]);
+  const capturedStep = admittedGeneric(memory, theory, dStep, [capturedDomainN, stepNN1, cN], cN1);
+  const capturedResult = resultIdentity(memory, theory, dResult, [capturedDomainN], cN);
+  expectClosureError("grounded-target-role-capture", () => replayStructuralClosureApplication(memory, {
+    ...evidence, authority: capturedAuthority,
+    authorityAdmission: memory.ensure(theory, capturedAuthority),
+    step: capturedStep.evidence, resultIdentity: capturedResult.identity,
+  }));
 
   const foreignAuthority = materializeExactSequence(memory, [
     foreignTheory, dAuthority, z, domainZ, domainX, stepXX1, domainX1,
