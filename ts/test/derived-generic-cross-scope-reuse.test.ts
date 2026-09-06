@@ -179,8 +179,10 @@ function main(): void {
 
   // Host metadata cannot bridge the trusted boundary. The replay result is still
   // determined only by MTS identities/admissions and the exact RoleDictionaries.
+  const crossScopeNode = crossScopeEvidence.nodes[0];
+  assert(crossScopeNode !== undefined, "cross-scope fixture must contain its proof node");
   const hostDecoratedNode = Object.freeze({
-    ...crossScopeEvidence.nodes[0],
+    ...crossScopeNode,
     generic: true,
     crossScope: true,
     roleMorphism: morphism,
