@@ -229,6 +229,12 @@ function main(): void {
     [[b, n], [c, n], [b1, n1]], [[a, ground]]));
   bad("duplicate-source-role-binding", carrier(memory, theory, dSource, dTarget,
     [[b, n], [b, n1], [c, n], [b1, n1], [c1, n1]], [[a, ground]]));
+  expectError("duplicate-source-role-binding", () =>
+    replayStructuralDerivedDerivationSpecialization(memory, evidence(
+      sourceGround.evidence,
+      carrier(memory, theory, dx, dEmpty, [], [[x, ground], [x, ground]]),
+      targetGround,
+    )));
   bad("binding-partition-overlap", carrier(memory, theory, dSource, dTarget,
     [[a, n], [b, n], [c, n], [b1, n1], [c1, n1]], [[a, ground]]));
   bad("undeclared-source-role", carrier(memory, theory, dSource, dTarget,
@@ -237,6 +243,17 @@ function main(): void {
     [[b, n], [c, n], [b1, n1], [c1, extra]], [[a, ground]]));
   bad("grounded-target-role-capture", carrier(memory, theory, dSource, dTarget,
     [[b, n], [c, n], [b1, n1], [c1, n1]], [[a, n]]));
+
+  // A source-grounded constant may not become generic merely because it is active in Ddst.
+  const captureDictionary = defineStructuralRoleDictionary(memory, [L, n1]);
+  const captureSource = admittedGeneric(memory, theory, dx, [], memory.ensure(L, x));
+  const captureTarget = target(memory, theory, captureDictionary, [], memory.ensure(L, n1));
+  expectError("grounded-target-role-capture", () =>
+    replayStructuralDerivedDerivationSpecialization(memory, evidence(
+      captureSource.evidence,
+      carrier(memory, theory, dx, captureDictionary, [[x, n1]], []),
+      captureTarget,
+    )));
 
   const wrongConclusion = target(memory, theory, dTarget,
     [mappedCurrent, mappedStep, mappedStep], tri(ground, n1, n));
