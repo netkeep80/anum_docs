@@ -310,12 +310,32 @@ function main(): void {
     }),
   );
 
-  // Foreign/stronger Theory identity cannot rescue the candidate either.
+  // Rebuild a structurally consistent foreign-Theory envelope so rejection
+  // reaches the exact Theory/admission boundary rather than failing on stale
+  // assumption occurrences from the original identity.
+  const resultNode = result.evidence.nodes[0];
+  assert(resultNode !== undefined, "candidate result node");
   const foreignIdentity = memory.ensure(result.derivationRule, foreignTheory);
-  expectDerivedError("derivation-rule-not-admitted", () =>
+  const foreignAssumptions = result.evidence.assumptions.map(({ template }) =>
+    Object.freeze({ occurrence: memory.ensure(template, foreignIdentity), template }),
+  );
+  const foreignPremises = materializeExactSequence(
+    memory,
+    foreignAssumptions.map(({ occurrence }) => occurrence),
+  );
+  const foreignOccurrence = memory.ensure(result.derivationRule, foreignPremises);
+  expectDerivedError("rule-not-admitted", () =>
     replayStructuralDerivedDerivationSchema(memory, {
-      ...result.evidence,
       identity: foreignIdentity,
+      targetOccurrence: foreignOccurrence,
+      assumptions: Object.freeze(foreignAssumptions),
+      nodes: Object.freeze([
+        Object.freeze({
+          ...resultNode,
+          occurrence: foreignOccurrence,
+          premiseOccurrenceSequence: foreignPremises,
+        }),
+      ]),
     }),
   );
 
