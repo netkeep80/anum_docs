@@ -59,7 +59,6 @@ function fixture() {
   const exact = (values: readonly LinkHandle[]) => materializeExactSequence(memory, values);
 
   // Grounded contextual relation vocabulary is materialized before generic roles.
-  // Host names below explain the witness only; exact Link topology is authority.
   const relationKind = fresh();
   const unaryKind = fresh();
   const binaryKind = fresh();
