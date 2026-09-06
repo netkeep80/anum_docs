@@ -162,6 +162,7 @@ function replayBody(
   const replacements = new Map<LinkHandle, LinkHandle>();
   const roleBindings: StructuralRoleBinding[] = [];
   const seenRolePartition = new Set<LinkHandle>();
+  const seenGroundPartition = new Set<LinkHandle>();
 
   const readBinding = (entry: LinkHandle): readonly [LinkHandle, LinkHandle] => {
     try { const p = memory.poles(entry); return [p.start, p.end] as const; }
@@ -179,8 +180,9 @@ function replayBody(
   for (const entry of groundEntries) {
     const [role, value] = readBinding(entry);
     if (!sourceRoleSet.has(role)) fail("undeclared-source-role");
+    if (seenGroundPartition.has(role)) fail("duplicate-source-role-binding");
+    seenGroundPartition.add(role);
     if (seenRolePartition.has(role)) fail("binding-partition-overlap");
-    if (replacements.has(role)) fail("binding-partition-overlap");
     try { memory.poles(value); } catch { fail("invalid-specialization-carrier"); }
     if (targetRoleSet.has(value)) fail("grounded-target-role-capture");
     replacements.set(role, value);
