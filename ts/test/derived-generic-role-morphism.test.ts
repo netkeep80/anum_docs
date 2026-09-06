@@ -237,7 +237,7 @@ function main(): void {
   expectMorphismError("duplicate-source-role", () => readResearchMorphism(memory, duplicate, theory));
   expectMorphismError("wrong-theory", () => readResearchMorphism(memory, morphismXA, foreignTheory));
 
-  const malformedCarrier = materializeExactSequence(memory, [theory, sourceX, targetAB, grounded]);
+  const malformedCarrier = materializeExactSequence(memory, [theory, sourceX, targetAB]);
   expectMorphismError("invalid-carrier", () => readResearchMorphism(memory, malformedCarrier, theory));
 
   // Host labels cannot supply absent structural mapping evidence.
