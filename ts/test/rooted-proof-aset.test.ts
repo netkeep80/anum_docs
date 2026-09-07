@@ -113,7 +113,8 @@ async function positiveCorpus(): Promise<void> {
   const oneReplay = replayStructuralRootedProofAset(memory, proofRoot(memory, one.identity, oneB));
   same(oneReplay.conclusion, b, "one-step conclusion");
   same(oneReplay.occurrenceCount, 1, "one-step occurrence count");
-  same(oneReplay.assumptionCount, 1, "one-step assumption count");
+  same(oneReplay.declaredAssumptionCount, 1, "one-step declared assumption count");
+  same(oneReplay.usedAssumptionCount, 1, "one-step used assumption count");
   assert(memory.find(theory, one.derivationRule) === undefined, "one-step target DR stays unadmitted");
 
   // Cross-dictionary chain: each primitive infers its own rho from actual claims.
@@ -130,7 +131,8 @@ async function positiveCorpus(): Promise<void> {
   const chainReplay = replayStructuralRootedProofAset(memory, chainRoot);
   same(chainReplay.conclusion, c, "chain conclusion");
   same(chainReplay.occurrenceCount, 2, "chain occurrence count");
-  same(chainReplay.assumptionCount, 1, "chain assumption count");
+  same(chainReplay.declaredAssumptionCount, 1, "chain declared assumption count");
+  same(chainReplay.usedAssumptionCount, 1, "chain used assumption count");
 
   // Unreachable application-like topology is ignored because it is outside P closure.
   const junkH = memory.ensure(junk, chain.identity);
@@ -155,7 +157,8 @@ async function positiveCorpus(): Promise<void> {
   const branchReplay = replayStructuralRootedProofAset(memory, proofRoot(memory, branch.identity, out));
   same(branchReplay.conclusion, c, "branch conclusion");
   same(branchReplay.occurrenceCount, 2, "branch occurrence count");
-  same(branchReplay.assumptionCount, 2, "branch unique assumption count");
+  same(branchReplay.declaredAssumptionCount, 2, "branch unique declared assumption count");
+  same(branchReplay.usedAssumptionCount, 2, "branch unique used assumption count");
 
   const revisionBefore = await computePortableStructuralTheoryRevision(
     exportPortableStructuralTheory(memory, theory),
@@ -194,7 +197,30 @@ function overlapCorpus(): void {
   const replay = replayStructuralRootedProofAset(memory, proofRoot(memory, identity, occurrence));
   same(replay.conclusion, claim, "overlap conclusion");
   same(replay.occurrenceCount, 1, "overlap occurrence count");
-  same(replay.assumptionCount, 0, "overlap assumption count");
+  same(replay.declaredAssumptionCount, 0, "overlap declared assumption count");
+  same(replay.usedAssumptionCount, 0, "overlap used assumption count");
+}
+
+function weakeningCorpus(): void {
+  const memory = new Memory();
+  const { R, L, U } = ensureRootBasis(memory);
+  let cursor = memory.ensure(U, R);
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
+  const theory = memory.ensure(L, U);
+
+  const a = fresh(), extra = fresh(), b = fresh();
+  const sourceA = fresh(), sourceB = fresh();
+  const sourceDictionary = defineStructuralRoleDictionary(memory, [sourceA, sourceB]);
+  const primitive = admittedPrimitive(memory, theory, sourceDictionary, [sourceA], sourceB);
+  const targetDictionary = defineStructuralRoleDictionary(memory, [a, extra, b]);
+  const target = targetIdentity(memory, theory, targetDictionary, [a, extra], b);
+  const hA = memory.ensure(a, target.identity);
+  const out = proofOccurrence(memory, b, primitive.derivationRule, [hA]);
+
+  const replay = replayStructuralRootedProofAset(memory, proofRoot(memory, target.identity, out));
+  same(replay.conclusion, b, "weakening conclusion");
+  same(replay.declaredAssumptionCount, 2, "weakening declared assumption count");
+  same(replay.usedAssumptionCount, 1, "weakening used assumption count");
 }
 
 function adversarialCorpus(): void {
@@ -286,6 +312,7 @@ function adversarialCorpus(): void {
 async function main(): Promise<void> {
   await positiveCorpus();
   overlapCorpus();
+  weakeningCorpus();
   adversarialCorpus();
   console.log("rooted proof-Aset primitive/chain/branch = SUPPORTED");
   console.log("rooted proof-Aset contextual role overlap = SUPPORTED");
