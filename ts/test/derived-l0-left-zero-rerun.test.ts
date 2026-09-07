@@ -604,6 +604,18 @@ function probeRootedProofAset(): void {
   const rABX = admittedGeneric(memory, theory, dABX, [a, b], x);
   const rXBC = admittedGeneric(memory, theory, dXBC, [x, b], c);
 
+  // T1: one primitive application is independently replayable from P.
+  const dOne = defineStructuralRoleDictionary(memory, [a, b, c]);
+  const one = resultIdentity(memory, theory, dOne, [a], b);
+  const oneH = memory.ensure(a, one.identity);
+  const oneO = rootedOccurrence(memory, b, rAB.derivationRule, [oneH]);
+  const oneReplay = replayRootedProofAset(memory, rootedProof(memory, one.identity, oneO));
+  same(oneReplay.conclusion, b, "rooted one-step conclusion");
+  same(oneReplay.occurrenceCount, 1, "rooted one-step occurrence count");
+  same(oneReplay.assumptionCount, 1, "rooted one-step assumption count");
+  assert(memory.find(theory, one.derivationRule) === undefined,
+    "rooted one-step target DR remains unadmitted");
+
   // T1: chain from P only; source primitive dictionaries are deliberately distinct.
   const dChain = defineStructuralRoleDictionary(memory, [a, c]);
   const chain = resultIdentity(memory, theory, dChain, [a], c);
@@ -685,6 +697,17 @@ function probeTopologyRoleOverlap(): void {
   same(replay.conclusion, claim, "context resolves overlapping I/A/H/O roles");
   same(replay.occurrenceCount, 1, "overlap proof occurrence count");
   same(replay.assumptionCount, 0, "overlap proof has no external assumptions");
+
+  // P versus ordinary occurrence + cyclic self-reference challenge. The
+  // self-end-closed Link is simultaneously supplied as root and target
+  // occurrence (`P.end == P`). It must fail closed from topology alone rather
+  // than being accepted because a host layer labels it as P or O.
+  const selfReference = memory.ensureEndSelfClosed(identity);
+  const selfReferencePoles = memory.poles(selfReference);
+  same(selfReferencePoles.start, identity, "self-reference P start is I");
+  same(selfReferencePoles.end, selfReference, "self-reference P points to itself");
+  expectProbeFailure("rooted P/O cyclic self-reference", () =>
+    replayRootedProofAset(memory, selfReference));
 }
 
 async function probeProofAsetComposition(): Promise<void> {
@@ -1033,6 +1056,7 @@ async function main(): Promise<void> {
   console.log("P3 shared occurrence + derived expansion = SUPPORTED");
   console.log("TOPOLOGY = SUPPORTED");
   console.log("WHOLE_DR_RHO = SUPPORTED");
+  console.log("T2 P/O cyclic self-reference shape = REJECTED");
   console.log("L0 rooted BASE/STEP candidate replay = SUPPORTED");
   console.log("L0 proof-Aset representation = SUPPORTED");
   console.log("L0 first production trusted consumer reject = invalid-base");
