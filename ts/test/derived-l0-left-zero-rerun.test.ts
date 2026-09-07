@@ -52,6 +52,11 @@ function expectClosureError(code: string, effect: () => unknown): void {
   }
   throw new Error(`${code}: expected closure rejection`);
 }
+function expectProbeFailure(label: string, effect: () => unknown): void {
+  try { effect(); }
+  catch { return; }
+  throw new Error(`${label}: expected rejection`);
+}
 
 interface GenericFixture {
   readonly rule: LinkHandle;
@@ -71,6 +76,12 @@ interface ProofAsetEvidence {
   readonly identity: LinkHandle;
   readonly targetOccurrence: LinkHandle;
   readonly nodes: readonly StructuralDerivedDerivationNodeEvidence[];
+}
+interface RootedProofReplayResult {
+  readonly theory: LinkHandle;
+  readonly conclusion: LinkHandle;
+  readonly occurrenceCount: number;
+  readonly assumptionCount: number;
 }
 
 function admittedGeneric(
@@ -243,6 +254,196 @@ function makeNode(
 }
 
 /**
+ * Test-local cumulative unifier for one complete StructuralDerivationRule.
+ * The RoleDictionary is read from the source rule topology; the Map is only a
+ * traversal projection. Grounded source subtrees retain exact Link identity.
+ */
+function wholeDerivationBindings(
+  memory: Memory,
+  derivationRule: LinkHandle,
+  actualPremises: readonly LinkHandle[],
+  actualConclusion: LinkHandle,
+): ReadonlyMap<LinkHandle, LinkHandle> {
+  const before = memory.linkCount;
+  const schema = readStructuralDerivationRule(memory, derivationRule);
+  const rule = readStructuralRule(memory, schema.structuralRule);
+  const dictionary = memory.poles(rule.roleDictionary);
+  assert(
+    dictionary.start === rule.roleDictionary && dictionary.end !== rule.roleDictionary,
+    "whole-DR invalid source RoleDictionary",
+  );
+  const roles = readExactSequence(memory, dictionary.end).values;
+  assert(new Set(roles).size === roles.length, "whole-DR duplicate source role");
+  assert(actualPremises.length === schema.premiseTemplates.length, "whole-DR premise arity");
+
+  const roleSet = new Set(roles);
+  const rho = new Map<LinkHandle, LinkHandle>();
+  const containsMemo = new Map<LinkHandle, boolean>();
+  const containsActive = new Set<LinkHandle>();
+
+  const containsRole = (node: LinkHandle): boolean => {
+    if (roleSet.has(node)) return true;
+    const cached = containsMemo.get(node);
+    if (cached !== undefined) return cached;
+    if (containsActive.has(node)) return false;
+    containsActive.add(node);
+    try {
+      const poles = memory.poles(node);
+      const result = containsRole(poles.start) || containsRole(poles.end);
+      containsMemo.set(node, result);
+      return result;
+    } finally {
+      containsActive.delete(node);
+    }
+  };
+
+  const visited = new Map<LinkHandle, Set<LinkHandle>>();
+  const seen = (left: LinkHandle, right: LinkHandle): boolean => {
+    let rights = visited.get(left);
+    if (rights === undefined) {
+      rights = new Set<LinkHandle>();
+      visited.set(left, rights);
+    }
+    if (rights.has(right)) return true;
+    rights.add(right);
+    return false;
+  };
+
+  const unify = (template: LinkHandle, actual: LinkHandle): void => {
+    if (roleSet.has(template)) {
+      const previous = rho.get(template);
+      if (previous !== undefined && previous !== actual) {
+        throw new Error("whole-DR conflicting role binding");
+      }
+      rho.set(template, actual);
+      return;
+    }
+    if (!containsRole(template)) {
+      if (template !== actual) throw new Error("whole-DR grounded template mismatch");
+      return;
+    }
+    if (seen(template, actual)) return;
+    const left = memory.poles(template);
+    const right = memory.poles(actual);
+    unify(left.start, right.start);
+    unify(left.end, right.end);
+  };
+
+  try {
+    unify(rule.body, actualConclusion);
+    schema.premiseTemplates.forEach((template, index) => {
+      const actual = actualPremises[index];
+      assert(actual !== undefined, "whole-DR premise arity");
+      unify(template, actual);
+    });
+    for (const role of roles) assert(rho.has(role), "whole-DR missing role binding");
+    same(memory.linkCount, before, "whole-DR replay read-only");
+    return rho;
+  } finally {
+    same(memory.linkCount, before, "whole-DR replay read-only");
+  }
+}
+
+/**
+ * Candidate rooted proof-Aset replay from #1042.
+ *
+ * The only input is the root Link P. Host Sets/Maps below cache traversal; they
+ * do not supply membership, node kinds, or authority. I/H/A/O/P are contextual
+ * roles recovered from the path being verified, so one exact Link may legally
+ * satisfy more than one role when all structural obligations agree.
+ */
+function replayRootedProofAset(memory: Memory, root: LinkHandle): RootedProofReplayResult {
+  const before = memory.linkCount;
+  const rootPoles = memory.poles(root);
+  const identity = rootPoles.start;
+  const targetOccurrence = rootPoles.end;
+  const identityPoles = memory.poles(identity);
+  const targetDerivationRule = identityPoles.start;
+  const theory = identityPoles.end;
+  const targetSchema = readStructuralDerivationRule(memory, targetDerivationRule);
+  const targetRule = readStructuralRule(memory, targetSchema.structuralRule);
+  const targetPremises = new Set(targetSchema.premiseTemplates);
+  const usedAssumptions = new Set<LinkHandle>();
+  const active = new Set<LinkHandle>();
+  const verified = new Map<LinkHandle, LinkHandle>();
+
+  const verifyOccurrence = (occurrence: LinkHandle): LinkHandle => {
+    const cached = verified.get(occurrence);
+    if (cached !== undefined) return cached;
+    assert(!active.has(occurrence), "rooted proof-Aset cyclic dependency");
+    active.add(occurrence);
+    try {
+      const occurrencePoles = memory.poles(occurrence);
+      const claim = occurrencePoles.start;
+      const application = occurrencePoles.end;
+      const applicationPoles = memory.poles(application);
+      const primitiveDerivationRule = applicationPoles.start;
+      const dependencySequence = applicationPoles.end;
+      const primitiveSchema = readStructuralDerivationRule(memory, primitiveDerivationRule);
+
+      assert(
+        memory.find(theory, primitiveSchema.structuralRule) !== undefined,
+        "rooted proof-Aset primitive Rule not admitted",
+      );
+      assert(
+        memory.find(theory, primitiveDerivationRule) !== undefined,
+        "rooted proof-Aset primitive DR not admitted",
+      );
+
+      const dependencyOccurrences = readExactSequence(memory, dependencySequence).values;
+      const dependencyClaims = dependencyOccurrences.map((dependency) => {
+        const poles = memory.poles(dependency);
+        if (poles.end === identity && targetPremises.has(poles.start)) {
+          usedAssumptions.add(poles.start);
+          return poles.start;
+        }
+        return verifyOccurrence(dependency);
+      });
+
+      wholeDerivationBindings(memory, primitiveDerivationRule, dependencyClaims, claim);
+      verified.set(occurrence, claim);
+      return claim;
+    } finally {
+      active.delete(occurrence);
+    }
+  };
+
+  try {
+    const conclusion = verifyOccurrence(targetOccurrence);
+    same(conclusion, targetRule.body, "rooted proof-Aset target conclusion");
+    for (const premise of targetPremises) {
+      assert(usedAssumptions.has(premise), "rooted proof-Aset unused target premise");
+    }
+    same(memory.linkCount, before, "rooted proof-Aset replay read-only");
+    return Object.freeze({
+      theory,
+      conclusion,
+      occurrenceCount: verified.size,
+      assumptionCount: usedAssumptions.size,
+    });
+  } finally {
+    same(memory.linkCount, before, "rooted proof-Aset replay read-only");
+  }
+}
+
+function rootedOccurrence(
+  memory: Memory,
+  claim: LinkHandle,
+  primitiveDerivationRule: LinkHandle,
+  dependencies: readonly LinkHandle[],
+): LinkHandle {
+  const application = memory.ensure(
+    primitiveDerivationRule,
+    materializeExactSequence(memory, dependencies),
+  );
+  return memory.ensure(claim, application);
+}
+
+function rootedProof(memory: Memory, identity: LinkHandle, targetOccurrence: LinkHandle): LinkHandle {
+  return memory.ensure(identity, targetOccurrence);
+}
+
+/**
  * Test-local reader for an MTS proof Aset.
  * `nodes` is only a traversal index; authority remains in exact MTS Link identity,
  * dependency sequences, and primitive Theory admissions.
@@ -384,6 +585,129 @@ function specializationProofAsetCarrier(
     materializeExactSequence(memory, evidence.targetAssumptions.map(({ occurrence }) => occurrence)),
     evidence.targetOccurrence,
   ]);
+}
+
+function probeRootedProofAset(): void {
+  const memory = new Memory();
+  const { R, L, U } = ensureRootBasis(memory);
+  let cursor = memory.ensure(U, R);
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
+  const theory = memory.ensure(L, U);
+  const a = fresh(), b = fresh(), c = fresh(), x = fresh(), junk = fresh();
+
+  const dAB = defineStructuralRoleDictionary(memory, [a, b]);
+  const dBC = defineStructuralRoleDictionary(memory, [b, c]);
+  const dABX = defineStructuralRoleDictionary(memory, [a, b, x]);
+  const dXBC = defineStructuralRoleDictionary(memory, [x, b, c]);
+  const rAB = admittedGeneric(memory, theory, dAB, [a], b);
+  const rBC = admittedGeneric(memory, theory, dBC, [b], c);
+  const rABX = admittedGeneric(memory, theory, dABX, [a, b], x);
+  const rXBC = admittedGeneric(memory, theory, dXBC, [x, b], c);
+
+  // T1: one primitive application is independently replayable from P.
+  const dOne = defineStructuralRoleDictionary(memory, [a, b, c]);
+  const one = resultIdentity(memory, theory, dOne, [a], b);
+  const oneH = memory.ensure(a, one.identity);
+  const oneO = rootedOccurrence(memory, b, rAB.derivationRule, [oneH]);
+  const oneReplay = replayRootedProofAset(memory, rootedProof(memory, one.identity, oneO));
+  same(oneReplay.conclusion, b, "rooted one-step conclusion");
+  same(oneReplay.occurrenceCount, 1, "rooted one-step occurrence count");
+  same(oneReplay.assumptionCount, 1, "rooted one-step assumption count");
+  assert(memory.find(theory, one.derivationRule) === undefined,
+    "rooted one-step target DR remains unadmitted");
+
+  // T1: chain from P only; source primitive dictionaries are deliberately distinct.
+  const dChain = defineStructuralRoleDictionary(memory, [a, c]);
+  const chain = resultIdentity(memory, theory, dChain, [a], c);
+  const hA = memory.ensure(a, chain.identity);
+  const oB = rootedOccurrence(memory, b, rAB.derivationRule, [hA]);
+  const oC = rootedOccurrence(memory, c, rBC.derivationRule, [oB]);
+  const chainRoot = rootedProof(memory, chain.identity, oC);
+  const chainReplay = replayRootedProofAset(memory, chainRoot);
+  same(chainReplay.conclusion, c, "rooted chain conclusion");
+  same(chainReplay.occurrenceCount, 2, "rooted chain occurrence count");
+  same(chainReplay.assumptionCount, 1, "rooted chain assumption count");
+  assert(memory.find(theory, chain.derivationRule) === undefined,
+    "rooted chain target DR remains unadmitted");
+
+  // Unreachable application-like topology is deliberately present but never traversed from P.
+  const junkH = memory.ensure(junk, chain.identity);
+  const junkOccurrence = rootedOccurrence(memory, b, rAB.derivationRule, [junkH]);
+  assert(junkOccurrence !== oB, "unreachable rooted occurrence is distinct");
+  same(replayRootedProofAset(memory, chainRoot).occurrenceCount, 2,
+    "unreachable rooted occurrence ignored");
+
+  // T1 shared semantic occurrence: one exact H(B) satisfies two structural positions.
+  const dBranch = defineStructuralRoleDictionary(memory, [a, b, c]);
+  const branch = resultIdentity(memory, theory, dBranch, [a, b, b], c);
+  const branchA = memory.ensure(a, branch.identity);
+  const branchB = memory.ensure(b, branch.identity);
+  const branchX = rootedOccurrence(memory, x, rABX.derivationRule, [branchA, branchB]);
+  const branchC = rootedOccurrence(memory, c, rXBC.derivationRule, [branchX, branchB]);
+  const branchRoot = rootedProof(memory, branch.identity, branchC);
+  const branchReplay = replayRootedProofAset(memory, branchRoot);
+  same(branchReplay.conclusion, c, "rooted branching conclusion");
+  same(branchReplay.occurrenceCount, 2, "rooted branching occurrence count");
+  same(branchReplay.assumptionCount, 2, "rooted branching unique assumptions");
+  const branchXDependencies = readExactSequence(
+    memory, memory.poles(memory.poles(branchX).end).end,
+  ).values;
+  const branchCDependencies = readExactSequence(
+    memory, memory.poles(memory.poles(branchC).end).end,
+  ).values;
+  same(branchXDependencies[1], branchB, "rooted shared B first reference");
+  same(branchCDependencies[1], branchB, "rooted shared B second reference");
+
+  // T2: a derived identity is not primitive authority even if shaped as an application.
+  const forgedApplication = memory.ensure(
+    chain.derivationRule,
+    materializeExactSequence(memory, [hA]),
+  );
+  const forgedOccurrence = memory.ensure(c, forgedApplication);
+  const forgedRoot = rootedProof(memory, chain.identity, forgedOccurrence);
+  expectProbeFailure("rooted forged derived promotion", () =>
+    replayRootedProofAset(memory, forgedRoot));
+}
+
+function probeTopologyRoleOverlap(): void {
+  const memory = new Memory();
+  const { R, U } = ensureRootBasis(memory);
+  let cursor = memory.ensure(U, R);
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
+
+  // Empty ExactSequence is R. Choosing the exact Theory as R makes I and A
+  // literally the same Link for an admitted zero-premise primitive DR.
+  // This is legal role overlap, not a host-type error: root context must still
+  // force the target occurrence to be verified as O rather than guessed by tag.
+  const theory = R;
+  const claim = fresh();
+  const dictionary = defineStructuralRoleDictionary(memory, []);
+  const primitive = admittedGeneric(memory, theory, dictionary, [], claim);
+  const identity = primitive.identity;
+  const application = memory.ensure(
+    primitive.derivationRule,
+    materializeExactSequence(memory, []),
+  );
+  same(identity, application, "candidate I/A exact Link overlap");
+  const occurrence = memory.ensure(claim, application);
+  const hypothesisShape = memory.ensure(claim, identity);
+  same(occurrence, hypothesisShape, "candidate H/O exact Link overlap");
+  const root = rootedProof(memory, identity, occurrence);
+  const replay = replayRootedProofAset(memory, root);
+  same(replay.conclusion, claim, "context resolves overlapping I/A/H/O roles");
+  same(replay.occurrenceCount, 1, "overlap proof occurrence count");
+  same(replay.assumptionCount, 0, "overlap proof has no external assumptions");
+
+  // P versus ordinary occurrence + cyclic self-reference challenge. The
+  // self-end-closed Link is simultaneously supplied as root and target
+  // occurrence (`P.end == P`). It must fail closed from topology alone rather
+  // than being accepted because a host layer labels it as P or O.
+  const selfReference = memory.ensureEndSelfClosed(identity);
+  const selfReferencePoles = memory.poles(selfReference);
+  same(selfReferencePoles.start, identity, "self-reference P start is I");
+  same(selfReferencePoles.end, selfReference, "self-reference P points to itself");
+  expectProbeFailure("rooted P/O cyclic self-reference", () =>
+    replayRootedProofAset(memory, selfReference));
 }
 
 async function probeProofAsetComposition(): Promise<void> {
@@ -567,6 +891,53 @@ async function probeL0(): Promise<void> {
   same(stepReplay.premiseSlotCount, 3, "mixed STEP structural slots");
   same(memory.linkCount, stepBefore, "mixed STEP replay read-only");
 
+  // T3: one rho is inferred across conclusion + all Add STEP premise slots.
+  const l0Rho = wholeDerivationBindings(
+    memory, sourceStep.derivationRule, [l0Current, l0S0, l0S0], l0Next);
+  same(l0Rho.get(a), U, "whole-DR A grounded to U");
+  same(l0Rho.get(b), n, "whole-DR B mapped to N");
+  same(l0Rho.get(c), n, "whole-DR C non-injectively mapped to N");
+  same(l0Rho.get(b1), n1, "whole-DR B1 mapped to N1");
+  same(l0Rho.get(c1), n1, "whole-DR C1 non-injectively mapped to N1");
+  expectProbeFailure("whole-DR wrong premise arity", () =>
+    wholeDerivationBindings(memory, sourceStep.derivationRule, [l0Current, l0S0], l0Next));
+  expectProbeFailure("whole-DR conflicting repeated role", () =>
+    wholeDerivationBindings(
+      memory,
+      sourceStep.derivationRule,
+      [l0Current, s0(n, x1), l0S0],
+      l0Next,
+    ));
+  expectProbeFailure("whole-DR mutated grounded U", () =>
+    wholeDerivationBindings(memory, sourceBase.derivationRule, [], add(U, n, U)));
+
+  const distinctCurrent = add(U, n, x);
+  const distinctLeft = s0(n, n1);
+  const distinctRight = s0(x, x1);
+  const distinctNext = add(U, n1, x1);
+  const distinctRho = wholeDerivationBindings(
+    memory, sourceStep.derivationRule, [distinctCurrent, distinctLeft, distinctRight], distinctNext);
+  same(distinctRho.get(b), n, "whole-DR ordered B slot");
+  same(distinctRho.get(c), x, "whole-DR ordered C slot");
+  expectProbeFailure("whole-DR wrong premise slot", () =>
+    wholeDerivationBindings(
+      memory, sourceStep.derivationRule, [distinctCurrent, distinctRight, distinctLeft], distinctNext));
+
+  const unusedRoleDictionary = defineStructuralRoleDictionary(memory, [a, x]);
+  const partialRule = defineStructuralRule(memory, unusedRoleDictionary, add(a, U, a));
+  const partialDR = defineStructuralDerivationRule(memory, partialRule, []);
+  expectProbeFailure("whole-DR partial rho", () =>
+    wholeDerivationBindings(memory, partialDR, [], add(U, U, U)));
+
+  const foreignGround = fresh();
+  const foreignOther = fresh();
+  defineStructuralRoleDictionary(memory, [foreignGround]);
+  const groundedDictionary = defineStructuralRoleDictionary(memory, []);
+  const groundedRule = defineStructuralRule(memory, groundedDictionary, foreignGround);
+  const groundedDR = defineStructuralDerivationRule(memory, groundedRule, []);
+  expectProbeFailure("whole-DR foreign RoleDictionary cannot capture grounded Link", () =>
+    wholeDerivationBindings(memory, groundedDR, [], foreignOther));
+
   const stepSlots = readExactSequence(memory, memory.poles(stepTarget.targetOccurrence).end).values;
   same(stepSlots.length, 3, "L0 STEP structural slots");
   same(new Set(stepSlots).size, 2, "L0 STEP unique semantic occurrences");
@@ -578,6 +949,31 @@ async function probeL0(): Promise<void> {
     "mixed BASE target DR remains unadmitted");
   assert(memory.find(theory, stepTarget.derivationRule) === undefined,
     "mixed STEP target DR remains unadmitted");
+
+  // T4/T5: specialization metadata builds evidence above but is not supplied to
+  // rooted replay. Only resulting MTS topology + exact Theory are consumed.
+  const rootedBaseOccurrence = rootedOccurrence(memory, addUUU, sourceBase.derivationRule, []);
+  const rootedBase = replayRootedProofAset(
+    memory, rootedProof(memory, baseTarget.identity, rootedBaseOccurrence));
+  same(rootedBase.conclusion, addUUU, "rooted L0 BASE conclusion");
+  same(rootedBase.assumptionCount, 0, "rooted L0 BASE assumptions");
+
+  const rootedStepCurrent = memory.ensure(l0Current, stepTarget.identity);
+  const rootedStepS0 = memory.ensure(l0S0, stepTarget.identity);
+  const rootedStepOccurrence = rootedOccurrence(
+    memory,
+    l0Next,
+    sourceStep.derivationRule,
+    [rootedStepCurrent, rootedStepS0, rootedStepS0],
+  );
+  const rootedStep = replayRootedProofAset(
+    memory, rootedProof(memory, stepTarget.identity, rootedStepOccurrence));
+  same(rootedStep.conclusion, l0Next, "rooted L0 STEP conclusion");
+  same(rootedStep.assumptionCount, 2, "rooted L0 STEP unique assumptions");
+  const rootedStepDeps = readExactSequence(
+    memory, memory.poles(memory.poles(rootedStepOccurrence).end).end,
+  ).values;
+  same(rootedStepDeps[1], rootedStepDeps[2], "rooted L0 STEP exact S0 occurrence reused");
 
   const baseProofObject = unadmittedTargetEvidence(baseTarget);
   expectSchemaError("target-occurrence-not-found", () =>
@@ -651,14 +1047,20 @@ async function probeL0(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  probeRootedProofAset();
+  probeTopologyRoleOverlap();
   await probeProofAsetComposition();
   await probeL0();
   console.log("P1 shared proof-Aset occurrence reuse = SUPPORTED");
   console.log("P2 proof-carrying derived DR composition = SUPPORTED");
   console.log("P3 shared occurrence + derived expansion = SUPPORTED");
+  console.log("TOPOLOGY = SUPPORTED");
+  console.log("WHOLE_DR_RHO = SUPPORTED");
+  console.log("T2 P/O cyclic self-reference shape = REJECTED");
+  console.log("L0 rooted BASE/STEP candidate replay = SUPPORTED");
   console.log("L0 proof-Aset representation = SUPPORTED");
-  console.log("L0 first trusted consumer reject = invalid-base");
-  console.log("classification = L0_PROOF_ASET_COMPOSITION_REPLAY_GAP_CONFIRMED");
+  console.log("L0 first production trusted consumer reject = invalid-base");
+  console.log("PRODUCTION_GAP = GENERIC_ROOTED_PROOF_ASET_REPLAY_GAP_CONFIRMED");
   console.log("guarded-step weakening = NOT REACHED");
 }
 
