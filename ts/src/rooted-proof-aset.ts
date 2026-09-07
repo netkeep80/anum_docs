@@ -22,7 +22,6 @@ export type StructuralRootedProofAsetReplayErrorCode =
   | "premise-arity-mismatch"
   | "template-mismatch"
   | "cyclic-dependency"
-  | "unused-target-premise"
   | "replay-wrote";
 
 export class StructuralRootedProofAsetReplayError extends Error {
@@ -318,9 +317,6 @@ export function replayStructuralRootedProofAset(
 
     const conclusion = verifyOccurrence(targetOccurrence);
     if (conclusion !== targetRule.body) fail("template-mismatch");
-    for (const premise of targetPremises) {
-      if (!usedPremises.has(premise)) fail("unused-target-premise");
-    }
 
     return Object.freeze({
       theory,
