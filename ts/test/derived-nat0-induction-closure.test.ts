@@ -14,6 +14,7 @@ import {
   replayStructuralDerivedDerivationSchema,
   type StructuralDerivedDerivationEvidence,
 } from "../src/derived-derivation-schema.js";
+import { replayStructuralRootedProofAset } from "../src/rooted-proof-aset.js";
 import {
   StructuralClosureApplicationReplayError,
   replayStructuralClosureApplication,
@@ -48,6 +49,7 @@ function expectDerivedError(code: string, effect: () => unknown): void {
 interface GenericFixture {
   readonly derivationRule: LinkHandle;
   readonly identity: LinkHandle;
+  readonly root: LinkHandle;
   readonly evidence: StructuralDerivedDerivationEvidence;
 }
 
@@ -70,9 +72,12 @@ function admittedGeneric(
     memory, assumptions.map(({ occurrence }) => occurrence),
   );
   const targetOccurrence = memory.ensure(derivationRule, premiseOccurrenceSequence);
+  const rootedOccurrence = memory.ensure(conclusion, targetOccurrence);
+  const root = memory.ensure(identity, rootedOccurrence);
   return Object.freeze({
     derivationRule,
     identity,
+    root,
     evidence: Object.freeze({
       identity,
       targetOccurrence,
@@ -106,9 +111,12 @@ function unadmittedGeneric(
     memory, assumptions.map(({ occurrence }) => occurrence),
   );
   const targetOccurrence = memory.ensure(derivationRule, premiseOccurrenceSequence);
+  const rootedOccurrence = memory.ensure(conclusion, targetOccurrence);
+  const root = memory.ensure(identity, rootedOccurrence);
   return Object.freeze({
     derivationRule,
     identity,
+    root,
     evidence: Object.freeze({
       identity,
       targetOccurrence,
@@ -198,9 +206,13 @@ function main(): void {
   const natBase = admittedGeneric(memory, theory, dBase, [], natU);
   const natStep = admittedGeneric(memory, theory, dStep, [natN, s0NN1], natN1);
   same(replayStructuralDerivedDerivationSchema(memory, natBase.evidence).conclusionTemplate, natU,
-    "Nat0(U) control");
+    "Nat0(U) strict control");
   same(replayStructuralDerivedDerivationSchema(memory, natStep.evidence).conclusionTemplate, natN1,
-    "Nat0 successor-closure control");
+    "Nat0 successor-closure strict control");
+  same(replayStructuralRootedProofAset(memory, natBase.root).conclusion, natU,
+    "Nat0(U) rooted control");
+  same(replayStructuralRootedProofAset(memory, natStep.root).conclusion, natN1,
+    "Nat0 successor-closure rooted control");
 
   const authority = materializeExactSequence(memory, [
     theory, dAuthority, U, natU, natX, s0XX1, natX1,
@@ -210,9 +222,13 @@ function main(): void {
   const base = admittedGeneric(memory, theory, dBase, [], cU);
   const step = admittedGeneric(memory, theory, dStep, [natN, s0NN1, cN], cN1);
   same(replayStructuralDerivedDerivationSchema(memory, base.evidence).conclusionTemplate, cU,
-    "IND BASE control");
+    "IND BASE strict control");
   same(replayStructuralDerivedDerivationSchema(memory, step.evidence).conclusionTemplate, cN1,
-    "IND STEP control");
+    "IND STEP strict control");
+  same(replayStructuralRootedProofAset(memory, base.root).conclusion, cU,
+    "IND BASE rooted control");
+  same(replayStructuralRootedProofAset(memory, step.root).conclusion, cN1,
+    "IND STEP rooted control");
 
   const result = unadmittedGeneric(memory, theory, dResult, [natN], cN);
   assert(memory.find(theory, result.derivationRule) === undefined,
@@ -228,8 +244,8 @@ function main(): void {
   const evidence: StructuralClosureApplicationEvidence = Object.freeze({
     authority,
     authorityAdmission,
-    base: base.evidence,
-    step: step.evidence,
+    baseRoot: base.root,
+    stepRoot: step.root,
     resultIdentity: result.identity,
     authorityMorphism,
     currentMorphism,
@@ -275,13 +291,13 @@ function main(): void {
   const wrongNatN = memory.ensure(wrongDomainContext, n);
   const wrongDomainStep = admittedGeneric(memory, theory, dStep, [wrongNatN, s0NN1, cN], cN1);
   expectClosureError("domain-mismatch", () =>
-    replayStructuralClosureApplication(memory, { ...evidence, step: wrongDomainStep.evidence }),
+    replayStructuralClosureApplication(memory, { ...evidence, stepRoot: wrongDomainStep.root }),
   );
 
   const wrongS0 = s0(n1, n);
   const wrongStep = admittedGeneric(memory, theory, dStep, [natN, wrongS0, cN], cN1);
   expectClosureError("step-mismatch", () =>
-    replayStructuralClosureApplication(memory, { ...evidence, step: wrongStep.evidence }),
+    replayStructuralClosureApplication(memory, { ...evidence, stepRoot: wrongStep.root }),
   );
 
   const foreignAuthority = materializeExactSequence(memory, [

@@ -2,10 +2,9 @@ import { ExactSequenceError, readExactSequence } from "./exact-sequence.js";
 import { MemoryError, type LinkHandle, type ReadMemory } from "./memory.js";
 import { readStructuralDerivationRule } from "./derivation.js";
 import {
-  replayStructuralDerivedDerivationSchema,
-  type StructuralDerivedDerivationEvidence,
-  type StructuralDerivedDerivationReplayResult,
-} from "./derived-derivation-schema.js";
+  replayStructuralRootedProofAset,
+  type StructuralRootedProofAsetReplayResult,
+} from "./rooted-proof-aset.js";
 import {
   StructuralRuleError,
   matchStructuralTemplate,
@@ -42,8 +41,8 @@ export class StructuralClosureApplicationReplayError extends Error {
 export interface StructuralClosureApplicationEvidence {
   readonly authority: LinkHandle;
   readonly authorityAdmission: LinkHandle;
-  readonly base: StructuralDerivedDerivationEvidence;
-  readonly step: StructuralDerivedDerivationEvidence;
+  readonly baseRoot: LinkHandle;
+  readonly stepRoot: LinkHandle;
   readonly resultIdentity: LinkHandle;
   readonly authorityMorphism: LinkHandle;
   readonly currentMorphism: LinkHandle;
@@ -56,8 +55,8 @@ export interface StructuralClosureApplicationReplayResult {
   readonly authority: LinkHandle;
   readonly resultDerivationRule: LinkHandle;
   readonly resultConclusionTemplate: LinkHandle;
-  readonly base: StructuralDerivedDerivationReplayResult;
-  readonly step: StructuralDerivedDerivationReplayResult;
+  readonly base: StructuralRootedProofAsetReplayResult;
+  readonly step: StructuralRootedProofAsetReplayResult;
 }
 
 interface MappingBinding { readonly sourceRole: LinkHandle; readonly targetRole: LinkHandle; }
@@ -228,11 +227,11 @@ export function replayStructuralClosureApplication(
     verifyMapping(memory, domainCurrent!, domainBase!, [{ sourceRole: x, targetRole: generator! }], [], "invalid-authority");
     verifyMapping(memory, domainCurrent!, domainNext!, [{ sourceRole: x, targetRole: x1 }], authorityRoles, "invalid-authority");
 
-    let base: StructuralDerivedDerivationReplayResult;
-    let step: StructuralDerivedDerivationReplayResult;
-    try { base = replayStructuralDerivedDerivationSchema(memory, evidence.base); }
+    let base: StructuralRootedProofAsetReplayResult;
+    let step: StructuralRootedProofAsetReplayResult;
+    try { base = replayStructuralRootedProofAset(memory, evidence.baseRoot); }
     catch { fail("invalid-base"); }
-    try { step = replayStructuralDerivedDerivationSchema(memory, evidence.step); }
+    try { step = replayStructuralRootedProofAset(memory, evidence.stepRoot); }
     catch { fail("invalid-step"); }
     if (base.theory !== theory || step.theory !== theory) fail("theory-mismatch");
 
@@ -243,8 +242,8 @@ export function replayStructuralClosureApplication(
 
     let baseParts: ReturnType<typeof schemaParts>, stepParts: ReturnType<typeof schemaParts>, resultParts: ReturnType<typeof schemaParts>;
     try {
-      baseParts = schemaParts(memory, base.derivationRule);
-      stepParts = schemaParts(memory, step.derivationRule);
+      baseParts = schemaParts(memory, base.targetDerivationRule);
+      stepParts = schemaParts(memory, step.targetDerivationRule);
       resultParts = schemaParts(memory, resultDerivationRule);
     } catch { fail("invalid-result-identity"); }
     if (memory.find(theory!, resultParts.schema.structuralRule) === undefined) fail("invalid-result-identity");
