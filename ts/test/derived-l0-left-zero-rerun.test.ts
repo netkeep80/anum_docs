@@ -825,7 +825,7 @@ async function probeProofAsetComposition(): Promise<void> {
   same(revisionAfter.value, revisionBefore.value, "proof-Aset expansion preserves exact Theory revision");
 }
 
-async function probeL0(): Promise<void> {
+async function probeL0(): Promise<string> {
   const memory = new Memory();
   const { R, O, C, L, U } = ensureRootBasis(memory);
   let cursor = memory.ensure(U, R);
@@ -953,8 +953,8 @@ async function probeL0(): Promise<void> {
   // T4/T5: specialization metadata builds evidence above but is not supplied to
   // rooted replay. Only resulting MTS topology + exact Theory are consumed.
   const rootedBaseOccurrence = rootedOccurrence(memory, addUUU, sourceBase.derivationRule, []);
-  const rootedBase = replayRootedProofAset(
-    memory, rootedProof(memory, baseTarget.identity, rootedBaseOccurrence));
+  const rootedBaseRoot = rootedProof(memory, baseTarget.identity, rootedBaseOccurrence);
+  const rootedBase = replayRootedProofAset(memory, rootedBaseRoot);
   same(rootedBase.conclusion, addUUU, "rooted L0 BASE conclusion");
   same(rootedBase.assumptionCount, 0, "rooted L0 BASE assumptions");
 
@@ -966,8 +966,8 @@ async function probeL0(): Promise<void> {
     sourceStep.derivationRule,
     [rootedStepCurrent, rootedStepS0, rootedStepS0],
   );
-  const rootedStep = replayRootedProofAset(
-    memory, rootedProof(memory, stepTarget.identity, rootedStepOccurrence));
+  const rootedStepRoot = rootedProof(memory, stepTarget.identity, rootedStepOccurrence);
+  const rootedStep = replayRootedProofAset(memory, rootedStepRoot);
   same(rootedStep.conclusion, l0Next, "rooted L0 STEP conclusion");
   same(rootedStep.assumptionCount, 2, "rooted L0 STEP unique assumptions");
   const rootedStepDeps = readExactSequence(
@@ -1018,8 +1018,8 @@ async function probeL0(): Promise<void> {
   const closureEvidence = Object.freeze({
     authority,
     authorityAdmission,
-    base: baseProofObject,
-    step: stepProofObject,
+    baseRoot: rootedBaseRoot,
+    stepRoot: rootedStepRoot,
     resultIdentity: result.identity,
     authorityMorphism,
     currentMorphism,
@@ -1030,8 +1030,17 @@ async function probeL0(): Promise<void> {
   const revisionBefore = await computePortableStructuralTheoryRevision(
     exportPortableStructuralTheory(memory, theory));
   const closureBefore = memory.linkCount;
-  expectClosureError("invalid-base", () =>
-    replayStructuralClosureApplication(memory, closureEvidence));
+  let closureReject: string | undefined;
+  try {
+    replayStructuralClosureApplication(memory, closureEvidence);
+  } catch (error) {
+    assert(error instanceof StructuralClosureApplicationReplayError,
+      "L0 closure boundary: wrong error type");
+    closureReject = error.code;
+  }
+  assert(closureReject !== undefined, "L0 closure boundary must still reject in this slice");
+  assert(closureReject !== "invalid-base" && closureReject !== "invalid-step",
+    `L0 rooted proof consumption did not advance: ${closureReject}`);
   same(memory.linkCount, closureBefore, "L0 closure rejection is read-only");
   const revisionAfter = await computePortableStructuralTheoryRevision(
     exportPortableStructuralTheory(memory, theory));
@@ -1044,13 +1053,14 @@ async function probeL0(): Promise<void> {
     "falsifier does not promote STEP target DR");
   assert(memory.find(theory, result.derivationRule) === undefined,
     "falsifier does not promote RESULT DR");
+  return closureReject;
 }
 
 async function main(): Promise<void> {
   probeRootedProofAset();
   probeTopologyRoleOverlap();
   await probeProofAsetComposition();
-  await probeL0();
+  const l0ClosureReject = await probeL0();
   console.log("P1 shared proof-Aset occurrence reuse = SUPPORTED");
   console.log("P2 proof-carrying derived DR composition = SUPPORTED");
   console.log("P3 shared occurrence + derived expansion = SUPPORTED");
@@ -1059,8 +1069,9 @@ async function main(): Promise<void> {
   console.log("T2 P/O cyclic self-reference shape = REJECTED");
   console.log("L0 rooted BASE/STEP candidate replay = SUPPORTED");
   console.log("L0 proof-Aset representation = SUPPORTED");
-  console.log("L0 first production trusted consumer reject = invalid-base");
-  console.log("PRODUCTION_GAP = GENERIC_ROOTED_PROOF_ASET_REPLAY_GAP_CONFIRMED");
+  console.log("ROOTED_PROOF_ASET_CLOSURE_CONSUMPTION = SUPPORTED");
+  console.log(`L0 first remaining closure-law reject = ${l0ClosureReject}`);
+  console.log("L0 = STILL BLOCKED");
   console.log("guarded-step weakening = NOT REACHED");
 }
 
