@@ -9,6 +9,7 @@ export type RecursiveLinkIdentityProofReplayErrorCode =
   | "child-arity-mismatch"
   | "child-claim-mismatch"
   | "invalid-root-base"
+  | "cyclic-grounding"
   | "replay-wrote";
 
 export class RecursiveLinkIdentityProofReplayError extends Error {
@@ -100,56 +101,78 @@ export function replayRecursiveLinkIdentityProofAset(
 ): RecursiveLinkIdentityProofReplayResult {
   const before = memory.linkCount;
   const verified = new Set<LinkHandle>();
+  const activePairs = new Map<LinkHandle, Set<LinkHandle>>();
+
+  const enterPair = (left: LinkHandle, right: LinkHandle): void => {
+    let rights = activePairs.get(left);
+    if (rights === undefined) {
+      rights = new Set<LinkHandle>();
+      activePairs.set(left, rights);
+    }
+    if (rights.has(right)) fail("cyclic-grounding");
+    rights.add(right);
+  };
+
+  const leavePair = (left: LinkHandle, right: LinkHandle): void => {
+    const rights = activePairs.get(left);
+    rights?.delete(right);
+    if (rights?.size === 0) activePairs.delete(left);
+  };
 
   try {
     const verify = (occurrence: LinkHandle): ReadOccurrence => {
       const data = readOccurrence(memory, occurrence);
       if (verified.has(occurrence)) return data;
 
-      const left = classify(memory, data.left);
-      const right = classify(memory, data.right);
-      if (left.shape !== right.shape) fail("closure-shape-mismatch");
+      enterPair(data.left, data.right);
+      try {
+        const left = classify(memory, data.left);
+        const right = classify(memory, data.right);
+        if (left.shape !== right.shape) fail("closure-shape-mismatch");
 
-      let expected: readonly (readonly [LinkHandle, LinkHandle])[];
-      switch (left.shape) {
-        case "full":
-          if (
-            data.left !== memory.root
-            || data.right !== memory.root
-            || occurrence !== memory.root
-          ) {
-            fail("invalid-root-base");
-          }
-          expected = [];
-          break;
-        case "start":
-          expected = [[left.end, right.end]];
-          break;
-        case "end":
-          expected = [[left.start, right.start]];
-          break;
-        case "ordinary":
-          expected = [
-            [left.start, right.start],
-            [left.end, right.end],
-          ];
-          break;
-      }
-
-      if (data.children.length !== expected.length) fail("child-arity-mismatch");
-
-      data.children.forEach((child, index) => {
-        const required = expected[index];
-        if (required === undefined) fail("child-arity-mismatch");
-        const childData = readOccurrence(memory, child);
-        if (childData.left !== required[0] || childData.right !== required[1]) {
-          fail("child-claim-mismatch");
+        let expected: readonly (readonly [LinkHandle, LinkHandle])[];
+        switch (left.shape) {
+          case "full":
+            if (
+              data.left !== memory.root
+              || data.right !== memory.root
+              || occurrence !== memory.root
+            ) {
+              fail("invalid-root-base");
+            }
+            expected = [];
+            break;
+          case "start":
+            expected = [[left.end, right.end]];
+            break;
+          case "end":
+            expected = [[left.start, right.start]];
+            break;
+          case "ordinary":
+            expected = [
+              [left.start, right.start],
+              [left.end, right.end],
+            ];
+            break;
         }
-        verify(child);
-      });
 
-      verified.add(occurrence);
-      return data;
+        if (data.children.length !== expected.length) fail("child-arity-mismatch");
+
+        data.children.forEach((child, index) => {
+          const required = expected[index];
+          if (required === undefined) fail("child-arity-mismatch");
+          const childData = readOccurrence(memory, child);
+          if (childData.left !== required[0] || childData.right !== required[1]) {
+            fail("child-claim-mismatch");
+          }
+          verify(child);
+        });
+
+        verified.add(occurrence);
+        return data;
+      } finally {
+        leavePair(data.left, data.right);
+      }
     };
 
     const root = verify(proofRoot);
