@@ -22,7 +22,6 @@ export type StructuralRootedProofAsetReplayErrorCode =
   | "premise-arity-mismatch"
   | "template-mismatch"
   | "cyclic-dependency"
-  | "unused-target-premise"
   | "replay-wrote";
 
 export class StructuralRootedProofAsetReplayError extends Error {
@@ -40,7 +39,8 @@ export interface StructuralRootedProofAsetReplayResult {
   readonly targetOccurrence: LinkHandle;
   readonly conclusion: LinkHandle;
   readonly occurrenceCount: number;
-  readonly assumptionCount: number;
+  readonly declaredAssumptionCount: number;
+  readonly usedAssumptionCount: number;
 }
 
 function fail(code: StructuralRootedProofAsetReplayErrorCode): never {
@@ -318,9 +318,6 @@ export function replayStructuralRootedProofAset(
 
     const conclusion = verifyOccurrence(targetOccurrence);
     if (conclusion !== targetRule.body) fail("template-mismatch");
-    for (const premise of targetPremises) {
-      if (!usedPremises.has(premise)) fail("unused-target-premise");
-    }
 
     return Object.freeze({
       theory,
@@ -329,7 +326,8 @@ export function replayStructuralRootedProofAset(
       targetOccurrence,
       conclusion,
       occurrenceCount: verified.size,
-      assumptionCount: usedPremises.size,
+      declaredAssumptionCount: targetPremises.size,
+      usedAssumptionCount: usedPremises.size,
     });
   } catch (error) {
     if (error instanceof StructuralRootedProofAsetReplayError) throw error;
