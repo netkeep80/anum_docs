@@ -13,6 +13,7 @@ import {
   replayStructuralDerivedDerivationSchema,
   type StructuralDerivedDerivationEvidence,
 } from "../src/derived-derivation-schema.js";
+import { replayStructuralRootedProofAset } from "../src/rooted-proof-aset.js";
 import {
   StructuralClosureApplicationReplayError,
   replayStructuralClosureApplication,
@@ -38,6 +39,7 @@ function expectClosureError(code: string, effect: () => unknown): void {
 interface GenericFixture {
   readonly derivationRule: LinkHandle;
   readonly identity: LinkHandle;
+  readonly root: LinkHandle;
   readonly evidence: StructuralDerivedDerivationEvidence;
 }
 
@@ -60,9 +62,12 @@ function admittedGeneric(
     memory, assumptions.map(({ occurrence }) => occurrence),
   );
   const targetOccurrence = memory.ensure(derivationRule, premiseOccurrenceSequence);
+  const rootedOccurrence = memory.ensure(conclusion, targetOccurrence);
+  const root = memory.ensure(identity, rootedOccurrence);
   return Object.freeze({
     derivationRule,
     identity,
+    root,
     evidence: Object.freeze({
       identity,
       targetOccurrence,
@@ -167,9 +172,13 @@ function main(): void {
   const base = admittedGeneric(memory, theory, dBase, [], cZ);
   const step = admittedGeneric(memory, theory, dStep, [domainN, stepNN1, cN], cN1);
   same(replayStructuralDerivedDerivationSchema(memory, base.evidence).conclusionTemplate, cZ,
-    "BASE control");
+    "BASE strict control");
   same(replayStructuralDerivedDerivationSchema(memory, step.evidence).conclusionTemplate, cN1,
-    "STEP control");
+    "STEP strict control");
+  same(replayStructuralRootedProofAset(memory, base.root).conclusion, cZ,
+    "BASE rooted control");
+  same(replayStructuralRootedProofAset(memory, step.root).conclusion, cN1,
+    "STEP rooted control");
 
   const result = resultIdentity(memory, theory, dResult, [domainN], cN);
   assert(memory.find(theory, result.derivationRule) === undefined,
@@ -185,8 +194,8 @@ function main(): void {
   const evidence: StructuralClosureApplicationEvidence = Object.freeze({
     authority,
     authorityAdmission,
-    base: base.evidence,
-    step: step.evidence,
+    baseRoot: base.root,
+    stepRoot: step.root,
     resultIdentity: result.identity,
     authorityMorphism,
     currentMorphism,
@@ -210,7 +219,7 @@ function main(): void {
   );
   const simpleResult = resultIdentity(memory, theory, dResult, [domainN], simple(n));
   same(replayStructuralClosureApplication(memory, {
-    ...evidence, base: simpleBase.evidence, step: simpleStep.evidence,
+    ...evidence, baseRoot: simpleBase.root, stepRoot: simpleStep.root,
     resultIdentity: simpleResult.identity,
   }).resultConclusionTemplate, simple(n), "simple structural claim closes");
 
@@ -252,17 +261,13 @@ function main(): void {
     }),
   );
 
-  const baseNode = base.evidence.nodes[0];
-  assert(baseNode !== undefined, "BASE node");
   expectClosureError("invalid-base", () => replayStructuralClosureApplication(memory, {
     ...evidence,
-    base: { ...base.evidence, nodes: [{ ...baseNode, derivationRuleAdmission: base.identity }] },
+    baseRoot: memory.ensure(base.identity, base.identity),
   }));
-  const stepNode = step.evidence.nodes[0];
-  assert(stepNode !== undefined, "STEP node");
   expectClosureError("invalid-step", () => replayStructuralClosureApplication(memory, {
     ...evidence,
-    step: { ...step.evidence, nodes: [{ ...stepNode, derivationRuleAdmission: step.identity }] },
+    stepRoot: memory.ensure(step.identity, step.identity),
   }));
 
   const wideResult = resultIdentity(memory, theory, dStep, [domainN], cN);
@@ -280,13 +285,13 @@ function main(): void {
 
   const wrongBase = admittedGeneric(memory, theory, dBase, [], claim(wrongGenerator));
   expectClosureError("base-mismatch", () =>
-    replayStructuralClosureApplication(memory, { ...evidence, base: wrongBase.evidence }),
+    replayStructuralClosureApplication(memory, { ...evidence, baseRoot: wrongBase.root }),
   );
 
   const wrongDomain = memory.ensure(domainContext, memory.ensure(n, O));
   const domainBadStep = admittedGeneric(memory, theory, dStep, [wrongDomain, stepNN1, cN], cN1);
   expectClosureError("domain-mismatch", () =>
-    replayStructuralClosureApplication(memory, { ...evidence, step: domainBadStep.evidence }),
+    replayStructuralClosureApplication(memory, { ...evidence, stepRoot: domainBadStep.root }),
   );
 
   const wrongTransition = edge(n1, n);
@@ -294,19 +299,19 @@ function main(): void {
     memory, theory, dStep, [domainN, wrongTransition, cN], cN1,
   );
   expectClosureError("step-mismatch", () =>
-    replayStructuralClosureApplication(memory, { ...evidence, step: transitionBadStep.evidence }),
+    replayStructuralClosureApplication(memory, { ...evidence, stepRoot: transitionBadStep.root }),
   );
 
   const wrongIH = memory.ensure(claimContext, n);
   const ihBadStep = admittedGeneric(memory, theory, dStep, [domainN, stepNN1, wrongIH], cN1);
   expectClosureError("ih-mismatch", () =>
-    replayStructuralClosureApplication(memory, { ...evidence, step: ihBadStep.evidence }),
+    replayStructuralClosureApplication(memory, { ...evidence, stepRoot: ihBadStep.root }),
   );
 
   const wrongNext = memory.ensure(claimContext, n1);
   const nextBadStep = admittedGeneric(memory, theory, dStep, [domainN, stepNN1, cN], wrongNext);
   expectClosureError("next-conclusion-mismatch", () =>
-    replayStructuralClosureApplication(memory, { ...evidence, step: nextBadStep.evidence }),
+    replayStructuralClosureApplication(memory, { ...evidence, stepRoot: nextBadStep.root }),
   );
 
   const wrongNextMorphism = morphism(memory, theory, dResult, dStep, [[n, n]]);
@@ -326,7 +331,7 @@ function main(): void {
   expectClosureError("grounded-target-role-capture", () => replayStructuralClosureApplication(memory, {
     ...evidence, authority: capturedAuthority,
     authorityAdmission: memory.ensure(theory, capturedAuthority),
-    step: capturedStep.evidence, resultIdentity: capturedResult.identity,
+    stepRoot: capturedStep.root, resultIdentity: capturedResult.identity,
   }));
 
   const foreignAuthority = materializeExactSequence(memory, [
