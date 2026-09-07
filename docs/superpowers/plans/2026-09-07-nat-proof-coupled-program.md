@@ -1,85 +1,10 @@
-# Nat + Proof Calculus Coupled Program Implementation Plan
+# План сопряжённого развития натуральных чисел и исчисления доказательств
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+## Цель
 
-**Goal:** Establish the first reusable Peano theorem suite while developing Nat structure and generic MTS proof calculus in parallel without conflating mathematical truth, proof expressibility, or theorem reuse.
+Построить первый переиспользуемый набор теорем Пеано, одновременно развивая математическую структуру натуральных чисел и общий механизм доказательств МТС.
 
-**Architecture:** #1052 owns Nat truth, #999 owns proof-calculus semantics, and #1057 synchronizes them through theorem challenges classified independently as STRUCTURE / PROOF_ANET / REUSE. Each executable theorem is a bounded child with its own ChangeIntent and can only change generic proof machinery when a structural theorem is already supported but proof replay exposes a generic gap.
-
-**Tech Stack:** TypeScript MTS core/tests, MTS Links/Anets, GitHub Issues/PRs, repo-guard blocking policy, GitHub Actions CI.
-
-**Spec:** `docs/superpowers/specs/2026-09-07-nat-proof-coupled-program-design.md`
-
-## Global Constraints
-
-- Accepted MTS remains `v0.11` unless a separate semantic-delta lifecycle is explicitly opened.
-- Active semantic candidate remains `NONE` during W1.
-- New prose uses `Anet`; technical `Aset -> Anet` migration is owned by #1049 and is not mixed into theorem behavior slices.
-- No host integer, Nat class, Ordinal/Cardinal kind, theorem-specific trusted opcode, `InductionNode`, `forall`, `lambda`, or `Predicate<T>` may become authority.
-- MTS Links/Anets and exact Theory topology remain semantic/proof authority; host structures are projections only.
-- Every repository-file write uses explicit branch + PR flow.
-- Every merge requires fresh main/Issue/PR/policy, CI GREEN, blocking repo-guard GREEN, `behind_by=0`, mergeable Ready PR, stable exact head, expected-head merge, and post-merge main + CI verification.
-- Arithmetic L0/L1/COMM remain paused until W3/W4/W5 re-entry on the selected Nat theory.
-
----
-
-### Task 1: Synchronize the GitHub control plane
-
-**Files:**
-- Modify: none
-
-**Interfaces:**
-- Consumes: #1052, #999, #1019, #1050/#1051, #1053, #1057.
-- Produces: one unambiguous ownership/status map used by all later tasks.
-
-- [ ] **Step 1: Fresh-read state**
-
-Read exact `main`, `repo-policy.json`, #1052, #999, #1019, #1050, PR #1051, PR #1053, and #1057.
-
-- [ ] **Step 2: Update #1052**
-
-Add the coupled-program boundary:
-
-```text
-TRACK N authority remains here.
-Theorem work is synchronized by #1057.
-Each theorem records STRUCTURE independently from PROOF_ANET/REUSE.
-W1 = active Nat structural theorem suite.
-```
-
-- [ ] **Step 3: Update #999**
-
-Add:
-
-```text
-TRACK P authority remains here.
-Nat theorem challenges from #1057 are the preferred proving ground.
-A mathematical theorem may expose a generic proof gap but may never authorize Nat-specific trusted behavior.
-```
-
-- [ ] **Step 4: Update #1019**
-
-Record:
-
-```text
-N2a/N2b/generic induction research = preserved.
-L0/L1/COMM = PAUSED.
-Re-entry is W3/W4/W5 under #1057 after selected Nat carrier/theory is established.
-```
-
-- [ ] **Step 5: Narrow #1050/#1051**
-
-Ensure #1050/#1051 is classified strictly as generic weakening:
-
-```text
-UsedPremises ⊆ DeclaredPremises
-```
-
-Any old-Nat L0 rerun is diagnostic only and must not advance arithmetic status.
-
-- [ ] **Step 6: Update #1053 chapter PR**
-
-Add #1057 as the program owner and require the chapter to distinguish:
+Три вида результата никогда не смешиваются:
 
 ```text
 STRUCTURE
@@ -87,199 +12,218 @@ PROOF_ANET
 REUSE
 ```
 
-- [ ] **Step 7: Re-read all modified Issues/PRs**
-
-Verify no owner claims contradictory active status for L0/L1/COMM or semantic candidate/version.
-
----
-
-### Task 2: Finish generic rooted proof-Anet weakening independently of Nat
-
-**Files:**
-- Modify: `ts/src/rooted-proof-aset.ts`
-- Modify: `ts/test/rooted-proof-aset.test.ts`
-- Modify: `docs/specs/Асеть доказательства МТС.md`
-- Do not use old arithmetic fixture acceptance as completion evidence.
-
-**Interfaces:**
-- Consumes: current PR #1051 test/production work.
-- Produces: generic rooted replay law `UsedPremises ⊆ DeclaredPremises` and exact declared/used diagnostics.
-
-- [ ] **Step 1: Fresh-read #1050/#1051 and exact head**
-
-Confirm existing RED/GREEN evidence remains intact after main movement.
-
-- [ ] **Step 2: Ensure undeclared reachable premise remains rejected**
-
-Test shape:
+## Архитектура ответственности
 
 ```text
-TargetDR premises = [A]
-reachable external H = EXTRA
-expected = reject
+#1052 — математическая и структурная теория Nat
+#999  — исчисление доказательств
+#1057 — синхронизация через последовательность теорем
 ```
 
-The rejection must prove weakening is one-directional only.
+Каждая исполняемая теорема получает отдельную ограниченную Issue с собственным `ChangeIntent`.
 
-- [ ] **Step 3: Remove/neutralize arithmetic acceptance coupling**
+Если теорема структурно истинна, но её нельзя доказать текущим аппаратом, изменяется только общий proof calculus. Если структурная гипотеза опровергнута, prover не усиливается ради её сохранения.
 
-If `derived-l0-left-zero-rerun.test.ts` is still touched, its output may only say that the historical fixture was observed; it must not set current Nat/L0 program status.
-
-- [ ] **Step 4: Synchronize proof specification**
-
-Document exactly:
+## Общие ограничения
 
 ```text
-declared target context != used support
+accepted MTS = v0.11
+active semantic candidate = NONE
+```
+
+До отдельной классификации запрещено менять принятый контракт или придумывать номер следующей версии.
+
+Также запрещены:
+
+```text
+host integer as Nat authority
+host Nat / Ordinal / Cardinal kind
+Nat-specific trusted opcode
+InductionNode
+forall / lambda / Predicate<T> as trusted AST
+primitive promotion of derived theorem
+```
+
+Семантический и доказательный авторитет принадлежит Links и Anets. Массивы, отображения и объекты языка реализации являются только проекциями.
+
+Все записи файлов выполняются только в явную ветку и проходят PR, CI и blocking repo-guard.
+
+## Задача 1 — синхронизировать GitHub control plane
+
+- [x] Создать #1057 как общий координатор программы.
+- [x] Зафиксировать #1052 как `TRACK N`.
+- [x] Зафиксировать #999 как `TRACK P`.
+- [x] Перевести старую арифметическую лестницу #1019 в downstream-состояние.
+- [x] Сузить #1050/#1051 до общего weakening без принятия старого L0.
+- [x] Добавить методологию #1057 в исследовательскую главу #1053.
+- [x] Создать отдельные структурные задачи T3 и T4: #1059 и #1060.
+
+Текущий арифметический статус:
+
+```text
+L0 = PAUSED
+L1 = PAUSED
+COMM = PAUSED
+```
+
+## Задача 2 — закончить общий weakening proof Anet
+
+Владелец: #1050. Текущая ветка исследования: PR #1051.
+
+Целевой общий закон:
+
+```text
 UsedPremises ⊆ DeclaredPremises
-primitive premise slots remain exact
 ```
 
-- [ ] **Step 5: Run full CI and repo-guard**
+Необходимые действия:
 
-Expected: all generic proof tests GREEN; no Nat semantic/version delta.
-
-- [ ] **Step 6: Merge exact head and verify push CI**
-
-Feed generic result to #999 and #1057, not as arithmetic completion.
-
----
-
-### Task 3: W1a structural challenge T3 — Zero is not successor
-
-**Files:**
-- Create: `ts/test/nat-peano-zero-not-successor.test.ts`
-- Production: none unless a genuine generic foundation gap is proven and separately designed.
-
-**Interfaces:**
-- Consumes: `N0=U`, `Succ(N)=N⟼L`, accepted root basis and Link identity/self-closure laws.
-- Produces: `STRUCTURE(T3)` classification only.
-
-- [ ] **Step 1: Open bounded T3 Issue/ChangeIntent**
-
-Scope only the new test file; forbid `ts/src/**`, contracts, docs, policy.
-
-- [ ] **Step 2: Write finite/adversarial structural falsifier**
-
-Construct ordinary Link samples `N0..Nk` from:
-
-```ts
-const nat: LinkHandle[] = [U];
-for (let i = 0; i < 8; i += 1) nat.push(memory.ensure(nat.at(-1)!, L));
-```
-
-For every tested predecessor `N` assert:
-
-```ts
-assert(memory.ensure(N, L) !== U, "successor collapsed to zero boundary");
-```
-
-Also inspect exact poles of each successor.
-
-- [ ] **Step 3: Run full test suite**
-
-Expected finite classification:
+- [ ] Перенести/повторить изменение на свежем `main`, если старая ветка слишком отстала.
+- [ ] Сохранить уже полученное доказательство RED на `unused-target-premise`.
+- [ ] Проверить успешный replay при объявленной, но неиспользованной внешней посылке.
+- [ ] Проверить отрицательный случай: реально используемая необъявленная посылка должна быть отвергнута.
+- [ ] Сохранить точные счётчики:
 
 ```text
-T3 STRUCTURE_FINITE = SUPPORTED
+declaredAssumptionCount
+usedAssumptionCount
 ```
 
-Do not claim a general theorem from finite enumeration alone.
+- [ ] Синхронизировать спецификацию proof Anet.
+- [ ] Не использовать старый L0 как критерий принятия этой задачи.
+- [ ] Полный CI должен быть GREEN.
+- [ ] Blocking repo-guard должен быть GREEN.
+- [ ] Выполнить exact-head merge и проверить post-merge CI.
+- [ ] Передать общий результат в #999 и #1057.
 
-- [ ] **Step 4: Identify the general structural proof obligation**
+## Задача 3 — W1/T3: ноль не является successor
 
-Determine whether accepted laws already imply:
+Владелец: #1059.
+
+Цель структуры:
 
 ```text
-N⟼L != U
+Nat(N)
+-------
+N ⟼ L != U
 ```
 
-for arbitrary Link `N`, especially via the exact identity/topology of `U` and self-closure laws. If not derivable, classify the precise foundation theorem gap; do not patch Memory.
+### Исполняемый конечный falsifier
 
-- [ ] **Step 5: Merge only the falsifier/evidence slice**
+Создать только:
 
-Record `STRUCTURE=SUPPORTED` only if the general argument is separately justified; otherwise retain `STRUCTURE=NOT TESTED` with finite evidence explicitly labeled.
-
----
-
-### Task 4: W1a structural challenge T4 — Successor injectivity
-
-**Files:**
-- Create: `ts/test/nat-peano-successor-injective.test.ts`
-- Production: none expected.
-
-**Interfaces:**
-- Consumes: ordered-pole identity law for Links.
-- Produces: structural theorem target later consumed by proof-Anet challenge.
-
-- [ ] **Step 1: Open bounded T4 structure Issue/ChangeIntent**
-
-The statement is generic over Links; Nat membership is not required for injectivity itself.
-
-- [ ] **Step 2: Write exact structural corpus**
-
-For unrelated `A`, `B`, and shared `L`, test construction identity and pole recovery:
-
-```ts
-const sA = memory.ensure(A, L);
-const sB = memory.ensure(B, L);
-if (sA === sB) {
-  const pA = memory.poles(sA);
-  const pB = memory.poles(sB);
-  assert(pA.start === pB.start);
-  assert(A === B);
-}
+```text
+ts/test/nat-peano-zero-not-successor.test.ts
 ```
 
-Include negative samples with `A !== B` and assert `sA !== sB`.
+Построить конечную выборку:
 
-- [ ] **Step 3: Tie result to accepted identity invariant**
+```text
+N0 = U
+N(n+1) = Nn ⟼ L
+```
 
-Write the mathematical argument in the Issue:
+и проверить для всех выбранных `N`:
+
+```text
+Succ(N) != U
+start(Succ(N)) = N
+end(Succ(N)) = L
+```
+
+Индексы цикла являются только метками тестовой выборки.
+
+### Общий структурный вывод
+
+Конечная выборка не является общей теоремой.
+
+Нужно отдельно проверить вывод из корневого базиса:
+
+```text
+U = C ⟼ O
+Succ(N) = N ⟼ L
+```
+
+Если предположить:
+
+```text
+N ⟼ L = U = C ⟼ O
+```
+
+то инвариант тождества Link требует:
+
+```text
+N = C
+L = O
+```
+
+Поэтому общая теорема сводится к уже принятому различию `L != O`. Это различие должно быть подтверждено точной структурой root basis, а не предположено по имени.
+
+Результат фиксируется только как:
+
+```text
+STRUCTURE = SUPPORTED
+```
+
+если общий вывод действительно замкнут принятой структурой.
+
+`PROOF_ANET` и `REUSE` в этой задаче не проверяются.
+
+## Задача 4 — W1/T4: инъективность successor
+
+Владелец: #1060.
+
+Структурная теорема:
+
+```text
+A ⟼ L = B ⟼ L
+----------------
+A = B
+```
+
+Создать только:
+
+```text
+ts/test/nat-peano-successor-injective.test.ts
+```
+
+Проверить несколько независимых и вложенных Links:
+
+```text
+A = B  =>  Succ(A) = Succ(B)
+A != B =>  Succ(A) != Succ(B)
+start(Succ(A)) = A
+end(Succ(A)) = L
+```
+
+Общий математический вывод должен ссылаться на инвариант упорядоченных полюсов:
+
+```text
+(A ⟼ B) = (C ⟼ D)
+iff
+A=C and B=D
+```
+
+Следовательно:
 
 ```text
 (A⟼L)=(B⟼L)
-=> A=B and L=L
 => A=B
 ```
 
-The executable corpus is evidence, not the source of the general law.
-
-- [ ] **Step 4: CI/repo-guard/merge**
-
-Expected classification:
+После CI и repo-guard ожидаемый статус:
 
 ```text
-T4 STRUCTURE = SUPPORTED
+STRUCTURE = SUPPORTED
 PROOF_ANET = NOT TESTED
 REUSE = NOT TESTED
 ```
 
----
+## Задача 5 — W1/T4: представить инъективность как proof Anet
 
-### Task 5: W1b proof-Anet challenge for T4
+Эта задача открывается отдельной Issue только после принятого `STRUCTURE=SUPPORTED` для T4.
 
-**Files:**
-- Prefer create: `ts/test/nat-peano-successor-injective-proof.test.ts`
-- Modify generic proof-calculus production only if a RED exposes a general gap and a separate bounded child design is approved.
-
-**Interfaces:**
-- Consumes: T4 structural theorem and current #999 proof machinery.
-- Produces: replayable generic proof evidence for successor injectivity or exact `PROOF_ANET=GAP`.
-
-- [ ] **Step 1: Open proof challenge Issue**
-
-Explicitly lock:
-
-```text
-STRUCTURE(T4)=SUPPORTED
-```
-
-and forbid Nat-specific trusted code.
-
-- [ ] **Step 2: Attempt test-only proof Anet**
-
-Target contextual rule:
+Целевая форма:
 
 ```text
 Eq(A⟼L, B⟼L)
@@ -287,100 +231,62 @@ Eq(A⟼L, B⟼L)
 Eq(A,B)
 ```
 
-Represent equality/identity dependencies using existing structural proof machinery only.
+Действия:
 
-- [ ] **Step 3: Run RED or GREEN**
-
-If current machinery rejects, capture the exact generic error code and classify:
+- [ ] Попытаться выразить доказательство только существующими общими средствами.
+- [ ] Не добавлять T4 как primitive Theory admission.
+- [ ] Не добавлять специальную операцию successor или Nat.
+- [ ] Если replay отвергает доказательство, записать точную общую причину:
 
 ```text
-T4 PROOF_ANET = GAP(<exact mechanism>)
+PROOF_ANET = GAP(<exact mechanism>)
 ```
 
-Do not modify mathematics.
+- [ ] Если нужен production fix, открыть отдельную proof-calculus Issue.
+- [ ] Новый механизм обязан иметь как минимум один неарифметический контрольный пример.
+- [ ] После общего исправления заново воспроизвести именно T4.
 
-- [ ] **Step 4: If a generic gap exists, open one bounded proof-calculus child**
-
-The child must be theorem-neutral and prove its fix with at least one non-Nat control example.
-
-- [ ] **Step 5: Replay T4 after any generic fix**
-
-Expected eventual classification:
+Целевой статус:
 
 ```text
-T4 STRUCTURE = SUPPORTED
-T4 PROOF_ANET = SUPPORTED
-T4 REUSE = NOT TESTED
+STRUCTURE = SUPPORTED
+PROOF_ANET = SUPPORTED
+REUSE = NOT TESTED
 ```
 
----
+## Задача 6 — W1/T5: единственность predecessor как первая проверка REUSE
 
-### Task 6: W1c reuse challenge T5 — Unique predecessor
+Открывается после принятого proof Anet для T4.
 
-**Files:**
-- Prefer create: `ts/test/nat-peano-unique-predecessor-proof.test.ts`
-- Modify generic reuse machinery only after exact RED classification and bounded approval.
-
-**Interfaces:**
-- Consumes: accepted reusable T4 proof evidence.
-- Produces: first theorem whose proof should depend on another derived theorem without primitive promotion.
-
-- [ ] **Step 1: Open T5 Issue with reuse as the primary gate**
-
-Statement:
+Теорема:
 
 ```text
-A⟼L = N
-B⟼L = N
--------------
+A ⟼ L = N
+B ⟼ L = N
+----------------
 A = B
 ```
 
-- [ ] **Step 2: Build proof by composing equalities into a T4-shaped premise**
+Доказательство должно:
 
-The proof must obtain:
+1. получить `A⟼L = B⟼L` из двух равенств с общим `N`;
+2. применить уже доказанную T4;
+3. использовать производное evidence T4 через общий механизм expansion/replay;
+4. не создавать вторую primitive-аксиому инъективности.
 
-```text
-A⟼L = B⟼L
-```
-
-from the shared-result premises, then invoke/reuse T4 derived proof evidence.
-
-- [ ] **Step 3: Forbid duplicate primitive derivation**
-
-The fixture must make it observable whether T4 evidence is actually referenced/expanded. A second independently admitted injectivity rule is not allowed.
-
-- [ ] **Step 4: Run and classify reuse**
-
-Possible outcomes:
+Если T4 можно доказать, но нельзя переиспользовать:
 
 ```text
-REUSE=SUPPORTED
-REUSE=GAP(<exact expansion/composition boundary>)
+REUSE = GAP(<exact mechanism>)
 ```
 
-- [ ] **Step 5: If GAP, fix only generic theorem reuse**
+Тогда исправляется только общий механизм переиспользования теорем и добавляется неарифметический контроль.
 
-Require a non-Nat reuse control in the same proof-calculus child.
+W1 не считается законченным, пока T5 действительно не использует T4.
 
-- [ ] **Step 6: Merge and update W1 matrix**
+## Задача 7 — W2: индукция и минимальность
 
-W1 reusable suite is not complete until T5 uses T4 successfully.
-
----
-
-### Task 7: Start W2 induction only after W1 reuse is proven
-
-**Files:**
-- New bounded child tests/issues determined after W1 evidence.
-
-**Interfaces:**
-- Consumes: W1 reusable theorem suite, generic weakening, cross-scope machinery from #1019/#999.
-- Produces: structural/minimality and proof-Anet induction classification.
-
-- [ ] **Step 1: Verify W1 gate**
-
-Required:
+Начинать только при выполнении:
 
 ```text
 T4 STRUCTURE = SUPPORTED
@@ -388,49 +294,97 @@ T4 PROOF_ANET = SUPPORTED
 T5 REUSE = SUPPORTED
 ```
 
-- [ ] **Step 2: Separate induction mathematics from proof mechanism**
+Математическая и доказательная части снова разделяются.
 
-Open one structure owner for Nat minimality/induction and one proof challenge only after the structure statement is precise.
-
-- [ ] **Step 3: Reuse existing generic machinery before adding anything new**
-
-Attempt with role morphisms, cross-scope hypotheses, weakening, rooted proof Anets, and derived-schema expansion already present.
-
-- [ ] **Step 4: Classify exact induction gap**
-
-No trusted Nat/induction opcode may be introduced.
-
----
-
-### Task 8: Continuously update the canonical Nat chapter
-
-**Files:**
-- Modify: `docs/theory/Натуральные числа, счёт и мера в МТС.md` through PR #1053 or its successor after rebase/merge.
-
-**Interfaces:**
-- Consumes: accepted theorem-challenge evidence only.
-- Produces: human-readable canonical theory chapter with explicit research/accepted boundaries.
-
-- [ ] **Step 1: Add program methodology**
-
-Explain STRUCTURE / PROOF_ANET / REUSE.
-
-- [ ] **Step 2: Add theorem matrix**
-
-For every T1..T5 record exact status and evidence owner.
-
-- [ ] **Step 3: Keep conceptual distinctions explicit**
-
-Document:
+Цель:
 
 ```text
-U = zero boundary / unlinked in counting interpretation
-L = Link / unit of extent
-Nat(1) = U⟼L
-coordinate boundary != accumulated extent
+P(N0)
+P(N) -> P(Succ(N))
+-------------------
+P(N)
+```
+
+Сначала формулируется структурная минимальность выбранного `Nat`, затем существующий proof calculus пытается воспроизвести её через уже имеющиеся:
+
+```text
+role morphisms
+cross-scope hypotheses
+weakening
+rooted proof Anets
+derived-schema expansion
+```
+
+Специальный доверенный механизм индукции запрещён.
+
+## Задача 8 — W3 и далее: арифметика
+
+После W2 заново вывести:
+
+```text
+Add(a,N0)=a
+Add(a,Succ(b))=Succ(Add(a,b))
+```
+
+Затем последовательно:
+
+```text
+W4 — простые теоремы Add
+W5 — commutativity
+W6 — Mul / Order
+W7 — Degree / Count / ordinal-like / cardinal-like readings
+```
+
+Старые результаты #1019 сохраняются как доказательства возможностей общего calculus, но арифметические утверждения повторно проверяются на выбранном новом носителе.
+
+## Задача 9 — постоянно обновлять центральную главу
+
+Файл:
+
+```text
+docs/theory/Натуральные числа, счёт и мера в МТС.md
+```
+
+Документ должен обновляться только по merged evidence и хранить для каждой теоремы точные статусы:
+
+```text
+STRUCTURE
+PROOF_ANET
+REUSE
+```
+
+Обязательно сохраняются различия:
+
+```text
+U = нулевая граница в выбранном чтении
+L = единичная связь / единица протяжённости
+Nat(1) = U ⟼ L
+координатная граница != накопленная протяжённость
 historical L-degree != Nat carrier
 ```
 
-- [ ] **Step 4: Update only from merged evidence**
+## Правило завершения каждого исполняемого среза
 
-Research hypotheses remain labeled as such until their structural/proof obligations are satisfied.
+Перед каждой записью или сменой состояния:
+
+```text
+fresh main
+fresh target Issue / PR
+fresh repo-policy.json
+```
+
+Перед merge:
+
+```text
+CI = GREEN
+blocking repo-guard = GREEN
+behind_by = 0
+mergeable = true
+draft = false
+exact head stable
+merge with expected_head_sha
+post-merge exact main verified
+post-merge CI = GREEN
+```
+
+Ни один статус математической теоремы не повышается только потому, что код компилируется или конечный тест прошёл. Нужный вид evidence должен соответствовать именно `STRUCTURE`, `PROOF_ANET` или `REUSE`.
