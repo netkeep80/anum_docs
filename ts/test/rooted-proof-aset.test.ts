@@ -197,6 +197,38 @@ function overlapCorpus(): void {
   same(replay.assumptionCount, 0, "overlap assumption count");
 }
 
+function weakeningCorpus(): void {
+  const memory = new Memory();
+  const { R, L, U } = ensureRootBasis(memory);
+  let cursor = memory.ensure(U, R);
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
+  const theory = memory.ensure(L, U);
+
+  const a = fresh(), extra = fresh(), b = fresh();
+  const sourceA = fresh(), sourceB = fresh();
+  const sourceDictionary = defineStructuralRoleDictionary(memory, [sourceA, sourceB]);
+  const primitive = admittedPrimitive(memory, theory, sourceDictionary, [sourceA], sourceB);
+  const targetDictionary = defineStructuralRoleDictionary(memory, [a, extra, b]);
+  const target = targetIdentity(memory, theory, targetDictionary, [a, extra], b);
+  const hA = memory.ensure(a, target.identity);
+  const out = proofOccurrence(memory, b, primitive.derivationRule, [hA]);
+
+  try {
+    const replay = replayStructuralRootedProofAset(memory, proofRoot(memory, target.identity, out));
+    same(replay.conclusion, b, "weakening conclusion");
+  } catch (error) {
+    if (
+      error instanceof StructuralRootedProofAsetReplayError
+      && error.code === "unused-target-premise"
+    ) {
+      throw new Error(
+        "weakening should allow a declared-but-unused target premise: unused-target-premise",
+      );
+    }
+    throw error;
+  }
+}
+
 function adversarialCorpus(): void {
   const memory = new Memory();
   const { R, L, U } = ensureRootBasis(memory);
@@ -286,6 +318,7 @@ function adversarialCorpus(): void {
 async function main(): Promise<void> {
   await positiveCorpus();
   overlapCorpus();
+  weakeningCorpus();
   adversarialCorpus();
   console.log("rooted proof-Aset primitive/chain/branch = SUPPORTED");
   console.log("rooted proof-Aset contextual role overlap = SUPPORTED");
