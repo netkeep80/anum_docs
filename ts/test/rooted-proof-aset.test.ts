@@ -223,6 +223,38 @@ function weakeningCorpus(): void {
   same(replay.usedAssumptionCount, 1, "weakening used assumption count");
 }
 
+function undeclaredHypothesisCorpus(): void {
+  const memory = new Memory();
+  const { R, L, U } = ensureRootBasis(memory);
+  let cursor = memory.ensure(U, R);
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
+  const theory = memory.ensure(L, U);
+
+  const declared = fresh(), undeclared = fresh(), conclusion = fresh();
+  const sourcePremise = fresh(), sourceConclusion = fresh();
+  const sourceDictionary = defineStructuralRoleDictionary(
+    memory,
+    [sourcePremise, sourceConclusion],
+  );
+  const primitive = admittedPrimitive(
+    memory,
+    theory,
+    sourceDictionary,
+    [sourcePremise],
+    sourceConclusion,
+  );
+  const targetDictionary = defineStructuralRoleDictionary(memory, [declared, conclusion]);
+  const target = targetIdentity(memory, theory, targetDictionary, [declared], conclusion);
+
+  // This has the external-hypothesis shape Claim -> I and is reachable from P,
+  // but Claim is not one of TargetDR's declared premises. Weakening must never
+  // turn such an undeclared reachable dependency into proof support.
+  const hUndeclared = memory.ensure(undeclared, target.identity);
+  const out = proofOccurrence(memory, conclusion, primitive.derivationRule, [hUndeclared]);
+  expectRootedFailure("reachable undeclared outer hypothesis", () =>
+    replayStructuralRootedProofAset(memory, proofRoot(memory, target.identity, out)));
+}
+
 function adversarialCorpus(): void {
   const memory = new Memory();
   const { R, L, U } = ensureRootBasis(memory);
@@ -313,6 +345,7 @@ async function main(): Promise<void> {
   await positiveCorpus();
   overlapCorpus();
   weakeningCorpus();
+  undeclaredHypothesisCorpus();
   adversarialCorpus();
   console.log("rooted proof-Aset primitive/chain/branch = SUPPORTED");
   console.log("rooted proof-Aset contextual role overlap = SUPPORTED");
