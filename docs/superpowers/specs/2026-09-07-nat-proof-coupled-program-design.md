@@ -1,10 +1,10 @@
-# Coupled Nat Foundation + Proof-Calculus Program Design
+# Сопряжённая программа натуральных чисел и исчисления доказательств
 
-## Status
+## Статус
 
-Approved architectural design for #1057.
+Утверждённая архитектура программы #1057.
 
-Exact baseline at capture:
+Точная база на момент фиксации:
 
 ```text
 main = 8af99dd02816ff612d8411c569fabf8e82e3c955
@@ -13,33 +13,31 @@ active semantic candidate = NONE
 post-merge CI #4236 = GREEN
 ```
 
-## Purpose
+## Назначение
 
-Natural numbers serve two roles simultaneously:
+Натуральные числа в МТС имеют сразу две роли:
 
-1. a foundational derived mathematical structure of MTS;
-2. the smallest serious proving ground for MTS proof calculus and aprover mathematics.
+1. фундаментальная производная математическая структура;
+2. простейший содержательный полигон для построения исчисления доказательств и математического аппарата aprover.
 
-The program therefore develops Nat structure and proof calculus in parallel, while keeping their authorities independent.
+Поэтому структура натуральных чисел и исчисление доказательств развиваются параллельно, но их источники авторитета не смешиваются.
 
-## Authority split
+## Разделение ответственности
 
 ```text
 TRACK N — #1052
-What is Nat and which statements are structurally true?
+Что представляет собой Nat и какие утверждения структурно истинны?
 
 TRACK P — #999
-How are proofs represented as Anets, replayed, composed and reused?
+Как доказательства представляются как Anet, проверяются, компонуются и переиспользуются?
 
 SYNC — #1057
-Which theorem is the next shared challenge and what exact gap does it expose?
+Какая теорема является следующим общим испытанием и какой точный пробел она обнаруживает?
 ```
 
-Neither track may define truth for the other.
+Ни один трек не имеет права определять истинность за другой.
 
-## Per-theorem contract
-
-Every theorem challenge is classified independently along three axes:
+## Три независимых статуса каждой теоремы
 
 ```text
 STRUCTURE = SUPPORTED | FALSIFIED | NOT TESTED
@@ -47,90 +45,136 @@ PROOF_ANET = SUPPORTED | GAP | NOT TESTED
 REUSE = SUPPORTED | GAP | NOT TESTED
 ```
 
-Interpretation:
+Смысл статусов:
 
-- `STRUCTURE=FALSIFIED`: revise/reject mathematics; do not patch the prover.
-- `STRUCTURE=SUPPORTED, PROOF_ANET=GAP`: keep mathematics; improve only generic proof calculus.
-- `STRUCTURE=SUPPORTED, PROOF_ANET=SUPPORTED, REUSE=GAP`: theorem is provable once but cannot yet participate as reusable derived evidence.
+- `STRUCTURE=FALSIFIED` — исправляется или отвергается математическая гипотеза; prover не усиливается ради её спасения;
+- `STRUCTURE=SUPPORTED, PROOF_ANET=GAP` — математика сохраняется, исправляется только общий механизм доказательств;
+- `STRUCTURE=SUPPORTED, PROOF_ANET=SUPPORTED, REUSE=GAP` — теорема доказывается один раз, но её производное доказательство пока нельзя корректно использовать дальше.
 
-## Current Nat hypothesis
+## Текущий кандидат натурального ряда
 
 ```text
 N0 = U
 Succ(N) = N ⟼ L
 ```
 
-Therefore:
+Следовательно:
 
 ```text
 N1 = U ⟼ L
 N2 = (U ⟼ L) ⟼ L
+N3 = ((U ⟼ L) ⟼ L) ⟼ L
 ...
 ```
 
-`L` remains the unit Link / unit of extent and is not identified with `Nat(1)`.
+`L` остаётся единичной связью и единицей протяжённости. Она не отождествляется с `Nat(1)`.
 
-Historical L-degree remains a separate measured family:
+Историческая степень связности сохраняется как отдельное измеряемое семейство:
 
 ```text
 D1 = L
 D(n+1) = Dn ⟼ L
 ```
 
-## Core loop
+## Основной цикл работы
 
 ```text
-MATH CHALLENGE
-  -> establish/falsify structural truth
-  -> attempt proof Anet using current calculus
-  -> classify exact generic proof gap
-  -> change only generic calculus when needed
-  -> replay the original theorem
-  -> reuse accepted theorem in the next theorem
+МАТЕМАТИЧЕСКАЯ ТЕОРЕМА
+  -> доказать или опровергнуть структурную истинность
+  -> попытаться построить proof Anet существующими средствами
+  -> классифицировать точный общий пробел исчисления доказательств
+  -> при необходимости менять только общий calculus
+  -> повторить исходное доказательство
+  -> использовать принятую теорему в следующем доказательстве
 ```
 
-No theorem-specific trusted opcode is allowed.
+Запрещены доверенные операции, специально введённые ради одной теоремы.
 
-## Waves
+## Волна W0 — носитель
 
-### W0 — Carrier
-
-Accepted finite evidence from #1055/#1056:
+Конечный исполняемый результат #1055/#1056:
 
 ```text
 N0 = U
-Succ(N) = N⟼L
+Succ(N) = N ⟼ L
 N1 != L
-historical D-family preserved
+historical D-family = preserved
 ```
 
-### W1 — Local Peano laws and first reusable proof suite
+## Волна W1 — локальные законы Пеано и первый переиспользуемый набор доказательств
 
-Theorem ladder:
+Лестница теорем:
 
 ```text
-T1 Zero/carrier base
-T2 Succ closure
-T3 Zero is not successor
-T4 Successor injectivity
-T5 Unique predecessor
+T1 — ноль / базовый элемент
+T2 — замкнутость относительно successor
+T3 — ноль не является successor
+T4 — инъективность successor
+T5 — единственность predecessor
 ```
 
-Expected proof-calculus pressure:
+Ожидаемая нагрузка на исчисление доказательств:
 
 ```text
 Link identity
 ordered-pole decomposition
-implication/dependency
+implication / dependency
 structural substitution
 proof composition
 reusable derived theorem evidence
 generic Roles
 ```
 
-### W2 — Structural induction / minimality
+### T1 — ноль
 
-Target shape:
+```text
+N0 = U
+```
+
+### T2 — замкнутость
+
+```text
+Nat(N)
+-------
+Nat(N ⟼ L)
+```
+
+Контекст `Nat` должен быть выражен структурой МТС, а не типом языка реализации.
+
+### T3 — ноль не является следующим
+
+```text
+Nat(N)
+-------
+N ⟼ L != U
+```
+
+Сначала это структурная задача на фальсификацию. Она не принимается как аксиома только из-за сходства с Пеано.
+
+### T4 — инъективность следующего
+
+```text
+A ⟼ L = B ⟼ L
+----------------
+A = B
+```
+
+Ожидаемый источник общего доказательства — инвариант тождества Link по упорядоченным полюсам.
+
+### T5 — единственность предыдущего
+
+```text
+A ⟼ L = N
+B ⟼ L = N
+----------------
+A = B
+```
+
+Предпочтительное доказательство обязано использовать уже доказанную T4 как производное evidence. Это первое явное испытание `REUSE`.
+
+## Волна W2 — структурная индукция и минимальность
+
+Целевая форма:
 
 ```text
 P(N0)
@@ -139,7 +183,7 @@ P(N) -> P(Succ(N))
 P(N)
 ```
 
-Expected proof-calculus pressure:
+Ожидаемые необходимые механизмы:
 
 ```text
 generic scope
@@ -150,155 +194,120 @@ role morphisms
 proof-carrying derived schemas
 ```
 
-No trusted `InductionNode`, `forall`, `lambda`, `Predicate<T>` or Nat opcode.
+Запрещены доверенные `InductionNode`, `forall`, `lambda`, `Predicate<T>` и специальная операция для `Nat`.
 
-### W3 — Recursive Add
+## Волна W3 — рекурсивное сложение
 
-Re-establish against the selected Nat carrier:
+После выбора и подтверждения носителя заново устанавливаются:
 
 ```text
 Add(a,N0)=a
 Add(a,Succ(b))=Succ(Add(a,b))
 ```
 
-### W4 — Elementary arithmetic theorem ladder
+Старые доказательства на историческом носителе не переносятся автоматически.
 
-Start from defining/right-zero consequences, then left-zero and successor lemmas.
-Each theorem remains a coupled structure/proof/reuse challenge.
+## Волна W4 — элементарные арифметические теоремы
 
-### W5 — Addition commutativity
+Сначала проверяются следствия рекурсивного определения, затем левый ноль и леммы о следующем элементе.
 
-Resume applicable machinery from #1019 only against the selected Nat theory.
+Каждая теорема по-прежнему имеет три независимых статуса: структура, доказательство, переиспользование.
 
-### W6 — Mul / Order
+## Волна W5 — коммутативность сложения
 
-Reuse induction and theorem composition; add no new trusted proof categories merely for arithmetic convenience.
+Механизмы из #1019 могут быть использованы только против выбранной новой теории натуральных чисел.
 
-### W7 — Measurement interpretations
+## Волна W6 — умножение и порядок
 
-Use the same Nat family with explicit provenance for:
+Используются уже построенные индукция и композиция теорем. Новые доверенные категории доказательств ради удобства арифметики не вводятся.
+
+## Волна W7 — измерения
+
+Одна и та же форма натурального числа исследуется с явным происхождением результата:
 
 ```text
 Degree
-Count/cardinal-like reading
-ordinal-like reading
-arity/depth/other finite measures
+Count
+ordinal-like provenance
+cardinal-like provenance
+arity
+depth
 ```
 
-No primitive host `Ordinal` or `Cardinal` semantic type.
+`Ordinal` и `Cardinal` не становятся примитивными типами реализации или МТС.
 
-## W1 theorem definitions
+## Параллельная общая работа proof calculus
 
-### T1 — Zero
-
-```text
-N0 = U
-```
-
-### T2 — Successor closure
-
-```text
-Nat(N)
--------
-Nat(N ⟼ L)
-```
-
-The Nat context itself must be explicit MTS structure, never a host recursive datatype.
-
-### T3 — Zero is not successor
-
-```text
-Nat(N)
--------
-N ⟼ L != U
-```
-
-This is a structural falsification target first, not an assumed Peano axiom.
-
-### T4 — Successor injectivity
-
-```text
-A ⟼ L = B ⟼ L
-----------------
-A = B
-```
-
-Expected foundation source is ordered-pole Link identity.
-
-### T5 — Unique predecessor
-
-```text
-A ⟼ L = N
-B ⟼ L = N
-----------------
-A = B
-```
-
-The preferred proof reuses T4 as derived evidence. This is the first explicit reuse gate.
-
-## Parallel proof-calculus work
-
-Generic Nat-independent work may proceed simultaneously. #1050/#1051 is the immediate example:
+Независимые от конкретной арифметики механизмы развиваются одновременно. Первый текущий пример — #1050/#1051:
 
 ```text
 UsedPremises ⊆ DeclaredPremises
 ```
 
-Any old-Nat L0 observation inside that branch is diagnostic only and cannot advance arithmetic acceptance.
+Исторический прогон L0 внутри старой ветки является только диагностикой и не может продвигать принятие новой арифметики.
 
-## Relationship to #1019
+## Отношение к #1019
 
-Completed generic results are preserved. The arithmetic ladder is reclassified as downstream:
+Все уже доказанные общие результаты сохраняются:
 
 ```text
-L0/L1/COMM = PAUSED
+N2a = COMPLETE
+N2b = COMPLETE
+generic role morphisms = PRESERVED
+cross-scope reuse = PRESERVED
 ```
 
-until W3/W4/W5 re-entry on the selected Nat theory.
-
-Induction/cross-scope mechanisms may be reused earlier if W1/W2 theorem challenges require them.
-
-## Governance
-
-Every executable theorem child must have a bounded ChangeIntent.
-
-Required boundaries:
+А старая арифметическая лестница переводится вниз по новой программе:
 
 ```text
-accepted v0.11 unchanged unless separately classified
+L0 = PAUSED
+L1 = PAUSED
+COMM = PAUSED
+```
+
+Возврат к ней происходит через W3, W4 и W5.
+
+## Управление изменениями
+
+Каждая исполняемая теорема получает отдельную ограниченную Issue с `ChangeIntent`.
+
+Обязательные границы:
+
+```text
+accepted MTS v0.11 = unchanged unless separately classified
 active semantic candidate = NONE until evidence requires lifecycle
-MTS Links/Anets = semantic/proof authority
-host arrays/maps/AST = projections only
+MTS Links / Anets = semantic and proof authority
+host arrays / maps / AST = projections only
 exact Theory revision
 read-only trusted replay
 no theorem-specific trusted opcode
-no primitive admission/promotion of derived theorem evidence
-no host Nat/Ordinal/Cardinal kind as authority
+no primitive promotion of derived theorem evidence
+no host Nat / Ordinal / Cardinal authority
 ```
 
-## Documentation
+## Документация
 
-The central Nat chapter owned by #1053 must eventually explain:
+Центральная глава #1053 должна поддерживаться вместе с доказательствами и объяснять:
 
-- zero boundary and unit Link;
-- the new Nat carrier;
-- structure/proof/reuse separation;
-- Peano laws as theorem challenges;
-- proof Anet representation and theorem reuse;
-- induction/minimality;
-- Degree, Count, ordinal-like and cardinal-like provenance;
-- recursive arithmetic and the constructive proof ladder.
+- нулевую границу и единичную связь;
+- новый носитель натуральных чисел;
+- различие `STRUCTURE`, `PROOF_ANET`, `REUSE`;
+- законы Пеано как последовательность проверяемых теорем;
+- доказательство как Anet и переиспользование теорем;
+- индукцию и минимальность;
+- `Degree`, `Count`, ординальное и кардинальное чтение;
+- рекурсивную арифметику и конструктивную лестницу доказательств.
 
-New prose uses `Anet`; repository-wide technical renaming is owned by #1049.
+Новая русская документация использует термин Anet. Полная техническая миграция `Aset -> Anet` принадлежит #1049.
 
-## Immediate program sequence
+## Ближайший порядок
 
 ```text
-P0  finish generic weakening #1050/#1051 as Nat-independent proof work
-W1a structural falsifiers for T3 and T4
-W1b proof-Anet challenge for T4
-W1c theorem-reuse challenge T5
-W2  induction/minimality only after W1 reusable suite
+P0  закончить общий weakening #1050/#1051
+W1a проверить структуру T3 и T4
+W1b построить proof Anet для T4
+W1c проверить REUSE на T5
+W2  перейти к индукции только после переиспользуемого W1-набора
 ```
 
-T1/T2 are context-definition prerequisites and should be split or bundled only by a bounded child design that demonstrates the dependency boundary.
+T1 и T2 являются необходимыми определительными границами. Их объединение или разделение допускается только отдельным ограниченным дизайном.
