@@ -39,7 +39,8 @@ export interface StructuralRootedProofAsetReplayResult {
   readonly targetOccurrence: LinkHandle;
   readonly conclusion: LinkHandle;
   readonly occurrenceCount: number;
-  readonly assumptionCount: number;
+  readonly declaredAssumptionCount: number;
+  readonly usedAssumptionCount: number;
 }
 
 function fail(code: StructuralRootedProofAsetReplayErrorCode): never {
@@ -325,7 +326,8 @@ export function replayStructuralRootedProofAset(
       targetOccurrence,
       conclusion,
       occurrenceCount: verified.size,
-      assumptionCount: usedPremises.size,
+      declaredAssumptionCount: targetPremises.size,
+      usedAssumptionCount: usedPremises.size,
     });
   } catch (error) {
     if (error instanceof StructuralRootedProofAsetReplayError) throw error;
