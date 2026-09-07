@@ -213,20 +213,8 @@ function weakeningCorpus(): void {
   const hA = memory.ensure(a, target.identity);
   const out = proofOccurrence(memory, b, primitive.derivationRule, [hA]);
 
-  try {
-    const replay = replayStructuralRootedProofAset(memory, proofRoot(memory, target.identity, out));
-    same(replay.conclusion, b, "weakening conclusion");
-  } catch (error) {
-    if (
-      error instanceof StructuralRootedProofAsetReplayError
-      && error.code === "unused-target-premise"
-    ) {
-      throw new Error(
-        "weakening should allow a declared-but-unused target premise: unused-target-premise",
-      );
-    }
-    throw error;
-  }
+  const replay = replayStructuralRootedProofAset(memory, proofRoot(memory, target.identity, out));
+  same(replay.conclusion, b, "weakening conclusion");
 }
 
 function adversarialCorpus(): void {
