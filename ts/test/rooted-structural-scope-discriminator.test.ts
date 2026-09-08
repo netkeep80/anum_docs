@@ -153,7 +153,6 @@ function confirmSharedDictionaryInformationLoss(): void {
 }
 
 async function main(): Promise<void> {
-  // D1 is isolated: its global primitive admissions cannot contaminate D2.
   confirmSharedDictionaryInformationLoss();
   console.log("SHARED_DICTIONARY_V1_INFORMATION_LOSS = CONFIRMED");
 
@@ -168,7 +167,6 @@ async function main(): Promise<void> {
   const localAB = defineStructuralRoleDictionary(memory, [A, B]);
   const localBC = defineStructuralRoleDictionary(memory, [B, CRole]);
 
-  // D2a: local primitive ownership removes the invisible-role loss.
   const localR1 = primitiveFixture(memory, theory, localAB, A, B);
   const localR2 = primitiveFixture(memory, theory, localBC, B, CRole);
   const localR1Root = rootedPrimitiveRoot(memory, theory, localR1.derivationRule, a, b);
@@ -181,7 +179,6 @@ async function main(): Promise<void> {
   same(memory.linkCount, beforeR2, "local R2 read-only");
   console.log("LOCAL_PRIMITIVE_ROOTED_V1_COMPLETE_RHO = SUPPORTED");
 
-  // Incomplete local rho and inconsistent visible rho still fail closed.
   const incomplete = primitiveFixture(memory, theory, localAB, A, A);
   const incompleteRoot = rootedPrimitiveRoot(memory, theory, incomplete.derivationRule, a, a);
   expectRootedError("template-mismatch", () => replayStructuralRootedProofAset(memory, incompleteRoot));
@@ -192,7 +189,6 @@ async function main(): Promise<void> {
   same(replayStructuralRootedProofAset(memory, localR1Root).conclusion, b,
     "unreachable other proof occurrences grant zero authority");
 
-  // D2b: both local schemas map successfully into the enclosing global scope.
   const globalR1 = targetFixture(memory, theory, globalDictionary, A, B);
   const globalR2 = targetFixture(memory, theory, globalDictionary, B, CRole);
   const mu1 = morphism(memory, theory, localAB, globalDictionary, [[A, A], [B, B]]);
@@ -205,7 +201,6 @@ async function main(): Promise<void> {
   same(memory.linkCount, beforeMu, "accepted mu replay read-only");
   console.log("LOCAL_TO_GLOBAL_MU_REPLAY = SUPPORTED");
 
-  // Required mu negatives, including host metadata having zero authority.
   const partialMu = morphism(memory, theory, localAB, globalDictionary, [[A, A]]);
   const hostMu = new Map<LinkHandle, LinkHandle>([[A, A], [B, B]]);
   same(hostMu.get(B), B, "host map contains missing coordinate but grants no authority");
@@ -229,8 +224,6 @@ async function main(): Promise<void> {
     replayStructuralDerivedDerivationCrossScopeApplication(memory,
       { source: captureSource.evidence, morphism: captureMu, targetIdentity: captureTarget.identity }));
 
-  // D2c: mapped identities still cannot act as primitive nodes of a larger
-  // global derived proof merely because mu replay succeeded.
   assert(memory.find(theory, globalR1.rule) === undefined, "global R1 rule stays unadmitted");
   assert(memory.find(theory, globalR2.rule) === undefined, "global R2 rule stays unadmitted");
   const composedRule = defineStructuralRule(memory, globalDictionary, CRole);
@@ -262,17 +255,13 @@ async function main(): Promise<void> {
     ]),
   });
   const beforeComposition = memory.linkCount;
-  expectDerivedError("rule-not-admitted", () =>
-    replayStructuralDerivedDerivationSchema(memory, composedEvidence));
+  expectDerivedError("rule-not-admitted", () => replayStructuralDerivedDerivationSchema(memory, composedEvidence));
   same(memory.linkCount, beforeComposition, "composition rejection read-only");
   console.log("GENERIC_ROOTED_COMPOSITION_GAP = rule-not-admitted");
 
-  // D3: current Act meaning is incidence-sensitive. The exact same Act/evidence
-  // fails with one declared field absent, then succeeds after only Act -> field.
   const interpreterDictionary = fresh(), grammar = fresh(), afterContext = fresh();
   const interpreter = defineStructuralInterpreter(memory, interpreterDictionary, grammar, theory);
-  const actBody = memory.ensure(B, B);
-  const actClaim = memory.ensure(b, b);
+  const actBody = memory.ensure(B, B), actClaim = memory.ensure(b, b);
   const actRule = defineStructuralRule(memory, globalDictionary, actBody);
   const actRuleAdmission = admitStructuralRule(memory, theory, actRule);
   const act = defineActHeader(memory, interpreter, globalDictionary, afterContext);
@@ -291,7 +280,7 @@ async function main(): Promise<void> {
   defineActField(memory, act, CRole, c);
   const beforeComplete = memory.linkCount;
   const actReplay = replayStructuralRule(memory, actEvidence);
-  same(actReplay.act ?? act, act, "same Act remains authority carrier");
+  same(actReplay.bindings.length, 3, "complete Act binding count");
   same(memory.linkCount, beforeComplete, "complete Act replay read-only");
   const revisionAfter = await computePortableStructuralTheoryRevision(
     exportPortableStructuralTheory(memory, theory));
