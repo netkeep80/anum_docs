@@ -10,7 +10,6 @@ import {
   defineStructuralDerivationRule,
 } from "../src/derivation.js";
 import {
-  StructuralHeterogeneousDerivedDerivationReplayError,
   replayStructuralHeterogeneousDerivedDerivationSchema,
   type StructuralHeterogeneousDerivedDerivationEvidence,
 } from "../src/derived-derivation-heterogeneous.js";
@@ -20,6 +19,9 @@ import { replayStructuralHeterogeneousDerivedClosedRootedInstance } from "../src
 import { materializeHeterogeneousDerivedClosedRootedDischarge } from "../src/derived-derivation-heterogeneous-discharge-materialize.js";
 import { replayStructuralRootedProofAset } from "../src/rooted-proof-aset.js";
 import { replayRecursiveLinkIdentityProofAset } from "../src/recursive-link-identity-proof.js";
+import { replayProofSubAnetProjection } from "../src/proof-subanet-projection.js";
+import { exportPortableStructuralTheory } from "../src/portable-theory.js";
+import { computePortableStructuralTheoryRevision } from "../src/portable-theory-digest.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -75,25 +77,7 @@ function genericNode(
   );
 }
 
-function expectGenericGap(
-  memory: Memory,
-  evidence: StructuralHeterogeneousDerivedDerivationEvidence & Readonly<Record<string, unknown>>,
-): string {
-  const before = memory.linkCount;
-  try {
-    replayStructuralHeterogeneousDerivedDerivationSchema(memory, evidence);
-  } catch (error) {
-    assert(
-      error instanceof StructuralHeterogeneousDerivedDerivationReplayError,
-      "T4 rerun must fail at the heterogeneous generic authority boundary",
-    );
-    same(memory.linkCount, before, "failed generic replay remains read-only");
-    return error.code;
-  }
-  throw new Error("T4 generic certificate unexpectedly accepted without primitive authority");
-}
-
-function main(): void {
+async function main(): Promise<void> {
   const memory = new Memory();
   const { R, O, C, L, U } = ensureRootBasis(memory);
   const theory = memory.ensure(C, U);
@@ -128,11 +112,53 @@ function main(): void {
   replayRecursiveLinkIdentityProofAset(memory, arbitraryRelationProof);
   replayRecursiveLinkIdentityProofAset(memory, aProof);
 
+  // Accepted K1e must remain genuinely generic: replay the arbitrary non-Nat
+  // relation through an unadmitted one-premise ProjectionSchema and recover the
+  // exact existing start identity ProofOccurrence from the validated closure.
+  const genericStartRole = memory.ensure(U, R);
+  const genericEndRole = memory.ensure(R, U);
+  const genericProjectionDictionary = defineStructuralRoleDictionary(
+    memory,
+    [genericStartRole, genericEndRole],
+  );
+  const genericRelationTemplate = memory.ensure(genericStartRole, genericEndRole);
+  const genericPremiseTemplate = memory.ensure(genericRelationTemplate, genericRelationTemplate);
+  const genericConclusionTemplate = memory.ensure(genericStartRole, genericStartRole);
+  const genericProjectionRule = defineStructuralRule(
+    memory,
+    genericProjectionDictionary,
+    genericConclusionTemplate,
+  );
+  const genericProjectionDR = defineStructuralDerivationRule(
+    memory,
+    genericProjectionRule,
+    [genericPremiseTemplate],
+  );
+  assert(
+    memory.find(theory, genericProjectionRule) === undefined,
+    "generic projection Rule remains unadmitted",
+  );
+  assert(
+    memory.find(theory, genericProjectionDR) === undefined,
+    "generic projection DR remains unadmitted",
+  );
+
+  const genericProjectionBefore = memory.linkCount;
+  const genericProjection = replayProofSubAnetProjection(memory, {
+    theory,
+    schemaDerivationRule: genericProjectionDR,
+    premiseProofOccurrence: arbitraryRelationProof,
+  });
+  same(genericProjection.projectedOccurrence, aProof, "generic non-Nat projection exact occurrence");
+  same(genericProjection.projectedClaim, startClaim, "generic non-Nat projection exact Claim");
+  same(memory.linkCount, genericProjectionBefore, "generic non-Nat projection replay read-only");
+
   // T4-shaped concrete control. Because Memory is canonical, a true concrete
   // equality (A->L)=(B->L) is represented by one exact successor Link. Its
   // recursive identity proof already carries the exact start-pole proof.
   const successor = memory.ensure(a, L);
   const successorProof = identityProof(memory, successor, successor, [aProof, lProof]);
+  const successorClaim = memory.poles(successorProof).start;
   const successorChildren = readExactSequence(
     memory,
     memory.poles(successorProof).end,
@@ -148,9 +174,9 @@ function main(): void {
   replayRecursiveLinkIdentityProofAset(memory, aProof);
 
   // ---------------------------------------------------------------------------
-  // F2. K1d3/K1d4 are not the remaining blocker. Use one arbitrary admitted
-  // structural step P->Q. The projected identity ProofOccurrence discharges only
-  // the concrete P assumption; it is never interpreted as this primitive step.
+  // F2. K1d3/K1d4 are not blockers. Use one arbitrary admitted structural step
+  // P->Q. The projected identity ProofOccurrence discharges only the concrete P
+  // assumption; it is never interpreted as this primitive step.
   // ---------------------------------------------------------------------------
   const P = memory.ensure(L, U);
   const Q = memory.ensure(U, R);
@@ -236,64 +262,61 @@ function main(): void {
   same(closedBinding.pairedStructuralOccurrenceCount, 1, "one arbitrary structural node survives discharge");
 
   // ---------------------------------------------------------------------------
-  // F3. Exact generic T4 schema. Current K1d2 has no occurrence law saying that
-  // an already-valid premise identity ProofOccurrence authorizes one of its
-  // reachable pole subproofs as the theorem consequence. The only structural
-  // node shape that could encode this today would promote ordered-pole/T4 to an
-  // admitted primitive Rule/DR. Keep that authority deliberately absent.
+  // F3. Exact generic T4 rerun after accepted K1e.
+  //
+  // ProjectionSchema is ordinary MTS structural schema data and remains
+  // unadmitted. The trusted K1e mechanism must infer A/B solely from the exact
+  // premise Claim Eq(A->L,B->L), traverse only the K1-validated premise closure,
+  // and select the unique existing Eq(A,B) ProofOccurrence.
   // ---------------------------------------------------------------------------
   const A = memory.ensure(L, R);
   const B = memory.ensure(R, L);
-  const t4GlobalDictionary = defineStructuralRoleDictionary(memory, [A, B]);
+  const t4Dictionary = defineStructuralRoleDictionary(memory, [A, B]);
   const t4Premise = memory.ensure(memory.ensure(A, L), memory.ensure(B, L));
   const t4Conclusion = memory.ensure(A, B);
-  const t4TargetRule = defineStructuralRule(memory, t4GlobalDictionary, t4Conclusion);
-  const t4TargetDR = defineStructuralDerivationRule(memory, t4TargetRule, [t4Premise]);
-  const t4Identity = memory.ensure(t4TargetDR, theory);
-  const t4Assumption = memory.ensure(t4Premise, t4Identity);
+  const t4ProjectionRule = defineStructuralRule(memory, t4Dictionary, t4Conclusion);
+  const t4ProjectionDR = defineStructuralDerivationRule(
+    memory,
+    t4ProjectionRule,
+    [t4Premise],
+  );
 
-  // Use distinct local Roles so the candidate exercises the accepted local->global
-  // morphism architecture rather than relying on one shared RoleDictionary.
-  const X = memory.ensure(U, L);
-  const Y = memory.ensure(C, L);
-  const localDictionary = defineStructuralRoleDictionary(memory, [X, Y]);
-  const localPremise = memory.ensure(memory.ensure(X, L), memory.ensure(Y, L));
-  const localConclusion = memory.ensure(X, Y);
-  const localRule = defineStructuralRule(memory, localDictionary, localConclusion);
-  const localDR = defineStructuralDerivationRule(memory, localRule, [localPremise]);
-  const mu = morphism(memory, theory, localDictionary, t4GlobalDictionary, [
-    [X, A],
-    [Y, B],
-  ]);
-  const t4Candidate = genericNode(memory, t4Conclusion, localDR, mu, [t4Assumption]);
+  assert(memory.find(theory, t4ProjectionRule) === undefined, "T4 projection Rule remains unadmitted");
+  assert(memory.find(theory, t4ProjectionDR) === undefined, "T4 projection DR remains unadmitted");
 
-  assert(memory.find(theory, t4TargetRule) === undefined, "T4 target Rule remains unadmitted");
-  assert(memory.find(theory, t4TargetDR) === undefined, "T4 target DR remains unadmitted");
-  assert(memory.find(theory, localRule) === undefined, "ordered-pole local Rule remains unadmitted");
-  assert(memory.find(theory, localDR) === undefined, "ordered-pole local DR remains unadmitted");
-
-  // Host coordinates and ambient Links may describe the already-observed
-  // whole-proof -> start-subproof relation, but they grant zero generic authority.
-  const hostDecoratedEvidence = Object.freeze({
-    identity: t4Identity,
-    targetOccurrence: t4Candidate,
-    premiseProof: successorProof,
-    projectedStartProof: aProof,
+  const revisionBefore = await computePortableStructuralTheoryRevision(
+    exportPortableStructuralTheory(memory, theory),
+  );
+  const t4Before = memory.linkCount;
+  const t4Replay = replayProofSubAnetProjection(memory, {
+    theory,
+    schemaDerivationRule: t4ProjectionDR,
+    premiseProofOccurrence: successorProof,
   });
-  memory.ensure(successorProof, aProof);
 
-  const gap = expectGenericGap(memory, hostDecoratedEvidence);
-  same(gap, "invalid-generic-occurrence", "exact post-K1d4 generic boundary");
-  assert(memory.find(theory, localRule) === undefined, "rerun did not admit ordered-pole Rule");
-  assert(memory.find(theory, localDR) === undefined, "rerun did not admit ordered-pole DR");
+  same(t4Replay.premiseClaim, successorClaim, "T4 exact premise identity Claim");
+  same(t4Replay.projectedOccurrence, aProof, "T4 exact existing projected ProofOccurrence");
+  same(t4Replay.projectedClaim, startClaim, "T4 exact projected Eq(A,B) Claim");
+  same(t4Replay.bindings.length, 2, "T4 A/B bindings inferred only from premise Claim");
+  same(memory.linkCount, t4Before, "T4 projection replay read-only");
+
+  assert(memory.find(theory, t4ProjectionRule) === undefined, "T4 rerun did not admit projection Rule");
+  assert(memory.find(theory, t4ProjectionDR) === undefined, "T4 rerun did not admit projection DR");
+
+  const revisionAfter = await computePortableStructuralTheoryRevision(
+    exportPortableStructuralTheory(memory, theory),
+  );
+  same(revisionAfter.scheme, revisionBefore.scheme, "T4 Theory revision scheme unchanged");
+  same(revisionAfter.value, revisionBefore.value, "T4 exact Theory revision unchanged");
 
   console.log("T4_SUCCESSOR_INJECTIVITY_STRUCTURE = SUPPORTED");
   console.log("IDENTITY_POLE_SUBANET_PROJECTION = SUPPORTED");
   console.log("K1D4_PROJECTED_PROOF_ASSUMPTION_DISCHARGE = SUPPORTED");
-  console.log(`T4_PROOF_ANET_RERUN = GAP(${gap})`);
+  console.log("K1E_GENERIC_PROOF_SUBANET_PROJECTION = SUPPORTED");
+  console.log("T4_PROOF_ANET_RERUN = SUPPORTED");
   console.log("T4_REUSE = NOT TESTED");
   console.log("T4_PRIMITIVE_PROMOTION = NOT USED");
   console.log("accepted semantic delta = NONE");
 }
 
-main();
+void main();
