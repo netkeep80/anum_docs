@@ -136,13 +136,13 @@ function morphism(
   ]);
 }
 
-function rootedPrimitiveReplay(
+function rootedPrimitiveRoot(
   memory: Memory,
   theory: LinkHandle,
   primitiveDerivationRule: LinkHandle,
   premiseClaim: LinkHandle,
   conclusionClaim: LinkHandle,
-) {
+): LinkHandle {
   const targetDictionary = defineStructuralRoleDictionary(memory, []);
   const targetRule = defineStructuralRule(memory, targetDictionary, conclusionClaim);
   const targetDerivationRule = defineStructuralDerivationRule(
@@ -157,10 +157,7 @@ function rootedPrimitiveReplay(
     materializeExactSequence(memory, [assumptionOccurrence]),
   );
   const targetOccurrence = memory.ensure(conclusionClaim, application);
-  return replayStructuralRootedProofAset(
-    memory,
-    memory.ensure(targetIdentity, targetOccurrence),
-  );
+  return memory.ensure(targetIdentity, targetOccurrence);
 }
 
 function main(): void {
@@ -186,22 +183,25 @@ function main(): void {
 
   // D1: shared RoleDictionary V1 loses the invisible C binding for R1: A -> B.
   const sharedR1 = primitiveFixture(memory, theory, globalDictionary, A, B);
-  expectRootedError("template-mismatch", () =>
-    rootedPrimitiveReplay(memory, theory, sharedR1.derivationRule, a, b),
-  );
+  const sharedRoot = rootedPrimitiveRoot(memory, theory, sharedR1.derivationRule, a, b);
+  const beforeSharedReplay = memory.linkCount;
+  expectRootedError("template-mismatch", () => replayStructuralRootedProofAset(memory, sharedRoot));
+  same(memory.linkCount, beforeSharedReplay, "shared R1 rejection read-only");
   console.log("SHARED_DICTIONARY_V1_INFORMATION_LOSS = CONFIRMED");
 
   // D2a: the exact same primitive applications are complete under local scopes.
   const localR1 = primitiveFixture(memory, theory, localAB, A, B);
   const localR2 = primitiveFixture(memory, theory, localBC, B, CRole);
 
+  const localR1Root = rootedPrimitiveRoot(memory, theory, localR1.derivationRule, a, b);
   const beforeLocalR1 = memory.linkCount;
-  const localR1Replay = rootedPrimitiveReplay(memory, theory, localR1.derivationRule, a, b);
+  const localR1Replay = replayStructuralRootedProofAset(memory, localR1Root);
   same(localR1Replay.conclusion, b, "local R1 concrete conclusion");
   same(memory.linkCount, beforeLocalR1, "local R1 rooted replay read-only");
 
+  const localR2Root = rootedPrimitiveRoot(memory, theory, localR2.derivationRule, b, c);
   const beforeLocalR2 = memory.linkCount;
-  const localR2Replay = rootedPrimitiveReplay(memory, theory, localR2.derivationRule, b, c);
+  const localR2Replay = replayStructuralRootedProofAset(memory, localR2Root);
   same(localR2Replay.conclusion, c, "local R2 concrete conclusion");
   same(memory.linkCount, beforeLocalR2, "local R2 rooted replay read-only");
   console.log("LOCAL_PRIMITIVE_ROOTED_V1_COMPLETE_RHO = SUPPORTED");
