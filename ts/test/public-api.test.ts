@@ -77,6 +77,8 @@ const expectedRuntimeExports = [
   "Memory",
   "MemoryError",
   "PORTABLE_MTS_SEMANTIC_BASE",
+  "PORTABLE_PROOF_SUBANET_PROJECTION_CONTENT_DIGEST_SCHEME",
+  "PORTABLE_PROOF_SUBANET_PROJECTION_SCHEMA",
   "PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME",
   "PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_DIGEST_SCHEME",
   "PORTABLE_STRUCTURAL_DERIVATION_PROVENANCE_SCHEMA",
@@ -93,6 +95,7 @@ const expectedRuntimeExports = [
   "PORTABLE_STRUCTURAL_THEORY_SCHEMA",
   "PersistentStore",
   "PersistentStoreError",
+  "PortableProofSubAnetProjectionError",
   "PortableStructuralDerivationError",
   "PortableStructuralDerivationProvenanceError",
   "PortableStructuralTheoryError",
@@ -110,6 +113,7 @@ const expectedRuntimeExports = [
   "ValueBundleReplayError",
   "analyzeDirectDeixisCarrier",
   "bundleRoleAt",
+  "computePortableProofSubAnetProjectionContentDigest",
   "computePortableStructuralDerivationContentDigest",
   "computePortableStructuralDerivationProvenanceDigest",
   "computePortableStructuralDerivationWithAssumptionsContentDigest",
@@ -126,14 +130,18 @@ const expectedRuntimeExports = [
   "elaborateBundleRoles",
   "ensureRootBasis",
   "executeAbits",
+  "exportPortableProofSubAnetProjection",
   "exportPortableStructuralDerivation",
   "exportPortableStructuralDerivationWithAssumptions",
   "exportPortableStructuralDerivationWithTheorems",
   "exportPortableStructuralTheory",
+  "materializeHeterogeneousDerivedClosedRootedDischarge",
+  "materializeHeterogeneousDerivedOpenRootedExpansion",
   "materializePersistentSequence",
   "materializeSequence",
   "normalizeRawForm",
   "parseRawQuaternary",
+  "replayClosedProofOccurrence",
   "replayColonEffect",
   "replayDefinitionEffect",
   "replayDecomposeEqualRelations",
@@ -143,11 +151,13 @@ const expectedRuntimeExports = [
   "replayFlatSubselectionReading",
   "replayIntegratedProof",
   "replayPersistentSequenceMaterialization",
+  "replayPortableProofSubAnetProjection",
   "replayPortableStructuralDerivation",
   "replayPortableStructuralDerivationWithAssumptions",
   "replayPortableStructuralDerivationWithTheorems",
   "replayPortableStructuralProof",
   "replayPortableStructuralTheory",
+  "replayProofSubAnetProjection",
   "replayRelationStep",
   "replayRelationSubselectionStep",
   "replayResolvedSequenceGrouping",
@@ -157,19 +167,23 @@ const expectedRuntimeExports = [
   "replayStructuralDerivation",
   "replayStructuralDerivationWithAssumptions",
   "replayStructuralDerivationWithTheorems",
+  "replayStructuralHeterogeneousDerivedClosedRootedInstance",
+  "replayStructuralHeterogeneousDerivedDerivationSchema",
+  "replayStructuralHeterogeneousDerivedOpenRootedInstance",
   "replayStructuralJudgment",
   "replayStructuralScopedDerivation",
   "replayStructuralTheorem",
   "resolveFlatBundle",
   "symbolicStackAlgebra",
   "valuesEqual",
+  "verifyPortableProofSubAnetProjectionTheoryRevision",
   "verifyPortableStructuralDerivationProvenanceClaim",
   "verifyPortableStructuralDerivationWithAssumptionsProvenanceClaim",
   "verifyPortableStructuralDerivationWithTheoremsProvenanceClaim",
   "verifyPortableStructuralProofTheoryRevision",
 ].sort();
 
-assert(expectedRuntimeExports.length === 99, "R3 theorem transport + producer runtime export budget must be exactly 99");
+assert(expectedRuntimeExports.length === 113, "portable proof-Anet runtime export budget must be exactly 113");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
@@ -190,6 +204,16 @@ assert(
 assert(
   publicApi.PORTABLE_MTS_SEMANTIC_BASE === "mts-contract/v0.11",
   "portable derivation semantic base must stay pinned",
+);
+assert(
+  publicApi.PORTABLE_PROOF_SUBANET_PROJECTION_SCHEMA ===
+    "mts-portable-proof-subanet-projection/v0.1",
+  "portable proof-Anet projection schema must stay pinned",
+);
+assert(
+  publicApi.PORTABLE_PROOF_SUBANET_PROJECTION_CONTENT_DIGEST_SCHEME ===
+    "mts-portable-proof-subanet-projection-content/sha-256/v0.1",
+  "portable proof-Anet projection digest scheme must stay pinned",
 );
 assert(
   publicApi.PORTABLE_STRUCTURAL_DERIVATION_CONTENT_DIGEST_SCHEME ===
