@@ -1,5 +1,6 @@
 import { materializeExactSequence } from "../src/exact-sequence.js";
 import { Memory, ensureRootBasis, type LinkHandle } from "../src/memory.js";
+import { defineContext } from "../src/state.js";
 import {
   admitStructuralDerivationRule,
   defineStructuralDerivationRule,
@@ -207,7 +208,6 @@ async function main(): Promise<void> {
   same(memory.linkCount, beforeMuReplay, "cross-scope replay is read-only");
   console.log("LOCAL_TO_GLOBAL_MU = SUPPORTED");
 
-  // Exact predecessor invariant: mapped targets are derived, never primitive Theory authority.
   assert(memory.find(theory, globalR1.rule) === undefined, "mapped global R1 Rule stays unadmitted");
   assert(memory.find(theory, globalR1.derivationRule) === undefined,
     "mapped global R1 DR stays unadmitted");
@@ -215,7 +215,6 @@ async function main(): Promise<void> {
   assert(memory.find(theory, globalR2.derivationRule) === undefined,
     "mapped global R2 DR stays unadmitted");
 
-  // Arbitrary ROOT-grounded A-value with accepted intrinsic identity proof.
   const arbitraryStart = memory.ensureStartSelfClosed(C);
   const arbitraryEnd = memory.ensureEndSelfClosed(O);
   const x = memory.ensure(arbitraryStart, arbitraryEnd);
@@ -236,10 +235,9 @@ async function main(): Promise<void> {
   same(memory.poles(xProof).start, aClaim, "identity root exact A Claim");
   same(memory.linkCount, beforeIdentityReplay, "identity replay is read-only");
 
-  // Prove that the existing generic instantiator/application replay works locally.
   const interpreterDictionary = fresh();
   const grammar = fresh();
-  const afterContext = fresh();
+  const afterContext = defineContext(memory, R, L);
   const interpreter = defineStructuralInterpreter(memory, interpreterDictionary, grammar, theory);
   const r1Bindings: readonly StructuralRoleBinding[] = Object.freeze([
     Object.freeze({ role: A, value: aClaim }),
@@ -272,8 +270,6 @@ async function main(): Promise<void> {
     exportPortableStructuralTheory(memory, theory),
   );
 
-  // Expansion target: do not reify mapped global R1/R2 as proof nodes.
-  // Use the admitted LOCAL primitive DRs directly; exact Claims connect the scopes.
   const r1Occurrence = proofOccurrence(memory, bClaim, localR1.derivationRule, [xProof]);
   const r2Occurrence = proofOccurrence(memory, cClaim, localR2.derivationRule, [r1Occurrence]);
 
@@ -293,7 +289,6 @@ async function main(): Promise<void> {
   same(rooted.usedAssumptionCount, 0, "expanded root has no open assumptions");
   same(memory.linkCount, beforeRootReplay, "expanded rooted replay is read-only");
 
-  // Host projections may exist for construction, but they are not consumed by trusted replay.
   const hostProjection = new Map<LinkHandle, LinkHandle>([
     [A, cClaim],
     [B, aClaim],
@@ -304,7 +299,6 @@ async function main(): Promise<void> {
   same(replayWithBogusHostProjection.conclusion, cClaim,
     "host projection grants zero rooted authority");
 
-  // Required cross-scope negative controls.
   const partialMu = morphism(memory, theory, localAB, globalDictionary, [[A, A]]);
   expectCrossScopeError("missing-source-role", () =>
     replayStructuralDerivedDerivationCrossScopeApplication(memory, {
@@ -348,7 +342,6 @@ async function main(): Promise<void> {
   same(revisionAfter.scheme, revisionBeforeRootConstruction.scheme, "Theory revision scheme unchanged");
   same(revisionAfter.value, revisionBeforeRootConstruction.value, "exact Theory revision unchanged");
 
-  // Reconfirm that success did not silently promote mapped global nodes.
   assert(memory.find(theory, globalR1.rule) === undefined, "mapped global R1 Rule remains unadmitted");
   assert(memory.find(theory, globalR1.derivationRule) === undefined,
     "mapped global R1 DR remains unadmitted");
