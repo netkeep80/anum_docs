@@ -227,8 +227,11 @@ function exportWithReplay(
 } {
   const before = memory.linkCount;
   try {
-    const support = exportObservedReplaySupportTopology(memory, (observedMemory) =>
-      replayProofSubAnetProjection(observedMemory, evidence));
+    const support = exportObservedReplaySupportTopology(
+      memory,
+      (observedMemory) => replayProofSubAnetProjection(observedMemory, evidence),
+      [evidence.theory, evidence.schemaDerivationRule, evidence.premiseProofOccurrence],
+    );
     if (memory.linkCount !== before) fail("replay-wrote");
     return Object.freeze({
       artifact: artifactFromSupport(support, evidence),
