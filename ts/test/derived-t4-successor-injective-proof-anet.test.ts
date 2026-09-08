@@ -1,10 +1,14 @@
 import { materializeExactSequence, readExactSequence } from "../src/exact-sequence.js";
 import { Memory, ensureRootBasis, type LinkHandle } from "../src/memory.js";
 import {
+  admitStructuralRule,
   defineStructuralRoleDictionary,
   defineStructuralRule,
 } from "../src/structural-rule.js";
-import { defineStructuralDerivationRule } from "../src/derivation.js";
+import {
+  admitStructuralDerivationRule,
+  defineStructuralDerivationRule,
+} from "../src/derivation.js";
 import {
   StructuralHeterogeneousDerivedDerivationReplayError,
   replayStructuralHeterogeneousDerivedDerivationSchema,
@@ -144,32 +148,62 @@ function main(): void {
   replayRecursiveLinkIdentityProofAset(memory, aProof);
 
   // ---------------------------------------------------------------------------
-  // F2. K1d3/K1d4 are not the remaining blocker. If the generic theorem already
-  // declares the projected Claim itself as its assumption, the exact same aProof
-  // closes the OPEN instance law-neutrally with no structural primitive node.
+  // F2. K1d3/K1d4 are not the remaining blocker. Use one arbitrary admitted
+  // structural step P->Q. The projected identity ProofOccurrence discharges only
+  // the concrete P assumption; it is never interpreted as this primitive step.
   // ---------------------------------------------------------------------------
   const P = memory.ensure(L, U);
-  const projectionDictionary = defineStructuralRoleDictionary(memory, [P]);
-  const projectionRule = defineStructuralRule(memory, projectionDictionary, P);
+  const Q = memory.ensure(U, R);
+  const projectionDictionary = defineStructuralRoleDictionary(memory, [P, Q]);
+  const projectionRule = defineStructuralRule(memory, projectionDictionary, Q);
   const projectionDR = defineStructuralDerivationRule(memory, projectionRule, [P]);
   const projectionIdentity = memory.ensure(projectionDR, theory);
+
+  const localP = memory.ensure(O, L);
+  const localQ = memory.ensure(U, O);
+  const projectionLocalDictionary = defineStructuralRoleDictionary(memory, [localP, localQ]);
+  const projectionLocalRule = defineStructuralRule(memory, projectionLocalDictionary, localQ);
+  const projectionLocalDR = defineStructuralDerivationRule(
+    memory,
+    projectionLocalRule,
+    [localP],
+  );
+  admitStructuralRule(memory, theory, projectionLocalRule);
+  admitStructuralDerivationRule(memory, theory, projectionLocalDR);
+  const projectionMu = morphism(
+    memory,
+    theory,
+    projectionLocalDictionary,
+    projectionDictionary,
+    [[localP, P], [localQ, Q]],
+  );
+
   const projectionAssumption = memory.ensure(P, projectionIdentity);
+  const projectionTarget = genericNode(
+    memory,
+    Q,
+    projectionLocalDR,
+    projectionMu,
+    [projectionAssumption],
+  );
   const projectionGeneric: StructuralHeterogeneousDerivedDerivationEvidence = Object.freeze({
     identity: projectionIdentity,
-    targetOccurrence: projectionAssumption,
+    targetOccurrence: projectionTarget,
   });
 
   const projectionReplay = replayStructuralHeterogeneousDerivedDerivationSchema(
     memory,
     projectionGeneric,
   );
+  same(projectionReplay.occurrenceCount, 1, "projection generic one structural node");
   same(projectionReplay.declaredAssumptionCount, 1, "projection generic one assumption");
   same(projectionReplay.usedAssumptionCount, 1, "projection generic assumption reachable");
 
+  const projectionValue = memory.ensure(U, C);
   const openRoot = materializeHeterogeneousDerivedOpenRootedExpansion(
     memory,
     projectionGeneric,
-    [{ role: P, value: startClaim }],
+    [{ role: P, value: startClaim }, { role: Q, value: projectionValue }],
   ).concreteRoot;
   const openReplay = replayStructuralHeterogeneousDerivedOpenRootedInstance(memory, {
     generic: projectionGeneric,
@@ -177,7 +211,7 @@ function main(): void {
   });
   same(
     memory.poles(openReplay.concreteTargetOccurrence).start,
-    startClaim,
+    projectionValue,
     "projection OPEN exact conclusion",
   );
 
@@ -190,7 +224,7 @@ function main(): void {
   ).closedRoot;
 
   const closedK1 = replayStructuralRootedProofAset(memory, closedRoot);
-  same(closedK1.conclusion, startClaim, "projection CLOSED exact conclusion");
+  same(closedK1.conclusion, projectionValue, "projection CLOSED exact conclusion");
   same(closedK1.declaredAssumptionCount, 0, "projection CLOSED declared assumptions");
   same(closedK1.usedAssumptionCount, 0, "projection CLOSED used assumptions");
 
@@ -199,7 +233,7 @@ function main(): void {
     closedRoot,
   });
   same(closedBinding.dischargedAssumptionCount, 1, "projected proof discharges one OPEN assumption");
-  same(closedBinding.pairedStructuralOccurrenceCount, 0, "no structural primitive needed for projection control");
+  same(closedBinding.pairedStructuralOccurrenceCount, 1, "one arbitrary structural node survives discharge");
 
   // ---------------------------------------------------------------------------
   // F3. Exact generic T4 schema. Current K1d2 has no occurrence law saying that
