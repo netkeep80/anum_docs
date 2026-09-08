@@ -77,14 +77,16 @@ function main(): void {
   const memory = new Memory();
   const { R, O, C, L, U } = ensureRootBasis(memory);
   const theory = memory.ensure(C, U);
+  let roleCursor = memory.ensure(L, R);
+  const freshRole = (): LinkHandle => (roleCursor = memory.ensure(roleCursor, R));
 
   // W1c F2 discriminator. The target is deliberately only a neutral pair of
   // the two premises: no equality-transitivity rule and no T4/T5 theorem is
   // admitted here. This slice asks only whether two supplied predecessor
   // premises remain observably two proof dependencies after instantiation.
-  const A = memory.ensure(U, R);
-  const B = memory.ensure(R, U);
-  const N = memory.ensure(C, R);
+  const A = freshRole();
+  const B = freshRole();
+  const N = freshRole();
   const globalDictionary = defineStructuralRoleDictionary(memory, [A, B, N]);
 
   const successorA = memory.ensure(A, L);
@@ -103,9 +105,9 @@ function main(): void {
   // One unrelated admitted structural packaging step proves only
   // Pair(PremiseA, PremiseB) from PremiseA, PremiseB. It grants no equality,
   // predecessor, Nat, Succ, T4 or T5 authority.
-  const localA = memory.ensure(O, C);
-  const localB = memory.ensure(C, O);
-  const localN = memory.ensure(U, C);
+  const localA = freshRole();
+  const localB = freshRole();
+  const localN = freshRole();
   const localDictionary = defineStructuralRoleDictionary(memory, [localA, localB, localN]);
   const localSuccessorA = memory.ensure(localA, L);
   const localSuccessorB = memory.ensure(localB, L);
