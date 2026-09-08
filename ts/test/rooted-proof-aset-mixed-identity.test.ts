@@ -15,6 +15,7 @@ import {
 } from "../src/derivation.js";
 import {
   StructuralRootedProofAsetReplayError,
+  replayClosedProofOccurrence,
   replayStructuralRootedProofAset,
 } from "../src/rooted-proof-aset.js";
 import { replayRecursiveLinkIdentityProofAset } from "../src/recursive-link-identity-proof.js";
@@ -95,6 +96,27 @@ async function main(): Promise<void> {
   same(memory.poles(xProof).start, identityClaim, "proof root exact Claim");
   same(memory.linkCount, identityBefore, "identity replay read-only");
 
+  // The same accepted K1 law selection must also expose the exact validated
+  // CLOSED occurrence closure without callbacks, proof kinds, or assumption lists.
+  const closedBefore = memory.linkCount;
+  const closedIdentity = replayClosedProofOccurrence(memory, theory, xProof);
+  same(closedIdentity.theory, theory, "closed K1 exact Theory coordinate");
+  same(closedIdentity.occurrence, xProof, "closed K1 exact occurrence");
+  same(closedIdentity.claim, identityClaim, "closed K1 exact Claim");
+  assert(
+    closedIdentity.validatedOccurrences.some(({ occurrence }) => occurrence === xProof),
+    "closed K1 validated closure contains the selected identity occurrence",
+  );
+  assert(
+    closedIdentity.validatedOccurrences.some(({ occurrence }) => occurrence === startProof),
+    "closed K1 validated closure contains the start child occurrence",
+  );
+  assert(
+    closedIdentity.validatedOccurrences.some(({ occurrence }) => occurrence === endProof),
+    "closed K1 validated closure contains the end child occurrence",
+  );
+  same(memory.linkCount, closedBefore, "closed K1 replay is read-only");
+
   // A primitive structural application consumes the exact identity Claim.
   const premiseRole = fresh();
   const conclusionRole = fresh();
@@ -126,6 +148,20 @@ async function main(): Promise<void> {
   same(replay.declaredAssumptionCount, 0, "closed proof has no assumptions");
   same(replay.usedAssumptionCount, 0, "closed proof uses no assumptions");
   same(memory.linkCount, before, "mixed rooted replay read-only");
+
+  const closedStructuralBefore = memory.linkCount;
+  const closedStructural = replayClosedProofOccurrence(memory, theory, resultOccurrence);
+  same(closedStructural.occurrence, resultOccurrence, "closed K1 structural exact occurrence");
+  same(closedStructural.claim, resultClaim, "closed K1 structural exact Claim");
+  assert(
+    closedStructural.validatedOccurrences.some(({ occurrence }) => occurrence === resultOccurrence),
+    "closed K1 structural closure contains the parent occurrence",
+  );
+  assert(
+    closedStructural.validatedOccurrences.some(({ occurrence }) => occurrence === xProof),
+    "closed K1 structural closure contains the selected identity dependency",
+  );
+  same(memory.linkCount, closedStructuralBefore, "closed structural K1 replay is read-only");
 
   // The mixed replay must not change exact Theory authority.
   const revisionBefore = await computePortableStructuralTheoryRevision(
