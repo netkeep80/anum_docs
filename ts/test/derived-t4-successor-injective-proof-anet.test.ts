@@ -175,7 +175,11 @@ function main(): void {
     generic: projectionGeneric,
     concreteRoot: openRoot,
   });
-  same(openReplay.conclusion, startClaim, "projection OPEN exact conclusion");
+  same(
+    memory.poles(openReplay.concreteTargetOccurrence).start,
+    startClaim,
+    "projection OPEN exact conclusion",
+  );
 
   const openIdentity = memory.poles(openRoot).start;
   const openAssumption = memory.ensure(startClaim, openIdentity);
