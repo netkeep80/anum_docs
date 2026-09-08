@@ -237,6 +237,7 @@ export {
   PortableStructuralTheoryError,
   exportPortableStructuralTheory,
   replayPortableStructuralTheory,
+  verifyPortableProofSubAnetProjectionTheoryRevision,
   verifyPortableStructuralProofTheoryRevision,
 } from "./portable-theory.js";
 export type {
@@ -301,3 +302,86 @@ export type {
   ProofGoalSelection,
   ProofJudgmentSelection,
 } from "./checker.js";
+
+// Portable ONE PROOF ANET boundary. These are already-accepted proof-calculus
+// laws and transport operations; exporting them adds package capability only.
+export {
+  PORTABLE_PROOF_SUBANET_PROJECTION_SCHEMA,
+  PortableProofSubAnetProjectionError,
+  exportPortableProofSubAnetProjection,
+  replayPortableProofSubAnetProjection,
+} from "./portable-proof-subanet-projection.js";
+export type {
+  PortableProofSubAnetProjectionArtifact,
+  PortableProofSubAnetProjectionErrorCode,
+  PortableProofSubAnetProjectionReplayResult,
+} from "./portable-proof-subanet-projection.js";
+export {
+  PORTABLE_PROOF_SUBANET_PROJECTION_CONTENT_DIGEST_SCHEME,
+  computePortableProofSubAnetProjectionContentDigest,
+} from "./portable-proof-anet-digest.js";
+export type {
+  PortableProofSubAnetProjectionContentDigest,
+} from "./portable-proof-anet-digest.js";
+
+export {
+  replayClosedProofOccurrence,
+} from "./rooted-proof-aset.js";
+export type {
+  ClosedProofOccurrenceReplayResult,
+  StructuralRootedProofAsetReplayErrorCode,
+} from "./rooted-proof-aset.js";
+
+export {
+  replayProofSubAnetProjection,
+} from "./proof-subanet-projection.js";
+export type {
+  ProofSubAnetProjectionEvidence,
+  ProofSubAnetProjectionReplayErrorCode,
+  ProofSubAnetProjectionReplayResult,
+} from "./proof-subanet-projection.js";
+
+export {
+  replayStructuralHeterogeneousDerivedDerivationSchema,
+} from "./derived-derivation-heterogeneous.js";
+export type {
+  StructuralHeterogeneousDerivedDerivationEvidence,
+  StructuralHeterogeneousDerivedDerivationReplayErrorCode,
+  StructuralHeterogeneousDerivedDerivationReplayResult,
+} from "./derived-derivation-heterogeneous.js";
+
+export {
+  materializeHeterogeneousDerivedOpenRootedExpansion,
+} from "./derived-derivation-heterogeneous-expansion.js";
+export type {
+  StructuralHeterogeneousDerivedOpenRootedExpansionErrorCode,
+} from "./derived-derivation-heterogeneous-expansion.js";
+export type {
+  StructuralRoleBinding,
+} from "./structural-rule.js";
+
+export {
+  replayStructuralHeterogeneousDerivedOpenRootedInstance,
+} from "./derived-derivation-heterogeneous-instance.js";
+export type {
+  StructuralHeterogeneousDerivedOpenRootedInstanceEvidence,
+  StructuralHeterogeneousDerivedOpenRootedInstanceReplayErrorCode,
+  StructuralHeterogeneousDerivedOpenRootedInstanceReplayResult,
+} from "./derived-derivation-heterogeneous-instance.js";
+
+export {
+  replayStructuralHeterogeneousDerivedClosedRootedInstance,
+} from "./derived-derivation-heterogeneous-discharge.js";
+export type {
+  StructuralHeterogeneousDerivedClosedRootedInstanceEvidence,
+  StructuralHeterogeneousDerivedClosedRootedInstanceReplayErrorCode,
+  StructuralHeterogeneousDerivedClosedRootedInstanceReplayResult,
+} from "./derived-derivation-heterogeneous-discharge.js";
+
+export {
+  materializeHeterogeneousDerivedClosedRootedDischarge,
+} from "./derived-derivation-heterogeneous-discharge-materialize.js";
+export type {
+  StructuralAssumptionProofCoordinate,
+  StructuralHeterogeneousDerivedClosedRootedDischargeMaterializeErrorCode,
+} from "./derived-derivation-heterogeneous-discharge-materialize.js";
