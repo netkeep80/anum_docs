@@ -1,93 +1,48 @@
 # Асеть доказательства МТС — ONE rooted proof Anet
 
-Статус: **текущая каноническая спецификация состояния proof authority** поверх принятой MTS `v0.11`.
+Статус: текущая каноническая спецификация proof authority поверх принятой MTS `v0.11`.
 
-Связанные владельцы:
+Владельцы: #999, #1066, #1087, #1057, #1064, #1093. Semantic-delta escalation only: #995.
 
-```text
-#999  proof-calculus authority
-#1066 ONE MTS PROOF ANET
-#1087 rooted mixed-proof architecture
-#1057 Nat × proof theorem-challenge program
-#1064 T4 successor-injectivity proof challenge
-#1093 current K1b architecture discriminator
-#995  semantic-delta escalation only
-```
-
-Историческая архитектурная спецификация:
-
-```text
-docs/specs/Асеть доказательства МТС.md
-```
-
-остаётся важным proof-log и источником происхождения решений. Этот документ **заменяет только её устаревшие утверждения о текущем исполнимом состоянии**, когда они расходятся с уже принятыми K1 / recursive-Link-identity результатами.
-
-Принятая семантика МТС остаётся:
+Исторический документ `docs/specs/Асеть доказательства МТС.md` сохраняется как proof-log. Этот документ заменяет только его устаревшие утверждения о **текущем исполнимом состоянии**.
 
 ```text
 accepted MTS = v0.11
 active semantic candidate = NONE
 ```
 
-Ни один результат ниже сам по себе не является semantic-contract delta.
-
----
-
-## 1. Главный закон доказательного авторитета
+## 1. Главный закон
 
 ```text
 proof authority = one rooted reachable MTS proof Anet
 ```
 
-Доказательный объект не является host-графом, массивом узлов, tagged union, TypeScript-объектом, JSON envelope или результатом callback.
+Host `Map`, `Set`, массивы, объекты, graph DTO, JSON и текст — только traversal/transport/presentation projections. Они не дают доказательного авторитета.
 
-Все такие структуры могут быть только проекциями:
+Принадлежность доказательству определяется rooted MTS topology и достижимым proof-support closure.
 
-```text
-MTS proof Anet               <- authority
-        |
-        +-> Map / Set         <- traversal cache
-        +-> array / index     <- operational projection
-        +-> JSON              <- transport projection
-        +-> graph             <- visual projection
-        +-> formal notation   <- textual projection
-```
-
-Принадлежность доказательству определяется корневой MTS-топологией и доказательным замыканием, а не host-списком членов.
-
----
-
-## 2. Общая внешняя форма доказанного вхождения
-
-Принятая внешняя форма:
+## 2. Общая внешняя форма
 
 ```text
 ProofOccurrence = Claim ⟼ Support
 ```
 
-`Claim` — точная доказываемая Link.
+`Claim` — точная доказываемая Link. `Support` — MTS topology, из которой trusted replay восстанавливает proof law.
 
-`Support` — MTS-топология, из которой доверенный replay должен однозначно восстановить допустимый proof law.
+`Claim`, `Support`, `ProofOccurrence` — поясняющие роли, не фундаментальные MTS-типы.
 
-Имена `Claim`, `Support`, `ProofOccurrence` являются поясняющими ролями, а не фундаментальными MTS-типами.
-
-Нельзя вводить авторитетную host-иерархию:
+Запрещён host-authority слой вида:
 
 ```text
+ProofStepKind
 StructuralProofNode
 IdentityProofNode
-TheoremProofNode
-ProofStepKind
 kind = structural | identity | ...
 ```
 
-Если смысл proof occurrence нельзя восстановить из MTS-топологии, форма ещё не готова войти в общий rooted kernel.
-
----
+Если смысл occurrence нельзя восстановить из Links, он ещё не готов войти в общий rooted kernel.
 
 ## 3. Принятая rooted structural application V1
-
-Для уже принятого структурного proof law поддерживается:
 
 ```text
 Occurrence
@@ -101,159 +56,96 @@ StructuralDerivationRule
 ExactSequence(dependency ProofOccurrences)
 ```
 
-Для структурного применения точная rooted `Theory` остаётся примитивным авторитетом:
+Structural application остаётся Theory-relative:
 
 ```text
 Theory ⟼ StructuralRule
 Theory ⟼ StructuralDerivationRule
 ```
 
-Производное доказательство не получает примитивного разрешения только из-за успешного replay.
+Успешный replay производного доказательства не разрешает материализовать `Theory ⟼ DerivedDR`. Exact Theory revision должна оставаться неизменной.
 
-Запрещено:
+## 4. Полная structural rho
 
-```text
-verified DerivedDR
-  -> materialize Theory ⟼ DerivedDR
-```
-
-Точная ревизия `Theory` должна оставаться неизменной.
-
----
-
-## 4. Полная структурная подстановка rho
-
-Для одного primitive `StructuralDerivationRule` действует одна согласованная структурная подстановка:
+Для одного primitive `StructuralDerivationRule` используется одна согласованная подстановка:
 
 ```text
 rho : Role -> Link
 ```
 
-Она должна удовлетворять одновременно:
+Она одновременно обязана удовлетворять всем premise templates и conclusion template.
+
+Для каждой Role в **RoleDictionary данного primitive rule** требуется ровно одно значение:
 
 ```text
-всем premise templates
-+
-conclusion template
+missing binding     -> reject
+conflicting binding -> reject
+repeated Role       -> same exact value
+grounded subtree    -> exact identity
 ```
 
-Для **каждой Role в exact RoleDictionary данного primitive rule** требуется ровно одно значение.
-
-Действуют границы:
-
-```text
-missing role binding       -> reject
-conflicting role binding   -> reject
-repeated Role              -> same exact value
-undeclared grounded Link   -> remains grounded
-capture by target Role     -> reject where cross-scope mapping applies
-```
-
-Полнота rho не ослабляется только потому, что конкретная Role визуально не встретилась в одной части шага.
-
-Открытым остаётся другой вопрос: должна ли primitive application вообще владеть Roles более широкого enclosing generic scope, которые не принадлежат её собственному локальному правилу. Этот вопрос теперь принадлежит #1093.
-
----
+Полнота rho не ослабляется. Открытым является другое: должна ли primitive application вообще владеть Roles более широкого enclosing generic scope. Это исследует #1093.
 
 ## 5. Принятая intrinsic recursive Link identity
 
-Intrinsic recursive identity является отдельным уже принятым proof law над обычной MTS-топологией.
-
-Его proof occurrence также имеет форму:
+Intrinsic identity также использует общий outer carrier:
 
 ```text
-Claim ⟼ Support
+Occurrence = IdentityClaim(left,right) ⟼ ExactSequence(child ProofOccurrences)
+IdentityClaim(left,right) = left ⟼ right
 ```
 
-где:
-
-```text
-Claim = left ⟼ right
-Support = ExactSequence(child ProofOccurrences)
-```
-
-Доказательный смысл восстанавливается из структурной формы сравниваемых Links и точных child occurrences.
-
-Поддерживаются рекурсивные случаи, соответствующие полной/частичной self-closed форме и ordinary pair decomposition; уникальное ROOT-bottomed основание остаётся частью fail-closed replay.
+Replay восстанавливает точные recursive child obligations из Link topology и остаётся ROOT-bottomed/fail-closed.
 
 Критически:
 
 ```text
 intrinsic identity
 !=
-Theory-specific primitive theorem admission
+Theory-specific primitive admission
 ```
 
-Не создаётся искусственная связь:
+Нельзя создавать fake `Theory ⟼ IdentityRule` только ради унификации host API.
 
-```text
-Theory ⟼ IdentityRule
-```
-
-лишь для унификации host API.
-
----
-
-## 6. K1 — mixed rooted proof dependency composition
-
-Принятый K1 результат:
+## 6. Принятый K1
 
 ```text
 MIXED_ROOTED_PROOF_ANET_DEPENDENCY = SUPPORTED
 ```
 
-Структурное primitive application может использовать intrinsic recursive identity `ProofOccurrence` как обычную dependency, если exact dependency `Claim` совпадает с требуемой premise Claim.
+Rooted structural application уже может использовать replay-valid intrinsic identity `ProofOccurrence` как dependency при точном совпадении требуемой Claim.
 
-То есть один rooted proof Anet уже способен содержать минимум два proof laws:
+Следовательно один rooted proof Anet уже композиционно содержит минимум два proof laws:
 
 ```text
 1. rooted structural application
 2. intrinsic recursive Link identity
 ```
 
-без превращения одного закона в разновидность другого и без host `ProofStepKind`.
+без host `ProofStepKind`.
 
-Это и есть первый принятый шаг к:
+## 7. Выбор proof law
 
-```text
-ONE MTS PROOF ANET
-```
-
----
-
-## 7. Выбор proof law только по топологии
-
-Порядок host-verifier'ов не должен давать смысл.
-
-Запрещено:
+Verifier order не является семантикой. Нельзя делать:
 
 ```text
 try identity
 catch -> try structural
 ```
 
-как семантический discriminator.
+как authority discriminator.
 
-Для одного candidate occurrence общий rooted kernel должен концептуально классифицировать все admitted на данном этапе proof laws:
+Концептуальный общий закон:
 
 ```text
-0 valid interpretations
-  -> invalid-proof-occurrence
-
-1 valid interpretation
-  -> accept exact Claim
-
->1 valid interpretations
-  -> ambiguous-proof-support
+0 valid interpretations -> invalid-proof-occurrence
+1 valid interpretation  -> accept exact Claim
+>1 interpretations      -> ambiguous-proof-support
 ```
 
-Неоднозначность закрывается fail-closed, а не порядком `if/switch/callback`.
-
----
+Неоднозначность закрывается fail-closed.
 
 ## 8. Root reachability
-
-Общий закон:
 
 ```text
 reachable proof-support closure from rooted target
@@ -261,70 +153,48 @@ reachable proof-support closure from rooted target
 proof membership authority
 ```
 
-Следствия:
+Поэтому unreachable proof occurrence, host evidence или cache entry ничего не доказывают.
 
-```text
-unreachable proof occurrence grants nothing
-unreachable host evidence grants nothing
-unreachable cache/index entry grants nothing
-```
-
-Но точное понятие reachability для self-describing carriers с outgoing incidence ещё не должно додумываться молча.
-
-В частности existing `Act` bindings читаются через outgoing attachments от `Act`. Поэтому если Act когда-либо войдёт в rooted proof support, необходимо явно решить:
+Отдельно не решён вопрос self-describing carriers с outgoing incidence. Existing `Act` bindings читаются через outgoing attachments от `Act`, поэтому до принятия Act внутри rooted support необходимо явно определить:
 
 ```text
 reachable Act
-=> какие именно outgoing fields считаются канонической частью его rooted support closure?
+=> какие outgoing fields канонически входят в rooted support closure?
 ```
 
-Этот вопрос сейчас специально фальсифицируется в #1093.
+Этот вопрос специально фальсифицируется в #1093. Нельзя молча считать текущий `readExactActBindings` уже совместимым с rooted reachability law.
 
-До его решения нельзя считать текущий `readExactActBindings` автоматически совместимым с rooted proof-membership law.
+## 9. K1b Act-V2 пока НЕ принят
 
----
-
-## 9. K1b Act-V2 НЕ принят
-
-Предложенная в #1092 форма:
+Предложенная #1092 форма:
 
 ```text
 ApplicationV2
 =
 StructuralDerivationRule
   ⟼
-ExactSequence(
-  Act,
-  dependency ProofOccurrences...
-)
+ExactSequence(Act, dependency ProofOccurrences...)
 ```
 
-**не является принятой архитектурой**.
+находится **UNDER FALSIFICATION**.
 
-Она возникла из измеренного случая:
+Она возникла из witness:
 
 ```text
 RoleDictionary = [A,B,C]
 R1: A -> B
+rho = {A=a,B=b,C=c}
 ```
 
-где rooted V1 видит только значения `A` и `B`, но shared dictionary требует ещё `C`.
+где V1 видит `A/B`, но shared dictionary требует ещё `C`.
 
-Repository-wide review обнаружил, что это может быть следствием старого намеренно ограниченного generic slice:
+Repository-wide review обнаружил, что это может быть следствием старого deliberately shared-RoleDictionary slice, а не фундаментальной необходимости нести полный `Act` в каждом rooted occurrence.
 
-```text
-all primitive nodes share one exact RoleDictionary
-```
+## 10. Текущий discriminator #1093
 
-а не фундаментальной необходимостью полного Act внутри каждого rooted occurrence.
+Сравниваются две архитектуры.
 
----
-
-## 10. Текущий K1b discriminator
-
-#1093 сравнивает две архитектуры.
-
-### Вариант A — shared dictionary + Act-V2
+### A. shared dictionary + Act-V2
 
 ```text
 Dglobal = [A,B,C]
@@ -332,97 +202,60 @@ R1: A -> B
 rho = {A=a,B=b,C=c}
 ```
 
-Если primitive R1 действительно семантически владеет всем `Dglobal`, rooted carrier должен сохранить invisible `C` каким-то MTS-native способом.
+Если primitive R1 семантически владеет всем `Dglobal`, invisible `C` действительно должен сохраняться MTS-native carrier'ом.
 
-### Вариант B — local primitive dictionary + existing mu
+### B. local primitive dictionaries + existing mu
 
 ```text
-D1 = [A,B]
-R1: A -> B
-
-D2 = [B,C]
-R2: B -> C
-
+D1 = [A,B]   R1: A -> B
+D2 = [B,C]   R2: B -> C
 Dglobal = [A,B,C]
 ```
 
-с уже существующими MTS-native morphisms:
+с MTS-native mappings:
 
 ```text
 mu1 : D1 -> Dglobal
 mu2 : D2 -> Dglobal
 ```
 
-Тогда concrete primitive rho локальны:
+Тогда concrete primitive substitutions локальны:
 
 ```text
 rho1 = {A=a,B=b}
 rho2 = {B=b,C=c}
 ```
 
-и invisible Role может исчезнуть не из-за ослабления полноты rho, а потому что она вообще не принадлежит локальному primitive rule.
+и invisible Role исчезает не через ослабление rho, а потому что не принадлежит local primitive rule.
 
 До executable classification #1093 нельзя утверждать, что Act-V2 необходим.
 
----
+## 11. Cross-scope mu уже принят
 
-## 11. Cross-scope role morphisms уже являются принятым proof-calculus механизмом
-
-Предыдущая N2 работа установила MTS-native transport между generic RoleDictionaries:
+N2 установил MTS-native generic Role transport:
 
 ```text
 mu : source Role -> target Role
 ```
 
-с явными структурными требованиями:
-
-```text
-exact source dictionary
-exact target dictionary
-total mapping over source Roles
-target Role membership
-capture safety
-exact Theory
-read-only verification
-```
+с exact source/target RoleDictionary, total mapping, target membership, capture safety, exact Theory и read-only replay.
 
 Host `Map` не является authority.
 
-Поэтому local-scope hypothesis #1093 обязана быть сфальсифицирована до добавления новой rooted application topology.
+Поэтому local-dictionary hypothesis обязана быть опровергнута до добавления новой rooted application topology.
 
----
-
-## 12. Старый K2 план больше не является execution authority
-
-Исторический K2 owner:
+## 12. Старый K2 путь закрыт
 
 ```text
-#1090
+#1090 = CLOSED / not_planned / SUPERSEDED
+#1091 = CLOSED UNMERGED historical RED witness
 ```
 
-закрыт:
+`invalid-proof-occurrence` из #1091 остаётся полезным измерением старого пути, но не разрешает production fix.
 
-```text
-CLOSED / not_planned / SUPERSEDED
-```
+После #1093 создаётся **новый** bounded K2 implementation plan из принятой архитектуры.
 
-PR:
-
-```text
-#1091
-```
-
-закрыт unmerged и сохраняется только как executable RED witness старого пути.
-
-Его `invalid-proof-occurrence` остаётся полезным измерением, но не разрешает конкретный production fix.
-
-После #1093 должен быть создан **новый K2 implementation plan**, основанный на принятой архитектуре, а не восстановлен старый план.
-
----
-
-## 13. Текущий T4 статус
-
-Theorem challenge:
+## 13. T4
 
 ```text
 A ⟼ L = B ⟼ L
@@ -430,57 +263,46 @@ A ⟼ L = B ⟼ L
 A = B
 ```
 
-текущий статус:
+Текущий статус:
 
 ```text
 STRUCTURE  = SUPPORTED
-PROOF_ANET = GAP / not yet rerun after final K1b architecture
+PROOF_ANET = GAP / not rerun after final K1b architecture
 REUSE      = NOT TESTED
 ```
 
 T4 нельзя повышать до `PROOF_ANET = SUPPORTED`, пока generic rooted application/discharge path не принят и исходный T4 witness не replayed через него.
 
-T5 остаётся downstream reuse challenge.
+## 14. Неизменные границы
 
----
-
-## 14. Что остаётся неизменным
-
-Независимо от результата #1093 сохраняются законы:
+Независимо от #1093 сохраняется:
 
 ```text
-proof authority = MTS Links/Anet topology
+MTS Links/Anet topology = proof authority
 host metadata = zero authority
 exact Theory revision
-primitive authority is explicit
 DerivedDR is not self-admitted
 replay is read-only
 cycles fail closed
-unreachable proof support grants nothing
+unreachable support grants nothing
 proof-law ambiguity fails closed
-no Nat/T4-specific trusted opcode
+NO Nat/T4-specific trusted opcode
 ```
 
-Также сохраняется semantic boundary:
+Semantic boundary:
 
 ```text
 accepted MTS = v0.11
 active semantic candidate = NONE
 ```
 
-Если executable evidence когда-либо покажет реальный observable semantic-contract delta:
+Если executable evidence покажет observable semantic-contract delta:
 
 ```text
-STOP
--> #995
--> separate semantic-candidate lifecycle
+STOP -> #995 -> separate semantic-candidate lifecycle
 ```
 
-Нельзя молча менять accepted `v0.11` и нельзя заранее называть следующую версию.
-
----
-
-## 15. Текущий порядок работы
+## 15. Текущий порядок
 
 ```text
 accepted K1
@@ -489,7 +311,7 @@ accepted K1
   ↓
 final K1b classification
   ↓
-new bounded K2 plan
+new K2 plan
   ↓
 closed rooted proof Anet discharge
   ↓
@@ -497,16 +319,10 @@ exact T4 rerun
   ↓
 reusable T4 evidence
   ↓
-T5 reuse challenge
+T5 reuse
 ```
 
-Aprover остаётся downstream-blocked до принятого reusable theorem path.
-
----
-
-## 16. Критерий архитектурной завершённости
-
-Долгосрочная цель остаётся прежней:
+Долгосрочный критерий остаётся:
 
 ```text
 rooted MTS proof Anet
@@ -516,9 +332,4 @@ exact required Theory authority
 trusted replay reconstructs complete proof authority
 ```
 
-без знания алгоритма построения proof Anet и без host-классификации математических или доказательных сущностей.
-
-```text
-всё доказательство выражено связями
-смысл доказательного support выражен связями
-```
+без знания алгоритма построения Anet и без host-сортов доказательных сущностей.
