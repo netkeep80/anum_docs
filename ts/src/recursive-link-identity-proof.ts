@@ -20,6 +20,18 @@ export class RecursiveLinkIdentityProofReplayError extends Error {
   }
 }
 
+export interface ValidatedProofOccurrenceClaim {
+  readonly occurrence: LinkHandle;
+  readonly claim: LinkHandle;
+}
+
+export interface RecursiveLinkIdentityProofClosureReplayResult {
+  readonly proofRoot: LinkHandle;
+  readonly left: LinkHandle;
+  readonly right: LinkHandle;
+  readonly validatedOccurrences: readonly ValidatedProofOccurrenceClaim[];
+}
+
 export interface RecursiveLinkIdentityProofReplayResult {
   readonly proofRoot: LinkHandle;
   readonly left: LinkHandle;
@@ -30,6 +42,7 @@ export interface RecursiveLinkIdentityProofReplayResult {
 type ClosureShape = "full" | "start" | "end" | "ordinary";
 
 interface ReadOccurrence {
+  readonly claim: LinkHandle;
   readonly left: LinkHandle;
   readonly right: LinkHandle;
   readonly children: readonly LinkHandle[];
@@ -64,6 +77,7 @@ function readOccurrence(memory: ReadMemory, occurrence: LinkHandle): ReadOccurre
 
   try {
     return Object.freeze({
+      claim,
       left,
       right,
       children: readExactSequence(memory, childSequence).values,
@@ -95,12 +109,12 @@ function classify(memory: ReadMemory, link: LinkHandle): {
   }
 }
 
-export function replayRecursiveLinkIdentityProofAset(
+export function replayRecursiveLinkIdentityProofClosure(
   memory: ReadMemory,
   proofRoot: LinkHandle,
-): RecursiveLinkIdentityProofReplayResult {
+): RecursiveLinkIdentityProofClosureReplayResult {
   const before = memory.linkCount;
-  const verified = new Set<LinkHandle>();
+  const verified = new Map<LinkHandle, LinkHandle>();
   const activePairs = new Map<LinkHandle, Set<LinkHandle>>();
 
   const enterPair = (left: LinkHandle, right: LinkHandle): void => {
@@ -168,7 +182,7 @@ export function replayRecursiveLinkIdentityProofAset(
           verify(child);
         });
 
-        verified.add(occurrence);
+        verified.set(occurrence, data.claim);
         return data;
       } finally {
         leavePair(data.left, data.right);
@@ -180,9 +194,24 @@ export function replayRecursiveLinkIdentityProofAset(
       proofRoot,
       left: root.left,
       right: root.right,
-      verifiedOccurrenceCount: verified.size,
+      validatedOccurrences: Object.freeze(
+        [...verified].map(([occurrence, claim]) => Object.freeze({ occurrence, claim })),
+      ),
     });
   } finally {
     if (memory.linkCount !== before) fail("replay-wrote");
   }
+}
+
+export function replayRecursiveLinkIdentityProofAset(
+  memory: ReadMemory,
+  proofRoot: LinkHandle,
+): RecursiveLinkIdentityProofReplayResult {
+  const replay = replayRecursiveLinkIdentityProofClosure(memory, proofRoot);
+  return Object.freeze({
+    proofRoot: replay.proofRoot,
+    left: replay.left,
+    right: replay.right,
+    verifiedOccurrenceCount: replay.validatedOccurrences.length,
+  });
 }
