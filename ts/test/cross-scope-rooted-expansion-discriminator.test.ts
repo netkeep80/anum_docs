@@ -17,41 +17,27 @@ import {
   replayStructuralDerivedDerivationSchema,
   type StructuralDerivedDerivationEvidence,
 } from "../src/derived-derivation-schema.js";
-import {
-  instantiateStructuralDerivedDerivationSchema,
-} from "../src/derived-derivation-instantiation.js";
-import {
-  replayStructuralDerivedDerivationApplication,
-} from "../src/derived-derivation-application.js";
+import { instantiateStructuralDerivedDerivationSchema } from "../src/derived-derivation-instantiation.js";
+import { replayStructuralDerivedDerivationApplication } from "../src/derived-derivation-application.js";
 import {
   StructuralDerivedDerivationCrossScopeApplicationReplayError,
   replayStructuralDerivedDerivationCrossScopeApplication,
 } from "../src/derived-derivation-cross-scope.js";
-import {
-  replayStructuralRootedProofAset,
-} from "../src/rooted-proof-aset.js";
-import {
-  replayRecursiveLinkIdentityProofAset,
-} from "../src/recursive-link-identity-proof.js";
+import { replayStructuralRootedProofAset } from "../src/rooted-proof-aset.js";
+import { replayRecursiveLinkIdentityProofAset } from "../src/recursive-link-identity-proof.js";
 import { exportPortableStructuralTheory } from "../src/portable-theory.js";
 import { computePortableStructuralTheoryRevision } from "../src/portable-theory-digest.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
-
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: values differ`);
 }
-
 function expectCrossScopeError(code: string, effect: () => unknown): void {
-  try {
-    effect();
-  } catch (error) {
-    assert(
-      error instanceof StructuralDerivedDerivationCrossScopeApplicationReplayError,
-      `${code}: wrong error type`,
-    );
+  try { effect(); } catch (error) {
+    assert(error instanceof StructuralDerivedDerivationCrossScopeApplicationReplayError,
+      `${code}: wrong error type`);
     same(error.code, code, `${code}: wrong error code`);
     return;
   }
@@ -63,7 +49,6 @@ interface PrimitiveFixture {
   readonly derivationRule: LinkHandle;
   readonly evidence: StructuralDerivedDerivationEvidence;
 }
-
 interface TargetFixture {
   readonly rule: LinkHandle;
   readonly derivationRule: LinkHandle;
@@ -88,7 +73,6 @@ function primitiveFixture(
   });
   const premiseOccurrenceSequence = materializeExactSequence(memory, [assumption.occurrence]);
   const targetOccurrence = memory.ensure(derivationRule, premiseOccurrenceSequence);
-
   return Object.freeze({
     rule,
     derivationRule,
@@ -96,15 +80,13 @@ function primitiveFixture(
       identity,
       targetOccurrence,
       assumptions: Object.freeze([assumption]),
-      nodes: Object.freeze([
-        Object.freeze({
-          occurrence: targetOccurrence,
-          derivationRule,
-          ruleAdmission,
-          derivationRuleAdmission,
-          premiseOccurrenceSequence,
-        }),
-      ]),
+      nodes: Object.freeze([Object.freeze({
+        occurrence: targetOccurrence,
+        derivationRule,
+        ruleAdmission,
+        derivationRuleAdmission,
+        premiseOccurrenceSequence,
+      })]),
     }),
   });
 }
@@ -118,11 +100,7 @@ function targetFixture(
 ): TargetFixture {
   const rule = defineStructuralRule(memory, dictionary, conclusion);
   const derivationRule = defineStructuralDerivationRule(memory, rule, [premise]);
-  return Object.freeze({
-    rule,
-    derivationRule,
-    identity: memory.ensure(derivationRule, theory),
-  });
+  return Object.freeze({ rule, derivationRule, identity: memory.ensure(derivationRule, theory) });
 }
 
 function morphism(
@@ -147,8 +125,7 @@ function identityProof(
   right: LinkHandle,
   children: readonly LinkHandle[],
 ): LinkHandle {
-  const claim = memory.ensure(left, right);
-  return memory.ensure(claim, materializeExactSequence(memory, children));
+  return memory.ensure(memory.ensure(left, right), materializeExactSequence(memory, children));
 }
 
 function proofOccurrence(
@@ -157,11 +134,10 @@ function proofOccurrence(
   derivationRule: LinkHandle,
   dependencies: readonly LinkHandle[],
 ): LinkHandle {
-  const application = memory.ensure(
-    derivationRule,
-    materializeExactSequence(memory, dependencies),
+  return memory.ensure(
+    claim,
+    memory.ensure(derivationRule, materializeExactSequence(memory, dependencies)),
   );
-  return memory.ensure(claim, application);
 }
 
 async function main(): Promise<void> {
@@ -179,7 +155,6 @@ async function main(): Promise<void> {
   const globalDictionary = defineStructuralRoleDictionary(memory, [A, B, CRole]);
   const localAB = defineStructuralRoleDictionary(memory, [A, B]);
   const localBC = defineStructuralRoleDictionary(memory, [B, CRole]);
-
   const localR1 = primitiveFixture(memory, theory, localAB, A, B);
   const localR2 = primitiveFixture(memory, theory, localBC, B, CRole);
 
@@ -193,18 +168,11 @@ async function main(): Promise<void> {
   const globalR2 = targetFixture(memory, theory, globalDictionary, B, CRole);
   const mu1 = morphism(memory, theory, localAB, globalDictionary, [[A, A], [B, B]]);
   const mu2 = morphism(memory, theory, localBC, globalDictionary, [[B, B], [CRole, CRole]]);
-
   const beforeMuReplay = memory.linkCount;
-  replayStructuralDerivedDerivationCrossScopeApplication(memory, {
-    source: localR1.evidence,
-    morphism: mu1,
-    targetIdentity: globalR1.identity,
-  });
-  replayStructuralDerivedDerivationCrossScopeApplication(memory, {
-    source: localR2.evidence,
-    morphism: mu2,
-    targetIdentity: globalR2.identity,
-  });
+  replayStructuralDerivedDerivationCrossScopeApplication(memory,
+    { source: localR1.evidence, morphism: mu1, targetIdentity: globalR1.identity });
+  replayStructuralDerivedDerivationCrossScopeApplication(memory,
+    { source: localR2.evidence, morphism: mu2, targetIdentity: globalR2.identity });
   same(memory.linkCount, beforeMuReplay, "cross-scope replay is read-only");
   console.log("LOCAL_TO_GLOBAL_MU = SUPPORTED");
 
@@ -221,7 +189,6 @@ async function main(): Promise<void> {
   const aClaim = memory.ensure(x, x);
   const bClaim = memory.ensure(C, fresh());
   const cClaim = memory.ensure(L, fresh());
-
   const rootProof = identityProof(memory, R, R, []);
   const oProof = identityProof(memory, O, O, [rootProof]);
   const cProof = identityProof(memory, C, C, [rootProof]);
@@ -235,10 +202,8 @@ async function main(): Promise<void> {
   same(memory.poles(xProof).start, aClaim, "identity root exact A Claim");
   same(memory.linkCount, beforeIdentityReplay, "identity replay is read-only");
 
-  const interpreterDictionary = fresh();
-  const grammar = fresh();
+  const interpreter = defineStructuralInterpreter(memory, fresh(), fresh(), theory);
   const afterContext = defineContext(memory, R, L);
-  const interpreter = defineStructuralInterpreter(memory, interpreterDictionary, grammar, theory);
   const r1Bindings: readonly StructuralRoleBinding[] = Object.freeze([
     Object.freeze({ role: A, value: aClaim }),
     Object.freeze({ role: B, value: bClaim }),
@@ -247,7 +212,6 @@ async function main(): Promise<void> {
     Object.freeze({ role: B, value: bClaim }),
     Object.freeze({ role: CRole, value: cClaim }),
   ]);
-
   const r1Concrete = instantiateStructuralDerivedDerivationSchema(
     memory, localR1.evidence, interpreter, afterContext, r1Bindings,
   );
@@ -266,13 +230,8 @@ async function main(): Promise<void> {
   );
   console.log("LOCAL_GENERIC_TO_CONCRETE_APPLICATION = SUPPORTED");
 
-  const revisionBeforeRootConstruction = await computePortableStructuralTheoryRevision(
-    exportPortableStructuralTheory(memory, theory),
-  );
-
   const r1Occurrence = proofOccurrence(memory, bClaim, localR1.derivationRule, [xProof]);
   const r2Occurrence = proofOccurrence(memory, cClaim, localR2.derivationRule, [r1Occurrence]);
-
   const closedDictionary = defineStructuralRoleDictionary(memory, []);
   const closedRule = defineStructuralRule(memory, closedDictionary, cClaim);
   admitStructuralRule(memory, theory, closedRule);
@@ -281,6 +240,9 @@ async function main(): Promise<void> {
   assert(memory.find(theory, closedDR) === undefined, "closed derived target DR stays unadmitted");
   const root = memory.ensure(closedIdentity, r2Occurrence);
 
+  const revisionBeforeRootReplay = await computePortableStructuralTheoryRevision(
+    exportPortableStructuralTheory(memory, theory),
+  );
   const beforeRootReplay = memory.linkCount;
   const rooted = replayStructuralRootedProofAset(memory, root);
   same(rooted.conclusion, cClaim, "local-scope rooted expansion conclusion");
@@ -290,57 +252,40 @@ async function main(): Promise<void> {
   same(memory.linkCount, beforeRootReplay, "expanded rooted replay is read-only");
 
   const hostProjection = new Map<LinkHandle, LinkHandle>([
-    [A, cClaim],
-    [B, aClaim],
-    [CRole, bClaim],
+    [A, cClaim], [B, aClaim], [CRole, bClaim],
   ]);
   same(hostProjection.size, 3, "bogus host projection exists");
-  const replayWithBogusHostProjection = replayStructuralRootedProofAset(memory, root);
-  same(replayWithBogusHostProjection.conclusion, cClaim,
+  same(replayStructuralRootedProofAset(memory, root).conclusion, cClaim,
     "host projection grants zero rooted authority");
+  const revisionAfterRootReplay = await computePortableStructuralTheoryRevision(
+    exportPortableStructuralTheory(memory, theory),
+  );
+  same(revisionAfterRootReplay.scheme, revisionBeforeRootReplay.scheme,
+    "Theory revision scheme unchanged by rooted replay");
+  same(revisionAfterRootReplay.value, revisionBeforeRootReplay.value,
+    "exact Theory revision unchanged by rooted replay");
 
   const partialMu = morphism(memory, theory, localAB, globalDictionary, [[A, A]]);
   expectCrossScopeError("missing-source-role", () =>
-    replayStructuralDerivedDerivationCrossScopeApplication(memory, {
-      source: localR1.evidence,
-      morphism: partialMu,
-      targetIdentity: globalR1.identity,
-    }));
-
+    replayStructuralDerivedDerivationCrossScopeApplication(memory,
+      { source: localR1.evidence, morphism: partialMu, targetIdentity: globalR1.identity }));
   const foreignTargetRole = fresh();
   const foreignMu = morphism(memory, theory, localAB, globalDictionary,
     [[A, A], [B, foreignTargetRole]]);
   expectCrossScopeError("target-role-not-member", () =>
-    replayStructuralDerivedDerivationCrossScopeApplication(memory, {
-      source: localR1.evidence,
-      morphism: foreignMu,
-      targetIdentity: globalR1.identity,
-    }));
-
+    replayStructuralDerivedDerivationCrossScopeApplication(memory,
+      { source: localR1.evidence, morphism: foreignMu, targetIdentity: globalR1.identity }));
   const wrongTheoryMu = morphism(memory, fresh(), localAB, globalDictionary, [[A, A], [B, B]]);
   expectCrossScopeError("theory-mismatch", () =>
-    replayStructuralDerivedDerivationCrossScopeApplication(memory, {
-      source: localR1.evidence,
-      morphism: wrongTheoryMu,
-      targetIdentity: globalR1.identity,
-    }));
-
+    replayStructuralDerivedDerivationCrossScopeApplication(memory,
+      { source: localR1.evidence, morphism: wrongTheoryMu, targetIdentity: globalR1.identity }));
   const capturePremise = memory.ensure(CRole, A);
   const captureSource = primitiveFixture(memory, theory, localAB, capturePremise, B);
   const captureTarget = targetFixture(memory, theory, globalDictionary, capturePremise, B);
   const captureMu = morphism(memory, theory, localAB, globalDictionary, [[A, A], [B, B]]);
   expectCrossScopeError("grounded-target-role-capture", () =>
-    replayStructuralDerivedDerivationCrossScopeApplication(memory, {
-      source: captureSource.evidence,
-      morphism: captureMu,
-      targetIdentity: captureTarget.identity,
-    }));
-
-  const revisionAfter = await computePortableStructuralTheoryRevision(
-    exportPortableStructuralTheory(memory, theory),
-  );
-  same(revisionAfter.scheme, revisionBeforeRootConstruction.scheme, "Theory revision scheme unchanged");
-  same(revisionAfter.value, revisionBeforeRootConstruction.value, "exact Theory revision unchanged");
+    replayStructuralDerivedDerivationCrossScopeApplication(memory,
+      { source: captureSource.evidence, morphism: captureMu, targetIdentity: captureTarget.identity }));
 
   assert(memory.find(theory, globalR1.rule) === undefined, "mapped global R1 Rule remains unadmitted");
   assert(memory.find(theory, globalR1.derivationRule) === undefined,
