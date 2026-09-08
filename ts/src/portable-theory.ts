@@ -255,15 +255,40 @@ function parseRevision(input: unknown): PortableStructuralTheoryRevision {
   return Object.freeze({ scheme: PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME, value: item.value });
 }
 
+async function replayExpectedTheoryRevision(
+  expectedTheoryArtifact: unknown,
+  expectedRevisionInput: unknown,
+): Promise<PortableStructuralTheoryReplayResult> {
+  const expected = replayPortableStructuralTheory(expectedTheoryArtifact);
+  const expectedRevision = parseRevision(expectedRevisionInput);
+  const actualRevision = await computePortableStructuralTheoryRevision(expected.artifact);
+  if (actualRevision.value !== expectedRevision.value) fail("theory-revision-mismatch");
+  return expected;
+}
+
+function verifySelectedTheoryAuthority(
+  proofMemory: ReadMemory,
+  proofTheory: LinkHandle,
+  expected: PortableStructuralTheoryReplayResult,
+): void {
+  if (linkFingerprint(proofMemory, proofTheory) !== linkFingerprint(expected.memory, expected.theory)) {
+    fail("proof-theory-mismatch");
+  }
+
+  const admitted = new Set(
+    expected.memory.outgoing(expected.theory).map((link) => linkFingerprint(expected.memory, link)),
+  );
+  for (const used of proofMemory.outgoing(proofTheory)) {
+    if (!admitted.has(linkFingerprint(proofMemory, used))) fail("proof-theory-mismatch");
+  }
+}
+
 export async function verifyPortableStructuralProofTheoryRevision(
   proofArtifact: unknown,
   expectedTheoryArtifact: unknown,
   expectedRevisionInput: unknown,
 ): Promise<void> {
-  const expected = replayPortableStructuralTheory(expectedTheoryArtifact);
-  const expectedRevision = parseRevision(expectedRevisionInput);
-  const actualRevision = await computePortableStructuralTheoryRevision(expected.artifact);
-  if (actualRevision.value !== expectedRevision.value) fail("theory-revision-mismatch");
+  const expected = await replayExpectedTheoryRevision(expectedTheoryArtifact, expectedRevisionInput);
 
   // Ordinary proof replay remains the proof-truth authority. This operation only
   // adds the external Theory-selection boundary required by a trusted consumer.
@@ -271,16 +296,7 @@ export async function verifyPortableStructuralProofTheoryRevision(
   const proofTheory = "theory" in proof.evidence
     ? proof.evidence.theory
     : proof.evidence.derivation.theory;
-  if (linkFingerprint(proof.memory, proofTheory) !== linkFingerprint(expected.memory, expected.theory)) {
-    fail("proof-theory-mismatch");
-  }
-
-  const admitted = new Set(
-    expected.memory.outgoing(expected.theory).map((link) => linkFingerprint(expected.memory, link)),
-  );
-  for (const used of proof.memory.outgoing(proofTheory)) {
-    if (!admitted.has(linkFingerprint(proof.memory, used))) fail("proof-theory-mismatch");
-  }
+  verifySelectedTheoryAuthority(proof.memory, proofTheory, expected);
 }
 
 /**
@@ -294,21 +310,7 @@ export async function verifyPortableProofSubAnetProjectionTheoryRevision(
   expectedTheoryArtifact: unknown,
   expectedRevisionInput: unknown,
 ): Promise<void> {
-  const expected = replayPortableStructuralTheory(expectedTheoryArtifact);
-  const expectedRevision = parseRevision(expectedRevisionInput);
-  const actualRevision = await computePortableStructuralTheoryRevision(expected.artifact);
-  if (actualRevision.value !== expectedRevision.value) fail("theory-revision-mismatch");
-
+  const expected = await replayExpectedTheoryRevision(expectedTheoryArtifact, expectedRevisionInput);
   const proof = replayPortableProofSubAnetProjection(proofArtifact);
-  const proofTheory = proof.evidence.theory;
-  if (linkFingerprint(proof.memory, proofTheory) !== linkFingerprint(expected.memory, expected.theory)) {
-    fail("proof-theory-mismatch");
-  }
-
-  const admitted = new Set(
-    expected.memory.outgoing(expected.theory).map((link) => linkFingerprint(expected.memory, link)),
-  );
-  for (const used of proof.memory.outgoing(proofTheory)) {
-    if (!admitted.has(linkFingerprint(proof.memory, used))) fail("proof-theory-mismatch");
-  }
+  verifySelectedTheoryAuthority(proof.memory, proof.evidence.theory, expected);
 }
