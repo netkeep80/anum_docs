@@ -5,6 +5,10 @@ import {
 } from "./derivation.js";
 import { MemoryError, type LinkHandle, type ReadMemory } from "./memory.js";
 import {
+  RecursiveLinkIdentityProofReplayError,
+  replayRecursiveLinkIdentityProofAset,
+} from "./recursive-link-identity-proof.js";
+import {
   StructuralRuleError,
   readStructuralRoleDictionary,
   readStructuralRule,
@@ -17,6 +21,8 @@ export type StructuralRootedProofAsetReplayErrorCode =
   | "invalid-occurrence"
   | "invalid-application"
   | "invalid-dependency-sequence"
+  | "invalid-proof-occurrence"
+  | "ambiguous-proof-support"
   | "primitive-rule-not-admitted"
   | "primitive-derivation-rule-not-admitted"
   | "premise-arity-mismatch"
@@ -245,7 +251,64 @@ export function replayStructuralRootedProofAset(
     const verified = new Map<LinkHandle, LinkHandle>();
     const active = new Set<LinkHandle>();
 
-    const verifyOccurrence = (occurrence: LinkHandle): LinkHandle => {
+    const restoreVerified = (snapshot: ReadonlyMap<LinkHandle, LinkHandle>): void => {
+      verified.clear();
+      for (const [occurrence, claim] of snapshot) verified.set(occurrence, claim);
+    };
+
+    const restoreUsedPremises = (snapshot: ReadonlySet<LinkHandle>): void => {
+      usedPremises.clear();
+      for (const premise of snapshot) usedPremises.add(premise);
+    };
+
+    function attemptIdentityClaim(occurrence: LinkHandle): LinkHandle | undefined {
+      try {
+        replayRecursiveLinkIdentityProofAset(memory, occurrence);
+        return memory.poles(occurrence).start;
+      } catch (error) {
+        if (
+          error instanceof RecursiveLinkIdentityProofReplayError
+          && error.code !== "replay-wrote"
+        ) {
+          return undefined;
+        }
+        throw error;
+      }
+    }
+
+    function attemptStructuralClaim(occurrence: LinkHandle): LinkHandle | undefined {
+      const verifiedBefore = new Map(verified);
+      const usedPremisesBefore = new Set(usedPremises);
+      try {
+        return verifyStructuralOccurrence(occurrence);
+      } catch (error) {
+        if (
+          error instanceof StructuralRootedProofAsetReplayError
+          && error.code !== "replay-wrote"
+        ) {
+          restoreVerified(verifiedBefore);
+          restoreUsedPremises(usedPremisesBefore);
+          return undefined;
+        }
+        throw error;
+      }
+    }
+
+    function verifyDependencyClaim(occurrence: LinkHandle): LinkHandle {
+      const identityClaim = attemptIdentityClaim(occurrence);
+      const structuralClaim = attemptStructuralClaim(occurrence);
+      const validClaims: LinkHandle[] = [];
+      if (identityClaim !== undefined) validClaims.push(identityClaim);
+      if (structuralClaim !== undefined) validClaims.push(structuralClaim);
+
+      if (validClaims.length === 0) fail("invalid-proof-occurrence");
+      if (validClaims.length !== 1) fail("ambiguous-proof-support");
+      const claim = validClaims[0];
+      if (claim === undefined) fail("invalid-proof-occurrence");
+      return claim;
+    }
+
+    function verifyStructuralOccurrence(occurrence: LinkHandle): LinkHandle {
       const cached = verified.get(occurrence);
       if (cached !== undefined) return cached;
       if (active.has(occurrence)) fail("cyclic-dependency");
@@ -300,7 +363,7 @@ export function replayStructuralRootedProofAset(
             if (error instanceof MemoryError) fail("invalid-occurrence");
             throw error;
           }
-          return verifyOccurrence(dependency);
+          return verifyDependencyClaim(dependency);
         });
 
         verifyWholeDerivationSubstitution(
@@ -314,9 +377,9 @@ export function replayStructuralRootedProofAset(
       } finally {
         active.delete(occurrence);
       }
-    };
+    }
 
-    const conclusion = verifyOccurrence(targetOccurrence);
+    const conclusion = verifyStructuralOccurrence(targetOccurrence);
     if (conclusion !== targetRule.body) fail("template-mismatch");
 
     return Object.freeze({
