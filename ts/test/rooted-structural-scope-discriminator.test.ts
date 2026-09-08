@@ -160,7 +160,31 @@ function rootedPrimitiveRoot(
   return memory.ensure(targetIdentity, targetOccurrence);
 }
 
+function confirmSharedDictionaryInformationLoss(): void {
+  const memory = new Memory();
+  const { R, O, C, L, U } = ensureRootBasis(memory);
+  let cursor = memory.ensure(U, R);
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
+  const theory = fresh();
+  const A = memory.ensure(L, R);
+  const B = memory.ensure(R, L);
+  const CRole = memory.ensure(R, U);
+  const a = memory.ensure(O, fresh());
+  const b = memory.ensure(C, fresh());
+  const globalDictionary = defineStructuralRoleDictionary(memory, [A, B, CRole]);
+  const sharedR1 = primitiveFixture(memory, theory, globalDictionary, A, B);
+  const sharedRoot = rootedPrimitiveRoot(memory, theory, sharedR1.derivationRule, a, b);
+  const before = memory.linkCount;
+  expectRootedError("template-mismatch", () => replayStructuralRootedProofAset(memory, sharedRoot));
+  same(memory.linkCount, before, "shared R1 rejection read-only");
+}
+
 function main(): void {
+  // D1 is intentionally isolated so its primitive admissions cannot contaminate
+  // the local-scope-vs-mapped-global authority discriminator below.
+  confirmSharedDictionaryInformationLoss();
+  console.log("SHARED_DICTIONARY_V1_INFORMATION_LOSS = CONFIRMED");
+
   const memory = new Memory();
   const { R, O, C, L, U } = ensureRootBasis(memory);
   let cursor = memory.ensure(U, R);
@@ -181,15 +205,8 @@ function main(): void {
   const localAB = defineStructuralRoleDictionary(memory, [A, B]);
   const localBC = defineStructuralRoleDictionary(memory, [B, CRole]);
 
-  // D1: shared RoleDictionary V1 loses the invisible C binding for R1: A -> B.
-  const sharedR1 = primitiveFixture(memory, theory, globalDictionary, A, B);
-  const sharedRoot = rootedPrimitiveRoot(memory, theory, sharedR1.derivationRule, a, b);
-  const beforeSharedReplay = memory.linkCount;
-  expectRootedError("template-mismatch", () => replayStructuralRootedProofAset(memory, sharedRoot));
-  same(memory.linkCount, beforeSharedReplay, "shared R1 rejection read-only");
-  console.log("SHARED_DICTIONARY_V1_INFORMATION_LOSS = CONFIRMED");
-
-  // D2a: the exact same primitive applications are complete under local scopes.
+  // D2a: primitive rooted V1 has complete rho when each primitive declares only
+  // the roles it actually owns.
   const localR1 = primitiveFixture(memory, theory, localAB, A, B);
   const localR2 = primitiveFixture(memory, theory, localBC, B, CRole);
 
