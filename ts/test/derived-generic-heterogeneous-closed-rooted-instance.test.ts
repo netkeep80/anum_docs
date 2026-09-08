@@ -16,6 +16,7 @@ import {
 import { materializeHeterogeneousDerivedOpenRootedExpansion } from "../src/derived-derivation-heterogeneous-expansion.js";
 import { replayStructuralHeterogeneousDerivedOpenRootedInstance } from "../src/derived-derivation-heterogeneous-instance.js";
 import { replayStructuralHeterogeneousDerivedClosedRootedInstance } from "../src/derived-derivation-heterogeneous-discharge.js";
+import { materializeHeterogeneousDerivedClosedRootedDischarge } from "../src/derived-derivation-heterogeneous-discharge-materialize.js";
 import { replayStructuralRootedProofAset } from "../src/rooted-proof-aset.js";
 import { replayRecursiveLinkIdentityProofAset } from "../src/recursive-link-identity-proof.js";
 
@@ -129,6 +130,7 @@ function main(): void {
   const openIdentity = memory.poles(openRoot).start;
   const openTargetDR = memory.poles(openIdentity).start;
   const openTargetRule = readStructuralDerivationRule(memory, openTargetDR).structuralRule;
+  const openAssumption = memory.ensure(a, openIdentity);
 
   const closedN1 = memory.ensure(
     b,
@@ -158,6 +160,18 @@ function main(): void {
   same(discharge.conclusion, c, "discharge exact conclusion");
   same(discharge.dischargedAssumptionCount, 1, "one reachable assumption discharged");
   same(memory.linkCount, before, "discharge replay read-only");
+
+  const materialized = materializeHeterogeneousDerivedClosedRootedDischarge(
+    memory,
+    { generic, concreteRoot: openRoot },
+    [{ assumptionOccurrence: openAssumption, proofOccurrence: xProof }],
+  );
+  same(materialized.closedRoot, closedRoot, "materializer matches canonical manual CLOSED root");
+  replayStructuralRootedProofAset(memory, materialized.closedRoot);
+  replayStructuralHeterogeneousDerivedClosedRootedInstance(memory, {
+    open: { generic, concreteRoot: openRoot },
+    closedRoot: materialized.closedRoot,
+  });
 
   console.log("TOPOLOGY_DERIVED_ASSUMPTION_DISCHARGE = SUPPORTED");
   console.log("CLOSED_ROOTED_GENERIC_INSTANCE = SUPPORTED");
