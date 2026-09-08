@@ -12,9 +12,14 @@ import {
 import { replayProofSubAnetProjection } from "../src/proof-subanet-projection.js";
 import {
   PORTABLE_PROOF_SUBANET_PROJECTION_SCHEMA,
+  canonicalPortableProofSubAnetProjectionV01Json,
   exportPortableProofSubAnetProjection,
   replayPortableProofSubAnetProjection,
 } from "../src/portable-proof-subanet-projection.js";
+import {
+  PORTABLE_PROOF_SUBANET_PROJECTION_CONTENT_DIGEST_SCHEME,
+  computePortableProofSubAnetProjectionContentDigest,
+} from "../src/portable-proof-anet-digest.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -93,6 +98,35 @@ async function main(): Promise<void> {
   assert(!("bindings" in artifact), "bindings are not serialized");
   assert(!("rho" in artifact), "rho is not serialized");
   same(memory.linkCount, before, "portable export remains read-only");
+  same(
+    canonicalPortableProofSubAnetProjectionV01Json(artifact),
+    JSON.stringify(artifact),
+    "export is already canonical JSON",
+  );
+
+  // Artifact identity follows the existing portable law: canonical JSON plus a
+  // domain-separated SHA-256 scheme. The digest is integrity identity only.
+  const digest = await computePortableProofSubAnetProjectionContentDigest(artifact);
+  same(
+    digest.scheme,
+    PORTABLE_PROOF_SUBANET_PROJECTION_CONTENT_DIGEST_SCHEME,
+    "exact portable projection digest scheme",
+  );
+  assert(/^[0-9a-f]{64}$/.test(digest.value), "digest is lowercase SHA-256 hex");
+  const digestAfterWire = await computePortableProofSubAnetProjectionContentDigest(
+    JSON.parse(JSON.stringify(artifact)),
+  );
+  same(digestAfterWire.value, digest.value, "wire round-trip preserves content digest");
+
+  const mutatedCoordinate = artifact.theoryCoordinate === artifact.schemaDerivationRuleCoordinate
+    ? artifact.premiseProofOccurrenceCoordinate
+    : artifact.schemaDerivationRuleCoordinate;
+  const coordinateMutation = {
+    ...artifact,
+    theoryCoordinate: mutatedCoordinate,
+  };
+  const mutatedDigest = await computePortableProofSubAnetProjectionContentDigest(coordinateMutation);
+  assert(mutatedDigest.value !== digest.value, "coordinate mutation changes content digest");
 
   // The three explicit coordinates are transport references into canonical MTS
   // topology, not host LinkHandles or semantic proof fields.
@@ -118,6 +152,7 @@ async function main(): Promise<void> {
   );
 
   console.log("PORTABLE_GENERIC_PROOF_SUBANET_PROJECTION = SUPPORTED");
+  console.log("PORTABLE_PROOF_SUBANET_PROJECTION_CONTENT_DIGEST = SUPPORTED");
   console.log("PORTABLE_PROJECTED_OCCURRENCE_AUTHORITY = NONE");
   console.log("accepted semantic delta = NONE");
 }
