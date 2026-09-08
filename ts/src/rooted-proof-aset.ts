@@ -7,6 +7,8 @@ import { MemoryError, type LinkHandle, type ReadMemory } from "./memory.js";
 import {
   RecursiveLinkIdentityProofReplayError,
   replayRecursiveLinkIdentityProofAset,
+  replayRecursiveLinkIdentityProofClosure,
+  type ValidatedProofOccurrenceClaim,
 } from "./recursive-link-identity-proof.js";
 import {
   StructuralRuleError,
@@ -53,6 +55,26 @@ export interface StructuralRootedProofAsetReplayResult {
   readonly usedAssumptionCount: number;
 }
 
+export interface ClosedProofOccurrenceReplayResult {
+  readonly theory: LinkHandle;
+  readonly occurrence: LinkHandle;
+  readonly claim: LinkHandle;
+  readonly validatedOccurrences: readonly ValidatedProofOccurrenceClaim[];
+}
+
+interface StructuralOccurrenceApplication {
+  readonly occurrence: LinkHandle;
+  readonly claim: LinkHandle;
+  readonly primitiveDerivationRule: LinkHandle;
+  readonly premiseTemplates: readonly LinkHandle[];
+  readonly dependencyOccurrences: readonly LinkHandle[];
+}
+
+interface ProofCandidateReplayResult {
+  readonly claim: LinkHandle;
+  readonly validatedOccurrences: readonly ValidatedProofOccurrenceClaim[];
+}
+
 function fail(code: StructuralRootedProofAsetReplayErrorCode): never {
   throw new StructuralRootedProofAsetReplayError(code);
 }
@@ -96,6 +118,74 @@ function readDependencies(memory: ReadMemory, sequence: LinkHandle): readonly Li
     }
     throw error;
   }
+}
+
+function selectUniqueCandidate<T>(
+  first: T | undefined,
+  second: T | undefined,
+): T {
+  const valid: T[] = [];
+  if (first !== undefined) valid.push(first);
+  if (second !== undefined) valid.push(second);
+  if (valid.length === 0) fail("invalid-proof-occurrence");
+  if (valid.length !== 1) fail("ambiguous-proof-support");
+  const selected = valid[0];
+  if (selected === undefined) fail("invalid-proof-occurrence");
+  return selected;
+}
+
+function readStructuralOccurrenceApplication(
+  memory: ReadMemory,
+  theory: LinkHandle,
+  occurrence: LinkHandle,
+): StructuralOccurrenceApplication {
+  let claim: LinkHandle;
+  let application: LinkHandle;
+  try {
+    const occurrencePoles = memory.poles(occurrence);
+    claim = occurrencePoles.start;
+    application = occurrencePoles.end;
+  } catch (error) {
+    if (error instanceof MemoryError) fail("invalid-occurrence");
+    throw error;
+  }
+
+  let primitiveDerivationRule: LinkHandle;
+  let dependencySequence: LinkHandle;
+  try {
+    const applicationPoles = memory.poles(application);
+    primitiveDerivationRule = applicationPoles.start;
+    dependencySequence = applicationPoles.end;
+  } catch (error) {
+    if (error instanceof MemoryError) fail("invalid-application");
+    throw error;
+  }
+
+  const primitiveSchema = readDerivationRule(
+    memory,
+    primitiveDerivationRule,
+    "invalid-application",
+  );
+  readRule(memory, primitiveSchema.structuralRule, "invalid-application");
+  if (memory.find(theory, primitiveSchema.structuralRule) === undefined) {
+    fail("primitive-rule-not-admitted");
+  }
+  if (memory.find(theory, primitiveDerivationRule) === undefined) {
+    fail("primitive-derivation-rule-not-admitted");
+  }
+
+  const dependencyOccurrences = readDependencies(memory, dependencySequence);
+  if (dependencyOccurrences.length !== primitiveSchema.premiseTemplates.length) {
+    fail("premise-arity-mismatch");
+  }
+
+  return Object.freeze({
+    occurrence,
+    claim,
+    primitiveDerivationRule,
+    premiseTemplates: primitiveSchema.premiseTemplates,
+    dependencyOccurrences,
+  });
 }
 
 /**
@@ -145,6 +235,136 @@ function verifyWholeDerivationSubstitution(
       fail("template-mismatch");
     }
     throw error;
+  }
+}
+
+function mergeValidatedClosures(
+  parts: readonly (readonly ValidatedProofOccurrenceClaim[])[],
+  current: ValidatedProofOccurrenceClaim,
+): readonly ValidatedProofOccurrenceClaim[] {
+  const merged = new Map<LinkHandle, LinkHandle>();
+  const add = ({ occurrence, claim }: ValidatedProofOccurrenceClaim): void => {
+    const previous = merged.get(occurrence);
+    if (previous !== undefined && previous !== claim) fail("invalid-proof-occurrence");
+    merged.set(occurrence, claim);
+  };
+  for (const part of parts) for (const entry of part) add(entry);
+  add(current);
+  return Object.freeze(
+    [...merged].map(([occurrence, claim]) => Object.freeze({ occurrence, claim })),
+  );
+}
+
+/**
+ * Trusted callback-free K1 replay for one CLOSED ProofOccurrence.
+ *
+ * It uses the same accepted identity/structural 0/1/>1 law selection as the
+ * rooted wrapper, but has no target-assumption topology. The returned closure
+ * contains only exact ProofOccurrences validated by the uniquely selected law.
+ */
+export function replayClosedProofOccurrence(
+  memory: ReadMemory,
+  theory: LinkHandle,
+  occurrence: LinkHandle,
+): ClosedProofOccurrenceReplayResult {
+  const before = memory.linkCount;
+  const structuralMemo = new Map<LinkHandle, ProofCandidateReplayResult>();
+  const activeStructural = new Set<LinkHandle>();
+
+  try {
+    const attemptIdentity = (candidate: LinkHandle): ProofCandidateReplayResult | undefined => {
+      try {
+        const replay = replayRecursiveLinkIdentityProofClosure(memory, candidate);
+        let claim: LinkHandle;
+        try {
+          claim = memory.poles(candidate).start;
+        } catch (error) {
+          if (error instanceof MemoryError) fail("invalid-proof-occurrence");
+          throw error;
+        }
+        return Object.freeze({
+          claim,
+          validatedOccurrences: replay.validatedOccurrences,
+        });
+      } catch (error) {
+        if (
+          error instanceof RecursiveLinkIdentityProofReplayError
+          && error.code !== "replay-wrote"
+        ) {
+          return undefined;
+        }
+        throw error;
+      }
+    };
+
+    const verifyStructural = (candidate: LinkHandle): ProofCandidateReplayResult => {
+      const cached = structuralMemo.get(candidate);
+      if (cached !== undefined) return cached;
+      if (activeStructural.has(candidate)) fail("cyclic-dependency");
+      activeStructural.add(candidate);
+      try {
+        const application = readStructuralOccurrenceApplication(memory, theory, candidate);
+        const dependencies = application.dependencyOccurrences.map((dependency) => verifyClosed(dependency));
+        verifyWholeDerivationSubstitution(
+          memory,
+          application.primitiveDerivationRule,
+          dependencies.map((dependency) => dependency.claim),
+          application.claim,
+        );
+        const replay = Object.freeze({
+          claim: application.claim,
+          validatedOccurrences: mergeValidatedClosures(
+            dependencies.map((dependency) => dependency.validatedOccurrences),
+            Object.freeze({ occurrence: candidate, claim: application.claim }),
+          ),
+        });
+        structuralMemo.set(candidate, replay);
+        return replay;
+      } finally {
+        activeStructural.delete(candidate);
+      }
+    };
+
+    const attemptStructural = (candidate: LinkHandle): ProofCandidateReplayResult | undefined => {
+      try {
+        return verifyStructural(candidate);
+      } catch (error) {
+        if (
+          error instanceof StructuralRootedProofAsetReplayError
+          && error.code !== "replay-wrote"
+        ) {
+          return undefined;
+        }
+        throw error;
+      }
+    };
+
+    function verifyClosed(candidate: LinkHandle): ProofCandidateReplayResult {
+      const identity = attemptIdentity(candidate);
+      const structural = attemptStructural(candidate);
+      return selectUniqueCandidate(identity, structural);
+    }
+
+    const selected = verifyClosed(occurrence);
+    return Object.freeze({
+      theory,
+      occurrence,
+      claim: selected.claim,
+      validatedOccurrences: selected.validatedOccurrences,
+    });
+  } catch (error) {
+    if (error instanceof StructuralRootedProofAsetReplayError) throw error;
+    if (
+      error instanceof MemoryError
+      || error instanceof ExactSequenceError
+      || error instanceof StructuralRuleError
+      || error instanceof StructuralDerivationReplayError
+    ) {
+      fail("invalid-proof-occurrence");
+    }
+    throw error;
+  } finally {
+    if (memory.linkCount !== before) fail("replay-wrote");
   }
 }
 
@@ -200,7 +420,7 @@ export function replayStructuralRootedProofAset(
 
     const restoreVerified = (snapshot: ReadonlyMap<LinkHandle, LinkHandle>): void => {
       verified.clear();
-      for (const [occurrence, claim] of snapshot) verified.set(occurrence, claim);
+      for (const [candidate, claim] of snapshot) verified.set(candidate, claim);
     };
 
     const restoreUsedPremises = (snapshot: ReadonlySet<LinkHandle>): void => {
@@ -208,10 +428,10 @@ export function replayStructuralRootedProofAset(
       for (const premise of snapshot) usedPremises.add(premise);
     };
 
-    function attemptIdentityClaim(occurrence: LinkHandle): LinkHandle | undefined {
+    function attemptIdentityClaim(candidate: LinkHandle): LinkHandle | undefined {
       try {
-        replayRecursiveLinkIdentityProofAset(memory, occurrence);
-        return memory.poles(occurrence).start;
+        replayRecursiveLinkIdentityProofAset(memory, candidate);
+        return memory.poles(candidate).start;
       } catch (error) {
         if (
           error instanceof RecursiveLinkIdentityProofReplayError
@@ -223,11 +443,11 @@ export function replayStructuralRootedProofAset(
       }
     }
 
-    function attemptStructuralClaim(occurrence: LinkHandle): LinkHandle | undefined {
+    function attemptStructuralClaim(candidate: LinkHandle): LinkHandle | undefined {
       const verifiedBefore = new Map(verified);
       const usedPremisesBefore = new Set(usedPremises);
       try {
-        return verifyStructuralOccurrence(occurrence);
+        return verifyStructuralOccurrence(candidate);
       } catch (error) {
         if (
           error instanceof StructuralRootedProofAsetReplayError
@@ -241,65 +461,21 @@ export function replayStructuralRootedProofAset(
       }
     }
 
-    function verifyDependencyClaim(occurrence: LinkHandle): LinkHandle {
-      const identityClaim = attemptIdentityClaim(occurrence);
-      const structuralClaim = attemptStructuralClaim(occurrence);
-      const validClaims: LinkHandle[] = [];
-      if (identityClaim !== undefined) validClaims.push(identityClaim);
-      if (structuralClaim !== undefined) validClaims.push(structuralClaim);
-
-      if (validClaims.length === 0) fail("invalid-proof-occurrence");
-      if (validClaims.length !== 1) fail("ambiguous-proof-support");
-      const claim = validClaims[0];
-      if (claim === undefined) fail("invalid-proof-occurrence");
-      return claim;
+    function verifyDependencyClaim(candidate: LinkHandle): LinkHandle {
+      return selectUniqueCandidate(
+        attemptIdentityClaim(candidate),
+        attemptStructuralClaim(candidate),
+      );
     }
 
-    function verifyStructuralOccurrence(occurrence: LinkHandle): LinkHandle {
-      const cached = verified.get(occurrence);
+    function verifyStructuralOccurrence(candidate: LinkHandle): LinkHandle {
+      const cached = verified.get(candidate);
       if (cached !== undefined) return cached;
-      if (active.has(occurrence)) fail("cyclic-dependency");
-      active.add(occurrence);
+      if (active.has(candidate)) fail("cyclic-dependency");
+      active.add(candidate);
       try {
-        let claim: LinkHandle;
-        let application: LinkHandle;
-        try {
-          const occurrencePoles = memory.poles(occurrence);
-          claim = occurrencePoles.start;
-          application = occurrencePoles.end;
-        } catch (error) {
-          if (error instanceof MemoryError) fail("invalid-occurrence");
-          throw error;
-        }
-
-        let primitiveDerivationRule: LinkHandle;
-        let dependencySequence: LinkHandle;
-        try {
-          const applicationPoles = memory.poles(application);
-          primitiveDerivationRule = applicationPoles.start;
-          dependencySequence = applicationPoles.end;
-        } catch (error) {
-          if (error instanceof MemoryError) fail("invalid-application");
-          throw error;
-        }
-
-        const primitiveSchema = readDerivationRule(
-          memory, primitiveDerivationRule, "invalid-application",
-        );
-        readRule(memory, primitiveSchema.structuralRule, "invalid-application");
-        if (memory.find(theory, primitiveSchema.structuralRule) === undefined) {
-          fail("primitive-rule-not-admitted");
-        }
-        if (memory.find(theory, primitiveDerivationRule) === undefined) {
-          fail("primitive-derivation-rule-not-admitted");
-        }
-
-        const dependencyOccurrences = readDependencies(memory, dependencySequence);
-        if (dependencyOccurrences.length !== primitiveSchema.premiseTemplates.length) {
-          fail("premise-arity-mismatch");
-        }
-
-        const dependencyClaims = dependencyOccurrences.map((dependency) => {
+        const application = readStructuralOccurrenceApplication(memory, theory, candidate);
+        const dependencyClaims = application.dependencyOccurrences.map((dependency) => {
           try {
             const poles = memory.poles(dependency);
             if (poles.end === targetIdentity && targetPremises.has(poles.start)) {
@@ -315,14 +491,14 @@ export function replayStructuralRootedProofAset(
 
         verifyWholeDerivationSubstitution(
           memory,
-          primitiveDerivationRule,
+          application.primitiveDerivationRule,
           dependencyClaims,
-          claim,
+          application.claim,
         );
-        verified.set(occurrence, claim);
-        return claim;
+        verified.set(candidate, application.claim);
+        return application.claim;
       } finally {
-        active.delete(occurrence);
+        active.delete(candidate);
       }
     }
 
