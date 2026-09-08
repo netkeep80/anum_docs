@@ -13,6 +13,7 @@ import {
   replayStructuralHeterogeneousDerivedDerivationSchema,
   type StructuralHeterogeneousDerivedDerivationEvidence,
 } from "../src/derived-derivation-heterogeneous.js";
+import { materializeHeterogeneousDerivedOpenRootedExpansion } from "../src/derived-derivation-heterogeneous-expansion.js";
 import { replayStructuralRootedProofAset } from "../src/rooted-proof-aset.js";
 import { replayStructuralHeterogeneousDerivedOpenRootedInstance } from "../src/derived-derivation-heterogeneous-instance.js";
 
@@ -156,9 +157,25 @@ function main(): void {
   same(replay.bindings[2]?.value, c, "binding[2] value c");
   same(memory.linkCount, before, "instance binding is read-only");
 
+  const expanded = materializeHeterogeneousDerivedOpenRootedExpansion(memory, generic, [
+    Object.freeze({ role: A, value: a }),
+    Object.freeze({ role: B, value: b }),
+    Object.freeze({ role: CRole, value: c }),
+  ]);
+  same(expanded.concreteRoot, concreteRoot, "constructor materializes canonical manual root");
+  replayStructuralRootedProofAset(memory, expanded.concreteRoot);
+  const expandedReplay = replayStructuralHeterogeneousDerivedOpenRootedInstance(memory, {
+    generic,
+    concreteRoot: expanded.concreteRoot,
+  });
+  same(expandedReplay.bindings[0]?.value, a, "expanded A binding");
+  same(expandedReplay.bindings[1]?.value, b, "expanded B binding");
+  same(expandedReplay.bindings[2]?.value, c, "expanded C binding");
+
   console.log("HETEROGENEOUS_GENERIC_OPEN_ROOTED_INSTANCE_BINDING = SUPPORTED");
   console.log("GLOBAL_ROLE_INSTANCE_OBSERVABILITY = SUPPORTED");
   console.log("EXPLICIT_RHO_AUTHORITY = NOT REQUIRED");
+  console.log("CONSTRUCTION_ONLY_OPEN_ROOTED_EXPANSION = SUPPORTED");
   console.log("accepted semantic delta = NONE");
 }
 
