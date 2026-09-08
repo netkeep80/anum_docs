@@ -17,6 +17,7 @@ import {
   type StorageTopologyImage,
 } from "./persistence-topology.js";
 import { PORTABLE_MTS_SEMANTIC_BASE } from "./portable-derivation.js";
+import { replayPortableProofSubAnetProjection } from "./portable-proof-subanet-projection.js";
 import { replayPortableStructuralProof } from "./portable-proof-replay.js";
 import {
   PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME,
@@ -270,6 +271,36 @@ export async function verifyPortableStructuralProofTheoryRevision(
   const proofTheory = "theory" in proof.evidence
     ? proof.evidence.theory
     : proof.evidence.derivation.theory;
+  if (linkFingerprint(proof.memory, proofTheory) !== linkFingerprint(expected.memory, expected.theory)) {
+    fail("proof-theory-mismatch");
+  }
+
+  const admitted = new Set(
+    expected.memory.outgoing(expected.theory).map((link) => linkFingerprint(expected.memory, link)),
+  );
+  for (const used of proof.memory.outgoing(proofTheory)) {
+    if (!admitted.has(linkFingerprint(proof.memory, used))) fail("proof-theory-mismatch");
+  }
+}
+
+/**
+ * Adds the same external exact-Theory selection boundary to the portable K1e
+ * projection envelope. Projection truth is still recomputed exclusively by the
+ * trusted K1/K1e replay; the selected Theory artifact/revision grants no proof
+ * authority and only constrains the Theory identity/admission subset it may use.
+ */
+export async function verifyPortableProofSubAnetProjectionTheoryRevision(
+  proofArtifact: unknown,
+  expectedTheoryArtifact: unknown,
+  expectedRevisionInput: unknown,
+): Promise<void> {
+  const expected = replayPortableStructuralTheory(expectedTheoryArtifact);
+  const expectedRevision = parseRevision(expectedRevisionInput);
+  const actualRevision = await computePortableStructuralTheoryRevision(expected.artifact);
+  if (actualRevision.value !== expectedRevision.value) fail("theory-revision-mismatch");
+
+  const proof = replayPortableProofSubAnetProjection(proofArtifact);
+  const proofTheory = proof.evidence.theory;
   if (linkFingerprint(proof.memory, proofTheory) !== linkFingerprint(expected.memory, expected.theory)) {
     fail("proof-theory-mismatch");
   }
