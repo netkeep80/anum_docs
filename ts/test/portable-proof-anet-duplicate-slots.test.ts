@@ -88,7 +88,7 @@ function projectionSchema(
   // One generic role is bound only from the exact parent Claim. The projected
   // body is fixed data and the schema deliberately remains unadmitted.
   const roleSeed = memory.ensure(premiseOccurrence, theory);
-  const role = memory.ensure(roleSeed, roleSeed);
+  const role = memory.ensure(roleSeed, memory.root);
   const dictionary = defineStructuralRoleDictionary(memory, [role]);
   const rule = defineStructuralRule(memory, dictionary, projectedClaim);
   return defineStructuralDerivationRule(memory, rule, [role]);
