@@ -1,16 +1,67 @@
-# K1e Topology-Derived Proof-subAnet Projection Implementation Plan
+# План реализации K1e: топологическая проекция проверенного поддоказательства
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> Для агентной разработки: выполнять план по задачам, отмечая завершённые пункты. Для исполнения использовать подходы пошаговой реализации и разработки через тесты.
 
-**Goal:** Add a generic, Nat-independent trusted read-only K1e binder that selects one exact already-existing `ProofOccurrence` from the K1-validated closure of a closed premise proof using a one-premise structural schema and a complete substitution inferred only from the premise Claim.
+## Цель
 
-**Architecture:** Reuse the accepted K1 proof laws rather than adding a projection proof law. First expose the exact recursive-identity validated occurrence closure without changing the existing outward identity replay result; then factor a callback-free CLOSED K1 occurrence replay surface that uses the same identity/structural candidate selection law as rooted K1. K1e reads an existing one-premise `StructuralDerivationRule` only as schema data, infers all Role bindings from the premise Claim, and matches the body against Claims in the exact validated closure; `0/1/>1` matches fail closed.
+Добавить общий, не зависящий от натуральных чисел, доверенный механизм K1e. Он должен по одно-посылочной структурной схеме выбрать ровно одно уже существующее доказательное вхождение из замыкания, которое было проверено тем же механизмом K1.
 
-**Tech Stack:** TypeScript 5.9, canonical `Memory`/`ReadMemory`, `ExactSequence`, structural Rule/DerivationRule readers, `inferStructuralSubstitution`, `matchStructuralTemplate`, accepted recursive Link-identity replay, accepted rooted K1, GitHub Actions, repo-guard.
+Ключевой закон:
 
-**Spec:** GitHub #1113 (approved Variant A) + normative self-review `#issuecomment-5587778158` + user approval `#issuecomment-5587948808` + global review #1114. Production owner: #1116.
+```text
+MTS-native one-premise ProjectionSchema
++
+closed K1-valid premise ProofOccurrence
++
+complete role substitution inferred only from premise Claim
++
+K1-validated reachable ProofOccurrence closure
+->
+exact already-existing unique matching ProofOccurrence
+```
 
-## Global Constraints
+K1e не создаёт новое доказательство и не вводит новый закон доказательства.
+
+## Архитектура
+
+Сначала существующая проверка рекурсивного тождества должна уметь внутренне вернуть точное множество проверенных вхождений и соответствующих им доказываемых связей, не меняя существующий внешний результат.
+
+Затем из корневой проверки K1 выделяется внутренний механизм проверки закрытого доказательного вхождения. Он не принимает обработчики, списки допущений, признаки вида доказательства или внешние списки потомков. Он независимо проверяет принятые законы K1 и выбирает результат только по правилу ноль/один/несколько.
+
+После этого K1e:
+
+1. читает существующее структурное производное правило как схему данных;
+2. требует ровно одну посылку;
+3. независимо проверяет родительское закрытое доказательное вхождение через общий механизм K1;
+4. выводит все значения ролей только из доказываемой связи посылки;
+5. сопоставляет заключение схемы только с доказываемыми связями из проверенного замыкания;
+6. возвращает точное уже существующее вхождение только при единственном совпадении.
+
+## Технологическая база
+
+```text
+TypeScript 5.9
+Memory / ReadMemory
+ExactSequence
+StructuralRule / StructuralDerivationRule
+inferStructuralSubstitution
+matchStructuralTemplate
+recursive Link identity replay
+rooted K1 replay
+GitHub Actions
+repo-guard
+```
+
+Архитектурные источники:
+
+```text
+#1113 approved Variant A
+#1114 global pre-implementation review
+#1116 bounded production owner
+#999 proof-calculus authority
+```
+
+## Жёсткие границы
 
 ```text
 accepted MTS = v0.11
@@ -20,7 +71,7 @@ observable accepted-MTS semantic delta = NONE
 
 NO new proof carrier
 NO new K1 proof law
-NO callback/resolver seam in the CLOSED K1 core
+NO callback/resolver seam in CLOSED K1 core
 NO second identity/structural proof walker outside K1
 NO host projectedOccurrence authority
 NO host rho / Map authority
@@ -29,54 +80,42 @@ NO ProjectionSchema primitive-admission requirement
 NO primitive ordered-pole/T4 Rule/DR promotion
 NO T4/Nat/Succ-specific production branch
 NO public.ts/package-root export in first K1e slice
-NO T4 rerun inside the K1e acceptance PR
+NO T4 rerun inside K1e acceptance PR
 NO contracts/**
 NO cutover/**
 NO traceability/**
 NO repo-policy.json
 ```
 
-Preserve existing outward diagnostics:
+Существующие наружные результаты должны сохранить прежний смысл.
 
 ```text
 replayRecursiveLinkIdentityProofAset(...) result shape unchanged
 replayStructuralRootedProofAset(...) result shape unchanged
 rooted K1 occurrenceCount remains structural-occurrence count
-rooted target assumptions remain explicit target topology, not a callback
+rooted target assumptions remain explicit target topology
 ```
 
-If executable work requires observable accepted MTS semantic change:
+Если исполнимая работа обнаружит наблюдаемое изменение принятой семантики МТС:
 
 ```text
 STOP -> #995
 ```
 
----
+## Файлы реализации
 
-## Locked File Map
+Разрешённая область:
 
 ```text
 MODIFY ts/src/recursive-link-identity-proof.ts
-  add internal/module-level closure replay projection; existing outward API delegates to it
-
 MODIFY ts/src/rooted-proof-aset.ts
-  factor common structural-application validation and callback-free CLOSED K1 replay;
-  keep existing rooted wrapper behavior and outward result unchanged
-
 CREATE ts/src/proof-subanet-projection.ts
-  trusted K1e one-premise projection binder; internal package surface only
-
 CREATE ts/test/proof-subanet-projection.test.ts
-  generic RED/GREEN + closure-shape + authority/security corpus
-
 MODIFY ts/test/recursive-link-identity-proof.test.ts
-  only to pin closure projection and unchanged outward identity replay
-
 MODIFY ts/test/rooted-proof-aset-mixed-identity.test.ts
-  only to pin closed-core/rooted-wrapper equivalence and unchanged K1 diagnostics
 ```
 
-Strictly unchanged in K1e:
+Строго не менять:
 
 ```text
 ts/src/public.ts
@@ -88,34 +127,30 @@ ts/src/structural-role-morphism.ts
 ts/src/structural-substitution.ts
 ts/src/proof.ts
 ts/src/checker.ts
+ts/test/derived-t4-successor-injective-proof-anet.test.ts
 contracts/**
 cutover/**
 traceability/**
 repo-policy.json
+docs/**
 .github/**
 ```
 
 ---
 
-### Task 1: RED — expose the generic proof-subAnet projection gap
+## Задача 1. Первый красный тест общего разрыва K1e
 
-**Files:**
-- Create: `ts/test/proof-subanet-projection.test.ts`
-- Production: none
+Файл:
 
-**Interfaces:**
-- Consumes existing `Memory`, `ensureRootBasis`, `materializeExactSequence`, structural Rule/DR constructors, and `replayRecursiveLinkIdentityProofAset`.
-- Expects the not-yet-existing module/API:
-
-```ts
-import {
-  replayProofSubAnetProjection,
-} from "../src/proof-subanet-projection.js";
+```text
+ts/test/proof-subanet-projection.test.ts
 ```
 
-- [ ] **Step 1: write one ordinary non-Nat RED witness**
+На этом шаге производственные файлы не добавлять.
 
-Construct an arbitrary ordinary relation and its accepted recursive identity proof:
+### 1.1. Построить произвольное доказательство тождества
+
+Использовать пример, не связанный с натуральными числами и T4.
 
 ```ts
 const memory = new Memory();
@@ -137,7 +172,7 @@ const relationProof = identityProof(memory, relation, relation, [leftProof, righ
 replayRecursiveLinkIdentityProofAset(memory, relationProof);
 ```
 
-Build a K1e schema entirely as existing structural topology, without admission:
+### 1.2. Построить одно-посылочную схему без примитивного допуска
 
 ```ts
 const A = memory.ensure(L, R);
@@ -149,9 +184,13 @@ const rule = defineStructuralRule(memory, dictionary, conclusionTemplate);
 const dr = defineStructuralDerivationRule(memory, rule, [premiseTemplate]);
 ```
 
-Call the intended API:
+### 1.3. Зафиксировать будущий вызов
 
 ```ts
+import {
+  replayProofSubAnetProjection,
+} from "../src/proof-subanet-projection.js";
+
 const replay = replayProofSubAnetProjection(memory, {
   theory,
   schemaDerivationRule: dr,
@@ -159,47 +198,46 @@ const replay = replayProofSubAnetProjection(memory, {
 });
 
 same(replay.premiseClaim, memory.poles(relationProof).start, "exact premise Claim");
-same(replay.projectedOccurrence, leftProof, "returns exact existing start proof occurrence");
+same(replay.projectedOccurrence, leftProof, "exact existing projected occurrence");
 same(replay.projectedClaim, memory.poles(leftProof).start, "exact projected Claim");
-same(replay.bindings.length, 2, "A/B bound only from premise Claim");
+same(replay.bindings.length, 2, "all roles bound from premise Claim");
 ```
 
-- [ ] **Step 2: run the targeted RED**
-
-Run:
+### 1.4. Получить честный красный результат
 
 ```bash
 npm --prefix ts run build
 ```
 
-Expected first failure:
+Ожидаемая первая граница:
 
 ```text
 TS2307: Cannot find module '../src/proof-subanet-projection.js'
 ```
 
-If the first failure is different, record the exact boundary in #1116 before production work; do not weaken the witness.
+Если первая ошибка отличается, записать фактическую границу в #1116 до производственного изменения.
 
-- [ ] **Step 3: commit the RED test only and open a Draft PR**
+### 1.5. Зафиксировать только тест
 
 ```bash
 git add ts/test/proof-subanet-projection.test.ts
 git commit -m "test(proof-calculus): expose proof-subAnet projection gap"
 ```
 
-Open a Draft PR and record exact RED head + CI run before adding production files.
+После этого открыть черновой запрос на слияние и сохранить точный красный запуск проверок.
 
 ---
 
-### Task 2: Expose recursive identity validated closure without changing identity replay semantics
+## Задача 2. Вывести проверенное замыкание рекурсивного тождества
 
-**Files:**
-- Modify: `ts/src/recursive-link-identity-proof.ts`
-- Modify: `ts/test/recursive-link-identity-proof.test.ts`
-- Test: `ts/test/proof-subanet-projection.test.ts` remains RED because K1e module is still absent
+Файлы:
 
-**Interfaces:**
-- Produces the module-internal reusable types/API:
+```text
+ts/src/recursive-link-identity-proof.ts
+ts/test/recursive-link-identity-proof.test.ts
+```
+
+### 2.1. Добавить внутренний результат замыкания
 
 ```ts
 export interface ValidatedProofOccurrenceClaim {
@@ -220,7 +258,7 @@ export function replayRecursiveLinkIdentityProofClosure(
 ): RecursiveLinkIdentityProofClosureReplayResult;
 ```
 
-Existing API stays exactly:
+Существующий интерфейс оставить без изменения.
 
 ```ts
 export function replayRecursiveLinkIdentityProofAset(
@@ -229,9 +267,9 @@ export function replayRecursiveLinkIdentityProofAset(
 ): RecursiveLinkIdentityProofReplayResult;
 ```
 
-- [ ] **Step 1: add closure assertions to the identity test**
+### 2.2. Сначала добавить тест новой внутренней проекции
 
-For an ordinary identity proof `P(X,X)` with ordered children `[P(start,start), P(end,end)]`, assert:
+Для обычной связи проверить наличие корневого вхождения и обоих дочерних доказательств в возвращённом замыкании.
 
 ```ts
 const closure = replayRecursiveLinkIdentityProofClosure(memory, xProof);
@@ -243,28 +281,19 @@ same(byOccurrence.get(startProof), memory.poles(startProof).start, "start child 
 same(byOccurrence.get(endProof), memory.poles(endProof).start, "end child -> exact Claim");
 ```
 
-Also call the existing outward API and pin:
+Отдельно зафиксировать неизменность старого результата.
 
 ```ts
 const outward = replayRecursiveLinkIdentityProofAset(memory, xProof);
-same(outward.proofRoot, xProof, "public/module replay proofRoot unchanged");
-same(outward.left, x, "public/module replay left unchanged");
-same(outward.right, x, "public/module replay right unchanged");
-same(outward.verifiedOccurrenceCount, closure.validatedOccurrences.length, "count projection unchanged");
+same(outward.proofRoot, xProof, "proofRoot unchanged");
+same(outward.left, x, "left unchanged");
+same(outward.right, x, "right unchanged");
+same(outward.verifiedOccurrenceCount, closure.validatedOccurrences.length, "count unchanged");
 ```
 
-- [ ] **Step 2: run the focused identity test and observe RED on the missing closure API**
+### 2.3. Минимально переработать внутренний обход
 
-```bash
-npm --prefix ts run build
-node ts/dist/test/recursive-link-identity-proof.test.js
-```
-
-Expected before implementation: compile failure for missing `replayRecursiveLinkIdentityProofClosure`.
-
-- [ ] **Step 3: refactor the identity verifier minimally**
-
-Change `ReadOccurrence` to retain the exact Claim:
+Внутреннее чтение вхождения должно сохранять точную доказываемую связь.
 
 ```ts
 interface ReadOccurrence {
@@ -275,21 +304,19 @@ interface ReadOccurrence {
 }
 ```
 
-In `readOccurrence`, return `claim` with `left/right/children`.
-
-Replace the current `verified Set<LinkHandle>` with an insertion-ordered `Map<LinkHandle, LinkHandle>`:
+Вместо множества проверенных вхождений использовать отображение вхождения на точную доказываемую связь.
 
 ```ts
 const verified = new Map<LinkHandle, LinkHandle>();
 ```
 
-After a node passes all recursive obligations:
+После успешной проверки узла:
 
 ```ts
 verified.set(occurrence, data.claim);
 ```
 
-The new closure replay returns a frozen array projection:
+Новый внутренний результат:
 
 ```ts
 return Object.freeze({
@@ -302,35 +329,20 @@ return Object.freeze({
 });
 ```
 
-Then implement the existing outward replay only as projection:
+Старая функция должна только спроецировать этот результат в прежнюю форму.
 
-```ts
-export function replayRecursiveLinkIdentityProofAset(
-  memory: ReadMemory,
-  proofRoot: LinkHandle,
-): RecursiveLinkIdentityProofReplayResult {
-  const replay = replayRecursiveLinkIdentityProofClosure(memory, proofRoot);
-  return Object.freeze({
-    proofRoot: replay.proofRoot,
-    left: replay.left,
-    right: replay.right,
-    verifiedOccurrenceCount: replay.validatedOccurrences.length,
-  });
-}
-```
+Не менять четыре структурных случая, порядок дочерних доказательств, корневую базу, обнаружение циклов и запрет записи.
 
-Do not alter the four FULL/START/END/ORDINARY obligations, child ordering, root base, cycle detection or read-only checks.
-
-- [ ] **Step 4: run identity corpus GREEN**
+### 2.4. Проверить регрессии
 
 ```bash
 npm --prefix ts run build
 node ts/dist/test/recursive-link-identity-proof.test.js
 ```
 
-Expected: all existing identity positives/negatives remain GREEN.
+Все прежние положительные и отрицательные случаи должны остаться зелёными.
 
-- [ ] **Step 5: commit**
+### 2.5. Зафиксировать изменение
 
 ```bash
 git add ts/src/recursive-link-identity-proof.ts ts/test/recursive-link-identity-proof.test.ts
@@ -339,15 +351,16 @@ git commit -m "refactor(proof-calculus): expose validated identity proof closure
 
 ---
 
-### Task 3: Factor callback-free CLOSED K1 occurrence replay and preserve rooted K1 behavior
+## Задача 3. Выделить общую проверку закрытого вхождения K1
 
-**Files:**
-- Modify: `ts/src/rooted-proof-aset.ts`
-- Modify: `ts/test/rooted-proof-aset-mixed-identity.test.ts`
-- Uses: `replayRecursiveLinkIdentityProofClosure` from Task 2
+Файлы:
 
-**Interfaces:**
-- Produces:
+```text
+ts/src/rooted-proof-aset.ts
+ts/test/rooted-proof-aset-mixed-identity.test.ts
+```
+
+### 3.1. Зафиксировать будущий интерфейс тестом
 
 ```ts
 export interface ClosedProofOccurrenceReplayResult {
@@ -364,34 +377,30 @@ export function replayClosedProofOccurrence(
 ): ClosedProofOccurrenceReplayResult;
 ```
 
-No callback, resolver, assumption list, proof kind or host descendant list is an input.
-
-- [ ] **Step 1: add no-regression tests before refactor**
-
-In `rooted-proof-aset-mixed-identity.test.ts`, for the existing accepted mixed dependency proof, add:
+Для уже существующего смешанного доказательства проверить:
 
 ```ts
 const dependencyClosure = replayClosedProofOccurrence(memory, theory, xProof);
-same(dependencyClosure.occurrence, xProof, "closed K1 exact occurrence");
-same(dependencyClosure.claim, identityClaim, "closed K1 exact Claim");
+same(dependencyClosure.occurrence, xProof, "exact occurrence");
+same(dependencyClosure.claim, identityClaim, "exact Claim");
 assert(
   dependencyClosure.validatedOccurrences.some(({ occurrence }) => occurrence === xProof),
-  "closed K1 validated closure contains selected identity occurrence",
+  "selected occurrence belongs to validated closure",
 );
 ```
 
-Pin the old rooted result independently:
+Одновременно закрепить прежнюю диагностику корневой проверки.
 
 ```ts
 const rooted = replayStructuralRootedProofAset(memory, root);
-same(rooted.occurrenceCount, 1, "rooted occurrenceCount remains structural-only");
-same(rooted.declaredAssumptionCount, 0, "rooted declared assumptions unchanged");
-same(rooted.usedAssumptionCount, 0, "rooted used assumptions unchanged");
+same(rooted.occurrenceCount, 1, "structural occurrence count unchanged");
+same(rooted.declaredAssumptionCount, 0, "declared assumptions unchanged");
+same(rooted.usedAssumptionCount, 0, "used assumptions unchanged");
 ```
 
-- [ ] **Step 2: factor common structural application parsing/validation**
+### 3.2. Выделить чтение структурного применения
 
-Inside `rooted-proof-aset.ts`, create private data shape:
+Внутреннее представление:
 
 ```ts
 interface StructuralOccurrenceApplication {
@@ -403,7 +412,7 @@ interface StructuralOccurrenceApplication {
 }
 ```
 
-Create a private reader that performs only the exact shared structural checks:
+Общий читатель выполняет только следующие проверки:
 
 ```text
 Occurrence poles valid
@@ -416,23 +425,13 @@ dependency ExactSequence valid
 dependency arity == premise arity
 ```
 
-Do not resolve dependencies in this reader.
+Разрешение зависимостей в этом читателе запрещено.
 
-Create a private finisher:
+После получения уже проверенных доказываемых связей зависимостей общий завершающий шаг вызывает существующий закон полной подстановки для посылок и внешнего заключения.
 
-```ts
-function verifyStructuralApplicationClaims(
-  memory: ReadMemory,
-  application: StructuralOccurrenceApplication,
-  dependencyClaims: readonly LinkHandle[],
-): void
-```
+### 3.3. Выделить чистый выбор одного закона
 
-which delegates to the existing whole-derivation substitution law with the exact outer Claim.
-
-- [ ] **Step 3: centralize candidate selection as a pure value selector, not callbacks**
-
-Use an internal candidate result:
+Внутренний результат кандидата:
 
 ```ts
 interface ProofCandidateReplayResult {
@@ -441,7 +440,7 @@ interface ProofCandidateReplayResult {
 }
 ```
 
-Use one pure selector:
+Выбор принимает уже вычисленные значения, а не функции обратного вызова.
 
 ```ts
 function selectUniqueProofCandidate(
@@ -457,48 +456,53 @@ function selectUniqueProofCandidate(
 }
 ```
 
-This function receives already-evaluated values. It is not a callback registry and verifier order cannot grant semantics.
+Порядок вычисления не должен определять смысл.
 
-- [ ] **Step 4: implement CLOSED replay recursively with candidate-local results**
+### 3.4. Реализовать проверку закрытого вхождения
 
-`replayClosedProofOccurrence` must:
+Для каждого вхождения независимо попытаться:
 
 ```text
-A. attempt identity by replayRecursiveLinkIdentityProofClosure
-B. attempt structural by recursively CLOSED-replaying every dependency
-C. call selectUniqueProofCandidate(identity, structural)
-D. return only the selected candidate closure
+A. recursive identity law
+B. structural application law
 ```
 
-Structural candidate recursion uses `activeStructural` for cycles and a structural-candidate memo only as operational cache. Every future proof-law selection still attempts identity and structural independently; a cached structural result must never skip identity ambiguity checking.
+Кандидат рекурсивного тождества использует только замыкание из задачи 2.
 
-For structural closure, combine exact dependency validated closures plus the structural occurrence itself, deduplicated by exact occurrence Link. Do not include any raw/unvalidated Memory neighbor.
+Структурный кандидат рекурсивно проверяет все зависимости тем же закрытым механизмом K1, а затем проверяет полную подстановку.
 
-- [ ] **Step 5: keep rooted OPEN wrapper separate but share the same structural reader/finisher and candidate selector**
+Замыкание структурного кандидата состоит только из:
 
-The existing rooted target remains structurally anchored:
+```text
+validated dependency closures
++
+current structural ProofOccurrence
+```
+
+Повторные точные вхождения удаляются по идентичности самой связи. Соседние или просто существующие в памяти связи не добавляются.
+
+Кэш структурной попытки является только рабочим ускорением. Даже при наличии кэша нельзя пропускать независимую попытку другого закона и тем самым скрывать неоднозначность.
+
+### 3.5. Сохранить отдельную корневую оболочку для открытых допущений
+
+Существующая корневая форма остаётся прежней.
 
 ```text
 root = targetIdentity ⟼ targetOccurrence
 ```
 
-For each structural dependency in the rooted wrapper:
+Для каждой зависимости корневая оболочка сначала структурно проверяет, является ли она объявленным допущением цели.
 
 ```text
-if dependency = Claim ⟼ targetIdentity
-AND Claim is a declared target premise
-  -> use explicit target assumption Claim
-else
-  -> independently attempt identity candidate
-  -> independently attempt rooted structural candidate
-  -> selectUniqueProofCandidate(...)
+dependency = Claim ⟼ targetIdentity
+AND Claim belongs to target premise templates
 ```
 
-The rooted structural candidate may recursively encounter target assumptions; the CLOSED replay never does. There is no resolver callback between the two surfaces.
+Если да, используется точная доказываемая связь допущения. Иначе независимо проверяются принятые законы K1 и выполняется общий выбор одного результата.
 
-Preserve the existing `verified` structural count semantics for `StructuralRootedProofAsetReplayResult.occurrenceCount`.
+Никакой внешний обработчик допущений между корневой и закрытой проверкой не вводится.
 
-- [ ] **Step 6: run focused K1 + identity corpora**
+### 3.6. Проверить регрессии
 
 ```bash
 npm --prefix ts run build
@@ -507,9 +511,9 @@ node ts/dist/test/rooted-proof-aset-mixed-identity.test.js
 node ts/dist/test/recursive-link-identity-proof.test.js
 ```
 
-Expected: all predecessor behavior GREEN, including `invalid-proof-occurrence`, `ambiguous-proof-support`, cycles, exact Theory admission, reachability and read-only checks.
+Все прежние правила K1, циклы, точная Теория, достижимость и запрет записи должны остаться неизменными.
 
-- [ ] **Step 7: commit**
+### 3.7. Зафиксировать изменение
 
 ```bash
 git add ts/src/rooted-proof-aset.ts ts/test/rooted-proof-aset-mixed-identity.test.ts
@@ -518,25 +522,16 @@ git commit -m "refactor(proof-calculus): expose closed K1 validated occurrence r
 
 ---
 
-### Task 4: Implement the minimal one-premise K1e projection binder
+## Задача 4. Реализовать минимальный механизм K1e
 
-**Files:**
-- Create: `ts/src/proof-subanet-projection.ts`
-- Modify: `ts/test/proof-subanet-projection.test.ts`
+Файлы:
 
-**Interfaces:**
-- Consumes:
-
-```ts
-replayClosedProofOccurrence(memory, theory, premiseProofOccurrence)
-inferStructuralSubstitution(memory, roles, constraints, { requireAll: true })
-matchStructuralTemplate(memory, template, claimed, bindings)
-readStructuralDerivationRule(...)
-readStructuralRule(...)
-readStructuralRoleDictionary(...)
+```text
+ts/src/proof-subanet-projection.ts
+ts/test/proof-subanet-projection.test.ts
 ```
 
-- Produces exactly:
+### 4.1. Интерфейс входа и результата
 
 ```ts
 export interface ProofSubAnetProjectionEvidence {
@@ -554,79 +549,55 @@ export interface ProofSubAnetProjectionReplayResult {
   readonly projectedClaim: LinkHandle;
   readonly bindings: readonly StructuralSubstitutionBinding[];
 }
-
-export type ProofSubAnetProjectionReplayErrorCode =
-  | "invalid-schema"
-  | "unsupported-schema-arity"
-  | "invalid-premise-proof"
-  | "unbound-schema-role"
-  | "invalid-premise-substitution"
-  | "projection-not-found"
-  | "ambiguous-projection"
-  | "replay-wrote";
-
-export class ProofSubAnetProjectionReplayError extends Error {
-  override readonly name = "ProofSubAnetProjectionReplayError";
-  constructor(readonly code: ProofSubAnetProjectionReplayErrorCode) {
-    super(code);
-  }
-}
-
-export function replayProofSubAnetProjection(
-  memory: ReadMemory,
-  evidence: ProofSubAnetProjectionEvidence,
-): ProofSubAnetProjectionReplayResult;
 ```
 
-- [ ] **Step 1: read schema as data only**
-
-Read:
+Коды отказа:
 
 ```text
-schemaDerivationRule
--> StructuralRule
--> RoleDictionary
-premiseTemplates
-body
+invalid-schema
+unsupported-schema-arity
+invalid-premise-proof
+unbound-schema-role
+invalid-premise-substitution
+projection-not-found
+ambiguous-projection
+replay-wrote
 ```
 
-Require exactly one premise template:
+### 4.2. Прочитать схему только как данные
+
+Прочитать структурное производное правило, структурное правило, словарь ролей, последовательность посылок и тело.
+
+Требовать ровно одну посылку.
 
 ```ts
 if (schema.premiseTemplates.length !== 1) fail("unsupported-schema-arity");
 ```
 
-Do not query:
+Не проверять примитивное членство схемы в Теории.
 
 ```ts
 memory.find(theory, schema.structuralRule)
 memory.find(theory, schemaDerivationRule)
 ```
 
-Schema admission is irrelevant to K1e authority.
+Эти вызовы не должны участвовать в авторитете K1e.
 
-- [ ] **Step 2: independently replay the premise proof through CLOSED K1**
+### 4.3. Независимо проверить родительское доказательство
 
 ```ts
-let parent: ClosedProofOccurrenceReplayResult;
-try {
-  parent = replayClosedProofOccurrence(
-    memory,
-    evidence.theory,
-    evidence.premiseProofOccurrence,
-  );
-} catch (error) {
-  if (error instanceof StructuralRootedProofAsetReplayError) {
-    if (error.code === "replay-wrote") fail("replay-wrote");
-    fail("invalid-premise-proof");
-  }
-  throw error;
-}
+const parent = replayClosedProofOccurrence(
+  memory,
+  evidence.theory,
+  evidence.premiseProofOccurrence,
+);
 ```
 
-K1e never trusts a caller-supplied parent Claim or descendant list.
+Любая неуспешная проверка родителя преобразуется в отказ K1e, кроме нарушения запрета записи, которое сохраняется отдельно.
 
-- [ ] **Step 3: infer the complete Role substitution from the premise Claim only**
+Вход не содержит доверенной доказываемой связи родителя или списка потомков.
+
+### 4.4. Полностью вывести роли только из посылки
 
 ```ts
 const premiseTemplate = schema.premiseTemplates[0]!;
@@ -638,66 +609,68 @@ const bindings = inferStructuralSubstitution(
 );
 ```
 
-Map errors exactly:
+Преобразование ошибок:
 
 ```text
-duplicate-role        -> invalid-schema
-missing-role-binding  -> unbound-schema-role
-template-mismatch     -> invalid-premise-substitution
-replay-wrote          -> replay-wrote
+duplicate-role       -> invalid-schema
+missing-role-binding -> unbound-schema-role
+template-mismatch    -> invalid-premise-substitution
+replay-wrote         -> replay-wrote
 ```
 
-This step occurs before searching/matching the conclusion. Conclusion-only Roles therefore cannot be guessed.
+Поиск подходящего заключения начинается только после полной подстановки. Роль, встречающаяся только в заключении, не может быть угадана.
 
-- [ ] **Step 4: match only validated closure Claims under the exact premise bindings**
+### 4.5. Искать только внутри проверенного замыкания
 
-For each distinct entry in:
+Для каждого точного элемента:
 
 ```ts
 parent.validatedOccurrences
 ```
 
-attempt:
+проверить тело схемы при уже выведенных значениях ролей.
 
 ```ts
 matchStructuralTemplate(memory, rule.body, candidate.claim, bindings);
 ```
 
-A normal `StructuralRuleError("template-mismatch")` means “not this candidate” and contributes no match. Do not inspect all Memory, incoming/outgoing links, allocation ids, host arrays supplied by caller, or raw pole reachability.
+Обычное несовпадение шаблона означает только отсутствие совпадения для данного кандидата.
 
-Collect distinct matching occurrences by exact Link identity.
+Запрещено просматривать всю память, входящие и исходящие связи, номера выделения, внешние массивы потомков или сырое замыкание полюсов.
 
-Then:
+После удаления повторов по точной идентичности вхождения:
 
 ```text
 0 -> projection-not-found
-1 -> return exact occurrence + exact Claim
+1 -> return exact existing ProofOccurrence
 >1 -> ambiguous-projection
 ```
 
-Do not choose first traversal result.
+Нельзя выбирать первое найденное совпадение.
 
-- [ ] **Step 5: enforce read-only on every exit path**
+### 4.6. Сохранить запрет записи
 
-Snapshot `memory.linkCount` at entry and in `finally` map any write to `replay-wrote`.
+Снимок количества связей выполняется на входе. Любое изменение числа связей на выходе превращается в:
 
-- [ ] **Step 6: make the Task-1 ordinary witness GREEN**
+```text
+replay-wrote
+```
 
-Run:
+### 4.7. Сделать исходный общий пример зелёным
 
 ```bash
 npm --prefix ts run build
 node ts/dist/test/proof-subanet-projection.test.js
 ```
 
-Expected marker after the positive assertion:
+После успешной проверки вывести:
 
 ```text
 PROOF_SUBANET_PROJECTION = SUPPORTED
 K1_VALIDATED_CLOSURE_OBSERVABILITY = SUPPORTED
 ```
 
-- [ ] **Step 7: commit minimal K1e production**
+### 4.8. Зафиксировать минимальную реализацию
 
 ```bash
 git add ts/src/proof-subanet-projection.ts ts/test/proof-subanet-projection.test.ts
@@ -706,42 +679,26 @@ git commit -m "feat(proof-calculus): project validated proof subAnets"
 
 ---
 
-### Task 5: Complete generic closure-shape and security corpus
+## Задача 5. Полный общий и защитный набор проверок
 
-**Files:**
-- Modify: `ts/test/proof-subanet-projection.test.ts`
-- Production: only bounded diagnostic corrections in K1e files if a test exposes a defect in the approved law
+Основной файл:
 
-**Interfaces:** existing Task-4 API only. No test hook or proof-kind injection.
+```text
+ts/test/proof-subanet-projection.test.ts
+```
 
-- [ ] **Step 1: exercise ordinary/start/end/full identity closure shapes generically**
+### 5.1. Проверить разные формы тождества без признака вида
 
-Use schema templates that expose the relevant role structurally rather than a child index.
-
-For ordinary relation projection:
+Для обычной связи использовать схему:
 
 ```text
 premise = ((A ⟼ B) ⟼ (A ⟼ B))
 body    = (A ⟼ A)
 ```
 
-For a start-selfclosed relation built with `ensureStartSelfClosed(E)`:
+Для связи с самозамкнутым началом вывести конец структурно через шаблон. Для связи с самозамкнутым концом вывести начало структурно через шаблон.
 
-```text
-premise relation template = ensureStartSelfClosed(Erole)
-premise = templateRelation ⟼ templateRelation
-body    = Erole ⟼ Erole
-```
-
-For an end-selfclosed relation built with `ensureEndSelfClosed(S)`:
-
-```text
-premise relation template = ensureEndSelfClosed(Srole)
-premise = templateRelation ⟼ templateRelation
-body    = Srole ⟼ Srole
-```
-
-For FULL root, use the conservative identity schema:
+Для корня использовать консервативную схему тождества:
 
 ```text
 roles   = [X]
@@ -749,68 +706,70 @@ premise = X
 body    = X
 ```
 
-against the canonical root proof occurrence; require it returns the exact existing root occurrence. K1e must not encode `child[0]`, `child[1]`, START/END/FULL/ORDINARY tags or selector enums.
+K1e не должен содержать номера дочерних элементов или признаки четырёх форм рекурсивного тождества.
 
-- [ ] **Step 2: invalid schema arity**
+```text
+child[0]
+child[1]
+START
+END
+FULL
+ORDINARY
+selector
+```
 
-Create schema DRs with `[]` and `[p1,p2]` and require exact:
+### 5.2. Неподдерживаемая арность схемы
+
+Проверить ноль и две посылки.
 
 ```text
 unsupported-schema-arity
 ```
 
-- [ ] **Step 3: unbound and inconsistent Role substitution**
+### 5.3. Невыводимая и противоречивая роль
 
-Unbound role fixture:
-
-```text
-roles = [A,B]
-premise mentions A only
-body mentions B
-```
-
-Require:
+Схема с двумя ролями, где посылка содержит только одну, должна дать:
 
 ```text
 unbound-schema-role
 ```
 
-Repeated-role inconsistent premise fixture must require:
+Повтор одной роли с противоречивыми значениями должен дать:
 
 ```text
 invalid-premise-substitution
 ```
 
-- [ ] **Step 4: invalid/foreign Theory structural parent**
+### 5.4. Неверная Теория структурного родителя
 
-Build one CLOSED structural parent whose primitive Rule/DR is admitted only under `theoryA`. Require:
+Построить закрытое структурное доказательство, примитивные правила которого допущены только в одной Теории.
 
 ```text
-replayProofSubAnetProjection(... theoryA ...) -> GREEN or normal projection result
-replayProofSubAnetProjection(... theoryB ...) -> invalid-premise-proof
+theoryA -> normal result
+theoryB -> invalid-premise-proof
 ```
 
-Do not weaken intrinsic identity authority merely because its parent does not require primitive Theory admission.
+Это не должно менять независимую природу рекурсивного тождества, которому не нужен примитивный допуск Теории.
 
-- [ ] **Step 5: unreachable same-Claim proof grants zero authority**
+### 5.5. Недостижимое доказательство той же связи не даёт авторитета
 
-Build a valid proof occurrence whose Claim matches the schema body but which is not in `parent.validatedOccurrences`. Ensure the actual parent closure contains no matching occurrence. Require:
+Построить корректное вхождение с подходящей доказываемой связью, но не включать его в проверенное замыкание родителя. При отсутствии подходящего вхождения внутри реального замыкания ожидать:
 
 ```text
 projection-not-found
 ```
 
-Then add a raw ambient Link:
+Затем добавить обычную внешнюю связь между родителем и недостижимым доказательством.
 
 ```ts
 memory.ensure(parentOccurrence, unreachableMatchingProof);
 ```
 
-Replay must still return `projection-not-found`.
+Результат K1e не должен измениться.
 
-- [ ] **Step 6: host metadata grants zero authority**
+### 5.6. Внешнее украшение входа не даёт авторитета
 
-Call using a structurally decorated object:
+Передать объект с дополнительными полями, которых нет в доверенном интерфейсе.
 
 ```ts
 const decorated = Object.freeze({
@@ -823,59 +782,65 @@ const decorated = Object.freeze({
 });
 ```
 
-The result/error must be identical to the undecorated evidence because these properties are not part of the trusted input.
+Результат должен совпасть с результатом для обычного входа.
 
-- [ ] **Step 7: schema admission is authority-neutral**
+### 5.7. Примитивный допуск схемы не влияет на результат
 
-Use a schema Rule/DR distinct from every primitive Rule/DR used by the parent proof.
+Использовать отдельную схему, не совпадающую с примитивными правилами родительского доказательства.
 
-Run K1e before admission and record exact projected occurrence. Then explicitly add:
+Сначала выполнить K1e без допуска схемы и сохранить точное выбранное вхождение. Затем вне K1e явно допустить правило и производное правило схемы в Теории и повторить вызов.
 
 ```ts
 admitStructuralRule(memory, theory, schemaRule);
 admitStructuralDerivationRule(memory, theory, schemaDR);
 ```
 
-Run K1e again and require the same exact projected occurrence. The writes occur outside K1e and may change Theory revision; the projection result must not.
+Должно вернуться то же точное вхождение.
 
-- [ ] **Step 8: construct a genuine ambiguous-projection fixture without test hooks**
+### 5.8. Построить настоящую неоднозначность проекции
 
-Create an exact Claim `pClaim = p ⟼ p` with two distinct independently K1-valid ProofOccurrences:
+Нужна одна и та же точная доказываемая связь:
+
+```text
+pClaim = p ⟼ p
+```
+
+и два различных независимо корректных доказательных вхождения:
 
 ```text
 identityProofP   = intrinsic recursive identity proof of p=p
 structuralProofP = pClaim ⟼ (zeroPremisePrimitiveDR ⟼ ExactSequence([]))
 ```
 
-Admit only the zero-premise structural primitive needed for `structuralProofP`.
+Для второго доказательства допустить только требуемое нуль-посылочное примитивное правило.
 
-Create a CLOSED parent structural proof whose admitted primitive schema has two premise positions both requiring `pClaim`, with dependencies exactly:
+Построить закрытое структурное родительское доказательство с двумя позициями посылок, обе требующими эту же доказываемую связь, и зависимостями:
 
 ```text
 [identityProofP, structuralProofP]
 ```
 
-and whose concrete parent Claim structurally contains `p` so the K1e schema can infer Role `P` from its single premise Claim.
+Доказываемая связь родителя должна структурно содержать значение роли, чтобы одно-посылочная схема K1e могла вывести его только из родительской посылки.
 
-Projection schema:
+Схема проекции:
 
 ```text
 one Role P
-premise template matches the parent Claim and binds P=p
+premise template matches parent Claim and binds P=p
 body = P ⟼ P
 ```
 
-Both distinct dependency ProofOccurrences are in the K1-validated closure and both match the body under the same binding. Require exact:
+Оба разных вхождения находятся в проверенном замыкании и совпадают с заключением. Требуется:
 
 ```text
 ambiguous-projection
 ```
 
-If canonical construction unexpectedly collapses the two supports into one exact occurrence, record that measured fact in #1116 before changing the test; do not add a proof-kind callback or fake dispatcher to manufacture ambiguity.
+Если каноническое построение неожиданно схлопнет два носителя в одну точную связь, сначала записать фактическое измерение в #1116. Нельзя вводить искусственный признак вида доказательства только ради изготовления неоднозначности.
 
-- [ ] **Step 9: read-only + exact Theory revision**
+### 5.9. Запрет записи и точная ревизия Теории
 
-Around a normal projection call:
+До и после обычного вызова K1e сравнить число связей и точную ревизию Теории.
 
 ```ts
 const revisionBefore = await computePortableStructuralTheoryRevision(
@@ -891,13 +856,13 @@ same(revisionAfter.scheme, revisionBefore.scheme, "Theory scheme unchanged");
 same(revisionAfter.value, revisionBefore.value, "exact Theory revision unchanged");
 ```
 
-- [ ] **Step 10: run all predecessor corpora and full gate**
+### 5.10. Полный регрессионный прогон
 
 ```bash
 npm --prefix ts run check
 ```
 
-Required predecessor markers/corpora remain GREEN:
+Должны остаться зелёными все предшествующие проверки:
 
 ```text
 recursive Link identity
@@ -907,11 +872,11 @@ K1d3 open rooted binding
 K1d4 closed rooted discharge
 ```
 
-Do not edit the T4 rerun test in this PR.
+Тест T4 в этом запросе на слияние не менять.
 
-- [ ] **Step 11: emit final generic K1e markers and commit**
+### 5.11. Итоговые маркеры K1e
 
-Only after the complete generic corpus is GREEN:
+После полного общего набора:
 
 ```text
 PROOF_SUBANET_PROJECTION = SUPPORTED
@@ -923,25 +888,20 @@ K1E_SECURITY_CORPUS = GREEN
 accepted semantic delta = NONE
 ```
 
-Commit:
+Зафиксировать защитные проверки отдельным коммитом.
 
 ```bash
 git add ts/test/proof-subanet-projection.test.ts
-# add K1e production files only if the security corpus exposed a bounded defect
 git commit -m "test(proof-calculus): harden proof-subAnet projection authority"
 ```
 
 ---
 
-### Task 6: K1e acceptance transaction — generic only
+## Задача 6. Приёмка K1e отдельно от T4
 
-**Files:** none beyond Tasks 1–5.
+### 6.1. Проверить точный набор изменённых файлов
 
-**Interfaces:** GitHub lifecycle only.
-
-- [ ] **Step 1: verify exact diff against the opening accepted main for the implementation branch**
-
-Required scope:
+Разрешены только:
 
 ```text
 ts/src/recursive-link-identity-proof.ts
@@ -952,11 +912,11 @@ ts/test/recursive-link-identity-proof.test.ts
 ts/test/rooted-proof-aset-mixed-identity.test.ts
 ```
 
-No `public.ts`, T4 test, docs, contracts, cutover, traceability, policy or workflows.
+Не должно быть изменений в публичной поверхности пакета, тесте T4, документации, контрактах, трассировке, политике или рабочих процессах.
 
-- [ ] **Step 2: update PR body with exact TDD evidence**
+### 6.2. Записать историю разработки через тесты
 
-Record:
+В описании запроса на слияние сохранить:
 
 ```text
 opening main SHA
@@ -971,27 +931,24 @@ active semantic candidate = NONE
 T4 PROOF_ANET remains GAP until separate #1064 rerun
 ```
 
-- [ ] **Step 3: mark ready only after exact-head full GREEN**
+### 6.3. Финальный шлюз слияния
 
-Require on one stable head:
+На одном неизменном точном коммите требуются:
 
 ```text
 full CI = GREEN
 blocking repo-guard = GREEN
-PR draft = false
+draft = false
 mergeable = true
 behind_by = 0
-no blocking review finding
-changed-file set unchanged
+stable exact head
 ```
 
-- [ ] **Step 4: merge with expected head SHA**
+Слияние выполнять только с защитой точного ожидаемого коммита.
 
-Use `expected_head_sha` equal to the exact verified final head.
+### 6.4. После слияния принять только K1e
 
-- [ ] **Step 5: require post-merge main CI GREEN and classify K1e only**
-
-Accepted result:
+После зелёной проверки нового основного состояния зафиксировать только:
 
 ```text
 K1e PROOF_SUBANET_PROJECTION = SUPPORTED
@@ -1000,23 +957,23 @@ ROOTED_K1_SEMANTICS = UNCHANGED
 accepted semantic delta = NONE
 ```
 
-Do **not** mark T4 `PROOF_ANET = SUPPORTED` here.
+Нельзя на этом этапе повышать статус T4.
 
-- [ ] **Step 6: hand off to a separate #1064 exact T4 rerun**
+### 6.5. Отдельно повторить T4
 
-Only after K1e is merged and post-merge GREEN:
+Только после принятия K1e:
 
 ```text
 fresh accepted main
--> separate test-only T4 rerun transaction
+-> separate test-only T4 rerun under #1064
 -> exact same T4 theorem challenge
 ```
 
-Aprover remains WAIT until the complete `aprover#246` A-SYNC1 trigger is satisfied.
+Aprover остаётся в ожидании до выполнения полного условия синхронизации из его отдельного владельца.
 
 ---
 
-## ChangeIntent for the K1e implementation PR
+## Ограничение изменения для #1116
 
 ```repo-guard-yaml
 change_type: feature
@@ -1054,12 +1011,12 @@ must_not_touch:
   - docs/**
   - .github/**
 expected_effects:
-  - expose exact validated recursive-identity ProofOccurrence closure without changing existing outward identity replay diagnostics
-  - expose callback-free CLOSED K1 ProofOccurrence replay using the accepted 0/1/>1 proof-law selection
-  - preserve existing rooted OPEN assumption topology and outward rooted replay result semantics
-  - replay one-premise MTS-native projection schemas without querying schema primitive admission
-  - infer every schema Role only from the exact premise Claim
-  - select exactly one existing ProofOccurrence from the K1-validated parent closure by conclusion-template match
+  - expose exact validated recursive-identity ProofOccurrence closure without outward diagnostic drift
+  - expose callback-free CLOSED K1 ProofOccurrence replay using accepted 0/1/>1 proof-law selection
+  - preserve existing rooted OPEN assumption topology and rooted replay result semantics
+  - replay one-premise MTS-native projection schemas without schema primitive-admission authority
+  - infer every schema Role only from exact premise Claim
+  - select exactly one existing ProofOccurrence from K1-validated parent closure
   - reject zero or multiple matching validated occurrences fail-closed
   - grant zero authority to host rho, projectedOccurrence metadata, ambient Links, raw Memory reachability, or unreachable same-Claim proofs
   - introduce no Nat/T4/Succ-specific trusted branch and no new K1 proof law
@@ -1067,7 +1024,7 @@ expected_effects:
   - accepted MTS v0.11 remains unchanged
 ```
 
-## Plan Self-Review
+## Самопроверка плана
 
 ```text
 SPEC COVERAGE = COMPLETE for approved #1113 Variant A + #1114 corrections
@@ -1080,4 +1037,4 @@ PUBLIC PACKAGE API DELTA = NONE
 SEMANTIC DELTA EXPECTED = NONE
 ```
 
-Execution mode for the current ChatGPT session: **inline execution** after #1115 docs/plan synchronization is accepted, using GitHub Actions as authoritative RED/GREEN evidence and the exact-head repo-guard merge gate.
+Исполнение этого плана начинается только после принятия #1115. Авторитетными свидетельствами красных и зелёных состояний являются точные запуски проверок репозитория на соответствующих коммитах.
