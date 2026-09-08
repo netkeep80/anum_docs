@@ -143,12 +143,14 @@ function includePoleClosure(
 
 /**
  * Executes one already-trusted read-only replay through an observing ReadMemory,
- * then canonicalizes exactly the Link surface that replay actually read plus its
- * pole closure. This helper knows no proof grammar and grants no proof authority.
+ * then canonicalizes the Link surface that replay actually read together with
+ * explicitly required transport roots and their pole closure. Required roots are
+ * envelope coordinates, not proof semantics: they are never interpreted here.
  */
 export function exportObservedReplaySupportTopology<T>(
   memory: ReadMemory,
   replay: (observedMemory: ReadMemory) => T,
+  requiredRoots: readonly LinkHandle[] = [],
 ): ObservedReplaySupportTopology<T> {
   const before = memory.linkCount;
   try {
@@ -160,6 +162,7 @@ export function exportObservedReplaySupportTopology<T>(
 
     const support = new Set(observedMemory.observed);
     support.add(memory.root);
+    for (const root of requiredRoots) support.add(root);
     includePoleClosure(memory, support);
 
     const canonical = exportCanonicalTopology(new ReplaySupportView(memory, support));
