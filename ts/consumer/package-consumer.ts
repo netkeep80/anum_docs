@@ -1,28 +1,44 @@
 import {
   Memory,
   PORTABLE_MTS_SEMANTIC_BASE,
+  PORTABLE_PROOF_SUBANET_PROJECTION_CONTENT_DIGEST_SCHEME,
+  PORTABLE_PROOF_SUBANET_PROJECTION_SCHEMA,
   PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_SCHEMA,
   PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME,
   PORTABLE_STRUCTURAL_THEORY_SCHEMA,
+  computePortableProofSubAnetProjectionContentDigest,
   computePortableStructuralDerivationWithTheoremsContentDigest,
   computePortableStructuralTheoryRevision,
   createPortableStructuralDerivationWithTheoremsProvenanceClaim,
   createStructuralProofProducer,
   ensureRootBasis,
+  exportPortableProofSubAnetProjection,
   exportPortableStructuralDerivation,
   exportPortableStructuralDerivationWithTheorems,
   exportPortableStructuralTheory,
+  materializeHeterogeneousDerivedClosedRootedDischarge,
+  materializeHeterogeneousDerivedOpenRootedExpansion,
+  replayClosedProofOccurrence,
+  replayPortableProofSubAnetProjection,
   replayPortableStructuralDerivation,
   replayPortableStructuralDerivationWithAssumptions,
   replayPortableStructuralDerivationWithTheorems,
   replayPortableStructuralProof,
   replayPortableStructuralTheory,
+  replayProofSubAnetProjection,
   replayStructuralDerivation,
   replayStructuralDerivationWithAssumptions,
+  replayStructuralHeterogeneousDerivedClosedRootedInstance,
+  replayStructuralHeterogeneousDerivedDerivationSchema,
+  replayStructuralHeterogeneousDerivedOpenRootedInstance,
   replayStructuralScopedDerivation,
+  verifyPortableProofSubAnetProjectionTheoryRevision,
   verifyPortableStructuralDerivationWithTheoremsProvenanceClaim,
   verifyPortableStructuralProofTheoryRevision,
   type LinkHandle,
+  type PortableProofSubAnetProjectionArtifact,
+  type PortableProofSubAnetProjectionContentDigest,
+  type PortableProofSubAnetProjectionReplayResult,
   type PortableStructuralDerivationReplayResult,
   type PortableStructuralDerivationWithAssumptionsReplayResult,
   type PortableStructuralDerivationWithTheoremsReplayResult,
@@ -30,8 +46,14 @@ import {
   type PortableStructuralTheoryArtifact,
   type PortableStructuralTheoryReplayResult,
   type PortableStructuralTheoryRevision,
+  type ProofSubAnetProjectionEvidence,
   type ReadMemory,
+  type StructuralAssumptionProofCoordinate,
   type StructuralDerivationEvidence,
+  type StructuralHeterogeneousDerivedClosedRootedInstanceEvidence,
+  type StructuralHeterogeneousDerivedDerivationEvidence,
+  type StructuralHeterogeneousDerivedOpenRootedInstanceEvidence,
+  type StructuralRoleBinding,
 } from "@mts/core";
 import { textToAnum } from "@mts/core/tooling/payload";
 import {
@@ -159,6 +181,33 @@ const theorySchema: "mts-portable-structural-theory/v0.1" = PORTABLE_STRUCTURAL_
 const theoryRevisionScheme: "mts-portable-structural-theory-revision/sha-256/v0.1" =
   PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME;
 const verifyTheoryRevision = verifyPortableStructuralProofTheoryRevision;
+
+// Portable ONE PROOF ANET is package-root consumable without exposing source
+// module paths. These assignments exercise generated declarations only; they do
+// not grant truth authority to transport, materializers, or host coordinates.
+const proofAnetSchema: "mts-portable-proof-subanet-projection/v0.1" =
+  PORTABLE_PROOF_SUBANET_PROJECTION_SCHEMA;
+const proofAnetDigestScheme:
+  "mts-portable-proof-subanet-projection-content/sha-256/v0.1" =
+  PORTABLE_PROOF_SUBANET_PROJECTION_CONTENT_DIGEST_SCHEME;
+const proofAnetExport: (
+  memory: ReadMemory,
+  evidence: ProofSubAnetProjectionEvidence,
+) => PortableProofSubAnetProjectionArtifact = exportPortableProofSubAnetProjection;
+const proofAnetReplay: (
+  input: unknown,
+) => PortableProofSubAnetProjectionReplayResult = replayPortableProofSubAnetProjection;
+const proofAnetDigest: (
+  input: unknown,
+) => Promise<PortableProofSubAnetProjectionContentDigest> =
+  computePortableProofSubAnetProjectionContentDigest;
+const verifyProofAnetTheory = verifyPortableProofSubAnetProjectionTheoryRevision;
+const genericCertificate: StructuralHeterogeneousDerivedDerivationEvidence | undefined = undefined;
+const openInstance: StructuralHeterogeneousDerivedOpenRootedInstanceEvidence | undefined = undefined;
+const closedInstance: StructuralHeterogeneousDerivedClosedRootedInstanceEvidence | undefined = undefined;
+const roleBindings: readonly StructuralRoleBinding[] | undefined = undefined;
+const assumptionProofs: readonly StructuralAssumptionProofCoordinate[] | undefined = undefined;
+
 void [
   read,
   link,
@@ -183,6 +232,24 @@ void [
   theorySchema,
   theoryRevisionScheme,
   verifyTheoryRevision,
+  proofAnetSchema,
+  proofAnetDigestScheme,
+  proofAnetExport,
+  proofAnetReplay,
+  proofAnetDigest,
+  verifyProofAnetTheory,
+  genericCertificate,
+  openInstance,
+  closedInstance,
+  roleBindings,
+  assumptionProofs,
+  replayClosedProofOccurrence,
+  replayProofSubAnetProjection,
+  replayStructuralHeterogeneousDerivedDerivationSchema,
+  replayStructuralHeterogeneousDerivedOpenRootedInstance,
+  replayStructuralHeterogeneousDerivedClosedRootedInstance,
+  materializeHeterogeneousDerivedOpenRootedExpansion,
+  materializeHeterogeneousDerivedClosedRootedDischarge,
   replayStructuralDerivation,
   replayStructuralDerivationWithAssumptions,
   replayStructuralScopedDerivation,

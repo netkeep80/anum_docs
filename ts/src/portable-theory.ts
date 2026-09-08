@@ -17,6 +17,7 @@ import {
   type StorageTopologyImage,
 } from "./persistence-topology.js";
 import { PORTABLE_MTS_SEMANTIC_BASE } from "./portable-derivation.js";
+import { replayPortableProofSubAnetProjection } from "./portable-proof-subanet-projection.js";
 import { replayPortableStructuralProof } from "./portable-proof-replay.js";
 import {
   PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME,
@@ -254,15 +255,40 @@ function parseRevision(input: unknown): PortableStructuralTheoryRevision {
   return Object.freeze({ scheme: PORTABLE_STRUCTURAL_THEORY_REVISION_SCHEME, value: item.value });
 }
 
+async function replayExpectedTheoryRevision(
+  expectedTheoryArtifact: unknown,
+  expectedRevisionInput: unknown,
+): Promise<PortableStructuralTheoryReplayResult> {
+  const expected = replayPortableStructuralTheory(expectedTheoryArtifact);
+  const expectedRevision = parseRevision(expectedRevisionInput);
+  const actualRevision = await computePortableStructuralTheoryRevision(expected.artifact);
+  if (actualRevision.value !== expectedRevision.value) fail("theory-revision-mismatch");
+  return expected;
+}
+
+function verifySelectedTheoryAuthority(
+  proofMemory: ReadMemory,
+  proofTheory: LinkHandle,
+  expected: PortableStructuralTheoryReplayResult,
+): void {
+  if (linkFingerprint(proofMemory, proofTheory) !== linkFingerprint(expected.memory, expected.theory)) {
+    fail("proof-theory-mismatch");
+  }
+
+  const admitted = new Set(
+    expected.memory.outgoing(expected.theory).map((link) => linkFingerprint(expected.memory, link)),
+  );
+  for (const used of proofMemory.outgoing(proofTheory)) {
+    if (!admitted.has(linkFingerprint(proofMemory, used))) fail("proof-theory-mismatch");
+  }
+}
+
 export async function verifyPortableStructuralProofTheoryRevision(
   proofArtifact: unknown,
   expectedTheoryArtifact: unknown,
   expectedRevisionInput: unknown,
 ): Promise<void> {
-  const expected = replayPortableStructuralTheory(expectedTheoryArtifact);
-  const expectedRevision = parseRevision(expectedRevisionInput);
-  const actualRevision = await computePortableStructuralTheoryRevision(expected.artifact);
-  if (actualRevision.value !== expectedRevision.value) fail("theory-revision-mismatch");
+  const expected = await replayExpectedTheoryRevision(expectedTheoryArtifact, expectedRevisionInput);
 
   // Ordinary proof replay remains the proof-truth authority. This operation only
   // adds the external Theory-selection boundary required by a trusted consumer.
@@ -270,14 +296,21 @@ export async function verifyPortableStructuralProofTheoryRevision(
   const proofTheory = "theory" in proof.evidence
     ? proof.evidence.theory
     : proof.evidence.derivation.theory;
-  if (linkFingerprint(proof.memory, proofTheory) !== linkFingerprint(expected.memory, expected.theory)) {
-    fail("proof-theory-mismatch");
-  }
+  verifySelectedTheoryAuthority(proof.memory, proofTheory, expected);
+}
 
-  const admitted = new Set(
-    expected.memory.outgoing(expected.theory).map((link) => linkFingerprint(expected.memory, link)),
-  );
-  for (const used of proof.memory.outgoing(proofTheory)) {
-    if (!admitted.has(linkFingerprint(proof.memory, used))) fail("proof-theory-mismatch");
-  }
+/**
+ * Adds the same external exact-Theory selection boundary to the portable K1e
+ * projection envelope. Projection truth is still recomputed exclusively by the
+ * trusted K1/K1e replay; the selected Theory artifact/revision grants no proof
+ * authority and only constrains the Theory identity/admission subset it may use.
+ */
+export async function verifyPortableProofSubAnetProjectionTheoryRevision(
+  proofArtifact: unknown,
+  expectedTheoryArtifact: unknown,
+  expectedRevisionInput: unknown,
+): Promise<void> {
+  const expected = await replayExpectedTheoryRevision(expectedTheoryArtifact, expectedRevisionInput);
+  const proof = replayPortableProofSubAnetProjection(proofArtifact);
+  verifySelectedTheoryAuthority(proof.memory, proof.evidence.theory, expected);
 }
