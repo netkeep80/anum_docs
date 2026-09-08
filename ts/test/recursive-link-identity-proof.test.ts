@@ -10,6 +10,7 @@ import {
 import {
   RecursiveLinkIdentityProofReplayError,
   replayRecursiveLinkIdentityProofAset,
+  replayRecursiveLinkIdentityProofClosure,
 } from "../src/recursive-link-identity-proof.js";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -60,11 +61,22 @@ const lProof = identityProof(memory, L, L, [oProof, cProof]);
 same(rootProof, R, "root identity proof collapses to the canonical root");
 
 const before = memory.linkCount;
+const closure = replayRecursiveLinkIdentityProofClosure(memory, lProof);
+const byOccurrence = new Map(
+  closure.validatedOccurrences.map(({ occurrence, claim }) => [occurrence, claim]),
+);
+same(byOccurrence.get(lProof), memory.poles(lProof).start, "root occurrence maps to exact Claim");
+same(byOccurrence.get(oProof), memory.poles(oProof).start, "start child maps to exact Claim");
+same(byOccurrence.get(cProof), memory.poles(cProof).start, "end child maps to exact Claim");
+same(byOccurrence.get(rootProof), memory.poles(rootProof).start, "shared ROOT maps to exact Claim");
+same(closure.validatedOccurrences.length, 4, "closure exposes four exact validated occurrences");
+
 const result = replayRecursiveLinkIdentityProofAset(memory, lProof);
 same(result.left, L, "replay reports exact left claim");
 same(result.right, L, "replay reports exact right claim");
 same(result.proofRoot, lProof, "replay reports exact proof root");
-same(result.verifiedOccurrenceCount, 4, "L/L proof reuses the one root proof occurrence");
+same(result.verifiedOccurrenceCount, closure.validatedOccurrences.length,
+  "existing replay count remains a projection of validated closure");
 same(memory.linkCount, before, "replay is read-only");
 
 // Generic finite grounded controls use the same four topology cases without
