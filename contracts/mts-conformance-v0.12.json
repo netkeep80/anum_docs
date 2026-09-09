@@ -34,7 +34,15 @@
     "v012-string-literal-one-is-utf8-character",
     "v012-string-literal-zero-is-utf8-character",
     "v012-string-literal-open-bracket-has-string-role",
-    "v012-string-literal-close-bracket-has-string-role"
+    "v012-string-literal-close-bracket-has-string-role",
+    "S-EMPTY",
+    "S-FLAT-AB",
+    "S-EMPTY-NESTED",
+    "S-NESTED-AB",
+    "S-FLAT-THEN-NESTED-SAME",
+    "S-DOUBLE-NESTING-PRESERVES-ROOT-LEVEL",
+    "S-EMPTY-NESTED-THEN-FLAT-COLLAPSES",
+    "S-FLAT-THEN-NESTED-EMPTY-THEN-FLAT"
   ],
   "requiredQuaternaryVectors": [
     "v012-q-empty",
