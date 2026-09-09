@@ -9,16 +9,16 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; C2 executable old-vs-new falsification is RED-confirmed and bound as evidence; C3-C7 runtime/convergence evidence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
+  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; C2 executable old-vs-new falsification is RED-confirmed and bound as evidence; C3 authoritative STRING nested-Anum runtime is GREEN-confirmed and bound as evidence; C4-C7 runtime/convergence evidence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.11",
     "conformance": "mts-conformance/v0.11"
   },
   "requiredExecutableGates": [
-    "ts/test/research-v012-interpreter-delta-c2.test.ts"
+    "ts/test/research-v012-interpreter-delta-c2.test.ts",
+    "ts/test/v012-string-anum-protocol-c3a.test.ts"
   ],
   "plannedExecutableGates": [
-    "C3 STRING nested-Anum runtime evidence",
     "C4 FORMAL [] -> STRING typed-child runtime evidence",
     "C5 Q compatibility and representation-separation evidence",
     "C6 FORMAL parentheses / explicit-K / left-reading evidence",
@@ -111,6 +111,29 @@
       ]
     }
   },
+  "runtimeEvidence": {
+    "c3": {
+      "test": "ts/test/v012-string-anum-protocol-c3a.test.ts",
+      "corpusIssue": 1144,
+      "issue": 1146,
+      "pullRequest": 1147,
+      "head": "78a93ddaa8a4901b5809f1c7eae2ac459d59fe18",
+      "ciRun": 4531,
+      "repoGuardRun": 1232,
+      "mergeSha": "285c195595c1a320bca0077aa4d017eee89f67c7",
+      "status": "green-confirmed",
+      "observations": [
+        "I_STRING child context opens explicitly from R",
+        "ordinary STRING signs use root-transparent first-sign continuation and ordinary Link folding thereafter",
+        "a nested STRING Anum result enters its parent as exactly one Link through ordinary parent-current-to-child-result linking",
+        "STRING close returns the child current Link unchanged and verifies the exact lexical parent read-only",
+        "R ⟼ R = R collapse is supplied by canonical Link identity rather than a parser special case",
+        "the authoritative corpus distinguishes ab[ab] = A ⟼ A from ab[[ab]] = A ⟼ (R ⟼ A)",
+        "the authoritative corpus confirms []ab = A and ab[[]ab] = A ⟼ A without preserving an artificial empty-occurrence flag",
+        "no unconditional root-wrap CLOSE, hidden semantic parser stack, depth tag or separate STRING state module is required"
+      ]
+    }
+  },
   "vectorEvidence": {
     "c2Retained": {
       "ts/test/research-v012-interpreter-delta-c2.test.ts": [
@@ -119,14 +142,26 @@
         "v012-same-glyph-one-has-distinct-string-and-q-role",
         "v012-string-glyph-one-is-not-q-abit-one"
       ]
+    },
+    "c3Authoritative": {
+      "ts/test/v012-string-anum-protocol-c3a.test.ts": [
+        "S-EMPTY",
+        "S-FLAT-AB",
+        "S-EMPTY-NESTED",
+        "S-NESTED-AB",
+        "S-FLAT-THEN-NESTED-SAME",
+        "S-DOUBLE-NESTING-PRESERVES-ROOT-LEVEL",
+        "S-EMPTY-NESTED-THEN-FLAT-COLLAPSES",
+        "S-FLAT-THEN-NESTED-EMPTY-THEN-FLAT"
+      ]
     }
   },
   "evidenceState": {
     "candidateContractBoundary": "defined-c1",
     "conformanceObligations": "declared-c1",
     "oldVsNewFalsifiersC2": "red-confirmed",
-    "stringRuntimeC3": "next",
-    "formalSquareBracketCutoverC4": "not-started",
+    "stringRuntimeC3": "green-confirmed",
+    "formalSquareBracketCutoverC4": "next",
     "qCompatibilityC5": "not-started",
     "formalContextC6": "not-started",
     "publicFacadeC7": "not-started",
@@ -154,15 +189,21 @@
       "requiredForAcceptance": true
     },
     "stringNestedAnumRuntime": {
-      "issue": 1134,
+      "issue": 1146,
       "stage": "C3",
-      "status": "next",
+      "test": "ts/test/v012-string-anum-protocol-c3a.test.ts",
+      "pullRequest": 1147,
+      "head": "78a93ddaa8a4901b5809f1c7eae2ac459d59fe18",
+      "ciRun": 4531,
+      "repoGuardRun": 1232,
+      "mergeSha": "285c195595c1a320bca0077aa4d017eee89f67c7",
+      "status": "green-confirmed",
       "requiredForAcceptance": true
     },
     "formalSquareBracketCutover": {
       "issue": 1134,
       "stage": "C4",
-      "status": "blocked-by-C3",
+      "status": "next",
       "requiredForAcceptance": true
     },
     "qCompatibility": {
@@ -191,7 +232,6 @@
     }
   },
   "acceptanceBlockers": [
-    "STRING nested-Anum runtime semantics are not implemented",
     "FORMAL [] -> STRING runtime cutover is not implemented",
     "Q compatibility and representation separation are not yet complete executable evidence",
     "FORMAL parentheses/contextual-K/left-reading convergence is incomplete",
