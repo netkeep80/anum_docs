@@ -147,6 +147,7 @@ X = b ⟼ e
 ## 2. Пять корневых связей
 
 МТС v0.11 сохраняет принятое в МТС v0.10 пятисвязное ядро:
+
 ```text
 R = ∞
 R = R ⟼ R
@@ -447,6 +448,7 @@ des(a,b,c) = (a ⟼ b) ⟼ c
 
 Предыдущая неизменяемая пара свидетельств:
 [`mts-contract/v0.10`](contracts/mts-contract-v0.10.json) + [`mts-conformance/v0.10`](contracts/mts-conformance-v0.10.json).
+
 МТС v0.11 имеет `semanticBase = mts-contract/v0.10` и `observableSemanticDelta = true`.
 
 Единственная текущая реализация написана на `TypeScript` и поставляется как пакет `@mts/core`. Среда исполнения Python, прежний эталон Python и режим совместимости отсутствуют в активном дереве.
