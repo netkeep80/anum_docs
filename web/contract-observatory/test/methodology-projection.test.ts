@@ -80,7 +80,7 @@ assert(candidate.lifecycle.some((entry) => entry.stage === "candidate"), "candid
 assert(!candidate.lifecycle.some((entry) => entry.stage === "accepted"), "candidate is not inferred accepted");
 assert(!candidate.lifecycle.some((entry) => entry.stage === "released"), "candidate is not inferred released");
 assert(candidate.negativeVectors.length > 0, "candidate veto corpus is projected as first-class evidence");
-same(candidate.executableGates.length, 4, "C5 candidate projects C2 falsifier, C3 STRING runtime, C4 FORMAL square-bracket and C5 Q/representation gates");
+same(candidate.executableGates.length, 5, "C6 candidate projects C2 falsifier, C3 STRING runtime, C4 FORMAL square-bracket, C5 Q/representation and C6 FORMAL/explicit-K/left-reading gates");
 
 const serialized = serializeMethodologyProjection(projection);
 same(
