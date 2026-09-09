@@ -136,7 +136,7 @@
     "conformanceObligationsDeclared": true,
     "executableFalsifiersComplete": true,
     "stringRuntimeComplete": true,
-    "formalSquareBracketCutoverComplete": false,
+    "formalSquareBracketCutoverComplete": true,
     "qRegressionComplete": false,
     "formalParenthesesContextComplete": false,
     "publicFacadeComplete": false,
