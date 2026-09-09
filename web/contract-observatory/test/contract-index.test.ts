@@ -31,10 +31,10 @@ function expectCode(effect: () => unknown, code: ContractIndexErrorCode, message
 const repositoryRoot = process.cwd();
 const realIndex = buildContractObservatoryIndex(repositoryRoot);
 same(realIndex.schema, "mts-contract-observatory-index/v0.1", "index schema");
-same(realIndex.versions.length, 2, "current repository has two live pairs");
+same(realIndex.versions.length, 3, "current repository has current, previous and candidate pairs");
 same(
   realIndex.versions.map((version) => version.contractId).join(","),
-  "mts-contract/v0.10,mts-contract/v0.11",
+  "mts-contract/v0.10,mts-contract/v0.11,mts-contract/v0.12",
   "real repository uses natural version order",
 );
 same(realIndex.currentContractPath, "contracts/mts-contract-v0.11.json", "policy current contract");
@@ -45,7 +45,8 @@ same(realIndex.acceptancePath, "cutover/typescript-c1-acceptance-v0.4.json", "ac
 
 const current = realIndex.versions.find((version) => version.isCurrent);
 const previous = realIndex.versions.find((version) => version.isPrevious);
-assert(current !== undefined && previous !== undefined, "current and previous summaries exist");
+const candidate = realIndex.versions.find((version) => version.contractId === "mts-contract/v0.12");
+assert(current !== undefined && previous !== undefined && candidate !== undefined, "current, previous and candidate summaries exist");
 same(current.contractId, "mts-contract/v0.11", "current classification comes from evidence");
 same(previous.contractId, "mts-contract/v0.10", "previous classification comes from evidence");
 same(current.status, "accepted", "current status projected");
@@ -54,13 +55,21 @@ same(current.acceptanceReady, true, "current readiness projected");
 same(current.coverageState, "complete", "current coverage projected");
 same(current.requiredExecutableGateCount, 5, "current executable gate count projected");
 assert(current.requiredNegativeVectorCount > 0, "current negative-vector coverage projected");
+same(candidate.status, "candidate", "candidate status projected");
+same(candidate.accepted, false, "candidate is not accepted");
+same(candidate.acceptanceReady, false, "candidate is not acceptance-ready");
+same(candidate.coverageState, "incomplete", "candidate coverage remains incomplete");
+same(candidate.requiredExecutableGateCount, 0, "C1 candidate has no fabricated executable gates");
+assert(candidate.requiredNegativeVectorCount > 0, "candidate veto corpus is projected");
+same(candidate.isCurrent, false, "candidate is not current");
+same(candidate.isPrevious, false, "candidate is not previous");
 
 const serialized = serializeContractObservatoryIndex(realIndex);
 same(serialized, serializeContractObservatoryIndex(buildContractObservatoryIndex(repositoryRoot)), "serialization is deterministic");
 assert(!serialized.includes("rootBasisTarget"), "index does not copy raw contract bodies");
 assert(!serialized.includes("TopBind(R,S)"), "index does not copy semantic equations");
 const livePaths = new Set(realIndex.versions.flatMap((version) => [version.contractPath, version.conformancePath]));
-same(livePaths.size, 4, "all four live evidence files accounted for exactly once");
+same(livePaths.size, 6, "all six tracked evidence files accounted for exactly once");
 
 interface Fixture {
   readonly root: string;

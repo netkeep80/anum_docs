@@ -1,0 +1,147 @@
+{
+  "schema": "mts-contract/v0.12",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 1137,
+  "candidateLifecycleIssue": 1134,
+  "semanticBase": "mts-contract/v0.11",
+  "observableSemanticDelta": true,
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.11",
+    "conformance": "mts-conformance/v0.11",
+    "immutable": true,
+    "liveRuntimeSelectable": true
+  },
+  "conformanceCorpus": "contracts/mts-conformance-v0.12.json",
+  "acceptedCurrent": "mts-contract/v0.11",
+  "acceptanceReady": false,
+  "inheritedFoundation": {
+    "semanticBase": "mts-contract/v0.11",
+    "rootBasisChanged": false,
+    "linkIdentityChanged": false,
+    "constructorChanged": false,
+    "proofCalculusChanged": false,
+    "natSemanticsChanged": false
+  },
+  "implementation": {
+    "language": "TypeScript",
+    "package": "@mts/core",
+    "publicFacade": "ts/src/public.ts",
+    "singleLiveSemanticRuntime": true,
+    "acceptedRuntime": "mts-contract/v0.11",
+    "candidateRuntimeSelectable": false,
+    "implementationComplete": false,
+    "productionBehaviorChanged": false
+  },
+  "interpreterModel": {
+    "identities": ["I_STRING", "I_FORMAL", "I_Q"],
+    "semanticInterpretationContexts": true,
+    "hiddenLexerModesAreSemanticAuthority": false,
+    "hiddenParserModesAreSemanticAuthority": false,
+    "physicalGlyphEqualsStringValue": false,
+    "physicalGlyphEqualsQAbit": false,
+    "physicalGlyphEqualsFormalRole": false,
+    "sameGlyphShapeImpliesSameRoleAcrossInterpreters": false
+  },
+  "stringInterpreter": {
+    "id": "I_STRING",
+    "physicalSignsAreUtf8": true,
+    "glyphOneRole": "UTF-8 character/sign `1`",
+    "glyphZeroRole": "UTF-8 character/sign `0`",
+    "squareBracketRole": "nested STRING Anum/context",
+    "squareBracketChildInterpreter": "I_STRING",
+    "childInitialState": "R",
+    "childResultCardinality": "exactly-one-Link",
+    "childResultReturnsToParent": true,
+    "parentContinuesAfterChild": true
+  },
+  "formalInterpreter": {
+    "id": "I_FORMAL",
+    "squareBracketRole": "nested STRING Anum/context",
+    "squareBracketChildInterpreter": "I_STRING",
+    "squareBracketChildIsQ": false,
+    "parenthesesRole": "explicit nested FORMAL context",
+    "parenthesesChildInterpreter": "I_FORMAL",
+    "parenthesesChildInitialState": "explicit child/root semantic state",
+    "parenthesesChildResultCardinality": "exactly-one-Link",
+    "parentContinuesAfterChild": true,
+    "emptyParenthesesAllowed": false,
+    "emptyParenthesesFailure": "empty-formal-context"
+  },
+  "quaternaryInterpreter": {
+    "id": "I_Q",
+    "alphabet": ["[", "]", "1", "0"],
+    "alphabetCount": 4,
+    "glyphOneRole": "Q abit 1",
+    "glyphZeroRole": "Q abit 0",
+    "squareBracketRole": "Q-native nested context",
+    "squareBracketChildInterpreter": "I_Q",
+    "childInitialState": "R",
+    "childResultCardinality": "exactly-one-Link",
+    "rejectNonQGlyphs": true
+  },
+  "representationBoundary": {
+    "canonicalStringToQUnit": "byte",
+    "byteEnvelope": "[bbbbbbbb]",
+    "bitsPerEnvelope": 8,
+    "bitOrder": "MSB-first",
+    "stringGlyphOneUtf8ByteHex": "31",
+    "stringGlyphOneCanonicalQCarrier": "[00110001]",
+    "representationEqualsInterpretation": false,
+    "representationInvokesQInterpreter": false,
+    "sameCarrierGlyphImpliesSameSemanticRole": false
+  },
+  "contextAuthority": {
+    "contextualDotUsesExplicitStructuralK": true,
+    "childCreationSelectsContextualK": false,
+    "nearestLexicalFrameIsSemanticAuthority": false,
+    "ambientMutableCurrentIsSemanticAuthority": false,
+    "hostParserStackIsSemanticAuthority": false,
+    "hiddenParentTraversalIsSemanticAuthority": false,
+    "explicitStructuralEvidenceRequired": true
+  },
+  "formalElaboration": {
+    "leftAssociatedLinkTopology": "retained from accepted structural topology",
+    "genericFlatReader": "distinct mechanism",
+    "formalGrammarExecution": "distinct mechanism",
+    "linkTopologyEqualsFormalGrammar": false,
+    "genericFlatReaderEqualsFormalGrammar": false
+  },
+  "requiredSemanticLaws": {
+    "interpreterSeparation": "I_STRING, I_FORMAL and I_Q are explicit semantic contexts; host parser/lexer modes have zero semantic authority",
+    "stringNestedAnum": "STRING [...] opens I_STRING child from R and returns exactly one Link/value to the STRING parent",
+    "formalSquareBracketStringChild": "FORMAL [...] opens I_STRING child, not I_Q, and returns exactly one Link/value to FORMAL",
+    "quaternaryNestedContext": "Q [...] remains Q-native recursion under I_Q",
+    "stringOneVsQOne": "STRING glyph `1` is UTF-8 character/sign `1`; Q `1` is abit 1",
+    "representationNotInterpretation": "STRING -> Q byte carrier does not invoke I_Q interpretation",
+    "formalParentheses": "FORMAL (...) is explicit I_FORMAL child execution returning exactly one Link/value; () is invalid",
+    "explicitKContext": "contextual `.` resolves only through explicitly selected structural K evidence",
+    "associationBoundary": "left-associated Link topology, generic flat reading and FORMAL execution remain distinct"
+  },
+  "explicitlyDeferred": {
+    "acceptedInlineFormalQSpelling": null,
+    "inlineFormalQCandidate": "∞\"0101\"",
+    "inlineFormalQCandidateAccepted": false,
+    "curlyBraceResearchIssue": 995,
+    "curlyBracesAvailableForQEscaping": false,
+    "natInScope": false,
+    "mathlibInScope": false,
+    "proofCalculusDeltaInScope": false,
+    "transportInScope": false,
+    "aproverInScope": false
+  },
+  "candidateState": {
+    "semanticDeltaScopeFrozenForC1": true,
+    "contractBoundaryEstablished": true,
+    "conformanceObligationsDeclared": true,
+    "executableFalsifiersComplete": false,
+    "stringRuntimeComplete": false,
+    "formalSquareBracketCutoverComplete": false,
+    "qRegressionComplete": false,
+    "formalParenthesesContextComplete": false,
+    "publicFacadeComplete": false,
+    "documentationComplete": false,
+    "traceabilityComplete": false,
+    "acceptedV011Mutated": false
+  }
+}

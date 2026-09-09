@@ -36,15 +36,17 @@ const index = buildContractObservatoryIndex(repositoryRoot);
 const projection: MethodologyProjection = buildMethodologyProjection(repositoryRoot, index);
 
 same(projection.schema, "mts-contract-methodology-projection/v0.1", "projection schema");
-same(projection.versions.length, 2, "live v0.10/v0.11 pair projected exactly once");
+same(projection.versions.length, 3, "current, previous and candidate pairs are projected exactly once");
 same(
   projection.versions.map((version) => version.contractId).join(","),
-  "mts-contract/v0.10,mts-contract/v0.11",
+  "mts-contract/v0.10,mts-contract/v0.11,mts-contract/v0.12",
   "projection preserves V3 deterministic version order",
 );
 
 const current = projection.versions.find((version) => version.isCurrent);
+const candidate = projection.versions.find((version) => version.contractId === "mts-contract/v0.12");
 assert(current !== undefined, "current contract version exists");
+assert(candidate !== undefined, "candidate contract version exists");
 same(current.contractId, "mts-contract/v0.11", "current comes from V3 evidence, not file recency");
 same(current.accepted, true, "explicit accepted state preserved");
 assert(current.positiveVectors.length > 0, "positive conformance vectors are first-class");
@@ -67,6 +69,18 @@ assert(
 );
 assert(current.lifecycle.some((entry) => entry.stage === "accepted"), "explicit accepted flag supports accepted stage");
 assert(current.lifecycle.some((entry) => entry.stage === "released"), "exact acceptance pointer supports released stage");
+
+same(candidate.status, "candidate", "real v0.12 status remains candidate");
+same(candidate.accepted, false, "real v0.12 candidate is not accepted");
+same(candidate.acceptanceReady, false, "real v0.12 candidate is not acceptance-ready");
+same(candidate.isCurrent, false, "real v0.12 candidate is not current");
+same(candidate.isPrevious, false, "real v0.12 candidate is not previous");
+same(candidate.acceptanceReferences.length, 0, "candidate has no acceptance authority");
+assert(candidate.lifecycle.some((entry) => entry.stage === "candidate"), "candidate lifecycle is explicit");
+assert(!candidate.lifecycle.some((entry) => entry.stage === "accepted"), "candidate is not inferred accepted");
+assert(!candidate.lifecycle.some((entry) => entry.stage === "released"), "candidate is not inferred released");
+assert(candidate.negativeVectors.length > 0, "candidate veto corpus is projected as first-class evidence");
+same(candidate.executableGates.length, 0, "C1 candidate has no fabricated executable gates");
 
 const serialized = serializeMethodologyProjection(projection);
 same(
