@@ -168,6 +168,90 @@ export function openQuaternaryContext(
   );
 }
 
+/** STRING starts at the exact root `R`; no separate host state exists. */
+export function openStringContext(
+  memory: WriteMemory,
+  parentBefore: TypedContext,
+  expectedParentInterpreter: StructuralInterpreter,
+  stringInterpreter: LinkHandle,
+): TypedContext {
+  return openChildContext(
+    memory,
+    parentBefore,
+    expectedParentInterpreter,
+    stringInterpreter,
+    memory.root,
+  );
+}
+
+/**
+ * One ordinary STRING sign. The initial root is the start of the Anum, not an
+ * extra operand; after the first sign, continuation is the ordinary Link fold.
+ */
+export function continueStringSign(
+  memory: WriteMemory,
+  before: TypedContext,
+  expectedInterpreter: StructuralInterpreter,
+  value: LinkHandle,
+): TypedContext {
+  verifyTypedContext(memory, before, expectedInterpreter);
+  const state = readContext(memory, before.context);
+  const current = state.current === memory.root
+    ? value
+    : memory.ensure(state.current, value);
+  return defineTypedContext(memory, before.interpreter, state.parent, current);
+}
+
+/**
+ * One nested STRING Anum result. Unlike an ordinary sign, the returned Link is
+ * always linked to the parent's current value. Therefore `R ⟼ R = R` collapse
+ * is a normal Memory identity, not a parser special case.
+ */
+export function continueStringAnum(
+  memory: WriteMemory,
+  before: TypedContext,
+  expectedInterpreter: StructuralInterpreter,
+  value: LinkHandle,
+): TypedContext {
+  verifyTypedContext(memory, before, expectedInterpreter);
+  const state = readContext(memory, before.context);
+  const current = memory.ensure(state.current, value);
+  return defineTypedContext(memory, before.interpreter, state.parent, current);
+}
+
+/**
+ * Read-only STRING CLOSE. The child result is its current Link unchanged;
+ * parent continuation is a separate explicit `continueStringAnum` transition.
+ */
+export function replayStringClose(
+  memory: ReadMemory,
+  child: TypedContext,
+  expectedChildInterpreter: StructuralInterpreter,
+  parentBefore: TypedContext,
+  expectedParentInterpreter: StructuralInterpreter,
+): LinkHandle {
+  const before = memory.linkCount;
+  try {
+    verifyTypedContext(memory, child, expectedChildInterpreter);
+    verifyTypedContext(memory, parentBefore, expectedParentInterpreter);
+    const childState = readContext(memory, child.context);
+    if (childState.parent !== parentBefore.context) {
+      throw new ContextIntegrationError("lexical-parent-mismatch");
+    }
+    return childState.current;
+  } catch (error) {
+    if (error instanceof ContextIntegrationError) throw error;
+    if (error instanceof StateError || error instanceof MemoryError) {
+      throw new ContextIntegrationError("invalid-context-typing");
+    }
+    throw error;
+  } finally {
+    if (memory.linkCount !== before) {
+      throw new ContextIntegrationError("replay-wrote");
+    }
+  }
+}
+
 /**
  * PARENT_CONTINUE for FORMAL. A returned `R` is appended as an explicit Cell,
  * so one root-valued child result can never collapse to the empty sequence.
