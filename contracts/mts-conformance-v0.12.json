@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; C2 executable old-vs-new falsification is RED-confirmed and bound as evidence; C3 authoritative STRING nested-Anum runtime is GREEN-confirmed and bound as evidence; C4 FORMAL square-bracket I_STRING cutover is GREEN-confirmed and bound as evidence; C5-C7 runtime/convergence evidence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
+  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; C2 executable old-vs-new falsification is RED-confirmed and bound as evidence; C3 authoritative STRING nested-Anum runtime is GREEN-confirmed and bound as evidence; C4 FORMAL square-bracket I_STRING cutover is GREEN-confirmed and bound as evidence; C5 Q compatibility and representation/interpretation separation are GREEN-confirmed and bound as evidence; C6-C7 runtime/convergence evidence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.11",
     "conformance": "mts-conformance/v0.11"
@@ -17,10 +17,10 @@
   "requiredExecutableGates": [
     "ts/test/research-v012-interpreter-delta-c2.test.ts",
     "ts/test/v012-string-anum-protocol-c3a.test.ts",
-    "ts/test/v012-formal-square-string-child-c4.test.ts"
+    "ts/test/v012-formal-square-string-child-c4.test.ts",
+    "ts/test/v012-q-compatibility-representation-c5.test.ts"
   ],
   "plannedExecutableGates": [
-    "C5 Q compatibility and representation-separation evidence",
     "C6 FORMAL parentheses / explicit-K / left-reading evidence",
     "C7 package and public-facade convergence evidence"
   ],
@@ -162,6 +162,29 @@
         "STRING close remains read-only",
         "the C4 implementation does not modify Q-native context operations"
       ]
+    },
+    "c5": {
+      "test": "ts/test/v012-q-compatibility-representation-c5.test.ts",
+      "issue": 1155,
+      "pullRequest": 1156,
+      "head": "db03cb3e3d88a4fbccd07a39223a922b0e346126",
+      "ciRun": 4581,
+      "repoGuardRun": 1254,
+      "mergeSha": "c94ed66feda7f07912b75f56b6628db4f708fc4b",
+      "status": "green-confirmed",
+      "runtimeDeltaRequired": false,
+      "evidenceOnly": true,
+      "observations": [
+        "Q empty, [], 1, 0, 10, [10] and [[10]] retain the required topology through explicit I_Q contexts",
+        "the raw Q admission boundary remains exactly [ ] 1 0 and rejects a non-Q physical glyph",
+        "physical STRING glyph `1` is UTF-8 byte 0x31 with canonical carrier [00110001]",
+        "canonical Byte(0x31) remains distinct from Q abit 1/L",
+        "explicit Q interpretation of physical glyph `1` yields L while explicit Q interpretation of [00110001] yields Byte(0x31)",
+        "byte representation may use structural Q denotation without selecting or opening I_Q as a semantic interpretation context",
+        "explicit source/dictionary evidence resolves physical `1` to STRING sign S1 distinct from Byte(0x31) and L",
+        "FORMAL [1] opens I_STRING, returns S1 and preserves S1 as exactly one FORMAL value",
+        "C5a required no production runtime change"
+      ]
     }
   },
   "vectorEvidence": {
@@ -193,6 +216,26 @@
         "v012-formal-square-bracket-child-is-string-not-q",
         "v012-formal-square-brackets-do-not-select-q-child"
       ]
+    },
+    "c5Compatibility": {
+      "ts/test/v012-q-compatibility-representation-c5.test.ts": [
+        "v012-q-empty",
+        "v012-q-empty-nested-context",
+        "v012-q-one-abit",
+        "v012-q-zero-abit",
+        "v012-q-one-zero-sequence",
+        "v012-q-nested-one-zero",
+        "v012-q-double-nested-one-zero",
+        "v012-q-rejects-non-q-glyph",
+        "v012-q-alphabet-remains-four-abits",
+        "v012-formal-square-one-uses-string-character-semantics",
+        "v012-representation-does-not-invoke-q-interpretation",
+        "v012-representation-is-not-interpretation",
+        "v012-string-one-utf8-byte-is-0x31",
+        "v012-string-one-q-carrier-is-00110001-envelope",
+        "v012-same-glyph-one-has-distinct-string-and-q-role",
+        "v012-string-glyph-one-is-not-q-abit-one"
+      ]
     }
   },
   "evidenceState": {
@@ -201,8 +244,8 @@
     "oldVsNewFalsifiersC2": "red-confirmed",
     "stringRuntimeC3": "green-confirmed",
     "formalSquareBracketCutoverC4": "green-confirmed",
-    "qCompatibilityC5": "next",
-    "formalContextC6": "not-started",
+    "qCompatibilityC5": "green-confirmed",
+    "formalContextC6": "next",
     "publicFacadeC7": "not-started",
     "documentationC8": "not-complete",
     "readinessC9": "blocked",
@@ -252,15 +295,21 @@
       "requiredForAcceptance": true
     },
     "qCompatibility": {
-      "issue": 1134,
+      "issue": 1155,
       "stage": "C5",
-      "status": "next",
+      "test": "ts/test/v012-q-compatibility-representation-c5.test.ts",
+      "pullRequest": 1156,
+      "head": "db03cb3e3d88a4fbccd07a39223a922b0e346126",
+      "ciRun": 4581,
+      "repoGuardRun": 1254,
+      "mergeSha": "c94ed66feda7f07912b75f56b6628db4f708fc4b",
+      "status": "green-confirmed",
       "requiredForAcceptance": true
     },
     "formalContextConvergence": {
       "issue": 1134,
       "stage": "C6",
-      "status": "blocked-by-C5",
+      "status": "next",
       "requiredForAcceptance": true
     },
     "publicFacadeConvergence": {
@@ -277,7 +326,6 @@
     }
   },
   "acceptanceBlockers": [
-    "Q compatibility and representation separation are not yet complete executable evidence",
     "FORMAL parentheses/contextual-K/left-reading convergence is incomplete",
     "package/public facade convergence is incomplete",
     "normative documentation and traceability are incomplete",

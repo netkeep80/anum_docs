@@ -137,7 +137,7 @@
     "executableFalsifiersComplete": true,
     "stringRuntimeComplete": true,
     "formalSquareBracketCutoverComplete": true,
-    "qRegressionComplete": false,
+    "qRegressionComplete": true,
     "formalParenthesesContextComplete": false,
     "publicFacadeComplete": false,
     "documentationComplete": false,
