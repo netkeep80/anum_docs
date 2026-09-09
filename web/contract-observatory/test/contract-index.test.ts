@@ -59,7 +59,7 @@ same(candidate.status, "candidate", "candidate status projected");
 same(candidate.accepted, false, "candidate is not accepted");
 same(candidate.acceptanceReady, false, "candidate is not acceptance-ready");
 same(candidate.coverageState, "incomplete", "candidate coverage remains incomplete");
-same(candidate.requiredExecutableGateCount, 2, "C3 candidate projects C2 falsifier and C3 STRING runtime gates");
+same(candidate.requiredExecutableGateCount, 3, "C4 candidate projects C2 falsifier, C3 STRING runtime and C4 FORMAL square-bracket gates");
 assert(candidate.requiredNegativeVectorCount > 0, "candidate veto corpus is projected");
 same(candidate.isCurrent, false, "candidate is not current");
 same(candidate.isPrevious, false, "candidate is not previous");
