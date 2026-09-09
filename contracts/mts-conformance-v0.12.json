@@ -9,14 +9,15 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; executable C2-C7 evidence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
+  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; C2 executable old-vs-new falsification is RED-confirmed and bound as evidence; C3-C7 runtime/convergence evidence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.11",
     "conformance": "mts-conformance/v0.11"
   },
-  "requiredExecutableGates": [],
+  "requiredExecutableGates": [
+    "ts/test/research-v012-interpreter-delta-c2.test.ts"
+  ],
   "plannedExecutableGates": [
-    "C2 executable old-vs-new interpreter falsifiers",
     "C3 STRING nested-Anum runtime evidence",
     "C4 FORMAL [] -> STRING typed-child runtime evidence",
     "C5 Q compatibility and representation-separation evidence",
@@ -86,12 +87,45 @@
     "representationEqualsInterpretation": false,
     "contextAuthority": "explicit structural evidence; no ambient runtime current or host stack"
   },
-  "vectorEvidence": {},
+  "falsificationEvidence": {
+    "c2": {
+      "test": "ts/test/research-v012-interpreter-delta-c2.test.ts",
+      "issue": 1139,
+      "pullRequest": 1140,
+      "head": "053ee914d382e48a23cfacdf9cb47de3a7d2456e",
+      "ciRun": 4499,
+      "repoGuardRun": 1217,
+      "mergeSha": "ec4b4c010a439c0d1b55fe495e31583dcf2fed67",
+      "verdict": "RED",
+      "reason": "FORMAL_SQUARE_BRACKET_CHILD_INTERPRETER_MISMATCH",
+      "candidateSatisfiedByCurrentRuntime": false,
+      "currentFormalBracketChildInterpreter": "I_Q",
+      "candidateRequiredFormalBracketChildInterpreter": "I_STRING",
+      "observations": [
+        "physical STRING glyph `1` is UTF-8 byte 0x31",
+        "its canonical byte representation is [00110001]",
+        "the canonical Byte(0x31) Link is distinct from Q abit 1/L",
+        "accepted v0.11 FORMAL bracket lifecycle opens an explicit I_Q child",
+        "the v0.12 candidate requires a distinct I_STRING child",
+        "the current runtime therefore does not satisfy the v0.12 FORMAL square-bracket requirement"
+      ]
+    }
+  },
+  "vectorEvidence": {
+    "c2Retained": {
+      "ts/test/research-v012-interpreter-delta-c2.test.ts": [
+        "v012-string-one-utf8-byte-is-0x31",
+        "v012-string-one-q-carrier-is-00110001-envelope",
+        "v012-same-glyph-one-has-distinct-string-and-q-role",
+        "v012-string-glyph-one-is-not-q-abit-one"
+      ]
+    }
+  },
   "evidenceState": {
     "candidateContractBoundary": "defined-c1",
     "conformanceObligations": "declared-c1",
-    "oldVsNewFalsifiersC2": "not-started",
-    "stringRuntimeC3": "not-started",
+    "oldVsNewFalsifiersC2": "red-confirmed",
+    "stringRuntimeC3": "next",
     "formalSquareBracketCutoverC4": "not-started",
     "qCompatibilityC5": "not-started",
     "formalContextC6": "not-started",
@@ -108,15 +142,21 @@
       "requiredForAcceptance": true
     },
     "oldVsNewFalsifiers": {
-      "issue": 1134,
+      "issue": 1139,
       "stage": "C2",
-      "status": "next",
+      "test": "ts/test/research-v012-interpreter-delta-c2.test.ts",
+      "pullRequest": 1140,
+      "head": "053ee914d382e48a23cfacdf9cb47de3a7d2456e",
+      "ciRun": 4499,
+      "repoGuardRun": 1217,
+      "mergeSha": "ec4b4c010a439c0d1b55fe495e31583dcf2fed67",
+      "status": "red-confirmed",
       "requiredForAcceptance": true
     },
     "stringNestedAnumRuntime": {
       "issue": 1134,
       "stage": "C3",
-      "status": "blocked-by-C2",
+      "status": "next",
       "requiredForAcceptance": true
     },
     "formalSquareBracketCutover": {
@@ -151,10 +191,9 @@
     }
   },
   "acceptanceBlockers": [
-    "C2 executable old-vs-new falsifiers are not yet green",
     "STRING nested-Anum runtime semantics are not implemented",
     "FORMAL [] -> STRING runtime cutover is not implemented",
-    "Q compatibility and representation separation are not yet executable evidence",
+    "Q compatibility and representation separation are not yet complete executable evidence",
     "FORMAL parentheses/contextual-K/left-reading convergence is incomplete",
     "package/public facade convergence is incomplete",
     "normative documentation and traceability are incomplete",
