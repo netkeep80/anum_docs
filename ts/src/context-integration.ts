@@ -184,6 +184,21 @@ export function openStringContext(
   );
 }
 
+/** FORMAL `[` selects an explicit STRING child; it never selects Q implicitly. */
+export function openFormalSquareBracketContext(
+  memory: WriteMemory,
+  formalBefore: TypedContext,
+  expectedFormalInterpreter: StructuralInterpreter,
+  stringInterpreter: LinkHandle,
+): TypedContext {
+  return openStringContext(
+    memory,
+    formalBefore,
+    expectedFormalInterpreter,
+    stringInterpreter,
+  );
+}
+
 /**
  * One ordinary STRING sign. The initial root is the start of the Anum, not an
  * extra operand; after the first sign, continuation is the ordinary Link fold.
