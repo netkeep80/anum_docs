@@ -1,22 +1,22 @@
-# MTS v0.12 C6 — FORMAL parentheses, explicit-K and reading convergence
+# МТС v0.12 C6 — круглые скобки формального контекста, явный K и сходимость чтения
 
 Дата: 2026-09-09
 
-Статус: **утверждённый архитектурный дизайн; implementation ещё не начат**.
+Статус: **утверждённая архитектура; реализация C6 ещё не начата**.
 
-Parent lifecycle: #1134  
-Roadmap: #657  
-Design owner: #1159  
-Anum Protocol research: #1143
+Родитель жизненного цикла: #1134  
+Дорожная карта: #657  
+Задача фиксации архитектуры: #1159  
+Связанное исследование `Anum Protocol`: #1143
 
-## 1. Exact baseline
+## 1. Точная исходная точка
 
-Дизайн зафиксирован относительно:
+Архитектура зафиксирована относительно:
 
 ```text
 anum_docs/main = 368fac45a60d3dc2626dd04c3ad2a0f539b1333c
 
-accepted MTS             = v0.11
+accepted MTS              = v0.11
 active semantic candidate = v0.12
 candidate status          = candidate
 candidate accepted        = false
@@ -34,74 +34,74 @@ C5 = COMPLETE
 C6 = NEXT
 ```
 
-C5 завершён без production runtime delta для Q compatibility / representation separation.
+C5 завершён без изменения рабочей реализации для совместимости `Q` и разделения представления с интерпретацией.
 
-Открытые unrelated draft PR на момент design capture:
+На момент фиксации остаются только два несвязанных черновых запроса на слияние:
 
 ```text
 #983
 #1053
 ```
 
-Они не являются C6 execution work.
+Они не относятся к выполнению C6.
 
-## 2. Цель C6
+## 2. Назначение C6
 
 C6 должен дать одно исполняемое доказательство согласованности трёх уже существующих механизмов:
 
 ```text
-A. nested FORMAL context / parentheses
-B. contextual resolution через явно выбранный K
-C. generic left-reading как отдельная проекция
+A. вложенный FORMAL-контекст / круглые скобки
+B. контекстное разрешение через явно выбранный K
+C. общее левое чтение как отдельная проекция
 ```
 
-Ключевой вопрос C6:
+Главный вопрос C6:
 
-> Нужна ли новая production-семантика, или текущий runtime уже удовлетворяет объявленной v0.12 candidate boundary?
+> Нужна ли новая рабочая семантика, или текущая исполняемая среда уже удовлетворяет объявленной границе кандидата v0.12?
 
-Стартовая гипотеза после repository-wide audit:
+Стартовая гипотеза после полного аудита репозитория:
 
 ```text
 production delta expected = NONE
 ```
 
-Поэтому C6 начинается не с новых helper-функций, а с candidate-specific executable convergence corpus.
+Поэтому C6 начинается не с новых вспомогательных функций, а с исполняемого корпуса сходимости, специфичного для кандидата v0.12.
 
-## 3. Не смешивать три разных механизма
+## 3. Три механизма нельзя отождествлять
 
-### 3.1 FORMAL grammar
+### 3.1 Грамматика `FORMAL`
 
-FORMAL child — отдельный typed semantic context:
+Дочерний `FORMAL` является отдельным типизированным смысловым контекстом:
 
 ```text
 I_FORMAL ⟼ K_child
 ```
 
-Его смысл задаётся FORMAL rule/template replay.
+Его результат определяется воспроизведением правила и шаблона `FORMAL`.
 
-### 3.2 Explicit contextual K
+### 3.2 Явный контекстный K
 
-Контекстная точка разрешается относительно **конкретного K, предъявленного evidence**:
+Контекстная точка разрешается относительно **конкретного K, предъявленного свидетельством**:
 
 ```text
 Act -> beforeContext = K
 Role_ctx -> K.current
 ```
 
-Лексическая близость или host stack не выбирают этот K автоматически.
+Лексическая близость и стек языка реализации не выбирают этот K автоматически.
 
-### 3.3 Generic flat reading
+### 3.3 Общее плоское чтение
 
-Generic flat reading проверяет уже разрешённую последовательность форм как явную левую свёртку:
+Общее плоское чтение проверяет уже разрешённую последовательность форм как явную левую свёртку:
 
 ```text
 [A,B,C]
 -> (A ⟼ B) ⟼ C
 ```
 
-Это не FORMAL parser/grammar и не разрешение contextual `.`.
+Это не грамматика `FORMAL` и не разрешение контекстной точки.
 
-Общий C6 non-conflation law:
+Общий закон C6:
 
 ```text
 FORMAL grammar
@@ -109,9 +109,9 @@ FORMAL grammar
 != generic flat fold
 ```
 
-## 4. Existing runtime inventory
+## 4. Уже существующая рабочая реализация
 
-C6 не должен дублировать уже существующий runtime.
+C6 не должен дублировать существующие механизмы.
 
 ### 4.1 `ts/src/context-integration.ts`
 
@@ -126,9 +126,9 @@ continueFormalContext
 replayFormalClose
 ```
 
-`openChildContext` получает parent и target interpreter явно. Hidden parser stack не участвует.
+`openChildContext` получает родительский контекст и целевой интерпретатор явно. Скрытый стек разбора не используется.
 
-`openFormalContext`:
+`openFormalContext` задаёт:
 
 ```text
 parentBefore = explicit supplied TypedContext
@@ -136,18 +136,18 @@ target interpreter = I_FORMAL
 initial current = R
 ```
 
-`continueFormalContext` хранит FORMAL sequence через ExactSequence и сохраняет даже explicit `R` как одну позицию.
+`continueFormalContext` хранит последовательность `FORMAL` через `ExactSequence` и сохраняет даже явный `R` как одну позицию.
 
 `replayFormalClose`:
 
 ```text
 - read-only;
-- проверяет exact child I/K;
-- проверяет exact lexical parent;
-- требует non-empty ExactSequence;
-- пустой child -> empty-formal-context;
-- выбирает/проверяет structural Rule через explicit evidence;
-- проверяет exact close projection [child-form-sequence, semantic-result].
+- verifies exact child I/K;
+- verifies exact lexical parent;
+- requires non-empty ExactSequence;
+- empty child -> empty-formal-context;
+- verifies structural Rule through explicit evidence;
+- verifies close projection [child-form-sequence, semantic-result].
 ```
 
 ### 4.2 `ts/src/state.ts`
@@ -159,7 +159,7 @@ payload = parent ⟼ current
 K = START(payload)
 ```
 
-ROOT не является альтернативной кодировкой K.
+`ROOT` не является альтернативной кодировкой K.
 
 `readContext(K)` возвращает только:
 
@@ -168,7 +168,7 @@ parent
 current
 ```
 
-без host-side hidden current authority.
+и не вводит скрытый текущий смысл на стороне языка реализации.
 
 ### 4.3 `ts/src/interpreter.ts`
 
@@ -180,9 +180,9 @@ replayContextualReading
 replayTopLevelContextualReading
 ```
 
-`replayContextualReading` читает `beforeContext` из explicit Act evidence и заменяет только явно admitted `contextualRole` на `K.current`.
+`replayContextualReading` получает `beforeContext` из явного свидетельства `Act` и заменяет только явно допущенную роль `contextualRole` на `K.current`.
 
-В production path отсутствуют:
+В этом пути отсутствуют:
 
 ```text
 nearest-frame search
@@ -192,13 +192,15 @@ parser-stack lookup
 second contextual fold engine
 ```
 
-`replayFlatReading` отдельно проверяет левую свёртку resolved forms.
+`replayFlatReading` отдельно проверяет левую свёртку уже разрешённых форм.
 
-## 5. Existing executable evidence to reuse, not clone blindly
+## 5. Существующие исполняемые свидетельства
+
+Их нужно переиспользовать и скомпоновать, а не копировать без необходимости.
 
 ### 5.1 `ts/test/v09-context-integration.test.ts`
 
-Уже доказывает среди прочего:
+Этот тест уже подтверждает среди прочего:
 
 ```text
 open FORMAL child
@@ -211,7 +213,7 @@ bare A-arrow-B-arrow-C does not automatically satisfy one binary FORMAL rule
 
 ### 5.2 `ts/test/v011-nested-explicit-binding-compatibility.test.ts`
 
-Уже доказывает:
+Этот тест уже подтверждает:
 
 ```text
 K_outer.current = A
@@ -224,25 +226,25 @@ outer K cannot claim inner current B
 TopBind wrapper cannot capture nested K
 ```
 
-Read probe запрещает hidden `find()`/incoming scan.
+Проверочная проекция чтения запрещает скрытые `find()` и сканирование `incoming()`.
 
-C6a должен **скомпоновать** эти принятые механизмы под exact v0.12 candidate vectors, а не копировать их как два независимых старых теста без cross-layer witness.
+C6a должен собрать эти принятые механизмы под точными векторами кандидата v0.12 и добавить межслойное доказательство их независимости.
 
-## 6. Chosen architecture
+## 6. Выбранная архитектура
 
-Выбран вариант:
+Выбран один новый тест сходимости кандидата:
 
 ```text
 C6a = one candidate-specific test-only convergence gate
 ```
 
-Канонический новый test path:
+Канонический путь:
 
 ```text
 ts/test/v012-formal-context-reading-c6.test.ts
 ```
 
-Начальный C6a scope:
+Начальная граница C6a:
 
 ```text
 ts/test/** only
@@ -251,19 +253,19 @@ NO contracts/**
 NO docs/** in the executable transaction
 ```
 
-Причина: все три production kernels уже существуют. Новый runtime до измерения был бы архитектурным дублированием.
+Причина: все три рабочих механизма уже существуют. Новая реализация до измерения была бы дублированием архитектуры.
 
-## 7. C6a block A — FORMAL parentheses
+## 7. C6a: блок A — круглые скобки `FORMAL`
 
-### 7.1 Positive law
+### 7.1 Положительный закон
 
-Для явного parent typed context:
+Для явно заданного родительского типизированного контекста:
 
 ```text
 K_parent
 ```
 
-открытие `(...)` моделируется существующим `openFormalContext`:
+открытие `(...)` выражается существующей функцией `openFormalContext`:
 
 ```text
 K_parent
@@ -271,7 +273,7 @@ K_parent
 K_child : I_FORMAL
 ```
 
-Требуется доказать:
+Необходимо доказать:
 
 ```text
 child.interpreter = I_FORMAL
@@ -279,35 +281,33 @@ parent(child.K) = exact K_parent
 current(child.K) = R immediately after open
 ```
 
-После заполнения FORMAL child admitted forms и replay close:
+После заполнения дочернего `FORMAL` допустимыми формами и воспроизведения закрытия:
 
 ```text
 child -> exactly one semantic Link/value
 ```
 
-Возвращённый Link сам по себе не мутирует parent. Продолжение parent выполняется отдельным explicit `continueFormalContext`.
+Возвращённая связь сама по себе не изменяет родителя. Продолжение родителя выполняется отдельным явным `continueFormalContext`.
 
-### 7.2 Empty negative law
+### 7.2 Отрицательный закон пустых скобок
 
-Пустые parentheses:
+Пустые круглые скобки:
 
 ```text
 ()
 ```
 
-соответствуют открытому, но не заполненному FORMAL child.
+соответствуют открытому, но не заполненному дочернему `FORMAL`.
 
-`replayFormalClose` обязан fail closed:
+`replayFormalClose` обязан завершиться отказом:
 
 ```text
 ContextIntegrationError("empty-formal-context")
 ```
 
-Никакой `R`, `undefined`, пустой list или host sentinel не считается допустимым FORMAL result.
+Ни `R`, ни `undefined`, ни пустой список, ни служебное значение языка реализации не считаются допустимым результатом `FORMAL`.
 
-### 7.3 Direct vectors
-
-C6a block A должен напрямую покрыть:
+### 7.3 Прямо доказываемые векторы
 
 ```text
 v012-formal-parentheses-open-formal-child
@@ -316,9 +316,9 @@ v012-formal-empty-parentheses-are-not-a-valid-result
 v012-formal-parent-continues-after-child-result
 ```
 
-## 8. C6a block B — explicit contextual K
+## 8. C6a: блок B — явный контекстный K
 
-### 8.1 Fixture
+### 8.1 Исходная конструкция
 
 Одновременно существуют:
 
@@ -329,11 +329,11 @@ K_inner.parent = K_outer
 A != B
 ```
 
-Один physical contextual glyph `.` через source/dictionary evidence разрешается в explicit semantic `Role_ctx`.
+Один физический знак `.` через явное свидетельство источника и словаря разрешается в смысловую роль `Role_ctx`.
 
-### 8.2 Positive authority law
+### 8.2 Положительный закон авторитета
 
-Act, который явно предъявляет:
+`Act`, который явно предъявляет:
 
 ```text
 beforeContext = K_outer
@@ -345,7 +345,7 @@ beforeContext = K_outer
 Role_ctx -> A
 ```
 
-Act, который явно предъявляет:
+`Act`, который явно предъявляет:
 
 ```text
 beforeContext = K_inner
@@ -357,33 +357,33 @@ beforeContext = K_inner
 Role_ctx -> B
 ```
 
-Идентичная physical форма не выбирает K по позиции или host scope.
+Одинаковая физическая форма не выбирает K по положению или области видимости языка реализации.
 
-### 8.3 Negative authority laws
+### 8.3 Отрицательные законы авторитета
 
-Должны fail closed следующие попытки:
+Должны завершаться отказом следующие попытки:
 
 ```text
-1. K_outer указан явно, но claimed result = B
-2. наличие K_inner заставляет outer evidence разрешиться через inner current
-3. child creation автоматически делает child contextual authority
-4. nearest lexical K выбирается без explicit evidence
-5. ambient mutable current подменяет named K
-6. hidden parent traversal находит другой K
+1. K_outer named explicitly, but claimed result = B
+2. existence of K_inner changes outer evidence to inner current
+3. child creation automatically selects child as contextual K
+4. nearest lexical K is selected without explicit evidence
+5. ambient mutable current replaces named K
+6. hidden parent traversal discovers another K
 ```
 
-### 8.4 Read-only adversarial probe
+### 8.4 Враждебная проекция чтения
 
-Replay должен работать на ReadMemory projection, где запрещены неразрешённые ambient operations, в частности hidden search/traversal, если они не входят в exact accepted read boundary.
+Воспроизведение должно работать на проекции `ReadMemory`, в которой запрещены неразрешённые операции фонового поиска или обхода.
 
-Цель не запретить легальный structural read API вообще, а доказать:
+Цель не запретить законное структурное чтение, а доказать:
 
 ```text
 selected K comes from evidence
 not from discovery
 ```
 
-### 8.5 Direct vectors
+### 8.5 Прямо доказываемые векторы
 
 ```text
 v012-formal-contextual-dot-uses-explicit-selected-k
@@ -393,43 +393,43 @@ v012-ambient-current-is-not-semantic-authority
 v012-hidden-parent-traversal-is-not-semantic-authority
 ```
 
-## 9. C6a block C — left-reading non-conflation
+## 9. C6a: блок C — левое чтение не является грамматикой `FORMAL`
 
-### 9.1 Generic flat reading
+### 9.1 Общее плоское чтение
 
-Для resolved forms:
+Для уже разрешённых форм:
 
 ```text
 [A,B,C]
 ```
 
-existing generic flat reader должен подтвердить:
+существующее общее плоское чтение должно подтвердить:
 
 ```text
 (A ⟼ B) ⟼ C
 ```
 
-Это projection/fold law.
+Это закон проекции и свёртки.
 
-### 9.2 FORMAL grammar is different authority
+### 9.2 Грамматика `FORMAL` имеет другой источник авторитета
 
-Для FORMAL sequence, похожей визуально на:
+Для последовательности `FORMAL`, визуально похожей на:
 
 ```text
 A ⟼ B ⟼ C
 ```
 
-одна admitted binary FORMAL rule/template не получает право автоматически интерпретировать всю последовательность как generic left fold.
+одно допущенное бинарное правило `FORMAL` не получает права автоматически интерпретировать всю последовательность как общее левое чтение.
 
-Без explicit nested FORMAL child structure такой bare sequence должна остаться несовместимой с соответствующим binary template:
+Без явной структуры вложенного дочернего `FORMAL` такая последовательность должна оставаться несовместимой с соответствующим бинарным шаблоном:
 
 ```text
 template mismatch / reject
 ```
 
-### 9.3 Explicit FORMAL nesting
+### 9.3 Явная вложенность `FORMAL`
 
-Отдельно доказать, что:
+Отдельно требуется доказать, что:
 
 ```text
 (A ⟼ B) ⟼ C
@@ -441,29 +441,29 @@ template mismatch / reject
 A ⟼ (B ⟼ C)
 ```
 
-получаются через explicit nested FORMAL child execution и имеют разные Link topology там, где соответствующие результаты структурно различны.
+получаются через явное выполнение вложенных дочерних контекстов `FORMAL` и имеют различную топологию связей там, где результаты структурно различны.
 
-### 9.4 Direct vectors
+### 9.4 Прямо доказываемые векторы
 
 ```text
 v012-link-left-association-is-not-formal-grammar
 v012-generic-flat-reader-is-not-formal-grammar
 ```
 
-## 10. C6 vectors deliberately not overclaimed
+## 10. Векторы, которые C6 не должен присваивать себе без доказательства
 
-C6a не должен автоматически присваивать себе все оставшиеся host-authority vectors.
+C6a не должен автоматически связывать все оставшиеся отрицательные векторы о скрытом авторитете среды.
 
-В частности full public/package proof для:
+Полную проверку публичной поверхности для:
 
 ```text
 v012-hidden-lexer-mode-has-zero-semantic-authority
 v012-hidden-parser-mode-has-zero-semantic-authority
 ```
 
-логичнее завершать в C7, где проверяется public facade и selectable surface целиком.
+правильнее завершать в C7, где проверяется весь публичный интерфейс и возможность выбора исполняемой среды.
 
-`v012-host-parser-stack-has-zero-semantic-authority` может быть связан в C6 только если C6a непосредственно построит adversarial witness достаточной силы. Иначе он остаётся C7 evidence.
+`v012-host-parser-stack-has-zero-semantic-authority` разрешено связать в C6 только при наличии прямого враждебного исполняемого свидетельства достаточной силы. Иначе он также остаётся до C7.
 
 Правило:
 
@@ -471,9 +471,9 @@ v012-hidden-parser-mode-has-zero-semantic-authority
 bind only what executable gate directly proves
 ```
 
-## 11. Expected C6a outcome
+## 11. Ожидаемый результат C6a
 
-Главное ожидаемое состояние:
+Основное ожидание:
 
 ```text
 new C6 candidate regression test
@@ -481,19 +481,19 @@ new C6 candidate regression test
 -> production delta = NONE
 ```
 
-Это не нарушение RED-first engineering discipline: C6a классифицирован как compatibility/convergence evidence stage поверх уже существующих production kernels.
+C6a является этапом проверки совместимости и сходимости поверх уже существующих рабочих механизмов, поэтому немедленный зелёный результат здесь является ожидаемым доказательством, а не нарушением разработки через тесты.
 
-## 12. RED handling
+## 12. Обработка неожиданного красного результата
 
-Если новый C6a test RED:
+Если новый тест C6a красный:
 
 ```text
 STOP
 ```
 
-Не разрешено сразу менять `ts/src/**` в той же транзакции.
+Запрещено сразу менять `ts/src/**` в той же транзакции.
 
-Сначала определить точную классификацию:
+Сначала нужно определить точную классификацию:
 
 ```text
 TEST_MISTAKE
@@ -502,23 +502,23 @@ MISSING_COMPOSITION_EVIDENCE
 ACTUAL_CANDIDATE_RUNTIME_GAP
 ```
 
-Только `ACTUAL_CANDIDATE_RUNTIME_GAP` разрешает отдельный bounded production child.
+Только последний случай разрешает отдельную ограниченную задачу на изменение рабочей реализации.
 
-Такой child должен:
+Такая задача должна:
 
 ```text
 - иметь собственную Issue/ChangeIntent;
 - иметь отдельный RED witness;
-- менять минимальный существующий kernel;
-- не добавлять новый parser subsystem;
-- после GREEN возвращаться к C6a convergence gate.
+- change the smallest existing kernel;
+- add no new parser subsystem;
+- return to C6a convergence gate after GREEN.
 ```
 
-## 13. Anti-designs rejected
+## 13. Отклонённые варианты архитектуры
 
-### 13.1 New `openFormalParenthesesContext`
+### 13.1 Новая `openFormalParenthesesContext`
 
-Отклонено как default design.
+Не вводится по умолчанию.
 
 Причина:
 
@@ -526,41 +526,37 @@ ACTUAL_CANDIDATE_RUNTIME_GAP
 openFormalContext already expresses the semantic child transition
 ```
 
-Новый helper допустим только если executable evidence докажет независимый observable law, которого текущая функция не выражает.
+Новая функция допустима только если исполняемое свидетельство покажет независимый наблюдаемый закон, которого текущая функция не выражает.
 
-### 13.2 Hidden parser stack
+### 13.2 Скрытый стек разбора
 
-Отклонено.
+Отклонён:
 
 ```text
 host stack != semantic authority
 ```
 
-### 13.3 Nearest-K discovery
+### 13.3 Поиск ближайшего K
 
-Отклонено.
+Отклонён:
 
 ```text
 lexical proximity != authority
 ```
 
-### 13.4 Reusing flat reader as FORMAL grammar
+### 13.4 Использование плоского чтения как грамматики `FORMAL`
 
-Отклонено.
+Отклонено. Левая свёртка и выполнение шаблона `FORMAL` являются разными путями свидетельств.
 
-Flat fold и FORMAL template execution — разные evidence paths.
+### 13.5 Новое дерево разбора языка реализации для круглых скобок
 
-### 13.5 New host AST for parentheses
+Отклонено. Смысл вложенного `FORMAL` уже выражается типизированным контекстом и обычными связями.
 
-Отклонено.
+## 14. C6b — отдельная привязка свидетельств
 
-Nested FORMAL semantics уже выражается typed context + ordinary Link evidence.
+После зелёного C6a выполняется отдельная транзакция.
 
-## 14. C6b evidence binding
-
-После C6a GREEN выполняется **отдельная transaction**.
-
-Expected machine transition:
+Ожидаемый переход машинного состояния:
 
 ```text
 formalContextComplete / equivalent C6 candidate flag -> true
@@ -569,9 +565,9 @@ requiredExecutableGates: 4 -> 5
 C7 = NEXT
 ```
 
-Точные field names должны браться из свежего candidate contract/conformance, а не придумываться заранее.
+Точные имена полей берутся из свежих файлов контракта и соответствия кандидата, а не придумываются заранее.
 
-C6b binds:
+C6b связывает:
 
 ```text
 - exact C6a test path;
@@ -581,19 +577,19 @@ C6b binds:
 - only directly proved vectors.
 ```
 
-C6b не меняет production runtime, если C6a прошёл на текущем коде.
+Если C6a прошёл на текущем коде, C6b не меняет рабочую реализацию.
 
-## 15. Documentation is part of lifecycle
+## 15. Документация является частью жизненного цикла
 
-Документация не откладывается до конца работы.
+Документация не откладывается до конца работ.
 
-### 15.1 This design transaction
+### 15.1 Текущая транзакция
 
-Создаёт этот durable design document и больше ничего нормативного не меняет.
+Она создаёт только этот устойчивый документ архитектуры и не меняет нормативную теорию.
 
-### 15.2 C6b factual cochange
+### 15.2 Фактическая синхронизация C6b
 
-После GREEN C6 evidence необходимо factually synchronize текущий lifecycle как минимум в тех canonical projections, которых требует свежий repo-policy.
+После зелёного свидетельства C6 необходимо синхронизировать фактическое состояние жизненного цикла во всех канонических проекциях, требуемых свежей политикой репозитория.
 
 Ожидаемый набор:
 
@@ -607,7 +603,7 @@ web/contract-observatory/test/contract-index.test.ts
 web/contract-observatory/test/methodology-projection.test.ts
 ```
 
-Ожидаемая factual projection:
+Ожидаемая фактическая проекция:
 
 ```text
 C6 = GREEN-confirmed / bound
@@ -616,11 +612,11 @@ v0.12 = candidate / NOT ACCEPTED / not selectable / not ready
 v0.11 = current accepted runtime
 ```
 
-### 15.3 C8 normative documentation convergence
+### 15.3 C8 — полная синхронизация нормативной документации
 
 C6b не подменяет C8.
 
-C8 должен отдельно проверить и синхронизировать нормативную документацию, минимум:
+C8 отдельно проверяет и синхронизирует минимум:
 
 ```text
 docs/specs/Формальная нотация МТС.md
@@ -630,11 +626,11 @@ docs/theory/Основания МТС.md
 docs/theory/Система аксиом МТС.md
 ```
 
-Известный stale historical accepted-version wording в FORMAL notation должен быть рассмотрен именно там либо раньше отдельным доказанным docs-only correction, если он начинает вводить текущую работу в заблуждение.
+Известная устаревшая формулировка о принятой версии в документе формальной нотации должна быть проверена именно там либо раньше отдельной доказанной документационной коррекцией, если начнёт вводить текущую работу в заблуждение.
 
-## 16. C7 boundary
+## 16. Граница C7
 
-C7 остаётся отдельным stage:
+C7 остаётся отдельным этапом:
 
 ```text
 package/public facade convergence
@@ -643,16 +639,16 @@ package/public facade convergence
 До C7 нельзя:
 
 ```text
-- экспортировать candidate runtime как selectable public authority;
-- считать наличие внутренних функций публичной поддержкой v0.12;
-- связывать full public absence of hidden lexer/parser mode knobs без public-surface audit.
+- export candidate runtime as selectable public authority;
+- treat internal functions as public v0.12 support;
+- bind full public absence of hidden lexer/parser mode knobs without public-surface audit.
 ```
 
-`ts/src/public.ts` не трогать в C6.
+`ts/src/public.ts` в C6 не изменяется.
 
-## 17. C8/C9/C10 boundaries
+## 17. Границы C8, C9 и C10
 
-C6 не означает:
+Завершение C6 не означает:
 
 ```text
 normative docs complete
@@ -661,18 +657,18 @@ acceptanceReady
 accepted v0.12
 ```
 
-Остаются отдельными:
+Отдельными этапами остаются:
 
 ```text
 C8  normative documentation synchronization
-C9  evidence completeness / readiness audit
+C9  evidence completeness / acceptance-readiness audit
 C10 atomic acceptance/cutover
 C11 post-cutover cleanup / contract budget normalization
 ```
 
-## 18. Downstream freeze
+## 18. Заморозка downstream
 
-До explicit C10 acceptance сохраняется:
+До явного принятия на C10 сохраняется:
 
 ```text
 #1132 native astring transport = PAUSED
@@ -680,11 +676,11 @@ C11 post-cutover cleanup / contract budget normalization
 aprover#255 = PAUSED
 ```
 
-C6 evidence не является разрешением repin downstream на candidate runtime.
+Свидетельство C6 не разрешает переключать потребителей на непринятую исполняемую среду кандидата.
 
-## 19. C6a proposed ChangeIntent boundary
+## 19. Предлагаемая граница `ChangeIntent` для C6a
 
-После written-spec review C6a implementation issue должен использовать примерно следующий bounded scope, но конкретный policy блок должен быть сформирован из свежего `repo-policy.json`:
+После проверки этого документа пользователем задача реализации C6a должна использовать примерно следующую ограниченную область, но точный блок политики формируется из свежего `repo-policy.json`:
 
 ```text
 change_type: test
@@ -705,11 +701,11 @@ must_not_touch:
   - .github/**
 ```
 
-No implementation plan may silently enlarge this scope.
+Будущий план реализации не может молча расширять эту область.
 
-## 20. Acceptance criteria for C6 design
+## 20. Критерии готовности архитектуры C6
 
-Design is ready for implementation planning only if all are true:
+Архитектура готова к планированию C6a только при выполнении всех условий:
 
 ```text
 [x] user approved architecture in chat
@@ -728,7 +724,7 @@ Design is ready for implementation planning only if all are true:
 [x] v0.12 remains candidate/not accepted
 ```
 
-## 21. Spec self-review
+## 21. Самопроверка спецификации
 
 ```text
 placeholder/TODO scan                 = CLEAN
@@ -743,11 +739,11 @@ C6b/C8 documentation ambiguity        = RESOLVED
 implementation scope                  = C6a ONLY after written-spec review
 ```
 
-## 22. Next process gate
+## 22. Следующий процессный шлюз
 
-Этот файл — durable written specification утверждённого C6 design.
+Этот файл является устойчивой письменной спецификацией утверждённой архитектуры C6.
 
-Следующий шаг выполняется только после review этого written spec пользователем:
+Следующий шаг выполняется только после проверки этого письменного документа пользователем:
 
 ```text
 write detailed implementation plan for C6a only
@@ -762,4 +758,4 @@ fresh GitHub state
 -> executable convergence gate
 ```
 
-Никакая production реализация C6 не считается заранее необходимой.
+Никакое изменение рабочей реализации C6 не считается заранее необходимым.
