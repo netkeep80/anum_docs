@@ -138,7 +138,7 @@
     "stringRuntimeComplete": true,
     "formalSquareBracketCutoverComplete": true,
     "qRegressionComplete": true,
-    "formalParenthesesContextComplete": false,
+    "formalParenthesesContextComplete": true,
     "publicFacadeComplete": false,
     "documentationComplete": false,
     "traceabilityComplete": false,
