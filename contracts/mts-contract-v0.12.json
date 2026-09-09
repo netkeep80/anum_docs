@@ -134,7 +134,7 @@
     "semanticDeltaScopeFrozenForC1": true,
     "contractBoundaryEstablished": true,
     "conformanceObligationsDeclared": true,
-    "executableFalsifiersComplete": false,
+    "executableFalsifiersComplete": true,
     "stringRuntimeComplete": false,
     "formalSquareBracketCutoverComplete": false,
     "qRegressionComplete": false,
