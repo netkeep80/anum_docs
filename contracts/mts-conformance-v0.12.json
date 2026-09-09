@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; C2 executable old-vs-new falsification is RED-confirmed and bound as evidence; C3 authoritative STRING nested-Anum runtime is GREEN-confirmed and bound as evidence; C4 FORMAL square-bracket I_STRING cutover is GREEN-confirmed and bound as evidence; C5 Q compatibility and representation/interpretation separation are GREEN-confirmed and bound as evidence; C6-C7 runtime/convergence evidence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
+  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; C2 executable old-vs-new falsification is RED-confirmed and bound as evidence; C3 authoritative STRING nested-Anum runtime is GREEN-confirmed and bound as evidence; C4 FORMAL square-bracket I_STRING cutover is GREEN-confirmed and bound as evidence; C5 Q compatibility and representation/interpretation separation are GREEN-confirmed and bound as evidence; C6 FORMAL parentheses, explicit-K and left-reading convergence are GREEN-confirmed and bound as evidence without production runtime delta; C7 package/public-facade convergence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.11",
     "conformance": "mts-conformance/v0.11"
@@ -18,10 +18,10 @@
     "ts/test/research-v012-interpreter-delta-c2.test.ts",
     "ts/test/v012-string-anum-protocol-c3a.test.ts",
     "ts/test/v012-formal-square-string-child-c4.test.ts",
-    "ts/test/v012-q-compatibility-representation-c5.test.ts"
+    "ts/test/v012-q-compatibility-representation-c5.test.ts",
+    "ts/test/v012-formal-context-reading-c6.test.ts"
   ],
   "plannedExecutableGates": [
-    "C6 FORMAL parentheses / explicit-K / left-reading evidence",
     "C7 package and public-facade convergence evidence"
   ],
   "requiredStringVectors": [
@@ -185,6 +185,31 @@
         "FORMAL [1] opens I_STRING, returns S1 and preserves S1 as exactly one FORMAL value",
         "C5a required no production runtime change"
       ]
+    },
+    "c6": {
+      "test": "ts/test/v012-formal-context-reading-c6.test.ts",
+      "issue": 1163,
+      "pullRequest": 1164,
+      "head": "2e67d8ff515908688e16ea09af07c2bed0e7e7d4",
+      "ciRun": 4603,
+      "repoGuardRun": 1260,
+      "mergeSha": "de78b3869dc3ffec41225ae1f7c721081797b864",
+      "status": "green-confirmed",
+      "runtimeDeltaRequired": false,
+      "evidenceOnly": true,
+      "observations": [
+        "FORMAL parentheses open an explicit I_FORMAL child with the exact supplied lexical parent and initial R state",
+        "a non-empty FORMAL child closes to exactly one Link/value and parent continuation remains an explicit separate operation",
+        "empty FORMAL parentheses fail closed with empty-formal-context",
+        "the same physical contextual dot resolves against K_outer or K_inner only according to the K explicitly carried by Act evidence",
+        "an outer K cannot claim the inner K current value",
+        "creating a nested FORMAL child does not auto-select that child or its nearest lexical frame as contextual authority",
+        "successful explicit-K replay works through a ReadMemory probe that rejects find() and incoming() discovery",
+        "generic [A,B,C] flat reading replays the explicit left fold (A ⟼ B) ⟼ C",
+        "a bare FORMAL A ⟼ B ⟼ C chain does not inherit generic left-fold authority and rejects template-mismatch",
+        "explicit left and right FORMAL nesting remain structurally distinct",
+        "C6a required no production runtime change"
+      ]
     }
   },
   "vectorEvidence": {
@@ -236,6 +261,21 @@
         "v012-same-glyph-one-has-distinct-string-and-q-role",
         "v012-string-glyph-one-is-not-q-abit-one"
       ]
+    },
+    "c6Convergence": {
+      "ts/test/v012-formal-context-reading-c6.test.ts": [
+        "v012-formal-parentheses-open-formal-child",
+        "v012-formal-empty-parentheses-fail-closed",
+        "v012-formal-empty-parentheses-are-not-a-valid-result",
+        "v012-formal-parent-continues-after-child-result",
+        "v012-formal-contextual-dot-uses-explicit-selected-k",
+        "v012-child-creation-does-not-auto-select-contextual-k",
+        "v012-nearest-lexical-frame-is-not-semantic-authority",
+        "v012-ambient-current-is-not-semantic-authority",
+        "v012-hidden-parent-traversal-is-not-semantic-authority",
+        "v012-link-left-association-is-not-formal-grammar",
+        "v012-generic-flat-reader-is-not-formal-grammar"
+      ]
     }
   },
   "evidenceState": {
@@ -245,8 +285,8 @@
     "stringRuntimeC3": "green-confirmed",
     "formalSquareBracketCutoverC4": "green-confirmed",
     "qCompatibilityC5": "green-confirmed",
-    "formalContextC6": "next",
-    "publicFacadeC7": "not-started",
+    "formalContextC6": "green-confirmed",
+    "publicFacadeC7": "next",
     "documentationC8": "not-complete",
     "readinessC9": "blocked",
     "acceptanceC10": "blocked"
@@ -307,26 +347,31 @@
       "requiredForAcceptance": true
     },
     "formalContextConvergence": {
-      "issue": 1134,
+      "issue": 1163,
       "stage": "C6",
-      "status": "next",
+      "test": "ts/test/v012-formal-context-reading-c6.test.ts",
+      "pullRequest": 1164,
+      "head": "2e67d8ff515908688e16ea09af07c2bed0e7e7d4",
+      "ciRun": 4603,
+      "repoGuardRun": 1260,
+      "mergeSha": "de78b3869dc3ffec41225ae1f7c721081797b864",
+      "status": "green-confirmed",
       "requiredForAcceptance": true
     },
     "publicFacadeConvergence": {
       "issue": 1134,
       "stage": "C7",
-      "status": "blocked-by-C6",
+      "status": "next",
       "requiredForAcceptance": true
     },
     "documentationConvergence": {
       "issue": 1134,
       "stage": "C8",
-      "status": "blocked-by-runtime-convergence",
+      "status": "blocked-by-public-facade-convergence",
       "requiredForAcceptance": true
     }
   },
   "acceptanceBlockers": [
-    "FORMAL parentheses/contextual-K/left-reading convergence is incomplete",
     "package/public facade convergence is incomplete",
     "normative documentation and traceability are incomplete",
     "v0.12 has not passed explicit acceptance cutover",
