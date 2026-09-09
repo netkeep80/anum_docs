@@ -119,6 +119,18 @@ try {
   );
   run(process.execPath, ["smoke.mjs"], consumer);
 
+  const proofAnetWitness = readFileSync(
+    join(packageRoot, "consumer", "package-proof-anet-t4-t5-witness.mjs"),
+    "utf8",
+  );
+  writeFileSync(
+    join(consumer, "proof-anet-t4-t5.mjs"),
+    proofAnetWitness,
+    "utf8",
+  );
+  const proofAnetOutput = run(process.execPath, ["proof-anet-t4-t5.mjs"], consumer);
+  process.stdout.write(proofAnetOutput);
+
   console.log(`package artifact sha256=${sha256(first.path)}`);
 } finally {
   rmSync(scratch, { recursive: true, force: true });
