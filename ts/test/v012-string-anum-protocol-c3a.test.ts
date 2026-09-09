@@ -1,11 +1,22 @@
-import * as contextIntegration from "../src/context-integration.js";
+import {
+  continueStringAnum,
+  continueStringSign,
+  defineTypedContext,
+  openStringContext,
+  replayStringClose,
+  type TypedContext,
+} from "../src/context-integration.js";
 import {
   Memory,
   type LinkHandle,
 } from "../src/memory.js";
+import {
+  defineStructuralInterpreter,
+  type StructuralInterpreter,
+} from "../src/structural-rule.js";
 
 function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) throw new Error(`v0.12 STRING Anum C3a: ${message}`);
+  if (!condition) throw new Error(`v0.12 STRING Anum C3: ${message}`);
 }
 
 function same<T>(actual: T, expected: T, message: string): void {
@@ -19,19 +30,48 @@ interface AuthoritativeVector {
   readonly expected: LinkHandle;
 }
 
-function anchors(memory: Memory): readonly [LinkHandle, LinkHandle] {
+interface InterpreterFixture {
+  readonly handle: LinkHandle;
+  readonly structure: StructuralInterpreter;
+}
+
+function anchors(memory: Memory, count: number): readonly LinkHandle[] {
+  const result: LinkHandle[] = [];
   const seed = memory.ensureEndSelfClosed(memory.root);
-  const tagA = memory.ensureStartSelfClosed(memory.root);
-  const tagB = memory.ensureStartSelfClosed(tagA);
-  return Object.freeze([
-    memory.ensure(seed, tagA),
-    memory.ensure(seed, tagB),
-  ]) as readonly [LinkHandle, LinkHandle];
+  let tag = memory.ensureStartSelfClosed(memory.root);
+  for (let index = 0; index < count; index += 1) {
+    tag = memory.ensureStartSelfClosed(tag);
+    result.push(memory.ensure(seed, tag));
+  }
+  return Object.freeze(result);
 }
 
 const memory = new Memory();
 const R = memory.root;
-const [a, b] = anchors(memory);
+const pool = anchors(memory, 10);
+let cursor = 0;
+
+function next(label: string): LinkHandle {
+  const value = pool[cursor++];
+  assert(value !== undefined, `missing fixture: ${label}`);
+  return value;
+}
+
+function interpreter(label: string): InterpreterFixture {
+  const dictionary = next(`${label}-dictionary`);
+  const grammar = next(`${label}-grammar`);
+  const theory = next(`${label}-theory`);
+  const structure: StructuralInterpreter = Object.freeze({ dictionary, grammar, theory });
+  return Object.freeze({
+    handle: defineStructuralInterpreter(memory, dictionary, grammar, theory),
+    structure,
+  });
+}
+
+const rootI = interpreter("root");
+const stringI = interpreter("string");
+const a = next("sign-a");
+const b = next("sign-b");
 const A = memory.ensure(a, b);
 const rootedA = memory.ensure(R, A);
 const A2 = memory.ensure(A, A);
@@ -56,50 +96,87 @@ for (const vector of authoritativeVectors) {
 // Canonical root collapse is semantic Link identity, not a parser special case.
 same(memory.ensure(R, R), R, "R ⟼ R collapses canonically to R");
 
-// Discriminator against the wrong unconditional-root-wrap CLOSE model.
+// These are immutable discriminators established by the C3a corpus.
 const wrongAbNestedAb = memory.ensure(A, rootedA);
-same(
-  authoritativeVectors.find((vector) => vector.source === "ab[ab]")?.expected,
-  A2,
-  "ab[ab] authoritative topology",
-);
 assert(A2 !== wrongAbNestedAb, "ab[ab] must not use unconditional R ⟼ child wrapping");
-
-// Empty nested Anum is a real R result. Its disappearance in []ab follows
-// from R ⟼ R = R, not from deleting [] as a host-parser no-op.
-same(
-  authoritativeVectors.find((vector) => vector.source === "[]")?.expected,
-  R,
-  "[] denotes R",
-);
-same(
-  authoritativeVectors.find((vector) => vector.source === "[]ab")?.expected,
-  A,
-  "[]ab collapses through root identity before flat ab",
-);
-
-// Additional explicit nesting is observable in Link topology itself.
 assert(rootedA !== A, "[ab] preserves one rooted level distinct from ab");
 assert(AThenRootedA !== A2, "ab[[ab]] preserves rooted child level distinct from ab[ab]");
 
-// C3a deliberately does not emulate STRING execution. It proves the corpus is
-// first-class while the current production runtime still lacks STRING lifecycle.
-const stringRuntimeAvailable = Object.prototype.hasOwnProperty.call(
-  contextIntegration,
-  "openStringContext",
-);
-const classification = Object.freeze({
-  authoritativeVectorCount: authoritativeVectors.length,
-  stringRuntimeAvailable,
-  candidateSatisfiedByCurrentRuntime: stringRuntimeAvailable,
-  verdict: "RED" as const,
-  reason: "STRING_ANUM_RUNTIME_NOT_IMPLEMENTED" as const,
-});
+/**
+ * Test-only lexical driver. It recognizes only `a`, `b`, `[` and `]` and delegates
+ * every semantic transition to the production STRING lifecycle. The recursive
+ * host call stack is syntax traversal only; lexical-parent authority remains the
+ * explicit TypedContext passed to open/replay operations.
+ */
+function interpretStringAnum(source: string): LinkHandle {
+  let offset = 0;
+  const rootParent: TypedContext = defineTypedContext(memory, rootI.handle, R, R);
 
-same(classification.authoritativeVectorCount, 8, "all confirmed STRING vectors are executable evidence");
-same(classification.stringRuntimeAvailable, false, "current runtime has no STRING context lifecycle");
-same(classification.candidateSatisfiedByCurrentRuntime, false, "current runtime does not satisfy C3 STRING corpus");
-same(classification.verdict, "RED", "C3a runtime classification");
-same(classification.reason, "STRING_ANUM_RUNTIME_NOT_IMPLEMENTED", "C3a RED reason");
+  function parse(
+    parentBefore: TypedContext,
+    expectedParentInterpreter: StructuralInterpreter,
+    nested: boolean,
+  ): LinkHandle {
+    let current = openStringContext(
+      memory,
+      parentBefore,
+      expectedParentInterpreter,
+      stringI.handle,
+    );
 
-console.log("MTS v0.12 C3a STRING Anum corpus: 8 authoritative vectors bound; runtime RED confirmed.");
+    while (offset < source.length) {
+      const token = source[offset];
+      if (token === "]") {
+        assert(nested, `unexpected ] at ${offset}`);
+        offset += 1;
+        return replayStringClose(
+          memory,
+          current,
+          stringI.structure,
+          parentBefore,
+          expectedParentInterpreter,
+        );
+      }
+      if (token === "[") {
+        offset += 1;
+        const childResult = parse(current, stringI.structure, true);
+        current = continueStringAnum(memory, current, stringI.structure, childResult);
+        continue;
+      }
+      if (token === "a" || token === "b") {
+        offset += 1;
+        current = continueStringSign(
+          memory,
+          current,
+          stringI.structure,
+          token === "a" ? a : b,
+        );
+        continue;
+      }
+      throw new Error(`v0.12 STRING Anum C3: unsupported test token ${String(token)} at ${offset}`);
+    }
+
+    assert(!nested, "unclosed [ in test source");
+    return replayStringClose(
+      memory,
+      current,
+      stringI.structure,
+      parentBefore,
+      expectedParentInterpreter,
+    );
+  }
+
+  const result = parse(rootParent, rootI.structure, false);
+  same(offset, source.length, `consumed source ${JSON.stringify(source)}`);
+  return result;
+}
+
+for (const vector of authoritativeVectors) {
+  same(
+    interpretStringAnum(vector.source),
+    vector.expected,
+    `${vector.id} production STRING topology`,
+  );
+}
+
+console.log("MTS v0.12 C3 STRING Anum runtime: 8 authoritative vectors GREEN.");
