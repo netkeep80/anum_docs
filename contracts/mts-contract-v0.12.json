@@ -135,7 +135,7 @@
     "contractBoundaryEstablished": true,
     "conformanceObligationsDeclared": true,
     "executableFalsifiersComplete": true,
-    "stringRuntimeComplete": false,
+    "stringRuntimeComplete": true,
     "formalSquareBracketCutoverComplete": false,
     "qRegressionComplete": false,
     "formalParenthesesContextComplete": false,
