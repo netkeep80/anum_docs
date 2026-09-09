@@ -1,0 +1,164 @@
+{
+  "schema": "mts-conformance/v0.12",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 1137,
+  "candidateLifecycleIssue": 1134,
+  "contract": "mts-contract/v0.12",
+  "semanticBase": "mts-conformance/v0.11",
+  "observableSemanticDelta": true,
+  "acceptanceReady": false,
+  "coverageState": "incomplete",
+  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; executable C2-C7 evidence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
+  "acceptedCurrent": {
+    "contract": "mts-contract/v0.11",
+    "conformance": "mts-conformance/v0.11"
+  },
+  "requiredExecutableGates": [],
+  "plannedExecutableGates": [
+    "C2 executable old-vs-new interpreter falsifiers",
+    "C3 STRING nested-Anum runtime evidence",
+    "C4 FORMAL [] -> STRING typed-child runtime evidence",
+    "C5 Q compatibility and representation-separation evidence",
+    "C6 FORMAL parentheses / explicit-K / left-reading evidence",
+    "C7 package and public-facade convergence evidence"
+  ],
+  "requiredStringVectors": [
+    "v012-string-empty",
+    "v012-string-empty-nested-anum",
+    "v012-string-single-a-nested-anum",
+    "v012-string-ab-nested-anum",
+    "v012-string-double-nested-ab",
+    "v012-string-parent-continues-after-ab-child",
+    "v012-string-literal-one-is-utf8-character",
+    "v012-string-literal-zero-is-utf8-character",
+    "v012-string-literal-open-bracket-has-string-role",
+    "v012-string-literal-close-bracket-has-string-role"
+  ],
+  "requiredQuaternaryVectors": [
+    "v012-q-empty",
+    "v012-q-empty-nested-context",
+    "v012-q-one-abit",
+    "v012-q-zero-abit",
+    "v012-q-one-zero-sequence",
+    "v012-q-nested-one-zero",
+    "v012-q-double-nested-one-zero",
+    "v012-q-rejects-non-q-glyph",
+    "v012-q-alphabet-remains-four-abits"
+  ],
+  "requiredFormalVectors": [
+    "v012-formal-empty-square-brackets-return-string-root-result",
+    "v012-formal-square-one-uses-string-character-semantics",
+    "v012-formal-nonempty-string-child",
+    "v012-formal-parentheses-open-formal-child",
+    "v012-formal-empty-parentheses-fail-closed",
+    "v012-formal-parent-continues-after-child-result",
+    "v012-formal-contextual-dot-uses-explicit-selected-k"
+  ],
+  "requiredCrossLayerVectors": [
+    "v012-string-one-utf8-byte-is-0x31",
+    "v012-string-one-q-carrier-is-00110001-envelope",
+    "v012-representation-does-not-invoke-q-interpretation",
+    "v012-same-glyph-one-has-distinct-string-and-q-role",
+    "v012-formal-square-bracket-child-is-string-not-q",
+    "v012-hidden-lexer-mode-has-zero-semantic-authority",
+    "v012-hidden-parser-mode-has-zero-semantic-authority",
+    "v012-host-parser-stack-has-zero-semantic-authority"
+  ],
+  "requiredNegativeVectors": [
+    "v012-string-glyph-one-is-not-q-abit-one",
+    "v012-formal-square-brackets-do-not-select-q-child",
+    "v012-representation-is-not-interpretation",
+    "v012-formal-empty-parentheses-are-not-a-valid-result",
+    "v012-child-creation-does-not-auto-select-contextual-k",
+    "v012-nearest-lexical-frame-is-not-semantic-authority",
+    "v012-ambient-current-is-not-semantic-authority",
+    "v012-hidden-parent-traversal-is-not-semantic-authority",
+    "v012-link-left-association-is-not-formal-grammar",
+    "v012-generic-flat-reader-is-not-formal-grammar",
+    "v012-inline-formal-q-spelling-is-not-accepted",
+    "v012-curly-braces-are-not-q-escaping"
+  ],
+  "retainedAcceptedEvidence": {
+    "semanticBase": "mts-contract/v0.11",
+    "qAlphabet": ["[", "]", "1", "0"],
+    "stringToQByteEnvelope": "[bbbbbbbb]",
+    "representationEqualsInterpretation": false,
+    "contextAuthority": "explicit structural evidence; no ambient runtime current or host stack"
+  },
+  "vectorEvidence": {},
+  "evidenceState": {
+    "candidateContractBoundary": "defined-c1",
+    "conformanceObligations": "declared-c1",
+    "oldVsNewFalsifiersC2": "not-started",
+    "stringRuntimeC3": "not-started",
+    "formalSquareBracketCutoverC4": "not-started",
+    "qCompatibilityC5": "not-started",
+    "formalContextC6": "not-started",
+    "publicFacadeC7": "not-started",
+    "documentationC8": "not-complete",
+    "readinessC9": "blocked",
+    "acceptanceC10": "blocked"
+  },
+  "implementationSlices": {
+    "candidateBoundary": {
+      "issue": 1137,
+      "stage": "C1",
+      "status": "candidate-defined",
+      "requiredForAcceptance": true
+    },
+    "oldVsNewFalsifiers": {
+      "issue": 1134,
+      "stage": "C2",
+      "status": "next",
+      "requiredForAcceptance": true
+    },
+    "stringNestedAnumRuntime": {
+      "issue": 1134,
+      "stage": "C3",
+      "status": "blocked-by-C2",
+      "requiredForAcceptance": true
+    },
+    "formalSquareBracketCutover": {
+      "issue": 1134,
+      "stage": "C4",
+      "status": "blocked-by-C3",
+      "requiredForAcceptance": true
+    },
+    "qCompatibility": {
+      "issue": 1134,
+      "stage": "C5",
+      "status": "blocked-by-C4",
+      "requiredForAcceptance": true
+    },
+    "formalContextConvergence": {
+      "issue": 1134,
+      "stage": "C6",
+      "status": "blocked-by-C5",
+      "requiredForAcceptance": true
+    },
+    "publicFacadeConvergence": {
+      "issue": 1134,
+      "stage": "C7",
+      "status": "blocked-by-C6",
+      "requiredForAcceptance": true
+    },
+    "documentationConvergence": {
+      "issue": 1134,
+      "stage": "C8",
+      "status": "blocked-by-runtime-convergence",
+      "requiredForAcceptance": true
+    }
+  },
+  "acceptanceBlockers": [
+    "C2 executable old-vs-new falsifiers are not yet green",
+    "STRING nested-Anum runtime semantics are not implemented",
+    "FORMAL [] -> STRING runtime cutover is not implemented",
+    "Q compatibility and representation separation are not yet executable evidence",
+    "FORMAL parentheses/contextual-K/left-reading convergence is incomplete",
+    "package/public facade convergence is incomplete",
+    "normative documentation and traceability are incomplete",
+    "v0.12 has not passed explicit acceptance cutover",
+    "temporary 6/2 contract budget debt remains until post-cutover cleanup"
+  ]
+}
