@@ -126,8 +126,8 @@ withSyntheticRepository(({ repoRoot, syntheticIndex, writeContract, writeConform
   writeConformance({ requiredAlphaVectors: [] });
   writeTraceability({
     schema: "mts-traceability/v9.9",
-    contract: "mts-contract/v9.1",
-    conformance: "mts-conformance/v9.1",
+    contract: "contracts/mts-contract-v9.1.json",
+    conformance: "contracts/mts-conformance-v9.1.json",
     acceptance: "cutover/acceptance.json",
     invariants: {
       law: {
