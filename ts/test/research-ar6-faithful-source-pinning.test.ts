@@ -43,6 +43,10 @@ interface AuthorityWithoutSource {
   readonly supportRevision: LinkHandle;
 }
 
+interface FixedSourceAuthority extends AuthorityWithoutSource {
+  readonly source: LinkHandle;
+}
+
 function anchors(memory: Memory, count: number): readonly LinkHandle[] {
   const result: LinkHandle[] = [];
   let current = memory.ensureEndSelfClosed(memory.root);
@@ -96,6 +100,17 @@ function verifyWithoutSourcePin(
   requireSupport(memory, authority.supportRevision, evidence.theoryMembership);
   if (memory.linkCount !== before) throw new SourcePinningError("replay wrote");
   return forms;
+}
+
+function verifyWithSourcePin(
+  memory: ReadMemory,
+  evidence: SourceFrontEndEvidence,
+  authority: FixedSourceAuthority,
+): readonly LinkHandle[] {
+  if (evidence.source !== authority.source) {
+    throw new SourcePinningError("source root mismatch");
+  }
+  return verifyWithoutSourcePin(memory, evidence, authority);
 }
 
 function expectRejected(effect: () => unknown, message: string): void {
@@ -183,30 +198,71 @@ const supportRevision = defineSupportRevision(memory, [
   evidenceA.grammarMembership,
   evidenceA.theoryMembership,
 ]);
-const authority: AuthorityWithoutSource = Object.freeze({
+const authorityWithoutSource: AuthorityWithoutSource = Object.freeze({
   dictionary,
   grammar,
   theory,
   supportRevision,
 });
+const fixedAuthority: FixedSourceAuthority = Object.freeze({
+  ...authorityWithoutSource,
+  source: sourceA,
+});
 
-same(verifyWithoutSourcePin(memory, evidenceA, authority)[0], entry, "selected source A");
+same(
+  verifyWithoutSourcePin(memory, evidenceA, authorityWithoutSource)[0],
+  entry,
+  "selected source A without independent source pin",
+);
 
-// TDD RED / F04: source B is internally faithful and has the same lossy Q
-// denotation, Entry, G/T memberships and fixed support. It must still be rejected
-// when source A was the independently selected source. The current authority
-// shape has no source coordinate, so this expectation should fail.
+// Retain the RED as executable evidence: all downstream authority coordinates
+// are unchanged, yet a verifier that omits the selected source accepts B.
+same(
+  verifyWithoutSourcePin(memory, evidenceB, authorityWithoutSource)[0],
+  entry,
+  "current missing-source authority exposes F04 replacement",
+);
+
+// GREEN candidate: the selected faithful source root is itself an authority
+// coordinate. Since SourceForm = START(SourceContent) and source replay validates
+// exact bytes/segments/provenance, pinning this Link pins the faithful source,
+// not its lossy denotation.
+same(
+  verifyWithSourcePin(memory, evidenceA, fixedAuthority)[0],
+  entry,
+  "fixed authority accepts selected source A",
+);
 expectRejected(
-  () => verifyWithoutSourcePin(memory, evidenceB, authority),
+  () => verifyWithSourcePin(memory, evidenceB, fixedAuthority),
   "different faithful source with same lossy denotation must not replace selected source A",
 );
 
-// Keep pole-only compatibility visible even in RED: the gap is missing source
-// authority, not a need for ambient discovery.
+// Trusted replay remains closure-only. Source pinning adds identity comparison,
+// not enumeration, reverse lookup, or host string comparison.
+const poleOnly = new PoleOnlyProbe(memory);
 same(
-  verifyWithoutSourcePin(new PoleOnlyProbe(memory), evidenceA, authority)[0],
+  verifyWithSourcePin(poleOnly, evidenceA, fixedAuthority)[0],
   entry,
   "pole-only selected source A",
 );
+expectRejected(
+  () => verifyWithSourcePin(poleOnly, evidenceB, fixedAuthority),
+  "pole-only faithful source replacement rejection",
+);
 
-console.log("MTS AR6 F04: expected RED while fixed authority omits selected source root.");
+const classification = Object.freeze({
+  distinctFaithfulSources: true,
+  lossyQDenotationCollisionConfirmed: true,
+  sameEntryAndDGTSupport: true,
+  authorityWithoutSourceAcceptsReplacement: true,
+  exactSourceRootIsIndependentAuthorityCoordinate: true,
+  exactSourceReplacementRejected: true,
+  noHostStringAuthorityRequired: true,
+  trustedReplayIsPoleOnlyAndReadOnly: true,
+  productionDelta: "NONE" as const,
+  verdict: "GREEN-CANDIDATE" as const,
+  reason: "FAITHFUL_SOURCE_ROOT_IS_AUTHORITY_COORDINATE" as const,
+});
+
+same(classification.verdict, "GREEN-CANDIDATE", "F04 source-pinning classification");
+console.log("MTS AR6 F04: RED retained; faithful source-root authority candidate exercised.");
