@@ -1,3 +1,5 @@
+// mts-version-evidence: required
+
 import { readFileSync } from "node:fs";
 import {
   deserializeAnum,
