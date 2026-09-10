@@ -58,9 +58,11 @@ function kernelEvidenceGates(): readonly KernelEvidenceGate[] {
     const source = readFileSync(join(directory, name), "utf8");
     const match = marker.exec(source);
     if (match === null) continue;
+    const requiredFrom = match[1];
+    assert(requiredFrom !== undefined, `invalid version evidence marker in ts/test/${name}`);
     result.push(Object.freeze({
       path: `ts/test/${name}`,
-      requiredFrom: parseVersion(match[1]),
+      requiredFrom: parseVersion(requiredFrom),
     }));
   }
   return Object.freeze(result);
