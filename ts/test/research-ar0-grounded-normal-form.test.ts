@@ -61,10 +61,76 @@ function rawShape(memory: ReadMemory, link: LinkHandle): RawShape {
   return "ordinary";
 }
 
-// RED scaffold: raw closure class is deliberately used as the candidate
-// semantic form. The alias case below must falsify this approximation.
-function candidateSemanticForm(memory: ReadMemory, link: LinkHandle): string {
-  return rawShape(memory, link);
+type GroundedForm =
+  | { readonly kind: "root" }
+  | { readonly kind: "start"; readonly end: GroundedForm }
+  | { readonly kind: "end"; readonly start: GroundedForm }
+  | { readonly kind: "pair"; readonly start: GroundedForm; readonly end: GroundedForm };
+
+const ROOT_FORM: GroundedForm = Object.freeze({ kind: "root" });
+
+function sameGroundedForm(left: GroundedForm, right: GroundedForm): boolean {
+  if (left.kind !== right.kind) return false;
+  switch (left.kind) {
+    case "root":
+      return true;
+    case "start":
+      return right.kind === "start" && sameGroundedForm(left.end, right.end);
+    case "end":
+      return right.kind === "end" && sameGroundedForm(left.start, right.start);
+    case "pair":
+      return right.kind === "pair"
+        && sameGroundedForm(left.start, right.start)
+        && sameGroundedForm(left.end, right.end);
+  }
+}
+
+function startForm(end: GroundedForm): GroundedForm {
+  return Object.freeze({ kind: "start", end });
+}
+
+function endForm(start: GroundedForm): GroundedForm {
+  return Object.freeze({ kind: "end", start });
+}
+
+function linkForm(start: GroundedForm, end: GroundedForm): GroundedForm {
+  // ∞⟼∞ = ∞
+  if (start.kind === "root" && end.kind === "root") return ROOT_FORM;
+
+  // (♂E)⟼E = ♂E
+  if (start.kind === "start" && sameGroundedForm(start.end, end)) return start;
+
+  // B⟼(B♀) = B♀
+  if (end.kind === "end" && sameGroundedForm(end.start, start)) return end;
+
+  return Object.freeze({ kind: "pair", start, end });
+}
+
+class UngroundedFormError extends Error {
+  override readonly name = "UngroundedFormError";
+}
+
+function normalizeGroundedForm(
+  memory: ReadMemory,
+  link: LinkHandle,
+  active: ReadonlySet<LinkHandle> = new Set<LinkHandle>(),
+): GroundedForm {
+  if (active.has(link)) throw new UngroundedFormError("non-self recursive dependency cycle");
+
+  const nextActive = new Set(active);
+  nextActive.add(link);
+  const poles = memory.poles(link);
+  const startSelf = poles.start === link;
+  const endSelf = poles.end === link;
+
+  if (startSelf && endSelf) return ROOT_FORM;
+  if (startSelf) return startForm(normalizeGroundedForm(memory, poles.end, nextActive));
+  if (endSelf) return endForm(normalizeGroundedForm(memory, poles.start, nextActive));
+
+  return linkForm(
+    normalizeGroundedForm(memory, poles.start, nextActive),
+    normalizeGroundedForm(memory, poles.end, nextActive),
+  );
 }
 
 const [r, s, x] = opaqueHandles(3);
@@ -87,10 +153,12 @@ same(rawShape(raw, r), "full", "raw ∞ shape");
 same(rawShape(raw, s), "start", "raw ♂∞ shape");
 same(rawShape(raw, x), "ordinary", "physical alias has different raw closure class");
 
-// Target semantic behavior: both presentations normalize to one form ♂∞.
-same(
-  candidateSemanticForm(raw, x),
-  candidateSemanticForm(raw, s),
+const normalizedS = normalizeGroundedForm(raw, s);
+const normalizedX = normalizeGroundedForm(raw, x);
+assert(normalizedS.kind === "start", "S=S⟼R normalizes to ♂∞ form");
+assert(normalizedS.end.kind === "root", "♂∞ external end normalizes to ∞");
+assert(
+  sameGroundedForm(normalizedX, normalizedS),
   "physical duplicate S⟼R must normalize to the same semantic form as S=S⟼R",
 );
 
