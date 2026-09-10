@@ -117,4 +117,14 @@ reject(
   binding,
 );
 
-console.log("MTS v0.12 ostensive self-incidence matcher gate: START/END forms preserve own self-closure shape.");
+// Compatibility boundary: absence of own self-incidence in a generic template
+// is NOT a post-substitution disequality constraint. Pair(E,E) under E:=R may
+// canonically collapse to R=R⟼R, as already exercised by accepted v0.10 generic
+// matching. Only self-incidence explicitly present in the template is ostensive.
+const genericTemplate = memory.ensure(role, role);
+const genericTemplatePoles = memory.poles(genericTemplate);
+assert(genericTemplatePoles.start !== genericTemplate, "generic template has no start self-incidence");
+assert(genericTemplatePoles.end !== genericTemplate, "generic template has no end self-incidence");
+replay(memory, genericTemplate, basis.R, binding);
+
+console.log("MTS v0.12 ostensive self-incidence matcher gate: explicit START/END incidence is preserved without constraining ordinary generic collapse.");
