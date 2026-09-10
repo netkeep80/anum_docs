@@ -59,16 +59,67 @@ function binding(role: LinkHandle, value: LinkHandle): StructuralRoleBinding {
   return Object.freeze({ role, value });
 }
 
-type LocalShape = "full" | "start" | "end" | "ordinary";
+type LocalShape = "∞" | "♂e" | "b♀" | "b⟼e";
 
 function localShape(memory: ReadMemory, link: LinkHandle): LocalShape {
   const poles = memory.poles(link);
   const startSelf = poles.start === link;
   const endSelf = poles.end === link;
-  if (startSelf && endSelf) return "full";
-  if (startSelf) return "start";
-  if (endSelf) return "end";
-  return "ordinary";
+  if (startSelf && endSelf) return "∞";
+  if (startSelf) return "♂e";
+  if (endSelf) return "b♀";
+  return "b⟼e";
+}
+
+// Test/meta encoding only. These two observations are not proposed as MTS
+// symbols, public opcodes or a second ontology. They are the machine-side
+// observation of the four ostensive forms on an already canonical support.
+type SelfIncidence = readonly [startIsWhole: boolean, endIsWhole: boolean];
+
+const INFINITY: SelfIncidence = Object.freeze([true, true]);
+const MALE: SelfIncidence = Object.freeze([true, false]);
+const FEMALE: SelfIncidence = Object.freeze([false, true]);
+const ORDINARY: SelfIncidence = Object.freeze([false, false]);
+
+class OstensiveFormMismatch extends Error {
+  override readonly name = "OstensiveFormMismatch";
+}
+
+function verifySelfIncidence(
+  memory: ReadMemory,
+  claimed: LinkHandle,
+  expected: SelfIncidence,
+): void {
+  const poles = memory.poles(claimed);
+  const actualStart = poles.start === claimed;
+  const actualEnd = poles.end === claimed;
+  if (actualStart !== expected[0] || actualEnd !== expected[1]) {
+    throw new OstensiveFormMismatch("ostensive self-incidence mismatch");
+  }
+}
+
+function matchCanonicalOstensiveTemplate(
+  memory: ReadMemory,
+  expected: SelfIncidence,
+  template: LinkHandle,
+  claimed: LinkHandle,
+  bindings: readonly StructuralRoleBinding[],
+): void {
+  // Preconditions established elsewhere by the selected support/backend:
+  // semantic Links are canonical and finitely grounded. Under that boundary,
+  // self-incidence distinguishes ∞ / ♂e / b♀ / b⟼e without a generic `!=`.
+  verifySelfIncidence(memory, claimed, expected);
+  matchStructuralTemplate(memory, template, claimed, bindings);
+}
+
+function rejectOstensive(effect: () => unknown, message: string): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(error instanceof OstensiveFormMismatch, `${message}: wrong error ${String(error)}`);
+    return;
+  }
+  throw new Error(`AR0 distinction probe: ${message}: expected ostensive rejection`);
 }
 
 const memory = new Memory();
@@ -82,102 +133,170 @@ assert(
   "fixture roles exist",
 );
 
-const startLikeTemplate = memory.ensure(wholeRole, externalRole);
-const endLikeTemplate = memory.ensure(externalRole, wholeRole);
-const pairLikeTemplate = memory.ensure(beginRole, endRole);
+const maleLikeTemplate = memory.ensure(wholeRole, externalRole);
+const femaleLikeTemplate = memory.ensure(externalRole, wholeRole);
+const ordinaryTemplate = memory.ensure(beginRole, endRole);
 
-// Positive controls: the generic matcher already expresses recursive equality
-// when the whole/current role is explicitly bound to the claimed result.
+// The generic matcher already expresses recursive equality/current binding.
 {
   const probe = new ReadProbe(memory);
   matchStructuralTemplate(
     probe,
-    startLikeTemplate,
+    maleLikeTemplate,
     basis.O,
     [binding(wholeRole, basis.O), binding(externalRole, basis.R)],
   );
-  assert(probe.polesCalls > 0, "START positive control must inspect poles");
+  assert(probe.polesCalls > 0, "♂e positive control must inspect poles");
 }
 {
   const probe = new ReadProbe(memory);
   matchStructuralTemplate(
     probe,
-    endLikeTemplate,
+    femaleLikeTemplate,
     basis.C,
     [binding(externalRole, basis.R), binding(wholeRole, basis.C)],
   );
-  assert(probe.polesCalls > 0, "END positive control must inspect poles");
+  assert(probe.polesCalls > 0, "b♀ positive control must inspect poles");
 }
 
-// Research falsifier: template equality alone cannot distinguish START(R)
-// from FULL when both roles are allowed to coalesce to R. The call succeeds.
-let rootAcceptedByStartLikeTemplate = false;
+// Bare-template RED: substitution alone allows roles to coalesce, therefore
+// ∞ can satisfy the same pole substitution used for ♂e and b♀.
+let rootAcceptedByMaleLikeTemplate = false;
 {
   const probe = new ReadProbe(memory);
   matchStructuralTemplate(
     probe,
-    startLikeTemplate,
+    maleLikeTemplate,
     basis.R,
     [binding(wholeRole, basis.R), binding(externalRole, basis.R)],
   );
-  rootAcceptedByStartLikeTemplate = true;
-  assert(probe.polesCalls > 0, "START falsifier must use only local poles");
+  rootAcceptedByMaleLikeTemplate = true;
 }
 
-let rootAcceptedByEndLikeTemplate = false;
+let rootAcceptedByFemaleLikeTemplate = false;
 {
   const probe = new ReadProbe(memory);
   matchStructuralTemplate(
     probe,
-    endLikeTemplate,
+    femaleLikeTemplate,
     basis.R,
     [binding(externalRole, basis.R), binding(wholeRole, basis.R)],
   );
-  rootAcceptedByEndLikeTemplate = true;
-  assert(probe.polesCalls > 0, "END falsifier must use only local poles");
+  rootAcceptedByFemaleLikeTemplate = true;
 }
 
-// Likewise a plain two-role pair template can match a one-sided selfclosure.
-// Therefore "ordered pair template matched" is not yet the ostensive ORDINARY
-// form unless the whole is known to be external to both poles.
-let startAcceptedByPairLikeTemplate = false;
+let maleAcceptedByOrdinaryTemplate = false;
 {
   const probe = new ReadProbe(memory);
   matchStructuralTemplate(
     probe,
-    pairLikeTemplate,
+    ordinaryTemplate,
     basis.O,
     [binding(beginRole, basis.O), binding(endRole, basis.R)],
   );
-  startAcceptedByPairLikeTemplate = true;
-  assert(probe.polesCalls > 0, "PAIR falsifier must use only local poles");
+  maleAcceptedByOrdinaryTemplate = true;
 }
 
-same(localShape(memory, basis.R), "full", "R actual local form");
-same(localShape(memory, basis.O), "start", "O actual local form");
-same(localShape(memory, basis.C), "end", "C actual local form");
-same(localShape(memory, basis.L), "ordinary", "L actual local form");
-same(localShape(memory, basis.U), "ordinary", "U actual local form");
+same(localShape(memory, basis.R), "∞", "R actual ostensive form");
+same(localShape(memory, basis.O), "♂e", "O actual ostensive form");
+same(localShape(memory, basis.C), "b♀", "C actual ostensive form");
+same(localShape(memory, basis.L), "b⟼e", "L actual ostensive form");
+same(localShape(memory, basis.U), "b⟼e", "U actual ostensive form");
+
+same(rootAcceptedByMaleLikeTemplate, true, "bare matcher admits ∞ under ♂e-like substitution");
+same(rootAcceptedByFemaleLikeTemplate, true, "bare matcher admits ∞ under b♀-like substitution");
+same(maleAcceptedByOrdinaryTemplate, true, "bare matcher admits ♂e under b⟼e-like substitution");
+
+// Bounded GREEN: on canonical support, exact self-incidence supplies precisely
+// the distinction already shown by the ostensive form itself.
+{
+  const probe = new ReadProbe(memory);
+  matchCanonicalOstensiveTemplate(
+    probe,
+    MALE,
+    maleLikeTemplate,
+    basis.O,
+    [binding(wholeRole, basis.O), binding(externalRole, basis.R)],
+  );
+  matchCanonicalOstensiveTemplate(
+    probe,
+    FEMALE,
+    femaleLikeTemplate,
+    basis.C,
+    [binding(externalRole, basis.R), binding(wholeRole, basis.C)],
+  );
+  matchCanonicalOstensiveTemplate(
+    probe,
+    ORDINARY,
+    ordinaryTemplate,
+    basis.L,
+    [binding(beginRole, basis.O), binding(endRole, basis.C)],
+  );
+  matchCanonicalOstensiveTemplate(probe, INFINITY, basis.R, basis.R, []);
+  assert(probe.polesCalls > 0, "bounded ostensive matching uses only pole evidence");
+}
+
+rejectOstensive(
+  () => matchCanonicalOstensiveTemplate(
+    memory,
+    MALE,
+    maleLikeTemplate,
+    basis.R,
+    [binding(wholeRole, basis.R), binding(externalRole, basis.R)],
+  ),
+  "∞ must not satisfy ♂e",
+);
+rejectOstensive(
+  () => matchCanonicalOstensiveTemplate(
+    memory,
+    FEMALE,
+    femaleLikeTemplate,
+    basis.R,
+    [binding(externalRole, basis.R), binding(wholeRole, basis.R)],
+  ),
+  "∞ must not satisfy b♀",
+);
+rejectOstensive(
+  () => matchCanonicalOstensiveTemplate(
+    memory,
+    ORDINARY,
+    ordinaryTemplate,
+    basis.O,
+    [binding(beginRole, basis.O), binding(endRole, basis.R)],
+  ),
+  "♂e must not satisfy b⟼e",
+);
+
+// Critical counter-control: distinct role names are allowed to resolve to one
+// semantic Link when the ostensive form does not require whole/pole separation.
+// For A != R, A⟼A is an ordinary Link and both pole roles legitimately coalesce.
+{
+  const A = basis.O;
+  const loop = memory.ensure(A, A);
+  same(localShape(memory, loop), "b⟼e", "A⟼A is ordinary for non-root A");
+  matchCanonicalOstensiveTemplate(
+    memory,
+    ORDINARY,
+    ordinaryTemplate,
+    loop,
+    [binding(beginRole, A), binding(endRole, A)],
+  );
+}
 
 const classification = Object.freeze({
   recursiveEqualityAlreadyExpressible: true,
-  rootAcceptedByStartLikeTemplate,
-  rootAcceptedByEndLikeTemplate,
-  startAcceptedByPairLikeTemplate,
-  genericDistinctionConstraintPresent: false,
-  verdict: "RED" as const,
-  reason: "OSTENSIVE_FORM_DISTINCTION_NOT_EXPRESSED_BY_TEMPLATE_MATCH" as const,
+  bareTemplateGapConfirmed: true,
+  canonicalSupportRequired: true,
+  ostensiveSelfIncidenceBoundarySufficient: true,
+  genericRoleInequalityRequired: false,
+  secondNormalFormRuntimeRequired: false,
+  bareMatcherVerdict: "RED" as const,
+  boundedJudgmentVerdict: "GREEN" as const,
 });
 
-same(classification.rootAcceptedByStartLikeTemplate, true, "START-like template admits FULL without distinction");
-same(classification.rootAcceptedByEndLikeTemplate, true, "END-like template admits FULL without distinction");
-same(classification.startAcceptedByPairLikeTemplate, true, "PAIR-like template admits START without whole/pole distinction");
-same(classification.genericDistinctionConstraintPresent, false, "generic matcher has no explicit distinction obligation");
-same(classification.verdict, "RED", "AR0 distinction classification");
-same(
-  classification.reason,
-  "OSTENSIVE_FORM_DISTINCTION_NOT_EXPRESSED_BY_TEMPLATE_MATCH",
-  "AR0 distinction RED reason",
-);
+same(classification.bareMatcherVerdict, "RED", "bare template matcher remains intentionally weaker");
+same(classification.boundedJudgmentVerdict, "GREEN", "canonical ostensive boundary closes tested gap");
+same(classification.genericRoleInequalityRequired, false, "no blanket role inequality is required");
+same(classification.secondNormalFormRuntimeRequired, false, "research oracle is not promoted to runtime");
 
-console.log("MTS AR0 rooted-form distinction: RED gap confirmed against current generic matcher.");
+console.log("MTS AR0 rooted-form distinction: bare matcher RED; canonical ostensive boundary GREEN.");
