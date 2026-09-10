@@ -355,6 +355,17 @@ export function matchStructuralTemplate(
     try {
       const leftPoles = memory.poles(left);
       const rightPoles = memory.poles(right);
+      const templateHasOwnSelfIncidence =
+        leftPoles.start === left || leftPoles.end === left;
+      if (
+        templateHasOwnSelfIncidence &&
+        (
+          (leftPoles.start === left) !== (rightPoles.start === right) ||
+          (leftPoles.end === left) !== (rightPoles.end === right)
+        )
+      ) {
+        throw new StructuralRuleError("template-mismatch");
+      }
       match(leftPoles.start, rightPoles.start);
       match(leftPoles.end, rightPoles.end);
     } catch (error) {
