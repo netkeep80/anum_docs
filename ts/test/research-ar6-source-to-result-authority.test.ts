@@ -79,6 +79,13 @@ interface IntegratedEvidence {
   readonly target: LinkHandle;
 }
 
+type TemplateMatcher = (
+  memory: ReadMemory,
+  template: LinkHandle,
+  claimed: LinkHandle,
+  bindings: readonly StructuralRoleBinding[],
+) => void;
+
 function anchors(memory: Memory, count: number): readonly LinkHandle[] {
   const result: LinkHandle[] = [];
   let current = ensureRootBasis(memory).C;
@@ -237,17 +244,97 @@ function bindingAtSnapshot(
   }
   const unique = new Set(values);
   if (unique.size !== 1) {
-    throw new IntegratedError(unique.size === 0 ? "missing contextual binding" : "contextual binding conflict");
+    throw new IntegratedError(
+      unique.size === 0 ? "missing contextual binding" : "contextual binding conflict",
+    );
   }
   const value = values[0];
   if (value === undefined) throw new IntegratedError("missing contextual binding");
   return value;
 }
 
-function verifyIntegratedCurrent(
+/**
+ * AR4 candidate folded into the integrated verifier. This is not a Pattern AST:
+ * for every structural node whose descendants still contain roles, matching
+ * preserves the two observable self-incidence facts of the Link itself.
+ */
+function matchOstensiveTemplate(
+  memory: ReadMemory,
+  template: LinkHandle,
+  claimed: LinkHandle,
+  bindings: readonly StructuralRoleBinding[],
+): void {
+  const rho = new Map<LinkHandle, LinkHandle>();
+  for (const item of bindings) {
+    if (rho.has(item.role)) throw new IntegratedError("duplicate role binding");
+    rho.set(item.role, item.value);
+  }
+
+  const containsMemo = new Map<LinkHandle, boolean>();
+  const containsActive = new Set<LinkHandle>();
+  const visited = new Map<LinkHandle, Set<LinkHandle>>();
+
+  const containsRole = (node: LinkHandle): boolean => {
+    if (rho.has(node)) return true;
+    const cached = containsMemo.get(node);
+    if (cached !== undefined) return cached;
+    if (containsActive.has(node)) return false;
+    containsActive.add(node);
+    try {
+      const poles = memory.poles(node);
+      const result = containsRole(poles.start) || containsRole(poles.end);
+      containsMemo.set(node, result);
+      return result;
+    } finally {
+      containsActive.delete(node);
+    }
+  };
+
+  const markVisited = (left: LinkHandle, right: LinkHandle): boolean => {
+    let rights = visited.get(left);
+    if (rights === undefined) {
+      rights = new Set<LinkHandle>();
+      visited.set(left, rights);
+    }
+    if (rights.has(right)) return true;
+    rights.add(right);
+    return false;
+  };
+
+  const match = (left: LinkHandle, right: LinkHandle): void => {
+    const replacement = rho.get(left);
+    if (replacement !== undefined) {
+      if (replacement !== right) throw new IntegratedError("role binding mismatch");
+      return;
+    }
+
+    if (!containsRole(left)) {
+      if (left !== right) throw new IntegratedError("grounded template mismatch");
+      return;
+    }
+
+    const leftPoles = memory.poles(left);
+    const rightPoles = memory.poles(right);
+    if (
+      (leftPoles.start === left) !== (rightPoles.start === right) ||
+      (leftPoles.end === left) !== (rightPoles.end === right)
+    ) {
+      throw new IntegratedError("ostensive self-incidence mismatch");
+    }
+
+    if (markVisited(left, right)) return;
+    match(leftPoles.start, rightPoles.start);
+    match(leftPoles.end, rightPoles.end);
+  };
+
+  match(template, claimed);
+}
+
+function verifyIntegratedWithMatcher(
   memory: ReadMemory,
   authority: FixedAuthority,
   evidence: IntegratedEvidence,
+  matcher: TemplateMatcher,
 ): LinkHandle {
   const before = memory.linkCount;
   if (
@@ -274,20 +361,33 @@ function verifyIntegratedCurrent(
   requireSupportAdmission(memory, authority.supportRevision, evidence.ruleAdmission);
   verifyStructuralRuleAdmission(memory, authority.theory, evidence.useRule, evidence.ruleAdmission);
   const rule = readStructuralRule(memory, evidence.useRule);
-  const dictionary = readStructuralRoleDictionary(memory, rule.roleDictionary);
+  const roleDictionary = readStructuralRoleDictionary(memory, rule.roleDictionary);
   const bindings: readonly StructuralRoleBinding[] = Object.freeze(
-    dictionary.roles.map((role) => Object.freeze({
+    roleDictionary.roles.map((role) => Object.freeze({
       role,
       value: bindingAtSnapshot(memory, authority.context, role),
     })),
   );
-
-  // Deliberately current trusted matcher: AR6 RED asks whether the complete
-  // source/authority path is enough to reject a wrong ostensive target today.
-  matchStructuralTemplate(memory, rule.body, evidence.target, bindings);
+  matcher(memory, rule.body, evidence.target, bindings);
 
   if (memory.linkCount !== before) throw new IntegratedError("integrated replay wrote to Memory");
   return evidence.target;
+}
+
+function verifyIntegratedCurrent(
+  memory: ReadMemory,
+  authority: FixedAuthority,
+  evidence: IntegratedEvidence,
+): LinkHandle {
+  return verifyIntegratedWithMatcher(memory, authority, evidence, matchStructuralTemplate);
+}
+
+function verifyIntegratedCandidate(
+  memory: ReadMemory,
+  authority: FixedAuthority,
+  evidence: IntegratedEvidence,
+): LinkHandle {
+  return verifyIntegratedWithMatcher(memory, authority, evidence, matchOstensiveTemplate);
 }
 
 function expectRejected(effect: () => unknown, message: string): void {
@@ -299,17 +399,30 @@ function expectRejected(effect: () => unknown, message: string): void {
   throw new Error(`AR6 integrated probe: ${message}: expected rejection`);
 }
 
+class PoleOnlyProbe implements ReadMemory {
+  constructor(private readonly source: ReadMemory) {}
+  get root(): LinkHandle { return this.source.root; }
+  get linkCount(): number { return this.source.linkCount; }
+  poles(link: LinkHandle): LinkPoles { return this.source.poles(link); }
+  find(): LinkHandle | undefined { throw new Error("AR6 replay forbids ambient find"); }
+  outgoing(): readonly LinkHandle[] { throw new Error("AR6 replay forbids ambient outgoing"); }
+  incoming(): readonly LinkHandle[] { throw new Error("AR6 replay forbids ambient incoming"); }
+}
+
 const memory = new Memory();
 const basis = ensureRootBasis(memory);
-const pool = anchors(memory, 10);
+const pool = anchors(memory, 14);
 const bracketEntry = pool[0];
 const grammarParent = pool[1];
 const theory = pool[2];
 const contextParent = pool[3];
 const contextCurrent = pool[4];
+const outsiderSeed = pool[5];
+const mismatchedTheory = pool[6];
 assert(
   bracketEntry !== undefined && grammarParent !== undefined && theory !== undefined &&
-  contextParent !== undefined && contextCurrent !== undefined,
+  contextParent !== undefined && contextCurrent !== undefined && outsiderSeed !== undefined &&
+  mismatchedTheory !== undefined,
   "fixture anchors",
 );
 
@@ -320,12 +433,21 @@ const startRootTemplate = memory.ensureStartSelfClosed(endRole); // ♂E
 const roleDictionary = defineStructuralRoleDictionary(memory, [endRole]);
 const useRule = defineStructuralRule(memory, roleDictionary, startRootTemplate);
 
-// Grammar authority explicitly admits Entry '[' -> this Use/Rule in a
-// persistent rooted revision.
+// A second well-formed Rule is Grammar-visible but deliberately excluded from
+// the fixed Theory support. This isolates F05 from Grammar selection.
+const unsupportedRole = memory.ensureEndSelfClosed(outsiderSeed);
+const unsupportedDictionary = defineStructuralRoleDictionary(memory, [unsupportedRole]);
+const unsupportedTemplate = memory.ensureEndSelfClosed(unsupportedRole);
+const unsupportedRule = defineStructuralRule(memory, unsupportedDictionary, unsupportedTemplate);
+
+// Grammar authority explicitly admits Entry '[' -> both Rules. Which Rule may
+// actually replay is still bounded by fixed Theory support below.
 const grammarBase = defineRevision(memory, grammarParent, memory.root);
 const useFact = memory.ensure(bracketEntry, useRule);
 const useEffect = appendRevisionFact(memory, grammarBase, useFact);
-const grammar = useEffect.afterRevision;
+const unsupportedUseFact = memory.ensure(bracketEntry, unsupportedRule);
+const unsupportedUseEffect = appendRevisionFact(memory, useEffect.afterRevision, unsupportedUseFact);
+const grammar = unsupportedUseEffect.afterRevision;
 
 // Context authority explicitly binds E := R in a new immutable K revision.
 const contextBase = defineContextSnapshot(memory, contextParent, contextCurrent, memory.root);
@@ -356,7 +478,9 @@ const sourceEvidence = buildSelectedSourceEvidence(
   { dictionary, grammar, theory },
 );
 
-// Theory support is independently frozen as one exact rooted revision.
+// Theory support is independently frozen as one exact rooted revision. The
+// unsupported Rule may later be admitted to T ambiently, but this selected S
+// does not contain that admission.
 const ruleAdmission = admitStructuralRule(memory, theory, useRule);
 const supportRevision = defineSupportRevision(memory, [
   sourceEvidence.grammarMembership,
@@ -382,18 +506,121 @@ const good: IntegratedEvidence = Object.freeze({
 });
 const wrongTarget: IntegratedEvidence = Object.freeze({ ...good, target: basis.R });
 
+// RED witness retained as executable evidence: the current production matcher
+// accepts both the intended O=♂R and the wrong but well-formed R=∞ under the
+// exact same source and authority roots.
+same(verifyIntegratedCurrent(memory, authority, good), basis.O, "current good result");
 same(
-  verifyIntegratedCurrent(memory, authority, good),
+  verifyIntegratedCurrent(memory, authority, wrongTarget),
+  basis.R,
+  "current matcher exposes integrated F01 false positive",
+);
+
+// GREEN candidate: only ostensive self-incidence preservation changes the
+// matching judgment. All source / D / G / T / support / K roots are identical.
+same(
+  verifyIntegratedCandidate(memory, authority, good),
   basis.O,
-  "faithful source -> Entry -> Use -> K -> fixed Theory -> O",
+  "candidate faithful source -> Entry -> Use -> K -> fixed Theory -> O",
 );
-
-// TDD RED / F01: R is internally well-formed, and all authority roots are
-// exactly unchanged. The current trusted matcher is expected to reject it.
-// AR4 predicts it will NOT reject, making this test fail for the right reason.
 expectRejected(
-  () => verifyIntegratedCurrent(memory, authority, wrongTarget),
-  "same source/support/K must reject well-formed wrong target R",
+  () => verifyIntegratedCandidate(memory, authority, wrongTarget),
+  "candidate must reject well-formed wrong target R under unchanged authority",
 );
 
-console.log("MTS AR6 source-to-result authority: expected RED if current matcher collapses O into R.");
+// F06 / AR3 integration: an old-style ambient K -> (role -> C) attachment does
+// not mutate the selected contextual revision. The pinned E:=R still selects O.
+const ambientRebindingPair = memory.ensure(endRole, basis.C);
+memory.ensure(context, ambientRebindingPair);
+same(
+  verifyIntegratedCandidate(memory, authority, good),
+  basis.O,
+  "ambient rebinding cannot mutate fixed K",
+);
+expectRejected(
+  () => verifyIntegratedCandidate(memory, authority, wrongTarget),
+  "ambient rebinding cannot make R valid",
+);
+
+// F02: a third internally well-formed Use is only ambiently attached to G, not
+// present as an occurrence in the selected persistent Grammar revision.
+const outsiderDictionary = defineStructuralRoleDictionary(memory, []);
+const outsiderRule = defineStructuralRule(memory, outsiderDictionary, basis.O);
+const outsiderUseFact = memory.ensure(bracketEntry, outsiderRule);
+const outsiderAmbientOccurrence = memory.ensure(grammar, outsiderUseFact);
+const outsiderAdmission = admitStructuralRule(memory, theory, outsiderRule);
+const outsiderEvidence: IntegratedEvidence = Object.freeze({
+  ...good,
+  useRule: outsiderRule,
+  useFact: outsiderUseFact,
+  useOccurrence: outsiderAmbientOccurrence,
+  ruleAdmission: outsiderAdmission,
+});
+expectRejected(
+  () => verifyIntegratedCandidate(memory, authority, outsiderEvidence),
+  "ambient unadmitted Use must fail under unchanged Grammar revision",
+);
+
+// F05: the second Rule really is in selected Grammar, and producer may even add
+// T -> Rule after S was frozen. Fixed support still rejects it.
+const unsupportedAdmission = admitStructuralRule(memory, theory, unsupportedRule);
+const unsupportedEvidence: IntegratedEvidence = Object.freeze({
+  ...good,
+  useRule: unsupportedRule,
+  useFact: unsupportedUseFact,
+  useOccurrence: unsupportedUseEffect.occurrence,
+  ruleAdmission: unsupportedAdmission,
+});
+expectRejected(
+  () => verifyIntegratedCandidate(memory, authority, unsupportedEvidence),
+  "producer Rule self-admission after fixed support must fail",
+);
+
+// F03: even structurally valid evidence cannot silently substitute one authority
+// root. No bridge is admitted in this bounded witness.
+const mismatchedSource: SourceFrontEndEvidence = Object.freeze({
+  ...sourceEvidence,
+  theory: mismatchedTheory,
+});
+expectRejected(
+  () => verifyIntegratedCandidate(memory, authority, Object.freeze({ ...good, source: mismatchedSource })),
+  "D/G/T root substitution without bridge must fail",
+);
+
+// All accepted/rejected verdicts above are reproducible through selected pole
+// closure only; ambient discovery APIs are forbidden in the trusted replay.
+const poleOnly = new PoleOnlyProbe(memory);
+same(
+  verifyIntegratedCandidate(poleOnly, authority, good),
+  basis.O,
+  "pole-only integrated positive replay",
+);
+expectRejected(
+  () => verifyIntegratedCandidate(poleOnly, authority, wrongTarget),
+  "pole-only integrated wrong target rejection",
+);
+expectRejected(
+  () => verifyIntegratedCandidate(poleOnly, authority, unsupportedEvidence),
+  "pole-only fixed-support self-admission rejection",
+);
+
+const classification = Object.freeze({
+  faithfulSourceOccurrenceIsRetained: true,
+  sourceResolvesEntryBeforeUseSelection: true,
+  useIsSelectedByPersistentGrammarRevision: true,
+  theoryRuleAdmissionIsBoundedByFixedSupportRevision: true,
+  contextPinsExplicitRoleBindingRevision: true,
+  currentTrustedMatcherStillViolatesIntegratedF01: true,
+  ostensiveMatcherRejectsWrongTargetUnderSameAuthority: true,
+  ambientContextRebindingCannotChangeOldK: true,
+  ambientUnadmittedUseIsRejected: true,
+  producerRuleSelfAdmissionOutsideFixedSupportIsRejected: true,
+  authorityRootSubstitutionWithoutBridgeIsRejected: true,
+  trustedReplayIsPoleOnlyAndReadOnly: true,
+  productionDelta: "NONE" as const,
+  verdict: "GREEN-CANDIDATE" as const,
+  reason: "INTEGRATED_SOURCE_TO_RESULT_AUTHORITY_SURVIVES_F01_F02_F03_F05_F06" as const,
+});
+
+same(classification.verdict, "GREEN-CANDIDATE", "AR6 classification");
+console.log("MTS AR6 source-to-result authority: RED retained; integrated GREEN candidate exercised.");
