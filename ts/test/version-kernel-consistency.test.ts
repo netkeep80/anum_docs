@@ -45,8 +45,35 @@ function parseVersion(version: string): readonly [number, number] {
   return [Number(match[1]), Number(match[2])];
 }
 
+function compareVersion(left: readonly [number, number], right: readonly [number, number]): number {
+  if (left[0] !== right[0]) return left[0] - right[0];
+  return left[1] - right[1];
+}
+
 function versionAtLeast(actual: readonly [number, number], required: readonly [number, number]): boolean {
-  return actual[0] > required[0] || (actual[0] === required[0] && actual[1] >= required[1]);
+  return compareVersion(actual, required) >= 0;
+}
+
+function governedVersions(): readonly string[] {
+  const contractsDirectory = join(repoRoot, "contracts");
+  const contractName = /^mts-contract-v(\d+\.\d+)\.json$/;
+  const firstGovernedVersion: readonly [number, number] = [0, 11];
+  const versions: string[] = [];
+
+  for (const name of readdirSync(contractsDirectory).sort()) {
+    const match = contractName.exec(name);
+    if (match === null) continue;
+    const version = match[1];
+    assert(version !== undefined, `invalid contract version filename: ${name}`);
+    if (!versionAtLeast(parseVersion(version), firstGovernedVersion)) continue;
+    const conformancePath = join(contractsDirectory, `mts-conformance-v${version}.json`);
+    assert(existsSync(conformancePath), `${version}: version contract has no matching conformance file`);
+    versions.push(version);
+  }
+
+  versions.sort((left, right) => compareVersion(parseVersion(left), parseVersion(right)));
+  assert(versions.length > 0, "no governed MTS version contracts found");
+  return Object.freeze(versions);
 }
 
 function kernelEvidenceGates(): readonly KernelEvidenceGate[] {
@@ -135,5 +162,4 @@ function verifyKernelBackedVersion(version: string): void {
   }
 }
 
-verifyKernelBackedVersion("0.11");
-verifyKernelBackedVersion("0.12");
+for (const version of governedVersions()) verifyKernelBackedVersion(version);
