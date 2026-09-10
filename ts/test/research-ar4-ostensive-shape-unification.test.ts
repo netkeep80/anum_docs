@@ -1,5 +1,6 @@
 import {
   Memory,
+  ensureRootBasis,
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
@@ -13,16 +14,6 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
-}
-
-function anchors(memory: Memory, count: number): readonly LinkHandle[] {
-  const result: LinkHandle[] = [];
-  let current = memory.ensureEndSelfClosed(memory.root);
-  for (let index = 0; index < count; index += 1) {
-    current = memory.ensureStartSelfClosed(current);
-    result.push(current);
-  }
-  return Object.freeze(result);
 }
 
 function binding(
@@ -107,8 +98,8 @@ function unifyOstensiveTemplate(
       return;
     }
 
-    // The missing condition in the current generic cyclic unifier: recursive
-    // matching must not collapse one primary ostensive form into another.
+    // Generic cyclic graph matching must not collapse one primary ostensive
+    // self-incidence form into another.
     if (ostensiveShape(memory, left) !== ostensiveShape(memory, right)) {
       throw new StructuralRuleError("template-mismatch");
     }
@@ -155,22 +146,28 @@ class PoleOnlyProbe implements ReadMemory {
 }
 
 const memory = new Memory();
-const [endRole, startRole, endValue, startValue, otherEnd] = anchors(memory, 5);
-assert(
-  endRole !== undefined &&
-  startRole !== undefined &&
-  endValue !== undefined &&
-  startValue !== undefined &&
-  otherEnd !== undefined,
-  "fixture anchors must exist",
-);
+const basis = ensureRootBasis(memory);
+
+// Keep role identities on a branch independent from the concrete values. The
+// first version of this research fixture accidentally chose startValue as
+// START(endValue), so ensure(startValue,endValue) correctly canonicalized back
+// to startValue. That was a fixture collision, not an ordinary-Link witness.
+const roleSeed = memory.ensure(basis.L, basis.U);
+const endRole = memory.ensureStartSelfClosed(roleSeed);
+const startRole = memory.ensureEndSelfClosed(roleSeed);
+const startValue = basis.O;
+const endValue = basis.C;
+const otherEnd = basis.U;
+assert(endRole !== startRole, "role anchors must be distinct");
+assert(startValue !== endValue && endValue !== otherEnd, "concrete values must be distinct");
 
 // Four primary ostensive forms are exactly the four possible ways in which a
 // Link can occur as its own start/end pole.
-const full = memory.root;
+const full = basis.R;
 const startSelf = memory.ensureStartSelfClosed(endValue);
 const endSelf = memory.ensureEndSelfClosed(startValue);
 const ordinary = memory.ensure(startValue, endValue);
+same(ordinary, basis.L, "ordinary fixture is canonical L");
 same(ostensiveShape(memory, full), "FULL", "∞ shape");
 same(ostensiveShape(memory, startSelf), "START", "♂e shape");
 same(ostensiveShape(memory, endSelf), "END", "b♀ shape");
@@ -180,12 +177,7 @@ same(ostensiveShape(memory, ordinary), "ORDINARY", "b⟼e shape");
 // START(endRole) can match the fully self-closed root because the recursive
 // template node is revisited before role=end is bound.
 const startTemplate = memory.ensureStartSelfClosed(endRole);
-const currentFalsePositive = unifyStructuralTemplate(
-  memory,
-  startTemplate,
-  full,
-  [endRole],
-);
+const currentFalsePositive = unifyStructuralTemplate(memory, startTemplate, full, [endRole]);
 same(binding(currentFalsePositive, endRole), full, "current unifier collapses ♂E onto ∞");
 
 // The candidate rejects exactly that collapse while preserving the intended
@@ -233,8 +225,8 @@ rejected(
 );
 
 // Recursive composition works without a second pattern language. Here the end
-// of a START-form candidate must itself have the ordinary structure
-// (startValue ⟼ E), and only E remains free.
+// of a START-form candidate must itself have the ordinary structure O⟼E, and
+// only E remains free.
 const nestedEndTemplate = memory.ensure(startValue, endRole);
 const nestedStartTemplate = memory.ensureStartSelfClosed(nestedEndTemplate);
 const concreteNestedEnd = memory.ensure(startValue, otherEnd);
