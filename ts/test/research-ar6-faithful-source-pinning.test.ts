@@ -126,7 +126,6 @@ const sourceBText = "[1]";
 const sourceABytes = bytes(sourceAText);
 const sourceBBytes = bytes(sourceBText);
 assert(
-  sourceAText !== sourceBText &&
   sourceABytes.some((value, index) => value !== sourceBBytes[index]),
   "faithful source bytes must differ",
 );
