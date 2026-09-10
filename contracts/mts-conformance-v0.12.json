@@ -19,7 +19,8 @@
     "ts/test/v012-string-anum-protocol-c3a.test.ts",
     "ts/test/v012-formal-square-string-child-c4.test.ts",
     "ts/test/v012-q-compatibility-representation-c5.test.ts",
-    "ts/test/v012-formal-context-reading-c6.test.ts"
+    "ts/test/v012-formal-context-reading-c6.test.ts",
+    "ts/test/v012-ostensive-self-incidence-matching.test.ts"
   ],
   "plannedExecutableGates": [
     "C7 package and public-facade convergence evidence"
