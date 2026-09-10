@@ -55,6 +55,15 @@ function opaqueHandles(count: number): readonly LinkHandle[] {
   return Object.freeze(result);
 }
 
+function opaqueHandleFactory(): () => LinkHandle {
+  const memory = new Memory();
+  let cursor = memory.root;
+  return () => {
+    cursor = memory.ensureStartSelfClosed(cursor);
+    return cursor;
+  };
+}
+
 type RawShape = "full" | "start" | "end" | "ordinary";
 
 function rawShape(memory: ReadMemory, link: LinkHandle): RawShape {
@@ -155,6 +164,167 @@ function expectUngrounded(effect: () => unknown, message: string): void {
     return;
   }
   throw new Error(`AR0 grounded normal form: ${message}: expected UNDERGROUNDED`);
+}
+
+function formKey(form: GroundedForm): string {
+  switch (form.kind) {
+    case "root":
+      return "∞";
+    case "start":
+      return `♂(${formKey(form.end)})`;
+    case "end":
+      return `(${formKey(form.start)})♀`;
+    case "pair":
+      return `(${formKey(form.start)})⟼(${formKey(form.end)})`;
+  }
+}
+
+function formsThroughDepth(maxDepth: number): readonly GroundedForm[] {
+  const forms = new Map<string, GroundedForm>([[formKey(ROOT_FORM), ROOT_FORM]]);
+  for (let depth = 1; depth <= maxDepth; depth += 1) {
+    const previous = [...forms.values()];
+    const candidates: GroundedForm[] = [ROOT_FORM];
+    for (const form of previous) {
+      candidates.push(startForm(form));
+      candidates.push(endForm(form));
+    }
+    for (const start of previous) {
+      for (const end of previous) {
+        candidates.push(linkForm(start, end));
+      }
+    }
+    for (const candidate of candidates) forms.set(formKey(candidate), candidate);
+  }
+  return Object.freeze([...forms.values()]);
+}
+
+function materializeCanonicalForm(
+  memory: Memory,
+  form: GroundedForm,
+  memo = new Map<string, LinkHandle>(),
+): LinkHandle {
+  const key = formKey(form);
+  const existing = memo.get(key);
+  if (existing !== undefined) return existing;
+
+  let result: LinkHandle;
+  switch (form.kind) {
+    case "root":
+      result = memory.root;
+      break;
+    case "start":
+      result = memory.ensureStartSelfClosed(materializeCanonicalForm(memory, form.end, memo));
+      break;
+    case "end":
+      result = memory.ensureEndSelfClosed(materializeCanonicalForm(memory, form.start, memo));
+      break;
+    case "pair":
+      result = memory.ensure(
+        materializeCanonicalForm(memory, form.start, memo),
+        materializeCanonicalForm(memory, form.end, memo),
+      );
+      break;
+  }
+  memo.set(key, result);
+  return result;
+}
+
+interface RawFormCorpus {
+  readonly memory: RawReadMemory;
+  canonical(form: GroundedForm): LinkHandle;
+  alias(form: GroundedForm): LinkHandle;
+}
+
+function materializeRawFormCorpus(forms: readonly GroundedForm[]): RawFormCorpus {
+  const next = opaqueHandleFactory();
+  const links = new Map<LinkHandle, LinkPoles>();
+  const canonicalByKey = new Map<string, LinkHandle>();
+  const aliasByKey = new Map<string, LinkHandle>();
+
+  const canonical = (form: GroundedForm): LinkHandle => {
+    const key = formKey(form);
+    const existing = canonicalByKey.get(key);
+    if (existing !== undefined) return existing;
+
+    let handle: LinkHandle;
+    switch (form.kind) {
+      case "root":
+        handle = next();
+        links.set(handle, Object.freeze({ start: handle, end: handle }));
+        break;
+      case "start": {
+        const end = canonical(form.end);
+        handle = next();
+        links.set(handle, Object.freeze({ start: handle, end }));
+        break;
+      }
+      case "end": {
+        const start = canonical(form.start);
+        handle = next();
+        links.set(handle, Object.freeze({ start, end: handle }));
+        break;
+      }
+      case "pair": {
+        const start = canonical(form.start);
+        const end = canonical(form.end);
+        handle = next();
+        links.set(handle, Object.freeze({ start, end }));
+        break;
+      }
+    }
+    canonicalByKey.set(key, handle);
+    return handle;
+  };
+
+  const root = canonical(ROOT_FORM);
+
+  // Build all canonical representatives first so aliases cannot influence them.
+  for (const form of forms) canonical(form);
+
+  const alias = (form: GroundedForm): LinkHandle => {
+    const key = formKey(form);
+    const existing = aliasByKey.get(key);
+    if (existing !== undefined) return existing;
+
+    let handle: LinkHandle;
+    switch (form.kind) {
+      case "root":
+        handle = next();
+        links.set(handle, Object.freeze({ start: root, end: root }));
+        break;
+      case "start": {
+        const semanticWhole = canonical(form);
+        const endAlias = alias(form.end);
+        handle = next();
+        links.set(handle, Object.freeze({ start: semanticWhole, end: endAlias }));
+        break;
+      }
+      case "end": {
+        const startAlias = alias(form.start);
+        const semanticWhole = canonical(form);
+        handle = next();
+        links.set(handle, Object.freeze({ start: startAlias, end: semanticWhole }));
+        break;
+      }
+      case "pair": {
+        const startAlias = alias(form.start);
+        const endAlias = alias(form.end);
+        handle = next();
+        links.set(handle, Object.freeze({ start: startAlias, end: endAlias }));
+        break;
+      }
+    }
+    aliasByKey.set(key, handle);
+    return handle;
+  };
+
+  for (const form of forms) alias(form);
+
+  return Object.freeze({
+    memory: new RawReadMemory(root, links),
+    canonical,
+    alias,
+  });
 }
 
 // D1-D5 — canonical production Memory is a positive control, not the authority
@@ -291,8 +461,47 @@ assert(sameGroundedForm(normalizedNestedStartAlias, normalizedS), "D14a pair of 
 expectUngrounded(() => normalizeGroundedForm(raw, cycleA), "D15 symmetric rootless cycle");
 expectUngrounded(() => normalizeGroundedForm(raw, asymmetricA), "D16 asymmetric rootless cycle");
 
+// D17-D20 — exhaustive finite slice through depth 3. This is deliberately
+// generated from the four MTS-native form families and the same reductions,
+// not from runtime IDs. There are exactly 189 distinct normal forms at depth 3.
+{
+  const forms = formsThroughDepth(3);
+  same(forms.length, 189, "D17 finite normal-form corpus size through depth 3");
+
+  const canonicalMemory = new Memory();
+  const materialized = new Map<string, LinkHandle>();
+  const reverse = new Map<LinkHandle, string>();
+
+  for (const form of forms) {
+    const key = formKey(form);
+    const handle = materializeCanonicalForm(canonicalMemory, form, materialized);
+    const previous = reverse.get(handle);
+    assert(previous === undefined, `D18 different normal forms collide in canonical Memory: ${previous ?? "?"} = ${key}`);
+    reverse.set(handle, key);
+
+    const roundTrip = normalizeGroundedForm(canonicalMemory, handle);
+    assert(sameGroundedForm(roundTrip, form), `D19 canonical form roundtrip failed: ${key}`);
+  }
+  same(reverse.size, forms.length, "D18 canonical Memory is injective over finite normal forms");
+
+  const rawCorpus = materializeRawFormCorpus(forms);
+  for (const form of forms) {
+    const key = formKey(form);
+    const canonicalHandle = rawCorpus.canonical(form);
+    const aliasHandle = rawCorpus.alias(form);
+    assert(canonicalHandle !== aliasHandle, `D20 alias must be physically distinct: ${key}`);
+    same(rawShape(rawCorpus.memory, aliasHandle), "ordinary", `D20 alias is deliberately ordinary carrier: ${key}`);
+
+    const canonicalForm = normalizeGroundedForm(rawCorpus.memory, canonicalHandle);
+    const aliasForm = normalizeGroundedForm(rawCorpus.memory, aliasHandle);
+    assert(sameGroundedForm(canonicalForm, form), `D20 canonical raw representative changed meaning: ${key}`);
+    assert(sameGroundedForm(aliasForm, form), `D20 physical alias failed semantic collapse: ${key}`);
+  }
+  assert(rawCorpus.memory.polesCalls > 0, "D20 exhaustive raw corpus used pole evidence");
+}
+
 // RawReadMemory throws on discovery APIs. Reaching this line proves the whole
 // matrix used only root/linkCount/poles and no find/outgoing/incoming scan.
 assert(raw.polesCalls > 0, "normalization inspected finite pole evidence");
 
-console.log("MTS AR0 grounded-form normalization: D1-D16 GREEN");
+console.log("MTS AR0 grounded-form normalization: D1-D20 GREEN");
