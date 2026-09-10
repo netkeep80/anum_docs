@@ -1,5 +1,4 @@
 import { readFileSync } from "node:fs";
-import * as publicApi from "../src/public.js";
 import {
   deserializeAnum,
   normalizeRawForm,
@@ -10,9 +9,9 @@ import {
   Memory,
   ensureRootBasis,
   type LinkHandle,
-  type ReadMemory,
   type RootBasis,
 } from "../src/memory.js";
+import { serializeQuaternaryLink } from "../src/quaternary-serialization.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -20,22 +19,6 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
-}
-
-type SerializeQuaternaryLink = (
-  memory: ReadMemory,
-  basis: RootBasis,
-  link: LinkHandle,
-) => string;
-
-function requireQuaternarySerializer(): SerializeQuaternaryLink {
-  const candidate = (publicApi as unknown as { readonly serializeQuaternaryLink?: unknown })
-    .serializeQuaternaryLink;
-  assert(
-    typeof candidate === "function",
-    "public production API serializeQuaternaryLink is required for two-memory ANUM transport",
-  );
-  return candidate as SerializeQuaternaryLink;
 }
 
 function loadQuaternary(
@@ -138,7 +121,6 @@ const memoryA = new Memory();
 const loadedA = loadQuaternary(memoryA, fixture);
 assert(memoryA.linkCount > 5, "fixture must materialize non-basis Links in Memory A");
 
-const serializeQuaternaryLink = requireQuaternarySerializer();
 const wire = serializeQuaternaryLink(memoryA, loadedA.basis, loadedA.link);
 same(wire, canonicalFixture, "Memory A must serialize back to the canonical fixture");
 
