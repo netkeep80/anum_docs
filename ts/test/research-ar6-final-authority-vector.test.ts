@@ -157,14 +157,18 @@ function verify(
   requireRevisionMember(memory, authority.supportRevision, evidence.use, "Use support");
 
   const useShape = memory.poles(evidence.use);
-  if (useShape.start !== evidence.use) {
-    throw new FinalAuthorityError("Use does not preserve ostensive start-self-closure");
+  if (useShape.start !== evidence.use || useShape.end === evidence.use) {
+    throw new FinalAuthorityError("Use must be exact start-self-closure, not full self-closure");
   }
   const boundEnd = readBinding(memory, authority.context, useShape.end);
 
   const target = memory.poles(evidence.target);
-  if (target.start !== evidence.target || target.end !== boundEnd) {
-    throw new FinalAuthorityError("candidate target violates selected ostensive Use under K");
+  if (
+    target.start !== evidence.target ||
+    target.end !== boundEnd ||
+    target.end === evidence.target
+  ) {
+    throw new FinalAuthorityError("candidate target violates exact one-pole ostensive Use under K");
   }
 
   if (memory.linkCount !== before) throw new FinalAuthorityError("trusted replay wrote to Memory");
@@ -201,7 +205,7 @@ assert(
 // Printed '[' is a source lexeme here, not the semantic root abit by spelling.
 assert(entry !== basis.O && entry !== basis.C && entry !== basis.L && entry !== basis.U, "F07 source Entry must not collapse to a root abit by glyph spelling");
 
-// Use is the ordinary Link shape ♂E: its start is itself and its end is a role.
+// Use is the exact one-pole Link shape ♂E: start=self, end=role, end!=self.
 const use = memory.ensureStartSelfClosed(role);
 const useFact = memory.ensure(entry, use);
 const grammar = defineExactRevision(memory, [useFact]);
@@ -295,7 +299,8 @@ expectRejected(
   "same lossy denotation/Entry/Use cannot replace selected faithful source",
 );
 
-// F01: same exact source and unchanged authority, wrong well-formed target R.
+// F01: same exact source and unchanged authority, wrong well-formed full
+// self-closure R must not masquerade as the requested exact one-pole ♂R form.
 expectRejected(
   () => verify(memory, authority, Object.freeze({ ...good, target: basis.R })),
   "wrong well-formed target must fail under unchanged authority",
@@ -345,7 +350,7 @@ const classification = Object.freeze({
   sourceIsIndependentAuthorityCoordinate: true,
   sourceIdentityIsNotLossyQDenotation: true,
   sourceIdentityIsNotEntryIdentity: true,
-  ostensiveUsePreservesSelfIncidence: true,
+  exactOnePoleUseExcludesFullSelfClosure: true,
   fixedGrammarTheorySupportAndContextAreExplicit: true,
   ambientDiscoveryAuthority: "NONE" as const,
   trustedReplay: "POLE_ONLY_READ_ONLY" as const,
