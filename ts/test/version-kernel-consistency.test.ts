@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -28,11 +28,43 @@ interface ConformanceBoundary {
   readonly plannedExecutableGates?: readonly string[];
 }
 
+interface KernelEvidenceGate {
+  readonly path: string;
+  readonly requiredFrom: readonly [number, number];
+}
+
 const repoRoot = resolve(process.cwd(), "..");
 const packageJson = JSON.parse(readFileSync(join(repoRoot, "ts/package.json"), "utf8")) as {
   readonly name?: string;
 };
 assert(packageJson.name === "@mts/core", "working semantic kernel package must be @mts/core");
+
+function parseVersion(version: string): readonly [number, number] {
+  const match = /^(\d+)\.(\d+)$/.exec(version);
+  assert(match !== null, `unsupported version syntax: ${version}`);
+  return [Number(match[1]), Number(match[2])];
+}
+
+function versionAtLeast(actual: readonly [number, number], required: readonly [number, number]): boolean {
+  return actual[0] > required[0] || (actual[0] === required[0] && actual[1] >= required[1]);
+}
+
+function kernelEvidenceGates(): readonly KernelEvidenceGate[] {
+  const directory = join(repoRoot, "ts/test");
+  const marker = /\/\/ mts-version-evidence: required-from=(\d+\.\d+)/;
+  const result: KernelEvidenceGate[] = [];
+  for (const name of readdirSync(directory).sort()) {
+    if (!name.endsWith(".test.ts")) continue;
+    const source = readFileSync(join(directory, name), "utf8");
+    const match = marker.exec(source);
+    if (match === null) continue;
+    result.push(Object.freeze({
+      path: `ts/test/${name}`,
+      requiredFrom: parseVersion(match[1]),
+    }));
+  }
+  return Object.freeze(result);
+}
 
 function loadVersion(version: string): {
   readonly contract: ContractBoundary;
@@ -47,8 +79,20 @@ function loadVersion(version: string): {
   return { contract, conformance };
 }
 
+function verifyDeclaredGateRunsOnKernel(version: string, gate: string): void {
+  assert(gate.startsWith("ts/test/"), `${version}: executable gate must be a real kernel test: ${gate}`);
+  const absolute = join(repoRoot, gate);
+  assert(existsSync(absolute), `${version}: declared executable gate does not exist: ${gate}`);
+  const source = readFileSync(absolute, "utf8");
+  assert(
+    source.includes("../src/") || source.includes("@mts/core"),
+    `${version}: declared gate must execute the real MTS kernel rather than paper-only assertions: ${gate}`,
+  );
+}
+
 function verifyKernelBackedVersion(version: string): void {
   const { contract, conformance } = loadVersion(version);
+  const parsedVersion = parseVersion(version);
   const contractId = `mts-contract/v${version}`;
   const conformanceId = `mts-conformance/v${version}`;
 
@@ -60,12 +104,23 @@ function verifyKernelBackedVersion(version: string): void {
 
   const gates = conformance.requiredExecutableGates ?? [];
   assert(gates.length > 0, `${version}: paper conformance cannot exist without executable kernel gates`);
-  for (const gate of gates) {
-    assert(gate.startsWith("ts/test/"), `${version}: executable gate must be a real kernel test: ${gate}`);
-    assert(existsSync(join(repoRoot, gate)), `${version}: declared executable gate does not exist: ${gate}`);
+  for (const gate of gates) verifyDeclaredGateRunsOnKernel(version, gate);
+
+  const requiredKernelEvidence = kernelEvidenceGates()
+    .filter((gate) => versionAtLeast(parsedVersion, gate.requiredFrom))
+    .map((gate) => gate.path);
+  const missingKernelEvidence = requiredKernelEvidence.filter((gate) => !gates.includes(gate));
+
+  if (missingKernelEvidence.length > 0) {
+    assert(contract.acceptanceReady !== true, `${version}: paper contract cannot become ready before kernel evidence is projected: ${missingKernelEvidence.join(", ")}`);
+    assert(contract.accepted !== true, `${version}: paper contract cannot become accepted before kernel evidence is projected: ${missingKernelEvidence.join(", ")}`);
+    assert(conformance.acceptanceReady !== true, `${version}: conformance cannot become ready while kernel evidence is missing: ${missingKernelEvidence.join(", ")}`);
+    assert(conformance.accepted !== true, `${version}: conformance cannot become accepted while kernel evidence is missing: ${missingKernelEvidence.join(", ")}`);
+    assert(conformance.coverageState !== "complete", `${version}: conformance cannot claim complete coverage while kernel evidence is missing`);
   }
 
   if (contract.acceptanceReady === true || contract.accepted === true) {
+    assert(missingKernelEvidence.length === 0, `${version}: ready/accepted version must include every required kernel evidence gate`);
     assert(contract.implementation?.implementationComplete === true, `${version}: ready/accepted contract requires a complete kernel implementation`);
     assert(conformance.acceptanceReady === true, `${version}: ready/accepted contract requires ready conformance`);
     assert(conformance.coverageState === "complete", `${version}: ready/accepted contract requires complete executable coverage`);
@@ -80,13 +135,3 @@ function verifyKernelBackedVersion(version: string): void {
 
 verifyKernelBackedVersion("0.11");
 verifyKernelBackedVersion("0.12");
-
-// The first fixture-first transport capability was merged into the real kernel
-// before the paper candidate is updated. From now on the paper projection must
-// follow that executable evidence rather than predeclare behavior ahead of it.
-const qTransportGate = "ts/test/anum-two-memory-conformance.test.ts";
-const candidate = loadVersion("0.12");
-assert(
-  candidate.conformance.requiredExecutableGates?.includes(qTransportGate) === true,
-  "v0.12 conformance must derive the already-GREEN two-memory Q kernel evidence",
-);
