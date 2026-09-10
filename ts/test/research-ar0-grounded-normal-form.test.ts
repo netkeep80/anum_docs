@@ -392,36 +392,21 @@ assert(
 // Deliberately noncanonical physical carrier. Duplicate rows are legal here so
 // the experiment cannot inherit semantic identity from Memory.byPair.
 const raw = new RawReadMemory(r, new Map<LinkHandle, LinkPoles>([
-  // D6-D7: two different physical ways to present the same semantic ∞.
   [r, Object.freeze({ start: r, end: r })],
   [rFullAlias, Object.freeze({ start: rFullAlias, end: rFullAlias })],
   [rrPairAlias, Object.freeze({ start: r, end: r })],
-
-  // D8-D9: S=S⟼R = ♂∞ and a second physical row S⟼R.
   [s, Object.freeze({ start: s, end: r })],
   [sPairAlias, Object.freeze({ start: s, end: r })],
-
-  // D10-D11: E=R⟼E = ∞♀ and a second physical row R⟼E.
   [e, Object.freeze({ start: r, end: e })],
   [ePairAlias, Object.freeze({ start: r, end: e })],
-
-  // D12-D14: ordinary pair, duplicate, pole-swapped pair and nested aliases.
   [p, Object.freeze({ start: s, end: e })],
   [pAlias, Object.freeze({ start: sPairAlias, end: ePairAlias })],
   [swapped, Object.freeze({ start: e, end: s })],
   [nested, Object.freeze({ start: p, end: s })],
   [nestedAlias, Object.freeze({ start: pAlias, end: sPairAlias })],
-
-  // A physical pair whose start/end are themselves only aliases of ♂∞ and ∞.
-  // It must still reduce to ♂∞ after recursive semantic normalization.
   [nestedStartAlias, Object.freeze({ start: sPairAlias, end: rrPairAlias })],
-
-  // D15: symmetric rootless mutual recursion remains UNDERGROUNDED.
   [cycleA, Object.freeze({ start: cycleB, end: r })],
   [cycleB, Object.freeze({ start: cycleA, end: r })],
-
-  // D16: orientation-asymmetric rootless mutual recursion also remains
-  // UNDERGROUNDED; global rigidity must not manufacture semantic identity.
   [asymmetricA, Object.freeze({ start: asymmetricB, end: r })],
   [asymmetricB, Object.freeze({ start: r, end: asymmetricA })],
 ]));
@@ -461,9 +446,7 @@ assert(sameGroundedForm(normalizedNestedStartAlias, normalizedS), "D14a pair of 
 expectUngrounded(() => normalizeGroundedForm(raw, cycleA), "D15 symmetric rootless cycle");
 expectUngrounded(() => normalizeGroundedForm(raw, asymmetricA), "D16 asymmetric rootless cycle");
 
-// D17-D20 — exhaustive finite slice through depth 3. This is deliberately
-// generated from the four MTS-native form families and the same reductions,
-// not from runtime IDs. There are exactly 189 distinct normal forms at depth 3.
+// D17-D20 — exhaustive finite slice through depth 3.
 {
   const forms = formsThroughDepth(3);
   same(forms.length, 189, "D17 finite normal-form corpus size through depth 3");
@@ -500,8 +483,80 @@ expectUngrounded(() => normalizeGroundedForm(raw, asymmetricA), "D16 asymmetric 
   assert(rawCorpus.memory.polesCalls > 0, "D20 exhaustive raw corpus used pole evidence");
 }
 
-// RawReadMemory throws on discovery APIs. Reaching this line proves the whole
-// matrix used only root/linkCount/poles and no find/outgoing/incoming scan.
+// D21-D25 — the production Memory constructors themselves must implement the
+// same canonical reductions. The oracle only checks their semantic result.
+{
+  const forms = formsThroughDepth(3);
+  const memoryA = new Memory();
+  const memoA = new Map<string, LinkHandle>();
+
+  for (const form of forms) materializeCanonicalForm(memoryA, form, memoA);
+  same(memoryA.linkCount, forms.length, "D21 production Memory has exactly one Link per normal form");
+  same(memoryA.ensure(memoryA.root, memoryA.root), memoryA.root, "D21 ∞⟼∞ reuses ∞");
+
+  for (const form of forms) {
+    const key = formKey(form);
+    const whole = memoA.get(key);
+    assert(whole !== undefined, `D22-D24 materialized whole missing: ${key}`);
+
+    switch (form.kind) {
+      case "root":
+        same(memoryA.ensureRoot(), whole, `D22 root constructor is stable: ${key}`);
+        break;
+      case "start": {
+        const end = memoA.get(formKey(form.end));
+        assert(end !== undefined, `D22 ♂ end missing: ${key}`);
+        same(memoryA.ensureStartSelfClosed(end), whole, `D22 ♂F constructor is stable: ${key}`);
+        same(memoryA.ensure(whole, end), whole, `D22 (♂F)⟼F reuses ♂F: ${key}`);
+        break;
+      }
+      case "end": {
+        const start = memoA.get(formKey(form.start));
+        assert(start !== undefined, `D23 F♀ start missing: ${key}`);
+        same(memoryA.ensureEndSelfClosed(start), whole, `D23 F♀ constructor is stable: ${key}`);
+        same(memoryA.ensure(start, whole), whole, `D23 F⟼(F♀) reuses F♀: ${key}`);
+        break;
+      }
+      case "pair": {
+        const start = memoA.get(formKey(form.start));
+        const end = memoA.get(formKey(form.end));
+        assert(start !== undefined && end !== undefined, `D24 pair poles missing: ${key}`);
+        same(memoryA.ensure(start, end), whole, `D24 F⟼G constructor is stable: ${key}`);
+        break;
+      }
+    }
+  }
+  same(memoryA.linkCount, forms.length, "D24 constructor replay materializes no duplicates");
+
+  // Build the same semantic universe in a second Memory with the top-level
+  // requests reversed. Runtime issuance order may differ; semantic form must not.
+  const memoryB = new Memory();
+  const memoB = new Map<string, LinkHandle>();
+  for (const form of [...forms].reverse()) materializeCanonicalForm(memoryB, form, memoB);
+  same(memoryB.linkCount, forms.length, "D25 second Memory has the same semantic cardinality");
+
+  let allocationOrderDifferences = 0;
+  for (const form of forms) {
+    const key = formKey(form);
+    const left = memoA.get(key);
+    const right = memoB.get(key);
+    assert(left !== undefined && right !== undefined, `D25 cross-memory representative missing: ${key}`);
+
+    const leftForm = normalizeGroundedForm(memoryA, left);
+    const rightForm = normalizeGroundedForm(memoryB, right);
+    assert(sameGroundedForm(leftForm, form), `D25 Memory A changed form: ${key}`);
+    assert(sameGroundedForm(rightForm, form), `D25 Memory B changed form: ${key}`);
+    assert(sameGroundedForm(leftForm, rightForm), `D25 cross-memory semantic mismatch: ${key}`);
+
+    if (memoryA.issuanceIndex(left) !== memoryB.issuanceIndex(right)) {
+      allocationOrderDifferences += 1;
+    }
+  }
+  assert(allocationOrderDifferences > 0, "D25 corpus must actually exercise different allocation orders");
+}
+
+// RawReadMemory throws on discovery APIs. Reaching this line proves the raw
+// normalization matrix used only finite pole evidence.
 assert(raw.polesCalls > 0, "normalization inspected finite pole evidence");
 
-console.log("MTS AR0 grounded-form normalization: D1-D20 GREEN");
+console.log("MTS AR0 grounded-form normalization: D1-D25 GREEN");
