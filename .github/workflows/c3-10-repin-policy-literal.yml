@@ -1,0 +1,38 @@
+name: C3.10 one-shot exact-pin policy sync
+
+on:
+  push:
+    branches:
+      - c3.10/1183-repo-guard-external-proof
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: c3.10/1183-repo-guard-external-proof
+      - name: Synchronize exact repo-guard pin literal
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('repo-policy.json')
+          text = path.read_text(encoding='utf-8')
+          old = 'netkeep80/repo-guard@f36a417a7c3a72a99c6e8c824194f96471218f73'
+          new = 'netkeep80/repo-guard@e5b9063c9d1c9e05404ec32b78ca005c278839ce'
+          count = text.count(old)
+          if count != 1:
+              raise SystemExit(f'expected exactly one old exact-pin literal, found {count}')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          PY
+          rm .github/workflows/c3-10-repin-policy-literal.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add repo-policy.json .github/workflows/c3-10-repin-policy-literal.yml
+          git commit -m 'test(repo-guard): synchronize accepted exact-pin invariant'
+          git push origin HEAD:c3.10/1183-repo-guard-external-proof
