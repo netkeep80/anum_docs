@@ -102,9 +102,10 @@ export function findRepositoryRoot(start = process.cwd()): string {
 
 export function loadCurrentProjection(root = findRepositoryRoot()): CurrentProjection {
   const policy = readJson(root, "repo-policy.json");
-  const topology = nested(policy, "contract_conformance", "repo-policy.json");
-  const current = nested(topology, "current", "repo-policy.json.contract_conformance");
-  const previous = nested(topology, "previous", "repo-policy.json.contract_conformance");
+  const packs = nested(policy, "packs", "repo-policy.json");
+  const topology = nested(packs, "contract-conformance", "repo-policy.json.packs");
+  const current = nested(topology, "current", "repo-policy.json.packs.contract-conformance");
+  const previous = nested(topology, "previous", "repo-policy.json.packs.contract-conformance");
 
   const currentContractPath = string(nested(current, "contract", "current").path, "current.contract.path");
   const currentConformancePath = string(nested(current, "conformance", "current").path, "current.conformance.path");

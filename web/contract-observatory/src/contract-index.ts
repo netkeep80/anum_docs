@@ -191,7 +191,8 @@ export function serializeContractObservatoryIndex(index: ContractObservatoryInde
 }
 
 function readPolicyPointers(policy: JsonRecord): PolicyPointers {
-  const boundary = recordField(policy, "contract_conformance", "repo-policy.json");
+  const packs = recordField(policy, "packs", "repo-policy.json");
+  const boundary = recordField(packs, "contract-conformance", "repo-policy.json.packs");
   const current = recordField(boundary, "current", "repo-policy.json");
   const previous = recordField(boundary, "previous", "repo-policy.json");
   const acceptance = recordField(boundary, "acceptance", "repo-policy.json");

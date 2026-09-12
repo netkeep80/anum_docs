@@ -106,16 +106,18 @@ function createFixture(versions = ["0.9", "0.10", "1.2", "1.10"]): Fixture {
   const previous = versions.at(-2)!;
   const acceptancePath = "cutover/acceptance.json";
   writeJson(root, "repo-policy.json", {
-    contract_conformance: {
-      current: {
-        contract: { path: `contracts/mts-contract-v${current}.json` },
-        conformance: { path: `contracts/mts-conformance-v${current}.json` },
+    packs: {
+      "contract-conformance": {
+        current: {
+          contract: { path: `contracts/mts-contract-v${current}.json` },
+          conformance: { path: `contracts/mts-conformance-v${current}.json` },
+        },
+        previous: {
+          contract: { path: `contracts/mts-contract-v${previous}.json` },
+          conformance: { path: `contracts/mts-conformance-v${previous}.json` },
+        },
+        acceptance: { document: { path: acceptancePath } },
       },
-      previous: {
-        contract: { path: `contracts/mts-contract-v${previous}.json` },
-        conformance: { path: `contracts/mts-conformance-v${previous}.json` },
-      },
-      acceptance: { document: { path: acceptancePath } },
     },
   });
   writeJson(root, acceptancePath, {
@@ -209,10 +211,12 @@ fixtureCase(({ root }) => {
 });
 fixtureCase(({ root }) => {
   overwrite(root, "repo-policy.json", {
-    contract_conformance: {
-      current: { contract: { path: "contracts/missing.json" }, conformance: { path: "contracts/mts-conformance-v1.10.json" } },
-      previous: { contract: { path: "contracts/mts-contract-v1.2.json" }, conformance: { path: "contracts/mts-conformance-v1.2.json" } },
-      acceptance: { document: { path: "cutover/acceptance.json" } },
+    packs: {
+      "contract-conformance": {
+        current: { contract: { path: "contracts/missing.json" }, conformance: { path: "contracts/mts-conformance-v1.10.json" } },
+        previous: { contract: { path: "contracts/mts-contract-v1.2.json" }, conformance: { path: "contracts/mts-conformance-v1.2.json" } },
+        acceptance: { document: { path: "cutover/acceptance.json" } },
+      },
     },
   });
   expectCode(() => buildContractObservatoryIndex(root), "policy-path-missing", "policy points outside discovered pairs");
