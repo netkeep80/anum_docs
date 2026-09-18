@@ -381,6 +381,43 @@ class ReadOnlyProbe implements ReadMemory {
     "interpreter-mismatch",
     () => replayStructuralRule(new ReadOnlyProbe(memory), wrongTheoryReplay),
   );
+
+  // Independent evidence-boundary falsifier: the already verified Rule evidence
+  // must keep its old verdict when unrelated later data is attached to the same
+  // mutable Act. Current ambient outgoing(act) must not silently redefine the
+  // evidence that was selected earlier.
+  const lateUse = refs[9]!;
+  assert(lateUse !== selectedUse, "late conflicting Use differs from selected Use");
+  defineActField(memory, act, sourceUseRole, lateUse);
+  const beforeOldEvidenceReplay = memory.linkCount;
+  let oldEvidenceReplay: ReturnType<typeof replayV012StructuralRuleAgainstTheoryAuthority> | undefined;
+  let oldEvidenceError: unknown;
+  try {
+    oldEvidenceReplay = replayV012StructuralRuleAgainstTheoryAuthority(
+      new ReadOnlyProbe(memory),
+      correctReplay,
+      fixedTheoryAuthority,
+    );
+  } catch (error) {
+    oldEvidenceError = error;
+  }
+  assert(
+    oldEvidenceError === undefined,
+    `later Act mutation must not change old selected evidence verdict: ${String(
+      oldEvidenceError instanceof StructuralRuleError ? oldEvidenceError.code : oldEvidenceError,
+    )}`,
+  );
+  assert(oldEvidenceReplay !== undefined, "old selected evidence still replays");
+  const oldUseBinding = oldEvidenceReplay.bindings.find(
+    (binding) => binding.role === sourceUseRole,
+  );
+  assert(oldUseBinding !== undefined, "old replay preserves source-Use binding");
+  same(oldUseBinding.value, selectedUse, "old replay preserves originally selected Use");
+  same(
+    memory.linkCount,
+    beforeOldEvidenceReplay,
+    "old selected evidence replay after ambient Act mutation is read-only",
+  );
 }
 
 console.log("MTS v0.12 FORMAL exact source -> fixed authority -> result witness: GREEN.");
