@@ -16,11 +16,21 @@ const conformance = JSON.parse(
   readonly requiredExecutableGates?: readonly string[];
 };
 
-const gate = "ts/test/v012-ostensive-self-incidence-matching.test.ts";
-assert(
-  conformance.requiredExecutableGates?.includes(gate) === true,
-  `merged mandatory kernel evidence is not projected into requiredExecutableGates: ${gate}`,
-);
+const gates = [
+  "ts/test/v012-ostensive-self-incidence-matching.test.ts",
+  "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+  "ts/test/v012-string-q-byte-bridge.test.ts",
+  "ts/test/v012-string-utf8-boundary.test.ts",
+  "ts/test/v012-formal-source-result-witness.test.ts",
+  "ts/test/v012-quaternary-root-basis-boundary.test.ts",
+] as const;
+
+for (const gate of gates) {
+  assert(
+    conformance.requiredExecutableGates?.includes(gate) === true,
+    `merged mandatory kernel evidence is not projected into requiredExecutableGates: ${gate}`,
+  );
+}
 
 // Consuming a real kernel gate does not itself promote the candidate lifecycle.
 assert(conformance.status === "candidate", "v0.12 must remain candidate");
