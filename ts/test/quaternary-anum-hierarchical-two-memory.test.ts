@@ -281,4 +281,39 @@ for (const fixture of fixtures) {
   );
 }
 
+// Capability boundary: materializing an exact Anum/address must not
+// materialize the semantic Link addressed by that Anum.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  const address = materializeQuaternaryAnum(memory, basis, "01[10]");
+
+  assert(
+    address.anumLink !== basis.R,
+    "address materialization creates a non-root exact Anum",
+  );
+  same(
+    memory.find(basis.U, basis.L),
+    undefined,
+    "address materialization does not create semantic B01",
+  );
+  same(
+    memory.find(basis.L, basis.U),
+    undefined,
+    "address materialization does not create semantic B10",
+  );
+
+  const beforeResolve = memory.linkCount;
+  same(
+    resolveQuaternaryAnum(memory, basis, address),
+    undefined,
+    "understood/materialized address remains NOT_FOUND without target materialization",
+  );
+  same(
+    memory.linkCount,
+    beforeResolve,
+    "NOT_FOUND Resolve stays read-only after address materialization",
+  );
+}
+
 console.log("Hierarchical Quaternary Anum two-memory transport: GREEN.");
