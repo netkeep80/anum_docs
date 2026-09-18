@@ -141,6 +141,47 @@ const fixtures: readonly FixtureExpectation[] = Object.freeze([
       );
     },
   },
+  {
+    path: "../examples/anum/conformance/q-hierarchical-adjacent-bytes.anum",
+    canonical: "[01001101][01010100]",
+    verifyA(memory, materialized): void {
+      const basis = ensureRootBasis(memory);
+      assert(
+        materialized.items.length === 2,
+        "adjacent bytes remain two root-level hierarchical items",
+      );
+      const first = materialized.items[0];
+      const second = materialized.items[1];
+      assert(first?.kind === "child", "first adjacent byte remains one child Anum");
+      assert(second?.kind === "child", "second adjacent byte remains one child Anum");
+      assert(first.anum.items.length === 8, "first byte keeps its own 8-bit boundary");
+      assert(second.anum.items.length === 8, "second byte keeps its own 8-bit boundary");
+      assert(
+        first.anum.anumLink !== second.anum.anumLink,
+        "different byte payloads remain different exact child Anum Links",
+      );
+
+      const firstStep = memory.find(basis.R, first.anum.anumLink);
+      assert(firstStep !== undefined, "parent has exact first grouped-byte edge");
+      same(
+        memory.find(firstStep, second.anum.anumLink),
+        materialized.anumLink,
+        "parent exact topology is a two-item chain of grouped byte Anums",
+      );
+
+      const before = memory.linkCount;
+      same(
+        resolveQuaternaryAnum(memory, basis, materialized),
+        undefined,
+        "adjacent grouped-byte address stays not-found without target materialization",
+      );
+      same(
+        memory.linkCount,
+        before,
+        "adjacent grouped-byte Resolve stays read-only",
+      );
+    },
+  },
 ]);
 
 for (const fixture of fixtures) {
