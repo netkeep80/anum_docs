@@ -283,6 +283,32 @@ function verifySelectedTheoryAuthority(
   }
 }
 
+/**
+ * Verify one explicitly selected Theory admission against an independently
+ * fixed exact Theory artifact.
+ *
+ * This deliberately checks only the selected admission. Ambient additions to
+ * the live Theory after the artifact was fixed do not retroactively invalidate
+ * an older authorized selection; an unselected later Link has no authority.
+ */
+export function verifySelectedTheoryAdmissionAuthority(
+  memory: ReadMemory,
+  theory: LinkHandle,
+  admission: LinkHandle,
+  expectedTheoryArtifact: unknown,
+): void {
+  const expected = replayPortableStructuralTheory(expectedTheoryArtifact);
+  if (linkFingerprint(memory, theory) !== linkFingerprint(expected.memory, expected.theory)) {
+    fail("proof-theory-mismatch");
+  }
+
+  const selected = linkFingerprint(memory, admission);
+  const admitted = new Set(
+    expected.memory.outgoing(expected.theory).map((link) => linkFingerprint(expected.memory, link)),
+  );
+  if (!admitted.has(selected)) fail("proof-theory-mismatch");
+}
+
 export async function verifyPortableStructuralProofTheoryRevision(
   proofArtifact: unknown,
   expectedTheoryArtifact: unknown,
