@@ -383,6 +383,10 @@ export function materializeQuaternaryAnumTarget(
   basis: RootBasis,
   value: QuaternaryAnumHierarchy,
 ): LinkHandle {
+  // Validate the complete exact hierarchy before the first target-side write.
+  // serializeHierarchy is read-only and already enforces every represented
+  // edge, value/abit correspondence, child hierarchy and final anumLink.
+  serializeHierarchy(memory, basis, value, new Set());
   return materializeTargetHierarchy(memory, basis, value);
 }
 
