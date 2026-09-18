@@ -254,6 +254,13 @@ export function verifyRootBasis(
       throw new MemoryError("invalid root basis");
     }
 
+    // O and C are proper ostensive self-closures relative to R. This
+    // properness belongs to RootBasis roles only; ordinary Links may still
+    // collapse when their semantic ordered pair is R -> R.
+    if (O === R || C === R) {
+      throw new MemoryError("invalid root basis");
+    }
+
     const root = memory.poles(R);
     const open = memory.poles(O);
     const close = memory.poles(C);
