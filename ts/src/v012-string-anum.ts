@@ -5,6 +5,7 @@ import {
 } from "./byte-carrier.js";
 import {
   MemoryError,
+  verifyRootBasis,
   type LinkHandle,
   type ReadMemory,
   type RootBasis,
@@ -39,6 +40,32 @@ function invalidByte(): never {
   throw new V012StringAnumError("not-v012-string-byte-anum");
 }
 
+function invalidString(): never {
+  throw new V012StringAnumError("not-v012-string-anum");
+}
+
+function requireByteRootBasis(
+  memory: ReadMemory,
+  basis: RootBasis,
+): RootBasis {
+  try {
+    return verifyRootBasis(memory, basis);
+  } catch {
+    return invalidByte();
+  }
+}
+
+function requireStringRootBasis(
+  memory: ReadMemory,
+  basis: RootBasis,
+): RootBasis {
+  try {
+    return verifyRootBasis(memory, basis);
+  } catch {
+    return invalidString();
+  }
+}
+
 function bitValue(basis: RootBasis, value: LinkHandle): 0 | 1 {
   if (value === basis.U) return 0;
   if (value === basis.L) return 1;
@@ -51,7 +78,7 @@ function bitValue(basis: RootBasis, value: LinkHandle): 0 | 1 {
  * The role is valid iff exactly eight rooted steps end in L/U and the eighth
  * predecessor is R. No hierarchy witness, lookup or materialization is used.
  */
-export function readV012StringByteAnum(
+function readVerifiedV012StringByteAnum(
   memory: ReadMemory,
   basis: RootBasis,
   link: LinkHandle,
@@ -78,6 +105,18 @@ export function readV012StringByteAnum(
   return result;
 }
 
+export function readV012StringByteAnum(
+  memory: ReadMemory,
+  basis: RootBasis,
+  link: LinkHandle,
+): number {
+  return readVerifiedV012StringByteAnum(
+    memory,
+    requireByteRootBasis(memory, basis),
+    link,
+  );
+}
+
 /**
  * Read a role-selected exact v0.12 STRING Anum directly from Link topology.
  *
@@ -90,11 +129,13 @@ export function readV012StringAnum(
   basis: RootBasis,
   link: LinkHandle,
 ): ReadV012StringAnum {
-  if (link === basis.R) {
+  const verifiedBasis = requireStringRootBasis(memory, basis);
+
+  if (link === verifiedBasis.R) {
     return Object.freeze({
       bytes: new Uint8Array(),
       byteLinks: Object.freeze([]),
-      prefixes: Object.freeze([basis.R]),
+      prefixes: Object.freeze([verifiedBasis.R]),
     });
   }
 
@@ -105,7 +146,7 @@ export function readV012StringAnum(
   let current = link;
 
   try {
-    while (current !== basis.R) {
+    while (current !== verifiedBasis.R) {
       if (visited.has(current)) {
         throw new V012StringAnumError("not-v012-string-anum");
       }
@@ -116,7 +157,7 @@ export function readV012StringAnum(
       const byteLink = poles.end;
       let byte: number;
       try {
-        byte = readV012StringByteAnum(memory, basis, byteLink);
+        byte = readVerifiedV012StringByteAnum(memory, verifiedBasis, byteLink);
       } catch (error) {
         if (error instanceof V012StringAnumError) {
           throw new V012StringAnumError("not-v012-string-anum");
@@ -138,7 +179,7 @@ export function readV012StringAnum(
   return Object.freeze({
     bytes: Uint8Array.from([...reversedBytes].reverse()),
     byteLinks: Object.freeze([...reversedByteLinks].reverse()),
-    prefixes: Object.freeze([basis.R, ...[...reversedPrefixes].reverse()]),
+    prefixes: Object.freeze([verifiedBasis.R, ...[...reversedPrefixes].reverse()]),
   });
 }
 
