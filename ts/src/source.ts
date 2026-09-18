@@ -38,6 +38,12 @@ export interface SourceContent {
   readonly prefixes: readonly LinkHandle[];
 }
 
+export type SourceContentReader = (
+  memory: ReadMemory,
+  basis: RootBasis,
+  content: LinkHandle,
+) => SourceContent;
+
 export interface SelectedSegmentSpec {
   readonly start: number;
   readonly end: number;
@@ -363,16 +369,17 @@ function verifyMembership(
   }
 }
 
-export function replaySelectedSourceEvidence(
+export function replaySelectedSourceEvidenceWithReader(
   memory: ReadMemory,
   evidence: SourceFrontEndEvidence,
+  readContent: SourceContentReader,
 ): readonly LinkHandle[] {
   const before = memory.linkCount;
   const content = readSourceForm(memory, evidence.source);
   if (content !== evidence.content) {
     throw new SourceError("invalid-source-evidence");
   }
-  const sourceContent = readSourceContent(memory, evidence.basis, evidence.content);
+  const sourceContent = readContent(memory, evidence.basis, evidence.content);
   validatePartition(sourceContent.bytes.length, evidence.segments);
 
   const forms: LinkHandle[] = [];
@@ -384,7 +391,7 @@ export function replaySelectedSourceEvidence(
       throw new SourceError("invalid-source-evidence");
     }
 
-    const slice = readSourceContent(memory, evidence.basis, segment.sliceContent);
+    const slice = readContent(memory, evidence.basis, segment.sliceContent);
     if (!sameBytes(slice.bytes, sourceContent.bytes.slice(segment.start, segment.end))) {
       throw new SourceError("invalid-source-evidence");
     }
@@ -456,6 +463,17 @@ export function replaySelectedSourceEvidence(
     throw new SourceError("invalid-source-evidence");
   }
   return Object.freeze(forms);
+}
+
+export function replaySelectedSourceEvidence(
+  memory: ReadMemory,
+  evidence: SourceFrontEndEvidence,
+): readonly LinkHandle[] {
+  return replaySelectedSourceEvidenceWithReader(
+    memory,
+    evidence,
+    readSourceContent,
+  );
 }
 
 export function replaySourceSubselection(
