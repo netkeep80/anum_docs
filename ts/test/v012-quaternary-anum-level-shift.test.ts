@@ -156,7 +156,12 @@ function expectProtocolError(
   expectProtocolError(
     () => materializeQuaternaryAnum(memory, basis, "]["),
     "trailing-after-root-close",
-    "source after root close is rejected",
+    "structural source after root close is rejected",
+  );
+  expectProtocolError(
+    () => materializeQuaternaryAnum(memory, basis, "]01"),
+    "trailing-after-root-close",
+    "data source after root close is rejected",
   );
 }
 
