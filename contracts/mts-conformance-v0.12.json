@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; C2 executable old-vs-new falsification is RED-confirmed and bound as evidence; C3 authoritative STRING nested-Anum runtime is GREEN-confirmed and bound as evidence; C4 FORMAL square-bracket I_STRING cutover is GREEN-confirmed and bound as evidence; C5 Q compatibility and representation/interpretation separation are GREEN-confirmed and bound as evidence; C6 FORMAL parentheses, explicit-K and left-reading convergence are GREEN-confirmed and bound as evidence without production runtime delta; C7 package/public-facade convergence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
+  "coverageStateMeaning": "C1-C6 retained candidate evidence remains executable; the completed #1167 foundation reconciliation is now projected through mandatory hierarchical Q, v0.12 STRING/Q byte identity, strict UTF-8 boundary, exact source-to-FORMAL-result authority, RootBasis fail-closed, and ostensive self-incidence kernel gates. C7 package/public-facade convergence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.11",
     "conformance": "mts-conformance/v0.11"
@@ -20,7 +20,12 @@
     "ts/test/v012-formal-square-string-child-c4.test.ts",
     "ts/test/v012-q-compatibility-representation-c5.test.ts",
     "ts/test/v012-formal-context-reading-c6.test.ts",
-    "ts/test/v012-ostensive-self-incidence-matching.test.ts"
+    "ts/test/v012-ostensive-self-incidence-matching.test.ts",
+    "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+    "ts/test/v012-string-q-byte-bridge.test.ts",
+    "ts/test/v012-string-utf8-boundary.test.ts",
+    "ts/test/v012-formal-source-result-witness.test.ts",
+    "ts/test/v012-quaternary-root-basis-boundary.test.ts"
   ],
   "plannedExecutableGates": [
     "C7 package and public-facade convergence evidence"
@@ -91,7 +96,12 @@
   ],
   "retainedAcceptedEvidence": {
     "semanticBase": "mts-contract/v0.11",
-    "qAlphabet": ["[", "]", "1", "0"],
+    "qAlphabet": [
+      "[",
+      "]",
+      "1",
+      "0"
+    ],
     "stringToQByteEnvelope": "[bbbbbbbb]",
     "representationEqualsInterpretation": false,
     "contextAuthority": "explicit structural evidence; no ambient runtime current or host stack"
@@ -290,7 +300,13 @@
     "publicFacadeC7": "next",
     "documentationC8": "not-complete",
     "readinessC9": "blocked",
-    "acceptanceC10": "blocked"
+    "acceptanceC10": "blocked",
+    "foundationReconciliation": "green-complete",
+    "hierarchicalQuaternaryAnum": "green-confirmed",
+    "v012StringHierarchy": "green-confirmed",
+    "strictUtf8Boundary": "green-confirmed",
+    "sourceToFormalResultAuthority": "green-confirmed",
+    "rootBasisVerification": "green-confirmed"
   },
   "implementationSlices": {
     "candidateBoundary": {
