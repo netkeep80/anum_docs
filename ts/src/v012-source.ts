@@ -1,11 +1,5 @@
 import {
-  DictionaryError,
-  verifyVisibleDictionaryOccurrence,
-} from "./dictionary.js";
-import {
-  ExactSequenceError,
   materializeExactSequence,
-  readExactSequence,
 } from "./exact-sequence.js";
 import {
   MemoryError,
@@ -15,12 +9,9 @@ import {
   type WriteMemory,
 } from "./memory.js";
 import {
-  RootedSequenceError,
-  readRootedSequence,
-} from "./rooted-sequence.js";
-import {
   SourceError,
   readSourceForm,
+  replaySelectedSourceEvidenceWithReader,
   type SelectedSegmentEvidence,
   type SelectedSegmentSpec,
   type SourceFrontEndEvidence,
@@ -185,198 +176,24 @@ export function buildV012SelectedSourceEvidence(
   });
 }
 
-function sameBytes(left: Uint8Array, right: Uint8Array): boolean {
-  return left.length === right.length &&
-    left.every((value, index) => value === right[index]);
-}
-
-function verifyFold(
-  memory: ReadMemory,
-  final: LinkHandle,
-  values: readonly LinkHandle[],
-): void {
-  try {
-    const sequence = readRootedSequence(memory, final);
-    if (
-      sequence.values.length !== values.length ||
-      sequence.values.some((value, index) => value !== values[index])
-    ) {
-      throw new SourceError("invalid-source-evidence");
-    }
-  } catch (error) {
-    if (error instanceof SourceError) throw error;
-    if (error instanceof RootedSequenceError || error instanceof MemoryError) {
-      throw new SourceError("invalid-source-evidence");
-    }
-    throw error;
-  }
-}
-
-function verifyExactSequence(
-  memory: ReadMemory,
-  final: LinkHandle,
-  values: readonly LinkHandle[],
-): void {
-  try {
-    const sequence = readExactSequence(memory, final);
-    if (
-      sequence.values.length !== values.length ||
-      sequence.values.some((value, index) => value !== values[index])
-    ) {
-      throw new SourceError("invalid-source-evidence");
-    }
-  } catch (error) {
-    if (error instanceof SourceError) throw error;
-    if (error instanceof ExactSequenceError || error instanceof MemoryError) {
-      throw new SourceError("invalid-source-evidence");
-    }
-    throw error;
-  }
-}
-
-function verifyMembership(
-  memory: ReadMemory,
-  membership: LinkHandle,
-  container: LinkHandle,
-  value: LinkHandle,
-): void {
-  try {
-    const link = memory.poles(membership);
-    if (link.start !== container || link.end !== value) {
-      throw new SourceError("invalid-admission-evidence");
-    }
-  } catch (error) {
-    if (error instanceof SourceError) throw error;
-    throw new SourceError("invalid-admission-evidence");
-  }
-}
-
-/**
- * Small read-only verifier for candidate source selection over exact v0.12
- * STRING content. It verifies the fixed dictionary and Grammar/Theory authority
- * carried by evidence; it never discovers or materializes replacement authority.
- */
 export function replayV012SelectedSourceEvidence(
   memory: ReadMemory,
   basis: RootBasis,
   evidence: SourceFrontEndEvidence,
 ): readonly LinkHandle[] {
-  const before = memory.linkCount;
-
-  try {
-    const content = readSourceForm(memory, evidence.source);
-    if (content !== evidence.content) {
-      throw new SourceError("invalid-source-evidence");
-    }
-
-    const sourceContent = readV012SourceContent(memory, basis, evidence.content);
-    validatePartition(sourceContent.bytes.length, evidence.segments);
-
-    const forms: LinkHandle[] = [];
-    const selections: LinkHandle[] = [];
-
-    for (const segment of evidence.segments) {
-      const startPrefix = sourceContent.prefixes[segment.start];
-      const endPrefix = sourceContent.prefixes[segment.end];
-      if (startPrefix === undefined || endPrefix === undefined) {
-        throw new SourceError("invalid-source-evidence");
-      }
-
-      const slice = readV012SourceContent(memory, basis, segment.sliceContent);
-      if (
-        !sameBytes(
-          slice.bytes,
-          sourceContent.bytes.slice(segment.start, segment.end),
-        )
-      ) {
-        throw new SourceError("invalid-source-evidence");
-      }
-
-      try {
-        const span = memory.poles(segment.span);
-        const sliceEvidence = memory.poles(segment.sliceEvidence);
-        const lexeme = memory.poles(segment.lexeme);
-        const resolution = memory.poles(segment.resolution);
-        if (span.start !== startPrefix || span.end !== endPrefix) {
-          throw new SourceError("invalid-source-evidence");
-        }
-        if (
-          sliceEvidence.start !== segment.span ||
-          sliceEvidence.end !== segment.sliceContent
-        ) {
-          throw new SourceError("invalid-source-evidence");
-        }
-        if (
-          lexeme.start !== evidence.source ||
-          lexeme.end !== segment.sliceEvidence
-        ) {
-          throw new SourceError("invalid-source-evidence");
-        }
-        if (
-          resolution.start !== segment.lexeme ||
-          resolution.end !== segment.form
-        ) {
-          throw new SourceError("invalid-source-evidence");
-        }
-      } catch (error) {
-        if (error instanceof SourceError) throw error;
-        throw new SourceError("invalid-source-evidence");
-      }
-
-      try {
-        verifyVisibleDictionaryOccurrence(
-          memory,
-          evidence.dictionary,
-          segment.dictionaryOccurrence,
-          segment.sliceContent,
-          segment.form,
-        );
-      } catch (error) {
-        if (error instanceof DictionaryError) {
-          throw new SourceError("invalid-dictionary-evidence");
-        }
-        throw error;
-      }
-
-      try {
-        const selection = memory.poles(segment.selection);
-        if (
-          selection.start !== segment.dictionaryOccurrence ||
-          selection.end !== segment.resolution
-        ) {
-          throw new SourceError("invalid-source-evidence");
-        }
-      } catch (error) {
-        if (error instanceof SourceError) throw error;
-        throw new SourceError("invalid-source-evidence");
-      }
-
-      forms.push(segment.form);
-      selections.push(segment.selection);
-    }
-
-    verifyFold(memory, evidence.selectionSequence, selections);
-    verifyExactSequence(memory, evidence.formSequence, forms);
-    verifyMembership(
-      memory,
-      evidence.grammarMembership,
-      evidence.grammar,
-      evidence.formSequence,
-    );
-    verifyMembership(
-      memory,
-      evidence.theoryMembership,
-      evidence.theory,
-      evidence.formSequence,
-    );
-
-    if (memory.linkCount !== before) {
-      throw new SourceError("invalid-source-evidence");
-    }
-    return Object.freeze(forms);
-  } finally {
-    if (memory.linkCount !== before) {
-      throw new SourceError("invalid-source-evidence");
-    }
+  if (
+    evidence.basis.R !== basis.R ||
+    evidence.basis.O !== basis.O ||
+    evidence.basis.C !== basis.C ||
+    evidence.basis.L !== basis.L ||
+    evidence.basis.U !== basis.U
+  ) {
+    throw new SourceError("invalid-source-content");
   }
+
+  return replaySelectedSourceEvidenceWithReader(
+    memory,
+    evidence,
+    readV012SourceContent,
+  );
 }
