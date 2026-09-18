@@ -2,6 +2,7 @@ import { Memory, ensureRootBasis, type LinkHandle } from "../src/memory.js";
 import {
   materializeQuaternaryAnum,
   materializeQuaternaryAnumTarget,
+  QuaternaryAnumError,
   resolveQuaternaryAnum,
   type QuaternaryAnumHierarchy,
 } from "../src/quaternary-anum.js";
@@ -90,5 +91,33 @@ for (const source of ["", "[]"]) {
   same(memory.find(B01, A10), target, "01[[10]] creates B01 -> Anum(10)");
   same(memory.find(basis.L, basis.U), undefined, "01[[10]] must not create B10");
 }
+
+
+{
+  const { memory, basis, address } = setup("01[10]");
+  const forged: QuaternaryAnumHierarchy = Object.freeze({
+    // Keep the exact item sequence but lie about the hierarchy result Link.
+    // Validation must reject this before target-side writes become observable.
+    anumLink: basis.R,
+    items: address.items,
+  });
+
+  same(memory.find(basis.U, basis.L), undefined, "forged hierarchy starts without B01");
+  same(memory.find(basis.L, basis.U), undefined, "forged hierarchy starts without B10");
+  const before = memory.linkCount;
+  let rejected = false;
+  try {
+    materializeQuaternaryAnumTarget(memory, basis, forged);
+  } catch (error) {
+    assert(error instanceof QuaternaryAnumError, "forged hierarchy uses stable protocol error");
+    same(error.code, "invalid-anum-representation", "forged hierarchy is rejected");
+    rejected = true;
+  }
+  assert(rejected, "forged hierarchy must be rejected");
+  same(memory.linkCount, before, "invalid hierarchy must not leave target writes");
+  same(memory.find(basis.U, basis.L), undefined, "invalid hierarchy must not leave B01");
+  same(memory.find(basis.L, basis.U), undefined, "invalid hierarchy must not leave B10");
+}
+
 
 console.log("MTS v0.12 Quaternary target one-root-cut materialization: GREEN.");
