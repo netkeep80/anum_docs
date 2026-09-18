@@ -10,6 +10,7 @@ import {
 } from "./exact-sequence.js";
 import {
   ensureRootBasis,
+  verifyRootBasis,
   type LinkHandle,
   type ReadMemory,
   type RootBasis,
@@ -91,41 +92,6 @@ export class SourceError extends Error {
 
   constructor(readonly code: SourceErrorCode) {
     super(code);
-  }
-}
-
-/**
- * RootBasis is evidence, not host authority: replay verifies every defining
- * equation through poles() and never needs a 256-entry injected byte table,
- * find(), incoming(), outgoing() or materialization.
- */
-function verifyRootBasis(
-  memory: ReadMemory,
-  basis: RootBasis,
-): RootBasis {
-  try {
-    const { R, O, C, L, U } = basis;
-    if (R !== memory.root) {
-      throw new SourceError("invalid-source-content");
-    }
-    const root = memory.poles(R);
-    const open = memory.poles(O);
-    const close = memory.poles(C);
-    const one = memory.poles(L);
-    const zero = memory.poles(U);
-    if (
-      root.start !== R || root.end !== R ||
-      open.start !== O || open.end !== R ||
-      close.start !== R || close.end !== C ||
-      one.start !== O || one.end !== C ||
-      zero.start !== C || zero.end !== O
-    ) {
-      throw new SourceError("invalid-source-content");
-    }
-    return basis;
-  } catch (error) {
-    if (error instanceof SourceError) throw error;
-    throw new SourceError("invalid-source-content");
   }
 }
 
