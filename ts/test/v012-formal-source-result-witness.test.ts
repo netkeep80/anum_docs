@@ -270,6 +270,38 @@ class ReadOnlyProbe implements ReadMemory {
   );
   same(memory.linkCount, beforeWrongRule, "unadmitted Rule rejection is read-only");
 
+  // Independent authority falsifier: after Theory authority was fixed, the
+  // candidate can still synthesize the exact same T -> Rule shape with the
+  // public Memory primitive. Mere existence of that Link must not let the
+  // candidate promote its own alternate Rule into accepted authority.
+  const candidateAdmission = memory.ensure(theory, alternateRule);
+  const selfAdmittedRuleReplay: StructuralRuleReplayEvidence = Object.freeze({
+    ...correctReplay,
+    rule: alternateRule,
+    ruleAdmission: candidateAdmission,
+    claimedBody: wrongClaimedBody,
+  });
+  const beforeSelfAdmissionReplay = memory.linkCount;
+  let selfAdmissionRejected = false;
+  try {
+    replayStructuralRule(new ReadOnlyProbe(memory), selfAdmittedRuleReplay);
+  } catch (error) {
+    assert(
+      error instanceof StructuralRuleError,
+      `expected StructuralRuleError, got ${String(error)}`,
+    );
+    selfAdmissionRejected = true;
+  }
+  assert(
+    selfAdmissionRejected,
+    "candidate-created Theory -> Rule admission must not authorize its own Rule",
+  );
+  same(
+    memory.linkCount,
+    beforeSelfAdmissionReplay,
+    "candidate self-admission replay is read-only",
+  );
+
   // Even the admitted Rule cannot be used to claim a different result.
   const wrongResultReplay: StructuralRuleReplayEvidence = Object.freeze({
     ...correctReplay,
