@@ -4,7 +4,6 @@ import {
   encodeBytesToQuaternary,
 } from "./byte-carrier.js";
 import {
-  type LinkHandle,
   type ReadMemory,
   type RootBasis,
   type WriteMemory,
@@ -74,9 +73,3 @@ export function serializeV012StringAnum(
   );
 }
 
-/** Convenience accessor used by bounded conformance evidence. */
-export function v012StringAnumLink(
-  value: MaterializedQuaternaryAnum,
-): LinkHandle {
-  return value.anumLink;
-}
