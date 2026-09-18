@@ -3,6 +3,7 @@ import {
   type AnumForm,
 } from "./anum.js";
 import {
+  verifyRootBasis,
   type LinkHandle,
   type ReadMemory,
   type RootBasis,
@@ -12,6 +13,7 @@ import {
 export type QuaternaryAnumErrorCode =
   | "trailing-after-root-close"
   | "unclosed-open"
+  | "invalid-root-basis"
   | "invalid-anum-representation";
 
 export class QuaternaryAnumError extends Error {
@@ -22,6 +24,17 @@ export class QuaternaryAnumError extends Error {
     readonly offset: number | null = null,
   ) {
     super(offset === null ? code : `${code} at code-point offset ${offset}`);
+  }
+}
+
+function requireRootBasis(
+  memory: ReadMemory,
+  basis: RootBasis,
+): RootBasis {
+  try {
+    return verifyRootBasis(memory, basis);
+  } catch {
+    throw new QuaternaryAnumError("invalid-root-basis");
   }
 }
 
@@ -146,8 +159,9 @@ export function materializeQuaternaryAnum(
   basis: RootBasis,
   source: string,
 ): MaterializedQuaternaryAnum {
+  const verifiedBasis = requireRootBasis(memory, basis);
   const form = parseRawQuaternary(source);
-  const parsed = materializeContext(memory, basis, form, 0, false);
+  const parsed = materializeContext(memory, verifiedBasis, form, 0, false);
 
   if (parsed.next !== form.tokens.length) {
     const trailing = form.tokens[parsed.next];
@@ -237,7 +251,8 @@ export function serializeMaterializedQuaternaryAnum(
   basis: RootBasis,
   value: MaterializedQuaternaryAnum,
 ): string {
-  const wire = serializeHierarchy(memory, basis, value, new Set());
+  const verifiedBasis = requireRootBasis(memory, basis);
+  const wire = serializeHierarchy(memory, verifiedBasis, value, new Set());
   return value.rootClosed ? `${wire}]` : wire;
 }
 
@@ -383,11 +398,12 @@ export function materializeQuaternaryAnumTarget(
   basis: RootBasis,
   value: QuaternaryAnumHierarchy,
 ): LinkHandle {
+  const verifiedBasis = requireRootBasis(memory, basis);
   // Validate the complete exact hierarchy before the first target-side write.
   // serializeHierarchy is read-only and already enforces every represented
   // edge, value/abit correspondence, child hierarchy and final anumLink.
-  serializeHierarchy(memory, basis, value, new Set());
-  return materializeTargetHierarchy(memory, basis, value);
+  serializeHierarchy(memory, verifiedBasis, value, new Set());
+  return materializeTargetHierarchy(memory, verifiedBasis, value);
 }
 
 /**
@@ -402,5 +418,6 @@ export function resolveQuaternaryAnum(
   basis: RootBasis,
   value: QuaternaryAnumHierarchy,
 ): LinkHandle | undefined {
-  return resolveHierarchy(memory, basis, value);
+  const verifiedBasis = requireRootBasis(memory, basis);
+  return resolveHierarchy(memory, verifiedBasis, value);
 }
