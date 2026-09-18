@@ -21,7 +21,8 @@
     "linkIdentityChanged": false,
     "constructorChanged": false,
     "proofCalculusChanged": false,
-    "natSemanticsChanged": false
+    "natSemanticsChanged": false,
+    "rootBasisVerificationChanged": true
   },
   "implementation": {
     "language": "TypeScript",
@@ -31,10 +32,16 @@
     "acceptedRuntime": "mts-contract/v0.11",
     "candidateRuntimeSelectable": false,
     "implementationComplete": false,
-    "productionBehaviorChanged": false
+    "productionBehaviorChanged": false,
+    "candidateKernelBehaviorImplemented": true,
+    "productionBehaviorChangedMeaning": "accepted-live-runtime-remains-v0.11"
   },
   "interpreterModel": {
-    "identities": ["I_STRING", "I_FORMAL", "I_Q"],
+    "identities": [
+      "I_STRING",
+      "I_FORMAL",
+      "I_Q"
+    ],
     "semanticInterpretationContexts": true,
     "hiddenLexerModesAreSemanticAuthority": false,
     "hiddenParserModesAreSemanticAuthority": false,
@@ -70,7 +77,12 @@
   },
   "quaternaryInterpreter": {
     "id": "I_Q",
-    "alphabet": ["[", "]", "1", "0"],
+    "alphabet": [
+      "[",
+      "]",
+      "1",
+      "0"
+    ],
     "alphabetCount": 4,
     "glyphOneRole": "Q abit 1",
     "glyphZeroRole": "Q abit 0",
@@ -116,7 +128,16 @@
     "representationNotInterpretation": "STRING -> Q byte carrier does not invoke I_Q interpretation",
     "formalParentheses": "FORMAL (...) is explicit I_FORMAL child execution returning exactly one Link/value; () is invalid",
     "explicitKContext": "contextual `.` resolves only through explicitly selected structural K evidence",
-    "associationBoundary": "left-associated Link topology, generic flat reading and FORMAL execution remain distinct"
+    "associationBoundary": "left-associated Link topology, generic flat reading and FORMAL execution remain distinct",
+    "exactAnumRooting": "Anum is a Link role; every local Anum begins at R and the exact rooted Anum/question is distinct from its addressed target",
+    "knowledgeStateSeparation": "UNINTERPRETABLE, understood-but-NOT_FOUND and FOUND(X) are semantically distinct read outcomes",
+    "resolveMaterializeSeparation": "Resolve is a read-only one-root-cut; exact address materialization and write-authorized target materialization are distinct capabilities",
+    "targetMaterializationBound": "MATERIALIZE_TARGET removes exactly one leading R hierarchy-wide, preserves remaining indirection and fails closed before target writes on invalid exact evidence",
+    "rootBasisBoundary": "Q operations require a structurally valid declared R/O/C/L/U basis; forged or foreign basis evidence fails closed with zero writes",
+    "v012StringByteIdentity": "Byte_v012(p) is the exact rooted Anum of bits8(p), not the historical Byte_v09 denotation; grouped byte Anums form the exact STRING Anum",
+    "utf8CarrierBoundary": "UTF-8 code-point grouping is a read over exact STRING bytes and does not rewrite STRING carrier topology or grant glyph spelling semantic authority",
+    "sourceUseAuthority": "exact STRING source selects Use only through independently fixed Dictionary/Grammar/Theory evidence; a producer cannot self-admit an alternate well-formed Use",
+    "formalResultAuthority": "FORMAL result replay requires the selected Use and a Rule admitted by the same Theory; unadmitted Rule, wrong result or mismatched Theory is rejected"
   },
   "explicitlyDeferred": {
     "acceptedInlineFormalQSpelling": null,
@@ -127,8 +148,11 @@
     "natInScope": false,
     "mathlibInScope": false,
     "proofCalculusDeltaInScope": false,
-    "transportInScope": false,
-    "aproverInScope": false
+    "aproverInScope": false,
+    "anumTwoMemoryTransportInScope": true,
+    "proofTransportDeltaInScope": false,
+    "cutDepthNCapabilityInScope": false,
+    "jsonSemanticsInScope": false
   },
   "candidateState": {
     "semanticDeltaScopeFrozenForC1": true,
@@ -142,6 +166,65 @@
     "publicFacadeComplete": false,
     "documentationComplete": false,
     "traceabilityComplete": false,
-    "acceptedV011Mutated": false
+    "acceptedV011Mutated": false,
+    "foundationReconciliationComplete": true,
+    "mandatoryKernelEvidenceProjected": true,
+    "contractDerivedFromKernelEvidence": true
+  },
+  "anumProtocol": {
+    "ontologyEntity": "Link",
+    "anumIsSeparateEntity": false,
+    "everyLocalAnumStartsAt": "R",
+    "exactAnumEqualsAddressedTarget": false,
+    "readOutcomes": [
+      "UNINTERPRETABLE",
+      "NOT_FOUND",
+      "FOUND"
+    ],
+    "resolve": {
+      "rootCutDepth": 1,
+      "readOnly": true,
+      "recursiveDereference": false,
+      "notFoundMaterializes": false
+    },
+    "addressMaterialization": {
+      "materializesExactAnum": true,
+      "materializesTarget": false
+    },
+    "targetMaterialization": {
+      "rootCutDepth": 1,
+      "writeAuthorized": true,
+      "recursiveDereference": false,
+      "failClosedBeforeWrite": true,
+      "preservesRemainingAnumIndirection": true
+    },
+    "rootBasis": {
+      "equationsUnchangedFromAcceptedFoundation": true,
+      "verifiedAtQBoundary": true,
+      "invalidBasisWrites": false
+    }
+  },
+  "stringAnumV012": {
+    "byteLaw": "Byte_v012(p)=Anum(bits8(p))=Resolve_Q([bits8(p)])",
+    "historicalByteV09Reused": false,
+    "exactForm": "R ⟼ Byte_v012(p1) ⟼ ... ⟼ Byte_v012(pn)",
+    "canonicalGroupedQCarrier": "[bits8(p1)][bits8(p2)]...",
+    "groupedQTopLevelIsExactStringAnum": true,
+    "utf8GroupingRewritesCarrierTopology": false,
+    "malformedExactBytesMayBeUtf8Uninterpretable": true,
+    "glyphSpellingIsSemanticAuthority": false
+  },
+  "sourceAuthority": {
+    "exactSourceCarrier": "StringAnum_v012",
+    "sourceOccurrenceDistinctFromResolvedMeaning": true,
+    "dictionaryGrammarTheoryFixedBeforeCandidate": true,
+    "candidateCanSelfAdmit": false,
+    "ruleAdmissionUsesSameTheory": true,
+    "replayReadOnly": true,
+    "alternateWellFormedUseRejected": true,
+    "unadmittedRuleRejected": true,
+    "wrongClaimedResultRejected": true,
+    "mismatchedTheoryRejected": true,
+    "hostParserIsSemanticAuthority": false
   }
 }
