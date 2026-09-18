@@ -13,6 +13,10 @@ import {
   type ReadMemory,
 } from "../src/memory.js";
 import {
+  PortableStructuralTheoryError,
+  exportPortableStructuralTheory,
+} from "../src/portable-theory.js";
+import {
   SourceError,
   defineSourceForm,
 } from "../src/source.js";
@@ -33,6 +37,7 @@ import {
   buildV012SelectedSourceEvidence,
   materializeV012SourceContent,
   replayV012SelectedSourceEvidence,
+  replayV012StructuralRuleAgainstTheoryAuthority,
   type V012SourceAuthority,
 } from "../src/v012-source.js";
 
@@ -51,6 +56,22 @@ function structuralError(
   } catch (error) {
     assert(error instanceof StructuralRuleError, `expected StructuralRuleError, got ${String(error)}`);
     same(error.code, code, "structural rule error code");
+    return;
+  }
+  throw new Error(`v0.12 FORMAL source->result witness: expected ${code}`);
+}
+function theoryAuthorityError(
+  code: PortableStructuralTheoryError["code"],
+  effect: () => unknown,
+): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(
+      error instanceof PortableStructuralTheoryError,
+      `expected PortableStructuralTheoryError, got ${String(error)}`,
+    );
+    same(error.code, code, "Theory authority error code");
     return;
   }
   throw new Error(`v0.12 FORMAL source->result witness: expected ${code}`);
@@ -162,6 +183,11 @@ class ReadOnlyProbe implements ReadMemory {
   const alternateTemplate = memory.ensure(sourceUseRole, wrongResult);
   const alternateRule = defineStructuralRule(memory, roleDictionary, alternateTemplate);
 
+  // Exact T0 is fixed independently before any candidate-side admission can be
+  // added. The artifact contains the Theory identity and its admitted outgoing
+  // authority at this boundary.
+  const fixedTheoryAuthority = exportPortableStructuralTheory(memory, theory);
+
   const interpreter = defineStructuralInterpreter(memory, dictionary, grammar, theory);
 
   const authority: V012SourceAuthority = Object.freeze({
@@ -219,8 +245,12 @@ class ReadOnlyProbe implements ReadMemory {
   same(selected.length, 1, "exact source selects one Use");
   same(selected[0], selectedUse, "fixed authority selects the admitted Use");
 
-  const structural = replayStructuralRule(probe, correctReplay);
-  same(memory.linkCount, before, "source + structural replay is read-only");
+  const structural = replayV012StructuralRuleAgainstTheoryAuthority(
+    probe,
+    correctReplay,
+    fixedTheoryAuthority,
+  );
+  same(memory.linkCount, before, "source + structural authority replay is read-only");
 
   const useBinding = structural.bindings.find((binding) => binding.role === sourceUseRole);
   assert(useBinding !== undefined, "Rule replay carries explicit source-Use role binding");
@@ -270,10 +300,10 @@ class ReadOnlyProbe implements ReadMemory {
   );
   same(memory.linkCount, beforeWrongRule, "unadmitted Rule rejection is read-only");
 
-  // Independent authority falsifier: after Theory authority was fixed, the
-  // candidate can still synthesize the exact same T -> Rule shape with the
-  // public Memory primitive. Mere existence of that Link must not let the
-  // candidate promote its own alternate Rule into accepted authority.
+  // Independent authority falsifier: after exact T0 was fixed, candidate-side
+  // code can synthesize the same structural T -> Rule shape with Memory.ensure.
+  // Raw StructuralRule replay intentionally treats the selected admission as
+  // trusted input, so it accepts this structurally valid evidence.
   const candidateAdmission = memory.ensure(theory, alternateRule);
   const selfAdmittedRuleReplay: StructuralRuleReplayEvidence = Object.freeze({
     ...correctReplay,
@@ -282,24 +312,47 @@ class ReadOnlyProbe implements ReadMemory {
     claimedBody: wrongClaimedBody,
   });
   const beforeSelfAdmissionReplay = memory.linkCount;
-  let selfAdmissionRejected = false;
-  try {
-    replayStructuralRule(new ReadOnlyProbe(memory), selfAdmittedRuleReplay);
-  } catch (error) {
-    assert(
-      error instanceof StructuralRuleError,
-      `expected StructuralRuleError, got ${String(error)}`,
-    );
-    selfAdmissionRejected = true;
-  }
-  assert(
-    selfAdmissionRejected,
-    "candidate-created Theory -> Rule admission must not authorize its own Rule",
+  const lowLevelSelfAdmission = replayStructuralRule(
+    new ReadOnlyProbe(memory),
+    selfAdmittedRuleReplay,
+  );
+  same(lowLevelSelfAdmission.rule, alternateRule, "low-level replay accepts selected admission shape");
+  same(
+    memory.linkCount,
+    beforeSelfAdmissionReplay,
+    "low-level candidate self-admission replay is read-only",
+  );
+
+  // The surrounding v0.12 verifier has an independently fixed T0 boundary and
+  // therefore rejects the candidate-created admission even though its shape is
+  // valid and the alternate claimed body matches.
+  theoryAuthorityError(
+    "proof-theory-mismatch",
+    () => replayV012StructuralRuleAgainstTheoryAuthority(
+      new ReadOnlyProbe(memory),
+      selfAdmittedRuleReplay,
+      fixedTheoryAuthority,
+    ),
   );
   same(
     memory.linkCount,
     beforeSelfAdmissionReplay,
-    "candidate self-admission replay is read-only",
+    "candidate self-admission authority rejection is read-only",
+  );
+
+  // An unrelated later admission must not poison the explicitly selected old
+  // admission. Authority is attached to selected evidence, not ambient current
+  // outgoing(Theory).
+  const correctAfterAmbientAddition = replayV012StructuralRuleAgainstTheoryAuthority(
+    new ReadOnlyProbe(memory),
+    correctReplay,
+    fixedTheoryAuthority,
+  );
+  same(correctAfterAmbientAddition.rule, correctRule, "fixed T0 still authorizes correct Rule");
+  same(
+    memory.linkCount,
+    beforeSelfAdmissionReplay,
+    "fixed authorized replay survives unrelated ambient Theory addition",
   );
 
   // Even the admitted Rule cannot be used to claim a different result.
