@@ -1,0 +1,180 @@
+import { readFileSync } from "node:fs";
+import {
+  normalizeRawForm,
+  parseRawQuaternary,
+} from "../src/anum.js";
+import {
+  Memory,
+  ensureRootBasis,
+  type LinkHandle,
+} from "../src/memory.js";
+import {
+  materializeQuaternaryAnum,
+  resolveQuaternaryAnum,
+  serializeMaterializedQuaternaryAnum,
+  type MaterializedQuaternaryAnum,
+} from "../src/quaternary-anum.js";
+
+function assert(condition: unknown, message: string): asserts condition {
+  if (!condition) throw new Error(`hierarchical Q two-memory: ${message}`);
+}
+
+function same<T>(actual: T, expected: T, message: string): void {
+  assert(Object.is(actual, expected), `${message}: values differ`);
+}
+
+function bind(
+  mapping: Map<LinkHandle, LinkHandle>,
+  inverse: Map<LinkHandle, LinkHandle>,
+  left: LinkHandle,
+  right: LinkHandle,
+): boolean {
+  const existingRight = mapping.get(left);
+  if (existingRight !== undefined) return existingRight === right;
+  const existingLeft = inverse.get(right);
+  if (existingLeft !== undefined) return existingLeft === left;
+  mapping.set(left, right);
+  inverse.set(right, left);
+  return true;
+}
+
+function mappedRelationsRemainCompatible(
+  left: Memory,
+  right: Memory,
+  mapping: ReadonlyMap<LinkHandle, LinkHandle>,
+  inverse: ReadonlyMap<LinkHandle, LinkHandle>,
+): boolean {
+  for (const [leftLink, rightLink] of mapping) {
+    const leftPoles = left.poles(leftLink);
+    const rightPoles = right.poles(rightLink);
+
+    const mappedStart = mapping.get(leftPoles.start);
+    if (mappedStart !== undefined && mappedStart !== rightPoles.start) return false;
+    const mappedEnd = mapping.get(leftPoles.end);
+    if (mappedEnd !== undefined && mappedEnd !== rightPoles.end) return false;
+
+    const inverseStart = inverse.get(rightPoles.start);
+    if (inverseStart !== undefined && inverseStart !== leftPoles.start) return false;
+    const inverseEnd = inverse.get(rightPoles.end);
+    if (inverseEnd !== undefined && inverseEnd !== leftPoles.end) return false;
+  }
+  return true;
+}
+
+function structurallyEquivalentState(
+  left: Memory,
+  right: Memory,
+  leftSelected: LinkHandle,
+  rightSelected: LinkHandle,
+): boolean {
+  const leftLinks = left.allLinks();
+  const rightLinks = right.allLinks();
+  if (leftLinks.length !== rightLinks.length) return false;
+
+  const mapping = new Map<LinkHandle, LinkHandle>();
+  const inverse = new Map<LinkHandle, LinkHandle>();
+  if (!bind(mapping, inverse, left.root, right.root)) return false;
+  if (!bind(mapping, inverse, leftSelected, rightSelected)) return false;
+
+  const search = (): boolean => {
+    if (!mappedRelationsRemainCompatible(left, right, mapping, inverse)) return false;
+    if (mapping.size === leftLinks.length) return true;
+
+    const nextLeft = leftLinks.find((link) => !mapping.has(link));
+    if (nextLeft === undefined) return false;
+
+    for (const nextRight of rightLinks) {
+      if (inverse.has(nextRight)) continue;
+      mapping.set(nextLeft, nextRight);
+      inverse.set(nextRight, nextLeft);
+      if (search()) return true;
+      mapping.delete(nextLeft);
+      inverse.delete(nextRight);
+    }
+    return false;
+  };
+
+  return search();
+}
+
+interface FixtureExpectation {
+  readonly path: string;
+  readonly canonical: string;
+  readonly verifyA: (
+    memory: Memory,
+    materialized: MaterializedQuaternaryAnum,
+  ) => void;
+}
+
+const fixtures: readonly FixtureExpectation[] = Object.freeze([
+  {
+    path: "../examples/anum/conformance/q-hierarchical-byte-4d.anum",
+    canonical: "[01001101]",
+    verifyA(memory, materialized): void {
+      assert(materialized.items.length === 1, "byte fixture has one root child");
+      const first = materialized.items[0];
+      assert(first?.kind === "child", "byte fixture root item is a child Anum");
+      const before = memory.linkCount;
+      same(
+        resolveQuaternaryAnum(memory, ensureRootBasis(memory), materialized),
+        first.anum.anumLink,
+        "one Resolve of bracketed byte returns the exact inner byte Anum",
+      );
+      same(memory.linkCount, before, "bracketed-byte Resolve is read-only");
+    },
+  },
+  {
+    path: "../examples/anum/conformance/q-hierarchical-relative-indirect.anum",
+    canonical: "01[[10]]",
+    verifyA(memory, materialized): void {
+      const basis = ensureRootBasis(memory);
+      const before = memory.linkCount;
+      same(
+        resolveQuaternaryAnum(memory, basis, materialized),
+        undefined,
+        "relative-indirect address stays not-found when addressed semantic Links are absent",
+      );
+      same(
+        memory.linkCount,
+        before,
+        "not-found Resolve does not materialize B01 or its addressed result",
+      );
+    },
+  },
+]);
+
+for (const fixture of fixtures) {
+  const source = readFileSync(fixture.path, "utf8");
+  const canonicalFixture = normalizeRawForm(parseRawQuaternary(source));
+  same(canonicalFixture, fixture.canonical, `canonical fixture ${fixture.path}`);
+
+  const memoryA = new Memory();
+  const basisA = ensureRootBasis(memoryA);
+  const loadedA = materializeQuaternaryAnum(memoryA, basisA, source);
+  assert(memoryA.linkCount > 5, `${fixture.path} materializes hierarchical non-basis Links`);
+  fixture.verifyA(memoryA, loadedA);
+
+  const beforeSerializeA = memoryA.linkCount;
+  const wire = serializeMaterializedQuaternaryAnum(memoryA, basisA, loadedA);
+  same(memoryA.linkCount, beforeSerializeA, `${fixture.path} serializer is read-only`);
+  same(wire, canonicalFixture, `${fixture.path} canonical hierarchical wire`);
+
+  const memoryB = new Memory();
+  const basisB = ensureRootBasis(memoryB);
+  const loadedB = materializeQuaternaryAnum(memoryB, basisB, wire);
+
+  assert(
+    structurallyEquivalentState(memoryA, memoryB, loadedA.anumLink, loadedB.anumLink),
+    `${fixture.path} A/B full exact-Anum state parity`,
+  );
+
+  const beforeSerializeB = memoryB.linkCount;
+  same(
+    serializeMaterializedQuaternaryAnum(memoryB, basisB, loadedB),
+    wire,
+    `${fixture.path} Memory B canonical reserialization`,
+  );
+  same(memoryB.linkCount, beforeSerializeB, `${fixture.path} B serializer is read-only`);
+}
+
+console.log("Hierarchical Quaternary Anum two-memory transport: GREEN.");

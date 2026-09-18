@@ -176,6 +176,71 @@ function exactNext(
   return next;
 }
 
+function serializeHierarchy(
+  memory: ReadMemory,
+  basis: RootBasis,
+  value: QuaternaryAnumHierarchy,
+  stack: Set<QuaternaryAnumHierarchy>,
+): string {
+  if (stack.has(value)) {
+    throw new QuaternaryAnumError("invalid-anum-representation");
+  }
+  stack.add(value);
+
+  try {
+    let exactCurrent = basis.R;
+    let wire = "";
+
+    for (const item of value.items) {
+      if (item.kind === "value") {
+        if (
+          (item.abit !== "0" && item.abit !== "1") ||
+          item.link !== bitLink(basis, item.abit)
+        ) {
+          throw new QuaternaryAnumError("invalid-anum-representation");
+        }
+        exactCurrent = exactNext(memory, exactCurrent, item.link);
+        wire += item.abit;
+        continue;
+      }
+
+      const childWire = serializeHierarchy(memory, basis, item.anum, stack);
+      exactCurrent = exactNext(
+        memory,
+        exactCurrent,
+        item.anum.anumLink,
+      );
+      wire += `[${childWire}]`;
+    }
+
+    if (exactCurrent !== value.anumLink) {
+      throw new QuaternaryAnumError("invalid-anum-representation");
+    }
+    return wire;
+  } finally {
+    stack.delete(value);
+  }
+}
+
+/**
+ * Canonically serialize an already materialized hierarchical Quaternary Anum.
+ *
+ * This is deliberately not an inverse from arbitrary Link topology. The
+ * hierarchy supplied by the production loader remains the protocol witness
+ * that distinguishes bracket structure from coincident pair topology.
+ *
+ * Serialization is read-only: every hierarchy edge is verified with find()
+ * and no missing Link is synthesized.
+ */
+export function serializeMaterializedQuaternaryAnum(
+  memory: ReadMemory,
+  basis: RootBasis,
+  value: MaterializedQuaternaryAnum,
+): string {
+  const wire = serializeHierarchy(memory, basis, value, new Set());
+  return value.rootClosed ? `${wire}]` : wire;
+}
+
 function resolveHierarchy(
   memory: ReadMemory,
   basis: RootBasis,
