@@ -9,6 +9,9 @@ import {
   type WriteMemory,
 } from "./memory.js";
 import {
+  verifySelectedTheoryAdmissionAuthority,
+} from "./portable-theory.js";
+import {
   SourceError,
   readSourceForm,
   replaySelectedSourceEvidenceWithReader,
@@ -16,6 +19,11 @@ import {
   type SelectedSegmentSpec,
   type SourceFrontEndEvidence,
 } from "./source.js";
+import {
+  replayStructuralRule,
+  type StructuralRuleReplayEvidence,
+  type StructuralRuleReplayResult,
+} from "./structural-rule.js";
 import {
   V012StringAnumError,
   materializeV012StringAnum,
@@ -196,4 +204,31 @@ export function replayV012SelectedSourceEvidence(
     evidence,
     readV012SourceContent,
   );
+}
+
+/**
+ * v0.12 surrounding authority boundary for StructuralRule replay.
+ *
+ * replayStructuralRule remains the low-level structural primitive whose
+ * selected ruleAdmission is trusted input. This operation adds the independent
+ * exact-Theory boundary: the selected admission itself must already belong to
+ * the caller-selected immutable Theory artifact.
+ *
+ * Only the selected admission is checked. Later unrelated ambient additions to
+ * the same live Theory do not acquire authority and do not invalidate an older
+ * authorized selection.
+ */
+export function replayV012StructuralRuleAgainstTheoryAuthority(
+  memory: ReadMemory,
+  evidence: StructuralRuleReplayEvidence,
+  expectedTheoryArtifact: unknown,
+): StructuralRuleReplayResult {
+  const replay = replayStructuralRule(memory, evidence);
+  verifySelectedTheoryAdmissionAuthority(
+    memory,
+    replay.interpreterStructure.theory,
+    evidence.ruleAdmission,
+    expectedTheoryArtifact,
+  );
+  return replay;
 }
