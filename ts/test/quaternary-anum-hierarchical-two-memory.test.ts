@@ -182,6 +182,43 @@ const fixtures: readonly FixtureExpectation[] = Object.freeze([
       );
     },
   },
+  {
+    path: "../examples/anum/conformance/q-hierarchical-nested-byte-pair.anum",
+    canonical: "[[01001101][01010100]]",
+    verifyA(memory, materialized): void {
+      const basis = ensureRootBasis(memory);
+      assert(
+        materialized.items.length === 1,
+        "nested byte pair has one outer root child",
+      );
+      const outer = materialized.items[0];
+      assert(outer?.kind === "child", "nested byte pair outer item is a child Anum");
+      assert(
+        outer.anum.items.length === 2,
+        "nested pair preserves two child byte groups inside its own local R context",
+      );
+      const first = outer.anum.items[0];
+      const second = outer.anum.items[1];
+      assert(first?.kind === "child", "nested pair first item remains one child byte Anum");
+      assert(second?.kind === "child", "nested pair second item remains one child byte Anum");
+      assert(first.anum.items.length === 8, "nested first byte keeps eight data bits");
+      assert(second.anum.items.length === 8, "nested second byte keeps eight data bits");
+
+      same(
+        memory.find(basis.R, outer.anum.anumLink),
+        materialized.anumLink,
+        "outer R[ adds one exact indirection level around the byte-pair hierarchy",
+      );
+
+      const before = memory.linkCount;
+      same(
+        resolveQuaternaryAnum(memory, basis, materialized),
+        outer.anum.anumLink,
+        "one Resolve removes only the outer R[ level",
+      );
+      same(memory.linkCount, before, "nested pair Resolve stays read-only");
+    },
+  },
 ]);
 
 for (const fixture of fixtures) {
@@ -216,6 +253,32 @@ for (const fixture of fixtures) {
     `${fixture.path} Memory B canonical reserialization`,
   );
   same(memoryB.linkCount, beforeSerializeB, `${fixture.path} B serializer is read-only`);
+}
+
+// AN-F05: adjacent grouped bytes and one extra outer R[ hierarchy are exact-distinct
+// even though both faithfully preserve the same two byte payload groups.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  const adjacentSource = "[01001101][01010100]";
+  const nestedSource = "[[01001101][01010100]]";
+  const adjacent = materializeQuaternaryAnum(memory, basis, adjacentSource);
+  const nested = materializeQuaternaryAnum(memory, basis, nestedSource);
+
+  assert(
+    adjacent.anumLink !== nested.anumLink,
+    "AN-F05 adjacent and nested byte-pair carriers are exact-distinct Links",
+  );
+  same(
+    serializeMaterializedQuaternaryAnum(memory, basis, adjacent),
+    adjacentSource,
+    "AN-F05 adjacent carrier keeps its faithful hierarchy",
+  );
+  same(
+    serializeMaterializedQuaternaryAnum(memory, basis, nested),
+    nestedSource,
+    "AN-F05 nested carrier keeps its extra R[ hierarchy",
+  );
 }
 
 console.log("Hierarchical Quaternary Anum two-memory transport: GREEN.");
