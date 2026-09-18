@@ -4,6 +4,7 @@ import {
 import {
   MemoryError,
   type LinkHandle,
+  type LinkPoles,
   type ReadMemory,
   type RootBasis,
   type WriteMemory,
@@ -231,4 +232,63 @@ export function replayV012StructuralRuleAgainstTheoryAuthority(
     expectedTheoryArtifact,
   );
   return replay;
+}
+
+class SelectedActEvidenceView implements ReadMemory {
+  readonly root: LinkHandle;
+  private readonly selected: ReadonlySet<LinkHandle>;
+
+  constructor(
+    private readonly source: ReadMemory,
+    private readonly act: LinkHandle,
+    selectedActAttachments: readonly LinkHandle[],
+  ) {
+    this.root = source.root;
+    this.selected = new Set(selectedActAttachments);
+  }
+
+  get linkCount(): number {
+    return this.source.linkCount;
+  }
+
+  poles(link: LinkHandle): LinkPoles {
+    return this.source.poles(link);
+  }
+
+  find(start: LinkHandle, end: LinkHandle): LinkHandle | undefined {
+    return this.source.find(start, end);
+  }
+
+  outgoing(start: LinkHandle): readonly LinkHandle[] {
+    const outgoing = this.source.outgoing(start);
+    if (start !== this.act) return outgoing;
+    return Object.freeze(
+      outgoing.filter((link) => link === this.act || this.selected.has(link)),
+    );
+  }
+
+  incoming(end: LinkHandle): readonly LinkHandle[] {
+    return this.source.incoming(end);
+  }
+}
+
+/**
+ * Stronger v0.12 replay against explicitly selected finite Act evidence.
+ *
+ * selectedActAttachments is a trusted consumer selection of existing attachment
+ * Links. It never resolves ambiguity: if the selected set itself contains two
+ * bindings for one role, ordinary StructuralRule replay still rejects them.
+ * Later unselected ambient attachments are outside this old evidence boundary.
+ */
+export function replayV012StructuralRuleAgainstSelectedEvidence(
+  memory: ReadMemory,
+  evidence: StructuralRuleReplayEvidence,
+  expectedTheoryArtifact: unknown,
+  selectedActAttachments: readonly LinkHandle[],
+): StructuralRuleReplayResult {
+  return replayV012StructuralRuleAgainstTheoryAuthority(
+    new SelectedActEvidenceView(memory, evidence.act, selectedActAttachments),
+    evidence,
+    expectedTheoryArtifact,
+  );
 }
