@@ -68,10 +68,11 @@ function sourceError(
 }
 function anchors(memory: Memory, count: number): readonly LinkHandle[] {
   const result: LinkHandle[] = [];
-  let current = ensureRootBasis(memory).C;
+  const seed = memory.ensureEndSelfClosed(memory.root);
+  let tag = memory.ensureStartSelfClosed(memory.root);
   for (let index = 0; index < count; index += 1) {
-    current = memory.ensureEndSelfClosed(current);
-    result.push(current);
+    tag = memory.ensureStartSelfClosed(tag);
+    result.push(memory.ensure(seed, tag));
   }
   return Object.freeze(result);
 }
