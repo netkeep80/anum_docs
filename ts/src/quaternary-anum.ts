@@ -308,6 +308,84 @@ function resolveHierarchy(
   return hasResolvedValue ? resolvedCurrent : basis.R;
 }
 
+function materializeTargetHierarchy(
+  memory: WriteMemory,
+  basis: RootBasis,
+  value: QuaternaryAnumHierarchy,
+): LinkHandle {
+  let exactCurrent = basis.R;
+  let targetCurrent: LinkHandle | undefined;
+  let hasTargetValue = false;
+
+  for (const item of value.items) {
+    const exactValue =
+      item.kind === "value"
+        ? item.link
+        : item.anum.anumLink;
+
+    const beforeOpen = exactCurrent;
+    const nextExact = exactNext(memory, exactCurrent, exactValue);
+
+    // [] is structurally neutral because R -> R is R. The one-root-cut pass
+    // therefore has no semantic value to materialize for this empty child.
+    if (
+      item.kind === "child" &&
+      beforeOpen === basis.R &&
+      item.anum.anumLink === basis.R
+    ) {
+      exactCurrent = nextExact;
+      continue;
+    }
+
+    let targetValue: LinkHandle;
+    if (item.kind === "value") {
+      targetValue = item.link;
+    } else if (beforeOpen === basis.R) {
+      // MATERIALIZE_TARGET may remove exactly this local leading R. The child
+      // Anum itself is therefore the result of this pass; do not descend again.
+      targetValue = item.anum.anumLink;
+    } else {
+      // Relative child Anums participate in the same hierarchy-wide one-level
+      // shift, so each local context may remove its own single leading R.
+      targetValue = materializeTargetHierarchy(memory, basis, item.anum);
+    }
+
+    if (!hasTargetValue) {
+      targetCurrent = targetValue;
+      hasTargetValue = true;
+    } else {
+      targetCurrent = memory.ensure(targetCurrent!, targetValue);
+    }
+
+    exactCurrent = nextExact;
+  }
+
+  if (exactCurrent !== value.anumLink) {
+    throw new QuaternaryAnumError("invalid-anum-representation");
+  }
+
+  return hasTargetValue ? targetCurrent! : basis.R;
+}
+
+/**
+ * Explicit write-side counterpart of one-pass Resolve.
+ *
+ * Every participating local Anum context may remove exactly one leading R.
+ * Links exposed by that single hierarchy-wide root cut are ensured as needed.
+ * Remaining Anum indirection is preserved; this function never recursively
+ * dereferences the result until a non-Anum target is reached.
+ *
+ * This is intentionally separate from materializeQuaternaryAnum(), which only
+ * materializes the exact rooted Anum/address representation itself.
+ */
+export function materializeQuaternaryAnumTarget(
+  memory: WriteMemory,
+  basis: RootBasis,
+  value: QuaternaryAnumHierarchy,
+): LinkHandle {
+  return materializeTargetHierarchy(memory, basis, value);
+}
+
 /**
  * Read-only one-pass associative Resolve.
  *
