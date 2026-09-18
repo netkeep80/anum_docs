@@ -32,6 +32,53 @@ export type {
   StreamErrorCode,
 } from "./anum.js";
 
+// v0.12 C7 exposes the stable carrier/read/replay boundary only. Producer-side
+// authority construction (dictionary mutation, Rule admission, Act builders)
+// remains internal so the public verifier cannot accidentally become authority.
+export {
+  QuaternaryAnumError,
+  materializeQuaternaryAnum,
+  materializeQuaternaryAnumTarget,
+  resolveQuaternaryAnum,
+  serializeMaterializedQuaternaryAnum,
+} from "./quaternary-anum.js";
+export type {
+  MaterializedQuaternaryAnum,
+  QuaternaryAnumErrorCode,
+  QuaternaryAnumHierarchy,
+  QuaternaryAnumItem,
+} from "./quaternary-anum.js";
+
+export {
+  V012StringAnumError,
+  materializeV012StringAnum,
+  materializeV012StringByteAnum,
+  readV012StringAnum,
+  readV012StringByteAnum,
+  serializeV012StringAnum,
+} from "./v012-string-anum.js";
+export type {
+  ReadV012StringAnum,
+  V012StringAnumErrorCode,
+} from "./v012-string-anum.js";
+
+export {
+  SourceError,
+} from "./source.js";
+export type {
+  SourceErrorCode,
+  SourceFrontEndEvidence,
+} from "./source.js";
+
+export {
+  materializeV012SourceContent,
+  readV012SourceContent,
+  replayV012SelectedSourceEvidence,
+} from "./v012-source.js";
+export type {
+  V012SourceContent,
+} from "./v012-source.js";
+
 export {
   PersistentStore,
   PersistentStoreError,
@@ -356,8 +403,16 @@ export {
 export type {
   StructuralHeterogeneousDerivedOpenRootedExpansionErrorCode,
 } from "./derived-derivation-heterogeneous-expansion.js";
+export {
+  StructuralRuleError,
+  replayStructuralRule,
+} from "./structural-rule.js";
 export type {
+  StructuralInterpreter,
   StructuralRoleBinding,
+  StructuralRuleErrorCode,
+  StructuralRuleReplayEvidence,
+  StructuralRuleReplayResult,
 } from "./structural-rule.js";
 
 export {
