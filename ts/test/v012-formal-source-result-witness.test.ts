@@ -37,6 +37,7 @@ import {
   buildV012SelectedSourceEvidence,
   materializeV012SourceContent,
   replayV012SelectedSourceEvidence,
+  replayV012StructuralRuleAgainstSelectedEvidence,
   replayV012StructuralRuleAgainstTheoryAuthority,
   type V012SourceAuthority,
 } from "../src/v012-source.js";
@@ -218,7 +219,8 @@ class ReadOnlyProbe implements ReadMemory {
   );
 
   const act = defineActHeader(memory, interpreter, roleDictionary, afterContext);
-  defineActField(memory, act, sourceUseRole, selectedUse);
+  const selectedUseAttachment = defineActField(memory, act, sourceUseRole, selectedUse);
+  const selectedActEvidence = Object.freeze([selectedUseAttachment]);
 
   const correctClaimedBody = memory.ensure(selectedUse, formalResult);
   const wrongClaimedBody = memory.ensure(selectedUse, wrongResult);
@@ -245,10 +247,11 @@ class ReadOnlyProbe implements ReadMemory {
   same(selected.length, 1, "exact source selects one Use");
   same(selected[0], selectedUse, "fixed authority selects the admitted Use");
 
-  const structural = replayV012StructuralRuleAgainstTheoryAuthority(
+  const structural = replayV012StructuralRuleAgainstSelectedEvidence(
     probe,
     correctReplay,
     fixedTheoryAuthority,
+    selectedActEvidence,
   );
   same(memory.linkCount, before, "source + structural authority replay is read-only");
 
@@ -328,10 +331,11 @@ class ReadOnlyProbe implements ReadMemory {
   // valid and the alternate claimed body matches.
   theoryAuthorityError(
     "proof-theory-mismatch",
-    () => replayV012StructuralRuleAgainstTheoryAuthority(
+    () => replayV012StructuralRuleAgainstSelectedEvidence(
       new ReadOnlyProbe(memory),
       selfAdmittedRuleReplay,
       fixedTheoryAuthority,
+      selectedActEvidence,
     ),
   );
   same(
@@ -343,10 +347,11 @@ class ReadOnlyProbe implements ReadMemory {
   // An unrelated later admission must not poison the explicitly selected old
   // admission. Authority is attached to selected evidence, not ambient current
   // outgoing(Theory).
-  const correctAfterAmbientAddition = replayV012StructuralRuleAgainstTheoryAuthority(
+  const correctAfterAmbientAddition = replayV012StructuralRuleAgainstSelectedEvidence(
     new ReadOnlyProbe(memory),
     correctReplay,
     fixedTheoryAuthority,
+    selectedActEvidence,
   );
   same(correctAfterAmbientAddition.rule, correctRule, "fixed T0 still authorizes correct Rule");
   same(
@@ -384,30 +389,29 @@ class ReadOnlyProbe implements ReadMemory {
 
   // Independent evidence-boundary falsifier: the already verified Rule evidence
   // must keep its old verdict when unrelated later data is attached to the same
-  // mutable Act. Current ambient outgoing(act) must not silently redefine the
-  // evidence that was selected earlier.
+  // mutable Act.
   const lateUse = refs[9]!;
   assert(lateUse !== selectedUse, "late conflicting Use differs from selected Use");
-  defineActField(memory, act, sourceUseRole, lateUse);
+  const lateUseAttachment = defineActField(memory, act, sourceUseRole, lateUse);
   const beforeOldEvidenceReplay = memory.linkCount;
-  let oldEvidenceReplay: ReturnType<typeof replayV012StructuralRuleAgainstTheoryAuthority> | undefined;
-  let oldEvidenceError: unknown;
-  try {
-    oldEvidenceReplay = replayV012StructuralRuleAgainstTheoryAuthority(
+
+  // The lower Theory-only layer intentionally remains current-memory relative.
+  structuralError(
+    "multiple-role-bindings",
+    () => replayV012StructuralRuleAgainstTheoryAuthority(
       new ReadOnlyProbe(memory),
       correctReplay,
       fixedTheoryAuthority,
-    );
-  } catch (error) {
-    oldEvidenceError = error;
-  }
-  assert(
-    oldEvidenceError === undefined,
-    `later Act mutation must not change old selected evidence verdict: ${String(
-      oldEvidenceError instanceof StructuralRuleError ? oldEvidenceError.code : oldEvidenceError,
-    )}`,
+    ),
   );
-  assert(oldEvidenceReplay !== undefined, "old selected evidence still replays");
+
+  // The stronger v0.12 boundary replays exactly the old selected attachment.
+  const oldEvidenceReplay = replayV012StructuralRuleAgainstSelectedEvidence(
+    new ReadOnlyProbe(memory),
+    correctReplay,
+    fixedTheoryAuthority,
+    selectedActEvidence,
+  );
   const oldUseBinding = oldEvidenceReplay.bindings.find(
     (binding) => binding.role === sourceUseRole,
   );
@@ -417,6 +421,23 @@ class ReadOnlyProbe implements ReadMemory {
     memory.linkCount,
     beforeOldEvidenceReplay,
     "old selected evidence replay after ambient Act mutation is read-only",
+  );
+
+  // Explicitly selecting both conflicting attachments still exposes the real
+  // ambiguity. The evidence boundary is not first-wins/last-wins.
+  structuralError(
+    "multiple-role-bindings",
+    () => replayV012StructuralRuleAgainstSelectedEvidence(
+      new ReadOnlyProbe(memory),
+      correctReplay,
+      fixedTheoryAuthority,
+      Object.freeze([selectedUseAttachment, lateUseAttachment]),
+    ),
+  );
+  same(
+    memory.linkCount,
+    beforeOldEvidenceReplay,
+    "conflicting selected evidence rejection is read-only",
   );
 }
 
