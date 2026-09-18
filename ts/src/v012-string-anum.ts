@@ -4,6 +4,8 @@ import {
   encodeBytesToQuaternary,
 } from "./byte-carrier.js";
 import {
+  MemoryError,
+  type LinkHandle,
   type ReadMemory,
   type RootBasis,
   type WriteMemory,
@@ -13,6 +15,132 @@ import {
   serializeMaterializedQuaternaryAnum,
   type MaterializedQuaternaryAnum,
 } from "./quaternary-anum.js";
+
+export type V012StringAnumErrorCode =
+  | "not-v012-string-byte-anum"
+  | "not-v012-string-anum";
+
+export class V012StringAnumError extends Error {
+  override readonly name = "V012StringAnumError";
+
+  constructor(readonly code: V012StringAnumErrorCode) {
+    super(code);
+  }
+}
+
+export interface ReadV012StringAnum {
+  readonly bytes: Uint8Array;
+  readonly byteLinks: readonly LinkHandle[];
+  /** Root plus every exact STRING prefix in source order. */
+  readonly prefixes: readonly LinkHandle[];
+}
+
+function invalidByte(): never {
+  throw new V012StringAnumError("not-v012-string-byte-anum");
+}
+
+function bitValue(basis: RootBasis, value: LinkHandle): 0 | 1 {
+  if (value === basis.U) return 0;
+  if (value === basis.L) return 1;
+  return invalidByte();
+}
+
+/**
+ * Pure structural inverse of Byte_v012(p) := Anum(bits8(p)).
+ *
+ * The role is valid iff exactly eight rooted steps end in L/U and the eighth
+ * predecessor is R. No hierarchy witness, lookup or materialization is used.
+ */
+export function readV012StringByteAnum(
+  memory: ReadMemory,
+  basis: RootBasis,
+  link: LinkHandle,
+): number {
+  let current = link;
+  const bits = new Array<0 | 1>(8);
+
+  try {
+    for (let index = 7; index >= 0; index -= 1) {
+      if (current === basis.R) invalidByte();
+      const poles = memory.poles(current);
+      bits[index] = bitValue(basis, poles.end);
+      current = poles.start;
+    }
+    if (current !== basis.R) invalidByte();
+  } catch (error) {
+    if (error instanceof V012StringAnumError) throw error;
+    if (error instanceof MemoryError) invalidByte();
+    throw error;
+  }
+
+  let result = 0;
+  for (const bit of bits) result = (result << 1) | bit;
+  return result;
+}
+
+/**
+ * Read a role-selected exact v0.12 STRING Anum directly from Link topology.
+ *
+ * StringAnum_v012(bytes) is a rooted left sequence of Byte_v012 Links. The
+ * returned prefixes are the exact rooted positions needed by source spans.
+ * This reader is intentionally poles-only and cannot synthesize missing Links.
+ */
+export function readV012StringAnum(
+  memory: ReadMemory,
+  basis: RootBasis,
+  link: LinkHandle,
+): ReadV012StringAnum {
+  if (link === basis.R) {
+    return Object.freeze({
+      bytes: new Uint8Array(),
+      byteLinks: Object.freeze([]),
+      prefixes: Object.freeze([basis.R]),
+    });
+  }
+
+  const reversedBytes: number[] = [];
+  const reversedByteLinks: LinkHandle[] = [];
+  const reversedPrefixes: LinkHandle[] = [];
+  const visited = new Set<LinkHandle>();
+  let current = link;
+
+  try {
+    while (current !== basis.R) {
+      if (visited.has(current)) {
+        throw new V012StringAnumError("not-v012-string-anum");
+      }
+      visited.add(current);
+      reversedPrefixes.push(current);
+
+      const poles = memory.poles(current);
+      const byteLink = poles.end;
+      let byte: number;
+      try {
+        byte = readV012StringByteAnum(memory, basis, byteLink);
+      } catch (error) {
+        if (error instanceof V012StringAnumError) {
+          throw new V012StringAnumError("not-v012-string-anum");
+        }
+        throw error;
+      }
+      reversedBytes.push(byte);
+      reversedByteLinks.push(byteLink);
+      current = poles.start;
+    }
+  } catch (error) {
+    if (error instanceof V012StringAnumError) throw error;
+    if (error instanceof MemoryError) {
+      throw new V012StringAnumError("not-v012-string-anum");
+    }
+    throw error;
+  }
+
+  return Object.freeze({
+    bytes: Uint8Array.from([...reversedBytes].reverse()),
+    byteLinks: Object.freeze([...reversedByteLinks].reverse()),
+    prefixes: Object.freeze([basis.R, ...[...reversedPrefixes].reverse()]),
+  });
+}
 
 /**
  * v0.12 candidate STRING byte.
