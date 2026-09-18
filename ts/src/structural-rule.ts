@@ -381,9 +381,16 @@ export function matchStructuralTemplate(
 }
 
 /**
- * Read-only generic replay: semantic selection comes from structural I/DR/Rule
- * and explicit T ⟼ Rule admission. No callback name, RuleKind/opcode or TS role
- * property participates in rule identity.
+ * Low-level read-only generic replay. Semantic matching comes from structural
+ * I/DR/Rule and the explicitly selected T ⟼ Rule admission.
+ *
+ * The selected admission is trusted input at this layer: this primitive proves
+ * its exact T ⟼ Rule shape, but not that it belongs to an independently fixed
+ * Theory revision. A consumer that needs that stronger authority boundary must
+ * use a surrounding authority verifier.
+ *
+ * No callback name, RuleKind/opcode or TS role property participates in rule
+ * identity.
  */
 export function replayStructuralRule(
   memory: ReadMemory,
