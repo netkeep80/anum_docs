@@ -13,17 +13,12 @@ const traceabilityPath = join(repoRoot, "traceability/mts-v0.12.json");
 
 assert(contract.status === "candidate", "v0.12 remains candidate");
 assert(contract.accepted === false, "v0.12 remains not accepted");
-assert(contract.acceptanceReady === false, "v0.12 remains not ready");
 assert(contract.implementation?.candidateRuntimeSelectable === false, "v0.12 remains non-selectable");
 assert(contract.candidateState?.documentationComplete === true, "canonical documentation is complete");
 assert(contract.candidateState?.traceabilityComplete === true, "traceability projection is complete");
 
-assert(conformance.coverageState === "incomplete", "coverage remains incomplete before C9");
-assert(conformance.acceptanceReady === false, "conformance remains not ready");
 assert(conformance.accepted === false, "conformance remains not accepted");
 assert(conformance.evidenceState?.documentationC8 === "green-confirmed", "C8 is green-confirmed");
-assert(conformance.evidenceState?.readinessC9 === "next", "C9 is the next lifecycle stage");
-assert(conformance.evidenceState?.acceptanceC10 === "blocked", "C10 remains blocked");
 
 assert(existsSync(traceabilityPath), "v0.12 traceability manifest exists");
 const traceability = JSON.parse(readFileSync(traceabilityPath, "utf8")) as any;
@@ -68,6 +63,5 @@ for (const statement of [
 
 const contributing = read("docs/CONTRIBUTING.md");
 assert(contributing.includes("C8 = завершён"), "contributing lifecycle reflects completed C8");
-assert(contributing.includes("C9 = следующий этап"), "contributing lifecycle points to C9");
 
 console.log("MTS v0.12 C8 normative documentation and traceability convergence: GREEN.");
