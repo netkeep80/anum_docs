@@ -49,6 +49,41 @@ export interface V012SourceContent {
   readonly prefixes: readonly LinkHandle[];
 }
 
+export type V012SourceResultErrorCode =
+  | "invalid-source-use-selection"
+  | "source-interpreter-mismatch"
+  | "source-use-binding-mismatch"
+  | "replay-wrote";
+
+export class V012SourceResultError extends Error {
+  override readonly name = "V012SourceResultError";
+
+  constructor(readonly code: V012SourceResultErrorCode) {
+    super(code);
+  }
+}
+
+export interface V012SourceResultEvidence {
+  readonly source: SourceFrontEndEvidence;
+  readonly structural: StructuralRuleReplayEvidence;
+  /** Exact Act attachment Links selected by the trusted consumer. */
+  readonly selectedActAttachments: readonly LinkHandle[];
+  /** Which source-selected form is required by this Rule application. */
+  readonly sourceUseIndex: number;
+  /** Which explicit StructuralRule role must carry that selected form. */
+  readonly sourceUseRole: LinkHandle;
+}
+
+export interface V012SourceResultReplayResult {
+  readonly selectedUses: readonly LinkHandle[];
+  readonly selectedUse: LinkHandle;
+  readonly structural: StructuralRuleReplayResult;
+}
+
+function failSourceResult(code: V012SourceResultErrorCode): never {
+  throw new V012SourceResultError(code);
+}
+
 export function materializeV012SourceContent(
   memory: WriteMemory,
   basis: RootBasis,
@@ -291,4 +326,94 @@ export function replayV012StructuralRuleAgainstSelectedEvidence(
     evidence,
     expectedTheoryArtifact,
   );
+}
+
+/**
+ * Consumer-visible v0.12 source -> Rule -> result verification boundary.
+ *
+ * Source truth and StructuralRule truth are replayed by their existing kernels.
+ * This operation owns only the cross-evidence invariants needed to claim that
+ * both successful replays are one source-driven result:
+ *
+ * - the actual Rule interpreter uses the same Dictionary/Grammar/Theory as the
+ *   source evidence;
+ * - the source Theory membership itself belongs to the independently selected
+ *   exact Theory authority;
+ * - one explicitly selected source Use equals one explicitly selected Rule-role
+ *   binding;
+ * - Act bindings are read only from the explicitly selected finite attachment
+ *   boundary.
+ */
+export function replayV012SourceResultEvidence(
+  memory: ReadMemory,
+  basis: RootBasis,
+  evidence: V012SourceResultEvidence,
+  expectedTheoryArtifact: unknown,
+): V012SourceResultReplayResult {
+  const before = memory.linkCount;
+  try {
+    const selectedUses = replayV012SelectedSourceEvidence(
+      memory,
+      basis,
+      evidence.source,
+    );
+
+    if (
+      !Number.isInteger(evidence.sourceUseIndex) ||
+      evidence.sourceUseIndex < 0 ||
+      evidence.sourceUseIndex >= selectedUses.length
+    ) {
+      return failSourceResult("invalid-source-use-selection");
+    }
+    const selectedUse = selectedUses[evidence.sourceUseIndex];
+    if (selectedUse === undefined) {
+      return failSourceResult("invalid-source-use-selection");
+    }
+
+    const structural = replayV012StructuralRuleAgainstSelectedEvidence(
+      memory,
+      evidence.structural,
+      expectedTheoryArtifact,
+      evidence.selectedActAttachments,
+    );
+
+    if (
+      structural.interpreterStructure.dictionary !== evidence.source.dictionary ||
+      structural.interpreterStructure.grammar !== evidence.source.grammar ||
+      structural.interpreterStructure.theory !== evidence.source.theory
+    ) {
+      return failSourceResult("source-interpreter-mismatch");
+    }
+
+    verifySelectedTheoryAdmissionAuthority(
+      memory,
+      evidence.source.theory,
+      evidence.source.theoryMembership,
+      expectedTheoryArtifact,
+    );
+
+    const sourceUseBinding = structural.bindings.find(
+      (binding) => binding.role === evidence.sourceUseRole,
+    );
+    if (
+      sourceUseBinding === undefined ||
+      sourceUseBinding.value !== selectedUse
+    ) {
+      return failSourceResult("source-use-binding-mismatch");
+    }
+
+    if (memory.linkCount !== before) {
+      return failSourceResult("replay-wrote");
+    }
+
+    return Object.freeze({
+      selectedUses,
+      selectedUse,
+      structural,
+    });
+  } finally {
+    if (memory.linkCount !== before) {
+      failSourceResult("replay-wrote");
+    }
+  }
 }
