@@ -263,6 +263,71 @@ class ReadOnlyProbe implements ReadMemory {
   same(resultPoles.start, selectedUse, "verified body starts from source-selected Use");
   same(resultPoles.end, formalResult, "verified FORMAL result is Theory-grounded");
 
+  // Independent composition falsifier: source and Rule replay can each be
+  // valid under the SAME Dictionary/Grammar/Theory while selecting different
+  // values for the explicit source-Use role. Today only this test harness sees
+  // the cross-evidence mismatch.
+  const mismatchedAct = defineActHeader(
+    memory,
+    interpreter,
+    roleDictionary,
+    afterContext,
+  );
+  const mismatchedUseAttachment = defineActField(
+    memory,
+    mismatchedAct,
+    sourceUseRole,
+    alternateUse,
+  );
+  const mismatchedClaimedBody = memory.ensure(alternateUse, formalResult);
+  const mismatchedRuleReplay: StructuralRuleReplayEvidence = Object.freeze({
+    ...correctReplay,
+    act: mismatchedAct,
+    claimedBody: mismatchedClaimedBody,
+  });
+
+  const beforeMismatchedComposition = memory.linkCount;
+  const mismatchedSelected = replayV012SelectedSourceEvidence(
+    new ReadOnlyProbe(memory),
+    basis,
+    sourceEvidence,
+  );
+  const mismatchedStructural = replayV012StructuralRuleAgainstSelectedEvidence(
+    new ReadOnlyProbe(memory),
+    mismatchedRuleReplay,
+    fixedTheoryAuthority,
+    Object.freeze([mismatchedUseAttachment]),
+  );
+  same(
+    mismatchedStructural.interpreterStructure.dictionary,
+    sourceEvidence.dictionary,
+    "mismatch control keeps same Dictionary",
+  );
+  same(
+    mismatchedStructural.interpreterStructure.grammar,
+    sourceEvidence.grammar,
+    "mismatch control keeps same Grammar",
+  );
+  same(
+    mismatchedStructural.interpreterStructure.theory,
+    sourceEvidence.theory,
+    "mismatch control keeps same Theory",
+  );
+  const mismatchedUseBinding = mismatchedStructural.bindings.find(
+    (binding) => binding.role === sourceUseRole,
+  );
+  assert(mismatchedUseBinding !== undefined, "mismatch control carries source-Use binding");
+  same(
+    mismatchedUseBinding.value,
+    mismatchedSelected[0],
+    "joint source/Rule verifier must reject mismatched selected Use before returning success",
+  );
+  same(
+    memory.linkCount,
+    beforeMismatchedComposition,
+    "mismatched separate replays remain read-only",
+  );
+
   // -----------------------------------------------------------------------
   // 4. SAME SOURCE + SAME AUTHORITY: WRONG CANDIDATES MUST FAIL.
   // -----------------------------------------------------------------------
