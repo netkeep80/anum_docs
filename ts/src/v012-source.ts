@@ -51,6 +51,7 @@ export interface V012SourceContent {
 
 export type V012SourceResultErrorCode =
   | "invalid-source-use-selection"
+  | "source-authority-mismatch"
   | "source-interpreter-mismatch"
   | "source-use-binding-mismatch"
   | "replay-wrote";
@@ -243,6 +244,55 @@ export function replayV012SelectedSourceEvidence(
 }
 
 /**
+ * Stronger source replay against an independently selected source authority.
+ *
+ * replayV012SelectedSourceEvidence remains the low-level structural replay over
+ * the membership Links carried by evidence. This boundary requires those exact
+ * Dictionary / Grammar / Theory identities and exact Grammar / Theory
+ * membership Links to match a separate trusted consumer selection.
+ *
+ * Theory membership is additionally checked against the independently fixed
+ * exact Theory artifact used by the surrounding consumer verifier.
+ */
+export function replayV012SelectedSourceEvidenceAgainstAuthority(
+  memory: ReadMemory,
+  basis: RootBasis,
+  evidence: SourceFrontEndEvidence,
+  expectedAuthority: V012SourceAuthority,
+  expectedTheoryArtifact: unknown,
+): readonly LinkHandle[] {
+  const before = memory.linkCount;
+  try {
+    if (
+      evidence.dictionary !== expectedAuthority.dictionary ||
+      evidence.grammar !== expectedAuthority.grammar ||
+      evidence.theory !== expectedAuthority.theory ||
+      evidence.grammarMembership !== expectedAuthority.grammarMembership ||
+      evidence.theoryMembership !== expectedAuthority.theoryMembership
+    ) {
+      return failSourceResult("source-authority-mismatch");
+    }
+
+    verifySelectedTheoryAdmissionAuthority(
+      memory,
+      expectedAuthority.theory,
+      expectedAuthority.theoryMembership,
+      expectedTheoryArtifact,
+    );
+
+    const selected = replayV012SelectedSourceEvidence(memory, basis, evidence);
+    if (memory.linkCount !== before) {
+      return failSourceResult("replay-wrote");
+    }
+    return selected;
+  } finally {
+    if (memory.linkCount !== before) {
+      failSourceResult("replay-wrote");
+    }
+  }
+}
+
+/**
  * v0.12 surrounding authority boundary for StructuralRule replay.
  *
  * replayStructuralRule remains the low-level structural primitive whose
@@ -348,14 +398,17 @@ export function replayV012SourceResultEvidence(
   memory: ReadMemory,
   basis: RootBasis,
   evidence: V012SourceResultEvidence,
+  expectedSourceAuthority: V012SourceAuthority,
   expectedTheoryArtifact: unknown,
 ): V012SourceResultReplayResult {
   const before = memory.linkCount;
   try {
-    const selectedUses = replayV012SelectedSourceEvidence(
+    const selectedUses = replayV012SelectedSourceEvidenceAgainstAuthority(
       memory,
       basis,
       evidence.source,
+      expectedSourceAuthority,
+      expectedTheoryArtifact,
     );
 
     if (
@@ -384,13 +437,6 @@ export function replayV012SourceResultEvidence(
     ) {
       return failSourceResult("source-interpreter-mismatch");
     }
-
-    verifySelectedTheoryAdmissionAuthority(
-      memory,
-      evidence.source.theory,
-      evidence.source.theoryMembership,
-      expectedTheoryArtifact,
-    );
 
     const sourceUseBinding = structural.bindings.find(
       (binding) => binding.role === evidence.sourceUseRole,

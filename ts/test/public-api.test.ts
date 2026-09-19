@@ -45,6 +45,7 @@ import type {
   StructuralScopedDerivationEvidence,
   StructuralScopedDerivationReplayResult,
   StructuralTheoremEvidence,
+  V012SourceAuthority,
   V012SourceContent,
   V012SourceResultErrorCode,
   V012SourceResultEvidence,
@@ -74,8 +75,6 @@ type InternalCanonicalPortableStructuralDerivationWithAssumptionsProvenanceClaim
 
 // @ts-expect-error P3b keeps assumption construction internal; consumers submit materialized evidence.
 type InternalAssumptionContextConstructor = typeof import("../src/public.js").defineStructuralAssumptionContext;
-// @ts-expect-error C7 keeps source authority construction internal.
-type InternalV012SourceAuthority = import("../src/public.js").V012SourceAuthority;
 // @ts-expect-error C7 keeps source evidence production internal.
 type InternalV012SourceBuilder = typeof import("../src/public.js").buildV012SelectedSourceEvidence;
 // @ts-expect-error C7 keeps structural Rule construction/admission internal.
@@ -86,6 +85,8 @@ type InternalStructuralRuleAdmission = typeof import("../src/public.js").admitSt
 type InternalV012TheoryRuleReplay = typeof import("../src/public.js").replayV012StructuralRuleAgainstTheoryAuthority;
 // @ts-expect-error C7 keeps selected-Act view plumbing internal; consumers use the composite verifier.
 type InternalV012SelectedRuleReplay = typeof import("../src/public.js").replayV012StructuralRuleAgainstSelectedEvidence;
+// @ts-expect-error C7 keeps source-authority plumbing internal; consumers use the composite verifier.
+type InternalV012SourceAuthorityReplay = typeof import("../src/public.js").replayV012SelectedSourceEvidenceAgainstAuthority;
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`public-api: ${message}`);
@@ -306,6 +307,7 @@ const qItem: QuaternaryAnumItem | undefined = undefined;
 const qMaterialized: MaterializedQuaternaryAnum | undefined = undefined;
 const stringRead: ReadV012StringAnum | undefined = undefined;
 const sourceEvidence: SourceFrontEndEvidence | undefined = undefined;
+const sourceAuthority: V012SourceAuthority | undefined = undefined;
 const sourceContent: V012SourceContent | undefined = undefined;
 const sourceResultErrorCode: V012SourceResultErrorCode | undefined = undefined;
 const sourceResultEvidence: V012SourceResultEvidence | undefined = undefined;
@@ -370,6 +372,7 @@ void [
   qMaterialized,
   stringRead,
   sourceEvidence,
+  sourceAuthority,
   sourceContent,
   sourceResultErrorCode,
   sourceResultEvidence,

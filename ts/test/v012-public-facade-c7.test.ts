@@ -36,6 +36,7 @@ import type {
   QuaternaryAnumItem,
   ReadV012StringAnum,
   SourceFrontEndEvidence,
+  V012SourceAuthority,
   StructuralRuleReplayEvidence,
   StructuralRuleReplayResult,
   V012SourceContent,
@@ -94,6 +95,7 @@ same(publicApi.replayStructuralRule, internalReplayStructuralRule, "replayStruct
 // construction vocabulary that produced the completion witnesses.
 for (const internalOnly of [
   "buildV012SelectedSourceEvidence",
+  "replayV012SelectedSourceEvidenceAgainstAuthority",
   "replayV012StructuralRuleAgainstTheoryAuthority",
   "replayV012StructuralRuleAgainstSelectedEvidence",
   "defineDictionaryScope",
