@@ -15,10 +15,8 @@ const index = buildContractObservatoryIndex(repositoryRoot);
 const projection = buildMethodologyProjection(repositoryRoot, index);
 const current = projection.versions.find((version) => version.isCurrent);
 const previous = projection.versions.find((version) => version.isPrevious);
-const older = projection.versions.find((version) => version.contractId === "mts-contract/v0.10");
 assert(current !== undefined, "current version exists");
 assert(previous !== undefined, "previous version exists");
-assert(older !== undefined, "older v0.10 version exists");
 
 same(current.contractId, "mts-contract/v0.12", "current release is v0.12 after B1");
 same(current.semanticInvariants.length, 18, "current v0.12 exposes every requiredSemanticLaw through traceability authority");
@@ -81,9 +79,6 @@ assert(
 
 same(previous.traceabilityManifestPath, "traceability/mts-v0.11.json", "previous v0.11 keeps immutable traceability provenance");
 assert(!previous.unresolvedRelations.includes("traceability-manifest"), "previous v0.11 traceability remains resolved after current rotates");
-
-same(older.semanticInvariants.length, 0, "older v0.10 without matching traceability manifest stays unlinked");
-assert(older.unresolvedRelations.includes("traceability-manifest"), "older missing manifest remains explicit");
 
 const html = renderContractObservatoryHtml(index, projection);
 assert(html.includes('data-invariant-id="topLevelDot"'), "topLevelDot has a visible source-derived anatomy card");

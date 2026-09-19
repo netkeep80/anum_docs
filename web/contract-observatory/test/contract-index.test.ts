@@ -31,10 +31,10 @@ function expectCode(effect: () => unknown, code: ContractIndexErrorCode, message
 const repositoryRoot = process.cwd();
 const realIndex = buildContractObservatoryIndex(repositoryRoot);
 same(realIndex.schema, "mts-contract-observatory-index/v0.1", "index schema");
-same(realIndex.versions.length, 3, "pre-cleanup repository has current, previous and one older accepted pair");
+same(realIndex.versions.length, 2, "post-cleanup repository has exactly current and previous accepted pairs");
 same(
   realIndex.versions.map((version) => version.contractId).join(","),
-  "mts-contract/v0.10,mts-contract/v0.11,mts-contract/v0.12",
+  "mts-contract/v0.11,mts-contract/v0.12",
   "real repository uses natural version order",
 );
 same(realIndex.currentContractPath, "contracts/mts-contract-v0.12.json", "policy current contract");
@@ -45,8 +45,7 @@ same(realIndex.acceptancePath, "cutover/typescript-c1-acceptance-v0.5.json", "ac
 
 const current = realIndex.versions.find((version) => version.isCurrent);
 const previous = realIndex.versions.find((version) => version.isPrevious);
-const older = realIndex.versions.find((version) => version.contractId === "mts-contract/v0.10");
-assert(current !== undefined && previous !== undefined && older !== undefined, "current, previous and older summaries exist");
+assert(current !== undefined && previous !== undefined, "current and previous summaries exist");
 same(current.contractId, "mts-contract/v0.12", "current classification comes from accepted evidence");
 same(previous.contractId, "mts-contract/v0.11", "previous classification comes from accepted evidence");
 same(current.status, "accepted", "current status projected");
@@ -57,16 +56,13 @@ same(current.requiredExecutableGateCount, 16, "current v0.12 keeps all mandatory
 assert(current.requiredNegativeVectorCount > 0, "current negative-vector coverage projected");
 same(previous.status, "accepted", "previous v0.11 remains accepted evidence");
 same(previous.accepted, true, "previous accepted flag projected");
-same(older.status, "accepted", "older v0.10 remains immutable accepted evidence pending cleanup");
-same(older.isCurrent, false, "older release is not current");
-same(older.isPrevious, false, "older release is not previous");
 
 const serialized = serializeContractObservatoryIndex(realIndex);
 same(serialized, serializeContractObservatoryIndex(buildContractObservatoryIndex(repositoryRoot)), "serialization is deterministic");
 assert(!serialized.includes("rootBasisTarget"), "index does not copy raw contract bodies");
 assert(!serialized.includes("TopBind(R,S)"), "index does not copy semantic equations");
 const livePaths = new Set(realIndex.versions.flatMap((version) => [version.contractPath, version.conformancePath]));
-same(livePaths.size, 6, "all six tracked evidence files accounted for exactly once");
+same(livePaths.size, 4, "current and previous contract/conformance evidence files are accounted for exactly once");
 
 interface Fixture {
   readonly root: string;
