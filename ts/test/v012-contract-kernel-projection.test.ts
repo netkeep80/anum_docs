@@ -10,27 +10,27 @@ const contract = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-contract-v0.12.json"), "utf8"),
 ) as any;
 
-// Lifecycle must not move merely because the paper projection catches up.
-assert(contract.status === "candidate", "status remains candidate");
-assert(contract.accepted === false, "candidate remains not accepted");
-assert(contract.implementation?.candidateRuntimeSelectable === false, "candidate remains non-selectable");
+// C10 records release authority only after the candidate kernel and documentation were complete.
+assert(contract.status === "accepted", "status is accepted after explicit C10");
+assert(contract.accepted === true, "accepted flag is explicit");
+assert(contract.implementation?.acceptedRuntime === "mts-contract/v0.12", "accepted runtime authority is v0.12");
+assert(contract.implementation?.candidateRuntimeSelectable === false, "no separate candidate runtime remains selectable");
 assert(contract.implementation?.publicFacade === "ts/src/public.ts", "public facade path remains explicit");
 assert(contract.candidateState?.publicFacadeComplete === true, "C7 public facade is complete");
 assert(contract.implementation?.implementationComplete === true, "candidate kernel implementation is complete");
 assert(
   contract.implementation?.implementationCompleteMeaning ===
-    "current-v0.12-candidate-kernel-scope-only; excludes C8 documentation, C9 readiness and C10 acceptance",
+    "accepted-v0.12-kernel-scope-complete; lifecycle completion is recorded separately",
   "implementationComplete meaning is bounded to the candidate kernel scope",
 );
 assert(contract.candidateState?.documentationComplete === true, "C8 documentation is complete");
 assert(contract.candidateState?.traceabilityComplete === true, "v0.12 traceability is complete");
 
-// The live accepted v0.11 runtime is unchanged, while the v0.12 candidate
-// kernel now contains executable behavior that must be projected honestly.
-assert(contract.implementation?.productionBehaviorChanged === false, "accepted live runtime remains unchanged");
+// C10 changes accepted version authority but introduces no new ts/src production code.
+assert(contract.implementation?.productionBehaviorChanged === false, "C10 adds no new ts/src production behavior");
 assert(contract.implementation?.candidateKernelBehaviorImplemented === true, "candidate kernel behavior is implemented");
 assert(
-  contract.implementation?.productionBehaviorChangedMeaning === "accepted-live-runtime-remains-v0.11",
+  contract.implementation?.productionBehaviorChangedMeaning === "C10-acceptance-rotates-version-authority-without-new-ts-src-production-change",
   "productionBehaviorChanged meaning is explicit",
 );
 
