@@ -188,7 +188,33 @@ function renderInvariantCard(
   const vectorIds = invariantVectorIds(invariant);
   const evidenceReferences = linkedEvidenceReferences(version, vectorIds);
   const acceptance = version.acceptanceReferences.map((reference) => Object.freeze({ id: reference.id, label: `${reference.id} · ${reference.sourcePath}` }));
-  return `<article class="invariant-card" data-invariant-id="${escapeAttribute(invariant.id)}"><h4><button type="button" class="invariant-select" data-item-id="invariant:${escapeAttribute(invariant.id)}" aria-pressed="false">${escapeHtml(invariant.id)}</button></h4><dl class="invariant-meta"><dt>Путь контракта</dt><dd>${escapeHtml(version.contractPath)}</dd><dt>JSON Pointer контракта</dt><dd>${escapeHtml(invariant.contractPointer)}</dd><dt>Закон контракта</dt><dd>${escapeHtml(invariant.contractValue)}</dd><dt>Путь корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd><dt>Ссылка на теорию</dt><dd>нет (нет исходной связи уровня инварианта)</dd></dl>${renderTraceGroup("Векторы генезиса", invariant.positive.requiredGenesisVectors, "vector")}${renderTraceGroup("Векторы смысла", invariant.positive.requiredMeaningVectors, "vector")}${renderTraceGroup("Векторы классификации C2", invariant.positive.requiredC2ClassificationVectors, "vector")}${renderTraceGroup("Векторы совместимости", invariant.positive.requiredCompatibilityVectors, "vector")}${renderTraceGroup("Отрицательные векторы", invariant.negative.requiredNegativeVectors, "vector")}${renderTraceGroup("Исполняемые проверки", invariant.requiredExecutableGates, "gate")}${renderEvidenceGroup("Существующие свидетельства", evidenceReferences)}${renderReferenceGroup("Происхождение приёмки", acceptance)}<details class="raw-provenance"><summary>Исходное происхождение данных</summary><dl class="invariant-meta"><dt>ID инварианта</dt><dd>${escapeHtml(invariant.id)}</dd><dt>Источник трассируемости</dt><dd>${escapeHtml(invariant.traceabilitySourcePath)}</dd><dt>Источник контракта</dt><dd>${escapeHtml(version.contractPath)}#${escapeHtml(invariant.contractPointer)}</dd><dt>Источник корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd></dl></details></article>`;
+  return `<article class="invariant-card" data-invariant-id="${escapeAttribute(invariant.id)}"><h4><button type="button" class="invariant-select" data-item-id="invariant:${escapeAttribute(invariant.id)}" aria-pressed="false">${escapeHtml(invariant.id)}</button></h4><dl class="invariant-meta"><dt>Путь контракта</dt><dd>${escapeHtml(version.contractPath)}</dd><dt>JSON Pointer контракта</dt><dd>${escapeHtml(invariant.contractPointer)}</dd><dt>Закон контракта</dt><dd>${escapeHtml(invariant.contractValue)}</dd><dt>Путь корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd><dt>Ссылка на теорию</dt><dd>нет (нет исходной связи уровня инварианта)</dd></dl>${renderPositiveTraceGroups(invariant)}${renderTraceGroup("Отрицательные векторы", invariant.negative.requiredNegativeVectors, "vector")}${renderTraceGroup("Исполняемые проверки", invariant.requiredExecutableGates, "gate")}${renderEvidenceGroup("Существующие свидетельства", evidenceReferences)}${renderReferenceGroup("Происхождение приёмки", acceptance)}<details class="raw-provenance"><summary>Исходное происхождение данных</summary><dl class="invariant-meta"><dt>ID инварианта</dt><dd>${escapeHtml(invariant.id)}</dd><dt>Источник трассируемости</dt><dd>${escapeHtml(invariant.traceabilitySourcePath)}</dd><dt>Источник контракта</dt><dd>${escapeHtml(version.contractPath)}#${escapeHtml(invariant.contractPointer)}</dd><dt>Источник корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd></dl></details></article>`;
+}
+
+function renderPositiveTraceGroups(
+  invariant: MethodologyVersionProjection["semanticInvariants"][number],
+): string {
+  if (invariant.positiveGroups !== undefined) {
+    return invariant.positiveGroups
+      .map((group) => renderTraceGroup(positiveSourceSetLabel(group.sourceSet), group.vectorIds, "vector"))
+      .join("");
+  }
+  return [
+    renderTraceGroup("Векторы генезиса", invariant.positive.requiredGenesisVectors, "vector"),
+    renderTraceGroup("Векторы смысла", invariant.positive.requiredMeaningVectors, "vector"),
+    renderTraceGroup("Векторы классификации C2", invariant.positive.requiredC2ClassificationVectors, "vector"),
+    renderTraceGroup("Векторы совместимости", invariant.positive.requiredCompatibilityVectors, "vector"),
+  ].join("");
+}
+
+function positiveSourceSetLabel(sourceSet: string): string {
+  switch (sourceSet) {
+    case "requiredStringVectors": return "Векторы строк";
+    case "requiredQuaternaryVectors": return "Векторы четверичной формы";
+    case "requiredFormalVectors": return "Векторы формальной нотации";
+    case "requiredCrossLayerVectors": return "Межслойные векторы";
+    default: return `Положительный набор · ${sourceSet}`;
+  }
 }
 
 function renderTraceGroup(label: string, values: readonly string[], prefix: "vector" | "gate" | "evidence"): string {
@@ -217,6 +243,7 @@ function invariantVectorIds(invariant: MethodologyVersionProjection["semanticInv
     ...invariant.positive.requiredMeaningVectors,
     ...invariant.positive.requiredC2ClassificationVectors,
     ...invariant.positive.requiredCompatibilityVectors,
+    ...(invariant.positiveGroups ?? []).flatMap((group) => group.vectorIds),
     ...invariant.negative.requiredNegativeVectors,
   ]);
 }
