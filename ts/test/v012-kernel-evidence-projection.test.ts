@@ -36,6 +36,8 @@ for (const gate of gates) {
   );
 }
 
-// Consuming a real kernel gate does not itself decide readiness or acceptance.
-assert(conformance.status === "candidate", "v0.12 must remain candidate");
-assert(conformance.accepted === false, "v0.12 must remain not accepted");
+// C10 acceptance consumes this already-established kernel evidence without
+// changing the exact mandatory gate set.
+assert(conformance.status === "accepted", "v0.12 accepted conformance consumes the projected kernel evidence");
+assert(conformance.accepted === true, "v0.12 accepted flag is explicit");
+assert(conformance.requiredExecutableGates?.length === 16, "accepted v0.12 retains all sixteen mandatory gates");
