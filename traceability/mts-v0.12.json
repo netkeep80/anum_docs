@@ -56,17 +56,23 @@
           "v012-formal-parent-continues-after-child-result"
         ],
         "requiredCrossLayerVectors": [
-          "v012-formal-square-bracket-child-is-string-not-q"
+          "v012-formal-square-bracket-child-is-string-not-q",
+          "v012-formal-square-bracket-rule-authorizes-string-open",
+          "v012-formal-square-bracket-rule-open-anchored-to-formal-k"
         ]
       },
       "negative": {
         "requiredNegativeVectors": [
-          "v012-formal-square-brackets-do-not-select-q-child"
+          "v012-formal-square-brackets-do-not-select-q-child",
+          "v012-formal-square-bracket-low-level-open-is-not-authority",
+          "v012-formal-square-bracket-missing-rule-does-not-open",
+          "v012-formal-square-bracket-substituted-q-rule-does-not-open"
         ]
       },
       "requiredExecutableGates": [
         "ts/test/v012-formal-square-string-child-c4.test.ts",
-        "ts/test/v012-q-compatibility-representation-c5.test.ts"
+        "ts/test/v012-q-compatibility-representation-c5.test.ts",
+        "ts/test/v012-formal-square-rule-authority.test.ts"
       ]
     },
     "quaternaryNestedContext": {
