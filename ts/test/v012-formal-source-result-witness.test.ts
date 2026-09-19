@@ -293,11 +293,16 @@ class ReadOnlyProbe implements ReadMemory {
   // valid under the SAME Dictionary/Grammar/Theory while selecting different
   // values for the explicit source-Use role. Today only this test harness sees
   // the cross-evidence mismatch.
+  const mismatchedAfterContext = refs[11]!;
+  assert(
+    mismatchedAfterContext !== afterContext,
+    "mismatch control uses a distinct explicit after-context",
+  );
   const mismatchedAct = defineActHeader(
     memory,
     interpreter,
     roleDictionary,
-    afterContext,
+    mismatchedAfterContext,
   );
   const mismatchedUseAttachment = defineActField(
     memory,
@@ -310,6 +315,7 @@ class ReadOnlyProbe implements ReadMemory {
     ...correctReplay,
     act: mismatchedAct,
     claimedBody: mismatchedClaimedBody,
+    expectedAfterContext: mismatchedAfterContext,
   });
 
   const beforeMismatchedComposition = memory.linkCount;
