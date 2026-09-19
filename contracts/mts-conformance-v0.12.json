@@ -7,9 +7,9 @@
   "contract": "mts-contract/v0.12",
   "semanticBase": "mts-conformance/v0.11",
   "observableSemanticDelta": true,
-  "acceptanceReady": false,
-  "coverageState": "incomplete",
-  "coverageStateMeaning": "C1-C8 and the completed foundation/authority reconciliation are backed by executable kernel evidence, public consumer convergence, normative candidate documentation and exact v0.12 traceability. C9 readiness evidence and C10 explicit acceptance are not complete.",
+  "acceptanceReady": true,
+  "coverageState": "complete",
+  "coverageStateMeaning": "C1-C9 and the completed foundation/authority reconciliation are backed by executable kernel evidence, public consumer convergence, normative candidate documentation, exact v0.12 traceability and an independent readiness audit. The candidate is ready for a separate C10 acceptance/rejection decision; acceptance itself has not been performed.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.11",
     "conformance": "mts-conformance/v0.11"
@@ -301,8 +301,8 @@
     "formalContextC6": "green-confirmed",
     "publicFacadeC7": "green-confirmed",
     "documentationC8": "green-confirmed",
-    "readinessC9": "next",
-    "acceptanceC10": "blocked",
+    "readinessC9": "green-confirmed",
+    "acceptanceC10": "next",
     "foundationReconciliation": "green-complete",
     "hierarchicalQuaternaryAnum": "green-confirmed",
     "v012StringHierarchy": "green-confirmed",
@@ -395,13 +395,11 @@
     "readinessAudit": {
       "issue": 1134,
       "stage": "C9",
-      "status": "next",
+      "status": "green-confirmed",
       "requiredForAcceptance": true
     }
   },
   "acceptanceBlockers": [
-    "readiness audit C9 is incomplete",
-    "v0.12 has not passed explicit acceptance cutover",
-    "temporary 6/2 contract budget debt remains until post-cutover cleanup"
+    "v0.12 has not passed explicit acceptance cutover"
   ]
 }
