@@ -273,6 +273,7 @@ class ReadOnlyProbe implements ReadMemory {
     probe,
     basis,
     correctSourceResultEvidence,
+    authority,
     fixedTheoryAuthority,
   );
   const selected = combined.selectedUses;
@@ -363,6 +364,7 @@ class ReadOnlyProbe implements ReadMemory {
         structural: mismatchedRuleReplay,
         selectedActAttachments: Object.freeze([mismatchedUseAttachment]),
       }),
+      authority,
       fixedTheoryAuthority,
     ),
   );
@@ -385,6 +387,11 @@ class ReadOnlyProbe implements ReadMemory {
     grammar: alternateGrammar,
     grammarMembership: alternateGrammarMembership,
   });
+  const alternateGrammarAuthority: V012SourceAuthority = Object.freeze({
+    ...authority,
+    grammar: alternateGrammar,
+    grammarMembership: alternateGrammarMembership,
+  });
   const alternateGrammarSelected = replayV012SelectedSourceEvidence(
     new ReadOnlyProbe(memory),
     basis,
@@ -400,6 +407,7 @@ class ReadOnlyProbe implements ReadMemory {
         ...correctSourceResultEvidence,
         source: alternateGrammarSourceEvidence,
       }),
+      alternateGrammarAuthority,
       fixedTheoryAuthority,
     ),
   );
@@ -479,6 +487,7 @@ class ReadOnlyProbe implements ReadMemory {
         ...correctSourceResultEvidence,
         structural: selfAdmittedRuleReplay,
       }),
+      authority,
       fixedTheoryAuthority,
     ),
   );
@@ -495,6 +504,7 @@ class ReadOnlyProbe implements ReadMemory {
     new ReadOnlyProbe(memory),
     basis,
     correctSourceResultEvidence,
+    authority,
     fixedTheoryAuthority,
   );
   same(
@@ -558,6 +568,7 @@ class ReadOnlyProbe implements ReadMemory {
     new ReadOnlyProbe(memory),
     basis,
     correctSourceResultEvidence,
+    authority,
     fixedTheoryAuthority,
   );
   const oldUseBinding = oldEvidenceReplay.structural.bindings.find(
@@ -585,6 +596,7 @@ class ReadOnlyProbe implements ReadMemory {
           lateUseAttachment,
         ]),
       }),
+      authority,
       fixedTheoryAuthority,
     ),
   );
