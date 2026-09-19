@@ -205,7 +205,7 @@ interface MarkdownFacts {
   readonly visible: readonly boolean[];
 }
 
-const OWNER_LINE = /^<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>$/;
+const OWNER_LINE = /^<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>(?:\s*<!--\s*нормативный владелец\s*-->)?$/;
 const REFERENCE = /<!--\s*mts-law-ref:([A-Za-z][A-Za-z0-9]*)\s*-->/g;
 
 function markdownFacts(path: string, source: string): MarkdownFacts {
