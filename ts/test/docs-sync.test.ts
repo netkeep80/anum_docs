@@ -39,15 +39,15 @@ expectThrow(
 
 const repositoryRoot = findRepositoryRoot();
 const projection = loadCurrentProjection(repositoryRoot);
-assert.equal(projection.currentContract, "mts-contract/v0.11");
-assert.equal(projection.previousContract, "mts-contract/v0.10");
+assert.equal(projection.currentContract, "mts-contract/v0.12");
+assert.equal(projection.previousContract, "mts-contract/v0.11");
 assert.deepEqual(projection.internalSigns, ["∞", "[", "]", "1", "0", "(", ")", "⟼", ":", "=", "."]);
 assert.equal(projection.readMayMaterialize, false);
 assert.equal(projection.notFoundImpliesNonExistence, false);
 
 const rendered = renderCurrentProjection(projection);
+assert.ok(rendered.includes("mts-contract/v0.12"));
 assert.ok(rendered.includes("mts-contract/v0.11"));
-assert.ok(rendered.includes("mts-contract/v0.10"));
 assert.ok(rendered.includes("∞ [ ] 1 0 ( ) ⟼ : = ."));
 assert.ok(rendered.includes(PROJECTION_START));
 assert.ok(rendered.includes(PROJECTION_END));
@@ -62,10 +62,10 @@ try {
     writeFileSync(target, readFileSync(resolve(repositoryRoot, path), "utf8"), "utf8");
   };
   copy("repo-policy.json");
+  copy("contracts/mts-contract-v0.12.json");
+  copy("contracts/mts-conformance-v0.12.json");
   copy("contracts/mts-contract-v0.11.json");
   copy("contracts/mts-conformance-v0.11.json");
-  copy("contracts/mts-contract-v0.10.json");
-  copy("contracts/mts-conformance-v0.10.json");
   for (const path of CANONICAL_DOCS) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);

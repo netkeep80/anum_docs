@@ -36,6 +36,8 @@ for (const gate of gates) {
   );
 }
 
-// Consuming a real kernel gate does not itself decide readiness or acceptance.
-assert(conformance.status === "candidate", "v0.12 must remain candidate");
-assert(conformance.accepted === false, "v0.12 must remain not accepted");
+// Consuming a real kernel gate does not itself decide lifecycle. The same
+// mandatory evidence remains required before and after explicit C10 acceptance.
+const candidateLifecycle = conformance.status === "candidate" && conformance.accepted === false;
+const acceptedLifecycle = conformance.status === "accepted" && conformance.accepted === true;
+assert(candidateLifecycle || acceptedLifecycle, "v0.12 is the ready candidate or accepted release");

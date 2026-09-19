@@ -14,10 +14,33 @@ const repositoryRoot = process.cwd();
 const index = buildContractObservatoryIndex(repositoryRoot);
 const projection = buildMethodologyProjection(repositoryRoot, index);
 const current = projection.versions.find((version) => version.isCurrent);
+const previous = projection.versions.find((version) => version.isPrevious);
+const older = projection.versions.find((version) => version.contractId === "mts-contract/v0.10");
 assert(current !== undefined, "current version exists");
+assert(previous !== undefined, "previous version exists");
+assert(older !== undefined, "older v0.10 version exists");
 
-same(current.semanticInvariants.length, 7, "current v0.11 exposes exactly seven authority invariants");
-const topLevelDot = current.semanticInvariants.find((invariant) => invariant.id === "topLevelDot");
+same(current.contractId, "mts-contract/v0.12", "current release is v0.12 after B1");
+same(current.semanticInvariants.length, 18, "current v0.12 exposes every requiredSemanticLaw through traceability authority");
+same(current.traceabilityManifestPath, "traceability/mts-v0.12.json", "current v0.12 traceability manifest source is explicit");
+assert(!current.unresolvedRelations.includes("traceability-manifest"), "current v0.12 traceability manifest is resolved");
+
+const currentFormalSquare = current.semanticInvariants.find((invariant) => invariant.id === "formalSquareBracketStringChild");
+assert(currentFormalSquare !== undefined, "current v0.12 FORMAL square-bracket invariant is projected");
+assert(
+  currentFormalSquare.requiredExecutableGates.includes("ts/test/v012-formal-square-string-child-c4.test.ts"),
+  "current v0.12 FORMAL square-bracket invariant is bound to its executable gate",
+);
+const formalGroup = currentFormalSquare.positiveGroups?.find((group) => group.sourceSet === "requiredFormalVectors");
+assert(formalGroup !== undefined, "v0.2 preserves requiredFormalVectors as an explicit source set");
+assert(
+  formalGroup.vectorIds.includes("v012-formal-nonempty-string-child"),
+  "v0.2 FORMAL source set carries its exact conformance vector",
+);
+
+same(previous.contractId, "mts-contract/v0.11", "previous release is immutable v0.11 evidence");
+same(previous.semanticInvariants.length, 7, "previous v0.11 exposes exactly seven authority invariants");
+const topLevelDot = previous.semanticInvariants.find((invariant) => invariant.id === "topLevelDot");
 assert(topLevelDot !== undefined, "topLevelDot invariant is projected from traceability authority");
 same(topLevelDot.traceabilitySourcePath, "traceability/mts-v0.11.json", "manifest source path remains explicit");
 same(topLevelDot.contractPointer, "/requiredSemanticLaws/topLevelDot", "exact contract pointer is preserved");
@@ -38,7 +61,7 @@ same(
   "required gates come directly from manifest",
 );
 
-const topLevelProduction = current.evidenceReferences.find(
+const topLevelProduction = previous.evidenceReferences.find(
   (reference) => reference.sourcePath === "ts/test/v011-top-level-root-binding.test.ts",
 );
 assert(topLevelProduction !== undefined, "top-level production evidence reference exists");
@@ -48,7 +71,7 @@ same(
   "production evidence identifiers are preserved exactly from conformance",
 );
 
-const dotMeaning = current.semanticInvariants.find((invariant) => invariant.id === "dotMeaning");
+const dotMeaning = previous.semanticInvariants.find((invariant) => invariant.id === "dotMeaning");
 assert(dotMeaning !== undefined, "dotMeaning invariant exists");
 same(dotMeaning.negative.requiredNegativeVectors.length, 0, "explicit empty negative category remains empty");
 assert(
@@ -56,29 +79,11 @@ assert(
   "Q-boundary evidence is not guessed into dotMeaning",
 );
 
-const candidate = projection.versions.find((version) => version.contractId === "mts-contract/v0.12");
-assert(candidate !== undefined, "v0.12 candidate exists");
-same(candidate.traceabilityManifestPath, "traceability/mts-v0.12.json", "candidate traceability manifest source is explicit");
-same(candidate.semanticInvariants.length, 18, "v0.12 exposes every requiredSemanticLaw through traceability authority");
-assert(!candidate.unresolvedRelations.includes("traceability-manifest"), "v0.12 traceability manifest is no longer unresolved");
+same(previous.traceabilityManifestPath, "traceability/mts-v0.11.json", "previous v0.11 keeps immutable traceability provenance");
+assert(!previous.unresolvedRelations.includes("traceability-manifest"), "previous v0.11 traceability remains resolved after current rotates");
 
-const candidateFormalSquare = candidate.semanticInvariants.find((invariant) => invariant.id === "formalSquareBracketStringChild");
-assert(candidateFormalSquare !== undefined, "v0.12 FORMAL square-bracket invariant is projected");
-assert(
-  candidateFormalSquare.requiredExecutableGates.includes("ts/test/v012-formal-square-string-child-c4.test.ts"),
-  "v0.12 FORMAL square-bracket invariant is bound to its executable gate",
-);
-const formalGroup = candidateFormalSquare.positiveGroups?.find((group) => group.sourceSet === "requiredFormalVectors");
-assert(formalGroup !== undefined, "v0.2 preserves requiredFormalVectors as an explicit source set");
-assert(
-  formalGroup.vectorIds.includes("v012-formal-nonempty-string-child"),
-  "v0.2 FORMAL source set carries its exact conformance vector",
-);
-
-const previous = projection.versions.find((version) => version.isPrevious);
-assert(previous !== undefined, "previous version exists");
-same(previous.semanticInvariants.length, 0, "version without a matching traceability manifest stays unlinked");
-assert(previous.unresolvedRelations.includes("traceability-manifest"), "missing manifest remains explicit");
+same(older.semanticInvariants.length, 0, "older v0.10 without matching traceability manifest stays unlinked");
+assert(older.unresolvedRelations.includes("traceability-manifest"), "older missing manifest remains explicit");
 
 const html = renderContractObservatoryHtml(index, projection);
 assert(html.includes('data-invariant-id="topLevelDot"'), "topLevelDot has a visible source-derived anatomy card");
@@ -132,7 +137,7 @@ assert(!dotMeaningHtml.includes("v011-q-alphabet-remains-four-abits"), "UI does 
 const maliciousLaw = `<img src=x onerror="alert('mts')">`;
 const maliciousProjection = Object.freeze({
   ...projection,
-  versions: Object.freeze(projection.versions.map((version) => version !== current ? version : Object.freeze({
+  versions: Object.freeze(projection.versions.map((version) => version !== previous ? version : Object.freeze({
     ...version,
     semanticInvariants: Object.freeze(version.semanticInvariants.map((invariant) => invariant.id !== "topLevelDot"
       ? invariant

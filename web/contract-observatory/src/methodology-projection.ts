@@ -192,7 +192,7 @@ function projectVersion(
   const manifest = findTraceabilityManifest(repoRoot, summary);
   const semanticInvariants = manifest === undefined
     ? []
-    : projectSemanticInvariants(index, summary, contract, conformance, manifest);
+    : projectSemanticInvariants(summary, contract, conformance, manifest);
   const traceability = collectTraceability(
     positiveVectors,
     negativeVectors,
@@ -265,7 +265,6 @@ function findTraceabilityManifest(
 }
 
 function projectSemanticInvariants(
-  index: ContractObservatoryIndex,
   summary: ContractVersionSummary,
   contract: JsonRecord,
   conformance: JsonRecord,
@@ -273,7 +272,8 @@ function projectSemanticInvariants(
 ): SemanticInvariant[] {
   const schema = requireString(manifest.value.schema, `${manifest.path}#/schema`);
   const acceptancePath = requireString(manifest.value.acceptance, `${manifest.path}#/acceptance`);
-  if (acceptancePath !== index.acceptancePath) {
+  const versionAcceptancePath = requireString(contract.currentPointer, `${summary.contractPath}#/currentPointer`);
+  if (acceptancePath !== versionAcceptancePath) {
     throw new Error(`Contract Observatory V4d: traceability acceptance mismatch: ${manifest.path}`);
   }
   const invariants = requireRecord(manifest.value.invariants, `${manifest.path}#/invariants`);

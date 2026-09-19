@@ -10,28 +10,39 @@ const contract = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-contract-v0.12.json"), "utf8"),
 ) as any;
 
-// Lifecycle must not move merely because the paper projection catches up.
-assert(contract.status === "candidate", "status remains candidate");
-assert(contract.accepted === false, "candidate remains not accepted");
-assert(contract.implementation?.candidateRuntimeSelectable === false, "candidate remains non-selectable");
+// This projection is historical kernel evidence, not the authority that decides
+// lifecycle. It must remain true both before and after the explicit C10 cutover.
+const candidateLifecycle = contract.status === "candidate" && contract.accepted === false;
+const acceptedLifecycle = contract.status === "accepted" && contract.accepted === true;
+assert(candidateLifecycle || acceptedLifecycle, "lifecycle is the ready candidate or accepted release");
+assert(contract.implementation?.candidateRuntimeSelectable === false, "no alternate candidate runtime is selectable");
 assert(contract.implementation?.publicFacade === "ts/src/public.ts", "public facade path remains explicit");
 assert(contract.candidateState?.publicFacadeComplete === true, "C7 public facade is complete");
-assert(contract.implementation?.implementationComplete === true, "candidate kernel implementation is complete");
+assert(contract.implementation?.implementationComplete === true, "declared v0.12 kernel implementation is complete");
 assert(
   contract.implementation?.implementationCompleteMeaning ===
-    "current-v0.12-candidate-kernel-scope-only; excludes C8 documentation, C9 readiness and C10 acceptance",
-  "implementationComplete meaning is bounded to the candidate kernel scope",
+    (candidateLifecycle
+      ? "current-v0.12-candidate-kernel-scope-only; excludes C8 documentation, C9 readiness and C10 acceptance"
+      : "accepted-v0.12-declared-scope; C1-C10 complete with 16 mandatory executable gates"),
+  "implementationComplete meaning matches the lifecycle without changing kernel scope",
 );
 assert(contract.candidateState?.documentationComplete === true, "C8 documentation is complete");
 assert(contract.candidateState?.traceabilityComplete === true, "v0.12 traceability is complete");
 
-// The live accepted v0.11 runtime is unchanged, while the v0.12 candidate
-// kernel now contains executable behavior that must be projected honestly.
-assert(contract.implementation?.productionBehaviorChanged === false, "accepted live runtime remains unchanged");
-assert(contract.implementation?.candidateKernelBehaviorImplemented === true, "candidate kernel behavior is implemented");
+// C10 itself adds no production-code delta. Before cutover the accepted runtime
+// is v0.11; after cutover the already merged v0.12 kernel becomes accepted.
+assert(contract.implementation?.productionBehaviorChanged === false, "C10 adds no new production behavior");
+assert(contract.implementation?.candidateKernelBehaviorImplemented === true, "v0.12 kernel behavior is implemented");
 assert(
-  contract.implementation?.productionBehaviorChangedMeaning === "accepted-live-runtime-remains-v0.11",
-  "productionBehaviorChanged meaning is explicit",
+  contract.implementation?.acceptedRuntime === (candidateLifecycle ? "mts-contract/v0.11" : "mts-contract/v0.12"),
+  "accepted runtime pointer matches the lifecycle",
+);
+assert(
+  contract.implementation?.productionBehaviorChangedMeaning ===
+    (candidateLifecycle
+      ? "accepted-live-runtime-remains-v0.11"
+      : "C10 performs no new ts/src production behavior change; the already merged and verified v0.12 kernel becomes the accepted current semantic boundary"),
+  "productionBehaviorChanged meaning matches the lifecycle",
 );
 
 // Foundation: Anum is a Link role rooted locally at R; exact question/address

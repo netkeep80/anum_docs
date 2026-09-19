@@ -79,7 +79,7 @@ const realIndex = buildContractObservatoryIndex(repositoryRoot);
 const realProjection = buildMethodologyProjection(repositoryRoot, realIndex);
 const realHtml = renderContractObservatoryHtml(realIndex, realProjection);
 
-same(realIndex.versions.length, 3, "real repository exposes current, previous and candidate versions");
+same(realIndex.versions.length, 3, "real pre-cleanup repository exposes current, previous and older accepted versions");
 assert(realHtml.startsWith("<!doctype html>\n<html lang=\"ru\">"), "browser document baseline");
 assert(realHtml.includes("<meta charset=\"utf-8\">"), "UTF-8 metadata");
 assert(realHtml.includes("name=\"viewport\""), "viewport metadata");
@@ -93,11 +93,11 @@ assert(!realHtml.includes("http://") && !realHtml.includes("https://"), "no exte
 assert(realHtml.includes("<section class=\"methodology-map\""), "V4c methodology map is rendered as the primary explanatory view");
 assert(realHtml.includes("aria-label=\"Стадии методологии\""), "methodology stages expose a semantic keyboard-navigation group");
 assert(realHtml.includes("data-methodology-stage=\"challenged\""), "methodology stage controls carry deterministic stage identity");
-assert(realHtml.includes("data-version-id=\"mts-contract/v0.11\""), "current version lane carries exact projected contract identity");
-assert(realHtml.includes("data-version-id=\"mts-contract/v0.12\""), "candidate version lane carries exact projected contract identity");
+assert(realHtml.includes("data-version-id=\"mts-contract/v0.11\""), "previous version lane carries exact projected contract identity");
+assert(realHtml.includes("data-version-id=\"mts-contract/v0.12\""), "current version lane carries exact projected contract identity");
 assert(realHtml.includes("ТЕКУЩАЯ"), "current classification remains explicit in V4c");
 assert(realHtml.includes("ПРЕДЫДУЩАЯ"), "previous classification remains explicit in V4c");
-assert(realHtml.includes("КАНДИДАТ"), "candidate classification remains explicit in V4c");
+assert(!realHtml.includes("КАНДИДАТ"), "accepted repository has no candidate status lane");
 assert(realHtml.includes("Связь метода и жизненного цикла"), "methodology relation authority is textually distinguished");
 assert(realHtml.includes("Семантические Связи МТС: в этом представлении не отображаются"), "methodology view cannot be mistaken for MTS semantic Links");
 assert(realHtml.includes("data-observatory-controller=\"shared-kernel\""), "static page embeds the shared canonical interaction kernel controller");
@@ -113,13 +113,18 @@ assert(realHtml.includes(realIndex.previousContractPath), "previous contract pro
 
 const current = realIndex.versions.find((entry) => entry.isCurrent);
 const previous = realIndex.versions.find((entry) => entry.isPrevious);
-const candidate = realIndex.versions.find((entry) => entry.contractId === "mts-contract/v0.12");
+const older = realIndex.versions.find((entry) => entry.contractId === "mts-contract/v0.10");
 assert(current !== undefined, "real current version exists");
 assert(previous !== undefined, "real previous version exists");
-assert(candidate !== undefined, "real candidate version exists");
-same(candidate.status, "candidate", "real candidate status is explicit");
-same(candidate.accepted, false, "real candidate is not accepted");
-same(candidate.acceptanceReady, true, "real candidate is acceptance-ready after C9");
+assert(older !== undefined, "real older accepted version exists");
+same(current.contractId, "mts-contract/v0.12", "real current is accepted v0.12");
+same(current.status, "accepted", "real current status is accepted");
+same(current.accepted, true, "real current accepted flag is explicit");
+same(current.acceptanceReady, true, "real current retains readiness evidence");
+same(current.requiredExecutableGateCount, 16, "real current preserves all v0.12 gates");
+same(previous.contractId, "mts-contract/v0.11", "real previous is accepted v0.11");
+same(older.isCurrent, false, "older v0.10 is not current");
+same(older.isPrevious, false, "older v0.10 is not previous");
 assert(realHtml.includes(String(current.requiredExecutableGateCount)), "current gate count rendered");
 assert(realHtml.includes(String(current.requiredNegativeVectorCount)), "current negative-vector count rendered");
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(current) + 1}\" class=\"version-card current\"`), "current section classified");
