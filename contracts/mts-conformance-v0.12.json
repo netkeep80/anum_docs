@@ -1,7 +1,7 @@
 {
   "schema": "mts-conformance/v0.12",
-  "status": "candidate",
-  "accepted": false,
+  "status": "accepted",
+  "accepted": true,
   "issue": 1137,
   "candidateLifecycleIssue": 1134,
   "contract": "mts-contract/v0.12",
@@ -9,10 +9,10 @@
   "observableSemanticDelta": true,
   "acceptanceReady": true,
   "coverageState": "complete",
-  "coverageStateMeaning": "C1-C9 and the completed foundation/authority reconciliation are backed by executable kernel evidence, public consumer convergence, normative candidate documentation, exact v0.12 traceability and an independent readiness audit. The candidate is ready for a separate C10 acceptance/rejection decision; acceptance itself has not been performed.",
+  "coverageStateMeaning": "C1-C9, the completed foundation/authority reconciliation, the C10 semantic preflight and all 16 mandatory executable gates are accepted evidence for MTS v0.12.",
   "acceptedCurrent": {
-    "contract": "mts-contract/v0.11",
-    "conformance": "mts-conformance/v0.11"
+    "contract": "mts-contract/v0.12",
+    "conformance": "mts-conformance/v0.12"
   },
   "requiredExecutableGates": [
     "ts/test/research-v012-interpreter-delta-c2.test.ts",
@@ -317,7 +317,7 @@
     "publicFacadeC7": "green-confirmed",
     "documentationC8": "green-confirmed",
     "readinessC9": "green-confirmed",
-    "acceptanceC10": "next",
+    "acceptanceC10": "accepted",
     "foundationReconciliation": "green-complete",
     "hierarchicalQuaternaryAnum": "green-confirmed",
     "v012StringHierarchy": "green-confirmed",
@@ -421,9 +421,28 @@
       "pullRequest": 1229,
       "status": "green-confirmed",
       "requiredForAcceptance": true
+    },
+    "acceptedCutover": {
+      "issue": 1234,
+      "stage": "C10",
+      "status": "accepted",
+      "requiredForAcceptance": true
     }
   },
-  "acceptanceBlockers": [
-    "v0.12 has not passed explicit acceptance cutover"
-  ]
+  "acceptanceBlockers": [],
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.11",
+    "conformance": "mts-conformance/v0.11",
+    "immutable": true
+  },
+  "acceptance": {
+    "performedHere": true,
+    "acceptedMtsVersion": "mts-contract/v0.12",
+    "previousAcceptedVersion": "mts-contract/v0.11",
+    "readinessIssue": 1225,
+    "authorDecisionIssue": 1227,
+    "semanticPreflightIssue": 1228,
+    "acceptedFlipBridgeIssue": 1230,
+    "cutoverIssue": 1234
+  }
 }
