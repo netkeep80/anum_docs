@@ -206,7 +206,7 @@ interface MarkdownFacts {
 }
 
 const OWNER_LINE = /^<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>(?:\s*<!--\s*нормативный владелец\s*-->)?$/;
-const REFERENCE = /<!--\s*mts-law-ref:([A-Za-z][A-Za-z0-9]*)\s*-->/g;
+const REFERENCE = /<!--\s*ссылка:mts-law-([A-Za-z][A-Za-z0-9]*)\s*-->/g;
 
 function markdownFacts(path: string, source: string): MarkdownFacts {
   const lines = source.split(/\r?\n/);
