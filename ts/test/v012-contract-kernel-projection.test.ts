@@ -23,8 +23,8 @@ assert(
     "current-v0.12-candidate-kernel-scope-only; excludes C8 documentation, C9 readiness and C10 acceptance",
   "implementationComplete meaning is bounded to the candidate kernel scope",
 );
-assert(contract.candidateState?.documentationComplete === false, "C8 documentation remains incomplete");
-assert(contract.candidateState?.traceabilityComplete === false, "traceability remains incomplete");
+assert(contract.candidateState?.documentationComplete === true, "C8 documentation is complete");
+assert(contract.candidateState?.traceabilityComplete === true, "v0.12 traceability is complete");
 
 // The live accepted v0.11 runtime is unchanged, while the v0.12 candidate
 // kernel now contains executable behavior that must be projected honestly.
