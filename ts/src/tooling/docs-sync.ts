@@ -295,8 +295,6 @@ export function validateSemanticLawDocumentation(
         message: `semantic law ${owner.lawId} owner must be ${expectedPath}, found ${owner.path}:${owner.line}`,
       });
     }
-    const sourceFacts = facts.find((item) => item.lines === documents[owner.path]?.split(/\r?\n/));
-    void sourceFacts;
   }
 
   for (const lawId of [...required].sort()) {
