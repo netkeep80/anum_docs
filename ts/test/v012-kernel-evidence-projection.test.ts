@@ -23,6 +23,10 @@ const gates = [
   "ts/test/v012-string-utf8-boundary.test.ts",
   "ts/test/v012-formal-source-result-witness.test.ts",
   "ts/test/v012-quaternary-root-basis-boundary.test.ts",
+  "ts/test/anum-two-memory-conformance.test.ts",
+  "ts/test/string-anum-two-memory-conformance.test.ts",
+  "ts/test/v012-public-facade-c7.test.ts",
+  "ts/test/v012-source-authority.test.ts",
 ] as const;
 
 for (const gate of gates) {
