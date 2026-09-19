@@ -75,8 +75,6 @@ type InternalCanonicalPortableStructuralDerivationWithAssumptionsProvenanceClaim
 
 // @ts-expect-error P3b keeps assumption construction internal; consumers submit materialized evidence.
 type InternalAssumptionContextConstructor = typeof import("../src/public.js").defineStructuralAssumptionContext;
-// @ts-expect-error C7 keeps source authority construction internal.
-type InternalV012SourceAuthority = import("../src/public.js").V012SourceAuthority;
 // @ts-expect-error C7 keeps source evidence production internal.
 type InternalV012SourceBuilder = typeof import("../src/public.js").buildV012SelectedSourceEvidence;
 // @ts-expect-error C7 keeps structural Rule construction/admission internal.
