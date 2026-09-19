@@ -118,8 +118,4 @@ for (const [id, expected] of presentTemporaryPins) {
   assert(rules.get(id)?.value === expected, `temporary pre-acceptance policy pin is exact: ${id}`);
 }
 
-const contributing = read("docs/CONTRIBUTING.md");
-assert(contributing.includes("C9 = завершён"), "contributing lifecycle records completed C9");
-
-
 console.log("MTS v0.12 C9 independent readiness audit: GREEN.");

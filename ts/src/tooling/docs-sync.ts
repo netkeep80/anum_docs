@@ -6,12 +6,12 @@ export const PROJECTION_START = "<!-- мтс-текущая-проекция:н�
 export const PROJECTION_END = "<!-- мтс-текущая-проекция:конец -->";
 
 /**
- * Только документы, которые сами объявляют текущее состояние МТС.
- * Специализированные спецификации не получают копию release manifest: это сохраняет
- * принцип #278 «main = current state без аддитивного дублирования».
+ * README — единственный владелец краткой автоматически синхронизируемой проекции
+ * текущего выпуска. Теория и процессные документы не получают копию release manifest.
  */
-export const CANONICAL_DOCS = [
-  "README.md",
+export const CANONICAL_DOCS = ["README.md"] as const;
+
+export const PROJECTION_FORBIDDEN_DOCS = [
   "docs/CONTRIBUTING.md",
   "docs/theory/Основания МТС.md",
   "docs/theory/Система аксиом МТС.md",
@@ -24,6 +24,11 @@ export interface CurrentProjection {
   readonly currentConformance: string;
   readonly previousContract: string;
   readonly previousConformance: string;
+  readonly currentContractPath: string;
+  readonly currentConformancePath: string;
+  readonly previousContractPath: string;
+  readonly previousConformancePath: string;
+  readonly acceptancePath: string;
   readonly semanticBase: string;
   readonly observableSemanticDelta: boolean;
   readonly implementationLanguage: string;
@@ -106,11 +111,13 @@ export function loadCurrentProjection(root = findRepositoryRoot()): CurrentProje
   const topology = nested(packs, "contract-conformance", "repo-policy.json.packs");
   const current = nested(topology, "current", "repo-policy.json.packs.contract-conformance");
   const previous = nested(topology, "previous", "repo-policy.json.packs.contract-conformance");
+  const acceptance = nested(topology, "acceptance", "repo-policy.json.packs.contract-conformance");
 
   const currentContractPath = string(nested(current, "contract", "current").path, "current.contract.path");
   const currentConformancePath = string(nested(current, "conformance", "current").path, "current.conformance.path");
   const previousContractPath = string(nested(previous, "contract", "previous").path, "previous.contract.path");
   const previousConformancePath = string(nested(previous, "conformance", "previous").path, "previous.conformance.path");
+  const acceptancePath = string(nested(acceptance, "document", "acceptance").path, "acceptance.document.path");
 
   const contract = readJson(root, currentContractPath);
   const conformance = readJson(root, currentConformancePath);
@@ -144,6 +151,11 @@ export function loadCurrentProjection(root = findRepositoryRoot()): CurrentProje
     currentConformance: conformanceSchema,
     previousContract: string(previousContract.schema, `${previousContractPath}.schema`),
     previousConformance: string(previousConformance.schema, `${previousConformancePath}.schema`),
+    currentContractPath,
+    currentConformancePath,
+    previousContractPath,
+    previousConformancePath,
+    acceptancePath,
     semanticBase: string(contract.semanticBase, `${currentContractPath}.semanticBase`),
     observableSemanticDelta: boolean(contract.observableSemanticDelta, `${currentContractPath}.observableSemanticDelta`),
     implementationLanguage: string(implementation.language, `${currentContractPath}.implementation.language`),
@@ -363,23 +375,14 @@ export function checkRepositorySemanticLawDocumentation(root = findRepositoryRoo
   return validateSemanticLawDocumentation(requiredLawIds, documents);
 }
 
-function yesNo(value: boolean): string {
-  return value ? "да" : "нет";
-}
-
 export function renderCurrentProjection(value: CurrentProjection): string {
-  const root = Object.entries(value.rootBasis).map(([name, equation]) => `${name}: ${equation}`).join("; ");
   return [
     PROJECTION_START,
-    "> **Автоматическая проекция текущей машинной границы.** Этот блок строится из принятого контракта командой `npm --prefix ts run docs:sync`; содержательную теорию вне блока команда не меняет.",
+    "> **Текущий принятый выпуск МТС.** Этот краткий блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.",
     ">",
-    `> - Текущий выпуск: \`${value.currentContract}\` + \`${value.currentConformance}\`; предыдущая неизменяемая пара: \`${value.previousContract}\` + \`${value.previousConformance}\`.`,
-    `> - Семантическая база: \`${value.semanticBase}\`; наблюдаемое смысловое изменение: \`${yesNo(value.observableSemanticDelta)}\`.`,
-    `> - Реализация: \`${value.implementationLanguage}\`; единственная действующая смысловая среда: \`${yesNo(value.singleLiveSemanticRuntime)}\`; Python присутствует: \`${yesNo(value.pythonRuntimePresent)}\`; режим совместимости выбираем: \`${yesNo(value.compatibilityRuntimeSelectable)}\`.`,
-    `> - Внутренние знаки F1: \`${value.internalSigns.join(" ")}\`; отложены: \`${value.deferredSigns.join(" ")}\`; только метаязык: \`${value.metaOnlySigns.join(" ")}\`.`,
-    `> - Корневой базис: \`${root}\`.`,
-    `> - Чтение может материализовать: \`${yesNo(value.readMayMaterialize)}\`; отсутствие найденной записи доказывает несуществование: \`${yesNo(value.notFoundImpliesNonExistence)}\`.`,
-    `> - Строковый носитель: единица \`${value.stringCarrierUnit}\`, конверт \`${value.byteEnvelope}\`, бит на конверт \`${value.bitsPerEnvelope}\`, порядок \`${value.bitOrder}\`.`,
+    `> - Текущий: \`${value.currentContract}\` + \`${value.currentConformance}\` — [контракт](${value.currentContractPath}) · [корпус](${value.currentConformancePath}).`,
+    `> - Предыдущий неизменяемый: \`${value.previousContract}\` + \`${value.previousConformance}\` — [контракт](${value.previousContractPath}) · [корпус](${value.previousConformancePath}).`,
+    `> - Принятие текущего выпуска: [свидетельство](${value.acceptancePath}).`,
     PROJECTION_END,
   ].join("\n");
 }
@@ -417,10 +420,15 @@ export function checkProjectionText(source: string, projection: string): boolean
 
 export function checkRepositoryDocs(root = findRepositoryRoot()): string[] {
   const projection = renderCurrentProjection(loadCurrentProjection(root));
-  return CANONICAL_DOCS.filter((path) => {
+  const stale = CANONICAL_DOCS.filter((path) => {
     const source = readFileSync(resolve(root, path), "utf8");
     return !checkProjectionText(source, projection);
   });
+  const duplicated = PROJECTION_FORBIDDEN_DOCS.filter((path) => {
+    const source = readFileSync(resolve(root, path), "utf8");
+    return source.includes(PROJECTION_START) || source.includes(PROJECTION_END);
+  });
+  return [...stale, ...duplicated];
 }
 
 export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {

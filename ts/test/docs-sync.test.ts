@@ -5,6 +5,7 @@ import { dirname, resolve } from "node:path";
 import {
   CANONICAL_DOCS,
   PROJECTION_END,
+  PROJECTION_FORBIDDEN_DOCS,
   PROJECTION_START,
   SEMANTIC_LAW_OWNER_BY_ID,
   checkProjectionText,
@@ -44,18 +45,28 @@ const repositoryRoot = findRepositoryRoot();
 const projection = loadCurrentProjection(repositoryRoot);
 assert.equal(projection.currentContract, "mts-contract/v0.12");
 assert.equal(projection.previousContract, "mts-contract/v0.11");
-assert.deepEqual(projection.internalSigns, ["∞", "[", "]", "1", "0", "(", ")", "⟼", ":", "=", "."]);
-assert.equal(projection.readMayMaterialize, false);
-assert.equal(projection.notFoundImpliesNonExistence, false);
+assert.equal(projection.acceptancePath, "cutover/typescript-c1-acceptance-v0.5.json");
+assert.deepEqual(CANONICAL_DOCS, ["README.md"], "generated current projection must have exactly one owner");
+assert.deepEqual(PROJECTION_FORBIDDEN_DOCS, [
+  "docs/CONTRIBUTING.md",
+  "docs/theory/Основания МТС.md",
+  "docs/theory/Система аксиом МТС.md",
+]);
 
 const rendered = renderCurrentProjection(projection);
 assert.ok(rendered.includes("mts-contract/v0.12"));
 assert.ok(rendered.includes("mts-contract/v0.11"));
-assert.ok(rendered.includes("∞ [ ] 1 0 ( ) ⟼ : = ."));
+assert.ok(rendered.includes("cutover/typescript-c1-acceptance-v0.5.json"));
+assert.ok(!rendered.includes("Корневой базис:"), "release projection must not duplicate theory");
+assert.ok(!rendered.includes("Строковый носитель:"), "release projection must not duplicate subject specs");
 assert.ok(rendered.includes(PROJECTION_START));
 assert.ok(rendered.includes(PROJECTION_END));
 
-assert.deepEqual(checkRepositoryDocs(repositoryRoot), [], "ветка должна хранить уже синхронизированные канонические документы");
+assert.deepEqual(checkRepositoryDocs(repositoryRoot), [], "ветка должна хранить одну актуальную release projection только в README");
+for (const path of PROJECTION_FORBIDDEN_DOCS) {
+  const source = readFileSync(resolve(repositoryRoot, path), "utf8");
+  assert.ok(!source.includes(PROJECTION_START) && !source.includes(PROJECTION_END), `${path} must not contain release projection markers`);
+}
 
 assert.deepEqual(
   checkRepositorySemanticLawDocumentation(repositoryRoot),
@@ -158,6 +169,7 @@ try {
   copy("contracts/mts-contract-v0.11.json");
   copy("contracts/mts-conformance-v0.11.json");
   for (const path of CANONICAL_DOCS) copy(path);
+  for (const path of PROJECTION_FORBIDDEN_DOCS) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
   writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.11", "mts-contract/v0.X"), "utf8");
@@ -165,6 +177,24 @@ try {
   assert.deepEqual(syncRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "синхронизация должна исправлять только устаревший файл");
   assert.deepEqual(checkRepositoryDocs(tempRoot), []);
   assert.deepEqual(syncRepositoryDocs(tempRoot), [], "повторная синхронизация должна быть пустой");
+
+  const forbiddenPath = PROJECTION_FORBIDDEN_DOCS[0];
+  const forbiddenFullPath = resolve(tempRoot, forbiddenPath);
+  writeFileSync(
+    forbiddenFullPath,
+    readFileSync(forbiddenFullPath, "utf8") + `\n${PROJECTION_START}\n> чужая копия\n${PROJECTION_END}\n`,
+    "utf8",
+  );
+  assert.deepEqual(
+    checkRepositoryDocs(tempRoot),
+    [forbiddenPath],
+    "D-F06: release projection outside README must be rejected",
+  );
+  assert.deepEqual(
+    syncRepositoryDocs(tempRoot),
+    [],
+    "docs:sync must not modify documents that no longer own the release projection",
+  );
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
