@@ -36,19 +36,17 @@ const index = buildContractObservatoryIndex(repositoryRoot);
 const projection: MethodologyProjection = buildMethodologyProjection(repositoryRoot, index);
 
 same(projection.schema, "mts-contract-methodology-projection/v0.1", "projection schema");
-same(projection.versions.length, 3, "current, previous and older accepted pairs are projected exactly once before cleanup");
+same(projection.versions.length, 2, "post-cleanup projection contains exactly current and previous accepted pairs");
 same(
   projection.versions.map((version) => version.contractId).join(","),
-  "mts-contract/v0.10,mts-contract/v0.11,mts-contract/v0.12",
+  "mts-contract/v0.11,mts-contract/v0.12",
   "projection preserves V3 deterministic version order",
 );
 
 const current = projection.versions.find((version) => version.isCurrent);
 const previous = projection.versions.find((version) => version.isPrevious);
-const older = projection.versions.find((version) => version.contractId === "mts-contract/v0.10");
 assert(current !== undefined, "current contract version exists");
 assert(previous !== undefined, "previous contract version exists");
-assert(older !== undefined, "older accepted contract version exists");
 same(current.contractId, "mts-contract/v0.12", "current comes from accepted V3 evidence");
 same(previous.contractId, "mts-contract/v0.11", "previous comes from accepted V3 evidence");
 same(current.accepted, true, "explicit accepted state preserved");
@@ -77,9 +75,6 @@ same(current.traceabilityManifestPath, "traceability/mts-v0.12.json", "current v
 same(previous.traceabilityManifestPath, "traceability/mts-v0.11.json", "previous v0.11 keeps immutable traceability provenance");
 assert(current.semanticInvariants.length > 0, "current v0.12 semantic invariants remain projectable");
 assert(previous.semanticInvariants.length > 0, "previous v0.11 semantic invariants remain projectable after current acceptance rotates");
-same(older.accepted, true, "older v0.10 remains accepted evidence pending B2 cleanup");
-same(older.isCurrent, false, "older release is not current");
-same(older.isPrevious, false, "older release is not previous");
 
 const serialized = serializeMethodologyProjection(projection);
 same(
