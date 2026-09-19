@@ -11,13 +11,17 @@ const contract = JSON.parse(read("contracts/mts-contract-v0.12.json")) as any;
 const conformance = JSON.parse(read("contracts/mts-conformance-v0.12.json")) as any;
 const traceabilityPath = join(repoRoot, "traceability/mts-v0.12.json");
 
-assert(contract.status === "candidate", "v0.12 remains candidate");
-assert(contract.accepted === false, "v0.12 remains not accepted");
-assert(contract.implementation?.candidateRuntimeSelectable === false, "v0.12 remains non-selectable");
+const candidateLifecycle = contract.status === "candidate" && contract.accepted === false;
+const acceptedLifecycle = contract.status === "accepted" && contract.accepted === true;
+assert(candidateLifecycle || acceptedLifecycle, "v0.12 is the documented candidate or accepted release");
+assert(contract.implementation?.candidateRuntimeSelectable === false, "no alternate candidate runtime is selectable");
 assert(contract.candidateState?.documentationComplete === true, "canonical documentation is complete");
 assert(contract.candidateState?.traceabilityComplete === true, "traceability projection is complete");
 
-assert(conformance.accepted === false, "conformance remains not accepted");
+assert(
+  conformance.status === contract.status && conformance.accepted === contract.accepted,
+  "contract and conformance lifecycle stay aligned",
+);
 assert(conformance.evidenceState?.documentationC8 === "green-confirmed", "C8 is green-confirmed");
 
 assert(existsSync(traceabilityPath), "v0.12 traceability manifest exists");
@@ -29,12 +33,19 @@ assert(
   "traceability invariant IDs exactly match contract semantic laws",
 );
 
-const docs: readonly (readonly [string, string])[] = [
-  ["docs/theory/Основания МТС.md", "## Кандидатная нормативная граница МТС v0.12"],
-  ["docs/theory/Система аксиом МТС.md", "## Кандидатная нормативная граница МТС v0.12"],
-  ["docs/specs/Формальная нотация МТС.md", "## Кандидат МТС v0.12: интерпретационные контексты и полномочия"],
-  ["docs/specs/Ачисла и сериализация.md", "## Кандидат МТС v0.12: укоренённое ачисло и один корневой срез"],
-] as const;
+const docs: readonly (readonly [string, string])[] = candidateLifecycle
+  ? [
+      ["docs/theory/Основания МТС.md", "## Кандидатная нормативная граница МТС v0.12"],
+      ["docs/theory/Система аксиом МТС.md", "## Кандидатная нормативная граница МТС v0.12"],
+      ["docs/specs/Формальная нотация МТС.md", "## Кандидат МТС v0.12: интерпретационные контексты и полномочия"],
+      ["docs/specs/Ачисла и сериализация.md", "## Кандидат МТС v0.12: укоренённое ачисло и один корневой срез"],
+    ]
+  : [
+      ["docs/theory/Основания МТС.md", "## Нормативная граница МТС v0.12"],
+      ["docs/theory/Система аксиом МТС.md", "## Нормативная граница МТС v0.12"],
+      ["docs/specs/Формальная нотация МТС.md", "## МТС v0.12: интерпретационные контексты и полномочия"],
+      ["docs/specs/Ачисла и сериализация.md", "## МТС v0.12: укоренённое ачисло и один корневой срез"],
+    ];
 
 for (const [path, marker] of docs) {
   assert(read(path).includes(marker), `${path} contains the v0.12 normative marker`);

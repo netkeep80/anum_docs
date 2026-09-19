@@ -31,38 +31,35 @@ function expectCode(effect: () => unknown, code: ContractIndexErrorCode, message
 const repositoryRoot = process.cwd();
 const realIndex = buildContractObservatoryIndex(repositoryRoot);
 same(realIndex.schema, "mts-contract-observatory-index/v0.1", "index schema");
-same(realIndex.versions.length, 3, "current repository has current, previous and candidate pairs");
+same(realIndex.versions.length, 3, "pre-cleanup repository has current, previous and one older accepted pair");
 same(
   realIndex.versions.map((version) => version.contractId).join(","),
   "mts-contract/v0.10,mts-contract/v0.11,mts-contract/v0.12",
   "real repository uses natural version order",
 );
-same(realIndex.currentContractPath, "contracts/mts-contract-v0.11.json", "policy current contract");
-same(realIndex.currentConformancePath, "contracts/mts-conformance-v0.11.json", "policy current conformance");
-same(realIndex.previousContractPath, "contracts/mts-contract-v0.10.json", "policy previous contract");
-same(realIndex.previousConformancePath, "contracts/mts-conformance-v0.10.json", "policy previous conformance");
-same(realIndex.acceptancePath, "cutover/typescript-c1-acceptance-v0.4.json", "acceptance path comes from policy");
+same(realIndex.currentContractPath, "contracts/mts-contract-v0.12.json", "policy current contract");
+same(realIndex.currentConformancePath, "contracts/mts-conformance-v0.12.json", "policy current conformance");
+same(realIndex.previousContractPath, "contracts/mts-contract-v0.11.json", "policy previous contract");
+same(realIndex.previousConformancePath, "contracts/mts-conformance-v0.11.json", "policy previous conformance");
+same(realIndex.acceptancePath, "cutover/typescript-c1-acceptance-v0.5.json", "acceptance path comes from policy");
 
 const current = realIndex.versions.find((version) => version.isCurrent);
 const previous = realIndex.versions.find((version) => version.isPrevious);
-const candidate = realIndex.versions.find((version) => version.contractId === "mts-contract/v0.12");
-assert(current !== undefined && previous !== undefined && candidate !== undefined, "current, previous and candidate summaries exist");
-same(current.contractId, "mts-contract/v0.11", "current classification comes from evidence");
-same(previous.contractId, "mts-contract/v0.10", "previous classification comes from evidence");
+const older = realIndex.versions.find((version) => version.contractId === "mts-contract/v0.10");
+assert(current !== undefined && previous !== undefined && older !== undefined, "current, previous and older summaries exist");
+same(current.contractId, "mts-contract/v0.12", "current classification comes from accepted evidence");
+same(previous.contractId, "mts-contract/v0.11", "previous classification comes from accepted evidence");
 same(current.status, "accepted", "current status projected");
 same(current.accepted, true, "current accepted flag projected");
 same(current.acceptanceReady, true, "current readiness projected");
 same(current.coverageState, "complete", "current coverage projected");
-same(current.requiredExecutableGateCount, 5, "current executable gate count projected");
+same(current.requiredExecutableGateCount, 16, "current v0.12 keeps all mandatory kernel, authority and preflight gates");
 assert(current.requiredNegativeVectorCount > 0, "current negative-vector coverage projected");
-same(candidate.status, "candidate", "candidate status projected");
-same(candidate.accepted, false, "candidate is not accepted");
-same(candidate.acceptanceReady, true, "candidate readiness is projected after C9");
-same(candidate.coverageState, "complete", "candidate declared-scope coverage is complete after C9");
-same(candidate.requiredExecutableGateCount, 16, "v0.12 candidate projects mandatory kernel, authority and C10-preflight evidence");
-assert(candidate.requiredNegativeVectorCount > 0, "candidate veto corpus is projected");
-same(candidate.isCurrent, false, "candidate is not current");
-same(candidate.isPrevious, false, "candidate is not previous");
+same(previous.status, "accepted", "previous v0.11 remains accepted evidence");
+same(previous.accepted, true, "previous accepted flag projected");
+same(older.status, "accepted", "older v0.10 remains immutable accepted evidence pending cleanup");
+same(older.isCurrent, false, "older release is not current");
+same(older.isPrevious, false, "older release is not previous");
 
 const serialized = serializeContractObservatoryIndex(realIndex);
 same(serialized, serializeContractObservatoryIndex(buildContractObservatoryIndex(repositoryRoot)), "serialization is deterministic");
