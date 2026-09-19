@@ -18,6 +18,7 @@
     "ts/test/research-v012-interpreter-delta-c2.test.ts",
     "ts/test/v012-string-anum-protocol-c3a.test.ts",
     "ts/test/v012-formal-square-string-child-c4.test.ts",
+    "ts/test/v012-formal-square-rule-authority.test.ts",
     "ts/test/v012-q-compatibility-representation-c5.test.ts",
     "ts/test/v012-formal-context-reading-c6.test.ts",
     "ts/test/v012-ostensive-self-incidence-matching.test.ts",
@@ -80,7 +81,9 @@
     "v012-formal-square-bracket-child-is-string-not-q",
     "v012-hidden-lexer-mode-has-zero-semantic-authority",
     "v012-hidden-parser-mode-has-zero-semantic-authority",
-    "v012-host-parser-stack-has-zero-semantic-authority"
+    "v012-host-parser-stack-has-zero-semantic-authority",
+    "v012-formal-square-bracket-rule-authorizes-string-open",
+    "v012-formal-square-bracket-rule-open-anchored-to-formal-k"
   ],
   "requiredNegativeVectors": [
     "v012-string-glyph-one-is-not-q-abit-one",
@@ -94,7 +97,10 @@
     "v012-link-left-association-is-not-formal-grammar",
     "v012-generic-flat-reader-is-not-formal-grammar",
     "v012-inline-formal-q-spelling-is-not-accepted",
-    "v012-curly-braces-are-not-q-escaping"
+    "v012-curly-braces-are-not-q-escaping",
+    "v012-formal-square-bracket-low-level-open-is-not-authority",
+    "v012-formal-square-bracket-missing-rule-does-not-open",
+    "v012-formal-square-bracket-substituted-q-rule-does-not-open"
   ],
   "retainedAcceptedEvidence": {
     "semanticBase": "mts-contract/v0.11",
@@ -166,9 +172,9 @@
       "mergeSha": "67249e192b42df4cc700e57773ca843ed4cf483b",
       "status": "green-confirmed",
       "observations": [
-        "FORMAL square brackets select an explicit I_STRING child from R",
+        "the low-level FORMAL square-bracket transition opens the explicitly supplied child interpreter from R; the C4 fixture supplies I_STRING",
         "the STRING child lexical parent is the exact supplied FORMAL context",
-        "FORMAL square brackets do not select I_Q",
+        "the C4 fixture keeps I_STRING distinct from I_Q; target-selection authority is proven separately by the mandatory C10-preflight Rule-authority witness",
         "an empty STRING child closes to R and FORMAL preserves that R as one exact sequence position",
         "a non-empty [ab] STRING child closes to a ⟼ b and FORMAL preserves that Link as one exact sequence position",
         "FORMAL continues after the returned STRING child result",
@@ -289,6 +295,15 @@
         "v012-link-left-association-is-not-formal-grammar",
         "v012-generic-flat-reader-is-not-formal-grammar"
       ]
+    },
+    "c10PreflightBracketAuthority": {
+      "ts/test/v012-formal-square-rule-authority.test.ts": [
+        "v012-formal-square-bracket-rule-authorizes-string-open",
+        "v012-formal-square-bracket-rule-open-anchored-to-formal-k",
+        "v012-formal-square-bracket-low-level-open-is-not-authority",
+        "v012-formal-square-bracket-missing-rule-does-not-open",
+        "v012-formal-square-bracket-substituted-q-rule-does-not-open"
+      ]
     }
   },
   "evidenceState": {
@@ -311,7 +326,8 @@
     "rootBasisVerification": "green-confirmed",
     "anumTwoMemoryTransport": "green-confirmed",
     "stringTwoMemoryTransport": "green-confirmed",
-    "sourceAuthoritySelection": "green-confirmed"
+    "sourceAuthoritySelection": "green-confirmed",
+    "formalSquareBracketRuleAuthority": "green-confirmed"
   },
   "implementationSlices": {
     "candidateBoundary": {
@@ -395,6 +411,14 @@
     "readinessAudit": {
       "issue": 1134,
       "stage": "C9",
+      "status": "green-confirmed",
+      "requiredForAcceptance": true
+    },
+    "formalSquareBracketRuleAuthority": {
+      "issue": 1228,
+      "stage": "C10-preflight",
+      "test": "ts/test/v012-formal-square-rule-authority.test.ts",
+      "pullRequest": 1229,
       "status": "green-confirmed",
       "requiredForAcceptance": true
     }
