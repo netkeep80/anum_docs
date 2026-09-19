@@ -31,10 +31,11 @@
     "singleLiveSemanticRuntime": true,
     "acceptedRuntime": "mts-contract/v0.11",
     "candidateRuntimeSelectable": false,
-    "implementationComplete": false,
+    "implementationComplete": true,
     "productionBehaviorChanged": false,
     "candidateKernelBehaviorImplemented": true,
-    "productionBehaviorChangedMeaning": "accepted-live-runtime-remains-v0.11"
+    "productionBehaviorChangedMeaning": "accepted-live-runtime-remains-v0.11",
+    "implementationCompleteMeaning": "current-v0.12-candidate-kernel-scope-only; excludes C8 documentation, C9 readiness and C10 acceptance"
   },
   "interpreterModel": {
     "identities": [
@@ -133,11 +134,11 @@
     "knowledgeStateSeparation": "UNINTERPRETABLE, understood-but-NOT_FOUND and FOUND(X) are semantically distinct read outcomes",
     "resolveMaterializeSeparation": "Resolve is a read-only one-root-cut; exact address materialization and write-authorized target materialization are distinct capabilities",
     "targetMaterializationBound": "MATERIALIZE_TARGET removes exactly one leading R hierarchy-wide, preserves remaining indirection and fails closed before target writes on invalid exact evidence",
-    "rootBasisBoundary": "Q operations require a structurally valid declared R/O/C/L/U basis; forged or foreign basis evidence fails closed with zero writes",
+    "rootBasisBoundary": "Q and v0.12 STRING/source operations require a structurally valid declared R/O/C/L/U basis with proper O/C relative to R; invalid, collapsed, forged or foreign basis evidence fails closed and write operations perform zero writes",
     "v012StringByteIdentity": "Byte_v012(p) is the exact rooted Anum of bits8(p), not the historical Byte_v09 denotation; grouped byte Anums form the exact STRING Anum",
     "utf8CarrierBoundary": "UTF-8 code-point grouping is a read over exact STRING bytes and does not rewrite STRING carrier topology or grant glyph spelling semantic authority",
-    "sourceUseAuthority": "exact STRING source selects Use only through independently fixed Dictionary/Grammar/Theory evidence; a producer cannot self-admit an alternate well-formed Use",
-    "formalResultAuthority": "FORMAL result replay requires the selected Use and a Rule admitted by the same Theory; unadmitted Rule, wrong result or mismatched Theory is rejected"
+    "sourceUseAuthority": "exact STRING source is replayed only against an independently selected V012SourceAuthority: exact Dictionary identity plus exact Grammar/Theory membership Links; raw membership shape is not semantic authority",
+    "formalResultAuthority": "consumer source-to-result replay requires fixed Theory authority, selected finite Act attachments, matching Dictionary/Grammar/Theory, and equality between the source-selected Use and the selected Rule-role binding; candidate self-admission and late unselected ambient attachments do not gain authority"
   },
   "explicitlyDeferred": {
     "acceptedInlineFormalQSpelling": null,
@@ -163,7 +164,7 @@
     "formalSquareBracketCutoverComplete": true,
     "qRegressionComplete": true,
     "formalParenthesesContextComplete": true,
-    "publicFacadeComplete": false,
+    "publicFacadeComplete": true,
     "documentationComplete": false,
     "traceabilityComplete": false,
     "acceptedV011Mutated": false,
@@ -201,7 +202,10 @@
     "rootBasis": {
       "equationsUnchangedFromAcceptedFoundation": true,
       "verifiedAtQBoundary": true,
-      "invalidBasisWrites": false
+      "invalidBasisWrites": false,
+      "properOstensiveOCRelativeToR": true,
+      "verifiedAtStringReadBoundary": true,
+      "verifiedAtSourceReadBoundary": true
     }
   },
   "stringAnumV012": {
@@ -218,13 +222,25 @@
     "exactSourceCarrier": "StringAnum_v012",
     "sourceOccurrenceDistinctFromResolvedMeaning": true,
     "dictionaryGrammarTheoryFixedBeforeCandidate": true,
-    "candidateCanSelfAdmit": false,
     "ruleAdmissionUsesSameTheory": true,
     "replayReadOnly": true,
     "alternateWellFormedUseRejected": true,
     "unadmittedRuleRejected": true,
     "wrongClaimedResultRejected": true,
     "mismatchedTheoryRejected": true,
-    "hostParserIsSemanticAuthority": false
+    "hostParserIsSemanticAuthority": false,
+    "independentlySelectedAuthorityRequired": true,
+    "dictionaryIdentitySelectedIndependently": true,
+    "grammarMembershipSelectedIndependently": true,
+    "theoryMembershipSelectedIndependently": true,
+    "rawSourceReplayConfersAuthority": false,
+    "rawRuleReplayConfersAuthority": false,
+    "candidateCanSelfAdmitAtConsumerBoundary": false,
+    "fixedTheoryArtifactRequired": true,
+    "selectedActAttachmentBoundaryRequired": true,
+    "sourceInterpreterAuthorityMustMatch": true,
+    "sourceUseBindingMustMatch": true,
+    "lateAmbientActMutationChangesSelectedVerdict": false,
+    "compositeConsumerVerifier": "replayV012SourceResultEvidence"
   }
 }
