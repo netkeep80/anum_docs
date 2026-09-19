@@ -36,8 +36,6 @@ for (const gate of gates) {
   );
 }
 
-// Consuming a real kernel gate does not itself promote the candidate lifecycle.
+// Consuming a real kernel gate does not itself decide readiness or acceptance.
 assert(conformance.status === "candidate", "v0.12 must remain candidate");
 assert(conformance.accepted === false, "v0.12 must remain not accepted");
-assert(conformance.acceptanceReady === false, "v0.12 must remain not acceptance-ready");
-assert(conformance.coverageState === "incomplete", "v0.12 must remain coverage-incomplete");

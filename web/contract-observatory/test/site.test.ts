@@ -119,7 +119,7 @@ assert(previous !== undefined, "real previous version exists");
 assert(candidate !== undefined, "real candidate version exists");
 same(candidate.status, "candidate", "real candidate status is explicit");
 same(candidate.accepted, false, "real candidate is not accepted");
-same(candidate.acceptanceReady, false, "real candidate is not acceptance-ready");
+same(candidate.acceptanceReady, true, "real candidate is acceptance-ready after C9");
 assert(realHtml.includes(String(current.requiredExecutableGateCount)), "current gate count rendered");
 assert(realHtml.includes(String(current.requiredNegativeVectorCount)), "current negative-vector count rendered");
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(current) + 1}\" class=\"version-card current\"`), "current section classified");

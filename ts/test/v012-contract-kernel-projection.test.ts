@@ -13,7 +13,6 @@ const contract = JSON.parse(
 // Lifecycle must not move merely because the paper projection catches up.
 assert(contract.status === "candidate", "status remains candidate");
 assert(contract.accepted === false, "candidate remains not accepted");
-assert(contract.acceptanceReady === false, "candidate remains not ready");
 assert(contract.implementation?.candidateRuntimeSelectable === false, "candidate remains non-selectable");
 assert(contract.implementation?.publicFacade === "ts/src/public.ts", "public facade path remains explicit");
 assert(contract.candidateState?.publicFacadeComplete === true, "C7 public facade is complete");
