@@ -30,6 +30,10 @@ for (const marker of [
   "ТЕКУЩАЯ",
   "ПРЕДЫДУЩАЯ",
   "Исходные связи трассируемости",
+  "Векторы строк",
+  "Векторы четверичной формы",
+  "Векторы формальной нотации",
+  "Межслойные векторы",
 ]) {
   assert(html.includes(marker), `missing Russian presentation marker: ${marker}`);
 }
