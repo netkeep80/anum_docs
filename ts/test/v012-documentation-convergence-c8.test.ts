@@ -11,13 +11,13 @@ const contract = JSON.parse(read("contracts/mts-contract-v0.12.json")) as any;
 const conformance = JSON.parse(read("contracts/mts-conformance-v0.12.json")) as any;
 const traceabilityPath = join(repoRoot, "traceability/mts-v0.12.json");
 
-assert(contract.status === "candidate", "v0.12 remains candidate");
-assert(contract.accepted === false, "v0.12 remains not accepted");
-assert(contract.implementation?.candidateRuntimeSelectable === false, "v0.12 remains non-selectable");
+assert(contract.status === "accepted", "v0.12 is accepted after C10");
+assert(contract.accepted === true, "v0.12 accepted flag is explicit");
+assert(contract.implementation?.acceptedRuntime === "mts-contract/v0.12", "accepted runtime authority is v0.12");
 assert(contract.candidateState?.documentationComplete === true, "canonical documentation is complete");
 assert(contract.candidateState?.traceabilityComplete === true, "traceability projection is complete");
 
-assert(conformance.accepted === false, "conformance remains not accepted");
+assert(conformance.status === "accepted" && conformance.accepted === true, "accepted conformance preserves C8 evidence");
 assert(conformance.evidenceState?.documentationC8 === "green-confirmed", "C8 is green-confirmed");
 
 assert(existsSync(traceabilityPath), "v0.12 traceability manifest exists");
@@ -30,10 +30,10 @@ assert(
 );
 
 const docs: readonly (readonly [string, string])[] = [
-  ["docs/theory/Основания МТС.md", "## Кандидатная нормативная граница МТС v0.12"],
-  ["docs/theory/Система аксиом МТС.md", "## Кандидатная нормативная граница МТС v0.12"],
-  ["docs/specs/Формальная нотация МТС.md", "## Кандидат МТС v0.12: интерпретационные контексты и полномочия"],
-  ["docs/specs/Ачисла и сериализация.md", "## Кандидат МТС v0.12: укоренённое ачисло и один корневой срез"],
+  ["docs/theory/Основания МТС.md", "## Нормативная граница МТС v0.12"],
+  ["docs/theory/Система аксиом МТС.md", "## Нормативная граница МТС v0.12"],
+  ["docs/specs/Формальная нотация МТС.md", "## МТС v0.12: интерпретационные контексты и полномочия"],
+  ["docs/specs/Ачисла и сериализация.md", "## МТС v0.12: укоренённое ачисло и один корневой срез"],
 ] as const;
 
 for (const [path, marker] of docs) {
