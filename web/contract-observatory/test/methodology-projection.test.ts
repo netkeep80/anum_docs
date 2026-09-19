@@ -72,7 +72,7 @@ assert(current.lifecycle.some((entry) => entry.stage === "released"), "exact acc
 
 same(candidate.status, "candidate", "real v0.12 status remains candidate");
 same(candidate.accepted, false, "real v0.12 candidate is not accepted");
-same(candidate.acceptanceReady, false, "real v0.12 candidate is not acceptance-ready");
+same(candidate.acceptanceReady, true, "real v0.12 candidate is acceptance-ready after C9");
 same(candidate.isCurrent, false, "real v0.12 candidate is not current");
 same(candidate.isPrevious, false, "real v0.12 candidate is not previous");
 same(candidate.acceptanceReferences.length, 0, "candidate has no acceptance authority");
