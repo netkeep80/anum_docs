@@ -14,38 +14,59 @@ const acceptedContract = JSON.parse(read("contracts/mts-contract-v0.11.json")) a
 const acceptedConformance = JSON.parse(read("contracts/mts-conformance-v0.11.json")) as any;
 const policy = JSON.parse(read("repo-policy.json")) as any;
 
-assert(contract.status === "candidate", "v0.12 remains candidate");
-assert(contract.accepted === false, "v0.12 remains not accepted");
+const candidateLifecycle =
+  contract.status === "candidate"
+  && contract.accepted === false
+  && conformance.status === "candidate"
+  && conformance.accepted === false;
+const acceptedLifecycle =
+  contract.status === "accepted"
+  && contract.accepted === true
+  && conformance.status === "accepted"
+  && conformance.accepted === true;
+assert(candidateLifecycle || acceptedLifecycle, "v0.12 is either the ready candidate or the accepted release");
 assert(contract.acceptanceReady === true, "v0.12 contract is acceptance-ready after C9");
-assert(contract.implementation?.candidateRuntimeSelectable === false, "candidate remains non-selectable");
+if (candidateLifecycle) {
+  assert(contract.implementation?.candidateRuntimeSelectable === false, "ready candidate remains non-selectable before cutover");
+}
 assert(contract.implementation?.implementationComplete === true, "declared candidate kernel scope remains complete");
 assert(contract.candidateState?.publicFacadeComplete === true, "C7 public facade remains complete");
 assert(contract.candidateState?.documentationComplete === true, "C8 documentation remains complete");
 assert(contract.candidateState?.traceabilityComplete === true, "C8 traceability remains complete");
 
-assert(conformance.status === "candidate", "v0.12 conformance remains candidate");
-assert(conformance.accepted === false, "v0.12 conformance remains not accepted");
+
 assert(conformance.acceptanceReady === true, "v0.12 conformance is acceptance-ready after C9");
 assert(conformance.coverageState === "complete", "C9 establishes complete declared-scope coverage");
 assert((conformance.plannedExecutableGates ?? []).length === 0, "no planned executable gates remain");
 assert(conformance.evidenceState?.readinessC9 === "green-confirmed", "C9 is green-confirmed");
-assert(conformance.evidenceState?.acceptanceC10 === "next", "C10 is the next lifecycle stage");
+assert(
+  candidateLifecycle
+    ? conformance.evidenceState?.acceptanceC10 === "next"
+    : conformance.evidenceState?.acceptanceC10 === "accepted",
+  "C10 lifecycle projection matches candidate or accepted state",
+);
 assert(conformance.implementationSlices?.readinessAudit?.status === "green-confirmed", "readiness audit slice is complete");
 
 const blockers = conformance.acceptanceBlockers ?? [];
-assert(
-  blockers.length === 1 && blockers[0] === "v0.12 has not passed explicit acceptance cutover",
-  "only explicit C10 acceptance remains an acceptance blocker",
-);
+if (candidateLifecycle) {
+  assert(
+    blockers.length === 1 && blockers[0] === "v0.12 has not passed explicit acceptance cutover",
+    "only explicit C10 acceptance remains an acceptance blocker before cutover",
+  );
+} else {
+  assert(blockers.length === 0, "accepted v0.12 has no acceptance blocker");
+}
 assert(!blockers.some((entry: string) => entry.includes("6/2")), "temporary contract budget debt is not a readiness/acceptance blocker");
 
 assert(acceptedContract.schema === "mts-contract/v0.11", "accepted contract identity remains v0.11");
 assert(acceptedContract.status === "accepted" && acceptedContract.accepted === true, "v0.11 contract remains accepted");
 assert(acceptedConformance.schema === "mts-conformance/v0.11", "accepted conformance identity remains v0.11");
 assert(acceptedConformance.status === "accepted" && acceptedConformance.accepted === true, "v0.11 conformance remains accepted");
-assert(contract.acceptedCurrent === "mts-contract/v0.11", "candidate still points to accepted v0.11");
-assert(conformance.acceptedCurrent?.contract === "mts-contract/v0.11", "conformance current contract remains v0.11");
-assert(conformance.acceptedCurrent?.conformance === "mts-conformance/v0.11", "conformance current corpus remains v0.11");
+const expectedCurrentContract = candidateLifecycle ? "mts-contract/v0.11" : "mts-contract/v0.12";
+const expectedCurrentConformance = candidateLifecycle ? "mts-conformance/v0.11" : "mts-conformance/v0.12";
+assert(contract.acceptedCurrent === expectedCurrentContract, "accepted-current contract pointer matches lifecycle");
+assert(conformance.acceptedCurrent?.contract === expectedCurrentContract, "conformance current contract pointer matches lifecycle");
+assert(conformance.acceptedCurrent?.conformance === expectedCurrentConformance, "conformance current corpus pointer matches lifecycle");
 
 const marker = /\/\/ mts-version-evidence: required-from=(\d+)\.(\d+)/;
 const mandatory = readdirSync(join(repoRoot, "ts/test"))
@@ -82,12 +103,23 @@ const rules = new Map<string, any>((policy.document_relations?.rules ?? []).map(
 assert(rules.get("v012-contract-ready")?.value === true, "policy positively pins contract readiness");
 assert(rules.get("v012-conformance-ready")?.value === true, "policy positively pins conformance readiness");
 assert(rules.get("v012-conformance-complete")?.value === "complete", "policy positively pins complete coverage");
-assert(rules.get("v012-contract-status-candidate")?.value === "candidate", "policy preserves candidate status");
-assert(rules.get("v012-contract-not-accepted")?.value === false, "policy preserves contract not-accepted state");
-assert(rules.get("v012-conformance-not-accepted")?.value === false, "policy preserves conformance not-accepted state");
+const temporaryPreAcceptancePins = [
+  ["v012-contract-status-candidate", "candidate"],
+  ["v012-conformance-status-candidate", "candidate"],
+  ["v012-contract-not-accepted", false],
+  ["v012-conformance-not-accepted", false],
+] as const;
+const presentTemporaryPins = temporaryPreAcceptancePins.filter(([id]) => rules.has(id));
+assert(
+  presentTemporaryPins.length === 0 || presentTemporaryPins.length === temporaryPreAcceptancePins.length,
+  "temporary pre-acceptance policy pins are either fully present or fully detached",
+);
+for (const [id, expected] of presentTemporaryPins) {
+  assert(rules.get(id)?.value === expected, `temporary pre-acceptance policy pin is exact: ${id}`);
+}
 
 const contributing = read("docs/CONTRIBUTING.md");
 assert(contributing.includes("C9 = завершён"), "contributing lifecycle records completed C9");
-assert(contributing.includes("C10 = следующий этап"), "contributing lifecycle points to C10");
+
 
 console.log("MTS v0.12 C9 independent readiness audit: GREEN.");
