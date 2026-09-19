@@ -13,6 +13,9 @@ import {
   type ReadMemory,
 } from "../src/memory.js";
 import {
+  exportPortableStructuralTheory,
+} from "../src/portable-theory.js";
+import {
   SourceError,
   defineSourceForm,
 } from "../src/source.js";
@@ -21,9 +24,11 @@ import {
   readV012StringAnum,
 } from "../src/v012-string-anum.js";
 import {
+  V012SourceResultError,
   buildV012SelectedSourceEvidence,
   materializeV012SourceContent,
   replayV012SelectedSourceEvidence,
+  replayV012SelectedSourceEvidenceAgainstAuthority,
   type V012SourceAuthority,
 } from "../src/v012-source.js";
 
@@ -39,6 +44,22 @@ function sourceError(code: SourceError["code"], effect: () => unknown): void {
   } catch (error) {
     assert(error instanceof SourceError, `expected SourceError, got ${String(error)}`);
     same(error.code, code, "source error code");
+    return;
+  }
+  throw new Error(`v0.12 source authority: expected ${code}`);
+}
+function sourceResultError(
+  code: V012SourceResultError["code"],
+  effect: () => unknown,
+): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(
+      error instanceof V012SourceResultError,
+      `expected V012SourceResultError, got ${String(error)}`,
+    );
+    same(error.code, code, "source result error code");
     return;
   }
   throw new Error(`v0.12 source authority: expected ${code}`);
@@ -117,6 +138,7 @@ class ReadOnlyProbe implements ReadMemory {
     grammarMembership,
     theoryMembership,
   });
+  const fixedTheoryAuthority = exportPortableStructuralTheory(memory, theory);
 
   const authorityLinkCount = memory.linkCount;
 
@@ -141,10 +163,16 @@ class ReadOnlyProbe implements ReadMemory {
   assert(memory.linkCount >= authorityLinkCount, "candidate evidence may materialize its own Links");
 
   const beforeCorrectReplay = memory.linkCount;
-  const selected = replayV012SelectedSourceEvidence(new ReadOnlyProbe(memory), basis, correct);
+  const selected = replayV012SelectedSourceEvidenceAgainstAuthority(
+    new ReadOnlyProbe(memory),
+    basis,
+    correct,
+    authority,
+    fixedTheoryAuthority,
+  );
   same(selected.length, 1, "one selected Use");
   same(selected[0], nestingUse, "fixed authority selects nesting Use");
-  same(memory.linkCount, beforeCorrectReplay, "correct replay is read-only");
+  same(memory.linkCount, beforeCorrectReplay, "correct strong replay is read-only");
 
   // Untrusted producer proposes another internally well-formed resolution for
   // the SAME exact source and carries the SAME fixed authority references.
@@ -228,15 +256,15 @@ class ReadOnlyProbe implements ReadMemory {
   same(memory.linkCount, before, "authority-mismatch replay is read-only");
 }
 
-// Grammar self-admission adversarial boundary: Dictionary and Theory are fixed
-// first, but the selected form is deliberately NOT admitted by Grammar. A
-// candidate-created Grammar -> formSequence Link must not acquire authority
-// merely because it has the expected membership shape.
+// Grammar self-admission adversarial boundary: raw source replay validates
+// selected membership shape, while the stronger consumer boundary must reject a
+// candidate-created membership that replaces the independently selected one.
 {
   const memory = new Memory();
   const basis = ensureRootBasis(memory);
   const refs = anchors(memory, 6);
   const selectedUse = refs[0]!;
+  const alternateUse = refs[1]!;
   const grammar = refs[2]!;
   const theory = refs[3]!;
 
@@ -253,18 +281,30 @@ class ReadOnlyProbe implements ReadMemory {
     selectedUse,
   );
 
-  const admittedForms = materializeExactSequence(memory, [selectedUse]);
-  const fixedTheoryMembership = memory.ensure(theory, admittedForms);
+  const selectedForms = materializeExactSequence(memory, [selectedUse]);
+  const alternateForms = materializeExactSequence(memory, [alternateUse]);
 
+  // Independent source authority is fixed first. Grammar admits a different
+  // sequence; Theory admits the selected sequence used by this source.
+  const fixedGrammarMembership = memory.ensure(grammar, alternateForms);
+  const fixedTheoryMembership = memory.ensure(theory, selectedForms);
+  const expectedAuthority: V012SourceAuthority = Object.freeze({
+    dictionary: dictionaryEffect.afterScope,
+    grammar,
+    theory,
+    grammarMembership: fixedGrammarMembership,
+    theoryMembership: fixedTheoryMembership,
+  });
+  const fixedTheoryAuthority = exportPortableStructuralTheory(memory, theory);
   const fixedAuthorityCount = memory.linkCount;
+
   assert(
-    memory.find(grammar, admittedForms) === undefined,
-    "fixed Grammar does not yet admit the selected form sequence",
+    memory.find(grammar, selectedForms) === undefined,
+    "fixed Grammar does not admit selected source forms",
   );
 
-  // Candidate acts only after the authority boundary and synthesizes exactly
-  // the shape that replay currently accepts as Grammar membership.
-  const candidateGrammarMembership = memory.ensure(grammar, admittedForms);
+  // Candidate later synthesizes the exact selected Grammar membership shape.
+  const candidateGrammarMembership = memory.ensure(grammar, selectedForms);
   assert(
     memory.linkCount > fixedAuthorityCount,
     "candidate Grammar admission is created after fixed authority boundary",
@@ -281,23 +321,37 @@ class ReadOnlyProbe implements ReadMemory {
       dictionaryOccurrence: dictionaryEffect.occurrence,
     }],
     Object.freeze({
-      dictionary: dictionaryEffect.afterScope,
-      grammar,
-      theory,
+      ...expectedAuthority,
       grammarMembership: candidateGrammarMembership,
-      theoryMembership: fixedTheoryMembership,
     }),
   );
 
   const beforeReplay = memory.linkCount;
-  sourceError(
-    "invalid-admission-evidence",
-    () => replayV012SelectedSourceEvidence(new ReadOnlyProbe(memory), basis, candidate),
+
+  // Low-level replay deliberately proves only the supplied membership shape.
+  const lowLevelSelected = replayV012SelectedSourceEvidence(
+    new ReadOnlyProbe(memory),
+    basis,
+    candidate,
+  );
+  same(lowLevelSelected[0], selectedUse, "low-level replay accepts selected membership shape");
+
+  // Strong replay owns the independent authority selection and rejects the
+  // candidate's replacement membership.
+  sourceResultError(
+    "source-authority-mismatch",
+    () => replayV012SelectedSourceEvidenceAgainstAuthority(
+      new ReadOnlyProbe(memory),
+      basis,
+      candidate,
+      expectedAuthority,
+      fixedTheoryAuthority,
+    ),
   );
   same(
     memory.linkCount,
     beforeReplay,
-    "candidate Grammar self-admission rejection is read-only",
+    "candidate Grammar self-admission strong rejection is read-only",
   );
 }
 
