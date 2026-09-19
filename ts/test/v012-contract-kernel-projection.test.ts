@@ -85,6 +85,7 @@ assert(contract.sourceAuthority?.rawRuleReplayConfersAuthority === false, "raw R
 assert(contract.sourceAuthority?.candidateCanSelfAdmitAtConsumerBoundary === false, "candidate cannot self-admit at consumer boundary");
 assert(contract.sourceAuthority?.fixedTheoryArtifactRequired === true, "fixed Theory artifact is required");
 assert(contract.sourceAuthority?.selectedActAttachmentBoundaryRequired === true, "finite selected Act evidence is required");
+assert(contract.sourceAuthority?.sourceInterpreterAuthorityMustMatch === true, "source and Rule D/G/T authority must match");
 assert(contract.sourceAuthority?.sourceUseBindingMustMatch === true, "source-selected Use must match Rule binding");
 assert(contract.sourceAuthority?.lateAmbientActMutationChangesSelectedVerdict === false, "late unselected Act mutation does not change selected verdict");
 assert(contract.sourceAuthority?.compositeConsumerVerifier === "replayV012SourceResultEvidence", "composite consumer verifier is explicit");
