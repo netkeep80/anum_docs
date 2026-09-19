@@ -82,9 +82,10 @@ const rules = new Map<string, any>((policy.document_relations?.rules ?? []).map(
 assert(rules.get("v012-contract-ready")?.value === true, "policy positively pins contract readiness");
 assert(rules.get("v012-conformance-ready")?.value === true, "policy positively pins conformance readiness");
 assert(rules.get("v012-conformance-complete")?.value === "complete", "policy positively pins complete coverage");
-assert(rules.get("v012-contract-status-candidate")?.value === "candidate", "policy preserves candidate status");
-assert(rules.get("v012-contract-not-accepted")?.value === false, "policy preserves contract not-accepted state");
-assert(rules.get("v012-conformance-not-accepted")?.value === false, "policy preserves conformance not-accepted state");
+assert(!rules.has("v012-contract-status-candidate"), "B0 removes temporary contract candidate-status pin after author ACCEPT");
+assert(!rules.has("v012-conformance-status-candidate"), "B0 removes temporary conformance candidate-status pin after author ACCEPT");
+assert(!rules.has("v012-contract-not-accepted"), "B0 removes temporary contract not-accepted pin after author ACCEPT");
+assert(!rules.has("v012-conformance-not-accepted"), "B0 removes temporary conformance not-accepted pin after author ACCEPT");
 
 const contributing = read("docs/CONTRIBUTING.md");
 assert(contributing.includes("C9 = завершён"), "contributing lifecycle records completed C9");
