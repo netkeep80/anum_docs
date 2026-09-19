@@ -228,4 +228,77 @@ class ReadOnlyProbe implements ReadMemory {
   same(memory.linkCount, before, "authority-mismatch replay is read-only");
 }
 
+// Grammar self-admission adversarial boundary: Dictionary and Theory are fixed
+// first, but the selected form is deliberately NOT admitted by Grammar. A
+// candidate-created Grammar -> formSequence Link must not acquire authority
+// merely because it has the expected membership shape.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  const refs = anchors(memory, 6);
+  const selectedUse = refs[0]!;
+  const grammar = refs[2]!;
+  const theory = refs[3]!;
+
+  const content = materializeV012SourceContent(memory, basis, Uint8Array.of(0x5b));
+  const source = defineSourceForm(memory, content);
+
+  const scope0 = defineDictionaryScope(memory, memory.root, memory.root);
+  const dictionaryEffect = defineDictionaryEffect(
+    memory,
+    scope0,
+    memory.root,
+    memory.root,
+    content,
+    selectedUse,
+  );
+
+  const admittedForms = materializeExactSequence(memory, [selectedUse]);
+  const fixedTheoryMembership = memory.ensure(theory, admittedForms);
+
+  const fixedAuthorityCount = memory.linkCount;
+  assert(
+    memory.find(grammar, admittedForms) === undefined,
+    "fixed Grammar does not yet admit the selected form sequence",
+  );
+
+  // Candidate acts only after the authority boundary and synthesizes exactly
+  // the shape that replay currently accepts as Grammar membership.
+  const candidateGrammarMembership = memory.ensure(grammar, admittedForms);
+  assert(
+    memory.linkCount > fixedAuthorityCount,
+    "candidate Grammar admission is created after fixed authority boundary",
+  );
+
+  const candidate = buildV012SelectedSourceEvidence(
+    memory,
+    basis,
+    source,
+    [{
+      start: 0,
+      end: 1,
+      form: selectedUse,
+      dictionaryOccurrence: dictionaryEffect.occurrence,
+    }],
+    Object.freeze({
+      dictionary: dictionaryEffect.afterScope,
+      grammar,
+      theory,
+      grammarMembership: candidateGrammarMembership,
+      theoryMembership: fixedTheoryMembership,
+    }),
+  );
+
+  const beforeReplay = memory.linkCount;
+  sourceError(
+    "invalid-admission-evidence",
+    () => replayV012SelectedSourceEvidence(new ReadOnlyProbe(memory), basis, candidate),
+  );
+  same(
+    memory.linkCount,
+    beforeReplay,
+    "candidate Grammar self-admission rejection is read-only",
+  );
+}
+
 console.log("MTS v0.12 exact STRING source authority: GREEN.");
