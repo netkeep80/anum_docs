@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "incomplete",
-  "coverageStateMeaning": "C1-C6 retained candidate evidence remains executable; the completed #1167 foundation reconciliation is now projected through mandatory hierarchical Q, v0.12 STRING/Q byte identity, strict UTF-8 boundary, exact source-to-FORMAL-result authority, RootBasis fail-closed, and ostensive self-incidence kernel gates. C7 package/public-facade convergence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete.",
+  "coverageStateMeaning": "C1-C7 and the completed foundation/authority reconciliation are backed by executable kernel evidence, including hierarchical/two-memory Q and STRING transport, strict UTF-8, RootBasis fail-closed, exact source authority, composite source-to-result verification, and the public consumer facade. C8 normative documentation, C9 readiness evidence and C10 acceptance are not complete.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.11",
     "conformance": "mts-conformance/v0.11"
@@ -25,11 +25,13 @@
     "ts/test/v012-string-q-byte-bridge.test.ts",
     "ts/test/v012-string-utf8-boundary.test.ts",
     "ts/test/v012-formal-source-result-witness.test.ts",
-    "ts/test/v012-quaternary-root-basis-boundary.test.ts"
+    "ts/test/v012-quaternary-root-basis-boundary.test.ts",
+    "ts/test/anum-two-memory-conformance.test.ts",
+    "ts/test/string-anum-two-memory-conformance.test.ts",
+    "ts/test/v012-source-authority.test.ts",
+    "ts/test/v012-public-facade-c7.test.ts"
   ],
-  "plannedExecutableGates": [
-    "C7 package and public-facade convergence evidence"
-  ],
+  "plannedExecutableGates": [],
   "requiredStringVectors": [
     "v012-string-empty",
     "v012-string-empty-nested-anum",
@@ -297,7 +299,7 @@
     "formalSquareBracketCutoverC4": "green-confirmed",
     "qCompatibilityC5": "green-confirmed",
     "formalContextC6": "green-confirmed",
-    "publicFacadeC7": "next",
+    "publicFacadeC7": "green-confirmed",
     "documentationC8": "not-complete",
     "readinessC9": "blocked",
     "acceptanceC10": "blocked",
@@ -306,7 +308,10 @@
     "v012StringHierarchy": "green-confirmed",
     "strictUtf8Boundary": "green-confirmed",
     "sourceToFormalResultAuthority": "green-confirmed",
-    "rootBasisVerification": "green-confirmed"
+    "rootBasisVerification": "green-confirmed",
+    "anumTwoMemoryTransport": "green-confirmed",
+    "stringTwoMemoryTransport": "green-confirmed",
+    "sourceAuthoritySelection": "green-confirmed"
   },
   "implementationSlices": {
     "candidateBoundary": {
@@ -378,18 +383,17 @@
     "publicFacadeConvergence": {
       "issue": 1134,
       "stage": "C7",
-      "status": "next",
+      "status": "green-confirmed",
       "requiredForAcceptance": true
     },
     "documentationConvergence": {
       "issue": 1134,
       "stage": "C8",
-      "status": "blocked-by-public-facade-convergence",
+      "status": "next",
       "requiredForAcceptance": true
     }
   },
   "acceptanceBlockers": [
-    "package/public facade convergence is incomplete",
     "normative documentation and traceability are incomplete",
     "v0.12 has not passed explicit acceptance cutover",
     "temporary 6/2 contract budget debt remains until post-cutover cleanup"
