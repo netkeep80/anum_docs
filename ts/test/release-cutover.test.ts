@@ -81,7 +81,7 @@ assert(
   "package root must expose matching declaration and runtime outputs",
 );
 
-const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.11.json"), "utf8")) as {
+const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.12.json"), "utf8")) as {
   readonly schema?: string;
   readonly status?: string;
   readonly accepted?: boolean;
@@ -95,29 +95,29 @@ const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-
     readonly compatibilityRuntimeSelectable?: boolean;
   };
 };
-assert(contract.schema === "mts-contract/v0.11", "current contract must be v0.11");
-assert(contract.status === "accepted" && contract.accepted === true, "current v0.11 contract must be accepted");
-assert(contract.semanticBase === "mts-contract/v0.10", "v0.11 semantic base must be accepted v0.10");
-assert(contract.observableSemanticDelta === true, "v0.11 must retain its explicit semantic delta");
-assert(contract.acceptanceReady === true, "accepted v0.11 must retain proven readiness");
+assert(contract.schema === "mts-contract/v0.12", "current contract must be v0.12");
+assert(contract.status === "accepted" && contract.accepted === true, "current v0.12 contract must be accepted");
+assert(contract.semanticBase === "mts-contract/v0.11", "v0.12 semantic base must be accepted v0.11");
+assert(contract.observableSemanticDelta === true, "v0.12 must retain its explicit semantic delta");
+assert(contract.acceptanceReady === true, "accepted v0.12 must retain proven readiness");
 assert(contract.implementation?.language === "TypeScript", "current implementation must be TypeScript");
 assert(contract.implementation?.pythonRuntimePresent === false, "current contract must reject Python runtime ownership");
 assert(contract.implementation?.singleLiveSemanticRuntime === true, "accepted runtime must remain single");
 assert(contract.implementation?.compatibilityRuntimeSelectable === false, "compatibility runtime must remain unavailable");
 
 const conformance = JSON.parse(
-  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.11.json"), "utf8"),
+  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.12.json"), "utf8"),
 ) as ConformanceBoundary;
-assert(conformance.status === "accepted" && conformance.accepted === true, "current v0.11 conformance must be accepted");
-assert(conformance.acceptanceReady === true, "accepted v0.11 conformance must retain proven readiness");
+assert(conformance.status === "accepted" && conformance.accepted === true, "current v0.12 conformance must be accepted");
+assert(conformance.acceptanceReady === true, "accepted v0.12 conformance must retain proven readiness");
 
 // Keep the immediately previous accepted release independently checkable while
 // the trusted-base current/previous pair rotates from v0.10/v0.9 to v0.11/v0.10.
 const previousConformance = JSON.parse(
-  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.10.json"), "utf8"),
+  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.11.json"), "utf8"),
 ) as ConformanceBoundary;
-assert(previousConformance.status === "accepted" && previousConformance.accepted === true, "previous v0.10 conformance must remain accepted evidence");
-assert(previousConformance.acceptanceReady === true, "previous v0.10 conformance must retain proven readiness");
+assert(previousConformance.status === "accepted" && previousConformance.accepted === true, "previous v0.11 conformance must remain accepted evidence");
+assert(previousConformance.acceptanceReady === true, "previous v0.11 conformance must retain proven readiness");
 
 const currentPython = pythonFiles(repoRoot);
 negativeVector("python-runtime-present", currentPython.length === 0);
@@ -156,25 +156,31 @@ try {
 negativeVector("root-as-fifth-abit", rootRejected);
 negativeVector("empty-group-rejected", deserializeStream("[]", symbolicStackAlgebra).denotation === "R");
 
-// Retain every accepted-v0.10 required negative as a literal trusted-base anchor.
-negativeVector("v010-free-dot-has-no-ambient-current", mappedNegativeVector(previousConformance, "v010-free-dot-has-no-ambient-current"));
-negativeVector("v010-dot-is-not-parent-navigation", mappedNegativeVector(previousConformance, "v010-dot-is-not-parent-navigation"));
-negativeVector("v010-dot-is-not-runtime-current", mappedNegativeVector(previousConformance, "v010-dot-is-not-runtime-current"));
-negativeVector("v010-dot-is-not-read-begin", mappedNegativeVector(previousConformance, "v010-dot-is-not-read-begin"));
-negativeVector("v010-dot-is-not-read-end", mappedNegativeVector(previousConformance, "v010-dot-is-not-read-end"));
-negativeVector("v010-dot-is-not-storage-dereference", mappedNegativeVector(previousConformance, "v010-dot-is-not-storage-dereference"));
-negativeVector("v010-dot-is-not-arbitrary-rewrite", mappedNegativeVector(previousConformance, "v010-dot-is-not-arbitrary-rewrite"));
-negativeVector("v010-nonroot-full-dot-selfclosure-rejected", mappedNegativeVector(previousConformance, "v010-nonroot-full-dot-selfclosure-rejected"));
+// Retain every accepted-v0.11 required negative as a literal previous-release anchor.
+negativeVector("v011-root-is-not-execution-frame", mappedNegativeVector(previousConformance, "v011-root-is-not-execution-frame"));
+negativeVector("v011-dot-is-not-ambient-runtime-current", mappedNegativeVector(previousConformance, "v011-dot-is-not-ambient-runtime-current"));
+negativeVector("v011-top-bind-does-not-insert-hidden-root-glyph", mappedNegativeVector(previousConformance, "v011-top-bind-does-not-insert-hidden-root-glyph"));
+negativeVector("v011-nonroot-pair-A-A-is-not-A", mappedNegativeVector(previousConformance, "v011-nonroot-pair-A-A-is-not-A"));
+negativeVector("v011-colon-meaning-is-not-dot-dot-fold", mappedNegativeVector(previousConformance, "v011-colon-meaning-is-not-dot-dot-fold"));
+negativeVector("v011-q-alphabet-remains-four-abits", mappedNegativeVector(previousConformance, "v011-q-alphabet-remains-four-abits"));
+negativeVector("v011-dot-is-not-q-abit", mappedNegativeVector(previousConformance, "v011-dot-is-not-q-abit"));
+negativeVector("v011-colon-is-not-q-abit", mappedNegativeVector(previousConformance, "v011-colon-is-not-q-abit"));
+negativeVector("v011-host-stack-is-not-semantic-authority", mappedNegativeVector(previousConformance, "v011-host-stack-is-not-semantic-authority"));
 
-// Current-v0.11 anchors must each map through one of the exact C1-C5 gates
-// required by the accepted current conformance. Evidence-group names are not
-// semantic, so the helper traverses every group rather than assuming "negative".
-negativeVector("v011-root-is-not-execution-frame", mappedNegativeVector(conformance, "v011-root-is-not-execution-frame"));
-negativeVector("v011-dot-is-not-ambient-runtime-current", mappedNegativeVector(conformance, "v011-dot-is-not-ambient-runtime-current"));
-negativeVector("v011-top-bind-does-not-insert-hidden-root-glyph", mappedNegativeVector(conformance, "v011-top-bind-does-not-insert-hidden-root-glyph"));
-negativeVector("v011-nonroot-pair-A-A-is-not-A", mappedNegativeVector(conformance, "v011-nonroot-pair-A-A-is-not-A"));
-negativeVector("v011-colon-meaning-is-not-dot-dot-fold", mappedNegativeVector(conformance, "v011-colon-meaning-is-not-dot-dot-fold"));
-negativeVector("v011-q-alphabet-remains-four-abits", mappedNegativeVector(conformance, "v011-q-alphabet-remains-four-abits"));
-negativeVector("v011-dot-is-not-q-abit", mappedNegativeVector(conformance, "v011-dot-is-not-q-abit"));
-negativeVector("v011-colon-is-not-q-abit", mappedNegativeVector(conformance, "v011-colon-is-not-q-abit"));
-negativeVector("v011-host-stack-is-not-semantic-authority", mappedNegativeVector(conformance, "v011-host-stack-is-not-semantic-authority"));
+// Current-v0.12 anchors: every required veto must map through one of the exact
+// sixteen mandatory executable gates retained by the accepted conformance.
+negativeVector("v012-string-glyph-one-is-not-q-abit-one", mappedNegativeVector(conformance, "v012-string-glyph-one-is-not-q-abit-one"));
+negativeVector("v012-formal-square-brackets-do-not-select-q-child", mappedNegativeVector(conformance, "v012-formal-square-brackets-do-not-select-q-child"));
+negativeVector("v012-representation-is-not-interpretation", mappedNegativeVector(conformance, "v012-representation-is-not-interpretation"));
+negativeVector("v012-formal-empty-parentheses-are-not-a-valid-result", mappedNegativeVector(conformance, "v012-formal-empty-parentheses-are-not-a-valid-result"));
+negativeVector("v012-child-creation-does-not-auto-select-contextual-k", mappedNegativeVector(conformance, "v012-child-creation-does-not-auto-select-contextual-k"));
+negativeVector("v012-nearest-lexical-frame-is-not-semantic-authority", mappedNegativeVector(conformance, "v012-nearest-lexical-frame-is-not-semantic-authority"));
+negativeVector("v012-ambient-current-is-not-semantic-authority", mappedNegativeVector(conformance, "v012-ambient-current-is-not-semantic-authority"));
+negativeVector("v012-hidden-parent-traversal-is-not-semantic-authority", mappedNegativeVector(conformance, "v012-hidden-parent-traversal-is-not-semantic-authority"));
+negativeVector("v012-link-left-association-is-not-formal-grammar", mappedNegativeVector(conformance, "v012-link-left-association-is-not-formal-grammar"));
+negativeVector("v012-generic-flat-reader-is-not-formal-grammar", mappedNegativeVector(conformance, "v012-generic-flat-reader-is-not-formal-grammar"));
+negativeVector("v012-inline-formal-q-spelling-is-not-accepted", mappedNegativeVector(conformance, "v012-inline-formal-q-spelling-is-not-accepted"));
+negativeVector("v012-curly-braces-are-not-q-escaping", mappedNegativeVector(conformance, "v012-curly-braces-are-not-q-escaping"));
+negativeVector("v012-formal-square-bracket-low-level-open-is-not-authority", mappedNegativeVector(conformance, "v012-formal-square-bracket-low-level-open-is-not-authority"));
+negativeVector("v012-formal-square-bracket-missing-rule-does-not-open", mappedNegativeVector(conformance, "v012-formal-square-bracket-missing-rule-does-not-open"));
+negativeVector("v012-formal-square-bracket-substituted-q-rule-does-not-open", mappedNegativeVector(conformance, "v012-formal-square-bracket-substituted-q-rule-does-not-open"));
