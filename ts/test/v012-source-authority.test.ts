@@ -174,6 +174,72 @@ class ReadOnlyProbe implements ReadMemory {
   same(selected[0], nestingUse, "fixed authority selects nesting Use");
   same(memory.linkCount, beforeCorrectReplay, "correct strong replay is read-only");
 
+  // A candidate can also construct a different but independently valid
+  // Dictionary snapshot after authority selection. Raw replay accepts that
+  // snapshot on its own terms; the stronger boundary must not let candidate
+  // evidence replace the consumer-selected Dictionary identity.
+  const unrelatedContent = materializeV012SourceContent(
+    memory,
+    basis,
+    Uint8Array.of(0x78),
+  );
+  const candidateSeedEffect = defineDictionaryEffect(
+    memory,
+    scope0,
+    memory.root,
+    memory.root,
+    unrelatedContent,
+    literalUse,
+  );
+  const candidateDictionaryEffect = defineDictionaryEffect(
+    memory,
+    candidateSeedEffect.afterScope,
+    memory.root,
+    candidateSeedEffect.historyAfter,
+    content,
+    nestingUse,
+  );
+  assert(
+    candidateDictionaryEffect.afterScope !== dictionary,
+    "candidate Dictionary snapshot differs from fixed Dictionary",
+  );
+
+  const candidateDictionaryEvidence = buildV012SelectedSourceEvidence(
+    memory,
+    basis,
+    source,
+    [{
+      start: 0,
+      end: 1,
+      form: nestingUse,
+      dictionaryOccurrence: candidateDictionaryEffect.occurrence,
+    }],
+    Object.freeze({
+      ...authority,
+      dictionary: candidateDictionaryEffect.afterScope,
+    }),
+  );
+  const candidateDictionarySelected = replayV012SelectedSourceEvidence(
+    new ReadOnlyProbe(memory),
+    basis,
+    candidateDictionaryEvidence,
+  );
+  same(
+    candidateDictionarySelected[0],
+    nestingUse,
+    "low-level replay accepts alternate valid Dictionary snapshot",
+  );
+  sourceResultError(
+    "source-authority-mismatch",
+    () => replayV012SelectedSourceEvidenceAgainstAuthority(
+      new ReadOnlyProbe(memory),
+      basis,
+      candidateDictionaryEvidence,
+      authority,
+      fixedTheoryAuthority,
+    ),
+  );
+
   // Untrusted producer proposes another internally well-formed resolution for
   // the SAME exact source and carries the SAME fixed authority references.
   const wrong = buildV012SelectedSourceEvidence(
