@@ -2,7 +2,7 @@
   "schema": "mts-traceability/v0.2",
   "contract": "contracts/mts-contract-v0.12.json",
   "conformance": "contracts/mts-conformance-v0.12.json",
-  "acceptance": "cutover/typescript-c1-acceptance-v0.4.json",
+  "acceptance": "cutover/typescript-c1-acceptance-v0.5.json",
   "invariants": {
     "interpreterSeparation": {
       "contractPointer": "/requiredSemanticLaws/interpreterSeparation",
