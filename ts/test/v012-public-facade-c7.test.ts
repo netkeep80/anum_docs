@@ -39,7 +39,6 @@ import type {
   V012SourceAuthority,
   StructuralRuleReplayEvidence,
   StructuralRuleReplayResult,
-  V012SourceAuthority,
   V012SourceContent,
   V012SourceResultEvidence,
   V012SourceResultReplayResult,
