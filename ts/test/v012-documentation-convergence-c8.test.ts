@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { join, resolve } from "node:path";\nimport { checkRepositorySemanticLawDocumentation } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.12 C8 normative convergence: ${message}`);
@@ -33,46 +33,21 @@ assert(
   "traceability invariant IDs exactly match contract semantic laws",
 );
 
-const docs: readonly (readonly [string, string])[] = candidateLifecycle
-  ? [
-      ["docs/theory/Основания МТС.md", "## Кандидатная нормативная граница МТС v0.12"],
-      ["docs/theory/Система аксиом МТС.md", "## Кандидатная нормативная граница МТС v0.12"],
-      ["docs/specs/Формальная нотация МТС.md", "## Кандидат МТС v0.12: интерпретационные контексты и полномочия"],
-      ["docs/specs/Ачисла и сериализация.md", "## Кандидат МТС v0.12: укоренённое ачисло и один корневой срез"],
-    ]
-  : [
-      ["docs/theory/Основания МТС.md", "## Нормативная граница МТС v0.12"],
-      ["docs/theory/Система аксиом МТС.md", "## Нормативная граница МТС v0.12"],
-      ["docs/specs/Формальная нотация МТС.md", "## МТС v0.12: интерпретационные контексты и полномочия"],
-      ["docs/specs/Ачисла и сериализация.md", "## МТС v0.12: укоренённое ачисло и один корневой срез"],
-    ];
+const lawDocumentationIssues = checkRepositorySemanticLawDocumentation(repoRoot);
+assert(
+  lawDocumentationIssues.length === 0,
+  `all accepted semantic laws have one stable normative owner and valid references: ${lawDocumentationIssues
+    .map((issue) => issue.message)
+    .join("; ")}`,
+);
 
-for (const [path, marker] of docs) {
-  assert(read(path).includes(marker), `${path} contains the v0.12 normative marker`);
+const ownerDocs = [
+  "docs/specs/Формальная нотация МТС.md",
+  "docs/specs/Ачисла и сериализация.md",
+  "docs/specs/Апамять и управление сетью связей.md",
+] as const;
+for (const path of ownerDocs) {
+  assert(read(path).includes('<a id="mts-law-'), `${path} contains stable semantic-law owner anchors`);
 }
-
-const formal = read("docs/specs/Формальная нотация МТС.md");
-for (const statement of [
-  "FORMAL [...] → I_STRING",
-  "Q [...] → I_Q",
-  "FORMAL (...) → I_FORMAL",
-  "replayV012SelectedSourceEvidence ≠ семантическое полномочие",
-]) {
-  assert(formal.includes(statement), `formal notation contains: ${statement}`);
-}
-
-const anum = read("docs/specs/Ачисла и сериализация.md");
-for (const statement of [
-  "каждое локальное ачисло начинается с R",
-  "Resolve = один корневой срез только для чтения",
-  "MATERIALIZE_TARGET = один разрешённый корневой срез с записью",
-  "UNINTERPRETABLE ≠ NOT_FOUND ≠ FOUND",
-  "Byte_v012(p) = Anum(bits8(p))",
-]) {
-  assert(anum.includes(statement), `Anum specification contains: ${statement}`);
-}
-
-const contributing = read("docs/CONTRIBUTING.md");
-assert(contributing.includes("C8 = завершён"), "contributing lifecycle reflects completed C8");
 
 console.log("MTS v0.12 C8 normative documentation and traceability convergence: GREEN.");
