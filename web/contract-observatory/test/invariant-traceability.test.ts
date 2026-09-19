@@ -68,6 +68,12 @@ assert(
   candidateFormalSquare.requiredExecutableGates.includes("ts/test/v012-formal-square-string-child-c4.test.ts"),
   "v0.12 FORMAL square-bracket invariant is bound to its executable gate",
 );
+const formalGroup = candidateFormalSquare.positiveGroups?.find((group) => group.sourceSet === "requiredFormalVectors");
+assert(formalGroup !== undefined, "v0.2 preserves requiredFormalVectors as an explicit source set");
+assert(
+  formalGroup.vectorIds.includes("v012-formal-nonempty-string-child"),
+  "v0.2 FORMAL source set carries its exact conformance vector",
+);
 
 const previous = projection.versions.find((version) => version.isPrevious);
 assert(previous !== undefined, "previous version exists");
@@ -80,6 +86,9 @@ assert(html.includes('data-item-id="invariant:topLevelDot"'), "invariant identit
 assert(html.includes("/requiredSemanticLaws/topLevelDot"), "exact contract JSON Pointer is visible");
 assert(html.includes(". -&gt; R under TopBind(R,S)"), "resolved contract law is visible without becoming UI authority");
 assert(html.includes("traceability/mts-v0.11.json"), "traceability manifest provenance is visible");
+assert(html.includes("traceability/mts-v0.12.json"), "v0.12 traceability provenance is visible");
+assert(html.includes("Векторы формальной нотации"), "v0.2 FORMAL positive source set has a Russian presentation label");
+assert(html.includes("Межслойные векторы"), "v0.2 cross-layer positive source set has a Russian presentation label");
 for (const label of [
   "Векторы генезиса",
   "Векторы смысла",
