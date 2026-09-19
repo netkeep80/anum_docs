@@ -95,7 +95,7 @@ assert.ok(
 const missingDocs = syntheticOwnerDocs();
 const missingPath = SEMANTIC_LAW_OWNER_BY_ID.exactAnumRooting;
 assert.ok(missingPath);
-missingDocs[missingPath] = missingDocs[missingPath].replace(
+missingDocs[missingPath] = missingDocs[missingPath]!.replace(
   '<a id="mts-law-exactAnumRooting"></a>\n### Переименовываемый заголовок\nНормативное тело exactAnumRooting.\n',
   "",
 );
@@ -107,7 +107,7 @@ assert.ok(
 );
 
 const emptyDocs = syntheticOwnerDocs();
-emptyDocs[missingPath] = emptyDocs[missingPath].replace(
+emptyDocs[missingPath] = emptyDocs[missingPath]!.replace(
   '<a id="mts-law-exactAnumRooting"></a>\n### Переименовываемый заголовок\nНормативное тело exactAnumRooting.\n',
   '<a id="mts-law-exactAnumRooting"></a>\n',
 );
@@ -128,7 +128,7 @@ assert.ok(
 );
 
 const fencedOnlyDocs = syntheticOwnerDocs();
-fencedOnlyDocs[missingPath] = fencedOnlyDocs[missingPath].replace(
+fencedOnlyDocs[missingPath] = fencedOnlyDocs[missingPath]!.replace(
   '<a id="mts-law-exactAnumRooting"></a>\n### Переименовываемый заголовок\nНормативное тело exactAnumRooting.\n',
   "",
 );
