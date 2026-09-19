@@ -57,8 +57,8 @@ same(current.requiredExecutableGateCount, 5, "current executable gate count proj
 assert(current.requiredNegativeVectorCount > 0, "current negative-vector coverage projected");
 same(candidate.status, "candidate", "candidate status projected");
 same(candidate.accepted, false, "candidate is not accepted");
-same(candidate.acceptanceReady, false, "candidate is not acceptance-ready");
-same(candidate.coverageState, "incomplete", "candidate coverage remains incomplete");
+same(candidate.acceptanceReady, true, "candidate readiness is projected after C9");
+same(candidate.coverageState, "complete", "candidate declared-scope coverage is complete after C9");
 same(candidate.requiredExecutableGateCount, 15, "v0.12 candidate projects C2-C7 plus completed foundation/authority kernel evidence");
 assert(candidate.requiredNegativeVectorCount > 0, "candidate veto corpus is projected");
 same(candidate.isCurrent, false, "candidate is not current");
