@@ -46,6 +46,9 @@ import type {
   StructuralScopedDerivationReplayResult,
   StructuralTheoremEvidence,
   V012SourceContent,
+  V012SourceResultErrorCode,
+  V012SourceResultEvidence,
+  V012SourceResultReplayResult,
   WriteMemory,
 } from "../src/public.js";
 
@@ -79,6 +82,10 @@ type InternalV012SourceBuilder = typeof import("../src/public.js").buildV012Sele
 type InternalStructuralRuleBuilder = typeof import("../src/public.js").defineStructuralRule;
 // @ts-expect-error C7 keeps structural Rule admission internal.
 type InternalStructuralRuleAdmission = typeof import("../src/public.js").admitStructuralRule;
+// @ts-expect-error C7 keeps lower v0.12 authority plumbing internal; consumers use the composite verifier.
+type InternalV012TheoryRuleReplay = typeof import("../src/public.js").replayV012StructuralRuleAgainstTheoryAuthority;
+// @ts-expect-error C7 keeps selected-Act view plumbing internal; consumers use the composite verifier.
+type InternalV012SelectedRuleReplay = typeof import("../src/public.js").replayV012StructuralRuleAgainstSelectedEvidence;
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`public-api: ${message}`);
@@ -130,6 +137,7 @@ const expectedRuntimeExports = [
   "StructuralScopedDerivationReplayError",
   "StructuralTheoremReplayError",
   "StructuralTheoremReuseReplayError",
+  "V012SourceResultError",
   "V012StringAnumError",
   "ValueBundleReplayError",
   "analyzeDirectDeixisCarrier",
@@ -204,6 +212,7 @@ const expectedRuntimeExports = [
   "replayStructuralScopedDerivation",
   "replayStructuralTheorem",
   "replayV012SelectedSourceEvidence",
+  "replayV012SourceResultEvidence",
   "resolveFlatBundle",
   "resolveQuaternaryAnum",
   "serializeMaterializedQuaternaryAnum",
@@ -217,7 +226,7 @@ const expectedRuntimeExports = [
   "verifyPortableStructuralProofTheoryRevision",
 ].sort();
 
-assert(expectedRuntimeExports.length === 130, "v0.12 C7 runtime export budget must be exactly 130");
+assert(expectedRuntimeExports.length === 132, "v0.12 C7 runtime export budget must be exactly 132");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
@@ -298,6 +307,9 @@ const qMaterialized: MaterializedQuaternaryAnum | undefined = undefined;
 const stringRead: ReadV012StringAnum | undefined = undefined;
 const sourceEvidence: SourceFrontEndEvidence | undefined = undefined;
 const sourceContent: V012SourceContent | undefined = undefined;
+const sourceResultErrorCode: V012SourceResultErrorCode | undefined = undefined;
+const sourceResultEvidence: V012SourceResultEvidence | undefined = undefined;
+const sourceResultReplay: V012SourceResultReplayResult | undefined = undefined;
 const structuralRuleEvidence: StructuralRuleReplayEvidence | undefined = undefined;
 const structuralRuleResult: StructuralRuleReplayResult | undefined = undefined;
 const relation: RelationReplayEvidence | undefined = undefined;
@@ -359,6 +371,9 @@ void [
   stringRead,
   sourceEvidence,
   sourceContent,
+  sourceResultErrorCode,
+  sourceResultEvidence,
+  sourceResultReplay,
   structuralRuleEvidence,
   structuralRuleResult,
   relation,

@@ -71,12 +71,17 @@ export type {
 } from "./source.js";
 
 export {
+  V012SourceResultError,
   materializeV012SourceContent,
   readV012SourceContent,
   replayV012SelectedSourceEvidence,
+  replayV012SourceResultEvidence,
 } from "./v012-source.js";
 export type {
   V012SourceContent,
+  V012SourceResultErrorCode,
+  V012SourceResultEvidence,
+  V012SourceResultReplayResult,
 } from "./v012-source.js";
 
 export {

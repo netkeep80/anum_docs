@@ -16,9 +16,11 @@ import {
   serializeV012StringAnum as internalSerializeV012StringAnum,
 } from "../src/v012-string-anum.js";
 import {
+  V012SourceResultError as InternalV012SourceResultError,
   materializeV012SourceContent as internalMaterializeV012SourceContent,
   readV012SourceContent as internalReadV012SourceContent,
   replayV012SelectedSourceEvidence as internalReplayV012SelectedSourceEvidence,
+  replayV012SourceResultEvidence as internalReplayV012SourceResultEvidence,
 } from "../src/v012-source.js";
 import {
   SourceError as InternalSourceError,
@@ -37,6 +39,8 @@ import type {
   StructuralRuleReplayEvidence,
   StructuralRuleReplayResult,
   V012SourceContent,
+  V012SourceResultEvidence,
+  V012SourceResultReplayResult,
 } from "../src/public.js";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -57,6 +61,8 @@ type PublicEvidenceSurface = readonly [
   SourceFrontEndEvidence,
   StructuralRuleReplayEvidence,
   StructuralRuleReplayResult,
+  V012SourceResultEvidence,
+  V012SourceResultReplayResult,
 ];
 const typeSurfaceExists: PublicEvidenceSurface | undefined = undefined;
 void typeSurfaceExists;
@@ -75,9 +81,11 @@ same(publicApi.readV012StringByteAnum, internalReadV012StringByteAnum, "readV012
 same(publicApi.readV012StringAnum, internalReadV012StringAnum, "readV012StringAnum");
 
 same(publicApi.SourceError, InternalSourceError, "SourceError");
+same(publicApi.V012SourceResultError, InternalV012SourceResultError, "V012SourceResultError");
 same(publicApi.materializeV012SourceContent, internalMaterializeV012SourceContent, "materializeV012SourceContent");
 same(publicApi.readV012SourceContent, internalReadV012SourceContent, "readV012SourceContent");
 same(publicApi.replayV012SelectedSourceEvidence, internalReplayV012SelectedSourceEvidence, "replayV012SelectedSourceEvidence");
+same(publicApi.replayV012SourceResultEvidence, internalReplayV012SourceResultEvidence, "replayV012SourceResultEvidence");
 
 same(publicApi.StructuralRuleError, InternalStructuralRuleError, "StructuralRuleError");
 same(publicApi.replayStructuralRule, internalReplayStructuralRule, "replayStructuralRule");
@@ -86,6 +94,8 @@ same(publicApi.replayStructuralRule, internalReplayStructuralRule, "replayStruct
 // construction vocabulary that produced the completion witnesses.
 for (const internalOnly of [
   "buildV012SelectedSourceEvidence",
+  "replayV012StructuralRuleAgainstTheoryAuthority",
+  "replayV012StructuralRuleAgainstSelectedEvidence",
   "defineDictionaryScope",
   "defineDictionaryEffect",
   "defineStructuralRule",

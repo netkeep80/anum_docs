@@ -34,12 +34,15 @@ import {
   defineActHeader,
 } from "../src/structural-readers.js";
 import {
+  V012SourceResultError,
   buildV012SelectedSourceEvidence,
   materializeV012SourceContent,
   replayV012SelectedSourceEvidence,
+  replayV012SourceResultEvidence,
   replayV012StructuralRuleAgainstSelectedEvidence,
   replayV012StructuralRuleAgainstTheoryAuthority,
   type V012SourceAuthority,
+  type V012SourceResultEvidence,
 } from "../src/v012-source.js";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -86,6 +89,22 @@ function sourceError(
   } catch (error) {
     assert(error instanceof SourceError, `expected SourceError, got ${String(error)}`);
     same(error.code, code, "source error code");
+    return;
+  }
+  throw new Error(`v0.12 FORMAL source->result witness: expected ${code}`);
+}
+function sourceResultError(
+  code: V012SourceResultError["code"],
+  effect: () => unknown,
+): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(
+      error instanceof V012SourceResultError,
+      `expected V012SourceResultError, got ${String(error)}`,
+    );
+    same(error.code, code, "source result error code");
     return;
   }
   throw new Error(`v0.12 FORMAL source->result witness: expected ${code}`);
@@ -233,6 +252,13 @@ class ReadOnlyProbe implements ReadMemory {
     expectedInterpreter: Object.freeze({ dictionary, grammar, theory }),
     expectedAfterContext: afterContext,
   });
+  const correctSourceResultEvidence: V012SourceResultEvidence = Object.freeze({
+    source: sourceEvidence,
+    structural: correctReplay,
+    selectedActAttachments: selectedActEvidence,
+    sourceUseIndex: 0,
+    sourceUseRole,
+  });
 
   assert(memory.linkCount >= fixedAuthorityCount, "candidate evidence may add non-authority Links");
 
@@ -243,25 +269,140 @@ class ReadOnlyProbe implements ReadMemory {
   const probe = new ReadOnlyProbe(memory);
   const before = memory.linkCount;
 
-  const selected = replayV012SelectedSourceEvidence(probe, basis, sourceEvidence);
-  same(selected.length, 1, "exact source selects one Use");
-  same(selected[0], selectedUse, "fixed authority selects the admitted Use");
-
-  const structural = replayV012StructuralRuleAgainstSelectedEvidence(
+  const combined = replayV012SourceResultEvidence(
     probe,
-    correctReplay,
+    basis,
+    correctSourceResultEvidence,
     fixedTheoryAuthority,
-    selectedActEvidence,
   );
-  same(memory.linkCount, before, "source + structural authority replay is read-only");
+  const selected = combined.selectedUses;
+  const structural = combined.structural;
+  same(selected.length, 1, "exact source selects one Use");
+  same(combined.selectedUse, selectedUse, "composite verifier selects admitted source Use");
+  same(memory.linkCount, before, "source + structural composite replay is read-only");
 
   const useBinding = structural.bindings.find((binding) => binding.role === sourceUseRole);
   assert(useBinding !== undefined, "Rule replay carries explicit source-Use role binding");
-  same(useBinding.value, selected[0], "Rule source-Use binding equals source-selected Use");
+  same(useBinding.value, combined.selectedUse, "Rule source-Use binding equals source-selected Use");
 
   const resultPoles = memory.poles(structural.claimedBody);
   same(resultPoles.start, selectedUse, "verified body starts from source-selected Use");
   same(resultPoles.end, formalResult, "verified FORMAL result is Theory-grounded");
+
+  // Independent composition falsifier: source and Rule replay can each be
+  // valid under the SAME Dictionary/Grammar/Theory while selecting different
+  // values for the explicit source-Use role. Today only this test harness sees
+  // the cross-evidence mismatch.
+  const mismatchedAfterContext = refs[11]!;
+  assert(
+    mismatchedAfterContext !== afterContext,
+    "mismatch control uses a distinct explicit after-context",
+  );
+  const mismatchedAct = defineActHeader(
+    memory,
+    interpreter,
+    roleDictionary,
+    mismatchedAfterContext,
+  );
+  const mismatchedUseAttachment = defineActField(
+    memory,
+    mismatchedAct,
+    sourceUseRole,
+    alternateUse,
+  );
+  const mismatchedClaimedBody = memory.ensure(alternateUse, formalResult);
+  const mismatchedRuleReplay: StructuralRuleReplayEvidence = Object.freeze({
+    ...correctReplay,
+    act: mismatchedAct,
+    claimedBody: mismatchedClaimedBody,
+    expectedAfterContext: mismatchedAfterContext,
+  });
+
+  const beforeMismatchedComposition = memory.linkCount;
+  const mismatchedSelected = replayV012SelectedSourceEvidence(
+    new ReadOnlyProbe(memory),
+    basis,
+    sourceEvidence,
+  );
+  const mismatchedStructural = replayV012StructuralRuleAgainstSelectedEvidence(
+    new ReadOnlyProbe(memory),
+    mismatchedRuleReplay,
+    fixedTheoryAuthority,
+    Object.freeze([mismatchedUseAttachment]),
+  );
+  same(
+    mismatchedStructural.interpreterStructure.dictionary,
+    sourceEvidence.dictionary,
+    "mismatch control keeps same Dictionary",
+  );
+  same(
+    mismatchedStructural.interpreterStructure.grammar,
+    sourceEvidence.grammar,
+    "mismatch control keeps same Grammar",
+  );
+  same(
+    mismatchedStructural.interpreterStructure.theory,
+    sourceEvidence.theory,
+    "mismatch control keeps same Theory",
+  );
+  const mismatchedUseBinding = mismatchedStructural.bindings.find(
+    (binding) => binding.role === sourceUseRole,
+  );
+  assert(mismatchedUseBinding !== undefined, "mismatch control carries source-Use binding");
+  assert(
+    mismatchedUseBinding.value !== mismatchedSelected[0],
+    "mismatch control must really disagree across otherwise valid replays",
+  );
+  sourceResultError(
+    "source-use-binding-mismatch",
+    () => replayV012SourceResultEvidence(
+      new ReadOnlyProbe(memory),
+      basis,
+      Object.freeze({
+        ...correctSourceResultEvidence,
+        structural: mismatchedRuleReplay,
+        selectedActAttachments: Object.freeze([mismatchedUseAttachment]),
+      }),
+      fixedTheoryAuthority,
+    ),
+  );
+  same(
+    memory.linkCount,
+    beforeMismatchedComposition,
+    "mismatched composite rejection is read-only",
+  );
+
+  // Separately valid source evidence under a different Grammar must not be
+  // composed with the original structural interpreter merely because Theory and
+  // selected Use still agree.
+  const alternateGrammar = refs[10]!;
+  const alternateGrammarMembership = memory.ensure(
+    alternateGrammar,
+    admittedFormSequence,
+  );
+  const alternateGrammarSourceEvidence = Object.freeze({
+    ...sourceEvidence,
+    grammar: alternateGrammar,
+    grammarMembership: alternateGrammarMembership,
+  });
+  const alternateGrammarSelected = replayV012SelectedSourceEvidence(
+    new ReadOnlyProbe(memory),
+    basis,
+    alternateGrammarSourceEvidence,
+  );
+  same(alternateGrammarSelected[0], selectedUse, "alternate Grammar source replay is valid");
+  sourceResultError(
+    "source-interpreter-mismatch",
+    () => replayV012SourceResultEvidence(
+      new ReadOnlyProbe(memory),
+      basis,
+      Object.freeze({
+        ...correctSourceResultEvidence,
+        source: alternateGrammarSourceEvidence,
+      }),
+      fixedTheoryAuthority,
+    ),
+  );
 
   // -----------------------------------------------------------------------
   // 4. SAME SOURCE + SAME AUTHORITY: WRONG CANDIDATES MUST FAIL.
@@ -331,11 +472,14 @@ class ReadOnlyProbe implements ReadMemory {
   // valid and the alternate claimed body matches.
   theoryAuthorityError(
     "proof-theory-mismatch",
-    () => replayV012StructuralRuleAgainstSelectedEvidence(
+    () => replayV012SourceResultEvidence(
       new ReadOnlyProbe(memory),
-      selfAdmittedRuleReplay,
+      basis,
+      Object.freeze({
+        ...correctSourceResultEvidence,
+        structural: selfAdmittedRuleReplay,
+      }),
       fixedTheoryAuthority,
-      selectedActEvidence,
     ),
   );
   same(
@@ -347,13 +491,17 @@ class ReadOnlyProbe implements ReadMemory {
   // An unrelated later admission must not poison the explicitly selected old
   // admission. Authority is attached to selected evidence, not ambient current
   // outgoing(Theory).
-  const correctAfterAmbientAddition = replayV012StructuralRuleAgainstSelectedEvidence(
+  const correctAfterAmbientAddition = replayV012SourceResultEvidence(
     new ReadOnlyProbe(memory),
-    correctReplay,
+    basis,
+    correctSourceResultEvidence,
     fixedTheoryAuthority,
-    selectedActEvidence,
   );
-  same(correctAfterAmbientAddition.rule, correctRule, "fixed T0 still authorizes correct Rule");
+  same(
+    correctAfterAmbientAddition.structural.rule,
+    correctRule,
+    "fixed T0 still authorizes correct source->Rule result",
+  );
   same(
     memory.linkCount,
     beforeSelfAdmissionReplay,
@@ -406,13 +554,13 @@ class ReadOnlyProbe implements ReadMemory {
   );
 
   // The stronger v0.12 boundary replays exactly the old selected attachment.
-  const oldEvidenceReplay = replayV012StructuralRuleAgainstSelectedEvidence(
+  const oldEvidenceReplay = replayV012SourceResultEvidence(
     new ReadOnlyProbe(memory),
-    correctReplay,
+    basis,
+    correctSourceResultEvidence,
     fixedTheoryAuthority,
-    selectedActEvidence,
   );
-  const oldUseBinding = oldEvidenceReplay.bindings.find(
+  const oldUseBinding = oldEvidenceReplay.structural.bindings.find(
     (binding) => binding.role === sourceUseRole,
   );
   assert(oldUseBinding !== undefined, "old replay preserves source-Use binding");
@@ -427,11 +575,17 @@ class ReadOnlyProbe implements ReadMemory {
   // ambiguity. The evidence boundary is not first-wins/last-wins.
   structuralError(
     "multiple-role-bindings",
-    () => replayV012StructuralRuleAgainstSelectedEvidence(
+    () => replayV012SourceResultEvidence(
       new ReadOnlyProbe(memory),
-      correctReplay,
+      basis,
+      Object.freeze({
+        ...correctSourceResultEvidence,
+        selectedActAttachments: Object.freeze([
+          selectedUseAttachment,
+          lateUseAttachment,
+        ]),
+      }),
       fixedTheoryAuthority,
-      Object.freeze([selectedUseAttachment, lateUseAttachment]),
     ),
   );
   same(
