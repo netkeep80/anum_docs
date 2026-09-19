@@ -119,7 +119,7 @@ assert.ok(
 );
 
 const badReferenceDocs = syntheticOwnerDocs();
-badReferenceDocs["README.md"] = "<!-- mts-law-ref:notAnAcceptedLaw -->\n";
+badReferenceDocs["README.md"] = "<!-- ссылка:mts-law-notAnAcceptedLaw -->\n";
 assert.ok(
   validateSemanticLawDocumentation(requiredLawIds, badReferenceDocs).some(
     (issue) => issue.code === "unknown-reference" && issue.lawId === "notAnAcceptedLaw",
