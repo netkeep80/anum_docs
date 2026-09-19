@@ -14,7 +14,7 @@
   },
   "conformanceCorpus": "contracts/mts-conformance-v0.12.json",
   "acceptedCurrent": "mts-contract/v0.11",
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "inheritedFoundation": {
     "semanticBase": "mts-contract/v0.11",
     "rootBasisChanged": false,
