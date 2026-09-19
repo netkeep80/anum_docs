@@ -50,7 +50,7 @@ for (const statement of [
   "FORMAL [...] → I_STRING",
   "Q [...] → I_Q",
   "FORMAL (...) → I_FORMAL",
-  "raw replay ≠ semantic authority",
+  "replayV012SelectedSourceEvidence ≠ семантическое полномочие",
 ]) {
   assert(formal.includes(statement), `formal notation contains: ${statement}`);
 }
