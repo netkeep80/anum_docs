@@ -78,6 +78,7 @@ export {
   replayV012SourceResultEvidence,
 } from "./v012-source.js";
 export type {
+  V012SourceAuthority,
   V012SourceContent,
   V012SourceResultErrorCode,
   V012SourceResultEvidence,
