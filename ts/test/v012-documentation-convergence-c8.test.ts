@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
-import { join, resolve } from "node:path";\nimport { checkRepositorySemanticLawDocumentation } from "../src/tooling/docs-sync.js";
+import { join, resolve } from "node:path";
+import { checkRepositorySemanticLawDocumentation } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.12 C8 normative convergence: ${message}`);
