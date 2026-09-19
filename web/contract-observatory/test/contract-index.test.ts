@@ -59,7 +59,7 @@ same(candidate.status, "candidate", "candidate status projected");
 same(candidate.accepted, false, "candidate is not accepted");
 same(candidate.acceptanceReady, true, "candidate readiness is projected after C9");
 same(candidate.coverageState, "complete", "candidate declared-scope coverage is complete after C9");
-same(candidate.requiredExecutableGateCount, 15, "v0.12 candidate projects C2-C7 plus completed foundation/authority kernel evidence");
+same(candidate.requiredExecutableGateCount, 16, "v0.12 candidate projects mandatory kernel, authority and C10-preflight evidence");
 assert(candidate.requiredNegativeVectorCount > 0, "candidate veto corpus is projected");
 same(candidate.isCurrent, false, "candidate is not current");
 same(candidate.isPrevious, false, "candidate is not previous");

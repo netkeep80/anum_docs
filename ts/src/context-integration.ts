@@ -184,7 +184,13 @@ export function openStringContext(
   );
 }
 
-/** FORMAL `[` selects an explicit STRING child; it never selects Q implicitly. */
+/**
+ * Low-level FORMAL square-bracket context transition.
+ *
+ * The target interpreter supplied here is transition data, not semantic
+ * authority. v0.12 source/Rule authority must be established by the surrounding
+ * FORMAL execution bridge before this operation is called.
+ */
 export function openFormalSquareBracketContext(
   memory: WriteMemory,
   formalBefore: TypedContext,
