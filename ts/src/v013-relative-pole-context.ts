@@ -1,9 +1,7 @@
 import {
   MemoryError,
-  verifyRootBasis,
   type LinkHandle,
   type ReadMemory,
-  type RootBasis,
   type WriteMemory,
 } from "./memory.js";
 import {
@@ -13,9 +11,8 @@ import {
 } from "./state.js";
 
 export type RelativePoleContextErrorCode =
-  | "invalid-basis"
   | "invalid-context"
-  | "invalid-direction"
+  | "invalid-form"
   | "selected-mismatch"
   | "replay-wrote";
 
@@ -27,12 +24,17 @@ export class RelativePoleContextError extends Error {
   }
 }
 
-export interface RelativePolePosition {
+export type RelativeUnarySide = "start" | "end";
+
+export interface RelativeUnaryForm {
+  readonly form: LinkHandle;
+  readonly whole: LinkHandle;
+  readonly side: RelativeUnarySide;
+}
+
+export interface RelativePolePosition extends RelativeUnaryForm {
   readonly parent: LinkHandle;
   readonly context: LinkHandle;
-  readonly frame: LinkHandle;
-  readonly whole: LinkHandle;
-  readonly direction: LinkHandle;
   readonly selected: LinkHandle;
 }
 
@@ -41,84 +43,87 @@ export interface RelativePoleReturn {
   readonly whole: LinkHandle;
 }
 
-function requireBasis(memory: ReadMemory, basis: RootBasis): RootBasis {
+/**
+ * Read a proper relative unary form directly from its self-incidence.
+ *
+ *   P = P -> S  => START form over Whole S
+ *   Q = S -> Q  => END form over Whole S
+ *
+ * ROOT/full self-closure and generic non-self-closed Links are not unary forms.
+ */
+export function readRelativeUnaryForm(
+  memory: ReadMemory,
+  form: LinkHandle,
+): RelativeUnaryForm {
   try {
-    return verifyRootBasis(memory, basis);
+    const poles = memory.poles(form);
+    const startSelfClosed = poles.start === form;
+    const endSelfClosed = poles.end === form;
+
+    if (startSelfClosed === endSelfClosed) {
+      throw new RelativePoleContextError("invalid-form");
+    }
+
+    return Object.freeze({
+      form,
+      whole: startSelfClosed ? poles.end : poles.start,
+      side: startSelfClosed ? "start" as const : "end" as const,
+    });
   } catch (error) {
+    if (error instanceof RelativePoleContextError) throw error;
     if (error instanceof MemoryError) {
-      throw new RelativePoleContextError("invalid-basis");
+      throw new RelativePoleContextError("invalid-form");
     }
     throw error;
   }
 }
 
-function requireDirection(
-  basis: RootBasis,
-  direction: LinkHandle,
-): void {
-  if (direction !== basis.O && direction !== basis.C) {
-    throw new RelativePoleContextError("invalid-direction");
-  }
-}
-
-function followPole(
+function resolveUnaryForm(
   memory: ReadMemory,
-  basis: RootBasis,
-  whole: LinkHandle,
-  direction: LinkHandle,
+  unary: RelativeUnaryForm,
 ): LinkHandle {
-  requireDirection(basis, direction);
-  const poles = memory.poles(whole);
-  return direction === basis.O ? poles.start : poles.end;
+  try {
+    const poles = memory.poles(unary.whole);
+    return unary.side === "start" ? poles.start : poles.end;
+  } catch (error) {
+    if (error instanceof MemoryError) {
+      throw new RelativePoleContextError("invalid-form");
+    }
+    throw error;
+  }
 }
 
 /**
  * Candidate v0.13 one-step position context.
  *
- * Sequential unary navigation is represented by nested position contexts.
- * Therefore one position needs only the direction used to enter it:
+ * The exact entry form is itself the evidence:
  *
- *   Direction  = O | C
- *   Frame      = Whole -> Direction
- *   K_evidence = START(ParentK -> Frame)
+ *   P = P -> S  or  Q = S -> Q
+ *
+ *   K_evidence = START(ParentK -> Form)
  *   K_pos      = START(K_evidence -> Selected)
  *
- * K_pos.current remains the exact semantic Selected Link. Whole + Direction
- * stay explicit in the parent evidence context so contextual return is
- * reconstructible without an ambient stack or incoming scan.
- *
- * O/C are used only as already-verified direction markers for this candidate;
- * this does not claim they remain v0.13 transport abits.
+ * The form already carries both Whole and START/END orientation, so no separate
+ * O/C direction marker or path carrier is required.
  */
 export function materializeRelativePoleContext(
   memory: WriteMemory,
-  basis: RootBasis,
   parent: LinkHandle,
-  whole: LinkHandle,
-  direction: LinkHandle,
+  form: LinkHandle,
 ): RelativePolePosition {
-  const verifiedBasis = requireBasis(memory, basis);
-
   try {
     readContext(memory, parent);
-    requireDirection(verifiedBasis, direction);
-
-    const frame = memory.ensure(whole, direction);
-    const selected = followPole(
-      memory,
-      verifiedBasis,
-      whole,
-      direction,
-    );
-    const evidenceContext = defineContext(memory, parent, frame);
+    const unary = readRelativeUnaryForm(memory, form);
+    const selected = resolveUnaryForm(memory, unary);
+    const evidenceContext = defineContext(memory, parent, form);
     const context = defineContext(memory, evidenceContext, selected);
 
     return Object.freeze({
       parent,
       context,
-      frame,
-      whole,
-      direction,
+      form,
+      whole: unary.whole,
+      side: unary.side,
       selected,
     });
   } catch (error) {
@@ -131,31 +136,20 @@ export function materializeRelativePoleContext(
 }
 
 /**
- * Read an already materialized one-step position using Links only.
+ * Read an already materialized one-step position using only the stored form
+ * Link and the context topology.
  */
 export function readRelativePoleContext(
   memory: ReadMemory,
-  basis: RootBasis,
   context: LinkHandle,
 ): RelativePolePosition {
-  const verifiedBasis = requireBasis(memory, basis);
-
   try {
     const state = readContext(memory, context);
     const evidence = readContext(memory, state.parent);
     readContext(memory, evidence.parent);
 
-    const framePoles = memory.poles(evidence.current);
-    const whole = framePoles.start;
-    const direction = framePoles.end;
-    requireDirection(verifiedBasis, direction);
-
-    const derivedSelected = followPole(
-      memory,
-      verifiedBasis,
-      whole,
-      direction,
-    );
+    const unary = readRelativeUnaryForm(memory, evidence.current);
+    const derivedSelected = resolveUnaryForm(memory, unary);
     if (derivedSelected !== state.current) {
       throw new RelativePoleContextError("selected-mismatch");
     }
@@ -163,9 +157,9 @@ export function readRelativePoleContext(
     return Object.freeze({
       parent: evidence.parent,
       context,
-      frame: evidence.current,
-      whole,
-      direction,
+      form: evidence.current,
+      whole: unary.whole,
+      side: unary.side,
       selected: state.current,
     });
   } catch (error) {
@@ -180,19 +174,17 @@ export function readRelativePoleContext(
 /**
  * Read-only contextual return.
  *
- * This is intentionally not the opposite pole of Selected. It verifies that
- * the supplied Link is exactly the result stored by K_pos and returns the Whole
- * recorded by that one-step position.
+ * This is intentionally not the opposite pole of Selected. It verifies the
+ * exact stored entry form and restores the Whole carried by that form.
  */
 export function replayRelativePoleReturn(
   memory: ReadMemory,
-  basis: RootBasis,
   context: LinkHandle,
   selected: LinkHandle,
 ): RelativePoleReturn {
   const before = memory.linkCount;
   try {
-    const position = readRelativePoleContext(memory, basis, context);
+    const position = readRelativePoleContext(memory, context);
     if (position.selected !== selected) {
       throw new RelativePoleContextError("selected-mismatch");
     }
