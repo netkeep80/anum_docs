@@ -761,4 +761,143 @@ function fixture(): Fixture {
   same(f.memory.linkCount, before, "weak prototype with foreign operand writes nothing");
 }
 
+// Symmetric END-side navigation required by inversion:
+//
+//   S=a->b
+//   S♀ = b
+//   ♂(S♀) = S
+//
+// This must be source/Rule/context-driven, not a host poles(S).end shortcut.
+{
+  const f = fixture();
+  const base = defineContext(f.memory, f.parent, f.S);
+
+  const endEvidence = f.evidence(
+    "female",
+    base,
+    f.postfixRule,
+    f.postfixAdmission,
+    f.postfix(f.S),
+    f.S,
+  );
+  const endSelected = executeAuthorizedRelativePoleSource(
+    f.memory,
+    f.basis,
+    base,
+    f.S,
+    endEvidence,
+    f.femaleAuthority,
+    f.fixedTheory,
+  );
+  same(endSelected.result, f.b, "S♀ selects end(S)=b");
+  assert(endSelected.afterContext !== base, "S♀ opens K_END");
+
+  const returnEvidence = f.evidence(
+    "male",
+    endSelected.afterContext,
+    f.prefixRule,
+    f.prefixAdmission,
+    f.prefix(f.b),
+    f.b,
+  );
+  const returned = executeAuthorizedRelativePoleSource(
+    f.memory,
+    f.basis,
+    endSelected.afterContext,
+    f.b,
+    returnEvidence,
+    f.maleAuthority,
+    f.fixedTheory,
+  );
+  same(returned.result, f.S, "♂(S♀) returns S");
+  same(returned.afterContext, base, "opposite sign closes K_END");
+}
+
+// Same-direction END nesting mirrors the already-proven START nesting.
+{
+  const f = fixture();
+
+  const x = f.memory.ensure(f.a, f.b);
+  const y = f.memory.ensure(f.c, f.a);
+  const deepS = f.memory.ensure(x, y);
+  const yEnd = f.memory.poles(y).end;
+  same(yEnd, f.a, "fixture end(y)=a");
+
+  const base = defineContext(f.memory, f.parent, deepS);
+
+  const firstEnd = executeAuthorizedRelativePoleSource(
+    f.memory,
+    f.basis,
+    base,
+    deepS,
+    f.evidence(
+      "female",
+      base,
+      f.postfixRule,
+      f.postfixAdmission,
+      f.postfix(deepS),
+      deepS,
+    ),
+    f.femaleAuthority,
+    f.fixedTheory,
+  );
+  same(firstEnd.result, y, "first ♀ yields end(S)=y");
+
+  const secondEnd = executeAuthorizedRelativePoleSource(
+    f.memory,
+    f.basis,
+    firstEnd.afterContext,
+    y,
+    f.evidence(
+      "female",
+      firstEnd.afterContext,
+      f.postfixRule,
+      f.postfixAdmission,
+      f.postfix(y),
+      y,
+    ),
+    f.femaleAuthority,
+    f.fixedTheory,
+  );
+  same(secondEnd.result, f.a, "second ♀ yields end(end(S))=a");
+
+  const firstStart = executeAuthorizedRelativePoleSource(
+    f.memory,
+    f.basis,
+    secondEnd.afterContext,
+    f.a,
+    f.evidence(
+      "male",
+      secondEnd.afterContext,
+      f.prefixRule,
+      f.prefixAdmission,
+      f.prefix(f.a),
+      f.a,
+    ),
+    f.maleAuthority,
+    f.fixedTheory,
+  );
+  same(firstStart.result, y, "S♀♀♂ = S♀");
+  same(firstStart.afterContext, firstEnd.afterContext, "♂ closes one END level");
+
+  const secondStart = executeAuthorizedRelativePoleSource(
+    f.memory,
+    f.basis,
+    firstStart.afterContext,
+    y,
+    f.evidence(
+      "male",
+      firstStart.afterContext,
+      f.prefixRule,
+      f.prefixAdmission,
+      f.prefix(y),
+      y,
+    ),
+    f.maleAuthority,
+    f.fixedTheory,
+  );
+  same(secondStart.result, deepS, "S♀♀♂♂ = S");
+  same(secondStart.afterContext, base, "second ♂ closes remaining END level");
+}
+
 console.log("MTS v0.13 exact operand-relative unary authority: GREEN.");
