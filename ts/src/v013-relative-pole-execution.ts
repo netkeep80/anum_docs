@@ -105,7 +105,6 @@ function executePoleForm(
   currentContext: LinkHandle,
   operation: LinkHandle,
   unary: RelativeUnaryForm,
-  current: LinkHandle,
   position: RelativePolePosition | undefined,
 ): {
   readonly afterContext: LinkHandle;
@@ -189,7 +188,6 @@ export function executeAuthorizedRelativePoleSource(
     currentContext,
     operation,
     unary,
-    current,
     position,
   );
 
