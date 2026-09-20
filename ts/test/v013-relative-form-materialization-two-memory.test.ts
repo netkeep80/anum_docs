@@ -16,6 +16,7 @@ import {
   defineStructuralInterpreter,
   defineStructuralRoleDictionary,
   defineStructuralRule,
+  StructuralRuleError,
   type StructuralInterpreter,
   type StructuralRuleReplayEvidence,
 } from "../src/structural-rule.js";
@@ -322,6 +323,23 @@ function transportGlyph(
   });
 }
 
+function expectStructuralRuleError(
+  effect: () => unknown,
+  code: StructuralRuleError["code"],
+): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(
+      error instanceof StructuralRuleError,
+      `expected StructuralRuleError, got ${String(error)}`,
+    );
+    same(error.code, code, "StructuralRule error code");
+    return;
+  }
+  throw new Error(`v0.13 authorized form materialization: expected ${code}`);
+}
+
 function expectMaterializationError(
   effect: () => unknown,
   code: V013RelativeFormMaterializationError["code"],
@@ -481,7 +499,7 @@ same(memoryB.poles(Q_B).end, Q_B, "B Q self-ends");
     }),
   });
   const before = memoryB.linkCount;
-  expectMaterializationError(
+  expectStructuralRuleError(
     () => materializeAuthorizedRelativeUnaryFormSource(
       memoryB,
       authorityB.basis,
@@ -490,8 +508,7 @@ same(memoryB.poles(Q_B).end, Q_B, "B Q self-ends");
       sourceAuthority(authorityB, "start"),
       authorityB.fixedTheory,
     ),
-    // StructuralRule rejects before the candidate materializer can classify it.
-    "constructor-request-mismatch",
+    "template-mismatch",
   );
   same(memoryB.linkCount, before, "forged orientation writes nothing");
 }
