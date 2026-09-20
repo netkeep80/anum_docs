@@ -21,11 +21,10 @@ import {
 } from "./v013-relative-pole-context.js";
 
 export type V013RelativePoleExecutionErrorCode =
-  | "invalid-operation-vocabulary"
   | "source-operation-mismatch"
   | "context-evidence-mismatch"
   | "current-value-mismatch"
-  | "unsupported-operation"
+  | "unsupported-operation-form"
   | "multi-step-return-undefined";
 
 export class V013RelativePoleExecutionError extends Error {
@@ -49,26 +48,31 @@ function fail(code: V013RelativePoleExecutionErrorCode): never {
   throw new V013RelativePoleExecutionError(code);
 }
 
-function readOperationVocabulary(
+type UnaryOperationForm = "prefix-start-self-closed" | "postfix-end-self-closed";
+
+function readUnaryOperationForm(
   memory: WriteMemory,
-  vocabulary: LinkHandle,
-): {
-  readonly selectStart: LinkHandle;
-  readonly contextualReturn: LinkHandle;
-} {
+  operation: LinkHandle,
+): UnaryOperationForm {
   try {
-    const poles = memory.poles(vocabulary);
-    if (poles.start === poles.end) {
-      return fail("invalid-operation-vocabulary");
+    const poles = memory.poles(operation);
+    const startSelfClosed = poles.start === operation;
+    const endSelfClosed = poles.end === operation;
+
+    if (startSelfClosed && !endSelfClosed) {
+      return "prefix-start-self-closed";
     }
-    return Object.freeze({
-      selectStart: poles.start,
-      contextualReturn: poles.end,
-    });
+    if (endSelfClosed && !startSelfClosed) {
+      return "postfix-end-self-closed";
+    }
+
+    // ROOT/full self-closure is not silently treated as either unary direction,
+    // and a generic non-self-closed Link is not a unary prefix/postfix form.
+    return fail("unsupported-operation-form");
   } catch (error) {
     if (error instanceof V013RelativePoleExecutionError) throw error;
     if (error instanceof MemoryError) {
-      return fail("invalid-operation-vocabulary");
+      return fail("unsupported-operation-form");
     }
     throw error;
   }
@@ -77,25 +81,24 @@ function readOperationVocabulary(
 /**
  * Candidate v0.13 source/Rule/context authority boundary.
  *
- * The physical source does not choose an operation by host glyph switch.
- * Existing v0.12 source authority selects one Use and one fixed-Theory Rule.
- * The grounded Rule body has the exact shape:
+ * The physical source does not choose an operation through a host glyph switch.
+ * Existing source authority selects one Use and one fixed-Theory Rule. The
+ * grounded Rule body has the exact shape:
  *
  *   selectedUse -> operation
  *
- * The operation vocabulary is itself one Link:
+ * Unary direction is then read from the operation Link itself:
  *
- *   selectStartOperation -> contextualReturnOperation
+ *   P = P -> x   => prefix / start-self-closed
+ *   Q = x -> Q   => postfix / end-self-closed
  *
- * Only after read-only source/Rule replay and exact current-context anchoring
- * may the selected operation affect context state.
+ * No separate operation vocabulary is semantic authority.
  */
 export function executeAuthorizedRelativePoleSource(
   memory: WriteMemory,
   basis: RootBasis,
   currentContext: LinkHandle,
   input: LinkHandle,
-  operationVocabulary: LinkHandle,
   sourceResultEvidence: V012SourceResultEvidence,
   expectedSourceAuthority: V012SourceAuthority,
   expectedTheoryArtifact: unknown,
@@ -126,9 +129,9 @@ export function executeAuthorizedRelativePoleSource(
   }
 
   const operation = grounded.end;
-  const operations = readOperationVocabulary(memory, operationVocabulary);
+  const form = readUnaryOperationForm(memory, operation);
 
-  if (operation === operations.selectStart) {
+  if (form === "prefix-start-self-closed") {
     let state;
     try {
       state = readContext(memory, currentContext);
@@ -159,42 +162,39 @@ export function executeAuthorizedRelativePoleSource(
     });
   }
 
-  if (operation === operations.contextualReturn) {
-    let position;
-    try {
-      position = readRelativePoleContext(memory, basis, currentContext);
-    } catch (error) {
-      if (
-        error instanceof RelativePoleContextError ||
-        error instanceof StateError ||
-        error instanceof MemoryError
-      ) {
-        return fail("context-evidence-mismatch");
-      }
-      throw error;
+  let position;
+  try {
+    position = readRelativePoleContext(memory, basis, currentContext);
+  } catch (error) {
+    if (
+      error instanceof RelativePoleContextError ||
+      error instanceof StateError ||
+      error instanceof MemoryError
+    ) {
+      return fail("context-evidence-mismatch");
     }
-
-    // The meaning of one visible ascent after a deeper path has not been
-    // decided. Refuse rather than silently choosing Whole-return.
-    if (position.steps.length !== 1) {
-      return fail("multi-step-return-undefined");
-    }
-
-    const returned = replayRelativePoleReturn(
-      memory,
-      basis,
-      currentContext,
-      input,
-    );
-    return Object.freeze({
-      selectedUse: replay.selectedUse,
-      operation,
-      beforeContext: currentContext,
-      afterContext: returned.parent,
-      input,
-      result: returned.whole,
-    });
+    throw error;
   }
 
-  return fail("unsupported-operation");
+  // The self-end form establishes postfix direction: it acts on an already
+  // selected left value. The exact meaning of one postfix step from a deeper
+  // path is still undecided, so the candidate refuses to guess.
+  if (position.steps.length !== 1) {
+    return fail("multi-step-return-undefined");
+  }
+
+  const returned = replayRelativePoleReturn(
+    memory,
+    basis,
+    currentContext,
+    input,
+  );
+  return Object.freeze({
+    selectedUse: replay.selectedUse,
+    operation,
+    beforeContext: currentContext,
+    afterContext: returned.parent,
+    input,
+    result: returned.whole,
+  });
 }
