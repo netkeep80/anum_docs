@@ -127,14 +127,9 @@ function executePoleForm(
   );
 
   if (position !== undefined && position.side !== unary.side) {
-    const returned = replayRelativePoleReturn(
-      memory,
-      currentContext,
-      input,
-    );
     return Object.freeze({
-      afterContext: returned.parent,
-      result: returned.whole,
+      afterContext: position.parent,
+      result: position.whole,
     });
   }
 
