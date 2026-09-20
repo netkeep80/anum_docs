@@ -427,6 +427,22 @@ function groundOrientationResult(
     ? operand
     : memory.ensure(operandPoles.end, operandPoles.start);
 
+  // Diagnostic structural substitution: if these equalities hold, the
+  // result law itself composes canonically and any later replay failure belongs
+  // to evidence/authority composition rather than form topology.
+  const boundOperand = memory.ensure(operandPoles.start, operandPoles.end);
+  same(boundOperand, operand, `${kind} bound Operand reconstructs exact Whole`);
+  const boundStartForm = memory.ensureStartSelfClosed(boundOperand);
+  const boundEndForm = memory.ensureEndSelfClosed(boundOperand);
+  const boundForm = kind === "direct"
+    ? memory.ensure(boundStartForm, boundEndForm)
+    : memory.ensure(boundEndForm, boundStartForm);
+  same(boundForm, operation, `${kind} bound form reconstructs exact operation`);
+  const boundResult = kind === "direct"
+    ? boundOperand
+    : memory.ensure(operandPoles.end, operandPoles.start);
+  same(boundResult, result, `${kind} bound result reconstructs exact result`);
+
   const transition = memory.ensure(operation, result);
   const claimedBody = memory.ensure(local.uses[kind], transition);
   const afterContext = defineContext(memory, local.basis.R, claimedBody);
