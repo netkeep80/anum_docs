@@ -900,4 +900,136 @@ function fixture(): Fixture {
   same(secondStart.afterContext, base, "second ♂ closes remaining END level");
 }
 
+// Author inversion is a composition of the two relative pole reads:
+//
+//   -S := S♀ -> ♂S
+//
+// No invert opcode is introduced. START and END are selected through the same
+// source/Rule/context execution boundary already tested above.
+{
+  const f = fixture();
+  let contextMarker = f.memory.ensureStartSelfClosed(f.basis.L);
+
+  function nextBase(whole: LinkHandle): LinkHandle {
+    contextMarker = f.memory.ensureStartSelfClosed(contextMarker);
+    // Keep each sibling evidence branch distinct, but make it an ordinary base
+    // context rather than a shape that can be mistaken for K_position.
+    const branchParent = defineContext(
+      f.memory,
+      f.basis.R,
+      contextMarker,
+    );
+    return defineContext(f.memory, branchParent, whole);
+  }
+
+  function selectStart(whole: LinkHandle): LinkHandle {
+    const base = nextBase(whole);
+    const selected = executeAuthorizedRelativePoleSource(
+      f.memory,
+      f.basis,
+      base,
+      whole,
+      f.evidence(
+        "male",
+        base,
+        f.prefixRule,
+        f.prefixAdmission,
+        f.prefix(whole),
+        whole,
+      ),
+      f.maleAuthority,
+      f.fixedTheory,
+    );
+    return selected.result;
+  }
+
+  function selectEnd(whole: LinkHandle): LinkHandle {
+    const base = nextBase(whole);
+    const selected = executeAuthorizedRelativePoleSource(
+      f.memory,
+      f.basis,
+      base,
+      whole,
+      f.evidence(
+        "female",
+        base,
+        f.postfixRule,
+        f.postfixAdmission,
+        f.postfix(whole),
+        whole,
+      ),
+      f.femaleAuthority,
+      f.fixedTheory,
+    );
+    return selected.result;
+  }
+
+  function invert(whole: LinkHandle): {
+    readonly start: LinkHandle;
+    readonly end: LinkHandle;
+    readonly inverse: LinkHandle;
+  } {
+    const start = selectStart(whole);
+    const end = selectEnd(whole);
+    return Object.freeze({
+      start,
+      end,
+      inverse: f.memory.ensure(end, start),
+    });
+  }
+
+  // I1: S=a->b => -S=b->a.
+  const invS = invert(f.S);
+  same(invS.start, f.a, "♂S is start(S)=a");
+  same(invS.end, f.b, "S♀ is end(S)=b");
+  const invSPoles = f.memory.poles(invS.inverse);
+  same(invSPoles.start, f.b, "-S starts at S♀");
+  same(invSPoles.end, f.a, "-S ends at ♂S");
+
+  // I2/I3: inversion swaps the two relative aspects.
+  const startInvS = selectStart(invS.inverse);
+  const endInvS = selectEnd(invS.inverse);
+  same(startInvS, invS.end, "♂(-S) = S♀");
+  same(endInvS, invS.start, "(-S)♀ = ♂S");
+
+  // I4: double inversion is ordered-pair identity.
+  const invInvS = invert(invS.inverse);
+  same(invInvS.inverse, f.S, "--S = S");
+
+  // I5: ROOT is value-level self-inverse.
+  const invR = invert(f.basis.R);
+  same(invR.start, f.basis.R, "♂R value is R");
+  same(invR.end, f.basis.R, "R♀ value is R");
+  same(invR.inverse, f.basis.R, "-R = R");
+
+  // Form-level root orientation remains distinct from value-level inversion:
+  // START_FORM(R)=O, END_FORM(R)=C, so O->C=L and C->O=U.
+  const startFormR = f.prefix(f.basis.R);
+  const endFormR = f.postfix(f.basis.R);
+  same(startFormR, f.basis.O, "proper START_FORM(R)=O");
+  same(endFormR, f.basis.C, "proper END_FORM(R)=C");
+  same(
+    f.memory.ensure(startFormR, endFormR),
+    f.basis.L,
+    "START_FORM(R)->END_FORM(R)=L",
+  );
+  same(
+    f.memory.ensure(endFormR, startFormR),
+    f.basis.U,
+    "END_FORM(R)->START_FORM(R)=U",
+  );
+  assert(
+    f.basis.U !== invR.inverse,
+    "form-level C->O must not be confused with value-level -R",
+  );
+
+  // I6: branching does not collapse distinct wholes sharing the same start.
+  const invT = invert(f.T);
+  same(invT.start, f.a, "T shares start a");
+  same(invT.end, f.c, "T end is c");
+  assert(invT.inverse !== invS.inverse, "-T remains distinct from -S");
+  same(f.memory.poles(invT.inverse).start, f.c, "-T starts at c");
+  same(f.memory.poles(invT.inverse).end, f.a, "-T ends at shared a");
+}
+
 console.log("MTS v0.13 exact operand-relative unary authority: GREEN.");
