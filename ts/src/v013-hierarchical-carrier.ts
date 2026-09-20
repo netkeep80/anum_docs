@@ -26,10 +26,13 @@ export class V013HierarchicalCarrierError extends Error {
   }
 }
 
-const ROOT_NODE = 0x00;
-const START_NODE = 0x01;
-const END_NODE = 0x02;
-const PAIR_NODE = 0x03;
+// Canonical research wire uses the historical quaternary digits themselves.
+// ASCII/UTF-8 keeps the physical stream directly readable as an anum such as
+// "19868", while node arity makes the prefix grammar self-delimiting.
+const ROOT_NODE = 0x38; // "8"
+const START_NODE = 0x39; // "9"
+const END_NODE = 0x36; // "6"
+const PAIR_NODE = 0x31; // "1"
 
 function fail(code: V013HierarchicalCarrierErrorCode): never {
   throw new V013HierarchicalCarrierError(code);
@@ -161,13 +164,15 @@ export function materializeV013HierarchicalCarrierFromSemanticLink(
 /**
  * Read-only canonical physical serialization of the quoted v0.13 hierarchy.
  *
- * Framing bytes are representation opcodes, not MTS abits:
+ * Canonical research framing is the historical quaternary alphabet:
  *
- *   00          ROOT
- *   01 node     START(node)
- *   02 node     END(node)
- *   03 node node PAIR(left,right)
+ *   8             ROOT
+ *   9 <node>      START(node)
+ *   6 <node>      END(node)
+ *   1 <node><node> PAIR(left,right)
  *
+ * The returned bytes are the ASCII/UTF-8 digits themselves, so the physical
+ * stream is also the canonical prefix spelling of the structural anum.
  * Semantic targets are never materialized by this serializer.
  */
 export function serializeV013HierarchicalCarrier(
