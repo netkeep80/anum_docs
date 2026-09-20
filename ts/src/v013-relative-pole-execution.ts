@@ -18,6 +18,7 @@ import {
   readRelativePoleContext,
   replayRelativePoleReturn,
   RelativePoleContextError,
+  type RelativePolePosition,
 } from "./v013-relative-pole-context.js";
 
 export type V013RelativePoleExecutionErrorCode =
@@ -78,8 +79,6 @@ function readUnaryOperation(
       });
     }
 
-    // ROOT/full self-closure is not silently treated as either unary direction,
-    // and a generic non-self-closed Link is not a unary prefix/postfix form.
     return fail("unsupported-operation-form");
   } catch (error) {
     if (error instanceof V013RelativePoleExecutionError) throw error;
@@ -90,23 +89,119 @@ function readUnaryOperation(
   }
 }
 
+function readOptionalPosition(
+  memory: WriteMemory,
+  basis: RootBasis,
+  currentContext: LinkHandle,
+  input: LinkHandle,
+): RelativePolePosition | undefined {
+  try {
+    const position = readRelativePoleContext(memory, basis, currentContext);
+    if (position.selected !== input) {
+      return fail("current-value-mismatch");
+    }
+    return position;
+  } catch (error) {
+    if (
+      error instanceof RelativePoleContextError &&
+      error.code !== "invalid-context"
+    ) {
+      return fail("context-evidence-mismatch");
+    }
+    if (
+      !(error instanceof RelativePoleContextError) &&
+      !(error instanceof StateError) &&
+      !(error instanceof MemoryError)
+    ) {
+      throw error;
+    }
+  }
+
+  try {
+    const state = readContext(memory, currentContext);
+    if (state.current !== input) {
+      return fail("current-value-mismatch");
+    }
+    return undefined;
+  } catch (error) {
+    if (error instanceof V013RelativePoleExecutionError) throw error;
+    if (error instanceof StateError || error instanceof MemoryError) {
+      return fail("context-evidence-mismatch");
+    }
+    throw error;
+  }
+}
+
+function executePoleDirection(
+  memory: WriteMemory,
+  basis: RootBasis,
+  currentContext: LinkHandle,
+  input: LinkHandle,
+  direction: LinkHandle,
+): {
+  readonly afterContext: LinkHandle;
+  readonly result: LinkHandle;
+} {
+  const position = readOptionalPosition(
+    memory,
+    basis,
+    currentContext,
+    input,
+  );
+
+  if (position !== undefined) {
+    if (position.steps.length !== 1) {
+      return fail("multi-step-return-undefined");
+    }
+
+    const enteredDirection = position.steps[0];
+    if (enteredDirection === undefined) {
+      return fail("context-evidence-mismatch");
+    }
+
+    if (enteredDirection !== direction) {
+      const returned = replayRelativePoleReturn(
+        memory,
+        basis,
+        currentContext,
+        input,
+      );
+      return Object.freeze({
+        afterContext: returned.parent,
+        result: returned.whole,
+      });
+    }
+  }
+
+  const selected = materializeRelativePoleContext(
+    memory,
+    basis,
+    currentContext,
+    input,
+    [direction],
+  );
+  return Object.freeze({
+    afterContext: selected.context,
+    result: selected.selected,
+  });
+}
+
 /**
  * Candidate v0.13 source/Rule/context authority boundary.
  *
- * The physical source does not choose an operation through a host glyph switch.
- * Existing source authority selects one Use and one fixed-Theory Rule. The
- * grounded Rule body has the exact shape:
+ * The concrete unary occurrence carries both direction and exact operand:
  *
- *   selectedUse -> operation
+ *   P = P -> input   => START direction
+ *   Q = input -> Q   => END direction
  *
- * The concrete unary occurrence carries its exact operand:
+ * Context makes both directions symmetric:
  *
- *   P = P -> input   => prefix / start-self-closed
- *   Q = input -> Q   => postfix / end-self-closed
+ * - from a base occurrence, either direction selects that pole;
+ * - from a one-step position, the same direction descends again;
+ * - the opposite direction returns exactly one contextual level.
  *
- * Both unary direction and operand are therefore read from the operation Link
- * itself. A prototype occurrence carrying a different operand has no authority
- * over the current input.
+ * Thus START/END navigation is derived from Link self-incidence + explicit
+ * Link context, not glyph spelling, host stack or a prefix/postfix opcode table.
  */
 export function executeAuthorizedRelativePoleSource(
   memory: WriteMemory,
@@ -148,71 +243,24 @@ export function executeAuthorizedRelativePoleSource(
     return fail("operation-operand-mismatch");
   }
 
-  if (unary.form === "prefix-start-self-closed") {
-    let state;
-    try {
-      state = readContext(memory, currentContext);
-    } catch (error) {
-      if (error instanceof StateError || error instanceof MemoryError) {
-        return fail("context-evidence-mismatch");
-      }
-      throw error;
-    }
-    if (state.current !== input) {
-      return fail("current-value-mismatch");
-    }
+  const direction = unary.form === "prefix-start-self-closed"
+    ? basis.O
+    : basis.C;
 
-    const position = materializeRelativePoleContext(
-      memory,
-      basis,
-      currentContext,
-      input,
-      [basis.O],
-    );
-    return Object.freeze({
-      selectedUse: replay.selectedUse,
-      operation,
-      beforeContext: currentContext,
-      afterContext: position.context,
-      input,
-      result: position.selected,
-    });
-  }
-
-  let position;
-  try {
-    position = readRelativePoleContext(memory, basis, currentContext);
-  } catch (error) {
-    if (
-      error instanceof RelativePoleContextError ||
-      error instanceof StateError ||
-      error instanceof MemoryError
-    ) {
-      return fail("context-evidence-mismatch");
-    }
-    throw error;
-  }
-
-  // The self-end form establishes postfix direction: it acts on an already
-  // selected left value. One postfix from a direct multi-step position remains
-  // deliberately undefined; sequential unary prefixes are represented instead
-  // by nested one-step contexts and cancel one level at a time.
-  if (position.steps.length !== 1) {
-    return fail("multi-step-return-undefined");
-  }
-
-  const returned = replayRelativePoleReturn(
+  const transition = executePoleDirection(
     memory,
     basis,
     currentContext,
     input,
+    direction,
   );
+
   return Object.freeze({
     selectedUse: replay.selectedUse,
     operation,
     beforeContext: currentContext,
-    afterContext: returned.parent,
+    afterContext: transition.afterContext,
     input,
-    result: returned.whole,
+    result: transition.result,
   });
 }
