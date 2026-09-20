@@ -389,10 +389,10 @@ function fixture(): Fixture {
   const baseS = defineContext(f.memory, f.parent, f.S);
   const baseT = defineContext(f.memory, f.parent, f.T);
   const kS = materializeRelativePoleContext(
-    f.memory, f.basis, baseS, f.S, f.basis.O,
+    f.memory, baseS, f.prefix(f.S),
   );
   const kT = materializeRelativePoleContext(
-    f.memory, f.basis, baseT, f.T, f.basis.O,
+    f.memory, baseT, f.prefix(f.T),
   );
   same(kS.selected, f.a, "K_S selects shared a");
   same(kT.selected, f.a, "K_T selects shared a");
