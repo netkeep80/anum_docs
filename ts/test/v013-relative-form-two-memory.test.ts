@@ -20,7 +20,10 @@ import {
   defineStructuralInterpreter,
   defineStructuralRoleDictionary,
   defineStructuralRule,
+  matchStructuralTemplate,
+  StructuralRuleError,
   type StructuralInterpreter,
+  type StructuralRoleBinding,
   type StructuralRuleReplayEvidence,
 } from "../src/structural-rule.js";
 import {
@@ -444,6 +447,37 @@ function groundOrientationResult(
     expectedInterpreter: local.interpreter.structure,
     expectedAfterContext: afterContext,
   });
+
+  const bindings: readonly StructuralRoleBinding[] = Object.freeze([
+    Object.freeze({ role: sourceUseRole, value: local.uses[kind] }),
+    Object.freeze({ role: startRole, value: operandPoles.start }),
+    Object.freeze({ role: endRole, value: operandPoles.end }),
+  ]);
+
+  const diagnose = (
+    label: string,
+    template: LinkHandle,
+    claimed: LinkHandle,
+  ): void => {
+    try {
+      matchStructuralTemplate(memory, template, claimed, bindings);
+    } catch (error) {
+      if (error instanceof StructuralRuleError) {
+        throw new Error(`result-template ${label}: ${error.code}`);
+      }
+      throw error;
+    }
+  };
+
+  const actualStartForm = memory.ensureStartSelfClosed(operand);
+  const actualEndForm = memory.ensureEndSelfClosed(operand);
+  diagnose("operand", operandTemplate, operand);
+  diagnose("start-form", startFormTemplate, actualStartForm);
+  diagnose("end-form", endFormTemplate, actualEndForm);
+  diagnose("form", formTemplate, operation);
+  diagnose("result", resultTemplate, result);
+  diagnose("transition", transitionTemplate, transition);
+  diagnose("body", body, claimedBody);
 
   const before = memory.linkCount;
   const replay = replayV012StructuralRuleAgainstTheoryAuthority(
