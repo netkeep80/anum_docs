@@ -121,16 +121,20 @@ function buildFormalAuthority(memory: Memory): FormalAuthority {
   const basis = ensureRootBasis(memory);
   const refs = neutralRefs(memory, basis, 12);
 
-  const sourceUseRole = refs[0]!;
-  const grammar = refs[1]!;
-  const theory = refs[2]!;
-
+  // Grounded constants must not structurally contain a declared role. Build
+  // all exact Uses first, then allocate the role placeholder later in the
+  // append-only Memory. Otherwise generic template matching would correctly
+  // discover SourceUseRole inside ExpectedUse and treat that subtree as
+  // parameterized rather than grounded.
   const uses = Object.freeze({
-    "8": refs[3]!,
-    "9": refs[4]!,
-    "6": refs[5]!,
-    "1": refs[6]!,
+    "8": refs[0]!,
+    "9": refs[1]!,
+    "6": refs[2]!,
+    "1": refs[3]!,
   });
+  const grammar = refs[4]!;
+  const theory = refs[5]!;
+  const sourceUseRole = refs[8]!;
 
   // These are structural class descriptors, not aliases for the physical
   // characters themselves:
