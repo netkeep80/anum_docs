@@ -455,7 +455,6 @@ function executeCombined(mode: Mode): LinkHandle {
     memory,
     basis,
     base,
-    whole,
     groupEvidence(
       mode,
       0,
@@ -475,7 +474,6 @@ function executeCombined(mode: Mode): LinkHandle {
     memory,
     basis,
     selected.afterContext,
-    selected.result,
     groupEvidence(
       mode,
       2,
