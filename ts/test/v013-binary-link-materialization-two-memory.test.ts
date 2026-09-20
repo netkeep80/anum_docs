@@ -226,11 +226,24 @@ function makeOperands(
   memory: Memory,
   local: LocalAuthority,
 ): readonly [LinkHandle, LinkHandle] {
-  const left = memory.ensure(local.interpreter.handle, local.grammar);
-  const right = memory.ensure(local.dictionary, local.theory);
-  assert(left !== right, "operands must differ");
-  assert(memory.find(left, right) === undefined, "target must start absent");
-  return Object.freeze([left, right]);
+  // Produce fresh operand candidates without ever ensuring Left->Right itself.
+  // Authority setup may already contain many ordinary Links, so absence of the
+  // target must be established rather than assumed from a convenient pair.
+  let leftSeed = local.contextSeed;
+  let rightSeed = local.use;
+
+  for (let attempt = 0; attempt < 16; attempt += 1) {
+    leftSeed = memory.ensureStartSelfClosed(leftSeed);
+    rightSeed = memory.ensureEndSelfClosed(rightSeed);
+    const left = memory.ensure(leftSeed, local.grammar);
+    const right = memory.ensure(local.theory, rightSeed);
+
+    if (left !== right && memory.find(left, right) === undefined) {
+      return Object.freeze([left, right]);
+    }
+  }
+
+  throw new Error("v0.13 binary materialization: could not obtain absent target fixture");
 }
 
 function evidence(
