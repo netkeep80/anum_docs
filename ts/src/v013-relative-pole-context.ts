@@ -90,12 +90,17 @@ function followPolePath(
 /**
  * Candidate v0.13 position context.
  *
- * The returned semantic Link is not wrapped. The context instead preserves
- * where that Link was selected from:
+ * The semantic current value remains exactly the selected Link. Structural
+ * evidence for where it came from is kept in one parent context:
  *
- *   Path  = ExactSequence(O|C, ...)
- *   Frame = Whole -> Path
- *   K_pos = START(ParentK -> Frame)
+ *   Path       = ExactSequence(O|C, ...)
+ *   Frame      = Whole -> Path
+ *   K_evidence = START(ParentK -> Frame)
+ *   K_pos      = START(K_evidence -> Selected)
+ *
+ * This extra Link-context layer is intentional: another unary prefix can now
+ * consume Selected directly as the current semantic value, while replay still
+ * reconstructs Whole/Path without wrapping Selected itself.
  *
  * O/C are used here only as already-verified structural direction markers for
  * the experiment. This does not claim that they remain the v0.13 transport
@@ -116,8 +121,9 @@ export function materializeRelativePoleContext(
 
     const path = materializeExactSequence(memory, steps);
     const frame = memory.ensure(whole, path);
-    const context = defineContext(memory, parent, frame);
     const selected = followPolePath(memory, verifiedBasis, whole, steps);
+    const evidenceContext = defineContext(memory, parent, frame);
+    const context = defineContext(memory, evidenceContext, selected);
 
     return Object.freeze({
       parent,
@@ -141,8 +147,8 @@ export function materializeRelativePoleContext(
  * Read an already materialized position using Links only.
  *
  * No source string, host path, occurrence id, incoming scan or ambient stack is
- * semantic authority. The exact path survives even when START and END resolve
- * to the same Link, as for R.
+ * semantic authority. K_pos.current is the selected semantic Link; its parent
+ * K_evidence carries Whole + exact Path.
  */
 export function readRelativePoleContext(
   memory: ReadMemory,
@@ -153,29 +159,33 @@ export function readRelativePoleContext(
 
   try {
     const state = readContext(memory, context);
-    readContext(memory, state.parent);
+    const evidence = readContext(memory, state.parent);
+    readContext(memory, evidence.parent);
 
-    const framePoles = memory.poles(state.current);
+    const framePoles = memory.poles(evidence.current);
     const whole = framePoles.start;
     const path = framePoles.end;
     const exact = readExactSequence(memory, path);
     requireSteps(verifiedBasis, exact.values);
 
-    const selected = followPolePath(
+    const derivedSelected = followPolePath(
       memory,
       verifiedBasis,
       whole,
       exact.values,
     );
+    if (derivedSelected !== state.current) {
+      throw new RelativePoleContextError("selected-mismatch");
+    }
 
     return Object.freeze({
-      parent: state.parent,
+      parent: evidence.parent,
       context,
-      frame: state.current,
+      frame: evidence.current,
       whole,
       path,
       steps: exact.values,
-      selected,
+      selected: state.current,
     });
   } catch (error) {
     if (error instanceof RelativePoleContextError) throw error;
