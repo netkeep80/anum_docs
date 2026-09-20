@@ -396,10 +396,14 @@ function groundOrientationResult(
   // a separate Rule dictionary from the source->form Rule: source transport has
   // already grounded the exact operation, and this Rule proves what that form
   // resolves to.
-  const roleSeed = memory.ensureEndSelfClosed(local.contextSeed);
-  const sourceUseRole = memory.ensureStartSelfClosed(roleSeed);
-  const startRole = memory.ensureStartSelfClosed(sourceUseRole);
-  const endRole = memory.ensureStartSelfClosed(startRole);
+  const roleSeed = memory.ensure(local.contextSeed, local.basis.U);
+  let roleTag = memory.ensure(local.basis.U, local.contextSeed);
+  roleTag = memory.ensureStartSelfClosed(roleTag);
+  const sourceUseRole = memory.ensure(roleSeed, roleTag);
+  roleTag = memory.ensureStartSelfClosed(roleTag);
+  const startRole = memory.ensure(roleSeed, roleTag);
+  roleTag = memory.ensureStartSelfClosed(roleTag);
+  const endRole = memory.ensure(roleSeed, roleTag);
   const roleDictionary = defineStructuralRoleDictionary(
     memory,
     [sourceUseRole, startRole, endRole],
