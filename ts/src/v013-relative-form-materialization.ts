@@ -98,3 +98,55 @@ export function materializeAuthorizedRelativeUnaryFormSource(
     ? memory.ensureStartSelfClosed(current)
     : memory.ensureEndSelfClosed(current);
 }
+
+
+/**
+ * Candidate v0.13 write boundary for a missing ordinary binary Link.
+ *
+ * The Rule proves a construction request made only of already existing Links:
+ *
+ *   LeftRequest  = Use -> Left
+ *   RightRequest = Use -> Right
+ *   Request      = LeftRequest -> RightRequest
+ *
+ * The target Left -> Right is deliberately absent from the request topology.
+ * Only after source + fixed-Theory replay succeeds may exactly that target be
+ * materialized. Operand identity is derived from the proved request itself; no
+ * separate host left/right arguments are accepted.
+ */
+export function materializeAuthorizedBinaryLinkSource(
+  memory: WriteMemory,
+  basis: RootBasis,
+  sourceResultEvidence: V012SourceResultEvidence,
+  expectedSourceAuthority: V012SourceAuthority,
+  expectedTheoryArtifact: unknown,
+): LinkHandle {
+  const replay = replayV012SourceResultEvidence(
+    memory,
+    basis,
+    sourceResultEvidence,
+    expectedSourceAuthority,
+    expectedTheoryArtifact,
+  );
+
+  try {
+    const request = memory.poles(replay.structural.claimedBody);
+    const leftRequest = memory.poles(request.start);
+    const rightRequest = memory.poles(request.end);
+
+    if (
+      leftRequest.start !== replay.selectedUse ||
+      rightRequest.start !== replay.selectedUse
+    ) {
+      return fail("constructor-request-mismatch");
+    }
+
+    return memory.ensure(leftRequest.end, rightRequest.end);
+  } catch (error) {
+    if (error instanceof V013RelativeFormMaterializationError) throw error;
+    if (error instanceof MemoryError) {
+      return fail("constructor-request-mismatch");
+    }
+    throw error;
+  }
+}
