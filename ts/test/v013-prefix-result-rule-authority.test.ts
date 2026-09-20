@@ -165,7 +165,7 @@ function evidence(
   const wrongResult = evidence(S, b, a, b);
   const before = memory.linkCount;
   expectRuleError(
-    "template-mismatch",
+    "multiple-role-bindings",
     () => replayV012StructuralRuleAgainstTheoryAuthority(
       memory,
       wrongResult,
