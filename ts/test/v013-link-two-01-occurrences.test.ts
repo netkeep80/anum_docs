@@ -397,7 +397,6 @@ function groupRight(right: LinkHandle): LinkHandle {
     memory,
     basis,
     base,
-    right,
     groupingEvidence(
       1,
       base,
@@ -416,7 +415,6 @@ function groupRight(right: LinkHandle): LinkHandle {
     memory,
     basis,
     selected.afterContext,
-    selected.result,
     groupingEvidence(
       3,
       selected.afterContext,
