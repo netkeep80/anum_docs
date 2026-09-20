@@ -37,9 +37,7 @@ export class V013RelativePoleExecutionError extends Error {
 }
 
 export interface V013RelativePoleExecutionResult {
-  readonly selectedUse: LinkHandle;
   readonly operation: LinkHandle;
-  readonly beforeContext: LinkHandle;
   readonly afterContext: LinkHandle;
   readonly result: LinkHandle;
 }
@@ -192,9 +190,7 @@ export function executeAuthorizedRelativePoleSource(
   );
 
   return Object.freeze({
-    selectedUse: replay.selectedUse,
     operation,
-    beforeContext: currentContext,
     afterContext: transition.afterContext,
     result: transition.result,
   });
