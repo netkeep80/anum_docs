@@ -22,6 +22,7 @@ import {
 
 export type V013RelativePoleExecutionErrorCode =
   | "source-operation-mismatch"
+  | "operation-operand-mismatch"
   | "context-evidence-mismatch"
   | "current-value-mismatch"
   | "unsupported-operation-form"
@@ -48,22 +49,33 @@ function fail(code: V013RelativePoleExecutionErrorCode): never {
   throw new V013RelativePoleExecutionError(code);
 }
 
-type UnaryOperationForm = "prefix-start-self-closed" | "postfix-end-self-closed";
+interface UnaryOperation {
+  readonly form:
+    | "prefix-start-self-closed"
+    | "postfix-end-self-closed";
+  readonly operand: LinkHandle;
+}
 
-function readUnaryOperationForm(
+function readUnaryOperation(
   memory: WriteMemory,
   operation: LinkHandle,
-): UnaryOperationForm {
+): UnaryOperation {
   try {
     const poles = memory.poles(operation);
     const startSelfClosed = poles.start === operation;
     const endSelfClosed = poles.end === operation;
 
     if (startSelfClosed && !endSelfClosed) {
-      return "prefix-start-self-closed";
+      return Object.freeze({
+        form: "prefix-start-self-closed" as const,
+        operand: poles.end,
+      });
     }
     if (endSelfClosed && !startSelfClosed) {
-      return "postfix-end-self-closed";
+      return Object.freeze({
+        form: "postfix-end-self-closed" as const,
+        operand: poles.start,
+      });
     }
 
     // ROOT/full self-closure is not silently treated as either unary direction,
@@ -87,12 +99,14 @@ function readUnaryOperationForm(
  *
  *   selectedUse -> operation
  *
- * Unary direction is then read from the operation Link itself:
+ * The concrete unary occurrence carries its exact operand:
  *
- *   P = P -> x   => prefix / start-self-closed
- *   Q = x -> Q   => postfix / end-self-closed
+ *   P = P -> input   => prefix / start-self-closed
+ *   Q = input -> Q   => postfix / end-self-closed
  *
- * No separate operation vocabulary is semantic authority.
+ * Both unary direction and operand are therefore read from the operation Link
+ * itself. A prototype occurrence carrying a different operand has no authority
+ * over the current input.
  */
 export function executeAuthorizedRelativePoleSource(
   memory: WriteMemory,
@@ -129,9 +143,12 @@ export function executeAuthorizedRelativePoleSource(
   }
 
   const operation = grounded.end;
-  const form = readUnaryOperationForm(memory, operation);
+  const unary = readUnaryOperation(memory, operation);
+  if (unary.operand !== input) {
+    return fail("operation-operand-mismatch");
+  }
 
-  if (form === "prefix-start-self-closed") {
+  if (unary.form === "prefix-start-self-closed") {
     let state;
     try {
       state = readContext(memory, currentContext);
@@ -177,8 +194,9 @@ export function executeAuthorizedRelativePoleSource(
   }
 
   // The self-end form establishes postfix direction: it acts on an already
-  // selected left value. The exact meaning of one postfix step from a deeper
-  // path is still undecided, so the candidate refuses to guess.
+  // selected left value. One postfix from a direct multi-step position remains
+  // deliberately undefined; sequential unary prefixes are represented instead
+  // by nested one-step contexts and cancel one level at a time.
   if (position.steps.length !== 1) {
     return fail("multi-step-return-undefined");
   }
