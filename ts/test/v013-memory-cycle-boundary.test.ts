@@ -120,6 +120,13 @@ for (let round = 0; round < 4; round += 1) {
   frontier = Object.freeze([...new Set(next)]);
 }
 
+// Add a guaranteed fresh ordinary-pair spine so the witness is broad even
+// when many combinatorial constructor requests canonicalize to existing Links.
+let spine = basis.L;
+for (let index = 0; index < 96; index += 1) {
+  spine = memory.ensure(spine, basis.U);
+}
+
 const semanticSnapshot = Object.freeze([...memory.allLinks()]);
 assert(semanticSnapshot.length > 100, "fixture exercises a broad constructive graph");
 
