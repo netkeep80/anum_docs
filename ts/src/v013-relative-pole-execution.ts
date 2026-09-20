@@ -16,9 +16,11 @@ import {
 import {
   materializeRelativePoleContext,
   readRelativePoleContext,
+  readRelativeUnaryForm,
   replayRelativePoleReturn,
   RelativePoleContextError,
   type RelativePolePosition,
+  type RelativeUnaryForm,
 } from "./v013-relative-pole-context.js";
 
 export type V013RelativePoleExecutionErrorCode =
@@ -49,38 +51,17 @@ function fail(code: V013RelativePoleExecutionErrorCode): never {
   throw new V013RelativePoleExecutionError(code);
 }
 
-interface UnaryOperation {
-  readonly direction: LinkHandle;
-  readonly operand: LinkHandle;
-}
-
-function readUnaryOperation(
+function requireUnaryOperation(
   memory: WriteMemory,
-  basis: RootBasis,
   operation: LinkHandle,
-): UnaryOperation {
+): RelativeUnaryForm {
   try {
-    const poles = memory.poles(operation);
-    const startSelfClosed = poles.start === operation;
-    const endSelfClosed = poles.end === operation;
-
-    if (startSelfClosed && !endSelfClosed) {
-      return Object.freeze({
-        direction: basis.O,
-        operand: poles.end,
-      });
-    }
-    if (endSelfClosed && !startSelfClosed) {
-      return Object.freeze({
-        direction: basis.C,
-        operand: poles.start,
-      });
-    }
-
-    return fail("unsupported-operation-form");
+    return readRelativeUnaryForm(memory, operation);
   } catch (error) {
-    if (error instanceof V013RelativePoleExecutionError) throw error;
-    if (error instanceof MemoryError) {
+    if (
+      error instanceof RelativePoleContextError &&
+      error.code === "invalid-form"
+    ) {
       return fail("unsupported-operation-form");
     }
     throw error;
@@ -89,12 +70,11 @@ function readUnaryOperation(
 
 function readOptionalPosition(
   memory: WriteMemory,
-  basis: RootBasis,
   currentContext: LinkHandle,
   input: LinkHandle,
 ): RelativePolePosition | undefined {
   try {
-    const position = readRelativePoleContext(memory, basis, currentContext);
+    const position = readRelativePoleContext(memory, currentContext);
     if (position.selected !== input) {
       return fail("current-value-mismatch");
     }
@@ -130,27 +110,25 @@ function readOptionalPosition(
   }
 }
 
-function executePoleDirection(
+function executePoleForm(
   memory: WriteMemory,
-  basis: RootBasis,
   currentContext: LinkHandle,
   input: LinkHandle,
-  direction: LinkHandle,
+  operation: LinkHandle,
+  unary: RelativeUnaryForm,
 ): {
   readonly afterContext: LinkHandle;
   readonly result: LinkHandle;
 } {
   const position = readOptionalPosition(
     memory,
-    basis,
     currentContext,
     input,
   );
 
-  if (position !== undefined && position.direction !== direction) {
+  if (position !== undefined && position.side !== unary.side) {
     const returned = replayRelativePoleReturn(
       memory,
-      basis,
       currentContext,
       input,
     );
@@ -162,10 +140,8 @@ function executePoleDirection(
 
   const selected = materializeRelativePoleContext(
     memory,
-    basis,
     currentContext,
-    input,
-    direction,
+    operation,
   );
   return Object.freeze({
     afterContext: selected.context,
@@ -176,15 +152,13 @@ function executePoleDirection(
 /**
  * Candidate v0.13 source/Rule/context authority boundary.
  *
- * The concrete unary occurrence carries both direction and exact operand:
+ * The concrete unary Link is both the operation and the position evidence:
  *
- *   P = P -> input   => START
- *   Q = input -> Q   => END
+ *   P = P -> input
+ *   Q = input -> Q
  *
- * A position context carries exactly one entry direction. Applying the same
- * direction descends one level; applying the opposite direction returns one
- * level. Nested navigation is therefore nested contexts, not a host path stack
- * or a multi-step path stored inside one context.
+ * No O/C direction marker is stored in the generic position. Whole and
+ * orientation are recovered from the exact self-incidence form itself.
  */
 export function executeAuthorizedRelativePoleSource(
   memory: WriteMemory,
@@ -221,17 +195,17 @@ export function executeAuthorizedRelativePoleSource(
   }
 
   const operation = grounded.end;
-  const unary = readUnaryOperation(memory, basis, operation);
-  if (unary.operand !== input) {
+  const unary = requireUnaryOperation(memory, operation);
+  if (unary.whole !== input) {
     return fail("operation-operand-mismatch");
   }
 
-  const transition = executePoleDirection(
+  const transition = executePoleForm(
     memory,
-    basis,
     currentContext,
     input,
-    unary.direction,
+    operation,
+    unary,
   );
 
   return Object.freeze({
