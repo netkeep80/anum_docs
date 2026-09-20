@@ -15,6 +15,7 @@ import {
 export type V013HierarchicalCarrierErrorCode =
   | "invalid-basis"
   | "invalid-carrier"
+  | "invalid-semantic-link"
   | "invalid-wire";
 
 export class V013HierarchicalCarrierError extends Error {
@@ -77,6 +78,84 @@ function readQuotedNode(
     }
     throw error;
   }
+}
+
+
+/**
+ * Project any finite Link constructible by the current Memory API into the
+ * quoted ROOT/START/END/PAIR carrier.
+ *
+ * The projection is structural: semantic identity is read only from poles.
+ * Host memoization avoids repeated traversal of shared sublinks, but no host
+ * identifier enters the carrier. Shared semantic sublinks therefore map to one
+ * canonical local carrier Link through ordinary memory.ensure canonicality.
+ */
+export function materializeV013HierarchicalCarrierFromSemanticLink(
+  memory: WriteMemory,
+  basis: RootBasis,
+  semantic: LinkHandle,
+): LinkHandle {
+  const verified = requireBasis(memory, basis);
+  const namespace = memory.ensure(verified.L, verified.L);
+  const memo = new Map<LinkHandle, LinkHandle>();
+  const active = new Set<LinkHandle>();
+
+  const project = (link: LinkHandle): LinkHandle => {
+    const known = memo.get(link);
+    if (known !== undefined) return known;
+
+    if (link === verified.R) {
+      memo.set(link, verified.R);
+      return verified.R;
+    }
+
+    if (active.has(link)) return fail("invalid-semantic-link");
+    active.add(link);
+    try {
+      const poles = memory.poles(link);
+
+      // A non-root Link cannot be self at both poles through the canonical
+      // Memory constructors. Treat such a foreign/forged cycle as unsupported.
+      if (poles.start === link && poles.end === link) {
+        return fail("invalid-semantic-link");
+      }
+
+      let carrier: LinkHandle;
+      if (poles.start === link) {
+        carrier = materializeQuotedNode(
+          memory,
+          verified,
+          namespace,
+          [verified.O, project(poles.end)],
+        );
+      } else if (poles.end === link) {
+        carrier = materializeQuotedNode(
+          memory,
+          verified,
+          namespace,
+          [verified.C, project(poles.start)],
+        );
+      } else {
+        carrier = materializeQuotedNode(
+          memory,
+          verified,
+          namespace,
+          [verified.L, project(poles.start), project(poles.end)],
+        );
+      }
+
+      memo.set(link, carrier);
+      return carrier;
+    } catch (error) {
+      if (error instanceof V013HierarchicalCarrierError) throw error;
+      if (error instanceof MemoryError) return fail("invalid-semantic-link");
+      throw error;
+    } finally {
+      active.delete(link);
+    }
+  };
+
+  return project(semantic);
 }
 
 /**
