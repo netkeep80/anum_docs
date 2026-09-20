@@ -345,7 +345,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     base,
-    f.S,
     f.evidence(
       "male",
       base,
@@ -365,7 +364,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     selected.afterContext,
-    f.a,
     f.evidence(
       "female",
       selected.afterContext,
@@ -413,7 +411,6 @@ function fixture(): Fixture {
       f.memory,
       f.basis,
       kT.context,
-      f.a,
       evidence,
       f.femaleAuthority,
       f.fixedTheory,
@@ -432,7 +429,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     base,
-    f.S,
     f.evidence(
       "female",
       base,
@@ -490,7 +486,6 @@ function fixture(): Fixture {
       f.memory,
       f.basis,
       base,
-      f.S,
       evidence,
       f.femaleAuthority,
       authority,
@@ -511,7 +506,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     base,
-    deepS,
     f.evidence(
       "male",
       base,
@@ -529,7 +523,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     firstPrefix.afterContext,
-    left,
     f.evidence(
       "male",
       firstPrefix.afterContext,
@@ -547,7 +540,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     secondPrefix.afterContext,
-    f.a,
     f.evidence(
       "female",
       secondPrefix.afterContext,
@@ -570,7 +562,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     firstPostfix.afterContext,
-    left,
     f.evidence(
       "female",
       firstPostfix.afterContext,
@@ -607,7 +598,6 @@ function fixture(): Fixture {
       f.memory,
       f.basis,
       base,
-      f.S,
       wrongPrefixEvidence,
       f.maleAuthority,
       f.fixedTheory,
@@ -627,7 +617,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     base,
-    f.S,
     correctPrefixEvidence,
     f.maleAuthority,
     f.fixedTheory,
@@ -648,7 +637,6 @@ function fixture(): Fixture {
       f.memory,
       f.basis,
       selected.afterContext,
-      f.a,
       wrongPostfixEvidence,
       f.femaleAuthority,
       f.fixedTheory,
@@ -717,7 +705,6 @@ function fixture(): Fixture {
       f.memory,
       f.basis,
       base,
-      f.S,
       evidence,
       f.maleAuthority,
       weakTheory,
@@ -749,7 +736,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     base,
-    f.S,
     endEvidence,
     f.femaleAuthority,
     f.fixedTheory,
@@ -769,7 +755,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     endSelected.afterContext,
-    f.b,
     returnEvidence,
     f.maleAuthority,
     f.fixedTheory,
@@ -794,7 +779,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     base,
-    deepS,
     f.evidence(
       "female",
       base,
@@ -812,7 +796,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     firstEnd.afterContext,
-    y,
     f.evidence(
       "female",
       firstEnd.afterContext,
@@ -830,7 +813,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     secondEnd.afterContext,
-    f.a,
     f.evidence(
       "male",
       secondEnd.afterContext,
@@ -849,7 +831,6 @@ function fixture(): Fixture {
     f.memory,
     f.basis,
     firstStart.afterContext,
-    y,
     f.evidence(
       "male",
       firstStart.afterContext,
@@ -893,7 +874,6 @@ function fixture(): Fixture {
       f.memory,
       f.basis,
       base,
-      whole,
       f.evidence(
         "male",
         base,
@@ -914,7 +894,6 @@ function fixture(): Fixture {
       f.memory,
       f.basis,
       base,
-      whole,
       f.evidence(
         "female",
         base,
@@ -1030,7 +1009,6 @@ function fixture(): Fixture {
       f.memory,
       f.basis,
       base,
-      whole,
       f.evidence(
         "male",
         base,
@@ -1051,7 +1029,6 @@ function fixture(): Fixture {
       f.memory,
       f.basis,
       selected.afterContext,
-      selected.result,
       f.evidence(
         "female",
         selected.afterContext,
