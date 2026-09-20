@@ -389,10 +389,10 @@ function fixture(): Fixture {
   const baseS = defineContext(f.memory, f.parent, f.S);
   const baseT = defineContext(f.memory, f.parent, f.T);
   const kS = materializeRelativePoleContext(
-    f.memory, f.basis, baseS, f.S, [f.basis.O],
+    f.memory, f.basis, baseS, f.S, f.basis.O,
   );
   const kT = materializeRelativePoleContext(
-    f.memory, f.basis, baseT, f.T, [f.basis.O],
+    f.memory, f.basis, baseT, f.T, f.basis.O,
   );
   same(kS.selected, f.a, "K_S selects shared a");
   same(kT.selected, f.a, "K_T selects shared a");
@@ -497,46 +497,6 @@ function fixture(): Fixture {
     ),
   );
   same(f.memory.linkCount, before, "unsupported form writes nothing");
-}
-
-// One direct deep path remains distinct from repeated unary prefix occurrences.
-{
-  const f = fixture();
-  const left = f.memory.ensure(f.a, f.b);
-  const deepS = f.memory.ensure(left, f.c);
-  const base = defineContext(f.memory, f.parent, deepS);
-  const deep = materializeRelativePoleContext(
-    f.memory,
-    f.basis,
-    base,
-    deepS,
-    [f.basis.O, f.basis.O],
-  );
-  same(deep.selected, f.a, "START,START selects a");
-
-  const operation = f.postfix(f.a);
-  const evidence = f.evidence(
-    "female",
-    deep.context,
-    f.postfixRule,
-    f.postfixAdmission,
-    operation,
-    f.a,
-  );
-  const before = f.memory.linkCount;
-  expectCode(
-    "multi-step-return-undefined",
-    () => executeAuthorizedRelativePoleSource(
-      f.memory,
-      f.basis,
-      deep.context,
-      f.a,
-      evidence,
-      f.femaleAuthority,
-      f.fixedTheory,
-    ),
-  );
-  same(f.memory.linkCount, before, "undefined deep-path ascent writes nothing");
 }
 
 // Repeated unary prefixes create nested one-step Link contexts. Each concrete

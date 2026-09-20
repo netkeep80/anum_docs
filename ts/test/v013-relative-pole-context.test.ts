@@ -1,4 +1,3 @@
-import { materializeExactSequence } from "../src/exact-sequence.js";
 import {
   Memory,
   ensureRootBasis,
@@ -100,10 +99,10 @@ function fixture(): Fixture {
 {
   const f = fixture();
   const fromS = materializeRelativePoleContext(
-    f.memory, f.basis, f.parent, f.S, [f.basis.O],
+    f.memory, f.basis, f.parent, f.S, f.basis.O,
   );
   const fromT = materializeRelativePoleContext(
-    f.memory, f.basis, f.parent, f.T, [f.basis.O],
+    f.memory, f.basis, f.parent, f.T, f.basis.O,
   );
 
   same(fromS.selected, f.a, "START(S) selects shared a");
@@ -133,10 +132,10 @@ function fixture(): Fixture {
 {
   const f = fixture();
   const fromP = materializeRelativePoleContext(
-    f.memory, f.basis, f.parent, f.P, [f.basis.C],
+    f.memory, f.basis, f.parent, f.P, f.basis.C,
   );
   const fromQ = materializeRelativePoleContext(
-    f.memory, f.basis, f.parent, f.Q, [f.basis.C],
+    f.memory, f.basis, f.parent, f.Q, f.basis.C,
   );
 
   same(fromP.selected, f.d, "END(P) selects shared d");
@@ -159,15 +158,15 @@ function fixture(): Fixture {
 {
   const f = fixture();
   const startR = materializeRelativePoleContext(
-    f.memory, f.basis, f.parent, f.basis.R, [f.basis.O],
+    f.memory, f.basis, f.parent, f.basis.R, f.basis.O,
   );
   const endR = materializeRelativePoleContext(
-    f.memory, f.basis, f.parent, f.basis.R, [f.basis.C],
+    f.memory, f.basis, f.parent, f.basis.R, f.basis.C,
   );
 
   same(startR.selected, f.basis.R, "START(R)=R");
   same(endR.selected, f.basis.R, "END(R)=R");
-  assert(startR.path !== endR.path, "ROOT START/END exact paths must differ");
+  assert(startR.direction !== endR.direction, "ROOT START/END directions must differ");
   assert(startR.context !== endR.context, "ROOT START/END positions must remain distinguishable");
 
   same(
@@ -186,10 +185,10 @@ function fixture(): Fixture {
 {
   const f = fixture();
   const startO = materializeRelativePoleContext(
-    f.memory, f.basis, f.parent, f.basis.O, [f.basis.O],
+    f.memory, f.basis, f.parent, f.basis.O, f.basis.O,
   );
   const endO = materializeRelativePoleContext(
-    f.memory, f.basis, f.parent, f.basis.O, [f.basis.C],
+    f.memory, f.basis, f.parent, f.basis.O, f.basis.C,
   );
 
   same(startO.selected, f.basis.O, "START(O)=O");
@@ -202,18 +201,16 @@ function fixture(): Fixture {
   );
 }
 
-// A path is structural evidence, not an arbitrary exact sequence.
-// Build the malformed witness in the current two-layer K_position topology so
-// rejection reaches the exact Path check rather than failing earlier on shape.
+// Direction is structural evidence and must be exactly START(O) or END(C).
+// Build the malformed witness in the same two-layer K_position topology.
 {
   const f = fixture();
-  const badPath = materializeExactSequence(f.memory, [f.basis.L]);
-  const badFrame = f.memory.ensure(f.S, badPath);
+  const badFrame = f.memory.ensure(f.S, f.basis.L);
   const badEvidenceContext = defineContext(f.memory, f.parent, badFrame);
   const badContext = defineContext(f.memory, badEvidenceContext, f.a);
   reject(
     () => readRelativePoleContext(f.memory, f.basis, badContext),
-    "invalid-path",
+    "invalid-direction",
   );
 }
 
@@ -228,10 +225,10 @@ function fixture(): Fixture {
   assert(left.S !== right.S, "corresponding wholes must have independent handles");
 
   const leftPos = materializeRelativePoleContext(
-    left.memory, left.basis, left.parent, left.S, [left.basis.O],
+    left.memory, left.basis, left.parent, left.S, left.basis.O,
   );
   const rightPos = materializeRelativePoleContext(
-    right.memory, right.basis, right.parent, right.S, [right.basis.O],
+    right.memory, right.basis, right.parent, right.S, right.basis.O,
   );
 
   same(leftPos.selected, left.a, "Memory A selects its own a");

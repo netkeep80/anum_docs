@@ -26,8 +26,7 @@ export type V013RelativePoleExecutionErrorCode =
   | "operation-operand-mismatch"
   | "context-evidence-mismatch"
   | "current-value-mismatch"
-  | "unsupported-operation-form"
-  | "multi-step-return-undefined";
+  | "unsupported-operation-form";
 
 export class V013RelativePoleExecutionError extends Error {
   override readonly name = "V013RelativePoleExecutionError";
@@ -51,14 +50,13 @@ function fail(code: V013RelativePoleExecutionErrorCode): never {
 }
 
 interface UnaryOperation {
-  readonly form:
-    | "prefix-start-self-closed"
-    | "postfix-end-self-closed";
+  readonly direction: LinkHandle;
   readonly operand: LinkHandle;
 }
 
 function readUnaryOperation(
   memory: WriteMemory,
+  basis: RootBasis,
   operation: LinkHandle,
 ): UnaryOperation {
   try {
@@ -68,13 +66,13 @@ function readUnaryOperation(
 
     if (startSelfClosed && !endSelfClosed) {
       return Object.freeze({
-        form: "prefix-start-self-closed" as const,
+        direction: basis.O,
         operand: poles.end,
       });
     }
     if (endSelfClosed && !startSelfClosed) {
       return Object.freeze({
-        form: "postfix-end-self-closed" as const,
+        direction: basis.C,
         operand: poles.start,
       });
     }
@@ -149,28 +147,17 @@ function executePoleDirection(
     input,
   );
 
-  if (position !== undefined) {
-    if (position.steps.length !== 1) {
-      return fail("multi-step-return-undefined");
-    }
-
-    const enteredDirection = position.steps[0];
-    if (enteredDirection === undefined) {
-      return fail("context-evidence-mismatch");
-    }
-
-    if (enteredDirection !== direction) {
-      const returned = replayRelativePoleReturn(
-        memory,
-        basis,
-        currentContext,
-        input,
-      );
-      return Object.freeze({
-        afterContext: returned.parent,
-        result: returned.whole,
-      });
-    }
+  if (position !== undefined && position.direction !== direction) {
+    const returned = replayRelativePoleReturn(
+      memory,
+      basis,
+      currentContext,
+      input,
+    );
+    return Object.freeze({
+      afterContext: returned.parent,
+      result: returned.whole,
+    });
   }
 
   const selected = materializeRelativePoleContext(
@@ -178,7 +165,7 @@ function executePoleDirection(
     basis,
     currentContext,
     input,
-    [direction],
+    direction,
   );
   return Object.freeze({
     afterContext: selected.context,
@@ -191,17 +178,13 @@ function executePoleDirection(
  *
  * The concrete unary occurrence carries both direction and exact operand:
  *
- *   P = P -> input   => START direction
- *   Q = input -> Q   => END direction
+ *   P = P -> input   => START
+ *   Q = input -> Q   => END
  *
- * Context makes both directions symmetric:
- *
- * - from a base occurrence, either direction selects that pole;
- * - from a one-step position, the same direction descends again;
- * - the opposite direction returns exactly one contextual level.
- *
- * Thus START/END navigation is derived from Link self-incidence + explicit
- * Link context, not glyph spelling, host stack or a prefix/postfix opcode table.
+ * A position context carries exactly one entry direction. Applying the same
+ * direction descends one level; applying the opposite direction returns one
+ * level. Nested navigation is therefore nested contexts, not a host path stack
+ * or a multi-step path stored inside one context.
  */
 export function executeAuthorizedRelativePoleSource(
   memory: WriteMemory,
@@ -238,21 +221,17 @@ export function executeAuthorizedRelativePoleSource(
   }
 
   const operation = grounded.end;
-  const unary = readUnaryOperation(memory, operation);
+  const unary = readUnaryOperation(memory, basis, operation);
   if (unary.operand !== input) {
     return fail("operation-operand-mismatch");
   }
-
-  const direction = unary.form === "prefix-start-self-closed"
-    ? basis.O
-    : basis.C;
 
   const transition = executePoleDirection(
     memory,
     basis,
     currentContext,
     input,
-    direction,
+    unary.direction,
   );
 
   return Object.freeze({
