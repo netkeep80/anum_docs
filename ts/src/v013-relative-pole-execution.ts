@@ -26,7 +26,6 @@ export type V013RelativePoleExecutionErrorCode =
   | "source-operation-mismatch"
   | "operation-operand-mismatch"
   | "context-evidence-mismatch"
-  | "current-value-mismatch"
   | "unsupported-operation-form";
 
 export class V013RelativePoleExecutionError extends Error {
@@ -67,17 +66,21 @@ function requireUnaryOperation(
   }
 }
 
-function readOptionalPosition(
+interface CurrentPosition {
+  readonly current: LinkHandle;
+  readonly position: RelativePolePosition | undefined;
+}
+
+function readCurrentPosition(
   memory: WriteMemory,
   currentContext: LinkHandle,
-  input: LinkHandle,
-): RelativePolePosition | undefined {
+): CurrentPosition {
   try {
     const position = readRelativePoleContext(memory, currentContext);
-    if (position.selected !== input) {
-      return fail("current-value-mismatch");
-    }
-    return position;
+    return Object.freeze({
+      current: position.selected,
+      position,
+    });
   } catch (error) {
     if (
       error instanceof RelativePoleContextError &&
@@ -96,10 +99,10 @@ function readOptionalPosition(
 
   try {
     const state = readContext(memory, currentContext);
-    if (state.current !== input) {
-      return fail("current-value-mismatch");
-    }
-    return undefined;
+    return Object.freeze({
+      current: state.current,
+      position: undefined,
+    });
   } catch (error) {
     if (error instanceof V013RelativePoleExecutionError) throw error;
     if (error instanceof StateError || error instanceof MemoryError) {
@@ -112,23 +115,20 @@ function readOptionalPosition(
 function executePoleForm(
   memory: WriteMemory,
   currentContext: LinkHandle,
-  input: LinkHandle,
   operation: LinkHandle,
   unary: RelativeUnaryForm,
+  current: CurrentPosition,
 ): {
   readonly afterContext: LinkHandle;
   readonly result: LinkHandle;
 } {
-  const position = readOptionalPosition(
-    memory,
-    currentContext,
-    input,
-  );
-
-  if (position !== undefined && position.side !== unary.side) {
+  if (
+    current.position !== undefined &&
+    current.position.side !== unary.side
+  ) {
     return Object.freeze({
-      afterContext: position.parent,
-      result: position.whole,
+      afterContext: current.position.parent,
+      result: current.position.whole,
     });
   }
 
@@ -148,17 +148,17 @@ function executePoleForm(
  *
  * The concrete unary Link is both the operation and the position evidence:
  *
- *   P = P -> input
- *   Q = input -> Q
+ *   P = P -> current
+ *   Q = current -> Q
  *
- * No O/C direction marker is stored in the generic position. Whole and
- * orientation are recovered from the exact self-incidence form itself.
+ * Current is derived only from currentContext; it is not a second host
+ * argument. No O/C direction marker is stored in the generic position. Whole
+ * and orientation are recovered from the exact self-incidence form itself.
  */
 export function executeAuthorizedRelativePoleSource(
   memory: WriteMemory,
   basis: RootBasis,
   currentContext: LinkHandle,
-  input: LinkHandle,
   sourceResultEvidence: V012SourceResultEvidence,
   expectedSourceAuthority: V012SourceAuthority,
   expectedTheoryArtifact: unknown,
@@ -190,16 +190,17 @@ export function executeAuthorizedRelativePoleSource(
 
   const operation = grounded.end;
   const unary = requireUnaryOperation(memory, operation);
-  if (unary.whole !== input) {
+  const current = readCurrentPosition(memory, currentContext);
+  if (unary.whole !== current.current) {
     return fail("operation-operand-mismatch");
   }
 
   const transition = executePoleForm(
     memory,
     currentContext,
-    input,
     operation,
     unary,
+    current,
   );
 
   return Object.freeze({
@@ -207,7 +208,7 @@ export function executeAuthorizedRelativePoleSource(
     operation,
     beforeContext: currentContext,
     afterContext: transition.afterContext,
-    input,
+    input: current.current,
     result: transition.result,
   });
 }
