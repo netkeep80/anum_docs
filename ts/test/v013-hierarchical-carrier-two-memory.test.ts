@@ -146,8 +146,8 @@ same(memoryA.linkCount, beforeSerializeA, "serializer is read-only");
 // PAIR(START(END(ROOT)), END(START(ROOT))).
 sameBytes(
   wire,
-  [0x03, 0x01, 0x02, 0x00, 0x02, 0x01, 0x00],
-  "exact canonical hierarchical wire",
+  [0x31, 0x39, 0x36, 0x38, 0x36, 0x39, 0x38],
+  "exact canonical quaternary wire 1968698",
 );
 
 // Existing canonical byte Link-carrier is the physical storage layer.
@@ -255,8 +255,8 @@ same(rightValues[0], basisB.C, "receiver right child is END");
 // Malformed physical framing is rejected before representation writes.
 for (const malformed of [
   Uint8Array.from([0xff]),
-  Uint8Array.from([0x01]),
-  Uint8Array.from([0x00, 0x00]),
+  Uint8Array.from([0x39]),
+  Uint8Array.from([0x38, 0x38]),
 ]) {
   const isolated = new Memory();
   const isolatedBasis = ensureRootBasis(isolated);
@@ -288,5 +288,5 @@ for (const malformed of [
 }
 
 console.log(
-  "MTS v0.13 hierarchical carrier canonical byte two-memory transport: GREEN.",
+  "MTS v0.13 historical 1/6/8/9 quaternary carrier two-memory transport: GREEN.",
 );

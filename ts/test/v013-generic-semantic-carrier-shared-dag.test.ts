@@ -98,18 +98,18 @@ const basisVectors: readonly [
   readonly number[],
   string,
 ][] = Object.freeze([
-  [graphA.basis.R, [0x00], "R = ROOT"],
-  [graphA.basis.O, [0x01, 0x00], "O = START(ROOT)"],
-  [graphA.basis.C, [0x02, 0x00], "C = END(ROOT)"],
+  [graphA.basis.R, [0x38], "R = 8"],
+  [graphA.basis.O, [0x39, 0x38], "O = 98"],
+  [graphA.basis.C, [0x36, 0x38], "C = 68"],
   [
     graphA.basis.L,
-    [0x03, 0x01, 0x00, 0x02, 0x00],
-    "L = PAIR(O,C)",
+    [0x31, 0x39, 0x38, 0x36, 0x38],
+    "L = 19868",
   ],
   [
     graphA.basis.U,
-    [0x03, 0x02, 0x00, 0x01, 0x00],
-    "U = PAIR(C,O)",
+    [0x31, 0x36, 0x38, 0x39, 0x38],
+    "U = 16898",
   ],
 ]);
 
@@ -155,10 +155,32 @@ same(selfPairValuesA[0], graphA.basis.L, "self-pair carrier PAIR tag");
 same(selfPairValuesA[1], sharedCarrierA, "self-pair left uses shared carrier");
 same(selfPairValuesA[2], sharedCarrierA, "self-pair right reuses same carrier");
 
+const xCarrierA = materializeV013HierarchicalCarrierFromSemanticLink(
+  memoryA,
+  graphA.basis,
+  graphA.x,
+);
+sameBytes(
+  serializeV013HierarchicalCarrier(memoryA, graphA.basis, xCarrierA),
+  [0x39, 0x36, 0x38],
+  "START(END(R)) = 968",
+);
+
+const yCarrierA = materializeV013HierarchicalCarrierFromSemanticLink(
+  memoryA,
+  graphA.basis,
+  graphA.y,
+);
+sameBytes(
+  serializeV013HierarchicalCarrier(memoryA, graphA.basis, yCarrierA),
+  [0x36, 0x39, 0x38],
+  "END(START(R)) = 698",
+);
+
 const sharedWire = Uint8Array.from([
-  0x03,
-  0x01, 0x02, 0x00,
-  0x02, 0x01, 0x00,
+  0x31,
+  0x39, 0x36, 0x38,
+  0x36, 0x39, 0x38,
 ]);
 sameBytes(
   serializeV013HierarchicalCarrier(
@@ -171,7 +193,7 @@ sameBytes(
 );
 
 const selfPairWire = Uint8Array.from([
-  0x03,
+  0x31,
   ...sharedWire,
   ...sharedWire,
 ]);
@@ -267,5 +289,5 @@ sameBytes(
 );
 
 console.log(
-  "MTS v0.13 generic semantic Link -> ROOT/START/END/PAIR carrier with shared DAG: GREEN.",
+  "MTS v0.13 generic semantic Link -> canonical 1/6/8/9 anum with shared DAG: GREEN.",
 );

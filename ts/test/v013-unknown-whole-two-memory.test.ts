@@ -132,8 +132,8 @@ const wireA = serializeV013HierarchicalCarrier(
 );
 sameBytes(
   wireA,
-  [0x03, 0x01, 0x02, 0x00, 0x02, 0x01, 0x00],
-  "sender exact hierarchy wire",
+  [0x31, 0x39, 0x36, 0x38, 0x36, 0x39, 0x38],
+  "sender exact historical anum 1968698",
 );
 
 const physicalA = materializeCanonicalByteSequence(
@@ -198,17 +198,17 @@ same(
 
 // ---------------------------------------------------------------------------
 // Exact transported wire becomes source authority for semantic reconstruction.
-// Host recursion below traverses only the fixed-arity physical framing.
+// Host recursion below traverses only the fixed-arity 1/6/8/9 prefix grammar.
 // Every semantic write is separately admitted by fixed-Theory StructuralRule.
 // ---------------------------------------------------------------------------
 
 type Kind = "root" | "start" | "end" | "pair";
 
 const OPCODE: Readonly<Record<Kind, number>> = Object.freeze({
-  root: 0x00,
-  start: 0x01,
-  end: 0x02,
-  pair: 0x03,
+  root: 0x38, // "8"
+  start: 0x39, // "9"
+  end: 0x36, // "6"
+  pair: 0x31, // "1"
 });
 
 interface InterpreterFixture {
@@ -706,5 +706,5 @@ sameBytes(
 );
 
 console.log(
-  "MTS v0.13 unknown semantic Whole transported and reconstructed under source/Rule authority: GREEN.",
+  "MTS v0.13 historical quaternary anum transported and reconstructed under source/Rule authority: GREEN.",
 );
