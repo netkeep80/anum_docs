@@ -118,11 +118,14 @@ function evidence(
   const transition = memory.ensure(operation, claimedResult);
   const claimedBody = memory.ensure(maleUse, transition);
 
+  // Give every candidate its own explicit after-context so alternative role
+  // bindings do not accumulate as ambient fields on one canonical Act header.
+  const afterContext = defineContext(memory, parent, claimedBody);
   const act = defineActHeader(
     memory,
     interpreter,
     roleDictionary,
-    parent,
+    afterContext,
   );
   defineActField(memory, act, sourceUseRole, maleUse);
   defineActField(memory, act, startRole, boundStart);
@@ -134,7 +137,7 @@ function evidence(
     ruleAdmission: admission,
     claimedBody,
     expectedInterpreter: Object.freeze({ dictionary, grammar, theory }),
-    expectedAfterContext: parent,
+    expectedAfterContext: afterContext,
   });
 }
 
