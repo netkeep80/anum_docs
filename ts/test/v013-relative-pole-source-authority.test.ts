@@ -935,6 +935,70 @@ function fixture(): Fixture {
     ),
   );
   same(memory.linkCount, beforeWrongFemale, "wrong ♀ operand causes zero writes");
+
+  // A weak prototype Rule that does NOT bind Operand must not be allowed to
+  // apply a concrete self-start occurrence carrying T to current input S.
+  // Baseline execution currently ignores the non-self pole and therefore this
+  // is the semantic RED for making operand-relative occurrence mandatory.
+  const weakRoleDictionary = defineStructuralRoleDictionary(
+    memory,
+    [sourceUseRole],
+  );
+  const weakPrototype = memory.ensureStartSelfClosed(T);
+  const weakRule = defineStructuralRule(
+    memory,
+    weakRoleDictionary,
+    memory.ensure(sourceUseRole, weakPrototype),
+  );
+  const weakAdmission = admitStructuralRule(memory, theory, weakRule);
+  const weakTheory = exportPortableStructuralTheory(memory, theory);
+
+  const weakAct = defineActHeader(
+    memory,
+    interpreter.handle,
+    weakRoleDictionary,
+    base,
+  );
+  const weakSourceAttachment = defineActField(
+    memory,
+    weakAct,
+    sourceUseRole,
+    maleUse,
+  );
+  const weakStructural: StructuralRuleReplayEvidence = Object.freeze({
+    act: weakAct,
+    rule: weakRule,
+    ruleAdmission: weakAdmission,
+    claimedBody: memory.ensure(maleUse, weakPrototype),
+    expectedInterpreter: interpreter.structure,
+    expectedAfterContext: base,
+  });
+  const weakEvidence: V012SourceResultEvidence = Object.freeze({
+    source: maleSourceEvidence,
+    structural: weakStructural,
+    selectedActAttachments: Object.freeze([weakSourceAttachment]),
+    sourceUseIndex: 0,
+    sourceUseRole,
+  });
+
+  const beforeWeakPrototype = memory.linkCount;
+  expectExecutionError(
+    "operation-operand-mismatch",
+    () => executeAuthorizedRelativePoleSource(
+      memory,
+      basis,
+      base,
+      S,
+      weakEvidence,
+      maleAuthority,
+      weakTheory,
+    ),
+  );
+  same(
+    memory.linkCount,
+    beforeWeakPrototype,
+    "prototype operation with foreign operand causes zero writes",
+  );
 }
 
 console.log("MTS v0.13 pole source/Rule/self-incidence authority: GREEN.");
