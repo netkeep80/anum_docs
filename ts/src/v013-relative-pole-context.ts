@@ -1,9 +1,4 @@
 import {
-  ExactSequenceError,
-  materializeExactSequence,
-  readExactSequence,
-} from "./exact-sequence.js";
-import {
   MemoryError,
   verifyRootBasis,
   type LinkHandle,
@@ -20,7 +15,7 @@ import {
 export type RelativePoleContextErrorCode =
   | "invalid-basis"
   | "invalid-context"
-  | "invalid-path"
+  | "invalid-direction"
   | "selected-mismatch"
   | "replay-wrote";
 
@@ -37,8 +32,7 @@ export interface RelativePolePosition {
   readonly context: LinkHandle;
   readonly frame: LinkHandle;
   readonly whole: LinkHandle;
-  readonly path: LinkHandle;
-  readonly steps: readonly LinkHandle[];
+  readonly direction: LinkHandle;
   readonly selected: LinkHandle;
 }
 
@@ -58,70 +52,64 @@ function requireBasis(memory: ReadMemory, basis: RootBasis): RootBasis {
   }
 }
 
-function requireSteps(
+function requireDirection(
   basis: RootBasis,
-  steps: readonly LinkHandle[],
+  direction: LinkHandle,
 ): void {
-  if (steps.length === 0) {
-    throw new RelativePoleContextError("invalid-path");
-  }
-  for (const step of steps) {
-    if (step !== basis.O && step !== basis.C) {
-      throw new RelativePoleContextError("invalid-path");
-    }
+  if (direction !== basis.O && direction !== basis.C) {
+    throw new RelativePoleContextError("invalid-direction");
   }
 }
 
-function followPolePath(
+function followPole(
   memory: ReadMemory,
   basis: RootBasis,
   whole: LinkHandle,
-  steps: readonly LinkHandle[],
+  direction: LinkHandle,
 ): LinkHandle {
-  requireSteps(basis, steps);
-  let current = whole;
-  for (const step of steps) {
-    const poles = memory.poles(current);
-    current = step === basis.O ? poles.start : poles.end;
-  }
-  return current;
+  requireDirection(basis, direction);
+  const poles = memory.poles(whole);
+  return direction === basis.O ? poles.start : poles.end;
 }
 
 /**
- * Candidate v0.13 position context.
+ * Candidate v0.13 one-step position context.
  *
- * The semantic current value remains exactly the selected Link. Structural
- * evidence for where it came from is kept in one parent context:
+ * Sequential unary navigation is represented by nested position contexts.
+ * Therefore one position needs only the direction used to enter it:
  *
- *   Path       = ExactSequence(O|C, ...)
- *   Frame      = Whole -> Path
+ *   Direction  = O | C
+ *   Frame      = Whole -> Direction
  *   K_evidence = START(ParentK -> Frame)
  *   K_pos      = START(K_evidence -> Selected)
  *
- * This extra Link-context layer is intentional: another unary prefix can now
- * consume Selected directly as the current semantic value, while replay still
- * reconstructs Whole/Path without wrapping Selected itself.
+ * K_pos.current remains the exact semantic Selected Link. Whole + Direction
+ * stay explicit in the parent evidence context so contextual return is
+ * reconstructible without an ambient stack or incoming scan.
  *
- * O/C are used here only as already-verified structural direction markers for
- * the experiment. This does not claim that they remain the v0.13 transport
- * abits.
+ * O/C are used only as already-verified direction markers for this candidate;
+ * this does not claim they remain v0.13 transport abits.
  */
 export function materializeRelativePoleContext(
   memory: WriteMemory,
   basis: RootBasis,
   parent: LinkHandle,
   whole: LinkHandle,
-  steps: readonly LinkHandle[],
+  direction: LinkHandle,
 ): RelativePolePosition {
   const verifiedBasis = requireBasis(memory, basis);
 
   try {
     readContext(memory, parent);
-    requireSteps(verifiedBasis, steps);
+    requireDirection(verifiedBasis, direction);
 
-    const path = materializeExactSequence(memory, steps);
-    const frame = memory.ensure(whole, path);
-    const selected = followPolePath(memory, verifiedBasis, whole, steps);
+    const frame = memory.ensure(whole, direction);
+    const selected = followPole(
+      memory,
+      verifiedBasis,
+      whole,
+      direction,
+    );
     const evidenceContext = defineContext(memory, parent, frame);
     const context = defineContext(memory, evidenceContext, selected);
 
@@ -130,8 +118,7 @@ export function materializeRelativePoleContext(
       context,
       frame,
       whole,
-      path,
-      steps: Object.freeze([...steps]),
+      direction,
       selected,
     });
   } catch (error) {
@@ -144,11 +131,7 @@ export function materializeRelativePoleContext(
 }
 
 /**
- * Read an already materialized position using Links only.
- *
- * No source string, host path, occurrence id, incoming scan or ambient stack is
- * semantic authority. K_pos.current is the selected semantic Link; its parent
- * K_evidence carries Whole + exact Path.
+ * Read an already materialized one-step position using Links only.
  */
 export function readRelativePoleContext(
   memory: ReadMemory,
@@ -164,15 +147,14 @@ export function readRelativePoleContext(
 
     const framePoles = memory.poles(evidence.current);
     const whole = framePoles.start;
-    const path = framePoles.end;
-    const exact = readExactSequence(memory, path);
-    requireSteps(verifiedBasis, exact.values);
+    const direction = framePoles.end;
+    requireDirection(verifiedBasis, direction);
 
-    const derivedSelected = followPolePath(
+    const derivedSelected = followPole(
       memory,
       verifiedBasis,
       whole,
-      exact.values,
+      direction,
     );
     if (derivedSelected !== state.current) {
       throw new RelativePoleContextError("selected-mismatch");
@@ -183,15 +165,11 @@ export function readRelativePoleContext(
       context,
       frame: evidence.current,
       whole,
-      path,
-      steps: exact.values,
+      direction,
       selected: state.current,
     });
   } catch (error) {
     if (error instanceof RelativePoleContextError) throw error;
-    if (error instanceof ExactSequenceError) {
-      throw new RelativePoleContextError("invalid-path");
-    }
     if (error instanceof StateError || error instanceof MemoryError) {
       throw new RelativePoleContextError("invalid-context");
     }
@@ -202,9 +180,9 @@ export function readRelativePoleContext(
 /**
  * Read-only contextual return.
  *
- * This is intentionally not end(selected). It verifies that the supplied Link
- * is exactly the pole selected by K_pos and returns the selected Whole stored
- * by that structural position.
+ * This is intentionally not the opposite pole of Selected. It verifies that
+ * the supplied Link is exactly the result stored by K_pos and returns the Whole
+ * recorded by that one-step position.
  */
 export function replayRelativePoleReturn(
   memory: ReadMemory,
