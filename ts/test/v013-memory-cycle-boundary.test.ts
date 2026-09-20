@@ -3,6 +3,8 @@ import {
   MemoryError,
   ensureRootBasis,
   type LinkHandle,
+  type LinkPoles,
+  type ReadMemory,
 } from "../src/memory.js";
 import {
   materializeV013HierarchicalCarrierFromSemanticLink,
@@ -163,6 +165,47 @@ for (const semantic of semanticSnapshot) {
   );
 }
 
+// The abstract read boundary itself does not encode this constructive
+// restriction. A synthetic ReadMemory can expose a mutual-cycle topology.
+// This does not make the cycle grounded or materializable; it proves only that
+// "not constructible by Memory" is narrower than "not describable as poles".
+{
+  class SyntheticReadMemory implements ReadMemory {
+    constructor(
+      readonly root: LinkHandle,
+      private readonly cells: ReadonlyMap<LinkHandle, LinkPoles>,
+    ) {}
+
+    get linkCount(): number { return this.cells.size; }
+
+    poles(link: LinkHandle): LinkPoles {
+      const value = this.cells.get(link);
+      if (value === undefined) throw new MemoryError("synthetic unknown Link");
+      return value;
+    }
+
+    find(): LinkHandle | undefined { return undefined; }
+    outgoing(): readonly LinkHandle[] { return []; }
+    incoming(): readonly LinkHandle[] { return []; }
+  }
+
+  const handle = (): LinkHandle => Object.freeze({}) as LinkHandle;
+  const syntheticRoot = handle();
+  const a = handle();
+  const b = handle();
+  const synthetic = new SyntheticReadMemory(
+    syntheticRoot,
+    new Map<LinkHandle, LinkPoles>([
+      [syntheticRoot, Object.freeze({ start: syntheticRoot, end: syntheticRoot })],
+      [a, Object.freeze({ start: a, end: b })],
+      [b, Object.freeze({ start: b, end: a })],
+    ]),
+  );
+
+  same(synthetic.poles(a).end, b, "abstract topology may expose A -> B");
+  same(synthetic.poles(b).end, a, "abstract topology may expose B -> A");
+}
+
 // The ordering invariant gives a direct contradiction for a hypothetical
 // distinct two-Link cycle:
 //
@@ -172,5 +215,5 @@ for (const semantic of semanticSnapshot) {
 // The test cannot construct A/B because no public constructor accepts unresolved
 // endpoints. This is a boundary of current Memory, not an ontological theorem.
 console.log(
-  `MTS v0.13 current Memory cycle boundary: ${semanticSnapshot.length} reachable Links are acyclic modulo direct self-incidence; mutual cycles are not constructible: GREEN.`,
+  `MTS v0.13 current Memory cycle boundary: ${semanticSnapshot.length} reachable Links are acyclic modulo direct self-incidence; abstract ReadMemory may describe a mutual cycle but concrete Memory cannot construct one: GREEN.`,
 );
