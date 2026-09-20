@@ -42,11 +42,7 @@ function expectRuleError(
       error instanceof StructuralRuleError,
       `expected StructuralRuleError, got ${String(error)}`,
     );
-    if (error.code !== code) {
-      throw new Error(
-        `v0.13 prefix result Rule: expected ${code}, got ${error.code}`,
-      );
-    }
+    same(error.code, code, "StructuralRule error code");
     return;
   }
   throw new Error(`v0.13 prefix result Rule: expected ${code}`);
@@ -63,148 +59,200 @@ function anchors(memory: Memory, count: number): readonly LinkHandle[] {
   return Object.freeze(result);
 }
 
-const memory = new Memory();
-ensureRootBasis(memory);
-const refs = anchors(memory, 24);
+interface Fixture {
+  readonly memory: Memory;
+  readonly fixedTheory: unknown;
+  readonly sourceUseRole: LinkHandle;
+  readonly startRole: LinkHandle;
+  readonly endRole: LinkHandle;
+  readonly maleUse: LinkHandle;
+  readonly rule: LinkHandle;
+  readonly admission: LinkHandle;
+  readonly interpreter: LinkHandle;
+  readonly roleDictionary: LinkHandle;
+  readonly dictionary: LinkHandle;
+  readonly grammar: LinkHandle;
+  readonly theory: LinkHandle;
+  readonly parent: LinkHandle;
+  readonly a: LinkHandle;
+  readonly b: LinkHandle;
+  readonly c: LinkHandle;
+  readonly S: LinkHandle;
+  readonly T: LinkHandle;
+  evidence(
+    operand: LinkHandle,
+    claimedResult: LinkHandle,
+    boundStart: LinkHandle,
+    boundEnd: LinkHandle,
+  ): StructuralRuleReplayEvidence;
+}
 
-const sourceUseRole = refs[0]!;
-const startRole = refs[1]!;
-const endRole = refs[2]!;
-const dictionary = refs[3]!;
-const grammar = refs[4]!;
-const theory = refs[5]!;
-const maleUse = refs[6]!;
+function fixture(): Fixture {
+  const memory = new Memory();
+  ensureRootBasis(memory);
+  const refs = anchors(memory, 24);
 
-const interpreter = defineStructuralInterpreter(
-  memory,
-  dictionary,
-  grammar,
-  theory,
-);
-const roleDictionary = defineStructuralRoleDictionary(
-  memory,
-  [sourceUseRole, startRole, endRole],
-);
+  const sourceUseRole = refs[0]!;
+  const startRole = refs[1]!;
+  const endRole = refs[2]!;
+  const dictionary = refs[3]!;
+  const grammar = refs[4]!;
+  const theory = refs[5]!;
+  const maleUse = refs[6]!;
 
-// Generic Rule:
-//
-//   Operand = Start -> End
-//   Prefix  = Prefix -> Operand
-//   Transition = Prefix -> Start
-//   Body = SourceUse -> Transition
-//
-// Therefore a claimed result is accepted only if it is exactly the start pole
-// of the same Operand carried by the concrete self-start occurrence.
-const operandTemplate = memory.ensure(startRole, endRole);
-const prefixTemplate = memory.ensureStartSelfClosed(operandTemplate);
-const transitionTemplate = memory.ensure(prefixTemplate, startRole);
-const ruleBody = memory.ensure(sourceUseRole, transitionTemplate);
-const rule = defineStructuralRule(memory, roleDictionary, ruleBody);
-const admission = admitStructuralRule(memory, theory, rule);
-const fixedTheory = exportPortableStructuralTheory(memory, theory);
-
-const parent = defineContext(memory, memory.root, memory.root);
-
-const a = refs[12]!;
-const b = refs[13]!;
-const c = refs[14]!;
-const S = memory.ensure(a, b);
-const T = memory.ensure(a, c);
-assert(S !== T, "fixture requires S != T");
-
-function evidence(
-  operand: LinkHandle,
-  claimedResult: LinkHandle,
-  boundStart: LinkHandle,
-  boundEnd: LinkHandle,
-): StructuralRuleReplayEvidence {
-  const operation = memory.ensureStartSelfClosed(operand);
-  const transition = memory.ensure(operation, claimedResult);
-  const claimedBody = memory.ensure(maleUse, transition);
-
-  // Give every candidate its own explicit after-context so alternative role
-  // bindings do not accumulate as ambient fields on one canonical Act header.
-  const afterContext = defineContext(memory, parent, claimedBody);
-  const act = defineActHeader(
+  const interpreter = defineStructuralInterpreter(
     memory,
-    interpreter,
-    roleDictionary,
-    afterContext,
+    dictionary,
+    grammar,
+    theory,
   );
-  defineActField(memory, act, sourceUseRole, maleUse);
-  defineActField(memory, act, startRole, boundStart);
-  defineActField(memory, act, endRole, boundEnd);
+  const roleDictionary = defineStructuralRoleDictionary(
+    memory,
+    [sourceUseRole, startRole, endRole],
+  );
+
+  // Generic Rule:
+  //
+  //   Operand    = Start -> End
+  //   Prefix     = Prefix -> Operand
+  //   Transition = Prefix -> Start
+  //   Body       = SourceUse -> Transition
+  //
+  // Reusing Start in Operand and Transition is the authority link between
+  // start(Operand) and the claimed semantic result.
+  const operandTemplate = memory.ensure(startRole, endRole);
+  const prefixTemplate = memory.ensureStartSelfClosed(operandTemplate);
+  const transitionTemplate = memory.ensure(prefixTemplate, startRole);
+  const ruleBody = memory.ensure(sourceUseRole, transitionTemplate);
+  const rule = defineStructuralRule(memory, roleDictionary, ruleBody);
+  const admission = admitStructuralRule(memory, theory, rule);
+  const fixedTheory = exportPortableStructuralTheory(memory, theory);
+
+  const parent = defineContext(memory, memory.root, memory.root);
+
+  const a = refs[12]!;
+  const b = refs[13]!;
+  const c = refs[14]!;
+  const S = memory.ensure(a, b);
+  const T = memory.ensure(a, c);
+  assert(S !== T, "fixture requires S != T");
+
+  function evidence(
+    operand: LinkHandle,
+    claimedResult: LinkHandle,
+    boundStart: LinkHandle,
+    boundEnd: LinkHandle,
+  ): StructuralRuleReplayEvidence {
+    const operation = memory.ensureStartSelfClosed(operand);
+    const transition = memory.ensure(operation, claimedResult);
+    const claimedBody = memory.ensure(maleUse, transition);
+    const afterContext = defineContext(memory, parent, claimedBody);
+    const act = defineActHeader(
+      memory,
+      interpreter,
+      roleDictionary,
+      afterContext,
+    );
+    defineActField(memory, act, sourceUseRole, maleUse);
+    defineActField(memory, act, startRole, boundStart);
+    defineActField(memory, act, endRole, boundEnd);
+
+    return Object.freeze({
+      act,
+      rule,
+      ruleAdmission: admission,
+      claimedBody,
+      expectedInterpreter: Object.freeze({ dictionary, grammar, theory }),
+      expectedAfterContext: afterContext,
+    });
+  }
 
   return Object.freeze({
-    act,
+    memory,
+    fixedTheory,
+    sourceUseRole,
+    startRole,
+    endRole,
+    maleUse,
     rule,
-    ruleAdmission: admission,
-    claimedBody,
-    expectedInterpreter: Object.freeze({ dictionary, grammar, theory }),
-    expectedAfterContext: afterContext,
+    admission,
+    interpreter,
+    roleDictionary,
+    dictionary,
+    grammar,
+    theory,
+    parent,
+    a,
+    b,
+    c,
+    S,
+    T,
+    evidence,
   });
 }
 
-// Positive: the Rule itself proves result=a from the same concrete occurrence
-// ♂S = (♂S)->S where S=a->b.
+// Positive: Rule itself proves result=a from the same concrete occurrence
+// ♂S=(♂S)->S where S=a->b.
 {
-  const correct = evidence(S, a, a, b);
-  const before = memory.linkCount;
+  const f = fixture();
+  const correct = f.evidence(f.S, f.a, f.a, f.b);
+  const before = f.memory.linkCount;
   const replay = replayV012StructuralRuleAgainstTheoryAuthority(
-    memory,
+    f.memory,
     correct,
-    fixedTheory,
+    f.fixedTheory,
   );
   same(replay.claimedBody, correct.claimedBody, "correct transition replays");
-  same(memory.linkCount, before, "correct replay is read-only");
+  same(f.memory.linkCount, before, "correct replay is read-only");
 }
 
-// Negative: same exact ♂S occurrence, but claimed result=b. A host callback
-// cannot choose an arbitrary result after the Rule has grounded S=a->b.
+// Same exact ♂S, but claimed result=b. Start is already grounded to a by
+// S=a->b, so the repeated Start role must reject b.
 {
-  const wrongResult = evidence(S, b, a, b);
-  const before = memory.linkCount;
+  const f = fixture();
+  const wrongResult = f.evidence(f.S, f.b, f.a, f.b);
+  const before = f.memory.linkCount;
   expectRuleError(
-    "multiple-role-bindings",
+    "template-mismatch",
     () => replayV012StructuralRuleAgainstTheoryAuthority(
-      memory,
+      f.memory,
       wrongResult,
-      fixedTheory,
+      f.fixedTheory,
     ),
   );
-  same(memory.linkCount, before, "wrong result rejection is read-only");
+  same(f.memory.linkCount, before, "wrong result rejection is read-only");
 }
 
-// Negative: Act binds S poles as a,b, but the concrete occurrence carries
-// T=a->c. Operand substitution is detected recursively inside self-incidence.
+// Act binds Operand poles as a,b, but concrete ♂T carries T=a->c.
 {
-  const wrongOperand = evidence(T, a, a, b);
-  const before = memory.linkCount;
+  const f = fixture();
+  const wrongOperand = f.evidence(f.T, f.a, f.a, f.b);
+  const before = f.memory.linkCount;
   expectRuleError(
     "template-mismatch",
     () => replayV012StructuralRuleAgainstTheoryAuthority(
-      memory,
+      f.memory,
       wrongOperand,
-      fixedTheory,
+      f.fixedTheory,
     ),
   );
-  same(memory.linkCount, before, "wrong operand rejection is read-only");
+  same(f.memory.linkCount, before, "wrong operand rejection is read-only");
 }
 
-// Negative: correct operation/result pair, but claimed start binding is b.
-// Result identity and operand topology must agree on one startRole.
+// Concrete S and result=a are correct, but Act lies that Start=b.
 {
-  const wrongStartBinding = evidence(S, a, b, b);
-  const before = memory.linkCount;
+  const f = fixture();
+  const wrongStartBinding = f.evidence(f.S, f.a, f.b, f.b);
+  const before = f.memory.linkCount;
   expectRuleError(
     "template-mismatch",
     () => replayV012StructuralRuleAgainstTheoryAuthority(
-      memory,
+      f.memory,
       wrongStartBinding,
-      fixedTheory,
+      f.fixedTheory,
     ),
   );
-  same(memory.linkCount, before, "wrong start binding rejection is read-only");
+  same(f.memory.linkCount, before, "wrong start binding rejection is read-only");
 }
 
 console.log("MTS v0.13 prefix result grounded by StructuralRule: GREEN.");
