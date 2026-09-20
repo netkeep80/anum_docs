@@ -32,6 +32,7 @@ import {
   buildV012SelectedSourceEvidence,
   materializeV012SourceContent,
   replayV012SourceResultEvidence,
+  replayV012StructuralRuleAgainstTheoryAuthority,
   type V012SourceAuthority,
   type V012SourceResultEvidence,
 } from "../src/v012-source.js";
@@ -330,6 +331,11 @@ function localOperation(
       local.fixedTheory,
     );
     same(result.operation, operation, "START Rule grounds exact local occurrence");
+    same(
+      result.result,
+      memory.poles(operand).start,
+      "START form result is local start(Operand)",
+    );
     return result.operation;
   }
 
@@ -345,6 +351,11 @@ function localOperation(
       local.fixedTheory,
     );
     same(result.operation, operation, "END Rule grounds exact local occurrence");
+    same(
+      result.result,
+      memory.poles(operand).end,
+      "END form result is local end(Operand)",
+    );
     return result.operation;
   }
 
@@ -367,6 +378,86 @@ function localOperation(
     `${kind} Rule grounds exact local orientation`,
   );
   return operation;
+}
+
+function groundOrientationResult(
+  memory: Memory,
+  local: LocalAuthority,
+  kind: "direct" | "inverse",
+  operation: LinkHandle,
+  operand: LinkHandle,
+): LinkHandle {
+  const operandPoles = memory.poles(operand);
+
+  // Result authority is structural and local. These roles deliberately live in
+  // a separate Rule dictionary from the source->form Rule: source transport has
+  // already grounded the exact operation, and this Rule proves what that form
+  // resolves to.
+  const roleSeed = memory.ensure(local.contextSeed, local.basis.U);
+  let roleTag = memory.ensure(local.basis.U, local.contextSeed);
+  roleTag = memory.ensureStartSelfClosed(roleTag);
+  const sourceUseRole = memory.ensure(roleSeed, roleTag);
+  roleTag = memory.ensureStartSelfClosed(roleTag);
+  const startRole = memory.ensure(roleSeed, roleTag);
+  roleTag = memory.ensureStartSelfClosed(roleTag);
+  const endRole = memory.ensure(roleSeed, roleTag);
+  const roleDictionary = defineStructuralRoleDictionary(
+    memory,
+    [sourceUseRole, startRole, endRole],
+  );
+
+  const operandTemplate = memory.ensure(startRole, endRole);
+  const startFormTemplate = memory.ensureStartSelfClosed(operandTemplate);
+  const endFormTemplate = memory.ensureEndSelfClosed(operandTemplate);
+
+  const formTemplate = kind === "direct"
+    ? memory.ensure(startFormTemplate, endFormTemplate)
+    : memory.ensure(endFormTemplate, startFormTemplate);
+  const resultTemplate = kind === "direct"
+    ? operandTemplate
+    : memory.ensure(endRole, startRole);
+
+  const transitionTemplate = memory.ensure(formTemplate, resultTemplate);
+  const body = memory.ensure(sourceUseRole, transitionTemplate);
+  const rule = defineStructuralRule(memory, roleDictionary, body);
+  const admission = admitStructuralRule(memory, local.theory, rule);
+  const fixedTheory = exportPortableStructuralTheory(memory, local.theory);
+
+  const result = kind === "direct"
+    ? operand
+    : memory.ensure(operandPoles.end, operandPoles.start);
+
+  const transition = memory.ensure(operation, result);
+  const claimedBody = memory.ensure(local.uses[kind], transition);
+  const afterContext = defineContext(memory, local.basis.R, claimedBody);
+  const act = defineActHeader(
+    memory,
+    local.interpreter.handle,
+    roleDictionary,
+    afterContext,
+  );
+  defineActField(memory, act, sourceUseRole, local.uses[kind]);
+  defineActField(memory, act, startRole, operandPoles.start);
+  defineActField(memory, act, endRole, operandPoles.end);
+
+  const evidence: StructuralRuleReplayEvidence = Object.freeze({
+    act,
+    rule,
+    ruleAdmission: admission,
+    claimedBody,
+    expectedInterpreter: local.interpreter.structure,
+    expectedAfterContext: afterContext,
+  });
+
+  const before = memory.linkCount;
+  const replay = replayV012StructuralRuleAgainstTheoryAuthority(
+    memory,
+    evidence,
+    fixedTheory,
+  );
+  same(replay.claimedBody, claimedBody, `${kind} result Rule replays`);
+  same(memory.linkCount, before, `${kind} result replay is read-only`);
+  return result;
 }
 
 function transportPhysicalSource(
@@ -511,6 +602,53 @@ assert(pA !== authorityA.basis.O && pB !== authorityB.basis.O, "START_FORM(L) is
 assert(qA !== authorityA.basis.C && qB !== authorityB.basis.C, "END_FORM(L) is not C");
 assert(dA !== authorityA.basis.L && dB !== authorityB.basis.L, "DIRECT_FORM(L) is not L");
 assert(iA !== authorityA.basis.U && iB !== authorityB.basis.U, "INVERSE_FORM(L) is not U");
+
+// End-to-end semantic result after physical-source transport and local form
+// reconstruction. No sender handle participates in receiver result authority.
+same(
+  groundOrientationResult(
+    memoryA,
+    authorityA,
+    "direct",
+    dA,
+    authorityA.basis.L,
+  ),
+  authorityA.basis.L,
+  "A DIRECT_FORM(L) resolves to L",
+);
+same(
+  groundOrientationResult(
+    memoryB,
+    authorityB,
+    "direct",
+    dB,
+    authorityB.basis.L,
+  ),
+  authorityB.basis.L,
+  "B DIRECT_FORM(L) resolves to local L",
+);
+same(
+  groundOrientationResult(
+    memoryA,
+    authorityA,
+    "inverse",
+    iA,
+    authorityA.basis.L,
+  ),
+  authorityA.basis.U,
+  "A INVERSE_FORM(L) resolves to -L=U",
+);
+same(
+  groundOrientationResult(
+    memoryB,
+    authorityB,
+    "inverse",
+    iB,
+    authorityB.basis.L,
+  ),
+  authorityB.basis.U,
+  "B INVERSE_FORM(L) resolves to local -L=U",
+);
 
 console.log(
   "MTS v0.13 relative four-form physical-source two-memory transport: GREEN.",
