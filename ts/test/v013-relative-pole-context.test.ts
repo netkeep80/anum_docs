@@ -203,11 +203,14 @@ function fixture(): Fixture {
 }
 
 // A path is structural evidence, not an arbitrary exact sequence.
+// Build the malformed witness in the current two-layer K_position topology so
+// rejection reaches the exact Path check rather than failing earlier on shape.
 {
   const f = fixture();
   const badPath = materializeExactSequence(f.memory, [f.basis.L]);
   const badFrame = f.memory.ensure(f.S, badPath);
-  const badContext = defineContext(f.memory, f.parent, badFrame);
+  const badEvidenceContext = defineContext(f.memory, f.parent, badFrame);
+  const badContext = defineContext(f.memory, badEvidenceContext, f.a);
   reject(
     () => readRelativePoleContext(f.memory, f.basis, badContext),
     "invalid-path",
