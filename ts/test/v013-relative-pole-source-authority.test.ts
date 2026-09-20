@@ -627,6 +627,14 @@ function fixture(): Fixture {
   const f = fixture();
   const base = defineContext(f.memory, f.parent, f.S);
 
+  const wrongPrefixEvidence = f.evidence(
+    "male",
+    base,
+    f.prefixRule,
+    f.prefixAdmission,
+    f.prefix(f.T),
+    f.S,
+  );
   const beforePrefix = f.memory.linkCount;
   expectCode(
     "template-mismatch",
@@ -635,37 +643,39 @@ function fixture(): Fixture {
       f.basis,
       base,
       f.S,
-      f.evidence(
-        "male",
-        base,
-        f.prefixRule,
-        f.prefixAdmission,
-        f.prefix(f.T),
-        f.S,
-      ),
+      wrongPrefixEvidence,
       f.maleAuthority,
       f.fixedTheory,
     ),
   );
   same(f.memory.linkCount, beforePrefix, "Rule rejects substituted prefix operand");
 
+  const correctPrefixEvidence = f.evidence(
+    "male",
+    base,
+    f.prefixRule,
+    f.prefixAdmission,
+    f.prefix(f.S),
+    f.S,
+  );
   const selected = executeAuthorizedRelativePoleSource(
     f.memory,
     f.basis,
     base,
     f.S,
-    f.evidence(
-      "male",
-      base,
-      f.prefixRule,
-      f.prefixAdmission,
-      f.prefix(f.S),
-      f.S,
-    ),
+    correctPrefixEvidence,
     f.maleAuthority,
     f.fixedTheory,
   );
 
+  const wrongPostfixEvidence = f.evidence(
+    "female",
+    selected.afterContext,
+    f.postfixRule,
+    f.postfixAdmission,
+    f.postfix(f.b),
+    f.a,
+  );
   const beforePostfix = f.memory.linkCount;
   expectCode(
     "template-mismatch",
@@ -674,14 +684,7 @@ function fixture(): Fixture {
       f.basis,
       selected.afterContext,
       f.a,
-      f.evidence(
-        "female",
-        selected.afterContext,
-        f.postfixRule,
-        f.postfixAdmission,
-        f.postfix(f.b),
-        f.a,
-      ),
+      wrongPostfixEvidence,
       f.femaleAuthority,
       f.fixedTheory,
     ),
