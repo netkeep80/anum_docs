@@ -167,6 +167,27 @@ export function materializeV013HierarchicalCarrier(
   const verified = requireBasis(memory, basis);
   if (!(bytes instanceof Uint8Array)) return fail("invalid-wire");
 
+  // Validate the physical framing completely before any representation write.
+  // This recursive walk has no semantic authority; it only checks opcode arity.
+  let checked = 0;
+  const check = (): void => {
+    if (checked >= bytes.length) return fail("invalid-wire");
+    const opcode = bytes[checked++]!;
+    if (opcode === ROOT_NODE) return;
+    if (opcode === START_NODE || opcode === END_NODE) {
+      check();
+      return;
+    }
+    if (opcode === PAIR_NODE) {
+      check();
+      check();
+      return;
+    }
+    return fail("invalid-wire");
+  };
+  check();
+  if (checked !== bytes.length) return fail("invalid-wire");
+
   // Representation namespace is itself an ordinary Link.
   const namespace = memory.ensure(verified.L, verified.L);
   let offset = 0;
