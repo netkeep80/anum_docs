@@ -359,15 +359,18 @@ assert(
 {
   const corrupted = Uint8Array.from(wireA);
   corrupted[Math.floor(corrupted.length / 2)] = 0x32; // "2"
+  let rejected = false;
   try {
     parse(corrupted);
   } catch (error) {
     assert(
       error instanceof Error &&
         error.message.includes("non-quaternary physical state"),
-      "invalid fifth physical value is rejected",
+      "invalid fifth physical value has the exact rejection boundary",
     );
+    rejected = true;
   }
+  assert(rejected, "invalid fifth physical value is rejected");
 }
 
 console.log(
