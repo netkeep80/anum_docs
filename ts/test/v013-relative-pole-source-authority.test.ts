@@ -556,4 +556,103 @@ function fixture(): Fixture {
   same(f.memory.linkCount, before, "undefined nested ascent writes nothing");
 }
 
+// Repeated unary prefixes create a chain of one-step Link contexts rather than
+// one context with a multi-step path. Therefore each postfix closes exactly one
+// prefix level without a host stack or a depth counter.
+{
+  const f = fixture();
+  const left = f.memory.ensure(f.a, f.b);
+  const deepS = f.memory.ensure(left, f.c);
+  const base = defineContext(f.memory, f.parent, deepS);
+
+  // First prefix: ♂S -> left.
+  const firstMaleEvidence = f.sourceResult(
+    "male",
+    base,
+    f.prefixRule,
+    f.prefixAdmission,
+    f.prefixOperation,
+  );
+  const firstPrefix = executeAuthorizedRelativePoleSource(
+    f.memory,
+    f.basis,
+    base,
+    deepS,
+    firstMaleEvidence,
+    f.maleAuthority,
+    f.fixedTheory,
+  );
+  same(firstPrefix.result, left, "first ♂ yields ♂S = left");
+  assert(firstPrefix.afterContext !== base, "first ♂ opens one context level");
+
+  // Second prefix: ♂(♂S) -> a, with a new child context whose parent is K1.
+  const secondMaleEvidence = f.sourceResult(
+    "male",
+    firstPrefix.afterContext,
+    f.prefixRule,
+    f.prefixAdmission,
+    f.prefixOperation,
+  );
+  const secondPrefix = executeAuthorizedRelativePoleSource(
+    f.memory,
+    f.basis,
+    firstPrefix.afterContext,
+    left,
+    secondMaleEvidence,
+    f.maleAuthority,
+    f.fixedTheory,
+  );
+  same(secondPrefix.result, f.a, "second ♂ yields ♂♂S = a");
+  assert(
+    secondPrefix.afterContext !== firstPrefix.afterContext,
+    "second ♂ opens a second context level",
+  );
+
+  // First postfix closes only the innermost unary level:
+  // ♂♂S♀ = ♂S.
+  const firstFemaleEvidence = f.sourceResult(
+    "female",
+    secondPrefix.afterContext,
+    f.postfixRule,
+    f.postfixAdmission,
+    f.postfixOperation,
+  );
+  const firstPostfix = executeAuthorizedRelativePoleSource(
+    f.memory,
+    f.basis,
+    secondPrefix.afterContext,
+    f.a,
+    firstFemaleEvidence,
+    f.femaleAuthority,
+    f.fixedTheory,
+  );
+  same(firstPostfix.result, left, "♂♂S♀ returns exactly one level to ♂S");
+  same(
+    firstPostfix.afterContext,
+    firstPrefix.afterContext,
+    "first ♀ returns from K2 to K1",
+  );
+
+  // Second postfix closes the remaining level:
+  // ♂♂S♀♀ = S.
+  const secondFemaleEvidence = f.sourceResult(
+    "female",
+    firstPostfix.afterContext,
+    f.postfixRule,
+    f.postfixAdmission,
+    f.postfixOperation,
+  );
+  const secondPostfix = executeAuthorizedRelativePoleSource(
+    f.memory,
+    f.basis,
+    firstPostfix.afterContext,
+    left,
+    secondFemaleEvidence,
+    f.femaleAuthority,
+    f.fixedTheory,
+  );
+  same(secondPostfix.result, deepS, "♂♂S♀♀ returns to S");
+  same(secondPostfix.afterContext, base, "second ♀ returns from K1 to K0");
+}
+
 console.log("MTS v0.13 pole source/Rule/self-incidence authority: GREEN.");
