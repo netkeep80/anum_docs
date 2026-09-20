@@ -19,29 +19,52 @@ function same<T>(actual: T, expected: T, message: string): void {
 
 interface CarrierGrammar {
   readonly basis: RootBasis;
+  readonly namespace: LinkHandle;
   root(): LinkHandle;
   start(child: LinkHandle): LinkHandle;
   end(child: LinkHandle): LinkHandle;
   pair(left: LinkHandle, right: LinkHandle): LinkHandle;
+  readValues(carrier: LinkHandle): readonly LinkHandle[];
 }
 
 function grammar(memory: Memory): CarrierGrammar {
   const basis = ensureRootBasis(memory);
+
+  // ExactSequence cells are themselves START-self-closed. Raw semantic values
+  // therefore cannot be placed directly into the sequence: e.g. the first
+  // raw value C would make payload R->C=C and the cell would become exactly
+  // START_FORM(C). Quote every carrier item into a representation namespace.
+  const namespace = memory.ensure(basis.L, basis.L);
+  const quote = (value: LinkHandle): LinkHandle =>
+    memory.ensure(namespace, value);
+
+  const readValues = (carrier: LinkHandle): readonly LinkHandle[] =>
+    Object.freeze(readExactSequence(memory, carrier).values.map((quoted) => {
+      const poles = memory.poles(quoted);
+      assert(
+        poles.start === namespace,
+        "carrier item must belong to representation namespace",
+      );
+      return poles.end;
+    }));
+
   return Object.freeze({
     basis,
+    namespace,
     root: () => basis.R,
     start: (child: LinkHandle) => materializeExactSequence(
       memory,
-      [basis.O, child],
+      [quote(basis.O), quote(child)],
     ),
     end: (child: LinkHandle) => materializeExactSequence(
       memory,
-      [basis.C, child],
+      [quote(basis.C), quote(child)],
     ),
     pair: (left: LinkHandle, right: LinkHandle) => materializeExactSequence(
       memory,
-      [basis.L, left, right],
+      [quote(basis.L), quote(left), quote(right)],
     ),
+    readValues,
   });
 }
 
@@ -68,10 +91,10 @@ function findEndForm(
 }
 
 function topValues(
-  memory: Memory,
+  g: CarrierGrammar,
   carrier: LinkHandle,
 ): readonly LinkHandle[] {
-  return readExactSequence(memory, carrier).values;
+  return g.readValues(carrier);
 }
 
 // Flat prefix/postfix spelling collides immediately.
@@ -104,9 +127,9 @@ const carrierS = gA.pair(carrierA, carrierB);
 assert(carrierA !== carrierB, "hierarchical carrier preserves nesting order");
 assert(carrierS !== semanticS, "carrier Whole is distinct from semantic Whole");
 
-const topA = topValues(memoryA, carrierA);
-const topB = topValues(memoryA, carrierB);
-const topS = topValues(memoryA, carrierS);
+const topA = topValues(gA, carrierA);
+const topB = topValues(gA, carrierB);
+const topS = topValues(gA, carrierS);
 
 same(topA.length, 2, "START carrier arity");
 same(topA[0], gA.basis.O, "START carrier tag");
@@ -155,7 +178,7 @@ same(
   "receiver carrier does not materialize END_FORM(O)",
 );
 
-const receiverTop = topValues(memoryB, carrierS_B);
+const receiverTop = topValues(gB, carrierS_B);
 same(receiverTop[0], gB.basis.L, "receiver PAIR tag is local L");
 same(receiverTop[1], carrierA_B, "receiver exact left description");
 same(receiverTop[2], carrierB_B, "receiver exact right description");
@@ -167,12 +190,12 @@ assert(carrierS !== carrierS_B, "top carrier handles remain Memory-local");
 // The carrier is structurally self-describing by poles/ExactSequence; no flat
 // glyph stream is consulted to distinguish the two colliding nested forms.
 same(
-  topValues(memoryB, receiverTop[1]!)[0],
+  topValues(gB, receiverTop[1]!)[0],
   gB.basis.O,
   "receiver reads START nesting from Link carrier",
 );
 same(
-  topValues(memoryB, receiverTop[2]!)[0],
+  topValues(gB, receiverTop[2]!)[0],
   gB.basis.C,
   "receiver reads END nesting from Link carrier",
 );
