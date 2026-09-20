@@ -103,26 +103,26 @@ function defineInterpreter(
   });
 }
 
-interface SignFixture {
+interface Fixture {
   readonly memory: Memory;
   readonly basis: ReturnType<typeof ensureRootBasis>;
   readonly interpreter: InterpreterFixture;
+  readonly roleDictionary: LinkHandle;
   readonly sourceUseRole: LinkHandle;
-  readonly operationVocabulary: LinkHandle;
-  readonly selectStartOperation: LinkHandle;
-  readonly contextualReturnOperation: LinkHandle;
   readonly maleUse: LinkHandle;
   readonly femaleUse: LinkHandle;
-  readonly maleSourceEvidence: ReturnType<typeof buildV012SelectedSourceEvidence>;
-  readonly femaleSourceEvidence: ReturnType<typeof buildV012SelectedSourceEvidence>;
+  readonly prefixOperation: LinkHandle;
+  readonly postfixOperation: LinkHandle;
+  readonly unsupportedOperation: LinkHandle;
   readonly maleAuthority: V012SourceAuthority;
   readonly femaleAuthority: V012SourceAuthority;
-  readonly selectRule: LinkHandle;
-  readonly selectAdmission: LinkHandle;
-  readonly returnRule: LinkHandle;
-  readonly returnAdmission: LinkHandle;
+  readonly maleSourceEvidence: ReturnType<typeof buildV012SelectedSourceEvidence>;
+  readonly femaleSourceEvidence: ReturnType<typeof buildV012SelectedSourceEvidence>;
+  readonly prefixRule: LinkHandle;
+  readonly prefixAdmission: LinkHandle;
+  readonly postfixRule: LinkHandle;
+  readonly postfixAdmission: LinkHandle;
   readonly fixedTheory: unknown;
-  readonly roleDictionary: LinkHandle;
   readonly parent: LinkHandle;
   readonly a: LinkHandle;
   readonly b: LinkHandle;
@@ -138,21 +138,35 @@ interface SignFixture {
   ): V012SourceResultEvidence;
 }
 
-function fixture(): SignFixture {
+function fixture(): Fixture {
   const memory = new Memory();
   const basis = ensureRootBasis(memory);
-  const refs = anchors(memory, 40);
+  const refs = anchors(memory, 36);
 
   const maleUse = refs[0]!;
   const femaleUse = refs[1]!;
   const sourceUseRole = refs[2]!;
   const grammar = refs[3]!;
   const theory = refs[4]!;
-  const selectStartOperation = refs[5]!;
-  const contextualReturnOperation = refs[6]!;
-  const operationVocabulary = memory.ensure(
-    selectStartOperation,
-    contextualReturnOperation,
+
+  // Operation direction is carried by the operation Link itself:
+  // prefix  P = P -> x
+  // postfix Q = x -> Q
+  const prefixOperation = memory.ensureStartSelfClosed(refs[5]!);
+  const postfixOperation = memory.ensureEndSelfClosed(refs[6]!);
+  const unsupportedOperation = memory.ensure(refs[7]!, refs[8]!);
+
+  const prefixPoles = memory.poles(prefixOperation);
+  const postfixPoles = memory.poles(postfixOperation);
+  const unsupportedPoles = memory.poles(unsupportedOperation);
+  same(prefixPoles.start, prefixOperation, "prefix operation is start-self-closed");
+  assert(prefixPoles.end !== prefixOperation, "prefix operation is proper");
+  same(postfixPoles.end, postfixOperation, "postfix operation is end-self-closed");
+  assert(postfixPoles.start !== postfixOperation, "postfix operation is proper");
+  assert(
+    unsupportedPoles.start !== unsupportedOperation &&
+      unsupportedPoles.end !== unsupportedOperation,
+    "unsupported operation is not unary self-incidence",
   );
 
   const maleContent = materializeV012SourceContent(
@@ -187,40 +201,39 @@ function fixture(): SignFixture {
   );
   const dictionary = femaleDictionaryEffect.afterScope;
 
-  const maleFormSequence = materializeExactSequence(memory, [maleUse]);
-  const femaleFormSequence = materializeExactSequence(memory, [femaleUse]);
-  const maleGrammarMembership = memory.ensure(grammar, maleFormSequence);
-  const maleTheoryMembership = memory.ensure(theory, maleFormSequence);
-  const femaleGrammarMembership = memory.ensure(grammar, femaleFormSequence);
-  const femaleTheoryMembership = memory.ensure(theory, femaleFormSequence);
-
+  const maleSequence = materializeExactSequence(memory, [maleUse]);
+  const femaleSequence = materializeExactSequence(memory, [femaleUse]);
   const maleAuthority: V012SourceAuthority = Object.freeze({
     dictionary,
     grammar,
     theory,
-    grammarMembership: maleGrammarMembership,
-    theoryMembership: maleTheoryMembership,
+    grammarMembership: memory.ensure(grammar, maleSequence),
+    theoryMembership: memory.ensure(theory, maleSequence),
   });
   const femaleAuthority: V012SourceAuthority = Object.freeze({
     dictionary,
     grammar,
     theory,
-    grammarMembership: femaleGrammarMembership,
-    theoryMembership: femaleTheoryMembership,
+    grammarMembership: memory.ensure(grammar, femaleSequence),
+    theoryMembership: memory.ensure(theory, femaleSequence),
   });
 
   const interpreter = defineInterpreter(memory, dictionary, grammar, theory);
   const roleDictionary = defineStructuralRoleDictionary(memory, [sourceUseRole]);
 
-  // The Rule body itself is grounded. The declared sourceUseRole is carried by
-  // the Act only so source evidence can be tied to the same exact Use.
-  const selectRuleBody = memory.ensure(maleUse, selectStartOperation);
-  const selectRule = defineStructuralRule(memory, roleDictionary, selectRuleBody);
-  const selectAdmission = admitStructuralRule(memory, theory, selectRule);
+  const prefixRule = defineStructuralRule(
+    memory,
+    roleDictionary,
+    memory.ensure(maleUse, prefixOperation),
+  );
+  const prefixAdmission = admitStructuralRule(memory, theory, prefixRule);
 
-  const returnRuleBody = memory.ensure(femaleUse, contextualReturnOperation);
-  const returnRule = defineStructuralRule(memory, roleDictionary, returnRuleBody);
-  const returnAdmission = admitStructuralRule(memory, theory, returnRule);
+  const postfixRule = defineStructuralRule(
+    memory,
+    roleDictionary,
+    memory.ensure(femaleUse, postfixOperation),
+  );
+  const postfixAdmission = admitStructuralRule(memory, theory, postfixRule);
 
   const fixedTheory = exportPortableStructuralTheory(memory, theory);
 
@@ -268,32 +281,30 @@ function fixture(): SignFixture {
     const sourceEvidence = source === "male"
       ? maleSourceEvidence
       : femaleSourceEvidence;
-
     const act = defineActHeader(
       memory,
       interpreter.handle,
       roleDictionary,
       currentContext,
     );
-    const selectedUseAttachment = defineActField(
+    const attachment = defineActField(
       memory,
       act,
       sourceUseRole,
       selectedUse,
     );
-    const claimedBody = memory.ensure(selectedUse, operation);
     const structural: StructuralRuleReplayEvidence = Object.freeze({
       act,
       rule,
       ruleAdmission: admission,
-      claimedBody,
+      claimedBody: memory.ensure(selectedUse, operation),
       expectedInterpreter: interpreter.structure,
       expectedAfterContext: currentContext,
     });
     return Object.freeze({
       source: sourceEvidence,
       structural,
-      selectedActAttachments: Object.freeze([selectedUseAttachment]),
+      selectedActAttachments: Object.freeze([attachment]),
       sourceUseIndex: 0,
       sourceUseRole,
     });
@@ -303,22 +314,22 @@ function fixture(): SignFixture {
     memory,
     basis,
     interpreter,
+    roleDictionary,
     sourceUseRole,
-    operationVocabulary,
-    selectStartOperation,
-    contextualReturnOperation,
     maleUse,
     femaleUse,
-    maleSourceEvidence,
-    femaleSourceEvidence,
+    prefixOperation,
+    postfixOperation,
+    unsupportedOperation,
     maleAuthority,
     femaleAuthority,
-    selectRule,
-    selectAdmission,
-    returnRule,
-    returnAdmission,
+    maleSourceEvidence,
+    femaleSourceEvidence,
+    prefixRule,
+    prefixAdmission,
+    postfixRule,
+    postfixAdmission,
     fixedTheory,
-    roleDictionary,
     parent,
     a,
     b,
@@ -329,9 +340,8 @@ function fixture(): SignFixture {
   });
 }
 
-// Exact physical "♂" source + fixed Rule + selected K chooses START selection.
-// Exact physical "♀" source + fixed Rule + selected K_pos chooses contextual
-// return. No glyph switch in this witness decides the operation.
+// No operation vocabulary is supplied. The Rule chooses one operation Link;
+// execution derives prefix/postfix only from self-incidence of that Link.
 {
   const f = fixture();
   const base = defineContext(f.memory, f.parent, f.S);
@@ -339,46 +349,44 @@ function fixture(): SignFixture {
   const maleEvidence = f.sourceResult(
     "male",
     base,
-    f.selectRule,
-    f.selectAdmission,
-    f.selectStartOperation,
+    f.prefixRule,
+    f.prefixAdmission,
+    f.prefixOperation,
   );
   const selected = executeAuthorizedRelativePoleSource(
     f.memory,
     f.basis,
     base,
     f.S,
-    f.operationVocabulary,
     maleEvidence,
     f.maleAuthority,
     f.fixedTheory,
   );
-  same(selected.result, f.a, "authorized ♂ selects start(S)");
-  assert(selected.afterContext !== base, "♂ creates a distinct position context");
+  same(selected.operation, f.prefixOperation, "Rule selected exact prefix form");
+  same(selected.result, f.a, "start-self-closed prefix selects start(S)");
 
   const femaleEvidence = f.sourceResult(
     "female",
     selected.afterContext,
-    f.returnRule,
-    f.returnAdmission,
-    f.contextualReturnOperation,
+    f.postfixRule,
+    f.postfixAdmission,
+    f.postfixOperation,
   );
   const returned = executeAuthorizedRelativePoleSource(
     f.memory,
     f.basis,
     selected.afterContext,
     f.a,
-    f.operationVocabulary,
     femaleEvidence,
     f.femaleAuthority,
     f.fixedTheory,
   );
-  same(returned.result, f.S, "authorized ♀ returns selected Whole S");
-  same(returned.afterContext, base, "authorized ♀ returns to exact parent K");
+  same(returned.operation, f.postfixOperation, "Rule selected exact postfix form");
+  same(returned.result, f.S, "end-self-closed postfix returns selected Whole");
+  same(returned.afterContext, base, "postfix returns to exact parent K");
 }
 
-// The Act/Rule is anchored to the exact selected context. Substituting K_T for
-// evidence built against K_S must fail before any contextual return is accepted.
+// Evidence for K_S cannot authorize execution at K_T even if both select a.
 {
   const f = fixture();
   const baseS = defineContext(f.memory, f.parent, f.S);
@@ -392,12 +400,12 @@ function fixture(): SignFixture {
   same(kS.selected, f.a, "K_S selects shared a");
   same(kT.selected, f.a, "K_T selects shared a");
 
-  const evidenceForKS = f.sourceResult(
+  const evidence = f.sourceResult(
     "female",
     kS.context,
-    f.returnRule,
-    f.returnAdmission,
-    f.contextualReturnOperation,
+    f.postfixRule,
+    f.postfixAdmission,
+    f.postfixOperation,
   );
   const before = f.memory.linkCount;
   expectExecutionError(
@@ -407,59 +415,49 @@ function fixture(): SignFixture {
       f.basis,
       kT.context,
       f.a,
-      f.operationVocabulary,
-      evidenceForKS,
+      evidence,
       f.femaleAuthority,
       f.fixedTheory,
     ),
   );
-  same(f.memory.linkCount, before, "context substitution rejection writes nothing");
+  same(f.memory.linkCount, before, "context substitution writes nothing");
 }
 
-// A later Rule may intentionally change the operation for the same physical
-// glyph. The old fixed Theory rejects it; a later exact Theory may authorize it.
-// This proves the action is Rule-grounded rather than hard-coded by glyph.
+// The same physical ♀ may be assigned a proper prefix form by a later Rule.
+// Old Theory rejects it; later exact Theory authorizes it. No glyph switch is
+// allowed to overrule the operation's own self-incidence.
 {
   const f = fixture();
   const base = defineContext(f.memory, f.parent, f.S);
-
-  const alternateRuleBody = f.memory.ensure(
-    f.femaleUse,
-    f.selectStartOperation,
-  );
   const alternateRule = defineStructuralRule(
     f.memory,
     f.roleDictionary,
-    alternateRuleBody,
+    f.memory.ensure(f.femaleUse, f.prefixOperation),
   );
   const alternateAdmission = admitStructuralRule(
     f.memory,
-    f.memory.poles(f.interpreter.handle).end
-      ? f.interpreter.structure.theory
-      : f.interpreter.structure.theory,
+    f.interpreter.structure.theory,
     alternateRule,
   );
-
   const alternateEvidence = f.sourceResult(
     "female",
     base,
     alternateRule,
     alternateAdmission,
-    f.selectStartOperation,
+    f.prefixOperation,
   );
 
-  const beforeOldTheory = f.memory.linkCount;
+  const before = f.memory.linkCount;
   expectTheoryError(() => executeAuthorizedRelativePoleSource(
     f.memory,
     f.basis,
     base,
     f.S,
-    f.operationVocabulary,
     alternateEvidence,
     f.femaleAuthority,
     f.fixedTheory,
   ));
-  same(f.memory.linkCount, beforeOldTheory, "old Theory rejects late Rule without writes");
+  same(f.memory.linkCount, before, "old Theory rejects late Rule without writes");
 
   const laterTheory = exportPortableStructuralTheory(
     f.memory,
@@ -470,30 +468,26 @@ function fixture(): SignFixture {
     f.basis,
     base,
     f.S,
-    f.operationVocabulary,
     alternateEvidence,
     f.femaleAuthority,
     laterTheory,
   );
-  same(changed.result, f.a, "later authorized Rule makes the same ♀ source select START");
+  same(changed.result, f.a, "later Rule makes the same ♀ source prefix-like");
 }
 
-// Valid source+Rule authority is not enough to silently reinterpret unknown
-// operations as own-end or end-self-close.
+// A generic non-self-closed operation is not silently assigned unary semantics.
 {
   const f = fixture();
   const base = defineContext(f.memory, f.parent, f.S);
-  const ownEndOperation = anchors(f.memory, 1)[0]!;
-  const ownEndRuleBody = f.memory.ensure(f.femaleUse, ownEndOperation);
-  const ownEndRule = defineStructuralRule(
+  const rule = defineStructuralRule(
     f.memory,
     f.roleDictionary,
-    ownEndRuleBody,
+    f.memory.ensure(f.femaleUse, f.unsupportedOperation),
   );
-  const ownEndAdmission = admitStructuralRule(
+  const admission = admitStructuralRule(
     f.memory,
     f.interpreter.structure.theory,
-    ownEndRule,
+    rule,
   );
   const authority = exportPortableStructuralTheory(
     f.memory,
@@ -502,30 +496,29 @@ function fixture(): SignFixture {
   const evidence = f.sourceResult(
     "female",
     base,
-    ownEndRule,
-    ownEndAdmission,
-    ownEndOperation,
+    rule,
+    admission,
+    f.unsupportedOperation,
   );
 
   const before = f.memory.linkCount;
   expectExecutionError(
-    "unsupported-operation",
+    "unsupported-operation-form",
     () => executeAuthorizedRelativePoleSource(
       f.memory,
       f.basis,
       base,
       f.S,
-      f.operationVocabulary,
       evidence,
       f.femaleAuthority,
       authority,
     ),
   );
-  same(f.memory.linkCount, before, "unsupported operation rejection writes nothing");
+  same(f.memory.linkCount, before, "unsupported form writes nothing");
 }
 
-// Multi-step ascent semantics are intentionally left unresolved. The current
-// primitive must not silently choose WHOLE_RETURN for START,START.
+// Prefix/postfix orientation is now structural, but one postfix step from a
+// deeper START,START position is still semantically unresolved.
 {
   const f = fixture();
   const left = f.memory.ensure(f.a, f.b);
@@ -543,9 +536,9 @@ function fixture(): SignFixture {
   const evidence = f.sourceResult(
     "female",
     deep.context,
-    f.returnRule,
-    f.returnAdmission,
-    f.contextualReturnOperation,
+    f.postfixRule,
+    f.postfixAdmission,
+    f.postfixOperation,
   );
   const before = f.memory.linkCount;
   expectExecutionError(
@@ -555,7 +548,6 @@ function fixture(): SignFixture {
       f.basis,
       deep.context,
       f.a,
-      f.operationVocabulary,
       evidence,
       f.femaleAuthority,
       f.fixedTheory,
@@ -564,4 +556,4 @@ function fixture(): SignFixture {
   same(f.memory.linkCount, before, "undefined nested ascent writes nothing");
 }
 
-console.log("MTS v0.13 pole source/Rule/context authority experiment: GREEN.");
+console.log("MTS v0.13 pole source/Rule/self-incidence authority: GREEN.");
