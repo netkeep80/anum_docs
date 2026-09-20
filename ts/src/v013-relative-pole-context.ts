@@ -38,11 +38,6 @@ export interface RelativePolePosition extends RelativeUnaryForm {
   readonly selected: LinkHandle;
 }
 
-export interface RelativePoleReturn {
-  readonly parent: LinkHandle;
-  readonly whole: LinkHandle;
-}
-
 /**
  * Read a proper relative unary form directly from its self-incidence.
  *
@@ -168,33 +163,5 @@ export function readRelativePoleContext(
       throw new RelativePoleContextError("invalid-context");
     }
     throw error;
-  }
-}
-
-/**
- * Read-only contextual return.
- *
- * This is intentionally not the opposite pole of Selected. It verifies the
- * exact stored entry form and restores the Whole carried by that form.
- */
-export function replayRelativePoleReturn(
-  memory: ReadMemory,
-  context: LinkHandle,
-  selected: LinkHandle,
-): RelativePoleReturn {
-  const before = memory.linkCount;
-  try {
-    const position = readRelativePoleContext(memory, context);
-    if (position.selected !== selected) {
-      throw new RelativePoleContextError("selected-mismatch");
-    }
-    return Object.freeze({
-      parent: position.parent,
-      whole: position.whole,
-    });
-  } finally {
-    if (memory.linkCount !== before) {
-      throw new RelativePoleContextError("replay-wrote");
-    }
   }
 }
