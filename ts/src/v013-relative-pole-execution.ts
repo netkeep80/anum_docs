@@ -17,7 +17,6 @@ import {
   materializeRelativePoleContext,
   readRelativePoleContext,
   readRelativeUnaryForm,
-  replayRelativePoleReturn,
   RelativePoleContextError,
   type RelativePolePosition,
   type RelativeUnaryForm,
