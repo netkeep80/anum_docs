@@ -9,6 +9,11 @@ import {
   type LinkHandle,
 } from "../src/memory.js";
 import { exportPortableStructuralTheory } from "../src/portable-theory.js";
+import {
+  materializeQuaternaryAnum,
+  resolveQuaternaryAnum,
+  serializeMaterializedQuaternaryAnum,
+} from "../src/quaternary-anum.js";
 import { defineSourceForm } from "../src/source.js";
 import {
   admitStructuralRule,
@@ -1030,6 +1035,80 @@ function fixture(): Fixture {
   assert(invT.inverse !== invS.inverse, "-T remains distinct from -S");
   same(f.memory.poles(invT.inverse).start, f.c, "-T starts at c");
   same(f.memory.poles(invT.inverse).end, f.a, "-T ends at shared a");
+}
+
+// The author's ♂S♀ law is parametric in the already-resolved Whole.
+// For source "01" v0.12 distinguishes the exact rooted carrier A from its
+// one-level resolved semantic result B. The unary law must work for both and
+// therefore must not decide the A/B question by itself.
+{
+  const f = fixture();
+  const anum01 = materializeQuaternaryAnum(f.memory, f.basis, "01");
+  const A = anum01.anumLink;
+  const firstExact = f.memory.ensure(f.basis.R, f.basis.U);
+  const expectedA = f.memory.ensure(firstExact, f.basis.L);
+  same(A, expectedA, "A is exact rooted carrier (R->U)->L");
+  same(
+    serializeMaterializedQuaternaryAnum(f.memory, f.basis, anum01),
+    "01",
+    "A faithfully serializes as 01",
+  );
+
+  const B = f.memory.ensure(f.basis.U, f.basis.L);
+  const beforeResolve = f.memory.linkCount;
+  same(
+    resolveQuaternaryAnum(f.memory, f.basis, anum01),
+    B,
+    "B is one-level resolved result U->L",
+  );
+  same(f.memory.linkCount, beforeResolve, "01 Resolve is read-only");
+  assert(A !== B, "exact carrier A and resolved result B remain distinct");
+
+  function groupRoundTrip(whole: LinkHandle, label: string): void {
+    const base = defineContext(f.memory, f.parent, whole);
+    const selected = executeAuthorizedRelativePoleSource(
+      f.memory,
+      f.basis,
+      base,
+      whole,
+      f.evidence(
+        "male",
+        base,
+        f.prefixRule,
+        f.prefixAdmission,
+        f.prefix(whole),
+        whole,
+      ),
+      f.maleAuthority,
+      f.fixedTheory,
+    );
+    assert(
+      selected.afterContext !== base,
+      `${label}: ♂ opens one relative START context`,
+    );
+
+    const returned = executeAuthorizedRelativePoleSource(
+      f.memory,
+      f.basis,
+      selected.afterContext,
+      selected.result,
+      f.evidence(
+        "female",
+        selected.afterContext,
+        f.postfixRule,
+        f.postfixAdmission,
+        f.postfix(selected.result),
+        selected.result,
+      ),
+      f.femaleAuthority,
+      f.fixedTheory,
+    );
+    same(returned.result, whole, `${label}: ♂S♀ returns the same Whole`);
+    same(returned.afterContext, base, `${label}: ♀ closes the exact START context`);
+  }
+
+  groupRoundTrip(A, "exact carrier A=Anum(01)");
+  groupRoundTrip(B, "resolved value B=U->L");
 }
 
 console.log("MTS v0.13 exact operand-relative unary authority: GREEN.");
