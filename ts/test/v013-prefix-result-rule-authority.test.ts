@@ -42,7 +42,11 @@ function expectRuleError(
       error instanceof StructuralRuleError,
       `expected StructuralRuleError, got ${String(error)}`,
     );
-    same(error.code, code, "StructuralRule error code");
+    if (error.code !== code) {
+      throw new Error(
+        `v0.13 prefix result Rule: expected ${code}, got ${error.code}`,
+      );
+    }
     return;
   }
   throw new Error(`v0.13 prefix result Rule: expected ${code}`);
