@@ -492,18 +492,21 @@ expectAtomicFailure(
   const memory = new ResearchAtomicGraphMemory();
   const basis = ensureRootBasis(memory);
   const bindings = new Map<number, LinkHandle>([
-    [1, basis.C],
+    [1, basis.U],
     [2, basis.R],
     [4, basis.C],
   ]);
   const before = memory.linkCount;
+  let rejected = false;
 
   try {
     memory.importAtomicGraph(description, bindings, 0);
   } catch (error) {
     assert(error instanceof AtomicImportError, "wrong bootstrap binding: stable error");
     same(memory.linkCount, before, "wrong bootstrap binding writes zero Links");
+    rejected = true;
   }
+  assert(rejected, "wrong bootstrap binding is rejected");
 }
 
 console.log(
