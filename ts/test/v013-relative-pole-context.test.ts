@@ -6,7 +6,7 @@ import {
   type ReadMemory,
   type RootBasis,
 } from "../src/memory.js";
-import { defineContext } from "../src/state.js";
+import { defineContext, readContext } from "../src/state.js";
 import {
   RelativePoleContextError,
   materializeRelativePoleContext,
@@ -120,8 +120,8 @@ function endForm(memory: Memory, whole: LinkHandle): LinkHandle {
 
   const before = f.memory.linkCount;
   const probe = new PoleOnlyReplay(f.memory);
-  const backS = replayRelativePoleReturn(probe, fromS.context, f.a);
-  const backT = replayRelativePoleReturn(probe, fromT.context, f.a);
+  const backS = readRelativePoleContext(probe, fromS.context);
+  const backT = readRelativePoleContext(probe, fromT.context);
 
   same(backS.whole, f.S, "K_S returns exactly S");
   same(backT.whole, f.T, "K_T returns exactly T");
@@ -131,8 +131,10 @@ function endForm(memory: Memory, whole: LinkHandle): LinkHandle {
 
   assert(backT.whole !== f.S, "substituted K_T must not justify S");
 
+  const state = readContext(f.memory, fromS.context);
+  const wrongContext = defineContext(f.memory, state.parent, f.b);
   reject(
-    () => replayRelativePoleReturn(probe, fromS.context, f.b),
+    () => readRelativePoleContext(probe, wrongContext),
     "selected-mismatch",
   );
 }
@@ -153,12 +155,12 @@ function endForm(memory: Memory, whole: LinkHandle): LinkHandle {
   assert(fromP.context !== fromQ.context, "shared END must preserve distinct origins");
 
   same(
-    replayRelativePoleReturn(f.memory, fromP.context, f.d).whole,
+    readRelativePoleContext(f.memory, fromP.context).whole,
     f.P,
     "END context returns P",
   );
   same(
-    replayRelativePoleReturn(f.memory, fromQ.context, f.d).whole,
+    readRelativePoleContext(f.memory, fromQ.context).whole,
     f.Q,
     "END context returns Q",
   );
@@ -182,12 +184,12 @@ function endForm(memory: Memory, whole: LinkHandle): LinkHandle {
   assert(startR.context !== endR.context, "ROOT START/END positions must remain distinguishable");
 
   same(
-    replayRelativePoleReturn(f.memory, startR.context, f.basis.R).whole,
+    readRelativePoleContext(f.memory, startR.context).whole,
     f.basis.R,
     "ROOT START context returns R",
   );
   same(
-    replayRelativePoleReturn(f.memory, endR.context, f.basis.R).whole,
+    readRelativePoleContext(f.memory, endR.context).whole,
     f.basis.R,
     "ROOT END context returns R",
   );
@@ -207,7 +209,7 @@ function endForm(memory: Memory, whole: LinkHandle): LinkHandle {
   same(endO.selected, f.basis.R, "END_FORM(O) resolves to R");
   same(f.memory.poles(startO.selected).end, f.basis.R, "ordinary end(O) is R");
   same(
-    replayRelativePoleReturn(f.memory, startO.context, f.basis.O).whole,
+    readRelativePoleContext(f.memory, startO.context).whole,
     f.basis.O,
     "contextual return from START_FORM(O) restores O",
   );
@@ -243,12 +245,12 @@ function endForm(memory: Memory, whole: LinkHandle): LinkHandle {
   same(leftPos.selected, left.a, "Memory A selects its own a");
   same(rightPos.selected, right.a, "Memory B selects its own a");
   same(
-    replayRelativePoleReturn(left.memory, leftPos.context, left.a).whole,
+    readRelativePoleContext(left.memory, leftPos.context).whole,
     left.S,
     "Memory A contextual return",
   );
   same(
-    replayRelativePoleReturn(right.memory, rightPos.context, right.a).whole,
+    readRelativePoleContext(right.memory, rightPos.context).whole,
     right.S,
     "Memory B contextual return",
   );
