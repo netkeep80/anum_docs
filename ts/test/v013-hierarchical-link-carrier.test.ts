@@ -30,15 +30,15 @@ function grammar(memory: Memory): CarrierGrammar {
   return Object.freeze({
     basis,
     root: () => basis.R,
-    start: (child) => materializeExactSequence(
+    start: (child: LinkHandle) => materializeExactSequence(
       memory,
       [basis.O, child],
     ),
-    end: (child) => materializeExactSequence(
+    end: (child: LinkHandle) => materializeExactSequence(
       memory,
       [basis.C, child],
     ),
-    pair: (left, right) => materializeExactSequence(
+    pair: (left: LinkHandle, right: LinkHandle) => materializeExactSequence(
       memory,
       [basis.L, left, right],
     ),
