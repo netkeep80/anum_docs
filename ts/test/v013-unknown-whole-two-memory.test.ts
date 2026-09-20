@@ -565,7 +565,9 @@ interface Decoded {
   readonly next: number;
 }
 
-function semanticDecode(offset: number): Decoded {
+type DecodePhase = "initial" | "repeat";
+
+function semanticDecode(offset: number, phase: DecodePhase): Decoded {
   assert(offset < received.length, "semantic traversal stays inside wire");
   const opcode = received[offset]!;
 
@@ -574,7 +576,7 @@ function semanticDecode(offset: number): Decoded {
   }
 
   if (opcode === OPCODE.start || opcode === OPCODE.end) {
-    const child = semanticDecode(offset + 1);
+    const child = semanticDecode(offset + 1, phase);
     const kind = opcode === OPCODE.start ? "start" as const : "end" as const;
 
     // Use a non-root parent so Context(parent,current) cannot collapse its
@@ -592,19 +594,29 @@ function semanticDecode(offset: number): Decoded {
       child.result,
     );
 
-    if (kind === "start" && child.result === basisB.C) {
-      same(
-        findStartForm(memoryB, basisB.C),
-        undefined,
-        "START_FORM(C) absent immediately before authorized write",
-      );
-    }
-    if (kind === "end" && child.result === basisB.O) {
-      same(
-        findEndForm(memoryB, basisB.O),
-        undefined,
-        "END_FORM(O) absent immediately before authorized write",
-      );
+    const trackedExisting = kind === "start" && child.result === basisB.C
+      ? findStartForm(memoryB, basisB.C)
+      : kind === "end" && child.result === basisB.O
+        ? findEndForm(memoryB, basisB.O)
+        : undefined;
+    const tracked = (
+      (kind === "start" && child.result === basisB.C) ||
+      (kind === "end" && child.result === basisB.O)
+    );
+
+    if (tracked) {
+      if (phase === "initial") {
+        same(
+          trackedExisting,
+          undefined,
+          `${kind} tracked target absent immediately before authorized write`,
+        );
+      } else {
+        assert(
+          trackedExisting !== undefined,
+          `${kind} tracked target exists before repeated authorization`,
+        );
+      }
     }
 
     const before = memoryB.linkCount;
@@ -617,29 +629,43 @@ function semanticDecode(offset: number): Decoded {
       authorityB.fixedTheory,
     );
 
-    if (
-      (kind === "start" && child.result === basisB.C) ||
-      (kind === "end" && child.result === basisB.O)
-    ) {
+    if (tracked) {
       same(
         memoryB.linkCount,
-        before + 1,
-        `${kind} unknown nested form writes exactly one semantic Link`,
+        phase === "initial" ? before + 1 : before,
+        phase === "initial"
+          ? `${kind} unknown nested form writes exactly one semantic Link`
+          : `${kind} repeated authorization writes zero semantic Links`,
       );
+      if (phase === "repeat") {
+        same(
+          result,
+          trackedExisting!,
+          `${kind} repeated authorization returns same local target`,
+        );
+      }
     }
 
     return Object.freeze({ result, next: child.next });
   }
 
   if (opcode === OPCODE.pair) {
-    const left = semanticDecode(offset + 1);
-    const right = semanticDecode(left.next);
+    const left = semanticDecode(offset + 1, phase);
+    const right = semanticDecode(left.next, phase);
 
-    same(
-      memoryB.find(left.result, right.result),
-      undefined,
-      "final unknown binary Whole absent before pair evidence",
-    );
+    const existingPair = memoryB.find(left.result, right.result);
+    if (phase === "initial") {
+      same(
+        existingPair,
+        undefined,
+        "final unknown binary Whole absent before pair evidence",
+      );
+    } else {
+      assert(
+        existingPair !== undefined,
+        "final binary Whole exists before repeated pair authorization",
+      );
+    }
     const evidence = pairEvidence(
       authorityB,
       offset,
@@ -648,8 +674,8 @@ function semanticDecode(offset: number): Decoded {
     );
     same(
       memoryB.find(left.result, right.result),
-      undefined,
-      "pair evidence does not smuggle final Whole",
+      existingPair,
+      "pair evidence does not change final Whole presence",
     );
 
     const before = memoryB.linkCount;
@@ -662,9 +688,14 @@ function semanticDecode(offset: number): Decoded {
     );
     same(
       memoryB.linkCount,
-      before + 1,
-      "authorized pair writes exactly one final unknown Whole",
+      phase === "initial" ? before + 1 : before,
+      phase === "initial"
+        ? "authorized pair writes exactly one final unknown Whole"
+        : "repeated pair authorization writes zero semantic Links",
     );
+    if (phase === "repeat") {
+      same(result, existingPair!, "repeated pair returns same local Whole");
+    }
 
     return Object.freeze({ result, next: right.next });
   }
@@ -672,7 +703,7 @@ function semanticDecode(offset: number): Decoded {
   throw new Error("v0.13 unknown Whole: unexpected validated opcode");
 }
 
-const decoded = semanticDecode(0);
+const decoded = semanticDecode(0, "initial");
 same(decoded.next, received.length, "semantic traversal consumes exact wire");
 const semanticWholeB = decoded.result;
 
@@ -698,6 +729,15 @@ assert(
   "final semantic Whole handles remain Memory-local",
 );
 
+// Replaying the exact same anum under the same fixed Theory is idempotent.
+const repeated = semanticDecode(0, "repeat");
+same(repeated.next, received.length, "repeated semantic traversal consumes exact wire");
+same(
+  repeated.result,
+  semanticWholeB,
+  "same anum plus same fixed Theory returns same local semantic Whole",
+);
+
 // Semantic reconstruction does not alter the transported description.
 sameBytes(
   serializeV013HierarchicalCarrier(memoryB, basisB, wholeCarrierB),
@@ -706,5 +746,5 @@ sameBytes(
 );
 
 console.log(
-  "MTS v0.13 historical quaternary anum transported and reconstructed under source/Rule authority: GREEN.",
+  "MTS v0.13 historical quaternary anum reconstructs canonically and idempotently under fixed Theory: GREEN.",
 );
