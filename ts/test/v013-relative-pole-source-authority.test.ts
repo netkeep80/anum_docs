@@ -912,7 +912,13 @@ function fixture(): Fixture {
 
   function nextBase(whole: LinkHandle): LinkHandle {
     contextMarker = f.memory.ensureStartSelfClosed(contextMarker);
-    const branchParent = defineContext(f.memory, f.parent, contextMarker);
+    // Keep each sibling evidence branch distinct, but make it an ordinary base
+    // context rather than a shape that can be mistaken for K_position.
+    const branchParent = defineContext(
+      f.memory,
+      f.basis.R,
+      contextMarker,
+    );
     return defineContext(f.memory, branchParent, whole);
   }
 
