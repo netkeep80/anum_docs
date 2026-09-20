@@ -414,6 +414,80 @@ same(
 );
 same(memoryB.linkCount, repeatB, "repeated authorization writes zero Links");
 
+// PAIR is a topology class, not merely a binary parser opcode. Existing
+// canonical pairs that resolve to one of their operands are ROOT/START/END
+// forms and must be rejected by PAIR authority.
+for (const [left, right, expectedExisting, label] of [
+  [
+    localB.basis.R,
+    localB.basis.R,
+    localB.basis.R,
+    "188 would collapse to canonical 8/R",
+  ],
+  [
+    localB.basis.O,
+    localB.basis.R,
+    localB.basis.O,
+    "1988 would collapse to canonical 98/O",
+  ],
+  [
+    localB.basis.R,
+    localB.basis.C,
+    localB.basis.C,
+    "1868 would collapse to canonical 68/C",
+  ],
+] as const) {
+  same(memoryB.find(left, right), expectedExisting, `${label}: existing target`);
+  const noncanonicalEvidence = evidence(
+    memoryB,
+    localB,
+    wire.receiverSource,
+    left,
+    right,
+  );
+  const before = memoryB.linkCount;
+  expectMaterializationError(
+    () => materializeAuthorizedBinaryLinkSource(
+      memoryB,
+      localB.basis,
+      noncanonicalEvidence,
+      authority(localB),
+      localB.fixedTheory,
+    ),
+    "noncanonical-binary-form",
+  );
+  same(memoryB.linkCount, before, `${label}: rejection writes zero Links`);
+}
+
+// Equal poles remain a valid ordinary PAIR when the target is a distinct Link.
+{
+  const equalOperand = memoryB.ensureStartSelfClosed(localB.contextSeed);
+  same(
+    memoryB.find(equalOperand, equalOperand),
+    undefined,
+    "ordinary equal-pole PAIR target absent initially",
+  );
+  const equalEvidence = evidence(
+    memoryB,
+    localB,
+    wire.receiverSource,
+    equalOperand,
+    equalOperand,
+  );
+  const before = memoryB.linkCount;
+  const equalPair = materializeAuthorizedBinaryLinkSource(
+    memoryB,
+    localB.basis,
+    equalEvidence,
+    authority(localB),
+    localB.fixedTheory,
+  );
+  same(memoryB.linkCount, before + 1, "ordinary equal-pole PAIR writes one Link");
+  assert(equalPair !== equalOperand, "ordinary equal-pole PAIR target is distinct");
+  same(memoryB.poles(equalPair).start, equalOperand, "equal-pole PAIR exact left");
+  same(memoryB.poles(equalPair).end, equalOperand, "equal-pole PAIR exact right");
+}
+
 // A fixed-Theory Rule may authorize some other structural request, but this
 // constructor boundary accepts only its declared binary request contract.
 {
@@ -451,5 +525,5 @@ same(memoryB.linkCount, repeatB, "repeated authorization writes zero Links");
 }
 
 console.log(
-  "MTS v0.13 missing binary Whole materializes only after source/Rule authority: GREEN.",
+  "MTS v0.13 binary authority preserves canonical PAIR topology and rejects ROOT/START/END collapses: GREEN.",
 );

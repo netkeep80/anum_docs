@@ -16,7 +16,8 @@ import {
 
 export type V013RelativeFormMaterializationErrorCode =
   | "context-evidence-mismatch"
-  | "constructor-request-mismatch";
+  | "constructor-request-mismatch"
+  | "noncanonical-binary-form";
 
 export class V013RelativeFormMaterializationError extends Error {
   override readonly name = "V013RelativeFormMaterializationError";
@@ -141,7 +142,19 @@ export function materializeAuthorizedBinaryLinkSource(
       return fail("constructor-request-mismatch");
     }
 
-    return memory.ensure(leftRequest.end, rightRequest.end);
+    const left = leftRequest.end;
+    const right = rightRequest.end;
+    const existing = memory.find(left, right);
+
+    // PAIR authority may only denote the ordinary binary topology class.
+    // If canonical ordered-pair identity already resolves to an operand, the
+    // target is actually START/END (or ROOT when both operands are R) and must
+    // be reconstructed through that form's own authority instead.
+    if (existing === left || existing === right) {
+      return fail("noncanonical-binary-form");
+    }
+
+    return memory.ensure(left, right);
   } catch (error) {
     if (error instanceof V013RelativeFormMaterializationError) throw error;
     if (error instanceof MemoryError) {
