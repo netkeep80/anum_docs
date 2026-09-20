@@ -41,7 +41,6 @@ export interface V013RelativePoleExecutionResult {
   readonly operation: LinkHandle;
   readonly beforeContext: LinkHandle;
   readonly afterContext: LinkHandle;
-  readonly input: LinkHandle;
   readonly result: LinkHandle;
 }
 
@@ -66,21 +65,13 @@ function requireUnaryOperation(
   }
 }
 
-interface CurrentPosition {
-  readonly current: LinkHandle;
-  readonly position: RelativePolePosition | undefined;
-}
-
 function readCurrentPosition(
   memory: WriteMemory,
   currentContext: LinkHandle,
-): CurrentPosition {
+): readonly [LinkHandle, RelativePolePosition | undefined] {
   try {
     const position = readRelativePoleContext(memory, currentContext);
-    return Object.freeze({
-      current: position.selected,
-      position,
-    });
+    return Object.freeze([position.selected, position]);
   } catch (error) {
     if (
       error instanceof RelativePoleContextError &&
@@ -99,10 +90,7 @@ function readCurrentPosition(
 
   try {
     const state = readContext(memory, currentContext);
-    return Object.freeze({
-      current: state.current,
-      position: undefined,
-    });
+    return Object.freeze([state.current, undefined]);
   } catch (error) {
     if (error instanceof V013RelativePoleExecutionError) throw error;
     if (error instanceof StateError || error instanceof MemoryError) {
@@ -117,18 +105,19 @@ function executePoleForm(
   currentContext: LinkHandle,
   operation: LinkHandle,
   unary: RelativeUnaryForm,
-  current: CurrentPosition,
+  current: LinkHandle,
+  position: RelativePolePosition | undefined,
 ): {
   readonly afterContext: LinkHandle;
   readonly result: LinkHandle;
 } {
   if (
-    current.position !== undefined &&
-    current.position.side !== unary.side
+    position !== undefined &&
+    position.side !== unary.side
   ) {
     return Object.freeze({
-      afterContext: current.position.parent,
-      result: current.position.whole,
+      afterContext: position.parent,
+      result: position.whole,
     });
   }
 
@@ -190,8 +179,8 @@ export function executeAuthorizedRelativePoleSource(
 
   const operation = grounded.end;
   const unary = requireUnaryOperation(memory, operation);
-  const current = readCurrentPosition(memory, currentContext);
-  if (unary.whole !== current.current) {
+  const [current, position] = readCurrentPosition(memory, currentContext);
+  if (unary.whole !== current) {
     return fail("operation-operand-mismatch");
   }
 
@@ -201,6 +190,7 @@ export function executeAuthorizedRelativePoleSource(
     operation,
     unary,
     current,
+    position,
   );
 
   return Object.freeze({
@@ -208,7 +198,6 @@ export function executeAuthorizedRelativePoleSource(
     operation,
     beforeContext: currentContext,
     afterContext: transition.afterContext,
-    input: current.current,
     result: transition.result,
   });
 }
