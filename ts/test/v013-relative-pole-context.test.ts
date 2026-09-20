@@ -11,7 +11,6 @@ import {
   RelativePoleContextError,
   materializeRelativePoleContext,
   readRelativePoleContext,
-  replayRelativePoleReturn,
 } from "../src/v013-relative-pole-context.js";
 
 function assert(condition: unknown, message: string): asserts condition {
