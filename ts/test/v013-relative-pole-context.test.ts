@@ -225,10 +225,10 @@ function fixture(): Fixture {
   assert(left.S !== right.S, "corresponding wholes must have independent handles");
 
   const leftPos = materializeRelativePoleContext(
-    left.memory, left.basis, left.parent, left.S, [left.basis.O],
+    left.memory, left.basis, left.parent, left.S, left.basis.O,
   );
   const rightPos = materializeRelativePoleContext(
-    right.memory, right.basis, right.parent, right.S, [right.basis.O],
+    right.memory, right.basis, right.parent, right.S, right.basis.O,
   );
 
   same(leftPos.selected, left.a, "Memory A selects its own a");
