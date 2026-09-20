@@ -655,4 +655,286 @@ function fixture(): Fixture {
   same(secondPostfix.afterContext, base, "second ♀ returns from K1 to K0");
 }
 
+// A stronger Rule can ground the operand directly inside the proper
+// self-incidence operation occurrence. No prototype operation handle needs to
+// carry an unrelated payload.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  const refs = anchors(memory, 36);
+
+  const maleUse = refs[0]!;
+  const femaleUse = refs[1]!;
+  const sourceUseRole = refs[2]!;
+  const operandRole = refs[3]!;
+  const grammar = refs[4]!;
+  const theory = refs[5]!;
+
+  const maleContent = materializeV012SourceContent(
+    memory,
+    basis,
+    Uint8Array.of(0xe2, 0x99, 0x82),
+  );
+  const femaleContent = materializeV012SourceContent(
+    memory,
+    basis,
+    Uint8Array.of(0xe2, 0x99, 0x80),
+  );
+  const maleSource = defineSourceForm(memory, maleContent);
+  const femaleSource = defineSourceForm(memory, femaleContent);
+
+  const scope0 = defineDictionaryScope(memory, memory.root, memory.root);
+  const maleDictionaryEffect = defineDictionaryEffect(
+    memory,
+    scope0,
+    memory.root,
+    memory.root,
+    maleContent,
+    maleUse,
+  );
+  const femaleDictionaryEffect = defineDictionaryEffect(
+    memory,
+    maleDictionaryEffect.afterScope,
+    memory.root,
+    maleDictionaryEffect.historyAfter,
+    femaleContent,
+    femaleUse,
+  );
+  const dictionary = femaleDictionaryEffect.afterScope;
+
+  const maleSequence = materializeExactSequence(memory, [maleUse]);
+  const femaleSequence = materializeExactSequence(memory, [femaleUse]);
+  const maleAuthority: V012SourceAuthority = Object.freeze({
+    dictionary,
+    grammar,
+    theory,
+    grammarMembership: memory.ensure(grammar, maleSequence),
+    theoryMembership: memory.ensure(theory, maleSequence),
+  });
+  const femaleAuthority: V012SourceAuthority = Object.freeze({
+    dictionary,
+    grammar,
+    theory,
+    grammarMembership: memory.ensure(grammar, femaleSequence),
+    theoryMembership: memory.ensure(theory, femaleSequence),
+  });
+
+  const interpreter = defineInterpreter(memory, dictionary, grammar, theory);
+  const roleDictionary = defineStructuralRoleDictionary(
+    memory,
+    [sourceUseRole, operandRole],
+  );
+
+  // Rule bodies contain the operand role inside the self-incidence topology.
+  const prefixTemplate = memory.ensureStartSelfClosed(operandRole);
+  const prefixRule = defineStructuralRule(
+    memory,
+    roleDictionary,
+    memory.ensure(sourceUseRole, prefixTemplate),
+  );
+  const prefixAdmission = admitStructuralRule(memory, theory, prefixRule);
+
+  const postfixTemplate = memory.ensureEndSelfClosed(operandRole);
+  const postfixRule = defineStructuralRule(
+    memory,
+    roleDictionary,
+    memory.ensure(sourceUseRole, postfixTemplate),
+  );
+  const postfixAdmission = admitStructuralRule(memory, theory, postfixRule);
+
+  const fixedTheory = exportPortableStructuralTheory(memory, theory);
+
+  const maleSourceEvidence = buildV012SelectedSourceEvidence(
+    memory,
+    basis,
+    maleSource,
+    [{
+      start: 0,
+      end: 3,
+      form: maleUse,
+      dictionaryOccurrence: maleDictionaryEffect.occurrence,
+    }],
+    maleAuthority,
+  );
+  const femaleSourceEvidence = buildV012SelectedSourceEvidence(
+    memory,
+    basis,
+    femaleSource,
+    [{
+      start: 0,
+      end: 3,
+      form: femaleUse,
+      dictionaryOccurrence: femaleDictionaryEffect.occurrence,
+    }],
+    femaleAuthority,
+  );
+
+  const parent = defineContext(memory, basis.R, basis.R);
+  const a = refs[20]!;
+  const b = refs[21]!;
+  const c = refs[22]!;
+  const S = memory.ensure(a, b);
+  const T = memory.ensure(a, c);
+  assert(S !== T, "operand-relative fixture requires S != T");
+
+  function evidence(
+    source: "male" | "female",
+    currentContext: LinkHandle,
+    rule: LinkHandle,
+    admission: LinkHandle,
+    operation: LinkHandle,
+    operand: LinkHandle,
+  ): V012SourceResultEvidence {
+    const selectedUse = source === "male" ? maleUse : femaleUse;
+    const sourceEvidence = source === "male"
+      ? maleSourceEvidence
+      : femaleSourceEvidence;
+    const act = defineActHeader(
+      memory,
+      interpreter.handle,
+      roleDictionary,
+      currentContext,
+    );
+    const sourceAttachment = defineActField(
+      memory,
+      act,
+      sourceUseRole,
+      selectedUse,
+    );
+    const operandAttachment = defineActField(
+      memory,
+      act,
+      operandRole,
+      operand,
+    );
+    const structural: StructuralRuleReplayEvidence = Object.freeze({
+      act,
+      rule,
+      ruleAdmission: admission,
+      claimedBody: memory.ensure(selectedUse, operation),
+      expectedInterpreter: interpreter.structure,
+      expectedAfterContext: currentContext,
+    });
+    return Object.freeze({
+      source: sourceEvidence,
+      structural,
+      selectedActAttachments: Object.freeze([
+        sourceAttachment,
+        operandAttachment,
+      ]),
+      sourceUseIndex: 0,
+      sourceUseRole,
+    });
+  }
+
+  const base = defineContext(memory, parent, S);
+
+  // Concrete prefix occurrence has exact author form:
+  //   ♂S = (♂S) -> S.
+  const maleOccurrence = memory.ensureStartSelfClosed(S);
+  const malePoles = memory.poles(maleOccurrence);
+  same(malePoles.start, maleOccurrence, "♂S starts from itself");
+  same(malePoles.end, S, "♂S carries exact operand S");
+
+  const maleEvidence = evidence(
+    "male",
+    base,
+    prefixRule,
+    prefixAdmission,
+    maleOccurrence,
+    S,
+  );
+  const selected = executeAuthorizedRelativePoleSource(
+    memory,
+    basis,
+    base,
+    S,
+    maleEvidence,
+    maleAuthority,
+    fixedTheory,
+  );
+  same(selected.operation, maleOccurrence, "Rule grounds exact ♂S occurrence");
+  same(selected.result, a, "grounded ♂S selects start(S)");
+
+  // The postfix occurrence is relative to the actual current semantic Link a:
+  //   a♀ = a -> (a♀).
+  const femaleOccurrence = memory.ensureEndSelfClosed(a);
+  const femalePoles = memory.poles(femaleOccurrence);
+  same(femalePoles.start, a, "a♀ carries exact previous semantic Link");
+  same(femalePoles.end, femaleOccurrence, "a♀ closes on itself");
+
+  const femaleEvidence = evidence(
+    "female",
+    selected.afterContext,
+    postfixRule,
+    postfixAdmission,
+    femaleOccurrence,
+    a,
+  );
+  const returned = executeAuthorizedRelativePoleSource(
+    memory,
+    basis,
+    selected.afterContext,
+    a,
+    femaleEvidence,
+    femaleAuthority,
+    fixedTheory,
+  );
+  same(returned.operation, femaleOccurrence, "Rule grounds exact a♀ occurrence");
+  same(returned.result, S, "♂S♀ returns S through contextual parent evidence");
+  same(returned.afterContext, base, "♂S♀ restores exact parent context");
+
+  // Parameter loss is rejected. The Act says operand=S, while the claimed
+  // self-start occurrence carries T.
+  const wrongMaleOccurrence = memory.ensureStartSelfClosed(T);
+  const wrongMaleEvidence = evidence(
+    "male",
+    base,
+    prefixRule,
+    prefixAdmission,
+    wrongMaleOccurrence,
+    S,
+  );
+  const beforeWrongMale = memory.linkCount;
+  expectExecutionError(
+    "template-mismatch",
+    () => executeAuthorizedRelativePoleSource(
+      memory,
+      basis,
+      base,
+      S,
+      wrongMaleEvidence,
+      maleAuthority,
+      fixedTheory,
+    ),
+  );
+  same(memory.linkCount, beforeWrongMale, "wrong ♂ operand causes zero writes");
+
+  // Same negative control for postfix: the Act binds operand=a, but the claimed
+  // occurrence carries b.
+  const wrongFemaleOccurrence = memory.ensureEndSelfClosed(b);
+  const wrongFemaleEvidence = evidence(
+    "female",
+    selected.afterContext,
+    postfixRule,
+    postfixAdmission,
+    wrongFemaleOccurrence,
+    a,
+  );
+  const beforeWrongFemale = memory.linkCount;
+  expectExecutionError(
+    "template-mismatch",
+    () => executeAuthorizedRelativePoleSource(
+      memory,
+      basis,
+      selected.afterContext,
+      a,
+      wrongFemaleEvidence,
+      femaleAuthority,
+      fixedTheory,
+    ),
+  );
+  same(memory.linkCount, beforeWrongFemale, "wrong ♀ operand causes zero writes");
+}
+
 console.log("MTS v0.13 pole source/Rule/self-incidence authority: GREEN.");
