@@ -37,7 +37,7 @@ same(projection.executionDependency, false, "MTS execution does not depend on pr
 same(projection.ownerIssue, 1270, "projection is owned by #1270");
 same(
   projection.candidateMain,
-  "2a397a3ee2f8594f78d2d303dd2fb057bdd27ddc",
+  "eaa949f8e3f064ad60c575eeb973502b8e15d9fd",
   "projection binds the exact ready candidate snapshot",
 );
 same(projection.coverage.globalTrustBoundaryComplete, false, "P1 does not overclaim global trust closure");
