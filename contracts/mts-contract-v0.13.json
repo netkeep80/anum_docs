@@ -44,7 +44,8 @@
       "ts/src/v013-hierarchical-carrier.ts",
       "ts/src/v013-relative-form-materialization.ts",
       "ts/src/v013-relative-pole-context.ts",
-      "ts/src/v013-relative-pole-execution.ts"
+      "ts/src/v013-relative-pole-execution.ts",
+      "ts/src/v013-formal-aspect-evaluator.ts"
     ],
     "nonWellFoundedAtomicWriterProductionEnabled": false
   },
@@ -302,7 +303,7 @@
     "AC7": "green",
     "AC8": "green",
     "AC9": "green",
-    "AC10": "pending"
+    "AC10": "green"
   },
   "explicitlyDeferred": {
     "productionNonWellFoundedMutualCycles": true,
@@ -318,7 +319,7 @@
   },
   "candidateState": {
     "researchEvidenceComplete": true,
-    "acceptanceCriteriaComplete": false,
+    "acceptanceCriteriaComplete": true,
     "semanticLawSetFrozenForR7b": true,
     "contractBoundaryEstablished": true,
     "conformanceObligationsDeclared": true,
@@ -329,7 +330,7 @@
     "linkNativeAbitGroundingComplete": true,
     "functionalParityAuditComplete": true,
     "foundationSuperiorityAuditComplete": true,
-    "rootFormalDialectComplete": false
+    "rootFormalDialectComplete": true
   },
   "owners": {
     "memory": "ts/src/memory.ts",
@@ -339,7 +340,8 @@
     "hierarchicalCarrierResearch": "ts/src/v013-hierarchical-carrier.ts",
     "relativePoleContextResearch": "ts/src/v013-relative-pole-context.ts",
     "relativePoleExecutionResearch": "ts/src/v013-relative-pole-execution.ts",
-    "relativeFormMaterializationResearch": "ts/src/v013-relative-form-materialization.ts"
+    "relativeFormMaterializationResearch": "ts/src/v013-relative-form-materialization.ts",
+    "formalAspectEvaluatorResearch": "ts/src/v013-formal-aspect-evaluator.ts"
   },
   "releaseState": {
     "currentAccepted": "mts-contract/v0.12",
