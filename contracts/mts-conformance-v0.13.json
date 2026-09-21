@@ -7,9 +7,9 @@
   "contract": "mts-contract/v0.13",
   "semanticBase": "mts-conformance/v0.12",
   "observableSemanticDelta": true,
-  "acceptanceReady": false,
-  "coverageState": "acceptance-criteria-complete-readiness-pending",
-  "coverageStateMeaning": "AC1-AC10 and L1-L13 have executable evidence for their declared scopes; the declared v0.13 candidate kernel and public consumer boundary are GREEN and mandatory evidence is projected. Accepted-v0.12 semantic/inherited parity and A5 foundation superiority remain complete. Independent readiness audit and explicit author acceptance remain pending.",
+  "acceptanceReady": true,
+  "coverageState": "complete",
+  "coverageStateMeaning": "AC1-AC10 and L1-L13 have executable evidence for their declared scopes; the declared v0.13 candidate kernel and public consumer boundary are GREEN; functional/inherited parity and foundation superiority are complete; the independent readiness audit is GREEN. Explicit author acceptance of the exact ready artifacts remains pending.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -280,7 +280,7 @@
     "conformanceObligations": "declared-r7b",
     "traceability": "green-complete",
     "normativeDocumentation": "green-complete",
-    "readinessAudit": "pending",
+    "readinessAudit": "green-confirmed",
     "authorAcceptance": "pending",
     "linkNativeAbitBasis": "green-complete-a2",
     "comparativeSuperiority": "pending",
@@ -292,7 +292,6 @@
     "candidateKernelImplementation": "green-complete-declared-scope"
   },
   "acceptanceBlockers": [
-    "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
   "previousAcceptedRelease": {
@@ -824,8 +823,17 @@
     "publicFacadeMerge": "d5df98791973711d054cdcf5dc3f9c25c0a8f4ae",
     "acceptedRuntimeRemains": "mts-contract/v0.12",
     "candidateRuntimeSelectable": false,
-    "readinessAuditComplete": false,
+    "readinessAuditComplete": true,
     "explicitAuthorAcceptanceRecorded": false,
     "lifecycleCheck": "ts/test/v013-kernel-public-lifecycle.test.ts"
+  },
+  "readinessAudit": {
+    "issue": 1335,
+    "gate": "ts/test/v013-readiness-audit.test.ts",
+    "status": "green-confirmed",
+    "requiredForAcceptance": true,
+    "acceptedRuntimeRemains": "mts-contract/v0.12",
+    "candidateRuntimeSelectable": false,
+    "explicitAuthorAcceptanceRecorded": false
   }
 }
