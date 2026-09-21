@@ -732,9 +732,10 @@ same(
   "unknown bootstrap primitive status count",
 );
 
-// A9 P1 must remain research-only and cannot silently rewrite the accepted state.
+// A9 remains research-only and cannot rewrite accepted v0.12. The stronger A9
+// criteria explicitly reopen candidate readiness until global trust/minimality closes.
 same(contract.accepted, false, "v0.13 remains unaccepted");
-same(contract.acceptanceReady, true, "existing readiness state is preserved");
+same(contract.acceptanceReady, false, "reopened readiness state is preserved");
 same(contract.implementation.candidateRuntimeSelectable, false, "candidate remains non-selectable");
 same(contract.candidateState.explicitAuthorAcceptanceRecorded, false, "author acceptance remains pending");
 
