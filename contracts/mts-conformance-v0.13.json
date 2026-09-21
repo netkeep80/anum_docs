@@ -306,7 +306,7 @@
     "foundationAcceptanceGate": false
   },
   "functionalParityAudit": {
-    "status": "green-complete-a4",
+    "status": "semantic-delta-green-inherited-foundation-reopened",
     "baseline": {
       "contract": "mts-contract/v0.12",
       "conformance": "mts-conformance/v0.12",
@@ -599,7 +599,9 @@
     ],
     "completedLawCount": 18,
     "reviewRequiredCount": 0,
-    "regressionCount": 0
+    "regressionCount": 0,
+    "semanticDeltaLawParityComplete": true,
+    "inheritedFoundationParityComplete": false
   },
   "foundationSuperiorityAudit": {
     "status": "red-a5b-correcting-cycle-boundary",
@@ -659,5 +661,25 @@
       "prove the minimal normative delta from accepted v0.12 rather than assuming every candidate mechanism is foundational",
       "independently review rooted cyclic graph identity/transport as a future graph-level layer without making tree-carrier limitations ontological"
     ]
+  },
+  "inheritedFoundationParity": {
+    "status": "in-progress-a5b",
+    "baselineDocument": "docs/theory/Система аксиом МТС.md",
+    "requiredScope": "A0-A20 and F2-F6 inherited by semanticBase mts-contract/v0.12",
+    "findings": {
+      "A1": {
+        "classification": "PRESERVED",
+        "note": "finite rooted distinguishing evidence remains required; finite grounding is not equated with acyclic topology"
+      },
+      "A5": {
+        "classification": "INTENTIONAL_FOUNDATION_DELTA_REVIEW_REQUIRED",
+        "note": "accepted [ ] 1 0 / O-C-L-U foundation alphabet is proposed to move to a compatibility layer while R-O-C-L becomes the aspect foundation"
+      },
+      "A18": {
+        "classification": "CORRECTION_IN_PROGRESS",
+        "note": "rooted distinguishable cycles must remain ontologically admissible; old candidate L9 overrejected them"
+      }
+    },
+    "remaining": "complete explicit A0-A20/F2-F6 delta map before restoring functionalParityAuditComplete=true"
   }
 }
