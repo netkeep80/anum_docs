@@ -72,15 +72,14 @@ same(
   "implemented candidate files are no longer classified as research runtime files",
 );
 
-for (const gate of [
-  "ts/test/v013-public-facade.test.ts",
-  "ts/test/v013-kernel-public-lifecycle.test.ts",
-]) {
-  assert(
-    conformance.requiredExecutableGates.includes(gate),
-    `mandatory v0.13 kernel/public gate projected: ${gate}`,
-  );
-}
+assert(
+  conformance.requiredExecutableGates.includes("ts/test/v013-public-facade.test.ts"),
+  "mandatory v0.13 public facade kernel gate is projected",
+);
+assert(
+  !conformance.requiredExecutableGates.includes("ts/test/v013-kernel-public-lifecycle.test.ts"),
+  "lifecycle-only consistency test is not misclassified as kernel evidence",
+);
 same(
   (conformance.plannedExecutableGates ?? []).length,
   0,
