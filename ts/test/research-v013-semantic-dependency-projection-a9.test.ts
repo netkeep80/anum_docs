@@ -28,7 +28,7 @@ const projectionPath = "traceability/mts-v0.13-semantic-dependency-projection.js
 const projection = readJson(projectionPath);
 const contract = readJson("contracts/mts-contract-v0.13.json");
 
-same(projection.schema, "mts-semantic-dependency-projection/v0.1", "projection schema");
+same(projection.schema, "mts-semantic-dependency-projection/v0.2", "projection schema");
 same(projection.mtsVersion, "0.13", "projection MTS version");
 same(projection.status, "research", "projection remains research evidence");
 same(projection.externalAuditProjectionOnly, true, "projection is external audit tooling");
@@ -38,7 +38,7 @@ same(projection.executionDependency, false, "MTS execution does not depend on pr
 same(projection.ownerIssue, 1270, "projection is owned by #1270");
 same(
   projection.candidateMain,
-  "eaa949f8e3f064ad60c575eeb973502b8e15d9fd",
+  "103264b0cea9a41e985f160c0b4070052a2753bf",
   "projection binds the exact ready candidate snapshot",
 );
 same(projection.coverage.globalTrustBoundaryComplete, false, "P1 does not overclaim global trust closure");
@@ -46,6 +46,26 @@ same(
   projection.coverage.candidateKernelDirectDependencyCoverageComplete,
   true,
   "P1 covers direct candidate-kernel dependencies",
+);
+same(
+  projection.coverage.inheritedAcceptedV012AuthorityRuntimeUnfolded,
+  true,
+  "P1b unfolds the inherited source/Dictionary/Theory/StructuralRule authority runtime",
+);
+same(
+  projection.coverage.inheritedAuthorityTransitiveImplementationClosureComplete,
+  false,
+  "P1b does not overclaim transitive closure below exact-Theory/string carrier helpers",
+);
+same(
+  projection.measurement.modelRevision,
+  "A9-P1b-service-unfolding",
+  "measurement model revision",
+);
+same(
+  projection.measurement.metricDeltaComparableToPreviousRevision,
+  false,
+  "P1b count changes are refinement, not runtime growth",
 );
 same(
   projection.metrics.globalUndocumentedSemanticPathCount,
@@ -260,6 +280,55 @@ same(
   "object-specific exact-term host shortcut metric",
 );
 same(objectSpecificWireLiteralCount, 0, "no exact multi-abit object special case exists in candidate kernel");
+
+// P1b replaces the coarse inherited-v0.12 authority aggregate with explicit
+// MTS-native service capabilities. The exact-Theory artifact runtime remains a
+// smaller unresolved bootstrap boundary for the next slice.
+assert(
+  !projection.capabilities.some(
+    (capability: any) => capability.id === "bootstrap.accepted-v012-authority-runtime",
+  ),
+  "coarse accepted-v0.12 authority aggregate is removed",
+);
+
+for (const id of [
+  "bootstrap.exact-theory-artifact-runtime",
+  "derived.dictionary-visibility",
+  "derived.structural-act",
+  "derived.structural-template-matching",
+  "derived.structural-rule-replay",
+  "derived.source-selection-replay",
+  "derived.exact-theory-admission-authority",
+  "representation.v012-string-anum",
+] as const) {
+  assert(capabilities.has(id), `P1b capability exists: ${id}`);
+}
+
+setEqual(
+  projection.auditScope.inheritedAuthorityServiceFiles,
+  [
+    "ts/src/dictionary.ts",
+    "ts/src/portable-theory.ts",
+    "ts/src/source.ts",
+    "ts/src/state.ts",
+    "ts/src/structural-readers.ts",
+    "ts/src/structural-rule.ts",
+    "ts/src/v012-source.ts",
+    "ts/src/v012-string-anum.ts",
+  ],
+  "P1b inherited authority service file inventory",
+);
+
+same(
+  projection.metrics.coarseInheritedAuthorityAggregateCount,
+  0,
+  "coarse inherited authority aggregate count",
+);
+same(
+  projection.metrics.unresolvedNestedBootstrapBoundaryCount,
+  1,
+  "only exact-Theory artifact runtime remains as an explicit nested unresolved bootstrap boundary",
+);
 
 // Recompute all published P1 metrics from stable capability IDs.
 const byLayer = (layer: string): any[] =>

@@ -1,9 +1,9 @@
 {
-  "schema": "mts-semantic-dependency-projection/v0.1",
+  "schema": "mts-semantic-dependency-projection/v0.2",
   "mtsVersion": "0.13",
   "status": "research",
   "ownerIssue": 1270,
-  "candidateMain": "eaa949f8e3f064ad60c575eeb973502b8e15d9fd",
+  "candidateMain": "103264b0cea9a41e985f160c0b4070052a2753bf",
   "externalAuditProjectionOnly": true,
   "normativeFoundation": false,
   "semanticAuthority": false,
@@ -11,8 +11,9 @@
   "architecturalBoundary": "This artifact is an external observability/verification projection over runtime dependencies. MTS semantics must not depend on it; graph theory is not part of the MTS foundation.",
   "coverage": {
     "candidateKernelDirectDependencyCoverageComplete": true,
-    "inheritedAcceptedV012AuthorityRuntimeUnfolded": false,
-    "globalTrustBoundaryComplete": false
+    "inheritedAcceptedV012AuthorityRuntimeUnfolded": true,
+    "globalTrustBoundaryComplete": false,
+    "inheritedAuthorityTransitiveImplementationClosureComplete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -70,7 +71,17 @@
       "regex": "^[8961]{2,}$",
       "scope": "candidateKernelFiles",
       "note": "Counts concrete multi-abit wire strings only when they directly participate in a binary control-flow expression or switch case. Structural data labels such as self-incidence 00/01/10/11 are not semantic shortcuts by themselves."
-    }
+    },
+    "inheritedAuthorityServiceFiles": [
+      "ts/src/dictionary.ts",
+      "ts/src/portable-theory.ts",
+      "ts/src/source.ts",
+      "ts/src/state.ts",
+      "ts/src/structural-readers.ts",
+      "ts/src/structural-rule.ts",
+      "ts/src/v012-source.ts",
+      "ts/src/v012-string-anum.ts"
+    ]
   },
   "publicSemanticEntrypoints": [
     {
@@ -238,20 +249,6 @@
       "reason": "WriteMemory.ensureEndSelfClosed realizes proper END self-incidence."
     },
     {
-      "id": "bootstrap.accepted-v012-authority-runtime",
-      "layer": "semantic-bootstrap",
-      "execution": "mixed",
-      "linkExpressed": true,
-      "hostLinkDuplication": true,
-      "primitiveStatus": "UNKNOWN",
-      "dependsOn": [
-        "ontology.link",
-        "bootstrap.link-identity",
-        "bootstrap.pole-read"
-      ],
-      "reason": "Temporary aggregate boundary for inherited accepted source/Dictionary/Grammar/Theory/StructuralRule replay. P1 deliberately does not yet unfold this runtime."
-    },
-    {
       "id": "resource.link-count",
       "layer": "resource-control",
       "execution": "host",
@@ -309,9 +306,13 @@
       "linkExpressed": true,
       "hostLinkDuplication": true,
       "dependsOn": [
-        "bootstrap.accepted-v012-authority-runtime"
+        "derived.source-selection-replay",
+        "derived.structural-rule-replay",
+        "derived.exact-theory-admission-authority",
+        "bootstrap.link-identity",
+        "resource.link-count"
       ],
-      "reason": "Exact source/Dictionary/Grammar/fixed-Theory/StructuralRule authority is Link-evidenced but replay is currently implemented by the inherited host runtime."
+      "reason": "Cross-evidence source->Rule result verification composes explicit source selection, StructuralRule replay and independently fixed Theory admission authority; cross-evidence invariants are still host execution."
     },
     {
       "id": "derived.hierarchical-carrier",
@@ -407,6 +408,128 @@
         "bootstrap.ensure-end-selfclosed"
       ],
       "reason": "Aspect meaning is Rule/Theory/Link-grounded; prefix-plan/canonicality/materialization control remains host execution."
+    },
+    {
+      "id": "bootstrap.outgoing-query",
+      "layer": "semantic-bootstrap",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "primitiveStatus": "UNKNOWN",
+      "dependsOn": [
+        "ontology.link",
+        "bootstrap.link-identity"
+      ],
+      "reason": "ReadMemory.outgoing enumerates issued Links with a selected start pole; inherited Act/Theory evidence readers rely on it. Independence versus implementation-only indexing is not yet tested."
+    },
+    {
+      "id": "bootstrap.exact-theory-artifact-runtime",
+      "layer": "semantic-bootstrap",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "primitiveStatus": "UNKNOWN",
+      "dependsOn": [
+        "ontology.link",
+        "bootstrap.link-identity",
+        "bootstrap.root-anchor",
+        "bootstrap.pole-read",
+        "bootstrap.outgoing-query"
+      ],
+      "reason": "Narrow unresolved boundary for canonical export/replay/fingerprinting of an independently fixed exact Theory artifact. Canonical-topology/persistence internals are intentionally left for the next A9 slice."
+    },
+    {
+      "id": "representation.v012-string-anum",
+      "layer": "representation",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": false,
+      "dependsOn": [
+        "derived.root-basis-verification",
+        "bootstrap.pole-read"
+      ],
+      "reason": "Accepted v0.12 STRING/anum reads exact bytes from Link-native carrier. Its lower quaternary/byte representation helpers are not semantic authority and are not unfolded in P1b."
+    },
+    {
+      "id": "derived.dictionary-visibility",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "bootstrap.root-anchor",
+        "bootstrap.pole-read"
+      ],
+      "reason": "Dictionary scope/history/occurrence are Links; current visibility/history traversal and conflict checks are host execution."
+    },
+    {
+      "id": "derived.structural-act",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "bootstrap.pole-read",
+        "bootstrap.outgoing-query",
+        "bootstrap.ensure-pair",
+        "bootstrap.ensure-start-selfclosed"
+      ],
+      "reason": "Act header/field attachments are Links; current attachment enumeration/cardinality reading is host execution."
+    },
+    {
+      "id": "derived.structural-template-matching",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "bootstrap.link-identity",
+        "bootstrap.pole-read"
+      ],
+      "reason": "Role dictionary and template are Links; recursive role containment, replacement matching and visited-pair control are host algorithms."
+    },
+    {
+      "id": "derived.structural-rule-replay",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "derived.exact-sequence",
+        "derived.structural-act",
+        "derived.structural-template-matching",
+        "bootstrap.pole-read",
+        "bootstrap.outgoing-query",
+        "resource.link-count"
+      ],
+      "reason": "Interpreter/DR/Rule/admission identities are Link-defined; replay sequencing and exact binding/cardinality checks are host execution."
+    },
+    {
+      "id": "derived.source-selection-replay",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "representation.v012-string-anum",
+        "derived.exact-sequence",
+        "derived.dictionary-visibility",
+        "bootstrap.pole-read",
+        "resource.link-count"
+      ],
+      "reason": "Source slices, lexemes, Dictionary occurrences, Grammar/Theory membership and selected form sequences are Links; partition and structural replay checks are host execution."
+    },
+    {
+      "id": "derived.exact-theory-admission-authority",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "bootstrap.exact-theory-artifact-runtime",
+        "bootstrap.outgoing-query"
+      ],
+      "reason": "The selected Theory/admission are Links; current independent exact-artifact identity/fingerprint verification is host execution."
     }
   ],
   "implementationBindings": {
@@ -426,26 +549,36 @@
     "./v013-relative-pole-context.js#materializeRelativePoleContext": "derived.relative-pole-context",
     "./v013-relative-pole-context.js#readRelativePoleContext": "derived.relative-pole-context",
     "./v013-relative-pole-context.js#readRelativeUnaryForm": "derived.relative-pole-context",
-    "./v013-hierarchical-carrier.js#decomposeV013SemanticLink": "derived.hierarchical-carrier"
+    "./v013-hierarchical-carrier.js#decomposeV013SemanticLink": "derived.hierarchical-carrier",
+    "memory#outgoing": "bootstrap.outgoing-query",
+    "./dictionary.js#verifyVisibleDictionaryOccurrence": "derived.dictionary-visibility",
+    "./structural-readers.js#readActHeader": "derived.structural-act",
+    "./structural-rule.js#replayStructuralRule": "derived.structural-rule-replay",
+    "./portable-theory.js#verifySelectedTheoryAdmissionAuthority": "derived.exact-theory-admission-authority",
+    "./source.js#replaySelectedSourceEvidenceWithReader": "derived.source-selection-replay",
+    "./v012-string-anum.js#readV012StringAnum": "representation.v012-string-anum",
+    "./v012-string-anum.js#materializeV012StringAnum": "representation.v012-string-anum"
   },
   "metrics": {
     "candidateKernelFileCount": 5,
     "publicSemanticEntrypointCount": 8,
-    "declaredCapabilityCount": 23,
+    "declaredCapabilityCount": 31,
     "ontologyCapabilityCount": 3,
-    "semanticBootstrapCapabilityCount": 8,
-    "derivedSemanticCapabilityCount": 9,
-    "representationCapabilityCount": 2,
+    "semanticBootstrapCapabilityCount": 9,
+    "derivedSemanticCapabilityCount": 15,
+    "representationCapabilityCount": 3,
     "resourceControlCapabilityCount": 1,
-    "hostOrMixedSemanticCapabilityCount": 17,
-    "linkExpressedSemanticCapabilityCount": 17,
+    "hostOrMixedSemanticCapabilityCount": 24,
+    "linkExpressedSemanticCapabilityCount": 24,
     "linkExecutedSemanticCapabilityCount": 0,
-    "hostLinkSemanticDuplicationCount": 17,
+    "hostLinkSemanticDuplicationCount": 24,
     "confirmedIndependentPrimitiveCount": 0,
-    "unknownPrimitiveStatusCount": 8,
+    "unknownPrimitiveStatusCount": 9,
     "directUndocumentedDependencyCount": 0,
     "objectSpecificHostSemanticShortcutCount": 0,
-    "globalUndocumentedSemanticPathCount": null
+    "globalUndocumentedSemanticPathCount": null,
+    "coarseInheritedAuthorityAggregateCount": 0,
+    "unresolvedNestedBootstrapBoundaryCount": 1
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -453,7 +586,10 @@
     "hostLinkSemanticDuplicationCount": "Counts semantic capabilities whose meaning/evidence is expressed through Links while an equally relevant host execution mechanism still implements the operation in this P1 model.",
     "directUndocumentedDependencyCount": "Exact static count only for direct dependencies observed in the five candidate-kernel files.",
     "globalUndocumentedSemanticPathCount": "Unknown until the inherited accepted v0.12 authority runtime and all public semantic paths are unfolded.",
-    "objectSpecificHostSemanticShortcutCount": "Counts exact multi-abit physical-term literals that directly participate in host control flow in the candidate kernel. It intentionally does not count structural self-incidence labels stored as data."
+    "objectSpecificHostSemanticShortcutCount": "Counts exact multi-abit physical-term literals that directly participate in host control flow in the candidate kernel. It intentionally does not count structural self-incidence labels stored as data.",
+    "coarseInheritedAuthorityAggregateCount": "P1b requires the previous accepted-v0.12 authority aggregate to disappear in favor of explicit service-level capabilities.",
+    "unresolvedNestedBootstrapBoundaryCount": "Counts semantic-bootstrap boundaries intentionally left aggregated after P1b; currently only exact-Theory artifact/canonical-topology replay.",
+    "modelRevision": "Capability counts before and after P1b are not runtime deltas because the measurement resolution changed."
   },
   "nextExperiments": [
     "Unfold bootstrap.accepted-v012-authority-runtime into Dictionary, source, Theory, StructuralRule and context dependencies.",
@@ -461,5 +597,31 @@
     "Run per-bootstrap-capability elimination experiments and classify INDEPENDENT/DERIVABLE/EQUIVALENT_REENCODING/IMPLEMENTATION_ONLY/UNKNOWN.",
     "Add an MTS-native self-interpretation witness and report residual host dependencies.",
     "Build a v0.12 -> v0.13 delta using the same stable capability IDs."
-  ]
+  ],
+  "measurement": {
+    "modelRevision": "A9-P1b-service-unfolding",
+    "metricDeltaComparableToPreviousRevision": false,
+    "reason": "P1b splits one coarse inherited authority aggregate into stable service-level capability IDs; count changes measure model resolution, not runtime growth."
+  },
+  "authorityServiceUnfolding": {
+    "replacedCapability": "bootstrap.accepted-v012-authority-runtime",
+    "sourceResultCapability": "derived.source-result-replay",
+    "explicitServiceCapabilities": [
+      "derived.dictionary-visibility",
+      "derived.structural-act",
+      "derived.structural-template-matching",
+      "derived.structural-rule-replay",
+      "derived.source-selection-replay",
+      "derived.exact-theory-admission-authority",
+      "representation.v012-string-anum"
+    ],
+    "newlyExposedBootstrapCapabilities": [
+      "bootstrap.outgoing-query",
+      "bootstrap.exact-theory-artifact-runtime"
+    ],
+    "remainingUnresolvedTransitiveBoundary": [
+      "bootstrap.exact-theory-artifact-runtime"
+    ],
+    "note": "P1b unfolds semantic services used by v0.13 source/Rule authority. It does not yet claim a complete static call closure through canonical-topology/persistence or representation helpers."
+  }
 }
