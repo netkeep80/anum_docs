@@ -221,6 +221,8 @@ async function importProbe(
   await import(`${probe.module}?${encodeURIComponent(suffix)}`);
 }
 
+// Fault injection starts only after the baseline matrix is frozen; fixture setup
+// outside a declared semantic-entrypoint stack is intentionally not denied.
 async function faultInjectOperation(operation: OperationName): Promise<string> {
   recording = false;
   deniedOperation = operation;
