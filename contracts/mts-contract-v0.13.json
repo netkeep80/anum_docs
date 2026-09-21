@@ -1,0 +1,286 @@
+{
+  "schema": "mts-contract/v0.13",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 1270,
+  "candidateLifecycleIssue": 1270,
+  "semanticBase": "mts-contract/v0.12",
+  "observableSemanticDelta": true,
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.12",
+    "conformance": "mts-conformance/v0.12",
+    "immutable": true
+  },
+  "conformanceCorpus": "contracts/mts-conformance-v0.13.json",
+  "acceptedCurrent": {
+    "contract": "mts-contract/v0.12",
+    "conformance": "mts-conformance/v0.12"
+  },
+  "acceptanceReady": false,
+  "currentPointer": {
+    "acceptance": "cutover/typescript-c1-acceptance-v0.5.json",
+    "currentContract": "mts-contract/v0.12",
+    "currentConformance": "mts-conformance/v0.12"
+  },
+  "inheritedFoundation": {
+    "ontology": "Link",
+    "root": "R = ∞ = R ⟼ R",
+    "finiteGroundingRetained": true,
+    "poleIdentityRetained": true,
+    "emptyEntityIntroduced": false,
+    "secondRootIntroduced": false,
+    "senderGlobalLinkIdIntroduced": false
+  },
+  "implementation": {
+    "language": "TypeScript",
+    "package": "@mts/core",
+    "publicFacade": "ts/src/public.ts",
+    "acceptedRuntime": "mts-contract/v0.12",
+    "candidateRuntimeSelectable": false,
+    "implementationComplete": false,
+    "productionBehaviorChanged": false,
+    "candidateKernelBehaviorImplemented": false,
+    "researchRuntimeFiles": [
+      "ts/src/v013-hierarchical-carrier.ts",
+      "ts/src/v013-relative-form-materialization.ts",
+      "ts/src/v013-relative-pole-context.ts",
+      "ts/src/v013-relative-pole-execution.ts"
+    ],
+    "nonWellFoundedAtomicWriterProductionEnabled": false
+  },
+  "bootstrapBasis": {
+    "root": "R",
+    "localBasisLinks": [
+      "R",
+      "O",
+      "C",
+      "L",
+      "U"
+    ],
+    "ordinaryTransportRequiredForBasisLinks": false,
+    "definitions": {
+      "R": "R = R ⟼ R",
+      "O": "O = O ⟼ R",
+      "C": "C = R ⟼ C",
+      "L": "L = O ⟼ C",
+      "U": "U = C ⟼ O"
+    }
+  },
+  "relativeForms": {
+    "forWhole": "S = a ⟼ b",
+    "startForm": "P = P ⟼ S",
+    "endForm": "Q = S ⟼ Q",
+    "directForm": "D = P ⟼ Q",
+    "inverseForm": "I = Q ⟼ P",
+    "execution": {
+      "P": "a",
+      "Q": "b",
+      "D": "S",
+      "I": "-S = b ⟼ a"
+    },
+    "formIdentityEqualsResultIdentity": false
+  },
+  "contextAuthority": {
+    "startOperation": "read start(S) and open START position",
+    "endOperation": "read end(S) and open END position",
+    "sameSideInPosition": "open deeper Link-context",
+    "oppositeSideInPosition": "return one enclosing Link-context",
+    "hostParserStackIsSemanticAuthority": false,
+    "ambientMutableCurrentIsSemanticAuthority": false,
+    "explicitStructuralContextRequired": true
+  },
+  "structuralQuaternaryAlphabet": {
+    "symbols": [
+      "1",
+      "6",
+      "8",
+      "9"
+    ],
+    "meaning": {
+      "1": "PAIR",
+      "6": "END",
+      "8": "ROOT",
+      "9": "START"
+    },
+    "grammar": "Anum ::= 8 | 9 Anum | 6 Anum | 1 Anum Anum",
+    "examples": {
+      "R": "8",
+      "O": "98",
+      "C": "68",
+      "L": "19868",
+      "U": "16898",
+      "startEndRoot": "968",
+      "endStartRoot": "698",
+      "mixedPair": "1968698"
+    },
+    "acceptedV012QAlphabetReplacedRetroactively": false
+  },
+  "canonicalTopologyClass": {
+    "ROOT": "8",
+    "START": "9",
+    "END": "6",
+    "PAIR": "1",
+    "pairRequiresTargetDistinctFromBothOperands": true,
+    "aliasesRejectedAsCanonicalPair": {
+      "188": "8",
+      "1868": "68",
+      "1988": "98"
+    },
+    "ordinaryEqualPolePairAllowedWhenTargetDistinct": true
+  },
+  "representationBoundary": {
+    "descriptionEqualsTarget": false,
+    "layers": [
+      "semantic Link",
+      "structural anum / description",
+      "Link-native representation carrier",
+      "physical wire"
+    ],
+    "representationMayUseQuotedLinkNamespace": true,
+    "representationPresenceImpliesSemanticTargetExists": false,
+    "representationPresenceGrantsMaterializationAuthority": false
+  },
+  "transportIdentity": {
+    "senderLocalLinkHandleIsTransportIdentity": false,
+    "canonicalStructuralDescriptionIsTransportIdentityEvidence": true,
+    "independentMemoriesUseDifferentLocalHandles": true,
+    "bootstrapBasisExemptFromOrdinaryTransport": [
+      "R",
+      "O",
+      "C",
+      "L",
+      "U"
+    ]
+  },
+  "materializationAuthority": {
+    "semanticWriteRequires": [
+      "exact source",
+      "selected Dictionary Use",
+      "Grammar",
+      "fixed Theory",
+      "admitted StructuralRule",
+      "validated construction request"
+    ],
+    "representationParserMayCreateSemanticTarget": false,
+    "readReplayEqualsMaterialization": false,
+    "failedAuthorizationWritesSemanticTargets": 0
+  },
+  "admissibleSemanticLinks": {
+    "finiteRootGroundingRequired": true,
+    "wellFoundedModulo": [
+      "ROOT self-incidence",
+      "direct START self-incidence",
+      "direct END self-incidence"
+    ],
+    "distinctNodeDependencyCyclesAdmissible": false,
+    "distinctNodeCycleFailure": "cyclic-grounding",
+    "arbitraryFiniteCyclicGraphMayExistAsDescriptionData": true
+  },
+  "rootOrigin": {
+    "everyLocalSequenceOrAnumContextStartsAt": "R",
+    "appliesTo": [
+      "ExactSequence",
+      "hierarchical Anum",
+      "every nested local Anum context",
+      "STRING prefixes"
+    ],
+    "unrootedLookalikesAccepted": false
+  },
+  "stringAnum": {
+    "identity": "exact bytes",
+    "unicodeNormalizationDefinesIdentity": false,
+    "storedAsLinks": true,
+    "startsAtRoot": true,
+    "twoMemoryExactByteRoundTripRequired": true,
+    "allocationIndependentV013StructuralDescriptionRequired": true
+  },
+  "formalGrounding": {
+    "physicalGlyphMeaningComesFromHostSwitch": false,
+    "physicalGlyphMeaningComesFromGlyphIdentity": false,
+    "authorityPath": [
+      "exact physical source",
+      "exact STRING source",
+      "Dictionary Use",
+      "Grammar",
+      "fixed Theory",
+      "admitted FORMAL StructuralRule",
+      "ROOT/START/END/PAIR structural class"
+    ],
+    "samePrintedGlyphAcrossRolesImpliesSemanticIdentity": false
+  },
+  "physicalBoundary": {
+    "requiredDistinguishableStates": [
+      "1",
+      "6",
+      "8",
+      "9"
+    ],
+    "otherPhysicalDigitAccepted": false,
+    "optionalNoSignalState": "Z",
+    "optionalNoSignalStateIsFifthSemanticAbit": false,
+    "optionalNoSignalStateRequiredForAcceptance": false
+  },
+  "requiredSemanticLaws": {
+    "L1": "Rooted Link foundation is retained with one ontology entity Link and one root R.",
+    "L2": "Relative form Link identity is distinct from execution result Link identity.",
+    "L3": "Relative pole navigation is authorized by explicit Link-context, never a host parser stack or ambient current.",
+    "L4": "The canonical structural transport alphabet is 8=ROOT, 9=START, 6=END, 1=PAIR with self-delimiting prefix arity.",
+    "L5": "A canonical quaternary digit must match the actual semantic topology class; PAIR aliases that collapse to ROOT/START/END are noncanonical.",
+    "L6": "DESCRIPTION != TARGET across semantic, structural, Link-carrier and physical layers.",
+    "L7": "Two-memory identity is structural; sender-local technical handles never cross as transport identity.",
+    "L8": "Semantic START/END/PAIR writes require explicit source/Dictionary/Grammar/fixed-Theory/StructuralRule authority.",
+    "L9": "Admissible distinguishable semantic Links require finite ROOT-grounding; genuine distinct-node recursive dependency cycles are rejected.",
+    "L10": "Every local exact sequence/anum context originates structurally at R.",
+    "L11": "STRING anums preserve exact byte identity and admit allocation-independent v0.13 structural description.",
+    "L12": "Quaternary structural meaning is grounded by FORMAL authority rather than host opcode or glyph identity.",
+    "L13": "The mandatory digital physical boundary distinguishes exactly 1/6/8/9; optional Z is not a semantic abit."
+  },
+  "acceptanceCriteria": {
+    "AC1": "green",
+    "AC2": "green",
+    "AC3": "green",
+    "AC4": "green",
+    "AC5": "green",
+    "AC6": "green",
+    "AC7": "green",
+    "AC8": "green",
+    "AC9": "green"
+  },
+  "explicitlyDeferred": {
+    "productionNonWellFoundedMutualCycles": true,
+    "productionAtomicCyclicWriter": true,
+    "fifthSemanticSymbolZ": true,
+    "senderGlobalRefOrId": true,
+    "mandatorySurfaceSpellingForRelativeForms": true,
+    "retroactiveMutationOfAcceptedV012": true,
+    "automaticAcceptance": true
+  },
+  "candidateState": {
+    "researchEvidenceComplete": true,
+    "acceptanceCriteriaComplete": true,
+    "semanticLawSetFrozenForR7b": true,
+    "contractBoundaryEstablished": true,
+    "conformanceObligationsDeclared": true,
+    "traceabilityComplete": false,
+    "documentationComplete": false,
+    "readinessAuditComplete": false,
+    "explicitAuthorAcceptanceRecorded": false
+  },
+  "owners": {
+    "memory": "ts/src/memory.ts",
+    "exactSequence": "ts/src/exact-sequence.ts",
+    "stringAnum": "ts/src/v012-string-anum.ts",
+    "structuralRule": "ts/src/structural-rule.ts",
+    "hierarchicalCarrierResearch": "ts/src/v013-hierarchical-carrier.ts",
+    "relativePoleContextResearch": "ts/src/v013-relative-pole-context.ts",
+    "relativePoleExecutionResearch": "ts/src/v013-relative-pole-execution.ts",
+    "relativeFormMaterializationResearch": "ts/src/v013-relative-form-materialization.ts"
+  },
+  "releaseState": {
+    "currentAccepted": "mts-contract/v0.12",
+    "candidate": "mts-contract/v0.13",
+    "accepted": false,
+    "acceptanceReady": false,
+    "candidateRuntimeSelectable": false
+  }
+}
