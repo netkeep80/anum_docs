@@ -304,7 +304,7 @@
     "foundationAcceptanceGate": false
   },
   "functionalParityAudit": {
-    "status": "green-complete-a5c",
+    "status": "green-complete-a4",
     "baseline": {
       "contract": "mts-contract/v0.12",
       "conformance": "mts-conformance/v0.12",
