@@ -79,7 +79,7 @@ const realIndex = buildContractObservatoryIndex(repositoryRoot);
 const realProjection = buildMethodologyProjection(repositoryRoot, realIndex);
 const realHtml = renderContractObservatoryHtml(realIndex, realProjection);
 
-same(realIndex.versions.length, 2, "real post-cleanup repository exposes exactly current and previous accepted versions");
+assert(realIndex.versions.length >= 2, "repository exposes at least current and previous accepted versions");
 assert(realHtml.startsWith("<!doctype html>\n<html lang=\"ru\">"), "browser document baseline");
 assert(realHtml.includes("<meta charset=\"utf-8\">"), "UTF-8 metadata");
 assert(realHtml.includes("name=\"viewport\""), "viewport metadata");
@@ -97,7 +97,9 @@ assert(realHtml.includes("data-version-id=\"mts-contract/v0.11\""), "previous ve
 assert(realHtml.includes("data-version-id=\"mts-contract/v0.12\""), "current version lane carries exact projected contract identity");
 assert(realHtml.includes("ТЕКУЩАЯ"), "current classification remains explicit in V4c");
 assert(realHtml.includes("ПРЕДЫДУЩАЯ"), "previous classification remains explicit in V4c");
-assert(!realHtml.includes("КАНДИДАТ"), "accepted repository has no candidate status lane");
+for (const candidate of realIndex.versions.filter((entry) => entry.status === "candidate" || !entry.accepted)) {
+  assert(realHtml.includes(candidate.contractId), `${candidate.contractId}: candidate appears in overview`);
+}
 assert(realHtml.includes("Связь метода и жизненного цикла"), "methodology relation authority is textually distinguished");
 assert(realHtml.includes("Семантические Связи МТС: в этом представлении не отображаются"), "methodology view cannot be mistaken for MTS semantic Links");
 assert(realHtml.includes("data-observatory-controller=\"shared-kernel\""), "static page embeds the shared canonical interaction kernel controller");
@@ -152,6 +154,9 @@ const synthetic = index([
   version({
     contractId: "mts-contract/v2.3",
     conformanceId: "mts-conformance/v2.3",
+    status: "candidate",
+    accepted: false,
+    acceptanceReady: false,
   }),
 ]);
 
@@ -168,6 +173,7 @@ same(count(syntheticHtml, "id=\"version-2\""), 1, "second version section exactl
 same(count(syntheticHtml, "id=\"version-3\""), 1, "third version section exactly once");
 assert(syntheticHtml.indexOf("contract-&lt;script&gt;") < syntheticHtml.indexOf("mts-contract/v9.7"), "input version order retained");
 assert(syntheticHtml.indexOf("mts-contract/v9.7") < syntheticHtml.indexOf("mts-contract/v2.3"), "renderer does not re-sort input");
+assert(syntheticHtml.includes("КАНДИДАТ"), "nonaccepted candidate is textually distinct in overview");
 
 same(count(syntheticHtml, "aria-current=\"page\""), 1, "current marker derives from isCurrent only");
 assert(syntheticHtml.includes("<details open>"), "current overview is open by default");
