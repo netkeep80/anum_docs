@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "research-evidence-complete-formalization-pending",
-  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable evidence for their declared scopes; accepted-v0.12 semantic-delta parity and inherited A0-A20/F2-F6 parity are complete with zero regressions. Foundation superiority is complete as a minimal A5 foundation-alphabet replacement; current graph-cycle transport remains a non-foundational future layer. Readiness audit and explicit author acceptance remain pending.",
+  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable evidence for their declared scopes; AC10 root-aspect FORMAL closure is newly mandatory and pending. Accepted-v0.12 semantic/inherited parity and A5 foundation superiority remain complete. v0.13 is not acceptance-ready.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -169,6 +169,26 @@
         "ts/test/v013-binary-link-materialization-two-memory.test.ts",
         "ts/test/v013-unknown-whole-two-memory.test.ts"
       ]
+    },
+    "AC10": {
+      "status": "pending",
+      "requirement": "one generic FORMAL composer over 8/9/6/1 must reconstruct R/O/C/L as 8/98/68/19868 under exact source/Dictionary/Grammar/fixed-Theory/admitted-Rule authority, with no term-specific host branches",
+      "requiredPositiveVectors": [
+        "v013-formal-root-R-from-8",
+        "v013-formal-root-O-from-98",
+        "v013-formal-root-C-from-68",
+        "v013-formal-root-L-from-19868",
+        "v013-formal-derived-U-from-16898",
+        "v013-formal-generic-unknown-finite-term"
+      ],
+      "requiredNegativeVectors": [
+        "v013-formal-root-wrong-rule-rejected",
+        "v013-formal-root-wrong-theory-rejected",
+        "v013-formal-root-malformed-prefix-rejected",
+        "v013-formal-root-noncanonical-pair-alias-rejected",
+        "v013-formal-root-no-host-term-special-case"
+      ],
+      "gates": []
     }
   },
   "requiredPositiveVectors": [
@@ -253,6 +273,7 @@
     "foundationSuperiority": "green-complete-a5c"
   },
   "acceptanceBlockers": [
+    "AC10 root-aspect FORMAL closure is incomplete: one generic FORMAL composer must derive R/O/C/L from 8/98/68/19868 using the same four aspect operators under fixed Theory authority",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
