@@ -517,6 +517,7 @@
         "note": "semantic result/materialization remains admitted-rule-authorized and fails closed.",
         "baselineRuntimeRetained": true
       }
-    }
+    },
+    "repositoryGate": "ts/test/v013-v012-functional-parity-lifecycle.test.ts"
   }
 }
