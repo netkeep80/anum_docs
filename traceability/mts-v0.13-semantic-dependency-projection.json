@@ -1,9 +1,9 @@
 {
-  "schema": "mts-semantic-dependency-projection/v0.6",
+  "schema": "mts-semantic-dependency-projection/v0.7",
   "mtsVersion": "0.13",
   "status": "research",
   "ownerIssue": 1270,
-  "candidateMain": "cd9dde66d9210d5d43024ceb0d8280b4d458e4f4",
+  "candidateMain": "832ffa3643b13eba4c9b29211ddf773ebd815b2d",
   "externalAuditProjectionOnly": true,
   "normativeFoundation": false,
   "semanticAuthority": false,
@@ -20,7 +20,9 @@
     "packageInterpretationEntrypointAuditComplete": true,
     "packageStaticSemanticDecisionAuditComplete": true,
     "packageTypedMemoryReadAuditComplete": true,
-    "packageTypedMemoryWriteCrossCheckComplete": true
+    "packageTypedMemoryWriteCrossCheckComplete": true,
+    "candidatePublicSemanticRuntimeProbeCoverageComplete": true,
+    "candidatePublicSemanticFaultInjectionComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -719,7 +721,9 @@
     "ts/src/portable-theory.ts#includePoleClosure": "derived.theory-support-projection",
     "ts/src/portable-theory.ts#projected": "derived.theory-support-projection",
     "ts/src/portable-theory.ts#replayPortableStructuralTheory": "derived.portable-theory-replay",
-    "ts/src/portable-theory.ts#linkFingerprint": "derived.canonical-link-fingerprint"
+    "ts/src/portable-theory.ts#linkFingerprint": "derived.canonical-link-fingerprint",
+    "memory#root": "bootstrap.root-anchor",
+    "memory#ensureRoot": "bootstrap.root-anchor"
   },
   "metrics": {
     "candidateKernelFileCount": 5,
@@ -769,7 +773,17 @@
     "packageWideExactWireLiteralDispatchCount": 0,
     "typedDirectSemanticWriteOwnerCount": 49,
     "hostLinkDuplicationCandidateCount": 26,
-    "confirmedHostLinkEquivalentDuplicationCount": null
+    "confirmedHostLinkEquivalentDuplicationCount": null,
+    "runtimeObservedPublicSemanticEntrypointCount": 8,
+    "runtimeMissingPublicSemanticEntrypointCount": 0,
+    "runtimeObservedMemoryOperationCount": 10,
+    "runtimeUnobservedMemoryOperationCount": 2,
+    "runtimeObservedProductionSegmentCount": 149,
+    "runtimeUndocumentedObservedEntrypointCount": 0,
+    "runtimeUndocumentedObservedMemoryOperationCount": 0,
+    "runtimeUndocumentedObservedEntrypointOperationSegmentCount": 0,
+    "runtimeFaultInjectedMemoryOperationCount": 10,
+    "runtimeFaultInjectionBypassCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -795,18 +809,18 @@
     "packageWideExactWireLiteralDispatchCount": "S3 count signal for exact multi-abit wire-like literals participating in detected host equality dispatch. Zero does not by itself prove absence of all object-specific host semantics."
   },
   "nextExperiments": [
-    "P1g: instrument real semantic entry points and Memory mutation/decision operations; require zero undocumented observed semantic paths/operations and hard bypass rejection.",
+    "P1g-b: extend runtime trust tracing/fault injection to proof/self-proof replay and remaining selected semantic paths; only then evaluate global undocumented semantic paths.",
     "Refine host/Link duplication from candidate overlap to confirmed semantic-equivalence duplication.",
     "Integrate A10b into a witness-scoped self-hosting maturity matrix with explicit residual host capabilities.",
-    "Run proof-driven and fault-injection per-bootstrap-capability elimination experiments only after runtime path coverage; failed removal remains UNKNOWN.",
+    "Run proof-driven and fault-injection per-bootstrap-capability elimination experiments only after the relevant runtime path coverage; failed removal remains UNKNOWN.",
     "Run the bounded 2^8 joint subset/minimal-basis experiment after single-capability elimination.",
     "Build a v0.12 -> v0.13 delta only for metrics measured under the same schema and scope."
   ],
   "measurement": {
-    "modelRevision": "A9-P1f-package-static-semantic-decision-audit",
+    "modelRevision": "A9-P1g-a-public-runtime-trust-audit",
     "metricDeltaComparableToPreviousRevision": false,
     "scope": "S3",
-    "reason": "P1f adds type-resolved package-wide read/write cross-checks and a conservative static host-decision candidate inventory. These S3 counts are audit-surface metrics, not minimal-foundation metrics."
+    "reason": "The projection remains an S3 whole-package audit envelope from P1f; P1g-a adds a nested S1 runtimeTrustAudit for the eight declared v0.13 public semantic entrypoints. Static S3 counts and runtime S1 counts must not be merged into one minimal-foundation denominator."
   },
   "authorityServiceUnfolding": {
     "replacedCapability": "bootstrap.accepted-v012-authority-runtime",
@@ -1410,6 +1424,150 @@
       "File-role classification separates semantic authority/proof replay/representation/transport/resource/tooling but does not prove semantic equivalence or independence.",
       "Inter-procedural dataflow, dynamic aliasing, reflective/dynamic invocation and future write APIs require P1g runtime instrumentation/bypass falsification.",
       "A zero exact-wire-literal signal does not imply zero object-specific host semantic authority."
+    ]
+  },
+  "runtimeTrustAudit": {
+    "status": "public-entrypoint-runtime-trace-with-fault-injection",
+    "scope": "S1",
+    "instrumentation": "research-test-only Memory prototype wrappers; no runtime instrumentation hook or execution dependency is added",
+    "probeCorpus": [
+      "ts/test/v013-root-aspect-formal-composition.test.ts",
+      "ts/test/v013-unknown-whole-two-memory.test.ts",
+      "ts/test/v013-relative-form-two-memory.test.ts"
+    ],
+    "publicEntrypointCoverage": {
+      "declared": 8,
+      "observed": 8,
+      "missing": []
+    },
+    "observedMemoryOperations": [
+      "allLinks",
+      "ensure",
+      "ensureEndSelfClosed",
+      "ensureRoot",
+      "ensureStartSelfClosed",
+      "find",
+      "linkCount",
+      "outgoing",
+      "poles",
+      "root"
+    ],
+    "unobservedMemoryOperations": [
+      "incoming",
+      "issuanceIndex"
+    ],
+    "entrypointOperationMatrix": {
+      "decomposeV013SemanticLink": [
+        "poles",
+        "root"
+      ],
+      "evaluateV013FormalAspectProgram": [
+        "allLinks",
+        "ensure",
+        "ensureEndSelfClosed",
+        "ensureRoot",
+        "ensureStartSelfClosed",
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ],
+      "executeAuthorizedRelativePoleSource": [
+        "allLinks",
+        "ensure",
+        "ensureEndSelfClosed",
+        "ensureRoot",
+        "ensureStartSelfClosed",
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ],
+      "materializeAuthorizedBinaryLinkSource": [
+        "allLinks",
+        "ensure",
+        "ensureEndSelfClosed",
+        "ensureRoot",
+        "ensureStartSelfClosed",
+        "find",
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ],
+      "materializeAuthorizedRelativeUnaryFormSource": [
+        "allLinks",
+        "ensure",
+        "ensureEndSelfClosed",
+        "ensureRoot",
+        "ensureStartSelfClosed",
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ],
+      "materializeV013HierarchicalCarrier": [
+        "ensure",
+        "ensureStartSelfClosed",
+        "poles",
+        "root"
+      ],
+      "materializeV013HierarchicalCarrierFromSemanticLink": [
+        "ensure",
+        "ensureStartSelfClosed",
+        "poles",
+        "root"
+      ],
+      "serializeV013HierarchicalCarrier": [
+        "linkCount",
+        "poles",
+        "root"
+      ]
+    },
+    "operationCapabilityMap": {
+      "root": "bootstrap.root-anchor",
+      "linkCount": "resource.link-count",
+      "poles": "bootstrap.pole-read",
+      "find": "bootstrap.pair-lookup",
+      "outgoing": "bootstrap.outgoing-query",
+      "allLinks": "resource.link-enumeration",
+      "ensureRoot": "bootstrap.root-anchor",
+      "ensureStartSelfClosed": "bootstrap.ensure-start-selfclosed",
+      "ensureEndSelfClosed": "bootstrap.ensure-end-selfclosed",
+      "ensure": "bootstrap.ensure-pair"
+    },
+    "baselineOperationCallCountsInformationalOnly": {
+      "root": 2248,
+      "linkCount": 1058,
+      "poles": 16674,
+      "find": 2,
+      "outgoing": 273,
+      "incoming": 0,
+      "issuanceIndex": 0,
+      "allLinks": 109,
+      "ensureRoot": 69,
+      "ensureStartSelfClosed": 1129,
+      "ensureEndSelfClosed": 128,
+      "ensure": 4018
+    },
+    "observedProductionSegmentCount": 149,
+    "segmentFingerprintFNV64": "d030f7d219a371aa",
+    "undocumentedObservedEntrypointCount": 0,
+    "undocumentedObservedMemoryOperationCount": 0,
+    "undocumentedObservedEntrypointOperationSegmentCount": 0,
+    "faultInjection": {
+      "method": "deny the real Memory operation only while a declared public semantic entrypoint is present on the production call stack; test fixture setup outside that stack remains available",
+      "testedOperationCount": 10,
+      "failClosedCount": 10,
+      "bypassCount": 0,
+      "classification": "boundary-interception evidence only; this does not prove each operation semantically independent or necessary"
+    },
+    "globalRuntimePathCoverageComplete": false,
+    "limitations": [
+      "The current probe corpus closes runtime Memory-operation coverage for the eight declared v0.13 public semantic entrypoints, not for every S2/S3 compatibility/proof/tooling path.",
+      "Memory-operation denial proves that the observed execution cannot bypass that concrete boundary on the selected witnesses; it is not a mathematical minimality or independence proof.",
+      "Proof/self-proof replay paths must be added before any globalTrustBoundaryComplete claim.",
+      "Host decisions that do not cross the Memory API still require the static P1f inventory plus later targeted/runtime falsification."
     ]
   }
 }
