@@ -1,9 +1,9 @@
 {
-  "schema": "mts-semantic-dependency-projection/v0.7",
+  "schema": "mts-semantic-dependency-projection/v0.8",
   "mtsVersion": "0.13",
   "status": "research",
   "ownerIssue": 1270,
-  "candidateMain": "832ffa3643b13eba4c9b29211ddf773ebd815b2d",
+  "candidateMain": "3c6883d2eb7496e398c33a5413c22571e719f2a7",
   "externalAuditProjectionOnly": true,
   "normativeFoundation": false,
   "semanticAuthority": false,
@@ -22,7 +22,9 @@
     "packageTypedMemoryReadAuditComplete": true,
     "packageTypedMemoryWriteCrossCheckComplete": true,
     "candidatePublicSemanticRuntimeProbeCoverageComplete": true,
-    "candidatePublicSemanticFaultInjectionComplete": true
+    "candidatePublicSemanticFaultInjectionComplete": true,
+    "proofVerifierRuntimeProbeCoverageComplete": true,
+    "proofVerifierFaultInjectionComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -783,7 +785,24 @@
     "runtimeUndocumentedObservedMemoryOperationCount": 0,
     "runtimeUndocumentedObservedEntrypointOperationSegmentCount": 0,
     "runtimeFaultInjectedMemoryOperationCount": 10,
-    "runtimeFaultInjectionBypassCount": 0
+    "runtimeFaultInjectionBypassCount": 0,
+    "proofRuntimeObservedVerifierEntrypointCount": 5,
+    "proofRuntimeMissingVerifierEntrypointCount": 0,
+    "proofRuntimeObservedMemoryOperationCount": 10,
+    "proofRuntimeUnobservedMemoryOperationCount": 2,
+    "proofRuntimeObservedProductionSegmentCount": 89,
+    "proofRuntimeUndocumentedVerifierEntrypointCount": 0,
+    "proofRuntimeUndocumentedMemoryOperationCount": 0,
+    "proofRuntimeUndocumentedEntrypointOperationSegmentCount": 0,
+    "proofRuntimeFaultInjectedMemoryOperationCount": 10,
+    "proofRuntimeFaultInjectionBypassCount": 0,
+    "proofRuntimeFaultInterceptedMemoryOperationCount": 10,
+    "proofRuntimeEndToEndFailClosedCount": null,
+    "observedProofVerifierEntrypointCount": 5,
+    "observedProofVerifierMemoryOperationKindCount": 10,
+    "observedProofVerifierRuntimeSegmentCount": 89,
+    "proofVerifierFaultInjectedOperationCount": 10,
+    "proofVerifierEndToEndFailClosedOperationCount": 10
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -806,10 +825,16 @@
     "typedReadMemoryOwnerCount": "S3 count of function/method owners containing at least one type-resolved ReadMemory access.",
     "staticSemanticDecisionCandidateOwnerCount": "S3 conservative static candidate count: owners with Link-dependent decisions, typed Memory-read decisions, literal/tag dispatch, fixed coordinate indexing, host callbacks or module-level mutable-state decisions. It is not a primitive count.",
     "staticDecisionOwnersByCategory": "File-role classification of the S3 static candidate surface. Proof, representation, transport, resource and tooling categories must not be counted as foundation primitives.",
-    "packageWideExactWireLiteralDispatchCount": "S3 count signal for exact multi-abit wire-like literals participating in detected host equality dispatch. Zero does not by itself prove absence of all object-specific host semantics."
+    "packageWideExactWireLiteralDispatchCount": "S3 count signal for exact multi-abit wire-like literals participating in detected host equality dispatch. Zero does not by itself prove absence of all object-specific host semantics.",
+    "observedProofVerifierEntrypointCount": "Number of selected generic proof-verifier entrypoints actually observed in the P1g-b corpus.",
+    "observedProofVerifierMemoryOperationKindCount": "Number of Memory operation kinds observed while a selected proof-verifier entrypoint is on the production call stack.",
+    "observedProofVerifierRuntimeSegmentCount": "Distinct probe|verifier-entrypoint|direct-ts/src-caller|Memory-operation segments observed by the P1g-b corpus.",
+    "proofVerifierFaultInjectedOperationCount": "Observed proof-verifier Memory operation kinds denied one at a time at the real Memory boundary.",
+    "proofVerifierEndToEndFailClosedOperationCount": "Observed proof-verifier Memory operation kinds for which denial propagates through the owning awaited proof probe and causes end-to-end rejection."
   },
   "nextExperiments": [
-    "P1g-b: extend runtime trust tracing/fault injection to proof/self-proof replay and remaining selected semantic paths; only then evaluate global undocumented semantic paths.",
+    "SP1-SP3: build the first bounded MTS-about-MTS Claim + rooted Proof Aset under an exact frozen Theory without theorem-name/opcode authority.",
+    "P1g-c: trace and hard-deny the actual self-proof replay witness, then compare its residual host boundary with the generic proof-verifier slice.",
     "Refine host/Link duplication from candidate overlap to confirmed semantic-equivalence duplication.",
     "Integrate A10b into a witness-scoped self-hosting maturity matrix with explicit residual host capabilities.",
     "Run proof-driven and fault-injection per-bootstrap-capability elimination experiments only after the relevant runtime path coverage; failed removal remains UNKNOWN.",
@@ -817,10 +842,10 @@
     "Build a v0.12 -> v0.13 delta only for metrics measured under the same schema and scope."
   ],
   "measurement": {
-    "modelRevision": "A9-P1g-a-public-runtime-trust-audit",
+    "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
     "metricDeltaComparableToPreviousRevision": false,
     "scope": "S3",
-    "reason": "The projection remains an S3 whole-package audit envelope from P1f; P1g-a adds a nested S1 runtimeTrustAudit for the eight declared v0.13 public semantic entrypoints. Static S3 counts and runtime S1 counts must not be merged into one minimal-foundation denominator."
+    "reason": "The S3 audit envelope now includes two separately scoped execution slices: S1 public v0.13 semantic entrypoints and S3/proof-replay verifier entrypoints. Their counts remain distinct and must not be summed into a foundation-complexity denominator."
   },
   "authorityServiceUnfolding": {
     "replacedCapability": "bootstrap.accepted-v012-authority-runtime",
@@ -1569,5 +1594,129 @@
       "Proof/self-proof replay paths must be added before any globalTrustBoundaryComplete claim.",
       "Host decisions that do not cross the Memory API still require the static P1f inventory plus later targeted/runtime falsification."
     ]
+  },
+  "proofRuntimeTrustAudit": {
+    "status": "proof-verifier-runtime-trace-with-fault-injection",
+    "scope": "S3",
+    "slice": "proof-replay",
+    "instrumentation": "research-test-only Memory prototype wrappers over existing proof witnesses; async proof probe modules own their top-level Promise via await main(), so module completion is the verifier scenario completion boundary; no proof/runtime instrumentation hook is added",
+    "probeCorpus": [
+      "ts/test/rooted-proof-aset.test.ts",
+      "ts/test/derivation.test.ts",
+      "ts/test/portable-trusted-kernel-boundary.test.ts",
+      "ts/test/portable-proof-anet-package-boundary.test.ts"
+    ],
+    "verifierEntrypointCoverage": {
+      "declared": 5,
+      "observed": 5,
+      "missing": []
+    },
+    "observedMemoryOperations": [
+      "allLinks",
+      "ensure",
+      "ensureEndSelfClosed",
+      "ensureRoot",
+      "ensureStartSelfClosed",
+      "find",
+      "linkCount",
+      "outgoing",
+      "poles",
+      "root"
+    ],
+    "unobservedMemoryOperations": [
+      "incoming",
+      "issuanceIndex"
+    ],
+    "entrypointOperationMatrix": {
+      "replayPortableProofSubAnetProjection": [
+        "allLinks",
+        "ensure",
+        "ensureEndSelfClosed",
+        "ensureRoot",
+        "ensureStartSelfClosed",
+        "linkCount",
+        "poles",
+        "root"
+      ],
+      "replayPortableStructuralProof": [
+        "allLinks",
+        "ensure",
+        "ensureEndSelfClosed",
+        "ensureRoot",
+        "ensureStartSelfClosed",
+        "find",
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ],
+      "replayStructuralDerivationWithTheorems": [
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ],
+      "replayStructuralRootedProofAset": [
+        "find",
+        "linkCount",
+        "poles",
+        "root"
+      ],
+      "replayStructuralTheorem": [
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ]
+    },
+    "operationCapabilityMap": {
+      "root": "bootstrap.root-anchor",
+      "linkCount": "resource.link-count",
+      "poles": "bootstrap.pole-read",
+      "find": "bootstrap.pair-lookup",
+      "outgoing": "bootstrap.outgoing-query",
+      "allLinks": "resource.link-enumeration",
+      "ensureRoot": "bootstrap.root-anchor",
+      "ensureStartSelfClosed": "bootstrap.ensure-start-selfclosed",
+      "ensureEndSelfClosed": "bootstrap.ensure-end-selfclosed",
+      "ensure": "bootstrap.ensure-pair"
+    },
+    "baselineOperationCallCountsInformationalOnly": {
+      "root": 1247,
+      "linkCount": 640,
+      "poles": 11095,
+      "find": 40,
+      "outgoing": 38,
+      "incoming": 0,
+      "issuanceIndex": 0,
+      "allLinks": 15,
+      "ensureRoot": 15,
+      "ensureStartSelfClosed": 137,
+      "ensureEndSelfClosed": 15,
+      "ensure": 493
+    },
+    "observedProductionSegmentCount": 89,
+    "segmentFingerprintFNV64": "c7f151b7450c8cde",
+    "undocumentedObservedVerifierEntrypointCount": 0,
+    "undocumentedObservedMemoryOperationCount": 0,
+    "undocumentedObservedEntrypointOperationSegmentCount": 0,
+    "faultInjection": {
+      "method": "deny each observed Memory operation only while one of the named proof verifier entrypoints is present on the production call stack; fixture construction outside verifier execution remains available",
+      "testedOperationCount": 10,
+      "interceptedOperationCount": 10,
+      "bypassCount": 0,
+      "endToEndFailClosed": true,
+      "classification": "verifier boundary interception + corpus-scoped end-to-end fail-closed evidence; not proof that any operation is mathematically independent or necessary",
+      "endToEndFailClosedCount": 10
+    },
+    "globalRuntimePathCoverageComplete": false,
+    "limitations": [
+      "This slice covers the selected rooted/theorem/portable proof verifier entrypoints, not every proof producer, compatibility path, or future self-proof witness.",
+      "Portable proof replay includes reconstruction/materialization bootstrap that is not required by in-memory rooted/theorem replay.",
+      "End-to-end fail-closed is established only for the selected proof-verifier corpus and each Memory operation observed by that corpus.",
+      "The first MTS-about-MTS self-proof artifact must still be traced separately before any self-verification closure claim."
+    ],
+    "asyncProbeSettlementRevision": "awaited-v2",
+    "asyncProbeOwnership": true
   }
 }
