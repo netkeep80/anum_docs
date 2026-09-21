@@ -69,7 +69,7 @@ same(
 );
 same(
   projection.measurement.modelRevision,
-  "A9-P1d-string-authority-read-closure",
+  "A9-P1e-package-direct-write-audit",
   "measurement model revision",
 );
 same(
