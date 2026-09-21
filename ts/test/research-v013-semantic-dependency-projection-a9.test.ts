@@ -684,6 +684,222 @@ same(
   "write-sink audit alone does not establish global trust closure",
 );
 
+// P1f independently discovers package-wide typed ReadMemory access and
+// host-owned decision candidates. Unlike P1e's deliberately syntax-only write
+// inventory, this pass resolves the called/read member to declarations in
+// memory.ts so unrelated methods with the same spelling are excluded.
+const sourcePaths = tsSourceFiles("ts/src");
+const typedProgram = ts.createProgram({
+  rootNames: sourcePaths.map((path) => join(repoRoot, path)),
+  options: {
+    target: ts.ScriptTarget.ES2022,
+    module: ts.ModuleKind.NodeNext,
+    moduleResolution: ts.ModuleResolutionKind.NodeNext,
+    strict: true,
+    skipLibCheck: true,
+  },
+});
+const typeChecker = typedProgram.getTypeChecker();
+const memorySourceSuffix = "/ts/src/memory.ts";
+const readMemoryMembers = new Set([
+  "root",
+  "linkCount",
+  "poles",
+  "find",
+  "outgoing",
+  "incoming",
+  "issuanceIndex",
+  "allLinks",
+]);
+
+interface TypedReadSite {
+  readonly file: string;
+  readonly owner: string;
+  readonly member: string;
+}
+
+interface DecisionCandidate {
+  readonly file: string;
+  readonly owner: string;
+  readonly signals: readonly string[];
+}
+
+function declarationIsMemoryMember(symbol: ts.Symbol | undefined, member: string): boolean {
+  if (symbol === undefined || !readMemoryMembers.has(member)) return false;
+  return (symbol.getDeclarations() ?? []).some((declaration) => {
+    const file = declaration.getSourceFile().fileName.replaceAll("\\", "/");
+    return file.endsWith(memorySourceSuffix) || file.endsWith("ts/src/memory.ts");
+  });
+}
+
+function nodeOwner(node: ts.Node): string {
+  let current: ts.Node | undefined = node;
+  while (current !== undefined) {
+    if (ts.isFunctionDeclaration(current) && current.name !== undefined) {
+      return current.name.text;
+    }
+    if (ts.isMethodDeclaration(current)) {
+      const method = memberName(current.name) ?? "<computed-method>";
+      const parent = current.parent;
+      const className =
+        ts.isClassDeclaration(parent) && parent.name !== undefined
+          ? parent.name.text
+          : "<class>";
+      return `${className}.${method}`;
+    }
+    if (ts.isConstructorDeclaration(current)) {
+      const parent = current.parent;
+      const className =
+        ts.isClassDeclaration(parent) && parent.name !== undefined
+          ? parent.name.text
+          : "<class>";
+      return `${className}.constructor`;
+    }
+    if (
+      (ts.isArrowFunction(current) || ts.isFunctionExpression(current)) &&
+      ts.isVariableDeclaration(current.parent) &&
+      ts.isIdentifier(current.parent.name)
+    ) {
+      return current.parent.name.text;
+    }
+    current = current.parent;
+  }
+  return "<module>";
+}
+
+function containsLinkHandle(node: ts.Node): boolean {
+  let found = false;
+  const visit = (child: ts.Node): void => {
+    if (found) return;
+    if (ts.isIdentifier(child) || ts.isPropertyAccessExpression(child)) {
+      const type = typeChecker.getTypeAtLocation(child);
+      const text = typeChecker.typeToString(type);
+      if (/\bLinkHandle\b/.test(text)) {
+        found = true;
+        return;
+      }
+    }
+    ts.forEachChild(child, visit);
+  };
+  visit(node);
+  return found;
+}
+
+function containsTypedMemoryRead(node: ts.Node): boolean {
+  let found = false;
+  const visit = (child: ts.Node): void => {
+    if (found) return;
+    if (ts.isPropertyAccessExpression(child)) {
+      const member = child.name.text;
+      const symbol = typeChecker.getSymbolAtLocation(child.name);
+      if (declarationIsMemoryMember(symbol, member)) {
+        found = true;
+        return;
+      }
+    }
+    ts.forEachChild(child, visit);
+  };
+  visit(node);
+  return found;
+}
+
+const typedReadSites: TypedReadSite[] = [];
+const decisionSignalsByOwner = new Map<string, Set<string>>();
+
+for (const sourcePath of sourcePaths) {
+  const source = typedProgram.getSourceFile(join(repoRoot, sourcePath));
+  assert(source !== undefined, `typed source is available: ${sourcePath}`);
+
+  const addDecision = (node: ts.Node, signal: string): void => {
+    const owner = `${sourcePath}#${nodeOwner(node)}`;
+    let signals = decisionSignalsByOwner.get(owner);
+    if (signals === undefined) {
+      signals = new Set<string>();
+      decisionSignalsByOwner.set(owner, signals);
+    }
+    signals.add(signal);
+  };
+
+  const visit = (node: ts.Node): void => {
+    if (ts.isPropertyAccessExpression(node)) {
+      const member = node.name.text;
+      const symbol = typeChecker.getSymbolAtLocation(node.name);
+      if (declarationIsMemoryMember(symbol, member)) {
+        typedReadSites.push(Object.freeze({
+          file: sourcePath,
+          owner: nodeOwner(node),
+          member,
+        }));
+      }
+    }
+
+    if (ts.isIfStatement(node)) {
+      if (containsLinkHandle(node.expression)) addDecision(node, "if-link");
+      if (containsTypedMemoryRead(node.expression)) addDecision(node, "if-memory-read");
+    } else if (ts.isConditionalExpression(node)) {
+      if (containsLinkHandle(node.condition)) addDecision(node, "ternary-link");
+      if (containsTypedMemoryRead(node.condition)) addDecision(node, "ternary-memory-read");
+    } else if (ts.isSwitchStatement(node)) {
+      if (containsLinkHandle(node.expression)) addDecision(node, "switch-link");
+      if (containsTypedMemoryRead(node.expression)) addDecision(node, "switch-memory-read");
+    } else if (
+      ts.isBinaryExpression(node) &&
+      [
+        ts.SyntaxKind.EqualsEqualsEqualsToken,
+        ts.SyntaxKind.ExclamationEqualsEqualsToken,
+        ts.SyntaxKind.EqualsEqualsToken,
+        ts.SyntaxKind.ExclamationEqualsToken,
+      ].includes(node.operatorToken.kind)
+    ) {
+      if (containsLinkHandle(node)) addDecision(node, "link-equality");
+      if (containsTypedMemoryRead(node)) addDecision(node, "memory-read-equality");
+    }
+
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+}
+
+const typedReadOwners = [...new Set(
+  typedReadSites.map((site) => `${site.file}#${site.owner}`),
+)].sort();
+
+const typedReadMemberCounts = Object.fromEntries(
+  [...readMemoryMembers].sort().map((member) => [
+    member,
+    typedReadSites.filter((site) => site.member === member).length,
+  ]),
+);
+
+const decisionCandidates: readonly DecisionCandidate[] = [...decisionSignalsByOwner.entries()]
+  .map(([id, signals]) => {
+    const split = id.lastIndexOf("#");
+    return Object.freeze({
+      file: id.slice(0, split),
+      owner: id.slice(split + 1),
+      signals: Object.freeze([...signals].sort()),
+    });
+  })
+  .sort((left, right) =>
+    left.file.localeCompare(right.file) || left.owner.localeCompare(right.owner)
+  );
+
+if (projection.packageSemanticDecisionAudit === undefined) {
+  console.log(
+    "A9 P1f typed ReadMemory owners:\n" +
+    typedReadOwners.join("\n") +
+    "\n\nA9 P1f typed ReadMemory member counts:\n" +
+    JSON.stringify(typedReadMemberCounts, null, 2) +
+    "\n\nA9 P1f host semantic decision candidates:\n" +
+    decisionCandidates
+      .map((entry) => `${entry.file}#${entry.owner} [${entry.signals.join(",")}]`)
+      .join("\n"),
+  );
+  throw new Error(
+    "v0.13 A9 P1f: packageSemanticDecisionAudit is not yet declared",
+  );
+}
+
 // Recompute all published P1 metrics from stable capability IDs.
 const byLayer = (layer: string): any[] =>
   projection.capabilities.filter((capability: any) => capability.layer === layer);
