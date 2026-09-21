@@ -819,8 +819,8 @@
   "measurement": {
     "modelRevision": "A9-P1g-a-public-runtime-trust-audit",
     "metricDeltaComparableToPreviousRevision": false,
-    "scope": "S1",
-    "reason": "P1g-a adds execution-observed public semantic entrypoint × Memory-operation segments and hard operation-boundary denial over existing end-to-end witnesses. Global trust closure remains open pending proof/self-proof and remaining package runtime paths."
+    "scope": "S3",
+    "reason": "The projection remains an S3 whole-package audit envelope from P1f; P1g-a adds a nested S1 runtimeTrustAudit for the eight declared v0.13 public semantic entrypoints. Static S3 counts and runtime S1 counts must not be merged into one minimal-foundation denominator."
   },
   "authorityServiceUnfolding": {
     "replacedCapability": "bootstrap.accepted-v012-authority-runtime",
