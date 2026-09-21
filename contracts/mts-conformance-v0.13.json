@@ -8,8 +8,8 @@
   "semanticBase": "mts-conformance/v0.12",
   "observableSemanticDelta": true,
   "acceptanceReady": false,
-  "coverageState": "research-evidence-complete-formalization-pending",
-  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable evidence for their declared scopes; AC10 root-aspect FORMAL closure is newly mandatory and pending. Accepted-v0.12 semantic/inherited parity and A5 foundation superiority remain complete. v0.13 is not acceptance-ready.",
+  "coverageState": "acceptance-criteria-complete-readiness-pending",
+  "coverageStateMeaning": "AC1-AC10 and L1-L13 have executable evidence for their declared scopes; root-aspect FORMAL closure is GREEN through one generic fixed-Theory composer. Accepted-v0.12 semantic/inherited parity and A5 foundation superiority remain complete. Independent readiness audit and explicit author acceptance remain pending.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -35,7 +35,8 @@
     "ts/test/v013-symmetric-nonroot.test.ts",
     "ts/test/v013-memory-cycle-boundary.test.ts",
     "ts/test/v013-cyclic-grounding-boundary.test.ts",
-    "ts/test/v013-link-native-abit-basis.test.ts"
+    "ts/test/v013-link-native-abit-basis.test.ts",
+    "ts/test/v013-root-aspect-formal-composition.test.ts"
   ],
   "plannedExecutableGates": [],
   "lawEvidence": {
@@ -91,7 +92,8 @@
     ],
     "L12": [
       "ts/test/v013-formal-quaternary-grounding.test.ts",
-      "ts/test/v013-link-native-abit-basis.test.ts"
+      "ts/test/v013-link-native-abit-basis.test.ts",
+      "ts/test/v013-root-aspect-formal-composition.test.ts"
     ],
     "L13": [
       "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
@@ -171,7 +173,7 @@
       ]
     },
     "AC10": {
-      "status": "pending",
+      "status": "green",
       "requirement": "one generic FORMAL composer over 8/9/6/1 must reconstruct R/O/C/L as 8/98/68/19868 under exact source/Dictionary/Grammar/fixed-Theory/admitted-Rule authority, with no term-specific host branches",
       "requiredPositiveVectors": [
         "v013-formal-root-R-from-8",
@@ -188,7 +190,9 @@
         "v013-formal-root-noncanonical-pair-alias-rejected",
         "v013-formal-root-no-host-term-special-case"
       ],
-      "gates": []
+      "gates": [
+        "ts/test/v013-root-aspect-formal-composition.test.ts"
+      ]
     }
   },
   "requiredPositiveVectors": [
@@ -215,7 +219,13 @@
     "v013-U-pair-not-fifth-abit",
     "v013-abit-sign-description-separation",
     "v013-abit-two-memory-local-handle-independence",
-    "v013-rooted-cycle-remains-ontologically-open"
+    "v013-rooted-cycle-remains-ontologically-open",
+    "v013-formal-root-R-from-8",
+    "v013-formal-root-O-from-98",
+    "v013-formal-root-C-from-68",
+    "v013-formal-root-L-from-19868",
+    "v013-formal-derived-U-from-16898",
+    "v013-formal-generic-unknown-finite-term"
   ],
   "requiredNegativeVectors": [
     "v013-flat-relative-glyph-collision-not-canonical",
@@ -230,7 +240,12 @@
     "v013-unrooted-anum-hierarchy-rejected",
     "v013-nonroot-both-selfclosed-rejected-by-root-uniqueness",
     "v013-foreign-abit-handle-rejected",
-    "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"
+    "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence",
+    "v013-formal-root-wrong-rule-rejected",
+    "v013-formal-root-wrong-theory-rejected",
+    "v013-formal-root-malformed-prefix-rejected",
+    "v013-formal-root-noncanonical-pair-alias-rejected",
+    "v013-formal-root-no-host-term-special-case"
   ],
   "retainedResearchEvidence": {
     "nonWellFoundedGraphDescription": {
@@ -270,10 +285,10 @@
     "comparativeSuperiority": "pending",
     "codecEngineeringComparison": "green-research-evidence-a3",
     "functionalParity": "green-complete-a5c",
-    "foundationSuperiority": "green-complete-a5c"
+    "foundationSuperiority": "green-complete-a5c",
+    "rootFormalDialect": "green-complete-ac10"
   },
   "acceptanceBlockers": [
-    "AC10 root-aspect FORMAL closure is incomplete: one generic FORMAL composer must derive R/O/C/L from 8/98/68/19868 using the same four aspect operators under fixed Theory authority",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
