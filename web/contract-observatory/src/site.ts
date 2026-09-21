@@ -305,7 +305,7 @@ function renderDefinition(label: string, value: string): string { return `<div><
 function renderRow(label: string, value: string): string { return `<tr><th scope="row">${escapeHtml(label)}</th><td>${escapeHtml(value)}</td></tr>`; }
 function metric(label: string, value: string): string { return `<div class="metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`; }
 function badge(value: string, muted: boolean): string { return `<span class="badge${muted ? " badge-muted" : ""}">${escapeHtml(value)}</span>`; }
-function classify(version: ContractVersionSummary): string { if (version.isCurrent) return "ТЕКУЩАЯ"; if (version.isPrevious) return "ПРЕДЫДУЩАЯ"; return "АКТИВНАЯ"; }
+function classify(version: ContractVersionSummary): string { if (version.isCurrent) return "ТЕКУЩАЯ"; if (version.isPrevious) return "ПРЕДЫДУЩАЯ"; if (version.status === "candidate" || !version.accepted) return "КАНДИДАТ"; return "ПРИНЯТА"; }
 function classificationLabel(value: string): string {
   switch (value) {
     case "CURRENT": return "ТЕКУЩАЯ";
