@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "research-evidence-complete-formalization-pending",
-  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability and normative documentation are complete, while Link-native abit-basis/minimality formalization, comparative superiority versus accepted v0.12, readiness audit and explicit acceptance remain pending.",
+  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability, normative documentation and Link-native abit grounding are complete, while comparative superiority versus accepted v0.12, readiness audit and explicit acceptance remain pending.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -34,13 +34,15 @@
     "ts/test/v013-string-anum-acceptance.test.ts",
     "ts/test/v013-symmetric-nonroot.test.ts",
     "ts/test/v013-memory-cycle-boundary.test.ts",
-    "ts/test/v013-cyclic-grounding-boundary.test.ts"
+    "ts/test/v013-cyclic-grounding-boundary.test.ts",
+    "ts/test/v013-link-native-abit-basis.test.ts"
   ],
   "plannedExecutableGates": [],
   "lawEvidence": {
     "L1": [
       "ts/test/v013-memory-cycle-boundary.test.ts",
-      "ts/test/v013-cyclic-grounding-boundary.test.ts"
+      "ts/test/v013-cyclic-grounding-boundary.test.ts",
+      "ts/test/v013-link-native-abit-basis.test.ts"
     ],
     "L2": [
       "ts/test/v013-relative-form-quartet.test.ts",
@@ -54,11 +56,13 @@
     ],
     "L4": [
       "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
-      "ts/test/v013-file-wire-conformance.test.ts"
+      "ts/test/v013-file-wire-conformance.test.ts",
+      "ts/test/v013-link-native-abit-basis.test.ts"
     ],
     "L5": [
       "ts/test/v013-binary-link-materialization-two-memory.test.ts",
-      "ts/test/v013-quaternary-canonicality.test.ts"
+      "ts/test/v013-quaternary-canonicality.test.ts",
+      "ts/test/v013-link-native-abit-basis.test.ts"
     ],
     "L6": [
       "ts/test/v013-hierarchical-link-carrier.test.ts",
@@ -86,7 +90,8 @@
       "ts/test/v013-string-anum-acceptance.test.ts"
     ],
     "L12": [
-      "ts/test/v013-formal-quaternary-grounding.test.ts"
+      "ts/test/v013-formal-quaternary-grounding.test.ts",
+      "ts/test/v013-link-native-abit-basis.test.ts"
     ],
     "L13": [
       "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
@@ -98,7 +103,8 @@
       "status": "green",
       "gates": [
         "ts/test/v013-memory-cycle-boundary.test.ts",
-        "ts/test/v013-root-origin-law.test.ts"
+        "ts/test/v013-root-origin-law.test.ts",
+        "ts/test/v013-link-native-abit-basis.test.ts"
       ]
     },
     "AC2": {
@@ -120,7 +126,8 @@
     "AC4": {
       "status": "green",
       "gates": [
-        "ts/test/v013-formal-quaternary-grounding.test.ts"
+        "ts/test/v013-formal-quaternary-grounding.test.ts",
+        "ts/test/v013-link-native-abit-basis.test.ts"
       ]
     },
     "AC5": {
@@ -143,7 +150,8 @@
       "status": "green",
       "gates": [
         "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
-        "ts/test/v013-file-wire-conformance.test.ts"
+        "ts/test/v013-file-wire-conformance.test.ts",
+        "ts/test/v013-link-native-abit-basis.test.ts"
       ]
     },
     "AC8": {
@@ -181,7 +189,12 @@
     "v013-real-file-1968698-two-memory",
     "v013-string-exact-byte-roundtrip",
     "v013-root-origin-every-local-anum-context",
-    "v013-formal-grounding-8-9-6-1"
+    "v013-formal-grounding-8-9-6-1",
+    "v013-abit-self-incidence-four-class-partition",
+    "v013-abit-link-signs-R-O-C-L",
+    "v013-U-pair-not-fifth-abit",
+    "v013-abit-sign-description-separation",
+    "v013-abit-two-memory-local-handle-independence"
   ],
   "requiredNegativeVectors": [
     "v013-flat-relative-glyph-collision-not-canonical",
@@ -194,7 +207,9 @@
     "v013-empty-wire-is-not-root",
     "v013-unrooted-sequence-lookalike-rejected",
     "v013-unrooted-anum-hierarchy-rejected",
-    "v013-mutual-distinct-node-cycle-rejected-as-cyclic-grounding"
+    "v013-mutual-distinct-node-cycle-rejected-as-cyclic-grounding",
+    "v013-nonroot-both-selfclosed-rejected-by-root-uniqueness",
+    "v013-foreign-abit-handle-rejected"
   ],
   "retainedResearchEvidence": {
     "nonWellFoundedGraphDescription": {
@@ -230,11 +245,10 @@
     "normativeDocumentation": "green-complete",
     "readinessAudit": "pending",
     "authorAcceptance": "pending",
-    "linkNativeAbitBasis": "research-observed-formalization-pending",
+    "linkNativeAbitBasis": "green-complete-a2",
     "comparativeSuperiority": "pending"
   },
   "acceptanceBlockers": [
-    "Link-native abit basis R/O/C/L and the four-class/minimality claim have not yet been promoted from research evidence into the candidate contract",
     "comparative superiority versus accepted v0.12, including serializer/deserializer complexity and shared-DAG cost, has not yet been demonstrated",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
