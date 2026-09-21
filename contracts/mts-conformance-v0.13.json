@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "research-evidence-complete-formalization-pending",
-  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability, normative documentation and Link-native abit grounding are complete. Foundation superiority and accepted-v0.12 functional non-regression are still pending. Retained v0.12 runtime tests are necessary compatibility evidence but do not by themselves prove v0.13 semantic parity.",
+  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability, normative documentation, Link-native abit grounding and accepted-v0.12 functional non-regression are complete. Foundation superiority, independent readiness audit and explicit author acceptance remain pending.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -248,11 +248,10 @@
     "linkNativeAbitBasis": "green-complete-a2",
     "comparativeSuperiority": "pending",
     "codecEngineeringComparison": "green-research-evidence-a3",
-    "functionalParity": "in-progress"
+    "functionalParity": "green-complete-a4"
   },
   "acceptanceBlockers": [
     "foundation superiority versus accepted v0.12 has not yet been demonstrated for necessity, sufficiency, derivability, Link-ontology closure, canonical unambiguity and absence of hidden host semantic authority",
-    "functional non-regression versus accepted v0.12 is incomplete; every essential accepted v0.12 semantic capability must be PRESERVED, GENERALIZED or explicitly REPLACED with equivalent observable capability, with no REGRESSION or REVIEW_REQUIRED entries",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
@@ -304,7 +303,7 @@
     "foundationAcceptanceGate": false
   },
   "functionalParityAudit": {
-    "status": "in-progress",
+    "status": "green-complete-a4",
     "baseline": {
       "contract": "mts-contract/v0.12",
       "conformance": "mts-conformance/v0.12",
@@ -510,11 +509,18 @@
       },
       "utf8CarrierBoundary": {
         "baselineStatement": "UTF-8 code-point grouping is a read over exact STRING bytes and does not rewrite STRING carrier topology or grant glyph spelling semantic authority",
-        "classification": "REVIEW_REQUIRED",
-        "candidateLaws": [],
-        "candidateEvidence": [],
+        "classification": "PRESERVED",
+        "candidateLaws": [
+          "L11",
+          "L12"
+        ],
+        "candidateEvidence": [
+          "ts/test/v012-string-utf8-boundary.test.ts",
+          "ts/test/v013-string-anum-acceptance.test.ts",
+          "ts/test/v013-v012-utf8-carrier-parity.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "v0.13 retains exact-byte STRING identity and strict read-only UTF-8 interpretation; malformed exact bytes may be UTF-8-uninterpretable, Unicode normalization does not redefine STRING identity, and glyph spelling grants no structural authority."
       },
       "sourceUseAuthority": {
         "baselineStatement": "exact STRING source is replayed only against an independently selected V012SourceAuthority: exact Dictionary identity plus exact Grammar/Theory membership Links; raw membership shape is not semantic authority",
@@ -570,6 +576,14 @@
           "associationBoundary"
         ],
         "status": "green-when-repository-gate-passes"
+      },
+      {
+        "id": "A4c-utf8-carrier-boundary",
+        "gate": "ts/test/v013-v012-utf8-carrier-parity.test.ts",
+        "laws": [
+          "utf8CarrierBoundary"
+        ],
+        "status": "green-when-repository-gate-passes"
       }
     ],
     "retainedCompatibilityGates": [
@@ -579,6 +593,9 @@
       "ts/test/v012-string-anum-protocol-c3a.test.ts",
       "ts/test/v012-formal-square-string-child-c4.test.ts",
       "ts/test/v012-formal-square-rule-authority.test.ts"
-    ]
+    ],
+    "completedLawCount": 18,
+    "reviewRequiredCount": 0,
+    "regressionCount": 0
   }
 }
