@@ -1,9 +1,9 @@
 {
-  "schema": "mts-semantic-dependency-projection/v0.3",
+  "schema": "mts-semantic-dependency-projection/v0.4",
   "mtsVersion": "0.13",
   "status": "research",
   "ownerIssue": 1270,
-  "candidateMain": "fa8912c7691d52c9011ad9005620842044b26fb3",
+  "candidateMain": "68c6ca8e9faae4d2dfc232ab5ec64dcb9657bfdd",
   "externalAuditProjectionOnly": true,
   "normativeFoundation": false,
   "semanticAuthority": false,
@@ -13,9 +13,9 @@
     "candidateKernelDirectDependencyCoverageComplete": true,
     "inheritedAcceptedV012AuthorityRuntimeUnfolded": true,
     "globalTrustBoundaryComplete": false,
-    "inheritedAuthorityTransitiveImplementationClosureComplete": false,
+    "inheritedAuthorityTransitiveImplementationClosureComplete": true,
     "exactTheorySelectedAdmissionTransitiveImplementationClosureComplete": true,
-    "stringCarrierTransitiveImplementationClosureComplete": false
+    "stringCarrierTransitiveImplementationClosureComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -98,6 +98,36 @@
         "ts/src/portable-proof-subanet-projection.ts#replayPortableProofSubAnetProjection"
       ],
       "note": "This is the exact runtime path used by v0.13 selected-admission authority. SHA-256 Theory revision and portable proof replay APIs are outside this path."
+    },
+    "stringAuthorityReadPath": {
+      "root": "ts/src/v012-string-anum.ts#readV012StringAnum",
+      "files": [
+        "ts/src/v012-string-anum.ts",
+        "ts/src/memory.ts"
+      ],
+      "directSemanticDependencies": [
+        "./memory.js#verifyRootBasis",
+        "memory#poles",
+        "Link identity against basis.R/basis.L/basis.U"
+      ],
+      "excludedFromPath": [
+        "ts/src/byte-carrier.ts",
+        "ts/src/quaternary-anum.ts",
+        "ts/src/quaternary-state.ts",
+        "ts/src/anum.ts"
+      ],
+      "excludedOperations": [
+        "byteToQuaternaryBits",
+        "encodeBytesToQuaternary",
+        "decodeBytesFromQuaternary",
+        "materializeQuaternaryAnum",
+        "serializeMaterializedQuaternaryAnum",
+        "memory.find",
+        "memory.ensure",
+        "memory.ensureStartSelfClosed",
+        "memory.ensureEndSelfClosed"
+      ],
+      "note": "The selected v0.13 source authority path reads accepted v0.12 STRING directly from Link poles and L/U identity. Neighboring producer/general codec APIs in the same module are outside this path."
     }
   },
   "publicSemanticEntrypoints": [
@@ -447,9 +477,10 @@
       "hostLinkDuplication": false,
       "dependsOn": [
         "derived.root-basis-verification",
-        "bootstrap.pole-read"
+        "bootstrap.pole-read",
+        "bootstrap.link-identity"
       ],
-      "reason": "Accepted v0.12 STRING/anum reads exact bytes from Link-native carrier. Its lower quaternary/byte representation helpers are not semantic authority and are not unfolded in P1b."
+      "reason": "The v0.13 authority path uses readV012StringAnum as a read-only poles traversal over rooted byte chains. L/U and R identity determine byte bits/boundaries; general byte/quaternary parsing, materialization and serialization helpers are outside this selected path."
     },
     {
       "id": "derived.dictionary-visibility",
@@ -663,7 +694,7 @@
     "./state.js#defineContext": "derived.context-state",
     "./state.js#readContext": "derived.context-state",
     "./v012-source.js#replayV012SourceResultEvidence": "derived.source-result-replay",
-    "./v012-source.js#readV012SourceContent": "derived.source-result-replay",
+    "./v012-source.js#readV012SourceContent": "representation.v012-string-anum",
     "./v013-relative-pole-context.js#materializeRelativePoleContext": "derived.relative-pole-context",
     "./v013-relative-pole-context.js#readRelativePoleContext": "derived.relative-pole-context",
     "./v013-relative-pole-context.js#readRelativeUnaryForm": "derived.relative-pole-context",
@@ -675,7 +706,6 @@
     "./portable-theory.js#verifySelectedTheoryAdmissionAuthority": "derived.exact-theory-admission-authority",
     "./source.js#replaySelectedSourceEvidenceWithReader": "derived.source-selection-replay",
     "./v012-string-anum.js#readV012StringAnum": "representation.v012-string-anum",
-    "./v012-string-anum.js#materializeV012StringAnum": "representation.v012-string-anum",
     "memory#allLinks": "resource.link-enumeration",
     "./memory.js#Memory": "resource.memory-instance",
     "./persistence-topology.js#restoreTopology": "representation.topology-restoration",
@@ -706,31 +736,31 @@
     "globalUndocumentedSemanticPathCount": null,
     "coarseInheritedAuthorityAggregateCount": 0,
     "unresolvedNestedBootstrapBoundaryCount": 0,
-    "unresolvedRepresentationBoundaryCount": 1
+    "unresolvedRepresentationBoundaryCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
     "linkExecutedSemanticCapabilityCount": "P1 counts a capability as Link-executed only if the execution mechanism itself is Link-defined. Link-grounded authority with host execution is counted as mixed, not self-hosted.",
     "hostLinkSemanticDuplicationCount": "Counts semantic capabilities whose meaning/evidence is expressed through Links while an equally relevant host execution mechanism still implements the operation in this P1 model.",
     "directUndocumentedDependencyCount": "Exact static count only for direct dependencies observed in the five candidate-kernel files.",
-    "globalUndocumentedSemanticPathCount": "Unknown until the lower STRING/anum representation chain and an independent package-wide semantic entrypoint/write-path audit are complete.",
+    "globalUndocumentedSemanticPathCount": "Unknown until an independent package-wide audit enumerates semantic interpretation/write entrypoints and verifies that every such path reaches only declared capabilities.",
     "objectSpecificHostSemanticShortcutCount": "Counts exact multi-abit physical-term literals that directly participate in host control flow in the candidate kernel. It intentionally does not count structural self-incidence labels stored as data.",
     "coarseInheritedAuthorityAggregateCount": "P1b requires the previous accepted-v0.12 authority aggregate to disappear in favor of explicit service-level capabilities.",
     "unresolvedNestedBootstrapBoundaryCount": "P1c removes the last intentionally aggregated semantic-bootstrap boundary from the selected-admission authority chain.",
     "modelRevision": "P1c changes measurement resolution; compare semantic capability identities, not raw counts, across P1/P1b/P1c.",
-    "unresolvedRepresentationBoundaryCount": "One lower representation aggregate remains: accepted v0.12 STRING/anum helpers below representation.v012-string-anum."
+    "unresolvedRepresentationBoundaryCount": "Zero means the currently selected v0.13 source/Rule authority chain has no intentionally aggregated representation boundary. This does not yet prove package-wide global trust closure."
   },
   "nextExperiments": [
-    "Unfold representation.v012-string-anum through byte-carrier, quaternary-anum, quaternary-state and raw anum parsing/execution while keeping representation separate from semantic bootstrap.",
-    "Add an independent audit of semantic-write and interpretation entrypoints beyond the currently enumerated v0.13/source-authority paths.",
+    "Add an independent package-wide audit of semantic-write and interpretation entrypoints, separate from the hand-maintained projection.",
+    "Trace mandatory executable gates against declared public semantic capability roots and compare observed runtime/static paths with the projection.",
     "Run per-bootstrap-capability elimination experiments and classify INDEPENDENT/DERIVABLE/EQUIVALENT_REENCODING/IMPLEMENTATION_ONLY/UNKNOWN.",
-    "Add the A10b MTS-native read-only self-interpretation witness and report residual host dependencies.",
-    "Build a v0.12 -> v0.13 trust-surface delta only after stable capability IDs and global-path coverage exist."
+    "Incorporate A10/A10b self-interpretation evidence into the Link-described/Link-executed maturity matrix without confusing read-only validation with write-side self-hosting.",
+    "Build a v0.12 -> v0.13 trust-surface delta only after stable global-path coverage exists."
   ],
   "measurement": {
-    "modelRevision": "A9-P1c-exact-theory-unfolding",
+    "modelRevision": "A9-P1d-string-authority-read-closure",
     "metricDeltaComparableToPreviousRevision": false,
-    "reason": "P1c removes one aggregate exact-Theory bootstrap capability and replaces it with explicit derived, representation and resource capabilities; count deltas reflect model resolution, not runtime growth."
+    "reason": "P1d narrows an existing representation capability to the actual v0.13 read/replay authority path. Capability counts are unchanged; trusted-path classification becomes more precise."
   },
   "authorityServiceUnfolding": {
     "replacedCapability": "bootstrap.accepted-v012-authority-runtime",
@@ -781,5 +811,26 @@
       "representation.v012-string-anum"
     ],
     "note": "P1c closes the selected-admission exact-Theory chain only. The lower accepted v0.12 STRING/anum representation remains aggregated and prevents full inherited/global closure claims."
+  },
+  "stringAuthorityReadClosure": {
+    "capability": "representation.v012-string-anum",
+    "root": "ts/src/v012-string-anum.ts#readV012StringAnum",
+    "pathKind": "read-only-poles",
+    "uses": [
+      "verifyRootBasis",
+      "memory.poles",
+      "basis.R identity",
+      "basis.L identity",
+      "basis.U identity"
+    ],
+    "excludes": [
+      "byte-carrier general codec",
+      "quaternary-anum materialization/serialization",
+      "quaternary-state",
+      "raw anum parser/executor",
+      "Memory lookup/write operations"
+    ],
+    "noWritePath": true,
+    "note": "Module-level imports are not automatically trusted dependencies. Only the reachable selected authority read path is projected."
   }
 }

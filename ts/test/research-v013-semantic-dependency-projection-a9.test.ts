@@ -28,7 +28,7 @@ const projectionPath = "traceability/mts-v0.13-semantic-dependency-projection.js
 const projection = readJson(projectionPath);
 const contract = readJson("contracts/mts-contract-v0.13.json");
 
-same(projection.schema, "mts-semantic-dependency-projection/v0.3", "projection schema");
+same(projection.schema, "mts-semantic-dependency-projection/v0.4", "projection schema");
 same(projection.mtsVersion, "0.13", "projection MTS version");
 same(projection.status, "research", "projection remains research evidence");
 same(projection.externalAuditProjectionOnly, true, "projection is external audit tooling");
@@ -38,7 +38,7 @@ same(projection.executionDependency, false, "MTS execution does not depend on pr
 same(projection.ownerIssue, 1270, "projection is owned by #1270");
 same(
   projection.candidateMain,
-  "fa8912c7691d52c9011ad9005620842044b26fb3",
+  "68c6ca8e9faae4d2dfc232ab5ec64dcb9657bfdd",
   "projection binds the exact ready candidate snapshot",
 );
 same(projection.coverage.globalTrustBoundaryComplete, false, "P1 does not overclaim global trust closure");
@@ -59,17 +59,17 @@ same(
 );
 same(
   projection.coverage.inheritedAuthorityTransitiveImplementationClosureComplete,
-  false,
-  "STRING/anum representation helpers remain to be unfolded before full inherited closure",
+  true,
+  "P1d closes the actual inherited authority execution chain",
 );
 same(
   projection.coverage.stringCarrierTransitiveImplementationClosureComplete,
-  false,
-  "P1c does not overclaim lower STRING/anum carrier closure",
+  true,
+  "P1d closes the poles-only STRING authority reader path",
 );
 same(
   projection.measurement.modelRevision,
-  "A9-P1c-exact-theory-unfolding",
+  "A9-P1d-string-authority-read-closure",
   "measurement model revision",
 );
 same(
@@ -429,9 +429,64 @@ same(
 );
 same(
   projection.metrics.unresolvedRepresentationBoundaryCount,
-  1,
-  "lower v0.12 STRING/anum representation chain remains intentionally aggregated",
+  0,
+  "actual STRING authority read path has no remaining aggregate representation boundary",
 );
+
+same(
+  projection.auditScope.stringAuthorityReadPath.root,
+  "ts/src/v012-string-anum.ts#readV012StringAnum",
+  "P1d STRING authority read root",
+);
+setEqual(
+  projection.auditScope.stringAuthorityReadPath.files,
+  [
+    "ts/src/v012-string-anum.ts",
+    "ts/src/memory.ts",
+  ],
+  "P1d STRING authority read file inventory",
+);
+setEqual(
+  projection.auditScope.stringAuthorityReadPath.excludedFromPath,
+  [
+    "ts/src/byte-carrier.ts",
+    "ts/src/quaternary-anum.ts",
+    "ts/src/quaternary-state.ts",
+    "ts/src/anum.ts",
+  ],
+  "producer/general codec modules are excluded from selected STRING authority read path",
+);
+
+const stringSource = read("ts/src/v012-string-anum.ts");
+const stringReadStart = stringSource.indexOf("export function readV012StringAnum");
+const stringReadEnd = stringSource.indexOf("export function materializeV012StringByteAnum");
+assert(stringReadStart >= 0 && stringReadEnd > stringReadStart,
+  "STRING read-only authority slice is locatable");
+const stringReadSlice = stringSource.slice(0, stringReadEnd);
+for (const requiredFragment of [
+  "verifyRootBasis(",
+  "memory.poles(",
+  "readVerifiedV012StringByteAnum(",
+  "value === basis.U",
+  "value === basis.L",
+] as const) {
+  assert(stringReadSlice.includes(requiredFragment),
+    `STRING authority reader uses expected structural dependency: ${requiredFragment}`);
+}
+for (const forbiddenFragment of [
+  "byteToQuaternaryBits(",
+  "encodeBytesToQuaternary(",
+  "decodeBytesFromQuaternary(",
+  "materializeQuaternaryAnum(",
+  "serializeMaterializedQuaternaryAnum(",
+  "memory.find(",
+  "memory.ensure(",
+  "memory.ensureStartSelfClosed(",
+  "memory.ensureEndSelfClosed(",
+] as const) {
+  assert(!stringReadSlice.includes(forbiddenFragment),
+    `STRING authority reader excludes producer/general codec dependency: ${forbiddenFragment}`);
+}
 
 // Recompute all published P1 metrics from stable capability IDs.
 const byLayer = (layer: string): any[] =>
