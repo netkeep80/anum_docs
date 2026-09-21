@@ -208,8 +208,12 @@ if (childGatePath !== undefined) {
       (entry: { readonly id: string }) => entry.id.slice(0, entry.id.indexOf("#")),
     ),
   ]);
-  const undocumentedDirectCallers = Object.keys(pathCounts)
-    .map((signature) => signature.slice(signature.indexOf("|") + 1).split(">")[0])
+  const observedDirectCallers = Object.keys(pathCounts)
+    .flatMap((signature) => {
+      const direct = signature.slice(signature.indexOf("|") + 1).split(">")[0];
+      return direct === undefined ? [] : [direct];
+    });
+  const undocumentedDirectCallers = observedDirectCallers
     .filter((file, index, all) => !allowedDirectSourceFiles.has(file) && all.indexOf(file) === index)
     .sort();
 
