@@ -219,7 +219,7 @@ same(
 same(
   (conformance13.acceptanceBlockers ?? []).length,
   3,
-  "three explicit blockers remain after readiness is reopened",
+  "three explicit blockers remain while readiness is reopened",
 );
 for (const blocker of [
   "foundation necessity/minimality remains open under A9 elimination and self-proof criteria",
