@@ -301,7 +301,8 @@
     "AC6": "green",
     "AC7": "green",
     "AC8": "green",
-    "AC9": "green"
+    "AC9": "green",
+    "AC10": "pending"
   },
   "explicitlyDeferred": {
     "productionNonWellFoundedMutualCycles": true,
@@ -317,7 +318,7 @@
   },
   "candidateState": {
     "researchEvidenceComplete": true,
-    "acceptanceCriteriaComplete": true,
+    "acceptanceCriteriaComplete": false,
     "semanticLawSetFrozenForR7b": true,
     "contractBoundaryEstablished": true,
     "conformanceObligationsDeclared": true,
@@ -327,7 +328,8 @@
     "explicitAuthorAcceptanceRecorded": false,
     "linkNativeAbitGroundingComplete": true,
     "functionalParityAuditComplete": true,
-    "foundationSuperiorityAuditComplete": true
+    "foundationSuperiorityAuditComplete": true,
+    "rootFormalDialectComplete": false
   },
   "owners": {
     "memory": "ts/src/memory.ts",
@@ -957,5 +959,71 @@
       "additiveOnlyFailureReason": "Adding R/O/C/L as another foundation alphabet while leaving A5 unchanged would retain two independent foundation alphabets and would not realize the claimed reduction of primitives.",
       "whyNewVersion": "Accepted v0.12 is immutable and A5 foundation-role replacement is an observable semantic delta; the smallest correct change therefore requires a new candidate version even though most inherited theory is unchanged."
     }
+  },
+  "rootAspectQuartet": {
+    "oneQuartetFourRoles": true,
+    "roles": [
+      "Link aspect",
+      "Link local form",
+      "Anum abit",
+      "FORMAL root operator / ostensive sign"
+    ],
+    "mapping": {
+      "10": {
+        "aspect": "START",
+        "form": "START",
+        "abit": "9",
+        "formalOperator": "9",
+        "arity": 1,
+        "rootWitness": "98",
+        "rootLink": "O"
+      },
+      "11": {
+        "aspect": "ROOT",
+        "form": "ROOT",
+        "abit": "8",
+        "formalOperator": "8",
+        "arity": 0,
+        "rootWitness": "8",
+        "rootLink": "R"
+      },
+      "01": {
+        "aspect": "END",
+        "form": "END",
+        "abit": "6",
+        "formalOperator": "6",
+        "arity": 1,
+        "rootWitness": "68",
+        "rootLink": "C"
+      },
+      "00": {
+        "aspect": "PAIR",
+        "form": "PAIR",
+        "abit": "1",
+        "formalOperator": "1",
+        "arity": 2,
+        "rootWitness": "19868",
+        "rootLink": "L"
+      }
+    },
+    "derivedControl": {
+      "term": "16898",
+      "expected": "U = C ⟼ O",
+      "isFifthAspect": false,
+      "isFifthAbit": false,
+      "isFifthFormalOperator": false
+    },
+    "operatorIsRootLinkAlias": false,
+    "examples": {
+      "1": "PAIR operator/aspect, not semantic L",
+      "6": "END operator/aspect, not semantic C",
+      "9": "START operator/aspect, not semantic O",
+      "68": "END(ROOT) = C",
+      "98": "START(ROOT) = O",
+      "19868": "PAIR(O,C) = L"
+    },
+    "formalClosureRequired": true,
+    "genericCompositionRequired": true,
+    "hostTermSpecialCasesAllowed": false
   }
 }
