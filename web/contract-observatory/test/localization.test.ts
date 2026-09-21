@@ -17,6 +17,46 @@ const index = buildContractObservatoryIndex(repositoryRoot);
 const projection = buildMethodologyProjection(repositoryRoot, index);
 const html = renderContractObservatoryHtml(index, projection);
 
+const candidateSummary = Object.freeze({
+  ...index.versions[0]!,
+  contractId: "mts-contract/v9.9",
+  conformanceId: "mts-conformance/v9.9",
+  contractPath: "contracts/mts-contract-v9.9.json",
+  conformancePath: "contracts/mts-conformance-v9.9.json",
+  status: "candidate",
+  accepted: false,
+  acceptanceReady: false,
+  isCurrent: false,
+  isPrevious: false,
+});
+const candidateProjection = Object.freeze({
+  ...projection,
+  versions: Object.freeze([
+    ...projection.versions,
+    Object.freeze({
+      ...projection.versions[0]!,
+      contractId: candidateSummary.contractId,
+      conformanceId: candidateSummary.conformanceId,
+      contractPath: candidateSummary.contractPath,
+      conformancePath: candidateSummary.conformancePath,
+      status: "candidate",
+      accepted: false,
+      acceptanceReady: false,
+      isCurrent: false,
+      isPrevious: false,
+      acceptanceReferences: Object.freeze([]),
+      lifecycle: Object.freeze([
+        Object.freeze({ stage: "candidate" as const, evidence: Object.freeze([candidateSummary.contractPath]) }),
+      ]),
+    }),
+  ]),
+});
+const candidateHtml = renderContractObservatoryHtml(
+  Object.freeze({ ...index, versions: Object.freeze([...index.versions, candidateSummary]) }),
+  candidateProjection,
+);
+assert(candidateHtml.includes("КАНДИДАТ"), "candidate classification is localized in static overview");
+
 for (const marker of [
   "<title>Обозреватель контрактов МТС</title>",
   "<h1>Обозреватель контрактов МТС</h1>",
