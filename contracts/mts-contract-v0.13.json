@@ -16,7 +16,7 @@
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
   },
-  "acceptanceReady": true,
+  "acceptanceReady": false,
   "currentPointer": {
     "acceptance": "cutover/typescript-c1-acceptance-v0.5.json",
     "currentContract": "mts-contract/v0.12",
@@ -332,9 +332,11 @@
     "explicitAuthorAcceptanceRecorded": false,
     "linkNativeAbitGroundingComplete": true,
     "functionalParityAuditComplete": true,
-    "foundationSuperiorityAuditComplete": true,
+    "foundationSuperiorityAuditComplete": false,
     "rootFormalDialectComplete": true,
-    "publicFacadeComplete": true
+    "publicFacadeComplete": true,
+    "readinessReopened": true,
+    "readinessReopenReason": "A9 adopted stronger package-wide trust/minimality and proof-driven self-verification criteria after the earlier readiness audit; readiness must be rerun after those criteria close."
   },
   "owners": {
     "memory": "ts/src/memory.ts",
@@ -351,8 +353,9 @@
     "currentAccepted": "mts-contract/v0.12",
     "candidate": "mts-contract/v0.13",
     "accepted": false,
-    "acceptanceReady": true,
-    "candidateRuntimeSelectable": false
+    "acceptanceReady": false,
+    "candidateRuntimeSelectable": false,
+    "readinessReopened": true
   },
   "traceabilityManifest": "traceability/mts-v0.13.json",
   "normativeDocumentation": {
@@ -1039,5 +1042,21 @@
     "acceptedRuntimeRemains": "mts-contract/v0.12",
     "candidateRuntimeSelectable": false,
     "explicitAuthorAcceptanceRecorded": false
+  },
+  "readinessReopen": {
+    "status": "reopened-a9-selfproof",
+    "ownerIssue": 1270,
+    "preserves": [
+      "AC1-AC10 executable evidence for their declared scopes",
+      "accepted/current v0.12",
+      "candidate runtime non-selectability",
+      "completed functional parity and public/kernel implementation evidence"
+    ],
+    "requires": [
+      "package-wide semantic decision/runtime trust boundary closure",
+      "experimentally scoped primitive elimination/minimal-basis evidence",
+      "proof-driven self-verification evidence for selected v0.13 foundation claims",
+      "independent readiness rerun after the stronger criteria close"
+    ]
   }
 }
