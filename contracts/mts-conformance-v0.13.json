@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "research-evidence-complete-formalization-pending",
-  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability, normative documentation, Link-native abit grounding and accepted-v0.12 functional non-regression are complete. Foundation superiority, independent readiness audit and explicit author acceptance remain pending.",
+  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable evidence for their declared candidate scopes, but inherited-foundation parity has been reopened after A5b found that the old L9 overrejected rooted cycles allowed by A18. The current tree carrier remains GREEN only for well-founded ROOT-decomposable Links.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -108,8 +108,8 @@
       ]
     },
     "AC2": {
-      "status": "green",
-      "scope": "all admissible distinguishable non-bootstrap Links with finite ROOT-grounding",
+      "status": "green-for-current-tree-carrier-domain",
+      "scope": "all well-founded ROOT-decomposable non-bootstrap Links supported by the current canonical tree carrier; rooted cyclic semantic graphs are outside this carrier scope but are not ontologically rejected",
       "gates": [
         "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
         "ts/test/v013-unknown-whole-two-memory.test.ts",
@@ -194,7 +194,8 @@
     "v013-abit-link-signs-R-O-C-L",
     "v013-U-pair-not-fifth-abit",
     "v013-abit-sign-description-separation",
-    "v013-abit-two-memory-local-handle-independence"
+    "v013-abit-two-memory-local-handle-independence",
+    "v013-rooted-cycle-remains-ontologically-open"
   ],
   "requiredNegativeVectors": [
     "v013-flat-relative-glyph-collision-not-canonical",
@@ -207,9 +208,9 @@
     "v013-empty-wire-is-not-root",
     "v013-unrooted-sequence-lookalike-rejected",
     "v013-unrooted-anum-hierarchy-rejected",
-    "v013-mutual-distinct-node-cycle-rejected-as-cyclic-grounding",
     "v013-nonroot-both-selfclosed-rejected-by-root-uniqueness",
-    "v013-foreign-abit-handle-rejected"
+    "v013-foreign-abit-handle-rejected",
+    "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"
   ],
   "retainedResearchEvidence": {
     "nonWellFoundedGraphDescription": {
@@ -248,10 +249,11 @@
     "linkNativeAbitBasis": "green-complete-a2",
     "comparativeSuperiority": "pending",
     "codecEngineeringComparison": "green-research-evidence-a3",
-    "functionalParity": "green-complete-a4",
-    "foundationSuperiority": "in-progress-a5a"
+    "functionalParity": "reopened-a5b-inherited-foundation",
+    "foundationSuperiority": "red-a5b-cycle-boundary-correction"
   },
   "acceptanceBlockers": [
+    "inherited-foundation non-regression is reopened: candidate L9 must preserve A18 rooted-cycle admissibility and the A1/A5/A18 delta must be explicitly audited",
     "foundation superiority versus accepted v0.12 has not yet been demonstrated for necessity, sufficiency, derivability, Link-ontology closure, canonical unambiguity and absence of hidden host semantic authority",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
@@ -304,7 +306,7 @@
     "foundationAcceptanceGate": false
   },
   "functionalParityAudit": {
-    "status": "green-complete-a4",
+    "status": "semantic-delta-green-inherited-foundation-reopened",
     "baseline": {
       "contract": "mts-contract/v0.12",
       "conformance": "mts-conformance/v0.12",
@@ -597,10 +599,12 @@
     ],
     "completedLawCount": 18,
     "reviewRequiredCount": 0,
-    "regressionCount": 0
+    "regressionCount": 0,
+    "semanticDeltaLawParityComplete": true,
+    "inheritedFoundationParityComplete": false
   },
   "foundationSuperiorityAudit": {
-    "status": "in-progress-a5a",
+    "status": "red-a5b-correcting-cycle-boundary",
     "criteria": {
       "necessity": {
         "status": "green-a5a",
@@ -610,7 +614,7 @@
         ]
       },
       "sufficiency": {
-        "status": "green-for-declared-finite-grounded-domain-a5a",
+        "status": "green-only-for-well-founded-tree-carrier-domain",
         "evidence": [
           "ts/test/v013-aspect-foundation-theorem.test.ts",
           "ts/test/v013-unknown-whole-two-memory.test.ts",
@@ -653,8 +657,29 @@
       "compactnessClaim": false
     },
     "remainingBeforeComplete": [
-      "independently challenge the finite-grounding premise versus accepted v0.12 capability",
-      "show whether the same foundation result could be obtained as a smaller v0.12 extension rather than a v0.13 refoundation"
+      "complete inherited-foundation non-regression audit, including A1/A5/A18",
+      "prove the minimal normative delta from accepted v0.12 rather than assuming every candidate mechanism is foundational",
+      "independently review rooted cyclic graph identity/transport as a future graph-level layer without making tree-carrier limitations ontological"
     ]
+  },
+  "inheritedFoundationParity": {
+    "status": "in-progress-a5b",
+    "baselineDocument": "docs/theory/Система аксиом МТС.md",
+    "requiredScope": "A0-A20 and F2-F6 inherited by semanticBase mts-contract/v0.12",
+    "findings": {
+      "A1": {
+        "classification": "PRESERVED",
+        "note": "finite rooted distinguishing evidence remains required; finite grounding is not equated with acyclic topology"
+      },
+      "A5": {
+        "classification": "INTENTIONAL_FOUNDATION_DELTA_REVIEW_REQUIRED",
+        "note": "accepted [ ] 1 0 / O-C-L-U foundation alphabet is proposed to move to a compatibility layer while R-O-C-L becomes the aspect foundation"
+      },
+      "A18": {
+        "classification": "CORRECTION_IN_PROGRESS",
+        "note": "rooted distinguishable cycles must remain ontologically admissible; old candidate L9 overrejected them"
+      }
+    },
+    "remaining": "complete explicit A0-A20/F2-F6 delta map before restoring functionalParityAuditComplete=true"
   }
 }

@@ -286,7 +286,7 @@
     "L6": "DESCRIPTION != TARGET across semantic, structural, Link-carrier and physical layers.",
     "L7": "Two-memory identity is structural; sender-local technical handles never cross as transport identity.",
     "L8": "Semantic START/END/PAIR writes require explicit source/Dictionary/Grammar/fixed-Theory/StructuralRule authority.",
-    "L9": "Admissible distinguishable semantic Links require finite ROOT-grounding; genuine distinct-node recursive dependency cycles are rejected.",
+    "L9": "Pure recursive dependency without finite ROOT-grounded distinguishing evidence does not establish semantic Link identity; the current canonical 1/6/8/9 tree carrier is complete only for well-founded ROOT-decomposable Links, while rooted cyclic graphs are not rejected ontologically.",
     "L10": "Every local exact sequence/anum context originates structurally at R.",
     "L11": "STRING anums preserve exact byte identity and admit allocation-independent v0.13 structural description.",
     "L12": "Quaternary structural meaning is grounded by FORMAL authority rather than host opcode or glyph identity.",
@@ -318,7 +318,7 @@
   "candidateState": {
     "researchEvidenceComplete": true,
     "acceptanceCriteriaComplete": true,
-    "semanticLawSetFrozenForR7b": true,
+    "semanticLawSetFrozenForR7b": false,
     "contractBoundaryEstablished": true,
     "conformanceObligationsDeclared": true,
     "traceabilityComplete": true,
@@ -326,7 +326,7 @@
     "readinessAuditComplete": false,
     "explicitAuthorAcceptanceRecorded": false,
     "linkNativeAbitGroundingComplete": true,
-    "functionalParityAuditComplete": true,
+    "functionalParityAuditComplete": false,
     "foundationSuperiorityAuditComplete": false
   },
   "owners": {
@@ -451,7 +451,7 @@
       "conformance": "mts-conformance/v0.12",
       "accepted": true
     },
-    "scope": "all essential accepted v0.12 semantic capabilities, executable gates, negative authority boundaries and public/runtime capabilities",
+    "scope": "all essential accepted v0.12 semantic capabilities, executable gates, negative authority boundaries, public/runtime capabilities, and inherited normative foundation A0-A20/F2-F6",
     "allowedClassifications": [
       "PRESERVED",
       "GENERALIZED",
@@ -464,7 +464,8 @@
     ],
     "deferredRequiresExplicitAuthorDecision": true,
     "passingOldRuntimeTestsAloneProvesSemanticParity": false,
-    "acceptanceRequiresCompleteAudit": true
+    "acceptanceRequiresCompleteAudit": true,
+    "inheritedFoundationAuditRequired": true
   },
   "retainedAcceptedCapabilities": {
     "anumAddressProtocolV012": {
@@ -680,5 +681,17 @@
       ],
       "isCompleteAspectPartition": true
     }
+  },
+  "cycleSemanticsBoundary": {
+    "inheritedFoundation": "A18",
+    "rootedDistinguishableCyclesOntologicallyRejected": false,
+    "pureUngroundedMutualRecursionEstablishesIdentity": false,
+    "currentConcreteMemoryCanConstructDistinctNodeCycles": false,
+    "currentPersistenceCanRestoreIdOnlyMutualCycles": false,
+    "currentRecursiveIdentityProofSupportsGraphCycles": false,
+    "currentCanonicalTreeCarrierSupportsGraphCycles": false,
+    "treeCarrierDomain": "well-founded ROOT-decomposable semantic Links",
+    "rootedCyclicGraphIdentityAndTransport": "requires separate graph-level evidence/representation; not supplied by the current tree carrier",
+    "finiteGroundingDoesNotMeanAcyclicOntology": true
   }
 }
