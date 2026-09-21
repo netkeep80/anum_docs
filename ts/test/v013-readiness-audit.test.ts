@@ -37,6 +37,11 @@ same(
   true,
   "candidate kernel behavior implemented",
 );
+same(
+  contract13.implementation?.singleLiveSemanticRuntime,
+  true,
+  "v0.13 shares the single live @mts/core semantic kernel",
+);
 same(contract13.candidateState?.publicFacadeComplete, true, "public facade complete");
 same(contract13.candidateState?.documentationComplete, true, "documentation complete");
 same(contract13.candidateState?.traceabilityComplete, true, "traceability complete");
