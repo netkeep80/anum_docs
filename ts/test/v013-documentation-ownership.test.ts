@@ -55,7 +55,7 @@ const expectedOwnerDocument = Object.freeze<Record<string, string>>({
 });
 
 const ownerPattern =
-  /<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>\s*<!--\s*нормативный владелец\s*-->/g;
+  /<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>\s*<!--\s*кандидатный нормативный владелец\s*-->/g;
 const owners = new Map<string, string[]>();
 
 for (const path of allowedDocuments) {
@@ -85,7 +85,7 @@ same(
 );
 same(
   contract.normativeDocumentation?.ownerRule,
-  "one candidate semantic law -> one canonical normative owner anchor",
+  "one candidate semantic law -> one canonical candidate normative owner anchor",
   "contract declares the ownership invariant",
 );
 
