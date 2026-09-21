@@ -85,6 +85,57 @@ export type {
   V012SourceResultReplayResult,
 } from "./v012-source.js";
 
+
+//
+// MTS v0.13 candidate consumer boundary.
+//
+// These exports expose already-proven representation/read operations and
+// semantic write/evaluation operations that consume explicit source/Rule/Theory
+// evidence. Authority construction remains internal: the public facade does not
+// export Dictionary mutation, Rule admission, Act builders, or low-level
+// relative-position context builders.
+//
+export {
+  V013HierarchicalCarrierError,
+  decomposeV013SemanticLink,
+  materializeV013HierarchicalCarrier,
+  materializeV013HierarchicalCarrierFromSemanticLink,
+  serializeV013HierarchicalCarrier,
+} from "./v013-hierarchical-carrier.js";
+export type {
+  V013HierarchicalCarrierErrorCode,
+  V013SelfIncidence,
+  V013SemanticDecomposition,
+  V013StructuralAspect,
+} from "./v013-hierarchical-carrier.js";
+
+export {
+  V013RelativeFormMaterializationError,
+  materializeAuthorizedBinaryLinkSource,
+  materializeAuthorizedRelativeUnaryFormSource,
+} from "./v013-relative-form-materialization.js";
+export type {
+  V013RelativeFormMaterializationErrorCode,
+} from "./v013-relative-form-materialization.js";
+
+export {
+  V013RelativePoleExecutionError,
+  executeAuthorizedRelativePoleSource,
+} from "./v013-relative-pole-execution.js";
+export type {
+  V013RelativePoleExecutionErrorCode,
+  V013RelativePoleExecutionResult,
+} from "./v013-relative-pole-execution.js";
+
+export {
+  V013FormalAspectEvaluationError,
+  evaluateV013FormalAspectProgram,
+} from "./v013-formal-aspect-evaluator.js";
+export type {
+  V013FormalAspectEvaluationErrorCode,
+  V013FormalAspectProgramEvidence,
+} from "./v013-formal-aspect-evaluator.js";
+
 export {
   PersistentStore,
   PersistentStoreError,
