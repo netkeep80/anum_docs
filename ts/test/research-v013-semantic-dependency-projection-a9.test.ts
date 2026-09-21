@@ -19,6 +19,18 @@ function setEqual(actual: readonly string[], expected: readonly string[], messag
   );
 }
 
+function fnv1a64(items: readonly string[]): string {
+  let hash = 14695981039346656037n;
+  const prime = 1099511628211n;
+  const mask = (1n << 64n) - 1n;
+  const source = items.join("\n");
+  for (let index = 0; index < source.length; index += 1) {
+    hash ^= BigInt(source.charCodeAt(index));
+    hash = (hash * prime) & mask;
+  }
+  return hash.toString(16).padStart(16, "0");
+}
+
 const repoRoot = resolve(process.cwd(), "..");
 const read = (path: string): string => readFileSync(join(repoRoot, path), "utf8");
 const readJson = (path: string): any => JSON.parse(read(path));
@@ -28,7 +40,7 @@ const projectionPath = "traceability/mts-v0.13-semantic-dependency-projection.js
 const projection = readJson(projectionPath);
 const contract = readJson("contracts/mts-contract-v0.13.json");
 
-same(projection.schema, "mts-semantic-dependency-projection/v0.5", "projection schema");
+same(projection.schema, "mts-semantic-dependency-projection/v0.6", "projection schema");
 same(projection.mtsVersion, "0.13", "projection MTS version");
 same(projection.status, "research", "projection remains research evidence");
 same(projection.externalAuditProjectionOnly, true, "projection is external audit tooling");
@@ -38,8 +50,8 @@ same(projection.executionDependency, false, "MTS execution does not depend on pr
 same(projection.ownerIssue, 1270, "projection is owned by #1270");
 same(
   projection.candidateMain,
-  "2ce5f2e8e7e22f2d89bfb6472a32e7cee4e54d77",
-  "projection binds the exact ready candidate snapshot",
+  "cd9dde66d9210d5d43024ceb0d8280b4d458e4f4",
+  "projection binds the exact post-P0 candidate snapshot",
 );
 same(projection.coverage.globalTrustBoundaryComplete, false, "P1 does not overclaim global trust closure");
 same(
@@ -69,7 +81,7 @@ same(
 );
 same(
   projection.measurement.modelRevision,
-  "A9-P1e-package-direct-write-audit",
+  "A9-P1f-package-static-semantic-decision-audit",
   "measurement model revision",
 );
 same(
@@ -675,13 +687,518 @@ same(
 );
 same(
   projection.coverage.packageInterpretationEntrypointAuditComplete,
-  false,
-  "write-sink audit does not overclaim read-only interpretation coverage",
+  true,
+  "P1f closes the declared static interpretation/decision candidate audit",
 );
 same(
   projection.coverage.globalTrustBoundaryComplete,
   false,
   "write-sink audit alone does not establish global trust closure",
+);
+
+// P1f independently discovers S3 package-wide typed ReadMemory access and
+// host-owned decision candidates. Unlike P1e's deliberately syntax-only write
+// inventory, this pass resolves the called/read member to declarations in
+// memory.ts so unrelated methods with the same spelling are excluded.
+const sourcePaths = tsSourceFiles("ts/src");
+const typedProgram = ts.createProgram({
+  rootNames: sourcePaths.map((path) => join(repoRoot, path)),
+  options: {
+    target: ts.ScriptTarget.ES2022,
+    module: ts.ModuleKind.NodeNext,
+    moduleResolution: ts.ModuleResolutionKind.NodeNext,
+    strict: true,
+    skipLibCheck: true,
+  },
+});
+const typeChecker = typedProgram.getTypeChecker();
+const memorySourceSuffix = "/ts/src/memory.ts";
+const readMemoryMembers = new Set([
+  "root",
+  "linkCount",
+  "poles",
+  "find",
+  "outgoing",
+  "incoming",
+  "issuanceIndex",
+  "allLinks",
+]);
+const writeMemoryMembers = new Set([
+  "ensureRoot",
+  "ensureStartSelfClosed",
+  "ensureEndSelfClosed",
+  "ensure",
+]);
+
+interface TypedReadSite {
+  readonly file: string;
+  readonly owner: string;
+  readonly member: string;
+}
+
+interface DecisionCandidate {
+  readonly file: string;
+  readonly owner: string;
+  readonly signals: readonly string[];
+}
+
+function declarationIsMemoryMemberFrom(
+  symbol: ts.Symbol | undefined,
+  member: string,
+  members: ReadonlySet<string>,
+): boolean {
+  if (symbol === undefined || !members.has(member)) return false;
+  return (symbol.getDeclarations() ?? []).some((declaration) => {
+    const file = declaration.getSourceFile().fileName.replaceAll("\\", "/");
+    return file.endsWith(memorySourceSuffix) || file.endsWith("ts/src/memory.ts");
+  });
+}
+
+function declarationIsMemoryMember(symbol: ts.Symbol | undefined, member: string): boolean {
+  return declarationIsMemoryMemberFrom(symbol, member, readMemoryMembers);
+}
+
+function nodeOwner(node: ts.Node): string {
+  let current: ts.Node | undefined = node;
+  while (current !== undefined) {
+    if (ts.isFunctionDeclaration(current) && current.name !== undefined) {
+      return current.name.text;
+    }
+    if (ts.isMethodDeclaration(current)) {
+      const method = memberName(current.name) ?? "<computed-method>";
+      const parent = current.parent;
+      const className =
+        ts.isClassDeclaration(parent) && parent.name !== undefined
+          ? parent.name.text
+          : "<class>";
+      return `${className}.${method}`;
+    }
+    if (ts.isConstructorDeclaration(current)) {
+      const parent = current.parent;
+      const className =
+        ts.isClassDeclaration(parent) && parent.name !== undefined
+          ? parent.name.text
+          : "<class>";
+      return `${className}.constructor`;
+    }
+    if (
+      (ts.isArrowFunction(current) || ts.isFunctionExpression(current)) &&
+      ts.isVariableDeclaration(current.parent) &&
+      ts.isIdentifier(current.parent.name)
+    ) {
+      return current.parent.name.text;
+    }
+    current = current.parent;
+  }
+  return "<module>";
+}
+
+function containsLinkHandle(node: ts.Node): boolean {
+  let found = false;
+  const visit = (child: ts.Node): void => {
+    if (found) return;
+    if (ts.isIdentifier(child) || ts.isPropertyAccessExpression(child)) {
+      const type = typeChecker.getTypeAtLocation(child);
+      const text = typeChecker.typeToString(type);
+      if (/\bLinkHandle\b/.test(text)) {
+        found = true;
+        return;
+      }
+    }
+    ts.forEachChild(child, visit);
+  };
+  visit(node);
+  return found;
+}
+
+function containsTypedMemoryRead(node: ts.Node): boolean {
+  let found = false;
+  const visit = (child: ts.Node): void => {
+    if (found) return;
+    if (ts.isPropertyAccessExpression(child)) {
+      const member = child.name.text;
+      const symbol = typeChecker.getSymbolAtLocation(child.name);
+      if (declarationIsMemoryMember(symbol, member)) {
+        found = true;
+        return;
+      }
+    }
+    ts.forEachChild(child, visit);
+  };
+  visit(node);
+  return found;
+}
+
+const semanticTagNames = new Set([
+  "kind",
+  "type",
+  "role",
+  "mode",
+  "operator",
+  "aspect",
+  "tag",
+  "opcode",
+  "classification",
+  "sourceKind",
+]);
+
+function isHostLiteral(node: ts.Node): boolean {
+  return (
+    ts.isStringLiteral(node) ||
+    ts.isNumericLiteral(node) ||
+    node.kind === ts.SyntaxKind.TrueKeyword ||
+    node.kind === ts.SyntaxKind.FalseKeyword ||
+    node.kind === ts.SyntaxKind.NullKeyword
+  );
+}
+
+function containsSemanticTag(node: ts.Node): boolean {
+  let found = false;
+  const visit = (child: ts.Node): void => {
+    if (found) return;
+    if (
+      ts.isPropertyAccessExpression(child) &&
+      semanticTagNames.has(child.name.text)
+    ) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(child, visit);
+  };
+  visit(node);
+  return found;
+}
+
+function containsAmbientMutable(node: ts.Node): boolean {
+  let found = false;
+  const visit = (child: ts.Node): void => {
+    if (found) return;
+    if (ts.isIdentifier(child)) {
+      const symbol = typeChecker.getSymbolAtLocation(child);
+      for (const declaration of symbol?.getDeclarations() ?? []) {
+        if (!ts.isVariableDeclaration(declaration)) continue;
+        const list = declaration.parent;
+        if (!ts.isVariableDeclarationList(list)) continue;
+        if ((list.flags & ts.NodeFlags.Const) !== 0) continue;
+        const statement = list.parent;
+        if (ts.isVariableStatement(statement) && ts.isSourceFile(statement.parent)) {
+          found = true;
+          return;
+        }
+      }
+    }
+    ts.forEachChild(child, visit);
+  };
+  visit(node);
+  return found;
+}
+
+function hasLiteralCase(node: ts.SwitchStatement): boolean {
+  return node.caseBlock.clauses.some(
+    (clause) => ts.isCaseClause(clause) && isHostLiteral(clause.expression),
+  );
+}
+
+const typedReadSites: TypedReadSite[] = [];
+const typedWriteSites: TypedReadSite[] = [];
+const decisionSignalsByOwner = new Map<string, Set<string>>();
+
+for (const sourcePath of sourcePaths) {
+  const source = typedProgram.getSourceFile(join(repoRoot, sourcePath));
+  assert(source !== undefined, `typed source is available: ${sourcePath}`);
+
+  const addDecision = (node: ts.Node, signal: string): void => {
+    const owner = `${sourcePath}#${nodeOwner(node)}`;
+    let signals = decisionSignalsByOwner.get(owner);
+    if (signals === undefined) {
+      signals = new Set<string>();
+      decisionSignalsByOwner.set(owner, signals);
+    }
+    signals.add(signal);
+  };
+
+  const visit = (node: ts.Node): void => {
+    if (ts.isPropertyAccessExpression(node)) {
+      const member = node.name.text;
+      const symbol = typeChecker.getSymbolAtLocation(node.name);
+      if (declarationIsMemoryMember(symbol, member)) {
+        typedReadSites.push(Object.freeze({
+          file: sourcePath,
+          owner: nodeOwner(node),
+          member,
+        }));
+      }
+      if (declarationIsMemoryMemberFrom(symbol, member, writeMemoryMembers)) {
+        typedWriteSites.push(Object.freeze({
+          file: sourcePath,
+          owner: nodeOwner(node),
+          member,
+        }));
+      }
+    }
+
+    if (ts.isIfStatement(node)) {
+      if (containsLinkHandle(node.expression)) addDecision(node, "if-link");
+      if (containsTypedMemoryRead(node.expression)) addDecision(node, "if-memory-read");
+      if (containsSemanticTag(node.expression)) addDecision(node, "host-tag-decision");
+      if (containsAmbientMutable(node.expression)) addDecision(node, "ambient-mutable-decision");
+    } else if (ts.isConditionalExpression(node)) {
+      if (containsLinkHandle(node.condition)) addDecision(node, "ternary-link");
+      if (containsTypedMemoryRead(node.condition)) addDecision(node, "ternary-memory-read");
+      if (containsSemanticTag(node.condition)) addDecision(node, "host-tag-decision");
+      if (containsAmbientMutable(node.condition)) addDecision(node, "ambient-mutable-decision");
+    } else if (ts.isSwitchStatement(node)) {
+      if (containsLinkHandle(node.expression)) addDecision(node, "switch-link");
+      if (containsTypedMemoryRead(node.expression)) addDecision(node, "switch-memory-read");
+      if (containsSemanticTag(node.expression)) addDecision(node, "host-tag-decision");
+      if (hasLiteralCase(node)) addDecision(node, "literal-switch");
+      if (containsAmbientMutable(node.expression)) addDecision(node, "ambient-mutable-decision");
+    } else if (
+      ts.isBinaryExpression(node) &&
+      [
+        ts.SyntaxKind.EqualsEqualsEqualsToken,
+        ts.SyntaxKind.ExclamationEqualsEqualsToken,
+        ts.SyntaxKind.EqualsEqualsToken,
+        ts.SyntaxKind.ExclamationEqualsToken,
+      ].includes(node.operatorToken.kind)
+    ) {
+      if (containsLinkHandle(node)) addDecision(node, "link-equality");
+      if (containsTypedMemoryRead(node)) addDecision(node, "memory-read-equality");
+      if (containsSemanticTag(node)) addDecision(node, "host-tag-decision");
+      if (isHostLiteral(node.left) || isHostLiteral(node.right)) {
+        addDecision(node, "literal-equality");
+      }
+      const literal = ts.isStringLiteral(node.left)
+        ? node.left.text
+        : ts.isStringLiteral(node.right)
+          ? node.right.text
+          : null;
+      if (literal !== null && /^[8961]{2,}$/.test(literal)) {
+        addDecision(node, "wire-literal-dispatch");
+      }
+      if (containsAmbientMutable(node)) addDecision(node, "ambient-mutable-decision");
+    } else if (
+      ts.isElementAccessExpression(node) &&
+      node.argumentExpression !== undefined &&
+      ts.isNumericLiteral(node.argumentExpression)
+    ) {
+      addDecision(node, "fixed-coordinate-index");
+    } else if (ts.isCallExpression(node)) {
+      if (
+        ts.isPropertyAccessExpression(node.expression) &&
+        ["includes", "has", "get"].includes(node.expression.name.text) &&
+        node.arguments.some(isHostLiteral)
+      ) {
+        addDecision(node, "literal-membership");
+      }
+      if (ts.isIdentifier(node.expression)) {
+        const symbol = typeChecker.getSymbolAtLocation(node.expression);
+        const parameterOwned = (symbol?.getDeclarations() ?? []).some(ts.isParameter);
+        if (
+          parameterOwned &&
+          typeChecker.getTypeAtLocation(node.expression).getCallSignatures().length > 0
+        ) {
+          addDecision(node, "host-callback-call");
+        }
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+}
+
+const typedReadOwners = [...new Set(
+  typedReadSites.map((site) => `${site.file}#${site.owner}`),
+)].sort();
+const typedWriteOwners = [...new Set(
+  typedWriteSites.map((site) => `${site.file}#${site.owner}`),
+)].sort();
+
+const typedReadMemberCounts = Object.fromEntries(
+  [...readMemoryMembers].sort().map((member) => [
+    member,
+    typedReadSites.filter((site) => site.member === member).length,
+  ]),
+);
+
+const decisionCandidates: readonly DecisionCandidate[] = [...decisionSignalsByOwner.entries()]
+  .map(([id, signals]) => {
+    const split = id.lastIndexOf("#");
+    return Object.freeze({
+      file: id.slice(0, split),
+      owner: id.slice(split + 1),
+      signals: Object.freeze([...signals].sort()),
+    });
+  })
+  .sort((left, right) =>
+    left.file.localeCompare(right.file) || left.owner.localeCompare(right.owner)
+  );
+
+const decisionAudit = projection.packageSemanticDecisionAudit;
+assert(decisionAudit !== undefined, "P1f semantic decision audit is declared");
+
+const decisionSignatures = decisionCandidates.map(
+  (entry) => `${entry.file}#${entry.owner} [${entry.signals.join(",")}]`,
+);
+const observedDecisionCountsByFile: Record<string, number> = {};
+const observedDecisionSignalCounts: Record<string, number> = {};
+const observedDecisionCountsByCategory: Record<string, number> = {};
+
+for (const entry of decisionCandidates) {
+  observedDecisionCountsByFile[entry.file] =
+    (observedDecisionCountsByFile[entry.file] ?? 0) + 1;
+  const category = decisionAudit.fileCategoryByFile[entry.file];
+  assert(typeof category === "string" && category.length > 0,
+    `P1f decision file is classified: ${entry.file}`);
+  observedDecisionCountsByCategory[category] =
+    (observedDecisionCountsByCategory[category] ?? 0) + 1;
+  for (const signal of entry.signals) {
+    observedDecisionSignalCounts[signal] =
+      (observedDecisionSignalCounts[signal] ?? 0) + 1;
+  }
+}
+for (const signal of Object.keys(decisionAudit.decisionSignalCounts)) {
+  observedDecisionSignalCounts[signal] ??= 0;
+}
+
+same(decisionAudit.scope, "S3", "P1f uses whole-package audit scope");
+same(projection.measurement.scope, "S3", "measurement revision declares S3 scope");
+same(
+  projection.measurementScopes.S0.id,
+  "foundation-bootstrap-only",
+  "S0 is reserved for minimal-foundation claims",
+);
+same(
+  projection.measurementScopes.S3.id,
+  "whole-ts-src-package",
+  "S3 identifies whole-package audit counts",
+);
+same(decisionAudit.typedReadSiteCount, typedReadSites.length, "typed ReadMemory site count");
+same(decisionAudit.typedReadOwnerCount, typedReadOwners.length, "typed ReadMemory owner count");
+same(
+  decisionAudit.typedReadOwnerFingerprintFNV64,
+  fnv1a64(typedReadOwners),
+  "typed ReadMemory owner fingerprint",
+);
+same(
+  JSON.stringify(decisionAudit.typedReadMemberCounts),
+  JSON.stringify(typedReadMemberCounts),
+  "typed ReadMemory member counts",
+);
+same(
+  decisionAudit.decisionCandidateOwnerCount,
+  decisionCandidates.length,
+  "static semantic decision candidate owner count",
+);
+same(
+  decisionAudit.decisionCandidateFingerprintFNV64,
+  fnv1a64(decisionSignatures),
+  "static semantic decision candidate fingerprint",
+);
+same(
+  JSON.stringify(decisionAudit.decisionOwnerCountsByFile),
+  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionCountsByFile).sort())),
+  "decision owner counts by file",
+);
+same(
+  JSON.stringify(decisionAudit.decisionSignalCounts),
+  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionSignalCounts).sort())),
+  "decision signal counts",
+);
+same(
+  JSON.stringify(decisionAudit.decisionOwnerCountsByCategory),
+  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionCountsByCategory).sort())),
+  "decision owner counts by category",
+);
+same(
+  decisionAudit.unclassifiedDecisionCandidateOwnerCount,
+  0,
+  "all static decision candidate files are classified",
+);
+same(
+  decisionAudit.staticInterpretationCandidateBoundaryCovered,
+  true,
+  "static interpretation candidate boundary is covered",
+);
+same(
+  decisionAudit.runtimePathCoverageComplete,
+  false,
+  "P1f does not claim runtime path closure",
+);
+
+setEqual(
+  typedWriteOwners,
+  projection.packageDirectSemanticWriteAudit.owners.map((entry: any) => entry.id),
+  "P1f typed Memory write owner set matches P1e syntax inventory",
+);
+same(
+  projection.packageDirectSemanticWriteAudit.typedOwnerSetCrossCheckedByP1f,
+  true,
+  "P1e owner set has a typed P1f cross-check",
+);
+same(
+  projection.packageDirectSemanticWriteAudit.physicalMutationBoundaryProven,
+  false,
+  "static direct-call evidence still does not prove the complete physical mutation boundary",
+);
+
+same(projection.metrics.typedReadMemorySiteCount, typedReadSites.length, "metric: typed read sites");
+same(projection.metrics.typedReadMemoryOwnerCount, typedReadOwners.length, "metric: typed read owners");
+same(
+  projection.metrics.typedDirectSemanticWriteOwnerCount,
+  typedWriteOwners.length,
+  "metric: typed direct Memory write owners",
+);
+same(
+  projection.metrics.staticSemanticDecisionCandidateOwnerCount,
+  decisionCandidates.length,
+  "metric: static decision candidate owners",
+);
+same(
+  projection.metrics.unclassifiedStaticDecisionCandidateOwnerCount,
+  0,
+  "metric: unclassified static decision candidates",
+);
+same(
+  JSON.stringify(projection.metrics.staticDecisionOwnersByCategory),
+  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionCountsByCategory).sort())),
+  "metric: decision owners by category",
+);
+same(
+  projection.metrics.packageWideExactWireLiteralDispatchCount,
+  observedDecisionSignalCounts["wire-literal-dispatch"] ?? 0,
+  "metric: exact wire literal dispatch",
+);
+same(
+  projection.metrics.packageWideObjectSpecificHostSemanticCount,
+  null,
+  "object-specific semantic-equivalence count remains unmeasured until P1g/elimination",
+);
+same(
+  projection.coverage.packageStaticSemanticDecisionAuditComplete,
+  true,
+  "P1f static semantic decision audit complete",
+);
+same(
+  projection.coverage.packageTypedMemoryReadAuditComplete,
+  true,
+  "P1f typed Memory read audit complete",
+);
+same(
+  projection.coverage.packageTypedMemoryWriteCrossCheckComplete,
+  true,
+  "P1f typed Memory write cross-check complete",
+);
+same(
+  projection.coverage.globalTrustBoundaryComplete,
+  false,
+  "P1f static closure does not overclaim global runtime trust closure",
+);
+same(
+  projection.metrics.globalUndocumentedSemanticPathCount,
+  null,
+  "runtime undocumented semantic path count remains unmeasured",
 );
 
 // Recompute all published P1 metrics from stable capability IDs.
@@ -719,6 +1236,16 @@ same(
   semanticCapabilities.filter((capability: any) => capability.hostLinkDuplication === true).length,
   "host/Link semantic duplication count",
 );
+same(
+  projection.metrics.hostLinkDuplicationCandidateCount,
+  semanticCapabilities.filter((capability: any) => capability.hostLinkDuplication === true).length,
+  "host/Link duplication candidate count",
+);
+same(
+  projection.metrics.confirmedHostLinkEquivalentDuplicationCount,
+  null,
+  "confirmed host/Link equivalent duplication remains unmeasured",
+);
 
 const bootstrap = byLayer("semantic-bootstrap");
 same(
@@ -740,5 +1267,5 @@ same(contract.implementation.candidateRuntimeSelectable, false, "candidate remai
 same(contract.candidateState.explicitAuthorAcceptanceRecorded, false, "author acceptance remains pending");
 
 console.log(
-  `MTS v0.13 A9 P1 semantic dependency projection: ${projection.metrics.publicSemanticEntrypointCount} public semantic entrypoints, ${projection.metrics.declaredCapabilityCount} declared capabilities, direct undocumented dependencies=0; global trust closure remains intentionally unclaimed: GREEN.`,
+  `MTS v0.13 A9 P1f: ${typedReadOwners.length} typed ReadMemory owners / ${typedReadSites.length} sites, ${decisionCandidates.length} static host-decision candidates, ${typedWriteOwners.length} typed direct Memory write owners; S3 static audit complete, runtime trust closure remains intentionally unclaimed: GREEN.`,
 );
