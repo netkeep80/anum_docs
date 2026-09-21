@@ -135,9 +135,10 @@ same(retained.contextAuthority.ambientMutableCurrentIsSemanticAuthority, false, 
 same(retained.formalElaboration.linkTopologyEqualsFormalGrammar, false, "Link topology is not FORMAL grammar");
 same(retained.formalElaboration.genericFlatReaderEqualsFormalGrammar, false, "flat reader is not FORMAL grammar");
 
-// This parity slice is still not acceptance.
+// This parity slice remains non-acceptance even though the separately audited
+// candidate is now ready for an explicit author decision.
 same(contract13.accepted, false, "v0.13 remains unaccepted");
-same(contract13.acceptanceReady, false, "v0.13 remains not ready");
+same(contract13.acceptanceReady, true, "v0.13 is acceptance-ready");
 same(contract13.candidateState.explicitAuthorAcceptanceRecorded, false, "author acceptance remains absent");
 
 console.log(
