@@ -19,6 +19,18 @@ function setEqual(actual: readonly string[], expected: readonly string[], messag
   );
 }
 
+function fnv1a64(items: readonly string[]): string {
+  let hash = 14695981039346656037n;
+  const prime = 1099511628211n;
+  const mask = (1n << 64n) - 1n;
+  const source = items.join("\n");
+  for (let index = 0; index < source.length; index += 1) {
+    hash ^= BigInt(source.charCodeAt(index));
+    hash = (hash * prime) & mask;
+  }
+  return hash.toString(16).padStart(16, "0");
+}
+
 const repoRoot = resolve(process.cwd(), "..");
 const read = (path: string): string => readFileSync(join(repoRoot, path), "utf8");
 const readJson = (path: string): any => JSON.parse(read(path));
@@ -28,7 +40,7 @@ const projectionPath = "traceability/mts-v0.13-semantic-dependency-projection.js
 const projection = readJson(projectionPath);
 const contract = readJson("contracts/mts-contract-v0.13.json");
 
-same(projection.schema, "mts-semantic-dependency-projection/v0.5", "projection schema");
+same(projection.schema, "mts-semantic-dependency-projection/v0.6", "projection schema");
 same(projection.mtsVersion, "0.13", "projection MTS version");
 same(projection.status, "research", "projection remains research evidence");
 same(projection.externalAuditProjectionOnly, true, "projection is external audit tooling");
@@ -38,8 +50,8 @@ same(projection.executionDependency, false, "MTS execution does not depend on pr
 same(projection.ownerIssue, 1270, "projection is owned by #1270");
 same(
   projection.candidateMain,
-  "2ce5f2e8e7e22f2d89bfb6472a32e7cee4e54d77",
-  "projection binds the exact ready candidate snapshot",
+  "cd9dde66d9210d5d43024ceb0d8280b4d458e4f4",
+  "projection binds the exact post-P0 candidate snapshot",
 );
 same(projection.coverage.globalTrustBoundaryComplete, false, "P1 does not overclaim global trust closure");
 same(
@@ -69,7 +81,7 @@ same(
 );
 same(
   projection.measurement.modelRevision,
-  "A9-P1e-package-direct-write-audit",
+  "A9-P1f-package-static-semantic-decision-audit",
   "measurement model revision",
 );
 same(
@@ -675,8 +687,8 @@ same(
 );
 same(
   projection.coverage.packageInterpretationEntrypointAuditComplete,
-  false,
-  "write-sink audit does not overclaim read-only interpretation coverage",
+  true,
+  "P1f closes the declared static interpretation/decision candidate audit",
 );
 same(
   projection.coverage.globalTrustBoundaryComplete,
@@ -1023,23 +1035,171 @@ const decisionCandidates: readonly DecisionCandidate[] = [...decisionSignalsByOw
     left.file.localeCompare(right.file) || left.owner.localeCompare(right.owner)
   );
 
-if (projection.packageSemanticDecisionAudit === undefined) {
-  console.log(
-    "A9 P1f typed ReadMemory owners:\n" +
-    typedReadOwners.join("\n") +
-    "\n\nA9 P1f typed WriteMemory owners:\n" +
-    typedWriteOwners.join("\n") +
-    "\n\nA9 P1f typed ReadMemory member counts:\n" +
-    JSON.stringify(typedReadMemberCounts, null, 2) +
-    "\n\nA9 P1f host semantic decision candidates:\n" +
-    decisionCandidates
-      .map((entry) => `${entry.file}#${entry.owner} [${entry.signals.join(",")}]`)
-      .join("\n"),
-  );
-  throw new Error(
-    "v0.13 A9 P1f: packageSemanticDecisionAudit is not yet declared",
-  );
+const decisionAudit = projection.packageSemanticDecisionAudit;
+assert(decisionAudit !== undefined, "P1f semantic decision audit is declared");
+
+const decisionSignatures = decisionCandidates.map(
+  (entry) => `${entry.file}#${entry.owner} [${entry.signals.join(",")}]`,
+);
+const observedDecisionCountsByFile: Record<string, number> = {};
+const observedDecisionSignalCounts: Record<string, number> = {};
+const observedDecisionCountsByCategory: Record<string, number> = {};
+
+for (const entry of decisionCandidates) {
+  observedDecisionCountsByFile[entry.file] =
+    (observedDecisionCountsByFile[entry.file] ?? 0) + 1;
+  const category = decisionAudit.fileCategoryByFile[entry.file];
+  assert(typeof category === "string" && category.length > 0,
+    `P1f decision file is classified: ${entry.file}`);
+  observedDecisionCountsByCategory[category] =
+    (observedDecisionCountsByCategory[category] ?? 0) + 1;
+  for (const signal of entry.signals) {
+    observedDecisionSignalCounts[signal] =
+      (observedDecisionSignalCounts[signal] ?? 0) + 1;
+  }
 }
+for (const signal of Object.keys(decisionAudit.decisionSignalCounts)) {
+  observedDecisionSignalCounts[signal] ??= 0;
+}
+
+same(decisionAudit.scope, "S3", "P1f uses whole-package audit scope");
+same(projection.measurement.scope, "S3", "measurement revision declares S3 scope");
+same(
+  projection.measurementScopes.S0.id,
+  "foundation-bootstrap-only",
+  "S0 is reserved for minimal-foundation claims",
+);
+same(
+  projection.measurementScopes.S3.id,
+  "whole-ts-src-package",
+  "S3 identifies whole-package audit counts",
+);
+same(decisionAudit.typedReadSiteCount, typedReadSites.length, "typed ReadMemory site count");
+same(decisionAudit.typedReadOwnerCount, typedReadOwners.length, "typed ReadMemory owner count");
+same(
+  decisionAudit.typedReadOwnerFingerprintFNV64,
+  fnv1a64(typedReadOwners),
+  "typed ReadMemory owner fingerprint",
+);
+same(
+  JSON.stringify(decisionAudit.typedReadMemberCounts),
+  JSON.stringify(typedReadMemberCounts),
+  "typed ReadMemory member counts",
+);
+same(
+  decisionAudit.decisionCandidateOwnerCount,
+  decisionCandidates.length,
+  "static semantic decision candidate owner count",
+);
+same(
+  decisionAudit.decisionCandidateFingerprintFNV64,
+  fnv1a64(decisionSignatures),
+  "static semantic decision candidate fingerprint",
+);
+same(
+  JSON.stringify(decisionAudit.decisionOwnerCountsByFile),
+  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionCountsByFile).sort())),
+  "decision owner counts by file",
+);
+same(
+  JSON.stringify(decisionAudit.decisionSignalCounts),
+  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionSignalCounts).sort())),
+  "decision signal counts",
+);
+same(
+  JSON.stringify(decisionAudit.decisionOwnerCountsByCategory),
+  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionCountsByCategory).sort())),
+  "decision owner counts by category",
+);
+same(
+  decisionAudit.unclassifiedDecisionCandidateOwnerCount,
+  0,
+  "all static decision candidate files are classified",
+);
+same(
+  decisionAudit.staticInterpretationCandidateBoundaryCovered,
+  true,
+  "static interpretation candidate boundary is covered",
+);
+same(
+  decisionAudit.runtimePathCoverageComplete,
+  false,
+  "P1f does not claim runtime path closure",
+);
+
+setEqual(
+  typedWriteOwners,
+  projection.packageDirectSemanticWriteAudit.owners.map((entry: any) => entry.id),
+  "P1f typed Memory write owner set matches P1e syntax inventory",
+);
+same(
+  projection.packageDirectSemanticWriteAudit.typedOwnerSetCrossCheckedByP1f,
+  true,
+  "P1e owner set has a typed P1f cross-check",
+);
+same(
+  projection.packageDirectSemanticWriteAudit.physicalMutationBoundaryProven,
+  false,
+  "static direct-call evidence still does not prove the complete physical mutation boundary",
+);
+
+same(projection.metrics.typedReadMemorySiteCount, typedReadSites.length, "metric: typed read sites");
+same(projection.metrics.typedReadMemoryOwnerCount, typedReadOwners.length, "metric: typed read owners");
+same(
+  projection.metrics.typedDirectSemanticWriteOwnerCount,
+  typedWriteOwners.length,
+  "metric: typed direct Memory write owners",
+);
+same(
+  projection.metrics.staticSemanticDecisionCandidateOwnerCount,
+  decisionCandidates.length,
+  "metric: static decision candidate owners",
+);
+same(
+  projection.metrics.unclassifiedStaticDecisionCandidateOwnerCount,
+  0,
+  "metric: unclassified static decision candidates",
+);
+same(
+  JSON.stringify(projection.metrics.staticDecisionOwnersByCategory),
+  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionCountsByCategory).sort())),
+  "metric: decision owners by category",
+);
+same(
+  projection.metrics.packageWideExactWireLiteralDispatchCount,
+  observedDecisionSignalCounts["wire-literal-dispatch"] ?? 0,
+  "metric: exact wire literal dispatch",
+);
+same(
+  projection.metrics.packageWideObjectSpecificHostSemanticCount,
+  null,
+  "object-specific semantic-equivalence count remains unmeasured until P1g/elimination",
+);
+same(
+  projection.coverage.packageStaticSemanticDecisionAuditComplete,
+  true,
+  "P1f static semantic decision audit complete",
+);
+same(
+  projection.coverage.packageTypedMemoryReadAuditComplete,
+  true,
+  "P1f typed Memory read audit complete",
+);
+same(
+  projection.coverage.packageTypedMemoryWriteCrossCheckComplete,
+  true,
+  "P1f typed Memory write cross-check complete",
+);
+same(
+  projection.coverage.globalTrustBoundaryComplete,
+  false,
+  "P1f static closure does not overclaim global runtime trust closure",
+);
+same(
+  projection.metrics.globalUndocumentedSemanticPathCount,
+  null,
+  "runtime undocumented semantic path count remains unmeasured",
+);
 
 // Recompute all published P1 metrics from stable capability IDs.
 const byLayer = (layer: string): any[] =>
@@ -1076,6 +1236,16 @@ same(
   semanticCapabilities.filter((capability: any) => capability.hostLinkDuplication === true).length,
   "host/Link semantic duplication count",
 );
+same(
+  projection.metrics.hostLinkDuplicationCandidateCount,
+  semanticCapabilities.filter((capability: any) => capability.hostLinkDuplication === true).length,
+  "host/Link duplication candidate count",
+);
+same(
+  projection.metrics.confirmedHostLinkEquivalentDuplicationCount,
+  null,
+  "confirmed host/Link equivalent duplication remains unmeasured",
+);
 
 const bootstrap = byLayer("semantic-bootstrap");
 same(
@@ -1097,5 +1267,5 @@ same(contract.implementation.candidateRuntimeSelectable, false, "candidate remai
 same(contract.candidateState.explicitAuthorAcceptanceRecorded, false, "author acceptance remains pending");
 
 console.log(
-  `MTS v0.13 A9 P1 semantic dependency projection: ${projection.metrics.publicSemanticEntrypointCount} public semantic entrypoints, ${projection.metrics.declaredCapabilityCount} declared capabilities, direct undocumented dependencies=0; global trust closure remains intentionally unclaimed: GREEN.`,
+  `MTS v0.13 A9 P1f: ${typedReadOwners.length} typed ReadMemory owners / ${typedReadSites.length} sites, ${decisionCandidates.length} static host-decision candidates, ${typedWriteOwners.length} typed direct Memory write owners; S3 static audit complete, runtime trust closure remains intentionally unclaimed: GREEN.`,
 );
