@@ -1,0 +1,465 @@
+{
+  "schema": "mts-semantic-dependency-projection/v0.1",
+  "mtsVersion": "0.13",
+  "status": "research",
+  "ownerIssue": 1270,
+  "candidateMain": "eaa949f8e3f064ad60c575eeb973502b8e15d9fd",
+  "externalAuditProjectionOnly": true,
+  "normativeFoundation": false,
+  "semanticAuthority": false,
+  "executionDependency": false,
+  "architecturalBoundary": "This artifact is an external observability/verification projection over runtime dependencies. MTS semantics must not depend on it; graph theory is not part of the MTS foundation.",
+  "coverage": {
+    "candidateKernelDirectDependencyCoverageComplete": true,
+    "inheritedAcceptedV012AuthorityRuntimeUnfolded": false,
+    "globalTrustBoundaryComplete": false
+  },
+  "auditScope": {
+    "publicFacade": "ts/src/public.ts",
+    "candidateKernelFiles": [
+      "ts/src/v013-hierarchical-carrier.ts",
+      "ts/src/v013-relative-form-materialization.ts",
+      "ts/src/v013-relative-pole-context.ts",
+      "ts/src/v013-relative-pole-execution.ts",
+      "ts/src/v013-formal-aspect-evaluator.ts"
+    ],
+    "directDependenciesByFile": {
+      "ts/src/v013-hierarchical-carrier.ts": [
+        "./exact-sequence.js#materializeExactSequence",
+        "./exact-sequence.js#readExactSequence",
+        "./memory.js#verifyRootBasis",
+        "memory#ensure",
+        "memory#linkCount",
+        "memory#poles"
+      ],
+      "ts/src/v013-relative-form-materialization.ts": [
+        "./state.js#readContext",
+        "./v012-source.js#replayV012SourceResultEvidence",
+        "memory#ensure",
+        "memory#ensureEndSelfClosed",
+        "memory#ensureStartSelfClosed",
+        "memory#find",
+        "memory#poles"
+      ],
+      "ts/src/v013-relative-pole-context.ts": [
+        "./state.js#defineContext",
+        "./state.js#readContext",
+        "memory#poles"
+      ],
+      "ts/src/v013-relative-pole-execution.ts": [
+        "./state.js#readContext",
+        "./v012-source.js#replayV012SourceResultEvidence",
+        "./v013-relative-pole-context.js#materializeRelativePoleContext",
+        "./v013-relative-pole-context.js#readRelativePoleContext",
+        "./v013-relative-pole-context.js#readRelativeUnaryForm",
+        "memory#poles"
+      ],
+      "ts/src/v013-formal-aspect-evaluator.ts": [
+        "./memory.js#verifyRootBasis",
+        "./v012-source.js#readV012SourceContent",
+        "./v012-source.js#replayV012SourceResultEvidence",
+        "./v013-hierarchical-carrier.js#decomposeV013SemanticLink",
+        "memory#ensure",
+        "memory#ensureEndSelfClosed",
+        "memory#ensureStartSelfClosed",
+        "memory#poles"
+      ]
+    },
+    "objectSpecificShortcutDetector": {
+      "kind": "exact-multi-abit-control-flow-literal",
+      "regex": "^[8961]{2,}$",
+      "scope": "candidateKernelFiles",
+      "note": "Counts concrete multi-abit wire strings only when they directly participate in a binary control-flow expression or switch case. Structural data labels such as self-incidence 00/01/10/11 are not semantic shortcuts by themselves."
+    }
+  },
+  "publicSemanticEntrypoints": [
+    {
+      "symbol": "decomposeV013SemanticLink",
+      "module": "./v013-hierarchical-carrier.js",
+      "capabilityId": "derived.hierarchical-carrier"
+    },
+    {
+      "symbol": "materializeV013HierarchicalCarrierFromSemanticLink",
+      "module": "./v013-hierarchical-carrier.js",
+      "capabilityId": "derived.hierarchical-carrier"
+    },
+    {
+      "symbol": "serializeV013HierarchicalCarrier",
+      "module": "./v013-hierarchical-carrier.js",
+      "capabilityId": "derived.hierarchical-carrier"
+    },
+    {
+      "symbol": "materializeV013HierarchicalCarrier",
+      "module": "./v013-hierarchical-carrier.js",
+      "capabilityId": "derived.hierarchical-carrier"
+    },
+    {
+      "symbol": "materializeAuthorizedRelativeUnaryFormSource",
+      "module": "./v013-relative-form-materialization.js",
+      "capabilityId": "derived.authorized-form-materialization"
+    },
+    {
+      "symbol": "materializeAuthorizedBinaryLinkSource",
+      "module": "./v013-relative-form-materialization.js",
+      "capabilityId": "derived.authorized-form-materialization"
+    },
+    {
+      "symbol": "executeAuthorizedRelativePoleSource",
+      "module": "./v013-relative-pole-execution.js",
+      "capabilityId": "derived.relative-pole-execution"
+    },
+    {
+      "symbol": "evaluateV013FormalAspectProgram",
+      "module": "./v013-formal-aspect-evaluator.js",
+      "capabilityId": "derived.formal-aspect-evaluation"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "ontology.link",
+      "layer": "ontology",
+      "execution": "link-defined",
+      "linkExpressed": true,
+      "hostLinkDuplication": false,
+      "dependsOn": [],
+      "reason": "The only ontological entity under analysis is Link; this projection does not introduce graph entities."
+    },
+    {
+      "id": "ontology.root-selfclosure",
+      "layer": "ontology",
+      "execution": "link-defined",
+      "linkExpressed": true,
+      "hostLinkDuplication": false,
+      "dependsOn": [
+        "ontology.link"
+      ],
+      "reason": "R is the unique full self-closed Link law, not a host graph node."
+    },
+    {
+      "id": "ontology.aspect-self-incidence",
+      "layer": "ontology",
+      "execution": "link-defined",
+      "linkExpressed": true,
+      "hostLinkDuplication": false,
+      "dependsOn": [
+        "ontology.link",
+        "ontology.root-selfclosure"
+      ],
+      "reason": "ROOT/START/END/PAIR are the four derived self-incidence classes."
+    },
+    {
+      "id": "bootstrap.link-identity",
+      "layer": "semantic-bootstrap",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "primitiveStatus": "UNKNOWN",
+      "dependsOn": [
+        "ontology.link"
+      ],
+      "reason": "Current runtime uses Memory-local handle identity/foreign-handle validation to realize canonical semantic identity."
+    },
+    {
+      "id": "bootstrap.root-anchor",
+      "layer": "semantic-bootstrap",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "primitiveStatus": "UNKNOWN",
+      "dependsOn": [
+        "ontology.root-selfclosure",
+        "bootstrap.link-identity"
+      ],
+      "reason": "Current Memory exposes one distinguished root handle; elimination/derivability has not yet been tested."
+    },
+    {
+      "id": "bootstrap.pole-read",
+      "layer": "semantic-bootstrap",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "primitiveStatus": "UNKNOWN",
+      "dependsOn": [
+        "ontology.link",
+        "bootstrap.link-identity"
+      ],
+      "reason": "ReadMemory.poles exposes start/end of an issued Link."
+    },
+    {
+      "id": "bootstrap.pair-lookup",
+      "layer": "semantic-bootstrap",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "primitiveStatus": "UNKNOWN",
+      "dependsOn": [
+        "ontology.link",
+        "bootstrap.link-identity"
+      ],
+      "reason": "ReadMemory.find uses the host canonical-pair index; whether this is semantically independent or implementation-only is not yet proven."
+    },
+    {
+      "id": "bootstrap.ensure-pair",
+      "layer": "semantic-bootstrap",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "primitiveStatus": "UNKNOWN",
+      "dependsOn": [
+        "ontology.link",
+        "bootstrap.link-identity"
+      ],
+      "reason": "WriteMemory.ensure materializes or reuses the canonical ordinary pair Link."
+    },
+    {
+      "id": "bootstrap.ensure-start-selfclosed",
+      "layer": "semantic-bootstrap",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "primitiveStatus": "UNKNOWN",
+      "dependsOn": [
+        "ontology.aspect-self-incidence",
+        "bootstrap.link-identity"
+      ],
+      "reason": "WriteMemory.ensureStartSelfClosed realizes proper START self-incidence."
+    },
+    {
+      "id": "bootstrap.ensure-end-selfclosed",
+      "layer": "semantic-bootstrap",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "primitiveStatus": "UNKNOWN",
+      "dependsOn": [
+        "ontology.aspect-self-incidence",
+        "bootstrap.link-identity"
+      ],
+      "reason": "WriteMemory.ensureEndSelfClosed realizes proper END self-incidence."
+    },
+    {
+      "id": "bootstrap.accepted-v012-authority-runtime",
+      "layer": "semantic-bootstrap",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "primitiveStatus": "UNKNOWN",
+      "dependsOn": [
+        "ontology.link",
+        "bootstrap.link-identity",
+        "bootstrap.pole-read"
+      ],
+      "reason": "Temporary aggregate boundary for inherited accepted source/Dictionary/Grammar/Theory/StructuralRule replay. P1 deliberately does not yet unfold this runtime."
+    },
+    {
+      "id": "resource.link-count",
+      "layer": "resource-control",
+      "execution": "host",
+      "linkExpressed": false,
+      "hostLinkDuplication": false,
+      "dependsOn": [
+        "bootstrap.link-identity"
+      ],
+      "reason": "linkCount is used as a no-write/read-only guard and is not itself an MTS semantic primitive."
+    },
+    {
+      "id": "derived.root-basis-verification",
+      "layer": "derived-semantic",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "bootstrap.root-anchor",
+        "bootstrap.link-identity",
+        "bootstrap.pole-read"
+      ],
+      "reason": "verifyRootBasis checks R/O/C/L/U against current Link topology."
+    },
+    {
+      "id": "derived.exact-sequence",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "bootstrap.root-anchor",
+        "bootstrap.pole-read",
+        "bootstrap.ensure-pair",
+        "bootstrap.ensure-start-selfclosed"
+      ],
+      "reason": "ExactSequence cells are Links, while current fold/read traversal is host code."
+    },
+    {
+      "id": "derived.context-state",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "bootstrap.pole-read",
+        "bootstrap.ensure-pair",
+        "bootstrap.ensure-start-selfclosed"
+      ],
+      "reason": "Context structure is Link-native; current define/read traversal is host code."
+    },
+    {
+      "id": "derived.source-result-replay",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "bootstrap.accepted-v012-authority-runtime"
+      ],
+      "reason": "Exact source/Dictionary/Grammar/fixed-Theory/StructuralRule authority is Link-evidenced but replay is currently implemented by the inherited host runtime."
+    },
+    {
+      "id": "derived.hierarchical-carrier",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "derived.root-basis-verification",
+        "derived.exact-sequence",
+        "bootstrap.pole-read",
+        "bootstrap.ensure-pair",
+        "resource.link-count"
+      ],
+      "reason": "Semantic decomposition and Link-native carrier are structural; traversal/serialization/materialization control is host code."
+    },
+    {
+      "id": "derived.authorized-form-materialization",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "derived.context-state",
+        "derived.source-result-replay",
+        "bootstrap.pole-read",
+        "bootstrap.pair-lookup",
+        "bootstrap.ensure-pair",
+        "bootstrap.ensure-start-selfclosed",
+        "bootstrap.ensure-end-selfclosed"
+      ],
+      "reason": "Construction request and authority are Links; final ensure dispatch remains host execution."
+    },
+    {
+      "id": "derived.relative-pole-context",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "derived.context-state",
+        "bootstrap.pole-read"
+      ],
+      "reason": "Relative pole position/context is represented structurally; current reader/materializer uses host traversal."
+    },
+    {
+      "id": "derived.relative-pole-execution",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "derived.context-state",
+        "derived.source-result-replay",
+        "derived.relative-pole-context",
+        "bootstrap.pole-read"
+      ],
+      "reason": "Rule/Theory authority selects the requested form; open/return transition is still executed by host code."
+    },
+    {
+      "id": "representation.prefix-plan-parser",
+      "layer": "representation",
+      "execution": "host",
+      "linkExpressed": false,
+      "hostLinkDuplication": false,
+      "dependsOn": [],
+      "reason": "Prefix parsing is a representation algorithm, not an ontological MTS primitive."
+    },
+    {
+      "id": "representation.physical-wire-canonical-spelling",
+      "layer": "representation",
+      "execution": "host",
+      "linkExpressed": false,
+      "hostLinkDuplication": false,
+      "dependsOn": [],
+      "reason": "Physical 8/9/6/1 byte spelling is checked after semantic grounding and grants no semantic authority."
+    },
+    {
+      "id": "derived.formal-aspect-evaluation",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "derived.root-basis-verification",
+        "derived.source-result-replay",
+        "derived.hierarchical-carrier",
+        "representation.prefix-plan-parser",
+        "representation.physical-wire-canonical-spelling",
+        "bootstrap.pole-read",
+        "bootstrap.ensure-pair",
+        "bootstrap.ensure-start-selfclosed",
+        "bootstrap.ensure-end-selfclosed"
+      ],
+      "reason": "Aspect meaning is Rule/Theory/Link-grounded; prefix-plan/canonicality/materialization control remains host execution."
+    }
+  ],
+  "implementationBindings": {
+    "memory#poles": "bootstrap.pole-read",
+    "memory#find": "bootstrap.pair-lookup",
+    "memory#ensure": "bootstrap.ensure-pair",
+    "memory#ensureStartSelfClosed": "bootstrap.ensure-start-selfclosed",
+    "memory#ensureEndSelfClosed": "bootstrap.ensure-end-selfclosed",
+    "memory#linkCount": "resource.link-count",
+    "./memory.js#verifyRootBasis": "derived.root-basis-verification",
+    "./exact-sequence.js#materializeExactSequence": "derived.exact-sequence",
+    "./exact-sequence.js#readExactSequence": "derived.exact-sequence",
+    "./state.js#defineContext": "derived.context-state",
+    "./state.js#readContext": "derived.context-state",
+    "./v012-source.js#replayV012SourceResultEvidence": "derived.source-result-replay",
+    "./v012-source.js#readV012SourceContent": "derived.source-result-replay",
+    "./v013-relative-pole-context.js#materializeRelativePoleContext": "derived.relative-pole-context",
+    "./v013-relative-pole-context.js#readRelativePoleContext": "derived.relative-pole-context",
+    "./v013-relative-pole-context.js#readRelativeUnaryForm": "derived.relative-pole-context",
+    "./v013-hierarchical-carrier.js#decomposeV013SemanticLink": "derived.hierarchical-carrier"
+  },
+  "metrics": {
+    "candidateKernelFileCount": 5,
+    "publicSemanticEntrypointCount": 8,
+    "declaredCapabilityCount": 23,
+    "ontologyCapabilityCount": 3,
+    "semanticBootstrapCapabilityCount": 8,
+    "derivedSemanticCapabilityCount": 9,
+    "representationCapabilityCount": 2,
+    "resourceControlCapabilityCount": 1,
+    "hostOrMixedSemanticCapabilityCount": 17,
+    "linkExpressedSemanticCapabilityCount": 17,
+    "linkExecutedSemanticCapabilityCount": 0,
+    "hostLinkSemanticDuplicationCount": 17,
+    "confirmedIndependentPrimitiveCount": 0,
+    "unknownPrimitiveStatusCount": 8,
+    "directUndocumentedDependencyCount": 0,
+    "objectSpecificHostSemanticShortcutCount": 0,
+    "globalUndocumentedSemanticPathCount": null
+  },
+  "metricMeaning": {
+    "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
+    "linkExecutedSemanticCapabilityCount": "P1 counts a capability as Link-executed only if the execution mechanism itself is Link-defined. Link-grounded authority with host execution is counted as mixed, not self-hosted.",
+    "hostLinkSemanticDuplicationCount": "Counts semantic capabilities whose meaning/evidence is expressed through Links while an equally relevant host execution mechanism still implements the operation in this P1 model.",
+    "directUndocumentedDependencyCount": "Exact static count only for direct dependencies observed in the five candidate-kernel files.",
+    "globalUndocumentedSemanticPathCount": "Unknown until the inherited accepted v0.12 authority runtime and all public semantic paths are unfolded.",
+    "objectSpecificHostSemanticShortcutCount": "Counts exact multi-abit physical-term literals that directly participate in host control flow in the candidate kernel. It intentionally does not count structural self-incidence labels stored as data."
+  },
+  "nextExperiments": [
+    "Unfold bootstrap.accepted-v012-authority-runtime into Dictionary, source, Theory, StructuralRule and context dependencies.",
+    "Add an independent audit of semantic-write and interpretation entrypoints beyond the five v0.13 candidate-kernel files.",
+    "Run per-bootstrap-capability elimination experiments and classify INDEPENDENT/DERIVABLE/EQUIVALENT_REENCODING/IMPLEMENTATION_ONLY/UNKNOWN.",
+    "Add an MTS-native self-interpretation witness and report residual host dependencies.",
+    "Build a v0.12 -> v0.13 delta using the same stable capability IDs."
+  ]
+}
