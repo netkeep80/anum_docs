@@ -130,9 +130,19 @@ if (contract13.candidateState.functionalParityAuditComplete) {
   same(parity.completedLawCount, baselineLaws.length, "completed parity law count");
   same(parity.reviewRequiredCount, 0, "completed parity review-required count");
   same(parity.regressionCount, 0, "completed parity regression count");
+  same(
+    conformance13.inheritedFoundationParity?.status,
+    "green-complete",
+    "complete parity also requires inherited foundation audit",
+  );
 } else {
-  same(parity.status, "in-progress", "in-progress parity audit status");
-  assert(reviewRequired > 0, "in-progress audit must expose unresolved semantic parity");
+  const inheritedOpen =
+    conformance13.inheritedFoundationParity !== undefined &&
+    conformance13.inheritedFoundationParity.status !== "green-complete";
+  assert(
+    reviewRequired > 0 || inheritedOpen,
+    "in-progress audit must expose unresolved semantic laws or inherited foundation",
+  );
 }
 
 const nonRegression = contract13.functionalNonRegression;
