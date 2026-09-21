@@ -28,19 +28,13 @@ same(contract13.accepted, false, "candidate v0.13 is not accepted");
 same(
   contract13.acceptanceReady,
   false,
-  "candidate v0.13 is not acceptance-ready while parity is incomplete",
+  "candidate v0.13 remains not acceptance-ready; parity completion alone is insufficient",
 );
 same(
   contract13.candidateState.explicitAuthorAcceptanceRecorded,
   false,
   "explicit author acceptance is not pre-recorded",
 );
-same(
-  contract13.candidateState.functionalParityAuditComplete,
-  false,
-  "functional parity audit is not pre-declared complete",
-);
-
 const authority = contract13.acceptanceAuthority;
 same(authority.explicitAuthorApprovalRequired, true, "explicit author approval required");
 same(
@@ -64,7 +58,6 @@ for (const signal of [
 }
 
 const parity = conformance13.functionalParityAudit;
-same(parity.status, "in-progress", "parity audit status");
 same(parity.baseline.contract, "mts-contract/v0.12", "parity contract baseline");
 same(parity.baseline.conformance, "mts-conformance/v0.12", "parity conformance baseline");
 same(parity.baseline.accepted, true, "parity baseline accepted");
@@ -129,8 +122,18 @@ for (const law of baselineLaws) {
   if (entry.classification === "REGRESSION") regression += 1;
 }
 
-assert(reviewRequired > 0, "in-progress audit must expose unresolved semantic parity");
 same(regression, 0, "no known regression is silently accepted");
+
+if (contract13.candidateState.functionalParityAuditComplete) {
+  same(parity.status, "green-complete-a4", "completed parity audit status");
+  same(reviewRequired, 0, "completed parity audit has no REVIEW_REQUIRED laws");
+  same(parity.completedLawCount, baselineLaws.length, "completed parity law count");
+  same(parity.reviewRequiredCount, 0, "completed parity review-required count");
+  same(parity.regressionCount, 0, "completed parity regression count");
+} else {
+  same(parity.status, "in-progress", "in-progress parity audit status");
+  assert(reviewRequired > 0, "in-progress audit must expose unresolved semantic parity");
+}
 
 const nonRegression = contract13.functionalNonRegression;
 same(nonRegression.acceptanceRequiresCompleteAudit, true, "complete parity audit required");
@@ -173,5 +176,5 @@ if (contract13.acceptanceReady || contract13.accepted) {
 }
 
 console.log(
-  `MTS v0.13 functional non-regression lifecycle: ${baselineLaws.length} accepted v0.12 laws and ${baselineGates.length} mandatory gates mapped; ${reviewRequired} semantic parity entries remain REVIEW_REQUIRED; explicit author acceptance is mandatory and not recorded: GREEN.`,
+  `MTS v0.13 functional non-regression lifecycle: ${baselineLaws.length} accepted v0.12 laws and ${baselineGates.length} mandatory gates mapped; parityComplete=${String(contract13.candidateState.functionalParityAuditComplete)} reviewRequired=${reviewRequired}; explicit author acceptance remains separately mandatory and is not recorded: GREEN.`,
 );
