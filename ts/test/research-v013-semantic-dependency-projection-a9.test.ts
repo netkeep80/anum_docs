@@ -803,6 +803,76 @@ function containsTypedMemoryRead(node: ts.Node): boolean {
   return found;
 }
 
+const semanticTagNames = new Set([
+  "kind",
+  "type",
+  "role",
+  "mode",
+  "operator",
+  "aspect",
+  "tag",
+  "opcode",
+  "classification",
+  "sourceKind",
+]);
+
+function isHostLiteral(node: ts.Node): boolean {
+  return (
+    ts.isStringLiteral(node) ||
+    ts.isNumericLiteral(node) ||
+    node.kind === ts.SyntaxKind.TrueKeyword ||
+    node.kind === ts.SyntaxKind.FalseKeyword ||
+    node.kind === ts.SyntaxKind.NullKeyword
+  );
+}
+
+function containsSemanticTag(node: ts.Node): boolean {
+  let found = false;
+  const visit = (child: ts.Node): void => {
+    if (found) return;
+    if (
+      ts.isPropertyAccessExpression(child) &&
+      semanticTagNames.has(child.name.text)
+    ) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(child, visit);
+  };
+  visit(node);
+  return found;
+}
+
+function containsAmbientMutable(node: ts.Node): boolean {
+  let found = false;
+  const visit = (child: ts.Node): void => {
+    if (found) return;
+    if (ts.isIdentifier(child)) {
+      const symbol = typeChecker.getSymbolAtLocation(child);
+      for (const declaration of symbol?.getDeclarations() ?? []) {
+        if (!ts.isVariableDeclaration(declaration)) continue;
+        const list = declaration.parent;
+        if (!ts.isVariableDeclarationList(list)) continue;
+        if ((list.flags & ts.NodeFlags.Const) !== 0) continue;
+        const statement = list.parent;
+        if (ts.isVariableStatement(statement) && ts.isSourceFile(statement.parent)) {
+          found = true;
+          return;
+        }
+      }
+    }
+    ts.forEachChild(child, visit);
+  };
+  visit(node);
+  return found;
+}
+
+function hasLiteralCase(node: ts.SwitchStatement): boolean {
+  return node.caseBlock.clauses.some(
+    (clause) => ts.isCaseClause(clause) && isHostLiteral(clause.expression),
+  );
+}
+
 const typedReadSites: TypedReadSite[] = [];
 const decisionSignalsByOwner = new Map<string, Set<string>>();
 
@@ -836,12 +906,19 @@ for (const sourcePath of sourcePaths) {
     if (ts.isIfStatement(node)) {
       if (containsLinkHandle(node.expression)) addDecision(node, "if-link");
       if (containsTypedMemoryRead(node.expression)) addDecision(node, "if-memory-read");
+      if (containsSemanticTag(node.expression)) addDecision(node, "host-tag-decision");
+      if (containsAmbientMutable(node.expression)) addDecision(node, "ambient-mutable-decision");
     } else if (ts.isConditionalExpression(node)) {
       if (containsLinkHandle(node.condition)) addDecision(node, "ternary-link");
       if (containsTypedMemoryRead(node.condition)) addDecision(node, "ternary-memory-read");
+      if (containsSemanticTag(node.condition)) addDecision(node, "host-tag-decision");
+      if (containsAmbientMutable(node.condition)) addDecision(node, "ambient-mutable-decision");
     } else if (ts.isSwitchStatement(node)) {
       if (containsLinkHandle(node.expression)) addDecision(node, "switch-link");
       if (containsTypedMemoryRead(node.expression)) addDecision(node, "switch-memory-read");
+      if (containsSemanticTag(node.expression)) addDecision(node, "host-tag-decision");
+      if (hasLiteralCase(node)) addDecision(node, "literal-switch");
+      if (containsAmbientMutable(node.expression)) addDecision(node, "ambient-mutable-decision");
     } else if (
       ts.isBinaryExpression(node) &&
       [
@@ -853,6 +930,43 @@ for (const sourcePath of sourcePaths) {
     ) {
       if (containsLinkHandle(node)) addDecision(node, "link-equality");
       if (containsTypedMemoryRead(node)) addDecision(node, "memory-read-equality");
+      if (containsSemanticTag(node)) addDecision(node, "host-tag-decision");
+      if (isHostLiteral(node.left) || isHostLiteral(node.right)) {
+        addDecision(node, "literal-equality");
+      }
+      const literal = ts.isStringLiteral(node.left)
+        ? node.left.text
+        : ts.isStringLiteral(node.right)
+          ? node.right.text
+          : null;
+      if (literal !== null && /^[8961]{2,}$/.test(literal)) {
+        addDecision(node, "wire-literal-dispatch");
+      }
+      if (containsAmbientMutable(node)) addDecision(node, "ambient-mutable-decision");
+    } else if (
+      ts.isElementAccessExpression(node) &&
+      node.argumentExpression !== undefined &&
+      ts.isNumericLiteral(node.argumentExpression)
+    ) {
+      addDecision(node, "fixed-coordinate-index");
+    } else if (ts.isCallExpression(node)) {
+      if (
+        ts.isPropertyAccessExpression(node.expression) &&
+        ["includes", "has", "get"].includes(node.expression.name.text) &&
+        node.arguments.some(isHostLiteral)
+      ) {
+        addDecision(node, "literal-membership");
+      }
+      if (ts.isIdentifier(node.expression)) {
+        const symbol = typeChecker.getSymbolAtLocation(node.expression);
+        const parameterOwned = (symbol?.getDeclarations() ?? []).some(ts.isParameter);
+        if (
+          parameterOwned &&
+          typeChecker.getTypeAtLocation(node.expression).getCallSignatures().length > 0
+        ) {
+          addDecision(node, "host-callback-call");
+        }
+      }
     }
 
     ts.forEachChild(node, visit);
