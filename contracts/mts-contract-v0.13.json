@@ -286,7 +286,7 @@
   "traceabilityManifest": "traceability/mts-v0.13.json",
   "normativeDocumentation": {
     "status": "candidate-complete-r7d",
-    "ownerRule": "one candidate semantic law -> one canonical normative owner anchor",
+    "ownerRule": "one candidate semantic law -> one canonical candidate normative owner anchor",
     "candidateSectionsDoNotPromoteAcceptedCurrent": true,
     "owners": {
       "L1": {
@@ -341,6 +341,9 @@
         "path": "docs/specs/Ачисла и сериализация.md",
         "anchor": "mts-law-L13"
       }
-    }
+    },
+    "acceptedOwnerMarker": "нормативный владелец",
+    "candidateOwnerMarker": "кандидатный нормативный владелец",
+    "candidateOwnersEnterAcceptedNamespaceOnlyAtCutover": true
   }
 }
