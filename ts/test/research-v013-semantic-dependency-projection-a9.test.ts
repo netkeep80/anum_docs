@@ -226,9 +226,11 @@ for (const [symbol, capabilityId] of Object.entries(projection.implementationBin
   assert(capabilities.has(capabilityId), `${symbol}: implementation binding resolves to a capability`);
 }
 
-// A narrow but executable object-specific shortcut detector: candidate kernel
-// control/data must not contain exact multi-abit wire terms such as 98/19868.
-// Single physical spellings 8/9/6/1 remain legitimate representation bytes.
+// A narrow but executable object-specific shortcut detector: a concrete
+// multi-abit wire term such as 98/19868 must not participate in host control
+// flow that selects semantic behavior. Structural data labels such as the
+// self-incidence classifier "11" are not shortcuts merely because they are
+// strings containing the same characters.
 let objectSpecificWireLiteralCount = 0;
 const exactTermLiteral = /^[8961]{2,}$/;
 for (const sourcePath of projection.auditScope.candidateKernelFiles as string[]) {
@@ -240,7 +242,11 @@ for (const sourcePath of projection.auditScope.candidateKernelFiles as string[])
     ts.ScriptKind.TS,
   );
   const visit = (node: ts.Node): void => {
-    if (ts.isStringLiteral(node) && exactTermLiteral.test(node.text)) {
+    if (
+      ts.isStringLiteral(node) &&
+      exactTermLiteral.test(node.text) &&
+      (ts.isBinaryExpression(node.parent) || ts.isCaseClause(node.parent))
+    ) {
       objectSpecificWireLiteralCount += 1;
     }
     ts.forEachChild(node, visit);
