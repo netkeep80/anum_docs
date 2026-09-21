@@ -342,43 +342,57 @@
     "entries": {
       "interpreterSeparation": {
         "baselineStatement": "I_STRING, I_FORMAL and I_Q are explicit semantic contexts; host parser/lexer modes have zero semantic authority",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/research-v012-interpreter-delta-c2.test.ts",
+          "ts/test/v012-q-compatibility-representation-c5.test.ts",
+          "ts/test/v012-formal-context-reading-c6.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "Accepted v0.12 interpreterSeparation semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
       },
       "stringNestedAnum": {
         "baselineStatement": "STRING [...] opens I_STRING child from R and returns exactly one Link/value to the STRING parent",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/v012-string-anum-protocol-c3a.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "Accepted v0.12 stringNestedAnum semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
       },
       "formalSquareBracketStringChild": {
         "baselineStatement": "FORMAL [...] opens I_STRING child, not I_Q, and returns exactly one Link/value to FORMAL",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/v012-formal-square-string-child-c4.test.ts",
+          "ts/test/v012-formal-square-rule-authority.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "Accepted v0.12 formalSquareBracketStringChild semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
       },
       "quaternaryNestedContext": {
         "baselineStatement": "Q [...] remains Q-native recursion under I_Q",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/v012-q-compatibility-representation-c5.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "Accepted v0.12 quaternaryNestedContext semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
       },
       "stringOneVsQOne": {
         "baselineStatement": "STRING glyph `1` is UTF-8 character/sign `1`; Q `1` is abit 1",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/research-v012-interpreter-delta-c2.test.ts",
+          "ts/test/v012-q-compatibility-representation-c5.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "Accepted v0.12 stringOneVsQOne semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
       },
       "representationNotInterpretation": {
         "baselineStatement": "STRING -> Q byte carrier does not invoke I_Q interpretation",
@@ -396,27 +410,33 @@
       },
       "formalParentheses": {
         "baselineStatement": "FORMAL (...) is explicit I_FORMAL child execution returning exactly one Link/value; () is invalid",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/v012-formal-context-reading-c6.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "Accepted v0.12 formalParentheses semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
       },
       "explicitKContext": {
         "baselineStatement": "contextual `.` resolves only through explicitly selected structural K evidence",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/v012-formal-context-reading-c6.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "Accepted v0.12 explicitKContext semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
       },
       "associationBoundary": {
         "baselineStatement": "left-associated Link topology, generic flat reading and FORMAL execution remain distinct",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/v012-formal-context-reading-c6.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "Accepted v0.12 associationBoundary semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
       },
       "exactAnumRooting": {
         "baselineStatement": "Anum is a Link role; every local Anum begins at R and the exact rooted Anum/question is distinct from its addressed target",
@@ -535,7 +555,30 @@
           "targetMaterializationBound"
         ],
         "status": "green"
+      },
+      {
+        "id": "A4b-interpreter-context-layer",
+        "gate": "ts/test/v013-v012-interpreter-context-parity.test.ts",
+        "laws": [
+          "interpreterSeparation",
+          "stringNestedAnum",
+          "formalSquareBracketStringChild",
+          "quaternaryNestedContext",
+          "stringOneVsQOne",
+          "formalParentheses",
+          "explicitKContext",
+          "associationBoundary"
+        ],
+        "status": "green-when-repository-gate-passes"
       }
+    ],
+    "retainedCompatibilityGates": [
+      "ts/test/research-v012-interpreter-delta-c2.test.ts",
+      "ts/test/v012-q-compatibility-representation-c5.test.ts",
+      "ts/test/v012-formal-context-reading-c6.test.ts",
+      "ts/test/v012-string-anum-protocol-c3a.test.ts",
+      "ts/test/v012-formal-square-string-child-c4.test.ts",
+      "ts/test/v012-formal-square-rule-authority.test.ts"
     ]
   }
 }
