@@ -326,7 +326,7 @@
     "readinessAuditComplete": false,
     "explicitAuthorAcceptanceRecorded": false,
     "linkNativeAbitGroundingComplete": true,
-    "functionalParityAuditComplete": false
+    "functionalParityAuditComplete": true
   },
   "owners": {
     "memory": "ts/src/memory.ts",
@@ -580,6 +580,16 @@
         "oldInterpreterCapabilitiesMayBeReimplementedLater": true,
         "reimplementationMayWeakenAcceptedObservableCapability": false
       }
+    },
+    "utf8CarrierBoundaryV012": {
+      "role": "retained read-only interpretation over exact STRING bytes",
+      "exactBytesRemainStringIdentity": true,
+      "utf8GroupingRewritesCarrierTopology": false,
+      "malformedExactBytesMayBeUtf8Uninterpretable": true,
+      "unicodeNormalizationDefinesStringIdentity": false,
+      "glyphSpellingIsSemanticAuthority": false,
+      "utf8ReadMayMaterialize": false,
+      "v013StructuralDescriptionDependsOnUtf8Decoding": false
     }
   }
 }
