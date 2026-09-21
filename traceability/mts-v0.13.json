@@ -159,12 +159,13 @@
       "contractPointer": "/requiredSemanticLaws/L9",
       "positive": {
         "requiredPositiveVectors": [
-          "v013-root-basis-R-O-C-L-U"
+          "v013-root-basis-R-O-C-L-U",
+          "v013-rooted-cycle-remains-ontologically-open"
         ]
       },
       "negative": {
         "requiredNegativeVectors": [
-          "v013-mutual-distinct-node-cycle-rejected-as-cyclic-grounding"
+          "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"
         ]
       },
       "requiredExecutableGates": [
