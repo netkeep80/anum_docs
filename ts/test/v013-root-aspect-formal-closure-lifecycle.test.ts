@@ -66,15 +66,19 @@ same(quartet.derivedControl.isFifthAspect, false, "U is not fifth aspect");
 same(quartet.derivedControl.isFifthAbit, false, "U is not fifth abit");
 same(quartet.derivedControl.isFifthFormalOperator, false, "U is not fifth FORMAL operator");
 
-same(contract.acceptanceCriteria.AC10, "pending", "AC10 is pending");
-same(contract.candidateState.rootFormalDialectComplete, false, "root FORMAL dialect incomplete");
-same(contract.candidateState.acceptanceCriteriaComplete, false, "acceptance criteria reopened");
+same(contract.acceptanceCriteria.AC10, "green", "AC10 is green");
+same(contract.candidateState.rootFormalDialectComplete, true, "root FORMAL dialect complete");
+same(contract.candidateState.acceptanceCriteriaComplete, true, "acceptance criteria complete");
 same(contract.acceptanceReady, false, "candidate is not acceptance-ready");
 same(contract.accepted, false, "candidate remains unaccepted");
 
 const ac10 = conformance.acceptanceCriteriaEvidence.AC10;
-same(ac10.status, "pending", "AC10 evidence status");
-same(ac10.gates.length, 0, "AC10 has no fake executable evidence yet");
+same(ac10.status, "green", "AC10 evidence status");
+sameJson(
+  ac10.gates,
+  ["ts/test/v013-root-aspect-formal-composition.test.ts"],
+  "AC10 executable gate",
+);
 
 for (const vector of [
   "v013-formal-root-R-from-8",
@@ -98,12 +102,20 @@ for (const vector of [
 }
 
 assert(
-  conformance.acceptanceBlockers.some(
+  !conformance.acceptanceBlockers.some(
     (value: string) => value.startsWith("AC10 root-aspect FORMAL closure"),
   ),
-  "AC10 is an explicit acceptance blocker",
+  "completed AC10 is no longer an acceptance blocker",
+);
+same(conformance.acceptanceReady, false, "conformance remains not acceptance-ready");
+same(conformance.accepted, false, "conformance remains unaccepted");
+same(contract.candidateState.readinessAuditComplete, false, "readiness audit remains pending");
+same(
+  contract.candidateState.explicitAuthorAcceptanceRecorded,
+  false,
+  "explicit author acceptance remains pending",
 );
 
 console.log(
-  "MTS v0.13 AC10 lifecycle: one ROOT/START/END/PAIR quartet is simultaneously aspect/form/abit/FORMAL-operator; 8/98/68/19868 root closure is mandatory, generic, non-host-special-cased and still pending: GREEN.",
+  "MTS v0.13 AC10 lifecycle: one ROOT/START/END/PAIR quartet is simultaneously aspect/form/abit/FORMAL-operator; generic fixed-Theory root closure is GREEN while readiness and explicit author acceptance remain pending.",
 );
