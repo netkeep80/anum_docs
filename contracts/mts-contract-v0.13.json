@@ -464,5 +464,29 @@
     "deferredRequiresExplicitAuthorDecision": true,
     "passingOldRuntimeTestsAloneProvesSemanticParity": false,
     "acceptanceRequiresCompleteAudit": true
+  },
+  "retainedAcceptedCapabilities": {
+    "anumAddressProtocolV012": {
+      "role": "retained higher-level compatibility capability; not the v0.13 foundation alphabet",
+      "knowledgeStates": [
+        "UNINTERPRETABLE",
+        "NOT_FOUND",
+        "FOUND"
+      ],
+      "resolve": {
+        "readOnly": true,
+        "rootCutDepth": 1,
+        "recursiveDereference": false,
+        "notFoundMaterializes": false
+      },
+      "exactAddressMaterializationCreatesTarget": false,
+      "targetMaterialization": {
+        "writeAuthorized": true,
+        "rootCutDepth": 1,
+        "recursiveDereference": false,
+        "preservesRemainingAnumIndirection": true,
+        "failClosedBeforeWrite": true
+      }
+    }
   }
 }
