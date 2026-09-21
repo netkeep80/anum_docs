@@ -37,17 +37,19 @@
     "publicFacade": "ts/src/public.ts",
     "acceptedRuntime": "mts-contract/v0.12",
     "candidateRuntimeSelectable": false,
-    "implementationComplete": false,
+    "implementationComplete": true,
     "productionBehaviorChanged": false,
-    "candidateKernelBehaviorImplemented": false,
-    "researchRuntimeFiles": [
+    "candidateKernelBehaviorImplemented": true,
+    "researchRuntimeFiles": [],
+    "nonWellFoundedAtomicWriterProductionEnabled": false,
+    "candidateKernelFiles": [
       "ts/src/v013-hierarchical-carrier.ts",
       "ts/src/v013-relative-form-materialization.ts",
       "ts/src/v013-relative-pole-context.ts",
       "ts/src/v013-relative-pole-execution.ts",
       "ts/src/v013-formal-aspect-evaluator.ts"
     ],
-    "nonWellFoundedAtomicWriterProductionEnabled": false
+    "implementationCompleteMeaning": "declared-v0.13-candidate-kernel-scope-complete; public consumer boundary is merged and mandatory evidence is projected; excludes readiness, runtime selection and acceptance"
   },
   "bootstrapBasis": {
     "root": "R",
@@ -330,7 +332,8 @@
     "linkNativeAbitGroundingComplete": true,
     "functionalParityAuditComplete": true,
     "foundationSuperiorityAuditComplete": true,
-    "rootFormalDialectComplete": true
+    "rootFormalDialectComplete": true,
+    "publicFacadeComplete": true
   },
   "owners": {
     "memory": "ts/src/memory.ts",
