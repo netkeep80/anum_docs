@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import * as ts from "typescript";
 
@@ -487,6 +487,181 @@ for (const forbiddenFragment of [
   assert(!stringReadSlice.includes(forbiddenFragment),
     `STRING authority reader excludes producer/general codec dependency: ${forbiddenFragment}`);
 }
+
+// P1e independently discovers every direct Memory write sink in ts/src.
+// It does not trust auditScope.candidateKernelFiles or any manually maintained
+// source inventory. New direct write owners must be explicitly classified.
+const writeMethods = new Set([
+  "ensureRoot",
+  "ensureStartSelfClosed",
+  "ensureEndSelfClosed",
+  "ensure",
+]);
+
+function tsSourceFiles(directory: string): readonly string[] {
+  const result: string[] = [];
+  for (const name of readdirSync(join(repoRoot, directory))) {
+    const relative = join(directory, name).replaceAll("\\", "/");
+    const absolute = join(repoRoot, relative);
+    const stat = statSync(absolute);
+    if (stat.isDirectory()) {
+      result.push(...tsSourceFiles(relative));
+    } else if (
+      stat.isFile() &&
+      relative.endsWith(".ts") &&
+      !relative.endsWith(".d.ts")
+    ) {
+      result.push(relative);
+    }
+  }
+  return result.sort();
+}
+
+interface WriteSink {
+  readonly file: string;
+  readonly owner: string;
+  readonly method: string;
+}
+
+function memberName(name: ts.PropertyName | undefined): string | undefined {
+  if (name === undefined) return undefined;
+  if (ts.isIdentifier(name) || ts.isStringLiteral(name) || ts.isNumericLiteral(name)) {
+    return name.text;
+  }
+  return undefined;
+}
+
+function discoverDirectWriteSinks(sourcePath: string): readonly WriteSink[] {
+  const source = ts.createSourceFile(
+    sourcePath,
+    read(sourcePath),
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
+  const result: WriteSink[] = [];
+
+  const visit = (node: ts.Node, owner: string): void => {
+    let nestedOwner = owner;
+
+    if (ts.isFunctionDeclaration(node) && node.name !== undefined) {
+      nestedOwner = node.name.text;
+    } else if (ts.isMethodDeclaration(node)) {
+      const method = memberName(node.name) ?? "<computed-method>";
+      const parent = node.parent;
+      const className =
+        ts.isClassDeclaration(parent) && parent.name !== undefined
+          ? parent.name.text
+          : "<class>";
+      nestedOwner = `${className}.${method}`;
+    } else if (ts.isConstructorDeclaration(node)) {
+      const parent = node.parent;
+      const className =
+        ts.isClassDeclaration(parent) && parent.name !== undefined
+          ? parent.name.text
+          : "<class>";
+      nestedOwner = `${className}.constructor`;
+    } else if (
+      (ts.isArrowFunction(node) || ts.isFunctionExpression(node)) &&
+      ts.isVariableDeclaration(node.parent) &&
+      ts.isIdentifier(node.parent.name)
+    ) {
+      nestedOwner = node.parent.name.text;
+    }
+
+    if (
+      ts.isCallExpression(node) &&
+      ts.isPropertyAccessExpression(node.expression) &&
+      writeMethods.has(node.expression.name.text)
+    ) {
+      result.push(Object.freeze({
+        file: sourcePath,
+        owner: nestedOwner,
+        method: node.expression.name.text,
+      }));
+    }
+
+    ts.forEachChild(node, (child) => visit(child, nestedOwner));
+  };
+
+  visit(source, "<module>");
+  return result;
+}
+
+const observedDirectWriteSinks = tsSourceFiles("ts/src")
+  .flatMap(discoverDirectWriteSinks)
+  .sort((left, right) =>
+    left.file.localeCompare(right.file) ||
+    left.owner.localeCompare(right.owner) ||
+    left.method.localeCompare(right.method)
+  );
+
+const observedDirectWriteOwners = [...new Set(
+  observedDirectWriteSinks.map((sink) => `${sink.file}#${sink.owner}`),
+)].sort();
+
+if (projection.packageDirectSemanticWriteAudit === undefined) {
+  console.log(
+    "A9 P1e observed direct semantic write owners:\n" +
+    observedDirectWriteOwners.join("\n"),
+  );
+  throw new Error(
+    "v0.13 A9 semantic dependency projection: packageDirectSemanticWriteAudit is not yet declared",
+  );
+}
+
+setEqual(
+  observedDirectWriteOwners,
+  projection.packageDirectSemanticWriteAudit.owners.map((entry: any) => entry.id),
+  "package-wide direct semantic write owners",
+);
+
+for (const entry of projection.packageDirectSemanticWriteAudit.owners as any[]) {
+  assert(typeof entry.category === "string" && entry.category.length > 0,
+    `${entry.id}: write owner category is declared`);
+  assert(typeof entry.reason === "string" && entry.reason.length > 0,
+    `${entry.id}: write owner reason is declared`);
+  if (entry.capabilityId !== null) {
+    assert(capabilities.has(entry.capabilityId),
+      `${entry.id}: write owner capability resolves`);
+  }
+}
+
+same(
+  projection.packageDirectSemanticWriteAudit.scanRoot,
+  "ts/src",
+  "package-wide direct write scan root",
+);
+setEqual(
+  projection.packageDirectSemanticWriteAudit.methods,
+  [...writeMethods],
+  "direct write sink method set",
+);
+same(
+  projection.metrics.directSemanticWriteOwnerCount,
+  observedDirectWriteOwners.length,
+  "direct semantic write owner count",
+);
+same(
+  projection.metrics.unclassifiedDirectSemanticWriteOwnerCount,
+  0,
+  "all direct semantic write owners are classified",
+);
+same(
+  projection.coverage.packageDirectSemanticWriteAuditComplete,
+  true,
+  "package-wide direct semantic write audit is complete",
+);
+same(
+  projection.coverage.packageInterpretationEntrypointAuditComplete,
+  false,
+  "write-sink audit does not overclaim read-only interpretation coverage",
+);
+same(
+  projection.coverage.globalTrustBoundaryComplete,
+  false,
+  "write-sink audit alone does not establish global trust closure",
+);
 
 // Recompute all published P1 metrics from stable capability IDs.
 const byLayer = (layer: string): any[] =>
