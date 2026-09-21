@@ -92,7 +92,7 @@ same(conformance12.accepted, true, "v0.12 conformance accepted flag remains true
 same(contract13.acceptedCurrent?.contract, "mts-contract/v0.12", "accepted-current contract");
 same(
   contract13.acceptedCurrent?.conformance,
-  "mts-conformance/v0.12",
+  "contracts/mts-conformance-v0.12.json",
   "accepted-current conformance",
 );
 same(
@@ -105,7 +105,7 @@ same(
   "mts-conformance/v0.12",
   "conformance accepted-current corpus",
 );
-same(acceptance12.current?.contract, "mts-contract/v0.12", "cutover current contract remains v0.12");
+same(acceptance12.current?.contract, "contracts/mts-contract-v0.12.json", "cutover current contract remains v0.12");
 same(
   acceptance12.current?.conformance,
   "mts-conformance/v0.12",
