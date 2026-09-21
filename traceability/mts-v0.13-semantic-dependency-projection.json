@@ -1,9 +1,9 @@
 {
-  "schema": "mts-semantic-dependency-projection/v0.4",
+  "schema": "mts-semantic-dependency-projection/v0.5",
   "mtsVersion": "0.13",
   "status": "research",
   "ownerIssue": 1270,
-  "candidateMain": "68c6ca8e9faae4d2dfc232ab5ec64dcb9657bfdd",
+  "candidateMain": "2ce5f2e8e7e22f2d89bfb6472a32e7cee4e54d77",
   "externalAuditProjectionOnly": true,
   "normativeFoundation": false,
   "semanticAuthority": false,
@@ -15,7 +15,9 @@
     "globalTrustBoundaryComplete": false,
     "inheritedAuthorityTransitiveImplementationClosureComplete": true,
     "exactTheorySelectedAdmissionTransitiveImplementationClosureComplete": true,
-    "stringCarrierTransitiveImplementationClosureComplete": true
+    "stringCarrierTransitiveImplementationClosureComplete": true,
+    "packageDirectSemanticWriteAuditComplete": true,
+    "packageInterpretationEntrypointAuditComplete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -736,31 +738,47 @@
     "globalUndocumentedSemanticPathCount": null,
     "coarseInheritedAuthorityAggregateCount": 0,
     "unresolvedNestedBootstrapBoundaryCount": 0,
-    "unresolvedRepresentationBoundaryCount": 0
+    "unresolvedRepresentationBoundaryCount": 0,
+    "directSemanticWriteOwnerCount": 49,
+    "unclassifiedDirectSemanticWriteOwnerCount": 0,
+    "directSemanticWriteOwnersByCategory": {
+      "authority-evidence-producer": 19,
+      "proof-derivation-producer": 11,
+      "representation-materialization": 12,
+      "bootstrap-foundation-materialization": 2,
+      "tooling": 2,
+      "authorized-semantic-target-materialization": 3
+    },
+    "packageWideObjectSpecificHostSemanticCount": null
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
     "linkExecutedSemanticCapabilityCount": "P1 counts a capability as Link-executed only if the execution mechanism itself is Link-defined. Link-grounded authority with host execution is counted as mixed, not self-hosted.",
     "hostLinkSemanticDuplicationCount": "Counts semantic capabilities whose meaning/evidence is expressed through Links while an equally relevant host execution mechanism still implements the operation in this P1 model.",
     "directUndocumentedDependencyCount": "Exact static count only for direct dependencies observed in the five candidate-kernel files.",
-    "globalUndocumentedSemanticPathCount": "Unknown until an independent package-wide audit enumerates semantic interpretation/write entrypoints and verifies that every such path reaches only declared capabilities.",
+    "globalUndocumentedSemanticPathCount": "Still unknown because direct writes do not cover read-only interpretation paths.",
     "objectSpecificHostSemanticShortcutCount": "Counts exact multi-abit physical-term literals that directly participate in host control flow in the candidate kernel. It intentionally does not count structural self-incidence labels stored as data.",
     "coarseInheritedAuthorityAggregateCount": "P1b requires the previous accepted-v0.12 authority aggregate to disappear in favor of explicit service-level capabilities.",
     "unresolvedNestedBootstrapBoundaryCount": "P1c removes the last intentionally aggregated semantic-bootstrap boundary from the selected-admission authority chain.",
     "modelRevision": "P1c changes measurement resolution; compare semantic capability identities, not raw counts, across P1/P1b/P1c.",
-    "unresolvedRepresentationBoundaryCount": "Zero means the currently selected v0.13 source/Rule authority chain has no intentionally aggregated representation boundary. This does not yet prove package-wide global trust closure."
+    "unresolvedRepresentationBoundaryCount": "Zero means the currently selected v0.13 source/Rule authority chain has no intentionally aggregated representation boundary. This does not yet prove package-wide global trust closure.",
+    "directSemanticWriteOwnerCount": "Number of distinct function/method owners under ts/src that directly call Memory semantic-write methods ensureRoot/ensureStartSelfClosed/ensureEndSelfClosed/ensure. It is a write-surface size, not a primitive count.",
+    "unclassifiedDirectSemanticWriteOwnerCount": "Independent package-wide AST discovery must match the classified owner set exactly; zero means every currently observed direct write owner has a declared role.",
+    "directSemanticWriteOwnersByCategory": "Separates bootstrap realization, evidence/proof producers, representation, authorized target writes and tooling; category counts are not semantic primitive counts.",
+    "packageWideObjectSpecificHostSemanticCount": "Unmeasured until the package-wide read-only interpretation/semantic-decision audit is complete."
   },
   "nextExperiments": [
-    "Add an independent package-wide audit of semantic-write and interpretation entrypoints, separate from the hand-maintained projection.",
-    "Trace mandatory executable gates against declared public semantic capability roots and compare observed runtime/static paths with the projection.",
-    "Run per-bootstrap-capability elimination experiments and classify INDEPENDENT/DERIVABLE/EQUIVALENT_REENCODING/IMPLEMENTATION_ONLY/UNKNOWN.",
-    "Incorporate A10/A10b self-interpretation evidence into the Link-described/Link-executed maturity matrix without confusing read-only validation with write-side self-hosting.",
-    "Build a v0.12 -> v0.13 trust-surface delta only after stable global-path coverage exists."
+    "Independently audit package-wide read-only semantic interpretation/decision entrypoints; direct write coverage alone is insufficient for global trust closure.",
+    "Add hard bypass falsification so semantic mutation/materialization cannot silently appear outside the classified capability boundary.",
+    "Refine host/Link duplication from candidate count to confirmed semantic-equivalence duplication.",
+    "Integrate A10b into a witness-scoped self-hosting maturity matrix with explicit residual host capabilities.",
+    "Run per-bootstrap-capability elimination experiments only after global path coverage; failed removal remains UNKNOWN.",
+    "Build a v0.12 -> v0.13 delta only for metrics measured under the same schema."
   ],
   "measurement": {
-    "modelRevision": "A9-P1d-string-authority-read-closure",
+    "modelRevision": "A9-P1e-package-direct-write-audit",
     "metricDeltaComparableToPreviousRevision": false,
-    "reason": "P1d narrows an existing representation capability to the actual v0.13 read/replay authority path. Capability counts are unchanged; trusted-path classification becomes more precise."
+    "reason": "P1e adds an independent observed-owner metric over the whole source tree; it does not change runtime or the existing semantic capability model."
   },
   "authorityServiceUnfolding": {
     "replacedCapability": "bootstrap.accepted-v012-authority-runtime",
@@ -832,5 +850,314 @@
     ],
     "noWritePath": true,
     "note": "Module-level imports are not automatically trusted dependencies. Only the reachable selected authority read path is projected."
+  },
+  "packageDirectSemanticWriteAudit": {
+    "status": "classified",
+    "scanRoot": "ts/src",
+    "discovery": "independent TypeScript AST scan; owner set is not derived from candidateKernelFiles or the dependency projection",
+    "methods": [
+      "ensure",
+      "ensureEndSelfClosed",
+      "ensureRoot",
+      "ensureStartSelfClosed"
+    ],
+    "owners": [
+      {
+        "id": "ts/src/context-integration.ts#continueFormalContext",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.context-state",
+        "reason": "Builds the next FORMAL context using Link structures; package semantic construction, not a bootstrap primitive."
+      },
+      {
+        "id": "ts/src/context-integration.ts#continueStringAnum",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.context-state",
+        "reason": "Builds the next STRING-Anum context using Link structures."
+      },
+      {
+        "id": "ts/src/context-integration.ts#continueStringSign",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.context-state",
+        "reason": "Builds the next STRING-sign context using Link structures."
+      },
+      {
+        "id": "ts/src/context-integration.ts#defineTypedContext",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.context-state",
+        "reason": "Defines typed context structure above Memory write capabilities."
+      },
+      {
+        "id": "ts/src/derivation.ts#admitStructuralDerivationRule",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Produces derivation-rule admission evidence; not itself an independent bootstrap capability."
+      },
+      {
+        "id": "ts/src/derivation.ts#defineStructuralAssumptionContext",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Produces structural assumption-context evidence."
+      },
+      {
+        "id": "ts/src/derivation.ts#defineStructuralDerivationRule",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Produces structural derivation-rule structure."
+      },
+      {
+        "id": "ts/src/derivation.ts#defineStructuralProofOccurrence",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Produces proof-occurrence structure."
+      },
+      {
+        "id": "ts/src/derivation.ts#defineStructuralTheorem",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Produces theorem structure."
+      },
+      {
+        "id": "ts/src/derived-derivation-heterogeneous-discharge-materialize.ts#materializeHeterogeneousDerivedClosedRootedDischarge",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Materializes a derived proof construction above the Memory boundary."
+      },
+      {
+        "id": "ts/src/derived-derivation-heterogeneous-discharge-materialize.ts#rebuild",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Internal derived-proof reconstruction helper."
+      },
+      {
+        "id": "ts/src/derived-derivation-heterogeneous-expansion.ts#build",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Builds derived expansion structure."
+      },
+      {
+        "id": "ts/src/derived-derivation-heterogeneous-expansion.ts#buildOccurrence",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Builds a derived occurrence structure."
+      },
+      {
+        "id": "ts/src/derived-derivation-heterogeneous-expansion.ts#materializeHeterogeneousDerivedOpenRootedExpansion",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Materializes derived expansion semantics above Memory."
+      },
+      {
+        "id": "ts/src/derived-derivation-instantiation.ts#instantiateTemplate",
+        "category": "proof-derivation-producer",
+        "capabilityId": null,
+        "reason": "Instantiates a derived structural template; not classified as an independent Memory primitive."
+      },
+      {
+        "id": "ts/src/dictionary.ts#defineDictionaryEffect",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.dictionary-visibility",
+        "reason": "Writes Dictionary history/effect structure used later by visibility replay."
+      },
+      {
+        "id": "ts/src/dictionary.ts#defineDictionaryScope",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.dictionary-visibility",
+        "reason": "Writes Dictionary scope structure used later by visibility replay."
+      },
+      {
+        "id": "ts/src/exact-sequence.ts#materializeExactSequence",
+        "category": "representation-materialization",
+        "capabilityId": "derived.exact-sequence",
+        "reason": "Materializes Link-native ExactSequence structure; derived representation convention."
+      },
+      {
+        "id": "ts/src/memory.ts#Memory.constructor",
+        "category": "bootstrap-foundation-materialization",
+        "capabilityId": "bootstrap.root-anchor",
+        "reason": "Initializes the Memory-local root realization."
+      },
+      {
+        "id": "ts/src/memory.ts#ensureRootBasis",
+        "category": "bootstrap-foundation-materialization",
+        "capabilityId": null,
+        "reason": "Materializes the convenient R/O/C/L/U basis from Memory capabilities; basis convenience is not counted as an independent primitive."
+      },
+      {
+        "id": "ts/src/persistence-topology.ts#restoreTopology",
+        "category": "representation-materialization",
+        "capabilityId": "representation.topology-restoration",
+        "reason": "Restores stored topology into Memory; representation boundary."
+      },
+      {
+        "id": "ts/src/quaternary-anum.ts#materializeContext",
+        "category": "representation-materialization",
+        "capabilityId": null,
+        "reason": "Builds quaternary codec context structure; outside the v0.13 source-authority read path."
+      },
+      {
+        "id": "ts/src/quaternary-anum.ts#materializeTargetHierarchy",
+        "category": "representation-materialization",
+        "capabilityId": null,
+        "reason": "Builds hierarchical quaternary representation targets."
+      },
+      {
+        "id": "ts/src/quaternary-state.ts#appendQuaternaryValue",
+        "category": "representation-materialization",
+        "capabilityId": null,
+        "reason": "Mutates quaternary representation state."
+      },
+      {
+        "id": "ts/src/quaternary-state.ts#closeQuaternaryState",
+        "category": "representation-materialization",
+        "capabilityId": null,
+        "reason": "Closes quaternary representation state."
+      },
+      {
+        "id": "ts/src/sequence.ts#materializeItems",
+        "category": "representation-materialization",
+        "capabilityId": null,
+        "reason": "Materializes a sequence representation."
+      },
+      {
+        "id": "ts/src/source.ts#buildSelectedSourceEvidence",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.source-selection-replay",
+        "reason": "Produces selected-source evidence consumed by read-only replay."
+      },
+      {
+        "id": "ts/src/source.ts#defineSourceForm",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.source-selection-replay",
+        "reason": "Defines source-form structure."
+      },
+      {
+        "id": "ts/src/source.ts#fold",
+        "category": "authority-evidence-producer",
+        "capabilityId": null,
+        "reason": "Internal fold used to build source evidence sequences."
+      },
+      {
+        "id": "ts/src/state.ts#defineContext",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.context-state",
+        "reason": "Defines Link-native context evidence."
+      },
+      {
+        "id": "ts/src/state.ts#defineLocalRepresentativeBinding",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.context-state",
+        "reason": "Defines local representative binding evidence."
+      },
+      {
+        "id": "ts/src/structural-readers.ts#defineActField",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.structural-act",
+        "reason": "Produces Act field attachment structure."
+      },
+      {
+        "id": "ts/src/structural-readers.ts#defineActHeader",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.structural-act",
+        "reason": "Produces Act header structure."
+      },
+      {
+        "id": "ts/src/structural-rule.ts#admitStructuralRule",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.structural-rule-replay",
+        "reason": "Produces Theory admission Link later verified by replay."
+      },
+      {
+        "id": "ts/src/structural-rule.ts#defineStructuralInterpreter",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.structural-rule-replay",
+        "reason": "Defines structural interpreter identity as Links."
+      },
+      {
+        "id": "ts/src/structural-rule.ts#defineStructuralRoleDictionary",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.structural-rule-replay",
+        "reason": "Defines role dictionary structure."
+      },
+      {
+        "id": "ts/src/structural-rule.ts#defineStructuralRule",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.structural-rule-replay",
+        "reason": "Defines structural Rule structure."
+      },
+      {
+        "id": "ts/src/syntax-aset-contract.ts#SyntaxAsetBuilder.finish",
+        "category": "representation-materialization",
+        "capabilityId": null,
+        "reason": "Syntax-aset builder output; tooling/representation helper, not normative semantic bootstrap."
+      },
+      {
+        "id": "ts/src/syntax-aset-contract.ts#materializeTriad",
+        "category": "representation-materialization",
+        "capabilityId": null,
+        "reason": "Syntax-aset triad materializer; tooling layer."
+      },
+      {
+        "id": "ts/src/tooling/syntax-aset.ts#materializeNamedSeries",
+        "category": "tooling",
+        "capabilityId": null,
+        "reason": "Tooling-only named-series materializer."
+      },
+      {
+        "id": "ts/src/tooling/syntax-aset.ts#materializeSyntaxAsetVocabulary",
+        "category": "tooling",
+        "capabilityId": null,
+        "reason": "Tooling-only syntax-aset vocabulary materializer."
+      },
+      {
+        "id": "ts/src/v012-source.ts#buildV012SelectedSourceEvidence",
+        "category": "authority-evidence-producer",
+        "capabilityId": "derived.source-selection-replay",
+        "reason": "Produces v0.12 source evidence consumed by v0.13 authority replay."
+      },
+      {
+        "id": "ts/src/v012-source.ts#fold",
+        "category": "authority-evidence-producer",
+        "capabilityId": null,
+        "reason": "Internal evidence-sequence fold."
+      },
+      {
+        "id": "ts/src/v013-formal-aspect-evaluator.ts#materializePlan",
+        "category": "authorized-semantic-target-materialization",
+        "capabilityId": "derived.formal-aspect-evaluation",
+        "reason": "Final host execution of already-authorized FORMAL structural plan."
+      },
+      {
+        "id": "ts/src/v013-hierarchical-carrier.ts#materializeQuotedNode",
+        "category": "representation-materialization",
+        "capabilityId": "derived.hierarchical-carrier",
+        "reason": "Materializes a quoted carrier node."
+      },
+      {
+        "id": "ts/src/v013-hierarchical-carrier.ts#materializeV013HierarchicalCarrier",
+        "category": "representation-materialization",
+        "capabilityId": "derived.hierarchical-carrier",
+        "reason": "Materializes Link-native carrier from representation."
+      },
+      {
+        "id": "ts/src/v013-hierarchical-carrier.ts#materializeV013HierarchicalCarrierFromSemanticLink",
+        "category": "representation-materialization",
+        "capabilityId": "derived.hierarchical-carrier",
+        "reason": "Projects semantic Link into Link-native carrier structure."
+      },
+      {
+        "id": "ts/src/v013-relative-form-materialization.ts#materializeAuthorizedBinaryLinkSource",
+        "category": "authorized-semantic-target-materialization",
+        "capabilityId": "derived.authorized-form-materialization",
+        "reason": "Authorized binary semantic target materialization."
+      },
+      {
+        "id": "ts/src/v013-relative-form-materialization.ts#materializeAuthorizedRelativeUnaryFormSource",
+        "category": "authorized-semantic-target-materialization",
+        "capabilityId": "derived.authorized-form-materialization",
+        "reason": "Authorized START/END semantic target materialization."
+      }
+    ],
+    "interpretationBoundaryCovered": false,
+    "note": "A direct Memory write owner is an implementation write sink, not automatically a trusted semantic primitive. Categories separate bootstrap, semantic materialization, evidence production, representation reconstruction and tooling."
   }
 }
