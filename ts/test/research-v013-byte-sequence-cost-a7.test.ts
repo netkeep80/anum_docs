@@ -13,6 +13,10 @@ import {
   serializeV013HierarchicalCarrier,
 } from "../src/v013-hierarchical-carrier.js";
 
+// Bounded A7 witness only: a tree-shaped structural carrier here does not
+// assert that arbitrary semantic/aset containment is tree-shaped or acyclic.
+// Recursive/shared semantic topology is a separate #1270 falsification target.
+
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
