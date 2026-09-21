@@ -248,7 +248,8 @@
     "linkNativeAbitBasis": "green-complete-a2",
     "comparativeSuperiority": "pending",
     "codecEngineeringComparison": "green-research-evidence-a3",
-    "functionalParity": "green-complete-a4"
+    "functionalParity": "green-complete-a4",
+    "foundationSuperiority": "in-progress-a5a"
   },
   "acceptanceBlockers": [
     "foundation superiority versus accepted v0.12 has not yet been demonstrated for necessity, sufficiency, derivability, Link-ontology closure, canonical unambiguity and absence of hidden host semantic authority",
@@ -597,5 +598,63 @@
     "completedLawCount": 18,
     "reviewRequiredCount": 0,
     "regressionCount": 0
+  },
+  "foundationSuperiorityAudit": {
+    "status": "in-progress-a5a",
+    "criteria": {
+      "necessity": {
+        "status": "green-a5a",
+        "evidence": [
+          "ts/test/v013-aspect-foundation-theorem.test.ts",
+          "ts/test/v013-link-native-abit-basis.test.ts"
+        ]
+      },
+      "sufficiency": {
+        "status": "green-for-declared-finite-grounded-domain-a5a",
+        "evidence": [
+          "ts/test/v013-aspect-foundation-theorem.test.ts",
+          "ts/test/v013-unknown-whole-two-memory.test.ts",
+          "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
+          "ts/test/v013-cyclic-grounding-boundary.test.ts"
+        ]
+      },
+      "derivability": {
+        "status": "green-a2",
+        "evidence": [
+          "ts/test/v013-link-native-abit-basis.test.ts"
+        ]
+      },
+      "closure": {
+        "status": "green-a2",
+        "evidence": [
+          "ts/test/v013-link-native-abit-basis.test.ts",
+          "ts/test/v013-hierarchical-link-carrier.test.ts"
+        ]
+      },
+      "unambiguity": {
+        "status": "green-a5a",
+        "evidence": [
+          "ts/test/v013-aspect-foundation-theorem.test.ts",
+          "ts/test/v013-quaternary-canonicality.test.ts"
+        ]
+      },
+      "hostAuthorityBoundary": {
+        "status": "green-a5a",
+        "evidence": [
+          "ts/test/v013-aspect-foundation-theorem.test.ts",
+          "ts/test/v013-codec-comparison.test.ts",
+          "ts/test/v013-formal-quaternary-grounding.test.ts"
+        ]
+      }
+    },
+    "comparativeFinding": {
+      "status": "green-structural-delta-a5a",
+      "statement": "accepted v0.12 Q signs O/C/L/U do not form a bijection to the four Link self-incidence classes, while v0.13 R/O/C/L does",
+      "compactnessClaim": false
+    },
+    "remainingBeforeComplete": [
+      "independently challenge the finite-grounding premise versus accepted v0.12 capability",
+      "show whether the same foundation result could be obtained as a smaller v0.12 extension rather than a v0.13 refoundation"
+    ]
   }
 }
