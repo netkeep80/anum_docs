@@ -1,3 +1,4 @@
+// mts-version-evidence: required-from=0.13
 import * as publicApi from "../src/public.js";
 
 import {
