@@ -271,10 +271,14 @@ function projectSemanticInvariants(
   manifest: TraceabilityManifestSelection,
 ): SemanticInvariant[] {
   const schema = requireString(manifest.value.schema, `${manifest.path}#/schema`);
-  const acceptancePath = requireString(manifest.value.acceptance, `${manifest.path}#/acceptance`);
-  const versionAcceptancePath = requireString(contract.currentPointer, `${summary.contractPath}#/currentPointer`);
-  if (acceptancePath !== versionAcceptancePath) {
-    throw new Error(`Contract Observatory V4d: traceability acceptance mismatch: ${manifest.path}`);
+  if (summary.accepted) {
+    const acceptancePath = requireString(manifest.value.acceptance, `${manifest.path}#/acceptance`);
+    const versionAcceptancePath = requireString(contract.currentPointer, `${summary.contractPath}#/currentPointer`);
+    if (acceptancePath !== versionAcceptancePath) {
+      throw new Error(`Contract Observatory V4d: traceability acceptance mismatch: ${manifest.path}`);
+    }
+  } else if (manifest.value.acceptance !== undefined && manifest.value.acceptance !== null) {
+    throw new Error(`Contract Observatory V4d: candidate traceability must not claim acceptance: ${manifest.path}`);
   }
   const invariants = requireRecord(manifest.value.invariants, `${manifest.path}#/invariants`);
   const laws = requireRecord(contract.requiredSemanticLaws, `${summary.contractPath}#/requiredSemanticLaws`);
