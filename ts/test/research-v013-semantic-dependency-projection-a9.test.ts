@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import * as ts from "typescript";
+import { Memory, ensureRootBasis } from "../src/memory.js";
+import { decomposeV013SemanticLink } from "../src/v013-hierarchical-carrier.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.13 A9 semantic dependency projection: ${message}`);
@@ -308,6 +310,88 @@ same(
   bootstrap.filter((capability: any) => capability.primitiveStatus === "UNKNOWN").length,
   "unknown bootstrap primitive status count",
 );
+
+// ---------------------------------------------------------------------------
+// A9 root-function hypothesis falsifier.
+//
+// Historical #1010 witnesses happened to use O as an explanatory Function /
+// Relation kind. Their own comments explicitly say those host labels were not
+// semantic authority. Test the stronger hypothesis against the v0.13 root
+// aspect model instead of preserving that accidental assignment.
+//
+// Result we are looking for:
+//
+// 1. no one root Link is forced to be the contextual F merely by application
+//    topology: R/O/C/L/U can all head the same left-associated relation shape;
+// 2. every ordinary application/correspondence step is locally PAIR/00 and
+//    therefore has the canonical root representative L;
+// 3. L does not by itself imply mathematical functionality, because one fully
+//    applied prefix may still have multiple ordinary PAIR/L continuations.
+//
+// So L is a candidate root representative of the *mapping/application form*,
+// not a primitive Function kind and not a proof of single-valuedness.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+
+  const argument = memory.ensure(basis.U, basis.L);
+  const value1 = memory.ensure(basis.C, basis.O);
+  const value2 = memory.ensure(basis.L, basis.C);
+
+  const rootCandidates = [
+    ["R", basis.R],
+    ["O", basis.O],
+    ["C", basis.C],
+    ["L", basis.L],
+    ["U", basis.U],
+  ] as const;
+
+  for (const [name, functionContext] of rootCandidates) {
+    const application = memory.ensure(functionContext, argument);
+    const fact = memory.ensure(application, value1);
+
+    const applicationAspect = decomposeV013SemanticLink(memory, basis, application);
+    const factAspect = decomposeV013SemanticLink(memory, basis, fact);
+
+    same(applicationAspect.aspect, "PAIR", `${name}: application is ordinary PAIR`);
+    same(applicationAspect.selfIncidence, "00", `${name}: application self-incidence`);
+    same(applicationAspect.sign, basis.L, `${name}: application root representative is L`);
+
+    same(factAspect.aspect, "PAIR", `${name}: correspondence fact is ordinary PAIR`);
+    same(factAspect.selfIncidence, "00", `${name}: fact self-incidence`);
+    same(factAspect.sign, basis.L, `${name}: correspondence root representative is L`);
+  }
+
+  // O was historically chosen as functionKind in #1010, but left-associated
+  // relation topology alone does not distinguish it from the other roots.
+  const oApplication = memory.ensure(basis.O, argument);
+  const lApplication = memory.ensure(basis.L, argument);
+  assert(oApplication !== lApplication, "O and L contexts remain distinct Links");
+  same(
+    decomposeV013SemanticLink(memory, basis, oApplication).sign,
+    basis.L,
+    "O-headed application still has PAIR/L form",
+  );
+  same(
+    decomposeV013SemanticLink(memory, basis, lApplication).sign,
+    basis.L,
+    "L-headed application has the same PAIR/L form",
+  );
+
+  // A conventional mathematical function needs uniqueness. The same PAIR/L
+  // application prefix can have more than one value continuation, so L alone
+  // cannot mean “single-valued function”.
+  const fullPrefix = memory.ensure(basis.L, argument);
+  const continuation1 = memory.ensure(fullPrefix, value1);
+  const continuation2 = memory.ensure(fullPrefix, value2);
+  assert(continuation1 !== continuation2, "two distinct values remain representable");
+
+  for (const continuation of [continuation1, continuation2]) {
+    const decomposition = decomposeV013SemanticLink(memory, basis, continuation);
+    same(decomposition.aspect, "PAIR", "multivalued continuation remains PAIR");
+    same(decomposition.sign, basis.L, "multivalued continuation remains represented by L");
+  }
+}
 
 // A9 P1 must remain research-only and cannot silently rewrite the accepted state.
 same(contract.accepted, false, "v0.13 remains unaccepted");
