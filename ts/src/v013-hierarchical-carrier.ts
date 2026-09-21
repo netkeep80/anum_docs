@@ -83,6 +83,88 @@ function readQuotedNode(
   }
 }
 
+export type V013StructuralAspect = "ROOT" | "START" | "END" | "PAIR";
+export type V013SelfIncidence = "11" | "10" | "01" | "00";
+
+export interface V013SemanticDecomposition {
+  readonly aspect: V013StructuralAspect;
+  readonly selfIncidence: V013SelfIncidence;
+  readonly sign: LinkHandle;
+  readonly children: readonly LinkHandle[];
+}
+
+function decomposeVerifiedSemanticLink(
+  memory: ReadMemory,
+  basis: RootBasis,
+  semantic: LinkHandle,
+): V013SemanticDecomposition {
+  if (semantic === basis.R) {
+    return Object.freeze({
+      aspect: "ROOT",
+      selfIncidence: "11",
+      sign: basis.R,
+      children: Object.freeze([]),
+    });
+  }
+
+  try {
+    const poles = memory.poles(semantic);
+    const startSelf = poles.start === semantic;
+    const endSelf = poles.end === semantic;
+
+    if (startSelf && endSelf) {
+      // RootBasis verification already proves the unique local R handle.
+      // A second both-self-closed handle is therefore outside the admissible
+      // canonical semantic class.
+      return fail("invalid-semantic-link");
+    }
+
+    if (startSelf) {
+      return Object.freeze({
+        aspect: "START",
+        selfIncidence: "10",
+        sign: basis.O,
+        children: Object.freeze([poles.end]),
+      });
+    }
+
+    if (endSelf) {
+      return Object.freeze({
+        aspect: "END",
+        selfIncidence: "01",
+        sign: basis.C,
+        children: Object.freeze([poles.start]),
+      });
+    }
+
+    return Object.freeze({
+      aspect: "PAIR",
+      selfIncidence: "00",
+      sign: basis.L,
+      children: Object.freeze([poles.start, poles.end]),
+    });
+  } catch (error) {
+    if (error instanceof V013HierarchicalCarrierError) throw error;
+    if (error instanceof MemoryError) return fail("invalid-semantic-link");
+    throw error;
+  }
+}
+
+/**
+ * Read-only local aspect decomposition of one semantic Link.
+ *
+ * The result depends only on the verified rooted basis, the Link's two poles
+ * and Link identity equality. It does not consult parser state, AST node kind,
+ * sender-local IDs, adjacency discovery or ambient context.
+ */
+export function decomposeV013SemanticLink(
+  memory: ReadMemory,
+  basis: RootBasis,
+  semantic: LinkHandle,
+): V013SemanticDecomposition {
+  return decomposeVerifiedSemanticLink(memory, requireBasis(memory, basis), semantic);
+}
+
 
 /**
  * Project any finite Link constructible by the current Memory API into the
@@ -107,7 +189,8 @@ export function materializeV013HierarchicalCarrierFromSemanticLink(
     const known = memo.get(link);
     if (known !== undefined) return known;
 
-    if (link === verified.R) {
+    const decomposition = decomposeVerifiedSemanticLink(memory, verified, link);
+    if (decomposition.aspect === "ROOT") {
       memo.set(link, verified.R);
       return verified.R;
     }
@@ -115,44 +198,36 @@ export function materializeV013HierarchicalCarrierFromSemanticLink(
     if (active.has(link)) return fail("invalid-semantic-link");
     active.add(link);
     try {
-      const poles = memory.poles(link);
-
-      // A non-root Link cannot be self at both poles through the canonical
-      // Memory constructors. Treat such a foreign/forged cycle as unsupported.
-      if (poles.start === link && poles.end === link) {
-        return fail("invalid-semantic-link");
-      }
-
       let carrier: LinkHandle;
-      if (poles.start === link) {
+      if (decomposition.aspect === "START") {
         carrier = materializeQuotedNode(
           memory,
           verified,
           namespace,
-          [verified.O, project(poles.end)],
+          [decomposition.sign, project(decomposition.children[0]!)],
         );
-      } else if (poles.end === link) {
+      } else if (decomposition.aspect === "END") {
         carrier = materializeQuotedNode(
           memory,
           verified,
           namespace,
-          [verified.C, project(poles.start)],
+          [decomposition.sign, project(decomposition.children[0]!)],
         );
       } else {
         carrier = materializeQuotedNode(
           memory,
           verified,
           namespace,
-          [verified.L, project(poles.start), project(poles.end)],
+          [
+            decomposition.sign,
+            project(decomposition.children[0]!),
+            project(decomposition.children[1]!),
+          ],
         );
       }
 
       memo.set(link, carrier);
       return carrier;
-    } catch (error) {
-      if (error instanceof V013HierarchicalCarrierError) throw error;
-      if (error instanceof MemoryError) return fail("invalid-semantic-link");
-      throw error;
     } finally {
       active.delete(link);
     }
