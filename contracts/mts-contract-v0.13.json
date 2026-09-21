@@ -325,7 +325,8 @@
     "documentationComplete": true,
     "readinessAuditComplete": false,
     "explicitAuthorAcceptanceRecorded": false,
-    "linkNativeAbitGroundingComplete": true
+    "linkNativeAbitGroundingComplete": true,
+    "functionalParityAuditComplete": false
   },
   "owners": {
     "memory": "ts/src/memory.ts",
@@ -423,5 +424,45 @@
     "engineeringCodecMeasurementsRemainRelevant": true,
     "derivedCompactAlphabetsAllowed": true,
     "philosophicalAspectMappingsRequiredForAcceptance": false
+  },
+  "acceptanceAuthority": {
+    "explicitAuthorApprovalRequired": true,
+    "approvalMustReferenceExactCandidateArtifacts": true,
+    "requiredExactArtifacts": [
+      "candidate main SHA",
+      "contracts/mts-contract-v0.13.json content/SHA",
+      "contracts/mts-conformance-v0.13.json content/SHA",
+      "traceability/mts-v0.13.json content/SHA",
+      "independent readiness audit evidence"
+    ],
+    "implicitSignalsNeverCountAsAcceptance": [
+      "continue/proceed instruction",
+      "approval of an individual issue, PR, law or experiment",
+      "GREEN CI or conformance",
+      "readiness audit completion",
+      "absence of objection"
+    ],
+    "automaticAcceptanceForbidden": true
+  },
+  "functionalNonRegression": {
+    "baseline": {
+      "contract": "mts-contract/v0.12",
+      "conformance": "mts-conformance/v0.12",
+      "accepted": true
+    },
+    "scope": "all essential accepted v0.12 semantic capabilities, executable gates, negative authority boundaries and public/runtime capabilities",
+    "allowedClassifications": [
+      "PRESERVED",
+      "GENERALIZED",
+      "REPLACED",
+      "REVIEW_REQUIRED"
+    ],
+    "acceptanceForbiddenClassifications": [
+      "REGRESSION",
+      "REVIEW_REQUIRED"
+    ],
+    "deferredRequiresExplicitAuthorDecision": true,
+    "passingOldRuntimeTestsAloneProvesSemanticParity": false,
+    "acceptanceRequiresCompleteAudit": true
   }
 }
