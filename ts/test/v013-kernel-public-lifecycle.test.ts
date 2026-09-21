@@ -19,7 +19,7 @@ const conformance = JSON.parse(
 
 same(contract.status, "candidate", "v0.13 remains candidate");
 same(contract.accepted, false, "v0.13 remains unaccepted");
-same(contract.acceptanceReady, true, "separate readiness audit is now complete");
+same(contract.acceptanceReady, false, "readiness is reopened under the stronger A9/self-proof criteria");
 same(
   contract.implementation.acceptedRuntime,
   "mts-contract/v0.12",
@@ -121,7 +121,7 @@ same(
   "implementation slice does not record author acceptance",
 );
 
-same(conformance.acceptanceReady, true, "conformance is acceptance-ready");
+same(conformance.acceptanceReady, false, "conformance readiness is reopened");
 same(conformance.accepted, false, "conformance remains unaccepted");
 assert(
   !conformance.acceptanceBlockers.includes(
@@ -129,12 +129,13 @@ assert(
   ),
   "completed readiness audit is no longer a blocker",
 );
-assert(
-  conformance.acceptanceBlockers.includes(
-    "explicit author acceptance of the exact candidate artifacts has not yet been recorded",
-  ),
-  "author acceptance remains an explicit blocker",
-);
+for (const blocker of [
+  "foundation necessity/minimality remains open under A9 elimination and self-proof criteria",
+  "global host semantic trust boundary remains open until package-wide decision/runtime path audit closes",
+  "explicit author acceptance of the exact candidate artifacts has not yet been recorded",
+]) {
+  assert(conformance.acceptanceBlockers.includes(blocker), `acceptance blocker is explicit: ${blocker}`);
+}
 assert(
   !conformance.acceptanceBlockers.some((entry: string) =>
     /implementation|public facade|kernel/i.test(entry)
@@ -143,5 +144,5 @@ assert(
 );
 
 console.log(
-  "MTS v0.13 declared candidate kernel + public consumer boundary and separate readiness audit: GREEN; runtime selection and explicit author acceptance remain separate.",
+  "MTS v0.13 declared kernel/public evidence remains GREEN; readiness is conservatively reopened for A9 trust/minimality + self-proof closure, while v0.12 remains current.",
 );
