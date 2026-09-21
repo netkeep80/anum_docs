@@ -711,6 +711,12 @@ const readMemoryMembers = new Set([
   "issuanceIndex",
   "allLinks",
 ]);
+const writeMemoryMembers = new Set([
+  "ensureRoot",
+  "ensureStartSelfClosed",
+  "ensureEndSelfClosed",
+  "ensure",
+]);
 
 interface TypedReadSite {
   readonly file: string;
@@ -724,12 +730,20 @@ interface DecisionCandidate {
   readonly signals: readonly string[];
 }
 
-function declarationIsMemoryMember(symbol: ts.Symbol | undefined, member: string): boolean {
-  if (symbol === undefined || !readMemoryMembers.has(member)) return false;
+function declarationIsMemoryMemberFrom(
+  symbol: ts.Symbol | undefined,
+  member: string,
+  members: ReadonlySet<string>,
+): boolean {
+  if (symbol === undefined || !members.has(member)) return false;
   return (symbol.getDeclarations() ?? []).some((declaration) => {
     const file = declaration.getSourceFile().fileName.replaceAll("\\", "/");
     return file.endsWith(memorySourceSuffix) || file.endsWith("ts/src/memory.ts");
   });
+}
+
+function declarationIsMemoryMember(symbol: ts.Symbol | undefined, member: string): boolean {
+  return declarationIsMemoryMemberFrom(symbol, member, readMemoryMembers);
 }
 
 function nodeOwner(node: ts.Node): string {
@@ -874,6 +888,7 @@ function hasLiteralCase(node: ts.SwitchStatement): boolean {
 }
 
 const typedReadSites: TypedReadSite[] = [];
+const typedWriteSites: TypedReadSite[] = [];
 const decisionSignalsByOwner = new Map<string, Set<string>>();
 
 for (const sourcePath of sourcePaths) {
@@ -896,6 +911,13 @@ for (const sourcePath of sourcePaths) {
       const symbol = typeChecker.getSymbolAtLocation(node.name);
       if (declarationIsMemoryMember(symbol, member)) {
         typedReadSites.push(Object.freeze({
+          file: sourcePath,
+          owner: nodeOwner(node),
+          member,
+        }));
+      }
+      if (declarationIsMemoryMemberFrom(symbol, member, writeMemoryMembers)) {
+        typedWriteSites.push(Object.freeze({
           file: sourcePath,
           owner: nodeOwner(node),
           member,
@@ -977,6 +999,9 @@ for (const sourcePath of sourcePaths) {
 const typedReadOwners = [...new Set(
   typedReadSites.map((site) => `${site.file}#${site.owner}`),
 )].sort();
+const typedWriteOwners = [...new Set(
+  typedWriteSites.map((site) => `${site.file}#${site.owner}`),
+)].sort();
 
 const typedReadMemberCounts = Object.fromEntries(
   [...readMemoryMembers].sort().map((member) => [
@@ -1002,6 +1027,8 @@ if (projection.packageSemanticDecisionAudit === undefined) {
   console.log(
     "A9 P1f typed ReadMemory owners:\n" +
     typedReadOwners.join("\n") +
+    "\n\nA9 P1f typed WriteMemory owners:\n" +
+    typedWriteOwners.join("\n") +
     "\n\nA9 P1f typed ReadMemory member counts:\n" +
     JSON.stringify(typedReadMemberCounts, null, 2) +
     "\n\nA9 P1f host semantic decision candidates:\n" +
