@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "research-evidence-complete-formalization-pending",
-  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable evidence for their declared candidate scopes, but inherited-foundation parity has been reopened after A5b found that the old L9 overrejected rooted cycles allowed by A18. The current tree carrier remains GREEN only for well-founded ROOT-decomposable Links.",
+  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable evidence for their declared scopes; accepted-v0.12 semantic-delta parity and inherited A0-A20/F2-F6 parity are complete with zero regressions. Foundation superiority is complete as a minimal A5 foundation-alphabet replacement; current graph-cycle transport remains a non-foundational future layer. Readiness audit and explicit author acceptance remain pending.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -249,12 +249,10 @@
     "linkNativeAbitBasis": "green-complete-a2",
     "comparativeSuperiority": "pending",
     "codecEngineeringComparison": "green-research-evidence-a3",
-    "functionalParity": "reopened-a5b-inherited-foundation",
-    "foundationSuperiority": "red-a5b-cycle-boundary-correction"
+    "functionalParity": "green-complete-a5c",
+    "foundationSuperiority": "green-complete-a5c"
   },
   "acceptanceBlockers": [
-    "inherited-foundation non-regression is reopened: candidate L9 must preserve A18 rooted-cycle admissibility and the A1/A5/A18 delta must be explicitly audited",
-    "foundation superiority versus accepted v0.12 has not yet been demonstrated for necessity, sufficiency, derivability, Link-ontology closure, canonical unambiguity and absence of hidden host semantic authority",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
@@ -306,7 +304,7 @@
     "foundationAcceptanceGate": false
   },
   "functionalParityAudit": {
-    "status": "semantic-delta-green-inherited-foundation-reopened",
+    "status": "green-complete-a4",
     "baseline": {
       "contract": "mts-contract/v0.12",
       "conformance": "mts-conformance/v0.12",
@@ -601,85 +599,92 @@
     "reviewRequiredCount": 0,
     "regressionCount": 0,
     "semanticDeltaLawParityComplete": true,
-    "inheritedFoundationParityComplete": false
+    "inheritedFoundationParityComplete": true
   },
   "foundationSuperiorityAudit": {
-    "status": "red-a5b-correcting-cycle-boundary",
+    "status": "green-complete-a5c",
     "criteria": {
       "necessity": {
-        "status": "green-a5a",
+        "status": "green",
         "evidence": [
           "ts/test/v013-aspect-foundation-theorem.test.ts",
-          "ts/test/v013-link-native-abit-basis.test.ts"
-        ]
+          "ts/test/v013-link-native-abit-basis.test.ts",
+          "ts/test/v013-inherited-foundation-delta.test.ts"
+        ],
+        "finding": "all four self-incidence cases are realized and distinct as local reconstruction aspects"
       },
       "sufficiency": {
-        "status": "green-only-for-well-founded-tree-carrier-domain",
+        "status": "green-for-foundation-aspect-classification",
         "evidence": [
           "ts/test/v013-aspect-foundation-theorem.test.ts",
-          "ts/test/v013-unknown-whole-two-memory.test.ts",
-          "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
-          "ts/test/v013-cyclic-grounding-boundary.test.ts"
-        ]
+          "ts/test/v013-cyclic-grounding-boundary.test.ts",
+          "ts/test/v013-inherited-foundation-delta.test.ts"
+        ],
+        "finding": "ROOT/START/END/PAIR exhaust local Link self-incidence, including Links appearing inside rooted cyclic graphs; current tree transport remains intentionally partial for graph cycles"
       },
       "derivability": {
-        "status": "green-a2",
-        "evidence": [
-          "ts/test/v013-link-native-abit-basis.test.ts"
-        ]
-      },
-      "closure": {
-        "status": "green-a2",
+        "status": "green",
         "evidence": [
           "ts/test/v013-link-native-abit-basis.test.ts",
-          "ts/test/v013-hierarchical-link-carrier.test.ts"
-        ]
+          "ts/test/v013-inherited-foundation-delta.test.ts"
+        ],
+        "finding": "R/O/C/L aspect signs are derived from rooted Link structure rather than an unrelated symbol dictionary"
+      },
+      "closure": {
+        "status": "green",
+        "evidence": [
+          "ts/test/v013-link-native-abit-basis.test.ts",
+          "ts/test/v013-hierarchical-link-carrier.test.ts",
+          "ts/test/v013-inherited-foundation-delta.test.ts"
+        ],
+        "finding": "aspect signs and representations remain Links; no second ontology entity is introduced"
       },
       "unambiguity": {
-        "status": "green-a5a",
+        "status": "green",
         "evidence": [
           "ts/test/v013-aspect-foundation-theorem.test.ts",
           "ts/test/v013-quaternary-canonicality.test.ts"
-        ]
+        ],
+        "finding": "one Link has exactly one local self-incidence aspect under the unique-root law; collapsing PAIR aliases are noncanonical"
       },
       "hostAuthorityBoundary": {
-        "status": "green-a5a",
+        "status": "green",
         "evidence": [
           "ts/test/v013-aspect-foundation-theorem.test.ts",
-          "ts/test/v013-codec-comparison.test.ts",
-          "ts/test/v013-formal-quaternary-grounding.test.ts"
-        ]
+          "ts/test/v013-formal-quaternary-grounding.test.ts",
+          "ts/test/v013-codec-comparison.test.ts"
+        ],
+        "finding": "aspect classification requires only rooted basis, poles and Link identity equality; parser/AST/sender ID/ambient current are not authority"
       }
     },
     "comparativeFinding": {
-      "status": "green-structural-delta-a5a",
-      "statement": "accepted v0.12 Q signs O/C/L/U do not form a bijection to the four Link self-incidence classes, while v0.13 R/O/C/L does",
+      "status": "green",
+      "statement": "accepted A5 uses [ ] 1 0 / O-C-L-U as a foundation Q alphabet, which maps to START/END/PAIR/PAIR rather than the four self-incidence classes; candidate v0.13 replaces only that foundation role with R-O-C-L = ROOT/START/END/PAIR while retaining legacy Q as a compatibility layer",
       "compactnessClaim": false
     },
-    "remainingBeforeComplete": [
-      "complete inherited-foundation non-regression audit, including A1/A5/A18",
-      "prove the minimal normative delta from accepted v0.12 rather than assuming every candidate mechanism is foundational",
-      "independently review rooted cyclic graph identity/transport as a future graph-level layer without making tree-carrier limitations ontological"
-    ]
+    "minimalDelta": {
+      "status": "green",
+      "semanticReplacementCount": 1,
+      "replacedClause": "A5 foundation alphabet role",
+      "additiveOnlyExtensionSufficient": false,
+      "reason": "an additive second aspect alphabet would leave the old A5 alphabet as an independent foundation primitive and therefore would not achieve the claimed reduction"
+    },
+    "remainingBeforeComplete": []
   },
   "inheritedFoundationParity": {
-    "status": "in-progress-a5b",
+    "status": "green-complete",
     "baselineDocument": "docs/theory/Система аксиом МТС.md",
     "requiredScope": "A0-A20 and F2-F6 inherited by semanticBase mts-contract/v0.12",
-    "findings": {
-      "A1": {
-        "classification": "PRESERVED",
-        "note": "finite rooted distinguishing evidence remains required; finite grounding is not equated with acyclic topology"
-      },
-      "A5": {
-        "classification": "INTENTIONAL_FOUNDATION_DELTA_REVIEW_REQUIRED",
-        "note": "accepted [ ] 1 0 / O-C-L-U foundation alphabet is proposed to move to a compatibility layer while R-O-C-L becomes the aspect foundation"
-      },
-      "A18": {
-        "classification": "CORRECTION_IN_PROGRESS",
-        "note": "rooted distinguishable cycles must remain ontologically admissible; old candidate L9 overrejected them"
-      }
-    },
-    "remaining": "complete explicit A0-A20/F2-F6 delta map before restoring functionalParityAuditComplete=true"
+    "repositoryGate": "ts/test/v013-inherited-foundation-delta.test.ts",
+    "semanticReplacementCount": 1,
+    "replacedClause": "A5",
+    "clarificationOnly": [
+      "A1",
+      "A18",
+      "F2/F3"
+    ],
+    "regressionCount": 0,
+    "unresolvedCount": 0,
+    "note": "All inherited clauses are explicitly mapped. Only the A5 foundation-alphabet role is replaced; the five-Link basis and legacy Q functionality are retained."
   }
 }

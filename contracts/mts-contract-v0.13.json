@@ -318,7 +318,7 @@
   "candidateState": {
     "researchEvidenceComplete": true,
     "acceptanceCriteriaComplete": true,
-    "semanticLawSetFrozenForR7b": false,
+    "semanticLawSetFrozenForR7b": true,
     "contractBoundaryEstablished": true,
     "conformanceObligationsDeclared": true,
     "traceabilityComplete": true,
@@ -326,8 +326,8 @@
     "readinessAuditComplete": false,
     "explicitAuthorAcceptanceRecorded": false,
     "linkNativeAbitGroundingComplete": true,
-    "functionalParityAuditComplete": false,
-    "foundationSuperiorityAuditComplete": false
+    "functionalParityAuditComplete": true,
+    "foundationSuperiorityAuditComplete": true
   },
   "owners": {
     "memory": "ts/src/memory.ts",
@@ -693,5 +693,269 @@
     "treeCarrierDomain": "well-founded ROOT-decomposable semantic Links",
     "rootedCyclicGraphIdentityAndTransport": "requires separate graph-level evidence/representation; not supplied by the current tree carrier",
     "finiteGroundingDoesNotMeanAcyclicOntology": true
+  },
+  "inheritedFoundationDeltaAudit": {
+    "baseline": {
+      "semanticBase": "mts-contract/v0.12",
+      "normativeTheory": "docs/theory/Система аксиом МТС.md",
+      "scope": [
+        "A0",
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10",
+        "A11",
+        "A12",
+        "A13",
+        "A14",
+        "A15",
+        "A16",
+        "A17",
+        "A18",
+        "A19",
+        "A20",
+        "F2/F3",
+        "F4",
+        "F5",
+        "F6"
+      ]
+    },
+    "inheritanceRule": "Every baseline clause not explicitly replaced remains normative through semanticBase=v0.12.",
+    "entries": {
+      "A0": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "One ontology entity Link remains unchanged.",
+        "evidence": [
+          "L1",
+          "L6"
+        ]
+      },
+      "A1": {
+        "classification": "PRESERVED_CLARIFIED",
+        "note": "Finite rooted distinguishing evidence remains required; finite grounding is not equivalent to acyclic topology.",
+        "evidence": [
+          "L9"
+        ]
+      },
+      "A2": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Unique ROOT/acorn remains unchanged.",
+        "evidence": [
+          "L1"
+        ]
+      },
+      "A3": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "START/END one-pole self-incidence and orientation remain unchanged.",
+        "evidence": [
+          "L2",
+          "L4"
+        ]
+      },
+      "A4": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Binary ordered Link poles remain unchanged.",
+        "evidence": []
+      },
+      "A5": {
+        "classification": "REPLACED_MINIMAL_FOUNDATION_DELTA",
+        "preservedParts": [
+          "R = R ⟼ R",
+          "O = O ⟼ R",
+          "C = R ⟼ C",
+          "L = O ⟼ C",
+          "U = C ⟼ O",
+          "five-Link rooted basis R/O/C/L/U"
+        ],
+        "replacedPart": "the role of [ ] 1 0 / O-C-L-U as the foundation quaternary alphabet",
+        "candidateReplacement": {
+          "structuralAspectSigns": [
+            "R",
+            "O",
+            "C",
+            "L"
+          ],
+          "structuralAspects": [
+            "ROOT",
+            "START",
+            "END",
+            "PAIR"
+          ],
+          "physicalSpellings": [
+            "8",
+            "9",
+            "6",
+            "1"
+          ],
+          "legacyQAlphabet": [
+            "[",
+            "]",
+            "1",
+            "0"
+          ],
+          "legacyQRole": "retained higher-level compatibility interpreter/protocol, not foundation aspect alphabet"
+        },
+        "reason": "R/O/C/L are a bijection to the four self-incidence classes; retaining old Q as a second independent foundation alphabet would violate the no-extra-independent-primitive criterion.",
+        "evidence": [
+          "ts/test/v013-link-native-abit-basis.test.ts",
+          "ts/test/v013-aspect-foundation-theorem.test.ts",
+          "ts/test/v013-v012-interpreter-context-parity.test.ts"
+        ]
+      },
+      "A6": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Structural Link identity remains grounded in ordered poles rather than technical handles.",
+        "evidence": [
+          "L7"
+        ]
+      },
+      "A7": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Rooted distinguishability still propagates from R.",
+        "evidence": [
+          "L10"
+        ]
+      },
+      "A8": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Ordinary loops remain distinct from full self-closure.",
+        "evidence": [
+          "L5"
+        ]
+      },
+      "A9": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Roles remain represented by Links.",
+        "evidence": [
+          "L8",
+          "L12"
+        ]
+      },
+      "A10": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Form remains distinct from action/materialization.",
+        "evidence": [
+          "L6",
+          "L8"
+        ]
+      },
+      "A11": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Context remains explicit structural evidence; host stack/current has no authority.",
+        "evidence": [
+          "L3"
+        ]
+      },
+      "A12": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Physical source, exact carrier, use and semantic form remain distinct.",
+        "evidence": [
+          "L6",
+          "L12"
+        ]
+      },
+      "A13": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Dictionary/history provenance remains structural.",
+        "evidence": [
+          "L8"
+        ]
+      },
+      "A14": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Read/resolve/replay remain distinct from write/materialization.",
+        "evidence": [
+          "L6",
+          "L8"
+        ]
+      },
+      "A15": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Local representative relations do not replace fundamental Link identity.",
+        "evidence": []
+      },
+      "A16": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Rules require explicit structural admission.",
+        "evidence": [
+          "L8"
+        ]
+      },
+      "A17": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Act/interpreter/result roles remain distinct.",
+        "evidence": [
+          "L2",
+          "L8"
+        ]
+      },
+      "A18": {
+        "classification": "PRESERVED_CLARIFIED",
+        "note": "Rooted distinguishable cycles remain ontologically open; only pure ungrounded recursion fails to establish identity. Current tree proof/carrier limitations are not ontology.",
+        "evidence": [
+          "L9"
+        ]
+      },
+      "A19": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Physical/local handles remain distinct from semantic identity.",
+        "evidence": [
+          "L7"
+        ]
+      },
+      "A20": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Machine representation remains downstream of ostensive/structural foundation.",
+        "evidence": [
+          "L4",
+          "L12"
+        ]
+      },
+      "F2/F3": {
+        "classification": "PRESERVED_CLARIFIED",
+        "note": "Rooted normalization/no semantic instances remain; pure ungrounded recursion is not individuated, while rooted graph cycles require graph-level evidence beyond the current tree proof.",
+        "evidence": [
+          "L7",
+          "L9"
+        ]
+      },
+      "F4": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Recursive reversal remains a derived operation and is not conflated with Link inversion or self-incidence-form inversion.",
+        "evidence": []
+      },
+      "F5": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Derived counting/connectivity semantics are unchanged.",
+        "evidence": []
+      },
+      "F6": {
+        "classification": "INHERITED_UNCHANGED",
+        "note": "Derived theories remain built from Links, explicit theory/context, roles and provenance.",
+        "evidence": [
+          "L8"
+        ]
+      }
+    },
+    "minimalFoundationDelta": {
+      "semanticReplacementCount": 1,
+      "replacedClause": "A5 foundation alphabet role",
+      "clarificationOnly": [
+        "A1",
+        "A18",
+        "F2/F3"
+      ],
+      "addedIndependentOntologyEntities": 0,
+      "oldQFunctionalityRemoved": false,
+      "additiveOnlyExtensionSufficient": false,
+      "additiveOnlyFailureReason": "Adding R/O/C/L as another foundation alphabet while leaving A5 unchanged would retain two independent foundation alphabets and would not realize the claimed reduction of primitives.",
+      "whyNewVersion": "Accepted v0.12 is immutable and A5 foundation-role replacement is an observable semantic delta; the smallest correct change therefore requires a new candidate version even though most inherited theory is unchanged."
+    }
   }
 }
