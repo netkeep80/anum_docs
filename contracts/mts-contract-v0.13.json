@@ -326,7 +326,8 @@
     "readinessAuditComplete": false,
     "explicitAuthorAcceptanceRecorded": false,
     "linkNativeAbitGroundingComplete": true,
-    "functionalParityAuditComplete": true
+    "functionalParityAuditComplete": true,
+    "foundationSuperiorityAuditComplete": false
   },
   "owners": {
     "memory": "ts/src/memory.ts",
@@ -590,6 +591,94 @@
       "glyphSpellingIsSemanticAuthority": false,
       "utf8ReadMayMaterialize": false,
       "v013StructuralDescriptionDependsOnUtf8Decoding": false
+    }
+  },
+  "aspectFoundationTheorem": {
+    "domain": "admissible semantic Links with finite R-grounding",
+    "classifier": {
+      "inputs": [
+        "start(X)=X",
+        "end(X)=X"
+      ],
+      "classes": {
+        "10": "START",
+        "11": "ROOT",
+        "01": "END",
+        "00": "PAIR"
+      },
+      "exhaustive": true,
+      "mutuallyExclusive": true,
+      "rootUniquenessPremise": "X = X ⟼ X => X = R"
+    },
+    "necessity": {
+      "meaning": "all four self-incidence combinations are realizable and require distinct local reconstruction cases",
+      "witnesses": {
+        "ROOT": "R",
+        "START": "O",
+        "END": "C",
+        "PAIR": "L"
+      },
+      "claimsPhysicalAlphabetMinimum": false
+    },
+    "sufficiency": {
+      "proofMethod": "well-founded structural induction over finite R-grounding",
+      "base": "ROOT terminates at R",
+      "steps": {
+        "START": "reduce to the one non-self end child",
+        "END": "reduce to the one non-self start child",
+        "PAIR": "reduce to both ordinary poles"
+      },
+      "sharedDagDuplicationAffectsTransportCostNotSemanticSufficiency": true,
+      "distinctNodeCyclesOutsideDomain": true
+    },
+    "canonicalSigns": {
+      "ROOT": "R",
+      "START": "O",
+      "END": "C",
+      "PAIR": "L"
+    },
+    "localDecompositionRequiresOnly": [
+      "verified RootBasis",
+      "poles(X)",
+      "Link identity equality"
+    ],
+    "localDecompositionForbiddenAuthority": [
+      "parser stack",
+      "AST node kind",
+      "sender-local ID",
+      "ambient mutable context",
+      "find/outgoing/incoming discovery"
+    ],
+    "acceptedV012Comparison": {
+      "qSignLinks": [
+        "O",
+        "C",
+        "L",
+        "U"
+      ],
+      "selfIncidenceClasses": [
+        "START",
+        "END",
+        "PAIR",
+        "PAIR"
+      ],
+      "rootClassIsDirectQAbit": false,
+      "isCompleteAspectPartition": false
+    },
+    "v013Comparison": {
+      "signLinks": [
+        "R",
+        "O",
+        "C",
+        "L"
+      ],
+      "selfIncidenceClasses": [
+        "ROOT",
+        "START",
+        "END",
+        "PAIR"
+      ],
+      "isCompleteAspectPartition": true
     }
   }
 }
