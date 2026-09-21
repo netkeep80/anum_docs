@@ -432,27 +432,33 @@
       },
       "knowledgeStateSeparation": {
         "baselineStatement": "UNINTERPRETABLE, understood-but-NOT_FOUND and FOUND(X) are semantically distinct read outcomes",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/v013-v012-anum-protocol-parity.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "v0.13 explicitly retains the accepted distinction between structurally UNINTERPRETABLE input, understood-but-NOT_FOUND, and FOUND(X); executable parity exercises all three outcomes."
       },
       "resolveMaterializeSeparation": {
         "baselineStatement": "Resolve is a read-only one-root-cut; exact address materialization and write-authorized target materialization are distinct capabilities",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/v013-v012-anum-protocol-parity.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "v0.13 retains read-only one-root-cut Resolve, exact-address materialization separate from target materialization, and NOT_FOUND without implicit writes."
       },
       "targetMaterializationBound": {
         "baselineStatement": "MATERIALIZE_TARGET removes exactly one leading R hierarchy-wide, preserves remaining indirection and fails closed before target writes on invalid exact evidence",
-        "classification": "REVIEW_REQUIRED",
+        "classification": "PRESERVED",
         "candidateLaws": [],
-        "candidateEvidence": [],
+        "candidateEvidence": [
+          "ts/test/v013-v012-anum-protocol-parity.test.ts"
+        ],
         "baselineRuntimeRetained": true,
-        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+        "note": "v0.13 retains one hierarchy-wide root cut, preserves remaining Anum indirection, and validates exact evidence before target-side writes."
       },
       "rootBasisBoundary": {
         "baselineStatement": "Q and v0.12 STRING/source operations require a structurally valid declared R/O/C/L/U basis with proper O/C relative to R; invalid, collapsed, forged or foreign basis evidence fails closed and write operations perform zero writes",
@@ -518,6 +524,18 @@
         "baselineRuntimeRetained": true
       }
     },
-    "repositoryGate": "ts/test/v013-v012-functional-parity-lifecycle.test.ts"
+    "repositoryGate": "ts/test/v013-v012-functional-parity-lifecycle.test.ts",
+    "resolvedSlices": [
+      {
+        "id": "A4a-anum-address-protocol",
+        "gate": "ts/test/v013-v012-anum-protocol-parity.test.ts",
+        "laws": [
+          "knowledgeStateSeparation",
+          "resolveMaterializeSeparation",
+          "targetMaterializationBound"
+        ],
+        "status": "green"
+      }
+    ]
   }
 }
