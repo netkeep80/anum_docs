@@ -686,5 +686,97 @@
     "regressionCount": 0,
     "unresolvedCount": 0,
     "note": "All inherited clauses are explicitly mapped. Only the A5 foundation-alphabet role is replaced; the five-Link basis and legacy Q functionality are retained."
+  },
+  "nonBlockingComparativeResearch": {
+    "formalLogicDialectA6": {
+      "status": "baseline-recorded",
+      "acceptanceBlocker": false,
+      "promotionRequiresExplicitAuthorDecision": true,
+      "commonStages": {
+        "B0": "exact source bytes exist as STRING/anum",
+        "B1": "source is replayed under exact Dictionary + Grammar + fixed Theory",
+        "B2": "FORMAL source declares or structurally identifies a Theory",
+        "B3": "FORMAL source presents MTS axioms as judgments/claims",
+        "B4": "FORMAL source presents a reusable inference rule",
+        "B5": "the selected Theory explicitly admits that rule",
+        "B6": "source/evidence builds a proof occurrence/derivation",
+        "B7": "read-only replay validates a nontrivial theorem/result",
+        "B8": "forged rule, wrong Theory, host rule name and missing premise fail closed",
+        "B9": "same source/theory/proof reconstructs and replays in an independent Memory without sender-local IDs",
+        "B10": "complete A0-A20/F2-F6 axiom system is encoded through the dialect rather than host constants"
+      },
+      "currentBaseline": {
+        "v012": {
+          "foundationInternalSigns": 11,
+          "foundationQAlphabetCount": 4,
+          "semanticInterpreterKinds": 3,
+          "stages": {
+            "B0": "GREEN",
+            "B1": "GREEN",
+            "B2": "PARTIAL_BACKEND_ONLY",
+            "B3": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+            "B4": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+            "B5": "GREEN_BACKEND_ONLY",
+            "B6": "GREEN_BACKEND_ONLY",
+            "B7": "GREEN_BACKEND_ONLY",
+            "B8": "GREEN_BACKEND_ONLY",
+            "B9": "PARTIAL_BACKEND_ONLY",
+            "B10": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE"
+          },
+          "proofBackend": {
+            "theoryRuleAdmission": true,
+            "assumptions": true,
+            "derivations": true,
+            "theoremReuse": true,
+            "readOnlyReplay": true,
+            "derivedModusPonens": true,
+            "theoremSpecificKernelRequiredForExistingDerivedLogic": false
+          }
+        },
+        "v013": {
+          "foundationAspectAlphabetCount": 4,
+          "foundationAspectAlphabetDerivedFromLink": true,
+          "retainedFormalInternalSigns": 11,
+          "semanticInterpreterKinds": 3,
+          "stages": {
+            "B0": "GREEN_RETAINED",
+            "B1": "GREEN_RETAINED",
+            "B2": "PARTIAL_BACKEND_ONLY_RETAINED",
+            "B3": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+            "B4": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+            "B5": "GREEN_BACKEND_ONLY_RETAINED",
+            "B6": "GREEN_BACKEND_ONLY_RETAINED",
+            "B7": "GREEN_BACKEND_ONLY_RETAINED",
+            "B8": "GREEN_BACKEND_ONLY_RETAINED",
+            "B9": "PARTIAL_BACKEND_ONLY_RETAINED",
+            "B10": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE"
+          },
+          "proofBackendRelation": "same accepted structural proof backend retained; no A6 dialect advantage claimed yet"
+        }
+      },
+      "comparisonRule": {
+        "powerAxes": [
+          "source-stage coverage B0-B10",
+          "axiom coverage",
+          "generic reusable rule coverage",
+          "assumption/derivation/theorem capability",
+          "independent-Memory portability",
+          "Link-ontology closure",
+          "negative authority coverage"
+        ],
+        "simplicityAxes": [
+          "independent semantic primitives",
+          "surface signs",
+          "semantic interpreter kinds",
+          "theorem-specific kernel branches",
+          "host semantic authority branches",
+          "structural role count",
+          "trusted semantic code surface",
+          "source and Link materialization cost as secondary metrics"
+        ],
+        "aggregateScoreForbidden": true,
+        "fairness": "compare the best honest implementation of the same dialect task on frozen v0.12 foundation versus candidate v0.13 foundation"
+      }
+    }
   }
 }
