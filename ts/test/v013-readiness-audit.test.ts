@@ -92,7 +92,7 @@ same(conformance12.accepted, true, "v0.12 conformance accepted flag remains true
 same(contract13.acceptedCurrent?.contract, "mts-contract/v0.12", "accepted-current contract");
 same(
   contract13.acceptedCurrent?.conformance,
-  "contracts/mts-conformance-v0.12.json",
+  "mts-conformance/v0.12",
   "accepted-current conformance",
 );
 same(
