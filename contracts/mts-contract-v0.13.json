@@ -310,7 +310,10 @@
     "senderGlobalRefOrId": true,
     "mandatorySurfaceSpellingForRelativeForms": true,
     "retroactiveMutationOfAcceptedV012": true,
-    "automaticAcceptance": true
+    "automaticAcceptance": true,
+    "philosophicalInterpretationOfFourStructuralClasses": true,
+    "compactDerivedTransportAlphabet": true,
+    "graphReferenceCompression": true
   },
   "candidateState": {
     "researchEvidenceComplete": true,
@@ -403,5 +406,22 @@
     "acceptedOwnerMarker": "нормативный владелец",
     "candidateOwnerMarker": "кандидатный нормативный владелец",
     "candidateOwnersEnterAcceptedNamespaceOnlyAtCutover": true
+  },
+  "foundationSuperiorityCriteria": {
+    "purpose": "compare candidate v0.13 with accepted v0.12 as a mathematical foundation, not as a compression format",
+    "required": [
+      "necessity: no independent primitive is retained when it is derivable from Link structure",
+      "sufficiency: the four self-incidence classes are sufficient to recursively describe the declared admissible Link class",
+      "derivability: the structural alphabet is derived from Link topology rather than imposed as an unrelated dictionary",
+      "closure: structural signs and descriptions remain within Link ontology",
+      "unambiguity: canonical decomposition is structurally deterministic for the declared admissible Link class",
+      "host-authority boundary: parser/AST/runtime state does not supply hidden semantic primitives"
+    ],
+    "codecCompactnessIsFoundationCriterion": false,
+    "codecRuntimeSpeedIsFoundationCriterion": false,
+    "sharedDagExpansionIsFoundationCriterion": false,
+    "engineeringCodecMeasurementsRemainRelevant": true,
+    "derivedCompactAlphabetsAllowed": true,
+    "philosophicalAspectMappingsRequiredForAcceptance": false
   }
 }
