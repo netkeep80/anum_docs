@@ -69,7 +69,7 @@ same(quartet.derivedControl.isFifthFormalOperator, false, "U is not fifth FORMAL
 same(contract.acceptanceCriteria.AC10, "green", "AC10 is green");
 same(contract.candidateState.rootFormalDialectComplete, true, "root FORMAL dialect complete");
 same(contract.candidateState.acceptanceCriteriaComplete, true, "acceptance criteria complete");
-same(contract.acceptanceReady, false, "candidate is not acceptance-ready");
+same(contract.acceptanceReady, true, "candidate is acceptance-ready after independent audit");
 same(contract.accepted, false, "candidate remains unaccepted");
 
 const ac10 = conformance.acceptanceCriteriaEvidence.AC10;
@@ -107,9 +107,9 @@ assert(
   ),
   "completed AC10 is no longer an acceptance blocker",
 );
-same(conformance.acceptanceReady, false, "conformance remains not acceptance-ready");
+same(conformance.acceptanceReady, true, "conformance is acceptance-ready after independent audit");
 same(conformance.accepted, false, "conformance remains unaccepted");
-same(contract.candidateState.readinessAuditComplete, false, "readiness audit remains pending");
+same(contract.candidateState.readinessAuditComplete, true, "readiness audit is complete");
 same(
   contract.candidateState.explicitAuthorAcceptanceRecorded,
   false,
@@ -117,5 +117,5 @@ same(
 );
 
 console.log(
-  "MTS v0.13 AC10 lifecycle: one ROOT/START/END/PAIR quartet is simultaneously aspect/form/abit/FORMAL-operator; generic fixed-Theory root closure is GREEN while readiness and explicit author acceptance remain pending.",
+  "MTS v0.13 AC10 lifecycle: one ROOT/START/END/PAIR quartet is simultaneously aspect/form/abit/FORMAL-operator; generic fixed-Theory root closure and readiness are GREEN while explicit author acceptance remains pending.",
 );
