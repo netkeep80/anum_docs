@@ -40,7 +40,7 @@ const projectionPath = "traceability/mts-v0.13-semantic-dependency-projection.js
 const projection = readJson(projectionPath);
 const contract = readJson("contracts/mts-contract-v0.13.json");
 
-same(projection.schema, "mts-semantic-dependency-projection/v0.6", "projection schema");
+same(projection.schema, "mts-semantic-dependency-projection/v0.7", "projection schema");
 same(projection.mtsVersion, "0.13", "projection MTS version");
 same(projection.status, "research", "projection remains research evidence");
 same(projection.externalAuditProjectionOnly, true, "projection is external audit tooling");
@@ -50,8 +50,8 @@ same(projection.executionDependency, false, "MTS execution does not depend on pr
 same(projection.ownerIssue, 1270, "projection is owned by #1270");
 same(
   projection.candidateMain,
-  "cd9dde66d9210d5d43024ceb0d8280b4d458e4f4",
-  "projection binds the exact post-P0 candidate snapshot",
+  "832ffa3643b13eba4c9b29211ddf773ebd815b2d",
+  "projection binds the exact post-P1f candidate snapshot",
 );
 same(projection.coverage.globalTrustBoundaryComplete, false, "P1 does not overclaim global trust closure");
 same(
@@ -81,7 +81,7 @@ same(
 );
 same(
   projection.measurement.modelRevision,
-  "A9-P1f-package-static-semantic-decision-audit",
+  "A9-P1g-mandatory-gate-runtime-trust-coverage",
   "measurement model revision",
 );
 same(
