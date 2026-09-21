@@ -27,8 +27,8 @@ same(contract12.accepted, true, "baseline v0.12 remains accepted");
 same(contract13.accepted, false, "candidate v0.13 is not accepted");
 same(
   contract13.acceptanceReady,
-  false,
-  "candidate v0.13 remains not acceptance-ready; parity completion alone is insufficient",
+  true,
+  "candidate v0.13 is acceptance-ready only after the separate readiness audit",
 );
 same(
   contract13.candidateState.explicitAuthorAcceptanceRecorded,
@@ -161,18 +161,13 @@ assert(
   "REVIEW_REQUIRED blocks acceptance",
 );
 
-// Future lifecycle guard: if somebody flips readiness/acceptance, all parity
-// obligations and explicit author acceptance must already be complete.
+// Readiness requires complete parity, but is deliberately prior to the
+// author's separate exact-artifact acceptance decision.
 if (contract13.acceptanceReady || contract13.accepted) {
   same(
     contract13.candidateState.functionalParityAuditComplete,
     true,
     "ready/accepted candidate requires complete functional parity",
-  );
-  same(
-    contract13.candidateState.explicitAuthorAcceptanceRecorded,
-    true,
-    "ready/accepted candidate requires explicit author acceptance",
   );
 
   for (const [law, entry] of Object.entries(parity.entries) as Array<
@@ -183,6 +178,27 @@ if (contract13.acceptanceReady || contract13.accepted) {
       `${law}: unresolved/regressive parity cannot cross readiness boundary`,
     );
   }
+}
+
+if (contract13.acceptanceReady && !contract13.accepted) {
+  same(
+    contract13.candidateState.readinessAuditComplete,
+    true,
+    "ready candidate requires completed readiness audit",
+  );
+  same(
+    contract13.candidateState.explicitAuthorAcceptanceRecorded,
+    false,
+    "readiness itself must not pre-record author acceptance",
+  );
+}
+
+if (contract13.accepted) {
+  same(
+    contract13.candidateState.explicitAuthorAcceptanceRecorded,
+    true,
+    "accepted candidate requires explicit author acceptance",
+  );
 }
 
 console.log(

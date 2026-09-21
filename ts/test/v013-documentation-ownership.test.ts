@@ -25,7 +25,7 @@ const contract = JSON.parse(readFileSync(contractPath, "utf8")) as {
 
 same(contract.status, "candidate", "documentation evidence belongs to candidate");
 same(contract.accepted, false, "documentation convergence does not accept v0.13");
-same(contract.acceptanceReady, false, "documentation convergence does not make v0.13 ready");
+same(contract.acceptanceReady, true, "candidate readiness is now established separately from documentation convergence");
 same(contract.acceptedCurrent?.contract, "mts-contract/v0.12", "accepted contract remains v0.12");
 same(contract.acceptedCurrent?.conformance, "mts-conformance/v0.12", "accepted conformance remains v0.12");
 

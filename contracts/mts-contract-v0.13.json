@@ -16,7 +16,7 @@
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
   },
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "currentPointer": {
     "acceptance": "cutover/typescript-c1-acceptance-v0.5.json",
     "currentContract": "mts-contract/v0.12",
@@ -49,7 +49,8 @@
       "ts/src/v013-relative-pole-execution.ts",
       "ts/src/v013-formal-aspect-evaluator.ts"
     ],
-    "implementationCompleteMeaning": "declared-v0.13-candidate-kernel-scope-complete; public consumer boundary is merged and mandatory evidence is projected; excludes readiness, runtime selection and acceptance"
+    "implementationCompleteMeaning": "declared-v0.13-candidate-kernel-scope-complete; public consumer boundary is merged and mandatory evidence is projected; excludes readiness, runtime selection and acceptance",
+    "singleLiveSemanticRuntime": true
   },
   "bootstrapBasis": {
     "root": "R",
@@ -327,7 +328,7 @@
     "conformanceObligationsDeclared": true,
     "traceabilityComplete": true,
     "documentationComplete": true,
-    "readinessAuditComplete": false,
+    "readinessAuditComplete": true,
     "explicitAuthorAcceptanceRecorded": false,
     "linkNativeAbitGroundingComplete": true,
     "functionalParityAuditComplete": true,
@@ -350,7 +351,7 @@
     "currentAccepted": "mts-contract/v0.12",
     "candidate": "mts-contract/v0.13",
     "accepted": false,
-    "acceptanceReady": false,
+    "acceptanceReady": true,
     "candidateRuntimeSelectable": false
   },
   "traceabilityManifest": "traceability/mts-v0.13.json",
@@ -1030,5 +1031,13 @@
     "formalClosureRequired": true,
     "genericCompositionRequired": true,
     "hostTermSpecialCasesAllowed": false
+  },
+  "readinessAudit": {
+    "issue": 1335,
+    "gate": "ts/test/v013-readiness-audit.test.ts",
+    "status": "green-confirmed",
+    "acceptedRuntimeRemains": "mts-contract/v0.12",
+    "candidateRuntimeSelectable": false,
+    "explicitAuthorAcceptanceRecorded": false
   }
 }
