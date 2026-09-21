@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "research-evidence-complete-formalization-pending",
-  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability, normative documentation and Link-native abit grounding are complete, while comparative superiority versus accepted v0.12, readiness audit and explicit acceptance remain pending.",
+  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability, normative documentation and Link-native abit grounding are complete. Foundation superiority over accepted v0.12 is still pending on necessity/sufficiency/derivability/closure/unambiguity/host-authority evidence; codec compactness and shared-DAG transport cost are engineering evidence, not foundation acceptance gates.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -246,10 +246,11 @@
     "readinessAudit": "pending",
     "authorAcceptance": "pending",
     "linkNativeAbitBasis": "green-complete-a2",
-    "comparativeSuperiority": "pending"
+    "comparativeSuperiority": "pending",
+    "codecEngineeringComparison": "green-research-evidence-a3"
   },
   "acceptanceBlockers": [
-    "comparative superiority versus accepted v0.12, including serializer/deserializer complexity and shared-DAG cost, has not yet been demonstrated",
+    "foundation superiority versus accepted v0.12 has not yet been demonstrated for necessity, sufficiency, derivability, Link-ontology closure, canonical unambiguity and absence of hidden host semantic authority",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
@@ -289,5 +290,15 @@
       "L13"
     ],
     "exactOneOwnerPerLaw": true
+  },
+  "nonBlockingEngineeringEvidence": {
+    "codecComparison": "ts/test/v013-codec-comparison.test.ts",
+    "includes": [
+      "serializer/deserializer capability comparison",
+      "known-bootstrap compactness",
+      "STRING representation size",
+      "shared-DAG expansion"
+    ],
+    "foundationAcceptanceGate": false
   }
 }
