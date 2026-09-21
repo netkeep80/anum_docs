@@ -34,7 +34,8 @@
     "ts/test/v013-string-anum-acceptance.test.ts",
     "ts/test/v013-symmetric-nonroot.test.ts",
     "ts/test/v013-memory-cycle-boundary.test.ts",
-    "ts/test/v013-cyclic-grounding-boundary.test.ts"
+    "ts/test/v013-cyclic-grounding-boundary.test.ts",
+    "ts/test/v013-documentation-ownership.test.ts"
   ],
   "plannedExecutableGates": [],
   "lawEvidence": {
@@ -227,12 +228,11 @@
     "candidateContractBoundary": "defined-r7b",
     "conformanceObligations": "declared-r7b",
     "traceability": "green-complete",
-    "normativeDocumentation": "pending",
+    "normativeDocumentation": "green-complete",
     "readinessAudit": "pending",
     "authorAcceptance": "pending"
   },
   "acceptanceBlockers": [
-    "normative documentation has not yet converged on the v0.13 candidate law set",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
@@ -247,5 +247,30 @@
     "candidateMtsVersion": "mts-contract/v0.13",
     "acceptedPointerUnchanged": true
   },
-  "traceabilityManifest": "traceability/mts-v0.13.json"
+  "traceabilityManifest": "traceability/mts-v0.13.json",
+  "documentationEvidence": {
+    "status": "green-required-r7d",
+    "gate": "ts/test/v013-documentation-ownership.test.ts",
+    "ownerDocuments": [
+      "docs/specs/Формальная нотация МТС.md",
+      "docs/specs/Ачисла и сериализация.md",
+      "docs/specs/Апамять и управление сетью связей.md"
+    ],
+    "requiredLawIds": [
+      "L1",
+      "L2",
+      "L3",
+      "L4",
+      "L5",
+      "L6",
+      "L7",
+      "L8",
+      "L9",
+      "L10",
+      "L11",
+      "L12",
+      "L13"
+    ],
+    "exactOneOwnerPerLaw": true
+  }
 }
