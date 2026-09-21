@@ -696,7 +696,7 @@ same(
   "write-sink audit alone does not establish global trust closure",
 );
 
-// P1f independently discovers package-wide typed ReadMemory access and
+// P1f independently discovers S3 package-wide typed ReadMemory access and
 // host-owned decision candidates. Unlike P1e's deliberately syntax-only write
 // inventory, this pass resolves the called/read member to declarations in
 // memory.ts so unrelated methods with the same spelling are excluded.
