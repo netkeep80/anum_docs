@@ -1,4 +1,3 @@
-// mts-version-evidence: required-from=0.13
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
