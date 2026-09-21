@@ -29,9 +29,11 @@ same(contract.acceptanceReady, false, "documentation convergence does not make v
 same(contract.acceptedCurrent?.contract, "mts-contract/v0.12", "accepted contract remains v0.12");
 same(contract.acceptedCurrent?.conformance, "mts-conformance/v0.12", "accepted conformance remains v0.12");
 
-const laws = Object.keys(contract.requiredSemanticLaws ?? {}).sort(
-  (left, right) => Number(left.slice(1)) - Number(right.slice(1)),
-);
+function compareLawIds(left: string, right: string): number {
+  return Number(left.slice(1)) - Number(right.slice(1));
+}
+
+const laws = Object.keys(contract.requiredSemanticLaws ?? {}).sort(compareLawIds);
 same(laws.join(","), Array.from({ length: 13 }, (_, index) => `L${index + 1}`).join(","), "candidate law identity");
 
 const allowedDocuments = Object.freeze([
@@ -81,7 +83,7 @@ for (const law of laws) {
 
 const ownerMap = contract.normativeDocumentation?.owners ?? {};
 same(
-  Object.keys(ownerMap).sort().join(","),
+  Object.keys(ownerMap).sort(compareLawIds).join(","),
   laws.join(","),
   "contract owner map covers exactly L1-L13",
 );
