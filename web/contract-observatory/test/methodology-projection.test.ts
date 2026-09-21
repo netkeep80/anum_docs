@@ -36,12 +36,15 @@ const index = buildContractObservatoryIndex(repositoryRoot);
 const projection: MethodologyProjection = buildMethodologyProjection(repositoryRoot, index);
 
 same(projection.schema, "mts-contract-methodology-projection/v0.1", "projection schema");
-same(projection.versions.length, 2, "post-cleanup projection contains exactly current and previous accepted pairs");
-same(
-  projection.versions.map((version) => version.contractId).join(","),
-  "mts-contract/v0.11,mts-contract/v0.12",
-  "projection preserves V3 deterministic version order",
-);
+assert(projection.versions.length >= 2, "projection contains at least current and previous accepted pairs");
+const projectionV011 = projection.versions.findIndex((version) => version.contractId === "mts-contract/v0.11");
+const projectionV012 = projection.versions.findIndex((version) => version.contractId === "mts-contract/v0.12");
+assert(projectionV011 >= 0 && projectionV012 > projectionV011, "projection preserves accepted v0.11/v0.12 deterministic order");
+for (const candidate of projection.versions.filter((version) => !version.isCurrent && !version.isPrevious)) {
+  same(candidate.accepted, false, `${candidate.contractId}: extra projected version remains nonaccepted`);
+  assert(candidate.lifecycle.some((entry) => entry.stage === "candidate"), `${candidate.contractId}: candidate lifecycle is explicit`);
+  same(candidate.acceptanceReferences.length, 0, `${candidate.contractId}: candidate has no acceptance authority`);
+}
 
 const current = projection.versions.find((version) => version.isCurrent);
 const previous = projection.versions.find((version) => version.isPrevious);
