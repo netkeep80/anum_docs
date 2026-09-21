@@ -19,7 +19,7 @@ const conformance = JSON.parse(
 
 same(contract.status, "candidate", "v0.13 remains candidate");
 same(contract.accepted, false, "v0.13 remains unaccepted");
-same(contract.acceptanceReady, false, "kernel completion does not imply readiness");
+same(contract.acceptanceReady, true, "separate readiness audit is now complete");
 same(
   contract.implementation.acceptedRuntime,
   "mts-contract/v0.12",
@@ -47,8 +47,8 @@ same(
 );
 same(
   contract.candidateState.readinessAuditComplete,
-  false,
-  "readiness audit remains pending",
+  true,
+  "readiness audit is complete",
 );
 same(
   contract.candidateState.explicitAuthorAcceptanceRecorded,
@@ -112,8 +112,8 @@ same(
 );
 same(
   conformance.candidateKernelImplementation.readinessAuditComplete,
-  false,
-  "implementation slice does not complete readiness",
+  true,
+  "kernel slice projects the separately completed readiness audit",
 );
 same(
   conformance.candidateKernelImplementation.explicitAuthorAcceptanceRecorded,
@@ -121,13 +121,13 @@ same(
   "implementation slice does not record author acceptance",
 );
 
-same(conformance.acceptanceReady, false, "conformance remains not ready");
+same(conformance.acceptanceReady, true, "conformance is acceptance-ready");
 same(conformance.accepted, false, "conformance remains unaccepted");
 assert(
-  conformance.acceptanceBlockers.includes(
+  !conformance.acceptanceBlockers.includes(
     "independent readiness audit has not yet been recorded",
   ),
-  "readiness remains an explicit blocker",
+  "completed readiness audit is no longer a blocker",
 );
 assert(
   conformance.acceptanceBlockers.includes(
@@ -143,5 +143,5 @@ assert(
 );
 
 console.log(
-  "MTS v0.13 declared candidate kernel + public consumer boundary: GREEN; readiness, runtime selection and explicit author acceptance remain separate.",
+  "MTS v0.13 declared candidate kernel + public consumer boundary and separate readiness audit: GREEN; runtime selection and explicit author acceptance remain separate.",
 );
