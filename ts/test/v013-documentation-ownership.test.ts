@@ -29,7 +29,7 @@ same(contract.acceptanceReady, false, "documentation convergence does not make v
 same(contract.acceptedCurrent?.contract, "mts-contract/v0.12", "accepted contract remains v0.12");
 same(contract.acceptedCurrent?.conformance, "mts-conformance/v0.12", "accepted conformance remains v0.12");
 
-const laws = Object.keys(contract.requiredSemanticLaws ?? {}).sort();
+const laws = Object.keys(contract.requiredSemanticLaws ?? {}).sort(\n  (left, right) => Number(left.slice(1)) - Number(right.slice(1)),\n);
 same(laws.join(","), Array.from({ length: 13 }, (_, index) => `L${index + 1}`).join(","), "candidate law identity");
 
 const allowedDocuments = Object.freeze([
