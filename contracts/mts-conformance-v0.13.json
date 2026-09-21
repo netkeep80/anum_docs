@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "research-evidence-complete-formalization-pending",
-  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable research evidence, while traceability, normative documentation convergence, readiness audit and explicit acceptance remain pending.",
+  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability and normative documentation are complete, while Link-native abit-basis/minimality formalization, comparative superiority versus accepted v0.12, readiness audit and explicit acceptance remain pending.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -34,8 +34,7 @@
     "ts/test/v013-string-anum-acceptance.test.ts",
     "ts/test/v013-symmetric-nonroot.test.ts",
     "ts/test/v013-memory-cycle-boundary.test.ts",
-    "ts/test/v013-cyclic-grounding-boundary.test.ts",
-    "ts/test/v013-documentation-ownership.test.ts"
+    "ts/test/v013-cyclic-grounding-boundary.test.ts"
   ],
   "plannedExecutableGates": [],
   "lawEvidence": {
@@ -230,9 +229,13 @@
     "traceability": "green-complete",
     "normativeDocumentation": "green-complete",
     "readinessAudit": "pending",
-    "authorAcceptance": "pending"
+    "authorAcceptance": "pending",
+    "linkNativeAbitBasis": "research-observed-formalization-pending",
+    "comparativeSuperiority": "pending"
   },
   "acceptanceBlockers": [
+    "Link-native abit basis R/O/C/L and the four-class/minimality claim have not yet been promoted from research evidence into the candidate contract",
+    "comparative superiority versus accepted v0.12, including serializer/deserializer complexity and shared-DAG cost, has not yet been demonstrated",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
@@ -249,7 +252,7 @@
   },
   "traceabilityManifest": "traceability/mts-v0.13.json",
   "documentationEvidence": {
-    "status": "green-required-r7d",
+    "status": "green-repository-check-r7d",
     "gate": "ts/test/v013-documentation-ownership.test.ts",
     "ownerDocuments": [
       "docs/specs/Формальная нотация МТС.md",
