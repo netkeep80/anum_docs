@@ -23,6 +23,7 @@ const repoRoot = resolve(process.cwd(), "..");
 const read = (path: string): string => readFileSync(join(repoRoot, path), "utf8");
 const readJson = (path: string): any => JSON.parse(read(path));
 
+// P1 audit source; this file is external verification and is never imported by runtime.
 const projectionPath = "traceability/mts-v0.13-semantic-dependency-projection.json";
 const projection = readJson(projectionPath);
 const contract = readJson("contracts/mts-contract-v0.13.json");
