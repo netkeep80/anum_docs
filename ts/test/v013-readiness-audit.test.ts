@@ -108,7 +108,7 @@ same(
 same(acceptance12.current?.contract, "contracts/mts-contract-v0.12.json", "cutover current contract remains v0.12");
 same(
   acceptance12.current?.conformance,
-  "mts-conformance/v0.12",
+  "contracts/mts-conformance-v0.12.json",
   "cutover current conformance remains v0.12",
 );
 
