@@ -1,0 +1,251 @@
+{
+  "schema": "mts-conformance/v0.13",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 1270,
+  "candidateLifecycleIssue": 1270,
+  "contract": "mts-contract/v0.13",
+  "semanticBase": "mts-conformance/v0.12",
+  "observableSemanticDelta": true,
+  "acceptanceReady": false,
+  "coverageState": "research-evidence-complete-formalization-pending",
+  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable research evidence, while traceability, normative documentation convergence, readiness audit and explicit acceptance remain pending.",
+  "acceptedCurrent": {
+    "contract": "mts-contract/v0.12",
+    "conformance": "mts-conformance/v0.12"
+  },
+  "requiredExecutableGates": [
+    "ts/test/v013-relative-form-quartet.test.ts",
+    "ts/test/v013-form-result-rule-authority.test.ts",
+    "ts/test/v013-relative-pole-context.test.ts",
+    "ts/test/v013-relative-pole-source-authority.test.ts",
+    "ts/test/v013-prefix-result-rule-authority.test.ts",
+    "ts/test/v013-relative-form-two-memory.test.ts",
+    "ts/test/v013-relative-form-materialization-two-memory.test.ts",
+    "ts/test/v013-binary-link-materialization-two-memory.test.ts",
+    "ts/test/v013-hierarchical-link-carrier.test.ts",
+    "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+    "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
+    "ts/test/v013-unknown-whole-two-memory.test.ts",
+    "ts/test/v013-quaternary-canonicality.test.ts",
+    "ts/test/v013-file-wire-conformance.test.ts",
+    "ts/test/v013-formal-quaternary-grounding.test.ts",
+    "ts/test/v013-root-origin-law.test.ts",
+    "ts/test/v013-string-anum-acceptance.test.ts",
+    "ts/test/v013-symmetric-nonroot.test.ts",
+    "ts/test/v013-memory-cycle-boundary.test.ts",
+    "ts/test/v013-cyclic-grounding-boundary.test.ts"
+  ],
+  "plannedExecutableGates": [],
+  "lawEvidence": {
+    "L1": [
+      "ts/test/v013-memory-cycle-boundary.test.ts",
+      "ts/test/v013-cyclic-grounding-boundary.test.ts"
+    ],
+    "L2": [
+      "ts/test/v013-relative-form-quartet.test.ts",
+      "ts/test/v013-form-result-rule-authority.test.ts",
+      "ts/test/v013-symmetric-nonroot.test.ts"
+    ],
+    "L3": [
+      "ts/test/v013-relative-pole-context.test.ts",
+      "ts/test/v013-relative-pole-source-authority.test.ts",
+      "ts/test/v013-prefix-result-rule-authority.test.ts"
+    ],
+    "L4": [
+      "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+      "ts/test/v013-file-wire-conformance.test.ts"
+    ],
+    "L5": [
+      "ts/test/v013-binary-link-materialization-two-memory.test.ts",
+      "ts/test/v013-quaternary-canonicality.test.ts"
+    ],
+    "L6": [
+      "ts/test/v013-hierarchical-link-carrier.test.ts",
+      "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+      "ts/test/v013-unknown-whole-two-memory.test.ts"
+    ],
+    "L7": [
+      "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
+      "ts/test/v013-unknown-whole-two-memory.test.ts",
+      "ts/test/v013-file-wire-conformance.test.ts"
+    ],
+    "L8": [
+      "ts/test/v013-relative-form-materialization-two-memory.test.ts",
+      "ts/test/v013-binary-link-materialization-two-memory.test.ts",
+      "ts/test/v013-unknown-whole-two-memory.test.ts"
+    ],
+    "L9": [
+      "ts/test/v013-memory-cycle-boundary.test.ts",
+      "ts/test/v013-cyclic-grounding-boundary.test.ts"
+    ],
+    "L10": [
+      "ts/test/v013-root-origin-law.test.ts"
+    ],
+    "L11": [
+      "ts/test/v013-string-anum-acceptance.test.ts"
+    ],
+    "L12": [
+      "ts/test/v013-formal-quaternary-grounding.test.ts"
+    ],
+    "L13": [
+      "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+      "ts/test/v013-file-wire-conformance.test.ts"
+    ]
+  },
+  "acceptanceCriteriaEvidence": {
+    "AC1": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-memory-cycle-boundary.test.ts",
+        "ts/test/v013-root-origin-law.test.ts"
+      ]
+    },
+    "AC2": {
+      "status": "green",
+      "scope": "all admissible distinguishable non-bootstrap Links with finite ROOT-grounding",
+      "gates": [
+        "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
+        "ts/test/v013-unknown-whole-two-memory.test.ts",
+        "ts/test/v013-quaternary-canonicality.test.ts",
+        "ts/test/v013-cyclic-grounding-boundary.test.ts"
+      ]
+    },
+    "AC3": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-string-anum-acceptance.test.ts"
+      ]
+    },
+    "AC4": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-formal-quaternary-grounding.test.ts"
+      ]
+    },
+    "AC5": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
+        "ts/test/v013-quaternary-canonicality.test.ts",
+        "ts/test/v013-file-wire-conformance.test.ts",
+        "ts/test/v013-unknown-whole-two-memory.test.ts"
+      ]
+    },
+    "AC6": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-root-origin-law.test.ts",
+        "ts/test/v013-string-anum-acceptance.test.ts"
+      ]
+    },
+    "AC7": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+        "ts/test/v013-file-wire-conformance.test.ts"
+      ]
+    },
+    "AC8": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-hierarchical-link-carrier.test.ts",
+        "ts/test/v013-hierarchical-carrier-two-memory.test.ts"
+      ]
+    },
+    "AC9": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-hierarchical-link-carrier.test.ts",
+        "ts/test/v013-relative-form-materialization-two-memory.test.ts",
+        "ts/test/v013-binary-link-materialization-two-memory.test.ts",
+        "ts/test/v013-unknown-whole-two-memory.test.ts"
+      ]
+    }
+  },
+  "requiredPositiveVectors": [
+    "v013-root-basis-R-O-C-L-U",
+    "v013-relative-form-quartet-generic-S",
+    "v013-relative-form-result-separation",
+    "v013-relative-start-end-context-navigation",
+    "v013-quaternary-R-8",
+    "v013-quaternary-O-98",
+    "v013-quaternary-C-68",
+    "v013-quaternary-L-19868",
+    "v013-quaternary-U-16898",
+    "v013-nesting-968-vs-698",
+    "v013-complex-pair-1968698",
+    "v013-shared-dag",
+    "v013-ordinary-equal-pole-pair",
+    "v013-unknown-whole-two-memory",
+    "v013-real-file-1968698-two-memory",
+    "v013-string-exact-byte-roundtrip",
+    "v013-root-origin-every-local-anum-context",
+    "v013-formal-grounding-8-9-6-1"
+  ],
+  "requiredNegativeVectors": [
+    "v013-flat-relative-glyph-collision-not-canonical",
+    "v013-noncanonical-pair-188-rejected",
+    "v013-noncanonical-pair-1988-rejected",
+    "v013-noncanonical-pair-1868-rejected",
+    "v013-description-does-not-materialize-target",
+    "v013-wrong-structural-rule-writes-zero-target-links",
+    "v013-invalid-physical-opcode-fails-before-representation-writes",
+    "v013-empty-wire-is-not-root",
+    "v013-unrooted-sequence-lookalike-rejected",
+    "v013-unrooted-anum-hierarchy-rejected",
+    "v013-mutual-distinct-node-cycle-rejected-as-cyclic-grounding"
+  ],
+  "retainedResearchEvidence": {
+    "nonWellFoundedGraphDescription": {
+      "gate": "ts/test/v013-cyclic-graph-description.test.ts",
+      "productionSemanticLaw": false,
+      "result": "arbitrary finite cyclic graph topology can be represented over the same 1/6/8/9 physical alphabet using representation-local references"
+    },
+    "atomicCyclicMaterializationModel": {
+      "gate": "ts/test/v013-atomic-cyclic-materialization.test.ts",
+      "productionSemanticLaw": false,
+      "result": "test-only reserve/bind/commit model demonstrates a possible graph-store write boundary if a future non-well-founded foundation is adopted"
+    },
+    "combinedSourceExamples": {
+      "gates": [
+        "ts/test/v013-combined-group-source-authority.test.ts",
+        "ts/test/v013-link-two-01-occurrences.test.ts"
+      ],
+      "productionSemanticLaw": true,
+      "requiredGate": false
+    },
+    "historicalTransportGap": {
+      "gate": "ts/test/v013-relative-form-transport-gap.test.ts",
+      "productionSemanticLaw": false,
+      "result": "documents why accepted flat-Q transport was insufficient for the new relative form identities"
+    }
+  },
+  "evidenceState": {
+    "researchAcceptanceCriteria": "green-complete",
+    "semanticLawProjection": "green-complete",
+    "candidateContractBoundary": "defined-r7b",
+    "conformanceObligations": "declared-r7b",
+    "traceability": "pending",
+    "normativeDocumentation": "pending",
+    "readinessAudit": "pending",
+    "authorAcceptance": "pending"
+  },
+  "acceptanceBlockers": [
+    "v0.13 traceability candidate has not yet been created and checked",
+    "normative documentation has not yet converged on the v0.13 candidate law set",
+    "independent readiness audit has not yet been recorded",
+    "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
+  ],
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.12",
+    "conformance": "mts-conformance/v0.12",
+    "immutable": true
+  },
+  "acceptance": {
+    "performedHere": false,
+    "acceptedMtsVersion": "mts-contract/v0.12",
+    "candidateMtsVersion": "mts-contract/v0.13",
+    "acceptedPointerUnchanged": true
+  }
+}
