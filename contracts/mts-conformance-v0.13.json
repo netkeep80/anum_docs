@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "research-evidence-complete-formalization-pending",
-  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability, normative documentation and Link-native abit grounding are complete. Foundation superiority over accepted v0.12 is still pending on necessity/sufficiency/derivability/closure/unambiguity/host-authority evidence; codec compactness and shared-DAG transport cost are engineering evidence, not foundation acceptance gates.",
+  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability, normative documentation and Link-native abit grounding are complete. Foundation superiority and accepted-v0.12 functional non-regression are still pending. Retained v0.12 runtime tests are necessary compatibility evidence but do not by themselves prove v0.13 semantic parity.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -247,10 +247,12 @@
     "authorAcceptance": "pending",
     "linkNativeAbitBasis": "green-complete-a2",
     "comparativeSuperiority": "pending",
-    "codecEngineeringComparison": "green-research-evidence-a3"
+    "codecEngineeringComparison": "green-research-evidence-a3",
+    "functionalParity": "in-progress"
   },
   "acceptanceBlockers": [
     "foundation superiority versus accepted v0.12 has not yet been demonstrated for necessity, sufficiency, derivability, Link-ontology closure, canonical unambiguity and absence of hidden host semantic authority",
+    "functional non-regression versus accepted v0.12 is incomplete; every essential accepted v0.12 semantic capability must be PRESERVED, GENERALIZED or explicitly REPLACED with equivalent observable capability, with no REGRESSION or REVIEW_REQUIRED entries",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
@@ -300,5 +302,221 @@
       "shared-DAG expansion"
     ],
     "foundationAcceptanceGate": false
+  },
+  "functionalParityAudit": {
+    "status": "in-progress",
+    "baseline": {
+      "contract": "mts-contract/v0.12",
+      "conformance": "mts-conformance/v0.12",
+      "accepted": true,
+      "requiredSemanticLawCount": 18,
+      "requiredExecutableGateCount": 16
+    },
+    "requiredBaselineExecutableGates": [
+      "ts/test/research-v012-interpreter-delta-c2.test.ts",
+      "ts/test/v012-string-anum-protocol-c3a.test.ts",
+      "ts/test/v012-formal-square-string-child-c4.test.ts",
+      "ts/test/v012-formal-square-rule-authority.test.ts",
+      "ts/test/v012-q-compatibility-representation-c5.test.ts",
+      "ts/test/v012-formal-context-reading-c6.test.ts",
+      "ts/test/v012-ostensive-self-incidence-matching.test.ts",
+      "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+      "ts/test/v012-string-q-byte-bridge.test.ts",
+      "ts/test/v012-string-utf8-boundary.test.ts",
+      "ts/test/v012-formal-source-result-witness.test.ts",
+      "ts/test/v012-quaternary-root-basis-boundary.test.ts",
+      "ts/test/anum-two-memory-conformance.test.ts",
+      "ts/test/string-anum-two-memory-conformance.test.ts",
+      "ts/test/v012-source-authority.test.ts",
+      "ts/test/v012-public-facade-c7.test.ts"
+    ],
+    "baselineGatesRetainedInRepository": true,
+    "baselineGatesPassingIsNecessaryButNotSufficient": true,
+    "classifications": {
+      "PRESERVED": "same essential observable capability remains required",
+      "GENERALIZED": "a more general v0.13 mechanism covers the accepted capability",
+      "REPLACED": "mechanism differs but the accepted observable capability is explicitly preserved",
+      "REVIEW_REQUIRED": "retained runtime exists but v0.13 semantic parity is not yet proven",
+      "REGRESSION": "essential accepted capability is lost or weakened"
+    },
+    "entries": {
+      "interpreterSeparation": {
+        "baselineStatement": "I_STRING, I_FORMAL and I_Q are explicit semantic contexts; host parser/lexer modes have zero semantic authority",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "stringNestedAnum": {
+        "baselineStatement": "STRING [...] opens I_STRING child from R and returns exactly one Link/value to the STRING parent",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "formalSquareBracketStringChild": {
+        "baselineStatement": "FORMAL [...] opens I_STRING child, not I_Q, and returns exactly one Link/value to FORMAL",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "quaternaryNestedContext": {
+        "baselineStatement": "Q [...] remains Q-native recursion under I_Q",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "stringOneVsQOne": {
+        "baselineStatement": "STRING glyph `1` is UTF-8 character/sign `1`; Q `1` is abit 1",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "representationNotInterpretation": {
+        "baselineStatement": "STRING -> Q byte carrier does not invoke I_Q interpretation",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L6",
+          "L12"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-hierarchical-link-carrier.test.ts",
+          "ts/test/v013-formal-quaternary-grounding.test.ts"
+        ],
+        "note": "description/representation/physical source remain distinct from semantic target and interpretation authority.",
+        "baselineRuntimeRetained": true
+      },
+      "formalParentheses": {
+        "baselineStatement": "FORMAL (...) is explicit I_FORMAL child execution returning exactly one Link/value; () is invalid",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "explicitKContext": {
+        "baselineStatement": "contextual `.` resolves only through explicitly selected structural K evidence",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "associationBoundary": {
+        "baselineStatement": "left-associated Link topology, generic flat reading and FORMAL execution remain distinct",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "exactAnumRooting": {
+        "baselineStatement": "Anum is a Link role; every local Anum begins at R and the exact rooted Anum/question is distinct from its addressed target",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L10"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-root-origin-law.test.ts"
+        ],
+        "note": "v0.13 directly requires every local exact sequence/anum context to originate at R.",
+        "baselineRuntimeRetained": true
+      },
+      "knowledgeStateSeparation": {
+        "baselineStatement": "UNINTERPRETABLE, understood-but-NOT_FOUND and FOUND(X) are semantically distinct read outcomes",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "resolveMaterializeSeparation": {
+        "baselineStatement": "Resolve is a read-only one-root-cut; exact address materialization and write-authorized target materialization are distinct capabilities",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "targetMaterializationBound": {
+        "baselineStatement": "MATERIALIZE_TARGET removes exactly one leading R hierarchy-wide, preserves remaining indirection and fails closed before target writes on invalid exact evidence",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "rootBasisBoundary": {
+        "baselineStatement": "Q and v0.12 STRING/source operations require a structurally valid declared R/O/C/L/U basis with proper O/C relative to R; invalid, collapsed, forged or foreign basis evidence fails closed and write operations perform zero writes",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L1",
+          "L4",
+          "L5",
+          "L12"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-link-native-abit-basis.test.ts",
+          "ts/test/v013-formal-quaternary-grounding.test.ts"
+        ],
+        "note": "rooted basis and Link-native structural signs are explicitly checked, while the accepted v0.12 basis gate remains retained.",
+        "baselineRuntimeRetained": true
+      },
+      "v012StringByteIdentity": {
+        "baselineStatement": "Byte_v012(p) is the exact rooted Anum of bits8(p), not the historical Byte_v09 denotation; grouped byte Anums form the exact STRING Anum",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L11"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-string-anum-acceptance.test.ts"
+        ],
+        "note": "exact byte identity and allocation-independent structural description are required.",
+        "baselineRuntimeRetained": true
+      },
+      "utf8CarrierBoundary": {
+        "baselineStatement": "UTF-8 code-point grouping is a read over exact STRING bytes and does not rewrite STRING carrier topology or grant glyph spelling semantic authority",
+        "classification": "REVIEW_REQUIRED",
+        "candidateLaws": [],
+        "candidateEvidence": [],
+        "baselineRuntimeRetained": true,
+        "note": "accepted v0.12 runtime/gates still pass, but semantic parity under the v0.13 foundation has not yet been independently demonstrated."
+      },
+      "sourceUseAuthority": {
+        "baselineStatement": "exact STRING source is replayed only against an independently selected V012SourceAuthority: exact Dictionary identity plus exact Grammar/Theory membership Links; raw membership shape is not semantic authority",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L8",
+          "L12"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-relative-pole-source-authority.test.ts",
+          "ts/test/v013-formal-quaternary-grounding.test.ts"
+        ],
+        "note": "source/Dictionary/Grammar/fixed-Theory/Rule authority remains explicit and host glyphs have no semantic authority.",
+        "baselineRuntimeRetained": true
+      },
+      "formalResultAuthority": {
+        "baselineStatement": "consumer source-to-result replay requires fixed Theory authority, selected finite Act attachments, matching Dictionary/Grammar/Theory, and equality between the source-selected Use and the selected Rule-role binding; candidate self-admission and late unselected ambient attachments do not gain authority",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L8"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-form-result-rule-authority.test.ts",
+          "ts/test/v013-prefix-result-rule-authority.test.ts"
+        ],
+        "note": "semantic result/materialization remains admitted-rule-authorized and fails closed.",
+        "baselineRuntimeRetained": true
+      }
+    }
   }
 }
