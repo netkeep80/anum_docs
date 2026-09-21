@@ -28,7 +28,7 @@ const projectionPath = "traceability/mts-v0.13-semantic-dependency-projection.js
 const projection = readJson(projectionPath);
 const contract = readJson("contracts/mts-contract-v0.13.json");
 
-same(projection.schema, "mts-semantic-dependency-projection/v0.4", "projection schema");
+same(projection.schema, "mts-semantic-dependency-projection/v0.5", "projection schema");
 same(projection.mtsVersion, "0.13", "projection MTS version");
 same(projection.status, "research", "projection remains research evidence");
 same(projection.externalAuditProjectionOnly, true, "projection is external audit tooling");
@@ -38,7 +38,7 @@ same(projection.executionDependency, false, "MTS execution does not depend on pr
 same(projection.ownerIssue, 1270, "projection is owned by #1270");
 same(
   projection.candidateMain,
-  "68c6ca8e9faae4d2dfc232ab5ec64dcb9657bfdd",
+  "2ce5f2e8e7e22f2d89bfb6472a32e7cee4e54d77",
   "projection binds the exact ready candidate snapshot",
 );
 same(projection.coverage.globalTrustBoundaryComplete, false, "P1 does not overclaim global trust closure");
@@ -616,7 +616,23 @@ setEqual(
   "package-wide direct semantic write owners",
 );
 
+const allowedWriteOwnerCategories = [
+  "bootstrap-foundation-materialization",
+  "authority-evidence-producer",
+  "proof-derivation-producer",
+  "representation-materialization",
+  "authorized-semantic-target-materialization",
+  "tooling",
+] as const;
+const observedWriteCategoryCounts: Record<string, number> = {};
+
 for (const entry of projection.packageDirectSemanticWriteAudit.owners as any[]) {
+  assert(
+    allowedWriteOwnerCategories.includes(entry.category),
+    `${entry.id}: write owner category is from the closed classification`,
+  );
+  observedWriteCategoryCounts[entry.category] =
+    (observedWriteCategoryCounts[entry.category] ?? 0) + 1;
   assert(typeof entry.category === "string" && entry.category.length > 0,
     `${entry.id}: write owner category is declared`);
   assert(typeof entry.reason === "string" && entry.reason.length > 0,
@@ -646,6 +662,11 @@ same(
   projection.metrics.unclassifiedDirectSemanticWriteOwnerCount,
   0,
   "all direct semantic write owners are classified",
+);
+same(
+  JSON.stringify(projection.metrics.directSemanticWriteOwnersByCategory),
+  JSON.stringify(observedWriteCategoryCounts),
+  "direct semantic write category counts",
 );
 same(
   projection.coverage.packageDirectSemanticWriteAuditComplete,
