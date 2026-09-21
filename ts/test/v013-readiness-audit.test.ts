@@ -21,13 +21,13 @@ const conformance12 = readJson("contracts/mts-conformance-v0.12.json");
 const acceptance12 = readJson("cutover/typescript-c1-acceptance-v0.5.json");
 const policy = readJson("repo-policy.json");
 
-// Readiness is a separately merged pre-acceptance state.
+// The earlier readiness audit remains historical evidence, but readiness is reopened after stronger A9/self-proof criteria were adopted.
 same(contract13.status, "candidate", "v0.13 status remains candidate");
 same(contract13.accepted, false, "v0.13 remains unaccepted");
-same(contract13.acceptanceReady, true, "v0.13 contract is acceptance-ready");
+same(contract13.acceptanceReady, false, "v0.13 contract readiness is reopened");
 same(conformance13.status, "candidate", "v0.13 conformance remains candidate");
 same(conformance13.accepted, false, "v0.13 conformance remains unaccepted");
-same(conformance13.acceptanceReady, true, "v0.13 conformance is acceptance-ready");
+same(conformance13.acceptanceReady, false, "v0.13 conformance readiness is reopened");
 same(conformance13.coverageState, "complete", "declared v0.13 coverage is complete");
 
 // The candidate kernel is complete but is not selected before an explicit cutover.
@@ -52,8 +52,14 @@ same(
 );
 same(
   contract13.candidateState?.foundationSuperiorityAuditComplete,
-  true,
-  "foundation superiority audit complete",
+  false,
+  "foundation superiority audit is reopened under stronger minimality/trust criteria",
+);
+same(contract13.candidateState?.readinessReopened, true, "candidate records reopened readiness");
+same(
+  contract13.readinessReopen?.status,
+  "reopened-a9-selfproof",
+  "reopen reason is machine-readable",
 );
 same(
   contract13.candidateState?.rootFormalDialectComplete,
@@ -85,7 +91,7 @@ same(
   false,
   "release state keeps candidate non-selectable",
 );
-same(contract13.releaseState?.acceptanceReady, true, "release state projects readiness");
+same(contract13.releaseState?.acceptanceReady, false, "release state projects reopened readiness");
 
 // Accepted/current v0.12 remains untouched.
 same(contract12.schema, "mts-contract/v0.12", "accepted contract identity");
@@ -198,12 +204,12 @@ for (const [law, entry] of Object.entries(
   );
 }
 
-// Readiness removes only the readiness blocker. Acceptance remains a distinct
-// explicit author decision over the exact ready artifacts.
+// The earlier readiness audit remains evidence, but later stronger criteria reopen
+// the lifecycle conclusion without invalidating completed AC/kernel evidence.
 same(
   conformance13.evidenceState?.readinessAudit,
-  "green-confirmed",
-  "readiness evidence is green-confirmed",
+  "reopened-after-a9-selfproof-criteria",
+  "readiness evidence records the stronger-criteria reopen",
 );
 same(
   conformance13.evidenceState?.authorAcceptance,
@@ -212,14 +218,19 @@ same(
 );
 same(
   (conformance13.acceptanceBlockers ?? []).length,
-  1,
-  "exactly one acceptance blocker remains after readiness",
+  3,
+  "three explicit blockers remain while readiness is reopened",
 );
-same(
-  conformance13.acceptanceBlockers?.[0],
+for (const blocker of [
+  "foundation necessity/minimality remains open under A9 elimination and self-proof criteria",
+  "global host semantic trust boundary remains open until package-wide decision/runtime path audit closes",
   "explicit author acceptance of the exact candidate artifacts has not yet been recorded",
-  "only explicit author acceptance remains",
-);
+]) {
+  assert(
+    conformance13.acceptanceBlockers.includes(blocker),
+    `reopened readiness blocker is explicit: ${blocker}`,
+  );
+}
 
 // Readiness itself is not author acceptance.
 assert(
@@ -234,13 +245,13 @@ same(
   "author decision must reference exact ready artifacts",
 );
 
-// Positive trusted-base readiness pins are present; no false->true policy bridge
-// was required because v0.13 had no previous readiness literals in repo-policy.
+// Governance pins the reopened lifecycle state so contract/conformance cannot
+// silently drift back to readiness before the stronger criteria close.
 const rules = new Map<string, any>(
   (policy.document_relations?.rules ?? []).map((rule: any) => [rule.id, rule]),
 );
-same(rules.get("v013-contract-ready")?.value, true, "policy pins v0.13 contract ready");
-same(rules.get("v013-conformance-ready")?.value, true, "policy pins v0.13 conformance ready");
+same(rules.get("v013-contract-ready")?.value, false, "policy pins v0.13 contract not-ready");
+same(rules.get("v013-conformance-ready")?.value, false, "policy pins v0.13 conformance not-ready");
 same(
   rules.get("v013-conformance-complete")?.value,
   "complete",
@@ -248,5 +259,5 @@ same(
 );
 
 console.log(
-  `MTS v0.13 independent readiness audit: GREEN; ${declaredGates.length} kernel gates projected, v0.12 remains current, and only explicit author acceptance remains.`,
+  `MTS v0.13 readiness lifecycle: prior executable evidence remains GREEN across ${declaredGates.length} projected gates, but readiness is reopened for A9 trust/minimality + self-proof closure; v0.12 remains current.`,
 );

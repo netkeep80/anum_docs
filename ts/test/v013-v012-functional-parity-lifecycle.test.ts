@@ -27,8 +27,8 @@ same(contract12.accepted, true, "baseline v0.12 remains accepted");
 same(contract13.accepted, false, "candidate v0.13 is not accepted");
 same(
   contract13.acceptanceReady,
-  true,
-  "candidate v0.13 is acceptance-ready only after the separate readiness audit",
+  false,
+  "candidate v0.13 readiness is reopened under stronger A9/self-proof criteria",
 );
 same(
   contract13.candidateState.explicitAuthorAcceptanceRecorded,
