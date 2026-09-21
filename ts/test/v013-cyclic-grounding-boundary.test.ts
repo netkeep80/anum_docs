@@ -3,11 +3,15 @@ import {
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
+  type RootBasis,
 } from "../src/memory.js";
 import {
   RecursiveLinkIdentityProofReplayError,
   replayRecursiveLinkIdentityProofAset,
 } from "../src/recursive-link-identity-proof.js";
+import {
+  decomposeV013SemanticLink,
+} from "../src/v013-hierarchical-carrier.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.13 cyclic grounding boundary: ${message}`);
@@ -142,6 +146,9 @@ const fixture = new FixtureBuilder();
 const R = fixture.root;
 const O = fixture.startClosed(R);
 const C = fixture.endClosed(R);
+const L = fixture.link(O, C);
+const U = fixture.link(C, O);
+const basis: RootBasis = Object.freeze({ R, O, C, L, U });
 
 const A = fixture.reserve();
 const B = fixture.reserve();
@@ -173,6 +180,24 @@ const memory = new SyntheticReadMemory(
   R,
   new Map<LinkHandle, LinkPoles>(fixture.cells),
 );
+
+// A rooted cyclic graph remains locally meaningful as Link topology. The
+// aspect classifier itself does not reject A/B merely because their ordinary
+// poles participate in a cycle.
+{
+  const aLocal = decomposeV013SemanticLink(memory, basis, A);
+  const bLocal = decomposeV013SemanticLink(memory, basis, B);
+
+  same(aLocal.aspect, "PAIR", "root-anchored cycle A has ordinary local aspect");
+  same(aLocal.selfIncidence, "00", "root-anchored cycle A self-incidence");
+  same(aLocal.children[0], O, "A retains grounded O side");
+  same(aLocal.children[1], B, "A retains cyclic B side");
+
+  same(bLocal.aspect, "PAIR", "root-anchored cycle B has ordinary local aspect");
+  same(bLocal.selfIncidence, "00", "root-anchored cycle B self-incidence");
+  same(bLocal.children[0], A, "B retains cyclic A side");
+  same(bLocal.children[1], C, "B retains grounded C side");
+}
 
 // Rooted side obligations are independently and finitely grounded.
 {
@@ -237,12 +262,16 @@ const memoryWithSelfIncidence = new SyntheticReadMemory(
   );
 }
 
-// This exactly matches the accepted finite-grounding distinction:
+// Important boundary:
 //
 //   - full self-closure is valid only as ROOT;
 //   - START/END self-incidence recurses only through its grounded external pole;
-//   - an ordinary dependency cycle among distinct Links repeats an identity
-//     obligation and therefore has no finite grounding proof.
+//   - the CURRENT recursive identity-proof form is well-founded and rejects a
+//     repeated A<->B identity obligation as cyclic-grounding;
+//   - this does not prove that every rooted cyclic semantic graph is
+//     ontologically inadmissible. A18 keeps that question open for graph-level
+//     identity evidence.
+//
 console.log(
-  "MTS v0.13 AC2 cyclic grounding boundary: rooted O/C side branches are finite, direct self-incidence is grounded, but genuine distinct A<->B recursion is rejected as cyclic-grounding: GREEN.",
+  "MTS v0.13 cycle boundary: rooted mutual A<->B topology remains locally classifiable, while the current well-founded recursive identity proof rejects the repeated obligation as cyclic-grounding; proof/carrier limitation is not an acyclic ontology axiom: GREEN.",
 );
