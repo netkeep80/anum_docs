@@ -262,7 +262,7 @@
     "contractBoundaryEstablished": true,
     "conformanceObligationsDeclared": true,
     "traceabilityComplete": true,
-    "documentationComplete": false,
+    "documentationComplete": true,
     "readinessAuditComplete": false,
     "explicitAuthorAcceptanceRecorded": false
   },
@@ -283,5 +283,64 @@
     "acceptanceReady": false,
     "candidateRuntimeSelectable": false
   },
-  "traceabilityManifest": "traceability/mts-v0.13.json"
+  "traceabilityManifest": "traceability/mts-v0.13.json",
+  "normativeDocumentation": {
+    "status": "candidate-complete-r7d",
+    "ownerRule": "one candidate semantic law -> one canonical normative owner anchor",
+    "candidateSectionsDoNotPromoteAcceptedCurrent": true,
+    "owners": {
+      "L1": {
+        "path": "docs/specs/Апамять и управление сетью связей.md",
+        "anchor": "mts-law-L1"
+      },
+      "L2": {
+        "path": "docs/specs/Формальная нотация МТС.md",
+        "anchor": "mts-law-L2"
+      },
+      "L3": {
+        "path": "docs/specs/Формальная нотация МТС.md",
+        "anchor": "mts-law-L3"
+      },
+      "L4": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L4"
+      },
+      "L5": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L5"
+      },
+      "L6": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L6"
+      },
+      "L7": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L7"
+      },
+      "L8": {
+        "path": "docs/specs/Апамять и управление сетью связей.md",
+        "anchor": "mts-law-L8"
+      },
+      "L9": {
+        "path": "docs/specs/Апамять и управление сетью связей.md",
+        "anchor": "mts-law-L9"
+      },
+      "L10": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L10"
+      },
+      "L11": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L11"
+      },
+      "L12": {
+        "path": "docs/specs/Формальная нотация МТС.md",
+        "anchor": "mts-law-L12"
+      },
+      "L13": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L13"
+      }
+    }
+  }
 }
