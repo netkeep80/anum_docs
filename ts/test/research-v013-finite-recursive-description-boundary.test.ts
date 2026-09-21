@@ -95,7 +95,7 @@ class SyntheticGraphMemory implements WriteMemory {
 
   ensureStartSelfClosed(end: LinkHandle): LinkHandle {
     for (const [link, poles] of this.cells) {
-      if (poles.start === link && poles.end === end) return link;
+      if (link !== end && poles.start === link && poles.end === end) return link;
     }
     const link = this.reserve();
     return this.bind(link, link, end);
@@ -103,7 +103,7 @@ class SyntheticGraphMemory implements WriteMemory {
 
   ensureEndSelfClosed(start: LinkHandle): LinkHandle {
     for (const [link, poles] of this.cells) {
-      if (poles.start === start && poles.end === link) return link;
+      if (link !== start && poles.start === start && poles.end === link) return link;
     }
     const link = this.reserve();
     return this.bind(link, start, link);
