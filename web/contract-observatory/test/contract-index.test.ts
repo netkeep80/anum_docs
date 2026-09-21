@@ -31,12 +31,15 @@ function expectCode(effect: () => unknown, code: ContractIndexErrorCode, message
 const repositoryRoot = process.cwd();
 const realIndex = buildContractObservatoryIndex(repositoryRoot);
 same(realIndex.schema, "mts-contract-observatory-index/v0.1", "index schema");
-same(realIndex.versions.length, 2, "post-cleanup repository has exactly current and previous accepted pairs");
-same(
-  realIndex.versions.map((version) => version.contractId).join(","),
-  "mts-contract/v0.11,mts-contract/v0.12",
-  "real repository uses natural version order",
-);
+assert(realIndex.versions.length >= 2, "repository exposes at least current and previous accepted pairs");
+same(realIndex.versions.filter((version) => version.isCurrent).length, 1, "exactly one current pair");
+same(realIndex.versions.filter((version) => version.isPrevious).length, 1, "exactly one previous pair");
+const v011Index = realIndex.versions.findIndex((version) => version.contractId === "mts-contract/v0.11");
+const v012Index = realIndex.versions.findIndex((version) => version.contractId === "mts-contract/v0.12");
+assert(v011Index >= 0 && v012Index > v011Index, "accepted v0.11/v0.12 retain natural version order");
+for (const version of realIndex.versions.filter((entry) => !entry.isCurrent && !entry.isPrevious)) {
+  same(version.accepted, false, `${version.contractId}: extra observed pair must not silently become accepted`);
+}
 same(realIndex.currentContractPath, "contracts/mts-contract-v0.12.json", "policy current contract");
 same(realIndex.currentConformancePath, "contracts/mts-conformance-v0.12.json", "policy current conformance");
 same(realIndex.previousContractPath, "contracts/mts-contract-v0.11.json", "policy previous contract");
@@ -62,7 +65,11 @@ same(serialized, serializeContractObservatoryIndex(buildContractObservatoryIndex
 assert(!serialized.includes("rootBasisTarget"), "index does not copy raw contract bodies");
 assert(!serialized.includes("TopBind(R,S)"), "index does not copy semantic equations");
 const livePaths = new Set(realIndex.versions.flatMap((version) => [version.contractPath, version.conformancePath]));
-same(livePaths.size, 4, "current and previous contract/conformance evidence files are accounted for exactly once");
+same(
+  livePaths.size,
+  realIndex.versions.length * 2,
+  "every observed contract/conformance pair is accounted for exactly once",
+);
 
 interface Fixture {
   readonly root: string;
@@ -148,6 +155,68 @@ try {
   );
 } finally {
   rmSync(natural.root, { recursive: true, force: true });
+}
+
+
+// A nonaccepted candidate is observable without becoming current/previous or
+// changing the accepted pointer.
+const withCandidate = createFixture(["0.11", "0.12", "0.13"]);
+try {
+  overwrite(withCandidate.root, "contracts/mts-contract-v0.13.json", {
+    schema: "mts-contract/v0.13",
+    status: "candidate",
+    accepted: false,
+    acceptanceReady: false,
+    semanticBase: "mts-contract/v0.12",
+    observableSemanticDelta: true,
+    conformanceCorpus: "contracts/mts-conformance-v0.13.json",
+    issue: 1270,
+    candidateLifecycleIssue: 1270,
+  });
+  overwrite(withCandidate.root, "contracts/mts-conformance-v0.13.json", {
+    schema: "mts-conformance/v0.13",
+    status: "candidate",
+    accepted: false,
+    contract: "mts-contract/v0.13",
+    coverageState: "partial",
+    requiredExecutableGates: ["candidate-gate"],
+    requiredNegativeVectors: ["candidate-negative"],
+  });
+  overwrite(withCandidate.root, "repo-policy.json", {
+    packs: {
+      "contract-conformance": {
+        current: {
+          contract: { path: "contracts/mts-contract-v0.12.json" },
+          conformance: { path: "contracts/mts-conformance-v0.12.json" },
+        },
+        previous: {
+          contract: { path: "contracts/mts-contract-v0.11.json" },
+          conformance: { path: "contracts/mts-conformance-v0.11.json" },
+        },
+        acceptance: { document: { path: withCandidate.acceptancePath } },
+      },
+    },
+  });
+  overwrite(withCandidate.root, withCandidate.acceptancePath, {
+    current: {
+      contract: "contracts/mts-contract-v0.12.json",
+      conformance: "contracts/mts-conformance-v0.12.json",
+    },
+  });
+
+  const candidateIndex = buildContractObservatoryIndex(withCandidate.root);
+  same(candidateIndex.versions.length, 3, "candidate pair is visible alongside accepted pair history");
+  const candidate = candidateIndex.versions.find((version) => version.contractId === "mts-contract/v0.13");
+  assert(candidate !== undefined, "candidate summary exists");
+  same(candidate.status, "candidate", "candidate status projected");
+  same(candidate.accepted, false, "candidate remains nonaccepted");
+  same(candidate.acceptanceReady, false, "candidate remains not ready");
+  same(candidate.isCurrent, false, "candidate does not become current");
+  same(candidate.isPrevious, false, "candidate does not become previous");
+  same(candidateIndex.versions.find((version) => version.isCurrent)?.contractId, "mts-contract/v0.12", "accepted current remains v0.12");
+  same(candidateIndex.versions.find((version) => version.isPrevious)?.contractId, "mts-contract/v0.11", "accepted previous remains v0.11");
+} finally {
+  rmSync(withCandidate.root, { recursive: true, force: true });
 }
 
 fixtureCase(({ root }) => {
