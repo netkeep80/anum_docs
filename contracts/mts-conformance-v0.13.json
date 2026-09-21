@@ -226,13 +226,12 @@
     "semanticLawProjection": "green-complete",
     "candidateContractBoundary": "defined-r7b",
     "conformanceObligations": "declared-r7b",
-    "traceability": "pending",
+    "traceability": "green-complete",
     "normativeDocumentation": "pending",
     "readinessAudit": "pending",
     "authorAcceptance": "pending"
   },
   "acceptanceBlockers": [
-    "v0.13 traceability candidate has not yet been created and checked",
     "normative documentation has not yet converged on the v0.13 candidate law set",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
@@ -247,5 +246,6 @@
     "acceptedMtsVersion": "mts-contract/v0.12",
     "candidateMtsVersion": "mts-contract/v0.13",
     "acceptedPointerUnchanged": true
-  }
+  },
+  "traceabilityManifest": "traceability/mts-v0.13.json"
 }
