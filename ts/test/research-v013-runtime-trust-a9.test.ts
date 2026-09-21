@@ -261,6 +261,7 @@ if (childGatePath !== undefined) {
     throw new Error("v0.13 A9 P1g: runtimeTrustCoverage is not yet declared");
   }
 
+  // GREEN below is intentionally corpus-scoped: exact mandatory gates only.
   const runtime = projection.runtimeTrustCoverage;
   same(runtime.status, "green-observed-mandatory-corpus", "runtime coverage status");
   same(runtime.scope, "requiredExecutableGates-v0.13", "runtime coverage scope");
