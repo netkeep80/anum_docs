@@ -208,16 +208,28 @@
       "contractPointer": "/requiredSemanticLaws/L12",
       "positive": {
         "requiredPositiveVectors": [
-          "v013-formal-grounding-8-9-6-1"
+          "v013-formal-grounding-8-9-6-1",
+          "v013-formal-root-R-from-8",
+          "v013-formal-root-O-from-98",
+          "v013-formal-root-C-from-68",
+          "v013-formal-root-L-from-19868",
+          "v013-formal-derived-U-from-16898",
+          "v013-formal-generic-unknown-finite-term"
         ]
       },
       "negative": {
         "requiredNegativeVectors": [
-          "v013-wrong-structural-rule-writes-zero-target-links"
+          "v013-wrong-structural-rule-writes-zero-target-links",
+          "v013-formal-root-wrong-rule-rejected",
+          "v013-formal-root-wrong-theory-rejected",
+          "v013-formal-root-malformed-prefix-rejected",
+          "v013-formal-root-noncanonical-pair-alias-rejected",
+          "v013-formal-root-no-host-term-special-case"
         ]
       },
       "requiredExecutableGates": [
-        "ts/test/v013-formal-quaternary-grounding.test.ts"
+        "ts/test/v013-formal-quaternary-grounding.test.ts",
+        "ts/test/v013-root-aspect-formal-composition.test.ts"
       ]
     },
     "L13": {
