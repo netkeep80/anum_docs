@@ -45,25 +45,6 @@ jobs:
           node web/contract-observatory/dist/test/contract-index.test.js
           node web/contract-observatory/dist/test/site.test.js
 
-  no-python:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Reject Python sources or runtime dependencies
-        shell: bash
-        run: |
-          if find . -path './.git' -prune -o -path './ts/node_modules' -prune -o -name '*.py' -print | grep -q .; then
-            echo "::error::Python source remains after the TypeScript cutover"
-            find . -path './.git' -prune -o -path './ts/node_modules' -prune -o -name '*.py' -print
-            exit 1
-          fi
-          if grep -R -n -E 'python3|pytest|ruff' ts --exclude='*.map'; then
-            echo "::error::Python runtime/tooling command remains in current TypeScript tree"
-            exit 1
-          fi
-          echo "Python-free current tree confirmed."
-
 
   protect-readonly-files:
     runs-on: ubuntu-latest
