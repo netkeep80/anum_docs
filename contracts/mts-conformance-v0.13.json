@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "research-evidence-complete-formalization-pending",
-  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable research evidence, while traceability, normative documentation convergence, readiness audit and explicit acceptance remain pending.",
+  "coverageStateMeaning": "AC1-AC9 and L1-L13 have executable kernel evidence; traceability and normative documentation are complete, while Link-native abit-basis/minimality formalization, comparative superiority versus accepted v0.12, readiness audit and explicit acceptance remain pending.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -227,12 +227,15 @@
     "candidateContractBoundary": "defined-r7b",
     "conformanceObligations": "declared-r7b",
     "traceability": "green-complete",
-    "normativeDocumentation": "pending",
+    "normativeDocumentation": "green-complete",
     "readinessAudit": "pending",
-    "authorAcceptance": "pending"
+    "authorAcceptance": "pending",
+    "linkNativeAbitBasis": "research-observed-formalization-pending",
+    "comparativeSuperiority": "pending"
   },
   "acceptanceBlockers": [
-    "normative documentation has not yet converged on the v0.13 candidate law set",
+    "Link-native abit basis R/O/C/L and the four-class/minimality claim have not yet been promoted from research evidence into the candidate contract",
+    "comparative superiority versus accepted v0.12, including serializer/deserializer complexity and shared-DAG cost, has not yet been demonstrated",
     "independent readiness audit has not yet been recorded",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
@@ -247,5 +250,30 @@
     "candidateMtsVersion": "mts-contract/v0.13",
     "acceptedPointerUnchanged": true
   },
-  "traceabilityManifest": "traceability/mts-v0.13.json"
+  "traceabilityManifest": "traceability/mts-v0.13.json",
+  "documentationEvidence": {
+    "status": "green-repository-check-r7d",
+    "gate": "ts/test/v013-documentation-ownership.test.ts",
+    "ownerDocuments": [
+      "docs/specs/Формальная нотация МТС.md",
+      "docs/specs/Ачисла и сериализация.md",
+      "docs/specs/Апамять и управление сетью связей.md"
+    ],
+    "requiredLawIds": [
+      "L1",
+      "L2",
+      "L3",
+      "L4",
+      "L5",
+      "L6",
+      "L7",
+      "L8",
+      "L9",
+      "L10",
+      "L11",
+      "L12",
+      "L13"
+    ],
+    "exactOneOwnerPerLaw": true
+  }
 }
