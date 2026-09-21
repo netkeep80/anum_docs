@@ -6,6 +6,7 @@ import {
 import {
   Memory,
   ensureRootBasis,
+  type LinkHandle,
 } from "../src/memory.js";
 import {
   materializeV012StringAnum,
@@ -33,7 +34,7 @@ function sameBytes(actual: Uint8Array, expected: Uint8Array, message: string): v
 
 function structuralWire(
   memory: Memory,
-  semantic: number,
+  semantic: LinkHandle,
 ): Uint8Array {
   const basis = ensureRootBasis(memory);
   const carrier = materializeV013HierarchicalCarrierFromSemanticLink(
