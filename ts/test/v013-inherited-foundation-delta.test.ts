@@ -86,7 +86,7 @@ same(conformance13.inheritedFoundationParity.status, "green-complete", "inherite
 same(conformance13.inheritedFoundationParity.regressionCount, 0, "inherited regression count");
 same(conformance13.foundationSuperiorityAudit.status, "green-complete-a5c", "superiority status");
 same(contract13.accepted, false, "candidate remains unaccepted");
-same(contract13.acceptanceReady, false, "candidate remains not acceptance-ready");
+same(contract13.acceptanceReady, true, "candidate is acceptance-ready after independent audit");
 same(contract13.candidateState.explicitAuthorAcceptanceRecorded, false, "author acceptance remains absent");
 
 console.log("MTS v0.13 inherited foundation A5c: A0-A20/F2-F6 mapped; only A5 alphabet role replaced; A1/A18/F2-F3 clarified; old Q retained; zero regressions; candidate remains unaccepted: GREEN.");
