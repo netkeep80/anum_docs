@@ -9,7 +9,7 @@
   "observableSemanticDelta": true,
   "acceptanceReady": false,
   "coverageState": "acceptance-criteria-complete-readiness-pending",
-  "coverageStateMeaning": "AC1-AC10 and L1-L13 have executable evidence for their declared scopes; root-aspect FORMAL closure is GREEN through one generic fixed-Theory composer. Accepted-v0.12 semantic/inherited parity and A5 foundation superiority remain complete. Independent readiness audit and explicit author acceptance remain pending.",
+  "coverageStateMeaning": "AC1-AC10 and L1-L13 have executable evidence for their declared scopes; the declared v0.13 candidate kernel and public consumer boundary are GREEN and mandatory evidence is projected. Accepted-v0.12 semantic/inherited parity and A5 foundation superiority remain complete. Independent readiness audit and explicit author acceptance remain pending.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
@@ -36,7 +36,8 @@
     "ts/test/v013-memory-cycle-boundary.test.ts",
     "ts/test/v013-cyclic-grounding-boundary.test.ts",
     "ts/test/v013-link-native-abit-basis.test.ts",
-    "ts/test/v013-root-aspect-formal-composition.test.ts"
+    "ts/test/v013-root-aspect-formal-composition.test.ts",
+    "ts/test/v013-public-facade.test.ts"
   ],
   "plannedExecutableGates": [],
   "lawEvidence": {
@@ -286,7 +287,9 @@
     "codecEngineeringComparison": "green-research-evidence-a3",
     "functionalParity": "green-complete-a5c",
     "foundationSuperiority": "green-complete-a5c",
-    "rootFormalDialect": "green-complete-ac10"
+    "rootFormalDialect": "green-complete-ac10",
+    "publicFacade": "green-complete-public-consumer-boundary",
+    "candidateKernelImplementation": "green-complete-declared-scope"
   },
   "acceptanceBlockers": [
     "independent readiness audit has not yet been recorded",
@@ -814,5 +817,15 @@
         "fairness": "compare the best honest implementation of the same dialect task on frozen v0.12 foundation versus candidate v0.13 foundation"
       }
     }
+  },
+  "candidateKernelImplementation": {
+    "status": "green-complete",
+    "publicFacadeGate": "ts/test/v013-public-facade.test.ts",
+    "publicFacadeMerge": "d5df98791973711d054cdcf5dc3f9c25c0a8f4ae",
+    "acceptedRuntimeRemains": "mts-contract/v0.12",
+    "candidateRuntimeSelectable": false,
+    "readinessAuditComplete": false,
+    "explicitAuthorAcceptanceRecorded": false,
+    "lifecycleCheck": "ts/test/v013-kernel-public-lifecycle.test.ts"
   }
 }
