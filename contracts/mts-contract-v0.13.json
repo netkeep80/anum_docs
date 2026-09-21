@@ -487,6 +487,99 @@
         "preservesRemainingAnumIndirection": true,
         "failClosedBeforeWrite": true
       }
+    },
+    "interpreterLayerV012": {
+      "role": "retained higher-level semantic compatibility layer over the v0.13 Link foundation",
+      "definesV013FoundationAlphabet": false,
+      "interpreterModel": {
+        "identities": [
+          "I_STRING",
+          "I_FORMAL",
+          "I_Q"
+        ],
+        "semanticInterpretationContexts": true,
+        "hiddenLexerModesAreSemanticAuthority": false,
+        "hiddenParserModesAreSemanticAuthority": false,
+        "physicalGlyphEqualsStringValue": false,
+        "physicalGlyphEqualsQAbit": false,
+        "physicalGlyphEqualsFormalRole": false,
+        "sameGlyphShapeImpliesSameRoleAcrossInterpreters": false
+      },
+      "stringInterpreter": {
+        "id": "I_STRING",
+        "physicalSignsAreUtf8": true,
+        "glyphOneRole": "UTF-8 character/sign `1`",
+        "glyphZeroRole": "UTF-8 character/sign `0`",
+        "squareBracketRole": "nested STRING Anum/context",
+        "squareBracketChildInterpreter": "I_STRING",
+        "childInitialState": "R",
+        "childResultCardinality": "exactly-one-Link",
+        "childResultReturnsToParent": true,
+        "parentContinuesAfterChild": true
+      },
+      "formalInterpreter": {
+        "id": "I_FORMAL",
+        "squareBracketRole": "nested STRING Anum/context",
+        "squareBracketChildInterpreter": "I_STRING",
+        "squareBracketChildIsQ": false,
+        "parenthesesRole": "explicit nested FORMAL context",
+        "parenthesesChildInterpreter": "I_FORMAL",
+        "parenthesesChildInitialState": "explicit child/root semantic state",
+        "parenthesesChildResultCardinality": "exactly-one-Link",
+        "parentContinuesAfterChild": true,
+        "emptyParenthesesAllowed": false,
+        "emptyParenthesesFailure": "empty-formal-context"
+      },
+      "quaternaryInterpreter": {
+        "id": "I_Q",
+        "alphabet": [
+          "[",
+          "]",
+          "1",
+          "0"
+        ],
+        "alphabetCount": 4,
+        "glyphOneRole": "Q abit 1",
+        "glyphZeroRole": "Q abit 0",
+        "squareBracketRole": "Q-native nested context",
+        "squareBracketChildInterpreter": "I_Q",
+        "childInitialState": "R",
+        "childResultCardinality": "exactly-one-Link",
+        "rejectNonQGlyphs": true
+      },
+      "contextAuthority": {
+        "contextualDotUsesExplicitStructuralK": true,
+        "childCreationSelectsContextualK": false,
+        "nearestLexicalFrameIsSemanticAuthority": false,
+        "ambientMutableCurrentIsSemanticAuthority": false,
+        "hostParserStackIsSemanticAuthority": false,
+        "hiddenParentTraversalIsSemanticAuthority": false,
+        "explicitStructuralEvidenceRequired": true
+      },
+      "formalElaboration": {
+        "leftAssociatedLinkTopology": "retained from accepted structural topology",
+        "genericFlatReader": "distinct mechanism",
+        "formalGrammarExecution": "distinct mechanism",
+        "linkTopologyEqualsFormalGrammar": false,
+        "genericFlatReaderEqualsFormalGrammar": false
+      },
+      "compatibilityBoundary": {
+        "qAlphabet": [
+          "[",
+          "]",
+          "1",
+          "0"
+        ],
+        "qAlphabetIsV013FoundationAlphabet": false,
+        "v013FoundationAlphabet": [
+          "1",
+          "6",
+          "8",
+          "9"
+        ],
+        "oldInterpreterCapabilitiesMayBeReimplementedLater": true,
+        "reimplementationMayWeakenAcceptedObservableCapability": false
+      }
     }
   }
 }
