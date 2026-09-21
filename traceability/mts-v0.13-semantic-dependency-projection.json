@@ -66,10 +66,10 @@
       ]
     },
     "objectSpecificShortcutDetector": {
-      "kind": "exact-multi-abit-string-literal",
+      "kind": "exact-multi-abit-control-flow-literal",
       "regex": "^[8961]{2,}$",
       "scope": "candidateKernelFiles",
-      "note": "Detects concrete full-term wire literals such as 98 or 19868. Single 8/9/6/1 spellings are representation symbols and are intentionally not counted."
+      "note": "Counts concrete multi-abit wire strings only when they directly participate in a binary control-flow expression or switch case. Structural data labels such as self-incidence 00/01/10/11 are not semantic shortcuts by themselves."
     }
   },
   "publicSemanticEntrypoints": [
@@ -452,7 +452,8 @@
     "linkExecutedSemanticCapabilityCount": "P1 counts a capability as Link-executed only if the execution mechanism itself is Link-defined. Link-grounded authority with host execution is counted as mixed, not self-hosted.",
     "hostLinkSemanticDuplicationCount": "Counts semantic capabilities whose meaning/evidence is expressed through Links while an equally relevant host execution mechanism still implements the operation in this P1 model.",
     "directUndocumentedDependencyCount": "Exact static count only for direct dependencies observed in the five candidate-kernel files.",
-    "globalUndocumentedSemanticPathCount": "Unknown until the inherited accepted v0.12 authority runtime and all public semantic paths are unfolded."
+    "globalUndocumentedSemanticPathCount": "Unknown until the inherited accepted v0.12 authority runtime and all public semantic paths are unfolded.",
+    "objectSpecificHostSemanticShortcutCount": "Counts exact multi-abit physical-term literals that directly participate in host control flow in the candidate kernel. It intentionally does not count structural self-incidence labels stored as data."
   },
   "nextExperiments": [
     "Unfold bootstrap.accepted-v012-authority-runtime into Dictionary, source, Theory, StructuralRule and context dependencies.",
