@@ -451,7 +451,7 @@
       "conformance": "mts-conformance/v0.12",
       "accepted": true
     },
-    "scope": "all essential accepted v0.12 semantic capabilities, executable gates, negative authority boundaries and public/runtime capabilities",
+    "scope": "all essential accepted v0.12 semantic capabilities, executable gates, negative authority boundaries, public/runtime capabilities, and inherited normative foundation A0-A20/F2-F6",
     "allowedClassifications": [
       "PRESERVED",
       "GENERALIZED",
@@ -464,7 +464,8 @@
     ],
     "deferredRequiresExplicitAuthorDecision": true,
     "passingOldRuntimeTestsAloneProvesSemanticParity": false,
-    "acceptanceRequiresCompleteAudit": true
+    "acceptanceRequiresCompleteAudit": true,
+    "inheritedFoundationAuditRequired": true
   },
   "retainedAcceptedCapabilities": {
     "anumAddressProtocolV012": {
