@@ -1,9 +1,9 @@
 {
-  "schema": "mts-semantic-dependency-projection/v0.2",
+  "schema": "mts-semantic-dependency-projection/v0.3",
   "mtsVersion": "0.13",
   "status": "research",
   "ownerIssue": 1270,
-  "candidateMain": "103264b0cea9a41e985f160c0b4070052a2753bf",
+  "candidateMain": "fa8912c7691d52c9011ad9005620842044b26fb3",
   "externalAuditProjectionOnly": true,
   "normativeFoundation": false,
   "semanticAuthority": false,
@@ -13,7 +13,9 @@
     "candidateKernelDirectDependencyCoverageComplete": true,
     "inheritedAcceptedV012AuthorityRuntimeUnfolded": true,
     "globalTrustBoundaryComplete": false,
-    "inheritedAuthorityTransitiveImplementationClosureComplete": false
+    "inheritedAuthorityTransitiveImplementationClosureComplete": false,
+    "exactTheorySelectedAdmissionTransitiveImplementationClosureComplete": true,
+    "stringCarrierTransitiveImplementationClosureComplete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -81,7 +83,22 @@
       "ts/src/structural-rule.ts",
       "ts/src/v012-source.ts",
       "ts/src/v012-string-anum.ts"
-    ]
+    ],
+    "exactTheorySelectedAdmissionPath": {
+      "root": "ts/src/portable-theory.ts#verifySelectedTheoryAdmissionAuthority",
+      "files": [
+        "ts/src/portable-theory.ts",
+        "ts/src/canonical-topology.ts",
+        "ts/src/persistence-topology.ts",
+        "ts/src/memory.ts"
+      ],
+      "excludedFromPath": [
+        "ts/src/portable-theory-digest.ts#computePortableStructuralTheoryRevision",
+        "ts/src/portable-proof-replay.ts#replayPortableStructuralProof",
+        "ts/src/portable-proof-subanet-projection.ts#replayPortableProofSubAnetProjection"
+      ],
+      "note": "This is the exact runtime path used by v0.13 selected-admission authority. SHA-256 Theory revision and portable proof replay APIs are outside this path."
+    }
   },
   "publicSemanticEntrypoints": [
     {
@@ -423,22 +440,6 @@
       "reason": "ReadMemory.outgoing enumerates issued Links with a selected start pole; inherited Act/Theory evidence readers rely on it. Independence versus implementation-only indexing is not yet tested."
     },
     {
-      "id": "bootstrap.exact-theory-artifact-runtime",
-      "layer": "semantic-bootstrap",
-      "execution": "host",
-      "linkExpressed": true,
-      "hostLinkDuplication": true,
-      "primitiveStatus": "UNKNOWN",
-      "dependsOn": [
-        "ontology.link",
-        "bootstrap.link-identity",
-        "bootstrap.root-anchor",
-        "bootstrap.pole-read",
-        "bootstrap.outgoing-query"
-      ],
-      "reason": "Narrow unresolved boundary for canonical export/replay/fingerprinting of an independently fixed exact Theory artifact. Canonical-topology/persistence internals are intentionally left for the next A9 slice."
-    },
-    {
       "id": "representation.v012-string-anum",
       "layer": "representation",
       "execution": "host",
@@ -526,10 +527,127 @@
       "linkExpressed": true,
       "hostLinkDuplication": true,
       "dependsOn": [
-        "bootstrap.exact-theory-artifact-runtime",
+        "derived.portable-theory-replay",
+        "derived.canonical-link-fingerprint",
         "bootstrap.outgoing-query"
       ],
-      "reason": "The selected Theory/admission are Links; current independent exact-artifact identity/fingerprint verification is host execution."
+      "reason": "Selected Theory/admission are Links. Current independent authority replays the external Theory artifact, compares canonical Link fingerprints and checks the selected admission against the exact admitted set."
+    },
+    {
+      "id": "resource.memory-instance",
+      "layer": "resource-control",
+      "execution": "host",
+      "linkExpressed": false,
+      "hostLinkDuplication": false,
+      "dependsOn": [
+        "bootstrap.root-anchor",
+        "bootstrap.link-identity"
+      ],
+      "reason": "Exact-Theory artifact replay allocates an isolated scratch Memory. Allocation is runtime/resource machinery; semantic meaning still comes from reconstructed Links."
+    },
+    {
+      "id": "resource.link-enumeration",
+      "layer": "resource-control",
+      "execution": "host",
+      "linkExpressed": false,
+      "hostLinkDuplication": false,
+      "dependsOn": [
+        "bootstrap.link-identity"
+      ],
+      "reason": "EnumerableReadMemory.allLinks exposes the selected finite issued-Link support for canonical export. It is observability/representation support, not an ontological primitive."
+    },
+    {
+      "id": "representation.storage-topology-image",
+      "layer": "representation",
+      "execution": "host",
+      "linkExpressed": false,
+      "hostLinkDuplication": false,
+      "dependsOn": [],
+      "reason": "Portable storage coordinates [start,end] are an external finite representation of Link topology, not MTS ontology."
+    },
+    {
+      "id": "representation.portable-theory-envelope",
+      "layer": "representation",
+      "execution": "host",
+      "linkExpressed": false,
+      "hostLinkDuplication": false,
+      "dependsOn": [
+        "representation.storage-topology-image"
+      ],
+      "reason": "Portable Theory artifact schema/coordinate validation is host envelope parsing and grants no proof authority by itself."
+    },
+    {
+      "id": "representation.topology-restoration",
+      "layer": "representation",
+      "execution": "host",
+      "linkExpressed": false,
+      "hostLinkDuplication": false,
+      "dependsOn": [
+        "representation.storage-topology-image",
+        "resource.memory-instance",
+        "bootstrap.root-anchor",
+        "bootstrap.ensure-pair",
+        "bootstrap.ensure-start-selfclosed",
+        "bootstrap.ensure-end-selfclosed",
+        "bootstrap.link-identity"
+      ],
+      "reason": "restoreTopology reconstructs canonical Links from external coordinates using the ordinary Memory write capabilities."
+    },
+    {
+      "id": "representation.canonical-topology",
+      "layer": "representation",
+      "execution": "host",
+      "linkExpressed": false,
+      "hostLinkDuplication": false,
+      "dependsOn": [
+        "resource.link-enumeration",
+        "resource.link-count",
+        "bootstrap.root-anchor",
+        "bootstrap.pole-read",
+        "bootstrap.link-identity"
+      ],
+      "reason": "Allocation-independent canonical coordinates are computed by host ordering over already-existing Link topology; this is a representation/verification algorithm."
+    },
+    {
+      "id": "derived.theory-support-projection",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "bootstrap.root-anchor",
+        "bootstrap.pole-read",
+        "bootstrap.outgoing-query",
+        "resource.link-enumeration"
+      ],
+      "reason": "Theory identity, selected admissions and their pole-closure are Links; current finite support construction/filtering is host traversal."
+    },
+    {
+      "id": "derived.portable-theory-replay",
+      "layer": "derived-semantic",
+      "execution": "mixed",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "representation.portable-theory-envelope",
+        "representation.topology-restoration",
+        "representation.canonical-topology",
+        "derived.theory-support-projection",
+        "bootstrap.link-identity"
+      ],
+      "reason": "Portable Theory replay reconstructs Links and re-exports canonical topology to reject noncanonical external representations."
+    },
+    {
+      "id": "derived.canonical-link-fingerprint",
+      "layer": "derived-semantic",
+      "execution": "host",
+      "linkExpressed": true,
+      "hostLinkDuplication": true,
+      "dependsOn": [
+        "derived.theory-support-projection",
+        "representation.canonical-topology"
+      ],
+      "reason": "Current exact-Theory equality compares canonical topology plus the selected Link coordinate through host JSON serialization."
     }
   ],
   "implementationBindings": {
@@ -557,51 +675,62 @@
     "./portable-theory.js#verifySelectedTheoryAdmissionAuthority": "derived.exact-theory-admission-authority",
     "./source.js#replaySelectedSourceEvidenceWithReader": "derived.source-selection-replay",
     "./v012-string-anum.js#readV012StringAnum": "representation.v012-string-anum",
-    "./v012-string-anum.js#materializeV012StringAnum": "representation.v012-string-anum"
+    "./v012-string-anum.js#materializeV012StringAnum": "representation.v012-string-anum",
+    "memory#allLinks": "resource.link-enumeration",
+    "./memory.js#Memory": "resource.memory-instance",
+    "./persistence-topology.js#restoreTopology": "representation.topology-restoration",
+    "./canonical-topology.js#exportCanonicalTopology": "representation.canonical-topology",
+    "ts/src/portable-theory.ts#parseArtifact": "representation.portable-theory-envelope",
+    "ts/src/portable-theory.ts#includePoleClosure": "derived.theory-support-projection",
+    "ts/src/portable-theory.ts#projected": "derived.theory-support-projection",
+    "ts/src/portable-theory.ts#replayPortableStructuralTheory": "derived.portable-theory-replay",
+    "ts/src/portable-theory.ts#linkFingerprint": "derived.canonical-link-fingerprint"
   },
   "metrics": {
     "candidateKernelFileCount": 5,
     "publicSemanticEntrypointCount": 8,
-    "declaredCapabilityCount": 31,
+    "declaredCapabilityCount": 39,
     "ontologyCapabilityCount": 3,
-    "semanticBootstrapCapabilityCount": 9,
-    "derivedSemanticCapabilityCount": 15,
-    "representationCapabilityCount": 3,
-    "resourceControlCapabilityCount": 1,
-    "hostOrMixedSemanticCapabilityCount": 24,
-    "linkExpressedSemanticCapabilityCount": 24,
+    "semanticBootstrapCapabilityCount": 8,
+    "derivedSemanticCapabilityCount": 18,
+    "representationCapabilityCount": 7,
+    "resourceControlCapabilityCount": 3,
+    "hostOrMixedSemanticCapabilityCount": 26,
+    "linkExpressedSemanticCapabilityCount": 26,
     "linkExecutedSemanticCapabilityCount": 0,
-    "hostLinkSemanticDuplicationCount": 24,
+    "hostLinkSemanticDuplicationCount": 26,
     "confirmedIndependentPrimitiveCount": 0,
-    "unknownPrimitiveStatusCount": 9,
+    "unknownPrimitiveStatusCount": 8,
     "directUndocumentedDependencyCount": 0,
     "objectSpecificHostSemanticShortcutCount": 0,
     "globalUndocumentedSemanticPathCount": null,
     "coarseInheritedAuthorityAggregateCount": 0,
-    "unresolvedNestedBootstrapBoundaryCount": 1
+    "unresolvedNestedBootstrapBoundaryCount": 0,
+    "unresolvedRepresentationBoundaryCount": 1
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
     "linkExecutedSemanticCapabilityCount": "P1 counts a capability as Link-executed only if the execution mechanism itself is Link-defined. Link-grounded authority with host execution is counted as mixed, not self-hosted.",
     "hostLinkSemanticDuplicationCount": "Counts semantic capabilities whose meaning/evidence is expressed through Links while an equally relevant host execution mechanism still implements the operation in this P1 model.",
     "directUndocumentedDependencyCount": "Exact static count only for direct dependencies observed in the five candidate-kernel files.",
-    "globalUndocumentedSemanticPathCount": "Unknown until the inherited accepted v0.12 authority runtime and all public semantic paths are unfolded.",
+    "globalUndocumentedSemanticPathCount": "Unknown until the lower STRING/anum representation chain and an independent package-wide semantic entrypoint/write-path audit are complete.",
     "objectSpecificHostSemanticShortcutCount": "Counts exact multi-abit physical-term literals that directly participate in host control flow in the candidate kernel. It intentionally does not count structural self-incidence labels stored as data.",
     "coarseInheritedAuthorityAggregateCount": "P1b requires the previous accepted-v0.12 authority aggregate to disappear in favor of explicit service-level capabilities.",
-    "unresolvedNestedBootstrapBoundaryCount": "Counts semantic-bootstrap boundaries intentionally left aggregated after P1b; currently only exact-Theory artifact/canonical-topology replay.",
-    "modelRevision": "Capability counts before and after P1b are not runtime deltas because the measurement resolution changed."
+    "unresolvedNestedBootstrapBoundaryCount": "P1c removes the last intentionally aggregated semantic-bootstrap boundary from the selected-admission authority chain.",
+    "modelRevision": "P1c changes measurement resolution; compare semantic capability identities, not raw counts, across P1/P1b/P1c.",
+    "unresolvedRepresentationBoundaryCount": "One lower representation aggregate remains: accepted v0.12 STRING/anum helpers below representation.v012-string-anum."
   },
   "nextExperiments": [
-    "Unfold bootstrap.accepted-v012-authority-runtime into Dictionary, source, Theory, StructuralRule and context dependencies.",
-    "Add an independent audit of semantic-write and interpretation entrypoints beyond the five v0.13 candidate-kernel files.",
+    "Unfold representation.v012-string-anum through byte-carrier, quaternary-anum, quaternary-state and raw anum parsing/execution while keeping representation separate from semantic bootstrap.",
+    "Add an independent audit of semantic-write and interpretation entrypoints beyond the currently enumerated v0.13/source-authority paths.",
     "Run per-bootstrap-capability elimination experiments and classify INDEPENDENT/DERIVABLE/EQUIVALENT_REENCODING/IMPLEMENTATION_ONLY/UNKNOWN.",
-    "Add an MTS-native self-interpretation witness and report residual host dependencies.",
-    "Build a v0.12 -> v0.13 delta using the same stable capability IDs."
+    "Add the A10b MTS-native read-only self-interpretation witness and report residual host dependencies.",
+    "Build a v0.12 -> v0.13 trust-surface delta only after stable capability IDs and global-path coverage exist."
   ],
   "measurement": {
-    "modelRevision": "A9-P1b-service-unfolding",
+    "modelRevision": "A9-P1c-exact-theory-unfolding",
     "metricDeltaComparableToPreviousRevision": false,
-    "reason": "P1b splits one coarse inherited authority aggregate into stable service-level capability IDs; count changes measure model resolution, not runtime growth."
+    "reason": "P1c removes one aggregate exact-Theory bootstrap capability and replaces it with explicit derived, representation and resource capabilities; count deltas reflect model resolution, not runtime growth."
   },
   "authorityServiceUnfolding": {
     "replacedCapability": "bootstrap.accepted-v012-authority-runtime",
@@ -623,5 +752,34 @@
       "bootstrap.exact-theory-artifact-runtime"
     ],
     "note": "P1b unfolds semantic services used by v0.13 source/Rule authority. It does not yet claim a complete static call closure through canonical-topology/persistence or representation helpers."
+  },
+  "exactTheoryUnfolding": {
+    "replacedCapability": "bootstrap.exact-theory-artifact-runtime",
+    "selectedAdmissionRoot": "ts/src/portable-theory.ts#verifySelectedTheoryAdmissionAuthority",
+    "derivedCapabilities": [
+      "derived.theory-support-projection",
+      "derived.portable-theory-replay",
+      "derived.canonical-link-fingerprint",
+      "derived.exact-theory-admission-authority"
+    ],
+    "representationCapabilities": [
+      "representation.portable-theory-envelope",
+      "representation.storage-topology-image",
+      "representation.topology-restoration",
+      "representation.canonical-topology"
+    ],
+    "resourceCapabilities": [
+      "resource.memory-instance",
+      "resource.link-enumeration"
+    ],
+    "excludedPortableCapabilities": [
+      "computePortableStructuralTheoryRevision",
+      "replayPortableStructuralProof",
+      "replayPortableProofSubAnetProjection"
+    ],
+    "remainingTransitiveBoundary": [
+      "representation.v012-string-anum"
+    ],
+    "note": "P1c closes the selected-admission exact-Theory chain only. The lower accepted v0.12 STRING/anum representation remains aggregated and prevents full inherited/global closure claims."
   }
 }

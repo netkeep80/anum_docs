@@ -28,7 +28,7 @@ const projectionPath = "traceability/mts-v0.13-semantic-dependency-projection.js
 const projection = readJson(projectionPath);
 const contract = readJson("contracts/mts-contract-v0.13.json");
 
-same(projection.schema, "mts-semantic-dependency-projection/v0.2", "projection schema");
+same(projection.schema, "mts-semantic-dependency-projection/v0.3", "projection schema");
 same(projection.mtsVersion, "0.13", "projection MTS version");
 same(projection.status, "research", "projection remains research evidence");
 same(projection.externalAuditProjectionOnly, true, "projection is external audit tooling");
@@ -38,7 +38,7 @@ same(projection.executionDependency, false, "MTS execution does not depend on pr
 same(projection.ownerIssue, 1270, "projection is owned by #1270");
 same(
   projection.candidateMain,
-  "103264b0cea9a41e985f160c0b4070052a2753bf",
+  "fa8912c7691d52c9011ad9005620842044b26fb3",
   "projection binds the exact ready candidate snapshot",
 );
 same(projection.coverage.globalTrustBoundaryComplete, false, "P1 does not overclaim global trust closure");
@@ -53,13 +53,23 @@ same(
   "P1b unfolds the inherited source/Dictionary/Theory/StructuralRule authority runtime",
 );
 same(
+  projection.coverage.exactTheorySelectedAdmissionTransitiveImplementationClosureComplete,
+  true,
+  "P1c closes the exact-Theory selected-admission implementation chain",
+);
+same(
   projection.coverage.inheritedAuthorityTransitiveImplementationClosureComplete,
   false,
-  "P1b does not overclaim transitive closure below exact-Theory/string carrier helpers",
+  "STRING/anum representation helpers remain to be unfolded before full inherited closure",
+);
+same(
+  projection.coverage.stringCarrierTransitiveImplementationClosureComplete,
+  false,
+  "P1c does not overclaim lower STRING/anum carrier closure",
 );
 same(
   projection.measurement.modelRevision,
-  "A9-P1b-service-unfolding",
+  "A9-P1c-exact-theory-unfolding",
   "measurement model revision",
 );
 same(
@@ -281,27 +291,39 @@ same(
 );
 same(objectSpecificWireLiteralCount, 0, "no exact multi-abit object special case exists in candidate kernel");
 
-// P1b replaces the coarse inherited-v0.12 authority aggregate with explicit
-// MTS-native service capabilities. The exact-Theory artifact runtime remains a
-// smaller unresolved bootstrap boundary for the next slice.
-assert(
-  !projection.capabilities.some(
-    (capability: any) => capability.id === "bootstrap.accepted-v012-authority-runtime",
-  ),
-  "coarse accepted-v0.12 authority aggregate is removed",
-);
+// P1b/P1c eliminate both coarse inherited authority aggregates. The exact
+// selected-admission path is now represented as explicit derived,
+// representation and resource capabilities; this is still not a claim that the
+// whole package has global trust-boundary closure.
+for (const removed of [
+  "bootstrap.accepted-v012-authority-runtime",
+  "bootstrap.exact-theory-artifact-runtime",
+] as const) {
+  assert(
+    !projection.capabilities.some((capability: any) => capability.id === removed),
+    `coarse bootstrap aggregate is removed: ${removed}`,
+  );
+}
 
 for (const id of [
-  "bootstrap.exact-theory-artifact-runtime",
   "derived.dictionary-visibility",
   "derived.structural-act",
   "derived.structural-template-matching",
   "derived.structural-rule-replay",
   "derived.source-selection-replay",
   "derived.exact-theory-admission-authority",
+  "derived.theory-support-projection",
+  "derived.portable-theory-replay",
+  "derived.canonical-link-fingerprint",
   "representation.v012-string-anum",
+  "representation.portable-theory-envelope",
+  "representation.storage-topology-image",
+  "representation.topology-restoration",
+  "representation.canonical-topology",
+  "resource.memory-instance",
+  "resource.link-enumeration",
 ] as const) {
-  assert(capabilities.has(id), `P1b capability exists: ${id}`);
+  assert(capabilities.has(id), `P1c capability exists: ${id}`);
 }
 
 setEqual(
@@ -319,6 +341,82 @@ setEqual(
   "P1b inherited authority service file inventory",
 );
 
+setEqual(
+  projection.auditScope.exactTheorySelectedAdmissionPath.files,
+  [
+    "ts/src/portable-theory.ts",
+    "ts/src/canonical-topology.ts",
+    "ts/src/persistence-topology.ts",
+    "ts/src/memory.ts",
+  ],
+  "P1c exact-Theory selected-admission file inventory",
+);
+same(
+  projection.auditScope.exactTheorySelectedAdmissionPath.root,
+  "ts/src/portable-theory.ts#verifySelectedTheoryAdmissionAuthority",
+  "P1c exact-Theory selected-admission root",
+);
+setEqual(
+  projection.auditScope.exactTheorySelectedAdmissionPath.excludedFromPath,
+  [
+    "ts/src/portable-theory-digest.ts#computePortableStructuralTheoryRevision",
+    "ts/src/portable-proof-replay.ts#replayPortableStructuralProof",
+    "ts/src/portable-proof-subanet-projection.ts#replayPortableProofSubAnetProjection",
+  ],
+  "unrelated portable revision/proof APIs are excluded from selected-admission trust path",
+);
+
+const portableTheorySource = read("ts/src/portable-theory.ts");
+for (const requiredSymbol of [
+  "verifySelectedTheoryAdmissionAuthority",
+  "replayPortableStructuralTheory",
+  "exportPortableStructuralTheory",
+  "linkFingerprint",
+  "projected",
+  "includePoleClosure",
+  "exportCanonicalTopology",
+  "restoreTopology",
+] as const) {
+  assert(portableTheorySource.includes(requiredSymbol), `selected-admission chain contains ${requiredSymbol}`);
+}
+const selectedAdmissionStart = portableTheorySource.indexOf(
+  "export function verifySelectedTheoryAdmissionAuthority",
+);
+const selectedAdmissionEnd = portableTheorySource.indexOf(
+  "export async function verifyPortableStructuralProofTheoryRevision",
+);
+assert(selectedAdmissionStart >= 0 && selectedAdmissionEnd > selectedAdmissionStart,
+  "selected-admission function boundary is locatable");
+const selectedAdmissionTail = portableTheorySource.slice(selectedAdmissionStart, selectedAdmissionEnd);
+assert(
+  !selectedAdmissionTail.includes("computePortableStructuralTheoryRevision"),
+  "SHA-256 Theory revision is not part of selected-admission path",
+);
+assert(
+  !selectedAdmissionTail.includes("replayPortableStructuralProof("),
+  "portable proof replay is not part of selected-admission path",
+);
+assert(
+  !selectedAdmissionTail.includes("replayPortableProofSubAnetProjection("),
+  "portable proof sub-aset projection is not part of selected-admission path",
+);
+
+for (const [path, requiredFragments] of [
+  ["ts/src/canonical-topology.ts", ["memory.allLinks()", "memory.poles(", "memory.linkCount"]],
+  ["ts/src/persistence-topology.ts", [
+    "new Memory()",
+    "memory.ensureStartSelfClosed(",
+    "memory.ensureEndSelfClosed(",
+    "memory.ensure(",
+    "memory.linkCount",
+  ]],
+] as const) {
+  const source = read(path);
+  for (const fragment of requiredFragments) {
+    assert(source.includes(fragment), `${path}: exact-Theory implementation dependency is visible: ${fragment}`);
+  }
+}
+
 same(
   projection.metrics.coarseInheritedAuthorityAggregateCount,
   0,
@@ -326,8 +424,13 @@ same(
 );
 same(
   projection.metrics.unresolvedNestedBootstrapBoundaryCount,
+  0,
+  "selected-admission path has no remaining aggregate semantic-bootstrap boundary",
+);
+same(
+  projection.metrics.unresolvedRepresentationBoundaryCount,
   1,
-  "only exact-Theory artifact runtime remains as an explicit nested unresolved bootstrap boundary",
+  "lower v0.12 STRING/anum representation chain remains intentionally aggregated",
 );
 
 // Recompute all published P1 metrics from stable capability IDs.
