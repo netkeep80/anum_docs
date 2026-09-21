@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.13/v0.12 functional parity: ${message}`);
@@ -9,7 +9,7 @@ function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: values differ`);
 }
 
-const repoRoot = join(import.meta.dirname, "..", "..");
+const repoRoot = resolve(process.cwd(), "..");
 const contract12 = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-contract-v0.12.json"), "utf8"),
 );
