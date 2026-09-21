@@ -1,0 +1,6 @@
+# anum-format: quaternary
+# conformance: hierarchical-two-memory
+# canonical: true
+# witness: two consecutive bracketed byte groups keep distinct in-band boundaries
+
+[01001101][01010100]

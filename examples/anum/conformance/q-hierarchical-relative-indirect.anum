@@ -1,0 +1,6 @@
+# anum-format: quaternary
+# conformance: hierarchical-two-memory
+# canonical: true
+# witness: relative right operand carries one extra R[ indirection level
+
+01[[10]]

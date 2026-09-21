@@ -1,0 +1,858 @@
+{
+  "schema": "mts-conformance/v0.13",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 1270,
+  "candidateLifecycleIssue": 1270,
+  "contract": "mts-contract/v0.13",
+  "semanticBase": "mts-conformance/v0.12",
+  "observableSemanticDelta": true,
+  "acceptanceReady": true,
+  "coverageState": "complete",
+  "coverageStateMeaning": "AC1-AC10 and L1-L13 have executable evidence for their declared scopes; all 16 accepted-v0.12 mandatory kernel gates are explicitly inherited alongside the v0.13 candidate gates; the declared v0.13 candidate kernel and public consumer boundary are GREEN; functional/inherited parity and foundation superiority are complete; the independent readiness audit is GREEN. Explicit author acceptance of the exact ready artifacts remains pending.",
+  "acceptedCurrent": {
+    "contract": "mts-contract/v0.12",
+    "conformance": "mts-conformance/v0.12"
+  },
+  "requiredExecutableGates": [
+    "ts/test/v013-relative-form-quartet.test.ts",
+    "ts/test/v013-form-result-rule-authority.test.ts",
+    "ts/test/v013-relative-pole-context.test.ts",
+    "ts/test/v013-relative-pole-source-authority.test.ts",
+    "ts/test/v013-prefix-result-rule-authority.test.ts",
+    "ts/test/v013-relative-form-two-memory.test.ts",
+    "ts/test/v013-relative-form-materialization-two-memory.test.ts",
+    "ts/test/v013-binary-link-materialization-two-memory.test.ts",
+    "ts/test/v013-hierarchical-link-carrier.test.ts",
+    "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+    "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
+    "ts/test/v013-unknown-whole-two-memory.test.ts",
+    "ts/test/v013-quaternary-canonicality.test.ts",
+    "ts/test/v013-file-wire-conformance.test.ts",
+    "ts/test/v013-formal-quaternary-grounding.test.ts",
+    "ts/test/v013-root-origin-law.test.ts",
+    "ts/test/v013-string-anum-acceptance.test.ts",
+    "ts/test/v013-symmetric-nonroot.test.ts",
+    "ts/test/v013-memory-cycle-boundary.test.ts",
+    "ts/test/v013-cyclic-grounding-boundary.test.ts",
+    "ts/test/v013-link-native-abit-basis.test.ts",
+    "ts/test/v013-root-aspect-formal-composition.test.ts",
+    "ts/test/v013-public-facade.test.ts",
+    "ts/test/research-v012-interpreter-delta-c2.test.ts",
+    "ts/test/v012-string-anum-protocol-c3a.test.ts",
+    "ts/test/v012-formal-square-string-child-c4.test.ts",
+    "ts/test/v012-formal-square-rule-authority.test.ts",
+    "ts/test/v012-q-compatibility-representation-c5.test.ts",
+    "ts/test/v012-formal-context-reading-c6.test.ts",
+    "ts/test/v012-ostensive-self-incidence-matching.test.ts",
+    "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+    "ts/test/v012-string-q-byte-bridge.test.ts",
+    "ts/test/v012-string-utf8-boundary.test.ts",
+    "ts/test/v012-formal-source-result-witness.test.ts",
+    "ts/test/v012-quaternary-root-basis-boundary.test.ts",
+    "ts/test/anum-two-memory-conformance.test.ts",
+    "ts/test/string-anum-two-memory-conformance.test.ts",
+    "ts/test/v012-source-authority.test.ts",
+    "ts/test/v012-public-facade-c7.test.ts"
+  ],
+  "plannedExecutableGates": [],
+  "lawEvidence": {
+    "L1": [
+      "ts/test/v013-memory-cycle-boundary.test.ts",
+      "ts/test/v013-cyclic-grounding-boundary.test.ts",
+      "ts/test/v013-link-native-abit-basis.test.ts"
+    ],
+    "L2": [
+      "ts/test/v013-relative-form-quartet.test.ts",
+      "ts/test/v013-form-result-rule-authority.test.ts",
+      "ts/test/v013-symmetric-nonroot.test.ts"
+    ],
+    "L3": [
+      "ts/test/v013-relative-pole-context.test.ts",
+      "ts/test/v013-relative-pole-source-authority.test.ts",
+      "ts/test/v013-prefix-result-rule-authority.test.ts"
+    ],
+    "L4": [
+      "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+      "ts/test/v013-file-wire-conformance.test.ts",
+      "ts/test/v013-link-native-abit-basis.test.ts"
+    ],
+    "L5": [
+      "ts/test/v013-binary-link-materialization-two-memory.test.ts",
+      "ts/test/v013-quaternary-canonicality.test.ts",
+      "ts/test/v013-link-native-abit-basis.test.ts"
+    ],
+    "L6": [
+      "ts/test/v013-hierarchical-link-carrier.test.ts",
+      "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+      "ts/test/v013-unknown-whole-two-memory.test.ts"
+    ],
+    "L7": [
+      "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
+      "ts/test/v013-unknown-whole-two-memory.test.ts",
+      "ts/test/v013-file-wire-conformance.test.ts"
+    ],
+    "L8": [
+      "ts/test/v013-relative-form-materialization-two-memory.test.ts",
+      "ts/test/v013-binary-link-materialization-two-memory.test.ts",
+      "ts/test/v013-unknown-whole-two-memory.test.ts"
+    ],
+    "L9": [
+      "ts/test/v013-memory-cycle-boundary.test.ts",
+      "ts/test/v013-cyclic-grounding-boundary.test.ts"
+    ],
+    "L10": [
+      "ts/test/v013-root-origin-law.test.ts"
+    ],
+    "L11": [
+      "ts/test/v013-string-anum-acceptance.test.ts"
+    ],
+    "L12": [
+      "ts/test/v013-formal-quaternary-grounding.test.ts",
+      "ts/test/v013-link-native-abit-basis.test.ts",
+      "ts/test/v013-root-aspect-formal-composition.test.ts"
+    ],
+    "L13": [
+      "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+      "ts/test/v013-file-wire-conformance.test.ts"
+    ]
+  },
+  "acceptanceCriteriaEvidence": {
+    "AC1": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-memory-cycle-boundary.test.ts",
+        "ts/test/v013-root-origin-law.test.ts",
+        "ts/test/v013-link-native-abit-basis.test.ts"
+      ]
+    },
+    "AC2": {
+      "status": "green-for-current-tree-carrier-domain",
+      "scope": "all well-founded ROOT-decomposable non-bootstrap Links supported by the current canonical tree carrier; rooted cyclic semantic graphs are outside this carrier scope but are not ontologically rejected",
+      "gates": [
+        "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
+        "ts/test/v013-unknown-whole-two-memory.test.ts",
+        "ts/test/v013-quaternary-canonicality.test.ts",
+        "ts/test/v013-cyclic-grounding-boundary.test.ts"
+      ]
+    },
+    "AC3": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-string-anum-acceptance.test.ts"
+      ]
+    },
+    "AC4": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-formal-quaternary-grounding.test.ts",
+        "ts/test/v013-link-native-abit-basis.test.ts"
+      ]
+    },
+    "AC5": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
+        "ts/test/v013-quaternary-canonicality.test.ts",
+        "ts/test/v013-file-wire-conformance.test.ts",
+        "ts/test/v013-unknown-whole-two-memory.test.ts"
+      ]
+    },
+    "AC6": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-root-origin-law.test.ts",
+        "ts/test/v013-string-anum-acceptance.test.ts"
+      ]
+    },
+    "AC7": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+        "ts/test/v013-file-wire-conformance.test.ts",
+        "ts/test/v013-link-native-abit-basis.test.ts"
+      ]
+    },
+    "AC8": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-hierarchical-link-carrier.test.ts",
+        "ts/test/v013-hierarchical-carrier-two-memory.test.ts"
+      ]
+    },
+    "AC9": {
+      "status": "green",
+      "gates": [
+        "ts/test/v013-hierarchical-link-carrier.test.ts",
+        "ts/test/v013-relative-form-materialization-two-memory.test.ts",
+        "ts/test/v013-binary-link-materialization-two-memory.test.ts",
+        "ts/test/v013-unknown-whole-two-memory.test.ts"
+      ]
+    },
+    "AC10": {
+      "status": "green",
+      "requirement": "one generic FORMAL composer over 8/9/6/1 must reconstruct R/O/C/L as 8/98/68/19868 under exact source/Dictionary/Grammar/fixed-Theory/admitted-Rule authority, with no term-specific host branches",
+      "requiredPositiveVectors": [
+        "v013-formal-root-R-from-8",
+        "v013-formal-root-O-from-98",
+        "v013-formal-root-C-from-68",
+        "v013-formal-root-L-from-19868",
+        "v013-formal-derived-U-from-16898",
+        "v013-formal-generic-unknown-finite-term"
+      ],
+      "requiredNegativeVectors": [
+        "v013-formal-root-wrong-rule-rejected",
+        "v013-formal-root-wrong-theory-rejected",
+        "v013-formal-root-malformed-prefix-rejected",
+        "v013-formal-root-noncanonical-pair-alias-rejected",
+        "v013-formal-root-no-host-term-special-case"
+      ],
+      "gates": [
+        "ts/test/v013-root-aspect-formal-composition.test.ts"
+      ]
+    }
+  },
+  "requiredPositiveVectors": [
+    "v013-root-basis-R-O-C-L-U",
+    "v013-relative-form-quartet-generic-S",
+    "v013-relative-form-result-separation",
+    "v013-relative-start-end-context-navigation",
+    "v013-quaternary-R-8",
+    "v013-quaternary-O-98",
+    "v013-quaternary-C-68",
+    "v013-quaternary-L-19868",
+    "v013-quaternary-U-16898",
+    "v013-nesting-968-vs-698",
+    "v013-complex-pair-1968698",
+    "v013-shared-dag",
+    "v013-ordinary-equal-pole-pair",
+    "v013-unknown-whole-two-memory",
+    "v013-real-file-1968698-two-memory",
+    "v013-string-exact-byte-roundtrip",
+    "v013-root-origin-every-local-anum-context",
+    "v013-formal-grounding-8-9-6-1",
+    "v013-abit-self-incidence-four-class-partition",
+    "v013-abit-link-signs-R-O-C-L",
+    "v013-U-pair-not-fifth-abit",
+    "v013-abit-sign-description-separation",
+    "v013-abit-two-memory-local-handle-independence",
+    "v013-rooted-cycle-remains-ontologically-open",
+    "v013-formal-root-R-from-8",
+    "v013-formal-root-O-from-98",
+    "v013-formal-root-C-from-68",
+    "v013-formal-root-L-from-19868",
+    "v013-formal-derived-U-from-16898",
+    "v013-formal-generic-unknown-finite-term"
+  ],
+  "requiredNegativeVectors": [
+    "v013-flat-relative-glyph-collision-not-canonical",
+    "v013-noncanonical-pair-188-rejected",
+    "v013-noncanonical-pair-1988-rejected",
+    "v013-noncanonical-pair-1868-rejected",
+    "v013-description-does-not-materialize-target",
+    "v013-wrong-structural-rule-writes-zero-target-links",
+    "v013-invalid-physical-opcode-fails-before-representation-writes",
+    "v013-empty-wire-is-not-root",
+    "v013-unrooted-sequence-lookalike-rejected",
+    "v013-unrooted-anum-hierarchy-rejected",
+    "v013-nonroot-both-selfclosed-rejected-by-root-uniqueness",
+    "v013-foreign-abit-handle-rejected",
+    "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence",
+    "v013-formal-root-wrong-rule-rejected",
+    "v013-formal-root-wrong-theory-rejected",
+    "v013-formal-root-malformed-prefix-rejected",
+    "v013-formal-root-noncanonical-pair-alias-rejected",
+    "v013-formal-root-no-host-term-special-case"
+  ],
+  "retainedResearchEvidence": {
+    "nonWellFoundedGraphDescription": {
+      "gate": "ts/test/v013-cyclic-graph-description.test.ts",
+      "productionSemanticLaw": false,
+      "result": "arbitrary finite cyclic graph topology can be represented over the same 1/6/8/9 physical alphabet using representation-local references"
+    },
+    "atomicCyclicMaterializationModel": {
+      "gate": "ts/test/v013-atomic-cyclic-materialization.test.ts",
+      "productionSemanticLaw": false,
+      "result": "test-only reserve/bind/commit model demonstrates a possible graph-store write boundary if a future non-well-founded foundation is adopted"
+    },
+    "combinedSourceExamples": {
+      "gates": [
+        "ts/test/v013-combined-group-source-authority.test.ts",
+        "ts/test/v013-link-two-01-occurrences.test.ts"
+      ],
+      "productionSemanticLaw": true,
+      "requiredGate": false
+    },
+    "historicalTransportGap": {
+      "gate": "ts/test/v013-relative-form-transport-gap.test.ts",
+      "productionSemanticLaw": false,
+      "result": "documents why accepted flat-Q transport was insufficient for the new relative form identities"
+    }
+  },
+  "evidenceState": {
+    "researchAcceptanceCriteria": "green-complete",
+    "semanticLawProjection": "green-complete",
+    "candidateContractBoundary": "defined-r7b",
+    "conformanceObligations": "declared-r7b",
+    "traceability": "green-complete",
+    "normativeDocumentation": "green-complete",
+    "readinessAudit": "green-confirmed",
+    "authorAcceptance": "pending",
+    "linkNativeAbitBasis": "green-complete-a2",
+    "comparativeSuperiority": "pending",
+    "codecEngineeringComparison": "green-research-evidence-a3",
+    "functionalParity": "green-complete-a5c",
+    "foundationSuperiority": "green-complete-a5c",
+    "rootFormalDialect": "green-complete-ac10",
+    "publicFacade": "green-complete-public-consumer-boundary",
+    "candidateKernelImplementation": "green-complete-declared-scope"
+  },
+  "acceptanceBlockers": [
+    "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
+  ],
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.12",
+    "conformance": "mts-conformance/v0.12",
+    "immutable": true
+  },
+  "acceptance": {
+    "performedHere": false,
+    "acceptedMtsVersion": "mts-contract/v0.12",
+    "candidateMtsVersion": "mts-contract/v0.13",
+    "acceptedPointerUnchanged": true
+  },
+  "traceabilityManifest": "traceability/mts-v0.13.json",
+  "documentationEvidence": {
+    "status": "green-repository-check-r7d",
+    "gate": "ts/test/v013-documentation-ownership.test.ts",
+    "ownerDocuments": [
+      "docs/specs/Формальная нотация МТС.md",
+      "docs/specs/Ачисла и сериализация.md",
+      "docs/specs/Апамять и управление сетью связей.md"
+    ],
+    "requiredLawIds": [
+      "L1",
+      "L2",
+      "L3",
+      "L4",
+      "L5",
+      "L6",
+      "L7",
+      "L8",
+      "L9",
+      "L10",
+      "L11",
+      "L12",
+      "L13"
+    ],
+    "exactOneOwnerPerLaw": true
+  },
+  "nonBlockingEngineeringEvidence": {
+    "codecComparison": "ts/test/v013-codec-comparison.test.ts",
+    "includes": [
+      "serializer/deserializer capability comparison",
+      "known-bootstrap compactness",
+      "STRING representation size",
+      "shared-DAG expansion"
+    ],
+    "foundationAcceptanceGate": false
+  },
+  "functionalParityAudit": {
+    "status": "green-complete-a4",
+    "baseline": {
+      "contract": "mts-contract/v0.12",
+      "conformance": "mts-conformance/v0.12",
+      "accepted": true,
+      "requiredSemanticLawCount": 18,
+      "requiredExecutableGateCount": 16
+    },
+    "requiredBaselineExecutableGates": [
+      "ts/test/research-v012-interpreter-delta-c2.test.ts",
+      "ts/test/v012-string-anum-protocol-c3a.test.ts",
+      "ts/test/v012-formal-square-string-child-c4.test.ts",
+      "ts/test/v012-formal-square-rule-authority.test.ts",
+      "ts/test/v012-q-compatibility-representation-c5.test.ts",
+      "ts/test/v012-formal-context-reading-c6.test.ts",
+      "ts/test/v012-ostensive-self-incidence-matching.test.ts",
+      "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+      "ts/test/v012-string-q-byte-bridge.test.ts",
+      "ts/test/v012-string-utf8-boundary.test.ts",
+      "ts/test/v012-formal-source-result-witness.test.ts",
+      "ts/test/v012-quaternary-root-basis-boundary.test.ts",
+      "ts/test/anum-two-memory-conformance.test.ts",
+      "ts/test/string-anum-two-memory-conformance.test.ts",
+      "ts/test/v012-source-authority.test.ts",
+      "ts/test/v012-public-facade-c7.test.ts"
+    ],
+    "baselineGatesRetainedInRepository": true,
+    "baselineGatesPassingIsNecessaryButNotSufficient": true,
+    "classifications": {
+      "PRESERVED": "same essential observable capability remains required",
+      "GENERALIZED": "a more general v0.13 mechanism covers the accepted capability",
+      "REPLACED": "mechanism differs but the accepted observable capability is explicitly preserved",
+      "REVIEW_REQUIRED": "retained runtime exists but v0.13 semantic parity is not yet proven",
+      "REGRESSION": "essential accepted capability is lost or weakened"
+    },
+    "entries": {
+      "interpreterSeparation": {
+        "baselineStatement": "I_STRING, I_FORMAL and I_Q are explicit semantic contexts; host parser/lexer modes have zero semantic authority",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/research-v012-interpreter-delta-c2.test.ts",
+          "ts/test/v012-q-compatibility-representation-c5.test.ts",
+          "ts/test/v012-formal-context-reading-c6.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "Accepted v0.12 interpreterSeparation semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
+      },
+      "stringNestedAnum": {
+        "baselineStatement": "STRING [...] opens I_STRING child from R and returns exactly one Link/value to the STRING parent",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/v012-string-anum-protocol-c3a.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "Accepted v0.12 stringNestedAnum semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
+      },
+      "formalSquareBracketStringChild": {
+        "baselineStatement": "FORMAL [...] opens I_STRING child, not I_Q, and returns exactly one Link/value to FORMAL",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/v012-formal-square-string-child-c4.test.ts",
+          "ts/test/v012-formal-square-rule-authority.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "Accepted v0.12 formalSquareBracketStringChild semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
+      },
+      "quaternaryNestedContext": {
+        "baselineStatement": "Q [...] remains Q-native recursion under I_Q",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/v012-q-compatibility-representation-c5.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "Accepted v0.12 quaternaryNestedContext semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
+      },
+      "stringOneVsQOne": {
+        "baselineStatement": "STRING glyph `1` is UTF-8 character/sign `1`; Q `1` is abit 1",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/research-v012-interpreter-delta-c2.test.ts",
+          "ts/test/v012-q-compatibility-representation-c5.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "Accepted v0.12 stringOneVsQOne semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
+      },
+      "representationNotInterpretation": {
+        "baselineStatement": "STRING -> Q byte carrier does not invoke I_Q interpretation",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L6",
+          "L12"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-hierarchical-link-carrier.test.ts",
+          "ts/test/v013-formal-quaternary-grounding.test.ts"
+        ],
+        "note": "description/representation/physical source remain distinct from semantic target and interpretation authority.",
+        "baselineRuntimeRetained": true
+      },
+      "formalParentheses": {
+        "baselineStatement": "FORMAL (...) is explicit I_FORMAL child execution returning exactly one Link/value; () is invalid",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/v012-formal-context-reading-c6.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "Accepted v0.12 formalParentheses semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
+      },
+      "explicitKContext": {
+        "baselineStatement": "contextual `.` resolves only through explicitly selected structural K evidence",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/v012-formal-context-reading-c6.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "Accepted v0.12 explicitKContext semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
+      },
+      "associationBoundary": {
+        "baselineStatement": "left-associated Link topology, generic flat reading and FORMAL execution remain distinct",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/v012-formal-context-reading-c6.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "Accepted v0.12 associationBoundary semantics remain an explicit higher-level compatibility capability of v0.13; the original mandatory executable evidence is retained and the legacy interpreter layer does not define the v0.13 foundation alphabet."
+      },
+      "exactAnumRooting": {
+        "baselineStatement": "Anum is a Link role; every local Anum begins at R and the exact rooted Anum/question is distinct from its addressed target",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L10"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-root-origin-law.test.ts"
+        ],
+        "note": "v0.13 directly requires every local exact sequence/anum context to originate at R.",
+        "baselineRuntimeRetained": true
+      },
+      "knowledgeStateSeparation": {
+        "baselineStatement": "UNINTERPRETABLE, understood-but-NOT_FOUND and FOUND(X) are semantically distinct read outcomes",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/v013-v012-anum-protocol-parity.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "v0.13 explicitly retains the accepted distinction between structurally UNINTERPRETABLE input, understood-but-NOT_FOUND, and FOUND(X); executable parity exercises all three outcomes."
+      },
+      "resolveMaterializeSeparation": {
+        "baselineStatement": "Resolve is a read-only one-root-cut; exact address materialization and write-authorized target materialization are distinct capabilities",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/v013-v012-anum-protocol-parity.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "v0.13 retains read-only one-root-cut Resolve, exact-address materialization separate from target materialization, and NOT_FOUND without implicit writes."
+      },
+      "targetMaterializationBound": {
+        "baselineStatement": "MATERIALIZE_TARGET removes exactly one leading R hierarchy-wide, preserves remaining indirection and fails closed before target writes on invalid exact evidence",
+        "classification": "PRESERVED",
+        "candidateLaws": [],
+        "candidateEvidence": [
+          "ts/test/v013-v012-anum-protocol-parity.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "v0.13 retains one hierarchy-wide root cut, preserves remaining Anum indirection, and validates exact evidence before target-side writes."
+      },
+      "rootBasisBoundary": {
+        "baselineStatement": "Q and v0.12 STRING/source operations require a structurally valid declared R/O/C/L/U basis with proper O/C relative to R; invalid, collapsed, forged or foreign basis evidence fails closed and write operations perform zero writes",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L1",
+          "L4",
+          "L5",
+          "L12"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-link-native-abit-basis.test.ts",
+          "ts/test/v013-formal-quaternary-grounding.test.ts"
+        ],
+        "note": "rooted basis and Link-native structural signs are explicitly checked, while the accepted v0.12 basis gate remains retained.",
+        "baselineRuntimeRetained": true
+      },
+      "v012StringByteIdentity": {
+        "baselineStatement": "Byte_v012(p) is the exact rooted Anum of bits8(p), not the historical Byte_v09 denotation; grouped byte Anums form the exact STRING Anum",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L11"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-string-anum-acceptance.test.ts"
+        ],
+        "note": "exact byte identity and allocation-independent structural description are required.",
+        "baselineRuntimeRetained": true
+      },
+      "utf8CarrierBoundary": {
+        "baselineStatement": "UTF-8 code-point grouping is a read over exact STRING bytes and does not rewrite STRING carrier topology or grant glyph spelling semantic authority",
+        "classification": "PRESERVED",
+        "candidateLaws": [
+          "L11",
+          "L12"
+        ],
+        "candidateEvidence": [
+          "ts/test/v012-string-utf8-boundary.test.ts",
+          "ts/test/v013-string-anum-acceptance.test.ts",
+          "ts/test/v013-v012-utf8-carrier-parity.test.ts"
+        ],
+        "baselineRuntimeRetained": true,
+        "note": "v0.13 retains exact-byte STRING identity and strict read-only UTF-8 interpretation; malformed exact bytes may be UTF-8-uninterpretable, Unicode normalization does not redefine STRING identity, and glyph spelling grants no structural authority."
+      },
+      "sourceUseAuthority": {
+        "baselineStatement": "exact STRING source is replayed only against an independently selected V012SourceAuthority: exact Dictionary identity plus exact Grammar/Theory membership Links; raw membership shape is not semantic authority",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L8",
+          "L12"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-relative-pole-source-authority.test.ts",
+          "ts/test/v013-formal-quaternary-grounding.test.ts"
+        ],
+        "note": "source/Dictionary/Grammar/fixed-Theory/Rule authority remains explicit and host glyphs have no semantic authority.",
+        "baselineRuntimeRetained": true
+      },
+      "formalResultAuthority": {
+        "baselineStatement": "consumer source-to-result replay requires fixed Theory authority, selected finite Act attachments, matching Dictionary/Grammar/Theory, and equality between the source-selected Use and the selected Rule-role binding; candidate self-admission and late unselected ambient attachments do not gain authority",
+        "classification": "GENERALIZED",
+        "candidateLaws": [
+          "L8"
+        ],
+        "candidateEvidence": [
+          "ts/test/v013-form-result-rule-authority.test.ts",
+          "ts/test/v013-prefix-result-rule-authority.test.ts"
+        ],
+        "note": "semantic result/materialization remains admitted-rule-authorized and fails closed.",
+        "baselineRuntimeRetained": true
+      }
+    },
+    "repositoryGate": "ts/test/v013-v012-functional-parity-lifecycle.test.ts",
+    "resolvedSlices": [
+      {
+        "id": "A4a-anum-address-protocol",
+        "gate": "ts/test/v013-v012-anum-protocol-parity.test.ts",
+        "laws": [
+          "knowledgeStateSeparation",
+          "resolveMaterializeSeparation",
+          "targetMaterializationBound"
+        ],
+        "status": "green"
+      },
+      {
+        "id": "A4b-interpreter-context-layer",
+        "gate": "ts/test/v013-v012-interpreter-context-parity.test.ts",
+        "laws": [
+          "interpreterSeparation",
+          "stringNestedAnum",
+          "formalSquareBracketStringChild",
+          "quaternaryNestedContext",
+          "stringOneVsQOne",
+          "formalParentheses",
+          "explicitKContext",
+          "associationBoundary"
+        ],
+        "status": "green-when-repository-gate-passes"
+      },
+      {
+        "id": "A4c-utf8-carrier-boundary",
+        "gate": "ts/test/v013-v012-utf8-carrier-parity.test.ts",
+        "laws": [
+          "utf8CarrierBoundary"
+        ],
+        "status": "green-when-repository-gate-passes"
+      }
+    ],
+    "retainedCompatibilityGates": [
+      "ts/test/research-v012-interpreter-delta-c2.test.ts",
+      "ts/test/v012-q-compatibility-representation-c5.test.ts",
+      "ts/test/v012-formal-context-reading-c6.test.ts",
+      "ts/test/v012-string-anum-protocol-c3a.test.ts",
+      "ts/test/v012-formal-square-string-child-c4.test.ts",
+      "ts/test/v012-formal-square-rule-authority.test.ts"
+    ],
+    "completedLawCount": 18,
+    "reviewRequiredCount": 0,
+    "regressionCount": 0,
+    "semanticDeltaLawParityComplete": true,
+    "inheritedFoundationParityComplete": true
+  },
+  "foundationSuperiorityAudit": {
+    "status": "green-complete-a5c",
+    "criteria": {
+      "necessity": {
+        "status": "green",
+        "evidence": [
+          "ts/test/v013-aspect-foundation-theorem.test.ts",
+          "ts/test/v013-link-native-abit-basis.test.ts",
+          "ts/test/v013-inherited-foundation-delta.test.ts"
+        ],
+        "finding": "all four self-incidence cases are realized and distinct as local reconstruction aspects"
+      },
+      "sufficiency": {
+        "status": "green-for-foundation-aspect-classification",
+        "evidence": [
+          "ts/test/v013-aspect-foundation-theorem.test.ts",
+          "ts/test/v013-cyclic-grounding-boundary.test.ts",
+          "ts/test/v013-inherited-foundation-delta.test.ts"
+        ],
+        "finding": "ROOT/START/END/PAIR exhaust local Link self-incidence, including Links appearing inside rooted cyclic graphs; current tree transport remains intentionally partial for graph cycles"
+      },
+      "derivability": {
+        "status": "green",
+        "evidence": [
+          "ts/test/v013-link-native-abit-basis.test.ts",
+          "ts/test/v013-inherited-foundation-delta.test.ts"
+        ],
+        "finding": "R/O/C/L aspect signs are derived from rooted Link structure rather than an unrelated symbol dictionary"
+      },
+      "closure": {
+        "status": "green",
+        "evidence": [
+          "ts/test/v013-link-native-abit-basis.test.ts",
+          "ts/test/v013-hierarchical-link-carrier.test.ts",
+          "ts/test/v013-inherited-foundation-delta.test.ts"
+        ],
+        "finding": "aspect signs and representations remain Links; no second ontology entity is introduced"
+      },
+      "unambiguity": {
+        "status": "green",
+        "evidence": [
+          "ts/test/v013-aspect-foundation-theorem.test.ts",
+          "ts/test/v013-quaternary-canonicality.test.ts"
+        ],
+        "finding": "one Link has exactly one local self-incidence aspect under the unique-root law; collapsing PAIR aliases are noncanonical"
+      },
+      "hostAuthorityBoundary": {
+        "status": "green",
+        "evidence": [
+          "ts/test/v013-aspect-foundation-theorem.test.ts",
+          "ts/test/v013-formal-quaternary-grounding.test.ts",
+          "ts/test/v013-codec-comparison.test.ts"
+        ],
+        "finding": "aspect classification requires only rooted basis, poles and Link identity equality; parser/AST/sender ID/ambient current are not authority"
+      }
+    },
+    "comparativeFinding": {
+      "status": "green",
+      "statement": "accepted A5 uses [ ] 1 0 / O-C-L-U as a foundation Q alphabet, which maps to START/END/PAIR/PAIR rather than the four self-incidence classes; candidate v0.13 replaces only that foundation role with R-O-C-L = ROOT/START/END/PAIR while retaining legacy Q as a compatibility layer",
+      "compactnessClaim": false
+    },
+    "minimalDelta": {
+      "status": "green",
+      "semanticReplacementCount": 1,
+      "replacedClause": "A5 foundation alphabet role",
+      "additiveOnlyExtensionSufficient": false,
+      "reason": "an additive second aspect alphabet would leave the old A5 alphabet as an independent foundation primitive and therefore would not achieve the claimed reduction"
+    },
+    "remainingBeforeComplete": []
+  },
+  "inheritedFoundationParity": {
+    "status": "green-complete",
+    "baselineDocument": "docs/theory/Система аксиом МТС.md",
+    "requiredScope": "A0-A20 and F2-F6 inherited by semanticBase mts-contract/v0.12",
+    "repositoryGate": "ts/test/v013-inherited-foundation-delta.test.ts",
+    "semanticReplacementCount": 1,
+    "replacedClause": "A5",
+    "clarificationOnly": [
+      "A1",
+      "A18",
+      "F2/F3"
+    ],
+    "regressionCount": 0,
+    "unresolvedCount": 0,
+    "note": "All inherited clauses are explicitly mapped. Only the A5 foundation-alphabet role is replaced; the five-Link basis and legacy Q functionality are retained."
+  },
+  "nonBlockingComparativeResearch": {
+    "formalLogicDialectA6": {
+      "status": "baseline-recorded",
+      "acceptanceBlocker": false,
+      "promotionRequiresExplicitAuthorDecision": true,
+      "commonStages": {
+        "B0": "exact source bytes exist as STRING/anum",
+        "B1": "source is replayed under exact Dictionary + Grammar + fixed Theory",
+        "B2": "FORMAL source declares or structurally identifies a Theory",
+        "B3": "FORMAL source presents MTS axioms as judgments/claims",
+        "B4": "FORMAL source presents a reusable inference rule",
+        "B5": "the selected Theory explicitly admits that rule",
+        "B6": "source/evidence builds a proof occurrence/derivation",
+        "B7": "read-only replay validates a nontrivial theorem/result",
+        "B8": "forged rule, wrong Theory, host rule name and missing premise fail closed",
+        "B9": "same source/theory/proof reconstructs and replays in an independent Memory without sender-local IDs",
+        "B10": "complete A0-A20/F2-F6 axiom system is encoded through the dialect rather than host constants"
+      },
+      "currentBaseline": {
+        "v012": {
+          "foundationInternalSigns": 11,
+          "foundationQAlphabetCount": 4,
+          "semanticInterpreterKinds": 3,
+          "stages": {
+            "B0": "GREEN",
+            "B1": "GREEN",
+            "B2": "PARTIAL_BACKEND_ONLY",
+            "B3": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+            "B4": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+            "B5": "GREEN_BACKEND_ONLY",
+            "B6": "GREEN_BACKEND_ONLY",
+            "B7": "GREEN_BACKEND_ONLY",
+            "B8": "GREEN_BACKEND_ONLY",
+            "B9": "PARTIAL_BACKEND_ONLY",
+            "B10": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE"
+          },
+          "proofBackend": {
+            "theoryRuleAdmission": true,
+            "assumptions": true,
+            "derivations": true,
+            "theoremReuse": true,
+            "readOnlyReplay": true,
+            "derivedModusPonens": true,
+            "theoremSpecificKernelRequiredForExistingDerivedLogic": false
+          }
+        },
+        "v013": {
+          "foundationAspectAlphabetCount": 4,
+          "foundationAspectAlphabetDerivedFromLink": true,
+          "retainedFormalInternalSigns": 11,
+          "semanticInterpreterKinds": 3,
+          "stages": {
+            "B0": "GREEN_RETAINED",
+            "B1": "GREEN_RETAINED",
+            "B2": "PARTIAL_BACKEND_ONLY_RETAINED",
+            "B3": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+            "B4": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+            "B5": "GREEN_BACKEND_ONLY_RETAINED",
+            "B6": "GREEN_BACKEND_ONLY_RETAINED",
+            "B7": "GREEN_BACKEND_ONLY_RETAINED",
+            "B8": "GREEN_BACKEND_ONLY_RETAINED",
+            "B9": "PARTIAL_BACKEND_ONLY_RETAINED",
+            "B10": "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE"
+          },
+          "proofBackendRelation": "same accepted structural proof backend retained; no A6 dialect advantage claimed yet"
+        }
+      },
+      "comparisonRule": {
+        "powerAxes": [
+          "source-stage coverage B0-B10",
+          "axiom coverage",
+          "generic reusable rule coverage",
+          "assumption/derivation/theorem capability",
+          "independent-Memory portability",
+          "Link-ontology closure",
+          "negative authority coverage"
+        ],
+        "simplicityAxes": [
+          "independent semantic primitives",
+          "surface signs",
+          "semantic interpreter kinds",
+          "theorem-specific kernel branches",
+          "host semantic authority branches",
+          "structural role count",
+          "trusted semantic code surface",
+          "source and Link materialization cost as secondary metrics"
+        ],
+        "aggregateScoreForbidden": true,
+        "fairness": "compare the best honest implementation of the same dialect task on frozen v0.12 foundation versus candidate v0.13 foundation"
+      }
+    }
+  },
+  "candidateKernelImplementation": {
+    "status": "green-complete",
+    "publicFacadeGate": "ts/test/v013-public-facade.test.ts",
+    "publicFacadeMerge": "d5df98791973711d054cdcf5dc3f9c25c0a8f4ae",
+    "acceptedRuntimeRemains": "mts-contract/v0.12",
+    "candidateRuntimeSelectable": false,
+    "readinessAuditComplete": true,
+    "explicitAuthorAcceptanceRecorded": false,
+    "lifecycleCheck": "ts/test/v013-kernel-public-lifecycle.test.ts"
+  },
+  "readinessAudit": {
+    "issue": 1335,
+    "gate": "ts/test/v013-readiness-audit.test.ts",
+    "status": "green-confirmed",
+    "requiredForAcceptance": true,
+    "acceptedRuntimeRemains": "mts-contract/v0.12",
+    "candidateRuntimeSelectable": false,
+    "explicitAuthorAcceptanceRecorded": false,
+    "requiredExecutableGateCount": 39,
+    "inheritedAcceptedV012GateCount": 16,
+    "inheritedAcceptedV012GatesProjected": true
+  }
+}

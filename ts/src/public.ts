@@ -32,6 +32,110 @@ export type {
   StreamErrorCode,
 } from "./anum.js";
 
+// v0.12 C7 exposes the stable carrier/read/replay boundary only. Producer-side
+// authority construction (dictionary mutation, Rule admission, Act builders)
+// remains internal so the public verifier cannot accidentally become authority.
+export {
+  QuaternaryAnumError,
+  materializeQuaternaryAnum,
+  materializeQuaternaryAnumTarget,
+  resolveQuaternaryAnum,
+  serializeMaterializedQuaternaryAnum,
+} from "./quaternary-anum.js";
+export type {
+  MaterializedQuaternaryAnum,
+  QuaternaryAnumErrorCode,
+  QuaternaryAnumHierarchy,
+  QuaternaryAnumItem,
+} from "./quaternary-anum.js";
+
+export {
+  V012StringAnumError,
+  materializeV012StringAnum,
+  materializeV012StringByteAnum,
+  readV012StringAnum,
+  readV012StringByteAnum,
+  serializeV012StringAnum,
+} from "./v012-string-anum.js";
+export type {
+  ReadV012StringAnum,
+  V012StringAnumErrorCode,
+} from "./v012-string-anum.js";
+
+export {
+  SourceError,
+} from "./source.js";
+export type {
+  SourceErrorCode,
+  SourceFrontEndEvidence,
+} from "./source.js";
+
+export {
+  V012SourceResultError,
+  materializeV012SourceContent,
+  readV012SourceContent,
+  replayV012SelectedSourceEvidence,
+  replayV012SourceResultEvidence,
+} from "./v012-source.js";
+export type {
+  V012SourceAuthority,
+  V012SourceContent,
+  V012SourceResultErrorCode,
+  V012SourceResultEvidence,
+  V012SourceResultReplayResult,
+} from "./v012-source.js";
+
+
+//
+// MTS v0.13 candidate consumer boundary.
+//
+// These exports expose already-proven representation/read operations and
+// semantic write/evaluation operations that consume explicit source/Rule/Theory
+// evidence. Authority construction remains internal: the public facade does not
+// export Dictionary mutation, Rule admission, Act builders, or low-level
+// relative-position context builders.
+//
+export {
+  V013HierarchicalCarrierError,
+  decomposeV013SemanticLink,
+  materializeV013HierarchicalCarrier,
+  materializeV013HierarchicalCarrierFromSemanticLink,
+  serializeV013HierarchicalCarrier,
+} from "./v013-hierarchical-carrier.js";
+export type {
+  V013HierarchicalCarrierErrorCode,
+  V013SelfIncidence,
+  V013SemanticDecomposition,
+  V013StructuralAspect,
+} from "./v013-hierarchical-carrier.js";
+
+export {
+  V013RelativeFormMaterializationError,
+  materializeAuthorizedBinaryLinkSource,
+  materializeAuthorizedRelativeUnaryFormSource,
+} from "./v013-relative-form-materialization.js";
+export type {
+  V013RelativeFormMaterializationErrorCode,
+} from "./v013-relative-form-materialization.js";
+
+export {
+  V013RelativePoleExecutionError,
+  executeAuthorizedRelativePoleSource,
+} from "./v013-relative-pole-execution.js";
+export type {
+  V013RelativePoleExecutionErrorCode,
+  V013RelativePoleExecutionResult,
+} from "./v013-relative-pole-execution.js";
+
+export {
+  V013FormalAspectEvaluationError,
+  evaluateV013FormalAspectProgram,
+} from "./v013-formal-aspect-evaluator.js";
+export type {
+  V013FormalAspectEvaluationErrorCode,
+  V013FormalAspectProgramEvidence,
+} from "./v013-formal-aspect-evaluator.js";
+
 export {
   PersistentStore,
   PersistentStoreError,
@@ -356,8 +460,16 @@ export {
 export type {
   StructuralHeterogeneousDerivedOpenRootedExpansionErrorCode,
 } from "./derived-derivation-heterogeneous-expansion.js";
+export {
+  StructuralRuleError,
+  replayStructuralRule,
+} from "./structural-rule.js";
 export type {
+  StructuralInterpreter,
   StructuralRoleBinding,
+  StructuralRuleErrorCode,
+  StructuralRuleReplayEvidence,
+  StructuralRuleReplayResult,
 } from "./structural-rule.js";
 
 export {

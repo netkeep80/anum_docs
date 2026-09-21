@@ -10,6 +10,7 @@ import {
 } from "./exact-sequence.js";
 import {
   ensureRootBasis,
+  verifyRootBasis,
   type LinkHandle,
   type ReadMemory,
   type RootBasis,
@@ -37,6 +38,12 @@ export interface SourceContent {
   readonly bytes: Uint8Array;
   readonly prefixes: readonly LinkHandle[];
 }
+
+export type SourceContentReader = (
+  memory: ReadMemory,
+  basis: RootBasis,
+  content: LinkHandle,
+) => SourceContent;
 
 export interface SelectedSegmentSpec {
   readonly start: number;
@@ -85,41 +92,6 @@ export class SourceError extends Error {
 
   constructor(readonly code: SourceErrorCode) {
     super(code);
-  }
-}
-
-/**
- * RootBasis is evidence, not host authority: replay verifies every defining
- * equation through poles() and never needs a 256-entry injected byte table,
- * find(), incoming(), outgoing() or materialization.
- */
-function verifyRootBasis(
-  memory: ReadMemory,
-  basis: RootBasis,
-): RootBasis {
-  try {
-    const { R, O, C, L, U } = basis;
-    if (R !== memory.root) {
-      throw new SourceError("invalid-source-content");
-    }
-    const root = memory.poles(R);
-    const open = memory.poles(O);
-    const close = memory.poles(C);
-    const one = memory.poles(L);
-    const zero = memory.poles(U);
-    if (
-      root.start !== R || root.end !== R ||
-      open.start !== O || open.end !== R ||
-      close.start !== R || close.end !== C ||
-      one.start !== O || one.end !== C ||
-      zero.start !== C || zero.end !== O
-    ) {
-      throw new SourceError("invalid-source-content");
-    }
-    return basis;
-  } catch (error) {
-    if (error instanceof SourceError) throw error;
-    throw new SourceError("invalid-source-content");
   }
 }
 
@@ -363,16 +335,17 @@ function verifyMembership(
   }
 }
 
-export function replaySelectedSourceEvidence(
+export function replaySelectedSourceEvidenceWithReader(
   memory: ReadMemory,
   evidence: SourceFrontEndEvidence,
+  readContent: SourceContentReader,
 ): readonly LinkHandle[] {
   const before = memory.linkCount;
   const content = readSourceForm(memory, evidence.source);
   if (content !== evidence.content) {
     throw new SourceError("invalid-source-evidence");
   }
-  const sourceContent = readSourceContent(memory, evidence.basis, evidence.content);
+  const sourceContent = readContent(memory, evidence.basis, evidence.content);
   validatePartition(sourceContent.bytes.length, evidence.segments);
 
   const forms: LinkHandle[] = [];
@@ -384,7 +357,7 @@ export function replaySelectedSourceEvidence(
       throw new SourceError("invalid-source-evidence");
     }
 
-    const slice = readSourceContent(memory, evidence.basis, segment.sliceContent);
+    const slice = readContent(memory, evidence.basis, segment.sliceContent);
     if (!sameBytes(slice.bytes, sourceContent.bytes.slice(segment.start, segment.end))) {
       throw new SourceError("invalid-source-evidence");
     }
@@ -456,6 +429,17 @@ export function replaySelectedSourceEvidence(
     throw new SourceError("invalid-source-evidence");
   }
   return Object.freeze(forms);
+}
+
+export function replaySelectedSourceEvidence(
+  memory: ReadMemory,
+  evidence: SourceFrontEndEvidence,
+): readonly LinkHandle[] {
+  return replaySelectedSourceEvidenceWithReader(
+    memory,
+    evidence,
+    readSourceContent,
+  );
 }
 
 export function replaySourceSubselection(

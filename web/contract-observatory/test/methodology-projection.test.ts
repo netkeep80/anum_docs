@@ -36,22 +36,26 @@ const index = buildContractObservatoryIndex(repositoryRoot);
 const projection: MethodologyProjection = buildMethodologyProjection(repositoryRoot, index);
 
 same(projection.schema, "mts-contract-methodology-projection/v0.1", "projection schema");
-same(projection.versions.length, 3, "current, previous and candidate pairs are projected exactly once");
-same(
-  projection.versions.map((version) => version.contractId).join(","),
-  "mts-contract/v0.10,mts-contract/v0.11,mts-contract/v0.12",
-  "projection preserves V3 deterministic version order",
-);
+assert(projection.versions.length >= 2, "projection contains at least current and previous accepted pairs");
+const projectionV011 = projection.versions.findIndex((version) => version.contractId === "mts-contract/v0.11");
+const projectionV012 = projection.versions.findIndex((version) => version.contractId === "mts-contract/v0.12");
+assert(projectionV011 >= 0 && projectionV012 > projectionV011, "projection preserves accepted v0.11/v0.12 deterministic order");
+for (const candidate of projection.versions.filter((version) => !version.isCurrent && !version.isPrevious)) {
+  same(candidate.accepted, false, `${candidate.contractId}: extra projected version remains nonaccepted`);
+  assert(candidate.lifecycle.some((entry) => entry.stage === "candidate"), `${candidate.contractId}: candidate lifecycle is explicit`);
+  same(candidate.acceptanceReferences.length, 0, `${candidate.contractId}: candidate has no acceptance authority`);
+}
 
 const current = projection.versions.find((version) => version.isCurrent);
-const candidate = projection.versions.find((version) => version.contractId === "mts-contract/v0.12");
+const previous = projection.versions.find((version) => version.isPrevious);
 assert(current !== undefined, "current contract version exists");
-assert(candidate !== undefined, "candidate contract version exists");
-same(current.contractId, "mts-contract/v0.11", "current comes from V3 evidence, not file recency");
+assert(previous !== undefined, "previous contract version exists");
+same(current.contractId, "mts-contract/v0.12", "current comes from accepted V3 evidence");
+same(previous.contractId, "mts-contract/v0.11", "previous comes from accepted V3 evidence");
 same(current.accepted, true, "explicit accepted state preserved");
 assert(current.positiveVectors.length > 0, "positive conformance vectors are first-class");
 assert(current.negativeVectors.length > 0, "negative/veto vectors are first-class");
-assert(current.executableGates.length > 0, "challenge/gate evidence is first-class");
+same(current.executableGates.length, 16, "accepted v0.12 projects all mandatory executable gates");
 assert(current.acceptanceReferences.length > 0, "explicit acceptance evidence is represented");
 assert(
   current.negativeVectors.every((vector) => vector.polarity === "negative"),
@@ -69,18 +73,11 @@ assert(
 );
 assert(current.lifecycle.some((entry) => entry.stage === "accepted"), "explicit accepted flag supports accepted stage");
 assert(current.lifecycle.some((entry) => entry.stage === "released"), "exact acceptance pointer supports released stage");
-
-same(candidate.status, "candidate", "real v0.12 status remains candidate");
-same(candidate.accepted, false, "real v0.12 candidate is not accepted");
-same(candidate.acceptanceReady, false, "real v0.12 candidate is not acceptance-ready");
-same(candidate.isCurrent, false, "real v0.12 candidate is not current");
-same(candidate.isPrevious, false, "real v0.12 candidate is not previous");
-same(candidate.acceptanceReferences.length, 0, "candidate has no acceptance authority");
-assert(candidate.lifecycle.some((entry) => entry.stage === "candidate"), "candidate lifecycle is explicit");
-assert(!candidate.lifecycle.some((entry) => entry.stage === "accepted"), "candidate is not inferred accepted");
-assert(!candidate.lifecycle.some((entry) => entry.stage === "released"), "candidate is not inferred released");
-assert(candidate.negativeVectors.length > 0, "candidate veto corpus is projected as first-class evidence");
-same(candidate.executableGates.length, 6, "v0.12 candidate projects C2-C6 gates plus merged ostensive self-incidence kernel evidence");
+same(previous.accepted, true, "previous v0.11 remains accepted evidence");
+same(current.traceabilityManifestPath, "traceability/mts-v0.12.json", "current v0.12 keeps its traceability manifest");
+same(previous.traceabilityManifestPath, "traceability/mts-v0.11.json", "previous v0.11 keeps immutable traceability provenance");
+assert(current.semanticInvariants.length > 0, "current v0.12 semantic invariants remain projectable");
+assert(previous.semanticInvariants.length > 0, "previous v0.11 semantic invariants remain projectable after current acceptance rotates");
 
 const serialized = serializeMethodologyProjection(projection);
 same(
@@ -106,6 +103,63 @@ withSyntheticRepository(({ repoRoot, syntheticIndex }) => {
   assert(version.unresolvedRelations.includes("acceptance-reference"), "candidate missing acceptance remains unresolved");
 });
 
+withSyntheticRepository(({ repoRoot, syntheticIndex, writeContract, writeConformance, writeTraceability }) => {
+  writeContract({
+    requiredSemanticLaws: { law: "synthetic candidate law" },
+  });
+  writeConformance({
+    requiredAlphaVectors: ["candidate-positive"],
+    requiredExecutableGates: ["ts/test/candidate-traceability.test.ts"],
+  });
+  writeTraceability({
+    schema: "mts-traceability/v0.2",
+    contract: "contracts/mts-contract-v9.1.json",
+    conformance: "contracts/mts-conformance-v9.1.json",
+    invariants: {
+      law: {
+        contractPointer: "/requiredSemanticLaws/law",
+        positive: {
+          requiredAlphaVectors: ["candidate-positive"],
+        },
+        negative: { requiredNegativeVectors: [] },
+        requiredExecutableGates: ["ts/test/candidate-traceability.test.ts"],
+      },
+    },
+  });
+  const version = buildMethodologyProjection(repoRoot, syntheticIndex()).versions[0]!;
+  same(version.traceabilityManifestPath, "traceability/synthetic.json", "candidate traceability manifest is selected");
+  same(version.semanticInvariants.length, 1, "candidate traceability projects semantic invariants without acceptance");
+  same(version.acceptanceReferences.length, 0, "candidate traceability creates no acceptance authority");
+  assert(version.lifecycle.some((entry) => entry.stage === "candidate"), "candidate traceability preserves candidate lifecycle");
+  assert(!version.lifecycle.some((entry) => entry.stage === "accepted"), "candidate traceability does not infer acceptance");
+  assert(!version.lifecycle.some((entry) => entry.stage === "released"), "candidate traceability does not infer release");
+});
+
+withSyntheticRepository(({ repoRoot, syntheticIndex, writeContract, writeTraceability }) => {
+  writeContract({
+    requiredSemanticLaws: { law: "synthetic candidate law" },
+  });
+  writeTraceability({
+    schema: "mts-traceability/v0.2",
+    contract: "contracts/mts-contract-v9.1.json",
+    conformance: "contracts/mts-conformance-v9.1.json",
+    acceptance: "cutover/acceptance.json",
+    invariants: {
+      law: {
+        contractPointer: "/requiredSemanticLaws/law",
+        positive: {},
+        negative: { requiredNegativeVectors: [] },
+        requiredExecutableGates: [],
+      },
+    },
+  });
+  throws(
+    () => buildMethodologyProjection(repoRoot, syntheticIndex()),
+    /candidate traceability must not claim acceptance/,
+    "candidate traceability cannot manufacture acceptance authority",
+  );
+});
+
 withSyntheticRepository(({ repoRoot, syntheticIndex, writeAcceptance }) => {
   writeAcceptance({});
   const acceptedWithoutPointer = buildMethodologyProjection(repoRoot, syntheticIndex({
@@ -119,6 +173,42 @@ withSyntheticRepository(({ repoRoot, syntheticIndex, writeAcceptance }) => {
   assert(version.lifecycle.some((entry) => entry.stage === "accepted"), "accepted flag is represented");
   assert(!version.lifecycle.some((entry) => entry.stage === "released"), "current classification alone cannot invent release evidence");
   assert(version.unresolvedRelations.includes("acceptance-reference"), "missing acceptance pointer stays explicit");
+});
+
+withSyntheticRepository(({ repoRoot, syntheticIndex, writeContract, writeConformance, writeTraceability }) => {
+  writeContract({
+    currentPointer: "cutover/version-local-acceptance.json",
+    requiredSemanticLaws: { law: "synthetic law" },
+  });
+  writeConformance({
+    requiredAlphaVectors: [],
+  });
+  writeTraceability({
+    schema: "mts-traceability/v0.1",
+    contract: "contracts/mts-contract-v9.1.json",
+    conformance: "contracts/mts-conformance-v9.1.json",
+    acceptance: "cutover/version-local-acceptance.json",
+    invariants: {
+      law: {
+        contractPointer: "/requiredSemanticLaws/law",
+        positive: {
+          requiredGenesisVectors: [],
+          requiredMeaningVectors: [],
+          requiredC2ClassificationVectors: [],
+          requiredCompatibilityVectors: [],
+        },
+        negative: { requiredNegativeVectors: [] },
+        requiredExecutableGates: [],
+      },
+    },
+  });
+  const version = buildMethodologyProjection(repoRoot, syntheticIndex({
+    status: "accepted",
+    accepted: true,
+    acceptanceReady: true,
+    isCurrent: true,
+  })).versions[0]!;
+  same(version.semanticInvariants.length, 1, "accepted traceability requires and accepts exact version-local acceptance pointer");
 });
 
 withSyntheticRepository(({ repoRoot, syntheticIndex, writeContract, writeConformance, writeTraceability }) => {

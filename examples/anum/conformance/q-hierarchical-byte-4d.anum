@@ -1,0 +1,6 @@
+# anum-format: quaternary
+# conformance: hierarchical-two-memory
+# canonical: true
+# witness: one bracketed UTF-8 byte value 0x4d
+
+[01001101]

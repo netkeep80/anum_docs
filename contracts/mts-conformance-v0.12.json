@@ -1,30 +1,38 @@
 {
   "schema": "mts-conformance/v0.12",
-  "status": "candidate",
-  "accepted": false,
+  "status": "accepted",
+  "accepted": true,
   "issue": 1137,
   "candidateLifecycleIssue": 1134,
   "contract": "mts-contract/v0.12",
   "semanticBase": "mts-conformance/v0.11",
   "observableSemanticDelta": true,
-  "acceptanceReady": false,
-  "coverageState": "incomplete",
-  "coverageStateMeaning": "C1 declares the v0.12 interpreter semantic boundary and positive/negative obligations; C2 executable old-vs-new falsification is RED-confirmed and bound as evidence; C3 authoritative STRING nested-Anum runtime is GREEN-confirmed and bound as evidence; C4 FORMAL square-bracket I_STRING cutover is GREEN-confirmed and bound as evidence; C5 Q compatibility and representation/interpretation separation are GREEN-confirmed and bound as evidence; C6 FORMAL parentheses, explicit-K and left-reading convergence are GREEN-confirmed and bound as evidence without production runtime delta; C7 package/public-facade convergence, normative C8 documentation, C9 readiness evidence and C10 acceptance are not complete",
+  "acceptanceReady": true,
+  "coverageState": "complete",
+  "coverageStateMeaning": "C1-C10 for the declared v0.12 scope are complete: 16 mandatory executable gates, public boundary, normative documentation, exact traceability, independent readiness audit, semantic preflight and explicit author acceptance are all recorded.",
   "acceptedCurrent": {
-    "contract": "mts-contract/v0.11",
-    "conformance": "mts-conformance/v0.11"
+    "contract": "mts-contract/v0.12",
+    "conformance": "mts-conformance/v0.12"
   },
   "requiredExecutableGates": [
     "ts/test/research-v012-interpreter-delta-c2.test.ts",
     "ts/test/v012-string-anum-protocol-c3a.test.ts",
     "ts/test/v012-formal-square-string-child-c4.test.ts",
+    "ts/test/v012-formal-square-rule-authority.test.ts",
     "ts/test/v012-q-compatibility-representation-c5.test.ts",
     "ts/test/v012-formal-context-reading-c6.test.ts",
-    "ts/test/v012-ostensive-self-incidence-matching.test.ts"
+    "ts/test/v012-ostensive-self-incidence-matching.test.ts",
+    "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+    "ts/test/v012-string-q-byte-bridge.test.ts",
+    "ts/test/v012-string-utf8-boundary.test.ts",
+    "ts/test/v012-formal-source-result-witness.test.ts",
+    "ts/test/v012-quaternary-root-basis-boundary.test.ts",
+    "ts/test/anum-two-memory-conformance.test.ts",
+    "ts/test/string-anum-two-memory-conformance.test.ts",
+    "ts/test/v012-source-authority.test.ts",
+    "ts/test/v012-public-facade-c7.test.ts"
   ],
-  "plannedExecutableGates": [
-    "C7 package and public-facade convergence evidence"
-  ],
+  "plannedExecutableGates": [],
   "requiredStringVectors": [
     "v012-string-empty",
     "v012-string-empty-nested-anum",
@@ -73,7 +81,9 @@
     "v012-formal-square-bracket-child-is-string-not-q",
     "v012-hidden-lexer-mode-has-zero-semantic-authority",
     "v012-hidden-parser-mode-has-zero-semantic-authority",
-    "v012-host-parser-stack-has-zero-semantic-authority"
+    "v012-host-parser-stack-has-zero-semantic-authority",
+    "v012-formal-square-bracket-rule-authorizes-string-open",
+    "v012-formal-square-bracket-rule-open-anchored-to-formal-k"
   ],
   "requiredNegativeVectors": [
     "v012-string-glyph-one-is-not-q-abit-one",
@@ -86,12 +96,18 @@
     "v012-hidden-parent-traversal-is-not-semantic-authority",
     "v012-link-left-association-is-not-formal-grammar",
     "v012-generic-flat-reader-is-not-formal-grammar",
-    "v012-inline-formal-q-spelling-is-not-accepted",
-    "v012-curly-braces-are-not-q-escaping"
+    "v012-formal-square-bracket-low-level-open-is-not-authority",
+    "v012-formal-square-bracket-missing-rule-does-not-open",
+    "v012-formal-square-bracket-substituted-q-rule-does-not-open"
   ],
   "retainedAcceptedEvidence": {
     "semanticBase": "mts-contract/v0.11",
-    "qAlphabet": ["[", "]", "1", "0"],
+    "qAlphabet": [
+      "[",
+      "]",
+      "1",
+      "0"
+    ],
     "stringToQByteEnvelope": "[bbbbbbbb]",
     "representationEqualsInterpretation": false,
     "contextAuthority": "explicit structural evidence; no ambient runtime current or host stack"
@@ -154,9 +170,9 @@
       "mergeSha": "67249e192b42df4cc700e57773ca843ed4cf483b",
       "status": "green-confirmed",
       "observations": [
-        "FORMAL square brackets select an explicit I_STRING child from R",
+        "the low-level FORMAL square-bracket transition opens the explicitly supplied child interpreter from R; the C4 fixture supplies I_STRING",
         "the STRING child lexical parent is the exact supplied FORMAL context",
-        "FORMAL square brackets do not select I_Q",
+        "the C4 fixture keeps I_STRING distinct from I_Q; target-selection authority is proven separately by the mandatory C10-preflight Rule-authority witness",
         "an empty STRING child closes to R and FORMAL preserves that R as one exact sequence position",
         "a non-empty [ab] STRING child closes to a ⟼ b and FORMAL preserves that Link as one exact sequence position",
         "FORMAL continues after the returned STRING child result",
@@ -277,6 +293,15 @@
         "v012-link-left-association-is-not-formal-grammar",
         "v012-generic-flat-reader-is-not-formal-grammar"
       ]
+    },
+    "c10PreflightBracketAuthority": {
+      "ts/test/v012-formal-square-rule-authority.test.ts": [
+        "v012-formal-square-bracket-rule-authorizes-string-open",
+        "v012-formal-square-bracket-rule-open-anchored-to-formal-k",
+        "v012-formal-square-bracket-low-level-open-is-not-authority",
+        "v012-formal-square-bracket-missing-rule-does-not-open",
+        "v012-formal-square-bracket-substituted-q-rule-does-not-open"
+      ]
     }
   },
   "evidenceState": {
@@ -287,10 +312,20 @@
     "formalSquareBracketCutoverC4": "green-confirmed",
     "qCompatibilityC5": "green-confirmed",
     "formalContextC6": "green-confirmed",
-    "publicFacadeC7": "next",
-    "documentationC8": "not-complete",
-    "readinessC9": "blocked",
-    "acceptanceC10": "blocked"
+    "publicFacadeC7": "green-confirmed",
+    "documentationC8": "green-confirmed",
+    "readinessC9": "green-confirmed",
+    "acceptanceC10": "accepted",
+    "foundationReconciliation": "green-complete",
+    "hierarchicalQuaternaryAnum": "green-confirmed",
+    "v012StringHierarchy": "green-confirmed",
+    "strictUtf8Boundary": "green-confirmed",
+    "sourceToFormalResultAuthority": "green-confirmed",
+    "rootBasisVerification": "green-confirmed",
+    "anumTwoMemoryTransport": "green-confirmed",
+    "stringTwoMemoryTransport": "green-confirmed",
+    "sourceAuthoritySelection": "green-confirmed",
+    "formalSquareBracketRuleAuthority": "green-confirmed"
   },
   "implementationSlices": {
     "candidateBoundary": {
@@ -362,20 +397,50 @@
     "publicFacadeConvergence": {
       "issue": 1134,
       "stage": "C7",
-      "status": "next",
+      "status": "green-confirmed",
       "requiredForAcceptance": true
     },
     "documentationConvergence": {
       "issue": 1134,
       "stage": "C8",
-      "status": "blocked-by-public-facade-convergence",
+      "status": "green-confirmed",
+      "requiredForAcceptance": true
+    },
+    "readinessAudit": {
+      "issue": 1134,
+      "stage": "C9",
+      "status": "green-confirmed",
+      "requiredForAcceptance": true
+    },
+    "formalSquareBracketRuleAuthority": {
+      "issue": 1228,
+      "stage": "C10-preflight",
+      "test": "ts/test/v012-formal-square-rule-authority.test.ts",
+      "pullRequest": 1229,
+      "status": "green-confirmed",
+      "requiredForAcceptance": true
+    },
+    "acceptedCutover": {
+      "issue": 1235,
+      "stage": "C10",
+      "status": "accepted",
       "requiredForAcceptance": true
     }
   },
-  "acceptanceBlockers": [
-    "package/public facade convergence is incomplete",
-    "normative documentation and traceability are incomplete",
-    "v0.12 has not passed explicit acceptance cutover",
-    "temporary 6/2 contract budget debt remains until post-cutover cleanup"
-  ]
+  "acceptanceBlockers": [],
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.11",
+    "conformance": "mts-conformance/v0.11",
+    "immutable": true
+  },
+  "acceptance": {
+    "performedHere": true,
+    "acceptedMtsVersion": "mts-contract/v0.12",
+    "previousAcceptedVersion": "mts-contract/v0.11",
+    "readinessIssue": 1222,
+    "semanticPreflightIssue": 1228,
+    "authorDecisionIssue": 1227,
+    "acceptedFlipBridgeIssue": 1230,
+    "cutoverIssue": 1235
+  }
 }

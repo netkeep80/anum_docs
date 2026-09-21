@@ -1,0 +1,309 @@
+{
+  "schema": "mts-traceability/v0.2",
+  "contract": "contracts/mts-contract-v0.12.json",
+  "conformance": "contracts/mts-conformance-v0.12.json",
+  "acceptance": "cutover/typescript-c1-acceptance-v0.5.json",
+  "invariants": {
+    "interpreterSeparation": {
+      "contractPointer": "/requiredSemanticLaws/interpreterSeparation",
+      "positive": {
+        "requiredCrossLayerVectors": [
+          "v012-hidden-lexer-mode-has-zero-semantic-authority",
+          "v012-hidden-parser-mode-has-zero-semantic-authority",
+          "v012-host-parser-stack-has-zero-semantic-authority"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v012-nearest-lexical-frame-is-not-semantic-authority",
+          "v012-ambient-current-is-not-semantic-authority",
+          "v012-hidden-parent-traversal-is-not-semantic-authority"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v012-interpreter-delta-c2.test.ts",
+        "ts/test/v012-formal-context-reading-c6.test.ts",
+        "ts/test/v012-public-facade-c7.test.ts"
+      ]
+    },
+    "stringNestedAnum": {
+      "contractPointer": "/requiredSemanticLaws/stringNestedAnum",
+      "positive": {
+        "requiredStringVectors": [
+          "S-EMPTY",
+          "S-FLAT-AB",
+          "S-EMPTY-NESTED",
+          "S-NESTED-AB",
+          "S-FLAT-THEN-NESTED-SAME",
+          "S-DOUBLE-NESTING-PRESERVES-ROOT-LEVEL",
+          "S-EMPTY-NESTED-THEN-FLAT-COLLAPSES",
+          "S-FLAT-THEN-NESTED-EMPTY-THEN-FLAT"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-string-anum-protocol-c3a.test.ts"
+      ]
+    },
+    "formalSquareBracketStringChild": {
+      "contractPointer": "/requiredSemanticLaws/formalSquareBracketStringChild",
+      "positive": {
+        "requiredFormalVectors": [
+          "v012-formal-empty-square-brackets-return-string-root-result",
+          "v012-formal-nonempty-string-child",
+          "v012-formal-parent-continues-after-child-result"
+        ],
+        "requiredCrossLayerVectors": [
+          "v012-formal-square-bracket-child-is-string-not-q",
+          "v012-formal-square-bracket-rule-authorizes-string-open",
+          "v012-formal-square-bracket-rule-open-anchored-to-formal-k"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v012-formal-square-brackets-do-not-select-q-child",
+          "v012-formal-square-bracket-low-level-open-is-not-authority",
+          "v012-formal-square-bracket-missing-rule-does-not-open",
+          "v012-formal-square-bracket-substituted-q-rule-does-not-open"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-formal-square-string-child-c4.test.ts",
+        "ts/test/v012-q-compatibility-representation-c5.test.ts",
+        "ts/test/v012-formal-square-rule-authority.test.ts"
+      ]
+    },
+    "quaternaryNestedContext": {
+      "contractPointer": "/requiredSemanticLaws/quaternaryNestedContext",
+      "positive": {
+        "requiredQuaternaryVectors": [
+          "v012-q-empty",
+          "v012-q-empty-nested-context",
+          "v012-q-one-abit",
+          "v012-q-zero-abit",
+          "v012-q-one-zero-sequence",
+          "v012-q-nested-one-zero",
+          "v012-q-double-nested-one-zero",
+          "v012-q-rejects-non-q-glyph",
+          "v012-q-alphabet-remains-four-abits"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-q-compatibility-representation-c5.test.ts",
+        "ts/test/quaternary-anum-hierarchical-two-memory.test.ts"
+      ]
+    },
+    "stringOneVsQOne": {
+      "contractPointer": "/requiredSemanticLaws/stringOneVsQOne",
+      "positive": {
+        "requiredFormalVectors": [
+          "v012-formal-square-one-uses-string-character-semantics"
+        ],
+        "requiredCrossLayerVectors": [
+          "v012-string-one-utf8-byte-is-0x31",
+          "v012-string-one-q-carrier-is-00110001-envelope",
+          "v012-same-glyph-one-has-distinct-string-and-q-role"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v012-string-glyph-one-is-not-q-abit-one"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v012-interpreter-delta-c2.test.ts",
+        "ts/test/v012-q-compatibility-representation-c5.test.ts"
+      ]
+    },
+    "representationNotInterpretation": {
+      "contractPointer": "/requiredSemanticLaws/representationNotInterpretation",
+      "positive": {
+        "requiredCrossLayerVectors": [
+          "v012-string-one-q-carrier-is-00110001-envelope",
+          "v012-representation-does-not-invoke-q-interpretation"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v012-representation-is-not-interpretation"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v012-interpreter-delta-c2.test.ts",
+        "ts/test/v012-q-compatibility-representation-c5.test.ts",
+        "ts/test/v012-string-q-byte-bridge.test.ts"
+      ]
+    },
+    "formalParentheses": {
+      "contractPointer": "/requiredSemanticLaws/formalParentheses",
+      "positive": {
+        "requiredFormalVectors": [
+          "v012-formal-parentheses-open-formal-child",
+          "v012-formal-empty-parentheses-fail-closed",
+          "v012-formal-parent-continues-after-child-result"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v012-formal-empty-parentheses-are-not-a-valid-result"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-formal-context-reading-c6.test.ts"
+      ]
+    },
+    "explicitKContext": {
+      "contractPointer": "/requiredSemanticLaws/explicitKContext",
+      "positive": {
+        "requiredFormalVectors": [
+          "v012-formal-contextual-dot-uses-explicit-selected-k"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v012-child-creation-does-not-auto-select-contextual-k",
+          "v012-nearest-lexical-frame-is-not-semantic-authority",
+          "v012-ambient-current-is-not-semantic-authority",
+          "v012-hidden-parent-traversal-is-not-semantic-authority"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-formal-context-reading-c6.test.ts"
+      ]
+    },
+    "associationBoundary": {
+      "contractPointer": "/requiredSemanticLaws/associationBoundary",
+      "positive": {},
+      "negative": {
+        "requiredNegativeVectors": [
+          "v012-link-left-association-is-not-formal-grammar",
+          "v012-generic-flat-reader-is-not-formal-grammar"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-formal-context-reading-c6.test.ts"
+      ]
+    },
+    "exactAnumRooting": {
+      "contractPointer": "/requiredSemanticLaws/exactAnumRooting",
+      "positive": {},
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+        "ts/test/anum-two-memory-conformance.test.ts"
+      ]
+    },
+    "knowledgeStateSeparation": {
+      "contractPointer": "/requiredSemanticLaws/knowledgeStateSeparation",
+      "positive": {},
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/quaternary-anum-hierarchical-two-memory.test.ts"
+      ]
+    },
+    "resolveMaterializeSeparation": {
+      "contractPointer": "/requiredSemanticLaws/resolveMaterializeSeparation",
+      "positive": {},
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+        "ts/test/anum-two-memory-conformance.test.ts"
+      ]
+    },
+    "targetMaterializationBound": {
+      "contractPointer": "/requiredSemanticLaws/targetMaterializationBound",
+      "positive": {},
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+        "ts/test/v012-quaternary-root-basis-boundary.test.ts"
+      ]
+    },
+    "rootBasisBoundary": {
+      "contractPointer": "/requiredSemanticLaws/rootBasisBoundary",
+      "positive": {},
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-quaternary-root-basis-boundary.test.ts"
+      ]
+    },
+    "v012StringByteIdentity": {
+      "contractPointer": "/requiredSemanticLaws/v012StringByteIdentity",
+      "positive": {
+        "requiredCrossLayerVectors": [
+          "v012-string-one-utf8-byte-is-0x31",
+          "v012-string-one-q-carrier-is-00110001-envelope"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-string-q-byte-bridge.test.ts",
+        "ts/test/string-anum-two-memory-conformance.test.ts"
+      ]
+    },
+    "utf8CarrierBoundary": {
+      "contractPointer": "/requiredSemanticLaws/utf8CarrierBoundary",
+      "positive": {
+        "requiredStringVectors": [
+          "v012-string-literal-one-is-utf8-character",
+          "v012-string-literal-zero-is-utf8-character",
+          "v012-string-literal-open-bracket-has-string-role",
+          "v012-string-literal-close-bracket-has-string-role"
+        ],
+        "requiredCrossLayerVectors": [
+          "v012-string-one-utf8-byte-is-0x31",
+          "v012-same-glyph-one-has-distinct-string-and-q-role"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v012-string-glyph-one-is-not-q-abit-one"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-string-utf8-boundary.test.ts",
+        "ts/test/string-anum-two-memory-conformance.test.ts"
+      ]
+    },
+    "sourceUseAuthority": {
+      "contractPointer": "/requiredSemanticLaws/sourceUseAuthority",
+      "positive": {},
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-source-authority.test.ts",
+        "ts/test/v012-formal-source-result-witness.test.ts"
+      ]
+    },
+    "formalResultAuthority": {
+      "contractPointer": "/requiredSemanticLaws/formalResultAuthority",
+      "positive": {},
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/v012-formal-source-result-witness.test.ts",
+        "ts/test/v012-source-authority.test.ts",
+        "ts/test/v012-public-facade-c7.test.ts"
+      ]
+    }
+  }
+}

@@ -6,12 +6,12 @@ export const PROJECTION_START = "<!-- мтс-текущая-проекция:н�
 export const PROJECTION_END = "<!-- мтс-текущая-проекция:конец -->";
 
 /**
- * Только документы, которые сами объявляют текущее состояние МТС.
- * Специализированные спецификации не получают копию release manifest: это сохраняет
- * принцип #278 «main = current state без аддитивного дублирования».
+ * README — единственный владелец краткой автоматически синхронизируемой проекции
+ * текущего выпуска. Теория и процессные документы не получают копию release manifest.
  */
-export const CANONICAL_DOCS = [
-  "README.md",
+export const CANONICAL_DOCS = ["README.md"] as const;
+
+export const PROJECTION_FORBIDDEN_DOCS = [
   "docs/CONTRIBUTING.md",
   "docs/theory/Основания МТС.md",
   "docs/theory/Система аксиом МТС.md",
@@ -24,6 +24,11 @@ export interface CurrentProjection {
   readonly currentConformance: string;
   readonly previousContract: string;
   readonly previousConformance: string;
+  readonly currentContractPath: string;
+  readonly currentConformancePath: string;
+  readonly previousContractPath: string;
+  readonly previousConformancePath: string;
+  readonly acceptancePath: string;
   readonly semanticBase: string;
   readonly observableSemanticDelta: boolean;
   readonly implementationLanguage: string;
@@ -102,14 +107,17 @@ export function findRepositoryRoot(start = process.cwd()): string {
 
 export function loadCurrentProjection(root = findRepositoryRoot()): CurrentProjection {
   const policy = readJson(root, "repo-policy.json");
-  const topology = nested(policy, "contract_conformance", "repo-policy.json");
-  const current = nested(topology, "current", "repo-policy.json.contract_conformance");
-  const previous = nested(topology, "previous", "repo-policy.json.contract_conformance");
+  const packs = nested(policy, "packs", "repo-policy.json");
+  const topology = nested(packs, "contract-conformance", "repo-policy.json.packs");
+  const current = nested(topology, "current", "repo-policy.json.packs.contract-conformance");
+  const previous = nested(topology, "previous", "repo-policy.json.packs.contract-conformance");
+  const acceptance = nested(topology, "acceptance", "repo-policy.json.packs.contract-conformance");
 
   const currentContractPath = string(nested(current, "contract", "current").path, "current.contract.path");
   const currentConformancePath = string(nested(current, "conformance", "current").path, "current.conformance.path");
   const previousContractPath = string(nested(previous, "contract", "previous").path, "previous.contract.path");
   const previousConformancePath = string(nested(previous, "conformance", "previous").path, "previous.conformance.path");
+  const acceptancePath = string(nested(acceptance, "document", "acceptance").path, "acceptance.document.path");
 
   const contract = readJson(root, currentContractPath);
   const conformance = readJson(root, currentConformancePath);
@@ -143,6 +151,11 @@ export function loadCurrentProjection(root = findRepositoryRoot()): CurrentProje
     currentConformance: conformanceSchema,
     previousContract: string(previousContract.schema, `${previousContractPath}.schema`),
     previousConformance: string(previousConformance.schema, `${previousConformancePath}.schema`),
+    currentContractPath,
+    currentConformancePath,
+    previousContractPath,
+    previousConformancePath,
+    acceptancePath,
     semanticBase: string(contract.semanticBase, `${currentContractPath}.semanticBase`),
     observableSemanticDelta: boolean(contract.observableSemanticDelta, `${currentContractPath}.observableSemanticDelta`),
     implementationLanguage: string(implementation.language, `${currentContractPath}.implementation.language`),
@@ -162,23 +175,214 @@ export function loadCurrentProjection(root = findRepositoryRoot()): CurrentProje
   };
 }
 
-function yesNo(value: boolean): string {
-  return value ? "да" : "нет";
+export const SEMANTIC_LAW_OWNER_BY_ID: Readonly<Record<string, string>> = Object.freeze({
+  interpreterSeparation: "docs/specs/Формальная нотация МТС.md",
+  stringNestedAnum: "docs/specs/Ачисла и сериализация.md",
+  formalSquareBracketStringChild: "docs/specs/Формальная нотация МТС.md",
+  quaternaryNestedContext: "docs/specs/Ачисла и сериализация.md",
+  stringOneVsQOne: "docs/specs/Ачисла и сериализация.md",
+  representationNotInterpretation: "docs/specs/Ачисла и сериализация.md",
+  formalParentheses: "docs/specs/Формальная нотация МТС.md",
+  explicitKContext: "docs/specs/Формальная нотация МТС.md",
+  associationBoundary: "docs/specs/Формальная нотация МТС.md",
+  exactAnumRooting: "docs/specs/Ачисла и сериализация.md",
+  knowledgeStateSeparation: "docs/specs/Апамять и управление сетью связей.md",
+  resolveMaterializeSeparation: "docs/specs/Ачисла и сериализация.md",
+  targetMaterializationBound: "docs/specs/Ачисла и сериализация.md",
+  rootBasisBoundary: "docs/specs/Ачисла и сериализация.md",
+  v012StringByteIdentity: "docs/specs/Ачисла и сериализация.md",
+  utf8CarrierBoundary: "docs/specs/Ачисла и сериализация.md",
+  sourceUseAuthority: "docs/specs/Формальная нотация МТС.md",
+  formalResultAuthority: "docs/specs/Формальная нотация МТС.md",
+});
+
+export interface SemanticLawDocumentationIssue {
+  readonly code: "law-set-mismatch" | "unknown-owner" | "wrong-owner" | "duplicate-owner" | "missing-owner" | "empty-owner" | "unknown-reference";
+  readonly lawId: string;
+  readonly path?: string;
+  readonly line?: number;
+  readonly message: string;
+}
+
+interface SemanticLawAnchor {
+  readonly lawId: string;
+  readonly path: string;
+  readonly line: number;
+}
+
+interface MarkdownFacts {
+  readonly owners: readonly SemanticLawAnchor[];
+  readonly references: readonly SemanticLawAnchor[];
+  readonly lines: readonly string[];
+  readonly visible: readonly boolean[];
+}
+
+const OWNER_LINE = /^<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>(?:\s*<!--\s*нормативный владелец\s*-->)?$/;
+const REFERENCE = /<!--\s*ссылка:mts-law-([A-Za-z][A-Za-z0-9]*)\s*-->/g;
+
+function markdownFacts(path: string, source: string): MarkdownFacts {
+  const lines = source.split(/\r?\n/);
+  const visible: boolean[] = [];
+  const owners: SemanticLawAnchor[] = [];
+  const references: SemanticLawAnchor[] = [];
+  let inFence = false;
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index] ?? "";
+    const trimmed = line.trim();
+    if (trimmed.startsWith("~~~") || trimmed.startsWith(String.fromCharCode(96, 96, 96))) {
+      visible.push(false);
+      inFence = !inFence;
+      continue;
+    }
+    visible.push(!inFence);
+    if (inFence) continue;
+
+    const owner = trimmed.match(OWNER_LINE);
+    if (owner?.[1]) owners.push({ lawId: owner[1], path, line: index + 1 });
+
+    REFERENCE.lastIndex = 0;
+    for (const match of line.matchAll(REFERENCE)) {
+      const lawId = match[1];
+      if (lawId) references.push({ lawId, path, line: index + 1 });
+    }
+  }
+  return { owners, references, lines, visible };
+}
+
+function ownerHasBody(facts: MarkdownFacts, owner: SemanticLawAnchor): boolean {
+  const start = owner.line;
+  for (let index = start; index < facts.lines.length; index += 1) {
+    if (!facts.visible[index]) continue;
+    const trimmed = (facts.lines[index] ?? "").trim();
+    if (!trimmed) continue;
+    if (OWNER_LINE.test(trimmed)) return false;
+    if (/^<!--.*-->$/.test(trimmed)) continue;
+    if (/^#{1,6}\s+/.test(trimmed)) continue;
+    return true;
+  }
+  return false;
+}
+
+export function validateSemanticLawDocumentation(
+  requiredLawIds: readonly string[],
+  documents: Readonly<Record<string, string>>,
+): SemanticLawDocumentationIssue[] {
+  const issues: SemanticLawDocumentationIssue[] = [];
+  const required = new Set(requiredLawIds);
+  const configured = new Set(Object.keys(SEMANTIC_LAW_OWNER_BY_ID));
+
+  const missingFromConfig = [...required].filter((id) => !configured.has(id));
+  const extraInConfig = [...configured].filter((id) => !required.has(id));
+  for (const lawId of [...missingFromConfig, ...extraInConfig].sort()) {
+    issues.push({
+      code: "law-set-mismatch",
+      lawId,
+      message: `configured owner law set differs from accepted requiredSemanticLaws: ${lawId}`,
+    });
+  }
+
+  const facts = Object.entries(documents).map(([path, source]) => markdownFacts(path, source));
+  const owners = facts.flatMap((item) => item.owners);
+  const references = facts.flatMap((item) => item.references);
+
+  for (const owner of owners) {
+    if (!required.has(owner.lawId)) {
+      issues.push({
+        code: "unknown-owner",
+        lawId: owner.lawId,
+        path: owner.path,
+        line: owner.line,
+        message: `unknown semantic law owner ${owner.lawId} at ${owner.path}:${owner.line}`,
+      });
+      continue;
+    }
+    const expectedPath = SEMANTIC_LAW_OWNER_BY_ID[owner.lawId];
+    if (expectedPath !== owner.path) {
+      issues.push({
+        code: "wrong-owner",
+        lawId: owner.lawId,
+        path: owner.path,
+        line: owner.line,
+        message: `semantic law ${owner.lawId} owner must be ${expectedPath}, found ${owner.path}:${owner.line}`,
+      });
+    }
+  }
+
+  for (const lawId of [...required].sort()) {
+    const matches = owners.filter((owner) => owner.lawId === lawId);
+    if (matches.length === 0) {
+      issues.push({ code: "missing-owner", lawId, message: `semantic law ${lawId} has no current normative owner` });
+      continue;
+    }
+    if (matches.length > 1) {
+      issues.push({
+        code: "duplicate-owner",
+        lawId,
+        message: `semantic law ${lawId} has multiple owners: ${matches.map((owner) => `${owner.path}:${owner.line}`).join(", ")}`,
+      });
+    }
+    for (const owner of matches) {
+      const ownerFacts = facts.find((item) => item.owners.some((candidate) => candidate.path === owner.path && candidate.line === owner.line));
+      if (ownerFacts && !ownerHasBody(ownerFacts, owner)) {
+        issues.push({
+          code: "empty-owner",
+          lawId,
+          path: owner.path,
+          line: owner.line,
+          message: `semantic law ${lawId} owner at ${owner.path}:${owner.line} has no normative body`,
+        });
+      }
+    }
+  }
+
+  for (const reference of references) {
+    if (!required.has(reference.lawId)) {
+      issues.push({
+        code: "unknown-reference",
+        lawId: reference.lawId,
+        path: reference.path,
+        line: reference.line,
+        message: `semantic law reference ${reference.lawId} at ${reference.path}:${reference.line} does not resolve`,
+      });
+    }
+  }
+
+  return issues;
+}
+
+export function checkRepositorySemanticLawDocumentation(root = findRepositoryRoot()): SemanticLawDocumentationIssue[] {
+  const policy = readJson(root, "repo-policy.json");
+  const packs = nested(policy, "packs", "repo-policy.json");
+  const topology = nested(packs, "contract-conformance", "repo-policy.json.packs");
+  const current = nested(topology, "current", "repo-policy.json.packs.contract-conformance");
+  const currentContractPath = string(nested(current, "contract", "current").path, "current.contract.path");
+  const contract = readJson(root, currentContractPath);
+  const laws = nested(contract, "requiredSemanticLaws", currentContractPath);
+  const requiredLawIds = Object.keys(laws);
+
+  const paths = new Set<string>([
+    ...Object.values(SEMANTIC_LAW_OWNER_BY_ID),
+    ...((nested(policy, "paths", "repo-policy.json").canonical_docs as unknown[]) ?? [])
+      .filter((value): value is string => typeof value === "string"),
+  ]);
+  const documents: Record<string, string> = {};
+  for (const path of paths) {
+    const fullPath = resolve(root, path);
+    if (!existsSync(fullPath)) continue;
+    documents[path] = readFileSync(fullPath, "utf8");
+  }
+  return validateSemanticLawDocumentation(requiredLawIds, documents);
 }
 
 export function renderCurrentProjection(value: CurrentProjection): string {
-  const root = Object.entries(value.rootBasis).map(([name, equation]) => `${name}: ${equation}`).join("; ");
   return [
     PROJECTION_START,
-    "> **Автоматическая проекция текущей машинной границы.** Этот блок строится из принятого контракта командой `npm --prefix ts run docs:sync`; содержательную теорию вне блока команда не меняет.",
+    "> **Текущий принятый выпуск МТС.** Этот краткий блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.",
     ">",
-    `> - Текущий выпуск: \`${value.currentContract}\` + \`${value.currentConformance}\`; предыдущая неизменяемая пара: \`${value.previousContract}\` + \`${value.previousConformance}\`.`,
-    `> - Семантическая база: \`${value.semanticBase}\`; наблюдаемое смысловое изменение: \`${yesNo(value.observableSemanticDelta)}\`.`,
-    `> - Реализация: \`${value.implementationLanguage}\`; единственная действующая смысловая среда: \`${yesNo(value.singleLiveSemanticRuntime)}\`; Python присутствует: \`${yesNo(value.pythonRuntimePresent)}\`; режим совместимости выбираем: \`${yesNo(value.compatibilityRuntimeSelectable)}\`.`,
-    `> - Внутренние знаки F1: \`${value.internalSigns.join(" ")}\`; отложены: \`${value.deferredSigns.join(" ")}\`; только метаязык: \`${value.metaOnlySigns.join(" ")}\`.`,
-    `> - Корневой базис: \`${root}\`.`,
-    `> - Чтение может материализовать: \`${yesNo(value.readMayMaterialize)}\`; отсутствие найденной записи доказывает несуществование: \`${yesNo(value.notFoundImpliesNonExistence)}\`.`,
-    `> - Строковый носитель: единица \`${value.stringCarrierUnit}\`, конверт \`${value.byteEnvelope}\`, бит на конверт \`${value.bitsPerEnvelope}\`, порядок \`${value.bitOrder}\`.`,
+    `> - Текущий: \`${value.currentContract}\` + \`${value.currentConformance}\` — [контракт](${value.currentContractPath}) · [корпус](${value.currentConformancePath}).`,
+    `> - Предыдущий неизменяемый: \`${value.previousContract}\` + \`${value.previousConformance}\` — [контракт](${value.previousContractPath}) · [корпус](${value.previousConformancePath}).`,
+    `> - Принятие текущего выпуска: [свидетельство](${value.acceptancePath}).`,
     PROJECTION_END,
   ].join("\n");
 }
@@ -216,10 +420,15 @@ export function checkProjectionText(source: string, projection: string): boolean
 
 export function checkRepositoryDocs(root = findRepositoryRoot()): string[] {
   const projection = renderCurrentProjection(loadCurrentProjection(root));
-  return CANONICAL_DOCS.filter((path) => {
+  const stale = CANONICAL_DOCS.filter((path) => {
     const source = readFileSync(resolve(root, path), "utf8");
     return !checkProjectionText(source, projection);
   });
+  const duplicated = PROJECTION_FORBIDDEN_DOCS.filter((path) => {
+    const source = readFileSync(resolve(root, path), "utf8");
+    return source.includes(PROJECTION_START) || source.includes(PROJECTION_END);
+  });
+  return [...stale, ...duplicated];
 }
 
 export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {
@@ -247,7 +456,9 @@ function main(): void {
   if (mode !== "--check") fail(`unknown mode ${mode}; expected --check or --write`);
   const stale = checkRepositoryDocs(root);
   if (stale.length) fail(`устарела автоматическая проекция: ${stale.join(", ")}; запустите npm --prefix ts run docs:sync`);
-  console.log("Автоматическая проекция документации соответствует текущему контракту.");
+  const lawIssues = checkRepositorySemanticLawDocumentation(root);
+  if (lawIssues.length) fail(`нарушена документационная канонизация законов: ${lawIssues.map((issue) => issue.message).join("; ")}`);
+  console.log("Автоматическая проекция и владельцы semantic laws соответствуют текущему контракту.");
 }
 
 const invokedPath = process.argv[1] === undefined ? undefined : resolve(process.argv[1]);

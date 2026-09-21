@@ -6,6 +6,7 @@ import type {
   DirectDeixisVocabulary,
   IntegratedProofEvidence,
   LinkHandle,
+  MaterializedQuaternaryAnum,
   MtsValue,
   PersistentSequenceDescription,
   PersistentTopologyBackend,
@@ -25,6 +26,9 @@ import type {
   PortableStructuralDerivationWithAssumptionsReplayResult,
   PortableStructuralProofReplayResult,
   ReadMemory,
+  QuaternaryAnumHierarchy,
+  QuaternaryAnumItem,
+  ReadV012StringAnum,
   RelationReplayEvidence,
   RunEvidence,
   SequenceDescription,
@@ -34,10 +38,18 @@ import type {
   StructuralDerivationWithAssumptionsEvidence,
   StructuralDerivationWithAssumptionsReplayResult,
   StructuralDerivationWithTheoremsEvidence,
+  SourceFrontEndEvidence,
   StructuralJudgmentEvidence,
+  StructuralRuleReplayEvidence,
+  StructuralRuleReplayResult,
   StructuralScopedDerivationEvidence,
   StructuralScopedDerivationReplayResult,
   StructuralTheoremEvidence,
+  V012SourceAuthority,
+  V012SourceContent,
+  V012SourceResultErrorCode,
+  V012SourceResultEvidence,
+  V012SourceResultReplayResult,
   WriteMemory,
 } from "../src/public.js";
 
@@ -60,8 +72,21 @@ type InternalCanonicalPortableStructuralDerivationWithAssumptionsV01Json = typeo
 type InternalCanonicalPortableStructuralDerivationProvenanceClaimJson = typeof import("../src/public.js").canonicalPortableStructuralDerivationProvenanceClaimJson;
 // @ts-expect-error P6s keeps conditional provenance canonical JSON normalization internal.
 type InternalCanonicalPortableStructuralDerivationWithAssumptionsProvenanceClaimJson = typeof import("../src/public.js").canonicalPortableStructuralDerivationWithAssumptionsProvenanceClaimJson;
+
 // @ts-expect-error P3b keeps assumption construction internal; consumers submit materialized evidence.
 type InternalAssumptionContextConstructor = typeof import("../src/public.js").defineStructuralAssumptionContext;
+// @ts-expect-error C7 keeps source evidence production internal.
+type InternalV012SourceBuilder = typeof import("../src/public.js").buildV012SelectedSourceEvidence;
+// @ts-expect-error C7 keeps structural Rule construction/admission internal.
+type InternalStructuralRuleBuilder = typeof import("../src/public.js").defineStructuralRule;
+// @ts-expect-error C7 keeps structural Rule admission internal.
+type InternalStructuralRuleAdmission = typeof import("../src/public.js").admitStructuralRule;
+// @ts-expect-error C7 keeps lower v0.12 authority plumbing internal; consumers use the composite verifier.
+type InternalV012TheoryRuleReplay = typeof import("../src/public.js").replayV012StructuralRuleAgainstTheoryAuthority;
+// @ts-expect-error C7 keeps selected-Act view plumbing internal; consumers use the composite verifier.
+type InternalV012SelectedRuleReplay = typeof import("../src/public.js").replayV012StructuralRuleAgainstSelectedEvidence;
+// @ts-expect-error C7 keeps source-authority plumbing internal; consumers use the composite verifier.
+type InternalV012SourceAuthorityReplay = typeof import("../src/public.js").replayV012SelectedSourceEvidenceAgainstAuthority;
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`public-api: ${message}`);
@@ -100,16 +125,25 @@ const expectedRuntimeExports = [
   "PortableStructuralDerivationProvenanceError",
   "PortableStructuralTheoryError",
   "ProofRuleReplayError",
+  "QuaternaryAnumError",
   "QuaternaryDecodeError",
   "RunReplayError",
   "SequenceReplayError",
+  "SourceError",
   "StreamError",
   "StructuralAssumptionReplayError",
   "StructuralDerivationReplayError",
   "StructuralJudgmentReplayError",
+  "StructuralRuleError",
   "StructuralScopedDerivationReplayError",
   "StructuralTheoremReplayError",
   "StructuralTheoremReuseReplayError",
+  "V012SourceResultError",
+  "V012StringAnumError",
+  "V013FormalAspectEvaluationError",
+  "V013HierarchicalCarrierError",
+  "V013RelativeFormMaterializationError",
+  "V013RelativePoleExecutionError",
   "ValueBundleReplayError",
   "analyzeDirectDeixisCarrier",
   "bundleRoleAt",
@@ -125,10 +159,13 @@ const expectedRuntimeExports = [
   "createPortableStructuralDerivationWithAssumptionsProvenanceClaim",
   "createPortableStructuralDerivationWithTheoremsProvenanceClaim",
   "createStructuralProofProducer",
+  "decomposeV013SemanticLink",
   "deserializeAnum",
   "deserializeStream",
   "elaborateBundleRoles",
   "ensureRootBasis",
+  "evaluateV013FormalAspectProgram",
+  "executeAuthorizedRelativePoleSource",
   "executeAbits",
   "exportPortableProofSubAnetProjection",
   "exportPortableStructuralDerivation",
@@ -137,10 +174,22 @@ const expectedRuntimeExports = [
   "exportPortableStructuralTheory",
   "materializeHeterogeneousDerivedClosedRootedDischarge",
   "materializeHeterogeneousDerivedOpenRootedExpansion",
+  "materializeAuthorizedBinaryLinkSource",
+  "materializeAuthorizedRelativeUnaryFormSource",
   "materializePersistentSequence",
+  "materializeQuaternaryAnum",
+  "materializeQuaternaryAnumTarget",
   "materializeSequence",
+  "materializeV012SourceContent",
+  "materializeV012StringAnum",
+  "materializeV012StringByteAnum",
+  "materializeV013HierarchicalCarrier",
+  "materializeV013HierarchicalCarrierFromSemanticLink",
   "normalizeRawForm",
   "parseRawQuaternary",
+  "readV012SourceContent",
+  "readV012StringAnum",
+  "readV012StringByteAnum",
   "replayClosedProofOccurrence",
   "replayColonEffect",
   "replayDefinitionEffect",
@@ -171,9 +220,16 @@ const expectedRuntimeExports = [
   "replayStructuralHeterogeneousDerivedDerivationSchema",
   "replayStructuralHeterogeneousDerivedOpenRootedInstance",
   "replayStructuralJudgment",
+  "replayStructuralRule",
   "replayStructuralScopedDerivation",
   "replayStructuralTheorem",
+  "replayV012SelectedSourceEvidence",
+  "replayV012SourceResultEvidence",
   "resolveFlatBundle",
+  "resolveQuaternaryAnum",
+  "serializeMaterializedQuaternaryAnum",
+  "serializeV012StringAnum",
+  "serializeV013HierarchicalCarrier",
   "symbolicStackAlgebra",
   "valuesEqual",
   "verifyPortableProofSubAnetProjectionTheoryRevision",
@@ -183,7 +239,7 @@ const expectedRuntimeExports = [
   "verifyPortableStructuralProofTheoryRevision",
 ].sort();
 
-assert(expectedRuntimeExports.length === 113, "portable proof-Anet runtime export budget must be exactly 113");
+assert(expectedRuntimeExports.length === 144, "public runtime export budget must be exactly 144 after bounded v0.13 facade projection");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
@@ -258,6 +314,18 @@ const backend: PersistentTopologyBackend | undefined = undefined;
 const dataset: StoredDataset | undefined = undefined;
 const persistentSequence: PersistentSequenceDescription | undefined = undefined;
 const sequence: SequenceDescription | undefined = undefined;
+const qHierarchy: QuaternaryAnumHierarchy | undefined = undefined;
+const qItem: QuaternaryAnumItem | undefined = undefined;
+const qMaterialized: MaterializedQuaternaryAnum | undefined = undefined;
+const stringRead: ReadV012StringAnum | undefined = undefined;
+const sourceEvidence: SourceFrontEndEvidence | undefined = undefined;
+const sourceAuthority: V012SourceAuthority | undefined = undefined;
+const sourceContent: V012SourceContent | undefined = undefined;
+const sourceResultErrorCode: V012SourceResultErrorCode | undefined = undefined;
+const sourceResultEvidence: V012SourceResultEvidence | undefined = undefined;
+const sourceResultReplay: V012SourceResultReplayResult | undefined = undefined;
+const structuralRuleEvidence: StructuralRuleReplayEvidence | undefined = undefined;
+const structuralRuleResult: StructuralRuleReplayResult | undefined = undefined;
 const relation: RelationReplayEvidence | undefined = undefined;
 const definition: DefinitionReplayEvidence | undefined = undefined;
 const deixis: DirectDeixisVocabulary | undefined = undefined;
@@ -311,6 +379,18 @@ void [
   dataset,
   persistentSequence,
   sequence,
+  qHierarchy,
+  qItem,
+  qMaterialized,
+  stringRead,
+  sourceEvidence,
+  sourceAuthority,
+  sourceContent,
+  sourceResultErrorCode,
+  sourceResultEvidence,
+  sourceResultReplay,
+  structuralRuleEvidence,
+  structuralRuleResult,
   relation,
   definition,
   deixis,

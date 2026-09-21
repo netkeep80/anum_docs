@@ -79,7 +79,7 @@ const realIndex = buildContractObservatoryIndex(repositoryRoot);
 const realProjection = buildMethodologyProjection(repositoryRoot, realIndex);
 const realHtml = renderContractObservatoryHtml(realIndex, realProjection);
 
-same(realIndex.versions.length, 3, "real repository exposes current, previous and candidate versions");
+assert(realIndex.versions.length >= 2, "repository exposes at least current and previous accepted versions");
 assert(realHtml.startsWith("<!doctype html>\n<html lang=\"ru\">"), "browser document baseline");
 assert(realHtml.includes("<meta charset=\"utf-8\">"), "UTF-8 metadata");
 assert(realHtml.includes("name=\"viewport\""), "viewport metadata");
@@ -93,33 +93,36 @@ assert(!realHtml.includes("http://") && !realHtml.includes("https://"), "no exte
 assert(realHtml.includes("<section class=\"methodology-map\""), "V4c methodology map is rendered as the primary explanatory view");
 assert(realHtml.includes("aria-label=\"Стадии методологии\""), "methodology stages expose a semantic keyboard-navigation group");
 assert(realHtml.includes("data-methodology-stage=\"challenged\""), "methodology stage controls carry deterministic stage identity");
-assert(realHtml.includes("data-version-id=\"mts-contract/v0.11\""), "current version lane carries exact projected contract identity");
-assert(realHtml.includes("data-version-id=\"mts-contract/v0.12\""), "candidate version lane carries exact projected contract identity");
+assert(realHtml.includes("data-version-id=\"mts-contract/v0.11\""), "previous version lane carries exact projected contract identity");
+assert(realHtml.includes("data-version-id=\"mts-contract/v0.12\""), "current version lane carries exact projected contract identity");
 assert(realHtml.includes("ТЕКУЩАЯ"), "current classification remains explicit in V4c");
 assert(realHtml.includes("ПРЕДЫДУЩАЯ"), "previous classification remains explicit in V4c");
-assert(realHtml.includes("КАНДИДАТ"), "candidate classification remains explicit in V4c");
+for (const candidate of realIndex.versions.filter((entry) => entry.status === "candidate" || !entry.accepted)) {
+  assert(realHtml.includes(candidate.contractId), `${candidate.contractId}: candidate appears in overview`);
+}
 assert(realHtml.includes("Связь метода и жизненного цикла"), "methodology relation authority is textually distinguished");
 assert(realHtml.includes("Семантические Связи МТС: в этом представлении не отображаются"), "methodology view cannot be mistaken for MTS semantic Links");
 assert(realHtml.includes("data-observatory-controller=\"shared-kernel\""), "static page embeds the shared canonical interaction kernel controller");
 assert(!realHtml.includes("const readState ="), "static page no longer owns the old handwritten hash parser");
 
-const v010Position = realHtml.indexOf("mts-contract/v0.10");
-const v011Position = realHtml.indexOf("mts-contract/v0.11");
-const v012Position = realHtml.indexOf("mts-contract/v0.12");
-assert(v010Position >= 0 && v011Position > v010Position && v012Position > v011Position, "timeline preserves V3a natural order");
+const v011Position = realHtml.indexOf('data-version-id="mts-contract/v0.11"');
+const v012Position = realHtml.indexOf('data-version-id="mts-contract/v0.12"');
+assert(v011Position >= 0 && v012Position > v011Position, "timeline preserves current active-pair natural order");
+assert(!realHtml.includes('data-version-id="mts-contract/v0.10"'), "removed v0.10 active pair has no version lane");
 assert(realHtml.includes(realIndex.acceptancePath), "acceptance provenance visible");
 assert(realHtml.includes(realIndex.currentContractPath), "current contract provenance visible");
 assert(realHtml.includes(realIndex.previousContractPath), "previous contract provenance visible");
 
 const current = realIndex.versions.find((entry) => entry.isCurrent);
 const previous = realIndex.versions.find((entry) => entry.isPrevious);
-const candidate = realIndex.versions.find((entry) => entry.contractId === "mts-contract/v0.12");
 assert(current !== undefined, "real current version exists");
 assert(previous !== undefined, "real previous version exists");
-assert(candidate !== undefined, "real candidate version exists");
-same(candidate.status, "candidate", "real candidate status is explicit");
-same(candidate.accepted, false, "real candidate is not accepted");
-same(candidate.acceptanceReady, false, "real candidate is not acceptance-ready");
+same(current.contractId, "mts-contract/v0.12", "real current is accepted v0.12");
+same(current.status, "accepted", "real current status is accepted");
+same(current.accepted, true, "real current accepted flag is explicit");
+same(current.acceptanceReady, true, "real current retains readiness evidence");
+same(current.requiredExecutableGateCount, 16, "real current preserves all v0.12 gates");
+same(previous.contractId, "mts-contract/v0.11", "real previous is accepted v0.11");
 assert(realHtml.includes(String(current.requiredExecutableGateCount)), "current gate count rendered");
 assert(realHtml.includes(String(current.requiredNegativeVectorCount)), "current negative-vector count rendered");
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(current) + 1}\" class=\"version-card current\"`), "current section classified");
@@ -151,6 +154,9 @@ const synthetic = index([
   version({
     contractId: "mts-contract/v2.3",
     conformanceId: "mts-conformance/v2.3",
+    status: "candidate",
+    accepted: false,
+    acceptanceReady: false,
   }),
 ]);
 
@@ -167,6 +173,7 @@ same(count(syntheticHtml, "id=\"version-2\""), 1, "second version section exactl
 same(count(syntheticHtml, "id=\"version-3\""), 1, "third version section exactly once");
 assert(syntheticHtml.indexOf("contract-&lt;script&gt;") < syntheticHtml.indexOf("mts-contract/v9.7"), "input version order retained");
 assert(syntheticHtml.indexOf("mts-contract/v9.7") < syntheticHtml.indexOf("mts-contract/v2.3"), "renderer does not re-sort input");
+assert(syntheticHtml.includes("КАНДИДАТ"), "nonaccepted candidate is textually distinct in overview");
 
 same(count(syntheticHtml, "aria-current=\"page\""), 1, "current marker derives from isCurrent only");
 assert(syntheticHtml.includes("<details open>"), "current overview is open by default");

@@ -1,0 +1,6 @@
+# anum-format: quaternary
+# conformance: hierarchical-two-memory
+# canonical: true
+# witness: one outer R[ level around two individually bracketed byte groups
+
+[[01001101][01010100]]

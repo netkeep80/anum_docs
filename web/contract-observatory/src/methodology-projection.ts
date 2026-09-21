@@ -73,6 +73,11 @@ export interface SemanticInvariantPositive {
   readonly requiredCompatibilityVectors: readonly string[];
 }
 
+export interface SemanticInvariantPositiveGroup {
+  readonly sourceSet: string;
+  readonly vectorIds: readonly string[];
+}
+
 export interface SemanticInvariantNegative {
   readonly requiredNegativeVectors: readonly string[];
 }
@@ -84,6 +89,7 @@ export interface SemanticInvariant {
   readonly contractPointer: string;
   readonly contractValue: string;
   readonly positive: SemanticInvariantPositive;
+  readonly positiveGroups?: readonly SemanticInvariantPositiveGroup[];
   readonly negative: SemanticInvariantNegative;
   readonly requiredExecutableGates: readonly string[];
 }
@@ -186,7 +192,7 @@ function projectVersion(
   const manifest = findTraceabilityManifest(repoRoot, summary);
   const semanticInvariants = manifest === undefined
     ? []
-    : projectSemanticInvariants(index, summary, contract, conformance, manifest);
+    : projectSemanticInvariants(summary, contract, conformance, manifest);
   const traceability = collectTraceability(
     positiveVectors,
     negativeVectors,
@@ -247,7 +253,7 @@ function findTraceabilityManifest(
   for (const name of readdirSync(directory).filter((entry) => entry.endsWith(".json")).sort()) {
     const path = `traceability/${name}`;
     const value = readJson(join(repoRoot, path));
-    if (value.schema !== "mts-traceability/v0.1") continue;
+    if (value.schema !== "mts-traceability/v0.1" && value.schema !== "mts-traceability/v0.2") continue;
     if (value.contract === summary.contractPath && value.conformance === summary.conformancePath) {
       matches.push(Object.freeze({ path, value }));
     }
@@ -259,15 +265,20 @@ function findTraceabilityManifest(
 }
 
 function projectSemanticInvariants(
-  index: ContractObservatoryIndex,
   summary: ContractVersionSummary,
   contract: JsonRecord,
   conformance: JsonRecord,
   manifest: TraceabilityManifestSelection,
 ): SemanticInvariant[] {
-  const acceptancePath = requireString(manifest.value.acceptance, `${manifest.path}#/acceptance`);
-  if (acceptancePath !== index.acceptancePath) {
-    throw new Error(`Contract Observatory V4d: traceability acceptance mismatch: ${manifest.path}`);
+  const schema = requireString(manifest.value.schema, `${manifest.path}#/schema`);
+  if (summary.accepted) {
+    const acceptancePath = requireString(manifest.value.acceptance, `${manifest.path}#/acceptance`);
+    const versionAcceptancePath = requireString(contract.currentPointer, `${summary.contractPath}#/currentPointer`);
+    if (acceptancePath !== versionAcceptancePath) {
+      throw new Error(`Contract Observatory V4d: traceability acceptance mismatch: ${manifest.path}`);
+    }
+  } else if (manifest.value.acceptance !== undefined && manifest.value.acceptance !== null) {
+    throw new Error(`Contract Observatory V4d: candidate traceability must not claim acceptance: ${manifest.path}`);
   }
   const invariants = requireRecord(manifest.value.invariants, `${manifest.path}#/invariants`);
   const laws = requireRecord(contract.requiredSemanticLaws, `${summary.contractPath}#/requiredSemanticLaws`);
@@ -283,26 +294,6 @@ function projectSemanticInvariants(
     const contractValue = requireString(resolveJsonPointer(contract, contractPointer), `${summary.contractPath}#${contractPointer}`);
     const positive = requireRecord(source.positive, `${manifest.path}#/invariants/${id}/positive`);
     const negative = requireRecord(source.negative, `${manifest.path}#/invariants/${id}/negative`);
-    const requiredGenesisVectors = validatedSubset(
-      positive.requiredGenesisVectors,
-      conformance.requiredGenesisVectors,
-      `${manifest.path}#/invariants/${id}/positive/requiredGenesisVectors`,
-    );
-    const requiredMeaningVectors = validatedSubset(
-      positive.requiredMeaningVectors,
-      conformance.requiredMeaningVectors,
-      `${manifest.path}#/invariants/${id}/positive/requiredMeaningVectors`,
-    );
-    const requiredC2ClassificationVectors = validatedSubset(
-      positive.requiredC2ClassificationVectors,
-      conformance.requiredC2ClassificationVectors,
-      `${manifest.path}#/invariants/${id}/positive/requiredC2ClassificationVectors`,
-    );
-    const requiredCompatibilityVectors = validatedSubset(
-      positive.requiredCompatibilityVectors,
-      conformance.requiredCompatibilityVectors,
-      `${manifest.path}#/invariants/${id}/positive/requiredCompatibilityVectors`,
-    );
     const requiredNegativeVectors = validatedSubset(
       negative.requiredNegativeVectors,
       conformance.requiredNegativeVectors,
@@ -313,21 +304,78 @@ function projectSemanticInvariants(
       conformance.requiredExecutableGates,
       `${manifest.path}#/invariants/${id}/requiredExecutableGates`,
     );
-    return Object.freeze({
-      authority: "semantic-invariant" as const,
-      id,
-      traceabilitySourcePath: manifest.path,
-      contractPointer,
-      contractValue,
-      positive: Object.freeze({
-        requiredGenesisVectors,
-        requiredMeaningVectors,
-        requiredC2ClassificationVectors,
-        requiredCompatibilityVectors,
-      }),
-      negative: Object.freeze({ requiredNegativeVectors }),
-      requiredExecutableGates,
-    });
+
+    if (schema === "mts-traceability/v0.1") {
+      const requiredGenesisVectors = validatedSubset(
+        positive.requiredGenesisVectors,
+        conformance.requiredGenesisVectors,
+        `${manifest.path}#/invariants/${id}/positive/requiredGenesisVectors`,
+      );
+      const requiredMeaningVectors = validatedSubset(
+        positive.requiredMeaningVectors,
+        conformance.requiredMeaningVectors,
+        `${manifest.path}#/invariants/${id}/positive/requiredMeaningVectors`,
+      );
+      const requiredC2ClassificationVectors = validatedSubset(
+        positive.requiredC2ClassificationVectors,
+        conformance.requiredC2ClassificationVectors,
+        `${manifest.path}#/invariants/${id}/positive/requiredC2ClassificationVectors`,
+      );
+      const requiredCompatibilityVectors = validatedSubset(
+        positive.requiredCompatibilityVectors,
+        conformance.requiredCompatibilityVectors,
+        `${manifest.path}#/invariants/${id}/positive/requiredCompatibilityVectors`,
+      );
+      return Object.freeze({
+        authority: "semantic-invariant" as const,
+        id,
+        traceabilitySourcePath: manifest.path,
+        contractPointer,
+        contractValue,
+        positive: Object.freeze({
+          requiredGenesisVectors,
+          requiredMeaningVectors,
+          requiredC2ClassificationVectors,
+          requiredCompatibilityVectors,
+        }),
+        negative: Object.freeze({ requiredNegativeVectors }),
+        requiredExecutableGates,
+      });
+    }
+
+    if (schema === "mts-traceability/v0.2") {
+      const positiveGroups = Object.keys(positive).sort((a, b) => a.localeCompare(b)).map((sourceSet) => {
+        if (!/^required.+Vectors$/.test(sourceSet) || sourceSet === "requiredNegativeVectors") {
+          throw new Error(`Contract Observatory V4d: invalid v0.2 positive source set: ${manifest.path}#/invariants/${id}/positive/${sourceSet}`);
+        }
+        return Object.freeze({
+          sourceSet,
+          vectorIds: validatedSubset(
+            positive[sourceSet],
+            conformance[sourceSet],
+            `${manifest.path}#/invariants/${id}/positive/${sourceSet}`,
+          ),
+        });
+      });
+      return Object.freeze({
+        authority: "semantic-invariant" as const,
+        id,
+        traceabilitySourcePath: manifest.path,
+        contractPointer,
+        contractValue,
+        positive: Object.freeze({
+          requiredGenesisVectors: Object.freeze([]),
+          requiredMeaningVectors: Object.freeze([]),
+          requiredC2ClassificationVectors: Object.freeze([]),
+          requiredCompatibilityVectors: Object.freeze([]),
+        }),
+        positiveGroups: Object.freeze(positiveGroups),
+        negative: Object.freeze({ requiredNegativeVectors }),
+        requiredExecutableGates,
+      });
+    }
+
+    throw new Error(`Contract Observatory V4d: unsupported selected traceability schema: ${schema}`);
   });
 }
 
@@ -556,6 +604,7 @@ function invariantPositiveIds(invariant: SemanticInvariant): readonly string[] {
     ...invariant.positive.requiredMeaningVectors,
     ...invariant.positive.requiredC2ClassificationVectors,
     ...invariant.positive.requiredCompatibilityVectors,
+    ...(invariant.positiveGroups ?? []).flatMap((group) => group.vectorIds),
   ]);
 }
 

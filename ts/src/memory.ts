@@ -238,6 +238,51 @@ export class Memory implements WriteMemory, AppendOnlyReadMemory, EnumerableRead
   }
 }
 
+/**
+ * Verify that a caller-supplied RootBasis is the canonical rooted basis of
+ * this Memory. RootBasis is structural evidence, not trusted host authority.
+ *
+ * This operation is read-only and uses poles() only.
+ */
+export function verifyRootBasis(
+  memory: ReadMemory,
+  basis: RootBasis,
+): RootBasis {
+  try {
+    const { R, O, C, L, U } = basis;
+    if (R !== memory.root) {
+      throw new MemoryError("invalid root basis");
+    }
+
+    // O and C are proper ostensive self-closures relative to R. This
+    // properness belongs to RootBasis roles only; ordinary Links may still
+    // collapse when their semantic ordered pair is R -> R.
+    if (O === R || C === R) {
+      throw new MemoryError("invalid root basis");
+    }
+
+    const root = memory.poles(R);
+    const open = memory.poles(O);
+    const close = memory.poles(C);
+    const one = memory.poles(L);
+    const zero = memory.poles(U);
+
+    if (
+      root.start !== R || root.end !== R ||
+      open.start !== O || open.end !== R ||
+      close.start !== R || close.end !== C ||
+      one.start !== O || one.end !== C ||
+      zero.start !== C || zero.end !== O
+    ) {
+      throw new MemoryError("invalid root basis");
+    }
+
+    return basis;
+  } catch {
+    throw new MemoryError("invalid root basis");
+  }
+}
+
 export function ensureRootBasis(memory: WriteMemory): RootBasis {
   const R = memory.ensureRoot();
   const O = memory.ensureStartSelfClosed(R);

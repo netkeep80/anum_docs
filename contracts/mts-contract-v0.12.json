@@ -1,7 +1,7 @@
 {
   "schema": "mts-contract/v0.12",
-  "status": "candidate",
-  "accepted": false,
+  "status": "accepted",
+  "accepted": true,
   "issue": 1137,
   "candidateLifecycleIssue": 1134,
   "semanticBase": "mts-contract/v0.11",
@@ -10,31 +10,42 @@
     "contract": "mts-contract/v0.11",
     "conformance": "mts-conformance/v0.11",
     "immutable": true,
-    "liveRuntimeSelectable": true
+    "liveRuntimeSelectable": false
   },
   "conformanceCorpus": "contracts/mts-conformance-v0.12.json",
-  "acceptedCurrent": "mts-contract/v0.11",
-  "acceptanceReady": false,
+  "acceptedCurrent": "mts-contract/v0.12",
+  "acceptanceReady": true,
   "inheritedFoundation": {
     "semanticBase": "mts-contract/v0.11",
     "rootBasisChanged": false,
     "linkIdentityChanged": false,
     "constructorChanged": false,
     "proofCalculusChanged": false,
-    "natSemanticsChanged": false
+    "natSemanticsChanged": false,
+    "rootBasisVerificationChanged": true
   },
   "implementation": {
     "language": "TypeScript",
     "package": "@mts/core",
     "publicFacade": "ts/src/public.ts",
     "singleLiveSemanticRuntime": true,
-    "acceptedRuntime": "mts-contract/v0.11",
+    "acceptedRuntime": "mts-contract/v0.12",
     "candidateRuntimeSelectable": false,
-    "implementationComplete": false,
-    "productionBehaviorChanged": false
+    "implementationComplete": true,
+    "productionBehaviorChanged": false,
+    "candidateKernelBehaviorImplemented": true,
+    "productionBehaviorChangedMeaning": "C10 performs no new ts/src production behavior change; the already merged and verified v0.12 kernel becomes the accepted current semantic boundary",
+    "implementationCompleteMeaning": "accepted-v0.12-declared-scope; C1-C10 complete with 16 mandatory executable gates",
+    "packageManifest": "ts/package.json",
+    "pythonRuntimePresent": false,
+    "compatibilityRuntimeSelectable": false
   },
   "interpreterModel": {
-    "identities": ["I_STRING", "I_FORMAL", "I_Q"],
+    "identities": [
+      "I_STRING",
+      "I_FORMAL",
+      "I_Q"
+    ],
     "semanticInterpretationContexts": true,
     "hiddenLexerModesAreSemanticAuthority": false,
     "hiddenParserModesAreSemanticAuthority": false,
@@ -70,7 +81,12 @@
   },
   "quaternaryInterpreter": {
     "id": "I_Q",
-    "alphabet": ["[", "]", "1", "0"],
+    "alphabet": [
+      "[",
+      "]",
+      "1",
+      "0"
+    ],
     "alphabetCount": 4,
     "glyphOneRole": "Q abit 1",
     "glyphZeroRole": "Q abit 0",
@@ -116,7 +132,16 @@
     "representationNotInterpretation": "STRING -> Q byte carrier does not invoke I_Q interpretation",
     "formalParentheses": "FORMAL (...) is explicit I_FORMAL child execution returning exactly one Link/value; () is invalid",
     "explicitKContext": "contextual `.` resolves only through explicitly selected structural K evidence",
-    "associationBoundary": "left-associated Link topology, generic flat reading and FORMAL execution remain distinct"
+    "associationBoundary": "left-associated Link topology, generic flat reading and FORMAL execution remain distinct",
+    "exactAnumRooting": "Anum is a Link role; every local Anum begins at R and the exact rooted Anum/question is distinct from its addressed target",
+    "knowledgeStateSeparation": "UNINTERPRETABLE, understood-but-NOT_FOUND and FOUND(X) are semantically distinct read outcomes",
+    "resolveMaterializeSeparation": "Resolve is a read-only one-root-cut; exact address materialization and write-authorized target materialization are distinct capabilities",
+    "targetMaterializationBound": "MATERIALIZE_TARGET removes exactly one leading R hierarchy-wide, preserves remaining indirection and fails closed before target writes on invalid exact evidence",
+    "rootBasisBoundary": "Q and v0.12 STRING/source operations require a structurally valid declared R/O/C/L/U basis with proper O/C relative to R; invalid, collapsed, forged or foreign basis evidence fails closed and write operations perform zero writes",
+    "v012StringByteIdentity": "Byte_v012(p) is the exact rooted Anum of bits8(p), not the historical Byte_v09 denotation; grouped byte Anums form the exact STRING Anum",
+    "utf8CarrierBoundary": "UTF-8 code-point grouping is a read over exact STRING bytes and does not rewrite STRING carrier topology or grant glyph spelling semantic authority",
+    "sourceUseAuthority": "exact STRING source is replayed only against an independently selected V012SourceAuthority: exact Dictionary identity plus exact Grammar/Theory membership Links; raw membership shape is not semantic authority",
+    "formalResultAuthority": "consumer source-to-result replay requires fixed Theory authority, selected finite Act attachments, matching Dictionary/Grammar/Theory, and equality between the source-selected Use and the selected Rule-role binding; candidate self-admission and late unselected ambient attachments do not gain authority"
   },
   "explicitlyDeferred": {
     "acceptedInlineFormalQSpelling": null,
@@ -127,8 +152,11 @@
     "natInScope": false,
     "mathlibInScope": false,
     "proofCalculusDeltaInScope": false,
-    "transportInScope": false,
-    "aproverInScope": false
+    "aproverInScope": false,
+    "anumTwoMemoryTransportInScope": true,
+    "proofTransportDeltaInScope": false,
+    "cutDepthNCapabilityInScope": false,
+    "jsonSemanticsInScope": false
   },
   "candidateState": {
     "semanticDeltaScopeFrozenForC1": true,
@@ -139,9 +167,208 @@
     "formalSquareBracketCutoverComplete": true,
     "qRegressionComplete": true,
     "formalParenthesesContextComplete": true,
-    "publicFacadeComplete": false,
-    "documentationComplete": false,
-    "traceabilityComplete": false,
-    "acceptedV011Mutated": false
+    "publicFacadeComplete": true,
+    "documentationComplete": true,
+    "traceabilityComplete": true,
+    "acceptedV011Mutated": false,
+    "foundationReconciliationComplete": true,
+    "mandatoryKernelEvidenceProjected": true,
+    "contractDerivedFromKernelEvidence": true
+  },
+  "anumProtocol": {
+    "ontologyEntity": "Link",
+    "anumIsSeparateEntity": false,
+    "everyLocalAnumStartsAt": "R",
+    "exactAnumEqualsAddressedTarget": false,
+    "readOutcomes": [
+      "UNINTERPRETABLE",
+      "NOT_FOUND",
+      "FOUND"
+    ],
+    "resolve": {
+      "rootCutDepth": 1,
+      "readOnly": true,
+      "recursiveDereference": false,
+      "notFoundMaterializes": false
+    },
+    "addressMaterialization": {
+      "materializesExactAnum": true,
+      "materializesTarget": false
+    },
+    "targetMaterialization": {
+      "rootCutDepth": 1,
+      "writeAuthorized": true,
+      "recursiveDereference": false,
+      "failClosedBeforeWrite": true,
+      "preservesRemainingAnumIndirection": true
+    },
+    "rootBasis": {
+      "equationsUnchangedFromAcceptedFoundation": true,
+      "verifiedAtQBoundary": true,
+      "invalidBasisWrites": false,
+      "properOstensiveOCRelativeToR": true,
+      "verifiedAtStringReadBoundary": true,
+      "verifiedAtSourceReadBoundary": true
+    }
+  },
+  "stringAnumV012": {
+    "byteLaw": "Byte_v012(p)=Anum(bits8(p))=Resolve_Q([bits8(p)])",
+    "historicalByteV09Reused": false,
+    "exactForm": "R ⟼ Byte_v012(p1) ⟼ ... ⟼ Byte_v012(pn)",
+    "canonicalGroupedQCarrier": "[bits8(p1)][bits8(p2)]...",
+    "groupedQTopLevelIsExactStringAnum": true,
+    "utf8GroupingRewritesCarrierTopology": false,
+    "malformedExactBytesMayBeUtf8Uninterpretable": true,
+    "glyphSpellingIsSemanticAuthority": false
+  },
+  "sourceAuthority": {
+    "exactSourceCarrier": "StringAnum_v012",
+    "sourceOccurrenceDistinctFromResolvedMeaning": true,
+    "dictionaryGrammarTheoryFixedBeforeCandidate": true,
+    "ruleAdmissionUsesSameTheory": true,
+    "replayReadOnly": true,
+    "alternateWellFormedUseRejected": true,
+    "unadmittedRuleRejected": true,
+    "wrongClaimedResultRejected": true,
+    "mismatchedTheoryRejected": true,
+    "hostParserIsSemanticAuthority": false,
+    "independentlySelectedAuthorityRequired": true,
+    "dictionaryIdentitySelectedIndependently": true,
+    "grammarMembershipSelectedIndependently": true,
+    "theoryMembershipSelectedIndependently": true,
+    "rawSourceReplayConfersAuthority": false,
+    "rawRuleReplayConfersAuthority": false,
+    "candidateCanSelfAdmitAtConsumerBoundary": false,
+    "fixedTheoryArtifactRequired": true,
+    "selectedActAttachmentBoundaryRequired": true,
+    "sourceInterpreterAuthorityMustMatch": true,
+    "sourceUseBindingMustMatch": true,
+    "lateAmbientActMutationChangesSelectedVerdict": false,
+    "compositeConsumerVerifier": "replayV012SourceResultEvidence"
+  },
+  "currentPointer": "cutover/typescript-c1-acceptance-v0.5.json",
+  "acceptedMtsVersion": "mts-contract/v0.12",
+  "owners": {
+    "publicFacade": "ts/src/public.ts",
+    "memory": "ts/src/memory.ts",
+    "anum": "ts/src/anum.ts",
+    "source": "ts/src/source.ts",
+    "state": "ts/src/state.ts",
+    "dictionary": "ts/src/dictionary.ts",
+    "interpreter": "ts/src/interpreter.ts",
+    "sequence": "ts/src/sequence.ts",
+    "run": "ts/src/run.ts",
+    "proof": "ts/src/proof.ts",
+    "checker": "ts/src/checker.ts",
+    "directDeixis": "ts/src/direct-deixis.ts",
+    "valueBundle": "ts/src/value-bundle.ts",
+    "persistenceTopology": "ts/src/persistence-topology.ts",
+    "persistenceStore": "ts/src/persistent-store.ts",
+    "persistenceSequence": "ts/src/persistent-sequence.ts",
+    "exactSequence": "ts/src/exact-sequence.ts",
+    "quaternaryState": "ts/src/quaternary-state.ts",
+    "byteCarrier": "ts/src/byte-carrier.ts",
+    "structuralRule": "ts/src/structural-rule.ts",
+    "contextIntegration": "ts/src/context-integration.ts"
+  },
+  "rootBasisTarget": {
+    "R": "R = R ⟼ R",
+    "O": "O = O ⟼ R",
+    "C": "C = R ⟼ C",
+    "L": "L = O ⟼ C",
+    "U": "U = C ⟼ O"
+  },
+  "foundation": {
+    "minimalInternalSigns": [
+      "∞",
+      "[",
+      "]",
+      "1",
+      "0",
+      "(",
+      ")",
+      "⟼",
+      ":",
+      "=",
+      "."
+    ],
+    "deferredSigns": [
+      "≡",
+      "♂",
+      "♀",
+      "↑",
+      "{",
+      "}",
+      "¬",
+      "↛"
+    ],
+    "metaOnlySigns": [
+      "∧",
+      "⇔",
+      "⇒",
+      "≠",
+      "→"
+    ],
+    "internalSignCount": 11,
+    "supersededResearchSigns": [
+      "↑"
+    ],
+    "singleFormalArrow": "⟼",
+    "dotIntroduced": true,
+    "dotIsNewRootPrimitive": false,
+    "inheritedInternalSigns": [
+      "∞",
+      "[",
+      "]",
+      "1",
+      "0",
+      "(",
+      ")",
+      "⟼",
+      ":",
+      "=",
+      "."
+    ],
+    "qAlphabet": [
+      "[",
+      "]",
+      "1",
+      "0"
+    ],
+    "qAlphabetCount": 4,
+    "dotIsQAbit": false,
+    "colonIsQAbit": false,
+    "newPrimitiveExpected": false,
+    "minimalSignBasisStatus": "classified-c2-semantic-derived-presentation-cycle-retained"
+  },
+  "canonicalStringQuaternaryCarrier": {
+    "canonicalUnit": "byte",
+    "byteEnvelope": "[bbbbbbbb]",
+    "bitsPerEnvelope": 8,
+    "bitOrder": "MSB-first",
+    "unicodeNormalization": false,
+    "invalidUtf8CarrierAllowed": true,
+    "runtimeByteIdIsSemanticIdentity": false,
+    "representationEqualsInterpretation": false
+  },
+  "effects": {
+    "findEqualsMaterialize": false,
+    "notFoundImpliesNonExistence": false,
+    "readMayMaterialize": false,
+    "replayMayMaterialize": false,
+    "explicitMaterializationMustReuseSameGroundedForm": true
+  },
+  "releaseState": {
+    "theoryResearchComplete": true,
+    "contractBoundaryEstablished": true,
+    "executableEvidenceComplete": true,
+    "runtimeMappingComplete": true,
+    "documentationComplete": true,
+    "traceabilityComplete": true,
+    "readinessAuditComplete": true,
+    "semanticPreflightComplete": true,
+    "acceptedV011Mutated": false,
+    "acceptedCurrent": true,
+    "postAcceptanceDebtRepaymentPending": true
   }
 }

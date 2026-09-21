@@ -1,0 +1,253 @@
+{
+  "schema": "mts-traceability/v0.2",
+  "status": "candidate",
+  "accepted": false,
+  "contract": "contracts/mts-contract-v0.13.json",
+  "conformance": "contracts/mts-conformance-v0.13.json",
+  "issue": 1270,
+  "acceptance": null,
+  "invariants": {
+    "L1": {
+      "contractPointer": "/requiredSemanticLaws/L1",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-root-basis-R-O-C-L-U"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v013-empty-wire-is-not-root"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-memory-cycle-boundary.test.ts",
+        "ts/test/v013-cyclic-grounding-boundary.test.ts"
+      ]
+    },
+    "L2": {
+      "contractPointer": "/requiredSemanticLaws/L2",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-relative-form-quartet-generic-S",
+          "v013-relative-form-result-separation"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v013-flat-relative-glyph-collision-not-canonical"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-relative-form-quartet.test.ts",
+        "ts/test/v013-form-result-rule-authority.test.ts",
+        "ts/test/v013-symmetric-nonroot.test.ts"
+      ]
+    },
+    "L3": {
+      "contractPointer": "/requiredSemanticLaws/L3",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-relative-start-end-context-navigation"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-relative-pole-context.test.ts",
+        "ts/test/v013-relative-pole-source-authority.test.ts",
+        "ts/test/v013-prefix-result-rule-authority.test.ts"
+      ]
+    },
+    "L4": {
+      "contractPointer": "/requiredSemanticLaws/L4",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-quaternary-R-8",
+          "v013-quaternary-O-98",
+          "v013-quaternary-C-68",
+          "v013-quaternary-L-19868",
+          "v013-quaternary-U-16898",
+          "v013-nesting-968-vs-698",
+          "v013-complex-pair-1968698"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v013-invalid-physical-opcode-fails-before-representation-writes"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+        "ts/test/v013-file-wire-conformance.test.ts"
+      ]
+    },
+    "L5": {
+      "contractPointer": "/requiredSemanticLaws/L5",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-ordinary-equal-pole-pair"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v013-noncanonical-pair-188-rejected",
+          "v013-noncanonical-pair-1988-rejected",
+          "v013-noncanonical-pair-1868-rejected"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-binary-link-materialization-two-memory.test.ts",
+        "ts/test/v013-quaternary-canonicality.test.ts"
+      ]
+    },
+    "L6": {
+      "contractPointer": "/requiredSemanticLaws/L6",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-unknown-whole-two-memory"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v013-description-does-not-materialize-target"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-hierarchical-link-carrier.test.ts",
+        "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+        "ts/test/v013-unknown-whole-two-memory.test.ts"
+      ]
+    },
+    "L7": {
+      "contractPointer": "/requiredSemanticLaws/L7",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-shared-dag",
+          "v013-unknown-whole-two-memory",
+          "v013-real-file-1968698-two-memory"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-generic-semantic-carrier-shared-dag.test.ts",
+        "ts/test/v013-unknown-whole-two-memory.test.ts",
+        "ts/test/v013-file-wire-conformance.test.ts"
+      ]
+    },
+    "L8": {
+      "contractPointer": "/requiredSemanticLaws/L8",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-unknown-whole-two-memory"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v013-wrong-structural-rule-writes-zero-target-links"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-relative-form-materialization-two-memory.test.ts",
+        "ts/test/v013-binary-link-materialization-two-memory.test.ts",
+        "ts/test/v013-unknown-whole-two-memory.test.ts"
+      ]
+    },
+    "L9": {
+      "contractPointer": "/requiredSemanticLaws/L9",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-root-basis-R-O-C-L-U",
+          "v013-rooted-cycle-remains-ontologically-open"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-memory-cycle-boundary.test.ts",
+        "ts/test/v013-cyclic-grounding-boundary.test.ts"
+      ]
+    },
+    "L10": {
+      "contractPointer": "/requiredSemanticLaws/L10",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-root-origin-every-local-anum-context"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v013-unrooted-sequence-lookalike-rejected",
+          "v013-unrooted-anum-hierarchy-rejected"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-root-origin-law.test.ts"
+      ]
+    },
+    "L11": {
+      "contractPointer": "/requiredSemanticLaws/L11",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-string-exact-byte-roundtrip"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-string-anum-acceptance.test.ts"
+      ]
+    },
+    "L12": {
+      "contractPointer": "/requiredSemanticLaws/L12",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-formal-grounding-8-9-6-1",
+          "v013-formal-root-R-from-8",
+          "v013-formal-root-O-from-98",
+          "v013-formal-root-C-from-68",
+          "v013-formal-root-L-from-19868",
+          "v013-formal-derived-U-from-16898",
+          "v013-formal-generic-unknown-finite-term"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v013-wrong-structural-rule-writes-zero-target-links",
+          "v013-formal-root-wrong-rule-rejected",
+          "v013-formal-root-wrong-theory-rejected",
+          "v013-formal-root-malformed-prefix-rejected",
+          "v013-formal-root-noncanonical-pair-alias-rejected",
+          "v013-formal-root-no-host-term-special-case"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-formal-quaternary-grounding.test.ts",
+        "ts/test/v013-root-aspect-formal-composition.test.ts"
+      ]
+    },
+    "L13": {
+      "contractPointer": "/requiredSemanticLaws/L13",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v013-real-file-1968698-two-memory"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v013-invalid-physical-opcode-fails-before-representation-writes"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+        "ts/test/v013-file-wire-conformance.test.ts"
+      ]
+    }
+  }
+}

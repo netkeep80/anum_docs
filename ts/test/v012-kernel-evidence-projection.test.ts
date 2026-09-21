@@ -16,14 +16,28 @@ const conformance = JSON.parse(
   readonly requiredExecutableGates?: readonly string[];
 };
 
-const gate = "ts/test/v012-ostensive-self-incidence-matching.test.ts";
-assert(
-  conformance.requiredExecutableGates?.includes(gate) === true,
-  `merged mandatory kernel evidence is not projected into requiredExecutableGates: ${gate}`,
-);
+const gates = [
+  "ts/test/v012-ostensive-self-incidence-matching.test.ts",
+  "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+  "ts/test/v012-string-q-byte-bridge.test.ts",
+  "ts/test/v012-string-utf8-boundary.test.ts",
+  "ts/test/v012-formal-source-result-witness.test.ts",
+  "ts/test/v012-quaternary-root-basis-boundary.test.ts",
+  "ts/test/anum-two-memory-conformance.test.ts",
+  "ts/test/string-anum-two-memory-conformance.test.ts",
+  "ts/test/v012-public-facade-c7.test.ts",
+  "ts/test/v012-source-authority.test.ts",
+] as const;
 
-// Consuming a real kernel gate does not itself promote the candidate lifecycle.
-assert(conformance.status === "candidate", "v0.12 must remain candidate");
-assert(conformance.accepted === false, "v0.12 must remain not accepted");
-assert(conformance.acceptanceReady === false, "v0.12 must remain not acceptance-ready");
-assert(conformance.coverageState === "incomplete", "v0.12 must remain coverage-incomplete");
+for (const gate of gates) {
+  assert(
+    conformance.requiredExecutableGates?.includes(gate) === true,
+    `merged mandatory kernel evidence is not projected into requiredExecutableGates: ${gate}`,
+  );
+}
+
+// Consuming a real kernel gate does not itself decide lifecycle. The same
+// mandatory evidence remains required before and after explicit C10 acceptance.
+const candidateLifecycle = conformance.status === "candidate" && conformance.accepted === false;
+const acceptedLifecycle = conformance.status === "accepted" && conformance.accepted === true;
+assert(candidateLifecycle || acceptedLifecycle, "v0.12 is the ready candidate or accepted release");

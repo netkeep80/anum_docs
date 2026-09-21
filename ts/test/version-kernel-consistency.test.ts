@@ -13,6 +13,7 @@ interface ContractBoundary {
   readonly implementation?: {
     readonly package?: string;
     readonly singleLiveSemanticRuntime?: boolean;
+    readonly candidateRuntimeSelectable?: boolean;
     readonly implementationComplete?: boolean;
   };
 }
@@ -129,7 +130,20 @@ function verifyKernelBackedVersion(version: string): void {
   assert(conformance.schema === conformanceId, `${version}: conformance schema mismatch`);
   assert(conformance.contract === contractId, `${version}: conformance must point to its contract`);
   assert(contract.implementation?.package === "@mts/core", `${version}: contract must bind the real @mts/core kernel`);
-  assert(contract.implementation?.singleLiveSemanticRuntime === true, `${version}: version must have one live semantic kernel`);
+
+  const requiresLiveSemanticKernel =
+    contract.acceptanceReady === true || contract.accepted === true;
+  if (requiresLiveSemanticKernel) {
+    assert(
+      contract.implementation?.singleLiveSemanticRuntime === true,
+      `${version}: ready/accepted version must have one live semantic kernel`,
+    );
+  } else if (contract.implementation?.singleLiveSemanticRuntime !== true) {
+    assert(
+      contract.implementation?.candidateRuntimeSelectable !== true,
+      `${version}: evidence-backed candidate without a live kernel cannot be runtime-selectable`,
+    );
+  }
 
   const gates = conformance.requiredExecutableGates ?? [];
   assert(gates.length > 0, `${version}: paper conformance cannot exist without executable kernel gates`);

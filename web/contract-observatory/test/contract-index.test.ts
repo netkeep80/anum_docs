@@ -31,45 +31,45 @@ function expectCode(effect: () => unknown, code: ContractIndexErrorCode, message
 const repositoryRoot = process.cwd();
 const realIndex = buildContractObservatoryIndex(repositoryRoot);
 same(realIndex.schema, "mts-contract-observatory-index/v0.1", "index schema");
-same(realIndex.versions.length, 3, "current repository has current, previous and candidate pairs");
-same(
-  realIndex.versions.map((version) => version.contractId).join(","),
-  "mts-contract/v0.10,mts-contract/v0.11,mts-contract/v0.12",
-  "real repository uses natural version order",
-);
-same(realIndex.currentContractPath, "contracts/mts-contract-v0.11.json", "policy current contract");
-same(realIndex.currentConformancePath, "contracts/mts-conformance-v0.11.json", "policy current conformance");
-same(realIndex.previousContractPath, "contracts/mts-contract-v0.10.json", "policy previous contract");
-same(realIndex.previousConformancePath, "contracts/mts-conformance-v0.10.json", "policy previous conformance");
-same(realIndex.acceptancePath, "cutover/typescript-c1-acceptance-v0.4.json", "acceptance path comes from policy");
+assert(realIndex.versions.length >= 2, "repository exposes at least current and previous accepted pairs");
+same(realIndex.versions.filter((version) => version.isCurrent).length, 1, "exactly one current pair");
+same(realIndex.versions.filter((version) => version.isPrevious).length, 1, "exactly one previous pair");
+const v011Index = realIndex.versions.findIndex((version) => version.contractId === "mts-contract/v0.11");
+const v012Index = realIndex.versions.findIndex((version) => version.contractId === "mts-contract/v0.12");
+assert(v011Index >= 0 && v012Index > v011Index, "accepted v0.11/v0.12 retain natural version order");
+for (const version of realIndex.versions.filter((entry) => !entry.isCurrent && !entry.isPrevious)) {
+  same(version.accepted, false, `${version.contractId}: extra observed pair must not silently become accepted`);
+}
+same(realIndex.currentContractPath, "contracts/mts-contract-v0.12.json", "policy current contract");
+same(realIndex.currentConformancePath, "contracts/mts-conformance-v0.12.json", "policy current conformance");
+same(realIndex.previousContractPath, "contracts/mts-contract-v0.11.json", "policy previous contract");
+same(realIndex.previousConformancePath, "contracts/mts-conformance-v0.11.json", "policy previous conformance");
+same(realIndex.acceptancePath, "cutover/typescript-c1-acceptance-v0.5.json", "acceptance path comes from policy");
 
 const current = realIndex.versions.find((version) => version.isCurrent);
 const previous = realIndex.versions.find((version) => version.isPrevious);
-const candidate = realIndex.versions.find((version) => version.contractId === "mts-contract/v0.12");
-assert(current !== undefined && previous !== undefined && candidate !== undefined, "current, previous and candidate summaries exist");
-same(current.contractId, "mts-contract/v0.11", "current classification comes from evidence");
-same(previous.contractId, "mts-contract/v0.10", "previous classification comes from evidence");
+assert(current !== undefined && previous !== undefined, "current and previous summaries exist");
+same(current.contractId, "mts-contract/v0.12", "current classification comes from accepted evidence");
+same(previous.contractId, "mts-contract/v0.11", "previous classification comes from accepted evidence");
 same(current.status, "accepted", "current status projected");
 same(current.accepted, true, "current accepted flag projected");
 same(current.acceptanceReady, true, "current readiness projected");
 same(current.coverageState, "complete", "current coverage projected");
-same(current.requiredExecutableGateCount, 5, "current executable gate count projected");
+same(current.requiredExecutableGateCount, 16, "current v0.12 keeps all mandatory kernel, authority and preflight gates");
 assert(current.requiredNegativeVectorCount > 0, "current negative-vector coverage projected");
-same(candidate.status, "candidate", "candidate status projected");
-same(candidate.accepted, false, "candidate is not accepted");
-same(candidate.acceptanceReady, false, "candidate is not acceptance-ready");
-same(candidate.coverageState, "incomplete", "candidate coverage remains incomplete");
-same(candidate.requiredExecutableGateCount, 6, "v0.12 candidate projects C2-C6 gates plus merged ostensive self-incidence kernel evidence");
-assert(candidate.requiredNegativeVectorCount > 0, "candidate veto corpus is projected");
-same(candidate.isCurrent, false, "candidate is not current");
-same(candidate.isPrevious, false, "candidate is not previous");
+same(previous.status, "accepted", "previous v0.11 remains accepted evidence");
+same(previous.accepted, true, "previous accepted flag projected");
 
 const serialized = serializeContractObservatoryIndex(realIndex);
 same(serialized, serializeContractObservatoryIndex(buildContractObservatoryIndex(repositoryRoot)), "serialization is deterministic");
 assert(!serialized.includes("rootBasisTarget"), "index does not copy raw contract bodies");
 assert(!serialized.includes("TopBind(R,S)"), "index does not copy semantic equations");
 const livePaths = new Set(realIndex.versions.flatMap((version) => [version.contractPath, version.conformancePath]));
-same(livePaths.size, 6, "all six tracked evidence files accounted for exactly once");
+same(
+  livePaths.size,
+  realIndex.versions.length * 2,
+  "every observed contract/conformance pair is accounted for exactly once",
+);
 
 interface Fixture {
   readonly root: string;
@@ -106,16 +106,18 @@ function createFixture(versions = ["0.9", "0.10", "1.2", "1.10"]): Fixture {
   const previous = versions.at(-2)!;
   const acceptancePath = "cutover/acceptance.json";
   writeJson(root, "repo-policy.json", {
-    contract_conformance: {
-      current: {
-        contract: { path: `contracts/mts-contract-v${current}.json` },
-        conformance: { path: `contracts/mts-conformance-v${current}.json` },
+    packs: {
+      "contract-conformance": {
+        current: {
+          contract: { path: `contracts/mts-contract-v${current}.json` },
+          conformance: { path: `contracts/mts-conformance-v${current}.json` },
+        },
+        previous: {
+          contract: { path: `contracts/mts-contract-v${previous}.json` },
+          conformance: { path: `contracts/mts-conformance-v${previous}.json` },
+        },
+        acceptance: { document: { path: acceptancePath } },
       },
-      previous: {
-        contract: { path: `contracts/mts-contract-v${previous}.json` },
-        conformance: { path: `contracts/mts-conformance-v${previous}.json` },
-      },
-      acceptance: { document: { path: acceptancePath } },
     },
   });
   writeJson(root, acceptancePath, {
@@ -153,6 +155,68 @@ try {
   );
 } finally {
   rmSync(natural.root, { recursive: true, force: true });
+}
+
+
+// A nonaccepted candidate is observable without becoming current/previous or
+// changing the accepted pointer.
+const withCandidate = createFixture(["0.11", "0.12", "0.13"]);
+try {
+  overwrite(withCandidate.root, "contracts/mts-contract-v0.13.json", {
+    schema: "mts-contract/v0.13",
+    status: "candidate",
+    accepted: false,
+    acceptanceReady: false,
+    semanticBase: "mts-contract/v0.12",
+    observableSemanticDelta: true,
+    conformanceCorpus: "contracts/mts-conformance-v0.13.json",
+    issue: 1270,
+    candidateLifecycleIssue: 1270,
+  });
+  overwrite(withCandidate.root, "contracts/mts-conformance-v0.13.json", {
+    schema: "mts-conformance/v0.13",
+    status: "candidate",
+    accepted: false,
+    contract: "mts-contract/v0.13",
+    coverageState: "partial",
+    requiredExecutableGates: ["candidate-gate"],
+    requiredNegativeVectors: ["candidate-negative"],
+  });
+  overwrite(withCandidate.root, "repo-policy.json", {
+    packs: {
+      "contract-conformance": {
+        current: {
+          contract: { path: "contracts/mts-contract-v0.12.json" },
+          conformance: { path: "contracts/mts-conformance-v0.12.json" },
+        },
+        previous: {
+          contract: { path: "contracts/mts-contract-v0.11.json" },
+          conformance: { path: "contracts/mts-conformance-v0.11.json" },
+        },
+        acceptance: { document: { path: withCandidate.acceptancePath } },
+      },
+    },
+  });
+  overwrite(withCandidate.root, withCandidate.acceptancePath, {
+    current: {
+      contract: "contracts/mts-contract-v0.12.json",
+      conformance: "contracts/mts-conformance-v0.12.json",
+    },
+  });
+
+  const candidateIndex = buildContractObservatoryIndex(withCandidate.root);
+  same(candidateIndex.versions.length, 3, "candidate pair is visible alongside accepted pair history");
+  const candidate = candidateIndex.versions.find((version) => version.contractId === "mts-contract/v0.13");
+  assert(candidate !== undefined, "candidate summary exists");
+  same(candidate.status, "candidate", "candidate status projected");
+  same(candidate.accepted, false, "candidate remains nonaccepted");
+  same(candidate.acceptanceReady, false, "candidate remains not ready");
+  same(candidate.isCurrent, false, "candidate does not become current");
+  same(candidate.isPrevious, false, "candidate does not become previous");
+  same(candidateIndex.versions.find((version) => version.isCurrent)?.contractId, "mts-contract/v0.12", "accepted current remains v0.12");
+  same(candidateIndex.versions.find((version) => version.isPrevious)?.contractId, "mts-contract/v0.11", "accepted previous remains v0.11");
+} finally {
+  rmSync(withCandidate.root, { recursive: true, force: true });
 }
 
 fixtureCase(({ root }) => {
@@ -209,10 +273,12 @@ fixtureCase(({ root }) => {
 });
 fixtureCase(({ root }) => {
   overwrite(root, "repo-policy.json", {
-    contract_conformance: {
-      current: { contract: { path: "contracts/missing.json" }, conformance: { path: "contracts/mts-conformance-v1.10.json" } },
-      previous: { contract: { path: "contracts/mts-contract-v1.2.json" }, conformance: { path: "contracts/mts-conformance-v1.2.json" } },
-      acceptance: { document: { path: "cutover/acceptance.json" } },
+    packs: {
+      "contract-conformance": {
+        current: { contract: { path: "contracts/missing.json" }, conformance: { path: "contracts/mts-conformance-v1.10.json" } },
+        previous: { contract: { path: "contracts/mts-contract-v1.2.json" }, conformance: { path: "contracts/mts-conformance-v1.2.json" } },
+        acceptance: { document: { path: "cutover/acceptance.json" } },
+      },
     },
   });
   expectCode(() => buildContractObservatoryIndex(root), "policy-path-missing", "policy points outside discovered pairs");
