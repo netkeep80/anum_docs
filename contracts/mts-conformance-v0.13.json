@@ -37,8 +37,7 @@
     "ts/test/v013-cyclic-grounding-boundary.test.ts",
     "ts/test/v013-link-native-abit-basis.test.ts",
     "ts/test/v013-root-aspect-formal-composition.test.ts",
-    "ts/test/v013-public-facade.test.ts",
-    "ts/test/v013-kernel-public-lifecycle.test.ts"
+    "ts/test/v013-public-facade.test.ts"
   ],
   "plannedExecutableGates": [],
   "lawEvidence": {
@@ -822,11 +821,11 @@
   "candidateKernelImplementation": {
     "status": "green-complete",
     "publicFacadeGate": "ts/test/v013-public-facade.test.ts",
-    "lifecycleGate": "ts/test/v013-kernel-public-lifecycle.test.ts",
     "publicFacadeMerge": "d5df98791973711d054cdcf5dc3f9c25c0a8f4ae",
     "acceptedRuntimeRemains": "mts-contract/v0.12",
     "candidateRuntimeSelectable": false,
     "readinessAuditComplete": false,
-    "explicitAuthorAcceptanceRecorded": false
+    "explicitAuthorAcceptanceRecorded": false,
+    "lifecycleCheck": "ts/test/v013-kernel-public-lifecycle.test.ts"
   }
 }
