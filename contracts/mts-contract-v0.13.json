@@ -261,7 +261,7 @@
     "semanticLawSetFrozenForR7b": true,
     "contractBoundaryEstablished": true,
     "conformanceObligationsDeclared": true,
-    "traceabilityComplete": false,
+    "traceabilityComplete": true,
     "documentationComplete": false,
     "readinessAuditComplete": false,
     "explicitAuthorAcceptanceRecorded": false
@@ -282,5 +282,6 @@
     "accepted": false,
     "acceptanceReady": false,
     "candidateRuntimeSelectable": false
-  }
+  },
+  "traceabilityManifest": "traceability/mts-v0.13.json"
 }
