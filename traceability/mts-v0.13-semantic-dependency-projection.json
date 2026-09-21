@@ -1,9 +1,9 @@
 {
-  "schema": "mts-semantic-dependency-projection/v0.6",
+  "schema": "mts-semantic-dependency-projection/v0.7",
   "mtsVersion": "0.13",
   "status": "research",
   "ownerIssue": 1270,
-  "candidateMain": "cd9dde66d9210d5d43024ceb0d8280b4d458e4f4",
+  "candidateMain": "832ffa3643b13eba4c9b29211ddf773ebd815b2d",
   "externalAuditProjectionOnly": true,
   "normativeFoundation": false,
   "semanticAuthority": false,
@@ -20,7 +20,9 @@
     "packageInterpretationEntrypointAuditComplete": true,
     "packageStaticSemanticDecisionAuditComplete": true,
     "packageTypedMemoryReadAuditComplete": true,
-    "packageTypedMemoryWriteCrossCheckComplete": true
+    "packageTypedMemoryWriteCrossCheckComplete": true,
+    "mandatoryGateRuntimeTrustCoverageComplete": true,
+    "mandatoryGateRuntimeBypassFalsificationComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -769,7 +771,16 @@
     "packageWideExactWireLiteralDispatchCount": 0,
     "typedDirectSemanticWriteOwnerCount": 49,
     "hostLinkDuplicationCandidateCount": 26,
-    "confirmedHostLinkEquivalentDuplicationCount": null
+    "confirmedHostLinkEquivalentDuplicationCount": null,
+    "observedMandatoryGateMemoryOperationCount": 1182599,
+    "observedMandatoryGateMemoryOperationKindCount": 11,
+    "observedMandatoryGateSourcePathOperationKindCount": 10,
+    "unobservedMandatoryGateInstrumentedOperationCount": 1,
+    "observedMandatoryGateRuntimeSourceFileCount": 26,
+    "observedMandatoryGateRuntimeDirectCallerCount": 25,
+    "observedMandatoryGateUniqueRuntimePathCount": 315,
+    "undocumentedObservedMandatoryGateDirectCallerCount": 0,
+    "mandatoryGateDirectTestFixtureOperationCount": 20656
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -792,21 +803,31 @@
     "typedReadMemoryOwnerCount": "S3 count of function/method owners containing at least one type-resolved ReadMemory access.",
     "staticSemanticDecisionCandidateOwnerCount": "S3 conservative static candidate count: owners with Link-dependent decisions, typed Memory-read decisions, literal/tag dispatch, fixed coordinate indexing, host callbacks or module-level mutable-state decisions. It is not a primitive count.",
     "staticDecisionOwnersByCategory": "File-role classification of the S3 static candidate surface. Proof, representation, transport, resource and tooling categories must not be counted as foundation primitives.",
-    "packageWideExactWireLiteralDispatchCount": "S3 count signal for exact multi-abit wire-like literals participating in detected host equality dispatch. Zero does not by itself prove absence of all object-specific host semantics."
+    "packageWideExactWireLiteralDispatchCount": "S3 count signal for exact multi-abit wire-like literals participating in detected host equality dispatch. Zero does not by itself prove absence of all object-specific host semantics.",
+    "observedMandatoryGateMemoryOperationCount": "Observed dynamic Memory calls while re-running the exact 39 mandatory v0.13 gates under test-only instrumentation. Descriptive workload count, not a foundation-complexity metric.",
+    "observedMandatoryGateMemoryOperationKindCount": "Number of instrumented Memory operation kinds invoked at least once by the exact mandatory-gate corpus, including direct test/fixture calls.",
+    "observedMandatoryGateSourcePathOperationKindCount": "Number of Memory operation kinds with at least one observed ts/src caller path in the exact mandatory-gate corpus.",
+    "unobservedMandatoryGateInstrumentedOperationCount": "Instrumented Memory operation kinds not exercised by the exact mandatory-gate corpus. Nonzero prevents overclaiming complete operation-surface coverage.",
+    "observedMandatoryGateRuntimeSourceFileCount": "Distinct ts/src files appearing anywhere in observed instrumented Memory call-stack paths for the exact mandatory-gate corpus.",
+    "observedMandatoryGateRuntimeDirectCallerCount": "Distinct first ts/src callers of instrumented Memory operations in the exact mandatory-gate corpus.",
+    "observedMandatoryGateUniqueRuntimePathCount": "Distinct operation + ordered ts/src call-stack signatures observed while executing the exact mandatory-gate corpus.",
+    "undocumentedObservedMandatoryGateDirectCallerCount": "Zero means every observed direct ts/src caller in the exact mandatory-gate corpus belongs to the P1e/P1f classified static surfaces. This is corpus-scoped and does not imply globalUndocumentedSemanticPathCount=0.",
+    "mandatoryGateDirectTestFixtureOperationCount": "Instrumented Memory calls whose stack contains no ts/src caller after memory.ts is removed; these are test/fixture-side operations and are excluded from production source-path closure."
   },
   "nextExperiments": [
-    "P1g: instrument real semantic entry points and Memory mutation/decision operations; require zero undocumented observed semantic paths/operations and hard bypass rejection.",
+    "SP1-SP3: build the first bounded MTS-about-MTS proof corpus under an independently frozen exact candidate Theory/profile.",
+    "P2: integrate A10b and the P1g observed runtime surface into a witness-scoped self-hosting maturity matrix with explicit residual host capabilities.",
+    "P2b: execute a previously unknown Theory/Rule program without new host semantic dispatch.",
+    "SP4/P3a: run proof-driven and runtime fault-injection single bootstrap elimination experiments; failed removal remains UNKNOWN.",
+    "P3b: run the bounded 2^8 joint subset/minimal-basis experiment and classify equivalent re-encodings.",
     "Refine host/Link duplication from candidate overlap to confirmed semantic-equivalence duplication.",
-    "Integrate A10b into a witness-scoped self-hosting maturity matrix with explicit residual host capabilities.",
-    "Run proof-driven and fault-injection per-bootstrap-capability elimination experiments only after runtime path coverage; failed removal remains UNKNOWN.",
-    "Run the bounded 2^8 joint subset/minimal-basis experiment after single-capability elimination.",
     "Build a v0.12 -> v0.13 delta only for metrics measured under the same schema and scope."
   ],
   "measurement": {
-    "modelRevision": "A9-P1f-package-static-semantic-decision-audit",
+    "modelRevision": "A9-P1g-mandatory-gate-runtime-trust-coverage",
     "metricDeltaComparableToPreviousRevision": false,
-    "scope": "S3",
-    "reason": "P1f adds type-resolved package-wide read/write cross-checks and a conservative static host-decision candidate inventory. These S3 counts are audit-surface metrics, not minimal-foundation metrics."
+    "scope": "S1+S2 mandatory executable corpus observed through S3 Memory instrumentation",
+    "reason": "P1g adds dynamic observed-path evidence over all 39 mandatory candidate/inherited gates. It does not alter runtime and does not convert corpus-scoped zero-undocumented evidence into a global path-closure claim."
   },
   "authorityServiceUnfolding": {
     "replacedCapability": "bootstrap.accepted-v012-authority-runtime",
@@ -1410,6 +1431,158 @@
       "File-role classification separates semantic authority/proof replay/representation/transport/resource/tooling but does not prove semantic equivalence or independence.",
       "Inter-procedural dataflow, dynamic aliasing, reflective/dynamic invocation and future write APIs require P1g runtime instrumentation/bypass falsification.",
       "A zero exact-wire-literal signal does not imply zero object-specific host semantic authority."
+    ]
+  },
+  "runtimeTrustCoverage": {
+    "status": "green-observed-mandatory-corpus",
+    "scope": "requiredExecutableGates-v0.13",
+    "baselineMain": "832ffa3643b13eba4c9b29211ddf773ebd815b2d",
+    "gateCount": 39,
+    "allMandatoryGatesPassedUnderInstrumentation": true,
+    "instrumentation": {
+      "location": "ts/test/research-v013-runtime-trust-a9.test.ts",
+      "productionRuntimeModified": false,
+      "mechanism": "test-process Memory.prototype interception before importing each existing compiled mandatory gate in an isolated child Node process",
+      "operations": [
+        "root",
+        "linkCount",
+        "poles",
+        "find",
+        "outgoing",
+        "incoming",
+        "issuanceIndex",
+        "allLinks",
+        "ensureRoot",
+        "ensureStartSelfClosed",
+        "ensureEndSelfClosed",
+        "ensure"
+      ]
+    },
+    "operationCoverage": {
+      "observedOperationKinds": [
+        "allLinks",
+        "ensure",
+        "ensureEndSelfClosed",
+        "ensureRoot",
+        "ensureStartSelfClosed",
+        "find",
+        "issuanceIndex",
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ],
+      "observedSourcePathOperationKinds": [
+        "allLinks",
+        "ensure",
+        "ensureEndSelfClosed",
+        "ensureRoot",
+        "ensureStartSelfClosed",
+        "find",
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ],
+      "unobservedOperationKinds": [
+        "incoming"
+      ],
+      "fixtureOnlyOperationKinds": [
+        "issuanceIndex"
+      ],
+      "observedOperationCounts": {
+        "allLinks": 313,
+        "ensure": 110352,
+        "ensureEndSelfClosed": 2392,
+        "ensureRoot": 561,
+        "ensureStartSelfClosed": 47882,
+        "find": 3646,
+        "incoming": 0,
+        "issuanceIndex": 499,
+        "linkCount": 8418,
+        "outgoing": 814,
+        "poles": 828800,
+        "root": 178922
+      },
+      "totalObservedOperationCount": 1182599,
+      "directTestFixtureOperationCount": 20656,
+      "note": "Operation frequencies are descriptive evidence only. The trust-boundary invariant is the classified observed path/direct-caller surface, not a requirement that execution counts remain semantically significant."
+    },
+    "observedPathSurface": {
+      "uniquePathCount": 315,
+      "pathFingerprintAlgorithm": "FNV-1a-64 over sorted unique operation|ts/src-stack signatures",
+      "pathFingerprint": "ec997063492a037e",
+      "sourceFileCount": 26,
+      "directCallerCount": 25,
+      "directCallers": [
+        "ts/src/anum-carrier.ts",
+        "ts/src/anum.ts",
+        "ts/src/byte-carrier.ts",
+        "ts/src/context-integration.ts",
+        "ts/src/dictionary.ts",
+        "ts/src/exact-sequence.ts",
+        "ts/src/interpreter.ts",
+        "ts/src/persistence-topology.ts",
+        "ts/src/portable-theory.ts",
+        "ts/src/quaternary-anum.ts",
+        "ts/src/quaternary-serialization.ts",
+        "ts/src/quaternary-state.ts",
+        "ts/src/rooted-sequence.ts",
+        "ts/src/source.ts",
+        "ts/src/state.ts",
+        "ts/src/structural-readers.ts",
+        "ts/src/structural-rule.ts",
+        "ts/src/v012-formal-execution.ts",
+        "ts/src/v012-source.ts",
+        "ts/src/v012-string-anum.ts",
+        "ts/src/v013-formal-aspect-evaluator.ts",
+        "ts/src/v013-hierarchical-carrier.ts",
+        "ts/src/v013-relative-form-materialization.ts",
+        "ts/src/v013-relative-pole-context.ts",
+        "ts/src/v013-relative-pole-execution.ts"
+      ],
+      "sourceFiles": [
+        "ts/src/anum-carrier.ts",
+        "ts/src/anum.ts",
+        "ts/src/byte-carrier.ts",
+        "ts/src/canonical-topology.ts",
+        "ts/src/context-integration.ts",
+        "ts/src/dictionary.ts",
+        "ts/src/exact-sequence.ts",
+        "ts/src/interpreter.ts",
+        "ts/src/persistence-topology.ts",
+        "ts/src/portable-theory.ts",
+        "ts/src/quaternary-anum.ts",
+        "ts/src/quaternary-serialization.ts",
+        "ts/src/quaternary-state.ts",
+        "ts/src/rooted-sequence.ts",
+        "ts/src/source.ts",
+        "ts/src/state.ts",
+        "ts/src/structural-readers.ts",
+        "ts/src/structural-rule.ts",
+        "ts/src/v012-formal-execution.ts",
+        "ts/src/v012-source.ts",
+        "ts/src/v012-string-anum.ts",
+        "ts/src/v013-formal-aspect-evaluator.ts",
+        "ts/src/v013-hierarchical-carrier.ts",
+        "ts/src/v013-relative-form-materialization.ts",
+        "ts/src/v013-relative-pole-context.ts",
+        "ts/src/v013-relative-pole-execution.ts"
+      ],
+      "undocumentedDirectCallerCount": 0
+    },
+    "falsification": {
+      "status": "green",
+      "syntheticUnknownCallerRejected": true,
+      "removedObservedCallerRejected": true,
+      "meaning": "The same classifier that accepts the observed corpus rejects both an injected unknown ts/src caller and the real corpus after one actually observed direct caller is removed from the allowlist."
+    },
+    "limitations": [
+      "The result covers the exact 39 mandatory v0.13 executable gates, not every theoretically possible runtime input/path.",
+      "The mandatory corpus does not exercise Memory.incoming at all.",
+      "Memory.issuanceIndex is observed only from test/fixture-side stacks, not through a ts/src caller path.",
+      "Dynamic operation frequencies are descriptive and are not a simplicity/foundation-size metric.",
+      "globalUndocumentedSemanticPathCount remains UNMEASURED and globalTrustBoundaryComplete remains false."
     ]
   }
 }
