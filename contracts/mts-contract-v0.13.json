@@ -113,7 +113,64 @@
       "endStartRoot": "698",
       "mixedPair": "1968698"
     },
-    "acceptedV012QAlphabetReplacedRetroactively": false
+    "acceptedV012QAlphabetReplacedRetroactively": false,
+    "derivedFromLinkSelfIncidencePartition": true,
+    "linkNativeAbitBasis": {
+      "ontologyEntity": "Link",
+      "abitIsSeparateOntologyEntity": false,
+      "atomicity": "interpretation-local, not ontological",
+      "classifier": {
+        "startBit": "1 iff start(X) = X, otherwise 0",
+        "endBit": "1 iff end(X) = X, otherwise 0",
+        "table": {
+          "10": {
+            "structuralClass": "START",
+            "signLink": "O",
+            "physicalSpelling": "9",
+            "arity": 1
+          },
+          "11": {
+            "structuralClass": "ROOT",
+            "signLink": "R",
+            "physicalSpelling": "8",
+            "arity": 0
+          },
+          "00": {
+            "structuralClass": "PAIR",
+            "signLink": "L",
+            "physicalSpelling": "1",
+            "arity": 2
+          },
+          "01": {
+            "structuralClass": "END",
+            "signLink": "C",
+            "physicalSpelling": "6",
+            "arity": 1
+          }
+        }
+      },
+      "canonicalSignDefinitions": {
+        "R": "R = R ⟼ R",
+        "O": "O = O ⟼ R",
+        "C": "C = R ⟼ C",
+        "L": "L = O ⟼ C"
+      },
+      "bothSelfClosedUniquenessLaw": "X = X ⟼ X => X = R",
+      "UIsFifthStructuralAbit": false,
+      "UStructuralClass": "PAIR",
+      "signLinkEqualsCanonicalDescriptionOfSign": false,
+      "signDescriptionExamples": {
+        "START sign Link": "O",
+        "START physical spelling": "9",
+        "canonical description of semantic O": "98"
+      },
+      "directPrefixCardinality": {
+        "scope": "one abit per node; the current tag alone selects the local self-incidence class and node arity without external parser state",
+        "structuralClassCount": 4,
+        "requiredDistinctAbitValues": 4,
+        "claimsGlobalMinimumOverVariableLengthPhysicalCodes": false
+      }
+    }
   },
   "canonicalTopologyClass": {
     "ROOT": "8",
@@ -264,7 +321,8 @@
     "traceabilityComplete": true,
     "documentationComplete": true,
     "readinessAuditComplete": false,
-    "explicitAuthorAcceptanceRecorded": false
+    "explicitAuthorAcceptanceRecorded": false,
+    "linkNativeAbitGroundingComplete": true
   },
   "owners": {
     "memory": "ts/src/memory.ts",
