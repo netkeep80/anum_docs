@@ -77,8 +77,9 @@
     "selfGeneratedFullF4AuthorityProven": true,
     "genericConstructionPlanF5F4Complete": true,
     "genericConstructionRuntimeDomainSourceRemovalProven": true,
-    "templateInstantiationF5F5Complete": false,
-    "externalConstructionPlanCompilerRemoved": false
+    "templateInstantiationF5F5Complete": true,
+    "externalConstructionPlanCompilerRemoved": true,
+    "publicationOnlyTemplateClosureComplete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1008,12 +1009,13 @@
     "genericConstructionPlanF5F4EndSelfEnsureCount": 0,
     "genericConstructionPlanF5F4DomainSpecificConstructorBranchCount": 0,
     "genericConstructionPlanF5F4IndependentMemoryCount": 2,
-    "templateInstantiationF5F5MappedSeedCount": null,
-    "templateInstantiationF5F5OrdinaryCloneCount": null,
-    "templateInstantiationF5F5StartSelfCloneCount": null,
-    "templateInstantiationF5F5EndSelfCloneCount": null,
-    "templateInstantiationF5F5FullSelfCloneCount": null,
-    "templateInstantiationF5F5IndependentMemoryCount": null
+    "templateInstantiationF5F5MappedSeedCount": 142,
+    "templateInstantiationF5F5OrdinaryCloneCount": 94,
+    "templateInstantiationF5F5StartSelfCloneCount": 23,
+    "templateInstantiationF5F5EndSelfCloneCount": 0,
+    "templateInstantiationF5F5FullSelfCloneCount": 0,
+    "templateInstantiationF5F5IndependentMemoryCount": 2,
+    "templateInstantiationF5F5ExplicitSeedCorrespondenceCount": 25
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1198,14 +1200,15 @@
     "templateInstantiationF5F5StartSelfCloneCount": "Template Links instantiated by generic START self-closure detected only from source Link self-incidence.",
     "templateInstantiationF5F5EndSelfCloneCount": "Template Links instantiated by generic END self-closure detected only from source Link self-incidence.",
     "templateInstantiationF5F5FullSelfCloneCount": "Template Links instantiated as full self-closure/root detected only from source Link self-incidence.",
-    "templateInstantiationF5F5IndependentMemoryCount": "Independent fresh Memories instantiating the same admitted template and frozen seed correspondences."
+    "templateInstantiationF5F5IndependentMemoryCount": "Independent fresh Memories instantiating the same admitted template and frozen seed correspondences.",
+    "templateInstantiationF5F5ExplicitSeedCorrespondenceCount": "Explicit frozen source-template -> target seed correspondences required before generic recursion. Twenty-five is the measured residual external correspondence authority in F5-F5."
   },
   "nextExperiments": [
-    "F5-F5: falsify/remove the external construction-plan source. The 97-equation F5-F4 plan must be generated or reconstructed from more primitive frozen MTS evidence without running the domain-specific F5-F3 reference producer as a compiler.",
-    "Source-remove or classify the generic structural admission rule interpreter itself; data-driven E3 is not yet global E3 closure.",
-    "Carry A14 root asymmetry/chirality into future carrier/observer redesigns; reversal may exchange L/U but an orientation-free non-degenerate root basis must defeat O=C and L=U collapse controls.",
-    "A15: investigate weighted predictive Bundle frontiers with weights on occurrences/provenance; prediction/ranking must remain separate from admission and publication authority.",
-    "Keep A13/A13b branch scheduling/materialization semantics as the substrate for multi-candidate generation and future physical parallel-executor work."
+    "F5-F6: attack the 25 external seed correspondences. Partition them into identity/shared-context, derivable-by-structure, and genuinely externally selected mappings; reconstruct every derivable correspondence from the two Link-carried requests/template evidence and measure the irreducible remainder.",
+    "F5-F6 must also test template selection: distinguish whether a suitable closure-complete authority can be selected by frozen structural evidence rather than a host-chosen template handle.",
+    "Promote the F5-F5 publication-only RED into a general authority-closure invariant: a publication claim cannot stand for portable executable authority unless its selected evidence closure is explicitly rooted/recoverable.",
+    "Audit whether F5-F2 verification, F5-F4 construction and F5-F5 cloning can converge onto one bidirectional role/pole kernel instead of three host interpreters.",
+    "Keep global E2/E3/E4 and FULL_SELF_HOSTED open until the remaining seed/template-selection source authority is reconstructed or explicitly proven irreducible."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -4031,7 +4034,7 @@
       }
     },
     "templateInstantiationF5F5": {
-      "status": "DESIGNED_NOT_EXECUTED",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can the external F5-F4 97-equation plan compiler be removed by using one already-admitted Link-native generated authority itself as the constructive template for a new named function?",
       "setup": [
         "build and admit/publish one ordinary F5-F3-style q(a) authority before the target freeze",
@@ -4066,11 +4069,32 @@
         "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
       ],
       "evidenceTest": "ts/test/research-v013-template-instantiation-f5-f5.test.ts",
-      "consequence": "First execution falsified publication-only templating: the publication Link is not closure-complete for F4-compatible portable authority. The revised F5-F5 test therefore keeps that failure as an explicit negative control and tests a Link-native closure-complete authority-root set. GREEN would remove the external 97-equation compiler while making template-root selection and seed correspondence the next precise source boundary.",
+      "consequence": "F5-F5 removes the explicit external 97-equation construction-plan compiler from the tested runtime path. A previously admitted closure-complete Link-native authority can serve as the constructive exemplar for a new named function, and generic topology recursion reproduces the domain reference exactly. The source boundary is now smaller and sharper: 25 externally prepared seed correspondences plus external selection of one suitable closure-complete template. Publication alone is insufficient. Semantic information is reused and structurally reconstructed, not eliminated; global E2/E3/E4 and FULL_SELF_HOSTED remain open.",
       "negativeControls": [
         "publication-only template: clone only q publication and require canonical topology to differ from the domain reference; publication is therefore not closure-complete authority",
         "missing required seed: remove one frozen seed binding while retaining the required-seed set and require rejection before cloning"
-      ]
+      ],
+      "currentResult": "GREEN after one informative falsifier: cloning only the q publication is RED because publication is not closure-complete for F4 portable authority. When the frozen Link-native template is expanded to the closure-complete authority-root set, 25 explicit q->r seed correspondences plus one generic pole/self-incidence recursion reconstruct 142 mapped Links using 94 ordinary and 23 START-self clones, with zero END/full-self clones. The complete canonical topology is byte-identical to an independent domain reference generation of r(a), frozen F5-F2 admission remains GREEN, the cloned Dictionary resolves r to the cloned function, a missing required seed rejects, and two independent template Memories agree.",
+      "observed": {
+        "explicitFrozenSeedCorrespondences": 25,
+        "mappedLinksAfterRun": 142,
+        "ordinaryClones": 94,
+        "startSelfClones": 23,
+        "endSelfClones": 0,
+        "fullSelfClones": 0,
+        "publicationOnlyTemplate": "RED_INCOMPLETE_CLOSURE",
+        "fullAuthorityRootTemplate": "GREEN",
+        "external97EquationPlanCompiler": "REMOVED",
+        "existingAdmittedTemplateAuthorities": 1,
+        "externalSeedCorrespondence": true,
+        "topologyEqualsReference": true,
+        "frozenF5F2Admission": true,
+        "targetNameResolution": true,
+        "missingRequiredSeedRejected": true,
+        "independentMemories": 2,
+        "semanticInformationEliminated": false,
+        "productionChanged": false
+      }
     }
   }
 }
