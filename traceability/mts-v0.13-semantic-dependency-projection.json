@@ -82,8 +82,8 @@
     "publicationOnlyTemplateClosureComplete": false,
     "seedCorrespondenceCompressionF5F6Complete": true,
     "explicitPerLinkSeedPairsRemoved": true,
-    "sourceCorrespondenceDerivationF5F7Complete": false,
-    "externalPrefixSequencePreparationRemoved": false
+    "sourceCorrespondenceDerivationF5F7Complete": true,
+    "externalPrefixSequencePreparationRemoved": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1026,14 +1026,14 @@
     "seedCorrespondenceCompressionF5F6DerivedUniqueSeedCount": 23,
     "seedCorrespondenceCompressionF5F6MappedLinkCount": 142,
     "seedCorrespondenceCompressionF5F6IndependentMemoryCount": 2,
-    "sourceCorrespondenceDerivationF5F7ExternalCorrespondenceDeclarationCount": null,
-    "sourceCorrespondenceDerivationF5F7RequestZippedPositionCount": null,
-    "sourceCorrespondenceDerivationF5F7StructuralCandidateCount": null,
-    "sourceCorrespondenceDerivationF5F7DerivedPrefixPositionCount": null,
-    "sourceCorrespondenceDerivationF5F7DerivedUniqueSeedCount": null,
-    "sourceCorrespondenceDerivationF5F7MappedLinkCount": null,
-    "sourceCorrespondenceDerivationF5F7SourceFieldBranchCount": null,
-    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": null
+    "sourceCorrespondenceDerivationF5F7ExternalCorrespondenceDeclarationCount": 1,
+    "sourceCorrespondenceDerivationF5F7RequestZippedPositionCount": 19,
+    "sourceCorrespondenceDerivationF5F7StructuralCandidateCount": 1,
+    "sourceCorrespondenceDerivationF5F7DerivedPrefixPositionCount": 5,
+    "sourceCorrespondenceDerivationF5F7DerivedUniqueSeedCount": 23,
+    "sourceCorrespondenceDerivationF5F7MappedLinkCount": 142,
+    "sourceCorrespondenceDerivationF5F7SourceFieldBranchCount": 0,
+    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1236,11 +1236,11 @@
     "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": "Independent Memories required to reproduce byte-identical target topology under the same single request correspondence."
   },
   "nextExperiments": [
-    "F5-F7: eliminate the externally prepared source-prefix correspondence declaration. Derive compatible prefix correspondence from the already-selected q/r source carriers or from their Link-native source evidence with a generic structural traversal, without semantic STRING-position labels.",
-    "F5-F7 should measure whether the request-sequence correspondence alone plus a generic source-carrier relation can reproduce the 23 unique seed mappings required by F5-F6.",
-    "Then attack external template selection: select a closure-complete authority exemplar by frozen structural admission/signature rather than a host-supplied template handle.",
-    "Keep the F5-F5 publication-only RED as an authority-closure invariant: publication identity alone is not portable executable authority unless the selected evidence closure is rooted/recoverable.",
-    "Audit unification of F5-F2 verification, F5-F4 construction, F5-F5 cloning and F5-F6 correspondence into one bidirectional role/pole kernel before making any FULL_SELF_HOSTED claim."
+    "F5-F8: attack external request-correspondence selection. Derive target correspondence from a Link-native transformation/renaming request and the selected template, instead of supplying qRequest->rRequest as an already paired host-chosen Link.",
+    "F5-F8 should separate shared-context identity from true delta inputs: target physical name/source/function seeds are the intended delta; inherited argument/results/grammar/theory/syntax/direct-method context should be recovered by structure or template identity rather than repeated correspondence positions.",
+    "Then attack external template selection: choose a closure-complete authority exemplar through frozen structural signature/admission rather than a host-supplied template handle.",
+    "Preserve the F5-F5 authority-closure falsifier: publication alone remains insufficient unless its selected executable evidence closure is rooted/recoverable.",
+    "Keep global E2/E3/E4 and FULL_SELF_HOSTED open until request-delta and template-selection authority are reconstructed or proven irreducible."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -4182,7 +4182,7 @@
       }
     },
     "sourceCorrespondenceDerivationF5F7": {
-      "status": "DESIGNED_NOT_EXECUTED",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can F5-F6's externally prepared q/r source-prefix sequence correspondence be eliminated, deriving the same prefix mappings structurally from the single already-selected q-request <-> r-request correspondence?",
       "frozenAuthority": [
         "one closure-complete admitted q authority template",
@@ -4216,7 +4216,30 @@
         "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
       ],
       "evidenceTest": "ts/test/research-v013-source-correspondence-derivation-f5-f7.test.ts",
-      "consequence": "Pending CI. GREEN would reduce F5-F6 from two external correspondence declarations to one while eliminating separate source-prefix preparation and preserving exact reference topology."
+      "consequence": "F5-F7 removes the separately prepared source-prefix correspondence and compresses residual correspondence authority to one request-sequence pairing. The five prefix mappings are reconstructed from self-incidence plus rooted predecessor topology without naming a source field. The remaining explicit source boundary is now the externally selected q-request <-> r-request correspondence itself, plus external selection of one closure-complete template.",
+      "currentResult": "GREEN: only one external request(q)<->request(r) correspondence is frozen. Its 19 positions are zipped generically; among those pairs a label-free structural selector finds exactly one proper START/self-incident pair whose end payloads are equal-depth ordinary predecessor chains to R. Synchronous traversal derives five rooted-prefix positions, yielding the same 23 unique seeds and 142 total mappings as F5-F6. The selector has zero source-field/index branches, no prefix sequences are externally prepared, the complete canonical topology equals the domain-reference r(a) generation byte-for-byte, malformed rooted depth rejects, F5-F2 admission and target Dictionary resolution remain GREEN, and two independent Memories agree.",
+      "observed": {
+        "explicitPerLinkSeedPairs": 0,
+        "externalCorrespondenceDeclarations": 1,
+        "requestZippedPositions": 19,
+        "structuralDeepStartCandidates": 1,
+        "derivedPrefixPositions": 5,
+        "derivedUniqueSeeds": 23,
+        "mappedLinksAfterRun": 142,
+        "ordinaryClones": 94,
+        "startSelfClones": 24,
+        "externalPrefixSequencePreparation": false,
+        "sourceFieldIndexBranches": 0,
+        "malformedRootedDepth": "REJECTED",
+        "topologyEqualsReference": true,
+        "frozenF5F2Admission": true,
+        "targetNameResolution": true,
+        "independentMemories": 2,
+        "externalTemplateSelection": true,
+        "externalRequestCorrespondenceSelection": 1,
+        "semanticInformationEliminated": false,
+        "productionChanged": false
+      }
     }
   }
 }
