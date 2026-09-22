@@ -64,9 +64,28 @@ same(
 );
 same(
   projection.coverage.aspectApplicationUnifierSourceRemovalProven,
-  false,
-  "unifier source removal remains open",
+  true,
+  "later F2/F3 evidence closes scoped A11 unifier source removal",
 );
+same(
+  projection.coverage.aspectApplicationProofCarryingBindingMechanismProven,
+  true,
+  "F2 supplies the native proof-carrying binding mechanism",
+);
+same(
+  projection.coverage.aspectApplicationProofCarryingUnifiedContinuationResearchComplete,
+  true,
+  "F3 executes the complete scoped continuation corpus",
+);
+const f3 = projection.formalKernelAudit.aspectApplicationA11g
+  .proofCarryingUnifiedContinuationF3;
+same(
+  f3.status,
+  "EXECUTED_GREEN_SCOPED_RESEARCH",
+  "F3 exact executed status",
+);
+same(f3.observed.hostMatchers, 0, "F3 host matcher count");
+same(f3.observed.targetDecompositionReads, 0, "F3 target decomposition count");
 same(
   projection.metrics.aspectUnifierDeniedAlternativeHostMatcherCount,
   2,
@@ -80,6 +99,8 @@ console.log([
   "STRUCTURAL_RULE_MATCHER=INVALID_SUBSTITUTE",
   "ROLE_MORPHISM_MATCHER=INVALID_SUBSTITUTE",
   "EXACT_MISSING_CAPABILITY=PORTABLE_MTS_NATIVE_TWO_ROLE_BINDING_LAW",
-  "SEMANTIC_CLOSURE=OPEN",
+  "F1_HISTORICAL_RED=PRESERVED",
+  "F2_F3_NATIVE_BINDING_PATH=GREEN",
+  "SCOPED_A11_UNIFIER_SOURCE_REMOVAL=GREEN",
   "PRODUCTION_UNCHANGED",
 ].join(" "));
