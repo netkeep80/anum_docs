@@ -26,7 +26,9 @@
     "proofVerifierRuntimeProbeCoverageComplete": true,
     "proofVerifierFaultInjectionComplete": true,
     "semanticSourceAuthorityInventoryComplete": true,
-    "semanticSourceReconstructionProven": false
+    "semanticSourceReconstructionProven": false,
+    "formalKernelAuditComplete": true,
+    "formalKernelSelfExtensionProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -814,7 +816,9 @@
     "hostFormationAdmissibilityAuthorityCount": null,
     "hostOrchestrationAuthorityCount": null,
     "selfGeneratedOrReconstructedSemanticArtifactCount": null,
-    "externallyGeneratedSemanticArtifactCount": null
+    "externallyGeneratedSemanticArtifactCount": null,
+    "formalKernelHostDefinedSemanticLawCount": 3,
+    "formalKernelSelfExtensionWitnessCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -852,12 +856,16 @@
     "hostFormationAdmissibilityAuthorityCount": "E3 host-side formation/admissibility authorities; intentionally UNMEASURED after SP7.",
     "hostOrchestrationAuthorityCount": "E4 host-side scheduling/fixed-point/termination/resource-control authorities; intentionally UNMEASURED after SP7.",
     "selfGeneratedOrReconstructedSemanticArtifactCount": "Still UNMEASURED until the E2 kernel-source removal/reconstruction falsifier defines and exercises a semantic-artifact accounting scope. Do not infer zero merely from the current host-source inventory.",
-    "externallyGeneratedSemanticArtifactCount": "Still UNMEASURED until the E2 kernel-source removal/reconstruction falsifier defines and exercises a semantic-artifact accounting scope. Host semantic-source law families are counted separately by hostSemanticSourceDefinitionCount."
+    "externallyGeneratedSemanticArtifactCount": "Still UNMEASURED until the E2 kernel-source removal/reconstruction falsifier defines and exercises a semantic-artifact accounting scope. Host semantic-source law families are counted separately by hostSemanticSourceDefinitionCount.",
+    "formalKernelHostDefinedSemanticLawCount": "Scoped count of FORMAL semantic-law families in the current v0.13 evaluator that remain HOST_DEFINED in the E2 authority inventory: operator grounding, prefix composition and plan materialization.",
+    "formalKernelSelfExtensionWitnessCount": "Executable witnesses in which a previously unknown named FORMAL form is defined as MTS/Link evidence and then used in an independent Memory without adding host grammar/parser/evaluator semantic branches."
   },
   "nextExperiments": [
-    "E2-F1: deny the host root-aspect source and attempt two-Memory reconstruction/revalidation of the ROOT/START/END/PAIR interpretation law from Link/MTS evidence without equivalent host reimplementation.",
-    "If E2-F1 establishes a valid reconstruction method, apply the same source-removal discipline to proof meta-semantics (template matching, derivation replay, recursive identity and rooted Proof Aset replay) before any SELF_GENERATED_OR_RECONSTRUCTED claim.",
-    "After E2 accounting/reconstruction experiments, audit E3 formation/admissibility authority separately.",
+    "E2-F1: deny the host root-aspect source and attempt two-Memory reconstruction/revalidation of the ROOT/START/END/PAIR interpretation law from Link/MTS evidence without equivalent host reimplementation; reuse A10b self-template evidence only where it does not smuggle equivalent host semantics.",
+    "Measure the A10b residual host bootstrap (identity + poles + prefix traversal + generic unification) explicitly; do not treat read-only self-template validation as full FORMAL self-hosting.",
+    "F-KERNEL-SELF-EXTENSION: RED-first test of a previously unknown named form defined and interpreted from portable MTS/Link evidence under an unchanged host kernel.",
+    "If E2 source-removal establishes a valid reconstruction method, apply the same discipline to proof meta-semantics (template matching, derivation replay, recursive identity and rooted Proof Aset replay) before any SELF_GENERATED_OR_RECONSTRUCTED claim.",
+    "After E2 and FORMAL-kernel accounting/reconstruction experiments, audit E3 formation/admissibility authority separately.",
     "After E3, audit E4 orchestration/fixed-point/scheduling/resource authority separately.",
     "Refine host/Link duplication from candidate overlap to confirmed semantic-equivalence duplication.",
     "Run proof-driven and fault-injection per-bootstrap-capability elimination experiments only after the relevant runtime path coverage; failed removal remains UNKNOWN.",
@@ -2091,6 +2099,86 @@
       "The count is intentionally by semantic-law family rather than functions, branches, tests or named primitives.",
       "LINK_REPRESENTED data is not upgraded merely because host code validates or executes it; the semantic interpretation law itself must move into/reconstruct from MTS evidence.",
       "No authority family has yet passed kernel-source removal/reconstruction, so this audit does not close E2."
+    ]
+  },
+  "formalKernelAudit": {
+    "status": "baseline-recorded-self-extension-not-proven",
+    "ownerIssue": 1270,
+    "scope": "v0.13 FORMAL notation/kernel evidence relevant to semantic self-description and self-hosting",
+    "acceptedBaseline": {
+      "version": "v0.12",
+      "capabilities": [
+        "exact FORMAL source carried as STRING Anum",
+        "explicit I_STRING/I_FORMAL/I_Q interpretation contexts",
+        "explicit structural K for contextual dot",
+        "source -> Dictionary -> Grammar -> fixed Theory -> admitted Rule -> result authority",
+        "structural proof backend with admission, derivation, theorem reuse and read-only replay"
+      ]
+    },
+    "candidateEvidence": {
+      "structuralAlphabet": "four Link-derived structural signs R/O/C/L for ROOT/START/END/PAIR",
+      "currentPrefixGrammar": "Anum ::= 8 | 9 Anum | 6 Anum | 1 Anum Anum",
+      "a10b": {
+        "finding": "each grounded structural sign can act as its own ostensive operation template for read-only validation",
+        "hostAspectEnumRequiredForValidation": false,
+        "residualHostBootstrap": [
+          "Link identity",
+          "poles",
+          "prefix traversal",
+          "generic structural unification"
+        ],
+        "writeFixedPointInstantiationProven": false
+      }
+    },
+    "currentGaps": {
+      "formalSourcePresentsAxioms": false,
+      "formalSourcePresentsReusableRules": false,
+      "completeAxiomSystemEncodedThroughDialect": false,
+      "definePreviouslyUnknownNamedFormFromFormalSource": false,
+      "useNewFormWithoutHostSemanticBranch": false,
+      "twoMemorySelfExtensionWitness": false
+    },
+    "e2Relation": {
+      "hostDefinedFormalLawFamilies": [
+        "formal-operator-grounding-law",
+        "formal-prefix-composition-law",
+        "formal-plan-materialization-law"
+      ],
+      "classification": "HOST_DEFINED",
+      "consequence": "FORMAL self-description closure and FULL_SELF_HOSTED remain unproven even if bounded proof replay succeeds."
+    },
+    "ontologyFirewall": [
+      "Link is the only foundational ontology entity; reference/name/sequence/type/set/etc. may only be derived roles or interpretations.",
+      "sequence/carrier != Link denotation != interpretation result",
+      "external LiNo/RML/meta-theory/set/lambda/type/graph concepts are comparison or tooling inputs, not imported MTS primitives",
+      "graph theory is permitted only as an external metric/projection/visualization layer, never as MTS foundation"
+    ],
+    "selfExtensionFalsifier": {
+      "id": "F-KERNEL-SELF-EXTENSION",
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Can a frozen minimal FORMAL kernel define a previously unknown named form and its interpretation authority entirely as portable MTS/Link evidence, then use that form in an independent Memory without adding a host semantic branch?",
+      "failConditions": [
+        "the new form receives semantic authority from a host enum/string/opcode",
+        "a new parser/evaluator semantic case is required for the form",
+        "Link evidence merely stores the expected result while host code performs the real interpretation",
+        "sender-local LinkHandles are required",
+        "the candidate can mutate the frozen verifier/generator authority"
+      ],
+      "passConditions": [
+        "the form/name and its interpretation authority are explicit MTS/Link evidence",
+        "the host kernel is unchanged and form-agnostic",
+        "the artifact reconstructs in a second independent Memory without sender-local IDs",
+        "the new form is actually used by source interpretation/validation",
+        "malformed/forged definitions and uses fail closed",
+        "frozen verifier/generator authority remains unchanged"
+      ],
+      "currentResult": "NOT_RUN"
+    },
+    "limitations": [
+      "This audit does not require textual self-proof; it measures whether semantic source/notation authority can be expressed and extended inside MTS.",
+      "A10b demonstrates read-only self-template validation, not full FORMAL generation/materialization closure.",
+      "The existing fixed prefix grammar is useful executable evidence but is not yet a self-extensible FORMAL kernel.",
+      "No claim is made that naming/reference must be a new ontology primitive; the target is a derived Link role."
     ]
   }
 }
