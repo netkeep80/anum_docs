@@ -306,10 +306,7 @@ function runGenerationRequest(
   const inventory=contextPoles.end;
   const sources=readExactSequence(memory,inventory).values;
   assert(sources.length>0,"A30 non-empty context-carried source inventory");
-
-  // Validate selected target truth before any template instantiation.
   deriveTargetSeeds(memory,targetDescriptor);
-
   const candidates=new Set<LinkHandle>(),publications=new Set<LinkHandle>(),metas=new Set<LinkHandle>();
   let compatibleCount=0;
   for(const source of sources){
@@ -332,7 +329,6 @@ function runGenerationRequest(
     compatibleCount,inventoryCount:sources.length,
   });
 }
-
 function exercise(noise:boolean):void{
   const memory=new Memory(),b=ensureRootBasis(memory);
   if(noise)memory.ensure(memory.ensure(b.L,b.U),b.C);
@@ -341,7 +337,6 @@ function exercise(noise:boolean):void{
   const source3=buildFamily(memory,b,memory.ensure(b.C,b.L));
   const target=buildFamily(memory,b,memory.ensure(b.C,b.U));
   const rule=defineRule(memory);
-
   const t1=producerTemplate(
     memory,source1.metaParent,[source1.E0,source1.E1,source1.E2,source1.E3,source1.E4],
   );
@@ -353,7 +348,6 @@ function exercise(noise:boolean):void{
   );
   assert(admitted(memory,rule,t1.candidate)&&admitted(memory,rule,t2.candidate),
     "A30 full-length source templates admitted");
-
   let shortTruth=memory.ensure(t3.M,source3.E0);
   for(const expected of [source3.E1,source3.E2,source3.E3]){
     const next=metaStep(memory,shortTruth);
@@ -362,7 +356,6 @@ function exercise(noise:boolean):void{
     shortTruth=next;
   }
   same(metaStep(memory,shortTruth),undefined,"A30 shorter valid authority terminates");
-
   const inventory=materializeExactSequence(memory,[t1.candidate,t2.candidate,t3.candidate]);
   const targetDescriptor=targetHistoryDescriptor(memory,target.metaParent,[
     target.E0,target.E1,target.E2,target.E3,target.E4,
@@ -370,35 +363,27 @@ function exercise(noise:boolean):void{
   const requestParent=memory.ensure(b.R,b.U);
   const generationContext=memory.ensure(requestParent,inventory);
   const requestTruth=memory.ensure(generationContext,targetDescriptor);
-
   same(memory.find(target.E0,target.E1),undefined,"A30 target authority absent at freeze");
   const out=runGenerationRequest(memory,rule,requestTruth);
   same(out.inventoryCount,3,"A30 context-carried inventory size");
   same(out.compatibleCount,2,"A30 compatible source count");
-
   let truth=memory.ensure(out.M,target.E0);
   for(const expected of [target.E1,target.E2,target.E3,target.E4]){
     const next=metaStep(memory,truth);assert(next!==undefined,"A30 target meta-step");
     same(memory.poles(next).end,expected,"A30 generated authority execution");truth=next;
   }
   same(metaStep(memory,truth),undefined,"A30 terminal ZERO");
-
-  // Another target can be true in the same generation context but remains inert
-  // unless its contextual truth Link is selected as the request input.
   const ambientTarget=targetHistoryDescriptor(memory,target.metaParent,[
     target.E0,target.E1,target.E2,target.E3,
   ]);
   memory.ensure(generationContext,ambientTarget);
   const afterAmbientTarget=runGenerationRequest(memory,rule,requestTruth);
   same(afterAmbientTarget.candidate,out.candidate,"A30 ambient target truth ignored");
-
-  // An alternate inventory/context is likewise inert while requestTruth keeps G.
   const alternateInventory=materializeExactSequence(memory,[t1.candidate]);
   const alternateContext=memory.ensure(requestParent,alternateInventory);
   memory.ensure(alternateContext,targetDescriptor);
   const afterAmbientContext=runGenerationRequest(memory,rule,requestTruth);
   same(afterAmbientContext.inventoryCount,3,"A30 ambient generation context ignored");
-
   const malformedTarget=targetHistoryDescriptor(memory,target.metaParent,[
     target.E0,source1.E1,target.E2,target.E3,target.E4,
   ]);
@@ -407,7 +392,6 @@ function exercise(noise:boolean):void{
     ()=>{runGenerationRequest(memory,rule,malformedTargetTruth);},
     "A30 mixed-context selected target truth rejected",
   );
-
   const malformedInventory=memory.ensure(target.E0,target.E2);
   const malformedContext=memory.ensure(requestParent,malformedInventory);
   const malformedInventoryTruth=memory.ensure(malformedContext,targetDescriptor);
@@ -416,7 +400,6 @@ function exercise(noise:boolean):void{
     "A30 malformed selected inventory context rejected",
   );
 }
-
 function staticGuards():void{
   const root=resolve(process.cwd(),"..");
   const own=readFileSync(
@@ -434,7 +417,6 @@ function staticGuards():void{
     prior.indexOf("\nfunction frontierOccurrences(",prior.indexOf("function metaStep(")),
   );
   same(a.replace(/\s+/g,""),b.replace(/\s+/g,""),"A30 unchanged A23 metaStep");
-
   const runner=own.slice(
     own.indexOf("function runGenerationRequest("),
     own.indexOf("\nfunction exercise(",own.indexOf("function runGenerationRequest(")),
@@ -449,7 +431,6 @@ function staticGuards():void{
   for(const x of [".find(", ".outgoing(", ".incoming(", "allLinks(", "switch("])
     assert(!runner.includes(x),`A30 request runner excludes ambient selector ${x}`);
 }
-
 function main():void{
   exercise(false);exercise(true);staticGuards();
   console.log([
