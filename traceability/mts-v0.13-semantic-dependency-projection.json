@@ -119,7 +119,9 @@
     "metaAuthorityInventoryDiscoveryA27Designed": true,
     "metaAuthorityInventoryDiscoveryA27Complete": true,
     "derivedMetaSeedCorrespondenceA28Designed": true,
-    "derivedMetaSeedCorrespondenceA28Complete": true
+    "derivedMetaSeedCorrespondenceA28Complete": true,
+    "linkNativeTargetHistoryA29Designed": true,
+    "linkNativeTargetHistoryA29Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1175,7 +1177,11 @@
     "derivedMetaSeedCorrespondenceA28ExplicitPerTemplateCorrespondenceCount": 0,
     "derivedMetaSeedCorrespondenceA28BroadInventorySize": 3,
     "derivedMetaSeedCorrespondenceA28DerivedCompatibleTemplateCount": 2,
-    "derivedMetaSeedCorrespondenceA28IndependentMemoryCount": 2
+    "derivedMetaSeedCorrespondenceA28IndependentMemoryCount": 2,
+    "linkNativeTargetHistoryA29PositionalTargetSeedSequenceCount": 0,
+    "linkNativeTargetHistoryA29DerivedCompatibleTemplateCount": 2,
+    "linkNativeTargetHistoryA29AmbientTargetHistoryFires": 0,
+    "linkNativeTargetHistoryA29IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1481,12 +1487,16 @@
     "derivedMetaSeedCorrespondenceA28ExplicitPerTemplateCorrespondenceCount": "Explicit sourceSeeds->targetSeeds correspondence Links carried per source template. Target zero.",
     "derivedMetaSeedCorrespondenceA28BroadInventorySize": "Frozen source-candidate inventory members presented before structural seed derivation.",
     "derivedMetaSeedCorrespondenceA28DerivedCompatibleTemplateCount": "Source candidates whose structurally derived producer seed path matches selected target-description arity.",
-    "derivedMetaSeedCorrespondenceA28IndependentMemoryCount": "Independent Memories reproducing structural source-seed derivation, convergence and execution."
+    "derivedMetaSeedCorrespondenceA28IndependentMemoryCount": "Independent Memories reproducing structural source-seed derivation, convergence and execution.",
+    "linkNativeTargetHistoryA29PositionalTargetSeedSequenceCount": "Externally selected positional target seed ExactSequences consumed by A29 mapping. Target zero.",
+    "linkNativeTargetHistoryA29DerivedCompatibleTemplateCount": "Source producer candidates structurally compatible with the selected Link-native target history.",
+    "linkNativeTargetHistoryA29AmbientTargetHistoryFires": "Ambient target-history witnesses outside the selected descriptor that affect execution. Target zero.",
+    "linkNativeTargetHistoryA29IndependentMemoryCount": "Independent Memories reproducing target-history derivation, convergence and execution."
   },
   "nextExperiments": [
-    "A29: remove the externally selected positional target seed ExactSequence. Derive the target execution-root chain from one Link-carried selected target history/context witness, while keeping source-seed derivation and A23 consumption unchanged.",
-    "A29 must distinguish target-description selection from ambient Memory: late ambient target histories remain inert and ambiguous/malformed selected target history fails closed.",
-    "If A29 is GREEN, the next source boundary is broad source-inventory selection and current meta-occurrence selection.",
+    "A30: attack external selection of the target-history witness without granting ambient histories authority; carry target selection inside already selected execution/meta context or explicit Link-native request authority.",
+    "A30 must keep broad source-inventory selection separate and preserve fail-closed ambiguity/malformed-target behavior.",
+    "If A30 is GREEN, attack broad source-inventory selection and current meta-occurrence selection as the next independent authority boundaries.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
@@ -5645,6 +5655,59 @@
         "malformedStructuralProducerEvidence": "REJECTED",
         "externalBroadInventoryMembership": true,
         "externalTargetSeedSelection": true,
+        "semanticInformationEliminated": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "linkNativeTargetHistoryA29": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A28's externally selected positional target seed ExactSequence be removed and replaced by one selected Link-carried target-history descriptor whose execution-root sequence is reconstructed from Link ancestry?",
+      "setup": [
+        "source seeds remain structurally derived from producer-authority candidates with no per-template correspondence",
+        "selected target is one Link TargetDescriptor=MetaParent->Hn whose H ancestry carries E0..En",
+        "target extractor validates one shared execution context and proper frontier envelopes before mapping"
+      ],
+      "oracle": [
+        "target positional ExactSequence is absent and two compatible source templates converge to one candidate/publication/M",
+        "unchanged A23 metaStep executes target E0..E4 then ZERO",
+        "ambient alternative target history and ambient source candidate are inert",
+        "mixed-context selected target history rejects fail-closed"
+      ],
+      "antiCheat": [
+        "target extraction has no ExactSequence decoder or ambient find/outgoing/incoming/allLinks scan",
+        "A29 metaStep remains whitespace-normalized source-identical to A23"
+      ],
+      "residualAuthority": [
+        "selection of one target-history descriptor and one broad source inventory remains external",
+        "current meta-occurrence selection remains explicit",
+        "generic topology/rule interpreters remain host executed"
+      ],
+      "evidenceTest": "ts/test/research-v013-link-native-target-history-a29.test.ts",
+      "claimBoundary": [
+        "GREEN removes positional target seed-sequence authority but not selected target-history authority",
+        "ambient histories remain non-authoritative",
+        "global E2/E3 and FULL_SELF_HOSTED remain open",
+        "v0.13 is not accepted and production runtime is unchanged"
+      ],
+      "consequence": "A29 removes the externally selected positional target seed ExactSequence. One selected Link descriptor carries MetaParent plus immutable execution-root history ancestry; a generic extractor reconstructs target seeds while verifying one shared execution context and structurally valid frontier envelopes. A28 source-side structural derivation and unchanged A23 execution remain intact.",
+      "currentResult": "GREEN: selected Link history reconstructs target MetaParent,E0..E4 with zero target ExactSequence input. Two full source producer candidates remain compatible, shorter valid authority is excluded by structural arity, and both compatible instantiations converge to one target candidate/publication/M. Target producer authority is absent at freeze; unchanged A23 metaStep executes E0..E4 then ZERO. Ambient alternative target history is ignored, mixed-context selected history rejects, and late ambient source candidate remains inert. Two independent Memories agree.",
+      "observed": {
+        "targetSeedExactSequence": false,
+        "targetDescription": "METAPARENT_TO_EXECUTION_HISTORY",
+        "targetExecutionHistory": "LINK_ANCESTRY",
+        "sourceSeeds": "DERIVED_FROM_PRODUCER_AUTHORITY_TOPOLOGY",
+        "explicitPerTemplateSeedCorrespondence": 0,
+        "derivedCompatibleTemplates": 2,
+        "validShorterProducerTemplate": "EXCLUDED_BY_STRUCTURAL_ARITY",
+        "targetAuthorityAbsentAtFreeze": true,
+        "frozenStructuralAdmission": "GREEN",
+        "unchangedA23MetaStep": true,
+        "ambientTargetHistoryIgnored": true,
+        "mixedContextTargetHistory": "REJECTED",
+        "lateAmbientSourceCandidateIgnored": true,
+        "externalSelectedTargetHistory": true,
+        "externalBroadInventoryMembership": true,
         "semanticInformationEliminated": false,
         "independentMemories": 2,
         "productionChanged": false
