@@ -289,7 +289,6 @@ function readCurrentRequestTruth(
   const seen=new Set<LinkHandle>();
   let historyLength=0;
   let currentTruth:LinkHandle|undefined;
-
   while(true){
     assert(!seen.has(cursor),"A31 request occurrence cycle");
     seen.add(cursor);
@@ -302,11 +301,9 @@ function readCurrentRequestTruth(
     if(occurrence.start===memory.root)break;
     cursor=occurrence.start;
   }
-
   assert(currentTruth!==undefined,"A31 request history current truth");
   return Object.freeze({generationContext,requestTruth:memory.poles(q.end).end,historyLength});
 }
-
 function runGenerationHistory(
   memory:Memory,
   rule:LinkHandle,
@@ -325,13 +322,11 @@ function runGenerationHistory(
   const truth=memory.poles(requestTruth);
   same(truth.start,generationContext,"A31 current request truth belongs to G");
   const targetDescriptor=truth.end;
-
   const contextPoles=memory.poles(generationContext);
   const inventory=contextPoles.end;
   const sources=readExactSequence(memory,inventory).values;
   assert(sources.length>0,"A31 non-empty context-carried source inventory");
   deriveTargetSeeds(memory,targetDescriptor);
-
   const candidates=new Set<LinkHandle>(),publications=new Set<LinkHandle>(),metas=new Set<LinkHandle>();
   let compatibleCount=0;
   for(const source of sources){
@@ -354,17 +349,15 @@ function runGenerationHistory(
     compatibleCount,inventoryCount:sources.length,requestHistoryLength:selected.historyLength,
   });
 }
-
 function exercise(noise:boolean):void{
   const memory=new Memory(),b=ensureRootBasis(memory);
   if(noise)memory.ensure(memory.ensure(b.L,b.U),b.C);
-
   const source1=buildFamily(memory,b,memory.ensure(b.U,b.L));
   const source2=buildFamily(memory,b,memory.ensure(b.O,b.U));
   const source3=buildFamily(memory,b,memory.ensure(b.C,b.L));
   const target=buildFamily(memory,b,memory.ensure(b.C,b.U));
+  const target2=buildFamily(memory,b,memory.ensure(b.L,b.O));
   const rule=defineRule(memory);
-
   const t1=producerTemplate(
     memory,source1.metaParent,[source1.E0,source1.E1,source1.E2,source1.E3,source1.E4],
   );
@@ -376,59 +369,47 @@ function exercise(noise:boolean):void{
   );
   assert(admitted(memory,rule,t1.candidate)&&admitted(memory,rule,t2.candidate),
     "A31 full-length source templates admitted");
-
   const inventory=materializeExactSequence(memory,[t1.candidate,t2.candidate,t3.candidate]);
   const targetDescriptor=targetHistoryDescriptor(memory,target.metaParent,[
     target.E0,target.E1,target.E2,target.E3,target.E4,
   ]);
-  const oldTarget=targetHistoryDescriptor(memory,target.metaParent,[
-    target.E0,target.E1,target.E2,target.E3,
+  const oldTarget=targetHistoryDescriptor(memory,target2.metaParent,[
+    target2.E0,target2.E1,target2.E2,target2.E3,target2.E4,
   ]);
-
   const requestParent=memory.ensure(b.R,b.U);
   const generationContext=memory.ensure(requestParent,inventory);
   const oldTruth=memory.ensure(generationContext,oldTarget);
   const currentTruth=memory.ensure(generationContext,targetDescriptor);
-
   const h0=memory.ensure(memory.root,oldTruth);
   const h1=memory.ensure(h0,currentTruth);
   const requestExecution=memory.ensure(generationContext,h1);
-
   same(memory.find(target.E0,target.E1),undefined,"A31 target authority absent at freeze");
   const out=runGenerationHistory(memory,rule,requestExecution);
   same(out.inventoryCount,3,"A31 context-carried inventory size");
   same(out.compatibleCount,2,"A31 compatible source count");
   same(out.requestHistoryLength,2,"A31 immutable request history length");
-
   let truth=memory.ensure(out.M,target.E0);
   for(const expected of [target.E1,target.E2,target.E3,target.E4]){
     const next=metaStep(memory,truth);assert(next!==undefined,"A31 target meta-step");
     same(memory.poles(next).end,expected,"A31 generated authority execution");truth=next;
   }
   same(metaStep(memory,truth),undefined,"A31 terminal ZERO");
-
-  // Ambient G->Target truth is inert because it is not the selected occurrence head.
   const ambientTarget=targetHistoryDescriptor(memory,target.metaParent,[
     target.E0,target.E1,target.E2,
   ]);
   memory.ensure(generationContext,ambientTarget);
   const afterAmbientTruth=runGenerationHistory(memory,rule,requestExecution);
   same(afterAmbientTruth.candidate,out.candidate,"A31 ambient target truth ignored");
-
-  // A newer occurrence exists physically but is inert until a new requestExecution points at it.
   const alternateTruth=memory.ensure(generationContext,oldTarget);
   const h2=memory.ensure(h1,alternateTruth);
   const afterAmbientOccurrence=runGenerationHistory(memory,rule,requestExecution);
   same(afterAmbientOccurrence.requestHistoryLength,2,
     "A31 ambient newer request occurrence not selected by immutable Q");
-
   const alternateExecution=memory.ensure(generationContext,h2);
   const alternate=runGenerationHistory(memory,rule,alternateExecution);
   same(alternate.requestHistoryLength,3,"A31 new Q explicitly advances request history");
   assert(alternate.candidate!==out.candidate,
     "A31 advancing Q changes selected target rather than ambient truth");
-
-  // A selected request occurrence whose truth belongs to another G is rejected.
   const otherInventory=materializeExactSequence(memory,[t1.candidate]);
   const otherG=memory.ensure(requestParent,otherInventory);
   const foreignTruth=memory.ensure(otherG,targetDescriptor);
@@ -438,15 +419,12 @@ function exercise(noise:boolean):void{
     ()=>{runGenerationHistory(memory,rule,malformedExecution);},
     "A31 cross-context selected request occurrence rejected",
   );
-
-  // Malformed requestExecution whose END is not an occurrence chain rejects.
   const malformedExecution2=memory.ensure(generationContext,targetDescriptor);
   expectThrows(
     ()=>{runGenerationHistory(memory,rule,malformedExecution2);},
     "A31 non-history request execution rejected",
   );
 }
-
 function staticGuards():void{
   const root=resolve(process.cwd(),"..");
   const own=readFileSync(
@@ -464,7 +442,6 @@ function staticGuards():void{
     prior.indexOf("\nfunction frontierOccurrences(",prior.indexOf("function metaStep(")),
   );
   same(a.replace(/\s+/g,""),b.replace(/\s+/g,""),"A31 unchanged A23 metaStep");
-
   const selector=own.slice(
     own.indexOf("function readCurrentRequestTruth("),
     own.indexOf("\nfunction runGenerationHistory(",own.indexOf("function readCurrentRequestTruth(")),
@@ -475,7 +452,6 @@ function staticGuards():void{
     "A31 derives generation context/history from Q");
   assert(selector.includes("same(tp.start,generationContext"),
     "A31 validates every carried request truth against G");
-
   const runner=own.slice(
     own.indexOf("function runGenerationHistory("),
     own.indexOf("\nfunction exercise(",own.indexOf("function runGenerationHistory(")),
@@ -487,14 +463,12 @@ function staticGuards():void{
     "A31 no current T or target host argument");
   for(const x of [".find(", ".outgoing(", ".incoming(", "allLinks(", "switch("])
     assert(!runner.includes(x),`A31 runner excludes ambient selector ${x}`);
-
   const target=own.slice(
     own.indexOf("function deriveTargetSeeds("),
     own.indexOf("\nfunction deriveProducerSeeds(",own.indexOf("function deriveTargetSeeds(")),
   );
   for(const x of ["readExactSequence","ExactSequence",".find(", ".outgoing(", ".incoming(", "allLinks(","switch("])
     assert(!target.includes(x),`A31 target extractor excludes positional/ambient primitive ${x}`);
-
   const source=own.slice(
     own.indexOf("function deriveProducerSeeds("),
     own.indexOf("\nfunction derivedSeedMap(",own.indexOf("function deriveProducerSeeds(")),
@@ -502,7 +476,6 @@ function staticGuards():void{
   for(const x of ["META","E0","E1","E2","E3","E4","T0","C0","ENV","switch(", ".find(", ".outgoing(", ".incoming(", "allLinks("])
     assert(!source.includes(x),`A31 source extractor excludes positional/ambient primitive ${x}`);
 }
-
 function main():void{
   exercise(false);exercise(true);staticGuards();
   console.log([
