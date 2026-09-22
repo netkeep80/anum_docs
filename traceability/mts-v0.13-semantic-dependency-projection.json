@@ -91,7 +91,9 @@
     "contextualTruthMetaFrontierA16F1Designed": true,
     "contextualTruthMetaFrontierA16F1Complete": true,
     "genericCallActualizationA16F2Designed": true,
-    "genericCallActualizationA16F2Complete": true
+    "genericCallActualizationA16F2Complete": true,
+    "contextualEventInputA16F3Designed": true,
+    "contextualEventInputA16F3Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1066,7 +1068,13 @@
     "genericCallActualizationA16F2ConvergenceDistinctTruthLinkCount": 1,
     "genericCallActualizationA16F2ConvergenceOccurrenceCount": 2,
     "genericCallActualizationA16F2ExternalEventInputCount": 1,
-    "genericCallActualizationA16F2IndependentMemoryCount": 2
+    "genericCallActualizationA16F2IndependentMemoryCount": 2,
+    "contextualEventInputA16F3RawEventControlParameterCount": 0,
+    "contextualEventInputA16F3PairKernelDomainSemanticBranchCount": 0,
+    "contextualEventInputA16F3AmbientEventTruthFires": 0,
+    "contextualEventInputA16F3UnknownEventBranchResultCount": 0,
+    "contextualEventInputA16F3OperandSelectionResidualCount": 1,
+    "contextualEventInputA16F3IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1291,12 +1299,19 @@
     "genericCallActualizationA16F2ConvergenceDistinctTruthLinkCount": "Distinct extensional K->EZ truth Links after generic-call A13-equivalent convergence. Target one.",
     "genericCallActualizationA16F2ConvergenceOccurrenceCount": "Provenance occurrences retained at the converged K->EZ truth Link. Target two.",
     "genericCallActualizationA16F2ExternalEventInputCount": "Explicit external input classes remaining in call actualization after selected application lookup removal. Event is one input class, not yet source-removed.",
-    "genericCallActualizationA16F2IndependentMemoryCount": "Independent canonical Memories reproducing generic application construction and contextual continuation behavior."
+    "genericCallActualizationA16F2IndependentMemoryCount": "Independent canonical Memories reproducing generic application construction and contextual continuation behavior.",
+    "contextualEventInputA16F3RawEventControlParameterCount": "Raw Event handle control parameters consumed by the generic pair-actualization kernel. Target zero.",
+    "contextualEventInputA16F3PairKernelDomainSemanticBranchCount": "State/Event/application-specific semantic branches in the generic pair-actualization kernel. Target zero.",
+    "contextualEventInputA16F3AmbientEventTruthFires": "Ambient K->Event contextual truths outside the explicitly supplied right-operand frontier that affect execution. Target zero.",
+    "contextualEventInputA16F3UnknownEventBranchResultCount": "Semantic results produced by an unknown contextual Event branch whose constructed application has no selected continuation authority. Target zero.",
+    "contextualEventInputA16F3OperandSelectionResidualCount": "Explicit host residual classes selecting which two contextual truth frontiers are operands for generic pair actualization. Target remains one in A16-F3.",
+    "contextualEventInputA16F3IndependentMemoryCount": "Independent canonical Memories reproducing contextual Event input and generic pair actualization behavior."
   },
   "nextExperiments": [
-    "A16-F3: classify Event as input/data rather than host semantic authority. Represent event occurrence itself as contextual linkage and test whether call actualization can be expressed entirely as Link-native composition/combination of contextual truth rather than an external control parameter.",
+    "A16-F4: remove host selection of left/right operand frontiers. Represent a request to combine specific contextual truths as Link-carried execution authority, then let one generic executor discover/consume that request without pairing all K-linked values.",
+    "A16-F4 must fail closed when operand-selection evidence is absent or ambiguous, and must ignore late ambient pairing requests outside frozen selected authority.",
+    "After A16-F4, reconnect contextual execution to F5 source-authority reduction and reassess E2/E3 host semantic residue.",
     "A16-F3 must distinguish unavoidable external input from semantic interpretation: receiving an Event may remain exogenous, but deciding what State->Event means must not be host code.",
-    "After A16-F3, reconnect the dynamic execution line to F5 source-authority reduction and reassess the remaining E2/E3 boundary.",
     "A16-F2 must show that an arbitrary constructed State->Event Link has no semantic effect unless selected Application->NextState continuation authority exists; this separates generic application construction from semantic authority.",
     "After A16-F2, reassess whether external Event selection is genuine irreducible input rather than semantic host authority, and only then connect this execution line back to F5 source-authority reduction.",
     "A16-F1 must preserve selected-authority isolation: physical but unselected Links must remain semantically inert, and newly derived K->B truth Links may enter only the explicit next execution frontier.",
@@ -4522,6 +4537,59 @@
         "lateAmbientTransitionIgnored": true,
         "ambientTruthOutsideFrontierIgnored": true,
         "externalEventInput": true,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "contextualEventInputA16F3": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can external Event cease to be a raw host control parameter and instead enter execution as ordinary contextual truth K->Event, with call construction performed by one value-generic truth-pair kernel over selected K->X and K->Y operands?",
+      "setup": [
+        "reuse A16-F2 contextual state frontier K->State",
+        "represent each input Event occurrence as contextual truth K->Event",
+        "generic pair actualization consumes two explicitly selected contextual truth frontiers K->X and K->Y",
+        "construct X->Y and then K->(X->Y) without State/Event-specific branches",
+        "continue execution through unchanged selected Application->Next authority and A16 propagation"
+      ],
+      "oracle": [
+        "reproduce A13/A16-F2 first split, local termination, second split and convergence",
+        "forward/reverse scheduling remains extensionally and provenance equivalent",
+        "ambient K->Event outside the explicitly supplied right-operand frontier is ignored",
+        "a mixed right-operand frontier containing one known and one unknown contextual Event yields only results whose applications possess selected continuation authority",
+        "generic application without selected continuation still yields ZERO",
+        "late ambient transition and ambient state truth outside explicit frontier remain inert",
+        "two independent canonical Memories agree"
+      ],
+      "antiCheat": [
+        "pair actualization kernel is generic over left/right BundleValue truth operands and contains no state/event/application semantic branch",
+        "pair kernel may not use applications/applicationCoordinates/find/filter/outgoing/incoming/switch",
+        "transition kernel retains A16 host-semantic prohibitions"
+      ],
+      "residualAuthority": [
+        "the external world/runtime still injects an Event occurrence by creating/selecting K->Event",
+        "the caller still selects which left and right contextual truth frontiers are operands of pair actualization",
+        "selected Application->Next continuation authority remains explicit",
+        "arbitrary values merely coexisting under K are not automatically paired"
+      ],
+      "evidenceTest": "ts/test/research-v013-contextual-event-input-a16-f3.test.ts",
+      "claimBoundary": [
+        "GREEN would classify Event as ordinary contextual data/truth rather than a raw host semantic control parameter",
+        "GREEN would not prove automatic closure over all K-linked values; operand-frontier selection remains explicit",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ],
+      "consequence": "A16-F3 removes raw Event-as-control from the tested call path. Event is represented exactly like other contextual truth as K->Event. One generic pair kernel accepts explicitly selected K->X and K->Y truth frontiers, constructs X->Y and K->(X->Y), and contains no State/Event/application semantics. Unknown or ambient Event truths have no effect unless explicitly selected and backed by continuation authority. The remaining boundary is now operand-frontier selection, not Event interpretation.",
+      "currentResult": "GREEN: A13/A16-F2 behavior is preserved with Event supplied only as K->Event contextual truth. The pair kernel is value-generic, raw Event control parameters are absent from that kernel, ambient event truth outside the selected right operand is inert, and a mixed event frontier contributes results only for applications with selected continuation authority. Generic application without continuation remains ZERO. One explicit residual remains: the caller chooses which left/right truth frontiers are operands. External creation/injection of K->Event remains exogenous input rather than semantic interpretation.",
+      "observed": {
+        "rawEventControlParameter": false,
+        "eventRepresentation": "K_TO_EVENT_TRUTH_LINK",
+        "pairActualization": "GENERIC_TRUTH_OPERANDS",
+        "pairKernelDomainSemanticBranches": 0,
+        "ambientEventTruthOutsideOperandFrontierIgnored": true,
+        "unknownContextualEventBranch": "ZERO",
+        "operandFrontierSelectionResiduals": 1,
+        "externalEventInjection": true,
         "independentMemories": 2,
         "productionChanged": false
       }
