@@ -68,8 +68,8 @@
     "publicationAdmissionSourceRemovalA13dComplete": true,
     "selfGeneratedDefinitionAdmissionF5F1Complete": true,
     "selfGeneratedDefinitionProven": false,
-    "selfGeneratedStructuralAdmissionF5F2Complete": false,
-    "selfGeneratedUnknownCandidateStructuralAdmissionProven": false
+    "selfGeneratedStructuralAdmissionF5F2Complete": true,
+    "selfGeneratedUnknownCandidateStructuralAdmissionProven": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -3770,8 +3770,8 @@
       "consequence": "F5 cannot be GREEN under exact-candidate admission alone. SELF_EXTENSIBLE remains GREEN, runtime candidate construction is demonstrated, but SELF_ADMISSIBILITY for candidates unknown at freeze time is missing. The next required E3 capability is a frozen generic formation/admissibility law over candidate structure, represented/reconstructed from MTS evidence rather than candidate identity or host isValidDefinition logic."
     },
     "selfGeneratedStructuralAdmissionF5F2": {
-      "status": "DESIGNED_NOT_EXECUTED",
-      "currentResult": "NOT_RUN",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "currentResult": "GREEN: two distinct definition-shaped candidates generated only after frozen rule selection are admitted by one candidate-agnostic Link rule containing anonymous roles and three pair-identity constraints, with zero generated candidate identities in frozen authority. Forged application, forged continuation and wrong-arity candidates are rejected. A frontier containing both valid candidates remains ambiguous rather than gaining priority. Two independent replay Memories generate byte-identical canonical topology.",
       "question": "Can one frozen candidate-agnostic Link rule structurally admit previously unknown definition candidates generated after freeze without exact candidate identity or host definition-specific branches?",
       "frozenRuleShape": [
         "Roles = ExactSequence(anonymous role Links)",
@@ -3810,18 +3810,18 @@
         "global E3/source removal is therefore still open"
       ],
       "observed": {
-        "generatedCandidates": null,
-        "bothUnknownCandidatesAdmitted": null,
-        "forgedApplicationRejected": null,
-        "forgedContinuationRejected": null,
-        "wrongArityRejected": null,
-        "twoValidCandidatesAmbiguous": null,
+        "generatedCandidates": 2,
+        "bothUnknownCandidatesAdmitted": true,
+        "forgedApplicationRejected": true,
+        "forgedContinuationRejected": true,
+        "wrongArityRejected": true,
+        "twoValidCandidatesAmbiguous": true,
         "frozenCandidateIdentityReferences": 0,
         "independentMemories": 2,
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-structural-admission-f5-f2.test.ts",
-      "consequence": "Pending execution. GREEN would remove the F5-F1 exact-identity blocker by demonstrating frozen structural admission of unknown generated candidates, while leaving the generic rule interpreter as a residual host E3 service."
+      "consequence": "F5-F1's exact-identity blocker is removed on the scoped path: frozen structural MTS evidence can admit candidates unknown at freeze time. This demonstrates unknown-candidate structural self-admissibility, but not full F5: the generated candidate is not yet a full F4-compatible Dictionary/source-grouping/behavior authority, and the generic structural-rule interpreter remains a host E3 service."
     }
   }
 }
