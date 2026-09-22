@@ -103,7 +103,8 @@
     "contextCarriedContinuationAuthorityA19Designed": true,
     "contextCarriedContinuationAuthorityA19Complete": true,
     "linkNativeFrontierA20Designed": true,
-    "linkNativeFrontierA20Complete": true
+    "linkNativeFrontierA20Complete": true,
+    "singleExecutionRootA21Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1374,9 +1375,10 @@
     "linkNativeFrontierA20IndependentMemoryCount": "Independent Memories reproducing Link-native frontier/provenance behavior."
   },
   "nextExperiments": [
-    "A21: combine current context K and selected Link-native frontier into one execution-root Link, so one Link identifies the complete executable state without separate host context/frontier selection.",
+    "A21: execute one-Link execution root E_n=K->Frontier_n. Remove separate context/frontier inputs while preserving context-carried authority and Link-native provenance.",
+    "If A21 is GREEN, represent the state transition itself as Link-carried E_n->E_(n+1) and test whether current-execution selection can be propagated by the same contextual detachment law rather than host replacement.",
+    "After A21, reconnect the single-root execution state with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A21 must preserve context-carried authority, occurrence ancestry, convergence multiplicity, ambient isolation and fail-closed structural validation.",
-    "After A21, test recursive execution-root replacement E_n -> E_{n+1} as a Link-native meta-interpreter state transition and reconnect it with F5 self-generated authority.",
     "A20 should use Link-native occurrence ancestry (for example ParentOccurrence->TruthWitness) and a frozen frontier carrier; it must not execute every truth merely linked to K.",
     "A20 must preserve first split, branch-local termination, convergence multiplicity, schedule equivalence, ambient-truth isolation and ZERO.",
     "A19 must preserve ambient-authority isolation and fail closed if K does not carry a structurally valid selected authority.",
@@ -4987,6 +4989,52 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "singleExecutionRootA21": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A20's separately supplied context K and Link-native frontier be combined into one execution-root Link E=K->Frontier, so one Link identifies the complete selected executable state and Step(E_n)=E_(n+1)?",
+      "setup": [
+        "retain A19 context-carried continuation authority",
+        "retain A20 Link-native frontier and occurrence ancestry provenance",
+        "define execution root E_n=K->Frontier_n",
+        "semantic step receives only memory, executionRoot and schedule",
+        "derive K from START(E_n) and selected frontier from END(E_n)",
+        "return E_(n+1)=K->Frontier_(n+1)"
+      ],
+      "oracle": [
+        "reproduce A20 first fan-out, local termination, recursive split and convergence",
+        "two converging occurrence paths retain one canonical K->Z truth Link and two occurrence Links",
+        "forward/reverse scheduling preserves provenance paths",
+        "terminal step returns one execution root whose frontier is ZERO and whose context remains K",
+        "ambient execution root is ignored unless selected as the step input",
+        "selected execution with foreign-context occurrence is rejected",
+        "selected execution with unwrapped frontier is rejected",
+        "selected execution whose START does not carry valid context authority is rejected",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "step signature has one executionRoot LinkHandle and no separate context/frontier parameters",
+        "kernel contains no BundleValue/ResolvedOccurrence/authorityTruth/transitions array/active/isTrue/currentValue/modusPonens/find/outgoing/incoming/switch primitive",
+        "K must be derived from START(executionRoot)",
+        "frontier must be derived from END(executionRoot)",
+        "next selected execution state must be returned as one Link K->NextFrontier"
+      ],
+      "residualAuthority": [
+        "the host/runtime still selects the current execution-root Link E_n",
+        "schedule order remains an external implementation choice",
+        "initial execution-root injection remains external",
+        "execution-root transition E_n->E_(n+1) is not yet itself represented/selected as a Link-carried transition",
+        "authority/frontier publication source remains outside this gate"
+      ],
+      "evidenceTest": "ts/test/research-v013-single-execution-root-a21.test.ts",
+      "claimBoundary": [
+        "GREEN would make one Link sufficient to identify the complete selected scoped execution state",
+        "GREEN would not yet source-remove selection of which execution root is current",
+        "GREEN would not prove physical parallelism",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
