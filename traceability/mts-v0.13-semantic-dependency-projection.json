@@ -102,7 +102,8 @@
     "linkCarriedContinuationAuthorityA18Complete": true,
     "contextCarriedContinuationAuthorityA19Designed": true,
     "contextCarriedContinuationAuthorityA19Complete": true,
-    "linkNativeFrontierA20Designed": true
+    "linkNativeFrontierA20Designed": true,
+    "linkNativeFrontierA20Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1106,7 +1107,12 @@
     "contextCarriedContinuationAuthorityA19HostTransitionArrayParameterCount": 0,
     "contextCarriedContinuationAuthorityA19AmbientContinuationFires": 0,
     "contextCarriedContinuationAuthorityA19AmbientAlternateAuthorityFires": 0,
-    "contextCarriedContinuationAuthorityA19IndependentMemoryCount": 2
+    "contextCarriedContinuationAuthorityA19IndependentMemoryCount": 2,
+    "linkNativeFrontierA20HostBundleFrontierCount": 0,
+    "linkNativeFrontierA20ConvergenceDistinctTruthLinkCount": 1,
+    "linkNativeFrontierA20ConvergenceOccurrenceLinkCount": 2,
+    "linkNativeFrontierA20HostPathArrayCount": 0,
+    "linkNativeFrontierA20IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1360,12 +1366,17 @@
     "contextCarriedContinuationAuthorityA19HostTransitionArrayParameterCount": "Host-selected transition-array parameters consumed by A19. Target zero.",
     "contextCarriedContinuationAuthorityA19AmbientContinuationFires": "Ambient continuations outside the authority structurally carried by K that affect execution. Target zero.",
     "contextCarriedContinuationAuthorityA19AmbientAlternateAuthorityFires": "Ambient alternative authority envelopes that affect an already selected immutable context K. Target zero.",
-    "contextCarriedContinuationAuthorityA19IndependentMemoryCount": "Independent Memories reproducing context-carried continuation authority behavior."
+    "contextCarriedContinuationAuthorityA19IndependentMemoryCount": "Independent Memories reproducing context-carried continuation authority behavior.",
+    "linkNativeFrontierA20HostBundleFrontierCount": "BundleValue/ResolvedOccurrence host frontier carriers consumed by the A20 semantic kernel. Target zero.",
+    "linkNativeFrontierA20ConvergenceDistinctTruthLinkCount": "Distinct canonical K->Z truth Links after converging branches. Target one.",
+    "linkNativeFrontierA20ConvergenceOccurrenceLinkCount": "Distinct Link-native occurrence Links retaining the converged proof paths. Target two.",
+    "linkNativeFrontierA20HostPathArrayCount": "Host provenance path arrays in the A20 semantic frontier representation. Target zero.",
+    "linkNativeFrontierA20IndependentMemoryCount": "Independent Memories reproducing Link-native frontier/provenance behavior."
   },
   "nextExperiments": [
-    "A20: execute Link-native frontier/provenance. Replace host BundleValue frontier with a Link carrier of occurrence Links ParentOccurrence->(K->A).",
-    "If A20 is GREEN, reduce the remaining externally selected initial frontier/context package into one Link-native execution root and test recursive self-description of scheduler state.",
-    "After A20, reconnect context/frontier execution with F5 self-generated authority/template convergence and reassess E2/E3.",
+    "A21: combine current context K and selected Link-native frontier into one execution-root Link, so one Link identifies the complete executable state without separate host context/frontier selection.",
+    "A21 must preserve context-carried authority, occurrence ancestry, convergence multiplicity, ambient isolation and fail-closed structural validation.",
+    "After A21, test recursive execution-root replacement E_n -> E_{n+1} as a Link-native meta-interpreter state transition and reconnect it with F5 self-generated authority.",
     "A20 should use Link-native occurrence ancestry (for example ParentOccurrence->TruthWitness) and a frozen frontier carrier; it must not execute every truth merely linked to K.",
     "A20 must preserve first split, branch-local termination, convergence multiplicity, schedule equivalence, ambient-truth isolation and ZERO.",
     "A19 must preserve ambient-authority isolation and fail closed if K does not carry a structurally valid selected authority.",
@@ -4904,7 +4915,7 @@
       }
     },
     "linkNativeFrontierA20": {
-      "status": "DESIGNED_PENDING_EXECUTION",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A19's host BundleValue frontier carrier be removed and replaced by one Link-native frontier whose occurrence Links preserve branch provenance even when extensional contextual truth converges?",
       "setup": [
         "retain context-carried continuation authority from A19",
@@ -4948,7 +4959,34 @@
         "this gate does not accept v0.13",
         "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
         "production runtime remains unchanged"
-      ]
+      ],
+      "consequence": "A20 removes BundleValue as the selected frontier/provenance carrier in the tested application-closed path. The selected frontier is one Link envelope containing occurrence Links. Each occurrence is ParentOccurrence->TruthWitness, where TruthWitness is K->A. At convergence two branch occurrences share one canonical K->Z truth Link while remaining two distinct occurrence Links, so extensional truth convergence and proof-path multiplicity coexist entirely in Link data.",
+      "currentResult": "GREEN: first split, local termination, recursive split, convergence and terminal ZERO all reproduce without BundleValue/ResolvedOccurrence/path[] in the semantic frontier. Link ancestry reconstructs A0>A2>A3>Z and A0>A2>A4>Z over one canonical K->Z truth witness. Forward/reverse scheduling preserves the same provenance paths. Ambient contextual truth and ambient occurrence carriers outside the selected frontier are ignored; foreign-context occurrence and unwrapped frontier are rejected fail-closed. Two independent Memories agree.",
+      "observed": {
+        "hostBundleValueFrontier": false,
+        "frontierCarrier": "PROPER_START_SELF_CLOSED_LINK_CHAIN",
+        "occurrenceShape": "PARENT_OCCURRENCE_TO_TRUTH_WITNESS",
+        "truthWitnessShape": "K_TO_A",
+        "contextCarriedAuthority": true,
+        "firstFanout": 2,
+        "secondFanout": 2,
+        "localTermination": true,
+        "convergenceDistinctTruthLinks": 1,
+        "convergenceOccurrenceLinks": 2,
+        "provenance": [
+          "A0>A2>A3>Z",
+          "A0>A2>A4>Z"
+        ],
+        "hostPathArrays": 0,
+        "scheduleProvenanceEquivalent": true,
+        "ambientTruthIgnored": true,
+        "ambientOccurrenceIgnored": true,
+        "foreignContextOccurrence": "REJECTED",
+        "unwrappedFrontier": "REJECTED",
+        "terminalFrontier": "ZERO",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     }
   }
 }
