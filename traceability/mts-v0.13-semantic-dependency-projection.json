@@ -41,7 +41,9 @@
     "aspectApplicationLTemplateContinuationResearchComplete": true,
     "aspectApplicationDualRoleTemplateResearchComplete": true,
     "aspectApplicationMethodOrientationResearchComplete": true,
-    "aspectApplicationSelfContinuationSignatureResearchComplete": true
+    "aspectApplicationSelfContinuationSignatureResearchComplete": true,
+    "aspectApplicationUnifierSliceAuditComplete": true,
+    "aspectApplicationUnifierSourceRemovalProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -864,7 +866,11 @@
     "aspectSelfContinuationDistinctSignatureCount": 4,
     "aspectSelfContinuationBasisCaseCount": 5,
     "aspectSelfContinuationHostAspectBranchCount": 0,
-    "aspectSelfContinuationIndependentMemoryCount": 2
+    "aspectSelfContinuationIndependentMemoryCount": 2,
+    "aspectA11UnifierPoleReadsPerDecode": 3,
+    "aspectA11UnifierRoleBindingsPerDecode": 2,
+    "aspectA11UnifierTemplateDepth": 1,
+    "aspectA11UnifierIndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -937,13 +943,17 @@
     "aspectSelfContinuationDistinctSignatureCount": "A11f distinct direct/inverse self-continuation signatures induced by one generic method-oriented decoder: 11, 10, 01 and 00; these coincide with the four local self-incidence aspect masks.",
     "aspectSelfContinuationBasisCaseCount": "A11f basis Links exercised under the same self-continuation law: R,O,C,L,U. L and U share the 00 ordinary-pair signature.",
     "aspectSelfContinuationHostAspectBranchCount": "Per-aspect ROOT/START/END/PAIR branches in the A11f kernel. Zero: the signature is derived from selected method Links and generic structural bindings.",
-    "aspectSelfContinuationIndependentMemoryCount": "Independent Memories in which identical four-signature behavior is reconstructed with unrelated local handles/noise."
+    "aspectSelfContinuationIndependentMemoryCount": "Independent Memories in which identical four-signature behavior is reconstructed with unrelated local handles/noise.",
+    "aspectA11UnifierPoleReadsPerDecode": "Observed poles() calls for one A11 root-frame decode via unifyStructuralTemplate(L,target,[O,C]): L during contains-role analysis, L during root unification, and target once. No deeper target traversal occurs.",
+    "aspectA11UnifierRoleBindingsPerDecode": "A11g exact bindings inferred per decode: O-role -> target.start and C-role -> target.end.",
+    "aspectA11UnifierTemplateDepth": "Effective A11g template traversal depth before declared roles terminate matching. One means only the outer L=O⟼C layer is traversed.",
+    "aspectA11UnifierIndependentMemoryCount": "Independent Memories, one with unrelated noise, in which the same minimal unifier slice is observed across R/O/C/L/U."
   },
   "nextExperiments": [
-    "A11g/E2: source-remove generic structural unification and method-role interpretation from the A11f path. The four signatures must be reconstructed from portable MTS evidence without re-encoding the same pole/equality law in host code.",
-    "A11h: combine ordinary zero/one/many frozen continuations with self-continuation signatures under one selected method authority, proving no separate evaluator is needed for PAIR versus ROOT/START/END cases.",
-    "After A11g/A11h, integrate F2b portable naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
-    "Then rerun F-KERNEL-SELF-EXTENSION and reassess the three remaining host-defined FORMAL law families.",
+    "Execute A11G-F1-UNIFIER-DENIAL against the exact one-Link/two-role binding slice. Do not substitute direct host candidate.start/candidate.end mapping or another host matcher.",
+    "A11h: combine ordinary zero/one/many frozen continuations with A11f self-continuation signatures under one method authority and one result projection, proving no separate evaluator is needed for PAIR versus ROOT/START/END.",
+    "After A11G-F1/A11h, integrate F2b portable naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
+    "Then rerun F-KERNEL-SELF-EXTENSION and reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization.",
     "E3/E4 remain separate and open; selected frozen authority must not collapse into live adjacency."
   ],
   "measurement": {
@@ -2736,6 +2746,63 @@
       },
       "evidenceTest": "ts/test/research-v013-self-continuation-signature-a11f.test.ts",
       "consequence": "A11f gives executable evidence that the four self-incidence aspects and four method-oriented self-continuation behaviors are the same 2-bit structural classification. This strongly supports the hypothesis that application/function behavior is intrinsic to Link aspects, but generic unification/method interpretation is still host-defined and full semantic closure is not proven."
+    },
+    "aspectApplicationA11g": {
+      "status": "EXECUTED_GREEN_UNIFIER_SLICE_AUDIT",
+      "question": "How much of generic structural-unification semantics is actually exercised by the A11 method/aspect path, and what exact host boundary remains before source removal?",
+      "exactCall": "unifyStructuralTemplate(memory, L, target, [O,C]) where L=O⟼C and both immediate template poles are declared roles",
+      "observedRuntimeSlice": [
+        "three poles() reads per decode: template during contains-role test, template root during unification, target root once",
+        "two role bindings per decode",
+        "effective template depth one",
+        "zero find/outgoing/incoming calls",
+        "zero writes",
+        "target self-incidence is not recursively traversed because matching terminates at declared O/C roles"
+      ],
+      "genericUnifierCapabilitiesNotNeededByA11RootDecode": [
+        "grounded subtree identity below the template root",
+        "repeated-role consistency across multiple occurrences",
+        "recursive nested role-bearing template traversal below one Link level",
+        "cycle-pair visitation for recursive template structure"
+      ],
+      "stillRequiredHostDecisions": [
+        "roles O and C are recognized as placeholders for this selected root frame",
+        "target start pole is bound to O-role and target end pole to C-role",
+        "role bindings are returned in the selected role order",
+        "generic unifier implementation remains the operative semantic source"
+      ],
+      "sourceRemovalFalsifier": {
+        "id": "A11G-F1-UNIFIER-DENIAL",
+        "status": "DESIGNED_NOT_EXECUTED",
+        "question": "Can the exact two-role binding law used by A11 be reconstructed from portable MTS Link/method evidence after denying structural-unification.ts, without replacing it with equivalent host pole/equality code?",
+        "failConditions": [
+          "replacement host code explicitly maps candidate.start -> START role and candidate.end -> END role",
+          "replacement host code re-encodes ROOT/START/END/PAIR cases",
+          "precomputed expected role bindings are merely stored in Links and trusted",
+          "a proof/morphism replay service with equivalent host matching semantics is substituted and called closure",
+          "sender-local handles are required"
+        ],
+        "passConditions": [
+          "binding law is selected/reconstructed from portable MTS evidence",
+          "same evidence works in two independent Memories",
+          "no structural-unification/matchStructuralTemplate equivalent is invoked",
+          "forged/reversed/collapsed role evidence fails closed",
+          "A11f four behavioral signatures remain equal to self-incidence masks"
+        ],
+        "currentResult": "NOT_RUN"
+      },
+      "observed": {
+        "poleReadsPerDecode": 3,
+        "roleBindingsPerDecode": 2,
+        "effectiveTemplateDepth": 1,
+        "findOutgoingIncomingCalls": 0,
+        "writes": 0,
+        "independentMemories": 2,
+        "sourceRemovalProven": false,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-unifier-slice-a11g.test.ts",
+      "consequence": "A11g does not source-remove generic unification, but shrinks the relevant semantic-source boundary to a one-Link, two-role projection. Most generic unifier machinery is not exercised on the A11 root-aspect path. The next source-removal experiment can target this exact narrow law instead of the full generic matcher."
     }
   }
 }
