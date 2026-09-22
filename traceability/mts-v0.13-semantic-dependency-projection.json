@@ -34,7 +34,9 @@
     "formalKernelSelfExtensionFalsifierComplete": true,
     "formalGenericExtensionApplicationResearchComplete": true,
     "formalGenericExtensionSourceNamingComplete": false,
-    "formalPortableNameAuthorityResearchComplete": true
+    "formalPortableNameAuthorityResearchComplete": true,
+    "aspectApplicationStructuralCandidateResearchComplete": true,
+    "aspectApplicationSemanticClosureProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -836,7 +838,10 @@
     "formalPortableNameAliasCount": 2,
     "formalPortableNameIndependentMemoryCount": 2,
     "formalPortableNameHostSpecificBranchCount": 0,
-    "formalPortableNameNegativeControlCount": 3
+    "formalPortableNameNegativeControlCount": 3,
+    "aspectApplicationBasisEquationCount": 5,
+    "aspectApplicationIndependentMemoryCount": 2,
+    "aspectApplicationContinuationDepth": 3
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -888,14 +893,18 @@
     "formalPortableNameAliasCount": "F2b physical names carried as exact STRING source content and resolved by one frozen portable Dictionary authority to the same Use; current corpus has two aliases.",
     "formalPortableNameIndependentMemoryCount": "Independent replay Memories in which the same portable Dictionary authority resolves the aliases without sender-local LinkHandles.",
     "formalPortableNameHostSpecificBranchCount": "Per-name semantic branches in the F2b generic resolver. Zero means physical bytes are materialized generically and Dictionary topology selects the Use.",
-    "formalPortableNameNegativeControlCount": "F2b controls: unknown name has no semantic resolution, conflicting local definitions fail closed, and a later child scope cannot mutate the already selected frozen Dictionary authority."
+    "formalPortableNameNegativeControlCount": "F2b controls: unknown name has no semantic resolution, conflicting local definitions fail closed, and a later child scope cannot mutate the already selected frozen Dictionary authority.",
+    "aspectApplicationBasisEquationCount": "Executable A11a structural application-reading equations checked directly through ordinary Memory.ensure canonicality: R=R(R), O=O(R), C=R(C), L=O(C), U=C(O). This is a structural count, not proof that function/application semantics are foundationally closed.",
+    "aspectApplicationIndependentMemoryCount": "Independent Memories, including unrelated allocation noise, in which the same A11a structural equations and continuation nesting hold without sender-local handle identity.",
+    "aspectApplicationContinuationDepth": "A11a left-nested ordinary Link continuation depth exercised with no host arity metadata: F(a), F(a)(b), F(a)(b)(c)."
   },
   "nextExperiments": [
-    "FORMAL F2 integration: combine F2b portable physical-name -> Use resolution with F2a bundle-valued generic application in one end-to-end two-Memory witness under frozen authorities and zero per-form/name host branches.",
-    "FORMAL F2c: extend generic result-template construction to cyclic/self-incidence forms without START/END-specific host branches.",
-    "After integrated naming+application+cyclic-construction evidence, rerun F-KERNEL-SELF-EXTENSION against the fixed production-kernel blockers.",
-    "Measure/falsify residual generic E2 authority in exact STRING materialization, Dictionary lookup, structural unification, result-template carrier interpretation and generic template instantiation.",
-    "Apply source-removal discipline to proof meta-semantics before any global SELF_GENERATED_OR_RECONSTRUCTED claim.",
+    "A11b: replace the five grounded basis examples with one portable aspect-derived application/continuation law and attempt to reconstruct its ZERO/ONE/MANY continuation semantics under frozen authority; no independent Apply primitive and no per-aspect switch.",
+    "A11c: test bundle-valued higher-order continuation: one application returns a BundleValue containing Links that can themselves occupy the function/start pole of subsequent applications; keep bundle orchestration and authority ambiguity distinct.",
+    "Only after A11b/A11c, integrate F2b portable naming with aspect-derived application; do not make F2a's host helper the normative FORMAL kernel.",
+    "F2c/A11 cyclic closure: derive cyclic/self-incidence result construction without START/END-specific host branches.",
+    "Rerun F-KERNEL-SELF-EXTENSION only after naming + aspect-derived application + cyclic construction evidence.",
+    "Measure/falsify residual generic E2 authority in exact STRING materialization, Dictionary lookup, structural unification, result-template interpretation and instantiation.",
     "Audit E3 only after E2/FORMAL reconstruction work; frozen selected authority must remain distinct from live adjacency."
   ],
   "measurement": {
@@ -2376,6 +2385,48 @@
         "productionChanged": false
       },
       "consequence": "Physical spelling no longer needs per-name host semantic dispatch in this research slice: exact STRING carrier plus portable Dictionary topology is sufficient to select Use. Generic Dictionary lookup and exact STRING materialization remain host laws; F2 name+application integration and cyclic result construction remain open, so F-KERNEL-SELF-EXTENSION stays RED overall."
+    },
+    "aspectApplicationA11": {
+      "status": "EXECUTED_GREEN_STRUCTURAL_CANDIDATE",
+      "hypothesis": "Application is not an additional MTS primitive. Candidate reading: ordinary Link construction itself carries application, while the four self-incidence aspects are four intrinsic cases/modes of that same Link structure.",
+      "ontologyBoundary": [
+        "no Apply primitive is added to the foundation",
+        "function, argument, relation, tuple/pair and currying terminology are explanatory projections only unless derived",
+        "sequence of applications is nested Link structure, not a foundational Sequence entity",
+        "ValueBundle remains a derived result projection, not a foundational result container",
+        "F2a applyFrozenExtension is an external research helper name with no ontological authority"
+      ],
+      "executableStructuralEquations": [
+        "R = R(R) because R = R ⟼ R and ordinary ensure(R,R) reuses R",
+        "O = O(R) because poles(O) = (O,R) and ordinary ensure(O,R) reuses O",
+        "C = R(C) because poles(C) = (R,C) and ordinary ensure(R,C) reuses C",
+        "L = O(C) because L = O ⟼ C",
+        "U = C(O) because U = C ⟼ O"
+      ],
+      "continuationCandidate": "For ordinary non-self-referential cases, left-nested Link construction F⟼a, (F⟼a)⟼b, ((F⟼a)⟼b)⟼c requires no arity tag. The previous result Link is structurally eligible to occupy the start/function pole of the next Link.",
+      "relationToF2a": [
+        "F2a already proves one generic rule kernel can interpret an application-shaped Link to ZERO/ONE/MANY derived BundleValue results with zero per-form host branches",
+        "A11a does not yet derive F2a rule selection, unification, instantiation or BundleValue projection from the four aspects",
+        "therefore A11a is structural evidence for a unifying foundation hypothesis, not semantic closure"
+      ],
+      "falsifiersStillOpen": [
+        "derive or reconstruct result/continuation authority from Link aspects rather than an independently privileged Apply/rule interpreter",
+        "show all four aspects participate under one generic law rather than five hard-coded basis equations",
+        "show bundle-valued continuations under frozen authority without treating live adjacency as result authority",
+        "show recursive/self-incidence construction without START/END-specific host builders",
+        "reconstruct the same law across two Memories from portable MTS evidence",
+        "falsify the need for an independent application primitive"
+      ],
+      "observed": {
+        "basisEquations": 5,
+        "independentMemories": 2,
+        "continuationDepth": 3,
+        "hostArityMetadata": 0,
+        "productionChanged": false,
+        "semanticClosureProven": false
+      },
+      "evidenceTest": "ts/test/research-v013-aspect-application-a11a.test.ts",
+      "consequence": "The existing rooted basis is structurally consistent with reading Link itself as application: R/O/C/L/U are canonical fixed/degenerate/ordinary cases of the same two-pole constructor, and arbitrary argument depth is ordinary left-nesting. This does not yet prove that MTS evaluation/result semantics are fully derivable from the aspect basis."
     }
   }
 }
