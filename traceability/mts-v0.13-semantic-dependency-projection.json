@@ -117,7 +117,8 @@
     "metaAuthorityTemplateConvergenceA26Designed": true,
     "metaAuthorityTemplateConvergenceA26Complete": true,
     "metaAuthorityInventoryDiscoveryA27Designed": true,
-    "metaAuthorityInventoryDiscoveryA27Complete": true
+    "metaAuthorityInventoryDiscoveryA27Complete": true,
+    "derivedMetaSeedCorrespondenceA28Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1474,9 +1475,9 @@
     "metaAuthorityInventoryDiscoveryA27IndependentMemoryCount": "Independent Memories reproducing broad-inventory discovery and convergence behavior."
   },
   "nextExperiments": [
-    "A28: remove explicit per-template sourceSeeds->targetSeeds correspondence from the A27 broad inventory. Derive source/target seed correspondence structurally from Link-carried source candidate and selected target execution description, reusing the F5-F7 structural-correspondence method.",
-    "A28 must preserve broad-inventory compatibility discovery without ambient scans and must fail closed on structurally ambiguous or mismatched derived correspondence.",
-    "If A28 is GREEN, attack selected target-seed authority itself and then broad-inventory selection; do not collapse either into ambient Memory truth.",
+    "A28: execute structural derivation of producer source seeds from source-candidate topology and remove explicit per-template sourceSeeds->targetSeeds correspondence Links.",
+    "If A28 is GREEN, attack the externally selected target seed description: derive the target execution-root chain from Link-carried selected target context/history rather than a positional ExactSequence.",
+    "A28 must preserve broad-inventory isolation, unchanged A23 consumption, canonical convergence and fail-closed rejection of malformed structural producer evidence.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
@@ -5568,6 +5569,55 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "derivedMetaSeedCorrespondenceA28": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A27's explicit per-template sourceSeeds->targetSeeds correspondence Links be removed by deriving each source seed path structurally from the producer-authority candidate topology itself, while retaining only one externally selected target seed description?",
+      "setup": [
+        "freeze a broad inventory containing source candidate identities only; no package contains a sourceSeeds->targetSeeds correspondence Link",
+        "two source candidates carry valid four-transition producer authorities compatible with the selected target description",
+        "one source candidate carries a valid shorter three-transition producer authority and is structurally incompatible by derived seed arity",
+        "generic extractor searches candidate values for exactly one M whose END is a proper START-self producer-authority envelope",
+        "extractor traverses that envelope and requires a non-empty contiguous E_i->E_(i+1) transition chain",
+        "derive source seeds as MetaParent followed by the execution-root chain",
+        "zip derived source seeds to the one selected target seed ExactSequence only when cardinalities match",
+        "instantiate compatible candidates by unchanged generic pole/self-incidence recursion, require frozen structural admission/publication/convergence, and consume through unchanged A23 metaStep"
+      ],
+      "oracle": [
+        "broad inventory size equals three and contains zero explicit per-template correspondence Links",
+        "two full-length source candidates are structurally compatible with the selected target description",
+        "one independently executable shorter producer authority is excluded by structural seed arity rather than identity",
+        "source seed sequence is reconstructed from candidate topology without candidate role positions",
+        "both compatible candidates converge to one target candidate/publication/M",
+        "target producer authority is absent at freeze",
+        "unchanged A23 metaStep executes target E0..E4 then ZERO",
+        "late ambient compatible source candidate outside the frozen inventory remains inert",
+        "malformed selected producer candidate missing one carried authority-chain cell rejects fail-closed even though the physical ambient topology still exists",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "structural seed extractor contains no META/E0/E1/E2/E3/E4/T0/C0/ENV positional role identifiers",
+        "structural seed extractor contains no find/outgoing/incoming/allLinks ambient recovery",
+        "inventory runner contains no explicit correspondence/package identity branch",
+        "A28 metaStep remains whitespace-normalized source-identical to A23",
+        "target convergence remains canonical Link identity"
+      ],
+      "residualAuthority": [
+        "selected target seed ExactSequence remains externally supplied",
+        "membership of the broad frozen source-candidate inventory remains externally selected",
+        "generic structural-rule interpreter and topology-instantiation interpreter remain host executed",
+        "current meta-occurrence selection remains explicit",
+        "semantic information is therefore not claimed eliminated"
+      ],
+      "evidenceTest": "ts/test/research-v013-derived-meta-seed-correspondence-a28.test.ts",
+      "claimBoundary": [
+        "GREEN would remove explicit per-template sequence correspondence authority from the tested meta producer-template path",
+        "GREEN would not remove target description selection or broad inventory selection",
+        "GREEN would not authorize ambient Memory as source authority",
+        "this gate does not accept v0.13",
+        "global E2/E3 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
