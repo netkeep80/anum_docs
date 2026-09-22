@@ -36,7 +36,8 @@
     "formalGenericExtensionSourceNamingComplete": false,
     "formalPortableNameAuthorityResearchComplete": true,
     "aspectApplicationStructuralCandidateResearchComplete": true,
-    "aspectApplicationSemanticClosureProven": false
+    "aspectApplicationSemanticClosureProven": false,
+    "aspectApplicationFrozenContinuationResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -841,7 +842,11 @@
     "formalPortableNameNegativeControlCount": 3,
     "aspectApplicationBasisEquationCount": 5,
     "aspectApplicationIndependentMemoryCount": 2,
-    "aspectApplicationContinuationDepth": 3
+    "aspectApplicationContinuationDepth": 3,
+    "aspectContinuationResultCardinalityCases": 3,
+    "aspectContinuationIndependentMemoryCount": 2,
+    "aspectContinuationHigherOrderDepth": 2,
+    "aspectContinuationRuleAuthorityCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -896,15 +901,18 @@
     "formalPortableNameNegativeControlCount": "F2b controls: unknown name has no semantic resolution, conflicting local definitions fail closed, and a later child scope cannot mutate the already selected frozen Dictionary authority.",
     "aspectApplicationBasisEquationCount": "Executable A11a structural application-reading equations checked directly through ordinary Memory.ensure canonicality: R=R(R), O=O(R), C=R(C), L=O(C), U=C(O). This is a structural count, not proof that function/application semantics are foundationally closed.",
     "aspectApplicationIndependentMemoryCount": "Independent Memories, including unrelated allocation noise, in which the same A11a structural equations and continuation nesting hold without sender-local handle identity.",
-    "aspectApplicationContinuationDepth": "A11a left-nested ordinary Link continuation depth exercised with no host arity metadata: F(a), F(a)(b), F(a)(b)(c)."
+    "aspectApplicationContinuationDepth": "A11a left-nested ordinary Link continuation depth exercised with no host arity metadata: F(a), F(a)(b), F(a)(b)(c).",
+    "aspectContinuationResultCardinalityCases": "A11b frozen selected Link-continuation authority cases read by one generic kernel: defined application with zero result continuations, one result continuation, and multiple result continuations.",
+    "aspectContinuationIndependentMemoryCount": "Independent replay Memories in which byte-identical selected Link-continuation topology yields the same application results without sender-local handles.",
+    "aspectContinuationHigherOrderDepth": "A11b repeated semantic application depth demonstrated after a returned Link is reused as the function/start pole of the next application.",
+    "aspectContinuationRuleAuthorityCount": "StructuralRule/Dictionary semantic authorities consulted by the A11b continuation reader. Zero means the scoped experiment reads only the frozen selected Link topology plus generic Memory operations; it does not imply global E2 closure."
   },
   "nextExperiments": [
-    "A11b: replace the five grounded basis examples with one portable aspect-derived application/continuation law and attempt to reconstruct its ZERO/ONE/MANY continuation semantics under frozen authority; no independent Apply primitive and no per-aspect switch.",
-    "A11c: test bundle-valued higher-order continuation: one application returns a BundleValue containing Links that can themselves occupy the function/start pole of subsequent applications; keep bundle orchestration and authority ambiguity distinct.",
-    "Only after A11b/A11c, integrate F2b portable naming with aspect-derived application; do not make F2a's host helper the normative FORMAL kernel.",
-    "F2c/A11 cyclic closure: derive cyclic/self-incidence result construction without START/END-specific host branches.",
-    "Rerun F-KERNEL-SELF-EXTENSION only after naming + aspect-derived application + cyclic construction evidence.",
-    "Measure/falsify residual generic E2 authority in exact STRING materialization, Dictionary lookup, structural unification, result-template interpretation and instantiation.",
+    "A11c: remove the host semantic privilege of 'prefix find + frozen outgoing ends are results' by representing/reconstructing that continuation-reading law from MTS Link/aspect evidence under a frozen authority; equivalent host re-encoding is failure.",
+    "A11d: extend the same continuation law to self-incidence application keys, especially R(R)=R, START and END cases, without a per-aspect host switch.",
+    "After A11c/A11d, integrate F2b portable physical naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
+    "Only then revisit F2c cyclic construction and rerun F-KERNEL-SELF-EXTENSION.",
+    "Measure/falsify residual generic E2 authority in exact STRING materialization, Dictionary lookup, structural unification and selected-support interpretation.",
     "Audit E3 only after E2/FORMAL reconstruction work; frozen selected authority must remain distinct from live adjacency."
   ],
   "measurement": {
@@ -2427,6 +2435,59 @@
       },
       "evidenceTest": "ts/test/research-v013-aspect-application-a11a.test.ts",
       "consequence": "The existing rooted basis is structurally consistent with reading Link itself as application: R/O/C/L/U are canonical fixed/degenerate/ordinary cases of the same two-pole constructor, and arbitrary argument depth is ordinary left-nesting. This does not yet prove that MTS evaluation/result semantics are fully derivable from the aspect basis."
+    },
+    "aspectApplicationA11b": {
+      "status": "EXECUTED_GREEN_FROZEN_CONTINUATION_CANDIDATE",
+      "hypothesis": "For a frozen selected Link authority, F(a) can be read as the result bundle of b values whose exact nested Links (F ⟼ a) ⟼ b belong to that authority. The application key F ⟼ a and every result occurrence are ordinary Links.",
+      "selectedAuthority": "Canonical pole-closed topology containing only the selected function/application prefixes, authorized continuation Links and their structural support. Unrelated source-Memory noise is excluded before transport.",
+      "genericKernel": [
+        "find the exact ordinary Link prefix P = F ⟼ argument inside the frozen selected support",
+        "if P is absent, the application is not defined by this selected authority and fails closed",
+        "read selected strict outgoing Links P ⟼ b from the frozen support",
+        "project their end poles b as the derived BundleValue result",
+        "do not consult Dictionary, Grammar, Theory, StructuralRule, operator enum, physical name or host arity metadata"
+      ],
+      "positiveCorpus": [
+        "R(a0) -> empty BundleValue while the application prefix itself is explicitly present",
+        "R(a1) -> singleton BundleValue {g}",
+        "R(aMany) -> BundleValue {g,h}",
+        "g(a2) -> {z1} and h(a2) -> {z2}, proving returned result Links may themselves act as functions under the same law"
+      ],
+      "frozenAuthorityControls": [
+        "unknown application prefix is absent and fails closed rather than being confused with a defined empty result",
+        "post-freeze live outgoing Link from an application prefix is invisible to the frozen selected support",
+        "two independently built source Memories with unrelated allocation noise export byte-identical selected authority"
+      ],
+      "ontologyBoundary": [
+        "no Apply, Function, Argument, Rule or Bundle primitive is added to the MTS foundation",
+        "F(a) is research notation for reading ordinary nested Links under selected authority",
+        "BundleValue is only the existing derived projection of zero/one/many selected result Links",
+        "selected frozen support grants semantic authority; ambient live adjacency does not",
+        "ordinary PAIR-like application prefixes are exercised here; ROOT/START/END self-incidence application cases remain open"
+      ],
+      "residualHostSemanticBoundary": [
+        "exact Memory.find(F,argument) prefix lookup",
+        "frozen-support outgoing traversal",
+        "interpret strict outgoing end poles as result continuations",
+        "BundleValue projection",
+        "selected-support export/replay framing"
+      ],
+      "observed": {
+        "resultCardinality": [
+          "zero",
+          "one",
+          "many"
+        ],
+        "independentMemories": 2,
+        "higherOrderDepth": 2,
+        "structuralRuleAuthorityCount": 0,
+        "dictionaryAuthorityCount": 0,
+        "hostArityMetadata": 0,
+        "productionChanged": false,
+        "semanticClosureProven": false
+      },
+      "evidenceTest": "ts/test/research-v013-aspect-continuation-a11b.test.ts",
+      "consequence": "The user's R→a→b reading is executable as a scoped frozen-Link semantics: R(a) can yield zero/one/many b continuations, and a returned b may itself be used as the function pole of a later application. The remaining question is whether the generic prefix/outgoing/end-pole interpretation law itself can be reconstructed from MTS aspects rather than remain host semantic source."
     }
   }
 }
