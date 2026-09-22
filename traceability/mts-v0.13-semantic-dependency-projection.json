@@ -882,11 +882,10 @@
     "formalGenericExtensionResultCardinalityCases": "Result cardinalities exercised through one generic kernel: zero values, one value and multiple values. The result is always the derived BundleValue surface; singleton bundle is not coerced to Link."
   },
   "nextExperiments": [
-    "Execute FORMAL F2a: portable frozen Link-defined extension Rules under one form-agnostic generic application kernel, with no per-form host branch and explicit fail-closed ambiguity/unknown/mutation controls.",
-    "If F2a is GREEN, keep naming separate: F2b must bind exact source/name -> Use through portable frozen MTS authority without canonicalByte or a host spelling switch.",
-    "After naming, F2c must address cyclic/self-incidence result-template construction without adding START/END-specific host cases.",
-    "Only after F2a/F2b/F2c can F-KERNEL-SELF-EXTENSION be rerun as a candidate GREEN witness.",
-    "Measure/falsify the residual generic E2 boundary: structural unification, generic role extraction and generic template instantiation.",
+    "FORMAL F2b: bind exact source/name -> Use through portable frozen MTS authority without canonicalByte or a host spelling switch; preserve aliases and canonical-representation policy as separate from semantic identity.",
+    "FORMAL F2c: extend generic result-template construction to cyclic/self-incidence forms without START/END-specific host branches and without collapsing BundleValue into LinkValue.",
+    "Rerun the full F-KERNEL-SELF-EXTENSION falsifier only after F2b/F2c; F2a alone does not upgrade it from RED.",
+    "Measure/falsify the residual generic E2 boundary: structural unification, role extraction, result-template carrier interpretation and generic template instantiation.",
     "Apply source-removal discipline to proof meta-semantics before any global SELF_GENERATED_OR_RECONSTRUCTED claim.",
     "Audit E3 only after E2/FORMAL reconstruction work; preserve frozen authority and never equate live adjacency with admission."
   ],
@@ -2249,7 +2248,7 @@
       "No claim is made that naming/reference must be a new ontology primitive; the target is a derived Link role."
     ],
     "genericExtensionF2a": {
-      "status": "DESIGNED_FOR_EXECUTION",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can one form-agnostic generic Link-rule application kernel execute previously unknown ordinary acyclic forms from frozen portable MTS/Link authority without adding a per-form host branch?",
       "scope": [
         "application semantics only",
@@ -2290,14 +2289,30 @@
         "does not prove F-KERNEL-SELF-EXTENSION GREEN",
         "does not prove FULL_SELF_HOSTED"
       ],
-      "result": "NOT_RUN",
+      "result": "GREEN: one unchanged form-agnostic research kernel executed three portable Link-defined Rules returning zero, one and multiple values as the accepted derived BundleValue surface across two independent replay Memories. The kernel has zero per-form/cardinality branches; singleton BundleValue remains distinct from LinkValue. Unknown Use fails closed, competing semantic Rules are rejected as authority ambiguity, and post-freeze live Theory mutation cannot alter the frozen selected Rule set.",
       "authorClarification": "R/result is more general than a single Link and may return a bundle. F2a must preserve zero/one/many value cardinality rather than accidentally impose single-valued function semantics.",
       "bundleBoundary": [
         "ValueBundle is a derived structural value surface, not a new foundational ontology entity",
         "result-template ExactSequence != semantic BundleValue",
         "singleton BundleValue != LinkValue",
         "multiple values from one selected Rule != multiple competing semantic Rules"
-      ]
+      ],
+      "evidenceTest": "ts/test/research-v013-formal-generic-extension-f2a.test.ts",
+      "observed": {
+        "portableRules": 3,
+        "resultCardinality": [
+          "zero",
+          "one",
+          "many"
+        ],
+        "resultKind": "BundleValue",
+        "singletonBundleEqualsLink": false,
+        "independentMemories": 2,
+        "hostFormSpecificBranches": 0,
+        "negativeControls": 3,
+        "productionChanged": false
+      },
+      "consequence": "Per-form application semantics can be compressed to one generic Link-rule kernel for ordinary acyclic result templates without imposing single-valued function semantics. F2b source/name binding, cyclic/self-incidence result construction, and the E2 source authority of generic unification/instantiation remain open; F-KERNEL-SELF-EXTENSION stays RED overall."
     }
   }
 }
