@@ -107,7 +107,8 @@
     "singleExecutionRootA21Designed": true,
     "singleExecutionRootA21Complete": true,
     "metaExecutionDetachmentA22Designed": true,
-    "metaExecutionDetachmentA22Complete": true
+    "metaExecutionDetachmentA22Complete": true,
+    "metaTransitionAuthorityA23Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1398,8 +1399,9 @@
     "metaExecutionDetachmentA22IndependentMemoryCount": "Independent Memories reproducing meta-execution detachment and history."
   },
   "nextExperiments": [
-    "A23: attack the E_n->E_(n+1) transition-producer residual. Represent the A21 execution transformation as Link-carried application/continuation authority and require transition production without a domain-specific host producer.",
-    "A23 must preserve A22 self-similar meta-detachment and fail closed when transition-production authority is absent, malformed or ambient-only.",
+    "A23: execute context-carried meta transition authority. Remove runtime produceNextExecution and selectedExecutionTransition arguments while preserving A22 self-similar meta-detachment.",
+    "If A23 is GREEN, connect producer-authority publication to F5 self-generated authority/template convergence so E_n->E_(n+1) authority is generated/discovered from Link-carried semantics rather than prepublished by the fixture.",
+    "A23 must preserve fail-closed ZERO/malformed/ambiguous producer authority behavior and ambient-authority isolation.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A22 should distinguish immutable execution history from selection of the current execution root and must preserve branch/provenance semantics from A21.",
     "A21 must preserve context-carried authority, occurrence ancestry, convergence multiplicity, ambient isolation and fail-closed structural validation.",
@@ -5147,6 +5149,52 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "metaTransitionAuthorityA23": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A22's domain-specific E_n->E_(n+1) transition producer and selected-transition argument be removed from runtime by carrying selected execution-transition authority structurally inside meta-context M, while preserving the same self-similar contextual detachment law?",
+      "setup": [
+        "retain A21 one-Link execution roots E_n=K->Frontier_n",
+        "retain A22 immutable meta truth/history M->E_n with occurrence ancestry",
+        "pre-publish a frozen research authority containing selected E_n->E_(n+1) transition Links",
+        "encode that producer authority structurally inside meta-context M",
+        "semantic meta-step receives only current contextual truth M->E_n",
+        "meta-step derives producer authority from M and matches E_n->E_(n+1) structurally"
+      ],
+      "oracle": [
+        "reproduce A22 semantic first fan-out, recursive split, convergence and terminal ZERO through the E0..E4 sequence",
+        "meta-history remains immutable Link ancestry M->E0..E4",
+        "runtime domain-specific A21 transition producer count is zero",
+        "selected execution-transition argument count is zero",
+        "ambient E_n->E_bad outside frozen producer authority is ignored",
+        "ambient alternative producer authority does not alter immutable selected M",
+        "empty selected producer authority yields ZERO",
+        "raw unwrapped producer authority is rejected fail-closed",
+        "ambiguous selected producer authority with two successors for one E_n is rejected fail-closed",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "meta-step kernel contains no referenceNextExecution/produceNextExecution/frontier/schedule/State/Event/BundleValue/selectedExecutionTransition/modusPonens/find/outgoing/incoming/switch primitive",
+        "producer authority must be derived structurally from meta-context M",
+        "current execution matching must use only Link pole identity",
+        "meta-step performs exactly one Memory.ensure form: ensure(M,E_(n+1))"
+      ],
+      "residualAuthority": [
+        "publication/source of the frozen producer authority containing E_n->E_(n+1) remains outside this gate",
+        "current meta-occurrence selection remains explicit",
+        "initial M->E0 injection remains external",
+        "schedule/physical concurrency remains implementation-level",
+        "reference A21 production is used only before A23 execution to construct the authority witness under test"
+      ],
+      "evidenceTest": "ts/test/research-v013-meta-transition-authority-a23.test.ts",
+      "claimBoundary": [
+        "GREEN would remove the domain-specific execution-transition producer from runtime meta-step execution",
+        "GREEN would not source-remove publication/generation of the producer authority itself",
+        "GREEN preserves A22 self-similar detachment but does not prove unbounded self-hosting",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
