@@ -276,7 +276,6 @@ function encodePlan(initial:InitialArtifact,d:Description,dropLast:boolean):Plan
   const constraints=materializeExactSequence(memory,constraintLinks);
   const outputs=materializeExactSequence(memory,[roles[d.candidateRole]!,roles[d.publicationRole]!]);
   const plan=materializeExactSequence(memory,[seedBindings,constraints,outputs]);
-  const allBeforeFreeze=memory.allLinks();
   const request=at(initialLinks,initial.requestCoordinate),q=readRequest(memory,request);
   assert(memory.find(q.fnStart,q.fnEnd)===undefined,"plan does not precreate function");
   same(lookupScopedDictionary(memory,q.dictionary,q.nameContent),undefined,"plan does not precreate name authority");
