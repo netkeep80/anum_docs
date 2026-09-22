@@ -58,10 +58,21 @@ same(audit.currentGaps.definePreviouslyUnknownNamedFormFromFormalSource, false,
   "new named FORMAL form is not yet demonstrated");
 same(audit.currentGaps.useNewFormWithoutHostSemanticBranch, false,
   "host-branch-free extension is not yet demonstrated");
-same(audit.selfExtensionFalsifier.status, "DESIGNED_NOT_EXECUTED",
-  "self-extension falsifier is designed but not executed");
-same(audit.selfExtensionFalsifier.currentResult, "NOT_RUN",
-  "self-extension remains an open falsifier");
+same(audit.selfExtensionFalsifier.status, "EXECUTED_RED_FIXED_KERNEL",
+  "self-extension falsifier records the executed RED boundary");
+assert(
+  typeof audit.selfExtensionFalsifier.currentResult === "string" &&
+    audit.selfExtensionFalsifier.currentResult.startsWith("RED:"),
+  "self-extension falsifier records the executable RED result",
+);
+same(audit.selfExtensionFalsifier.attemptCount, 4,
+  "self-extension falsifier records four independent attempts");
+same(audit.selfExtensionFalsifier.successfulWitnessCount, 0,
+  "self-extension falsifier has no successful witness");
+same(audit.selfExtensionFalsifier.independentMemoryCount, 2,
+  "self-extension falsifier is reproduced in two independent Memories");
+same(audit.selfExtensionFalsifier.productionChanged, false,
+  "self-extension RED does not change production");
 
 assert(
   audit.ontologyFirewall.some((x: string) => x.includes("Link is the only foundational ontology entity")),
@@ -77,5 +88,5 @@ assert(
 );
 
 console.log(
-  "MTS v0.13 FORMAL kernel audit: A10b self-template validation exists, but B3/B4/B10 and unknown-form self-extension remain open; three FORMAL E2 law families are still HOST_DEFINED and F-KERNEL-SELF-EXTENSION is RED-design-only: GREEN.",
+  "MTS v0.13 FORMAL kernel audit: A10b self-template validation exists, B3/B4/B10 remain open, and F-KERNEL-SELF-EXTENSION is now EXECUTED_RED_FIXED_KERNEL with zero successful witnesses: GREEN.",
 );
