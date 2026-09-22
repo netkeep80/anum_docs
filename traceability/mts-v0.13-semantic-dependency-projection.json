@@ -1170,7 +1170,7 @@
     "selfGeneratedDefinitionF5F3GeneratorNameSpecificBranchCount": "Physical-name/result-specific semantic branches in the post-freeze F5-F3 generator. Target is zero.",
     "selfGeneratedDefinitionF5F3ProducerMemoryCount": "Independent replay Memories that must generate byte-identical complete portable authority from the same frozen Link-carried request/rule.",
     "selfGeneratedDefinitionF5F3ReceiverMemoryCount": "Independent second Memories executing the exported generated authority through the unchanged F4 receiver.",
-    "selfGeneratedDefinitionF5F3UnchangedF4ReceiverSourceMatch": "Exact source-block equality between F5-F3 receiver execution code and the already-GREEN F4 generic receiver. Target is true."
+    "selfGeneratedDefinitionF5F3UnchangedF4ReceiverSourceMatch": "Whitespace-normalized exact source-block equality between F5-F3 receiver execution code and the already-GREEN F4 generic receiver. Target is true; compaction may remove formatting only."
   },
   "nextExperiments": [
     "Execute F5-F3: generate a full F4-compatible portable Dictionary/source-grouping/continuation authority after freeze, admit its definition root through F5-F2 structural admission, publish/export it, and execute the new named function in a second Memory through the unchanged F4 receiver.",
@@ -3924,7 +3924,7 @@
         "two replay producer Memories must generate byte-identical portable authority",
         "two fresh second Memories must execute that authority"
       ],
-      "unchangedReceiver": "The F5-F3 test copies the F4 receiver block from function at(...) through executeExpression(...), and an executable source-equality guard requires exact byte equality with research-v013-formal-self-extension-f4.test.ts.",
+      "unchangedReceiver": "The F5-F3 test mirrors the F4 receiver block from function at(...) through executeExpression(...). An executable whitespace-normalized source-equality guard requires identical receiver tokens/structure while allowing formatting-only compaction for repository diff budget.",
       "antiCheat": [
         "generator source contains no physical q/b1/b2 semantic literals",
         "generator has no switch/operatorAspect/unifyStructuralTemplate",
