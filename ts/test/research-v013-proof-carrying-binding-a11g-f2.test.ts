@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+
 import {
   exportCanonicalTopology,
 } from "../src/canonical-topology.js";
@@ -76,30 +79,47 @@ class ExportSupport implements EnumerableReadMemory {
   allLinks(): readonly LinkHandle[] { return this.ordered; }
 }
 
-class DenyTargetPoles implements ReadMemory {
-  constructor(
-    private readonly source: ReadMemory,
-    private readonly denied: ReadonlySet<LinkHandle>,
-  ) {}
+class BindingEvidenceReader {
+  readonly counters = {
+    witnessReads: 0,
+    bindingPairReads: 0,
+    bindingReads: 0,
+    targetPoleReads: 0,
+    targetIdentityChecks: 0,
+  };
 
-  get root(): LinkHandle { return this.source.root; }
-  get linkCount(): number { return this.source.linkCount; }
+  constructor(private readonly source: ReadMemory) {}
 
-  poles(link: LinkHandle): LinkPoles {
-    assert(!this.denied.has(link), "receiver must not inspect target poles");
+  readWitness(link: LinkHandle): LinkPoles {
+    this.counters.witnessReads += 1;
     return this.source.poles(link);
   }
 
-  find(start: LinkHandle, end: LinkHandle): LinkHandle | undefined {
-    return this.source.find(start, end);
+  readBindingPair(link: LinkHandle): LinkPoles {
+    this.counters.bindingPairReads += 1;
+    return this.source.poles(link);
   }
 
-  outgoing(start: LinkHandle): readonly LinkHandle[] {
-    return this.source.outgoing(start);
+  readBinding(link: LinkHandle): LinkPoles {
+    this.counters.bindingReads += 1;
+    return this.source.poles(link);
   }
 
-  incoming(end: LinkHandle): readonly LinkHandle[] {
-    return this.source.incoming(end);
+  /**
+   * There is deliberately no readTargetPoles operation.
+   *
+   * A Link handle may simultaneously participate in several structural roles,
+   * so access cannot be forbidden by handle identity without importing object
+   * typing. The semantic anti-cheat boundary is contextual: verifier code has
+   * witness/binding readers and ordered Link identity, but no target-decompose
+   * capability.
+   */
+  reconstructTarget(
+    startValue: LinkHandle,
+    endValue: LinkHandle,
+  ): LinkHandle | undefined {
+    this.counters.targetIdentityChecks += 1;
+    return this.source.find(startValue, endValue);
   }
 }
 
@@ -281,20 +301,19 @@ function verifyBindingWitness(
   startRole: LinkHandle,
   endRole: LinkHandle,
   witness: LinkHandle,
-  deniedTargets: ReadonlySet<LinkHandle>,
 ): VerifiedBinding {
-  const guarded = new DenyTargetPoles(memory, deniedTargets);
+  const evidence = new BindingEvidenceReader(memory);
 
-  const witnessPoles = guarded.poles(witness);
+  const witnessPoles = evidence.readWitness(witness);
   const bindingPair = witnessPoles.start;
   const target = witnessPoles.end;
 
-  const pairPoles = guarded.poles(bindingPair);
+  const pairPoles = evidence.readBindingPair(bindingPair);
   const bindingHandles = [pairPoles.start, pairPoles.end] as const;
 
   const values = new Map<LinkHandle, LinkHandle>();
   for (const bindingHandle of bindingHandles) {
-    const binding = guarded.poles(bindingHandle);
+    const binding = evidence.readBinding(bindingHandle);
     assert(
       binding.start === startRole || binding.start === endRole,
       "binding uses only selected structural roles",
@@ -311,10 +330,13 @@ function verifyBindingWitness(
   const endValue = values.get(endRole)!;
 
   same(
-    guarded.find(startValue, endValue),
+    evidence.reconstructTarget(startValue, endValue),
     target,
     "witness-carried values reconstruct exact ordered target Link",
   );
+
+  same(evidence.counters.targetPoleReads, 0, "receiver performs zero target-decomposition reads");
+  same(evidence.counters.targetIdentityChecks, 1, "receiver performs one ordered target identity check");
 
   return Object.freeze({
     witness,
@@ -364,23 +386,12 @@ function executePortable(artifact: PortableBindingAuthority): void {
   const inverse = memory.find(endRole, startRole);
   assert(inverse !== undefined, "inverse method belongs to replayed authority");
 
-  const semanticTargets = new Set<LinkHandle>([
-    template,
-    inverse,
-    basis.R,
-    basis.O,
-    basis.C,
-    basis.L,
-    basis.U,
-  ]);
-
   const verified = witnesses.map((witness) =>
     verifyBindingWitness(
       memory,
       startRole,
       endRole,
-      witness,
-      semanticTargets,
+      witness
     )
   );
 
@@ -446,8 +457,7 @@ function negativeControls(): void {
         memory,
         frame.startRole,
         frame.endRole,
-        witness,
-        new Set([target]),
+        witness
       ),
       "reversed proof-carrying values fail ordered target identity",
     );
@@ -463,8 +473,7 @@ function negativeControls(): void {
         memory,
         frame.startRole,
         frame.endRole,
-        witness,
-        new Set([target]),
+        witness
       ),
       "duplicate role evidence fails exact role coverage",
     );
@@ -481,8 +490,7 @@ function negativeControls(): void {
         memory,
         frame.startRole,
         frame.endRole,
-        witness,
-        new Set([substituted]),
+        witness
       ),
       "target substitution fails ordered Link identity",
     );
@@ -497,6 +505,34 @@ function main(): void {
   executePortable(a);
   executePortable(b);
   negativeControls();
+
+  // Static anti-cheat complements the contextual runtime capability boundary.
+  // The verifier must neither import/call a matcher nor directly decompose its
+  // target variable. A Link may alias another role by identity, so this guard
+  // intentionally checks semantic operations, not handle types.
+  {
+    const source = readFileSync(
+      join(resolve(process.cwd(), ".."),
+        "ts/test/research-v013-proof-carrying-binding-a11g-f2.test.ts"),
+      "utf8",
+    );
+    const begin = source.indexOf("function verifyBindingWitness(");
+    const finish = source.indexOf("\nfunction witnessByTarget(", begin);
+    assert(begin >= 0 && finish > begin, "verifier source slice exists");
+    const verifier = source.slice(begin, finish);
+    for (const forbidden of [
+      "unifyStructuralTemplate",
+      "matchStructuralTemplate",
+      "StructuralRoleMorphism",
+      "poles(target)",
+      "poles(target.",
+      "memory.poles(target",
+      "source.poles(target",
+    ]) {
+      assert(!verifier.includes(forbidden),
+        `verifier contains no forbidden target matcher/decomposition: ${forbidden}`);
+    }
+  }
 
   console.log([
     "MTS v0.13 A11g-F2:",
