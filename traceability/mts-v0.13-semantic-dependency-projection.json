@@ -72,7 +72,9 @@
     "selfGeneratedUnknownCandidateStructuralAdmissionProven": true,
     "rootAsymmetryChiralityA14Complete": true,
     "rootAsymmetryMirrorChiralityPreserved": true,
-    "rootAsymmetryErasureNondegenerateBasisRejected": true
+    "rootAsymmetryErasureNondegenerateBasisRejected": true,
+    "selfGeneratedDefinitionF5F3Complete": false,
+    "selfGeneratedFullF4AuthorityProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -987,7 +989,15 @@
     "rootAsymmetryChiralityForcedCollapseControlCount": 2,
     "rootAsymmetryChiralityCollapsedEquivalenceClassCount": 1,
     "rootAsymmetryChiralityHostAspectBranchCount": 0,
-    "rootAsymmetryChiralityIndependentMemoryCount": 2
+    "rootAsymmetryChiralityIndependentMemoryCount": 2,
+    "selfGeneratedDefinitionF5F3GeneratedFunctionCount": null,
+    "selfGeneratedDefinitionF5F3PostFreezeDictionaryExtensionCount": null,
+    "selfGeneratedDefinitionF5F3ContinuationCount": null,
+    "selfGeneratedDefinitionF5F3NegativeControlCount": null,
+    "selfGeneratedDefinitionF5F3GeneratorNameSpecificBranchCount": null,
+    "selfGeneratedDefinitionF5F3ProducerMemoryCount": null,
+    "selfGeneratedDefinitionF5F3ReceiverMemoryCount": null,
+    "selfGeneratedDefinitionF5F3UnchangedF4ReceiverSourceMatch": null
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1152,7 +1162,15 @@
     "rootAsymmetryChiralityForcedCollapseControlCount": "A14 symmetry-erasure quotients tested: identify O=C and identify L=U. Exact-pole plus canonical-pair congruence must drive both to the same universal collapse.",
     "rootAsymmetryChiralityCollapsedEquivalenceClassCount": "A14 number of surviving root-basis equivalence classes after either asymmetry-erasure quotient. One means R/O/C/L/U all collapse.",
     "rootAsymmetryChiralityHostAspectBranchCount": "ROOT/START/END/PAIR host branches in the A14 self-incidence observer. Zero.",
-    "rootAsymmetryChiralityIndependentMemoryCount": "Independent Memories required to reproduce byte-identical canonical root topology and the same A14 verdict."
+    "rootAsymmetryChiralityIndependentMemoryCount": "Independent Memories required to reproduce byte-identical canonical root topology and the same A14 verdict.",
+    "selfGeneratedDefinitionF5F3GeneratedFunctionCount": "F5-F3 new function Links absent at freeze and materialized only by the generic post-freeze producer.",
+    "selfGeneratedDefinitionF5F3PostFreezeDictionaryExtensionCount": "F5-F3 new physical-name -> function Dictionary authorities created after freeze rather than supplied in the frozen artifact.",
+    "selfGeneratedDefinitionF5F3ContinuationCount": "F5-F3 generated application continuation/result Links carried by the new definition authority.",
+    "selfGeneratedDefinitionF5F3NegativeControlCount": "F5-F3 forged application, forged continuation and wrong-arity generated definition candidates that must fail frozen structural admission/publication.",
+    "selfGeneratedDefinitionF5F3GeneratorNameSpecificBranchCount": "Physical-name/result-specific semantic branches in the post-freeze F5-F3 generator. Target is zero.",
+    "selfGeneratedDefinitionF5F3ProducerMemoryCount": "Independent replay Memories that must generate byte-identical complete portable authority from the same frozen Link-carried request/rule.",
+    "selfGeneratedDefinitionF5F3ReceiverMemoryCount": "Independent second Memories executing the exported generated authority through the unchanged F4 receiver.",
+    "selfGeneratedDefinitionF5F3UnchangedF4ReceiverSourceMatch": "Exact source-block equality between F5-F3 receiver execution code and the already-GREEN F4 generic receiver. Target is true."
   },
   "nextExperiments": [
     "Execute F5-F3: generate a full F4-compatible portable Dictionary/source-grouping/continuation authority after freeze, admit its definition root through F5-F2 structural admission, publish/export it, and execute the new named function in a second Memory through the unchanged F4 receiver.",
@@ -3881,6 +3899,48 @@
       },
       "evidenceTest": "ts/test/research-v013-root-asymmetry-chirality-a14.test.ts",
       "consequence": "Scoped evidence supports an unavoidable-orientedness claim modulo reversal: choosing the opposite root cross-link reverses chirality but does not remove asymmetry, while identifying the two boundary roles or the two opposite cross-links degenerates the entire root basis. This does not establish a metaphysically privileged absolute handedness, global E2/E3/E4 closure, or v0.13 acceptance."
+    },
+    "selfGeneratedDefinitionF5F3": {
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Can a frozen candidate-agnostic Link generation request/rule produce a previously absent full F4-compatible named-function authority, structurally admit and explicitly publish it, export it, and execute it in a second Memory through the exact unchanged F4 receiver?",
+      "frozenBoundary": [
+        "new function Link does not exist at freeze",
+        "new physical function name has no frozen Dictionary binding",
+        "frozen Link-carried request contains name/source carriers, constructor seeds, base Dictionary/history, Grammar/Theory, syntax forms and selected Direct method",
+        "frozen structural admission rule contains anonymous roles and pair-identity constraints but no future candidate identity"
+      ],
+      "generatedAuthority": [
+        "post-freeze function Link",
+        "post-freeze application and two continuation/result Links",
+        "post-freeze Dictionary extension binding the frozen physical name carrier to the new function Link",
+        "post-freeze Grammar/Theory membership for the generated expression forms",
+        "post-freeze source-selection evidence and source grouping",
+        "post-freeze proof-carrying bindings for Direct method, application and both continuations",
+        "one structural definition candidate admitted by the frozen F5-F2 rule",
+        "one explicit publication Link from admitted definition candidate to generated authority carrier"
+      ],
+      "portability": [
+        "two frozen source Memories with unrelated noise must export byte-identical frozen request/rule",
+        "two replay producer Memories must generate byte-identical portable authority",
+        "two fresh second Memories must execute that authority"
+      ],
+      "unchangedReceiver": "The F5-F3 test copies the F4 receiver block from function at(...) through executeExpression(...), and an executable source-equality guard requires exact byte equality with research-v013-formal-self-extension-f4.test.ts.",
+      "antiCheat": [
+        "generator source contains no physical q/b1/b2 semantic literals",
+        "generator has no switch/operatorAspect/unifyStructuralTemplate",
+        "singleton candidate cardinality does not grant publication; publication helper first requires frozen structural admission",
+        "forged application cannot be published",
+        "production runtime remains unchanged"
+      ],
+      "residualBoundary": [
+        "generation request position schema is still interpreted by host code",
+        "generic structural-rule interpreter remains host-executed",
+        "publication helper remains host-executed",
+        "Dictionary/source/grouping/proof-evidence materializers are host services",
+        "therefore a GREEN result may establish scoped SELF_GENERATED behavior but does not close global E2/E3/E4 or FULL_SELF_HOSTED"
+      ],
+      "evidenceTest": "ts/test/research-v013-self-generated-definition-f5-f3.test.ts",
+      "consequence": "Pending CI. A GREEN result would close the behavioral full-definition gap after F4/F5-F2 while leaving generic producer/verifier source authority as the next explicit self-hosting boundary."
     }
   }
 }
