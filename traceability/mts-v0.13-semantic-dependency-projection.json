@@ -50,7 +50,8 @@
     "aspectApplicationProofCarryingBindingResearchComplete": true,
     "aspectApplicationProofCarryingBindingMechanismProven": true,
     "aspectApplicationProofCarryingUnifiedContinuationResearchComplete": true,
-    "formalIntegratedNameAspectProofBindingResearchComplete": true
+    "formalIntegratedNameAspectProofBindingResearchComplete": true,
+    "formalSourceGroupingResearchComplete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -901,7 +902,11 @@
     "formalIntegratedProofBindingWitnessCount": 4,
     "formalIntegratedProofBindingHostMatcherCount": 0,
     "formalIntegratedProofBindingIndependentMemoryCount": 2,
-    "formalIntegratedProofBindingResultCardinality": 2
+    "formalIntegratedProofBindingResultCardinality": 2,
+    "formalSourceGroupingPhysicalSegmentCount": 4,
+    "formalSourceGroupingProofBindingWitnessCount": 4,
+    "formalSourceGroupingHostMatcherCount": 0,
+    "formalSourceGroupingExternalFunctionArgumentParameterCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1002,15 +1007,18 @@
     "formalIntegratedProofBindingWitnessCount": "F2d selected proof-carrying witnesses: direct method, application key, and two result-continuation Links.",
     "formalIntegratedProofBindingHostMatcherCount": "Host structural matcher/unifier calls in the F2d name->application path. Target is zero.",
     "formalIntegratedProofBindingIndependentMemoryCount": "Independent replay Memories executing the same combined portable Dictionary + proof-carrying application authority.",
-    "formalIntegratedProofBindingResultCardinality": "F2d exact result bundle cardinality for both physical aliases f(a) and dup(a)."
+    "formalIntegratedProofBindingResultCardinality": "F2d exact result bundle cardinality for both physical aliases f(a) and dup(a).",
+    "formalSourceGroupingPhysicalSegmentCount": "FORMAL F3 exact selected source segments in physical carrier f(a): f, (, a, ). Parentheses remain representation only.",
+    "formalSourceGroupingProofBindingWitnessCount": "FORMAL F3 proof-carrying bindings for Direct method, grouped application P, and two continuation occurrences.",
+    "formalSourceGroupingHostMatcherCount": "Structural unifier/matcher dependencies in the FORMAL F3 grouping/evaluation path. Target is zero.",
+    "formalSourceGroupingExternalFunctionArgumentParameterCount": "Semantic function/argument Link parameters supplied externally to the F3 evaluator. Target is zero: grouping evidence selects source resolutions and the application target."
   },
   "nextExperiments": [
-    "FORMAL F3: represent application grouping itself in portable FORMAL/MTS evidence so source expresses f(a), instead of the test externally supplying f and a as separate names.",
-    "After F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
-    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization against the matcher-free aspect/proof-carrying path.",
-    "Measure/classify exact STRING materialization and Dictionary lookup as remaining FORMAL semantic/representation services before any global E2 claim.",
-    "Apply the same proof-carrying/aspect mechanism to proof semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims.",
-    "E3/E4 remain separate and open."
+    "Execute FORMAL F3 grouping witness and require one physical source f(a) to drive the application without external function/argument Link parameters.",
+    "After F3, rerun F-KERNEL-SELF-EXTENSION using a previously unknown named function/form expressed through the matcher-free naming + grouping + aspect application path.",
+    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization; compare each old host law with the new Dictionary/grouping/aspect path before removal.",
+    "Measure/classify exact STRING/source segmentation and Dictionary lookup as remaining FORMAL authority boundaries.",
+    "Then apply the same proof-carrying/aspect mechanism to proof semantics; E3/E4 remain separate and open."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3154,6 +3162,45 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "formalSourceGroupingF3": {
+      "id": "FORMAL-F3-SOURCE-GROUPING",
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Can one exact physical FORMAL source carry its own portable MTS grouping authority so the evaluator derives the application F⟼A from source evidence rather than receiving F and A as separate host parameters?",
+      "physicalCarrier": [
+        "exact STRING source is literal f(a)",
+        "selected source segments are f, (, a, )",
+        "Dictionary maps those physical segments to semantic Uses/Links",
+        "exact Grammar membership fixes the selected Use sequence",
+        "parenthesis glyphs have no direct application semantics; they are carrier/grammar evidence only"
+      ],
+      "groupingEvidence": [
+        "grouping is one selected Link whose start contains exact source formSequence plus a two-role binding pair",
+        "START-role binding points to one verified source resolution Link",
+        "END-role binding points to another verified source resolution Link",
+        "grouping target is the proposed application Link P",
+        "proof-carrying binding for P independently verifies ordered Link identity and its START/END values",
+        "receiver accepts grouping only when source-resolution semantic values equal the proof-verified values of P"
+      ],
+      "antiCheat": [
+        "receiver grouping evaluator receives no fn or argument Link parameters",
+        "receiver does not select source segments by host array index",
+        "role-to-source-resolution selection is carried by Link evidence",
+        "no structural-unification/matchStructuralTemplate/StructuralRoleMorphism",
+        "swapped source-role bindings under unchanged target must fail",
+        "foreign source resolution must fail",
+        "grouping for a different formSequence must fail"
+      ],
+      "residualBoundary": [
+        "v0.12 source segmentation still uses physical byte spans as representation metadata",
+        "exact STRING materialization and source replay remain host implementation",
+        "Dictionary/Grammar replay remain host semantic services",
+        "proof-carrying witness/package reading and ordered Link identity remain host execution substrate",
+        "selected grouping coordinate is frozen transport/authority selection",
+        "BundleValue projection remains derived host surface"
+      ],
+      "evidenceTest": "ts/test/research-v013-formal-source-grouping-f3.test.ts",
+      "currentResult": "NOT_RUN"
     }
   }
 }
