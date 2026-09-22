@@ -60,7 +60,7 @@
     "metaInterpreterFrontierA13Complete": true,
     "metaInterpreterPhysicalParallelismProven": false,
     "metaInterpreterMaterializingConcurrencyProven": false,
-    "materializingBranchesA13bComplete": false,
+    "materializingBranchesA13bComplete": true,
     "materializingBranchesPhysicalThreadSafetyProven": false,
     "competingPublicationAutoMergeProven": false
   },
@@ -3532,8 +3532,8 @@
       "consequence": "Scoped research demonstrates the meta-interpreter as a BundleValue frontier transformer over explicit Link-carried states. The old scalar Out(D,Fnext) model is a one-branch special case. Branching semantics is independent of physical scheduling; A13b still owns concurrent materialization/admission/conflict semantics, and global E4/FULL_SELF_HOSTED remain open."
     },
     "materializingBranchesA13b": {
-      "status": "DESIGNED_NOT_EXECUTED",
-      "currentResult": "NOT_RUN",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "currentResult": "GREEN: divergent branch-local append-only materialization A->B versus B->A yields byte-identical canonical final topology; two attempts to ensure the same shared pair converge to one exact Link while preserving two write/provenance occurrences; distinct branch-local immutable Context/publication candidates remain distinct and ambiguous publication is rejected rather than resolved by last-writer-wins. In the convergence control, two distinct branch identities with identical write operands converge to one exact publication Link with two occurrences and singleton publication selection succeeds.",
       "question": "Do branch-local append-only Link/context materializations commute across scheduler order while competing publication roots remain explicit alternatives rather than implicit last-writer-wins state?",
       "planCarrier": "Each frozen branch plan is ExactSequence(branchId, sharedStart, sharedEnd, uniqueStart, uniqueEnd, parentContext, poolSeed). It is a research carrier, not a new foundational instruction type.",
       "designedDivergentCase": [
@@ -3561,20 +3561,21 @@
         "E3 must still define admissibility/publication authority when distinct candidates exist"
       ],
       "observed": {
-        "divergentScheduleTopologyEqual": null,
-        "sharedWriteDistinctLinks": null,
-        "sharedWriteOccurrences": null,
-        "competingPublicationDistinctLinks": null,
-        "ambiguousPublicationRejected": null,
-        "convergedPublicationDistinctLinks": null,
-        "convergedPublicationOccurrences": null,
-        "convergedPublicationAccepted": null,
+        "divergentScheduleTopologyEqual": true,
+        "sharedWriteDistinctLinks": 1,
+        "sharedWriteOccurrences": 2,
+        "competingPublicationDistinctLinks": 2,
+        "ambiguousPublicationRejected": true,
+        "convergedPublicationDistinctLinks": 1,
+        "convergedPublicationOccurrences": 2,
+        "convergedPublicationAccepted": true,
         "physicalConcurrencyPrimitives": 0,
         "independentAuthorities": 2,
+        "actualThreadSafetyTested": false,
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-materializing-branches-a13b.test.ts",
-      "consequence": "Pending execution. GREEN would support monotone branch-local materialization as schedule-commutative at canonical topology level while proving that publication/admission remains a separate explicit authority problem."
+      "consequence": "Scoped research supports semantic schedule commutativity for monotone branch-local Link/Context materialization at canonical topology level. Canonical write convergence does not grant publication/admission authority: distinct publication roots remain an explicit E3/E4 ambiguity. Actual parallel Memory thread safety, transactions and linearizability remain implementation questions."
     }
   }
 }
