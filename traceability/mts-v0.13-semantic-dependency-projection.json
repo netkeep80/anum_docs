@@ -115,7 +115,9 @@
     "metaAuthorityTemplateInstantiationA25Designed": true,
     "metaAuthorityTemplateInstantiationA25Complete": true,
     "metaAuthorityTemplateConvergenceA26Designed": true,
-    "metaAuthorityTemplateConvergenceA26Complete": true
+    "metaAuthorityTemplateConvergenceA26Complete": true,
+    "metaAuthorityInventoryDiscoveryA27Designed": true,
+    "metaAuthorityInventoryDiscoveryA27Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1161,7 +1163,13 @@
     "metaAuthorityTemplateConvergenceA26DistinctTargetMetaContextCount": 1,
     "metaAuthorityTemplateConvergenceA26HostSelectedTemplateHandleCount": 0,
     "metaAuthorityTemplateConvergenceA26CorrespondencePerTemplateCount": 1,
-    "metaAuthorityTemplateConvergenceA26IndependentMemoryCount": 2
+    "metaAuthorityTemplateConvergenceA26IndependentMemoryCount": 2,
+    "metaAuthorityInventoryDiscoveryA27BroadInventorySize": 3,
+    "metaAuthorityInventoryDiscoveryA27DiscoveredCompatibleTemplateCount": 2,
+    "metaAuthorityInventoryDiscoveryA27ExcludedValidIncompatibleTemplateCount": 1,
+    "metaAuthorityInventoryDiscoveryA27ExternalPrefilteredCompatibleFrontierCount": 0,
+    "metaAuthorityInventoryDiscoveryA27LateAmbientCompatiblePackageFires": 0,
+    "metaAuthorityInventoryDiscoveryA27IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1457,12 +1465,18 @@
     "metaAuthorityTemplateConvergenceA26DistinctTargetMetaContextCount": "Canonical target M identities derived by all compatible template instantiations. Target one.",
     "metaAuthorityTemplateConvergenceA26HostSelectedTemplateHandleCount": "Host-selected single source-template winner handles in the A26 frontier runner. Target zero.",
     "metaAuthorityTemplateConvergenceA26CorrespondencePerTemplateCount": "External source-seed->target-seed correspondence declarations retained per template package. Current residual one.",
-    "metaAuthorityTemplateConvergenceA26IndependentMemoryCount": "Independent Memories reproducing A26 convergence behavior."
+    "metaAuthorityTemplateConvergenceA26IndependentMemoryCount": "Independent Memories reproducing A26 convergence behavior.",
+    "metaAuthorityInventoryDiscoveryA27BroadInventorySize": "Frozen broad producer-template inventory members presented to A27 before compatibility discovery.",
+    "metaAuthorityInventoryDiscoveryA27DiscoveredCompatibleTemplateCount": "Inventory members structurally discovered as targeting the selected target seed sequence.",
+    "metaAuthorityInventoryDiscoveryA27ExcludedValidIncompatibleTemplateCount": "Independently valid inventory packages excluded only because their Link-carried correspondence targets a different seed sequence.",
+    "metaAuthorityInventoryDiscoveryA27ExternalPrefilteredCompatibleFrontierCount": "Externally supplied already-compatible frontier selectors consumed by A27. Target zero.",
+    "metaAuthorityInventoryDiscoveryA27LateAmbientCompatiblePackageFires": "Compatible packages created after frozen inventory selection that affect A27 execution. Target zero.",
+    "metaAuthorityInventoryDiscoveryA27IndependentMemoryCount": "Independent Memories reproducing broad-inventory discovery and convergence behavior."
   },
   "nextExperiments": [
-    "A27: remove externally prefiltered compatible-frontier membership. Freeze a broader producer-template inventory containing compatible and incompatible packages, then structurally discover the target-compatible subset from Link-carried evidence without template identity/name branches.",
-    "A27 must distinguish broad inventory membership from compatibility authority: incompatible inventory members must be excluded by structural correspondence evidence, malformed selected evidence must fail closed, and late ambient inventory additions must remain inert.",
-    "If A27 is GREEN, the next source boundary is external per-template correspondence / common target seed selection rather than template winner or compatible-frontier enumeration.",
+    "A28: remove explicit per-template sourceSeeds->targetSeeds correspondence from the A27 broad inventory. Derive source/target seed correspondence structurally from Link-carried source candidate and selected target execution description, reusing the F5-F7 structural-correspondence method.",
+    "A28 must preserve broad-inventory compatibility discovery without ambient scans and must fail closed on structurally ambiguous or mismatched derived correspondence.",
+    "If A28 is GREEN, attack selected target-seed authority itself and then broad-inventory selection; do not collapse either into ambient Memory truth.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
@@ -5477,6 +5491,79 @@
         "malformedPackage": "REJECTS_FULL_FRONTIER",
         "externalTemplateFrontierMembership": true,
         "externalSequenceCorrespondence": true,
+        "semanticInformationEliminated": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "metaAuthorityInventoryDiscoveryA27": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A26's externally prefiltered compatible template frontier be removed by freezing a broader Link-carried producer-template inventory containing both compatible and incompatible valid packages, then structurally discovering the target-compatible subset without template identity branches or ambient Memory scans?",
+      "setup": [
+        "construct three independently valid source producer-authority templates with distinct candidate identities",
+        "construct one target execution family whose producer authority is absent at freeze",
+        "freeze a broad inventory containing two packages whose Link-carried correspondence ends at the selected target seed sequence and one valid package whose correspondence ends elsewhere",
+        "do not supply a prefiltered compatible frontier",
+        "generic inventory runner reads every frozen package and derives target compatibility only from correspondence END identity",
+        "instantiate every discovered compatible package through the unchanged A25/A26 seed zipper and topology recursion",
+        "require frozen structural admission, explicit publication and canonical convergence to one target candidate/publication/M",
+        "consume the converged target through unchanged A23 metaStep"
+      ],
+      "oracle": [
+        "broad frozen inventory size equals three",
+        "structurally discovered compatible subset size equals two",
+        "one independently valid incompatible inventory member is excluded rather than executed",
+        "external prefiltered compatible-frontier membership count is zero",
+        "both discovered compatible templates converge to one candidate, one publication and one target M",
+        "target producer authority is absent at freeze",
+        "unchanged A23 metaStep advances target E0..E4 then ZERO",
+        "a late ambient compatible package outside the frozen inventory remains inert",
+        "evidence whose correspondence targets the selected target but has malformed sequence cardinality rejects fail-closed rather than being silently excluded",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "inventory runner contains no source1/source2/source3/t1/t2/t3 identity branch or switch dispatch",
+        "inventory runner may not scan ambient Memory through allLinks/outgoing/incoming",
+        "compatibility selector is the Link-carried structural condition correspondence.end == selectedTargetSeeds",
+        "A27 metaStep remains whitespace-normalized source-identical to A23",
+        "canonical convergence is checked by Link identity"
+      ],
+      "residualAuthority": [
+        "membership of the broader frozen template inventory remains externally selected",
+        "each package still carries one external source-seed->target-seed sequence correspondence",
+        "selected target seed sequence remains external",
+        "current meta-occurrence selection remains explicit",
+        "semantic information is not claimed eliminated"
+      ],
+      "evidenceTest": "ts/test/research-v013-meta-authority-inventory-discovery-a27.test.ts",
+      "claimBoundary": [
+        "GREEN would remove externally enumerated compatible-frontier membership while preserving a frozen selected broad inventory boundary",
+        "GREEN would not authorize ambient Memory as truth/template authority",
+        "GREEN would not remove per-template correspondence or target-seed selection",
+        "this gate does not accept v0.13",
+        "global E2/E3 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ],
+      "consequence": "A27 removes externally prefiltered compatible-frontier membership from the tested meta-authority template path. A frozen broad inventory contains three independently valid source packages; two carry correspondences ending at the selected target seed sequence and one valid package targets elsewhere. The generic runner derives compatibility only from Link-carried correspondence END identity, instantiates both discovered compatible packages, and requires canonical convergence to one target candidate/publication/M. No ambient Memory scan or template identity dispatch is used.",
+      "currentResult": "GREEN: broad inventory size is 3, structurally discovered compatible subset size is 2, and one valid incompatible package is excluded. Both compatible packages instantiate through the A25/A26 zipper/topology recursion, pass frozen structural admission and converge to one target candidate, one publication and one M. Target producer authority is absent at freeze and unchanged A23 metaStep executes target E0..E4 then ZERO. A late ambient compatible package outside the frozen inventory remains inert. Evidence whose correspondence points at the selected target but has malformed sequence cardinality rejects fail-closed. Two independent Memories agree.",
+      "observed": {
+        "broadInventorySize": 3,
+        "discoveredCompatibleTemplates": 2,
+        "excludedValidIncompatibleTemplates": 1,
+        "externalPrefilteredCompatibleFrontier": false,
+        "hostSelectedTemplateHandle": false,
+        "discoveryLaw": "CORRESPONDENCE_END_EQUALS_SELECTED_TARGET_SEEDS",
+        "distinctTargetCandidates": 1,
+        "distinctTargetPublications": 1,
+        "distinctTargetMetaContexts": 1,
+        "targetAuthorityAbsentAtFreeze": true,
+        "frozenStructuralAdmission": "GREEN",
+        "unchangedA23MetaStep": true,
+        "lateAmbientCompatiblePackageIgnored": true,
+        "malformedTargetCompatibleEvidence": "REJECTED",
+        "externalBroadInventoryMembership": true,
+        "externalSequenceCorrespondence": true,
+        "externalTargetSeedSelection": true,
         "semanticInformationEliminated": false,
         "independentMemories": 2,
         "productionChanged": false
