@@ -1,0 +1,393 @@
+import { exportCanonicalTopology } from "../src/canonical-topology.js";
+import { defineDictionaryEffect, defineDictionaryScope, lookupScopedDictionary } from "../src/dictionary.js";
+import { materializeExactSequence, readExactSequence } from "../src/exact-sequence.js";
+import { Memory, ensureRootBasis, type LinkHandle, type ReadMemory, type RootBasis } from "../src/memory.js";
+import { restoreTopology, type StorageTopologyImage } from "../src/persistence-topology.js";
+import { defineSourceForm } from "../src/source.js";
+import {
+  buildV012SelectedSourceEvidence,
+  materializeV012SourceContent,
+  readV012SourceContent,
+  type V012SourceAuthority,
+} from "../src/v012-source.js";
+
+function assert(condition:unknown,message:string):asserts condition{
+  if(!condition) throw new Error(`v0.13 F5-F5 template instantiation: ${message}`);
+}
+function same<T>(actual:T,expected:T,message:string):void{
+  assert(Object.is(actual,expected),`${message}: values differ`);
+}
+function exactJson(actual:unknown,expected:unknown,message:string):void{
+  same(JSON.stringify(actual),JSON.stringify(expected),message);
+}
+function bytes(text:string):Uint8Array{return new TextEncoder().encode(text);}
+function at(all:readonly LinkHandle[],n:number):LinkHandle{
+  const x=all[n]; assert(x!==undefined,"coordinate resolves"); return x;
+}
+function coord(map:ReadonlyMap<LinkHandle,number>,link:LinkHandle,message:string):number{
+  const n=map.get(link); assert(n!==undefined,message); return n;
+}
+function expectRejected(effect:()=>unknown,message:string):void{
+  let rejected=false; try{effect();}catch{rejected=true;} assert(rejected,message);
+}
+
+interface Frame{
+  readonly startRole:LinkHandle;
+  readonly endRole:LinkHandle;
+  readonly directMethod:LinkHandle;
+}
+function frame(memory:Memory):Frame{
+  const b=ensureRootBasis(memory);
+  return Object.freeze({startRole:b.O,endRole:b.C,directMethod:b.L});
+}
+function defineName(
+  memory:Memory,basis:RootBasis,dictionary:LinkHandle,history:LinkHandle,
+  name:string,value:LinkHandle,
+):Readonly<{dictionary:LinkHandle;history:LinkHandle;occurrence:LinkHandle}>{
+  const content=materializeV012SourceContent(memory,basis,bytes(name));
+  const effect=defineDictionaryEffect(memory,dictionary,basis.R,history,content,value);
+  return Object.freeze({
+    dictionary:effect.afterScope,history:effect.historyAfter,occurrence:effect.occurrence,
+  });
+}
+function defineWitness(memory:Memory,f:Frame,target:LinkHandle):LinkHandle{
+  const p=memory.poles(target);
+  const a=memory.ensure(f.startRole,p.start);
+  const b=memory.ensure(f.endRole,p.end);
+  return memory.ensure(memory.ensure(a,b),target);
+}
+function defineAdmissionRule(memory:Memory):LinkHandle{
+  const b=ensureRootBasis(memory);
+  const roles=[
+    memory.ensure(b.O,b.L),memory.ensure(b.C,b.L),
+    memory.ensure(b.L,b.O),memory.ensure(b.L,b.C),
+    memory.ensure(b.U,b.O),memory.ensure(b.U,b.C),
+  ];
+  roles.push(memory.ensure(roles[0]!,roles[4]!));
+  roles.push(memory.ensure(roles[1]!,roles[5]!));
+  const roleSequence=materializeExactSequence(memory,roles);
+  const constraints=materializeExactSequence(memory,[
+    materializeExactSequence(memory,[roles[3]!,roles[1]!,roles[2]!]),
+    materializeExactSequence(memory,[roles[6]!,roles[3]!,roles[4]!]),
+    materializeExactSequence(memory,[roles[7]!,roles[3]!,roles[5]!]),
+  ]);
+  return materializeExactSequence(memory,[roleSequence,constraints]);
+}
+function structurallyAdmitted(memory:ReadMemory,rule:LinkHandle,candidate:LinkHandle):boolean{
+  try{
+    const parts=readExactSequence(memory,rule).values;
+    if(parts.length!==2||parts[0]===undefined||parts[1]===undefined)return false;
+    const roles=readExactSequence(memory,parts[0]).values;
+    const values=readExactSequence(memory,candidate).values;
+    if(roles.length!==values.length||new Set(roles).size!==roles.length)return false;
+    const binding=new Map<LinkHandle,LinkHandle>();
+    roles.forEach((role,index)=>{const value=values[index];if(value!==undefined)binding.set(role,value);});
+    if(binding.size!==roles.length)return false;
+    for(const encoded of readExactSequence(memory,parts[1]).values){
+      const q=readExactSequence(memory,encoded).values;
+      if(q.length!==3||q.some(x=>x===undefined))return false;
+      const target=binding.get(q[0]!),start=binding.get(q[1]!),end=binding.get(q[2]!);
+      if(target===undefined||start===undefined||end===undefined)return false;
+      if(memory.find(start,end)!==target)return false;
+    }
+    return true;
+  }catch{return false;}
+}
+
+interface Request{
+  readonly values:readonly LinkHandle[];
+  readonly nameContent:LinkHandle; readonly source:LinkHandle;
+  readonly fnStart:LinkHandle; readonly fnEnd:LinkHandle;
+  readonly argument:LinkHandle; readonly result1:LinkHandle; readonly result2:LinkHandle;
+  readonly dictionary:LinkHandle; readonly history:LinkHandle;
+  readonly grammar:LinkHandle; readonly theory:LinkHandle;
+  readonly openUse:LinkHandle; readonly closeUse:LinkHandle;
+  readonly openOccurrence:LinkHandle; readonly argumentOccurrence:LinkHandle;
+  readonly closeOccurrence:LinkHandle; readonly result1Occurrence:LinkHandle;
+  readonly result2Occurrence:LinkHandle; readonly directMethod:LinkHandle;
+}
+function requestFromValues(values:readonly LinkHandle[]):Request{
+  same(values.length,19,"request arity");
+  return Object.freeze({
+    values:Object.freeze([...values]),
+    nameContent:values[0]!,source:values[1]!,fnStart:values[2]!,fnEnd:values[3]!,
+    argument:values[4]!,result1:values[5]!,result2:values[6]!,dictionary:values[7]!,
+    history:values[8]!,grammar:values[9]!,theory:values[10]!,openUse:values[11]!,
+    closeUse:values[12]!,openOccurrence:values[13]!,argumentOccurrence:values[14]!,
+    closeOccurrence:values[15]!,result1Occurrence:values[16]!,result2Occurrence:values[17]!,
+    directMethod:values[18]!,
+  });
+}
+function readRequest(memory:ReadMemory,request:LinkHandle):Request{
+  return requestFromValues(readExactSequence(memory,request).values);
+}
+interface GenerationResult{
+  readonly candidate:LinkHandle;
+  readonly publication:LinkHandle;
+  readonly dictionary:LinkHandle;
+  readonly history:LinkHandle;
+  readonly functionLink:LinkHandle;
+}
+function referenceGenerate(memory:Memory,rule:LinkHandle,request:LinkHandle):GenerationResult{
+  const basis=ensureRootBasis(memory),q=readRequest(memory,request),f=frame(memory);
+  assert(memory.find(q.fnStart,q.fnEnd)===undefined,"reference function absent before generation");
+  same(lookupScopedDictionary(memory,q.dictionary,q.nameContent),undefined,"reference name absent");
+  const fn=memory.ensure(q.fnStart,q.fnEnd);
+  const application=memory.ensure(fn,q.argument);
+  const continuation1=memory.ensure(application,q.result1);
+  const continuation2=memory.ensure(application,q.result2);
+  const candidate=materializeExactSequence(memory,[
+    q.nameContent,fn,q.argument,application,q.result1,q.result2,continuation1,continuation2,
+  ]);
+  assert(structurallyAdmitted(memory,rule,candidate),"reference candidate admitted");
+  const effect=defineDictionaryEffect(memory,q.dictionary,basis.R,q.history,q.nameContent,fn);
+  const forms=materializeExactSequence(memory,[fn,q.openUse,q.argument,q.closeUse]);
+  const authority:V012SourceAuthority=Object.freeze({
+    dictionary:effect.afterScope,grammar:q.grammar,theory:q.theory,
+    grammarMembership:memory.ensure(q.grammar,forms),
+    theoryMembership:memory.ensure(q.theory,forms),
+  });
+  const evidence=buildV012SelectedSourceEvidence(memory,basis,q.source,[
+    {start:0,end:1,form:fn,dictionaryOccurrence:effect.occurrence},
+    {start:1,end:2,form:q.openUse,dictionaryOccurrence:q.openOccurrence},
+    {start:2,end:3,form:q.argument,dictionaryOccurrence:q.argumentOccurrence},
+    {start:3,end:4,form:q.closeUse,dictionaryOccurrence:q.closeOccurrence},
+  ],authority);
+  const sourceStart=memory.ensure(f.startRole,evidence.segments[0]!.resolution);
+  const sourceEnd=memory.ensure(f.endRole,evidence.segments[2]!.resolution);
+  const grouping=memory.ensure(
+    memory.ensure(evidence.formSequence,memory.ensure(sourceStart,sourceEnd)),
+    application,
+  );
+  const witnesses=[q.directMethod,application,continuation1,continuation2].map(x=>defineWitness(memory,f,x));
+  const witnessSequence=materializeExactSequence(memory,witnesses);
+  const authorityCarrier=materializeExactSequence(memory,[
+    effect.afterScope,evidence.source,evidence.formSequence,grouping,q.directMethod,witnessSequence,
+  ]);
+  const publication=memory.ensure(candidate,authorityCarrier);
+  return Object.freeze({
+    candidate,publication,dictionary:effect.afterScope,history:effect.historyAfter,functionLink:fn,
+  });
+}
+
+interface FrozenArtifact{
+  readonly schema:"mts-v013-template-instantiation-f5-f5/v0.1";
+  readonly topology:StorageTopologyImage;
+  readonly ruleCoordinate:number;
+  readonly templatePublicationCoordinate:number;
+  readonly targetRequestCoordinate:number;
+  readonly seedBindingsCoordinate:number;
+  readonly requiredSeedsCoordinate:number;
+}
+function sourcePrefixes(memory:Memory,source:LinkHandle):readonly LinkHandle[]{
+  const basis=ensureRootBasis(memory);
+  const content=memory.poles(source).end;
+  return readV012SourceContent(memory,basis,content).prefixes;
+}
+function addMapping(
+  map:Map<LinkHandle,LinkHandle>,
+  from:LinkHandle,to:LinkHandle,
+):void{
+  const previous=map.get(from);
+  if(previous!==undefined)same(previous,to,"seed mapping consistent");
+  else map.set(from,to);
+}
+function buildFrozen():FrozenArtifact{
+  const memory=new Memory(),basis=ensureRootBasis(memory),f=frame(memory);
+  const openUse=memory.ensure(basis.O,basis.U),closeUse=memory.ensure(basis.C,basis.L);
+  const argument=memory.ensure(basis.C,basis.U);
+  const result1=memory.ensure(basis.O,basis.L);
+  const result2=memory.ensure(basis.C,basis.O);
+  let history=basis.R;
+  let dictionary=defineDictionaryScope(memory,basis.R,history);
+  const occurrences=new Map<string,LinkHandle>();
+  for(const [name,value] of [["(",openUse],["a",argument],[")",closeUse],["b1",result1],["b2",result2]] as const){
+    const next=defineName(memory,basis,dictionary,history,name,value);
+    dictionary=next.dictionary; history=next.history; occurrences.set(name,next.occurrence);
+  }
+  const grammar=memory.ensure(openUse,closeUse),theory=memory.ensure(closeUse,openUse);
+  const rule=defineAdmissionRule(memory);
+
+  const qFnStart=memory.ensure(basis.U,basis.L),qFnEnd=memory.ensure(basis.L,basis.C);
+  const qName=materializeV012SourceContent(memory,basis,bytes("q"));
+  const qSource=defineSourceForm(memory,materializeV012SourceContent(memory,basis,bytes("q(a)")));
+  const qRequest=materializeExactSequence(memory,[
+    qName,qSource,qFnStart,qFnEnd,argument,result1,result2,dictionary,history,grammar,theory,
+    openUse,closeUse,occurrences.get("(")!,occurrences.get("a")!,occurrences.get(")")!,
+    occurrences.get("b1")!,occurrences.get("b2")!,f.directMethod,
+  ]);
+  const qBefore=readRequest(memory,qRequest);
+  const qGenerated=referenceGenerate(memory,rule,qRequest);
+
+  const rFnStart=memory.ensure(basis.U,basis.O),rFnEnd=memory.ensure(basis.C,basis.L);
+  assert(memory.find(rFnStart,rFnEnd)===undefined,"target function absent at freeze");
+  const rName=materializeV012SourceContent(memory,basis,bytes("r"));
+  const rSource=defineSourceForm(memory,materializeV012SourceContent(memory,basis,bytes("r(a)")));
+  same(lookupScopedDictionary(memory,qGenerated.dictionary,rName),undefined,"target name absent at freeze");
+  const rRequestValues=[
+    rName,rSource,rFnStart,rFnEnd,argument,result1,result2,
+    qGenerated.dictionary,qGenerated.history,grammar,theory,openUse,closeUse,
+    occurrences.get("(")!,occurrences.get("a")!,occurrences.get(")")!,
+    occurrences.get("b1")!,occurrences.get("b2")!,f.directMethod,
+  ] as const;
+  const rRequest=materializeExactSequence(memory,rRequestValues);
+  const rAfter=requestFromValues(rRequestValues);
+
+  const seedMap=new Map<LinkHandle,LinkHandle>();
+  qBefore.values.forEach((value,index)=>addMapping(seedMap,value,rAfter.values[index]!));
+  const qPrefixes=sourcePrefixes(memory,qBefore.source);
+  const rPrefixes=sourcePrefixes(memory,rAfter.source);
+  same(qPrefixes.length,rPrefixes.length,"source prefix cardinality");
+  qPrefixes.forEach((value,index)=>addMapping(seedMap,value,rPrefixes[index]!));
+  addMapping(seedMap,basis.R,basis.R);
+  addMapping(seedMap,basis.O,basis.O);
+  addMapping(seedMap,basis.C,basis.C);
+  addMapping(seedMap,basis.L,basis.L);
+  addMapping(seedMap,basis.U,basis.U);
+
+  const seedPairs=[...seedMap.entries()].map(([from,to])=>memory.ensure(from,to));
+  const seedBindings=materializeExactSequence(memory,seedPairs);
+  const requiredSeeds=materializeExactSequence(memory,[...seedMap.keys()]);
+
+  assert(memory.find(rFnStart,rFnEnd)===undefined,"seed artifact does not create target function");
+  same(lookupScopedDictionary(memory,qGenerated.dictionary,rName),undefined,"seed artifact does not create target name authority");
+
+  const canonical=exportCanonicalTopology(memory);
+  return Object.freeze({
+    schema:"mts-v013-template-instantiation-f5-f5/v0.1" as const,
+    topology:canonical.topology,
+    ruleCoordinate:coord(canonical.coordinates,rule,"rule coordinate"),
+    templatePublicationCoordinate:coord(canonical.coordinates,qGenerated.publication,"template publication coordinate"),
+    targetRequestCoordinate:coord(canonical.coordinates,rRequest,"target request coordinate"),
+    seedBindingsCoordinate:coord(canonical.coordinates,seedBindings,"seed bindings coordinate"),
+    requiredSeedsCoordinate:coord(canonical.coordinates,requiredSeeds,"required seeds coordinate"),
+  });
+}
+
+interface InstantiateResult{
+  readonly publication:LinkHandle;
+  readonly candidate:LinkHandle;
+  readonly mappedSeedCount:number;
+  readonly ordinary:number;
+  readonly startSelf:number;
+  readonly endSelf:number;
+  readonly fullSelf:number;
+}
+function instantiateTemplate(
+  memory:Memory,
+  templateRoot:LinkHandle,
+  seedBindings:LinkHandle,
+  requiredSeeds:LinkHandle,
+):InstantiateResult{
+  const mapping=new Map<LinkHandle,LinkHandle>();
+  for(const pair of readExactSequence(memory,seedBindings).values){
+    const p=memory.poles(pair),previous=mapping.get(p.start);
+    if(previous!==undefined)same(previous,p.end,"runtime seed mapping consistent");
+    else mapping.set(p.start,p.end);
+  }
+  const required=readExactSequence(memory,requiredSeeds).values;
+  for(const seed of required)assert(mapping.has(seed),"all required template seeds mapped");
+
+  let ordinary=0,startSelf=0,endSelf=0,fullSelf=0;
+  const visiting=new Set<LinkHandle>();
+  const clone=(source:LinkHandle):LinkHandle=>{
+    const known=mapping.get(source);
+    if(known!==undefined)return known;
+    assert(!visiting.has(source),"unsupported non-self cycle");
+    const p=memory.poles(source);
+    let value:LinkHandle;
+    if(p.start===source&&p.end===source){
+      value=memory.ensureRoot(); fullSelf+=1;
+    }else if(p.start===source){
+      value=memory.ensureStartSelfClosed(clone(p.end)); startSelf+=1;
+    }else if(p.end===source){
+      value=memory.ensureEndSelfClosed(clone(p.start)); endSelf+=1;
+    }else{
+      visiting.add(source);
+      const start=clone(p.start),end=clone(p.end);
+      visiting.delete(source);
+      value=memory.ensure(start,end); ordinary+=1;
+    }
+    mapping.set(source,value);
+    return value;
+  };
+
+  const publication=clone(templateRoot);
+  const candidate=memory.poles(publication).start;
+  return Object.freeze({
+    publication,candidate,mappedSeedCount:mapping.size,ordinary,startSelf,endSelf,fullSelf,
+  });
+}
+function runReference(artifact:FrozenArtifact):Readonly<{topology:StorageTopologyImage;candidate:LinkHandle;publication:LinkHandle}>{
+  const memory=restoreTopology(artifact.topology),all=memory.allLinks();
+  const generated=referenceGenerate(
+    memory,at(all,artifact.ruleCoordinate),at(all,artifact.targetRequestCoordinate),
+  );
+  return Object.freeze({
+    topology:exportCanonicalTopology(memory).topology,
+    candidate:generated.candidate,
+    publication:generated.publication,
+  });
+}
+function runTemplate(
+  artifact:FrozenArtifact,
+  dropRequiredSeed:boolean,
+):Readonly<{topology:StorageTopologyImage;result:InstantiateResult}>{
+  const memory=restoreTopology(artifact.topology),all=memory.allLinks();
+  let bindings=at(all,artifact.seedBindingsCoordinate);
+  const required=at(all,artifact.requiredSeedsCoordinate);
+  if(dropRequiredSeed){
+    const pairs=readExactSequence(memory,bindings).values;
+    bindings=materializeExactSequence(memory,pairs.slice(0,-1));
+  }
+  const result=instantiateTemplate(
+    memory,at(all,artifact.templatePublicationCoordinate),bindings,required,
+  );
+  const rule=at(all,artifact.ruleCoordinate);
+  assert(structurallyAdmitted(memory,rule,result.candidate),"instantiated candidate passes frozen F5-F2 rule");
+
+  const target=readRequest(memory,at(all,artifact.targetRequestCoordinate));
+  const carrier=readExactSequence(memory,memory.poles(result.publication).end).values;
+  same(carrier.length,6,"instantiated authority carrier arity");
+  const dictionary=carrier[0]; assert(dictionary!==undefined,"instantiated dictionary exists");
+  const resolved=lookupScopedDictionary(memory,dictionary,target.nameContent);
+  assert(resolved!==undefined,"instantiated target name resolves");
+  const candidateValues=readExactSequence(memory,result.candidate).values;
+  same(candidateValues.length,8,"instantiated candidate arity");
+  same(resolved.form,candidateValues[1],"instantiated Dictionary resolves candidate function");
+
+  return Object.freeze({topology:exportCanonicalTopology(memory).topology,result});
+}
+function main():void{
+  const artifact=buildFrozen();
+  const reference=runReference(artifact);
+  const a=runTemplate(artifact,false),b=runTemplate(artifact,false);
+  exactJson(a.topology,b.topology,"independent template instantiations agree");
+  exactJson(a.topology,reference.topology,"template instantiation equals domain reference topology");
+  assert(a.result.ordinary>0,"ordinary cloning exercised");
+  assert(a.result.startSelf>0,"START self-incidence cloning exercised");
+  expectRejected(()=>runTemplate(artifact,true),"missing required seed fails closed");
+  console.log([
+    "MTS v0.13 F5-F5:",
+    "LINK_NATIVE_TEMPLATE_INSTANTIATION=GREEN_SCOPED_RESEARCH",
+    `MAPPED_SEEDS_AFTER_RUN=${a.result.mappedSeedCount}`,
+    `ORDINARY_CLONES=${a.result.ordinary}`,
+    `START_SELF_CLONES=${a.result.startSelf}`,
+    `END_SELF_CLONES=${a.result.endSelf}`,
+    `FULL_SELF_CLONES=${a.result.fullSelf}`,
+    "EXTERNAL_97_EQUATION_PLAN_COMPILER=REMOVED",
+    "EXISTING_ADMITTED_TEMPLATE_AUTHORITY=1",
+    "EXTERNAL_SEED_CORRESPONDENCE=YES",
+    "GENERIC_TEMPLATE_TOPOLOGY_EQUALS_REFERENCE=YES",
+    "FROZEN_F5_F2_ADMISSION=GREEN",
+    "TARGET_NAME_RESOLUTION=GREEN",
+    "NEGATIVE_MISSING_REQUIRED_SEED=REJECTED",
+    "INDEPENDENT_TEMPLATE_MEMORIES=2",
+    "SEMANTIC_INFORMATION_ELIMINATED=NOT_CLAIMED",
+    "GLOBAL_E2=OPEN",
+    "GLOBAL_E3=OPEN",
+    "FULL_SELF_HOSTED=NOT_CLAIMED",
+    "PRODUCTION_UNCHANGED",
+  ].join(" "));
+}
+main();
