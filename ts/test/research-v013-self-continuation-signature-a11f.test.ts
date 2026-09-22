@@ -235,6 +235,19 @@ function exercise(memory: Memory, withNoise: boolean): void {
 
     const signature = `${bit(direct)}${bit(inverse)}`;
     same(signature, item.signature, `${item.name} method-oriented signature`);
+
+    // Independent structural cross-check: the behavioral method signature must
+    // be exactly the Link's own start/end self-incidence mask. This assertion
+    // is outside the generic selfContinuation kernel and therefore cannot
+    // grant it aspect authority.
+    const poles = memory.poles(item.link);
+    const structuralMask = `${poles.start === item.link ? "1" : "0"}${poles.end === item.link ? "1" : "0"}`;
+    same(
+      signature,
+      structuralMask,
+      `${item.name} method signature equals structural self-incidence mask`,
+    );
+
     signatures.add(signature);
 
     if (item.directExpected === undefined) {
