@@ -106,7 +106,8 @@
     "linkNativeFrontierA20Complete": true,
     "singleExecutionRootA21Designed": true,
     "singleExecutionRootA21Complete": true,
-    "metaExecutionDetachmentA22Designed": true
+    "metaExecutionDetachmentA22Designed": true,
+    "metaExecutionDetachmentA22Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1120,7 +1121,12 @@
     "singleExecutionRootA21SeparateFrontierParameterCount": 0,
     "singleExecutionRootA21ConvergenceDistinctTruthLinkCount": 1,
     "singleExecutionRootA21ConvergenceOccurrenceLinkCount": 2,
-    "singleExecutionRootA21IndependentMemoryCount": 2
+    "singleExecutionRootA21IndependentMemoryCount": 2,
+    "metaExecutionDetachmentA22SemanticLevelsUsingSameLaw": 2,
+    "metaExecutionDetachmentA22TransitionProducerHostResidualCount": 1,
+    "metaExecutionDetachmentA22CurrentOccurrenceSelectionResidualCount": 1,
+    "metaExecutionDetachmentA22AmbientTransitionFires": 0,
+    "metaExecutionDetachmentA22IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1384,12 +1390,17 @@
     "singleExecutionRootA21SeparateFrontierParameterCount": "Separate frontier LinkHandle parameters consumed by A21. Target zero.",
     "singleExecutionRootA21ConvergenceDistinctTruthLinkCount": "Distinct canonical K->Z truth Links after converging branches under one-root execution. Target one.",
     "singleExecutionRootA21ConvergenceOccurrenceLinkCount": "Distinct occurrence Links preserving the two converged proof paths. Target two.",
-    "singleExecutionRootA21IndependentMemoryCount": "Independent Memories reproducing the one-Link execution-root behavior."
+    "singleExecutionRootA21IndependentMemoryCount": "Independent Memories reproducing the one-Link execution-root behavior.",
+    "metaExecutionDetachmentA22SemanticLevelsUsingSameLaw": "Distinct tested semantic levels using contextual detachment: ordinary K->A/A->B and meta M->E_n/E_n->E_(n+1).",
+    "metaExecutionDetachmentA22TransitionProducerHostResidualCount": "Host residual classes producing E_n->E_(n+1) before generic meta-detachment. Target remains one in A22.",
+    "metaExecutionDetachmentA22CurrentOccurrenceSelectionResidualCount": "External residual classes selecting the current meta-history occurrence. Target remains one in A22.",
+    "metaExecutionDetachmentA22AmbientTransitionFires": "Ambient alternative execution transitions that affect propagation when not selected. Target zero.",
+    "metaExecutionDetachmentA22IndependentMemoryCount": "Independent Memories reproducing meta-execution detachment and history."
   },
   "nextExperiments": [
-    "A22: execute meta-level contextual detachment M->E_n plus E_n->E_(n+1) => M->E_(n+1), preserving immutable Link-native execution history.",
-    "If A22 is GREEN, attack the transition-producer residual: represent the A21 transformation itself as application/continuation authority so producing E_n->E_(n+1) is no longer a special host semantic operation.",
-    "After A22, reconnect self-similar execution-state propagation with F5 self-generated authority/template convergence and reassess E2/E3.",
+    "A23: attack the E_n->E_(n+1) transition-producer residual. Represent the A21 execution transformation as Link-carried application/continuation authority and require transition production without a domain-specific host producer.",
+    "A23 must preserve A22 self-similar meta-detachment and fail closed when transition-production authority is absent, malformed or ambient-only.",
+    "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A22 should distinguish immutable execution history from selection of the current execution root and must preserve branch/provenance semantics from A21.",
     "A21 must preserve context-carried authority, occurrence ancestry, convergence multiplicity, ambient isolation and fail-closed structural validation.",
     "A20 should use Link-native occurrence ancestry (for example ParentOccurrence->TruthWitness) and a frozen frontier carrier; it must not execute every truth merely linked to K.",
@@ -5074,7 +5085,7 @@
       }
     },
     "metaExecutionDetachmentA22": {
-      "status": "DESIGNED_PENDING_EXECUTION",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can progression of the meta-interpreter's own one-Link execution root obey the same contextual detachment law as ordinary MTS execution: M->E_n plus selected E_n->E_(n+1) gives M->E_(n+1)?",
       "setup": [
         "retain A21 one-Link execution root E_n=K->Frontier_n",
@@ -5114,7 +5125,28 @@
         "this gate does not accept v0.13",
         "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
         "production runtime remains unchanged"
-      ]
+      ],
+      "consequence": "A22 demonstrates scoped self-similarity of directed-duality detachment across ordinary semantics and meta-execution state propagation. The same structural law K->A; A->B => K->B appears one level up as M->E_n; E_n->E_(n+1) => M->E_(n+1). Execution truths remain immutable history facts rather than destructive current pointers; selected occurrence ancestry carries the execution path. The producer of E_n->E_(n+1) remains an explicit host residual.",
+      "currentResult": "GREEN: A21 produces E0..E4 with the expected split, local termination, convergence and terminal ZERO. Each produced Link transition E_n->E_(n+1) is consumed by a generic meta-detachment kernel that knows nothing about frontier, authority, scheduler, State/Event or A21 production and materializes only M->E_(n+1). Meta-occurrence ancestry reconstructs E0,E1,E2,E3,E4. Ambient alternative transition is inert unless selected; mismatched transition and foreign meta-context truth are rejected. Two independent Memories agree.",
+      "observed": {
+        "ordinaryLaw": "K_TO_A_PLUS_A_TO_B_GIVES_K_TO_B",
+        "metaLaw": "M_TO_E_N_PLUS_E_N_TO_E_N_PLUS_1_GIVES_M_TO_E_N_PLUS_1",
+        "selfSimilarSemanticLevels": 2,
+        "executionTransition": "LINK_CARRIED",
+        "metaHistory": "LINK_ANCESTRY",
+        "semanticFirstFanout": 2,
+        "semanticSecondFanout": 2,
+        "semanticConvergenceDistinctTruthLinks": 1,
+        "semanticConvergenceOccurrences": 2,
+        "terminalFrontier": "ZERO",
+        "ambientExecutionTransitionIgnored": true,
+        "mismatchedTransition": "REJECTED",
+        "foreignMetaContext": "REJECTED",
+        "transitionProducerHostResiduals": 1,
+        "currentMetaOccurrenceSelectionResiduals": 1,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     }
   }
 }
