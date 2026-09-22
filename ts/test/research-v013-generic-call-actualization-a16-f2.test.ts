@@ -467,7 +467,7 @@ function exercise(artifact: Artifact): void {
 function staticKernelGuard(): void {
   const repoRoot = resolve(process.cwd(), "..");
   const source = readFileSync(
-    join(repoRoot, "ts/test/research-v013-contextual-meta-frontier-a16-f1.test.ts"),
+    join(repoRoot, "ts/test/research-v013-generic-call-actualization-a16-f2.test.ts"),
     "utf8",
   );
   const transitionStart = source.indexOf("function propagateCallTruth(");
