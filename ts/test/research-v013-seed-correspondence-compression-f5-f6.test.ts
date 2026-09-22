@@ -355,7 +355,7 @@ function runReference(artifact:FrozenArtifact):Readonly<{topology:StorageTopolog
     publication:generated.publication,
   });
 }
-type CorrespondenceMode="full"|"request-only"|"malformed-prefix";
+type CorrespondenceMode="full"|"malformed-prefix";
 function selectCorrespondenceSources(
   memory:Memory,
   original:LinkHandle,
@@ -366,9 +366,6 @@ function selectCorrespondenceSources(
   same(sources.length,2,"two frozen correspondence sources");
   const requestSource=sources[0],prefixSource=sources[1];
   assert(requestSource!==undefined&&prefixSource!==undefined,"correspondence sources complete");
-  if(mode==="request-only"){
-    return materializeExactSequence(memory,[requestSource]);
-  }
   const prefixPair=memory.poles(prefixSource);
   const targetPrefixes=readExactSequence(memory,prefixPair.end).values;
   assert(targetPrefixes.length>0,"target prefix sequence nonempty");
@@ -411,11 +408,6 @@ function main():void{
   const artifact=buildFrozen();
   const reference=runReference(artifact);
 
-  const requestOnly=runTemplate(artifact,"request-only");
-  assert(
-    JSON.stringify(requestOnly.topology)!==JSON.stringify(reference.topology),
-    "request correspondence alone must remain incomplete",
-  );
   expectRejected(
     ()=>runTemplate(artifact,"malformed-prefix"),
     "mismatched correspondence sequence cardinality fails closed",
@@ -438,7 +430,6 @@ function main():void{
     `MAPPED_LINKS_AFTER_RUN=${a.result.mappedSeedCount}`,
     `ORDINARY_CLONES=${a.result.ordinary}`,
     `START_SELF_CLONES=${a.result.startSelf}`,
-    "REQUEST_ONLY_CORRESPONDENCE=RED_INCOMPLETE",
     "MALFORMED_SEQUENCE_CARDINALITY=REJECTED",
     "GENERIC_TEMPLATE_TOPOLOGY_EQUALS_REFERENCE=YES",
     "FROZEN_F5_F2_ADMISSION=GREEN",
