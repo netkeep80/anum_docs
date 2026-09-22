@@ -144,12 +144,12 @@ function templateMatches(
 
 function classify(
   memory: Memory,
-  theory: LinkHandle,
+  frozenTemplates: readonly LinkHandle[],
   target: LinkHandle,
 ): LinkHandle {
   const before = memory.linkCount;
   const probe = new PoleOnlyProbe(memory);
-  const matches = admittedTemplates(memory, theory).filter(
+  const matches = frozenTemplates.filter(
     (template) => templateMatches(memory, probe, template, target),
   );
   same(memory.linkCount, before, "classification is read-only");
@@ -175,6 +175,13 @@ async function main(): Promise<void> {
   const theory = replay.theory;
   const root = memory.root;
 
+  // Select the authority snapshot BEFORE any candidate target is materialized.
+  // replayPortableStructuralTheory proves this Memory is exactly the frozen
+  // portable artifact at this point. Later ordinary Links whose start happens
+  // to equal the Theory root must not acquire admission by ambient outgoing().
+  const frozenTemplates = admittedTemplates(memory, theory);
+  same(frozenTemplates.length, 4, "frozen authority contains exactly four templates");
+
   // These constructions are E1 Memory operations only. The classifier itself
   // has no named aspect enum, opcode table or branch for the four cases.
   const firstUnary = memory.ensureStartSelfClosed(root);
@@ -187,21 +194,21 @@ async function main(): Promise<void> {
   const genericSecondUnary = memory.ensureEndSelfClosed(pairSeed);
   const genericBinary = memory.ensure(genericFirstUnary, genericSecondUnary);
 
-  const rootClass = classify(memory, theory, root);
-  const firstUnaryClass = classify(memory, theory, firstUnary);
-  const secondUnaryClass = classify(memory, theory, secondUnary);
-  const binaryClass = classify(memory, theory, binary);
+  const rootClass = classify(memory, frozenTemplates, root);
+  const firstUnaryClass = classify(memory, frozenTemplates, firstUnary);
+  const secondUnaryClass = classify(memory, frozenTemplates, secondUnary);
+  const binaryClass = classify(memory, frozenTemplates, binary);
 
   same(new Set([rootClass, firstUnaryClass, secondUnaryClass, binaryClass]).size, 4,
     "frozen Link authority reconstructs four distinct local classes");
 
-  same(classify(memory, theory, ordinaryReverse), binaryClass,
+  same(classify(memory, frozenTemplates, ordinaryReverse), binaryClass,
     "ordinary reverse basis Link is reconstructed as the binary class");
-  same(classify(memory, theory, genericFirstUnary), firstUnaryClass,
+  same(classify(memory, frozenTemplates, genericFirstUnary), firstUnaryClass,
     "unknown first-unary target reconstructs from the ostensive template");
-  same(classify(memory, theory, genericSecondUnary), secondUnaryClass,
+  same(classify(memory, frozenTemplates, genericSecondUnary), secondUnaryClass,
     "unknown second-unary target reconstructs from the ostensive template");
-  same(classify(memory, theory, genericBinary), binaryClass,
+  same(classify(memory, frozenTemplates, genericBinary), binaryClass,
     "unknown binary target reconstructs from the ostensive template");
 
   for (const target of [
@@ -214,7 +221,7 @@ async function main(): Promise<void> {
     genericSecondUnary,
     genericBinary,
   ]) {
-    const sign = classify(memory, theory, target);
+    const sign = classify(memory, frozenTemplates, target);
     assert(sameMask(mask(memory, sign), mask(memory, target)),
       "reconstructed sign and target have the same self-incidence");
   }
@@ -224,13 +231,15 @@ async function main(): Promise<void> {
     const missing = replayPortableStructuralTheory(
       buildAuthority(false, "missing-binary").artifact,
     );
+    const missingTemplates = admittedTemplates(missing.memory, missing.theory);
+    same(missingTemplates.length, 3, "missing authority snapshot has three templates");
     const r = missing.memory.root;
     const a = missing.memory.ensureStartSelfClosed(r);
     const b = missing.memory.ensureEndSelfClosed(r);
     const target = missing.memory.ensure(b, a);
     let rejected = false;
     try {
-      classify(missing.memory, missing.theory, target);
+      classify(missing.memory, missingTemplates, target);
     } catch {
       rejected = true;
     }
@@ -244,13 +253,15 @@ async function main(): Promise<void> {
     const extra = replayPortableStructuralTheory(
       buildAuthority(false, "extra-ordinary").artifact,
     );
+    const extraTemplates = admittedTemplates(extra.memory, extra.theory);
+    same(extraTemplates.length, 5, "ambiguous authority snapshot has five templates");
     const r = extra.memory.root;
     const a = extra.memory.ensureStartSelfClosed(r);
     const b = extra.memory.ensureEndSelfClosed(r);
     const target = extra.memory.ensure(b, a);
     let rejected = false;
     try {
-      classify(extra.memory, extra.theory, target);
+      classify(extra.memory, extraTemplates, target);
     } catch {
       rejected = true;
     }
@@ -269,11 +280,16 @@ async function main(): Promise<void> {
       "post-freeze authority mutation changes revision");
 
     const frozenReplay = replayPortableStructuralTheory(frozenArtifact);
+    const frozenTemplatesAgain = admittedTemplates(
+      frozenReplay.memory,
+      frozenReplay.theory,
+    );
+    same(frozenTemplatesAgain.length, 4, "replayed frozen snapshot has four templates");
     const r = frozenReplay.memory.root;
     const a = frozenReplay.memory.ensureStartSelfClosed(r);
     const b = frozenReplay.memory.ensureEndSelfClosed(r);
     const ordinary = frozenReplay.memory.ensure(b, a);
-    const selected = classify(frozenReplay.memory, frozenReplay.theory, ordinary);
+    const selected = classify(frozenReplay.memory, frozenTemplatesAgain, ordinary);
     assert(selected !== ordinary,
       "frozen authority does not self-admit the later ordinary-pair candidate");
   }
