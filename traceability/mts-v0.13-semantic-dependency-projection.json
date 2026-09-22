@@ -53,7 +53,10 @@
     "formalIntegratedNameAspectProofBindingResearchComplete": true,
     "formalSourceGroupingResearchComplete": true,
     "formalKernelSelfExtensionF4ResearchComplete": true,
-    "formalFixedEvaluatorLawReassessmentAfterF4Complete": true
+    "formalFixedEvaluatorLawReassessmentAfterF4Complete": true,
+    "bundleContinuationBranchingResearchComplete": true,
+    "bundleContinuationPhysicalParallelismProven": false,
+    "bundleContinuationMaterializingConcurrencyProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -918,7 +921,15 @@
     "formalGenericReceiverFixedEvaluatorDependencyCount": 0,
     "formalGenericPathReplacedFixedLawCount": 2,
     "formalGenericPathBypassedNotReplacedFixedLawCount": 1,
-    "formalSelfGenerationResidualLawCount": 1
+    "formalSelfGenerationResidualLawCount": 1,
+    "bundleContinuationInitialFanout": 2,
+    "bundleContinuationSecondStepFanout": 3,
+    "bundleContinuationConvergenceDistinctLinkCount": 1,
+    "bundleContinuationConvergenceOccurrenceCount": 2,
+    "bundleContinuationScheduleOrderVariantCount": 2,
+    "bundleContinuationPhysicalConcurrencyPrimitiveCount": 0,
+    "bundleContinuationIndependentMemoryCount": 2,
+    "bundleContinuationPartialTerminationSurvivorCount": 1
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1033,14 +1044,22 @@
     "formalGenericReceiverFixedEvaluatorDependencyCount": "F4 generic receiver dependencies on operatorAspect, parsePlan/samePlan/verifyCanonicalPlan, or materializePlan. Zero.",
     "formalGenericPathReplacedFixedLawCount": "Fixed-evaluator law families for which the generic research path now has positive Link-authority replacement evidence: operator grounding and source/application composition.",
     "formalGenericPathBypassedNotReplacedFixedLawCount": "Fixed-evaluator law families bypassed by generic receiver execution but not yet replaced as producer/self-generation authority: plan materialization.",
-    "formalSelfGenerationResidualLawCount": "Remaining fixed-evaluator-equivalent FORMAL law family whose producer authority is not reconstructed by F4: materialization/definition generation."
+    "formalSelfGenerationResidualLawCount": "Remaining fixed-evaluator-equivalent FORMAL law family whose producer authority is not reconstructed by F4: materialization/definition generation.",
+    "bundleContinuationInitialFanout": "A12 first application F(a) produces two continuation occurrences g/h.",
+    "bundleContinuationSecondStepFanout": "A12 next argument x maps frontier {g,h} to three continuation occurrences u/v/w.",
+    "bundleContinuationConvergenceDistinctLinkCount": "A12 convergence case maps two independent parent occurrences to one extensional result Link z.",
+    "bundleContinuationConvergenceOccurrenceCount": "A12 convergence preserves two provenance occurrences even though BundleValue.links deduplicates to one z.",
+    "bundleContinuationScheduleOrderVariantCount": "A12 executes the same frontier in forward and reverse parent scheduling order and requires identical extensional/provenance semantics.",
+    "bundleContinuationPhysicalConcurrencyPrimitiveCount": "Promise/Worker/async/threading primitives in the A12 semantic branching kernel. Zero: branching semantics is separated from executor parallelism.",
+    "bundleContinuationIndependentMemoryCount": "Independent canonical source Memories with unrelated allocation noise that export byte-identical selected branching authority.",
+    "bundleContinuationPartialTerminationSurvivorCount": "A12 branch-local termination case: one parent branch has zero continuations while another survives; the whole frontier does not terminate."
   },
   "nextExperiments": [
-    "F5 SELF_GENERATED-DEFINITION: make MTS, under frozen authority, construct/admit a previously unknown function name plus grouping/behavior definition that a second Memory executes through F4; externally prebuilt definition Links are forbidden as the final authority.",
-    "Measure/classify exact STRING materialization, source segmentation, Dictionary lookup and Grammar/source replay as remaining generic FORMAL E2 services; distinguish representation services from semantic authority.",
-    "Only after F5 reassess whether formal-plan-materialization-law can move from BYPASSED_NOT_REPLACED_FOR_PRODUCER to LINK_GENERATED/RECONSTRUCTED on a scoped path.",
-    "Then apply the same proof-carrying/aspect mechanism to proof meta-semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims.",
-    "Audit E3 formation/admissibility and E4 orchestration separately; v0.13 acceptance remains blocked."
+    "A13 BRANCH-CONTEXT/SCHEDULING: carry explicit branch-local interpretation Context/provenance through A12 frontier steps and classify which semantics is E2 versus E4; executor order must remain non-authoritative.",
+    "A13b MATERIALIZING-BRANCHES: separately falsify concurrent Link materialization/admission/conflict semantics. Do not infer write semantics from read-only A12.",
+    "F5 SELF_GENERATED-DEFINITION: after A12 frontier semantics, make MTS under frozen authority construct/admit a new portable function definition consumable by F4; if generation branches, all producer continuations must use the same frontier model.",
+    "Measure/classify exact STRING materialization, source segmentation, Dictionary lookup and Grammar/source replay as remaining generic FORMAL E2 services.",
+    "Apply proof-carrying/aspect + frontier semantics to proof meta-semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3350,6 +3369,68 @@
       },
       "evidenceTest": "ts/test/research-v013-formal-law-reassessment-f4a.test.ts",
       "consequence": "F4 does not justify changing production authority-family classifications. It does show that fixed operator grounding and fixed prefix composition are no longer necessary for the generic receiver path. The remaining foundational FORMAL gap is producer/self-generation authority: creating/admitting equivalent Link definitions without externally prebuilding them."
+    }
+  },
+  "executionSemanticsAudit": {
+    "bundleContinuationA12": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "If one Link/aspect application returns a BundleValue, can that bundle act as the next execution frontier so each occurrence continues independently while extensional value and provenance remain distinct?",
+      "semanticModel": [
+        "one application step may produce zero/one/many continuation occurrences",
+        "BundleValue.occurrences is the branch frontier; BundleValue.links is only its extensional semantic projection",
+        "next argument is applied independently to each frontier occurrence",
+        "child occurrence path extends the parent path and is not derived from scheduler order",
+        "zero continuation terminates only that branch",
+        "multiple branches may converge to the same exact Link while retaining distinct provenance"
+      ],
+      "positiveCorpus": [
+        "F(a) -> {g,h}",
+        "{g,h}(x) -> {u,v,w} with three occurrences",
+        "{g,h}(y) -> {z} with two distinct provenance occurrences",
+        "{g,h}(t) -> {q} because g-branch terminates and h-branch survives"
+      ],
+      "schedulerBoundary": [
+        "forward and reverse parent processing order yield identical extensional result",
+        "normalized provenance paths/results are identical across those schedules",
+        "no Promise/Worker/async/await/thread primitive participates in semantic authority",
+        "physical sequential/parallel/distributed execution is therefore an implementation choice, not the A12 meaning"
+      ],
+      "relationToJsonRvm": "jsonRVM is a useful implementation analogy because object projections can run under std::execution::par, but MTS A12 fan-out is data-dependent on selected Link continuation authority rather than fixed by JSON object syntax.",
+      "relationToCurrentBundleSurface": [
+        "current resolveFlatBundle is a static read-only value constructor, not an executor",
+        "A12 layers execution-frontier semantics above existing BundleValue without changing the accepted bundle surface",
+        "singleton BundleValue remains distinct from Link",
+        "extensional deduplication does not erase occurrence/provenance multiplicity"
+      ],
+      "ontologyBoundary": [
+        "Thread/Worker/Promise is not an MTS primitive",
+        "BundleValue remains derived, not a new foundational entity",
+        "frontier sequence/order is not semantic authority",
+        "branching does not introduce graph theory into the foundation"
+      ],
+      "openBoundaries": [
+        "branch-local interpretation Context propagation is not yet modeled",
+        "materializing branches with concurrent writes/admission/conflict semantics are not tested",
+        "fairness, cancellation, resource scheduling and distributed execution belong to E4 and remain open",
+        "whether every abit transition is bundle-valued is still a hypothesis; A12 proves the required execution composition model, not universal abit semantics"
+      ],
+      "observed": {
+        "initialFanout": 2,
+        "secondStepFanout": 3,
+        "convergenceDistinctLinks": 1,
+        "convergenceOccurrences": 2,
+        "scheduleOrders": [
+          "forward",
+          "reverse"
+        ],
+        "physicalConcurrencyPrimitives": 0,
+        "partialTerminationSurvivors": 1,
+        "independentMemories": 2,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-bundle-continuation-a12.test.ts",
+      "consequence": "Scoped read-only research now demonstrates BundleValue.occurrences as a viable continuation frontier over Link/aspect application while BundleValue.links remains the extensional result. Branching semantics is independent of physical scheduling. This does not prove universal bundle-valued abit semantics or concurrent materializing execution; those remain separate A13/E4 questions.",
+      "currentResult": "GREEN: F(a) produces frontier occurrences g/h; applying x independently to that frontier yields u/v/w, two parent branches can converge to one exact z while preserving two provenance occurrences, one branch may terminate while another survives, and forward/reverse parent scheduling produces identical extensional and normalized provenance semantics. The semantic kernel uses zero physical concurrency primitives."
     }
   }
 }
