@@ -40,7 +40,8 @@
     "aspectApplicationFrozenContinuationResearchComplete": true,
     "aspectApplicationLTemplateContinuationResearchComplete": true,
     "aspectApplicationDualRoleTemplateResearchComplete": true,
-    "aspectApplicationMethodOrientationResearchComplete": true
+    "aspectApplicationMethodOrientationResearchComplete": true,
+    "aspectApplicationSelfContinuationSignatureResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -859,7 +860,11 @@
     "aspectMethodOrientationCount": 2,
     "aspectMethodOrientationHostDirectionBranchCount": 0,
     "aspectMethodOrientationIndependentMemoryCount": 2,
-    "aspectMethodOrientationNegativeControlCount": 2
+    "aspectMethodOrientationNegativeControlCount": 2,
+    "aspectSelfContinuationDistinctSignatureCount": 4,
+    "aspectSelfContinuationBasisCaseCount": 5,
+    "aspectSelfContinuationHostAspectBranchCount": 0,
+    "aspectSelfContinuationIndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -928,13 +933,17 @@
     "aspectMethodOrientationCount": "A11e selected ordinary Link methods over one generic START(A)/END(A) role frame: direct START(A)⟼END(A) and inverse END(A)⟼START(A).",
     "aspectMethodOrientationHostDirectionBranchCount": "Per-direction branches in the A11e continuation kernel. Zero means direct/inverse behavior is selected only by the method Link and generic role bindings.",
     "aspectMethodOrientationIndependentMemoryCount": "Independent replay Memories in which the same portable role/method/continuation authority yields covariant direct/inverse results without sender-local handles.",
-    "aspectMethodOrientationNegativeControlCount": "A11e fail-closed method controls: unselected method has no authority; non-bijective/collapsed role method is rejected."
+    "aspectMethodOrientationNegativeControlCount": "A11e fail-closed method controls: unselected method has no authority; non-bijective/collapsed role method is rejected.",
+    "aspectSelfContinuationDistinctSignatureCount": "A11f distinct direct/inverse self-continuation signatures induced by one generic method-oriented decoder: 11, 10, 01 and 00; these coincide with the four local self-incidence aspect masks.",
+    "aspectSelfContinuationBasisCaseCount": "A11f basis Links exercised under the same self-continuation law: R,O,C,L,U. L and U share the 00 ordinary-pair signature.",
+    "aspectSelfContinuationHostAspectBranchCount": "Per-aspect ROOT/START/END/PAIR branches in the A11f kernel. Zero: the signature is derived from selected method Links and generic structural bindings.",
+    "aspectSelfContinuationIndependentMemoryCount": "Independent Memories in which identical four-signature behavior is reconstructed with unrelated local handles/noise."
   },
   "nextExperiments": [
-    "A11f: exercise self-incidence application keys/results, especially R(R)=R plus START/END cases, under explicit method authority without a per-aspect host switch or accidental self-edge-as-result ambiguity.",
-    "A11g/E2: source-remove generic structural unification/method-role interpretation; the verifier must reconstruct the method/template law from portable MTS evidence rather than re-encode it in host code.",
-    "After self-incidence and unification-source work, integrate F2b portable naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
-    "Then rerun F-KERNEL-SELF-EXTENSION and reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization.",
+    "A11g/E2: source-remove generic structural unification and method-role interpretation from the A11f path. The four signatures must be reconstructed from portable MTS evidence without re-encoding the same pole/equality law in host code.",
+    "A11h: combine ordinary zero/one/many frozen continuations with self-continuation signatures under one selected method authority, proving no separate evaluator is needed for PAIR versus ROOT/START/END cases.",
+    "After A11g/A11h, integrate F2b portable naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
+    "Then rerun F-KERNEL-SELF-EXTENSION and reassess the three remaining host-defined FORMAL law families.",
     "E3/E4 remain separate and open; selected frozen authority must not collapse into live adjacency."
   ],
   "measurement": {
@@ -2671,6 +2680,62 @@
       },
       "evidenceTest": "ts/test/research-v013-method-orientation-a11e.test.ts",
       "consequence": "Direction is now executable as selected Link evidence rather than a fixed END-is-result host convention. Direct and inverse methods act covariantly over the same frozen support. Remaining closure work is to reconstruct generic unification/method-role interpretation itself and to handle self-incidence application keys/results such as R(R)=R."
+    },
+    "aspectApplicationA11f": {
+      "status": "EXECUTED_GREEN_SELF_CONTINUATION_SIGNATURE_CANDIDATE",
+      "hypothesis": "The four local Link aspects can be read as four functional self-continuation modes of one method-oriented Link law. Direct and inverse method Links probe whether the selected Link can continue from itself through its start/end role without any aspect enum.",
+      "rootRoleFrame": [
+        "START(R)=O",
+        "END(R)=C",
+        "Direct(R)=O⟼C=L",
+        "Inverse(R)=C⟼O=U"
+      ],
+      "genericSelfContinuationLaw": [
+        "decode the selected application Link through the root Dual(R)=L template",
+        "derive FROM/TO role orientation from the selected method Link L or U",
+        "treat the application Link itself as the sole self-continuation candidate",
+        "if candidate value at FROM role equals the application Link, candidate value at TO role is the self-continuation result",
+        "otherwise the self-continuation BundleValue is empty"
+      ],
+      "observedSignatures": [
+        "R: direct {R}, inverse {R} => 11",
+        "O: direct {R}, inverse {} => 10",
+        "C: direct {}, inverse {R} => 01",
+        "L: direct {}, inverse {} => 00",
+        "U: direct {}, inverse {} => 00"
+      ],
+      "structuralEquivalence": "The direct/inverse non-empty bits exactly equal the existing start-self-incidence/end-self-incidence bits. Thus ROOT=11, START=10, END=01, PAIR=00 can be observed as method-oriented self-continuation behavior rather than host tags.",
+      "eliminatedPrivilege": [
+        "no ROOT/START/END/PAIR host enum or switch",
+        "no host boolean for direct/inverse",
+        "no hard-coded END-is-result convention",
+        "no Dictionary/Grammar/Theory/StructuralRule authority",
+        "no host arity metadata"
+      ],
+      "residualHostSemanticBoundary": [
+        "generic structural unification remains host semantic law",
+        "root role frame START(R)/END(R)/L/U is reconstructed through current Memory bootstrap",
+        "host still executes method-role bijection and equality comparison",
+        "BundleValue projection remains derived host surface"
+      ],
+      "observed": {
+        "distinctSignatures": 4,
+        "basisCases": 5,
+        "signatures": {
+          "R": "11",
+          "O": "10",
+          "C": "01",
+          "L": "00",
+          "U": "00"
+        },
+        "rootFixedPointResult": "R(R) -> {R} in both direct and inverse methods",
+        "hostAspectBranches": 0,
+        "independentMemories": 2,
+        "productionChanged": false,
+        "semanticClosureProven": false
+      },
+      "evidenceTest": "ts/test/research-v013-self-continuation-signature-a11f.test.ts",
+      "consequence": "A11f gives executable evidence that the four self-incidence aspects and four method-oriented self-continuation behaviors are the same 2-bit structural classification. This strongly supports the hypothesis that application/function behavior is intrinsic to Link aspects, but generic unification/method interpretation is still host-defined and full semantic closure is not proven."
     }
   }
 }
