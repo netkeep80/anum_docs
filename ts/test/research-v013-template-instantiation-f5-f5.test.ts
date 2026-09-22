@@ -127,6 +127,7 @@ interface GenerationResult{
   readonly dictionary:LinkHandle;
   readonly history:LinkHandle;
   readonly functionLink:LinkHandle;
+  readonly authorityRoots:readonly LinkHandle[];
 }
 function referenceGenerate(memory:Memory,rule:LinkHandle,request:LinkHandle):GenerationResult{
   const basis=ensureRootBasis(memory),q=readRequest(memory,request),f=frame(memory);
@@ -165,8 +166,19 @@ function referenceGenerate(memory:Memory,rule:LinkHandle,request:LinkHandle):Gen
     effect.afterScope,evidence.source,evidence.formSequence,grouping,q.directMethod,witnessSequence,
   ]);
   const publication=memory.ensure(candidate,authorityCarrier);
+  const authorityRoots=Object.freeze([
+    publication,
+    evidence.content,evidence.source,evidence.dictionary,evidence.grammar,evidence.theory,
+    evidence.selectionSequence,evidence.formSequence,evidence.grammarMembership,evidence.theoryMembership,
+    ...evidence.segments.flatMap(segment=>[
+      segment.form,segment.dictionaryOccurrence,segment.sliceContent,segment.span,
+      segment.sliceEvidence,segment.lexeme,segment.resolution,segment.selection,
+    ]),
+    grouping,q.directMethod,...witnesses,
+  ]);
   return Object.freeze({
-    candidate,publication,dictionary:effect.afterScope,history:effect.historyAfter,functionLink:fn,
+    candidate,publication,dictionary:effect.afterScope,history:effect.historyAfter,
+    functionLink:fn,authorityRoots,
   });
 }
 
@@ -175,6 +187,7 @@ interface FrozenArtifact{
   readonly topology:StorageTopologyImage;
   readonly ruleCoordinate:number;
   readonly templatePublicationCoordinate:number;
+  readonly templateRootsCoordinate:number;
   readonly targetRequestCoordinate:number;
   readonly seedBindingsCoordinate:number;
   readonly requiredSeedsCoordinate:number;
@@ -218,6 +231,7 @@ function buildFrozen():FrozenArtifact{
   ]);
   const qBefore=readRequest(memory,qRequest);
   const qGenerated=referenceGenerate(memory,rule,qRequest);
+  const templateRoots=materializeExactSequence(memory,qGenerated.authorityRoots);
 
   const rFnStart=memory.ensure(basis.U,basis.O),rFnEnd=memory.ensure(basis.C,basis.L);
   assert(memory.find(rFnStart,rFnEnd)===undefined,"target function absent at freeze");
@@ -258,6 +272,7 @@ function buildFrozen():FrozenArtifact{
     topology:canonical.topology,
     ruleCoordinate:coord(canonical.coordinates,rule,"rule coordinate"),
     templatePublicationCoordinate:coord(canonical.coordinates,qGenerated.publication,"template publication coordinate"),
+    templateRootsCoordinate:coord(canonical.coordinates,templateRoots,"template roots coordinate"),
     targetRequestCoordinate:coord(canonical.coordinates,rRequest,"target request coordinate"),
     seedBindingsCoordinate:coord(canonical.coordinates,seedBindings,"seed bindings coordinate"),
     requiredSeedsCoordinate:coord(canonical.coordinates,requiredSeeds,"required seeds coordinate"),
@@ -276,8 +291,10 @@ interface InstantiateResult{
 function instantiateTemplate(
   memory:Memory,
   templateRoot:LinkHandle,
+  templateRoots:LinkHandle,
   seedBindings:LinkHandle,
   requiredSeeds:LinkHandle,
+  fullAuthority:boolean,
 ):InstantiateResult{
   const mapping=new Map<LinkHandle,LinkHandle>();
   for(const pair of readExactSequence(memory,seedBindings).values){
@@ -312,6 +329,9 @@ function instantiateTemplate(
     return value;
   };
 
+  if(fullAuthority){
+    for(const root of readExactSequence(memory,templateRoots).values) clone(root);
+  }
   const publication=clone(templateRoot);
   const candidate=memory.poles(publication).start;
   return Object.freeze({
@@ -332,6 +352,7 @@ function runReference(artifact:FrozenArtifact):Readonly<{topology:StorageTopolog
 function runTemplate(
   artifact:FrozenArtifact,
   dropRequiredSeed:boolean,
+  fullAuthority=true,
 ):Readonly<{topology:StorageTopologyImage;result:InstantiateResult}>{
   const memory=restoreTopology(artifact.topology),all=memory.allLinks();
   let bindings=at(all,artifact.seedBindingsCoordinate);
@@ -341,7 +362,12 @@ function runTemplate(
     bindings=materializeExactSequence(memory,pairs.slice(0,-1));
   }
   const result=instantiateTemplate(
-    memory,at(all,artifact.templatePublicationCoordinate),bindings,required,
+    memory,
+    at(all,artifact.templatePublicationCoordinate),
+    at(all,artifact.templateRootsCoordinate),
+    bindings,
+    required,
+    fullAuthority,
   );
   const rule=at(all,artifact.ruleCoordinate);
   assert(structurallyAdmitted(memory,rule,result.candidate),"instantiated candidate passes frozen F5-F2 rule");
@@ -361,12 +387,17 @@ function runTemplate(
 function main():void{
   const artifact=buildFrozen();
   const reference=runReference(artifact);
-  const a=runTemplate(artifact,false),b=runTemplate(artifact,false);
+  const publicationOnly=runTemplate(artifact,false,false);
+  assert(
+    JSON.stringify(publicationOnly.topology)!==JSON.stringify(reference.topology),
+    "publication-only template must remain incomplete",
+  );
+  const a=runTemplate(artifact,false,true),b=runTemplate(artifact,false,true);
   exactJson(a.topology,b.topology,"independent template instantiations agree");
-  exactJson(a.topology,reference.topology,"template instantiation equals domain reference topology");
+  exactJson(a.topology,reference.topology,"full authority-root template equals domain reference topology");
   assert(a.result.ordinary>0,"ordinary cloning exercised");
   assert(a.result.startSelf>0,"START self-incidence cloning exercised");
-  expectRejected(()=>runTemplate(artifact,true),"missing required seed fails closed");
+  expectRejected(()=>runTemplate(artifact,true,true),"missing required seed fails closed");
   console.log([
     "MTS v0.13 F5-F5:",
     "LINK_NATIVE_TEMPLATE_INSTANTIATION=GREEN_SCOPED_RESEARCH",
@@ -375,6 +406,8 @@ function main():void{
     `START_SELF_CLONES=${a.result.startSelf}`,
     `END_SELF_CLONES=${a.result.endSelf}`,
     `FULL_SELF_CLONES=${a.result.fullSelf}`,
+    "PUBLICATION_ONLY_TEMPLATE=RED_INCOMPLETE_CLOSURE",
+    "FULL_AUTHORITY_ROOT_TEMPLATE=GREEN",
     "EXTERNAL_97_EQUATION_PLAN_COMPILER=REMOVED",
     "EXISTING_ADMITTED_TEMPLATE_AUTHORITY=1",
     "EXTERNAL_SEED_CORRESPONDENCE=YES",
