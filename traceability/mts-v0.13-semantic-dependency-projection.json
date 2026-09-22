@@ -65,7 +65,9 @@
     "competingPublicationAutoMergeProven": false,
     "publicationAdmissionA13cComplete": true,
     "publicationAdmissionSourceRemovalProven": true,
-    "publicationAdmissionSourceRemovalA13dComplete": true
+    "publicationAdmissionSourceRemovalA13dComplete": true,
+    "selfGeneratedDefinitionAdmissionF5F1Complete": false,
+    "selfGeneratedDefinitionProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -964,7 +966,12 @@
     "publicationAdmissionSourceRemovalTargetDecompositionReadCount": 0,
     "publicationAdmissionSourceRemovalHostMatcherCount": 0,
     "publicationAdmissionSourceRemovalForgedControlCount": 1,
-    "publicationAdmissionSourceRemovalIndependentMemoryCount": 2
+    "publicationAdmissionSourceRemovalIndependentMemoryCount": 2,
+    "selfGeneratedDefinitionF5F1GeneratedCandidateCount": 1,
+    "selfGeneratedDefinitionF5F1FrozenAdmissionSuccessCount": 0,
+    "selfGeneratedDefinitionF5F1InvalidSelfApprovalPathCount": 1,
+    "selfGeneratedDefinitionF5F1IndependentMemoryCount": 2,
+    "selfGeneratedDefinitionF5F1HostNameBranchCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1113,13 +1120,18 @@
     "publicationAdmissionSourceRemovalTargetDecompositionReadCount": "A13d receiver decomposition reads of admission target Links. Designed as zero; target poles are reconstructed from proof-carrying binding evidence.",
     "publicationAdmissionSourceRemovalHostMatcherCount": "A13d structural matcher/unifier dependencies. Designed as zero.",
     "publicationAdmissionSourceRemovalForgedControlCount": "A13d reversed role/value proof witness attached to the original target; it must fail exact target reconstruction.",
-    "publicationAdmissionSourceRemovalIndependentMemoryCount": "Independent source Memories with unrelated allocation noise required to export byte-identical A13d authority."
+    "publicationAdmissionSourceRemovalIndependentMemoryCount": "Independent source Memories with unrelated allocation noise required to export byte-identical A13d authority.",
+    "selfGeneratedDefinitionF5F1GeneratedCandidateCount": "F5-F1 runtime-generated previously absent definition-shaped candidate produced from Link-carried request data after admission authority freeze.",
+    "selfGeneratedDefinitionF5F1FrozenAdmissionSuccessCount": "Expected successful frozen exact-candidate admissions of the new generated candidate. Zero is the current-architecture RED result.",
+    "selfGeneratedDefinitionF5F1InvalidSelfApprovalPathCount": "Late candidate-specific admission proof created after generation can make the candidate pass only if selected authority is expanded; this is classified as invalid self-approval.",
+    "selfGeneratedDefinitionF5F1IndependentMemoryCount": "Independent replay Memories required to generate byte-identical canonical definition topology from the same portable request.",
+    "selfGeneratedDefinitionF5F1HostNameBranchCount": "Per-definition/name branches in the F5-F1 generic candidate generator. Zero."
   },
   "nextExperiments": [
-    "Execute A13d admission source-removal witness; promote only after direct/inverse method authorities pass through one resolver with zero admission-target decomposition and zero matcher dependency.",
-    "If A13d is GREEN, classify the admission-specific E3 relation-shape law as replaced by the generic A11g proof-binding/orientation substrate; keep global E3 open for authority/profile selection and generic verifier execution.",
-    "F5 SELF_GENERATED-DEFINITION: construct a new portable definition through MTS/frontier semantics and publish it only through explicit A13c/A13d admission evidence; unique generation alone is insufficient.",
-    "Then measure remaining generic FORMAL E2 services and audit E3/E4 closure separately before any FULL_SELF_HOSTED claim."
+    "Execute F5-F1 RED-first falsifier. If confirmed, keep SELF_GENERATED=false and record the missing E3 generic unknown-candidate formation/admissibility law.",
+    "F5-F2: design a frozen structural admission rule capable of validating generated definition candidates without naming candidate identity and without host isValidDefinition branches.",
+    "Only after F5-F2 admission succeeds, build the full F4-compatible generated Dictionary/grouping/behavior authority and execute it in a second Memory.",
+    "Continue to keep E4 scheduling separate from E3 admission; A13/A13b frontier/materialization results remain the execution substrate."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3700,6 +3712,50 @@
       },
       "evidenceTest": "ts/test/research-v013-admission-source-removal-a13d.test.ts",
       "consequence": "The admission-specific relation-shape law is replaced on this scoped path by the generic A11g proof-carrying two-role binding and method-orientation substrate. Publication admission therefore needs no independent root->candidate semantic primitive here. Global E3 remains open because generic proof-binding execution, method-role interpretation and authority/profile selection are still host-executed."
+    },
+    "selfGeneratedDefinitionF5F1": {
+      "status": "DESIGNED_NOT_EXECUTED",
+      "currentResult": "NOT_RUN",
+      "question": "Can the current frozen exact-candidate A13d admission authority authorize a genuinely new definition candidate generated only after freeze?",
+      "generatedCandidate": [
+        "portable request is Link-carried before freeze",
+        "after replay/freeze one generic generator materializes a previously absent function Link",
+        "generator materializes application and two continuation/result Links",
+        "generator packages name carrier + function + application + continuations into one exact-sequence definition candidate",
+        "generator has no name-specific branch and does not build admission evidence"
+      ],
+      "falsifier": [
+        "frozen authority successfully admits one old pre-existing control candidate",
+        "same frozen authority rejects singleton frontier containing new generated definition candidate",
+        "late live root->Dnew relation and proof witness remain invisible to frozen selected authority",
+        "candidate becomes selectable only if selected admission authority is expanded after observing Dnew",
+        "that expanded path is classified INVALID_SELF_APPROVAL, not self-admissibility"
+      ],
+      "expectedRedMeaning": "Exact candidate identity admission cannot by itself support SELF_GENERATED definitions unknown at freeze time. A frozen generic formation/admissibility law over candidate structure is missing.",
+      "antiCheat": [
+        "generated candidate does not exist in frozen artifact",
+        "generator receives no admission root and creates no admission Link/witness",
+        "frozen admission binding list is captured before generation",
+        "singleton cardinality never grants authorization",
+        "two replay Memories must generate equal canonical topology"
+      ],
+      "residualNeed": [
+        "generic formation/admissibility predicate/rule applicable to candidates not named by identity",
+        "that rule must ultimately be represented/reconstructed from MTS evidence rather than host isValidDefinition logic",
+        "only after such E3 capability can F5 attempt full F4-compatible generated authority publication"
+      ],
+      "observed": {
+        "oldControlAdmitted": null,
+        "newCandidateGenerated": null,
+        "frozenNewCandidateAdmission": null,
+        "lateAmbientAdmissionIgnored": null,
+        "expandedAuthorityWouldAccept": null,
+        "invalidSelfApprovalClassified": null,
+        "independentMemories": 2,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-self-generated-admission-f5-f1.test.ts",
+      "consequence": "Pending execution. Expected RED current architecture: candidate construction can occur after freeze, but exact-candidate admission cannot independently authorize the unknown generated candidate."
     }
   }
 }
