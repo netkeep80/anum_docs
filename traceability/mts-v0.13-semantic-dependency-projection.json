@@ -105,7 +105,8 @@
     "linkNativeFrontierA20Designed": true,
     "linkNativeFrontierA20Complete": true,
     "singleExecutionRootA21Designed": true,
-    "singleExecutionRootA21Complete": true
+    "singleExecutionRootA21Complete": true,
+    "metaExecutionDetachmentA22Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1386,9 +1387,10 @@
     "singleExecutionRootA21IndependentMemoryCount": "Independent Memories reproducing the one-Link execution-root behavior."
   },
   "nextExperiments": [
-    "A22: represent execution progression itself as Link-carried transition E_n->E_(n+1), and test contextual propagation of current-execution truth rather than host replacement of the current root.",
+    "A22: execute meta-level contextual detachment M->E_n plus E_n->E_(n+1) => M->E_(n+1), preserving immutable Link-native execution history.",
+    "If A22 is GREEN, attack the transition-producer residual: represent the A21 transformation itself as application/continuation authority so producing E_n->E_(n+1) is no longer a special host semantic operation.",
+    "After A22, reconnect self-similar execution-state propagation with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A22 should distinguish immutable execution history from selection of the current execution root and must preserve branch/provenance semantics from A21.",
-    "After A22, reconnect single-root execution and execution-transition history with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A21 must preserve context-carried authority, occurrence ancestry, convergence multiplicity, ambient isolation and fail-closed structural validation.",
     "A20 should use Link-native occurrence ancestry (for example ParentOccurrence->TruthWitness) and a frozen frontier carrier; it must not execute every truth merely linked to K.",
     "A20 must preserve first split, branch-local termination, convergence multiplicity, schedule equivalence, ambient-truth isolation and ZERO.",
@@ -5070,6 +5072,49 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "metaExecutionDetachmentA22": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can progression of the meta-interpreter's own one-Link execution root obey the same contextual detachment law as ordinary MTS execution: M->E_n plus selected E_n->E_(n+1) gives M->E_(n+1)?",
+      "setup": [
+        "retain A21 one-Link execution root E_n=K->Frontier_n",
+        "retain A19 context-carried continuation authority and A20 Link-native occurrence provenance inside E_n",
+        "represent execution-state reachability/history as contextual truth M->E_n",
+        "produce E_(n+1) with the already-GREEN A21 step as an explicit residual",
+        "materialize execution transition E_n->E_(n+1)",
+        "propagate meta-context truth through that transition with one generic Link-composition kernel",
+        "represent immutable selected meta-history as occurrence ancestry over M->E_n truths"
+      ],
+      "oracle": [
+        "E0->E1->E2->E3->E4 reproduces first fan-out, recursive split, convergence and terminal ZERO from A21",
+        "M->E_n plus selected E_n->E_(n+1) produces exactly M->E_(n+1)",
+        "semantic convergence inside E3 remains one K->Z truth with two provenance occurrences",
+        "meta-occurrence ancestry reconstructs E0,E1,E2,E3,E4 without destructive replacement of older truths",
+        "ambient alternative execution transition is inert unless selected",
+        "selected execution transition whose START differs from the true E_n is rejected",
+        "execution truth from a different meta-context is rejected",
+        "two independent Memories reproduce the behavior"
+      ],
+      "antiCheat": [
+        "meta-detachment kernel contains no frontier/authority/schedule/State/Event/BundleValue/producer/modusPonens/find/outgoing/incoming/switch semantics",
+        "meta-detachment kernel reads only M->E_n and E_n->E_(n+1) poles",
+        "meta-detachment materializes only M->E_(n+1)"
+      ],
+      "residualAuthority": [
+        "A21 production of E_(n+1) from E_n remains host-executed in this gate",
+        "selection of which E_n->E_(n+1) transition is the active meta-transition remains explicit",
+        "selection of the current meta-occurrence remains external even though history is Link-native",
+        "scheduling implementation and physical parallelism remain external"
+      ],
+      "evidenceTest": "ts/test/research-v013-meta-detachment-history-a22.test.ts",
+      "claimBoundary": [
+        "GREEN would show self-similarity of the detachment law across ordinary semantic execution and meta-execution state propagation",
+        "M->E_n is an immutable execution-history truth, not a destructive unique current flag; current branch selection remains occurrence/frontier authority",
+        "GREEN would not source-remove production of E_n->E_(n+1)",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
