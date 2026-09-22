@@ -28,7 +28,7 @@
     "semanticSourceAuthorityInventoryComplete": true,
     "semanticSourceReconstructionProven": false,
     "formalKernelAuditComplete": true,
-    "formalKernelSelfExtensionProven": false,
+    "formalKernelSelfExtensionProven": true,
     "rootAspectSourceRemovalFalsifierComplete": true,
     "rootAspectSemanticSourceReconstructionMethodProven": true,
     "formalKernelSelfExtensionFalsifierComplete": true,
@@ -52,7 +52,7 @@
     "aspectApplicationProofCarryingUnifiedContinuationResearchComplete": true,
     "formalIntegratedNameAspectProofBindingResearchComplete": true,
     "formalSourceGroupingResearchComplete": true,
-    "formalKernelSelfExtensionF4ResearchComplete": false
+    "formalKernelSelfExtensionF4ResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -842,10 +842,10 @@
     "selfGeneratedOrReconstructedSemanticArtifactCount": null,
     "externallyGeneratedSemanticArtifactCount": null,
     "formalKernelHostDefinedSemanticLawCount": 3,
-    "formalKernelSelfExtensionWitnessCount": 0,
+    "formalKernelSelfExtensionWitnessCount": 2,
     "rootAspectSourceRemovalPositiveVectorCount": 8,
     "rootAspectSourceRemovalNegativeControlCount": 3,
-    "formalKernelSelfExtensionAttemptCount": 4,
+    "formalKernelSelfExtensionAttemptCount": 6,
     "formalGenericExtensionPortableRuleCount": 3,
     "formalGenericExtensionIndependentMemoryCount": 2,
     "formalGenericExtensionHostFormSpecificBranchCount": 0,
@@ -911,7 +911,8 @@
     "formalKernelSelfExtensionF4UnknownFunctionCount": 2,
     "formalKernelSelfExtensionF4HostFormSpecificBranchCount": 0,
     "formalKernelSelfExtensionF4IndependentMemoryCount": 2,
-    "formalKernelSelfExtensionF4BehaviorCardinalityCases": 2
+    "formalKernelSelfExtensionF4BehaviorCardinalityCases": 2,
+    "formalKernelSelfExtensionF4NegativeControlCount": 3
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1020,14 +1021,15 @@
     "formalKernelSelfExtensionF4UnknownFunctionCount": "Previously unknown named semantic function Links exercised by F4 under one unchanged generic receiver.",
     "formalKernelSelfExtensionF4HostFormSpecificBranchCount": "Per-name/per-form semantic branches in the F4 receiver kernel. Target is zero.",
     "formalKernelSelfExtensionF4IndependentMemoryCount": "Independent replay Memories executing the same portable self-extension authority.",
-    "formalKernelSelfExtensionF4BehaviorCardinalityCases": "Distinct result cardinalities intentionally assigned to unknown functions in F4 to falsify hidden per-form dispatch."
+    "formalKernelSelfExtensionF4BehaviorCardinalityCases": "Distinct result cardinalities intentionally assigned to unknown functions in F4 to falsify hidden per-form dispatch.",
+    "formalKernelSelfExtensionF4NegativeControlCount": "F4 malformed/forged authority controls rejected fail-closed: cross-source grouping, application-target substitution, and reversed proof-binding values."
   },
   "nextExperiments": [
-    "Execute F-KERNEL-SELF-EXTENSION F4 and only set formalKernelSelfExtensionProven=true after two unknown function/forms with different behavior pass one branch-free two-Memory receiver.",
-    "If F4 is GREEN, reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization against the generic path and classify which fixed-evaluator law families are now redundant rather than merely bypassed.",
-    "Measure/classify exact STRING/source segmentation and Dictionary/Grammar lookup as the remaining FORMAL authority boundary.",
-    "Apply the same proof-carrying/aspect mechanism to proof semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims.",
-    "E3/E4 remain separate and open."
+    "Audit the three HOST_DEFINED fixed-evaluator FORMAL law families against F4 and classify each as still required, bypassed, or redundant on the generic research path; do not change production classification without an executable replacement witness.",
+    "Measure/classify exact STRING materialization, source segmentation, Dictionary lookup and Grammar/source replay as the remaining FORMAL E2 authority boundary.",
+    "F5 SELF_GENERATED-DEFINITION: under frozen authority, make MTS construct/admit a new portable function-name/grouping/behavior definition that a second Memory can execute through the F4 kernel; externally prebuilt definition evidence is not sufficient.",
+    "After F5, rerun the strong self-description/self-proof boundary and apply the same mechanism to proof meta-semantics.",
+    "Audit E3 formation/admissibility and E4 orchestration separately; v0.13 acceptance remains blocked."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -2318,8 +2320,8 @@
       "formalSourcePresentsReusableRules": false,
       "completeAxiomSystemEncodedThroughDialect": false,
       "definePreviouslyUnknownNamedFormFromFormalSource": false,
-      "useNewFormWithoutHostSemanticBranch": false,
-      "twoMemorySelfExtensionWitness": false
+      "useNewFormWithoutHostSemanticBranch": true,
+      "twoMemorySelfExtensionWitness": true
     },
     "e2Relation": {
       "hostDefinedFormalLawFamilies": [
@@ -2375,11 +2377,20 @@
         "ts/src/public.ts: producer authority construction remains intentionally internal",
         "ts/src/interpreter.ts#replayColonEffect: definition replay is verification, not definition materialization"
       ],
-      "nextRequiredCapability": "An MTS-native, portable and frozen-authority mechanism by which FORMAL evidence can declare a new name/form plus its interpretation/application rule, and a form-agnostic host kernel can subsequently consume it without adding a semantic branch or canonical-byte case.",
+      "nextRequiredCapability": "SELF_GENERATED definition authority: demonstrate that MTS itself can construct/admit equivalent portable name/grouping/behavior authority under frozen rules, rather than receiving externally produced Link definitions.",
       "productionChanged": false,
-      "consequence": "F-KERNEL-SELF-EXTENSION is currently falsified for the existing fixed FORMAL kernel. This is evidence of a concrete missing capability, not evidence that self-extension is impossible in MTS. Full FORMAL self-description and FULL_SELF_HOSTED remain prohibited claims.",
+      "consequence": "Historical F1 remains RED for the fixed production evaluator, while F4 is GREEN for the newer generic research kernel. Therefore self-extension is proven only in that scoped research sense; self-generation, production replacement, global E2, E3/E4 and FULL_SELF_HOSTED remain open.",
       "baselineGuardTest": "ts/test/research-v013-formal-kernel-self-extension-a9.test.ts",
-      "baselineGuardStatus": "advanced from DESIGNED_NOT_EXECUTED to EXECUTED_RED_FIXED_KERNEL in the same transaction"
+      "baselineGuardStatus": "advanced from DESIGNED_NOT_EXECUTED to EXECUTED_RED_FIXED_KERNEL in the same transaction",
+      "genericKernelRerun": {
+        "id": "F-KERNEL-SELF-EXTENSION-F4",
+        "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+        "evidenceTest": "ts/test/research-v013-formal-self-extension-f4.test.ts",
+        "successfulWitnessCount": 2,
+        "independentMemoryCount": 2,
+        "negativeControls": 3,
+        "result": "GREEN for the generic Dictionary + grouping + proof-carrying aspect kernel; historical F1 RED remains valid for the fixed production FORMAL evaluator."
+      }
     },
     "limitations": [
       "This audit does not require textual self-proof; it measures whether semantic source/notation authority can be expressed and extended inside MTS.",
@@ -3228,7 +3239,7 @@
     },
     "selfExtensionF4": {
       "id": "F-KERNEL-SELF-EXTENSION-F4",
-      "status": "DESIGNED_NOT_EXECUTED",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can two previously unknown named function/forms with different behavior be defined entirely by portable MTS Link authority, then parsed/grouped/interpreted in independent Memories by one unchanged generic receiver with no name/form branch?",
       "corpus": [
         "physical source x(a) resolves x -> arbitrary semantic function Link Fx and returns singleton {b1}",
@@ -3254,7 +3265,23 @@
         "production FORMAL evaluator remains unchanged; global E2/E3/E4 stay open"
       ],
       "evidenceTest": "ts/test/research-v013-formal-self-extension-f4.test.ts",
-      "currentResult": "NOT_RUN"
+      "currentResult": "GREEN: x(a) and y(a) introduce two distinct non-basis function Links through portable Dictionary + source-grouping + proof-carrying continuation evidence. One unchanged generic receiver executes singleton and two-result behavior across two independent replay Memories with zero x/y receiver branches, zero structural matcher/unifier dependency, and no canonicalByte/operatorAspect dispatch. Unknown z has no authority; three forged grouping/binding controls fail closed.",
+      "observed": {
+        "unknownFunctionForms": 2,
+        "resultCardinalities": [
+          1,
+          2
+        ],
+        "independentMemories": 2,
+        "genericReceiverFormBranches": 0,
+        "hostMatchers": 0,
+        "structuralUnificationUsed": false,
+        "canonicalByteOperatorAspectUsed": false,
+        "negativeControls": 3,
+        "unknownName": "NO_AUTHORITY",
+        "productionChanged": false
+      },
+      "consequence": "The generic research kernel is self-extensible with respect to externally supplied portable Link definitions: previously unknown function names/forms and different behavior require no new host semantic branch. This is SELF_EXTENSIBLE evidence, not SELF_GENERATED evidence. The fixed production FORMAL evaluator remains historically RED and unchanged."
     }
   }
 }
