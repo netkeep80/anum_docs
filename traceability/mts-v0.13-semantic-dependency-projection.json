@@ -121,7 +121,9 @@
     "derivedMetaSeedCorrespondenceA28Designed": true,
     "derivedMetaSeedCorrespondenceA28Complete": true,
     "linkNativeTargetHistoryA29Designed": true,
-    "linkNativeTargetHistoryA29Complete": true
+    "linkNativeTargetHistoryA29Complete": true,
+    "contextualGenerationRequestA30Designed": true,
+    "contextualGenerationRequestA30Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1181,7 +1183,11 @@
     "linkNativeTargetHistoryA29PositionalTargetSeedSequenceCount": 0,
     "linkNativeTargetHistoryA29DerivedCompatibleTemplateCount": 2,
     "linkNativeTargetHistoryA29AmbientTargetHistoryFires": 0,
-    "linkNativeTargetHistoryA29IndependentMemoryCount": 2
+    "linkNativeTargetHistoryA29IndependentMemoryCount": 2,
+    "contextualGenerationRequestA30SeparateTargetArgumentCount": 0,
+    "contextualGenerationRequestA30SeparateInventoryArgumentCount": 0,
+    "contextualGenerationRequestA30AmbientSelectionFires": 0,
+    "contextualGenerationRequestA30IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1491,12 +1497,16 @@
     "linkNativeTargetHistoryA29PositionalTargetSeedSequenceCount": "Externally selected positional target seed ExactSequences consumed by A29 mapping. Target zero.",
     "linkNativeTargetHistoryA29DerivedCompatibleTemplateCount": "Source producer candidates structurally compatible with the selected Link-native target history.",
     "linkNativeTargetHistoryA29AmbientTargetHistoryFires": "Ambient target-history witnesses outside the selected descriptor that affect execution. Target zero.",
-    "linkNativeTargetHistoryA29IndependentMemoryCount": "Independent Memories reproducing target-history derivation, convergence and execution."
+    "linkNativeTargetHistoryA29IndependentMemoryCount": "Independent Memories reproducing target-history derivation, convergence and execution.",
+    "contextualGenerationRequestA30SeparateTargetArgumentCount": "Separate target-history arguments accepted by the A30 generation runner. Target zero.",
+    "contextualGenerationRequestA30SeparateInventoryArgumentCount": "Separate source-inventory arguments accepted by the A30 generation runner. Target zero.",
+    "contextualGenerationRequestA30AmbientSelectionFires": "Ambient target truths or alternate generation contexts that affect the selected request. Target zero.",
+    "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A30: attack external selection of the target-history witness without granting ambient histories authority; carry target selection inside already selected execution/meta context or explicit Link-native request authority.",
-    "A30 must keep broad source-inventory selection separate and preserve fail-closed ambiguity/malformed-target behavior.",
-    "If A30 is GREEN, attack broad source-inventory selection and current meta-occurrence selection as the next independent authority boundaries.",
+    "A31: remove host selection of the current generation-request truth T by carrying request occurrence/history as Link authority; do not execute every target merely linked to G.",
+    "A31 must preserve immutable request truth and distinguish selected occurrence from ambient alternative G->Target truths.",
+    "If A31 is GREEN, attack publication/membership of the broad source inventory and current meta-occurrence selection as separate remaining source boundaries.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
@@ -5709,6 +5719,61 @@
         "externalSelectedTargetHistory": true,
         "externalBroadInventoryMembership": true,
         "semanticInformationEliminated": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "contextualGenerationRequestA30": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A29 target-history selection and broad-inventory selection be carried by one contextual generation-request truth Link rather than supplied as two host arguments?",
+      "setup": [
+        "G=RequestParent->Inventory carries the frozen broad source inventory",
+        "T=G->TargetHistory is the one selected contextual generation request",
+        "runner derives G/TargetHistory/Inventory from T and retains A29 structural seed derivation"
+      ],
+      "oracle": [
+        "zero separate target/inventory arguments and two compatible templates converge",
+        "unchanged A23 metaStep executes generated target E0..E4 then ZERO",
+        "ambient target truth and alternate generation context are inert",
+        "mixed-context target truth and malformed inventory context reject fail-closed"
+      ],
+      "antiCheat": [
+        "runner derives generationContext from START(T), target from END(T), and inventory from END(G)",
+        "runner contains no find/outgoing/incoming/allLinks/switch ambient selector",
+        "A30 metaStep remains whitespace-normalized source-identical to A23"
+      ],
+      "residualAuthority": [
+        "selection of current request truth T remains external",
+        "inventory membership and target-history construction/publication remain externally sourced",
+        "current meta-occurrence selection and generic topology/rule interpreters remain residual"
+      ],
+      "evidenceTest": "ts/test/research-v013-contextual-generation-request-a30.test.ts",
+      "claimBoundary": [
+        "GREEN makes target/inventory selection contextual Link authority rather than separate host arguments",
+        "GREEN does not source-remove current T or its carried evidence",
+        "v0.13 is not accepted; E2/E3 and FULL_SELF_HOSTED remain open; production unchanged"
+      ],
+      "consequence": "A30 collapses separate target-history and broad-inventory runtime selection into one contextual truth Link T=G->TargetHistory, with G itself carrying Inventory. This applies the MTS truth rule directly to generation selection: the chosen target is active because the selected generation context is linked to it. A29 source/target structural derivation and A23 runtime detachment remain unchanged.",
+      "currentResult": "GREEN: runGenerationRequest receives rule plus one requestTruth and derives generationContext=START(T), target=END(T), inventory=END(G). Separate target and inventory argument counts are zero. Two compatible source candidates converge to one generated target authority; unchanged A23 metaStep executes E0..E4 then ZERO. Ambient G->otherTarget and alternate generation contexts are ignored. Mixed-context target truth and malformed inventory context reject. Inherited A29 source/target anti-cheat guards remain GREEN. Two independent Memories agree.",
+      "observed": {
+        "generationContext": "REQUEST_PARENT_TO_INVENTORY",
+        "targetSelection": "G_TO_TARGET_HISTORY",
+        "requestInput": "ONE_CONTEXTUAL_TRUTH_LINK",
+        "separateTargetArguments": 0,
+        "separateInventoryArguments": 0,
+        "targetSeedExactSequence": 0,
+        "perTemplateSeedCorrespondence": 0,
+        "sourceSeeds": "DERIVED",
+        "targetSeeds": "DERIVED_FROM_LINK_HISTORY",
+        "inventorySize": 3,
+        "compatibleTemplates": 2,
+        "targetAuthorityAbsentAtFreeze": true,
+        "unchangedA23MetaStep": true,
+        "ambientTargetTruthIgnored": true,
+        "ambientGenerationContextIgnored": true,
+        "mixedContextTargetTruth": "REJECTED",
+        "malformedInventoryContext": "REJECTED",
+        "externalRequestTruthSelection": true,
         "independentMemories": 2,
         "productionChanged": false
       }
