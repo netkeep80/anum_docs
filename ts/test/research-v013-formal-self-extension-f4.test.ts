@@ -534,6 +534,74 @@ function executeArtifact(artifact:Artifact):void{
   same(resolveName(memory,dictionary,"z"),undefined,"F4 unknown z has no Use");
 }
 
+function expectRejected(effect:()=>unknown,message:string):void{
+  let rejected=false;
+  try{ effect(); }catch{ rejected=true; }
+  assert(rejected,message);
+}
+
+function negativeControls(artifact:Artifact):void{
+  const memory=restoreTopology(artifact.topology);
+  const all=memory.allLinks();
+  const f=frame(memory);
+  const directMethod=at(all,artifact.directMethod);
+  const bindings=artifact.witnessCoordinates.map(
+    n=>verifyWitness(memory,f,at(all,n)),
+  );
+
+  const xPortable=artifact.expressions[0]!;
+  const yPortable=artifact.expressions[1]!;
+  const xEvidence=restoreSource(memory,xPortable.source);
+  const yEvidence=restoreSource(memory,yPortable.source);
+  const xSelected=replayV012SelectedSourceEvidence(
+    memory,ensureRootBasis(memory),xEvidence,
+  );
+  const ySelected=replayV012SelectedSourceEvidence(
+    memory,ensureRootBasis(memory),yEvidence,
+  );
+  const xGrouping=at(all,xPortable.grouping);
+  const yGrouping=at(all,yPortable.grouping);
+
+  expectRejected(
+    ()=>groupedApplication(
+      memory,xEvidence,xSelected,f,yGrouping,bindings,
+    ),
+    "F4 cross-source grouping fails closed",
+  );
+
+  {
+    const xgp=memory.poles(xGrouping);
+    const yApplication=memory.poles(yGrouping).end;
+    const forged=memory.ensure(xgp.start,yApplication);
+    expectRejected(
+      ()=>groupedApplication(
+        memory,xEvidence,xSelected,f,forged,bindings,
+      ),
+      "F4 application-target substitution fails closed",
+    );
+  }
+
+  {
+    const xApplication=memory.poles(xGrouping).end;
+    const p=memory.poles(xApplication);
+    const a=memory.ensure(f.startRole,p.end);
+    const b=memory.ensure(f.endRole,p.start);
+    const forged=memory.ensure(memory.ensure(a,b),xApplication);
+    expectRejected(
+      ()=>verifyWitness(memory,f,forged),
+      "F4 reversed proof-binding values fail closed",
+    );
+  }
+
+  same(ySelected.length,4,"F4 y source remains exact after negative controls");
+  const yResult=evaluate(
+    memory,f,directMethod,
+    groupedApplication(memory,yEvidence,ySelected,f,yGrouping,bindings),
+    bindings,
+  );
+  same(yResult.links.size,2,"F4 y behavior unchanged after forged controls");
+}
+
 function staticBranchGuard():void{
   const repoRoot=resolve(process.cwd(),"..");
   const source=readFileSync(
@@ -557,6 +625,7 @@ function main():void{
   exactJson(a,b,"F4 portable authority ignores unrelated allocation noise");
   executeArtifact(a);
   executeArtifact(b);
+  negativeControls(a);
   staticBranchGuard();
 
   console.log([
@@ -571,6 +640,7 @@ function main():void{
     "CANONICAL_BYTE_OPERATOR_ASPECT=NOT_USED",
     "INDEPENDENT_MEMORIES=2",
     "UNKNOWN_Z=NO_AUTHORITY",
+    "NEGATIVE_CONTROLS=3",
     "PRODUCTION_FORMAL_EVALUATOR=UNCHANGED",
     "FULL_SELF_HOSTED=NOT_CLAIMED",
   ].join(" "));
