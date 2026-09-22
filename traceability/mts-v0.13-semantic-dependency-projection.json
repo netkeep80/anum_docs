@@ -56,7 +56,10 @@
     "formalFixedEvaluatorLawReassessmentAfterF4Complete": true,
     "bundleContinuationBranchingResearchComplete": true,
     "bundleContinuationPhysicalParallelismProven": false,
-    "bundleContinuationMaterializingConcurrencyProven": false
+    "bundleContinuationMaterializingConcurrencyProven": false,
+    "metaInterpreterFrontierA13Complete": true,
+    "metaInterpreterPhysicalParallelismProven": false,
+    "metaInterpreterMaterializingConcurrencyProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -929,7 +932,14 @@
     "bundleContinuationScheduleOrderVariantCount": 2,
     "bundleContinuationPhysicalConcurrencyPrimitiveCount": 0,
     "bundleContinuationIndependentMemoryCount": 2,
-    "bundleContinuationPartialTerminationSurvivorCount": 1
+    "bundleContinuationPartialTerminationSurvivorCount": 1,
+    "metaInterpreterInitialBranchCount": 2,
+    "metaInterpreterSecondBranchCount": 2,
+    "metaInterpreterConvergenceDistinctStateCount": 1,
+    "metaInterpreterConvergenceOccurrenceCount": 2,
+    "metaInterpreterScheduleOrderVariantCount": 2,
+    "metaInterpreterPhysicalConcurrencyPrimitiveCount": 0,
+    "metaInterpreterIndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1052,14 +1062,21 @@
     "bundleContinuationScheduleOrderVariantCount": "A12 executes the same frontier in forward and reverse parent scheduling order and requires identical extensional/provenance semantics.",
     "bundleContinuationPhysicalConcurrencyPrimitiveCount": "Promise/Worker/async/threading primitives in the A12 semantic branching kernel. Zero: branching semantics is separated from executor parallelism.",
     "bundleContinuationIndependentMemoryCount": "Independent canonical source Memories with unrelated allocation noise that export byte-identical selected branching authority.",
-    "bundleContinuationPartialTerminationSurvivorCount": "A12 branch-local termination case: one parent branch has zero continuations while another survives; the whole frontier does not terminate."
+    "bundleContinuationPartialTerminationSurvivorCount": "A12 branch-local termination case: one parent branch has zero continuations while another survives; the whole frontier does not terminate.",
+    "metaInterpreterInitialBranchCount": "A13 designed first event fan-out from one interpreter state E0 to branch-local EA/EB.",
+    "metaInterpreterSecondBranchCount": "A13 designed second event where EA terminates locally and EB splits into EC/ED.",
+    "metaInterpreterConvergenceDistinctStateCount": "A13 designed convergence of EC/ED to one exact EZ interpreter-state Link.",
+    "metaInterpreterConvergenceOccurrenceCount": "A13 designed convergence preserves two provenance occurrences at exact EZ.",
+    "metaInterpreterScheduleOrderVariantCount": "A13 forward/reverse parent scheduling variants required to yield identical extensional/provenance semantics.",
+    "metaInterpreterPhysicalConcurrencyPrimitiveCount": "Promise/Worker/async/threading primitives in the A13 semantic frontier kernel. Designed as zero.",
+    "metaInterpreterIndependentMemoryCount": "Independent portable replay Memories required by A13."
   },
   "nextExperiments": [
-    "A13 BRANCH-CONTEXT/SCHEDULING: carry explicit branch-local interpretation Context/provenance through A12 frontier steps and classify which semantics is E2 versus E4; executor order must remain non-authoritative.",
-    "A13b MATERIALIZING-BRANCHES: separately falsify concurrent Link materialization/admission/conflict semantics. Do not infer write semantics from read-only A12.",
-    "F5 SELF_GENERATED-DEFINITION: after A12 frontier semantics, make MTS under frozen authority construct/admit a new portable function definition consumable by F4; if generation branches, all producer continuations must use the same frontier model.",
-    "Measure/classify exact STRING materialization, source segmentation, Dictionary lookup and Grammar/source replay as remaining generic FORMAL E2 services.",
-    "Apply proof-carrying/aspect + frontier semantics to proof meta-semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims."
+    "Execute A13 meta-interpreter frontier witness; promote only after full CI with branch-local K/F/TOS isolation, convergence and schedule-order controls.",
+    "A13b MATERIALIZING-BRANCHES: separately falsify concurrent Link/context materialization, admission/conflict and causal ordering; do not infer write semantics from read-only A13.",
+    "F5 SELF_GENERATED-DEFINITION must use A13 frontier semantics if definition generation admits multiple continuations; do not regress to hidden scalar execution.",
+    "Measure/classify remaining generic FORMAL E2 services: exact STRING materialization, source segmentation, Dictionary lookup and Grammar/source replay.",
+    "Apply the same frontier semantics to proof meta-semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3431,6 +3448,69 @@
       "evidenceTest": "ts/test/research-v013-bundle-continuation-a12.test.ts",
       "consequence": "Scoped read-only research now demonstrates BundleValue.occurrences as a viable continuation frontier over Link/aspect application while BundleValue.links remains the extensional result. Branching semantics is independent of physical scheduling. This does not prove universal bundle-valued abit semantics or concurrent materializing execution; those remain separate A13/E4 questions.",
       "currentResult": "GREEN: F(a) produces frontier occurrences g/h; applying x independently to that frontier yields u/v/w, two parent branches can converge to one exact z while preserving two provenance occurrences, one branch may terminate while another survives, and forward/reverse parent scheduling produces identical extensional and normalized provenance semantics. The semantic kernel uses zero physical concurrency primitives."
+    },
+    "metaInterpreterFrontierA13": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "currentResult": "GREEN: one explicit interpreter state E0 splits under one event into branch-local EA/EB with distinct K/F/TOS/Pool; EA terminates locally while EB recursively splits into EC/ED; EC/ED converge under the next event to one exact EZ while preserving two provenance occurrences. Forward/reverse scheduling yields identical extensional and normalized provenance semantics; late ambient transition evidence after freeze is ignored; the semantic kernel performs zero Link writes and uses zero physical concurrency primitives.",
+      "question": "Can the meta-interpreter itself be modeled as a BundleValue frontier of explicit Link-carried interpreter states, so ambiguity/fan-out, local termination, recursive splitting and semantic convergence use the same A12 continuation semantics?",
+      "stateCarrier": [
+        "research carrier E = ExactSequence(Pool, K, TOS, Fcurrent)",
+        "K is an existing explicit Context Link validated by readContext",
+        "Pool/TOS/Fcurrent are ordinary Links",
+        "ExactSequence is transport/record structure only, not a new foundational execution entity"
+      ],
+      "transitionAuthority": "Frozen selected Links encode one event application as prefix E⟼event and zero/one/many next-state occurrences (E⟼event)⟼E'.",
+      "designedTrace": [
+        "E0 --event1--> {EA,EB}",
+        "EA --event2--> {}",
+        "EB --event2--> {EC,ED}",
+        "EC --event3--> {EZ}",
+        "ED --event3--> {EZ}"
+      ],
+      "requiredProperties": [
+        "EA/EB have distinct branch-local K/F/TOS and may have distinct Pool",
+        "EA local termination does not terminate EB",
+        "EB recursively splits under the next event",
+        "EC/ED converge to the exact same EZ state while provenance remains two occurrences",
+        "forward/reverse parent scheduling yields equal extensional result and normalized provenance",
+        "late ambient transition after authority freeze is ignored",
+        "semantic kernel performs no Link writes",
+        "Promise/Worker/async/thread primitives are absent from semantic authority",
+        "two independent source Memories export byte-identical authority"
+      ],
+      "relationToFormalInterpreterSketch": "The earlier scalar result 'action over context + next function' becomes the one-branch special case. General research form is one state occurrence -> Bundle<next interpreter-state occurrences>, each carrying its own post-action K and Fnext/TOS/Pool.",
+      "e2e4Boundary": [
+        "E2 decides which next interpreter-state Links are admissible under frozen transition authority",
+        "E4 decides scheduling/order/executor of already-admissible branch occurrences",
+        "A13 tests order-independence only for read-only frozen execution",
+        "branch-local mutation/materialization/conflict semantics remain A13b/E4"
+      ],
+      "ontologyBoundary": [
+        "no Thread/Worker/Promise primitive enters MTS",
+        "no global mutable interpreter context is shared between branches",
+        "frontier order is not semantic authority",
+        "branch provenance does not imply causal Links between converged semantic states"
+      ],
+      "observed": {
+        "initialBranches": 2,
+        "secondBranches": 2,
+        "convergenceDistinctStates": 1,
+        "convergenceOccurrences": 2,
+        "scheduleOrders": [
+          "forward",
+          "reverse"
+        ],
+        "physicalConcurrencyPrimitives": 0,
+        "independentMemories": 2,
+        "branchLocalStateIsolation": true,
+        "localTermination": true,
+        "recursiveSplit": true,
+        "lateAmbientTransitionIgnored": true,
+        "semanticKernelWrites": 0,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-meta-interpreter-frontier-a13.test.ts",
+      "consequence": "Scoped research demonstrates the meta-interpreter as a BundleValue frontier transformer over explicit Link-carried states. The old scalar Out(D,Fnext) model is a one-branch special case. Branching semantics is independent of physical scheduling; A13b still owns concurrent materialization/admission/conflict semantics, and global E4/FULL_SELF_HOSTED remain open."
     }
   }
 }
