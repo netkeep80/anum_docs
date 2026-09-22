@@ -64,7 +64,8 @@
     "materializingBranchesPhysicalThreadSafetyProven": false,
     "competingPublicationAutoMergeProven": false,
     "publicationAdmissionA13cComplete": true,
-    "publicationAdmissionSourceRemovalProven": false
+    "publicationAdmissionSourceRemovalProven": false,
+    "publicationAdmissionSourceRemovalA13dComplete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -958,7 +959,12 @@
     "publicationAdmissionCandidateOrderVariantCount": 2,
     "publicationAdmissionConvergedOccurrenceCount": 2,
     "publicationAdmissionHostPriorityCount": 0,
-    "publicationAdmissionIndependentAuthorityCount": 2
+    "publicationAdmissionIndependentAuthorityCount": 2,
+    "publicationAdmissionSourceRemovalOrientationCount": 2,
+    "publicationAdmissionSourceRemovalTargetDecompositionReadCount": 0,
+    "publicationAdmissionSourceRemovalHostMatcherCount": 0,
+    "publicationAdmissionSourceRemovalForgedControlCount": 1,
+    "publicationAdmissionSourceRemovalIndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1102,13 +1108,18 @@
     "publicationAdmissionCandidateOrderVariantCount": "A13c divergent candidate frontier is evaluated in forward and reversed occurrence order with identical selected result.",
     "publicationAdmissionConvergedOccurrenceCount": "A13c exact-convergence publication PZ preserves two branch provenance occurrences after explicit admission.",
     "publicationAdmissionHostPriorityCount": "Insertion-order/last-writer-wins/first-candidate priority rules in the A13c resolver. Zero.",
-    "publicationAdmissionIndependentAuthorityCount": "Independent source Memories with unrelated noise that must export byte-identical frozen admission authority."
+    "publicationAdmissionIndependentAuthorityCount": "Independent source Memories with unrelated noise that must export byte-identical frozen admission authority.",
+    "publicationAdmissionSourceRemovalOrientationCount": "A13d designed direct and inverse method-Link orientations exercised by one generic admission resolver.",
+    "publicationAdmissionSourceRemovalTargetDecompositionReadCount": "A13d receiver decomposition reads of admission target Links. Designed as zero; target poles are reconstructed from proof-carrying binding evidence.",
+    "publicationAdmissionSourceRemovalHostMatcherCount": "A13d structural matcher/unifier dependencies. Designed as zero.",
+    "publicationAdmissionSourceRemovalForgedControlCount": "A13d reversed role/value proof witness attached to the original target; it must fail exact target reconstruction.",
+    "publicationAdmissionSourceRemovalIndependentMemoryCount": "Independent source Memories with unrelated allocation noise required to export byte-identical A13d authority."
   },
   "nextExperiments": [
-    "Execute A13c publication/admission witness; promote only after full CI proves explicit admission, ambiguity rejection, singleton-without-admission rejection and freeze stability.",
-    "A13d/E3 source-removal: represent/reconstruct the admission-link interpretation law itself from MTS evidence without re-encoding root->candidate semantics in host code.",
-    "F5 SELF_GENERATED-DEFINITION must publish generated definitions through explicit A13c-style admission authority; mere unique generation is not enough.",
-    "Then reassess E3 formation/admissibility and E4 orchestration independently before any FULL_SELF_HOSTED claim."
+    "Execute A13d admission source-removal witness; promote only after direct/inverse method authorities pass through one resolver with zero admission-target decomposition and zero matcher dependency.",
+    "If A13d is GREEN, classify the admission-specific E3 relation-shape law as replaced by the generic A11g proof-binding/orientation substrate; keep global E3 open for authority/profile selection and generic verifier execution.",
+    "F5 SELF_GENERATED-DEFINITION: construct a new portable definition through MTS/frontier semantics and publish it only through explicit A13c/A13d admission evidence; unique generation alone is insufficient.",
+    "Then measure remaining generic FORMAL E2 services and audit E3/E4 closure separately before any FULL_SELF_HOSTED claim."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3638,6 +3649,56 @@
       },
       "evidenceTest": "ts/test/research-v013-publication-admission-a13c.test.ts",
       "consequence": "Scoped research demonstrates that publication cardinality/order and semantic admission are distinct. Frozen Link evidence can authorize one candidate while preserving provenance and fail-closed ambiguity/absence. The generic admission-link interpretation law is still host-defined, so global E3/source removal remains open."
+    },
+    "publicationAdmissionSourceRemovalA13d": {
+      "status": "DESIGNED_NOT_EXECUTED",
+      "currentResult": "NOT_RUN",
+      "question": "Can the A13c admission-specific root->candidate host law be eliminated by reducing publication admission to the already-grounded generic proof-carrying two-role Link binding plus a selected method-Link orientation?",
+      "genericLaw": [
+        "verify proof-carrying binding for each selected admission target without decomposing that target",
+        "verify proof-carrying binding for selected method Link",
+        "derive FROM/TO role orientation from the method binding",
+        "for each verified admission target, candidate = value(TO) iff value(FROM) equals selected resolution root",
+        "intersect admitted candidates with the explicit publication frontier",
+        "require exactly one admitted extensional candidate and preserve all of its frontier occurrences"
+      ],
+      "directionControls": [
+        "Direct method + target rootA->PA must admit PA",
+        "Inverse method + target PA->rootA must admit PA under the same resolver",
+        "no admission-specific start/end branch may exist in the resolver"
+      ],
+      "a13cRegression": [
+        "double direct admission of PA/PB rejects ambiguity",
+        "no selected admission rejects divergent frontier",
+        "singleton PZ without admission rejects authorization",
+        "converged PZ with explicit proof-bound admission preserves two provenance occurrences",
+        "late ambient admission target without frozen proof witness is ignored"
+      ],
+      "antiCheat": [
+        "admission resolver performs zero poles()/find() target operations",
+        "proof verifier reconstructs exact target identity from carried role values",
+        "no structural-unification/matchStructuralTemplate/StructuralRoleMorphism",
+        "reversed forged role/value witness fails closed",
+        "direction is selected by method Link data, not host boolean/switch"
+      ],
+      "residualBoundary": [
+        "generic proof-carrying binding verifier remains host-executed",
+        "generic method-role interpretation/equality remains host-executed",
+        "selected authority/profile remains externally supplied",
+        "therefore this removes the admission-specific E3 law but does not close global E3"
+      ],
+      "observed": {
+        "directAdmission": null,
+        "inverseAdmission": null,
+        "a13cRegression": null,
+        "targetDecompositionReads": 0,
+        "hostMatchers": 0,
+        "forgedWitnessRejected": null,
+        "independentMemories": 2,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-admission-source-removal-a13d.test.ts",
+      "consequence": "Pending execution. GREEN would show that publication admission needs no independent root->candidate semantic primitive: it is one use of the generic method-oriented proof-carrying Link relation already established by A11g."
     }
   }
 }
