@@ -508,10 +508,7 @@ function exercise(artifact: Artifact): void {
     "A16-F4 converged provenance ignores scheduler order",
   );
 
-  // Generic application construction is not semantic authority.
-  // EA/event3 was not one of the frozen selected applications. A16-F4 creates
-  // the Link anyway, but because no selected continuation starts there the
-  // resulting call truth must evaluate to ZERO.
+  // Generic application without selected continuation yields ZERO.
   {
     const onlyEA = resolveFlatBundle(r.memory, Object.freeze([
       Object.freeze({
@@ -531,9 +528,7 @@ function exercise(artifact: Artifact): void {
       "A16-F4 unknown application contributes no provenance");
   }
 
-  // Event is data/truth, not a host control parameter. An unrelated event
-  // may be linked to K, but it has no effect unless that truth occurrence is
-  // explicitly supplied to pair actualization and continuation authority exists.
+  // Ambient event truth is inert unless selected by request production.
   const unrelatedEvent = r.memory.ensure(n.event1!, n.EZ!);
   r.memory.ensure(n.K!, unrelatedEvent);
   const firstAgain = propagateCallTruth(
@@ -549,8 +544,7 @@ function exercise(artifact: Artifact): void {
   setSame(stateEnds(r, firstAgain), [n.EA!, n.EB!],
     "A16-F4 ambient event truth outside selected operand frontier ignored");
 
-  // Supplying both a meaningful and an unknown event truth is allowed as data.
-  // Only the application with selected continuation authority contributes result.
+  // Unknown requested event branches remain continuation-governed.
   const mixedEventTruth = resolveFlatBundle(r.memory, Object.freeze([
     ...event1Truth.occurrences,
     Object.freeze({
@@ -568,8 +562,7 @@ function exercise(artifact: Artifact): void {
   setSame(stateEnds(r, mixedResult), [n.EA!, n.EB!],
     "A16-F4 unknown contextual event branch yields no semantic result");
 
-  // Operand selection authority is carried by request Links. Merely creating
-  // another request in ambient Memory does not affect the selected request frontier.
+  // Ambient request outside selected request frontier is inert.
   const startTruthLink = [...start.links][0]!;
   const event1TruthLink = [...event1Truth.links][0]!;
   const unrelatedTruthLink = r.memory.ensure(n.K!, unrelatedEvent);
@@ -585,8 +578,7 @@ function exercise(artifact: Artifact): void {
   setSame(stateEnds(r, firstSelectedAgain), [n.EA!, n.EB!],
     "A16-F4 late ambient pair request outside frontier ignored");
 
-  // A selected request whose two witnesses belong to different contexts is
-  // structurally malformed and must fail closed.
+  // Cross-context selected request fails closed.
   const otherContext = r.memory.ensure(n.K!, n.EZ!);
   const foreignTruth = r.memory.ensure(otherContext, n.event1!);
   const malformedRequest = r.memory.ensure(startTruthLink, foreignTruth);
@@ -602,12 +594,11 @@ function exercise(artifact: Artifact): void {
     "A16-F4 cross-context request rejected",
   );
 
-  // Empty request authority produces no calls.
   const emptyRequests = resolveFlatBundle(r.memory, Object.freeze([]));
   const emptyCalls = executePairRequests(r.memory, n.K!, emptyRequests);
   same(emptyCalls.links.size, 0, "A16-F4 absent pair request yields ZERO");
 
-  // A physical transition added after freeze must remain semantically inert.
+  // Late ambient transition is inert.
   const app = r.memory.ensure(n.EB!, n.event2!);
   const bogus = r.memory.ensure(n.event1!, n.EZ!);
   r.memory.ensure(app, bogus);
@@ -618,7 +609,7 @@ function exercise(artifact: Artifact): void {
   setSame(stateEnds(r, afterAmbient), [n.EC!, n.ED!],
     "A16-F4 late ambient transition ignored");
 
-  // A physical contextual truth not carried by the explicit frontier is inert.
+  // Ambient truth outside the explicit frontier is inert.
   r.memory.ensure(n.K!, bogus);
   const afterAmbientTruth = propagateCallTruth(
     r.memory, n.K!, secondCallsForward, r.transitions,
