@@ -30,7 +30,8 @@
     "formalKernelAuditComplete": true,
     "formalKernelSelfExtensionProven": false,
     "rootAspectSourceRemovalFalsifierComplete": true,
-    "rootAspectSemanticSourceReconstructionMethodProven": true
+    "rootAspectSemanticSourceReconstructionMethodProven": true,
+    "formalKernelSelfExtensionFalsifierComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -822,7 +823,8 @@
     "formalKernelHostDefinedSemanticLawCount": 3,
     "formalKernelSelfExtensionWitnessCount": 0,
     "rootAspectSourceRemovalPositiveVectorCount": 8,
-    "rootAspectSourceRemovalNegativeControlCount": 3
+    "rootAspectSourceRemovalNegativeControlCount": 3,
+    "formalKernelSelfExtensionAttemptCount": 4
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -862,21 +864,20 @@
     "selfGeneratedOrReconstructedSemanticArtifactCount": "Still UNMEASURED until the E2 kernel-source removal/reconstruction falsifier defines and exercises a semantic-artifact accounting scope. Do not infer zero merely from the current host-source inventory.",
     "externallyGeneratedSemanticArtifactCount": "Still UNMEASURED until the E2 kernel-source removal/reconstruction falsifier defines and exercises a semantic-artifact accounting scope. Host semantic-source law families are counted separately by hostSemanticSourceDefinitionCount.",
     "formalKernelHostDefinedSemanticLawCount": "Scoped count of FORMAL semantic-law families in the current v0.13 evaluator that remain HOST_DEFINED in the E2 authority inventory: operator grounding, prefix composition and plan materialization.",
-    "formalKernelSelfExtensionWitnessCount": "Executable witnesses in which a previously unknown named FORMAL form is defined as MTS/Link evidence and then used in an independent Memory without adding host grammar/parser/evaluator semantic branches.",
+    "formalKernelSelfExtensionWitnessCount": "Successful executable witnesses in which a previously unknown named FORMAL form is defined as MTS/Link evidence and then used in an independent Memory without adding host grammar/parser/evaluator semantic branches.",
     "rootAspectSourceRemovalPositiveVectorCount": "E2-F1 positive targets classified by the frozen portable Link-template authority without invoking/reimplementing the production root-aspect switch: four basis targets, U as an ordinary pair target, and three non-basis generic targets.",
-    "rootAspectSourceRemovalNegativeControlCount": "E2-F1 negative authority controls: missing template admission, extra ordinary-pair admission causing ambiguity, and post-freeze live authority mutation distinguished by the frozen portable revision."
+    "rootAspectSourceRemovalNegativeControlCount": "E2-F1 negative authority controls: missing template admission, extra ordinary-pair admission causing ambiguity, and post-freeze live authority mutation distinguished by the frozen portable revision.",
+    "formalKernelSelfExtensionAttemptCount": "Independent F-KERNEL-SELF-EXTENSION executions: two Memories for a new physical name aliasing an existing structural operator plus two Memories for a new named semantic form outside the four admitted operator signs."
   },
   "nextExperiments": [
-    "Measure/falsify the residual generic E2 boundary exposed by E2-F1: self-incidence comparison, non-self-pole role extraction and generic structural unification. Do not call the scoped reconstruction method full self-hosting.",
-    "Decide through RED-first evidence whether the E2-F1 Link-template reconstruction can replace the production root-aspect decomposition source without weakening existing v0.13 behavior; do not rewrite production merely because the research method is GREEN.",
-    "F-KERNEL-SELF-EXTENSION: RED-first test of a previously unknown named form defined and interpreted from portable MTS/Link evidence under an unchanged host kernel.",
-    "Apply source-removal discipline to proof meta-semantics (template matching, derivation replay, recursive identity and rooted Proof Aset replay) before any global SELF_GENERATED_OR_RECONSTRUCTED claim.",
-    "After E2 and FORMAL-kernel accounting/reconstruction experiments, audit E3 formation/admissibility authority separately.",
+    "FORMAL F2: derive the minimal missing self-extension operation from MTS-native evidence without adding a second ontology primitive. Separate name/definition authority, operator/application semantics and physical spelling; do not assume they are one operation.",
+    "FORMAL F2 must be RED-first: a new name/form plus interpretation rule must be portable across two Memories and consumed by an unchanged form-agnostic host kernel; storing the expected result in Links for host comparison is a failure.",
+    "Measure/falsify the residual generic E2 boundary exposed by E2-F1: self-incidence comparison, non-self-pole role extraction and generic structural unification.",
+    "Decide through RED-first evidence whether the E2-F1 Link-template reconstruction can replace the production root-aspect decomposition source without weakening existing v0.13 behavior.",
+    "Apply source-removal discipline to proof meta-semantics before any global SELF_GENERATED_OR_RECONSTRUCTED claim.",
+    "After E2 and FORMAL-kernel reconstruction experiments, audit E3 formation/admissibility authority separately; preserve the frozen-authority lesson that live adjacency is not admission.",
     "After E3, audit E4 orchestration/fixed-point/scheduling/resource authority separately.",
-    "Refine host/Link duplication from candidate overlap to confirmed semantic-equivalence duplication.",
-    "Run proof-driven and fault-injection per-bootstrap-capability elimination experiments only after the relevant runtime path coverage; failed removal remains UNKNOWN.",
-    "Run the bounded 2^8 joint subset/minimal-basis experiment after single-capability elimination.",
-    "Build a v0.12 -> v0.13 delta only for metrics measured under the same schema and scope."
+    "Refine host/Link duplication from candidate overlap to confirmed semantic-equivalence duplication."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -2187,7 +2188,7 @@
     ],
     "selfExtensionFalsifier": {
       "id": "F-KERNEL-SELF-EXTENSION",
-      "status": "DESIGNED_NOT_EXECUTED",
+      "status": "EXECUTED_RED_FIXED_KERNEL",
       "question": "Can a frozen minimal FORMAL kernel define a previously unknown named form and its interpretation authority entirely as portable MTS/Link evidence, then use that form in an independent Memory without adding a host semantic branch?",
       "failConditions": [
         "the new form receives semantic authority from a host enum/string/opcode",
@@ -2204,7 +2205,29 @@
         "malformed/forged definitions and uses fail closed",
         "frozen verifier/generator authority remains unchanged"
       ],
-      "currentResult": "NOT_RUN"
+      "currentResult": "RED: under the unchanged production FORMAL evaluator, a fixture-only candidate given prebuilt Dictionary, Grammar, fixed Theory and admitted Rule evidence for a previously unknown source name still cannot extend the language. A new spelling for an existing structural operator is rejected as noncanonical-spelling; a new named semantic form outside the four root representatives is rejected as operator-meaning-mismatch. The same exact failures reproduce in two independent Memories.",
+      "evidenceTest": "ts/test/research-v013-formal-kernel-self-extension-f1.test.ts",
+      "attemptCount": 4,
+      "successfulWitnessCount": 0,
+      "independentMemoryCount": 2,
+      "redFindings": [
+        "Public v0.13 consumer surface intentionally does not export Dictionary mutation, Rule admission or Act producer authority.",
+        "replayDefinitionEffect is the read-only replay alias of replayColonEffect; it validates an already materialized definition effect and does not create one.",
+        "Even granting fixture-only producer authority ahead of evaluation, a previously unknown physical name mapped to an existing structural sign is rejected by the fixed canonical spelling map.",
+        "Even granting fixture-only Dictionary/Grammar/Theory/Rule evidence, a previously unknown semantic form is rejected because operator grounding admits only the four root representatives R/O/C/L as operator signs.",
+        "Therefore the current fixed prefix evaluator can consume authorized evidence only inside its already-known operator kernel; it does not yet provide MTS-native language self-extension."
+      ],
+      "exactBlockers": [
+        "ts/src/v013-formal-aspect-evaluator.ts#operatorAspect: requires decomposition.sign === tag, admitting only the four root representatives as operators",
+        "ts/src/v013-formal-aspect-evaluator.ts#canonicalByte: fixes physical spelling to 8/9/6/1 after meaning resolution",
+        "ts/src/v013-formal-aspect-evaluator.ts#parsePlan: fixes arity/composition to ROOT/START/END/PAIR",
+        "ts/src/v013-formal-aspect-evaluator.ts#materializePlan: fixes semantic construction to the same four cases",
+        "ts/src/public.ts: producer authority construction remains intentionally internal",
+        "ts/src/interpreter.ts#replayColonEffect: definition replay is verification, not definition materialization"
+      ],
+      "nextRequiredCapability": "An MTS-native, portable and frozen-authority mechanism by which FORMAL evidence can declare a new name/form plus its interpretation/application rule, and a form-agnostic host kernel can subsequently consume it without adding a semantic branch or canonical-byte case.",
+      "productionChanged": false,
+      "consequence": "F-KERNEL-SELF-EXTENSION is currently falsified for the existing fixed FORMAL kernel. This is evidence of a concrete missing capability, not evidence that self-extension is impossible in MTS. Full FORMAL self-description and FULL_SELF_HOSTED remain prohibited claims."
     },
     "limitations": [
       "This audit does not require textual self-proof; it measures whether semantic source/notation authority can be expressed and extended inside MTS.",
