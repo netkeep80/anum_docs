@@ -367,13 +367,10 @@ function exercise(noise:boolean):void{
     same(memory.poles(next).end,expected,"A29 derived authority execution");truth=next;
   }
   same(metaStep(memory,truth),undefined,"A29 terminal ZERO");
-  // Ambient alternative target history is inert because it is not selected.
   targetHistoryDescriptor(memory,target.metaParent,[target.E0,target.E1,target.E2,target.E3]);
   const afterAmbient=runInventory(memory,rule,inventory,targetDescriptor);
   same(afterAmbient.compatibleCount,2,"A29 ambient target history ignored");
   same(afterAmbient.candidate,out.candidate,"A29 ambient target history preserves target");
-  // A selected target history mixing execution roots from different contexts
-  // must fail structurally before any source template is instantiated.
   const malformedTarget=targetHistoryDescriptor(memory,target.metaParent,[
     target.E0,source1.E1,target.E2,target.E3,target.E4,
   ]);
@@ -381,7 +378,6 @@ function exercise(noise:boolean):void{
     ()=>{runInventory(memory,rule,inventory,malformedTarget);},
     "A29 mixed-context selected target history rejected",
   );
-  // Late ambient compatible source candidate remains inert outside inventory.
   producerTemplate(
     memory,source3.metaParent,[source3.E0,source3.E1,source3.E2,source3.E3,source3.E4],
   );
