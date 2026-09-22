@@ -83,7 +83,9 @@
     "seedCorrespondenceCompressionF5F6Complete": true,
     "explicitPerLinkSeedPairsRemoved": true,
     "sourceCorrespondenceDerivationF5F7Complete": true,
-    "externalPrefixSequencePreparationRemoved": true
+    "externalPrefixSequencePreparationRemoved": true,
+    "templateSelectionConvergenceF5F8Complete": true,
+    "hostSelectedTemplateHandleRemoved": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1033,7 +1035,12 @@
     "sourceCorrespondenceDerivationF5F7DerivedUniqueSeedCount": 23,
     "sourceCorrespondenceDerivationF5F7MappedLinkCount": 142,
     "sourceCorrespondenceDerivationF5F7SourceFieldBranchCount": 0,
-    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": 2
+    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": 2,
+    "templateSelectionConvergenceF5F8FrontierSize": 2,
+    "templateSelectionConvergenceF5F8SuccessfulInstantiationCount": 2,
+    "templateSelectionConvergenceF5F8DistinctPublicationCount": 1,
+    "templateSelectionConvergenceF5F8HostTemplateIdentityBranchCount": 0,
+    "templateSelectionConvergenceF5F8IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1233,14 +1240,19 @@
     "sourceCorrespondenceDerivationF5F7DerivedUniqueSeedCount": "Unique template->target seed mappings after request zip plus structurally derived rooted-prefix correspondence.",
     "sourceCorrespondenceDerivationF5F7MappedLinkCount": "Total memoized template->target mappings after closure-complete authority instantiation.",
     "sourceCorrespondenceDerivationF5F7SourceFieldBranchCount": "Source/STRING/request-index specific branches in the structural deep-START selector. Target zero.",
-    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": "Independent Memories required to reproduce byte-identical target topology under the same single request correspondence."
+    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": "Independent Memories required to reproduce byte-identical target topology under the same single request correspondence.",
+    "templateSelectionConvergenceF5F8FrontierSize": "Number of independently valid closure-complete generated authority templates frozen in the F5-F8 candidate frontier.",
+    "templateSelectionConvergenceF5F8SuccessfulInstantiationCount": "Frontier templates that independently instantiate toward the same selected target request and pass F5-F2 admission/name-resolution checks.",
+    "templateSelectionConvergenceF5F8DistinctPublicationCount": "Distinct target publication Link identities after all compatible templates instantiate in one Memory. One is extensional convergence.",
+    "templateSelectionConvergenceF5F8HostTemplateIdentityBranchCount": "q/s/template-identity-specific branches in the generic frontier runner. Target zero.",
+    "templateSelectionConvergenceF5F8IndependentMemoryCount": "Independent Memories replaying the full template frontier and required to obtain byte-identical topology."
   },
   "nextExperiments": [
-    "F5-F8: attack external request-correspondence selection. Derive target correspondence from a Link-native transformation/renaming request and the selected template, instead of supplying qRequest->rRequest as an already paired host-chosen Link.",
-    "F5-F8 should separate shared-context identity from true delta inputs: target physical name/source/function seeds are the intended delta; inherited argument/results/grammar/theory/syntax/direct-method context should be recovered by structure or template identity rather than repeated correspondence positions.",
-    "Then attack external template selection: choose a closure-complete authority exemplar through frozen structural signature/admission rather than a host-supplied template handle.",
-    "Preserve the F5-F5 authority-closure falsifier: publication alone remains insufficient unless its selected executable evidence closure is rooted/recoverable.",
-    "Keep global E2/E3/E4 and FULL_SELF_HOSTED open until request-delta and template-selection authority are reconstructed or proven irreducible."
+    "F5-F9: remove per-template externally materialized requestCorrespondence Links. Given each template package's request and one selected target request, derive the correspondence locally by generic equal-length ExactSequence pairing; require the same two-template convergence and exact reference topology.",
+    "F5-F9 must treat any temporary correspondence carrier as non-semantic execution scratch or avoid materializing it entirely; it must not become a hidden replacement for the removed authority.",
+    "After per-template correspondence removal, attack external frontier membership: discover admissible closure-complete template packages from a frozen authority set/signature rather than supplying the candidate frontier manually.",
+    "Separate target request construction from target request selection: identify the irreducible delta needed to name/source/function-seed a genuinely new definition versus inherited context that can be reconstructed.",
+    "Keep global E2/E3/E4 and FULL_SELF_HOSTED open until target-delta and authority-set discovery are source-removed or explicitly classified."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -4237,6 +4249,60 @@
         "independentMemories": 2,
         "externalTemplateSelection": true,
         "externalRequestCorrespondenceSelection": 1,
+        "semanticInformationEliminated": false,
+        "productionChanged": false
+      }
+    },
+    "templateSelectionConvergenceF5F8": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Is external selection of one specific closure-complete exemplar semantically necessary, or do multiple independently valid templates converge to one target authority when each is structurally corresponded to the same target request?",
+      "frozenFrontier": [
+        "q(a) generated/admitted/published closure-complete authority with qRequest",
+        "s(a) independently generated/admitted/published closure-complete authority from the same pre-extension base Dictionary/history with sRequest",
+        "one common target rRequest whose continuation context is q's post-generation Dictionary/history",
+        "one requestCorrespondence from qRequest to rRequest and one from sRequest to rRequest",
+        "two anonymous template packages in one ExactSequence frontier; no selected q/s template handle"
+      ],
+      "executionLaw": [
+        "iterate every template package without template-name dispatch",
+        "verify package requestCorrespondence starts at its template request and ends at the selected target request",
+        "instantiate closure-complete authority using the F5-F7 request zip + structural deep-START rooted-prefix derivation",
+        "require every produced candidate to pass frozen F5-F2 admission",
+        "require every produced target Dictionary to resolve the selected target physical name to the candidate function",
+        "require all successful template instantiations to converge to one target publication identity"
+      ],
+      "oracle": [
+        "full topology after applying the whole frontier must equal one independent domain-reference r(a) generation from the same frozen state",
+        "two independent frontier replay Memories must be byte-identical",
+        "both q and s templates must instantiate successfully",
+        "frontier runner source must contain no q/s template identity branch"
+      ],
+      "claimBoundary": [
+        "a GREEN result removes host selection of one specific template handle within the tested compatible frontier",
+        "frontier membership remains externally selected",
+        "the target request remains externally selected",
+        "each template package still carries an external request->target correspondence",
+        "semantic information is not claimed eliminated",
+        "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
+      ],
+      "evidenceTest": "ts/test/research-v013-template-selection-convergence-f5-f8.test.ts",
+      "consequence": "F5-F8 removes the need for a host-picked single template winner within the tested compatible frontier: q and s are extensionally confluent under the selected target request. This is stronger than heuristic template ranking. It does not remove external frontier membership, target-request selection, or per-template request correspondence; those remain the next source-authority boundary.",
+      "currentResult": "GREEN: two independently valid closure-complete self-generated authorities q(a) and s(a), both originating from the same pre-extension base context, are frozen in one anonymous template frontier. Each package carries its own request->rRequest correspondence, but the frontier runner contains no q/s template identity branch and host selects no template winner. Both templates instantiate successfully through the F5-F7 structural mapping path, both target candidates pass frozen F5-F2 admission and Dictionary name resolution, and both converge to exactly one target publication identity. The complete topology after running the full frontier equals one independent domain-reference r(a) generation byte-for-byte, and two replay Memories agree.",
+      "observed": {
+        "templateFrontierSize": 2,
+        "successfulTemplateInstantiations": 2,
+        "distinctTargetPublications": 1,
+        "hostSelectedTemplateHandle": false,
+        "requestCorrespondencePerTemplate": 1,
+        "structuralDeepStartCandidatesPerTemplate": 1,
+        "derivedPrefixPositionsPerTemplate": 5,
+        "topologyEqualsReference": true,
+        "frozenF5F2Admission": true,
+        "targetNameResolution": true,
+        "independentMemories": 2,
+        "externalTemplateFrontierMembership": true,
+        "externalTargetRequestSelection": true,
+        "externalRequestCorrespondence": true,
         "semanticInformationEliminated": false,
         "productionChanged": false
       }
