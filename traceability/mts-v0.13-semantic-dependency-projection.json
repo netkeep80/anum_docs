@@ -114,7 +114,8 @@
     "selfGeneratedMetaProducerAuthorityA24Complete": true,
     "metaAuthorityTemplateInstantiationA25Designed": true,
     "metaAuthorityTemplateInstantiationA25Complete": true,
-    "metaAuthorityTemplateConvergenceA26Designed": true
+    "metaAuthorityTemplateConvergenceA26Designed": true,
+    "metaAuthorityTemplateConvergenceA26Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1152,7 +1153,15 @@
     "metaAuthorityTemplateInstantiationA25DerivedSeedMappingCount": 7,
     "metaAuthorityTemplateInstantiationA25ExternalTemplateSelectionCount": 1,
     "metaAuthorityTemplateInstantiationA25ExternalSequenceCorrespondenceCount": 1,
-    "metaAuthorityTemplateInstantiationA25IndependentMemoryCount": 2
+    "metaAuthorityTemplateInstantiationA25IndependentMemoryCount": 2,
+    "metaAuthorityTemplateConvergenceA26TemplateFrontierSize": 2,
+    "metaAuthorityTemplateConvergenceA26SuccessfulInstantiationCount": 2,
+    "metaAuthorityTemplateConvergenceA26DistinctTargetCandidateCount": 1,
+    "metaAuthorityTemplateConvergenceA26DistinctTargetPublicationCount": 1,
+    "metaAuthorityTemplateConvergenceA26DistinctTargetMetaContextCount": 1,
+    "metaAuthorityTemplateConvergenceA26HostSelectedTemplateHandleCount": 0,
+    "metaAuthorityTemplateConvergenceA26CorrespondencePerTemplateCount": 1,
+    "metaAuthorityTemplateConvergenceA26IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1440,12 +1449,20 @@
     "metaAuthorityTemplateInstantiationA25DerivedSeedMappingCount": "Seed mappings available to generic topology instantiation including R->R plus six zipped source/target seed positions.",
     "metaAuthorityTemplateInstantiationA25ExternalTemplateSelectionCount": "Externally selected source producer-authority templates in A25. Current residual one.",
     "metaAuthorityTemplateInstantiationA25ExternalSequenceCorrespondenceCount": "Externally selected source/target seed sequence correspondences in A25. Current residual one.",
-    "metaAuthorityTemplateInstantiationA25IndependentMemoryCount": "Independent Memories reproducing A25 template instantiation/admission/publication/runtime behavior."
+    "metaAuthorityTemplateInstantiationA25IndependentMemoryCount": "Independent Memories reproducing A25 template instantiation/admission/publication/runtime behavior.",
+    "metaAuthorityTemplateConvergenceA26TemplateFrontierSize": "Independently valid compatible source producer-authority template packages executed by A26.",
+    "metaAuthorityTemplateConvergenceA26SuccessfulInstantiationCount": "Compatible frontier members that instantiate and pass frozen structural admission. Target equals frontier size.",
+    "metaAuthorityTemplateConvergenceA26DistinctTargetCandidateCount": "Canonical target producer-authority candidate identities after executing the full compatible frontier. Target one.",
+    "metaAuthorityTemplateConvergenceA26DistinctTargetPublicationCount": "Canonical Candidate->M publications after executing the full compatible frontier. Target one.",
+    "metaAuthorityTemplateConvergenceA26DistinctTargetMetaContextCount": "Canonical target M identities derived by all compatible template instantiations. Target one.",
+    "metaAuthorityTemplateConvergenceA26HostSelectedTemplateHandleCount": "Host-selected single source-template winner handles in the A26 frontier runner. Target zero.",
+    "metaAuthorityTemplateConvergenceA26CorrespondencePerTemplateCount": "External source-seed->target-seed correspondence declarations retained per template package. Current residual one.",
+    "metaAuthorityTemplateConvergenceA26IndependentMemoryCount": "Independent Memories reproducing A26 convergence behavior."
   },
   "nextExperiments": [
-    "A26: execute a two-template producer-authority frontier and require all compatible members to converge to one target candidate/publication/meta-context without host template selection.",
-    "If A26 is GREEN, A27 should attack external compatible-frontier membership: start from a broader frozen authority inventory and structurally discover which packages correspond to the selected target, while keeping incompatible/malformed packages fail-closed or excluded by explicit evidence.",
-    "A26 must preserve per-template correspondence as an explicit residual and must not add ranking/heuristic winner selection.",
+    "A27: remove externally prefiltered compatible-frontier membership. Freeze a broader producer-template inventory containing compatible and incompatible packages, then structurally discover the target-compatible subset from Link-carried evidence without template identity/name branches.",
+    "A27 must distinguish broad inventory membership from compatibility authority: incompatible inventory members must be excluded by structural correspondence evidence, malformed selected evidence must fail closed, and late ambient inventory additions must remain inert.",
+    "If A27 is GREEN, the next source boundary is external per-template correspondence / common target seed selection rather than template winner or compatible-frontier enumeration.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
@@ -5397,7 +5414,7 @@
       }
     },
     "metaAuthorityTemplateConvergenceA26": {
-      "status": "DESIGNED_PENDING_EXECUTION",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can host selection of one source producer-authority exemplar be removed by instantiating every member of a Link-carried compatible template frontier and requiring canonical convergence to one target candidate/publication/meta-context?",
       "setup": [
         "construct two independently valid source execution families with distinct producer-authority candidate identities",
@@ -5442,7 +5459,28 @@
         "this gate does not accept v0.13",
         "global E2/E3 and FULL_SELF_HOSTED remain open",
         "production runtime remains unchanged"
-      ]
+      ],
+      "consequence": "A26 removes host selection of one specific source producer-authority exemplar within the tested compatible frontier. Two independently valid source candidates with distinct identities are both instantiated through their own Link-carried seed correspondence, both pass the same frozen structural admission rule, and both converge canonically to one target candidate, one Candidate->M publication and one target meta-context M. The unchanged A23 metaStep executes that converged authority. External frontier membership and per-template correspondence remain source authority.",
+      "currentResult": "GREEN after one parser-only RED fixed without weakening the oracle: the selected frontier contains two independently valid source producer-authority packages and the generic runner executes both with no source1/source2/t1/t2 identity branch. Both instantiate successfully, both pass frozen structural admission, and canonical target identity converges to exactly one candidate, one publication and one M. Target producer authority was absent at freeze; unchanged A23 metaStep advances target E0..E4 then ZERO. A frontier containing one malformed correspondence package rejects fail-closed. Two independent Memories agree.",
+      "observed": {
+        "templateFrontierSize": 2,
+        "successfulTemplateInstantiations": 2,
+        "sourceTemplateCandidateIdentitiesDistinct": true,
+        "distinctTargetCandidates": 1,
+        "distinctTargetPublications": 1,
+        "distinctTargetMetaContexts": 1,
+        "hostSelectedTemplateHandle": false,
+        "targetAuthorityAbsentAtFreeze": true,
+        "correspondencePerTemplate": 1,
+        "frozenStructuralAdmission": "GREEN",
+        "unchangedA23MetaStep": true,
+        "malformedPackage": "REJECTS_FULL_FRONTIER",
+        "externalTemplateFrontierMembership": true,
+        "externalSequenceCorrespondence": true,
+        "semanticInformationEliminated": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     }
   }
 }
