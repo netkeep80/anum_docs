@@ -24,7 +24,9 @@
     "candidatePublicSemanticRuntimeProbeCoverageComplete": true,
     "candidatePublicSemanticFaultInjectionComplete": true,
     "proofVerifierRuntimeProbeCoverageComplete": true,
-    "proofVerifierFaultInjectionComplete": true
+    "proofVerifierFaultInjectionComplete": true,
+    "semanticSourceAuthorityInventoryComplete": true,
+    "semanticSourceReconstructionProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -808,7 +810,7 @@
     "boundedSelfProofObservedRuntimeSegmentCount": 28,
     "boundedSelfProofFaultInjectedOperationCount": 10,
     "boundedSelfProofEndToEndFailClosedOperationCount": 10,
-    "hostSemanticSourceDefinitionCount": null,
+    "hostSemanticSourceDefinitionCount": 19,
     "hostFormationAdmissibilityAuthorityCount": null,
     "hostOrchestrationAuthorityCount": null,
     "selfGeneratedOrReconstructedSemanticArtifactCount": null,
@@ -846,17 +848,18 @@
     "boundedSelfProofObservedRuntimeSegmentCount": "Distinct bounded-self-proof|entrypoint|direct-ts/src-caller|Memory-operation runtime segments.",
     "boundedSelfProofFaultInjectedOperationCount": "Observed bounded-self-proof Memory operation kinds denied one at a time at the real Memory boundary.",
     "boundedSelfProofEndToEndFailClosedOperationCount": "Observed bounded-self-proof Memory operation kinds whose denial makes the awaited self-proof reject end-to-end.",
-    "hostSemanticSourceDefinitionCount": "E2 host-side semantic source/generator authorities; intentionally UNMEASURED after SP7.",
+    "hostSemanticSourceDefinitionCount": "E2 scoped count of distinct semantic-law families whose defining interpretation law is still embodied by host TypeScript in the bounded self-proof + selected v0.13 candidate semantic slice. This is a law-family count, not a function/branch count and not a primitive count.",
     "hostFormationAdmissibilityAuthorityCount": "E3 host-side formation/admissibility authorities; intentionally UNMEASURED after SP7.",
     "hostOrchestrationAuthorityCount": "E4 host-side scheduling/fixed-point/termination/resource-control authorities; intentionally UNMEASURED after SP7.",
-    "selfGeneratedOrReconstructedSemanticArtifactCount": "Semantic executable artifacts demonstrably generated or reconstructed from internal MTS evidence rather than privileged host semantic source; UNMEASURED after SP7.",
-    "externallyGeneratedSemanticArtifactCount": "Semantic executable artifacts whose defining generator/source remains external to MTS; UNMEASURED after SP7."
+    "selfGeneratedOrReconstructedSemanticArtifactCount": "Still UNMEASURED until the E2 kernel-source removal/reconstruction falsifier defines and exercises a semantic-artifact accounting scope. Do not infer zero merely from the current host-source inventory.",
+    "externallyGeneratedSemanticArtifactCount": "Still UNMEASURED until the E2 kernel-source removal/reconstruction falsifier defines and exercises a semantic-artifact accounting scope. Host semantic-source law families are counted separately by hostSemanticSourceDefinitionCount."
   },
   "nextExperiments": [
-    "SP1-SP3: build the first bounded MTS-about-MTS Claim + rooted Proof Aset under an exact frozen Theory without theorem-name/opcode authority.",
-    "P1g-c: trace and hard-deny the actual self-proof replay witness, then compare its residual host boundary with the generic proof-verifier slice.",
+    "E2-F1: deny the host root-aspect source and attempt two-Memory reconstruction/revalidation of the ROOT/START/END/PAIR interpretation law from Link/MTS evidence without equivalent host reimplementation.",
+    "If E2-F1 establishes a valid reconstruction method, apply the same source-removal discipline to proof meta-semantics (template matching, derivation replay, recursive identity and rooted Proof Aset replay) before any SELF_GENERATED_OR_RECONSTRUCTED claim.",
+    "After E2 accounting/reconstruction experiments, audit E3 formation/admissibility authority separately.",
+    "After E3, audit E4 orchestration/fixed-point/scheduling/resource authority separately.",
     "Refine host/Link duplication from candidate overlap to confirmed semantic-equivalence duplication.",
-    "Integrate A10b into a witness-scoped self-hosting maturity matrix with explicit residual host capabilities.",
     "Run proof-driven and fault-injection per-bootstrap-capability elimination experiments only after the relevant runtime path coverage; failed removal remains UNKNOWN.",
     "Run the bounded 2^8 joint subset/minimal-basis experiment after single-capability elimination.",
     "Build a v0.12 -> v0.13 delta only for metrics measured under the same schema and scope."
@@ -1835,6 +1838,259 @@
       "E3 formation/admissibility authority is not measured here.",
       "E4 orchestration/fixed-point/resource-control authority is not measured here.",
       "Full self-hosting and global runtime trust closure remain unclaimed."
+    ]
+  },
+  "semanticSourceAuthorityAudit": {
+    "status": "inventory-complete-reconstruction-falsifier-pending",
+    "scope": "S_E2_P2: semantic-source laws required by the bounded self-proof verifier semantics plus the selected v0.13 root-aspect/relative-form/FORMAL candidate paths named by #1270",
+    "boundaryClass": "E2-semantic-source-kernel-generation-authority",
+    "countUnit": "semantic-law-family",
+    "classificationScale": [
+      "HOST_DEFINED",
+      "LINK_REPRESENTED_ONLY",
+      "LINK_VALIDATED",
+      "LINK_INTERPRETED",
+      "LINK_EXECUTED",
+      "LINK_RECONSTRUCTED"
+    ],
+    "countingRule": "Count one authority family per distinct semantic law, even when several TypeScript functions implement it. Representation-only spelling/serialization, caches, traversal memoization, resource guards and pure Memory E1 operations do not create additional E2 source authorities.",
+    "currentFinding": "All inventoried meta-interpretation/candidate semantic laws still derive their operative meaning from host TypeScript. Link artifacts carry Rules, Theory, proof topology, source evidence and aspect/form evidence, but no inventoried law is yet reconstructed from Link structure strongly enough to survive removal of its host semantic source.",
+    "authorityFamilies": [
+      {
+        "id": "root-basis-topology-law",
+        "area": "foundation-root-basis",
+        "owners": [
+          "ts/src/memory.ts#verifyRootBasis"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "R/O/C/L/U are Links with explicit topology, but host code still defines which exact topology constitutes the accepted RootBasis."
+      },
+      {
+        "id": "structural-template-matching-law",
+        "area": "proof-rule-semantics",
+        "owners": [
+          "ts/src/structural-rule.ts#matchStructuralTemplate"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Rule templates and declared roles are Links; host recursion defines placeholder substitution, grounded identity and self-incidence matching."
+      },
+      {
+        "id": "structural-rule-replay-law",
+        "area": "proof-rule-semantics",
+        "owners": [
+          "ts/src/structural-rule.ts#replayStructuralRule"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Interpreter/DR/Rule/admission/bindings are Link evidence; host sequencing defines how those structures become one accepted Rule replay."
+      },
+      {
+        "id": "structural-unification-law",
+        "area": "structural-matching-unification",
+        "owners": [
+          "ts/src/structural-unification.ts#unifyStructuralTemplate"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Roles/template/claim are Links; host recursion defines unification and binding consistency."
+      },
+      {
+        "id": "structural-substitution-law",
+        "area": "structural-matching-unification",
+        "owners": [
+          "ts/src/structural-substitution.ts#inferStructuralSubstitution"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Constraints and roles refer to Links; host recursion defines multi-constraint substitution inference."
+      },
+      {
+        "id": "structural-derivation-replay-law",
+        "area": "proof-rule-semantics",
+        "owners": [
+          "ts/src/derivation.ts#replayStructuralDerivationCore",
+          "ts/src/derivation.ts#replayStructuralTheorem",
+          "ts/src/derivation.ts#replayStructuralDerivationWithTheorems"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Judgments, occurrences, derivation rules, Theory and theorem identities are Links; host code defines dependency replay, cycle rejection and theorem expansion."
+      },
+      {
+        "id": "recursive-link-identity-proof-law",
+        "area": "proof-rule-semantics",
+        "owners": [
+          "ts/src/recursive-link-identity-proof.ts#replayRecursiveLinkIdentityProofClosure"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Identity claims and child proof occurrences are Links; host code defines FULL/START/END/ordinary decomposition and required recursive children."
+      },
+      {
+        "id": "rooted-proof-aset-replay-law",
+        "area": "proof-rule-semantics",
+        "owners": [
+          "ts/src/rooted-proof-aset.ts#replayStructuralRootedProofAset"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "The rooted Proof Aset and dependencies are Links; host code defines reachable proof membership, identity-vs-structural claim resolution and closure replay."
+      },
+      {
+        "id": "source-result-coupling-law",
+        "area": "source-rule-result-authority",
+        "owners": [
+          "ts/src/v012-source.ts#replayV012SourceResultEvidence"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Source uses, Dictionary/Grammar/Theory, Act attachments and Rule bindings are Links; host code defines the cross-evidence equality/coupling that makes them one semantic result."
+      },
+      {
+        "id": "root-aspect-decomposition-law",
+        "area": "root-aspect-reconstruction",
+        "owners": [
+          "ts/src/v013-hierarchical-carrier.ts#decomposeVerifiedSemanticLink"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Self-incidence is directly present in Link poles, but host branching still assigns ROOT/START/END/PAIR and R/O/C/L sign roles."
+      },
+      {
+        "id": "relative-unary-form-law",
+        "area": "relative-aspect-semantics",
+        "owners": [
+          "ts/src/v013-relative-pole-context.ts#readRelativeUnaryForm",
+          "ts/src/v013-relative-pole-context.ts#resolveUnaryForm"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "The proper self-incidence form is a Link; host code turns its incidence orientation into START/END side and pole selection."
+      },
+      {
+        "id": "relative-pole-context-law",
+        "area": "relative-aspect-semantics",
+        "owners": [
+          "ts/src/v013-relative-pole-context.ts#materializeRelativePoleContext",
+          "ts/src/v013-relative-pole-context.ts#readRelativePoleContext"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Position/context evidence is materialized as Links; host code defines how that topology is constructed, read and checked against the selected pole."
+      },
+      {
+        "id": "authorized-unary-materialization-law",
+        "area": "candidate-semantic-materialization",
+        "owners": [
+          "ts/src/v013-relative-form-materialization.ts#materializeAuthorizedRelativeUnaryFormSource"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "The proved request is a Link, but host code interprets Use->Current versus Current->Use and dispatches START/END self-closure materialization."
+      },
+      {
+        "id": "authorized-binary-materialization-law",
+        "area": "candidate-semantic-materialization",
+        "owners": [
+          "ts/src/v013-relative-form-materialization.ts#materializeAuthorizedBinaryLinkSource"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "The proved construction request is Link topology, but host code extracts operands, rejects collapsing aliases and dispatches ordinary-pair materialization."
+      },
+      {
+        "id": "authorized-relative-pole-source-law",
+        "area": "relative-aspect-semantics",
+        "owners": [
+          "ts/src/v013-relative-pole-execution.ts#requireUnaryOperation",
+          "ts/src/v013-relative-pole-execution.ts#readCurrentPosition",
+          "ts/src/v013-relative-pole-execution.ts#executeAuthorizedRelativePoleSource"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Source/Rule/current-context/operation evidence is Link-grounded; host code defines the coupling from the proved operation to the current semantic position."
+      },
+      {
+        "id": "relative-pole-transition-law",
+        "area": "relative-aspect-semantics",
+        "owners": [
+          "ts/src/v013-relative-pole-execution.ts#executePoleForm"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Current position and unary form are Link-grounded, but host code defines descend-versus-return transition behavior."
+      },
+      {
+        "id": "formal-operator-grounding-law",
+        "area": "formal-aspect-semantics",
+        "owners": [
+          "ts/src/v013-formal-aspect-evaluator.ts#operatorAspect"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Operator meaning is selected through source/Rule evidence and a Link tag, but host code requires the exact root representative and maps it through the aspect decomposition."
+      },
+      {
+        "id": "formal-prefix-composition-law",
+        "area": "formal-aspect-semantics",
+        "owners": [
+          "ts/src/v013-formal-aspect-evaluator.ts#parsePlan",
+          "ts/src/v013-formal-aspect-evaluator.ts#samePlan",
+          "ts/src/v013-formal-aspect-evaluator.ts#verifyCanonicalPlan"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "Grounded aspects originate in Link evidence; host code still defines arity/prefix composition and canonical PAIR alias rejection."
+      },
+      {
+        "id": "formal-plan-materialization-law",
+        "area": "formal-aspect-semantics",
+        "owners": [
+          "ts/src/v013-formal-aspect-evaluator.ts#materializePlan"
+        ],
+        "currentClassification": "HOST_DEFINED",
+        "linkEvidence": "The parsed semantic plan is host data; host code dispatches ROOT/START/END/PAIR to concrete Link materialization."
+      }
+    ],
+    "classificationCounts": {
+      "HOST_DEFINED": 19,
+      "LINK_REPRESENTED_ONLY": 0,
+      "LINK_VALIDATED": 0,
+      "LINK_INTERPRETED": 0,
+      "LINK_EXECUTED": 0,
+      "LINK_RECONSTRUCTED": 0
+    },
+    "representationOnlyExclusions": [
+      "ts/src/v013-formal-aspect-evaluator.ts#canonicalByte",
+      "ts/src/v013-hierarchical-carrier.ts#serializeV013HierarchicalCarrier",
+      "ts/src/v013-hierarchical-carrier.ts#materializeV013HierarchicalCarrier",
+      "ts/src/v012-string-anum.ts#readV012StringAnum",
+      "ts/src/canonical-topology.ts#exportCanonicalTopology",
+      "ts/src/persistence-topology.ts#restoreTopology"
+    ],
+    "deferredBoundaries": {
+      "E3": "Formation/admissibility decisions such as exact Theory membership, malformed proof/object rejection and admission policy are intentionally not counted as E2 closure here.",
+      "E4": "Scheduling, fixed-point, search, termination and resource-control authority are intentionally not counted as E2 closure here."
+    },
+    "kernelSourceRemovalFalsifier": {
+      "id": "E2-F1-root-aspect-source-removal",
+      "targetAuthority": "root-aspect-decomposition-law",
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Can ROOT/START/END/PAIR interpretation for an unknown semantic Link be reconstructed and revalidated from Link structure plus fixed MTS evidence after the host-side root-aspect semantic source is denied?",
+      "denyOwners": [
+        "ts/src/v013-hierarchical-carrier.ts#decomposeVerifiedSemanticLink",
+        "ts/src/v013-hierarchical-carrier.ts#decomposeV013SemanticLink"
+      ],
+      "allowedExternalBoundary": [
+        "E1 Memory operations already measured by the relevant runtime slice",
+        "frozen verifier/source authority artifacts selected independently of the candidate",
+        "generic replay machinery only when it does not contain an equivalent ROOT/START/END/PAIR host branch"
+      ],
+      "failConditions": [
+        "the test or replacement runtime re-encodes the same self-incidence-to-aspect switch in host code",
+        "a host enum/string/byte/opcode selects ROOT/START/END/PAIR semantics",
+        "reconstruction depends on sender-local LinkHandles or mutable ambient context",
+        "the candidate can modify the verifier/generator authority that validates its reconstruction"
+      ],
+      "passConditions": [
+        "the denied host semantic source is not invoked or reimplemented",
+        "an explicit Link/MTS-evidence artifact reconstructs the interpretation law",
+        "the reconstructed artifact is portable across two independent Memories without sender-local IDs",
+        "generic replay of that artifact validates positive ROOT/START/END/PAIR witnesses and rejects malformed/forged controls",
+        "the independently frozen verifier/generator authority remains unchanged"
+      ],
+      "currentResult": "NOT_RUN",
+      "consequence": "E2 remains open; no SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claim is permitted."
+    },
+    "limitations": [
+      "This is a scoped semantic-source inventory, not a proof that no E2 authority exists elsewhere in ts/src.",
+      "The count is intentionally by semantic-law family rather than functions, branches, tests or named primitives.",
+      "LINK_REPRESENTED data is not upgraded merely because host code validates or executes it; the semantic interpretation law itself must move into/reconstruct from MTS evidence.",
+      "No authority family has yet passed kernel-source removal/reconstruction, so this audit does not close E2."
     ]
   }
 }
