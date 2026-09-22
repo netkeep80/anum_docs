@@ -89,7 +89,9 @@
     "contextualTruthDynamicDualityA16Designed": true,
     "contextualTruthDynamicDualityA16Complete": true,
     "contextualTruthMetaFrontierA16F1Designed": true,
-    "contextualTruthMetaFrontierA16F1Complete": true
+    "contextualTruthMetaFrontierA16F1Complete": true,
+    "genericCallActualizationA16F2Designed": true,
+    "genericCallActualizationA16F2Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1058,7 +1060,13 @@
     "contextualTruthMetaFrontierA16F1ConvergenceOccurrenceCount": 2,
     "contextualTruthMetaFrontierA16F1HostSemanticPrimitiveCount": 0,
     "contextualTruthMetaFrontierA16F1CallPreparationHostResidualCount": 1,
-    "contextualTruthMetaFrontierA16F1IndependentMemoryCount": 2
+    "contextualTruthMetaFrontierA16F1IndependentMemoryCount": 2,
+    "genericCallActualizationA16F2SelectedApplicationLookupCount": 0,
+    "genericCallActualizationA16F2UnknownApplicationResultCount": 0,
+    "genericCallActualizationA16F2ConvergenceDistinctTruthLinkCount": 1,
+    "genericCallActualizationA16F2ConvergenceOccurrenceCount": 2,
+    "genericCallActualizationA16F2ExternalEventInputCount": 1,
+    "genericCallActualizationA16F2IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1277,10 +1285,18 @@
     "contextualTruthMetaFrontierA16F1ConvergenceOccurrenceCount": "Proof/provenance occurrences retained at the one canonical K->EZ truth Link. Target two.",
     "contextualTruthMetaFrontierA16F1HostSemanticPrimitiveCount": "Host active/isTrue/currentValue/modusPonens/event/state/applicationFor/find/outgoing/incoming/switch semantic primitives inside the A16 transition kernel. Target zero.",
     "contextualTruthMetaFrontierA16F1CallPreparationHostResidualCount": "Explicit residual host operation class that maps K->State plus Event to selected State->Event application and materializes K->Application.",
-    "contextualTruthMetaFrontierA16F1IndependentMemoryCount": "Independent canonical Memories reproducing the contextual meta-frontier result."
+    "contextualTruthMetaFrontierA16F1IndependentMemoryCount": "Independent canonical Memories reproducing the contextual meta-frontier result.",
+    "genericCallActualizationA16F2SelectedApplicationLookupCount": "Selected-application list/coordinate lookup operations in A16-F2 call actualization. Target zero.",
+    "genericCallActualizationA16F2UnknownApplicationResultCount": "Semantic results produced by a generically constructed State->Event application that has no selected Application->Next continuation. Target zero.",
+    "genericCallActualizationA16F2ConvergenceDistinctTruthLinkCount": "Distinct extensional K->EZ truth Links after generic-call A13-equivalent convergence. Target one.",
+    "genericCallActualizationA16F2ConvergenceOccurrenceCount": "Provenance occurrences retained at the converged K->EZ truth Link. Target two.",
+    "genericCallActualizationA16F2ExternalEventInputCount": "Explicit external input classes remaining in call actualization after selected application lookup removal. Event is one input class, not yet source-removed.",
+    "genericCallActualizationA16F2IndependentMemoryCount": "Independent canonical Memories reproducing generic application construction and contextual continuation behavior."
   },
   "nextExperiments": [
-    "A16-F2: remove selected-application lookup from call preparation. Given contextual truth K->State and external Event, construct the application generically as Application=ensure(State,Event), then actualize K->Application with the same L/context-link operation; require transition semantics to remain identical.",
+    "A16-F3: classify Event as input/data rather than host semantic authority. Represent event occurrence itself as contextual linkage and test whether call actualization can be expressed entirely as Link-native composition/combination of contextual truth rather than an external control parameter.",
+    "A16-F3 must distinguish unavoidable external input from semantic interpretation: receiving an Event may remain exogenous, but deciding what State->Event means must not be host code.",
+    "After A16-F3, reconnect the dynamic execution line to F5 source-authority reduction and reassess the remaining E2/E3 boundary.",
     "A16-F2 must show that an arbitrary constructed State->Event Link has no semantic effect unless selected Application->NextState continuation authority exists; this separates generic application construction from semantic authority.",
     "After A16-F2, reassess whether external Event selection is genuine irreducible input rather than semantic host authority, and only then connect this execution line back to F5 source-authority reduction.",
     "A16-F1 must preserve selected-authority isolation: physical but unselected Links must remain semantically inert, and newly derived K->B truth Links may enter only the explicit next execution frontier.",
@@ -4451,6 +4467,61 @@
         "ambientTruthOutsideFrontierIgnored": true,
         "hostSemanticPrimitives": 0,
         "callPreparationHostResiduals": 1,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "genericCallActualizationA16F2": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A16-F1's selected State->Event application lookup be removed entirely, constructing Application generically as ensure(State,Event) and actualizing contextual truth K->Application, while leaving semantic authority solely in selected Application->Next continuations?",
+      "setup": [
+        "reuse the A16-F1 contextual truth frontier K->State",
+        "remove applicationCoordinates and selected-application lookup from replay",
+        "for each contextual K->State plus external Event, construct Application=ensure(State,Event)",
+        "construct K->Application as contextual truth of the call",
+        "execute results only through selected Application->Next continuation Links using the unchanged A16 propagation law"
+      ],
+      "oracle": [
+        "reproduce the A13/A16-F1 first split, local termination, second split and convergence behavior",
+        "forward/reverse scheduling remains equivalent",
+        "a newly constructed State->Event application that has no selected continuation authority evaluates to ZERO",
+        "late ambient Application->Next transition remains inert when not in selected transition authority",
+        "ambient K->State outside explicit frontier remains inert",
+        "two independent canonical Memories agree"
+      ],
+      "antiCheat": [
+        "call actualization kernel may not inspect an applications list or applicationCoordinates",
+        "call actualization kernel may not use find/filter/outgoing/incoming/switch to select an application",
+        "transition propagation kernel retains the A16-F1 prohibition on host active/isTrue/currentValue/modusPonens/event/state/applicationFor/find/outgoing/incoming/switch semantics"
+      ],
+      "residualAuthority": [
+        "external Event remains an explicit input to call actualization",
+        "selected Application->Next continuation authority remains explicit",
+        "no claim is made yet that Event selection/input is derived from Link-native authority"
+      ],
+      "evidenceTest": "ts/test/research-v013-generic-call-actualization-a16-f2.test.ts",
+      "claimBoundary": [
+        "GREEN would remove selected-application lookup as semantic host authority",
+        "generic construction of Application does not itself imply semantic validity; no selected continuation means ZERO",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ],
+      "consequence": "A16-F2 removes selected State->Event application lookup from the tested meta-interpreter call path. Given contextual truth K->State and external Event, the application is generically constructed as the Link State->Event and actualized as K->Application. Semantic authority remains solely in the selected Application->Next continuation relation: constructing an otherwise unknown application produces ZERO. This sharpens the author's (∞->∞)->∞ formulation: the inner Link can be constructed generically; contextual truth plus the outer continuation drives execution.",
+      "currentResult": "GREEN: the A13/A16-F1 frontier corpus reproduces unchanged after deleting applicationCoordinates and any selected-application lookup from replay/call preparation. Each call actualizes Application=ensure(State,Event) and K->Application directly. First fan-out, local termination, second fan-out, convergence to one K->EZ with two provenance occurrences, schedule equivalence, ambient-transition isolation and ambient-truth isolation all hold. A generically constructed EA->event3 application with no selected continuation authority returns ZERO. Call actualization contains zero applications/applicationCoordinates/find/filter/outgoing/incoming/switch selection primitives. External Event remains explicit input.",
+      "observed": {
+        "selectedApplicationLookup": false,
+        "genericApplicationConstruction": "STATE_TO_EVENT",
+        "unknownApplicationWithoutContinuation": "ZERO",
+        "initialFanout": 2,
+        "secondFanout": 2,
+        "localTermination": true,
+        "convergenceDistinctTruthLinks": 1,
+        "convergenceOccurrences": 2,
+        "scheduleOrderEquivalent": true,
+        "lateAmbientTransitionIgnored": true,
+        "ambientTruthOutsideFrontierIgnored": true,
+        "externalEventInput": true,
         "independentMemories": 2,
         "productionChanged": false
       }
