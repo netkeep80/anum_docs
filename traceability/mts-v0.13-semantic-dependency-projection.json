@@ -123,7 +123,8 @@
     "linkNativeTargetHistoryA29Designed": true,
     "linkNativeTargetHistoryA29Complete": true,
     "contextualGenerationRequestA30Designed": true,
-    "contextualGenerationRequestA30Complete": true
+    "contextualGenerationRequestA30Complete": true,
+    "generationRequestOccurrenceA31Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1504,9 +1505,9 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A31: remove host selection of the current generation-request truth T by carrying request occurrence/history as Link authority; do not execute every target merely linked to G.",
-    "A31 must preserve immutable request truth and distinguish selected occurrence from ambient alternative G->Target truths.",
-    "If A31 is GREEN, attack publication/membership of the broad source inventory and current meta-occurrence selection as separate remaining source boundaries.",
+    "A31: execute Link-native generation-request occurrence selection. Keep immutable G->Target truths and let selected occurrence ancestry choose the current request.",
+    "If A31 is GREEN, attack external selection of the current request occurrence without introducing latest-write-wins; prefer one higher-level Link execution root/history authority.",
+    "A31 must keep inventory publication/source and current meta-occurrence selection as separate residual boundaries.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
@@ -5777,6 +5778,48 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "generationRequestOccurrenceA31": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A30's direct host selection of current request truth T=G->TargetHistory be removed by selecting one Link-native request occurrence whose ancestry preserves immutable contextual request truths?",
+      "setup": [
+        "retain A30 generation context G=RequestParent->Inventory and immutable request truths T_i=G->TargetHistory_i",
+        "represent request selection/history as occurrence ancestry O0=R->T0, O1=O0->T1",
+        "semantic runner receives one selected request occurrence Link, not a request-truth/target/inventory argument",
+        "walk selected occurrence ancestry and require all carried request truths to share one generation context G",
+        "use only the truth carried by the selected occurrence as the current target request"
+      ],
+      "oracle": [
+        "current request-truth argument count is zero and selected request-occurrence input count is one",
+        "T1 may already exist in Memory while selecting O0 still executes only T0",
+        "selecting O1 switches execution to target2 and yields a distinct generated candidate/meta-context",
+        "old T0 remains physically true after O1 selection",
+        "occurrence ancestry crossing from G to another generation context rejects fail-closed",
+        "an occurrence whose END is not a contextual request truth rejects fail-closed",
+        "A29 source/target structural derivation and exact unchanged A23 metaStep remain intact",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "runner signature contains requestOccurrence only; no direct requestTruth/target/inventory argument",
+        "current request truth is read only from the selected occurrence END",
+        "occurrence ancestry is validated back to R and must keep one generation context",
+        "runner contains no find/outgoing/incoming/allLinks/switch ambient selector",
+        "A31 preserves inherited A29 source/target anti-cheat guards and source-identical A23 metaStep"
+      ],
+      "residualAuthority": [
+        "the current request occurrence itself remains externally selected",
+        "inventory membership/publication and target-history construction/publication remain externally sourced",
+        "current meta-execution occurrence selection remains explicit",
+        "generic topology/rule interpreters remain host executed"
+      ],
+      "evidenceTest": "ts/test/research-v013-generation-request-occurrence-a31.test.ts",
+      "claimBoundary": [
+        "GREEN would remove direct current-T selection and replace it with Link-native occurrence authority",
+        "GREEN would not remove selection of which occurrence is current",
+        "truth remains monotonic: old G->Target Links are not retracted",
+        "this gate does not accept v0.13; global E2/E3 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
