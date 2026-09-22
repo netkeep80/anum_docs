@@ -62,7 +62,9 @@
     "metaInterpreterMaterializingConcurrencyProven": false,
     "materializingBranchesA13bComplete": true,
     "materializingBranchesPhysicalThreadSafetyProven": false,
-    "competingPublicationAutoMergeProven": false
+    "competingPublicationAutoMergeProven": false,
+    "publicationAdmissionA13cComplete": true,
+    "publicationAdmissionSourceRemovalProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -950,7 +952,13 @@
     "materializingConvergedPublicationDistinctCount": 1,
     "materializingConvergedPublicationOccurrenceCount": 2,
     "materializingPhysicalConcurrencyPrimitiveCount": 0,
-    "materializingIndependentAuthorityCount": 2
+    "materializingIndependentAuthorityCount": 2,
+    "publicationAdmissionProfileCount": 4,
+    "publicationAdmissionNegativeControlCount": 3,
+    "publicationAdmissionCandidateOrderVariantCount": 2,
+    "publicationAdmissionConvergedOccurrenceCount": 2,
+    "publicationAdmissionHostPriorityCount": 0,
+    "publicationAdmissionIndependentAuthorityCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1088,14 +1096,19 @@
     "materializingConvergedPublicationDistinctCount": "A13b convergence control where two branch plans independently materialize the same publication Link.",
     "materializingConvergedPublicationOccurrenceCount": "A13b convergence control preserves two write/provenance occurrences for one exact publication Link.",
     "materializingPhysicalConcurrencyPrimitiveCount": "Promise/Worker/async/threading primitives in A13b semantic materialization executor. Designed as zero; test concerns schedule commutativity, not physical thread safety.",
-    "materializingIndependentAuthorityCount": "Independent source Memories with unrelated noise required to export byte-identical frozen materialization plan authority."
+    "materializingIndependentAuthorityCount": "Independent source Memories with unrelated noise required to export byte-identical frozen materialization plan authority.",
+    "publicationAdmissionProfileCount": "A13c frozen publication authority profiles: admit-A, admit-both, admit-none and admit-converged-Z.",
+    "publicationAdmissionNegativeControlCount": "A13c negative controls: ambiguous double admission, no admission for divergent frontier, and singleton candidate without admission.",
+    "publicationAdmissionCandidateOrderVariantCount": "A13c divergent candidate frontier is evaluated in forward and reversed occurrence order with identical selected result.",
+    "publicationAdmissionConvergedOccurrenceCount": "A13c exact-convergence publication PZ preserves two branch provenance occurrences after explicit admission.",
+    "publicationAdmissionHostPriorityCount": "Insertion-order/last-writer-wins/first-candidate priority rules in the A13c resolver. Zero.",
+    "publicationAdmissionIndependentAuthorityCount": "Independent source Memories with unrelated noise that must export byte-identical frozen admission authority."
   },
   "nextExperiments": [
-    "Execute A13b materializing-branches witness; promote only after full CI proves canonical schedule commutativity and explicit publication ambiguity handling.",
-    "A13c/E3: represent publication/admission resolution itself as frozen MTS evidence; do not introduce implicit last-writer-wins or host priority.",
-    "F5 SELF_GENERATED-DEFINITION must use A13/A13b branch semantics if definition generation materializes multiple candidates.",
-    "Measure/classify remaining generic FORMAL E2 services and then audit E3/E4 independently.",
-    "Physical parallel executor/thread safety is an implementation benchmark after semantic commutativity, not a foundation acceptance criterion."
+    "Execute A13c publication/admission witness; promote only after full CI proves explicit admission, ambiguity rejection, singleton-without-admission rejection and freeze stability.",
+    "A13d/E3 source-removal: represent/reconstruct the admission-link interpretation law itself from MTS evidence without re-encoding root->candidate semantics in host code.",
+    "F5 SELF_GENERATED-DEFINITION must publish generated definitions through explicit A13c-style admission authority; mere unique generation is not enough.",
+    "Then reassess E3 formation/admissibility and E4 orchestration independently before any FULL_SELF_HOSTED claim."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3576,6 +3589,55 @@
       },
       "evidenceTest": "ts/test/research-v013-materializing-branches-a13b.test.ts",
       "consequence": "Scoped research supports semantic schedule commutativity for monotone branch-local Link/Context materialization at canonical topology level. Canonical write convergence does not grant publication/admission authority: distinct publication roots remain an explicit E3/E4 ambiguity. Actual parallel Memory thread safety, transactions and linearizability remain implementation questions."
+    },
+    "publicationAdmissionA13c": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "currentResult": "GREEN: divergent publication frontier {PA,PB} is resolved only by explicit frozen admission evidence; admit(PA) selects PA independent of candidate occurrence order, double admission is rejected as ambiguous, no-admission is rejected, and even singleton {PZ} is rejected without admission. Explicit admit(PZ) preserves both convergence provenance occurrences. A late live root->PB admission after freeze is ignored.",
+      "question": "Can branch publication be resolved only from explicitly frozen MTS Link admission evidence, so candidate uniqueness/order never substitutes for semantic authorization?",
+      "authorityShape": [
+        "selected resolution root is a Link",
+        "each frozen admission evidence Link has shape ResolutionRoot⟼Candidate",
+        "resolver receives the exact frozen admission list; it does not scan live outgoing(root)",
+        "candidate frontier remains BundleValue with provenance occurrences"
+      ],
+      "designedPositive": [
+        "{PA,PB} + frozen admit(PA) -> PA",
+        "reversing candidate occurrence order still -> PA",
+        "{PZ} with two provenance occurrences + frozen admit(PZ) -> PZ with both occurrences preserved"
+      ],
+      "designedNegative": [
+        "{PA,PB} + frozen admit(PA),admit(PB) -> reject ambiguity",
+        "{PA,PB} + no admission -> reject unauthorized",
+        "singleton {PZ} + no admission -> reject: uniqueness does not grant admission"
+      ],
+      "freezeControl": "A live ResolutionRoot⟼PB Link added after authority selection must not alter the exact frozen admit(PA) verdict.",
+      "ontologyBoundary": [
+        "admission is not candidate cardinality",
+        "admission is not insertion order",
+        "admission is not last-writer-wins",
+        "admission evidence is ordinary Link data under a selected frozen authority",
+        "A13c does not make publication/admission a new ontology primitive"
+      ],
+      "residualBoundary": [
+        "host still interprets the selected admission Link shape root⟼candidate",
+        "host still intersects exact candidate identities with frozen admissions",
+        "authority profile selection itself remains external",
+        "therefore global E3/source removal is not proven"
+      ],
+      "observed": {
+        "selectA": true,
+        "reverseOrderStable": true,
+        "ambiguousDoubleAdmissionRejected": true,
+        "noAdmissionRejected": true,
+        "singletonWithoutAdmissionRejected": true,
+        "convergedPublicationOccurrences": 2,
+        "lateAmbientAdmissionIgnored": true,
+        "hostPriorityCount": 0,
+        "independentAuthorities": 2,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-publication-admission-a13c.test.ts",
+      "consequence": "Scoped research demonstrates that publication cardinality/order and semantic admission are distinct. Frozen Link evidence can authorize one candidate while preserving provenance and fail-closed ambiguity/absence. The generic admission-link interpretation law is still host-defined, so global E3/source removal remains open."
     }
   }
 }
