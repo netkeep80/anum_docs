@@ -2227,7 +2227,9 @@
       ],
       "nextRequiredCapability": "An MTS-native, portable and frozen-authority mechanism by which FORMAL evidence can declare a new name/form plus its interpretation/application rule, and a form-agnostic host kernel can subsequently consume it without adding a semantic branch or canonical-byte case.",
       "productionChanged": false,
-      "consequence": "F-KERNEL-SELF-EXTENSION is currently falsified for the existing fixed FORMAL kernel. This is evidence of a concrete missing capability, not evidence that self-extension is impossible in MTS. Full FORMAL self-description and FULL_SELF_HOSTED remain prohibited claims."
+      "consequence": "F-KERNEL-SELF-EXTENSION is currently falsified for the existing fixed FORMAL kernel. This is evidence of a concrete missing capability, not evidence that self-extension is impossible in MTS. Full FORMAL self-description and FULL_SELF_HOSTED remain prohibited claims.",
+      "baselineGuardTest": "ts/test/research-v013-formal-kernel-self-extension-a9.test.ts",
+      "baselineGuardStatus": "advanced from DESIGNED_NOT_EXECUTED to EXECUTED_RED_FIXED_KERNEL in the same transaction"
     },
     "limitations": [
       "This audit does not require textual self-proof; it measures whether semantic source/notation authority can be expressed and extended inside MTS.",
