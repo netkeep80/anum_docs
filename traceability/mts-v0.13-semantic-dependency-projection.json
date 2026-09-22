@@ -79,7 +79,9 @@
     "genericConstructionRuntimeDomainSourceRemovalProven": true,
     "templateInstantiationF5F5Complete": true,
     "externalConstructionPlanCompilerRemoved": true,
-    "publicationOnlyTemplateClosureComplete": false
+    "publicationOnlyTemplateClosureComplete": false,
+    "seedCorrespondenceCompressionF5F6Complete": false,
+    "explicitPerLinkSeedPairsRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1015,7 +1017,13 @@
     "templateInstantiationF5F5EndSelfCloneCount": 0,
     "templateInstantiationF5F5FullSelfCloneCount": 0,
     "templateInstantiationF5F5IndependentMemoryCount": 2,
-    "templateInstantiationF5F5ExplicitSeedCorrespondenceCount": 25
+    "templateInstantiationF5F5ExplicitSeedCorrespondenceCount": 25,
+    "seedCorrespondenceCompressionF5F6ExplicitPerLinkPairCount": null,
+    "seedCorrespondenceCompressionF5F6SequenceSourceCount": null,
+    "seedCorrespondenceCompressionF5F6ZippedPositionCount": null,
+    "seedCorrespondenceCompressionF5F6DerivedUniqueSeedCount": null,
+    "seedCorrespondenceCompressionF5F6MappedLinkCount": null,
+    "seedCorrespondenceCompressionF5F6IndependentMemoryCount": null
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1201,7 +1209,13 @@
     "templateInstantiationF5F5EndSelfCloneCount": "Template Links instantiated by generic END self-closure detected only from source Link self-incidence.",
     "templateInstantiationF5F5FullSelfCloneCount": "Template Links instantiated as full self-closure/root detected only from source Link self-incidence.",
     "templateInstantiationF5F5IndependentMemoryCount": "Independent fresh Memories instantiating the same admitted template and frozen seed correspondences.",
-    "templateInstantiationF5F5ExplicitSeedCorrespondenceCount": "Explicit frozen source-template -> target seed correspondences required before generic recursion. Twenty-five is the measured residual external correspondence authority in F5-F5."
+    "templateInstantiationF5F5ExplicitSeedCorrespondenceCount": "Explicit frozen source-template -> target seed correspondences required before generic recursion. Twenty-five is the measured residual external correspondence authority in F5-F5.",
+    "seedCorrespondenceCompressionF5F6ExplicitPerLinkPairCount": "Explicit frozen individual template-Link -> target-Link seed pairs in F5-F6. Target zero.",
+    "seedCorrespondenceCompressionF5F6SequenceSourceCount": "Frozen Link-native sequence-correspondence declarations consumed by the generic zipper. Designed corpus: generation-request pair and source-prefix-sequence pair.",
+    "seedCorrespondenceCompressionF5F6ZippedPositionCount": "Total positional correspondences read by generic equal-length ExactSequence zip across all selected correspondence sources.",
+    "seedCorrespondenceCompressionF5F6DerivedUniqueSeedCount": "Unique template-Link -> target-Link mappings derived after deduplicating zipped positional correspondences.",
+    "seedCorrespondenceCompressionF5F6MappedLinkCount": "Total memoized template->target Link mappings after recursive full-authority instantiation, including derived seeds plus reconstructed Links.",
+    "seedCorrespondenceCompressionF5F6IndependentMemoryCount": "Independent fresh Memories required to produce byte-identical target topology from the same frozen sequence-correspondence authority."
   },
   "nextExperiments": [
     "F5-F6: attack the 25 external seed correspondences. Partition them into identity/shared-context, derivable-by-structure, and genuinely externally selected mappings; reconstruct every derivable correspondence from the two Link-carried requests/template evidence and measure the irreducible remainder.",
@@ -4095,6 +4109,39 @@
         "semanticInformationEliminated": false,
         "productionChanged": false
       }
+    },
+    "seedCorrespondenceCompressionF5F6": {
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Can F5-F5's 25 individually prepared seed correspondences be eliminated by deriving them generically from a small number of Link-native equal-length sequence correspondences?",
+      "frozenCorrespondenceSources": [
+        "template q generation-request ExactSequence paired with target r generation-request ExactSequence",
+        "template q source-prefix ExactSequence paired with target r source-prefix ExactSequence",
+        "the runtime receives no explicit individual qLink->rLink seed-pair list"
+      ],
+      "genericZipLaw": [
+        "for each selected correspondence-source Link, read its start/end as templateSequence/targetSequence",
+        "read both ExactSequences and require identical cardinality",
+        "zip positions in order and add sourceLink->targetLink mapping",
+        "duplicate template keys must map to the same target Link or fail closed",
+        "feed the derived mapping into unchanged F5-F5 generic topology recursion"
+      ],
+      "oracle": [
+        "complete canonical topology must equal the same domain-reference r(a) generation from the frozen state",
+        "two independent generic replay Memories must agree byte-for-byte",
+        "candidate must still pass frozen F5-F2 admission",
+        "final Dictionary must still resolve r to the generated candidate function"
+      ],
+      "negativeControl": "replace the target source-prefix sequence with a shorter ExactSequence inside one correspondence source; equal-length zip must reject before template cloning",
+      "claimBoundary": [
+        "explicit per-Link seed correspondence authority is targeted for removal",
+        "selection of two correspondence-source sequence pairs remains external",
+        "source-prefix sequences are still prepared using the inherited source reader before freeze",
+        "template selection remains external",
+        "semantic information is compressed into structural correspondence sources, not claimed eliminated",
+        "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
+      ],
+      "evidenceTest": "ts/test/research-v013-seed-correspondence-compression-f5-f6.test.ts",
+      "consequence": "Pending CI. GREEN would reduce the residual F5-F5 source boundary from 25 hand-prepared Link pairs to two Link-native sequence-correspondence declarations consumed by a domain-agnostic positional zipper."
     }
   }
 }
