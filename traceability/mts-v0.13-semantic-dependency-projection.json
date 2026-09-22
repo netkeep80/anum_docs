@@ -98,7 +98,8 @@
     "linkCarriedPairRequestA16F4Complete": true,
     "applicationClosedFrontierA17Designed": true,
     "applicationClosedFrontierA17Complete": true,
-    "linkCarriedContinuationAuthorityA18Designed": true
+    "linkCarriedContinuationAuthorityA18Designed": true,
+    "linkCarriedContinuationAuthorityA18Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1092,7 +1093,12 @@
     "applicationClosedFrontierA17SemanticKernelEnsureForms": 1,
     "applicationClosedFrontierA17ConvergenceDistinctTruthLinkCount": 1,
     "applicationClosedFrontierA17ConvergenceOccurrenceCount": 2,
-    "applicationClosedFrontierA17IndependentMemoryCount": 2
+    "applicationClosedFrontierA17IndependentMemoryCount": 2,
+    "linkCarriedContinuationAuthorityA18HostTransitionArrayParameterCount": 0,
+    "linkCarriedContinuationAuthorityA18AmbientContinuationFires": 0,
+    "linkCarriedContinuationAuthorityA18AmbientAlternativeAuthorityFires": 0,
+    "linkCarriedContinuationAuthorityA18ForeignContextAuthorityAccepted": 0,
+    "linkCarriedContinuationAuthorityA18IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1336,12 +1342,18 @@
     "applicationClosedFrontierA17SemanticKernelEnsureForms": "Distinct Memory.ensure forms inside A17 semantic step. Exactly one is allowed: ensure(context, consequent) for propagated truth.",
     "applicationClosedFrontierA17ConvergenceDistinctTruthLinkCount": "Distinct extensional K->Z truth Links after two application branches converge. Target one.",
     "applicationClosedFrontierA17ConvergenceOccurrenceCount": "Provenance occurrences retained at the converged K->Z truth. Target two.",
-    "applicationClosedFrontierA17IndependentMemoryCount": "Independent Memories reproducing the application-closed frontier behavior."
+    "applicationClosedFrontierA17IndependentMemoryCount": "Independent Memories reproducing the application-closed frontier behavior.",
+    "linkCarriedContinuationAuthorityA18HostTransitionArrayParameterCount": "Host-selected transition-array parameters consumed by the A18 semantic kernel. Target zero.",
+    "linkCarriedContinuationAuthorityA18AmbientContinuationFires": "Ambient A->B continuations outside the selected Link-carried authority that affect execution. Target zero.",
+    "linkCarriedContinuationAuthorityA18AmbientAlternativeAuthorityFires": "Ambient alternative authority roots that affect execution while K->Authority remains selected. Target zero.",
+    "linkCarriedContinuationAuthorityA18ForeignContextAuthorityAccepted": "Authority truth witnesses rooted in a different context that are accepted by A18. Target zero.",
+    "linkCarriedContinuationAuthorityA18IndependentMemoryCount": "Independent Memories reproducing the Link-carried continuation authority behavior."
   },
   "nextExperiments": [
-    "A18: execute Link-carried continuation authority. Replace A17 host transition array with one selected contextual authority truth K->Authority and require identical application-closed frontier behavior.",
-    "If A18 is GREEN, source-remove host selection of K->Authority by carrying execution authority together with the contextual frontier in Link data, or deriving it from already selected program authority, without granting ambient Memory authority.",
-    "After A18, reconnect application-closed execution with F5 self-generated authority/template convergence and reassess E2/E3.",
+    "A19: carry selected continuation authority inside the execution context K itself, so the semantic step needs no separate K->Authority argument. Preserve K->A as contextual truth and derive Authority structurally from K.",
+    "A19 must preserve ambient-authority isolation and fail closed if K does not carry a structurally valid selected authority.",
+    "After A19, attack the remaining host Bundle frontier representation/selection without treating every K-linked truth as simultaneously executable.",
+    "Then reconnect the application-closed execution line with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A17-F1: connect application-closed continuation authority A->B to the F5 self-generated authority line. Ask whether the selected continuation relation itself can be generated/discovered from Link-carried authority without host semantic source.",
     "A17-F1 should preserve A17's one-law execution kernel unchanged; all further complexity belongs to authority generation/selection, not runtime detachment.",
     "Keep A16-F4 as an optional generic Link-synthesis mechanism, not a mandatory primitive of the minimal application-closed execution core.",
@@ -4750,7 +4762,7 @@
       }
     },
     "linkCarriedContinuationAuthorityA18": {
-      "status": "DESIGNED_PENDING_EXECUTION",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A17's host-supplied selected transition array be removed and replaced by one contextual Link-native continuation authority K->Authority, while preserving recursive generalized modus ponens and keeping ambient Memory semantically inert?",
       "setup": [
         "retain A17 application-closed frontier K->A",
@@ -4788,7 +4800,26 @@
         "this gate does not accept v0.13",
         "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
         "production runtime remains unchanged"
-      ]
+      ],
+      "consequence": "A18 removes A17's host-selected transition array from the tested application-closed semantic step. The selected continuation set is carried by one frozen Link authority root and its selection is itself contextual truth K->Authority. Recursive detachment preserves A17 split, local termination, convergence and ZERO behavior. Ambient continuations and alternative authority roots remain inert, foreign-context authority is rejected, and an explicitly selected empty authority yields ZERO. The remaining boundary is selection/injection of K->Authority itself.",
+      "currentResult": "GREEN: the semantic step receives Bundle<K->A> plus one LinkHandle authorityTruth, verifies authorityTruth is K->Authority, traverses only that frozen Link-carried authority closure, and materializes only K->B. No host transition-array parameter exists in the kernel. A0 branches to A1/A2; A1 terminates while A2 branches to A3/A4; A3/A4 converge to one K->Z with preserved provenance; terminal Z yields ZERO. Ambient A0->Z outside authority and ambient alternative authority roots are ignored. Foreign-context authority is rejected and empty selected authority returns ZERO. Two independent Memories agree.",
+      "observed": {
+        "hostTransitionArrayParameterCount": 0,
+        "authorityRepresentation": "LINK_CHAIN_TERMINATED_BY_R_RESEARCH_LOCAL",
+        "authoritySelection": "K_TO_AUTHORITY",
+        "firstFanout": 2,
+        "secondFanout": 2,
+        "localTermination": true,
+        "convergenceDistinctTruthLinks": 1,
+        "convergenceOccurrences": 2,
+        "ambientContinuationIgnored": true,
+        "ambientAlternativeAuthorityIgnored": true,
+        "foreignContextAuthority": "REJECTED",
+        "emptyAuthority": "ZERO",
+        "semanticKernelEnsureForms": 1,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     }
   }
 }
