@@ -802,7 +802,17 @@
     "observedProofVerifierMemoryOperationKindCount": 10,
     "observedProofVerifierRuntimeSegmentCount": 89,
     "proofVerifierFaultInjectedOperationCount": 10,
-    "proofVerifierEndToEndFailClosedOperationCount": 10
+    "proofVerifierEndToEndFailClosedOperationCount": 10,
+    "boundedSelfProofObservedEntrypointCount": 4,
+    "boundedSelfProofObservedMemoryOperationKindCount": 10,
+    "boundedSelfProofObservedRuntimeSegmentCount": 28,
+    "boundedSelfProofFaultInjectedOperationCount": 10,
+    "boundedSelfProofEndToEndFailClosedOperationCount": 10,
+    "hostSemanticSourceDefinitionCount": null,
+    "hostFormationAdmissibilityAuthorityCount": null,
+    "hostOrchestrationAuthorityCount": null,
+    "selfGeneratedOrReconstructedSemanticArtifactCount": null,
+    "externallyGeneratedSemanticArtifactCount": null
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -830,7 +840,17 @@
     "observedProofVerifierMemoryOperationKindCount": "Number of Memory operation kinds observed while a selected proof-verifier entrypoint is on the production call stack.",
     "observedProofVerifierRuntimeSegmentCount": "Distinct probe|verifier-entrypoint|direct-ts/src-caller|Memory-operation segments observed by the P1g-b corpus.",
     "proofVerifierFaultInjectedOperationCount": "Observed proof-verifier Memory operation kinds denied one at a time at the real Memory boundary.",
-    "proofVerifierEndToEndFailClosedOperationCount": "Observed proof-verifier Memory operation kinds for which denial propagates through the owning awaited proof probe and causes end-to-end rejection."
+    "proofVerifierEndToEndFailClosedOperationCount": "Observed proof-verifier Memory operation kinds for which denial propagates through the owning awaited proof probe and causes end-to-end rejection.",
+    "boundedSelfProofObservedEntrypointCount": "Tracked verifier/authority entrypoints actually observed while replaying the merged bounded MTS-about-MTS proof.",
+    "boundedSelfProofObservedMemoryOperationKindCount": "Memory operation kinds observed inside tracked entrypoint stacks for the bounded self-proof.",
+    "boundedSelfProofObservedRuntimeSegmentCount": "Distinct bounded-self-proof|entrypoint|direct-ts/src-caller|Memory-operation runtime segments.",
+    "boundedSelfProofFaultInjectedOperationCount": "Observed bounded-self-proof Memory operation kinds denied one at a time at the real Memory boundary.",
+    "boundedSelfProofEndToEndFailClosedOperationCount": "Observed bounded-self-proof Memory operation kinds whose denial makes the awaited self-proof reject end-to-end.",
+    "hostSemanticSourceDefinitionCount": "E2 host-side semantic source/generator authorities; intentionally UNMEASURED after SP7.",
+    "hostFormationAdmissibilityAuthorityCount": "E3 host-side formation/admissibility authorities; intentionally UNMEASURED after SP7.",
+    "hostOrchestrationAuthorityCount": "E4 host-side scheduling/fixed-point/termination/resource-control authorities; intentionally UNMEASURED after SP7.",
+    "selfGeneratedOrReconstructedSemanticArtifactCount": "Semantic executable artifacts demonstrably generated or reconstructed from internal MTS evidence rather than privileged host semantic source; UNMEASURED after SP7.",
+    "externallyGeneratedSemanticArtifactCount": "Semantic executable artifacts whose defining generator/source remains external to MTS; UNMEASURED after SP7."
   },
   "nextExperiments": [
     "SP1-SP3: build the first bounded MTS-about-MTS Claim + rooted Proof Aset under an exact frozen Theory without theorem-name/opcode authority.",
@@ -1718,5 +1738,103 @@
     ],
     "asyncProbeSettlementRevision": "awaited-v2",
     "asyncProbeOwnership": true
+  },
+  "selfProofRuntimeTrustAudit": {
+    "status": "bounded-self-proof-runtime-trace-with-fault-injection",
+    "scope": "S1+S3-proof-intersection",
+    "boundaryClass": "E1-execution-semantics",
+    "claimSet": "L_IDENTITY+U_IDENTITY",
+    "verifierTheoryRevision": "f9a72299b112c235c14ef230bcf3d6cac39069d12a7f633b0aac11dd68266675",
+    "instrumentation": "research-test-only Memory prototype wrappers around the already-merged bounded self-proof; the frozen verifier authority profile and proof witness are not modified",
+    "probeCorpus": [
+      "ts/test/research-v013-bounded-self-proof.test.ts"
+    ],
+    "verifierEntrypointCoverage": {
+      "declared": 4,
+      "observed": 4,
+      "missing": []
+    },
+    "observedMemoryOperations": [
+      "allLinks",
+      "ensure",
+      "ensureEndSelfClosed",
+      "ensureRoot",
+      "ensureStartSelfClosed",
+      "find",
+      "linkCount",
+      "outgoing",
+      "poles",
+      "root"
+    ],
+    "unobservedMemoryOperations": [
+      "incoming",
+      "issuanceIndex"
+    ],
+    "entrypointOperationMatrix": {
+      "exportPortableStructuralTheory": [
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ],
+      "replayPortableStructuralTheory": [
+        "allLinks",
+        "ensure",
+        "ensureEndSelfClosed",
+        "ensureRoot",
+        "ensureStartSelfClosed",
+        "linkCount",
+        "outgoing",
+        "poles",
+        "root"
+      ],
+      "replayRecursiveLinkIdentityProofAset": [
+        "linkCount",
+        "poles",
+        "root"
+      ],
+      "replayStructuralRootedProofAset": [
+        "find",
+        "linkCount",
+        "poles",
+        "root"
+      ]
+    },
+    "baselineOperationCallCountsInformationalOnly": {
+      "root": 200,
+      "linkCount": 52,
+      "poles": 860,
+      "find": 8,
+      "outgoing": 6,
+      "incoming": 0,
+      "issuanceIndex": 0,
+      "allLinks": 2,
+      "ensureRoot": 2,
+      "ensureStartSelfClosed": 6,
+      "ensureEndSelfClosed": 2,
+      "ensure": 22
+    },
+    "observedProductionSegmentCount": 28,
+    "segmentFingerprintFNV64": "686ddf11e6130e60",
+    "undocumentedObservedEntrypointCount": 0,
+    "undocumentedObservedMemoryOperationCount": 0,
+    "undocumentedObservedEntrypointOperationSegmentCount": 0,
+    "faultInjection": {
+      "method": "deny each Memory operation observed while a tracked self-proof verifier/authority entrypoint is on the production call stack; require the awaited bounded self-proof module to reject end-to-end",
+      "testedOperationCount": 10,
+      "endToEndFailClosedCount": 10,
+      "bypassCount": 0,
+      "classification": "corpus-scoped E1 execution-boundary evidence only; not semantic independence, E2 source-generation closure, E3 formation/admissibility closure, E4 orchestration closure, or mathematical minimality"
+    },
+    "globalRuntimePathCoverageComplete": false,
+    "globalTrustBoundaryComplete": false,
+    "limitations": [
+      "The audit covers only the merged L_IDENTITY/U_IDENTITY bounded self-proof witness under the frozen verifier Theory revision.",
+      "Memory-operation fault injection establishes concrete E1 execution-boundary dependence for this witness, not mathematical primitive independence.",
+      "E2 semantic-source/kernel-generation authority is not measured here.",
+      "E3 formation/admissibility authority is not measured here.",
+      "E4 orchestration/fixed-point/resource-control authority is not measured here.",
+      "Full self-hosting and global runtime trust closure remain unclaimed."
+    ]
   }
 }
