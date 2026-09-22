@@ -613,6 +613,10 @@ function staticBranchGuard():void{
   assert(start>=0&&end>start,"F4 generic receiver source slice");
   const kernel=source.slice(start,end);
   assert(!kernel.includes('"x"')&&!kernel.includes('"y"'),"F4 receiver has no x/y literals");
+  assert(
+    !kernel.includes('"b1"')&&!kernel.includes('"b2"')&&!kernel.includes('"b3"'),
+    "F4 receiver has no result-name literals",
+  );
   assert(!kernel.includes("switch ("),"F4 receiver has no form switch");
   assert(!kernel.includes("unifyStructuralTemplate"),"F4 receiver has no unifier");
   assert(!kernel.includes("canonicalByte"),"F4 receiver has no canonical-byte dispatch");
