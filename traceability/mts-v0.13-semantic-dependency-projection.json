@@ -103,7 +103,9 @@
     "contextCarriedContinuationAuthorityA19Designed": true,
     "contextCarriedContinuationAuthorityA19Complete": true,
     "linkNativeFrontierA20Designed": true,
-    "linkNativeFrontierA20Complete": true
+    "linkNativeFrontierA20Complete": true,
+    "singleExecutionRootA21Designed": true,
+    "singleExecutionRootA21Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1112,7 +1114,12 @@
     "linkNativeFrontierA20ConvergenceDistinctTruthLinkCount": 1,
     "linkNativeFrontierA20ConvergenceOccurrenceLinkCount": 2,
     "linkNativeFrontierA20HostPathArrayCount": 0,
-    "linkNativeFrontierA20IndependentMemoryCount": 2
+    "linkNativeFrontierA20IndependentMemoryCount": 2,
+    "singleExecutionRootA21SeparateContextParameterCount": 0,
+    "singleExecutionRootA21SeparateFrontierParameterCount": 0,
+    "singleExecutionRootA21ConvergenceDistinctTruthLinkCount": 1,
+    "singleExecutionRootA21ConvergenceOccurrenceLinkCount": 2,
+    "singleExecutionRootA21IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1371,12 +1378,18 @@
     "linkNativeFrontierA20ConvergenceDistinctTruthLinkCount": "Distinct canonical K->Z truth Links after converging branches. Target one.",
     "linkNativeFrontierA20ConvergenceOccurrenceLinkCount": "Distinct Link-native occurrence Links retaining the converged proof paths. Target two.",
     "linkNativeFrontierA20HostPathArrayCount": "Host provenance path arrays in the A20 semantic frontier representation. Target zero.",
-    "linkNativeFrontierA20IndependentMemoryCount": "Independent Memories reproducing Link-native frontier/provenance behavior."
+    "linkNativeFrontierA20IndependentMemoryCount": "Independent Memories reproducing Link-native frontier/provenance behavior.",
+    "singleExecutionRootA21SeparateContextParameterCount": "Separate context LinkHandle parameters consumed by the A21 semantic step. Target zero.",
+    "singleExecutionRootA21SeparateFrontierParameterCount": "Separate frontier LinkHandle parameters consumed by A21. Target zero.",
+    "singleExecutionRootA21ConvergenceDistinctTruthLinkCount": "Distinct canonical K->Z truth Links after converging branches under one-root execution. Target one.",
+    "singleExecutionRootA21ConvergenceOccurrenceLinkCount": "Distinct occurrence Links preserving the two converged proof paths. Target two.",
+    "singleExecutionRootA21IndependentMemoryCount": "Independent Memories reproducing the one-Link execution-root behavior."
   },
   "nextExperiments": [
-    "A21: combine current context K and selected Link-native frontier into one execution-root Link, so one Link identifies the complete executable state without separate host context/frontier selection.",
+    "A22: represent execution progression itself as Link-carried transition E_n->E_(n+1), and test contextual propagation of current-execution truth rather than host replacement of the current root.",
+    "A22 should distinguish immutable execution history from selection of the current execution root and must preserve branch/provenance semantics from A21.",
+    "After A22, reconnect single-root execution and execution-transition history with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A21 must preserve context-carried authority, occurrence ancestry, convergence multiplicity, ambient isolation and fail-closed structural validation.",
-    "After A21, test recursive execution-root replacement E_n -> E_{n+1} as a Link-native meta-interpreter state transition and reconnect it with F5 self-generated authority.",
     "A20 should use Link-native occurrence ancestry (for example ParentOccurrence->TruthWitness) and a frozen frontier carrier; it must not execute every truth merely linked to K.",
     "A20 must preserve first split, branch-local termination, convergence multiplicity, schedule equivalence, ambient-truth isolation and ZERO.",
     "A19 must preserve ambient-authority isolation and fail closed if K does not carry a structurally valid selected authority.",
@@ -4984,6 +4997,76 @@
         "foreignContextOccurrence": "REJECTED",
         "unwrappedFrontier": "REJECTED",
         "terminalFrontier": "ZERO",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "singleExecutionRootA21": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A20's separately supplied context K and Link-native frontier be combined into one execution-root Link E=K->Frontier, so one Link identifies the complete selected executable state and Step(E_n)=E_(n+1)?",
+      "setup": [
+        "retain A19 context-carried continuation authority",
+        "retain A20 Link-native frontier and occurrence ancestry provenance",
+        "define execution root E_n=K->Frontier_n",
+        "semantic step receives only memory, executionRoot and schedule",
+        "derive K from START(E_n) and selected frontier from END(E_n)",
+        "return E_(n+1)=K->Frontier_(n+1)"
+      ],
+      "oracle": [
+        "reproduce A20 first fan-out, local termination, recursive split and convergence",
+        "two converging occurrence paths retain one canonical K->Z truth Link and two occurrence Links",
+        "forward/reverse scheduling preserves provenance paths",
+        "terminal step returns one execution root whose frontier is ZERO and whose context remains K",
+        "ambient execution root is ignored unless selected as the step input",
+        "selected execution with foreign-context occurrence is rejected",
+        "selected execution with unwrapped frontier is rejected",
+        "selected execution whose START does not carry valid context authority is rejected",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "step signature has one executionRoot LinkHandle and no separate context/frontier parameters",
+        "kernel contains no BundleValue/ResolvedOccurrence/authorityTruth/transitions array/active/isTrue/currentValue/modusPonens/find/outgoing/incoming/switch primitive",
+        "K must be derived from START(executionRoot)",
+        "frontier must be derived from END(executionRoot)",
+        "next selected execution state must be returned as one Link K->NextFrontier"
+      ],
+      "residualAuthority": [
+        "the host/runtime still selects the current execution-root Link E_n",
+        "schedule order remains an external implementation choice",
+        "initial execution-root injection remains external",
+        "execution-root transition E_n->E_(n+1) is not yet itself represented/selected as a Link-carried transition",
+        "authority/frontier publication source remains outside this gate"
+      ],
+      "evidenceTest": "ts/test/research-v013-single-execution-root-a21.test.ts",
+      "claimBoundary": [
+        "GREEN would make one Link sufficient to identify the complete selected scoped execution state",
+        "GREEN would not yet source-remove selection of which execution root is current",
+        "GREEN would not prove physical parallelism",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ],
+      "consequence": "A21 collapses the selected scoped execution state to one Link E_n=K->Frontier_n. START(E_n) is the A19 context carrying continuation authority; END(E_n) is the A20 Link-native occurrence frontier. The semantic step receives one execution-root Link, derives both components structurally, preserves branching/convergence/provenance, and returns one next execution-root Link E_(n+1)=K->Frontier_(n+1).",
+      "currentResult": "GREEN: no separate context or frontier parameter is used by the semantic step. E0 reproduces first split; E1 reproduces local termination/recursive split; converging branches share one K->Z truth while retaining two occurrence Links and two ancestry paths; terminal step returns one execution root with empty frontier and unchanged K. Ambient execution roots are inert unless selected. Foreign-context occurrence, unwrapped frontier and invalid-context authority are rejected fail-closed. Two independent Memories agree.",
+      "observed": {
+        "executionRootShape": "K_TO_FRONTIER",
+        "contextCarriedAuthority": true,
+        "linkNativeFrontier": true,
+        "linkNativeProvenance": true,
+        "separateContextParameters": 0,
+        "separateFrontierParameters": 0,
+        "hostBundleValueFrontier": 0,
+        "firstFanout": 2,
+        "secondFanout": 2,
+        "localTermination": true,
+        "convergenceDistinctTruthLinks": 1,
+        "convergenceOccurrenceLinks": 2,
+        "scheduleProvenanceEquivalent": true,
+        "terminalFrontier": "ZERO",
+        "ambientExecutionRootIgnored": true,
+        "foreignContextOccurrence": "REJECTED",
+        "unwrappedFrontier": "REJECTED",
+        "invalidContextAuthority": "REJECTED",
         "independentMemories": 2,
         "productionChanged": false
       }
