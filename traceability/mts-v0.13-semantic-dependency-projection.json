@@ -33,7 +33,8 @@
     "rootAspectSemanticSourceReconstructionMethodProven": true,
     "formalKernelSelfExtensionFalsifierComplete": true,
     "formalGenericExtensionApplicationResearchComplete": true,
-    "formalGenericExtensionSourceNamingComplete": false
+    "formalGenericExtensionSourceNamingComplete": false,
+    "formalPortableNameAuthorityResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -831,7 +832,11 @@
     "formalGenericExtensionIndependentMemoryCount": 2,
     "formalGenericExtensionHostFormSpecificBranchCount": 0,
     "formalGenericExtensionNegativeControlCount": 3,
-    "formalGenericExtensionResultCardinalityCases": 3
+    "formalGenericExtensionResultCardinalityCases": 3,
+    "formalPortableNameAliasCount": 2,
+    "formalPortableNameIndependentMemoryCount": 2,
+    "formalPortableNameHostSpecificBranchCount": 0,
+    "formalPortableNameNegativeControlCount": 3
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -879,15 +884,19 @@
     "formalGenericExtensionIndependentMemoryCount": "Independent replay Memories in which the same portable extension authority is exercised without sender-local handles.",
     "formalGenericExtensionHostFormSpecificBranchCount": "Per-extension semantic branches inside the F2a generic apply kernel. Zero means the kernel iterates admitted Rules, unifies the application template, and instantiates the result template without dispatching on an extension name/opcode.",
     "formalGenericExtensionNegativeControlCount": "F2a fail-closed controls: unknown Use/no matching Rule, ambiguous frozen authority with two matching Rules, and post-freeze live Theory mutation ignored by the frozen selected Rule set.",
-    "formalGenericExtensionResultCardinalityCases": "Result cardinalities exercised through one generic kernel: zero values, one value and multiple values. The result is always the derived BundleValue surface; singleton bundle is not coerced to Link."
+    "formalGenericExtensionResultCardinalityCases": "Result cardinalities exercised through one generic kernel: zero values, one value and multiple values. The result is always the derived BundleValue surface; singleton bundle is not coerced to Link.",
+    "formalPortableNameAliasCount": "F2b physical names carried as exact STRING source content and resolved by one frozen portable Dictionary authority to the same Use; current corpus has two aliases.",
+    "formalPortableNameIndependentMemoryCount": "Independent replay Memories in which the same portable Dictionary authority resolves the aliases without sender-local LinkHandles.",
+    "formalPortableNameHostSpecificBranchCount": "Per-name semantic branches in the F2b generic resolver. Zero means physical bytes are materialized generically and Dictionary topology selects the Use.",
+    "formalPortableNameNegativeControlCount": "F2b controls: unknown name has no semantic resolution, conflicting local definitions fail closed, and a later child scope cannot mutate the already selected frozen Dictionary authority."
   },
   "nextExperiments": [
-    "FORMAL F2b: bind exact source/name -> Use through portable frozen MTS authority without canonicalByte or a host spelling switch; preserve aliases and canonical-representation policy as separate from semantic identity.",
-    "FORMAL F2c: extend generic result-template construction to cyclic/self-incidence forms without START/END-specific host branches and without collapsing BundleValue into LinkValue.",
-    "Rerun the full F-KERNEL-SELF-EXTENSION falsifier only after F2b/F2c; F2a alone does not upgrade it from RED.",
-    "Measure/falsify the residual generic E2 boundary: structural unification, role extraction, result-template carrier interpretation and generic template instantiation.",
+    "FORMAL F2 integration: combine F2b portable physical-name -> Use resolution with F2a bundle-valued generic application in one end-to-end two-Memory witness under frozen authorities and zero per-form/name host branches.",
+    "FORMAL F2c: extend generic result-template construction to cyclic/self-incidence forms without START/END-specific host branches.",
+    "After integrated naming+application+cyclic-construction evidence, rerun F-KERNEL-SELF-EXTENSION against the fixed production-kernel blockers.",
+    "Measure/falsify residual generic E2 authority in exact STRING materialization, Dictionary lookup, structural unification, result-template carrier interpretation and generic template instantiation.",
     "Apply source-removal discipline to proof meta-semantics before any global SELF_GENERATED_OR_RECONSTRUCTED claim.",
-    "Audit E3 only after E2/FORMAL reconstruction work; preserve frozen authority and never equate live adjacency with admission."
+    "Audit E3 only after E2/FORMAL reconstruction work; frozen selected authority must remain distinct from live adjacency."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -2313,6 +2322,60 @@
         "productionChanged": false
       },
       "consequence": "Per-form application semantics can be compressed to one generic Link-rule kernel for ordinary acyclic result templates without imposing single-valued function semantics. F2b source/name binding, cyclic/self-incidence result construction, and the E2 source authority of generic unification/instantiation remain open; F-KERNEL-SELF-EXTENSION stays RED overall."
+    },
+    "portableNameAuthorityF2b": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can previously unknown physical names be bound to a semantic Use by frozen portable MTS/Link Dictionary authority under one generic resolver, with no canonicalByte/name switch?",
+      "scope": [
+        "physical exact STRING source content -> Use binding only",
+        "Dictionary remains a derived Link role, not a foundational entity",
+        "aliases are permitted",
+        "portable frozen selected Dictionary root",
+        "two independent replay Memories"
+      ],
+      "authorityShape": "DictionaryScope history contains Entry(SourceContent, Use) occurrences; the selected final Dictionary root is transported by canonical rooted topology",
+      "genericResolver": [
+        "materialize exact v0.12 STRING source content from input bytes",
+        "lookup the selected frozen Dictionary root generically",
+        "return the structurally selected Use or no resolution",
+        "do not dispatch on glyph/name/opcode/canonical spelling"
+      ],
+      "plannedPositiveCorpus": [
+        "name x -> Use",
+        "name dup -> the same Use, proving aliasing is semantic-authority data rather than host spelling identity"
+      ],
+      "plannedNegativeControls": [
+        "unknown name -> no Dictionary resolution",
+        "same local scope defines one exact name to two different Uses -> local-form-conflict",
+        "later child scope may shadow the name locally but the previously selected frozen parent Dictionary remains unchanged"
+      ],
+      "ontologyBoundary": [
+        "name/source bytes are representation/carrier, not Link identity",
+        "Dictionary is a derived structural role over Links, not a second ontology primitive",
+        "canonical topology coordinates are transport coordinates only",
+        "same Use may have multiple physical names",
+        "physical spelling policy remains separate from semantic Use identity"
+      ],
+      "explicitNonClaims": [
+        "does not yet execute the resolved Use through F2a in one end-to-end witness",
+        "generic Dictionary lookup remains host semantic law",
+        "exact STRING carrier materialization remains host implementation",
+        "does not replace production v0.13 FORMAL evaluator",
+        "does not prove F-KERNEL-SELF-EXTENSION GREEN",
+        "does not prove FULL_SELF_HOSTED"
+      ],
+      "result": "GREEN: one generic resolver reconstructed a frozen selected Dictionary authority from portable rooted topology and resolved two exact physical STRING aliases to one semantic Use across two independent Memories with zero name-specific host branches and no canonicalByte switch. Unknown names receive no semantic Use, conflicting local definitions fail closed, and later child-scope shadowing cannot mutate the selected frozen parent Dictionary.",
+      "evidenceTest": "ts/test/research-v013-formal-portable-name-authority-f2b.test.ts",
+      "observed": {
+        "aliases": 2,
+        "semanticUseCount": 1,
+        "independentMemories": 2,
+        "hostNameSpecificBranches": 0,
+        "negativeControls": 3,
+        "canonicalByteSwitchUsed": false,
+        "productionChanged": false
+      },
+      "consequence": "Physical spelling no longer needs per-name host semantic dispatch in this research slice: exact STRING carrier plus portable Dictionary topology is sufficient to select Use. Generic Dictionary lookup and exact STRING materialization remain host laws; F2 name+application integration and cyclic result construction remain open, so F-KERNEL-SELF-EXTENSION stays RED overall."
     }
   }
 }
