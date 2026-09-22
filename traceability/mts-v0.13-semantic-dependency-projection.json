@@ -87,7 +87,9 @@
     "templateSelectionConvergenceF5F8Complete": true,
     "hostSelectedTemplateHandleRemoved": true,
     "contextualTruthDynamicDualityA16Designed": true,
-    "contextualTruthDynamicDualityA16Complete": true
+    "contextualTruthDynamicDualityA16Complete": true,
+    "contextualTruthMetaFrontierA16F1Designed": true,
+    "contextualTruthMetaFrontierA16F1Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1049,7 +1051,14 @@
     "contextualTruthDynamicDualityA16ConvergenceDistinctTruthLinkCount": 1,
     "contextualTruthDynamicDualityA16ConvergenceOccurrenceCount": 2,
     "contextualTruthDynamicDualityA16HostSemanticPrimitiveCount": 0,
-    "contextualTruthDynamicDualityA16IndependentMemoryCount": 2
+    "contextualTruthDynamicDualityA16IndependentMemoryCount": 2,
+    "contextualTruthMetaFrontierA16F1InitialFanout": 2,
+    "contextualTruthMetaFrontierA16F1SecondFanout": 2,
+    "contextualTruthMetaFrontierA16F1ConvergenceDistinctTruthLinkCount": 1,
+    "contextualTruthMetaFrontierA16F1ConvergenceOccurrenceCount": 2,
+    "contextualTruthMetaFrontierA16F1HostSemanticPrimitiveCount": 0,
+    "contextualTruthMetaFrontierA16F1CallPreparationHostResidualCount": 1,
+    "contextualTruthMetaFrontierA16F1IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1261,10 +1270,19 @@
     "contextualTruthDynamicDualityA16ConvergenceDistinctTruthLinkCount": "A16 extensional contextual truth Links after two independent K->A/K->C proof paths converge on one consequent B.",
     "contextualTruthDynamicDualityA16ConvergenceOccurrenceCount": "A16 provenance occurrences retained when two proof paths converge on the same canonical K->B truth Link.",
     "contextualTruthDynamicDualityA16HostSemanticPrimitiveCount": "Host active/isTrue/modusPonens/direction-switch/find/outgoing/incoming semantic primitives used inside the A16 propagation kernel. Target zero.",
-    "contextualTruthDynamicDualityA16IndependentMemoryCount": "Independent Memories in which the same contextual-linkage detachment behavior is reproduced."
+    "contextualTruthDynamicDualityA16IndependentMemoryCount": "Independent Memories in which the same contextual-linkage detachment behavior is reproduced.",
+    "contextualTruthMetaFrontierA16F1InitialFanout": "A16-F1 first A13-equivalent contextual truth split: K->E0/event1 produces K->EA and K->EB.",
+    "contextualTruthMetaFrontierA16F1SecondFanout": "A16-F1 surviving EB/event2 branch produces K->EC and K->ED while EA terminates locally.",
+    "contextualTruthMetaFrontierA16F1ConvergenceDistinctTruthLinkCount": "Distinct extensional K->EZ truth Links after EC/ED convergence. Target one.",
+    "contextualTruthMetaFrontierA16F1ConvergenceOccurrenceCount": "Proof/provenance occurrences retained at the one canonical K->EZ truth Link. Target two.",
+    "contextualTruthMetaFrontierA16F1HostSemanticPrimitiveCount": "Host active/isTrue/currentValue/modusPonens/event/state/applicationFor/find/outgoing/incoming/switch semantic primitives inside the A16 transition kernel. Target zero.",
+    "contextualTruthMetaFrontierA16F1CallPreparationHostResidualCount": "Explicit residual host operation class that maps K->State plus Event to selected State->Event application and materializes K->Application.",
+    "contextualTruthMetaFrontierA16F1IndependentMemoryCount": "Independent canonical Memories reproducing the contextual meta-frontier result."
   },
   "nextExperiments": [
-    "A16-F1: integrate contextual truth propagation with the existing A12/A13 frontier model. Replace the host notion of a current value/active state with explicit K->A truth Links and require the same fan-out, local termination, convergence and provenance behavior through the A16 composition law.",
+    "A16-F2: remove selected-application lookup from call preparation. Given contextual truth K->State and external Event, construct the application generically as Application=ensure(State,Event), then actualize K->Application with the same L/context-link operation; require transition semantics to remain identical.",
+    "A16-F2 must show that an arbitrary constructed State->Event Link has no semantic effect unless selected Application->NextState continuation authority exists; this separates generic application construction from semantic authority.",
+    "After A16-F2, reassess whether external Event selection is genuine irreducible input rather than semantic host authority, and only then connect this execution line back to F5 source-authority reduction.",
     "A16-F1 must preserve selected-authority isolation: physical but unselected Links must remain semantically inert, and newly derived K->B truth Links may enter only the explicit next execution frontier.",
     "F5-F9: remove per-template externally materialized requestCorrespondence Links. Given each template package's request and one selected target request, derive the correspondence locally by generic equal-length ExactSequence pairing; require the same two-template convergence and exact reference topology.",
     "F5-F9 must treat any temporary correspondence carrier as non-semantic execution scratch or avoid materializing it entirely; it must not become a hidden replacement for the removed authority.",
@@ -4374,6 +4392,65 @@
         "convergenceProvenanceOccurrences": 2,
         "recursivePropagation": true,
         "hostSemanticPrimitives": 0,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "contextualTruthMetaFrontierA16F1": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can the existing A13 meta-interpreter transition frontier be represented as contextual truth Links K->State and executed through the A16 Link-composition law, leaving only explicit State/Event application actualization as a residual host boundary?",
+      "setup": [
+        "reuse the A13 branch-local meta-state shape and transition topology E0 -> EA/EB -> EC/ED -> EZ",
+        "carry semantic frontier values as K->State truth Links rather than bare active state handles",
+        "for each external event, explicitly prepare K->(State->Event) call-truth Links using the frozen selected application set",
+        "execute every transition from call truth to next state only through the A16 contextual-link composition kernel"
+      ],
+      "executionLaw": [
+        "frontier occurrence K->Application is the contextual truth of the current call",
+        "selected Application->NextState transition composes to K->NextState",
+        "ZERO local transition means no derived truth occurrence for that branch",
+        "multiple selected transitions produce a Bundle of contextual truth Links",
+        "new contextual truth Links form the next semantic frontier"
+      ],
+      "oracle": [
+        "first A13 split reproduces K->EA and K->EB",
+        "EA/event2 terminates locally while EB/event2 yields K->EC and K->ED",
+        "EC/ED event3 paths converge to one extensional K->EZ Link with two provenance occurrences",
+        "forward/reverse scheduling preserves extensional and provenance semantics",
+        "late ambient transition outside frozen selected authority is ignored",
+        "ambient K->State truth outside the explicit frontier is ignored",
+        "two independent canonical Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "A16 propagation kernel must contain no active/isTrue/currentValue/modusPonens/event/state/applicationFor/find/outgoing/incoming/switch semantic primitive",
+        "transition kernel may use only contextual Link poles, selected transition Links, and Memory.ensure for propagated truth",
+        "State/Event call preparation is counted explicitly as host residual rather than hidden inside the A16 kernel"
+      ],
+      "residualAuthority": [
+        "external event selection remains explicit",
+        "mapping a contextual K->State frontier occurrence plus Event to the selected State->Event application remains host-side in this gate",
+        "selected application and transition authority sets remain explicit"
+      ],
+      "evidenceTest": "ts/test/research-v013-contextual-meta-frontier-a16-f1.test.ts",
+      "claimBoundary": [
+        "GREEN would reduce A13 transition execution to A16 dynamic duality but would not source-remove call preparation",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ],
+      "consequence": "A16-F1 reduces the A13 transition frontier to the A16 contextual-truth law: semantic frontier values are explicit K->State Links, selected Application->NextState transitions propagate them to K->NextState, ZERO is local termination, MANY is branch fan-out, and convergence canonicalizes one contextual truth Link while retaining provenance occurrences. The remaining non-reduced boundary is narrower: external Event selection and preparation/actualization of K->(State->Event).",
+      "currentResult": "GREEN: the A13 E0/EA/EB/EC/ED/EZ transition corpus is replayed with Bundle frontier values represented as contextual truth Links rather than bare active state handles. K->E0/event1 splits to K->EA and K->EB; EA/event2 terminates locally while EB/event2 yields K->EC and K->ED; EC/ED event3 converge to one extensional K->EZ with two provenance occurrences. Forward/reverse scheduling agrees, late ambient transition authority and ambient K->State outside the explicit frontier remain inert, two independent canonical Memories agree, and the guarded transition kernel contains zero host active/isTrue/currentValue/modusPonens/event/state/applicationFor/find/outgoing/incoming/switch semantics. One explicit host residual remains: call preparation K->State + Event -> K->(State->Event).",
+      "observed": {
+        "initialFanout": 2,
+        "secondFanout": 2,
+        "localTermination": true,
+        "convergenceDistinctTruthLinks": 1,
+        "convergenceOccurrences": 2,
+        "scheduleOrderEquivalent": true,
+        "lateAmbientTransitionIgnored": true,
+        "ambientTruthOutsideFrontierIgnored": true,
+        "hostSemanticPrimitives": 0,
+        "callPreparationHostResiduals": 1,
         "independentMemories": 2,
         "productionChanged": false
       }
