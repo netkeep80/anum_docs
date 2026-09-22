@@ -353,4 +353,4 @@ async function main(): Promise<void> {
   console.log("classification = GENERIC_ROOTED_PROOF_ASET_REPLAY_SUPPORTED");
 }
 
-void main();
+await main();
