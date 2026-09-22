@@ -51,19 +51,11 @@ function readChain(
 
 interface Fixture {
   readonly memory: Memory;
-  readonly K: LinkHandle;
-  readonly M: LinkHandle;
-  readonly metaParent: LinkHandle;
-  readonly E0: LinkHandle;
-  readonly E1: LinkHandle;
-  readonly E2: LinkHandle;
-  readonly E3: LinkHandle;
-  readonly E4: LinkHandle;
-  readonly A1: LinkHandle;
-  readonly A2: LinkHandle;
-  readonly A3: LinkHandle;
-  readonly A4: LinkHandle;
-  readonly Z: LinkHandle;
+  readonly K: LinkHandle; readonly M: LinkHandle; readonly metaParent: LinkHandle;
+  readonly E0: LinkHandle; readonly E1: LinkHandle; readonly E2: LinkHandle;
+  readonly E3: LinkHandle; readonly E4: LinkHandle;
+  readonly A1: LinkHandle; readonly A2: LinkHandle; readonly A3: LinkHandle;
+  readonly A4: LinkHandle; readonly Z: LinkHandle;
 }
 
 function buildSemanticBase(noise: boolean): {
@@ -177,8 +169,7 @@ function buildFixture(noise: boolean): Fixture {
   const M = memory.ensure(metaParent, producerAuthority);
 
   return Object.freeze({
-    memory, K, M, metaParent, E0, E1, E2, E3, E4,
-    A1, A2, A3, A4, Z,
+    memory, K, M, metaParent, E0, E1, E2, E3, E4, A1, A2, A3, A4, Z,
   });
 }
 
