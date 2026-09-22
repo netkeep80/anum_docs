@@ -34,7 +34,7 @@
     "formalKernelSelfExtensionFalsifierComplete": true,
     "formalGenericExtensionApplicationResearchComplete": true,
     "formalGenericExtensionSourceNamingComplete": false,
-    "formalPortableNameAuthorityResearchComplete": false
+    "formalPortableNameAuthorityResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -891,11 +891,11 @@
     "formalPortableNameNegativeControlCount": "F2b controls: unknown name has no semantic resolution, conflicting local definitions fail closed, and a later child scope cannot mutate the already selected frozen Dictionary authority."
   },
   "nextExperiments": [
-    "Execute FORMAL F2b portable name authority: two physical aliases -> one Use under one generic Dictionary resolver across two independent Memories, with unknown/conflict/frozen-scope controls.",
-    "After F2b, build one end-to-end F2 integration witness combining portable name resolution with F2a bundle-valued generic application under unchanged form-agnostic research kernels.",
+    "FORMAL F2 integration: combine F2b portable physical-name -> Use resolution with F2a bundle-valued generic application in one end-to-end two-Memory witness under frozen authorities and zero per-form/name host branches.",
     "FORMAL F2c: extend generic result-template construction to cyclic/self-incidence forms without START/END-specific host branches.",
-    "Rerun the full F-KERNEL-SELF-EXTENSION falsifier only after naming/application/cyclic-construction boundaries are jointly exercised.",
-    "Measure/falsify residual generic E2 authority in Dictionary lookup, structural unification and template instantiation.",
+    "After integrated naming+application+cyclic-construction evidence, rerun F-KERNEL-SELF-EXTENSION against the fixed production-kernel blockers.",
+    "Measure/falsify residual generic E2 authority in exact STRING materialization, Dictionary lookup, structural unification, result-template carrier interpretation and generic template instantiation.",
+    "Apply source-removal discipline to proof meta-semantics before any global SELF_GENERATED_OR_RECONSTRUCTED claim.",
     "Audit E3 only after E2/FORMAL reconstruction work; frozen selected authority must remain distinct from live adjacency."
   ],
   "measurement": {
@@ -2324,7 +2324,7 @@
       "consequence": "Per-form application semantics can be compressed to one generic Link-rule kernel for ordinary acyclic result templates without imposing single-valued function semantics. F2b source/name binding, cyclic/self-incidence result construction, and the E2 source authority of generic unification/instantiation remain open; F-KERNEL-SELF-EXTENSION stays RED overall."
     },
     "portableNameAuthorityF2b": {
-      "status": "DESIGNED_FOR_EXECUTION",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can previously unknown physical names be bound to a semantic Use by frozen portable MTS/Link Dictionary authority under one generic resolver, with no canonicalByte/name switch?",
       "scope": [
         "physical exact STRING source content -> Use binding only",
@@ -2364,7 +2364,18 @@
         "does not prove F-KERNEL-SELF-EXTENSION GREEN",
         "does not prove FULL_SELF_HOSTED"
       ],
-      "result": "NOT_RUN"
+      "result": "GREEN: one generic resolver reconstructed a frozen selected Dictionary authority from portable rooted topology and resolved two exact physical STRING aliases to one semantic Use across two independent Memories with zero name-specific host branches and no canonicalByte switch. Unknown names receive no semantic Use, conflicting local definitions fail closed, and later child-scope shadowing cannot mutate the selected frozen parent Dictionary.",
+      "evidenceTest": "ts/test/research-v013-formal-portable-name-authority-f2b.test.ts",
+      "observed": {
+        "aliases": 2,
+        "semanticUseCount": 1,
+        "independentMemories": 2,
+        "hostNameSpecificBranches": 0,
+        "negativeControls": 3,
+        "canonicalByteSwitchUsed": false,
+        "productionChanged": false
+      },
+      "consequence": "Physical spelling no longer needs per-name host semantic dispatch in this research slice: exact STRING carrier plus portable Dictionary topology is sufficient to select Use. Generic Dictionary lookup and exact STRING materialization remain host laws; F2 name+application integration and cyclic result construction remain open, so F-KERNEL-SELF-EXTENSION stays RED overall."
     }
   }
 }
