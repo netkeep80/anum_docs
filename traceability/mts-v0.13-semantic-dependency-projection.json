@@ -74,7 +74,9 @@
     "rootAsymmetryMirrorChiralityPreserved": true,
     "rootAsymmetryErasureNondegenerateBasisRejected": true,
     "selfGeneratedDefinitionF5F3Complete": true,
-    "selfGeneratedFullF4AuthorityProven": true
+    "selfGeneratedFullF4AuthorityProven": true,
+    "genericConstructionPlanF5F4Complete": false,
+    "genericConstructionRuntimeDomainSourceRemovalProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -997,7 +999,13 @@
     "selfGeneratedDefinitionF5F3GeneratorNameSpecificBranchCount": 0,
     "selfGeneratedDefinitionF5F3ProducerMemoryCount": 2,
     "selfGeneratedDefinitionF5F3ReceiverMemoryCount": 2,
-    "selfGeneratedDefinitionF5F3UnchangedF4ReceiverSourceMatch": true
+    "selfGeneratedDefinitionF5F3UnchangedF4ReceiverSourceMatch": true,
+    "genericConstructionPlanF5F4ConstraintCount": null,
+    "genericConstructionPlanF5F4OrdinaryEnsureCount": null,
+    "genericConstructionPlanF5F4StartSelfEnsureCount": null,
+    "genericConstructionPlanF5F4EndSelfEnsureCount": null,
+    "genericConstructionPlanF5F4DomainSpecificConstructorBranchCount": null,
+    "genericConstructionPlanF5F4IndependentMemoryCount": null
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1170,7 +1178,13 @@
     "selfGeneratedDefinitionF5F3GeneratorNameSpecificBranchCount": "Physical-name/result-specific semantic branches in the post-freeze F5-F3 generator. Target is zero.",
     "selfGeneratedDefinitionF5F3ProducerMemoryCount": "Independent replay Memories that must generate byte-identical complete portable authority from the same frozen Link-carried request/rule.",
     "selfGeneratedDefinitionF5F3ReceiverMemoryCount": "Independent second Memories executing the exported generated authority through the unchanged F4 receiver.",
-    "selfGeneratedDefinitionF5F3UnchangedF4ReceiverSourceMatch": "Whitespace-normalized exact source-block equality between F5-F3 receiver execution code and the already-GREEN F4 generic receiver. Target is true; compaction may remove formatting only."
+    "selfGeneratedDefinitionF5F3UnchangedF4ReceiverSourceMatch": "Whitespace-normalized exact source-block equality between F5-F3 receiver execution code and the already-GREEN F4 generic receiver. Target is true; compaction may remove formatting only.",
+    "genericConstructionPlanF5F4ConstraintCount": "F5-F4 frozen Link-carried target/start/end role equations compiled from the reference F5-F3 producer trace.",
+    "genericConstructionPlanF5F4OrdinaryEnsureCount": "F5-F4 constraints executed as generic ordinary memory.ensure(start,end).",
+    "genericConstructionPlanF5F4StartSelfEnsureCount": "F5-F4 constraints whose target role equals start role and therefore use generic START self-closed materialization.",
+    "genericConstructionPlanF5F4EndSelfEnsureCount": "F5-F4 constraints whose target role equals end role and therefore use generic END self-closed materialization.",
+    "genericConstructionPlanF5F4DomainSpecificConstructorBranchCount": "Dictionary/Source/Grouping/Function/Application/Continuation/Witness/Publication-specific branches in the runtime construction-plan interpreter. Target zero.",
+    "genericConstructionPlanF5F4IndependentMemoryCount": "Independent replay Memories executing the same frozen constructive plan and required to produce byte-identical canonical topology."
   },
   "nextExperiments": [
     "F5-F4: inventory and source-remove/classify the generic producer authority still visible in F5-F3, especially the 19-position generation-request interpretation and calls that construct Dictionary/source/grouping/proof evidence. Do not count F5-F3 behavioral SELF_GENERATED as FULL_SELF_HOSTED.",
@@ -3957,6 +3971,33 @@
         "receiverMemories": 2,
         "productionChanged": false
       }
+    },
+    "genericConstructionPlanF5F4": {
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Can the domain-specific F5-F3 runtime producer be replaced by one generic Link-carried constructive plan whose only operations are role binding plus canonical Link materialization selected by target/start/end role incidence?",
+      "method": [
+        "run the already-GREEN F5-F3-style reference producer once in an isolated compiler Memory",
+        "record every newly allocated Link only as an abstract target/start/end role equation",
+        "freeze seed role bindings plus the ordered equation sequence as Link data before the tested runtime generation",
+        "execute the frozen plan in fresh Memories with one generic constructor",
+        "compare the complete final canonical topology byte-for-byte against a fresh run of the domain-specific reference producer from the same frozen state"
+      ],
+      "genericConstructor": [
+        "ordinary: targetRole differs from startRole/endRole -> ensure(start,end)",
+        "START: targetRole == startRole -> ensureStartSelfClosed(end)",
+        "END: targetRole == endRole -> ensureEndSelfClosed(start)",
+        "ROOT/full-self case is generic but must not be needed for this generated authority",
+        "no Dictionary/Source/Grouping/function/application/continuation/witness/publication semantic branch"
+      ],
+      "negativeControl": "remove the final construction constraint; required publication output must remain unbound and execution must reject fail-closed",
+      "claimBoundary": [
+        "the construction plan is compiled from an external domain-specific reference producer, so its semantic source is still external",
+        "GREEN would prove runtime constructor domain-source removal into Link data, not semantic-information reduction",
+        "the generic role/equation interpreter and Memory ensure/self-closure substrate remain host-executed",
+        "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
+      ],
+      "evidenceTest": "ts/test/research-v013-generic-construction-plan-f5-f4.test.ts",
+      "consequence": "Pending CI. A GREEN result would separate runtime construction mechanism from externally supplied construction semantics and make the remaining source-authority boundary explicit."
     }
   }
 }
