@@ -57,7 +57,7 @@
     "bundleContinuationBranchingResearchComplete": true,
     "bundleContinuationPhysicalParallelismProven": false,
     "bundleContinuationMaterializingConcurrencyProven": false,
-    "metaInterpreterFrontierA13Complete": false,
+    "metaInterpreterFrontierA13Complete": true,
     "metaInterpreterPhysicalParallelismProven": false,
     "metaInterpreterMaterializingConcurrencyProven": false
   },
@@ -3450,8 +3450,8 @@
       "currentResult": "GREEN: F(a) produces frontier occurrences g/h; applying x independently to that frontier yields u/v/w, two parent branches can converge to one exact z while preserving two provenance occurrences, one branch may terminate while another survives, and forward/reverse parent scheduling produces identical extensional and normalized provenance semantics. The semantic kernel uses zero physical concurrency primitives."
     },
     "metaInterpreterFrontierA13": {
-      "status": "DESIGNED_NOT_EXECUTED",
-      "currentResult": "NOT_RUN",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "currentResult": "GREEN: one explicit interpreter state E0 splits under one event into branch-local EA/EB with distinct K/F/TOS/Pool; EA terminates locally while EB recursively splits into EC/ED; EC/ED converge under the next event to one exact EZ while preserving two provenance occurrences. Forward/reverse scheduling yields identical extensional and normalized provenance semantics; late ambient transition evidence after freeze is ignored; the semantic kernel performs zero Link writes and uses zero physical concurrency primitives.",
       "question": "Can the meta-interpreter itself be modeled as a BundleValue frontier of explicit Link-carried interpreter states, so ambiguity/fan-out, local termination, recursive splitting and semantic convergence use the same A12 continuation semantics?",
       "stateCarrier": [
         "research carrier E = ExactSequence(Pool, K, TOS, Fcurrent)",
@@ -3492,20 +3492,25 @@
         "branch provenance does not imply causal Links between converged semantic states"
       ],
       "observed": {
-        "initialBranches": null,
-        "secondBranches": null,
-        "convergenceDistinctStates": null,
-        "convergenceOccurrences": null,
+        "initialBranches": 2,
+        "secondBranches": 2,
+        "convergenceDistinctStates": 1,
+        "convergenceOccurrences": 2,
         "scheduleOrders": [
           "forward",
           "reverse"
         ],
         "physicalConcurrencyPrimitives": 0,
         "independentMemories": 2,
+        "branchLocalStateIsolation": true,
+        "localTermination": true,
+        "recursiveSplit": true,
+        "lateAmbientTransitionIgnored": true,
+        "semanticKernelWrites": 0,
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-meta-interpreter-frontier-a13.test.ts",
-      "consequence": "Pending execution. A GREEN result would show that meta-interpretation can reuse bundle-continuation semantics at the state-machine level without making physical threading foundational."
+      "consequence": "Scoped research demonstrates the meta-interpreter as a BundleValue frontier transformer over explicit Link-carried states. The old scalar Out(D,Fnext) model is a one-branch special case. Branching semantics is independent of physical scheduling; A13b still owns concurrent materialization/admission/conflict semantics, and global E4/FULL_SELF_HOSTED remain open."
     }
   }
 }
