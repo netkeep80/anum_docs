@@ -85,7 +85,8 @@
     "sourceCorrespondenceDerivationF5F7Complete": true,
     "externalPrefixSequencePreparationRemoved": true,
     "templateSelectionConvergenceF5F8Complete": true,
-    "hostSelectedTemplateHandleRemoved": true
+    "hostSelectedTemplateHandleRemoved": true,
+    "contextualTruthDynamicDualityA16Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1248,6 +1249,7 @@
     "templateSelectionConvergenceF5F8IndependentMemoryCount": "Independent Memories replaying the full template frontier and required to obtain byte-identical topology."
   },
   "nextExperiments": [
+    "A16: execute contextual truth/dynamic-duality falsifier. Require K->A plus A->B => K->B, ZERO/ONE/MANY, selected-authority isolation, convergence provenance, and recursive propagation with zero host active/true/modusPonens branches.",
     "F5-F9: remove per-template externally materialized requestCorrespondence Links. Given each template package's request and one selected target request, derive the correspondence locally by generic equal-length ExactSequence pairing; require the same two-template convergence and exact reference topology.",
     "F5-F9 must treat any temporary correspondence carrier as non-semantic execution scratch or avoid materializing it entirely; it must not become a hidden replacement for the removed authority.",
     "After per-template correspondence removal, attack external frontier membership: discover admissible closure-complete template packages from a frozen authority set/signature rather than supplying the candidate frontier manually.",
@@ -4306,6 +4308,46 @@
         "semanticInformationEliminated": false,
         "productionChanged": false
       }
+    },
+    "contextualTruthDynamicDualityA16": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can MTS truth be represented literally as current-context linkage K->A (TRUE=L), with directed duality executing contextual detachment K->A plus A->B => K->B, including ZERO/ONE/MANY branching, without a host active/true/modusPonens primitive?",
+      "authorClarification": [
+        "TRUE is L",
+        "A is true in current execution context K means literally that K is linked with A",
+        "existence of A somewhere in Memory is not contextual truth",
+        "directed duality is dynamic: it propagates current-context linkage through a directed Link"
+      ],
+      "executionLaw": [
+        "freeze/select Link authority before each semantic step",
+        "for every selected contextual Link K->A, match every selected Link A->B by pole identity",
+        "materialize K->B as the propagated contextual-truth witness",
+        "return all propagated truth witnesses as one BundleValue",
+        "repeat with newly derived contextual Links only through an explicit next selected step"
+      ],
+      "oracle": [
+        "K->A with no selected A->B gives ZERO",
+        "K->A plus one selected A->B gives exactly K->B",
+        "K->A plus multiple selected A->Bi gives MANY contextual truth Links",
+        "ambient but unselected A->B must not fire",
+        "selected A->B without K->A must not fire",
+        "two independent K->A/K->C paths converging on B yield one extensional K->B Link with two provenance occurrences",
+        "a newly derived K->B can propagate through B->C on the next selected step",
+        "same behavior must reproduce in two independent Memories"
+      ],
+      "antiCheat": [
+        "dynamic kernel must contain no active(), isTrue, modusPonens, basis-specific branch, switch, find, incoming or outgoing semantic primitive",
+        "kernel composes only selected Links by generic pole identity and Memory.ensure",
+        "production runtime remains unchanged"
+      ],
+      "evidenceTest": "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
+      "claimBoundary": [
+        "this gate tests the author's contextual truth/dynamic-duality semantics; it does not accept v0.13",
+        "selected authority remains explicit; ambient Memory is not semantic authority",
+        "the gate does not claim global E2/E3/E4 closure or FULL_SELF_HOSTED",
+        "A11e already carries direct/inverse method orientation; A16 tests the direct contextual propagation consequence",
+        "physical concurrency is not part of this gate"
+      ]
     }
   }
 }
