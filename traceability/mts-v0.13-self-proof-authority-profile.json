@@ -1,0 +1,110 @@
+{
+  "schema": "mts-v013-self-proof-authority-profile/v0.1",
+  "status": "frozen-verifier-profile",
+  "ownerIssue": 1270,
+  "candidateMain": "c3626220f9475360108896892a599cc8c6326bdb",
+  "normativeFoundation": false,
+  "mtsExecutionDependency": false,
+  "proofAcceptanceAuthority": true,
+  "contractBlobSha": "740bafd1f345651390699c09023f060f3d3ab675",
+  "kernelPins": {
+    "rootedProofAset": "a33ed3f388108b3c1fee4f8d248ec1d6c4c70a26",
+    "recursiveLinkIdentityProof": "e0a0eb16a16f3f0749e223e08fb35b196480a44f",
+    "structuralRule": "8a1a9fa946cdc6977ab9c8bd335ef96cf3510d27",
+    "derivation": "bb7e8bd9150e29718015020c939f054f1fa0987a",
+    "portableTheory": "0db49ea342e9e9c711f51ed7110ab7967deb36ef",
+    "portableTheoryDigest": "983a4d4c627052f7062466b1343bf8c4876344ab"
+  },
+  "theory": {
+    "policy": "GENERIC_IDENTITY_LIFT_ONLY",
+    "targetSpecificAdmissionsAllowed": false,
+    "admittedRuleCount": 1,
+    "admittedDerivationRuleCount": 1,
+    "artifact": {
+      "schema": "mts-portable-structural-theory/v0.1",
+      "mtsSemanticBase": "mts-contract/v0.11",
+      "topology": {
+        "schema": "mts-storage-topology/v0.1",
+        "root": 0,
+        "links": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            0,
+            7
+          ],
+          [
+            10,
+            9
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            11,
+            7
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            12,
+            10
+          ],
+          [
+            8,
+            14
+          ]
+        ]
+      },
+      "theoryCoordinate": 8
+    },
+    "revision": {
+      "scheme": "mts-portable-structural-theory-revision/sha-256/v0.1",
+      "value": "f9a72299b112c235c14ef230bcf3d6cac39069d12a7f633b0aac11dd68266675"
+    }
+  },
+  "acceptanceBoundary": {
+    "candidateMayModifyProfile": false,
+    "candidateMayAddTheoryAdmissions": false,
+    "proofMustReplayAgainstFrozenRevision": true,
+    "theoremOrMetadataAloneGrantsAuthority": false
+  },
+  "note": "External verifier-owned authority profile for the bounded v0.13 self-proof research program. It is not a global MTS Theory, not MTS foundation, and not an execution dependency."
+}
