@@ -121,7 +121,8 @@
     "derivedMetaSeedCorrespondenceA28Designed": true,
     "derivedMetaSeedCorrespondenceA28Complete": true,
     "linkNativeTargetHistoryA29Designed": true,
-    "linkNativeTargetHistoryA29Complete": true
+    "linkNativeTargetHistoryA29Complete": true,
+    "contextualGenerationRequestA30Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1494,9 +1495,9 @@
     "linkNativeTargetHistoryA29IndependentMemoryCount": "Independent Memories reproducing target-history derivation, convergence and execution."
   },
   "nextExperiments": [
-    "A30: attack external selection of the target-history witness without granting ambient histories authority; carry target selection inside already selected execution/meta context or explicit Link-native request authority.",
-    "A30 must keep broad source-inventory selection separate and preserve fail-closed ambiguity/malformed-target behavior.",
-    "If A30 is GREEN, attack broad source-inventory selection and current meta-occurrence selection as the next independent authority boundaries.",
+    "A30: execute one-Link contextual generation request G->TargetHistory with G carrying the frozen broad inventory; remove separate target and inventory arguments.",
+    "If A30 is GREEN, attack external selection of the current generation-request truth T itself using Link-native occurrence/history authority, without treating every G-linked target as active.",
+    "A30 must preserve A29 structural derivation, ambient isolation, malformed-evidence rejection and unchanged A23 execution.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
@@ -5712,6 +5713,41 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "contextualGenerationRequestA30": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A29 target-history selection and broad-inventory selection be carried by one contextual generation-request truth Link rather than supplied as two host arguments?",
+      "setup": [
+        "retain A29 structural source-seed and target-history derivation",
+        "define generation context G=RequestParent->Inventory",
+        "select target by contextual truth T=G->TargetHistory",
+        "semantic runner receives only rule plus T, derives G and target from T, and derives Inventory from G"
+      ],
+      "oracle": [
+        "runner has zero separate target/inventory arguments",
+        "two compatible templates converge and unchanged A23 metaStep executes target E0..E4 then ZERO",
+        "ambient alternative G->Target and ambient alternative generation context remain inert while T is selected",
+        "mixed-context selected target truth and malformed selected inventory context reject fail-closed",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "runner derives generationContext from START(T), target from END(T), and inventory from END(G)",
+        "runner contains no find/outgoing/incoming/allLinks/switch ambient selector",
+        "A30 metaStep remains whitespace-normalized source-identical to A23"
+      ],
+      "residualAuthority": [
+        "host/runtime still selects the one current request-truth Link T",
+        "inventory membership and target-history construction/publication remain externally sourced",
+        "current meta-occurrence selection remains explicit",
+        "generic topology/rule interpreters remain host executed"
+      ],
+      "evidenceTest": "ts/test/research-v013-contextual-generation-request-a30.test.ts",
+      "claimBoundary": [
+        "GREEN would make target/inventory selection Link-carried contextual authority instead of separate semantic arguments",
+        "GREEN would not source-remove selection of current T or publication of its carried evidence",
+        "this gate does not accept v0.13; global E2/E3 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
