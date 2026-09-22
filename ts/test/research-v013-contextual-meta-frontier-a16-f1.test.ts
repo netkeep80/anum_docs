@@ -459,7 +459,7 @@ function staticKernelGuard(): void {
     "utf8",
   );
   const start = source.indexOf("function propagateCallTruth(");
-  const end = source.indexOf("function prepareCallFrontier(", start);
+  const end = source.indexOf("/**\n * Explicit residual for this gate:", start);
   assert(start >= 0 && end > start, "A16-F1 kernel source slice");
   const kernel = source.slice(start, end);
 
