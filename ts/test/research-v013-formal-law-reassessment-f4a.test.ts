@@ -29,8 +29,12 @@ same(
   "one producer law remains only bypassed",
 );
 
-const byId=new Map(
-  audit.families.map((x:{id:string})=>[x.id,x]),
+type FamilyAudit = {
+  readonly id: string;
+  readonly genericPathClassification: string;
+};
+const byId = new Map<string, FamilyAudit>(
+  (audit.families as readonly FamilyAudit[]).map((x) => [x.id, x]),
 );
 same(
   byId.get("formal-operator-grounding-law")?.genericPathClassification,
