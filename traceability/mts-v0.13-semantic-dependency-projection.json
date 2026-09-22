@@ -109,7 +109,9 @@
     "metaExecutionDetachmentA22Designed": true,
     "metaExecutionDetachmentA22Complete": true,
     "metaTransitionAuthorityA23Designed": true,
-    "metaTransitionAuthorityA23Complete": true
+    "metaTransitionAuthorityA23Complete": true,
+    "selfGeneratedMetaProducerAuthorityA24Designed": true,
+    "selfGeneratedMetaProducerAuthorityA24Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1135,7 +1137,13 @@
     "metaTransitionAuthorityA23AmbientAlternativeAuthorityFires": 0,
     "metaTransitionAuthorityA23ProducerAuthorityPublicationSourceResidualCount": 1,
     "metaTransitionAuthorityA23CurrentMetaOccurrenceSelectionResidualCount": 1,
-    "metaTransitionAuthorityA23IndependentMemoryCount": 2
+    "metaTransitionAuthorityA23IndependentMemoryCount": 2,
+    "selfGeneratedMetaProducerAuthorityA24ProducerAuthorityAbsentAtFreeze": 1,
+    "selfGeneratedMetaProducerAuthorityA24FrozenStructuralConstraintCount": 10,
+    "selfGeneratedMetaProducerAuthorityA24ExplicitPublicationCount": 1,
+    "selfGeneratedMetaProducerAuthorityA24RuntimeConsumerChanged": 0,
+    "selfGeneratedMetaProducerAuthorityA24ForgedAuthorityAccepted": 0,
+    "selfGeneratedMetaProducerAuthorityA24IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1411,12 +1419,19 @@
     "metaTransitionAuthorityA23AmbientAlternativeAuthorityFires": "Ambient alternative producer authorities that affect an immutable selected M. Target zero.",
     "metaTransitionAuthorityA23ProducerAuthorityPublicationSourceResidualCount": "Explicit residual source classes that publish the frozen E_n->E_(n+1) producer authority before A23 execution.",
     "metaTransitionAuthorityA23CurrentMetaOccurrenceSelectionResidualCount": "Explicit residual classes selecting the current meta-history occurrence/current M->E_n truth.",
-    "metaTransitionAuthorityA23IndependentMemoryCount": "Independent Memories reproducing A23 context-carried meta-transition authority behavior."
+    "metaTransitionAuthorityA23IndependentMemoryCount": "Independent Memories reproducing A23 context-carried meta-transition authority behavior.",
+    "selfGeneratedMetaProducerAuthorityA24ProducerAuthorityAbsentAtFreeze": "A24 producer transition/authority absence witness at the frozen generation boundary. Target one confirmed absence.",
+    "selfGeneratedMetaProducerAuthorityA24FrozenStructuralConstraintCount": "Anonymous Link-carried pair-identity constraints in the frozen candidate-agnostic producer-authority rule.",
+    "selfGeneratedMetaProducerAuthorityA24ExplicitPublicationCount": "Checked Candidate->M publications produced after frozen structural admission. Target one.",
+    "selfGeneratedMetaProducerAuthorityA24RuntimeConsumerChanged": "Semantic source changes between A23 metaStep and the A24 consumer copy after whitespace normalization. Target zero.",
+    "selfGeneratedMetaProducerAuthorityA24ForgedAuthorityAccepted": "Forged producer-authority candidates accepted/published by the frozen structural path. Target zero.",
+    "selfGeneratedMetaProducerAuthorityA24IndependentMemoryCount": "Independent Memories reproducing the post-freeze generation/admission/publication/execution behavior."
   },
   "nextExperiments": [
-    "A24: source-reduce producer-authority publication by connecting A23 execution-transition authority to the existing F5 self-generated/template authority machinery. Runtime A23 metaStep must remain unchanged.",
+    "A25: reduce A24 generation-request source authority. Replace the positional MetaParent,E0..E4 request schema with a more structural Link-carried description of the execution-root succession, while keeping the A24 frozen structural admission and unchanged A23 metaStep.",
+    "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
+    "A25 must not conflate current meta-occurrence selection with authority generation; current selection remains a separate residual.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
-    "A24 must keep current meta-occurrence selection explicit and must not claim FULL_SELF_HOSTED while F5 request/template source authority remains external.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A22 should distinguish immutable execution history from selection of the current execution root and must preserve branch/provenance semantics from A21.",
     "A21 must preserve context-carried authority, occurrence ancestry, convergence multiplicity, ambient isolation and fail-closed structural validation.",
@@ -5231,6 +5246,71 @@
         "ambiguousProducerAuthority": "REJECTED",
         "producerAuthorityPublicationSourceResiduals": 1,
         "currentMetaOccurrenceSelectionResiduals": 1,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "selfGeneratedMetaProducerAuthorityA24": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A23 producer-transition authority be absent at freeze, generated after freeze from Link-carried request data, admitted by one frozen candidate-agnostic structural rule, explicitly published, and then consumed through the exact unchanged A23 metaStep?",
+      "setup": [
+        "build fixed A21 execution roots E0..E4 before the producer-authority freeze",
+        "freeze one candidate-agnostic structural rule over anonymous roles and ten pair-identity constraints",
+        "freeze one Link-carried generation request carrying MetaParent and E0..E4",
+        "require E0->E1 producer transition to be physically absent at freeze",
+        "post-freeze generic generator constructs E_i->E_(i+1) transitions, authority chain, START-self envelope and M",
+        "package all generated values into one unknown structural candidate",
+        "require frozen structural admission before explicit Candidate->M publication",
+        "consume published M through a whitespace-normalized exact copy of the A23 metaStep"
+      ],
+      "oracle": [
+        "producer transition/authority is absent at freeze and materialized only after generation",
+        "generated unknown candidate passes frozen candidate-agnostic structural admission",
+        "explicit publication exists only after successful structural admission",
+        "unchanged A23 metaStep advances M->E0 through E1,E2,E3,E4 and then ZERO",
+        "E1/E2 preserve two-branch frontier counts, E3 preserves two converged occurrences and E4 is ZERO",
+        "forged producer transition fails frozen structural admission",
+        "forged candidate cannot be explicitly published through the checked publication path",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "A24 metaStep must be whitespace-normalized source-identical to the A23 metaStep",
+        "post-freeze generator has no E0/E1/E2/E3/E4 identity branch or switch dispatch",
+        "frozen structural rule contains anonymous roles and pair constraints, not future candidate identity",
+        "generator creates no candidate-specific admission evidence",
+        "publication helper first requires frozen structural admission"
+      ],
+      "residualAuthority": [
+        "generation-request positional schema remains host interpreted",
+        "the request explicitly carries the E0..E4 execution sequence and MetaParent",
+        "generic structural-rule interpreter remains host executed",
+        "reference A21 producer is still used before freeze to construct E0..E4",
+        "current meta-occurrence selection remains explicit",
+        "therefore global E2/E3 and FULL_SELF_HOSTED remain open"
+      ],
+      "evidenceTest": "ts/test/research-v013-self-generated-meta-authority-a24.test.ts",
+      "claimBoundary": [
+        "GREEN would connect the A16-A23 dynamic execution line directly to F5-style unknown-candidate self-generation/admission/publication",
+        "GREEN would source-reduce producer-authority publication but would not eliminate the generation request as semantic source",
+        "this gate does not accept v0.13",
+        "production runtime remains unchanged"
+      ],
+      "consequence": "A24 directly joins the F5-style self-generation/admission/publication line to the A16-A23 dynamic execution line. Producer transition authority is absent at freeze, then one generic post-freeze producer constructs the E0->E1->E2->E3->E4 authority topology from Link-carried request data. The unknown authority candidate passes one frozen candidate-agnostic structural rule with ten anonymous pair constraints, receives explicit Candidate->M publication, and is consumed through a whitespace-normalized source-identical A23 metaStep. Runtime detachment semantics are unchanged.",
+      "currentResult": "GREEN: E0->E1 is absent at freeze. Post-freeze generation constructs four execution transitions, four authority-chain cells, a proper START-self authority envelope, M, one structural candidate and one checked publication. The generated candidate passes frozen structural admission; an authority with a forged first transition fails admission and cannot use checked publication. The exact unchanged A23 metaStep advances M->E0 through E1,E2,E3,E4 and then ZERO. E1/E2 retain two frontier occurrences, E3 retains two converged occurrences, and E4 is empty. Two independent Memories agree on behavior. The request positional schema and its explicit E0..E4 sequence remain source authority, so source elimination is not claimed.",
+      "observed": {
+        "producerAuthorityAbsentAtFreeze": true,
+        "generatedAfterFreeze": true,
+        "frozenStructuralAdmission": "GREEN",
+        "frozenStructuralConstraints": 10,
+        "explicitPublication": true,
+        "unchangedA23MetaStep": true,
+        "firstFanout": 2,
+        "secondFanout": 2,
+        "convergenceOccurrences": 2,
+        "terminal": "ZERO",
+        "forgedProducerAuthority": "REJECTED",
+        "invalidSelfPublication": "REJECTED",
+        "requestSchemaSourceRemoved": false,
         "independentMemories": 2,
         "productionChanged": false
       }
