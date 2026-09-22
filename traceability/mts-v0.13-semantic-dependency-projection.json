@@ -44,7 +44,8 @@
     "aspectApplicationSelfContinuationSignatureResearchComplete": true,
     "aspectApplicationUnifierSliceAuditComplete": true,
     "aspectApplicationUnifierSourceRemovalProven": false,
-    "aspectApplicationUnifiedContinuationResearchComplete": true
+    "aspectApplicationUnifiedContinuationResearchComplete": true,
+    "aspectApplicationUnifierDenialFalsifierComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -875,7 +876,9 @@
     "aspectUnifiedContinuationApplicationClassCount": 2,
     "aspectUnifiedContinuationSpecialCaseBranchCount": 0,
     "aspectUnifiedContinuationResultCardinalityCases": 3,
-    "aspectUnifiedContinuationIndependentMemoryCount": 2
+    "aspectUnifiedContinuationIndependentMemoryCount": 2,
+    "aspectUnifierDeniedAlternativeHostMatcherCount": 2,
+    "aspectUnifierDeniedSuccessfulNativeBindingWitnessCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -956,14 +959,16 @@
     "aspectUnifiedContinuationApplicationClassCount": "A11h application classes handled by the same method-oriented continuation kernel: ordinary non-self-incidence application Links and self-incidence R/O/C/L/U application Links.",
     "aspectUnifiedContinuationSpecialCaseBranchCount": "Branches that distinguish ordinary PAIR applications from ROOT/START/END self-incidence applications in the A11h kernel. Zero.",
     "aspectUnifiedContinuationResultCardinalityCases": "A11h result cardinalities observed through one kernel across ordinary and self-incidence cases: zero, one and many.",
-    "aspectUnifiedContinuationIndependentMemoryCount": "Independent Memories in which the same unified continuation law reproduces ordinary and self-incidence results."
+    "aspectUnifiedContinuationIndependentMemoryCount": "Independent Memories in which the same unified continuation law reproduces ordinary and self-incidence results.",
+    "aspectUnifierDeniedAlternativeHostMatcherCount": "A11G-F1 known substitute paths that still retain equivalent host matching semantics: structural Rule replay/matching and StructuralRoleMorphism verification.",
+    "aspectUnifierDeniedSuccessfulNativeBindingWitnessCount": "A11G-F1 successful portable MTS-native two-role binding witnesses after structural-unification denial. Zero in the current architecture."
   },
   "nextExperiments": [
-    "Execute A11G-F1-UNIFIER-DENIAL now against the unified A11h kernel; the exact two-role binding law must become portable MTS evidence rather than direct host pole remapping.",
-    "After A11G-F1, integrate F2b physical name -> Use with A11h unified aspect-continuation semantics in one end-to-end FORMAL witness.",
+    "A11g-F2: design the missing portable MTS-native two-role binding artifact/law itself. It must not be a precomputed binding table and must reject forged/reversed/collapsed evidence.",
+    "In parallel but without claiming closure, integrate F2b physical naming with A11h unified continuation semantics to test the full source-name -> Link-application -> BundleValue path.",
+    "After an A11g-F2 candidate exists, rerun A11G-F1 denial and require a GREEN two-Memory witness before semantic-closure claims.",
     "Then rerun F-KERNEL-SELF-EXTENSION and reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization.",
-    "If FORMAL closure improves, apply the same unified aspect/application law to proof meta-semantics rather than preserving a separate proof evaluator by assumption.",
-    "E3/E4 remain separate and open; selected frozen authority must not collapse into live adjacency."
+    "E3/E4 remain separate and open."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -2782,7 +2787,7 @@
       ],
       "sourceRemovalFalsifier": {
         "id": "A11G-F1-UNIFIER-DENIAL",
-        "status": "DESIGNED_NOT_EXECUTED",
+        "status": "EXECUTED_RED_CURRENT_ARCHITECTURE",
         "question": "Can the exact two-role binding law used by A11 be reconstructed from portable MTS Link/method evidence after denying structural-unification.ts, without replacing it with equivalent host pole/equality code?",
         "failConditions": [
           "replacement host code explicitly maps candidate.start -> START role and candidate.end -> END role",
@@ -2798,7 +2803,15 @@
           "forged/reversed/collapsed role evidence fails closed",
           "A11f four behavioral signatures remain equal to self-incidence masks"
         ],
-        "currentResult": "NOT_RUN"
+        "currentResult": "RED: after denying structural-unification as semantic source, the current repository has no demonstrated portable MTS-native mechanism that infers the A11 two-role binding law from target Link evidence. Structural Rule matching and StructuralRoleMorphism are not valid substitutes because they retain equivalent host matching/replay semantics.",
+        "evidenceTest": "ts/test/research-v013-unifier-denial-a11g-f1.test.ts",
+        "successfulNativeBindingWitnessCount": 0,
+        "knownInvalidSubstitutes": [
+          "ts/src/structural-rule.ts#matchStructuralTemplate — equivalent host recursive matcher",
+          "ts/src/structural-role-morphism.ts#verifyStructuralRoleMorphismMapping — delegates to matchStructuralTemplate and additionally replays host role-mapping checks"
+        ],
+        "exactMissingCapability": "A portable Link/aspect artifact whose own MTS semantics reconstructs the ordered two-role binding between selected Dual(A) roles and an arbitrary target Link, without structural-unification/matchStructuralTemplate-equivalent host code.",
+        "consequence": "A11 application semantics remains semantically open at E2. The RED is useful: ordinary/self-incidence unification is no longer the blocker; one precise MTS-native role-binding law is."
       },
       "observed": {
         "poleReadsPerDecode": 3,
