@@ -3121,18 +3121,7 @@
         "F-KERNEL-SELF-EXTENSION remains to be rerun after grouping evidence"
       ],
       "currentResult": "NOT_RUN",
-      "consequence": "A GREEN result removes generic structural-unification from the integrated F2c FORMAL research path but does not yet make source-level application grouping self-describing."
-    },
-    "integratedNameAspectProofBindingF2d": {
-      "status": "DESIGNED_NOT_EXECUTED",
-      "question": "Can the F2c physical-name -> Dictionary -> Link -> application -> BundleValue witness execute through proof-carrying A11 bindings with zero structural-unification/matcher dependencies?",
-      "portableAuthority": [
-        "one pole-closed canonical Link topology",
-        "frozen Dictionary coordinate",
-        "selected Direct method Link",
-        "proof-carrying two-role binding witnesses for Direct method, application F⟼A and two selected continuation occurrences",
-        "no sender-local LinkHandle crosses transport"
-      ],
+      "consequence": "A GREEN result removes generic structural-unification from the integrated F2c FORMAL research path but does not yet make source-level application grouping self-describing.",
       "flow": [
         "physical name f -> exact STRING -> frozen Dictionary -> semantic function F",
         "physical alias dup -> same F",
@@ -3143,15 +3132,6 @@
         "candidate contributes iff verified FROM value == P",
         "verified TO values produce BundleValue {b1,b2}",
         "physical names b1/b2 resolve independently to exact returned Links"
-      ],
-      "passConditions": [
-        "two independently built source Memories export byte-identical portable authority",
-        "same artifact executes in two replay Memories",
-        "f and dup resolve to one exact semantic function Link",
-        "f(a) and dup(a) both return exact BundleValue {b1,b2}",
-        "zero structural-unification/matchStructuralTemplate/StructuralRoleMorphism imports or calls",
-        "unknown physical name receives no semantic Use",
-        "no canonicalByte/operatorAspect/name-specific branch participates"
       ],
       "residualBoundary": [
         "exact STRING materialization remains host implementation",
