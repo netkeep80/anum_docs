@@ -32,12 +32,12 @@ same(a6.currentBaseline.v013.stages.B10, "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
 
 same(projection.coverage.formalKernelAuditComplete, true,
   "FORMAL kernel audit is recorded");
-same(projection.coverage.formalKernelSelfExtensionProven, false,
-  "self-extension is not falsely claimed");
+same(projection.coverage.formalKernelSelfExtensionProven, true,
+  "generic research-kernel self-extension is proven");
 same(projection.metrics.formalKernelHostDefinedSemanticLawCount, 3,
   "three scoped FORMAL E2 law families remain host-defined");
-same(projection.metrics.formalKernelSelfExtensionWitnessCount, 0,
-  "no self-extension witness exists yet");
+same(projection.metrics.formalKernelSelfExtensionWitnessCount, 2,
+  "two generic self-extension witnesses exist");
 
 const families = new Map(
   projection.semanticSourceAuthorityAudit.authorityFamilies.map(
@@ -56,8 +56,10 @@ same(audit.candidateEvidence.a10b.writeFixedPointInstantiationProven, false,
 
 same(audit.currentGaps.definePreviouslyUnknownNamedFormFromFormalSource, false,
   "new named FORMAL form is not yet demonstrated");
-same(audit.currentGaps.useNewFormWithoutHostSemanticBranch, false,
-  "host-branch-free extension is not yet demonstrated");
+same(audit.currentGaps.useNewFormWithoutHostSemanticBranch, true,
+  "host-branch-free extension is demonstrated on the generic research path");
+same(audit.currentGaps.twoMemorySelfExtensionWitness, true,
+  "two-Memory generic self-extension witness is demonstrated");
 same(audit.selfExtensionFalsifier.status, "EXECUTED_RED_FIXED_KERNEL",
   "self-extension falsifier records the executed RED boundary");
 assert(
@@ -66,13 +68,33 @@ assert(
   "self-extension falsifier records the executable RED result",
 );
 same(audit.selfExtensionFalsifier.attemptCount, 4,
-  "self-extension falsifier records four independent attempts");
+  "historical fixed-kernel F1 records four independent attempts");
 same(audit.selfExtensionFalsifier.successfulWitnessCount, 0,
-  "self-extension falsifier has no successful witness");
+  "historical fixed-kernel F1 remains zero-success RED");
 same(audit.selfExtensionFalsifier.independentMemoryCount, 2,
   "self-extension falsifier is reproduced in two independent Memories");
 same(audit.selfExtensionFalsifier.productionChanged, false,
   "self-extension RED does not change production");
+
+const f4 = audit.selfExtensionF4;
+same(f4.status, "EXECUTED_GREEN_SCOPED_RESEARCH",
+  "F4 generic research kernel is GREEN");
+same(f4.observed.unknownFunctionForms, 2,
+  "F4 executes two previously unknown function forms");
+same(f4.observed.genericReceiverFormBranches, 0,
+  "F4 receiver has no per-form branches");
+same(f4.observed.hostMatchers, 0,
+  "F4 receiver has no host matchers");
+same(f4.observed.negativeControls, 3,
+  "F4 forged authority controls fail closed");
+same(f4.observed.productionChanged, false,
+  "F4 leaves fixed production FORMAL evaluator unchanged");
+
+same(
+  audit.selfExtensionFalsifier.genericKernelRerun.status,
+  "EXECUTED_GREEN_SCOPED_RESEARCH",
+  "strong self-extension question is rerun GREEN on generic kernel",
+);
 
 assert(
   audit.ontologyFirewall.some((x: string) => x.includes("Link is the only foundational ontology entity")),
@@ -88,5 +110,5 @@ assert(
 );
 
 console.log(
-  "MTS v0.13 FORMAL kernel audit: A10b self-template validation exists, B3/B4/B10 remain open, and F-KERNEL-SELF-EXTENSION is now EXECUTED_RED_FIXED_KERNEL with zero successful witnesses: GREEN.",
+  "MTS v0.13 FORMAL kernel audit: fixed production F1 remains RED, generic Link-defined F4 self-extension is GREEN with two unknown functions and three forged controls, while B3/B4/B10 and self-generation remain open: GREEN.",
 );
