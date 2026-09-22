@@ -37,7 +37,8 @@
     "formalPortableNameAuthorityResearchComplete": true,
     "aspectApplicationStructuralCandidateResearchComplete": true,
     "aspectApplicationSemanticClosureProven": false,
-    "aspectApplicationFrozenContinuationResearchComplete": true
+    "aspectApplicationFrozenContinuationResearchComplete": true,
+    "aspectApplicationLTemplateContinuationResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -846,7 +847,10 @@
     "aspectContinuationResultCardinalityCases": 3,
     "aspectContinuationIndependentMemoryCount": 2,
     "aspectContinuationHigherOrderDepth": 2,
-    "aspectContinuationRuleAuthorityCount": 0
+    "aspectContinuationRuleAuthorityCount": 0,
+    "aspectApplicationLTemplateBasisCoverageCount": 5,
+    "aspectContinuationKernelDirectFindOutgoingCount": 0,
+    "aspectContinuationLTemplateIndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -905,14 +909,17 @@
     "aspectContinuationResultCardinalityCases": "A11b frozen selected Link-continuation authority cases read by one generic kernel: defined application with zero result continuations, one result continuation, and multiple result continuations.",
     "aspectContinuationIndependentMemoryCount": "Independent replay Memories in which byte-identical selected Link-continuation topology yields the same application results without sender-local handles.",
     "aspectContinuationHigherOrderDepth": "A11b repeated semantic application depth demonstrated after a returned Link is reused as the function/start pole of the next application.",
-    "aspectContinuationRuleAuthorityCount": "StructuralRule/Dictionary semantic authorities consulted by the A11b continuation reader. Zero means the scoped experiment reads only the frozen selected Link topology plus generic Memory operations; it does not imply global E2 closure."
+    "aspectContinuationRuleAuthorityCount": "StructuralRule/Dictionary semantic authorities consulted by the A11b continuation reader. Zero means the scoped experiment reads only the frozen selected Link topology plus generic Memory operations; it does not imply global E2 closure.",
+    "aspectApplicationLTemplateBasisCoverageCount": "A11c targets decoded by one grounded L=O⟼C structural template with O/C declared as its two roles: R, O, C, L and U. This demonstrates one two-pole template across all current basis cases but does not yet make role designation self-authorizing.",
+    "aspectContinuationKernelDirectFindOutgoingCount": "Direct find/outgoing/incoming topology operations used by the A11c continuation-reading kernel. Zero: it scans the explicitly frozen selected Link support and decodes candidate two-pole Links through generic unification against L.",
+    "aspectContinuationLTemplateIndependentMemoryCount": "Independent replay Memories in which the same portable selected continuation authority is interpreted through the L self-template without sender-local handles."
   },
   "nextExperiments": [
-    "A11c: remove the host semantic privilege of 'prefix find + frozen outgoing ends are results' by representing/reconstructing that continuation-reading law from MTS Link/aspect evidence under a frozen authority; equivalent host re-encoding is failure.",
-    "A11d: extend the same continuation law to self-incidence application keys, especially R(R)=R, START and END cases, without a per-aspect host switch.",
-    "After A11c/A11d, integrate F2b portable physical naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
-    "Only then revisit F2c cyclic construction and rerun F-KERNEL-SELF-EXTENSION.",
-    "Measure/falsify residual generic E2 authority in exact STRING materialization, Dictionary lookup, structural unification and selected-support interpretation.",
+    "A11d: attack the remaining role authority. Represent/reconstruct from MTS evidence why L's ordered roles are O/C and why the C-role is the continuation/result role, rather than hard-coding [O,C] and C in the host reader.",
+    "A11e: exercise self-incidence application keys/results, especially R(R)=R plus START/END cases, through the same aspect-derived law without a per-aspect host switch or accidental self-edge-as-result ambiguity.",
+    "After role/self-incidence closure, integrate F2b portable naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
+    "Only then revisit cyclic FORMAL construction and rerun F-KERNEL-SELF-EXTENSION.",
+    "Measure/falsify residual generic E2 authority in exact STRING materialization, Dictionary lookup, structural unification and frozen-support orchestration.",
     "Audit E3 only after E2/FORMAL reconstruction work; frozen selected authority must remain distinct from live adjacency."
   ],
   "measurement": {
@@ -2488,6 +2495,60 @@
       },
       "evidenceTest": "ts/test/research-v013-aspect-continuation-a11b.test.ts",
       "consequence": "The user's R→a→b reading is executable as a scoped frozen-Link semantics: R(a) can yield zero/one/many b continuations, and a returned b may itself be used as the function pole of a later application. The remaining question is whether the generic prefix/outgoing/end-pole interpretation law itself can be reconstructed from MTS aspects rather than remain host semantic source."
+    },
+    "aspectApplicationA11c": {
+      "status": "EXECUTED_GREEN_L_TEMPLATE_RECONSTRUCTION_CANDIDATE",
+      "hypothesis": "L=O⟼C can serve as one generic ostensive two-pole application template when O and C are treated as its ordered structural roles. The same template can infer the pole values of R/O/C/L/U and decode continuation occurrences (F⟼a)⟼b without direct host find/outgoing/end-pole interpretation.",
+      "basisCoverage": [
+        "L template against R infers O-role=R and C-role=R",
+        "L template against O infers O-role=O and C-role=R",
+        "L template against C infers O-role=R and C-role=C",
+        "L template against L infers O-role=O and C-role=C",
+        "L template against U infers O-role=C and C-role=O"
+      ],
+      "continuationKernel": [
+        "application key is the already-existing Link F⟼a",
+        "require that key itself belongs to the frozen selected authority",
+        "iterate the frozen selected Link support without ambient topology discovery",
+        "unify each selected Link against grounded template L with roles [O,C]",
+        "when inferred O-role equals the exact application key, infer the C-role as one result continuation b",
+        "project zero/one/many inferred b Links through derived BundleValue"
+      ],
+      "eliminatedFromA11bKernel": [
+        "direct Memory.find(F,a)",
+        "direct outgoing(applicationPrefix)",
+        "direct poles(continuationOccurrence).end"
+      ],
+      "residualHostSemanticBoundary": [
+        "the host still supplies [O,C] as the role list for L",
+        "the host still treats the inferred O-role as application-prefix position and C-role as result position",
+        "generic structural unification remains host semantic law",
+        "iteration over the explicitly frozen selected support remains host orchestration",
+        "BundleValue projection remains derived host surface",
+        "portable selected-support framing remains external"
+      ],
+      "authorityBoundary": [
+        "frozen selected support is semantic authority; ambient live adjacency is not",
+        "no Dictionary/Grammar/Theory/StructuralRule authority participates in the A11c reader",
+        "the selected authority is portable canonical Link topology only"
+      ],
+      "observed": {
+        "basisTargetsDecodedByL": 5,
+        "resultCardinality": [
+          "zero",
+          "one",
+          "many"
+        ],
+        "higherOrderDepth": 2,
+        "independentMemories": 2,
+        "directFindOutgoingIncomingCallsInKernel": 0,
+        "structuralRuleAuthorityCount": 0,
+        "dictionaryAuthorityCount": 0,
+        "productionChanged": false,
+        "semanticClosureProven": false
+      },
+      "evidenceTest": "ts/test/research-v013-l-template-continuation-a11c.test.ts",
+      "consequence": "A11c removes the A11b host privilege that directly interpreted prefix lookup, outgoing adjacency and end poles. One grounded L template now structurally decodes the selected nested Links and works across all R/O/C/L/U basis topologies. Remaining semantic privilege is concentrated in role authority: why O means application/start position, why C means result/end position, and why [O,C] are the roles of L."
     }
   }
 }
