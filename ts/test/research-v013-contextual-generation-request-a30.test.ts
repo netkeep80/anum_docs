@@ -77,7 +77,6 @@ function buildFamily(memory: Memory, b: RootBasis, seed: LinkHandle): Family {
   const E3=referenceNextExecution(memory,E2), E4=referenceNextExecution(memory,E3);
   return Object.freeze({metaParent,E0,E1,E2,E3,E4});
 }
-/** Exact A23 runtime consumer; A30 changes only producer-authority source selection. */
 function metaStep(
   memory: Memory,
   currentExecutionTruth: LinkHandle,
@@ -214,14 +213,6 @@ function deriveTargetSeeds(
   assert(reversed.length>1,"A30 target history nontrivial");
   return Object.freeze([dp.start,...reversed]);
 }
-/**
- * Derive the source seed sequence from producer-authority topology itself.
- *
- * No candidate role positions are interpreted. The extractor searches the
- * candidate's Link values for exactly one M whose END is a proper START-self
- * envelope. That envelope must carry a non-empty contiguous chain of
- * execution transitions E_i->E_(i+1).
- */
 function deriveProducerSeeds(
   memory:Memory,
   candidate:LinkHandle,
@@ -402,35 +393,25 @@ function exercise(noise:boolean):void{
 }
 function staticGuards():void{
   const root=resolve(process.cwd(),"..");
-  const own=readFileSync(
-    join(root,"ts/test/research-v013-contextual-generation-request-a30.test.ts"),"utf8",
-  );
-  const prior=readFileSync(
-    join(root,"ts/test/research-v013-meta-transition-authority-a23.test.ts"),"utf8",
-  );
-  const a=own.slice(
-    own.indexOf("function metaStep("),
-    own.indexOf("\nconst ROOT=",own.indexOf("function metaStep(")),
-  );
-  const b=prior.slice(
-    prior.indexOf("function metaStep("),
-    prior.indexOf("\nfunction frontierOccurrences(",prior.indexOf("function metaStep(")),
-  );
+  const own=readFileSync(join(root,"ts/test/research-v013-contextual-generation-request-a30.test.ts"),"utf8");
+  const prior=readFileSync(join(root,"ts/test/research-v013-meta-transition-authority-a23.test.ts"),"utf8");
+  const a=own.slice(own.indexOf("function metaStep("),own.indexOf("\nconst ROOT=",own.indexOf("function metaStep(")));
+  const b=prior.slice(prior.indexOf("function metaStep("),prior.indexOf("\nfunction frontierOccurrences(",prior.indexOf("function metaStep(")));
   same(a.replace(/\s+/g,""),b.replace(/\s+/g,""),"A30 unchanged A23 metaStep");
-  const runner=own.slice(
-    own.indexOf("function runGenerationRequest("),
-    own.indexOf("\nfunction exercise(",own.indexOf("function runGenerationRequest(")),
-  );
+  const runner=own.slice(own.indexOf("function runGenerationRequest("),own.indexOf("\nfunction exercise(",own.indexOf("function runGenerationRequest(")));
   const signature=runner.slice(0,runner.indexOf("):Readonly"));
   assert(signature.includes("requestTruth:LinkHandle"),"A30 one contextual request truth input");
-  assert(!signature.includes("inventory:LinkHandle"),"A30 no separate inventory argument");
-  assert(!signature.includes("targetDescriptor:LinkHandle"),"A30 no separate target argument");
-  assert(runner.includes("const generationContext=truth.start"),"A30 generation context comes from truth");
-  assert(runner.includes("const targetDescriptor=truth.end"),"A30 target selection comes from truth");
-  assert(runner.includes("const inventory=contextPoles.end"),"A30 inventory comes from generation context");
+  assert(!signature.includes("inventory:LinkHandle")&&!signature.includes("targetDescriptor:LinkHandle"),"A30 no separate target/inventory args");
   for(const x of [".find(", ".outgoing(", ".incoming(", "allLinks(", "switch("])
     assert(!runner.includes(x),`A30 request runner excludes ambient selector ${x}`);
+  const target=own.slice(own.indexOf("function deriveTargetSeeds("),own.indexOf("\nfunction deriveProducerSeeds(",own.indexOf("function deriveTargetSeeds(")));
+  for(const x of ["readExactSequence","ExactSequence",".find(", ".outgoing(", ".incoming(", "allLinks(","switch("])
+    assert(!target.includes(x),`A30 target extractor excludes positional/ambient primitive ${x}`);
+  const source=own.slice(own.indexOf("function deriveProducerSeeds("),own.indexOf("\nfunction derivedSeedMap(",own.indexOf("function deriveProducerSeeds(")));
+  for(const x of ["META","E0","E1","E2","E3","E4","T0","C0","ENV","switch(", ".find(", ".outgoing(", ".incoming(", "allLinks("])
+    assert(!source.includes(x),`A30 source extractor excludes positional/ambient primitive ${x}`);
 }
+
 function main():void{
   exercise(false);exercise(true);staticGuards();
   console.log([
