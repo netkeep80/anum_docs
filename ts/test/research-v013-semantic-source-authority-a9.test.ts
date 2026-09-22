@@ -101,7 +101,8 @@ for (const family of audit.authorityFamilies as any[]) {
   assert(!familyIds.has(family.id), `duplicate E2 family id: ${family.id}`);
   familyIds.add(family.id);
   assert(classifications.includes(family.currentClassification), `${family.id}: known classification`);
-  observedCounts[family.currentClassification] =\n    (observedCounts[family.currentClassification] ?? 0) + 1;
+  observedCounts[family.currentClassification] =
+    (observedCounts[family.currentClassification] ?? 0) + 1;
   assert(
     typeof family.linkEvidence === "string" && family.linkEvidence.length > 0,
     `${family.id}: Link-evidence boundary is explained`,
