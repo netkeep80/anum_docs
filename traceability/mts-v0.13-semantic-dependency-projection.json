@@ -113,7 +113,8 @@
     "selfGeneratedMetaProducerAuthorityA24Designed": true,
     "selfGeneratedMetaProducerAuthorityA24Complete": true,
     "metaAuthorityTemplateInstantiationA25Designed": true,
-    "metaAuthorityTemplateInstantiationA25Complete": true
+    "metaAuthorityTemplateInstantiationA25Complete": true,
+    "metaAuthorityTemplateConvergenceA26Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1442,9 +1443,9 @@
     "metaAuthorityTemplateInstantiationA25IndependentMemoryCount": "Independent Memories reproducing A25 template instantiation/admission/publication/runtime behavior."
   },
   "nextExperiments": [
-    "A26: remove host selection of one source producer-authority exemplar. Freeze at least two independently valid compatible source templates, instantiate all through their Link-carried target correspondences, and require convergence to one target publication with no template-identity branch.",
-    "A26 must keep per-template correspondence authority explicit unless separately derived; the target is exemplar-selection removal, not a false claim of full source elimination.",
-    "If A26 is GREEN, attack external template-frontier membership / correspondence selection using the same structural-discovery boundary exposed by F5-F8.",
+    "A26: execute a two-template producer-authority frontier and require all compatible members to converge to one target candidate/publication/meta-context without host template selection.",
+    "If A26 is GREEN, A27 should attack external compatible-frontier membership: start from a broader frozen authority inventory and structurally discover which packages correspond to the selected target, while keeping incompatible/malformed packages fail-closed or excluded by explicit evidence.",
+    "A26 must preserve per-template correspondence as an explicit residual and must not add ranking/heuristic winner selection.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
@@ -5394,6 +5395,54 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "metaAuthorityTemplateConvergenceA26": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can host selection of one source producer-authority exemplar be removed by instantiating every member of a Link-carried compatible template frontier and requiring canonical convergence to one target candidate/publication/meta-context?",
+      "setup": [
+        "construct two independently valid source execution families with distinct producer-authority candidate identities",
+        "construct one target execution family whose producer authority is absent at freeze",
+        "freeze one source-template package per source: source candidate plus source-seed->common-target-seed correspondence",
+        "freeze both packages in one Link-carried ExactSequence frontier with no selected winner",
+        "generic runner instantiates every package using A25 equal-length seed zipper plus pole/self-incidence topology recursion",
+        "require each target candidate to pass the same frozen structural admission rule and receive explicit publication",
+        "require all successful target results to converge to one candidate, one publication and one target meta-context M",
+        "consume the converged authority through unchanged A23 metaStep"
+      ],
+      "oracle": [
+        "source template candidates are independently valid and have distinct identities",
+        "template frontier size is two and both members instantiate successfully",
+        "distinct target candidates equals one",
+        "distinct target publications equals one",
+        "distinct target meta-contexts equals one",
+        "no host-selected source template handle or source-template identity branch exists in the frontier runner",
+        "target producer authority is absent at freeze",
+        "unchanged A23 metaStep advances target E0..E4 then ZERO",
+        "one malformed package causes the entire selected frontier to reject fail-closed",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "frontier runner contains no source1/source2/t1/t2 identity branch or switch dispatch",
+        "A26 metaStep is whitespace-normalized source-identical to A23",
+        "all frontier members must execute; no heuristic ranking or early winner selection",
+        "canonical convergence is checked by Link identity, not labels or host names"
+      ],
+      "residualAuthority": [
+        "template frontier membership remains externally selected",
+        "each package still carries one external source-seed->target-seed sequence correspondence",
+        "target seed ExactSequence remains externally selected/common",
+        "current meta-occurrence selection remains explicit",
+        "semantic information is not claimed eliminated"
+      ],
+      "evidenceTest": "ts/test/research-v013-meta-authority-template-convergence-a26.test.ts",
+      "claimBoundary": [
+        "GREEN would remove host selection of one specific producer-authority template within the tested compatible frontier",
+        "GREEN would not remove external frontier membership or per-template correspondence authority",
+        "next gate should attack structural discovery/frontier membership rather than introduce ranking",
+        "this gate does not accept v0.13",
+        "global E2/E3 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
