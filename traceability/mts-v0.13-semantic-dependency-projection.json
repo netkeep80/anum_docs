@@ -43,7 +43,8 @@
     "aspectApplicationMethodOrientationResearchComplete": true,
     "aspectApplicationSelfContinuationSignatureResearchComplete": true,
     "aspectApplicationUnifierSliceAuditComplete": true,
-    "aspectApplicationUnifierSourceRemovalProven": false
+    "aspectApplicationUnifierSourceRemovalProven": false,
+    "aspectApplicationUnifiedContinuationResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -870,7 +871,11 @@
     "aspectA11UnifierPoleReadsPerDecode": 3,
     "aspectA11UnifierRoleBindingsPerDecode": 2,
     "aspectA11UnifierTemplateDepth": 1,
-    "aspectA11UnifierIndependentMemoryCount": 2
+    "aspectA11UnifierIndependentMemoryCount": 2,
+    "aspectUnifiedContinuationApplicationClassCount": 2,
+    "aspectUnifiedContinuationSpecialCaseBranchCount": 0,
+    "aspectUnifiedContinuationResultCardinalityCases": 3,
+    "aspectUnifiedContinuationIndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -947,13 +952,17 @@
     "aspectA11UnifierPoleReadsPerDecode": "Observed poles() calls for one A11 root-frame decode via unifyStructuralTemplate(L,target,[O,C]): L during contains-role analysis, L during root unification, and target once. No deeper target traversal occurs.",
     "aspectA11UnifierRoleBindingsPerDecode": "A11g exact bindings inferred per decode: O-role -> target.start and C-role -> target.end.",
     "aspectA11UnifierTemplateDepth": "Effective A11g template traversal depth before declared roles terminate matching. One means only the outer L=O⟼C layer is traversed.",
-    "aspectA11UnifierIndependentMemoryCount": "Independent Memories, one with unrelated noise, in which the same minimal unifier slice is observed across R/O/C/L/U."
+    "aspectA11UnifierIndependentMemoryCount": "Independent Memories, one with unrelated noise, in which the same minimal unifier slice is observed across R/O/C/L/U.",
+    "aspectUnifiedContinuationApplicationClassCount": "A11h application classes handled by the same method-oriented continuation kernel: ordinary non-self-incidence application Links and self-incidence R/O/C/L/U application Links.",
+    "aspectUnifiedContinuationSpecialCaseBranchCount": "Branches that distinguish ordinary PAIR applications from ROOT/START/END self-incidence applications in the A11h kernel. Zero.",
+    "aspectUnifiedContinuationResultCardinalityCases": "A11h result cardinalities observed through one kernel across ordinary and self-incidence cases: zero, one and many.",
+    "aspectUnifiedContinuationIndependentMemoryCount": "Independent Memories in which the same unified continuation law reproduces ordinary and self-incidence results."
   },
   "nextExperiments": [
-    "Execute A11G-F1-UNIFIER-DENIAL against the exact one-Link/two-role binding slice. Do not substitute direct host candidate.start/candidate.end mapping or another host matcher.",
-    "A11h: combine ordinary zero/one/many frozen continuations with A11f self-continuation signatures under one method authority and one result projection, proving no separate evaluator is needed for PAIR versus ROOT/START/END.",
-    "After A11G-F1/A11h, integrate F2b portable naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
+    "Execute A11G-F1-UNIFIER-DENIAL now against the unified A11h kernel; the exact two-role binding law must become portable MTS evidence rather than direct host pole remapping.",
+    "After A11G-F1, integrate F2b physical name -> Use with A11h unified aspect-continuation semantics in one end-to-end FORMAL witness.",
     "Then rerun F-KERNEL-SELF-EXTENSION and reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization.",
+    "If FORMAL closure improves, apply the same unified aspect/application law to proof meta-semantics rather than preserving a separate proof evaluator by assumption.",
     "E3/E4 remain separate and open; selected frozen authority must not collapse into live adjacency."
   ],
   "measurement": {
@@ -2803,6 +2812,54 @@
       },
       "evidenceTest": "ts/test/research-v013-unifier-slice-a11g.test.ts",
       "consequence": "A11g does not source-remove generic unification, but shrinks the relevant semantic-source boundary to a one-Link, two-role projection. Most generic unifier machinery is not exercised on the A11 root-aspect path. The next source-removal experiment can target this exact narrow law instead of the full generic matcher."
+    },
+    "aspectApplicationA11h": {
+      "status": "EXECUTED_GREEN_UNIFIED_CONTINUATION_CANDIDATE",
+      "hypothesis": "Ordinary frozen continuations P⟼b and intrinsic self-continuations of R/O/C/L/U do not require separate evaluators. One method-oriented kernel can inspect a selected candidate set and include a candidate whenever its method-FROM value equals the application Link.",
+      "genericKernel": [
+        "derive FROM/TO role orientation from selected method Link L or U",
+        "decode every selected candidate through one root Dual(R)=L template",
+        "do not skip candidate===application",
+        "candidate contributes iff decoded FROM value equals application",
+        "decoded TO value becomes one result",
+        "project zero/one/many results through derived BundleValue"
+      ],
+      "ordinaryCorpus": [
+        "ordinary P plus selected P⟼d1 and P⟼d2 => direct {d1,d2}",
+        "ordinary P plus selected i1⟼P and i2⟼P => inverse {i1,i2}",
+        "ordinary P itself contributes nothing because neither of its poles equals P"
+      ],
+      "selfIncidenceCorpus": [
+        "R as its own candidate => direct {R}, inverse {R}",
+        "O as its own candidate => direct {R}, inverse {}",
+        "C as its own candidate => direct {}, inverse {R}",
+        "L and U as their own candidates => empty under both methods"
+      ],
+      "keyResult": "The same equality condition handles both explicit continuation occurrences and intrinsic self-incidence. No ROOT/START/END/PAIR dispatch and no candidate===application exclusion is needed.",
+      "residualHostSemanticBoundary": [
+        "generic structural unification remains host semantic law",
+        "method-role interpretation/equality comparison remains host execution",
+        "candidate selection/frozen authority framing remains external",
+        "BundleValue projection remains derived host surface"
+      ],
+      "observed": {
+        "applicationClasses": [
+          "ordinary",
+          "self-incidence"
+        ],
+        "resultCardinality": [
+          "zero",
+          "one",
+          "many"
+        ],
+        "specialCaseBranches": 0,
+        "candidateSelfExclusion": false,
+        "independentMemories": 2,
+        "productionChanged": false,
+        "semanticClosureProven": false
+      },
+      "evidenceTest": "ts/test/research-v013-unified-continuation-a11h.test.ts",
+      "consequence": "A11h removes the architectural need for one evaluator for ordinary application and another for four self-incidence aspects. Explicit P⟼b continuations and intrinsic self-continuation are two cases of the same selected method-oriented Link law. Remaining closure is concentrated in the tiny A11g unifier/method semantic source."
     }
   }
 }
