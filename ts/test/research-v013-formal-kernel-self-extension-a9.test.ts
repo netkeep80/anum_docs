@@ -1,0 +1,81 @@
+import { readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+
+function assert(condition: unknown, message: string): asserts condition {
+  if (!condition) throw new Error(`v0.13 FORMAL kernel audit: ${message}`);
+}
+
+function same<T>(actual: T, expected: T, message: string): void {
+  assert(Object.is(actual, expected), `${message}: values differ`);
+}
+
+const repoRoot = resolve(process.cwd(), "..");
+const conformance = JSON.parse(
+  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.13.json"), "utf8"),
+);
+const projection = JSON.parse(
+  readFileSync(
+    join(repoRoot, "traceability/mts-v0.13-semantic-dependency-projection.json"),
+    "utf8",
+  ),
+);
+
+const a6 = conformance.nonBlockingComparativeResearch.formalLogicDialectA6;
+const audit = projection.formalKernelAudit;
+
+same(a6.currentBaseline.v013.stages.B3, "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+  "FORMAL source does not yet present MTS axioms");
+same(a6.currentBaseline.v013.stages.B4, "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+  "FORMAL source does not yet present reusable rules");
+same(a6.currentBaseline.v013.stages.B10, "NOT_DEMONSTRATED_FROM_FORMAL_SOURCE",
+  "complete axiom system is not yet encoded through FORMAL source");
+
+same(projection.coverage.formalKernelAuditComplete, true,
+  "FORMAL kernel audit is recorded");
+same(projection.coverage.formalKernelSelfExtensionProven, false,
+  "self-extension is not falsely claimed");
+same(projection.metrics.formalKernelHostDefinedSemanticLawCount, 3,
+  "three scoped FORMAL E2 law families remain host-defined");
+same(projection.metrics.formalKernelSelfExtensionWitnessCount, 0,
+  "no self-extension witness exists yet");
+
+const families = new Map(
+  projection.semanticSourceAuthorityAudit.authorityFamilies.map(
+    (entry: { id: string; currentClassification: string }) =>
+      [entry.id, entry.currentClassification] as const,
+  ),
+);
+for (const id of audit.e2Relation.hostDefinedFormalLawFamilies) {
+  same(families.get(id), "HOST_DEFINED", `${id} remains E2 host-defined`);
+}
+
+same(audit.candidateEvidence.a10b.hostAspectEnumRequiredForValidation, false,
+  "A10b already removes aspect-enum authority from read-only validation");
+same(audit.candidateEvidence.a10b.writeFixedPointInstantiationProven, false,
+  "A10b does not overclaim write/fixed-point closure");
+
+same(audit.currentGaps.definePreviouslyUnknownNamedFormFromFormalSource, false,
+  "new named FORMAL form is not yet demonstrated");
+same(audit.currentGaps.useNewFormWithoutHostSemanticBranch, false,
+  "host-branch-free extension is not yet demonstrated");
+same(audit.selfExtensionFalsifier.status, "DESIGNED_NOT_EXECUTED",
+  "self-extension falsifier is designed but not executed");
+same(audit.selfExtensionFalsifier.currentResult, "NOT_RUN",
+  "self-extension remains an open falsifier");
+
+assert(
+  audit.ontologyFirewall.some((x: string) => x.includes("Link is the only foundational ontology entity")),
+  "ontology firewall preserves Link-only foundation",
+);
+assert(
+  audit.ontologyFirewall.some((x: string) => x.includes("sequence/carrier != Link denotation")),
+  "carrier/sequence is not conflated with semantic Link",
+);
+assert(
+  audit.ontologyFirewall.some((x: string) => x.includes("graph theory")),
+  "graph theory remains external to the foundation",
+);
+
+console.log(
+  "MTS v0.13 FORMAL kernel audit: A10b self-template validation exists, but B3/B4/B10 and unknown-form self-extension remain open; three FORMAL E2 law families are still HOST_DEFINED and F-KERNEL-SELF-EXTENSION is RED-design-only: GREEN.",
+);
