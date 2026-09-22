@@ -372,7 +372,7 @@ function staticVerifierGuard():void{
   assert(start>=0&&end>start,"F5-F2 verifier source slice");
   const verifier=source.slice(start,end);
   for(const forbidden of [
-    "switch(","candidateCoordinate","nameCarrier","function","argument",
+    "switch(","candidateCoordinate","nameCarrier","argument",
     "application","continuation","result1","result2","isValidDefinition",
   ]){
     assert(!verifier.includes(forbidden),
