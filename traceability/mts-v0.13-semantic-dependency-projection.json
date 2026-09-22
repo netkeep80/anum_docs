@@ -124,7 +124,8 @@
     "linkNativeTargetHistoryA29Complete": true,
     "contextualGenerationRequestA30Designed": true,
     "contextualGenerationRequestA30Complete": true,
-    "generationRequestHistoryA31Designed": true
+    "generationRequestHistoryA31Designed": true,
+    "generationRequestHistoryA31Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1505,9 +1506,9 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A31: execute Link-native generation-request occurrence history and remove current request-truth T from runner arguments.",
-    "If A31 is GREEN, attack selection/publication of Q itself or fold generation-request execution into a higher contextual/meta occurrence without executing every ambient request truth.",
-    "After A31, broad inventory membership/publication and current meta-occurrence selection remain separate source boundaries.",
+    "A32: reduce external selection of Q itself. Carry the currently selected generation request-execution root in a higher contextual occurrence/authority, while keeping ambient Q candidates inert.",
+    "A32 must not execute every request execution linked to the generation context; selection must remain explicit in Link structure and preserve immutable request history.",
+    "After A32, broad inventory membership/publication and current meta-occurrence selection remain separate source boundaries.",
     "A31 must preserve immutable request truth and distinguish selected occurrence from ambient alternative G->Target truths.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
@@ -5781,7 +5782,7 @@
       }
     },
     "generationRequestHistoryA31": {
-      "status": "DESIGNED_PENDING_EXECUTION",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can host selection of current generation-request truth T be removed by carrying immutable request occurrence/history as Link authority, while keeping ambient G->Target truths inert?",
       "setup": [
         "retain A30 generation context G carrying source inventory and Link-native target histories",
@@ -5815,7 +5816,27 @@
         "GREEN removes direct host selection of T but not selection of Q itself",
         "ambient target truths remain non-authoritative unless referenced by selected request occurrence history",
         "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open; production unchanged"
-      ]
+      ],
+      "consequence": "A31 removes direct host selection of the current generation-request truth T from the tested generation runner. Request selection is carried by immutable Link occurrence ancestry H and one selected request-execution root Q=G->Hn. The runner derives G, current occurrence and current T structurally; ambient G->Target truths and unselected newer occurrences remain inert. Advancing selection requires a new Q.",
+      "currentResult": "GREEN in the full TypeScript/test/browser-check step: the runner accepts one requestExecution handle and no requestTruth/targetDescriptor argument. A two-occurrence request history selects the current full target and generates the expected converged authority consumed by unchanged A23 metaStep. Ambient target truth and a physically newer occurrence do not change the selected request. A new Q over the newer occurrence switches to a second full structurally compatible target. Cross-context occurrence and non-history Q reject fail-closed. Two independent Memories execute the same corpus.",
+      "observed": {
+        "requestSelection": "LINK_NATIVE_OCCURRENCE_HISTORY",
+        "requestExecution": "G_TO_CURRENT_OCCURRENCE",
+        "currentRequestTruth": "DERIVED_FROM_OCCURRENCE_END",
+        "currentRequestTruthHostArgumentCount": 0,
+        "ambientTargetTruth": "IGNORED",
+        "ambientNewerOccurrence": "IGNORED",
+        "advanceRequiresNewRequestExecution": true,
+        "crossContextRequestOccurrence": "REJECTED",
+        "nonHistoryRequestExecution": "REJECTED",
+        "targetSeedExactSequence": 0,
+        "perTemplateSeedCorrespondence": 0,
+        "compatibleTemplates": 2,
+        "unchangedA23MetaStep": true,
+        "externalRequestExecutionSelection": true,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     }
   }
 }
