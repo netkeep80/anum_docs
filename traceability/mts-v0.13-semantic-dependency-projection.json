@@ -38,7 +38,8 @@
     "aspectApplicationStructuralCandidateResearchComplete": true,
     "aspectApplicationSemanticClosureProven": false,
     "aspectApplicationFrozenContinuationResearchComplete": true,
-    "aspectApplicationLTemplateContinuationResearchComplete": true
+    "aspectApplicationLTemplateContinuationResearchComplete": true,
+    "aspectApplicationDualRoleTemplateResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -850,7 +851,10 @@
     "aspectContinuationRuleAuthorityCount": 0,
     "aspectApplicationLTemplateBasisCoverageCount": 5,
     "aspectContinuationKernelDirectFindOutgoingCount": 0,
-    "aspectContinuationLTemplateIndependentMemoryCount": 2
+    "aspectContinuationLTemplateIndependentMemoryCount": 2,
+    "aspectDualRoleTemplateBasisCoverageCount": 5,
+    "aspectDualRoleTemplateIndependentMemoryCount": 2,
+    "aspectRawPoleRoleFalsifierCount": 1
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -912,15 +916,17 @@
     "aspectContinuationRuleAuthorityCount": "StructuralRule/Dictionary semantic authorities consulted by the A11b continuation reader. Zero means the scoped experiment reads only the frozen selected Link topology plus generic Memory operations; it does not imply global E2 closure.",
     "aspectApplicationLTemplateBasisCoverageCount": "A11c targets decoded by one grounded L=O⟼C structural template with O/C declared as its two roles: R, O, C, L and U. This demonstrates one two-pole template across all current basis cases but does not yet make role designation self-authorizing.",
     "aspectContinuationKernelDirectFindOutgoingCount": "Direct find/outgoing/incoming topology operations used by the A11c continuation-reading kernel. Zero: it scans the explicitly frozen selected Link support and decodes candidate two-pole Links through generic unification against L.",
-    "aspectContinuationLTemplateIndependentMemoryCount": "Independent replay Memories in which the same portable selected continuation authority is interpreted through the L self-template without sender-local handles."
+    "aspectContinuationLTemplateIndependentMemoryCount": "Independent replay Memories in which the same portable selected continuation authority is interpreted through the L self-template without sender-local handles.",
+    "aspectDualRoleTemplateBasisCoverageCount": "A11d basis targets R/O/C/L/U decoded by a generic Dual(A)=START(A)⟼END(A) role template whose roles are structurally distinct even when A has equal raw endpoint values.",
+    "aspectDualRoleTemplateIndependentMemoryCount": "Independent replay Memories in which the same portable continuation authority and non-root Dual(A) role template preserve decoding and result semantics without sender-local handles.",
+    "aspectRawPoleRoleFalsifierCount": "A11d negative result: one ordinary equal-raw-pole Link A=X⟼X falsifies the naive idea that raw endpoint values themselves can always serve as two distinct role placeholders."
   },
   "nextExperiments": [
-    "A11d: attack the remaining role authority. Represent/reconstruct from MTS evidence why L's ordered roles are O/C and why the C-role is the continuation/result role, rather than hard-coding [O,C] and C in the host reader.",
-    "A11e: exercise self-incidence application keys/results, especially R(R)=R plus START/END cases, through the same aspect-derived law without a per-aspect host switch or accidental self-edge-as-result ambiguity.",
-    "After role/self-incidence closure, integrate F2b portable naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
-    "Only then revisit cyclic FORMAL construction and rerun F-KERNEL-SELF-EXTENSION.",
-    "Measure/falsify residual generic E2 authority in exact STRING materialization, Dictionary lookup, structural unification and frozen-support orchestration.",
-    "Audit E3 only after E2/FORMAL reconstruction work; frozen selected authority must remain distinct from live adjacency."
+    "A11e: represent/reconstruct the direction convention itself: given selected Dual(A), make the choice START-role=input and END-role=result an explicit MTS Link/method authority rather than host positional convention; test direct and inverse orientations.",
+    "A11f: exercise self-incidence application/result cases, especially R(R)=R and START/END application keys, without accidental self-edge ambiguity or per-aspect host switches.",
+    "After direction and self-incidence closure, integrate F2b portable naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
+    "Only then rerun F-KERNEL-SELF-EXTENSION and reassess the three remaining host-defined FORMAL law families.",
+    "Continue E2 source-removal on generic structural unification/role reconstruction before any FULL_SELF_HOSTED claim."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -2549,6 +2555,51 @@
       },
       "evidenceTest": "ts/test/research-v013-l-template-continuation-a11c.test.ts",
       "consequence": "A11c removes the A11b host privilege that directly interpreted prefix lookup, outgoing adjacency and end poles. One grounded L template now structurally decodes the selected nested Links and works across all R/O/C/L/U basis topologies. Remaining semantic privilege is concentrated in role authority: why O means application/start position, why C means result/end position, and why [O,C] are the roles of L."
+    },
+    "aspectApplicationA11d": {
+      "status": "EXECUTED_GREEN_DUAL_ROLE_GENERALIZATION",
+      "hypothesis": "The ordered semantic roles needed by application are not the raw endpoint values O/C as privileged constants. For any selected whole A, START(A) and END(A) are structurally distinct role Links and Dual(A)=START(A)⟼END(A) can serve as a two-role template. Root L is the specialization Dual(R).",
+      "rootSpecialization": [
+        "START(R)=O",
+        "END(R)=C",
+        "Dual(R)=O⟼C=L"
+      ],
+      "rawPoleFalsifier": "For ordinary A=X⟼X, raw poles are equal and cannot form two distinct StructuralRole placeholders; naive raw-pole role derivation is therefore not general.",
+      "generalizedRoleConstruction": [
+        "START(A)=START_FORM(A)",
+        "END(A)=END_FORM(A)",
+        "START(A) != END(A) even when raw A.start == A.end",
+        "Dual(A)=START(A)⟼END(A)",
+        "Dual(A) with roles [START(A),END(A)] generically infers the start/end values of R/O/C/L/U and selected continuation Links"
+      ],
+      "continuationResult": "The A11c zero/one/many frozen continuation corpus is preserved when decoded through a non-root Dual(A) role template instead of root L/O/C roles.",
+      "eliminatedPrivilege": [
+        "no hard-coded O role in the continuation decoder",
+        "no hard-coded C role in the continuation decoder",
+        "L is no longer required as the unique decoding template"
+      ],
+      "residualHostSemanticBoundary": [
+        "host materializes/reads START(A), END(A) and Dual(A) through current Memory constructors",
+        "host still treats the ordered end role of the selected Dual template as continuation/result position",
+        "generic structural unification remains host semantic law",
+        "frozen-support iteration and BundleValue projection remain host orchestration/projection"
+      ],
+      "observed": {
+        "basisTargetsDecoded": 5,
+        "independentMemories": 2,
+        "rawPoleRoleModelGeneral": false,
+        "rootLIsDualOfR": true,
+        "hardcodedRootOCRolesInContinuationDecoder": 0,
+        "resultCardinality": [
+          "zero",
+          "one",
+          "many"
+        ],
+        "productionChanged": false,
+        "semanticClosureProven": false
+      },
+      "evidenceTest": "ts/test/research-v013-dual-role-template-a11d.test.ts",
+      "consequence": "A11d moves role authority from privileged root constants O/C to the generic START(A)/END(A) structure of any selected whole. L remains important as Dual(R), but the generic mechanism is Dual(A), which survives equal raw endpoint values. The remaining semantic question is why END-role denotes continuation/result and how that orientation law becomes MTS-owned rather than host convention."
     }
   }
 }
