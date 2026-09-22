@@ -2884,10 +2884,11 @@
         ],
         "a11fRegression": "Verified proof-carrying bindings must reproduce R=11,O=10,C=01,L=00,U=00 and remain equal to independently observed self-incidence masks.",
         "antiCheat": [
-          "sender-side fixture may inspect target poles only to construct a witness; sender is not semantic authority",
-          "receiver verifier is wrapped so poles(target) throws",
-          "witness values are not trusted; exact target Link identity is independently checked",
-          "no equivalent recursive matcher or role morphism verifier is used",
+          "sender-side fixture may inspect target poles only to construct proof evidence; sender is not semantic authority",
+          "receiver verifier has contextual witness/binding readers plus ordered Link identity, but no target-decomposition capability",
+          "a Link handle may alias another structural role; anti-cheat is defined by semantic read role, not object/handle type",
+          "verifier source is guarded against structural-unification/matchStructuralTemplate/StructuralRoleMorphism and direct poles(target) code",
+          "witness values are not trusted; exact ordered target Link identity is independently checked",
           "transport coordinates identify artifact nodes only and carry no semantic role/value meaning"
         ],
         "residualBoundary": [
@@ -2897,7 +2898,9 @@
           "Bundle/application orchestration outside this exact binding slice remains separate",
           "whether generic Link identity/find is E1 irreducible substrate rather than E2 semantic source remains to be classified"
         ],
-        "expectedConsequence": "If GREEN, A11G-F1's missing capability is supplied by proof-carrying MTS binding evidence without target matching. This would source-remove generic unification from the exact A11 two-role decode path, but not yet close global E2 or prove FULL_SELF_HOSTED."
+        "expectedConsequence": "If GREEN, A11G-F1's missing capability is supplied by proof-carrying MTS binding evidence without target matching. This would source-remove generic unification from the exact A11 two-role decode path, but not yet close global E2 or prove FULL_SELF_HOSTED.",
+        "firstRedFinding": "Initial runtime anti-cheat denied poles access by LinkHandle identity. This failed because one Link may simultaneously occupy semantic-target and witness/package roles. Handle-level access denial therefore imported an invalid object-typing assumption.",
+        "verifierBoundary": "TARGET_POLE_READS means target-decomposition operations in verifier semantics, not physical poles() calls on a handle that may simultaneously serve another witness role."
       }
     },
     "aspectApplicationA11h": {
