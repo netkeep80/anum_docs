@@ -34,7 +34,6 @@ import {
   type BundleValue,
   type ResolvedOccurrence,
 } from "../src/value-bundle.js";
-
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.13 FORMAL F3 grouping: ${message}`);
 }
@@ -47,7 +46,6 @@ function exactJson(actual: unknown, expected: unknown, message: string): void {
 function bytes(text: string): Uint8Array {
   return new TextEncoder().encode(text);
 }
-
 class SupportView implements EnumerableReadMemory {
   readonly root: LinkHandle;
   private readonly ordered: readonly LinkHandle[];
@@ -87,7 +85,6 @@ class SupportView implements EnumerableReadMemory {
   }
   allLinks(): readonly LinkHandle[] { return this.ordered; }
 }
-
 function poleClosure(
   memory: ReadMemory,
   roots: readonly LinkHandle[],
@@ -103,13 +100,11 @@ function poleClosure(
   }
   return support;
 }
-
 interface Frame {
   readonly startRole: LinkHandle;
   readonly endRole: LinkHandle;
   readonly directMethod: LinkHandle;
 }
-
 function frame(memory: Memory): Frame {
   const basis = ensureRootBasis(memory);
   return Object.freeze({
@@ -118,7 +113,6 @@ function frame(memory: Memory): Frame {
     directMethod: basis.L,
   });
 }
-
 function defineName(
   memory: Memory,
   basis: RootBasis,
@@ -146,7 +140,6 @@ function defineName(
     occurrence: effect.occurrence,
   });
 }
-
 interface PortableSegment {
   readonly start: number;
   readonly end: number;
@@ -159,7 +152,6 @@ interface PortableSegment {
   readonly resolution: number;
   readonly selection: number;
 }
-
 interface PortableSourceEvidence {
   readonly content: number;
   readonly source: number;
@@ -172,7 +164,6 @@ interface PortableSourceEvidence {
   readonly grammarMembership: number;
   readonly theoryMembership: number;
 }
-
 interface PortableAuthority {
   readonly schema: "mts-v013-formal-source-grouping/research-v0.1";
   readonly topology: StorageTopologyImage;
@@ -181,7 +172,6 @@ interface PortableAuthority {
   readonly directMethodCoordinate: number;
   readonly proofWitnessCoordinates: readonly number[];
 }
-
 function coordinate(
   coordinates: ReadonlyMap<LinkHandle, number>,
   link: LinkHandle,
@@ -191,7 +181,6 @@ function coordinate(
   assert(value !== undefined, message);
   return value;
 }
-
 function portableSegment(
   coordinates: ReadonlyMap<LinkHandle, number>,
   segment: SelectedSegmentEvidence,
@@ -213,7 +202,6 @@ function portableSegment(
     selection: coordinate(coordinates, segment.selection, "F3 selection coordinate"),
   });
 }
-
 function defineProofWitness(
   memory: Memory,
   f: Frame,
@@ -224,7 +212,6 @@ function defineProofWitness(
   const second = memory.ensure(f.endRole, poles.end);
   return memory.ensure(memory.ensure(first, second), target);
 }
-
 function buildAuthority(noise: boolean): PortableAuthority {
   const memory = new Memory();
   const basis = ensureRootBasis(memory);
@@ -233,7 +220,6 @@ function buildAuthority(noise: boolean): PortableAuthority {
     const n1 = memory.ensure(n0, basis.O);
     memory.ensure(basis.L, n1);
   }
-
   const f = frame(memory);
   const fn = memory.ensure(basis.U, basis.L);
   const arg = memory.ensure(basis.L, basis.U);
@@ -241,11 +227,9 @@ function buildAuthority(noise: boolean): PortableAuthority {
   const closeUse = memory.ensure(basis.C, basis.L);
   const b1 = memory.ensure(basis.O, fn);
   const b2 = memory.ensure(basis.C, arg);
-
   const application = memory.ensure(fn, arg);
   const result1 = memory.ensure(application, b1);
   const result2 = memory.ensure(application, b2);
-
   let history = basis.R;
   let dictionary = defineDictionaryScope(memory, basis.R, history);
   const occurrences = new Map<string, LinkHandle>();
@@ -262,7 +246,6 @@ function buildAuthority(noise: boolean): PortableAuthority {
     history = next.history;
     occurrences.set(name, next.occurrence);
   }
-
   const grammar = memory.ensure(openUse, closeUse);
   const theory = memory.ensure(closeUse, openUse);
   const admittedForms = materializeExactSequence(
@@ -276,7 +259,6 @@ function buildAuthority(noise: boolean): PortableAuthority {
     grammarMembership: memory.ensure(grammar, admittedForms),
     theoryMembership: memory.ensure(theory, admittedForms),
   });
-
   const content = materializeV012SourceContent(memory, basis, bytes("f(a)"));
   const source = defineSourceForm(memory, content);
   const sourceEvidence = buildV012SelectedSourceEvidence(
@@ -291,7 +273,6 @@ function buildAuthority(noise: boolean): PortableAuthority {
     ],
     authority,
   );
-
   // Grouping binds structural roles to verified source-resolution Links.
   const functionResolution = sourceEvidence.segments[0]!.resolution;
   const argumentResolution = sourceEvidence.segments[2]!.resolution;
@@ -300,7 +281,6 @@ function buildAuthority(noise: boolean): PortableAuthority {
   const sourceBindingPair = memory.ensure(sourceStartBinding, sourceEndBinding);
   const descriptor = memory.ensure(sourceEvidence.formSequence, sourceBindingPair);
   const grouping = memory.ensure(descriptor, application);
-
   const proofTargets = [f.directMethod, application, result1, result2] as const;
   const proofWitnesses = proofTargets.map((target) =>
     defineProofWitness(memory, f, target)
