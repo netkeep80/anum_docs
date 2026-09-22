@@ -81,7 +81,9 @@
     "externalConstructionPlanCompilerRemoved": true,
     "publicationOnlyTemplateClosureComplete": false,
     "seedCorrespondenceCompressionF5F6Complete": true,
-    "explicitPerLinkSeedPairsRemoved": true
+    "explicitPerLinkSeedPairsRemoved": true,
+    "sourceCorrespondenceDerivationF5F7Complete": false,
+    "externalPrefixSequencePreparationRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1023,7 +1025,15 @@
     "seedCorrespondenceCompressionF5F6ZippedPositionCount": 24,
     "seedCorrespondenceCompressionF5F6DerivedUniqueSeedCount": 23,
     "seedCorrespondenceCompressionF5F6MappedLinkCount": 142,
-    "seedCorrespondenceCompressionF5F6IndependentMemoryCount": 2
+    "seedCorrespondenceCompressionF5F6IndependentMemoryCount": 2,
+    "sourceCorrespondenceDerivationF5F7ExternalCorrespondenceDeclarationCount": null,
+    "sourceCorrespondenceDerivationF5F7RequestZippedPositionCount": null,
+    "sourceCorrespondenceDerivationF5F7StructuralCandidateCount": null,
+    "sourceCorrespondenceDerivationF5F7DerivedPrefixPositionCount": null,
+    "sourceCorrespondenceDerivationF5F7DerivedUniqueSeedCount": null,
+    "sourceCorrespondenceDerivationF5F7MappedLinkCount": null,
+    "sourceCorrespondenceDerivationF5F7SourceFieldBranchCount": null,
+    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": null
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1215,7 +1225,15 @@
     "seedCorrespondenceCompressionF5F6ZippedPositionCount": "Total positional correspondences read by generic equal-length ExactSequence zip across all selected correspondence sources.",
     "seedCorrespondenceCompressionF5F6DerivedUniqueSeedCount": "Unique template-Link -> target-Link mappings derived after deduplicating zipped positional correspondences.",
     "seedCorrespondenceCompressionF5F6MappedLinkCount": "Total memoized template->target Link mappings after recursive full-authority instantiation, including derived seeds plus reconstructed Links.",
-    "seedCorrespondenceCompressionF5F6IndependentMemoryCount": "Independent fresh Memories required to produce byte-identical target topology from the same frozen sequence-correspondence authority."
+    "seedCorrespondenceCompressionF5F6IndependentMemoryCount": "Independent fresh Memories required to produce byte-identical target topology from the same frozen sequence-correspondence authority.",
+    "sourceCorrespondenceDerivationF5F7ExternalCorrespondenceDeclarationCount": "Externally selected correspondence Links needed by F5-F7. Target one: request(q)<->request(r).",
+    "sourceCorrespondenceDerivationF5F7RequestZippedPositionCount": "Positions consumed by the generic equal-length request zipper before any nested structural correspondence is derived.",
+    "sourceCorrespondenceDerivationF5F7StructuralCandidateCount": "Request-position pairs satisfying the generic proper-START + equal-depth ordinary-rooted-payload-chain predicate. Target exactly one, with no request-field index/name branch.",
+    "sourceCorrespondenceDerivationF5F7DerivedPrefixPositionCount": "Rooted-chain positions derived structurally from the unique deep START pair and added as template->target mappings.",
+    "sourceCorrespondenceDerivationF5F7DerivedUniqueSeedCount": "Unique template->target seed mappings after request zip plus structurally derived rooted-prefix correspondence.",
+    "sourceCorrespondenceDerivationF5F7MappedLinkCount": "Total memoized template->target mappings after closure-complete authority instantiation.",
+    "sourceCorrespondenceDerivationF5F7SourceFieldBranchCount": "Source/STRING/request-index specific branches in the structural deep-START selector. Target zero.",
+    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": "Independent Memories required to reproduce byte-identical target topology under the same single request correspondence."
   },
   "nextExperiments": [
     "F5-F7: eliminate the externally prepared source-prefix correspondence declaration. Derive compatible prefix correspondence from the already-selected q/r source carriers or from their Link-native source evidence with a generic structural traversal, without semantic STRING-position labels.",
@@ -4162,6 +4180,43 @@
         "semanticInformationEliminated": false,
         "productionChanged": false
       }
+    },
+    "sourceCorrespondenceDerivationF5F7": {
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Can F5-F6's externally prepared q/r source-prefix sequence correspondence be eliminated, deriving the same prefix mappings structurally from the single already-selected q-request <-> r-request correspondence?",
+      "frozenAuthority": [
+        "one closure-complete admitted q authority template",
+        "one q generation-request ExactSequence",
+        "one r generation-request ExactSequence",
+        "one requestCorrespondence Link = qRequest -> rRequest",
+        "no q/r prefix ExactSequences and no prefixCorrespondence Link",
+        "no explicit individual template-Link -> target-Link seed-pair list"
+      ],
+      "genericStructuralSelector": [
+        "zip q/r request positions by the existing generic equal-length positional law",
+        "inspect every zipped pair without field names or indices",
+        "accept a nested correspondence candidate only when both Links are proper START self-incident",
+        "their end payloads must each be an ordinary predecessor chain terminating at R",
+        "both rooted chains must have equal depth greater than one",
+        "require exactly one such pair; otherwise reject ambiguity/no-candidate",
+        "zip the two rooted chains and add their positions as derived mappings"
+      ],
+      "antiCheat": [
+        "selector source slice contains no readRequest/requestFromValues/.source/STRING/readV012SourceContent/[1]",
+        "source-prefix sequences are not materialized into the frozen artifact",
+        "target topology must equal independent domain-reference generation byte-for-byte"
+      ],
+      "negativeControl": "replace the target request's deep START carrier with another proper START carrier whose ordinary rooted payload chain has a different depth; generic structural selector must reject instead of guessing a request field",
+      "claimBoundary": [
+        "external prefix-sequence preparation is targeted for removal",
+        "one external request-correspondence Link remains selected",
+        "one closure-complete template remains externally selected",
+        "the request ExactSequences themselves still carry positional correspondence authority",
+        "semantic information is compressed/reconstructed structurally, not claimed eliminated",
+        "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
+      ],
+      "evidenceTest": "ts/test/research-v013-source-correspondence-derivation-f5-f7.test.ts",
+      "consequence": "Pending CI. GREEN would reduce F5-F6 from two external correspondence declarations to one while eliminating separate source-prefix preparation and preserving exact reference topology."
     }
   }
 }
