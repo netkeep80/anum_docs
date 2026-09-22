@@ -93,7 +93,9 @@
     "genericCallActualizationA16F2Designed": true,
     "genericCallActualizationA16F2Complete": true,
     "contextualEventInputA16F3Designed": true,
-    "contextualEventInputA16F3Complete": true
+    "contextualEventInputA16F3Complete": true,
+    "linkCarriedPairRequestA16F4Designed": true,
+    "linkCarriedPairRequestA16F4Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1074,7 +1076,13 @@
     "contextualEventInputA16F3AmbientEventTruthFires": 0,
     "contextualEventInputA16F3UnknownEventBranchResultCount": 0,
     "contextualEventInputA16F3OperandSelectionResidualCount": 1,
-    "contextualEventInputA16F3IndependentMemoryCount": 2
+    "contextualEventInputA16F3IndependentMemoryCount": 2,
+    "linkCarriedPairRequestA16F4ExecutorOperandFrontierParameterCount": 0,
+    "linkCarriedPairRequestA16F4RequestProducerResidualCount": 1,
+    "linkCarriedPairRequestA16F4CrossContextMalformedRequestAccepted": 0,
+    "linkCarriedPairRequestA16F4AmbientRequestFires": 0,
+    "linkCarriedPairRequestA16F4EmptyRequestResultCount": 0,
+    "linkCarriedPairRequestA16F4IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1305,12 +1313,20 @@
     "contextualEventInputA16F3AmbientEventTruthFires": "Ambient K->Event contextual truths outside the explicitly supplied right-operand frontier that affect execution. Target zero.",
     "contextualEventInputA16F3UnknownEventBranchResultCount": "Semantic results produced by an unknown contextual Event branch whose constructed application has no selected continuation authority. Target zero.",
     "contextualEventInputA16F3OperandSelectionResidualCount": "Explicit host residual classes selecting which two contextual truth frontiers are operands for generic pair actualization. Target remains one in A16-F3.",
-    "contextualEventInputA16F3IndependentMemoryCount": "Independent canonical Memories reproducing contextual Event input and generic pair actualization behavior."
+    "contextualEventInputA16F3IndependentMemoryCount": "Independent canonical Memories reproducing contextual Event input and generic pair actualization behavior.",
+    "linkCarriedPairRequestA16F4ExecutorOperandFrontierParameterCount": "Separate left/right contextual truth-frontier parameters accepted by the A16-F4 semantic request executor. Target zero.",
+    "linkCarriedPairRequestA16F4RequestProducerResidualCount": "Explicit host residual classes that still choose operand frontiers and encode K->Q requests. Target remains one after A16-F4.",
+    "linkCarriedPairRequestA16F4CrossContextMalformedRequestAccepted": "Selected pair requests whose two truth witnesses come from different contexts but are accepted by executor. Target zero.",
+    "linkCarriedPairRequestA16F4AmbientRequestFires": "Ambient pair requests outside the selected request frontier that affect execution. Target zero.",
+    "linkCarriedPairRequestA16F4EmptyRequestResultCount": "Call truths produced when selected pair-request frontier is empty. Target zero.",
+    "linkCarriedPairRequestA16F4IndependentMemoryCount": "Independent canonical Memories reproducing Link-carried request behavior."
   },
   "nextExperiments": [
-    "A16-F4: remove host selection of left/right operand frontiers. Represent a request to combine specific contextual truths as Link-carried execution authority, then let one generic executor discover/consume that request without pairing all K-linked values.",
+    "A16-F5: source-remove the pair-request producer. Derive/emit K->Q from Link-carried execution authority rather than host-selected operand frontiers, while avoiding automatic all-to-all pairing of K-linked truths.",
+    "A16-F5 must keep request selection frozen/fail-closed, reject late ambient producer evidence, and preserve A16-F4 malformed-request rejection.",
+    "After A16-F5, reconnect the now-Link-carried dynamic execution path with F5 template/self-generated authority work and reassess E2/E3.",
+    "Then reconnect the A16 execution line with F5 self-generated authority reduction and reassess the remaining E2/E3 kernel.",
     "A16-F4 must fail closed when operand-selection evidence is absent or ambiguous, and must ignore late ambient pairing requests outside frozen selected authority.",
-    "After A16-F4, reconnect contextual execution to F5 source-authority reduction and reassess E2/E3 host semantic residue.",
     "A16-F3 must distinguish unavoidable external input from semantic interpretation: receiving an Event may remain exogenous, but deciding what State->Event means must not be host code.",
     "A16-F2 must show that an arbitrary constructed State->Event Link has no semantic effect unless selected Application->NextState continuation authority exists; this separates generic application construction from semantic authority.",
     "After A16-F2, reassess whether external Event selection is genuine irreducible input rather than semantic host authority, and only then connect this execution line back to F5 source-authority reduction.",
@@ -4590,6 +4606,62 @@
         "unknownContextualEventBranch": "ZERO",
         "operandFrontierSelectionResiduals": 1,
         "externalEventInjection": true,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "linkCarriedPairRequestA16F4": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can operand selection for generic pair actualization be moved from two host-supplied truth frontiers into Link-carried execution authority Q=(K->X)->(K->Y), contextualized as K->Q, so the semantic executor consumes only a request frontier?",
+      "setup": [
+        "retain contextual truths K->X and K->Y",
+        "encode operand selection as request Q=(K->X)->(K->Y)",
+        "contextualize request as K->Q",
+        "semantic request executor receives only Bundle<K->Q>",
+        "executor validates both request operands are truth witnesses of the same K",
+        "executor constructs X->Y and K->(X->Y)",
+        "continue through unchanged A16 propagation and selected continuation authority"
+      ],
+      "oracle": [
+        "reproduce A13/A16-F3 split, local termination, convergence and schedule equivalence",
+        "semantic request executor has zero separate left/right truth-frontier parameters",
+        "late ambient pair request outside explicit request frontier is ignored",
+        "selected cross-context malformed request is rejected fail-closed",
+        "empty request frontier produces ZERO",
+        "mixed known/unknown event requests yield results only for applications with selected continuation authority",
+        "late ambient transition and ambient truth remain inert",
+        "two independent canonical Memories agree"
+      ],
+      "antiCheat": [
+        "request executor contains no state/event/application semantics",
+        "request executor contains no leftTruthFrontier/rightTruthFrontier host parameters",
+        "request executor may not use find/filter/outgoing/incoming/switch",
+        "operand choice must be read from request Link poles"
+      ],
+      "residualAuthority": [
+        "request producer still receives/selects the operand truth frontiers and constructs K->Q",
+        "selected request frontier itself remains explicit",
+        "external injection of contextual Event truth remains exogenous input",
+        "selected Application->Next continuation authority remains explicit"
+      ],
+      "evidenceTest": "ts/test/research-v013-link-carried-pair-request-a16-f4.test.ts",
+      "claimBoundary": [
+        "GREEN would move operand-selection information into Link data and remove separate operand frontiers from the semantic executor",
+        "GREEN would not source-remove the request producer itself",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ],
+      "consequence": "A16-F4 moves operand-selection information out of semantic executor arguments and into Link-carried request data. Q=(K->X)->(K->Y), contextualized as K->Q, is sufficient for one generic executor to recover both contextual witnesses, validate same-context truth, construct X->Y and K->(X->Y), and continue via A16. Ambient requests are inert, cross-context malformed selected requests fail closed, and empty request authority yields ZERO. The remaining boundary is the request producer that chooses operand frontiers and emits K->Q.",
+      "currentResult": "GREEN: the complete A13/A16-F3 behavioral corpus survives with the pair executor receiving only Bundle<K->Q>. It has zero separate left/right operand-frontier parameters and reads operand choice from Q poles. Late ambient pair request outside the selected frontier is ignored; selected cross-context request is rejected; empty request frontier yields ZERO; mixed known/unknown requests remain governed by selected continuation authority. Two independent canonical Memories agree. Request production remains explicitly host-side and is not claimed source-removed.",
+      "observed": {
+        "requestRepresentation": "K_TO_Q_WHERE_Q_IS_LEFT_TRUTH_TO_RIGHT_TRUTH",
+        "executorOperandFrontierParameters": 0,
+        "operandSelectionCarriedInLink": true,
+        "crossContextRequest": "REJECTED",
+        "lateAmbientRequest": "IGNORED",
+        "absentRequest": "ZERO",
+        "requestProducerHostResiduals": 1,
         "independentMemories": 2,
         "productionChanged": false
       }
