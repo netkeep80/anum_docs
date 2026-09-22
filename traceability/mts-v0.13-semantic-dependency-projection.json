@@ -100,7 +100,8 @@
     "applicationClosedFrontierA17Complete": true,
     "linkCarriedContinuationAuthorityA18Designed": true,
     "linkCarriedContinuationAuthorityA18Complete": true,
-    "contextCarriedContinuationAuthorityA19Designed": true
+    "contextCarriedContinuationAuthorityA19Designed": true,
+    "contextCarriedContinuationAuthorityA19Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1099,7 +1100,12 @@
     "linkCarriedContinuationAuthorityA18AmbientContinuationFires": 0,
     "linkCarriedContinuationAuthorityA18AmbientAlternativeAuthorityFires": 0,
     "linkCarriedContinuationAuthorityA18ForeignContextAuthorityAccepted": 0,
-    "linkCarriedContinuationAuthorityA18IndependentMemoryCount": 2
+    "linkCarriedContinuationAuthorityA18IndependentMemoryCount": 2,
+    "contextCarriedContinuationAuthorityA19SeparateAuthorityArgumentCount": 0,
+    "contextCarriedContinuationAuthorityA19HostTransitionArrayParameterCount": 0,
+    "contextCarriedContinuationAuthorityA19AmbientContinuationFires": 0,
+    "contextCarriedContinuationAuthorityA19AmbientAlternateAuthorityFires": 0,
+    "contextCarriedContinuationAuthorityA19IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1348,12 +1354,18 @@
     "linkCarriedContinuationAuthorityA18AmbientContinuationFires": "Ambient A->B continuations outside the selected Link-carried authority that affect execution. Target zero.",
     "linkCarriedContinuationAuthorityA18AmbientAlternativeAuthorityFires": "Ambient alternative authority roots that affect execution while K->Authority remains selected. Target zero.",
     "linkCarriedContinuationAuthorityA18ForeignContextAuthorityAccepted": "Authority truth witnesses rooted in a different context that are accepted by A18. Target zero.",
-    "linkCarriedContinuationAuthorityA18IndependentMemoryCount": "Independent Memories reproducing the Link-carried continuation authority behavior."
+    "linkCarriedContinuationAuthorityA18IndependentMemoryCount": "Independent Memories reproducing the Link-carried continuation authority behavior.",
+    "contextCarriedContinuationAuthorityA19SeparateAuthorityArgumentCount": "Separate authority inputs consumed by the A19 semantic step. Target zero.",
+    "contextCarriedContinuationAuthorityA19HostTransitionArrayParameterCount": "Host-selected transition-array parameters consumed by A19. Target zero.",
+    "contextCarriedContinuationAuthorityA19AmbientContinuationFires": "Ambient continuations outside the authority structurally carried by K that affect execution. Target zero.",
+    "contextCarriedContinuationAuthorityA19AmbientAlternateAuthorityFires": "Ambient alternative authority envelopes that affect an already selected immutable context K. Target zero.",
+    "contextCarriedContinuationAuthorityA19IndependentMemoryCount": "Independent Memories reproducing context-carried continuation authority behavior."
   },
   "nextExperiments": [
-    "A19: execute context-carried continuation authority. Require K=Parent->AuthorityEnvelope and derive selected continuations from K with no separate authority argument.",
-    "If A19 is GREEN, attack the remaining host Bundle frontier boundary: carry the selected executable frontier as Link-native authority/state while preserving occurrence provenance and avoiding execution of every truth linked to K.",
-    "After A19, reconnect context-carried execution authority with F5 self-generated authority/template convergence and reassess E2/E3.",
+    "A20: remove host BundleValue as the selected frontier carrier. Encode execution occurrences as Links so convergence may share one K->B truth Link while retaining multiple distinct provenance occurrences.",
+    "A20 should use Link-native occurrence ancestry (for example ParentOccurrence->TruthWitness) and a frozen frontier carrier; it must not execute every truth merely linked to K.",
+    "A20 must preserve first split, branch-local termination, convergence multiplicity, schedule equivalence, ambient-truth isolation and ZERO.",
+    "After A20, reconnect the application-closed execution path with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A19 must preserve ambient-authority isolation and fail closed if K does not carry a structurally valid selected authority.",
     "Then reconnect the application-closed execution line with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A17-F1: connect application-closed continuation authority A->B to the F5 self-generated authority line. Ask whether the selected continuation relation itself can be generated/discovered from Link-carried authority without host semantic source.",
@@ -4824,7 +4836,7 @@
       }
     },
     "contextCarriedContinuationAuthorityA19": {
-      "status": "DESIGNED_PENDING_EXECUTION",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A18's separate K->Authority argument be removed entirely by carrying the selected continuation authority structurally inside execution context K, while contextual truth remains K->A and recursive detachment behavior is unchanged?",
       "setup": [
         "retain application-closed contextual frontier K->A",
@@ -4866,7 +4878,28 @@
         "this gate does not accept v0.13",
         "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
         "production runtime remains unchanged"
-      ]
+      ],
+      "consequence": "A19 removes the separate continuation-authority input from the tested application-closed semantic step. The current context itself carries the selected authority structurally as K=Parent->AuthorityEnvelope, while truth remains K->A. The step validates a proper START-self-closed research envelope at END(K), traverses only that frozen authority, and executes recursive contextual detachment. Changing authority requires selecting a different context Link; ambient continuations or alternate authorities do not mutate existing K.",
+      "currentResult": "GREEN: A18 behavior is reproduced with step(memory,K,frontier,schedule) and no authorityTruth or transitions[] parameter. K carries a proper START-self-closed authority envelope. First fan-out, local termination, recursive split, convergence and ZERO all hold; schedule/provenance equivalence is preserved. Ambient continuation and ambient alternate authority are ignored for existing K. A separately selected Kalt carrying alternate authority yields its own semantics. Raw unwrapped authority body is rejected fail-closed and a proper empty authority yields ZERO. Two independent Memories agree.",
+      "observed": {
+        "contextShape": "PARENT_TO_AUTHORITY_ENVELOPE",
+        "authorityEnvelope": "PROPER_START_SELF_CLOSED_RESEARCH_LOCAL",
+        "separateAuthorityArguments": 0,
+        "hostTransitionArrayParameters": 0,
+        "firstFanout": 2,
+        "secondFanout": 2,
+        "localTermination": true,
+        "convergenceDistinctTruthLinks": 1,
+        "convergenceOccurrences": 2,
+        "ambientContinuationIgnored": true,
+        "ambientAlternateAuthorityIgnored": true,
+        "authorityChangeRequiresNewContext": true,
+        "unwrappedAuthority": "REJECTED",
+        "emptyAuthority": "ZERO",
+        "semanticKernelEnsureForms": 1,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     }
   }
 }
