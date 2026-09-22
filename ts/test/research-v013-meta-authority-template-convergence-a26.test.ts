@@ -139,8 +139,10 @@ function defineRule(memory:Memory):LinkHandle{
   ] as const;
   return materializeExactSequence(memory,[
     materializeExactSequence(memory,r),
-    materializeExactSequence(memory,triples.map(([t,s,e])=>
-      materializeExactSequence(memory,[r[t]!,r[s]!,r[e]!])),
+    materializeExactSequence(
+      memory,
+      triples.map(([t,s,e])=>materializeExactSequence(memory,[r[t]!,r[s]!,r[e]!])),
+    ),
   ]);
 }
 function admitted(memory:ReadMemory,rule:LinkHandle,candidate:LinkHandle):boolean{
