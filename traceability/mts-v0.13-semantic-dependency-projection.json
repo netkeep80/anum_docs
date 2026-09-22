@@ -101,7 +101,8 @@
     "linkCarriedContinuationAuthorityA18Designed": true,
     "linkCarriedContinuationAuthorityA18Complete": true,
     "contextCarriedContinuationAuthorityA19Designed": true,
-    "contextCarriedContinuationAuthorityA19Complete": true
+    "contextCarriedContinuationAuthorityA19Complete": true,
+    "linkNativeFrontierA20Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1362,10 +1363,11 @@
     "contextCarriedContinuationAuthorityA19IndependentMemoryCount": "Independent Memories reproducing context-carried continuation authority behavior."
   },
   "nextExperiments": [
-    "A20: remove host BundleValue as the selected frontier carrier. Encode execution occurrences as Links so convergence may share one K->B truth Link while retaining multiple distinct provenance occurrences.",
+    "A20: execute Link-native frontier/provenance. Replace host BundleValue frontier with a Link carrier of occurrence Links ParentOccurrence->(K->A).",
+    "If A20 is GREEN, reduce the remaining externally selected initial frontier/context package into one Link-native execution root and test recursive self-description of scheduler state.",
+    "After A20, reconnect context/frontier execution with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A20 should use Link-native occurrence ancestry (for example ParentOccurrence->TruthWitness) and a frozen frontier carrier; it must not execute every truth merely linked to K.",
     "A20 must preserve first split, branch-local termination, convergence multiplicity, schedule equivalence, ambient-truth isolation and ZERO.",
-    "After A20, reconnect the application-closed execution path with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A19 must preserve ambient-authority isolation and fail closed if K does not carry a structurally valid selected authority.",
     "Then reconnect the application-closed execution line with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A17-F1: connect application-closed continuation authority A->B to the F5 self-generated authority line. Ask whether the selected continuation relation itself can be generated/discovered from Link-carried authority without host semantic source.",
@@ -4900,6 +4902,53 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "linkNativeFrontierA20": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A19's host BundleValue frontier carrier be removed and replaced by one Link-native frontier whose occurrence Links preserve branch provenance even when extensional contextual truth converges?",
+      "setup": [
+        "retain context-carried continuation authority from A19",
+        "represent contextual truth as K->A",
+        "represent each execution occurrence as ParentOccurrence->TruthWitness",
+        "represent selected frontier as a proper START-self-closed Link chain of occurrence Links",
+        "semantic step receives one frontier LinkHandle rather than BundleValue",
+        "derived child occurrence points to exact parent occurrence and canonical K->B truth witness"
+      ],
+      "oracle": [
+        "first split yields two occurrence Links carrying K->A1 and K->A2",
+        "A1 terminates locally while A2 yields A3/A4 occurrences",
+        "A3/A4 converge extensionally to one canonical K->Z truth Link but retain two distinct occurrence Links",
+        "occurrence ancestry reconstructs the two distinct proof paths",
+        "forward/reverse scheduling preserves extensional truth and provenance paths",
+        "terminal Z frontier yields ZERO",
+        "ambient K->A truth outside selected frontier is ignored",
+        "ambient occurrence/frontier carrier outside selected frontier is ignored",
+        "foreign-context selected occurrence is rejected fail-closed",
+        "raw unwrapped frontier body is rejected",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "semantic kernel contains no BundleValue/ResolvedOccurrence/resolveFlatBundle/.occurrences/.links host frontier primitive",
+        "kernel contains no authorityTruth/transitions array/active/isTrue/currentValue/modusPonens/find/outgoing/incoming/switch semantic primitive",
+        "frontier input is one LinkHandle structural carrier",
+        "provenance must be represented by Link ancestry, not host path arrays"
+      ],
+      "residualAuthority": [
+        "current context K remains host-selected",
+        "initial Link-native frontier carrier is externally selected/injected",
+        "schedule order remains a host execution choice though semantic provenance is schedule-equivalent",
+        "frontier chain/envelope encoding is research-local rather than normative",
+        "authority publication/source remains outside this gate"
+      ],
+      "evidenceTest": "ts/test/research-v013-link-native-frontier-a20.test.ts",
+      "claimBoundary": [
+        "GREEN would remove BundleValue as the selected semantic frontier carrier in this scoped application-closed path",
+        "GREEN would preserve extensional convergence and provenance multiplicity simultaneously using Links",
+        "GREEN would not prove physical parallelism or production executor replacement",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
