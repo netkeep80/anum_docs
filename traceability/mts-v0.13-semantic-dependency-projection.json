@@ -51,7 +51,8 @@
     "aspectApplicationProofCarryingBindingMechanismProven": true,
     "aspectApplicationProofCarryingUnifiedContinuationResearchComplete": true,
     "formalIntegratedNameAspectProofBindingResearchComplete": true,
-    "formalSourceGroupingResearchComplete": true
+    "formalSourceGroupingResearchComplete": true,
+    "formalKernelSelfExtensionF4ResearchComplete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -906,7 +907,11 @@
     "formalSourceGroupingPhysicalSegmentCount": 4,
     "formalSourceGroupingProofBindingWitnessCount": 4,
     "formalSourceGroupingHostMatcherCount": 0,
-    "formalSourceGroupingExternalFunctionArgumentParameterCount": 0
+    "formalSourceGroupingExternalFunctionArgumentParameterCount": 0,
+    "formalKernelSelfExtensionF4UnknownFunctionCount": 2,
+    "formalKernelSelfExtensionF4HostFormSpecificBranchCount": 0,
+    "formalKernelSelfExtensionF4IndependentMemoryCount": 2,
+    "formalKernelSelfExtensionF4BehaviorCardinalityCases": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1011,14 +1016,18 @@
     "formalSourceGroupingPhysicalSegmentCount": "FORMAL F3 exact selected source segments in physical carrier f(a): f, (, a, ). Parentheses remain representation only.",
     "formalSourceGroupingProofBindingWitnessCount": "FORMAL F3 proof-carrying bindings for Direct method, grouped application P, and two continuation occurrences.",
     "formalSourceGroupingHostMatcherCount": "Structural unifier/matcher dependencies in the FORMAL F3 grouping/evaluation path. Target is zero.",
-    "formalSourceGroupingExternalFunctionArgumentParameterCount": "Semantic function/argument Link parameters supplied externally to the F3 evaluator. Target is zero: grouping evidence selects source resolutions and the application target."
+    "formalSourceGroupingExternalFunctionArgumentParameterCount": "Semantic function/argument Link parameters supplied externally to the F3 evaluator. Target is zero: grouping evidence selects source resolutions and the application target.",
+    "formalKernelSelfExtensionF4UnknownFunctionCount": "Previously unknown named semantic function Links exercised by F4 under one unchanged generic receiver.",
+    "formalKernelSelfExtensionF4HostFormSpecificBranchCount": "Per-name/per-form semantic branches in the F4 receiver kernel. Target is zero.",
+    "formalKernelSelfExtensionF4IndependentMemoryCount": "Independent replay Memories executing the same portable self-extension authority.",
+    "formalKernelSelfExtensionF4BehaviorCardinalityCases": "Distinct result cardinalities intentionally assigned to unknown functions in F4 to falsify hidden per-form dispatch."
   },
   "nextExperiments": [
-    "F-KERNEL-SELF-EXTENSION F4: introduce a previously unknown physical function/form name and its behavior entirely through portable Dictionary + grouping + proof-carrying continuation Link evidence, then use it from one source under an unchanged generic host kernel.",
-    "F4 must include at least two independently unknown function forms with different behavior/cardinality to falsify hidden per-name/per-form branches.",
-    "After F4, reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization; remove only host law families proven redundant by the generic source path.",
-    "Measure/classify exact STRING/source segmentation and Dictionary/Grammar lookup as remaining FORMAL authority boundaries.",
-    "Then apply the same proof-carrying/aspect mechanism to proof semantics; E3/E4 remain separate and open."
+    "Execute F-KERNEL-SELF-EXTENSION F4 and only set formalKernelSelfExtensionProven=true after two unknown function/forms with different behavior pass one branch-free two-Memory receiver.",
+    "If F4 is GREEN, reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization against the generic path and classify which fixed-evaluator law families are now redundant rather than merely bypassed.",
+    "Measure/classify exact STRING/source segmentation and Dictionary/Grammar lookup as the remaining FORMAL authority boundary.",
+    "Apply the same proof-carrying/aspect mechanism to proof semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims.",
+    "E3/E4 remain separate and open."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3216,6 +3225,36 @@
         "productionChanged": false
       },
       "consequence": "Source-level application grouping is now demonstrated without a host-selected F/A pair: physical syntax is carrier evidence, while semantic grouping is an explicit portable Link authority. The next gate is to rerun F-KERNEL-SELF-EXTENSION with a previously unknown named function/form through this same generic naming+grouping+aspect path."
+    },
+    "selfExtensionF4": {
+      "id": "F-KERNEL-SELF-EXTENSION-F4",
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Can two previously unknown named function/forms with different behavior be defined entirely by portable MTS Link authority, then parsed/grouped/interpreted in independent Memories by one unchanged generic receiver with no name/form branch?",
+      "corpus": [
+        "physical source x(a) resolves x -> arbitrary semantic function Link Fx and returns singleton {b1}",
+        "physical source y(a) resolves y -> distinct arbitrary semantic function Link Fy and returns {b2,b3}",
+        "both sources use the same exact STRING/Dictionary/source-grouping/proof-binding/aspect continuation kernel"
+      ],
+      "passConditions": [
+        "Fx and Fy are not root basis operator signs and are not equal",
+        "x/y semantics come only from portable Dictionary + grouping + selected continuation Links",
+        "one generic receiver executes both without x/y/form-specific branches",
+        "same authority reconstructs and executes in two independent Memories without sender-local IDs",
+        "x(a) and y(a) exhibit different result cardinality under the same kernel",
+        "unknown physical name z has no semantic authority",
+        "no structural-unification/matcher or canonicalByte/operatorAspect/parsePlan branch participates",
+        "frozen selected authority remains unchanged by candidate execution"
+      ],
+      "relationToHistoricalF1": "F1 remains the historical RED of the fixed production FORMAL evaluator. F4 tests whether the newer generic Dictionary + source-grouping + proof-carrying aspect path supplies the missing self-extension capability without changing that production evaluator.",
+      "residualBoundary": [
+        "exact STRING materialization/source segmentation remain host representation services",
+        "Dictionary/Grammar/source replay remain host services",
+        "proof-carrying package reading and ordered Link identity remain host execution substrate",
+        "BundleValue projection remains derived host surface",
+        "production FORMAL evaluator remains unchanged; global E2/E3/E4 stay open"
+      ],
+      "evidenceTest": "ts/test/research-v013-formal-self-extension-f4.test.ts",
+      "currentResult": "NOT_RUN"
     }
   }
 }
