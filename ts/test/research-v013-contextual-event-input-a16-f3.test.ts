@@ -530,12 +530,18 @@ function staticKernelGuard(): void {
     "utf8",
   );
   const transitionStart = source.indexOf("function propagateCallTruth(");
+  const transitionEnd = source.indexOf("/**\n * Generic pair actualization", transitionStart);
   const pairStart = source.indexOf("function actualizePairTruth(");
   const pairEnd = source.indexOf("function contextualTruth(", pairStart);
-  assert(transitionStart >= 0 && pairStart > transitionStart && pairEnd > pairStart,
-    "A16-F3 kernel source slices");
+  assert(
+    transitionStart >= 0 &&
+    transitionEnd > transitionStart &&
+    pairStart > transitionEnd &&
+    pairEnd > pairStart,
+    "A16-F3 kernel source slices",
+  );
 
-  const transitionKernel = source.slice(transitionStart, pairStart);
+  const transitionKernel = source.slice(transitionStart, transitionEnd);
   const pairKernel = source.slice(pairStart, pairEnd);
 
   for (const forbidden of [
