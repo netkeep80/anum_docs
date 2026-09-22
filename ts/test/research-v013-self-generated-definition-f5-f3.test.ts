@@ -36,7 +36,6 @@ import {
   type BundleValue,
   type ResolvedOccurrence,
 } from "../src/value-bundle.js";
-
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.13 FORMAL F5-F3 self-generation: ${message}`);
 }
@@ -47,7 +46,6 @@ function exactJson(actual:unknown, expected:unknown, message:string):void {
   same(JSON.stringify(actual),JSON.stringify(expected),message);
 }
 function bytes(text:string):Uint8Array { return new TextEncoder().encode(text); }
-
 class View implements EnumerableReadMemory {
   readonly root:LinkHandle;
   private readonly ordered:readonly LinkHandle[];
@@ -83,7 +81,6 @@ class View implements EnumerableReadMemory {
   }
   allLinks():readonly LinkHandle[] { return this.ordered; }
 }
-
 function closure(memory:ReadMemory, roots:readonly LinkHandle[]):ReadonlySet<LinkHandle>{
   const support=new Set<LinkHandle>();
   const pending=[memory.root,...roots];
@@ -96,7 +93,6 @@ function closure(memory:ReadMemory, roots:readonly LinkHandle[]):ReadonlySet<Lin
   }
   return support;
 }
-
 interface Frame {
   readonly startRole:LinkHandle;
   readonly endRole:LinkHandle;
@@ -106,7 +102,6 @@ function frame(memory:Memory):Frame {
   const b=ensureRootBasis(memory);
   return Object.freeze({startRole:b.O,endRole:b.C,directMethod:b.L});
 }
-
 function defineName(
   memory:Memory,
   basis:RootBasis,
@@ -125,7 +120,6 @@ function defineName(
     occurrence:effect.occurrence,
   });
 }
-
 interface PSegment {
   readonly start:number; readonly end:number;
   readonly form:number; readonly dictionaryOccurrence:number;
@@ -167,7 +161,6 @@ interface GeneratedRun {
   readonly authorityCarrier:LinkHandle;
   readonly publication:LinkHandle;
 }
-
 function coord(
   c:ReadonlyMap<LinkHandle,number>, link:LinkHandle, message:string,
 ):number{
@@ -204,14 +197,12 @@ function packSource(
     theoryMembership:coord(c,e.theoryMembership,"F5-F3 Theory membership coordinate"),
   });
 }
-
 function defineWitness(memory:Memory,f:Frame,target:LinkHandle):LinkHandle{
   const p=memory.poles(target);
   const a=memory.ensure(f.startRole,p.start);
   const b=memory.ensure(f.endRole,p.end);
   return memory.ensure(memory.ensure(a,b),target);
 }
-
 function evidenceRoots(e:SourceFrontEndEvidence):readonly LinkHandle[]{
   return Object.freeze([
     e.content,e.source,e.dictionary,e.grammar,e.theory,
@@ -222,7 +213,6 @@ function evidenceRoots(e:SourceFrontEndEvidence):readonly LinkHandle[]{
     ]),
   ]);
 }
-
 function anonymousRoles(memory:Memory):readonly LinkHandle[]{
   const b=ensureRootBasis(memory);
   const r0=memory.ensure(b.O,b.L);
@@ -237,7 +227,6 @@ function anonymousRoles(memory:Memory):readonly LinkHandle[]{
   same(new Set(roles).size,8,"F5-F3 anonymous roles distinct");
   return Object.freeze(roles);
 }
-
 function defineRule(memory:Memory):LinkHandle{
   const roles=anonymousRoles(memory);
   const roleSequence=materializeExactSequence(memory,roles);
@@ -249,7 +238,6 @@ function defineRule(memory:Memory):LinkHandle{
   );
   return materializeExactSequence(memory,[roleSequence,constraints]);
 }
-
 function structurallyAdmitted(
   memory:ReadMemory,
   rule:LinkHandle,
@@ -261,19 +249,16 @@ function structurallyAdmitted(
     const roleSequence=ruleParts[0];
     const constraintSequence=ruleParts[1];
     if(roleSequence===undefined||constraintSequence===undefined) return false;
-
     const roles=readExactSequence(memory,roleSequence).values;
     const values=readExactSequence(memory,candidate).values;
     if(roles.length!==values.length) return false;
     if(new Set(roles).size!==roles.length) return false;
-
     const bindings=new Map<LinkHandle,LinkHandle>();
     roles.forEach((role,index)=>{
       const value=values[index];
       if(value!==undefined) bindings.set(role,value);
     });
     if(bindings.size!==roles.length) return false;
-
     const constraints=readExactSequence(memory,constraintSequence).values;
     for(const constraint of constraints){
       const triple=readExactSequence(memory,constraint).values;
@@ -291,7 +276,6 @@ function structurallyAdmitted(
     return false;
   }
 }
-
 interface GenerationRequest {
   readonly nameContent:LinkHandle;
   readonly source:LinkHandle;
@@ -313,7 +297,6 @@ interface GenerationRequest {
   readonly result2Occurrence:LinkHandle;
   readonly directMethod:LinkHandle;
 }
-
 function readGenerationRequest(
   memory:ReadMemory,
   request:LinkHandle,
@@ -343,7 +326,6 @@ function readGenerationRequest(
     directMethod:q[18]!,
   });
 }
-
 function buildFrozenArtifact(noise:boolean):FrozenArtifact{
   const memory=new Memory();
   const basis=ensureRootBasis(memory);
@@ -352,7 +334,6 @@ function buildFrozenArtifact(noise:boolean):FrozenArtifact{
     const n1=memory.ensure(n0,basis.O);
     memory.ensure(basis.L,n1);
   }
-
   const f=frame(memory);
   const fnStart=memory.ensure(basis.U,basis.L);
   const fnEnd=memory.ensure(basis.L,basis.C);
@@ -361,9 +342,7 @@ function buildFrozenArtifact(noise:boolean):FrozenArtifact{
   const result2=memory.ensure(basis.C,fnEnd);
   const openUse=memory.ensure(basis.O,basis.U);
   const closeUse=memory.ensure(basis.C,basis.L);
-
   assert(memory.find(fnStart,fnEnd)===undefined,"F5-F3 function absent before freeze");
-
   let history=basis.R;
   let dictionary=defineDictionaryScope(memory,basis.R,history);
   const occurrences=new Map<string,LinkHandle>();
@@ -379,20 +358,17 @@ function buildFrozenArtifact(noise:boolean):FrozenArtifact{
     history=next.history;
     occurrences.set(name,next.occurrence);
   }
-
   const nameContent=materializeV012SourceContent(memory,basis,bytes("q"));
   same(
     lookupScopedDictionary(memory,dictionary,nameContent),
     undefined,
     "F5-F3 new function name has no frozen Dictionary authority",
   );
-
   const sourceContent=materializeV012SourceContent(memory,basis,bytes("q(a)"));
   const source=defineSourceForm(memory,sourceContent);
   const grammar=memory.ensure(openUse,closeUse);
   const theory=memory.ensure(closeUse,openUse);
   const rule=defineRule(memory);
-
   const request=materializeExactSequence(memory,[
     nameContent,source,fnStart,fnEnd,argument,result1,result2,
     dictionary,history,grammar,theory,openUse,closeUse,
@@ -403,11 +379,9 @@ function buildFrozenArtifact(noise:boolean):FrozenArtifact{
     occurrences.get("b2")!,
     f.directMethod,
   ]);
-
   const support=closure(memory,[rule,request]);
   const canonical=exportCanonicalTopology(new View(memory,support));
   const c=canonical.coordinates;
-
   return Object.freeze({
     schema:"mts-v013-self-generated-definition-f5-f3/frozen-v0.1" as const,
     topology:canonical.topology,
@@ -415,7 +389,6 @@ function buildFrozenArtifact(noise:boolean):FrozenArtifact{
     requestCoordinate:coord(c,request,"F5-F3 request coordinate"),
   });
 }
-
 function publishGeneratedAuthority(
   memory:Memory,
   rule:LinkHandle,
@@ -428,7 +401,6 @@ function publishGeneratedAuthority(
   );
   return memory.ensure(candidate,authorityCarrier);
 }
-
 function generateAuthority(
   memory:Memory,
   rule:LinkHandle,
@@ -436,14 +408,12 @@ function generateAuthority(
 ):GeneratedRun{
   const basis=ensureRootBasis(memory);
   const q=readGenerationRequest(memory,request);
-
   assert(memory.find(q.fnStart,q.fnEnd)===undefined,"F5-F3 function absent at generation start");
   same(
     lookupScopedDictionary(memory,q.dictionary,q.nameContent),
     undefined,
     "F5-F3 name absent at generation start",
   );
-
   const before=memory.linkCount;
   const fn=memory.ensure(q.fnStart,q.fnEnd);
   const application=memory.ensure(fn,q.argument);
@@ -454,18 +424,15 @@ function generateAuthority(
     continuation1,continuation2,
   ]);
   const candidate=materializeExactSequence(memory,values);
-
   assert(
     structurallyAdmitted(memory,rule,candidate),
     "F5-F3 generated unknown definition passes frozen structural rule",
   );
-
   const nameEffect=defineDictionaryEffect(
     memory,q.dictionary,basis.R,q.history,q.nameContent,fn,
   );
   const dictionary=nameEffect.afterScope;
   const nameOccurrence=nameEffect.occurrence;
-
   const forms=materializeExactSequence(
     memory,[fn,q.openUse,q.argument,q.closeUse],
   );
@@ -476,7 +443,6 @@ function generateAuthority(
     grammarMembership:memory.ensure(q.grammar,forms),
     theoryMembership:memory.ensure(q.theory,forms),
   });
-
   const evidence=buildV012SelectedSourceEvidence(
     memory,basis,q.source,[
       {start:0,end:1,form:fn,dictionaryOccurrence:nameOccurrence},
@@ -485,14 +451,12 @@ function generateAuthority(
       {start:3,end:4,form:q.closeUse,dictionaryOccurrence:q.closeOccurrence},
     ],authority,
   );
-
   const f=frame(memory);
   const sourceStart=memory.ensure(f.startRole,evidence.segments[0]!.resolution);
   const sourceEnd=memory.ensure(f.endRole,evidence.segments[2]!.resolution);
   const sourcePair=memory.ensure(sourceStart,sourceEnd);
   const descriptor=memory.ensure(evidence.formSequence,sourcePair);
   const grouping=memory.ensure(descriptor,application);
-
   const targets=[
     q.directMethod,
     application,
@@ -501,7 +465,6 @@ function generateAuthority(
   ] as const;
   const witnesses=targets.map(target=>defineWitness(memory,f,target));
   const witnessSequence=materializeExactSequence(memory,witnesses);
-
   const authorityCarrier=materializeExactSequence(memory,[
     dictionary,
     evidence.source,
@@ -513,9 +476,7 @@ function generateAuthority(
   const publication=publishGeneratedAuthority(
     memory,rule,candidate,authorityCarrier,
   );
-
   assert(memory.linkCount>before,"F5-F3 generation materializes new authority topology");
-
   const roots=[
     rule,publication,
     ...evidenceRoots(evidence),
@@ -524,7 +485,6 @@ function generateAuthority(
   const support=closure(memory,roots);
   const canonical=exportCanonicalTopology(new View(memory,support));
   const c=canonical.coordinates;
-
   const artifact:GeneratedArtifact=Object.freeze({
     schema:"mts-v013-self-generated-definition-f5-f3/generated-v0.1" as const,
     topology:canonical.topology,
@@ -540,12 +500,10 @@ function generateAuthority(
       witnesses.map(w=>coord(c,w,"F5-F3 proof witness coordinate")),
     ),
   });
-
   return Object.freeze({
     artifact,candidate,values,authorityCarrier,publication,
   });
 }
-
 function generatePortable(frozen:FrozenArtifact):GeneratedRun{
   same(
     frozen.schema,
@@ -558,147 +516,7 @@ function generatePortable(frozen:FrozenArtifact):GeneratedRun{
   const request=at(all,frozen.requestCoordinate);
   return generateAuthority(memory,rule,request);
 }
-
-function at(all:readonly LinkHandle[],n:number):LinkHandle{
-  const x=all[n]; assert(x!==undefined,"F4 coordinate resolves"); return x;
-}
-function restoreSegment(all:readonly LinkHandle[],s:PSegment):SelectedSegmentEvidence{
-  return Object.freeze({
-    start:s.start,end:s.end,
-    form:at(all,s.form),
-    dictionaryOccurrence:at(all,s.dictionaryOccurrence),
-    sliceContent:at(all,s.sliceContent),span:at(all,s.span),
-    sliceEvidence:at(all,s.sliceEvidence),lexeme:at(all,s.lexeme),
-    resolution:at(all,s.resolution),selection:at(all,s.selection),
-  });
-}
-function restoreSource(memory:Memory,p:PSource):SourceFrontEndEvidence{
-  const all=memory.allLinks();
-  return Object.freeze({
-    basis:ensureRootBasis(memory),
-    content:at(all,p.content),source:at(all,p.source),
-    dictionary:at(all,p.dictionary),grammar:at(all,p.grammar),theory:at(all,p.theory),
-    segments:Object.freeze(p.segments.map(s=>restoreSegment(all,s))),
-    selectionSequence:at(all,p.selectionSequence),
-    formSequence:at(all,p.formSequence),
-    grammarMembership:at(all,p.grammarMembership),
-    theoryMembership:at(all,p.theoryMembership),
-  });
-}
-
-interface Binding {
-  readonly target:LinkHandle;
-  readonly values:ReadonlyMap<LinkHandle,LinkHandle>;
-}
-function verifyWitness(memory:ReadMemory,f:Frame,witness:LinkHandle):Binding{
-  const wp=memory.poles(witness);
-  const pair=memory.poles(wp.start);
-  const values=new Map<LinkHandle,LinkHandle>();
-  for(const handle of [pair.start,pair.end]){
-    const b=memory.poles(handle);
-    assert(
-      b.start===f.startRole||b.start===f.endRole,
-      "F4 proof witness selected roles only",
-    );
-    assert(!values.has(b.start),"F4 proof role unique");
-    values.set(b.start,b.end);
-  }
-  same(values.size,2,"F4 exact proof role coverage");
-  const s=values.get(f.startRole), e=values.get(f.endRole);
-  assert(s!==undefined&&e!==undefined,"F4 proof values exist");
-  same(memory.find(s,e),wp.end,"F4 proof reconstructs target");
-  return Object.freeze({target:wp.end,values});
-}
-function bindingFor(bindings:readonly Binding[],target:LinkHandle):Binding{
-  const found=bindings.filter(b=>b.target===target);
-  same(found.length,1,"F4 exact binding per target");
-  return found[0]!;
-}
-function valueOfResolution(
-  memory:ReadMemory,e:SourceFrontEndEvidence,resolution:LinkHandle,
-):LinkHandle{
-  const segment=e.segments.find(s=>s.resolution===resolution);
-  assert(segment!==undefined,"F4 grouping uses verified source resolution");
-  same(memory.poles(resolution).end,segment.form,"F4 source resolution semantic value");
-  return segment.form;
-}
-function groupedApplication(
-  memory:ReadMemory,
-  evidence:SourceFrontEndEvidence,
-  selectedUses:readonly LinkHandle[],
-  f:Frame,
-  grouping:LinkHandle,
-  bindings:readonly Binding[],
-):LinkHandle{
-  same(selectedUses.length,4,"F4 exact source Use count");
-  const gp=memory.poles(grouping);
-  const descriptor=memory.poles(gp.start);
-  same(descriptor.start,evidence.formSequence,"F4 grouping exact formSequence");
-
-  const pair=memory.poles(descriptor.end);
-  const sourceRoles=new Map<LinkHandle,LinkHandle>();
-  for(const h of [pair.start,pair.end]){
-    const b=memory.poles(h);
-    assert(
-      b.start===f.startRole||b.start===f.endRole,
-      "F4 grouping selected roles only",
-    );
-    assert(!sourceRoles.has(b.start),"F4 grouping role unique");
-    sourceRoles.set(b.start,b.end);
-  }
-  const sr=sourceRoles.get(f.startRole), er=sourceRoles.get(f.endRole);
-  assert(sr!==undefined&&er!==undefined,"F4 grouping role values exist");
-  const functionValue=valueOfResolution(memory,evidence,sr);
-  const argumentValue=valueOfResolution(memory,evidence,er);
-
-  const app=bindingFor(bindings,gp.end);
-  same(app.values.get(f.startRole),functionValue,"F4 grouped function matches app");
-  same(app.values.get(f.endRole),argumentValue,"F4 grouped argument matches app");
-  return gp.end;
-}
-function evaluate(
-  memory:Memory,
-  f:Frame,
-  directMethod:LinkHandle,
-  application:LinkHandle,
-  bindings:readonly Binding[],
-):BundleValue{
-  const method=bindingFor(bindings,directMethod);
-  const fromRole=method.values.get(f.startRole);
-  const toRole=method.values.get(f.endRole);
-  assert(fromRole!==undefined&&toRole!==undefined,"F4 method roles");
-  const occurrences:ResolvedOccurrence[]=[];
-  let index=0;
-  for(const candidate of bindings){
-    if(candidate.target===directMethod) continue;
-    const from=candidate.values.get(fromRole);
-    const to=candidate.values.get(toRole);
-    assert(from!==undefined&&to!==undefined,"F4 candidate roles");
-    if(from!==application) continue;
-    occurrences.push(Object.freeze({path:Object.freeze([index]),link:to}));
-    index+=1;
-  }
-  return resolveFlatBundle(memory,Object.freeze(occurrences));
-}
-
-function executeExpression(
-  memory:Memory,
-  portable:PExpression,
-  directMethod:LinkHandle,
-  bindings:readonly Binding[],
-):BundleValue{
-  const evidence=restoreSource(memory,portable.source);
-  const selected=replayV012SelectedSourceEvidence(
-    memory,ensureRootBasis(memory),evidence,
-  );
-  const f=frame(memory);
-  const grouping=at(memory.allLinks(),portable.grouping);
-  const application=groupedApplication(
-    memory,evidence,selected,f,grouping,bindings,
-  );
-  return evaluate(memory,f,directMethod,application,bindings);
-}
-
+function at(all:readonly LinkHandle[],n:number):LinkHandle{ const x=all[n]; assert(x!==undefined,"F4 coordinate resolves"); return x; } function restoreSegment(all:readonly LinkHandle[],s:PSegment):SelectedSegmentEvidence{ return Object.freeze({ start:s.start,end:s.end, form:at(all,s.form), dictionaryOccurrence:at(all,s.dictionaryOccurrence), sliceContent:at(all,s.sliceContent),span:at(all,s.span), sliceEvidence:at(all,s.sliceEvidence),lexeme:at(all,s.lexeme), resolution:at(all,s.resolution),selection:at(all,s.selection), }); } function restoreSource(memory:Memory,p:PSource):SourceFrontEndEvidence{ const all=memory.allLinks(); return Object.freeze({ basis:ensureRootBasis(memory), content:at(all,p.content),source:at(all,p.source), dictionary:at(all,p.dictionary),grammar:at(all,p.grammar),theory:at(all,p.theory), segments:Object.freeze(p.segments.map(s=>restoreSegment(all,s))), selectionSequence:at(all,p.selectionSequence), formSequence:at(all,p.formSequence), grammarMembership:at(all,p.grammarMembership), theoryMembership:at(all,p.theoryMembership), }); } interface Binding { readonly target:LinkHandle; readonly values:ReadonlyMap<LinkHandle,LinkHandle>; } function verifyWitness(memory:ReadMemory,f:Frame,witness:LinkHandle):Binding{ const wp=memory.poles(witness); const pair=memory.poles(wp.start); const values=new Map<LinkHandle,LinkHandle>(); for(const handle of [pair.start,pair.end]){ const b=memory.poles(handle); assert( b.start===f.startRole||b.start===f.endRole, "F4 proof witness selected roles only", ); assert(!values.has(b.start),"F4 proof role unique"); values.set(b.start,b.end); } same(values.size,2,"F4 exact proof role coverage"); const s=values.get(f.startRole), e=values.get(f.endRole); assert(s!==undefined&&e!==undefined,"F4 proof values exist"); same(memory.find(s,e),wp.end,"F4 proof reconstructs target"); return Object.freeze({target:wp.end,values}); } function bindingFor(bindings:readonly Binding[],target:LinkHandle):Binding{ const found=bindings.filter(b=>b.target===target); same(found.length,1,"F4 exact binding per target"); return found[0]!; } function valueOfResolution( memory:ReadMemory,e:SourceFrontEndEvidence,resolution:LinkHandle, ):LinkHandle{ const segment=e.segments.find(s=>s.resolution===resolution); assert(segment!==undefined,"F4 grouping uses verified source resolution"); same(memory.poles(resolution).end,segment.form,"F4 source resolution semantic value"); return segment.form; } function groupedApplication( memory:ReadMemory, evidence:SourceFrontEndEvidence, selectedUses:readonly LinkHandle[], f:Frame, grouping:LinkHandle, bindings:readonly Binding[], ):LinkHandle{ same(selectedUses.length,4,"F4 exact source Use count"); const gp=memory.poles(grouping); const descriptor=memory.poles(gp.start); same(descriptor.start,evidence.formSequence,"F4 grouping exact formSequence"); const pair=memory.poles(descriptor.end); const sourceRoles=new Map<LinkHandle,LinkHandle>(); for(const h of [pair.start,pair.end]){ const b=memory.poles(h); assert( b.start===f.startRole||b.start===f.endRole, "F4 grouping selected roles only", ); assert(!sourceRoles.has(b.start),"F4 grouping role unique"); sourceRoles.set(b.start,b.end); } const sr=sourceRoles.get(f.startRole), er=sourceRoles.get(f.endRole); assert(sr!==undefined&&er!==undefined,"F4 grouping role values exist"); const functionValue=valueOfResolution(memory,evidence,sr); const argumentValue=valueOfResolution(memory,evidence,er); const app=bindingFor(bindings,gp.end); same(app.values.get(f.startRole),functionValue,"F4 grouped function matches app"); same(app.values.get(f.endRole),argumentValue,"F4 grouped argument matches app"); return gp.end; } function evaluate( memory:Memory, f:Frame, directMethod:LinkHandle, application:LinkHandle, bindings:readonly Binding[], ):BundleValue{ const method=bindingFor(bindings,directMethod); const fromRole=method.values.get(f.startRole); const toRole=method.values.get(f.endRole); assert(fromRole!==undefined&&toRole!==undefined,"F4 method roles"); const occurrences:ResolvedOccurrence[]=[]; let index=0; for(const candidate of bindings){ if(candidate.target===directMethod) continue; const from=candidate.values.get(fromRole); const to=candidate.values.get(toRole); assert(from!==undefined&&to!==undefined,"F4 candidate roles"); if(from!==application) continue; occurrences.push(Object.freeze({path:Object.freeze([index]),link:to})); index+=1; } return resolveFlatBundle(memory,Object.freeze(occurrences)); } function executeExpression( memory:Memory, portable:PExpression, directMethod:LinkHandle, bindings:readonly Binding[], ):BundleValue{ const evidence=restoreSource(memory,portable.source); const selected=replayV012SelectedSourceEvidence( memory,ensureRootBasis(memory),evidence, ); const f=frame(memory); const grouping=at(memory.allLinks(),portable.grouping); const application=groupedApplication( memory,evidence,selected,f,grouping,bindings, ); return evaluate(memory,f,directMethod,application,bindings); }
 function resolveName(
   memory:Memory,dictionary:LinkHandle,name:string,
 ):LinkHandle|undefined{
@@ -712,7 +530,6 @@ function setSame(
   same(actual.size,new Set(expected).size,`${message}: cardinality`);
   for(const x of expected) assert(actual.has(x),`${message}: missing result`);
 }
-
 function executeGeneratedArtifact(artifact:GeneratedArtifact):void{
   same(
     artifact.schema,
@@ -724,7 +541,6 @@ function executeGeneratedArtifact(artifact:GeneratedArtifact):void{
   const rule=at(all,artifact.ruleCoordinate);
   const candidate=at(all,artifact.definitionCoordinate);
   const publication=at(all,artifact.publicationCoordinate);
-
   assert(
     structurallyAdmitted(memory,rule,candidate),
     "F5-F3 second Memory replays structural admission",
@@ -735,14 +551,12 @@ function executeGeneratedArtifact(artifact:GeneratedArtifact):void{
     publicationPoles.end!==candidate,
     "F5-F3 publication carries separate generated authority",
   );
-
   const f=frame(memory);
   const directMethod=at(all,artifact.directMethod);
   const bindings=artifact.witnessCoordinates.map(
     n=>verifyWitness(memory,f,at(all,n)),
   );
   same(bindings.length,4,"F5-F3 four proof bindings");
-
   const result=executeExpression(
     memory,artifact.expression,directMethod,bindings,
   );
@@ -756,20 +570,17 @@ function executeGeneratedArtifact(artifact:GeneratedArtifact):void{
   setSame(result.links,[b1,b2],"F5-F3 generated q(a)");
   same(result.links.size,2,"F5-F3 generated behavior cardinality");
 }
-
 function expectRejected(effect:()=>unknown,message:string):void{
   let rejected=false;
   try{ effect(); }catch{ rejected=true; }
   assert(rejected,message);
 }
-
 function negativeControls(frozen:FrozenArtifact):void{
   const memory=restoreTopology(frozen.topology);
   const all=memory.allLinks();
   const rule=at(all,frozen.ruleCoordinate);
   const request=at(all,frozen.requestCoordinate);
   const generated=generateAuthority(memory,rule,request);
-
   {
     const v=[...generated.values];
     v[3]=memory.ensure(v[2]!,v[1]!);
@@ -783,7 +594,6 @@ function negativeControls(frozen:FrozenArtifact):void{
       "F5-F3 forged application cannot publish",
     );
   }
-
   {
     const v=[...generated.values];
     v[6]=memory.ensure(v[4]!,v[3]!);
@@ -793,7 +603,6 @@ function negativeControls(frozen:FrozenArtifact):void{
       "F5-F3 forged continuation rejected",
     );
   }
-
   {
     const forged=materializeExactSequence(
       memory,generated.values.slice(0,-1),
@@ -804,7 +613,6 @@ function negativeControls(frozen:FrozenArtifact):void{
     );
   }
 }
-
 function staticGeneratorGuard():void{
   const repoRoot=resolve(process.cwd(),"..");
   const source=readFileSync(
@@ -825,30 +633,18 @@ function staticGeneratorGuard():void{
     );
   }
 }
-
 function staticReceiverIdentityGuard():void{
   const repoRoot=resolve(process.cwd(),"..");
-  const current=readFileSync(
-    join(repoRoot,"ts/test/research-v013-self-generated-definition-f5-f3.test.ts"),
-    "utf8",
-  );
-  const f4=readFileSync(
-    join(repoRoot,"ts/test/research-v013-formal-self-extension-f4.test.ts"),
-    "utf8",
-  );
+  const current=readFileSync(join(repoRoot,"ts/test/research-v013-self-generated-definition-f5-f3.test.ts"),"utf8");
+  const f4=readFileSync(join(repoRoot,"ts/test/research-v013-formal-self-extension-f4.test.ts"),"utf8");
   const extract=(source:string):string=>{
     const start=source.indexOf("function at(");
-    const end=source.indexOf("\nfunction resolveName(",start);
+    const end=source.indexOf("function resolveName(",start);
     assert(start>=0&&end>start,"F5-F3 receiver source slice");
-    return source.slice(start,end);
+    return source.slice(start,end).replace(/\s+/g," ").trim();
   };
-  same(
-    extract(current),
-    extract(f4),
-    "F5-F3 executes the exact unchanged F4 generic receiver source block",
-  );
+  same(extract(current),extract(f4),"F5-F3 executes whitespace-normalized exact F4 receiver source");
 }
-
 function main():void{
   const frozenA=buildFrozenArtifact(false);
   const frozenB=buildFrozenArtifact(true);
@@ -856,20 +652,17 @@ function main():void{
     frozenA,frozenB,
     "F5-F3 frozen rule/request ignores unrelated allocation noise",
   );
-
   const generatedA=generatePortable(frozenA);
   const generatedB=generatePortable(frozenB);
   exactJson(
     generatedA.artifact,generatedB.artifact,
     "F5-F3 independent producers generate byte-identical portable authority",
   );
-
   executeGeneratedArtifact(generatedA.artifact);
   executeGeneratedArtifact(generatedB.artifact);
   negativeControls(frozenA);
   staticGeneratorGuard();
   staticReceiverIdentityGuard();
-
   console.log([
     "MTS v0.13 F5-F3:",
     "FULL_F4_COMPATIBLE_GENERATED_AUTHORITY=GREEN_SCOPED_RESEARCH",
@@ -881,7 +674,7 @@ function main():void{
     "FROZEN_STRUCTURAL_ADMISSION=GREEN",
     "EXPLICIT_PUBLICATION=YES",
     "SECOND_MEMORY_EXECUTION=GREEN",
-    "UNCHANGED_F4_RECEIVER_SOURCE=EXACT",
+    "UNCHANGED_F4_RECEIVER_SOURCE=NORMALIZED_EXACT",
     "GENERATOR_NAME_SPECIFIC_BRANCHES=0",
     "NEGATIVE_CONTROLS=3",
     "INDEPENDENT_PRODUCER_MEMORIES=2",
