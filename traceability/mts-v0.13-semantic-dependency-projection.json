@@ -39,7 +39,8 @@
     "aspectApplicationSemanticClosureProven": false,
     "aspectApplicationFrozenContinuationResearchComplete": true,
     "aspectApplicationLTemplateContinuationResearchComplete": true,
-    "aspectApplicationDualRoleTemplateResearchComplete": true
+    "aspectApplicationDualRoleTemplateResearchComplete": true,
+    "aspectApplicationMethodOrientationResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -854,7 +855,11 @@
     "aspectContinuationLTemplateIndependentMemoryCount": 2,
     "aspectDualRoleTemplateBasisCoverageCount": 5,
     "aspectDualRoleTemplateIndependentMemoryCount": 2,
-    "aspectRawPoleRoleFalsifierCount": 1
+    "aspectRawPoleRoleFalsifierCount": 1,
+    "aspectMethodOrientationCount": 2,
+    "aspectMethodOrientationHostDirectionBranchCount": 0,
+    "aspectMethodOrientationIndependentMemoryCount": 2,
+    "aspectMethodOrientationNegativeControlCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -919,14 +924,18 @@
     "aspectContinuationLTemplateIndependentMemoryCount": "Independent replay Memories in which the same portable selected continuation authority is interpreted through the L self-template without sender-local handles.",
     "aspectDualRoleTemplateBasisCoverageCount": "A11d basis targets R/O/C/L/U decoded by a generic Dual(A)=START(A)⟼END(A) role template whose roles are structurally distinct even when A has equal raw endpoint values.",
     "aspectDualRoleTemplateIndependentMemoryCount": "Independent replay Memories in which the same portable continuation authority and non-root Dual(A) role template preserve decoding and result semantics without sender-local handles.",
-    "aspectRawPoleRoleFalsifierCount": "A11d negative result: one ordinary equal-raw-pole Link A=X⟼X falsifies the naive idea that raw endpoint values themselves can always serve as two distinct role placeholders."
+    "aspectRawPoleRoleFalsifierCount": "A11d negative result: one ordinary equal-raw-pole Link A=X⟼X falsifies the naive idea that raw endpoint values themselves can always serve as two distinct role placeholders.",
+    "aspectMethodOrientationCount": "A11e selected ordinary Link methods over one generic START(A)/END(A) role frame: direct START(A)⟼END(A) and inverse END(A)⟼START(A).",
+    "aspectMethodOrientationHostDirectionBranchCount": "Per-direction branches in the A11e continuation kernel. Zero means direct/inverse behavior is selected only by the method Link and generic role bindings.",
+    "aspectMethodOrientationIndependentMemoryCount": "Independent replay Memories in which the same portable role/method/continuation authority yields covariant direct/inverse results without sender-local handles.",
+    "aspectMethodOrientationNegativeControlCount": "A11e fail-closed method controls: unselected method has no authority; non-bijective/collapsed role method is rejected."
   },
   "nextExperiments": [
-    "A11e: represent/reconstruct the direction convention itself: given selected Dual(A), make the choice START-role=input and END-role=result an explicit MTS Link/method authority rather than host positional convention; test direct and inverse orientations.",
-    "A11f: exercise self-incidence application/result cases, especially R(R)=R and START/END application keys, without accidental self-edge ambiguity or per-aspect host switches.",
-    "After direction and self-incidence closure, integrate F2b portable naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
-    "Only then rerun F-KERNEL-SELF-EXTENSION and reassess the three remaining host-defined FORMAL law families.",
-    "Continue E2 source-removal on generic structural unification/role reconstruction before any FULL_SELF_HOSTED claim."
+    "A11f: exercise self-incidence application keys/results, especially R(R)=R plus START/END cases, under explicit method authority without a per-aspect host switch or accidental self-edge-as-result ambiguity.",
+    "A11g/E2: source-remove generic structural unification/method-role interpretation; the verifier must reconstruct the method/template law from portable MTS evidence rather than re-encode it in host code.",
+    "After self-incidence and unification-source work, integrate F2b portable naming with aspect-derived continuation semantics in one end-to-end two-Memory FORMAL witness.",
+    "Then rerun F-KERNEL-SELF-EXTENSION and reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization.",
+    "E3/E4 remain separate and open; selected frozen authority must not collapse into live adjacency."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -2600,6 +2609,68 @@
       },
       "evidenceTest": "ts/test/research-v013-dual-role-template-a11d.test.ts",
       "consequence": "A11d moves role authority from privileged root constants O/C to the generic START(A)/END(A) structure of any selected whole. L remains important as Dual(R), but the generic mechanism is Dual(A), which survives equal raw endpoint values. The remaining semantic question is why END-role denotes continuation/result and how that orientation law becomes MTS-owned rather than host convention."
+    },
+    "aspectApplicationA11e": {
+      "status": "EXECUTED_GREEN_METHOD_ORIENTATION_CANDIDATE",
+      "hypothesis": "Application/result direction need not be a host convention. A selected ordinary Link between structural roles can be the method authority: Direct(A)=START(A)⟼END(A), Inverse(A)=END(A)⟼START(A). One generic kernel derives from/to role selection from the chosen method Link.",
+      "methodAuthority": [
+        "role frame is generic START(A), END(A), Dual(A)=START(A)⟼END(A) for a non-root selected whole A",
+        "Direct(A) is the existing Dual(A) Link",
+        "Inverse(A) is END(A)⟼START(A)",
+        "both methods are explicit selected Links inside frozen portable authority",
+        "no boolean, enum, opcode, string or host insertion order selects direction"
+      ],
+      "genericKernel": [
+        "unify Dual(A) template against selected method using roles START(A),END(A)",
+        "require the two inferred method-role values to be a bijection of the same structural role pair",
+        "unify each frozen selected candidate Link against the same Dual(A) template",
+        "lookup candidate values by the roles selected as method-from and method-to",
+        "candidate contributes a result iff method-from value equals the selected application Link",
+        "method-to value becomes the continuation/result Link"
+      ],
+      "covarianceCorpus": [
+        "same frozen support contains direct occurrence P⟼g and inverse occurrence h⟼P",
+        "Direct(A) reads g from P and does not read h",
+        "Inverse(A) reads h from P and does not read g",
+        "multi-result direct/inverse corpora swap covariantly under method selection with zero direction-specific branches"
+      ],
+      "negativeControls": [
+        "method Link not present in frozen selected authority is rejected even when structurally valid",
+        "collapsed role method START(A)⟼START(A) is rejected because it is not a bijection over START(A),END(A)"
+      ],
+      "relationToPriorEvidence": [
+        "A11d already falsifies raw endpoint values as general role identities",
+        "existing H2d/H2e research independently shows pole roles, traversal and method can be explicit Links and host field order has no authority",
+        "A11e uses the smaller method-Link idea directly for frozen continuation semantics"
+      ],
+      "eliminatedPrivilege": [
+        "no hard-coded rule that END-role is always result",
+        "no direct/inverse host branch",
+        "no hard-coded root O/C role constants",
+        "no Dictionary/Grammar/Theory/StructuralRule authority in the continuation kernel"
+      ],
+      "residualHostSemanticBoundary": [
+        "generic structural unification remains host semantic law",
+        "host checks method-role binding is a bijection of the selected structural role pair",
+        "host compares method-from candidate value to the selected application Link",
+        "frozen-support iteration remains host orchestration",
+        "BundleValue projection remains derived host surface",
+        "START(A)/END(A)/Dual(A) construction remains current Memory bootstrap"
+      ],
+      "observed": {
+        "methods": [
+          "direct",
+          "inverse"
+        ],
+        "directionSpecificHostBranches": 0,
+        "independentMemories": 2,
+        "negativeControls": 2,
+        "rawHostInsertionOrderAuthority": false,
+        "productionChanged": false,
+        "semanticClosureProven": false
+      },
+      "evidenceTest": "ts/test/research-v013-method-orientation-a11e.test.ts",
+      "consequence": "Direction is now executable as selected Link evidence rather than a fixed END-is-result host convention. Direct and inverse methods act covariantly over the same frozen support. Remaining closure work is to reconstruct generic unification/method-role interpretation itself and to handle self-incidence application keys/results such as R(R)=R."
     }
   }
 }
