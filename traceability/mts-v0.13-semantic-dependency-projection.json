@@ -28,7 +28,9 @@
     "semanticSourceAuthorityInventoryComplete": true,
     "semanticSourceReconstructionProven": false,
     "formalKernelAuditComplete": true,
-    "formalKernelSelfExtensionProven": false
+    "formalKernelSelfExtensionProven": false,
+    "rootAspectSourceRemovalFalsifierComplete": true,
+    "rootAspectSemanticSourceReconstructionMethodProven": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -818,7 +820,9 @@
     "selfGeneratedOrReconstructedSemanticArtifactCount": null,
     "externallyGeneratedSemanticArtifactCount": null,
     "formalKernelHostDefinedSemanticLawCount": 3,
-    "formalKernelSelfExtensionWitnessCount": 0
+    "formalKernelSelfExtensionWitnessCount": 0,
+    "rootAspectSourceRemovalPositiveVectorCount": 8,
+    "rootAspectSourceRemovalNegativeControlCount": 3
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -858,13 +862,15 @@
     "selfGeneratedOrReconstructedSemanticArtifactCount": "Still UNMEASURED until the E2 kernel-source removal/reconstruction falsifier defines and exercises a semantic-artifact accounting scope. Do not infer zero merely from the current host-source inventory.",
     "externallyGeneratedSemanticArtifactCount": "Still UNMEASURED until the E2 kernel-source removal/reconstruction falsifier defines and exercises a semantic-artifact accounting scope. Host semantic-source law families are counted separately by hostSemanticSourceDefinitionCount.",
     "formalKernelHostDefinedSemanticLawCount": "Scoped count of FORMAL semantic-law families in the current v0.13 evaluator that remain HOST_DEFINED in the E2 authority inventory: operator grounding, prefix composition and plan materialization.",
-    "formalKernelSelfExtensionWitnessCount": "Executable witnesses in which a previously unknown named FORMAL form is defined as MTS/Link evidence and then used in an independent Memory without adding host grammar/parser/evaluator semantic branches."
+    "formalKernelSelfExtensionWitnessCount": "Executable witnesses in which a previously unknown named FORMAL form is defined as MTS/Link evidence and then used in an independent Memory without adding host grammar/parser/evaluator semantic branches.",
+    "rootAspectSourceRemovalPositiveVectorCount": "E2-F1 positive targets classified by the frozen portable Link-template authority without invoking/reimplementing the production root-aspect switch: four basis targets, U as an ordinary pair target, and three non-basis generic targets.",
+    "rootAspectSourceRemovalNegativeControlCount": "E2-F1 negative authority controls: missing template admission, extra ordinary-pair admission causing ambiguity, and post-freeze live authority mutation distinguished by the frozen portable revision."
   },
   "nextExperiments": [
-    "E2-F1: deny the host root-aspect source and attempt two-Memory reconstruction/revalidation of the ROOT/START/END/PAIR interpretation law from Link/MTS evidence without equivalent host reimplementation; reuse A10b self-template evidence only where it does not smuggle equivalent host semantics.",
-    "Measure the A10b residual host bootstrap (identity + poles + prefix traversal + generic unification) explicitly; do not treat read-only self-template validation as full FORMAL self-hosting.",
+    "Measure/falsify the residual generic E2 boundary exposed by E2-F1: self-incidence comparison, non-self-pole role extraction and generic structural unification. Do not call the scoped reconstruction method full self-hosting.",
+    "Decide through RED-first evidence whether the E2-F1 Link-template reconstruction can replace the production root-aspect decomposition source without weakening existing v0.13 behavior; do not rewrite production merely because the research method is GREEN.",
     "F-KERNEL-SELF-EXTENSION: RED-first test of a previously unknown named form defined and interpreted from portable MTS/Link evidence under an unchanged host kernel.",
-    "If E2 source-removal establishes a valid reconstruction method, apply the same discipline to proof meta-semantics (template matching, derivation replay, recursive identity and rooted Proof Aset replay) before any SELF_GENERATED_OR_RECONSTRUCTED claim.",
+    "Apply source-removal discipline to proof meta-semantics (template matching, derivation replay, recursive identity and rooted Proof Aset replay) before any global SELF_GENERATED_OR_RECONSTRUCTED claim.",
     "After E2 and FORMAL-kernel accounting/reconstruction experiments, audit E3 formation/admissibility authority separately.",
     "After E3, audit E4 orchestration/fixed-point/scheduling/resource authority separately.",
     "Refine host/Link duplication from candidate overlap to confirmed semantic-equivalence duplication.",
@@ -1954,7 +1960,11 @@
           "ts/src/v013-hierarchical-carrier.ts#decomposeVerifiedSemanticLink"
         ],
         "currentClassification": "HOST_DEFINED",
-        "linkEvidence": "Self-incidence is directly present in Link poles, but host branching still assigns ROOT/START/END/PAIR and R/O/C/L sign roles."
+        "linkEvidence": "Self-incidence is directly present in Link poles, but host branching still assigns ROOT/START/END/PAIR and R/O/C/L sign roles.",
+        "reconstructionExperiment": "E2-F1 GREEN_SCOPED_RESEARCH",
+        "reconstructionEvidence": "ts/test/research-v013-root-aspect-source-removal-e2-f1.test.ts",
+        "productionClassificationUnchanged": "HOST_DEFINED",
+        "productionSourceRemoved": false
       },
       {
         "id": "relative-unary-form-law",
@@ -2067,7 +2077,7 @@
     "kernelSourceRemovalFalsifier": {
       "id": "E2-F1-root-aspect-source-removal",
       "targetAuthority": "root-aspect-decomposition-law",
-      "status": "DESIGNED_NOT_EXECUTED",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can ROOT/START/END/PAIR interpretation for an unknown semantic Link be reconstructed and revalidated from Link structure plus fixed MTS evidence after the host-side root-aspect semantic source is denied?",
       "denyOwners": [
         "ts/src/v013-hierarchical-carrier.ts#decomposeVerifiedSemanticLink",
@@ -2091,8 +2101,30 @@
         "generic replay of that artifact validates positive ROOT/START/END/PAIR witnesses and rejects malformed/forged controls",
         "the independently frozen verifier/generator authority remains unchanged"
       ],
-      "currentResult": "NOT_RUN",
-      "consequence": "E2 remains open; no SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claim is permitted."
+      "currentResult": "GREEN: after freezing the admitted-template projection immediately from the replayed portable authority artifact and before candidate construction, four ostensive Link templates reconstruct the local structural class of unknown Links in independent Memories through generic self-incidence comparison plus structural unification, without invoking or reimplementing the production aspect-name switch. Production decomposeV013SemanticLink remains HOST_DEFINED and unchanged.",
+      "consequence": "E2-F1 establishes a viable Link-reconstruction method for the root-aspect family, but production still uses the HOST_DEFINED decomposition function. Global E2 remains open; no SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claim is permitted.",
+      "evidenceTest": "ts/test/research-v013-root-aspect-source-removal-e2-f1.test.ts",
+      "reconstructionArtifact": "portable structural authority artifact plus its admitted-template projection selected immediately after replay and before candidate construction; canonical export/replay and revision are independent of sender-local handles",
+      "hostSemanticLabelsUsedByClassifier": [],
+      "residualExternalSemanticBoundary": [
+        "Link identity",
+        "poles()",
+        "generic comparison of operator/target self-incidence",
+        "generic extraction of non-self operator poles as roles",
+        "generic structural unification",
+        "generic prefix/traversal concerns remain outside this target-only classifier",
+        "portable authority export/replay and revision verification"
+      ],
+      "positiveVectorCount": 8,
+      "negativeControlCount": 3,
+      "productionClassificationChanged": false,
+      "authoritySnapshotRequirement": "The admitted-template projection must be frozen before candidate target construction. Reading live outgoing(theory) afterwards is invalid because an unrelated candidate Link may share the Theory root as its start pole and would then masquerade as a new admission.",
+      "firstRedFinding": "The initial E2-F1 execution failed because classification reread live outgoing(theory) after target materialization. A generic target created an unrelated Link whose start pole equalled the Theory root, producing an ambient fifth admission and ambiguous classification. This was treated as a falsifier finding, not patched by choosing an order.",
+      "negativeControls": [
+        "missing one frozen template rejects the corresponding target",
+        "a frozen authority artifact that explicitly admits an extra ordinary-pair template rejects ordinary-pair classification as ambiguous",
+        "post-freeze live authority mutation changes the exported revision while replay of the original frozen artifact preserves the original four-template authority"
+      ]
     },
     "limitations": [
       "This is a scoped semantic-source inventory, not a proof that no E2 authority exists elsewhere in ts/src.",

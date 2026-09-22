@@ -143,7 +143,7 @@ for (const excluded of audit.representationOnlyExclusions as string[]) {
 same(
   projection.metrics.selfGeneratedOrReconstructedSemanticArtifactCount,
   null,
-  "semantic artifact reconstruction count remains unmeasured until removal falsifier",
+  "global semantic artifact reconstruction count remains unmeasured after scoped E2-F1",
 );
 same(
   projection.metrics.externallyGeneratedSemanticArtifactCount,
@@ -164,8 +164,27 @@ same(
 const falsifier = audit.kernelSourceRemovalFalsifier;
 same(falsifier.id, "E2-F1-root-aspect-source-removal", "first E2 falsifier id");
 same(falsifier.targetAuthority, "root-aspect-decomposition-law", "first E2 falsifier target");
-same(falsifier.status, "DESIGNED_NOT_EXECUTED", "first E2 falsifier is not pre-claimed green");
-same(falsifier.currentResult, "NOT_RUN", "first E2 falsifier has no invented result");
+same(
+  falsifier.status,
+  "EXECUTED_GREEN_SCOPED_RESEARCH",
+  "first E2 falsifier records the executed scoped result",
+);
+assert(
+  typeof falsifier.currentResult === "string" &&
+    falsifier.currentResult.startsWith("GREEN:"),
+  "first E2 falsifier records an executable GREEN result",
+);
+same(falsifier.positiveVectorCount, 8, "E2-F1 positive vector count");
+same(falsifier.negativeControlCount, 3, "E2-F1 negative control count");
+same(
+  falsifier.productionClassificationChanged,
+  false,
+  "E2-F1 does not silently upgrade production classification",
+);
+assert(
+  (falsifier.residualExternalSemanticBoundary as string[]).length > 0,
+  "E2-F1 keeps the residual generic host boundary explicit",
+);
 assert(
   (falsifier.failConditions as string[]).some((condition) =>
     condition.includes("re-encodes the same self-incidence-to-aspect switch")
