@@ -1,11 +1,9 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-
 import { materializeExactSequence, readExactSequence } from "../src/exact-sequence.js";
 import {
   Memory, ensureRootBasis, type LinkHandle, type ReadMemory, type RootBasis,
 } from "../src/memory.js";
-
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.13 A28 derived meta seed correspondence: ${message}`);
 }
@@ -17,7 +15,6 @@ function expectThrows(run: () => void, message: string): void {
   try { run(); } catch { threw = true; }
   assert(threw, message);
 }
-
 function freezeChain(memory: Memory, values: readonly LinkHandle[]): LinkHandle {
   let body = memory.root;
   for (let i = values.length - 1; i >= 0; i -= 1) body = memory.ensure(values[i]!, body);
@@ -37,7 +34,6 @@ function readChain(memory: Memory, envelope: LinkHandle): readonly LinkHandle[] 
   }
   return Object.freeze(out);
 }
-
 interface Family {
   readonly metaParent: LinkHandle;
   readonly E0: LinkHandle; readonly E1: LinkHandle; readonly E2: LinkHandle;
@@ -81,7 +77,6 @@ function buildFamily(memory: Memory, b: RootBasis, seed: LinkHandle): Family {
   const E3=referenceNextExecution(memory,E2), E4=referenceNextExecution(memory,E3);
   return Object.freeze({metaParent,E0,E1,E2,E3,E4});
 }
-
 /** Exact A23 runtime consumer; A28 changes only producer-authority source selection. */
 function metaStep(
   memory: Memory,
@@ -90,7 +85,6 @@ function metaStep(
   const truth = memory.poles(currentExecutionTruth);
   const metaContext = truth.start;
   const currentExecution = truth.end;
-
   const metaContextPoles = memory.poles(metaContext);
   const envelope = metaContextPoles.end;
   const envelopePoles = memory.poles(envelope);
@@ -98,19 +92,15 @@ function metaStep(
     envelopePoles.start === envelope && envelopePoles.end !== envelope,
     "A23 meta-context carries proper START-self-closed producer authority",
   );
-
   const seen = new Set<LinkHandle>();
   let cursor = envelopePoles.end;
   let selected: LinkHandle | undefined;
-
   while (cursor !== memory.root) {
     assert(!seen.has(cursor), "A23 producer authority cycle");
     seen.add(cursor);
-
     const cell = memory.poles(cursor);
     const candidate = cell.start;
     const transition = memory.poles(candidate);
-
     if (transition.start === currentExecution) {
       assert(selected === undefined,
         "A23 producer authority is ambiguous for current execution");
@@ -118,12 +108,10 @@ function metaStep(
     }
     cursor = cell.end;
   }
-
   if (selected === undefined) return undefined;
   const transition = memory.poles(selected);
   return memory.ensure(metaContext, transition.end);
 }
-
 const ROOT=0,META=1,E0=2,E1=3,E2=4,E3=5,E4=6,T0=7,T1=8,T2=9,T3=10;
 const C3=11,C2=12,C1=13,C0=14,ENV=15,M=16;
 function anonymousRoles(memory:Memory):readonly LinkHandle[]{
@@ -188,7 +176,6 @@ function producerTemplate(
     candidate,M:meta,publication:memory.ensure(candidate,meta),
   });
 }
-
 function seedSequence(memory:Memory,f:Family):LinkHandle{
   return materializeExactSequence(memory,[f.metaParent,f.E0,f.E1,f.E2,f.E3,f.E4]);
 }
@@ -207,14 +194,12 @@ function deriveProducerSeeds(
   const values=readExactSequence(memory,candidate).values;
   const members=new Set(values);
   const matches:LinkHandle[][]=[];
-
   for(const possibleMeta of values){
     const mp=memory.poles(possibleMeta);
     if(!members.has(mp.start)||!members.has(mp.end))continue;
     const envelope=mp.end;
     const ep=memory.poles(envelope);
     if(ep.start!==envelope||ep.end===envelope)continue;
-
     const transitions:LinkHandle[]=[];
     const seen=new Set<LinkHandle>();
     let cursor=ep.end;
@@ -228,7 +213,6 @@ function deriveProducerSeeds(
       cursor=cell.end;
     }
     if(!valid||transitions.length===0)continue;
-
     const executions:LinkHandle[]=[];
     for(let i=0;i<transitions.length;i+=1){
       const tp=memory.poles(transitions[i]!);
@@ -240,11 +224,9 @@ function deriveProducerSeeds(
     if(!valid)continue;
     matches.push([mp.start,...executions]);
   }
-
   same(matches.length,1,"A28 exactly one structural producer seed path");
   return Object.freeze(matches[0]!);
 }
-
 function derivedSeedMap(
   memory:Memory,
   sourceCandidate:LinkHandle,
@@ -262,7 +244,6 @@ function derivedSeedMap(
   }
   return map;
 }
-
 function instantiate(memory:Memory,source:LinkHandle,map:Map<LinkHandle,LinkHandle>):LinkHandle{
   const known=map.get(source);if(known!==undefined)return known;
   const p=memory.poles(source);let target:LinkHandle;
@@ -273,7 +254,6 @@ function instantiate(memory:Memory,source:LinkHandle,map:Map<LinkHandle,LinkHand
   const prior=map.get(source);assert(prior===undefined||prior===target,"A28 clone conflict");
   map.set(source,target);return target;
 }
-
 function runInventory(
   memory:Memory,
   rule:LinkHandle,
@@ -290,7 +270,6 @@ function runInventory(
   assert(sources.length>0,"A28 non-empty broad template inventory");
   const candidates=new Set<LinkHandle>(),publications=new Set<LinkHandle>(),metas=new Set<LinkHandle>();
   let compatibleCount=0;
-
   for(const source of sources){
     const map=derivedSeedMap(memory,source,targetSeeds);
     if(map===undefined)continue;
@@ -302,7 +281,6 @@ function runInventory(
     const publication=memory.ensure(candidate,meta);
     candidates.add(candidate);publications.add(publication);metas.add(meta);
   }
-
   assert(compatibleCount>0,"A28 at least one structurally compatible template");
   same(candidates.size,1,"A28 derived compatible templates converge candidate");
   same(publications.size,1,"A28 derived compatible templates converge publication");
@@ -312,17 +290,14 @@ function runInventory(
     compatibleCount,inventoryCount:sources.length,
   });
 }
-
 function exercise(noise:boolean):void{
   const memory=new Memory(),b=ensureRootBasis(memory);
   if(noise)memory.ensure(memory.ensure(b.L,b.U),b.C);
-
   const source1=buildFamily(memory,b,memory.ensure(b.U,b.L));
   const source2=buildFamily(memory,b,memory.ensure(b.O,b.U));
   const source3=buildFamily(memory,b,memory.ensure(b.C,b.L));
   const target=buildFamily(memory,b,memory.ensure(b.C,b.U));
   const rule=defineRule(memory);
-
   const t1=producerTemplate(
     memory,source1.metaParent,[source1.E0,source1.E1,source1.E2,source1.E3,source1.E4],
   );
@@ -339,7 +314,6 @@ function exercise(noise:boolean):void{
     "A28 broad inventory source candidate identities distinct");
   assert(admitted(memory,rule,t1.candidate)&&admitted(memory,rule,t2.candidate),
     "A28 full-length source templates admitted");
-
   let shortTruth=memory.ensure(t3.M,source3.E0);
   for(const expected of [source3.E1,source3.E2,source3.E3]){
     const next=metaStep(memory,shortTruth);
@@ -348,24 +322,20 @@ function exercise(noise:boolean):void{
     shortTruth=next;
   }
   same(metaStep(memory,shortTruth),undefined,"A28 shorter valid authority terminates");
-
   const targetSeeds=seedSequence(memory,target);
   same(memory.find(target.E0,target.E1),undefined,"A28 target authority absent at freeze");
-
   // Inventory members are source candidates only: no sourceSeeds->targetSeeds
   // correspondence Link is frozen per template.
   const inventory=materializeExactSequence(memory,[t1.candidate,t2.candidate,t3.candidate]);
   const out=runInventory(memory,rule,inventory,targetSeeds);
   same(out.inventoryCount,3,"A28 broad inventory size");
   same(out.compatibleCount,2,"A28 structurally derived compatible subset size");
-
   let truth=memory.ensure(out.M,target.E0);
   for(const expected of [target.E1,target.E2,target.E3,target.E4]){
     const next=metaStep(memory,truth);assert(next!==undefined,"A28 target meta-step");
     same(memory.poles(next).end,expected,"A28 derived authority execution");truth=next;
   }
   same(metaStep(memory,truth),undefined,"A28 terminal ZERO");
-
   // Late ambient full-length source candidate remains inert outside frozen inventory.
   producerTemplate(
     memory,source3.metaParent,[source3.E0,source3.E1,source3.E2,source3.E3,source3.E4],
@@ -374,7 +344,6 @@ function exercise(noise:boolean):void{
   same(afterAmbient.inventoryCount,3,"A28 ambient candidate does not mutate inventory");
   same(afterAmbient.compatibleCount,2,"A28 ambient compatible candidate ignored");
   same(afterAmbient.candidate,out.candidate,"A28 ambient candidate preserves target");
-
   // Remove one authority-chain cell from the candidate evidence while leaving
   // the actual ambient topology intact. Structural extraction must reject the
   // malformed selected candidate instead of recovering it from ambient Memory.
@@ -392,7 +361,6 @@ function exercise(noise:boolean):void{
     "A28 malformed structural producer evidence rejected",
   );
 }
-
 function staticGuards():void{
   const root=resolve(process.cwd(),"..");
   const own=readFileSync(
@@ -410,14 +378,12 @@ function staticGuards():void{
     prior.indexOf("\nfunction frontierOccurrences(",prior.indexOf("function metaStep(")),
   );
   same(a.replace(/\s+/g,""),b.replace(/\s+/g,""),"A28 unchanged A23 metaStep");
-
   const derive=own.slice(
     own.indexOf("function deriveProducerSeeds("),
     own.indexOf("\nfunction derivedSeedMap(",own.indexOf("function deriveProducerSeeds(")),
   );
   for(const x of ["META","E0","E1","E2","E3","E4","T0","C0","ENV","switch(", ".find(", ".outgoing(", ".incoming(", "allLinks("])
     assert(!derive.includes(x),`A28 structural seed extractor excludes positional/ambient primitive ${x}`);
-
   const runner=own.slice(
     own.indexOf("function runInventory("),
     own.indexOf("\nfunction exercise(",own.indexOf("function runInventory(")),
@@ -425,7 +391,6 @@ function staticGuards():void{
   for(const x of ["source1","source2","source3","t1","t2","t3","correspondence","switch(","allLinks(", ".outgoing(", ".incoming("])
     assert(!runner.includes(x),`A28 inventory runner excludes explicit correspondence/template primitive ${x}`);
 }
-
 function main():void{
   exercise(false);exercise(true);staticGuards();
   console.log([
