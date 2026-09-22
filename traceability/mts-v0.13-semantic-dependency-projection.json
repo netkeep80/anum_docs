@@ -1187,11 +1187,11 @@
     "genericConstructionPlanF5F4IndependentMemoryCount": "Independent replay Memories executing the same frozen constructive plan and required to produce byte-identical canonical topology."
   },
   "nextExperiments": [
-    "F5-F5: falsify/remove the external construction-plan source. The 97-equation F5-F4 plan must be generated or reconstructed from more primitive frozen MTS evidence without running the domain-specific F5-F3 reference producer as a compiler.",
-    "Source-remove or classify the generic structural admission rule interpreter itself; data-driven E3 is not yet global E3 closure.",
-    "Carry A14 root asymmetry/chirality into future carrier/observer redesigns; reversal may exchange L/U but an orientation-free non-degenerate root basis must defeat O=C and L=U collapse controls.",
-    "A15: investigate weighted predictive Bundle frontiers with weights on occurrences/provenance; prediction/ranking must remain separate from admission and publication authority.",
-    "Keep A13/A13b branch scheduling/materialization semantics as the substrate for multi-candidate generation and future physical parallel-executor work."
+    "F5-F5: remove or reconstruct the external source of the 97-equation constructive plan. The target is not another hand-authored plan: derive the plan from already-admitted Link evidence/rules or demonstrate the irreducible residual information explicitly.",
+    "Source-remove/classify the generic structural admission rule interpreter itself; data-driven E3 still is not global E3 closure.",
+    "Audit whether the F5-F4 constructive-plan interpreter can be reduced to the same generic role/equation kernel as F5-F2 verification, yielding one bidirectional constraint substrate for verify/construct.",
+    "Carry A14 root asymmetry/chirality into any carrier/observer redesign: reversal may exchange L/U, but orientation erasure must still hit the O=C / L=U collapse controls.",
+    "Only after the self-generation source boundary is reduced should A15 weighted predictive Bundle frontiers be allowed to influence search/order; probability must never become admission or publication authority."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3997,20 +3997,20 @@
         "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
       ],
       "evidenceTest": "ts/test/research-v013-generic-construction-plan-f5-f4.test.ts",
-      "consequence": "F5-F4 removes domain-specific semantics from the runtime construction mechanism on this scoped path: the runtime consumes only frozen Link role bindings and target/start/end equations. However the 97-equation plan is compiled from an external domain-specific reference producer, so semantic information has been relocated into Link data rather than eliminated or self-reconstructed. Global E2/E3 and FULL_SELF_HOSTED remain open; the next gate must attack the external construction-plan source itself.",
-      "currentResult": "GREEN: the complete F5-F3 generated-authority construction trace compiles to 97 frozen Link-carried target/start/end role equations. One generic runtime constructor executes 75 ordinary pair ensures and 22 START-self-closed ensures, with zero END/full-self operations and zero Dictionary/Source/Grouping/Function/Application/Continuation/Witness/Publication-specific branches. Its complete final canonical topology is byte-identical to a fresh domain-specific reference-producer run from the same frozen state; two independent generic Memories agree, frozen F5-F2 admission remains GREEN, explicit publication is reproduced, and removing the final construction constraint fails closed.",
+      "consequence": "F5-F4 removes domain-specific semantics from the runtime construction mechanism on this scoped path: the generic constructor needs only Link role bindings, role-incidence and canonical Memory materialization primitives. However the 97-equation plan was compiled from an external domain-specific reference producer, so semantic information has been moved into Link data, not eliminated or reconstructed. The next gate must attack the plan source itself rather than the constructor.",
+      "currentResult": "GREEN: a frozen Link-carried constructive plan of 97 target/start/end role equations drives a generic runtime constructor that performs 75 ordinary canonical pair ensures and 22 START self-closed constructions, with zero END/full-self constructions and zero Dictionary/Source/Grouping/Function/Application/Continuation/Witness/Publication-specific branches. Two independent generic replay Memories are byte-identical, and the complete final canonical topology equals a fresh domain-specific F5-F3-style reference producer run from the same frozen state. The candidate remains accepted by frozen F5-F2 structural admission, publication is reproduced, and removing the final construction constraint fails closed.",
       "observed": {
-        "constructionConstraints": 97,
+        "constraints": 97,
         "ordinaryEnsures": 75,
         "startSelfEnsures": 22,
         "endSelfEnsures": 0,
         "fullSelfEnsures": 0,
         "domainSpecificConstructorBranches": 0,
         "genericTopologyEqualsReference": true,
-        "frozenStructuralAdmission": true,
-        "explicitPublicationReproduced": true,
+        "frozenF5F2Admission": true,
+        "publicationReproduced": true,
         "missingConstraintRejected": true,
-        "independentGenericMemories": 2,
+        "independentMemories": 2,
         "externalPlanSource": true,
         "semanticInformationReduced": false,
         "productionChanged": false
