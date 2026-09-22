@@ -64,8 +64,8 @@
     "materializingBranchesPhysicalThreadSafetyProven": false,
     "competingPublicationAutoMergeProven": false,
     "publicationAdmissionA13cComplete": true,
-    "publicationAdmissionSourceRemovalProven": false,
-    "publicationAdmissionSourceRemovalA13dComplete": false
+    "publicationAdmissionSourceRemovalProven": true,
+    "publicationAdmissionSourceRemovalA13dComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -3651,8 +3651,8 @@
       "consequence": "Scoped research demonstrates that publication cardinality/order and semantic admission are distinct. Frozen Link evidence can authorize one candidate while preserving provenance and fail-closed ambiguity/absence. The generic admission-link interpretation law is still host-defined, so global E3/source removal remains open."
     },
     "publicationAdmissionSourceRemovalA13d": {
-      "status": "DESIGNED_NOT_EXECUTED",
-      "currentResult": "NOT_RUN",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "currentResult": "GREEN: one generic method-oriented resolver admits PA from both direct target rootA->PA and inverse target PA->rootA, with direction supplied by selected method Link; A13c ambiguity/no-admission/singleton-without-admission/convergence/freeze controls remain GREEN. Admission targets are not decomposed by the resolver, no structural matcher/unifier participates, and a reversed forged proof witness fails exact target reconstruction.",
       "question": "Can the A13c admission-specific root->candidate host law be eliminated by reducing publication admission to the already-grounded generic proof-carrying two-role Link binding plus a selected method-Link orientation?",
       "genericLaw": [
         "verify proof-carrying binding for each selected admission target without decomposing that target",
@@ -3688,17 +3688,18 @@
         "therefore this removes the admission-specific E3 law but does not close global E3"
       ],
       "observed": {
-        "directAdmission": null,
-        "inverseAdmission": null,
-        "a13cRegression": null,
+        "directAdmission": true,
+        "inverseAdmission": true,
+        "a13cRegression": true,
         "targetDecompositionReads": 0,
         "hostMatchers": 0,
-        "forgedWitnessRejected": null,
+        "admissionDirectionHostBranches": 0,
+        "forgedWitnessRejected": true,
         "independentMemories": 2,
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-admission-source-removal-a13d.test.ts",
-      "consequence": "Pending execution. GREEN would show that publication admission needs no independent root->candidate semantic primitive: it is one use of the generic method-oriented proof-carrying Link relation already established by A11g."
+      "consequence": "The admission-specific relation-shape law is replaced on this scoped path by the generic A11g proof-carrying two-role binding and method-orientation substrate. Publication admission therefore needs no independent root->candidate semantic primitive here. Global E3 remains open because generic proof-binding execution, method-role interpretation and authority/profile selection are still host-executed."
     }
   }
 }
