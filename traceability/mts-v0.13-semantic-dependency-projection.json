@@ -107,7 +107,8 @@
     "singleExecutionRootA21Designed": true,
     "singleExecutionRootA21Complete": true,
     "metaExecutionDetachmentA22Designed": true,
-    "metaExecutionDetachmentA22Complete": true
+    "metaExecutionDetachmentA22Complete": true,
+    "selectedAssociativeDetachmentA23Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1398,9 +1399,11 @@
     "metaExecutionDetachmentA22IndependentMemoryCount": "Independent Memories reproducing meta-execution detachment and history."
   },
   "nextExperiments": [
-    "A23: attack the E_n->E_(n+1) transition-producer residual. Represent the A21 execution transformation as Link-carried application/continuation authority and require transition production without a domain-specific host producer.",
+    "A23: execute selected associative detachment. Replace explicit continuation matching with exactly one selected-authority outgoing(A) relational-image primitive.",
+    "If A23 is GREEN, run a denial/irreducibility experiment: remove selected relational image and determine whether execution can proceed without reintroducing an equivalent join/search operation under another name.",
+    "If A23 is GREEN, separately source-reduce the selected-authority view projection from K without granting ambient Memory semantic authority.",
+    "After A23 classification, reconnect the physical dynamic-duality candidate with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A23 must preserve A22 self-similar meta-detachment and fail closed when transition-production authority is absent, malformed or ambient-only.",
-    "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A22 should distinguish immutable execution history from selection of the current execution root and must preserve branch/provenance semantics from A21.",
     "A21 must preserve context-carried authority, occurrence ancestry, convergence multiplicity, ambient isolation and fail-closed structural validation.",
     "A20 should use Link-native occurrence ancestry (for example ParentOccurrence->TruthWitness) and a frozen frontier carrier; it must not execute every truth merely linked to K.",
@@ -5147,6 +5150,48 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "selectedAssociativeDetachmentA23": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can the remaining A21/A22 transition matcher be reduced to one associative relational-image operation outgoing(A) over authority structurally selected by K, eliminating host transition arrays and explicit START(C)==A matcher branches?",
+      "setup": [
+        "retain A21 one-Link execution root E=K->Frontier",
+        "retain A19 context-carried frozen continuation authority and A20 Link-native frontier/provenance",
+        "derive a selected read view structurally from the authority envelope carried by K",
+        "for each selected contextual truth K->A call exactly one authority.outgoing(A)",
+        "materialize K->B, child occurrence, next frontier and next execution root for each returned selected continuation"
+      ],
+      "oracle": [
+        "selected relational image cardinality covers ZERO, ONE and MANY",
+        "reproduce A21 first split, local termination, second split and convergence",
+        "forward/reverse scheduling preserves provenance",
+        "convergence remains one canonical K->Z truth with two occurrence Links",
+        "ambient A->B outside selected authority closure is invisible",
+        "ambient alternate authority does not alter immutable K",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "semantic kernel has zero host transition-array inputs",
+        "semantic kernel has zero explicit continuation START == antecedent matcher branches",
+        "semantic kernel contains no find/incoming/modusPonens/State/Event semantic helper",
+        "semantic kernel contains exactly one selected authority.outgoing(A) relational-image call"
+      ],
+      "residualAuthority": [
+        "projection of Link-carried authority into the selected read view is still host-implemented structural infrastructure",
+        "frontier iteration and output materialization remain executor mechanics",
+        "schedule remains an executor choice",
+        "irreducibility of selected associative relational image is not proven by this gate"
+      ],
+      "evidenceTest": "ts/test/research-v013-selected-associative-detachment-a23.test.ts",
+      "claimBoundary": [
+        "GREEN would classify selected associative relational image as a candidate physical primitive of dynamic directed duality",
+        "GREEN would not prove the primitive irreducible",
+        "GREEN would not mean arbitrary ambient Memory outgoing(A) is semantic authority; the query is restricted to authority selected by K",
+        "the SelectedView adapter is research infrastructure, not a foundational graph layer",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
