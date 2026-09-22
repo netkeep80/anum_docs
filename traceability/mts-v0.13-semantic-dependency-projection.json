@@ -2975,7 +2975,13 @@
           "unknownWithoutWitness": "FAIL_CLOSED",
           "productionChanged": false
         },
-        "evidenceTest": "ts/test/research-v013-unified-proof-binding-a11g-f3.test.ts"
+        "evidenceTest": "ts/test/research-v013-unified-proof-binding-a11g-f3.test.ts",
+        "sourceRemovalScope": {
+          "activeResearchWitness": "ts/test/research-v013-unified-proof-binding-a11g-f3.test.ts",
+          "historicalComparator": "ts/test/research-v013-unified-continuation-a11h.test.ts",
+          "historicalComparatorStillUsesStructuralUnification": true,
+          "interpretation": "The source-removal flag is witnessed by F3. A11h is retained unchanged as the pre-removal semantic comparator and is not part of the source-removed path."
+        }
       }
     },
     "aspectApplicationA11h": {
