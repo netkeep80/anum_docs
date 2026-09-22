@@ -345,7 +345,6 @@ function exercise(noise:boolean):void{
     "A29 broad inventory source candidate identities distinct");
   assert(admitted(memory,rule,t1.candidate)&&admitted(memory,rule,t2.candidate),
     "A29 full-length source templates admitted");
-
   let shortTruth=memory.ensure(t3.M,source3.E0);
   for(const expected of [source3.E1,source3.E2,source3.E3]){
     const next=metaStep(memory,shortTruth);
@@ -354,7 +353,6 @@ function exercise(noise:boolean):void{
     shortTruth=next;
   }
   same(metaStep(memory,shortTruth),undefined,"A29 shorter valid authority terminates");
-
   const targetDescriptor=targetHistoryDescriptor(memory,target.metaParent,[
     target.E0,target.E1,target.E2,target.E3,target.E4,
   ]);
@@ -363,20 +361,17 @@ function exercise(noise:boolean):void{
   const out=runInventory(memory,rule,inventory,targetDescriptor);
   same(out.inventoryCount,3,"A29 broad inventory size");
   same(out.compatibleCount,2,"A29 structurally derived compatible subset size");
-
   let truth=memory.ensure(out.M,target.E0);
   for(const expected of [target.E1,target.E2,target.E3,target.E4]){
     const next=metaStep(memory,truth);assert(next!==undefined,"A29 target meta-step");
     same(memory.poles(next).end,expected,"A29 derived authority execution");truth=next;
   }
   same(metaStep(memory,truth),undefined,"A29 terminal ZERO");
-
   // Ambient alternative target history is inert because it is not selected.
   targetHistoryDescriptor(memory,target.metaParent,[target.E0,target.E1,target.E2,target.E3]);
   const afterAmbient=runInventory(memory,rule,inventory,targetDescriptor);
   same(afterAmbient.compatibleCount,2,"A29 ambient target history ignored");
   same(afterAmbient.candidate,out.candidate,"A29 ambient target history preserves target");
-
   // A selected target history mixing execution roots from different contexts
   // must fail structurally before any source template is instantiated.
   const malformedTarget=targetHistoryDescriptor(memory,target.metaParent,[
@@ -386,7 +381,6 @@ function exercise(noise:boolean):void{
     ()=>{runInventory(memory,rule,inventory,malformedTarget);},
     "A29 mixed-context selected target history rejected",
   );
-
   // Late ambient compatible source candidate remains inert outside inventory.
   producerTemplate(
     memory,source3.metaParent,[source3.E0,source3.E1,source3.E2,source3.E3,source3.E4],
@@ -394,7 +388,6 @@ function exercise(noise:boolean):void{
   const afterSourceAmbient=runInventory(memory,rule,inventory,targetDescriptor);
   same(afterSourceAmbient.compatibleCount,2,"A29 ambient source candidate ignored");
 }
-
 function staticGuards():void{
   const root=resolve(process.cwd(),"..");
   const own=readFileSync(
@@ -412,7 +405,6 @@ function staticGuards():void{
     prior.indexOf("\nfunction frontierOccurrences(",prior.indexOf("function metaStep(")),
   );
   same(a.replace(/\s+/g,""),b.replace(/\s+/g,""),"A29 unchanged A23 metaStep");
-
   const target=own.slice(
     own.indexOf("function deriveTargetSeeds("),
     own.indexOf("\n/**\n * Derive the source seed sequence",own.indexOf("function deriveTargetSeeds(")),
@@ -420,7 +412,6 @@ function staticGuards():void{
   for(const x of [
     "readExactSequence","ExactSequence",".find(", ".outgoing(", ".incoming(", "allLinks(","switch(",
   ]) assert(!target.includes(x),`A29 target extractor excludes positional/ambient primitive ${x}`);
-
   const source=own.slice(
     own.indexOf("function deriveProducerSeeds("),
     own.indexOf("\nfunction derivedSeedMap(",own.indexOf("function deriveProducerSeeds(")),
@@ -428,7 +419,6 @@ function staticGuards():void{
   for(const x of ["META","E0","E1","E2","E3","E4","T0","C0","ENV","switch(", ".find(", ".outgoing(", ".incoming(", "allLinks("])
     assert(!source.includes(x),`A29 source extractor excludes positional/ambient primitive ${x}`);
 }
-
 function main():void{
   exercise(false);exercise(true);staticGuards();
   console.log([
