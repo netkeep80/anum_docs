@@ -67,7 +67,9 @@
     "publicationAdmissionSourceRemovalProven": true,
     "publicationAdmissionSourceRemovalA13dComplete": true,
     "selfGeneratedDefinitionAdmissionF5F1Complete": true,
-    "selfGeneratedDefinitionProven": false
+    "selfGeneratedDefinitionProven": false,
+    "selfGeneratedStructuralAdmissionF5F2Complete": false,
+    "selfGeneratedUnknownCandidateStructuralAdmissionProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -971,7 +973,12 @@
     "selfGeneratedDefinitionF5F1FrozenAdmissionSuccessCount": 0,
     "selfGeneratedDefinitionF5F1InvalidSelfApprovalPathCount": 1,
     "selfGeneratedDefinitionF5F1IndependentMemoryCount": 2,
-    "selfGeneratedDefinitionF5F1HostNameBranchCount": 0
+    "selfGeneratedDefinitionF5F1HostNameBranchCount": 0,
+    "selfGeneratedStructuralAdmissionF5F2GeneratedCandidateCount": 2,
+    "selfGeneratedStructuralAdmissionF5F2ConstraintCount": 3,
+    "selfGeneratedStructuralAdmissionF5F2NegativeControlCount": 3,
+    "selfGeneratedStructuralAdmissionF5F2CandidateIdentityReferenceCount": 0,
+    "selfGeneratedStructuralAdmissionF5F2IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1125,13 +1132,18 @@
     "selfGeneratedDefinitionF5F1FrozenAdmissionSuccessCount": "Expected successful frozen exact-candidate admissions of the new generated candidate. Zero is the current-architecture RED result.",
     "selfGeneratedDefinitionF5F1InvalidSelfApprovalPathCount": "Late candidate-specific admission proof created after generation can make the candidate pass only if selected authority is expanded; this is classified as invalid self-approval.",
     "selfGeneratedDefinitionF5F1IndependentMemoryCount": "Independent replay Memories required to generate byte-identical canonical definition topology from the same portable request.",
-    "selfGeneratedDefinitionF5F1HostNameBranchCount": "Per-definition/name branches in the F5-F1 generic candidate generator. Zero."
+    "selfGeneratedDefinitionF5F1HostNameBranchCount": "Per-definition/name branches in the F5-F1 generic candidate generator. Zero.",
+    "selfGeneratedStructuralAdmissionF5F2GeneratedCandidateCount": "F5-F2 distinct definition-shaped candidates generated only after freeze and validated by one candidate-agnostic frozen structural rule.",
+    "selfGeneratedStructuralAdmissionF5F2ConstraintCount": "F5-F2 frozen generic pair-identity constraints encoded as Link data.",
+    "selfGeneratedStructuralAdmissionF5F2NegativeControlCount": "F5-F2 forged application, forged continuation and wrong-arity candidates that must fail structural admission.",
+    "selfGeneratedStructuralAdmissionF5F2CandidateIdentityReferenceCount": "Exact generated candidate identities named by frozen rule authority. Zero.",
+    "selfGeneratedStructuralAdmissionF5F2IndependentMemoryCount": "Independent replay Memories generating and validating equivalent candidate topology under the same portable frozen rule."
   },
   "nextExperiments": [
-    "Execute F5-F1 RED-first falsifier. If confirmed, keep SELF_GENERATED=false and record the missing E3 generic unknown-candidate formation/admissibility law.",
-    "F5-F2: design a frozen structural admission rule capable of validating generated definition candidates without naming candidate identity and without host isValidDefinition branches.",
-    "Only after F5-F2 admission succeeds, build the full F4-compatible generated Dictionary/grouping/behavior authority and execute it in a second Memory.",
-    "Continue to keep E4 scheduling separate from E3 admission; A13/A13b frontier/materialization results remain the execution substrate."
+    "Execute F5-F2 frozen structural admission. Promote only if two different post-freeze generated candidates pass one candidate-agnostic rule and all forged controls fail.",
+    "If F5-F2 is GREEN, F5-F3 must generate a full F4-compatible portable Dictionary/source-grouping/continuation authority, structurally admit its definition root, export it, and execute it in a second Memory through the unchanged F4 receiver.",
+    "Then source-remove or classify the generic structural admission rule interpreter itself; do not equate data-driven E3 with full E3 closure.",
+    "Keep A13/A13b branch scheduling/materialization semantics as the execution substrate for any multi-candidate generator."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3756,6 +3768,60 @@
       },
       "evidenceTest": "ts/test/research-v013-self-generated-admission-f5-f1.test.ts",
       "consequence": "F5 cannot be GREEN under exact-candidate admission alone. SELF_EXTENSIBLE remains GREEN, runtime candidate construction is demonstrated, but SELF_ADMISSIBILITY for candidates unknown at freeze time is missing. The next required E3 capability is a frozen generic formation/admissibility law over candidate structure, represented/reconstructed from MTS evidence rather than candidate identity or host isValidDefinition logic."
+    },
+    "selfGeneratedStructuralAdmissionF5F2": {
+      "status": "DESIGNED_NOT_EXECUTED",
+      "currentResult": "NOT_RUN",
+      "question": "Can one frozen candidate-agnostic Link rule structurally admit previously unknown definition candidates generated after freeze without exact candidate identity or host definition-specific branches?",
+      "frozenRuleShape": [
+        "Roles = ExactSequence(anonymous role Links)",
+        "Constraints = ExactSequence of ExactSequence(targetRole,startRole,endRole)",
+        "Rule = ExactSequence(Roles,Constraints)",
+        "no generated candidate identity is present in frozen rule"
+      ],
+      "genericVerifierLaw": [
+        "read ordered role sequence from frozen rule",
+        "read candidate value sequence and require equal arity",
+        "bind each anonymous role to the corresponding candidate value",
+        "for each frozen triple constraint require find(value(startRole),value(endRole)) == value(targetRole)",
+        "no semantic role name or definition-specific relation is hardcoded in verifier"
+      ],
+      "generatedDefinitionShape": "Candidate carries eight values: name carrier, function, argument, application, two result Links and two continuation Links. Their meaning is supplied only by frozen role order/constraints.",
+      "positiveCorpus": [
+        "D1 generated after freeze passes rule",
+        "D2 with different function/argument/results generated after freeze passes the same rule"
+      ],
+      "negativeCorpus": [
+        "candidate with forged application Link fails",
+        "candidate with forged continuation Link fails",
+        "candidate with wrong arity fails"
+      ],
+      "publicationControl": "A unique structurally valid candidate can be selected. A frontier containing two structurally valid generated candidates remains ambiguous; structural validity does not introduce priority.",
+      "antiCheat": [
+        "frozen rule contains zero D1/D2 candidate identity",
+        "generic verifier has no function/application/continuation role-name branches",
+        "generator creates no admission evidence",
+        "all semantic shape constraints are Link-carried rule data"
+      ],
+      "residualBoundary": [
+        "generic exact-sequence rule interpreter remains host-executed",
+        "generic role-to-position binding remains host-executed",
+        "generic pair identity memory.find remains E1 substrate",
+        "global E3/source removal is therefore still open"
+      ],
+      "observed": {
+        "generatedCandidates": null,
+        "bothUnknownCandidatesAdmitted": null,
+        "forgedApplicationRejected": null,
+        "forgedContinuationRejected": null,
+        "wrongArityRejected": null,
+        "twoValidCandidatesAmbiguous": null,
+        "frozenCandidateIdentityReferences": 0,
+        "independentMemories": 2,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-structural-admission-f5-f2.test.ts",
+      "consequence": "Pending execution. GREEN would remove the F5-F1 exact-identity blocker by demonstrating frozen structural admission of unknown generated candidates, while leaving the generic rule interpreter as a residual host E3 service."
     }
   }
 }
