@@ -391,7 +391,8 @@ function staticGuards():void{
   const prior=readFileSync(join(root,"ts/test/research-v013-meta-transition-authority-a23.test.ts"),"utf8");
   const a=own.slice(own.indexOf("function metaStep("),own.indexOf(" const ROOT=",own.indexOf("function metaStep(")));
   const b=prior.slice(prior.indexOf("function metaStep("),prior.indexOf(" function frontierOccurrences(",prior.indexOf("function metaStep(")));
-  same(a.replace(/\s+/g,""),b.replace(/\s+/g,""),"A32 unchanged A23 metaStep");
+  const na=a.replace(/\\s+/g,""),nb=b.replace(/\\s+/g,"");
+  assert(na===nb,`A32 unchanged A23 metaStep: normalized lengths ${na.length}/${nb.length}`);
   const selector=own.slice(own.indexOf("function readSelectedRequestExecution("),own.indexOf(" function runSelectedGeneration(",own.indexOf("function readSelectedRequestExecution(")));
   for(const x of [".find(", ".outgoing(", ".incoming(", "allLinks(", "switch("])
     assert(!selector.includes(x),`A32 Q-selector excludes ambient primitive ${x}`);
