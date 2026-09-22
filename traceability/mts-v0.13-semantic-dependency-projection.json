@@ -54,7 +54,7 @@
     "formalSourceGroupingResearchComplete": true,
     "formalKernelSelfExtensionF4ResearchComplete": true,
     "formalFixedEvaluatorLawReassessmentAfterF4Complete": true,
-    "bundleContinuationBranchingResearchComplete": false,
+    "bundleContinuationBranchingResearchComplete": true,
     "bundleContinuationPhysicalParallelismProven": false,
     "bundleContinuationMaterializingConcurrencyProven": false
   },
@@ -3373,7 +3373,7 @@
   },
   "executionSemanticsAudit": {
     "bundleContinuationA12": {
-      "status": "DESIGNED_NOT_EXECUTED",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "If one Link/aspect application returns a BundleValue, can that bundle act as the next execution frontier so each occurrence continues independently while extensional value and provenance remain distinct?",
       "semanticModel": [
         "one application step may produce zero/one/many continuation occurrences",
@@ -3415,22 +3415,22 @@
         "whether every abit transition is bundle-valued is still a hypothesis; A12 proves the required execution composition model, not universal abit semantics"
       ],
       "observed": {
-        "initialFanout": null,
-        "secondStepFanout": null,
-        "convergenceDistinctLinks": null,
-        "convergenceOccurrences": null,
+        "initialFanout": 2,
+        "secondStepFanout": 3,
+        "convergenceDistinctLinks": 1,
+        "convergenceOccurrences": 2,
         "scheduleOrders": [
           "forward",
           "reverse"
         ],
         "physicalConcurrencyPrimitives": 0,
-        "partialTerminationSurvivors": null,
+        "partialTerminationSurvivors": 1,
         "independentMemories": 2,
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-bundle-continuation-a12.test.ts",
-      "consequence": "Bundle-valued application is no longer only a returned collection in the research model: it can be treated as a continuation frontier with branch-local fan-out/convergence semantics independent of physical scheduling. This exposes a new E4 problem for branch scheduling and branch-local mutation, but does not require OS threads in the foundation.",
-      "currentResult": "NOT_RUN"
+      "consequence": "Scoped read-only research now demonstrates BundleValue.occurrences as a viable continuation frontier over Link/aspect application while BundleValue.links remains the extensional result. Branching semantics is independent of physical scheduling. This does not prove universal bundle-valued abit semantics or concurrent materializing execution; those remain separate A13/E4 questions.",
+      "currentResult": "GREEN: F(a) produces frontier occurrences g/h; applying x independently to that frontier yields u/v/w, two parent branches can converge to one exact z while preserving two provenance occurrences, one branch may terminate while another survives, and forward/reverse parent scheduling produces identical extensional and normalized provenance semantics. The semantic kernel uses zero physical concurrency primitives."
     }
   }
 }
