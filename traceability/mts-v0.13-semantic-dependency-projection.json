@@ -97,7 +97,8 @@
     "linkCarriedPairRequestA16F4Designed": true,
     "linkCarriedPairRequestA16F4Complete": true,
     "applicationClosedFrontierA17Designed": true,
-    "applicationClosedFrontierA17Complete": true
+    "applicationClosedFrontierA17Complete": true,
+    "linkCarriedContinuationAuthorityA18Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1338,6 +1339,9 @@
     "applicationClosedFrontierA17IndependentMemoryCount": "Independent Memories reproducing the application-closed frontier behavior."
   },
   "nextExperiments": [
+    "A18: execute Link-carried continuation authority. Replace A17 host transition array with one selected contextual authority truth K->Authority and require identical application-closed frontier behavior.",
+    "If A18 is GREEN, source-remove host selection of K->Authority by carrying execution authority together with the contextual frontier in Link data, or deriving it from already selected program authority, without granting ambient Memory authority.",
+    "After A18, reconnect application-closed execution with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A17-F1: connect application-closed continuation authority A->B to the F5 self-generated authority line. Ask whether the selected continuation relation itself can be generated/discovered from Link-carried authority without host semantic source.",
     "A17-F1 should preserve A17's one-law execution kernel unchanged; all further complexity belongs to authority generation/selection, not runtime detachment.",
     "Keep A16-F4 as an optional generic Link-synthesis mechanism, not a mandatory primitive of the minimal application-closed execution core.",
@@ -4744,6 +4748,47 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "linkCarriedContinuationAuthorityA18": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A17's host-supplied selected transition array be removed and replaced by one contextual Link-native continuation authority K->Authority, while preserving recursive generalized modus ponens and keeping ambient Memory semantically inert?",
+      "setup": [
+        "retain A17 application-closed frontier K->A",
+        "freeze selected A->B continuation Links into a Link-carried authority chain terminated by R",
+        "select that authority contextually as K->Authority",
+        "semantic step receives frontier plus one authority truth witness, not a host transition array",
+        "step traverses only the frozen authority closure and materializes only propagated K->B truth"
+      ],
+      "oracle": [
+        "reproduce A17 first fan-out, local termination, second fan-out and convergence",
+        "forward/reverse scheduling remains equivalent",
+        "host selected transition-array parameter count is zero",
+        "ambient A->B outside frozen authority is ignored",
+        "ambient alternative authority root is ignored while selected K->Authority remains unchanged",
+        "authority witness from a different context is rejected fail-closed",
+        "explicit empty authority yields ZERO",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "kernel contains no transitions array parameter or selectedTransitions host primitive",
+        "kernel contains no event/state/pair/request/active/isTrue/currentValue/modusPonens/find/outgoing/incoming/switch semantic primitive",
+        "selected continuation set is recovered only from the Link-carried authority root selected by K->Authority",
+        "semantic kernel performs exactly one Memory.ensure form: ensure(context, consequent)"
+      ],
+      "residualAuthority": [
+        "the host still supplies/selects the single contextual authority truth witness K->Authority for the step",
+        "construction/publication of the authority root itself is outside this gate",
+        "initial contextual invocation truth K->A0 remains externally injected",
+        "physical executor/bootstrap primitives remain open"
+      ],
+      "evidenceTest": "ts/test/research-v013-link-carried-continuation-authority-a18.test.ts",
+      "claimBoundary": [
+        "GREEN would remove the host transition-array selection boundary from the A17 semantic step",
+        "GREEN would not yet source-remove selection/publication of K->Authority itself",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
