@@ -63,7 +63,7 @@
     "materializingBranchesA13bComplete": true,
     "materializingBranchesPhysicalThreadSafetyProven": false,
     "competingPublicationAutoMergeProven": false,
-    "publicationAdmissionA13cComplete": false,
+    "publicationAdmissionA13cComplete": true,
     "publicationAdmissionSourceRemovalProven": false
   },
   "auditScope": {
@@ -3591,8 +3591,8 @@
       "consequence": "Scoped research supports semantic schedule commutativity for monotone branch-local Link/Context materialization at canonical topology level. Canonical write convergence does not grant publication/admission authority: distinct publication roots remain an explicit E3/E4 ambiguity. Actual parallel Memory thread safety, transactions and linearizability remain implementation questions."
     },
     "publicationAdmissionA13c": {
-      "status": "DESIGNED_NOT_EXECUTED",
-      "currentResult": "NOT_RUN",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "currentResult": "GREEN: divergent publication frontier {PA,PB} is resolved only by explicit frozen admission evidence; admit(PA) selects PA independent of candidate occurrence order, double admission is rejected as ambiguous, no-admission is rejected, and even singleton {PZ} is rejected without admission. Explicit admit(PZ) preserves both convergence provenance occurrences. A late live root->PB admission after freeze is ignored.",
       "question": "Can branch publication be resolved only from explicitly frozen MTS Link admission evidence, so candidate uniqueness/order never substitutes for semantic authorization?",
       "authorityShape": [
         "selected resolution root is a Link",
@@ -3625,19 +3625,19 @@
         "therefore global E3/source removal is not proven"
       ],
       "observed": {
-        "selectA": null,
-        "reverseOrderStable": null,
-        "ambiguousDoubleAdmissionRejected": null,
-        "noAdmissionRejected": null,
-        "singletonWithoutAdmissionRejected": null,
-        "convergedPublicationOccurrences": null,
-        "lateAmbientAdmissionIgnored": null,
+        "selectA": true,
+        "reverseOrderStable": true,
+        "ambiguousDoubleAdmissionRejected": true,
+        "noAdmissionRejected": true,
+        "singletonWithoutAdmissionRejected": true,
+        "convergedPublicationOccurrences": 2,
+        "lateAmbientAdmissionIgnored": true,
         "hostPriorityCount": 0,
         "independentAuthorities": 2,
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-publication-admission-a13c.test.ts",
-      "consequence": "Pending execution. GREEN would show that publication selection can depend on explicit frozen Link admission evidence rather than frontier cardinality or scheduler/insertion order, while leaving the generic E3 admission law itself host-interpreted."
+      "consequence": "Scoped research demonstrates that publication cardinality/order and semantic admission are distinct. Frozen Link evidence can authorize one candidate while preserving provenance and fail-closed ambiguity/absence. The generic admission-link interpretation law is still host-defined, so global E3/source removal remains open."
     }
   }
 }
