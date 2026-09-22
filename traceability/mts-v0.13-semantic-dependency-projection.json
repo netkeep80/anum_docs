@@ -89,7 +89,8 @@
     "contextualTruthDynamicDualityA16Designed": true,
     "contextualTruthDynamicDualityA16Complete": true,
     "contextualTruthMetaFrontierA16F1Designed": true,
-    "contextualTruthMetaFrontierA16F1Complete": true
+    "contextualTruthMetaFrontierA16F1Complete": true,
+    "genericCallActualizationA16F2Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1280,7 +1281,8 @@
     "contextualTruthMetaFrontierA16F1IndependentMemoryCount": "Independent canonical Memories reproducing the contextual meta-frontier result."
   },
   "nextExperiments": [
-    "A16-F2: remove selected-application lookup from call preparation. Given contextual truth K->State and external Event, construct the application generically as Application=ensure(State,Event), then actualize K->Application with the same L/context-link operation; require transition semantics to remain identical.",
+    "A16-F2: execute generic call actualization; remove selected-application lookup and require Application=ensure(State,Event), K->Application, then unchanged A16 continuation propagation.",
+    "If A16-F2 is GREEN, classify external Event as input/data versus semantic authority; then test whether event/context actualization itself can be represented as ordinary contextual linkage rather than host control.",
     "A16-F2 must show that an arbitrary constructed State->Event Link has no semantic effect unless selected Application->NextState continuation authority exists; this separates generic application construction from semantic authority.",
     "After A16-F2, reassess whether external Event selection is genuine irreducible input rather than semantic host authority, and only then connect this execution line back to F5 source-authority reduction.",
     "A16-F1 must preserve selected-authority isolation: physical but unselected Links must remain semantically inert, and newly derived K->B truth Links may enter only the explicit next execution frontier.",
@@ -4454,6 +4456,43 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "genericCallActualizationA16F2": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A16-F1's selected State->Event application lookup be removed entirely, constructing Application generically as ensure(State,Event) and actualizing contextual truth K->Application, while leaving semantic authority solely in selected Application->Next continuations?",
+      "setup": [
+        "reuse the A16-F1 contextual truth frontier K->State",
+        "remove applicationCoordinates and selected-application lookup from replay",
+        "for each contextual K->State plus external Event, construct Application=ensure(State,Event)",
+        "construct K->Application as contextual truth of the call",
+        "execute results only through selected Application->Next continuation Links using the unchanged A16 propagation law"
+      ],
+      "oracle": [
+        "reproduce the A13/A16-F1 first split, local termination, second split and convergence behavior",
+        "forward/reverse scheduling remains equivalent",
+        "a newly constructed State->Event application that has no selected continuation authority evaluates to ZERO",
+        "late ambient Application->Next transition remains inert when not in selected transition authority",
+        "ambient K->State outside explicit frontier remains inert",
+        "two independent canonical Memories agree"
+      ],
+      "antiCheat": [
+        "call actualization kernel may not inspect an applications list or applicationCoordinates",
+        "call actualization kernel may not use find/filter/outgoing/incoming/switch to select an application",
+        "transition propagation kernel retains the A16-F1 prohibition on host active/isTrue/currentValue/modusPonens/event/state/applicationFor/find/outgoing/incoming/switch semantics"
+      ],
+      "residualAuthority": [
+        "external Event remains an explicit input to call actualization",
+        "selected Application->Next continuation authority remains explicit",
+        "no claim is made yet that Event selection/input is derived from Link-native authority"
+      ],
+      "evidenceTest": "ts/test/research-v013-generic-call-actualization-a16-f2.test.ts",
+      "claimBoundary": [
+        "GREEN would remove selected-application lookup as semantic host authority",
+        "generic construction of Application does not itself imply semantic validity; no selected continuation means ZERO",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
