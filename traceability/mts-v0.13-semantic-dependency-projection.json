@@ -119,7 +119,8 @@
     "metaAuthorityInventoryDiscoveryA27Designed": true,
     "metaAuthorityInventoryDiscoveryA27Complete": true,
     "derivedMetaSeedCorrespondenceA28Designed": true,
-    "derivedMetaSeedCorrespondenceA28Complete": true
+    "derivedMetaSeedCorrespondenceA28Complete": true,
+    "linkNativeTargetHistoryA29Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1484,9 +1485,9 @@
     "derivedMetaSeedCorrespondenceA28IndependentMemoryCount": "Independent Memories reproducing structural source-seed derivation, convergence and execution."
   },
   "nextExperiments": [
-    "A29: remove the externally selected positional target seed ExactSequence. Derive the target execution-root chain from one Link-carried selected target history/context witness, while keeping source-seed derivation and A23 consumption unchanged.",
-    "A29 must distinguish target-description selection from ambient Memory: late ambient target histories remain inert and ambiguous/malformed selected target history fails closed.",
-    "If A29 is GREEN, the next source boundary is broad source-inventory selection and current meta-occurrence selection.",
+    "A29: execute Link-native target-history derivation and remove the externally selected positional target seed ExactSequence.",
+    "If A29 is GREEN, attack selection of the target-history witness and broad source inventory as separate authority boundaries; do not grant ambient Memory authority.",
+    "A29 must preserve source structural derivation, canonical convergence, malformed-history rejection and unchanged A23 execution.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
@@ -5649,6 +5650,51 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "linkNativeTargetHistoryA29": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A28's externally selected positional target seed ExactSequence be removed and replaced by one selected Link-carried target-history descriptor whose execution-root sequence is reconstructed from Link ancestry?",
+      "setup": [
+        "retain A28 broad source-candidate inventory with source seeds structurally derived from producer-authority topology",
+        "replace target ExactSequence(MetaParent,E0..E4) with TargetDescriptor=MetaParent->Hn",
+        "encode H0=R->E0 and Hi=H(i-1)->Ei as immutable Link ancestry",
+        "derive target seeds by walking only the selected target-history witness",
+        "require all target execution roots to share one context K and carry proper START-self frontier envelopes",
+        "zip structurally derived source seeds to structurally derived target seeds only when cardinalities match",
+        "retain frozen structural admission, canonical convergence and exact unchanged A23 metaStep"
+      ],
+      "oracle": [
+        "no target seed ExactSequence is supplied to the seed-mapping path",
+        "selected target descriptor reconstructs MetaParent,E0..E4 from Link ancestry",
+        "two full producer templates remain compatible and shorter valid producer authority remains excluded by structural arity",
+        "target producer authority is absent at freeze and converged generated authority executes E0..E4 then ZERO",
+        "ambient alternative target-history descriptor is ignored while the selected descriptor remains unchanged",
+        "selected target history mixing execution roots from different contexts rejects fail-closed",
+        "late ambient compatible source candidate remains inert outside frozen inventory",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "target extractor contains no readExactSequence/ExactSequence positional decoding",
+        "target extractor contains no find/outgoing/incoming/allLinks/switch ambient discovery",
+        "source extractor retains A28 position-free and ambient-free constraints",
+        "A29 metaStep is whitespace-normalized source-identical to A23"
+      ],
+      "residualAuthority": [
+        "selection of the single target-history descriptor remains external",
+        "membership of the broad frozen source-candidate inventory remains external",
+        "current meta-occurrence selection remains explicit",
+        "generic topology/rule interpreters remain host executed",
+        "semantic information is not claimed eliminated"
+      ],
+      "evidenceTest": "ts/test/research-v013-link-native-target-history-a29.test.ts",
+      "claimBoundary": [
+        "GREEN would remove positional target seed-sequence authority from the tested path",
+        "GREEN would not remove selection of which target history is active",
+        "ambient histories remain non-authoritative",
+        "this gate does not accept v0.13",
+        "global E2/E3 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
