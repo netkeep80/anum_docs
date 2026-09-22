@@ -429,4 +429,4 @@ function main():void{
     "FULL_SELF_HOSTED=NOT_CLAIMED PRODUCTION_UNCHANGED",
   ].join(" "));
 }
-main();\n
+main();
