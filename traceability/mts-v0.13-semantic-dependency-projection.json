@@ -95,7 +95,9 @@
     "contextualEventInputA16F3Designed": true,
     "contextualEventInputA16F3Complete": true,
     "linkCarriedPairRequestA16F4Designed": true,
-    "linkCarriedPairRequestA16F4Complete": true
+    "linkCarriedPairRequestA16F4Complete": true,
+    "applicationClosedFrontierA17Designed": true,
+    "applicationClosedFrontierA17Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1082,7 +1084,14 @@
     "linkCarriedPairRequestA16F4CrossContextMalformedRequestAccepted": 0,
     "linkCarriedPairRequestA16F4AmbientRequestFires": 0,
     "linkCarriedPairRequestA16F4EmptyRequestResultCount": 0,
-    "linkCarriedPairRequestA16F4IndependentMemoryCount": 2
+    "linkCarriedPairRequestA16F4IndependentMemoryCount": 2,
+    "applicationClosedFrontierA17RuntimeEventParameterCount": 0,
+    "applicationClosedFrontierA17RuntimePairConstructionCount": 0,
+    "applicationClosedFrontierA17RuntimePairRequestCount": 0,
+    "applicationClosedFrontierA17SemanticKernelEnsureForms": 1,
+    "applicationClosedFrontierA17ConvergenceDistinctTruthLinkCount": 1,
+    "applicationClosedFrontierA17ConvergenceOccurrenceCount": 2,
+    "applicationClosedFrontierA17IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1319,9 +1328,20 @@
     "linkCarriedPairRequestA16F4CrossContextMalformedRequestAccepted": "Selected pair requests whose two truth witnesses come from different contexts but are accepted by executor. Target zero.",
     "linkCarriedPairRequestA16F4AmbientRequestFires": "Ambient pair requests outside the selected request frontier that affect execution. Target zero.",
     "linkCarriedPairRequestA16F4EmptyRequestResultCount": "Call truths produced when selected pair-request frontier is empty. Target zero.",
-    "linkCarriedPairRequestA16F4IndependentMemoryCount": "Independent canonical Memories reproducing Link-carried request behavior."
+    "linkCarriedPairRequestA16F4IndependentMemoryCount": "Independent canonical Memories reproducing Link-carried request behavior.",
+    "applicationClosedFrontierA17RuntimeEventParameterCount": "Per-step Event control parameters in the A17 semantic kernel. Target zero.",
+    "applicationClosedFrontierA17RuntimePairConstructionCount": "Runtime next-application pair constructions inside the A17 semantic step. Target zero.",
+    "applicationClosedFrontierA17RuntimePairRequestCount": "Runtime pair/request authority consumed by the A17 semantic step. Target zero.",
+    "applicationClosedFrontierA17SemanticKernelEnsureForms": "Distinct Memory.ensure forms inside A17 semantic step. Exactly one is allowed: ensure(context, consequent) for propagated truth.",
+    "applicationClosedFrontierA17ConvergenceDistinctTruthLinkCount": "Distinct extensional K->Z truth Links after two application branches converge. Target one.",
+    "applicationClosedFrontierA17ConvergenceOccurrenceCount": "Provenance occurrences retained at the converged K->Z truth. Target two.",
+    "applicationClosedFrontierA17IndependentMemoryCount": "Independent Memories reproducing the application-closed frontier behavior."
   },
   "nextExperiments": [
+    "A17-F1: connect application-closed continuation authority A->B to the F5 self-generated authority line. Ask whether the selected continuation relation itself can be generated/discovered from Link-carried authority without host semantic source.",
+    "A17-F1 should preserve A17's one-law execution kernel unchanged; all further complexity belongs to authority generation/selection, not runtime detachment.",
+    "Keep A16-F4 as an optional generic Link-synthesis mechanism, not a mandatory primitive of the minimal application-closed execution core.",
+    "After A17, ask whether selected continuation authority A->B itself can be generated/discovered through the F5 line without host semantic source.",
     "A16-F5: source-remove the pair-request producer. Derive/emit K->Q from Link-carried execution authority rather than host-selected operand frontiers, while avoiding automatic all-to-all pairing of K-linked truths.",
     "A16-F5 must keep request selection frozen/fail-closed, reject late ambient producer evidence, and preserve A16-F4 malformed-request rejection.",
     "After A16-F5, reconnect the now-Link-carried dynamic execution path with F5 template/self-generated authority work and reassess E2/E3.",
@@ -4662,6 +4682,65 @@
         "lateAmbientRequest": "IGNORED",
         "absentRequest": "ZERO",
         "requestProducerHostResiduals": 1,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "applicationClosedFrontierA17": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can the multithreaded meta-interpreter core operate on an application-closed frontier where every active semantic item is contextual truth K->A with A already shaped as ∞->∞, so recursive execution is only repeated A16 detachment K->A plus A->B => K->B?",
+      "setup": [
+        "preconstruct application-shaped Links A0..A4 as ordinary ∞->∞ Links",
+        "freeze selected continuation authority A0->{A1,A2}, A2->{A3,A4}, A3->Z, A4->Z",
+        "start from one contextual invocation truth K->A0",
+        "carry every next frontier item only as K->B truth produced by A16 detachment",
+        "allow consequent B itself to be another application-shaped Link"
+      ],
+      "oracle": [
+        "first split K->A0 yields K->A1 and K->A2",
+        "A1 terminates locally while A2 yields K->A3 and K->A4",
+        "A3 and A4 converge to one extensional K->Z with two provenance occurrences",
+        "forward/reverse scheduling preserves extensional value and provenance",
+        "terminal Z yields ZERO on the next step",
+        "true unknown application with no selected continuation yields ZERO",
+        "late ambient transition outside frozen selected authority is ignored",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "semantic step kernel contains no event/state/pair/request/application lookup/active/isTrue/currentValue/modusPonens semantic primitive",
+        "semantic step performs exactly one Memory.ensure form: ensure(context, consequent)",
+        "no runtime construction of next application Links is allowed inside the semantic step"
+      ],
+      "consequenceIfGreen": [
+        "runtime State/Event recombination is not fundamental to the minimal meta-interpreter execution path",
+        "A16-F4 remains a valid generic Link synthesis mechanism but is not required by application-closed recursive execution",
+        "the execution core reduces to recursive generalized modus ponens over Bundle<K->A>",
+        "the only initial external boundary in this witness is injection/selection of K->A0 and selected continuation authority"
+      ],
+      "evidenceTest": "ts/test/research-v013-application-closed-frontier-a17.test.ts",
+      "claimBoundary": [
+        "GREEN would be a scoped execution witness, not a proof that all programs can always be encoded application-closed without other construction mechanisms",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ],
+      "consequence": "A17 gives executable support to the author's compact model: the minimal tested multithreaded meta-interpreter path is recursive contextual detachment over an application-closed Bundle frontier. Starting from K->A0, selected A->B continuations alone reproduce split, branch-local termination, recursive split, convergence and terminal ZERO. Consequent B may itself already be another ∞->∞ application Link, so no runtime State/Event recombination, pair construction or pair-request machinery is required on this path.",
+      "currentResult": "GREEN: K->A0 branches to K->A1/K->A2; A1 terminates while A2 branches to K->A3/K->A4; A3/A4 converge to one extensional K->Z with two provenance occurrences; Z produces ZERO next. Forward/reverse schedules agree. A true application with no selected continuation produces ZERO. Late ambient transition is ignored. The guarded step kernel contains zero event/state/pair/request/active/isTrue/currentValue/modusPonens/find/outgoing/incoming/switch semantics and exactly one ensure form: ensure(context, consequent). Two independent Memories agree.",
+      "observed": {
+        "applicationClosedFrontier": true,
+        "stepLaw": "K_TO_A_PLUS_A_TO_B_GIVES_K_TO_B",
+        "firstFanout": 2,
+        "localTermination": true,
+        "secondFanout": 2,
+        "convergenceDistinctTruthLinks": 1,
+        "convergenceOccurrences": 2,
+        "terminalNext": "ZERO",
+        "unknownApplicationWithoutContinuation": "ZERO",
+        "lateAmbientTransitionIgnored": true,
+        "runtimeEventParameters": 0,
+        "runtimePairConstruction": 0,
+        "runtimePairRequests": 0,
+        "semanticKernelEnsureForms": 1,
         "independentMemories": 2,
         "productionChanged": false
       }
