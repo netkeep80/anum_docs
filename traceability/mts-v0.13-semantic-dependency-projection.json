@@ -59,7 +59,10 @@
     "bundleContinuationMaterializingConcurrencyProven": false,
     "metaInterpreterFrontierA13Complete": true,
     "metaInterpreterPhysicalParallelismProven": false,
-    "metaInterpreterMaterializingConcurrencyProven": false
+    "metaInterpreterMaterializingConcurrencyProven": false,
+    "materializingBranchesA13bComplete": false,
+    "materializingBranchesPhysicalThreadSafetyProven": false,
+    "competingPublicationAutoMergeProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -939,7 +942,15 @@
     "metaInterpreterConvergenceOccurrenceCount": 2,
     "metaInterpreterScheduleOrderVariantCount": 2,
     "metaInterpreterPhysicalConcurrencyPrimitiveCount": 0,
-    "metaInterpreterIndependentMemoryCount": 2
+    "metaInterpreterIndependentMemoryCount": 2,
+    "materializingBranchScheduleOrderVariantCount": 2,
+    "materializingSharedWriteOccurrenceCount": 2,
+    "materializingSharedWriteDistinctLinkCount": 1,
+    "materializingCompetingPublicationDistinctCount": 2,
+    "materializingConvergedPublicationDistinctCount": 1,
+    "materializingConvergedPublicationOccurrenceCount": 2,
+    "materializingPhysicalConcurrencyPrimitiveCount": 0,
+    "materializingIndependentAuthorityCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1069,14 +1080,22 @@
     "metaInterpreterConvergenceOccurrenceCount": "A13 designed convergence preserves two provenance occurrences at exact EZ.",
     "metaInterpreterScheduleOrderVariantCount": "A13 forward/reverse parent scheduling variants required to yield identical extensional/provenance semantics.",
     "metaInterpreterPhysicalConcurrencyPrimitiveCount": "Promise/Worker/async/threading primitives in the A13 semantic frontier kernel. Designed as zero.",
-    "metaInterpreterIndependentMemoryCount": "Independent portable replay Memories required by A13."
+    "metaInterpreterIndependentMemoryCount": "Independent portable replay Memories required by A13.",
+    "materializingBranchScheduleOrderVariantCount": "A13b designed schedule variants A->B and B->A (plus C->D/D->C convergence control) compared by canonical final topology.",
+    "materializingSharedWriteOccurrenceCount": "A13b two branch-local materialization attempts of the same canonical Link.",
+    "materializingSharedWriteDistinctLinkCount": "A13b expected extensional shared write result after canonical ensure: one exact Link.",
+    "materializingCompetingPublicationDistinctCount": "A13b expected two distinct publication candidates from divergent branch-local contexts; generic selector must reject ambiguity.",
+    "materializingConvergedPublicationDistinctCount": "A13b convergence control where two branch plans independently materialize the same publication Link.",
+    "materializingConvergedPublicationOccurrenceCount": "A13b convergence control preserves two write/provenance occurrences for one exact publication Link.",
+    "materializingPhysicalConcurrencyPrimitiveCount": "Promise/Worker/async/threading primitives in A13b semantic materialization executor. Designed as zero; test concerns schedule commutativity, not physical thread safety.",
+    "materializingIndependentAuthorityCount": "Independent source Memories with unrelated noise required to export byte-identical frozen materialization plan authority."
   },
   "nextExperiments": [
-    "Execute A13 meta-interpreter frontier witness; promote only after full CI with branch-local K/F/TOS isolation, convergence and schedule-order controls.",
-    "A13b MATERIALIZING-BRANCHES: separately falsify concurrent Link/context materialization, admission/conflict and causal ordering; do not infer write semantics from read-only A13.",
-    "F5 SELF_GENERATED-DEFINITION must use A13 frontier semantics if definition generation admits multiple continuations; do not regress to hidden scalar execution.",
-    "Measure/classify remaining generic FORMAL E2 services: exact STRING materialization, source segmentation, Dictionary lookup and Grammar/source replay.",
-    "Apply the same frontier semantics to proof meta-semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims."
+    "Execute A13b materializing-branches witness; promote only after full CI proves canonical schedule commutativity and explicit publication ambiguity handling.",
+    "A13c/E3: represent publication/admission resolution itself as frozen MTS evidence; do not introduce implicit last-writer-wins or host priority.",
+    "F5 SELF_GENERATED-DEFINITION must use A13/A13b branch semantics if definition generation materializes multiple candidates.",
+    "Measure/classify remaining generic FORMAL E2 services and then audit E3/E4 independently.",
+    "Physical parallel executor/thread safety is an implementation benchmark after semantic commutativity, not a foundation acceptance criterion."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3511,6 +3530,51 @@
       },
       "evidenceTest": "ts/test/research-v013-meta-interpreter-frontier-a13.test.ts",
       "consequence": "Scoped research demonstrates the meta-interpreter as a BundleValue frontier transformer over explicit Link-carried states. The old scalar Out(D,Fnext) model is a one-branch special case. Branching semantics is independent of physical scheduling; A13b still owns concurrent materialization/admission/conflict semantics, and global E4/FULL_SELF_HOSTED remain open."
+    },
+    "materializingBranchesA13b": {
+      "status": "DESIGNED_NOT_EXECUTED",
+      "currentResult": "NOT_RUN",
+      "question": "Do branch-local append-only Link/context materializations commute across scheduler order while competing publication roots remain explicit alternatives rather than implicit last-writer-wins state?",
+      "planCarrier": "Each frozen branch plan is ExactSequence(branchId, sharedStart, sharedEnd, uniqueStart, uniqueEnd, parentContext, poolSeed). It is a research carrier, not a new foundational instruction type.",
+      "designedDivergentCase": [
+        "A and B both materialize shared x=a⟼b",
+        "A materializes unique xa and immutable Context KA; B materializes unique xb and Context KB",
+        "A publishes PA=poolSeedA⟼KA; B publishes PB=poolSeedB⟼KB",
+        "A->B and B->A must produce byte-identical canonical final topology",
+        "shared write BundleValue has one Link x and two provenance occurrences",
+        "publication frontier has two distinct Links PA/PB and two occurrences",
+        "unique-publication selection must reject PA/PB ambiguity; no last-writer-wins"
+      ],
+      "designedConvergenceControl": [
+        "C and D carry distinct branch identities but identical materialization operands",
+        "both independently materialize the same shared/unique/context/publication structure",
+        "publication BundleValue has one exact Link with two provenance occurrences",
+        "unique-publication selection may accept this singleton extensional result",
+        "C->D and D->C must produce byte-identical canonical final topology"
+      ],
+      "boundary": [
+        "A13b tests semantic schedule commutativity of sequentially simulated append-only writes, not actual TS Memory thread safety",
+        "within-branch operation order remains fixed; only branch scheduling order is varied",
+        "Memory canonical ensure convergence is distinct from semantic authority/publication selection",
+        "immutable Context snapshots coexist; no shared mutable K is overwritten",
+        "physical locks/transactions/linearizability/GC are outside scope",
+        "E3 must still define admissibility/publication authority when distinct candidates exist"
+      ],
+      "observed": {
+        "divergentScheduleTopologyEqual": null,
+        "sharedWriteDistinctLinks": null,
+        "sharedWriteOccurrences": null,
+        "competingPublicationDistinctLinks": null,
+        "ambiguousPublicationRejected": null,
+        "convergedPublicationDistinctLinks": null,
+        "convergedPublicationOccurrences": null,
+        "convergedPublicationAccepted": null,
+        "physicalConcurrencyPrimitives": 0,
+        "independentAuthorities": 2,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-materializing-branches-a13b.test.ts",
+      "consequence": "Pending execution. GREEN would support monotone branch-local materialization as schedule-commutative at canonical topology level while proving that publication/admission remains a separate explicit authority problem."
     }
   }
 }
