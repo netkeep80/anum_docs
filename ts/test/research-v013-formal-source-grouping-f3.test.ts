@@ -292,8 +292,7 @@ function buildAuthority(noise: boolean): PortableAuthority {
     authority,
   );
 
-  // Semantic grouping authority points to SOURCE RESOLUTION LINKS, not host
-  // segment indexes. Parentheses remain in exact source/Grammar evidence only.
+  // Grouping binds structural roles to verified source-resolution Links.
   const functionResolution = sourceEvidence.segments[0]!.resolution;
   const argumentResolution = sourceEvidence.segments[2]!.resolution;
   const sourceStartBinding = memory.ensure(f.startRole, functionResolution);
@@ -632,15 +631,12 @@ function execute(artifact: PortableAuthority): void {
     bindings,
   );
 
-  // Expected results are independently recovered through Dictionary names.
   const b1 = resolveName(memory, sourceEvidence.dictionary, "b1");
   const b2 = resolveName(memory, sourceEvidence.dictionary, "b2");
   assert(b1 !== undefined && b2 !== undefined, "F3 output names resolve");
   same(result.kind, "bundle", "F3 grouped source result is BundleValue");
   setSame(result.links, [b1, b2], "F3 exact grouped source results");
 
-  // Exact physical source remains one carrier, not two externally supplied
-  // semantic input names.
   const sourceContent = memory.poles(sourceEvidence.source).end;
   same(sourceContent, sourceEvidence.content, "F3 exact SourceForm content");
 }
@@ -668,8 +664,6 @@ function negativeControls(artifact: PortableAuthority): void {
   );
   const application = memory.poles(selectedGrouping).end;
 
-  // 1. Swapping source-role resolutions while keeping the same target P fails:
-  // P's proof binding still says START=F, END=A.
   {
     const selectedPoles = memory.poles(selectedGrouping);
     const descriptor = memory.poles(selectedPoles.start);
@@ -689,7 +683,6 @@ function negativeControls(artifact: PortableAuthority): void {
     );
   }
 
-  // 2. Resolution from outside this selected source is rejected.
   {
     const foreignLexeme = memory.ensure(sourceEvidence.source, directMethod);
     const foreignResolution = memory.ensure(foreignLexeme, directMethod);
@@ -708,7 +701,6 @@ function negativeControls(artifact: PortableAuthority): void {
     );
   }
 
-  // 3. Grouping bound to a different formSequence is rejected.
   {
     const selectedPoles = memory.poles(selectedGrouping);
     const descriptor = memory.poles(selectedPoles.start);
