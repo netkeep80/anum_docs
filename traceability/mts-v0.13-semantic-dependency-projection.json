@@ -80,8 +80,8 @@
     "templateInstantiationF5F5Complete": true,
     "externalConstructionPlanCompilerRemoved": true,
     "publicationOnlyTemplateClosureComplete": false,
-    "seedCorrespondenceCompressionF5F6Complete": false,
-    "explicitPerLinkSeedPairsRemoved": false
+    "seedCorrespondenceCompressionF5F6Complete": true,
+    "explicitPerLinkSeedPairsRemoved": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1018,12 +1018,12 @@
     "templateInstantiationF5F5FullSelfCloneCount": 0,
     "templateInstantiationF5F5IndependentMemoryCount": 2,
     "templateInstantiationF5F5ExplicitSeedCorrespondenceCount": 25,
-    "seedCorrespondenceCompressionF5F6ExplicitPerLinkPairCount": null,
-    "seedCorrespondenceCompressionF5F6SequenceSourceCount": null,
-    "seedCorrespondenceCompressionF5F6ZippedPositionCount": null,
-    "seedCorrespondenceCompressionF5F6DerivedUniqueSeedCount": null,
-    "seedCorrespondenceCompressionF5F6MappedLinkCount": null,
-    "seedCorrespondenceCompressionF5F6IndependentMemoryCount": null
+    "seedCorrespondenceCompressionF5F6ExplicitPerLinkPairCount": 0,
+    "seedCorrespondenceCompressionF5F6SequenceSourceCount": 2,
+    "seedCorrespondenceCompressionF5F6ZippedPositionCount": 24,
+    "seedCorrespondenceCompressionF5F6DerivedUniqueSeedCount": 23,
+    "seedCorrespondenceCompressionF5F6MappedLinkCount": 142,
+    "seedCorrespondenceCompressionF5F6IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1218,11 +1218,11 @@
     "seedCorrespondenceCompressionF5F6IndependentMemoryCount": "Independent fresh Memories required to produce byte-identical target topology from the same frozen sequence-correspondence authority."
   },
   "nextExperiments": [
-    "F5-F6: attack the 25 external seed correspondences. Partition them into identity/shared-context, derivable-by-structure, and genuinely externally selected mappings; reconstruct every derivable correspondence from the two Link-carried requests/template evidence and measure the irreducible remainder.",
-    "F5-F6 must also test template selection: distinguish whether a suitable closure-complete authority can be selected by frozen structural evidence rather than a host-chosen template handle.",
-    "Promote the F5-F5 publication-only RED into a general authority-closure invariant: a publication claim cannot stand for portable executable authority unless its selected evidence closure is explicitly rooted/recoverable.",
-    "Audit whether F5-F2 verification, F5-F4 construction and F5-F5 cloning can converge onto one bidirectional role/pole kernel instead of three host interpreters.",
-    "Keep global E2/E3/E4 and FULL_SELF_HOSTED open until the remaining seed/template-selection source authority is reconstructed or explicitly proven irreducible."
+    "F5-F7: eliminate the externally prepared source-prefix correspondence declaration. Derive compatible prefix correspondence from the already-selected q/r source carriers or from their Link-native source evidence with a generic structural traversal, without semantic STRING-position labels.",
+    "F5-F7 should measure whether the request-sequence correspondence alone plus a generic source-carrier relation can reproduce the 23 unique seed mappings required by F5-F6.",
+    "Then attack external template selection: select a closure-complete authority exemplar by frozen structural admission/signature rather than a host-supplied template handle.",
+    "Keep the F5-F5 publication-only RED as an authority-closure invariant: publication identity alone is not portable executable authority unless the selected evidence closure is rooted/recoverable.",
+    "Audit unification of F5-F2 verification, F5-F4 construction, F5-F5 cloning and F5-F6 correspondence into one bidirectional role/pole kernel before making any FULL_SELF_HOSTED claim."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -4111,7 +4111,7 @@
       }
     },
     "seedCorrespondenceCompressionF5F6": {
-      "status": "DESIGNED_NOT_EXECUTED",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can F5-F5's 25 individually prepared seed correspondences be eliminated by deriving them generically from a small number of Link-native equal-length sequence correspondences?",
       "frozenCorrespondenceSources": [
         "template q generation-request ExactSequence paired with target r generation-request ExactSequence",
@@ -4141,7 +4141,27 @@
         "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
       ],
       "evidenceTest": "ts/test/research-v013-seed-correspondence-compression-f5-f6.test.ts",
-      "consequence": "Pending CI. GREEN would reduce the residual F5-F5 source boundary from 25 hand-prepared Link pairs to two Link-native sequence-correspondence declarations consumed by a domain-agnostic positional zipper."
+      "consequence": "F5-F6 removes explicit per-Link correspondence enumeration from the tested path. The residual source authority is compressed to two Link-native sequence-pair selections, plus external preparation of the source-prefix sequences and selection of the closure-complete template. This is genuine authority compression, not elimination: the correspondence sources still say which structures are to be identified positionally. Global E2/E3/E4 and FULL_SELF_HOSTED remain open.",
+      "currentResult": "GREEN: the F5-F5 residual list of 25 explicit template-Link -> target-Link seed pairs is absent. Two frozen Link-native sequence correspondence sources (q-request <-> r-request and q-source-prefixes <-> r-source-prefixes) are consumed by one domain-agnostic equal-length positional zipper. Across 24 zipped positions it derives 23 unique seed mappings, after which unchanged generic template recursion reconstructs 142 total mappings using 94 ordinary and 24 START-self clones. The complete canonical topology equals the independent domain-reference r(a) generation byte-for-byte; frozen F5-F2 admission and target Dictionary resolution remain GREEN; unequal sequence cardinality rejects before cloning; two independent Memories agree.",
+      "observed": {
+        "explicitPerLinkSeedPairs": 0,
+        "correspondenceSequenceSources": 2,
+        "zippedPositions": 24,
+        "derivedUniqueSeeds": 23,
+        "mappedLinksAfterRun": 142,
+        "ordinaryClones": 94,
+        "startSelfClones": 24,
+        "malformedSequenceCardinality": "REJECTED",
+        "topologyEqualsReference": true,
+        "frozenF5F2Admission": true,
+        "targetNameResolution": true,
+        "independentMemories": 2,
+        "externalTemplateSelection": true,
+        "externalCorrespondenceSourceSelection": 2,
+        "externalPrefixSequencePreparation": true,
+        "semanticInformationEliminated": false,
+        "productionChanged": false
+      }
     }
   }
 }
