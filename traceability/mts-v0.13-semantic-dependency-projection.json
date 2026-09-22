@@ -46,7 +46,8 @@
     "aspectApplicationUnifierSourceRemovalProven": false,
     "aspectApplicationUnifiedContinuationResearchComplete": true,
     "aspectApplicationUnifierDenialFalsifierComplete": true,
-    "formalIntegratedNameAspectApplicationResearchComplete": true
+    "formalIntegratedNameAspectApplicationResearchComplete": true,
+    "aspectApplicationProofCarryingBindingResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -884,7 +885,12 @@
     "formalIntegratedAliasCount": 2,
     "formalIntegratedResultCardinality": 2,
     "formalIntegratedIndependentMemoryCount": 2,
-    "formalIntegratedNameOrFormSpecificHostBranchCount": 0
+    "formalIntegratedNameOrFormSpecificHostBranchCount": 0,
+    "aspectProofCarryingBindingPositiveWitnessCount": 7,
+    "aspectProofCarryingBindingNegativeControlCount": 3,
+    "aspectProofCarryingBindingIndependentMemoryCount": 2,
+    "aspectProofCarryingBindingTargetPoleReadCount": 0,
+    "aspectProofCarryingBindingHostMatcherCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -972,14 +978,20 @@
     "formalIntegratedAliasCount": "Physical function names f and dup that resolve through frozen Dictionary topology to one semantic function Link.",
     "formalIntegratedResultCardinality": "Result count of the selected f(a) application in the integrated naming + A11h continuation witness.",
     "formalIntegratedIndependentMemoryCount": "Independent replay Memories executing the same portable combined Dictionary/continuation authority.",
-    "formalIntegratedNameOrFormSpecificHostBranchCount": "Per-name/per-function semantic branches in the integrated resolver+continuation kernel. Zero."
+    "formalIntegratedNameOrFormSpecificHostBranchCount": "Per-name/per-function semantic branches in the integrated resolver+continuation kernel. Zero.",
+    "aspectProofCarryingBindingPositiveWitnessCount": "A11g-F2 portable Link binding witnesses verified without target-pole reads or a matcher: direct/inverse method Links plus R/O/C/L/U targets.",
+    "aspectProofCarryingBindingNegativeControlCount": "A11g-F2 forged witness controls: reversed target values, duplicate/collapsed structural role, and target substitution.",
+    "aspectProofCarryingBindingIndependentMemoryCount": "Independent replay Memories in which one canonical portable binding authority verifies the same target mappings without sender-local handles.",
+    "aspectProofCarryingBindingTargetPoleReadCount": "Semantic verifier reads of poles(target). Zero: target decomposition is supplied by Link evidence and checked by ordered Link identity instead.",
+    "aspectProofCarryingBindingHostMatcherCount": "Calls/imports of structural-unification, StructuralRule matching, or StructuralRoleMorphism matching in the A11g-F2 verifier. Zero."
   },
   "nextExperiments": [
-    "A11g-F2 remains the foundation priority: design a portable MTS-native two-role binding law and rerun A11G-F1 until structural-unification denial is GREEN without equivalent host matching.",
-    "FORMAL F3: put argument/application grouping itself into portable FORMAL/MTS evidence so the source can express f(a) rather than the test selecting f and a as two source names externally.",
-    "After A11g-F2 and F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
-    "Reassess the three host-defined FORMAL law families; remove any family made redundant by Dictionary + aspect/application evidence.",
-    "Then apply the same aspect/application mechanism to proof semantics before any FULL_SELF_HOSTED claim; E3/E4 remain open."
+    "Execute and, if valid, promote A11G-F2 proof-carrying two-role binding from candidate to measured GREEN; require zero target-pole reads and zero matcher calls on receiver.",
+    "If A11G-F2 is GREEN, replace the research A11h/F2c decode dependency on structural-unification with the verified binding-witness path in a new research-only end-to-end witness before touching production.",
+    "FORMAL F3: put argument/application grouping itself into portable FORMAL/MTS evidence so source expresses f(a) rather than the test externally selecting f and a as two source names.",
+    "Rerun F-KERNEL-SELF-EXTENSION only after binding-source removal and F3 grouping evidence.",
+    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization; remove only families actually made redundant by evidence.",
+    "Then apply the same proof-carrying/aspect mechanism to proof semantics; E3/E4 remain separate and open."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -2835,7 +2847,58 @@
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-unifier-slice-a11g.test.ts",
-      "consequence": "A11g does not source-remove generic unification, but shrinks the relevant semantic-source boundary to a one-Link, two-role projection. Most generic unifier machinery is not exercised on the A11 root-aspect path. The next source-removal experiment can target this exact narrow law instead of the full generic matcher."
+      "consequence": "A11g does not source-remove generic unification, but shrinks the relevant semantic-source boundary to a one-Link, two-role projection. Most generic unifier machinery is not exercised on the A11 root-aspect path. The next source-removal experiment can target this exact narrow law instead of the full generic matcher.",
+      "proofCarryingBindingF2": {
+        "id": "A11G-F2-PROOF-CARRYING-BINDING",
+        "status": "CANDIDATE_EXECUTION_RECORDED",
+        "question": "Can A11 two-role binding be verified from portable MTS Link evidence after denying generic host matching, while also denying direct poles(target) role remapping?",
+        "witnessShape": [
+          "selected role frame has two explicit role Links S and E and template D=S⟼E",
+          "binding evidence contains two ordinary Links S⟼x and E⟼y",
+          "the two binding Links are grouped into one binding-pair Link",
+          "witness root links that binding pair to target T",
+          "receiver reconstructs x/y only from witness topology, never from poles(T)"
+        ],
+        "verificationLaw": [
+          "derive selected role identities from the frozen role-frame/template authority",
+          "read witness-carried role/value Links",
+          "require exactly one value for each selected role and no foreign/duplicate role",
+          "verify ordered Link identity find(x,y) == T",
+          "do not call structural-unification/matchStructuralTemplate/StructuralRoleMorphism",
+          "do not call poles(T)"
+        ],
+        "semanticInterpretation": "The witness is proof-carrying evidence, not a trusted precomputed table: receiver rejects it unless its carried values reconstruct the exact target Link under the selected ordered role frame.",
+        "positiveWitnesses": [
+          "Direct method",
+          "Inverse method",
+          "R",
+          "O",
+          "C",
+          "L",
+          "U"
+        ],
+        "negativeControls": [
+          "reversed target values under unchanged roles fail ordered target identity",
+          "duplicate/collapsed role evidence fails exact two-role coverage",
+          "correct values attached to a substituted target fail target identity"
+        ],
+        "a11fRegression": "Verified proof-carrying bindings must reproduce R=11,O=10,C=01,L=00,U=00 and remain equal to independently observed self-incidence masks.",
+        "antiCheat": [
+          "sender-side fixture may inspect target poles only to construct a witness; sender is not semantic authority",
+          "receiver verifier is wrapped so poles(target) throws",
+          "witness values are not trusted; exact target Link identity is independently checked",
+          "no equivalent recursive matcher or role morphism verifier is used",
+          "transport coordinates identify artifact nodes only and carry no semantic role/value meaning"
+        ],
+        "residualBoundary": [
+          "receiver still reads witness/package Link topology",
+          "receiver uses generic ordered Link identity find(x,y)==target",
+          "selected role-frame/template authority is still externally chosen/frozen",
+          "Bundle/application orchestration outside this exact binding slice remains separate",
+          "whether generic Link identity/find is E1 irreducible substrate rather than E2 semantic source remains to be classified"
+        ],
+        "expectedConsequence": "If GREEN, A11G-F1's missing capability is supplied by proof-carrying MTS binding evidence without target matching. This would source-remove generic unification from the exact A11 two-role decode path, but not yet close global E2 or prove FULL_SELF_HOSTED."
+      }
     },
     "aspectApplicationA11h": {
       "status": "EXECUTED_GREEN_UNIFIED_CONTINUATION_CANDIDATE",
