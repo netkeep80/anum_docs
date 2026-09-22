@@ -282,6 +282,7 @@ function buildFrozen():FrozenArtifact{
 interface InstantiateResult{
   readonly publication:LinkHandle;
   readonly candidate:LinkHandle;
+  readonly explicitSeedCount:number;
   readonly mappedSeedCount:number;
   readonly ordinary:number;
   readonly startSelf:number;
@@ -304,6 +305,7 @@ function instantiateTemplate(
   }
   const required=readExactSequence(memory,requiredSeeds).values;
   for(const seed of required)assert(mapping.has(seed),"all required template seeds mapped");
+  const explicitSeedCount=mapping.size;
 
   let ordinary=0,startSelf=0,endSelf=0,fullSelf=0;
   const visiting=new Set<LinkHandle>();
@@ -335,7 +337,8 @@ function instantiateTemplate(
   const publication=clone(templateRoot);
   const candidate=memory.poles(publication).start;
   return Object.freeze({
-    publication,candidate,mappedSeedCount:mapping.size,ordinary,startSelf,endSelf,fullSelf,
+    publication,candidate,explicitSeedCount,mappedSeedCount:mapping.size,
+    ordinary,startSelf,endSelf,fullSelf,
   });
 }
 function runReference(artifact:FrozenArtifact):Readonly<{topology:StorageTopologyImage;candidate:LinkHandle;publication:LinkHandle}>{
@@ -401,7 +404,8 @@ function main():void{
   console.log([
     "MTS v0.13 F5-F5:",
     "LINK_NATIVE_TEMPLATE_INSTANTIATION=GREEN_SCOPED_RESEARCH",
-    `MAPPED_SEEDS_AFTER_RUN=${a.result.mappedSeedCount}`,
+    `EXPLICIT_FROZEN_SEED_CORRESPONDENCES=${a.result.explicitSeedCount}`,
+    `MAPPED_LINKS_AFTER_RUN=${a.result.mappedSeedCount}`,
     `ORDINARY_CLONES=${a.result.ordinary}`,
     `START_SELF_CLONES=${a.result.startSelf}`,
     `END_SELF_CLONES=${a.result.endSelf}`,
