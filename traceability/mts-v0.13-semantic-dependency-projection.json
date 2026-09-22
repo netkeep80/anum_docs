@@ -99,7 +99,8 @@
     "applicationClosedFrontierA17Designed": true,
     "applicationClosedFrontierA17Complete": true,
     "linkCarriedContinuationAuthorityA18Designed": true,
-    "linkCarriedContinuationAuthorityA18Complete": true
+    "linkCarriedContinuationAuthorityA18Complete": true,
+    "contextCarriedContinuationAuthorityA19Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1350,9 +1351,10 @@
     "linkCarriedContinuationAuthorityA18IndependentMemoryCount": "Independent Memories reproducing the Link-carried continuation authority behavior."
   },
   "nextExperiments": [
-    "A19: carry selected continuation authority inside the execution context K itself, so the semantic step needs no separate K->Authority argument. Preserve K->A as contextual truth and derive Authority structurally from K.",
+    "A19: execute context-carried continuation authority. Require K=Parent->AuthorityEnvelope and derive selected continuations from K with no separate authority argument.",
+    "If A19 is GREEN, attack the remaining host Bundle frontier boundary: carry the selected executable frontier as Link-native authority/state while preserving occurrence provenance and avoiding execution of every truth linked to K.",
+    "After A19, reconnect context-carried execution authority with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A19 must preserve ambient-authority isolation and fail closed if K does not carry a structurally valid selected authority.",
-    "After A19, attack the remaining host Bundle frontier representation/selection without treating every K-linked truth as simultaneously executable.",
     "Then reconnect the application-closed execution line with F5 self-generated authority/template convergence and reassess E2/E3.",
     "A17-F1: connect application-closed continuation authority A->B to the F5 self-generated authority line. Ask whether the selected continuation relation itself can be generated/discovered from Link-carried authority without host semantic source.",
     "A17-F1 should preserve A17's one-law execution kernel unchanged; all further complexity belongs to authority generation/selection, not runtime detachment.",
@@ -4820,6 +4822,51 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "contextCarriedContinuationAuthorityA19": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A18's separate K->Authority argument be removed entirely by carrying the selected continuation authority structurally inside execution context K, while contextual truth remains K->A and recursive detachment behavior is unchanged?",
+      "setup": [
+        "retain application-closed contextual frontier K->A",
+        "encode selected continuation authority as a frozen Link chain terminated by R",
+        "wrap authority body in a proper START-self-closed structural envelope",
+        "define execution context K=Parent->AuthorityEnvelope",
+        "semantic step receives only memory, K, frontier and schedule",
+        "step derives and validates authority structurally from END(K)"
+      ],
+      "oracle": [
+        "reproduce A18 first fan-out, local termination, second fan-out and convergence",
+        "forward/reverse scheduling remains equivalent",
+        "separate authority argument count is zero",
+        "host transition-array parameter count remains zero",
+        "ambient continuation outside context authority is ignored",
+        "ambient alternate authority does not alter existing immutable K",
+        "changing authority requires explicitly selecting a new context Link",
+        "raw unwrapped authority body is rejected fail-closed",
+        "proper empty authority envelope yields ZERO",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "kernel contains no authorityTruth/transitions array/event/state/pair/request/active/isTrue/currentValue/modusPonens/find/outgoing/incoming/switch semantic primitive",
+        "authority must be derived from context poles",
+        "authority envelope must be structurally validated as proper START self-closed",
+        "semantic kernel performs exactly one Memory.ensure form: ensure(context, consequent)"
+      ],
+      "residualAuthority": [
+        "host/runtime still selects current context K",
+        "initial contextual invocation truth K->A0 remains externally injected",
+        "frontier is still represented/selected as host BundleValue even though every member is a Link truth witness",
+        "authority publication/construction is outside this gate"
+      ],
+      "evidenceTest": "ts/test/research-v013-context-carried-authority-a19.test.ts",
+      "claimBoundary": [
+        "GREEN would remove separate continuation-authority input from the semantic step",
+        "GREEN would not source-remove current-context selection or frontier selection",
+        "the START-self-closed authority envelope is research-local representation, not a new foundational aspect",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
