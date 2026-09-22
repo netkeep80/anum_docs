@@ -4035,8 +4035,9 @@
       "question": "Can the external F5-F4 97-equation plan compiler be removed by using one already-admitted Link-native generated authority itself as the constructive template for a new named function?",
       "setup": [
         "build and admit/publish one ordinary F5-F3-style q(a) authority before the target freeze",
+        "materialize one Link-native closure-complete template-root sequence containing q publication plus all source/grouping/proof authority roots used by the F5-F3 portable artifact",
         "prepare a distinct future r(a) request whose function Link and Dictionary name authority do not yet exist",
-        "freeze q publication plus Link-carried q->r seed correspondences",
+        "freeze the q authority-root sequence plus Link-carried q->r seed correspondences",
         "include source-prefix correspondences required because physical q/r STRING carriers differ structurally",
         "do not freeze any 97-equation constructive plan"
       ],
@@ -4057,14 +4058,19 @@
       ],
       "negativeControl": "remove one explicitly required seed binding while keeping the required-seed set frozen; generic instantiation must reject before cloning",
       "claimBoundary": [
-        "the 97-equation external plan source is absent on the tested path",
-        "one existing admitted template authority remains externally selected",
+        "publication-only cloning is explicitly RED because current publication does not carry all selected source/Grammar/Theory evidence",
+        "the positive template authority is an explicit Link-native root set, not a 97-equation construction plan",
+        "one existing admitted closure-complete template authority remains externally selected",
         "seed correspondences, including q/r source-prefix correspondences, remain externally prepared",
-        "therefore semantic information is reused/reconstructed from a Link-native exemplar but is not claimed eliminated",
+        "therefore semantic information is reused/reconstructed from Link-native evidence but is not claimed eliminated",
         "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
       ],
       "evidenceTest": "ts/test/research-v013-template-instantiation-f5-f5.test.ts",
-      "consequence": "Pending CI. GREEN would replace the explicit constructive-plan compiler with generic Link-topology instantiation and move the remaining source question to template selection and seed-correspondence authority."
+      "consequence": "First execution falsified publication-only templating: the publication Link is not closure-complete for F4-compatible portable authority. The revised F5-F5 test therefore keeps that failure as an explicit negative control and tests a Link-native closure-complete authority-root set. GREEN would remove the external 97-equation compiler while making template-root selection and seed correspondence the next precise source boundary.",
+      "negativeControls": [
+        "publication-only template: clone only q publication and require canonical topology to differ from the domain reference; publication is therefore not closure-complete authority",
+        "missing required seed: remove one frozen seed binding while retaining the required-seed set and require rejection before cloning"
+      ]
     }
   }
 }
