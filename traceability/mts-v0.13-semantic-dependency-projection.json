@@ -69,7 +69,10 @@
     "selfGeneratedDefinitionAdmissionF5F1Complete": true,
     "selfGeneratedDefinitionProven": false,
     "selfGeneratedStructuralAdmissionF5F2Complete": true,
-    "selfGeneratedUnknownCandidateStructuralAdmissionProven": true
+    "selfGeneratedUnknownCandidateStructuralAdmissionProven": true,
+    "rootAsymmetryChiralityA14Complete": true,
+    "rootAsymmetryMirrorChiralityPreserved": true,
+    "rootAsymmetryErasureNondegenerateBasisRejected": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -978,7 +981,13 @@
     "selfGeneratedStructuralAdmissionF5F2ConstraintCount": 3,
     "selfGeneratedStructuralAdmissionF5F2NegativeControlCount": 3,
     "selfGeneratedStructuralAdmissionF5F2CandidateIdentityReferenceCount": 0,
-    "selfGeneratedStructuralAdmissionF5F2IndependentMemoryCount": 2
+    "selfGeneratedStructuralAdmissionF5F2IndependentMemoryCount": 2,
+    "rootAsymmetryChiralityOrientationCount": 2,
+    "rootAsymmetryChiralityDistinctSignatureCount": 4,
+    "rootAsymmetryChiralityForcedCollapseControlCount": 2,
+    "rootAsymmetryChiralityCollapsedEquivalenceClassCount": 1,
+    "rootAsymmetryChiralityHostAspectBranchCount": 0,
+    "rootAsymmetryChiralityIndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1137,12 +1146,19 @@
     "selfGeneratedStructuralAdmissionF5F2ConstraintCount": "F5-F2 frozen generic pair-identity constraints encoded as Link data.",
     "selfGeneratedStructuralAdmissionF5F2NegativeControlCount": "F5-F2 forged application, forged continuation and wrong-arity candidates that must fail structural admission.",
     "selfGeneratedStructuralAdmissionF5F2CandidateIdentityReferenceCount": "Exact generated candidate identities named by frozen rule authority. Zero.",
-    "selfGeneratedStructuralAdmissionF5F2IndependentMemoryCount": "Independent replay Memories generating and validating equivalent candidate topology under the same portable frozen rule."
+    "selfGeneratedStructuralAdmissionF5F2IndependentMemoryCount": "Independent replay Memories generating and validating equivalent candidate topology under the same portable frozen rule.",
+    "rootAsymmetryChiralityOrientationCount": "A14 opposite root cross-link choices O->C and C->O. Both preserve non-degenerate orientation; the test does not privilege one absolute handedness label.",
+    "rootAsymmetryChiralityDistinctSignatureCount": "A14 structural self-incidence classes recovered by the label-free observer in either chirality: 11, 10, 01 and 00.",
+    "rootAsymmetryChiralityForcedCollapseControlCount": "A14 symmetry-erasure quotients tested: identify O=C and identify L=U. Exact-pole plus canonical-pair congruence must drive both to the same universal collapse.",
+    "rootAsymmetryChiralityCollapsedEquivalenceClassCount": "A14 number of surviving root-basis equivalence classes after either asymmetry-erasure quotient. One means R/O/C/L/U all collapse.",
+    "rootAsymmetryChiralityHostAspectBranchCount": "ROOT/START/END/PAIR host branches in the A14 self-incidence observer. Zero.",
+    "rootAsymmetryChiralityIndependentMemoryCount": "Independent Memories required to reproduce byte-identical canonical root topology and the same A14 verdict."
   },
   "nextExperiments": [
-    "Execute F5-F2 frozen structural admission. Promote only if two different post-freeze generated candidates pass one candidate-agnostic rule and all forged controls fail.",
-    "If F5-F2 is GREEN, F5-F3 must generate a full F4-compatible portable Dictionary/source-grouping/continuation authority, structurally admit its definition root, export it, and execute it in a second Memory through the unchanged F4 receiver.",
+    "Execute F5-F3: generate a full F4-compatible portable Dictionary/source-grouping/continuation authority after freeze, admit its definition root through F5-F2 structural admission, publish/export it, and execute the new named function in a second Memory through the unchanged F4 receiver.",
     "Then source-remove or classify the generic structural admission rule interpreter itself; do not equate data-driven E3 with full E3 closure.",
+    "Carry the A14 root-asymmetry falsifier into any future carrier/observer redesign: opposite chirality may exchange the selected cross-link, but an orientation-free non-degenerate root basis must not be assumed without defeating the O=C/L=U collapse controls.",
+    "After the full F5 self-generation path is executable, investigate A15 weighted predictive Bundle frontiers with weights attached to occurrences/provenance; prediction/ranking must remain distinct from structural admission and publication authority.",
     "Keep A13/A13b branch scheduling/materialization semantics as the execution substrate for any multi-candidate generator."
   ],
   "measurement": {
@@ -3822,6 +3838,49 @@
       },
       "evidenceTest": "ts/test/research-v013-structural-admission-f5-f2.test.ts",
       "consequence": "F5-F1's exact-identity blocker is removed on the scoped path: frozen structural MTS evidence can admit candidates unknown at freeze time. This demonstrates unknown-candidate structural self-admissibility, but not full F5: the generated candidate is not yet a full F4-compatible Dictionary/source-grouping/behavior authority, and the generic structural-rule interpreter remains a host E3 service."
+    },
+    "rootAsymmetryChiralityA14": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "currentResult": "GREEN: selecting O->C or the opposite C->O yields two mirror chirality choices with the same four label-free self-incidence classes and distinct direct/inverse Links. Erasing asymmetry by quotienting O=C forces the recursive root equations to identify O=C=R and then L=U=R; independently, quotienting L=U first forces O=C and reaches the same universal collapse. Two independent Memories materialize byte-identical canonical root topology.",
+      "question": "Is root-level Link orientation an externally painted direction, or is non-degenerate orientedness unavoidable once the two one-sided root roles are preserved?",
+      "rootEquations": [
+        "R = R->R",
+        "O = O->R",
+        "C = R->C",
+        "L = O->C",
+        "U = C->O"
+      ],
+      "mirrorControl": [
+        "direct chirality chooses O->C = L and inverse C->O = U",
+        "mirror chirality chooses C->O = U and inverse O->C = L",
+        "both quartets recover exactly four structural masks 11/10/01/00 without aspect-name branches",
+        "absolute naming of one chirality as privileged is not claimed"
+      ],
+      "asymmetryErasureFalsifier": [
+        "force O=C under exact Link poles and canonical ordered-pair identity",
+        "equal O/C result identities force their pole roles equal, hence O=R=C",
+        "then L=O->C and U=C->O both reduce to R->R=R",
+        "separate control force L=U; exact poles force O=C and therefore the same universal collapse"
+      ],
+      "observerBoundary": [
+        "self-incidence observer reads only exact poles and Link identity",
+        "observer contains no ROOT/START/END/PAIR branch or switch",
+        "finite quotient closure is a research proof harness over already-existing exact-pole/canonical-pair identity discipline",
+        "no graph-theory primitive or new production semantic operation is introduced"
+      ],
+      "observed": {
+        "directChiralityDistinctSignatures": 4,
+        "mirrorChiralityDistinctSignatures": 4,
+        "directInverseDistinct": true,
+        "forceOEqualsCClassCount": 1,
+        "forceLEqualsUClassCount": 1,
+        "absoluteHandednessClaimed": false,
+        "hostAspectBranches": 0,
+        "independentMemories": 2,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-root-asymmetry-chirality-a14.test.ts",
+      "consequence": "Scoped evidence supports an unavoidable-orientedness claim modulo reversal: choosing the opposite root cross-link reverses chirality but does not remove asymmetry, while identifying the two boundary roles or the two opposite cross-links degenerates the entire root basis. This does not establish a metaphysically privileged absolute handedness, global E2/E3/E4 closure, or v0.13 acceptance."
     }
   }
 }
