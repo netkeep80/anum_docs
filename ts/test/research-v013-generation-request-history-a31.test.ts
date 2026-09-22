@@ -66,10 +66,7 @@ function buildFamily(memory: Memory, b: RootBasis, seed: LinkHandle): Family {
   const A2=memory.ensure(at(4),at(5)), A3=memory.ensure(at(6),at(7));
   const A4=memory.ensure(at(8),at(9)), Z=memory.ensure(at(10),at(11));
   const parent=memory.ensure(at(12),at(13)), metaParent=memory.ensure(at(14),at(15));
-  const authority=freezeChain(memory,[
-    memory.ensure(A0,A1),memory.ensure(A0,A2),memory.ensure(A2,A3),
-    memory.ensure(A2,A4),memory.ensure(A3,Z),memory.ensure(A4,Z),
-  ]);
+const authority=freezeChain(memory,[ memory.ensure(A0,A1),memory.ensure(A0,A2),memory.ensure(A2,A3), memory.ensure(A2,A4),memory.ensure(A3,Z),memory.ensure(A4,Z), ]);
   const K=memory.ensure(parent,authority);
   const occurrence0=memory.ensure(memory.root,memory.ensure(K,A0));
   const E0=memory.ensure(K,freezeChain(memory,[occurrence0]));
@@ -77,20 +74,14 @@ function buildFamily(memory: Memory, b: RootBasis, seed: LinkHandle): Family {
   const E3=referenceNextExecution(memory,E2), E4=referenceNextExecution(memory,E3);
   return Object.freeze({metaParent,E0,E1,E2,E3,E4});
 }
-function metaStep(
-  memory: Memory,
-  currentExecutionTruth: LinkHandle,
-): LinkHandle | undefined {
+function metaStep( memory: Memory, currentExecutionTruth: LinkHandle, ): LinkHandle | undefined {
   const truth = memory.poles(currentExecutionTruth);
   const metaContext = truth.start;
   const currentExecution = truth.end;
   const metaContextPoles = memory.poles(metaContext);
   const envelope = metaContextPoles.end;
   const envelopePoles = memory.poles(envelope);
-  assert(
-    envelopePoles.start === envelope && envelopePoles.end !== envelope,
-    "A23 meta-context carries proper START-self-closed producer authority",
-  );
+assert( envelopePoles.start === envelope && envelopePoles.end !== envelope, "A23 meta-context carries proper START-self-closed producer authority", );
   const seen = new Set<LinkHandle>();
   let cursor = envelopePoles.end;
   let selected: LinkHandle | undefined;
@@ -101,8 +92,7 @@ function metaStep(
     const candidate = cell.start;
     const transition = memory.poles(candidate);
     if (transition.start === currentExecution) {
-      assert(selected === undefined,
-        "A23 producer authority is ambiguous for current execution");
+assert(selected === undefined, "A23 producer authority is ambiguous for current execution");
       selected = candidate;
     }
     cursor = cell.end;
@@ -120,17 +110,8 @@ function anonymousRoles(memory:Memory):readonly LinkHandle[]{
 }
 function defineRule(memory:Memory):LinkHandle{
   const r=anonymousRoles(memory);
-  const triples=[
-    [T0,E0,E1],[T1,E1,E2],[T2,E2,E3],[T3,E3,E4],
-    [C3,T3,ROOT],[C2,T2,C3],[C1,T1,C2],[C0,T0,C1],[ENV,ENV,C0],[M,META,ENV],
-  ] as const;
-  return materializeExactSequence(memory,[
-    materializeExactSequence(memory,r),
-    materializeExactSequence(
-      memory,
-      triples.map(([t,s,e])=>materializeExactSequence(memory,[r[t]!,r[s]!,r[e]!])),
-    ),
-  ]);
+const triples=[ [T0,E0,E1],[T1,E1,E2],[T2,E2,E3],[T3,E3,E4], [C3,T3,ROOT],[C2,T2,C3],[C1,T1,C2],[C0,T0,C1],[ENV,ENV,C0],[M,META,ENV], ] as const;
+return materializeExactSequence(memory,[ materializeExactSequence(memory,r), materializeExactSequence( memory, triples.map(([t,s,e])=>materializeExactSequence(memory,[r[t]!,r[s]!,r[e]!])), ), ]);
 }
 function admitted(memory:ReadMemory,rule:LinkHandle,candidate:LinkHandle):boolean{
   try{
@@ -155,11 +136,7 @@ interface Template {
   readonly M:LinkHandle;
   readonly publication:LinkHandle;
 }
-function producerTemplate(
-  memory:Memory,
-  metaParent:LinkHandle,
-  executions:readonly LinkHandle[],
-):Template{
+function producerTemplate( memory:Memory, metaParent:LinkHandle, executions:readonly LinkHandle[], ):Template{
   assert(executions.length>1,"A31 producer template has at least one transition");
   const ts=executions.slice(0,-1).map((e,i)=>memory.ensure(e,executions[i+1]!));
   let tail=memory.root; const cells:LinkHandle[]=[];
@@ -168,27 +145,16 @@ function producerTemplate(
   }
   const env=memory.ensureStartSelfClosed(cells[0]!);
   const meta=memory.ensure(metaParent,env);
-  const candidate=materializeExactSequence(memory,[
-    memory.root,metaParent,...executions,...ts,...[...cells].reverse(),env,meta,
-  ]);
-  return Object.freeze({
-    candidate,M:meta,publication:memory.ensure(candidate,meta),
-  });
+const candidate=materializeExactSequence(memory,[ memory.root,metaParent,...executions,...ts,...[...cells].reverse(),env,meta, ]);
+return Object.freeze({ candidate,M:meta,publication:memory.ensure(candidate,meta), });
 }
-function targetHistoryDescriptor(
-  memory:Memory,
-  metaParent:LinkHandle,
-  executions:readonly LinkHandle[],
-):LinkHandle{
+function targetHistoryDescriptor( memory:Memory, metaParent:LinkHandle, executions:readonly LinkHandle[], ):LinkHandle{
   assert(executions.length>1,"A31 target history has more than one execution root");
   let occurrence=memory.ensure(memory.root,executions[0]!);
   for(let i=1;i<executions.length;i+=1) occurrence=memory.ensure(occurrence,executions[i]!);
   return memory.ensure(metaParent,occurrence);
 }
-function deriveTargetSeeds(
-  memory:Memory,
-  descriptor:LinkHandle,
-):readonly LinkHandle[]{
+function deriveTargetSeeds( memory:Memory, descriptor:LinkHandle, ):readonly LinkHandle[]{
   const dp=memory.poles(descriptor);
   const reversed:LinkHandle[]=[];
   const seenOccurrences=new Set<LinkHandle>(),seenExecutions=new Set<LinkHandle>();
@@ -213,10 +179,7 @@ function deriveTargetSeeds(
   assert(reversed.length>1,"A31 target history nontrivial");
   return Object.freeze([dp.start,...reversed]);
 }
-function deriveProducerSeeds(
-  memory:Memory,
-  candidate:LinkHandle,
-):readonly LinkHandle[]{
+function deriveProducerSeeds( memory:Memory, candidate:LinkHandle, ):readonly LinkHandle[]{
   const values=readExactSequence(memory,candidate).values;
   const members=new Set(values);
   const matches:LinkHandle[][]=[];
@@ -253,11 +216,7 @@ function deriveProducerSeeds(
   same(matches.length,1,"A31 exactly one structural producer seed path");
   return Object.freeze(matches[0]!);
 }
-function derivedSeedMap(
-  memory:Memory,
-  sourceCandidate:LinkHandle,
-  targetDescriptor:LinkHandle,
-):Map<LinkHandle,LinkHandle>|undefined{
+function derivedSeedMap( memory:Memory, sourceCandidate:LinkHandle, targetDescriptor:LinkHandle, ):Map<LinkHandle,LinkHandle>|undefined{
   const source=deriveProducerSeeds(memory,sourceCandidate);
   const target=deriveTargetSeeds(memory,targetDescriptor);
   if(source.length!==target.length)return undefined;
@@ -279,10 +238,7 @@ function instantiate(memory:Memory,source:LinkHandle,map:Map<LinkHandle,LinkHand
   const prior=map.get(source);assert(prior===undefined||prior===target,"A31 clone conflict");
   map.set(source,target);return target;
 }
-function readCurrentRequestTruth(
-  memory:Memory,
-  requestExecution:LinkHandle,
-):Readonly<{generationContext:LinkHandle;requestTruth:LinkHandle;historyLength:number}>{
+function readCurrentRequestTruth( memory:Memory, requestExecution:LinkHandle, ):Readonly<{generationContext:LinkHandle;requestTruth:LinkHandle;historyLength:number}>{
   const q=memory.poles(requestExecution);
   const generationContext=q.start;
   let cursor=q.end;
@@ -304,11 +260,7 @@ function readCurrentRequestTruth(
   assert(currentTruth!==undefined,"A31 request history current truth");
   return Object.freeze({generationContext,requestTruth:memory.poles(q.end).end,historyLength});
 }
-function runGenerationHistory(
-  memory:Memory,
-  rule:LinkHandle,
-  requestExecution:LinkHandle,
-):Readonly<{
+function runGenerationHistory( memory:Memory, rule:LinkHandle, requestExecution:LinkHandle, ):Readonly<{
   candidate:LinkHandle;
   publication:LinkHandle;
   M:LinkHandle;
@@ -344,10 +296,7 @@ function runGenerationHistory(
   same(candidates.size,1,"A31 compatible templates converge candidate");
   same(publications.size,1,"A31 compatible templates converge publication");
   same(metas.size,1,"A31 compatible templates converge M");
-  return Object.freeze({
-    candidate:[...candidates][0]!,publication:[...publications][0]!,M:[...metas][0]!,
-    compatibleCount,inventoryCount:sources.length,requestHistoryLength:selected.historyLength,
-  });
+return Object.freeze({ candidate:[...candidates][0]!,publication:[...publications][0]!,M:[...metas][0]!, compatibleCount,inventoryCount:sources.length,requestHistoryLength:selected.historyLength, });
 }
 function exercise(noise:boolean):void{
   const memory=new Memory(),b=ensureRootBasis(memory);
@@ -358,24 +307,13 @@ function exercise(noise:boolean):void{
   const target=buildFamily(memory,b,memory.ensure(b.C,b.U));
   const target2=buildFamily(memory,b,memory.ensure(b.L,b.O));
   const rule=defineRule(memory);
-  const t1=producerTemplate(
-    memory,source1.metaParent,[source1.E0,source1.E1,source1.E2,source1.E3,source1.E4],
-  );
-  const t2=producerTemplate(
-    memory,source2.metaParent,[source2.E0,source2.E1,source2.E2,source2.E3,source2.E4],
-  );
-  const t3=producerTemplate(
-    memory,source3.metaParent,[source3.E0,source3.E1,source3.E2,source3.E3],
-  );
-  assert(admitted(memory,rule,t1.candidate)&&admitted(memory,rule,t2.candidate),
-    "A31 full-length source templates admitted");
+const t1=producerTemplate( memory,source1.metaParent,[source1.E0,source1.E1,source1.E2,source1.E3,source1.E4], );
+const t2=producerTemplate( memory,source2.metaParent,[source2.E0,source2.E1,source2.E2,source2.E3,source2.E4], );
+const t3=producerTemplate( memory,source3.metaParent,[source3.E0,source3.E1,source3.E2,source3.E3], );
+assert(admitted(memory,rule,t1.candidate)&&admitted(memory,rule,t2.candidate), "A31 full-length source templates admitted");
   const inventory=materializeExactSequence(memory,[t1.candidate,t2.candidate,t3.candidate]);
-  const targetDescriptor=targetHistoryDescriptor(memory,target.metaParent,[
-    target.E0,target.E1,target.E2,target.E3,target.E4,
-  ]);
-  const oldTarget=targetHistoryDescriptor(memory,target2.metaParent,[
-    target2.E0,target2.E1,target2.E2,target2.E3,target2.E4,
-  ]);
+const targetDescriptor=targetHistoryDescriptor(memory,target.metaParent,[ target.E0,target.E1,target.E2,target.E3,target.E4, ]);
+const oldTarget=targetHistoryDescriptor(memory,target2.metaParent,[ target2.E0,target2.E1,target2.E2,target2.E3,target2.E4, ]);
   const requestParent=memory.ensure(b.R,b.U);
   const generationContext=memory.ensure(requestParent,inventory);
   const oldTruth=memory.ensure(generationContext,oldTarget);
@@ -394,105 +332,54 @@ function exercise(noise:boolean):void{
     same(memory.poles(next).end,expected,"A31 generated authority execution");truth=next;
   }
   same(metaStep(memory,truth),undefined,"A31 terminal ZERO");
-  const ambientTarget=targetHistoryDescriptor(memory,target.metaParent,[
-    target.E0,target.E1,target.E2,
-  ]);
+const ambientTarget=targetHistoryDescriptor(memory,target.metaParent,[ target.E0,target.E1,target.E2, ]);
   memory.ensure(generationContext,ambientTarget);
   const afterAmbientTruth=runGenerationHistory(memory,rule,requestExecution);
   same(afterAmbientTruth.candidate,out.candidate,"A31 ambient target truth ignored");
   const alternateTruth=memory.ensure(generationContext,oldTarget);
   const h2=memory.ensure(h1,alternateTruth);
   const afterAmbientOccurrence=runGenerationHistory(memory,rule,requestExecution);
-  same(afterAmbientOccurrence.requestHistoryLength,2,
-    "A31 ambient newer request occurrence not selected by immutable Q");
+same(afterAmbientOccurrence.requestHistoryLength,2, "A31 ambient newer request occurrence not selected by immutable Q");
   const alternateExecution=memory.ensure(generationContext,h2);
   const alternate=runGenerationHistory(memory,rule,alternateExecution);
   same(alternate.requestHistoryLength,3,"A31 new Q explicitly advances request history");
-  assert(alternate.candidate!==out.candidate,
-    "A31 advancing Q changes selected target rather than ambient truth");
+assert(alternate.candidate!==out.candidate, "A31 advancing Q changes selected target rather than ambient truth");
   const otherInventory=materializeExactSequence(memory,[t1.candidate]);
   const otherG=memory.ensure(requestParent,otherInventory);
   const foreignTruth=memory.ensure(otherG,targetDescriptor);
   const malformedOccurrence=memory.ensure(h0,foreignTruth);
   const malformedExecution=memory.ensure(generationContext,malformedOccurrence);
-  expectThrows(
-    ()=>{runGenerationHistory(memory,rule,malformedExecution);},
-    "A31 cross-context selected request occurrence rejected",
-  );
+expectThrows( ()=>{runGenerationHistory(memory,rule,malformedExecution);}, "A31 cross-context selected request occurrence rejected", );
   const malformedExecution2=memory.ensure(generationContext,targetDescriptor);
-  expectThrows(
-    ()=>{runGenerationHistory(memory,rule,malformedExecution2);},
-    "A31 non-history request execution rejected",
-  );
+expectThrows( ()=>{runGenerationHistory(memory,rule,malformedExecution2);}, "A31 non-history request execution rejected", );
 }
 function staticGuards():void{
   const root=resolve(process.cwd(),"..");
-  const own=readFileSync(
-    join(root,"ts/test/research-v013-generation-request-history-a31.test.ts"),"utf8",
-  );
-  const prior=readFileSync(
-    join(root,"ts/test/research-v013-meta-transition-authority-a23.test.ts"),"utf8",
-  );
-  const a=own.slice(
-    own.indexOf("function metaStep("),
-    own.indexOf("\nconst ROOT=",own.indexOf("function metaStep(")),
-  );
-  const b=prior.slice(
-    prior.indexOf("function metaStep("),
-    prior.indexOf("\nfunction frontierOccurrences(",prior.indexOf("function metaStep(")),
-  );
+const own=readFileSync( join(root,"ts/test/research-v013-generation-request-history-a31.test.ts"),"utf8", );
+const prior=readFileSync( join(root,"ts/test/research-v013-meta-transition-authority-a23.test.ts"),"utf8", );
+const a=own.slice( own.indexOf("function metaStep("), own.indexOf("\nconst ROOT=",own.indexOf("function metaStep(")), );
+const b=prior.slice( prior.indexOf("function metaStep("), prior.indexOf("\nfunction frontierOccurrences(",prior.indexOf("function metaStep(")), );
   same(a.replace(/\s+/g,""),b.replace(/\s+/g,""),"A31 unchanged A23 metaStep");
-  const selector=own.slice(
-    own.indexOf("function readCurrentRequestTruth("),
-    own.indexOf("\nfunction runGenerationHistory(",own.indexOf("function readCurrentRequestTruth(")),
-  );
+const selector=own.slice( own.indexOf("function readCurrentRequestTruth("), own.indexOf("\nfunction runGenerationHistory(",own.indexOf("function readCurrentRequestTruth(")), );
   for(const x of [".find(", ".outgoing(", ".incoming(", "allLinks(", "switch("])
     assert(!selector.includes(x),`A31 request-history selector excludes ambient primitive ${x}`);
-  assert(selector.includes("const q=memory.poles(requestExecution)"),
-    "A31 derives generation context/history from Q");
-  assert(selector.includes("same(tp.start,generationContext"),
-    "A31 validates every carried request truth against G");
-  const runner=own.slice(
-    own.indexOf("function runGenerationHistory("),
-    own.indexOf("\nfunction exercise(",own.indexOf("function runGenerationHistory(")),
-  );
+assert(selector.includes("const q=memory.poles(requestExecution)"), "A31 derives generation context/history from Q");
+assert(selector.includes("same(tp.start,generationContext"), "A31 validates every carried request truth against G");
+const runner=own.slice( own.indexOf("function runGenerationHistory("), own.indexOf("\nfunction exercise(",own.indexOf("function runGenerationHistory(")), );
   const signature=runner.slice(0,runner.indexOf("):Readonly"));
-  assert(signature.includes("requestExecution:LinkHandle"),
-    "A31 runner input is one request execution/history root");
-  assert(!signature.includes("requestTruth:LinkHandle")&&!signature.includes("targetDescriptor:LinkHandle"),
-    "A31 no current T or target host argument");
+assert(signature.includes("requestExecution:LinkHandle"), "A31 runner input is one request execution/history root");
+assert(!signature.includes("requestTruth:LinkHandle")&&!signature.includes("targetDescriptor:LinkHandle"), "A31 no current T or target host argument");
   for(const x of [".find(", ".outgoing(", ".incoming(", "allLinks(", "switch("])
     assert(!runner.includes(x),`A31 runner excludes ambient selector ${x}`);
-  const target=own.slice(
-    own.indexOf("function deriveTargetSeeds("),
-    own.indexOf("\nfunction deriveProducerSeeds(",own.indexOf("function deriveTargetSeeds(")),
-  );
+const target=own.slice( own.indexOf("function deriveTargetSeeds("), own.indexOf("\nfunction deriveProducerSeeds(",own.indexOf("function deriveTargetSeeds(")), );
   for(const x of ["readExactSequence","ExactSequence",".find(", ".outgoing(", ".incoming(", "allLinks(","switch("])
     assert(!target.includes(x),`A31 target extractor excludes positional/ambient primitive ${x}`);
-  const source=own.slice(
-    own.indexOf("function deriveProducerSeeds("),
-    own.indexOf("\nfunction derivedSeedMap(",own.indexOf("function deriveProducerSeeds(")),
-  );
+const source=own.slice( own.indexOf("function deriveProducerSeeds("), own.indexOf("\nfunction derivedSeedMap(",own.indexOf("function deriveProducerSeeds(")), );
   for(const x of ["META","E0","E1","E2","E3","E4","T0","C0","ENV","switch(", ".find(", ".outgoing(", ".incoming(", "allLinks("])
     assert(!source.includes(x),`A31 source extractor excludes positional/ambient primitive ${x}`);
 }
 function main():void{
   exercise(false);exercise(true);staticGuards();
-  console.log([
-    "MTS v0.13 A31: GENERATION_REQUEST_HISTORY=GREEN_SCOPED_RESEARCH",
-    "REQUEST_SELECTION=LINK_NATIVE_OCCURRENCE_HISTORY",
-    "REQUEST_EXECUTION=G_TO_CURRENT_OCCURRENCE",
-    "CURRENT_REQUEST_TRUTH=DERIVED_FROM_OCCURRENCE_END",
-    "CURRENT_REQUEST_TRUTH_HOST_ARGUMENT=0",
-    "AMBIENT_TARGET_TRUTH=IGNORED AMBIENT_NEWER_OCCURRENCE=IGNORED",
-    "ADVANCE_REQUIRES_NEW_REQUEST_EXECUTION=YES",
-    "CROSS_CONTEXT_REQUEST_OCCURRENCE=REJECTED NON_HISTORY_REQUEST_EXECUTION=REJECTED",
-    "TARGET_SEED_EXACT_SEQUENCE=0 PER_TEMPLATE_SEED_CORRESPONDENCE=0",
-    "COMPATIBLE_TEMPLATES=2 UNCHANGED_A23_META_STEP=YES",
-    "EXTERNAL_REQUEST_EXECUTION_SELECTION=YES EXTERNAL_INVENTORY_MEMBERSHIP=YES",
-    "CURRENT_META_OCCURRENCE_SELECTION_RESIDUAL=YES",
-    "INDEPENDENT_MEMORIES=2 GLOBAL_E2=OPEN GLOBAL_E3=OPEN",
-    "FULL_SELF_HOSTED=NOT_CLAIMED PRODUCTION_UNCHANGED",
-  ].join(" "));
+console.log([ "MTS v0.13 A31: GENERATION_REQUEST_HISTORY=GREEN_SCOPED_RESEARCH", "REQUEST_SELECTION=LINK_NATIVE_OCCURRENCE_HISTORY", "REQUEST_EXECUTION=G_TO_CURRENT_OCCURRENCE", "CURRENT_REQUEST_TRUTH=DERIVED_FROM_OCCURRENCE_END", "CURRENT_REQUEST_TRUTH_HOST_ARGUMENT=0", "AMBIENT_TARGET_TRUTH=IGNORED AMBIENT_NEWER_OCCURRENCE=IGNORED", "ADVANCE_REQUIRES_NEW_REQUEST_EXECUTION=YES", "CROSS_CONTEXT_REQUEST_OCCURRENCE=REJECTED NON_HISTORY_REQUEST_EXECUTION=REJECTED", "TARGET_SEED_EXACT_SEQUENCE=0 PER_TEMPLATE_SEED_CORRESPONDENCE=0", "COMPATIBLE_TEMPLATES=2 UNCHANGED_A23_META_STEP=YES", "EXTERNAL_REQUEST_EXECUTION_SELECTION=YES EXTERNAL_INVENTORY_MEMBERSHIP=YES", "CURRENT_META_OCCURRENCE_SELECTION_RESIDUAL=YES", "INDEPENDENT_MEMORIES=2 GLOBAL_E2=OPEN GLOBAL_E3=OPEN", "FULL_SELF_HOSTED=NOT_CLAIMED PRODUCTION_UNCHANGED", ].join(" "));
 }
 main();
