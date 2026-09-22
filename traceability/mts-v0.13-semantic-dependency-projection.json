@@ -43,13 +43,13 @@
     "aspectApplicationMethodOrientationResearchComplete": true,
     "aspectApplicationSelfContinuationSignatureResearchComplete": true,
     "aspectApplicationUnifierSliceAuditComplete": true,
-    "aspectApplicationUnifierSourceRemovalProven": false,
+    "aspectApplicationUnifierSourceRemovalProven": true,
     "aspectApplicationUnifiedContinuationResearchComplete": true,
     "aspectApplicationUnifierDenialFalsifierComplete": true,
     "formalIntegratedNameAspectApplicationResearchComplete": true,
     "aspectApplicationProofCarryingBindingResearchComplete": true,
     "aspectApplicationProofCarryingBindingMechanismProven": true,
-    "aspectApplicationProofCarryingUnifiedContinuationResearchComplete": false
+    "aspectApplicationProofCarryingUnifiedContinuationResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -996,12 +996,12 @@
     "aspectProofUnifiedContinuationIndependentMemoryCount": "Independent replay Memories executing the same portable A11g-F3 binding authority."
   },
   "nextExperiments": [
-    "Execute A11g-F3 unified proof-carrying continuation; only GREEN may flip aspectApplicationUnifierSourceRemovalProven=true for scoped A11 semantics.",
-    "F2d: migrate the integrated FORMAL name->aspect-application witness from structural-unification to the same proof-carrying binding authority.",
+    "F2d: migrate the integrated FORMAL name->aspect-application witness from structural-unification to the GREEN proof-carrying binding authority and reconfirm aliases/results across two Memories.",
     "FORMAL F3: put argument/application grouping itself into portable FORMAL/MTS evidence so source expresses f(a) rather than the test externally selecting f and a as two source names.",
-    "After A11g-F3/F2d/FORMAL-F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
-    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization.",
-    "Then apply the same proof-carrying/aspect mechanism to proof semantics; E3/E4 remain separate and open."
+    "After F2d/FORMAL-F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
+    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization; remove only families actually made redundant by executable evidence.",
+    "Then apply the same proof-carrying/aspect mechanism to proof semantics before any global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claim.",
+    "E3/E4 remain separate and open; selected frozen authority must remain distinct from live adjacency."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -2844,7 +2844,13 @@
           "ts/src/structural-role-morphism.ts#verifyStructuralRoleMorphismMapping — delegates to matchStructuralTemplate and additionally replays host role-mapping checks"
         ],
         "exactMissingCapability": "A portable Link/aspect artifact whose own MTS semantics reconstructs the ordered two-role binding between selected Dual(A) roles and an arbitrary target Link, without structural-unification/matchStructuralTemplate-equivalent host code.",
-        "consequence": "A11 application semantics remains semantically open at E2. The RED is useful: ordinary/self-incidence unification is no longer the blocker; one precise MTS-native role-binding law is."
+        "consequence": "A11 application semantics remains semantically open at E2. The RED is useful: ordinary/self-incidence unification is no longer the blocker; one precise MTS-native role-binding law is.",
+        "supersededByEvidence": [
+          "A11G-F2-PROOF-CARRYING-BINDING — supplies the missing portable native two-role binding witness",
+          "A11G-F3-UNIFIED-PROOF-BINDING — executes the full ordinary+self continuation corpus without structural-unification"
+        ],
+        "historicalResultPreserved": true,
+        "currentConsequence": "F1 remains a valid historical RED against the pre-F2 architecture and its rejected matcher substitutes remain invalid. The missing capability it identified is now supplied by F2/F3 evidence."
       },
       "observed": {
         "poleReadsPerDecode": 3,
@@ -2927,7 +2933,7 @@
       },
       "proofCarryingUnifiedContinuationF3": {
         "id": "A11G-F3-UNIFIED-PROOF-BINDING",
-        "status": "DESIGNED_NOT_EXECUTED",
+        "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
         "question": "Can the full A11h ordinary+self continuation corpus run from proof-carrying bindings with zero structural-unification/matcher calls and zero target decomposition on receiver?",
         "corpus": [
           "ordinary direct multi-result application",
@@ -2949,8 +2955,27 @@
           "ZERO/ONE/MANY BundleValue cardinalities remain supported",
           "unknown candidate without selected binding evidence fails closed"
         ],
-        "currentResult": "NOT_RUN",
-        "consequence": "Only a GREEN F3 may set aspectApplicationUnifierSourceRemovalProven=true for the scoped A11 continuation semantics. Production and global E2 remain separate."
+        "currentResult": "GREEN: one proof-carrying binding authority executes the full A11 ordinary+self-incidence continuation corpus across two independent replay Memories with ZERO/ONE/MANY BundleValue results, zero host matcher dependencies, zero receiver target-decomposition reads, zero aspect special-case branches, and fail-closed unknown targets.",
+        "consequence": "The exact generic-unification dependency has been source-removed from a complete scoped A11 continuation path. aspectApplicationUnifierSourceRemovalProven=true means only this research A11 path; production, F2c FORMAL integration, global E2 and FULL_SELF_HOSTED remain open.",
+        "observed": {
+          "selectedTargetWitnesses": 13,
+          "applicationClasses": [
+            "ordinary",
+            "self-incidence"
+          ],
+          "resultCardinality": [
+            "zero",
+            "one",
+            "many"
+          ],
+          "hostMatchers": 0,
+          "targetDecompositionReads": 0,
+          "aspectSpecialCaseBranches": 0,
+          "independentMemories": 2,
+          "unknownWithoutWitness": "FAIL_CLOSED",
+          "productionChanged": false
+        },
+        "evidenceTest": "ts/test/research-v013-unified-proof-binding-a11g-f3.test.ts"
       }
     },
     "aspectApplicationA11h": {
