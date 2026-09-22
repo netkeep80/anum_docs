@@ -8,7 +8,7 @@ import { restoreTopology, type StorageTopologyImage } from "../src/persistence-t
 import { defineSourceForm } from "../src/source.js";
 import {
   buildV012SelectedSourceEvidence,
-  materializeV012SourceContent
+  materializeV012SourceContent,
   type V012SourceAuthority,
 } from "../src/v012-source.js";
 
