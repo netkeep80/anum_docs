@@ -31,7 +31,9 @@
     "formalKernelSelfExtensionProven": false,
     "rootAspectSourceRemovalFalsifierComplete": true,
     "rootAspectSemanticSourceReconstructionMethodProven": true,
-    "formalKernelSelfExtensionFalsifierComplete": true
+    "formalKernelSelfExtensionFalsifierComplete": true,
+    "formalGenericExtensionApplicationResearchComplete": true,
+    "formalGenericExtensionSourceNamingComplete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -824,7 +826,12 @@
     "formalKernelSelfExtensionWitnessCount": 0,
     "rootAspectSourceRemovalPositiveVectorCount": 8,
     "rootAspectSourceRemovalNegativeControlCount": 3,
-    "formalKernelSelfExtensionAttemptCount": 4
+    "formalKernelSelfExtensionAttemptCount": 4,
+    "formalGenericExtensionPortableRuleCount": 3,
+    "formalGenericExtensionIndependentMemoryCount": 2,
+    "formalGenericExtensionHostFormSpecificBranchCount": 0,
+    "formalGenericExtensionNegativeControlCount": 3,
+    "formalGenericExtensionResultCardinalityCases": 3
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -867,17 +874,20 @@
     "formalKernelSelfExtensionWitnessCount": "Successful executable witnesses in which a previously unknown named FORMAL form is defined as MTS/Link evidence and then used in an independent Memory without adding host grammar/parser/evaluator semantic branches.",
     "rootAspectSourceRemovalPositiveVectorCount": "E2-F1 positive targets classified by the frozen portable Link-template authority without invoking/reimplementing the production root-aspect switch: four basis targets, U as an ordinary pair target, and three non-basis generic targets.",
     "rootAspectSourceRemovalNegativeControlCount": "E2-F1 negative authority controls: missing template admission, extra ordinary-pair admission causing ambiguity, and post-freeze live authority mutation distinguished by the frozen portable revision.",
-    "formalKernelSelfExtensionAttemptCount": "Independent F-KERNEL-SELF-EXTENSION executions: two Memories for a new physical name aliasing an existing structural operator plus two Memories for a new named semantic form outside the four admitted operator signs."
+    "formalKernelSelfExtensionAttemptCount": "Independent F-KERNEL-SELF-EXTENSION executions: two Memories for a new physical name aliasing an existing structural operator plus two Memories for a new named semantic form outside the four admitted operator signs.",
+    "formalGenericExtensionPortableRuleCount": "F2a Link-defined extension Rules carried by one frozen portable Theory and executed by the same generic research application kernel; current corpus has zero-, one- and many-valued Rules.",
+    "formalGenericExtensionIndependentMemoryCount": "Independent replay Memories in which the same portable extension authority is exercised without sender-local handles.",
+    "formalGenericExtensionHostFormSpecificBranchCount": "Per-extension semantic branches inside the F2a generic apply kernel. Zero means the kernel iterates admitted Rules, unifies the application template, and instantiates the result template without dispatching on an extension name/opcode.",
+    "formalGenericExtensionNegativeControlCount": "F2a fail-closed controls: unknown Use/no matching Rule, ambiguous frozen authority with two matching Rules, and post-freeze live Theory mutation ignored by the frozen selected Rule set.",
+    "formalGenericExtensionResultCardinalityCases": "Result cardinalities exercised through one generic kernel: zero values, one value and multiple values. The result is always the derived BundleValue surface; singleton bundle is not coerced to Link."
   },
   "nextExperiments": [
-    "FORMAL F2: derive the minimal missing self-extension operation from MTS-native evidence without adding a second ontology primitive. Separate name/definition authority, operator/application semantics and physical spelling; do not assume they are one operation.",
-    "FORMAL F2 must be RED-first: a new name/form plus interpretation rule must be portable across two Memories and consumed by an unchanged form-agnostic host kernel; storing the expected result in Links for host comparison is a failure.",
-    "Measure/falsify the residual generic E2 boundary exposed by E2-F1: self-incidence comparison, non-self-pole role extraction and generic structural unification.",
-    "Decide through RED-first evidence whether the E2-F1 Link-template reconstruction can replace the production root-aspect decomposition source without weakening existing v0.13 behavior.",
+    "FORMAL F2b: bind exact source/name -> Use through portable frozen MTS authority without canonicalByte or a host spelling switch; preserve aliases and canonical-representation policy as separate from semantic identity.",
+    "FORMAL F2c: extend generic result-template construction to cyclic/self-incidence forms without START/END-specific host branches and without collapsing BundleValue into LinkValue.",
+    "Rerun the full F-KERNEL-SELF-EXTENSION falsifier only after F2b/F2c; F2a alone does not upgrade it from RED.",
+    "Measure/falsify the residual generic E2 boundary: structural unification, role extraction, result-template carrier interpretation and generic template instantiation.",
     "Apply source-removal discipline to proof meta-semantics before any global SELF_GENERATED_OR_RECONSTRUCTED claim.",
-    "After E2 and FORMAL-kernel reconstruction experiments, audit E3 formation/admissibility authority separately; preserve the frozen-authority lesson that live adjacency is not admission.",
-    "After E3, audit E4 orchestration/fixed-point/scheduling/resource authority separately.",
-    "Refine host/Link duplication from candidate overlap to confirmed semantic-equivalence duplication."
+    "Audit E3 only after E2/FORMAL reconstruction work; preserve frozen authority and never equate live adjacency with admission."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -2236,6 +2246,73 @@
       "A10b demonstrates read-only self-template validation, not full FORMAL generation/materialization closure.",
       "The existing fixed prefix grammar is useful executable evidence but is not yet a self-extensible FORMAL kernel.",
       "No claim is made that naming/reference must be a new ontology primitive; the target is a derived Link role."
-    ]
+    ],
+    "genericExtensionF2a": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can one form-agnostic generic Link-rule application kernel execute previously unknown ordinary acyclic forms from frozen portable MTS/Link authority without adding a per-form host branch?",
+      "scope": [
+        "application semantics only",
+        "ordinary acyclic Link result templates",
+        "zero/one/many result cardinality through derived ValueBundle",
+        "portable frozen Theory authority",
+        "two independent Memories"
+      ],
+      "ruleShape": "StructuralRule(RoleDictionary, Pair(ApplicationTemplate, ExactSequence(ResultTemplates...))) admitted by frozen Theory; the ExactSequence is authority carrier only, not the semantic result",
+      "genericKernel": [
+        "freeze selected admitted Rules before candidate application construction",
+        "read RoleDictionary and Rule body structurally",
+        "treat body.start as ApplicationTemplate",
+        "read body.end only as an ExactSequence carrier of zero/one/many result templates",
+        "generic structural unification infers Role bindings from actual application",
+        "generic template instantiation replaces Roles and materializes each concrete result Link through ensure",
+        "project instantiated results through the accepted derived ValueBundle surface without singleton-to-Link coercion",
+        "require exactly one matching semantic Rule; multiple values inside that Rule are not authority ambiguity"
+      ],
+      "formSpecificHostBranchesExpected": 0,
+      "plannedPositiveExtensions": [
+        "ZERO: one-role application returns empty ValueBundle",
+        "ONE: one-role application returns singleton ValueBundle and proves {a} != a",
+        "MANY: two-role application returns two distinct values in one ValueBundle"
+      ],
+      "plannedNegativeControls": [
+        "unknown Use produces zero matching Rules and fails closed",
+        "two admitted semantic Rules competing for one application produce authority ambiguity and fail closed",
+        "post-freeze live Theory mutation cannot modify the frozen selected Rule set"
+      ],
+      "explicitNonClaims": [
+        "does not yet define source text/name -> Use inside FORMAL",
+        "does not yet transport Dictionary naming authority",
+        "does not yet materialize cyclic/self-incidence result templates",
+        "generic unification and generic template instantiation remain host semantic laws",
+        "ValueBundle projection remains the already accepted derived host surface",
+        "does not replace production v013 FORMAL evaluator",
+        "does not prove F-KERNEL-SELF-EXTENSION GREEN",
+        "does not prove FULL_SELF_HOSTED"
+      ],
+      "result": "GREEN: one unchanged form-agnostic research kernel executed three portable Link-defined Rules returning zero, one and multiple values as the accepted derived BundleValue surface across two independent replay Memories. The kernel has zero per-form/cardinality branches; singleton BundleValue remains distinct from LinkValue. Unknown Use fails closed, competing semantic Rules are rejected as authority ambiguity, and post-freeze live Theory mutation cannot alter the frozen selected Rule set.",
+      "authorClarification": "R/result is more general than a single Link and may return a bundle. F2a must preserve zero/one/many value cardinality rather than accidentally impose single-valued function semantics.",
+      "bundleBoundary": [
+        "ValueBundle is a derived structural value surface, not a new foundational ontology entity",
+        "result-template ExactSequence != semantic BundleValue",
+        "singleton BundleValue != LinkValue",
+        "multiple values from one selected Rule != multiple competing semantic Rules"
+      ],
+      "evidenceTest": "ts/test/research-v013-formal-generic-extension-f2a.test.ts",
+      "observed": {
+        "portableRules": 3,
+        "resultCardinality": [
+          "zero",
+          "one",
+          "many"
+        ],
+        "resultKind": "BundleValue",
+        "singletonBundleEqualsLink": false,
+        "independentMemories": 2,
+        "hostFormSpecificBranches": 0,
+        "negativeControls": 3,
+        "productionChanged": false
+      },
+      "consequence": "Per-form application semantics can be compressed to one generic Link-rule kernel for ordinary acyclic result templates without imposing single-valued function semantics. F2b source/name binding, cyclic/self-incidence result construction, and the E2 source authority of generic unification/instantiation remain open; F-KERNEL-SELF-EXTENSION stays RED overall."
+    }
   }
 }
