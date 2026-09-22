@@ -66,7 +66,7 @@
     "publicationAdmissionA13cComplete": true,
     "publicationAdmissionSourceRemovalProven": true,
     "publicationAdmissionSourceRemovalA13dComplete": true,
-    "selfGeneratedDefinitionAdmissionF5F1Complete": false,
+    "selfGeneratedDefinitionAdmissionF5F1Complete": true,
     "selfGeneratedDefinitionProven": false
   },
   "auditScope": {
@@ -3714,8 +3714,8 @@
       "consequence": "The admission-specific relation-shape law is replaced on this scoped path by the generic A11g proof-carrying two-role binding and method-orientation substrate. Publication admission therefore needs no independent root->candidate semantic primitive here. Global E3 remains open because generic proof-binding execution, method-role interpretation and authority/profile selection are still host-executed."
     },
     "selfGeneratedDefinitionF5F1": {
-      "status": "DESIGNED_NOT_EXECUTED",
-      "currentResult": "NOT_RUN",
+      "status": "EXECUTED_RED_CURRENT_ARCHITECTURE",
+      "currentResult": "RED current architecture: a previously absent definition-shaped candidate is generated after frozen authority selection by one name-agnostic generic Link constructor, and two independent replay Memories generate byte-identical canonical topology. The existing frozen exact-candidate admission successfully admits its old control candidate but rejects the new singleton generated candidate. A late live candidate-specific admission relation/witness remains invisible to frozen authority. The candidate becomes selectable only if selected authority is expanded after observing it, which is explicitly classified INVALID_SELF_APPROVAL.",
       "question": "Can the current frozen exact-candidate A13d admission authority authorize a genuinely new definition candidate generated only after freeze?",
       "generatedCandidate": [
         "portable request is Link-carried before freeze",
@@ -3745,17 +3745,17 @@
         "only after such E3 capability can F5 attempt full F4-compatible generated authority publication"
       ],
       "observed": {
-        "oldControlAdmitted": null,
-        "newCandidateGenerated": null,
-        "frozenNewCandidateAdmission": null,
-        "lateAmbientAdmissionIgnored": null,
-        "expandedAuthorityWouldAccept": null,
-        "invalidSelfApprovalClassified": null,
+        "oldControlAdmitted": true,
+        "newCandidateGenerated": true,
+        "frozenNewCandidateAdmission": "REJECTED",
+        "lateAmbientAdmissionIgnored": true,
+        "expandedAuthorityWouldAccept": true,
+        "invalidSelfApprovalClassified": true,
         "independentMemories": 2,
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-self-generated-admission-f5-f1.test.ts",
-      "consequence": "Pending execution. Expected RED current architecture: candidate construction can occur after freeze, but exact-candidate admission cannot independently authorize the unknown generated candidate."
+      "consequence": "F5 cannot be GREEN under exact-candidate admission alone. SELF_EXTENSIBLE remains GREEN, runtime candidate construction is demonstrated, but SELF_ADMISSIBILITY for candidates unknown at freeze time is missing. The next required E3 capability is a frozen generic formation/admissibility law over candidate structure, represented/reconstructed from MTS evidence rather than candidate identity or host isValidDefinition logic."
     }
   }
 }
