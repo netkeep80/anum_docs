@@ -85,7 +85,9 @@
     "sourceCorrespondenceDerivationF5F7Complete": true,
     "externalPrefixSequencePreparationRemoved": true,
     "templateSelectionConvergenceF5F8Complete": true,
-    "hostSelectedTemplateHandleRemoved": true
+    "hostSelectedTemplateHandleRemoved": true,
+    "contextualTruthDynamicDualityA16Designed": true,
+    "contextualTruthDynamicDualityA16Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1040,7 +1042,14 @@
     "templateSelectionConvergenceF5F8SuccessfulInstantiationCount": 2,
     "templateSelectionConvergenceF5F8DistinctPublicationCount": 1,
     "templateSelectionConvergenceF5F8HostTemplateIdentityBranchCount": 0,
-    "templateSelectionConvergenceF5F8IndependentMemoryCount": 2
+    "templateSelectionConvergenceF5F8IndependentMemoryCount": 2,
+    "contextualTruthDynamicDualityA16ResultCardinalityCases": 3,
+    "contextualTruthDynamicDualityA16AmbientUnselectedRuleFires": 0,
+    "contextualTruthDynamicDualityA16UnlinkedAntecedentFires": 0,
+    "contextualTruthDynamicDualityA16ConvergenceDistinctTruthLinkCount": 1,
+    "contextualTruthDynamicDualityA16ConvergenceOccurrenceCount": 2,
+    "contextualTruthDynamicDualityA16HostSemanticPrimitiveCount": 0,
+    "contextualTruthDynamicDualityA16IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1245,9 +1254,18 @@
     "templateSelectionConvergenceF5F8SuccessfulInstantiationCount": "Frontier templates that independently instantiate toward the same selected target request and pass F5-F2 admission/name-resolution checks.",
     "templateSelectionConvergenceF5F8DistinctPublicationCount": "Distinct target publication Link identities after all compatible templates instantiate in one Memory. One is extensional convergence.",
     "templateSelectionConvergenceF5F8HostTemplateIdentityBranchCount": "q/s/template-identity-specific branches in the generic frontier runner. Target zero.",
-    "templateSelectionConvergenceF5F8IndependentMemoryCount": "Independent Memories replaying the full template frontier and required to obtain byte-identical topology."
+    "templateSelectionConvergenceF5F8IndependentMemoryCount": "Independent Memories replaying the full template frontier and required to obtain byte-identical topology.",
+    "contextualTruthDynamicDualityA16ResultCardinalityCases": "A16 contextual detachment cardinalities exercised by one Link-composition kernel: ZERO, ONE and MANY.",
+    "contextualTruthDynamicDualityA16AmbientUnselectedRuleFires": "A16 physically present but unselected A->B continuations that propagated contextual truth. Target zero.",
+    "contextualTruthDynamicDualityA16UnlinkedAntecedentFires": "A16 selected A->B continuations that fired without a selected current-context K->A truth witness. Target zero.",
+    "contextualTruthDynamicDualityA16ConvergenceDistinctTruthLinkCount": "A16 extensional contextual truth Links after two independent K->A/K->C proof paths converge on one consequent B.",
+    "contextualTruthDynamicDualityA16ConvergenceOccurrenceCount": "A16 provenance occurrences retained when two proof paths converge on the same canonical K->B truth Link.",
+    "contextualTruthDynamicDualityA16HostSemanticPrimitiveCount": "Host active/isTrue/modusPonens/direction-switch/find/outgoing/incoming semantic primitives used inside the A16 propagation kernel. Target zero.",
+    "contextualTruthDynamicDualityA16IndependentMemoryCount": "Independent Memories in which the same contextual-linkage detachment behavior is reproduced."
   },
   "nextExperiments": [
+    "A16-F1: integrate contextual truth propagation with the existing A12/A13 frontier model. Replace the host notion of a current value/active state with explicit K->A truth Links and require the same fan-out, local termination, convergence and provenance behavior through the A16 composition law.",
+    "A16-F1 must preserve selected-authority isolation: physical but unselected Links must remain semantically inert, and newly derived K->B truth Links may enter only the explicit next execution frontier.",
     "F5-F9: remove per-template externally materialized requestCorrespondence Links. Given each template package's request and one selected target request, derive the correspondence locally by generic equal-length ExactSequence pairing; require the same two-template convergence and exact reference topology.",
     "F5-F9 must treat any temporary correspondence carrier as non-semantic execution scratch or avoid materializing it entirely; it must not become a hidden replacement for the removed authority.",
     "After per-template correspondence removal, attack external frontier membership: discover admissible closure-complete template packages from a frozen authority set/signature rather than supplying the candidate frontier manually.",
@@ -4304,6 +4322,59 @@
         "externalTargetRequestSelection": true,
         "externalRequestCorrespondence": true,
         "semanticInformationEliminated": false,
+        "productionChanged": false
+      }
+    },
+    "contextualTruthDynamicDualityA16": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can MTS truth be represented literally as current-context linkage K->A (TRUE=L), with directed duality executing contextual detachment K->A plus A->B => K->B, including ZERO/ONE/MANY branching, without a host active/true/modusPonens primitive?",
+      "authorClarification": [
+        "TRUE is L",
+        "A is true in current execution context K means literally that K is linked with A",
+        "existence of A somewhere in Memory is not contextual truth",
+        "directed duality is dynamic: it propagates current-context linkage through a directed Link"
+      ],
+      "executionLaw": [
+        "freeze/select Link authority before each semantic step",
+        "for every selected contextual Link K->A, match every selected Link A->B by pole identity",
+        "materialize K->B as the propagated contextual-truth witness",
+        "return all propagated truth witnesses as one BundleValue",
+        "repeat with newly derived contextual Links only through an explicit next selected step"
+      ],
+      "oracle": [
+        "K->A with no selected A->B gives ZERO",
+        "K->A plus one selected A->B gives exactly K->B",
+        "K->A plus multiple selected A->Bi gives MANY contextual truth Links",
+        "ambient but unselected A->B must not fire",
+        "selected A->B without K->A must not fire",
+        "two independent K->A/K->C paths converging on B yield one extensional K->B Link with two provenance occurrences",
+        "a newly derived K->B can propagate through B->C on the next selected step",
+        "same behavior must reproduce in two independent Memories"
+      ],
+      "antiCheat": [
+        "dynamic kernel must contain no active(), isTrue, modusPonens, basis-specific branch, switch, find, incoming or outgoing semantic primitive",
+        "kernel composes only selected Links by generic pole identity and Memory.ensure",
+        "production runtime remains unchanged"
+      ],
+      "evidenceTest": "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
+      "claimBoundary": [
+        "this gate tests the author's contextual truth/dynamic-duality semantics; it does not accept v0.13",
+        "selected authority remains explicit; ambient Memory is not semantic authority",
+        "the gate does not claim global E2/E3/E4 closure or FULL_SELF_HOSTED",
+        "A11e already carries direct/inverse method orientation; A16 tests the direct contextual propagation consequence",
+        "physical concurrency is not part of this gate"
+      ],
+      "consequence": "A16 gives executable support to the author's clarification TRUE=L at the operational level: contextual truth is carried by K->A and directed duality propagates that linkage by generic relational composition. ONE is the ordinary modus-ponens-shaped case; ZERO/MANY are native cardinality cases of the same law. Ambient physical Memory is not authority, convergence canonicalizes K->B identity while preserving proof-path occurrences, and recursive propagation needs no host active/true/modusPonens predicate.",
+      "currentResult": "GREEN: one branch-free kernel composes selected Links by pole identity. K->A with no selected continuation yields ZERO; K->A plus A->B materializes and returns K->B; multiple A->Bi yield multiple contextual truth Links; an ambient unselected A->B and a selected rule with no contextual K->A do not fire. Two distinct contextual antecedent paths converging on B produce one extensional K->B Link with two provenance occurrences. A newly derived K->B participates in the next selected step and propagates through B->C. The same behavior reproduces in two independent Memories, and the guarded kernel contains zero host active/isTrue/modusPonens/basis-direction/find/outgoing/incoming semantic primitives.",
+      "observed": {
+        "resultCardinalityCases": 3,
+        "ambientUnselectedRuleFires": 0,
+        "unlinkedAntecedentFires": 0,
+        "convergenceDistinctTruthLinks": 1,
+        "convergenceProvenanceOccurrences": 2,
+        "recursivePropagation": true,
+        "hostSemanticPrimitives": 0,
+        "independentMemories": 2,
         "productionChanged": false
       }
     }
