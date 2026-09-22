@@ -52,7 +52,8 @@
     "aspectApplicationProofCarryingUnifiedContinuationResearchComplete": true,
     "formalIntegratedNameAspectProofBindingResearchComplete": true,
     "formalSourceGroupingResearchComplete": true,
-    "formalKernelSelfExtensionF4ResearchComplete": true
+    "formalKernelSelfExtensionF4ResearchComplete": true,
+    "formalFixedEvaluatorLawReassessmentAfterF4Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -912,7 +913,12 @@
     "formalKernelSelfExtensionF4HostFormSpecificBranchCount": 0,
     "formalKernelSelfExtensionF4IndependentMemoryCount": 2,
     "formalKernelSelfExtensionF4BehaviorCardinalityCases": 2,
-    "formalKernelSelfExtensionF4NegativeControlCount": 3
+    "formalKernelSelfExtensionF4NegativeControlCount": 3,
+    "formalFixedEvaluatorHostDefinedLawCount": 3,
+    "formalGenericReceiverFixedEvaluatorDependencyCount": 0,
+    "formalGenericPathReplacedFixedLawCount": 2,
+    "formalGenericPathBypassedNotReplacedFixedLawCount": 1,
+    "formalSelfGenerationResidualLawCount": 1
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1022,13 +1028,18 @@
     "formalKernelSelfExtensionF4HostFormSpecificBranchCount": "Per-name/per-form semantic branches in the F4 receiver kernel. Target is zero.",
     "formalKernelSelfExtensionF4IndependentMemoryCount": "Independent replay Memories executing the same portable self-extension authority.",
     "formalKernelSelfExtensionF4BehaviorCardinalityCases": "Distinct result cardinalities intentionally assigned to unknown functions in F4 to falsify hidden per-form dispatch.",
-    "formalKernelSelfExtensionF4NegativeControlCount": "F4 malformed/forged authority controls rejected fail-closed: cross-source grouping, application-target substitution, and reversed proof-binding values."
+    "formalKernelSelfExtensionF4NegativeControlCount": "F4 malformed/forged authority controls rejected fail-closed: cross-source grouping, application-target substitution, and reversed proof-binding values.",
+    "formalFixedEvaluatorHostDefinedLawCount": "Production fixed-evaluator FORMAL law families still classified HOST_DEFINED after F4. This remains three because production is unchanged.",
+    "formalGenericReceiverFixedEvaluatorDependencyCount": "F4 generic receiver dependencies on operatorAspect, parsePlan/samePlan/verifyCanonicalPlan, or materializePlan. Zero.",
+    "formalGenericPathReplacedFixedLawCount": "Fixed-evaluator law families for which the generic research path now has positive Link-authority replacement evidence: operator grounding and source/application composition.",
+    "formalGenericPathBypassedNotReplacedFixedLawCount": "Fixed-evaluator law families bypassed by generic receiver execution but not yet replaced as producer/self-generation authority: plan materialization.",
+    "formalSelfGenerationResidualLawCount": "Remaining fixed-evaluator-equivalent FORMAL law family whose producer authority is not reconstructed by F4: materialization/definition generation."
   },
   "nextExperiments": [
-    "Audit the three HOST_DEFINED fixed-evaluator FORMAL law families against F4 and classify each as still required, bypassed, or redundant on the generic research path; do not change production classification without an executable replacement witness.",
-    "Measure/classify exact STRING materialization, source segmentation, Dictionary lookup and Grammar/source replay as the remaining FORMAL E2 authority boundary.",
-    "F5 SELF_GENERATED-DEFINITION: under frozen authority, make MTS construct/admit a new portable function-name/grouping/behavior definition that a second Memory can execute through the F4 kernel; externally prebuilt definition evidence is not sufficient.",
-    "After F5, rerun the strong self-description/self-proof boundary and apply the same mechanism to proof meta-semantics.",
+    "F5 SELF_GENERATED-DEFINITION: make MTS, under frozen authority, construct/admit a previously unknown function name plus grouping/behavior definition that a second Memory executes through F4; externally prebuilt definition Links are forbidden as the final authority.",
+    "Measure/classify exact STRING materialization, source segmentation, Dictionary lookup and Grammar/source replay as remaining generic FORMAL E2 services; distinguish representation services from semantic authority.",
+    "Only after F5 reassess whether formal-plan-materialization-law can move from BYPASSED_NOT_REPLACED_FOR_PRODUCER to LINK_GENERATED/RECONSTRUCTED on a scoped path.",
+    "Then apply the same proof-carrying/aspect mechanism to proof meta-semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims.",
     "Audit E3 formation/admissibility and E4 orchestration separately; v0.13 acceptance remains blocked."
   ],
   "measurement": {
@@ -3282,6 +3293,63 @@
         "productionChanged": false
       },
       "consequence": "The generic research kernel is self-extensible with respect to externally supplied portable Link definitions: previously unknown function names/forms and different behavior require no new host semantic branch. This is SELF_EXTENSIBLE evidence, not SELF_GENERATED evidence. The fixed production FORMAL evaluator remains historically RED and unchanged."
+    },
+    "fixedEvaluatorLawReassessmentAfterF4": {
+      "status": "EXECUTED_GREEN_CLASSIFICATION_AUDIT",
+      "fixedProductionClassificationUnchanged": true,
+      "families": [
+        {
+          "id": "formal-operator-grounding-law",
+          "productionClassification": "HOST_DEFINED",
+          "genericPathClassification": "REPLACED_FOR_GENERIC_RECEIVER",
+          "replacementEvidence": [
+            "portable Dictionary resolves arbitrary physical function names to arbitrary non-basis semantic Links",
+            "proof-carrying binding verifies the selected application Link without operatorAspect/root-representative gating",
+            "F4 executes two unknown functions under one receiver with zero form-specific branches"
+          ],
+          "residual": [
+            "exact STRING materialization and Dictionary lookup remain host services",
+            "this does not remove the production operatorAspect implementation"
+          ]
+        },
+        {
+          "id": "formal-prefix-composition-law",
+          "productionClassification": "HOST_DEFINED",
+          "genericPathClassification": "REPLACED_FOR_GENERIC_RECEIVER",
+          "replacementEvidence": [
+            "F3/F4 grouping is explicit Link evidence bound to exact source formSequence",
+            "physical parentheses have zero direct semantic authority",
+            "proof-carrying binding verifies grouped F⟼A target",
+            "generic receiver uses no parsePlan/samePlan/verifyCanonicalPlan"
+          ],
+          "residual": [
+            "physical byte spans/source segmentation remain representation-side host metadata",
+            "Grammar/source replay remain host services"
+          ]
+        },
+        {
+          "id": "formal-plan-materialization-law",
+          "productionClassification": "HOST_DEFINED",
+          "genericPathClassification": "BYPASSED_NOT_REPLACED_FOR_PRODUCER",
+          "replacementEvidence": [
+            "F4 receiver consumes already-portable application/continuation/definition Links without materializePlan"
+          ],
+          "residual": [
+            "F4 sender/fixture externally constructs Dictionary/grouping/application/continuation authority",
+            "MTS has not yet generated/admitted a new function definition under frozen rules",
+            "SELF_EXTENSIBLE is GREEN but SELF_GENERATED remains open"
+          ]
+        }
+      ],
+      "observed": {
+        "productionHostDefinedFamilies": 3,
+        "genericReceiverDependenciesOnFixedEvaluatorFamilies": 0,
+        "genericReceiverReplacedFamilies": 2,
+        "bypassedNotProducerReplacedFamilies": 1,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-formal-law-reassessment-f4a.test.ts",
+      "consequence": "F4 does not justify changing production authority-family classifications. It does show that fixed operator grounding and fixed prefix composition are no longer necessary for the generic receiver path. The remaining foundational FORMAL gap is producer/self-generation authority: creating/admitting equivalent Link definitions without externally prebuilding them."
     }
   }
 }
