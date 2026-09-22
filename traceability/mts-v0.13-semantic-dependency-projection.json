@@ -76,7 +76,9 @@
     "selfGeneratedDefinitionF5F3Complete": true,
     "selfGeneratedFullF4AuthorityProven": true,
     "genericConstructionPlanF5F4Complete": true,
-    "genericConstructionRuntimeDomainSourceRemovalProven": true
+    "genericConstructionRuntimeDomainSourceRemovalProven": true,
+    "templateInstantiationF5F5Complete": false,
+    "externalConstructionPlanCompilerRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1005,7 +1007,13 @@
     "genericConstructionPlanF5F4StartSelfEnsureCount": 22,
     "genericConstructionPlanF5F4EndSelfEnsureCount": 0,
     "genericConstructionPlanF5F4DomainSpecificConstructorBranchCount": 0,
-    "genericConstructionPlanF5F4IndependentMemoryCount": 2
+    "genericConstructionPlanF5F4IndependentMemoryCount": 2,
+    "templateInstantiationF5F5MappedSeedCount": null,
+    "templateInstantiationF5F5OrdinaryCloneCount": null,
+    "templateInstantiationF5F5StartSelfCloneCount": null,
+    "templateInstantiationF5F5EndSelfCloneCount": null,
+    "templateInstantiationF5F5FullSelfCloneCount": null,
+    "templateInstantiationF5F5IndependentMemoryCount": null
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1184,7 +1192,13 @@
     "genericConstructionPlanF5F4StartSelfEnsureCount": "F5-F4 constraints whose target role equals start role and therefore use generic START self-closed materialization.",
     "genericConstructionPlanF5F4EndSelfEnsureCount": "F5-F4 constraints whose target role equals end role and therefore use generic END self-closed materialization.",
     "genericConstructionPlanF5F4DomainSpecificConstructorBranchCount": "Dictionary/Source/Grouping/Function/Application/Continuation/Witness/Publication-specific branches in the runtime construction-plan interpreter. Target zero.",
-    "genericConstructionPlanF5F4IndependentMemoryCount": "Independent replay Memories executing the same frozen constructive plan and required to produce byte-identical canonical topology."
+    "genericConstructionPlanF5F4IndependentMemoryCount": "Independent replay Memories executing the same frozen constructive plan and required to produce byte-identical canonical topology.",
+    "templateInstantiationF5F5MappedSeedCount": "Number of template Link identities mapped during F5-F5 instantiation, including explicit frozen seed correspondences plus recursively reconstructed template Links.",
+    "templateInstantiationF5F5OrdinaryCloneCount": "Template Links instantiated by generic ensure(start,end).",
+    "templateInstantiationF5F5StartSelfCloneCount": "Template Links instantiated by generic START self-closure detected only from source Link self-incidence.",
+    "templateInstantiationF5F5EndSelfCloneCount": "Template Links instantiated by generic END self-closure detected only from source Link self-incidence.",
+    "templateInstantiationF5F5FullSelfCloneCount": "Template Links instantiated as full self-closure/root detected only from source Link self-incidence.",
+    "templateInstantiationF5F5IndependentMemoryCount": "Independent fresh Memories instantiating the same admitted template and frozen seed correspondences."
   },
   "nextExperiments": [
     "F5-F5: falsify/remove the external construction-plan source. The 97-equation F5-F4 plan must be generated or reconstructed from more primitive frozen MTS evidence without running the domain-specific F5-F3 reference producer as a compiler.",
@@ -4015,6 +4029,42 @@
         "semanticInformationReduced": false,
         "productionChanged": false
       }
+    },
+    "templateInstantiationF5F5": {
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Can the external F5-F4 97-equation plan compiler be removed by using one already-admitted Link-native generated authority itself as the constructive template for a new named function?",
+      "setup": [
+        "build and admit/publish one ordinary F5-F3-style q(a) authority before the target freeze",
+        "prepare a distinct future r(a) request whose function Link and Dictionary name authority do not yet exist",
+        "freeze q publication plus Link-carried q->r seed correspondences",
+        "include source-prefix correspondences required because physical q/r STRING carriers differ structurally",
+        "do not freeze any 97-equation constructive plan"
+      ],
+      "genericInstantiationLaw": [
+        "if a template Link has an explicit seed mapping, return the mapped target Link",
+        "otherwise read only its poles",
+        "ordinary Link -> recursively instantiate start/end then ensure(start,end)",
+        "START-self Link -> recursively instantiate end then ensureStartSelfClosed(end)",
+        "END-self Link -> recursively instantiate start then ensureEndSelfClosed(start)",
+        "full-self Link -> ensureRoot()",
+        "memoize source-Link -> target-Link identity"
+      ],
+      "oracle": [
+        "from the same frozen artifact, independently run the known F5-F3 domain reference producer for r(a)",
+        "require the complete canonical topology of generic template instantiation to equal the reference topology byte-for-byte",
+        "require the cloned candidate to pass frozen F5-F2 admission",
+        "require the cloned final Dictionary to resolve r to the cloned candidate function"
+      ],
+      "negativeControl": "remove one explicitly required seed binding while keeping the required-seed set frozen; generic instantiation must reject before cloning",
+      "claimBoundary": [
+        "the 97-equation external plan source is absent on the tested path",
+        "one existing admitted template authority remains externally selected",
+        "seed correspondences, including q/r source-prefix correspondences, remain externally prepared",
+        "therefore semantic information is reused/reconstructed from a Link-native exemplar but is not claimed eliminated",
+        "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
+      ],
+      "evidenceTest": "ts/test/research-v013-template-instantiation-f5-f5.test.ts",
+      "consequence": "Pending CI. GREEN would replace the explicit constructive-plan compiler with generic Link-topology instantiation and move the remaining source question to template selection and seed-correspondence authority."
     }
   }
 }
