@@ -45,7 +45,8 @@
     "aspectApplicationUnifierSliceAuditComplete": true,
     "aspectApplicationUnifierSourceRemovalProven": false,
     "aspectApplicationUnifiedContinuationResearchComplete": true,
-    "aspectApplicationUnifierDenialFalsifierComplete": true
+    "aspectApplicationUnifierDenialFalsifierComplete": true,
+    "formalIntegratedNameAspectApplicationResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -878,7 +879,12 @@
     "aspectUnifiedContinuationResultCardinalityCases": 3,
     "aspectUnifiedContinuationIndependentMemoryCount": 2,
     "aspectUnifierDeniedAlternativeHostMatcherCount": 2,
-    "aspectUnifierDeniedSuccessfulNativeBindingWitnessCount": 0
+    "aspectUnifierDeniedSuccessfulNativeBindingWitnessCount": 0,
+    "formalIntegratedPhysicalNameCount": 5,
+    "formalIntegratedAliasCount": 2,
+    "formalIntegratedResultCardinality": 2,
+    "formalIntegratedIndependentMemoryCount": 2,
+    "formalIntegratedNameOrFormSpecificHostBranchCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -961,14 +967,19 @@
     "aspectUnifiedContinuationResultCardinalityCases": "A11h result cardinalities observed through one kernel across ordinary and self-incidence cases: zero, one and many.",
     "aspectUnifiedContinuationIndependentMemoryCount": "Independent Memories in which the same unified continuation law reproduces ordinary and self-incidence results.",
     "aspectUnifierDeniedAlternativeHostMatcherCount": "A11G-F1 known substitute paths that still retain equivalent host matching semantics: structural Rule replay/matching and StructuralRoleMorphism verification.",
-    "aspectUnifierDeniedSuccessfulNativeBindingWitnessCount": "A11G-F1 successful portable MTS-native two-role binding witnesses after structural-unification denial. Zero in the current architecture."
+    "aspectUnifierDeniedSuccessfulNativeBindingWitnessCount": "A11G-F1 successful portable MTS-native two-role binding witnesses after structural-unification denial. Zero in the current architecture.",
+    "formalIntegratedPhysicalNameCount": "F2c-integrated exact STRING names in one portable selected authority: f, dup, a, b1, b2.",
+    "formalIntegratedAliasCount": "Physical function names f and dup that resolve through frozen Dictionary topology to one semantic function Link.",
+    "formalIntegratedResultCardinality": "Result count of the selected f(a) application in the integrated naming + A11h continuation witness.",
+    "formalIntegratedIndependentMemoryCount": "Independent replay Memories executing the same portable combined Dictionary/continuation authority.",
+    "formalIntegratedNameOrFormSpecificHostBranchCount": "Per-name/per-function semantic branches in the integrated resolver+continuation kernel. Zero."
   },
   "nextExperiments": [
-    "A11g-F2: design the missing portable MTS-native two-role binding artifact/law itself. It must not be a precomputed binding table and must reject forged/reversed/collapsed evidence.",
-    "In parallel but without claiming closure, integrate F2b physical naming with A11h unified continuation semantics to test the full source-name -> Link-application -> BundleValue path.",
-    "After an A11g-F2 candidate exists, rerun A11G-F1 denial and require a GREEN two-Memory witness before semantic-closure claims.",
-    "Then rerun F-KERNEL-SELF-EXTENSION and reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization.",
-    "E3/E4 remain separate and open."
+    "A11g-F2 remains the foundation priority: design a portable MTS-native two-role binding law and rerun A11G-F1 until structural-unification denial is GREEN without equivalent host matching.",
+    "FORMAL F3: put argument/application grouping itself into portable FORMAL/MTS evidence so the source can express f(a) rather than the test selecting f and a as two source names externally.",
+    "After A11g-F2 and F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
+    "Reassess the three host-defined FORMAL law families; remove any family made redundant by Dictionary + aspect/application evidence.",
+    "Then apply the same aspect/application mechanism to proof semantics before any FULL_SELF_HOSTED claim; E3/E4 remain open."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -2873,6 +2884,58 @@
       },
       "evidenceTest": "ts/test/research-v013-unified-continuation-a11h.test.ts",
       "consequence": "A11h removes the architectural need for one evaluator for ordinary application and another for four self-incidence aspects. Explicit P⟼b continuations and intrinsic self-continuation are two cases of the same selected method-oriented Link law. Remaining closure is concentrated in the tiny A11g unifier/method semantic source."
+    },
+    "integratedNameAspectApplicationF2c": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can an exact physical FORMAL name resolve through portable Dictionary Link authority to a semantic function Link, combine with a named argument, and execute through the A11h aspect/continuation law to a BundleValue without canonicalByte or per-form host dispatch?",
+      "portableAuthority": [
+        "one pole-closed canonical Link topology",
+        "frozen Dictionary coordinate",
+        "frozen selected continuation-candidate coordinates",
+        "no sender-local LinkHandle crosses transport"
+      ],
+      "positiveFlow": [
+        "physical name f -> Dictionary -> semantic function F",
+        "physical alias dup -> same exact F",
+        "physical name a -> semantic argument A",
+        "ordinary Link application P=F⟼A",
+        "selected continuation Links P⟼b1 and P⟼b2",
+        "A11h direct method -> BundleValue {b1,b2}",
+        "physical names b1/b2 independently resolve to the same result Links"
+      ],
+      "controls": [
+        "unknown physical name receives no semantic Use",
+        "known source carriers are already present in frozen authority and resolve without semantic mutation",
+        "f and dup construct/reuse the same application Link and produce the same result bundle",
+        "two independently built source Memories with unrelated noise export byte-identical authority"
+      ],
+      "eliminatedFromFixedFormalPath": [
+        "no canonicalByte name spelling switch",
+        "no operatorAspect four-sign-only gate",
+        "no per-form parsePlan branch",
+        "no per-name/per-function host semantic branch"
+      ],
+      "explicitNonClaims": [
+        "exact STRING materialization and Dictionary lookup remain host laws",
+        "A11h generic structural unification remains host semantic source and A11G-F1 is RED",
+        "candidate selection/frozen authority framing remains external",
+        "this is not yet a general textual grammar/parser for arbitrary argument grouping",
+        "does not replace production v0.13 FORMAL evaluator",
+        "does not make F-KERNEL-SELF-EXTENSION GREEN",
+        "does not prove FULL_SELF_HOSTED"
+      ],
+      "observed": {
+        "physicalNames": 5,
+        "functionAliases": 2,
+        "resultCardinality": 2,
+        "resultKind": "BundleValue",
+        "independentMemories": 2,
+        "nameOrFormSpecificHostBranches": 0,
+        "canonicalByteUsed": false,
+        "productionChanged": false
+      },
+      "evidenceTest": "ts/test/research-v013-formal-name-aspect-integration-f2c.test.ts",
+      "consequence": "A previously unknown physical name can now travel end-to-end through exact STRING -> portable Dictionary -> semantic Link -> ordinary Link application -> aspect-derived frozen continuation -> BundleValue without the fixed production FORMAL spelling/operator switch. The remaining hard semantic blocker is no longer name binding but A11G-F1's MTS-native two-role binding law plus later grammar/source composition."
     }
   }
 }
