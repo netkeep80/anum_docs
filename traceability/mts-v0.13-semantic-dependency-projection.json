@@ -112,7 +112,8 @@
     "metaTransitionAuthorityA23Complete": true,
     "selfGeneratedMetaProducerAuthorityA24Designed": true,
     "selfGeneratedMetaProducerAuthorityA24Complete": true,
-    "metaAuthorityTemplateInstantiationA25Designed": true
+    "metaAuthorityTemplateInstantiationA25Designed": true,
+    "metaAuthorityTemplateInstantiationA25Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1144,7 +1145,13 @@
     "selfGeneratedMetaProducerAuthorityA24ExplicitPublicationCount": 1,
     "selfGeneratedMetaProducerAuthorityA24RuntimeConsumerChanged": 0,
     "selfGeneratedMetaProducerAuthorityA24ForgedAuthorityAccepted": 0,
-    "selfGeneratedMetaProducerAuthorityA24IndependentMemoryCount": 2
+    "selfGeneratedMetaProducerAuthorityA24IndependentMemoryCount": 2,
+    "metaAuthorityTemplateInstantiationA25TargetPositionalRequestCount": 0,
+    "metaAuthorityTemplateInstantiationA25SequenceCorrespondenceSourceCount": 1,
+    "metaAuthorityTemplateInstantiationA25DerivedSeedMappingCount": 7,
+    "metaAuthorityTemplateInstantiationA25ExternalTemplateSelectionCount": 1,
+    "metaAuthorityTemplateInstantiationA25ExternalSequenceCorrespondenceCount": 1,
+    "metaAuthorityTemplateInstantiationA25IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1426,12 +1433,18 @@
     "selfGeneratedMetaProducerAuthorityA24ExplicitPublicationCount": "Checked Candidate->M publications produced after frozen structural admission. Target one.",
     "selfGeneratedMetaProducerAuthorityA24RuntimeConsumerChanged": "Semantic source changes between A23 metaStep and the A24 consumer copy after whitespace normalization. Target zero.",
     "selfGeneratedMetaProducerAuthorityA24ForgedAuthorityAccepted": "Forged producer-authority candidates accepted/published by the frozen structural path. Target zero.",
-    "selfGeneratedMetaProducerAuthorityA24IndependentMemoryCount": "Independent Memories reproducing the post-freeze generation/admission/publication/execution behavior."
+    "selfGeneratedMetaProducerAuthorityA24IndependentMemoryCount": "Independent Memories reproducing the post-freeze generation/admission/publication/execution behavior.",
+    "metaAuthorityTemplateInstantiationA25TargetPositionalRequestCount": "Explicit A24-style target positional generation requests consumed by A25. Target zero.",
+    "metaAuthorityTemplateInstantiationA25SequenceCorrespondenceSourceCount": "Link-native source-seed -> target-seed sequence correspondences consumed by A25. Current scoped result one.",
+    "metaAuthorityTemplateInstantiationA25DerivedSeedMappingCount": "Seed mappings available to generic topology instantiation including R->R plus six zipped source/target seed positions.",
+    "metaAuthorityTemplateInstantiationA25ExternalTemplateSelectionCount": "Externally selected source producer-authority templates in A25. Current residual one.",
+    "metaAuthorityTemplateInstantiationA25ExternalSequenceCorrespondenceCount": "Externally selected source/target seed sequence correspondences in A25. Current residual one.",
+    "metaAuthorityTemplateInstantiationA25IndependentMemoryCount": "Independent Memories reproducing A25 template instantiation/admission/publication/runtime behavior."
   },
   "nextExperiments": [
-    "A25: execute producer-authority template instantiation from one source authority plus one Link-native seed-sequence correspondence, with no target positional generation request.",
-    "If A25 is GREEN, A26 should remove host selection of one source producer-authority template by running a compatible template frontier and requiring convergence to one target publication, following F5-F8.",
-    "A25 must preserve frozen structural admission, explicit publication, unchanged A23 metaStep and malformed-correspondence rejection.",
+    "A26: remove host selection of one source producer-authority exemplar. Freeze at least two independently valid compatible source templates, instantiate all through their Link-carried target correspondences, and require convergence to one target publication with no template-identity branch.",
+    "A26 must keep per-template correspondence authority explicit unless separately derived; the target is exemplar-selection removal, not a false claim of full source elimination.",
+    "If A26 is GREEN, attack external template-frontier membership / correspondence selection using the same structural-discovery boundary exposed by F5-F8.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
     "A24 should test whether a producer authority absent at freeze can be generated after freeze from Link-carried generic construction/template evidence, structurally admitted and explicitly published, then consumed unchanged by A23.",
     "After A23, reconnect recursive execution transition production with F5 self-generated authority/template convergence and reassess E2/E3.",
@@ -5318,7 +5331,7 @@
       }
     },
     "metaAuthorityTemplateInstantiationA25": {
-      "status": "DESIGNED_PENDING_EXECUTION",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A24's explicit positional target generation request MetaParent,E0..E4 be removed by instantiating producer authority from one already-admitted source template using only one Link-native equal-length seed-sequence correspondence?",
       "setup": [
         "build two independent but behaviorally analogous execution families source and target",
@@ -5362,7 +5375,25 @@
         "this gate does not accept v0.13",
         "global E2/E3 and FULL_SELF_HOSTED remain open",
         "production runtime remains unchanged"
-      ]
+      ],
+      "consequence": "A25 removes A24's explicit target positional generation-request schema from the tested meta-authority path. One already-admitted/published source producer-authority candidate plus one Link-native equal-length source-seed->target-seed sequence correspondence is sufficient for a generic pole/self-incidence topology instantiator to reconstruct the target producer-authority candidate. The target candidate passes the same frozen structural rule, is explicitly published, and is consumed by the exact unchanged A23 metaStep. Source-template selection and the sequence correspondence remain external semantic authority.",
+      "currentResult": "GREEN: target E0->E1 producer authority is absent at freeze and no A24-style target positional request is used. One Link-native sequence correspondence yields seven seed mappings (R->R plus six zipped positions). Generic recursive topology instantiation reconstructs the target candidate; frozen structural admission and explicit publication succeed; the unchanged A23 metaStep advances target E0..E4 and then ZERO. Unequal sequence cardinality rejects fail-closed. Two independent Memories agree. External source-template selection and one sequence correspondence remain, so semantic-information elimination is not claimed.",
+      "observed": {
+        "targetPositionalGenerationRequest": "REMOVED",
+        "sequenceCorrespondenceSources": 1,
+        "derivedSeedMappings": 7,
+        "targetAuthorityAbsentAtFreeze": true,
+        "genericTopologyInstantiation": "GREEN",
+        "frozenStructuralAdmission": "GREEN",
+        "explicitPublication": true,
+        "unchangedA23MetaStep": true,
+        "malformedCorrespondence": "REJECTED",
+        "externalTemplateSelection": true,
+        "externalSequenceCorrespondence": true,
+        "semanticInformationEliminated": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     }
   }
 }
