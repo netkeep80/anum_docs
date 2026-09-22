@@ -83,7 +83,9 @@
     "seedCorrespondenceCompressionF5F6Complete": true,
     "explicitPerLinkSeedPairsRemoved": true,
     "sourceCorrespondenceDerivationF5F7Complete": true,
-    "externalPrefixSequencePreparationRemoved": true
+    "externalPrefixSequencePreparationRemoved": true,
+    "templateSelectionConvergenceF5F8Complete": false,
+    "hostSelectedTemplateHandleRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1033,7 +1035,12 @@
     "sourceCorrespondenceDerivationF5F7DerivedUniqueSeedCount": 23,
     "sourceCorrespondenceDerivationF5F7MappedLinkCount": 142,
     "sourceCorrespondenceDerivationF5F7SourceFieldBranchCount": 0,
-    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": 2
+    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": 2,
+    "templateSelectionConvergenceF5F8FrontierSize": null,
+    "templateSelectionConvergenceF5F8SuccessfulInstantiationCount": null,
+    "templateSelectionConvergenceF5F8DistinctPublicationCount": null,
+    "templateSelectionConvergenceF5F8HostTemplateIdentityBranchCount": null,
+    "templateSelectionConvergenceF5F8IndependentMemoryCount": null
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1233,7 +1240,12 @@
     "sourceCorrespondenceDerivationF5F7DerivedUniqueSeedCount": "Unique template->target seed mappings after request zip plus structurally derived rooted-prefix correspondence.",
     "sourceCorrespondenceDerivationF5F7MappedLinkCount": "Total memoized template->target mappings after closure-complete authority instantiation.",
     "sourceCorrespondenceDerivationF5F7SourceFieldBranchCount": "Source/STRING/request-index specific branches in the structural deep-START selector. Target zero.",
-    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": "Independent Memories required to reproduce byte-identical target topology under the same single request correspondence."
+    "sourceCorrespondenceDerivationF5F7IndependentMemoryCount": "Independent Memories required to reproduce byte-identical target topology under the same single request correspondence.",
+    "templateSelectionConvergenceF5F8FrontierSize": "Number of independently valid closure-complete generated authority templates frozen in the F5-F8 candidate frontier.",
+    "templateSelectionConvergenceF5F8SuccessfulInstantiationCount": "Frontier templates that independently instantiate toward the same selected target request and pass F5-F2 admission/name-resolution checks.",
+    "templateSelectionConvergenceF5F8DistinctPublicationCount": "Distinct target publication Link identities after all compatible templates instantiate in one Memory. One is extensional convergence.",
+    "templateSelectionConvergenceF5F8HostTemplateIdentityBranchCount": "q/s/template-identity-specific branches in the generic frontier runner. Target zero.",
+    "templateSelectionConvergenceF5F8IndependentMemoryCount": "Independent Memories replaying the full template frontier and required to obtain byte-identical topology."
   },
   "nextExperiments": [
     "F5-F8: attack external request-correspondence selection. Derive target correspondence from a Link-native transformation/renaming request and the selected template, instead of supplying qRequest->rRequest as an already paired host-chosen Link.",
@@ -4240,6 +4252,41 @@
         "semanticInformationEliminated": false,
         "productionChanged": false
       }
+    },
+    "templateSelectionConvergenceF5F8": {
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Is external selection of one specific closure-complete exemplar semantically necessary, or do multiple independently valid templates converge to one target authority when each is structurally corresponded to the same target request?",
+      "frozenFrontier": [
+        "q(a) generated/admitted/published closure-complete authority with qRequest",
+        "s(a) independently generated/admitted/published closure-complete authority from the same pre-extension base Dictionary/history with sRequest",
+        "one common target rRequest whose continuation context is q's post-generation Dictionary/history",
+        "one requestCorrespondence from qRequest to rRequest and one from sRequest to rRequest",
+        "two anonymous template packages in one ExactSequence frontier; no selected q/s template handle"
+      ],
+      "executionLaw": [
+        "iterate every template package without template-name dispatch",
+        "verify package requestCorrespondence starts at its template request and ends at the selected target request",
+        "instantiate closure-complete authority using the F5-F7 request zip + structural deep-START rooted-prefix derivation",
+        "require every produced candidate to pass frozen F5-F2 admission",
+        "require every produced target Dictionary to resolve the selected target physical name to the candidate function",
+        "require all successful template instantiations to converge to one target publication identity"
+      ],
+      "oracle": [
+        "full topology after applying the whole frontier must equal one independent domain-reference r(a) generation from the same frozen state",
+        "two independent frontier replay Memories must be byte-identical",
+        "both q and s templates must instantiate successfully",
+        "frontier runner source must contain no q/s template identity branch"
+      ],
+      "claimBoundary": [
+        "a GREEN result removes host selection of one specific template handle within the tested compatible frontier",
+        "frontier membership remains externally selected",
+        "the target request remains externally selected",
+        "each template package still carries an external request->target correspondence",
+        "semantic information is not claimed eliminated",
+        "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
+      ],
+      "evidenceTest": "ts/test/research-v013-template-selection-convergence-f5-f8.test.ts",
+      "consequence": "Pending CI. GREEN would show that compatible closure-complete exemplars can be treated as a convergent frontier rather than requiring a host-picked template winner."
     }
   }
 }
