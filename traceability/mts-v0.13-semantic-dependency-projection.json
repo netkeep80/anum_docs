@@ -50,7 +50,7 @@
     "aspectApplicationProofCarryingBindingResearchComplete": true,
     "aspectApplicationProofCarryingBindingMechanismProven": true,
     "aspectApplicationProofCarryingUnifiedContinuationResearchComplete": true,
-    "formalIntegratedNameAspectProofBindingResearchComplete": false
+    "formalIntegratedNameAspectProofBindingResearchComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1005,10 +1005,10 @@
     "formalIntegratedProofBindingResultCardinality": "F2d exact result bundle cardinality for both physical aliases f(a) and dup(a)."
   },
   "nextExperiments": [
-    "Execute FORMAL F2d and only mark the integrated name->aspect path matcher-free after GREEN portable two-Memory evidence.",
     "FORMAL F3: represent application grouping itself in portable FORMAL/MTS evidence so source expresses f(a), instead of the test externally supplying f and a as separate names.",
-    "After F2d/F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
-    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization against the new aspect/proof-carrying path.",
+    "After F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
+    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization against the matcher-free aspect/proof-carrying path.",
+    "Measure/classify exact STRING materialization and Dictionary lookup as remaining FORMAL semantic/representation services before any global E2 claim.",
     "Apply the same proof-carrying/aspect mechanism to proof semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims.",
     "E3/E4 remain separate and open."
   ],
@@ -3095,7 +3095,7 @@
     },
     "formalNameAspectProofBindingF2d": {
       "id": "FORMAL-F2D-NAME-ASPECT-PROOF-BINDING",
-      "status": "DESIGNED_NOT_EXECUTED",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can the existing portable physical-name -> Link -> application -> BundleValue flow preserve F2c behavior after replacing structural-unification with proof-carrying two-role bindings?",
       "authority": [
         "portable frozen Dictionary maps exact STRING names f/dup/a/b1/b2 to semantic Links",
@@ -3120,8 +3120,8 @@
         "production v0.13 FORMAL evaluator is unchanged",
         "F-KERNEL-SELF-EXTENSION remains to be rerun after grouping evidence"
       ],
-      "currentResult": "NOT_RUN",
-      "consequence": "A GREEN result removes generic structural-unification from the integrated F2c FORMAL research path but does not yet make source-level application grouping self-describing.",
+      "currentResult": "GREEN: exact physical STRING names resolve through the frozen Dictionary to semantic function/argument Links; application P=F⟼A and selected continuations execute through four proof-carrying two-role binding witnesses with zero structural-unification/matcher dependencies. f(a) and alias dup(a) both return exact BundleValue {b1,b2} across two independent replay Memories.",
+      "consequence": "The integrated FORMAL name->Link->application research path no longer depends on generic structural unification. The next hard FORMAL boundary is grouping/composition authority: source still does not itself express that resolved names f and a form one application P=F⟼A.",
       "flow": [
         "physical name f -> exact STRING -> frozen Dictionary -> semantic function F",
         "physical alias dup -> same F",
@@ -3141,7 +3141,19 @@
         "grouping of f and a as one application expression remains selected externally",
         "BundleValue projection remains derived host surface"
       ],
-      "evidenceTest": "ts/test/research-v013-formal-proof-binding-f2d.test.ts"
+      "evidenceTest": "ts/test/research-v013-formal-proof-binding-f2d.test.ts",
+      "observed": {
+        "physicalNames": 5,
+        "functionAliases": 2,
+        "proofBindingWitnesses": 4,
+        "resultCardinality": 2,
+        "resultKind": "BundleValue",
+        "hostMatchers": 0,
+        "structuralUnificationUsed": false,
+        "canonicalByteUsed": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     }
   }
 }
