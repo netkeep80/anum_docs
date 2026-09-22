@@ -47,7 +47,8 @@
     "aspectApplicationUnifiedContinuationResearchComplete": true,
     "aspectApplicationUnifierDenialFalsifierComplete": true,
     "formalIntegratedNameAspectApplicationResearchComplete": true,
-    "aspectApplicationProofCarryingBindingResearchComplete": true
+    "aspectApplicationProofCarryingBindingResearchComplete": true,
+    "aspectApplicationProofCarryingBindingMechanismProven": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -986,11 +987,11 @@
     "aspectProofCarryingBindingHostMatcherCount": "Calls/imports of structural-unification, StructuralRule matching, or StructuralRoleMorphism matching in the A11g-F2 verifier. Zero."
   },
   "nextExperiments": [
-    "Execute and, if valid, promote A11G-F2 proof-carrying two-role binding from candidate to measured GREEN; require zero target-pole reads and zero matcher calls on receiver.",
-    "If A11G-F2 is GREEN, replace the research A11h/F2c decode dependency on structural-unification with the verified binding-witness path in a new research-only end-to-end witness before touching production.",
+    "A11g-F3: integrate the GREEN proof-carrying binding verifier into the unified A11h ordinary+self continuation path and rerun zero/one/many + self-incidence corpus with no structural-unification import; only then set aspectApplicationUnifierSourceRemovalProven=true.",
+    "F2d: migrate the integrated FORMAL name->aspect-application witness from structural-unification to the same proof-carrying binding authority and confirm aliases/results across two Memories.",
     "FORMAL F3: put argument/application grouping itself into portable FORMAL/MTS evidence so source expresses f(a) rather than the test externally selecting f and a as two source names.",
-    "Rerun F-KERNEL-SELF-EXTENSION only after binding-source removal and F3 grouping evidence.",
-    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization; remove only families actually made redundant by evidence.",
+    "After A11g-F3/F2d/F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
+    "Reassess the three host-defined FORMAL law families; remove only families actually made redundant by evidence.",
     "Then apply the same proof-carrying/aspect mechanism to proof semantics; E3/E4 remain separate and open."
   ],
   "measurement": {
@@ -2850,7 +2851,7 @@
       "consequence": "A11g does not source-remove generic unification, but shrinks the relevant semantic-source boundary to a one-Link, two-role projection. Most generic unifier machinery is not exercised on the A11 root-aspect path. The next source-removal experiment can target this exact narrow law instead of the full generic matcher.",
       "proofCarryingBindingF2": {
         "id": "A11G-F2-PROOF-CARRYING-BINDING",
-        "status": "CANDIDATE_EXECUTION_RECORDED",
+        "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
         "question": "Can A11 two-role binding be verified from portable MTS Link evidence after denying generic host matching, while also denying direct poles(target) role remapping?",
         "witnessShape": [
           "selected role frame has two explicit role Links S and E and template D=S⟼E",
@@ -2900,7 +2901,20 @@
         ],
         "expectedConsequence": "If GREEN, A11G-F1's missing capability is supplied by proof-carrying MTS binding evidence without target matching. This would source-remove generic unification from the exact A11 two-role decode path, but not yet close global E2 or prove FULL_SELF_HOSTED.",
         "firstRedFinding": "Initial runtime anti-cheat denied poles access by LinkHandle identity. This failed because one Link may simultaneously occupy semantic-target and witness/package roles. Handle-level access denial therefore imported an invalid object-typing assumption.",
-        "verifierBoundary": "TARGET_POLE_READS means target-decomposition operations in verifier semantics, not physical poles() calls on a handle that may simultaneously serve another witness role."
+        "verifierBoundary": "TARGET_POLE_READS means target-decomposition operations in verifier semantics, not physical poles() calls on a handle that may simultaneously serve another witness role.",
+        "currentResult": "GREEN: portable proof-carrying two-role binding verifies Direct/Inverse plus R/O/C/L/U across two independent replay Memories with zero target-decomposition reads and zero host matcher calls. Reversed values, collapsed-role evidence and target substitution fail closed. A11f signatures R=11,O=10,C=01,L=00,U=00 are preserved.",
+        "observed": {
+          "positiveWitnesses": 7,
+          "negativeControls": 3,
+          "independentMemories": 2,
+          "targetDecompositionReadsInVerifier": 0,
+          "hostMatcherCalls": 0,
+          "orderedLinkIdentityChecksPerWitness": 1,
+          "a11fSignaturesPreserved": true,
+          "productionChanged": false
+        },
+        "consequence": "The exact missing A11G-F1 capability now has a GREEN research witness: bindings can be carried as portable MTS Link evidence and verified without target matching. However the active A11h/F2c research kernels still import structural-unification, so aspectApplicationUnifierSourceRemovalProven remains false until one end-to-end path is migrated and re-falsified.",
+        "evidenceTest": "ts/test/research-v013-proof-carrying-binding-a11g-f2.test.ts"
       }
     },
     "aspectApplicationA11h": {
