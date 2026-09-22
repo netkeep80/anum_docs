@@ -389,29 +389,28 @@ function staticGuards():void{
   const root=resolve(process.cwd(),"..");
   const own=readFileSync(join(root,"ts/test/research-v013-generation-selection-occurrence-a32.test.ts"),"utf8");
   const prior=readFileSync(join(root,"ts/test/research-v013-meta-transition-authority-a23.test.ts"),"utf8");
-  const a=own.slice(own.indexOf("function metaStep("),own.indexOf(" const ROOT=",own.indexOf("function metaStep(")));
-  const b=prior.slice(prior.indexOf("function metaStep("),prior.indexOf(" function frontierOccurrences(",prior.indexOf("function metaStep(")));
-  const na=a.replace(/\\s+/g,""),nb=b.replace(/\\s+/g,"");
+  const a=own.slice(own.indexOf("function metaStep("),own.indexOf("\nconst ROOT=",own.indexOf("function metaStep(")));
+  const b=prior.slice(prior.indexOf("function metaStep("),prior.indexOf("\nfunction frontierOccurrences(",prior.indexOf("function metaStep(")));
+  const na=a.replace(/\s+/g,""),nb=b.replace(/\s+/g,"");
   assert(na===nb,`A32 unchanged A23 metaStep: normalized lengths ${na.length}/${nb.length}`);
-  const selector=own.slice(own.indexOf("function readSelectedRequestExecution("),own.indexOf(" function runSelectedGeneration(",own.indexOf("function readSelectedRequestExecution(")));
+  const selector=own.slice(own.indexOf("function readSelectedRequestExecution("),own.indexOf("\nfunction runSelectedGeneration(",own.indexOf("function readSelectedRequestExecution(")));
   for(const x of [".find(", ".outgoing(", ".incoming(", "allLinks(", "switch("])
     assert(!selector.includes(x),`A32 Q-selector excludes ambient primitive ${x}`);
   assert(selector.includes("const currentQ=memory.poles(root.end).end"),"A32 current Q derives from selected occurrence END");
-  const top=own.slice(own.indexOf("function runSelectedGeneration("),own.indexOf(" function exercise(",own.indexOf("function runSelectedGeneration(")));
+  const top=own.slice(own.indexOf("function runSelectedGeneration("),own.indexOf("\nfunction exercise(",own.indexOf("function runSelectedGeneration(")));
   const signature=top.slice(0,top.indexOf("){"));
   assert(signature.includes("selectionRoot:LinkHandle"),"A32 top runner receives one higher selection root");
   assert(!signature.includes("requestExecution:LinkHandle"),"A32 top runner has no Q host argument");
-  const history=own.slice(own.indexOf("function readCurrentRequestTruth("),own.indexOf(" function runGenerationHistory(",own.indexOf("function readCurrentRequestTruth(")));
+  const history=own.slice(own.indexOf("function readCurrentRequestTruth("),own.indexOf("\nfunction runGenerationHistory(",own.indexOf("function readCurrentRequestTruth(")));
   for(const x of [".find(", ".outgoing(", ".incoming(", "allLinks(", "switch("])
     assert(!history.includes(x),`A32 request-history selector excludes ambient primitive ${x}`);
-  const target=own.slice(own.indexOf("function deriveTargetSeeds("),own.indexOf(" function deriveProducerSeeds(",own.indexOf("function deriveTargetSeeds(")));
+  const target=own.slice(own.indexOf("function deriveTargetSeeds("),own.indexOf("\nfunction deriveProducerSeeds(",own.indexOf("function deriveTargetSeeds(")));
   for(const x of ["readExactSequence","ExactSequence",".find(", ".outgoing(", ".incoming(", "allLinks(","switch("])
     assert(!target.includes(x),`A32 target extractor excludes positional/ambient primitive ${x}`);
-  const source=own.slice(own.indexOf("function deriveProducerSeeds("),own.indexOf(" function derivedSeedMap(",own.indexOf("function deriveProducerSeeds(")));
+  const source=own.slice(own.indexOf("function deriveProducerSeeds("),own.indexOf("\nfunction derivedSeedMap(",own.indexOf("function deriveProducerSeeds(")));
   for(const x of ["META","E0","E1","E2","E3","E4","T0","C0","ENV","switch(", ".find(", ".outgoing(", ".incoming(", "allLinks("])
     assert(!source.includes(x),`A32 source extractor excludes positional/ambient primitive ${x}`);
 }
-
 function main():void{
   exercise(false);exercise(true);staticGuards();
   console.log([
