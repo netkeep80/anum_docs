@@ -367,19 +367,9 @@ function staticKernelGuard(): void {
   const signature = kernel.slice(0, kernel.indexOf("): LinkHandle"));
 
   for (const forbidden of [
-    "BundleValue",
-    "ResolvedOccurrence",
-    "resolveFlatBundle",
-    "authorityTruth",
-    "transitions:",
-    "active",
-    "isTrue",
-    "currentValue",
-    "modusPonens",
-    ".find(",
-    ".outgoing(",
-    ".incoming(",
-    "switch(",
+    "BundleValue", "ResolvedOccurrence", "resolveFlatBundle", "authorityTruth",
+    "transitions:", "active", "isTrue", "currentValue", "modusPonens",
+    ".find(", ".outgoing(", ".incoming(", "switch(",
   ]) {
     assert(!kernel.includes(forbidden),
       `A21 kernel excludes host semantic primitive ${forbidden}`);
@@ -401,29 +391,13 @@ function main(): void {
   staticKernelGuard();
 
   console.log([
-    "MTS v0.13 A21:",
-    "SINGLE_EXECUTION_ROOT=GREEN_SCOPED_RESEARCH",
-    "EXECUTION_ROOT=K_TO_FRONTIER",
-    "CONTEXT_CARRIED_AUTHORITY=YES",
-    "LINK_NATIVE_FRONTIER=YES",
-    "LINK_NATIVE_PROVENANCE=YES",
-    "SEPARATE_CONTEXT_PARAMETER=0",
-    "SEPARATE_FRONTIER_PARAMETER=0",
-    "HOST_BUNDLEVALUE_FRONTIER=0",
-    "STEP=E_N_TO_E_N_PLUS_1",
-    "FIRST_FANOUT=2",
-    "LOCAL_TERMINATION=CONFIRMED",
-    "SECOND_FANOUT=2",
-    "CONVERGENCE_DISTINCT_TRUTH_LINKS=1",
-    "CONVERGENCE_OCCURRENCES=2",
-    "SCHEDULE_PROVENANCE_EQUIVALENCE=YES",
-    "TERMINAL_FRONTIER=ZERO",
-    "AMBIENT_EXECUTION_ROOT=IGNORED",
-    "FOREIGN_CONTEXT_OCCURRENCE=REJECTED",
-    "UNWRAPPED_FRONTIER=REJECTED",
-    "INVALID_CONTEXT_AUTHORITY=REJECTED",
-    "INDEPENDENT_MEMORIES=2",
-    "PRODUCTION_UNCHANGED",
+    "MTS v0.13 A21: SINGLE_EXECUTION_ROOT=GREEN_SCOPED_RESEARCH",
+    "EXECUTION_ROOT=K_TO_FRONTIER CONTEXT_CARRIED_AUTHORITY=YES LINK_NATIVE_FRONTIER=YES LINK_NATIVE_PROVENANCE=YES",
+    "SEPARATE_CONTEXT_PARAMETER=0 SEPARATE_FRONTIER_PARAMETER=0 HOST_BUNDLEVALUE_FRONTIER=0 STEP=E_N_TO_E_N_PLUS_1",
+    "FIRST_FANOUT=2 LOCAL_TERMINATION=CONFIRMED SECOND_FANOUT=2 CONVERGENCE_DISTINCT_TRUTH_LINKS=1 CONVERGENCE_OCCURRENCES=2",
+    "SCHEDULE_PROVENANCE_EQUIVALENCE=YES TERMINAL_FRONTIER=ZERO AMBIENT_EXECUTION_ROOT=IGNORED",
+    "FOREIGN_CONTEXT_OCCURRENCE=REJECTED UNWRAPPED_FRONTIER=REJECTED INVALID_CONTEXT_AUTHORITY=REJECTED",
+    "INDEPENDENT_MEMORIES=2 PRODUCTION_UNCHANGED",
   ].join(" "));
 }
 
