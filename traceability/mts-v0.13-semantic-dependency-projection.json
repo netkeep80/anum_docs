@@ -48,7 +48,8 @@
     "aspectApplicationUnifierDenialFalsifierComplete": true,
     "formalIntegratedNameAspectApplicationResearchComplete": true,
     "aspectApplicationProofCarryingBindingResearchComplete": true,
-    "aspectApplicationProofCarryingBindingMechanismProven": true
+    "aspectApplicationProofCarryingBindingMechanismProven": true,
+    "aspectApplicationProofCarryingUnifiedContinuationResearchComplete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -891,7 +892,11 @@
     "aspectProofCarryingBindingNegativeControlCount": 3,
     "aspectProofCarryingBindingIndependentMemoryCount": 2,
     "aspectProofCarryingBindingTargetPoleReadCount": 0,
-    "aspectProofCarryingBindingHostMatcherCount": 0
+    "aspectProofCarryingBindingHostMatcherCount": 0,
+    "aspectProofUnifiedContinuationTargetCount": 12,
+    "aspectProofUnifiedContinuationHostMatcherCount": 0,
+    "aspectProofUnifiedContinuationTargetDecompositionReadCount": 0,
+    "aspectProofUnifiedContinuationIndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -984,14 +989,18 @@
     "aspectProofCarryingBindingNegativeControlCount": "A11g-F2 forged witness controls: reversed target values, duplicate/collapsed structural role, and target substitution.",
     "aspectProofCarryingBindingIndependentMemoryCount": "Independent replay Memories in which one canonical portable binding authority verifies the same target mappings without sender-local handles.",
     "aspectProofCarryingBindingTargetPoleReadCount": "Semantic verifier reads of poles(target). Zero: target decomposition is supplied by Link evidence and checked by ordered Link identity instead.",
-    "aspectProofCarryingBindingHostMatcherCount": "Calls/imports of structural-unification, StructuralRule matching, or StructuralRoleMorphism matching in the A11g-F2 verifier. Zero."
+    "aspectProofCarryingBindingHostMatcherCount": "Calls/imports of structural-unification, StructuralRule matching, or StructuralRoleMorphism matching in the A11g-F2 verifier. Zero.",
+    "aspectProofUnifiedContinuationTargetCount": "A11g-F3 proof-carrying target witnesses covering direct/inverse method Links, ordinary application/candidates, zero-valued ordinary application, and R/O/C/L/U self-incidence applications.",
+    "aspectProofUnifiedContinuationHostMatcherCount": "Host structural matcher/unifier calls in the A11g-F3 continuation path. Target is zero.",
+    "aspectProofUnifiedContinuationTargetDecompositionReadCount": "Receiver target-decomposition reads in A11g-F3. Target is zero; candidate values must come only from verified proof-carrying bindings.",
+    "aspectProofUnifiedContinuationIndependentMemoryCount": "Independent replay Memories executing the same portable A11g-F3 binding authority."
   },
   "nextExperiments": [
-    "A11g-F3: integrate the GREEN proof-carrying binding verifier into the unified A11h ordinary+self continuation path and rerun zero/one/many + self-incidence corpus with no structural-unification import; only then set aspectApplicationUnifierSourceRemovalProven=true.",
-    "F2d: migrate the integrated FORMAL name->aspect-application witness from structural-unification to the same proof-carrying binding authority and confirm aliases/results across two Memories.",
+    "Execute A11g-F3 unified proof-carrying continuation; only GREEN may flip aspectApplicationUnifierSourceRemovalProven=true for scoped A11 semantics.",
+    "F2d: migrate the integrated FORMAL name->aspect-application witness from structural-unification to the same proof-carrying binding authority.",
     "FORMAL F3: put argument/application grouping itself into portable FORMAL/MTS evidence so source expresses f(a) rather than the test externally selecting f and a as two source names.",
-    "After A11g-F3/F2d/F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
-    "Reassess the three host-defined FORMAL law families; remove only families actually made redundant by evidence.",
+    "After A11g-F3/F2d/FORMAL-F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
+    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization.",
     "Then apply the same proof-carrying/aspect mechanism to proof semantics; E3/E4 remain separate and open."
   ],
   "measurement": {
@@ -2915,6 +2924,33 @@
         },
         "consequence": "The exact missing A11G-F1 capability now has a GREEN research witness: bindings can be carried as portable MTS Link evidence and verified without target matching. However the active A11h/F2c research kernels still import structural-unification, so aspectApplicationUnifierSourceRemovalProven remains false until one end-to-end path is migrated and re-falsified.",
         "evidenceTest": "ts/test/research-v013-proof-carrying-binding-a11g-f2.test.ts"
+      },
+      "proofCarryingUnifiedContinuationF3": {
+        "id": "A11G-F3-UNIFIED-PROOF-BINDING",
+        "status": "DESIGNED_NOT_EXECUTED",
+        "question": "Can the full A11h ordinary+self continuation corpus run from proof-carrying bindings with zero structural-unification/matcher calls and zero target decomposition on receiver?",
+        "corpus": [
+          "ordinary direct multi-result application",
+          "ordinary inverse multi-result application",
+          "ordinary defined-zero application",
+          "R direct/inverse singleton self-continuation",
+          "O direct-only singleton self-continuation",
+          "C inverse-only singleton self-continuation",
+          "L/U zero self-continuation"
+        ],
+        "kernel": "method orientation and candidate FROM/TO values are read only from previously verified proof-carrying two-role bindings; candidate contributes iff candidate.FROM == application; candidate.TO is the result",
+        "passConditions": [
+          "portable selected authority is byte-identical across source Memories with unrelated allocation noise",
+          "same artifact executes in two independent replay Memories",
+          "no structural-unification/matchStructuralTemplate/StructuralRoleMorphism path is imported or called",
+          "receiver never decomposes semantic target Links",
+          "ordinary direct/inverse results match A11h",
+          "self-incidence results match A11h/A11f",
+          "ZERO/ONE/MANY BundleValue cardinalities remain supported",
+          "unknown candidate without selected binding evidence fails closed"
+        ],
+        "currentResult": "NOT_RUN",
+        "consequence": "Only a GREEN F3 may set aspectApplicationUnifierSourceRemovalProven=true for the scoped A11 continuation semantics. Production and global E2 remain separate."
       }
     },
     "aspectApplicationA11h": {
