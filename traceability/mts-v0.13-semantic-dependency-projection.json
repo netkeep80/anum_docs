@@ -49,7 +49,8 @@
     "formalIntegratedNameAspectApplicationResearchComplete": true,
     "aspectApplicationProofCarryingBindingResearchComplete": true,
     "aspectApplicationProofCarryingBindingMechanismProven": true,
-    "aspectApplicationProofCarryingUnifiedContinuationResearchComplete": true
+    "aspectApplicationProofCarryingUnifiedContinuationResearchComplete": true,
+    "formalIntegratedNameAspectProofBindingResearchComplete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -896,7 +897,11 @@
     "aspectProofUnifiedContinuationTargetCount": 13,
     "aspectProofUnifiedContinuationHostMatcherCount": 0,
     "aspectProofUnifiedContinuationTargetDecompositionReadCount": 0,
-    "aspectProofUnifiedContinuationIndependentMemoryCount": 2
+    "aspectProofUnifiedContinuationIndependentMemoryCount": 2,
+    "formalIntegratedProofBindingWitnessCount": 4,
+    "formalIntegratedProofBindingHostMatcherCount": 0,
+    "formalIntegratedProofBindingIndependentMemoryCount": 2,
+    "formalIntegratedProofBindingResultCardinality": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -993,15 +998,19 @@
     "aspectProofUnifiedContinuationTargetCount": "A11g-F3 proof-carrying target witnesses covering 2 method Links + ordinary application + 4 ordinary continuation candidates + zero-valued ordinary application + R/O/C/L/U self-incidence applications = 13.",
     "aspectProofUnifiedContinuationHostMatcherCount": "Host structural matcher/unifier calls in the A11g-F3 continuation path. Target is zero.",
     "aspectProofUnifiedContinuationTargetDecompositionReadCount": "Receiver target-decomposition reads in A11g-F3. Target is zero; candidate values must come only from verified proof-carrying bindings.",
-    "aspectProofUnifiedContinuationIndependentMemoryCount": "Independent replay Memories executing the same portable A11g-F3 binding authority."
+    "aspectProofUnifiedContinuationIndependentMemoryCount": "Independent replay Memories executing the same portable A11g-F3 binding authority.",
+    "formalIntegratedProofBindingWitnessCount": "F2d selected proof-carrying witnesses: direct method, application key, and two result-continuation Links.",
+    "formalIntegratedProofBindingHostMatcherCount": "Host structural matcher/unifier calls in the F2d name->application path. Target is zero.",
+    "formalIntegratedProofBindingIndependentMemoryCount": "Independent replay Memories executing the same combined portable Dictionary + proof-carrying application authority.",
+    "formalIntegratedProofBindingResultCardinality": "F2d exact result bundle cardinality for both physical aliases f(a) and dup(a)."
   },
   "nextExperiments": [
-    "F2d: migrate the integrated FORMAL name->aspect-application witness from structural-unification to the GREEN proof-carrying binding authority and reconfirm aliases/results across two Memories.",
-    "FORMAL F3: put argument/application grouping itself into portable FORMAL/MTS evidence so source expresses f(a) rather than the test externally selecting f and a as two source names.",
-    "After F2d/FORMAL-F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
-    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization; remove only families actually made redundant by executable evidence.",
-    "Then apply the same proof-carrying/aspect mechanism to proof semantics before any global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claim.",
-    "E3/E4 remain separate and open; selected frozen authority must remain distinct from live adjacency."
+    "Execute FORMAL F2d and only mark the integrated name->aspect path matcher-free after GREEN portable two-Memory evidence.",
+    "FORMAL F3: represent application grouping itself in portable FORMAL/MTS evidence so source expresses f(a), instead of the test externally supplying f and a as separate names.",
+    "After F2d/F3, rerun F-KERNEL-SELF-EXTENSION against a previously unknown named form under an unchanged generic kernel.",
+    "Reassess formal-operator-grounding, formal-prefix-composition and formal-plan-materialization against the new aspect/proof-carrying path.",
+    "Apply the same proof-carrying/aspect mechanism to proof semantics before global SELF_GENERATED_OR_RECONSTRUCTED or FULL_SELF_HOSTED claims.",
+    "E3/E4 remain separate and open."
   ],
   "measurement": {
     "modelRevision": "A9-P1g-b-proof-runtime-trust-audit",
@@ -3083,6 +3092,36 @@
       },
       "evidenceTest": "ts/test/research-v013-formal-name-aspect-integration-f2c.test.ts",
       "consequence": "A previously unknown physical name can now travel end-to-end through exact STRING -> portable Dictionary -> semantic Link -> ordinary Link application -> aspect-derived frozen continuation -> BundleValue without the fixed production FORMAL spelling/operator switch. The remaining hard semantic blocker is no longer name binding but A11G-F1's MTS-native two-role binding law plus later grammar/source composition."
+    },
+    "formalNameAspectProofBindingF2d": {
+      "id": "FORMAL-F2D-NAME-ASPECT-PROOF-BINDING",
+      "status": "DESIGNED_NOT_EXECUTED",
+      "question": "Can the existing portable physical-name -> Link -> application -> BundleValue flow preserve F2c behavior after replacing structural-unification with proof-carrying two-role bindings?",
+      "authority": [
+        "portable frozen Dictionary maps exact STRING names f/dup/a/b1/b2 to semantic Links",
+        "one selected two-role frame carries a direct method Link",
+        "proof-carrying witnesses bind the direct method, application F⟼A, and two continuation Links (F⟼A)⟼b1 / (F⟼A)⟼b2",
+        "receiver verifies each witness through exact ordered Link identity rather than target decomposition"
+      ],
+      "expectedFlow": "exact STRING -> frozen Dictionary -> function/argument Links -> exact application Link -> verified proof-carrying continuation bindings -> BundleValue",
+      "passConditions": [
+        "f and dup resolve to the same semantic function Link",
+        "f(a) and dup(a) both return exactly {b1,b2}",
+        "same combined portable artifact works in two independent Memories",
+        "zero structural-unification/matchStructuralTemplate/StructuralRoleMorphism dependencies",
+        "zero receiver target-decomposition reads",
+        "no canonicalByte/name/form-specific host branch",
+        "unknown physical name has no semantic authority"
+      ],
+      "explicitNonClaims": [
+        "source text does not yet encode grouping f(a); test still supplies function and argument names separately",
+        "Dictionary lookup and exact STRING materialization remain host semantic/representation services",
+        "ordered Link identity find(fn,arg) remains the grouping/application lookup step",
+        "production v0.13 FORMAL evaluator is unchanged",
+        "F-KERNEL-SELF-EXTENSION remains to be rerun after grouping evidence"
+      ],
+      "currentResult": "NOT_RUN",
+      "consequence": "A GREEN result removes generic structural-unification from the integrated F2c FORMAL research path but does not yet make source-level application grouping self-describing."
     }
   }
 }
