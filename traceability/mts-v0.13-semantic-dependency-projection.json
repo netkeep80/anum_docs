@@ -95,7 +95,8 @@
     "contextualEventInputA16F3Designed": true,
     "contextualEventInputA16F3Complete": true,
     "linkCarriedPairRequestA16F4Designed": true,
-    "linkCarriedPairRequestA16F4Complete": true
+    "linkCarriedPairRequestA16F4Complete": true,
+    "applicationClosedFrontierA17Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1322,6 +1323,9 @@
     "linkCarriedPairRequestA16F4IndependentMemoryCount": "Independent canonical Memories reproducing Link-carried request behavior."
   },
   "nextExperiments": [
+    "A17: execute application-closed frontier. Require all A13 split/termination/convergence behavior using only repeated contextual detachment K->A ; A->B => K->B and no runtime State/Event/pair/request machinery.",
+    "If A17 is GREEN, treat A16-F4 as an optional generic synthesis path rather than mandatory execution kernel, then connect application-closed continuations to F5 self-generated semantic authority.",
+    "After A17, ask whether selected continuation authority A->B itself can be generated/discovered through the F5 line without host semantic source.",
     "A16-F5: source-remove the pair-request producer. Derive/emit K->Q from Link-carried execution authority rather than host-selected operand frontiers, while avoiding automatic all-to-all pairing of K-linked truths.",
     "A16-F5 must keep request selection frozen/fail-closed, reject late ambient producer evidence, and preserve A16-F4 malformed-request rejection.",
     "After A16-F5, reconnect the now-Link-carried dynamic execution path with F5 template/self-generated authority work and reassess E2/E3.",
@@ -4665,6 +4669,45 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "applicationClosedFrontierA17": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can the multithreaded meta-interpreter core operate on an application-closed frontier where every active semantic item is contextual truth K->A with A already shaped as ∞->∞, so recursive execution is only repeated A16 detachment K->A plus A->B => K->B?",
+      "setup": [
+        "preconstruct application-shaped Links A0..A4 as ordinary ∞->∞ Links",
+        "freeze selected continuation authority A0->{A1,A2}, A2->{A3,A4}, A3->Z, A4->Z",
+        "start from one contextual invocation truth K->A0",
+        "carry every next frontier item only as K->B truth produced by A16 detachment",
+        "allow consequent B itself to be another application-shaped Link"
+      ],
+      "oracle": [
+        "first split K->A0 yields K->A1 and K->A2",
+        "A1 terminates locally while A2 yields K->A3 and K->A4",
+        "A3 and A4 converge to one extensional K->Z with two provenance occurrences",
+        "forward/reverse scheduling preserves extensional value and provenance",
+        "terminal Z yields ZERO on the next step",
+        "true unknown application with no selected continuation yields ZERO",
+        "late ambient transition outside frozen selected authority is ignored",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "semantic step kernel contains no event/state/pair/request/application lookup/active/isTrue/currentValue/modusPonens semantic primitive",
+        "semantic step performs exactly one Memory.ensure form: ensure(context, consequent)",
+        "no runtime construction of next application Links is allowed inside the semantic step"
+      ],
+      "consequenceIfGreen": [
+        "runtime State/Event recombination is not fundamental to the minimal meta-interpreter execution path",
+        "A16-F4 remains a valid generic Link synthesis mechanism but is not required by application-closed recursive execution",
+        "the execution core reduces to recursive generalized modus ponens over Bundle<K->A>",
+        "the only initial external boundary in this witness is injection/selection of K->A0 and selected continuation authority"
+      ],
+      "evidenceTest": "ts/test/research-v013-application-closed-frontier-a17.test.ts",
+      "claimBoundary": [
+        "GREEN would be a scoped execution witness, not a proof that all programs can always be encoded application-closed without other construction mechanisms",
+        "this gate does not accept v0.13",
+        "global E2/E3/E4 and FULL_SELF_HOSTED remain open",
+        "production runtime remains unchanged"
+      ]
     }
   }
 }
