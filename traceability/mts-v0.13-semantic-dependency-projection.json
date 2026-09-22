@@ -893,7 +893,7 @@
     "aspectProofCarryingBindingIndependentMemoryCount": 2,
     "aspectProofCarryingBindingTargetPoleReadCount": 0,
     "aspectProofCarryingBindingHostMatcherCount": 0,
-    "aspectProofUnifiedContinuationTargetCount": 12,
+    "aspectProofUnifiedContinuationTargetCount": 13,
     "aspectProofUnifiedContinuationHostMatcherCount": 0,
     "aspectProofUnifiedContinuationTargetDecompositionReadCount": 0,
     "aspectProofUnifiedContinuationIndependentMemoryCount": 2
@@ -990,7 +990,7 @@
     "aspectProofCarryingBindingIndependentMemoryCount": "Independent replay Memories in which one canonical portable binding authority verifies the same target mappings without sender-local handles.",
     "aspectProofCarryingBindingTargetPoleReadCount": "Semantic verifier reads of poles(target). Zero: target decomposition is supplied by Link evidence and checked by ordered Link identity instead.",
     "aspectProofCarryingBindingHostMatcherCount": "Calls/imports of structural-unification, StructuralRule matching, or StructuralRoleMorphism matching in the A11g-F2 verifier. Zero.",
-    "aspectProofUnifiedContinuationTargetCount": "A11g-F3 proof-carrying target witnesses covering direct/inverse method Links, ordinary application/candidates, zero-valued ordinary application, and R/O/C/L/U self-incidence applications.",
+    "aspectProofUnifiedContinuationTargetCount": "A11g-F3 proof-carrying target witnesses covering 2 method Links + ordinary application + 4 ordinary continuation candidates + zero-valued ordinary application + R/O/C/L/U self-incidence applications = 13.",
     "aspectProofUnifiedContinuationHostMatcherCount": "Host structural matcher/unifier calls in the A11g-F3 continuation path. Target is zero.",
     "aspectProofUnifiedContinuationTargetDecompositionReadCount": "Receiver target-decomposition reads in A11g-F3. Target is zero; candidate values must come only from verified proof-carrying bindings.",
     "aspectProofUnifiedContinuationIndependentMemoryCount": "Independent replay Memories executing the same portable A11g-F3 binding authority."
