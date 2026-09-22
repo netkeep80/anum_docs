@@ -190,4 +190,4 @@ async function main(): Promise<void> {
   console.log("accepted semantic delta = NONE");
 }
 
-void main();
+await main();
