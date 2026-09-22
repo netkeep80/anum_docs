@@ -216,6 +216,9 @@ function executePlan(memory:Memory, carrier:LinkHandle):BranchWriteResult{
   const shared=memory.ensure(p.sharedStart,p.sharedEnd);
   const unique=memory.ensure(p.uniqueStart,p.uniqueEnd);
   const context=defineContext(memory,p.parentContext,unique);
+  const contextState=readContext(memory,context);
+  same(contextState.parent,p.parentContext,"A13b branch Context preserves explicit parent");
+  same(contextState.current,unique,"A13b branch Context current is branch-local materialization");
   const publication=memory.ensure(p.poolSeed,context);
   return Object.freeze({
     branchId:p.branchId,
@@ -312,11 +315,6 @@ function validateDivergent(
   assert(a.unique!==b.unique,"A13b branch unique writes remain distinct");
   assert(a.context!==b.context,"A13b immutable branch contexts remain distinct");
   assert(a.publication!==b.publication,"A13b publication candidates remain distinct");
-
-  const ka=readContext(restoreTopology(forward.topology), a.context);
-  // Local handles in exported topology are not portable across restore; the
-  // canonical topology equality above is the cross-schedule assertion.
-  void ka;
 
   same(Object.keys(artifact.planCoordinates).length,4,"A13b authority contains four plans");
 }
