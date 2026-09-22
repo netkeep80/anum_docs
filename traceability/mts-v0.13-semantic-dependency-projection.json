@@ -54,7 +54,7 @@
     "formalSourceGroupingResearchComplete": true,
     "formalKernelSelfExtensionF4ResearchComplete": true,
     "formalFixedEvaluatorLawReassessmentAfterF4Complete": true,
-    "bundleContinuationBranchingResearchComplete": true,
+    "bundleContinuationBranchingResearchComplete": false,
     "bundleContinuationPhysicalParallelismProven": false,
     "bundleContinuationMaterializingConcurrencyProven": false
   },
@@ -3373,7 +3373,7 @@
   },
   "executionSemanticsAudit": {
     "bundleContinuationA12": {
-      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "status": "DESIGNED_NOT_EXECUTED",
       "question": "If one Link/aspect application returns a BundleValue, can that bundle act as the next execution frontier so each occurrence continues independently while extensional value and provenance remain distinct?",
       "semanticModel": [
         "one application step may produce zero/one/many continuation occurrences",
@@ -3415,21 +3415,22 @@
         "whether every abit transition is bundle-valued is still a hypothesis; A12 proves the required execution composition model, not universal abit semantics"
       ],
       "observed": {
-        "initialFanout": 2,
-        "secondStepFanout": 3,
-        "convergenceDistinctLinks": 1,
-        "convergenceOccurrences": 2,
+        "initialFanout": null,
+        "secondStepFanout": null,
+        "convergenceDistinctLinks": null,
+        "convergenceOccurrences": null,
         "scheduleOrders": [
           "forward",
           "reverse"
         ],
         "physicalConcurrencyPrimitives": 0,
-        "partialTerminationSurvivors": 1,
+        "partialTerminationSurvivors": null,
         "independentMemories": 2,
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-bundle-continuation-a12.test.ts",
-      "consequence": "Bundle-valued application is no longer only a returned collection in the research model: it can be treated as a continuation frontier with branch-local fan-out/convergence semantics independent of physical scheduling. This exposes a new E4 problem for branch scheduling and branch-local mutation, but does not require OS threads in the foundation."
+      "consequence": "Bundle-valued application is no longer only a returned collection in the research model: it can be treated as a continuation frontier with branch-local fan-out/convergence semantics independent of physical scheduling. This exposes a new E4 problem for branch scheduling and branch-local mutation, but does not require OS threads in the foundation.",
+      "currentResult": "NOT_RUN"
     }
   }
 }
