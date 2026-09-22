@@ -2,6 +2,10 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 import {
+  materializeExactSequence,
+  readExactSequence,
+} from "../src/exact-sequence.js";
+import {
   Memory,
   ensureRootBasis,
   type LinkHandle,
@@ -26,6 +30,11 @@ import {
   type StructuralRoleBinding,
 } from "../src/structural-rule.js";
 import { unifyStructuralTemplate } from "../src/structural-unification.js";
+import {
+  resolveFlatBundle,
+  type BundleValue,
+  type ResolvedOccurrence,
+} from "../src/value-bundle.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.13 FORMAL F2a: ${message}`);
@@ -37,6 +46,15 @@ function same<T>(actual: T, expected: T, message: string): void {
 
 function exactJson(actual: unknown, expected: unknown, message: string): void {
   same(JSON.stringify(actual), JSON.stringify(expected), message);
+}
+
+function setSame(
+  actual: ReadonlySet<LinkHandle>,
+  expected: readonly LinkHandle[],
+  message: string,
+): void {
+  same(actual.size, new Set(expected).size, `${message}: size`);
+  for (const link of expected) assert(actual.has(link), `${message}: missing expected Link`);
 }
 
 class PoleOnlyProbe implements ReadMemory {
@@ -61,7 +79,22 @@ interface AuthorityFixture {
   readonly artifact: PortableStructuralTheoryArtifact;
 }
 
-type AuthorityMode = "exact" | "ambiguous-dup";
+type AuthorityMode = "exact" | "ambiguous-one";
+
+function defineExtensionRule(
+  memory: Memory,
+  theory: LinkHandle,
+  roles: readonly LinkHandle[],
+  applicationTemplate: LinkHandle,
+  resultTemplates: readonly LinkHandle[],
+): LinkHandle {
+  const resultTemplateCarrier = materializeExactSequence(memory, resultTemplates);
+  const body = memory.ensure(applicationTemplate, resultTemplateCarrier);
+  const roleDictionary = defineStructuralRoleDictionary(memory, roles);
+  const rule = defineStructuralRule(memory, roleDictionary, body);
+  admitStructuralRule(memory, theory, rule);
+  return rule;
+}
 
 function buildAuthority(noise: boolean, mode: AuthorityMode = "exact"): AuthorityFixture {
   const memory = new Memory();
@@ -74,39 +107,59 @@ function buildAuthority(noise: boolean, mode: AuthorityMode = "exact"): Authorit
   }
 
   // Grounded Uses are created before role placeholders.
-  const dupUse = memory.ensure(basis.U, basis.L);
-  const swapUse = memory.ensure(basis.L, dupUse);
-  const roleSeed = memory.ensure(dupUse, swapUse);
+  const zeroUse = memory.ensure(basis.U, basis.L);
+  const oneUse = memory.ensure(basis.L, zeroUse);
+  const manyUse = memory.ensure(basis.C, oneUse);
+  const roleSeed = memory.ensure(zeroUse, memory.ensure(oneUse, manyUse));
   const xRole = memory.ensureStartSelfClosed(roleSeed);
   const yRole = memory.ensureEndSelfClosed(roleSeed);
   assert(xRole !== yRole, "F2a roles are distinct");
 
-  // Theory is structurally independent from application Uses/roles. No
-  // non-admission Link below intentionally starts at Theory.
-  const theory = memory.ensure(basis.C, roleSeed);
+  // Theory is structurally independent from application Uses/roles.
+  const theory = memory.ensure(basis.O, roleSeed);
 
-  // Extension 1: UseDup -> X  ==>  X -> X
-  const dupInput = memory.ensure(dupUse, xRole);
-  const dupOutput = memory.ensure(xRole, xRole);
-  const dupBody = memory.ensure(dupInput, dupOutput);
-  const dupDictionary = defineStructuralRoleDictionary(memory, [xRole]);
-  const dupRule = defineStructuralRule(memory, dupDictionary, dupBody);
-  admitStructuralRule(memory, theory, dupRule);
+  // ZERO: UseZero -> X => empty ValueBundle.
+  defineExtensionRule(
+    memory,
+    theory,
+    [xRole],
+    memory.ensure(zeroUse, xRole),
+    [],
+  );
 
-  // Extension 2: UseSwap -> (A -> B)  ==>  B -> A
-  const swapPayload = memory.ensure(xRole, yRole);
-  const swapInput = memory.ensure(swapUse, swapPayload);
-  const swapOutput = memory.ensure(yRole, xRole);
-  const swapBody = memory.ensure(swapInput, swapOutput);
-  const swapDictionary = defineStructuralRoleDictionary(memory, [xRole, yRole]);
-  const swapRule = defineStructuralRule(memory, swapDictionary, swapBody);
-  admitStructuralRule(memory, theory, swapRule);
+  // ONE: UseOne -> X => { X -> X }.
+  defineExtensionRule(
+    memory,
+    theory,
+    [xRole],
+    memory.ensure(oneUse, xRole),
+    [memory.ensure(xRole, xRole)],
+  );
 
-  if (mode === "ambiguous-dup") {
-    const alternateOutput = memory.ensure(xRole, basis.R);
-    const alternateBody = memory.ensure(dupInput, alternateOutput);
-    const alternateRule = defineStructuralRule(memory, dupDictionary, alternateBody);
-    admitStructuralRule(memory, theory, alternateRule);
+  // MANY: UseMany -> (A -> B) => { B -> A, A -> A }.
+  const payload = memory.ensure(xRole, yRole);
+  const manyInput = memory.ensure(manyUse, payload);
+  const reversed = memory.ensure(yRole, xRole);
+  const diagonal = memory.ensure(xRole, xRole);
+  defineExtensionRule(
+    memory,
+    theory,
+    [xRole, yRole],
+    manyInput,
+    [reversed, diagonal],
+  );
+
+  if (mode === "ambiguous-one") {
+    // This is authority ambiguity, not result multiplicity: a second Rule
+    // competes for the same application template. Multiple values must instead
+    // live inside one selected Rule's result-template carrier.
+    defineExtensionRule(
+      memory,
+      theory,
+      [xRole],
+      memory.ensure(oneUse, xRole),
+      [memory.ensure(xRole, basis.R)],
+    );
   }
 
   return Object.freeze({
@@ -176,21 +229,27 @@ function instantiateTemplate(
 
 interface Match {
   readonly rule: LinkHandle;
-  readonly resultTemplate: LinkHandle;
+  readonly resultTemplates: readonly LinkHandle[];
   readonly bindings: readonly StructuralRoleBinding[];
 }
 
 /**
  * One generic extension kernel.
  *
+ * The result-template ExactSequence is only an authority carrier. It is NOT the
+ * semantic result and is NOT identified with a bundle. After substitution each
+ * concrete result Link is projected through the already accepted derived
+ * ValueBundle surface, preserving {} / {a} / {a,b,...} as distinct bundle
+ * cardinalities with {a} != a.
+ *
  * No extension name, arity tag, opcode, source glyph or expected result is
- * dispatched here. Rule structure and RoleDictionary are read from Links.
+ * dispatched here.
  */
 function applyFrozenExtension(
   memory: Memory,
   selectedRules: readonly LinkHandle[],
   application: LinkHandle,
-): LinkHandle {
+): BundleValue {
   const matches: Match[] = [];
   const probe = new PoleOnlyProbe(memory);
 
@@ -199,7 +258,7 @@ function applyFrozenExtension(
     const roles = readStructuralRoleDictionary(memory, rule.roleDictionary).roles;
     const relation = memory.poles(rule.body);
     const applicationTemplate = relation.start;
-    const resultTemplate = relation.end;
+    const resultTemplates = readExactSequence(memory, relation.end).values;
 
     try {
       const bindings = unifyStructuralTemplate(
@@ -210,7 +269,7 @@ function applyFrozenExtension(
       );
       matches.push(Object.freeze({
         rule: ruleHandle,
-        resultTemplate,
+        resultTemplates,
         bindings,
       }));
     } catch (error) {
@@ -220,16 +279,22 @@ function applyFrozenExtension(
   }
 
   assert(matches.length > 0, "unknown application has no admitted extension Rule");
-  assert(matches.length === 1, "ambiguous application has multiple admitted extension Rules");
+  assert(matches.length === 1, "authority ambiguity: multiple admitted Rules match one application");
+
   const selected = matches[0]!;
-  return instantiateTemplate(memory, selected.resultTemplate, selected.bindings);
+  const occurrences: ResolvedOccurrence[] = selected.resultTemplates.map((template, index) =>
+    Object.freeze({
+      path: Object.freeze([index]),
+      link: instantiateTemplate(memory, template, selected.bindings),
+    })
+  );
+  return resolveFlatBundle(memory, Object.freeze(occurrences));
 }
 
 function ruleView(memory: Memory, ruleHandle: LinkHandle): {
   readonly roles: readonly LinkHandle[];
   readonly use: LinkHandle;
-  readonly applicationTemplate: LinkHandle;
-  readonly resultTemplate: LinkHandle;
+  readonly resultTemplateCount: number;
 } {
   const rule = readStructuralRule(memory, ruleHandle);
   const roles = readStructuralRoleDictionary(memory, rule.roleDictionary).roles;
@@ -238,8 +303,7 @@ function ruleView(memory: Memory, ruleHandle: LinkHandle): {
   return Object.freeze({
     roles,
     use: input.start,
-    applicationTemplate: relation.start,
-    resultTemplate: relation.end,
+    resultTemplateCount: readExactSequence(memory, relation.end).values.length,
   });
 }
 
@@ -250,35 +314,57 @@ function executeCorpus(artifact: PortableStructuralTheoryArtifact): void {
 
   // Freeze authority before constructing any candidate application.
   const rules = frozenRules(memory, theory);
-  same(rules.length, 2, "exact F2a authority has two admitted extension Rules");
+  same(rules.length, 3, "exact F2a authority has three admitted extension Rules");
 
   const views = rules.map((rule) => Object.freeze({ rule, ...ruleView(memory, rule) }));
-  const unary = views.find((view) => view.roles.length === 1);
-  const binary = views.find((view) => view.roles.length === 2);
-  assert(unary !== undefined, "one-role extension is present");
-  assert(binary !== undefined, "two-role extension is present");
+  const zero = views.find((view) => view.resultTemplateCount === 0);
+  const one = views.find((view) => view.resultTemplateCount === 1);
+  const many = views.find((view) => view.resultTemplateCount === 2);
+  assert(zero !== undefined, "zero-value extension is present");
+  assert(one !== undefined, "one-value extension is present");
+  assert(many !== undefined, "many-value extension is present");
 
-  // One-role extension, semantically unknown to the generic kernel.
-  const operand = memory.ensure(memory.root, binary.use);
-  const unaryApplication = memory.ensure(unary.use, operand);
-  const unaryResult = applyFrozenExtension(memory, rules, unaryApplication);
-  const unaryPoles = memory.poles(unaryResult);
-  same(unaryPoles.start, operand, "generic one-role result start");
-  same(unaryPoles.end, operand, "generic one-role result end");
+  const operand = memory.ensure(memory.root, many.use);
 
-  // Two-role extension, same kernel, different RoleDictionary and topology.
-  const left = memory.ensure(operand, unary.use);
-  const right = memory.ensure(binary.use, operand);
-  const payload = memory.ensure(left, right);
-  const binaryApplication = memory.ensure(binary.use, payload);
-  const binaryResult = applyFrozenExtension(memory, rules, binaryApplication);
-  const binaryPoles = memory.poles(binaryResult);
-  same(binaryPoles.start, right, "generic two-role result start is second operand");
-  same(binaryPoles.end, left, "generic two-role result end is first operand");
+  // Zero values are a valid BundleValue, not "no execution".
+  {
+    const application = memory.ensure(zero.use, operand);
+    const result = applyFrozenExtension(memory, rules, application);
+    same(result.kind, "bundle", "zero result remains BundleValue");
+    same(result.links.size, 0, "zero result cardinality");
+    same(result.occurrences.length, 0, "zero result has no occurrences");
+  }
+
+  // One value remains a one-element BundleValue and must not collapse to Link.
+  {
+    const application = memory.ensure(one.use, operand);
+    const result = applyFrozenExtension(memory, rules, application);
+    const expected = memory.ensure(operand, operand);
+    same(result.kind, "bundle", "one result remains BundleValue");
+    setSame(result.links, [expected], "one result exact value");
+    same(result.occurrences.length, 1, "one result occurrence count");
+  }
+
+  // Multiple values are returned by ONE selected Rule, not by choosing among
+  // competing Rules.
+  {
+    const left = memory.ensure(operand, one.use);
+    const right = memory.ensure(many.use, operand);
+    assert(left !== right, "many-value operands are distinct");
+    const payload = memory.ensure(left, right);
+    const application = memory.ensure(many.use, payload);
+    const result = applyFrozenExtension(memory, rules, application);
+    const reversed = memory.ensure(right, left);
+    const diagonal = memory.ensure(left, left);
+    assert(reversed !== diagonal, "many-value outputs are distinct");
+    same(result.kind, "bundle", "many result remains BundleValue");
+    setSame(result.links, [reversed, diagonal], "many result exact values");
+    same(result.occurrences.length, 2, "many result occurrence count");
+  }
 
   // Unknown Use: no Rule matches.
   {
-    const unknownUse = memory.ensure(right, left);
+    const unknownUse = memory.ensure(operand, memory.root);
     const unknownApplication = memory.ensure(unknownUse, operand);
     let rejected = false;
     try {
@@ -292,19 +378,20 @@ function executeCorpus(artifact: PortableStructuralTheoryArtifact): void {
   // Post-freeze live Theory mutation cannot change the selected Rule set.
   {
     const before = rules.length;
-    const bogusRole = memory.ensureStartSelfClosed(memory.ensure(left, right));
-    const roleDictionary = defineStructuralRoleDictionary(memory, [bogusRole]);
-    const input = memory.ensure(unary.use, bogusRole);
-    const output = memory.ensure(bogusRole, memory.root);
-    const body = memory.ensure(input, output);
-    const lateRule = defineStructuralRule(memory, roleDictionary, body);
-    admitStructuralRule(memory, theory, lateRule);
+    const bogusRole = memory.ensureStartSelfClosed(memory.ensure(operand, one.use));
+    defineExtensionRule(
+      memory,
+      theory,
+      [bogusRole],
+      memory.ensure(one.use, bogusRole),
+      [memory.ensure(bogusRole, memory.root)],
+    );
     same(rules.length, before, "frozen selected Rule set is immutable after live Theory growth");
 
-    const still = applyFrozenExtension(memory, rules, unaryApplication);
-    const poles = memory.poles(still);
-    same(poles.start, operand, "frozen authority preserves unary result after live mutation");
-    same(poles.end, operand, "frozen authority preserves unary result after live mutation");
+    const application = memory.ensure(one.use, operand);
+    const still = applyFrozenExtension(memory, rules, application);
+    setSame(still.links, [memory.ensure(operand, operand)],
+      "frozen authority preserves one-value result after live mutation");
   }
 }
 
@@ -322,33 +409,35 @@ async function main(): Promise<void> {
   executeCorpus(a.artifact);
   executeCorpus(b.artifact);
 
-  // Explicit ambiguous frozen authority: two Rules match the same one-role
-  // application. Generic kernel must reject rather than choose by order.
+  // Explicit authority ambiguity: two Rules compete for the same application.
+  // This is distinct from one Rule returning multiple bundle values.
   {
     const replay = replayPortableStructuralTheory(
-      buildAuthority(false, "ambiguous-dup").artifact,
+      buildAuthority(false, "ambiguous-one").artifact,
     );
     const rules = frozenRules(replay.memory, replay.theory);
-    same(rules.length, 3, "ambiguous F2a authority has three Rules");
-    const oneRoleViews = rules
+    same(rules.length, 4, "ambiguous F2a authority has four Rules");
+    const oneViews = rules
       .map((rule) => Object.freeze({ rule, ...ruleView(replay.memory, rule) }))
-      .filter((view) => view.roles.length === 1);
-    assert(oneRoleViews.length === 2, "ambiguous authority has two one-role candidates");
-    const use = oneRoleViews[0]!.use;
-    const operand = replay.memory.ensure(replay.memory.root, use);
-    const application = replay.memory.ensure(use, operand);
+      .filter((view) => view.roles.length === 1 && view.resultTemplateCount === 1);
+    assert(oneViews.length >= 2, "ambiguous authority has competing one-value Rules");
+    const useCounts = new Map<LinkHandle, number>();
+    for (const view of oneViews) useCounts.set(view.use, (useCounts.get(view.use) ?? 0) + 1);
+    const ambiguousUse = [...useCounts.entries()].find(([, count]) => count > 1)?.[0];
+    assert(ambiguousUse !== undefined, "competing Rules share one application Use");
+    const operand = replay.memory.ensure(replay.memory.root, ambiguousUse);
+    const application = replay.memory.ensure(ambiguousUse, operand);
     let rejected = false;
     try {
       applyFrozenExtension(replay.memory, rules, application);
     } catch {
       rejected = true;
     }
-    assert(rejected, "ambiguous frozen extension authority fails closed");
+    assert(rejected, "competing frozen semantic Rules fail closed as authority ambiguity");
   }
 
   // Anti-special-case guard: the generic apply kernel itself contains no
-  // extension-specific identifier. The test harness may name examples; the
-  // kernel may not.
+  // extension-specific identifier or cardinality branch.
   {
     const repoRoot = resolve(process.cwd(), "..");
     const source = readFileSync(
@@ -359,15 +448,22 @@ async function main(): Promise<void> {
     const end = source.indexOf("\nfunction ruleView(", start);
     assert(start >= 0 && end > start, "generic kernel source slice exists");
     const kernel = source.slice(start, end);
-    for (const forbidden of ["dup", "swap", "\"x\"", "canonicalByte", "ROOT", "START", "END", "PAIR"]) {
-      assert(!kernel.includes(forbidden), `generic kernel has no form-specific branch: ${forbidden}`);
+    for (const forbidden of [
+      "zeroUse", "oneUse", "manyUse", "DUP", "SWAP", "\"x\"",
+      "canonicalByte", "ROOT", "START", "END", "PAIR",
+      "resultTemplates.length ===",
+    ]) {
+      assert(!kernel.includes(forbidden), `generic kernel has no form/cardinality-specific branch: ${forbidden}`);
     }
   }
 
   console.log([
     "MTS v0.13 FORMAL F2a:",
     "GENERIC_LINK_EXTENSION_APPLICATION=GREEN_SCOPED_RESEARCH",
-    "PORTABLE_RULES=2",
+    "PORTABLE_RULES=3",
+    "RESULT_CARDINALITY=ZERO_ONE_MANY",
+    "RESULT_KIND=VALUE_BUNDLE",
+    "SINGLETON_BUNDLE_NE_LINK=CONFIRMED",
     "INDEPENDENT_MEMORIES=2",
     "HOST_FORM_SPECIFIC_BRANCHES=0",
     "NEGATIVE_CONTROLS=3",
