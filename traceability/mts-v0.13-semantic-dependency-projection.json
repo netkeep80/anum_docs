@@ -75,8 +75,8 @@
     "rootAsymmetryErasureNondegenerateBasisRejected": true,
     "selfGeneratedDefinitionF5F3Complete": true,
     "selfGeneratedFullF4AuthorityProven": true,
-    "genericConstructionPlanF5F4Complete": false,
-    "genericConstructionRuntimeDomainSourceRemovalProven": false
+    "genericConstructionPlanF5F4Complete": true,
+    "genericConstructionRuntimeDomainSourceRemovalProven": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1000,12 +1000,12 @@
     "selfGeneratedDefinitionF5F3ProducerMemoryCount": 2,
     "selfGeneratedDefinitionF5F3ReceiverMemoryCount": 2,
     "selfGeneratedDefinitionF5F3UnchangedF4ReceiverSourceMatch": true,
-    "genericConstructionPlanF5F4ConstraintCount": null,
-    "genericConstructionPlanF5F4OrdinaryEnsureCount": null,
-    "genericConstructionPlanF5F4StartSelfEnsureCount": null,
-    "genericConstructionPlanF5F4EndSelfEnsureCount": null,
-    "genericConstructionPlanF5F4DomainSpecificConstructorBranchCount": null,
-    "genericConstructionPlanF5F4IndependentMemoryCount": null
+    "genericConstructionPlanF5F4ConstraintCount": 97,
+    "genericConstructionPlanF5F4OrdinaryEnsureCount": 75,
+    "genericConstructionPlanF5F4StartSelfEnsureCount": 22,
+    "genericConstructionPlanF5F4EndSelfEnsureCount": 0,
+    "genericConstructionPlanF5F4DomainSpecificConstructorBranchCount": 0,
+    "genericConstructionPlanF5F4IndependentMemoryCount": 2
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -1187,10 +1187,10 @@
     "genericConstructionPlanF5F4IndependentMemoryCount": "Independent replay Memories executing the same frozen constructive plan and required to produce byte-identical canonical topology."
   },
   "nextExperiments": [
-    "F5-F4: inventory and source-remove/classify the generic producer authority still visible in F5-F3, especially the 19-position generation-request interpretation and calls that construct Dictionary/source/grouping/proof evidence. Do not count F5-F3 behavioral SELF_GENERATED as FULL_SELF_HOSTED.",
+    "F5-F5: falsify/remove the external construction-plan source. The 97-equation F5-F4 plan must be generated or reconstructed from more primitive frozen MTS evidence without running the domain-specific F5-F3 reference producer as a compiler.",
     "Source-remove or classify the generic structural admission rule interpreter itself; data-driven E3 is not yet global E3 closure.",
-    "Carry A14 root asymmetry/chirality into any future carrier or observer redesign: reversal may exchange L/U, but an orientation-free non-degenerate root basis must defeat the O=C and L=U collapse falsifiers.",
-    "A15: investigate weighted predictive Bundle frontiers now that the full generated-definition path executes; attach weights to occurrences/provenance, never use probability/rank as admission or publication authority.",
+    "Carry A14 root asymmetry/chirality into future carrier/observer redesigns; reversal may exchange L/U but an orientation-free non-degenerate root basis must defeat O=C and L=U collapse controls.",
+    "A15: investigate weighted predictive Bundle frontiers with weights on occurrences/provenance; prediction/ranking must remain separate from admission and publication authority.",
     "Keep A13/A13b branch scheduling/materialization semantics as the substrate for multi-candidate generation and future physical parallel-executor work."
   ],
   "measurement": {
@@ -3973,7 +3973,7 @@
       }
     },
     "genericConstructionPlanF5F4": {
-      "status": "DESIGNED_NOT_EXECUTED",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can the domain-specific F5-F3 runtime producer be replaced by one generic Link-carried constructive plan whose only operations are role binding plus canonical Link materialization selected by target/start/end role incidence?",
       "method": [
         "run the already-GREEN F5-F3-style reference producer once in an isolated compiler Memory",
@@ -3997,7 +3997,24 @@
         "global E2/E3/E4, FULL_SELF_HOSTED and v0.13 acceptance remain open"
       ],
       "evidenceTest": "ts/test/research-v013-generic-construction-plan-f5-f4.test.ts",
-      "consequence": "Pending CI. A GREEN result would separate runtime construction mechanism from externally supplied construction semantics and make the remaining source-authority boundary explicit."
+      "consequence": "F5-F4 removes domain-specific semantics from the runtime construction mechanism on this scoped path: the runtime consumes only frozen Link role bindings and target/start/end equations. However the 97-equation plan is compiled from an external domain-specific reference producer, so semantic information has been relocated into Link data rather than eliminated or self-reconstructed. Global E2/E3 and FULL_SELF_HOSTED remain open; the next gate must attack the external construction-plan source itself.",
+      "currentResult": "GREEN: the complete F5-F3 generated-authority construction trace compiles to 97 frozen Link-carried target/start/end role equations. One generic runtime constructor executes 75 ordinary pair ensures and 22 START-self-closed ensures, with zero END/full-self operations and zero Dictionary/Source/Grouping/Function/Application/Continuation/Witness/Publication-specific branches. Its complete final canonical topology is byte-identical to a fresh domain-specific reference-producer run from the same frozen state; two independent generic Memories agree, frozen F5-F2 admission remains GREEN, explicit publication is reproduced, and removing the final construction constraint fails closed.",
+      "observed": {
+        "constructionConstraints": 97,
+        "ordinaryEnsures": 75,
+        "startSelfEnsures": 22,
+        "endSelfEnsures": 0,
+        "fullSelfEnsures": 0,
+        "domainSpecificConstructorBranches": 0,
+        "genericTopologyEqualsReference": true,
+        "frozenStructuralAdmission": true,
+        "explicitPublicationReproduced": true,
+        "missingConstraintRejected": true,
+        "independentGenericMemories": 2,
+        "externalPlanSource": true,
+        "semanticInformationReduced": false,
+        "productionChanged": false
+      }
     }
   }
 }
