@@ -120,6 +120,8 @@ function exercise(noise:boolean):void{
   same(memory.poles(factA).start,app0,"A64 result fact START is application Link");
   same(memory.poles(app0).start,f0,"A64 application START is current function");
   same(memory.poles(app0).end,a1,"A64 application END is selected argument");
+  same(q0p.start,memory.poles(app0).end,
+    "A64 current argument alternates from START in Q to END in application");
   assert(memory.poles(factA).start===app0&&rootPayload.end===rootFrame.state,
     "A64 application/context triads use opposite left/right association");
 
@@ -133,6 +135,10 @@ function exercise(noise:boolean):void{
   same(kB.cursor,q1,"A64 branch B advances same argument cursor");
   same(kA.currentFn,gA,"A64 branch A result becomes next current function");
   same(kB.currentFn,gB,"A64 branch B result becomes next current function");
+  same(memory.poles(factA).end,memory.poles(kA.state).start,
+    "A64 result alternates from END in result fact to START in next frame state");
+  same(memory.poles(factB).end,memory.poles(kB.state).start,
+    "A64 branch B result alternates END-to-START likewise");
 
   // Intermediate values are branch-local temporaries, not root results.
   assert(memory.find(rootContext,gA)===undefined,"A64 intermediate A absent from root result scope");
@@ -211,6 +217,8 @@ function main():void{
     "CONTEXT_PAYLOAD_TRIAD=PARENT_TO_(F_TO_Q)",
     "CONTEXT_TRIAD_ASSOCIATIVITY=RIGHT",
     "MIRROR_ASSOCIATIVITY=CONFIRMED_SCOPED",
+    "ARGUMENT_ROLE_ALTERNATION=Q_START_TO_APPLICATION_END",
+    "RESULT_ROLE_ALTERNATION=RESULT_END_TO_NEXT_FRAME_START",
     "CURRENT_ARGUMENT=START_OF_SELECTED_Q NEXT_CURSOR=END_OF_SELECTED_Q",
     "MOVING_FUNCTION_POINTER=RESULT_BECOMES_NEXT_F",
     "MOVING_ARGUMENT_POINTER=Q_BECOMES_NEXT_Q",
