@@ -173,7 +173,7 @@
     "applicationNormalFormA52Designed": true,
     "applicationNormalFormA52Complete": true,
     "proofGatedApplicationA53Designed": true,
-    "proofGatedApplicationA53Complete": false
+    "proofGatedApplicationA53Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -4269,6 +4269,7 @@
         "twoValidCandidatesAmbiguous": true,
         "frozenCandidateIdentityReferences": 0,
         "independentMemories": 2,
+        "finalCi": "GREEN_6319",
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-structural-admission-f5-f2.test.ts",
@@ -6771,7 +6772,7 @@
       }
     },
     "proofGatedApplicationA53": {
-      "status": "DESIGNED_CI_PENDING",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A52's generic binary application executor be reduced to Link-carried proof validation plus an isolated raw Memory constructor, with zero semantic pole reads of the Application Link and zero host boolean role/template decisions?",
       "setup": [
         "selected input carries Application proof separately from K->Application so the semantic path never decomposes the Application Link itself",
@@ -6808,7 +6809,7 @@
         "A53 does not by itself prove memory.ensure is E1 rather than E2; that is A54",
         "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "If exact-head CI is GREEN, A53 reduces the A52 host binary executor to proof-carried canonical validation plus a raw constructor boundary. Invalid physical scratch Links remain semantically inert, demonstrating again that ambient Memory existence is not truth. A54 must classify the residual raw constructor rather than recurse indefinitely into self-hosting physical Link creation.",
+      "consequence": "A53 reduces the A52 host binary executor to proof-carried canonical validation plus a raw constructor boundary. Invalid physical scratch Links remain semantically inert, demonstrating again that ambient Memory existence is not truth. A54 must classify the residual raw constructor rather than recurse indefinitely into self-hosting physical Link creation.",
       "observed": {
         "applicationPoleSemanticReads": 0,
         "hostRoleTemplateBooleanBranches": 0,
