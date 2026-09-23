@@ -335,7 +335,7 @@ function staticGuards():void{
   same(x.replace(/\s+/g,""),y.replace(/\s+/g,""),"A39 runtime source-identical A21/A37");
 
   const selected=own.slice(own.indexOf("function executeSelectedBootstrap("),own.indexOf("\nfunction exercise(",own.indexOf("function executeSelectedBootstrap(")));
-  for(const forbidden of ["defineFrozenPlan(","compileReference(","roles[","constraintLinks",".find(",".outgoing(",".incoming(","switch("])
+  for(const forbidden of ["defineFrozenPlan(",forbiddenReferenceCompiler,"roles[","constraintLinks",".find(",".outgoing(",".incoming(","switch("])
     assert(!selected.includes(forbidden),`A39 selected executor excludes authoring primitive ${forbidden}`);
 }
 
