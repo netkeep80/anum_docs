@@ -149,7 +149,9 @@
     "ruleSchemaUnderdeterminationA41Complete": true,
     "ruleSchemaUnderdeterminationA41ExactSchemaSourceRemoved": false,
     "ruleSemanticSchemaContractA42Designed": true,
-    "ruleSemanticSchemaContractA42Complete": true
+    "ruleSemanticSchemaContractA42Complete": true,
+    "linkNativeContractMatchingA43Designed": true,
+    "linkNativeContractMatchingA43Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1530,8 +1532,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A43: source-remove A42 host Set/equality validation. Express semantic-schema obligations and realization coverage through Link-native contextual authority/canonical identity plus recursive detachment, with ZERO for missing/duplicate/foreign obligations.",
-    "A43 must preserve A42's order-insensitive contract and must not reintroduce a privileged exact ProducerSchema topology; keep Rule-contract derivation as a separately visible residual unless independently removed.",
+    "A44: source-remove A43 host exact-one cardinality branch. Use Link-native occurrence/provenance structure so ZERO, ONE and MANY matches are distinguished by continuation topology and only ONE can reach contextual acceptance without host count===1.",
+    "A44 must preserve canonical Link-collapse matching, A42 order-insensitive contract semantics and A21 runtime; do not collapse MANY provenance into ONE or reintroduce host semantic equality.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6382,6 +6384,16 @@
       "residualAuthority": ["host Set/equality implements extensional contract validation", "host structural reader derives contract from Rule", "F5-F4/A36/A38/A21 remain the already-classified lower boundaries"],
       "consequence": "A42 removes arbitrary exact gate/package topology from schema semantic authority. The remaining immediate source boundary is host extensional validation of Link-carried obligations; A43 should reduce that validation to canonical Link identity plus contextual detachment without restoring exact topology authority.",
       "observed": {"exactTopologyAuthorityInContract": 0, "freeRoleObligations": 5, "constrainedTargetObligations": 3, "forwardReverse": "ACCEPTED", "invalidRealizations": "ZERO", "contextualAcceptanceWitness": "K_TO_REALIZATION", "hostSetValidation": "RESIDUAL", "independentMemories": 2, "productionChanged": false}
+    },
+    "linkNativeContractMatchingA43": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A42 host Set/equality membership validation be removed while preserving order-insensitive semantic-schema coverage?",
+      "setup": ["for expected A build canonical gate g=g->A", "for each proposed B build query g->B; canonical identity makes query=g only when B=A", "use source-identical A21 detachment to emit one provenance occurrence per match", "validate expected->proposed and proposed->expected exact-one coverage without host Set membership or semantic Link equality"],
+      "oracle": ["forward and reverse A42 realizations accepted", "missing, duplicate, foreign, short-free and duplicate-free realizations yield ZERO", "direct probes expose match cardinality ZERO/ONE/MANY", "two independent Memories agree"],
+      "evidenceTest": "ts/test/research-v013-link-native-contract-matching-a43.test.ts",
+      "residualAuthority": ["host numeric matchCount===1 branch decides exact-one cardinality", "Rule->contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
+      "consequence": "A43 source-removes host semantic membership/equality from contract validation: matching is canonical Link collapse followed by ordinary A21 detachment. The remaining immediate validation boundary is the host exact-one cardinality decision over provenance multiplicity; A44 should make ZERO/ONE/MANY itself Link-native.",
+      "observed": {"hostSetMembershipValidation": 0, "hostSemanticLinkEqualityValidation": 0, "matching": "CANONICAL_LINK_COLLAPSE_PLUS_A21", "orderInsensitiveContract": true, "invalidRealizations": "ZERO", "matchCardinality": "ZERO_ONE_MANY", "hostExactOneCardinalityBranch": "RESIDUAL", "independentMemories": 2, "productionChanged": false}
     }
   }
 }
