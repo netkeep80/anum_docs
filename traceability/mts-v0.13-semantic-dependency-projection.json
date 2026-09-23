@@ -141,7 +141,7 @@
     "genericAdmissionProgramInstantiationA38Designed": true,
     "genericAdmissionProgramInstantiationA38Complete": true,
     "bootstrapProducerPlanA39Designed": true,
-    "bootstrapProducerPlanA39Complete": false
+    "bootstrapProducerPlanA39Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -6251,7 +6251,7 @@
       }
     },
     "bootstrapProducerPlanA39": {
-      "status": "EXECUTION_PENDING",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can the first A38-compatible Rule-bound TemplateE0 and FreeSeedSequence be generated after freeze from Link-carried construction evidence, with no host reference compiler and no self-authorized template publication?",
       "setup": [
         "freeze Rule->Plan before bootstrap execution",
@@ -6282,12 +6282,20 @@
         "GREEN makes ambient self-publication semantically inert without frozen-plan candidate-integrity authority",
         "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "Pending execution. A39 moves first-template bootstrap from prebuilt TemplateE0 into frozen Link-carried construction evidence; if GREEN the next source boundary is plan authoring itself.",
+      "consequence": "A39 removes host reference compilation of the first A38-compatible TemplateE0/free-seed package from the bootstrap execution path. A frozen Link-carried construction Plan, interpreted by the unchanged F5-F4 generic executor, generates Candidate, TemplateE0, FreeSeedSequence and Package after freeze. A36 canonical identity plus unchanged A21 rejects forged proposed templates despite ambient self-publication. The next semantic source boundary is authorship of the construction Plan itself.",
       "observed": {
         "hostReferenceCompiler": 0,
         "constructionExecutor": "F5_F4_SOURCE_IDENTICAL",
         "publicationValidation": "A36_CANONICAL_GATE_PLUS_A21",
         "planAuthoring": "HOST_BOOTSTRAP_RESIDUAL",
+        "firstTemplateE0Source": "FROZEN_LINK_CONSTRUCTION_PLAN",
+        "firstFreeSeedSequenceSource": "FROZEN_LINK_CONSTRUCTION_PLAN",
+        "validTemplatePackage": "PUBLISHED",
+        "forgedTemplates": "ZERO_SELF_PUBLICATION_REJECTED",
+        "lateAmbientPlan": "INERT",
+        "a38PackageSchema": "COMPATIBLE",
+        "independentMemories": 2,
+        "ci": "GREEN_6226",
         "productionChanged": false
       }
     }
