@@ -106,12 +106,22 @@ function exercise(noise:boolean):void{
   const rootFrame=defineFrame(memory,memory.root,f0,q0);
   const rootContext=rootFrame.context;
 
-  // The executable application/result triad is exactly (F->arg)->value.
+  // Context payload is the mirrored/right-associated triad parent -> (F -> Q).
+  const rootContextPoles=memory.poles(rootContext);
+  const rootPayload=memory.poles(rootContextPoles.end);
+  same(rootPayload.start,memory.root,"A64 context payload outer START is parent context");
+  same(rootPayload.end,rootFrame.state,"A64 context payload outer END is F->Q state");
+  same(memory.poles(rootPayload.end).start,f0,"A64 right-associated context triad keeps F");
+  same(memory.poles(rootPayload.end).end,q0,"A64 right-associated context triad keeps Q");
+
+  // The executable application/result triad is exactly left-associated (F->arg)->value.
   const app0=memory.ensure(f0,a1);
   const factA=memory.ensure(app0,gA),factB=memory.ensure(app0,gB);
   same(memory.poles(factA).start,app0,"A64 result fact START is application Link");
   same(memory.poles(app0).start,f0,"A64 application START is current function");
   same(memory.poles(app0).end,a1,"A64 application END is selected argument");
+  assert(memory.poles(factA).start===app0&&rootPayload.end===rootFrame.state,
+    "A64 application/context triads use opposite left/right association");
 
   // MANY on one application creates sibling child contexts.
   const kA=advance(memory,rootContext,factA);
@@ -197,6 +207,10 @@ function main():void{
     "EXECUTION_TRIAD=CONTEXT_CURRENT_FUNCTION_ARGUMENT_CURSOR",
     "FRAME_STATE=F_TO_Q",
     "APPLICATION_RESULT_TRIAD=(F_TO_ARG)_TO_VALUE",
+    "APPLICATION_TRIAD_ASSOCIATIVITY=LEFT",
+    "CONTEXT_PAYLOAD_TRIAD=PARENT_TO_(F_TO_Q)",
+    "CONTEXT_TRIAD_ASSOCIATIVITY=RIGHT",
+    "MIRROR_ASSOCIATIVITY=CONFIRMED_SCOPED",
     "CURRENT_ARGUMENT=START_OF_SELECTED_Q NEXT_CURSOR=END_OF_SELECTED_Q",
     "MOVING_FUNCTION_POINTER=RESULT_BECOMES_NEXT_F",
     "MOVING_ARGUMENT_POINTER=Q_BECOMES_NEXT_Q",
