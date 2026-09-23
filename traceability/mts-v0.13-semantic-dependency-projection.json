@@ -181,7 +181,11 @@
     "ruleNativeConstructionContractA55Designed": true,
     "ruleNativeConstructionContractA55Complete": true,
     "ruleNativeConstructionContractA55SourceRemoved": true,
-    "ruleNativeConstructionContractA55LinkNativeValidationReconnected": false
+    "ruleNativeConstructionContractA55LinkNativeValidationReconnected": true,
+    "directRuleLinkNativeCoverageA56Designed": true,
+    "directRuleLinkNativeCoverageA56Complete": true,
+    "directRuleLinkNativeCoverageA56HostSetValidatorRemoved": true,
+    "directRuleLinkNativeCoverageA56RoleCoverageTransducerRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1562,8 +1566,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A56: reconnect the A55 direct Rule-native obligation carriers to the already-GREEN A43-A45 canonical matching/cardinality/coverage machinery, so K->(Rule->Realization) reaches acceptance without a host extensional Rule validator and without recreating an intermediate derived Contract.",
-    "A56 must preserve A41 ordering underdetermination, A55 equation-form Rule authority, ambient physical-equation inertness, ZERO for missing/duplicate/foreign/misclassified inputs or equations, and must not reintroduce host Set/equality/exact-one semantic branches.",
+    "A57: classify or source-remove the remaining host role-coverage transducer used by A56 to combine proposed input-role carriers with START projections of proposed Rule-native equations before A45 coverage validation.",
+    "A57 must not reintroduce a derived Contract/free-role list. Prefer reusing A47-A48 proof-carried/construction-carried projection lessons or show that the transducer is only generic representation plumbing; preserve ZERO/ONE/MANY validation, A41 ordering underdetermination and ambient physical-equation inertness.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6955,6 +6959,73 @@
         "ambientPhysicalEquation": "INERT",
         "selectedRequest": "K_TO_RULE_TO_REALIZATION",
         "linkNativeValidationReconnected": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "directRuleLinkNativeCoverageA56": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can the A55 direct Rule-native carriers be validated through the already-GREEN A43-A45 canonical matching, Link-native ONE-cardinality and coverage-history machinery without recreating a derived Contract or using host Set/equality/exact-one semantic branches?",
+      "setup": [
+        "selected input is K->(Rule->Realization)",
+        "Rule poles directly carry roles and Rule-native equations",
+        "Realization poles directly carry proposed input roles and proposed equations",
+        "temporary role coverage is proposed input roles followed by START projections of proposed equations",
+        "two-element validation scratch descriptors pair Rule roles with role coverage and Rule equations with proposed equations",
+        "A45 bidirectional coverage history validates both descriptor components"
+      ],
+      "inheritedMechanisms": [
+        "A43 canonical Link-collapse matching",
+        "A44 stage-scoped ZERO/ONE/MANY ONE gate",
+        "A45 generic Link-carried coverage history",
+        "A21 recursive contextual detachment"
+      ],
+      "oracle": [
+        "22 exact-one checks are derived: 8+8 for role coverage and 3+3 for equation coverage",
+        "forward/reverse Rule carrier order and forward/reverse realization order are all accepted",
+        "missing, duplicate, foreign or misclassified input roles yield ZERO",
+        "missing, duplicate or foreign equations yield ZERO",
+        "ambient physical equation and ambient alternate request are inert",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "compileSelectedValidation contains no deriveSemanticContract/SemanticContract/freeRoles/constrainedTargets/Set membership/host exact-one branch/memory.find",
+        "compileSelectedValidation contains no derived Contract concept",
+        "deriveCoverageHistory is source-identical to A45",
+        "deriveOneCheck is source-identical to A45/A44",
+        "runtime step is source-identical to A45/A21"
+      ],
+      "evidenceTest": "ts/test/research-v013-direct-rule-coverage-a56.test.ts",
+      "residualAuthority": [
+        "host appendMappedSequence currently constructs the temporary role-coverage carrier from input roles plus START projections of proposed equations",
+        "equationTarget currently uses generic memory.poles(value).start",
+        "generic recursive carrier transduction and pole projection therefore remain an explicit source/classification boundary for A57",
+        "Rule authorship/generation/admission remain broader E2/E3 questions",
+        "A35 prior-publication existence and E4 orchestration remain open"
+      ],
+      "claimBoundary": [
+        "GREEN reconnects A55 Rule-native authority to the already-established Link-native validation semantics without a derived Contract",
+        "GREEN removes the host extensional Set/equality validator used only as A55 oracle",
+        "GREEN does not claim the temporary role-coverage transducer source-removed; A57 owns that boundary",
+        "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A56 closes the validation gap left intentionally by A55. Direct Rule roles/equations and Realization inputs/equations now feed unchanged A43-A45 canonical matching and Link-native exact-one coverage, producing contextual acceptance solely through A21. No derived SemanticContract, host set-equality validator or host exact-one branch is required. The remaining local source is sharply isolated to formation of the temporary role-coverage carrier by combining input roles with equation START projections.",
+      "observed": {
+        "derivedSemanticContract": 0,
+        "hostSetEqualityValidator": 0,
+        "hostExactOneBranch": 0,
+        "selectedAuthority": "K_TO_RULE_TO_REALIZATION",
+        "roleCoverage": "INPUT_ROLES_PLUS_EQUATION_TARGETS",
+        "equationTargetProjection": "START_POLE",
+        "coverageHistory": "A45_SOURCE_IDENTICAL",
+        "oneGate": "A44_STYLE_SOURCE_IDENTICAL",
+        "runtime": "A21_SOURCE_IDENTICAL",
+        "exactOneChecks": 22,
+        "validRuleOrders": 2,
+        "validRealizationOrders": 2,
+        "invalidControlClasses": 7,
+        "ambientPhysicalEquation": "INERT",
+        "hostRoleCoverageTransducer": "RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
