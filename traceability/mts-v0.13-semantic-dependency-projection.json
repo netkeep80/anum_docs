@@ -6375,7 +6375,7 @@
       "evidenceTest": "ts/test/research-v013-rule-schema-underdetermination-a41.test.ts",
       "residualAuthority": ["semantic schema contract is not yet represented Link-natively", "generic schema cloning and F5-F4 plan interpretation remain host-executed", "A35 publication-existence and A36 scratch boundaries remain open"],
       "consequence": "A41 separates semantic authority from incidental program packaging. The next target is not another exact template: A42 must derive a Rule-native semantic schema contract that admits multiple equivalent realizations and rejects incomplete ones.",
-      "observed": {"ruleRoleCount": 8, "constrainedTargetCount": 3, "ruleDerivedFreeRoleCount": 5, "equivalentDistinctSchemaCount": 2, "validVariants": "ACCEPT", "forgedVariants": "ZERO", "constructionExecutor": "F5_F4_SOURCE_IDENTICAL", "runtime": "A21_SOURCE_IDENTICAL", "exactSchemaSourceRemoved": false, "independentMemories": 2, "productionChanged": false}
+      "observed": {"ruleRoleCount": 8, "constrainedTargetCount": 3, "ruleDerivedFreeRoleCount": 5, "equivalentDistinctSchemaCount": 2, "validVariants": "ACCEPT", "forgedVariants": "ZERO", "constructionExecutor": "F5_F4_SOURCE_IDENTICAL", "runtime": "A21_SOURCE_IDENTICAL", "exactSchemaSourceRemoved": false, "independentMemories": 2, "finalCi": "GREEN_6260", "productionChanged": false}
     },
     "ruleSemanticSchemaContractA42": {
       "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
@@ -6398,7 +6398,7 @@
       "observed": {"hostSetMembershipValidation": 0, "hostSemanticLinkEqualityValidation": 0, "matching": "CANONICAL_LINK_COLLAPSE_PLUS_A21", "orderInsensitiveContract": true, "invalidRealizations": "ZERO", "matchCardinality": "ZERO_ONE_MANY", "hostExactOneCardinalityBranch": "RESIDUAL", "independentMemories": 2, "productionChanged": false}
     },
     "linkNativeOneCardinalityA44": {
-      "status": "REVISED_AFTER_SECOND_RED_CI_PENDING",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A43 host exact-one cardinality branching be removed so ZERO/ONE/MANY provenance itself determines whether validation continues?",
       "firstAttemptRed": "CI #6252 exhausted the Node heap because ZERO made bodyGate and truthGate alias as START(R); two continuations then shared one antecedent, creating an unauthorized exponentially branching frontier.",
       "firstRedCorrection": "Anchor the second gate on expectedTruth=matchK->R and compare actualTruth through a distinct truth gate. ZERO gets a distinct failing second gate.",
@@ -6408,8 +6408,8 @@
       "oracle": ["forward and reverse A42 realizations reach contextual acceptance", "all A43 invalid realization classes yield ZERO", "direct ZERO/ONE/MANY probes show only ONE reaches marker", "two independent Memories agree"],
       "evidenceTest": "ts/test/research-v013-link-native-one-cardinality-a44.test.ts",
       "residualAuthority": ["host loops assemble coverage checks from Contract/Realization carriers", "Rule->Contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
-      "consequence": "If the revised exact-head CI is GREEN, A44 removes the host matchCount===1 semantic branch: ZERO, ONE and MANY are distinguished by stage-scoped Link topology and ordinary recursive detachment; only ONE continues. The next boundary is host assembly/enumeration of the coverage program itself.",
-      "observed": {"hostExactOneCardinalityBranch": 0, "zeroOneMany": "STAGE_SCOPED_LINK_NATIVE_CONTINUATION_TOPOLOGY", "onlyOneReachesContextualAcceptance": "CI_PENDING", "matching": "CANONICAL_LINK_COLLAPSE_PLUS_A21", "orderInsensitiveContract": true, "coverageProgramAssembly": "HOST_GENERIC_RESIDUAL", "independentMemories": 2, "productionChanged": false}
+      "consequence": "A44 removes the host matchCount===1 semantic branch: ZERO, ONE and MANY are distinguished by stage-scoped Link topology and ordinary recursive detachment; only ONE continues. Two successive RED runs exposed both local ZERO-gate aliasing and cross-position repeated-check aliasing before final GREEN. The next boundary is host assembly/enumeration of the coverage program itself.",
+      "observed": {"hostExactOneCardinalityBranch": 0, "zeroOneMany": "STAGE_SCOPED_LINK_NATIVE_CONTINUATION_TOPOLOGY", "onlyOneReachesContextualAcceptance": true, "matching": "CANONICAL_LINK_COLLAPSE_PLUS_A21", "orderInsensitiveContract": true, "coverageProgramAssembly": "HOST_GENERIC_RESIDUAL", "independentMemories": 2, "productionChanged": false}
     }
   }
 }
