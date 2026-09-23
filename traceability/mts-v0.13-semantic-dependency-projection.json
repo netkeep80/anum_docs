@@ -166,7 +166,10 @@
     "structuralConstructionSchemaA49Designed": true,
     "structuralConstructionSchemaA49Complete": true,
     "directStructuralSchemaExecutionA50Designed": true,
-    "directStructuralSchemaExecutionA50Complete": true
+    "directStructuralSchemaExecutionA50Complete": true,
+    "templatePairJoinFalsifierA51Designed": true,
+    "templatePairJoinFalsifierA51Complete": true,
+    "templatePairJoinFalsifierA51SourceRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1547,8 +1550,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A51: source-remove the generic recursive template-instantiation host law exposed by A50. Execute role-bearing Link templates through Link-carried decomposition/construction authority without a JS recursive clone oracle.",
-    "A51 must keep the A49 StructuralRule schema and A47 receiver unchanged, preserve ZERO on forged decomposition, and must not reintroduce StructuralRule->plan compilation, frozen per-schema execution topology or target pole reads.",
+    "A52: reconnect the A51 binary-join boundary with the existing A16-F4/A16-F5 line. Source-remove pair-request production so template execution can emit selected K->Q join requests from Link-carried template/decomposition authority rather than host-selected operand frontiers.",
+    "A52 must keep A21 unary detachment unchanged, preserve A51 ambient-pair inertness and forged-decomposition ZERO, and must avoid automatic all-to-all pairing or a host semantic clone recursion.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -4162,6 +4165,7 @@
         "admissionDirectionHostBranches": 0,
         "forgedWitnessRejected": true,
         "independentMemories": 2,
+        "finalCi": "GREEN_6306",
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-admission-source-removal-a13d.test.ts",
@@ -6651,6 +6655,57 @@
         "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
         "genericRecursiveTemplateInstantiation": "HOST_RESIDUAL",
         "schemaAuthoritySource": "FIXTURE_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "templatePairJoinFalsifierA51": {
+      "status": "EXECUTED_GREEN_FALSIFIER_CLONE_SOURCE_REMOVAL_RED",
+      "question": "Can A50 generic recursive template instantiation be source-removed using only Link-carried decomposition, role bindings and unchanged unary A21 detachment, with no recursive clone oracle?",
+      "setup": [
+        "keep the A49 StructuralRule schema unchanged and use its decomposition-witness template to admit targetTemplate->S and targetTemplate->E projections",
+        "carry concrete S->startValue and E->endValue role bindings as selected continuations",
+        "seed contextual truth at targetTemplate and execute only unchanged A21 detachment",
+        "run a separate one-request A16-F4 pair-construction positive control after the pairless path reaches ZERO"
+      ],
+      "oracle": [
+        "valid template decomposition plus role bindings reaches both concrete poles but does not materialize startValue->endValue",
+        "the next unary A21 step yields ZERO because no selected continuation joins two independent truths",
+        "ambient physical existence of the concrete pair cannot revive the terminal frontier",
+        "forged swapped decomposition yields ZERO",
+        "one explicit Link-carried A16-F4 pair request constructs the exact missing target",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "A51 execution path contains no instantiateStructuralSchema/compileSchemaPlan/executeConstructionPlan/recursive clone",
+        "pairless template evaluation contains no binary memory.ensure(left,right) construction oracle",
+        "A21 runtime remains source-identical to A37"
+      ],
+      "evidenceTest": "ts/test/research-v013-template-pair-join-falsifier-a51.test.ts",
+      "expectedResult": "GREEN falsifier with source-removal RED: decomposition+bindings+A21 are insufficient; dynamic binary pair construction is the localized missing authority.",
+      "residualAuthority": [
+        "source/selection of dynamic pair requests remains the immediate boundary; A16-F4 executor itself still performs generic pair construction",
+        "construction StructuralRule/schema source and admission remain fixture authority",
+        "Rule->Contract derivation, A35 prior-publication existence and physical Memory substrate remain open"
+      ],
+      "claimBoundary": [
+        "A51 does not prove recursive template execution impossible; it falsifies sufficiency of decomposition+unary detachment for a minimal ordinary pair template",
+        "ambient pair existence is not semantic construction authority",
+        "positive-control A16-F4 pair request is not counted as source-removal because its request producer remains open",
+        "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A51 localizes A50's generic recursive clone residual to a binary join capability: once child values are available, unchanged A21 cannot synthesize their parent Link. A52 should reconnect this boundary with A16-F5 and make pair-request production Link-carried rather than reintroducing a recursive host clone.",
+      "observed": {
+        "recursiveCloneInA51": 0,
+        "templateDecomposition": "A47_STYLE_PROOF_CARRIED",
+        "roleBindings": "LINK_CARRIED",
+        "pairlessA21Result": "ZERO",
+        "targetMaterializedWithoutJoin": false,
+        "ambientPair": "INERT",
+        "forgedDecomposition": "ZERO",
+        "pairPositiveControl": "A16_F4_EXACT_FRESH_TARGET",
+        "minimumMissingAuthority": "DYNAMIC_BINARY_PAIR_REQUEST",
+        "sourceRemoved": false,
         "independentMemories": 2,
         "productionChanged": false
       }
