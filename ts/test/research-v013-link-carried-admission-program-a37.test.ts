@@ -355,13 +355,19 @@ function staticGuards(): void {
     "utf8",
   );
 
+  const ownStepStart = own.indexOf("function step(");
+  const ownStepEnd = own.indexOf("\ninterface Program", ownStepStart);
+  const a21StepStart = a21.indexOf("function step(");
+  const a21StepEnd = a21.indexOf("\nfunction executionContext(", a21StepStart);
+  assert(ownStepStart >= 0 && ownStepEnd > ownStepStart, "A37 own step source slice");
+  assert(a21StepStart >= 0 && a21StepEnd > a21StepStart, "A37 A21 step source slice");
+  const runtime = own.slice(ownStepStart, ownStepEnd);
   same(
-    normalize(sliceFunction(own, "step", "frontierTruthEnds")),
-    normalize(sliceFunction(a21, "step", "executionContext")),
+    normalize(runtime),
+    normalize(a21.slice(a21StepStart, a21StepEnd)),
     "A37 runtime step remains exact normalized A21 implementation",
   );
 
-  const runtime = sliceFunction(own, "step", "frontierTruthEnds");
   for (const forbidden of [
     "candidate", "rule", "binding", "constraint", "readExactSequence",
     "ensureStartSelfClosed(target)", ".find(", "switch(",
