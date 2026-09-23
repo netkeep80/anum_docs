@@ -224,7 +224,7 @@ function exercise(memory: Memory, withNoise: boolean): void {
   assert(stable !== undefined, "A55 selected valid request stable under ambient alternate");
 
   // Contract identity is literally Rule identity: no derived semantic object.
-  same(memory.poles(selected.end).start, forward.rule, "A55 request selects Rule directly");
+  same(memory.poles(memory.poles(selected).end).start, forward.rule, "A55 request selects Rule directly");
 }
 
 function staticGuards(): void {
