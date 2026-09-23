@@ -127,7 +127,9 @@
     "generationRequestHistoryA31Designed": true,
     "generationRequestHistoryA31Complete": true,
     "generationSelectionOccurrenceA32Designed": true,
-    "generationSelectionOccurrenceA32Complete": true
+    "generationSelectionOccurrenceA32Complete": true,
+    "genericCurrentOccurrenceA33Designed": true,
+    "genericCurrentOccurrenceA33Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1508,9 +1510,10 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A33: test whether current X and current meta-occurrence are instances of one generic current-occurrence carrier/reader rather than distinct semantic selectors.",
+    "A34: attack broad source-inventory membership/publication without authorizing ambient Memory. Replace host-enumerated ExactSequence inventory authority with a frozen Link-carried publication/catalog authority from which admitted source candidates are discovered structurally.",
+    "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
+    "After A34, reassess host-executed generic topology/rule interpreters as the principal remaining E2/E3 semantic boundary.",
     "A33 must preserve context identity, immutable ancestry and ambient-candidate isolation at both generation-selection and meta-execution levels.",
-    "If A33 is GREEN, treat the remaining current-occurrence pointer as an executor state boundary and return to unresolved source authority: broad inventory publication/membership and host-executed generic topology/rule interpreters.",
     "A32 must not execute every request execution linked to the generation context; selection must remain explicit in Link structure and preserve immutable request history.",
     "A31 must preserve immutable request truth and distinguish selected occurrence from ambient alternative G->Target truths.",
     "A25 should reuse F5-F7/F5-F8 lessons: derive correspondence structurally where possible, avoid a host-picked single exemplar, and require compatible alternatives to converge rather than adding heuristic ranking.",
@@ -5891,6 +5894,60 @@
         "compatibleTemplates": 2,
         "unchangedA23MetaStep": true,
         "externalSelectionRootX": true,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "genericCurrentOccurrenceA33": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Are A32 generation-selection heads and A22 meta-execution heads instances of one generic Link-native current-occurrence mechanism rather than distinct semantic selector primitives?",
+      "setup": [
+        "model occurrence ancestry uniformly as Occurrence_n = PreviousOccurrence -> ContextualValue_n",
+        "require every ContextualValue in one history to share one context by START identity",
+        "apply one generic reader to A32-shaped Q histories and A22-shaped M->E histories",
+        "treat the externally held current occurrence head as the only remaining current-position input"
+      ],
+      "oracle": [
+        "one generic reader recovers generation context/current Q/history and meta context/current M->E/history",
+        "ambient contextual values and newer unselected occurrences remain inert",
+        "advancing only the occurrence head changes the selected current value",
+        "mixed-context generation and meta histories reject fail-closed",
+        "reader contains zero generation/meta semantic dispatch",
+        "static evidence confirms A22 and A32 both construct current state through occurrence ancestry",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "generic reader contains no request/target/template/metaStep/produceNextExecution primitive",
+        "generic reader contains no find/outgoing/incoming/allLinks/switch ambient selector",
+        "context consistency is verified only from START(ContextualValue)",
+        "current value is END(selected occurrence head)"
+      ],
+      "residualAuthority": [
+        "the current occurrence-head handle remains selected by the physical/executor boundary",
+        "broad inventory membership/publication remains externally sourced",
+        "generic topology/rule interpreters remain host executed",
+        "classification as executor-state boundary is scoped to the tested occurrence representations"
+      ],
+      "evidenceTest": "ts/test/research-v013-generic-current-occurrence-a33.test.ts",
+      "claimBoundary": [
+        "GREEN would remove the need to classify current X and current meta-occurrence as distinct semantic authority types",
+        "GREEN would terminate the selector-wrapping regress for this line: choosing the current occurrence head is executor state, while semantic truth/authority remains inside Links",
+        "GREEN does not remove source authority for inventory publication or generic interpreters",
+        "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open; production unchanged"
+      ],
+      "consequence": "A33 shows that A32 generation-selection and A22 meta-execution current positions share one generic Link-native occurrence form: PreviousOccurrence->ContextualValue, with all carried values sharing one context. A single domain-agnostic reader recovers context, current value and immutable history for both. Therefore this research line no longer needs distinct semantic selector kinds for current X versus current meta-occurrence; the remaining choice of occurrence-head handle is classified as an executor-state boundary, scoped to these representations.",
+      "currentResult": "GREEN in the full TypeScript/test/browser-check step: the same generic reader consumes A32-shaped Q occurrence history and A22-shaped M->E truth history. Ambient contextual values and newer unselected occurrences remain inert; advancing the occurrence head changes selection. Mixed generation-context and mixed meta-context histories reject fail-closed. The reader contains no request/target/template/metaStep/produceNextExecution or ambient Memory selector primitive. Static checks confirm A22 and A32 both use occurrence ancestry. Two independent Memories agree.",
+      "observed": {
+        "commonShape": "PREVIOUS_OCCURRENCE_TO_CONTEXTUAL_VALUE",
+        "generationSelectionReader": "GENERIC",
+        "metaSelectionReader": "GENERIC",
+        "semanticSelectorTypesRequired": 0,
+        "ambientNewerGenerationOccurrence": "IGNORED",
+        "ambientNewerMetaOccurrence": "IGNORED",
+        "advanceByNewHead": true,
+        "mixedGenerationContext": "REJECTED",
+        "mixedMetaContext": "REJECTED",
+        "currentHeadSelection": "EXECUTOR_STATE_BOUNDARY_SCOPED",
         "independentMemories": 2,
         "productionChanged": false
       }
