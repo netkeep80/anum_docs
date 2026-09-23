@@ -7512,9 +7512,11 @@
       ],
       "oracle": [
         "two supplied values create a nested context chain K0 -> K1 -> K2 rather than a flat replacement of K0.current",
+        "two distinct earlier argument histories that end at the same latest value remain distinct when nested but collide under the flat common-parent representation",
         "reversing argument order produces a different context ancestry",
         "distinct MANY results from one parent produce distinct sibling child contexts sharing that exact parent",
         "continuing both sibling branches with the same later value preserves distinct child contexts because their parents differ",
+        "flattening those converged branches back to their common ancestor plus the same current value collapses them to one canonical context and therefore loses branch provenance",
         "re-materializing sibling contexts in a different order converges to the same canonical Link identities",
         "two independent Memories, one with unrelated allocation noise, satisfy the same structural laws"
       ],
@@ -7536,6 +7538,7 @@
         "contextInnerLinkOuterRole": "END",
         "twoLinkChiralPlacement": "CONFIRMED_STRUCTURAL",
         "multiArgumentExecution": "NESTED_CONTEXT_CHAIN",
+        "flatContextFalsifier": "LOSES_ARGUMENT_HISTORY_AND_BRANCH_PROVENANCE",
         "manyValuedExecution": "SIBLING_CHILD_CONTEXT_SPLIT",
         "convergedValueAncestry": "PRESERVED_BY_DISTINCT_PARENT_CONTEXTS",
         "applicationContextFormalDuality": "HYPOTHESIS_NOT_PROVEN",
@@ -7559,6 +7562,8 @@
         "nestedArguments": true,
         "argumentOrderStructural": true,
         "flatReplacementEquivalent": false,
+        "flatContextLosesArgumentHistory": true,
+        "flatContextLosesConvergedBranchProvenance": true,
         "manySiblingContexts": true,
         "convergedCurrentPreservesDistinctContextIdentity": true,
         "previousContextWholeBecomesNextPayloadStart": true,
