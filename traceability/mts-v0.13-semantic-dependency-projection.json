@@ -162,7 +162,7 @@
     "proofCarriedStartProjectionA47Designed": true,
     "proofCarriedStartProjectionA47Complete": true,
     "constructionCarriedDecompositionA48Designed": true,
-    "constructionCarriedDecompositionA48Complete": false
+    "constructionCarriedDecompositionA48Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -3612,6 +3612,7 @@
         "specialCaseBranches": 0,
         "candidateSelfExclusion": false,
         "independentMemories": 2,
+        "finalCi": "GREEN_6283",
         "productionChanged": false,
         "semanticClosureProven": false
       },
@@ -6494,7 +6495,7 @@
       }
     },
     "constructionCarriedDecompositionA48": {
-      "status": "DESIGNED_CI_PENDING",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A47 construction-time decomposition-witness authoring be removed from each target by making target and ordered decomposition evidence outputs of one reusable Link-carried generic construction template?",
       "setup": [
         "freeze one generic construction template with only START input, END input and fixed decomposition-role seeds",
@@ -6528,7 +6529,7 @@
         "per-instance external input is only ordered start/end operands",
         "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "If exact-head CI is GREEN, A48 folds decomposition evidence into generic Link creation authority: one frozen plan produces both each new target and its proof-carried START/END witness, while A47 projection admission remains unchanged. The next boundary is A49 source of the generic construction template itself.",
+      "consequence": "A48 folds decomposition evidence into generic Link creation authority: one frozen plan produces both each new target and its proof-carried START/END witness, while A47 projection admission remains unchanged. Per-target witness authoring is zero; the next boundary is A49 source of the generic construction template itself.",
       "observed": {
         "constructionTemplateCount": 1,
         "perTargetWitnessAuthoring": 0,
@@ -6538,7 +6539,7 @@
         "receiverTargetPoleReads": 0,
         "ambientProjection": "INERT",
         "forgedDecomposition": "ZERO",
-        "fullTraversal": "EXPECTED_CI_GREEN",
+        "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
         "constructionTemplateAuthoring": "BOOTSTRAP_RESIDUAL",
         "genericClone": "HOST_GENERIC_RESIDUAL",
         "independentMemories": 2,
