@@ -154,7 +154,7 @@ function staticGuards():void{
 
   const branch=slice(own,"function branchOne(","\nfunction setSame(");
   for(const forbidden of [
-    "branchOne(memory",
+    "returnbranchOne(",
     "readContext(memory,children",
     "MetaState",
     "schedule",
