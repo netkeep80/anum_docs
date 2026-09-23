@@ -323,7 +323,8 @@ function staticGuards():void{
   const own=readFileSync(join(root,"ts/test/research-v013-bootstrap-producer-plan-a39.test.ts"),"utf8");
   const f5=readFileSync(join(root,"ts/test/research-v013-generic-construction-plan-f5-f4.test.ts"),"utf8");
   const a37=readFileSync(join(root,"ts/test/research-v013-link-carried-admission-program-a37.test.ts"),"utf8");
-  assert(!own.includes("compileReference("),"A39 contains no host reference compiler");
+  const forbiddenReferenceCompiler=["compile","Reference("].join("");
+  assert(!own.includes(forbiddenReferenceCompiler),"A39 contains no host reference compiler");
 
   const a=own.slice(own.indexOf("function executeConstructionPlan("),own.indexOf("\nfunction makeRoles(",own.indexOf("function executeConstructionPlan(")));
   const z=f5.slice(f5.indexOf("function executeConstructionPlan("),f5.indexOf("\nfunction runReference(",f5.indexOf("function executeConstructionPlan(")));
