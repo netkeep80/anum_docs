@@ -197,7 +197,11 @@
     "constructionCarriedEquationWitnessA59Designed": true,
     "constructionCarriedEquationWitnessA59Complete": true,
     "constructionCarriedEquationWitnessA59PerEquationAuthoringRemoved": true,
-    "constructionCarriedEquationWitnessA59TemplateSourceReconnected": false
+    "constructionCarriedEquationWitnessA59TemplateSourceReconnected": false,
+    "ruleProofApplicationReconnectA60Designed": true,
+    "ruleProofApplicationReconnectA60Complete": true,
+    "ruleProofApplicationReconnectA60TemplateSourceReconnected": true,
+    "ruleProofApplicationReconnectA60RuleApplicationProducerRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1578,8 +1582,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A60: reconnect the A59 reusable witnessed-equation construction template to the already-established A49-A54 source-removal line. Replace the fixture-authored construction-plan/topology source and generic clone residual with Rule/selected-application/proof-gated construction authority, without reintroducing per-equation witness authoring.",
-    "A60 must preserve target/start/end as the only per-instance semantic inputs, exact A58-compatible Equation+witness outputs, A54 raw-pair E1 boundary, canonical convergence across equivalent authorities, zero target-pole reads, and no derived Contract/target-role list.",
+    "A61: attack the remaining generic Rule->selected-application production boundary exposed by A60. Determine whether converting one ready Rule-carried decomposition obligation plus current role/value bindings into the selected application carrier is E4 orchestration/executor state or still an E2 semantic-source law.",
+    "A61 must not reintroduce an F5 construction plan, recursive clone, per-equation witness authoring, direct target-pole reads, derived Contract/free-role/target-role lists or ambient-Memory selection; it must preserve schedule/order convergence and A53/A54 proof-gated/E1 boundaries.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -7208,6 +7212,66 @@
         "equivalentReusableTemplateConvergence": true,
         "templateAuthoring": "RESIDUAL",
         "genericTopologySubstitution": "HISTORICAL_RESIDUAL_REOPENED_FOR_RECONNECTION_ONLY",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "ruleProofApplicationReconnectA60": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A59 witnessed-equation construction be reconnected to the A49-A54 source-removal line so the selected Rule carries reusable decomposition obligations, every ready binary node executes as a proof-gated selected application, and physical pair creation stays behind the A54 E1 boundary without an F5 plan or recursive clone?",
+      "setup": [
+        "one StructuralRule carries three per-instance input roles and a Link-carried set of proof-carrying decomposition obligations for the Equation+witness output templates",
+        "selected request is Context -> (Rule -> role-binding carrier) with target/start/end as the only per-instance semantic values",
+        "generic scheduler may scan Rule obligations forward or reverse; readiness/order is treated as explicit E4 orchestration rather than semantic authority",
+        "each ready obligation creates one selected Link application whose witness, proof, environment bindings and contextual truth are validated by stage-scoped canonical gates plus unchanged A21",
+        "physical result construction crosses only an opaque A54-style construct(start,end) boundary"
+      ],
+      "oracle": [
+        "forward/reverse Rule obligation order and forward/reverse scheduler order converge to identical canonical Equation+witness outputs",
+        "direct and noisy conforming physical constructors preserve the same outputs",
+        "three independent target/start/end inputs reproduce the exact A58-compatible Equation+witness topology",
+        "post-hoc direct construction adds zero Links",
+        "forged decomposition obligation yields ZERO even if physical scratch may be created",
+        "ambient decomposition obligation outside the selected Rule remains inert",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "A60 Rule execution contains no A59 executeConstructionPlan/instantiatePlan, recursive clone, derived freeRoles or constrainedTargets",
+        "selected application derivation does not inspect Application poles or use memory.find semantic equality",
+        "physical constructor interface carries no schema/template/role/context/truth/application/proof/candidate semantics",
+        "A51 binary-join localization, A52 selected-application normal form, A53 proof-gated semantics and A54 E1 classification are asserted as inherited boundaries",
+        "A21 runtime remains source-identical to A54"
+      ],
+      "evidenceTest": "ts/test/research-v013-rule-proof-application-reconnect-a60.test.ts",
+      "residualAuthority": [
+        "generic production of the selected application carrier from one ready Rule obligation plus current bindings remains host-executed and is the next A61 classification/source-removal boundary",
+        "scheduler readiness/order and fixed-point iteration remain explicitly E4 orchestration",
+        "Rule authorship/generation and Rule admission remain broader E2/E3 questions",
+        "A35 prior-publication existence remains open"
+      ],
+      "claimBoundary": [
+        "GREEN reconnects the local A59 construction template to Rule/selected-application/proof-gated/A54 construction authority and removes the reopened F5-plan/clone path",
+        "GREEN does not close the generic Rule->selected-application producer or global E4 scheduling",
+        "GREEN does not claim Rule authorship/admission source-removed",
+        "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A60 closes the local architectural loop opened by A59: Equation+witness construction no longer depends on the A59 F5-style plan interpreter or recursive topology clone. A selected StructuralRule carries unordered proof-carrying decomposition obligations; any ready obligation is executed as the same selected proof-gated binary application family established by A52-A53, and physical Link creation is replaceable within the A54 E1 constructor contract. Obligation order and execution schedule converge, so exact packaging/scheduling is not semantic authority. The next boundary is the generic host step that turns one ready Rule obligation plus current bindings into the selected application carrier.",
+      "observed": {
+        "a59F5PlanInterpreter": 0,
+        "recursiveClone": 0,
+        "semanticAuthority": "STRUCTURAL_RULE_PLUS_PROOF_CARRIED_DECOMPOSITION",
+        "pairConstruction": "SELECTED_PROOF_GATED_APPLICATION",
+        "applicationValidation": "STAGE_SCOPED_CANONICAL_COLLAPSE_PLUS_A21",
+        "physicalConstructor": "A54_E1_BOUNDARY",
+        "perInstanceSemanticInputs": "TARGET_START_END_ONLY",
+        "outputs": "EXACT_A58_EQUATION_PLUS_WITNESS",
+        "ruleObligationOrders": 2,
+        "schedulerOrders": 2,
+        "conformingConstructors": 2,
+        "forgedDecomposition": "ZERO",
+        "ambientObligation": "INERT",
+        "ruleToSelectedApplicationProduction": "HOST_GENERIC_RESIDUAL",
+        "scheduling": "E4_RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
