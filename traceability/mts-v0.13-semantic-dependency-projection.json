@@ -213,7 +213,10 @@
     "ruleSelfRealizationAdmissionA63Designed": true,
     "ruleSelfRealizationAdmissionA63Complete": true,
     "ruleSelfRealizationAdmissionA63HostSemanticWhitelistRemoved": true,
-    "ruleSelfRealizationAdmissionA63GlobalFormationClosed": false
+    "ruleSelfRealizationAdmissionA63GlobalFormationClosed": false,
+    "executionContextGeometryA64Designed": true,
+    "executionContextGeometryA64Complete": true,
+    "executionContextGeometryA64FormalDualityProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1594,8 +1597,10 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A64: build an end-to-end selected Rule lifecycle closure experiment: externally supplied Rule content -> A63 structural self-realization -> A62 immutable publication history -> direct K->(Rule->Realization) execution through A60/A61. Reassess whether any E2 host semantic decision remains on this complete line.",
-    "A64 must keep Rule content authoring as explicit external input rather than hidden host interpretation, preserve A62 publication selection as authority, preserve A63 structural validity as separate from publication, and keep E3 formation plus E4 scheduling boundaries explicit instead of relabeling them E2.",
+    "A65: collapse the A13 host MetaState separation of context/tos/currentFn into a context-native frontier whose execution state is K.current = F->Q. Preserve first split, recursive split, local termination, schedule-order equivalence, extensional convergence and distinct branch ancestry while the frontier carries only execution contexts plus selected authority.",
+    "A65 must preserve A64's two independently advancing coordinates F and Q, left-associated (F->arg)->value execution, right-associated parent->(F->Q) context payloads, START/END role alternation, MANY sibling child contexts and final return only after cursor exhaustion. The scoped Q carrier may remain temporary in A65.",
+    "A66: attack the remaining argument-cursor representation boundary. Compare the scoped forward Q_i=arg_i->Q_(i+1) carrier with existing MTS sequence forms and test whether Q is a structural mirror/projection of an existing immutable sequence rather than a new semantic primitive.",
+    "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -7494,6 +7499,103 @@
         "publicationAuthority": "A62_HISTORY",
         "dictionarySequenceFormation": "E3_RESIDUAL",
         "completionScheduling": "E4_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "executionContextGeometryA64": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "Can one MTS execution stage be represented by an execution frame with two independently advancing Link-native coordinates — current function/value F and argument cursor Q — so that application is (F->arg(Q))->value, MANY creates sibling child contexts, and only an exhausted frame returns its final value to the root context?",
+      "authorClarification": [
+        "execution context is analogous to but not identical with multi-argument function application",
+        "a context must keep a relation to the current function/value and a pointer into an argument-link sequence",
+        "the function/value pointer advances to the result of each application",
+        "the argument pointer advances independently to the next argument",
+        "nested child-context current values are temporary execution variables; the overall result is returned in the root context",
+        "jsonRVM is historical analogy only, not normative authority"
+      ],
+      "candidateNormalForm": [
+        "Q_i = arg_i -> Q_(i+1), with Q_done = R, as a scoped cursor carrier for the falsifier",
+        "S_i = F_i -> Q_i",
+        "K_i = Context(parent_i,S_i)",
+        "application_i = F_i -> arg(Q_i)",
+        "resultFact_i = application_i -> y",
+        "child state: F_(i+1)=y and Q_(i+1)=next(Q_i)",
+        "for MANY results y_a,y_b,... one selected parent K_i yields sibling child contexts",
+        "when Q=R, final current F is returned as contextual root result K_root -> F"
+      ],
+      "oracle": [
+        "Q0 locally selects the first argument and Q1 selects the second without a host positional index",
+        "the selected argument is START of Q_i and the same Link becomes END of application F_i->arg_i",
+        "the result witness has exact two-Link left-associated application form (F->arg)->value",
+        "the context payload has exact right-associated form parent->(F->Q), exposing a scoped mirror in associativity without adding a new primitive",
+        "ONE application with two selected result facts creates two sibling contexts with the same next argument cursor but distinct next F values",
+        "each result is END of its application-result fact and the same Link becomes START of the next frame state F_(i+1)->Q_(i+1)",
+        "intermediate branch values do not appear as root-context results and cannot be finalized before Q is exhausted",
+        "each second-step branch consumes the same next argument independently and may converge to one extensional final value",
+        "converged final values keep distinct child-context ancestry while finalization canonically yields one root-context result",
+        "the original root F and intermediate F values remain immutable in ancestor frames; logical pointer movement is represented by child contexts, never host mutation",
+        "same F with a different Q and same Q with a different F produce distinct execution states",
+        "a result fact for the wrong current application is rejected",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "advance consumes one explicitly selected result fact and does not search ambient Memory for candidate results",
+        "the normative experiment uses only current anum_docs Memory and defineContext/readContext",
+        "the argument cursor carrier is explicitly scoped research and is not claimed as the final v0.13 sequence representation",
+        "A13 currentFn/tos and branch evidence are compatibility evidence only, not copied semantics",
+        "old contextual-binary relation tests supply independent MTS evidence for left-associated application topology",
+        "no jsonRVM vocabulary or context fields occur in the normative experiment"
+      ],
+      "evidenceTest": "ts/test/research-v013-execution-context-geometry-a64.test.ts",
+      "classification": {
+        "executionTriad": "CONTEXT_CURRENT_FUNCTION_ARGUMENT_CURSOR",
+        "frameState": "F_TO_Q",
+        "applicationResultTriad": "(F_TO_ARG)_TO_VALUE",
+        "applicationTriadAssociativity": "LEFT",
+        "contextPayloadTriad": "PARENT_TO_(F_TO_Q)",
+        "contextTriadAssociativity": "RIGHT",
+        "mirrorAssociativity": "CONFIRMED_SCOPED",
+        "argumentRoleAlternation": "Q_START_TO_APPLICATION_END",
+        "resultRoleAlternation": "RESULT_END_TO_NEXT_FRAME_START",
+        "currentArgument": "START_OF_SELECTED_Q_SCOPED",
+        "nextArgumentCursor": "END_OF_SELECTED_Q_SCOPED",
+        "movingFunctionPointer": "RESULT_BECOMES_NEXT_F",
+        "movingArgumentPointer": "Q_BECOMES_NEXT_Q",
+        "pointerMovement": "IMMUTABLE_CHILD_CONTEXT_NOT_MUTATION",
+        "manyValuedExecution": "SIBLING_CHILD_CONTEXT_SPLIT",
+        "intermediateValues": "CHILD_CONTEXT_LOCAL_TEMPORARIES",
+        "finalResult": "ROOT_CONTEXT_ONLY_AFTER_CURSOR_EXHAUSTION",
+        "convergedBranches": "ONE_ROOT_RESULT_WITH_DISTINCT_CHILD_ANCESTRY",
+        "argumentCursorCarrier": "SCOPED_NOT_FINAL_REPRESENTATION",
+        "jsonRvmNormativeAuthority": 0
+      },
+      "residualAuthority": [
+        "the scoped Q_i=arg_i->Q_(i+1) cursor carrier must be reconciled with an existing MTS sequence carrier before any normative representation claim",
+        "A64 does not yet derive result facts application->value from Rule authority; it consumes explicitly selected result facts to isolate execution-frame geometry",
+        "root-return projection after cursor exhaustion is structural in this falsifier but must later be connected to general Rule/context execution",
+        "the A63/A62 lifecycle-provenance question is deferred until it is represented as ordinary execution-frame ancestry",
+        "global E2/E3/E4 and Rule content authorship remain open"
+      ],
+      "claimBoundary": [
+        "GREEN establishes the scoped execution-frame geometry, not a final interpreter ABI",
+        "GREEN does not claim the scoped argument cursor is the accepted MTS sequence representation",
+        "GREEN confirms scoped mirror associativity: application is left-associated while context payload is right-associated",
+        "GREEN does not make jsonRVM normative and does not claim a full semantic application/context duality theorem",
+        "v0.13 remains unaccepted; FULL_SELF_HOSTED remains false"
+      ],
+      "consequence": "A64 replaces the too-flat model K=START(parent->currentValue) with a frame model in which context carries a state S=F->Q. F is the moving current function/value pointer and Q is an independently moving argument cursor. Each selected result witness has the ordinary MTS shape (F->arg)->value; every result becomes the next F in a new child context while Q advances separately. MANY therefore creates sibling contexts naturally. Intermediate values remain branch-local temporaries, and only a frame with exhausted Q returns its final F into the root context. This aligns prior MTS evidence for curried application with prior branch-local context evidence without importing jsonRVM as authority.",
+      "observed": {
+        "selectedArguments": 2,
+        "firstStepFanout": 2,
+        "secondStepConvergenceValueCount": 1,
+        "secondStepDistinctLeafContexts": 2,
+        "intermediateRootResults": 0,
+        "prematureFinalizeRejected": true,
+        "mismatchedResultRejected": true,
+        "functionPointerImmutableHistory": true,
+        "cursorPointerImmutableHistory": true,
+        "rootResultCanonicalConvergence": true,
         "independentMemories": 2,
         "productionChanged": false
       }
