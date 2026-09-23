@@ -7303,6 +7303,7 @@
         "canonical producer has no Rule reader, scheduler, pending set, role dictionary, memory.find semantic lookup or semantic branching",
         "the current-occurrence reader is source-identical to A33",
         "malformed producer outputs are not trusted: A53-style proof gates remain semantic authority",
+        "physical result construction remains behind an opaque start/end-only A54-style pair-constructor boundary",
         "physical/canonical formation may occur, but carrier existence alone does not grant contextual truth"
       ],
       "evidenceTest": "ts/test/research-v013-application-producer-classification-a61.test.ts",
@@ -7339,6 +7340,7 @@
         "e2SemanticSourceInProducer": 0,
         "formation": "E3_SCOPED_BOUNDARY",
         "executionSelection": "E4_SCOPED_BOUNDARY",
+        "physicalConstructor": "A54_START_END_ONLY_BOUNDARY",
         "independentMemories": 2,
         "productionChanged": false
       }
