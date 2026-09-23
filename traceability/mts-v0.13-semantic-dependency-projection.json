@@ -153,7 +153,9 @@
     "linkNativeContractMatchingA43Designed": true,
     "linkNativeContractMatchingA43Complete": true,
     "linkNativeOneCardinalityA44Designed": true,
-    "linkNativeOneCardinalityA44Complete": true
+    "linkNativeOneCardinalityA44Complete": true,
+    "linkCarriedCoverageHistoryA45Designed": true,
+    "linkCarriedCoverageHistoryA45Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1534,8 +1536,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A45: source-remove A44 host coverage-program assembly. Generate the bidirectional obligation checks and ONE-cardinality continuation chain from Link-carried Contract/Realization authority rather than host loops that enumerate both carriers.",
-    "A45 must keep A43 canonical matching, A44 Link-native ZERO/ONE/MANY gate, A42 order-insensitive contract and A21 runtime unchanged; Rule->Contract derivation remains separately open unless also proven.",
+    "A46: source-remove the generic recursive carrier transducer left by A45. Generate/execute the Link-carried coverage history through existing generic Link construction/execution authority rather than host recursion over ExactSequence cells.",
+    "A46 must preserve A45 domain-coverage-loop count zero, A44 stage-scoped ONE gate, A43 canonical matching, A42 order-insensitive contract and A21 runtime; Rule->Contract derivation remains separately open.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6410,6 +6412,17 @@
       "residualAuthority": ["host loops assemble coverage checks from Contract/Realization carriers", "Rule->Contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
       "consequence": "A44 removes the host matchCount===1 semantic branch: ZERO, ONE and MANY are distinguished by stage-scoped Link topology and ordinary recursive detachment; only ONE continues. Two successive RED runs exposed both local ZERO-gate aliasing and cross-position repeated-check aliasing before final GREEN. The next boundary is host assembly/enumeration of the coverage program itself.",
       "observed": {"hostExactOneCardinalityBranch": 0, "zeroOneMany": "STAGE_SCOPED_LINK_NATIVE_CONTINUATION_TOPOLOGY", "onlyOneReachesContextualAcceptance": true, "matching": "CANONICAL_LINK_COLLAPSE_PLUS_A21", "orderInsensitiveContract": true, "coverageProgramAssembly": "HOST_GENERIC_RESIDUAL", "independentMemories": 2, "finalCi": "GREEN_6260", "productionChanged": false}
+    },
+    "linkCarriedCoverageHistoryA45": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A44 host coverage-program assembly loops be removed so bidirectional exact coverage is generated from Contract/Realization Link carriers without a JS check array?",
+      "setup": ["walk arbitrary ExactSequence carriers through one generic recursive structural fold and one generic recursive descriptor zipper", "for each carrier value derive A43 canonical match execution and the source-identical A44 stage-scoped ONE check", "append each check to immutable Link-native coverage history rather than a JS array", "recursively consume that Link history into selected continuation authority and execute with unchanged A21"],
+      "oracle": ["forward and reverse A42 realizations reach contextual acceptance", "missing target, duplicate target, foreign target, short free boundary and duplicate free role yield ZERO", "valid 5+5+3+3 obligations produce 16 history-carried checks", "ambient alternate request cannot rewrite selected E0", "two independent Memories agree"],
+      "antiCheat": ["coverage generator contains no for/map/forEach enumeration", "coverage generator contains no JS OneCheck array", "coverage generator has no free-vs-obligation or forward-vs-reverse list-specific variable names", "A44 deriveOneCheck is source-identical and A21 runtime is source-identical"],
+      "evidenceTest": "ts/test/research-v013-link-carried-coverage-history-a45.test.ts",
+      "residualAuthority": ["generic recursive ExactSequence fold/zip and coverage-history transduction remain host-executed generic mechanisms", "Rule->Contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
+      "consequence": "A45 removes domain-specific host coverage loops and JS program assembly: carrier membership/order supplies the traversal source and the intermediate validation program is Link-native history. The remaining immediate source boundary is the generic host recursive carrier transducer itself; A46 should move that generation/execution into existing Link-carried generic authority without restoring domain-specific loops.",
+      "observed": {"domainCoverageLoops": 0, "jsCheckArray": 0, "coverageSource": "CONTRACT_REALIZATION_LINK_CARRIERS", "descriptorZip": "GENERIC_RECURSIVE", "structuralFold": "GENERIC_RECURSIVE", "checkHistory": "LINK_NATIVE", "oneGate": "A44_SOURCE_IDENTICAL", "runtime": "A21_SOURCE_IDENTICAL", "validRealizations": "ACCEPT", "invalidRealizations": "ZERO", "genericRecursiveCarrierTransducer": "HOST_RESIDUAL", "independentMemories": 2, "productionChanged": false}
     }
   }
 }
