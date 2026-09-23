@@ -139,7 +139,7 @@
     "linkCarriedAdmissionProgramA37Designed": true,
     "linkCarriedAdmissionProgramA37Complete": true,
     "genericAdmissionProgramInstantiationA38Designed": true,
-    "genericAdmissionProgramInstantiationA38Complete": true
+    "genericAdmissionProgramInstantiationA38Complete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -6193,56 +6193,51 @@
       }
     },
     "genericAdmissionProgramInstantiationA38": {
-      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
-      "question": "Can A37's per-target Rule/Candidate compiler be removed by instantiating a frozen Link-native admission-program template through generic topology cloning, while keeping A21 runtime unchanged?",
+      "status": "EXECUTION_PENDING_AFTER_RED",
+      "question": "Can A37's per-target Rule/Candidate compiler be removed by instantiating a frozen Link-native admission-program template through generic topology cloning, while preserving constrained values by reconstruction rather than trusting them as target seeds?",
+      "firstAttemptRed": "Mapping every TemplateCandidate position directly to the target let forged constrained values bypass admission: template application=fn->arg was itself seed-mapped to forgedApplication, so clone did not reconstruct the constraint. CI #6212 failed on forged constraint 0.",
       "setup": [
-        "freeze one producer package Rule->(TemplateCandidate->TemplateE0)",
+        "freeze producer package Rule->Descriptor where Descriptor carries TemplateCandidate, TemplateE0 and an explicit free-seed sequence",
         "select target request as G->(Package->(Rule->TargetCandidate))",
-        "derive only generic equal-length seed correspondence from template/target candidate ExactSequences",
-        "clone TemplateE0 recursively through ordinary Link construction and self-incidence",
-        "execute resulting target E0 with source-identical A21 step"
+        "map only frozen free seeds by generic template/target candidate position correspondence",
+        "reconstruct all non-seed candidate topology and TemplateE0 recursively by ordinary Link construction/self-incidence",
+        "validate reconstructed Candidate against selected TargetCandidate through an A36 START-self canonical gate executed by unchanged A21 before exposing TargetE0"
       ],
       "oracle": [
-        "new valid target reaches ACCEPT without per-target rule decoding or constraint compilation",
-        "generated target E0 is exact-handle equal to post-hoc A37 reference compilation and the oracle adds zero Links",
-        "three independently forged target constraints yield ZERO",
-        "foreign Rule/package authority and malformed seed correspondence reject",
+        "valid target passes candidate-integrity gate, reaches ACCEPT and equals post-hoc A37 reference E0 with zero additional Links",
+        "forged constraint 0/1/2 each yields ZERO before TargetE0 publication",
+        "foreign Rule/package authority and malformed correspondence reject",
         "ambient alternate target request remains inert",
         "two independent Memories agree"
       ],
       "antiCheat": [
-        "generic instantiator contains no roles/bindings/constraint loop/gates/queries compiler constructs",
-        "generic instantiator contains no find/outgoing/incoming/allLinks/switch selector",
-        "runtime step is whitespace-normalized source-identical to A37/A21"
+        "target instantiator contains no roles/bindings/constraint loop/gates-array/queries-array compiler",
+        "target instantiator contains no find/outgoing/incoming/allLinks/switch selector",
+        "constrained target fields are not seed-mapped",
+        "candidate-integrity decision uses canonical Link collapse plus source-identical A21, not a host equality admission branch"
       ],
       "residualAuthority": [
-        "the first frozen TemplateE0 is still prepared by the A37 reference compiler and is a bootstrap producer-authority residual",
-        "generic candidate-seed correspondence and topology cloning remain host-executed generic mechanisms",
+        "the first TemplateE0 and the free-seed boundary are frozen bootstrap producer authority prepared externally",
+        "generic seed correspondence/topology cloning remain host-executed generic mechanisms",
         "A35 prior-publication existence authority and A36 probe scratch remain open",
         "current generated/root handle selection remains executor state"
       ],
       "evidenceTest": "ts/test/research-v013-generic-admission-program-instantiation-a38.test.ts",
       "claimBoundary": [
-        "GREEN removes domain-specific per-target Rule/Candidate compilation, not the origin of the first admission-program template",
-        "GREEN preserves exact A37 target topology and unchanged A21 runtime",
+        "if GREEN, A38 removes domain-specific per-target Rule/Candidate compilation but not origin of the first template/free-seed authority",
+        "if GREEN, forged constrained target values are rejected before TargetE0 selection",
         "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "A38 converts the A37 admission producer into reusable Link-carried producer authority: once one Rule-bound TemplateE0 exists, arbitrary same-shape target candidates receive exact admission execution roots through generic topology instantiation with no target rule/constraint compiler. The remaining producer boundary is now the bootstrap origin/admission of the first template authority.",
+      "consequence": "Pending rerun after a substantive RED: A38 now treats the free-vs-derived seed boundary as semantic producer authority instead of assuming every Candidate field is freely substitutable. The next falsifier is whether generic reconstruction plus canonical candidate-integrity detachment can reproduce exact A37 target programs without reintroducing a target compiler.",
       "observed": {
-        "targetProgramProducer": "GENERIC_TOPOLOGY_INSTANTIATION",
+        "firstAttempt": "RED_OVERBROAD_SEED_MAPPING",
+        "firstFailure": "FORGED_CONSTRAINT_0_FALSE_ACCEPT",
         "perTargetRuleDecoding": 0,
         "perTargetConstraintCompilation": 0,
         "runtimeStep": "A21_SOURCE_IDENTICAL",
-        "targetReferenceTopology": "EXACT",
-        "validTarget": "ACCEPT",
-        "forgedTargets": "ZERO",
-        "foreignProducerAuthority": "REJECTED",
-        "malformedCorrespondence": "REJECTED",
-        "ambientAlternateRequest": "INERT",
+        "freeSeedBoundary": "LINK_CARRIED_BOOTSTRAP_AUTHORITY",
         "frozenTemplateProgramOrigin": "BOOTSTRAP_RESIDUAL",
-        "independentMemories": 2,
         "productionChanged": false
       }
-    }
-  }
+    }  }
 }
