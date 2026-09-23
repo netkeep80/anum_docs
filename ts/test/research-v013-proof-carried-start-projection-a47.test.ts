@@ -239,6 +239,17 @@ function exercise(memory:Memory,withNoise:boolean):void{
   }
 
   const candidates=s.witnesses.map(w=>deriveStartProjection(memory,f,w));
+
+  // Projection Links now exist physically, but remain semantically inert until
+  // their proof gate admits them into selected continuation authority.
+  let intrinsic=seedTraversal(memory,s,[],memory.ensure(basis.L,basis.U));
+  intrinsic=step(memory,intrinsic,"forward");
+  same(frontierTruthEnds(memory,intrinsic)[0],s.payloads[2]!,
+    "A47 ambient projections do not alter intrinsic Cell->Payload step");
+  intrinsic=step(memory,intrinsic,"forward");
+  same(frontierTruthEnds(memory,intrinsic).length,0,
+    "A47 ambient unselected projections remain inert at Payload");
+
   const accepted=candidates.map((candidate,index)=>{
     same(candidate.target,s.payloads[index]!,"A47 witness target");
     same(candidate.start,s.previous[index]!,"A47 witness-carried START");
@@ -296,7 +307,7 @@ function main():void{
     "START_CONSTRUCTOR_NOT_PROJECTION=CONFIRMED",
     "PREAUTHORED_START_PROJECTION_EDGES=0 RECEIVER_TARGET_POLE_READS=0",
     "DECOMPOSITION_VALIDATION=A36_CANONICAL_COLLAPSE_PLUS_A21",
-    "VALID_DECOMPOSITION=PROJECTION_ADMITTED FORGED_DECOMPOSITION=ZERO",
+    "VALID_DECOMPOSITION=PROJECTION_ADMITTED FORGED_DECOMPOSITION=ZERO AMBIENT_PROJECTION=INERT",
     "DERIVED_START_PROJECTIONS=A46_FULL_TRAVERSAL",
     "DECOMPOSITION_WITNESS_SOURCE=CONSTRUCTION_TIME_RESIDUAL",
     "RELATIVE_POLE_PROJECTION=BOOTSTRAP_POLE_READ_NOT_REUSED",
