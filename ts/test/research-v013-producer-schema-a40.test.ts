@@ -162,7 +162,11 @@ function defineRule(memory:Memory):LinkHandle{
 }
 
 interface FrozenPlan{readonly plan:LinkHandle;readonly authority:LinkHandle;}
-/** A39 recipe retained only to author one abstract ProducerSchema and post-hoc oracle. */
+/**
+ * Falsifier boundary: A39 recipe is still required to author ProducerSchema.
+ * Therefore A40 compresses per-instance Plan authoring, but does NOT source-remove
+ * Plan topology authority. That residual must stay explicit for A41.
+ */
 function authorReferencePlan(memory:Memory,rule:LinkHandle,proposed:Candidate):FrozenPlan{
   const b=ensureRootBasis(memory),v=proposed.values;
   const roles=makeRoles(memory,72);let n=0;const role=():LinkHandle=>roles[n++]!;
@@ -311,6 +315,12 @@ function staticGuards():void{
   const f5=readFileSync(join(root,"ts/test/research-v013-generic-construction-plan-f5-f4.test.ts"),"utf8");
   const a37=readFileSync(join(root,"ts/test/research-v013-link-carried-admission-program-a37.test.ts"),"utf8");
   const inst=own.slice(own.indexOf("function instantiatePlanFromSchema("),own.indexOf("\nfunction executeSelectedPlan(",own.indexOf("function instantiatePlanFromSchema(")));
+  const schemaAuthor=own.slice(
+    own.indexOf("function defineProducerSchema("),
+    own.indexOf("\nfunction schemaRequest(",own.indexOf("function defineProducerSchema(")),
+  );
+  assert(schemaAuthor.includes("authorReferencePlan("),
+    "A40 falsifier keeps ProducerSchema authoring residual explicit");
   for(const forbidden of [
     "authorReferencePlan(","makeRoles(","roles[","triples",
     "for(const encoded","for (const encoded","constraintSequence",
@@ -327,7 +337,8 @@ function staticGuards():void{
 function main():void{
   exercise(new Memory(),false);exercise(new Memory(),true);staticGuards();
   console.log([
-    "MTS v0.13 A40: PRODUCER_SCHEMA_INSTANTIATION=GREEN_SCOPED_RESEARCH",
+    "MTS v0.13 A40: PRODUCER_SCHEMA_FALSIFIER=GREEN_SCOPED_RESEARCH",
+    "A40_PLAN_AUTHORING_SOURCE_REMOVAL=RED",
     "RULE_ONLY_PLAN_AUTHORITY=INSUFFICIENT_PACKAGING_SCHEMA_REQUIRED",
     "CONCRETE_PLAN_SOURCE=LINK_CARRIED_PRODUCER_SCHEMA",
     "PER_INSTANCE_PLAN_AUTHORING=0",
@@ -336,7 +347,7 @@ function main():void{
     "CONSTRUCTION_EXECUTOR=F5_F4_SOURCE_IDENTICAL RUNTIME=A21_SOURCE_IDENTICAL",
     "VALID_PACKAGE=PUBLISHED FORGED_0_1_2=ZERO",
     "FOREIGN_SCHEMA_RULE=REJECTED LATE_AMBIENT_SCHEMA=INERT",
-    "PRODUCER_SCHEMA_AUTHORING=HOST_BOOTSTRAP_RESIDUAL",
+    "PRODUCER_SCHEMA_AUTHORING=HOST_BOOTSTRAP_RESIDUAL NEXT_BOUNDARY=A41",
     "A35_PUBLICATION_EXISTENCE=RESIDUAL A36_PROBE_SCRATCH=RESIDUAL",
     "INDEPENDENT_MEMORIES=2 GLOBAL_E2=OPEN GLOBAL_E3=OPEN",
     "FULL_SELF_HOSTED=NOT_CLAIMED PRODUCTION_UNCHANGED",
