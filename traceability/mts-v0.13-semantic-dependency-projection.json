@@ -137,7 +137,9 @@
     "detachmentStructuralAdmissionA36Designed": true,
     "detachmentStructuralAdmissionA36Complete": true,
     "linkCarriedAdmissionProgramA37Designed": true,
-    "linkCarriedAdmissionProgramA37Complete": true
+    "linkCarriedAdmissionProgramA37Complete": true,
+    "genericAdmissionProgramInstantiationA38Designed": true,
+    "genericAdmissionProgramInstantiationA38Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1518,8 +1520,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A38: source-remove the host producer that compiles Rule/Candidate bindings into the A37 Link-carried admission execution root; generate the same K/Frontier program from Link authority without a domain-specific compiler.",
-    "A38 must reuse the unchanged A21 runtime step, preserve A36 canonical ZERO/ONE gates, and reject forged/missing producer authority before any ACCEPT publication.",
+    "A39: remove the frozen admission-template bootstrap residual left by A38; generate or admit the first Rule->(TemplateCandidate->TemplateE0) producer authority from Link-carried generic construction evidence rather than a host reference compiler.",
+    "A39 must keep A38 generic target instantiation and the A21 runtime unchanged, and must reject self-authorized template publication.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6186,6 +6188,58 @@
         "hostProgramProducer": "RESIDUAL",
         "hostRuleCandidateDecoding": "PRODUCER_RESIDUAL",
         "publicationExistence": "RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "genericAdmissionProgramInstantiationA38": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A37's per-target Rule/Candidate compiler be removed by instantiating a frozen Link-native admission-program template through generic topology cloning, while keeping A21 runtime unchanged?",
+      "setup": [
+        "freeze one producer package Rule->(TemplateCandidate->TemplateE0)",
+        "select target request as G->(Package->(Rule->TargetCandidate))",
+        "derive only generic equal-length seed correspondence from template/target candidate ExactSequences",
+        "clone TemplateE0 recursively through ordinary Link construction and self-incidence",
+        "execute resulting target E0 with source-identical A21 step"
+      ],
+      "oracle": [
+        "new valid target reaches ACCEPT without per-target rule decoding or constraint compilation",
+        "generated target E0 is exact-handle equal to post-hoc A37 reference compilation and the oracle adds zero Links",
+        "three independently forged target constraints yield ZERO",
+        "foreign Rule/package authority and malformed seed correspondence reject",
+        "ambient alternate target request remains inert",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "generic instantiator contains no roles/bindings/constraint loop/gates/queries compiler constructs",
+        "generic instantiator contains no find/outgoing/incoming/allLinks/switch selector",
+        "runtime step is whitespace-normalized source-identical to A37/A21"
+      ],
+      "residualAuthority": [
+        "the first frozen TemplateE0 is still prepared by the A37 reference compiler and is a bootstrap producer-authority residual",
+        "generic candidate-seed correspondence and topology cloning remain host-executed generic mechanisms",
+        "A35 prior-publication existence authority and A36 probe scratch remain open",
+        "current generated/root handle selection remains executor state"
+      ],
+      "evidenceTest": "ts/test/research-v013-generic-admission-program-instantiation-a38.test.ts",
+      "claimBoundary": [
+        "GREEN removes domain-specific per-target Rule/Candidate compilation, not the origin of the first admission-program template",
+        "GREEN preserves exact A37 target topology and unchanged A21 runtime",
+        "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A38 converts the A37 admission producer into reusable Link-carried producer authority: once one Rule-bound TemplateE0 exists, arbitrary same-shape target candidates receive exact admission execution roots through generic topology instantiation with no target rule/constraint compiler. The remaining producer boundary is now the bootstrap origin/admission of the first template authority.",
+      "observed": {
+        "targetProgramProducer": "GENERIC_TOPOLOGY_INSTANTIATION",
+        "perTargetRuleDecoding": 0,
+        "perTargetConstraintCompilation": 0,
+        "runtimeStep": "A21_SOURCE_IDENTICAL",
+        "targetReferenceTopology": "EXACT",
+        "validTarget": "ACCEPT",
+        "forgedTargets": "ZERO",
+        "foreignProducerAuthority": "REJECTED",
+        "malformedCorrespondence": "REJECTED",
+        "ambientAlternateRequest": "INERT",
+        "frozenTemplateProgramOrigin": "BOOTSTRAP_RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
