@@ -158,7 +158,9 @@
     "linkCarriedCoverageHistoryA45Complete": true,
     "intrinsicSequenceTraversalA46Designed": true,
     "intrinsicSequenceTraversalA46Complete": true,
-    "intrinsicSequenceTraversalA46SourceRemoved": false
+    "intrinsicSequenceTraversalA46SourceRemoved": false,
+    "proofCarriedStartProjectionA47Designed": true,
+    "proofCarriedStartProjectionA47Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1539,8 +1541,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A47: source-remove the START-projection authority exposed by A46. Derive or execute Payload->START(Payload) from Link-carried structural/aspect authority without pre-authoring one projection edge per ExactSequence payload and without a host memory.poles semantic oracle.",
-    "A47 must keep unchanged A21 traversal, preserve ambient-projection inertness, and distinguish constructor/aspect authority from genuine arbitrary-Link pole projection; Rule->Contract derivation remains separately open.",
+    "A48: source-remove the construction-time decomposition-witness producer exposed by A47. Derive or preserve ordered START/END construction evidence as part of generic Link creation authority rather than requiring an external caller to author witness bindings per target.",
+    "A48 must keep A47 receiver target-pole reads at zero, preserve forged-witness ZERO and ambient-projection inertness, and must not replace witness production with memory.poles(target) or a hidden per-target projection edge.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -3369,6 +3371,7 @@
         "rootFixedPointResult": "R(R) -> {R} in both direct and inverse methods",
         "hostAspectBranches": 0,
         "independentMemories": 2,
+        "finalCi": "GREEN_6277",
         "productionChanged": false,
         "semanticClosureProven": false
       },
@@ -6439,6 +6442,54 @@
       "residualAuthority": ["source/admission of generic START projection for arbitrary Payload Links", "Rule->Contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
       "consequence": "A46 narrows A45's host recursion boundary to one structural capability rather than a general iterator: recursive ExactSequence execution needs Link-carried START projection of Payload=Prev->Value. The intrinsic Payload already supplies Value when Prev is current, so END projection is not required for full traversal. A47 should attack the source of START projection without smuggling host poles or per-payload projection edges.",
       "observed": {"intrinsicFirstStep": "CELL_TO_PAYLOAD", "intrinsicSecondStep": "ZERO", "ambientProjection": "INERT", "selectedEndProjection": "LAST_VALUE_ONLY_NO_RECURSION", "selectedStartProjection": "FULL_TRAVERSAL_VALUES_3_OF_3", "minimumMissingAuthority": "PAYLOAD_TO_START_PAYLOAD", "a21Runtime": "SOURCE_IDENTICAL", "hostRecursiveSequenceReaderInTraversalRuntime": 0, "sourceRemoved": false, "independentMemories": 2, "productionChanged": false}
+    },
+    "proofCarriedStartProjectionA47": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A46's required Payload->START(Payload) authority be derived from proof-carried ordered construction evidence without pre-authoring projection edges and without receiver-side target pole reads?",
+      "setup": [
+        "when a Payload=start->end is constructed, materialize a decomposition witness from explicit START/END role bindings already known to the constructor",
+        "receiver reads only witness/binding topology, reconstructs start->end canonically, and never decomposes target",
+        "candidate projection target->start is admitted only through A36 canonical collapse plus unchanged A21",
+        "use admitted START projections with intrinsic Cell/Payload authority to reproduce A46 full ExactSequence traversal"
+      ],
+      "oracle": [
+        "START self-incidence constructor is distinct from arbitrary-Link START projection",
+        "projection edge is absent before witness derivation and witness itself does not pre-author it",
+        "physically materialized but unselected projection Links remain inert",
+        "valid decomposition admits exact target->start projection and full A46 traversal",
+        "forged ordered poles produce ZERO",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "receiver derivation contains no target memory.poles/readTargetPoles/memory.find projection oracle",
+        "A21 runtime remains source-identical to A37",
+        "existing FORMAL START constructor and relative-pole bootstrap reader are explicitly distinguished from arbitrary-Link projection"
+      ],
+      "evidenceTest": "ts/test/research-v013-proof-carried-start-projection-a47.test.ts",
+      "residualAuthority": [
+        "construction-time decomposition witness source remains externally authored from already-known operands",
+        "candidate projection construction is scratch until canonical gate admits it",
+        "Rule->Contract derivation, A35 prior-publication existence and broader physical substrate remain open"
+      ],
+      "claimBoundary": [
+        "A47 source-removes pre-authored START projection edges from the tested traversal path, not the source of decomposition evidence itself",
+        "A47 does not claim a universal host-free arbitrary-Link pole oracle",
+        "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A47 reduces the A46 START-projection source to proof-carrying construction evidence: receiver-side semantic projection no longer reads target poles, ambient projection Links remain inert, and forged evidence fails through canonical Link identity plus ordinary detachment. The next boundary is A48 construction of the decomposition witness itself.",
+      "observed": {
+        "preauthoredStartProjectionEdges": 0,
+        "receiverTargetPoleReads": 0,
+        "ambientProjection": "INERT",
+        "decompositionValidation": "A36_CANONICAL_COLLAPSE_PLUS_A21",
+        "validDecomposition": "PROJECTION_ADMITTED",
+        "forgedDecomposition": "ZERO",
+        "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
+        "decompositionWitnessSource": "CONSTRUCTION_TIME_RESIDUAL",
+        "runtime": "A21_SOURCE_IDENTICAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     }
   }
 }
