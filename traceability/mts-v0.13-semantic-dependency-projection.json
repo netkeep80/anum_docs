@@ -164,7 +164,7 @@
     "constructionCarriedDecompositionA48Designed": true,
     "constructionCarriedDecompositionA48Complete": true,
     "structuralConstructionSchemaA49Designed": true,
-    "structuralConstructionSchemaA49Complete": false
+    "structuralConstructionSchemaA49Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -3732,6 +3732,7 @@
         "structuralUnificationUsed": false,
         "canonicalByteUsed": false,
         "independentMemories": 2,
+        "finalCi": "GREEN_6292",
         "productionChanged": false
       }
     },
@@ -6549,7 +6550,7 @@
       }
     },
     "structuralConstructionSchemaA49": {
-      "status": "REVISED_AFTER_TYPECHECK_RED_CI_PENDING",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "firstAttemptRed": "CI #6289 stopped at TypeScript before evidence execution because inputRoles inferred as LinkHandle[] instead of the declared readonly [LinkHandle,LinkHandle] tuple.",
       "redCorrection": "Preserve the two-role schema boundary explicitly with [sRole,eRole] as const; no semantic mechanism changed.",
       "question": "Can A48 host-authored frozen F5 construction-plan topology be replaced by a Link-carried StructuralRule schema whose body directly states target and decomposition-witness templates over two input roles?",
@@ -6584,7 +6585,7 @@
         "A49 does not claim the construction schema itself is self-generated",
         "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "If exact-head CI is GREEN, construction semantics are represented by ordinary StructuralRule role/template authority rather than a privileged frozen F5 plan. The next boundary is A50: remove the host generic rule-to-plan compiler while preserving the same schema and construction behavior.",
+      "consequence": "A49 demonstrates that construction semantics can be represented by ordinary StructuralRule role/template authority rather than a privileged frozen F5 plan. The next boundary is A50: remove the host generic rule-to-plan compiler while preserving the same schema and construction behavior.",
       "observed": {
         "frozenF5PlanAuthority": 0,
         "schema": "STRUCTURAL_RULE_ROLE_TEMPLATE",
@@ -6594,7 +6595,7 @@
         "receiverTargetPoleReads": 0,
         "ambientProjection": "INERT",
         "forgedDecomposition": "ZERO",
-        "fullTraversal": "EXPECTED_CI_GREEN",
+        "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
         "schemaAuthoritySource": "FIXTURE_RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
