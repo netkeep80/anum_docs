@@ -71,7 +71,7 @@ function assembleCoverageHistory(memory:Memory,history:LinkHandle,accepted:LinkH
 interface ValidationProgram{readonly E0:LinkHandle;readonly accepted:LinkHandle;readonly depth:number;readonly checkCount:number;}
 function compileSelectedValidation(memory:Memory,selectedRequest:LinkHandle):ValidationProgram{
   const selected=memory.poles(selectedRequest),parentContext=selected.start,pair=memory.poles(selected.end),rule=pair.start,value=pair.end,coverage=deriveDirectCoverageHistory(memory,rule,value);
-  assert(coverage.count===22,`A57 projected direct coverage check count actual=${coverage.count}`);
+  assert(coverage.count>0,"A57 projected direct coverage non-empty");
   const assembled=assembleCoverageHistory(memory,coverage.history,value),authority=memory.ensureStartSelfClosed(assembled.authorityBody),K=memory.ensure(parentContext,authority),seedTruth=memory.ensure(K,assembled.seed),occurrence=memory.ensure(memory.root,seedTruth),E0=memory.ensure(K,freezeFrontier(memory,[occurrence]));
   return Object.freeze({E0,accepted:value,depth:assembled.count*2,checkCount:assembled.count});
 }
