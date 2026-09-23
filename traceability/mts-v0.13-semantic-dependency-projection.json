@@ -209,7 +209,11 @@
     "rulePublicationHistoryA62Designed": true,
     "rulePublicationHistoryA62Complete": true,
     "rulePublicationHistoryA62PriorExistenceSourceRemoved": true,
-    "rulePublicationHistoryA62RuleAdmissibilityClosed": false
+    "rulePublicationHistoryA62RuleAdmissibilityClosed": false,
+    "ruleSelfRealizationAdmissionA63Designed": true,
+    "ruleSelfRealizationAdmissionA63Complete": true,
+    "ruleSelfRealizationAdmissionA63HostSemanticWhitelistRemoved": true,
+    "ruleSelfRealizationAdmissionA63GlobalFormationClosed": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1590,8 +1594,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A63: attack Rule formation/admissibility before publication. Validate that a StructuralRule selected for publication satisfies its direct Rule-native structural obligations through Link-carried proof/coverage rather than host semantic authoring, whitelist or physical existence.",
-    "A63 must keep A62 immutable publication history as prior-existence authority, reject malformed or foreign Rule structures even if physically present or publication-shaped, and must not conflate publication with validity.",
+    "A64: build an end-to-end selected Rule lifecycle closure experiment: externally supplied Rule content -> A63 structural self-realization -> A62 immutable publication history -> direct K->(Rule->Realization) execution through A60/A61. Reassess whether any E2 host semantic decision remains on this complete line.",
+    "A64 must keep Rule content authoring as explicit external input rather than hidden host interpretation, preserve A62 publication selection as authority, preserve A63 structural validity as separate from publication, and keep E3 formation plus E4 scheduling boundaries explicit instead of relabeling them E2.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -7415,6 +7419,81 @@
         "ruleWellFormedAdmission": "E2_E3_RESIDUAL",
         "publicationEventFormation": "E3_RESIDUAL",
         "runtime": "A21_SOURCE_IDENTICAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "ruleSelfRealizationAdmissionA63": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can pre-publication structural admissibility of the A60 construction Rule be determined by the Rule's own proof-carrying topology under generic execution, rather than by a host RuleKind/opcode/whitelist or physical existence?",
+      "criterion": [
+        "bind every declared input role to itself",
+        "execute the selected Rule through the same proof-gated binary-application semantics used by A60",
+        "a structurally admissible Rule canonically reproduces every derived template and declared output under identity bindings",
+        "successful self-realization yields contextual admission truth K->Rule; physical Rule existence alone yields nothing"
+      ],
+      "oracle": [
+        "forward/reverse obligation order and forward/reverse scheduler order self-realize successfully",
+        "direct and noisy A54-conforming pair constructors preserve admission",
+        "forged decomposition witness is not admitted",
+        "a canonical self-dependent obligation makes no progress and is not admitted",
+        "a foreign undeclared output is not admitted",
+        "a duplicate-role dictionary is rejected",
+        "ambient physical scratch cannot rescue an invalid cyclic Rule",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "self-realization contains no RuleKind, opcode, whitelist, switch-based rule dispatch, memory.find, outgoing/incoming or allLinks semantic discovery",
+        "semantic construction reuses A60 proof-carried decomposition and A53-style canonical proof gates plus unchanged A21",
+        "declared output closure is also validated by stage-scoped canonical equality gates plus A21; no host output-identity boolean decides admission",
+        "the contextual admission witness is the actual final-frontier truth Link emitted by A21; the admission path contains no post-hoc ensure(K,Rule)",
+        "A62 immutable publication history remains a separate authority boundary; self-realization does not publish the Rule",
+        "successful result is contextual K->Rule, not a physical Rule self-link"
+      ],
+      "evidenceTest": "ts/test/research-v013-rule-self-realization-admission-a63.test.ts",
+      "classification": {
+        "structuralAdmissibility": "SELF_REALIZATION_UNDER_IDENTITY_BINDINGS",
+        "hostRuleKind": 0,
+        "hostOpcode": 0,
+        "hostWhitelist": 0,
+        "ruleContentAuthoring": "EXTERNAL_INPUT_BOUNDARY",
+        "dictionarySequenceFormation": "E3_RESIDUAL",
+        "completionScheduling": "E4_RESIDUAL",
+        "globalFormationClosed": false
+      },
+      "residualAuthority": [
+        "low-level role-dictionary and ExactSequence formation/reading remain E3 representation/formation boundaries",
+        "fixed-point readiness and completion detection remain E4 orchestration",
+        "Rule content authoring remains explicit external semantic input; A63 does not claim the system invents new semantic content ex nihilo",
+        "publication authorization remains A62 selected immutable history and is intentionally distinct from structural validity"
+      ],
+      "claimBoundary": [
+        "GREEN removes a host semantic Rule-kind/whitelist decision from the tested A60-style Rule-admissibility path",
+        "GREEN means structurally coherent Rule content can prove its own generic executability and declared-output closure under identity substitution; it does not authorize publication",
+        "GREEN does not close global E3/E4 or prove all possible StructuralRule representations admissible by this one criterion",
+        "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A63 separates Rule validity from Rule authority. An A60-style proof-carrying StructuralRule is structurally admissible when generic execution under identity role bindings reproduces its own derived topology and outputs. No host RuleKind/opcode/whitelist decides that property; malformed decomposition, self-dependency, foreign output and duplicate dictionary controls fail. A successful run yields the contextual Rule truth Link emitted by the final A21 frontier, while A62 publication history remains the independent act that grants authority. This prepares A64 to test the complete externally-authored -> structurally-admitted -> explicitly-published -> executed lifecycle and reassess E2 end-to-end.",
+      "observed": {
+        "structuralAdmissibility": "SELF_REALIZATION_UNDER_IDENTITY_BINDINGS",
+        "validRuleOrders": 2,
+        "schedulerOrders": 2,
+        "conformingConstructors": 2,
+        "forgedDecomposition": "ZERO",
+        "selfDependency": "ZERO",
+        "foreignOutput": "ZERO",
+        "duplicateRoleDictionary": "ZERO",
+        "ambientPhysicalScratch": "INERT",
+        "admissionResult": "CONTEXTUAL_RULE_TRUTH",
+        "admissionTruthSource": "A21_FRONTIER_TRUTH_LINK",
+        "postHocAdmissionEnsure": 0,
+        "hostSemanticWhitelist": 0,
+        "hostOutputIdentityBoolean": 0,
+        "outputClosure": "CANONICAL_GATES_PLUS_A21",
+        "ruleContentAuthoring": "EXTERNAL_INPUT_BOUNDARY",
+        "publicationAuthority": "A62_HISTORY",
+        "dictionarySequenceFormation": "E3_RESIDUAL",
+        "completionScheduling": "E4_RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
