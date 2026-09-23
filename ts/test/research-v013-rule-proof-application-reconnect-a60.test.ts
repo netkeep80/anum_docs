@@ -173,13 +173,13 @@ const p = memory.poles(binding); if (!dictionary.roles.includes(p.start) || valu
 values.set(p.start, p.end); }
 if (values.size !== dictionary.roles.length) return undefined; const body = memory.poles(structural.body);
 const obligations = [...readExactSequence(memory, body.start).values]; const outputs = readExactSequence(memory, body.end).values;
-if (outputs.length !== 2) return undefined; let pending = obligations;
+if (outputs.length !== 2) return undefined; const derivedTargets=new Set(obligations.map(value=>readObligationOperands(memory,value).node)); let pending = obligations;
 while (pending.length > 0) { let progress = false;
 const scan = schedule === "forward" ? pending : [...pending].reverse(); const executed = new Set<LinkHandle>();
 for (const witness of scan) { const o = readObligationOperands(memory, witness);
-const left = values.get(o.leftTemplate) ?? ( dictionary.roles.includes(o.leftTemplate) ? undefined : o.leftTemplate
+const left = values.get(o.leftTemplate) ?? ( dictionary.roles.includes(o.leftTemplate)||derivedTargets.has(o.leftTemplate) ? undefined : o.leftTemplate
 ); const right = values.get(o.rightTemplate) ?? (
-dictionary.roles.includes(o.rightTemplate) ? undefined : o.rightTemplate );
+dictionary.roles.includes(o.rightTemplate)||derivedTargets.has(o.rightTemplate) ? undefined : o.rightTemplate );
 if (left === undefined || right === undefined) continue; const selectedApplicationValue = selectedApplication(
 memory, context, witness, o.leftTemplate, o.rightTemplate, left, right, o.node, );
 const result = executeSelectedApplication(memory, f, selectedApplicationValue.selection, constructor); if (result === undefined) return undefined;
