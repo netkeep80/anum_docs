@@ -71,9 +71,14 @@ function exercise(noise:boolean):void{
   const k21=contextStep(memory,contextStep(memory,k0,x2).context,x1).context;
   assert(k21!==k2.context,"A64 x1/x2 and x2/x1 context histories differ");
 
-  // A flat replacement at k0 is not the same execution history as nested application.
+  // A flat replacement loses the prior argument history.
   const flat=contextStep(memory,k0,x2).context;
   assert(flat!==k2.context,"A64 nested execution context does not collapse to flat current value");
+  const otherFirst=contextStep(memory,k0,xa);
+  const otherHistory=contextStep(memory,otherFirst.context,x2);
+  assert(otherHistory.context!==k2.context,"A64 distinct first arguments preserve distinct nested histories");
+  same(contextStep(memory,k0,x2).context,flat,
+    "A64 flattened histories with the same last value collide canonically");
 
   // MANY: distinct results produce sibling child contexts under one selected parent.
   const ka=contextStep(memory,k2.context,xa);
@@ -90,6 +95,12 @@ function exercise(noise:boolean):void{
   assert(kza.context!==kzb.context,"A64 converged value does not collapse branch contexts");
   assert(readContext(memory,kza.context).parent!==readContext(memory,kzb.context).parent,
     "A64 converged branches preserve distinct immediate ancestry");
+  const flatConvergedA=contextStep(memory,k2.context,z).context;
+  const flatConvergedB=contextStep(memory,k2.context,z).context;
+  same(flatConvergedA,flatConvergedB,
+    "A64 flattening converged branches to their common ancestor erases branch provenance");
+  assert(flatConvergedA!==kza.context&&flatConvergedB!==kzb.context,
+    "A64 branch-local continuation differs from flattened common-parent continuation");
 
   // Re-materialization order is non-semantic: canonical identities are stable.
   same(contextStep(memory,k2.context,xb).context,kb.context,
@@ -132,6 +143,7 @@ function main():void{
     "INNER_LINK_ROLE_CONTEXT=OUTER_END",
     "TWO_LINK_CHIRAL_PLACEMENT=CONFIRMED",
     "MULTI_ARGUMENT_CONTEXT=NESTED_NOT_FLAT",
+    "FLAT_CONTEXT_FALSIFIER=LOSES_ARGUMENT_HISTORY_AND_BRANCH_PROVENANCE",
     "ARGUMENT_ORDER=STRUCTURAL",
     "MANY_RESULT=CHILD_CONTEXT_SPLIT",
     "CONVERGED_CURRENT_VALUE=PRESERVES_DISTINCT_CONTEXT_ANCESTRY",
