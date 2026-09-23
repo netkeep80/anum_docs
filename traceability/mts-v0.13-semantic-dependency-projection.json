@@ -7446,6 +7446,7 @@
         "self-realization contains no RuleKind, opcode, whitelist, switch-based rule dispatch, memory.find, outgoing/incoming or allLinks semantic discovery",
         "semantic construction reuses A60 proof-carried decomposition and A53-style canonical proof gates plus unchanged A21",
         "declared output closure is also validated by stage-scoped canonical equality gates plus A21; no host output-identity boolean decides admission",
+        "the contextual admission witness is the actual final-frontier truth Link emitted by A21; the admission path contains no post-hoc ensure(K,Rule)",
         "A62 immutable publication history remains a separate authority boundary; self-realization does not publish the Rule",
         "successful result is contextual K->Rule, not a physical Rule self-link"
       ],
@@ -7472,7 +7473,7 @@
         "GREEN does not close global E3/E4 or prove all possible StructuralRule representations admissible by this one criterion",
         "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "A63 separates Rule validity from Rule authority. An A60-style proof-carrying StructuralRule is structurally admissible when generic execution under identity role bindings reproduces its own derived topology and outputs. No host RuleKind/opcode/whitelist decides that property; malformed decomposition, self-dependency, foreign output and duplicate dictionary controls fail. A successful run yields contextual K->Rule evidence, while A62 publication history remains the independent act that grants authority. This prepares A64 to test the complete externally-authored -> structurally-admitted -> explicitly-published -> executed lifecycle and reassess E2 end-to-end.",
+      "consequence": "A63 separates Rule validity from Rule authority. An A60-style proof-carrying StructuralRule is structurally admissible when generic execution under identity role bindings reproduces its own derived topology and outputs. No host RuleKind/opcode/whitelist decides that property; malformed decomposition, self-dependency, foreign output and duplicate dictionary controls fail. A successful run yields the contextual Rule truth Link emitted by the final A21 frontier, while A62 publication history remains the independent act that grants authority. This prepares A64 to test the complete externally-authored -> structurally-admitted -> explicitly-published -> executed lifecycle and reassess E2 end-to-end.",
       "observed": {
         "structuralAdmissibility": "SELF_REALIZATION_UNDER_IDENTITY_BINDINGS",
         "validRuleOrders": 2,
@@ -7483,7 +7484,9 @@
         "foreignOutput": "ZERO",
         "duplicateRoleDictionary": "ZERO",
         "ambientPhysicalScratch": "INERT",
-        "admissionResult": "CONTEXTUAL_K_TO_RULE",
+        "admissionResult": "CONTEXTUAL_RULE_TRUTH",
+        "admissionTruthSource": "A21_FRONTIER_TRUTH_LINK",
+        "postHocAdmissionEnsure": 0,
         "hostSemanticWhitelist": 0,
         "hostOutputIdentityBoolean": 0,
         "outputClosure": "CANONICAL_GATES_PLUS_A21",
