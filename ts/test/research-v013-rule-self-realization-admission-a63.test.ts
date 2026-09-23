@@ -8,7 +8,42 @@ function assert(c:unknown,m:string):asserts c{if(!c)throw new Error(`v0.13 A63 R
 function same<T>(a:T,e:T,m:string):void{assert(Object.is(a,e),`${m}: values differ`);}
 function freezeChain(memory:Memory,values:readonly LinkHandle[]):LinkHandle{let body=memory.root;for(let i=values.length-1;i>=0;i-=1)body=memory.ensure(values[i]!,body);return memory.ensureStartSelfClosed(body);}
 function readChain(memory:Memory,envelope:LinkHandle,kind:string):readonly LinkHandle[]{const e=memory.poles(envelope);assert(e.start===envelope&&e.end!==envelope,`A21 ${kind} envelope`);const out:LinkHandle[]=[],seen=new Set<LinkHandle>();let cursor=e.end;while(cursor!==memory.root){assert(!seen.has(cursor),`A21 ${kind} cycle`);seen.add(cursor);const p=memory.poles(cursor);out.push(p.start);cursor=p.end;}return Object.freeze(out);}
-function step(memory:Memory,executionRoot:LinkHandle,schedule:"forward"|"reverse"):LinkHandle{const execution=memory.poles(executionRoot),context=execution.start,frontierEnvelope=execution.end;const contextPoles=memory.poles(context),authorityEnvelope=contextPoles.end,continuations=[...readChain(memory,authorityEnvelope,"authority")],occurrences=[...readChain(memory,frontierEnvelope,"frontier")];if(schedule==="reverse")occurrences.reverse();let nextBody=memory.root;for(const occurrence of occurrences){const occurrencePoles=memory.poles(occurrence),truth=memory.poles(occurrencePoles.end);assert(truth.start===context,"A21 occurrence carries current-context truth");const antecedent=truth.end;for(const continuation of continuations){const p=memory.poles(continuation);if(p.start!==antecedent)continue;const nextTruth=memory.ensure(context,p.end),childOccurrence=memory.ensure(occurrence,nextTruth);nextBody=memory.ensure(childOccurrence,nextBody);}}const nextFrontier=memory.ensureStartSelfClosed(nextBody);return memory.ensure(context,nextFrontier);}
+function step(
+  memory: Memory,
+  executionRoot: LinkHandle,
+  schedule: "forward" | "reverse",
+): LinkHandle {
+  const execution = memory.poles(executionRoot);
+  const context = execution.start;
+  const frontierEnvelope = execution.end;
+
+  const contextPoles = memory.poles(context);
+  const authorityEnvelope = contextPoles.end;
+  const continuations = [...readChain(memory, authorityEnvelope, "authority")];
+  const occurrences = [...readChain(memory, frontierEnvelope, "frontier")];
+  if (schedule === "reverse") occurrences.reverse();
+
+  let nextBody = memory.root;
+
+  for (const occurrence of occurrences) {
+    const occurrencePoles = memory.poles(occurrence);
+    const truth = memory.poles(occurrencePoles.end);
+    assert(truth.start === context, "A21 occurrence carries current-context truth");
+    const antecedent = truth.end;
+
+    for (const continuation of continuations) {
+      const p = memory.poles(continuation);
+      if (p.start !== antecedent) continue;
+
+      const nextTruth = memory.ensure(context, p.end);
+      const childOccurrence = memory.ensure(occurrence, nextTruth);
+      nextBody = memory.ensure(childOccurrence, nextBody);
+    }
+  }
+
+  const nextFrontier = memory.ensureStartSelfClosed(nextBody);
+  return memory.ensure(context, nextFrontier);
+}
 function frontierTruthEnds(memory:Memory,E:LinkHandle):readonly LinkHandle[]{const ep=memory.poles(E),out:LinkHandle[]=[];for(const occurrence of readChain(memory,ep.end,"frontier")){const truth=memory.poles(memory.poles(occurrence).end);same(truth.start,ep.start,"A63 frontier context");out.push(truth.end);}return Object.freeze(out);}
 
 interface Frame{readonly startRole:LinkHandle;readonly endRole:LinkHandle;}
