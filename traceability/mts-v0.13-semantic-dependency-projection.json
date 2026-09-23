@@ -224,7 +224,9 @@
     "contextNativeRecursionA65cDesigned": true,
     "contextNativeRecursionA65cComplete": true,
     "contextNativeConvergenceA65dDesigned": true,
-    "contextNativeConvergenceA65dComplete": true
+    "contextNativeConvergenceA65dComplete": true,
+    "sequenceCursorComparisonA66aDesigned": true,
+    "sequenceCursorComparisonA66aComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1605,8 +1607,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A66a: compare exactly one two-element scoped forward cursor Q0=a1->(a2->R) with the existing two-element ExactSequence carrier. Determine only their structural relationship under START/END roles; do not yet replace either representation or connect generalized cascade execution.",
-    "Only after the small A66 sequence experiments should scheduler/cascade semantics be revisited; preserve the author roadmap that function, argument and result may themselves be executable Links and generalized detachment may form nested parallel cascades.",
+    "A66b: only after A66a, ask the minimal-position question: can forward execution over an existing ExactSequence be represented by selecting existing sequence structure plus minimal position evidence, without materializing a second full Q chain? Do not choose a representation in advance.",
+    "A66b must preserve A66a's observed direction mismatch: ExactSequence locally exposes latest value + previous prefix, while forward execution needs current earliest remaining value + next suffix. Any solution must make the missing forward-position information explicit rather than hiding a host reversal.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
@@ -7726,7 +7728,7 @@
       }
     },
     "contextNativeConvergenceA65d": {
-      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "When two distinct context-native execution histories converge to the same extensional F value after the same number of local steps, does ordinary context ancestry preserve the two histories without a separate execution-path carrier?",
       "setup": [
         "K0 branches through unchanged A65b into distinct KA and KB",
@@ -7759,6 +7761,46 @@
         "branchHistory": "RECOVERABLE_FROM_CONTEXT_ANCESTRY",
         "separateExecutionPathCarrier": "NOT_REQUIRED_FOR_THIS_SCOPED_FRAME_HISTORY",
         "a21OccurrenceModel": "NOT_INVALIDATED",
+        "productionChanged": false
+      }
+    },
+    "sequenceCursorComparisonA66a": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "For exactly two ordered values a1,a2, what is the structural relationship between the existing ExactSequence carrier and the scoped forward execution cursor Q0=a1->(a2->R)?",
+      "setup": [
+        "materialize the existing canonical ExactSequence for [a1,a2]",
+        "inspect each ExactSequence cell locally as START-self-closed Cell(prev,value)=self->(prev->value)",
+        "materialize the scoped forward cursor Q0=a1->Q1 and Q1=a2->R",
+        "compare identity, local pole orientation and one literal START/END-swapped tail candidate"
+      ],
+      "oracle": [
+        "both forms decode to the same ordered values [a1,a2]",
+        "ExactSequence final cell locally exposes latest value a2 plus previous prefix E1",
+        "forward Q0 locally exposes current earliest value a1 plus next suffix Q1",
+        "Q0 is not ExactSequence final cell and Q1 is not ExactSequence first prefix cell",
+        "one START/END swap of the ExactSequence final payload does not yield Q0 or Q1",
+        "full traversal of ExactSequence values is sufficient to construct canonical Q, but that construction adds Q topology when it was absent",
+        "repeated Q reconstruction is canonical",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-sequence-cursor-comparison-a66a.test.ts",
+      "exclusions": [
+        "no final Q representation selected",
+        "no semantic execution performed",
+        "no generalized cascade tested",
+        "no formal duality theorem claimed",
+        "no Rule lifecycle work"
+      ],
+      "classification": {
+        "orderedValues": "EQUIVALENT",
+        "topologyIdentity": false,
+        "exactSequence": "START_CLOSED_PREFIX_ACCUMULATOR",
+        "forwardCursor": "RAW_FORWARD_SUFFIX_CURSOR",
+        "exactLocalHead": "LATEST_VALUE_PLUS_PREVIOUS_PREFIX",
+        "cursorLocalHead": "CURRENT_EARLIEST_VALUE_PLUS_NEXT_SUFFIX",
+        "identityOrSinglePoleSwap": false,
+        "fullValueTraversalReconstructsCursor": true,
+        "formalDuality": "NOT_CLAIMED",
         "productionChanged": false
       }
     }
