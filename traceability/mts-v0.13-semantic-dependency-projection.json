@@ -135,7 +135,9 @@
     "contextualCatalogPublicationA35Designed": true,
     "contextualCatalogPublicationA35Complete": true,
     "detachmentStructuralAdmissionA36Designed": true,
-    "detachmentStructuralAdmissionA36Complete": true
+    "detachmentStructuralAdmissionA36Complete": true,
+    "linkCarriedAdmissionProgramA37Designed": true,
+    "linkCarriedAdmissionProgramA37Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1516,9 +1518,9 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A37: remove host compilation of Rule/Candidate pair constraints into the A36 gate schedule; carry binding/schedule authority in Links and let the generic detachment kernel consume it unchanged.",
-    "A37 must preserve A36 ZERO/ONE canonical gate behavior and classify probe-Link construction explicitly as executor scratch rather than semantic publication.",
-    "Keep A35 prior-publication existence authority open: do not replace it by ensure(Candidate,M), which would create the evidence being checked.",
+    "A38: source-remove the host producer that compiles Rule/Candidate bindings into the A37 Link-carried admission execution root; generate the same K/Frontier program from Link authority without a domain-specific compiler.",
+    "A38 must reuse the unchanged A21 runtime step, preserve A36 canonical ZERO/ONE gates, and reject forged/missing producer authority before any ACCEPT publication.",
+    "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
     "A33 must preserve context identity, immutable ancestry and ambient-candidate isolation at both generation-selection and meta-execution levels.",
@@ -6133,6 +6135,57 @@
         "publicationExistenceSourceRemoved": false,
         "hostRuleCandidateDecoding": "RESIDUAL",
         "hostProgramConstruction": "RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "linkCarriedAdmissionProgramA37": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can the A36 canonical admission gate schedule execute with zero Rule/Candidate/binding semantics in runtime by carrying all selected continuations and frontier state in the already-proven A19-A21 Link topology?",
+      "setup": [
+        "producer decodes Rule/Candidate and constructs the A36 gate/query chain",
+        "selected gate continuations are frozen into K's A19 authority envelope",
+        "seed K->query0 is frozen into one A20 frontier occurrence",
+        "E0=K->Frontier is the only runtime input",
+        "runtime step is whitespace-normalized source-identical to A21"
+      ],
+      "oracle": [
+        "valid three-constraint program reaches ACCEPT through successive A21 steps",
+        "forging constraint 0/1/2 never reaches ACCEPT",
+        "ambient shortcut outside K authority remains inert",
+        "runtime step has zero Rule/Candidate/binding/constraint arguments or branches",
+        "two independent Memories reproduce behavior"
+      ],
+      "antiCheat": [
+        "A37 step is source-compared against merged A21 step",
+        "runtime has no readExactSequence/find/domain compiler dependency",
+        "producer residual remains visibly separate and still uses A36 START(target) canonical gates"
+      ],
+      "residualAuthority": [
+        "host producer still decodes Rule/Candidate and builds the Link-carried program",
+        "A36 probe construction/executor scratch remains",
+        "A35 prior-publication existence authority remains host-side",
+        "current execution-root handle remains executor state per A33"
+      ],
+      "evidenceTest": "ts/test/research-v013-link-carried-admission-program-a37.test.ts",
+      "claimBoundary": [
+        "GREEN removes admission semantics from runtime execution, not from program production",
+        "GREEN reuses the existing A21 recursive detachment executor unchanged",
+        "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A37 turns A36 admission into an ordinary Link-carried A21 program: once produced, runtime receives only E=K->Frontier and recursively detaches selected continuations. Rule/Candidate interpretation has moved completely out of the runtime path. The next boundary is the host producer that constructs this program.",
+      "observed": {
+        "runtimeExecutionRoot": "E_K_FRONTIER",
+        "runtimeStep": "A21_SOURCE_IDENTICAL",
+        "hostRuntimeRuleArgument": 0,
+        "hostRuntimeCandidateArgument": 0,
+        "hostRuntimeBindingCompiler": 0,
+        "validResult": "ACCEPT",
+        "forgedConstraints": "ZERO",
+        "ambientShortcut": "INERT",
+        "hostProgramProducer": "RESIDUAL",
+        "hostRuleCandidateDecoding": "PRODUCER_RESIDUAL",
+        "publicationExistence": "RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
