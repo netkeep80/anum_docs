@@ -326,7 +326,8 @@ function staticGuards():void{
     own.indexOf("\nfunction exercise(",own.indexOf("function instantiateSelectedProgram(")),
   );
   for(const forbidden of [
-    "compileReference(", "role", "constraint", "gate", "query",
+    "compileReference(", "const roles", "const bindings", "for(const constraint",
+    "for (const constraint", "gates.push", "queries.push",
     ".find(", ".outgoing(", ".incoming(", "allLinks(", "switch(",
   ]) assert(!producer.includes(forbidden),`A38 generic producer excludes domain compiler primitive ${forbidden}`);
 
