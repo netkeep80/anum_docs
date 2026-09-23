@@ -103,6 +103,7 @@ function staticGuards():void{
   const state=readFileSync(join(root,"ts/src/state.ts"),"utf8");
   const a13=readFileSync(join(root,"ts/test/research-v013-meta-interpreter-frontier-a13.test.ts"),"utf8");
   const own=readFileSync(join(root,"ts/test/research-v013-execution-context-geometry-a64.test.ts"),"utf8");
+  const normative=own.slice(0,own.indexOf("function staticGuards():void"));
 
   assert(state.includes("const payload = memory.ensure(parent, current);"),
     "A64 current MTS context payload is parent->current");
@@ -113,7 +114,7 @@ function staticGuards():void{
   assert(a13.includes("A13 convergence preserves two branches"),
     "A64 inherits convergence provenance evidence");
   for(const forbidden of ["jsonRVM","$sub","$obj","$rel","parent_ref","ctx_ref"])
-    assert(!own.includes(forbidden),`A64 normative test excludes imported historical semantics ${forbidden}`);
+    assert(!normative.includes(forbidden),`A64 normative test excludes imported historical semantics ${forbidden}`);
 }
 
 function main():void{
