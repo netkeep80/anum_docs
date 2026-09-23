@@ -6549,7 +6549,9 @@
       }
     },
     "structuralConstructionSchemaA49": {
-      "status": "DESIGNED_CI_PENDING",
+      "status": "REVISED_AFTER_TYPECHECK_RED_CI_PENDING",
+      "firstAttemptRed": "CI #6289 stopped at TypeScript before evidence execution because inputRoles inferred as LinkHandle[] instead of the declared readonly [LinkHandle,LinkHandle] tuple.",
+      "redCorrection": "Preserve the two-role schema boundary explicitly with [sRole,eRole] as const; no semantic mechanism changed.",
       "question": "Can A48 host-authored frozen F5 construction-plan topology be replaced by a Link-carried StructuralRule schema whose body directly states target and decomposition-witness templates over two input roles?",
       "setup": [
         "define one StructuralRoleDictionary with only input roles S and E",
