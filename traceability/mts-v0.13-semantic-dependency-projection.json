@@ -218,7 +218,9 @@
     "executionContextGeometryA64Complete": true,
     "executionContextGeometryA64FormalDualityProven": false,
     "contextNativeSingleStepA65aDesigned": true,
-    "contextNativeSingleStepA65aComplete": true
+    "contextNativeSingleStepA65aComplete": true,
+    "contextNativeCardinalityA65bDesigned": true,
+    "contextNativeCardinalityA65bComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1599,8 +1601,7 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A65b: starting only from GREEN A65a, test ZERO/ONE/MANY for one execution step. One selected K may yield zero, one or several child contexts from selected result facts. Do not add recursion, convergence, scheduler equivalence or lifecycle authority yet.",
-    "A65c: only after A65b, test recursive continuation plus local termination over context-native frames.",
+    "A65c: starting only from GREEN A65b, test recursive continuation plus local termination over context-native frames. Do not test convergence/provenance or Rule lifecycle yet.",
     "A65d: only after A65c, test convergence and whether context ancestry alone preserves branch provenance without a separate occurrence path.",
     "A66: only after A65a-d, attack the argument-cursor representation boundary. Compare the scoped forward Q_i=arg_i->Q_(i+1) carrier with existing MTS sequence forms and test whether Q is a structural mirror/projection of an existing immutable sequence rather than a new semantic primitive.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
@@ -7640,6 +7641,36 @@
         "currentArgument": "START_Q_SCOPED",
         "nextCursor": "END_Q_SCOPED",
         "childState": "Y_TO_NEXT_Q",
+        "productionChanged": false
+      }
+    },
+    "contextNativeCardinalityA65b": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "For one already-selected context-native execution step, do selected result facts produce ZERO, ONE or MANY child contexts without changing the frame law from A65a?",
+      "oracle": [
+        "empty selected-result carrier yields zero children",
+        "one selected result yields one child",
+        "two selected results for the same application yield two sibling child contexts",
+        "siblings share the exact parent K and exact nextQ while carrying distinct next F values",
+        "an ambient result fact outside the selected carrier is inert",
+        "a selected result for a mismatched application rejects",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-context-native-cardinality-a65b.test.ts",
+      "exclusions": [
+        "result selection source is an explicit scoped boundary",
+        "recursion not tested",
+        "local termination not tested",
+        "convergence/provenance not tested",
+        "scheduler order not tested",
+        "Rule lifecycle not tested"
+      ],
+      "classification": {
+        "zero": "0_CHILD",
+        "one": "1_CHILD",
+        "many": "SIBLING_CHILD_CONTEXTS",
+        "ambientUnselectedResult": "INERT",
+        "selectedMismatch": "REJECTED",
         "productionChanged": false
       }
     }
