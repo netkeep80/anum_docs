@@ -177,7 +177,11 @@
     "rawBinaryConstructorA54Designed": true,
     "rawBinaryConstructorA54Complete": true,
     "rawBinaryConstructorA54E1PathClassified": true,
-    "rawBinaryConstructorA54IrreducibilityProven": false
+    "rawBinaryConstructorA54IrreducibilityProven": false,
+    "ruleNativeConstructionContractA55Designed": true,
+    "ruleNativeConstructionContractA55Complete": true,
+    "ruleNativeConstructionContractA55SourceRemoved": true,
+    "ruleNativeConstructionContractA55LinkNativeValidationReconnected": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1558,8 +1562,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A55: attack the remaining Rule->semantic construction-contract/schema source. Derive or reconstruct invariant construction obligations from Link-carried Rule/role authority without privileging one exact packaging topology and without a fixture-authored schema.",
-    "A55 must preserve A41 underdetermination: distinct equivalent program/package topologies may realize the same semantic obligations, so source removal must target the invariant contract rather than one canonical gate order.",
+    "A56: reconnect the A55 direct Rule-native obligation carriers to the already-GREEN A43-A45 canonical matching/cardinality/coverage machinery, so K->(Rule->Realization) reaches acceptance without a host extensional Rule validator and without recreating an intermediate derived Contract.",
+    "A56 must preserve A41 ordering underdetermination, A55 equation-form Rule authority, ambient physical-equation inertness, ZERO for missing/duplicate/foreign/misclassified inputs or equations, and must not reintroduce host Set/equality/exact-one semantic branches.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6890,6 +6894,67 @@
         "classification": "E1_PHYSICAL_SUBSTRATE_ON_A53_PATH",
         "primitiveIrreducibility": "NOT_PROVEN",
         "runtime": "A21_SOURCE_IDENTICAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "ruleNativeConstructionContractA55": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can the A42-A45 Rule->derived-Contract source be removed by making the Rule itself the invariant construction-contract authority, without privileging one exact program/package order?",
+      "ruleNormalForm": [
+        "Rule = RolesCarrier -> EquationsCarrier",
+        "Equation = TargetRole -> (StartRole -> EndRole)",
+        "no separately materialized SemanticContract object",
+        "no precomputed free-role list",
+        "no precomputed constrained-target list"
+      ],
+      "invariantMeaning": [
+        "Rule equation identity is an extensional obligation independent of equation carrier order",
+        "role completeness is coverage by proposed input roles union equation target roles",
+        "the target role of one construction equation is structurally its START pole rather than position 0 in an external triple schema",
+        "distinct role/equation carrier orderings may represent the same obligations"
+      ],
+      "oracle": [
+        "two exact Rule handles with reversed role/equation carrier order expose the same role and equation sets",
+        "forward and reverse realizations are accepted against both equivalent Rule topologies",
+        "missing, duplicate, foreign or misclassified input roles reject",
+        "missing, duplicate or foreign equations reject",
+        "ambient physical equation outside selected Rule authority is inert",
+        "selected request is directly K->(Rule->Realization)"
+      ],
+      "antiCheat": [
+        "the Rule semantic-source slice contains no deriveSemanticContract/SemanticContract/freeRoles/constrainedTargets/gateOrder/TemplatePlan/TemplateE0",
+        "selected request carries the Rule directly and contains no derived Contract handle",
+        "A42 and A45 historical residual markers are asserted as the exact boundary being attacked",
+        "A45 Link-native validation evidence remains preserved but is not falsely claimed reconnected in A55"
+      ],
+      "evidenceTest": "ts/test/research-v013-rule-native-contract-a55.test.ts",
+      "residualAuthority": [
+        "A55 uses a host extensional validator only as a reference oracle for direct Rule semantics; the A43-A45 Link-native validation machinery has not yet been reconnected to this new Rule-native carrier shape",
+        "generic pole/ExactSequence reading remains execution/representation plumbing",
+        "Rule authorship/generation and Rule admission remain broader E2/E3 questions",
+        "A35 prior-publication existence remains open",
+        "E4 orchestration remains open"
+      ],
+      "claimBoundary": [
+        "GREEN removes the separate Rule->derived SemanticContract semantic-source artifact on this scoped construction-contract line",
+        "GREEN does not claim host validation removed on the new carrier shape; A56 owns that reconnection",
+        "GREEN preserves A41: semantic obligations are invariant while exact carrier/program order may differ",
+        "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A55 removes the need for a separately derived freeRoles/constrainedTargets Contract on the tested construction-schema line. The Rule itself now carries invariant obligations as ordinary Links: roles plus equation Links TargetRole->(StartRole->EndRole). Free-vs-constrained status is not semantic data authored into another object; it is a coverage property of a proposed realization. Two distinct Rule carrier orderings preserve the same obligations, so A41 underdetermination is respected. The next gate is A56: feed these direct Rule carriers into the already-established Link-native coverage machinery without a host extensional validator or derived Contract.",
+      "observed": {
+        "derivedSemanticContractObject": 0,
+        "ruleIsContractAuthority": true,
+        "equationForm": "TARGET_ROLE_TO_START_ROLE_TO_END_ROLE",
+        "freeRolePrecomputation": 0,
+        "constrainedTargetList": 0,
+        "equivalentDistinctRuleTopologies": 2,
+        "validRealizationOrders": 2,
+        "invalidControlClasses": 7,
+        "ambientPhysicalEquation": "INERT",
+        "selectedRequest": "K_TO_RULE_TO_REALIZATION",
+        "linkNativeValidationReconnected": false,
         "independentMemories": 2,
         "productionChanged": false
       }
