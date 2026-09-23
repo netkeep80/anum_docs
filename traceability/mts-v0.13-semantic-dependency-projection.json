@@ -213,7 +213,10 @@
     "ruleSelfRealizationAdmissionA63Designed": true,
     "ruleSelfRealizationAdmissionA63Complete": true,
     "ruleSelfRealizationAdmissionA63HostSemanticWhitelistRemoved": true,
-    "ruleSelfRealizationAdmissionA63GlobalFormationClosed": false
+    "ruleSelfRealizationAdmissionA63GlobalFormationClosed": false,
+    "executionContextGeometryA64Designed": true,
+    "executionContextGeometryA64Complete": true,
+    "executionContextGeometryA64FormalDualityProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1594,8 +1597,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A64: build an end-to-end selected Rule lifecycle closure experiment: externally supplied Rule content -> A63 structural self-realization -> A62 immutable publication history -> direct K->(Rule->Realization) execution through A60/A61. Reassess whether any E2 host semantic decision remains on this complete line.",
-    "A64 must keep Rule content authoring as explicit external input rather than hidden host interpretation, preserve A62 publication selection as authority, preserve A63 structural validity as separate from publication, and keep E3 formation plus E4 scheduling boundaries explicit instead of relabeling them E2.",
+    "A65: re-test the A63 -> A62 lifecycle using nested execution-context ancestry rather than a flat K->Rule handoff. Ask whether successful admission should advance into a child context whose ancestry is then structurally consumed by publication, eliminating the apparent provenance gap without a separate host-defined provenance object.",
+    "A65 must preserve A64 recursive context growth, sibling branching for MANY, branch-local ancestry after convergence, A63 structural validity and A62 immutable publication history. Do not import jsonRVM semantics; use only MTS Link topology and existing context laws.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -7494,6 +7497,67 @@
         "publicationAuthority": "A62_HISTORY",
         "dictionarySequenceFormation": "E3_RESIDUAL",
         "completionScheduling": "E4_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "executionContextGeometryA64": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Does current MTS context topology already support recursive multi-argument execution as nested context growth, including MANY-valued branch splitting, and how does that topology relate structurally to ordinary recursive application?",
+      "internalMtsObservation": [
+        "ordinary application recurrence is F_n = F_(n-1) -> x_n",
+        "current defineContext constructs payload P_n = K_(n-1) -> x_n",
+        "current context whole is K_n = START(P_n), therefore K_n = K_n -> (K_(n-1) -> x_n)",
+        "the previous whole becomes START of the next binary Link at both application and context-payload levels"
+      ],
+      "oracle": [
+        "two supplied values create a nested context chain K0 -> K1 -> K2 rather than a flat replacement of K0.current",
+        "reversing argument order produces a different context ancestry",
+        "distinct MANY results from one parent produce distinct sibling child contexts sharing that exact parent",
+        "continuing both sibling branches with the same later value preserves distinct child contexts because their parents differ",
+        "re-materializing sibling contexts in a different order converges to the same canonical Link identities",
+        "two independent Memories, one with unrelated allocation noise, satisfy the same structural laws"
+      ],
+      "antiCheat": [
+        "the normative test uses only current anum_docs Memory plus defineContext/readContext; it imports no jsonRVM code, vocabulary or context fields",
+        "the test statically asserts current state.ts context construction is parent->current followed by START closure",
+        "A13 is used only as inherited MTS evidence that branch-local contexts and convergence provenance already exist",
+        "the experiment does not claim a complete formal duality/isomorphism between application and context; it proves only the scoped recursive/START-lift relation"
+      ],
+      "evidenceTest": "ts/test/research-v013-execution-context-geometry-a64.test.ts",
+      "classification": {
+        "applicationRecurrence": "PREVIOUS_WHOLE_TO_NEXT_VALUE",
+        "contextPayloadRecurrence": "PREVIOUS_CONTEXT_TO_NEXT_VALUE",
+        "contextWhole": "START_OF_CONTEXT_PAYLOAD",
+        "contextNormalForm": "K_SELF_TO_(PARENT_TO_CURRENT)",
+        "roleAlternation": "PREVIOUS_WHOLE_BECOMES_NEXT_START",
+        "multiArgumentExecution": "NESTED_CONTEXT_CHAIN",
+        "manyValuedExecution": "SIBLING_CHILD_CONTEXT_SPLIT",
+        "convergedValueAncestry": "PRESERVED_BY_DISTINCT_PARENT_CONTEXTS",
+        "applicationContextFormalDuality": "HYPOTHESIS_NOT_PROVEN",
+        "jsonRvmNormativeAuthority": 0
+      },
+      "residualAuthority": [
+        "A64 establishes structural execution-context geometry but does not yet connect A63 admission and A62 publication through that ancestry",
+        "the old flat A64 provenance falsifier remains informative only as a counterexample to flattening context; its proposed separate admission-history object is not adopted",
+        "A65 must test whether context ancestry itself carries the required lifecycle provenance before adding any new provenance carrier",
+        "global E2/E3/E4 and Rule content authorship remain open"
+      ],
+      "claimBoundary": [
+        "GREEN means current MTS context topology already has recursive nested growth and natural sibling branching under distinct results",
+        "GREEN does not mean jsonRVM context semantics are part of MTS",
+        "GREEN does not establish a mathematical duality theorem between (f->x)->y and K=K->(parent->current)",
+        "v0.13 remains unaccepted; FULL_SELF_HOSTED remains false"
+      ],
+      "consequence": "A64 changes the lifecycle analysis direction. The current MTS context is not a flat K with a mutable frontier: defineContext already makes every new value a child context through P=parent->current and K=START(P). Thus multi-argument execution naturally forms nested context ancestry, and a MANY-valued step naturally forms sibling contexts under one parent. When branches later carry the same current value, their context identities remain distinct because the parent contexts differ. This supports treating execution provenance as context ancestry first; A65 must re-test the A63-to-A62 handoff using that ancestry before inventing a separate provenance-history object.",
+      "observed": {
+        "nestedArguments": true,
+        "argumentOrderStructural": true,
+        "flatReplacementEquivalent": false,
+        "manySiblingContexts": true,
+        "convergedCurrentPreservesDistinctContextIdentity": true,
+        "previousContextWholeBecomesNextPayloadStart": true,
+        "previousApplicationWholeBecomesNextApplicationStart": true,
         "independentMemories": 2,
         "productionChanged": false
       }
