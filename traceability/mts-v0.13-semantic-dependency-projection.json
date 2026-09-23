@@ -213,7 +213,11 @@
     "ruleSelfRealizationAdmissionA63Designed": true,
     "ruleSelfRealizationAdmissionA63Complete": true,
     "ruleSelfRealizationAdmissionA63HostSemanticWhitelistRemoved": true,
-    "ruleSelfRealizationAdmissionA63GlobalFormationClosed": false
+    "ruleSelfRealizationAdmissionA63GlobalFormationClosed": false,
+    "lifecycleAdmissionProvenanceA64Designed": true,
+    "lifecycleAdmissionProvenanceA64Complete": true,
+    "lifecycleAdmissionProvenanceA64ClosureGreen": false,
+    "lifecycleAdmissionProvenanceA64ProvenanceGapFound": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1594,8 +1598,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A64: build an end-to-end selected Rule lifecycle closure experiment: externally supplied Rule content -> A63 structural self-realization -> A62 immutable publication history -> direct K->(Rule->Realization) execution through A60/A61. Reassess whether any E2 host semantic decision remains on this complete line.",
-    "A64 must keep Rule content authoring as explicit external input rather than hidden host interpretation, preserve A62 publication selection as authority, preserve A63 structural validity as separate from publication, and keep E3 formation plus E4 scheduling boundaries explicit instead of relabeling them E2.",
+    "A65: carry immutable structural-admission provenance into publication. Replace the current A63 truth-Link-only handoff with a selected immutable admission history/version whose head commits the actual A63 admission occurrence before publication, and make publication bind the exact admitted Rule to that selected admission version.",
+    "A65 must preserve A62 late-publication non-backdating, reject fabricated K->Rule truth Links and late admission-shaped scratch, keep A63 self-realization as the validity producer, and prevent structurally invalid Rules from becoming executable merely because an external caller physically published them.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -7494,6 +7498,67 @@
         "publicationAuthority": "A62_HISTORY",
         "dictionarySequenceFormation": "E3_RESIDUAL",
         "completionScheduling": "E4_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "lifecycleAdmissionProvenanceA64": {
+      "status": "EXECUTED_GREEN_FALSIFIER_LIFECYCLE_CLOSURE_RED",
+      "question": "Does the A63 structural-admission result compose safely with A62 immutable publication history and downstream execution, or is producer provenance lost when A63 hands off only the canonical contextual truth Link K->Rule?",
+      "setup": [
+        "construct a structurally malformed StructuralRule using a duplicate-role dictionary and independently confirm that the structural dictionary reader rejects it",
+        "observe that a contextual Rule truth handle has canonical identity K->Rule: repeated physical ensure(K,Rule) yields the exact same Link handle regardless of producer provenance",
+        "publish the malformed Rule into an A62-style immutable catalog version using the current publication shape Membership = CatalogContext -> Rule",
+        "run the unchanged A62 selected-history proof against that catalog version",
+        "preserve old/new catalog-version immutability and ambient-scratch isolation controls"
+      ],
+      "oracle": [
+        "canonical K->Rule identity cannot distinguish an A63-emitted truth Link from a physically ensured lookalike once only the truth handle is handed off",
+        "the malformed Rule is structurally rejected before publication by the structural reader",
+        "the same malformed Rule can nevertheless be physically published into the current A62 publication shape",
+        "A62 selected publication history then authorizes that exact malformed Rule because A62 proves publication history, not A63 structural admission provenance",
+        "late catalog versions remain separate and cannot rewrite an old selected version",
+        "ambient admission-shaped scratch remains inert with respect to the selected A62 history but does not repair the missing admission-provenance binding",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "A64 reuses the A62 proof shape unchanged: selected history validates catalog context and requested/published Rule identity only",
+        "A63 source is asserted to return the actual final A21 frontier truth Link; A64 does not weaken the A63 admission experiment itself",
+        "A64 does not call RuleKind/opcode/whitelist semantics to manufacture the RED result",
+        "the malformed Rule is independently rejected by the structural-role dictionary reader before publication"
+      ],
+      "evidenceTest": "ts/test/research-v013-lifecycle-admission-provenance-a64.test.ts",
+      "classification": {
+        "endToEndLifecycleClosure": "RED_ADMISSION_PROVENANCE_GAP",
+        "a63OutputHandoff": "CANONICAL_CONTEXTUAL_RULE_TRUTH_LINK",
+        "canonicalTruthProducerProvenanceDistinguishable": false,
+        "a62PublicationCarriesAdmissionHistory": false,
+        "e2LifecycleSourceRemoved": false
+      },
+      "residualAuthority": [
+        "A63 proves structural validity only inside its selected self-realization execution; returning only K->Rule loses evidence of which selected execution/history produced that truth",
+        "A62 currently commits Rule publication history but does not commit the prior A63 admission occurrence/version that justified publication",
+        "an external publisher can therefore physically publish a structurally invalid Rule and A62 will correctly prove that it was published, not that it was admitted",
+        "A65 must introduce immutable admission-history provenance into the publication handoff without collapsing validity and authority into one primitive",
+        "global E3 formation and E4 scheduling/readiness remain open"
+      ],
+      "claimBoundary": [
+        "GREEN means the falsifier is executable and the current end-to-end lifecycle closure claim is RED",
+        "this does not invalidate A62 or A63 individually: A62 proves prior publication history and A63 proves scoped structural self-admission exactly as claimed",
+        "the new failure is at their handoff/provenance composition boundary",
+        "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A64 finds a genuine lifecycle composition gap. A63 returns a canonical contextual truth Link K->Rule, but canonical Link identity intentionally erases producer provenance: the same handle can be physically ensured without having passed A63. A62, also correctly by design, records only immutable publication of Rule and does not inspect structural validity. Therefore a malformed Rule can be physically published and then authorized by A62 history even though A63 would reject it. The next step is not another semantic whitelist; A65 must carry immutable admission history/version into the publication record so selected authority proves both prior structural admission and prior publication without ambient Memory queries.",
+      "observed": {
+        "malformedRuleStructuralReader": "REJECTED",
+        "forgedAdmissionTruthIdentity": "CANONICALLY_INDISTINGUISHABLE_BY_HANDLE",
+        "malformedRulePhysicallyPublishable": true,
+        "a62HistoryAuthorizesPublishedMalformedRule": true,
+        "oldCatalogVersion": "IMMUTABLE",
+        "lateCatalogVersion": "SEPARATE",
+        "ambientAdmissionScratch": "INERT_DOES_NOT_FIX_PROVENANCE",
+        "lifecycleClosure": "RED",
+        "provenanceGap": "A63_ADMISSION_HISTORY_NOT_CARRIED_TO_A62_PUBLICATION",
         "independentMemories": 2,
         "productionChanged": false
       }
