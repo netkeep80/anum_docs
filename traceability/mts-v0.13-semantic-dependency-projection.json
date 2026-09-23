@@ -139,7 +139,7 @@
     "linkCarriedAdmissionProgramA37Designed": true,
     "linkCarriedAdmissionProgramA37Complete": true,
     "genericAdmissionProgramInstantiationA38Designed": true,
-    "genericAdmissionProgramInstantiationA38Complete": false
+    "genericAdmissionProgramInstantiationA38Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -6193,7 +6193,7 @@
       }
     },
     "genericAdmissionProgramInstantiationA38": {
-      "status": "EXECUTION_PENDING_AFTER_RED",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A37's per-target Rule/Candidate compiler be removed by instantiating a frozen Link-native admission-program template through generic topology cloning, while preserving constrained values by reconstruction rather than trusting them as target seeds?",
       "firstAttemptRed": "Mapping every TemplateCandidate position directly to the target let forged constrained values bypass admission: template application=fn->arg was itself seed-mapped to forgedApplication, so clone did not reconstruct the constraint. CI #6212 failed on forged constraint 0.",
       "setup": [
@@ -6228,7 +6228,7 @@
         "if GREEN, forged constrained target values are rejected before TargetE0 selection",
         "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "Pending rerun after a substantive RED: A38 now treats the free-vs-derived seed boundary as semantic producer authority instead of assuming every Candidate field is freely substitutable. The next falsifier is whether generic reconstruction plus canonical candidate-integrity detachment can reproduce exact A37 target programs without reintroducing a target compiler.",
+      "consequence": "A38 removes the domain-specific per-target Rule/Candidate compiler after one frozen producer template exists. The first attempt RED proved that constrained candidate values cannot be treated as free seeds. With an explicit Link-carried free-seed boundary, generic reconstruction regenerates constrained topology, an A36 canonical candidate-integrity gate rejects forged targets before TargetE0 selection, and valid targets reproduce exact A37 execution roots under unchanged A21 runtime. The remaining producer boundary is bootstrap origin/admission of the first TemplateE0 and its free-seed authority.",
       "observed": {
         "firstAttempt": "RED_OVERBROAD_SEED_MAPPING",
         "firstFailure": "FORGED_CONSTRAINT_0_FALSE_ACCEPT",
@@ -6237,6 +6237,14 @@
         "runtimeStep": "A21_SOURCE_IDENTICAL",
         "freeSeedBoundary": "LINK_CARRIED_BOOTSTRAP_AUTHORITY",
         "frozenTemplateProgramOrigin": "BOOTSTRAP_RESIDUAL",
+        "finalCi": "GREEN_6216",
+        "validTarget": "ACCEPT",
+        "forgedTargets": "ZERO_BEFORE_E0",
+        "targetReferenceTopology": "EXACT",
+        "foreignProducerAuthority": "REJECTED",
+        "malformedCorrespondence": "REJECTED",
+        "ambientAlternateRequest": "INERT",
+        "independentMemories": 2,
         "productionChanged": false
       }
     }  }
