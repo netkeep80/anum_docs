@@ -193,7 +193,11 @@
     "proofCarriedEquationStartA58Designed": true,
     "proofCarriedEquationStartA58Complete": true,
     "proofCarriedEquationStartA58TargetPoleReadRemoved": true,
-    "proofCarriedEquationStartA58WitnessSourceRemoved": false
+    "proofCarriedEquationStartA58WitnessSourceRemoved": true,
+    "constructionCarriedEquationWitnessA59Designed": true,
+    "constructionCarriedEquationWitnessA59Complete": true,
+    "constructionCarriedEquationWitnessA59PerEquationAuthoringRemoved": true,
+    "constructionCarriedEquationWitnessA59TemplateSourceReconnected": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1574,8 +1578,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A59: source-remove the construction-time decomposition-witness producer introduced by A58 for proposed Rule-native equations. Reuse the A48 construction-carried witness lesson so equation and ordered decomposition evidence arise from one reusable Link-carried construction authority rather than per-equation host witness authoring.",
-    "A59 must preserve zero equation-target pole reads, direct K->(Rule->Realization) authority, 22 Link-native coverage ONE checks plus proof gates, forged-witness ZERO, A41 ordering underdetermination and ambient physical-existence inertness; do not reintroduce a target-role list or derived Contract.",
+    "A60: reconnect the A59 reusable witnessed-equation construction template to the already-established A49-A54 source-removal line. Replace the fixture-authored construction-plan/topology source and generic clone residual with Rule/selected-application/proof-gated construction authority, without reintroducing per-equation witness authoring.",
+    "A60 must preserve target/start/end as the only per-instance semantic inputs, exact A58-compatible Equation+witness outputs, A54 raw-pair E1 boundary, canonical convergence across equivalent authorities, zero target-pole reads, and no derived Contract/target-role list.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -7152,6 +7156,58 @@
         "ambientPhysicalExistence": "INERT",
         "directAuthority": "K_TO_RULE_TO_REALIZATION",
         "witnessSource": "CONSTRUCTION_TIME_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "constructionCarriedEquationWitnessA59": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A58 per-equation decomposition-witness authoring be removed by one reusable Link-carried construction authority that emits both Equation and its ordered decomposition witness from only target/start/end instance inputs?",
+      "setup": [
+        "one construction template defines seed-role bindings, six ordinary target/start/end constraints and two outputs",
+        "per-instance caller supplies only target, start and end Link values",
+        "domain-agnostic topology substitution instantiates the frozen template",
+        "generic constraint execution constructs pair, Equation, START/END bindings, binding pair and witness",
+        "outputs are Equation plus A58-compatible decomposition witness"
+      ],
+      "oracle": [
+        "three independent target/start/end inputs generate exact canonical Equation+witness pairs",
+        "post-hoc direct witness oracle adds zero Links and yields identical handles",
+        "A58 evidence reader recovers exact target and Equation from generated witness",
+        "a separately created equivalent reusable template converges to the same canonical Equation+witness",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "per-equation generate path contains no START-role/END-role binding authoring and does not call the direct witness oracle",
+        "generic plan instantiator contains no witness/equation/startRole/endRole semantics and no pair lookup",
+        "instance semantic inputs are target/start/end only",
+        "A48 construction-carried decomposition result is reused as the methodological predecessor",
+        "A58 construction-time witness residual is asserted as the exact boundary being attacked"
+      ],
+      "evidenceTest": "ts/test/research-v013-construction-carried-equation-witness-a59.test.ts",
+      "residualAuthority": [
+        "the reusable construction template topology is still fixture-authored in A59",
+        "generic topology substitution/plan execution remains host execution; A60 must reconnect this local template to the A49-A54 Rule/application/proof-gated construction line rather than reopening generic clone as a new primitive",
+        "Rule generation/admission, A35 prior-publication existence and E4 remain open"
+      ],
+      "claimBoundary": [
+        "GREEN removes per-equation decomposition-witness authoring on the tested path",
+        "GREEN does not claim the reusable template source or generic topology substitution is newly source-removed",
+        "historical A49-A54 results constrain the next reconnection rather than permitting another privileged construction interpreter",
+        "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A59 removes A58's per-equation witness producer: one reusable Link-carried construction authority emits the canonical Equation and exactly the ordered decomposition witness consumed by A58 from target/start/end alone. Equivalent reusable authorities converge canonically. This closes the local witness-authoring residual but deliberately exposes the reusable template/topology source again; A60 must reconnect it to the already-established A49-A54 source-removal line instead of treating the A59 plan interpreter as foundational.",
+      "observed": {
+        "constructionTemplateCount": 1,
+        "perEquationWitnessAuthoring": 0,
+        "perInstanceInputs": "TARGET_START_END_ONLY",
+        "outputs": "EQUATION_PLUS_ORDERED_DECOMPOSITION_WITNESS",
+        "genericPlanInstantiation": "DOMAIN_AGNOSTIC",
+        "a58EvidenceCompatibility": "EXACT",
+        "postHocDirectOracleAddsLinks": 0,
+        "equivalentReusableTemplateConvergence": true,
+        "templateAuthoring": "RESIDUAL",
+        "genericTopologySubstitution": "HISTORICAL_RESIDUAL_REOPENED_FOR_RECONNECTION_ONLY",
         "independentMemories": 2,
         "productionChanged": false
       }
