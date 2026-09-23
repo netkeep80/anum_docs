@@ -31,24 +31,43 @@ function readChain(memory:Memory,envelope:LinkHandle,kind:string):readonly LinkH
 }
 
 /** Exact A21 executor. */
-function step(memory:Memory,executionRoot:LinkHandle,schedule:"forward"|"reverse"):LinkHandle{
-  const execution=memory.poles(executionRoot),context=execution.start,frontierEnvelope=execution.end;
-  const authorityEnvelope=memory.poles(context).end;
-  const continuations=[...readChain(memory,authorityEnvelope,"authority")];
-  const occurrences=[...readChain(memory,frontierEnvelope,"frontier")];
-  if(schedule==="reverse")occurrences.reverse();
-  let nextBody=memory.root;
-  for(const occurrence of occurrences){
-    const truth=memory.poles(memory.poles(occurrence).end);
-    assert(truth.start===context,"A21 occurrence context");
-    for(const continuation of continuations){
-      const p=memory.poles(continuation);if(p.start!==truth.end)continue;
-      const nextTruth=memory.ensure(context,p.end);
-      nextBody=memory.ensure(memory.ensure(occurrence,nextTruth),nextBody);
+function step(
+  memory: Memory,
+  executionRoot: LinkHandle,
+  schedule: "forward" | "reverse",
+): LinkHandle {
+  const execution = memory.poles(executionRoot);
+  const context = execution.start;
+  const frontierEnvelope = execution.end;
+
+  const contextPoles = memory.poles(context);
+  const authorityEnvelope = contextPoles.end;
+  const continuations = [...readChain(memory, authorityEnvelope, "authority")];
+  const occurrences = [...readChain(memory, frontierEnvelope, "frontier")];
+  if (schedule === "reverse") occurrences.reverse();
+
+  let nextBody = memory.root;
+
+  for (const occurrence of occurrences) {
+    const occurrencePoles = memory.poles(occurrence);
+    const truth = memory.poles(occurrencePoles.end);
+    assert(truth.start === context, "A21 occurrence carries current-context truth");
+    const antecedent = truth.end;
+
+    for (const continuation of continuations) {
+      const p = memory.poles(continuation);
+      if (p.start !== antecedent) continue;
+
+      const nextTruth = memory.ensure(context, p.end);
+      const childOccurrence = memory.ensure(occurrence, nextTruth);
+      nextBody = memory.ensure(childOccurrence, nextBody);
     }
   }
-  return memory.ensure(context,memory.ensureStartSelfClosed(nextBody));
+
+  const nextFrontier = memory.ensureStartSelfClosed(nextBody);
+  return memory.ensure(context, nextFrontier);
 }
+
 function frontierTruthEnds(memory:Memory,E:LinkHandle):readonly LinkHandle[]{
   const ep=memory.poles(E),out:LinkHandle[]=[];
   for(const occurrence of readChain(memory,ep.end,"frontier")){
@@ -252,6 +271,7 @@ function exercise(memory:Memory,withNoise:boolean):void{
   const plan=memory.poles(planTruth).end;
 
   // Post-hoc A39 author is oracle only: generated Plan must already be exact.
+  memory.ensure(rule,plan);
   const beforeOracle=memory.linkCount;
   const oracle=authorReferencePlan(memory,rule,proposed);
   same(oracle.plan,plan,"A40 schema instantiation equals exact A39 Plan");
@@ -291,8 +311,11 @@ function staticGuards():void{
   const f5=readFileSync(join(root,"ts/test/research-v013-generic-construction-plan-f5-f4.test.ts"),"utf8");
   const a37=readFileSync(join(root,"ts/test/research-v013-link-carried-admission-program-a37.test.ts"),"utf8");
   const inst=own.slice(own.indexOf("function instantiatePlanFromSchema("),own.indexOf("\nfunction executeSelectedPlan(",own.indexOf("function instantiatePlanFromSchema(")));
-  for(const forbidden of ["authorReferencePlan(","makeRoles(","roles[","triples","constraint",".find(",".outgoing(",".incoming(","switch("])
-    assert(!inst.includes(forbidden),`A40 schema instantiator excludes recipe primitive ${forbidden}`);
+  for(const forbidden of [
+    "authorReferencePlan(","makeRoles(","roles[","triples",
+    "for(const encoded","for (const encoded","constraintSequence",
+    ".find(",".outgoing(",".incoming(","switch(",
+  ]) assert(!inst.includes(forbidden),`A40 schema instantiator excludes recipe primitive ${forbidden}`);
   const a=own.slice(own.indexOf("function executeConstructionPlan("),own.indexOf("\nfunction makeRoles(",own.indexOf("function executeConstructionPlan(")));
   const z=f5.slice(f5.indexOf("function executeConstructionPlan("),f5.indexOf("\nfunction runReference(",f5.indexOf("function executeConstructionPlan(")));
   same(a.replace(/\s+/g,""),z.replace(/\s+/g,""),"A40 construction executor source-identical F5-F4");
