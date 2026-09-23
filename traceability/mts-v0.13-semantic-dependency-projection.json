@@ -133,7 +133,9 @@
     "admittedSourceCatalogA34Designed": true,
     "admittedSourceCatalogA34Complete": true,
     "contextualCatalogPublicationA35Designed": true,
-    "contextualCatalogPublicationA35Complete": true
+    "contextualCatalogPublicationA35Complete": true,
+    "detachmentStructuralAdmissionA36Designed": true,
+    "detachmentStructuralAdmissionA36Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1514,9 +1516,9 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A36: replace A34/A35 sourcePublishable/admitted pair-identity host checks with a Link-native structural gate executed by recursive contextual detachment.",
-    "A36 must test whether START-self-closed canonicalization can reduce target=(start->end) identity to ZERO/ONE detachment without memory.find equality or a boolean admitted predicate.",
-    "After A36, attack remaining host rule/candidate topology decoding and template instantiation while keeping physical pole access/construction explicit as executor substrate.",
+    "A37: remove host compilation of Rule/Candidate pair constraints into the A36 gate schedule; carry binding/schedule authority in Links and let the generic detachment kernel consume it unchanged.",
+    "A37 must preserve A36 ZERO/ONE canonical gate behavior and classify probe-Link construction explicitly as executor scratch rather than semantic publication.",
+    "Keep A35 prior-publication existence authority open: do not replace it by ensure(Candidate,M), which would create the evidence being checked.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
     "A33 must preserve context identity, immutable ancestry and ambient-candidate isolation at both generation-selection and meta-execution levels.",
@@ -6080,6 +6082,57 @@
         "foreignCatalogContext": "REJECTED",
         "sourcePublishableInterpreter": "HOST_RESIDUAL",
         "currentRequestTruth": "EXECUTOR_STATE_BOUNDARY_SCOPED",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "detachmentStructuralAdmissionA36": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can an already-bound structural constraint target=(start->end) be decided without host memory.find equality or a boolean admitted predicate, using only canonical Link construction plus recursive contextual detachment?",
+      "setup": [
+        "bind anonymous rule roles to candidate values as in F5-F2/A34 admitted",
+        "for each constraint build pair=start->end, gate=START(target), query=gate->pair",
+        "canonical identity gives query=gate iff pair=target",
+        "chain selected gate->next continuations and seed K->query0",
+        "run one domain-agnostic K->A plus A->B gives K->B kernel"
+      ],
+      "oracle": [
+        "three valid pair constraints recursively reach ACCEPT",
+        "forging each constraint independently yields ZERO before ACCEPT",
+        "compiler and detachment kernel contain no memory.find equality truth test",
+        "ambient forged shortcut remains inert unless selected",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "detachment kernel knows no candidate/rule/role/constraint semantics",
+        "constraint compiler does not read target poles or call find/outgoing/incoming/allLinks",
+        "A34 admitted memory.find(s,e)==target residual is statically identified as the replaced check"
+      ],
+      "residualAuthority": [
+        "host code still decodes Rule/Candidate and compiles the gate schedule",
+        "probe construction may materialize start->end scratch Links; historical read-only admission is not preserved",
+        "A35 sourcePublishable prior-publication existence check remains host authority because ensure(Candidate,M) would self-create publication",
+        "physical Link construction/pole reads remain executor substrate"
+      ],
+      "evidenceTest": "ts/test/research-v013-detachment-structural-admission-a36.test.ts",
+      "claimBoundary": [
+        "GREEN removes the boolean pair-identity decision from the tested structural admission path",
+        "GREEN does not source-remove rule decoding, program construction, publication-existence authority or physical execution",
+        "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A36 reduces pair-identity admission to the same recursive contextual-detachment semantics as A16: structural equality is expressed by canonical collapse of gate->(start->end) onto START(target). Invalid constraints naturally have no selected continuation and yield ZERO. The next boundary is the host compiler that creates this schedule.",
+      "observed": {
+        "pairIdentityTruthTest": "START_SELF_CLOSED_CANONICALIZATION",
+        "hostFindEqualityCheck": 0,
+        "admissionResult": "RECURSIVE_CONTEXTUAL_DETACHMENT",
+        "validConstraints": 3,
+        "forgedConstraints": "ZERO",
+        "ambientShortcutAuthority": "IGNORED",
+        "structuralProbeMayMaterializeScratch": true,
+        "readOnlyAdmissionPreserved": false,
+        "publicationExistenceSourceRemoved": false,
+        "hostRuleCandidateDecoding": "RESIDUAL",
+        "hostProgramConstruction": "RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
