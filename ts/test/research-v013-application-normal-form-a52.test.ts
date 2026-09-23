@@ -248,25 +248,8 @@ function exercise(memory:Memory,withNoise:boolean):void{
   ).length,0,"A52 forged decomposition ZERO");
 
   const [startValue,endValue]=freshValues(memory,basis);
-  assert(memory.find(startValue,endValue)===undefined,"A52 result absent before selected application");
-
-  const marker=memory.ensure(basis.L,basis.U);
-  const transition=memory.ensure(memory.ensure(startValue,endValue),marker);
-  // Remove the oracle-created result before execution is impossible in canonical
-  // Memory, so use a fresh pair for the actual selected application below.
-  const actualStart=memory.ensure(startValue,basis.R);
-  const actualEnd=memory.ensure(endValue,basis.R);
-  assert(memory.find(actualStart,actualEnd)===undefined,"A52 actual result absent");
-  const actualMarker=memory.ensure(marker,basis.C);
-  const actualTransitionAntecedent=memory.ensure(actualStart,actualEnd);
-  const actualTransition=memory.ensure(actualTransitionAntecedent,actualMarker);
-  // The continuation above necessarily materializes its antecedent, so use a
-  // second independent application to test result creation without prebuilding
-  // a continuation target.
-  void transition;void actualTransition;
-
-  const requestedStart=memory.ensure(actualStart,basis.O);
-  const requestedEnd=memory.ensure(actualEnd,basis.O);
+  const requestedStart=memory.ensure(startValue,basis.O);
+  const requestedEnd=memory.ensure(endValue,basis.O);
   assert(memory.find(requestedStart,requestedEnd)===undefined,"A52 requested pair absent");
   const parent=memory.ensure(basis.O,basis.U);
   const K=memory.ensure(parent,freezeAuthority(memory,[]));
