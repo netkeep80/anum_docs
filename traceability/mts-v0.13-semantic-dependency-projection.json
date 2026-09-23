@@ -147,7 +147,9 @@
     "producerSchemaFalsifierA40PlanAuthoringSourceRemoved": false,
     "ruleSchemaUnderdeterminationA41Designed": true,
     "ruleSchemaUnderdeterminationA41Complete": true,
-    "ruleSchemaUnderdeterminationA41ExactSchemaSourceRemoved": false
+    "ruleSchemaUnderdeterminationA41ExactSchemaSourceRemoved": false,
+    "ruleSemanticSchemaContractA42Designed": true,
+    "ruleSemanticSchemaContractA42Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1528,8 +1530,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A42: replace A40/A41 exact ProducerSchema topology authority with a Rule-derived semantic schema contract: free-role boundary + constraint authority + execution/publication obligations, without privileging one gate order or exact packaging topology.",
-    "A42 must accept multiple extensionally equivalent topology realizations under the same Rule-derived contract, reject semantically incomplete/forged realizations, and keep F5-F4/A36/A38/A21 boundaries explicit.",
+    "A43: source-remove A42 host Set/equality validation. Express semantic-schema obligations and realization coverage through Link-native contextual authority/canonical identity plus recursive detachment, with ZERO for missing/duplicate/foreign obligations.",
+    "A43 must preserve A42's order-insensitive contract and must not reintroduce a privileged exact ProducerSchema topology; keep Rule-contract derivation as a separately visible residual unless independently removed.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6370,6 +6372,16 @@
       "residualAuthority": ["semantic schema contract is not yet represented Link-natively", "generic schema cloning and F5-F4 plan interpretation remain host-executed", "A35 publication-existence and A36 scratch boundaries remain open"],
       "consequence": "A41 separates semantic authority from incidental program packaging. The next target is not another exact template: A42 must derive a Rule-native semantic schema contract that admits multiple equivalent realizations and rejects incomplete ones.",
       "observed": {"ruleRoleCount": 8, "constrainedTargetCount": 3, "ruleDerivedFreeRoleCount": 5, "equivalentDistinctSchemaCount": 2, "validVariants": "ACCEPT", "forgedVariants": "ZERO", "constructionExecutor": "F5_F4_SOURCE_IDENTICAL", "runtime": "A21_SOURCE_IDENTICAL", "exactSchemaSourceRemoved": false, "independentMemories": 2, "productionChanged": false}
+    },
+    "ruleSemanticSchemaContractA42": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can exact ProducerSchema topology authority be replaced by one Rule-derived semantic contract that is insensitive to incidental gate ordering?",
+      "setup": ["derive five free roles and three constrained-target obligations from Rule structure", "materialize Contract=Rule->(FreeRoleCarrier,ObligationCarrier) with no TemplatePlan/TemplateE0/exact gate order", "validate selected realizations extensionally and emit contextual K->Realization only on success", "reuse merged A41 as unchanged lower execution evidence for forward/reverse full topologies"],
+      "oracle": ["forward and reverse obligation orders are both accepted under one contract", "missing, duplicate, foreign and short-free realizations produce ZERO accepted witnesses", "contract contains no exact plan/program topology", "two independent Memories agree"],
+      "evidenceTest": "ts/test/research-v013-rule-semantic-schema-contract-a42.test.ts",
+      "residualAuthority": ["host Set/equality implements extensional contract validation", "host structural reader derives contract from Rule", "F5-F4/A36/A38/A21 remain the already-classified lower boundaries"],
+      "consequence": "A42 removes arbitrary exact gate/package topology from schema semantic authority. The remaining immediate source boundary is host extensional validation of Link-carried obligations; A43 should reduce that validation to canonical Link identity plus contextual detachment without restoring exact topology authority.",
+      "observed": {"exactTopologyAuthorityInContract": 0, "freeRoleObligations": 5, "constrainedTargetObligations": 3, "forwardReverse": "ACCEPTED", "invalidRealizations": "ZERO", "contextualAcceptanceWitness": "K_TO_REALIZATION", "hostSetValidation": "RESIDUAL", "independentMemories": 2, "productionChanged": false}
     }
   }
 }
