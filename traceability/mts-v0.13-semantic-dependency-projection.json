@@ -7522,7 +7522,8 @@
         "the normative test uses only current anum_docs Memory plus defineContext/readContext; it imports no jsonRVM code, vocabulary or context fields",
         "the test statically asserts current state.ts context construction is parent->current followed by START closure",
         "A13 is used only as inherited MTS evidence that branch-local contexts and convergence provenance already exist",
-        "the experiment does not claim a complete formal duality/isomorphism between application and context; it proves only the scoped recursive/START-lift relation"
+        "the experiment proves the inner Link occupies START of the outer application Link but END of the outer context Link",
+        "the experiment does not claim a complete formal duality/isomorphism between application and context; it proves only the scoped recursive/START-lift relation plus this chiral START/END placement"
       ],
       "evidenceTest": "ts/test/research-v013-execution-context-geometry-a64.test.ts",
       "classification": {
@@ -7531,6 +7532,9 @@
         "contextWhole": "START_OF_CONTEXT_PAYLOAD",
         "contextNormalForm": "K_SELF_TO_(PARENT_TO_CURRENT)",
         "roleAlternation": "PREVIOUS_WHOLE_BECOMES_NEXT_START",
+        "applicationInnerLinkOuterRole": "START",
+        "contextInnerLinkOuterRole": "END",
+        "twoLinkChiralPlacement": "CONFIRMED_STRUCTURAL",
         "multiArgumentExecution": "NESTED_CONTEXT_CHAIN",
         "manyValuedExecution": "SIBLING_CHILD_CONTEXT_SPLIT",
         "convergedValueAncestry": "PRESERVED_BY_DISTINCT_PARENT_CONTEXTS",
@@ -7546,7 +7550,8 @@
       "claimBoundary": [
         "GREEN means current MTS context topology already has recursive nested growth and natural sibling branching under distinct results",
         "GREEN does not mean jsonRVM context semantics are part of MTS",
-        "GREEN does not establish a mathematical duality theorem between (f->x)->y and K=K->(parent->current)",
+        "GREEN establishes structural chirality of the two-Link forms: inner Link is outer START in application and outer END in context",
+        "GREEN does not establish a full mathematical or semantic duality theorem between (f->x)->y and K=K->(parent->current)",
         "v0.13 remains unaccepted; FULL_SELF_HOSTED remains false"
       ],
       "consequence": "A64 changes the lifecycle analysis direction. The current MTS context is not a flat K with a mutable frontier: defineContext already makes every new value a child context through P=parent->current and K=START(P). Thus multi-argument execution naturally forms nested context ancestry, and a MANY-valued step naturally forms sibling contexts under one parent. When branches later carry the same current value, their context identities remain distinct because the parent contexts differ. This supports treating execution provenance as context ancestry first; A65 must re-test the A63-to-A62 handoff using that ancestry before inventing a separate provenance-history object.",
