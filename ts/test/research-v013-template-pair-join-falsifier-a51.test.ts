@@ -242,20 +242,39 @@ function exercise(memory:Memory,withNoise:boolean):void{
   same(frontierTruthEnds(memory,step(memory,E,"forward")).length,0,
     "A51 ambient pair cannot revive terminal frontier");
 
-  // Positive control: one explicit Link-carried pair request closes exactly the
-  // missing binary step and yields K->(startValue->endValue).
-  const evalContext=memory.poles(
-    seedTemplateEvaluation(memory,targetTemplate,selected,memory.ensure(basis.L,basis.U)),
-  ).start;
-  const leftTruth=operandTruthLinks.find(t=>memory.poles(t).end===startValue);
-  const rightTruth=operandTruthLinks.find(t=>memory.poles(t).end===endValue);
-  assert(leftTruth!==undefined&&rightTruth!==undefined,"A51 operand truths selected");
-  same(memory.poles(leftTruth).start,memory.poles(rightTruth).start,"A51 operand truth contexts agree");
+  // Positive control uses a fresh operand pair so the requested target is
+  // genuinely absent immediately before execution.
+  const positiveStart=memory.ensure(startValue,basis.R);
+  const positiveEnd=memory.ensure(endValue,basis.R);
+  assert(memory.find(positiveStart,positiveEnd)===undefined,
+    "A51 positive-control target absent before pair request");
+  const selectedPositive=[
+    startProjection.projection,endProjection.projection,
+    memory.ensure(schema.inputRoles[0],positiveStart),
+    memory.ensure(schema.inputRoles[1],positiveEnd),
+  ] as const;
+  let positiveE=seedTemplateEvaluation(
+    memory,targetTemplate,selectedPositive,memory.ensure(basis.O,basis.L),
+  );
+  positiveE=step(memory,positiveE,"forward");
+  positiveE=step(memory,positiveE,"forward");
+  const positiveTruthLinks=frontierTruthLinks(memory,positiveE);
+  const leftTruth=positiveTruthLinks.find(t=>memory.poles(t).end===positiveStart);
+  const rightTruth=positiveTruthLinks.find(t=>memory.poles(t).end===positiveEnd);
+  assert(leftTruth!==undefined&&rightTruth!==undefined,"A51 positive operand truths selected");
+  same(memory.poles(leftTruth).start,memory.poles(rightTruth).start,
+    "A51 positive operand truth contexts agree");
+  positiveE=step(memory,positiveE,"forward");
+  same(frontierTruthEnds(memory,positiveE).length,0,"A51 fresh pairless control also yields ZERO");
+  assert(memory.find(positiveStart,positiveEnd)===undefined,
+    "A51 fresh target still absent before pair request");
+
   const request=memory.ensure(leftTruth,rightTruth);
   const requestTruth=memory.ensure(memory.poles(leftTruth).start,request);
   const pairedTruth=executePairRequest(memory,memory.poles(leftTruth).start,requestTruth);
-  same(memory.poles(pairedTruth).end,ambientPair,"A51 A16 pair control yields exact target");
-  void evalContext;
+  const created=memory.find(positiveStart,positiveEnd);
+  assert(created!==undefined,"A51 pair request materializes previously absent target");
+  same(memory.poles(pairedTruth).end,created,"A51 A16 pair control yields exact fresh target");
 }
 
 function staticGuards():void{
