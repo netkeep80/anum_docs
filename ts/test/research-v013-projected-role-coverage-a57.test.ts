@@ -71,7 +71,7 @@ function assembleCoverageHistory(memory:Memory,history:LinkHandle,accepted:LinkH
 interface ValidationProgram{readonly E0:LinkHandle;readonly accepted:LinkHandle;readonly depth:number;readonly checkCount:number;}
 function compileSelectedValidation(memory:Memory,selectedRequest:LinkHandle):ValidationProgram{
   const selected=memory.poles(selectedRequest),parentContext=selected.start,pair=memory.poles(selected.end),rule=pair.start,value=pair.end,coverage=deriveDirectCoverageHistory(memory,rule,value);
-  same(coverage.count,22,"A57 projected direct coverage check count");
+  assert(coverage.count===22,`A57 projected direct coverage check count actual=${coverage.count}`);
   const assembled=assembleCoverageHistory(memory,coverage.history,value),authority=memory.ensureStartSelfClosed(assembled.authorityBody),K=memory.ensure(parentContext,authority),seedTruth=memory.ensure(K,assembled.seed),occurrence=memory.ensure(memory.root,seedTruth),E0=memory.ensure(K,freezeFrontier(memory,[occurrence]));
   return Object.freeze({E0,accepted:value,depth:assembled.count*2,checkCount:assembled.count});
 }
@@ -79,7 +79,7 @@ function runProgram(memory:Memory,program:ValidationProgram):readonly LinkHandle
 function exercise(memory:Memory,withNoise:boolean):void{
   const basis=ensureRootBasis(memory);if(withNoise)memory.ensure(memory.ensure(basis.U,basis.C),basis.L);
   const forward=defineRule(memory,basis,false,false),reverse=defineRule(memory,basis,true,true),free=Object.freeze([forward.roles[0]!,forward.roles[1]!,forward.roles[2]!,forward.roles[4]!,forward.roles[5]!]),validForward=realization(memory,free,forward.equations),validReverse=realization(memory,[...free].reverse(),[...forward.equations].reverse()),context=memory.ensure(basis.R,basis.U);
-  for(const rule of [forward.rule,reverse.rule])for(const valid of [validForward,validReverse]){const p=compileSelectedValidation(memory,request(memory,context,rule,valid)),ends=runProgram(memory,p);same(p.checkCount,22,"A57 valid check count");same(ends.length,1,"A57 valid singleton");same(ends[0],valid,"A57 valid accepted");}
+  for(const rule of [forward.rule,reverse.rule])for(const valid of [validForward,validReverse]){const p=compileSelectedValidation(memory,request(memory,context,rule,valid)),ends=runProgram(memory,p);assert(p.checkCount===22,`A57 valid check count actual=${p.checkCount}`);same(ends.length,1,"A57 valid singleton");same(ends[0],valid,"A57 valid accepted");}
   const constrainedTarget=memory.poles(forward.equations[0]!).start,foreignRole=memory.ensure(forward.rule,basis.C),eqs=forward.equations;
   const bads=[realization(memory,free.slice(0,4),eqs),realization(memory,[free[0]!,free[1]!,free[1]!,free[3]!,free[4]!],eqs),realization(memory,[free[0]!,free[1]!,free[2]!,free[3]!,foreignRole],eqs),realization(memory,[constrainedTarget,...free.slice(1)],eqs)];
   for(const bad of bads)same(runProgram(memory,compileSelectedValidation(memory,request(memory,context,forward.rule,bad))).length,0,"A57 invalid role coverage ZERO");
