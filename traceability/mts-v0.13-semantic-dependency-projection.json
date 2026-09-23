@@ -171,7 +171,9 @@
     "templatePairJoinFalsifierA51Complete": true,
     "templatePairJoinFalsifierA51SourceRemoved": false,
     "applicationNormalFormA52Designed": true,
-    "applicationNormalFormA52Complete": true
+    "applicationNormalFormA52Complete": true,
+    "proofGatedApplicationA53Designed": true,
+    "proofGatedApplicationA53Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1552,8 +1554,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A53: source-remove the generic binary application executor exposed by A52. Execute selected K->(Template->Environment) from Link-carried template/decomposition authority without host semantic memory.poles decoding of the application or a direct host memory.ensure(left,right) result constructor.",
-    "A53 must keep external application selection as an input boundary, preserve A52 ambient-application inertness/swapped-environment/foreign-template rejection, and keep unchanged A21 for result continuation.",
+    "A54: classify the raw binary Memory constructor boundary exposed by A53. Falsify whether memory.ensure(start,end), after all semantic operand/template decisions have been moved into Link-carried proof gates, is pure E1 physical substrate or still hides an E2 semantic source.",
+    "A54 must deny schema/template/role/application access to the constructor, preserve A53 semantic results under an opaque constructor interface, and avoid claiming irreducibility merely because the implementation currently calls ensure.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -4267,6 +4269,7 @@
         "twoValidCandidatesAmbiguous": true,
         "frozenCandidateIdentityReferences": 0,
         "independentMemories": 2,
+        "finalCi": "GREEN_6319",
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-structural-admission-f5-f2.test.ts",
@@ -6764,6 +6767,62 @@
         "forgedDecomposition": "ZERO",
         "runtime": "A21_SOURCE_IDENTICAL",
         "genericBinaryApplicationExecutor": "HOST_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "proofGatedApplicationA53": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A52's generic binary application executor be reduced to Link-carried proof validation plus an isolated raw Memory constructor, with zero semantic pole reads of the Application Link and zero host boolean role/template decisions?",
+      "setup": [
+        "selected input carries Application proof separately from K->Application so the semantic path never decomposes the Application Link itself",
+        "read only proof/environment/binding carriers to obtain candidate operands",
+        "encode proof/truth identity, expected Template application identity and ordered role identity as stage-scoped canonical equality gates",
+        "run all semantic validation through unchanged A21",
+        "materialize the candidate pair through one isolated raw memory.ensure(start,end) constructor before validation; contextual truth is published only if every gate collapses"
+      ],
+      "oracle": [
+        "valid selected application yields the exact contextual result",
+        "ambient alternate application remains inert",
+        "swapped environment yields semantic ZERO even though its reverse scratch pair may physically exist",
+        "foreign Template yields semantic ZERO",
+        "proof/truth disagreement yields semantic ZERO",
+        "accepted result continues through source-identical A21",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "semantic candidate derivation never calls memory.poles on either Application handle",
+        "semantic candidate derivation contains no same/find/direct result-pair ensure decision",
+        "raw constructor contains only memory.ensure(start,end) and no schema/template/role/context/truth/application/poles/find dependency",
+        "A21 runtime remains source-identical to A37"
+      ],
+      "evidenceTest": "ts/test/research-v013-proof-gated-application-a53.test.ts",
+      "residualAuthority": [
+        "raw memory.ensure(start,end) is only an E1 candidate until A54 classifies it independently",
+        "generic proof/environment/binding carrier projection remains host-executed representation plumbing",
+        "external application selection remains an input boundary",
+        "construction schema source/admission, Rule->Contract derivation and A35 prior-publication existence remain open"
+      ],
+      "claimBoundary": [
+        "A53 source-removes Template/role acceptance and Application-pole interpretation from the binary semantic decision path; it does not claim the physical act of creating a Link can disappear",
+        "physical scratch existence is explicitly allowed and is not contextual truth authority",
+        "A53 does not by itself prove memory.ensure is E1 rather than E2; that is A54",
+        "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A53 reduces the A52 host binary executor to proof-carried canonical validation plus a raw constructor boundary. Invalid physical scratch Links remain semantically inert, demonstrating again that ambient Memory existence is not truth. A54 must classify the residual raw constructor rather than recurse indefinitely into self-hosting physical Link creation.",
+      "observed": {
+        "applicationPoleSemanticReads": 0,
+        "hostRoleTemplateBooleanBranches": 0,
+        "semanticValidation": "STAGE_SCOPED_CANONICAL_COLLAPSE_PLUS_A21",
+        "physicalPairConstructor": "RAW_MEMORY_ENSURE_E1_CANDIDATE",
+        "validApplication": "CONTEXTUAL_RESULT",
+        "swappedEnvironment": "ZERO",
+        "foreignTemplate": "ZERO",
+        "proofTruthMismatch": "ZERO",
+        "invalidPhysicalScratchCanExist": true,
+        "ambientExistenceIsAuthority": false,
+        "runtime": "A21_SOURCE_IDENTICAL",
+        "externalApplicationSelection": "INPUT_BOUNDARY",
         "independentMemories": 2,
         "productionChanged": false
       }
