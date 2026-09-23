@@ -129,7 +129,8 @@
     "generationSelectionOccurrenceA32Designed": true,
     "generationSelectionOccurrenceA32Complete": true,
     "genericCurrentOccurrenceA33Designed": true,
-    "genericCurrentOccurrenceA33Complete": true
+    "genericCurrentOccurrenceA33Complete": true,
+    "admittedSourceCatalogA34Designed": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1510,9 +1511,10 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A34: attack broad source-inventory membership/publication without authorizing ambient Memory. Replace host-enumerated ExactSequence inventory authority with a frozen Link-carried publication/catalog authority from which admitted source candidates are discovered structurally.",
+    "A34: execute admitted Link-native source catalog and remove host-enumerated ExactSequence inventory from the generation runner.",
+    "If A34 is GREEN, attack external catalog publication invocation: test whether already selected Link-native publication/admission authority can generate catalog membership without a domain-specific host publisher.",
+    "After catalog publication source reduction, reassess host-executed generic structural admission/topology interpreters as the principal remaining E2/E3 boundary.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
-    "After A34, reassess host-executed generic topology/rule interpreters as the principal remaining E2/E3 semantic boundary.",
     "A33 must preserve context identity, immutable ancestry and ambient-candidate isolation at both generation-selection and meta-execution levels.",
     "A32 must not execute every request execution linked to the generation context; selection must remain explicit in Link structure and preserve immutable request history.",
     "A31 must preserve immutable request truth and distinguish selected occurrence from ambient alternative G->Target truths.",
@@ -5951,6 +5953,50 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "admittedSourceCatalogA34": {
+      "status": "DESIGNED_PENDING_EXECUTION",
+      "question": "Can A30-A32's host-enumerated ExactSequence source inventory be replaced by a versioned Link-native source catalog whose membership is created only through structurally checked publication, without granting ambient Memory authority?",
+      "setup": [
+        "retain structurally published producer candidates and A28/A29 source/target derivation",
+        "represent catalog membership as publication truth C->Candidate carried by immutable occurrence ancestry",
+        "represent a catalog version as Catalog=C->MembershipHistoryHead",
+        "generation context G carries one selected Catalog version instead of an ExactSequence inventory",
+        "catalog publication accepts a candidate only when its producer topology is structurally extractable and it has exactly one explicit Candidate->M publication",
+        "late publication creates a new Catalog version; previously selected G remains immutable"
+      ],
+      "oracle": [
+        "host-enumerated ExactSequence inventory is absent from generation runner",
+        "selected catalog initially carries three structurally publishable source candidates, including one shorter source structurally incompatible with target",
+        "two compatible sources converge to one target candidate/publication/M and unchanged A23 metaStep executes target",
+        "valid ambient publishable source outside selected catalog is ignored",
+        "late checked publication creates a new catalog version while old selected catalog remains unchanged",
+        "selecting the new catalog exposes the new source and preserves canonical convergence",
+        "malformed self-published candidate cannot enter catalog",
+        "membership occurrence rooted in a foreign catalog context rejects fail-closed",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "catalog reader contains no ExactSequence decoder, find, outgoing, incoming, allLinks or switch ambient selector",
+        "catalog publisher requires sourcePublishable before membership creation and contains no ambient enumeration",
+        "generation runner obtains sources only from selected catalog history",
+        "A34 metaStep remains whitespace-normalized source-identical to A23",
+        "A28/A29 structural source/target anti-cheat guards remain inherited"
+      ],
+      "residualAuthority": [
+        "catalog publication events remain externally invoked",
+        "which catalog version is selected by generation context remains Link-carried but externally constructed",
+        "sourcePublishable/target admission/topology interpreters remain host executed",
+        "current occurrence-head selection remains executor state per A33"
+      ],
+      "evidenceTest": "ts/test/research-v013-admitted-source-catalog-a34.test.ts",
+      "claimBoundary": [
+        "GREEN would remove arbitrary host list enumeration as source-inventory authority",
+        "GREEN would replace it with explicit immutable Link-native catalog publication history guarded by structural source publication",
+        "GREEN would not eliminate publication events or host generic interpreters",
+        "ambient Memory remains non-authoritative",
+        "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open; production unchanged"
+      ]
     }
   }
 }
