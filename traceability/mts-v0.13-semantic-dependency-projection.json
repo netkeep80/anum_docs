@@ -222,7 +222,9 @@
     "contextNativeBranchingA65bDesigned": true,
     "contextNativeBranchingA65bComplete": true,
     "contextNativeRecursionA65cDesigned": true,
-    "contextNativeRecursionA65cComplete": true
+    "contextNativeRecursionA65cComplete": true,
+    "contextNativeConvergenceA65dDesigned": true,
+    "contextNativeConvergenceA65dComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1603,8 +1605,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A65d: starting only from GREEN A65a-c, test one convergence case: two distinct child-context histories reach the same extensional F value. Ask only whether context ancestry preserves two branch histories without a separate occurrence path; do not add scheduler equivalence or generalized cascade closure yet.",
-    "A66: only after A65a-d, attack the argument-cursor representation boundary. Compare the scoped forward Q_i=arg_i->Q_(i+1) carrier with existing MTS sequence forms and test whether Q is a structural mirror/projection of an existing immutable sequence rather than a new semantic primitive.",
+    "A66a: compare exactly one two-element scoped forward cursor Q0=a1->(a2->R) with the existing two-element ExactSequence carrier. Determine only their structural relationship under START/END roles; do not yet replace either representation or connect generalized cascade execution.",
+    "Only after the small A66 sequence experiments should scheduler/cascade semantics be revisited; preserve the author roadmap that function, argument and result may themselves be executable Links and generalized detachment may form nested parallel cascades.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
@@ -7686,7 +7688,7 @@
       }
     },
     "contextNativeRecursionA65c": {
-      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can the exact A65b one-layer law be reapplied once to a child context, while a sibling with ZERO selected second-step results terminates locally even though its argument cursor still has a remaining cell?",
       "setup": [
         "root K0 has scoped two-cell cursor q0=a1->q1 and q1=a2->R",
@@ -7720,6 +7722,43 @@
         "ambientContinuation": "INERT",
         "cursorAdvance": "ONE_CELL_PER_SUCCESSFUL_STEP",
         "convergence": "NOT_TESTED",
+        "productionChanged": false
+      }
+    },
+    "contextNativeConvergenceA65d": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "When two distinct context-native execution histories converge to the same extensional F value after the same number of local steps, does ordinary context ancestry preserve the two histories without a separate execution-path carrier?",
+      "setup": [
+        "K0 branches through unchanged A65b into distinct KA and KB",
+        "KA and KB both retain the same next argument cursor q1 but distinct current F values gA and gB",
+        "one selected second-step result on each branch maps both applications to the same z"
+      ],
+      "oracle": [
+        "both final frame states have F=z and Q=R",
+        "extensional final F count is one",
+        "final context count is two",
+        "leaf contexts KAZ and KBZ remain distinct because their parents KA and KB differ",
+        "read-only parent traversal recovers two distinct length-three context histories with common ancestor K0",
+        "re-materialization converges independently to the same canonical KAZ and KBZ identities",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-context-native-convergence-a65d.test.ts",
+      "exclusions": [
+        "scheduler equivalence not tested",
+        "generalized cascade closure not tested",
+        "Rule publication/admission not tested",
+        "A21 occurrence model not invalidated",
+        "Q remains scoped research representation"
+      ],
+      "classification": {
+        "executionLaws": "A65A_A65B_SOURCE_IDENTICAL",
+        "extensionalFinalFCount": 1,
+        "distinctLeafContextCount": 2,
+        "distinctParentContextCount": 2,
+        "commonAncestor": "K0",
+        "branchHistory": "RECOVERABLE_FROM_CONTEXT_ANCESTRY",
+        "separateExecutionPathCarrier": "NOT_REQUIRED_FOR_THIS_SCOPED_FRAME_HISTORY",
+        "a21OccurrenceModel": "NOT_INVALIDATED",
         "productionChanged": false
       }
     }
