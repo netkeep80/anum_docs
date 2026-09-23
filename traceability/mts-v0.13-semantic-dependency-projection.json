@@ -220,7 +220,9 @@
     "contextNativeSingleStepA65aDesigned": true,
     "contextNativeSingleStepA65aComplete": true,
     "contextNativeBranchingA65bDesigned": true,
-    "contextNativeBranchingA65bComplete": true
+    "contextNativeBranchingA65bComplete": true,
+    "contextNativeRecursionA65cDesigned": true,
+    "contextNativeRecursionA65cComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1601,8 +1603,7 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A65c: starting only from GREEN A65a/A65b, test exactly one recursive continuation from one child frame into one grandchild frame plus one local-termination control. Do not add convergence, scheduler equivalence, generalized cascade closure or lifecycle authority yet.",
-    "A65d: only after A65c, test convergence and whether context ancestry alone preserves branch provenance without a separate occurrence path.",
+    "A65d: starting only from GREEN A65a-c, test one convergence case: two distinct child-context histories reach the same extensional F value. Ask only whether context ancestry preserves two branch histories without a separate occurrence path; do not add scheduler equivalence or generalized cascade closure yet.",
     "A66: only after A65a-d, attack the argument-cursor representation boundary. Compare the scoped forward Q_i=arg_i->Q_(i+1) carrier with existing MTS sequence forms and test whether Q is a structural mirror/projection of an existing immutable sequence rather than a new semantic primitive.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
@@ -7645,7 +7646,7 @@
       }
     },
     "contextNativeBranchingA65b": {
-      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Starting from GREEN A65a, does one selected result-fact carrier produce exactly ZERO, ONE or MANY sibling child contexts in one execution layer, without recursion or scheduler semantics?",
       "setup": [
         "one selected parent context K with K.current=F->Q",
@@ -7681,6 +7682,44 @@
         "ambientPhysicalResult": "INERT",
         "selectedOrder": "EXTENSIONALLY_INERT",
         "recursion": "NOT_TESTED",
+        "productionChanged": false
+      }
+    },
+    "contextNativeRecursionA65c": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "Can the exact A65b one-layer law be reapplied once to a child context, while a sibling with ZERO selected second-step results terminates locally even though its argument cursor still has a remaining cell?",
+      "setup": [
+        "root K0 has scoped two-cell cursor q0=a1->q1 and q1=a2->R",
+        "A65b source-identical branching creates two first-level children KA and KB",
+        "KA receives exactly one selected second-step result fact",
+        "KB receives an empty selected second-step result carrier"
+      ],
+      "oracle": [
+        "KA produces exactly one grandchild KAZ by reapplying the unchanged A65b/A65a law",
+        "KAZ has current F=z and Q=R after exactly one additional cursor-cell advance",
+        "KB produces zero grandchildren",
+        "KB still has q1 != R, proving local termination is distinct from cursor exhaustion",
+        "an ambient physical KB second-step continuation remains inert when not selected",
+        "no convergence between KA and KB is introduced",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-context-native-recursion-a65c.test.ts",
+      "exclusions": [
+        "convergence/provenance reduction not tested",
+        "scheduler equivalence not tested",
+        "generalized cascade closure not tested",
+        "Rule publication/admission not tested",
+        "Q remains scoped research representation"
+      ],
+      "classification": {
+        "level1Law": "A65B_SOURCE_IDENTICAL",
+        "level2Law": "A65B_SOURCE_IDENTICAL_REAPPLIED_TO_CHILD",
+        "continuingChild": "ONE_GRANDCHILD",
+        "terminatingChild": "ZERO_GRANDCHILDREN_WITH_REMAINING_Q",
+        "localTermination": "SELECTED_CONTINUATION_CARDINALITY_ZERO",
+        "ambientContinuation": "INERT",
+        "cursorAdvance": "ONE_CELL_PER_SUCCESSFUL_STEP",
+        "convergence": "NOT_TESTED",
         "productionChanged": false
       }
     }
