@@ -168,7 +168,7 @@
     "directStructuralSchemaExecutionA50Designed": true,
     "directStructuralSchemaExecutionA50Complete": true,
     "templatePairJoinFalsifierA51Designed": true,
-    "templatePairJoinFalsifierA51Complete": false,
+    "templatePairJoinFalsifierA51Complete": true,
     "templatePairJoinFalsifierA51SourceRemoved": false
   },
   "auditScope": {
@@ -4165,6 +4165,7 @@
         "admissionDirectionHostBranches": 0,
         "forgedWitnessRejected": true,
         "independentMemories": 2,
+        "finalCi": "GREEN_6306",
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-admission-source-removal-a13d.test.ts",
@@ -6659,7 +6660,7 @@
       }
     },
     "templatePairJoinFalsifierA51": {
-      "status": "DESIGNED_FALSIFIER_CI_PENDING",
+      "status": "EXECUTED_GREEN_FALSIFIER_CLONE_SOURCE_REMOVAL_RED",
       "question": "Can A50 generic recursive template instantiation be source-removed using only Link-carried decomposition, role bindings and unchanged unary A21 detachment, with no recursive clone oracle?",
       "setup": [
         "keep the A49 StructuralRule schema unchanged and use its decomposition-witness template to admit targetTemplate->S and targetTemplate->E projections",
@@ -6693,16 +6694,16 @@
         "positive-control A16-F4 pair request is not counted as source-removal because its request producer remains open",
         "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "If exact-head CI is GREEN, A51 localizes A50's generic recursive clone residual to a binary join capability: once child values are available, unchanged A21 cannot synthesize their parent Link. A52 should reconnect this boundary with A16-F5 and make pair-request production Link-carried rather than reintroducing a recursive host clone.",
+      "consequence": "A51 localizes A50's generic recursive clone residual to a binary join capability: once child values are available, unchanged A21 cannot synthesize their parent Link. A52 should reconnect this boundary with A16-F5 and make pair-request production Link-carried rather than reintroducing a recursive host clone.",
       "observed": {
         "recursiveCloneInA51": 0,
         "templateDecomposition": "A47_STYLE_PROOF_CARRIED",
         "roleBindings": "LINK_CARRIED",
-        "pairlessA21Result": "EXPECTED_ZERO",
+        "pairlessA21Result": "ZERO",
         "targetMaterializedWithoutJoin": false,
-        "ambientPair": "EXPECTED_INERT",
+        "ambientPair": "INERT",
         "forgedDecomposition": "ZERO",
-        "pairPositiveControl": "A16_F4_EXACT_TARGET_EXPECTED",
+        "pairPositiveControl": "A16_F4_EXACT_FRESH_TARGET",
         "minimumMissingAuthority": "DYNAMIC_BINARY_PAIR_REQUEST",
         "sourceRemoved": false,
         "independentMemories": 2,
