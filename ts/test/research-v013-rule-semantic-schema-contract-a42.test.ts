@@ -128,10 +128,9 @@ function exercise(memory:Memory,withNoise:boolean):void{
   for(const [name,bad] of [
     ["missing",missing],["duplicate",duplicate],["foreign",foreign],["short-free",shortFree],
   ] as const){
-    const before=memory.linkCount;
     same(validateSelectedContract(memory,request(memory,context,contract.handle,bad)),undefined,
       `A42 ${name} realization rejected`);
-    assert(memory.linkCount>=before,"A42 rejection does not require accepted witness");
+    same(memory.find(context,bad),undefined,`A42 ${name} creates no accepted contextual witness`);
   }
 
   // Ambient invalid realization cannot alter an already selected good witness.
