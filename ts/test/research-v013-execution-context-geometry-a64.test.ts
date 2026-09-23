@@ -76,13 +76,22 @@ function advance(memory:Memory,parentContext:LinkHandle,resultFact:LinkHandle):F
 }
 
 /**
- * Final result appears in the root execution context only after Q is exhausted.
- * Child-frame currentFn values are temporary branch-local values until then.
+ * Q exhaustion closes only this local frame.
+ *
+ * The returned K_root->F is a root-context continuation candidate, not proof of
+ * global execution termination. F may itself be the antecedent of further
+ * selected generalized-detachment continuations.
  */
-function finalize(memory:Memory,rootContext:LinkHandle,leafContext:LinkHandle):LinkHandle{
+function returnFromFrame(memory:Memory,rootContext:LinkHandle,leafContext:LinkHandle):LinkHandle{
   const leaf=readFrame(memory,leafContext),q=readArgumentCursor(memory,leaf.cursor);
-  assert(q.done,"A64 only exhausted frame may return to root context");
+  assert(q.done,"A64 only exhausted local frame may return to parent/root context");
   return memory.ensure(rootContext,leaf.currentFn);
+}
+
+function detach(memory:Memory,truth:LinkHandle,continuation:LinkHandle):LinkHandle{
+  const t=memory.poles(truth),c=memory.poles(continuation);
+  same(t.end,c.start,"A64 generalized detachment shares middle Link A");
+  return memory.ensure(t.start,c.end);
 }
 
 function exercise(noise:boolean):void{
@@ -143,8 +152,8 @@ function exercise(noise:boolean):void{
   // Intermediate values are branch-local temporaries, not root results.
   assert(memory.find(rootContext,gA)===undefined,"A64 intermediate A absent from root result scope");
   assert(memory.find(rootContext,gB)===undefined,"A64 intermediate B absent from root result scope");
-  expectThrows(()=>{finalize(memory,rootContext,kA.context);},"A64 branch A cannot finalize before arguments exhausted");
-  expectThrows(()=>{finalize(memory,rootContext,kB.context);},"A64 branch B cannot finalize before arguments exhausted");
+  expectThrows(()=>{returnFromFrame(memory,rootContext,kA.context);},"A64 branch A cannot finalize before arguments exhausted");
+  expectThrows(()=>{returnFromFrame(memory,rootContext,kB.context);},"A64 branch B cannot finalize before arguments exhausted");
 
   // Second application consumes the same next argument independently per branch.
   const appA=memory.ensure(gA,a2),appB=memory.ensure(gB,a2);
@@ -159,12 +168,46 @@ function exercise(noise:boolean):void{
   assert(kzA.parent!==kzB.parent,"A64 equal final value preserves branch ancestry");
 
   // Both completed branches return the same extensional result to the root context.
-  const rootResultA=finalize(memory,rootContext,kzA.context);
-  const rootResultB=finalize(memory,rootContext,kzB.context);
+  const rootResultA=returnFromFrame(memory,rootContext,kzA.context);
+  const rootResultB=returnFromFrame(memory,rootContext,kzB.context);
   same(rootResultA,rootResultB,"A64 converged branches canonically return one root result");
   const rr=memory.poles(rootResultA);
-  same(rr.start,rootContext,"A64 final result is contextualized by root execution context");
-  same(rr.end,z,"A64 final root result value");
+  same(rr.start,rootContext,"A64 local frame return is contextualized by root execution context");
+  same(rr.end,z,"A64 local frame return value");
+
+  // Q=R is LOCAL completion only. The returned value may be a whole Link that
+  // immediately participates in further generalized detachment.
+  const nestedFunction=memory.ensure(b.O,b.U);
+  const nestedArgument=memory.ensure(b.C,b.L);
+  const nestedApplication=memory.ensure(nestedFunction,nestedArgument);
+  const nestedValueA=memory.ensure(nestedArgument,b.O);
+  const nestedValueB=memory.ensure(nestedArgument,b.C);
+
+  // Make the locally returned z itself a compound/application Link.
+  const compoundReturn=memory.ensure(nestedFunction,nestedArgument);
+  const compoundLeaf=defineFrame(memory,kzA.parent,compoundReturn,memory.root);
+  const rootCompoundTruth=returnFromFrame(memory,rootContext,compoundLeaf.context);
+  same(memory.poles(rootCompoundTruth).end,compoundReturn,
+    "A64 locally completed value may itself be a compound application Link");
+
+  // Generalized MP is the global cascade law:
+  // K->A, A->B => K->B. ONE local completion can fan out to MANY continuations.
+  const contA=memory.ensure(compoundReturn,nestedValueA);
+  const contB=memory.ensure(compoundReturn,nestedValueB);
+  const cascadedA=detach(memory,rootCompoundTruth,contA);
+  const cascadedB=detach(memory,rootCompoundTruth,contB);
+  assert(cascadedA!==cascadedB,"A64 one contextual truth may split into parallel detachment branches");
+  same(memory.poles(cascadedA).start,rootContext,"A64 cascade branch A keeps context");
+  same(memory.poles(cascadedB).start,rootContext,"A64 cascade branch B keeps context");
+
+  // A consequence may itself be another compound antecedent and detach again.
+  const deeper=memory.ensure(nestedValueA,b.L);
+  const nextContinuation=memory.ensure(nestedValueA,deeper);
+  const cascadedAgain=detach(memory,cascadedA,nextContinuation);
+  same(memory.poles(cascadedAgain).end,deeper,
+    "A64 detachment consequence recursively becomes next antecedent");
+  assert(memory.poles(cascadedAgain).end!==nestedValueA,
+    "A64 global cascade does not stop at one unary application");
 
   // The moving pointer is immutable history, not host mutation.
   same(readFrame(memory,rootContext).currentFn,f0,"A64 root keeps original function");
@@ -225,13 +268,19 @@ function main():void{
     "POINTER_MOVEMENT=IMMUTABLE_CHILD_CONTEXT_NOT_MUTATION",
     "MANY_RESULT=SIBLING_CHILD_CONTEXTS",
     "INTERMEDIATE_VALUES=CHILD_CONTEXT_LOCAL_TEMPORARIES",
-    "EXHAUSTED_CURSOR=RETURN_TO_ROOT_CONTEXT",
-    "CONVERGED_BRANCHES=ONE_ROOT_RESULT_DISTINCT_CHILD_ANCESTRY",
+    "EXHAUSTED_CURSOR=LOCAL_FRAME_RETURN_ONLY",
+    "GLOBAL_TERMINATION=NOT_EQ_CURSOR_EXHAUSTION",
+    "GENERALIZED_DETACHMENT_TRIAD=K_A_B_WITH_TWO_PREMISE_LINKS",
+    "DETACHMENT=K_TO_A_PLUS_A_TO_B_GIVES_K_TO_B",
+    "FRACTAL_OPERANDS=COMPOUND_LINKS_ALLOWED",
+    "CASCADE=CONSEQUENCE_CAN_BECOME_NEXT_ANTECEDENT",
+    "PARALLEL_CASCADE=ZERO_ONE_MANY_CONTINUATIONS",
+    "CONVERGED_BRANCHES=ONE_ROOT_RETURN_CANDIDATE_DISTINCT_CHILD_ANCESTRY",
     "FUNCTION_AND_CURSOR=INDEPENDENT_FRAME_COORDINATES",
     "MISMATCHED_RESULT_PROVENANCE=REJECTED",
     "ARGUMENT_CURSOR_CARRIER=SCOPED_NOT_FINAL_REPRESENTATION",
     "JSONRVM=NORMATIVE_AUTHORITY_0",
-    "NEXT=A65_RECONCILE_FRAME_WITH_EXISTING_SEQUENCE_AND_RULE_LIFECYCLE",
+    "NEXT=A65_CONTEXT_NATIVE_FRACTAL_DETACHMENT_CASCADE",
     "GLOBAL_E2=OPEN GLOBAL_E3=OPEN GLOBAL_E4=OPEN FULL_SELF_HOSTED=FALSE",
     "V013_NOT_ACCEPTED PRODUCTION_UNCHANGED",
   ].join(" "));
