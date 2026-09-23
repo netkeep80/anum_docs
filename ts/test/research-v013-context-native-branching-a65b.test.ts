@@ -12,7 +12,11 @@ function defineFrame(memory:Memory,parent:LinkHandle,f:LinkHandle,q:LinkHandle):
   return defineContext(memory,parent,memory.ensure(f,q));
 }
 
-function advanceOne(memory:Memory,context:LinkHandle,selectedResultFact:LinkHandle):LinkHandle{
+function advanceOne(
+  memory: Memory,
+  context: LinkHandle,
+  selectedResultFact: LinkHandle,
+): LinkHandle {
   const k=readContext(memory,context);
   const state=memory.poles(k.current);
   const f=state.start;
