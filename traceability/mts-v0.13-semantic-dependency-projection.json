@@ -144,7 +144,10 @@
     "bootstrapProducerPlanA39Complete": true,
     "producerSchemaFalsifierA40Designed": true,
     "producerSchemaFalsifierA40Complete": true,
-    "producerSchemaFalsifierA40PlanAuthoringSourceRemoved": false
+    "producerSchemaFalsifierA40PlanAuthoringSourceRemoved": false,
+    "ruleSchemaUnderdeterminationA41Designed": true,
+    "ruleSchemaUnderdeterminationA41Complete": true,
+    "ruleSchemaUnderdeterminationA41ExactSchemaSourceRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1525,8 +1528,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A41: source-remove ProducerSchema authoring exposed by A40. Derive the reusable plan topology schema itself from pre-existing Rule/role Link authority, without calling the A39 host recipe at schema freeze.",
-    "A41 must keep A40 generic schema instantiation, the F5-F4 construction executor, A36 publication gate, revised A38 target instantiation and A21 runtime unchanged; neither candidate nor schema publisher may smuggle a pre-authored admission plan.",
+    "A42: replace A40/A41 exact ProducerSchema topology authority with a Rule-derived semantic schema contract: free-role boundary + constraint authority + execution/publication obligations, without privileging one gate order or exact packaging topology.",
+    "A42 must accept multiple extensionally equivalent topology realizations under the same Rule-derived contract, reject semantically incomplete/forged realizations, and keep F5-F4/A36/A38/A21 boundaries explicit.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6356,6 +6359,17 @@
         "independentMemories": 2,
         "productionChanged": false
       }
+    },
+    "ruleSchemaUnderdeterminationA41": {
+      "status": "EXECUTED_GREEN_FALSIFIER_EXACT_SOURCE_REMOVAL_RED",
+      "question": "Does one Rule/role authority uniquely determine the exact ProducerSchema/Plan topology required by A40?",
+      "setup": ["derive the five free roles structurally from one eight-role/three-constraint Rule", "author two schemas for that same Rule differing only by forward vs reverse ordering of the three independent admission gates", "instantiate later target Plans through unchanged A40 generic schema cloning", "execute with source-identical F5-F4 constructor and A21 runtime"],
+      "oracle": ["the two schema handles and target Plan handles are distinct", "both valid realizations publish Packages whose TemplateE0 reaches ACCEPT", "both reject independent forgeries of constraints 0/1/2 with ZERO", "two independent Memories agree"],
+      "result": "GREEN falsifier: the Rule determines the free-role boundary but does not determine one exact packaging/gate-order topology. Exact-schema source-removal is RED because choosing one exact topology adds authority not present in the Rule.",
+      "evidenceTest": "ts/test/research-v013-rule-schema-underdetermination-a41.test.ts",
+      "residualAuthority": ["semantic schema contract is not yet represented Link-natively", "generic schema cloning and F5-F4 plan interpretation remain host-executed", "A35 publication-existence and A36 scratch boundaries remain open"],
+      "consequence": "A41 separates semantic authority from incidental program packaging. The next target is not another exact template: A42 must derive a Rule-native semantic schema contract that admits multiple equivalent realizations and rejects incomplete ones.",
+      "observed": {"ruleRoleCount": 8, "constrainedTargetCount": 3, "ruleDerivedFreeRoleCount": 5, "equivalentDistinctSchemaCount": 2, "validVariants": "ACCEPT", "forgedVariants": "ZERO", "constructionExecutor": "F5_F4_SOURCE_IDENTICAL", "runtime": "A21_SOURCE_IDENTICAL", "exactSchemaSourceRemoved": false, "independentMemories": 2, "productionChanged": false}
     }
   }
 }
