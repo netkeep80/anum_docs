@@ -228,7 +228,9 @@
     "sequenceCursorComparisonA66aDesigned": true,
     "sequenceCursorComparisonA66aComplete": true,
     "exactSequenceSelectedPositionA66bDesigned": true,
-    "exactSequenceSelectedPositionA66bComplete": true
+    "exactSequenceSelectedPositionA66bComplete": true,
+    "exactSequenceInitialPositionA66cDesigned": true,
+    "exactSequenceInitialPositionA66cComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1609,8 +1611,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A66c: starting only from GREEN A66b, test initialization only: given a selected non-empty ExactSequence handle, can the first execution position P=Sequence->FirstCell be derived structurally without a host index, host value array or materialized forward Q chain?",
-    "A66c must not solve arbitrary execution or cursor advancement again. It should isolate only the missing operation 'selected sequence -> first cell' and fail closed for malformed/non-ExactSequence input.",
+    "A66d: starting only from GREEN A66b/A66c, replace the scoped raw Q in exactly one A65a-style context step with position P=Sequence->CurrentCell. Test only one selected result and one child; do not add branching, recursion or cascade.",
+    "A66d must recover current argument and next position structurally from P, keep Sequence identity unchanged, and show the child frame carries Y plus the advanced position without constructing a forward Q chain.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
@@ -7807,7 +7809,7 @@
       }
     },
     "exactSequenceSelectedPositionA66b": {
-      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "For exactly two values, is one Link P=Sequence->CurrentCell sufficient position evidence to move forward over the existing immutable ExactSequence without materializing a duplicate Q suffix chain?",
       "setup": [
         "S1=ExactSequence([a1,a2]) and S2=ExactSequence([a1,b2]) share the canonical first prefix cell E1",
@@ -7843,6 +7845,49 @@
         "ambientMemoryEnumeration": 0,
         "foreignCell": "REJECTED",
         "globalMinimality": "NOT_CLAIMED",
+        "productionChanged": false
+      }
+    },
+    "exactSequenceInitialPositionA66c": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "Given only one selected non-empty ExactSequence handle, can its initial position P0=Sequence->FirstCell be derived structurally without a host index/value array, ambient search or materialized forward Q chain?",
+      "setup": [
+        "use canonical ExactSequence instances of lengths 1, 2 and 3 sharing their canonical prefixes",
+        "walk only the selected sequence's previous-prefix ancestry",
+        "identify FirstCell as the unique traversed cell whose previous prefix is R",
+        "construct P0=Sequence->FirstCell"
+      ],
+      "oracle": [
+        "length-1, length-2 and length-3 sequences all initialize to their canonical first cell",
+        "shared FirstCell under distinct selected Sequence identities yields distinct position Links",
+        "the initial argument read from each position is the same expected first value",
+        "repeated initialization converges to the same canonical position without adding Links",
+        "empty sequence is rejected by the explicitly non-empty initializer",
+        "malformed START-self-closed ancestry whose previous pole is not an ExactSequence cell is rejected",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-exact-sequence-initial-position-a66c.test.ts",
+      "exclusions": [
+        "position advancement is not retested",
+        "execution context is not tested",
+        "branching/recursion/cascade are not tested",
+        "global minimality and asymptotic cost are not claimed",
+        "Rule publication/admission not tested"
+      ],
+      "classification": {
+        "input": "ONE_SELECTED_NONEMPTY_EXACT_SEQUENCE",
+        "output": "SEQUENCE_TO_FIRST_CELL",
+        "firstCellCriterion": "PREVIOUS_EQUALS_R",
+        "hostIndex": 0,
+        "hostValueArray": 0,
+        "ambientMemorySearch": 0,
+        "forwardQChain": 0,
+        "lengthsTested": [
+          1,
+          2,
+          3
+        ],
+        "malformedAncestry": "REJECTED",
         "productionChanged": false
       }
     }
