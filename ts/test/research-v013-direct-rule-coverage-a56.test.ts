@@ -2,7 +2,6 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { materializeExactSequence, readExactSequence } from "../src/exact-sequence.js";
 import { Memory, ensureRootBasis, type LinkHandle, type RootBasis } from "../src/memory.js";
-
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.13 A56 direct Rule coverage: ${message}`);
 }
@@ -33,7 +32,6 @@ function readChain(memory: Memory, envelope: LinkHandle, kind: string): readonly
   }
   return Object.freeze(out);
 }
-
 /** Exact A21 executor. */
 function step(
   memory: Memory,
@@ -43,31 +41,25 @@ function step(
   const execution = memory.poles(executionRoot);
   const context = execution.start;
   const frontierEnvelope = execution.end;
-
   const contextPoles = memory.poles(context);
   const authorityEnvelope = contextPoles.end;
   const continuations = [...readChain(memory, authorityEnvelope, "authority")];
   const occurrences = [...readChain(memory, frontierEnvelope, "frontier")];
   if (schedule === "reverse") occurrences.reverse();
-
   let nextBody = memory.root;
-
   for (const occurrence of occurrences) {
     const occurrencePoles = memory.poles(occurrence);
     const truth = memory.poles(occurrencePoles.end);
     assert(truth.start === context, "A21 occurrence carries current-context truth");
     const antecedent = truth.end;
-
     for (const continuation of continuations) {
       const p = memory.poles(continuation);
       if (p.start !== antecedent) continue;
-
       const nextTruth = memory.ensure(context, p.end);
       const childOccurrence = memory.ensure(occurrence, nextTruth);
       nextBody = memory.ensure(childOccurrence, nextBody);
     }
   }
-
   const nextFrontier = memory.ensureStartSelfClosed(nextBody);
   return memory.ensure(context, nextFrontier);
 }
@@ -80,7 +72,6 @@ function frontierTruthEnds(memory: Memory, E: LinkHandle): readonly LinkHandle[]
   }
   return Object.freeze(out);
 }
-
 interface RuleShape {
   readonly rule: LinkHandle;
   readonly roles: readonly LinkHandle[];
@@ -145,7 +136,6 @@ function request(
 ): LinkHandle {
   return memory.ensure(context, memory.ensure(rule, value));
 }
-
 interface SequenceNode { readonly previous: LinkHandle; readonly value: LinkHandle; }
 function sequenceNode(memory:Memory,cell:LinkHandle):SequenceNode{
   assert(cell!==memory.root,"A45 sequence node is non-root");
@@ -179,7 +169,6 @@ function zipSequence<S>(
   const previous=zipSequence(memory,l.previous,r.previous,state,visit);
   return visit(previous,l.value,r.value);
 }
-
 /** A43 matching, but candidates are consumed directly from a Link carrier. */
 function matchExecution(
   memory:Memory,
@@ -201,7 +190,6 @@ function matchExecution(
   );
   return step(memory,memory.ensure(K,memory.ensureStartSelfClosed(seed.body)),"forward");
 }
-
 interface OneCheck{
   readonly bodyGate:LinkHandle;readonly bodyQuery:LinkHandle;
   readonly truthGate:LinkHandle;readonly truthQuery:LinkHandle;
@@ -215,16 +203,13 @@ function deriveOneCheck(
   const envelope=memory.poles(execution.end),body=envelope.end;
   const bodyPoles=memory.poles(body),occurrence=bodyPoles.start;
   const occurrencePoles=memory.poles(occurrence),truth=occurrencePoles.end;
-
   const bodyScope=memory.ensure(stage,memory.root);
   const truthScope=memory.ensure(stage,bodyScope);
-
   const expectedBody=memory.ensure(occurrence,memory.root);
   const scopedBody=memory.ensure(bodyScope,body);
   const scopedExpectedBody=memory.ensure(bodyScope,expectedBody);
   const bodyGate=memory.ensureStartSelfClosed(scopedBody);
   const bodyQuery=memory.ensure(bodyGate,scopedExpectedBody);
-
   const expectedTruth=memory.ensure(matchK,memory.root);
   const scopedTruth=memory.ensure(truthScope,truth);
   const scopedExpectedTruth=memory.ensure(truthScope,expectedTruth);
@@ -232,7 +217,6 @@ function deriveOneCheck(
   const truthQuery=memory.ensure(truthGate,scopedTruth);
   return Object.freeze({bodyGate,bodyQuery,truthGate,truthQuery});
 }
-
 interface CoverageState{readonly history:LinkHandle;readonly count:number;}
 function appendCoverage(
   memory:Memory,
@@ -284,7 +268,6 @@ function assembleCoverageHistory(
   body=memory.ensure(memory.ensure(check.bodyGate,check.truthQuery),body);
   return assembleCoverageHistory(memory,p.start,check.bodyQuery,body,count+1);
 }
-
 function appendMappedSequence(
   memory: Memory,
   source: LinkHandle,
@@ -299,7 +282,6 @@ function appendMappedSequence(
 function equationTarget(memory: Memory, value: LinkHandle): LinkHandle {
   return memory.poles(value).start;
 }
-
 interface ValidationProgram{
   readonly E0:LinkHandle;readonly accepted:LinkHandle;
   readonly depth:number;readonly coverageHistory:LinkHandle;readonly checkCount:number;
@@ -312,19 +294,16 @@ function compileSelectedValidation(memory: Memory, selectedRequest: LinkHandle):
   const rule = memory.poles(pair.start);
   const candidateRealization = pair.end;
   const proposed = memory.poles(candidateRealization);
-
   const roleCoverage = appendMappedSequence(
     memory,
     proposed.end,
     proposed.start,
     value => equationTarget(memory, value),
   );
-
   const ruleDescriptor = materializeExactSequence(memory,[rule.start,rule.end]);
   const realizationDescriptor = materializeExactSequence(memory,[roleCoverage,proposed.end]);
   const coverage = deriveCoverageHistory(memory,ruleDescriptor,realizationDescriptor);
   assert(coverage.count>0,"A56 non-empty direct Rule coverage history");
-
   const assembled=assembleCoverageHistory(memory,coverage.history,candidateRealization);
   same(assembled.count,coverage.count,"A56 assembly consumes complete history");
   const authority=memory.ensureStartSelfClosed(assembled.authorityBody);
@@ -342,22 +321,18 @@ function runProgram(memory:Memory,program:ValidationProgram):readonly LinkHandle
   for(let i=0;i<program.depth;i+=1)current=step(memory,current,"forward");
   return frontierTruthEnds(memory,current);
 }
-
 function exercise(memory: Memory, withNoise: boolean): void {
   const basis = ensureRootBasis(memory);
   if (withNoise) memory.ensure(memory.ensure(basis.U,basis.C),basis.L);
-
   const forward = defineRule(memory,basis,false,false);
   const reverse = defineRule(memory,basis,true,true);
   assert(forward.rule!==reverse.rule,"A56 distinct exact Rule topology");
-
   const free = Object.freeze([
     forward.roles[0]!,forward.roles[1]!,forward.roles[2]!,forward.roles[4]!,forward.roles[5]!,
   ]);
   const validForward = realization(memory,free,forward.equations);
   const validReverse = realization(memory,[...free].reverse(),[...forward.equations].reverse());
   const context = memory.ensure(basis.R,basis.U);
-
   for (const rule of [forward.rule,reverse.rule]) {
     for (const valid of [validForward,validReverse]) {
       const program=compileSelectedValidation(memory,request(memory,context,rule,valid));
@@ -368,7 +343,6 @@ function exercise(memory: Memory, withNoise: boolean): void {
       same(ends[0],valid,"A56 valid realization accepted");
     }
   }
-
   const eqs=forward.equations;
   const foreignRole=memory.ensure(forward.rule,basis.C);
   const foreignEquation=equation(memory,eqs[0]!,basis.C,basis.U);
@@ -388,7 +362,6 @@ function exercise(memory: Memory, withNoise: boolean): void {
     ));
     same(ends.length,0,"A56 invalid realization ZERO");
   }
-
   const selected=request(memory,context,forward.rule,validForward);
   const frozen=compileSelectedValidation(memory,selected);
   const frozenE0=frozen.E0;
@@ -397,12 +370,10 @@ function exercise(memory: Memory, withNoise: boolean): void {
   same(frozen.E0,frozenE0,"A56 ambient alternate request cannot rewrite selected program");
   same(runProgram(memory,frozen)[0],validForward,"A56 ambient physical equation inert");
 }
-
 function staticGuards(): void {
   const root=resolve(process.cwd(),"..");
   const own=readFileSync(join(root,"ts/test/research-v013-direct-rule-coverage-a56.test.ts"),"utf8");
   const a45=readFileSync(join(root,"ts/test/research-v013-link-carried-coverage-history-a45.test.ts"),"utf8");
-
   const compile=own.slice(
     own.indexOf("function compileSelectedValidation("),
     own.indexOf("\nfunction runProgram(",own.indexOf("function compileSelectedValidation(")),
@@ -412,7 +383,6 @@ function staticGuards(): void {
     "new Set",".has(","sameSet","count===1","count === 1","memory.find(",
   ])assert(!compile.includes(forbidden),`A56 direct Rule compiler excludes ${forbidden}`);
   assert(!compile.toLowerCase().includes("contract"),"A56 compiler contains no derived Contract concept");
-
   const d1=own.slice(
     own.indexOf("function deriveCoverageHistory("),
     own.indexOf("\nfunction readOneCheck(",own.indexOf("function deriveCoverageHistory(")),
@@ -422,7 +392,6 @@ function staticGuards(): void {
     a45.indexOf("\nfunction readOneCheck(",a45.indexOf("function deriveCoverageHistory(")),
   );
   same(d1.replace(/\s+/g,""),d2.replace(/\s+/g,""),"A56 coverage history source-identical A45");
-
   const o1=own.slice(
     own.indexOf("function deriveOneCheck("),
     own.indexOf("\ninterface CoverageState",own.indexOf("function deriveOneCheck(")),
@@ -432,7 +401,6 @@ function staticGuards(): void {
     a45.indexOf("\ninterface CoverageState",a45.indexOf("function deriveOneCheck(")),
   );
   same(o1.replace(/\s+/g,""),o2.replace(/\s+/g,""),"A56 ONE gate source-identical A45/A44");
-
   const s1=own.slice(own.indexOf("function step("),own.indexOf("\nfunction frontierTruthEnds(",own.indexOf("function step(")));
   const s2=a45.slice(a45.indexOf("function step("),a45.indexOf("\nfunction frontierTruthEnds(",a45.indexOf("function step(")));
   same(s1.replace(/\s+/g,""),s2.replace(/\s+/g,""),"A56 runtime source-identical A21/A45");
