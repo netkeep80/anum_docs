@@ -171,7 +171,7 @@
     "templatePairJoinFalsifierA51Complete": true,
     "templatePairJoinFalsifierA51SourceRemoved": false,
     "applicationNormalFormA52Designed": true,
-    "applicationNormalFormA52Complete": false
+    "applicationNormalFormA52Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -4212,6 +4212,7 @@
         "expandedAuthorityWouldAccept": true,
         "invalidSelfApprovalClassified": true,
         "independentMemories": 2,
+        "finalCi": "GREEN_6313",
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-self-generated-admission-f5-f1.test.ts",
@@ -6713,7 +6714,7 @@
       }
     },
     "applicationNormalFormA52": {
-      "status": "DESIGNED_CI_PENDING",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A51 pair-request production be removed from semantic host selection by representing the selected binary join as a normal Link application K->(Template->Environment) whose ordered environment bindings and result semantics are carried by the A49 schema?",
       "setup": [
         "keep the unchanged A49 StructuralRule schema and admit its proof-carried template decomposition through the unchanged A47 canonical gate",
@@ -6748,7 +6749,7 @@
         "ambient physical application existence is not execution authority; only the selected contextual K->Q is executed",
         "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "If exact-head CI is GREEN, A52 reconnects A51 with the A16-F4/F5 line by replacing host-selected operand pairing with a normal selected Link application. The immediate next boundary is A53: make the generic binary application executor itself Link-carried while leaving external application choice as input.",
+      "consequence": "A52 reconnects A51 with the A16-F4/F5 line by replacing host-selected operand pairing with a normal selected Link application. The immediate next boundary is A53: make the generic binary application executor itself Link-carried while leaving external application choice as input.",
       "observed": {
         "hostSelectedOperandFrontiers": 0,
         "allToAllPairing": 0,
