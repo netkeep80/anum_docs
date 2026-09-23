@@ -193,8 +193,11 @@ function producerPackage(
   rule:LinkHandle,
   templateCandidate:LinkHandle,
   templateE0:LinkHandle,
+  templateSeeds:readonly LinkHandle[],
 ):LinkHandle{
-  return memory.ensure(rule,memory.ensure(templateCandidate,templateE0));
+  const seedSequence=materializeExactSequence(memory,templateSeeds);
+  const descriptor=materializeExactSequence(memory,[templateCandidate,templateE0,seedSequence]);
+  return memory.ensure(rule,descriptor);
 }
 function productionRequest(
   memory:Memory,
@@ -218,18 +221,30 @@ function instantiateSelectedProgram(memory:Memory,requestTruth:LinkHandle):LinkH
   const truth=memory.poles(requestTruth),context=truth.start,request=memory.poles(truth.end);
   const pack=memory.poles(request.start),target=memory.poles(request.end);
   same(pack.start,target.start,"A38 selected producer authority identity");
-  const descriptor=memory.poles(pack.end);
-  const from=readExactSequence(memory,descriptor.start).values;
+
+  const descriptor=readExactSequence(memory,pack.end).values;
+  same(descriptor.length,3,"A38 producer descriptor arity");
+  const templateCandidate=descriptor[0],templateRoot=descriptor[1],seedSequence=descriptor[2];
+  assert(templateCandidate!==undefined&&templateRoot!==undefined&&seedSequence!==undefined,
+    "A38 producer descriptor complete");
+
+  const from=readExactSequence(memory,templateCandidate).values;
   const to=readExactSequence(memory,target.end).values;
-  same(from.length,to.length,"A38 generic seed correspondence cardinality");
+  same(from.length,to.length,"A38 generic candidate correspondence cardinality");
+  const seeds=new Set(readExactSequence(memory,seedSequence).values);
+  assert(seeds.size>0,"A38 non-empty frozen free-seed authority");
 
   const mapping=new Map<LinkHandle,LinkHandle>([[memory.root,memory.root]]);
+  let mappedSeeds=0;
   from.forEach((value,index)=>{
+    if(!seeds.has(value))return;
     const next=to[index];assert(next!==undefined,"A38 target seed exists");
     const previous=mapping.get(value);
     if(previous!==undefined)same(previous,next,"A38 generic seed mapping stable");
     else mapping.set(value,next);
+    mappedSeeds+=1;
   });
+  same(mappedSeeds,seeds.size,"A38 every frozen free seed maps exactly once");
 
   const visiting=new Set<LinkHandle>();
   const clone=(source:LinkHandle):LinkHandle=>{
@@ -248,7 +263,18 @@ function instantiateSelectedProgram(memory:Memory,requestTruth:LinkHandle):LinkH
     mapping.set(source,value);return value;
   };
 
-  return memory.ensure(context,clone(descriptor.end));
+  const reconstructedCandidate=clone(templateCandidate);
+  const clonedE0=clone(templateRoot);
+
+  // Generic candidate-integrity gate. If reconstruction from frozen free seeds
+  // equals the selected target candidate, query canonically collapses to gate.
+  // Otherwise the unchanged A21 step has no selected continuation and yields ZERO.
+  const gate=memory.ensureStartSelfClosed(target.end);
+  const query=memory.ensure(gate,reconstructedCandidate);
+  const transition=memory.ensure(gate,clonedE0);
+  const K=memory.ensure(context,freezeAuthority(memory,[transition]));
+  const seedTruth=memory.ensure(K,query);
+  return memory.ensure(K,freezeFrontier(memory,[memory.ensure(memory.root,seedTruth)]));
 }
 
 function exercise(memory:Memory,withNoise:boolean):void{
@@ -256,26 +282,32 @@ function exercise(memory:Memory,withNoise:boolean):void{
   if(withNoise)memory.ensure(memory.ensure(b.C,b.U),b.L);
   const rule=defineRule(memory);
 
-  // One frozen producer template is prepared once.
+  // Bootstrap residual: one frozen template program and its free-seed boundary
+  // are prepared once. A38 removes compilation for later target candidates.
   const template=candidate(memory,b,memory.ensure(b.U,b.L));
-  const templateParent=memory.ensure(template.handle,b.O);
-  const templateAccept=memory.ensure(b.L,template.handle);
-  const templateProgram=compileReference(memory,rule,template.handle,templateParent,templateAccept);
-  const pack=producerPackage(memory,rule,template.handle,templateProgram.E0);
+  const templateProgram=compileReference(
+    memory,rule,template.handle,memory.ensure(template.handle,b.O),memory.ensure(b.L,template.handle),
+  );
+  const freeSeeds=Object.freeze([
+    template.values[0]!,template.values[1]!,template.values[2]!,
+    template.values[4]!,template.values[5]!,
+  ]);
+  const pack=producerPackage(memory,rule,template.handle,templateProgram.E0,freeSeeds);
 
-  // A previously unseen target gets no per-target Rule/Candidate compilation.
   const targetCandidate=candidate(memory,b,memory.ensure(b.O,b.U));
   assert(targetCandidate.handle!==template.handle,"A38 target differs from template");
   const generationContext=memory.ensure(b.R,b.U);
   const request=productionRequest(memory,generationContext,pack,rule,targetCandidate.handle);
-  const generatedTruth=instantiateSelectedProgram(memory,request);
-  same(memory.poles(generatedTruth).start,generationContext,"A38 generated program truth context");
-  const generatedE0=memory.poles(generatedTruth).end;
+  const validationE0=instantiateSelectedProgram(memory,request);
+  const validationNext=step(memory,validationE0,"forward");
+  const generated=frontierTruthEnds(memory,validationNext);
+  same(generated.length,1,"A38 valid target passes canonical candidate-integrity gate");
+  const generatedE0=generated[0]!;
   const targetAccept=memory.ensure(b.L,targetCandidate.handle);
   assert(runToDepth(memory,generatedE0,4).includes(targetAccept),"A38 generated target program reaches ACCEPT");
 
-  // Reference compiler is invoked only after generation as an oracle. It must
-  // allocate nothing: generic instantiation already produced the exact A37 E0.
+  // Reference compiler runs only as a post-hoc oracle and must allocate zero
+  // missing target topology.
   const beforeReference=memory.linkCount;
   const reference=compileReference(
     memory,rule,targetCandidate.handle,memory.ensure(targetCandidate.handle,b.O),targetAccept,
@@ -283,18 +315,18 @@ function exercise(memory:Memory,withNoise:boolean):void{
   same(reference.E0,generatedE0,"A38 generic instantiation equals exact A37 target program");
   same(memory.linkCount,beforeReference,"A38 reference compiler adds no missing target topology");
 
-  // Three different invalid targets are instantiated by the same generic
-  // producer; their canonical A36 gates fail naturally under unchanged A21.
+  // Forged constrained values are NOT seed-mapped. They are reconstructed from
+  // free seeds, so candidate-integrity canonicalization fails before TargetE0
+  // can be selected.
   for(const failed of [0,1,2] as const){
     const bad=forge(memory,targetCandidate,failed);
     const badRequest=productionRequest(memory,generationContext,pack,rule,bad.handle);
-    const badE0=memory.poles(instantiateSelectedProgram(memory,badRequest)).end;
-    const badAccept=memory.ensure(b.L,bad.handle);
-    assert(!runToDepth(memory,badE0,4).includes(badAccept),`A38 forged constraint ${failed} yields ZERO`);
+    const badValidation=instantiateSelectedProgram(memory,badRequest);
+    const badNext=step(memory,badValidation,"forward");
+    same(frontierTruthEnds(memory,badNext).length,0,
+      `A38 forged constraint ${failed} rejected before target E0 publication`);
   }
 
-  // Wrong or malformed producer authority fails before an execution root can
-  // be returned.
   const foreignRule=memory.ensure(rule,b.U);
   expectThrows(
     ()=>{instantiateSelectedProgram(memory,productionRequest(
@@ -307,13 +339,12 @@ function exercise(memory:Memory,withNoise:boolean):void{
     ()=>{instantiateSelectedProgram(memory,productionRequest(
       memory,generationContext,pack,rule,short,
     ));},
-    "A38 malformed seed correspondence rejected",
+    "A38 malformed candidate correspondence rejected",
   );
 
-  // Ambient alternate request does not alter an already selected generated root.
   const alternate=candidate(memory,b,memory.ensure(b.C,b.L));
   productionRequest(memory,generationContext,pack,rule,alternate.handle);
-  same(memory.poles(generatedTruth).end,generatedE0,"A38 ambient alternate request inert");
+  same(generated[0],generatedE0,"A38 ambient alternate request inert");
 }
 
 function staticGuards():void{
@@ -345,8 +376,10 @@ function main():void{
     "RUNTIME_STEP=A21_SOURCE_IDENTICAL",
     "TARGET_REFERENCE_TOPOLOGY=EXACT",
     "VALID_TARGET=ACCEPT FORGED_0_1_2=ZERO",
+    "FORGED_TARGETS_REJECTED_BEFORE_E0=YES",
     "FOREIGN_PRODUCER_AUTHORITY=REJECTED MALFORMED_CORRESPONDENCE=REJECTED",
     "AMBIENT_ALTERNATE_REQUEST=INERT",
+    "FREE_SEED_BOUNDARY=LINK_CARRIED_BOOTSTRAP_AUTHORITY",
     "FROZEN_TEMPLATE_PROGRAM_ORIGIN=BOOTSTRAP_RESIDUAL",
     "GENERIC_SEED_CORRESPONDENCE_EXECUTOR=HOST_RESIDUAL",
     "A35_PUBLICATION_EXISTENCE=RESIDUAL A36_PROBE_SCRATCH=RESIDUAL",
