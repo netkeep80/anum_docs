@@ -205,7 +205,11 @@
     "applicationProducerClassificationA61Designed": true,
     "applicationProducerClassificationA61Complete": true,
     "applicationProducerClassificationA61E2SourceRemoved": true,
-    "applicationProducerClassificationA61FormationClosed": false
+    "applicationProducerClassificationA61FormationClosed": false,
+    "rulePublicationHistoryA62Designed": true,
+    "rulePublicationHistoryA62Complete": true,
+    "rulePublicationHistoryA62PriorExistenceSourceRemoved": true,
+    "rulePublicationHistoryA62RuleAdmissibilityClosed": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1586,8 +1590,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A62: reconnect selected StructuralRule authority to the A34-A37 Link-native publication/admission line. Test whether Rule origin/admission can be made explicit through immutable catalog publication and ordinary A21 admission without host semantic source, while preserving the A35 prior-publication-existence falsifier.",
-    "A62 must keep ambient physical Rule existence inert, distinguish prior admitted publication from ensure-created scratch, preserve direct K->(Rule->Realization) authority, and must not reopen derived Contract, F5 plan/clone, per-equation witness authoring or application-producer E2 authority.",
+    "A63: attack Rule formation/admissibility before publication. Validate that a StructuralRule selected for publication satisfies its direct Rule-native structural obligations through Link-carried proof/coverage rather than host semantic authoring, whitelist or physical existence.",
+    "A63 must keep A62 immutable publication history as prior-existence authority, reject malformed or foreign Rule structures even if physically present or publication-shaped, and must not conflate publication with validity.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -7341,6 +7345,76 @@
         "formation": "E3_SCOPED_BOUNDARY",
         "executionSelection": "E4_SCOPED_BOUNDARY",
         "physicalConstructor": "A54_START_END_ONLY_BOUNDARY",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "rulePublicationHistoryA62": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A35 prior-publication existence for selected StructuralRule authority be represented by the selected immutable catalog version itself, eliminating any ambient Memory existence query that can be falsified by ensure-created evidence?",
+      "historyShape": [
+        "CatalogVersion = CatalogContext -> HeadOccurrence",
+        "PublicationOccurrence = PreviousHead -> Membership",
+        "Membership = CatalogContext -> Rule",
+        "selected execution request = ExecutionContext -> (CatalogVersion -> Rule)"
+      ],
+      "semanticPath": [
+        "read only the selected catalog version head; do not enumerate Memory or search for Rule memberships",
+        "derive the prior publication token directly from HeadOccurrence -> Membership",
+        "validate CatalogContext == MembershipContext through stage-scoped canonical equality gate",
+        "validate RequestedRule == PublishedRule through stage-scoped canonical equality gate",
+        "ordinary A21 detachment reaches contextual Rule acceptance only if both selected-history gates collapse"
+      ],
+      "oracle": [
+        "Rule published in selected catalog head is accepted",
+        "different physically existing Rule not present in selected head yields ZERO",
+        "ambient CatalogContext->Rule membership outside selected history remains inert",
+        "publishing the Rule later into a new catalog version allows the new version but cannot backdate the frozen old-version request",
+        "old catalog version remains immutable and continues to authorize its own prior head Rule",
+        "foreign membership context yields ZERO",
+        "publication-shaped scratch unrelated to selected catalog history yields ZERO",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "selected publication-proof compiler contains no memory.find/outgoing/incoming/allLinks/sourcePublishable/catalog scan/Set membership",
+        "Rule identity comes only from the selected catalog head membership and selected request",
+        "the proof does not inspect StructuralRule internals; Rule well-formedness/admissibility is intentionally left for A63",
+        "A21 runtime remains source-identical to A37"
+      ],
+      "evidenceTest": "ts/test/research-v013-rule-publication-history-a62.test.ts",
+      "classification": {
+        "priorPublicationEvidence": "SELECTED_IMMUTABLE_CATALOG_VERSION",
+        "ambientMemoryExistenceQuery": 0,
+        "publicationExistenceSourceRemoved": "YES_SCOPED_RULE_AUTHORITY",
+        "ruleWellFormedAdmissionClosed": false,
+        "publicationEventFormationClosed": false
+      },
+      "residualAuthority": [
+        "A62 proves only that selected Rule authority was explicitly committed in the chosen immutable publication history; it does not prove that the published Rule is structurally valid",
+        "Rule formation/well-formedness/admissibility before publication remains an E2/E3 frontier for A63",
+        "formation of the publication event/catalog version itself remains a scoped E3 operation",
+        "global E4 scheduling/readiness remains open"
+      ],
+      "claimBoundary": [
+        "GREEN removes the A35 ambient prior-existence query for the tested selected Rule authority path",
+        "GREEN does not mean physical Rule existence or a free-standing CatalogContext->Rule Link grants authority",
+        "GREEN does not equate publication with Rule validity/admissibility",
+        "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A62 resolves the old A35 prior-publication-existence paradox on the selected Rule-authority path without asking current Memory whether evidence exists. The chosen immutable catalog version is itself a historical commitment: its head occurrence carries the exact membership that must predate execution. Late ensure-created membership or later catalog versions cannot alter that frozen topology, so they cannot backdate authority. Canonical gates verify catalog-context coherence and requested/published Rule identity, then ordinary A21 detachment supplies contextual acceptance. The remaining semantic frontier is not publication existence but whether a Rule is admissible for publication at all.",
+      "observed": {
+        "memoryFindPublicationCheck": 0,
+        "catalogScan": 0,
+        "selectedEvidence": "CATALOG_HEAD_PUBLICATION_OCCURRENCE",
+        "oldCatalogVersion": "IMMUTABLE",
+        "ambientRuleMembership": "INERT",
+        "latePublicationBackdates": false,
+        "foreignMembershipContext": "ZERO",
+        "mismatchedRequestedRule": "ZERO",
+        "publicationLikeScratch": "ZERO",
+        "ruleWellFormedAdmission": "E2_E3_RESIDUAL",
+        "publicationEventFormation": "E3_RESIDUAL",
+        "runtime": "A21_SOURCE_IDENTICAL",
         "independentMemories": 2,
         "productionChanged": false
       }
