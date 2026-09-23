@@ -144,23 +144,39 @@ interface OneCheck{
  * MANY => first equality fails because body tail is another cell.
  * ZERO => first equality can collapse at R, but the distinct expected-truth gate fails.
  */
-function deriveOneCheck(memory:Memory,matchE:LinkHandle):OneCheck{
+function deriveOneCheck(
+  memory:Memory,
+  matchE:LinkHandle,
+  stage:LinkHandle,
+):OneCheck{
   const execution=memory.poles(matchE),matchK=execution.start;
   const envelope=memory.poles(execution.end),body=envelope.end;
   const bodyPoles=memory.poles(body),occurrence=bodyPoles.start;
   const occurrencePoles=memory.poles(occurrence),truth=occurrencePoles.end;
 
-  const expectedBody=memory.ensure(occurrence,memory.root);
-  const bodyGate=memory.ensureStartSelfClosed(body);
-  const bodyQuery=memory.ensure(bodyGate,expectedBody);
+  // Scope both canonical equality probes to this immutable validation stage.
+  // Equal semantic checks can occur twice in bidirectional coverage. Without
+  // stage scoping they share antecedent gates but have different successors,
+  // so ordinary A21 detachment correctly branches and can grow exponentially.
+  // The scope does not decide equality: because both compared values have the
+  // same prefix, scopedActual===scopedExpected iff actual===expected.
+  const bodyScope=memory.ensure(stage,memory.root);
+  const truthScope=memory.ensure(stage,bodyScope);
 
-  // Anchor the second canonical gate on the expected contextual match truth,
-  // never on the observed truth. In ZERO the observed truth is R; anchoring on
-  // it would alias truthGate with bodyGate=START(R), creating two continuations
-  // from one antecedent and an unauthorized/explosive branch.
+  const expectedBody=memory.ensure(occurrence,memory.root);
+  const scopedBody=memory.ensure(bodyScope,body);
+  const scopedExpectedBody=memory.ensure(bodyScope,expectedBody);
+  const bodyGate=memory.ensureStartSelfClosed(scopedBody);
+  const bodyQuery=memory.ensure(bodyGate,scopedExpectedBody);
+
+  // ZERO still needs a second distinct failing gate: observed truth is R, but
+  // expected contextual match truth is matchK->R. Stage scoping additionally
+  // prevents this truth gate from aliasing any repeated coverage occurrence.
   const expectedTruth=memory.ensure(matchK,memory.root);
-  const truthGate=memory.ensureStartSelfClosed(expectedTruth);
-  const truthQuery=memory.ensure(truthGate,truth);
+  const scopedTruth=memory.ensure(truthScope,truth);
+  const scopedExpectedTruth=memory.ensure(truthScope,expectedTruth);
+  const truthGate=memory.ensureStartSelfClosed(scopedExpectedTruth);
+  const truthQuery=memory.ensure(truthGate,scopedTruth);
   return Object.freeze({bodyGate,bodyQuery,truthGate,truthQuery});
 }
 
@@ -210,10 +226,15 @@ function compileSelectedValidation(
   const proposedObligations=readExactSequence(memory,proposed[1]!).values;
 
   const checks:OneCheck[]=[];
-  for(const expected of expectedFree)checks.push(deriveOneCheck(memory,matchExecution(memory,expected,proposedFree)));
-  for(const proposedValue of proposedFree)checks.push(deriveOneCheck(memory,matchExecution(memory,proposedValue,expectedFree)));
-  for(const expected of expectedObligations)checks.push(deriveOneCheck(memory,matchExecution(memory,expected,proposedObligations)));
-  for(const proposedValue of proposedObligations)checks.push(deriveOneCheck(memory,matchExecution(memory,proposedValue,expectedObligations)));
+  let stage=memory.ensure(selectedRequest,candidateRealization);
+  const addCheck=(matchE:LinkHandle):void=>{
+    stage=memory.ensure(stage,matchE);
+    checks.push(deriveOneCheck(memory,matchE,stage));
+  };
+  for(const expected of expectedFree)addCheck(matchExecution(memory,expected,proposedFree));
+  for(const proposedValue of proposedFree)addCheck(matchExecution(memory,proposedValue,expectedFree));
+  for(const expected of expectedObligations)addCheck(matchExecution(memory,expected,proposedObligations));
+  for(const proposedValue of proposedObligations)addCheck(matchExecution(memory,proposedValue,expectedObligations));
   return compileChecks(memory,parentContext,checks,candidateRealization);
 }
 
@@ -257,7 +278,9 @@ function exercise(memory:Memory,withNoise:boolean):void{
     ["ONE",[targets[2]!,targets[0]!,targets[1]!],true],
     ["MANY",[targets[0]!,targets[1]!,targets[0]!],false],
   ] as const){
-    const check=deriveOneCheck(memory,matchExecution(memory,targets[0]!,candidates));
+    const matchE=matchExecution(memory,targets[0]!,candidates);
+    const stage=memory.ensure(memory.ensure(context,marker),matchE);
+    const check=deriveOneCheck(memory,matchE,stage);
     const ends=runProgram(memory,compileChecks(memory,context,[check],marker));
     same(ends.length,accepted?1:0,`A44 ${name} Link-native cardinality result`);
     if(accepted)same(ends[0],marker,"A44 ONE reaches marker");
