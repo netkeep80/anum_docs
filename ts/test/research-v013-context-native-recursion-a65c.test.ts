@@ -128,7 +128,7 @@ function exercise(noise:boolean):void{
   same(afterA.f,z,"recursive step result becomes grandchild F");
   same(afterA.q,memory.root,"recursive step advances exactly one Q cell");
 
-  // No convergence claim: only KA has a selected child at level 2.
+  // Only KA has a selected child at level 2; KB stops at its first child frame.
   assert(KAZ!==KB,"continued grandchild remains distinct from terminated sibling");
 }
 
