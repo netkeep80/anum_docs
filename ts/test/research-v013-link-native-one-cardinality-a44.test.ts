@@ -142,22 +142,25 @@ interface OneCheck{
  *
  * ONE  => body == occurrence->R and occurrence.end == matchK->value.
  * MANY => first equality fails because body tail is another cell.
- * ZERO => first equality can collapse at R, but contextual-truth equality fails.
+ * ZERO => first equality can collapse at R, but the distinct expected-truth gate fails.
  */
 function deriveOneCheck(memory:Memory,matchE:LinkHandle):OneCheck{
   const execution=memory.poles(matchE),matchK=execution.start;
   const envelope=memory.poles(execution.end),body=envelope.end;
   const bodyPoles=memory.poles(body),occurrence=bodyPoles.start;
   const occurrencePoles=memory.poles(occurrence),truth=occurrencePoles.end;
-  const truthPoles=memory.poles(truth);
 
   const expectedBody=memory.ensure(occurrence,memory.root);
   const bodyGate=memory.ensureStartSelfClosed(body);
   const bodyQuery=memory.ensure(bodyGate,expectedBody);
 
-  const expectedTruth=memory.ensure(matchK,truthPoles.end);
-  const truthGate=memory.ensureStartSelfClosed(truth);
-  const truthQuery=memory.ensure(truthGate,expectedTruth);
+  // Anchor the second canonical gate on the expected contextual match truth,
+  // never on the observed truth. In ZERO the observed truth is R; anchoring on
+  // it would alias truthGate with bodyGate=START(R), creating two continuations
+  // from one antecedent and an unauthorized/explosive branch.
+  const expectedTruth=memory.ensure(matchK,memory.root);
+  const truthGate=memory.ensureStartSelfClosed(expectedTruth);
+  const truthQuery=memory.ensure(truthGate,truth);
   return Object.freeze({bodyGate,bodyQuery,truthGate,truthQuery});
 }
 
