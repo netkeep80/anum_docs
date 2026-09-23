@@ -201,7 +201,11 @@
     "ruleProofApplicationReconnectA60Designed": true,
     "ruleProofApplicationReconnectA60Complete": true,
     "ruleProofApplicationReconnectA60TemplateSourceReconnected": true,
-    "ruleProofApplicationReconnectA60RuleApplicationProducerRemoved": false
+    "ruleProofApplicationReconnectA60RuleApplicationProducerRemoved": false,
+    "applicationProducerClassificationA61Designed": true,
+    "applicationProducerClassificationA61Complete": true,
+    "applicationProducerClassificationA61E2SourceRemoved": true,
+    "applicationProducerClassificationA61FormationClosed": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1582,8 +1586,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A61: attack the remaining generic Rule->selected-application production boundary exposed by A60. Determine whether converting one ready Rule-carried decomposition obligation plus current role/value bindings into the selected application carrier is E4 orchestration/executor state or still an E2 semantic-source law.",
-    "A61 must not reintroduce an F5 construction plan, recursive clone, per-equation witness authoring, direct target-pole reads, derived Contract/free-role/target-role lists or ambient-Memory selection; it must preserve schedule/order convergence and A53/A54 proof-gated/E1 boundaries.",
+    "A62: reconnect selected StructuralRule authority to the A34-A37 Link-native publication/admission line. Test whether Rule origin/admission can be made explicit through immutable catalog publication and ordinary A21 admission without host semantic source, while preserving the A35 prior-publication-existence falsifier.",
+    "A62 must keep ambient physical Rule existence inert, distinguish prior admitted publication from ensure-created scratch, preserve direct K->(Rule->Realization) authority, and must not reopen derived Contract, F5 plan/clone, per-equation witness authoring or application-producer E2 authority.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -7272,6 +7276,71 @@
         "ambientObligation": "INERT",
         "ruleToSelectedApplicationProduction": "HOST_GENERIC_RESIDUAL",
         "scheduling": "E4_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "applicationProducerClassificationA61": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Does the A60 boundary that turns one already-selected ready obligation plus current bindings into a selected application carrier contain E2 semantic-source authority, or can it be split into A33-style executor-state selection plus deterministic carrier formation?",
+      "setup": [
+        "ready work is represented as an immutable occurrence history: Occurrence_n = PreviousOccurrence -> ContextualValue_n",
+        "ContextualValue_n = Context -> ReadyValue, where ReadyValue carries the already-selected decomposition witness and concrete binding environment",
+        "the application producer receives only the current occurrence head; it receives no Rule, scheduler, pending set, role dictionary, candidate type or semantic callback",
+        "canonical formation deterministically builds Application, Proof, contextual Truth and Selection from the current occurrence payload",
+        "three conforming producer implementations exercise direct, idempotent and noisy formation"
+      ],
+      "oracle": [
+        "all conforming producers converge to the same canonical selected-application Link identity",
+        "the resulting selection reaches the exact binary result through A53-style canonical proof gates plus A21",
+        "swapped-environment, foreign-node and proof/truth-mismatch producers all yield semantic ZERO",
+        "a newer ambient occurrence remains inert while the old head is selected",
+        "advancing the current head selects the newer ready value",
+        "mixed-context occurrence history is rejected",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "canonical producer has no Rule reader, scheduler, pending set, role dictionary, memory.find semantic lookup or semantic branching",
+        "the current-occurrence reader is source-identical to A33",
+        "malformed producer outputs are not trusted: A53-style proof gates remain semantic authority",
+        "physical result construction remains behind an opaque start/end-only A54-style pair-constructor boundary",
+        "physical/canonical formation may occur, but carrier existence alone does not grant contextual truth"
+      ],
+      "evidenceTest": "ts/test/research-v013-application-producer-classification-a61.test.ts",
+      "classification": {
+        "currentHeadSelection": "E4_EXECUTOR_STATE_SCOPED",
+        "applicationCarrierFormation": "E3_CANONICAL_FORMATION_SCOPED",
+        "e2SemanticSourceInsideProducer": 0,
+        "formationGloballyClosed": false
+      },
+      "residualAuthority": [
+        "readiness discovery and choice of which occurrence head becomes current remain E4 orchestration/executor-state boundaries",
+        "the fixed selected-application normal-form construction is classified only as scoped E3 formation; global E3 formation/admissibility is not closed",
+        "Rule authorship/generation and Rule admission remain broader E2/E3 questions",
+        "A35 prior-publication existence remains open and must not be bypassed by physical ensure-created Rule/publication Links"
+      ],
+      "claimBoundary": [
+        "GREEN removes E2 semantic-source authority from the tested ready-obligation->selected-application producer",
+        "GREEN does not claim application carrier formation irreducible or globally E3-closed",
+        "GREEN does not close E4 scheduling/readiness or Rule authority origin/admission",
+        "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A61 splits the last A60 producer boundary cleanly. Selection of the current ready item is the already-established A33 occurrence-head executor-state boundary (E4 scoped). Once that head is fixed, selected-application carrier formation is deterministic canonical normal-form construction: different conforming producers converge to the same Link identity, while malformed packages remain semantic ZERO under the existing proof gates. Therefore no E2 semantic decision remains inside the tested application producer. The next semantic-source frontier moves outward to origin/admission/publication of the selected StructuralRule itself.",
+      "observed": {
+        "producerArguments": "CURRENT_OCCURRENCE_ONLY",
+        "ruleSchedulerArguments": 0,
+        "conformingProducers": 3,
+        "canonicalSelectionIdentity": "INVARIANT",
+        "malformedProducerClasses": 3,
+        "malformedProducerResult": "ZERO",
+        "ambientNewerOccurrence": "INERT_UNTIL_HEAD_ADVANCE",
+        "currentHeadAdvance": "SELECTS_NEW_READY_VALUE",
+        "mixedContextHistory": "REJECTED",
+        "currentOccurrenceReader": "A33_SOURCE_IDENTICAL",
+        "e2SemanticSourceInProducer": 0,
+        "formation": "E3_SCOPED_BOUNDARY",
+        "executionSelection": "E4_SCOPED_BOUNDARY",
+        "physicalConstructor": "A54_START_END_ONLY_BOUNDARY",
         "independentMemories": 2,
         "productionChanged": false
       }
