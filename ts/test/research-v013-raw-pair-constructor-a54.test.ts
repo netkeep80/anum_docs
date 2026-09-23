@@ -6,7 +6,6 @@ import {
   type LinkHandle,
   type RootBasis,
 } from "../src/memory.js";
-
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.13 A54 raw pair constructor: ${message}`);
 }
@@ -33,7 +32,6 @@ function readChain(memory: Memory, envelope: LinkHandle, kind: string): readonly
   }
   return Object.freeze(out);
 }
-
 /** Exact A21 single-root executor, source-identical to A53. */
 function step(
   memory: Memory,
@@ -43,31 +41,25 @@ function step(
   const execution = memory.poles(executionRoot);
   const context = execution.start;
   const frontierEnvelope = execution.end;
-
   const contextPoles = memory.poles(context);
   const authorityEnvelope = contextPoles.end;
   const continuations = [...readChain(memory, authorityEnvelope, "authority")];
   const occurrences = [...readChain(memory, frontierEnvelope, "frontier")];
   if (schedule === "reverse") occurrences.reverse();
-
   let nextBody = memory.root;
-
   for (const occurrence of occurrences) {
     const occurrencePoles = memory.poles(occurrence);
     const truth = memory.poles(occurrencePoles.end);
     assert(truth.start === context, "A21 occurrence carries current-context truth");
     const antecedent = truth.end;
-
     for (const continuation of continuations) {
       const p = memory.poles(continuation);
       if (p.start !== antecedent) continue;
-
       const nextTruth = memory.ensure(context, p.end);
       const childOccurrence = memory.ensure(occurrence, nextTruth);
       nextBody = memory.ensure(childOccurrence, nextBody);
     }
   }
-
   const nextFrontier = memory.ensureStartSelfClosed(nextBody);
   return memory.ensure(context, nextFrontier);
 }
@@ -81,7 +73,6 @@ function frontierTruthEnds(memory: Memory, E: LinkHandle): readonly LinkHandle[]
   }
   return Object.freeze(out);
 }
-
 interface Schema {
   readonly startRole: LinkHandle;
   readonly endRole: LinkHandle;
@@ -122,7 +113,6 @@ function selectedInput(
     selection: memory.ensure(proof, truth),
   });
 }
-
 interface EqualityCheck {
   readonly gate: LinkHandle;
   readonly query: LinkHandle;
@@ -156,14 +146,12 @@ function deriveCandidate(
   const proofApplication = proof.end;
   const parentContext = truth.start;
   const truthApplication = truth.end;
-
   const env = memory.poles(environment);
   const leftBinding = memory.poles(env.start);
   const rightBinding = memory.poles(env.end);
   const startValue = leftBinding.end;
   const endValue = rightBinding.end;
   const expectedApplication = memory.ensure(schema.targetTemplate, environment);
-
   let stage = memory.ensure(selection, memory.root);
   const check = (expected: LinkHandle, actual: LinkHandle): EqualityCheck => {
     stage = memory.ensure(stage, memory.ensure(expected, actual));
@@ -181,7 +169,6 @@ function deriveCandidate(
     ]),
   });
 }
-
 interface PairConstructor {
   construct(start: LinkHandle, end: LinkHandle): LinkHandle;
   calls(): number;
@@ -242,7 +229,6 @@ function rootConstructor(memory: Memory): PairConstructor {
     calls: () => n,
   });
 }
-
 /** External substrate audit only: no Template/role/context semantics. */
 function pairContractHolds(
   memory: Memory,
@@ -254,7 +240,6 @@ function pairContractHolds(
   const p = memory.poles(result);
   return p.start === start && p.end === end && memory.find(start, end) === result;
 }
-
 interface ValidationProgram {
   readonly E0: LinkHandle;
   readonly depth: number;
@@ -290,14 +275,12 @@ function executeSelection(
   const physical = constructor.construct(candidate.startValue, candidate.endValue);
   return runProgram(memory, compileValidation(memory, candidate, physical));
 }
-
 function freshValues(memory: Memory, basis: RootBasis): readonly [LinkHandle, LinkHandle] {
   const start = memory.ensure(memory.ensure(basis.C, basis.U), basis.L);
   const end = memory.ensure(memory.ensure(basis.O, basis.C), basis.U);
   return Object.freeze([start, end] as const);
 }
 type ConstructorFactory = (memory: Memory) => PairConstructor;
-
 function exercise(
   memory: Memory,
   factory: ConstructorFactory,
@@ -307,12 +290,10 @@ function exercise(
   if (withNoise) memory.ensure(memory.ensure(basis.U, basis.C), basis.O);
   const schema = defineSchema(memory, basis);
   const constructor = factory(memory);
-
   // Audit the constructor contract on unrelated operands, not the semantic case.
   const auditStart = memory.ensure(basis.R, memory.ensure(basis.C, basis.L));
   const auditEnd = memory.ensure(basis.O, memory.ensure(basis.U, basis.C));
   assert(pairContractHolds(memory, constructor, auditStart, auditEnd), "A54 compliant E1 pair contract");
-
   const [startValue, endValue] = freshValues(memory, basis);
   const parent = memory.ensure(basis.O, basis.U);
   const selected = selectedInput(memory, parent, schema, startValue, endValue);
@@ -322,7 +303,6 @@ function exercise(
   assert(result !== undefined, "A54 compliant constructor materializes exact pair");
   same(valid.length, 1, "A54 valid application singleton");
   same(valid[0], result, "A54 valid application exact pair");
-
   // Physical ambient existence carries no execution authority.
   const ambientStart = memory.ensure(startValue, basis.C);
   const ambientEnd = memory.ensure(endValue, basis.C);
@@ -330,7 +310,6 @@ function exercise(
   const ambientPair = memory.ensure(ambientStart, ambientEnd);
   assert(ambientPair !== result, "A54 ambient physical pair distinct");
   assert(!valid.includes(ambientPair), "A54 ambient physical pair absent from contextual result");
-
   // Invalid selected carrier may create scratch, but semantic gates still yield ZERO.
   const left = memory.ensure(schema.startRole, startValue);
   const right = memory.ensure(schema.endRole, endValue);
@@ -343,7 +322,6 @@ function exercise(
   const swapped = executeSelection(memory, schema, swappedSelection, constructor);
   assert(memory.find(endValue, startValue) !== undefined, "A54 invalid reverse scratch may physically exist");
   same(swapped.length, 0, "A54 swapped semantic ZERO");
-
   const foreignTemplate = memory.ensure(schema.targetTemplate, basis.U);
   const foreignApp = memory.ensure(foreignTemplate, selected.environment);
   const foreign = executeSelection(
@@ -356,7 +334,6 @@ function exercise(
     constructor,
   );
   same(foreign.length, 0, "A54 foreign template ZERO");
-
   const mismatchApp = memory.ensure(foreignTemplate, memory.ensure(selected.environment, basis.C));
   const mismatch = executeSelection(
     memory,
@@ -368,7 +345,6 @@ function exercise(
     constructor,
   );
   same(mismatch.length, 0, "A54 proof truth mismatch ZERO");
-
   return [
     valid.length,
     swapped.length,
@@ -378,7 +354,6 @@ function exercise(
     memory.poles(result).end === endValue ? 1 : 0,
   ].join(":");
 }
-
 function nonconformingControls(): void {
   for (const factory of [reversedConstructor, rootConstructor] as const) {
     const memory = new Memory();
@@ -388,19 +363,16 @@ function nonconformingControls(): void {
       "A54 nonconforming constructor rejected by generic Link-pair contract");
   }
 }
-
 function staticGuards(): void {
   const root = resolve(process.cwd(), "..");
   const own = readFileSync(join(root, "ts/test/research-v013-raw-pair-constructor-a54.test.ts"), "utf8");
   const a53 = readFileSync(join(root, "ts/test/research-v013-proof-gated-application-a53.test.ts"), "utf8");
-
   const interfaceSlice = own.slice(
     own.indexOf("interface PairConstructor"),
     own.indexOf("/** External substrate audit", own.indexOf("interface PairConstructor")),
   ).toLowerCase();
   for (const forbidden of ["schema", "template", "role", "context", "truth", "application", "proof", "candidate"])
     assert(!interfaceSlice.includes(forbidden), `A54 constructor capability excludes semantic term ${forbidden}`);
-
   const execute = own.slice(
     own.indexOf("function executeSelection("),
     own.indexOf("\nfunction freshValues(", own.indexOf("function executeSelection(")),
@@ -409,12 +381,10 @@ function staticGuards(): void {
     "A54 semantic path crosses only opaque binary constructor interface");
   assert(!execute.includes("memory.ensure(candidate.startValue, candidate.endValue)"),
     "A54 semantic path contains no raw pair creation bypass");
-
   const x = own.slice(own.indexOf("function step("), own.indexOf("\nfunction frontierTruthEnds(", own.indexOf("function step(")));
   const y = a53.slice(a53.indexOf("function step("), a53.indexOf("\nfunction frontierTruthEnds(", a53.indexOf("function step(")));
   same(x.replace(/\s+/g, ""), y.replace(/\s+/g, ""), "A54 runtime source-identical A53/A21");
 }
-
 function main(): void {
   const factories: readonly ConstructorFactory[] = [
     directConstructor,
@@ -431,7 +401,6 @@ function main(): void {
   }
   nonconformingControls();
   staticGuards();
-
   console.log([
     "MTS v0.13 A54: RAW_BINARY_CONSTRUCTOR_CLASSIFICATION=GREEN_SCOPED_RESEARCH",
     "CONSTRUCTOR_INPUTS=START_END_ONLY SEMANTIC_ARGUMENTS=0",
