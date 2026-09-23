@@ -218,7 +218,9 @@
     "executionContextGeometryA64Complete": true,
     "executionContextGeometryA64FormalDualityProven": false,
     "contextNativeSingleStepA65aDesigned": true,
-    "contextNativeSingleStepA65aComplete": true
+    "contextNativeSingleStepA65aComplete": true,
+    "contextNativeBranchingA65bDesigned": true,
+    "contextNativeBranchingA65bComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1599,8 +1601,7 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A65b: starting only from GREEN A65a, test ZERO/ONE/MANY for one execution step. One selected K may yield zero, one or several child contexts from selected result facts. Do not add recursion, convergence, scheduler equivalence or lifecycle authority yet.",
-    "A65c: only after A65b, test recursive continuation plus local termination over context-native frames.",
+    "A65c: starting only from GREEN A65a/A65b, test exactly one recursive continuation from one child frame into one grandchild frame plus one local-termination control. Do not add convergence, scheduler equivalence, generalized cascade closure or lifecycle authority yet.",
     "A65d: only after A65c, test convergence and whether context ancestry alone preserves branch provenance without a separate occurrence path.",
     "A66: only after A65a-d, attack the argument-cursor representation boundary. Compare the scoped forward Q_i=arg_i->Q_(i+1) carrier with existing MTS sequence forms and test whether Q is a structural mirror/projection of an existing immutable sequence rather than a new semantic primitive.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
@@ -7604,7 +7605,7 @@
       }
     },
     "contextNativeSingleStepA65a": {
-      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Given only one selected execution context K with K.current=F->Q and one selected result fact (F->arg)->Y, can one child context K' with K'.current=Y->next(Q) be derived without separate host currentFn/tos or MetaState?",
       "setup": [
         "K.current is one ordinary Link F->Q",
@@ -7640,6 +7641,46 @@
         "currentArgument": "START_Q_SCOPED",
         "nextCursor": "END_Q_SCOPED",
         "childState": "Y_TO_NEXT_Q",
+        "productionChanged": false
+      }
+    },
+    "contextNativeBranchingA65b": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "Starting from GREEN A65a, does one selected result-fact carrier produce exactly ZERO, ONE or MANY sibling child contexts in one execution layer, without recursion or scheduler semantics?",
+      "setup": [
+        "one selected parent context K with K.current=F->Q",
+        "one Link-native frozen carrier of selected result facts",
+        "each selected result fact has ordinary shape (F->arg(Q))->Y",
+        "child construction law is source-identical to A65a"
+      ],
+      "oracle": [
+        "empty selected-result carrier produces zero child contexts",
+        "one selected result produces exactly one canonical A65a child",
+        "two selected results produce exactly two distinct sibling child contexts",
+        "reversing selected-result carrier order preserves the extensional child set",
+        "an ambient physical result fact outside the selected carrier remains inert",
+        "a malformed selected result makes the one-layer branch step fail closed",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-context-native-branching-a65b.test.ts",
+      "exclusions": [
+        "recursive continuation not tested",
+        "local termination not tested",
+        "convergence/provenance not tested",
+        "scheduler semantics not tested",
+        "generalized cascade closure not tested",
+        "Rule publication/admission not tested",
+        "Q remains scoped research representation"
+      ],
+      "classification": {
+        "selectedInput": "CONTEXT_PLUS_LINK_NATIVE_RESULT_CARRIER",
+        "childLaw": "A65A_SOURCE_IDENTICAL",
+        "zero": "ZERO_CHILDREN",
+        "one": "ONE_CHILD",
+        "many": "MANY_SIBLING_CHILDREN",
+        "ambientPhysicalResult": "INERT",
+        "selectedOrder": "EXTENSIONALLY_INERT",
+        "recursion": "NOT_TESTED",
         "productionChanged": false
       }
     }
