@@ -7524,7 +7524,8 @@
       ],
       "oracle": [
         "Q0 locally selects the first argument and Q1 selects the second without a host positional index",
-        "the result witness has exact two-Link application form (F->arg)->value",
+        "the result witness has exact two-Link left-associated application form (F->arg)->value",
+        "the context payload has exact right-associated form parent->(F->Q), exposing a scoped mirror in associativity without adding a new primitive",
         "ONE application with two selected result facts creates two sibling contexts with the same next argument cursor but distinct next F values",
         "intermediate branch values do not appear as root-context results and cannot be finalized before Q is exhausted",
         "each second-step branch consumes the same next argument independently and may converge to one extensional final value",
@@ -7547,6 +7548,10 @@
         "executionTriad": "CONTEXT_CURRENT_FUNCTION_ARGUMENT_CURSOR",
         "frameState": "F_TO_Q",
         "applicationResultTriad": "(F_TO_ARG)_TO_VALUE",
+        "applicationTriadAssociativity": "LEFT",
+        "contextPayloadTriad": "PARENT_TO_(F_TO_Q)",
+        "contextTriadAssociativity": "RIGHT",
+        "mirrorAssociativity": "CONFIRMED_SCOPED",
         "currentArgument": "START_OF_SELECTED_Q_SCOPED",
         "nextArgumentCursor": "END_OF_SELECTED_Q_SCOPED",
         "movingFunctionPointer": "RESULT_BECOMES_NEXT_F",
@@ -7569,7 +7574,8 @@
       "claimBoundary": [
         "GREEN establishes the scoped execution-frame geometry, not a final interpreter ABI",
         "GREEN does not claim the scoped argument cursor is the accepted MTS sequence representation",
-        "GREEN does not make jsonRVM normative and does not claim full application/context duality",
+        "GREEN confirms scoped mirror associativity: application is left-associated while context payload is right-associated",
+        "GREEN does not make jsonRVM normative and does not claim a full semantic application/context duality theorem",
         "v0.13 remains unaccepted; FULL_SELF_HOSTED remains false"
       ],
       "consequence": "A64 replaces the too-flat model K=START(parent->currentValue) with a frame model in which context carries a state S=F->Q. F is the moving current function/value pointer and Q is an independently moving argument cursor. Each selected result witness has the ordinary MTS shape (F->arg)->value; every result becomes the next F in a new child context while Q advances separately. MANY therefore creates sibling contexts naturally. Intermediate values remain branch-local temporaries, and only a frame with exhausted Q returns its final F into the root context. This aligns prior MTS evidence for curried application with prior branch-local context evidence without importing jsonRVM as authority.",
