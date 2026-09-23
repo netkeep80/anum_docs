@@ -51,6 +51,8 @@ function exercise(noise:boolean):void{
   const a2=applicationStep(memory,a1.application,x2);
   same(memory.poles(a2.application).start,a1.application,
     "A64 previous application whole alternates into START role");
+  same(memory.poles(a2.application).start,a1.application,
+    "A64 application inner Link occupies outer START");
 
   // Context recurrence is the START-lift of the same binary recurrence.
   const k0=contextStep(memory,memory.root,f).context;
@@ -60,6 +62,10 @@ function exercise(noise:boolean):void{
     "A64 previous context whole alternates into next payload START");
   same(memory.poles(k2.context).end,k2.payload,
     "A64 new context whole wraps payload through START closure");
+  same(memory.poles(k2.context).end,k2.payload,
+    "A64 context inner Link occupies outer END");
+  assert(memory.poles(a2.application).start===a1.application&&memory.poles(k2.context).end===k2.payload,
+    "A64 two-Link application/context forms place inner Link on opposite outer poles");
 
   // Argument order is structural, not an unordered bag.
   const k21=contextStep(memory,contextStep(memory,k0,x2).context,x1).context;
@@ -121,6 +127,9 @@ function main():void{
     "CONTEXT_WHOLE=START_OF_PAYLOAD",
     "CONTEXT_NORMAL_FORM=K_SELF_TO_(PARENT_TO_CURRENT)",
     "ROLE_ALTERNATION=PREVIOUS_WHOLE_BECOMES_NEXT_START",
+    "INNER_LINK_ROLE_APPLICATION=OUTER_START",
+    "INNER_LINK_ROLE_CONTEXT=OUTER_END",
+    "TWO_LINK_CHIRAL_PLACEMENT=CONFIRMED",
     "MULTI_ARGUMENT_CONTEXT=NESTED_NOT_FLAT",
     "ARGUMENT_ORDER=STRUCTURAL",
     "MANY_RESULT=CHILD_CONTEXT_SPLIT",
