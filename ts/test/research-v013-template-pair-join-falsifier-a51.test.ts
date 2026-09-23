@@ -263,9 +263,10 @@ function staticGuards():void{
   const own=readFileSync(join(root,"ts/test/research-v013-template-pair-join-falsifier-a51.test.ts"),"utf8");
   const a37=readFileSync(join(root,"ts/test/research-v013-link-carried-admission-program-a37.test.ts"),"utf8");
 
+  const execution=own.slice(0,own.indexOf("\nfunction staticGuards("));
   for(const forbidden of [
     "instantiateStructuralSchema(","compileSchemaPlan(","executeConstructionPlan(","const clone=",
-  ])assert(!own.includes(forbidden),`A51 contains no recursive template executor ${forbidden}`);
+  ])assert(!execution.includes(forbidden),`A51 contains no recursive template executor ${forbidden}`);
 
   const pairless=own.slice(
     own.indexOf("function seedTemplateEvaluation("),
