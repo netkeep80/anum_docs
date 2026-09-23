@@ -185,7 +185,11 @@
     "directRuleLinkNativeCoverageA56Designed": true,
     "directRuleLinkNativeCoverageA56Complete": true,
     "directRuleLinkNativeCoverageA56HostSetValidatorRemoved": true,
-    "directRuleLinkNativeCoverageA56RoleCoverageTransducerRemoved": false
+    "directRuleLinkNativeCoverageA56RoleCoverageTransducerRemoved": true,
+    "projectedRoleCoverageA57Designed": true,
+    "projectedRoleCoverageA57Complete": true,
+    "projectedRoleCoverageA57MaterializedCarrierRemoved": true,
+    "projectedRoleCoverageA57StartProjectionRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1566,8 +1570,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A57: classify or source-remove the remaining host role-coverage transducer used by A56 to combine proposed input-role carriers with START projections of proposed Rule-native equations before A45 coverage validation.",
-    "A57 must not reintroduce a derived Contract/free-role list. Prefer reusing A47-A48 proof-carried/construction-carried projection lessons or show that the transducer is only generic representation plumbing; preserve ZERO/ONE/MANY validation, A41 ordering underdetermination and ambient physical-equation inertness.",
+    "A58: attack the remaining generic START projection in A57 projected role matching. Determine whether equation-target START can be proof-carried/construction-carried using A47-A48 lessons or must be classified as a bootstrap structural substrate boundary.",
+    "A58 must keep the materialized role-coverage carrier absent, preserve the direct K->(Rule->Realization) authority, 22 Link-native ONE checks, A41 ordering underdetermination and ambient physical-equation inertness; do not smuggle target roles back as a derived free/constrained list.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -7026,6 +7030,63 @@
         "invalidControlClasses": 7,
         "ambientPhysicalEquation": "INERT",
         "hostRoleCoverageTransducer": "RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "projectedRoleCoverageA57": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A56's host role-coverage carrier transducer be removed by matching Rule roles directly against two realization sources—input-role identity and START projections of proposed equations—while leaving A43-A45 Link-native exact-one validation intact?",
+      "setup": [
+        "selected input remains K->(Rule->Realization)",
+        "no combined roleCoverage ExactSequence is materialized",
+        "for each expected Rule role, one match frontier combines exact input-role candidates and START(projected equation) candidates",
+        "reverse role coverage validates every proposed input role and every proposed equation START against Rule roles",
+        "equation identity coverage remains bidirectional",
+        "all resulting exact-one checks are assembled into one Link-carried validation history and executed by A21"
+      ],
+      "oracle": [
+        "valid forward/reverse Rule and realization orderings reach acceptance",
+        "missing, duplicate, foreign or constrained-target-as-input role cases yield ZERO",
+        "equation identity coverage remains part of the 22-check program",
+        "ambient physical equation outside selected realization is inert",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "projected validation core contains no appendMappedSequence/materialized roleCoverage/derived SemanticContract/freeRoles/constrainedTargets",
+        "no host Set membership, semantic equality, exact-one boolean branch or memory.find appears in projected core",
+        "the remaining projection is explicit as generic memory.poles(eq).start",
+        "A56 A45-source-identical lower validation evidence is preserved"
+      ],
+      "evidenceTest": "ts/test/research-v013-projected-role-coverage-a57.test.ts",
+      "residualAuthority": [
+        "generic equation START projection is still host-executed through memory.poles(eq).start",
+        "A57 does not yet classify pole projection as E1, E2 or proof-carried derived structure",
+        "A58 must reuse A47-A48 projection lessons or classify the bootstrap boundary without reintroducing target-role lists",
+        "Rule authorship/generation/admission, A35 prior-publication existence and E4 remain open"
+      ],
+      "claimBoundary": [
+        "GREEN removes the materialized role-coverage carrier and appendMappedSequence transducer from the tested semantic path",
+        "GREEN preserves direct Rule authority and Link-native exact-one coverage but does not source-remove START projection",
+        "GREEN does not close global E2/E3/E4 or prove FULL_SELF_HOSTED",
+        "v0.13 remains unaccepted"
+      ],
+      "consequence": "A57 removes the A56 temporary roleCoverage carrier entirely. Role completeness is now checked directly: expected Rule roles match either proposed input roles or START projections of proposed equations, while reverse checks and equation identity coverage preserve exact extensional equality through the existing ZERO/ONE/MANY gates. The remaining local semantic/structural boundary is no longer carrier assembly; it is the generic START projection itself, isolated for A58.",
+      "observed": {
+        "materializedRoleCoverageCarrier": 0,
+        "hostAppendMappedSequence": 0,
+        "roleForwardMatch": "INPUT_IDENTITY_PLUS_EQUATION_START",
+        "reverseRoleCoverage": "INPUT_IDENTITY_PLUS_EQUATION_TARGETS",
+        "equationIdentityCoverage": "PRESERVED",
+        "exactOneChecks": 22,
+        "derivedSemanticContract": 0,
+        "hostSetEqualityValidator": 0,
+        "hostExactOneBranch": 0,
+        "validRuleOrders": 2,
+        "validRealizationOrders": 2,
+        "invalidRoleControlClasses": 4,
+        "ambientPhysicalEquation": "INERT",
+        "startProjection": "HOST_GENERIC_RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
