@@ -216,7 +216,9 @@
     "ruleSelfRealizationAdmissionA63GlobalFormationClosed": false,
     "executionContextGeometryA64Designed": true,
     "executionContextGeometryA64Complete": true,
-    "executionContextGeometryA64FormalDualityProven": false
+    "executionContextGeometryA64FormalDualityProven": false,
+    "contextNativeSingleStepA65aDesigned": true,
+    "contextNativeSingleStepA65aComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1597,9 +1599,10 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A65: collapse the A13 host MetaState separation of context/tos/currentFn into a context-native frontier whose execution state is K.current = F->Q. Preserve first split, recursive split, local termination, schedule-order equivalence, extensional convergence and distinct branch ancestry while the frontier carries only execution contexts plus selected authority.",
-    "A65 must preserve A64's two independently advancing coordinates F and Q, left-associated (F->arg)->value execution, right-associated parent->(F->Q) context payloads, START/END role alternation, MANY sibling child contexts and final return only after cursor exhaustion. The scoped Q carrier may remain temporary in A65.",
-    "A66: attack the remaining argument-cursor representation boundary. Compare the scoped forward Q_i=arg_i->Q_(i+1) carrier with existing MTS sequence forms and test whether Q is a structural mirror/projection of an existing immutable sequence rather than a new semantic primitive.",
+    "A65b: starting only from GREEN A65a, test ZERO/ONE/MANY for one execution step. One selected K may yield zero, one or several child contexts from selected result facts. Do not add recursion, convergence, scheduler equivalence or lifecycle authority yet.",
+    "A65c: only after A65b, test recursive continuation plus local termination over context-native frames.",
+    "A65d: only after A65c, test convergence and whether context ancestry alone preserves branch provenance without a separate occurrence path.",
+    "A66: only after A65a-d, attack the argument-cursor representation boundary. Compare the scoped forward Q_i=arg_i->Q_(i+1) carrier with existing MTS sequence forms and test whether Q is a structural mirror/projection of an existing immutable sequence rather than a new semantic primitive.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
@@ -7504,7 +7507,7 @@
       }
     },
     "executionContextGeometryA64": {
-      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can one MTS execution stage be represented by an execution frame with two independently advancing Link-native coordinates — current function/value F and argument cursor Q — so that application is (F->arg(Q))->value, MANY creates sibling child contexts, and only an exhausted frame returns its final value to the root context?",
       "authorClarification": [
         "execution context is analogous to but not identical with multi-argument function application",
@@ -7597,6 +7600,46 @@
         "cursorPointerImmutableHistory": true,
         "rootResultCanonicalConvergence": true,
         "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "contextNativeSingleStepA65a": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "Given only one selected execution context K with K.current=F->Q and one selected result fact (F->arg)->Y, can one child context K' with K'.current=Y->next(Q) be derived without separate host currentFn/tos or MetaState?",
+      "setup": [
+        "K.current is one ordinary Link F->Q",
+        "scoped cursor Q is one ordinary Link arg->nextQ",
+        "selected result fact is (F->arg)->Y"
+      ],
+      "oracle": [
+        "advanceOne recovers F and Q from K.current",
+        "advanceOne recovers arg and nextQ from Q poles",
+        "selected result must match exact current F and exact current arg",
+        "child parent is exactly K",
+        "child current state is exactly Y->nextQ",
+        "parent retains original F->Q unchanged",
+        "wrong-F result rejects",
+        "wrong-argument result rejects",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-context-native-step-a65a.test.ts",
+      "exclusions": [
+        "MANY not tested",
+        "recursive frontier not tested",
+        "local termination not tested",
+        "convergence/provenance not tested",
+        "scheduler order not tested",
+        "Rule publication/admission not tested",
+        "Q remains scoped research representation"
+      ],
+      "classification": {
+        "separateCurrentFn": 0,
+        "separateTos": 0,
+        "metaStateTuple": 0,
+        "contextState": "F_TO_Q",
+        "currentArgument": "START_Q_SCOPED",
+        "nextCursor": "END_Q_SCOPED",
+        "childState": "Y_TO_NEXT_Q",
         "productionChanged": false
       }
     }
