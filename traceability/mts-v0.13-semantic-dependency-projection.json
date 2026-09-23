@@ -139,7 +139,9 @@
     "linkCarriedAdmissionProgramA37Designed": true,
     "linkCarriedAdmissionProgramA37Complete": true,
     "genericAdmissionProgramInstantiationA38Designed": true,
-    "genericAdmissionProgramInstantiationA38Complete": true
+    "genericAdmissionProgramInstantiationA38Complete": true,
+    "bootstrapProducerPlanA39Designed": true,
+    "bootstrapProducerPlanA39Complete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1520,8 +1522,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A39: remove the frozen admission-template bootstrap residual left by A38; generate or admit the first Rule->(TemplateCandidate->TemplateE0) producer authority from Link-carried generic construction evidence rather than a host reference compiler.",
-    "A39 must keep A38 generic target instantiation and the A21 runtime unchanged, and must reject self-authorized template publication.",
+    "A40: source-remove A39 plan authoring. Derive the producer construction plan itself from Rule/role authority through Link-native generic execution rather than a host-authored topology recipe.",
+    "A40 must keep the F5-F4 construction executor, A36 publication gate, revised A38 target instantiation and A21 runtime unchanged; a candidate must not be able to author the plan that admits its own producer package.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6247,5 +6249,47 @@
         "independentMemories": 2,
         "productionChanged": false
       }
-    }  }
+    },
+    "bootstrapProducerPlanA39": {
+      "status": "EXECUTION_PENDING",
+      "question": "Can the first A38-compatible Rule-bound TemplateE0 and FreeSeedSequence be generated after freeze from Link-carried construction evidence, with no host reference compiler and no self-authorized template publication?",
+      "setup": [
+        "freeze Rule->Plan before bootstrap execution",
+        "plan seeds only Rule, root basis and five free candidate values; Candidate handle and constrained application/continuation values are absent",
+        "source-identical F5-F4 construction executor builds canonical Candidate, TemplateE0, FreeSeedSequence and final A38-compatible Package",
+        "A36 canonical candidate-integrity gate plus unchanged A21 selects Package only when reconstructed Candidate equals proposed Candidate"
+      ],
+      "oracle": [
+        "valid template publishes one Rule-bound A38-compatible Package and generated TemplateE0 reaches ACCEPT",
+        "generated free-seed sequence is exact",
+        "forged constrained template 0/1/2 yields ZERO despite ambient self-publication attempts",
+        "foreign Rule/Plan authority rejects and late ambient Plan is inert",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "A39 contains no host reference compiler",
+        "construction executor is source-identical F5-F4 and runtime is source-identical A21/A37",
+        "selected bootstrap executor contains no plan authoring/roles/constraint compiler or ambient selector"
+      ],
+      "residualAuthority": [
+        "construction Plan is still host-authored and encodes producer topology recipe",
+        "generic F5-F4 plan interpretation remains host-executed",
+        "A35 prior-publication existence authority and A36 scratch construction remain open"
+      ],
+      "evidenceTest": "ts/test/research-v013-bootstrap-producer-plan-a39.test.ts",
+      "claimBoundary": [
+        "GREEN removes host reference compilation of first TemplateE0/free-seed package, not origin of construction Plan",
+        "GREEN makes ambient self-publication semantically inert without frozen-plan candidate-integrity authority",
+        "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "Pending execution. A39 moves first-template bootstrap from prebuilt TemplateE0 into frozen Link-carried construction evidence; if GREEN the next source boundary is plan authoring itself.",
+      "observed": {
+        "hostReferenceCompiler": 0,
+        "constructionExecutor": "F5_F4_SOURCE_IDENTICAL",
+        "publicationValidation": "A36_CANONICAL_GATE_PLUS_A21",
+        "planAuthoring": "HOST_BOOTSTRAP_RESIDUAL",
+        "productionChanged": false
+      }
+    }
+  }
 }
