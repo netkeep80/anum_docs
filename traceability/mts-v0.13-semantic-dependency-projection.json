@@ -173,7 +173,11 @@
     "applicationNormalFormA52Designed": true,
     "applicationNormalFormA52Complete": true,
     "proofGatedApplicationA53Designed": true,
-    "proofGatedApplicationA53Complete": true
+    "proofGatedApplicationA53Complete": true,
+    "rawBinaryConstructorA54Designed": true,
+    "rawBinaryConstructorA54Complete": true,
+    "rawBinaryConstructorA54E1PathClassified": true,
+    "rawBinaryConstructorA54IrreducibilityProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1554,8 +1558,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A54: classify the raw binary Memory constructor boundary exposed by A53. Falsify whether memory.ensure(start,end), after all semantic operand/template decisions have been moved into Link-carried proof gates, is pure E1 physical substrate or still hides an E2 semantic source.",
-    "A54 must deny schema/template/role/application access to the constructor, preserve A53 semantic results under an opaque constructor interface, and avoid claiming irreducibility merely because the implementation currently calls ensure.",
+    "A55: attack the remaining Rule->semantic construction-contract/schema source. Derive or reconstruct invariant construction obligations from Link-carried Rule/role authority without privileging one exact packaging topology and without a fixture-authored schema.",
+    "A55 must preserve A41 underdetermination: distinct equivalent program/package topologies may realize the same semantic obligations, so source removal must target the invariant contract rather than one canonical gate order.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6823,6 +6827,69 @@
         "ambientExistenceIsAuthority": false,
         "runtime": "A21_SOURCE_IDENTICAL",
         "externalApplicationSelection": "INPUT_BOUNDARY",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "rawBinaryConstructorA54": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "After A53 has moved Template/role/application validity into Link-carried proof gates plus unchanged A21, is the remaining binary constructor an E1 physical Link substrate boundary rather than an E2 semantic-source law?",
+      "setup": [
+        "replace direct raw pair creation in the A53 path with an opaque PairConstructor capability whose only semantic-call inputs are ordered start and end Link handles",
+        "exercise three conforming implementations: direct canonical ensure, repeated/idempotent canonical ensure, and a noisy allocator that materializes unrelated scratch before the requested pair",
+        "audit the substrate contract independently on unrelated operands: returned Link must have exactly the requested ordered poles and canonical pair identity",
+        "exercise two deliberately nonconforming implementations: reversed ordered pair and constant root result"
+      ],
+      "oracle": [
+        "all three conforming opaque constructors preserve the same A53 semantic signature for valid, swapped, foreign-template and proof/truth-mismatch cases",
+        "valid selected application yields exactly the canonical start->end Link",
+        "invalid swapped selection may physically materialize reverse scratch but remains semantic ZERO",
+        "ambient physical pair existence remains outside contextual truth",
+        "reversed and constant constructors fail the generic Link-pair substrate contract without consulting Template, role, context, truth, proof or application semantics",
+        "two independent Memories plus constructor variants agree"
+      ],
+      "antiCheat": [
+        "PairConstructor exposes only construct(start,end) and call accounting; no schema/template/role/context/truth/application/proof/candidate argument crosses the boundary",
+        "semantic executeSelection reaches physical creation only through constructor.construct(candidate.startValue,candidate.endValue)",
+        "the generic substrate conformance audit checks only ordered Link poles/canonical pair identity, not application semantics",
+        "A21 runtime remains source-identical to A53"
+      ],
+      "evidenceTest": "ts/test/research-v013-raw-pair-constructor-a54.test.ts",
+      "classification": {
+        "boundary": "E1_PHYSICAL_SUBSTRATE_ON_A53_PATH",
+        "requiredContract": "CANONICAL_ORDERED_LINK_START_END",
+        "e2SemanticArguments": 0,
+        "compliantOpaqueImplementations": 3,
+        "nonconformingControls": 2,
+        "bootstrapPrimitiveStatus": "UNKNOWN",
+        "irreducibilityProven": false
+      },
+      "residualAuthority": [
+        "this classifies the A53 use of ordinary pair construction as E1 substrate provided the canonical ordered-Link contract holds; it does not prove memory.ensure is globally irreducible",
+        "bootstrap root/pole-read/pair-lookup/self-closed constructors/outgoing-query remain separately UNKNOWN",
+        "generic proof/environment/binding carrier projection remains host-executed plumbing",
+        "construction schema source/admission and Rule->Contract derivation remain open E2/E3 work",
+        "A35 prior-publication existence remains open",
+        "future authority discovery must preserve the invariant that physical scratch cannot become semantic authority merely by ambient existence"
+      ],
+      "claimBoundary": [
+        "GREEN means semantic correctness is invariant across conforming constructor implementations and depends on no application-specific knowledge inside the constructor",
+        "a constructor that reverses poles is rejected because it violates the fundamental Link(start,end) substrate contract, not because of a Template/application rule",
+        "do not recurse into self-hosting ensure through ensure and do not mark bootstrap.ensure-pair INDEPENDENT from this experiment",
+        "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A54 separates meaning from physical Link creation on the A53 path. Once semantic selection and validation are Link-carried, the constructor contributes only the generic ordered canonical Link(start,end) operation. Semantic results are unchanged by conforming opaque allocator strategies, while nonconforming reversed/constant allocators fail a purely ontological Link-pair contract. This is scoped E1 boundary classification, not an irreducibility proof. The next source-removal target returns upward to Rule->semantic contract/schema authority rather than recursing below pair construction.",
+      "observed": {
+        "constructorSemanticArguments": 0,
+        "compliantOpaqueConstructors": 3,
+        "semanticSignature": "INVARIANT",
+        "nonconformingConstructors": 2,
+        "nonconformingFailureBoundary": "GENERIC_LINK_PAIR_CONTRACT",
+        "invalidPhysicalScratch": "ALLOWED_SEMANTIC_ZERO",
+        "ambientPhysicalExistence": "INERT",
+        "classification": "E1_PHYSICAL_SUBSTRATE_ON_A53_PATH",
+        "primitiveIrreducibility": "NOT_PROVEN",
+        "runtime": "A21_SOURCE_IDENTICAL",
         "independentMemories": 2,
         "productionChanged": false
       }
