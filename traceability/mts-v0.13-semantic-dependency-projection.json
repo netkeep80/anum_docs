@@ -7445,6 +7445,7 @@
       "antiCheat": [
         "self-realization contains no RuleKind, opcode, whitelist, switch-based rule dispatch, memory.find, outgoing/incoming or allLinks semantic discovery",
         "semantic construction reuses A60 proof-carried decomposition and A53-style canonical proof gates plus unchanged A21",
+        "declared output closure is also validated by stage-scoped canonical equality gates plus A21; no host output-identity boolean decides admission",
         "A62 immutable publication history remains a separate authority boundary; self-realization does not publish the Rule",
         "successful result is contextual K->Rule, not a physical Rule self-link"
       ],
@@ -7467,7 +7468,7 @@
       ],
       "claimBoundary": [
         "GREEN removes a host semantic Rule-kind/whitelist decision from the tested A60-style Rule-admissibility path",
-        "GREEN means structurally coherent Rule content can prove its own generic executability under identity substitution; it does not authorize publication",
+        "GREEN means structurally coherent Rule content can prove its own generic executability and declared-output closure under identity substitution; it does not authorize publication",
         "GREEN does not close global E3/E4 or prove all possible StructuralRule representations admissible by this one criterion",
         "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
       ],
@@ -7484,6 +7485,8 @@
         "ambientPhysicalScratch": "INERT",
         "admissionResult": "CONTEXTUAL_K_TO_RULE",
         "hostSemanticWhitelist": 0,
+        "hostOutputIdentityBoolean": 0,
+        "outputClosure": "CANONICAL_GATES_PLUS_A21",
         "ruleContentAuthoring": "EXTERNAL_INPUT_BOUNDARY",
         "publicationAuthority": "A62_HISTORY",
         "dictionarySequenceFormation": "E3_RESIDUAL",
