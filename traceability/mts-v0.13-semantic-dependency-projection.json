@@ -226,7 +226,9 @@
     "contextNativeConvergenceA65dDesigned": true,
     "contextNativeConvergenceA65dComplete": true,
     "sequenceCursorComparisonA66aDesigned": true,
-    "sequenceCursorComparisonA66aComplete": true
+    "sequenceCursorComparisonA66aComplete": true,
+    "exactSequenceSelectedPositionA66bDesigned": true,
+    "exactSequenceSelectedPositionA66bComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1607,8 +1609,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A66b: only after A66a, ask the minimal-position question: can forward execution over an existing ExactSequence be represented by selecting existing sequence structure plus minimal position evidence, without materializing a second full Q chain? Do not choose a representation in advance.",
-    "A66b must preserve A66a's observed direction mismatch: ExactSequence locally exposes latest value + previous prefix, while forward execution needs current earliest remaining value + next suffix. Any solution must make the missing forward-position information explicit rather than hiding a host reversal.",
+    "A66c: starting only from GREEN A66b, test initialization only: given a selected non-empty ExactSequence handle, can the first execution position P=Sequence->FirstCell be derived structurally without a host index, host value array or materialized forward Q chain?",
+    "A66c must not solve arbitrary execution or cursor advancement again. It should isolate only the missing operation 'selected sequence -> first cell' and fail closed for malformed/non-ExactSequence input.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
@@ -7765,7 +7767,7 @@
       }
     },
     "sequenceCursorComparisonA66a": {
-      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "For exactly two ordered values a1,a2, what is the structural relationship between the existing ExactSequence carrier and the scoped forward execution cursor Q0=a1->(a2->R)?",
       "setup": [
         "materialize the existing canonical ExactSequence for [a1,a2]",
@@ -7801,6 +7803,46 @@
         "identityOrSinglePoleSwap": false,
         "fullValueTraversalReconstructsCursor": true,
         "formalDuality": "NOT_CLAIMED",
+        "productionChanged": false
+      }
+    },
+    "exactSequenceSelectedPositionA66b": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "For exactly two values, is one Link P=Sequence->CurrentCell sufficient position evidence to move forward over the existing immutable ExactSequence without materializing a duplicate Q suffix chain?",
+      "setup": [
+        "S1=ExactSequence([a1,a2]) and S2=ExactSequence([a1,b2]) share the canonical first prefix cell E1",
+        "position is one ordinary Link P=Sequence->CurrentCell",
+        "current argument is read from CurrentCell",
+        "the successor cell is discovered by traversing only the selected Sequence ancestry backward until a cell whose previous prefix equals CurrentCell is found"
+      ],
+      "oracle": [
+        "CurrentCell=E1 alone is insufficient because E1 is shared by S1 and S2 but has different forward successors in each selected sequence",
+        "S1->E1 yields a1 and advances to S1->S1",
+        "S2->E1 yields a1 and advances to S2->S2",
+        "S1->S1 yields a2 and reports local completion after that argument",
+        "a foreign current cell not belonging to the selected sequence is rejected",
+        "position stores no copied argument values and no second suffix chain",
+        "step uses no incoming/outgoing/allLinks/find/readExactSequence ambient or decoded-sequence search",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-exact-sequence-position-a66b.test.ts",
+      "exclusions": [
+        "global minimality of P=Sequence->CurrentCell is not claimed",
+        "arbitrary-length asymptotic cost is not classified",
+        "initial position derivation from Sequence alone is not solved",
+        "execution context and generalized cascade are not tested",
+        "Rule publication/admission not tested"
+      ],
+      "classification": {
+        "position": "SEQUENCE_TO_CURRENT_CELL",
+        "copiedValues": 0,
+        "duplicateForwardSuffixChain": 0,
+        "currentCellAlone": "INSUFFICIENT_WITH_SHARED_PREFIX",
+        "sequencePlusCurrentCell": "SUFFICIENT_FOR_TWO_ELEMENT_FORWARD_STEP",
+        "successorDiscovery": "SELECTED_SEQUENCE_ANCESTRY_SCAN",
+        "ambientMemoryEnumeration": 0,
+        "foreignCell": "REJECTED",
+        "globalMinimality": "NOT_CLAIMED",
         "productionChanged": false
       }
     }
