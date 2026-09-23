@@ -155,7 +155,10 @@
     "linkNativeOneCardinalityA44Designed": true,
     "linkNativeOneCardinalityA44Complete": true,
     "linkCarriedCoverageHistoryA45Designed": true,
-    "linkCarriedCoverageHistoryA45Complete": true
+    "linkCarriedCoverageHistoryA45Complete": true,
+    "intrinsicSequenceTraversalA46Designed": true,
+    "intrinsicSequenceTraversalA46Complete": true,
+    "intrinsicSequenceTraversalA46SourceRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1536,8 +1539,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A46: source-remove the generic recursive carrier transducer left by A45. Generate/execute the Link-carried coverage history through existing generic Link construction/execution authority rather than host recursion over ExactSequence cells.",
-    "A46 must preserve A45 domain-coverage-loop count zero, A44 stage-scoped ONE gate, A43 canonical matching, A42 order-insensitive contract and A21 runtime; Rule->Contract derivation remains separately open.",
+    "A47: source-remove the START-projection authority exposed by A46. Derive or execute Payload->START(Payload) from Link-carried structural/aspect authority without pre-authoring one projection edge per ExactSequence payload and without a host memory.poles semantic oracle.",
+    "A47 must keep unchanged A21 traversal, preserve ambient-projection inertness, and distinguish constructor/aspect authority from genuine arbitrary-Link pole projection; Rule->Contract derivation remains separately open.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6423,6 +6426,19 @@
       "residualAuthority": ["generic recursive ExactSequence fold/zip and coverage-history transduction remain host-executed generic mechanisms", "Rule->Contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
       "consequence": "A45 removes domain-specific host coverage loops and JS program assembly: carrier membership/order supplies the traversal source and the intermediate validation program is Link-native history. The remaining immediate source boundary is the generic host recursive carrier transducer itself; A46 should move that generation/execution into existing Link-carried generic authority without restoring domain-specific loops.",
       "observed": {"domainCoverageLoops": 0, "jsCheckArray": 0, "coverageSource": "CONTRACT_REALIZATION_LINK_CARRIERS", "descriptorZip": "GENERIC_RECURSIVE", "structuralFold": "GENERIC_RECURSIVE", "checkHistory": "LINK_NATIVE", "oneGate": "A44_SOURCE_IDENTICAL", "runtime": "A21_SOURCE_IDENTICAL", "validRealizations": "ACCEPT", "invalidRealizations": "ZERO", "genericRecursiveCarrierTransducer": "HOST_RESIDUAL", "independentMemories": 2, "productionChanged": false}
+    },
+    "intrinsicSequenceTraversalA46": {
+      "status": "EXECUTED_RED_INTRINSIC_AUTHORITY_INSUFFICIENT_GREEN_START_PROJECTION_CONTROL",
+      "question": "Can the A45 generic recursive ExactSequence carrier transducer be removed using only intrinsic ExactSequence Link topology plus unchanged A21 contextual detachment?",
+      "setup": ["materialize canonical ExactSequence cells Cell=Cell->Payload with Payload=Prev->Value", "select all intrinsic Cell and Payload Links as A21 continuation authority and seed contextual truth at the final Cell", "materialize START and END projection Links only after the intrinsic run and verify they remain inert when unselected", "run separate positive controls with selected END-only projection and selected START-only projection"],
+      "oracle": ["intrinsic selected authority performs Cell3->Payload3 and then yields ZERO because no selected continuation starts at Payload3 and returns Prev", "ambient physical projection Links do not change the frozen intrinsic result", "selected END projection exposes only the last Value and cannot recurse", "selected START projection traverses all three cells and all three values because intrinsic Payload=Prev->Value supplies value continuation once Prev becomes current", "two independent Memories agree"],
+      "antiCheat": ["traversal runtime is only unchanged A21 step and contains no memory.poles/readExactSequence/sequenceNode/foldSequence/zipSequence carrier reader", "A21 step is source-identical to A37", "fixture is checked against canonical materializeExactSequence topology"],
+      "evidenceTest": "ts/test/research-v013-intrinsic-sequence-traversal-a46.test.ts",
+      "result": "RED for A45 transducer source-removal under intrinsic ExactSequence authority. ExactSequence self-incidence exposes Cell->Payload but does not itself carry Payload->START(Payload), so recursive traversal cannot continue. GREEN positive control localizes the missing authority to START projection: selected Payload->Prev is sufficient for full traversal; selected END projection alone is not.",
+      "claimBoundary": ["this is a scoped falsifier of intrinsic ExactSequence+A21 sufficiency, not a proof that Link-native pole projection is impossible", "pre-authored Payload->Prev edges are positive-control authority and remain a source residual", "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"],
+      "residualAuthority": ["source/admission of generic START projection for arbitrary Payload Links", "Rule->Contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
+      "consequence": "A46 narrows A45's host recursion boundary to one structural capability rather than a general iterator: recursive ExactSequence execution needs Link-carried START projection of Payload=Prev->Value. The intrinsic Payload already supplies Value when Prev is current, so END projection is not required for full traversal. A47 should attack the source of START projection without smuggling host poles or per-payload projection edges.",
+      "observed": {"intrinsicFirstStep": "CELL_TO_PAYLOAD", "intrinsicSecondStep": "ZERO", "ambientProjection": "INERT", "selectedEndProjection": "LAST_VALUE_ONLY_NO_RECURSION", "selectedStartProjection": "FULL_TRAVERSAL_VALUES_3_OF_3", "minimumMissingAuthority": "PAYLOAD_TO_START_PAYLOAD", "a21Runtime": "SOURCE_IDENTICAL", "hostRecursiveSequenceReaderInTraversalRuntime": 0, "sourceRemoved": false, "independentMemories": 2, "productionChanged": false}
     }
   }
 }
