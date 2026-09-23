@@ -131,7 +131,9 @@
     "genericCurrentOccurrenceA33Designed": true,
     "genericCurrentOccurrenceA33Complete": true,
     "admittedSourceCatalogA34Designed": true,
-    "admittedSourceCatalogA34Complete": true
+    "admittedSourceCatalogA34Complete": true,
+    "contextualCatalogPublicationA35Designed": true,
+    "contextualCatalogPublicationA35Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1512,9 +1514,10 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A35: remove domain-specific external catalog publication invocation. Represent catalog-admission requests as contextual Link truth and execute one generic publication detachment/construction law over structurally publishable candidates.",
-    "A35 must keep ambient candidates inert, require explicit selected publication request, preserve immutable catalog versioning, and reject malformed/self-asserted candidates.",
-    "After A35, reassess whether host-executed sourcePublishable/admitted/instantiate interpreters can be unified with the existing Link-carried structural rule machinery; this is likely the main remaining E2/E3 boundary.",
+    "A36: replace A34/A35 sourcePublishable/admitted pair-identity host checks with a Link-native structural gate executed by recursive contextual detachment.",
+    "A36 must test whether START-self-closed canonicalization can reduce target=(start->end) identity to ZERO/ONE detachment without memory.find equality or a boolean admitted predicate.",
+    "After A36, attack remaining host rule/candidate topology decoding and template instantiation while keeping physical pole access/construction explicit as executor substrate.",
+    "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
     "A33 must preserve context identity, immutable ancestry and ambient-candidate isolation at both generation-selection and meta-execution levels.",
     "A32 must not execute every request execution linked to the generation context; selection must remain explicit in Link structure and preserve immutable request history.",
@@ -6017,6 +6020,66 @@
         "unchangedA23MetaStep": true,
         "externalCatalogPublicationEvent": true,
         "semanticInformationEliminated": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "contextualCatalogPublicationA35": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A34's externally invoked publishCatalog(catalog,candidate) boundary be replaced by one selected contextual Link request K->(Catalog->Candidate), so the executor derives publication operands from Link structure while ambient candidates and ambient requests remain inert?",
+      "setup": [
+        "retain A34 sourcePublishable structural gate unchanged as an explicit residual",
+        "represent publication request as Q=Catalog->Candidate and selected request truth as K->Q",
+        "publication executor receives only the selected K->Q Link and derives Catalog/Candidate from its END poles",
+        "successful publication immutably appends C->Candidate to the selected catalog history and returns K->Catalog'",
+        "current selected request truth remains an executor-state input, consistent with A33"
+      ],
+      "oracle": [
+        "no direct Catalog or Candidate host argument crosses the publication executor boundary",
+        "ambient structurally publishable candidates do not mutate a catalog",
+        "ambient unselected publication requests do not mutate a catalog",
+        "executing one selected request creates exactly one new immutable catalog version",
+        "old catalog versions remain unchanged after later publication",
+        "duplicate publication rejects fail-closed",
+        "malformed self-asserted source request rejects fail-closed",
+        "foreign catalog-context membership rejects fail-closed",
+        "two independent Memories reproduce the same behavior"
+      ],
+      "antiCheat": [
+        "publication executor contains no outgoing/incoming/allLinks/switch ambient selector",
+        "publication executor does not call A34 publishCatalog and has no catalog/candidate parameters",
+        "catalog and candidate are derived only from the selected contextual request Link",
+        "sourcePublishable remains visibly host-executed rather than being falsely claimed removed"
+      ],
+      "residualAuthority": [
+        "sourcePublishable/deriveProducerSeeds still decode and validate producer topology in host code",
+        "sourcePublishable still uses ordered Link identity lookup as a host truth check",
+        "construction of membership/history/catalog Links is still performed by the physical host executor",
+        "selection of the current request-truth handle remains executor state per A33",
+        "generic target admission/topology/template instantiation remain host executed"
+      ],
+      "evidenceTest": "ts/test/research-v013-contextual-catalog-publication-a35.test.ts",
+      "claimBoundary": [
+        "GREEN removes direct catalog/candidate publication arguments and domain-specific external publishCatalog invocation from the tested boundary",
+        "GREEN does not remove structural source validation or physical Link construction",
+        "ambient Memory remains non-authoritative",
+        "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open; production unchanged"
+      ],
+      "consequence": "A35 moves catalog publication selection into Link structure: the executor consumes one contextual truth K->(Catalog->Candidate), derives both publication operands structurally, and returns K->Catalog' for a new immutable version. A publishable candidate or request merely existing in Memory remains inert until its exact request truth is selected. The next semantic residual is the host pair-identity/topology validation inside sourcePublishable/admitted, targeted by A36.",
+      "currentResult": "GREEN in the executable research corpus: selected contextual requests add one source at a time to immutable catalog versions; unselected ambient requests and publishable candidates are inert; duplicate, malformed self-asserted source and foreign catalog-context cases reject. A34 sourcePublishable remains explicit and unchanged in semantic role so A35 does not hide the next host-interpreter boundary.",
+      "observed": {
+        "publicationRequest": "K_TO_CATALOG_TO_CANDIDATE",
+        "directCatalogHostArgument": false,
+        "directCandidateHostArgument": false,
+        "ambientPublishableCandidate": "INERT",
+        "ambientUnselectedRequest": "INERT",
+        "selectedRequestCreatesNewCatalogVersion": true,
+        "oldCatalogVersionImmutable": true,
+        "duplicatePublication": "REJECTED",
+        "malformedSelfAssertedSource": "REJECTED",
+        "foreignCatalogContext": "REJECTED",
+        "sourcePublishableInterpreter": "HOST_RESIDUAL",
+        "currentRequestTruth": "EXECUTOR_STATE_BOUNDARY_SCOPED",
         "independentMemories": 2,
         "productionChanged": false
       }
