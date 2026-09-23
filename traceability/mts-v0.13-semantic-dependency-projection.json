@@ -189,7 +189,11 @@
     "projectedRoleCoverageA57Designed": true,
     "projectedRoleCoverageA57Complete": true,
     "projectedRoleCoverageA57MaterializedCarrierRemoved": true,
-    "projectedRoleCoverageA57StartProjectionRemoved": false
+    "projectedRoleCoverageA57StartProjectionRemoved": true,
+    "proofCarriedEquationStartA58Designed": true,
+    "proofCarriedEquationStartA58Complete": true,
+    "proofCarriedEquationStartA58TargetPoleReadRemoved": true,
+    "proofCarriedEquationStartA58WitnessSourceRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1570,8 +1574,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A58: attack the remaining generic START projection in A57 projected role matching. Determine whether equation-target START can be proof-carried/construction-carried using A47-A48 lessons or must be classified as a bootstrap structural substrate boundary.",
-    "A58 must keep the materialized role-coverage carrier absent, preserve the direct K->(Rule->Realization) authority, 22 Link-native ONE checks, A41 ordering underdetermination and ambient physical-equation inertness; do not smuggle target roles back as a derived free/constrained list.",
+    "A59: source-remove the construction-time decomposition-witness producer introduced by A58 for proposed Rule-native equations. Reuse the A48 construction-carried witness lesson so equation and ordered decomposition evidence arise from one reusable Link-carried construction authority rather than per-equation host witness authoring.",
+    "A59 must preserve zero equation-target pole reads, direct K->(Rule->Realization) authority, 22 Link-native coverage ONE checks plus proof gates, forged-witness ZERO, A41 ordering underdetermination and ambient physical-existence inertness; do not reintroduce a target-role list or derived Contract.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -7087,6 +7091,67 @@
         "invalidRoleControlClasses": 4,
         "ambientPhysicalEquation": "INERT",
         "startProjection": "HOST_GENERIC_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "proofCarriedEquationStartA58": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A57's remaining host START(Equation) pole read be removed by carrying ordered equation decomposition evidence and validating it through canonical Link gates before the projected role/equation coverage program?",
+      "realizationShape": [
+        "Realization = InputRolesCarrier -> EquationWitnessCarrier",
+        "each witness carries ordered START-role and END-role bindings plus the proposed Equation handle",
+        "the Equation handle itself is never decomposed to discover its target role"
+      ],
+      "semanticPath": [
+        "read target and equation-end pair from the witness bindings",
+        "reconstruct expected Equation = target -> pair",
+        "encode START-role identity, END-role identity and reconstructed-Equation identity as stage-scoped canonical equality gates",
+        "use witness-carried target values for A57 projected role coverage",
+        "use witness-carried Equation handles for bidirectional Rule-equation identity coverage",
+        "prepend all proof gates to the unchanged 22-check Link-native coverage program and execute with A21"
+      ],
+      "oracle": [
+        "valid forward/reverse Rule and realization ordering reaches contextual acceptance",
+        "valid realization retains 22 coverage exact-one checks plus 9 proof gates for three equations",
+        "forged ordered decomposition yields ZERO",
+        "witness/proposed-Equation mismatch yields ZERO",
+        "ambient projection-like physical Links remain inert",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "semantic equation projection path contains no memory.poles(equation) or memory.poles(eq).start target read",
+        "no materialized roleCoverage carrier or appendMappedSequence is reintroduced",
+        "no derived SemanticContract/freeRoles/constrainedTargets list is reintroduced",
+        "no memory.find semantic equality check is used in the projection path",
+        "A47 no-target-pole projection principle is explicitly inherited"
+      ],
+      "evidenceTest": "ts/test/research-v013-proof-carried-equation-start-a58.test.ts",
+      "residualAuthority": [
+        "construction-time witnessedEquation currently receives target/start/end operands from the fixture and authors one decomposition witness per proposed equation",
+        "A59 must source-remove that witness producer using reusable construction-carried authority rather than treating witness authoring as free",
+        "generic witness/package reading remains host execution plumbing",
+        "Rule generation/admission, A35 prior-publication existence and E4 remain open"
+      ],
+      "claimBoundary": [
+        "GREEN removes arbitrary proposed-Equation START pole reads from A57 semantic validation",
+        "GREEN does not claim per-equation decomposition-witness source removed; A59 owns that boundary",
+        "GREEN keeps physical witness/projection-like existence non-authoritative until selected proof gates succeed",
+        "v0.13 remains unaccepted; global E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A58 replaces A57's direct memory.poles(eq).start semantic projection with proof-carried ordered decomposition. The projected target role is obtained from explicit witness bindings, while canonical equality gates independently verify binding roles and that reconstructed target->pair equals the selected Equation. The 22 Link-native coverage checks remain intact and are preceded by nine proof gates. The remaining local source is now construction-time production of those witnesses, targeted by A59.",
+      "observed": {
+        "equationTargetPoleReads": 0,
+        "materializedRoleCoverageCarrier": 0,
+        "realizationEquationCarrier": "DECOMPOSITION_WITNESSES",
+        "witnessValidation": "THREE_STAGE_SCOPED_CANONICAL_GATES_PER_EQUATION",
+        "validCoverageExactOneChecks": 22,
+        "validProofGates": 9,
+        "forgedDecomposition": "ZERO",
+        "proofEquationMismatch": "ZERO",
+        "ambientPhysicalExistence": "INERT",
+        "directAuthority": "K_TO_RULE_TO_REALIZATION",
+        "witnessSource": "CONSTRUCTION_TIME_RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
