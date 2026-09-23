@@ -166,7 +166,7 @@
     "structuralConstructionSchemaA49Designed": true,
     "structuralConstructionSchemaA49Complete": true,
     "directStructuralSchemaExecutionA50Designed": true,
-    "directStructuralSchemaExecutionA50Complete": false
+    "directStructuralSchemaExecutionA50Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -3951,6 +3951,7 @@
         "physicalConcurrencyPrimitives": 0,
         "partialTerminationSurvivors": 1,
         "independentMemories": 2,
+        "finalCi": "GREEN_6298",
         "productionChanged": false
       },
       "evidenceTest": "ts/test/research-v013-bundle-continuation-a12.test.ts",
@@ -6604,7 +6605,7 @@
       }
     },
     "directStructuralSchemaExecutionA50": {
-      "status": "DESIGNED_CI_PENDING",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A49's host StructuralRule-to-F5-plan compiler be removed by executing the unchanged role/template schema directly through the already-established generic F5-F5 template-instantiation law?",
       "setup": [
         "keep the A49 StructuralRule schema unchanged: roles S/E and output templates target+witness",
@@ -6637,7 +6638,7 @@
         "A50 reuses an existing F5-F5 generic kernel rather than introducing a new construction-specific interpreter",
         "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "If exact-head CI is GREEN, A50 shows that the A49 Link-carried StructuralRule schema can execute directly without a rule-to-plan compiler or intermediate F5 plan. The remaining immediate execution source is the already-known generic F5-F5 recursive template-instantiation law; A51 should attack that law itself.",
+      "consequence": "A50 shows that the A49 Link-carried StructuralRule schema can execute directly without a rule-to-plan compiler or intermediate F5 plan. The remaining immediate execution source is the already-known generic F5-F5 recursive template-instantiation law; A51 should attack that law itself.",
       "observed": {
         "structuralRuleToF5PlanCompiler": 0,
         "intermediateF5Plan": 0,
@@ -6647,7 +6648,7 @@
         "receiverTargetPoleReads": 0,
         "ambientProjection": "INERT",
         "forgedDecomposition": "ZERO",
-        "fullTraversal": "EXPECTED_CI_GREEN",
+        "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
         "genericRecursiveTemplateInstantiation": "HOST_RESIDUAL",
         "schemaAuthoritySource": "FIXTURE_RESIDUAL",
         "independentMemories": 2,
