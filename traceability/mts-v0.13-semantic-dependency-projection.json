@@ -160,7 +160,7 @@
     "intrinsicSequenceTraversalA46Complete": true,
     "intrinsicSequenceTraversalA46SourceRemoved": false,
     "proofCarriedStartProjectionA47Designed": true,
-    "proofCarriedStartProjectionA47Complete": false
+    "proofCarriedStartProjectionA47Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -3371,6 +3371,7 @@
         "rootFixedPointResult": "R(R) -> {R} in both direct and inverse methods",
         "hostAspectBranches": 0,
         "independentMemories": 2,
+        "finalCi": "GREEN_6277",
         "productionChanged": false,
         "semanticClosureProven": false
       },
@@ -6443,7 +6444,7 @@
       "observed": {"intrinsicFirstStep": "CELL_TO_PAYLOAD", "intrinsicSecondStep": "ZERO", "ambientProjection": "INERT", "selectedEndProjection": "LAST_VALUE_ONLY_NO_RECURSION", "selectedStartProjection": "FULL_TRAVERSAL_VALUES_3_OF_3", "minimumMissingAuthority": "PAYLOAD_TO_START_PAYLOAD", "a21Runtime": "SOURCE_IDENTICAL", "hostRecursiveSequenceReaderInTraversalRuntime": 0, "sourceRemoved": false, "independentMemories": 2, "productionChanged": false}
     },
     "proofCarriedStartProjectionA47": {
-      "status": "DESIGNED_CI_PENDING",
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A46's required Payload->START(Payload) authority be derived from proof-carried ordered construction evidence without pre-authoring projection edges and without receiver-side target pole reads?",
       "setup": [
         "when a Payload=start->end is constructed, materialize a decomposition witness from explicit START/END role bindings already known to the constructor",
@@ -6475,7 +6476,7 @@
         "A47 does not claim a universal host-free arbitrary-Link pole oracle",
         "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
       ],
-      "consequence": "If exact-head CI is GREEN, A47 reduces the A46 START-projection source to proof-carrying construction evidence: receiver-side semantic projection no longer reads target poles and forged evidence fails through canonical Link identity plus ordinary detachment. The next boundary is A48 construction of the decomposition witness itself.",
+      "consequence": "A47 reduces the A46 START-projection source to proof-carrying construction evidence: receiver-side semantic projection no longer reads target poles, ambient projection Links remain inert, and forged evidence fails through canonical Link identity plus ordinary detachment. The next boundary is A48 construction of the decomposition witness itself.",
       "observed": {
         "preauthoredStartProjectionEdges": 0,
         "receiverTargetPoleReads": 0,
@@ -6483,7 +6484,7 @@
         "decompositionValidation": "A36_CANONICAL_COLLAPSE_PLUS_A21",
         "validDecomposition": "PROJECTION_ADMITTED",
         "forgedDecomposition": "ZERO",
-        "fullTraversal": "EXPECTED_CI_GREEN",
+        "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
         "decompositionWitnessSource": "CONSTRUCTION_TIME_RESIDUAL",
         "runtime": "A21_SOURCE_IDENTICAL",
         "independentMemories": 2,
