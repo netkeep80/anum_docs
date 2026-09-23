@@ -169,7 +169,9 @@
     "directStructuralSchemaExecutionA50Complete": true,
     "templatePairJoinFalsifierA51Designed": true,
     "templatePairJoinFalsifierA51Complete": true,
-    "templatePairJoinFalsifierA51SourceRemoved": false
+    "templatePairJoinFalsifierA51SourceRemoved": false,
+    "applicationNormalFormA52Designed": true,
+    "applicationNormalFormA52Complete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1550,8 +1552,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A52: reconnect the A51 binary-join boundary with the existing A16-F4/A16-F5 line. Source-remove pair-request production so template execution can emit selected K->Q join requests from Link-carried template/decomposition authority rather than host-selected operand frontiers.",
-    "A52 must keep A21 unary detachment unchanged, preserve A51 ambient-pair inertness and forged-decomposition ZERO, and must avoid automatic all-to-all pairing or a host semantic clone recursion.",
+    "A53: source-remove the generic binary application executor exposed by A52. Execute selected K->(Template->Environment) from Link-carried template/decomposition authority without host semantic memory.poles decoding of the application or a direct host memory.ensure(left,right) result constructor.",
+    "A53 must keep external application selection as an input boundary, preserve A52 ambient-application inertness/swapped-environment/foreign-template rejection, and keep unchanged A21 for result continuation.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6706,6 +6708,61 @@
         "pairPositiveControl": "A16_F4_EXACT_FRESH_TARGET",
         "minimumMissingAuthority": "DYNAMIC_BINARY_PAIR_REQUEST",
         "sourceRemoved": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "applicationNormalFormA52": {
+      "status": "DESIGNED_CI_PENDING",
+      "question": "Can A51 pair-request production be removed from semantic host selection by representing the selected binary join as a normal Link application K->(Template->Environment) whose ordered environment bindings and result semantics are carried by the A49 schema?",
+      "setup": [
+        "keep the unchanged A49 StructuralRule schema and admit its proof-carried template decomposition through the unchanged A47 canonical gate",
+        "represent one selected external application as Env=(S->s)->(E->e), Q=Template->Env and K->Q",
+        "execute only the selected application; do not scan operand truth frontiers and do not form a cross-product",
+        "emit contextual result truth K->(s->e) and continue it through source-identical A21"
+      ],
+      "oracle": [
+        "requested pair is absent before selected application execution",
+        "selected application materializes the exact ordered pair",
+        "ambient alternate application remains physically present but semantically inert",
+        "swapped environment rejects",
+        "foreign template rejects",
+        "forged template decomposition remains ZERO",
+        "application result continues through unchanged A21",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "selected input producer has no BundleValue/occurrence scan/for/map/forEach/outgoing/incoming frontier logic",
+        "binary application executor has no operand frontier or allLinks/all-to-all traversal",
+        "A21 runtime remains source-identical to A37"
+      ],
+      "evidenceTest": "ts/test/research-v013-application-normal-form-a52.test.ts",
+      "residualAuthority": [
+        "generic binary application executor remains host-executed and still decodes Template/Environment poles and constructs the result pair",
+        "external choice of which concrete Template application to evaluate remains an irreducible selected-input boundary unless later evidence removes it",
+        "construction schema source/admission, Rule->Contract derivation, A35 prior-publication existence and physical Memory substrate remain open"
+      ],
+      "claimBoundary": [
+        "A52 source-removes semantic pair selection over host operand frontiers and the separate A16-F4 request-producer shape; it does not claim that exogenous application selection disappears",
+        "A52 does not source-remove the generic binary application executor itself",
+        "ambient physical application existence is not execution authority; only the selected contextual K->Q is executed",
+        "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "If exact-head CI is GREEN, A52 reconnects A51 with the A16-F4/F5 line by replacing host-selected operand pairing with a normal selected Link application. The immediate next boundary is A53: make the generic binary application executor itself Link-carried while leaving external application choice as input.",
+      "observed": {
+        "hostSelectedOperandFrontiers": 0,
+        "allToAllPairing": 0,
+        "joinRequest": "SELECTED_APPLICATION_TEMPLATE_TO_BINDING_ENVIRONMENT",
+        "applicationTruth": "K_TO_Q",
+        "externalSelection": "INPUT_BOUNDARY",
+        "resultSemantics": "A49_TEMPLATE_PLUS_ORDERED_ROLE_BINDINGS",
+        "selectedApplication": "EXACT_PAIR",
+        "ambientApplication": "INERT",
+        "swappedEnvironment": "REJECTED",
+        "foreignTemplate": "REJECTED",
+        "forgedDecomposition": "ZERO",
+        "runtime": "A21_SOURCE_IDENTICAL",
+        "genericBinaryApplicationExecutor": "HOST_RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
