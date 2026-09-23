@@ -173,7 +173,7 @@ function defineConstructionSchema(
   const witness=memory.ensure(memory.ensure(startBinding,endBinding),target);
   const body=materializeExactSequence(memory,[target,witness]);
   const dictionary=defineStructuralRoleDictionary(memory,[sRole,eRole]);
-  return Object.freeze({rule:defineStructuralRule(memory,dictionary,body),inputRoles:[sRole,eRole]});
+  return Object.freeze({rule:defineStructuralRule(memory,dictionary,body),inputRoles:[sRole,eRole] as const});
 }
 
 function makePlanRoleFactory(memory:Memory):()=>LinkHandle{
