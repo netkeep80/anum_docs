@@ -66,10 +66,7 @@ function buildFamily(memory: Memory, b: RootBasis, seed: LinkHandle): Family {
   const A2=memory.ensure(at(4),at(5)), A3=memory.ensure(at(6),at(7));
   const A4=memory.ensure(at(8),at(9)), Z=memory.ensure(at(10),at(11));
   const parent=memory.ensure(at(12),at(13)), metaParent=memory.ensure(at(14),at(15));
-  const authority=freezeChain(memory,[
-    memory.ensure(A0,A1),memory.ensure(A0,A2),memory.ensure(A2,A3),
-    memory.ensure(A2,A4),memory.ensure(A3,Z),memory.ensure(A4,Z),
-  ]);
+const authority=freezeChain(memory,[ memory.ensure(A0,A1),memory.ensure(A0,A2),memory.ensure(A2,A3), memory.ensure(A2,A4),memory.ensure(A3,Z),memory.ensure(A4,Z), ]);
   const K=memory.ensure(parent,authority);
   const occurrence0=memory.ensure(memory.root,memory.ensure(K,A0));
   const E0=memory.ensure(K,freezeChain(memory,[occurrence0]));
@@ -77,20 +74,14 @@ function buildFamily(memory: Memory, b: RootBasis, seed: LinkHandle): Family {
   const E3=referenceNextExecution(memory,E2), E4=referenceNextExecution(memory,E3);
   return Object.freeze({metaParent,E0,E1,E2,E3,E4});
 }
-function metaStep(
-  memory: Memory,
-  currentExecutionTruth: LinkHandle,
-): LinkHandle | undefined {
+function metaStep( memory: Memory, currentExecutionTruth: LinkHandle, ): LinkHandle | undefined {
   const truth = memory.poles(currentExecutionTruth);
   const metaContext = truth.start;
   const currentExecution = truth.end;
   const metaContextPoles = memory.poles(metaContext);
   const envelope = metaContextPoles.end;
   const envelopePoles = memory.poles(envelope);
-  assert(
-    envelopePoles.start === envelope && envelopePoles.end !== envelope,
-    "A23 meta-context carries proper START-self-closed producer authority",
-  );
+assert( envelopePoles.start === envelope && envelopePoles.end !== envelope, "A23 meta-context carries proper START-self-closed producer authority", );
   const seen = new Set<LinkHandle>();
   let cursor = envelopePoles.end;
   let selected: LinkHandle | undefined;
@@ -101,8 +92,7 @@ function metaStep(
     const candidate = cell.start;
     const transition = memory.poles(candidate);
     if (transition.start === currentExecution) {
-      assert(selected === undefined,
-        "A23 producer authority is ambiguous for current execution");
+assert(selected === undefined, "A23 producer authority is ambiguous for current execution");
       selected = candidate;
     }
     cursor = cell.end;
@@ -120,17 +110,8 @@ function anonymousRoles(memory:Memory):readonly LinkHandle[]{
 }
 function defineRule(memory:Memory):LinkHandle{
   const r=anonymousRoles(memory);
-  const triples=[
-    [T0,E0,E1],[T1,E1,E2],[T2,E2,E3],[T3,E3,E4],
-    [C3,T3,ROOT],[C2,T2,C3],[C1,T1,C2],[C0,T0,C1],[ENV,ENV,C0],[M,META,ENV],
-  ] as const;
-  return materializeExactSequence(memory,[
-    materializeExactSequence(memory,r),
-    materializeExactSequence(
-      memory,
-      triples.map(([t,s,e])=>materializeExactSequence(memory,[r[t]!,r[s]!,r[e]!])),
-    ),
-  ]);
+const triples=[ [T0,E0,E1],[T1,E1,E2],[T2,E2,E3],[T3,E3,E4], [C3,T3,ROOT],[C2,T2,C3],[C1,T1,C2],[C0,T0,C1],[ENV,ENV,C0],[M,META,ENV], ] as const;
+return materializeExactSequence(memory,[ materializeExactSequence(memory,r), materializeExactSequence( memory, triples.map(([t,s,e])=>materializeExactSequence(memory,[r[t]!,r[s]!,r[e]!])), ), ]);
 }
 function admitted(memory:ReadMemory,rule:LinkHandle,candidate:LinkHandle):boolean{
   try{
@@ -155,11 +136,7 @@ interface Template {
   readonly M:LinkHandle;
   readonly publication:LinkHandle;
 }
-function producerTemplate(
-  memory:Memory,
-  metaParent:LinkHandle,
-  executions:readonly LinkHandle[],
-):Template{
+function producerTemplate( memory:Memory, metaParent:LinkHandle, executions:readonly LinkHandle[], ):Template{
   assert(executions.length>1,"A34 producer template has at least one transition");
   const ts=executions.slice(0,-1).map((e,i)=>memory.ensure(e,executions[i+1]!));
   let tail=memory.root; const cells:LinkHandle[]=[];
@@ -168,27 +145,16 @@ function producerTemplate(
   }
   const env=memory.ensureStartSelfClosed(cells[0]!);
   const meta=memory.ensure(metaParent,env);
-  const candidate=materializeExactSequence(memory,[
-    memory.root,metaParent,...executions,...ts,...[...cells].reverse(),env,meta,
-  ]);
-  return Object.freeze({
-    candidate,M:meta,publication:memory.ensure(candidate,meta),
-  });
+const candidate=materializeExactSequence(memory,[ memory.root,metaParent,...executions,...ts,...[...cells].reverse(),env,meta, ]);
+return Object.freeze({ candidate,M:meta,publication:memory.ensure(candidate,meta), });
 }
-function targetHistoryDescriptor(
-  memory:Memory,
-  metaParent:LinkHandle,
-  executions:readonly LinkHandle[],
-):LinkHandle{
+function targetHistoryDescriptor( memory:Memory, metaParent:LinkHandle, executions:readonly LinkHandle[], ):LinkHandle{
   assert(executions.length>1,"A34 target history has more than one execution root");
   let occurrence=memory.ensure(memory.root,executions[0]!);
   for(let i=1;i<executions.length;i+=1) occurrence=memory.ensure(occurrence,executions[i]!);
   return memory.ensure(metaParent,occurrence);
 }
-function deriveTargetSeeds(
-  memory:Memory,
-  descriptor:LinkHandle,
-):readonly LinkHandle[]{
+function deriveTargetSeeds( memory:Memory, descriptor:LinkHandle, ):readonly LinkHandle[]{
   const dp=memory.poles(descriptor);
   const reversed:LinkHandle[]=[];
   const seenOccurrences=new Set<LinkHandle>(),seenExecutions=new Set<LinkHandle>();
@@ -213,10 +179,7 @@ function deriveTargetSeeds(
   assert(reversed.length>1,"A34 target history nontrivial");
   return Object.freeze([dp.start,...reversed]);
 }
-function deriveProducerSeeds(
-  memory:Memory,
-  candidate:LinkHandle,
-):readonly LinkHandle[]{
+function deriveProducerSeeds( memory:Memory, candidate:LinkHandle, ):readonly LinkHandle[]{
   const values=readExactSequence(memory,candidate).values;
   const members=new Set(values);
   const matches:LinkHandle[][]=[];
@@ -253,11 +216,7 @@ function deriveProducerSeeds(
   same(matches.length,1,"A34 exactly one structural producer seed path");
   return Object.freeze(matches[0]!);
 }
-function derivedSeedMap(
-  memory:Memory,
-  sourceCandidate:LinkHandle,
-  targetDescriptor:LinkHandle,
-):Map<LinkHandle,LinkHandle>|undefined{
+function derivedSeedMap( memory:Memory, sourceCandidate:LinkHandle, targetDescriptor:LinkHandle, ):Map<LinkHandle,LinkHandle>|undefined{
   const source=deriveProducerSeeds(memory,sourceCandidate);
   const target=deriveTargetSeeds(memory,targetDescriptor);
   if(source.length!==target.length)return undefined;
@@ -299,11 +258,7 @@ function sourcePublishable(memory:Memory,candidate:LinkHandle):boolean{
     return publications===1;
   }catch{return false;}
 }
-function publishCatalog(
-  memory:Memory,
-  catalog:LinkHandle,
-  candidate:LinkHandle,
-):LinkHandle{
+function publishCatalog( memory:Memory, catalog:LinkHandle, candidate:LinkHandle, ):LinkHandle{
   assert(sourcePublishable(memory,candidate),"A34 source candidate structurally published before catalog admission");
   const cp=memory.poles(catalog),members=readCatalog(memory,catalog);
   assert(!members.includes(candidate),"A34 duplicate catalog publication rejected");
@@ -311,11 +266,7 @@ function publishCatalog(
   const nextHead=memory.ensure(cp.end,membership);
   return memory.ensure(cp.start,nextHead);
 }
-function runGenerationRequest(
-  memory:Memory,
-  rule:LinkHandle,
-  requestTruth:LinkHandle,
-):Readonly<{
+function runGenerationRequest( memory:Memory, rule:LinkHandle, requestTruth:LinkHandle, ):Readonly<{
   candidate:LinkHandle;
   publication:LinkHandle;
   M:LinkHandle;
@@ -347,10 +298,7 @@ function runGenerationRequest(
   same(candidates.size,1,"A34 compatible templates converge candidate");
   same(publications.size,1,"A34 compatible templates converge publication");
   same(metas.size,1,"A34 compatible templates converge M");
-  return Object.freeze({
-    candidate:[...candidates][0]!,publication:[...publications][0]!,M:[...metas][0]!,
-    compatibleCount,inventoryCount:sources.length,
-  });
+return Object.freeze({ candidate:[...candidates][0]!,publication:[...publications][0]!,M:[...metas][0]!, compatibleCount,inventoryCount:sources.length, });
 }
 function exercise(noise:boolean):void{
   const memory=new Memory(),b=ensureRootBasis(memory);
@@ -363,8 +311,7 @@ function exercise(noise:boolean):void{
   const t1=producerTemplate(memory,source1.metaParent,[source1.E0,source1.E1,source1.E2,source1.E3,source1.E4]);
   const t2=producerTemplate(memory,source2.metaParent,[source2.E0,source2.E1,source2.E2,source2.E3,source2.E4]);
   const t3=producerTemplate(memory,source3.metaParent,[source3.E0,source3.E1,source3.E2,source3.E3]);
-  assert(sourcePublishable(memory,t1.candidate)&&sourcePublishable(memory,t2.candidate)&&sourcePublishable(memory,t3.candidate),
-    "A34 full and shorter source authorities structurally publishable");
+assert(sourcePublishable(memory,t1.candidate)&&sourcePublishable(memory,t2.candidate)&&sourcePublishable(memory,t3.candidate), "A34 full and shorter source authorities structurally publishable");
   const catalogContext=memory.ensure(b.O,b.C);
   let catalog=memory.ensure(catalogContext,memory.root);
   catalog=publishCatalog(memory,catalog,t1.candidate);
@@ -401,15 +348,13 @@ function exercise(noise:boolean):void{
   same(afterPublish.candidate,out.candidate,"A34 added compatible source converges canonically");
   const forged=materializeExactSequence(memory,[memory.root,b.O,b.C]);
   memory.ensure(forged,b.L);
-  expectThrows(()=>{publishCatalog(memory,catalog,forged);},
-    "A34 malformed self-published source rejected");
+expectThrows(()=>{publishCatalog(memory,catalog,forged);}, "A34 malformed self-published source rejected");
   const foreignContext=memory.ensure(b.C,b.U);
   const foreignMembership=memory.ensure(foreignContext,t1.candidate);
   const badHead=memory.ensure(memory.poles(catalog).end,foreignMembership);
   const badCatalog=memory.ensure(catalogContext,badHead);
   const badG=memory.ensure(requestParent,badCatalog),badT=memory.ensure(badG,targetDescriptor);
-  expectThrows(()=>{runGenerationRequest(memory,rule,badT);},
-    "A34 mixed catalog-context membership rejected");
+expectThrows(()=>{runGenerationRequest(memory,rule,badT);}, "A34 mixed catalog-context membership rejected");
 }
 function staticGuards():void{
   const root=resolve(process.cwd(),"..");
@@ -437,23 +382,6 @@ function staticGuards():void{
 }
 function main():void{
   exercise(false);exercise(true);staticGuards();
-  console.log([
-    "MTS v0.13 A34: ADMITTED_SOURCE_CATALOG=GREEN_SCOPED_RESEARCH",
-    "HOST_ENUMERATED_EXACT_SEQUENCE_INVENTORY=REMOVED",
-    "CATALOG_MEMBERSHIP=LINK_NATIVE_PUBLICATION_HISTORY",
-    "CATALOG_PUBLICATION_REQUIRES_STRUCTURAL_SOURCE_PUBLICATION=YES",
-    "CATALOG_SIZE=3 COMPATIBLE_TEMPLATES=2",
-    "AMBIENT_PUBLISHABLE_SOURCE=IGNORED",
-    "LATE_PUBLICATION_CREATES_NEW_CATALOG_VERSION=YES",
-    "OLD_SELECTED_CATALOG_IMMUTABLE=YES",
-    "NEW_CATALOG_SIZE=4 NEW_COMPATIBLE_TEMPLATES=3",
-    "CANONICAL_TARGET_CONVERGENCE=PRESERVED",
-    "MALFORMED_SELF_PUBLISHED_SOURCE=REJECTED MIXED_CATALOG_CONTEXT=REJECTED",
-    "UNCHANGED_A23_META_STEP=YES",
-    "EXTERNAL_CATALOG_PUBLICATION_EVENT=YES EXTERNAL_CATALOG_SELECTION=YES",
-    "SEMANTIC_INFORMATION_ELIMINATED=NOT_CLAIMED",
-    "INDEPENDENT_MEMORIES=2 GLOBAL_E2=OPEN GLOBAL_E3=OPEN",
-    "FULL_SELF_HOSTED=NOT_CLAIMED PRODUCTION_UNCHANGED",
-  ].join(" "));
+console.log([ "MTS v0.13 A34: ADMITTED_SOURCE_CATALOG=GREEN_SCOPED_RESEARCH", "HOST_ENUMERATED_EXACT_SEQUENCE_INVENTORY=REMOVED", "CATALOG_MEMBERSHIP=LINK_NATIVE_PUBLICATION_HISTORY", "CATALOG_PUBLICATION_REQUIRES_STRUCTURAL_SOURCE_PUBLICATION=YES", "CATALOG_SIZE=3 COMPATIBLE_TEMPLATES=2", "AMBIENT_PUBLISHABLE_SOURCE=IGNORED", "LATE_PUBLICATION_CREATES_NEW_CATALOG_VERSION=YES", "OLD_SELECTED_CATALOG_IMMUTABLE=YES", "NEW_CATALOG_SIZE=4 NEW_COMPATIBLE_TEMPLATES=3", "CANONICAL_TARGET_CONVERGENCE=PRESERVED", "MALFORMED_SELF_PUBLISHED_SOURCE=REJECTED MIXED_CATALOG_CONTEXT=REJECTED", "UNCHANGED_A23_META_STEP=YES", "EXTERNAL_CATALOG_PUBLICATION_EVENT=YES EXTERNAL_CATALOG_SELECTION=YES", "SEMANTIC_INFORMATION_ELIMINATED=NOT_CLAIMED", "INDEPENDENT_MEMORIES=2 GLOBAL_E2=OPEN GLOBAL_E3=OPEN", "FULL_SELF_HOSTED=NOT_CLAIMED PRODUCTION_UNCHANGED", ].join(" "));
 }
 main();
