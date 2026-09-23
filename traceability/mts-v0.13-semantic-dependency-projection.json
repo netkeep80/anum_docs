@@ -162,7 +162,9 @@
     "proofCarriedStartProjectionA47Designed": true,
     "proofCarriedStartProjectionA47Complete": true,
     "constructionCarriedDecompositionA48Designed": true,
-    "constructionCarriedDecompositionA48Complete": true
+    "constructionCarriedDecompositionA48Complete": true,
+    "structuralConstructionSchemaA49Designed": true,
+    "structuralConstructionSchemaA49Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1543,8 +1545,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A49: source-remove A48 construction-template authoring. Derive the generic target+decomposition evidence schema from existing Link construction/aspect authority rather than a host-authored frozen plan topology.",
-    "A49 must keep the F5-F4 constructor and A47 receiver unchanged, preserve only-start/end per-instance input, reject forged decomposition evidence, and avoid reintroducing target pole reads or per-target witness code.",
+    "A50: source-remove the A49 host generic StructuralRule->F5-plan compiler. Execute or transduce the Link-carried construction schema itself through existing generic Link authority without JS recursive template compilation.",
+    "A50 must keep A49 StructuralRule schema authority, F5-F4 construction semantics and A47 receiver behavior unchanged; it must not reintroduce a frozen per-schema plan, domain-specific START/END compiler branch, target pole reads or per-target witness code.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -3730,6 +3732,7 @@
         "structuralUnificationUsed": false,
         "canonicalByteUsed": false,
         "independentMemories": 2,
+        "finalCi": "GREEN_6292",
         "productionChanged": false
       }
     },
@@ -6542,6 +6545,58 @@
         "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
         "constructionTemplateAuthoring": "BOOTSTRAP_RESIDUAL",
         "genericClone": "HOST_GENERIC_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "structuralConstructionSchemaA49": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "firstAttemptRed": "CI #6289 stopped at TypeScript before evidence execution because inputRoles inferred as LinkHandle[] instead of the declared readonly [LinkHandle,LinkHandle] tuple.",
+      "redCorrection": "Preserve the two-role schema boundary explicitly with [sRole,eRole] as const; no semantic mechanism changed.",
+      "question": "Can A48 host-authored frozen F5 construction-plan topology be replaced by a Link-carried StructuralRule schema whose body directly states target and decomposition-witness templates over two input roles?",
+      "setup": [
+        "define one StructuralRoleDictionary with only input roles S and E",
+        "carry semantic outputs in StructuralRule body: T=S->E and W=((START_ROLE->S)->(END_ROLE->E))->T",
+        "compile arbitrary role-bearing template topology into an F5 plan with one domain-agnostic recursive compiler",
+        "execute with source-identical F5-F4 constructor and consume generated witness with unchanged A47 receiver"
+      ],
+      "oracle": [
+        "schema stores no F5 seed/constraint/output plan",
+        "per-instance external inputs remain only start/end role bindings",
+        "generic compilation alone does not materialize concrete target",
+        "F5 execution creates exact target+witness and post-hoc target ensure adds zero Links",
+        "START projection remains absent until A47 proof admission",
+        "ambient projections remain inert, valid witnesses restore full A46 traversal and forged witness yields ZERO",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "semantic schema author contains no F5 plan primitives",
+        "generic compiler contains no START/END/witness/target domain semantics",
+        "F5-F4 executor and A21 runtime remain source-identical"
+      ],
+      "evidenceTest": "ts/test/research-v013-structural-construction-schema-a49.test.ts",
+      "residualAuthority": [
+        "generic recursive StructuralRule template-to-F5-plan compiler remains host-executed",
+        "construction StructuralRule/schema source and admission are fixture authority",
+        "Rule->Contract derivation, A35 prior-publication existence and physical Memory substrate remain open"
+      ],
+      "claimBoundary": [
+        "A49 removes exact frozen F5 plan topology as construction semantic authority, not the generic compiler that realizes StructuralRule templates",
+        "A49 does not claim the construction schema itself is self-generated",
+        "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A49 demonstrates that construction semantics can be represented by ordinary StructuralRule role/template authority rather than a privileged frozen F5 plan. The next boundary is A50: remove the host generic rule-to-plan compiler while preserving the same schema and construction behavior.",
+      "observed": {
+        "frozenF5PlanAuthority": 0,
+        "schema": "STRUCTURAL_RULE_ROLE_TEMPLATE",
+        "perInstanceInputs": "START_END_ONLY",
+        "ruleToPlanCompiler": "HOST_GENERIC_RESIDUAL",
+        "f5Constructor": "SOURCE_IDENTICAL",
+        "receiverTargetPoleReads": 0,
+        "ambientProjection": "INERT",
+        "forgedDecomposition": "ZERO",
+        "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
+        "schemaAuthoritySource": "FIXTURE_RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
