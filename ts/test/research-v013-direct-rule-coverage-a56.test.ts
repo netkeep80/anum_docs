@@ -400,7 +400,7 @@ function staticGuards(): void {
     a45.indexOf("function deriveOneCheck("),
     a45.indexOf("\ninterface CoverageState",a45.indexOf("function deriveOneCheck(")),
   );
-  same(o1.replace(/\s+/g,""),o2.replace(/\s+/g,""),"A56 ONE gate source-identical A45/A44");
+  same(o1.replace(/\/\*[\s\S]*?\*\//g,"").replace(/\/\/.*$/gm,"").replace(/\s+/g,""),o2.replace(/\/\*[\s\S]*?\*\//g,"").replace(/\/\/.*$/gm,"").replace(/\s+/g,""),"A56 ONE gate source-identical A45/A44");
   const s1=own.slice(own.indexOf("function step("),own.indexOf("\nfunction frontierTruthEnds(",own.indexOf("function step(")));
   const s2=a45.slice(a45.indexOf("function step("),a45.indexOf("\nfunction frontierTruthEnds(",a45.indexOf("function step(")));
   same(s1.replace(/\s+/g,""),s2.replace(/\s+/g,""),"A56 runtime source-identical A21/A45");
