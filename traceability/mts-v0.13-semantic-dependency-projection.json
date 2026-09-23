@@ -164,7 +164,9 @@
     "constructionCarriedDecompositionA48Designed": true,
     "constructionCarriedDecompositionA48Complete": true,
     "structuralConstructionSchemaA49Designed": true,
-    "structuralConstructionSchemaA49Complete": true
+    "structuralConstructionSchemaA49Complete": true,
+    "directStructuralSchemaExecutionA50Designed": true,
+    "directStructuralSchemaExecutionA50Complete": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1545,8 +1547,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A50: source-remove the A49 host generic StructuralRule->F5-plan compiler. Execute or transduce the Link-carried construction schema itself through existing generic Link authority without JS recursive template compilation.",
-    "A50 must keep A49 StructuralRule schema authority, F5-F4 construction semantics and A47 receiver behavior unchanged; it must not reintroduce a frozen per-schema plan, domain-specific START/END compiler branch, target pole reads or per-target witness code.",
+    "A51: source-remove the generic recursive template-instantiation host law exposed by A50. Execute role-bearing Link templates through Link-carried decomposition/construction authority without a JS recursive clone oracle.",
+    "A51 must keep the A49 StructuralRule schema and A47 receiver unchanged, preserve ZERO on forged decomposition, and must not reintroduce StructuralRule->plan compilation, frozen per-schema execution topology or target pole reads.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6596,6 +6598,57 @@
         "ambientProjection": "INERT",
         "forgedDecomposition": "ZERO",
         "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
+        "schemaAuthoritySource": "FIXTURE_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "directStructuralSchemaExecutionA50": {
+      "status": "DESIGNED_CI_PENDING",
+      "question": "Can A49's host StructuralRule-to-F5-plan compiler be removed by executing the unchanged role/template schema directly through the already-established generic F5-F5 template-instantiation law?",
+      "setup": [
+        "keep the A49 StructuralRule schema unchanged: roles S/E and output templates target+witness",
+        "use concrete S/E bindings directly as the generic template seed mapping",
+        "clone the two Rule-body output templates without materializing any F5 seed/constraint/output plan",
+        "consume generated witness with unchanged A47 canonical projection admission and A21 runtime"
+      ],
+      "oracle": [
+        "target is absent before direct schema execution",
+        "direct execution creates exact target and exact decomposition witness; post-hoc semantic ensures add zero Links",
+        "START projection remains absent until A47 admission",
+        "ambient projection Links remain inert",
+        "valid witnesses restore full A46 traversal and forged swapped decomposition yields ZERO",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "direct executor contains no compileSchemaPlan/executeConstructionPlan/F5 plan carrier",
+        "direct executor contains no START/END/witness/target domain semantic branch",
+        "recursive clone law is source-identical to the existing F5-F5 generic template-instantiation clone",
+        "A21 runtime remains source-identical to A37"
+      ],
+      "evidenceTest": "ts/test/research-v013-direct-structural-schema-a50.test.ts",
+      "residualAuthority": [
+        "generic recursive template-instantiation clone remains host-executed",
+        "construction StructuralRule/schema source and admission remain fixture authority",
+        "Rule->Contract derivation, A35 prior-publication existence and physical Memory substrate remain open"
+      ],
+      "claimBoundary": [
+        "A50 removes the StructuralRule-to-F5-plan compiler and intermediate F5 plan from this construction path, not the generic recursive template-instantiation law",
+        "A50 reuses an existing F5-F5 generic kernel rather than introducing a new construction-specific interpreter",
+        "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "If exact-head CI is GREEN, A50 shows that the A49 Link-carried StructuralRule schema can execute directly without a rule-to-plan compiler or intermediate F5 plan. The remaining immediate execution source is the already-known generic F5-F5 recursive template-instantiation law; A51 should attack that law itself.",
+      "observed": {
+        "structuralRuleToF5PlanCompiler": 0,
+        "intermediateF5Plan": 0,
+        "schema": "A49_STRUCTURAL_RULE_UNCHANGED",
+        "perInstanceInputs": "START_END_ONLY",
+        "genericTemplateExecution": "F5_F5_CLONE_LAW_SOURCE_IDENTICAL",
+        "receiverTargetPoleReads": 0,
+        "ambientProjection": "INERT",
+        "forgedDecomposition": "ZERO",
+        "fullTraversal": "EXPECTED_CI_GREEN",
+        "genericRecursiveTemplateInstantiation": "HOST_RESIDUAL",
         "schemaAuthoritySource": "FIXTURE_RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
