@@ -160,7 +160,9 @@
     "intrinsicSequenceTraversalA46Complete": true,
     "intrinsicSequenceTraversalA46SourceRemoved": false,
     "proofCarriedStartProjectionA47Designed": true,
-    "proofCarriedStartProjectionA47Complete": true
+    "proofCarriedStartProjectionA47Complete": true,
+    "constructionCarriedDecompositionA48Designed": true,
+    "constructionCarriedDecompositionA48Complete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1541,8 +1543,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A48: source-remove the construction-time decomposition-witness producer exposed by A47. Derive or preserve ordered START/END construction evidence as part of generic Link creation authority rather than requiring an external caller to author witness bindings per target.",
-    "A48 must keep A47 receiver target-pole reads at zero, preserve forged-witness ZERO and ambient-projection inertness, and must not replace witness production with memory.poles(target) or a hidden per-target projection edge.",
+    "A49: source-remove A48 construction-template authoring. Derive the generic target+decomposition evidence schema from existing Link construction/aspect authority rather than a host-authored frozen plan topology.",
+    "A49 must keep the F5-F4 constructor and A47 receiver unchanged, preserve only-start/end per-instance input, reject forged decomposition evidence, and avoid reintroducing target pole reads or per-target witness code.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -3610,6 +3612,7 @@
         "specialCaseBranches": 0,
         "candidateSelfExclusion": false,
         "independentMemories": 2,
+        "finalCi": "GREEN_6283",
         "productionChanged": false,
         "semanticClosureProven": false
       },
@@ -6487,6 +6490,58 @@
         "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
         "decompositionWitnessSource": "CONSTRUCTION_TIME_RESIDUAL",
         "runtime": "A21_SOURCE_IDENTICAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
+    },
+    "constructionCarriedDecompositionA48": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can A47 construction-time decomposition-witness authoring be removed from each target by making target and ordered decomposition evidence outputs of one reusable Link-carried generic construction template?",
+      "setup": [
+        "freeze one generic construction template with only START input, END input and fixed decomposition-role seeds",
+        "for each new Payload substitute only concrete start/end seed values through domain-agnostic topology cloning",
+        "execute the resulting plan with source-identical F5-F4 construction executor to create target and decomposition witness together",
+        "feed generated witness unchanged into A47 receiver and canonical projection gate"
+      ],
+      "oracle": [
+        "target is absent before plan execution and plan instantiation alone does not create it",
+        "post-hoc target ensure adds zero Links after generic plan execution",
+        "START projection remains absent after target+witness construction",
+        "ambient unselected projections remain inert",
+        "valid generated witnesses admit START projections and restore full A46 traversal",
+        "forged swapped decomposition yields ZERO",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "per-target sequence builder contains no decomposition-witness authoring or START/END binding construction",
+        "plan instantiator is domain-agnostic and has no target/witness/role semantics",
+        "receiver contains no target pole oracle",
+        "construction executor is source-identical F5-F4 and runtime is source-identical A21/A37"
+      ],
+      "evidenceTest": "ts/test/research-v013-construction-carried-decomposition-a48.test.ts",
+      "residualAuthority": [
+        "the reusable construction template itself is host-authored bootstrap authority",
+        "generic topology substitution remains host-executed",
+        "Rule->Contract derivation, A35 prior-publication existence and physical Memory substrate remain open"
+      ],
+      "claimBoundary": [
+        "A48 removes per-target decomposition-witness production, not authorship of the generic construction template",
+        "per-instance external input is only ordered start/end operands",
+        "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A48 folds decomposition evidence into generic Link creation authority: one frozen plan produces both each new target and its proof-carried START/END witness, while A47 projection admission remains unchanged. Per-target witness authoring is zero; the next boundary is A49 source of the generic construction template itself.",
+      "observed": {
+        "constructionTemplateCount": 1,
+        "perTargetWitnessAuthoring": 0,
+        "perTargetInputs": "START_END_ONLY",
+        "targetAndWitness": "F5_F4_LINK_CARRIED_PLAN",
+        "preauthoredStartProjection": 0,
+        "receiverTargetPoleReads": 0,
+        "ambientProjection": "INERT",
+        "forgedDecomposition": "ZERO",
+        "fullTraversal": "A46_FULL_TRAVERSAL_GREEN",
+        "constructionTemplateAuthoring": "BOOTSTRAP_RESIDUAL",
+        "genericClone": "HOST_GENERIC_RESIDUAL",
         "independentMemories": 2,
         "productionChanged": false
       }
