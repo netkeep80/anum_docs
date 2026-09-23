@@ -141,7 +141,10 @@
     "genericAdmissionProgramInstantiationA38Designed": true,
     "genericAdmissionProgramInstantiationA38Complete": true,
     "bootstrapProducerPlanA39Designed": true,
-    "bootstrapProducerPlanA39Complete": true
+    "bootstrapProducerPlanA39Complete": true,
+    "producerSchemaFalsifierA40Designed": true,
+    "producerSchemaFalsifierA40Complete": true,
+    "producerSchemaFalsifierA40PlanAuthoringSourceRemoved": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1522,8 +1525,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A40: source-remove A39 plan authoring. Derive the producer construction plan itself from Rule/role authority through Link-native generic execution rather than a host-authored topology recipe.",
-    "A40 must keep the F5-F4 construction executor, A36 publication gate, revised A38 target instantiation and A21 runtime unchanged; a candidate must not be able to author the plan that admits its own producer package.",
+    "A41: source-remove ProducerSchema authoring exposed by A40. Derive the reusable plan topology schema itself from pre-existing Rule/role Link authority, without calling the A39 host recipe at schema freeze.",
+    "A41 must keep A40 generic schema instantiation, the F5-F4 construction executor, A36 publication gate, revised A38 target instantiation and A21 runtime unchanged; neither candidate nor schema publisher may smuggle a pre-authored admission plan.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
     "A34 must keep late ambient candidates inert, require explicit admitted publication into the selected catalog authority, and preserve A28-A32 structural source/target derivation.",
@@ -6296,6 +6299,61 @@
         "a38PackageSchema": "COMPATIBLE",
         "independentMemories": 2,
         "ci": "GREEN_6226",
+        "productionChanged": false
+      }
+    },
+    "producerSchemaFalsifierA40": {
+      "status": "EXECUTED_GREEN_FALSIFIER_SOURCE_REMOVAL_RED",
+      "question": "Can A39 construction-Plan authorship be source-removed by deriving each concrete Plan from a reusable Rule-bound ProducerSchema rather than authoring the Plan per candidate?",
+      "setup": [
+        "freeze ProducerSchema=Rule->(TemplateCandidate,TemplatePlan,FreeSeedSequence) before concrete candidate creation",
+        "map only schema-declared free candidate seeds into a later target candidate",
+        "clone TemplatePlan generically with no per-instance role indices, constraint compiler or recipe branch",
+        "execute cloned Plan with source-identical F5-F4 construction executor and validate publication through A36 canonical identity plus unchanged A21"
+      ],
+      "oracle": [
+        "valid later candidate derives an exact A39 Plan and post-hoc A39 author adds zero missing Links",
+        "valid derived Plan publishes an A38-compatible Package whose TemplateE0 reaches ACCEPT",
+        "forged constrained candidate 0/1/2 yields ZERO",
+        "foreign Rule/schema authority rejects and late ambient alternate schema is inert",
+        "two independent Memories agree"
+      ],
+      "falsifierResult": [
+        "per-instance Plan authoring is removed",
+        "but ProducerSchema authoring still calls the A39 host authorReferencePlan recipe",
+        "therefore the semantic source of Plan topology is not removed; it is compressed and lifted into reusable schema authority"
+      ],
+      "antiCheat": [
+        "schema instantiator contains no authorReferencePlan/makeRoles/role-index/triples/constraint-loop or ambient selector",
+        "construction executor remains source-identical F5-F4",
+        "runtime remains source-identical A21/A37",
+        "test explicitly asserts that schema authoring still contains authorReferencePlan so the residual cannot be hidden"
+      ],
+      "residualAuthority": [
+        "ProducerSchema topology is HOST_BOOTSTRAP_RESIDUAL",
+        "generic schema cloning and F5-F4 plan interpretation remain host-executed generic mechanisms",
+        "A35 prior-publication existence authority and A36 scratch construction remain open"
+      ],
+      "evidenceTest": "ts/test/research-v013-producer-schema-a40.test.ts",
+      "claimBoundary": [
+        "GREEN means the falsifier/compression experiment is executable and exact",
+        "A40 plan-authoring source-removal itself is RED and must not be reported as closed",
+        "v0.13 remains unaccepted; E2/E3 and FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A40 shows that concrete A39 Plans can be generated exactly from one reusable Link-carried ProducerSchema, but it also falsifies the stronger source-removal claim because that schema is itself authored by the same host topology recipe. The next boundary is A41: derive the reusable schema topology from pre-existing Rule/role Link authority without pre-authoring an admission Plan.",
+      "observed": {
+        "perInstancePlanAuthoring": 0,
+        "concretePlanSource": "LINK_CARRIED_PRODUCER_SCHEMA",
+        "a39ReferencePlan": "EXACT_ZERO_ADDITIONAL_LINKS",
+        "constructionExecutor": "F5_F4_SOURCE_IDENTICAL",
+        "runtime": "A21_SOURCE_IDENTICAL",
+        "validPackage": "PUBLISHED",
+        "forgedCandidates": "ZERO",
+        "foreignSchemaRule": "REJECTED",
+        "lateAmbientSchema": "INERT",
+        "producerSchemaAuthoring": "HOST_BOOTSTRAP_RESIDUAL",
+        "planAuthoringSourceRemoved": false,
+        "independentMemories": 2,
         "productionChanged": false
       }
     }
