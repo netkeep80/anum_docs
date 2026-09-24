@@ -257,7 +257,8 @@
       "ts/src/v013-relative-pole-context.ts",
       "ts/src/v013-relative-pole-execution.ts",
       "ts/src/v013-formal-aspect-evaluator.ts",
-      "ts/src/v013-structural-execution.ts"
+      "ts/src/v013-structural-execution.ts",
+      "ts/src/v013-grounded-execution.ts"
     ],
     "directDependenciesByFile": {
       "ts/src/v013-hierarchical-carrier.ts": [
@@ -310,6 +311,13 @@
         "memory#ensure",
         "memory#ensureEndSelfClosed",
         "memory#ensureRoot",
+        "memory#ensureStartSelfClosed",
+        "memory#outgoing",
+        "memory#poles"
+      ],
+      "ts/src/v013-grounded-execution.ts": [
+        "./exact-sequence.js#readExactSequence",
+        "memory#ensure",
         "memory#ensureStartSelfClosed",
         "memory#outgoing",
         "memory#poles"
@@ -971,7 +979,7 @@
     "memory#ensureRoot": "bootstrap.root-anchor"
   },
   "metrics": {
-    "candidateKernelFileCount": 6,
+    "candidateKernelFileCount": 7,
     "publicSemanticEntrypointCount": 8,
     "declaredCapabilityCount": 39,
     "ontologyCapabilityCount": 3,
