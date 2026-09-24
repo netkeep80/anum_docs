@@ -247,7 +247,19 @@
     "groundedRelationalExecutionA73hComplete": true,
     "groundedRelationalMatcherSourceRemovedInExperiment": true,
     "groundedRelationalTemplateInstantiatorSourceRemovedInExperiment": true,
-    "genericRuleGroundingSelfHostedProven": false
+    "genericRuleGroundingSelfHostedProven": false,
+    "groundedSelfActivationA73jComplete": true,
+    "groundedSelfActivationScheduleInvarianceA73kComplete": true,
+    "groundedExecutionProductionPromotionA73lComplete": true,
+    "groundedExecutionCandidateBindingA73mComplete": true,
+    "groundedExecutionFloorBoundaryA73nComplete": true,
+    "structuralExecutionCandidateDemotionA73oComplete": true,
+    "selfHostedProgramSemanticsA73pComplete": true,
+    "selfHostedProgramSemanticAuthorityLinkCarried": true,
+    "groundedExecutionProgramSpecificHostDispatchRemoved": true,
+    "groundedExecutionHostRegistrationRemoved": true,
+    "groundedExecutionAntecedentLocalActivationIndexRemoved": true,
+    "groundedExecutionCarrierSubstrateSeparated": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1333,7 +1345,16 @@
     "groundedRelationalExecutionRound2RelationMatches": 1,
     "groundedRelationalExecutionHandoffCount": 2,
     "groundedRelationalExecutionHostRuleMatcherCount": 0,
-    "groundedRelationalExecutionHostTemplateInstantiatorCount": 0
+    "groundedRelationalExecutionHostTemplateInstantiatorCount": 0,
+    "groundedSelfActivationHostRegistrationPassCount": 0,
+    "groundedSelfActivationAntecedentLocalIndexCount": 0,
+    "groundedSelfActivationGeneratorFirstMatchSchedule": "2,0",
+    "groundedSelfActivationTargetFirstMatchSchedule": "1,1,0",
+    "groundedSelfActivationDistinctTestedFixedPointCount": 1,
+    "groundedProgramSpecificHostDispatchCount": 0,
+    "groundedProgramSemanticAuthorityLinkCarriedCount": 1,
+    "candidateExecutionFloorStructuralExecutorCount": 0,
+    "candidateExecutionFloorGroundedExecutorCount": 1
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -8449,6 +8470,56 @@
         "foreignTheoryInert": true,
         "productionChanged": false
       }
+    },
+    "selfHostedProgramSemanticsA73p": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "After reducing the candidate execution floor to the self-activating grounded executor, is program semantic authority Link-carried while the remaining host code is generic A-memory/carrier substrate rather than function/operator-specific semantics?",
+      "executionLaw": [
+        "current Scope carries current Theory",
+        "Theory -> relation is executable authority",
+        "relation = A -> exactSequence(B...)",
+        "current truth = K -> A",
+        "generic reaction materializes K -> B... for every admitted image",
+        "absence of admitted relation preserves K -> A",
+        "admitted empty image removes K -> A from the successor Scope"
+      ],
+      "evidence": [
+        "A73j: generated Theory -> relation becomes executable without host registration or antecedent-local activation index",
+        "A73k: generator-first schedule 2,0 and target-first schedule 1,1,0 converge to the same tested extensional fixed point",
+        "A73l: the self-activating grounded law is promoted into ts/src/v013-grounded-execution.ts",
+        "A73m: grounded execution is bound into the declared candidate kernel and A9 dependency projection",
+        "A73n: grounded execution is runtime-independent from structural Rule/template execution",
+        "A73o: structural execution is demoted from the candidate execution floor and retained as meta-grounding research",
+        "A73p: production grounded execution contains zero program-specific function/operator/Rule/branch dispatch"
+      ],
+      "evidenceTests": [
+        "ts/test/research-v013-self-activating-theory-relations-a73j.test.ts",
+        "ts/test/research-v013-self-activation-schedule-invariance-a73k.test.ts",
+        "ts/test/research-v013-execution-floor-boundary-a73n.test.ts",
+        "ts/test/research-v013-self-hosted-program-semantics-a73p.test.ts"
+      ],
+      "productionModule": "ts/src/v013-grounded-execution.ts",
+      "classification": {
+        "programSemanticAuthority": "LINK_CARRIED_THEORY_RELATIONS",
+        "selfHostedProgramSemantics": "GREEN_SCOPED",
+        "currentScopeRoot": "OPAQUE_AMEMORY_SUBSTRATE",
+        "exactSequenceTraversal": "GENERIC_CARRIER_SUBSTRATE",
+        "generalizedGroundedReaction": "AMEMORY_DYNAMIC_LAW_CANDIDATE",
+        "programSpecificHostDispatchCount": 0,
+        "hostRegistrationPassCount": 0,
+        "antecedentLocalActivationIndexCount": 0,
+        "structuralRuleGrounding": "SEPARATE_META_LAYER",
+        "genericMetaGroundingSelfHosted": false,
+        "fullSelfHostedSystemClaimed": false
+      },
+      "retainedOpenBoundaries": [
+        "minimality/irreducibility of the generalized A-memory dynamic law is not proven",
+        "generic high-level StructuralRule/template grounding into executable grounded relations remains open as a separate meta-layer",
+        "genericRuleGroundingSelfHostedProven remains false",
+        "globalTrustBoundaryComplete remains false",
+        "A72u/A72v hierarchical Result/Context research remains retained and deferred"
+      ],
+      "consequence": "The tested program semantics and executable relation-set self-modification are now Link-carried under one generic grounded relational reaction. This supports SELF_HOSTED_PROGRAM_SEMANTICS=GREEN_SCOPED without claiming that the physical A-memory law, carrier traversal, meta-grounding compiler, or the whole system recursively implements itself."
     }
   }
 }
