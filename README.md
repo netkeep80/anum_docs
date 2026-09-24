@@ -44,9 +44,9 @@ U = C ⟼ O
 <!-- мтс-текущая-проекция:начало -->
 > **Текущий принятый выпуск МТС.** Этот краткий блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.
 >
-> - Текущий: `mts-contract/v0.12` + `mts-conformance/v0.12` — [контракт](contracts/mts-contract-v0.12.json) · [корпус](contracts/mts-conformance-v0.12.json).
-> - Предыдущий неизменяемый: `mts-contract/v0.11` + `mts-conformance/v0.11` — [контракт](contracts/mts-contract-v0.11.json) · [корпус](contracts/mts-conformance-v0.11.json).
-> - Принятие текущего выпуска: [свидетельство](cutover/typescript-c1-acceptance-v0.5.json).
+> - Текущий: `mts-contract/v0.13` + `mts-conformance/v0.13` — [контракт](contracts/mts-contract-v0.13.json) · [корпус](contracts/mts-conformance-v0.13.json).
+> - Предыдущий неизменяемый: `mts-contract/v0.12` + `mts-conformance/v0.12` — [контракт](contracts/mts-contract-v0.12.json) · [корпус](contracts/mts-conformance-v0.12.json).
+> - Принятие текущего выпуска: [свидетельство](cutover/typescript-c1-acceptance-v0.6.json).
 <!-- мтс-текущая-проекция:конец -->
 
 Остенсивные `♂` и `♀` здесь являются первичной теоретической записью форм самозамыкания. Принятый машинный реестр внутренних знаков задаётся нормативной теорией и машинным контрактом; эти уровни не следует смешивать.
