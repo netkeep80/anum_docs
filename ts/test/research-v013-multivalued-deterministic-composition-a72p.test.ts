@@ -498,6 +498,7 @@ function buildFixture(): Fixture {
   defineGroundedFunctionRule(memory, theory, b, at(18), AND, P10, FALSE);
   defineGroundedFunctionRule(memory, theory, b, at(19), AND, P11, TRUE);
 
+  // Separate scope identities make every lifecycle handoff observable.
   const scopeSeeds = Object.freeze([
     at(30), at(31), at(32), at(33), at(34), at(35),
     at(36), at(37), at(38), at(39), at(40), at(41),
