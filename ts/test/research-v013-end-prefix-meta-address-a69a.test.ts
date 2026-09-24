@@ -263,7 +263,7 @@ function exercise(noise: boolean): void {
   same(cAddress.depth, 1, "C=END(R) has one END prefix structurally");
   same(cAddress.body, b.R, "C END-prefix body is R");
 
-  // The address resolver is read-only. Arbitrary meta depth is represented by
+  // The address resolver is read-only. Recursive meta depth is represented by
   // recursive END topology, not a fixed host table of $, $$, $$$, ...
   const beforeRead = memory.linkCount;
   for (let depth = 0; depth <= 4; depth += 1) {
