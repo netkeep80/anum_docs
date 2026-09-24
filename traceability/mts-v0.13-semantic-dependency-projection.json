@@ -2258,7 +2258,8 @@
       "ts/src/v013-relative-form-materialization.ts": "semantic-authority",
       "ts/src/v013-relative-pole-context.ts": "semantic-authority",
       "ts/src/v013-relative-pole-execution.ts": "semantic-authority",
-      "ts/src/value-bundle.ts": "semantic-authority"
+      "ts/src/value-bundle.ts": "semantic-authority",
+      "ts/src/v013-structural-execution.ts": "semantic-authority"
     },
     "decisionOwnerCountsByCategory": {
       "memory-resource-safety": 4,
