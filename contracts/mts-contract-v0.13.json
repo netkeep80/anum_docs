@@ -1075,5 +1075,92 @@
       "FULL_SELF_HOSTED system closure"
     ]
   },
-  "acceptedMtsVersion": "mts-contract/v0.13"
+  "acceptedMtsVersion": "mts-contract/v0.13",
+  "foundation": {
+    "minimalInternalSigns": [
+      "∞",
+      "[",
+      "]",
+      "1",
+      "0",
+      "(",
+      ")",
+      "⟼",
+      ":",
+      "=",
+      "."
+    ],
+    "deferredSigns": [
+      "≡",
+      "♂",
+      "♀",
+      "↑",
+      "{",
+      "}",
+      "¬",
+      "↛"
+    ],
+    "metaOnlySigns": [
+      "∧",
+      "⇔",
+      "⇒",
+      "≠",
+      "→"
+    ],
+    "internalSignCount": 11,
+    "supersededResearchSigns": [
+      "↑"
+    ],
+    "singleFormalArrow": "⟼",
+    "dotIntroduced": true,
+    "dotIsNewRootPrimitive": false,
+    "inheritedInternalSigns": [
+      "∞",
+      "[",
+      "]",
+      "1",
+      "0",
+      "(",
+      ")",
+      "⟼",
+      ":",
+      "=",
+      "."
+    ],
+    "qAlphabet": [
+      "[",
+      "]",
+      "1",
+      "0"
+    ],
+    "qAlphabetCount": 4,
+    "dotIsQAbit": false,
+    "colonIsQAbit": false,
+    "newPrimitiveExpected": false,
+    "minimalSignBasisStatus": "classified-c2-semantic-derived-presentation-cycle-retained"
+  },
+  "rootBasisTarget": {
+    "R": "R = R ⟼ R",
+    "O": "O = O ⟼ R",
+    "C": "C = R ⟼ C",
+    "L": "L = O ⟼ C",
+    "U": "U = C ⟼ O"
+  },
+  "canonicalStringQuaternaryCarrier": {
+    "canonicalUnit": "byte",
+    "byteEnvelope": "[bbbbbbbb]",
+    "bitsPerEnvelope": 8,
+    "bitOrder": "MSB-first",
+    "unicodeNormalization": false,
+    "invalidUtf8CarrierAllowed": true,
+    "runtimeByteIdIsSemanticIdentity": false,
+    "representationEqualsInterpretation": false
+  },
+  "effects": {
+    "findEqualsMaterialize": false,
+    "notFoundImpliesNonExistence": false,
+    "readMayMaterialize": false,
+    "replayMayMaterialize": false,
+    "explicitMaterializationMustReuseSameGroundedForm": true
+  }
 }
