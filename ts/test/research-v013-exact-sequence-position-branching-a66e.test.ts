@@ -63,18 +63,25 @@ function initialPosition(memory:Memory,sequence:LinkHandle):LinkHandle{
 function defineFrame(memory:Memory,parent:LinkHandle,f:LinkHandle,position:LinkHandle):LinkHandle{
   return defineContext(memory,parent,memory.ensure(f,position));
 }
-function advanceOnePosition(memory:Memory,context:LinkHandle,selectedResultFact:LinkHandle):LinkHandle{
+function advanceOnePosition(
+  memory:Memory,
+  context:LinkHandle,
+  selectedResultFact:LinkHandle,
+):LinkHandle{
   const k=readContext(memory,context);
   const state=memory.poles(k.current);
   const f=state.start;
   const position=state.end;
+
   const positionStep=stepPosition(memory,position);
-  assert(!positionStep.doneAfter,"A66e fixture requires next position");
-  assert(positionStep.nextPosition!==undefined,"A66e next position exists");
+  assert(!positionStep.doneAfter,"A66d fixture requires a next ExactSequence position");
+  assert(positionStep.nextPosition!==undefined,"A66d next position exists");
+
   const fact=memory.poles(selectedResultFact);
   const application=memory.poles(fact.start);
   same(application.start,f,"selected result uses current F");
-  same(application.end,positionStep.argument,"selected result uses current argument");
+  same(application.end,positionStep.argument,"selected result uses current ExactSequence argument");
+
   return defineFrame(memory,context,fact.end,positionStep.nextPosition);
 }
 
