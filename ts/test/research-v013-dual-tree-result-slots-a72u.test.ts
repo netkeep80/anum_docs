@@ -483,6 +483,7 @@ function staticGuards(): void {
     "utf8",
   );
 
+  const executable = own.slice(0, own.indexOf("function staticGuards(): void {"));
   for (const forbidden of [
     "Map<LinkHandle,",
     "Set<LinkHandle>",
@@ -491,7 +492,7 @@ function staticGuards(): void {
     "resultVersion",
     "delete(",
   ]) {
-    assert(!own.includes(forbidden),
+    assert(!executable.includes(forbidden),
       "A72u excludes host Result-map/version mutation: " + forbidden);
   }
 
