@@ -149,12 +149,24 @@ function exercise(noise:boolean):void{
   const C=b.C;
   if(noise)memory.ensure(memory.ensure(b.U,b.C),memory.ensure(b.O,b.L));
 
-  const f0=memory.ensure(b.L,b.U);
-  const a1=memory.ensure(b.O,b.C);
-  const a2=memory.ensure(b.C,b.O);
-  const g=memory.ensure(a1,b.L);
-  const y=memory.ensure(a2,b.U);
-  const ambientY=memory.ensure(b.U,a2);
+  const fresh:LinkHandle[]=[];
+  let seed=memory.ensure(b.U,b.L);
+  for(let i=0;i<12;i+=1){
+    seed=memory.ensure(seed,i%2===0?b.O:b.C);
+    fresh.push(seed);
+  }
+  const at=(i:number):LinkHandle=>{
+    const value=fresh[i];
+    assert(value!==undefined,`fresh anchor ${i}`);
+    return value;
+  };
+  const f0=memory.ensure(at(0),at(1));
+  const a1=memory.ensure(at(2),at(3));
+  const a2=memory.ensure(at(4),at(5));
+  const g=memory.ensure(at(6),at(7));
+  const y=memory.ensure(at(8),at(9));
+  const ambientY=memory.ensure(at(10),at(11));
+  assert(y!==ambientY,"selected and ambient final values are distinct");
 
   const sequence=materializeExactSequence(memory,[a1,a2]);
   const p0=initialPosition(memory,sequence);
