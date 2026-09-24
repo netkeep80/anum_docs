@@ -186,17 +186,18 @@ function exercise(noise: boolean): void {
     "malformed fixture first output absent before rewrite");
   assert(memory.find(badK, badB2) === undefined,
     "malformed fixture second output absent before rewrite");
+  const badActive = memory.ensure(badK, badA);
   const beforeMalformed = memory.linkCount;
   expectThrows(
-    () => rewriteSelectedOne(memory, memory.ensure(badK, badA), malformedCarrier),
+    () => rewriteSelectedOne(memory, badActive, malformedCarrier),
     "foreign selected continuation must fail",
   );
   assert(memory.find(badK, badB1) === undefined,
     "malformed selection leaves no partial first output");
   assert(memory.find(badK, badB2) === undefined,
     "malformed selection leaves no partial second output");
-  same(memory.linkCount, beforeMalformed + 1,
-    "only explicit activeTruth fixture materializes during failing call setup");
+  same(memory.linkCount, beforeMalformed,
+    "malformed selected authority performs no output write");
 }
 
 function staticGuards(): void {
