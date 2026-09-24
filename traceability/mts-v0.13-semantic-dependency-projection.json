@@ -230,7 +230,9 @@
     "exactSequenceSelectedPositionA66bDesigned": true,
     "exactSequenceSelectedPositionA66bComplete": true,
     "exactSequenceInitialPositionA66cDesigned": true,
-    "exactSequenceInitialPositionA66cComplete": true
+    "exactSequenceInitialPositionA66cComplete": true,
+    "exactSequencePositionFrameStepA66dDesigned": true,
+    "exactSequencePositionFrameStepA66dComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1611,8 +1613,9 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A66d: starting only from GREEN A66b/A66c, replace the scoped raw Q in exactly one A65a-style context step with position P=Sequence->CurrentCell. Test only one selected result and one child; do not add branching, recursion or cascade.",
-    "A66d must recover current argument and next position structurally from P, keep Sequence identity unchanged, and show the child frame carries Y plus the advanced position without constructing a forward Q chain.",
+    "A66e: starting only from GREEN A66d, replace the scoped one-result step with selected ZERO/ONE/MANY result carriers while keeping frame state F->P and the selected ExactSequence identity unchanged. Do not add recursion yet.",
+    "A66f: only after A66e, re-run A65c-style recursive continuation and local termination with ExactSequence positions instead of raw Q.",
+    "A66g: only after A66f, re-run A65d convergence and add scheduler-order equivalence on the position-based context frontier. Test whether exact child-context sets and final extensional result are invariant under forward/reverse parent scheduling.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
@@ -7890,6 +7893,59 @@
         "malformedAncestry": "REJECTED",
         "productionChanged": false
       }
+    },
+    "exactSequencePositionFrameStepA66d": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "Can one A65a-style context-native execution step use an existing ExactSequence position P=Sequence->CurrentCell instead of the scoped raw forward Q chain, while preserving exact result matching and advancing to a child frame Y->NextPosition?",
+      "setup": [
+        "materialize one two-element canonical ExactSequence [a1,a2]",
+        "derive initial position P0=Sequence->FirstCell using the A66c source-identical initializer",
+        "store context frame state as F->P0",
+        "consume one selected result fact (F->a1)->Y",
+        "advance P0 with the A66b source-identical position step"
+      ],
+      "oracle": [
+        "current argument is recovered structurally from selected ExactSequence position P0",
+        "selected result fact must match exact current F and exact current argument",
+        "child parent is exactly the previous context",
+        "child current state is exactly Y->P1",
+        "P1 preserves the same selected Sequence identity as P0",
+        "for a two-element sequence P1 selects the canonical final ExactSequence cell and exposes a2",
+        "parent frame remains F->P0 unchanged",
+        "wrong-F and wrong-argument result facts reject",
+        "repeated initialization and repeated frame step converge canonically without growth",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-exact-sequence-frame-step-a66d.test.ts",
+      "antiCheat": [
+        "A66d position advancement is source-identical to A66b",
+        "A66d initial-position derivation is source-identical to A66c",
+        "advanceOnePosition uses no forwardCursor, readExactSequence, incoming/outgoing/allLinks, MetaState, currentFn/tos tuple, branching or scheduler",
+        "no duplicated forward suffix Q chain is constructed"
+      ],
+      "classification": {
+        "frameState": "F_TO_P",
+        "position": "SEQUENCE_TO_CURRENT_CELL",
+        "currentArgument": "FROM_SELECTED_EXACT_SEQUENCE_POSITION",
+        "resultFact": "(F_TO_ARG)_TO_Y",
+        "childState": "Y_TO_NEXT_POSITION",
+        "sequenceIdentityAcrossAdvance": "PRESERVED",
+        "forwardQChain": 0,
+        "hostIndex": 0,
+        "hostValueArray": 0,
+        "ambientMemoryEnumeration": 0,
+        "parentContextImmutable": true,
+        "repeatedStepCanonicalNoGrowth": true,
+        "productionChanged": false
+      },
+      "exclusions": [
+        "ZERO/ONE/MANY branching not tested",
+        "recursive continuation/local termination not tested",
+        "convergence/provenance not tested",
+        "scheduler equivalence not tested",
+        "Rule publication/admission not tested"
+      ],
+      "consequence": "A66d removes the temporary raw forward-Q representation from one context-native execution step. The frame can carry F plus a selected position into the already materialized ExactSequence, recover the current argument structurally, validate (F->arg)->Y, and move to a child frame Y->NextPosition while retaining Sequence identity. The next tests should lift A65b-d behavior onto this position-based frame before reconnecting Rule lifecycle authority."
     }
   }
 }
