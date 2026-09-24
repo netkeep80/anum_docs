@@ -459,10 +459,18 @@ function staticGuards():void{
   assert(parity.includes("(lp.end===left)!==(rp.end===right)"),
     "parity law compares END self-incidence bit generically");
 
-  assert(!production.includes("(leftPoles.start === left) !== (rightPoles.start === right)"),
-    "production unifier currently lacks self-incidence parity guard");
-  assert(!production.includes("(lp.start===left)!==(rp.start===right)"),
-    "production unifier does not already contain A71o diagnostic law");
+  const projectionStart=production.indexOf("export function unifyStructuralTemplate(");
+  const projectionEnd=production.indexOf(
+    "\nexport function unifyStructuralRuleTemplate(",
+    projectionStart,
+  );
+  assert(projectionStart>=0&&projectionEnd>projectionStart,
+    "projection unifier source slice");
+  const projection=production.slice(projectionStart,projectionEnd);
+  assert(!projection.includes("(leftPoles.start === left) !== (rightPoles.start === right)"),
+    "projection unifier remains intentionally aspect-insensitive");
+  assert(!projection.includes("(lp.start===left)!==(rp.start===right)"),
+    "projection unifier does not contain A71o diagnostic law");
 
   assert(a71n.includes("RULE_NETWORK_AUTHORING_FROM_TEMPLATE=RESIDUAL"),
     "A71o starts from exact A71n universalization boundary");
