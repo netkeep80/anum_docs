@@ -459,9 +459,17 @@ function staticGuards():void{
     "A71c construction request source-identical A52",
   );
   same(
-    sourceSlice(own,"function executeTemplateApplication(","\nfunction frameFunction("),
-    sourceSlice(a52,"function executeTemplateApplication(","\nfunction executeResultContinuation("),
-    "A71c explicit construction oracle source-identical A52",
+    sourceSlice(
+      own,
+      "function executeTemplateApplication(",
+      "\nfunction frameFunction(",
+    ).replaceAll("ConstructionFrame","Frame"),
+    sourceSlice(
+      a52,
+      "function executeTemplateApplication(",
+      "\nfunction executeResultContinuation(",
+    ),
+    "A71c explicit construction oracle source-equivalent A52 modulo local frame type name",
   );
 
   const natural=sourceSlice(
