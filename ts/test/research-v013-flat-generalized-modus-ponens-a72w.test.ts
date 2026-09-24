@@ -539,8 +539,9 @@ function staticGuards(): void {
     );
   }
 
+  const implementation = own.slice(0, own.indexOf("function staticGuards(): void {"));
   assert(
-    !own.includes('from "../src/state.js"'),
+    !implementation.includes('from "../src/state.js"'),
     "flat witness imports no Context/state interpreter",
   );
 
