@@ -425,24 +425,11 @@ interface PlannedNonFinalLeaf {
   readonly leaf: LinkHandle;
   readonly resultFacts: readonly LinkHandle[];
 }
-
 interface DerivedRoundPlan {
   readonly workset: readonly LinkHandle[];
   readonly nonFinal: readonly PlannedNonFinalLeaf[];
   readonly finalLeaves: readonly LinkHandle[];
 }
-
-/**
- * Freeze one executable round before any Context/END output write.
- *
- * Both membership choices are intrinsic:
- *
- *   workset     <- currentWorkset(C)
- *   resultFacts <- intrinsicApplicationResults(leaf)
- *
- * The only remaining branch is structural: final ExactSequence positions are
- * separated for the already-established A70d final-return boundary.
- */
 function planDerivedRound(
   memory:Memory,
   contextRoot:LinkHandle,
@@ -450,43 +437,30 @@ function planDerivedRound(
   const workset=currentWorkset(memory,contextRoot);
   const nonFinal:PlannedNonFinalLeaf[]=[];
   const finalLeaves:LinkHandle[]=[];
-
   for(const leaf of workset){
     const context=readContext(memory,leaf);
     const state=memory.poles(context.current);
     const positionStep=stepPosition(memory,state.end);
-
     if(positionStep.doneAfter){
       finalLeaves.push(leaf);
       continue;
     }
-
     const intrinsic=intrinsicApplicationResults(memory,leaf);
     nonFinal.push(Object.freeze({
       leaf,
       resultFacts:Object.freeze([...intrinsic.resultFacts]),
     }));
   }
-
   return Object.freeze({
     workset:Object.freeze([...workset]),
     nonFinal:Object.freeze(nonFinal),
     finalLeaves:Object.freeze(finalLeaves),
   });
 }
-
 interface DerivedRoundExecution {
   readonly children: readonly LinkHandle[];
   readonly closures: readonly LinkHandle[];
 }
-
-/**
- * Execute only the frozen intrinsic non-final plans.
- *
- * No adjacency/work discovery happens here. ZERO becomes END(leaf);
- * ONE/MANY are the unchanged A70c continuation derivation + A68 rewrite +
- * START activation.
- */
 function executeFrozenNonFinalPlans(
   memory:Memory,
   plans:readonly PlannedNonFinalLeaf[],
@@ -494,16 +468,13 @@ function executeFrozenNonFinalPlans(
 ):DerivedRoundExecution{
   const selected=[...plans];
   if(order==="reverse")selected.reverse();
-
   const children:LinkHandle[]=[];
   const closures:LinkHandle[]=[];
-
   for(const plan of selected){
     if(plan.resultFacts.length===0){
       closures.push(memory.ensureEndSelfClosed(plan.leaf));
       continue;
     }
-
     const continuations=plan.resultFacts.map(
       (fact)=>deriveFrameContinuation(memory,plan.leaf,fact),
     );
@@ -516,18 +487,15 @@ function executeFrozenNonFinalPlans(
       children.push(memory.ensureStartSelfClosed(output));
     }
   }
-
   return Object.freeze({
     children:Object.freeze(children),
     closures:Object.freeze(closures),
   });
 }
-
 interface DerivedRound {
   readonly plan: DerivedRoundPlan;
   readonly execution: DerivedRoundExecution;
 }
-
 function runDerivedRound(
   memory:Memory,
   contextRoot:LinkHandle,
@@ -537,17 +505,14 @@ function runDerivedRound(
   const execution=executeFrozenNonFinalPlans(memory,plan.nonFinal,order);
   return Object.freeze({plan,execution});
 }
-
 function exerciseIntegrated(noise:boolean):void{
   const memory=new Memory();
   const b=ensureRootBasis(memory);
   const C=b.C;
-
   if(noise){
     memory.ensure(memory.ensure(b.U,b.C),memory.ensure(b.O,b.L));
     memory.ensureEndSelfClosed(memory.ensure(b.L,b.U));
   }
-
   const fresh:LinkHandle[]=[];
   let seed=memory.ensure(b.U,b.L);
   for(let i=0;i<44;i+=1){
@@ -559,21 +524,14 @@ function exerciseIntegrated(noise:boolean):void{
     assert(value!==undefined,`fresh anchor ${i}`);
     return value;
   };
-
   const a1=memory.ensure(at(0),at(1));
   const a2=memory.ensure(at(2),at(3));
   const a3=memory.ensure(at(4),at(5));
   const sequence=materializeExactSequence(memory,[a1,a2,a3]);
-
-  // Materialize all three canonical positions before scheduling so planning is
-  // observational in this fixture even though legacy stepPosition uses ensure
-  // to recover an already-existing next-position identity.
   const p0=initialPosition(memory,sequence);
   const p1=stepPosition(memory,p0).nextPosition!;
   const p2=stepPosition(memory,p1).nextPosition!;
   same(stepPosition(memory,p2).doneAfter,true,"P2 is final");
-
-  // Entry A: MANY at round 1.
   const fA=memory.ensure(at(6),at(7));
   const gA1=memory.ensure(at(8),at(9));
   const gA2=memory.ensure(at(10),at(11));
@@ -581,26 +539,19 @@ function exerciseIntegrated(noise:boolean):void{
   const appA0=memory.ensure(fA,a1);
   const factA1=memory.ensure(appA0,gA1);
   const factA2=memory.ensure(appA0,gA2);
-
-  // Entry B: ZERO at round 1.
   const fB=memory.ensure(at(12),at(13));
   const entryB=defineFrame(memory,C,fB,p0);
   memory.ensure(fB,a1); // application exists, ordinary result set is empty.
-
-  // Entry C: ONE at round 1.
   const fC=memory.ensure(at(14),at(15));
   const gC=memory.ensure(at(16),at(17));
   const entryC=defineFrame(memory,C,fC,p0);
   const appC0=memory.ensure(fC,a1);
   const factC=memory.ensure(appC0,gC);
-
-  // ROUND 1 — derive both scheduler membership and result authority from graph.
   let beforePlan=memory.linkCount;
   const plan1=planDerivedRound(memory,C);
   same(memory.linkCount,beforePlan,"round1 planning writes no Links");
   setSame(plan1.workset,[entryA,entryB,entryC],"round1 derived workset");
   same(plan1.finalLeaves.length,0,"round1 has no final leaves");
-
   const pA=plan1.nonFinal.find(x=>x.leaf===entryA);
   const pB=plan1.nonFinal.find(x=>x.leaf===entryB);
   const pC=plan1.nonFinal.find(x=>x.leaf===entryC);
@@ -609,7 +560,6 @@ function exerciseIntegrated(noise:boolean):void{
   setSame(pA.resultFacts,[factA1,factA2],"round1 A intrinsic MANY");
   setSame(pB.resultFacts,[],"round1 B intrinsic ZERO");
   setSame(pC.resultFacts,[factC],"round1 C intrinsic ONE");
-
   const forward1=executeFrozenNonFinalPlans(memory,plan1.nonFinal,"forward");
   const afterForward1=memory.linkCount;
   const reverse1=executeFrozenNonFinalPlans(memory,plan1.nonFinal,"reverse");
@@ -619,8 +569,6 @@ function exerciseIntegrated(noise:boolean):void{
     "round1 schedule order preserves exact child set");
   setSame(reverse1.closures,forward1.closures,
     "round1 schedule order preserves exact closure set");
-
-  // Compare integrated products to direct A70g replay for each frozen leaf.
   const directA=executeIntrinsicNonFinal(memory,entryA);
   const directB=executeIntrinsicNonFinal(memory,entryB);
   const directC=executeIntrinsicNonFinal(memory,entryC);
@@ -633,7 +581,6 @@ function exerciseIntegrated(noise:boolean):void{
   assert(directB.closure!==undefined,"round1 B direct ZERO closure");
   setSame(forward1.closures,[directB.closure],
     "round1 integrated ZERO closure exact A70g");
-
   const childA1=advanceOnePosition(memory,entryA,factA1);
   const childA2=advanceOnePosition(memory,entryA,factA2);
   const childC=advanceOnePosition(memory,entryC,factC);
@@ -641,21 +588,15 @@ function exerciseIntegrated(noise:boolean):void{
     "round1 topology automatically becomes next workset");
   same(closureOf(memory,entryB),directB.closure,
     "round1 completed B remains structurally closed");
-
-  // Prepare ROUND 2 result adjacency on the now-active child applications.
-  // A1 => ONE, A2 => ZERO, C => MANY.
   const hA1=memory.ensure(at(18),at(19));
   const appA1=memory.ensure(gA1,a2);
   const factAH=memory.ensure(appA1,hA1);
-
   memory.ensure(gA2,a2); // A2 application exists but has ZERO results.
-
   const hC1=memory.ensure(at(20),at(21));
   const hC2=memory.ensure(at(22),at(23));
   const appC1=memory.ensure(gC,a2);
   const factCH1=memory.ensure(appC1,hC1);
   const factCH2=memory.ensure(appC1,hC2);
-
   beforePlan=memory.linkCount;
   const round2=runDerivedRound(memory,C,"reverse");
   same(memory.linkCount>=beforePlan,true,"round2 execution may write outputs");
@@ -669,7 +610,6 @@ function exerciseIntegrated(noise:boolean):void{
   setSame(r2A1.resultFacts,[factAH],"round2 A1 ONE");
   setSame(r2A2.resultFacts,[],"round2 A2 ZERO");
   setSame(r2C.resultFacts,[factCH1,factCH2],"round2 C MANY");
-
   const finalA=advanceOnePosition(memory,childA1,factAH);
   const finalC1=advanceOnePosition(memory,childC,factCH1);
   const finalC2=advanceOnePosition(memory,childC,factCH2);
@@ -677,16 +617,12 @@ function exerciseIntegrated(noise:boolean):void{
     "round2 ONE/ZERO/MANY automatically yields final active leaves");
   assert(closureOf(memory,childA2)!==undefined,
     "round2 ZERO branch A2 is closed");
-
-  // Final application results may already exist, but A70h deliberately does
-  // not consume them. A70d remains the separate final publication boundary.
   const yA=memory.ensure(at(24),at(25));
   const yC1=memory.ensure(at(26),at(27));
   const yC2=memory.ensure(at(28),at(29));
   memory.ensure(memory.ensure(hA1,a3),yA);
   memory.ensure(memory.ensure(hC1,a3),yC1);
   memory.ensure(memory.ensure(hC2,a3),yC2);
-
   beforePlan=memory.linkCount;
   const plan3=planDerivedRound(memory,C);
   same(memory.linkCount,beforePlan,"final-only planning writes no Links");
@@ -696,23 +632,16 @@ function exerciseIntegrated(noise:boolean):void{
     "round3 delegates all final leaves instead of guessing final semantics");
   setSame(plan3.finalLeaves,[finalA,finalC1,finalC2],
     "round3 final leaves identified structurally");
-
   const finalNoop=executeFrozenNonFinalPlans(memory,plan3.nonFinal,"forward");
   setSame(finalNoop.children,[],"final-only round creates no child");
   setSame(finalNoop.closures,[],"final-only round creates no premature END");
   setSame(currentWorkset(memory,C),[finalA,finalC1,finalC2],
     "final leaves remain active for A70d final boundary");
-
-  // Completed entry B remains discoverable but never re-enters workset.
   setSame(discoverEntryContexts(memory,C),[entryA,entryB,entryC],
     "all physical entries remain discoverable");
   assert(!currentWorkset(memory,C).includes(entryB),
     "completed stale B entry never re-executes");
-
-  // No external queue/result selection is needed to reproduce two recursive
-  // non-final rounds with ZERO/ONE/MANY and multiple entries.
 }
-
 function sourceSlice(
   source:string,
   start:string,
@@ -722,7 +651,6 @@ function sourceSlice(
   assert(i>=0&&j>i,`source slice ${start}`);
   return source.slice(i,j).replace(/\s+/g,"");
 }
-
 function staticGuards():void{
   const root=resolve(process.cwd(),"..");
   const own=readFileSync(
@@ -737,7 +665,6 @@ function staticGuards():void{
     join(root,"ts/test/research-v013-intrinsic-application-results-a70g.test.ts"),
     "utf8",
   );
-
   same(
     sourceSlice(
       own,
@@ -751,7 +678,6 @@ function staticGuards():void{
     ),
     "A70h current workset is source-identical A70f",
   );
-
   same(
     sourceSlice(
       own,
@@ -765,7 +691,6 @@ function staticGuards():void{
     ),
     "A70h intrinsic result discovery is source-identical A70g",
   );
-
   same(
     sourceSlice(
       own,
@@ -779,7 +704,6 @@ function staticGuards():void{
     ),
     "A70h direct intrinsic executor reference is source-identical A70g",
   );
-
   const plan=sourceSlice(
     own,
     "function planDerivedRound(",
@@ -800,7 +724,6 @@ function staticGuards():void{
     "A70h planner derives runnable Contexts");
   assert(plan.includes("intrinsicApplicationResults(memory,leaf)"),
     "A70h planner derives per-leaf application values");
-
   const executor=sourceSlice(
     own,
     "function executeFrozenNonFinalPlans(",
@@ -815,12 +738,10 @@ function staticGuards():void{
   assert(executor.includes("memory.ensureEndSelfClosed(plan.leaf)"),
     "A70h ZERO closes exact leaf");
 }
-
 function main():void{
   exerciseIntegrated(false);
   exerciseIntegrated(true);
   staticGuards();
-
   console.log([
     "MTS v0.13 A70h: DERIVED_EXECUTION_CYCLE=GREEN_SCOPED_RESEARCH",
     "WORKSET=A70F_SOURCE_IDENTICAL",
@@ -846,5 +767,4 @@ function main():void{
     "V013_NOT_ACCEPTED PRODUCTION_UNCHANGED",
   ].join(" "));
 }
-
 main();
