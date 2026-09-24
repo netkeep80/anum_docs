@@ -232,7 +232,9 @@
     "exactSequenceInitialPositionA66cDesigned": true,
     "exactSequenceInitialPositionA66cComplete": true,
     "exactSequencePositionFrameStepA66dDesigned": true,
-    "exactSequencePositionFrameStepA66dComplete": true
+    "exactSequencePositionFrameStepA66dComplete": true,
+    "exactSequencePositionBranchingA66eDesigned": true,
+    "exactSequencePositionBranchingA66eComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1613,8 +1615,7 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A66e: starting only from GREEN A66d, replace the scoped one-result step with selected ZERO/ONE/MANY result carriers while keeping frame state F->P and the selected ExactSequence identity unchanged. Do not add recursion yet.",
-    "A66f: only after A66e, re-run A65c-style recursive continuation and local termination with ExactSequence positions instead of raw Q.",
+    "A66f: starting only from GREEN A66e, re-run A65c-style recursive continuation and local termination with ExactSequence positions instead of raw Q. Preserve the A66d atomic step and A66e one-layer branching law source-identically.",
     "A66g: only after A66f, re-run A65d convergence and add scheduler-order equivalence on the position-based context frontier. Test whether exact child-context sets and final extensional result are invariant under forward/reverse parent scheduling.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
@@ -7946,6 +7947,55 @@
         "Rule publication/admission not tested"
       ],
       "consequence": "A66d removes the temporary raw forward-Q representation from one context-native execution step. The frame can carry F plus a selected position into the already materialized ExactSequence, recover the current argument structurally, validate (F->arg)->Y, and move to a child frame Y->NextPosition while retaining Sequence identity. The next tests should lift A65b-d behavior onto this position-based frame before reconnecting Rule lifecycle authority."
+    },
+    "exactSequencePositionBranchingA66e": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "Can the A66d position-based frame lift from one selected result to ZERO/ONE/MANY selected results without reintroducing raw Q, while all sibling contexts preserve the same selected ExactSequence identity and advanced position?",
+      "setup": [
+        "use one two-element ExactSequence and derive P0 with the A66c initializer",
+        "use the A66d source-identical atomic step K.current=F->P",
+        "select zero, one or many result facts for the same current application F->a1",
+        "materialize exactly one layer of sibling child contexts"
+      ],
+      "oracle": [
+        "ZERO selected result facts produce ZERO child contexts",
+        "ONE selected result fact produces the exact A66d child",
+        "MANY selected result facts produce one distinct sibling context per distinct result",
+        "all siblings carry the same advanced position P1",
+        "all siblings retain the exact same selected Sequence identity",
+        "selected result carrier order does not change the extensional child set",
+        "ambient but unselected result facts remain inert",
+        "a malformed selected result makes the branch fail closed",
+        "repeated branching is canonical and adds no Links",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-exact-sequence-position-branching-a66e.test.ts",
+      "antiCheat": [
+        "A66e advanceOnePosition is source-identical to A66d",
+        "branchOnePosition performs exactly one layer and does not recurse",
+        "no scheduler, publication/admission, forwardCursor or MetaState semantics are introduced"
+      ],
+      "classification": {
+        "frameState": "F_TO_P",
+        "atomicStep": "A66D_SOURCE_IDENTICAL",
+        "zeroResults": "ZERO_CHILDREN",
+        "oneResult": "ONE_CHILD",
+        "manyResults": "MANY_SIBLING_CHILDREN",
+        "siblingPosition": "SHARED_NEXT_P",
+        "siblingSequenceIdentity": "PRESERVED",
+        "selectedResultOrder": "EXTENSIONALLY_INERT",
+        "ambientResultFact": "INERT",
+        "malformedSelectedResult": "FAIL_CLOSED",
+        "forwardQChain": 0,
+        "productionChanged": false
+      },
+      "exclusions": [
+        "recursive continuation/local termination not tested",
+        "convergence/provenance not tested",
+        "scheduler equivalence not tested",
+        "Rule publication/admission not tested"
+      ],
+      "consequence": "A66e lifts the A66d ExactSequence-position execution frame from ONE to ZERO/ONE/MANY without changing the atomic child law. Branching is now native to K.current=F->P: each selected result becomes a sibling F while every sibling shares the structurally advanced position into the same immutable Sequence. A66f can therefore test recursive continuation and local termination without returning to the temporary raw-Q carrier."
     }
   }
 }
