@@ -39,6 +39,14 @@ function exercise(noise:boolean):void{
   const A2=memory.ensure(b.U,b.C);
   const B=memory.ensure(A1,A2);
 
+  // Root projection: the same boundary algebra is already the R/O/C/L/U basis.
+  const startR=memory.ensureStartSelfClosed(b.R);
+  const endR=memory.ensureEndSelfClosed(b.R);
+  same(startR,b.O,"START(R)=O");
+  same(endR,b.C,"END(R)=C");
+  same(memory.ensure(startR,endR),b.L,"START(R)->END(R)=L");
+  same(memory.ensure(endR,startR),b.U,"END(R)->START(R)=U");
+
   // -----------------------------------------------------------------------
   // Exact chiral fixed-point identities for arbitrary grounded X/K.
   // -----------------------------------------------------------------------
@@ -172,6 +180,7 @@ function main():void{
     "START_FIXED_POINT=START_X_TO_X_EQ_START_X",
     "END_FIXED_POINT=X_TO_END_X_EQ_END_X",
     "START_END_CHIRALITY=CONFIRMED",
+    "ROOT_BOUNDARY_PROJECTION=START_R_O_END_R_C_DIRECT_L_INVERSE_U",
     "START_SIDE_DETACHMENT_REDUCTION=CONFIRMED",
     "END_SIDE_DETACHMENT_REDUCTION=CONFIRMED",
     "MULTIPLE_TERMINAL_PREDECESSORS=ONE_CANONICAL_END",
