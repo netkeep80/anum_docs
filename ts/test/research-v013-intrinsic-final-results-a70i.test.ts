@@ -146,6 +146,28 @@ function carrier(memory:Memory,values:readonly LinkHandle[]):LinkHandle{
   return materializeExactSequence(memory,values);
 }
 
+interface IntrinsicApplication {
+  readonly f:LinkHandle;
+  readonly argument:LinkHandle;
+  readonly application:LinkHandle|undefined;
+  readonly resultFacts:readonly LinkHandle[];
+}
+
+/**
+ * Read the current application and all of its ordinary PAIR result relations.
+ *
+ *   state       = F -> P
+ *   argument    = arg(P)
+ *   application = F -> argument
+ *   resultFact  = application -> Y
+ *
+ * There is no host-selected result list. For this scoped hypothesis every
+ * ordinary outgoing PAIR from the exact current application is a function
+ * value relation by topology.
+ *
+ * START/END self-incidence around the application is structural syntax/control
+ * and is not classified as an ordinary result fact.
+ */
 function intrinsicApplicationResults(
   memory:Memory,
   context:LinkHandle,
