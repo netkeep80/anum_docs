@@ -1259,12 +1259,11 @@ same(
   "unknown bootstrap primitive status count",
 );
 
-// A9 remains research-only and cannot rewrite accepted v0.12. The stronger A9
-// criteria explicitly reopen candidate readiness until global trust/minimality closes.
-same(contract.accepted, false, "v0.13 remains unaccepted");
+// A9 remains research-only and does not broaden the accepted v0.13 claim. Global trust/minimality remains post-acceptance research.
+same(contract.accepted, true, "v0.13 is accepted while A9 remains research-only");
 same(contract.acceptanceReady, true, "ready state is restored while A9 global gaps remain research-only");
 same(contract.implementation.candidateRuntimeSelectable, false, "candidate remains non-selectable");
-same(contract.candidateState.explicitAuthorAcceptanceRecorded, false, "author acceptance remains pending");
+same(contract.candidateState.explicitAuthorAcceptanceRecorded, true, "author acceptance is recorded");
 
 console.log(
   `MTS v0.13 A9 P1f: ${typedReadOwners.length} typed ReadMemory owners / ${typedReadSites.length} sites, ${decisionCandidates.length} static host-decision candidates, ${typedWriteOwners.length} typed direct Memory write owners; S3 static audit complete, runtime trust closure remains intentionally unclaimed: GREEN.`,
