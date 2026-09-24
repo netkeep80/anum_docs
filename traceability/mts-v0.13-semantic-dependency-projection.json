@@ -242,7 +242,12 @@
     "executionSubstrateInvarianceA73gDesigned": true,
     "executionSubstrateInvarianceA73gComplete": true,
     "currentScopeIdentityExtensionalInvarianceProven": true,
-    "genericRuleMatcherInstantiationSelfHostedProven": false
+    "genericRuleMatcherInstantiationSelfHostedProven": false,
+    "groundedRelationalExecutionA73hDesigned": true,
+    "groundedRelationalExecutionA73hComplete": true,
+    "groundedRelationalMatcherSourceRemovedInExperiment": true,
+    "groundedRelationalTemplateInstantiatorSourceRemovedInExperiment": true,
+    "genericRuleGroundingSelfHostedProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1330,7 +1335,12 @@
     "executionSubstrateInvarianceVariantCount": 3,
     "executionSubstrateMemberOrderVariantCount": 2,
     "executionSubstrateRuleAdmissionOrderVariantCount": 2,
-    "executionSubstrateProgramSemanticDispatchHostCount": 0
+    "executionSubstrateProgramSemanticDispatchHostCount": 0,
+    "groundedRelationalExecutionRound1RelationMatches": 4,
+    "groundedRelationalExecutionRound2RelationMatches": 1,
+    "groundedRelationalExecutionHandoffCount": 2,
+    "groundedRelationalExecutionHostRuleMatcherCount": 0,
+    "groundedRelationalExecutionHostTemplateInstantiatorCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -8371,6 +8381,65 @@
         "handoffsPerRun": 1,
         "reactionsPerRun": 2,
         "hostProgramSemanticDispatchCount": 0,
+        "productionChanged": false
+      }
+    },
+    "groundedRelationalExecutionA73h": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Can generalized fixed-point execution realize zero/one/many relational images and branch-depth skew from exact Link-carried admitted grounded relations without invoking structural Rule matching or output-template instantiation?",
+      "law": "K->A plus admitted A->exactSequence(B_j) yields K->B_j for every output; no admitted A-relation preserves K->A; an admitted empty image removes K->A from the successor Scope.",
+      "setup": [
+        "working Scope carries exact Theory identity and current truth Links",
+        "grounded relation is A -> exactSequence(B...)",
+        "admission is Theory -> relation and A -> admission is the local discovery index",
+        "A -> [B,C] tests one-to-many branching",
+        "B -> [D] creates a deeper continuation while sibling C is already stable",
+        "P -> [E] and Q -> [E] test many-to-one canonical convergence",
+        "ZERO -> [] tests explicit zero-image deletion",
+        "INERT has no admitted relation and tests preservation",
+        "a relation admitted under a foreign Theory tests authority locality"
+      ],
+      "oracle": [
+        "round 1 transforms A to B,C; converges P,Q to one canonical K->E; deletes ZERO; preserves INERT",
+        "round 2 transforms only B to D while C,E,INERT remain stable/current",
+        "round 3 has zero admitted current antecedents and is quiescent with no Scope handoff",
+        "foreign-Theory relation cannot perturb the fixed point",
+        "the reaction kernel contains no unifier, template, Role environment, StructuralRule, opcode, selected Rule/branch, Context reader, or semantic switch",
+        "context preservation is one generic memory.ensure(truth.start, output)",
+        "output multiplicity is carried by the exact-sequence Link carrier, not a fundamental host Set object"
+      ],
+      "evidenceTest": "ts/test/research-v013-grounded-relational-execution-a73h.test.ts",
+      "classification": {
+        "innerExecutionLaw": "GROUNDED_RELATIONAL_COMPOSITION",
+        "currentScopeRoot": "OPAQUE_MUTABLE_AMEMORY_SUBSTRATE_HANDLE_SCOPED",
+        "programSemanticAuthority": "LINK_CARRIED_GROUNDED_RELATIONS",
+        "outputBundleCarrier": "EXACT_SEQUENCE_LINK_CARRIER",
+        "noRelationMeaning": "PRESERVE_CURRENT_TRUTH",
+        "explicitEmptyRelationMeaning": "REMOVE_CURRENT_TRUTH_FROM_SUCCESSOR_SCOPE",
+        "hostRuleMatcherCount": 0,
+        "hostTemplateInstantiatorCount": 0,
+        "hostFunctionOpcodeDispatchCount": 0,
+        "genericRuleGroundingOrSelfGeneration": "OPEN"
+      },
+      "retainedBoundary": [
+        "production v013-structural-execution remains unchanged and still uses structural Rule matching plus template instantiation",
+        "A73h proves a lower matcher-free execution law only after relations are already grounded and admitted",
+        "how generic structural Rules become grounded relations without restoring hidden host semantic authority remains open",
+        "ExactSequence decoding remains a generic host-executed carrier reader in this witness",
+        "A72u/A72v hierarchical Result research remains retained and deferred"
+      ],
+      "consequence": "The semantic inner loop can be reduced to generalized relational composition over already-grounded Link-carried relations. Structural matching and template instantiation are therefore not required by the fixed-point execution law itself; they can be investigated as a separate grounding/meta-execution layer. FULL_SELF_HOSTED is still not claimed until generic grounding/self-generation and remaining carrier-reading mechanics are either source-removed or classified as admissible A-memory substrate.",
+      "observed": {
+        "round1RelationMatches": 4,
+        "round2RelationMatches": 1,
+        "totalNonQuiescentHandoffs": 2,
+        "fixedPointRound": 3,
+        "oneToZero": true,
+        "oneToMany": true,
+        "manyToOneCanonicalConvergence": true,
+        "branchDepthSkew": true,
+        "noRelationPreservation": true,
+        "foreignTheoryInert": true,
         "productionChanged": false
       }
     }
