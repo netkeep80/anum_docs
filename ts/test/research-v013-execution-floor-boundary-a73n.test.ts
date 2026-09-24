@@ -38,8 +38,8 @@ function main(): void {
   const kernelFiles = contract.implementation.candidateKernelFiles as string[];
   assert(kernelFiles.includes("ts/src/v013-grounded-execution.ts"),
     "A73m grounded executor is declared candidate kernel");
-  assert(kernelFiles.includes("ts/src/v013-structural-execution.ts"),
-    "structural executor remains candidate during boundary witness");
+  assert(!kernelFiles.includes("ts/src/v013-structural-execution.ts"),
+    "A73o demotes structural executor from candidate execution floor");
 
   // The self-activating execution floor is source-independent of the older
   // structural Rule/template executor.
@@ -125,7 +125,7 @@ function main(): void {
     "STRUCTURAL_RESEARCH_EVIDENCE=RETAINED",
     "GENERIC_RELATION_GROUNDING_SELF_HOSTED=FALSE",
     "INITIAL_EXECUTABLE_RELATION_NETWORK_BOOTSTRAP=OPEN",
-    "CANDIDATE_SCOPE_DEMOTION=SUPPORTED_NOT_APPLIED",
+    "CANDIDATE_SCOPE_DEMOTION=APPLIED_A73O",
     "A72U_A72V=RETAINED_DEFERRED",
     "FULL_SELF_HOSTED=NOT_YET_CLAIMED",
     "V013_NOT_ACCEPTED",
