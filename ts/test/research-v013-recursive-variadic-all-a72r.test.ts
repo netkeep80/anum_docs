@@ -122,9 +122,7 @@ function unifyRuleTemplate(
     unify(template, claimed);
     return Object.freeze(roles.map((role) => {
       const value = inferred.get(role);
-      if (value === undefined) {
-        throw new StructuralRuleError("missing-role-binding");
-      }
+      if (value === undefined) throw new StructuralRuleError("missing-role-binding");
       return Object.freeze({ role, value });
     }));
   } finally {
