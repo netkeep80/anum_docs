@@ -479,8 +479,11 @@ function staticGuards(): void {
   ]) {
     const start = own.indexOf("function " + functionName + "(");
     assert(start >= 0, functionName + " source slice");
-    const next = own.indexOf("\nfunction ", start + 10);
-    const source = own.slice(start, next >= 0 ? next : own.length);
+    const nextFunction = own.indexOf("\nfunction ", start + 10);
+    const nextInterface = own.indexOf("\ninterface ", start + 10);
+    const candidates = [nextFunction, nextInterface].filter((index) => index >= 0);
+    const end = candidates.length > 0 ? Math.min(...candidates) : own.length;
+    const source = own.slice(start, end);
     for (const forbidden of ["NOT", "AND", "RuleKind", "opcode", "switch("]) {
       assert(!source.includes(forbidden),
         functionName + " remains function-agnostic: " + forbidden);
