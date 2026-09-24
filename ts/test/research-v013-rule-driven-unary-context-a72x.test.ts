@@ -91,10 +91,6 @@ function readWorkingScope(
   return Object.freeze(members);
 }
 
-/**
- * The only mutable host scalar in the witness: one opaque A-memory current root.
- * It has no function, Context, Rule, arity or value knowledge.
- */
 class CurrentScopeCursor {
   constructor(
     private readonly memory: Memory,
@@ -115,15 +111,6 @@ class CurrentScopeCursor {
   }
 }
 
-/**
- * Scoped execution vocabulary built only from Links.
- *
- * CALL(F,X) = O -> (F -> X)
- * DONE(X)   = C -> X
- *
- * O/C here are the already-grounded START/END aspect Links. They are not
- * additional ontology entities and the runtime does not compare them by name.
- */
 function call(
   memory: Memory,
   b: RootBasis,
@@ -141,16 +128,6 @@ function done(
   return memory.ensure(b.C, value);
 }
 
-/**
- * Temporary unary continuation frame:
- *
- *   FRAME(K,F) = START(K -> F)
- *
- * This is exactly a Link-native START-shaped scaffold node. It is distinct
- * from ordinary top-level K by topology and can nest recursively:
- *
- *   FRAME(FRAME(K,F),G)
- */
 function frame(
   memory: Memory,
   parent: LinkHandle,
@@ -188,21 +165,6 @@ interface GroundedRuleImage {
   readonly bindings: readonly StructuralRoleBinding[];
 }
 
-/**
- * Local structural Rule index.
- *
- * Every active truth is:
- *
- *   caller -> endpoint
- *
- * and endpoint begins with a structural trigger key:
- *
- *   CALL ... => endpoint.start = O
- *   DONE ... => endpoint.start = C
- *
- * The kernel does not test O/C identities. It obtains endpoint.start and scans
- * only Rule admissions attached to that exact structural key.
- */
 function discoverTaggedRuleImages(
   memory: Memory,
   theory: LinkHandle,
@@ -294,18 +256,6 @@ interface ScopeReaction {
   readonly rawRuleMatches: number;
 }
 
-/**
- * Same generalized A72w reaction law, now over tagged execution states.
- *
- * Host algorithm:
- *   current Scope -> structural Theory -> current members
- *   -> structurally match every locally triggered Rule
- *   -> instantiate all images
- *   -> canonicalize
- *   -> one atomic opaque Scope handoff
- *
- * There is no host branch for OPEN / CALL / DONE / RESUME.
- */
 function reactTaggedScope(
   memory: Memory,
   cursor: CurrentScopeCursor,
@@ -392,23 +342,6 @@ interface LifecycleRules {
   readonly resume: LinkHandle;
 }
 
-/**
- * Two universal unary lifecycle Rules.
- *
- * OPEN:
- *
- *   K -> CALL(F, CALL(G,X))
- *   ------------------------
- *   FRAME(K,F) -> CALL(G,X)
- *
- * RESUME:
- *
- *   FRAME(K,F) -> DONE(V)
- *   ----------------------
- *   K -> CALL(F,V)
- *
- * Neither Rule contains NOT or any other concrete function identity.
- */
 function defineUnaryLifecycleRules(
   memory: Memory,
   theory: LinkHandle,
