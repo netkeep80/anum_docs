@@ -1004,14 +1004,14 @@
     "packageWideObjectSpecificHostSemanticCount": null,
     "typedReadMemorySiteCount": 508,
     "typedReadMemoryOwnerCount": 233,
-    "staticSemanticDecisionCandidateOwnerCount": 338,
+    "staticSemanticDecisionCandidateOwnerCount": 343,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
     "staticDecisionOwnersByCategory": {
       "memory-resource-safety": 4,
       "mixed-semantic-transport": 60,
       "proof-replay": 91,
       "representation": 55,
-      "semantic-authority": 83,
+      "semantic-authority": 88,
       "tooling": 22,
       "transport-persistence": 23
     },
@@ -2154,7 +2154,7 @@
       "poles": 215,
       "root": 70
     },
-    "decisionCandidateOwnerCount": 338,
+    "decisionCandidateOwnerCount": 343,
     "decisionCandidateFingerprintFNV64": "08d099e570c86a17",
     "decisionSignalCounts": {
       "ambient-mutable-decision": 51,
@@ -2240,7 +2240,8 @@
       "ts/src/v013-relative-pole-context.ts": 3,
       "ts/src/v013-relative-pole-execution.ts": 3,
       "ts/src/v013-structural-execution.ts": 6,
-      "ts/src/value-bundle.ts": 14
+      "ts/src/value-bundle.ts": 14,
+      "ts/src/v013-grounded-execution.ts": 5
     },
     "fileCategoryByFile": {
       "ts/src/anum-carrier.ts": "representation",
@@ -2318,7 +2319,7 @@
       "mixed-semantic-transport": 60,
       "proof-replay": 91,
       "representation": 55,
-      "semantic-authority": 83,
+      "semantic-authority": 88,
       "tooling": 22,
       "transport-persistence": 23
     },
