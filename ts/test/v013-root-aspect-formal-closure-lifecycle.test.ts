@@ -107,7 +107,7 @@ assert(
   ),
   "completed AC10 is no longer an acceptance blocker",
 );
-same(conformance.acceptanceReady, false, "conformance readiness is reopened after stronger criteria");
+same(conformance.acceptanceReady, true, "conformance readiness is restored after A73t");
 same(conformance.accepted, false, "conformance remains unaccepted");
 same(contract.candidateState.readinessAuditComplete, true, "readiness audit is complete");
 same(
