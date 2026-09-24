@@ -162,9 +162,9 @@ function staticGuards(): void {
   );
   assert(own.includes('from "../src/v013-grounded-execution.js"'),
     "A73k consumes production grounded execution module");
-  assert(!own.includes("function discoverTheoryImages("),
+  assert(!own.includes("function discover" + "TheoryImages("),
     "A73k carries no test-local relation discovery");
-  assert(!own.includes("function react(memory:"),
+  assert(!own.includes("function react" + "(memory:"),
     "A73k carries no test-local reaction kernel");
 }
 
