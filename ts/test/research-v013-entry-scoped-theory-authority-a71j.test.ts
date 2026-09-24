@@ -17,18 +17,13 @@ import {
   readStructuralRule,
   StructuralRuleError,
   verifyStructuralRuleAdmission,
-  type StructuralInterpreter,
   type StructuralRoleBinding,
 } from "../src/structural-rule.js";
 import { unifyStructuralTemplate } from "../src/structural-unification.js";
-import {
-  defineContext,
-  readContext,
-  StateError,
-} from "../src/state.js";
+import { defineContext, readContext, StateError } from "../src/state.js";
 
 function assert(c:unknown,m:string):asserts c{
-  if(!c)throw new Error(`v0.13 A71j entry-scoped Theory authority: ${m}`);
+  if(!c)throw new Error(`v0.13 A71j entry meta Theory authority: ${m}`);
 }
 function same<T>(a:T,e:T,m:string):void{
   assert(Object.is(a,e),`${m}: values differ`);
@@ -70,96 +65,19 @@ function definePairConstructionRule(
   return Object.freeze({rule,admission});
 }
 
-function pairRequestContext(
-  memory:Memory,
-  caller:LinkHandle,
-  x:LinkHandle,
-  y:LinkHandle,
-):LinkHandle{
-  const leftTruth=memory.ensure(caller,x);
-  const rightTruth=memory.ensure(caller,y);
-  const request=memory.ensure(leftTruth,rightTruth);
-  const requestTruth=memory.ensure(caller,request);
-  return memory.ensureStartSelfClosed(requestTruth);
-}
-
-/** Source-identical A70i entry-root derivation. */
-function entryRootOf(
-  memory:Memory,
-  contextRoot:LinkHandle,
-  leaf:LinkHandle,
-):LinkHandle{
-  let current=leaf;
-  const seen=new Set<LinkHandle>();
-  while(true){
-    assert(!seen.has(current),"entry-root ancestry cycle");
-    seen.add(current);
-    let state;
-    try{
-      state=readContext(memory,current);
-    }catch(error){
-      if(error instanceof StateError)throw new Error("leaf is outside Context ancestry");
-      throw error;
-    }
-    if(state.parent===contextRoot)return current;
-    current=state.parent;
-  }
-}
-
-interface EntryInterpreterAuthority{
-  readonly entry:LinkHandle;
-  readonly interpreter:LinkHandle;
-  readonly structure:StructuralInterpreter;
-}
-
-/**
- * Derive execution authority from the direct C-rooted entry Context:
- *
- *   E = START(C -> I)
- *   current(E) = I = D -> (G -> T)
- *
- * A nested request supplies only its own Context identity. Entry ancestry
- * supplies I; I supplies exact Theory. No Theory handle is passed by the host.
- */
-function deriveEntryInterpreterAuthority(
-  memory:Memory,
-  contextRoot:LinkHandle,
-  requestContext:LinkHandle,
-):EntryInterpreterAuthority{
-  const entry=entryRootOf(memory,contextRoot,requestContext);
-  const entryState=readContext(memory,entry);
-  same(entryState.parent,contextRoot,"entry authority is direct C child");
-
-  const interpreter=entryState.current;
-  const structure=readStructuralInterpreter(memory,interpreter);
-  return Object.freeze({entry,interpreter,structure});
-}
-
 interface GroundedConstructiveRule{
-  readonly authority:EntryInterpreterAuthority;
   readonly rule:LinkHandle;
   readonly admission:LinkHandle;
   readonly outputTemplate:LinkHandle;
   readonly bindings:readonly StructuralRoleBinding[];
 }
 
-/**
- * A71h discovery with Theory authority removed from the function signature.
- *
- * Candidate Rule inventory comes only from the Theory carried by the entry's
- * StructuralInterpreter.
- */
+/** Source-identical A71h Rule discovery after Theory is known. */
 function discoverGroundedConstructiveRule(
   memory:Memory,
-  contextRoot:LinkHandle,
+  theory:LinkHandle,
   requestContext:LinkHandle,
 ):GroundedConstructiveRule{
-  const authority=deriveEntryInterpreterAuthority(
-    memory,
-    contextRoot,
-    requestContext,
-  );
-
   const state=readContext(memory,requestContext);
   const claimed=memory.poles(requestContext).end;
   const claimedPoles=memory.poles(claimed);
@@ -169,18 +87,13 @@ function discoverGroundedConstructiveRule(
     "active request payload ends at current request");
 
   const matches:GroundedConstructiveRule[]=[];
-  for(const admission of memory.outgoing(authority.structure.theory)){
+  for(const admission of memory.outgoing(theory)){
     const ap=memory.poles(admission);
-    if(ap.start!==authority.structure.theory || ap.end===admission)continue;
+    if(ap.start!==theory || ap.end===admission)continue;
     const ruleHandle=ap.end;
 
     try{
-      verifyStructuralRuleAdmission(
-        memory,
-        authority.structure.theory,
-        ruleHandle,
-        admission,
-      );
+      verifyStructuralRuleAdmission(memory,theory,ruleHandle,admission);
       const rule=readStructuralRule(memory,ruleHandle);
       const dictionary=readStructuralRoleDictionary(memory,rule.roleDictionary);
       const body=memory.poles(rule.body);
@@ -191,7 +104,6 @@ function discoverGroundedConstructiveRule(
         dictionary.roles,
       );
       matches.push(Object.freeze({
-        authority,
         rule:ruleHandle,
         admission,
         outputTemplate:body.end,
@@ -204,7 +116,7 @@ function discoverGroundedConstructiveRule(
   }
 
   assert(matches.length===1,
-    `exactly one entry-Theory Rule must match; got ${matches.length}`);
+    `exactly one admitted constructive Rule must match; got ${matches.length}`);
   return matches[0]!;
 }
 
@@ -251,8 +163,85 @@ function instantiateStructuralTemplate(
   return clone(template);
 }
 
-interface ContextNativeRuleResult{
-  readonly authority:EntryInterpreterAuthority;
+function entryRootOf(
+  memory:Memory,
+  contextRoot:LinkHandle,
+  leaf:LinkHandle,
+):LinkHandle{
+  let current=leaf;
+  const seen=new Set<LinkHandle>();
+
+  while(true){
+    assert(!seen.has(current),"entry-root ancestry cycle");
+    seen.add(current);
+
+    let state;
+    try{
+      state=readContext(memory,current);
+    }catch(error){
+      if(error instanceof StateError)throw new Error("leaf is outside Context ancestry");
+      throw error;
+    }
+
+    if(state.parent===contextRoot)return current;
+    current=state.parent;
+  }
+}
+
+/**
+ * Preserve the A70a entry/call-root state and carry interpreter authority as
+ * separate existing meta topology:
+ *
+ *   entry -> END(I)
+ *   I = D -> (G -> T)
+ *
+ * END is already the established outward/meta direction. The authority relation
+ * is not START-lifted, so it does not become execution growth.
+ */
+function deriveEntryInterpreterAuthority(
+  memory:Memory,
+  contextRoot:LinkHandle,
+  requestContext:LinkHandle,
+):LinkHandle{
+  const entry=entryRootOf(memory,contextRoot,requestContext);
+  const matches:LinkHandle[]=[];
+
+  for(const relation of memory.outgoing(entry)){
+    const rp=memory.poles(relation);
+    if(rp.start!==entry || rp.end===relation)continue;
+
+    const meta=rp.end;
+    const mp=memory.poles(meta);
+    if(mp.end!==meta || mp.start===meta)continue;
+
+    const interpreter=mp.start;
+    try{
+      readStructuralInterpreter(memory,interpreter);
+      matches.push(interpreter);
+    }catch(error){
+      if(error instanceof StructuralRuleError)continue;
+      throw error;
+    }
+  }
+
+  assert(matches.length===1,
+    `exactly one entry END(interpreter) authority required; got ${matches.length}`);
+  return matches[0]!;
+}
+
+function deriveEntryTheoryAuthority(
+  memory:Memory,
+  contextRoot:LinkHandle,
+  requestContext:LinkHandle,
+):LinkHandle{
+  return readStructuralInterpreter(
+    memory,
+    deriveEntryInterpreterAuthority(memory,contextRoot,requestContext),
+  ).theory;
+}
+
+interface ContextGroundedRuleResult{
+  readonly theory:LinkHandle;
   readonly rule:LinkHandle;
   readonly outputTruth:LinkHandle;
   readonly closure:LinkHandle;
@@ -260,17 +249,18 @@ interface ContextNativeRuleResult{
 }
 
 /**
- * Generic Rule subcall with no Theory/interpreter argument.
+ * A71h executor with Theory removed from its external signature.
  */
-function executeContextNativeRuleSubcall(
+function executeContextGroundedRuleSubcall(
   memory:Memory,
   contextRoot:LinkHandle,
   requestContext:LinkHandle,
-):ContextNativeRuleResult{
+):ContextGroundedRuleResult{
   const requestState=readContext(memory,requestContext);
+  const theory=deriveEntryTheoryAuthority(memory,contextRoot,requestContext);
   const grounded=discoverGroundedConstructiveRule(
     memory,
-    contextRoot,
+    theory,
     requestContext,
   );
 
@@ -292,7 +282,7 @@ function executeContextNativeRuleSubcall(
     "Rule continuation current is output value");
 
   return Object.freeze({
-    authority:grounded.authority,
+    theory,
     rule:grounded.rule,
     outputTruth,
     closure,
@@ -300,31 +290,24 @@ function executeContextNativeRuleSubcall(
   });
 }
 
-interface ExecutionTree{
-  readonly interpreter:LinkHandle;
-  readonly entry:LinkHandle;
-  readonly bridge:LinkHandle;
-  readonly caller:LinkHandle;
-}
-function executionTree(
+function attachEntryInterpreterAuthority(
   memory:Memory,
-  contextRoot:LinkHandle,
-  dictionary:LinkHandle,
-  grammar:LinkHandle,
-  theory:LinkHandle,
-  bridgeState:LinkHandle,
-  callerState:LinkHandle,
-):ExecutionTree{
-  const interpreter=defineStructuralInterpreter(
-    memory,
-    dictionary,
-    grammar,
-    theory,
-  );
-  const entry=defineContext(memory,contextRoot,interpreter);
-  const bridge=defineContext(memory,entry,bridgeState);
-  const caller=defineContext(memory,bridge,callerState);
-  return Object.freeze({interpreter,entry,bridge,caller});
+  entry:LinkHandle,
+  interpreter:LinkHandle,
+):LinkHandle{
+  return memory.ensure(entry,memory.ensureEndSelfClosed(interpreter));
+}
+
+function pairRequestContext(
+  memory:Memory,
+  caller:LinkHandle,
+  x:LinkHandle,
+  y:LinkHandle,
+):LinkHandle{
+  const leftTruth=memory.ensure(caller,x);
+  const rightTruth=memory.ensure(caller,y);
+  const request=memory.ensure(leftTruth,rightTruth);
+  return memory.ensureStartSelfClosed(memory.ensure(caller,request));
 }
 
 function exercise(noise:boolean):void{
@@ -335,7 +318,7 @@ function exercise(noise:boolean):void{
 
   const fresh:LinkHandle[]=[];
   let seed=memory.ensure(b.U,b.L);
-  for(let i=0;i<42;i+=1){
+  for(let i=0;i<52;i+=1){
     seed=memory.ensure(seed,i%2===0?b.O:b.C);
     fresh.push(seed);
   }
@@ -347,121 +330,130 @@ function exercise(noise:boolean):void{
 
   const theoryA=memory.ensure(at(0),at(1));
   const theoryB=memory.ensure(at(2),at(3));
-  const ruleA=definePairConstructionRule(memory,theoryA,b,at(4),false);
-  const ruleB=definePairConstructionRule(memory,theoryB,b,at(5),true);
+  const interpreterA=defineStructuralInterpreter(memory,at(4),at(5),theoryA);
+  const interpreterB=defineStructuralInterpreter(memory,at(6),at(7),theoryB);
 
-  // Same request shape, different admitted semantics in two execution trees.
-  // If Theory were selected ambiently/globally this fixture would be ambiguous.
-  const treeA=executionTree(
-    memory,C,at(6),at(7),theoryA,at(8),at(9),
-  );
-  const treeB=executionTree(
-    memory,C,at(10),at(11),theoryB,at(12),at(13),
-  );
+  const ruleA=definePairConstructionRule(memory,theoryA,b,at(8),false);
+  const ruleB=definePairConstructionRule(memory,theoryB,b,at(9),true);
+
+  // Keep direct C-rooted entries as ordinary execution states, preserving A70a.
+  const stateA=memory.ensure(at(10),at(11));
+  const stateB=memory.ensure(at(12),at(13));
+  const entryA=defineContext(memory,C,stateA);
+  const entryB=defineContext(memory,C,stateB);
+
+  attachEntryInterpreterAuthority(memory,entryA,interpreterA);
+  attachEntryInterpreterAuthority(memory,entryB,interpreterB);
+
+  same(readContext(memory,entryA).current,stateA,
+    "entry A execution state is not replaced by interpreter");
+  same(readContext(memory,entryB).current,stateB,
+    "entry B execution state is not replaced by interpreter");
 
   const x=memory.ensure(at(14),at(15));
   const y=memory.ensure(at(16),at(17));
-  assert(memory.find(x,y)===undefined,"A target absent before execution");
-  assert(memory.find(y,x)===undefined,"B target absent before execution");
+  const requestA=pairRequestContext(memory,entryA,x,y);
+  const requestB=pairRequestContext(memory,entryB,x,y);
 
-  const requestA=pairRequestContext(memory,treeA.caller,x,y);
-  const requestB=pairRequestContext(memory,treeB.caller,x,y);
+  const beforeAuthority=memory.linkCount;
+  same(deriveEntryInterpreterAuthority(memory,C,requestA),interpreterA,
+    "request A derives its own entry interpreter");
+  same(deriveEntryTheoryAuthority(memory,C,requestA),theoryA,
+    "request A derives Theory A");
+  same(deriveEntryInterpreterAuthority(memory,C,requestB),interpreterB,
+    "request B derives its own entry interpreter");
+  same(deriveEntryTheoryAuthority(memory,C,requestB),theoryB,
+    "request B derives Theory B");
+  same(memory.linkCount,beforeAuthority,
+    "Theory authority derivation is read-only");
 
-  // Authority is derivable read-only from arbitrary nested request depth.
-  let before=memory.linkCount;
-  const authA=deriveEntryInterpreterAuthority(memory,C,requestA);
-  const authB=deriveEntryInterpreterAuthority(memory,C,requestB);
-  same(memory.linkCount,before,"entry authority derivation read-only");
+  assert(memory.find(x,y)===undefined,"X->Y absent before Theory A");
+  assert(memory.find(y,x)===undefined,"Y->X absent before Theory B");
 
-  same(authA.entry,treeA.entry,"A request resolves own entry");
-  same(authA.interpreter,treeA.interpreter,"A exact interpreter identity");
-  same(authA.structure.theory,theoryA,"A Theory from entry interpreter");
-  same(authB.entry,treeB.entry,"B request resolves own entry");
-  same(authB.interpreter,treeB.interpreter,"B exact interpreter identity");
-  same(authB.structure.theory,theoryB,"B Theory from entry interpreter");
-
-  // Same request topology is classified differently only because each Context
-  // tree carries a different StructuralInterpreter at its C-rooted entry.
-  before=memory.linkCount;
-  const groundedA=discoverGroundedConstructiveRule(memory,C,requestA);
-  const groundedB=discoverGroundedConstructiveRule(memory,C,requestB);
-  same(memory.linkCount,before,"entry-scoped Rule discovery read-only");
-  same(groundedA.rule,ruleA.rule,"A discovers only Theory-A Rule");
-  same(groundedB.rule,ruleB.rule,"B discovers only Theory-B Rule");
-
-  const resultA=executeContextNativeRuleSubcall(memory,C,requestA);
-  same(resultA.rule,ruleA.rule,"A executes Theory-A semantics");
+  const resultA=executeContextGroundedRuleSubcall(memory,C,requestA);
+  same(resultA.theory,theoryA,"A executor uses derived Theory A");
+  same(resultA.rule,ruleA.rule,"A selects only Theory-A Rule");
   const xy=memory.find(x,y);
   assert(xy!==undefined,"Theory A materializes X->Y");
   same(memory.find(y,x),undefined,
-    "Theory-B output not accidentally materialized by A");
-  same(resultA.outputTruth,memory.find(treeA.caller,xy),
-    "A output returns to own caller");
+    "Theory B semantics remain inert during A execution");
 
-  const resultB=executeContextNativeRuleSubcall(memory,C,requestB);
-  same(resultB.rule,ruleB.rule,"B executes Theory-B semantics");
+  const resultB=executeContextGroundedRuleSubcall(memory,C,requestB);
+  same(resultB.theory,theoryB,"B executor uses derived Theory B");
+  same(resultB.rule,ruleB.rule,"B selects only Theory-B Rule");
   const yx=memory.find(y,x);
   assert(yx!==undefined,"Theory B materializes Y->X");
-  same(resultB.outputTruth,memory.find(treeB.caller,yx),
-    "B output returns to own caller");
 
-  // Foreign Theory remains physically present and structurally matching but is
-  // inert to the other execution tree.
-  same(groundedA.authority.structure.theory,theoryA,
-    "A authority never switches to foreign Theory");
-  same(groundedB.authority.structure.theory,theoryB,
-    "B authority never switches to foreign Theory");
+  same(resultA.outputTruth,memory.find(entryA,xy),
+    "A result returns under exact entry A");
+  same(resultB.outputTruth,memory.find(entryB,yx),
+    "B result returns under exact entry B");
 
-  // Zero matching Rule in the entry-selected Theory fails closed.
-  const ordinaryState=memory.ensure(at(18),at(19));
-  const ordinaryRequest=defineContext(memory,treeA.caller,ordinaryState);
-  before=memory.linkCount;
+  // Zero authority fails before semantic writes.
+  const entryZero=defineContext(memory,C,memory.ensure(at(18),at(19)));
+  const xZero=memory.ensure(at(20),at(21));
+  const yZero=memory.ensure(at(22),at(23));
+  const requestZero=pairRequestContext(memory,entryZero,xZero,yZero);
+  const beforeZero=memory.linkCount;
   let zero=false;
   try{
-    executeContextNativeRuleSubcall(memory,C,ordinaryRequest);
+    executeContextGroundedRuleSubcall(memory,C,requestZero);
   }catch{
     zero=true;
   }
-  assert(zero,"zero matching Rule under entry Theory fails closed");
-  same(memory.linkCount,before,"zero-match authority path writes nothing");
+  assert(zero,"zero Theory authority fails closed");
+  same(memory.find(xZero,yZero),undefined,
+    "zero-authority target remains absent");
+  same(memory.linkCount,beforeZero,
+    "zero-authority failure writes nothing");
 
-  // Two matching Rules admitted to the SAME entry Theory are ambiguous.
-  const secondA=definePairConstructionRule(memory,theoryA,b,at(20),true);
-  assert(secondA.rule!==ruleA.rule,"second A Rule distinct");
-
-  const treeA2=executionTree(
-    memory,C,at(21),at(22),theoryA,at(23),at(24),
+  // Multiple entry meta-authorities are ambiguous.
+  const theoryOther=memory.ensure(at(24),at(25));
+  const interpreterOther=defineStructuralInterpreter(
+    memory,at(26),at(27),theoryOther,
   );
-  const x2=memory.ensure(at(25),at(26));
-  const y2=memory.ensure(at(27),at(28));
-  const ambiguousRequest=pairRequestContext(memory,treeA2.caller,x2,y2);
-  assert(memory.find(x2,y2)===undefined,"ambiguous XY target absent");
-  assert(memory.find(y2,x2)===undefined,"ambiguous YX target absent");
+  attachEntryInterpreterAuthority(memory,entryA,interpreterOther);
 
-  before=memory.linkCount;
+  const xAmb=memory.ensure(at(28),at(29));
+  const yAmb=memory.ensure(at(30),at(31));
+  const requestAmb=pairRequestContext(memory,entryA,xAmb,yAmb);
+  const beforeAmb=memory.linkCount;
   let ambiguous=false;
   try{
-    executeContextNativeRuleSubcall(memory,C,ambiguousRequest);
+    executeContextGroundedRuleSubcall(memory,C,requestAmb);
   }catch{
     ambiguous=true;
   }
-  assert(ambiguous,"multiple matching Rules in entry Theory fail closed");
-  same(memory.find(x2,y2),undefined,"ambiguous XY remains absent");
-  same(memory.find(y2,x2),undefined,"ambiguous YX remains absent");
-  same(memory.linkCount,before,"ambiguity performs no semantic writes");
+  assert(ambiguous,"multiple entry Theory authorities fail closed");
+  same(memory.find(xAmb,yAmb),undefined,
+    "ambiguous authority target remains absent");
+  same(memory.linkCount,beforeAmb,
+    "ambiguous authority failure writes nothing");
 
-  // A Context tree rooted outside selected C is not allowed to borrow Theory
-  // authority from an unrelated entry.
-  const foreignEntry=defineContext(memory,b.R,treeA.interpreter);
-  const foreignCaller=defineContext(memory,foreignEntry,at(29));
-  const foreignRequest=pairRequestContext(memory,foreignCaller,x,y);
-  let foreignRejected=false;
+  // Foreign non-C-rooted execution cannot borrow a C-scoped authority.
+  const foreignEntry=defineContext(memory,b.R,memory.ensure(at(32),at(33)));
+  attachEntryInterpreterAuthority(
+    memory,
+    foreignEntry,
+    defineStructuralInterpreter(memory,at(34),at(35),theoryA),
+  );
+  const foreignCaller=defineContext(memory,foreignEntry,memory.ensure(at(36),at(37)));
+  const foreignRequest=pairRequestContext(
+    memory,
+    foreignCaller,
+    memory.ensure(at(38),at(39)),
+    memory.ensure(at(40),at(41)),
+  );
+  const beforeForeign=memory.linkCount;
+  let foreign=false;
   try{
-    deriveEntryInterpreterAuthority(memory,C,foreignRequest);
+    executeContextGroundedRuleSubcall(memory,C,foreignRequest);
   }catch{
-    foreignRejected=true;
+    foreign=true;
   }
-  assert(foreignRejected,"non-C-rooted execution cannot derive C authority");
+  assert(foreign,"non-C-rooted request fails authority derivation");
+  same(memory.linkCount,beforeForeign,
+    "foreign authority failure writes nothing");
 }
 
 function sourceSlice(source:string,start:string,end:string):string{
@@ -488,21 +480,21 @@ function staticGuards():void{
   same(
     sourceSlice(
       own,
-      "function entryRootOf(",
-      "\ninterface EntryInterpreterAuthority",
+      "function discoverGroundedConstructiveRule(",
+      "\n/** Source-identical A71h generic structural-template instantiation.",
     ),
     sourceSlice(
-      a70i,
-      "function entryRootOf(",
-      "\ninterface IntrinsicFinalProducts",
+      a71h,
+      "function discoverGroundedConstructiveRule(",
+      "\n/**\n * Generic recursive structural-template instantiation.",
     ),
-    "A71j entry-root derivation source-identical A70i/A70d",
+    "A71j Rule discovery source-identical A71h",
   );
   same(
     sourceSlice(
       own,
       "function instantiateStructuralTemplate(",
-      "\ninterface ContextNativeRuleResult",
+      "\nfunction entryRootOf(",
     ),
     sourceSlice(
       a71h,
@@ -511,56 +503,57 @@ function staticGuards():void{
     ),
     "A71j output instantiation source-identical A71h",
   );
+  same(
+    sourceSlice(
+      own,
+      "function entryRootOf(",
+      "\n/**\n * Preserve the A70a entry/call-root state",
+    ),
+    sourceSlice(
+      a70i,
+      "function entryRootOf(",
+      "\ninterface IntrinsicFinalProducts",
+    ),
+    "A71j entry-root derivation source-identical A70i/A70d",
+  );
 
   const authority=sourceSlice(
     own,
     "function deriveEntryInterpreterAuthority(",
-    "\ninterface GroundedConstructiveRule",
+    "\nfunction deriveEntryTheoryAuthority(",
   );
   for(const forbidden of [
-    ".outgoing(",
-    ".incoming(",
-    "allLinks(",
-    ".find(",
     ".ensure(",
+    "defineContext(",
     "selectedTheory",
-    "theory:",
+    "expectedTheory",
+    "registry",
+    "allLinks(",
     "switch(",
   ]){
     assert(!authority.includes(forbidden),
-      `A71j entry authority excludes external selector ${forbidden}`);
+      `A71j authority derivation excludes host selector ${forbidden}`);
   }
   assert(authority.includes("entryRootOf(memory,contextRoot,requestContext)"),
-    "authority derives exact C-rooted entry from ancestry");
-  assert(authority.includes("readStructuralInterpreter(memory,interpreter)"),
-    "entry state is interpreted as canonical StructuralInterpreter");
-
-  const discovery=sourceSlice(
-    own,
-    "function discoverGroundedConstructiveRule(",
-    "\n/** Source-identical A71h generic structural-template instantiation.",
-  );
-  assert(!discovery.includes("theory:LinkHandle"),
-    "Rule discovery receives no Theory argument");
-  assert(discovery.includes("authority.structure.theory"),
-    "Rule inventory derives from entry-carried interpreter Theory");
+    "A71j authority is scoped by Context ancestry");
+  assert(authority.includes("memory.outgoing(entry)"),
+    "A71j authority reads only entry-local meta topology");
+  assert(authority.includes("mp.end!==meta||mp.start===meta"),
+    "A71j authority requires proper END meta wrapper");
+  assert(authority.includes("matches.length===1"),
+    "A71j zero/multiple authorities fail closed");
 
   const executor=sourceSlice(
     own,
-    "function executeContextNativeRuleSubcall(",
-    "\ninterface ExecutionTree",
+    "function executeContextGroundedRuleSubcall(",
+    "\nfunction attachEntryInterpreterAuthority(",
   );
-  for(const forbidden of [
-    "theory:LinkHandle",
-    "interpreter:LinkHandle",
-    "selectedTheory",
-    "RuleKind",
-    "opcode",
-    "switch(",
-  ]){
-    assert(!executor.includes(forbidden),
-      `A71j executor excludes external semantic authority ${forbidden}`);
-  }
+  assert(!executor.includes("theory:LinkHandle"),
+    "A71j executor receives no Theory argument");
+  assert(!executor.includes("interpreter:LinkHandle"),
+    "A71j executor receives no interpreter argument");
+  assert(executor.includes("deriveEntryTheoryAuthority("),
+    "A71j executor derives Theory from Context/meta topology");
 }
 
 function main():void{
@@ -569,26 +562,25 @@ function main():void{
   staticGuards();
 
   console.log([
-    "MTS v0.13 A71j: ENTRY_SCOPED_THEORY_AUTHORITY=GREEN_SCOPED_RESEARCH",
-    "ENTRY=START_C_TO_STRUCTURAL_INTERPRETER",
-    "ENTRY_CURRENT=DICTIONARY_TO_GRAMMAR_TO_THEORY",
-    "NESTED_REQUEST_TO_ENTRY=CONTEXT_ANCESTRY",
-    "THEORY_SOURCE=ENTRY_STRUCTURAL_INTERPRETER",
-    "HOST_THEORY_ARGUMENT=0",
-    "HOST_INTERPRETER_ARGUMENT=0",
+    "MTS v0.13 A71j: ENTRY_META_THEORY_AUTHORITY=GREEN_SCOPED_RESEARCH",
+    "ENTRY_EXECUTION_STATE=PRESERVED",
+    "AUTHORITY_TOPOLOGY=ENTRY_TO_END_INTERPRETER",
+    "STRUCTURAL_INTERPRETER=D_TO_G_TO_T",
+    "THEORY_SOURCE=CONTEXT_ANCESTRY_PLUS_ENTRY_META_LINK",
+    "HOST_THEORY_ARGUMENT=0 HOST_INTERPRETER_ARGUMENT=0",
     "GLOBAL_THEORY_REGISTRY=0",
-    "THEORY_MARKER_LINK=0",
-    "TWO_EXECUTION_TREES=TWO_INDEPENDENT_THEORIES",
-    "SAME_REQUEST_SHAPE=DIFFERENT_ENTRY_SCOPED_SEMANTICS",
-    "FOREIGN_THEORY=INERT",
-    "ZERO_MATCH=FAIL_CLOSED MULTIPLE_MATCH=FAIL_CLOSED",
-    "NON_C_ROOTED_CONTEXT=FAIL_CLOSED",
-    "AUTHORITY_DERIVATION=READ_ONLY",
-    "RULE_DISCOVERY=A71H_STYLE_THEORY_ADMISSION_PLUS_UNIFICATION",
+    "USES_EXISTING_END_META_DIRECTION=YES",
+    "TWO_ENTRIES_TWO_THEORIES=INDEPENDENT",
+    "SAME_REQUEST_SHAPE=ENTRY_SCOPED_DIFFERENT_SEMANTICS",
+    "ZERO_AUTHORITY=FAIL_CLOSED MULTIPLE_AUTHORITY=FAIL_CLOSED",
+    "FOREIGN_NON_C_ROOTED_CONTEXT=FAIL_CLOSED",
+    "AUTHORITY_DISCOVERY=READ_ONLY",
+    "A70A_ENTRY_CALL_ROOT_STATE=NOT_REPURPOSED",
+    "NESTED_THEORY_OVERRIDE=NOT_CLAIMED",
     "GENERIC_TEMPLATE_INSTANTIATION=HOST_RESIDUAL",
-    "ENTRY_INTERPRETER_SEED=INPUT_AUTHORITY_BOUNDARY",
+    "INITIAL_META_AUTHORITY_SEED=INPUT_BOUNDARY",
     "RULE_AUTHORSHIP_ADMISSION=RESIDUAL",
-    "NEXT=A71K_INTEGRATE_ENTRY_ENVIRONMENT_WITH_DERIVED_WORKSET",
+    "NEXT=A71K_GENERIC_TEMPLATE_INSTANTIATION_SELF_EXECUTION",
     "FULL_SELF_HOSTED=FALSE",
     "V013_NOT_ACCEPTED PRODUCTION_UNCHANGED",
   ].join(" "));
