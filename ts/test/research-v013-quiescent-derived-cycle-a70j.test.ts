@@ -698,7 +698,7 @@ function staticGuards():void{
     "function runToQuiescence(",
     "\nfunction exercise(",
   );
-  assert(driver.includes("for(let round=0;round<maxRounds;round+=1)"),
+  assert(driver.includes("for(letround=0;round<maxRounds;round+=1)"),
     "host fixed-point iteration remains explicit residual");
 }
 
