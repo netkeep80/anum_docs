@@ -180,7 +180,7 @@ interface FinalProducts{
 }
 
 /**
- * Factor the final position into two independent products:
+ * Factor the final position into two structurally independent products:
  *
  *   publication = callRoot -> Y
  *   closure     = END(leaf)
