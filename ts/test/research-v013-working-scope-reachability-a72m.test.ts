@@ -374,9 +374,13 @@ function staticGuards(): void {
     "utf8",
   );
 
-  assert(!own.includes("class WorkingBundle"),
+  const staticStart = own.indexOf("function staticGuards(): void {");
+  assert(staticStart > 0, "static guard boundary");
+  const implementation = own.slice(0, staticStart);
+
+  assert(!implementation.includes("class WorkingBundle"),
     "external host bundle collection is removed");
-  assert(!own.includes("replaceAtomically("),
+  assert(!implementation.includes("replaceAtomically("),
     "external host bundle replacement primitive is removed");
 
   const kernelStart = own.indexOf("function reactCurrentScope(");
