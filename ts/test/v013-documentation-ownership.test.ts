@@ -23,11 +23,11 @@ const contract = JSON.parse(readFileSync(contractPath, "utf8")) as {
   };
 };
 
-same(contract.status, "candidate", "documentation evidence belongs to candidate");
-same(contract.accepted, false, "documentation convergence does not accept v0.13");
+same(contract.status, "accepted", "documentation evidence belongs to accepted v0.13");
+same(contract.accepted, true, "v0.13 documentation is on the accepted boundary");
 same(contract.acceptanceReady, true, "documentation convergence remains valid in the restored ready lifecycle");
-same(contract.acceptedCurrent?.contract, "mts-contract/v0.12", "accepted contract remains v0.12");
-same(contract.acceptedCurrent?.conformance, "mts-conformance/v0.12", "accepted conformance remains v0.12");
+same(contract.acceptedCurrent?.contract, "mts-contract/v0.13", "accepted contract is v0.13");
+same(contract.acceptedCurrent?.conformance, "mts-conformance/v0.13", "accepted conformance is v0.13");
 
 function compareLawIds(left: string, right: string): number {
   return Number(left.slice(1)) - Number(right.slice(1));
@@ -59,12 +59,12 @@ const expectedOwnerDocument = Object.freeze<Record<string, string>>({
 });
 
 const ownerPattern =
-  /<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>\s*<!--\s*кандидатный нормативный владелец\s*-->/g;
+  /<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>\s*<!--\s*нормативный владелец\s*-->/g;
 const owners = new Map<string, string[]>();
 
 for (const path of allowedDocuments) {
   const source = readFileSync(join(repoRoot, path), "utf8");
-  assert(source.includes("Кандидат v0.13"), `${path}: explicit candidate boundary`);
+  assert(source.includes("MTS v0.13"), `${path}: explicit v0.13 boundary`);
 
   for (const match of source.matchAll(ownerPattern)) {
     const law = match[1]!;
@@ -89,7 +89,7 @@ same(
 );
 same(
   contract.normativeDocumentation?.ownerRule,
-  "one candidate semantic law -> one canonical candidate normative owner anchor",
+  "one accepted semantic law -> one canonical accepted normative owner anchor",
   "contract declares the ownership invariant",
 );
 
@@ -101,5 +101,5 @@ for (const law of laws) {
 }
 
 console.log(
-  "MTS v0.13 R7d documentation ownership: L1-L13 each have exactly one canonical candidate normative owner; accepted current remains v0.12: GREEN.",
+  "MTS v0.13 R7d documentation ownership: L1-L13 each have exactly one canonical accepted normative owner; accepted current is v0.13: GREEN.",
 );
