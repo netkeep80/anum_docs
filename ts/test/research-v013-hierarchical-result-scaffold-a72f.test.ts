@@ -414,12 +414,22 @@ function runCase(
   // Resolve the three nested NOT calls, but stop when the resumed top-level
   // PACK call becomes current. Its structural output is the actual hierarchy.
   let collapseCount = 0;
+  let dynamicHierarchyAbsentBeforePack = false;
   while (readContext(memory, current).parent !== rootParent) {
     const beforeDepth = contextDepthTo(memory, current, rootParent);
     const resumed = collapseOneLevel(memory, current, working);
     scaffold.add(resumed);
-    same(contextDepthTo(memory, resumed, rootParent), beforeDepth - 1,
+    const resumedDepth = contextDepthTo(memory, resumed, rootParent);
+    same(resumedDepth, beforeDepth - 1,
       label + " collapse removes one scaffold level");
+
+    if (resumedDepth === 1) {
+      same(readContext(memory, resumed).current, memory.ensure(PACK, expectedScalar),
+        label + " top-level resumed call is PACK(runtimeScalar)");
+      same(memory.find(expectedScalar, MARK), undefined,
+        label + " grounded hierarchy payload is absent before PACK fires");
+      dynamicHierarchyAbsentBeforePack = true;
+    }
 
     current = reactSingleActiveContext(memory, theory, working);
     scaffold.add(current);
@@ -427,6 +437,8 @@ function runCase(
   }
 
   same(collapseCount, 3, label + " collapses three nested levels");
+  assert(dynamicHierarchyAbsentBeforePack,
+    label + " observed hierarchy absence immediately before PACK reaction");
 
   // After three NOT evaluations, PACK has fired at top level. Its output is a
   // hierarchical value TAG -> (scalar -> MARK).
@@ -440,6 +452,10 @@ function runCase(
   const innerPoles = memory.poles(resultPoles.end);
   same(innerPoles.start, expectedScalar, label + " hierarchy embeds runtime scalar");
   same(innerPoles.end, MARK, label + " hierarchy carries stable marker");
+  same(memory.find(expectedScalar, MARK), resultPoles.end,
+    label + " runtime-bound inner Result Link was materialized by PACK");
+  same(memory.find(TAG, resultPoles.end), resultValue,
+    label + " runtime-bound outer Result Link was materialized by PACK");
 
   // The grounded hierarchy was not the Rule's pre-grounded answer. It is the
   // instantiated result of binding X to the runtime scalar.
