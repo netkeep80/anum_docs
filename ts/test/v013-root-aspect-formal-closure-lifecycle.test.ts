@@ -69,7 +69,7 @@ same(quartet.derivedControl.isFifthFormalOperator, false, "U is not fifth FORMAL
 same(contract.acceptanceCriteria.AC10, "green", "AC10 is green");
 same(contract.candidateState.rootFormalDialectComplete, true, "root FORMAL dialect complete");
 same(contract.candidateState.acceptanceCriteriaComplete, true, "acceptance criteria complete");
-same(contract.acceptanceReady, false, "candidate readiness is reopened after stronger criteria");
+same(contract.acceptanceReady, true, "candidate readiness is restored after A73t");
 same(contract.accepted, false, "candidate remains unaccepted");
 
 const ac10 = conformance.acceptanceCriteriaEvidence.AC10;
@@ -107,7 +107,7 @@ assert(
   ),
   "completed AC10 is no longer an acceptance blocker",
 );
-same(conformance.acceptanceReady, false, "conformance readiness is reopened after stronger criteria");
+same(conformance.acceptanceReady, true, "conformance readiness is restored after A73t");
 same(conformance.accepted, false, "conformance remains unaccepted");
 same(contract.candidateState.readinessAuditComplete, true, "readiness audit is complete");
 same(

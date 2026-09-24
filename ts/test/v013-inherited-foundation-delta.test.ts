@@ -81,12 +81,12 @@ same(contract13.cycleSemanticsBoundary.finiteGroundingDoesNotMeanAcyclicOntology
 same(contract13.cycleSemanticsBoundary.currentCanonicalTreeCarrierSupportsGraphCycles, false, "tree carrier graph-cycle limitation explicit");
 
 same(contract13.candidateState.functionalParityAuditComplete, true, "functional parity complete");
-same(contract13.candidateState.foundationSuperiorityAuditComplete, false, "foundation superiority reopened");
+same(contract13.candidateState.foundationSuperiorityAuditComplete, true, "foundation superiority complete for declared v0.13 scope");
 same(conformance13.inheritedFoundationParity.status, "green-complete", "inherited parity status");
 same(conformance13.inheritedFoundationParity.regressionCount, 0, "inherited regression count");
-same(conformance13.foundationSuperiorityAudit.status, "reopened-a9-selfproof", "superiority status reopened");
+same(conformance13.foundationSuperiorityAudit.status, "green-complete-declared-v013-scope", "superiority complete for declared v0.13 scope");
 same(contract13.accepted, false, "candidate remains unaccepted");
-same(contract13.acceptanceReady, false, "candidate readiness is reopened after stronger audit criteria");
+same(contract13.acceptanceReady, true, "candidate readiness is restored after A73t scoped reclassification");
 same(contract13.candidateState.explicitAuthorAcceptanceRecorded, false, "author acceptance remains absent");
 
-console.log("MTS v0.13 inherited foundation A5c evidence remains GREEN and zero-regression, while the global superiority/readiness conclusion is reopened for A9 minimality/trust + self-proof.");
+console.log("MTS v0.13 inherited foundation A5c evidence remains GREEN and zero-regression; readiness is restored for the declared v0.13 scope while A9 global minimality/trust + self-proof remain non-blocking research.");

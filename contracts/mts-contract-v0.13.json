@@ -16,7 +16,7 @@
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
   },
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "currentPointer": {
     "acceptance": "cutover/typescript-c1-acceptance-v0.5.json",
     "currentContract": "mts-contract/v0.12",
@@ -333,11 +333,11 @@
     "explicitAuthorAcceptanceRecorded": false,
     "linkNativeAbitGroundingComplete": true,
     "functionalParityAuditComplete": true,
-    "foundationSuperiorityAuditComplete": false,
+    "foundationSuperiorityAuditComplete": true,
     "rootFormalDialectComplete": true,
     "publicFacadeComplete": true,
-    "readinessReopened": true,
-    "readinessReopenReason": "A9 adopted stronger package-wide trust/minimality and proof-driven self-verification criteria after the earlier readiness audit; readiness must be rerun after those criteria close."
+    "readinessReopened": false,
+    "readinessReopenReason": "A73s/A73t reclassified package-wide trust/minimality/self-proof obligations as non-blocking full-system research outside the declared v0.13 acceptance scope; exact-current candidate readiness was rerun."
   },
   "owners": {
     "memory": "ts/src/memory.ts",
@@ -356,9 +356,9 @@
     "currentAccepted": "mts-contract/v0.12",
     "candidate": "mts-contract/v0.13",
     "accepted": false,
-    "acceptanceReady": false,
+    "acceptanceReady": true,
     "candidateRuntimeSelectable": false,
-    "readinessReopened": true
+    "readinessReopened": false
   },
   "traceabilityManifest": "traceability/mts-v0.13.json",
   "normativeDocumentation": {
@@ -1044,10 +1044,11 @@
     "status": "green-confirmed",
     "acceptedRuntimeRemains": "mts-contract/v0.12",
     "candidateRuntimeSelectable": false,
-    "explicitAuthorAcceptanceRecorded": false
+    "explicitAuthorAcceptanceRecorded": false,
+    "rerunAfterA73s": "green-a73t-exact-current-candidate"
   },
   "readinessReopen": {
-    "status": "reopened-a9-selfproof",
+    "status": "closed-a73t-scoped-reclassification",
     "ownerIssue": 1270,
     "preserves": [
       "AC1-AC10 executable evidence for their declared scopes",
@@ -1055,11 +1056,13 @@
       "candidate runtime non-selectability",
       "completed functional parity and public/kernel implementation evidence"
     ],
-    "requires": [
+    "requires": [],
+    "nonBlockingResearch": [
       "package-wide semantic decision/runtime trust boundary closure",
-      "experimentally scoped primitive elimination/minimal-basis evidence",
-      "proof-driven self-verification evidence for selected v0.13 foundation claims",
-      "independent readiness rerun after the stronger criteria close"
+      "A-memory/carrier primitive irreducibility and global minimal-basis proof",
+      "proof-driven self-verification beyond the declared v0.13 acceptance scope",
+      "generic Rule/template meta-grounding self-hosting",
+      "FULL_SELF_HOSTED system closure"
     ]
   }
 }

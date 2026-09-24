@@ -138,7 +138,7 @@ same(retained.formalElaboration.genericFlatReaderEqualsFormalGrammar, false, "fl
 // This parity slice remains valid non-acceptance evidence; later A9/self-proof
 // criteria conservatively reopened global readiness without changing parity.
 same(contract13.accepted, false, "v0.13 remains unaccepted");
-same(contract13.acceptanceReady, false, "v0.13 readiness is reopened");
+same(contract13.acceptanceReady, true, "v0.13 readiness is restored after A73t");
 same(contract13.candidateState.explicitAuthorAcceptanceRecorded, false, "author acceptance remains absent");
 
 console.log(

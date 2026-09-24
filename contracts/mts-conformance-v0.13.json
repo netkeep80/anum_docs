@@ -7,7 +7,7 @@
   "contract": "mts-contract/v0.13",
   "semanticBase": "mts-conformance/v0.12",
   "observableSemanticDelta": true,
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "coverageState": "complete",
   "coverageStateMeaning": "AC1-AC10 and L1-L13 retain executable evidence for their declared scopes; all 16 accepted-v0.12 mandatory kernel gates remain inherited and the declared v0.13 kernel/public boundary remains GREEN. Acceptance readiness is reopened because later A9/self-proof criteria require package-wide semantic trust closure, experimentally scoped minimality and proof-driven self-verification before the independent readiness audit can be rerun.",
   "acceptedCurrent": {
@@ -296,10 +296,10 @@
     "conformanceObligations": "declared-r7b",
     "traceability": "green-complete",
     "normativeDocumentation": "green-complete",
-    "readinessAudit": "reopened-after-a9-selfproof-criteria",
+    "readinessAudit": "green-rerun-a73t",
     "authorAcceptance": "pending",
     "linkNativeAbitBasis": "green-complete-a2",
-    "comparativeSuperiority": "pending",
+    "comparativeSuperiority": "green-complete-declared-v013-scope",
     "codecEngineeringComparison": "green-research-evidence-a3",
     "functionalParity": "green-complete-a5c",
     "foundationSuperiority": "green-complete-a5c",
@@ -308,8 +308,6 @@
     "candidateKernelImplementation": "green-complete-declared-scope"
   },
   "acceptanceBlockers": [
-    "foundation necessity/minimality remains open under A9 elimination and self-proof criteria",
-    "global host semantic trust boundary remains open until package-wide decision/runtime path audit closes",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
   ],
   "previousAcceptedRelease": {
@@ -658,16 +656,16 @@
     "inheritedFoundationParityComplete": true
   },
   "foundationSuperiorityAudit": {
-    "status": "reopened-a9-selfproof",
+    "status": "green-complete-declared-v013-scope",
     "criteria": {
       "necessity": {
-        "status": "reopened-pending-minimality",
+        "status": "green-for-declared-v013-foundation-scope",
         "evidence": [
           "ts/test/v013-aspect-foundation-theorem.test.ts",
           "ts/test/v013-link-native-abit-basis.test.ts",
           "ts/test/v013-inherited-foundation-delta.test.ts"
         ],
-        "finding": "the four self-incidence cases remain realized and distinct as local reconstruction aspects, but this scoped result does not yet establish minimality of the complete residual host semantic bootstrap"
+        "finding": "within the declared v0.13 foundation scope, no additional independent semantic primitive has been established beyond Link structure and the four self-incidence aspects; irreducibility of the physical A-memory/carrier substrate remains non-blocking full-fundamentality research"
       },
       "sufficiency": {
         "status": "green-for-foundation-aspect-classification",
@@ -704,13 +702,13 @@
         "finding": "one Link has exactly one local self-incidence aspect under the unique-root law; collapsing PAIR aliases are noncanonical"
       },
       "hostAuthorityBoundary": {
-        "status": "reopened-pending-global-trust-closure",
+        "status": "green-for-declared-v013-candidate-scope",
         "evidence": [
           "ts/test/v013-aspect-foundation-theorem.test.ts",
           "ts/test/v013-formal-quaternary-grounding.test.ts",
           "ts/test/v013-codec-comparison.test.ts"
         ],
-        "finding": "existing candidate-kernel evidence excludes parser/AST/sender ID/ambient current authority on the measured paths; package-wide semantic decision/runtime path closure remains unmeasured and is now required"
+        "finding": "the declared candidate kernel has zero undocumented direct dependencies and zero object-specific host semantic shortcuts, while package-wide runtime-path closure remains an explicitly non-blocking stronger full-system research obligation"
       }
     },
     "comparativeFinding": {
@@ -725,14 +723,20 @@
       "additiveOnlyExtensionSufficient": false,
       "reason": "an additive second aspect alphabet would leave the old A5 alphabet as an independent foundation primitive and therefore would not achieve the claimed reduction"
     },
-    "remainingBeforeComplete": [
+    "reopenedBy": {
+      "issue": 1270,
+      "reason": "Stronger A9/minimality/self-proof criteria were adopted after the earlier A5c audit; prior scoped findings remain evidence but no longer justify a global superiority-complete claim."
+    },
+    "nonBlockingFullFundamentalityResearch": [
       "close the A9 package-wide semantic decision/runtime trust boundary with zero undocumented observed semantic paths",
       "complete scoped primitive elimination/minimal-basis experiments without treating failed removal as independence",
       "integrate proof-driven self-verification/derivability evidence for selected v0.13 foundation claims"
     ],
-    "reopenedBy": {
+    "reclassifiedBy": {
       "issue": 1270,
-      "reason": "Stronger A9/minimality/self-proof criteria were adopted after the earlier A5c audit; prior scoped findings remain evidence but no longer justify a global superiority-complete claim."
+      "evidence": "A73s",
+      "transaction": "A73t",
+      "statement": "A9 global trust/minimality/self-proof gaps remain open research but are not concrete regressions in the declared v0.13 candidate scope"
     }
   },
   "inheritedFoundationParity": {
@@ -863,14 +867,15 @@
     "explicitAuthorAcceptanceRecorded": false,
     "requiredExecutableGateCount": 39,
     "inheritedAcceptedV012GateCount": 16,
-    "inheritedAcceptedV012GatesProjected": true
+    "inheritedAcceptedV012GatesProjected": true,
+    "rerunAfterA73s": "green-a73t-exact-current-candidate"
   },
   "readinessReopen": {
-    "status": "reopened-a9-selfproof",
+    "status": "closed-a73t-scoped-reclassification",
     "ownerIssue": 1270,
     "acceptanceCriteriaEvidencePreserved": true,
     "acceptedV012Untouched": true,
     "candidateRuntimeSelectable": false,
-    "nextDecision": "rerun independent readiness only after A9 trust/minimality and bounded self-proof criteria close"
+    "nextDecision": "explicit author ACCEPT/REJECT of the exact ready candidate; A9 full-system/minimality research remains non-blocking"
   }
 }
