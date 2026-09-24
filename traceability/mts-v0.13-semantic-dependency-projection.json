@@ -2150,8 +2150,8 @@
       "incoming": 7,
       "issuanceIndex": 3,
       "linkCount": 163,
-      "outgoing": 18,
-      "poles": 209,
+      "outgoing": 20,
+      "poles": 215,
       "root": 70
     },
     "decisionCandidateOwnerCount": 338,
