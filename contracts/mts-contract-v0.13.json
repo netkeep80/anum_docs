@@ -47,7 +47,8 @@
       "ts/src/v013-relative-form-materialization.ts",
       "ts/src/v013-relative-pole-context.ts",
       "ts/src/v013-relative-pole-execution.ts",
-      "ts/src/v013-formal-aspect-evaluator.ts"
+      "ts/src/v013-formal-aspect-evaluator.ts",
+      "ts/src/v013-structural-execution.ts"
     ],
     "implementationCompleteMeaning": "declared-v0.13-candidate-kernel-scope-complete; public consumer boundary is merged and mandatory evidence is projected; excludes readiness, runtime selection and acceptance",
     "singleLiveSemanticRuntime": true
@@ -347,7 +348,8 @@
     "relativePoleContextResearch": "ts/src/v013-relative-pole-context.ts",
     "relativePoleExecutionResearch": "ts/src/v013-relative-pole-execution.ts",
     "relativeFormMaterializationResearch": "ts/src/v013-relative-form-materialization.ts",
-    "formalAspectEvaluatorResearch": "ts/src/v013-formal-aspect-evaluator.ts"
+    "formalAspectEvaluatorResearch": "ts/src/v013-formal-aspect-evaluator.ts",
+    "structuralExecutionResearch": "ts/src/v013-structural-execution.ts"
   },
   "releaseState": {
     "currentAccepted": "mts-contract/v0.12",
