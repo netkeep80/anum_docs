@@ -101,7 +101,7 @@ function defineUnaryTruthRule(
  * Both K and X are structural roles. The hierarchical result therefore depends
  * on the runtime value bound to X; it is not a pre-grounded answer table.
  */
-function definePackRule(
+function defineNaivePackRule(
   memory: Memory,
   theory: LinkHandle,
   b: RootBasis,
@@ -123,6 +123,52 @@ function definePackRule(
   const after = memory.ensureStartSelfClosed(memory.ensure(kRole, dynamicResult));
 
   const rule = defineStructuralRule(memory, dictionary, memory.ensure(before, after));
+  admitStructuralRule(memory, theory, rule);
+}
+
+/**
+ * Completion-gated PACK consumes evidence shaped as a completed child Context:
+ *
+ *   START( START(K -> (PACK -> OLD)) -> X )
+ *     ->
+ *   START( K -> (TAG -> (X -> MARK)) )
+ *
+ * The child Context is the completion authority for X. Construction of the
+ * hierarchical Result and removal of the suspended PACK level are one Rule.
+ */
+function defineCompletionGatedPackRule(
+  memory: Memory,
+  theory: LinkHandle,
+  b: RootBasis,
+  kSeed: LinkHandle,
+  oldSeed: LinkHandle,
+  xSeed: LinkHandle,
+  pack: LinkHandle,
+  tag: LinkHandle,
+  mark: LinkHandle,
+): void {
+  const kRole = memory.ensure(kSeed, b.O);
+  const oldRole = memory.ensure(oldSeed, b.C);
+  const xRole = memory.ensure(xSeed, b.L);
+  const dictionary =
+    defineStructuralRoleDictionary(memory, [kRole, oldRole, xRole]);
+
+  const suspendedCall = memory.ensure(pack, oldRole);
+  const suspendedContext =
+    memory.ensureStartSelfClosed(memory.ensure(kRole, suspendedCall));
+  const completedChild =
+    memory.ensureStartSelfClosed(memory.ensure(suspendedContext, xRole));
+
+  const dynamicInner = memory.ensure(xRole, mark);
+  const dynamicResult = memory.ensure(tag, dynamicInner);
+  const outputContext =
+    memory.ensureStartSelfClosed(memory.ensure(kRole, dynamicResult));
+
+  const rule = defineStructuralRule(
+    memory,
+    dictionary,
+    memory.ensure(completedChild, outputContext),
+  );
   admitStructuralRule(memory, theory, rule);
 }
 
@@ -315,6 +361,7 @@ function publishStableResult(
 interface Fixture {
   readonly memory: Memory;
   readonly theory: LinkHandle;
+  readonly naiveTheory: LinkHandle;
   readonly NOT: LinkHandle;
   readonly PACK: LinkHandle;
   readonly FALSE: LinkHandle;
@@ -342,6 +389,7 @@ function buildFixture(): Fixture {
   };
 
   const theory = memory.ensure(at(0), at(1));
+  const naiveTheory = memory.ensure(at(1), at(2));
   const FALSE = memory.ensure(at(2), at(3));
   const TRUE = memory.ensure(at(4), at(5));
   const NOT = memory.ensure(at(6), at(7));
@@ -353,11 +401,21 @@ function buildFixture(): Fixture {
 
   defineUnaryTruthRule(memory, theory, b, at(18), NOT, FALSE, TRUE);
   defineUnaryTruthRule(memory, theory, b, at(19), NOT, TRUE, FALSE);
-  definePackRule(memory, theory, b, at(20), at(21), PACK, TAG, MARK);
+
+  // Negative control: direct PACK(X) has no completion evidence.
+  defineNaivePackRule(
+    memory, naiveTheory, b, at(20), at(21), PACK, TAG, MARK,
+  );
+
+  // Actual Rule: completed child Context is the completion authority.
+  defineCompletionGatedPackRule(
+    memory, theory, b, at(22), at(23), at(24), PACK, TAG, MARK,
+  );
 
   return Object.freeze({
     memory,
     theory,
+    naiveTheory,
     NOT,
     PACK,
     FALSE,
@@ -378,6 +436,7 @@ function runCase(
   const {
     memory,
     theory,
+    naiveTheory,
     NOT,
     PACK,
     TAG,
@@ -398,6 +457,13 @@ function runCase(
   const working = new WorkingMembership([outer]);
   const scaffold = new Set<LinkHandle>([outer]);
 
+  // The first A72f attempt failed here: direct PACK(X) accepts n3 as X even
+  // though n3 is still an unevaluated call.
+  same(discoverAllApplicableRules(memory, naiveTheory, outer).length, 1,
+    label + " naive PACK(X) prematurely accepts an unevaluated argument");
+  same(discoverAllApplicableRules(memory, theory, outer).length, 0,
+    label + " completion-gated PACK rejects raw outer Context");
+
   while (discoverAllApplicableRules(memory, theory, working.only()).length === 0) {
     const child = openNestedUnaryArgument(memory, working.only(), working);
     for (const context of contextAncestry(memory, child, rootParent)) {
@@ -411,37 +477,39 @@ function runCase(
   let current = reactSingleActiveContext(memory, theory, working);
   scaffold.add(current);
 
-  // Resolve the three nested NOT calls, but stop when the resumed top-level
-  // PACK call becomes current. Its structural output is the actual hierarchy.
-  let collapseCount = 0;
-  let dynamicHierarchyAbsentBeforePack = false;
-  while (readContext(memory, current).parent !== rootParent) {
+  // Resolve only the inner NOT scaffold levels by the existing host helper.
+  // When the computed scalar becomes a child of suspended PACK, stop: the
+  // completion-gated PACK Rule itself performs the outer collapse.
+  let hostCollapseCount = 0;
+  while (readContext(memory, current).parent !== outer) {
     const beforeDepth = contextDepthTo(memory, current, rootParent);
     const resumed = collapseOneLevel(memory, current, working);
     scaffold.add(resumed);
-    const resumedDepth = contextDepthTo(memory, resumed, rootParent);
-    same(resumedDepth, beforeDepth - 1,
-      label + " collapse removes one scaffold level");
-
-    if (resumedDepth === 1) {
-      same(readContext(memory, resumed).current, memory.ensure(PACK, expectedScalar),
-        label + " top-level resumed call is PACK(runtimeScalar)");
-      same(memory.find(expectedScalar, MARK), undefined,
-        label + " grounded hierarchy payload is absent before PACK fires");
-      dynamicHierarchyAbsentBeforePack = true;
-    }
+    same(contextDepthTo(memory, resumed, rootParent), beforeDepth - 1,
+      label + " host collapse removes one NOT scaffold level");
 
     current = reactSingleActiveContext(memory, theory, working);
     scaffold.add(current);
-    collapseCount += 1;
+    hostCollapseCount += 1;
   }
 
-  same(collapseCount, 3, label + " collapses three nested levels");
-  assert(dynamicHierarchyAbsentBeforePack,
-    label + " observed hierarchy absence immediately before PACK reaction");
+  same(hostCollapseCount, 2, label + " only two inner collapses remain host-side");
+  same(contextDepthTo(memory, current, rootParent), 2,
+    label + " completed scalar remains under suspended PACK");
+  same(readContext(memory, current).current, expectedScalar,
+    label + " child Context carries completed runtime scalar");
 
-  // After three NOT evaluations, PACK has fired at top level. Its output is a
-  // hierarchical value TAG -> (scalar -> MARK).
+  same(memory.find(expectedScalar, MARK), undefined,
+    label + " runtime hierarchy payload absent before PACK reaction");
+  same(discoverAllApplicableRules(memory, theory, current).length, 1,
+    label + " completed child enables exactly one gated PACK Rule");
+
+  // Atomic semantic event: build Result + remove the outer PACK scaffold level.
+  current = reactSingleActiveContext(memory, theory, working);
+  scaffold.add(current);
+  same(contextDepthTo(memory, current, rootParent), 1,
+    label + " gated PACK collapses outer scaffold while constructing Result");
+
   const terminal = readContext(memory, current);
   same(terminal.parent, rootParent, label + " PACK result is top-level");
 
@@ -541,6 +609,10 @@ function main(): void {
     "FUNCTION_CLASS=SINGLE_VALUED_DETERMINISTIC_HIERARCHICAL_RESULT",
     "MAX_CONTEXT_DEPTH=4",
     "CASCADE_COLLAPSE_LEVELS=3",
+    "HOST_COLLAPSE_LEVELS=2",
+    "RULE_DRIVEN_RESULT_PLUS_OUTER_COLLAPSE_LEVELS=1",
+    "NAIVE_GENERIC_PACK_PREMATURE_MATCH=RED_CONFIRMED",
+    "COMPLETION_AUTHORITY=CHILD_CONTEXT_OCCURRENCE",
     "RESULT_TOPOLOGY=TAG_TO_SCALAR_TO_MARK",
     "RESULT_CONSTRUCTED_FROM_RUNTIME_ROLE_BINDING=GREEN",
     "RESULT_REMAINS_TRAVERSABLE_AFTER_CONTEXT_TEARDOWN=GREEN",
@@ -550,10 +622,11 @@ function main(): void {
     "CANONICAL_CONTEXT_IDENTITY_REMAINS_READABLE=TRUE",
     "PHYSICAL_CONTEXT_DELETION=NOT_CLAIMED",
     "HOST_NESTED_GROWTH=RESIDUAL",
-    "HOST_COLLAPSE=RESIDUAL",
+    "HOST_INNER_COLLAPSE=RESIDUAL",
+    "OUTER_PACK_COLLAPSE=RULE_DRIVEN_GREEN",
     "HOST_RESULT_PUBLICATION=RESIDUAL",
     "LINKS_ONLY_SCAFFOLD_DYNAMICS=NOT_PROVEN",
-    "NEXT=REMOVE_OR_ENCODE_HOST_SCAFFOLD_LIFECYCLE_USING_RULES_LINKS",
+    "NEXT=A72G_RULE_DRIVEN_GENERIC_INNER_COLLAPSE_AND_GROWTH",
     "MULTIVALUED_FUNCTIONS=DEFERRED",
     "VARIABLE_ARITY_FUNCTIONS=DEFERRED",
     "FULL_SELF_HOSTED=FALSE",
