@@ -137,13 +137,15 @@ function exercise(noise: boolean): void {
   // entry namespace and remain inert to this discovery rule.
   const rContext = defineContext(memory, memory.root, sA);
   const oContext = defineContext(memory, b.O, sB);
-  const ordinaryStart = memory.ensureStartSelfClosed(sOther);
+  const ordinaryPayload = memory.ensure(b.L, sOther);
+  const ordinaryStart = memory.ensureStartSelfClosed(ordinaryPayload);
   const afterForeignRoots = discoverEntryContexts(memory, C);
   setSame(afterForeignRoots, [entryA, entryB],
     "R/O rooted contexts and ordinary START values are not entries");
   assert(!afterForeignRoots.includes(rContext), "R-rooted Context excluded");
   assert(!afterForeignRoots.includes(oContext), "O-rooted Context excluded");
-  assert(!afterForeignRoots.includes(ordinaryStart), "ordinary START excluded");
+  assert(!afterForeignRoots.includes(ordinaryStart),
+    "START whose payload is not C-rooted is excluded");
 
   // An ordinary incoming Link to an entry payload is not enough. START
   // self-incidence is part of the entry marker itself.
@@ -235,7 +237,7 @@ function main(): void {
     "END_WRAPPED_PAYLOAD=INERT",
     "DIRECT_C_ROOTED_START_CONTEXT=DISCOVERED",
     "CHILD_CONTEXTS=NOT_TOP_LEVEL_ENTRIES",
-    "R_ROOTED_CONTEXT=INERT O_ROOTED_CONTEXT=INERT ORDINARY_START=INERT",
+    "R_ROOTED_CONTEXT=INERT O_ROOTED_CONTEXT=INERT NON_C_ROOTED_START=INERT",
     "ORDINARY_INCOMING_TO_PAYLOAD=INERT",
     "BASIS_U_C_TO_O=INERT_UNTIL_START_U_EXISTS",
     "GENERIC_START_AND_DEFINE_CONTEXT_PROVENANCE=SEMANTICALLY_IRRELEVANT",
