@@ -161,7 +161,7 @@ function deriveFrameContinuation(
 interface IntrinsicApplication {
   readonly f:LinkHandle;
   readonly argument:LinkHandle;
-  readonly application?:LinkHandle;
+  readonly application:LinkHandle|undefined;
   readonly resultFacts:readonly LinkHandle[];
 }
 
