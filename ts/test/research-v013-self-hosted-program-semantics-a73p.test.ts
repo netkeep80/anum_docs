@@ -45,11 +45,9 @@ function main(): void {
     "export function discoverV013GroundedTheoryImages(",
     "\nexport interface V013GroundedScopeReaction",
   );
-  const react = slice(
-    grounded,
-    "export function reactV013GroundedScope(",
-    "\n}",
-  );
+  const reactStart = grounded.indexOf("export function reactV013GroundedScope(");
+  assert(reactStart >= 0, "grounded reaction source slice");
+  const react = grounded.slice(reactStart);
 
   // Executable authority is entirely Link-carried:
   //
@@ -94,11 +92,9 @@ function main(): void {
 
   // ExactSequence is treated as carrier mechanics, not program authority. Its
   // reader knows only root termination, self-closed Cell shape and poles.
-  const sequenceReader = slice(
-    exactSequence,
-    "export function readExactSequence(",
-    "\n}",
-  );
+  const sequenceStart = exactSequence.indexOf("export function readExactSequence(");
+  assert(sequenceStart >= 0, "ExactSequence reader source slice");
+  const sequenceReader = exactSequence.slice(sequenceStart);
   for (const forbidden of [
     "Theory",
     "StructuralRule",
