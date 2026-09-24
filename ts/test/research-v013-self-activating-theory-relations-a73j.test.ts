@@ -236,7 +236,8 @@ function exercise(): void {
   // Round 1 dynamically admits candidate.
   const r1 = react(memory, cursor, at(31));
   same(r1.quiescent, false, "round1 bootstrap fires");
-  same(r1.matches, 1, "round1 exactly bootstrap relation matches");
+  assert(r1.matches === 1,
+    "round1 exactly bootstrap relation matches; actual=" + r1.matches);
   const admission = memory.find(theory, candidate);
   assert(admission !== undefined,
     "round1 materializes Theory->candidate");
@@ -252,7 +253,8 @@ function exercise(): void {
   // current Theory and reduces K->A to K->B automatically.
   const r2 = react(memory, cursor, at(32));
   same(r2.quiescent, false, "round2 self-activated candidate fires");
-  same(r2.matches, 1, "round2 exactly generated candidate matches");
+  assert(r2.matches === 1,
+    "round2 exactly generated candidate matches; actual=" + r2.matches);
   same(r2.transitioned, 1, "only K->A transitions");
   setSame(r2.after, [admission, memory.ensure(K, B)],
     "generated admission remains stable while target reduces to B");
