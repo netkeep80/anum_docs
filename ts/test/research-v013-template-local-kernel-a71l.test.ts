@@ -183,6 +183,7 @@ interface IterativeInstantiation{
 function instantiateByLocalKernel(
   memory:Memory,
   template:LinkHandle,
+  declaredRoles:readonly LinkHandle[],
   bindings:readonly StructuralRoleBinding[],
   schedule:"forward"|"reverse",
 ):IterativeInstantiation{
@@ -192,7 +193,14 @@ function instantiateByLocalKernel(
     if(previous!==undefined)same(previous,binding.value,"binding consistent");
     else mapping.set(binding.role,binding.value);
   }
-  const roles=new Set(bindings.map(x=>x.role));
+  const roles=new Set(declaredRoles);
+  same(roles.size,declaredRoles.length,"declared roles unique");
+  for(const role of declaredRoles){
+    assert(mapping.has(role),"all declared roles have bindings");
+  }
+  for(const role of mapping.keys()){
+    assert(roles.has(role),"binding role is declared");
+  }
   let pending=[...collectTemplateNodes(memory,template,roles)];
   let root=0,start=0,end=0,pair=0;
   let rounds=0;
@@ -312,14 +320,14 @@ function exercise(noise:boolean):void{
 
   // Local-kernel realization must produce the same canonical output.
   const beforeForward=memory.linkCount;
-  const forward=instantiateByLocalKernel(memory,a.root,ba,"forward");
+  const forward=instantiateByLocalKernel(memory,a.root,a.roles,ba,"forward");
   same(forward.output,oracleA,
     "forward local kernel equals recursive oracle");
   same(memory.linkCount,beforeForward,
     "oracle already materialized exact local-kernel output");
 
   const beforeReverse=memory.linkCount;
-  const reverse=instantiateByLocalKernel(memory,c.root,bc,"reverse");
+  const reverse=instantiateByLocalKernel(memory,c.root,c.roles,bc,"reverse");
   same(reverse.output,oracleA,
     "reverse local kernel equals same canonical output");
   same(memory.linkCount,beforeReverse,
@@ -349,6 +357,7 @@ function exercise(noise:boolean):void{
     instantiateByLocalKernel(
       memory,
       a.root,
+      a.roles,
       Object.freeze([ba[0]!]),
       "forward",
     );
