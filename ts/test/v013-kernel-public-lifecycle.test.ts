@@ -17,13 +17,13 @@ const conformance = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-conformance-v0.13.json"), "utf8"),
 );
 
-same(contract.status, "candidate", "v0.13 remains candidate");
-same(contract.accepted, false, "v0.13 remains unaccepted");
+same(contract.status, "accepted", "v0.13 is accepted");
+same(contract.accepted, true, "v0.13 is accepted");
 same(contract.acceptanceReady, true, "readiness is restored after A73t scoped reclassification");
 same(
   contract.implementation.acceptedRuntime,
-  "mts-contract/v0.12",
-  "accepted runtime remains v0.12",
+  "mts-contract/v0.13",
+  "accepted runtime is v0.13",
 );
 same(
   contract.implementation.candidateRuntimeSelectable,
@@ -52,8 +52,8 @@ same(
 );
 same(
   contract.candidateState.explicitAuthorAcceptanceRecorded,
-  false,
-  "explicit author acceptance remains pending",
+  true,
+  "explicit author acceptance is recorded",
 );
 
 const kernelFiles = contract.implementation.candidateKernelFiles ?? [];
@@ -118,25 +118,19 @@ same(
 );
 same(
   conformance.candidateKernelImplementation.explicitAuthorAcceptanceRecorded,
-  false,
-  "implementation slice does not record author acceptance",
+  true,
+  "implementation slice records author acceptance",
 );
 
 same(conformance.acceptanceReady, true, "conformance readiness is restored after A73t");
-same(conformance.accepted, false, "conformance remains unaccepted");
+same(conformance.accepted, true, "conformance is accepted");
 assert(
   !conformance.acceptanceBlockers.includes(
     "independent readiness audit has not yet been recorded",
   ),
   "completed readiness audit is no longer a blocker",
 );
-same(conformance.acceptanceBlockers.length, 1, "only author acceptance remains blocking");
-assert(
-  conformance.acceptanceBlockers.includes(
-    "explicit author acceptance of the exact candidate artifacts has not yet been recorded",
-  ),
-  "author acceptance blocker is explicit",
-);
+same(conformance.acceptanceBlockers.length, 0, "accepted conformance has no blockers");
 assert(
   !conformance.acceptanceBlockers.some((entry: string) =>
     /implementation|public facade|kernel/i.test(entry)
@@ -145,5 +139,5 @@ assert(
 );
 
 console.log(
-  "MTS v0.13 declared kernel/public evidence remains GREEN; A73t restores readiness for the declared scope while A9 global trust/minimality + self-proof remain non-blocking research and v0.12 remains current.",
+  "MTS v0.13 declared kernel/public evidence remains GREEN; A73t restores readiness for the declared scope while A9 global trust/minimality + self-proof remain non-blocking research and v0.13 is current accepted.",
 );
