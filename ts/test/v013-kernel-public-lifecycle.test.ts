@@ -19,7 +19,7 @@ const conformance = JSON.parse(
 
 same(contract.status, "candidate", "v0.13 remains candidate");
 same(contract.accepted, false, "v0.13 remains unaccepted");
-same(contract.acceptanceReady, false, "readiness is reopened under the stronger A9/self-proof criteria");
+same(contract.acceptanceReady, true, "readiness is restored after A73t scoped reclassification");
 same(
   contract.implementation.acceptedRuntime,
   "mts-contract/v0.12",
