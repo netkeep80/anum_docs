@@ -484,6 +484,18 @@ function defineVariadicHeadLifecycleRules(
     [resumeAfter],
   );
 }
+function defineTopLevelPublishRule(
+  memory: Memory,
+  theory: LinkHandle,
+  b: RootBasis,
+  seed: LinkHandle,
+): void {
+  const k = memory.ensure(seed, b.O);
+  const v = memory.ensure(seed, b.C);
+  const before = memory.ensure(rootBoundary(memory, k), done(memory, b, v));
+  const after = memory.ensure(k, v);
+  admitTaggedBundleRule(memory, theory, b.C, [k, v], before, [after]);
+}
 function defineRecursiveAllRules(
   memory: Memory,
   theory: LinkHandle,
@@ -566,7 +578,7 @@ function buildFixture(): Fixture {
   const ALL = memory.ensure(at(10), at(11));
   const CHOICE = memory.ensure(at(12), at(13));
   const TOKEN = memory.ensure(at(14), at(15));
-  defineUnaryLifecycleRules(memory, theory, b, at(20));
+  defineTopLevelPublishRule(memory, theory, b, at(20));
   defineVariadicHeadLifecycleRules(memory, theory, b, at(21));
   defineRecursiveAllRules(memory, theory, b, at(22), ALL, FALSE, TRUE);
   defineGroundedUnaryFunctionRule(
