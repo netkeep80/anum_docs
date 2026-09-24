@@ -16,7 +16,7 @@
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12"
   },
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "currentPointer": {
     "acceptance": "cutover/typescript-c1-acceptance-v0.5.json",
     "currentContract": "mts-contract/v0.12",
@@ -333,11 +333,11 @@
     "explicitAuthorAcceptanceRecorded": false,
     "linkNativeAbitGroundingComplete": true,
     "functionalParityAuditComplete": true,
-    "foundationSuperiorityAuditComplete": false,
+    "foundationSuperiorityAuditComplete": true,
     "rootFormalDialectComplete": true,
     "publicFacadeComplete": true,
-    "readinessReopened": true,
-    "readinessReopenReason": "A9 adopted stronger package-wide trust/minimality and proof-driven self-verification criteria after the earlier readiness audit; readiness must be rerun after those criteria close."
+    "readinessReopened": false,
+    "readinessReopenReason": "A73s separated declared v0.13 readiness from stronger full-system A9/minimality/self-hosting research; exact-current-candidate readiness is restored while those stronger claims remain explicitly unclaimed."
   },
   "owners": {
     "memory": "ts/src/memory.ts",
@@ -356,9 +356,9 @@
     "currentAccepted": "mts-contract/v0.12",
     "candidate": "mts-contract/v0.13",
     "accepted": false,
-    "acceptanceReady": false,
+    "acceptanceReady": true,
     "candidateRuntimeSelectable": false,
-    "readinessReopened": true
+    "readinessReopened": false
   },
   "traceabilityManifest": "traceability/mts-v0.13.json",
   "normativeDocumentation": {
@@ -1047,19 +1047,29 @@
     "explicitAuthorAcceptanceRecorded": false
   },
   "readinessReopen": {
-    "status": "reopened-a9-selfproof",
+    "status": "closed-a73s-scope-reclassification",
     "ownerIssue": 1270,
     "preserves": [
-      "AC1-AC10 executable evidence for their declared scopes",
+      "all A9 trust/minimality/self-proof evidence",
+      "globalTrustBoundaryComplete=false as a stronger full-system research status",
+      "generic meta-grounding/self-generation remains open",
+      "FULL_SELF_HOSTED_SYSTEM remains unclaimed",
       "accepted/current v0.12",
-      "candidate runtime non-selectability",
-      "completed functional parity and public/kernel implementation evidence"
+      "candidate runtime non-selectability"
     ],
-    "requires": [
-      "package-wide semantic decision/runtime trust boundary closure",
-      "experimentally scoped primitive elimination/minimal-basis evidence",
-      "proof-driven self-verification evidence for selected v0.13 foundation claims",
-      "independent readiness rerun after the stronger criteria close"
-    ]
+    "reclassifiedAsNonBlockingResearch": [
+      "package-wide/full-system semantic trust closure beyond the declared candidate acceptance scope",
+      "irreducibility/minimal-basis classification of the physical A-memory bootstrap operations",
+      "global semantic-source reconstruction and generic Rule/template meta-grounding",
+      "full-system E1/E2/E3/E4 self-hosting"
+    ],
+    "readinessEvidence": "ts/test/research-v013-readiness-scope-review-a73s.test.ts",
+    "nextDecision": "rerun exact-current-candidate readiness guards, then present exact ready artifacts for separate explicit author ACCEPT/REJECT"
+  },
+  "readinessScopeReview": {
+    "id": "A73s",
+    "status": "green-scoped-research",
+    "evidence": "ts/test/research-v013-readiness-scope-review-a73s.test.ts",
+    "conclusion": "stronger A9 full-system/fundamentality obligations remain valuable research but are not concrete regressions in the declared v0.13 acceptance scope"
   }
 }
