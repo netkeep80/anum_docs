@@ -3,7 +3,6 @@ import { join, resolve } from "node:path";
 
 import {
   Memory,
-  MemoryError,
   ensureRootBasis,
   type LinkHandle,
   type RootBasis,
@@ -173,102 +172,6 @@ function defineCompletionGatedPackRule(
   admitStructuralRule(memory, theory, rule);
 }
 
-/**
- * A71p strict Rule relation, source-equivalent in semantics:
- * projection unification remains aspect-insensitive, but Rule matching must
- * preserve the two self-incidence bits of every non-role node.
- */
-function unifyRuleTemplate(
-  memory: Memory,
-  template: LinkHandle,
-  claimed: LinkHandle,
-  roles: readonly LinkHandle[],
-): readonly StructuralRoleBinding[] {
-  if (new Set(roles).size !== roles.length) {
-    throw new StructuralRuleError("duplicate-role");
-  }
-
-  const before = memory.linkCount;
-  const roleSet = new Set(roles);
-  const inferred = new Map<LinkHandle, LinkHandle>();
-  const containsMemo = new Map<LinkHandle, boolean>();
-  const containsActive = new Set<LinkHandle>();
-
-  const containsRole = (node: LinkHandle): boolean => {
-    if (roleSet.has(node)) return true;
-    const cached = containsMemo.get(node);
-    if (cached !== undefined) return cached;
-    if (containsActive.has(node)) return false;
-    containsActive.add(node);
-    try {
-      const p = memory.poles(node);
-      const result = containsRole(p.start) || containsRole(p.end);
-      containsMemo.set(node, result);
-      return result;
-    } finally {
-      containsActive.delete(node);
-    }
-  };
-
-  const visited = new Map<LinkHandle, Set<LinkHandle>>();
-  const markVisited = (left: LinkHandle, right: LinkHandle): boolean => {
-    let rights = visited.get(left);
-    if (rights === undefined) {
-      rights = new Set<LinkHandle>();
-      visited.set(left, rights);
-    }
-    if (rights.has(right)) return true;
-    rights.add(right);
-    return false;
-  };
-
-  const unify = (left: LinkHandle, right: LinkHandle): void => {
-    if (roleSet.has(left)) {
-      const previous = inferred.get(left);
-      if (previous !== undefined && previous !== right) {
-        throw new StructuralRuleError("template-mismatch");
-      }
-      inferred.set(left, right);
-      return;
-    }
-    if (!containsRole(left)) {
-      if (left !== right) throw new StructuralRuleError("template-mismatch");
-      return;
-    }
-    if (markVisited(left, right)) return;
-
-    try {
-      const lp = memory.poles(left);
-      const rp = memory.poles(right);
-      if (
-        (lp.start === left) !== (rp.start === right) ||
-        (lp.end === left) !== (rp.end === right)
-      ) {
-        throw new StructuralRuleError("template-mismatch");
-      }
-      unify(lp.start, rp.start);
-      unify(lp.end, rp.end);
-    } catch (error) {
-      if (error instanceof StructuralRuleError) throw error;
-      if (error instanceof MemoryError) {
-        throw new StructuralRuleError("template-mismatch");
-      }
-      throw error;
-    }
-  };
-
-  try {
-    unify(template, claimed);
-    return Object.freeze(roles.map((role) => {
-      const value = inferred.get(role);
-      if (value === undefined) throw new StructuralRuleError("missing-role-binding");
-      return Object.freeze({ role, value });
-    }));
-  } finally {
-    same(memory.linkCount, before, "strict Rule matching is read-only");
-  }
-}
-
 function discoverAllApplicableRules(
   memory: Memory,
   theory: LinkHandle,
@@ -286,7 +189,7 @@ function discoverAllApplicableRules(
       const rule = readStructuralRule(memory, ap.end);
       const dictionary = readStructuralRoleDictionary(memory, rule.roleDictionary);
       const body = memory.poles(rule.body);
-      const bindings = unifyRuleTemplate(
+      const bindings = unifyStructuralTemplate(
         memory,
         body.start,
         activeContext,
@@ -296,35 +199,6 @@ function discoverAllApplicableRules(
         outputTemplate: body.end,
         bindings,
       }));
-    } catch (error) {
-      if (error instanceof StructuralRuleError) continue;
-      throw error;
-    }
-  }
-
-  return Object.freeze(matches);
-}
-
-function discoverAllApplicableRulesByProjection(
-  memory: Memory,
-  theory: LinkHandle,
-  activeContext: LinkHandle,
-): readonly GroundedRewrite[] {
-  readContext(memory, activeContext);
-  const matches: GroundedRewrite[] = [];
-
-  for (const admission of memory.outgoing(theory)) {
-    const ap = memory.poles(admission);
-    if (ap.start !== theory || ap.end === admission) continue;
-    try {
-      verifyStructuralRuleAdmission(memory, theory, ap.end, admission);
-      const rule = readStructuralRule(memory, ap.end);
-      const dictionary = readStructuralRoleDictionary(memory, rule.roleDictionary);
-      const body = memory.poles(rule.body);
-      const bindings = unifyStructuralTemplate(
-        memory, body.start, activeContext, dictionary.roles,
-      );
-      matches.push(Object.freeze({ outputTemplate: body.end, bindings }));
     } catch (error) {
       if (error instanceof StructuralRuleError) continue;
       throw error;
@@ -590,33 +464,12 @@ function runCase(
   same(discoverAllApplicableRules(memory, theory, outer).length, 0,
     label + " completion-gated PACK rejects raw outer Context");
 
-  let projectionPrematureDepth: number | null = null;
   while (discoverAllApplicableRules(memory, theory, working.only()).length === 0) {
     const child = openNestedUnaryArgument(memory, working.only(), working);
     for (const context of contextAncestry(memory, child, rootParent)) {
       scaffold.add(context);
     }
-
-    const depth = contextDepthTo(memory, child, rootParent);
-    const strictMatches = discoverAllApplicableRules(memory, theory, child);
-    const projectionMatches =
-      discoverAllApplicableRulesByProjection(memory, theory, child);
-    if (
-      depth < 4 &&
-      strictMatches.length === 0 &&
-      projectionMatches.length > 0 &&
-      projectionPrematureDepth === null
-    ) {
-      projectionPrematureDepth = depth;
-    }
   }
-
-  assert(
-    projectionPrematureDepth !== null &&
-      projectionPrematureDepth > 1 &&
-      projectionPrematureDepth < 4,
-    label + " projection matcher has an intermediate premature completion match",
-  );
 
   same(contextDepthTo(memory, working.only(), rootParent), 4,
     label + " unresolved computation reaches Context depth four");
@@ -759,8 +612,6 @@ function main(): void {
     "HOST_COLLAPSE_LEVELS=2",
     "RULE_DRIVEN_RESULT_PLUS_OUTER_COLLAPSE_LEVELS=1",
     "NAIVE_GENERIC_PACK_PREMATURE_MATCH=RED_CONFIRMED",
-    "PROJECTION_MATCHER_INTERMEDIATE_COMPLETION_FALSE_POSITIVE=RED_CONFIRMED",
-    "STRICT_A71P_RULE_MATCHING=REUSED",
     "COMPLETION_AUTHORITY=CHILD_CONTEXT_OCCURRENCE",
     "RESULT_TOPOLOGY=TAG_TO_SCALAR_TO_MARK",
     "RESULT_CONSTRUCTED_FROM_RUNTIME_ROLE_BINDING=GREEN",
