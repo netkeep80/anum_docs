@@ -63,7 +63,6 @@ for (const path of [
   "ts/src/v013-relative-pole-context.ts",
   "ts/src/v013-relative-pole-execution.ts",
   "ts/src/v013-formal-aspect-evaluator.ts",
-  "ts/src/v013-structural-execution.ts",
   "ts/src/v013-grounded-execution.ts",
 ]) {
   assert(kernelFiles.includes(path), `candidate kernel file projected: ${path}`);
