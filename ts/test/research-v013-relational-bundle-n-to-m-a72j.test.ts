@@ -126,9 +126,9 @@ interface BundleReaction {
  *
  * No produced Link becomes current while successor derivation is still running.
  *
- * A72i exercises N -> 1 canonical convergence. Multiple independent causal
- * paths may derive the same successor identity, but canonical Link identity
- * collapses them to one current K -> B Link. This is NOT a synchronizing join.
+ * A72j exercises the general N -> M relational image. Multiple source Links
+ * may contribute overlapping successor Links; canonical identity collapses the
+ * overlap while the complete image becomes current in one semantic commit.
  */
 function reactBundleAtomically(
   memory: Memory,
