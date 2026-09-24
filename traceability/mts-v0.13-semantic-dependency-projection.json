@@ -234,7 +234,9 @@
     "exactSequencePositionFrameStepA66dDesigned": true,
     "exactSequencePositionFrameStepA66dComplete": true,
     "exactSequencePositionBranchingA66eDesigned": true,
-    "exactSequencePositionBranchingA66eComplete": true
+    "exactSequencePositionBranchingA66eComplete": true,
+    "exactSequencePositionRecursionA66fDesigned": true,
+    "exactSequencePositionRecursionA66fComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1615,8 +1617,8 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A66f: starting only from GREEN A66e, re-run A65c-style recursive continuation and local termination with ExactSequence positions instead of raw Q. Preserve the A66d atomic step and A66e one-layer branching law source-identically.",
-    "A66g: only after A66f, re-run A65d convergence and add scheduler-order equivalence on the position-based context frontier. Test whether exact child-context sets and final extensional result are invariant under forward/reverse parent scheduling.",
+    "A66g: starting only from GREEN A66f, consume the final ExactSequence position without inventing a synthetic exhausted position. Test whether final (F->arg_final)->Y returns Y directly to the selected call-root context rather than creating another temporary child frame.",
+    "A66g must include two pre-final branches that converge to the same final Y, preserve their distinct context ancestry, and prove forward/reverse parent scheduling yields the same exact final root-result set. Keep A66d/A66e execution laws source-identical for non-final steps.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
@@ -7996,6 +7998,55 @@
         "Rule publication/admission not tested"
       ],
       "consequence": "A66e lifts the A66d ExactSequence-position execution frame from ONE to ZERO/ONE/MANY without changing the atomic child law. Branching is now native to K.current=F->P: each selected result becomes a sibling F while every sibling shares the structurally advanced position into the same immutable Sequence. A66f can therefore test recursive continuation and local termination without returning to the temporary raw-Q carrier."
+    },
+    "exactSequencePositionRecursionA66f": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "Can the A66e position-based branching law be reapplied recursively across non-final ExactSequence positions while preserving local termination, exact one-position advancement and selected Sequence identity, without introducing a synthetic exhausted position?",
+      "setup": [
+        "use one three-element ExactSequence [a1,a2,a3]",
+        "derive positions P0, P1 and P2 structurally, where P2 selects the final a3",
+        "branch at a1 into sibling contexts KA and KB using the A66e source-identical law",
+        "give KA one selected continuation at a2 and KB zero selected continuations"
+      ],
+      "oracle": [
+        "first layer reproduces exact A66e sibling contexts at P1",
+        "continuing KA creates exactly one grandchild KAZ at P2",
+        "KB locally terminates with P1 still selecting a2 and with a3 still later in the selected sequence",
+        "an ambient physical KB continuation remains inert because it is not selected",
+        "every successful non-final step advances exactly one ExactSequence position",
+        "the selected Sequence identity is preserved from P0 through P1 to P2",
+        "P2 exposes final argument a3 with doneAfter=true and no nextPosition",
+        "no synthetic exhausted position is materialized",
+        "two independent Memories agree"
+      ],
+      "evidenceTest": "ts/test/research-v013-exact-sequence-position-recursion-a66f.test.ts",
+      "antiCheat": [
+        "A66f advanceOnePosition is source-identical to A66e/A66d",
+        "A66f branchOnePosition is source-identical to A66e",
+        "the scoped experiment contains no scheduler, convergence, publication/admission, MetaState, occurrence or forwardCursor semantics",
+        "final argument a3 is intentionally not consumed in A66f"
+      ],
+      "classification": {
+        "frameState": "F_TO_P",
+        "level1": "A66E_SOURCE_IDENTICAL_BRANCHING",
+        "level2": "A66E_SOURCE_IDENTICAL_REAPPLIED_TO_CHILD",
+        "continuingChild": "ONE_GRANDCHILD",
+        "terminatingChild": "ZERO_GRANDCHILDREN",
+        "localTerminationWithRemainingPosition": "CONFIRMED",
+        "positionAdvancePerSuccessfulStep": "ONE_CELL",
+        "selectedSequenceIdentity": "PRESERVED",
+        "finalPosition": "PRESENT_WITHOUT_SYNTHETIC_EXHAUSTED_POSITION",
+        "forwardQChain": 0,
+        "productionChanged": false
+      },
+      "exclusions": [
+        "final argument consumption not tested",
+        "final return to call-root context not tested",
+        "convergence/provenance not tested",
+        "scheduler equivalence not tested",
+        "Rule publication/admission not tested"
+      ],
+      "consequence": "A66f shows that nested execution contexts can recurse through ordinary ExactSequence positions without a raw forward Q or a terminal cursor sentinel. Non-final results become child-frame temporary values and advance exactly one P. A locally terminated branch may still have unconsumed arguments. The successful branch reaches P2, whose selected Cell contains the final argument and has no successor; therefore A66g should test final application as a return to the selected call-root context rather than inventing another exhausted-position child frame."
     }
   }
 }
