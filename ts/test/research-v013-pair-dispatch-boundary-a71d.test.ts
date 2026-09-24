@@ -314,6 +314,9 @@ function staticGuards():void{
   const a54=readFileSync(
     join(root,"ts/test/research-v013-raw-pair-constructor-a54.test.ts"),"utf8",
   );
+  const a16f4=readFileSync(
+    join(root,"ts/test/research-v013-link-carried-pair-request-a16-f4.test.ts"),"utf8",
+  );
   const contract=JSON.parse(readFileSync(
     join(root,"contracts/mts-contract-v0.13.json"),"utf8",
   ));
@@ -350,6 +353,12 @@ function staticGuards():void{
 
   same(contract.rootAspectQuartet.operatorIsRootLinkAlias,false,
     "FORMAL operator is not root-Link alias");
+  assert(a16f4.includes("PAIR_ACTUALIZATION=LINK_CARRIED_REQUEST"),
+    "A16-F4 already carries PAIR actualization as Link request");
+  assert(a16f4.includes("EXECUTOR_OPERAND_FRONTIER_PARAMETERS=0"),
+    "A16-F4 request executor receives no separate operand frontiers");
+  assert(a16f4.includes("REQUEST_PRODUCER_HOST_RESIDUAL=1"),
+    "A16-F4 still records request-production authority residual");
 
   // The remaining host boundary is visible directly in production: the
   // operator is converted to a host Plan and dispatched by host branches.
