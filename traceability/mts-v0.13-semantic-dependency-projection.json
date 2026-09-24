@@ -962,15 +962,15 @@
     "coarseInheritedAuthorityAggregateCount": 0,
     "unresolvedNestedBootstrapBoundaryCount": 0,
     "unresolvedRepresentationBoundaryCount": 0,
-    "directSemanticWriteOwnerCount": 49,
+    "directSemanticWriteOwnerCount": 51,
     "unclassifiedDirectSemanticWriteOwnerCount": 0,
     "directSemanticWriteOwnersByCategory": {
-      "authority-evidence-producer": 19,
+      "authority-evidence-producer": 20,
       "proof-derivation-producer": 11,
       "representation-materialization": 12,
       "bootstrap-foundation-materialization": 2,
       "tooling": 2,
-      "authorized-semantic-target-materialization": 3
+      "authorized-semantic-target-materialization": 4
     },
     "packageWideObjectSpecificHostSemanticCount": null,
     "typedReadMemorySiteCount": 489,
@@ -987,7 +987,7 @@
       "transport-persistence": 23
     },
     "packageWideExactWireLiteralDispatchCount": 0,
-    "typedDirectSemanticWriteOwnerCount": 49,
+    "typedDirectSemanticWriteOwnerCount": 51,
     "hostLinkDuplicationCandidateCount": 26,
     "confirmedHostLinkEquivalentDuplicationCount": null,
     "runtimeObservedPublicSemanticEntrypointCount": 8,
@@ -1854,16 +1854,16 @@
         "reason": "Materializes Link-native ExactSequence structure; derived representation convention."
       },
       {
-        "id": "ts/src/memory.ts#Memory.constructor",
-        "category": "bootstrap-foundation-materialization",
-        "capabilityId": "bootstrap.root-anchor",
-        "reason": "Initializes the Memory-local root realization."
-      },
-      {
         "id": "ts/src/memory.ts#ensureRootBasis",
         "category": "bootstrap-foundation-materialization",
         "capabilityId": null,
         "reason": "Materializes the convenient R/O/C/L/U basis from Memory capabilities; basis convenience is not counted as an independent primitive."
+      },
+      {
+        "id": "ts/src/memory.ts#Memory.constructor",
+        "category": "bootstrap-foundation-materialization",
+        "capabilityId": "bootstrap.root-anchor",
+        "reason": "Initializes the Memory-local root realization."
       },
       {
         "id": "ts/src/persistence-topology.ts#restoreTopology",
@@ -1968,16 +1968,16 @@
         "reason": "Defines structural Rule structure."
       },
       {
-        "id": "ts/src/syntax-aset-contract.ts#SyntaxAsetBuilder.finish",
-        "category": "representation-materialization",
-        "capabilityId": null,
-        "reason": "Syntax-aset builder output; tooling/representation helper, not normative semantic bootstrap."
-      },
-      {
         "id": "ts/src/syntax-aset-contract.ts#materializeTriad",
         "category": "representation-materialization",
         "capabilityId": null,
         "reason": "Syntax-aset triad materializer; tooling layer."
+      },
+      {
+        "id": "ts/src/syntax-aset-contract.ts#SyntaxAsetBuilder.finish",
+        "category": "representation-materialization",
+        "capabilityId": null,
+        "reason": "Syntax-aset builder output; tooling/representation helper, not normative semantic bootstrap."
       },
       {
         "id": "ts/src/tooling/syntax-aset.ts#materializeNamedSeries",
@@ -2038,10 +2038,22 @@
         "category": "authorized-semantic-target-materialization",
         "capabilityId": "derived.authorized-form-materialization",
         "reason": "Authorized START/END semantic target materialization."
+      },
+      {
+        "id": "ts/src/v013-structural-execution.ts#clone",
+        "category": "authorized-semantic-target-materialization",
+        "capabilityId": null,
+        "reason": "Generic instantiation of an already-admitted structural Rule output template; materializes only the structurally authorized successor image."
+      },
+      {
+        "id": "ts/src/v013-structural-execution.ts#defineV013WorkingScope",
+        "category": "authority-evidence-producer",
+        "capabilityId": null,
+        "reason": "Materializes the Link-native working Scope that carries interpreter authority and current membership; the current-root choice remains external opaque A-memory mechanics."
       }
     ],
     "interpretationBoundaryCovered": false,
-    "note": "The 49 current owners are confirmed to use actual Memory write members, but static direct-call analysis can still miss alias/rebinding/new-write-API bypasses. P1g runtime instrumentation remains required.",
+    "note": "The 51 current owners are confirmed to use actual Memory write members, but static direct-call analysis can still miss alias/rebinding/new-write-API bypasses. P1g runtime instrumentation remains required.",
     "receiverTypeCheckedByP1e": false,
     "typedOwnerSetCrossCheckedByP1f": true,
     "physicalMutationBoundaryProven": false
@@ -6463,33 +6475,107 @@
     "ruleSchemaUnderdeterminationA41": {
       "status": "EXECUTED_GREEN_FALSIFIER_EXACT_SOURCE_REMOVAL_RED",
       "question": "Does one Rule/role authority uniquely determine the exact ProducerSchema/Plan topology required by A40?",
-      "setup": ["derive the five free roles structurally from one eight-role/three-constraint Rule", "author two schemas for that same Rule differing only by forward vs reverse ordering of the three independent admission gates", "instantiate later target Plans through unchanged A40 generic schema cloning", "execute with source-identical F5-F4 constructor and A21 runtime"],
-      "oracle": ["the two schema handles and target Plan handles are distinct", "both valid realizations publish Packages whose TemplateE0 reaches ACCEPT", "both reject independent forgeries of constraints 0/1/2 with ZERO", "two independent Memories agree"],
+      "setup": [
+        "derive the five free roles structurally from one eight-role/three-constraint Rule",
+        "author two schemas for that same Rule differing only by forward vs reverse ordering of the three independent admission gates",
+        "instantiate later target Plans through unchanged A40 generic schema cloning",
+        "execute with source-identical F5-F4 constructor and A21 runtime"
+      ],
+      "oracle": [
+        "the two schema handles and target Plan handles are distinct",
+        "both valid realizations publish Packages whose TemplateE0 reaches ACCEPT",
+        "both reject independent forgeries of constraints 0/1/2 with ZERO",
+        "two independent Memories agree"
+      ],
       "result": "GREEN falsifier: the Rule determines the free-role boundary but does not determine one exact packaging/gate-order topology. Exact-schema source-removal is RED because choosing one exact topology adds authority not present in the Rule.",
       "evidenceTest": "ts/test/research-v013-rule-schema-underdetermination-a41.test.ts",
-      "residualAuthority": ["semantic schema contract is not yet represented Link-natively", "generic schema cloning and F5-F4 plan interpretation remain host-executed", "A35 publication-existence and A36 scratch boundaries remain open"],
+      "residualAuthority": [
+        "semantic schema contract is not yet represented Link-natively",
+        "generic schema cloning and F5-F4 plan interpretation remain host-executed",
+        "A35 publication-existence and A36 scratch boundaries remain open"
+      ],
       "consequence": "A41 separates semantic authority from incidental program packaging. The next target is not another exact template: A42 must derive a Rule-native semantic schema contract that admits multiple equivalent realizations and rejects incomplete ones.",
-      "observed": {"ruleRoleCount": 8, "constrainedTargetCount": 3, "ruleDerivedFreeRoleCount": 5, "equivalentDistinctSchemaCount": 2, "validVariants": "ACCEPT", "forgedVariants": "ZERO", "constructionExecutor": "F5_F4_SOURCE_IDENTICAL", "runtime": "A21_SOURCE_IDENTICAL", "exactSchemaSourceRemoved": false, "independentMemories": 2, "productionChanged": false}
+      "observed": {
+        "ruleRoleCount": 8,
+        "constrainedTargetCount": 3,
+        "ruleDerivedFreeRoleCount": 5,
+        "equivalentDistinctSchemaCount": 2,
+        "validVariants": "ACCEPT",
+        "forgedVariants": "ZERO",
+        "constructionExecutor": "F5_F4_SOURCE_IDENTICAL",
+        "runtime": "A21_SOURCE_IDENTICAL",
+        "exactSchemaSourceRemoved": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     },
     "ruleSemanticSchemaContractA42": {
       "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can exact ProducerSchema topology authority be replaced by one Rule-derived semantic contract that is insensitive to incidental gate ordering?",
-      "setup": ["derive five free roles and three constrained-target obligations from Rule structure", "materialize Contract=Rule->(FreeRoleCarrier,ObligationCarrier) with no TemplatePlan/TemplateE0/exact gate order", "validate selected realizations extensionally and emit contextual K->Realization only on success", "reuse merged A41 as unchanged lower execution evidence for forward/reverse full topologies"],
-      "oracle": ["forward and reverse obligation orders are both accepted under one contract", "missing, duplicate, foreign and short-free realizations produce ZERO accepted witnesses", "contract contains no exact plan/program topology", "two independent Memories agree"],
+      "setup": [
+        "derive five free roles and three constrained-target obligations from Rule structure",
+        "materialize Contract=Rule->(FreeRoleCarrier,ObligationCarrier) with no TemplatePlan/TemplateE0/exact gate order",
+        "validate selected realizations extensionally and emit contextual K->Realization only on success",
+        "reuse merged A41 as unchanged lower execution evidence for forward/reverse full topologies"
+      ],
+      "oracle": [
+        "forward and reverse obligation orders are both accepted under one contract",
+        "missing, duplicate, foreign and short-free realizations produce ZERO accepted witnesses",
+        "contract contains no exact plan/program topology",
+        "two independent Memories agree"
+      ],
       "evidenceTest": "ts/test/research-v013-rule-semantic-schema-contract-a42.test.ts",
-      "residualAuthority": ["host Set/equality implements extensional contract validation", "host structural reader derives contract from Rule", "F5-F4/A36/A38/A21 remain the already-classified lower boundaries"],
+      "residualAuthority": [
+        "host Set/equality implements extensional contract validation",
+        "host structural reader derives contract from Rule",
+        "F5-F4/A36/A38/A21 remain the already-classified lower boundaries"
+      ],
       "consequence": "A42 removes arbitrary exact gate/package topology from schema semantic authority. The remaining immediate source boundary is host extensional validation of Link-carried obligations; A43 should reduce that validation to canonical Link identity plus contextual detachment without restoring exact topology authority.",
-      "observed": {"exactTopologyAuthorityInContract": 0, "freeRoleObligations": 5, "constrainedTargetObligations": 3, "forwardReverse": "ACCEPTED", "invalidRealizations": "ZERO", "contextualAcceptanceWitness": "K_TO_REALIZATION", "hostSetValidation": "RESIDUAL", "independentMemories": 2, "productionChanged": false}
+      "observed": {
+        "exactTopologyAuthorityInContract": 0,
+        "freeRoleObligations": 5,
+        "constrainedTargetObligations": 3,
+        "forwardReverse": "ACCEPTED",
+        "invalidRealizations": "ZERO",
+        "contextualAcceptanceWitness": "K_TO_REALIZATION",
+        "hostSetValidation": "RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     },
     "linkNativeContractMatchingA43": {
       "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A42 host Set/equality membership validation be removed while preserving order-insensitive semantic-schema coverage?",
-      "setup": ["for expected A build canonical gate g=g->A", "for each proposed B build query g->B; canonical identity makes query=g only when B=A", "use source-identical A21 detachment to emit one provenance occurrence per match", "validate expected->proposed and proposed->expected exact-one coverage without host Set membership or semantic Link equality"],
-      "oracle": ["forward and reverse A42 realizations accepted", "missing, duplicate, foreign, short-free and duplicate-free realizations yield ZERO", "direct probes expose match cardinality ZERO/ONE/MANY", "two independent Memories agree"],
+      "setup": [
+        "for expected A build canonical gate g=g->A",
+        "for each proposed B build query g->B; canonical identity makes query=g only when B=A",
+        "use source-identical A21 detachment to emit one provenance occurrence per match",
+        "validate expected->proposed and proposed->expected exact-one coverage without host Set membership or semantic Link equality"
+      ],
+      "oracle": [
+        "forward and reverse A42 realizations accepted",
+        "missing, duplicate, foreign, short-free and duplicate-free realizations yield ZERO",
+        "direct probes expose match cardinality ZERO/ONE/MANY",
+        "two independent Memories agree"
+      ],
       "evidenceTest": "ts/test/research-v013-link-native-contract-matching-a43.test.ts",
-      "residualAuthority": ["host numeric matchCount===1 branch decides exact-one cardinality", "Rule->contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
+      "residualAuthority": [
+        "host numeric matchCount===1 branch decides exact-one cardinality",
+        "Rule->contract structural derivation remains host-side",
+        "A35 publication-existence and A36 scratch boundaries remain open"
+      ],
       "consequence": "A43 source-removes host semantic membership/equality from contract validation: matching is canonical Link collapse followed by ordinary A21 detachment. The remaining immediate validation boundary is the host exact-one cardinality decision over provenance multiplicity; A44 should make ZERO/ONE/MANY itself Link-native.",
-      "observed": {"hostSetMembershipValidation": 0, "hostSemanticLinkEqualityValidation": 0, "matching": "CANONICAL_LINK_COLLAPSE_PLUS_A21", "orderInsensitiveContract": true, "invalidRealizations": "ZERO", "matchCardinality": "ZERO_ONE_MANY", "hostExactOneCardinalityBranch": "RESIDUAL", "independentMemories": 2, "productionChanged": false}
+      "observed": {
+        "hostSetMembershipValidation": 0,
+        "hostSemanticLinkEqualityValidation": 0,
+        "matching": "CANONICAL_LINK_COLLAPSE_PLUS_A21",
+        "orderInsensitiveContract": true,
+        "invalidRealizations": "ZERO",
+        "matchCardinality": "ZERO_ONE_MANY",
+        "hostExactOneCardinalityBranch": "RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     },
     "linkNativeOneCardinalityA44": {
       "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
@@ -6498,36 +6584,130 @@
       "firstRedCorrection": "Anchor the second gate on expectedTruth=matchK->R and compare actualTruth through a distinct truth gate. ZERO gets a distinct failing second gate.",
       "secondAttemptRed": "CI #6256 still exhausted the Node heap. Root cause: bidirectional coverage contains extensionally identical checks twice; those checks canonicalized to the same bodyGate/truthGate antecedents but compileChecks attached different successor continuations at their two program positions, so unchanged A21 correctly branched across positions and grew exponentially.",
       "secondRedCorrection": "Scope each body/truth equality probe under an immutable validation-stage carrier. ScopedActual=Stage->Actual and ScopedExpected=Stage->Expected preserve equality iff Actual=Expected, while repeated semantic checks at different program positions no longer share continuation antecedents.",
-      "setup": ["reuse A43 canonical match execution to produce ZERO/ONE/MANY occurrence frontiers", "derive a one-cell body equality gate plus a distinct expected-contextual-truth equality gate from each match frontier", "scope both canonical equality probes by immutable validation-stage carriers so repeated bidirectional checks cannot alias continuation antecedents", "chain both gates for every bidirectional coverage obligation under one A21 continuation program", "reach K->Realization only if every match frontier has exactly one valid occurrence"],
-      "oracle": ["forward and reverse A42 realizations reach contextual acceptance", "all A43 invalid realization classes yield ZERO", "direct ZERO/ONE/MANY probes show only ONE reaches marker", "two independent Memories agree"],
+      "setup": [
+        "reuse A43 canonical match execution to produce ZERO/ONE/MANY occurrence frontiers",
+        "derive a one-cell body equality gate plus a distinct expected-contextual-truth equality gate from each match frontier",
+        "scope both canonical equality probes by immutable validation-stage carriers so repeated bidirectional checks cannot alias continuation antecedents",
+        "chain both gates for every bidirectional coverage obligation under one A21 continuation program",
+        "reach K->Realization only if every match frontier has exactly one valid occurrence"
+      ],
+      "oracle": [
+        "forward and reverse A42 realizations reach contextual acceptance",
+        "all A43 invalid realization classes yield ZERO",
+        "direct ZERO/ONE/MANY probes show only ONE reaches marker",
+        "two independent Memories agree"
+      ],
       "evidenceTest": "ts/test/research-v013-link-native-one-cardinality-a44.test.ts",
-      "residualAuthority": ["host loops assemble coverage checks from Contract/Realization carriers", "Rule->Contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
+      "residualAuthority": [
+        "host loops assemble coverage checks from Contract/Realization carriers",
+        "Rule->Contract structural derivation remains host-side",
+        "A35 publication-existence and A36 scratch boundaries remain open"
+      ],
       "consequence": "A44 removes the host matchCount===1 semantic branch: ZERO, ONE and MANY are distinguished by stage-scoped Link topology and ordinary recursive detachment; only ONE continues. Two successive RED runs exposed both local ZERO-gate aliasing and cross-position repeated-check aliasing before final GREEN. The next boundary is host assembly/enumeration of the coverage program itself.",
-      "observed": {"hostExactOneCardinalityBranch": 0, "zeroOneMany": "STAGE_SCOPED_LINK_NATIVE_CONTINUATION_TOPOLOGY", "onlyOneReachesContextualAcceptance": true, "matching": "CANONICAL_LINK_COLLAPSE_PLUS_A21", "orderInsensitiveContract": true, "coverageProgramAssembly": "HOST_GENERIC_RESIDUAL", "independentMemories": 2, "finalCi": "GREEN_6260", "productionChanged": false}
+      "observed": {
+        "hostExactOneCardinalityBranch": 0,
+        "zeroOneMany": "STAGE_SCOPED_LINK_NATIVE_CONTINUATION_TOPOLOGY",
+        "onlyOneReachesContextualAcceptance": true,
+        "matching": "CANONICAL_LINK_COLLAPSE_PLUS_A21",
+        "orderInsensitiveContract": true,
+        "coverageProgramAssembly": "HOST_GENERIC_RESIDUAL",
+        "independentMemories": 2,
+        "finalCi": "GREEN_6260",
+        "productionChanged": false
+      }
     },
     "linkCarriedCoverageHistoryA45": {
       "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
       "question": "Can A44 host coverage-program assembly loops be removed so bidirectional exact coverage is generated from Contract/Realization Link carriers without a JS check array?",
-      "setup": ["walk arbitrary ExactSequence carriers through one generic recursive structural fold and one generic recursive descriptor zipper", "for each carrier value derive A43 canonical match execution and the source-identical A44 stage-scoped ONE check", "append each check to immutable Link-native coverage history rather than a JS array", "recursively consume that Link history into selected continuation authority and execute with unchanged A21"],
-      "oracle": ["forward and reverse A42 realizations reach contextual acceptance", "missing target, duplicate target, foreign target, short free boundary and duplicate free role yield ZERO", "valid 5+5+3+3 obligations produce 16 history-carried checks", "ambient alternate request cannot rewrite selected E0", "two independent Memories agree"],
-      "antiCheat": ["coverage generator contains no for/map/forEach enumeration", "coverage generator contains no JS OneCheck array", "coverage generator has no free-vs-obligation or forward-vs-reverse list-specific variable names", "A44 deriveOneCheck is source-identical and A21 runtime is source-identical"],
+      "setup": [
+        "walk arbitrary ExactSequence carriers through one generic recursive structural fold and one generic recursive descriptor zipper",
+        "for each carrier value derive A43 canonical match execution and the source-identical A44 stage-scoped ONE check",
+        "append each check to immutable Link-native coverage history rather than a JS array",
+        "recursively consume that Link history into selected continuation authority and execute with unchanged A21"
+      ],
+      "oracle": [
+        "forward and reverse A42 realizations reach contextual acceptance",
+        "missing target, duplicate target, foreign target, short free boundary and duplicate free role yield ZERO",
+        "valid 5+5+3+3 obligations produce 16 history-carried checks",
+        "ambient alternate request cannot rewrite selected E0",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "coverage generator contains no for/map/forEach enumeration",
+        "coverage generator contains no JS OneCheck array",
+        "coverage generator has no free-vs-obligation or forward-vs-reverse list-specific variable names",
+        "A44 deriveOneCheck is source-identical and A21 runtime is source-identical"
+      ],
       "evidenceTest": "ts/test/research-v013-link-carried-coverage-history-a45.test.ts",
-      "residualAuthority": ["generic recursive ExactSequence fold/zip and coverage-history transduction remain host-executed generic mechanisms", "Rule->Contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
+      "residualAuthority": [
+        "generic recursive ExactSequence fold/zip and coverage-history transduction remain host-executed generic mechanisms",
+        "Rule->Contract structural derivation remains host-side",
+        "A35 publication-existence and A36 scratch boundaries remain open"
+      ],
       "consequence": "A45 removes domain-specific host coverage loops and JS program assembly: carrier membership/order supplies the traversal source and the intermediate validation program is Link-native history. The remaining immediate source boundary is the generic host recursive carrier transducer itself; A46 should move that generation/execution into existing Link-carried generic authority without restoring domain-specific loops.",
-      "observed": {"domainCoverageLoops": 0, "jsCheckArray": 0, "coverageSource": "CONTRACT_REALIZATION_LINK_CARRIERS", "descriptorZip": "GENERIC_RECURSIVE", "structuralFold": "GENERIC_RECURSIVE", "checkHistory": "LINK_NATIVE", "oneGate": "A44_SOURCE_IDENTICAL", "runtime": "A21_SOURCE_IDENTICAL", "validRealizations": "ACCEPT", "invalidRealizations": "ZERO", "genericRecursiveCarrierTransducer": "HOST_RESIDUAL", "independentMemories": 2, "productionChanged": false}
+      "observed": {
+        "domainCoverageLoops": 0,
+        "jsCheckArray": 0,
+        "coverageSource": "CONTRACT_REALIZATION_LINK_CARRIERS",
+        "descriptorZip": "GENERIC_RECURSIVE",
+        "structuralFold": "GENERIC_RECURSIVE",
+        "checkHistory": "LINK_NATIVE",
+        "oneGate": "A44_SOURCE_IDENTICAL",
+        "runtime": "A21_SOURCE_IDENTICAL",
+        "validRealizations": "ACCEPT",
+        "invalidRealizations": "ZERO",
+        "genericRecursiveCarrierTransducer": "HOST_RESIDUAL",
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     },
     "intrinsicSequenceTraversalA46": {
       "status": "EXECUTED_RED_INTRINSIC_AUTHORITY_INSUFFICIENT_GREEN_START_PROJECTION_CONTROL",
       "question": "Can the A45 generic recursive ExactSequence carrier transducer be removed using only intrinsic ExactSequence Link topology plus unchanged A21 contextual detachment?",
-      "setup": ["materialize canonical ExactSequence cells Cell=Cell->Payload with Payload=Prev->Value", "select all intrinsic Cell and Payload Links as A21 continuation authority and seed contextual truth at the final Cell", "materialize START and END projection Links only after the intrinsic run and verify they remain inert when unselected", "run separate positive controls with selected END-only projection and selected START-only projection"],
-      "oracle": ["intrinsic selected authority performs Cell3->Payload3 and then yields ZERO because no selected continuation starts at Payload3 and returns Prev", "ambient physical projection Links do not change the frozen intrinsic result", "selected END projection exposes only the last Value and cannot recurse", "selected START projection traverses all three cells and all three values because intrinsic Payload=Prev->Value supplies value continuation once Prev becomes current", "two independent Memories agree"],
-      "antiCheat": ["traversal runtime is only unchanged A21 step and contains no memory.poles/readExactSequence/sequenceNode/foldSequence/zipSequence carrier reader", "A21 step is source-identical to A37", "fixture is checked against canonical materializeExactSequence topology"],
+      "setup": [
+        "materialize canonical ExactSequence cells Cell=Cell->Payload with Payload=Prev->Value",
+        "select all intrinsic Cell and Payload Links as A21 continuation authority and seed contextual truth at the final Cell",
+        "materialize START and END projection Links only after the intrinsic run and verify they remain inert when unselected",
+        "run separate positive controls with selected END-only projection and selected START-only projection"
+      ],
+      "oracle": [
+        "intrinsic selected authority performs Cell3->Payload3 and then yields ZERO because no selected continuation starts at Payload3 and returns Prev",
+        "ambient physical projection Links do not change the frozen intrinsic result",
+        "selected END projection exposes only the last Value and cannot recurse",
+        "selected START projection traverses all three cells and all three values because intrinsic Payload=Prev->Value supplies value continuation once Prev becomes current",
+        "two independent Memories agree"
+      ],
+      "antiCheat": [
+        "traversal runtime is only unchanged A21 step and contains no memory.poles/readExactSequence/sequenceNode/foldSequence/zipSequence carrier reader",
+        "A21 step is source-identical to A37",
+        "fixture is checked against canonical materializeExactSequence topology"
+      ],
       "evidenceTest": "ts/test/research-v013-intrinsic-sequence-traversal-a46.test.ts",
       "result": "RED for A45 transducer source-removal under intrinsic ExactSequence authority. ExactSequence self-incidence exposes Cell->Payload but does not itself carry Payload->START(Payload), so recursive traversal cannot continue. GREEN positive control localizes the missing authority to START projection: selected Payload->Prev is sufficient for full traversal; selected END projection alone is not.",
-      "claimBoundary": ["this is a scoped falsifier of intrinsic ExactSequence+A21 sufficiency, not a proof that Link-native pole projection is impossible", "pre-authored Payload->Prev edges are positive-control authority and remain a source residual", "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"],
-      "residualAuthority": ["source/admission of generic START projection for arbitrary Payload Links", "Rule->Contract structural derivation remains host-side", "A35 publication-existence and A36 scratch boundaries remain open"],
+      "claimBoundary": [
+        "this is a scoped falsifier of intrinsic ExactSequence+A21 sufficiency, not a proof that Link-native pole projection is impossible",
+        "pre-authored Payload->Prev edges are positive-control authority and remain a source residual",
+        "v0.13 remains unaccepted; E2/E3/E4 and FULL_SELF_HOSTED remain open"
+      ],
+      "residualAuthority": [
+        "source/admission of generic START projection for arbitrary Payload Links",
+        "Rule->Contract structural derivation remains host-side",
+        "A35 publication-existence and A36 scratch boundaries remain open"
+      ],
       "consequence": "A46 narrows A45's host recursion boundary to one structural capability rather than a general iterator: recursive ExactSequence execution needs Link-carried START projection of Payload=Prev->Value. The intrinsic Payload already supplies Value when Prev is current, so END projection is not required for full traversal. A47 should attack the source of START projection without smuggling host poles or per-payload projection edges.",
-      "observed": {"intrinsicFirstStep": "CELL_TO_PAYLOAD", "intrinsicSecondStep": "ZERO", "ambientProjection": "INERT", "selectedEndProjection": "LAST_VALUE_ONLY_NO_RECURSION", "selectedStartProjection": "FULL_TRAVERSAL_VALUES_3_OF_3", "minimumMissingAuthority": "PAYLOAD_TO_START_PAYLOAD", "a21Runtime": "SOURCE_IDENTICAL", "hostRecursiveSequenceReaderInTraversalRuntime": 0, "sourceRemoved": false, "independentMemories": 2, "productionChanged": false}
+      "observed": {
+        "intrinsicFirstStep": "CELL_TO_PAYLOAD",
+        "intrinsicSecondStep": "ZERO",
+        "ambientProjection": "INERT",
+        "selectedEndProjection": "LAST_VALUE_ONLY_NO_RECURSION",
+        "selectedStartProjection": "FULL_TRAVERSAL_VALUES_3_OF_3",
+        "minimumMissingAuthority": "PAYLOAD_TO_START_PAYLOAD",
+        "a21Runtime": "SOURCE_IDENTICAL",
+        "hostRecursiveSequenceReaderInTraversalRuntime": 0,
+        "sourceRemoved": false,
+        "independentMemories": 2,
+        "productionChanged": false
+      }
     },
     "proofCarriedStartProjectionA47": {
       "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
