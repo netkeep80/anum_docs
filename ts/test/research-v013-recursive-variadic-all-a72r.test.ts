@@ -604,8 +604,14 @@ function runSpec(f: Fixture, spec: RunSpec): void {
   const firstFalse = spec.args.findIndex((x) => x === FALSE);
   const expectedReactions =
     firstFalse >= 0 ? firstFalse + 1 : spec.args.length;
-  same(reactions, expectedReactions,
-    spec.label + " recursive reductions follow carrier prefix");
+  assert(
+    reactions === expectedReactions,
+    spec.label +
+      " recursive reductions follow carrier prefix: actual=" +
+      reactions +
+      " expected=" +
+      expectedReactions,
+  );
 }
 
 function exerciseCarrier(f: Fixture): void {
