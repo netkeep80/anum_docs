@@ -156,7 +156,7 @@ setEqual(
   "all public v0.13 runtime functions are classified as semantic entrypoints",
 );
 
-// Static direct-dependency observation over the five candidate-kernel files.
+// Static direct-dependency observation over the declared candidate-kernel files.
 // This projection is deliberately external observability: it watches source
 // dependencies but is never read by the runtime implementation.
 const memoryMembers = new Set([
