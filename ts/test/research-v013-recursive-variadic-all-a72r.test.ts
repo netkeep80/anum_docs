@@ -187,12 +187,20 @@ interface ContextReaction {
 }
 
 /**
- * Variadic carrier built only from the existing structural aspects:
+ * Recursive positive-arity carrier:
  *
- *   [x]       = END(x)
+ *   []        = ROOT
  *   [x,...xs] = PAIR(x, [xs])
  *
- * No program-data terminator and no MTS Set object are introduced.
+ * ROOT is reused here only as the empty-tail structural boundary for this
+ * scoped boolean-function experiment. No new terminator identity is created.
+ *
+ * A72r also records why the initially attempted END(x) terminal is invalid:
+ *
+ *   E = END(x) = x -> E
+ *   PAIR(x,E)  = x -> E = E
+ *
+ * so adjacent repeated values would collapse canonically.
  */
 function buildAspectArgumentChain(
   memory: Memory,
@@ -200,8 +208,8 @@ function buildAspectArgumentChain(
 ): LinkHandle {
   assert(args.length > 0, "positive arity required");
 
-  let chain = memory.ensureEndSelfClosed(args[args.length - 1]!);
-  for (let i = args.length - 2; i >= 0; i -= 1) {
+  let chain = memory.root;
+  for (let i = args.length - 1; i >= 0; i -= 1) {
     chain = memory.ensure(args[i]!, chain);
   }
   return chain;
@@ -237,82 +245,72 @@ function defineRecursiveAllRules(
   FALSE: LinkHandle,
   TRUE: LinkHandle,
 ): void {
-  // Separate role identities for separate Rules.
-  const kTerminalFalse = memory.ensure(seed, b.O);
-  const kTerminalTrue = memory.ensure(seed, b.C);
-  const kConsFalse = memory.ensure(seed, b.L);
-  const tailFalse = memory.ensure(seed, b.U);
-  const kConsTrue = memory.ensure(seed, memory.root);
-  const tailTrue = memory.ensure(seed, memory.ensure(b.O, b.C));
+  const kFalse = memory.ensure(seed, b.O);
+  const falseTail = memory.ensure(seed, b.C);
 
-  // END(FALSE) -> FALSE
-  {
-    const args = memory.ensureEndSelfClosed(FALSE);
-    const application = memory.ensure(ALL, args);
-    const before =
-      memory.ensureStartSelfClosed(memory.ensure(kTerminalFalse, application));
-    const after =
-      memory.ensureStartSelfClosed(memory.ensure(kTerminalFalse, FALSE));
-    defineRule(
-      memory,
-      theory,
-      ALL,
-      [kTerminalFalse],
-      before,
-      after,
-    );
-  }
+  const kTrueTerminal = memory.ensure(seed, b.L);
 
-  // END(TRUE) -> TRUE
-  {
-    const args = memory.ensureEndSelfClosed(TRUE);
-    const application = memory.ensure(ALL, args);
-    const before =
-      memory.ensureStartSelfClosed(memory.ensure(kTerminalTrue, application));
-    const after =
-      memory.ensureStartSelfClosed(memory.ensure(kTerminalTrue, TRUE));
-    defineRule(
-      memory,
-      theory,
-      ALL,
-      [kTerminalTrue],
-      before,
-      after,
-    );
-  }
+  const kTrueRecursive = memory.ensure(seed, b.U);
+  const nextHead = memory.ensure(seed, memory.root);
+  const nextRest = memory.ensure(seed, memory.ensure(b.O, b.C));
 
   // PAIR(FALSE, tail) -> FALSE
+  //
+  // One Rule covers FALSE at every positive arity, including tail=ROOT.
   {
-    const args = memory.ensure(FALSE, tailFalse);
+    const args = memory.ensure(FALSE, falseTail);
     const application = memory.ensure(ALL, args);
     const before =
-      memory.ensureStartSelfClosed(memory.ensure(kConsFalse, application));
+      memory.ensureStartSelfClosed(memory.ensure(kFalse, application));
     const after =
-      memory.ensureStartSelfClosed(memory.ensure(kConsFalse, FALSE));
+      memory.ensureStartSelfClosed(memory.ensure(kFalse, FALSE));
     defineRule(
       memory,
       theory,
       ALL,
-      [kConsFalse, tailFalse],
+      [kFalse, falseTail],
       before,
       after,
     );
   }
 
-  // PAIR(TRUE, tail) -> ALL(tail)
+  // PAIR(TRUE, ROOT) -> TRUE
   {
-    const args = memory.ensure(TRUE, tailTrue);
+    const args = memory.ensure(TRUE, memory.root);
     const application = memory.ensure(ALL, args);
     const before =
-      memory.ensureStartSelfClosed(memory.ensure(kConsTrue, application));
-    const resumed = memory.ensure(ALL, tailTrue);
+      memory.ensureStartSelfClosed(memory.ensure(kTrueTerminal, application));
     const after =
-      memory.ensureStartSelfClosed(memory.ensure(kConsTrue, resumed));
+      memory.ensureStartSelfClosed(memory.ensure(kTrueTerminal, TRUE));
     defineRule(
       memory,
       theory,
       ALL,
-      [kConsTrue, tailTrue],
+      [kTrueTerminal],
+      before,
+      after,
+    );
+  }
+
+  // PAIR(TRUE, PAIR(nextHead,nextRest))
+  //   -> ALL(PAIR(nextHead,nextRest))
+  //
+  // The strict A71p matcher distinguishes the nested ordinary PAIR tail from
+  // ROOT, so this Rule cannot also match the terminal TRUE case.
+  {
+    const nonEmptyTail = memory.ensure(nextHead, nextRest);
+    const args = memory.ensure(TRUE, nonEmptyTail);
+    const application = memory.ensure(ALL, args);
+    const before =
+      memory.ensureStartSelfClosed(memory.ensure(kTrueRecursive, application));
+    const resumed = memory.ensure(ALL, nonEmptyTail);
+    const after =
+      memory.ensureStartSelfClosed(memory.ensure(kTrueRecursive, resumed));
+    defineRule(
+      memory,
+      theory,
+      ALL,
+      [kTrueRecursive, nextHead, nextRest],
       before,
       after,
     );
@@ -617,27 +615,43 @@ function runSpec(f: Fixture, spec: RunSpec): void {
 function exerciseCarrier(f: Fixture): void {
   const { memory, FALSE, TRUE } = f;
 
+  // Falsifier for the first attempted END-terminal encoding.
+  const naiveEndTrue = memory.ensureEndSelfClosed(TRUE);
+  same(
+    memory.ensure(TRUE, naiveEndTrue),
+    naiveEndTrue,
+    "naive PAIR(TRUE,END(TRUE)) collapses to END(TRUE)",
+  );
+
+  const naiveEndFalse = memory.ensureEndSelfClosed(FALSE);
+  same(
+    memory.ensure(FALSE, naiveEndFalse),
+    naiveEndFalse,
+    "naive PAIR(FALSE,END(FALSE)) collapses to END(FALSE)",
+  );
+
+  // ROOT-tail carrier keeps repeated adjacent values distinct.
   const one = buildAspectArgumentChain(memory, [TRUE]);
-  const two = buildAspectArgumentChain(memory, [TRUE, FALSE]);
-  const three = buildAspectArgumentChain(memory, [TRUE, TRUE, FALSE]);
+  const two = buildAspectArgumentChain(memory, [TRUE, TRUE]);
+  const three = buildAspectArgumentChain(memory, [TRUE, TRUE, TRUE]);
+
+  assert(one !== two && two !== three && one !== three,
+    "arity 1/2/3 repeated TRUE carriers stay distinct");
 
   const p1 = memory.poles(one);
-  assert(p1.end === one && p1.start === TRUE,
-    "arity-1 carrier is END(TRUE)");
+  same(p1.start, TRUE, "arity-1 first argument");
+  same(p1.end, memory.root, "arity-1 tail is ROOT");
 
   const p2 = memory.poles(two);
-  assert(p2.start === TRUE && p2.end !== two,
-    "arity-2 carrier starts as ordinary PAIR");
+  same(p2.start, TRUE, "arity-2 first argument");
+  assert(p2.end !== memory.root, "arity-2 tail is non-empty");
   const p2tail = memory.poles(p2.end);
-  assert(p2tail.end === p2.end && p2tail.start === FALSE,
-    "arity-2 tail is END(FALSE)");
+  same(p2tail.start, TRUE, "arity-2 repeated second argument");
+  same(p2tail.end, memory.root, "arity-2 final tail is ROOT");
 
-  const p3 = memory.poles(three);
-  assert(p3.start === TRUE && p3.end !== three,
-    "arity-3 carrier starts as ordinary PAIR");
-  const p3second = memory.poles(p3.end);
-  assert(p3second.start === TRUE && p3second.end !== p3.end,
-    "arity-3 second node is ordinary PAIR");
+  const tf = buildAspectArgumentChain(memory, [TRUE, FALSE]);
+  const ft = buildAspectArgumentChain(memory, [FALSE, TRUE]);
+  assert(tf !== ft, "carrier preserves argument order");
 }
 
 function exercise(): void {
@@ -700,8 +714,8 @@ function staticGuards(): void {
 
   same(
     rules.split("defineRule(").length - 1,
-    4,
-    "ALL semantics uses exactly four generic Rules",
+    3,
+    "ALL semantics uses exactly three generic Rules",
   );
 
   for (const forbidden of [
@@ -743,15 +757,17 @@ function main(): void {
   console.log([
     "MTS v0.13 A72r: RECURSIVE_VARIADIC_ALL=GREEN_SCOPED_RESEARCH",
     "PROGRAM=ALL",
-    "ARGUMENT_CARRIER=PAIR_RECURSION_WITH_END_TERMINAL",
+    "ARGUMENT_CARRIER=PAIR_CHAIN_WITH_ROOT_EMPTY_TAIL",
     "PROGRAM_DATA_TERMINATOR=ABSENT",
     "NEW_FOUNDATION_ENTITY=ABSENT",
-    "GENERIC_RULE_COUNT=4",
+    "NAIVE_END_TERMINAL_REPEAT_COLLAPSE=PROVEN",
+    "GENERIC_RULE_COUNT=3",
     "GROUNDED_RULE_PER_INPUT=0",
     "RULE_MATCHER=A71P_ASPECT_PRESERVING",
-    "PAIR_VS_END_RULE_AMBIGUITY=0",
+    "PAIR_VS_ROOT_TERMINAL_AMBIGUITY=0",
     "TESTED_ARITIES=1_2_3_5",
     "ARITY_FIVE_WITHOUT_NEW_RULE=GREEN",
+    "ROOT_VALUED_ARGUMENT=OUTSIDE_CURRENT_BOOLEAN_FIXTURE",
     "ARGUMENT_ORDER_PRESERVED=TRUE",
     "EXECUTION_KERNEL_ARITY_BLIND=TRUE",
     "FALSE_SHORT_CIRCUIT=STRUCTURAL_REDUCTION",
