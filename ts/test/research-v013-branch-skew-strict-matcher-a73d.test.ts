@@ -116,40 +116,11 @@ function done(
 ): LinkHandle {
   return memory.ensure(b.C, value);
 }
-function frame(
-  memory: Memory,
-  parent: LinkHandle,
-  fn: LinkHandle,
-): LinkHandle {
-  return memory.ensureStartSelfClosed(memory.ensure(parent, fn));
-}
 function rootBoundary(
   memory: Memory,
   rootCaller: LinkHandle,
 ): LinkHandle {
   return memory.ensureEndSelfClosed(rootCaller);
-}
-function isFrame(memory: Memory, value: LinkHandle): boolean {
-  const p = memory.poles(value);
-  return p.start === value && p.end !== value;
-}
-function frameDepthTo(
-  memory: Memory,
-  current: LinkHandle,
-  root: LinkHandle,
-): number {
-  let depth = 0;
-  let cursor = current;
-  const seen = new Set<LinkHandle>();
-  while (cursor !== root) {
-    assert(!seen.has(cursor), "frame ancestry cycle");
-    seen.add(cursor);
-    assert(isFrame(memory, cursor), "non-root caller is START frame");
-    const payload = memory.poles(memory.poles(cursor).end);
-    cursor = payload.start;
-    depth += 1;
-  }
-  return depth;
 }
 interface GroundedRuleImage {
   readonly outputBundleTemplate: LinkHandle;
@@ -329,70 +300,6 @@ function admitTaggedBundleRule(
   const admission = admitStructuralRule(memory, theory, rule);
   memory.ensure(triggerKey, admission);
   return rule;
-}
-interface LifecycleRules {
-  readonly open: LinkHandle;
-  readonly resume: LinkHandle;
-  readonly publish: LinkHandle;
-}
-function defineUnaryLifecycleRules(
-  memory: Memory,
-  theory: LinkHandle,
-  b: RootBasis,
-  seed: LinkHandle,
-): LifecycleRules {
-  const kOpen = memory.ensure(seed, b.O);
-  const fOpen = memory.ensure(seed, b.C);
-  const gOpen = memory.ensure(seed, b.L);
-  const xOpen = memory.ensure(seed, b.U);
-  const inner = call(memory, b, gOpen, xOpen);
-  const outer = call(memory, b, fOpen, inner);
-  const openBefore = memory.ensure(kOpen, outer);
-  const openAfter =
-    memory.ensure(frame(memory, kOpen, fOpen), inner);
-  const open = admitTaggedBundleRule(
-    memory,
-    theory,
-    b.O,
-    [kOpen, fOpen, gOpen, xOpen],
-    openBefore,
-    [openAfter],
-  );
-  const kResume = memory.ensure(seed, memory.ensure(b.O, b.L));
-  const fResume = memory.ensure(seed, memory.ensure(b.C, b.U));
-  const vResume = memory.ensure(seed, memory.ensure(b.L, b.O));
-  const resumeBefore = memory.ensure(
-    frame(memory, kResume, fResume),
-    done(memory, b, vResume),
-  );
-  const resumeAfter = memory.ensure(
-    kResume,
-    call(memory, b, fResume, vResume),
-  );
-  const resume = admitTaggedBundleRule(
-    memory,
-    theory,
-    b.C,
-    [kResume, fResume, vResume],
-    resumeBefore,
-    [resumeAfter],
-  );
-  const kPublish = memory.ensure(seed, memory.ensure(b.U, b.C));
-  const vPublish = memory.ensure(seed, memory.ensure(b.L, b.C));
-  const publishBefore = memory.ensure(
-    rootBoundary(memory, kPublish),
-    done(memory, b, vPublish),
-  );
-  const publishAfter = memory.ensure(kPublish, vPublish);
-  const publish = admitTaggedBundleRule(
-    memory,
-    theory,
-    b.C,
-    [kPublish, vPublish],
-    publishBefore,
-    [publishAfter],
-  );
-  return Object.freeze({ open, resume, publish });
 }
 function defineGroundedUnaryFunctionRule(
   memory: Memory,
