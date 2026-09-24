@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-
 import {
   Memory,
   MemoryError,
@@ -19,15 +18,12 @@ import {
   type StructuralRoleBinding,
 } from "../src/structural-rule.js";
 import { readContext, StateError } from "../src/state.js";
-
 function assert(c: unknown, m: string): asserts c {
   if (!c) throw new Error("v0.13 A72t mixed-scope early collapse: " + m);
 }
-
 function same<T>(a: T, e: T, m: string): void {
   assert(Object.is(a, e), m + ": values differ");
 }
-
 function sameMembers(
   actual: readonly LinkHandle[],
   expected: readonly LinkHandle[],
@@ -38,7 +34,6 @@ function sameMembers(
     assert(actual.includes(member), message + " missing member");
   }
 }
-
 function unifyRuleTemplate(
   memory: Memory,
   template: LinkHandle,
@@ -48,13 +43,11 @@ function unifyRuleTemplate(
   if (new Set(roles).size !== roles.length) {
     throw new StructuralRuleError("duplicate-role");
   }
-
   const before = memory.linkCount;
   const roleSet = new Set(roles);
   const inferred = new Map<LinkHandle, LinkHandle>();
   const containsMemo = new Map<LinkHandle, boolean>();
   const containsActive = new Set<LinkHandle>();
-
   const containsRole = (node: LinkHandle): boolean => {
     if (roleSet.has(node)) return true;
     const cached = containsMemo.get(node);
@@ -70,7 +63,6 @@ function unifyRuleTemplate(
       containsActive.delete(node);
     }
   };
-
   const visited = new Map<LinkHandle, Set<LinkHandle>>();
   const markVisited = (left: LinkHandle, right: LinkHandle): boolean => {
     let rights = visited.get(left);
@@ -82,7 +74,6 @@ function unifyRuleTemplate(
     rights.add(right);
     return false;
   };
-
   const unify = (left: LinkHandle, right: LinkHandle): void => {
     if (roleSet.has(left)) {
       const previous = inferred.get(left);
@@ -92,14 +83,11 @@ function unifyRuleTemplate(
       inferred.set(left, right);
       return;
     }
-
     if (!containsRole(left)) {
       if (left !== right) throw new StructuralRuleError("template-mismatch");
       return;
     }
-
     if (markVisited(left, right)) return;
-
     try {
       const lp = memory.poles(left);
       const rp = memory.poles(right);
@@ -119,7 +107,6 @@ function unifyRuleTemplate(
       throw error;
     }
   };
-
   try {
     unify(template, claimed);
     return Object.freeze(roles.map((role) => {
@@ -131,7 +118,6 @@ function unifyRuleTemplate(
     same(memory.linkCount, before, "Rule matching is read-only");
   }
 }
-
 function defineWorkingScope(
   memory: Memory,
   seed: LinkHandle,
@@ -141,7 +127,6 @@ function defineWorkingScope(
   for (const member of members) memory.ensure(scope, member);
   return scope;
 }
-
 function readWorkingScope(
   memory: Memory,
   scope: LinkHandle,
@@ -155,39 +140,32 @@ function readWorkingScope(
   }
   return Object.freeze(members);
 }
-
 class CurrentScopeCursor {
   constructor(
     private readonly memory: Memory,
     private scope: LinkHandle,
   ) {}
-
   currentScope(): LinkHandle {
     return this.scope;
   }
-
   members(): readonly LinkHandle[] {
     return readWorkingScope(this.memory, this.scope);
   }
-
   switchAtomically(expectedOld: LinkHandle, next: LinkHandle): void {
     same(this.scope, expectedOld, "scope handoff old scope");
     this.scope = next;
   }
 }
-
 interface GroundedRuleImage {
   readonly outputTemplate: LinkHandle;
   readonly bindings: readonly StructuralRoleBinding[];
 }
-
 interface MixedReaction {
   readonly activeContexts: readonly LinkHandle[];
   readonly stableResults: readonly LinkHandle[];
   readonly rawRuleMatches: number;
   readonly collapsedCompletions: number;
 }
-
 function buildArgumentChain(
   memory: Memory,
   args: readonly LinkHandle[],
@@ -199,7 +177,6 @@ function buildArgumentChain(
   }
   return chain;
 }
-
 function defineRule(
   memory: Memory,
   theory: LinkHandle,
@@ -217,7 +194,6 @@ function defineRule(
   const admission = admitStructuralRule(memory, theory, rule);
   memory.ensure(triggerFunction, admission);
 }
-
 function completedContext(
   memory: Memory,
   context: LinkHandle,
@@ -225,7 +201,6 @@ function completedContext(
   readContext(memory, context);
   return memory.ensureEndSelfClosed(context);
 }
-
 function defineRecursiveAllRules(
   memory: Memory,
   theory: LinkHandle,
@@ -241,7 +216,6 @@ function defineRecursiveAllRules(
   const kTrueRecursive = memory.ensure(seed, b.U);
   const nextHead = memory.ensure(seed, memory.root);
   const nextRest = memory.ensure(seed, memory.ensure(b.O, b.C));
-
   {
     const args = memory.ensure(FALSE, falseTail);
     const app = memory.ensure(ALL, args);
@@ -251,7 +225,6 @@ function defineRecursiveAllRules(
     const after = completedContext(memory, terminal);
     defineRule(memory, theory, ALL, [kFalse, falseTail], before, after);
   }
-
   {
     const args = memory.ensure(TRUE, memory.root);
     const app = memory.ensure(ALL, args);
@@ -262,7 +235,6 @@ function defineRecursiveAllRules(
     const after = completedContext(memory, terminal);
     defineRule(memory, theory, ALL, [kTrueTerminal], before, after);
   }
-
   {
     const nonEmptyTail = memory.ensure(nextHead, nextRest);
     const args = memory.ensure(TRUE, nonEmptyTail);
@@ -282,7 +254,6 @@ function defineRecursiveAllRules(
     );
   }
 }
-
 function defineChoiceRules(
   memory: Memory,
   theory: LinkHandle,
@@ -296,20 +267,17 @@ function defineChoiceRules(
   const kFalse = memory.ensure(seed, b.O);
   const kTrue = memory.ensure(seed, b.C);
   const app = memory.ensure(CHOICE, token);
-
   const beforeFalse =
     memory.ensureStartSelfClosed(memory.ensure(kFalse, app));
   const afterFalse =
     memory.ensureStartSelfClosed(memory.ensure(kFalse, FALSE));
   defineRule(memory, theory, CHOICE, [kFalse], beforeFalse, afterFalse);
-
   const beforeTrue =
     memory.ensureStartSelfClosed(memory.ensure(kTrue, app));
   const afterTrue =
     memory.ensureStartSelfClosed(memory.ensure(kTrue, TRUE));
   defineRule(memory, theory, CHOICE, [kTrue], beforeTrue, afterTrue);
 }
-
 function discoverFunctionTriggeredRuleImages(
   memory: Memory,
   theory: LinkHandle,
@@ -319,16 +287,13 @@ function discoverFunctionTriggeredRuleImages(
   const application = memory.poles(state.current);
   const fn = application.start;
   const matches: GroundedRuleImage[] = [];
-
   for (const trigger of memory.outgoing(fn)) {
     if (trigger === fn) continue;
     const tp = memory.poles(trigger);
     if (tp.start !== fn) continue;
-
     const admission = tp.end;
     const ap = memory.poles(admission);
     if (ap.start !== theory || ap.end === admission) continue;
-
     try {
       const rule = ap.end;
       verifyStructuralRuleAdmission(memory, theory, rule, admission);
@@ -351,10 +316,8 @@ function discoverFunctionTriggeredRuleImages(
       throw error;
     }
   }
-
   return Object.freeze(matches);
 }
-
 function instantiateTemplate(
   memory: Memory,
   template: LinkHandle,
@@ -362,15 +325,12 @@ function instantiateTemplate(
 ): LinkHandle {
   const mapping = new Map<LinkHandle, LinkHandle>();
   for (const binding of bindings) mapping.set(binding.role, binding.value);
-
   const visiting = new Set<LinkHandle>();
   const clone = (source: LinkHandle): LinkHandle => {
     const bound = mapping.get(source);
     if (bound !== undefined) return bound;
-
     assert(!visiting.has(source), "unsupported non-self template cycle");
     const p = memory.poles(source);
-
     let value: LinkHandle;
     if (p.start === source && p.end === source) {
       value = memory.ensureRoot();
@@ -385,14 +345,11 @@ function instantiateTemplate(
       visiting.delete(source);
       value = memory.ensure(start, end);
     }
-
     mapping.set(source, value);
     return value;
   };
-
   return clone(template);
 }
-
 function tryReadContext(
   memory: Memory,
   link: LinkHandle,
@@ -406,20 +363,16 @@ function tryReadContext(
     throw error;
   }
 }
-
 function readCompletedResult(
   memory: Memory,
   link: LinkHandle,
 ): LinkHandle | undefined {
   const p = memory.poles(link);
   if (p.end !== link || p.start === link) return undefined;
-
   const completed = tryReadContext(memory, p.start);
   if (completed === undefined) return undefined;
-
   return memory.poles(p.start).end;
 }
-
 function reactMixedScope(
   memory: Memory,
   theory: LinkHandle,
@@ -429,42 +382,35 @@ function reactMixedScope(
   const oldScope = cursor.currentScope();
   const before = cursor.members();
   assert(before.length > 0, "reaction requires current members");
-
   const nextMembers: LinkHandle[] = [];
   const activeContexts: LinkHandle[] = [];
   const stableResults: LinkHandle[] = [];
   let rawRuleMatches = 0;
   let collapsedCompletions = 0;
-
   const addStable = (result: LinkHandle): void => {
     if (!stableResults.includes(result)) stableResults.push(result);
     if (!nextMembers.includes(result)) nextMembers.push(result);
   };
-
   const addActive = (context: LinkHandle): void => {
     readContext(memory, context);
     if (!activeContexts.includes(context)) activeContexts.push(context);
     if (!nextMembers.includes(context)) nextMembers.push(context);
   };
-
   for (const member of before) {
     const state = tryReadContext(memory, member);
     if (state === undefined) {
       addStable(member);
       continue;
     }
-
     const images =
       discoverFunctionTriggeredRuleImages(memory, theory, member);
     assert(images.length > 0,
       "active Context must either react or be explicitly completed");
-
     for (const image of images) {
       rawRuleMatches += 1;
       const successor =
         instantiateTemplate(memory, image.outputTemplate, image.bindings);
       const completed = readCompletedResult(memory, successor);
-
       if (completed !== undefined) {
         collapsedCompletions += 1;
         addStable(completed);
@@ -473,12 +419,10 @@ function reactMixedScope(
       }
     }
   }
-
   const nextScope = defineWorkingScope(memory, nextScopeSeed, nextMembers);
   same(cursor.currentScope(), oldScope,
     "mixed next Scope remains non-current until handoff");
   cursor.switchAtomically(oldScope, nextScope);
-
   return Object.freeze({
     activeContexts: Object.freeze(activeContexts),
     stableResults: Object.freeze(stableResults),
@@ -486,7 +430,6 @@ function reactMixedScope(
     collapsedCompletions,
   });
 }
-
 function openFirstArgumentCall(
   memory: Memory,
   cursor: CurrentScopeCursor,
@@ -495,13 +438,11 @@ function openFirstArgumentCall(
   const oldScope = cursor.currentScope();
   const before = cursor.members();
   same(before.length, 1, "one suspended outer Context");
-
   const outerContext = before[0]!;
   const outer = readContext(memory, outerContext);
   const outerApplication = memory.poles(outer.current);
   const carrier = memory.poles(outerApplication.end);
   const innerCall = carrier.start;
-
   const child = memory.ensureStartSelfClosed(
     memory.ensure(outerContext, innerCall),
   );
@@ -509,7 +450,6 @@ function openFirstArgumentCall(
   cursor.switchAtomically(oldScope, nextScope);
   return child;
 }
-
 function resumeFirstArgumentBranches(
   memory: Memory,
   cursor: CurrentScopeCursor,
@@ -518,9 +458,7 @@ function resumeFirstArgumentBranches(
   const oldScope = cursor.currentScope();
   const children = cursor.members();
   assert(children.length > 0, "inner result branches required");
-
   const produced: LinkHandle[] = [];
-
   for (const childContext of children) {
     const child = readContext(memory, childContext);
     const suspendedOuter = child.parent;
@@ -529,21 +467,17 @@ function resumeFirstArgumentBranches(
     const outerFunction = outerApplication.start;
     const oldCarrier = memory.poles(outerApplication.end);
     const tail = oldCarrier.end;
-
     const resumedCarrier = memory.ensure(child.current, tail);
     const resumedApplication = memory.ensure(outerFunction, resumedCarrier);
     const resumedContext = memory.ensureStartSelfClosed(
       memory.ensure(outer.parent, resumedApplication),
     );
-
     if (!produced.includes(resumedContext)) produced.push(resumedContext);
   }
-
   const nextScope = defineWorkingScope(memory, nextScopeSeed, produced);
   cursor.switchAtomically(oldScope, nextScope);
   return Object.freeze(produced);
 }
-
 interface Fixture {
   readonly memory: Memory;
   readonly theory: LinkHandle;
@@ -555,11 +489,9 @@ interface Fixture {
   readonly TRUE: LinkHandle;
   readonly seeds: readonly LinkHandle[];
 }
-
 function buildFixture(): Fixture {
   const memory = new Memory();
   const b = ensureRootBasis(memory);
-
   let seed = memory.ensure(b.U, b.L);
   const fresh: LinkHandle[] = [];
   for (let i = 0; i < 140; i += 1) {
@@ -571,7 +503,6 @@ function buildFixture(): Fixture {
     assert(value !== undefined, "fresh anchor " + i);
     return value;
   };
-
   const theory = memory.ensure(at(0), at(1));
   const K = memory.ensure(at(2), at(3));
   const FALSE = memory.ensure(at(4), at(5));
@@ -579,14 +510,12 @@ function buildFixture(): Fixture {
   const ALL = memory.ensure(at(8), at(9));
   const CHOICE = memory.ensure(at(10), at(11));
   const TOKEN = memory.ensure(at(12), at(13));
-
   defineRecursiveAllRules(
     memory, theory, b, at(14), ALL, FALSE, TRUE,
   );
   defineChoiceRules(
     memory, theory, b, at(15), CHOICE, TOKEN, FALSE, TRUE,
   );
-
   return Object.freeze({
     memory,
     theory,
@@ -602,7 +531,6 @@ function buildFixture(): Fixture {
     ]),
   });
 }
-
 function exercise(): void {
   const f = buildFixture();
   const {
@@ -616,36 +544,29 @@ function exercise(): void {
     TRUE,
     seeds,
   } = f;
-
   const choiceCall = memory.ensure(CHOICE, TOKEN);
   const args = buildArgumentChain(memory, [choiceCall, TRUE, TRUE]);
   const outerCall = memory.ensure(ALL, args);
   const outerContext =
     memory.ensureStartSelfClosed(memory.ensure(K, outerCall));
-
   const initialScope = defineWorkingScope(memory, seeds[0]!, [outerContext]);
   const cursor = new CurrentScopeCursor(memory, initialScope);
-
   same(
     discoverFunctionTriggeredRuleImages(memory, theory, outerContext).length,
     0,
     "outer ALL waits for nested first argument",
   );
-
   const child = openFirstArgumentCall(memory, cursor, seeds[1]!);
   same(readContext(memory, child).current, choiceCall,
     "child evaluates exact CHOICE call");
-
   const split = reactMixedScope(memory, theory, cursor, seeds[2]!);
   same(split.rawRuleMatches, 2, "CHOICE fires both Rules");
   same(split.collapsedCompletions, 0, "CHOICE results resume parent, not publish");
   same(split.activeContexts.length, 2, "CHOICE produces two child Contexts");
   same(split.stableResults.length, 0, "no top-level stable Result yet");
-
   const resumed =
     resumeFirstArgumentBranches(memory, cursor, seeds[3]!);
   same(resumed.length, 2, "both CHOICE values resume outer ALL");
-
   const falseProgram =
     memory.ensure(ALL, buildArgumentChain(memory, [FALSE, TRUE, TRUE]));
   const trueProgram =
@@ -658,13 +579,11 @@ function exercise(): void {
     [falseProgram, trueProgram],
     "exact resumed outer programs",
   );
-
   const round1 = reactMixedScope(memory, theory, cursor, seeds[4]!);
   const stableFalse = memory.ensure(K, FALSE);
   const allTT = memory.ensure(ALL, buildArgumentChain(memory, [TRUE, TRUE]));
   const activeTT =
     memory.ensureStartSelfClosed(memory.ensure(K, allTT));
-
   same(round1.rawRuleMatches, 2, "both outer branches react");
   same(round1.collapsedCompletions, 1,
     "FALSE branch completes and collapses immediately");
@@ -674,7 +593,6 @@ function exercise(): void {
     "round1 TRUE branch remains active");
   sameMembers(cursor.members(), [stableFalse, activeTT],
     "round1 mixed current Scope");
-
   const falseTerminal =
     memory.ensureStartSelfClosed(memory.ensure(K, FALSE));
   const falseCompletion = memory.ensureEndSelfClosed(falseTerminal);
@@ -684,12 +602,10 @@ function exercise(): void {
     "completion witness itself is not current after collapse");
   assert(cursor.members().includes(stableFalse),
     "stable FALSE result is current while sibling continues");
-
   const round2 = reactMixedScope(memory, theory, cursor, seeds[5]!);
   const allT = memory.ensure(ALL, buildArgumentChain(memory, [TRUE]));
   const activeT =
     memory.ensureStartSelfClosed(memory.ensure(K, allT));
-
   same(round2.rawRuleMatches, 1, "only active TRUE branch reacts");
   same(round2.collapsedCompletions, 0, "no new completion in round2");
   sameMembers(round2.stableResults, [stableFalse],
@@ -698,10 +614,8 @@ function exercise(): void {
     "TRUE branch reduces one more argument");
   sameMembers(cursor.members(), [stableFalse, activeT],
     "round2 remains mixed");
-
   const round3 = reactMixedScope(memory, theory, cursor, seeds[6]!);
   const stableTrue = memory.ensure(K, TRUE);
-
   same(round3.rawRuleMatches, 1, "last active TRUE branch reacts");
   same(round3.collapsedCompletions, 1,
     "TRUE branch completes and collapses");
@@ -711,30 +625,25 @@ function exercise(): void {
     "final canonical relational result bundle");
   sameMembers(cursor.members(), [stableFalse, stableTrue],
     "final current Scope contains stable Results only");
-
   for (const member of cursor.members()) {
     assert(tryReadContext(memory, member) === undefined,
       "final current member is not Context scaffold");
   }
-
   const trueTerminal =
     memory.ensureStartSelfClosed(memory.ensure(K, TRUE));
   assert(!cursor.members().includes(trueTerminal),
     "TRUE terminal Context scaffold also disappears from current state");
 }
-
 function staticGuards(): void {
   const root = resolve(process.cwd(), "..");
   const own = readFileSync(
     join(root, "ts/test/research-v013-mixed-scope-early-collapse-a72t.test.ts"),
     "utf8",
   );
-
   const start = own.indexOf("function reactMixedScope(");
   const end = own.indexOf("\nfunction openFirstArgumentCall(", start);
   assert(start >= 0 && end > start, "mixed reaction source slice");
   const reaction = own.slice(start, end);
-
   for (const required of [
     "addStable(member)",
     "readCompletedResult(memory, successor)",
@@ -744,7 +653,6 @@ function staticGuards(): void {
   ]) {
     assert(reaction.includes(required), "mixed reaction requires " + required);
   }
-
   for (const forbidden of [
     "selectedRule",
     "RuleKind",
@@ -754,13 +662,11 @@ function staticGuards(): void {
     assert(!reaction.includes(forbidden),
       "mixed reaction excludes procedural selector " + forbidden);
   }
-
   same(
     reaction.split("cursor.switchAtomically(").length - 1,
     1,
     "mixed reaction publishes complete next Scope once",
   );
-
   const a72s = readFileSync(
     join(
       root,
@@ -772,7 +678,6 @@ function staticGuards(): void {
     a72s.includes("BRANCH_SKEW_COMPLETION_FALSIFIER=GREEN_SCOPED_RESEARCH"),
     "A72s falsifier remains retained",
   );
-
   const a72r = readFileSync(
     join(root, "ts/test/research-v013-recursive-variadic-all-a72r.test.ts"),
     "utf8",
@@ -782,11 +687,9 @@ function staticGuards(): void {
     "A72r recursive variadic base remains retained",
   );
 }
-
 function main(): void {
   exercise();
   staticGuards();
-
   console.log([
     "MTS v0.13 A72t: MIXED_WORKING_SCOPE_EARLY_RESULT_COLLAPSE=GREEN_SCOPED_RESEARCH",
     "PROGRAM=ALL_OF_CHOICE_TRUE_TRUE",
@@ -814,5 +717,4 @@ function main(): void {
     "V013_NOT_ACCEPTED PRODUCTION_UNCHANGED",
   ].join(" "));
 }
-
 main();
