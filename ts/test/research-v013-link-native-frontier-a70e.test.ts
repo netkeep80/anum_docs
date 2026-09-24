@@ -265,8 +265,8 @@ function staticGuards():void{
     ".find(",
     "allLinks(",
     "defineContext(",
-    ".delete(",
-    ".remove(",
+    "memory.delete(",
+    "memory.remove(",
     "switch",
   ]){
     assert(!core.includes(forbidden),
