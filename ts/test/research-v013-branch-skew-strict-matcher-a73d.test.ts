@@ -1,9 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import {
-  materializeExactSequence,
-  readExactSequence,
-} from "../src/exact-sequence.js";
+import { materializeExactSequence } from "../src/exact-sequence.js";
 import {
   Memory,
   ensureRootBasis,
@@ -15,14 +12,12 @@ import {
   defineStructuralInterpreter,
   defineStructuralRoleDictionary,
   defineStructuralRule,
-  readStructuralInterpreter,
-  readStructuralRoleDictionary,
-  readStructuralRule,
-  StructuralRuleError,
-  verifyStructuralRuleAdmission,
-  type StructuralRoleBinding,
 } from "../src/structural-rule.js";
-import { unifyStructuralRuleTemplate } from "../src/structural-unification.js";
+import {
+  V013CurrentScopeCursor,
+  defineV013WorkingScope,
+  reactV013StructuralScope,
+} from "../src/v013-structural-execution.js";
 function assert(c: unknown, m: string): asserts c {
   if (!c) throw new Error("v0.13 A73d branch skew fixed point: " + m);
 }
@@ -37,68 +32,6 @@ function sameMembers(
   same(actual.length, expected.length, message + " cardinality");
   for (const member of expected) {
     assert(actual.includes(member), message + " missing member");
-  }
-}
-interface WorkingScopeAuthority {
-  readonly interpreter: LinkHandle;
-  readonly theory: LinkHandle;
-}
-function defineWorkingScope(
-  memory: Memory,
-  seed: LinkHandle,
-  interpreter: LinkHandle,
-  members: readonly LinkHandle[],
-): LinkHandle {
-  const descriptor = memory.ensure(seed, interpreter);
-  const scope = memory.ensureStartSelfClosed(descriptor);
-  for (const member of members) memory.ensure(scope, member);
-  return scope;
-}
-function readWorkingScopeAuthority(
-  memory: Memory,
-  scope: LinkHandle,
-): WorkingScopeAuthority {
-  const header = memory.poles(scope);
-  assert(
-    header.start === scope && header.end !== scope,
-    "working scope must have START shape",
-  );
-  const descriptor = memory.poles(header.end);
-  const interpreter = descriptor.end;
-  const structure = readStructuralInterpreter(memory, interpreter);
-  return Object.freeze({
-    interpreter,
-    theory: structure.theory,
-  });
-}
-function readWorkingScope(
-  memory: Memory,
-  scope: LinkHandle,
-): readonly LinkHandle[] {
-  readWorkingScopeAuthority(memory, scope);
-  const members: LinkHandle[] = [];
-  for (const attachment of memory.outgoing(scope)) {
-    if (attachment === scope) continue;
-    const p = memory.poles(attachment);
-    if (p.start !== scope) continue;
-    if (!members.includes(p.end)) members.push(p.end);
-  }
-  return Object.freeze(members);
-}
-class CurrentScopeCursor {
-  constructor(
-    private readonly memory: Memory,
-    private scope: LinkHandle,
-  ) {}
-  currentScope(): LinkHandle {
-    return this.scope;
-  }
-  members(): readonly LinkHandle[] {
-    return readWorkingScope(this.memory, this.scope);
-  }
-  switchAtomically(expectedOld: LinkHandle, next: LinkHandle): void {
-    same(this.scope, expectedOld, "scope handoff old root");
-    this.scope = next;
   }
 }
 function call(
@@ -121,166 +54,6 @@ function rootBoundary(
   rootCaller: LinkHandle,
 ): LinkHandle {
   return memory.ensureEndSelfClosed(rootCaller);
-}
-interface GroundedRuleImage {
-  readonly outputBundleTemplate: LinkHandle;
-  readonly bindings: readonly StructuralRoleBinding[];
-}
-function discoverTaggedRuleImages(
-  memory: Memory,
-  theory: LinkHandle,
-  active: LinkHandle,
-): readonly GroundedRuleImage[] {
-  const endpoint = memory.poles(active).end;
-  const triggerKey = memory.poles(endpoint).start;
-  const matches: GroundedRuleImage[] = [];
-  for (const trigger of memory.outgoing(triggerKey)) {
-    if (trigger === triggerKey) continue;
-    const tp = memory.poles(trigger);
-    if (tp.start !== triggerKey) continue;
-    const admission = tp.end;
-    const ap = memory.poles(admission);
-    if (ap.start !== theory || ap.end === admission) continue;
-    try {
-      const rule = ap.end;
-      verifyStructuralRuleAdmission(memory, theory, rule, admission);
-      const structuralRule = readStructuralRule(memory, rule);
-      const dictionary =
-        readStructuralRoleDictionary(memory, structuralRule.roleDictionary);
-      const body = memory.poles(structuralRule.body);
-      const bindings = unifyStructuralRuleTemplate(
-        memory,
-        body.start,
-        active,
-        dictionary.roles,
-      );
-      matches.push(Object.freeze({
-        outputBundleTemplate: body.end,
-        bindings,
-      }));
-    } catch (error) {
-      if (error instanceof StructuralRuleError) continue;
-      throw error;
-    }
-  }
-  return Object.freeze(matches);
-}
-function instantiateTemplate(
-  memory: Memory,
-  template: LinkHandle,
-  bindings: readonly StructuralRoleBinding[],
-): LinkHandle {
-  const mapping = new Map<LinkHandle, LinkHandle>();
-  for (const binding of bindings) mapping.set(binding.role, binding.value);
-  const visiting = new Set<LinkHandle>();
-  const clone = (source: LinkHandle): LinkHandle => {
-    const bound = mapping.get(source);
-    if (bound !== undefined) return bound;
-    assert(!visiting.has(source), "unsupported non-self template cycle");
-    const p = memory.poles(source);
-    let value: LinkHandle;
-    if (p.start === source && p.end === source) {
-      value = memory.ensureRoot();
-    } else if (p.start === source) {
-      value = memory.ensureStartSelfClosed(clone(p.end));
-    } else if (p.end === source) {
-      value = memory.ensureEndSelfClosed(clone(p.start));
-    } else {
-      visiting.add(source);
-      const start = clone(p.start);
-      const end = clone(p.end);
-      visiting.delete(source);
-      value = memory.ensure(start, end);
-    }
-    mapping.set(source, value);
-    return value;
-  };
-  return clone(template);
-}
-interface ScopeReaction {
-  readonly oldScope: LinkHandle;
-  readonly nextScope: LinkHandle;
-  readonly oldMembers: readonly LinkHandle[];
-  readonly nextMembers: readonly LinkHandle[];
-  readonly rawRuleMatches: number;
-  readonly transitionedMembers: number;
-  readonly quiescent: boolean;
-  readonly handoffCount: 0 | 1;
-}
-function reactScope(
-  memory: Memory,
-  cursor: CurrentScopeCursor,
-  nextScopeSeed: LinkHandle,
-): ScopeReaction {
-  const oldScope = cursor.currentScope();
-  const authority = readWorkingScopeAuthority(memory, oldScope);
-  const before = cursor.members();
-  assert(before.length > 0, "reaction requires non-empty current scope");
-  const nextMembers: LinkHandle[] = [];
-  const addNext = (link: LinkHandle): void => {
-    if (!nextMembers.includes(link)) nextMembers.push(link);
-  };
-  let rawRuleMatches = 0;
-  let transitionedMembers = 0;
-  for (const active of before) {
-    const images =
-      discoverTaggedRuleImages(memory, authority.theory, active);
-    if (images.length === 0) {
-      addNext(active);
-      continue;
-    }
-    transitionedMembers += 1;
-    for (const image of images) {
-      rawRuleMatches += 1;
-      const groundedBundle = instantiateTemplate(
-        memory,
-        image.outputBundleTemplate,
-        image.bindings,
-      );
-      const outputs = readExactSequence(memory, groundedBundle).values;
-      for (const successor of outputs) addNext(successor);
-      same(
-        cursor.currentScope(),
-        oldScope,
-        "old Scope remains current during successor derivation",
-      );
-      sameMembers(
-        cursor.members(),
-        before,
-        "partial successor image never becomes current",
-      );
-    }
-  }
-  if (rawRuleMatches === 0) {
-    sameMembers(nextMembers, before, "quiescent Scope is preserved exactly");
-    return Object.freeze({
-      oldScope,
-      nextScope: oldScope,
-      oldMembers: before,
-      nextMembers: Object.freeze(nextMembers),
-      rawRuleMatches,
-      transitionedMembers,
-      quiescent: true,
-      handoffCount: 0,
-    });
-  }
-  const nextScope = defineWorkingScope(
-    memory,
-    nextScopeSeed,
-    authority.interpreter,
-    nextMembers,
-  );
-  cursor.switchAtomically(oldScope, nextScope);
-  return Object.freeze({
-    oldScope,
-    nextScope,
-    oldMembers: before,
-    nextMembers: Object.freeze(nextMembers),
-    rawRuleMatches,
-    transitionedMembers,
-    quiescent: false,
-    handoffCount: 1,
-  });
 }
 function admitTaggedBundleRule(
   memory: Memory,
@@ -533,8 +306,8 @@ function runBranchSkew(f: Fixture): void {
   const args = argumentChain(memory, [choiceCall, TRUE, TRUE]);
   const initial = memory.ensure(boundary, call(memory, b, ALL, args));
   const initialScope =
-    defineWorkingScope(memory, at(80), interpreter, [initial]);
-  const cursor = new CurrentScopeCursor(memory, initialScope);
+    defineV013WorkingScope(memory, at(80), interpreter, [initial]);
+  const cursor = new V013CurrentScopeCursor(memory, initialScope);
   const snapshots: LinkHandle[][] = [];
   const matches: number[] = [];
   const transitioned: number[] = [];
@@ -543,7 +316,7 @@ function runBranchSkew(f: Fixture): void {
   let activeSiblingAfterFalse = false;
   while (true) {
     const beforeScope = cursor.currentScope();
-    const result = reactScope(memory, cursor, at(81 + reactions));
+    const result = reactV013StructuralScope(memory, cursor, at(81 + reactions));
     if (result.quiescent) {
       same(result.handoffCount, 0, "fixed point has no handoff");
       same(cursor.currentScope(), beforeScope,
@@ -615,43 +388,39 @@ function staticGuards(): void {
     join(root, "ts/test/research-v013-branch-skew-strict-matcher-a73d.test.ts"),
     "utf8",
   );
-  const a73a = readFileSync(
-    join(root, "ts/test/research-v013-nested-multivalued-a73a.test.ts"),
+  const runtime = readFileSync(
+    join(root, "ts/src/v013-structural-execution.ts"),
     "utf8",
   );
-  const ownKernel = sourceSlice(
-    own,
-    "function reactScope(",
-    "\nfunction admitTaggedBundleRule(",
-  );
-  const priorKernel = sourceSlice(
-    a73a,
-    "function reactScope(",
-    "\nfunction admitTaggedBundleRule(",
-  );
-  same(ownKernel, priorKernel,
-    "A73d uses source-identical A73a/A72z reaction kernel");
+  assert(own.includes('from "../src/v013-structural-execution.js"'),
+    "A73d consumes production structural execution");
+  assert(!own.includes("function reactV013StructuralScope("),
+    "A73d contains no local reaction-kernel implementation");
   for (const forbidden of [
     "ALL",
     "CHOICE",
+    "FALSE",
+    "TRUE",
+    "NOT",
+    "RuleKind",
+    "opcode",
     "selectedRule",
     "selectedBranch",
-    "Context",
-    "Result",
     "switch(",
   ]) {
-    assert(!ownKernel.includes(forbidden),
-      "kernel excludes branch-skew program semantics: " + forbidden);
+    assert(!runtime.includes(forbidden),
+      "production kernel excludes program semantic dispatch: " + forbidden);
   }
-  const discovery = sourceSlice(
-    own,
-    "function discoverTaggedRuleImages(",
-    "\nfunction instantiateTemplate(",
-  );
-  assert(discovery.includes("unifyStructuralRuleTemplate("),
-    "Rule discovery uses promoted strict Rule matcher");
-  assert(!discovery.includes("unifyStructuralTemplate("),
-    "projection unifier is absent from Rule discovery");
+  for (const required of [
+    "unifyStructuralRuleTemplate(",
+    "readExactSequence(",
+    "if (images.length === 0)",
+    "if (rawRuleMatches === 0)",
+    "cursor.switchAtomically(",
+  ]) {
+    assert(runtime.includes(required),
+      "production kernel retains generic law: " + required);
+  }
   const a73c = readFileSync(
     join(root, "ts/test/research-v013-promoted-rule-matcher-a73c.test.ts"),
     "utf8",
@@ -699,7 +468,8 @@ function main(): void {
   console.log([
     "MTS v0.13 A73d: BRANCH_SKEW_STRICT_MATCHER=GREEN_SCOPED_RESEARCH",
     "PROGRAM=ALL_OF_CHOICE_TRUE_TRUE",
-    "REACTION_KERNEL=A73A_A72Z_SOURCE_IDENTICAL",
+    "REACTION_KERNEL=PRODUCTION_V013_STRUCTURAL_EXECUTION",
+    "A73D_LOCAL_RUNTIME=0",
     "RULE_MATCHER=A73C_SELF_INCIDENCE_PRESERVING",
     "VARIADIC_HEAD_OPEN=RULE_DRIVEN",
     "VARIADIC_HEAD_RESUME=RULE_DRIVEN",
@@ -713,7 +483,7 @@ function main(): void {
     "CURRENT_SCOPE_ROOT=OPAQUE_AMEMORY_SUBSTRATE_HANDLE",
     "ATOMIC_SCOPE_HANDOFF=AMEMORY_SUBSTRATE_COMMIT",
     "HIERARCHICAL_RESULT_RESEARCH=DEFERRED_RETAINS_A72U_A72V",
-    "V013_NOT_ACCEPTED PRODUCTION_UNCHANGED",
+    "V013_NOT_ACCEPTED ACCEPTED_RUNTIME_UNCHANGED",
   ].join(" "));
 }
 main();
