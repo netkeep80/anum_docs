@@ -991,15 +991,15 @@
     "coarseInheritedAuthorityAggregateCount": 0,
     "unresolvedNestedBootstrapBoundaryCount": 0,
     "unresolvedRepresentationBoundaryCount": 0,
-    "directSemanticWriteOwnerCount": 51,
+    "directSemanticWriteOwnerCount": 53,
     "unclassifiedDirectSemanticWriteOwnerCount": 0,
     "directSemanticWriteOwnersByCategory": {
-      "authority-evidence-producer": 20,
+      "authority-evidence-producer": 21,
       "proof-derivation-producer": 11,
       "representation-materialization": 12,
       "bootstrap-foundation-materialization": 2,
       "tooling": 2,
-      "authorized-semantic-target-materialization": 4
+      "authorized-semantic-target-materialization": 5
     },
     "packageWideObjectSpecificHostSemanticCount": null,
     "typedReadMemorySiteCount": 500,
@@ -1016,7 +1016,7 @@
       "transport-persistence": 23
     },
     "packageWideExactWireLiteralDispatchCount": 0,
-    "typedDirectSemanticWriteOwnerCount": 51,
+    "typedDirectSemanticWriteOwnerCount": 53,
     "hostLinkDuplicationCandidateCount": 26,
     "confirmedHostLinkEquivalentDuplicationCount": null,
     "runtimeObservedPublicSemanticEntrypointCount": 8,
@@ -2048,6 +2048,18 @@
         "reason": "Final host execution of already-authorized FORMAL structural plan."
       },
       {
+        "id": "ts/src/v013-grounded-execution.ts#defineV013GroundedExecutionScope",
+        "category": "authority-evidence-producer",
+        "capabilityId": null,
+        "reason": "Materializes the Link-native grounded working Scope carrying current Theory authority and current membership; current-root selection remains opaque A-memory mechanics."
+      },
+      {
+        "id": "ts/src/v013-grounded-execution.ts#reactV013GroundedScope",
+        "category": "authorized-semantic-target-materialization",
+        "capabilityId": null,
+        "reason": "Materializes successor truths only from grounded relations admitted by the current Theory; no Rule/template/opcode selection is performed."
+      },
+      {
         "id": "ts/src/v013-hierarchical-carrier.ts#materializeQuotedNode",
         "category": "representation-materialization",
         "capabilityId": "derived.hierarchical-carrier",
@@ -2091,7 +2103,7 @@
       }
     ],
     "interpretationBoundaryCovered": false,
-    "note": "The 51 current owners are confirmed to use actual Memory write members, but static direct-call analysis can still miss alias/rebinding/new-write-API bypasses. P1g runtime instrumentation remains required.",
+    "note": "The 53 current owners are confirmed to use actual Memory write members, but static direct-call analysis can still miss alias/rebinding/new-write-API bypasses. P1g runtime instrumentation remains required.",
     "receiverTypeCheckedByP1e": false,
     "typedOwnerSetCrossCheckedByP1f": true,
     "physicalMutationBoundaryProven": false
@@ -2298,7 +2310,8 @@
       "ts/src/v013-relative-pole-context.ts": "semantic-authority",
       "ts/src/v013-relative-pole-execution.ts": "semantic-authority",
       "ts/src/v013-structural-execution.ts": "semantic-authority",
-      "ts/src/value-bundle.ts": "semantic-authority"
+      "ts/src/value-bundle.ts": "semantic-authority",
+      "ts/src/v013-grounded-execution.ts": "semantic-authority"
     },
     "decisionOwnerCountsByCategory": {
       "memory-resource-safety": 4,
