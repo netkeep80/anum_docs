@@ -146,7 +146,7 @@ function discoverGroundedImages(
 
     found.push(Object.freeze({
       relation,
-      outputs: readExactSequence(memory, rp.end),
+      outputs: readExactSequence(memory, rp.end).values,
     }));
   }
 
