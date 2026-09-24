@@ -8,22 +8,12 @@ import {
   type StructuralRoleBinding,
 } from "./structural-rule.js";
 
-/**
- * Read-only structural unification for already-grounded Links.
- *
- * Declared roles are placeholders. Their values are inferred from the claimed
- * Link instead of being supplied by an Act. Grounded template subtrees still
- * obey the same canonical-identity rule as matchStructuralTemplate: if a
- * subtree contains no role, it must be the same semantic Link.
- *
- * This is deliberately projection-only. It does not find, ensure, materialize,
- * navigate a context, or assign semantic identity from a runtime handle.
- */
-export function unifyStructuralTemplate(
+function unifyTemplate(
   memory: ReadMemory,
   template: LinkHandle,
   claimed: LinkHandle,
   roles: readonly LinkHandle[],
+  preserveSelfIncidence: boolean,
 ): readonly StructuralRoleBinding[] {
   if (new Set(roles).size !== roles.length) {
     throw new StructuralRuleError("duplicate-role");
@@ -86,6 +76,17 @@ export function unifyStructuralTemplate(
     try {
       const leftPoles = memory.poles(left);
       const rightPoles = memory.poles(right);
+
+      if (
+        preserveSelfIncidence &&
+        (
+          (leftPoles.start === left) !== (rightPoles.start === right) ||
+          (leftPoles.end === left) !== (rightPoles.end === right)
+        )
+      ) {
+        throw new StructuralRuleError("template-mismatch");
+      }
+
       unify(leftPoles.start, rightPoles.start);
       unify(leftPoles.end, rightPoles.end);
     } catch (error) {
@@ -114,4 +115,40 @@ export function unifyStructuralTemplate(
       throw new StructuralRuleError("replay-wrote");
     }
   }
+}
+
+/**
+ * Read-only projection unification for already-grounded Links.
+ *
+ * Declared roles are placeholders. This relation intentionally projects poles
+ * through ROOT/START/END/PAIR and therefore does not preserve self-incidence
+ * class at role-bearing template nodes.
+ *
+ * This is deliberately projection-only. It does not find, ensure, materialize,
+ * navigate a context, or assign semantic identity from a runtime handle.
+ */
+export function unifyStructuralTemplate(
+  memory: ReadMemory,
+  template: LinkHandle,
+  claimed: LinkHandle,
+  roles: readonly LinkHandle[],
+): readonly StructuralRoleBinding[] {
+  return unifyTemplate(memory, template, claimed, roles, false);
+}
+
+/**
+ * Read-only structural Rule matching.
+ *
+ * This is the A71p relation: it has the same role-binding semantics as
+ * projection unification but additionally preserves both self-incidence bits
+ * at every non-role template node. Thus a role-bearing PAIR pattern cannot
+ * match ROOT, START or END, while role values themselves remain unrestricted.
+ */
+export function unifyStructuralRuleTemplate(
+  memory: ReadMemory,
+  template: LinkHandle,
+  claimed: LinkHandle,
+  roles: readonly LinkHandle[],
+): readonly StructuralRoleBinding[] {
+  return unifyTemplate(memory, template, claimed, roles, true);
 }
