@@ -9,8 +9,10 @@ import {
 } from "../src/memory.js";
 import {
   admitStructuralRule,
+  defineStructuralInterpreter,
   defineStructuralRoleDictionary,
   defineStructuralRule,
+  readStructuralInterpreter,
   readStructuralRoleDictionary,
   readStructuralRule,
   StructuralRuleError,
@@ -46,25 +48,46 @@ function sameMembers(
  * No separate Set object exists. Scope is START(seed) only so its header Link
  * is distinguishable from ordinary membership attachments.
  */
+interface WorkingScopeAuthority {
+  readonly interpreter: LinkHandle;
+  readonly theory: LinkHandle;
+}
+
 function defineWorkingScope(
   memory: Memory,
   seed: LinkHandle,
+  interpreter: LinkHandle,
   members: readonly LinkHandle[],
 ): LinkHandle {
-  const scope = memory.ensureStartSelfClosed(seed);
+  const descriptor = memory.ensure(seed, interpreter);
+  const scope = memory.ensureStartSelfClosed(descriptor);
   for (const member of members) memory.ensure(scope, member);
   return scope;
+}
+
+function readWorkingScopeAuthority(
+  memory: Memory,
+  scope: LinkHandle,
+): WorkingScopeAuthority {
+  const header = memory.poles(scope);
+  assert(
+    header.start === scope && header.end !== scope,
+    "working scope must have START shape",
+  );
+  const descriptor = memory.poles(header.end);
+  const interpreter = descriptor.end;
+  const structure = readStructuralInterpreter(memory, interpreter);
+  return Object.freeze({
+    interpreter,
+    theory: structure.theory,
+  });
 }
 
 function readWorkingScope(
   memory: Memory,
   scope: LinkHandle,
 ): readonly LinkHandle[] {
-  const header = memory.poles(scope);
-  assert(
-    header.start === scope && header.end !== scope,
-    "working scope must have START shape",
-  );
+  readWorkingScopeAuthority(memory, scope);
 
   const members: LinkHandle[] = [];
   for (const attachment of memory.outgoing(scope)) {
@@ -251,11 +274,12 @@ function instantiateTemplate(
  */
 function reactFlatScope(
   memory: Memory,
-  theory: LinkHandle,
   cursor: CurrentScopeCursor,
   nextScopeSeed: LinkHandle,
 ): ScopeReaction {
   const oldScope = cursor.currentScope();
+  const authority = readWorkingScopeAuthority(memory, oldScope);
+  const theory = authority.theory;
   const before = cursor.members();
   assert(before.length > 0, "reaction requires non-empty current scope");
 
@@ -291,7 +315,12 @@ function reactFlatScope(
     }
   }
 
-  const nextScope = defineWorkingScope(memory, nextScopeSeed, produced);
+  const nextScope = defineWorkingScope(
+    memory,
+    nextScopeSeed,
+    authority.interpreter,
+    produced,
+  );
 
   same(
     cursor.currentScope(),
@@ -326,7 +355,7 @@ interface CaseSpec {
 
 function exerciseCase(
   memory: Memory,
-  theory: LinkHandle,
+  interpreter: LinkHandle,
   K: LinkHandle,
   spec: CaseSpec,
 ): void {
@@ -334,7 +363,7 @@ function exerciseCase(
   const expectedMembers = spec.expected.map((value) => memory.ensure(K, value));
 
   const oldScope =
-    defineWorkingScope(memory, spec.oldScopeSeed, oldMembers);
+    defineWorkingScope(memory, spec.oldScopeSeed, interpreter, oldMembers);
   const cursor = new CurrentScopeCursor(memory, oldScope);
 
   sameMembers(
@@ -344,7 +373,7 @@ function exerciseCase(
   );
 
   const reaction =
-    reactFlatScope(memory, theory, cursor, spec.nextScopeSeed);
+    reactFlatScope(memory, cursor, spec.nextScopeSeed);
 
   same(
     reaction.rawRuleMatches,
@@ -402,6 +431,10 @@ function exercise(): void {
   };
 
   const theory = memory.ensure(at(0), at(1));
+  const authorityDictionary = defineStructuralRoleDictionary(memory, []);
+  const grammar = memory.ensure(at(40), at(41));
+  const interpreter =
+    defineStructuralInterpreter(memory, authorityDictionary, grammar, theory);
   const K = memory.ensure(at(2), at(3));
 
   // 1 -> 0
@@ -437,7 +470,7 @@ function exercise(): void {
   defineTransitionRule(memory, theory, b, at(57), ANMb, BNM2);
   defineTransitionRule(memory, theory, b, at(58), ANMb, BNM3);
 
-  exerciseCase(memory, theory, K, {
+  exerciseCase(memory, interpreter, K, {
     label: "1->0",
     inputs: [A10],
     expected: [],
@@ -446,7 +479,7 @@ function exercise(): void {
     nextScopeSeed: at(71),
   });
 
-  exerciseCase(memory, theory, K, {
+  exerciseCase(memory, interpreter, K, {
     label: "1->1",
     inputs: [A11],
     expected: [B11],
@@ -455,7 +488,7 @@ function exercise(): void {
     nextScopeSeed: at(73),
   });
 
-  exerciseCase(memory, theory, K, {
+  exerciseCase(memory, interpreter, K, {
     label: "1->N",
     inputs: [A1N],
     expected: [B1N1, B1N2],
@@ -464,7 +497,7 @@ function exercise(): void {
     nextScopeSeed: at(75),
   });
 
-  exerciseCase(memory, theory, K, {
+  exerciseCase(memory, interpreter, K, {
     label: "N->1",
     inputs: [AN1a, AN1b],
     expected: [BN1],
@@ -473,13 +506,34 @@ function exercise(): void {
     nextScopeSeed: at(77),
   });
 
-  exerciseCase(memory, theory, K, {
+  exerciseCase(memory, interpreter, K, {
     label: "N->M",
     inputs: [ANMa, ANMb],
     expected: [BNM1, BNM2, BNM3],
     rawRuleMatches: 4,
     oldScopeSeed: at(78),
     nextScopeSeed: at(79),
+  });
+
+  // Same active K -> A11 shape under a different Scope-carried interpreter
+  // selects a different Theory without any host Theory argument.
+  const foreignTheory = memory.ensure(at(80), at(81));
+  const foreignGrammar = memory.ensure(at(82), at(83));
+  const foreignInterpreter = defineStructuralInterpreter(
+    memory,
+    authorityDictionary,
+    foreignGrammar,
+    foreignTheory,
+  );
+  const BForeign = memory.ensure(at(84), at(85));
+  defineTransitionRule(memory, foreignTheory, b, at(86), A11, BForeign);
+  exerciseCase(memory, foreignInterpreter, K, {
+    label: "scope-carried-theory",
+    inputs: [A11],
+    expected: [BForeign],
+    rawRuleMatches: 1,
+    oldScopeSeed: at(87),
+    nextScopeSeed: at(88),
   });
 }
 
@@ -505,6 +559,14 @@ function staticGuards(): void {
     kernel.split("cursor.switchAtomically(").length - 1,
     1,
     "one opaque current-root handoff publishes the whole successor image",
+  );
+  assert(
+    kernel.includes("readWorkingScopeAuthority(memory, oldScope)"),
+    "Theory authority is derived from current Scope topology",
+  );
+  assert(
+    !kernel.includes("theory: LinkHandle"),
+    "flat kernel receives no host Theory argument",
   );
   assert(
     kernel.includes("discoverLocallyTriggeredRuleImages"),
@@ -586,6 +648,9 @@ function main(): void {
     "HOST_RESULT_PUBLICATION=0",
     "HOST_FUNCTION_OPCODE_DISPATCH=0",
     "HOST_CARDINALITY_DISPATCH=0",
+    "HOST_THEORY_ARGUMENT=0",
+    "THEORY_SOURCE=CURRENT_SCOPE_STRUCTURAL_INTERPRETER",
+    "SAME_ACTIVE_SHAPE_DIFFERENT_SCOPE_THEORY=GREEN",
     "CURRENT_SCOPE_ROOT=OPAQUE_AMEMORY_SUBSTRATE_HANDLE",
     "ATOMIC_SCOPE_HANDOFF=AMEMORY_SUBSTRATE_COMMIT",
     "FLAT_EXECUTION_SEMANTIC_AUTHORITY=LINKS_AND_RULES",
