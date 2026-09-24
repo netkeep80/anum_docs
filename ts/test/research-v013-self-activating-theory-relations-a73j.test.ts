@@ -233,6 +233,19 @@ function exercise(): void {
     defineScope(memory, at(30), theory, [seedTruth, targetTruth]),
   );
 
+  same(memory.find(theory, candidate), undefined,
+    "candidate remains non-admitted immediately before round1");
+  const bootBefore = discoverTheoryImages(memory, theory, BOOT);
+  const aBefore = discoverTheoryImages(memory, theory, A);
+  assert(bootBefore.length === 1,
+    "pre-round1 BOOT image count=" + bootBefore.length);
+  assert(bootBefore[0]!.relation === bootstrap,
+    "pre-round1 BOOT image is exact bootstrap relation");
+  assert(aBefore.length === 0,
+    "pre-round1 A image count=" + aBefore.length +
+    " candidate=" + aBefore.some((x) => x.relation === candidate) +
+    " foreign=" + aBefore.some((x) => x.relation === foreignCandidate));
+
   // Round 1 dynamically admits candidate.
   const r1 = react(memory, cursor, at(31));
   same(r1.quiescent, false, "round1 bootstrap fires");
