@@ -122,7 +122,7 @@ same(
   "implementation slice does not record author acceptance",
 );
 
-same(conformance.acceptanceReady, false, "conformance readiness is reopened");
+same(conformance.acceptanceReady, true, "conformance readiness is restored after A73t");
 same(conformance.accepted, false, "conformance remains unaccepted");
 assert(
   !conformance.acceptanceBlockers.includes(
@@ -130,13 +130,13 @@ assert(
   ),
   "completed readiness audit is no longer a blocker",
 );
-for (const blocker of [
-  "foundation necessity/minimality remains open under A9 elimination and self-proof criteria",
-  "global host semantic trust boundary remains open until package-wide decision/runtime path audit closes",
-  "explicit author acceptance of the exact candidate artifacts has not yet been recorded",
-]) {
-  assert(conformance.acceptanceBlockers.includes(blocker), `acceptance blocker is explicit: ${blocker}`);
-}
+same(conformance.acceptanceBlockers.length, 1, "only author acceptance remains blocking");
+assert(
+  conformance.acceptanceBlockers.includes(
+    "explicit author acceptance of the exact candidate artifacts has not yet been recorded",
+  ),
+  "author acceptance blocker is explicit",
+);
 assert(
   !conformance.acceptanceBlockers.some((entry: string) =>
     /implementation|public facade|kernel/i.test(entry)
@@ -145,5 +145,5 @@ assert(
 );
 
 console.log(
-  "MTS v0.13 declared kernel/public evidence remains GREEN; readiness is conservatively reopened for A9 trust/minimality + self-proof closure, while v0.12 remains current.",
+  "MTS v0.13 declared kernel/public evidence remains GREEN; A73t restores readiness for the declared scope while A9 global trust/minimality + self-proof remain non-blocking research and v0.12 remains current.",
 );
