@@ -69,10 +69,8 @@ function main(): void {
     "A73k consumes grounded production execution");
   assert(!schedule.includes('from "../src/v013-structural-execution.js"'),
     "A73k dynamic witness has no structural executor dependency");
-  assert(schedule.includes("SAME_EXTensional_FIXED_POINT".toUpperCase()) ||
-         schedule.includes("SAME_EXTENSIONAL_FIXED_POINT") ||
-         schedule.includes("FIXED_POINT"),
-    "A73k retains fixed-point schedule evidence");
+  assert(schedule.includes("FINAL_EXTENTIONAL_FIXED_POINT=SAME"),
+    "A73k retains exact fixed-point schedule evidence");
 
   // Historical structural execution remains valuable research evidence. A73h
   // explicitly attacked its matcher/template residual rather than falsifying
