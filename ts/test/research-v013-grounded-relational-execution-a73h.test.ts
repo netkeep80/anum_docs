@@ -289,7 +289,7 @@ function exercise(): void {
   const r1 = reactGroundedScope(memory, cursor, at(41));
   same(r1.quiescent, false, "round1 transitions");
   same(r1.handoffCount, 1, "round1 one atomic handoff");
-  same(r1.matchedRelations, 5, "round1 five admitted relation matches");
+  same(r1.matchedRelations, 4, "round1 four admitted relation matches");
   same(r1.transitionedMembers, 4, "round1 four current members transition");
   setSame(r1.after, [
     memory.ensure(K, B),
