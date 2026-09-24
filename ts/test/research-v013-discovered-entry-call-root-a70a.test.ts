@@ -244,8 +244,8 @@ function staticGuards():void{
   const exercise=sourceSlice(own,"function exercise(","\nfunction sourceSlice(");
   assert(exercise.includes("const k0=defineFrame(memory,C,f0,p0)"),
     "call root is directly C-rooted A66 frame");
-  assert(!exercise.includes("adapter"),"no runtime entry-to-call-root adapter");
-  assert(!exercise.includes("translate"),"no runtime root translation");
+  assert(exercise.includes("setSame(discoverEntryContexts(memory,C),[k0]"),
+    "the exact A66 frame identity is the discovered entry");
 }
 
 function main():void{
