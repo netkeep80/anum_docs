@@ -247,7 +247,8 @@
       "ts/src/v013-relative-form-materialization.ts",
       "ts/src/v013-relative-pole-context.ts",
       "ts/src/v013-relative-pole-execution.ts",
-      "ts/src/v013-formal-aspect-evaluator.ts"
+      "ts/src/v013-formal-aspect-evaluator.ts",
+      "ts/src/v013-structural-execution.ts"
     ],
     "directDependenciesByFile": {
       "ts/src/v013-hierarchical-carrier.ts": [
@@ -288,6 +289,20 @@
         "memory#ensure",
         "memory#ensureEndSelfClosed",
         "memory#ensureStartSelfClosed",
+        "memory#poles"
+      ],
+      "ts/src/v013-structural-execution.ts": [
+        "./exact-sequence.js#readExactSequence",
+        "./structural-rule.js#readStructuralInterpreter",
+        "./structural-rule.js#readStructuralRoleDictionary",
+        "./structural-rule.js#readStructuralRule",
+        "./structural-rule.js#verifyStructuralRuleAdmission",
+        "./structural-unification.js#unifyStructuralRuleTemplate",
+        "memory#ensure",
+        "memory#ensureEndSelfClosed",
+        "memory#ensureRoot",
+        "memory#ensureStartSelfClosed",
+        "memory#outgoing",
         "memory#poles"
       ]
     },
@@ -926,6 +941,11 @@
     "./dictionary.js#verifyVisibleDictionaryOccurrence": "derived.dictionary-visibility",
     "./structural-readers.js#readActHeader": "derived.structural-act",
     "./structural-rule.js#replayStructuralRule": "derived.structural-rule-replay",
+    "./structural-rule.js#readStructuralInterpreter": "derived.structural-rule-replay",
+    "./structural-rule.js#readStructuralRoleDictionary": "derived.structural-rule-replay",
+    "./structural-rule.js#readStructuralRule": "derived.structural-rule-replay",
+    "./structural-rule.js#verifyStructuralRuleAdmission": "derived.structural-rule-replay",
+    "./structural-unification.js#unifyStructuralRuleTemplate": "derived.structural-template-matching",
     "./portable-theory.js#verifySelectedTheoryAdmissionAuthority": "derived.exact-theory-admission-authority",
     "./source.js#replaySelectedSourceEvidenceWithReader": "derived.source-selection-replay",
     "./v012-string-anum.js#readV012StringAnum": "representation.v012-string-anum",
@@ -942,7 +962,7 @@
     "memory#ensureRoot": "bootstrap.root-anchor"
   },
   "metrics": {
-    "candidateKernelFileCount": 5,
+    "candidateKernelFileCount": 6,
     "publicSemanticEntrypointCount": 8,
     "declaredCapabilityCount": 39,
     "ontologyCapabilityCount": 3,
