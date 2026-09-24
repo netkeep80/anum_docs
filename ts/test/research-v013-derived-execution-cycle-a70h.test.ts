@@ -556,7 +556,7 @@ function exerciseIntegrated(noise:boolean):void{
   }
   const at=(i:number):LinkHandle=>{
     const value=fresh[i];
-    assert(value!==undefined,\`fresh anchor \${i}\`);
+    assert(value!==undefined,`fresh anchor ${i}`);
     return value;
   };
 
@@ -719,7 +719,7 @@ function sourceSlice(
   end:string,
 ):string{
   const i=source.indexOf(start),j=source.indexOf(end,i+1);
-  assert(i>=0&&j>i,\`source slice \${start}\`);
+  assert(i>=0&&j>i,`source slice ${start}`);
   return source.slice(i,j).replace(/\s+/g,"");
 }
 
@@ -794,7 +794,7 @@ function staticGuards():void{
     "activeFlag",
   ]){
     assert(!plan.includes(forbidden),
-      \`A70h planner excludes external execution authority \${forbidden}\`);
+      `A70h planner excludes external execution authority ${forbidden}`);
   }
   assert(plan.includes("currentWorkset(memory,contextRoot)"),
     "A70h planner derives runnable Contexts");
