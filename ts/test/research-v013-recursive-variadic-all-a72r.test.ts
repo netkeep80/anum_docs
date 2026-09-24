@@ -493,7 +493,7 @@ function buildFixture(): Fixture {
 
   let seed = memory.ensure(b.U, b.L);
   const fresh: LinkHandle[] = [];
-  for (let i = 0; i < 160; i += 1) {
+  for (let i = 0; i < 320; i += 1) {
     seed = memory.ensure(seed, i % 2 === 0 ? b.O : b.C);
     fresh.push(seed);
   }
