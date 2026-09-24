@@ -18,11 +18,7 @@
     "conformance": "mts-conformance/v0.13"
   },
   "acceptanceReady": true,
-  "currentPointer": {
-    "acceptance": "cutover/typescript-c1-acceptance-v0.6.json",
-    "currentContract": "mts-contract/v0.13",
-    "currentConformance": "mts-conformance/v0.13"
-  },
+  "currentPointer": "cutover/typescript-c1-acceptance-v0.6.json",
   "inheritedFoundation": {
     "ontology": "Link",
     "root": "R = ∞ = R ⟼ R",
