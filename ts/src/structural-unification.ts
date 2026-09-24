@@ -123,6 +123,9 @@ function unifyTemplate(
  * Declared roles are placeholders. This relation intentionally projects poles
  * through ROOT/START/END/PAIR and therefore does not preserve self-incidence
  * class at role-bearing template nodes.
+ *
+ * This is deliberately projection-only. It does not find, ensure, materialize,
+ * navigate a context, or assign semantic identity from a runtime handle.
  */
 export function unifyStructuralTemplate(
   memory: ReadMemory,
