@@ -734,7 +734,7 @@ function staticGuards(): void {
     "utf8",
   );
   assert(
-    a72u.includes("DUAL_TREE_RESULT_SLOTS=GREEN_SCOPED_RESEARCH"),
+    a72u.includes("DUAL_TREE_SINGLE_ASSIGNMENT_RESULT_SLOTS=GREEN_SCOPED_RESEARCH"),
     "A72u deferred hierarchical research remains retained",
   );
 }
