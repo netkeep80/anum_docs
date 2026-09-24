@@ -171,15 +171,10 @@ function exercise(): void {
 
   // Candidate executable relation exists only as data.
   const candidate = relationData(memory, A, [B]);
-  const candidateAdmission = memory.ensure(theory, candidate);
-
-  // Important: physical admission Link is deliberately removed from semantic
-  // setup by never indexing it. Its existence lets the first reaction converge
-  // canonically to the exact same Theory->candidate Link without host creation
-  // ambiguity, but A73h discovery cannot see it without A->admission.
-  assert(
-    memory.find(A, candidateAdmission) === undefined,
-    "candidate local activation index absent before execution",
+  same(
+    memory.find(theory, candidate),
+    undefined,
+    "candidate is data only: Theory admission absent before execution",
   );
 
   // Bootstrap relation is executable and emits candidate relation under Theory:
@@ -199,6 +194,9 @@ function exercise(): void {
 
   const r1 = react(memory, cursor, at(21));
   same(r1.quiescent, false, "bootstrap relation fires");
+  const candidateAdmission = memory.find(theory, candidate);
+  assert(candidateAdmission !== undefined,
+    "first relational reaction physically materializes Theory->candidate");
   setSame(r1.after, [candidateAdmission, targetTruth],
     "reaction publishes generated Theory->candidate plus untouched target");
   assert(
