@@ -254,7 +254,7 @@ function buildFixture(): Fixture {
   return Object.freeze({ memory, theory, IMPLIES, FALSE, TRUE, parent });
 }
 
-function runAndCase(
+function runImpliesCase(
   f: Fixture,
   left: LinkHandle,
   right: LinkHandle,
@@ -291,10 +291,10 @@ function runAndCase(
 function exercise(): void {
   const f = buildFixture();
 
-  runAndCase(f, f.FALSE, f.FALSE, f.FALSE, "IMPLIES(FALSE,FALSE)");
-  runAndCase(f, f.FALSE, f.TRUE,  f.FALSE, "IMPLIES(FALSE,TRUE)");
-  runAndCase(f, f.TRUE,  f.FALSE, f.FALSE, "IMPLIES(TRUE,FALSE)");
-  runAndCase(f, f.TRUE,  f.TRUE,  f.TRUE,  "IMPLIES(TRUE,TRUE)");
+  runImpliesCase(f, f.FALSE, f.FALSE, f.TRUE,  "IMPLIES(FALSE,FALSE)");
+  runImpliesCase(f, f.FALSE, f.TRUE,  f.TRUE,  "IMPLIES(FALSE,TRUE)");
+  runImpliesCase(f, f.TRUE,  f.FALSE, f.FALSE, "IMPLIES(TRUE,FALSE)");
+  runImpliesCase(f, f.TRUE,  f.TRUE,  f.TRUE,  "IMPLIES(TRUE,TRUE)");
 
   // IMPLIES is deliberately non-commutative. The two mixed rows must remain
   // physically distinct and must evaluate to different values.
@@ -324,7 +324,7 @@ function exercise(): void {
 function staticGuards(): void {
   const root = resolve(process.cwd(), "..");
   const own = readFileSync(
-    join(root, "ts/test/research-v013-working-amemory-binary-and-a72b.test.ts"),
+    join(root, "ts/test/research-v013-working-amemory-binary-implies-a72c.test.ts"),
     "utf8",
   );
 
@@ -390,8 +390,8 @@ function main(): void {
     "ORDERED_ARGUMENT_OCCURRENCES=PRESERVED",
     "WORKING_MEMBERSHIP=MUTABLE_TEST_HYPOTHESIS",
     "LINKS_ONLY_MUTATION=NOT_PROVEN",
-    "CUMULATIVE_REGRESSION=A72A_NOT_PLUS_A72B_IMPLIES",
-    "NEXT=A72C_NONCOMMUTATIVE_SINGLE_VALUED_BINARY_LOGIC",
+    "CUMULATIVE_REGRESSION=A72A_NOT_PLUS_A72B_AND_PLUS_A72C_IMPLIES",
+    "NEXT=A72D_DETERMINISTIC_FUNCTION_COMPOSITION",
     "MULTIVALUED_FUNCTIONS=DEFERRED",
     "VARIABLE_ARITY_FUNCTIONS=DEFERRED",
     "FULL_SELF_HOSTED=FALSE",
