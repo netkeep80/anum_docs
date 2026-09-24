@@ -21,7 +21,7 @@ import { unifyStructuralTemplate } from "../src/structural-unification.js";
 import { defineContext, readContext } from "../src/state.js";
 
 function assert(c: unknown, m: string): asserts c {
-  if (!c) throw new Error("v0.13 A72a working A-memory rewrite: " + m);
+  if (!c) throw new Error("v0.13 A72a unary NOT dynamics: " + m);
 }
 
 function same<T>(a: T, e: T, m: string): void {
@@ -41,11 +41,11 @@ interface ReactionResult {
 }
 
 /**
- * Test-only candidate for "what is present in the working A-memory now".
+ * Test-only candidate for "which Context Links are in the working A-network
+ * now". It deliberately does not change canonical Link identity.
  *
- * This is deliberately NOT claimed as the final representation. The point of
- * A72a is to test whether current-state membership must be distinguished from
- * canonical Link identity in the existing append-only Memory carrier.
+ * A72a tests the distinction; it does not claim Set<> is the final Links-only
+ * representation of working presence.
  */
 class WorkingMembership {
   private present: Set<LinkHandle>;
@@ -79,22 +79,40 @@ class WorkingMembership {
   }
 }
 
-function defineSingleContextRewriteRule(
+/**
+ * Unary application is represented only by Links:
+ *
+ *   F ⟼ X
+ *
+ * and the active Context contains that application as its current value:
+ *
+ *   START(K ⟼ (F ⟼ X))
+ *
+ * A truth-table row is a structural Rule:
+ *
+ *   START(K ⟼ (F ⟼ X))  ->  START(K ⟼ Y)
+ *
+ * K is the sole role. F/X/Y are ordinary grounded Links.
+ */
+function defineUnaryTruthRule(
   memory: Memory,
   theory: LinkHandle,
   b: RootBasis,
   seed: LinkHandle,
-  fromValue: LinkHandle,
-  toValue: LinkHandle,
+  fn: LinkHandle,
+  input: LinkHandle,
+  output: LinkHandle,
 ): LinkHandle {
   const kRole = memory.ensure(seed, b.O);
   const dictionary = defineStructuralRoleDictionary(memory, [kRole]);
 
-  const beforePayload = memory.ensure(kRole, fromValue);
-  const beforeContext = memory.ensureStartSelfClosed(beforePayload);
-
-  const afterPayload = memory.ensure(kRole, toValue);
-  const afterContext = memory.ensureStartSelfClosed(afterPayload);
+  const application = memory.ensure(fn, input);
+  const beforeContext = memory.ensureStartSelfClosed(
+    memory.ensure(kRole, application),
+  );
+  const afterContext = memory.ensureStartSelfClosed(
+    memory.ensure(kRole, output),
+  );
 
   const body = memory.ensure(beforeContext, afterContext);
   const rule = defineStructuralRule(memory, dictionary, body);
@@ -107,8 +125,11 @@ function discoverAllApplicableRules(
   theory: LinkHandle,
   activeContext: LinkHandle,
 ): readonly GroundedRewrite[] {
-  const matches: GroundedRewrite[] = [];
+  // The active object must first be an actual Context. This prevents the
+  // projection unifier from turning a non-START object into execution input.
+  readContext(memory, activeContext);
 
+  const matches: GroundedRewrite[] = [];
   for (const admission of memory.outgoing(theory)) {
     const admissionPoles = memory.poles(admission);
     if (admissionPoles.start !== theory || admissionPoles.end === admission) {
@@ -180,15 +201,13 @@ function instantiateTemplate(
 }
 
 /**
- * Minimal local reaction law for the one-active-Context experiment.
+ * Candidate local reaction law:
  *
- * Important: this does not choose one matching Rule. Every admitted matching
- * Rule contributes an output. A72a exercises the cardinality-one case only;
- * branching is intentionally reserved for the next experiment.
+ *   one active Context -> all Context outputs of all applicable Rules
  *
- * The semantic transition is committed to working membership in one operation:
- * the old active Context is absent from the resulting membership and every
- * Rule-produced Context is present.
+ * A72a exercises only the deterministic 1 -> 1 NOT rows. The kernel itself
+ * does not choose a single Rule by identity and is intentionally shaped for
+ * later 1 -> N branching tests.
  */
 function reactSingleActiveContext(
   memory: Memory,
@@ -206,9 +225,10 @@ function reactSingleActiveContext(
   const produced = matches.map((match) =>
     instantiateTemplate(memory, match.outputTemplate, match.bindings)
   );
-
   for (const output of produced) readContext(memory, output);
 
+  // Semantic mutation is committed as one replacement of current membership:
+  // the consumed Context is no longer current when produced Contexts appear.
   working.replaceAtomically([activeContext], produced);
 
   return Object.freeze({
@@ -218,13 +238,22 @@ function reactSingleActiveContext(
   });
 }
 
-function exercise(): void {
+interface Fixture {
+  readonly memory: Memory;
+  readonly theory: LinkHandle;
+  readonly NOT: LinkHandle;
+  readonly FALSE: LinkHandle;
+  readonly TRUE: LinkHandle;
+  readonly parent: LinkHandle;
+}
+
+function buildFixture(): Fixture {
   const memory = new Memory();
   const b = ensureRootBasis(memory);
 
   let seed = memory.ensure(b.U, b.L);
   const fresh: LinkHandle[] = [];
-  for (let i = 0; i < 16; i += 1) {
+  for (let i = 0; i < 20; i += 1) {
     seed = memory.ensure(seed, i % 2 === 0 ? b.O : b.C);
     fresh.push(seed);
   }
@@ -235,75 +264,81 @@ function exercise(): void {
   };
 
   const theory = memory.ensure(at(0), at(1));
-  const fromValue = memory.ensure(at(2), at(3));
-  const toValue = memory.ensure(at(4), at(5));
-  const parent = memory.ensure(at(6), at(7));
 
-  const rule = defineSingleContextRewriteRule(
-    memory,
-    theory,
-    b,
-    at(8),
-    fromValue,
-    toValue,
-  );
+  // These are fixture truth-domain values only. A72a does not claim a new
+  // foundation definition of TRUE/FALSE.
+  const FALSE = memory.ensure(at(2), at(3));
+  const TRUE = memory.ensure(at(4), at(5));
+  const NOT = memory.ensure(at(6), at(7));
+  const parent = memory.ensure(at(8), at(9));
 
-  const beforeContext = defineContext(memory, parent, fromValue);
-  const afterContext = defineContext(memory, parent, toValue);
+  assert(FALSE !== TRUE, "truth values are distinct");
+  assert(NOT !== FALSE && NOT !== TRUE, "function identity is distinct");
+
+  defineUnaryTruthRule(memory, theory, b, at(10), NOT, FALSE, TRUE);
+  defineUnaryTruthRule(memory, theory, b, at(11), NOT, TRUE, FALSE);
+
+  return Object.freeze({ memory, theory, NOT, FALSE, TRUE, parent });
+}
+
+function runNotCase(
+  f: Fixture,
+  input: LinkHandle,
+  expected: LinkHandle,
+  label: string,
+): void {
+  const { memory, theory, NOT, parent } = f;
+  const application = memory.ensure(NOT, input);
+  const beforeContext = defineContext(memory, parent, application);
+  const expectedContext = defineContext(memory, parent, expected);
 
   const beforeState = readContext(memory, beforeContext);
-  same(beforeState.parent, parent, "before Context parent");
-  same(beforeState.current, fromValue, "before Context current");
-
-  const afterState = readContext(memory, afterContext);
-  same(afterState.parent, parent, "after Context parent");
-  same(afterState.current, toValue, "after Context current");
-
-  // Discriminator: the current append-only Memory carrier already contains
-  // both semantic Context Links. On its own it therefore cannot tell which one
-  // is the current working state.
-  assert(beforeContext !== afterContext, "before/after Context identities differ");
-  const carrierBeforeReaction = memory.linkCount;
+  same(beforeState.parent, parent, label + " parent");
+  same(beforeState.current, application, label + " current is NOT application");
 
   const working = new WorkingMembership([beforeContext]);
-  assert(working.has(beforeContext), "old Context initially present");
-  assert(!working.has(afterContext), "new Context initially absent");
+  assert(working.has(beforeContext), label + " old Context initially present");
+  assert(!working.has(expectedContext), label + " result Context initially absent");
 
-  const applicable = discoverAllApplicableRules(memory, theory, beforeContext);
-  same(applicable.length, 1, "exactly one Rule applies in A72a");
-  same(applicable[0]!.rule, rule, "the admitted concrete rewrite Rule applies");
-
+  const carrierBeforeReaction = memory.linkCount;
   const reaction = reactSingleActiveContext(memory, theory, working);
 
-  same(reaction.matchedRuleCount, 1, "one Rule fired");
-  same(reaction.consumed.length, 1, "one old Context consumed");
-  same(reaction.consumed[0]!, beforeContext, "exact old Context consumed");
-  same(reaction.produced.length, 1, "one new Context produced");
-  same(reaction.produced[0]!, afterContext, "exact new Context produced");
+  same(reaction.matchedRuleCount, 1, label + " exactly one truth-table Rule");
+  same(reaction.consumed.length, 1, label + " consumes one Context");
+  same(reaction.consumed[0]!, beforeContext, label + " consumes exact input Context");
+  same(reaction.produced.length, 1, label + " produces one Context");
+  same(reaction.produced[0]!, expectedContext, label + " produces expected truth value");
 
-  same(working.size, 1, "working state remains cardinality one");
-  assert(!working.has(beforeContext), "old Context disappears from working state");
-  assert(working.has(afterContext), "new Context is current working state");
+  same(working.size, 1, label + " remains one active Context");
+  assert(!working.has(beforeContext), label + " old Context absent after reaction");
+  assert(working.has(expectedContext), label + " result Context present after reaction");
 
-  // No END marker, tombstone or append-only lifecycle history is needed for
-  // the working-state transition itself. Carrier topology does not grow
-  // because all semantic values were canonicalized before the reaction.
+  // Both canonical Contexts were materialized before the reaction. Therefore a
+  // successful reaction changes only working presence, not carrier topology.
   same(memory.linkCount, carrierBeforeReaction,
-    "reaction adds no execution-history Links to canonical carrier");
+    label + " adds no append-only execution-history Links");
 
-  // The old semantic Link still has stable identity in the carrier. This is
-  // the exact distinction under test: identity existence != current presence.
-  const stillReadable = readContext(memory, beforeContext);
-  same(stillReadable.parent, parent, "old Context identity remains readable");
-  same(stillReadable.current, fromValue, "old Context semantic value remains readable");
+  // The old Link remains an addressable canonical value, but is no longer in
+  // the working A-network candidate. This is the distinction A72a isolates.
+  const oldIdentity = readContext(memory, beforeContext);
+  same(oldIdentity.current, application, label + " old identity remains readable");
+}
 
-  // Re-running the same law over the new active Context has no matching Rule,
-  // so the first reaction did not hide a second implicit lifecycle transition.
-  same(
-    discoverAllApplicableRules(memory, theory, afterContext).length,
-    0,
-    "new Context has no accidental continuation Rule",
-  );
+function exercise(): void {
+  const f = buildFixture();
+
+  // Complete unary NOT truth table.
+  runNotCase(f, f.FALSE, f.TRUE, "NOT(FALSE)");
+  runNotCase(f, f.TRUE, f.FALSE, "NOT(TRUE)");
+
+  // Ordinary truth values are terminal for this tiny program: there is no
+  // accidental second NOT reaction once the application has been replaced.
+  const terminalFalse = defineContext(f.memory, f.parent, f.FALSE);
+  const terminalTrue = defineContext(f.memory, f.parent, f.TRUE);
+  same(discoverAllApplicableRules(f.memory, f.theory, terminalFalse).length, 0,
+    "FALSE result has no accidental continuation");
+  same(discoverAllApplicableRules(f.memory, f.theory, terminalTrue).length, 0,
+    "TRUE result has no accidental continuation");
 }
 
 function staticGuards(): void {
@@ -314,7 +349,7 @@ function staticGuards(): void {
   );
 
   const kernelStart = own.indexOf("function reactSingleActiveContext(");
-  const kernelEnd = own.indexOf("\nfunction exercise()", kernelStart);
+  const kernelEnd = own.indexOf("\ninterface Fixture", kernelStart);
   assert(kernelStart >= 0 && kernelEnd > kernelStart, "reaction kernel source slice");
   const kernel = own.slice(kernelStart, kernelEnd);
 
@@ -328,11 +363,11 @@ function staticGuards(): void {
     "matches.length===1",
   ]) {
     assert(!kernel.includes(forbidden),
-      "reaction kernel excludes semantic selector/history mechanism: " + forbidden);
+      "reaction kernel excludes selector/history mechanism: " + forbidden);
   }
 
   assert(kernel.includes("discoverAllApplicableRules"),
-    "reaction derives outputs from all admitted matching Rules");
+    "reaction derives outputs from all applicable Rules");
   assert(kernel.includes("working.replaceAtomically"),
     "working-state replacement is one commit operation");
 
@@ -341,6 +376,12 @@ function staticGuards(): void {
     "current Memory explicitly enforces append-only allocation");
   assert(!memorySource.includes("remove(link:"),
     "current WriteMemory exposes no Link removal operation");
+
+  const runner = readFileSync(join(root, "ts/src/tooling/test-runner.ts"), "utf8");
+  assert(runner.includes('readdirSync(directory)'),
+    "test runner discovers the cumulative test corpus");
+  assert(runner.includes('for (const test of builtTests)'),
+    "every later iteration reruns all retained earlier test files");
 }
 
 function main(): void {
@@ -348,24 +389,25 @@ function main(): void {
   staticGuards();
 
   console.log([
-    "MTS v0.13 A72a: SINGLE_CONTEXT_WORKING_REWRITE=GREEN_SCOPED_RESEARCH",
-    "EXAMPLE=K_TO_A__BECOMES__K_TO_B",
-    "ACTIVE_CONTEXTS_BEFORE=1 ACTIVE_CONTEXTS_AFTER=1",
+    "MTS v0.13 A72a: UNARY_LOGIC_NOT_WORKING_DYNAMICS=GREEN_SCOPED_RESEARCH",
+    "PROGRAM=NOT",
+    "APPLICATION_TOPOLOGY=FUNCTION_TO_ARGUMENT",
+    "TRUTH_TABLE_ROWS=2",
+    "NOT_FALSE=TRUE NOT_TRUE=FALSE",
+    "ACTIVE_CONTEXTS_PER_CASE_BEFORE=1 ACTIVE_CONTEXTS_PER_CASE_AFTER=1",
     "OLD_CONTEXT_WORKING_PRESENCE=ABSENT_AFTER",
-    "NEW_CONTEXT_WORKING_PRESENCE=PRESENT_AFTER",
+    "RESULT_CONTEXT_WORKING_PRESENCE=PRESENT_AFTER",
     "APPEND_ONLY_EXECUTION_HISTORY=NOT_USED",
     "END_TOMBSTONE=NOT_USED",
     "HOST_RULE_KIND=0 HOST_OPCODE=0 HOST_SELECTED_RULE=0",
     "ALL_MATCHING_RULE_OUTPUTS=COLLECTED_BY_GENERIC_KERNEL",
-    "BRANCHING_CARDINALITY_GT_1=NOT_YET_EXERCISED",
     "CARRIER_LINK_IDENTITY=IMMUTABLE",
     "WORKING_MEMBERSHIP=MUTABLE_TEST_HYPOTHESIS",
-    "CURRENT_MEMORY_ONLY_CAN_DISTINGUISH_BEFORE_AFTER=FALSE",
     "LINK_IDENTITY_EQUALS_CURRENT_PRESENCE=FALSE_CANDIDATE",
     "HOST_PHYSICAL_MEMBERSHIP_COMMIT=RESIDUAL",
     "LINKS_ONLY_MUTATION=NOT_PROVEN",
-    "MULTI_LOCUS_SCHEDULING=NOT_TESTED",
-    "NEXT=A72B_TWO_RULE_ATOMIC_CONTEXT_SPLIT",
+    "CUMULATIVE_REGRESSION=ALL_RETAINED_TEST_FILES",
+    "NEXT=A72B_BINARY_AND_TRUTH_TABLE",
     "FULL_SELF_HOSTED=FALSE",
     "V013_NOT_ACCEPTED PRODUCTION_UNCHANGED",
   ].join(" "));
