@@ -360,7 +360,7 @@ interface PlannedLeaf {
   readonly leaf:LinkHandle;
   readonly final:boolean;
   readonly resultFacts:readonly LinkHandle[];
-  readonly callRoot?:LinkHandle;
+  readonly callRoot:LinkHandle|undefined;
 }
 interface FrozenRoundPlan {
   readonly workset:readonly LinkHandle[];
