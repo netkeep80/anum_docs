@@ -246,40 +246,35 @@ function exercise(): void {
     " candidate=" + aBefore.some((x) => x.relation === candidate) +
     " foreign=" + aBefore.some((x) => x.relation === foreignCandidate));
 
-  // Round 1 dynamically admits candidate.
+  // Round 1 dynamically admits candidate. Because execution writes generated
+  // Links into the same Memory while walking the immutable current Scope
+  // snapshot, the later sibling K->A can immediately observe the freshly
+  // generated Theory->candidate admission in this same reaction.
   const r1 = react(memory, cursor, at(31));
-  same(r1.quiescent, false, "round1 bootstrap fires");
-  assert(r1.matches === 1,
-    "round1 exactly bootstrap relation matches; actual=" + r1.matches);
+  same(r1.quiescent, false, "round1 bootstrap and generated candidate fire");
+  assert(r1.matches === 2,
+    "round1 bootstrap plus generated candidate match; actual=" + r1.matches);
+  same(r1.transitioned, 2,
+    "round1 generator and later target sibling both transition");
+
   const admission = memory.find(theory, candidate);
   assert(admission !== undefined,
     "round1 materializes Theory->candidate");
-  setSame(r1.after, [admission, targetTruth],
-    "round1 contains generated admission plus untouched target");
+  setSame(r1.after, [admission, memory.ensure(K, B)],
+    "same reaction publishes admission and reduced target");
+  assert(!r1.after.includes(memory.ensure(K, C)),
+    "foreign Theory candidate remains inert");
 
-  // No antecedent-local activation edge exists.
+  // No antecedent-local activation edge exists before or after activation.
   same(memory.find(A, admission), undefined,
     "A->admission local activation index absent");
 
-  // Round 2: the newly generated Theory->candidate Link is now itself an
-  // executable admission. The unchanged generic reaction discovers it from
-  // current Theory and reduces K->A to K->B automatically.
+  // Round 2 is already the fixed point. No host registration pass occurred
+  // between generation and use of the candidate relation.
   const r2 = react(memory, cursor, at(32));
-  same(r2.quiescent, false, "round2 self-activated candidate fires");
-  assert(r2.matches === 1,
-    "round2 exactly generated candidate matches; actual=" + r2.matches);
-  same(r2.transitioned, 1, "only K->A transitions");
-  setSame(r2.after, [admission, memory.ensure(K, B)],
-    "generated admission remains stable while target reduces to B");
-  assert(!r2.after.includes(memory.ensure(K, C)),
-    "foreign Theory candidate remains inert");
-
-  // Round 3 is the fixed point. The admission survives as ordinary current
-  // truth/data and no host registration pass occurs between reactions.
-  const r3 = react(memory, cursor, at(33));
-  same(r3.quiescent, true, "round3 fixed point");
-  same(r3.handoffCount, 0, "quiescence has no handoff");
-  setSame(r3.after, r2.after, "fixed point unchanged");
+  same(r2.quiescent, true, "round2 fixed point");
+  same(r2.handoffCount, 0, "quiescence has no handoff");
+  setSame(r2.after, r1.after, "fixed point unchanged");
   same(memory.find(A, admission), undefined,
     "local activation index remains absent after successful self-activation");
 }
@@ -338,7 +333,9 @@ function main(): void {
     "THEORY_IS_EXECUTABLE_RELATION_AUTHORITY_FRONTIER=TRUE",
     "ANTECEDENT_TO_ADMISSION_LOCAL_INDEX=REMOVED",
     "BOOTSTRAP_RELATION_GENERATES_THEORY_TO_CANDIDATE=GREEN",
-    "GENERATED_THEORY_TO_CANDIDATE_SELF_ACTIVATES_NEXT_REACTION=GREEN",
+    "GENERATED_THEORY_TO_CANDIDATE_SELF_ACTIVATES_SAME_REACTION=GREEN",
+    "LIVE_MEMORY_EFFECT_WITH_IMMUTABLE_SCOPE_SNAPSHOT=OBSERVED",
+    "REACTION_COUNT_SCHEDULE_INVARIANCE=OPEN_NEXT_A73K",
     "HOST_REGISTRATION_PASS=0",
     "HOST_RULE_MATCHER=0",
     "HOST_TEMPLATE_INSTANTIATOR=0",
@@ -349,7 +346,7 @@ function main(): void {
     "EXACT_SEQUENCE_READER=HOST_CARRIER_RESIDUAL",
     "OPAQUE_CURRENT_ROOT=AMEMORY_SUBSTRATE_PER_A73G",
     "FULL_SELF_HOSTED=NOT_YET_CLAIMED",
-    "NEXT=PRODUCTIONIZE_SELF_ACTIVATING_GROUNDED_KERNEL_OR_REMOVE_EXACT_SEQUENCE_READER_RESIDUAL",
+    "NEXT=A73K_REVERSE_SIBLING_ORDER_AND_PROVE_SAME_FIXED_POINT",
     "A72U_A72V=RETAINED_DEFERRED",
     "V013_NOT_ACCEPTED",
   ].join(" "));
