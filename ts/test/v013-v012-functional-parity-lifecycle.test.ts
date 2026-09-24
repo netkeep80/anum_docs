@@ -24,7 +24,7 @@ const conformance13 = JSON.parse(
 );
 
 same(contract12.accepted, true, "baseline v0.12 remains accepted");
-same(contract13.accepted, false, "candidate v0.13 is not accepted");
+same(contract13.accepted, true, "v0.13 is accepted");
 same(
   contract13.acceptanceReady,
   true,
@@ -32,8 +32,8 @@ same(
 );
 same(
   contract13.candidateState.explicitAuthorAcceptanceRecorded,
-  false,
-  "explicit author acceptance is not pre-recorded",
+  true,
+  "explicit author acceptance is recorded at cutover",
 );
 const authority = contract13.acceptanceAuthority;
 same(authority.explicitAuthorApprovalRequired, true, "explicit author approval required");
@@ -202,5 +202,5 @@ if (contract13.accepted) {
 }
 
 console.log(
-  `MTS v0.13 functional non-regression lifecycle: ${baselineLaws.length} accepted v0.12 laws and ${baselineGates.length} mandatory gates mapped; parityComplete=${String(contract13.candidateState.functionalParityAuditComplete)} reviewRequired=${reviewRequired}; explicit author acceptance remains separately mandatory and is not recorded: GREEN.`,
+  `MTS v0.13 functional non-regression lifecycle: ${baselineLaws.length} accepted v0.12 laws and ${baselineGates.length} mandatory gates mapped; parityComplete=${String(contract13.candidateState.functionalParityAuditComplete)} reviewRequired=${reviewRequired}; explicit author acceptance is recorded and the accepted v0.13 parity boundary remains GREEN.`,
 );
