@@ -587,19 +587,36 @@ function runCase(
   // though n3 is still an unevaluated call.
   same(discoverAllApplicableRules(memory, naiveTheory, outer).length, 1,
     label + " naive PACK(X) prematurely accepts an unevaluated argument");
-  assert(
-    discoverAllApplicableRulesByProjection(memory, theory, outer).length > 0,
-    label + " projection matcher falsely admits completion-gated Rule early",
-  );
   same(discoverAllApplicableRules(memory, theory, outer).length, 0,
-    label + " strict A71p matcher rejects premature completion");
+    label + " completion-gated PACK rejects raw outer Context");
 
+  let projectionPrematureDepth: number | null = null;
   while (discoverAllApplicableRules(memory, theory, working.only()).length === 0) {
     const child = openNestedUnaryArgument(memory, working.only(), working);
     for (const context of contextAncestry(memory, child, rootParent)) {
       scaffold.add(context);
     }
+
+    const depth = contextDepthTo(memory, child, rootParent);
+    const strictMatches = discoverAllApplicableRules(memory, theory, child);
+    const projectionMatches =
+      discoverAllApplicableRulesByProjection(memory, theory, child);
+    if (
+      depth < 4 &&
+      strictMatches.length === 0 &&
+      projectionMatches.length > 0 &&
+      projectionPrematureDepth === null
+    ) {
+      projectionPrematureDepth = depth;
+    }
   }
+
+  assert(
+    projectionPrematureDepth !== null &&
+      projectionPrematureDepth > 1 &&
+      projectionPrematureDepth < 4,
+    label + " projection matcher has an intermediate premature completion match",
+  );
 
   same(contextDepthTo(memory, working.only(), rootParent), 4,
     label + " unresolved computation reaches Context depth four");
@@ -742,7 +759,7 @@ function main(): void {
     "HOST_COLLAPSE_LEVELS=2",
     "RULE_DRIVEN_RESULT_PLUS_OUTER_COLLAPSE_LEVELS=1",
     "NAIVE_GENERIC_PACK_PREMATURE_MATCH=RED_CONFIRMED",
-    "PROJECTION_MATCHER_COMPLETION_FALSE_POSITIVE=RED_CONFIRMED",
+    "PROJECTION_MATCHER_INTERMEDIATE_COMPLETION_FALSE_POSITIVE=RED_CONFIRMED",
     "STRICT_A71P_RULE_MATCHING=REUSED",
     "COMPLETION_AUTHORITY=CHILD_CONTEXT_OCCURRENCE",
     "RESULT_TOPOLOGY=TAG_TO_SCALAR_TO_MARK",
