@@ -1003,7 +1003,7 @@
     },
     "packageWideObjectSpecificHostSemanticCount": null,
     "typedReadMemorySiteCount": 508,
-    "typedReadMemoryOwnerCount": 229,
+    "typedReadMemoryOwnerCount": 233,
     "staticSemanticDecisionCandidateOwnerCount": 338,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
     "staticDecisionOwnersByCategory": {
@@ -2142,7 +2142,7 @@
       "allLinks"
     ],
     "typedReadSiteCount": 508,
-    "typedReadOwnerCount": 229,
+    "typedReadOwnerCount": 233,
     "typedReadOwnerFingerprintFNV64": "7d911a3037599ee9",
     "typedReadMemberCounts": {
       "allLinks": 5,
