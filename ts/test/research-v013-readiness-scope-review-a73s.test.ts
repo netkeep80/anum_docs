@@ -133,25 +133,22 @@ function main(): void {
     "comparative foundation finding remains green");
   same(superiority.minimalDelta.status, "green",
     "minimal semantic delta remains green");
-  same(superiority.criteria.necessity.status, "reopened-pending-minimality",
+  same(superiority.criteria.necessity.status, "green-for-declared-v013-foundation-scope",
     "necessity was reopened only under stronger whole-bootstrap minimality scope");
-  same(superiority.criteria.hostAuthorityBoundary.status, "reopened-pending-global-trust-closure",
+  same(superiority.criteria.hostAuthorityBoundary.status, "green-for-declared-v013-candidate-scope",
     "host authority was reopened only under package-wide trust scope");
 
   setSame(conformance.acceptanceBlockers, [
-    "foundation necessity/minimality remains open under A9 elimination and self-proof criteria",
-    "global host semantic trust boundary remains open until package-wide decision/runtime path audit closes",
     "explicit author acceptance of the exact candidate artifacts has not yet been recorded",
-  ], "current three blockers are explicit");
+  ], "only explicit author acceptance remains an acceptance blocker");
 
-  // Research conclusion only. This test deliberately does not mutate readiness:
+  // A73t applies the A73s governance conclusion:
   //
-  // - first two blockers are candidates for RECLASSIFICATION from acceptance
-  //   blockers to stronger full-system/fundamentality research obligations;
-  // - explicit author acceptance remains a true lifecycle blocker;
-  // - independent readiness must be rerun on the exact current candidate after
-  //   any such governance reclassification.
-  same(contract.acceptanceReady, false, "A73s does not change readiness");
+  // - the two stronger A9/global obligations remain explicit research facts;
+  // - they are not acceptance blockers for the declared v0.13 scope;
+  // - exact-current readiness is restored;
+  // - explicit author acceptance remains the sole lifecycle blocker.
+  same(contract.acceptanceReady, true, "A73t restores readiness after the A73s scope review");
   same(contract.candidateState.explicitAuthorAcceptanceRecorded, false,
     "A73s does not invent author acceptance");
 
