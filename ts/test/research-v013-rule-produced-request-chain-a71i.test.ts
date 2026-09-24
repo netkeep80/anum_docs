@@ -262,6 +262,9 @@ function childContexts(
 
   for(const payload of memory.outgoing(parent)){
     const p=memory.poles(payload);
+
+    // Proper child payload is ordinary on its END side. END(parent) is also
+    // outgoing(parent), but p.end===payload and must not be treated as state.
     if(p.start!==parent || p.end===payload)continue;
 
     for(const candidate of memory.incoming(payload)){
