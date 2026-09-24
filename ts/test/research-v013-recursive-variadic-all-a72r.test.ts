@@ -560,7 +560,14 @@ function runSpec(f: Fixture, spec: RunSpec): void {
   let reactions = 0;
   while (true) {
     const members = cursor.members();
-    same(members.length, 1, spec.label + " deterministic current cardinality");
+    assert(
+      members.length === 1,
+      spec.label +
+        " deterministic current cardinality: actual=" +
+        members.length +
+        " reaction=" +
+        reactions,
+    );
     const state = readContext(memory, members[0]!);
 
     if (state.current === FALSE || state.current === TRUE) break;
