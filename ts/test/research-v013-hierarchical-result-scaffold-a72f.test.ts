@@ -305,6 +305,35 @@ function discoverAllApplicableRules(
   return Object.freeze(matches);
 }
 
+function discoverAllApplicableRulesByProjection(
+  memory: Memory,
+  theory: LinkHandle,
+  activeContext: LinkHandle,
+): readonly GroundedRewrite[] {
+  readContext(memory, activeContext);
+  const matches: GroundedRewrite[] = [];
+
+  for (const admission of memory.outgoing(theory)) {
+    const ap = memory.poles(admission);
+    if (ap.start !== theory || ap.end === admission) continue;
+    try {
+      verifyStructuralRuleAdmission(memory, theory, ap.end, admission);
+      const rule = readStructuralRule(memory, ap.end);
+      const dictionary = readStructuralRoleDictionary(memory, rule.roleDictionary);
+      const body = memory.poles(rule.body);
+      const bindings = unifyStructuralTemplate(
+        memory, body.start, activeContext, dictionary.roles,
+      );
+      matches.push(Object.freeze({ outputTemplate: body.end, bindings }));
+    } catch (error) {
+      if (error instanceof StructuralRuleError) continue;
+      throw error;
+    }
+  }
+
+  return Object.freeze(matches);
+}
+
 function instantiateTemplate(
   memory: Memory,
   template: LinkHandle,
@@ -558,8 +587,12 @@ function runCase(
   // though n3 is still an unevaluated call.
   same(discoverAllApplicableRules(memory, naiveTheory, outer).length, 1,
     label + " naive PACK(X) prematurely accepts an unevaluated argument");
+  assert(
+    discoverAllApplicableRulesByProjection(memory, theory, outer).length > 0,
+    label + " projection matcher falsely admits completion-gated Rule early",
+  );
   same(discoverAllApplicableRules(memory, theory, outer).length, 0,
-    label + " completion-gated PACK rejects raw outer Context");
+    label + " strict A71p matcher rejects premature completion");
 
   while (discoverAllApplicableRules(memory, theory, working.only()).length === 0) {
     const child = openNestedUnaryArgument(memory, working.only(), working);
