@@ -21,13 +21,14 @@ const conformance12 = readJson("contracts/mts-conformance-v0.12.json");
 const acceptance12 = readJson("cutover/typescript-c1-acceptance-v0.5.json");
 const policy = readJson("repo-policy.json");
 
-// The earlier readiness audit remains historical evidence, but readiness is reopened after stronger A9/self-proof criteria were adopted.
+// A73s reclassified stronger full-system A9/minimality/self-proof work as non-blocking research.
+ // This gate reruns readiness on the exact current candidate without accepting it.
 same(contract13.status, "candidate", "v0.13 status remains candidate");
 same(contract13.accepted, false, "v0.13 remains unaccepted");
-same(contract13.acceptanceReady, false, "v0.13 contract readiness is reopened");
+same(contract13.acceptanceReady, true, "v0.13 contract is ready for separate author decision");
 same(conformance13.status, "candidate", "v0.13 conformance remains candidate");
 same(conformance13.accepted, false, "v0.13 conformance remains unaccepted");
-same(conformance13.acceptanceReady, false, "v0.13 conformance readiness is reopened");
+same(conformance13.acceptanceReady, true, "v0.13 conformance is ready for separate author decision");
 same(conformance13.coverageState, "complete", "declared v0.13 coverage is complete");
 
 // The candidate kernel is complete but is not selected before an explicit cutover.
@@ -52,14 +53,14 @@ same(
 );
 same(
   contract13.candidateState?.foundationSuperiorityAuditComplete,
-  false,
-  "foundation superiority audit is reopened under stronger minimality/trust criteria",
+  true,
+  "foundation superiority is complete for the declared v0.13 scope",
 );
-same(contract13.candidateState?.readinessReopened, true, "candidate records reopened readiness");
+same(contract13.candidateState?.readinessReopened, false, "candidate readiness reopening is closed");
 same(
   contract13.readinessReopen?.status,
-  "reopened-a9-selfproof",
-  "reopen reason is machine-readable",
+  "closed-a73s-scope-reclassification",
+  "scope reclassification closure is machine-readable",
 );
 same(
   contract13.candidateState?.rootFormalDialectComplete,
@@ -91,7 +92,7 @@ same(
   false,
   "release state keeps candidate non-selectable",
 );
-same(contract13.releaseState?.acceptanceReady, false, "release state projects reopened readiness");
+same(contract13.releaseState?.acceptanceReady, true, "release state projects scoped readiness");
 
 // Accepted/current v0.12 remains untouched.
 same(contract12.schema, "mts-contract/v0.12", "accepted contract identity");
@@ -218,17 +219,15 @@ same(
 );
 same(
   (conformance13.acceptanceBlockers ?? []).length,
-  3,
-  "three explicit blockers remain while readiness is reopened",
+  1,
+  "only explicit author acceptance remains after scoped readiness rerun",
 );
 for (const blocker of [
-  "foundation necessity/minimality remains open under A9 elimination and self-proof criteria",
-  "global host semantic trust boundary remains open until package-wide decision/runtime path audit closes",
   "explicit author acceptance of the exact candidate artifacts has not yet been recorded",
 ]) {
   assert(
     conformance13.acceptanceBlockers.includes(blocker),
-    `reopened readiness blocker is explicit: ${blocker}`,
+    `remaining acceptance blocker is explicit: ${blocker}`,
   );
 }
 
@@ -246,12 +245,12 @@ same(
 );
 
 // Governance pins the reopened lifecycle state so contract/conformance cannot
-// silently drift back to readiness before the stronger criteria close.
+// pin the exact A73s scoped-readiness decision without accepting or selecting v0.13.
 const rules = new Map<string, any>(
   (policy.document_relations?.rules ?? []).map((rule: any) => [rule.id, rule]),
 );
-same(rules.get("v013-contract-ready")?.value, false, "policy pins v0.13 contract not-ready");
-same(rules.get("v013-conformance-ready")?.value, false, "policy pins v0.13 conformance not-ready");
+same(rules.get("v013-contract-ready")?.value, true, "policy pins v0.13 contract ready");
+same(rules.get("v013-conformance-ready")?.value, true, "policy pins v0.13 conformance ready");
 same(
   rules.get("v013-conformance-complete")?.value,
   "complete",
