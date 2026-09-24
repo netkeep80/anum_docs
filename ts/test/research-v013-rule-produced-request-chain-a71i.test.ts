@@ -521,18 +521,45 @@ function staticGuards():void{
     "A71i generic subcall executor source-identical A71h",
   );
 
-  const ownFrontier=sourceSlice(
-    own,
-    "function childContexts(",
-    "\nfunction seedProducerRequest(",
+  same(
+    sourceSlice(
+      own,
+      "function childContexts(",
+      "\n/** Source-identical A70e closure discovery.",
+    ),
+    sourceSlice(
+      a70e,
+      "function childContexts(",
+      "\n/**\n * Read the unique proper END-self-closed closure witness:",
+    ),
+    "A71i child discovery source-identical A70e",
   );
-  const referenceFrontier=sourceSlice(
-    a70e,
-    "function childContexts(",
-    "\nfunction exercise(",
+  same(
+    sourceSlice(
+      own,
+      "function closureOf(",
+      "\n/** Source-identical A70e active frontier.",
+    ),
+    sourceSlice(
+      a70e,
+      "function closureOf(",
+      "\n/**\n * Read the active execution frontier rooted at one already-discovered entry.",
+    ),
+    "A71i closure discovery source-identical A70e",
   );
-  same(ownFrontier,referenceFrontier,
-    "A71i lifecycle frontier source-identical A70e");
+  same(
+    sourceSlice(
+      own,
+      "function activeFrontier(",
+      "\nfunction seedProducerRequest(",
+    ),
+    sourceSlice(
+      a70e,
+      "function activeFrontier(",
+      "\nfunction exercise(",
+    ),
+    "A71i active frontier source-identical A70e",
+  );
 
   const exercise=sourceSlice(
     own,
