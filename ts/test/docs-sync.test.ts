@@ -82,7 +82,7 @@ function syntheticOwnerDocs(): Record<string, string> {
   for (const lawId of requiredLawIds) {
     const path = SEMANTIC_LAW_OWNER_BY_ID[lawId];
     assert.ok(path);
-    docs[path] += `\n<a id="mts-law-${lawId}"></a>\n### Переименовываемый заголовок\nНормативное тело ${lawId}.\n`;
+    docs[path] += `\n<a id="mts-law-${lawId}"></a> <!-- нормативный владелец -->\n### Переименовываемый заголовок\nНормативное тело ${lawId}.\n`;
   }
   return docs;
 }
@@ -95,36 +95,36 @@ assert.deepEqual(
 );
 
 const duplicateDocs = syntheticOwnerDocs();
-duplicateDocs["README.md"] = '<a id="mts-law-exactAnumRooting"></a>\nДублирующее нормативное тело.\n';
+duplicateDocs["README.md"] = '<a id="mts-law-L4"></a> <!-- нормативный владелец -->\nДублирующее нормативное тело.\n';
 assert.ok(
   validateSemanticLawDocumentation(requiredLawIds, duplicateDocs).some(
-    (issue) => issue.code === "duplicate-owner" && issue.lawId === "exactAnumRooting",
+    (issue) => issue.code === "duplicate-owner" && issue.lawId === "L4",
   ),
   "D-F01: второй current owner того же ID должен отклоняться",
 );
 
 const missingDocs = syntheticOwnerDocs();
-const missingPath = SEMANTIC_LAW_OWNER_BY_ID.exactAnumRooting;
+const missingPath = SEMANTIC_LAW_OWNER_BY_ID.L4;
 assert.ok(missingPath);
 missingDocs[missingPath] = missingDocs[missingPath]!.replace(
-  '<a id="mts-law-exactAnumRooting"></a>\n### Переименовываемый заголовок\nНормативное тело exactAnumRooting.\n',
+  '<a id="mts-law-L4"></a> <!-- нормативный владелец -->\n### Переименовываемый заголовок\nНормативное тело L4.\n',
   "",
 );
 assert.ok(
   validateSemanticLawDocumentation(requiredLawIds, missingDocs).some(
-    (issue) => issue.code === "missing-owner" && issue.lawId === "exactAnumRooting",
+    (issue) => issue.code === "missing-owner" && issue.lawId === "L4",
   ),
   "D-F02: удаление единственного owner должно отклоняться",
 );
 
 const emptyDocs = syntheticOwnerDocs();
 emptyDocs[missingPath] = emptyDocs[missingPath]!.replace(
-  '<a id="mts-law-exactAnumRooting"></a>\n### Переименовываемый заголовок\nНормативное тело exactAnumRooting.\n',
-  '<a id="mts-law-exactAnumRooting"></a>\n',
+  '<a id="mts-law-L4"></a> <!-- нормативный владелец -->\n### Переименовываемый заголовок\nНормативное тело L4.\n',
+  '<a id="mts-law-L4"></a> <!-- нормативный владелец -->\n',
 );
 assert.ok(
   validateSemanticLawDocumentation(requiredLawIds, emptyDocs).some(
-    (issue) => issue.code === "empty-owner" && issue.lawId === "exactAnumRooting",
+    (issue) => issue.code === "empty-owner" && issue.lawId === "L4",
   ),
   "D-F03: пустой owner-anchor должен отклоняться",
 );
@@ -140,17 +140,17 @@ assert.ok(
 
 const fencedOnlyDocs = syntheticOwnerDocs();
 fencedOnlyDocs[missingPath] = fencedOnlyDocs[missingPath]!.replace(
-  '<a id="mts-law-exactAnumRooting"></a>\n### Переименовываемый заголовок\nНормативное тело exactAnumRooting.\n',
+  '<a id="mts-law-L4"></a> <!-- нормативный владелец -->\n### Переименовываемый заголовок\nНормативное тело L4.\n',
   "",
 );
 fencedOnlyDocs["README.md"] = [
   String.fromCharCode(96, 96, 96) + "html",
-  '<a id="mts-law-exactAnumRooting"></a>',
+  '<a id="mts-law-L4"></a>',
   String.fromCharCode(96, 96, 96),
 ].join("\n");
 assert.ok(
   validateSemanticLawDocumentation(requiredLawIds, fencedOnlyDocs).some(
-    (issue) => issue.code === "missing-owner" && issue.lawId === "exactAnumRooting",
+    (issue) => issue.code === "missing-owner" && issue.lawId === "L4",
   ),
   "D-F05: anchor внутри code fence не является нормативным владельцем",
 );
