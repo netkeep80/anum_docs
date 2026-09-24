@@ -394,7 +394,11 @@ function staticGuards(): void {
   );
   assert(own.includes('from "../src/v013-structural-execution.js"'),
     "A73d consumes production structural execution");
-  assert(!own.includes("function reactV013StructuralScope("),
+  const implementation = own.slice(
+    0,
+    own.indexOf("function staticGuards(): void {"),
+  );
+  assert(!implementation.includes("function reactV013StructuralScope("),
     "A73d contains no local reaction-kernel implementation");
   for (const forbidden of [
     "ALL",
