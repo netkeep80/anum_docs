@@ -233,6 +233,58 @@ function exercise(): void {
   same(memory.ensure(K, B2), KB2, "K -> B2 canonical");
   same(memory.ensure(K, B3), KB3, "K -> B3 canonical");
 }
+function staticGuards(): void {
+  const root = resolve(process.cwd(), "..");
+  const own = readFileSync(
+    join(root, "ts/test/research-v013-relational-bundle-1-to-n-a72h.test.ts"),
+    "utf8",
+  );
+
+  const kernelStart = own.indexOf("function reactBundleAtomically(");
+  const kernelEnd = own.indexOf("\nfunction exercise()", kernelStart);
+  assert(kernelStart >= 0 && kernelEnd > kernelStart, "reaction source slice");
+  const kernel = own.slice(kernelStart, kernelEnd);
+
+  assert(kernel.includes("const before = working.snapshot()"),
+    "reaction reads one immutable pre-state snapshot");
+  assert(kernel.includes("working.replaceAtomically(before, produced)"),
+    "reaction commits current-state replacement once");
+  assert(kernel.includes("derived successor must not become current before atomic commit"),
+    "reaction checks successor invisibility before commit");
+
+  same(
+    kernel.split("working.replaceAtomically(").length - 1,
+    1,
+    "reaction performs exactly one working-state commit",
+  );
+
+  for (const forbidden of [
+    "RuleKind",
+    "opcode",
+    "selectedRule",
+    "history.push",
+    "tombstone",
+    "working.replaceAtomically([active]",
+  ]) {
+    assert(!kernel.includes(forbidden),
+      "kernel excludes sequential semantic mutation/special opcode: " + forbidden);
+  }
+
+  const a72g = readFileSync(
+    join(root, "ts/test/research-v013-relational-bundle-1-to-0-a72g.test.ts"),
+    "utf8",
+  );
+  assert(a72g.includes("RELATIONAL_BUNDLE_1_TO_0=GREEN_SCOPED_RESEARCH"),
+    "A72g 1 -> 0 remains retained");
+
+  const a72a = readFileSync(
+    join(root, "ts/test/research-v013-working-amemory-single-rewrite-a72a.test.ts"),
+    "utf8",
+  );
+  assert(a72a.includes("UNARY_LOGIC_NOT_WORKING_DYNAMICS=GREEN_SCOPED_RESEARCH"),
+    "existing 1 -> 1 witness remains retained");
+}
+
 function main(): void {
   exercise();
   staticGuards();
