@@ -728,7 +728,7 @@ function staticGuards(): void {
   const reactionStart =
     own.indexOf("function reactContextScopeDroppingNoMatch(");
   const reactionEnd =
-    own.indexOf("\n/**\n * Open a nested call", reactionStart);
+    own.indexOf("\nfunction openFirstArgumentCall(", reactionStart);
   assert(reactionStart >= 0 && reactionEnd > reactionStart,
     "reaction source slice");
   const reaction = own.slice(reactionStart, reactionEnd);
