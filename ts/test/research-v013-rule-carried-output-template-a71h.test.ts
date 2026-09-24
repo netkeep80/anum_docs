@@ -227,7 +227,7 @@ interface GroundedSubcallResult{
 }
 
 /**
- * Domain-agnostic Rule subcall:
+ * Domain-agnostic grounded Rule subcall:
  *
  *   1. discover admitted Rule by structural unification;
  *   2. instantiate its carried output-template;
