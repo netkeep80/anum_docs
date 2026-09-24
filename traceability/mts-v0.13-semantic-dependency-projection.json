@@ -991,32 +991,32 @@
     "coarseInheritedAuthorityAggregateCount": 0,
     "unresolvedNestedBootstrapBoundaryCount": 0,
     "unresolvedRepresentationBoundaryCount": 0,
-    "directSemanticWriteOwnerCount": 51,
+    "directSemanticWriteOwnerCount": 53,
     "unclassifiedDirectSemanticWriteOwnerCount": 0,
     "directSemanticWriteOwnersByCategory": {
-      "authority-evidence-producer": 20,
+      "authority-evidence-producer": 21,
       "proof-derivation-producer": 11,
       "representation-materialization": 12,
       "bootstrap-foundation-materialization": 2,
       "tooling": 2,
-      "authorized-semantic-target-materialization": 4
+      "authorized-semantic-target-materialization": 5
     },
     "packageWideObjectSpecificHostSemanticCount": null,
-    "typedReadMemorySiteCount": 500,
-    "typedReadMemoryOwnerCount": 229,
-    "staticSemanticDecisionCandidateOwnerCount": 338,
+    "typedReadMemorySiteCount": 508,
+    "typedReadMemoryOwnerCount": 233,
+    "staticSemanticDecisionCandidateOwnerCount": 343,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
     "staticDecisionOwnersByCategory": {
       "memory-resource-safety": 4,
       "mixed-semantic-transport": 60,
       "proof-replay": 91,
       "representation": 55,
-      "semantic-authority": 83,
+      "semantic-authority": 88,
       "tooling": 22,
       "transport-persistence": 23
     },
     "packageWideExactWireLiteralDispatchCount": 0,
-    "typedDirectSemanticWriteOwnerCount": 51,
+    "typedDirectSemanticWriteOwnerCount": 53,
     "hostLinkDuplicationCandidateCount": 26,
     "confirmedHostLinkEquivalentDuplicationCount": null,
     "runtimeObservedPublicSemanticEntrypointCount": 8,
@@ -2048,6 +2048,18 @@
         "reason": "Final host execution of already-authorized FORMAL structural plan."
       },
       {
+        "id": "ts/src/v013-grounded-execution.ts#defineV013GroundedExecutionScope",
+        "category": "authority-evidence-producer",
+        "capabilityId": null,
+        "reason": "Materializes the Link-native grounded working Scope carrying current Theory authority and current membership; current-root selection remains opaque A-memory mechanics."
+      },
+      {
+        "id": "ts/src/v013-grounded-execution.ts#reactV013GroundedScope",
+        "category": "authorized-semantic-target-materialization",
+        "capabilityId": null,
+        "reason": "Materializes successor truths only from grounded relations admitted by the current Theory; no Rule/template/opcode selection is performed."
+      },
+      {
         "id": "ts/src/v013-hierarchical-carrier.ts#materializeQuotedNode",
         "category": "representation-materialization",
         "capabilityId": "derived.hierarchical-carrier",
@@ -2091,7 +2103,7 @@
       }
     ],
     "interpretationBoundaryCovered": false,
-    "note": "The 51 current owners are confirmed to use actual Memory write members, but static direct-call analysis can still miss alias/rebinding/new-write-API bypasses. P1g runtime instrumentation remains required.",
+    "note": "The 53 current owners are confirmed to use actual Memory write members, but static direct-call analysis can still miss alias/rebinding/new-write-API bypasses. P1g runtime instrumentation remains required.",
     "receiverTypeCheckedByP1e": false,
     "typedOwnerSetCrossCheckedByP1f": true,
     "physicalMutationBoundaryProven": false
@@ -2129,30 +2141,30 @@
       "issuanceIndex",
       "allLinks"
     ],
-    "typedReadSiteCount": 500,
-    "typedReadOwnerCount": 229,
-    "typedReadOwnerFingerprintFNV64": "7d911a3037599ee9",
+    "typedReadSiteCount": 508,
+    "typedReadOwnerCount": 233,
+    "typedReadOwnerFingerprintFNV64": "ec3899165deb3c83",
     "typedReadMemberCounts": {
       "allLinks": 5,
       "find": 25,
       "incoming": 7,
       "issuanceIndex": 3,
       "linkCount": 163,
-      "outgoing": 18,
-      "poles": 209,
+      "outgoing": 20,
+      "poles": 215,
       "root": 70
     },
-    "decisionCandidateOwnerCount": 338,
-    "decisionCandidateFingerprintFNV64": "08d099e570c86a17",
+    "decisionCandidateOwnerCount": 343,
+    "decisionCandidateFingerprintFNV64": "c4b871f028f83a6c",
     "decisionSignalCounts": {
       "ambient-mutable-decision": 51,
       "fixed-coordinate-index": 50,
       "host-callback-call": 5,
       "host-tag-decision": 35,
-      "if-link": 212,
+      "if-link": 215,
       "if-memory-read": 84,
-      "link-equality": 206,
-      "literal-equality": 130,
+      "link-equality": 209,
+      "literal-equality": 131,
       "literal-switch": 3,
       "memory-read-equality": 89,
       "switch-link": 1,
@@ -2223,6 +2235,7 @@
       "ts/src/v012-source.ts": 6,
       "ts/src/v012-string-anum.ts": 3,
       "ts/src/v013-formal-aspect-evaluator.ts": 8,
+      "ts/src/v013-grounded-execution.ts": 5,
       "ts/src/v013-hierarchical-carrier.ts": 6,
       "ts/src/v013-relative-form-materialization.ts": 2,
       "ts/src/v013-relative-pole-context.ts": 3,
@@ -2298,14 +2311,15 @@
       "ts/src/v013-relative-pole-context.ts": "semantic-authority",
       "ts/src/v013-relative-pole-execution.ts": "semantic-authority",
       "ts/src/v013-structural-execution.ts": "semantic-authority",
-      "ts/src/value-bundle.ts": "semantic-authority"
+      "ts/src/value-bundle.ts": "semantic-authority",
+      "ts/src/v013-grounded-execution.ts": "semantic-authority"
     },
     "decisionOwnerCountsByCategory": {
       "memory-resource-safety": 4,
       "mixed-semantic-transport": 60,
       "proof-replay": 91,
       "representation": 55,
-      "semantic-authority": 83,
+      "semantic-authority": 88,
       "tooling": 22,
       "transport-persistence": 23
     },
