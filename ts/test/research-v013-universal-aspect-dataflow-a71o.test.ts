@@ -3,16 +3,15 @@ import { join, resolve } from "node:path";
 
 import {
   Memory,
+  MemoryError,
   ensureRootBasis,
   type LinkHandle,
   type RootBasis,
 } from "../src/memory.js";
 import {
   admitStructuralRule,
-  defineStructuralInterpreter,
   defineStructuralRoleDictionary,
   defineStructuralRule,
-  readStructuralInterpreter,
   readStructuralRoleDictionary,
   readStructuralRule,
   StructuralRuleError,
@@ -20,10 +19,10 @@ import {
   type StructuralRoleBinding,
 } from "../src/structural-rule.js";
 import { unifyStructuralTemplate } from "../src/structural-unification.js";
-import { defineContext, readContext, StateError } from "../src/state.js";
+import { defineContext, readContext } from "../src/state.js";
 
 function assert(c:unknown,m:string):asserts c{
-  if(!c)throw new Error(`v0.13 A71o universal aspect dataflow: ${m}`);
+  if(!c)throw new Error(`v0.13 A71o aspect-unifier boundary: ${m}`);
 }
 function same<T>(a:T,e:T,m:string):void{
   assert(Object.is(a,e),`${m}: values differ`);
@@ -41,8 +40,8 @@ interface UniversalRules{
 }
 
 /**
- * One universal Rule per structural aspect. No source-template node identity
- * occurs in these Rules.
+ * Candidate universal aspect Rules. They contain no concrete source-template
+ * node identity and no RuleKind/opcode tag.
  */
 function defineUniversalAspectRules(
   memory:Memory,
@@ -50,72 +49,71 @@ function defineUniversalAspectRules(
   b:RootBasis,
   seed:LinkHandle,
 ):UniversalRules{
-  // ROOT:
-  //   K -> R
-  //      -> K -> (R -> R)
   const kr=memory.ensure(seed,b.O);
   const dr=defineStructuralRoleDictionary(memory,[kr]);
   const rootInput=memory.ensure(kr,memory.root);
-  const rootMap=memory.ensure(memory.root,memory.root);
-  const rootOutput=memory.ensure(kr,rootMap);
+  const rootOutput=memory.ensure(
+    kr,
+    memory.ensure(memory.root,memory.root),
+  );
   const rootRule=defineStructuralRule(
     memory,dr,memory.ensure(rootInput,rootOutput),
   );
   admitStructuralRule(memory,theory,rootRule);
 
-  // PAIR:
-  //   K -> ((A->B) -> ((A->A') -> (B->B')))
-  //      -> K -> ((A->B) -> (A'->B'))
   const kp=memory.ensure(seed,b.C);
   const a=memory.ensure(seed,b.O);
   const bb=memory.ensure(seed,b.L);
   const ai=memory.ensure(seed,b.U);
   const bi=memory.ensure(seed,memory.root);
   const dp=defineStructuralRoleDictionary(memory,[kp,a,bb,ai,bi]);
-
   const sourcePair=memory.ensure(a,bb);
   const mapA=memory.ensure(a,ai);
   const mapB=memory.ensure(bb,bi);
-  const pairReady=memory.ensure(sourcePair,memory.ensure(mapA,mapB));
-  const pairInput=memory.ensure(kp,pairReady);
-  const pairImage=memory.ensure(ai,bi);
-  const pairOutput=memory.ensure(kp,memory.ensure(sourcePair,pairImage));
+  const pairInput=memory.ensure(
+    kp,
+    memory.ensure(sourcePair,memory.ensure(mapA,mapB)),
+  );
+  const pairOutput=memory.ensure(
+    kp,
+    memory.ensure(sourcePair,memory.ensure(ai,bi)),
+  );
   const pairRule=defineStructuralRule(
     memory,dp,memory.ensure(pairInput,pairOutput),
   );
   admitStructuralRule(memory,theory,pairRule);
 
-  // START:
-  //   K -> (START(A) -> (A->A'))
-  //      -> K -> (START(A) -> START(A'))
   const ks=memory.ensure(seed,memory.ensure(b.O,b.C));
   const sa=memory.ensure(seed,memory.ensure(b.C,b.L));
   const sai=memory.ensure(seed,memory.ensure(b.L,b.U));
   const ds=defineStructuralRoleDictionary(memory,[ks,sa,sai]);
-
   const sourceStart=memory.ensureStartSelfClosed(sa);
-  const startChildMap=memory.ensure(sa,sai);
-  const startInput=memory.ensure(ks,memory.ensure(sourceStart,startChildMap));
-  const startImage=memory.ensureStartSelfClosed(sai);
-  const startOutput=memory.ensure(ks,memory.ensure(sourceStart,startImage));
+  const startInput=memory.ensure(
+    ks,
+    memory.ensure(sourceStart,memory.ensure(sa,sai)),
+  );
+  const startOutput=memory.ensure(
+    ks,
+    memory.ensure(sourceStart,memory.ensureStartSelfClosed(sai)),
+  );
   const startRule=defineStructuralRule(
     memory,ds,memory.ensure(startInput,startOutput),
   );
   admitStructuralRule(memory,theory,startRule);
 
-  // END:
-  //   K -> (END(A) -> (A->A'))
-  //      -> K -> (END(A) -> END(A'))
   const ke=memory.ensure(seed,memory.ensure(b.C,b.O));
   const ea=memory.ensure(seed,memory.ensure(b.L,b.C));
   const eai=memory.ensure(seed,memory.ensure(b.U,b.L));
   const de=defineStructuralRoleDictionary(memory,[ke,ea,eai]);
-
   const sourceEnd=memory.ensureEndSelfClosed(ea);
-  const endChildMap=memory.ensure(ea,eai);
-  const endInput=memory.ensure(ke,memory.ensure(sourceEnd,endChildMap));
-  const endImage=memory.ensureEndSelfClosed(eai);
-  const endOutput=memory.ensure(ke,memory.ensure(sourceEnd,endImage));
+  const endInput=memory.ensure(
+    ke,
+    memory.ensure(sourceEnd,memory.ensure(ea,eai)),
+  );
+  const endOutput=memory.ensure(
+    ke,
+    memory.ensure(sourceEnd,memory.ensureEndSelfClosed(eai)),
+  );
   const endRule=defineStructuralRule(
     memory,de,memory.ensure(endInput,endOutput),
   );
@@ -129,59 +127,26 @@ function defineUniversalAspectRules(
   });
 }
 
-interface GroundedConstructiveRule{
+interface RuleMatch{
   readonly rule:LinkHandle;
-  readonly outputTemplate:LinkHandle;
   readonly bindings:readonly StructuralRoleBinding[];
 }
 
-function entryRootOf(
+function matchingRulesCurrentUnifier(
   memory:Memory,
-  contextRoot:LinkHandle,
-  leaf:LinkHandle,
-):LinkHandle{
-  let current=leaf;
-  const seen=new Set<LinkHandle>();
-  while(true){
-    assert(!seen.has(current),"entry-root ancestry cycle");
-    seen.add(current);
-    let state;
-    try{
-      state=readContext(memory,current);
-    }catch(error){
-      if(error instanceof StateError)throw new Error("leaf is outside Context ancestry");
-      throw error;
-    }
-    if(state.parent===contextRoot)return current;
-    current=state.parent;
-  }
-}
-
-function deriveEntryTheory(
-  memory:Memory,
-  contextRoot:LinkHandle,
+  theory:LinkHandle,
   requestContext:LinkHandle,
-):LinkHandle{
-  const entry=entryRootOf(memory,contextRoot,requestContext);
-  return readStructuralInterpreter(memory,readContext(memory,entry).current).theory;
-}
-
-function discoverGroundedConstructiveRule(
-  memory:Memory,
-  contextRoot:LinkHandle,
-  requestContext:LinkHandle,
-):GroundedConstructiveRule{
-  const theory=deriveEntryTheory(memory,contextRoot,requestContext);
+):readonly RuleMatch[]{
   const state=readContext(memory,requestContext);
   const claimed=memory.poles(requestContext).end;
-  const claimedPoles=memory.poles(claimed);
-  same(claimedPoles.start,state.parent,"request payload caller");
-  same(claimedPoles.end,state.current,"request payload current");
+  const cp=memory.poles(claimed);
+  same(cp.start,state.parent,"request payload caller");
+  same(cp.end,state.current,"request payload current");
 
-  const matches:GroundedConstructiveRule[]=[];
+  const matches:RuleMatch[]=[];
   for(const admission of memory.outgoing(theory)){
     const ap=memory.poles(admission);
-    if(ap.start!==theory || ap.end===admission)continue;
+    if(ap.start!==theory||ap.end===admission)continue;
     const ruleHandle=ap.end;
     try{
       verifyStructuralRuleAdmission(memory,theory,ruleHandle,admission);
@@ -191,302 +156,205 @@ function discoverGroundedConstructiveRule(
       const bindings=unifyStructuralTemplate(
         memory,body.start,claimed,dictionary.roles,
       );
-      matches.push(Object.freeze({
-        rule:ruleHandle,
-        outputTemplate:body.end,
-        bindings,
-      }));
+      matches.push(Object.freeze({rule:ruleHandle,bindings}));
     }catch(error){
       if(error instanceof StructuralRuleError)continue;
       throw error;
     }
   }
-  assert(matches.length===1,
-    `exactly one universal aspect Rule must match; got ${matches.length}`);
-  return matches[0]!;
+  return Object.freeze(matches);
 }
 
-function instantiateStructuralTemplate(
+/**
+ * Diagnostic control only.
+ *
+ * This is the current structural unifier plus one generic invariant:
+ *
+ *   source.startSelf == claimed.startSelf
+ *   source.endSelf   == claimed.endSelf
+ *
+ * at every non-role node.
+ *
+ * There is no ROOT/START/END/PAIR branch or tag.
+ */
+function unifyWithSelfIncidenceParity(
   memory:Memory,
   template:LinkHandle,
-  bindings:readonly StructuralRoleBinding[],
-):LinkHandle{
-  const mapping=new Map<LinkHandle,LinkHandle>();
-  for(const binding of bindings){
-    const previous=mapping.get(binding.role);
-    if(previous!==undefined)same(previous,binding.value,"role binding consistent");
-    else mapping.set(binding.role,binding.value);
-  }
-  const visiting=new Set<LinkHandle>();
-  const clone=(source:LinkHandle):LinkHandle=>{
-    const known=mapping.get(source);
-    if(known!==undefined)return known;
-    assert(!visiting.has(source),"unsupported non-self template cycle");
-    const p=memory.poles(source);
-    let value:LinkHandle;
-    if(p.start===source&&p.end===source){
-      value=memory.ensureRoot();
-    }else if(p.start===source){
-      value=memory.ensureStartSelfClosed(clone(p.end));
-    }else if(p.end===source){
-      value=memory.ensureEndSelfClosed(clone(p.start));
-    }else{
-      visiting.add(source);
-      value=memory.ensure(clone(p.start),clone(p.end));
-      visiting.delete(source);
+  claimed:LinkHandle,
+  roles:readonly LinkHandle[],
+):readonly StructuralRoleBinding[]{
+  assert(new Set(roles).size===roles.length,"roles unique");
+
+  const before=memory.linkCount;
+  const roleSet=new Set(roles);
+  const inferred=new Map<LinkHandle,LinkHandle>();
+  const containsMemo=new Map<LinkHandle,boolean>();
+  const containsActive=new Set<LinkHandle>();
+
+  const containsRole=(node:LinkHandle):boolean=>{
+    if(roleSet.has(node))return true;
+    const cached=containsMemo.get(node);
+    if(cached!==undefined)return cached;
+    if(containsActive.has(node))return false;
+    containsActive.add(node);
+    try{
+      const p=memory.poles(node);
+      const result=containsRole(p.start)||containsRole(p.end);
+      containsMemo.set(node,result);
+      return result;
+    }finally{
+      containsActive.delete(node);
     }
-    mapping.set(source,value);
-    return value;
   };
-  return clone(template);
+
+  const visited=new Map<LinkHandle,Set<LinkHandle>>();
+  const markVisited=(left:LinkHandle,right:LinkHandle):boolean=>{
+    let rights=visited.get(left);
+    if(rights===undefined){
+      rights=new Set<LinkHandle>();
+      visited.set(left,rights);
+    }
+    if(rights.has(right))return true;
+    rights.add(right);
+    return false;
+  };
+
+  const unify=(left:LinkHandle,right:LinkHandle):void=>{
+    if(roleSet.has(left)){
+      const previous=inferred.get(left);
+      if(previous!==undefined&&previous!==right){
+        throw new StructuralRuleError("template-mismatch");
+      }
+      inferred.set(left,right);
+      return;
+    }
+
+    if(!containsRole(left)){
+      if(left!==right)throw new StructuralRuleError("template-mismatch");
+      return;
+    }
+
+    if(markVisited(left,right))return;
+
+    try{
+      const lp=memory.poles(left);
+      const rp=memory.poles(right);
+
+      // The only difference from current production unification.
+      if(
+        (lp.start===left)!==(rp.start===right) ||
+        (lp.end===left)!==(rp.end===right)
+      ){
+        throw new StructuralRuleError("template-mismatch");
+      }
+
+      unify(lp.start,rp.start);
+      unify(lp.end,rp.end);
+    }catch(error){
+      if(error instanceof StructuralRuleError)throw error;
+      if(error instanceof MemoryError){
+        throw new StructuralRuleError("template-mismatch");
+      }
+      throw error;
+    }
+  };
+
+  try{
+    unify(template,claimed);
+    return Object.freeze(roles.map((role)=>{
+      const value=inferred.get(role);
+      if(value===undefined)throw new StructuralRuleError("missing-role-binding");
+      return Object.freeze({role,value});
+    }));
+  }finally{
+    same(memory.linkCount,before,"strict unifier is read-only");
+  }
 }
 
-interface RuleResult{
-  readonly rule:LinkHandle;
-  readonly outputTruth:LinkHandle;
-  readonly continuation:LinkHandle;
-}
-function executeRule(
+function matchingRulesParityControl(
   memory:Memory,
-  contextRoot:LinkHandle,
+  theory:LinkHandle,
   requestContext:LinkHandle,
-):RuleResult{
-  const request=readContext(memory,requestContext);
-  const grounded=discoverGroundedConstructiveRule(
-    memory,contextRoot,requestContext,
-  );
-  const outputTruth=instantiateStructuralTemplate(
-    memory,grounded.outputTemplate,grounded.bindings,
-  );
-  const output=memory.poles(outputTruth);
-  same(output.start,request.parent,"output returns to request caller");
-  memory.ensureEndSelfClosed(requestContext);
-  const continuation=memory.ensureStartSelfClosed(outputTruth);
-  return Object.freeze({rule:grounded.rule,outputTruth,continuation});
-}
+):readonly RuleMatch[]{
+  const state=readContext(memory,requestContext);
+  const claimed=memory.poles(requestContext).end;
+  const cp=memory.poles(claimed);
+  same(cp.start,state.parent,"parity request payload caller");
+  same(cp.end,state.current,"parity request payload current");
 
-function childContexts(memory:Memory,parent:LinkHandle):readonly LinkHandle[]{
-  const out:LinkHandle[]=[];
-  for(const payload of memory.outgoing(parent)){
-    const p=memory.poles(payload);
-    if(p.start!==parent||p.end===payload)continue;
-    for(const candidate of memory.incoming(payload)){
-      const c=memory.poles(candidate);
-      if(c.start!==candidate||c.end!==payload)continue;
-      if(readContext(memory,candidate).parent===parent)out.push(candidate);
+  const matches:RuleMatch[]=[];
+  for(const admission of memory.outgoing(theory)){
+    const ap=memory.poles(admission);
+    if(ap.start!==theory||ap.end===admission)continue;
+    const ruleHandle=ap.end;
+    try{
+      const rule=readStructuralRule(memory,ruleHandle);
+      const dictionary=readStructuralRoleDictionary(memory,rule.roleDictionary);
+      const body=memory.poles(rule.body);
+      const bindings=unifyWithSelfIncidenceParity(
+        memory,body.start,claimed,dictionary.roles,
+      );
+      matches.push(Object.freeze({rule:ruleHandle,bindings}));
+    }catch(error){
+      if(error instanceof StructuralRuleError)continue;
+      throw error;
     }
   }
-  return Object.freeze([...new Set(out)]);
+  return Object.freeze(matches);
 }
-function closureOf(memory:Memory,context:LinkHandle):LinkHandle|undefined{
-  for(const candidate of memory.outgoing(context)){
-    const p=memory.poles(candidate);
-    if(p.start===context&&p.end===candidate&&p.start!==candidate)return candidate;
-  }
-  return undefined;
-}
-function activeFrontier(memory:Memory,entry:LinkHandle):readonly LinkHandle[]{
-  const out:LinkHandle[]=[];
-  const walk=(k:LinkHandle):void=>{
-    const children=childContexts(memory,k);
-    const closure=closureOf(memory,k);
-    if(children.length>0){
-      assert(closure===undefined,"closed non-leaf invalid");
-      for(const child of children)walk(child);
-    }else if(closure===undefined)out.push(k);
-  };
-  walk(entry);
-  return Object.freeze(out);
+
+function rootRequest(memory:Memory,caller:LinkHandle):LinkHandle{
+  return defineContext(memory,caller,memory.root);
 }
 
 function pairReadyRequest(
   memory:Memory,
   caller:LinkHandle,
-  sourcePair:LinkHandle,
-  leftMap:LinkHandle,
-  rightMap:LinkHandle,
+  a:LinkHandle,
+  b:LinkHandle,
+  ai:LinkHandle,
+  bi:LinkHandle,
 ):LinkHandle{
+  const source=memory.ensure(a,b);
+  const mapA=memory.ensure(a,ai);
+  const mapB=memory.ensure(b,bi);
   return defineContext(
-    memory,
-    caller,
-    memory.ensure(sourcePair,memory.ensure(leftMap,rightMap)),
+    memory,caller,memory.ensure(source,memory.ensure(mapA,mapB)),
   );
 }
-function unaryReadyRequest(
+
+function startReadyRequest(
   memory:Memory,
   caller:LinkHandle,
-  sourceParent:LinkHandle,
-  childMap:LinkHandle,
+  a:LinkHandle,
+  ai:LinkHandle,
 ):LinkHandle{
-  return defineContext(memory,caller,memory.ensure(sourceParent,childMap));
+  const source=memory.ensureStartSelfClosed(a);
+  return defineContext(
+    memory,caller,memory.ensure(source,memory.ensure(a,ai)),
+  );
 }
 
-interface TemplateChain{
-  readonly xRole:LinkHandle;
-  readonly yRole:LinkHandle;
-  readonly pair:LinkHandle;
-  readonly inner:LinkHandle;
-  readonly root:LinkHandle;
-  readonly innerAspect:"START"|"END";
-  readonly rootAspect:"START"|"END";
-}
-function defineTemplateChain(
+function endReadyRequest(
   memory:Memory,
-  b:RootBasis,
-  seed:LinkHandle,
-  order:"START_END"|"END_START",
-):TemplateChain{
-  const xRole=memory.ensure(seed,b.O);
-  const yRole=memory.ensure(seed,b.C);
-  const pair=memory.ensure(xRole,yRole);
-  if(order==="START_END"){
-    const inner=memory.ensureStartSelfClosed(pair);
-    const root=memory.ensureEndSelfClosed(inner);
-    return Object.freeze({
-      xRole,yRole,pair,inner,root,innerAspect:"START",rootAspect:"END",
-    });
-  }
-  const inner=memory.ensureEndSelfClosed(pair);
-  const root=memory.ensureStartSelfClosed(inner);
-  return Object.freeze({
-    xRole,yRole,pair,inner,root,innerAspect:"END",rootAspect:"START",
-  });
-}
-
-function mapping(memory:Memory,source:LinkHandle,target:LinkHandle):LinkHandle{
-  return memory.ensure(source,target);
-}
-
-/**
- * Diagnostic-only host promotion. This is exactly the residual A71o is trying
- * to expose: sourceParent must be supplied from outside the generic Rule tick.
- */
-function promoteToParentReadyRequest(
-  memory:Memory,
-  mappingContext:LinkHandle,
-  sourceParent:LinkHandle,
+  caller:LinkHandle,
+  a:LinkHandle,
+  ai:LinkHandle,
 ):LinkHandle{
-  return unaryReadyRequest(
-    memory,
-    mappingContext,
-    sourceParent,
-    readContext(memory,mappingContext).current,
+  const source=memory.ensureEndSelfClosed(a);
+  return defineContext(
+    memory,caller,memory.ensure(source,memory.ensure(a,ai)),
   );
-}
-
-function expectNoRule(
-  memory:Memory,
-  contextRoot:LinkHandle,
-  context:LinkHandle,
-  m:string,
-):void{
-  let failed=false;
-  try{
-    discoverGroundedConstructiveRule(memory,contextRoot,context);
-  }catch{
-    failed=true;
-  }
-  assert(failed,m);
-}
-
-function exerciseChain(
-  memory:Memory,
-  C:LinkHandle,
-  entry:LinkHandle,
-  rules:UniversalRules,
-  source:TemplateChain,
-  x:LinkHandle,
-  y:LinkHandle,
-):LinkHandle{
-  const caller=defineContext(memory,entry,memory.ensure(x,y));
-  const mapX=mapping(memory,source.xRole,x);
-  const mapY=mapping(memory,source.yRole,y);
-
-  const pairRequest=pairReadyRequest(
-    memory,caller,source.pair,mapX,mapY,
-  );
-  const pairStep=executeRule(memory,C,pairRequest);
-  same(pairStep.rule,rules.pair,"universal PAIR Rule selected");
-  const pairTarget=memory.ensure(x,y);
-  const pairMap=mapping(memory,source.pair,pairTarget);
-  same(readContext(memory,pairStep.continuation).current,pairMap,
-    "PAIR Rule yields exact source-pair mapping");
-
-  // Critical RED boundary: source.inner physically exists in Memory, but the
-  // active mapping fact does not carry that parent identity. No universal Rule
-  // can fire until a parent-ready request is explicitly produced.
-  expectNoRule(
-    memory,C,pairStep.continuation,
-    "mapping fact alone does not select its source parent",
-  );
-
-  if(source.innerAspect==="START"){
-    assert(memory.incoming(source.pair).includes(source.inner),
-      "START source parent is physically adjacent to pair child");
-  }else{
-    assert(memory.outgoing(source.pair).includes(source.inner),
-      "END source parent is physically adjacent to pair child");
-  }
-
-  const innerRequest=promoteToParentReadyRequest(
-    memory,pairStep.continuation,source.inner,
-  );
-  const innerStep=executeRule(memory,C,innerRequest);
-  same(
-    innerStep.rule,
-    source.innerAspect==="START"?rules.start:rules.end,
-    "universal inner aspect Rule selected",
-  );
-
-  const innerTarget=source.innerAspect==="START"
-    ? memory.ensureStartSelfClosed(pairTarget)
-    : memory.ensureEndSelfClosed(pairTarget);
-  const innerMap=mapping(memory,source.inner,innerTarget);
-  same(readContext(memory,innerStep.continuation).current,innerMap,
-    "inner universal Rule yields exact mapping");
-
-  expectNoRule(
-    memory,C,innerStep.continuation,
-    "inner mapping still does not autonomously discover source root parent",
-  );
-
-  if(source.rootAspect==="START"){
-    assert(memory.incoming(source.inner).includes(source.root),
-      "START root parent physically adjacent to inner child");
-  }else{
-    assert(memory.outgoing(source.inner).includes(source.root),
-      "END root parent physically adjacent to inner child");
-  }
-
-  const rootRequest=promoteToParentReadyRequest(
-    memory,innerStep.continuation,source.root,
-  );
-  const rootStep=executeRule(memory,C,rootRequest);
-  same(
-    rootStep.rule,
-    source.rootAspect==="START"?rules.start:rules.end,
-    "universal root aspect Rule selected",
-  );
-
-  const finalTarget=source.rootAspect==="START"
-    ? memory.ensureStartSelfClosed(innerTarget)
-    : memory.ensureEndSelfClosed(innerTarget);
-  const finalMap=mapping(memory,source.root,finalTarget);
-  same(readContext(memory,rootStep.continuation).current,finalMap,
-    "universal Rule chain yields exact final homomorphic mapping");
-
-  return finalTarget;
 }
 
 function exercise(noise:boolean):void{
   const memory=new Memory();
   const b=ensureRootBasis(memory);
-  const C=b.C;
   if(noise)memory.ensure(memory.ensure(b.U,b.C),memory.ensure(b.O,b.L));
 
   const fresh:LinkHandle[]=[];
   let seed=memory.ensure(b.U,b.L);
-  for(let i=0;i<44;i+=1){
+  for(let i=0;i<28;i+=1){
     seed=memory.ensure(seed,i%2===0?b.O:b.C);
     fresh.push(seed);
   }
@@ -498,52 +366,53 @@ function exercise(noise:boolean):void{
 
   const theory=memory.ensure(at(0),at(1));
   const rules=defineUniversalAspectRules(memory,theory,b,at(2));
-  const interpreter=defineStructuralInterpreter(memory,at(3),at(4),theory);
-  const entry=defineContext(memory,C,interpreter);
+  const caller=defineContext(memory,b.C,at(3));
 
-  // ROOT universal Rule is independent of any template-specific node identity.
-  const rootCaller=defineContext(memory,entry,at(5));
-  const rootRequest=defineContext(memory,rootCaller,memory.root);
-  const rootStep=executeRule(memory,C,rootRequest);
-  same(rootStep.rule,rules.root,"universal ROOT Rule selected");
-  same(
-    readContext(memory,rootStep.continuation).current,
-    memory.ensure(memory.root,memory.root),
-    "ROOT Rule yields exact ROOT mapping fact",
+  const rootQ=rootRequest(memory,caller);
+  const pairQ=pairReadyRequest(
+    memory,caller,at(4),at(5),at(6),at(7),
   );
-  memory.ensureEndSelfClosed(rootStep.continuation);
+  const startQ=startReadyRequest(memory,caller,at(8),at(9));
+  const endQ=endReadyRequest(memory,caller,at(10),at(11));
 
-  // Same universal Rule set handles two distinct source templates with opposite
-  // START/END wrapper order.
-  const sourceA=defineTemplateChain(memory,b,at(6),"START_END");
-  const sourceB=defineTemplateChain(memory,b,at(7),"END_START");
-
-  const xA=memory.ensure(at(8),at(9));
-  const yA=memory.ensure(at(10),at(11));
-  const xB=memory.ensure(at(12),at(13));
-  const yB=memory.ensure(at(14),at(15));
-
-  const finalA=exerciseChain(memory,C,entry,rules,sourceA,xA,yA);
-  const finalB=exerciseChain(memory,C,entry,rules,sourceB,xB,yB);
-
-  const expectedA=memory.ensureEndSelfClosed(
-    memory.ensureStartSelfClosed(memory.ensure(xA,yA)),
+  // Current production unifier does not preserve self-incidence topology.
+  // ROOT is the sharpest falsifier: every universal aspect Rule matches.
+  const currentRoot=matchingRulesCurrentUnifier(memory,theory,rootQ);
+  setSame(
+    currentRoot.map(x=>x.rule),
+    [rules.root,rules.pair,rules.start,rules.end],
+    "current unifier makes ROOT ambiguous across all aspect Rules",
   );
-  const expectedB=memory.ensureStartSelfClosed(
-    memory.ensureEndSelfClosed(memory.ensure(xB,yB)),
-  );
-  same(finalA,expectedA,"template A exact homomorphic target");
-  same(finalB,expectedB,"template B exact homomorphic target");
 
-  // Universal Rule definitions are shared; no source-specific Rule was added.
-  const admitted=[...memory.outgoing(theory)].filter(link=>{
-    const p=memory.poles(link);
-    return p.start===theory&&p.end!==link;
-  });
-  same(admitted.length,4,"exactly four universal aspect Rules admitted");
+  // Therefore universal aspect Rule classification is RED before dependency
+  // parent-reaction can even be tested.
+  assert(currentRoot.length!==1,
+    "current unifier cannot uniquely classify ROOT aspect");
 
-  // The diagnostic parent-promotion calls, not Rule semantics, are now the
-  // remaining template-specific orchestration.
+  // Diagnostic single-law control: exact two-bit self-incidence parity makes
+  // all four candidate aspect Rules mutually exclusive without a kind switch.
+  const strictRoot=matchingRulesParityControl(memory,theory,rootQ);
+  const strictPair=matchingRulesParityControl(memory,theory,pairQ);
+  const strictStart=matchingRulesParityControl(memory,theory,startQ);
+  const strictEnd=matchingRulesParityControl(memory,theory,endQ);
+
+  setSame(strictRoot.map(x=>x.rule),[rules.root],
+    "self-incidence parity uniquely classifies ROOT");
+  setSame(strictPair.map(x=>x.rule),[rules.pair],
+    "self-incidence parity uniquely classifies PAIR");
+  setSame(strictStart.map(x=>x.rule),[rules.start],
+    "self-incidence parity uniquely classifies START");
+  setSame(strictEnd.map(x=>x.rule),[rules.end],
+    "self-incidence parity uniquely classifies END");
+
+  // The diagnostic law is topology-only and read-only. It adds no aspect tag,
+  // RuleKind, opcode or basis-name test.
+  const beforeReplay=memory.linkCount;
+  matchingRulesParityControl(memory,theory,rootQ);
+  matchingRulesParityControl(memory,theory,pairQ);
+  matchingRulesParityControl(memory,theory,startQ);
+  matchingRulesParityControl(memory,theory,endQ);
+  same(memory.linkCount,beforeReplay,"parity classification replay read-only");
 }
 
 function sourceSlice(source:string,start:string,end:string):string{
@@ -558,51 +427,45 @@ function staticGuards():void{
     join(root,"ts/test/research-v013-universal-aspect-dataflow-a71o.test.ts"),
     "utf8",
   );
+  const production=readFileSync(
+    join(root,"ts/src/structural-unification.ts"),
+    "utf8",
+  );
   const a71n=readFileSync(
     join(root,"ts/test/research-v013-rule-driven-homomorphism-dataflow-a71n.test.ts"),
     "utf8",
   );
 
-  const rules=sourceSlice(
+  const parity=sourceSlice(
     own,
-    "function defineUniversalAspectRules(",
-    "\ninterface GroundedConstructiveRule",
+    "function unifyWithSelfIncidenceParity(",
+    "\nfunction matchingRulesParityControl(",
   );
   for(const forbidden of [
-    "TemplateChain",
-    "sourceA",
-    "sourceB",
-    "pairSource",
-    "startSource",
-    "endSource",
-    "stage",
+    "ROOT",
+    "START",
+    "END",
+    "PAIR",
+    "RuleKind",
+    "opcode",
+    "basis",
+    "switch(",
   ]){
-    assert(!rules.includes(forbidden),
-      `A71o universal Rules exclude template-specific selector ${forbidden}`);
+    assert(!parity.includes(forbidden),
+      `A71o parity law excludes aspect semantic selector ${forbidden}`);
   }
+  assert(parity.includes("(lp.start===left)!==(rp.start===right)"),
+    "parity law compares START self-incidence bit generically");
+  assert(parity.includes("(lp.end===left)!==(rp.end===right)"),
+    "parity law compares END self-incidence bit generically");
 
-  const promotion=sourceSlice(
-    own,
-    "function promoteToParentReadyRequest(",
-    "\nfunction expectNoRule(",
-  );
-  assert(promotion.includes("sourceParent:LinkHandle"),
-    "A71o diagnostic promotion exposes exact source-parent residual");
+  assert(!production.includes("(leftPoles.start === left) !== (rightPoles.start === right)"),
+    "production unifier currently lacks self-incidence parity guard");
+  assert(!production.includes("(lp.start===left)!==(rp.start===right)"),
+    "production unifier does not already contain A71o diagnostic law");
 
-  const chain=sourceSlice(
-    own,
-    "function exerciseChain(",
-    "\nfunction exercise(",
-  );
-  assert(chain.includes("expectNoRule("),
-    "A71o proves natural mapping state stalls before parent request injection");
-  assert(chain.includes("promoteToParentReadyRequest("),
-    "A71o explicitly marks host parent-ready promotion boundary");
-
-  assert(a71n.includes("HOST_TEMPLATE_NODE_SCHEDULER=0"),
-    "A71o starts after A71n scheduler removal");
   assert(a71n.includes("RULE_NETWORK_AUTHORING_FROM_TEMPLATE=RESIDUAL"),
-    "A71o attacks exact A71n Rule-network authoring residual");
+    "A71o starts from exact A71n universalization boundary");
 }
 
 function main():void{
@@ -611,23 +474,23 @@ function main():void{
   staticGuards();
 
   console.log([
-    "MTS v0.13 A71o: UNIVERSAL_ASPECT_RULES_PARENT_DISCOVERY_RED=GREEN_RED_SCOPED_RESEARCH",
-    "UNIVERSAL_ROOT_RULE=GREEN",
-    "UNIVERSAL_PAIR_RULE=GREEN",
-    "UNIVERSAL_START_RULE=GREEN",
-    "UNIVERSAL_END_RULE=GREEN",
-    "TWO_DISTINCT_TEMPLATES=SAME_FOUR_RULES",
-    "TEMPLATE_SPECIFIC_RULE_NETWORK_AUTHORING=0",
-    "FINAL_IMAGES=EXACT_HOMOMORPHIC_TARGETS",
-    "ACTIVE_MAPPING_FACT_ALONE_TO_PARENT_READY_REQUEST=RED",
-    "SOURCE_PARENT_PHYSICALLY_ADJACENT=YES",
-    "GENERIC_RULE_EXECUTOR_READS_PARENT_ADJACENCY=NO",
-    "HOST_SOURCE_PARENT_ARGUMENT_REQUIRED=YES",
-    "HOST_PARENT_READY_REQUEST_PRODUCTION=RESIDUAL",
-    "RULE_SEMANTICS=GENERIC",
-    "SCHEDULER_READY_SET=0",
-    "EXACT_RESIDUAL=SOURCE_PARENT_DEPENDENCY_DISCOVERY_REACTION",
-    "NEXT=A71P_CONTEXT_NATIVE_SOURCE_PARENT_REACTION_OR_ACCEPT_SUBSTRATE_PRIMITIVE",
+    "MTS v0.13 A71o: UNIVERSAL_ASPECT_RULES_CURRENT_UNIFIER=RED_SCOPED_RESEARCH",
+    "CANDIDATE_UNIVERSAL_RULES=ROOT_START_END_PAIR",
+    "CURRENT_UNIFIER_SELF_INCIDENCE_PRESERVATION=NO",
+    "ROOT_REQUEST_MATCHES_ALL_FOUR_RULES=YES",
+    "UNIVERSAL_ASPECT_CLASSIFICATION=AMBIGUOUS",
+    "SELF_INCIDENCE_PARITY_CONTROL=GREEN",
+    "PARITY_CONTROL_ROOT=UNIQUE",
+    "PARITY_CONTROL_START=UNIQUE",
+    "PARITY_CONTROL_END=UNIQUE",
+    "PARITY_CONTROL_PAIR=UNIQUE",
+    "PARITY_LAW=EXACT_TWO_BOOLEAN_SELF_INCIDENCE_EQUALITY",
+    "PARITY_LAW_ASPECT_SWITCH=0",
+    "PARITY_LAW_WRITES=0",
+    "SOURCE_PARENT_REACTION=NOT_REACHED",
+    "TEMPLATE_SPECIFIC_RULE_NETWORK_AUTHORING=STILL_RESIDUAL",
+    "EXACT_MISSING_CAPABILITY=ASPECT_PRESERVING_GENERIC_UNIFICATION",
+    "NEXT=A71P_ASPECT_PRESERVING_UNIFIER_COMPATIBILITY",
     "FULL_SELF_HOSTED=FALSE",
     "V013_NOT_ACCEPTED PRODUCTION_UNCHANGED",
   ].join(" "));
