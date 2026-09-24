@@ -1002,7 +1002,7 @@
       "authorized-semantic-target-materialization": 5
     },
     "packageWideObjectSpecificHostSemanticCount": null,
-    "typedReadMemorySiteCount": 500,
+    "typedReadMemorySiteCount": 508,
     "typedReadMemoryOwnerCount": 229,
     "staticSemanticDecisionCandidateOwnerCount": 338,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
@@ -2141,7 +2141,7 @@
       "issuanceIndex",
       "allLinks"
     ],
-    "typedReadSiteCount": 500,
+    "typedReadSiteCount": 508,
     "typedReadOwnerCount": 229,
     "typedReadOwnerFingerprintFNV64": "7d911a3037599ee9",
     "typedReadMemberCounts": {
