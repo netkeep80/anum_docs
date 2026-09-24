@@ -129,7 +129,7 @@ function carrier(memory:Memory,values:readonly LinkHandle[]):LinkHandle{
 }
 
 /**
- * The only A66-specific residual in the factorized path.
+ * The only A66-specific semantic residual in the factorized path.
  *
  * Read selected A66 evidence and derive one generic continuation:
  *
