@@ -43,9 +43,9 @@ expectThrow(
 
 const repositoryRoot = findRepositoryRoot();
 const projection = loadCurrentProjection(repositoryRoot);
-assert.equal(projection.currentContract, "mts-contract/v0.12");
-assert.equal(projection.previousContract, "mts-contract/v0.11");
-assert.equal(projection.acceptancePath, "cutover/typescript-c1-acceptance-v0.5.json");
+assert.equal(projection.currentContract, "mts-contract/v0.13");
+assert.equal(projection.previousContract, "mts-contract/v0.12");
+assert.equal(projection.acceptancePath, "cutover/typescript-c1-acceptance-v0.6.json");
 assert.deepEqual(CANONICAL_DOCS, ["README.md"], "generated current projection must have exactly one owner");
 assert.deepEqual(PROJECTION_FORBIDDEN_DOCS, [
   "docs/CONTRIBUTING.md",
@@ -54,9 +54,9 @@ assert.deepEqual(PROJECTION_FORBIDDEN_DOCS, [
 ]);
 
 const rendered = renderCurrentProjection(projection);
+assert.ok(rendered.includes("mts-contract/v0.13"));
 assert.ok(rendered.includes("mts-contract/v0.12"));
-assert.ok(rendered.includes("mts-contract/v0.11"));
-assert.ok(rendered.includes("cutover/typescript-c1-acceptance-v0.5.json"));
+assert.ok(rendered.includes("cutover/typescript-c1-acceptance-v0.6.json"));
 assert.ok(!rendered.includes("Корневой базис:"), "release projection must not duplicate theory");
 assert.ok(!rendered.includes("Строковый носитель:"), "release projection must not duplicate subject specs");
 assert.ok(rendered.includes(PROJECTION_START));
@@ -164,15 +164,15 @@ try {
     writeFileSync(target, readFileSync(resolve(repositoryRoot, path), "utf8"), "utf8");
   };
   copy("repo-policy.json");
+  copy("contracts/mts-contract-v0.13.json");
+  copy("contracts/mts-conformance-v0.13.json");
   copy("contracts/mts-contract-v0.12.json");
   copy("contracts/mts-conformance-v0.12.json");
-  copy("contracts/mts-contract-v0.11.json");
-  copy("contracts/mts-conformance-v0.11.json");
   for (const path of CANONICAL_DOCS) copy(path);
   for (const path of PROJECTION_FORBIDDEN_DOCS) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
-  writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.11", "mts-contract/v0.X"), "utf8");
+  writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.12", "mts-contract/v0.X"), "utf8");
   assert.deepEqual(checkRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "устаревший блок должен обнаруживаться");
   assert.deepEqual(syncRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "синхронизация должна исправлять только устаревший файл");
   assert.deepEqual(checkRepositoryDocs(tempRoot), []);
