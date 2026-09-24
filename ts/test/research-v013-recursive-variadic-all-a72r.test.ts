@@ -491,7 +491,7 @@ function buildFixture(): Fixture {
 
   let seed = memory.ensure(b.U, b.L);
   const fresh: LinkHandle[] = [];
-  for (let i = 0; i < 320; i += 1) {
+  for (let i = 0; i < 520; i += 1) {
     seed = memory.ensure(seed, i % 2 === 0 ? b.O : b.C);
     fresh.push(seed);
   }
@@ -669,18 +669,18 @@ function exercise(): void {
 
   const specs: RunSpec[] = [
     { args: [F], expected: F, label: "ALL(F)", seedBase: 30 },
-    { args: [T], expected: T, label: "ALL(T)", seedBase: 55 },
+    { args: [T], expected: T, label: "ALL(T)", seedBase: 70 },
 
-    { args: [F, F], expected: F, label: "ALL(F,F)", seedBase: 80 },
-    { args: [F, T], expected: F, label: "ALL(F,T)", seedBase: 105 },
-    { args: [T, F], expected: F, label: "ALL(T,F)", seedBase: 130 },
-    { args: [T, T], expected: T, label: "ALL(T,T)", seedBase: 155 },
+    { args: [F, F], expected: F, label: "ALL(F,F)", seedBase: 110 },
+    { args: [F, T], expected: F, label: "ALL(F,T)", seedBase: 150 },
+    { args: [T, F], expected: F, label: "ALL(T,F)", seedBase: 190 },
+    { args: [T, T], expected: T, label: "ALL(T,T)", seedBase: 230 },
 
     // Generic recursion beyond the arities used to define any Rule.
-    { args: [T, T, T], expected: T, label: "ALL(T,T,T)", seedBase: 20 },
-    { args: [T, T, F], expected: F, label: "ALL(T,T,F)", seedBase: 45 },
-    { args: [T, T, T, T, T], expected: T, label: "ALL(T^5)", seedBase: 70 },
-    { args: [T, T, T, F, T], expected: F, label: "ALL(T,T,T,F,T)", seedBase: 95 },
+    { args: [T, T, T], expected: T, label: "ALL(T,T,T)", seedBase: 270 },
+    { args: [T, T, F], expected: F, label: "ALL(T,T,F)", seedBase: 310 },
+    { args: [T, T, T, T, T], expected: T, label: "ALL(T^5)", seedBase: 350 },
+    { args: [T, T, T, F, T], expected: F, label: "ALL(T,T,T,F,T)", seedBase: 390 },
   ];
 
   for (const spec of specs) runSpec(f, spec);
