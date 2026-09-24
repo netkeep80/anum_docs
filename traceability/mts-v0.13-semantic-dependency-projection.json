@@ -238,7 +238,11 @@
     "exactSequencePositionRecursionA66fDesigned": true,
     "exactSequencePositionRecursionA66fComplete": true,
     "finalPositionCallRootReturnA66gDesigned": true,
-    "finalPositionCallRootReturnA66gComplete": true
+    "finalPositionCallRootReturnA66gComplete": true,
+    "executionSubstrateInvarianceA73gDesigned": true,
+    "executionSubstrateInvarianceA73gComplete": true,
+    "currentScopeIdentityExtensionalInvarianceProven": true,
+    "genericRuleMatcherInstantiationSelfHostedProven": false
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1322,7 +1326,11 @@
     "contextualGenerationRequestA30SeparateTargetArgumentCount": 0,
     "contextualGenerationRequestA30SeparateInventoryArgumentCount": 0,
     "contextualGenerationRequestA30AmbientSelectionFires": 0,
-    "contextualGenerationRequestA30IndependentMemoryCount": 2
+    "contextualGenerationRequestA30IndependentMemoryCount": 2,
+    "executionSubstrateInvarianceVariantCount": 3,
+    "executionSubstrateMemberOrderVariantCount": 2,
+    "executionSubstrateRuleAdmissionOrderVariantCount": 2,
+    "executionSubstrateProgramSemanticDispatchHostCount": 0
   },
   "metricMeaning": {
     "confirmedIndependentPrimitiveCount": "Zero means no bootstrap capability has yet passed an elimination/irreducibility experiment; it does NOT mean the true minimal primitive count is zero.",
@@ -8310,6 +8318,61 @@
         "v0.13 remains unaccepted and global E2/E3/E4 plus FULL_SELF_HOSTED remain open"
       ],
       "consequence": "A66g closes the scoped multi-argument execution geometry from first argument through final return: non-final results become temporary child-context frame values and advance an ExactSequence position; the final result at a position with no successor returns directly as K_callRoot->Y. Branch ancestry remains in the two distinct pre-final contexts even when both converge extensionally to one canonical root result, and scheduler order is inert in the tested path. This removes the need for a synthetic exhausted cursor/frame but does not remove immutable occurrence history wholesale; A67 must now separate occurrence roles that context ancestry makes redundant from history/selection roles that remain necessary."
+    },
+    "executionSubstrateInvarianceA73g": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH",
+      "question": "Are current Scope identity/seed, current-member enumeration order and admitted-Rule enumeration order semantic authority, or can they vary while the same Link-carried Rule network reaches the same extensional fixed point?",
+      "setup": [
+        "one active unary call plus one inert sibling are placed in a Link-native working Scope",
+        "two admitted Rules for the same active call produce distinct y/z successor images",
+        "run A uses member order active,inert and Rule admission order y,z",
+        "run B uses the same Theory with member order inert,active and distinct initial/successor Scope seeds",
+        "run C uses another Theory carrying the same extensional Rules admitted in reverse order z,y",
+        "all runs use the production v013-structural-execution fixed-point kernel"
+      ],
+      "oracle": [
+        "all three runs reach the exact same extensional member set {caller->DONE(y), caller->DONE(z), inert}",
+        "each run fires both matching Rules and transitions only the active member",
+        "the inert sibling remains current unchanged",
+        "each run performs exactly one non-quiescent atomic Scope handoff and then reaches quiescence",
+        "different Scope seeds produce different current-root Link identities while fixed-point members remain identical",
+        "reversing current-member enumeration is extensionally inert",
+        "reversing admitted-Rule enumeration under an extensionally equal Theory is extensionally inert",
+        "the production fixed-point kernel contains no program-specific ALL/CHOICE/TRUE/FALSE/NOT/opcode/selectedRule/selectedBranch dispatch",
+        "V013CurrentScopeCursor performs no Link read/write or semantic inspection; it only checks expected-old identity and swaps one opaque current-root handle"
+      ],
+      "evidenceTest": "ts/test/research-v013-execution-substrate-invariance-a73g.test.ts",
+      "classification": {
+        "currentScopeRoot": "OPAQUE_MUTABLE_AMEMORY_SUBSTRATE_HANDLE_SCOPED",
+        "currentScopeSeedIdentity": "EXTENSIONALLY_INERT_IN_TESTED_FIXED_POINT",
+        "currentMemberEnumerationOrder": "EXTENSIONALLY_INERT_IN_TESTED_FIXED_POINT",
+        "admittedRuleEnumerationOrder": "EXTENSIONALLY_INERT_IN_TESTED_FIXED_POINT",
+        "atomicScopeHandoff": "SUBSTRATE_COMMIT_WITHOUT_SEMANTIC_SELECTION_SCOPED",
+        "programSemanticAuthority": "LINK_CARRIED_RULES",
+        "hostProgramSemanticDispatchCount": 0,
+        "genericRuleMatchingAndInstantiation": "HOST_EXECUTED_RESIDUAL"
+      },
+      "retainedBoundary": [
+        "A72n remains valid: plain append-only CURRENT->Scope Links cannot select a unique latest Scope without extra lifecycle/time semantics",
+        "A73g therefore does not encode currentness as an append-only Link relation; it tests the existing opaque mutable current-root substrate boundary",
+        "generic structural Rule matching, Rule reading/admission verification, output-template instantiation and ExactSequence decoding remain host-executed generic services",
+        "A73g does not prove those generic services irreducible or self-hosted",
+        "A72u/A72v hierarchical Result research remains retained and deferred"
+      ],
+      "consequence": "Scoped evidence now separates one executor-mechanics layer from Link-carried program semantics: changing physical current-root identity, Scope seed, member order or Rule admission order does not change the tested fixed point, while the host kernel contains no program-specific dispatch. This supports treating the opaque current-root swap and enumeration order as non-semantic A-memory execution mechanics for this model. FULL_SELF_HOSTED is still not claimed because generic Rule matching/verification/template instantiation remain host-executed and require a separate source-removal or irreducibility argument.",
+      "observed": {
+        "executionVariants": 3,
+        "memberOrderVariants": 2,
+        "ruleAdmissionOrderVariants": 2,
+        "distinctScopeIdentityRequiredForEqualResult": true,
+        "fixedPointMemberSetsEqual": true,
+        "rawRuleMatchesFirstReaction": 2,
+        "transitionedMembersFirstReaction": 1,
+        "handoffsPerRun": 1,
+        "reactionsPerRun": 2,
+        "hostProgramSemanticDispatchCount": 0,
+        "productionChanged": false
+      }
     }
   }
 }
