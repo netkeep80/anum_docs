@@ -42,7 +42,7 @@ function main(): void {
   same(contract.implementation.implementationComplete, true, "declared candidate implementation complete");
   same(contract.implementation.candidateKernelBehaviorImplemented, true, "candidate behavior implemented");
   same(contract.implementation.candidateRuntimeSelectable, false, "candidate remains non-selectable");
-  same(contract.accepted, false, "candidate remains unaccepted");
+  same(contract.accepted, true, "v0.13 is accepted after the later A74 cutover");
 
   same(conformance.coverageState, "complete", "declared conformance coverage complete");
   same(conformance.inheritedFoundationParity.status, "green-complete", "inherited foundation parity");
