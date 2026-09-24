@@ -127,14 +127,15 @@ function defineNaivePackRule(
 }
 
 /**
- * Completion-gated PACK consumes evidence shaped as a completed child Context:
+ * Completion-gated PACK consumes END of a completed child Context:
  *
  *   START( START(K -> (PACK -> OLD)) -> X )
  *     ->
  *   START( K -> (TAG -> (X -> MARK)) )
  *
- * The child Context is the completion authority for X. Construction of the
- * hierarchical Result and removal of the suspended PACK level are one Rule.
+ * START(child) alone is insufficient because it is also the active evaluation
+ * form. END(child) is tested as the structural completion witness. Result
+ * construction and removal of the suspended PACK level are one Rule.
  */
 function defineCompletionGatedPackRule(
   memory: Memory,
@@ -158,6 +159,7 @@ function defineCompletionGatedPackRule(
     memory.ensureStartSelfClosed(memory.ensure(kRole, suspendedCall));
   const completedChild =
     memory.ensureStartSelfClosed(memory.ensure(suspendedContext, xRole));
+  const completionWitness = memory.ensureEndSelfClosed(completedChild);
 
   const dynamicInner = memory.ensure(xRole, mark);
   const dynamicResult = memory.ensure(tag, dynamicInner);
@@ -167,7 +169,7 @@ function defineCompletionGatedPackRule(
   const rule = defineStructuralRule(
     memory,
     dictionary,
-    memory.ensure(completedChild, outputContext),
+    memory.ensure(completionWitness, outputContext),
   );
   admitStructuralRule(memory, theory, rule);
 }
@@ -177,8 +179,6 @@ function discoverAllApplicableRules(
   theory: LinkHandle,
   activeContext: LinkHandle,
 ): readonly GroundedRewrite[] {
-  readContext(memory, activeContext);
-
   const matches: GroundedRewrite[] = [];
   for (const admission of memory.outgoing(theory)) {
     const ap = memory.poles(admission);
@@ -267,6 +267,43 @@ function reactSingleActiveContext(
   readContext(memory, produced);
   working.replaceAtomically([active], [produced]);
   return produced;
+}
+
+function reactSingleWorkingLink(
+  memory: Memory,
+  theory: LinkHandle,
+  working: WorkingMembership,
+): LinkHandle {
+  const active = working.only();
+  const matches = discoverAllApplicableRules(memory, theory, active);
+  assert(matches.length === 1,
+    "working witness requires exactly one applicable Rule");
+
+  const match = matches[0]!;
+  const produced = instantiateTemplate(
+    memory,
+    match.outputTemplate,
+    match.bindings,
+  );
+  readContext(memory, produced);
+  working.replaceAtomically([active], [produced]);
+  return produced;
+}
+
+function sealCompletedContext(
+  memory: Memory,
+  theory: LinkHandle,
+  terminalContext: LinkHandle,
+  working: WorkingMembership,
+): LinkHandle {
+  assert(working.has(terminalContext), "terminal child Context must be current");
+  readContext(memory, terminalContext);
+  same(discoverAllApplicableRules(memory, theory, terminalContext).length, 0,
+    "only locally terminal Context may be sealed");
+
+  const completionWitness = memory.ensureEndSelfClosed(terminalContext);
+  working.replaceAtomically([terminalContext], [completionWitness]);
+  return completionWitness;
 }
 
 function openNestedUnaryArgument(
@@ -501,12 +538,28 @@ function runCase(
 
   same(memory.find(expectedScalar, MARK), undefined,
     label + " runtime hierarchy payload absent before PACK reaction");
-  same(discoverAllApplicableRules(memory, theory, current).length, 1,
-    label + " completed child enables exactly one gated PACK Rule");
 
-  // Atomic semantic event: build Result + remove the outer PACK scaffold level.
-  current = reactSingleActiveContext(memory, theory, working);
+  // START(child) is not completion authority: the same shape exists while
+  // its current value is still under construction.
+  same(discoverAllApplicableRules(memory, theory, current).length, 0,
+    label + " raw child Context does not enable PACK");
+
+  const completedChildContext = current;
+  const completionWitness =
+    sealCompletedContext(memory, theory, completedChildContext, working);
+  assert(!working.has(completedChildContext),
+    label + " completed child Context leaves working state when sealed");
+  assert(working.has(completionWitness),
+    label + " END(child Context) becomes temporary completion witness");
+  same(discoverAllApplicableRules(memory, theory, completionWitness).length, 1,
+    label + " END(child Context) enables exactly one gated PACK Rule");
+
+  // Atomic Rule event: consume completion witness, construct the hierarchy,
+  // and collapse the suspended outer PACK scaffold level.
+  current = reactSingleWorkingLink(memory, theory, working);
   scaffold.add(current);
+  assert(!working.has(completionWitness),
+    label + " completion witness disappears after PACK reaction");
   same(contextDepthTo(memory, current, rootParent), 1,
     label + " gated PACK collapses outer scaffold while constructing Result");
 
@@ -612,7 +665,9 @@ function main(): void {
     "HOST_COLLAPSE_LEVELS=2",
     "RULE_DRIVEN_RESULT_PLUS_OUTER_COLLAPSE_LEVELS=1",
     "NAIVE_GENERIC_PACK_PREMATURE_MATCH=RED_CONFIRMED",
-    "COMPLETION_AUTHORITY=CHILD_CONTEXT_OCCURRENCE",
+    "RAW_CHILD_CONTEXT_COMPLETION_AUTHORITY=FALSE",
+    "COMPLETION_AUTHORITY=END_OF_CHILD_CONTEXT_CANDIDATE",
+    "END_COMPLETION_WITNESS=GREEN_SCOPED",
     "RESULT_TOPOLOGY=TAG_TO_SCALAR_TO_MARK",
     "RESULT_CONSTRUCTED_FROM_RUNTIME_ROLE_BINDING=GREEN",
     "RESULT_REMAINS_TRAVERSABLE_AFTER_CONTEXT_TEARDOWN=GREEN",
@@ -623,10 +678,11 @@ function main(): void {
     "PHYSICAL_CONTEXT_DELETION=NOT_CLAIMED",
     "HOST_NESTED_GROWTH=RESIDUAL",
     "HOST_INNER_COLLAPSE=RESIDUAL",
+    "HOST_TERMINAL_CONTEXT_SEALING=RESIDUAL",
     "OUTER_PACK_COLLAPSE=RULE_DRIVEN_GREEN",
     "HOST_RESULT_PUBLICATION=RESIDUAL",
     "LINKS_ONLY_SCAFFOLD_DYNAMICS=NOT_PROVEN",
-    "NEXT=A72G_RULE_DRIVEN_GENERIC_INNER_COLLAPSE_AND_GROWTH",
+    "NEXT=A72G_REMOVE_HOST_TERMINAL_SEALING_AND_GENERIC_INNER_COLLAPSE",
     "MULTIVALUED_FUNCTIONS=DEFERRED",
     "VARIABLE_ARITY_FUNCTIONS=DEFERRED",
     "FULL_SELF_HOSTED=FALSE",
