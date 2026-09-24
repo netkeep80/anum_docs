@@ -236,7 +236,9 @@
     "exactSequencePositionBranchingA66eDesigned": true,
     "exactSequencePositionBranchingA66eComplete": true,
     "exactSequencePositionRecursionA66fDesigned": true,
-    "exactSequencePositionRecursionA66fComplete": true
+    "exactSequencePositionRecursionA66fComplete": true,
+    "finalPositionCallRootReturnA66gDesigned": true,
+    "finalPositionCallRootReturnA66gComplete": true
   },
   "auditScope": {
     "publicFacade": "ts/src/public.ts",
@@ -1617,8 +1619,9 @@
     "contextualGenerationRequestA30IndependentMemoryCount": "Independent Memories reproducing contextual request selection and generated authority execution."
   },
   "nextExperiments": [
-    "A66g: starting only from GREEN A66f, consume the final ExactSequence position without inventing a synthetic exhausted position. Test whether final (F->arg_final)->Y returns Y directly to the selected call-root context rather than creating another temporary child frame.",
-    "A66g must include two pre-final branches that converge to the same final Y, preserve their distinct context ancestry, and prove forward/reverse parent scheduling yields the same exact final root-result set. Keep A66d/A66e execution laws source-identical for non-final steps.",
+    "A67: reassess A20/A21/A33 occurrence machinery against the GREEN A65/A66 context-native execution line. Separate what occurrence history is still needed for immutable event/publication/current-head selection from branch provenance that is already carried by execution-context ancestry.",
+    "A67 must not delete A21 contextual truth or A33 immutable occurrence history by analogy. Falsify each role separately: local contextual truth, execution branch provenance, selected current occurrence, immutable historical ordering, and final call-root result provenance.",
+    "After A67, reconnect A63 structural Rule admission and A62 immutable publication to the context-native execution machine. Test whether lifecycle provenance can be represented by selected context/history ancestry before adding any separate provenance subsystem.",
     "Only after A65/A66 should the A63/A62 Rule admission/publication lifecycle be reconnected to the execution machine; test provenance as ordinary context/frame ancestry before introducing any separate provenance subsystem.",
     "Keep A35 prior-publication existence authority open: construction of Candidate->M cannot serve as proof that publication existed before execution.",
     "A35 must preserve ambient candidate/request isolation, immutable catalog versioning and fail-closed structural source publication.",
@@ -8047,6 +8050,64 @@
         "Rule publication/admission not tested"
       ],
       "consequence": "A66f shows that nested execution contexts can recurse through ordinary ExactSequence positions without a raw forward Q or a terminal cursor sentinel. Non-final results become child-frame temporary values and advance exactly one P. A locally terminated branch may still have unconsumed arguments. The successful branch reaches P2, whose selected Cell contains the final argument and has no successor; therefore A66g should test final application as a return to the selected call-root context rather than inventing another exhausted-position child frame."
+    },
+    "finalPositionCallRootReturnA66g": {
+      "status": "EXECUTED_GREEN_SCOPED_RESEARCH_PENDING_EXACT_HEAD_CI",
+      "question": "When a context-native execution frame reaches the final ExactSequence position, can the selected final result return directly to the root context of the call, without a synthetic exhausted position or another temporary child frame, while preserving branch ancestry and scheduler-order equivalence?",
+      "setup": [
+        "use one three-element ExactSequence [a1,a2,a3] and the A66f position-based execution laws",
+        "branch at a1 into KA and KB, then advance both at a2 to distinct pre-final contexts KHA and KHB at the same final position P2",
+        "give both final applications (hA->a3) and (hB->a3) the same selected result Y",
+        "represent selected work explicitly as Context->ResultFact and vary only scheduler order"
+      ],
+      "oracle": [
+        "A66f/A66e/A66d non-final advance and branching laws remain source-identical",
+        "P2 reports doneAfter=true and has no nextPosition",
+        "KHA and KHB are distinct and retain distinct parent context ancestry",
+        "forward and reverse parent scheduling yield the same exact pre-final context set",
+        "final return rejects a non-final context and rejects another branch's final result fact",
+        "two selected final branches converge to exactly one canonical call-root result K_callRoot->Y",
+        "final return materializes exactly one result Link and no additional child execution frame",
+        "forward and reverse final scheduling yield the same exact call-root result set",
+        "call-root frame keeps its original F and initial position while pre-final temporary F values remain in child histories",
+        "ambient unselected final result facts never reach the call-root result scope",
+        "two independent Memories agree, with opposite first scheduler order"
+      ],
+      "evidenceTest": "ts/test/research-v013-final-return-scheduler-a66g.test.ts",
+      "antiCheat": [
+        "returnFinalPosition requires the selected ExactSequence position to be final",
+        "returnFinalPosition validates exact current F and exact selected final argument against the selected result fact",
+        "returnFinalPosition contains no defineFrame or defineContext call",
+        "the only final semantic write is callRoot->selected Y",
+        "no forward Q, MetaState, ambient Memory enumeration or synthetic exhausted position is used"
+      ],
+      "classification": {
+        "frameState": "F_TO_P",
+        "finalPosition": "DONE_AFTER_TRUE_NO_NEXT_POSITION",
+        "finalApplication": "(F_TO_FINAL_ARG)_TO_Y",
+        "finalChildFrame": 0,
+        "syntheticExhaustedPosition": 0,
+        "finalReturn": "CALL_ROOT_TO_Y",
+        "preFinalContextCount": 2,
+        "preFinalAncestry": "DISTINCT",
+        "extensionalFinalValueCount": 1,
+        "callRootResultCount": 1,
+        "intermediateValues": "CHILD_CONTEXT_LOCAL_HISTORY",
+        "parentSchedule": "FORWARD_REVERSE_EXACT_CONTEXT_SET_EQUIVALENT",
+        "finalSchedule": "FORWARD_REVERSE_EXACT_ROOT_RESULT_EQUIVALENT",
+        "ambientFinalFact": "INERT",
+        "rootResultTemporalProvenanceFromLinkIdentity": "NOT_CLAIMED",
+        "forwardQChain": 0,
+        "productionChanged": false
+      },
+      "claimBoundary": [
+        "A66g establishes final return topology for the tested context-native call, not a complete nested-call ABI",
+        "the canonical root-result Link does not by itself prove temporal producer provenance if that exact Link pre-existed; A67/lifecycle work must keep physical existence distinct from selected execution history",
+        "A21 contextual truth remains valid and is not replaced by A66g",
+        "A33 immutable occurrence history remains valid for roles not falsified by context ancestry",
+        "v0.13 remains unaccepted and global E2/E3/E4 plus FULL_SELF_HOSTED remain open"
+      ],
+      "consequence": "A66g closes the scoped multi-argument execution geometry from first argument through final return: non-final results become temporary child-context frame values and advance an ExactSequence position; the final result at a position with no successor returns directly as K_callRoot->Y. Branch ancestry remains in the two distinct pre-final contexts even when both converge extensionally to one canonical root result, and scheduler order is inert in the tested path. This removes the need for a synthetic exhausted cursor/frame but does not remove immutable occurrence history wholesale; A67 must now separate occurrence roles that context ancestry makes redundant from history/selection roles that remain necessary."
     }
   }
 }
