@@ -452,7 +452,7 @@ function staticGuards():void{
     "current application discovered from exact F adjacency");
   assert(discovery.includes("memory.outgoing(application)"),
     "result authority is exact application adjacency");
-  assert(discovery.includes("p.start===candidate || p.end===candidate"),
+  assert(discovery.includes("p.start===candidate||p.end===candidate"),
     "START/END self-incidence excluded from ordinary result facts");
 
   const executor=sourceSlice(
