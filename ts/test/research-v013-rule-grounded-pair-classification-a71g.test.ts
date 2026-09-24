@@ -98,7 +98,7 @@ interface GroundedRequestRule{
 }
 
 /**
- * Discover one admitted Structural Rule matching the exact START payload of an
+ * Discover the unique admitted Structural Rule matching the exact START payload of an
  * already-active request Context.
  *
  * No Rule handle/opcode/RuleKind is selected by the host. The active Context
