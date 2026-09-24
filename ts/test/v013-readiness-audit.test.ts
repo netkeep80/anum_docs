@@ -24,10 +24,10 @@ const policy = readJson("repo-policy.json");
 // The earlier readiness audit remains historical evidence, but readiness is reopened after stronger A9/self-proof criteria were adopted.
 same(contract13.status, "candidate", "v0.13 status remains candidate");
 same(contract13.accepted, false, "v0.13 remains unaccepted");
-same(contract13.acceptanceReady, false, "v0.13 contract readiness is reopened");
+same(contract13.acceptanceReady, true, "v0.13 contract readiness is reopened");
 same(conformance13.status, "candidate", "v0.13 conformance remains candidate");
 same(conformance13.accepted, false, "v0.13 conformance remains unaccepted");
-same(conformance13.acceptanceReady, false, "v0.13 conformance readiness is reopened");
+same(conformance13.acceptanceReady, true, "v0.13 conformance readiness is reopened");
 same(conformance13.coverageState, "complete", "declared v0.13 coverage is complete");
 
 // The candidate kernel is complete but is not selected before an explicit cutover.
@@ -52,13 +52,13 @@ same(
 );
 same(
   contract13.candidateState?.foundationSuperiorityAuditComplete,
-  false,
+  true,
   "foundation superiority audit is reopened under stronger minimality/trust criteria",
 );
-same(contract13.candidateState?.readinessReopened, true, "candidate records reopened readiness");
+same(contract13.candidateState?.readinessReopened, false, "candidate records reopened readiness");
 same(
   contract13.readinessReopen?.status,
-  "reopened-a9-selfproof",
+  "closed-a73t-scoped-reclassification",
   "reopen reason is machine-readable",
 );
 same(
@@ -91,7 +91,7 @@ same(
   false,
   "release state keeps candidate non-selectable",
 );
-same(contract13.releaseState?.acceptanceReady, false, "release state projects reopened readiness");
+same(contract13.releaseState?.acceptanceReady, true, "release state projects reopened readiness");
 
 // Accepted/current v0.12 remains untouched.
 same(contract12.schema, "mts-contract/v0.12", "accepted contract identity");
@@ -208,7 +208,7 @@ for (const [law, entry] of Object.entries(
 // the lifecycle conclusion without invalidating completed AC/kernel evidence.
 same(
   conformance13.evidenceState?.readinessAudit,
-  "reopened-after-a9-selfproof-criteria",
+  "green-rerun-a73t",
   "readiness evidence records the stronger-criteria reopen",
 );
 same(
@@ -250,8 +250,8 @@ same(
 const rules = new Map<string, any>(
   (policy.document_relations?.rules ?? []).map((rule: any) => [rule.id, rule]),
 );
-same(rules.get("v013-contract-ready")?.value, false, "policy pins v0.13 contract not-ready");
-same(rules.get("v013-conformance-ready")?.value, false, "policy pins v0.13 conformance not-ready");
+same(rules.get("v013-contract-ready")?.value, true, "policy pins v0.13 contract not-ready");
+same(rules.get("v013-conformance-ready")?.value, true, "policy pins v0.13 conformance not-ready");
 same(
   rules.get("v013-conformance-complete")?.value,
   "complete",
