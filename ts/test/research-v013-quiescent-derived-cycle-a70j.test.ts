@@ -479,7 +479,7 @@ interface QuiescentRun {
 }
 
 /**
- * Research-only host fixed-point driver.
+ * Research-only bounded host fixed-point driver.
  *
  * The host still performs repeated rounds; that residual is explicit. What is
  * proven here is that each round's WHAT-runs and WHAT-results authority is
