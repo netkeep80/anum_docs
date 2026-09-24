@@ -339,7 +339,7 @@ function staticGuards(): void {
     "continuation authority comes from work-bound exact carrier");
   assert(core.includes("memory.ensure(item.context, target)"),
     "A68a generic K->B materialization remains sole rewrite output");
-  assert(core.includes("materializeExactSequence(memory, values)"),
+  assert(core.includes("const nextFrontier = carrier(memory, outputs)"),
     "next active set is Link-carried ExactSequence");
 }
 
