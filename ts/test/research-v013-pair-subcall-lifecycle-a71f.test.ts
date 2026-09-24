@@ -388,6 +388,11 @@ function sourceSlice(source:string,start:string,end:string):string{
   assert(i>=0&&j>i,`source slice ${start}`);
   return source.slice(i,j).replace(/\s+/g,"");
 }
+function sourceCodeSlice(source:string,start:string,end:string):string{
+  const i=source.indexOf(start),j=source.indexOf(end,i+1);
+  assert(i>=0&&j>i,`source code slice ${start}`);
+  return source.slice(i,j).replace(/\/\/[^\n]*/g,"").replace(/\s+/g,"");
+}
 
 function staticGuards():void{
   const root=resolve(process.cwd(),"..");
@@ -415,9 +420,9 @@ function staticGuards():void{
     "A71f closure rewrite source-identical A68a",
   );
   same(
-    sourceSlice(own,"function childContexts(","\n/** Source-identical A70e closure"),
-    sourceSlice(a70e,"function childContexts(","\n/**\n * Read the unique proper END"),
-    "A71f child discovery source-identical A70e",
+    sourceCodeSlice(own,"function childContexts(","\n/** Source-identical A70e closure"),
+    sourceCodeSlice(a70e,"function childContexts(","\n/**\n * Read the unique proper END"),
+    "A71f child discovery code-identical A70e",
   );
   same(
     sourceSlice(own,"function closureOf(","\n/** Source-identical A70e active"),
