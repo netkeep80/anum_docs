@@ -2189,8 +2189,8 @@
       "ts/src/v013-relative-form-materialization.ts": 2,
       "ts/src/v013-relative-pole-context.ts": 3,
       "ts/src/v013-relative-pole-execution.ts": 3,
-      "ts/src/value-bundle.ts": 14,
-      "ts/src/v013-structural-execution.ts": 6
+      "ts/src/v013-structural-execution.ts": 6,
+      "ts/src/value-bundle.ts": 14
     },
     "fileCategoryByFile": {
       "ts/src/anum-carrier.ts": "representation",
@@ -2259,8 +2259,8 @@
       "ts/src/v013-relative-form-materialization.ts": "semantic-authority",
       "ts/src/v013-relative-pole-context.ts": "semantic-authority",
       "ts/src/v013-relative-pole-execution.ts": "semantic-authority",
-      "ts/src/value-bundle.ts": "semantic-authority",
-      "ts/src/v013-structural-execution.ts": "semantic-authority"
+      "ts/src/v013-structural-execution.ts": "semantic-authority",
+      "ts/src/value-bundle.ts": "semantic-authority"
     },
     "decisionOwnerCountsByCategory": {
       "memory-resource-safety": 4,
