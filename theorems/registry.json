@@ -233,6 +233,17 @@
       "evidence": {"typescript": ["ts/test/research-v013-context-dualization-a75b.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
     },
     {
+      "id": "FRM-01",
+      "statement": "Generic v0.13 FORMAL composer эквивариантен рекурсивной инверсии на проверенной канонической области: Eval(J(q)) = J(Eval(q)) при том же Dictionary/Grammar/Theory identity и том же наборе четырёх operator Rules/admissions.",
+      "status": "scoped",
+      "assumptions": ["INV-01", "INV-06", "accepted AC10 generic FORMAL composer and StructuralRule authority"],
+      "dependsOn": ["INV-01", "INV-06"],
+      "scope": "Accepted finite canonical FORMAL prefix programs exercised in #1544",
+      "exclusions": "Это не доказывает J(PortableTheoryArtifact)=PortableTheoryArtifact и не классифицирует трансформацию source-specific Theory membership.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": ["ts/test/research-v013-formal-duality-a75c.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
       "id": "INV-08",
       "statement": "Для Link-выраженной theory T рекурсивная инверсия задаёт классификацию T относительно J(T): exact invariant, explicit dual или obstruction.",
       "status": "conjecture",
