@@ -65,7 +65,7 @@ assert.ok(rendered.includes(PROJECTION_END));
 
 const readmeSource = readFileSync(resolve(repositoryRoot, "README.md"), "utf8");
 assert.equal(
-  readmeSource.split("<!-- mts-doc-version: v0.13 -->").length - 1,
+  readmeSource.split("mts-doc-version: v0.13").length - 1,
   1,
   "README must contain exactly one v0.13 document marker",
 );
