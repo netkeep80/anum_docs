@@ -198,5 +198,115 @@
     "host-set-or-worklist-as-MTS-ontology",
     "automatic-full-self-hosted-claim",
     "retroactive-mutation-of-accepted-v0.13"
-  ]
-}
+  ],
+  "documentationConvergence": {
+    "profileDocument": "traceability/mts-v0.13-amemory-execution-profile-v0.1.json",
+    "requiredGlossaryPreferredTerms": [
+      "Апамять",
+      "Асеть",
+      "Контекст",
+      "Область исполнения",
+      "Текущесть",
+      "Контекстная истина",
+      "Реакция",
+      "Ветвь ZERO",
+      "Ветвь ONE",
+      "Ветвь MANY",
+      "Состояние NOT_FOUND",
+      "Неподвижная точка",
+      "Покой",
+      "Рекуррентность",
+      "Неограниченное исполнение",
+      "Теория",
+      "Явный допуск правила",
+      "Публикация текущего корня",
+      "Снимок Theory",
+      "Самохостинг",
+      "Субстрат апамяти",
+      "Иерархический результат",
+      "Дочерний контекст"
+    ],
+    "readerAcceptance": [
+      {
+        "id": "D9-01",
+        "question": "What exactly is the semantic state of A-memory?",
+        "section": "amemory-currentness"
+      },
+      {
+        "id": "D9-02",
+        "question": "What makes a Scope/state current?",
+        "section": "amemory-currentness"
+      },
+      {
+        "id": "D9-03",
+        "question": "Must an old physical Link be deleted when it leaves current semantic state?",
+        "section": "amemory-currentness"
+      },
+      {
+        "id": "D9-04",
+        "question": "What is one elementary A-network transition?",
+        "section": "amemory-transition"
+      },
+      {
+        "id": "D9-05",
+        "question": "What is the difference between NOT_FOUND/no admitted relation and ZERO?",
+        "section": "amemory-reaction-branches"
+      },
+      {
+        "id": "D9-06",
+        "question": "How do ONE and MANY change current truth?",
+        "section": "amemory-reaction-branches"
+      },
+      {
+        "id": "D9-07",
+        "question": "What does concurrent execution mean semantically?",
+        "section": "amemory-concurrency"
+      },
+      {
+        "id": "D9-08",
+        "question": "Which schedule differences are semantic?",
+        "section": "amemory-concurrency"
+      },
+      {
+        "id": "D9-09",
+        "question": "When does a newly created Theory admission become executable?",
+        "section": "amemory-theory-snapshot"
+      },
+      {
+        "id": "D9-10",
+        "question": "What is quiescence?",
+        "section": "amemory-quiescence"
+      },
+      {
+        "id": "D9-11",
+        "question": "How is recurrence different from quiescence?",
+        "section": "amemory-recurrence"
+      },
+      {
+        "id": "D9-12",
+        "question": "Is global termination required?",
+        "section": "amemory-recurrence"
+      },
+      {
+        "id": "D9-13",
+        "question": "Are hierarchical Result / nested Context required by the minimal law?",
+        "section": "amemory-hierarchical-result"
+      },
+      {
+        "id": "D9-14",
+        "question": "What remains physical A-memory substrate?",
+        "section": "amemory-substrate-boundary"
+      },
+      {
+        "id": "D9-15",
+        "question": "What exactly is self-hosted and what is not?",
+        "section": "amemory-self-hosting-boundary"
+      },
+      {
+        "id": "D9-16",
+        "question": "Which parts belong to MTS and which to the A-memory execution profile/implementation?",
+        "section": "amemory-substrate-boundary"
+      }
+    ]
+  }
+}\n
