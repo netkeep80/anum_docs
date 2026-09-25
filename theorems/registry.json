@@ -1,0 +1,214 @@
+{
+  "schema": "mts-theorem-registry/v0.1",
+  "authority": "index-only",
+  "version": "v0.13",
+  "families": {
+    "FND": "foundation / Link identity / self-incidence",
+    "INV": "inversion / chirality / duality",
+    "CTX": "Context",
+    "FRM": "FORMAL",
+    "EXE": "execution",
+    "TRN": "transport / reconstruction / address-renaming",
+    "PRF": "proof-system / meta-proof properties"
+  },
+  "theorems": [
+    {
+      "id": "FND-01",
+      "statement": "Самоинцидентность Link исчерпывается ровно четырьмя локальными структурными случаями ROOT, START, END и PAIR.",
+      "status": "scoped",
+      "assumptions": ["accepted MTS v0.13 Link identity and self-incidence laws"],
+      "dependsOn": [],
+      "scope": "MTS v0.13 accepted foundation",
+      "exclusions": "Не считать host enum или codec-метку доказательством классификации.",
+      "sources": ["#1431"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "FND-02",
+      "statement": "Полная самозамкнутость X = X ⟼ X единственна и определяет R в заявленной области MTS v0.13.",
+      "status": "scoped",
+      "assumptions": ["accepted MTS v0.13 Link identity laws"],
+      "dependsOn": [],
+      "scope": "MTS v0.13 accepted foundation",
+      "exclusions": "Физический адрес или новый handle не создаёт второй Root.",
+      "sources": ["#1431"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "FND-03",
+      "statement": "R/O/C/L являются производными структурными представителями, а не четырьмя независимыми примитивными объектами онтологии.",
+      "status": "scoped",
+      "assumptions": ["accepted MTS v0.13 root basis equations"],
+      "dependsOn": ["FND-01", "FND-02"],
+      "scope": "MTS v0.13 accepted root basis",
+      "exclusions": "Не выводить смысл только из символических имён R/O/C/L.",
+      "sources": ["#1431"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "FND-04",
+      "statement": "U = C ⟼ O является обычным PAIR, а не пятым структурным абитом.",
+      "status": "scoped",
+      "assumptions": ["accepted MTS v0.13 root basis equations"],
+      "dependsOn": ["FND-03"],
+      "scope": "MTS v0.13 accepted root basis",
+      "exclusions": "Не считать роль U отдельным self-incidence классом.",
+      "sources": ["#1431"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "FND-05",
+      "statement": "Каноническое структурное описание Link уникально в явно заявленной области carrier/domain.",
+      "status": "scoped",
+      "assumptions": ["accepted MTS v0.13 canonical structural carrier assumptions"],
+      "dependsOn": ["FND-01", "FND-02"],
+      "scope": "Only the exact carrier/domain claimed by accepted v0.13",
+      "exclusions": "Не распространять автоматически на произвольные неукоренённые циклические структуры вне заявленного carrier.",
+      "sources": ["#1431"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "FND-06",
+      "statement": "Транспорт и реконструкция инвариантны относительно свежих локальных Memory handles в принятой области transport.",
+      "status": "scoped",
+      "assumptions": ["accepted MTS v0.13 transport scope"],
+      "dependsOn": ["FND-05"],
+      "scope": "Accepted v0.13 transport/reconstruction scope",
+      "exclusions": "Адреса памяти не являются семантическим тождеством.",
+      "sources": ["#1431"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "FND-07",
+      "statement": "Контекстная истинность K ⟼ A отличается от простого наличия A в памяти; L является значением истины, а K ⟼ A — контекстным свидетельством.",
+      "status": "scoped",
+      "assumptions": ["accepted MTS v0.13 contextual truth laws"],
+      "dependsOn": [],
+      "scope": "MTS v0.13 contextual truth",
+      "exclusions": "Не отождествлять membership in Memory и truth in Context.",
+      "sources": ["#1431"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "FND-08",
+      "statement": "Generic detachment: из K ⟼ A и допущенного A ⟼ B выводится K ⟼ B в заявленной модели исполнения.",
+      "status": "scoped",
+      "assumptions": ["accepted MTS v0.13 grounded relational execution laws"],
+      "dependsOn": ["FND-07"],
+      "scope": "Exact accepted v0.13 execution scope",
+      "exclusions": "Не расширять до неограниченного host rewriting или глобальной подстановки.",
+      "sources": ["#1431"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "FND-09",
+      "statement": "Множественные допущенные продолжения дают ZERO/ONE/MANY relation semantics без отдельного примитива многозначной функции.",
+      "status": "scoped",
+      "assumptions": ["accepted MTS v0.13 grounded relational execution laws"],
+      "dependsOn": ["FND-08"],
+      "scope": "Exact accepted v0.13 execution scope",
+      "exclusions": "Не вводить новый multivalued-function primitive как скрытую семантическую власть.",
+      "sources": ["#1431"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "FND-10",
+      "statement": "Любое более сильное утверждение о self-hosting должно иметь отдельную точную формулировку и не выводиться из факта успешного исполнения реализации.",
+      "status": "scoped",
+      "assumptions": ["accepted MTS v0.13 self-hosting boundary"],
+      "dependsOn": [],
+      "scope": "Metatheoretical boundary for v0.13 claims",
+      "exclusions": "Никакого неявного перехода от bounded execution witness к unrestricted self-verification.",
+      "sources": ["#1431"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "INV-01",
+      "statement": "Рекурсивная инверсия J определяется непосредственно над Link: J(A ⟼ B) = J(B) ⟼ J(A), с отдельным точным разбором self-incidence.",
+      "status": "conjecture",
+      "assumptions": ["MTS v0.13 Link identity and structural self-incidence"],
+      "dependsOn": ["FND-01", "FND-02"],
+      "scope": "Post-v0.13 research in #1544",
+      "exclusions": "Графовая модель, host field order и codec labels не являются семантическим основанием определения.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "INV-02",
+      "statement": "Рекурсивная инверсия involutive: J(J(X)) = X в точной заявленной области.",
+      "status": "conjecture",
+      "assumptions": ["INV-01 is well-defined on the stated domain"],
+      "dependsOn": ["INV-01"],
+      "scope": "Post-v0.13 research in #1544",
+      "exclusions": "Не расширять область доказательства за пределы той, где J формально определена.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "INV-03",
+      "statement": "ROOT сохраняется рекурсивной инверсией.",
+      "status": "conjecture",
+      "assumptions": ["INV-01"],
+      "dependsOn": ["INV-01"],
+      "scope": "Post-v0.13 research in #1544",
+      "exclusions": "",
+      "sources": ["#1544"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "INV-04",
+      "statement": "Рекурсивная инверсия меняет proper START и proper END местами, не отождествляя их.",
+      "status": "conjecture",
+      "assumptions": ["INV-01", "proper START/END are structurally distinguished by self-incidence"],
+      "dependsOn": ["INV-01"],
+      "scope": "Post-v0.13 research in #1544",
+      "exclusions": "Это не утверждение о привилегированности одной абсолютной ориентации.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "INV-05",
+      "statement": "PAIR сохраняет класс при рекурсивной инверсии, а его полюса рекурсивно меняются местами.",
+      "status": "conjecture",
+      "assumptions": ["INV-01"],
+      "dependsOn": ["INV-01"],
+      "scope": "Post-v0.13 research in #1544",
+      "exclusions": "",
+      "sources": ["#1544"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "INV-06",
+      "statement": "Для корневого базиса рекурсивная инверсия фиксирует R и классифицирует образы O/C/L/U без опоры на их имена.",
+      "status": "conjecture",
+      "assumptions": ["accepted root basis equations", "INV-03", "INV-04", "INV-05"],
+      "dependsOn": ["INV-03", "INV-04", "INV-05"],
+      "scope": "Post-v0.13 research in #1544",
+      "exclusions": "Не предрешать результат для L/U до executable/formal witness.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "INV-07",
+      "statement": "Рекурсивная инверсия сохраняет структурную асимметрию/хиральность Link: ориентация обращается, но различие START и END не исчезает.",
+      "status": "conjecture",
+      "assumptions": ["INV-02", "INV-04", "INV-05"],
+      "dependsOn": ["INV-02", "INV-04", "INV-05"],
+      "scope": "Post-v0.13 research in #1544",
+      "exclusions": "Асимметрия не тождественна утверждению об абсолютном выборе START как привилегированной стороны.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "INV-08",
+      "statement": "Для Link-выраженной theory T рекурсивная инверсия задаёт классификацию T относительно J(T): exact invariant, explicit dual или obstruction.",
+      "status": "conjecture",
+      "assumptions": ["INV-07", "the transformed authority structure is stated explicitly"],
+      "dependsOn": ["INV-07"],
+      "scope": "Post-v0.13 research in #1544",
+      "exclusions": "Не считать локальную перестановку labels доказательством автоморфизма полной theory.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+    }
+  ]
+}
