@@ -342,6 +342,7 @@ function staticGuards(): void {
     ),
     "utf8",
   );
+  const implementation = own.slice(0, own.indexOf("function staticGuards(): void {"));
   for (const forbidden of [
     "setTimeout",
     "setInterval",
@@ -351,7 +352,7 @@ function staticGuards(): void {
     "process.exit",
   ]) {
     assert(
-      !own.includes(forbidden),
+      !implementation.includes(forbidden),
       "witness has no host-time or infinite-loop authority: " + forbidden,
     );
   }
