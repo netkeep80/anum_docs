@@ -118,7 +118,7 @@ same(
 );
 
 const doc = readFileSync(docPath, "utf8");
-const startMarker = '<a id="amemory-external-reader-acceptance"></a>';
+const startMarker = '<a id="d9-acceptance"></a>';
 const start = doc.indexOf(startMarker);
 const end = doc.indexOf("## 18. Производный результат", start);
 assert(start >= 0, "D9 acceptance section exists");
