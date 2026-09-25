@@ -369,9 +369,9 @@ export function renderCurrentProjection(value: CurrentProjection): string {
     PROJECTION_START,
     "> **Текущий принятый выпуск МТС: v0.13.** Этот блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.",
     ">",
-    `> - Контракт: \`${value.currentContract}\` — [${value.currentContractPath}](${value.currentContractPath}).`,
-    `> - Корпус соответствия: \`${value.currentConformance}\` — [${value.currentConformancePath}](${value.currentConformancePath}).`,
-    `> - Свидетельство принятия: [${value.acceptancePath}](${value.acceptancePath}).`,
+    `> - Контракт: \`${value.currentContract}\` — [файл контракта](${value.currentContractPath}).`,
+    `> - Корпус соответствия: \`${value.currentConformance}\` — [файл корпуса](${value.currentConformancePath}).`,
+    `> - Свидетельство принятия: [файл принятия](${value.acceptancePath}).`,
     PROJECTION_END,
   ].join("\n");
 }
