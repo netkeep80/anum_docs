@@ -1,3 +1,4 @@
+// Standalone index validator; this file grants no theorem authority.
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
