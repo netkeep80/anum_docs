@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="docs/assets/anum_docs-banner.png"
+       alt="anum_docs — Метатеория Связей"
+       width="100%">
+</p>
+
 # Метатеория связей (МТС)
 <!-- версия документа МТС; mts-doc-version: v0.13 -->
 > **Версия МТС: v0.13**
