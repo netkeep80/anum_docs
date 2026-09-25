@@ -17,7 +17,7 @@ import {
   normalizeV014QForm,
   parseRawV014Q,
   transcodeLegacyQ13ToV014Canonical,
-} from "../src/v014-q.js";
+} from "./support/v014-q.js";
 import {
   Memory,
   ensureRootBasis,
@@ -196,7 +196,7 @@ function signature(
 // contain legacy 1/0 value dispatch. The explicit transcoder is outside kernel.
 {
   const root = resolve(process.cwd(), "..");
-  const source = readFileSync(join(root, "ts/src/v014-q.ts"), "utf8");
+  const source = readFileSync(join(root, "ts/test/support/v014-q.ts"), "utf8");
   const start = source.indexOf("export function executeV014QSigns");
   const end = source.indexOf("\nexport function deserializeV014Q", start);
   assert(start >= 0 && end > start, "Q14 execution kernel source slice");
