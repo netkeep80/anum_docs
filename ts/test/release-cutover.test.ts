@@ -65,6 +65,12 @@ function mappedNegativeVector(conformance: ConformanceBoundary, id: string): boo
   return false;
 }
 
+function negativeVectorHasIndependentTestSource(id: string): boolean {
+  return readdirSync(join(repoRoot, "ts/test"))
+    .filter((name) => name.endsWith(".test.ts") && name !== "release-cutover.test.ts")
+    .some((name) => readFileSync(join(repoRoot, "ts/test", name), "utf8").includes(id));
+}
+
 const packageJson = JSON.parse(readFileSync(join(repoRoot, "ts/package.json"), "utf8")) as {
   readonly name?: string;
   readonly types?: string;
@@ -188,3 +194,21 @@ negativeVector("v012-formal-square-bracket-substituted-q-rule-does-not-open", ma
 
 // Current v0.13 keeps the exact accepted executable boundary.
 assert((conformance.requiredExecutableGates ?? []).length === 39, "accepted v0.13 keeps all 39 mandatory executable gates");
+negativeVector("v013-flat-relative-glyph-collision-not-canonical", negativeVectorHasIndependentTestSource("v013-flat-relative-glyph-collision-not-canonical"));
+negativeVector("v013-noncanonical-pair-188-rejected", negativeVectorHasIndependentTestSource("v013-noncanonical-pair-188-rejected"));
+negativeVector("v013-noncanonical-pair-1988-rejected", negativeVectorHasIndependentTestSource("v013-noncanonical-pair-1988-rejected"));
+negativeVector("v013-noncanonical-pair-1868-rejected", negativeVectorHasIndependentTestSource("v013-noncanonical-pair-1868-rejected"));
+negativeVector("v013-description-does-not-materialize-target", negativeVectorHasIndependentTestSource("v013-description-does-not-materialize-target"));
+negativeVector("v013-wrong-structural-rule-writes-zero-target-links", negativeVectorHasIndependentTestSource("v013-wrong-structural-rule-writes-zero-target-links"));
+negativeVector("v013-invalid-physical-opcode-fails-before-representation-writes", negativeVectorHasIndependentTestSource("v013-invalid-physical-opcode-fails-before-representation-writes"));
+negativeVector("v013-empty-wire-is-not-root", negativeVectorHasIndependentTestSource("v013-empty-wire-is-not-root"));
+negativeVector("v013-unrooted-sequence-lookalike-rejected", negativeVectorHasIndependentTestSource("v013-unrooted-sequence-lookalike-rejected"));
+negativeVector("v013-unrooted-anum-hierarchy-rejected", negativeVectorHasIndependentTestSource("v013-unrooted-anum-hierarchy-rejected"));
+negativeVector("v013-nonroot-both-selfclosed-rejected-by-root-uniqueness", negativeVectorHasIndependentTestSource("v013-nonroot-both-selfclosed-rejected-by-root-uniqueness"));
+negativeVector("v013-foreign-abit-handle-rejected", negativeVectorHasIndependentTestSource("v013-foreign-abit-handle-rejected"));
+negativeVector("v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence", negativeVectorHasIndependentTestSource("v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"));
+negativeVector("v013-formal-root-wrong-rule-rejected", negativeVectorHasIndependentTestSource("v013-formal-root-wrong-rule-rejected"));
+negativeVector("v013-formal-root-wrong-theory-rejected", negativeVectorHasIndependentTestSource("v013-formal-root-wrong-theory-rejected"));
+negativeVector("v013-formal-root-malformed-prefix-rejected", negativeVectorHasIndependentTestSource("v013-formal-root-malformed-prefix-rejected"));
+negativeVector("v013-formal-root-noncanonical-pair-alias-rejected", negativeVectorHasIndependentTestSource("v013-formal-root-noncanonical-pair-alias-rejected"));
+negativeVector("v013-formal-root-no-host-term-special-case", negativeVectorHasIndependentTestSource("v013-formal-root-no-host-term-special-case"));
