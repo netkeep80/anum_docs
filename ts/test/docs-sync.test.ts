@@ -55,12 +55,28 @@ assert.deepEqual(PROJECTION_FORBIDDEN_DOCS, [
 
 const rendered = renderCurrentProjection(projection);
 assert.ok(rendered.includes("mts-contract/v0.13"));
-assert.ok(rendered.includes("mts-contract/v0.12"));
+assert.ok(!rendered.includes("mts-contract/v0.12"), "current README projection must not expose previous MTS versions");
+assert.ok(!rendered.includes("Предыдущ"), "current README projection must not contain previous-release prose");
 assert.ok(rendered.includes("cutover/typescript-c1-acceptance-v0.6.json"));
 assert.ok(!rendered.includes("Корневой базис:"), "release projection must not duplicate theory");
 assert.ok(!rendered.includes("Строковый носитель:"), "release projection must not duplicate subject specs");
 assert.ok(rendered.includes(PROJECTION_START));
 assert.ok(rendered.includes(PROJECTION_END));
+
+const readmeSource = readFileSync(resolve(repositoryRoot, "README.md"), "utf8");
+assert.equal(
+  readmeSource.split("<!-- mts-doc-version: v0.13 -->").length - 1,
+  1,
+  "README must contain exactly one v0.13 document marker",
+);
+assert.ok(
+  readmeSource.includes("> **Версия МТС: v0.13**"),
+  "README must expose the v0.13 version to readers",
+);
+assert.ok(
+  !readmeSource.includes("mts-contract/v0.12"),
+  "README current prose must not expose previous MTS releases",
+);
 
 assert.deepEqual(checkRepositoryDocs(repositoryRoot), [], "ветка должна хранить одну актуальную release projection только в README");
 for (const path of PROJECTION_FORBIDDEN_DOCS) {
@@ -172,7 +188,7 @@ try {
   for (const path of PROJECTION_FORBIDDEN_DOCS) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
-  writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.12", "mts-contract/v0.X"), "utf8");
+  writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.13", "mts-contract/v0.X"), "utf8");
   assert.deepEqual(checkRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "устаревший блок должен обнаруживаться");
   assert.deepEqual(syncRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "синхронизация должна исправлять только устаревший файл");
   assert.deepEqual(checkRepositoryDocs(tempRoot), []);
