@@ -200,6 +200,39 @@
       "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
     },
     {
+      "id": "INV-09",
+      "statement": "Для относительных форм над Whole S рекурсивная инверсия меняет P=START(S) и Q=END(S) местами относительно J(S), сохраняет роли D=P⟼Q и I=Q⟼P и сохраняет отношение same-side/opposite-side, используемое open/return.",
+      "status": "scoped",
+      "assumptions": ["INV-04", "INV-05", "accepted v0.13 relative unary-form laws"],
+      "dependsOn": ["INV-04", "INV-05"],
+      "scope": "Accepted finite v0.13 relative-form carrier; executable witness in #1544",
+      "exclusions": "Сохранение relative-form геометрии не означает сохранение принятого Context constructor/reader.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": ["ts/test/research-v013-context-dualization-a75b.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "CTX-01",
+      "statement": "Принятый Context(parent,current)=START(parent⟼current) под рекурсивной инверсией переходит в точный dual Context END(J(current)⟼J(parent)); принятый readContext этот образ отвергает.",
+      "status": "scoped",
+      "assumptions": ["INV-02", "INV-04", "accepted v0.13 Context constructor and reader"],
+      "dependsOn": ["INV-02", "INV-04"],
+      "scope": "Accepted finite v0.13 Context law; executable witness in #1544",
+      "exclusions": "Это falsifier автоморфизма при фиксированном текущем Context law, но ещё не доказательство dualization всех остальных слоёв MTS.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": ["ts/test/research-v013-context-dualization-a75b.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
+      "id": "CTX-02",
+      "statement": "Материализованная relative-position Context-цепочка коммутирует с J только после одновременной замены принятого START-Context закона на его END-dual; текущий relative materializer dual-parent отвергает.",
+      "status": "scoped",
+      "assumptions": ["INV-09", "CTX-01", "accepted v0.13 relative-position Context topology"],
+      "dependsOn": ["INV-09", "CTX-01"],
+      "scope": "Accepted finite v0.13 relative-position layer; executable witness in #1544",
+      "exclusions": "FORMAL, Theory и grounded execution этим результатом ещё не классифицированы.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": ["ts/test/research-v013-context-dualization-a75b.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
       "id": "INV-08",
       "statement": "Для Link-выраженной theory T рекурсивная инверсия задаёт классификацию T относительно J(T): exact invariant, explicit dual или obstruction.",
       "status": "conjecture",
