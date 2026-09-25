@@ -163,6 +163,10 @@ function staticGuards(): void {
     ),
     "utf8",
   );
+  const implementation = own.slice(
+    0,
+    own.indexOf("function staticGuards(): void {"),
+  );
   for (const forbidden of [
     "Date.now",
     "timestamp",
@@ -171,7 +175,7 @@ function staticGuards(): void {
     "Math.max",
   ]) {
     assert(
-      !own.includes(forbidden),
+      !implementation.includes(forbidden),
       "W1 introduces no hidden semantic time/order authority: " + forbidden,
     );
   }
