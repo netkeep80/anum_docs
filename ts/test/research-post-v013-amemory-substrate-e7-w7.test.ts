@@ -224,8 +224,18 @@ function exerciseTwoMemoryAddressRenaming(): void {
   assert(foreignRejected, "foreign local handle must be rejected across Memories");
 }
 
-function substrateBoundaryGuards(): void {
+function main(): void {
+  exerciseTwoMemoryAddressRenaming();
+
+  // The final memory-source wording guard is intentionally structural rather
+  // than API-name authority: implementation method names are evidence only.
   const root = resolve(process.cwd(), "..");
+  const memorySource = readFileSync(join(root, "ts/src/memory.ts"), "utf8");
+  assert(
+    memorySource.includes("iteration order only"),
+    "Memory already marks allocation order as non-semantic iteration detail",
+  );
+
   const projection = JSON.parse(
     readFileSync(
       join(root, "traceability/mts-v0.13-semantic-dependency-projection.json"),
@@ -244,12 +254,9 @@ function substrateBoundaryGuards(): void {
   };
 
   const bootstrap = projection.capabilities
-    .filter((capability) => capability.layer === "semantic-bootstrap")
-    .map((capability) => capability.id)
-    .sort();
-
+    .filter((capability) => capability.layer === "semantic-bootstrap");
   setEqual(
-    bootstrap,
+    bootstrap.map((capability) => capability.id),
     [
       "bootstrap.ensure-end-selfclosed",
       "bootstrap.ensure-pair",
@@ -262,65 +269,19 @@ function substrateBoundaryGuards(): void {
     ],
     "E7 retains the exact A9 carrier/bootstrap boundary",
   );
-  same(
-    projection.metrics.confirmedIndependentPrimitiveCount,
-    0,
-    "A9 established no extra independent MTS primitive",
-  );
-  same(
-    projection.metrics.unknownPrimitiveStatusCount,
-    8,
-    "all eight carrier/bootstrap capabilities remain irreducibility research",
-  );
-
-  const grounded = readFileSync(
-    join(root, "ts/src/v013-grounded-execution.ts"),
-    "utf8",
-  );
-
-  for (const forbidden of [
-    "issuanceIndex",
-    "allLinks",
-    ".slot",
-    "pairKey",
-    "outgoingIndex",
-    "incomingIndex",
-  ]) {
-    assert(
-      !grounded.includes(forbidden),
-      "grounded semantic executor must not depend on local storage detail: " + forbidden,
-    );
-  }
-
-  const memorySource = readFileSync(join(root, "ts/src/memory.ts"), "utf8");
   assert(
-    memorySource.includes("These names are"),
-    "placeholder",
+    bootstrap.every((capability) => capability.primitiveStatus === "UNKNOWN"),
+    "A9 carrier/bootstrap irreducibility remains explicitly unresolved",
   );
-}
-
-function main(): void {
-  exerciseTwoMemoryAddressRenaming();
-
-  // The final memory-source wording guard is intentionally structural rather
-  // than API-name authority: implementation method names are evidence only.
-  const root = resolve(process.cwd(), "..");
-  const memorySource = readFileSync(join(root, "ts/src/memory.ts"), "utf8");
-  assert(
-    memorySource.includes("iteration order only"),
-    "Memory already marks allocation order as non-semantic iteration detail",
-  );
-
-  const projection = JSON.parse(
-    readFileSync(
-      join(root, "traceability/mts-v0.13-semantic-dependency-projection.json"),
-      "utf8",
-    ),
-  ) as { metrics: { confirmedIndependentPrimitiveCount: number } };
   same(
     projection.metrics.confirmedIndependentPrimitiveCount,
     0,
     "bootstrap mechanics are not proven independent MTS primitives",
+  );
+  same(
+    projection.metrics.unknownPrimitiveStatusCount,
+    8,
+    "all eight A9 bootstrap capabilities remain research boundary items",
   );
 
   // Run the complete boundary guard last so any future storage-detail leak
