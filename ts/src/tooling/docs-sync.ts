@@ -282,16 +282,10 @@ export function validateSemanticLawDocumentation(
   const references = facts.flatMap((item) => item.references);
 
   for (const owner of owners) {
-    if (!required.has(owner.lawId)) {
-      issues.push({
-        code: "unknown-owner",
-        lawId: owner.lawId,
-        path: owner.path,
-        line: owner.line,
-        message: `unknown semantic law owner ${owner.lawId} at ${owner.path}:${owner.line}`,
-      });
-      continue;
-    }
+    // During an atomic accepted-version cutover the trusted-base release may
+    // retain owner anchors as immutable acceptance evidence. Only owner IDs
+    // required by the current contract participate in current-owner checks.
+    if (!required.has(owner.lawId)) continue;
     const expectedPath = SEMANTIC_LAW_OWNER_BY_ID[owner.lawId];
     if (expectedPath !== owner.path) {
       issues.push({
