@@ -1,7 +1,7 @@
 {
   "schema": "mts-contract/v0.13",
-  "status": "candidate",
-  "accepted": false,
+  "status": "accepted",
+  "accepted": true,
   "issue": 1270,
   "candidateLifecycleIssue": 1270,
   "semanticBase": "mts-contract/v0.12",
@@ -9,19 +9,16 @@
   "previousAcceptedRelease": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12",
-    "immutable": true
+    "immutable": true,
+    "liveRuntimeSelectable": false
   },
   "conformanceCorpus": "contracts/mts-conformance-v0.13.json",
   "acceptedCurrent": {
-    "contract": "mts-contract/v0.12",
-    "conformance": "mts-conformance/v0.12"
+    "contract": "mts-contract/v0.13",
+    "conformance": "mts-conformance/v0.13"
   },
   "acceptanceReady": true,
-  "currentPointer": {
-    "acceptance": "cutover/typescript-c1-acceptance-v0.5.json",
-    "currentContract": "mts-contract/v0.12",
-    "currentConformance": "mts-conformance/v0.12"
-  },
+  "currentPointer": "cutover/typescript-c1-acceptance-v0.6.json",
   "inheritedFoundation": {
     "ontology": "Link",
     "root": "R = ∞ = R ⟼ R",
@@ -35,7 +32,7 @@
     "language": "TypeScript",
     "package": "@mts/core",
     "publicFacade": "ts/src/public.ts",
-    "acceptedRuntime": "mts-contract/v0.12",
+    "acceptedRuntime": "mts-contract/v0.13",
     "candidateRuntimeSelectable": false,
     "implementationComplete": true,
     "productionBehaviorChanged": false,
@@ -50,8 +47,11 @@
       "ts/src/v013-formal-aspect-evaluator.ts",
       "ts/src/v013-grounded-execution.ts"
     ],
-    "implementationCompleteMeaning": "declared-v0.13-candidate-kernel-scope-complete; public consumer boundary is merged and mandatory evidence is projected; excludes readiness, runtime selection and acceptance",
-    "singleLiveSemanticRuntime": true
+    "implementationCompleteMeaning": "accepted-v0.13-declared-scope; AC1-AC10, 39 mandatory executable gates, public boundary, readiness rerun and explicit author acceptance complete",
+    "singleLiveSemanticRuntime": true,
+    "packageManifest": "ts/package.json",
+    "pythonRuntimePresent": false,
+    "compatibilityRuntimeSelectable": false
   },
   "bootstrapBasis": {
     "root": "R",
@@ -330,7 +330,7 @@
     "traceabilityComplete": true,
     "documentationComplete": true,
     "readinessAuditComplete": true,
-    "explicitAuthorAcceptanceRecorded": false,
+    "explicitAuthorAcceptanceRecorded": true,
     "linkNativeAbitGroundingComplete": true,
     "functionalParityAuditComplete": true,
     "foundationSuperiorityAuditComplete": true,
@@ -353,18 +353,19 @@
     "groundedExecutionResearch": "ts/src/v013-grounded-execution.ts"
   },
   "releaseState": {
-    "currentAccepted": "mts-contract/v0.12",
+    "currentAccepted": "mts-contract/v0.13",
     "candidate": "mts-contract/v0.13",
-    "accepted": false,
+    "accepted": true,
     "acceptanceReady": true,
     "candidateRuntimeSelectable": false,
-    "readinessReopened": false
+    "readinessReopened": false,
+    "previousAccepted": "mts-contract/v0.12"
   },
   "traceabilityManifest": "traceability/mts-v0.13.json",
   "normativeDocumentation": {
-    "status": "candidate-complete-r7d",
-    "ownerRule": "one candidate semantic law -> one canonical candidate normative owner anchor",
-    "candidateSectionsDoNotPromoteAcceptedCurrent": true,
+    "status": "accepted-complete-a74",
+    "ownerRule": "one accepted semantic law -> one canonical accepted normative owner anchor",
+    "candidateSectionsDoNotPromoteAcceptedCurrent": false,
     "owners": {
       "L1": {
         "path": "docs/specs/Апамять и управление сетью связей.md",
@@ -457,7 +458,12 @@
       "readiness audit completion",
       "absence of objection"
     ],
-    "automaticAcceptanceForbidden": true
+    "automaticAcceptanceForbidden": true,
+    "explicitAuthorAcceptanceRecorded": true,
+    "authorDecisionIssue": 1270,
+    "authorDecisionComment": 5824024525,
+    "acceptedCandidateMainSha": "3819b5fb2bae65506c2888e7c4fa0de387551846",
+    "cutoverManifest": "cutover/typescript-c1-acceptance-v0.6.json"
   },
   "functionalNonRegression": {
     "baseline": {
@@ -1042,9 +1048,9 @@
     "issue": 1335,
     "gate": "ts/test/v013-readiness-audit.test.ts",
     "status": "green-confirmed",
-    "acceptedRuntimeRemains": "mts-contract/v0.12",
+    "acceptedRuntimeRemains": "mts-contract/v0.13",
     "candidateRuntimeSelectable": false,
-    "explicitAuthorAcceptanceRecorded": false,
+    "explicitAuthorAcceptanceRecorded": true,
     "rerunAfterA73s": "green-a73t-exact-current-candidate"
   },
   "readinessReopen": {
@@ -1064,5 +1070,93 @@
       "generic Rule/template meta-grounding self-hosting",
       "FULL_SELF_HOSTED system closure"
     ]
+  },
+  "acceptedMtsVersion": "mts-contract/v0.13",
+  "foundation": {
+    "minimalInternalSigns": [
+      "∞",
+      "[",
+      "]",
+      "1",
+      "0",
+      "(",
+      ")",
+      "⟼",
+      ":",
+      "=",
+      "."
+    ],
+    "deferredSigns": [
+      "≡",
+      "♂",
+      "♀",
+      "↑",
+      "{",
+      "}",
+      "¬",
+      "↛"
+    ],
+    "metaOnlySigns": [
+      "∧",
+      "⇔",
+      "⇒",
+      "≠",
+      "→"
+    ],
+    "internalSignCount": 11,
+    "supersededResearchSigns": [
+      "↑"
+    ],
+    "singleFormalArrow": "⟼",
+    "dotIntroduced": true,
+    "dotIsNewRootPrimitive": false,
+    "inheritedInternalSigns": [
+      "∞",
+      "[",
+      "]",
+      "1",
+      "0",
+      "(",
+      ")",
+      "⟼",
+      ":",
+      "=",
+      "."
+    ],
+    "qAlphabet": [
+      "[",
+      "]",
+      "1",
+      "0"
+    ],
+    "qAlphabetCount": 4,
+    "dotIsQAbit": false,
+    "colonIsQAbit": false,
+    "newPrimitiveExpected": false,
+    "minimalSignBasisStatus": "classified-c2-semantic-derived-presentation-cycle-retained"
+  },
+  "rootBasisTarget": {
+    "R": "R = R ⟼ R",
+    "O": "O = O ⟼ R",
+    "C": "C = R ⟼ C",
+    "L": "L = O ⟼ C",
+    "U": "U = C ⟼ O"
+  },
+  "canonicalStringQuaternaryCarrier": {
+    "canonicalUnit": "byte",
+    "byteEnvelope": "[bbbbbbbb]",
+    "bitsPerEnvelope": 8,
+    "bitOrder": "MSB-first",
+    "unicodeNormalization": false,
+    "invalidUtf8CarrierAllowed": true,
+    "runtimeByteIdIsSemanticIdentity": false,
+    "representationEqualsInterpretation": false
+  },
+  "effects": {
+    "findEqualsMaterialize": false,
+    "notFoundImpliesNonExistence": false,
+    "readMayMaterialize": false,
+    "replayMayMaterialize": false,
+    "explicitMaterializationMustReuseSameGroundedForm": true
   }
 }

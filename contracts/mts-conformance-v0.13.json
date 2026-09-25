@@ -1,7 +1,7 @@
 {
   "schema": "mts-conformance/v0.13",
-  "status": "candidate",
-  "accepted": false,
+  "status": "accepted",
+  "accepted": true,
   "issue": 1270,
   "candidateLifecycleIssue": 1270,
   "contract": "mts-contract/v0.13",
@@ -9,10 +9,10 @@
   "observableSemanticDelta": true,
   "acceptanceReady": true,
   "coverageState": "complete",
-  "coverageStateMeaning": "AC1-AC10 and L1-L13 retain executable evidence for their declared scopes; all 16 accepted-v0.12 mandatory kernel gates remain inherited and the declared v0.13 kernel/public boundary remains GREEN. Acceptance readiness is reopened because later A9/self-proof criteria require package-wide semantic trust closure, experimentally scoped minimality and proof-driven self-verification before the independent readiness audit can be rerun.",
+  "coverageStateMeaning": "AC1-AC10 and L1-L13 are accepted for the declared MTS v0.13 scope; all 39 mandatory executable gates, inherited v0.12 parity, public boundary, exact traceability, readiness rerun and explicit author acceptance are recorded. Stronger A9 FULL_SELF_HOSTED/global-fundamentality research remains explicitly non-blocking.",
   "acceptedCurrent": {
-    "contract": "mts-contract/v0.12",
-    "conformance": "mts-conformance/v0.12"
+    "contract": "mts-contract/v0.13",
+    "conformance": "mts-conformance/v0.13"
   },
   "requiredExecutableGates": [
     "ts/test/v013-relative-form-quartet.test.ts",
@@ -297,7 +297,7 @@
     "traceability": "green-complete",
     "normativeDocumentation": "green-complete",
     "readinessAudit": "green-rerun-a73t",
-    "authorAcceptance": "pending",
+    "authorAcceptance": "accepted-a74",
     "linkNativeAbitBasis": "green-complete-a2",
     "comparativeSuperiority": "green-complete-declared-v013-scope",
     "codecEngineeringComparison": "green-research-evidence-a3",
@@ -307,23 +307,26 @@
     "publicFacade": "green-complete-public-consumer-boundary",
     "candidateKernelImplementation": "green-complete-declared-scope"
   },
-  "acceptanceBlockers": [
-    "explicit author acceptance of the exact candidate artifacts has not yet been recorded"
-  ],
+  "acceptanceBlockers": [],
   "previousAcceptedRelease": {
     "contract": "mts-contract/v0.12",
     "conformance": "mts-conformance/v0.12",
-    "immutable": true
+    "immutable": true,
+    "liveRuntimeSelectable": false
   },
   "acceptance": {
-    "performedHere": false,
-    "acceptedMtsVersion": "mts-contract/v0.12",
-    "candidateMtsVersion": "mts-contract/v0.13",
-    "acceptedPointerUnchanged": true
+    "performedHere": true,
+    "acceptedMtsVersion": "mts-contract/v0.13",
+    "previousAcceptedVersion": "mts-contract/v0.12",
+    "authorDecisionIssue": 1270,
+    "authorDecisionComment": 5824024525,
+    "authorDecision": "ACCEPT_MTS_V0_13",
+    "preAcceptanceReadyMainSha": "3819b5fb2bae65506c2888e7c4fa0de387551846",
+    "cutoverManifest": "cutover/typescript-c1-acceptance-v0.6.json"
   },
   "traceabilityManifest": "traceability/mts-v0.13.json",
   "documentationEvidence": {
-    "status": "green-repository-check-r7d",
+    "status": "green-accepted-a74",
     "gate": "ts/test/v013-documentation-ownership.test.ts",
     "ownerDocuments": [
       "docs/specs/Формальная нотация МТС.md",
@@ -851,10 +854,10 @@
     "status": "green-complete",
     "publicFacadeGate": "ts/test/v013-public-facade.test.ts",
     "publicFacadeMerge": "d5df98791973711d054cdcf5dc3f9c25c0a8f4ae",
-    "acceptedRuntimeRemains": "mts-contract/v0.12",
+    "acceptedRuntimeRemains": "mts-contract/v0.13",
     "candidateRuntimeSelectable": false,
     "readinessAuditComplete": true,
-    "explicitAuthorAcceptanceRecorded": false,
+    "explicitAuthorAcceptanceRecorded": true,
     "lifecycleCheck": "ts/test/v013-kernel-public-lifecycle.test.ts"
   },
   "readinessAudit": {
@@ -862,9 +865,9 @@
     "gate": "ts/test/v013-readiness-audit.test.ts",
     "status": "green-confirmed",
     "requiredForAcceptance": true,
-    "acceptedRuntimeRemains": "mts-contract/v0.12",
+    "acceptedRuntimeRemains": "mts-contract/v0.13",
     "candidateRuntimeSelectable": false,
-    "explicitAuthorAcceptanceRecorded": false,
+    "explicitAuthorAcceptanceRecorded": true,
     "requiredExecutableGateCount": 39,
     "inheritedAcceptedV012GateCount": 16,
     "inheritedAcceptedV012GatesProjected": true,
@@ -876,6 +879,6 @@
     "acceptanceCriteriaEvidencePreserved": true,
     "acceptedV012Untouched": true,
     "candidateRuntimeSelectable": false,
-    "nextDecision": "explicit author ACCEPT/REJECT of the exact ready candidate; A9 full-system/minimality research remains non-blocking"
+    "nextDecision": "post-v0.13 research may continue without reopening accepted v0.13; FULL_SELF_HOSTED/global fundamentality claims remain separate"
   }
 }

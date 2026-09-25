@@ -43,9 +43,9 @@ expectThrow(
 
 const repositoryRoot = findRepositoryRoot();
 const projection = loadCurrentProjection(repositoryRoot);
-assert.equal(projection.currentContract, "mts-contract/v0.12");
-assert.equal(projection.previousContract, "mts-contract/v0.11");
-assert.equal(projection.acceptancePath, "cutover/typescript-c1-acceptance-v0.5.json");
+assert.equal(projection.currentContract, "mts-contract/v0.13");
+assert.equal(projection.previousContract, "mts-contract/v0.12");
+assert.equal(projection.acceptancePath, "cutover/typescript-c1-acceptance-v0.6.json");
 assert.deepEqual(CANONICAL_DOCS, ["README.md"], "generated current projection must have exactly one owner");
 assert.deepEqual(PROJECTION_FORBIDDEN_DOCS, [
   "docs/CONTRIBUTING.md",
@@ -54,9 +54,9 @@ assert.deepEqual(PROJECTION_FORBIDDEN_DOCS, [
 ]);
 
 const rendered = renderCurrentProjection(projection);
+assert.ok(rendered.includes("mts-contract/v0.13"));
 assert.ok(rendered.includes("mts-contract/v0.12"));
-assert.ok(rendered.includes("mts-contract/v0.11"));
-assert.ok(rendered.includes("cutover/typescript-c1-acceptance-v0.5.json"));
+assert.ok(rendered.includes("cutover/typescript-c1-acceptance-v0.6.json"));
 assert.ok(!rendered.includes("Корневой базис:"), "release projection must not duplicate theory");
 assert.ok(!rendered.includes("Строковый носитель:"), "release projection must not duplicate subject specs");
 assert.ok(rendered.includes(PROJECTION_START));
@@ -82,7 +82,7 @@ function syntheticOwnerDocs(): Record<string, string> {
   for (const lawId of requiredLawIds) {
     const path = SEMANTIC_LAW_OWNER_BY_ID[lawId];
     assert.ok(path);
-    docs[path] += `\n<a id="mts-law-${lawId}"></a>\n### Переименовываемый заголовок\nНормативное тело ${lawId}.\n`;
+    docs[path] += `\n<a id="mts-law-${lawId}"></a> <!-- нормативный владелец -->\n### Переименовываемый заголовок\nНормативное тело ${lawId}.\n`;
   }
   return docs;
 }
@@ -95,36 +95,36 @@ assert.deepEqual(
 );
 
 const duplicateDocs = syntheticOwnerDocs();
-duplicateDocs["README.md"] = '<a id="mts-law-exactAnumRooting"></a>\nДублирующее нормативное тело.\n';
+duplicateDocs["README.md"] = '<a id="mts-law-L4"></a> <!-- нормативный владелец -->\nДублирующее нормативное тело.\n';
 assert.ok(
   validateSemanticLawDocumentation(requiredLawIds, duplicateDocs).some(
-    (issue) => issue.code === "duplicate-owner" && issue.lawId === "exactAnumRooting",
+    (issue) => issue.code === "duplicate-owner" && issue.lawId === "L4",
   ),
   "D-F01: второй current owner того же ID должен отклоняться",
 );
 
 const missingDocs = syntheticOwnerDocs();
-const missingPath = SEMANTIC_LAW_OWNER_BY_ID.exactAnumRooting;
+const missingPath = SEMANTIC_LAW_OWNER_BY_ID.L4;
 assert.ok(missingPath);
 missingDocs[missingPath] = missingDocs[missingPath]!.replace(
-  '<a id="mts-law-exactAnumRooting"></a>\n### Переименовываемый заголовок\nНормативное тело exactAnumRooting.\n',
+  '<a id="mts-law-L4"></a> <!-- нормативный владелец -->\n### Переименовываемый заголовок\nНормативное тело L4.\n',
   "",
 );
 assert.ok(
   validateSemanticLawDocumentation(requiredLawIds, missingDocs).some(
-    (issue) => issue.code === "missing-owner" && issue.lawId === "exactAnumRooting",
+    (issue) => issue.code === "missing-owner" && issue.lawId === "L4",
   ),
   "D-F02: удаление единственного owner должно отклоняться",
 );
 
 const emptyDocs = syntheticOwnerDocs();
 emptyDocs[missingPath] = emptyDocs[missingPath]!.replace(
-  '<a id="mts-law-exactAnumRooting"></a>\n### Переименовываемый заголовок\nНормативное тело exactAnumRooting.\n',
-  '<a id="mts-law-exactAnumRooting"></a>\n',
+  '<a id="mts-law-L4"></a> <!-- нормативный владелец -->\n### Переименовываемый заголовок\nНормативное тело L4.\n',
+  '<a id="mts-law-L4"></a> <!-- нормативный владелец -->\n',
 );
 assert.ok(
   validateSemanticLawDocumentation(requiredLawIds, emptyDocs).some(
-    (issue) => issue.code === "empty-owner" && issue.lawId === "exactAnumRooting",
+    (issue) => issue.code === "empty-owner" && issue.lawId === "L4",
   ),
   "D-F03: пустой owner-anchor должен отклоняться",
 );
@@ -140,17 +140,17 @@ assert.ok(
 
 const fencedOnlyDocs = syntheticOwnerDocs();
 fencedOnlyDocs[missingPath] = fencedOnlyDocs[missingPath]!.replace(
-  '<a id="mts-law-exactAnumRooting"></a>\n### Переименовываемый заголовок\nНормативное тело exactAnumRooting.\n',
+  '<a id="mts-law-L4"></a> <!-- нормативный владелец -->\n### Переименовываемый заголовок\nНормативное тело L4.\n',
   "",
 );
 fencedOnlyDocs["README.md"] = [
   String.fromCharCode(96, 96, 96) + "html",
-  '<a id="mts-law-exactAnumRooting"></a>',
+  '<a id="mts-law-L4"></a>',
   String.fromCharCode(96, 96, 96),
 ].join("\n");
 assert.ok(
   validateSemanticLawDocumentation(requiredLawIds, fencedOnlyDocs).some(
-    (issue) => issue.code === "missing-owner" && issue.lawId === "exactAnumRooting",
+    (issue) => issue.code === "missing-owner" && issue.lawId === "L4",
   ),
   "D-F05: anchor внутри code fence не является нормативным владельцем",
 );
@@ -164,15 +164,15 @@ try {
     writeFileSync(target, readFileSync(resolve(repositoryRoot, path), "utf8"), "utf8");
   };
   copy("repo-policy.json");
+  copy("contracts/mts-contract-v0.13.json");
+  copy("contracts/mts-conformance-v0.13.json");
   copy("contracts/mts-contract-v0.12.json");
   copy("contracts/mts-conformance-v0.12.json");
-  copy("contracts/mts-contract-v0.11.json");
-  copy("contracts/mts-conformance-v0.11.json");
   for (const path of CANONICAL_DOCS) copy(path);
   for (const path of PROJECTION_FORBIDDEN_DOCS) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
-  writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.11", "mts-contract/v0.X"), "utf8");
+  writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.12", "mts-contract/v0.X"), "utf8");
   assert.deepEqual(checkRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "устаревший блок должен обнаруживаться");
   assert.deepEqual(syncRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "синхронизация должна исправлять только устаревший файл");
   assert.deepEqual(checkRepositoryDocs(tempRoot), []);

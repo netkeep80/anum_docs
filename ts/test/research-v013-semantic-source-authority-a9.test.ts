@@ -205,7 +205,7 @@ assert(
 );
 
 same(projection.coverage.globalTrustBoundaryComplete, false, "global trust closure remains false");
-same(contract.accepted, false, "v0.13 remains unaccepted");
+same(contract.accepted, true, "v0.13 is accepted while E2 remains stronger research");
 same(contract.acceptanceReady, true, "v0.13 readiness is restored while global trust closure remains open research");
 same(contract.implementation.candidateRuntimeSelectable, false, "candidate runtime remains non-selectable");
 

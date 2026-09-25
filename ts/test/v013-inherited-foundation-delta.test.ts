@@ -85,8 +85,8 @@ same(contract13.candidateState.foundationSuperiorityAuditComplete, true, "founda
 same(conformance13.inheritedFoundationParity.status, "green-complete", "inherited parity status");
 same(conformance13.inheritedFoundationParity.regressionCount, 0, "inherited regression count");
 same(conformance13.foundationSuperiorityAudit.status, "green-complete-declared-v013-scope", "superiority complete for declared v0.13 scope");
-same(contract13.accepted, false, "candidate remains unaccepted");
+same(contract13.accepted, true, "v0.13 is accepted");
 same(contract13.acceptanceReady, true, "candidate readiness is restored after A73t scoped reclassification");
-same(contract13.candidateState.explicitAuthorAcceptanceRecorded, false, "author acceptance remains absent");
+same(contract13.candidateState.explicitAuthorAcceptanceRecorded, true, "author acceptance is recorded");
 
 console.log("MTS v0.13 inherited foundation A5c evidence remains GREEN and zero-regression; readiness is restored for the declared v0.13 scope while A9 global minimality/trust + self-proof remain non-blocking research.");

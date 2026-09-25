@@ -137,9 +137,9 @@ same(retained.formalElaboration.genericFlatReaderEqualsFormalGrammar, false, "fl
 
 // This parity slice remains valid non-acceptance evidence; later A9/self-proof
 // criteria conservatively reopened global readiness without changing parity.
-same(contract13.accepted, false, "v0.13 remains unaccepted");
+same(contract13.accepted, true, "v0.13 is accepted");
 same(contract13.acceptanceReady, true, "v0.13 readiness is restored after A73t");
-same(contract13.candidateState.explicitAuthorAcceptanceRecorded, false, "author acceptance remains absent");
+same(contract13.candidateState.explicitAuthorAcceptanceRecorded, true, "author acceptance is recorded");
 
 console.log(
   "MTS v0.13/v0.12 interpreter/context parity: I_STRING/I_FORMAL/I_Q, nested STRING/Q/FORMAL roles, glyph-role separation, explicit K and association boundaries are preserved as a higher-level compatibility layer without redefining the 1/6/8/9 foundation: GREEN.",

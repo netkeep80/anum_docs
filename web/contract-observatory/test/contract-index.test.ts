@@ -36,28 +36,31 @@ same(realIndex.versions.filter((version) => version.isCurrent).length, 1, "exact
 same(realIndex.versions.filter((version) => version.isPrevious).length, 1, "exactly one previous pair");
 const v011Index = realIndex.versions.findIndex((version) => version.contractId === "mts-contract/v0.11");
 const v012Index = realIndex.versions.findIndex((version) => version.contractId === "mts-contract/v0.12");
-assert(v011Index >= 0 && v012Index > v011Index, "accepted v0.11/v0.12 retain natural version order");
-for (const version of realIndex.versions.filter((entry) => !entry.isCurrent && !entry.isPrevious)) {
-  same(version.accepted, false, `${version.contractId}: extra observed pair must not silently become accepted`);
-}
-same(realIndex.currentContractPath, "contracts/mts-contract-v0.12.json", "policy current contract");
-same(realIndex.currentConformancePath, "contracts/mts-conformance-v0.12.json", "policy current conformance");
-same(realIndex.previousContractPath, "contracts/mts-contract-v0.11.json", "policy previous contract");
-same(realIndex.previousConformancePath, "contracts/mts-conformance-v0.11.json", "policy previous conformance");
-same(realIndex.acceptancePath, "cutover/typescript-c1-acceptance-v0.5.json", "acceptance path comes from policy");
+const v013Index = realIndex.versions.findIndex((version) => version.contractId === "mts-contract/v0.13");
+assert(v011Index >= 0 && v012Index > v011Index && v013Index > v012Index, "accepted v0.11/v0.12/v0.13 retain natural version order");
+const historicalV011 = realIndex.versions.find((version) => version.contractId === "mts-contract/v0.11");
+assert(historicalV011 !== undefined, "historical v0.11 remains observable");
+same(historicalV011.accepted, true, "historical v0.11 remains accepted evidence");
+same(historicalV011.isCurrent, false, "historical v0.11 is not current");
+same(historicalV011.isPrevious, false, "historical v0.11 is not previous");
+same(realIndex.currentContractPath, "contracts/mts-contract-v0.13.json", "policy current contract");
+same(realIndex.currentConformancePath, "contracts/mts-conformance-v0.13.json", "policy current conformance");
+same(realIndex.previousContractPath, "contracts/mts-contract-v0.12.json", "policy previous contract");
+same(realIndex.previousConformancePath, "contracts/mts-conformance-v0.12.json", "policy previous conformance");
+same(realIndex.acceptancePath, "cutover/typescript-c1-acceptance-v0.6.json", "acceptance path comes from policy");
 
 const current = realIndex.versions.find((version) => version.isCurrent);
 const previous = realIndex.versions.find((version) => version.isPrevious);
 assert(current !== undefined && previous !== undefined, "current and previous summaries exist");
-same(current.contractId, "mts-contract/v0.12", "current classification comes from accepted evidence");
-same(previous.contractId, "mts-contract/v0.11", "previous classification comes from accepted evidence");
+same(current.contractId, "mts-contract/v0.13", "current classification comes from accepted evidence");
+same(previous.contractId, "mts-contract/v0.12", "previous classification comes from accepted evidence");
 same(current.status, "accepted", "current status projected");
 same(current.accepted, true, "current accepted flag projected");
 same(current.acceptanceReady, true, "current readiness projected");
 same(current.coverageState, "complete", "current coverage projected");
-same(current.requiredExecutableGateCount, 16, "current v0.12 keeps all mandatory kernel, authority and preflight gates");
+same(current.requiredExecutableGateCount, 39, "current v0.13 keeps all mandatory executable gates");
 assert(current.requiredNegativeVectorCount > 0, "current negative-vector coverage projected");
-same(previous.status, "accepted", "previous v0.11 remains accepted evidence");
+same(previous.status, "accepted", "previous v0.12 remains accepted evidence");
 same(previous.accepted, true, "previous accepted flag projected");
 
 const serialized = serializeContractObservatoryIndex(realIndex);

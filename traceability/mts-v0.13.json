@@ -1,11 +1,11 @@
 {
   "schema": "mts-traceability/v0.2",
-  "status": "candidate",
-  "accepted": false,
+  "status": "accepted",
+  "accepted": true,
   "contract": "contracts/mts-contract-v0.13.json",
   "conformance": "contracts/mts-conformance-v0.13.json",
   "issue": 1270,
-  "acceptance": null,
+  "acceptance": "cutover/typescript-c1-acceptance-v0.6.json",
   "invariants": {
     "L1": {
       "contractPointer": "/requiredSemanticLaws/L1",

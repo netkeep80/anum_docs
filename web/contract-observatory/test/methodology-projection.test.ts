@@ -39,23 +39,28 @@ same(projection.schema, "mts-contract-methodology-projection/v0.1", "projection 
 assert(projection.versions.length >= 2, "projection contains at least current and previous accepted pairs");
 const projectionV011 = projection.versions.findIndex((version) => version.contractId === "mts-contract/v0.11");
 const projectionV012 = projection.versions.findIndex((version) => version.contractId === "mts-contract/v0.12");
-assert(projectionV011 >= 0 && projectionV012 > projectionV011, "projection preserves accepted v0.11/v0.12 deterministic order");
-for (const candidate of projection.versions.filter((version) => !version.isCurrent && !version.isPrevious)) {
-  same(candidate.accepted, false, `${candidate.contractId}: extra projected version remains nonaccepted`);
-  assert(candidate.lifecycle.some((entry) => entry.stage === "candidate"), `${candidate.contractId}: candidate lifecycle is explicit`);
-  same(candidate.acceptanceReferences.length, 0, `${candidate.contractId}: candidate has no acceptance authority`);
+const projectionV013 = projection.versions.findIndex((version) => version.contractId === "mts-contract/v0.13");
+assert(projectionV011 >= 0 && projectionV012 > projectionV011 && projectionV013 > projectionV012, "projection preserves accepted v0.11/v0.12/v0.13 deterministic order");
+for (const extra of projection.versions.filter((version) => !version.isCurrent && !version.isPrevious)) {
+  if (extra.accepted) {
+    assert(extra.lifecycle.some((entry) => entry.stage === "accepted"), `${extra.contractId}: historical accepted lifecycle remains explicit`);
+    assert(!extra.lifecycle.some((entry) => entry.stage === "candidate"), `${extra.contractId}: historical accepted release is not reclassified as candidate`);
+  } else {
+    assert(extra.lifecycle.some((entry) => entry.stage === "candidate"), `${extra.contractId}: candidate lifecycle is explicit`);
+    same(extra.acceptanceReferences.length, 0, `${extra.contractId}: candidate has no acceptance authority`);
+  }
 }
 
 const current = projection.versions.find((version) => version.isCurrent);
 const previous = projection.versions.find((version) => version.isPrevious);
 assert(current !== undefined, "current contract version exists");
 assert(previous !== undefined, "previous contract version exists");
-same(current.contractId, "mts-contract/v0.12", "current comes from accepted V3 evidence");
-same(previous.contractId, "mts-contract/v0.11", "previous comes from accepted V3 evidence");
+same(current.contractId, "mts-contract/v0.13", "current comes from accepted V3 evidence");
+same(previous.contractId, "mts-contract/v0.12", "previous comes from accepted V3 evidence");
 same(current.accepted, true, "explicit accepted state preserved");
 assert(current.positiveVectors.length > 0, "positive conformance vectors are first-class");
 assert(current.negativeVectors.length > 0, "negative/veto vectors are first-class");
-same(current.executableGates.length, 16, "accepted v0.12 projects all mandatory executable gates");
+same(current.executableGates.length, 39, "accepted v0.13 projects all mandatory executable gates");
 assert(current.acceptanceReferences.length > 0, "explicit acceptance evidence is represented");
 assert(
   current.negativeVectors.every((vector) => vector.polarity === "negative"),
@@ -73,11 +78,11 @@ assert(
 );
 assert(current.lifecycle.some((entry) => entry.stage === "accepted"), "explicit accepted flag supports accepted stage");
 assert(current.lifecycle.some((entry) => entry.stage === "released"), "exact acceptance pointer supports released stage");
-same(previous.accepted, true, "previous v0.11 remains accepted evidence");
-same(current.traceabilityManifestPath, "traceability/mts-v0.12.json", "current v0.12 keeps its traceability manifest");
-same(previous.traceabilityManifestPath, "traceability/mts-v0.11.json", "previous v0.11 keeps immutable traceability provenance");
-assert(current.semanticInvariants.length > 0, "current v0.12 semantic invariants remain projectable");
-assert(previous.semanticInvariants.length > 0, "previous v0.11 semantic invariants remain projectable after current acceptance rotates");
+same(previous.accepted, true, "previous v0.12 remains accepted evidence");
+same(current.traceabilityManifestPath, "traceability/mts-v0.13.json", "current v0.13 keeps its traceability manifest");
+same(previous.traceabilityManifestPath, "traceability/mts-v0.12.json", "previous v0.12 keeps immutable traceability provenance");
+assert(current.semanticInvariants.length > 0, "current v0.13 semantic invariants remain projectable");
+assert(previous.semanticInvariants.length > 0, "previous v0.12 semantic invariants remain projectable after current acceptance rotates");
 
 const serialized = serializeMethodologyProjection(projection);
 same(

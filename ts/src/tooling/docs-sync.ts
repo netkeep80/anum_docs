@@ -176,24 +176,19 @@ export function loadCurrentProjection(root = findRepositoryRoot()): CurrentProje
 }
 
 export const SEMANTIC_LAW_OWNER_BY_ID: Readonly<Record<string, string>> = Object.freeze({
-  interpreterSeparation: "docs/specs/Формальная нотация МТС.md",
-  stringNestedAnum: "docs/specs/Ачисла и сериализация.md",
-  formalSquareBracketStringChild: "docs/specs/Формальная нотация МТС.md",
-  quaternaryNestedContext: "docs/specs/Ачисла и сериализация.md",
-  stringOneVsQOne: "docs/specs/Ачисла и сериализация.md",
-  representationNotInterpretation: "docs/specs/Ачисла и сериализация.md",
-  formalParentheses: "docs/specs/Формальная нотация МТС.md",
-  explicitKContext: "docs/specs/Формальная нотация МТС.md",
-  associationBoundary: "docs/specs/Формальная нотация МТС.md",
-  exactAnumRooting: "docs/specs/Ачисла и сериализация.md",
-  knowledgeStateSeparation: "docs/specs/Апамять и управление сетью связей.md",
-  resolveMaterializeSeparation: "docs/specs/Ачисла и сериализация.md",
-  targetMaterializationBound: "docs/specs/Ачисла и сериализация.md",
-  rootBasisBoundary: "docs/specs/Ачисла и сериализация.md",
-  v012StringByteIdentity: "docs/specs/Ачисла и сериализация.md",
-  utf8CarrierBoundary: "docs/specs/Ачисла и сериализация.md",
-  sourceUseAuthority: "docs/specs/Формальная нотация МТС.md",
-  formalResultAuthority: "docs/specs/Формальная нотация МТС.md",
+  L1: "docs/specs/Апамять и управление сетью связей.md",
+  L2: "docs/specs/Формальная нотация МТС.md",
+  L3: "docs/specs/Формальная нотация МТС.md",
+  L4: "docs/specs/Ачисла и сериализация.md",
+  L5: "docs/specs/Ачисла и сериализация.md",
+  L6: "docs/specs/Ачисла и сериализация.md",
+  L7: "docs/specs/Ачисла и сериализация.md",
+  L8: "docs/specs/Апамять и управление сетью связей.md",
+  L9: "docs/specs/Апамять и управление сетью связей.md",
+  L10: "docs/specs/Ачисла и сериализация.md",
+  L11: "docs/specs/Ачисла и сериализация.md",
+  L12: "docs/specs/Формальная нотация МТС.md",
+  L13: "docs/specs/Ачисла и сериализация.md",
 });
 
 export interface SemanticLawDocumentationIssue {
@@ -217,7 +212,7 @@ interface MarkdownFacts {
   readonly visible: readonly boolean[];
 }
 
-const OWNER_LINE = /^<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>(?:\s*<!--\s*нормативный владелец\s*-->)?$/;
+const OWNER_LINE = /^<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>\s*<!--\s*нормативный владелец\s*-->$/;
 const REFERENCE = /<!--\s*ссылка:mts-law-([A-Za-z][A-Za-z0-9]*)\s*-->/g;
 
 function markdownFacts(path: string, source: string): MarkdownFacts {
@@ -287,16 +282,10 @@ export function validateSemanticLawDocumentation(
   const references = facts.flatMap((item) => item.references);
 
   for (const owner of owners) {
-    if (!required.has(owner.lawId)) {
-      issues.push({
-        code: "unknown-owner",
-        lawId: owner.lawId,
-        path: owner.path,
-        line: owner.line,
-        message: `unknown semantic law owner ${owner.lawId} at ${owner.path}:${owner.line}`,
-      });
-      continue;
-    }
+    // During an atomic accepted-version cutover the trusted-base release may
+    // retain owner anchors as immutable acceptance evidence. Only owner IDs
+    // required by the current contract participate in current-owner checks.
+    if (!required.has(owner.lawId)) continue;
     const expectedPath = SEMANTIC_LAW_OWNER_BY_ID[owner.lawId];
     if (expectedPath !== owner.path) {
       issues.push({

@@ -18,19 +18,19 @@ const conformance13 = readJson("contracts/mts-conformance-v0.13.json");
 const traceability13 = readJson("traceability/mts-v0.13.json");
 const contract12 = readJson("contracts/mts-contract-v0.12.json");
 const conformance12 = readJson("contracts/mts-conformance-v0.12.json");
-const acceptance12 = readJson("cutover/typescript-c1-acceptance-v0.5.json");
+const acceptance13 = readJson("cutover/typescript-c1-acceptance-v0.6.json");
 const policy = readJson("repo-policy.json");
 
 // The earlier readiness audit remains historical evidence, but readiness has been rerun after A73s scoped reclassification.
-same(contract13.status, "candidate", "v0.13 status remains candidate");
-same(contract13.accepted, false, "v0.13 remains unaccepted");
+same(contract13.status, "accepted", "v0.13 status is accepted");
+same(contract13.accepted, true, "v0.13 is accepted");
 same(contract13.acceptanceReady, true, "v0.13 contract readiness is restored");
-same(conformance13.status, "candidate", "v0.13 conformance remains candidate");
-same(conformance13.accepted, false, "v0.13 conformance remains unaccepted");
+same(conformance13.status, "accepted", "v0.13 conformance is accepted");
+same(conformance13.accepted, true, "v0.13 conformance is accepted");
 same(conformance13.acceptanceReady, true, "v0.13 conformance readiness is restored");
 same(conformance13.coverageState, "complete", "declared v0.13 coverage is complete");
 
-// The candidate kernel is complete but is not selected before an explicit cutover.
+// The candidate kernel was readiness-complete before cutover and is now the accepted semantic boundary.
 same(contract13.implementation?.implementationComplete, true, "candidate kernel scope complete");
 same(
   contract13.implementation?.candidateKernelBehaviorImplemented,
@@ -78,13 +78,13 @@ same(
 );
 same(
   contract13.candidateState?.explicitAuthorAcceptanceRecorded,
-  false,
-  "author acceptance is intentionally still pending",
+  true,
+  "author acceptance is recorded by A74",
 );
 same(
   contract13.implementation?.candidateRuntimeSelectable,
   false,
-  "ready candidate remains non-selectable before explicit cutover",
+  "accepted v0.13 has no alternate candidate runtime mode",
 );
 same(
   contract13.releaseState?.candidateRuntimeSelectable,
@@ -93,34 +93,34 @@ same(
 );
 same(contract13.releaseState?.acceptanceReady, true, "release state projects restored readiness");
 
-// Accepted/current v0.12 remains untouched.
+// Accepted v0.12 remains immutable as the immediately previous release.
 same(contract12.schema, "mts-contract/v0.12", "accepted contract identity");
 same(contract12.status, "accepted", "v0.12 contract remains accepted");
 same(contract12.accepted, true, "v0.12 accepted flag remains true");
 same(conformance12.schema, "mts-conformance/v0.12", "accepted conformance identity");
 same(conformance12.status, "accepted", "v0.12 conformance remains accepted");
 same(conformance12.accepted, true, "v0.12 conformance accepted flag remains true");
-same(contract13.acceptedCurrent?.contract, "mts-contract/v0.12", "accepted-current contract");
+same(contract13.acceptedCurrent?.contract, "mts-contract/v0.13", "accepted-current contract");
 same(
   contract13.acceptedCurrent?.conformance,
-  "mts-conformance/v0.12",
+  "mts-conformance/v0.13",
   "accepted-current conformance",
 );
 same(
   conformance13.acceptedCurrent?.contract,
-  "mts-contract/v0.12",
+  "mts-contract/v0.13",
   "conformance accepted-current contract",
 );
 same(
   conformance13.acceptedCurrent?.conformance,
-  "mts-conformance/v0.12",
+  "mts-conformance/v0.13",
   "conformance accepted-current corpus",
 );
-same(acceptance12.current?.contract, "contracts/mts-contract-v0.12.json", "cutover current contract remains v0.12");
+same(acceptance13.current?.contract, "contracts/mts-contract-v0.13.json", "cutover current contract is v0.13");
 same(
-  acceptance12.current?.conformance,
-  "contracts/mts-conformance-v0.12.json",
-  "cutover current conformance remains v0.12",
+  acceptance13.current?.conformance,
+  "contracts/mts-conformance-v0.13.json",
+  "cutover current conformance is v0.13",
 );
 
 // Every acceptance criterion is green.
@@ -175,6 +175,9 @@ for (const gate of declaredGates) {
 
 // Traceability identity is exact for L1-L13.
 same(traceability13.schema, "mts-traceability/v0.2", "v0.13 traceability schema");
+same(traceability13.status, "accepted", "v0.13 traceability is accepted");
+same(traceability13.accepted, true, "v0.13 traceability accepted flag");
+same(traceability13.acceptance, "cutover/typescript-c1-acceptance-v0.6.json", "v0.13 traceability binds immutable acceptance");
 same(
   traceability13.contract,
   "contracts/mts-contract-v0.13.json",
@@ -214,22 +217,16 @@ same(
 );
 same(
   conformance13.evidenceState?.authorAcceptance,
-  "pending",
-  "author acceptance remains pending",
+  "accepted-a74",
+  "author acceptance is recorded",
 );
 same(
   (conformance13.acceptanceBlockers ?? []).length,
-  1,
-  "only explicit author acceptance remains an acceptance blocker",
-);
-assert(
-  conformance13.acceptanceBlockers.includes(
-    "explicit author acceptance of the exact candidate artifacts has not yet been recorded",
-  ),
-  "author acceptance blocker is explicit",
+  0,
+  "accepted v0.13 has no acceptance blockers",
 );
 
-// Readiness itself is not author acceptance.
+// Readiness itself still does not count as author acceptance; A74 records a separate explicit decision.
 assert(
   contract13.acceptanceAuthority?.implicitSignalsNeverCountAsAcceptance?.includes(
     "readiness audit completion",
@@ -242,7 +239,7 @@ same(
   "author decision must reference exact ready artifacts",
 );
 
-// Governance pins the restored ready state while acceptance and runtime selection remain separate.
+// Governance retains the readiness pins after acceptance and rotates current/previous separately.
 const rules = new Map<string, any>(
   (policy.document_relations?.rules ?? []).map((rule: any) => [rule.id, rule]),
 );
@@ -255,5 +252,5 @@ same(
 );
 
 console.log(
-  `MTS v0.13 A73t readiness lifecycle: exact-current candidate is readiness GREEN across ${declaredGates.length} projected gates; A9 global trust/minimality + self-proof remain non-blocking research; v0.12 remains current.`,
+  `MTS v0.13 A73t/A74 lifecycle: readiness evidence remains GREEN across ${declaredGates.length} projected gates; explicit author acceptance is recorded, v0.13 is current, and stronger A9 research remains non-blocking.`,
 );

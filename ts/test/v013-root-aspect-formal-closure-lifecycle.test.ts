@@ -70,7 +70,7 @@ same(contract.acceptanceCriteria.AC10, "green", "AC10 is green");
 same(contract.candidateState.rootFormalDialectComplete, true, "root FORMAL dialect complete");
 same(contract.candidateState.acceptanceCriteriaComplete, true, "acceptance criteria complete");
 same(contract.acceptanceReady, true, "candidate readiness is restored after A73t");
-same(contract.accepted, false, "candidate remains unaccepted");
+same(contract.accepted, true, "v0.13 is accepted");
 
 const ac10 = conformance.acceptanceCriteriaEvidence.AC10;
 same(ac10.status, "green", "AC10 evidence status");
@@ -108,12 +108,12 @@ assert(
   "completed AC10 is no longer an acceptance blocker",
 );
 same(conformance.acceptanceReady, true, "conformance readiness is restored after A73t");
-same(conformance.accepted, false, "conformance remains unaccepted");
+same(conformance.accepted, true, "conformance is accepted");
 same(contract.candidateState.readinessAuditComplete, true, "readiness audit is complete");
 same(
   contract.candidateState.explicitAuthorAcceptanceRecorded,
-  false,
-  "explicit author acceptance remains pending",
+  true,
+  "explicit author acceptance is recorded",
 );
 
 console.log(
