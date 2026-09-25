@@ -140,7 +140,7 @@ function algebra(memory: Memory, basis: RootBasis): StackAlgebra<LinkHandle> {
     root: basis.R,
     linked: basis.L,
     unlinked: basis.U,
-    link: (start, end) => memory.ensure(start, end),
+    link: (start: LinkHandle, end: LinkHandle) => memory.ensure(start, end),
   });
 }
 
