@@ -38,6 +38,27 @@ function rejectsTopology(links: readonly (readonly [number, number])[]): boolean
 }
 
 
+function rejectsForeignAbitHandle(): boolean {
+  const memoryA = new Memory();
+  const basisA = ensureRootBasis(memoryA);
+  const memoryB = new Memory();
+  const basisB = ensureRootBasis(memoryB);
+
+  try {
+    memoryA.poles(basisB.O);
+    return false;
+  } catch (error) {
+    if (!(error instanceof MemoryError)) return false;
+  }
+
+  try {
+    memoryB.poles(basisA.L);
+    return false;
+  } catch (error) {
+    return error instanceof MemoryError;
+  }
+}
+
 function rejectsSecondBothSelfClosedSemanticLink(): boolean {
   const handle = (): LinkHandle => Object.freeze({}) as LinkHandle;
   const R = handle();
@@ -273,7 +294,7 @@ negativeVector("v013-empty-wire-is-not-root", mappedV013NegativeVector(conforman
 negativeVector("v013-unrooted-sequence-lookalike-rejected", mappedV013NegativeVector(conformance, "v013-unrooted-sequence-lookalike-rejected"));
 negativeVector("v013-unrooted-anum-hierarchy-rejected", mappedV013NegativeVector(conformance, "v013-unrooted-anum-hierarchy-rejected"));
 negativeVector("v013-nonroot-both-selfclosed-rejected-by-root-uniqueness", rejectsSecondBothSelfClosedSemanticLink());
-negativeVector("v013-foreign-abit-handle-rejected", mappedV013NegativeVector(conformance, "v013-foreign-abit-handle-rejected"));
+negativeVector("v013-foreign-abit-handle-rejected", rejectsForeignAbitHandle());
 negativeVector("v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence", mappedV013NegativeVector(conformance, "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"));
 negativeVector("v013-formal-root-wrong-rule-rejected", mappedV013NegativeVector(conformance, "v013-formal-root-wrong-rule-rejected"));
 negativeVector("v013-formal-root-wrong-theory-rejected", mappedV013NegativeVector(conformance, "v013-formal-root-wrong-theory-rejected"));
