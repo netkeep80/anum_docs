@@ -41,10 +41,14 @@ const projectionV011 = projection.versions.findIndex((version) => version.contra
 const projectionV012 = projection.versions.findIndex((version) => version.contractId === "mts-contract/v0.12");
 const projectionV013 = projection.versions.findIndex((version) => version.contractId === "mts-contract/v0.13");
 assert(projectionV011 >= 0 && projectionV012 > projectionV011 && projectionV013 > projectionV012, "projection preserves accepted v0.11/v0.12/v0.13 deterministic order");
-for (const candidate of projection.versions.filter((version) => !version.isCurrent && !version.isPrevious)) {
-  same(candidate.accepted, false, `${candidate.contractId}: extra projected version remains nonaccepted`);
-  assert(candidate.lifecycle.some((entry) => entry.stage === "candidate"), `${candidate.contractId}: candidate lifecycle is explicit`);
-  same(candidate.acceptanceReferences.length, 0, `${candidate.contractId}: candidate has no acceptance authority`);
+for (const extra of projection.versions.filter((version) => !version.isCurrent && !version.isPrevious)) {
+  if (extra.accepted) {
+    assert(extra.lifecycle.some((entry) => entry.stage === "accepted"), `${extra.contractId}: historical accepted lifecycle remains explicit`);
+    assert(extra.acceptanceReferences.length > 0, `${extra.contractId}: historical accepted release keeps acceptance authority`);
+  } else {
+    assert(extra.lifecycle.some((entry) => entry.stage === "candidate"), `${extra.contractId}: candidate lifecycle is explicit`);
+    same(extra.acceptanceReferences.length, 0, `${extra.contractId}: candidate has no acceptance authority`);
+  }
 }
 
 const current = projection.versions.find((version) => version.isCurrent);
