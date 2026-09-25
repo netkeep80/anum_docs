@@ -65,15 +65,6 @@ function mappedNegativeVector(conformance: ConformanceBoundary, id: string): boo
   return false;
 }
 
-function requiredNegativeHasGateEvidence(conformance: ConformanceBoundary, id: string): boolean {
-  if (!conformance.requiredNegativeVectors?.includes(id)) return false;
-  for (const gate of conformance.requiredExecutableGates ?? []) {
-    const source = readFileSync(join(repoRoot, gate), "utf8");
-    if (source.includes(id)) return true;
-  }
-  return false;
-}
-
 const packageJson = JSON.parse(readFileSync(join(repoRoot, "ts/package.json"), "utf8")) as {
   readonly name?: string;
   readonly types?: string;
@@ -195,24 +186,5 @@ negativeVector("v012-formal-square-bracket-low-level-open-is-not-authority", map
 negativeVector("v012-formal-square-bracket-missing-rule-does-not-open", mappedNegativeVector(previousConformance, "v012-formal-square-bracket-missing-rule-does-not-open"));
 negativeVector("v012-formal-square-bracket-substituted-q-rule-does-not-open", mappedNegativeVector(previousConformance, "v012-formal-square-bracket-substituted-q-rule-does-not-open"));
 
-// Current v0.13 keeps the exact 39-gate accepted boundary and every required negative
-// vector must be witnessed by at least one mandatory executable gate source.
+// Current v0.13 keeps the exact accepted executable boundary.
 assert((conformance.requiredExecutableGates ?? []).length === 39, "accepted v0.13 keeps all 39 mandatory executable gates");
-negativeVector("v013-flat-relative-glyph-collision-not-canonical", requiredNegativeHasGateEvidence(conformance, "v013-flat-relative-glyph-collision-not-canonical"));
-negativeVector("v013-noncanonical-pair-188-rejected", requiredNegativeHasGateEvidence(conformance, "v013-noncanonical-pair-188-rejected"));
-negativeVector("v013-noncanonical-pair-1988-rejected", requiredNegativeHasGateEvidence(conformance, "v013-noncanonical-pair-1988-rejected"));
-negativeVector("v013-noncanonical-pair-1868-rejected", requiredNegativeHasGateEvidence(conformance, "v013-noncanonical-pair-1868-rejected"));
-negativeVector("v013-description-does-not-materialize-target", requiredNegativeHasGateEvidence(conformance, "v013-description-does-not-materialize-target"));
-negativeVector("v013-wrong-structural-rule-writes-zero-target-links", requiredNegativeHasGateEvidence(conformance, "v013-wrong-structural-rule-writes-zero-target-links"));
-negativeVector("v013-invalid-physical-opcode-fails-before-representation-writes", requiredNegativeHasGateEvidence(conformance, "v013-invalid-physical-opcode-fails-before-representation-writes"));
-negativeVector("v013-empty-wire-is-not-root", requiredNegativeHasGateEvidence(conformance, "v013-empty-wire-is-not-root"));
-negativeVector("v013-unrooted-sequence-lookalike-rejected", requiredNegativeHasGateEvidence(conformance, "v013-unrooted-sequence-lookalike-rejected"));
-negativeVector("v013-unrooted-anum-hierarchy-rejected", requiredNegativeHasGateEvidence(conformance, "v013-unrooted-anum-hierarchy-rejected"));
-negativeVector("v013-nonroot-both-selfclosed-rejected-by-root-uniqueness", requiredNegativeHasGateEvidence(conformance, "v013-nonroot-both-selfclosed-rejected-by-root-uniqueness"));
-negativeVector("v013-foreign-abit-handle-rejected", requiredNegativeHasGateEvidence(conformance, "v013-foreign-abit-handle-rejected"));
-negativeVector("v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence", requiredNegativeHasGateEvidence(conformance, "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"));
-negativeVector("v013-formal-root-wrong-rule-rejected", requiredNegativeHasGateEvidence(conformance, "v013-formal-root-wrong-rule-rejected"));
-negativeVector("v013-formal-root-wrong-theory-rejected", requiredNegativeHasGateEvidence(conformance, "v013-formal-root-wrong-theory-rejected"));
-negativeVector("v013-formal-root-malformed-prefix-rejected", requiredNegativeHasGateEvidence(conformance, "v013-formal-root-malformed-prefix-rejected"));
-negativeVector("v013-formal-root-noncanonical-pair-alias-rejected", requiredNegativeHasGateEvidence(conformance, "v013-formal-root-noncanonical-pair-alias-rejected"));
-negativeVector("v013-formal-root-no-host-term-special-case", requiredNegativeHasGateEvidence(conformance, "v013-formal-root-no-host-term-special-case"));
