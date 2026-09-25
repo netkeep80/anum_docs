@@ -244,6 +244,17 @@
       "evidence": {"typescript": ["ts/test/research-v013-formal-duality-a75c.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
     },
     {
+      "id": "FRM-02",
+      "statement": "Структурный FORMAL authority layer ориентирован: RoleDictionary=START(RoleSequence), Rule=RoleDictionary⟼Body, Theory admission=T⟼Rule и Interpreter=D⟼(G⟼T) под J переходят в точные зеркальные формы, которые текущие reader/verifier не принимают как ту же authority convention.",
+      "status": "scoped",
+      "assumptions": ["INV-02", "FRM-01", "accepted StructuralRule and portable Theory authority conventions"],
+      "dependsOn": ["INV-02", "FRM-01"],
+      "scope": "Accepted finite v0.13 StructuralRule/Theory authority layer; executable witness in #1544",
+      "exclusions": "Это подтверждает Theory dualization на structural-authority слое, но grounded execution ещё должен быть проверен отдельно.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": ["ts/test/research-v013-theory-authority-dualization-a75d.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
       "id": "INV-08",
       "statement": "Для Link-выраженной theory T рекурсивная инверсия задаёт классификацию T относительно J(T): exact invariant, explicit dual или obstruction.",
       "status": "conjecture",
