@@ -138,19 +138,14 @@ function main(): void {
   same(superiority.criteria.hostAuthorityBoundary.status, "green-for-declared-v013-candidate-scope",
     "host authority was reopened only under package-wide trust scope");
 
-  setSame(conformance.acceptanceBlockers, [
-    "explicit author acceptance of the exact candidate artifacts has not yet been recorded",
-  ], "only explicit author acceptance remains an acceptance blocker");
+  setSame(conformance.acceptanceBlockers, [],
+    "A74 acceptance clears the sole lifecycle blocker");
 
-  // A73t applies the A73s governance conclusion:
-  //
-  // - the two stronger A9/global obligations remain explicit research facts;
-  // - they are not acceptance blockers for the declared v0.13 scope;
-  // - exact-current readiness is restored;
-  // - explicit author acceptance remains the sole lifecycle blocker.
-  same(contract.acceptanceReady, true, "A73t restores readiness after the A73s scope review");
-  same(contract.candidateState.explicitAuthorAcceptanceRecorded, false,
-    "A73s does not invent author acceptance");
+  // A73t established scoped readiness; A74 later records the separate exact-artifact
+  // author decision without changing the stronger A9/global research classification.
+  same(contract.acceptanceReady, true, "A73t readiness remains valid after A74 acceptance");
+  same(contract.candidateState.explicitAuthorAcceptanceRecorded, true,
+    "A74 records the separate explicit author acceptance");
 
   console.log([
     "MTS v0.13 A73s: READINESS_SCOPE_REVIEW=GREEN_SCOPED_RESEARCH",
