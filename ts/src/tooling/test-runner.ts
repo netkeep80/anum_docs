@@ -7,9 +7,25 @@ function fail(message: string): never {
 }
 
 function sortedTests(directory: string, suffix: string): string[] {
-  return readdirSync(directory)
-    .filter((name) => name.endsWith(suffix))
-    .sort();
+  const tests: string[] = [];
+
+  function visit(current: string, relativePrefix: string): void {
+    for (const entry of readdirSync(current, { withFileTypes: true })) {
+      const absolute = join(current, entry.name);
+      const relative = relativePrefix === ""
+        ? entry.name
+        : join(relativePrefix, entry.name);
+
+      if (entry.isDirectory()) {
+        visit(absolute, relative);
+      } else if (entry.isFile() && entry.name.endsWith(suffix)) {
+        tests.push(relative);
+      }
+    }
+  }
+
+  visit(directory, "");
+  return tests.sort();
 }
 
 const sourceDirectory = resolve("test");
