@@ -1,0 +1,202 @@
+{
+  "schema": "mts-amemory-execution-profile/v0.1",
+  "profileId": "mts-v0.13-amemory-execution",
+  "profileVersion": "0.1",
+  "status": "current",
+  "ownerIssue": 1558,
+  "semanticResearchBaselineMainSha": "76e5d81e3e5a87b14a44c83160d19565e20bd431",
+  "classification": "V013_PLUS_EXECUTION_PROFILE",
+  "foundation": {
+    "mtsVersion": "0.13",
+    "contract": "contracts/mts-contract-v0.13.json",
+    "conformance": "contracts/mts-conformance-v0.13.json",
+    "acceptance": "cutover/typescript-c1-acceptance-v0.6.json",
+    "accepted": true,
+    "mutatedByThisProfile": false
+  },
+  "authority": {
+    "scope": "portable-complete-amemory-execution",
+    "normativeForProfileConsumers": true,
+    "mtsOntologyAuthority": false,
+    "changesAcceptedMtsSemantics": false,
+    "requiresFutureMtsVersion": false
+  },
+  "canonicalDocumentation": {
+    "owner": "docs/specs/Апамять и управление сетью связей.md",
+    "glossary": "docs/Словарь терминов МТС.md",
+    "profileSectionAnchor": "amemory-substrate-boundary"
+  },
+  "requirements": [
+    {
+      "id": "AEP-01-current-semantic-state",
+      "statement": "The current semantic state is exactly the members of the single published current Scope."
+    },
+    {
+      "id": "AEP-02-physical-history-non-authority",
+      "statement": "Physically retained older Scopes and truths do not become current merely by remaining stored."
+    },
+    {
+      "id": "AEP-03-theory-authority",
+      "statement": "The selected Link-carried Theory defines the admitted grounded relations for execution."
+    },
+    {
+      "id": "AEP-04-reaction-start-theory-snapshot",
+      "statement": "At logical reaction start the executable Theory frontier is frozen as TheorySnapshot_t."
+    },
+    {
+      "id": "AEP-05-one-snapshot-per-reaction",
+      "statement": "Every current member in reaction t is evaluated against the same TheorySnapshot_t."
+    },
+    {
+      "id": "AEP-06-exhaustive-admitted-images",
+      "statement": "For each current truth K->A, all relations admitted by the snapshot with antecedent A are exhausted."
+    },
+    {
+      "id": "AEP-07-no-admitted-relation-preserves",
+      "statement": "If no admitted relation exists for A, K->A is preserved in the successor semantic state."
+    },
+    {
+      "id": "AEP-08-admitted-relations-replace-by-union",
+      "statement": "If one or more admitted relations exist, the old current truth contributes the canonical union of every K->B_j output."
+    },
+    {
+      "id": "AEP-09-zero-is-empty-contribution",
+      "statement": "An admitted ZERO image contributes no successor truth and does not veto outputs of other simultaneously admitted relations."
+    },
+    {
+      "id": "AEP-10-canonical-convergence",
+      "statement": "Duplicate successor truths converge by canonical Link identity; physical occurrence count and carrier order are non-semantic."
+    },
+    {
+      "id": "AEP-11-build-successor-before-publication",
+      "statement": "The complete successor Scope is constructed before it can become current."
+    },
+    {
+      "id": "AEP-12-single-atomic-current-root-handoff",
+      "statement": "When matchedRelations is greater than zero, exactly one atomic current-root handoff publishes the completed successor Scope."
+    },
+    {
+      "id": "AEP-13-quiescence-is-complete-no-match",
+      "statement": "When the complete logical reaction has matchedRelations equal to zero, no handoff occurs and the current state is quiescent."
+    },
+    {
+      "id": "AEP-14-theory-writes-visible-next-reaction",
+      "statement": "Theory admissions materialized during reaction t are executable beginning with reaction t+1, not by physical intra-reaction order."
+    },
+    {
+      "id": "AEP-15-schedule-address-layout-non-authority",
+      "statement": "Physical scheduling, local handles, allocation order, indexes and backend layout cannot change the normalized semantic result."
+    },
+    {
+      "id": "AEP-16-nontermination-allowed",
+      "statement": "Recurrence and unbounded execution are permitted; the profile does not require global termination."
+    },
+    {
+      "id": "AEP-17-structural-end-is-not-global-halt",
+      "statement": "The structural END aspect alone is not a universal global halt instruction."
+    }
+  ],
+  "observables": {
+    "semanticState": "members(publishedCurrentScope)",
+    "reaction": {
+      "matchedRelations": "non-negative integer",
+      "transitionedMembers": "non-negative integer",
+      "handoffCount": [
+        0,
+        1
+      ],
+      "quiescent": "boolean"
+    },
+    "semanticEquality": "normalized Link topology and current membership, independent of local handles and physical ordering"
+  },
+  "distinctions": {
+    "noAdmittedRelation": "preserve current truth",
+    "admittedZeroImage": "remove that truth contribution from the successor state",
+    "one": "one canonical successor contribution",
+    "many": "canonical union of all admitted successor contributions",
+    "notFoundCandidateLookup": "does not prove exhaustive absence of an admitted relation"
+  },
+  "concurrency": {
+    "logicalReactionBoundaryRequired": true,
+    "threadOrWorkgroupOrderIsSemantic": false,
+    "snapshotTheoryAtReactionStart": true,
+    "independentScheduleNormalizedEquivalenceRequired": true
+  },
+  "recurrence": {
+    "quiescenceEqualsSchedulerIdle": false,
+    "recurrenceEqualsQuiescence": false,
+    "globalTerminationRequired": false,
+    "structuralEndImpliesGlobalHalt": false
+  },
+  "hierarchicalResult": {
+    "nestedLinkAsResultSupported": true,
+    "dynamicHierarchicalConstructionRequiredForMinimum": false,
+    "nestedContextResultLifecycleRequiredForMinimum": false,
+    "classification": "INDEPENDENT_LATER_FEATURE",
+    "retainedResearch": [
+      "A72u dual-tree single-assignment Result slots",
+      "A72v persistent Result versions/path-copy"
+    ]
+  },
+  "substrateBoundary": {
+    "carrierCapabilities": [
+      "local-link-technical-identity",
+      "root-anchor",
+      "pole-read",
+      "canonical-pair-lookup",
+      "ensure-ordinary-pair",
+      "ensure-start-selfclosure",
+      "ensure-end-selfclosure",
+      "outgoing-incidence-query"
+    ],
+    "a9ConfirmedIndependentPrimitiveCount": 0,
+    "a9UnknownPrimitiveStatusCount": 8,
+    "publicationCapabilities": [
+      "read-published-current-scope-root",
+      "atomic-current-scope-root-handoff"
+    ],
+    "representationCapabilities": [
+      "exact-output-carrier-traversal",
+      "portable-link-topology-import-export"
+    ],
+    "nonSemanticImplementationChoices": [
+      "local-handle-value",
+      "allocation-order",
+      "storage-index",
+      "Links-or-Doublets-API-shape",
+      "array-layout",
+      "GPU-layout",
+      "thread-order",
+      "workgroup-order"
+    ]
+  },
+  "selfHostingBoundary": {
+    "scopedProgramSemantics": "Link-carried Theory relations",
+    "fullySelfHostedSystemClaimed": false,
+    "currentRootMechanism": "A-memory substrate",
+    "genericHighLevelRuleGrounding": "separate layer"
+  },
+  "evidence": {
+    "E1_W1": "ts/test/research-post-v013-amemory-currentness-e1-w1.test.ts",
+    "E2_W2_W3": "ts/test/research-post-v013-amemory-transition-e2-w2-w3.test.ts",
+    "E3_W4_W5": "ts/test/research-post-v013-amemory-concurrency-e3-w4-w5.test.ts",
+    "E4": "ts/test/research-post-v013-amemory-theory-visibility-e4.test.ts",
+    "E5_W6": "ts/test/research-post-v013-amemory-recurrence-e5-w6.test.ts",
+    "E6": "ts/test/research-post-v013-amemory-hierarchical-result-e6.test.ts",
+    "E7_W7": "ts/test/research-post-v013-amemory-substrate-e7-w7.test.ts"
+  },
+  "downstream": {
+    "canonicalConsumerRepository": "netkeep80/amemory",
+    "consumerContractRule": "The consumer documents which version of this profile each backend implements; implementation layout is not semantic authority."
+  },
+  "vetoes": [
+    "host-cursor-identity-as-unexplained-semantic-authority",
+    "thread-order-as-semantic-law",
+    "Links-or-Doublets-API-as-MTS-semantics",
+    "GPU-layout-as-MTS-semantics",
+    "physical-deletion-inferred-from-semantic-replacement",
+    "host-set-or-worklist-as-MTS-ontology",
+    "automatic-full-self-hosted-claim",
+    "retroactive-mutation-of-accepted-v0.13"
+  ]
+}
