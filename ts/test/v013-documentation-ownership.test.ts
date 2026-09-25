@@ -64,7 +64,10 @@ const owners = new Map<string, string[]>();
 
 for (const path of allowedDocuments) {
   const source = readFileSync(join(repoRoot, path), "utf8");
-  assert(source.includes("MTS v0.13"), `${path}: explicit v0.13 boundary`);
+  const hasCurrentVersionBoundary =
+    source.includes("mts-doc-version: v0.13") ||
+    source.includes("MTS v0.13");
+  assert(hasCurrentVersionBoundary, `${path}: explicit v0.13 boundary`);
 
   for (const match of source.matchAll(ownerPattern)) {
     const law = match[1]!;
