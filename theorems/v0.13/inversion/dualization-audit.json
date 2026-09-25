@@ -1,0 +1,229 @@
+{
+  "schema": "mts-v013-duality-audit/v0.1",
+  "authority": "index-only",
+  "version": "v0.13",
+  "issue": 1544,
+  "verdict": "THEORY_DUALIZATION",
+  "domain": {
+    "finiteRootGroundingRequired": true,
+    "wellFoundedModulo": [
+      "ROOT self-incidence",
+      "direct START self-incidence",
+      "direct END self-incidence"
+    ],
+    "distinctNodeDependencyCyclesAdmissible": false,
+    "productionNonWellFoundedMutualCyclesDeferred": true,
+    "note": "Verdict covers the accepted v0.13 semantic domain. Non-well-founded distinct-node cycles are outside current admissible production semantics and remain deferred."
+  },
+  "candidates": {
+    "NO_AUTOMORPHISM": {
+      "holds": false,
+      "reason": "Recursive involution J exists on the accepted semantic domain and extends through relative forms, FORMAL composition and explicit dual execution.",
+      "evidence": [
+        "INV-02",
+        "INV-09",
+        "FRM-01",
+        "EXE-01"
+      ]
+    },
+    "FULL_AUTOMORPHISM": {
+      "holds": false,
+      "reason": "Fixed current Context, StructuralRule/Theory authority and grounded-execution conventions reject or miss their exact J-images.",
+      "evidence": [
+        "CTX-01",
+        "FRM-02",
+        "EXE-01"
+      ]
+    },
+    "THEORY_DUALIZATION": {
+      "holds": true,
+      "reason": "J preserves the Link foundation and maps every checked orientation-sensitive higher convention to a coherent explicit dual convention; dual execution commutes with J.",
+      "evidence": [
+        "INV-07",
+        "INV-09",
+        "CTX-01",
+        "CTX-02",
+        "FRM-01",
+        "FRM-02",
+        "EXE-01"
+      ]
+    }
+  },
+  "laws": {
+    "L1": {
+      "classification": "INVARIANT",
+      "evidence": [
+        "INV-03",
+        "INV-07"
+      ]
+    },
+    "L2": {
+      "classification": "INVARIANT_BY_INVOLUTION",
+      "evidence": [
+        "INV-02",
+        "INV-09"
+      ]
+    },
+    "L3": {
+      "classification": "EXPLICIT_DUAL",
+      "evidence": [
+        "CTX-01",
+        "CTX-02"
+      ]
+    },
+    "L4": {
+      "classification": "INVARIANT_ALPHABET_PERMUTATION",
+      "evidence": [
+        "INV-04",
+        "INV-05",
+        "INV-06"
+      ]
+    },
+    "L5": {
+      "classification": "INVARIANT_CANONICALITY",
+      "evidence": [
+        "INV-05",
+        "FRM-01"
+      ]
+    },
+    "L6": {
+      "classification": "INVARIANT_BY_BIJECTION",
+      "evidence": [
+        "INV-02"
+      ]
+    },
+    "L7": {
+      "classification": "INVARIANT_STRUCTURAL_IDENTITY",
+      "evidence": [
+        "INV-02"
+      ]
+    },
+    "L8": {
+      "classification": "EXPLICIT_DUAL_AUTHORITY",
+      "evidence": [
+        "FRM-02"
+      ]
+    },
+    "L9": {
+      "classification": "DOMAIN_BOUNDARY_PRESERVED",
+      "evidence": [
+        "INV-01",
+        "INV-02"
+      ]
+    },
+    "L10": {
+      "classification": "EXPLICIT_DUAL_WITH_ROOT_FIXED",
+      "evidence": [
+        "INV-03",
+        "EXE-01"
+      ]
+    },
+    "L11": {
+      "classification": "INVARIANT_EXACT_SOURCE_PROPERTY",
+      "evidence": [
+        "INV-02",
+        "FRM-01"
+      ]
+    },
+    "L12": {
+      "classification": "INVARIANT_PRINCIPLE_DUAL_AUTHORITY",
+      "evidence": [
+        "FRM-01",
+        "FRM-02"
+      ]
+    },
+    "L13": {
+      "classification": "INVARIANT_ALPHABET_PERMUTATION",
+      "evidence": [
+        "INV-06",
+        "FRM-01"
+      ]
+    }
+  },
+  "acceptanceCriteria": {
+    "AC1": {
+      "classification": "INVARIANT",
+      "evidence": [
+        "INV-03",
+        "INV-06"
+      ]
+    },
+    "AC2": {
+      "classification": "INVARIANT_IN_ACCEPTED_TREE_CARRIER_DOMAIN",
+      "evidence": [
+        "INV-01",
+        "INV-02",
+        "INV-05"
+      ]
+    },
+    "AC3": {
+      "classification": "INVARIANT_EXACT_SOURCE_PROPERTY",
+      "evidence": [
+        "FRM-01"
+      ]
+    },
+    "AC4": {
+      "classification": "INVARIANT_ROOT_ASPECT_PERMUTATION",
+      "evidence": [
+        "INV-06",
+        "FRM-01"
+      ]
+    },
+    "AC5": {
+      "classification": "INVARIANT_CANONICALITY_AND_TRANSPORT",
+      "evidence": [
+        "INV-02",
+        "INV-05"
+      ]
+    },
+    "AC6": {
+      "classification": "EXPLICIT_DUAL_WITH_ROOT_FIXED",
+      "evidence": [
+        "INV-03",
+        "EXE-01"
+      ]
+    },
+    "AC7": {
+      "classification": "INVARIANT_STRUCTURAL_TRANSPORT",
+      "evidence": [
+        "INV-02"
+      ]
+    },
+    "AC8": {
+      "classification": "INVARIANT_STRUCTURAL_CARRIER",
+      "evidence": [
+        "INV-01",
+        "INV-05"
+      ]
+    },
+    "AC9": {
+      "classification": "EXPLICIT_DUAL_MATERIALIZATION_CONTEXT",
+      "evidence": [
+        "INV-09",
+        "CTX-02"
+      ]
+    },
+    "AC10": {
+      "classification": "FORMAL_EQUIVARIANT_AUTHORITY_DUALIZED",
+      "evidence": [
+        "FRM-01",
+        "FRM-02"
+      ]
+    }
+  },
+  "finalDependencies": [
+    "INV-02",
+    "INV-07",
+    "INV-09",
+    "CTX-01",
+    "CTX-02",
+    "FRM-01",
+    "FRM-02",
+    "EXE-01"
+  ],
+  "exclusions": [
+    "This audit does not make the theorem registry or this JSON proof authority.",
+    "Lean and MTS-native proofs remain later independent proof backends under #1431.",
+    "Deferred non-well-founded distinct-node cycle semantics are not silently added to accepted v0.13."
+  ]
+}
