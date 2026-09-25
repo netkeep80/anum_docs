@@ -255,6 +255,17 @@
       "evidence": {"typescript": ["ts/test/research-v013-theory-authority-dualization-a75d.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
     },
     {
+      "id": "EXE-01",
+      "statement": "Grounded relational reaction эквивариантна рекурсивной инверсии только при переходе к точной dual-конвенции: dualReact(J(state)) = J(react(state)); scope, membership, Theory admission, relation и truth/output links одновременно меняют направление.",
+      "status": "scoped",
+      "assumptions": ["INV-02", "CTX-01", "FRM-02", "accepted v0.13 grounded relational execution law"],
+      "dependsOn": ["INV-02", "CTX-01", "FRM-02"],
+      "scope": "Accepted finite v0.13 grounded execution with MANY, ZERO and NOT_FOUND branches; executable witness in #1544",
+      "exclusions": "Это не заменяет итоговый аудит всех L1-L13/AC obligations и не превращает dual executor в принятую production semantics.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": ["ts/test/research-v013-grounded-execution-dualization-a75e.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
       "id": "INV-08",
       "statement": "Для Link-выраженной theory T рекурсивная инверсия задаёт классификацию T относительно J(T): exact invariant, explicit dual или obstruction.",
       "status": "conjecture",
