@@ -15,30 +15,32 @@ const index = buildContractObservatoryIndex(repositoryRoot);
 const projection = buildMethodologyProjection(repositoryRoot, index);
 const current = projection.versions.find((version) => version.isCurrent);
 const previous = projection.versions.find((version) => version.isPrevious);
+const historicalV011 = projection.versions.find((version) => version.contractId === "mts-contract/v0.11");
 assert(current !== undefined, "current version exists");
 assert(previous !== undefined, "previous version exists");
+assert(historicalV011 !== undefined, "historical v0.11 version exists");
 
-same(current.contractId, "mts-contract/v0.12", "current release is v0.12 after B1");
-same(current.semanticInvariants.length, 18, "current v0.12 exposes every requiredSemanticLaw through traceability authority");
-same(current.traceabilityManifestPath, "traceability/mts-v0.12.json", "current v0.12 traceability manifest source is explicit");
-assert(!current.unresolvedRelations.includes("traceability-manifest"), "current v0.12 traceability manifest is resolved");
+same(current.contractId, "mts-contract/v0.13", "current release is v0.13 after A74");
+same(current.semanticInvariants.length, 13, "current v0.13 exposes L1-L13 through traceability authority");
+same(current.traceabilityManifestPath, "traceability/mts-v0.13.json", "current v0.13 traceability manifest source is explicit");
+assert(!current.unresolvedRelations.includes("traceability-manifest"), "current v0.13 traceability manifest is resolved");
 
-const currentFormalSquare = current.semanticInvariants.find((invariant) => invariant.id === "formalSquareBracketStringChild");
-assert(currentFormalSquare !== undefined, "current v0.12 FORMAL square-bracket invariant is projected");
+const currentFormal = current.semanticInvariants.find((invariant) => invariant.id === "L12");
+assert(currentFormal !== undefined, "current v0.13 FORMAL grounding invariant L12 is projected");
 assert(
-  currentFormalSquare.requiredExecutableGates.includes("ts/test/v012-formal-square-string-child-c4.test.ts"),
-  "current v0.12 FORMAL square-bracket invariant is bound to its executable gate",
+  currentFormal.requiredExecutableGates.includes("ts/test/v013-root-aspect-formal-composition.test.ts"),
+  "current v0.13 L12 is bound to its executable FORMAL gate",
 );
-const formalGroup = currentFormalSquare.positiveGroups?.find((group) => group.sourceSet === "requiredFormalVectors");
-assert(formalGroup !== undefined, "v0.2 preserves requiredFormalVectors as an explicit source set");
+const formalGroup = currentFormal.positiveGroups?.find((group) => group.sourceSet === "requiredPositiveVectors");
+assert(formalGroup !== undefined, "v0.2 preserves requiredPositiveVectors as an explicit source set");
 assert(
-  formalGroup.vectorIds.includes("v012-formal-nonempty-string-child"),
-  "v0.2 FORMAL source set carries its exact conformance vector",
+  formalGroup.vectorIds.includes("v013-formal-root-R-from-8"),
+  "v0.13 L12 source set carries its exact conformance vector",
 );
 
-same(previous.contractId, "mts-contract/v0.11", "previous release is immutable v0.11 evidence");
-same(previous.semanticInvariants.length, 7, "previous v0.11 exposes exactly seven authority invariants");
-const topLevelDot = previous.semanticInvariants.find((invariant) => invariant.id === "topLevelDot");
+same(previous.contractId, "mts-contract/v0.12", "previous release is immutable v0.12 evidence");
+same(previous.semanticInvariants.length, 18, "previous v0.12 exposes exactly eighteen authority invariants");
+const topLevelDot = historicalV011.semanticInvariants.find((invariant) => invariant.id === "topLevelDot");
 assert(topLevelDot !== undefined, "topLevelDot invariant is projected from traceability authority");
 same(topLevelDot.traceabilitySourcePath, "traceability/mts-v0.11.json", "manifest source path remains explicit");
 same(topLevelDot.contractPointer, "/requiredSemanticLaws/topLevelDot", "exact contract pointer is preserved");
@@ -59,7 +61,7 @@ same(
   "required gates come directly from manifest",
 );
 
-const topLevelProduction = previous.evidenceReferences.find(
+const topLevelProduction = historicalV011.evidenceReferences.find(
   (reference) => reference.sourcePath === "ts/test/v011-top-level-root-binding.test.ts",
 );
 assert(topLevelProduction !== undefined, "top-level production evidence reference exists");
@@ -69,7 +71,7 @@ same(
   "production evidence identifiers are preserved exactly from conformance",
 );
 
-const dotMeaning = previous.semanticInvariants.find((invariant) => invariant.id === "dotMeaning");
+const dotMeaning = historicalV011.semanticInvariants.find((invariant) => invariant.id === "dotMeaning");
 assert(dotMeaning !== undefined, "dotMeaning invariant exists");
 same(dotMeaning.negative.requiredNegativeVectors.length, 0, "explicit empty negative category remains empty");
 assert(
@@ -77,8 +79,8 @@ assert(
   "Q-boundary evidence is not guessed into dotMeaning",
 );
 
-same(previous.traceabilityManifestPath, "traceability/mts-v0.11.json", "previous v0.11 keeps immutable traceability provenance");
-assert(!previous.unresolvedRelations.includes("traceability-manifest"), "previous v0.11 traceability remains resolved after current rotates");
+same(historicalV011.traceabilityManifestPath, "traceability/mts-v0.11.json", "historical v0.11 keeps immutable traceability provenance");
+assert(!historicalV011.unresolvedRelations.includes("traceability-manifest"), "historical v0.11 traceability remains resolved after current rotates");
 
 const html = renderContractObservatoryHtml(index, projection);
 assert(html.includes('data-invariant-id="topLevelDot"'), "topLevelDot has a visible source-derived anatomy card");
@@ -87,6 +89,7 @@ assert(html.includes("/requiredSemanticLaws/topLevelDot"), "exact contract JSON 
 assert(html.includes(". -&gt; R under TopBind(R,S)"), "resolved contract law is visible without becoming UI authority");
 assert(html.includes("traceability/mts-v0.11.json"), "traceability manifest provenance is visible");
 assert(html.includes("traceability/mts-v0.12.json"), "v0.12 traceability provenance is visible");
+assert(html.includes("traceability/mts-v0.13.json"), "v0.13 traceability provenance is visible");
 assert(html.includes("Векторы формальной нотации"), "v0.2 FORMAL positive source set has a Russian presentation label");
 assert(html.includes("Межслойные векторы"), "v0.2 cross-layer positive source set has a Russian presentation label");
 for (const label of [
@@ -132,7 +135,7 @@ assert(!dotMeaningHtml.includes("v011-q-alphabet-remains-four-abits"), "UI does 
 const maliciousLaw = `<img src=x onerror="alert('mts')">`;
 const maliciousProjection = Object.freeze({
   ...projection,
-  versions: Object.freeze(projection.versions.map((version) => version !== previous ? version : Object.freeze({
+  versions: Object.freeze(projection.versions.map((version) => version !== historicalV011 ? version : Object.freeze({
     ...version,
     semanticInvariants: Object.freeze(version.semanticInvariants.map((invariant) => invariant.id !== "topLevelDot"
       ? invariant
