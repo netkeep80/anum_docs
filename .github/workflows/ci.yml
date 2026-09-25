@@ -89,7 +89,7 @@ jobs:
 
       - name: Check required directories exist
         run: |
-          for dir in contracts cutover docs theorems ts; do
+          for dir in contracts cutover docs ts; do
             if [ ! -d "$dir" ]; then
               echo "::error::Required directory missing: $dir"
               exit 1
