@@ -49,31 +49,25 @@ includes(
   "gate:ts/test/v013-root-aspect-formal-composition.test.ts",
   "invariant highlights its manifest-declared executable gate",
 );
-includes(
-  invariantHighlights,
-  "evidence:ts/test/v013-root-aspect-formal-composition.test.ts",
-  "invariant follows vectorEvidence forward to existing executable evidence",
-);
 assert(
   !invariantHighlights.includes("vector:v013-empty-wire-is-not-root"),
   "forward highlighting never guesses unrelated Q-boundary evidence",
 );
 
-const evidenceState = kernel.reduce(kernel.initialState(), {
+const gateState = kernel.reduce(kernel.initialState(), {
   type: "select-item",
-  itemId: "evidence:ts/test/v013-root-aspect-formal-composition.test.ts",
+  itemId: "gate:ts/test/v013-root-aspect-formal-composition.test.ts",
 });
-const evidenceHighlights = kernel.highlightedItemIds(evidenceState);
-includes(evidenceHighlights, "evidence:ts/test/v013-root-aspect-formal-composition.test.ts", "selected evidence highlights itself");
+const gateHighlights = kernel.highlightedItemIds(gateState);
+includes(gateHighlights, "gate:ts/test/v013-root-aspect-formal-composition.test.ts", "selected gate highlights itself");
 includes(
-  evidenceHighlights,
-  "vector:v013-formal-root-R-from-8",
-  "evidence walks the explicit relation graph backwards to its vector",
-);
-includes(
-  evidenceHighlights,
+  gateHighlights,
   "invariant:L12",
-  "evidence walks backwards from vector to source-linked invariant",
+  "gate walks backwards through the manifest-declared invariant relation",
+);
+assert(
+  !gateHighlights.includes("evidence:ts/test/v013-root-aspect-formal-composition.test.ts"),
+  "v0.13 does not invent vectorEvidence that its conformance does not declare",
 );
 
 const previousState = kernel.reduce(kernel.initialState(), {
