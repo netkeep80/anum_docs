@@ -367,11 +367,11 @@ export function checkRepositorySemanticLawDocumentation(root = findRepositoryRoo
 export function renderCurrentProjection(value: CurrentProjection): string {
   return [
     PROJECTION_START,
-    "> **Текущий принятый выпуск МТС.** Этот краткий блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.",
+    "> **Текущий принятый выпуск МТС: v0.13.** Этот блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.",
     ">",
-    `> - Текущий: \`${value.currentContract}\` + \`${value.currentConformance}\` — [контракт](${value.currentContractPath}) · [корпус](${value.currentConformancePath}).`,
-    `> - Предыдущий неизменяемый: \`${value.previousContract}\` + \`${value.previousConformance}\` — [контракт](${value.previousContractPath}) · [корпус](${value.previousConformancePath}).`,
-    `> - Принятие текущего выпуска: [свидетельство](${value.acceptancePath}).`,
+    `> - Контракт: \`${value.currentContract}\` — [${value.currentContractPath}](${value.currentContractPath}).`,
+    `> - Корпус соответствия: \`${value.currentConformance}\` — [${value.currentConformancePath}](${value.currentConformancePath}).`,
+    `> - Свидетельство принятия: [${value.acceptancePath}](${value.acceptancePath}).`,
     PROJECTION_END,
   ].join("\n");
 }
