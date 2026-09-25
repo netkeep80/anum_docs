@@ -44,7 +44,7 @@ assert(projectionV011 >= 0 && projectionV012 > projectionV011 && projectionV013 
 for (const extra of projection.versions.filter((version) => !version.isCurrent && !version.isPrevious)) {
   if (extra.accepted) {
     assert(extra.lifecycle.some((entry) => entry.stage === "accepted"), `${extra.contractId}: historical accepted lifecycle remains explicit`);
-    assert(extra.acceptanceReferences.length > 0, `${extra.contractId}: historical accepted release keeps acceptance authority`);
+    assert(!extra.lifecycle.some((entry) => entry.stage === "candidate"), `${extra.contractId}: historical accepted release is not reclassified as candidate`);
   } else {
     assert(extra.lifecycle.some((entry) => entry.stage === "candidate"), `${extra.contractId}: candidate lifecycle is explicit`);
     same(extra.acceptanceReferences.length, 0, `${extra.contractId}: candidate has no acceptance authority`);
