@@ -93,8 +93,8 @@ assert(!realHtml.includes("http://") && !realHtml.includes("https://"), "no exte
 assert(realHtml.includes("<section class=\"methodology-map\""), "V4c methodology map is rendered as the primary explanatory view");
 assert(realHtml.includes("aria-label=\"Стадии методологии\""), "methodology stages expose a semantic keyboard-navigation group");
 assert(realHtml.includes("data-methodology-stage=\"challenged\""), "methodology stage controls carry deterministic stage identity");
-assert(realHtml.includes("data-version-id=\"mts-contract/v0.11\""), "previous version lane carries exact projected contract identity");
-assert(realHtml.includes("data-version-id=\"mts-contract/v0.12\""), "current version lane carries exact projected contract identity");
+assert(realHtml.includes("data-version-id=\"mts-contract/v0.12\""), "previous version lane carries exact projected contract identity");
+assert(realHtml.includes("data-version-id=\"mts-contract/v0.13\""), "current version lane carries exact projected contract identity");
 assert(realHtml.includes("ТЕКУЩАЯ"), "current classification remains explicit in V4c");
 assert(realHtml.includes("ПРЕДЫДУЩАЯ"), "previous classification remains explicit in V4c");
 for (const candidate of realIndex.versions.filter((entry) => entry.status === "candidate" || !entry.accepted)) {
@@ -105,9 +105,9 @@ assert(realHtml.includes("Семантические Связи МТС: в эт�
 assert(realHtml.includes("data-observatory-controller=\"shared-kernel\""), "static page embeds the shared canonical interaction kernel controller");
 assert(!realHtml.includes("const readState ="), "static page no longer owns the old handwritten hash parser");
 
-const v011Position = realHtml.indexOf('data-version-id="mts-contract/v0.11"');
 const v012Position = realHtml.indexOf('data-version-id="mts-contract/v0.12"');
-assert(v011Position >= 0 && v012Position > v011Position, "timeline preserves current active-pair natural order");
+const v013Position = realHtml.indexOf('data-version-id="mts-contract/v0.13"');
+assert(v012Position >= 0 && v013Position > v012Position, "timeline preserves current active-pair natural order");
 assert(!realHtml.includes('data-version-id="mts-contract/v0.10"'), "removed v0.10 active pair has no version lane");
 assert(realHtml.includes(realIndex.acceptancePath), "acceptance provenance visible");
 assert(realHtml.includes(realIndex.currentContractPath), "current contract provenance visible");
@@ -117,12 +117,12 @@ const current = realIndex.versions.find((entry) => entry.isCurrent);
 const previous = realIndex.versions.find((entry) => entry.isPrevious);
 assert(current !== undefined, "real current version exists");
 assert(previous !== undefined, "real previous version exists");
-same(current.contractId, "mts-contract/v0.12", "real current is accepted v0.12");
+same(current.contractId, "mts-contract/v0.13", "real current is accepted v0.13");
 same(current.status, "accepted", "real current status is accepted");
 same(current.accepted, true, "real current accepted flag is explicit");
 same(current.acceptanceReady, true, "real current retains readiness evidence");
-same(current.requiredExecutableGateCount, 16, "real current preserves all v0.12 gates");
-same(previous.contractId, "mts-contract/v0.11", "real previous is accepted v0.11");
+same(current.requiredExecutableGateCount, 39, "real current preserves all v0.13 gates");
+same(previous.contractId, "mts-contract/v0.12", "real previous is accepted v0.12");
 assert(realHtml.includes(String(current.requiredExecutableGateCount)), "current gate count rendered");
 assert(realHtml.includes(String(current.requiredNegativeVectorCount)), "current negative-vector count rendered");
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(current) + 1}\" class=\"version-card current\"`), "current section classified");
