@@ -266,6 +266,17 @@
       "evidence": {"typescript": ["ts/test/research-v013-grounded-execution-dualization-a75e.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
     },
     {
+      "id": "INV-10",
+      "statement": "На принятом semantic domain MTS v0.13 рекурсивная инверсия J классифицирует полную проверенную структуру как THEORY_DUALIZATION: Link foundation сохраняется, а orientation-sensitive Context/authority/execution conventions переходят в когерентные explicit dual conventions; FULL_AUTOMORPHISM фиксированной текущей theory ложен.",
+      "status": "scoped",
+      "assumptions": ["INV-02", "INV-07", "INV-09", "CTX-01", "CTX-02", "FRM-01", "FRM-02", "EXE-01"],
+      "dependsOn": ["INV-02", "INV-07", "INV-09", "CTX-01", "CTX-02", "FRM-01", "FRM-02", "EXE-01"],
+      "scope": "Accepted MTS v0.13 semantic domain and L1-L13/AC1-AC10 obligations; final executable coverage audit in #1544",
+      "exclusions": "Не распространять на deferred non-well-founded distinct-node cycles; Lean и MTS-native proof backends остаются независимым последующим этапом #1431.",
+      "sources": ["#1544"],
+      "evidence": {"typescript": ["ts/test/research-v013-full-duality-audit-a75f.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+    },
+    {
       "id": "INV-08",
       "statement": "Для Link-выраженной theory T рекурсивная инверсия задаёт классификацию T относительно J(T): exact invariant, explicit dual или obstruction.",
       "status": "conjecture",
