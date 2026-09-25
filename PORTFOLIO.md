@@ -1,20 +1,31 @@
-# Portfolio roadmap
+# Портфельный контекст
+<!-- версия документа МТС; mts-doc-version: v0.13 -->
+> **Документ относится к МТС v0.13**
 
-`anum_docs` является частью portfolio [`netkeep80`](https://github.com/netkeep80).
+Репозиторий `anum_docs` является частью портфеля [`netkeep80`](https://github.com/netkeep80).
 
-Portfolio-level направление, приоритет, lifecycle, cross-repo dependencies и следующий gate **намеренно не дублируются здесь**. Authoritative sources:
+Центральный портфельный репозиторий определяет порядок межрепозиторных работ и общие зависимости:
 
-- [netkeep80/roadmap](https://github.com/netkeep80/roadmap) — главный portfolio control plane;
-- [Current status](https://github.com/netkeep80/roadmap/blob/main/STATUS.md) — live GitHub state;
-- [Execution order](https://github.com/netkeep80/roadmap/blob/main/EXECUTION.md) — cross-repo gates;
-- [Architecture](https://github.com/netkeep80/roadmap/blob/main/ARCHITECTURE.md) — canonical ownership/dependencies.
+- [netkeep80/roadmap](https://github.com/netkeep80/roadmap) — главный портфельный контур управления;
+- [STATUS](https://github.com/netkeep80/roadmap/blob/main/STATUS.md) — текущее состояние портфеля;
+- [EXECUTION](https://github.com/netkeep80/roadmap/blob/main/EXECUTION.md) — порядок межрепозиторных этапов;
+- [ARCHITECTURE](https://github.com/netkeep80/roadmap/blob/main/ARCHITECTURE.md) — распределение ответственности и зависимостей.
 
-Normative МТС/Anum contracts, conformance и local research/implementation issues остаются source of truth этого repository. Central roadmap управляет только portfolio-level ordering и dependencies.
+Семантика МТС, локальные нормативные документы, доказательные результаты и реализация остаются ответственностью **этого репозитория**.
+
+Критическая граница:
 
 ```text
-roadmap decides portfolio direction;
-this repository owns its normative/local work;
-GitHub facts feed the central live status.
+центральный roadmap
+-> порядок работ и межрепозиторные зависимости
+
+anum_docs
+-> нормативная МТС
+-> локальные доказательства
+-> контракты и conformance
+-> реализация
 ```
 
-Если локальный foundation decision меняет downstream ordering, обновляется central roadmap, а не создаётся конкурирующая portfolio-карта здесь.
+Портфельный roadmap не является смысловым авторитетом МТС и не может изменить принятую семантику только изменением порядка задач.
+
+Если локальное смысловое решение меняет зависимости других репозиториев, обновляется центральный roadmap. Конкурирующая локальная карта портфеля здесь не создаётся.
