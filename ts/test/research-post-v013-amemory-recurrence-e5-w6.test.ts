@@ -12,6 +12,7 @@ import {
 import {
   V013GroundedScopeCursor,
   defineV013GroundedExecutionScope,
+  discoverV013GroundedTheoryImages,
   reactV013GroundedScope,
 } from "../src/v013-grounded-execution.js";
 
@@ -129,6 +130,40 @@ function exerciseTwoCycle(): void {
   }
 }
 
+function exerciseSchedulerPauseIsNotQuiescence(): void {
+  const memory = new Memory();
+  const f = freshLinks(memory, 12);
+  const at = (i: number): LinkHandle => {
+    const value = f[i];
+    assert(value !== undefined, "scheduler fresh link " + i);
+    return value;
+  };
+
+  const theory = memory.ensure(at(0), at(1));
+  const K = memory.ensure(at(2), at(3));
+  const A = memory.ensure(at(4), at(5));
+  const B = memory.ensure(at(6), at(7));
+  admit(memory, theory, A, [B]);
+
+  const KA = memory.ensure(K, A);
+  const scope = defineV013GroundedExecutionScope(
+    memory,
+    at(8),
+    theory,
+    [KA],
+  );
+  const cursor = new V013GroundedScopeCursor(memory, scope);
+
+  // No reaction is invoked here: the host/scheduler is simply idle.
+  same(cursor.currentScope(), scope, "scheduler pause changes no Scope");
+  const images = discoverV013GroundedTheoryImages(memory, theory, A);
+  same(images.length, 1, "paused state still has an enabled semantic transition");
+
+  const resumed = reactV013GroundedScope(memory, cursor, at(9));
+  assert(!resumed.quiescent, "scheduler inactivity was not semantic quiescence");
+  same(resumed.matchedRelations, 1, "resumed reaction finds semantic work");
+}
+
 function exerciseQuiescentControl(): void {
   const memory = new Memory();
   const f = freshLinks(memory, 12);
@@ -231,6 +266,7 @@ function staticGuards(): void {
 
 function main(): void {
   exerciseTwoCycle();
+  exerciseSchedulerPauseIsNotQuiescence();
   exerciseQuiescentControl();
   exerciseStructuralEndIsNotGlobalHalt();
   staticGuards();
@@ -242,6 +278,7 @@ function main(): void {
     "RECURRENCE=REPEATED_SEMANTIC_STATE_WITH_ACTIVE_TRANSITIONS",
     "RECURRENT_SCOPE_HANDLE_REUSE_REQUIRED=FALSE",
     "RECURRENCE_IMPLIES_QUIESCENCE=FALSE",
+    "SCHEDULER_INACTIVITY_EQUALS_QUIESCENCE=FALSE",
     "FINITE_RECURRENT_NETWORK_CAN_EXECUTE_WITHOUT_QUIESCENCE=TRUE",
     "GLOBAL_TERMINATION_REQUIRED=FALSE",
     "STRUCTURAL_END_ASPECT_IMPLIES_GLOBAL_HALT=FALSE",
