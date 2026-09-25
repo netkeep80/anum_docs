@@ -31,6 +31,7 @@ assert(
   canonical.every((value) => typeof value === "string"),
   "every canonical_docs entry must be a string",
 );
+same(canonical.length, 8, "canonical current documentation cardinality");
 
 const support = Object.freeze([
   "docs/CONTRIBUTING.md",
