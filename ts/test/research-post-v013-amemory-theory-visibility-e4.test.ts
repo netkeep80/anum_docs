@@ -412,6 +412,7 @@ function staticGuards(): void {
   );
 }
 
+// Research-only profile witness; accepted v0.13 production source remains untouched.
 function main(): void {
   exercise();
   staticGuards();
