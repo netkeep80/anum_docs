@@ -1,12 +1,24 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { Memory, ensureRootBasis } from "../src/memory.js";
+import {
+  Memory,
+  MemoryError,
+  ensureRootBasis,
+  type LinkHandle,
+  type LinkPoles,
+  type ReadMemory,
+  type RootBasis,
+} from "../src/memory.js";
 import { deserializeStream, symbolicStackAlgebra, StreamError } from "../src/anum.js";
 import {
   PersistenceTopologyError,
   STORAGE_TOPOLOGY_SCHEMA,
   restoreTopology,
 } from "../src/persistence-topology.js";
+import {
+  V013HierarchicalCarrierError,
+  decomposeV013SemanticLink,
+} from "../src/v013-hierarchical-carrier.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`release-cutover: ${message}`);
@@ -22,6 +34,48 @@ function rejectsTopology(links: readonly (readonly [number, number])[]): boolean
     return false;
   } catch (error) {
     return error instanceof PersistenceTopologyError;
+  }
+}
+
+
+function rejectsSecondBothSelfClosedSemanticLink(): boolean {
+  const handle = (): LinkHandle => Object.freeze({}) as LinkHandle;
+  const R = handle();
+  const O = handle();
+  const C = handle();
+  const L = handle();
+  const U = handle();
+  const X = handle();
+
+  const cells = new Map<LinkHandle, LinkPoles>([
+    [R, Object.freeze({ start: R, end: R })],
+    [O, Object.freeze({ start: O, end: R })],
+    [C, Object.freeze({ start: R, end: C })],
+    [L, Object.freeze({ start: O, end: C })],
+    [U, Object.freeze({ start: C, end: O })],
+    [X, Object.freeze({ start: X, end: X })],
+  ]);
+  const basis: RootBasis = Object.freeze({ R, O, C, L, U });
+
+  class SyntheticReadMemory implements ReadMemory {
+    readonly root = R;
+    get linkCount(): number { return cells.size; }
+    poles(link: LinkHandle): LinkPoles {
+      const poles = cells.get(link);
+      if (poles === undefined) throw new MemoryError("unknown synthetic Link");
+      return poles;
+    }
+    find(): LinkHandle | undefined { return undefined; }
+    outgoing(): readonly LinkHandle[] { return []; }
+    incoming(): readonly LinkHandle[] { return []; }
+  }
+
+  try {
+    decomposeV013SemanticLink(new SyntheticReadMemory(), basis, X);
+    return false;
+  } catch (error) {
+    return error instanceof V013HierarchicalCarrierError
+      && error.code === "invalid-semantic-link";
   }
 }
 
@@ -218,7 +272,7 @@ negativeVector("v013-invalid-physical-opcode-fails-before-representation-writes"
 negativeVector("v013-empty-wire-is-not-root", mappedV013NegativeVector(conformance, "v013-empty-wire-is-not-root"));
 negativeVector("v013-unrooted-sequence-lookalike-rejected", mappedV013NegativeVector(conformance, "v013-unrooted-sequence-lookalike-rejected"));
 negativeVector("v013-unrooted-anum-hierarchy-rejected", mappedV013NegativeVector(conformance, "v013-unrooted-anum-hierarchy-rejected"));
-negativeVector("v013-nonroot-both-selfclosed-rejected-by-root-uniqueness", mappedV013NegativeVector(conformance, "v013-nonroot-both-selfclosed-rejected-by-root-uniqueness"));
+negativeVector("v013-nonroot-both-selfclosed-rejected-by-root-uniqueness", rejectsSecondBothSelfClosedSemanticLink());
 negativeVector("v013-foreign-abit-handle-rejected", mappedV013NegativeVector(conformance, "v013-foreign-abit-handle-rejected"));
 negativeVector("v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence", mappedV013NegativeVector(conformance, "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"));
 negativeVector("v013-formal-root-wrong-rule-rejected", mappedV013NegativeVector(conformance, "v013-formal-root-wrong-rule-rejected"));
