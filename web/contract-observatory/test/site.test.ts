@@ -136,7 +136,11 @@ assert(realHtml.includes(String(current.requiredExecutableGateCount)), "current 
 assert(realHtml.includes(String(current.requiredNegativeVectorCount)), "current negative-vector count rendered");
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(current) + 1}\" class=\"version-card current\"`), "current section classified");
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(previous) + 1}\" class=\"version-card\"`), "previous section preserves order");
-same(renderContractObservatoryHtml(realIndex, realProjection), realHtml, "real repository rendering is deterministic");
+same(
+  renderContractObservatoryHtml(realIndex, realProjection, realSemanticIr),
+  realHtml,
+  "real repository rendering is deterministic",
+);
 
 const malicious = `<script>alert('x')</script>&\" >`;
 const synthetic = index([
