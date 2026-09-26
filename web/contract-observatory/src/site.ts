@@ -8,7 +8,8 @@ import {
   type ObservatoryInteractionVersionConfig,
 } from "./interaction.js";
 import type { MethodologyProjection, MethodologyVersionProjection } from "./methodology-projection.js";
-import type { ObservatoryRequirement, ObservatorySemanticIr } from "./semantic-ir-bridge.js";
+import { buildRequirementNavigationModel, type RequirementNavigationEntry } from "./requirement-navigation.js";
+import type { ObservatorySemanticIr } from "./semantic-ir-bridge.js";
 
 export function renderContractObservatoryHtml(
   index: ContractObservatoryIndex,
@@ -44,6 +45,15 @@ export function renderContractObservatoryHtml(
     .requirement-map { padding: 1.2rem; margin: 0 0 2.5rem; }
     .requirement-map h2 { margin: 0 0 .4rem; font-size: 1.7rem; }
     .requirement-map > p { margin: 0 0 1rem; max-width: 82ch; line-height: 1.5; opacity: .8; }
+    .requirement-controls { display: grid; gap: .55rem; margin: .9rem 0; padding: .75rem; border: 1px solid color-mix(in srgb, CanvasText 15%, transparent); border-radius: .75rem; }
+    .requirement-filter-group { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+    .requirement-filter-group > span { min-width: 5.5rem; font-size: .75rem; font-weight: 800; text-transform: uppercase; opacity: .7; }
+    .requirement-filter-group button, .requirement-clear { cursor: pointer; border: 1px solid color-mix(in srgb, CanvasText 24%, transparent); border-radius: .6rem; background: Canvas; color: inherit; padding: .35rem .55rem; }
+    .requirement-card:target { outline: 3px solid Highlight; outline-offset: 3px; }
+    .requirement-select { font-weight: 900; }
+    .requirement-links { display: flex; flex-wrap: wrap; gap: .35rem; }
+    .requirement-diagnostics { margin: .9rem 0 0; padding: .7rem; border: 1px dashed color-mix(in srgb, CanvasText 18%, transparent); border-radius: .7rem; font-size: .82rem; }
+    .requirement-diagnostics p { margin: .2rem 0; }
     .requirement-tree, .requirement-tree ul { list-style: none; margin: .45rem 0 0; padding-left: 1rem; }
     .requirement-tree { padding-left: 0; }
     .requirement-branch { margin: .5rem 0; }
@@ -154,12 +164,13 @@ interface RequirementTreeNode {
   readonly name: string;
   readonly path: string;
   readonly children: Map<string, RequirementTreeNode>;
-  readonly requirements: ObservatoryRequirement[];
+  readonly requirements: RequirementNavigationEntry[];
 }
 
 function renderSemanticRequirementMap(ir: ObservatorySemanticIr): string {
+  const model = buildRequirementNavigationModel(ir);
   const root: RequirementTreeNode = { name: "", path: "", children: new Map(), requirements: [] };
-  for (const requirement of [...ir.requirements].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id))) {
+  for (const requirement of model.entries) {
     let node = root;
     const parts = requirement.classificationPath.split("/");
     for (const part of parts) {
@@ -175,7 +186,24 @@ function renderSemanticRequirementMap(ir: ObservatorySemanticIr): string {
   }
   const tree = [...root.children.values()].sort((a, b) => a.name.localeCompare(b.name))
     .map((node) => renderRequirementBranch(node)).join("");
-  return `    <section class="requirement-map" aria-labelledby="requirements-title"><p class="eyebrow">Живая проекция проверенного семантического IR</p><h2 id="requirements-title">Проверяемые требования · ${escapeHtml(ir.contract)}</h2><p>Иерархия здесь определяется путями классификации контракта, а не порядком Markdown-разделов. Формулировки и свидетельства поступают из того же семантического IR, который компилирует MD-проекции.</p><ul class="requirement-tree">${tree}</ul><p class="raw-provenance">Источник IR: ${escapeHtml(ir.contractPath)} · схема ${escapeHtml(ir.schema)} · требований ${ir.requirements.length}.</p></section>`;
+  const diagnostics = model.diagnostics.length === 0
+    ? "<p>Диагностика IR: неразрешённых или отсутствующих обязательных метаданных = 0. Неполные обязательные поля отсекаются до рендера.</p>"
+    : `<ul>${model.diagnostics.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>`;
+  const comparison = model.versionComparison.available
+    ? `Сравнение по стабильному ID доступно с ${escapeHtml(model.versionComparison.previousContract ?? "предыдущей версией")}: строк ${model.versionComparison.rows.length}.`
+    : `Сравнение по стабильному ID недоступно: ${escapeHtml(model.versionComparison.reason ?? "нет второго проверенного IR")}.`;
+  const controls = [
+    renderRequirementFilterGroup("Вид", "kind", model.kinds),
+    renderRequirementFilterGroup("Статус", "status", model.statuses),
+    renderRequirementFilterGroup("Слой", "layer", model.layers),
+  ].join("");
+  return `    <section class="requirement-map" aria-labelledby="requirements-title"><p class="eyebrow">Живая проекция проверенного семантического IR</p><h2 id="requirements-title">Проверяемые требования · ${escapeHtml(ir.contract)}</h2><p>Иерархия определяется путями классификации контракта, а не порядком Markdown-разделов. Формулировки и свидетельства поступают из того же проверенного семантического IR, который компилирует MD-проекции.</p><div class="requirement-controls" aria-label="Фильтры требований">${controls}<button type="button" class="requirement-clear" data-requirement-clear>Сбросить фильтры</button></div><p class="requirement-filter-status" aria-live="polite">Показано требований: ${model.entries.length}.</p><ul class="requirement-tree">${tree}</ul><div class="requirement-diagnostics" aria-label="Диагностика requirement IR">${diagnostics}<p>${comparison}</p></div><p class="raw-provenance">Источник IR: ${escapeHtml(ir.contractPath)} · схема ${escapeHtml(ir.schema)} · требований ${model.entries.length}.</p></section>
+${renderRequirementFilterControllerScript()}`;
+}
+
+function renderRequirementFilterGroup(label: string, axis: "kind" | "status" | "layer", values: readonly string[]): string {
+  const buttons = values.map((value) => `<button type="button" data-requirement-filter-axis="${axis}" data-requirement-filter-value="${escapeAttribute(value)}" aria-pressed="false">${escapeHtml(value)}</button>`).join("");
+  return `<div class="requirement-filter-group" role="group" aria-label="${escapeAttribute(label)}"><span>${escapeHtml(label)}</span>${buttons}</div>`;
 }
 
 function renderRequirementBranch(node: RequirementTreeNode): string {
@@ -186,10 +214,64 @@ function renderRequirementBranch(node: RequirementTreeNode): string {
   return `<li class="requirement-branch" data-requirement-path="${escapeAttribute(node.path)}"><details open><summary>${escapeHtml(node.name)}</summary>${requirements}${children.length === 0 ? "" : `<ul>${children}</ul>`}</details></li>`;
 }
 
-function renderRequirementCard(requirement: ObservatoryRequirement): string {
-  const dependencies = requirement.dependsOn.length === 0 ? "нет" : requirement.dependsOn.join(", ");
+function renderRequirementCard(requirement: RequirementNavigationEntry): string {
   const sourceHref = `https://github.com/netkeep80/anum_docs/blob/main/${requirement.docPath.split("/").map(encodeURIComponent).join("/")}#${encodeURIComponent(requirement.docAnchor)}`;
-  return `<article id="requirement-${escapeAttribute(requirement.id)}" class="requirement-card" data-requirement-id="${escapeAttribute(requirement.id)}"><h4><span>${escapeHtml(requirement.id)}</span><span class="badge badge-muted">${escapeHtml(requirement.status)}</span><span class="badge badge-muted">${escapeHtml(requirement.kind)}</span></h4><blockquote>${escapeHtml(requirement.statement)}</blockquote><dl class="requirement-meta"><dt>Классификация</dt><dd>${escapeHtml(requirement.classificationPath)}</dd><dt>Зависимости</dt><dd>${escapeHtml(dependencies)}</dd><dt>Отпечаток</dt><dd>${escapeHtml(requirement.statementDigest)}</dd><dt>Свидетельства</dt><dd>+${requirement.positiveVectorCount} / −${requirement.negativeVectorCount}; исполняемых проверок: ${requirement.executableGateCount}</dd><dt>Семантический источник</dt><dd>${escapeHtml(requirement.authorityDocument)}#${escapeHtml(requirement.authorityPointer)}</dd><dt>Трассировка</dt><dd>${escapeHtml(requirement.traceabilityPath)}</dd><dt>Документация</dt><dd><a class="requirement-doc-link" href="${escapeAttribute(sourceHref)}">${escapeHtml(requirement.docPath)}#${escapeHtml(requirement.docAnchor)}</a></dd></dl></article>`;
+  return `<article id="requirement-${escapeAttribute(requirement.id)}" class="requirement-card" data-requirement-id="${escapeAttribute(requirement.id)}" data-requirement-kind="${escapeAttribute(requirement.kind)}" data-requirement-status="${escapeAttribute(requirement.status)}" data-requirement-layer="${escapeAttribute(requirement.layer)}"><h4><a class="requirement-select" href="#requirement-${escapeAttribute(requirement.id)}" aria-label="Выбрать требование ${escapeAttribute(requirement.id)}">${escapeHtml(requirement.id)}</a><span class="badge badge-muted">${escapeHtml(requirement.status)}</span><span class="badge badge-muted">${escapeHtml(requirement.kind)}</span></h4><blockquote>${escapeHtml(requirement.statement)}</blockquote><dl class="requirement-meta"><dt>Классификация</dt><dd>${escapeHtml(requirement.classificationPath)}</dd><dt>Зависимости</dt><dd>${renderRequirementLinks(requirement.dependsOn)}</dd><dt>Зависимые требования</dt><dd>${renderRequirementLinks(requirement.dependents)}</dd><dt>Отпечаток</dt><dd>${escapeHtml(requirement.statementDigest)}</dd><dt>Свидетельства</dt><dd>+${requirement.positiveVectorCount} / −${requirement.negativeVectorCount}; исполняемых проверок: ${requirement.executableGateCount}</dd><dt>Семантический источник</dt><dd>${escapeHtml(requirement.authorityDocument)}#${escapeHtml(requirement.authorityPointer)}</dd><dt>Трассировка</dt><dd>${escapeHtml(requirement.traceabilityPath)}</dd><dt>Документация</dt><dd><a class="requirement-doc-link" href="${escapeAttribute(sourceHref)}">${escapeHtml(requirement.docPath)}#${escapeHtml(requirement.docAnchor)}</a></dd></dl></article>`;
+}
+
+function renderRequirementLinks(ids: readonly string[]): string {
+  if (ids.length === 0) return "нет";
+  return `<span class="requirement-links">${ids.map((id) => `<a href="#requirement-${escapeAttribute(id)}">${escapeHtml(id)}</a>`).join("")}</span>`;
+}
+
+function renderRequirementFilterControllerScript(): string {
+  return `    <script data-requirement-controller="validated-ir">
+(() => {
+  "use strict";
+  const root = document.querySelector(".requirement-map");
+  if (root === null) return;
+  const active = { kind: new Set(), status: new Set(), layer: new Set() };
+  const axisDataset = { kind: "requirementKind", status: "requirementStatus", layer: "requirementLayer" };
+  const apply = () => {
+    let visible = 0;
+    root.querySelectorAll(".requirement-card").forEach((card) => {
+      const matches = ["kind", "status", "layer"].every((axis) => {
+        const selected = active[axis];
+        const value = card.dataset[axisDataset[axis]] || "";
+        return selected.size === 0 || selected.has(value);
+      });
+      card.hidden = !matches;
+      if (matches) visible += 1;
+    });
+    Array.from(root.querySelectorAll(".requirement-branch")).reverse().forEach((branch) => {
+      branch.hidden = !Array.from(branch.querySelectorAll(".requirement-card")).some((card) => !card.hidden);
+    });
+    const status = root.querySelector(".requirement-filter-status");
+    if (status !== null) status.textContent = "Показано требований: " + visible + ".";
+  };
+  root.addEventListener("click", (event) => {
+    const button = event.target && event.target.closest ? event.target.closest("button[data-requirement-filter-axis]") : null;
+    if (button !== null) {
+      const axis = button.dataset.requirementFilterAxis;
+      const value = button.dataset.requirementFilterValue;
+      if ((axis === "kind" || axis === "status" || axis === "layer") && value) {
+        const selected = active[axis];
+        selected.has(value) ? selected.delete(value) : selected.add(value);
+        button.setAttribute("aria-pressed", String(selected.has(value)));
+        apply();
+      }
+      return;
+    }
+    const clear = event.target && event.target.closest ? event.target.closest("[data-requirement-clear]") : null;
+    if (clear !== null) {
+      active.kind.clear(); active.status.clear(); active.layer.clear();
+      root.querySelectorAll("[data-requirement-filter-axis]").forEach((node) => node.setAttribute("aria-pressed", "false"));
+      apply();
+    }
+  });
+  apply();
+})();
+    </script>`;
 }
 
 function renderMethodologyMap(projection: MethodologyProjection): string {

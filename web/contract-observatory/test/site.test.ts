@@ -98,6 +98,14 @@ assert(realHtml.includes("representation/recursive-alphabet/prefix-codec"), "con
 assert(realHtml.includes("f740e98eade6204d"), "statement digest is rendered");
 assert(realHtml.includes(realSemanticIr.requirements.find((item) => item.id === "L4")!.statement), "exact contract statement is rendered");
 assert(realHtml.includes("https://github.com/netkeep80/anum_docs/blob/main/docs/specs/"), "human Markdown projection has direct source navigation");
+assert(realHtml.includes('data-requirement-filter-axis="kind"'), "P3b kind filter is rendered from validated IR");
+assert(realHtml.includes('data-requirement-filter-axis="status"'), "P3b status filter is rendered from validated IR");
+assert(realHtml.includes('data-requirement-filter-axis="layer"'), "P3b layer filter is rendered from classification path");
+assert(realHtml.includes('data-requirement-controller="validated-ir"'), "P3b requirement filter controller is embedded");
+assert(realHtml.includes('href="#requirement-L4"'), "stable requirement ID is URL-addressable");
+assert(realHtml.includes("Зависимые требования"), "reverse dependency backlinks are rendered");
+assert(realHtml.includes("неразрешённых или отсутствующих обязательных метаданных = 0"), "clean validated IR has explicit zero diagnostics");
+assert(realHtml.includes("Сравнение по стабильному ID недоступно"), "missing previous compiler registry is explicit instead of inferred");
 
 assert(realHtml.includes("<section class=\"methodology-map\""), "V4c methodology map is rendered as the primary explanatory view");
 assert(realHtml.includes("aria-label=\"Стадии методологии\""), "methodology stages expose a semantic keyboard-navigation group");
