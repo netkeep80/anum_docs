@@ -7,6 +7,10 @@ on:
       - "contracts/**"
       - "cutover/**"
       - "repo-policy.json"
+      - "requirements/**"
+      - "traceability/**"
+      - "ts/src/tooling/mts-compiler.ts"
+      - "ts/src/tooling/markdown-section-adapter.ts"
       - "web/contract-observatory/**"
       - ".github/workflows/pages.yml"
   push:
@@ -15,6 +19,10 @@ on:
       - "contracts/**"
       - "cutover/**"
       - "repo-policy.json"
+      - "requirements/**"
+      - "traceability/**"
+      - "ts/src/tooling/mts-compiler.ts"
+      - "ts/src/tooling/markdown-section-adapter.ts"
       - "web/contract-observatory/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -41,6 +49,12 @@ jobs:
 
       - name: Install TypeScript toolchain
         run: npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+
+      - name: Verify MTS semantic tests
+        run: npm --prefix ts test
+
+      - name: Verify compiled Markdown is current
+        run: npm --prefix ts run docs:check
 
       - name: Compile Contract Observatory
         run: ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
