@@ -56,7 +56,7 @@ function buildVersionComparison(
     return Object.freeze({
       available: false,
       previousContract: null,
-      reason: "предыдущая версия не имеет compiler-supported requirement registry",
+      reason: "для предыдущей версии нет реестра требований, поддерживаемого MTS Compiler",
       rows: Object.freeze([]),
     });
   }
