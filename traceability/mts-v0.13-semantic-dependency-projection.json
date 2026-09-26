@@ -2178,7 +2178,7 @@
       "if-link": 221,
       "if-memory-read": 87,
       "link-equality": 216,
-      "literal-equality": 172,
+      "literal-equality": 171,
       "literal-membership": 2,
       "literal-switch": 3,
       "memory-read-equality": 92,
