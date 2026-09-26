@@ -264,7 +264,7 @@ function marker(id: string, side: "begin" | "end"): string {
 }
 
 export function renderRequirementProjectionBody(item: MtsRequirementProjection): string {
-  return `> **MTS \`${item.id}\`** · \`${item.kind}\` · \`${item.classificationPath}\` · источник \`${item.authorityDocument}#${item.authorityPointer}\` · digest \`${item.statementDigest}\` · evidence +${item.positiveVectorCount}/-${item.negativeVectorCount} · gates ${item.executableGateCount} · \`${item.traceabilityPath}\`.`;
+  return `> **МТС \`${item.id}\`** · вид \`${item.kind}\` · класс \`${item.classificationPath}\` · источник \`${item.authorityDocument}#${item.authorityPointer}\` · отпечаток \`${item.statementDigest}\` · свидетельства +${item.positiveVectorCount}/-${item.negativeVectorCount} · проверок ${item.executableGateCount} · трассировка \`${item.traceabilityPath}\`.`;
 }
 
 export function renderRequirementProjection(item: MtsRequirementProjection): string {
