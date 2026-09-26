@@ -1009,12 +1009,12 @@
     "packageWideObjectSpecificHostSemanticCount": null,
     "typedReadMemorySiteCount": 531,
     "typedReadMemoryOwnerCount": 238,
-    "staticSemanticDecisionCandidateOwnerCount": 388,
+    "staticSemanticDecisionCandidateOwnerCount": 389,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
     "staticDecisionOwnersByCategory": {
       "memory-resource-safety": 4,
       "mixed-semantic-transport": 60,
-      "proof-replay": 98,
+      "proof-replay": 99,
       "representation": 55,
       "semantic-authority": 88,
       "tooling": 60,
@@ -2168,7 +2168,7 @@
       "poles": 220,
       "root": 70
     },
-    "decisionCandidateOwnerCount": 388,
+    "decisionCandidateOwnerCount": 389,
     "decisionCandidateFingerprintFNV64": "2799d65fa729be14",
     "decisionSignalCounts": {
       "ambient-mutable-decision": 64,
@@ -2228,7 +2228,7 @@
       "ts/src/quaternary-state.ts": 1,
       "ts/src/recursive-link-identity-proof.ts": 5,
       "ts/src/replay-support-topology.ts": 6,
-      "ts/src/rooted-proof-aset.ts": 13,
+      "ts/src/rooted-proof-aset.ts": 14,
       "ts/src/rooted-sequence.ts": 1,
       "ts/src/run.ts": 2,
       "ts/src/scoped-derivation.ts": 3,
@@ -2346,7 +2346,7 @@
     "decisionOwnerCountsByCategory": {
       "memory-resource-safety": 4,
       "mixed-semantic-transport": 60,
-      "proof-replay": 98,
+      "proof-replay": 99,
       "representation": 55,
       "semantic-authority": 88,
       "tooling": 60,
