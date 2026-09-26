@@ -1,6 +1,11 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import {
+  listRepositoryMarkdownSurface,
+  replaceOwnedMarkdownSection,
+  type MarkdownDocumentMode,
+} from "./markdown-section-adapter.js";
 
 type JsonObject = Record<string, unknown>;
 
@@ -30,6 +35,7 @@ export interface MtsSemanticIr {
   readonly contract: string;
   readonly contractPath: string;
   readonly requirements: readonly MtsRequirementProjection[];
+  readonly documentModes: Readonly<Record<string, MarkdownDocumentMode>>;
 }
 
 function fail(message: string): never {
@@ -145,6 +151,21 @@ export function loadMtsSemanticIr(
   const docs = object(contract.normativeDocumentation, `${contractPath}.normativeDocumentation`);
   const owners = object(docs.owners, `${contractPath}.normativeDocumentation.owners`);
 
+  const documentSurface = object(registry.documentSurface, `${registryPath}.documentSurface`);
+  const documentModes: Record<string, MarkdownDocumentMode> = {};
+  for (const [path, rawMode] of Object.entries(documentSurface)) {
+    const descriptor = object(rawMode, `${registryPath}.documentSurface.${path}`);
+    const mode = string(descriptor.mode, `${registryPath}.documentSurface.${path}.mode`);
+    if (mode !== "source" && mode !== "hybrid" && mode !== "generated") {
+      fail(`${path}: unknown Markdown document mode ${mode}`);
+    }
+    if (mode === "generated") {
+      fail(`${path}: whole-file GENERATED mode is forbidden in P1`);
+    }
+    documentModes[path] = mode;
+  }
+  exactSet("Markdown document surface", Object.keys(documentModes), listRepositoryMarkdownSurface(root));
+
   if (!Array.isArray(registry.requirements)) fail(`${registryPath}.requirements must be an array`);
   const rawRequirements = registry.requirements as unknown[];
   const seen = new Set<string>();
@@ -200,6 +221,9 @@ export function loadMtsSemanticIr(
       fail(`${id} doc projection differs from accepted normative owner`);
     }
     if (!existsSync(resolve(root, docPath))) fail(`${id} doc projection target does not exist: ${docPath}`);
+    if (documentModes[docPath] !== "hybrid") {
+      fail(`${id} doc projection target must be HYBRID, found ${documentModes[docPath] ?? "unclassified"}: ${docPath}`);
+    }
 
     return Object.freeze({
       id,
@@ -231,6 +255,7 @@ export function loadMtsSemanticIr(
     contract: contractId,
     contractPath,
     requirements: Object.freeze(requirements),
+    documentModes: Object.freeze(documentModes),
   });
 }
 
@@ -238,60 +263,35 @@ function marker(id: string, side: "begin" | "end"): string {
   return `<!-- mts:req:${id}:${side} -->`;
 }
 
-export function renderRequirementProjection(item: MtsRequirementProjection): string {
+export function renderRequirementProjectionBody(item: MtsRequirementProjection): string {
   return [
-    marker(item.id, "begin"),
     `> **Скомпилированное требование \`${item.id}\`.** Вид: \`${item.kind}\`; классификация: \`${item.classificationPath}\`.`,
     ">",
     `> Машинный источник: \`${item.authorityDocument}#${item.authorityPointer}\`; отпечаток формулировки: \`${item.statementDigest}\`.`,
     `> Свидетельства: +${item.positiveVectorCount} / -${item.negativeVectorCount}; исполняемых проверок: ${item.executableGateCount}; трассировка: \`${item.traceabilityPath}\`.`,
+  ].join("\n");
+}
+
+export function renderRequirementProjection(item: MtsRequirementProjection): string {
+  return [
+    marker(item.id, "begin"),
+    renderRequirementProjectionBody(item),
     marker(item.id, "end"),
   ].join("\n");
 }
 
-function occurrences(source: string, token: string): number[] {
-  const result: number[] = [];
-  let offset = 0;
-  while (true) {
-    const index = source.indexOf(token, offset);
-    if (index < 0) return result;
-    result.push(index);
-    offset = index + token.length;
-  }
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^$\{\}()|[\]\\]/g, "\\$&");
-}
-
-export function upsertRequirementProjection(source: string, item: MtsRequirementProjection): string {
-  const start = marker(item.id, "begin");
-  const end = marker(item.id, "end");
-  const starts = occurrences(source, start);
-  const ends = occurrences(source, end);
-  const projection = renderRequirementProjection(item);
-
-  if (starts.length === 1 && ends.length === 1 && starts[0] !== undefined && ends[0] !== undefined) {
-    if (ends[0] < starts[0]) fail(`${item.id} generated block end precedes begin`);
-    const before = source.slice(0, starts[0]);
-    const after = source.slice(ends[0] + end.length);
-    return `${before}${projection}${after}`;
-  }
-  if (starts.length !== 0 || ends.length !== 0) {
-    fail(`${item.id} has malformed generated markers start=${starts.length} end=${ends.length}`);
-  }
-
-  const ownerPattern = new RegExp(
-    `^<a id="${escapeRegExp(item.docAnchor)}"></a>\\s*<!--\\s*нормативный владелец\\s*-->\\s*$`,
-    "m",
-  );
-  const match = ownerPattern.exec(source);
-  if (match === null || match.index === undefined) fail(`${item.id} normative owner anchor not found in ${item.docPath}`);
-  const second = ownerPattern.exec(source.slice(match.index + match[0].length));
-  if (second !== null) fail(`${item.id} normative owner anchor is duplicated in ${item.docPath}`);
-
-  const insertAt = match.index + match[0].length;
-  return `${source.slice(0, insertAt)}\n${projection}${source.slice(insertAt)}`;
+export function upsertRequirementProjection(
+  source: string,
+  item: MtsRequirementProjection,
+  mode: MarkdownDocumentMode = "hybrid",
+): string {
+  return replaceOwnedMarkdownSection({
+    source,
+    mode,
+    anchorId: item.docAnchor,
+    blockId: item.id,
+    generatedContent: renderRequirementProjectionBody(item),
+  });
 }
 
 export function compileRequirementDocuments(root: string, write: boolean): string[] {
@@ -307,7 +307,9 @@ export function compileRequirementDocuments(root: string, write: boolean): strin
   for (const [path, items] of grouped) {
     const fullPath = resolve(root, path);
     const source = readFileSync(fullPath, "utf8");
-    const updated = items.reduce((text, item) => upsertRequirementProjection(text, item), source);
+    const mode = ir.documentModes[path];
+    if (mode === undefined) fail(`${path}: Markdown mode is not classified`);
+    const updated = items.reduce((text, item) => upsertRequirementProjection(text, item, mode), source);
     if (updated === source) continue;
     changed.push(path);
     if (write) writeFileSync(fullPath, updated, "utf8");
