@@ -1007,8 +1007,8 @@
       "authorized-semantic-target-materialization": 5
     },
     "packageWideObjectSpecificHostSemanticCount": null,
-    "typedReadMemorySiteCount": 522,
-    "typedReadMemoryOwnerCount": 236,
+    "typedReadMemorySiteCount": 528,
+    "typedReadMemoryOwnerCount": 237,
     "staticSemanticDecisionCandidateOwnerCount": 387,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
     "staticDecisionOwnersByCategory": {
@@ -2155,17 +2155,17 @@
       "issuanceIndex",
       "allLinks"
     ],
-    "typedReadSiteCount": 522,
-    "typedReadOwnerCount": 236,
+    "typedReadSiteCount": 528,
+    "typedReadOwnerCount": 237,
     "typedReadOwnerFingerprintFNV64": "a023834498d8036d",
     "typedReadMemberCounts": {
       "allLinks": 5,
-      "find": 29,
+      "find": 31,
       "incoming": 7,
       "issuanceIndex": 3,
-      "linkCount": 169,
+      "linkCount": 172,
       "outgoing": 20,
-      "poles": 219,
+      "poles": 220,
       "root": 70
     },
     "decisionCandidateOwnerCount": 387,
