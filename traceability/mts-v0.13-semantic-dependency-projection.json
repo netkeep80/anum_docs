@@ -2171,8 +2171,8 @@
     "decisionCandidateOwnerCount": 369,
     "decisionCandidateFingerprintFNV64": "9fa8fb5a782f104f",
     "decisionSignalCounts": {
-      "ambient-mutable-decision": 57,
-      "fixed-coordinate-index": 56,
+      "ambient-mutable-decision": 58,
+      "fixed-coordinate-index": 57,
       "host-callback-call": 5,
       "host-tag-decision": 35,
       "if-link": 215,
