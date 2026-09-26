@@ -38,6 +38,7 @@
     "test": "npm run build && npm run package:check && node dist/src/tooling/test-runner.js",
     "docs:sync": "npm run build --silent && node dist/src/tooling/docs-sync.js --write",
     "docs:check": "npm run build --silent && node dist/src/tooling/docs-sync.js --check",
+    "docs:coverage": "npm run build --silent && node dist/src/tooling/docs-coverage.js",
     "check": "npm run typecheck && npm test && npm run docs:check && npm run browser:check"
   },
   "devDependencies": {
