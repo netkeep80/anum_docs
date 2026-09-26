@@ -31,6 +31,9 @@ export type StructuralRootedProofAsetReplayErrorCode =
   | "ambiguous-proof-support"
   | "primitive-rule-not-admitted"
   | "primitive-derivation-rule-not-admitted"
+  | "primitive-derivation-rule-out-of-scope"
+  | "invalid-constructor-authority"
+  | "constructor-authority-not-admitted"
   | "premise-arity-mismatch"
   | "template-mismatch"
   | "cyclic-dependency"
@@ -60,6 +63,12 @@ export interface ClosedProofOccurrenceReplayResult {
   readonly occurrence: LinkHandle;
   readonly claim: LinkHandle;
   readonly validatedOccurrences: readonly ValidatedProofOccurrenceClaim[];
+}
+
+export interface ConstructorScopedClosedProofOccurrenceReplayResult
+  extends ClosedProofOccurrenceReplayResult {
+  readonly constructorAuthority: LinkHandle;
+  readonly constructors: readonly LinkHandle[];
 }
 
 interface StructuralOccurrenceApplication {
@@ -138,6 +147,7 @@ function readStructuralOccurrenceApplication(
   memory: ReadMemory,
   theory: LinkHandle,
   occurrence: LinkHandle,
+  allowedPrimitiveDerivationRules?: ReadonlySet<LinkHandle>,
 ): StructuralOccurrenceApplication {
   let claim: LinkHandle;
   let application: LinkHandle;
@@ -172,6 +182,12 @@ function readStructuralOccurrenceApplication(
   }
   if (memory.find(theory, primitiveDerivationRule) === undefined) {
     fail("primitive-derivation-rule-not-admitted");
+  }
+  if (
+    allowedPrimitiveDerivationRules !== undefined
+    && !allowedPrimitiveDerivationRules.has(primitiveDerivationRule)
+  ) {
+    fail("primitive-derivation-rule-out-of-scope");
   }
 
   const dependencyOccurrences = readDependencies(memory, dependencySequence);
@@ -262,10 +278,11 @@ function mergeValidatedClosures(
  * rooted wrapper, but has no target-assumption topology. The returned closure
  * contains only exact ProofOccurrences validated by the uniquely selected law.
  */
-export function replayClosedProofOccurrence(
+function replayClosedProofOccurrenceWithConstructors(
   memory: ReadMemory,
   theory: LinkHandle,
   occurrence: LinkHandle,
+  allowedPrimitiveDerivationRules?: ReadonlySet<LinkHandle>,
 ): ClosedProofOccurrenceReplayResult {
   const before = memory.linkCount;
   const structuralMemo = new Map<LinkHandle, ProofCandidateReplayResult>();
@@ -303,7 +320,12 @@ export function replayClosedProofOccurrence(
       if (activeStructural.has(candidate)) fail("cyclic-dependency");
       activeStructural.add(candidate);
       try {
-        const application = readStructuralOccurrenceApplication(memory, theory, candidate);
+        const application = readStructuralOccurrenceApplication(
+          memory,
+          theory,
+          candidate,
+          allowedPrimitiveDerivationRules,
+        );
         const dependencies = application.dependencyOccurrences.map((dependency) => verifyClosed(dependency));
         verifyWholeDerivationSubstitution(
           memory,
@@ -329,6 +351,12 @@ export function replayClosedProofOccurrence(
       try {
         return verifyStructural(candidate);
       } catch (error) {
+        if (
+          error instanceof StructuralRootedProofAsetReplayError
+          && error.code === "primitive-derivation-rule-out-of-scope"
+        ) {
+          throw error;
+        }
         if (
           error instanceof StructuralRootedProofAsetReplayError
           && error.code !== "replay-wrote"
@@ -363,6 +391,107 @@ export function replayClosedProofOccurrence(
       fail("invalid-proof-occurrence");
     }
     throw error;
+  } finally {
+    if (memory.linkCount !== before) fail("replay-wrote");
+  }
+}
+
+
+/**
+ * Backward-compatible trusted callback-free replay.
+ *
+ * No constructor scope is applied here; this preserves accepted behavior.
+ */
+export function replayClosedProofOccurrence(
+  memory: ReadMemory,
+  theory: LinkHandle,
+  occurrence: LinkHandle,
+): ClosedProofOccurrenceReplayResult {
+  return replayClosedProofOccurrenceWithConstructors(
+    memory,
+    theory,
+    occurrence,
+  );
+}
+
+/**
+ * Generic read-only replay under one explicit Link-carried constructor
+ * authority:
+ *
+ *   [ Theory, DR1, DR2, ... ]
+ *   Theory -> Authority
+ *
+ * Every structural ProofOccurrence reachable from the target must use one of
+ * the listed primitive StructuralDerivationRules. Identity-proof occurrences
+ * remain governed by their existing recursive structural laws.
+ */
+export function replayConstructorScopedClosedProofOccurrence(
+  memory: ReadMemory,
+  constructorAuthority: LinkHandle,
+  constructorAuthorityAdmission: LinkHandle,
+  occurrence: LinkHandle,
+): ConstructorScopedClosedProofOccurrenceReplayResult {
+  const before = memory.linkCount;
+  try {
+    let values: readonly LinkHandle[];
+    try {
+      values = readExactSequence(memory, constructorAuthority).values;
+    } catch (error) {
+      if (error instanceof ExactSequenceError || error instanceof MemoryError) {
+        fail("invalid-constructor-authority");
+      }
+      throw error;
+    }
+    if (values.length < 2) fail("invalid-constructor-authority");
+    const [theory, ...constructors] = values;
+    if (theory === undefined || constructors.length === 0) {
+      fail("invalid-constructor-authority");
+    }
+
+    try {
+      const admission = memory.poles(constructorAuthorityAdmission);
+      if (
+        admission.start !== theory
+        || admission.end !== constructorAuthority
+      ) {
+        fail("constructor-authority-not-admitted");
+      }
+    } catch (error) {
+      if (error instanceof StructuralRootedProofAsetReplayError) throw error;
+      if (error instanceof MemoryError) fail("constructor-authority-not-admitted");
+      throw error;
+    }
+
+    const allowed = new Set<LinkHandle>();
+    for (const derivationRule of constructors) {
+      if (allowed.has(derivationRule)) fail("invalid-constructor-authority");
+      allowed.add(derivationRule);
+      const schema = readDerivationRule(
+        memory,
+        derivationRule,
+        "invalid-constructor-authority",
+      );
+      readRule(memory, schema.structuralRule, "invalid-constructor-authority");
+      if (
+        memory.find(theory, schema.structuralRule) === undefined
+        || memory.find(theory, derivationRule) === undefined
+      ) {
+        fail("invalid-constructor-authority");
+      }
+    }
+
+    const replay = replayClosedProofOccurrenceWithConstructors(
+      memory,
+      theory,
+      occurrence,
+      allowed,
+    );
+    if (memory.linkCount !== before) fail("replay-wrote");
+    return Object.freeze({
+      ...replay,
+      constructorAuthority,
+      constructors: Object.freeze([...constructors]),
+    });
   } finally {
     if (memory.linkCount !== before) fail("replay-wrote");
   }
