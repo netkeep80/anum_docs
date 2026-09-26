@@ -2,9 +2,7 @@ name: Branch hygiene
 
 on:
   push:
-    branches:
-      - "**"
-      - "!main"
+    branches: ["**"]
   pull_request:
     types: [closed]
   schedule:
@@ -32,9 +30,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          existing="$(
-            gh api --method GET "repos/$REPO/pulls"               -f state=open               -f head="$OWNER:$BRANCH"               -f base="$BASE"               --jq 'length'
-          )"
+          existing="$(gh api --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f base="$BASE" --jq 'length')"
 
           if [ "$existing" -gt 0 ]; then
             echo "Open PR already exists for $BRANCH."
@@ -42,19 +38,22 @@ jobs:
           fi
 
           title="draft: ${BRANCH//\// }"
-          body="$(
-            cat <<EOF
-Automatically opened by repository branch-hygiene policy.
+          body="$(printf '%s\n' \
+            "Automatically opened by repository branch-hygiene policy." \
+            "" \
+            "- head: $BRANCH" \
+            "- base: $BASE" \
+            "- policy issue: #1637" \
+            "" \
+            "Please replace this placeholder title/body with the task-specific PR description before marking the PR ready.")"
 
-- head: `$BRANCH`
-- base: `$BASE`
-- policy issue: #1637
-
-Please replace this placeholder title/body with the task-specific PR description before marking the PR ready.
-EOF
-          )"
-
-          gh api --method POST "repos/$REPO/pulls"             -f title="$title"             -f head="$BRANCH"             -f base="$BASE"             -f body="$body"             -F draft=true             --silent
+          gh api --method POST "repos/$REPO/pulls" \
+            -f title="$title" \
+            -f head="$BRANCH" \
+            -f base="$BASE" \
+            -f body="$body" \
+            -F draft=true \
+            --silent
 
           echo "Created draft PR for $BRANCH -> $BASE."
 
@@ -85,6 +84,7 @@ EOF
   sweep-fully-merged:
     name: Sweep fully merged stale branches
     if: >-
+      (github.event_name == 'push' && github.ref_name == github.event.repository.default_branch) ||
       github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -98,12 +98,10 @@ EOF
         run: |
           set -euo pipefail
 
-          open_heads="$(
-            gh api --paginate "repos/$REPO/pulls?state=open&per_page=100"               --jq '.[].head.ref' | sort -u
-          )"
+          open_heads="$(gh api --paginate "repos/$REPO/pulls?state=open&per_page=100" --jq '.[].head.ref' | sort -u)"
 
           mapfile -t branches < <(
-            gh api --paginate "repos/$REPO/branches?per_page=100"               --jq '.[] | select(.protected == false) | .name'
+            gh api --paginate "repos/$REPO/branches?per_page=100" --jq '.[] | select(.protected == false) | .name'
           )
 
           deleted=0
@@ -123,9 +121,7 @@ EOF
             base_uri="$(jq -nr --arg v "$BASE" '$v|@uri')"
             branch_uri="$(jq -nr --arg v "$branch" '$v|@uri')"
 
-            if ! compare="$(
-              gh api "repos/$REPO/compare/$base_uri...$branch_uri" 2>/dev/null
-            )"; then
+            if ! compare="$(gh api "repos/$REPO/compare/$base_uri...$branch_uri" 2>/dev/null)"; then
               echo "KEEP unverified branch: $branch"
               skipped=$((skipped + 1))
               continue
