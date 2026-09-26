@@ -1009,7 +1009,7 @@
     "packageWideObjectSpecificHostSemanticCount": null,
     "typedReadMemorySiteCount": 508,
     "typedReadMemoryOwnerCount": 233,
-    "staticSemanticDecisionCandidateOwnerCount": 369,
+    "staticSemanticDecisionCandidateOwnerCount": 370,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
     "staticDecisionOwnersByCategory": {
       "memory-resource-safety": 4,
@@ -1017,7 +1017,7 @@
       "proof-replay": 91,
       "representation": 55,
       "semantic-authority": 88,
-      "tooling": 48,
+      "tooling": 49,
       "transport-persistence": 23
     },
     "packageWideExactWireLiteralDispatchCount": 0,
@@ -2168,8 +2168,8 @@
       "poles": 215,
       "root": 70
     },
-    "decisionCandidateOwnerCount": 369,
-    "decisionCandidateFingerprintFNV64": "9fa8fb5a782f104f",
+    "decisionCandidateOwnerCount": 370,
+    "decisionCandidateFingerprintFNV64": "9e83f43c991d5aa3",
     "decisionSignalCounts": {
       "ambient-mutable-decision": 58,
       "fixed-coordinate-index": 57,
@@ -2178,7 +2178,7 @@
       "if-link": 215,
       "if-memory-read": 84,
       "link-equality": 209,
-      "literal-equality": 155,
+      "literal-equality": 156,
       "literal-membership": 2,
       "literal-switch": 3,
       "memory-read-equality": 89,
@@ -2243,7 +2243,7 @@
       "ts/src/syntax-aset-contract.ts": 11,
       "ts/src/tooling/cli.ts": 3,
       "ts/src/tooling/docs-coverage.ts": 1,
-      "ts/src/tooling/docs-sync.ts": 12,
+      "ts/src/tooling/docs-sync.ts": 13,
       "ts/src/tooling/markdown-coverage-audit.ts": 2,
       "ts/src/tooling/markdown-section-adapter.ts": 17,
       "ts/src/tooling/mts-compiler.ts": 6,
@@ -2343,7 +2343,7 @@
       "proof-replay": 91,
       "representation": 55,
       "semantic-authority": 88,
-      "tooling": 48,
+      "tooling": 49,
       "transport-persistence": 23
     },
     "unclassifiedDecisionCandidateOwnerCount": 0,

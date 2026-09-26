@@ -6,6 +6,32 @@ import { compileRequirementDocuments } from "./mts-compiler.js";
 export const PROJECTION_START = "<!-- мтс-текущая-проекция:начало -->";
 export const PROJECTION_END = "<!-- мтс-текущая-проекция:конец -->";
 
+export const CURRENT_DOC_SIZE_SURFACE = [
+  "README.md",
+  "docs/CONTRIBUTING.md",
+  "docs/theory/Основания МТС.md",
+  "docs/theory/Система аксиом МТС.md",
+  "docs/specs/Формальная нотация МТС.md",
+  "docs/specs/Ачисла и сериализация.md",
+  "docs/specs/Апамять и управление сетью связей.md",
+  "docs/specs/Пучки связей.md",
+  "docs/Словарь терминов МТС.md",
+] as const;
+
+export const CURRENT_DOC_SIZE_BUDGET = Object.freeze({
+  baselineCodePoints: 162787,
+  baselineLines: 5499,
+  baselineWords: 19967,
+  hardCeilingCodePoints: 170926,
+});
+
+export interface DocumentationSizeMeasurement {
+  readonly documentCount: number;
+  readonly codePoints: number;
+  readonly lines: number;
+  readonly words: number;
+}
+
 /**
  * README — единственный владелец краткой автоматически синхронизируемой проекции
  * текущего выпуска. Теория и процессные документы не получают копию release manifest.
@@ -408,6 +434,45 @@ export function checkProjectionText(source: string, projection: string): boolean
   }
 }
 
+export function measureDocumentationSize(
+  documents: Readonly<Record<string, string>>,
+): DocumentationSizeMeasurement {
+  let codePoints = 0;
+  let lines = 0;
+  let words = 0;
+  for (const path of CURRENT_DOC_SIZE_SURFACE) {
+    const source = documents[path];
+    if (source === undefined) fail(`size-budget document is missing: ${path}`);
+    codePoints += [...source].length;
+    lines += source.length === 0 ? 0 : source.split(/\r?\n/).length;
+    words += source.match(/[\p{L}\p{N}_]+/gu)?.length ?? 0;
+  }
+  return Object.freeze({
+    documentCount: CURRENT_DOC_SIZE_SURFACE.length,
+    codePoints,
+    lines,
+    words,
+  });
+}
+
+export function measureRepositoryCurrentDocumentationSize(
+  root = findRepositoryRoot(),
+): DocumentationSizeMeasurement {
+  const documents: Record<string, string> = {};
+  for (const path of CURRENT_DOC_SIZE_SURFACE) {
+    const fullPath = resolve(root, path);
+    if (!existsSync(fullPath)) fail(`size-budget document is missing: ${path}`);
+    documents[path] = readFileSync(fullPath, "utf8");
+  }
+  return measureDocumentationSize(documents);
+}
+
+export function currentDocumentationSizeWithinBudget(
+  measurement: DocumentationSizeMeasurement,
+): boolean {
+  return measurement.codePoints <= CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints;
+}
+
 export function checkRepositoryDocs(root = findRepositoryRoot()): string[] {
   const projection = renderCurrentProjection(loadCurrentProjection(root));
   const stale = CANONICAL_DOCS.filter((path) => {
@@ -452,7 +517,13 @@ function main(): void {
   if (stale.length) fail(`устарела автоматическая проекция: ${stale.join(", ")}; запустите npm --prefix ts run docs:sync`);
   const lawIssues = checkRepositorySemanticLawDocumentation(root);
   if (lawIssues.length) fail(`нарушена документационная канонизация законов: ${lawIssues.map((issue) => issue.message).join("; ")}`);
-  console.log("MTS Compiler: release-проекция, requirement-блоки и владельцы semantic laws синхронизированы.");
+  const size = measureRepositoryCurrentDocumentationSize(root);
+  if (!currentDocumentationSizeWithinBudget(size)) {
+    fail(`current documentation size ${size.codePoints} exceeds hard ceiling ${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints} code points`);
+  }
+  console.log(
+    `MTS Compiler: docs synchronized; current-doc size=${size.codePoints} code points / ${size.lines} lines / ${size.words} words; ceiling=${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints}.`,
+  );
 }
 
 const invokedPath = process.argv[1] === undefined ? undefined : resolve(process.argv[1]);
