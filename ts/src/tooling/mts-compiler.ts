@@ -15,6 +15,10 @@ export interface MtsRequirementProjection {
   readonly statement: string;
   readonly authorityDocument: string;
   readonly authorityPointer: string;
+  readonly traceabilityPath: string;
+  readonly positiveVectorCount: number;
+  readonly negativeVectorCount: number;
+  readonly executableGateCount: number;
   readonly docPath: string;
   readonly docAnchor: string;
 }
@@ -126,6 +130,16 @@ export function loadMtsSemanticIr(
   }
 
   const laws = object(contract.requiredSemanticLaws, `${contractPath}.requiredSemanticLaws`);
+  const traceabilitySource = object(registry.traceabilitySource, `${registryPath}.traceabilitySource`);
+  const traceabilityPath = string(traceabilitySource.path, `${registryPath}.traceabilitySource.path`);
+  const traceability = readJson(root, traceabilityPath);
+  if (string(traceability.contract, `${traceabilityPath}.contract`) !== contractPath) {
+    fail(`${traceabilityPath} does not target current contract path ${contractPath}`);
+  }
+  if (string(traceability.conformance, `${traceabilityPath}.conformance`) !== string(contract.conformanceCorpus, `${contractPath}.conformanceCorpus`)) {
+    fail(`${traceabilityPath} conformance does not match current contract`);
+  }
+  const invariants = object(traceability.invariants, `${traceabilityPath}.invariants`);
   const docs = object(contract.normativeDocumentation, `${contractPath}.normativeDocumentation`);
   const owners = object(docs.owners, `${contractPath}.normativeDocumentation.owners`);
 
@@ -156,6 +170,25 @@ export function loadMtsSemanticIr(
       fail(`${id} authority must point to its accepted contract law`);
     }
 
+    const invariant = object(invariants[id], `${traceabilityPath}.invariants.${id}`);
+    if (string(invariant.contractPointer, `${traceabilityPath}.invariants.${id}.contractPointer`) !== `/requiredSemanticLaws/${id}`) {
+      fail(`${id} traceability contract pointer is not its accepted law`);
+    }
+    const positive = object(invariant.positive, `${traceabilityPath}.invariants.${id}.positive`);
+    const negative = object(invariant.negative, `${traceabilityPath}.invariants.${id}.negative`);
+    const countVectors = (value: JsonObject, name: string): number => Object.entries(value).reduce((total, [key, candidate]) => {
+      if (!Array.isArray(candidate) || candidate.some((entry) => typeof entry !== "string")) {
+        fail(`${name}.${key} must be an array of strings`);
+      }
+      return total + candidate.length;
+    }, 0);
+    const positiveVectorCount = countVectors(positive, `${traceabilityPath}.invariants.${id}.positive`);
+    const negativeVectorCount = countVectors(negative, `${traceabilityPath}.invariants.${id}.negative`);
+    const executableGateCount = strings(
+      invariant.requiredExecutableGates,
+      `${traceabilityPath}.invariants.${id}.requiredExecutableGates`,
+    ).length;
+
     const docProjection = object(value.docProjection, `requirements[${index}].docProjection`);
     const docPath = string(docProjection.path, `requirements[${index}].docProjection.path`);
     const docAnchor = string(docProjection.anchor, `requirements[${index}].docProjection.anchor`);
@@ -175,12 +208,17 @@ export function loadMtsSemanticIr(
       statement,
       authorityDocument,
       authorityPointer,
+      traceabilityPath,
+      positiveVectorCount,
+      negativeVectorCount,
+      executableGateCount,
       docPath,
       docAnchor,
     });
   });
 
   exactSet("requirement id set", requirements.map((item) => item.id), Object.keys(laws));
+  exactSet("traceability invariant id set", Object.keys(invariants), Object.keys(laws));
   validateDependencyGraph(requirements);
 
   requirements.sort((left, right) => left.order - right.order || left.id.localeCompare(right.id));
@@ -202,6 +240,7 @@ export function renderRequirementProjection(item: MtsRequirementProjection): str
     `> **Скомпилированное требование \`${item.id}\`.** Вид: \`${item.kind}\`; классификация: \`${item.classificationPath}\`.`,
     ">",
     `> Машинный источник: \`${item.authorityDocument}#${item.authorityPointer}\`.`,
+    `> Свидетельства: +${item.positiveVectorCount} / -${item.negativeVectorCount}; исполняемых проверок: ${item.executableGateCount}; трассировка: \`${item.traceabilityPath}\`.`,
     marker(item.id, "end"),
   ].join("\n");
 }
