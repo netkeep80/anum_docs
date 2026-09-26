@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compileRequirementDocuments } from "./mts-compiler.js";
 import { auditRepositoryMarkdownLinks } from "./markdown-link-audit.js";
+import { auditRepositoryStableAnchors } from "./markdown-anchor-baseline.js";
 
 export const PROJECTION_START = "<!-- мтс-текущая-проекция:начало -->";
 export const PROJECTION_END = "<!-- мтс-текущая-проекция:конец -->";
@@ -521,6 +522,10 @@ function main(): void {
   const linkIssues = auditRepositoryMarkdownLinks(root, CURRENT_DOC_SIZE_SURFACE);
   if (linkIssues.length) {
     fail(`нарушена целостность локальных Markdown-ссылок: ${linkIssues.map((issue) => issue.message).join("; ")}`);
+  }
+  const anchorIssues = auditRepositoryStableAnchors(root);
+  if (anchorIssues.length) {
+    fail(`нарушена сохранность stable Markdown anchors: ${anchorIssues.map((issue) => issue.message).join("; ")}`);
   }
   const size = measureRepositoryCurrentDocumentationSize(root);
   if (!currentDocumentationSizeWithinBudget(size)) {
