@@ -16,7 +16,7 @@ const model = buildRequirementNavigationModel(ir);
 same(model.entries.length, ir.requirements.length, "all validated requirements are navigable");
 same(model.diagnostics.length, 0, "validated current IR has no unresolved navigation diagnostics");
 same(model.versionComparison.available, false, "single compiled registry does not fabricate version comparison");
-assert(model.versionComparison.reason?.includes("compiler-supported requirement registry") === true, "missing previous registry is explicit");
+assert(model.versionComparison.reason?.includes("реестра требований") === true, "missing previous registry is explicit");
 assert(model.kinds.length > 0, "kind filters are derived");
 assert(model.statuses.includes("accepted"), "status filters are derived");
 assert(model.layers.includes("representation"), "top-level classification layers are derived");
@@ -51,7 +51,7 @@ const compared = buildRequirementNavigationModel(ir, previous).versionComparison
 same(compared.available, true, "comparison activates only with a second validated-style IR");
 same(compared.previousContract, "mts-contract/previous-fixture", "previous contract identity is explicit");
 same(compared.rows.find((row) => row.id === changed.id)?.state, "changed", "stable ID detects changed metadata");
-same(compared.rows.find((row) => row.id === ir.requirements.at(-1)!.id)?.state, "added", "current-only stable ID is added");
+same(compared.rows.find((row) => row.id === ir.requirements[ir.requirements.length - 1]!.id)?.state, "added", "current-only stable ID is added");
 same(compared.rows.find((row) => row.id === "OLD")?.state, "removed", "previous-only stable ID is removed");
 
 console.log(`Contract Observatory P3b requirement navigation: GREEN requirements=${model.entries.length} diagnostics=${model.diagnostics.length}`);
