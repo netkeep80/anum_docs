@@ -35,7 +35,12 @@ function issue(
   clauseId?: string,
   evidence?: string,
 ): FoundationProvenanceIssue {
-  return Object.freeze({ code, clauseId, evidence, message });
+  return Object.freeze({
+    code,
+    message,
+    ...(clauseId === undefined ? {} : { clauseId }),
+    ...(evidence === undefined ? {} : { evidence }),
+  });
 }
 
 export function validateFoundationProvenance(args: {
