@@ -7,6 +7,7 @@ import {
 } from "../src/interaction.js";
 import { buildMethodologyProjection } from "../src/methodology-projection.js";
 import { renderContractObservatoryHtml } from "../src/site.js";
+import { loadCompiledMtsSemanticIr } from "../src/semantic-ir-bridge.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Contract Observatory RU: ${message}`);
@@ -15,7 +16,8 @@ function assert(condition: unknown, message: string): asserts condition {
 const repositoryRoot = process.cwd();
 const index = buildContractObservatoryIndex(repositoryRoot);
 const projection = buildMethodologyProjection(repositoryRoot, index);
-const html = renderContractObservatoryHtml(index, projection);
+const semanticIr = loadCompiledMtsSemanticIr(repositoryRoot);
+const html = renderContractObservatoryHtml(index, projection, semanticIr);
 
 const candidateSummary = Object.freeze({
   ...index.versions[0]!,
@@ -62,6 +64,13 @@ for (const marker of [
   "<h1>Обозреватель контрактов МТС</h1>",
   ">Хронология<",
   ">Обзор версий<",
+  "Проверяемые требования",
+  "Живая проекция проверенного семантического IR",
+  "Классификация",
+  "Зависимости",
+  "Семантический источник",
+  "Трассировка",
+  "Документация",
   "Карта методологии и жизненного цикла версий",
   "Теория",
   "Контракт",

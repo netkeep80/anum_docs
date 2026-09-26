@@ -8,15 +8,18 @@ import {
   type ObservatoryInteractionVersionConfig,
 } from "./interaction.js";
 import type { MethodologyProjection, MethodologyVersionProjection } from "./methodology-projection.js";
+import type { ObservatoryRequirement, ObservatorySemanticIr } from "./semantic-ir-bridge.js";
 
 export function renderContractObservatoryHtml(
   index: ContractObservatoryIndex,
   methodology?: MethodologyProjection,
+  semanticIr?: ObservatorySemanticIr,
 ): string {
   const interactive = methodology !== undefined;
   const timeline = index.versions.map((version, ordinal) => renderTimelineItem(version, ordinal, interactive)).join("\n");
   const versions = index.versions.map((version, ordinal) => renderVersionSection(version, ordinal)).join("\n");
   const methodologyMap = methodology === undefined ? "" : renderMethodologyMap(methodology);
+  const requirementMap = semanticIr === undefined ? "" : renderSemanticRequirementMap(semanticIr);
 
   return `<!doctype html>
 <html lang="ru">
@@ -37,7 +40,21 @@ export function renderContractObservatoryHtml(
     h1 { margin: 0; font-size: clamp(2rem, 6vw, 4.5rem); line-height: .95; max-width: 12ch; }
     .lede { margin: 0; max-width: 72ch; line-height: 1.6; opacity: .82; }
     .provenance { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin: 1.5rem 0 2rem; }
-    .provenance div, .version-card, .methodology-map { border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 1rem; background: color-mix(in srgb, Canvas 94%, CanvasText 6%); }
+    .provenance div, .version-card, .methodology-map, .requirement-map { border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 1rem; background: color-mix(in srgb, Canvas 94%, CanvasText 6%); }
+    .requirement-map { padding: 1.2rem; margin: 0 0 2.5rem; }
+    .requirement-map h2 { margin: 0 0 .4rem; font-size: 1.7rem; }
+    .requirement-map > p { margin: 0 0 1rem; max-width: 82ch; line-height: 1.5; opacity: .8; }
+    .requirement-tree, .requirement-tree ul { list-style: none; margin: .45rem 0 0; padding-left: 1rem; }
+    .requirement-tree { padding-left: 0; }
+    .requirement-branch { margin: .5rem 0; }
+    .requirement-branch > details > summary { cursor: pointer; font-weight: 800; }
+    .requirement-list { display: grid; gap: .7rem; padding: .7rem 0 0; }
+    .requirement-card { padding: .85rem; border: 1px solid color-mix(in srgb, CanvasText 16%, transparent); border-radius: .75rem; background: color-mix(in srgb, Canvas 97%, CanvasText 3%); }
+    .requirement-card h4 { margin: 0 0 .5rem; display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; }
+    .requirement-card blockquote { margin: .55rem 0; padding-left: .8rem; border-left: 3px solid color-mix(in srgb, CanvasText 28%, transparent); line-height: 1.5; }
+    .requirement-meta { display: grid; grid-template-columns: minmax(9rem, .7fr) minmax(0, 1.8fr); gap: .3rem .7rem; margin: .5rem 0 0; font-size: .8rem; }
+    .requirement-meta dd { margin: 0; overflow-wrap: anywhere; }
+    .requirement-doc-link { font-weight: 700; }
     .provenance div { padding: .9rem 1rem; min-width: 0; }
     dt { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
     dd { margin: .35rem 0 0; overflow-wrap: anywhere; }
@@ -122,6 +139,7 @@ export function renderContractObservatoryHtml(
   <div class="shell">
     <header class="hero"><p class="eyebrow">МТС · производные свидетельства</p><h1>Обозреватель контрактов МТС</h1><p class="lede">Статическое представление свидетельств контракта и корпуса соответствия. Эта страница является производной навигацией и не является источником семантики МТС.</p></header>
     <dl class="provenance" aria-label="Происхождение данных">${renderDefinition("Схема индекса", index.schema)}${renderDefinition("Приёмка", index.acceptancePath)}${renderDefinition("Текущий контракт", index.currentContractPath)}${renderDefinition("Предыдущий контракт", index.previousContractPath)}</dl>
+${requirementMap}
 ${methodologyMap}
     <nav class="timeline" aria-labelledby="timeline-title"><h2 id="timeline-title">Хронология</h2><ol>${timeline}</ol></nav>
     <main class="versions" aria-labelledby="versions-title"><h2 id="versions-title">Обзор версий</h2><div class="version-list">${versions}</div></main>
@@ -130,6 +148,48 @@ ${methodologyMap}
 </body>
 </html>
 `;
+}
+
+interface RequirementTreeNode {
+  readonly name: string;
+  readonly path: string;
+  readonly children: Map<string, RequirementTreeNode>;
+  readonly requirements: ObservatoryRequirement[];
+}
+
+function renderSemanticRequirementMap(ir: ObservatorySemanticIr): string {
+  const root: RequirementTreeNode = { name: "", path: "", children: new Map(), requirements: [] };
+  for (const requirement of [...ir.requirements].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id))) {
+    let node = root;
+    const parts = requirement.classificationPath.split("/");
+    for (const part of parts) {
+      const path = node.path.length === 0 ? part : `${node.path}/${part}`;
+      let child = node.children.get(part);
+      if (child === undefined) {
+        child = { name: part, path, children: new Map(), requirements: [] };
+        node.children.set(part, child);
+      }
+      node = child;
+    }
+    node.requirements.push(requirement);
+  }
+  const tree = [...root.children.values()].sort((a, b) => a.name.localeCompare(b.name))
+    .map((node) => renderRequirementBranch(node)).join("");
+  return `    <section class="requirement-map" aria-labelledby="requirements-title"><p class="eyebrow">Живая проекция проверенного семантического IR</p><h2 id="requirements-title">Проверяемые требования · ${escapeHtml(ir.contract)}</h2><p>Иерархия здесь определяется путями классификации контракта, а не порядком Markdown-разделов. Формулировки и свидетельства поступают из того же семантического IR, который компилирует MD-проекции.</p><ul class="requirement-tree">${tree}</ul><p class="raw-provenance">Источник IR: ${escapeHtml(ir.contractPath)} · схема ${escapeHtml(ir.schema)} · требований ${ir.requirements.length}.</p></section>`;
+}
+
+function renderRequirementBranch(node: RequirementTreeNode): string {
+  const requirements = node.requirements.length === 0 ? "" :
+    `<div class="requirement-list">${node.requirements.map(renderRequirementCard).join("")}</div>`;
+  const children = [...node.children.values()].sort((a, b) => a.name.localeCompare(b.name))
+    .map((child) => renderRequirementBranch(child)).join("");
+  return `<li class="requirement-branch" data-requirement-path="${escapeAttribute(node.path)}"><details open><summary>${escapeHtml(node.name)}</summary>${requirements}${children.length === 0 ? "" : `<ul>${children}</ul>`}</details></li>`;
+}
+
+function renderRequirementCard(requirement: ObservatoryRequirement): string {
+  const dependencies = requirement.dependsOn.length === 0 ? "нет" : requirement.dependsOn.join(", ");
+  const sourceHref = `https://github.com/netkeep80/anum_docs/blob/main/${requirement.docPath.split("/").map(encodeURIComponent).join("/")}#${encodeURIComponent(requirement.docAnchor)}`;
+  return `<article id="requirement-${escapeAttribute(requirement.id)}" class="requirement-card" data-requirement-id="${escapeAttribute(requirement.id)}"><h4><span>${escapeHtml(requirement.id)}</span><span class="badge badge-muted">${escapeHtml(requirement.status)}</span><span class="badge badge-muted">${escapeHtml(requirement.kind)}</span></h4><blockquote>${escapeHtml(requirement.statement)}</blockquote><dl class="requirement-meta"><dt>Классификация</dt><dd>${escapeHtml(requirement.classificationPath)}</dd><dt>Зависимости</dt><dd>${escapeHtml(dependencies)}</dd><dt>Отпечаток</dt><dd>${escapeHtml(requirement.statementDigest)}</dd><dt>Свидетельства</dt><dd>+${requirement.positiveVectorCount} / −${requirement.negativeVectorCount}; исполняемых проверок: ${requirement.executableGateCount}</dd><dt>Семантический источник</dt><dd>${escapeHtml(requirement.authorityDocument)}#${escapeHtml(requirement.authorityPointer)}</dd><dt>Трассировка</dt><dd>${escapeHtml(requirement.traceabilityPath)}</dd><dt>Документация</dt><dd><a class="requirement-doc-link" href="${escapeAttribute(sourceHref)}">${escapeHtml(requirement.docPath)}#${escapeHtml(requirement.docAnchor)}</a></dd></dl></article>`;
 }
 
 function renderMethodologyMap(projection: MethodologyProjection): string {
