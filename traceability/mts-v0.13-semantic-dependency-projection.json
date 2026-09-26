@@ -1007,7 +1007,7 @@
       "authorized-semantic-target-materialization": 5
     },
     "packageWideObjectSpecificHostSemanticCount": null,
-    "typedReadMemorySiteCount": 508,
+    "typedReadMemorySiteCount": 515,
     "typedReadMemoryOwnerCount": 233,
     "staticSemanticDecisionCandidateOwnerCount": 381,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
