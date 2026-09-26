@@ -187,17 +187,17 @@ function renderSemanticRequirementMap(ir: ObservatorySemanticIr): string {
   const tree = [...root.children.values()].sort((a, b) => a.name.localeCompare(b.name))
     .map((node) => renderRequirementBranch(node)).join("");
   const diagnostics = model.diagnostics.length === 0
-    ? "<p>Диагностика IR: unresolved/missing metadata = 0. Неполные обязательные поля отсекаются fail-closed до рендера.</p>"
+    ? "<p>Диагностика IR: неразрешённых или отсутствующих обязательных метаданных = 0. Неполные обязательные поля отсекаются до рендера.</p>"
     : `<ul>${model.diagnostics.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>`;
   const comparison = model.versionComparison.available
-    ? `Сравнение по stable ID доступно с ${escapeHtml(model.versionComparison.previousContract ?? "предыдущей версией")}: строк ${model.versionComparison.rows.length}.`
-    : `Сравнение по stable ID недоступно: ${escapeHtml(model.versionComparison.reason ?? "нет второго validated IR")}.`;
+    ? `Сравнение по стабильному ID доступно с ${escapeHtml(model.versionComparison.previousContract ?? "предыдущей версией")}: строк ${model.versionComparison.rows.length}.`
+    : `Сравнение по стабильному ID недоступно: ${escapeHtml(model.versionComparison.reason ?? "нет второго проверенного IR")}.`;
   const controls = [
     renderRequirementFilterGroup("Вид", "kind", model.kinds),
     renderRequirementFilterGroup("Статус", "status", model.statuses),
     renderRequirementFilterGroup("Слой", "layer", model.layers),
   ].join("");
-  return `    <section class="requirement-map" aria-labelledby="requirements-title"><p class="eyebrow">Живая проекция проверенного семантического IR</p><h2 id="requirements-title">Проверяемые требования · ${escapeHtml(ir.contract)}</h2><p>Иерархия определяется путями классификации контракта, а не порядком Markdown-разделов. Формулировки и свидетельства поступают из того же validated semantic IR, который компилирует MD-проекции.</p><div class="requirement-controls" aria-label="Фильтры требований">${controls}<button type="button" class="requirement-clear" data-requirement-clear>Сбросить фильтры</button></div><p class="requirement-filter-status" aria-live="polite">Показано требований: ${model.entries.length}.</p><ul class="requirement-tree">${tree}</ul><div class="requirement-diagnostics" aria-label="Диагностика requirement IR">${diagnostics}<p>${comparison}</p></div><p class="raw-provenance">Источник IR: ${escapeHtml(ir.contractPath)} · схема ${escapeHtml(ir.schema)} · требований ${model.entries.length}.</p></section>
+  return `    <section class="requirement-map" aria-labelledby="requirements-title"><p class="eyebrow">Живая проекция проверенного семантического IR</p><h2 id="requirements-title">Проверяемые требования · ${escapeHtml(ir.contract)}</h2><p>Иерархия определяется путями классификации контракта, а не порядком Markdown-разделов. Формулировки и свидетельства поступают из того же проверенного семантического IR, который компилирует MD-проекции.</p><div class="requirement-controls" aria-label="Фильтры требований">${controls}<button type="button" class="requirement-clear" data-requirement-clear>Сбросить фильтры</button></div><p class="requirement-filter-status" aria-live="polite">Показано требований: ${model.entries.length}.</p><ul class="requirement-tree">${tree}</ul><div class="requirement-diagnostics" aria-label="Диагностика requirement IR">${diagnostics}<p>${comparison}</p></div><p class="raw-provenance">Источник IR: ${escapeHtml(ir.contractPath)} · схема ${escapeHtml(ir.schema)} · требований ${model.entries.length}.</p></section>
 ${renderRequirementFilterControllerScript()}`;
 }
 
