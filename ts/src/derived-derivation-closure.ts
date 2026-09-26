@@ -800,10 +800,6 @@ export function replayStructuralParametricClosureApplication(
       resultConclusionTemplate: resultParts.rule.body,
       base,
       step,
-      stableParameterRoles: Object.freeze([...parameterRoles]),
-      inductionRole,
-      dependentWitnessRole: witnessRole,
-      baseWitnessTargetRole: baseWitness,
     });
   } catch (error) {
     if (error instanceof StructuralClosureApplicationReplayError) throw error;
@@ -1166,6 +1162,10 @@ export function replayStructuralDependentWitnessClosureApplication(
       resultConclusionTemplate: resultParts.rule.body,
       base,
       step,
+      stableParameterRoles: Object.freeze([...parameterRoles]),
+      inductionRole,
+      dependentWitnessRole: witnessRole,
+      baseWitnessTargetRole: baseWitness,
     });
   } catch (error) {
     if (error instanceof StructuralClosureApplicationReplayError) throw error;
