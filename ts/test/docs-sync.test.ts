@@ -184,8 +184,11 @@ try {
   copy("contracts/mts-conformance-v0.13.json");
   copy("contracts/mts-contract-v0.12.json");
   copy("contracts/mts-conformance-v0.12.json");
+  copy("traceability/mts-v0.13.json");
+  copy("requirements/mts-v0.13.json");
   for (const path of CANONICAL_DOCS) copy(path);
   for (const path of PROJECTION_FORBIDDEN_DOCS) copy(path);
+  for (const path of new Set(Object.values(SEMANTIC_LAW_OWNER_BY_ID))) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
   writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.13", "mts-contract/v0.X"), "utf8");
