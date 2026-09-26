@@ -264,12 +264,7 @@ function marker(id: string, side: "begin" | "end"): string {
 }
 
 export function renderRequirementProjectionBody(item: MtsRequirementProjection): string {
-  return [
-    `> **Скомпилированное требование \`${item.id}\`.** Вид: \`${item.kind}\`; классификация: \`${item.classificationPath}\`.`,
-    ">",
-    `> Машинный источник: \`${item.authorityDocument}#${item.authorityPointer}\`; отпечаток формулировки: \`${item.statementDigest}\`.`,
-    `> Свидетельства: +${item.positiveVectorCount} / -${item.negativeVectorCount}; исполняемых проверок: ${item.executableGateCount}; трассировка: \`${item.traceabilityPath}\`.`,
-  ].join("\n");
+  return `> **MTS \`${item.id}\`** · \`${item.kind}\` · \`${item.classificationPath}\` · источник \`${item.authorityDocument}#${item.authorityPointer}\` · digest \`${item.statementDigest}\` · evidence +${item.positiveVectorCount}/-${item.negativeVectorCount} · gates ${item.executableGateCount} · \`${item.traceabilityPath}\`.`;
 }
 
 export function renderRequirementProjection(item: MtsRequirementProjection): string {
