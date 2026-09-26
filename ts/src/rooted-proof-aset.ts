@@ -442,11 +442,9 @@ export function replayConstructorScopedClosedProofOccurrence(
       }
       throw error;
     }
-    if (values.length < 2) fail("invalid-constructor-authority");
+    if (values.length < 1) fail("invalid-constructor-authority");
     const [theory, ...constructors] = values;
-    if (theory === undefined || constructors.length === 0) {
-      fail("invalid-constructor-authority");
-    }
+    if (theory === undefined) fail("invalid-constructor-authority");
 
     try {
       const admission = memory.poles(constructorAuthorityAdmission);
