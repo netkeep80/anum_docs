@@ -1009,12 +1009,12 @@
     "packageWideObjectSpecificHostSemanticCount": null,
     "typedReadMemorySiteCount": 522,
     "typedReadMemoryOwnerCount": 236,
-    "staticSemanticDecisionCandidateOwnerCount": 384,
+    "staticSemanticDecisionCandidateOwnerCount": 387,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
     "staticDecisionOwnersByCategory": {
       "memory-resource-safety": 4,
       "mixed-semantic-transport": 60,
-      "proof-replay": 94,
+      "proof-replay": 97,
       "representation": 55,
       "semantic-authority": 88,
       "tooling": 60,
@@ -2168,7 +2168,7 @@
       "poles": 219,
       "root": 70
     },
-    "decisionCandidateOwnerCount": 384,
+    "decisionCandidateOwnerCount": 387,
     "decisionCandidateFingerprintFNV64": "bf79bb9fb771bf01",
     "decisionSignalCounts": {
       "ambient-mutable-decision": 63,
@@ -2196,7 +2196,7 @@
       "ts/src/context-integration.ts": 7,
       "ts/src/derivation.ts": 8,
       "ts/src/derived-derivation-application.ts": 1,
-      "ts/src/derived-derivation-closure.ts": 8,
+      "ts/src/derived-derivation-closure.ts": 11,
       "ts/src/derived-derivation-cross-scope.ts": 3,
       "ts/src/derived-derivation-heterogeneous-discharge-materialize.ts": 3,
       "ts/src/derived-derivation-heterogeneous-discharge.ts": 2,
@@ -2346,7 +2346,7 @@
     "decisionOwnerCountsByCategory": {
       "memory-resource-safety": 4,
       "mixed-semantic-transport": 60,
-      "proof-replay": 94,
+      "proof-replay": 97,
       "representation": 55,
       "semantic-authority": 88,
       "tooling": 60,
