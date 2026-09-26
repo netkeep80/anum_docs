@@ -1062,14 +1062,6 @@ for (const signal of Object.keys(decisionAudit.decisionSignalCounts)) {
   observedDecisionSignalCounts[signal] ??= 0;
 }
 
-console.log("P1F_RECALC", JSON.stringify({
-  decisionCandidateOwnerCount: decisionCandidates.length,
-  decisionCandidateFingerprintFNV64: fnv1a64(decisionSignatures),
-  decisionOwnerCountsByFile: Object.fromEntries(Object.entries(observedDecisionCountsByFile).sort()),
-  decisionSignalCounts: Object.fromEntries(Object.entries(observedDecisionSignalCounts).sort()),
-  decisionOwnerCountsByCategory: Object.fromEntries(Object.entries(observedDecisionCountsByCategory).sort()),
-}));
-
 same(decisionAudit.scope, "S3", "P1f uses whole-package audit scope");
 same(projection.measurement.scope, "S3", "measurement revision declares S3 scope");
 same(
