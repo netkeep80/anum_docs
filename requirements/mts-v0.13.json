@@ -240,5 +240,8 @@
         "anchor": "mts-law-L13"
       }
     }
-  ]
+  ],
+  "traceabilitySource": {
+    "path": "traceability/mts-v0.13.json"
+  }
 }
