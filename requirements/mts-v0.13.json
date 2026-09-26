@@ -243,5 +243,43 @@
   ],
   "traceabilitySource": {
     "path": "traceability/mts-v0.13.json"
+  },
+  "documentSurface": {
+    "README.md": {
+      "mode": "hybrid"
+    },
+    "PORTFOLIO.md": {
+      "mode": "source"
+    },
+    "docs/CONTRIBUTING.md": {
+      "mode": "source"
+    },
+    "docs/research/Исходные мысли МТС.md": {
+      "mode": "source"
+    },
+    "docs/research/Новое осмысление МТС.md": {
+      "mode": "source"
+    },
+    "docs/specs/Апамять и управление сетью связей.md": {
+      "mode": "hybrid"
+    },
+    "docs/specs/Ачисла и сериализация.md": {
+      "mode": "hybrid"
+    },
+    "docs/specs/Пучки связей.md": {
+      "mode": "source"
+    },
+    "docs/specs/Формальная нотация МТС.md": {
+      "mode": "hybrid"
+    },
+    "docs/theory/Основания МТС.md": {
+      "mode": "source"
+    },
+    "docs/theory/Система аксиом МТС.md": {
+      "mode": "source"
+    },
+    "docs/Словарь терминов МТС.md": {
+      "mode": "source"
+    }
   }
 }
