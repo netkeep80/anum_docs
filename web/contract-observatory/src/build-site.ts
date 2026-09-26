@@ -3,6 +3,7 @@ import { resolve, sep } from "node:path";
 
 import { buildContractObservatoryIndex } from "./contract-index.js";
 import { buildMethodologyProjection } from "./methodology-projection.js";
+import { loadCompiledMarkdownCoverage } from "./markdown-coverage-bridge.js";
 import { renderContractObservatoryHtml } from "./site.js";
 import { loadCompiledMtsSemanticIr } from "./semantic-ir-bridge.js";
 
@@ -24,7 +25,8 @@ export function materializeContractObservatorySite(
   const index = buildContractObservatoryIndex(repositoryPath);
   const methodology = buildMethodologyProjection(repositoryPath, index);
   const semanticIr = loadCompiledMtsSemanticIr(repositoryPath);
-  const html = renderContractObservatoryHtml(index, methodology, semanticIr);
+  const markdownCoverage = loadCompiledMarkdownCoverage(repositoryPath);
+  const html = renderContractObservatoryHtml(index, methodology, semanticIr, markdownCoverage);
   const indexPath = resolve(outputPath, "index.html");
   const noJekyllPath = resolve(outputPath, ".nojekyll");
 
