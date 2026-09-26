@@ -11,6 +11,7 @@ import {
 } from "../src/contract-index.js";
 import { buildMethodologyProjection } from "../src/methodology-projection.js";
 import { renderContractObservatoryHtml } from "../src/site.js";
+import { loadCompiledMtsSemanticIr } from "../src/semantic-ir-bridge.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Contract Observatory V3b/V3c/V4c: ${message}`);
@@ -77,7 +78,8 @@ function index(versions: readonly ContractVersionSummary[]): ContractObservatory
 const repositoryRoot = process.cwd();
 const realIndex = buildContractObservatoryIndex(repositoryRoot);
 const realProjection = buildMethodologyProjection(repositoryRoot, realIndex);
-const realHtml = renderContractObservatoryHtml(realIndex, realProjection);
+const realSemanticIr = loadCompiledMtsSemanticIr(repositoryRoot);
+const realHtml = renderContractObservatoryHtml(realIndex, realProjection, realSemanticIr);
 
 assert(realIndex.versions.length >= 2, "repository exposes at least current and previous accepted versions");
 assert(realHtml.startsWith("<!doctype html>\n<html lang=\"ru\">"), "browser document baseline");
@@ -88,7 +90,14 @@ assert(realHtml.includes("<nav class=\"timeline\""), "timeline landmark retained
 assert(realHtml.includes("<main class=\"versions\""), "V3 version overview retained");
 assert(realHtml.includes(":focus-visible"), "visible keyboard focus styling");
 assert(realHtml.includes("@media (max-width: 680px)"), "responsive baseline");
-assert(!realHtml.includes("http://") && !realHtml.includes("https://"), "no external network dependency");
+assert(!realHtml.includes('<script src="http') && !realHtml.includes('<link rel="stylesheet" href="http'), "no external runtime asset dependency");
+same(realSemanticIr.requirements.length, 13, "P3a renders compiler-supported v0.13 requirements");
+assert(realHtml.includes('id="requirements-title"'), "semantic requirement hierarchy is rendered");
+assert(realHtml.includes('data-requirement-id="L4"'), "stable requirement ID is rendered");
+assert(realHtml.includes("representation/recursive-alphabet/prefix-codec"), "contract classification path is rendered");
+assert(realHtml.includes("f740e98eade6204d"), "statement digest is rendered");
+assert(realHtml.includes(realSemanticIr.requirements.find((item) => item.id === "L4")!.statement), "exact contract statement is rendered");
+assert(realHtml.includes("https://github.com/netkeep80/anum_docs/blob/main/docs/specs/"), "human Markdown projection has direct source navigation");
 
 assert(realHtml.includes("<section class=\"methodology-map\""), "V4c methodology map is rendered as the primary explanatory view");
 assert(realHtml.includes("aria-label=\"Стадии методологии\""), "methodology stages expose a semantic keyboard-navigation group");
