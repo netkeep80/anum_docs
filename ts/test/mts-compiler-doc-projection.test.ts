@@ -15,8 +15,128 @@ import {
   renderRequirementProjection,
   upsertRequirementProjection,
 } from "../src/tooling/mts-compiler.js";
+import {
+  assertOutsideOwnedBlockUnchanged,
+  listRepositoryMarkdownSurface,
+  readOwnedMarkdownBlock,
+  replaceOwnedMarkdownSection,
+  resolveMarkdownAnchor,
+} from "../src/tooling/markdown-section-adapter.js";
 
 const root = resolve(process.cwd(), "..");
+
+const markdownDb = [
+  "# Документ",
+  "<a id=\"root\"></a>",
+  "Авторский текст корня.",
+  "",
+  "## Первый раздел",
+  "<a id=\"node-a\"></a>",
+  "Авторский payload A.",
+  "",
+  "### Дочерний раздел",
+  "<a id=\"node-a-child\"></a>",
+  "Дочерний payload.",
+  "",
+  "## Второй раздел",
+  "<a id=\"node-b\"></a>",
+  "Авторский payload B.",
+  "",
+  "```html",
+  "<a id=\"fake\"></a>",
+  "<!-- mts:req:FAKE:begin -->",
+  "<!-- mts:req:FAKE:end -->",
+  "```",
+].join("\n");
+
+const nodeA = resolveMarkdownAnchor(markdownDb, "node-a");
+assert.deepEqual(
+  nodeA.headingPath.map((item) => [item.level, item.title]),
+  [[1, "Документ"], [2, "Первый раздел"]],
+  "anchor address must expose hierarchical heading path",
+);
+const child = resolveMarkdownAnchor(markdownDb, "node-a-child");
+assert.deepEqual(
+  child.headingPath.map((item) => [item.level, item.title]),
+  [[1, "Документ"], [2, "Первый раздел"], [3, "Дочерний раздел"]],
+  "child address must preserve tree ancestry",
+);
+assert.throws(() => resolveMarkdownAnchor(markdownDb, "fake"), /anchor not found/, "code-fence anchors are not database nodes");
+
+const firstWrite = replaceOwnedMarkdownSection({
+  source: markdownDb,
+  mode: "hybrid",
+  anchorId: "node-a",
+  blockId: "REQ_A",
+  generatedContent: "> generated A",
+});
+const firstBlock = readOwnedMarkdownBlock(firstWrite, "REQ_A");
+assert.ok(firstBlock);
+assert.match(firstBlock.content, /> generated A/);
+assert.match(firstWrite, /Авторский payload A\./, "authored payload must survive insertion");
+assert.match(firstWrite, /Дочерний payload\./, "child subtree must survive insertion");
+assert.match(firstWrite, /Авторский payload B\./, "sibling subtree must survive insertion");
+
+const secondWrite = replaceOwnedMarkdownSection({
+  source: firstWrite,
+  mode: "hybrid",
+  anchorId: "node-a",
+  blockId: "REQ_A",
+  generatedContent: "> generated A v2",
+});
+assertOutsideOwnedBlockUnchanged(firstWrite, secondWrite, "REQ_A");
+assert.match(secondWrite, /> generated A v2/);
+assert.doesNotMatch(secondWrite, /> generated A\n/);
+
+assert.equal(
+  replaceOwnedMarkdownSection({
+    source: secondWrite,
+    mode: "hybrid",
+    anchorId: "node-a",
+    blockId: "REQ_A",
+    generatedContent: "> generated A v2",
+  }),
+  secondWrite,
+  "same write must be idempotent",
+);
+
+assert.throws(
+  () => replaceOwnedMarkdownSection({
+    source: markdownDb,
+    mode: "source",
+    anchorId: "node-a",
+    blockId: "REQ_A",
+    generatedContent: "> forbidden",
+  }),
+  /SOURCE document is read-only/,
+  "SOURCE documents are immutable through the adapter",
+);
+assert.throws(
+  () => replaceOwnedMarkdownSection({
+    source: markdownDb,
+    mode: "generated",
+    anchorId: "node-a",
+    blockId: "REQ_A",
+    generatedContent: "> forbidden",
+  }),
+  /whole-file GENERATED mode is not supported/,
+  "P1 must not silently gain whole-file overwrite authority",
+);
+
+const duplicateAnchor = markdownDb + "\n<a id=\"node-a\"></a>\n";
+assert.throws(() => resolveMarkdownAnchor(duplicateAnchor, "node-a"), /anchor is duplicated/);
+
+const malformedBlock = markdownDb.replace(
+  "Авторский payload A.",
+  "Авторский payload A.\n<!-- mts:req:REQ_A:begin -->",
+);
+assert.throws(() => readOwnedMarkdownBlock(malformedBlock, "REQ_A"), /malformed owned block/);
+
+const surface = listRepositoryMarkdownSurface(root);
+assert.equal(new Set(surface).size, surface.length, "Markdown surface paths must be unique");
+assert.ok(surface.includes("docs/research/Исходные мысли МТС.md"));
+assert.ok(surface.includes("docs/theory/Система аксиом МТС.md"));
+
 const ir = loadMtsSemanticIr(root);
 
 assert.equal(ir.contract, "mts-contract/v0.13");
@@ -128,5 +248,7 @@ console.log([
   "SEMANTIC_DIGEST=BOUND",
   "TRACEABILITY=BOUND",
   "TRACKED_MD=COMPILED",
+  "MARKDOWN_DB_ADAPTER=GREEN",
+  "AUTHORED_BYTES_PRESERVED=GREEN",
   "FAIL_CLOSED=GREEN",
 ].join(" "));
