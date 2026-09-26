@@ -2,6 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compileRequirementDocuments } from "./mts-compiler.js";
+import { auditRepositoryMarkdownLinks } from "./markdown-link-audit.js";
 
 export const PROJECTION_START = "<!-- мтс-текущая-проекция:начало -->";
 export const PROJECTION_END = "<!-- мтс-текущая-проекция:конец -->";
@@ -517,6 +518,10 @@ function main(): void {
   if (stale.length) fail(`устарела автоматическая проекция: ${stale.join(", ")}; запустите npm --prefix ts run docs:sync`);
   const lawIssues = checkRepositorySemanticLawDocumentation(root);
   if (lawIssues.length) fail(`нарушена документационная канонизация законов: ${lawIssues.map((issue) => issue.message).join("; ")}`);
+  const linkIssues = auditRepositoryMarkdownLinks(root, CURRENT_DOC_SIZE_SURFACE);
+  if (linkIssues.length) {
+    fail(`нарушена целостность локальных Markdown-ссылок: ${linkIssues.map((issue) => issue.message).join("; ")}`);
+  }
   const size = measureRepositoryCurrentDocumentationSize(root);
   if (!currentDocumentationSizeWithinBudget(size)) {
     fail(`current documentation size ${size.codePoints} exceeds hard ceiling ${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints} code points`);
