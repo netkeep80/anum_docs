@@ -178,7 +178,7 @@ try {
     "contracts/mts-contract-v0.13.json",
     "traceability/mts-v0.13.json",
     "requirements/mts-v0.13.json",
-    ...new Set(ir.requirements.map((item) => item.docPath)),
+    ...listRepositoryMarkdownSurface(root),
   ]) copy(path);
 
   const contractPath = resolve(tempRoot, "contracts/mts-contract-v0.13.json");
@@ -215,6 +215,35 @@ try {
     compileRequirementDocuments(tempRoot, false),
     ["docs/specs/Ачисла и сериализация.md"],
     "classification change must make its compiled Markdown stale",
+  );
+  writeFileSync(registryPath, originalRegistry, "utf8");
+
+  const rogueDoc = resolve(tempRoot, "docs/Новый неизвестный документ.md");
+  writeFileSync(rogueDoc, "# Новый документ\n", "utf8");
+  assert.throws(
+    () => loadMtsSemanticIr(tempRoot),
+    /Markdown document surface differs/,
+    "new Markdown files must be explicitly classified before the compiler can proceed",
+  );
+  rmSync(rogueDoc);
+
+  const sourceTarget = JSON.parse(originalRegistry) as any;
+  sourceTarget.documentSurface["docs/specs/Ачисла и сериализация.md"].mode = "source";
+  writeFileSync(registryPath, JSON.stringify(sourceTarget), "utf8");
+  assert.throws(
+    () => loadMtsSemanticIr(tempRoot),
+    /doc projection target must be HYBRID/,
+    "requirements must never gain write access to SOURCE documents",
+  );
+  writeFileSync(registryPath, originalRegistry, "utf8");
+
+  const generatedTarget = JSON.parse(originalRegistry) as any;
+  generatedTarget.documentSurface["docs/specs/Ачисла и сериализация.md"].mode = "generated";
+  writeFileSync(registryPath, JSON.stringify(generatedTarget), "utf8");
+  assert.throws(
+    () => loadMtsSemanticIr(tempRoot),
+    /whole-file GENERATED mode is forbidden in P1/,
+    "whole-file generation must remain impossible in P1",
   );
   writeFileSync(registryPath, originalRegistry, "utf8");
 
