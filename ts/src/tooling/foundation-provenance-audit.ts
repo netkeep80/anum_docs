@@ -50,7 +50,7 @@ export function validateFoundationProvenance(args: {
   readonly localEvidenceExists: (path: string) => boolean;
   readonly expectedGapClauseIds?: readonly string[];
 }): FoundationProvenanceSummary {
-  const expectedGaps = [...(args.expectedGapClauseIds ?? KNOWN_FOUNDATION_EVIDENCE_GAPS)].sort();
+  const expectedGaps = [...(args.expectedGapClauseIds ?? KNOWN_FOUNDATION_EVIDENCE_GAPS)];
   const issues: FoundationProvenanceIssue[] = [];
   const scope = [...args.scope];
   const uniqueScope = new Set(scope);
@@ -113,21 +113,22 @@ export function validateFoundationProvenance(args: {
     }
   }
 
-  const actualGaps = [...gapIds].sort();
+  const expectedGapSet = new Set(expectedGaps);
+  const actualGapSet = new Set(gapIds);
   if (
-    actualGaps.length !== expectedGaps.length ||
-    actualGaps.some((id, index) => id !== expectedGaps[index])
+    actualGapSet.size !== expectedGapSet.size ||
+    [...actualGapSet].some((id) => !expectedGapSet.has(id))
   ) {
     issues.push(issue(
       "gap-baseline-drift",
-      `foundation direct-evidence gap set drifted: expected=[${expectedGaps.join(",")}] actual=[${actualGaps.join(",")}]`,
+      `foundation direct-evidence gap set drifted: expected=[${expectedGaps.join(",")}] actual=[${gapIds.join(",")}]`,
     ));
   }
 
   return Object.freeze({
     clauseCount: scope.length,
     directEvidenceClauseCount,
-    gapClauseIds: Object.freeze(actualGaps),
+    gapClauseIds: Object.freeze([...gapIds]),
     issues: Object.freeze(issues),
   });
 }
