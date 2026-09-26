@@ -33,6 +33,16 @@ export interface MarkdownNode {
   readonly subtree: string;
 }
 
+export interface MarkdownSection {
+  readonly diagnosticLine: number;
+  readonly heading: MarkdownHeading;
+  readonly headingPath: readonly MarkdownHeading[];
+  readonly anchorId: string | null;
+  readonly start: number;
+  readonly end: number;
+  readonly content: string;
+}
+
 export interface MarkdownChildSpec {
   readonly anchorId: string;
   readonly title: string;
@@ -215,6 +225,43 @@ export function listMarkdownChildren(source: string, parentAnchorId: string): re
     .sort((left, right) => left.start - right.start));
 }
 
+export function listMarkdownSections(source: string): readonly MarkdownSection[] {
+  const lines = linesOf(source);
+  const nodesByHeadingLine = new Map<number, MarkdownNode>();
+  for (const anchorId of listMarkdownAnchorIds(source)) {
+    const node = nodeOrNull(source, anchorId);
+    if (node === null) continue;
+    if (nodesByHeadingLine.has(node.headingLine)) {
+      fail(`heading at line ${node.headingLine} has multiple canonical node anchors`);
+    }
+    nodesByHeadingLine.set(node.headingLine, node);
+  }
+
+  const headingLines = lines.filter((line) => headingOf(line) !== null);
+  return Object.freeze(headingLines.map((line, index) => {
+    const heading = headingOf(line)!;
+    const node = nodesByHeadingLine.get(line.line);
+    const next = headingLines.slice(index + 1).find((candidate) => {
+      const candidateHeading = headingOf(candidate)!;
+      return candidateHeading.level <= heading.level;
+    });
+    let end = source.length;
+    if (next !== undefined) {
+      end = nodesByHeadingLine.get(next.line)?.start ?? next.start;
+    }
+    const start = node?.start ?? line.start;
+    return Object.freeze({
+      diagnosticLine: line.line,
+      heading,
+      headingPath: headingPathAt(lines, line.line),
+      anchorId: node?.anchorId ?? null,
+      start,
+      end,
+      content: source.slice(start, end),
+    });
+  }));
+}
+
 function validateChildSpec(spec: MarkdownChildSpec): void {
   assertSafeId(spec.anchorId, "child.anchorId");
   if (spec.title.trim().length === 0 || /[\r\n]/.test(spec.title)) fail("child title must be one non-empty line");
@@ -285,6 +332,22 @@ export function readOwnedMarkdownBlock(source: string, blockId: string): Markdow
     end: blockEnd,
     content: source.slice(blockStart, blockEnd),
   });
+}
+
+export function listOwnedMarkdownBlockIds(source: string): readonly string[] {
+  const marker = /^<!--\s*мтс:требование:([^:]+):(начало|конец)\s*-->$/;
+  const ids = new Set<string>();
+  for (const line of linesOf(source)) {
+    if (!line.visible) continue;
+    const match = marker.exec(line.text.trim());
+    if (match === null) continue;
+    const id = match[1]!;
+    assertSafeId(id, "owned block id");
+    ids.add(id);
+  }
+  const result = [...ids].sort((left, right) => left.localeCompare(right));
+  for (const id of result) readOwnedMarkdownBlock(source, id);
+  return Object.freeze(result);
 }
 
 function insertAfterAnchorLine(source: string, anchor: MarkdownAddress, block: string): string {
