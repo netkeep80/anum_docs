@@ -10,6 +10,7 @@ import {
   type ContractVersionSummary,
 } from "../src/contract-index.js";
 import { buildMethodologyProjection } from "../src/methodology-projection.js";
+import { loadCompiledMarkdownCoverage, validateMarkdownCoverage } from "../src/markdown-coverage-bridge.js";
 import { renderContractObservatoryHtml } from "../src/site.js";
 import { loadCompiledMtsSemanticIr } from "../src/semantic-ir-bridge.js";
 
@@ -79,7 +80,8 @@ const repositoryRoot = process.cwd();
 const realIndex = buildContractObservatoryIndex(repositoryRoot);
 const realProjection = buildMethodologyProjection(repositoryRoot, realIndex);
 const realSemanticIr = loadCompiledMtsSemanticIr(repositoryRoot);
-const realHtml = renderContractObservatoryHtml(realIndex, realProjection, realSemanticIr);
+const realMarkdownCoverage = loadCompiledMarkdownCoverage(repositoryRoot);
+const realHtml = renderContractObservatoryHtml(realIndex, realProjection, realSemanticIr, realMarkdownCoverage);
 
 assert(realIndex.versions.length >= 2, "repository exposes at least current and previous accepted versions");
 assert(realHtml.startsWith("<!doctype html>\n<html lang=\"ru\">"), "browser document baseline");
@@ -106,6 +108,16 @@ assert(realHtml.includes('href="#requirement-L4"'), "stable requirement ID is UR
 assert(realHtml.includes("Зависимые требования"), "reverse dependency backlinks are rendered");
 assert(realHtml.includes("неразрешённых или отсутствующих обязательных метаданных = 0"), "clean validated IR has explicit zero diagnostics");
 assert(realHtml.includes("Сравнение по стабильному ID недоступно"), "missing previous compiler registry is explicit instead of inferred");
+same(realMarkdownCoverage.summary.documentCount, 12, "P5 renders all registered Markdown documents");
+same(realMarkdownCoverage.summary.headingCount, 306, "P5 preserves P4 heading baseline");
+same(realMarkdownCoverage.summary.canonicalNodeCount, 22, "P5 preserves canonical node baseline");
+same(realMarkdownCoverage.summary.unanchoredHeadingCount, 284, "P5 makes unanchored knowledge explicit");
+same(realMarkdownCoverage.summary.currentlyUnclassifiedSectionCount, 279, "P5 preserves conservative unclassified baseline");
+assert(realHtml.includes('id="coverage-title"'), "Markdown coverage diagnostics are rendered");
+assert(realHtml.includes("Авторский текст:</strong> PRESERVE"), "authored prose preservation boundary is visible");
+assert(realHtml.includes("NOT AUTHORIZED"), "destructive whole-node mutation boundary is visible");
+assert(realHtml.includes("отсутствие requirement ID не означает"), "no-ID safety law is visible");
+throws(() => validateMarkdownCoverage({ schema: "mts-markdown-coverage/v0.1", contract: "x", documents: [], summary: {} }), "malformed coverage payload fails closed");
 
 assert(realHtml.includes("<section class=\"methodology-map\""), "V4c methodology map is rendered as the primary explanatory view");
 assert(realHtml.includes("aria-label=\"Стадии методологии\""), "methodology stages expose a semantic keyboard-navigation group");
@@ -145,7 +157,7 @@ assert(realHtml.includes(String(current.requiredNegativeVectorCount)), "current 
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(current) + 1}\" class=\"version-card current\"`), "current section classified");
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(previous) + 1}\" class=\"version-card\"`), "previous section preserves order");
 same(
-  renderContractObservatoryHtml(realIndex, realProjection, realSemanticIr),
+  renderContractObservatoryHtml(realIndex, realProjection, realSemanticIr, realMarkdownCoverage),
   realHtml,
   "real repository rendering is deterministic",
 );

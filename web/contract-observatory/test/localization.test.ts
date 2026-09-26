@@ -6,6 +6,7 @@ import {
   type ObservatoryInteractionConfig,
 } from "../src/interaction.js";
 import { buildMethodologyProjection } from "../src/methodology-projection.js";
+import { loadCompiledMarkdownCoverage } from "../src/markdown-coverage-bridge.js";
 import { renderContractObservatoryHtml } from "../src/site.js";
 import { loadCompiledMtsSemanticIr } from "../src/semantic-ir-bridge.js";
 
@@ -17,7 +18,8 @@ const repositoryRoot = process.cwd();
 const index = buildContractObservatoryIndex(repositoryRoot);
 const projection = buildMethodologyProjection(repositoryRoot, index);
 const semanticIr = loadCompiledMtsSemanticIr(repositoryRoot);
-const html = renderContractObservatoryHtml(index, projection, semanticIr);
+const markdownCoverage = loadCompiledMarkdownCoverage(repositoryRoot);
+const html = renderContractObservatoryHtml(index, projection, semanticIr, markdownCoverage);
 
 const candidateSummary = Object.freeze({
   ...index.versions[0]!,
@@ -76,6 +78,12 @@ for (const marker of [
   "Зависимые требования",
   "Показано требований:",
   "Сравнение по стабильному ID недоступно",
+  "Покрытие Markdown-знаний",
+  "Диагностика проекции документации",
+  "Границы безопасной мутации Markdown",
+  "Авторский текст:",
+  "Пока не классифицировано",
+  "Без якоря",
   "Карта методологии и жизненного цикла версий",
   "Теория",
   "Контракт",
