@@ -34,6 +34,7 @@ export type StructuralRootedProofAsetReplayErrorCode =
   | "primitive-derivation-rule-out-of-scope"
   | "invalid-constructor-authority"
   | "constructor-authority-not-admitted"
+  | "target-not-structural-constructor"
   | "premise-arity-mismatch"
   | "template-mismatch"
   | "cyclic-dependency"
@@ -69,6 +70,12 @@ export interface ConstructorScopedClosedProofOccurrenceReplayResult
   extends ClosedProofOccurrenceReplayResult {
   readonly constructorAuthority: LinkHandle;
   readonly constructors: readonly LinkHandle[];
+}
+
+export interface ConstructorScopedStructuralOccurrenceReplayResult
+  extends ConstructorScopedClosedProofOccurrenceReplayResult {
+  readonly primitiveDerivationRule: LinkHandle;
+  readonly dependencyOccurrences: readonly LinkHandle[];
 }
 
 interface StructuralOccurrenceApplication {
@@ -489,6 +496,67 @@ export function replayConstructorScopedClosedProofOccurrence(
       ...replay,
       constructorAuthority,
       constructors: Object.freeze([...constructors]),
+    });
+  } finally {
+    if (memory.linkCount !== before) fail("replay-wrote");
+  }
+}
+
+
+/**
+ * Invert one already constructor-scoped CLOSED structural ProofOccurrence.
+ *
+ * Full dependency closure is validated first by
+ * replayConstructorScopedClosedProofOccurrence. Only then is the exact target
+ * application exposed as its selected primitive DR plus ordered direct
+ * dependency ProofOccurrences.
+ *
+ * Intrinsic recursive identity proofs remain valid under constructor scope,
+ * but are intentionally not classified as structural constructors here.
+ */
+export function replayConstructorScopedStructuralOccurrence(
+  memory: ReadMemory,
+  constructorAuthority: LinkHandle,
+  constructorAuthorityAdmission: LinkHandle,
+  occurrence: LinkHandle,
+): ConstructorScopedStructuralOccurrenceReplayResult {
+  const before = memory.linkCount;
+  try {
+    const closed = replayConstructorScopedClosedProofOccurrence(
+      memory,
+      constructorAuthority,
+      constructorAuthorityAdmission,
+      occurrence,
+    );
+
+    let application: StructuralOccurrenceApplication;
+    try {
+      application = readStructuralOccurrenceApplication(
+        memory,
+        closed.theory,
+        occurrence,
+        new Set(closed.constructors),
+      );
+    } catch (error) {
+      if (error instanceof StructuralRootedProofAsetReplayError) {
+        if (
+          error.code === "primitive-derivation-rule-out-of-scope"
+          || error.code === "replay-wrote"
+        ) {
+          throw error;
+        }
+        fail("target-not-structural-constructor");
+      }
+      throw error;
+    }
+
+    if (memory.linkCount !== before) fail("replay-wrote");
+    return Object.freeze({
+      ...closed,
+      primitiveDerivationRule: application.primitiveDerivationRule,
+      dependencyOccurrences: Object.freeze([
+        ...application.dependencyOccurrences,
+      ]),
     });
   } finally {
     if (memory.linkCount !== before) fail("replay-wrote");
