@@ -1,20 +1,13 @@
 // mts-version-evidence: candidate-from=0.14
 
 import { materializeExactSequence } from "../src/exact-sequence.js";
-import {
-  admitStructuralDerivationRule,
-  defineStructuralDerivationRule,
-} from "../src/derivation.js";
+import { admitStructuralDerivationRule, defineStructuralDerivationRule } from "../src/derivation.js";
 import {
   StructuralClosureApplicationReplayError,
   replayStructuralDependentWitnessClosureApplication,
   replayStructuralParametricClosureApplication,
 } from "../src/derived-derivation-closure.js";
-import {
-  Memory,
-  ensureRootBasis,
-  type LinkHandle,
-} from "../src/memory.js";
+import { Memory, ensureRootBasis, type LinkHandle } from "../src/memory.js";
 import { replayStructuralRootedProofAset } from "../src/rooted-proof-aset.js";
 import {
   admitStructuralRule,
@@ -23,9 +16,7 @@ import {
 } from "../src/structural-rule.js";
 
 function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) {
-    throw new Error("v0.14 N8 dependent-witness closure: " + message);
-  }
+  if (!condition) throw new Error("v0.14 N8 dependent-witness closure: " + message);
 }
 
 function same<T>(actual: T, expected: T, message: string): void {
@@ -36,10 +27,7 @@ function expectClosureError(code: string, effect: () => unknown): void {
   try {
     effect();
   } catch (error) {
-    assert(
-      error instanceof StructuralClosureApplicationReplayError,
-      `${code}: wrong error type`,
-    );
+    assert(error instanceof StructuralClosureApplicationReplayError, `${code}: wrong error type`);
     same(error.code, code, `${code}: wrong error code`);
     return;
   }
@@ -52,31 +40,16 @@ function admittedRoot(
   dictionary: LinkHandle,
   premises: readonly LinkHandle[],
   conclusion: LinkHandle,
-): Readonly<{
-  derivationRule: LinkHandle;
-  identity: LinkHandle;
-  root: LinkHandle;
-}> {
+) {
   const rule = defineStructuralRule(memory, dictionary, conclusion);
-  const derivationRule = defineStructuralDerivationRule(
-    memory,
-    rule,
-    premises,
-  );
+  const derivationRule = defineStructuralDerivationRule(memory, rule, premises);
   admitStructuralRule(memory, theory, rule);
   admitStructuralDerivationRule(memory, theory, derivationRule);
   const identity = memory.ensure(derivationRule, theory);
-  const assumptions = premises.map((template) =>
-    memory.ensure(template, identity)
-  );
-  const targetOccurrence = memory.ensure(
-    derivationRule,
-    materializeExactSequence(memory, assumptions),
-  );
-  const rootedOccurrence = memory.ensure(conclusion, targetOccurrence);
-  const root = memory.ensure(identity, rootedOccurrence);
-  const replay = replayStructuralRootedProofAset(memory, root);
-  same(replay.conclusion, conclusion, "rooted conclusion");
+  const assumptions = premises.map((template) => memory.ensure(template, identity));
+  const target = memory.ensure(derivationRule, materializeExactSequence(memory, assumptions));
+  const root = memory.ensure(identity, memory.ensure(conclusion, target));
+  same(replayStructuralRootedProofAset(memory, root).conclusion, conclusion, "rooted conclusion");
   return Object.freeze({ derivationRule, identity, root });
 }
 
@@ -86,18 +59,18 @@ function derivedResult(
   dictionary: LinkHandle,
   premises: readonly LinkHandle[],
   conclusion: LinkHandle,
-): Readonly<{ derivationRule: LinkHandle; identity: LinkHandle }> {
+) {
   const rule = defineStructuralRule(memory, dictionary, conclusion);
   admitStructuralRule(memory, theory, rule);
-  const derivationRule = defineStructuralDerivationRule(
-    memory,
-    rule,
-    premises,
-  );
-  return Object.freeze({
-    derivationRule,
-    identity: memory.ensure(derivationRule, theory),
-  });
+  const derivationRule = defineStructuralDerivationRule(memory, rule, premises);
+  return Object.freeze({ derivationRule, identity: memory.ensure(derivationRule, theory) });
+}
+
+function carrier(
+  memory: Memory,
+  values: readonly LinkHandle[],
+): LinkHandle {
+  return materializeExactSequence(memory, values);
 }
 
 function morphism(
@@ -107,16 +80,11 @@ function morphism(
   targetDictionary: LinkHandle,
   bindings: readonly (readonly [LinkHandle, LinkHandle])[],
 ): LinkHandle {
-  return materializeExactSequence(memory, [
+  return carrier(memory, [
     theory,
     sourceDictionary,
     targetDictionary,
-    materializeExactSequence(
-      memory,
-      bindings.map(([source, target]) =>
-        memory.ensure(source, target)
-      ),
-    ),
+    carrier(memory, bindings.map(([source, target]) => memory.ensure(source, target))),
   ]);
 }
 
@@ -128,188 +96,72 @@ function specialization(
   roleBindings: readonly (readonly [LinkHandle, LinkHandle])[],
   groundBindings: readonly (readonly [LinkHandle, LinkHandle])[],
 ): LinkHandle {
-  return materializeExactSequence(memory, [
+  return carrier(memory, [
     theory,
     sourceDictionary,
     targetDictionary,
-    materializeExactSequence(
-      memory,
-      roleBindings.map(([source, target]) =>
-        memory.ensure(source, target)
-      ),
-    ),
-    materializeExactSequence(
-      memory,
-      groundBindings.map(([source, target]) =>
-        memory.ensure(source, target)
-      ),
-    ),
+    carrier(memory, roleBindings.map(([source, target]) => memory.ensure(source, target))),
+    carrier(memory, groundBindings.map(([source, target]) => memory.ensure(source, target))),
   ]);
 }
 
 function main(): void {
   const memory = new Memory();
   const { R, O, C, L, U } = ensureRootBasis(memory);
-
   let cursor = memory.ensure(U, R);
-  const fresh = (): LinkHandle => {
-    cursor = memory.ensure(cursor, R);
-    return cursor;
-  };
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, R));
 
   const theory = memory.ensure(L, U);
   const relationContext = memory.ensure(O, C);
   const addContext = memory.ensure(relationContext, fresh());
   const succContext = memory.ensure(relationContext, fresh());
   const natContext = memory.ensure(C, fresh());
-
-  const add = (
-    left: LinkHandle,
-    right: LinkHandle,
-    result: LinkHandle,
-  ): LinkHandle =>
-    memory.ensure(
-      memory.ensure(
-        memory.ensure(addContext, left),
-        right,
-      ),
-      result,
-    );
-
+  const add = (left: LinkHandle, right: LinkHandle, result: LinkHandle): LinkHandle =>
+    memory.ensure(memory.ensure(memory.ensure(addContext, left), right), result);
   const succ = (value: LinkHandle, next: LinkHandle): LinkHandle =>
     memory.ensure(memory.ensure(succContext, value), next);
+  const nat = (value: LinkHandle): LinkHandle => memory.ensure(natContext, value);
 
-  const nat = (value: LinkHandle): LinkHandle =>
-    memory.ensure(natContext, value);
-
-  // Faithful N7 geometry:
-  //   a       = stable parameter
-  //   b -> b1 = induction coordinate
-  //   c -> c1 = dependent witness
-  const a = fresh();
-  const b = fresh();
-  const c = fresh();
-  const b1 = fresh();
-  const c1 = fresh();
-  const x = fresh();
-  const x1 = fresh();
-  same(
-    new Set([a, b, c, b1, c1, x, x1]).size,
-    7,
-    "proof coordinates are distinct",
-  );
+  const a = fresh(), b = fresh(), c = fresh(), b1 = fresh(), c1 = fresh(), x = fresh(), x1 = fresh();
+  same(new Set([a, b, c, b1, c1, x, x1]).size, 7, "proof coordinates are distinct");
 
   const dBase = defineStructuralRoleDictionary(memory, [a]);
-  const dStep = defineStructuralRoleDictionary(
-    memory,
-    [a, b, c, b1, c1],
-  );
+  const dStep = defineStructuralRoleDictionary(memory, [a, b, c, b1, c1]);
   const dResult = defineStructuralRoleDictionary(memory, [a, b, c]);
   const dAuthority = defineStructuralRoleDictionary(memory, [x, x1]);
-
   const baseClaim = add(a, U, a);
   const currentClaim = add(a, b, c);
   const nextClaim = add(a, b1, c1);
   const inductionStep = succ(b, b1);
   const witnessStep = succ(c, c1);
 
-  const base = admittedRoot(
-    memory,
-    theory,
-    dBase,
-    [],
-    baseClaim,
-  );
+  const base = admittedRoot(memory, theory, dBase, [], baseClaim);
   const step = admittedRoot(
-    memory,
-    theory,
-    dStep,
-    [inductionStep, witnessStep, currentClaim],
-    nextClaim,
+    memory, theory, dStep, [inductionStep, witnessStep, currentClaim], nextClaim,
   );
-  const result = derivedResult(
-    memory,
-    theory,
-    dResult,
-    [nat(b)],
-    currentClaim,
-  );
+  const result = derivedResult(memory, theory, dResult, [nat(b)], currentClaim);
+  assert(memory.find(theory, result.derivationRule) === undefined, "RESULT starts derived");
 
-  assert(
-    memory.find(theory, result.derivationRule) === undefined,
-    "RESULT derivation rule starts derived",
-  );
-
-  const authority = materializeExactSequence(memory, [
-    theory,
-    dAuthority,
-    U,
-    nat(U),
-    nat(x),
-    succ(x, x1),
-    nat(x1),
+  const authority = carrier(memory, [
+    theory, dAuthority, U, nat(U), nat(x), succ(x, x1), nat(x1),
   ]);
   const authorityAdmission = memory.ensure(theory, authority);
+  const map = (
+    source: LinkHandle,
+    target: LinkHandle,
+    bindings: readonly (readonly [LinkHandle, LinkHandle])[],
+    ownerTheory: LinkHandle = theory,
+  ) => morphism(memory, ownerTheory, source, target, bindings);
+  const spec = (
+    roles: readonly (readonly [LinkHandle, LinkHandle])[],
+    grounds: readonly (readonly [LinkHandle, LinkHandle])[],
+  ) => specialization(memory, theory, dResult, dBase, roles, grounds);
 
-  const inductionAuthorityMorphism = morphism(
-    memory,
-    theory,
-    dAuthority,
-    dStep,
-    [
-      [x, b],
-      [x1, b1],
-    ],
-  );
-  const witnessAuthorityMorphism = morphism(
-    memory,
-    theory,
-    dAuthority,
-    dStep,
-    [
-      [x, c],
-      [x1, c1],
-    ],
-  );
-  const currentMorphism = morphism(
-    memory,
-    theory,
-    dResult,
-    dStep,
-    [
-      [a, a],
-      [b, b],
-      [c, c],
-    ],
-  );
-  const nextMorphism = morphism(
-    memory,
-    theory,
-    dResult,
-    dStep,
-    [
-      [a, a],
-      [b, b1],
-      [c, c1],
-    ],
-  );
-
-  // BASE explicitly says:
-  //   stable a -> a
-  //   dependent witness c -> a
-  //   induction b -> generator U
-  const baseSpecialization = specialization(
-    memory,
-    theory,
-    dResult,
-    dBase,
-    [
-      [a, a],
-      [c, a],
-    ],
-    [[b, U]],
-  );
-
+  const inductionAuthorityMorphism = map(dAuthority, dStep, [[x, b], [x1, b1]]);
+  const witnessAuthorityMorphism = map(dAuthority, dStep, [[x, c], [x1, c1]]);
+  const currentMorphism = map(dResult, dStep, [[a, a], [b, b], [c, c]]);
+  const nextMorphism = map(dResult, dStep, [[a, a], [b, b1], [c, c1]]);
+  const baseSpecialization = spec([[a, a], [c, a]], [[b, U]]);
   const evidence = Object.freeze({
     authority,
     authorityAdmission,
@@ -324,176 +176,61 @@ function main(): void {
   });
 
   const before = memory.linkCount;
-  const replay = replayStructuralDependentWitnessClosureApplication(
-    memory,
-    evidence,
-  );
+  const replay = replayStructuralDependentWitnessClosureApplication(memory, evidence);
   same(replay.theory, theory, "exact Theory");
-  same(
-    replay.resultDerivationRule,
-    result.derivationRule,
-    "derived RESULT identity",
-  );
-  same(
-    replay.resultConclusionTemplate,
-    currentClaim,
-    "constructive family body",
-  );
+  same(replay.resultDerivationRule, result.derivationRule, "derived RESULT identity");
+  same(replay.resultConclusionTemplate, currentClaim, "constructive family body");
   same(replay.base.conclusion, baseClaim, "BASE consumed");
   same(replay.step.conclusion, nextClaim, "STEP consumed");
-  same(replay.inductionRole, b, "RESULT induction Role is explicit");
-  same(replay.dependentWitnessRole, c, "RESULT dependent-witness Role is explicit");
-  same(replay.baseWitnessTargetRole, a, "BASE witness construction target is explicit");
-  same(replay.stableParameterRoles.length, 1, "exactly one stable parameter Role");
-  same(replay.stableParameterRoles[0], a, "stable parameter Role is explicit");
+  same(replay.inductionRole, b, "explicit induction Role");
+  same(replay.dependentWitnessRole, c, "explicit dependent-witness Role");
+  same(replay.baseWitnessTargetRole, a, "explicit BASE witness target");
+  same(replay.stableParameterRoles.length, 1, "one stable parameter");
+  same(replay.stableParameterRoles[0], a, "explicit stable parameter");
   same(memory.linkCount, before, "positive replay is read-only");
-  assert(
-    memory.find(theory, result.derivationRule) === undefined,
-    "successful closure never primitive-admits RESULT",
+  assert(memory.find(theory, result.derivationRule) === undefined, "RESULT remains unadmitted");
+
+  expectClosureError("invalid-scope", () =>
+    replayStructuralParametricClosureApplication(memory, {
+      authority,
+      authorityAdmission,
+      baseRoot: base.root,
+      stepRoot: step.root,
+      resultIdentity: result.identity,
+      authorityMorphism: inductionAuthorityMorphism,
+      currentMorphism,
+      nextMorphism,
+      baseSpecialization,
+    })
   );
 
-  // N8 is a strict extension of proof language; N6 must keep rejecting this
-  // faithful two-changing-coordinate geometry.
-  expectClosureError(
-    "invalid-scope",
-    () =>
-      replayStructuralParametricClosureApplication(memory, {
-        authority,
-        authorityAdmission,
-        baseRoot: base.root,
-        stepRoot: step.root,
-        resultIdentity: result.identity,
-        authorityMorphism: inductionAuthorityMorphism,
-        currentMorphism,
-        nextMorphism,
-        baseSpecialization,
-      }),
-  );
+  const reject = (code: string, patch: Partial<typeof evidence>): void =>
+    expectClosureError(code, () =>
+      replayStructuralDependentWitnessClosureApplication(memory, { ...evidence, ...patch })
+    );
 
-  // Stable parameter drift is rejected after induction/witness coordinates
-  // have been identified structurally by their two authority morphisms.
-  expectClosureError(
-    "parameter-drift",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(memory, {
-        ...evidence,
-        nextMorphism: morphism(
-          memory,
-          theory,
-          dResult,
-          dStep,
-          [
-            [a, b],
-            [b, b1],
-            [c, c1],
-          ],
-        ),
-      }),
-  );
-
-  expectClosureError(
-    "induction-not-advancing",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(memory, {
-        ...evidence,
-        inductionAuthorityMorphism: morphism(
-          memory,
-          theory,
-          dAuthority,
-          dStep,
-          [
-            [x, b],
-            [x1, b],
-          ],
-        ),
-      }),
-  );
-
-  expectClosureError(
-    "dependent-witness-not-advancing",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(memory, {
-        ...evidence,
-        witnessAuthorityMorphism: morphism(
-          memory,
-          theory,
-          dAuthority,
-          dStep,
-          [
-            [x, c],
-            [x1, c],
-          ],
-        ),
-      }),
-  );
-
-  expectClosureError(
-    "invalid-dependent-base-specialization",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(memory, {
-        ...evidence,
-        baseSpecialization: specialization(
-          memory,
-          theory,
-          dResult,
-          dBase,
-          [[a, a]],
-          [[b, U]],
-        ),
-      }),
-  );
-
-  expectClosureError(
-    "invalid-dependent-base-specialization",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(memory, {
-        ...evidence,
-        baseSpecialization: specialization(
-          memory,
-          theory,
-          dResult,
-          dBase,
-          [
-            [a, a],
-            [c, L],
-          ],
-          [[b, U]],
-        ),
-      }),
-  );
-
-  expectClosureError(
-    "invalid-witness-morphism",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(memory, {
-        ...evidence,
-        inductionAuthorityMorphism: morphism(
-          memory,
-          theory,
-          dAuthority,
-          dStep,
-          [
-            [x, b],
-            [x1, c1],
-          ],
-        ),
-      }),
-  );
-
-  expectClosureError(
-    "invalid-witness-morphism",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(memory, {
-        ...evidence,
-        witnessAuthorityMorphism: inductionAuthorityMorphism,
-      }),
-  );
+  reject("parameter-drift", {
+    nextMorphism: map(dResult, dStep, [[a, b], [b, b1], [c, c1]]),
+  });
+  reject("induction-not-advancing", {
+    inductionAuthorityMorphism: map(dAuthority, dStep, [[x, b], [x1, b]]),
+  });
+  reject("dependent-witness-not-advancing", {
+    witnessAuthorityMorphism: map(dAuthority, dStep, [[x, c], [x1, c]]),
+  });
+  reject("invalid-dependent-base-specialization", {
+    baseSpecialization: spec([[a, a]], [[b, U]]),
+  });
+  reject("invalid-dependent-base-specialization", {
+    baseSpecialization: spec([[a, a], [c, L]], [[b, U]]),
+  });
+  reject("invalid-witness-morphism", {
+    inductionAuthorityMorphism: map(dAuthority, dStep, [[x, b], [x1, c1]]),
+  });
+  reject("invalid-witness-morphism", { witnessAuthorityMorphism: inductionAuthorityMorphism });
 
   const q = fresh();
-  const dStepExtra = defineStructuralRoleDictionary(
-    memory,
-    [a, b, c, b1, c1, q],
-  );
+  const dStepExtra = defineStructuralRoleDictionary(memory, [a, b, c, b1, c1, q]);
   const stepExtra = admittedRoot(
     memory,
     theory,
@@ -501,60 +238,21 @@ function main(): void {
     [inductionStep, witnessStep, currentClaim],
     memory.ensure(nextClaim, q),
   );
-  expectClosureError(
-    "invalid-scope",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(memory, {
-        ...evidence,
-        stepRoot: stepExtra.root,
-      }),
-  );
+  reject("invalid-scope", { stepRoot: stepExtra.root });
 
   const foreignTheory = memory.ensure(C, R);
-  expectClosureError(
-    "invalid-witness-morphism",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(memory, {
-        ...evidence,
-        witnessAuthorityMorphism: morphism(
-          memory,
-          foreignTheory,
-          dAuthority,
-          dStep,
-          [
-            [x, c],
-            [x1, c1],
-          ],
-        ),
-      }),
-  );
-
-  const reversedWitnessStep = succ(c1, c);
+  reject("invalid-witness-morphism", {
+    witnessAuthorityMorphism: map(
+      dAuthority, dStep, [[x, c], [x1, c1]], foreignTheory,
+    ),
+  });
   const reversedStep = admittedRoot(
-    memory,
-    theory,
-    dStep,
-    [inductionStep, reversedWitnessStep, currentClaim],
-    nextClaim,
+    memory, theory, dStep, [inductionStep, succ(c1, c), currentClaim], nextClaim,
   );
-  expectClosureError(
-    "step-mismatch",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(memory, {
-        ...evidence,
-        stepRoot: reversedStep.root,
-      }),
-  );
+  reject("step-mismatch", { stepRoot: reversedStep.root });
 
   memory.ensure(theory, result.derivationRule);
-  expectClosureError(
-    "result-primitive-admission",
-    () =>
-      replayStructuralDependentWitnessClosureApplication(
-        memory,
-        evidence,
-      ),
-  );
+  reject("result-primitive-admission", {});
 
   console.log([
     "MTS v0.14 N8: DEPENDENT_WITNESS_CLOSURE=GREEN_RESEARCH",
