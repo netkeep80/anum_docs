@@ -1,5 +1,4 @@
 // mts-version-evidence: candidate-from=0.14
-
 import {
   materializeExactSequence,
   readExactSequence,
@@ -23,17 +22,14 @@ import {
   defineStructuralRoleDictionary,
   defineStructuralRule,
 } from "../src/structural-rule.js";
-
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
     throw new Error("v0.14 N7 Add dependent witness boundary: " + message);
   }
 }
-
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: values differ`);
 }
-
 function expectClosureError(
   code: string,
   effect: () => unknown,
@@ -50,7 +46,6 @@ function expectClosureError(
   }
   throw new Error(`${code}: expected closure rejection`);
 }
-
 function admittedRoot(
   memory: Memory,
   theory: LinkHandle,
@@ -70,7 +65,6 @@ function admittedRoot(
   );
   admitStructuralRule(memory, theory, rule);
   admitStructuralDerivationRule(memory, theory, derivationRule);
-
   const identity = memory.ensure(derivationRule, theory);
   const assumptions = premises.map((template) =>
     memory.ensure(template, identity),
@@ -85,7 +79,6 @@ function admittedRoot(
     targetOccurrence,
   );
   const root = memory.ensure(identity, rootedOccurrence);
-
   const replay = replayStructuralRootedProofAset(memory, root);
   same(replay.conclusion, conclusion, "rooted proof conclusion");
   same(
@@ -93,14 +86,12 @@ function admittedRoot(
     premises.length,
     "rooted proof declared assumptions",
   );
-
   return Object.freeze({
     derivationRule,
     identity,
     root,
   });
 }
-
 function derivedResult(
   memory: Memory,
   theory: LinkHandle,
@@ -123,7 +114,6 @@ function derivedResult(
     identity: memory.ensure(derivationRule, theory),
   });
 }
-
 function morphism(
   memory: Memory,
   theory: LinkHandle,
@@ -143,7 +133,6 @@ function morphism(
     ),
   ]);
 }
-
 function specialization(
   memory: Memory,
   theory: LinkHandle,
@@ -170,7 +159,6 @@ function specialization(
     ),
   ]);
 }
-
 function bindings(
   memory: Memory,
   carrier: LinkHandle,
@@ -185,7 +173,6 @@ function bindings(
     }),
   );
 }
-
 function hasBinding(
   values: readonly (readonly [LinkHandle, LinkHandle])[],
   source: LinkHandle,
@@ -195,23 +182,19 @@ function hasBinding(
     left === source && right === target
   );
 }
-
 function main(): void {
   const memory = new Memory();
   const { R, O, C, L, U } = ensureRootBasis(memory);
-
   let cursor = memory.ensure(U, R);
   const fresh = (): LinkHandle => {
     cursor = memory.ensure(cursor, R);
     return cursor;
   };
-
   const theory = memory.ensure(L, U);
   const relationContext = memory.ensure(O, C);
   const addContext = memory.ensure(relationContext, fresh());
   const succContext = memory.ensure(relationContext, fresh());
   const natContext = memory.ensure(C, fresh());
-
   const add = (
     left: LinkHandle,
     right: LinkHandle,
@@ -224,7 +207,6 @@ function main(): void {
       ),
       result,
     );
-
   const succ = (
     value: LinkHandle,
     next: LinkHandle,
@@ -233,41 +215,34 @@ function main(): void {
       memory.ensure(succContext, value),
       next,
     );
-
   const nat = (value: LinkHandle): LinkHandle =>
     memory.ensure(natContext, value);
-
   // ---------------------------------------------------------------------
   // N7.1 — exact generic Add laws.
   //
   // These are already the semantic source laws used by N2/N4. The present
   // witness deliberately does not alter or reinterpret them.
   // ---------------------------------------------------------------------
-
   const a = fresh();
   const b = fresh();
   const c = fresh();
   const b1 = fresh();
   const c1 = fresh();
-
   same(
     new Set([a, b, c, b1, c1]).size,
     5,
     "Add proof coordinates are distinct",
   );
-
   const dBase = defineStructuralRoleDictionary(memory, [a]);
   const dStep = defineStructuralRoleDictionary(
     memory,
     [a, b, c, b1, c1],
   );
-
   const baseClaim = add(a, U, a);
   const currentClaim = add(a, b, c);
   const nextClaim = add(a, b1, c1);
   const stepB = succ(b, b1);
   const stepC = succ(c, c1);
-
   const base = admittedRoot(
     memory,
     theory,
@@ -282,7 +257,6 @@ function main(): void {
     [currentClaim, stepB, stepC],
     nextClaim,
   );
-
   same(
     replayStructuralRootedProofAset(memory, base.root).conclusion,
     baseClaim,
@@ -293,7 +267,6 @@ function main(): void {
     nextClaim,
     "generic Add STEP replay",
   );
-
   // ---------------------------------------------------------------------
   // N7.2 — faithful totality proof coordinates.
   //
@@ -304,7 +277,6 @@ function main(): void {
   // RESULT intentionally exposes c so that the old verifier is forced to
   // classify it. This is precisely what N6 cannot yet do existentially.
   // ---------------------------------------------------------------------
-
   const dResult = defineStructuralRoleDictionary(
     memory,
     [a, b, c],
@@ -316,19 +288,16 @@ function main(): void {
     [nat(b)],
     currentClaim,
   );
-
   assert(
     memory.find(theory, result.derivationRule) === undefined,
     "dependent-witness RESULT starts derived",
   );
-
   const x = fresh();
   const x1 = fresh();
   const dAuthority = defineStructuralRoleDictionary(
     memory,
     [x, x1],
   );
-
   const authority = materializeExactSequence(memory, [
     theory,
     dAuthority,
@@ -339,7 +308,6 @@ function main(): void {
     nat(x1),
   ]);
   const authorityAdmission = memory.ensure(theory, authority);
-
   const authorityMorphism = morphism(
     memory,
     theory,
@@ -350,7 +318,6 @@ function main(): void {
       [x1, b1],
     ],
   );
-
   const currentMorphism = morphism(
     memory,
     theory,
@@ -362,7 +329,6 @@ function main(): void {
       [c, c],
     ],
   );
-
   const nextMorphism = morphism(
     memory,
     theory,
@@ -374,7 +340,6 @@ function main(): void {
       [c, c1],
     ],
   );
-
   // Faithful BASE specialization requires:
   //
   //   b := U
@@ -395,7 +360,6 @@ function main(): void {
     ],
     [[b, U]],
   );
-
   const currentBindings = bindings(memory, currentMorphism);
   const nextBindings = bindings(memory, nextMorphism);
   same(currentBindings.length, 3, "current morphism role count");
@@ -406,7 +370,6 @@ function main(): void {
   assert(hasBinding(nextBindings, b, b1), "next induction b1");
   assert(hasBinding(currentBindings, c, c), "current witness c");
   assert(hasBinding(nextBindings, c, c1), "next dependent witness c1");
-
   const baseOuter = readExactSequence(
     memory,
     baseSpecialization,
@@ -426,7 +389,6 @@ function main(): void {
     memory,
     baseGroundEntries,
   ).values.map((entry) => memory.poles(entry));
-
   assert(
     rolePairs.some(({ start, end }) =>
       start === a && end === a
@@ -445,7 +407,6 @@ function main(): void {
     ),
     "BASE grounds induction b:=U",
   );
-
   // Exact role geometry of the faithful Add construction:
   //
   // RESULT [a,b,c]          = 3
@@ -467,7 +428,6 @@ function main(): void {
     5 !== 3 + 1,
     "dependent STEP needs two next coordinates",
   );
-
   const evidence = Object.freeze({
     authority,
     authorityAdmission,
@@ -479,7 +439,6 @@ function main(): void {
     nextMorphism,
     baseSpecialization,
   });
-
   const before = memory.linkCount;
   expectClosureError(
     "invalid-scope",
@@ -498,7 +457,6 @@ function main(): void {
     memory.find(theory, result.derivationRule) === undefined,
     "rejection does not primitive-admit RESULT",
   );
-
   console.log([
     "MTS v0.14 N7: ADD_DEPENDENT_WITNESS_BOUNDARY=PINNED",
     "GENERIC_ADD_BASE_REPLAY=GREEN",
@@ -522,5 +480,4 @@ function main(): void {
     "ACCEPTED_V013_MUTATED=FALSE",
   ].join(" "));
 }
-
 main();
