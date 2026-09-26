@@ -10,6 +10,7 @@ export interface ObservatoryMarkdownCoverageDocument {
   readonly canonicalNodeCount: number;
   readonly nonCanonicalAnchorCount: number;
   readonly requirementCount: number;
+  readonly requirementBackedSectionCount: number;
   readonly ownedBlockCount: number;
   readonly unanchoredHeadingCount: number;
   readonly researchHistoricalSectionCount: number;
