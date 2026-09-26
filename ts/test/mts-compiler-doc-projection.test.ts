@@ -10,7 +10,11 @@ import {
 } from "../src/tooling/mts-compiler.js";
 import {
   assertOutsideOwnedBlockUnchanged,
+  insertMarkdownChild,
+  listMarkdownAnchorIds,
+  listMarkdownChildren,
   listRepositoryMarkdownSurface,
+  readMarkdownNode,
   readOwnedMarkdownBlock,
   replaceOwnedMarkdownSection,
   resolveMarkdownAnchor,
@@ -108,6 +112,133 @@ expect(
   ),
   /malformed owned block/,
 );
+
+const treeDb = [
+  '<a id="db-root"></a>',
+  "# Корень БД",
+  "Корневой payload.",
+  "",
+  '<a id="db-a"></a>',
+  "<!-- мтс:требование:META_A:начало -->",
+  "> служебная метаинформация",
+  "<!-- мтс:требование:META_A:конец -->",
+  "## Узел A",
+  "Авторский payload A.",
+  "",
+  '<a id="db-a1"></a>',
+  "### Узел A1",
+  "Авторский payload A1.",
+  "",
+  '<a id="db-b"></a>',
+  "## Узел B",
+  "Авторский payload B.",
+  "",
+  "```md",
+  '<a id="db-fake"></a>',
+  "## Ложный узел",
+  "```",
+].join("\n");
+
+assert.deepEqual(listMarkdownAnchorIds(treeDb), ["db-root", "db-a", "db-a1", "db-b"]);
+const rootNode = readMarkdownNode(treeDb, "db-root");
+const aNode = readMarkdownNode(treeDb, "db-a");
+assert.deepEqual(
+  aNode.headingPath.map((x) => [x.level, x.title]),
+  [[1, "Корень БД"], [2, "Узел A"]],
+  "compiler-owned metadata between anchor and heading must not break node addressing",
+);
+assert.deepEqual(listMarkdownChildren(treeDb, "db-root").map((x) => x.anchorId), ["db-a", "db-b"]);
+assert.deepEqual(listMarkdownChildren(treeDb, "db-a").map((x) => x.anchorId), ["db-a1"]);
+assert.ok(!aNode.subtree.includes('<a id="db-b"></a>'), "A subtree must end before sibling B anchor");
+assert.equal(rootNode.end, treeDb.length);
+
+const withC = insertMarkdownChild({
+  source: treeDb,
+  mode: "hybrid",
+  parentAnchorId: "db-root",
+  child: { anchorId: "db-c", title: "Узел C", payload: "Новый payload C." },
+});
+assert.deepEqual(listMarkdownChildren(withC, "db-root").map((x) => x.anchorId), ["db-a", "db-b", "db-c"]);
+for (const id of listMarkdownAnchorIds(treeDb)) resolveMarkdownAnchor(withC, id);
+for (const text of ["Корневой payload.", "Авторский payload A.", "Авторский payload A1.", "Авторский payload B."]) {
+  assert.ok(withC.includes(text), `insertChild must preserve authored text: ${text}`);
+}
+
+const withA2 = insertMarkdownChild({
+  source: treeDb,
+  mode: "hybrid",
+  parentAnchorId: "db-a",
+  child: { anchorId: "db-a2", title: "Узел A2", payload: "Новый payload A2." },
+});
+assert.deepEqual(listMarkdownChildren(withA2, "db-a").map((x) => x.anchorId), ["db-a1", "db-a2"]);
+assert.ok(
+  withA2.indexOf('<a id="db-a2"></a>') < withA2.indexOf('<a id="db-b"></a>'),
+  "new grandchild must be inserted before the next sibling subtree",
+);
+assert.equal(
+  withA2.slice(withA2.indexOf('<a id="db-b"></a>')),
+  treeDb.slice(treeDb.indexOf('<a id="db-b"></a>')),
+  "bytes after the insertion boundary must be unchanged",
+);
+
+expect(
+  () => insertMarkdownChild({
+    source: treeDb,
+    mode: "source",
+    parentAnchorId: "db-root",
+    child: { anchorId: "blocked", title: "Нельзя" },
+  }),
+  /SOURCE document is read-only/,
+);
+expect(
+  () => insertMarkdownChild({
+    source: treeDb,
+    mode: "generated",
+    parentAnchorId: "db-root",
+    child: { anchorId: "blocked", title: "Нельзя" },
+  }),
+  /GENERATED mode is not supported/,
+);
+expect(
+  () => insertMarkdownChild({
+    source: treeDb,
+    mode: "hybrid",
+    parentAnchorId: "db-root",
+    child: { anchorId: "db-a", title: "Дубликат" },
+  }),
+  /anchor is duplicated/,
+);
+expect(
+  () => insertMarkdownChild({
+    source: treeDb,
+    mode: "hybrid",
+    parentAnchorId: "db-root",
+    child: { anchorId: "bad-payload", title: "Плохой", payload: "## скрытая ветка" },
+  }),
+  /payload cannot contain headings/,
+);
+expect(
+  () => insertMarkdownChild({
+    source: treeDb,
+    mode: "hybrid",
+    parentAnchorId: "db-root",
+    child: { anchorId: "bad-anchor", title: "Плохой", payload: '<a id="hidden"></a>' },
+  }),
+  /payload cannot contain headings or stable anchors/,
+);
+const levelSix = treeDb + '\n<a id="deep"></a>\n###### Глубина 6\n';
+expect(
+  () => insertMarkdownChild({
+    source: levelSix,
+    mode: "hybrid",
+    parentAnchorId: "deep",
+    child: { anchorId: "too-deep", title: "Слишком глубоко" },
+  }),
+  /heading level 6 cannot have/,
+);
+const malformedNode = treeDb + '\n<a id="orphan"></a>\nне заголовок\n';
+expect(() => readMarkdownNode(malformedNode, "orphan"), /not a canonical tree node/);
+expect(() => readMarkdownNode(treeDb, "db-fake"), /anchor not found/);
 
 const surface = listRepositoryMarkdownSurface(root);
 assert.equal(new Set(surface).size, surface.length);
@@ -207,4 +338,4 @@ try {
   rmSync(tempRoot, { recursive: true, force: true });
 }
 
-console.log("MTS Compiler P1: GREEN REQUIREMENTS=13 MARKDOWN_DB_ADAPTER=GREEN AUTHORED_BYTES_PRESERVED=GREEN");
+console.log("MTS Compiler P2: GREEN REQUIREMENTS=13 MARKDOWN_TREE_DB=GREEN INSERT_CHILD=GREEN AUTHORED_BYTES_PRESERVED=GREEN");
