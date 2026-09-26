@@ -184,11 +184,15 @@ function main(): void {
     countExactSequence(memory, arbitraryPair, U, L),
   );
 
-  // A START-shaped Link is also not enough unless its complete canonical Cell
-  // ancestry satisfies ExactSequence.
-  const arbitraryStart = memory.ensureStartSelfClosed(A);
+  // Outer START shape alone is not the criterion. A START-shaped Link may
+  // legitimately be an ExactSequence Cell if its full previous-chain reaches R.
+  // Build an explicitly malformed Cell whose payload points to a non-sequence
+  // predecessor, so canonical ancestry must fail.
+  const malformedPrevious = memory.ensure(A, B);
+  const malformedPayload = memory.ensure(malformedPrevious, Cx);
+  const malformedCell = memory.ensureStartSelfClosed(malformedPayload);
   expectExactSequenceError(() =>
-    countExactSequence(memory, arbitraryStart, U, L),
+    countExactSequence(memory, malformedCell, U, L),
   );
 
   // -----------------------------------------------------------------------
