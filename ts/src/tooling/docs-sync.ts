@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compileRequirementDocuments } from "./mts-compiler.js";
 import { auditRepositoryMarkdownLinks } from "./markdown-link-audit.js";
+import { auditRepositoryFoundationProvenance } from "./foundation-provenance-audit.js";
 
 export const PROJECTION_START = "<!-- мтс-текущая-проекция:начало -->";
 export const PROJECTION_END = "<!-- мтс-текущая-проекция:конец -->";
@@ -522,12 +523,16 @@ function main(): void {
   if (linkIssues.length) {
     fail(`нарушена целостность локальных Markdown-ссылок: ${linkIssues.map((issue) => issue.message).join("; ")}`);
   }
+  const provenance = auditRepositoryFoundationProvenance(root);
+  if (provenance.issues.length) {
+    fail(`нарушена provenance-целостность baseline clauses: ${provenance.issues.map((entry) => entry.message).join("; ")}`);
+  }
   const size = measureRepositoryCurrentDocumentationSize(root);
   if (!currentDocumentationSizeWithinBudget(size)) {
     fail(`current documentation size ${size.codePoints} exceeds hard ceiling ${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints} code points`);
   }
   console.log(
-    `MTS Compiler: docs synchronized; current-doc size=${size.codePoints} code points / ${size.lines} lines / ${size.words} words; ceiling=${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints}.`,
+    `MTS Compiler: docs synchronized; foundation provenance=${provenance.directEvidenceClauseCount}/${provenance.clauseCount}, gaps=${provenance.gapClauseIds.join(",")}; current-doc size=${size.codePoints} code points / ${size.lines} lines / ${size.words} words; ceiling=${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints}.`,
   );
 }
 
