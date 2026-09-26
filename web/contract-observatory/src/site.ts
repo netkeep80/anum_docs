@@ -175,7 +175,7 @@ function renderSemanticRequirementMap(ir: ObservatorySemanticIr): string {
   }
   const tree = [...root.children.values()].sort((a, b) => a.name.localeCompare(b.name))
     .map((node) => renderRequirementBranch(node)).join("");
-  return `    <section class="requirement-map" aria-labelledby="requirements-title"><p class="eyebrow">Живая проекция validated semantic IR</p><h2 id="requirements-title">Проверяемые требования · ${escapeHtml(ir.contract)}</h2><p>Иерархия здесь определяется путями классификации контракта, а не порядком Markdown-разделов. Формулировки и свидетельства поступают из того же semantic IR, который компилирует MD-проекции.</p><ul class="requirement-tree">${tree}</ul><p class="raw-provenance">Источник IR: ${escapeHtml(ir.contractPath)} · схема ${escapeHtml(ir.schema)} · требований ${ir.requirements.length}.</p></section>`;
+  return `    <section class="requirement-map" aria-labelledby="requirements-title"><p class="eyebrow">Живая проекция проверенного семантического IR</p><h2 id="requirements-title">Проверяемые требования · ${escapeHtml(ir.contract)}</h2><p>Иерархия здесь определяется путями классификации контракта, а не порядком Markdown-разделов. Формулировки и свидетельства поступают из того же семантического IR, который компилирует MD-проекции.</p><ul class="requirement-tree">${tree}</ul><p class="raw-provenance">Источник IR: ${escapeHtml(ir.contractPath)} · схема ${escapeHtml(ir.schema)} · требований ${ir.requirements.length}.</p></section>`;
 }
 
 function renderRequirementBranch(node: RequirementTreeNode): string {
