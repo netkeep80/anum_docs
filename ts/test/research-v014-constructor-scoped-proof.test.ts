@@ -40,6 +40,16 @@ function expectReplayError(code: string, effect: () => unknown): void {
   throw new Error(`${code}: expected rejection`);
 }
 
+function identityProof(
+  memory: Memory,
+  left: LinkHandle,
+  right: LinkHandle,
+  children: readonly LinkHandle[],
+): LinkHandle {
+  const claim = memory.ensure(left, right);
+  return memory.ensure(claim, materializeExactSequence(memory, children));
+}
+
 function zeroPremiseOccurrence(
   memory: Memory,
   theory: LinkHandle,
@@ -82,6 +92,21 @@ function main(): void {
   const memory = new Memory();
   const { R, O, C, L, U } = ensureRootBasis(memory);
   const theory = memory.ensure(L, U);
+
+  // Empty constructor scope is meaningful: it allows the intrinsic recursive
+  // identity law while authorizing zero structural derivation constructors.
+  const identityOnly = authority(memory, theory, []);
+  const rootIdentityProof = identityProof(memory, R, R, []);
+  const identityBefore = memory.linkCount;
+  const identityReplay = replayConstructorScopedClosedProofOccurrence(
+    memory,
+    identityOnly.carrier,
+    identityOnly.admission,
+    rootIdentityProof,
+  );
+  same(identityReplay.claim, R, "identity-only scope exact ROOT identity Claim");
+  same(identityReplay.constructors.length, 0, "identity-only scope has zero structural constructors");
+  same(memory.linkCount, identityBefore, "identity-only replay read-only");
 
   const selectedClaim = memory.ensure(O, U);
   const selected = zeroPremiseOccurrence(memory, theory, selectedClaim);
@@ -216,6 +241,7 @@ function main(): void {
     "AUTHORITY=LINK_CARRIED",
     "AUTHORITY_THEORY_ADMISSION=REQUIRED",
     "SELECTED_CONSTRUCTOR_REPLAY=GREEN",
+    "EMPTY_CONSTRUCTOR_SCOPE_IDENTITY_REPLAY=GREEN",
     "LEGACY_UNSCOPED_REPLAY_UNCHANGED=TRUE",
     "THEORY_ADMITTED_OUT_OF_SCOPE_DR_REJECTED=TRUE",
     "OUT_OF_SCOPE_ERROR=primitive-derivation-rule-out-of-scope",
