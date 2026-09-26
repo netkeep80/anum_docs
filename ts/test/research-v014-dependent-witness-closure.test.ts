@@ -499,7 +499,7 @@ function main(): void {
     theory,
     dStepExtra,
     [inductionStep, witnessStep, currentClaim],
-    nextClaim,
+    memory.ensure(nextClaim, q),
   );
   expectClosureError(
     "invalid-scope",
