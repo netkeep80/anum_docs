@@ -341,6 +341,11 @@ function main(): void {
   );
   same(replay.base.conclusion, baseClaim, "BASE consumed");
   same(replay.step.conclusion, nextClaim, "STEP consumed");
+  same(replay.inductionRole, b, "RESULT induction Role is explicit");
+  same(replay.dependentWitnessRole, c, "RESULT dependent-witness Role is explicit");
+  same(replay.baseWitnessTargetRole, a, "BASE witness construction target is explicit");
+  same(replay.stableParameterRoles.length, 1, "exactly one stable parameter Role");
+  same(replay.stableParameterRoles[0], a, "stable parameter Role is explicit");
   same(memory.linkCount, before, "positive replay is read-only");
   assert(
     memory.find(theory, result.derivationRule) === undefined,
@@ -458,7 +463,7 @@ function main(): void {
   );
 
   expectClosureError(
-    "invalid-scope",
+    "invalid-witness-morphism",
     () =>
       replayStructuralDependentWitnessClosureApplication(memory, {
         ...evidence,
@@ -560,6 +565,8 @@ function main(): void {
     "DEPENDENT_WITNESS=C_TO_C1",
     "BASE_INDUCTION=B_TO_U",
     "BASE_WITNESS=C_TO_A",
+    "MACHINE_EXPOSED_WITNESS_COORDINATES=TRUE",
+    "GENERAL_BASE_WITNESS_FUNCTION_W0_PARAMS=NOT_PROVIDED",
     "SAME_SUCCESSOR_AUTHORITY_USED_TWICE=TRUE",
     "N6_FAITHFUL_CASE_REJECT=invalid-scope",
     "PARAMETER_DRIFT_REJECTED=TRUE",
