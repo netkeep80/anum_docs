@@ -40,8 +40,8 @@ const markdownDb = [
   "",
   "```html",
   '<a id="fake"></a>',
-  "<!-- mts:req:FAKE:begin -->",
-  "<!-- mts:req:FAKE:end -->",
+  "<!-- мтс:требование:FAKE:начало -->",
+  "<!-- мтс:требование:FAKE:конец -->",
   "```",
 ].join("\n");
 
@@ -103,7 +103,7 @@ for (const mode of ["source", "generated"] as const) {
 expect(() => resolveMarkdownAnchor(markdownDb + '\n<a id="node-a"></a>\n', "node-a"), /anchor is duplicated/);
 expect(
   () => readOwnedMarkdownBlock(
-    markdownDb.replace("Авторский payload A.", "Авторский payload A.\n<!-- mts:req:REQ_A:begin -->"),
+    markdownDb.replace("Авторский payload A.", "Авторский payload A.\n<!-- мтс:требование:REQ_A:начало -->"),
     "REQ_A",
   ),
   /malformed owned block/,
@@ -129,7 +129,7 @@ assert.deepEqual(
   [l4.positiveVectorCount, l4.negativeVectorCount, l4.executableGateCount],
   [7, 1, 2],
 );
-assert.match(renderRequirementProjection(l4), /mts:req:L4:begin/);
+assert.match(renderRequirementProjection(l4), /мтс:требование:L4:начало/);
 
 for (const item of ir.requirements) {
   const source = readFileSync(resolve(root, item.docPath), "utf8");
