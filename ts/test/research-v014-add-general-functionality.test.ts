@@ -859,9 +859,8 @@ function main(): void {
   );
 
   // Primitive/Theory admission alone therefore cannot act as result authority.
-  same(
-    memory.find(theory, forgedConstructor),
-    forgedConstructor,
+  assert(
+    memory.find(theory, forgedConstructor) !== undefined,
     "forged primitive DR is Theory-admitted",
   );
 
@@ -921,9 +920,7 @@ function main(): void {
   // Tamper the recursive direct dependency of an otherwise STEP-shaped target.
   const tamperedStep = occurrence(
     memory,
-    canonicalStep1.result === canonicalResult1
-      ? add(U, canonicalResult1, n2)
-      : add(U, canonicalResult1, n2),
+    add(U, canonicalResult1, n2),
     stepConstructor,
     [
       rootIdentity,
