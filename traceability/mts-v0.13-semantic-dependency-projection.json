@@ -2331,7 +2331,9 @@
       "ts/src/value-bundle.ts": "semantic-authority",
       "ts/src/v013-grounded-execution.ts": "semantic-authority",
       "ts/src/tooling/markdown-section-adapter.ts": "tooling",
-      "ts/src/tooling/mts-compiler.ts": "tooling"
+      "ts/src/tooling/mts-compiler.ts": "tooling",
+      "ts/src/tooling/docs-coverage.ts": "tooling",
+      "ts/src/tooling/markdown-coverage-audit.ts": "tooling"
     },
     "decisionOwnerCountsByCategory": {
       "memory-resource-safety": 4,
