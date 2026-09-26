@@ -25,6 +25,10 @@ export type StructuralClosureApplicationReplayErrorCode =
   | "invalid-next-morphism"
   | "invalid-base-grounding"
   | "invalid-base-specialization"
+  | "invalid-dependent-base-specialization"
+  | "invalid-witness-morphism"
+  | "induction-not-advancing"
+  | "dependent-witness-not-advancing"
   | "parameter-drift"
   | "domain-mismatch"
   | "step-mismatch"
@@ -59,6 +63,19 @@ export interface StructuralParametricClosureApplicationEvidence {
   readonly stepRoot: LinkHandle;
   readonly resultIdentity: LinkHandle;
   readonly authorityMorphism: LinkHandle;
+  readonly currentMorphism: LinkHandle;
+  readonly nextMorphism: LinkHandle;
+  readonly baseSpecialization: LinkHandle;
+}
+
+export interface StructuralDependentWitnessClosureApplicationEvidence {
+  readonly authority: LinkHandle;
+  readonly authorityAdmission: LinkHandle;
+  readonly baseRoot: LinkHandle;
+  readonly stepRoot: LinkHandle;
+  readonly resultIdentity: LinkHandle;
+  readonly inductionAuthorityMorphism: LinkHandle;
+  readonly witnessAuthorityMorphism: LinkHandle;
   readonly currentMorphism: LinkHandle;
   readonly nextMorphism: LinkHandle;
   readonly baseSpecialization: LinkHandle;
@@ -115,7 +132,7 @@ function readMorphism(
   targetDictionary: LinkHandle,
   sourceRoles: readonly LinkHandle[],
   targetRoles: readonly LinkHandle[],
-  code: "invalid-authority-morphism" | "invalid-current-morphism" | "invalid-next-morphism",
+  code: "invalid-authority-morphism" | "invalid-witness-morphism" | "invalid-current-morphism" | "invalid-next-morphism",
 ): readonly MappingBinding[] {
   const values = sequence(memory, carrier, code);
   if (values.length !== 4) fail(code);
@@ -256,6 +273,88 @@ function readBaseSpecialization(
     fail(code);
   }
 
+  return Object.freeze({
+    bindings: Object.freeze(bindings),
+    groundedSourceRole,
+  });
+}
+
+interface DependentBaseSpecialization {
+  readonly bindings: readonly MappingBinding[];
+  readonly groundedSourceRole: LinkHandle;
+}
+
+function readDependentBaseSpecialization(
+  memory: ReadMemory,
+  carrier: LinkHandle,
+  theory: LinkHandle,
+  sourceDictionary: LinkHandle,
+  targetDictionary: LinkHandle,
+  sourceRoles: readonly LinkHandle[],
+  targetRoles: readonly LinkHandle[],
+  generator: LinkHandle,
+): DependentBaseSpecialization {
+  const code = "invalid-dependent-base-specialization" as const;
+  const values = sequence(memory, carrier, code);
+  if (values.length !== 5) fail(code);
+  const [carrierTheory, source, target, roleEntriesHandle, groundEntriesHandle] = values;
+  if (
+    carrierTheory !== theory
+    || source !== sourceDictionary
+    || target !== targetDictionary
+    || roleEntriesHandle === undefined
+    || groundEntriesHandle === undefined
+  ) {
+    fail(code);
+  }
+  if (sourceRoles.includes(generator)) fail(code);
+
+  const sourceSet = new Set(sourceRoles);
+  const targetSet = new Set(targetRoles);
+  const mapped = new Map<LinkHandle, LinkHandle>();
+  const bindings: MappingBinding[] = [];
+
+  const readEntry = (entry: LinkHandle): readonly [LinkHandle, LinkHandle] => {
+    try {
+      const poles = memory.poles(entry);
+      return [poles.start, poles.end] as const;
+    } catch (error) {
+      if (error instanceof MemoryError) fail(code);
+      throw error;
+    }
+  };
+
+  for (const entry of sequence(memory, roleEntriesHandle, code)) {
+    const [sourceRole, targetRole] = readEntry(entry);
+    if (
+      !sourceSet.has(sourceRole)
+      || !targetSet.has(targetRole)
+      || mapped.has(sourceRole)
+    ) {
+      fail(code);
+    }
+    mapped.set(sourceRole, targetRole);
+    bindings.push(Object.freeze({ sourceRole, targetRole }));
+  }
+
+  const groundEntries = sequence(memory, groundEntriesHandle, code);
+  if (groundEntries.length !== 1) fail(code);
+  const [groundedSourceRole, groundedTarget] = readEntry(groundEntries[0]!);
+  if (
+    !sourceSet.has(groundedSourceRole)
+    || mapped.has(groundedSourceRole)
+    || groundedTarget !== generator
+    || targetSet.has(groundedTarget)
+  ) {
+    fail(code);
+  }
+  mapped.set(groundedSourceRole, groundedTarget);
+  bindings.push(Object.freeze({
+    sourceRole: groundedSourceRole,
+    targetRole: groundedTarget,
+  }));
+
+  if (mapped.size !== sourceRoles.length) fail(code);
   return Object.freeze({
     bindings: Object.freeze(bindings),
     groundedSourceRole,
@@ -675,6 +774,368 @@ export function replayStructuralParametricClosureApplication(
       baseSpecialization.bindings,
       baseParts.roles,
       "invalid-base-specialization",
+    );
+    verifyMapping(
+      memory,
+      resultParts.rule.body,
+      baseParts.rule.body,
+      baseSpecialization.bindings,
+      baseParts.roles,
+      "base-mismatch",
+    );
+
+    if (memory.linkCount !== before) fail("closure-application-wrote");
+    return Object.freeze({
+      theory: theory!,
+      authority: evidence.authority,
+      resultDerivationRule,
+      resultConclusionTemplate: resultParts.rule.body,
+      base,
+      step,
+    });
+  } catch (error) {
+    if (error instanceof StructuralClosureApplicationReplayError) throw error;
+    if (
+      error instanceof MemoryError
+      || error instanceof ExactSequenceError
+      || error instanceof StructuralRuleError
+    ) {
+      throw new StructuralClosureApplicationReplayError("invalid-authority");
+    }
+    throw error;
+  } finally {
+    if (memory.linkCount !== before) {
+      throw new StructuralClosureApplicationReplayError("closure-application-wrote");
+    }
+  }
+}
+
+export function replayStructuralDependentWitnessClosureApplication(
+  memory: ReadMemory,
+  evidence: StructuralDependentWitnessClosureApplicationEvidence,
+): StructuralClosureApplicationReplayResult {
+  const before = memory.linkCount;
+  try {
+    const authorityValues = sequence(memory, evidence.authority, "invalid-authority");
+    if (authorityValues.length !== 7) fail("invalid-authority");
+    const [
+      theory,
+      authorityDictionary,
+      generator,
+      domainBase,
+      domainCurrent,
+      transition,
+      domainNext,
+    ] = authorityValues;
+    if (
+      [
+        theory,
+        authorityDictionary,
+        generator,
+        domainBase,
+        domainCurrent,
+        transition,
+        domainNext,
+      ].some((value) => value === undefined)
+    ) {
+      fail("invalid-authority");
+    }
+    verifyAdmission(memory, evidence.authorityAdmission, theory!, evidence.authority);
+
+    let authorityRoles: readonly LinkHandle[];
+    try {
+      authorityRoles = readStructuralRoleDictionary(memory, authorityDictionary!).roles;
+    } catch {
+      fail("invalid-authority");
+    }
+    if (authorityRoles.length !== 2 || authorityRoles.includes(generator!)) {
+      fail("invalid-authority");
+    }
+    const [x, x1] = authorityRoles;
+    if (x === undefined || x1 === undefined) fail("invalid-authority");
+    verifyMapping(
+      memory,
+      domainCurrent!,
+      domainBase!,
+      [{ sourceRole: x, targetRole: generator! }],
+      [],
+      "invalid-authority",
+    );
+    verifyMapping(
+      memory,
+      domainCurrent!,
+      domainNext!,
+      [{ sourceRole: x, targetRole: x1 }],
+      authorityRoles,
+      "invalid-authority",
+    );
+
+    let base: StructuralRootedProofAsetReplayResult;
+    let step: StructuralRootedProofAsetReplayResult;
+    try {
+      base = replayStructuralRootedProofAset(memory, evidence.baseRoot);
+    } catch {
+      fail("invalid-base");
+    }
+    try {
+      step = replayStructuralRootedProofAset(memory, evidence.stepRoot);
+    } catch {
+      fail("invalid-step");
+    }
+    if (base.theory !== theory || step.theory !== theory) fail("theory-mismatch");
+
+    let resultDerivationRule: LinkHandle;
+    let resultTheory: LinkHandle;
+    try {
+      ({ start: resultDerivationRule, end: resultTheory } =
+        memory.poles(evidence.resultIdentity));
+    } catch {
+      fail("invalid-result-identity");
+    }
+    if (resultTheory !== theory) fail("theory-mismatch");
+
+    let baseParts: ReturnType<typeof schemaParts>;
+    let stepParts: ReturnType<typeof schemaParts>;
+    let resultParts: ReturnType<typeof schemaParts>;
+    try {
+      baseParts = schemaParts(memory, base.targetDerivationRule);
+      stepParts = schemaParts(memory, step.targetDerivationRule);
+      resultParts = schemaParts(memory, resultDerivationRule);
+    } catch {
+      fail("invalid-result-identity");
+    }
+    if (memory.find(theory!, resultParts.schema.structuralRule) === undefined) {
+      fail("invalid-result-identity");
+    }
+    if (memory.find(theory!, resultDerivationRule) !== undefined) {
+      fail("result-primitive-admission");
+    }
+
+    if (
+      resultParts.roles.length < 2
+      || baseParts.roles.length + 2 !== resultParts.roles.length
+      || stepParts.roles.length !== resultParts.roles.length + 2
+      || baseParts.schema.premiseTemplates.length !== 0
+      || resultParts.schema.premiseTemplates.length !== 1
+      || stepParts.schema.premiseTemplates.length !== 3
+    ) {
+      fail("invalid-scope");
+    }
+
+    const currentBindings = readMorphism(
+      memory,
+      evidence.currentMorphism,
+      theory!,
+      resultParts.rule.roleDictionary,
+      stepParts.rule.roleDictionary,
+      resultParts.roles,
+      stepParts.roles,
+      "invalid-current-morphism",
+    );
+    const nextBindings = readMorphism(
+      memory,
+      evidence.nextMorphism,
+      theory!,
+      resultParts.rule.roleDictionary,
+      stepParts.rule.roleDictionary,
+      resultParts.roles,
+      stepParts.roles,
+      "invalid-next-morphism",
+    );
+    if (!uniqueTargets(currentBindings) || !uniqueTargets(nextBindings)) {
+      fail("invalid-scope");
+    }
+
+    const currentBySource = new Map(
+      currentBindings.map(({ sourceRole, targetRole }) => [sourceRole, targetRole]),
+    );
+    const nextBySource = new Map(
+      nextBindings.map(({ sourceRole, targetRole }) => [sourceRole, targetRole]),
+    );
+
+    const inductionAuthorityBindings = readMorphism(
+      memory,
+      evidence.inductionAuthorityMorphism,
+      theory!,
+      authorityDictionary!,
+      stepParts.rule.roleDictionary,
+      authorityRoles,
+      stepParts.roles,
+      "invalid-authority-morphism",
+    );
+    const witnessAuthorityBindings = readMorphism(
+      memory,
+      evidence.witnessAuthorityMorphism,
+      theory!,
+      authorityDictionary!,
+      stepParts.rule.roleDictionary,
+      authorityRoles,
+      stepParts.roles,
+      "invalid-witness-morphism",
+    );
+    const inductionBySource = new Map(
+      inductionAuthorityBindings.map(({ sourceRole, targetRole }) => [sourceRole, targetRole]),
+    );
+    const witnessBySource = new Map(
+      witnessAuthorityBindings.map(({ sourceRole, targetRole }) => [sourceRole, targetRole]),
+    );
+    const currentInductionRole = inductionBySource.get(x);
+    const nextInductionRole = inductionBySource.get(x1);
+    const currentWitnessRole = witnessBySource.get(x);
+    const nextWitnessRole = witnessBySource.get(x1);
+    if (
+      currentInductionRole === undefined
+      || nextInductionRole === undefined
+      || currentInductionRole === nextInductionRole
+    ) {
+      fail("induction-not-advancing");
+    }
+    if (
+      currentWitnessRole === undefined
+      || nextWitnessRole === undefined
+      || currentWitnessRole === nextWitnessRole
+    ) {
+      fail("dependent-witness-not-advancing");
+    }
+    if (
+      currentInductionRole === currentWitnessRole
+      || currentInductionRole === nextWitnessRole
+      || nextInductionRole === currentWitnessRole
+      || nextInductionRole === nextWitnessRole
+    ) {
+      fail("invalid-witness-morphism");
+    }
+
+    const roleMatchingPair = (
+      currentTarget: LinkHandle,
+      nextTarget: LinkHandle,
+    ): LinkHandle => {
+      const matches = resultParts.roles.filter((role) =>
+        currentBySource.get(role) === currentTarget
+        && nextBySource.get(role) === nextTarget
+      );
+      if (matches.length !== 1) fail("invalid-scope");
+      return matches[0]!;
+    };
+
+    const inductionRole = roleMatchingPair(currentInductionRole, nextInductionRole);
+    const witnessRole = roleMatchingPair(currentWitnessRole, nextWitnessRole);
+    if (inductionRole === witnessRole) fail("invalid-scope");
+
+    const parameterRoles = resultParts.roles.filter(
+      (role) => role !== inductionRole && role !== witnessRole,
+    );
+    for (const parameterRole of parameterRoles) {
+      const currentParameter = currentBySource.get(parameterRole);
+      const nextParameter = nextBySource.get(parameterRole);
+      if (
+        currentParameter === undefined
+        || nextParameter === undefined
+        || currentParameter !== nextParameter
+      ) {
+        fail("parameter-drift");
+      }
+    }
+
+    const expectedStepRoles = new Set<LinkHandle>([
+      ...parameterRoles.map((role) => currentBySource.get(role)!),
+      currentInductionRole,
+      nextInductionRole,
+      currentWitnessRole,
+      nextWitnessRole,
+    ]);
+    if (
+      expectedStepRoles.size !== stepParts.roles.length
+      || stepParts.roles.some((role) => !expectedStepRoles.has(role))
+    ) {
+      fail("invalid-scope");
+    }
+
+    const baseSpecialization = readDependentBaseSpecialization(
+      memory,
+      evidence.baseSpecialization,
+      theory!,
+      resultParts.rule.roleDictionary,
+      baseParts.rule.roleDictionary,
+      resultParts.roles,
+      baseParts.roles,
+      generator!,
+    );
+    if (baseSpecialization.groundedSourceRole !== inductionRole) {
+      fail("invalid-dependent-base-specialization");
+    }
+    const baseBySource = new Map(
+      baseSpecialization.bindings.map(({ sourceRole, targetRole }) => [sourceRole, targetRole]),
+    );
+    const parameterTargets = parameterRoles.map((role) => baseBySource.get(role));
+    if (
+      parameterTargets.some((target) => target === undefined)
+      || new Set(parameterTargets).size !== baseParts.roles.length
+      || baseParts.roles.some((role) => !parameterTargets.includes(role))
+    ) {
+      fail("invalid-dependent-base-specialization");
+    }
+    const baseWitness = baseBySource.get(witnessRole);
+    if (
+      baseWitness === undefined
+      || !baseParts.roles.includes(baseWitness)
+      || !parameterTargets.includes(baseWitness)
+    ) {
+      fail("invalid-dependent-base-specialization");
+    }
+
+    const resultDomain = resultParts.schema.premiseTemplates[0]!;
+    const stepInductionTransition = stepParts.schema.premiseTemplates[0]!;
+    const stepWitnessTransition = stepParts.schema.premiseTemplates[1]!;
+    const stepCurrent = stepParts.schema.premiseTemplates[2]!;
+
+    verifyMapping(
+      memory,
+      domainCurrent!,
+      resultDomain,
+      [{ sourceRole: x, targetRole: inductionRole }],
+      resultParts.roles,
+      "domain-mismatch",
+    );
+    verifyMapping(
+      memory,
+      transition!,
+      stepInductionTransition,
+      inductionAuthorityBindings,
+      stepParts.roles,
+      "step-mismatch",
+    );
+    verifyMapping(
+      memory,
+      transition!,
+      stepWitnessTransition,
+      witnessAuthorityBindings,
+      stepParts.roles,
+      "step-mismatch",
+    );
+    verifyMapping(
+      memory,
+      resultParts.rule.body,
+      stepCurrent,
+      currentBindings,
+      stepParts.roles,
+      "ih-mismatch",
+    );
+    verifyMapping(
+      memory,
+      resultParts.rule.body,
+      stepParts.rule.body,
+      nextBindings,
+      stepParts.roles,
+      "next-conclusion-mismatch",
+    );
+    verifyMapping(
+      memory,
+      resultDomain,
+      domainBase!,
+      baseSpecialization.bindings,
+      baseParts.roles,
+      "invalid-dependent-base-specialization",
     );
     verifyMapping(
       memory,
