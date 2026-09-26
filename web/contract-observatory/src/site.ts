@@ -8,6 +8,7 @@ import {
   type ObservatoryInteractionVersionConfig,
 } from "./interaction.js";
 import type { MethodologyProjection, MethodologyVersionProjection } from "./methodology-projection.js";
+import type { ObservatoryMarkdownCoverage } from "./markdown-coverage-bridge.js";
 import { buildRequirementNavigationModel, type RequirementNavigationEntry } from "./requirement-navigation.js";
 import type { ObservatorySemanticIr } from "./semantic-ir-bridge.js";
 
@@ -15,12 +16,14 @@ export function renderContractObservatoryHtml(
   index: ContractObservatoryIndex,
   methodology?: MethodologyProjection,
   semanticIr?: ObservatorySemanticIr,
+  markdownCoverage?: ObservatoryMarkdownCoverage,
 ): string {
   const interactive = methodology !== undefined;
   const timeline = index.versions.map((version, ordinal) => renderTimelineItem(version, ordinal, interactive)).join("\n");
   const versions = index.versions.map((version, ordinal) => renderVersionSection(version, ordinal)).join("\n");
   const methodologyMap = methodology === undefined ? "" : renderMethodologyMap(methodology);
   const requirementMap = semanticIr === undefined ? "" : renderSemanticRequirementMap(semanticIr);
+  const coverageMap = markdownCoverage === undefined ? "" : renderMarkdownCoverageMap(markdownCoverage);
 
   return `<!doctype html>
 <html lang="ru">
@@ -41,7 +44,7 @@ export function renderContractObservatoryHtml(
     h1 { margin: 0; font-size: clamp(2rem, 6vw, 4.5rem); line-height: .95; max-width: 12ch; }
     .lede { margin: 0; max-width: 72ch; line-height: 1.6; opacity: .82; }
     .provenance { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin: 1.5rem 0 2rem; }
-    .provenance div, .version-card, .methodology-map, .requirement-map { border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 1rem; background: color-mix(in srgb, Canvas 94%, CanvasText 6%); }
+    .provenance div, .version-card, .methodology-map, .requirement-map, .coverage-map { border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 1rem; background: color-mix(in srgb, Canvas 94%, CanvasText 6%); }
     .requirement-map { padding: 1.2rem; margin: 0 0 2.5rem; }
     .requirement-map h2 { margin: 0 0 .4rem; font-size: 1.7rem; }
     .requirement-map > p { margin: 0 0 1rem; max-width: 82ch; line-height: 1.5; opacity: .8; }
@@ -65,6 +68,14 @@ export function renderContractObservatoryHtml(
     .requirement-meta { display: grid; grid-template-columns: minmax(9rem, .7fr) minmax(0, 1.8fr); gap: .3rem .7rem; margin: .5rem 0 0; font-size: .8rem; }
     .requirement-meta dd { margin: 0; overflow-wrap: anywhere; }
     .requirement-doc-link { font-weight: 700; }
+    .coverage-map { padding: 1.2rem; margin: 0 0 2.5rem; }
+    .coverage-map h2 { margin: 0 0 .4rem; font-size: 1.7rem; }
+    .coverage-map > p { margin: 0 0 1rem; max-width: 88ch; line-height: 1.5; opacity: .82; }
+    .coverage-safety { display: grid; gap: .35rem; margin: .8rem 0 1rem; padding: .8rem; border: 1px dashed color-mix(in srgb, CanvasText 20%, transparent); border-radius: .75rem; }
+    .coverage-safety p { margin: 0; }
+    .coverage-table { overflow-x: auto; }
+    .coverage-table table { min-width: 860px; font-size: .78rem; }
+    .coverage-table th { width: auto; white-space: nowrap; }
     .provenance div { padding: .9rem 1rem; min-width: 0; }
     dt { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
     dd { margin: .35rem 0 0; overflow-wrap: anywhere; }
@@ -150,6 +161,7 @@ export function renderContractObservatoryHtml(
     <header class="hero"><p class="eyebrow">МТС · производные свидетельства</p><h1>Обозреватель контрактов МТС</h1><p class="lede">Статическое представление свидетельств контракта и корпуса соответствия. Эта страница является производной навигацией и не является источником семантики МТС.</p></header>
     <dl class="provenance" aria-label="Происхождение данных">${renderDefinition("Схема индекса", index.schema)}${renderDefinition("Приёмка", index.acceptancePath)}${renderDefinition("Текущий контракт", index.currentContractPath)}${renderDefinition("Предыдущий контракт", index.previousContractPath)}</dl>
 ${requirementMap}
+${coverageMap}
 ${methodologyMap}
     <nav class="timeline" aria-labelledby="timeline-title"><h2 id="timeline-title">Хронология</h2><ol>${timeline}</ol></nav>
     <main class="versions" aria-labelledby="versions-title"><h2 id="versions-title">Обзор версий</h2><div class="version-list">${versions}</div></main>
@@ -158,6 +170,19 @@ ${methodologyMap}
 </body>
 </html>
 `;
+}
+
+function renderMarkdownCoverageMap(coverage: ObservatoryMarkdownCoverage): string {
+  const summary = coverage.summary;
+  const rows = coverage.documents.map((document) => `<tr><td>${escapeHtml(document.path)}</td><td>${escapeHtml(coverageModeLabel(document.mode))}</td><td>${document.headingCount}</td><td>${document.canonicalNodeCount}</td><td>${document.requirementCount}</td><td>${document.ownedBlockCount}</td><td>${document.unanchoredHeadingCount}</td><td>${document.currentlyUnclassifiedSectionCount}</td></tr>`).join("");
+  return `    <section class="coverage-map" aria-labelledby="coverage-title"><p class="eyebrow">Диагностика проекции документации</p><h2 id="coverage-title">Покрытие Markdown-знаний · ${escapeHtml(coverage.contract)}</h2><p>Этот раздел показывает результат проверенного P4-аудита. Observatory не анализирует Markdown повторно и не получает права изменять авторский текст.</p><div class="metric-grid"><div class="metric">Документы<strong>${summary.documentCount}</strong></div><div class="metric">Заголовки<strong>${summary.headingCount}</strong></div><div class="metric">Канонические узлы<strong>${summary.canonicalNodeCount}</strong></div><div class="metric">Требования<strong>${summary.requirementCount}</strong></div><div class="metric">Неякоренные заголовки<strong>${summary.unanchoredHeadingCount}</strong></div><div class="metric">Пока не классифицировано<strong>${summary.currentlyUnclassifiedSectionCount}</strong></div></div><div class="coverage-safety" aria-label="Границы безопасной мутации Markdown"><p><strong>Авторский текст:</strong> PRESERVE.</p><p><strong>Удаление / перенос / rekey целого узла:</strong> NOT AUTHORIZED.</p><p><strong>Закон сохранения:</strong> отсутствие requirement ID не означает, что знание можно удалить.</p><p><strong>Compiler-owned blocks:</strong> ${summary.ownedBlockCount}; requirement-backed sections: ${summary.requirementBackedSectionCount}.</p></div><div class="coverage-table"><table><thead><tr><th>Документ</th><th>Режим</th><th>Заголовки</th><th>Канон. узлы</th><th>Требования</th><th>Owned blocks</th><th>Без якоря</th><th>Не классиф.</th></tr></thead><tbody>${rows}</tbody></table></div><p class="raw-provenance">Схема: ${escapeHtml(coverage.schema)} · research-historical: ${summary.researchHistoricalSectionCount} · non-canonical anchors: ${summary.nonCanonicalAnchorCount}.</p></section>`;
+}
+
+function coverageModeLabel(mode: string): string {
+  if (mode === "source") return "исходный";
+  if (mode === "hybrid") return "гибридный";
+  if (mode === "generated") return "генерируемый";
+  return mode;
 }
 
 interface RequirementTreeNode {
