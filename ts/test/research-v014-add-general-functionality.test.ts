@@ -1,6 +1,6 @@
 // mts-version-evidence: candidate-from=0.14
 
-import { materializeExactSequence } from "../src/exact-sequence.js";
+import { materializeExactSequence, readExactSequence } from "../src/exact-sequence.js";
 import {
   admitStructuralDerivationRule,
   defineStructuralDerivationRule,
@@ -137,6 +137,98 @@ interface RecursiveFunctionalitySchema {
   readonly recursivePremiseTemplate: LinkHandle;
   readonly inductionTransitionTemplate: LinkHandle;
   readonly witnessTransitionTemplate: LinkHandle;
+}
+
+/**
+ * The functionality schema itself is ordinary Link-carried authority:
+ *
+ * [ Theory,
+ *   ConstructorAuthority, BASE, STEP,
+ *   stable, currentInduction, currentWitness, nextInduction, nextWitness,
+ *   baseInductionValue, successorUnit,
+ *   recursivePremise, inductionTransitionPremise, witnessTransitionPremise ]
+ *
+ * Host field names below are only a read projection of that exact carrier.
+ */
+function readRecursiveFunctionalitySchema(
+  memory: ReadMemory,
+  carrier: LinkHandle,
+  admission: LinkHandle,
+): RecursiveFunctionalitySchema {
+  const values = readExactSequence(memory, carrier).values;
+  if (values.length !== 14) functionalityFail("invalid-functionality-schema");
+
+  const [
+    theory,
+    constructorAuthority,
+    baseConstructor,
+    stepConstructor,
+    stableRole,
+    currentInductionRole,
+    currentWitnessRole,
+    nextInductionRole,
+    nextWitnessRole,
+    baseInductionValue,
+    successorUnit,
+    recursivePremiseTemplate,
+    inductionTransitionTemplate,
+    witnessTransitionTemplate,
+  ] = values;
+
+  if (
+    theory === undefined
+    || constructorAuthority === undefined
+    || baseConstructor === undefined
+    || stepConstructor === undefined
+    || stableRole === undefined
+    || currentInductionRole === undefined
+    || currentWitnessRole === undefined
+    || nextInductionRole === undefined
+    || nextWitnessRole === undefined
+    || baseInductionValue === undefined
+    || successorUnit === undefined
+    || recursivePremiseTemplate === undefined
+    || inductionTransitionTemplate === undefined
+    || witnessTransitionTemplate === undefined
+  ) {
+    functionalityFail("invalid-functionality-schema");
+  }
+
+  const admissionPoles = memory.poles(admission);
+  if (admissionPoles.start !== theory || admissionPoles.end !== carrier) {
+    functionalityFail("invalid-functionality-schema");
+  }
+
+  const constructorValues = readExactSequence(
+    memory,
+    constructorAuthority,
+  ).values;
+  if (
+    constructorValues.length !== 3
+    || constructorValues[0] !== theory
+    || constructorValues[1] !== baseConstructor
+    || constructorValues[2] !== stepConstructor
+  ) {
+    functionalityFail("invalid-functionality-schema");
+  }
+
+  return Object.freeze({
+    constructorAuthority,
+    constructorAuthorityAdmission: memory.find(theory, constructorAuthority)
+      ?? functionalityFail("invalid-functionality-schema"),
+    baseConstructor,
+    stepConstructor,
+    stableRole,
+    currentInductionRole,
+    currentWitnessRole,
+    nextInductionRole,
+    nextWitnessRole,
+    baseInductionValue,
+    successorUnit,
+    recursivePremiseTemplate,
+    inductionTransitionTemplate,
+    witnessTransitionTemplate,
+  });
 }
 
 type ConstructorNode =
@@ -359,11 +451,17 @@ function inspectRecursiveFunctionalityNode(
  */
 function proveRecursiveConstructorFunctionality(
   memory: ReadMemory,
-  schema: RecursiveFunctionalitySchema,
+  functionalityAuthority: LinkHandle,
+  functionalityAuthorityAdmission: LinkHandle,
   leftOccurrence: LinkHandle,
   rightOccurrence: LinkHandle,
 ): LinkHandle {
   const before = memory.linkCount;
+  const schema = readRecursiveFunctionalitySchema(
+    memory,
+    functionalityAuthority,
+    functionalityAuthorityAdmission,
+  );
   const active = new Map<LinkHandle, Set<LinkHandle>>();
 
   const enter = (left: LinkHandle, right: LinkHandle): void => {
@@ -557,22 +655,34 @@ function main(): void {
     constructorAuthority,
   );
 
-  const schema: RecursiveFunctionalitySchema = Object.freeze({
+  const functionalityAuthority = materializeExactSequence(memory, [
+    theory,
     constructorAuthority,
-    constructorAuthorityAdmission,
     baseConstructor,
     stepConstructor,
-    stableRole: a,
-    currentInductionRole: b,
-    currentWitnessRole: c,
-    nextInductionRole: b1,
-    nextWitnessRole: c1,
-    baseInductionValue: U,
-    successorUnit: L,
-    recursivePremiseTemplate: recursivePremise,
-    inductionTransitionTemplate: inductionTransitionPremise,
-    witnessTransitionTemplate: witnessTransitionPremise,
-  });
+    a,
+    b,
+    c,
+    b1,
+    c1,
+    U,
+    L,
+    recursivePremise,
+    inductionTransitionPremise,
+    witnessTransitionPremise,
+  ]);
+  const functionalityAuthorityAdmission = memory.ensure(
+    theory,
+    functionalityAuthority,
+  );
+
+  // Read-back proves that theorem coordinates come from the carrier rather than
+  // from an unvalidated host object.
+  readRecursiveFunctionalitySchema(
+    memory,
+    functionalityAuthority,
+    functionalityAuthorityAdmission,
+  );
 
   // Exact T3 boundary used by BASE/STEP exclusivity:
   // U=C->O while every positive successor has end=L, and O!=L.
@@ -640,7 +750,8 @@ function main(): void {
   same(
     proveRecursiveConstructorFunctionality(
       memory,
-      schema,
+      functionalityAuthority,
+      functionalityAuthorityAdmission,
       baseLeft.occurrence,
       baseRight.occurrence,
     ),
@@ -654,7 +765,8 @@ function main(): void {
   same(
     proveRecursiveConstructorFunctionality(
       memory,
-      schema,
+      functionalityAuthority,
+      functionalityAuthorityAdmission,
       oneLeft.occurrence,
       oneRight.occurrence,
     ),
@@ -668,7 +780,8 @@ function main(): void {
   same(
     proveRecursiveConstructorFunctionality(
       memory,
-      schema,
+      functionalityAuthority,
+      functionalityAuthorityAdmission,
       deepLeft.occurrence,
       deepRight.occurrence,
     ),
@@ -688,7 +801,8 @@ function main(): void {
   same(
     proveRecursiveConstructorFunctionality(
       memory,
-      schema,
+      functionalityAuthority,
+      functionalityAuthorityAdmission,
       deepLeft.occurrence,
       deepRight.occurrence,
     ),
@@ -955,6 +1069,7 @@ function main(): void {
     "STEP_STEP_RECURSIVE_UNIQUENESS=GREEN",
     "UNBOUNDED_PROOF_TREE_RECURSION=TRUE",
     "CONSTRUCTOR_SCOPE_ENFORCED=TRUE",
+    "FUNCTIONALITY_SCHEMA_LINK_CARRIED=TRUE",
     "CONSTRUCTOR_INVERSION_USED=TRUE",
     "SUCCESSOR_AUTHORITY=STRUCTURAL_IDENTITY_X1_EQ_X_TO_L",
     "SUCCESSOR_UNIQUENESS_USED=TRUE",
