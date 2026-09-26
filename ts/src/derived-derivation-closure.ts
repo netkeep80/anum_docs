@@ -90,6 +90,14 @@ export interface StructuralClosureApplicationReplayResult {
   readonly step: StructuralRootedProofAsetReplayResult;
 }
 
+export interface StructuralDependentWitnessClosureApplicationReplayResult
+  extends StructuralClosureApplicationReplayResult {
+  readonly stableParameterRoles: readonly LinkHandle[];
+  readonly inductionRole: LinkHandle;
+  readonly dependentWitnessRole: LinkHandle;
+  readonly baseWitnessTargetRole: LinkHandle;
+}
+
 interface MappingBinding { readonly sourceRole: LinkHandle; readonly targetRole: LinkHandle; }
 
 function fail(code: StructuralClosureApplicationReplayErrorCode): never {
@@ -792,6 +800,10 @@ export function replayStructuralParametricClosureApplication(
       resultConclusionTemplate: resultParts.rule.body,
       base,
       step,
+      stableParameterRoles: Object.freeze([...parameterRoles]),
+      inductionRole,
+      dependentWitnessRole: witnessRole,
+      baseWitnessTargetRole: baseWitness,
     });
   } catch (error) {
     if (error instanceof StructuralClosureApplicationReplayError) throw error;
@@ -813,7 +825,7 @@ export function replayStructuralParametricClosureApplication(
 export function replayStructuralDependentWitnessClosureApplication(
   memory: ReadMemory,
   evidence: StructuralDependentWitnessClosureApplicationEvidence,
-): StructuralClosureApplicationReplayResult {
+): StructuralDependentWitnessClosureApplicationReplayResult {
   const before = memory.linkCount;
   try {
     const authorityValues = sequence(memory, evidence.authority, "invalid-authority");
