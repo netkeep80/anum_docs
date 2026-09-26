@@ -33,11 +33,11 @@ function assertSafeId(value: string, name: string): void {
 }
 
 function beginMarker(blockId: string): string {
-  return `<!-- mts:req:${blockId}:begin -->`;
+  return `<!-- мтс:требование:${blockId}:начало -->`;
 }
 
 function endMarker(blockId: string): string {
-  return `<!-- mts:req:${blockId}:end -->`;
+  return `<!-- мтс:требование:${blockId}:конец -->`;
 }
 
 interface VisibleLine {
