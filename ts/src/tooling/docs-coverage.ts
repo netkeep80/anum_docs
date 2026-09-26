@@ -1,6 +1,7 @@
+import { findRepositoryRoot } from "./docs-sync.js";
 import { buildMarkdownCoverageAudit } from "./markdown-coverage-audit.js";
 
-const report = buildMarkdownCoverageAudit(process.cwd());
+const report = buildMarkdownCoverageAudit(findRepositoryRoot());
 if (process.argv.includes("--json")) {
   process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
 } else {
