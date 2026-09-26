@@ -1,4 +1,5 @@
 // mts-version-evidence: candidate-from=0.14
+// research-owner: #1648
 import { materializeExactSequence, readExactSequence } from "../src/exact-sequence.js";
 import {
   admitStructuralDerivationRule, defineStructuralDerivationRule,
