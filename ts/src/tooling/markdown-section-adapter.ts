@@ -168,11 +168,20 @@ function nodeOrNull(source: string, anchorId: string): MarkdownNode | null {
   const headingLine = associatedHeadingLine(lines, anchor.line);
   if (headingLine === null) return null;
   const heading = headingOf(headingLine)!;
-  const endLine = lines.find((line) =>
-    line.line > headingLine.line &&
-    ((candidate) => candidate !== null && candidate.level <= heading.level)(headingOf(line))
-  );
-  const end = endLine?.start ?? source.length;
+  const endLine = lines.find((line) => {
+    if (line.line <= headingLine.line) return false;
+    const candidate = headingOf(line);
+    return candidate !== null && candidate.level <= heading.level;
+  });
+  let end = source.length;
+  if (endLine !== undefined) {
+    const owningAnchors = lines.filter((line) => {
+      if (line.line >= endLine.line || stableAnchorId(line) === null) return false;
+      return associatedHeadingLine(lines, line.line)?.line === endLine.line;
+    });
+    if (owningAnchors.length > 1) fail(`heading at line ${endLine.line} has multiple node anchors`);
+    end = owningAnchors[0]?.start ?? endLine.start;
+  }
   return Object.freeze({
     anchorId,
     anchorLine: anchor.line,
