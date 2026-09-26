@@ -17,7 +17,7 @@ assert.deepEqual(
   ["A4", "A15", "F4", "F5"],
   "known accepted-v0.13 direct evidence gaps remain explicit",
 );
-assert.deepEqual(current.gapClauseIds, [...KNOWN_FOUNDATION_EVIDENCE_GAPS].sort());
+assert.deepEqual(current.gapClauseIds, [...KNOWN_FOUNDATION_EVIDENCE_GAPS]);
 assert.deepEqual(current.issues, [], "current accepted v0.13 provenance baseline must validate");
 
 const scope = ["A0", "A1", "A2"];
