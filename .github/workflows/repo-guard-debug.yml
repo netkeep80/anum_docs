@@ -1,0 +1,40 @@
+name: Repo-guard policy debug
+
+on:
+  push:
+    branches:
+      - "governance/1637-branch-hygiene"
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Checkout pinned repo-guard
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: a2cb2ae98596c5b673eed2548abef40edcf4bdce
+          path: .repo-guard
+
+      - name: Install repo-guard
+        run: npm install --prefix .repo-guard --omit=dev --silent
+
+      - name: Print structured policy report
+        env:
+          BASE: "046ecba148cd823180b9cc471147533a26168147"
+          HEAD: ${{ github.sha }}
+        shell: bash
+        run: |
+          set +e
+          node .repo-guard/dist/repo-guard.mjs             --repo-root "$GITHUB_WORKSPACE"             --enforcement blocking             check-diff             --base "$BASE"             --head "$HEAD"             --format json > "$RUNNER_TEMP/repo-guard.json"
+          status=$?
+          cat "$RUNNER_TEMP/repo-guard.json"
+          exit "$status"
