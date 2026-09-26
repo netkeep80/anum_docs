@@ -259,8 +259,8 @@ export function loadMtsSemanticIr(
   });
 }
 
-function marker(id: string, side: "begin" | "end"): string {
-  return side === "begin" ? `<!-- мтс:требование:${id}:начало -->` : `<!-- мтс:требование:${id}:конец -->`;
+function marker(id: string, side: "начало" | "конец"): string {
+  return `<!-- мтс:требование:${id}:${side} -->`;
 }
 
 export function renderRequirementProjectionBody(item: MtsRequirementProjection): string {
@@ -269,9 +269,9 @@ export function renderRequirementProjectionBody(item: MtsRequirementProjection):
 
 export function renderRequirementProjection(item: MtsRequirementProjection): string {
   return [
-    marker(item.id, "begin"),
+    marker(item.id, "начало"),
     renderRequirementProjectionBody(item),
-    marker(item.id, "end"),
+    marker(item.id, "конец"),
   ].join("\n");
 }
 
