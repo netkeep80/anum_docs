@@ -1,0 +1,244 @@
+{
+  "schema": "mts-requirement-registry/v0.1",
+  "contract": "mts-contract/v0.13",
+  "semanticSource": {
+    "path": "contracts/mts-contract-v0.13.json",
+    "pointer": "/requiredSemanticLaws"
+  },
+  "requirements": [
+    {
+      "id": "L1",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "theory/foundation/ontology"
+      },
+      "order": 10,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L1"
+      },
+      "docProjection": {
+        "path": "docs/specs/Апамять и управление сетью связей.md",
+        "anchor": "mts-law-L1"
+      }
+    },
+    {
+      "id": "L2",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "notation/formal/result-identity"
+      },
+      "order": 20,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L2"
+      },
+      "docProjection": {
+        "path": "docs/specs/Формальная нотация МТС.md",
+        "anchor": "mts-law-L2"
+      }
+    },
+    {
+      "id": "L3",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "notation/formal/context-authority"
+      },
+      "order": 30,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L3"
+      },
+      "docProjection": {
+        "path": "docs/specs/Формальная нотация МТС.md",
+        "anchor": "mts-law-L3"
+      }
+    },
+    {
+      "id": "L4",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "representation/recursive-alphabet/prefix-codec"
+      },
+      "order": 40,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L4"
+      },
+      "docProjection": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L4"
+      }
+    },
+    {
+      "id": "L5",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "representation/recursive-alphabet/canonicality"
+      },
+      "order": 50,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L5"
+      },
+      "docProjection": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L5"
+      }
+    },
+    {
+      "id": "L6",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "representation/carrier/description-target-boundary"
+      },
+      "order": 60,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L6"
+      },
+      "docProjection": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L6"
+      }
+    },
+    {
+      "id": "L7",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "representation/transport/structural-identity"
+      },
+      "order": 70,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L7"
+      },
+      "docProjection": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L7"
+      }
+    },
+    {
+      "id": "L8",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "execution/amemory/materialization-authority"
+      },
+      "order": 80,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L8"
+      },
+      "docProjection": {
+        "path": "docs/specs/Апамять и управление сетью связей.md",
+        "anchor": "mts-law-L8"
+      }
+    },
+    {
+      "id": "L9",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "theory/foundation/root-grounding"
+      },
+      "order": 90,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L9"
+      },
+      "docProjection": {
+        "path": "docs/specs/Апамять и управление сетью связей.md",
+        "anchor": "mts-law-L9"
+      }
+    },
+    {
+      "id": "L10",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "representation/anum/root-origin"
+      },
+      "order": 100,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L10"
+      },
+      "docProjection": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L10"
+      }
+    },
+    {
+      "id": "L11",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "representation/anum/string-carrier"
+      },
+      "order": 110,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L11"
+      },
+      "docProjection": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L11"
+      }
+    },
+    {
+      "id": "L12",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "notation/formal/structural-grounding"
+      },
+      "order": 120,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L12"
+      },
+      "docProjection": {
+        "path": "docs/specs/Формальная нотация МТС.md",
+        "anchor": "mts-law-L12"
+      }
+    },
+    {
+      "id": "L13",
+      "kind": "semantic-law",
+      "status": "accepted",
+      "classification": {
+        "path": "representation/physical-boundary/digital-alphabet"
+      },
+      "order": 130,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.13.json",
+        "pointer": "/requiredSemanticLaws/L13"
+      },
+      "docProjection": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-law-L13"
+      }
+    }
+  ]
+}
