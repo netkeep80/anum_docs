@@ -260,7 +260,7 @@ export function loadMtsSemanticIr(
 }
 
 function marker(id: string, side: "begin" | "end"): string {
-  return `<!-- mts:req:${id}:${side} -->`;
+  return side === "begin" ? `<!-- мтс:требование:${id}:начало -->` : `<!-- мтс:требование:${id}:конец -->`;
 }
 
 export function renderRequirementProjectionBody(item: MtsRequirementProjection): string {
