@@ -1009,7 +1009,7 @@
     "packageWideObjectSpecificHostSemanticCount": null,
     "typedReadMemorySiteCount": 508,
     "typedReadMemoryOwnerCount": 233,
-    "staticSemanticDecisionCandidateOwnerCount": 343,
+    "staticSemanticDecisionCandidateOwnerCount": 355,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
     "staticDecisionOwnersByCategory": {
       "memory-resource-safety": 4,
@@ -1017,7 +1017,7 @@
       "proof-replay": 91,
       "representation": 55,
       "semantic-authority": 88,
-      "tooling": 22,
+      "tooling": 34,
       "transport-persistence": 23
     },
     "packageWideExactWireLiteralDispatchCount": 0,
@@ -2168,17 +2168,17 @@
       "poles": 215,
       "root": 70
     },
-    "decisionCandidateOwnerCount": 343,
-    "decisionCandidateFingerprintFNV64": "c4b871f028f83a6c",
+    "decisionCandidateOwnerCount": 355,
+    "decisionCandidateFingerprintFNV64": "52e621a310944f17",
     "decisionSignalCounts": {
-      "ambient-mutable-decision": 51,
-      "fixed-coordinate-index": 50,
+      "ambient-mutable-decision": 56,
+      "fixed-coordinate-index": 53,
       "host-callback-call": 5,
       "host-tag-decision": 35,
       "if-link": 215,
       "if-memory-read": 84,
       "link-equality": 209,
-      "literal-equality": 131,
+      "literal-equality": 143,
       "literal-switch": 3,
       "memory-read-equality": 89,
       "switch-link": 1,
@@ -2242,6 +2242,8 @@
       "ts/src/syntax-aset-contract.ts": 11,
       "ts/src/tooling/cli.ts": 3,
       "ts/src/tooling/docs-sync.ts": 12,
+      "ts/src/tooling/markdown-section-adapter.ts": 6,
+      "ts/src/tooling/mts-compiler.ts": 6,
       "ts/src/tooling/notation.ts": 1,
       "ts/src/tooling/payload.ts": 5,
       "ts/src/tooling/test-runner.ts": 1,
@@ -2326,7 +2328,9 @@
       "ts/src/v013-relative-pole-execution.ts": "semantic-authority",
       "ts/src/v013-structural-execution.ts": "semantic-authority",
       "ts/src/value-bundle.ts": "semantic-authority",
-      "ts/src/v013-grounded-execution.ts": "semantic-authority"
+      "ts/src/v013-grounded-execution.ts": "semantic-authority",
+      "ts/src/tooling/markdown-section-adapter.ts": "tooling",
+      "ts/src/tooling/mts-compiler.ts": "tooling"
     },
     "decisionOwnerCountsByCategory": {
       "memory-resource-safety": 4,
@@ -2334,7 +2338,7 @@
       "proof-replay": 91,
       "representation": 55,
       "semantic-authority": 88,
-      "tooling": 22,
+      "tooling": 34,
       "transport-persistence": 23
     },
     "unclassifiedDecisionCandidateOwnerCount": 0,

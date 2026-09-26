@@ -18,6 +18,7 @@ import {
   syncRepositoryDocs,
   validateSemanticLawDocumentation,
 } from "../src/tooling/docs-sync.js";
+import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
 
 function expectThrow(action: () => unknown, pattern: RegExp): void {
   assert.throws(action, pattern);
@@ -184,8 +185,9 @@ try {
   copy("contracts/mts-conformance-v0.13.json");
   copy("contracts/mts-contract-v0.12.json");
   copy("contracts/mts-conformance-v0.12.json");
-  for (const path of CANONICAL_DOCS) copy(path);
-  for (const path of PROJECTION_FORBIDDEN_DOCS) copy(path);
+  copy("traceability/mts-v0.13.json");
+  copy("requirements/mts-v0.13.json");
+  for (const path of listRepositoryMarkdownSurface(repositoryRoot)) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
   writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.13", "mts-contract/v0.X"), "utf8");

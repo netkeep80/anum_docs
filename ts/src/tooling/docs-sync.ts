@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { compileRequirementDocuments } from "./mts-compiler.js";
 
 export const PROJECTION_START = "<!-- мтс-текущая-проекция:начало -->";
 export const PROJECTION_END = "<!-- мтс-текущая-проекция:конец -->";
@@ -417,7 +418,8 @@ export function checkRepositoryDocs(root = findRepositoryRoot()): string[] {
     const source = readFileSync(resolve(root, path), "utf8");
     return source.includes(PROJECTION_START) || source.includes(PROJECTION_END);
   });
-  return [...stale, ...duplicated];
+  const compiledRequirements = compileRequirementDocuments(root, false);
+  return [...new Set([...stale, ...duplicated, ...compiledRequirements])].sort();
 }
 
 export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {
@@ -431,7 +433,10 @@ export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {
     writeFileSync(fullPath, updated, "utf8");
     changed.push(path);
   }
-  return changed;
+  for (const path of compileRequirementDocuments(root, true)) {
+    if (!changed.includes(path)) changed.push(path);
+  }
+  return changed.sort();
 }
 
 function main(): void {
@@ -447,7 +452,7 @@ function main(): void {
   if (stale.length) fail(`устарела автоматическая проекция: ${stale.join(", ")}; запустите npm --prefix ts run docs:sync`);
   const lawIssues = checkRepositorySemanticLawDocumentation(root);
   if (lawIssues.length) fail(`нарушена документационная канонизация законов: ${lawIssues.map((issue) => issue.message).join("; ")}`);
-  console.log("Автоматическая проекция и владельцы semantic laws соответствуют текущему контракту.");
+  console.log("MTS Compiler: release-проекция, requirement-блоки и владельцы semantic laws синхронизированы.");
 }
 
 const invokedPath = process.argv[1] === undefined ? undefined : resolve(process.argv[1]);
