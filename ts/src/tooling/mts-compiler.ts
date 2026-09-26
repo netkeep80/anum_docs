@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -13,6 +14,7 @@ export interface MtsRequirementProjection {
   readonly order: number;
   readonly dependsOn: readonly string[];
   readonly statement: string;
+  readonly statementDigest: string;
   readonly authorityDocument: string;
   readonly authorityPointer: string;
   readonly traceabilityPath: string;
@@ -153,6 +155,7 @@ export function loadMtsSemanticIr(
     seen.add(id);
 
     const statement = string(laws[id], `${contractPath}.requiredSemanticLaws.${id}`);
+    const statementDigest = createHash("sha256").update(statement, "utf8").digest("hex").slice(0, 16);
     const kind = string(value.kind, `requirements[${index}].kind`);
     const status = string(value.status, `requirements[${index}].status`);
     if (status !== "accepted") fail(`${id} pilot status must be accepted`);
@@ -206,6 +209,7 @@ export function loadMtsSemanticIr(
       order: number(value.order, `requirements[${index}].order`),
       dependsOn: Object.freeze([...strings(value.dependsOn, `requirements[${index}].dependsOn`)]),
       statement,
+      statementDigest,
       authorityDocument,
       authorityPointer,
       traceabilityPath,
@@ -239,7 +243,7 @@ export function renderRequirementProjection(item: MtsRequirementProjection): str
     marker(item.id, "begin"),
     `> **Скомпилированное требование \`${item.id}\`.** Вид: \`${item.kind}\`; классификация: \`${item.classificationPath}\`.`,
     ">",
-    `> Машинный источник: \`${item.authorityDocument}#${item.authorityPointer}\`.`,
+    `> Машинный источник: \`${item.authorityDocument}#${item.authorityPointer}\`; отпечаток формулировки: \`${item.statementDigest}\`.`,
     `> Свидетельства: +${item.positiveVectorCount} / -${item.negativeVectorCount}; исполняемых проверок: ${item.executableGateCount}; трассировка: \`${item.traceabilityPath}\`.`,
     marker(item.id, "end"),
   ].join("\n");
