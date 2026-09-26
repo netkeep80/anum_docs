@@ -2338,6 +2338,7 @@
       "ts/src/tooling/mts-compiler.ts": "tooling",
       "ts/src/tooling/docs-coverage.ts": "tooling",
       "ts/src/tooling/foundation-provenance-audit.ts": "tooling",
+      "ts/src/tooling/markdown-anchor-baseline.ts": "tooling",
       "ts/src/tooling/markdown-coverage-audit.ts": "tooling",
       "ts/src/tooling/markdown-link-audit.ts": "tooling"
     },
