@@ -1009,7 +1009,7 @@
     "packageWideObjectSpecificHostSemanticCount": null,
     "typedReadMemorySiteCount": 508,
     "typedReadMemoryOwnerCount": 233,
-    "staticSemanticDecisionCandidateOwnerCount": 374,
+    "staticSemanticDecisionCandidateOwnerCount": 378,
     "unclassifiedStaticDecisionCandidateOwnerCount": 0,
     "staticDecisionOwnersByCategory": {
       "memory-resource-safety": 4,
@@ -1017,7 +1017,7 @@
       "proof-replay": 91,
       "representation": 55,
       "semantic-authority": 88,
-      "tooling": 53,
+      "tooling": 57,
       "transport-persistence": 23
     },
     "packageWideExactWireLiteralDispatchCount": 0,
@@ -2168,7 +2168,7 @@
       "poles": 215,
       "root": 70
     },
-    "decisionCandidateOwnerCount": 374,
+    "decisionCandidateOwnerCount": 378,
     "decisionCandidateFingerprintFNV64": "18445ff6816f2e1b",
     "decisionSignalCounts": {
       "ambient-mutable-decision": 58,
@@ -2244,6 +2244,7 @@
       "ts/src/tooling/cli.ts": 3,
       "ts/src/tooling/docs-coverage.ts": 1,
       "ts/src/tooling/docs-sync.ts": 13,
+      "ts/src/tooling/foundation-provenance-audit.ts": 4,
       "ts/src/tooling/markdown-coverage-audit.ts": 2,
       "ts/src/tooling/markdown-link-audit.ts": 4,
       "ts/src/tooling/markdown-section-adapter.ts": 17,
@@ -2346,7 +2347,7 @@
       "proof-replay": 91,
       "representation": 55,
       "semantic-authority": 88,
-      "tooling": 53,
+      "tooling": 57,
       "transport-persistence": 23
     },
     "unclassifiedDecisionCandidateOwnerCount": 0,
