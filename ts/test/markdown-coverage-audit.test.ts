@@ -2,6 +2,7 @@ import {
   auditMarkdownDocument,
   buildMarkdownCoverageAudit,
 } from "../src/tooling/markdown-coverage-audit.js";
+import { findRepositoryRoot } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Markdown coverage P4: ${message}`);
@@ -21,7 +22,7 @@ function throws(fn: () => unknown, fragment: string, message: string): void {
   throw new Error(`Markdown coverage P4: ${message}: expected failure`);
 }
 
-const root = process.cwd();
+const root = findRepositoryRoot();
 const report = buildMarkdownCoverageAudit(root);
 const again = buildMarkdownCoverageAudit(root);
 
