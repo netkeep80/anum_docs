@@ -93,12 +93,12 @@ assert(realHtml.includes("<main class=\"versions\""), "V3 version overview retai
 assert(realHtml.includes(":focus-visible"), "visible keyboard focus styling");
 assert(realHtml.includes("@media (max-width: 680px)"), "responsive baseline");
 assert(!realHtml.includes('<script src="http') && !realHtml.includes('<link rel="stylesheet" href="http'), "no external runtime asset dependency");
-same(realSemanticIr.requirements.length, 13, "P3a renders compiler-supported v0.13 requirements");
+same(realSemanticIr.requirements.length, 14, "P3a renders compiler-supported v0.14 requirements");
 assert(realHtml.includes('id="requirements-title"'), "semantic requirement hierarchy is rendered");
 assert(realHtml.includes('data-requirement-id="L4"'), "stable requirement ID is rendered");
 assert(realHtml.includes("representation/recursive-alphabet/prefix-codec"), "contract classification path is rendered");
 assert(realHtml.includes("f740e98eade6204d"), "statement digest is rendered");
-assert(realHtml.includes(realSemanticIr.requirements.find((item) => item.id === "L4")!.statement), "exact contract statement is rendered");
+assert(realHtml.includes(realSemanticIr.requirements.find((item) => item.id === "V14-L12")!.statement), "exact current contract statement is rendered");
 assert(realHtml.includes("https://github.com/netkeep80/anum_docs/blob/main/docs/specs/"), "human Markdown projection has direct source navigation");
 assert(realHtml.includes('data-requirement-filter-axis="kind"'), "P3b kind filter is rendered from validated IR");
 assert(realHtml.includes('data-requirement-filter-axis="status"'), "P3b status filter is rendered from validated IR");
