@@ -1,0 +1,228 @@
+{
+  "schema": "mts-traceability/v0.2",
+  "status": "candidate",
+  "accepted": false,
+  "acceptanceReady": false,
+  "contract": "contracts/mts-contract-v0.14.json",
+  "conformance": "contracts/mts-conformance-v0.14.json",
+  "issue": 1658,
+  "acceptance": null,
+  "currentAccepted": {
+    "contract": "contracts/mts-contract-v0.13.json",
+    "conformance": "contracts/mts-conformance-v0.13.json",
+    "acceptance": "cutover/typescript-c1-acceptance-v0.6.json"
+  },
+  "documentationOwnerProjection": "DEFERRED_TO_1585_AFTER_ACCEPTANCE",
+  "invariants": {
+    "V14-L1": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L1",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-recursive-link-alphabet-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-recursive-alphabet-is-not-anum-q-alphabet"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-foundation-orientation-witness.test.ts",
+        "ts/test/research-v014-ostensive-formal-grammar.test.ts"
+      ]
+    },
+    "V14-L2": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L2",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-ostensive-formal-grammar-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-recursive-alphabet-is-not-anum-q-alphabet"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-ostensive-formal-grammar.test.ts"
+      ]
+    },
+    "V14-L3": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L3",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-q14-version-separation-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-q14-rejects-legacy-1-0-source",
+          "v014-q13-rejects-t-f-source",
+          "v014-mixed-q13-q14-source-rejected"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/v014-q14-versioned-interpreter.test.ts"
+      ]
+    },
+    "V14-L4": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L4",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-reaction-result-basis-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-successful-empty-is-not-nat-zero-or-no-relation"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-reaction-result-basis.test.ts"
+      ]
+    },
+    "V14-L5": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L5",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-link-immutability-rewrite-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-immutable-link-chiral-rewrite.test.ts"
+      ]
+    },
+    "V14-L6": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L6",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-nat-degree-separation-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-ambient-nat-membership-is-not-canonical-authority",
+          "v014-legacy-succ-u-equals-l-rejected"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-nat-least-closed-authority.test.ts",
+        "ts/test/research-v014-count-nat-degree-separation.test.ts"
+      ]
+    },
+    "V14-L7": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L7",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-count-to-nat-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-ambient-nat-membership-is-not-canonical-authority"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-count-nat-degree-separation.test.ts"
+      ]
+    },
+    "V14-L8": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L8",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-add-total-functionality-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-ambient-add-link-is-not-canonical-proof-authority",
+          "v014-forged-add-constructor-cannot-witness-functionality"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-constructor-scoped-proof.test.ts",
+        "ts/test/research-v014-add-general-functionality.test.ts"
+      ]
+    },
+    "V14-L9": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L9",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-order-from-canonical-add-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-ambient-add-link-is-not-canonical-proof-authority",
+          "v014-forged-add-constructor-cannot-witness-le"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-order-replay-mul-scope.test.ts"
+      ]
+    },
+    "V14-L10": {
+      "status": "EXPLICITLY_DEFERRED_SCOPE",
+      "contractPointer": "/requiredSemanticLaws/V14-L10",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-multiplication-scope-deferred-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-order-replay-mul-scope.test.ts"
+      ]
+    },
+    "V14-L11": {
+      "status": "GREEN_RESEARCH_NON_REGRESSION",
+      "contractPointer": "/requiredSemanticLaws/V14-L11",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-generalized-mp-nonregression-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": []
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-orientation-gauge-view.test.ts"
+      ]
+    },
+    "V14-L12": {
+      "status": "BLOCKING_PENDING_AUTHOR_SEMANTIC_FREEZE",
+      "contractPointer": "/requiredSemanticLaws/V14-L12",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-orientation-gauge-research-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-local-unordered-collapses-o-c-l-u-and-orientation-orbit",
+          "v014-raw-inr-outr-presence-is-not-orientation-authority",
+          "v014-zero-or-two-selected-orientation-witnesses-unresolved"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-foundation-orientation-witness.test.ts",
+        "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
+        "ts/test/research-v014-orientation-gauge-view.test.ts"
+      ]
+    }
+  }
+}
