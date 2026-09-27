@@ -2,35 +2,45 @@
   "schema": "mts-traceability/v0.2",
   "status": "candidate",
   "accepted": false,
-  "acceptanceReady": true,
+  "acceptanceReady": false,
   "contract": "contracts/mts-contract-v0.14.json",
   "conformance": "contracts/mts-conformance-v0.14.json",
-  "issue": 1658,
+  "issue": 1677,
   "acceptance": null,
   "currentAccepted": {
     "contract": "contracts/mts-contract-v0.13.json",
     "conformance": "contracts/mts-conformance-v0.13.json",
     "acceptance": "cutover/typescript-c1-acceptance-v0.6.json"
   },
-  "documentationOwnerProjection": "DEFERRED_TO_1585_AFTER_ACCEPTANCE",
+  "documentationOwnerProjection": "PREDECLARED_IN_REQUIREMENTS_MTS_V0_14_PROSE_DEFERRED_TO_1585",
   "invariants": {
     "V14-L1": {
       "status": "GREEN_RESEARCH",
       "contractPointer": "/requiredSemanticLaws/V14-L1",
       "positive": {
         "requiredPositiveVectors": [
-          "v014-recursive-link-alphabet-grounded"
+          "v014-recursive-link-alphabet-grounded",
+          "v014-one-link-four-emergent-forms-grounded"
         ]
       },
       "negative": {
         "requiredNegativeVectors": [
-          "v014-recursive-alphabet-is-not-anum-q-alphabet"
+          "v014-recursive-alphabet-is-not-anum-q-alphabet",
+          "v014-four-recursive-forms-are-not-primitive-opcodes"
         ]
       },
       "requiredExecutableGates": [
         "ts/test/research-v014-foundation-orientation-witness.test.ts",
-        "ts/test/research-v014-ostensive-formal-grammar.test.ts"
-      ]
+        "ts/test/research-v014-ostensive-formal-grammar.test.ts",
+        "ts/test/research-v014-context-relative-a4prime.test.ts",
+        "ts/test/research-v014-preacceptance-closure.test.ts"
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l1",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L2": {
       "status": "GREEN_RESEARCH",
@@ -47,7 +57,13 @@
       },
       "requiredExecutableGates": [
         "ts/test/research-v014-ostensive-formal-grammar.test.ts"
-      ]
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/specs/Формальная нотация МТС.md",
+        "anchor": "mts-v014-v14-l2",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L3": {
       "status": "GREEN_RESEARCH",
@@ -66,7 +82,13 @@
       },
       "requiredExecutableGates": [
         "ts/test/v014-q14-versioned-interpreter.test.ts"
-      ]
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-v014-v14-l3",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L4": {
       "status": "GREEN_RESEARCH",
@@ -83,7 +105,13 @@
       },
       "requiredExecutableGates": [
         "ts/test/research-v014-reaction-result-basis.test.ts"
-      ]
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/specs/Апамять и управление сетью связей.md",
+        "anchor": "mts-v014-v14-l4",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L5": {
       "status": "GREEN_RESEARCH",
@@ -98,7 +126,13 @@
       },
       "requiredExecutableGates": [
         "ts/test/research-v014-immutable-link-chiral-rewrite.test.ts"
-      ]
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l5",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L6": {
       "status": "GREEN_RESEARCH",
@@ -117,7 +151,13 @@
       "requiredExecutableGates": [
         "ts/test/research-v014-nat-least-closed-authority.test.ts",
         "ts/test/research-v014-count-nat-degree-separation.test.ts"
-      ]
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l6",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L7": {
       "status": "GREEN_RESEARCH",
@@ -134,7 +174,13 @@
       },
       "requiredExecutableGates": [
         "ts/test/research-v014-count-nat-degree-separation.test.ts"
-      ]
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l7",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L8": {
       "status": "GREEN_RESEARCH",
@@ -153,7 +199,13 @@
       "requiredExecutableGates": [
         "ts/test/research-v014-constructor-scoped-proof.test.ts",
         "ts/test/research-v014-add-general-functionality.test.ts"
-      ]
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l8",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L9": {
       "status": "GREEN_RESEARCH",
@@ -171,7 +223,13 @@
       },
       "requiredExecutableGates": [
         "ts/test/research-v014-order-replay-mul-scope.test.ts"
-      ]
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l9",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L10": {
       "status": "EXPLICITLY_DEFERRED_SCOPE",
@@ -186,38 +244,58 @@
       },
       "requiredExecutableGates": [
         "ts/test/research-v014-order-replay-mul-scope.test.ts"
-      ]
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l10",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L11": {
       "status": "GREEN_RESEARCH_NON_REGRESSION",
       "contractPointer": "/requiredSemanticLaws/V14-L11",
       "positive": {
         "requiredPositiveVectors": [
-          "v014-generalized-mp-nonregression-grounded"
+          "v014-generalized-mp-nonregression-grounded",
+          "v014-generalized-mp-full-chain-grounded"
         ]
       },
       "negative": {
         "requiredNegativeVectors": []
       },
       "requiredExecutableGates": [
-        "ts/test/research-v014-orientation-gauge-view.test.ts"
-      ]
+        "ts/test/research-v014-orientation-gauge-view.test.ts",
+        "ts/test/research-v013-root-asymmetry-chirality-a14.test.ts",
+        "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
+        "ts/test/research-v013-application-closed-frontier-a17.test.ts",
+        "ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts"
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l11",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     },
     "V14-L12": {
-      "status": "GREEN_AUTHOR_FROZEN",
+      "status": "GREEN_AUTHOR_REFINED_CONTEXT_RELATIVE",
       "contractPointer": "/requiredSemanticLaws/V14-L12",
       "positive": {
         "requiredPositiveVectors": [
           "v014-orientation-gauge-research-grounded",
           "v014-a4-operational-equivalence-grounded",
-          "v014-a4prime-chiral-torsor-bootstrap-grounded"
+          "v014-a4prime-chiral-torsor-bootstrap-grounded",
+          "v014-context-relative-a4prime-grounded"
         ]
       },
       "negative": {
         "requiredNegativeVectors": [
           "v014-local-unordered-collapses-o-c-l-u-and-orientation-orbit",
           "v014-raw-inr-outr-presence-is-not-orientation-authority",
-          "v014-zero-or-two-selected-orientation-witnesses-unresolved"
+          "v014-global-selected-w-required-rejected",
+          "v014-exact-sequence-is-not-orientation-authority",
+          "v014-four-recursive-forms-are-not-primitive-opcodes"
         ]
       },
       "requiredExecutableGates": [
@@ -225,8 +303,67 @@
         "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
         "ts/test/research-v014-orientation-gauge-view.test.ts",
         "ts/test/research-v014-a4-operational-equivalence.test.ts",
-        "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts"
-      ]
+        "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
+        "ts/test/research-v014-context-relative-a4prime.test.ts"
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l12",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
+    },
+    "V14-L13": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L13",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-anum-sequence-semantics-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-anum-exact-sequence-is-not-fold-denotation",
+          "v014-recursive-codec-is-not-anum-carrier"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-preacceptance-closure.test.ts",
+        "ts/test/v013-root-origin-law.test.ts",
+        "ts/test/v014-q14-versioned-interpreter.test.ts"
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-v014-v14-l13",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
+    },
+    "V14-L14": {
+      "status": "GREEN_RESEARCH",
+      "contractPointer": "/requiredSemanticLaws/V14-L14",
+      "positive": {
+        "requiredPositiveVectors": [
+          "v014-representation-layer-registry-grounded"
+        ]
+      },
+      "negative": {
+        "requiredNegativeVectors": [
+          "v014-representation-layer-does-not-create-ontology-sort"
+        ]
+      },
+      "requiredExecutableGates": [
+        "ts/test/research-v014-preacceptance-closure.test.ts"
+      ],
+      "documentationOwner": {
+        "registry": "requirements/mts-v0.14.json",
+        "path": "docs/theory/Основания МТС.md",
+        "anchor": "mts-v014-v14-l14",
+        "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      }
     }
-  }
+  },
+  "documentationProjectionRegistry": "requirements/mts-v0.14.json",
+  "adversarialClosureIssue": 1677,
+  "contextRelativeA4ResearchIssue": 1673
 }
