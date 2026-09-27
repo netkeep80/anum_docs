@@ -2160,9 +2160,7 @@
         "JSON",
         "Python",
         "TypeScript",
-        "UTF",
-        "mts-readme-contract-observatory",
-        "mts-readme-authors"
+        "UTF"
       ],
       "max_unapproved_latin_words_per_line": 1
     },
