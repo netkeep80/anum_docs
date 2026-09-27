@@ -357,12 +357,14 @@ function exerciseContextRelativeGauge(): void {
   const gAB = transportBetweenSelections(m, R, chiA, chiB);
   const gBC = transportBetweenSelections(m, R, chiB, chiC);
   const gAC = transportBetweenSelections(m, R, chiA, chiC);
+  assert(gAB !== "UNRESOLVED" && gBC !== "UNRESOLVED" && gAC !== "UNRESOLVED", "pairwise transports resolve in Z2");
   same(gAB, "ID", "same-chirality Contexts have Id transport");
   same(gBC, "J", "opposite-chirality Contexts have J transport");
   same(gAC, "J", "A to C transport is J");
   same(composeTransport(gAB, gBC), gAC, "g_AB o g_BC = g_AC");
 
   const gCA = transportBetweenSelections(m, R, chiC, chiA);
+  assert(gCA !== "UNRESOLVED", "reverse transport resolves in Z2");
   same(gCA, "J", "g_AB = g_BA for Z2 transport");
   same(composeTransport(gAC, gCA), "ID", "J o J = Id");
   same(
@@ -392,32 +394,116 @@ function exerciseContextRelativeGauge(): void {
   same(rawInvertLink(m, R, crossed), crossed, "crossed matching is objective/J-fixed");
 
   // Each context-oriented semantic view derives the same local equations.
-  function frameFor(w: LinkHandle): "DIRECT" | "MIRROR" {
+  type LocalFrame = "DIRECT" | "MIRROR";
+
+  class LocalOrientationView {
+    constructor(
+      readonly localMemory: Memory,
+      readonly localFrame: LocalFrame,
+    ) {}
+
+    get root(): LinkHandle {
+      return this.localMemory.root;
+    }
+
+    poles(link: LinkHandle) {
+      const technical = this.localMemory.poles(link);
+      return this.localFrame === "DIRECT"
+        ? technical
+        : Object.freeze({ start: technical.end, end: technical.start });
+    }
+
+    ensure(a: LinkHandle, b: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensure(a, b)
+        : this.localMemory.ensure(b, a);
+    }
+
+    ensureStartSelfClosed(other: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensureStartSelfClosed(other)
+        : this.localMemory.ensureEndSelfClosed(other);
+    }
+
+    ensureEndSelfClosed(other: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensureEndSelfClosed(other)
+        : this.localMemory.ensureStartSelfClosed(other);
+    }
+  }
+
+  function localFoundation(view: LocalOrientationView) {
+    const localR = view.root;
+    const O = view.ensureStartSelfClosed(localR);
+    const C = view.ensureEndSelfClosed(localR);
+    const L = view.ensure(O, C);
+    const U = view.ensure(C, O);
+    return Object.freeze({ R: localR, O, C, L, U });
+  }
+
+  function localSemanticWire(
+    view: LocalOrientationView,
+    link: LinkHandle,
+    active = new Set<LinkHandle>(),
+  ): string {
+    assert(!active.has(link), "unexpected non-self cycle in local semantic wire");
+    const p = view.poles(link);
+    if (p.start === link && p.end === link) return "8";
+
+    if (p.start === link) {
+      active.add(link);
+      try {
+        return "9" + localSemanticWire(view, p.end, active);
+      } finally {
+        active.delete(link);
+      }
+    }
+
+    if (p.end === link) {
+      active.add(link);
+      try {
+        return "6" + localSemanticWire(view, p.start, active);
+      } finally {
+        active.delete(link);
+      }
+    }
+
+    active.add(link);
+    try {
+      return "1" +
+        localSemanticWire(view, p.start, active) +
+        localSemanticWire(view, p.end, active);
+    } finally {
+      active.delete(link);
+    }
+  }
+
+  function frameFor(w: LinkHandle): LocalFrame {
     const p = m.poles(w);
     if (p.end === R && p.start !== R) return "DIRECT";
     if (p.start === R && p.end !== R) return "MIRROR";
     throw new Error("v0.14 N20b: witness does not resolve a local frame");
   }
 
-  const viewA = new SemanticOrientationView(m, frameFor(chiA));
-  const viewC = new SemanticOrientationView(m, frameFor(chiC));
-  const fA = buildDerivedFoundation(viewA);
-  const fC = buildDerivedFoundation(viewC);
+  const viewA = new LocalOrientationView(m, frameFor(chiA));
+  const viewC = new LocalOrientationView(m, frameFor(chiC));
+  const fA = localFoundation(viewA);
+  const fC = localFoundation(viewC);
   const fingerprintA = [
-    semanticWire(viewA, fA.R),
-    semanticWire(viewA, fA.O),
-    semanticWire(viewA, fA.C),
-    semanticWire(viewA, fA.L),
-    semanticWire(viewA, fA.U),
-    semanticWire(viewA, chiA),
+    localSemanticWire(viewA, fA.R),
+    localSemanticWire(viewA, fA.O),
+    localSemanticWire(viewA, fA.C),
+    localSemanticWire(viewA, fA.L),
+    localSemanticWire(viewA, fA.U),
+    localSemanticWire(viewA, chiA),
   ].join("|");
   const fingerprintC = [
-    semanticWire(viewC, fC.R),
-    semanticWire(viewC, fC.O),
-    semanticWire(viewC, fC.C),
-    semanticWire(viewC, fC.L),
-    semanticWire(viewC, fC.U),
-    semanticWire(viewC, chiC),
+    localSemanticWire(viewC, fC.R),
+    localSemanticWire(viewC, fC.O),
+    localSemanticWire(viewC, fC.C),
+    localSemanticWire(viewC, fC.L),
+    localSemanticWire(viewC, fC.U),
+    localSemanticWire(viewC, chiC),
   ].join("|");
   same(fingerprintA, fingerprintC, "mirror Context frames preserve local semantic equations");
 }
