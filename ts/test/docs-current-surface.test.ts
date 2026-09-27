@@ -17,6 +17,18 @@ function same<T>(actual: T, expected: T, message: string): void {
 }
 
 const root = resolve(process.cwd(), "..");
+const acceptance = JSON.parse(
+  readFileSync(join(root, "cutover/typescript-c1-acceptance-v0.7.json"), "utf8"),
+) as any;
+assert(
+  acceptance.current?.contract === "contracts/mts-contract-v0.14.json",
+  "accepted release pointer is v0.14",
+);
+assert(
+  acceptance.acceptance?.proseDocumentationReconstructionPendingIssue === 1585,
+  "v0.13 prose surface is temporary only under explicit post-acceptance reconstruction #1585",
+);
+
 const policy = JSON.parse(
   readFileSync(join(root, "repo-policy.json"), "utf8"),
 ) as {
@@ -110,11 +122,12 @@ assert(
 assert(existsSync(glossary), "glossary exists");
 
 console.log([
-  "MTS v0.13 documentation conformance: GREEN",
+  "MTS v0.14 accepted / v0.13 prose staging: GREEN",
   `CURRENT_DOCS=${current.length}`,
   "VERSION_MARKER=EXACTLY_ONE_PER_DOC",
   "VISIBLE_VERSION_LABEL=REQUIRED",
   "PREVIOUS_VERSION_PROSE=0",
   "VERSIONED_CURRENT_FILENAMES=0",
   "OBSOLETE_BUNDLE_PATH=ABSENT",
+  "POST_ACCEPTANCE_RECONSTRUCTION_1585=PENDING",
 ].join(" "));
