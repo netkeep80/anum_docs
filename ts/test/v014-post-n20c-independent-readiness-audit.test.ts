@@ -190,7 +190,7 @@ for(const gate of [
 same(contract.candidateState.documentationOwnershipMapComplete,true,"doc owner map complete");
 same(contract.candidateState.documentationComplete,false,"human prose remains post-acceptance");
 same(contract.acceptanceBoundary.documentationReconstructionUnblocked,true,"#1585 is unblocked after acceptance");
-same(requirements.projectionState,"ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585","projection state");
+same(requirements.projectionState,"MATERIALIZED","current documentation projection state");
 
 // Readiness provenance and old-freeze invalidation.
 same(contract.readinessAudit.status,"GREEN_INDEPENDENT_POST_N20C_AUDIT","contract readiness status");
