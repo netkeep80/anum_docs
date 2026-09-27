@@ -3,6 +3,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { Memory, ensureRootBasis } from "../src/memory.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error("v0.14 N20 requirement projection: " + message);
@@ -23,6 +24,15 @@ const readJson=(path:string):any=>JSON.parse(readFileSync(join(repoRoot,path),"u
 const contract=readJson("contracts/mts-contract-v0.14.json");
 const trace=readJson("traceability/mts-v0.14.json");
 const registry=readJson("requirements/mts-v0.14.json");
+
+// A mandatory semantic projection gate must still execute against the real
+// kernel. The registry is metadata over these semantics, not a paper-only
+// replacement for them.
+const memory = new Memory();
+const basis = ensureRootBasis(memory);
+assert(basis.R !== basis.O && basis.O !== basis.C, "live kernel RootBasis remains proper");
+same(memory.ensure(basis.O, basis.C), basis.L, "live kernel L remains canonical");
+same(memory.ensure(basis.C, basis.O), basis.U, "live kernel U remains canonical");
 
 same(registry.schema,"mts-requirement-registry/v0.2","registry schema");
 same(registry.status,"candidate","registry remains pre-acceptance");
