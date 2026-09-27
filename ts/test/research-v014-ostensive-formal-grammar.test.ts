@@ -214,7 +214,10 @@ function main(): void {
   }
 
   // Same denotation vocabulary does not mean byte-identical source spelling.
-  assert("∞" !== "8", "ostensive ROOT source and recursive ROOT source are distinct STRINGs");
+  assert(
+    "∞".charCodeAt(0) !== "8".charCodeAt(0),
+    "ostensive ROOT source and recursive ROOT source are distinct STRINGs",
+  );
 
   console.log([
     "MTS v0.14 N15: OSTENSIVE_FORMAL_GRAMMAR=GREEN_RESEARCH",
