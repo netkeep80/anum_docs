@@ -111,7 +111,13 @@ same(contract.executionProfileNonRegression.status, "GREEN_RESEARCH", "execution
 // production runtime or claim that downstream cutover is already complete.
 same(contract.implementation.acceptedRuntime, "mts-contract/v0.13", "accepted runtime remains v0.13");
 same(contract.implementation.candidateRuntimeSelectable, false, "candidate runtime is not selectable");
-same(contract.implementation.implementationComplete, false, "production cutover is not misreported complete");
+same(contract.implementation.implementationComplete, true, "declared candidate implementation scope is complete");
+same(contract.implementation.candidateKernelBehaviorImplemented, true, "candidate kernel behavior is implementation-complete");
+same(
+  contract.implementation.implementationCompleteMeaning,
+  "declared-v0.14-candidate-scope complete with all mandatory executable gates; production cutover/current-pointer rotation not yet performed",
+  "implementationComplete does not imply cutover",
+);
 same(contract.implementation.productionBehaviorChanged, false, "no production behavior delta");
 same(contract.implementation.singleLiveSemanticRuntime, true, "single live semantic runtime retained");
 
@@ -165,6 +171,7 @@ assert(
 for (const gate of gates) {
   assert(existsSync(join(repoRoot, gate)), "declared gate exists: " + gate);
 }
+same(conformance.coverageState, "complete", "ready candidate has complete executable coverage");
 same((conformance.plannedExecutableGates as unknown[]).length, 0, "no planned executable gates remain");
 
 // Cross-repository accelerator evidence may remain pending only when it is
