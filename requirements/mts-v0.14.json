@@ -290,7 +290,7 @@
   "traceabilitySource": {
     "path": "traceability/mts-v0.14.json"
   },
-  "projectionState": "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585",
+  "projectionState": "MATERIALIZED",
   "documentSurface": {
     "README.md": {
       "mode": "hybrid"
@@ -674,5 +674,12 @@
         ]
       }
     ]
+  },
+  "documentationReconstruction": {
+    "issue": 1585,
+    "status": "MATERIALIZED_CURRENT_V014",
+    "ownerBlocks": 14,
+    "researchRetention": "DEFERRED_NOT_REJECTED",
+    "terminologyProjection": true
   }
 }
