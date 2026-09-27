@@ -162,7 +162,7 @@ const d10Marker = '<a id="d10-completion"></a>';
 same(doc.split(d10Marker).length - 1, 1, "D10 section appears exactly once");
 
 const d10Start = doc.indexOf(d10Marker);
-const d10End = doc.indexOf("## 18. Производный результат", d10Start);
+const d10End = doc.indexOf("## 21. Что апамять не утверждает", d10Start);
 assert(d10Start >= 0 && d10End > d10Start, "D10 section has a bounded current-doc range");
 const d10 = doc.slice(d10Start, d10End);
 
