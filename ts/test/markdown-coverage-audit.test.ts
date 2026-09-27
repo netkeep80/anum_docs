@@ -34,9 +34,9 @@ same(report.summary.documentCount, 12, "registered Markdown surface");
 assert(report.summary.headingCount > 0, "visible headings are inventoried");
 assert(report.summary.stableAnchorCount >= 14, "stable anchors include all accepted owners");
 assert(report.summary.canonicalNodeCount > 0, "canonical Markdown nodes remain present");
-same(report.summary.requirementCount, 14, "accepted requirement registry count");
-same(report.summary.requirementBackedSectionCount, 14, "all accepted requirements are materialized");
-same(report.summary.ownedBlockCount, 14, "compiler-owned block count");
+same(report.summary.requirementCount, 16, "semantic + repository requirement count");
+same(report.summary.requirementBackedSectionCount, 16, "all projected requirements are materialized");
+same(report.summary.ownedBlockCount, 16, "compiler-owned block count");
 assert(report.summary.researchHistoricalSectionCount > 0, "research/history remains reader-visible");
 assert(
   report.summary.unanchoredHeadingCount + report.summary.canonicalNodeCount >= report.summary.requirementBackedSectionCount,
