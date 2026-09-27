@@ -2,14 +2,14 @@
   "schema": "mts-conformance/v0.14",
   "status": "candidate",
   "accepted": false,
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "issue": 1586,
   "candidateLifecycleIssue": 1586,
   "contract": "mts-contract/v0.14",
   "semanticBase": "mts-conformance/v0.13",
   "observableSemanticDelta": true,
-  "coverageState": "partial-blocking",
-  "coverageStateMeaning": "Research evidence, candidate traceability and the author-frozen A4' chiral-torsor orientation law are projected; independent readiness audit and explicit author acceptance remain blocking.",
+  "coverageState": "complete",
+  "coverageStateMeaning": "Declared MTS v0.14 acceptance-scope evidence is complete and independently readiness-audited; the candidate remains nonaccepted until explicit author acceptance.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13"
@@ -78,7 +78,8 @@
     "ts/test/research-v014-ostensive-formal-grammar.test.ts",
     "ts/test/v014-traceability-candidate.test.ts",
     "ts/test/research-v014-a4-operational-equivalence.test.ts",
-    "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts"
+    "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
+    "ts/test/v014-independent-readiness-audit.test.ts"
   ],
   "requiredExecutableGates": [
     "ts/test/v013-relative-form-quartet.test.ts",
@@ -142,7 +143,8 @@
     "ts/test/research-v014-ostensive-formal-grammar.test.ts",
     "ts/test/v014-traceability-candidate.test.ts",
     "ts/test/research-v014-a4-operational-equivalence.test.ts",
-    "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts"
+    "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
+    "ts/test/v014-independent-readiness-audit.test.ts"
   ],
   "requiredNegativeVectors": [
     "v014-local-unordered-collapses-o-c-l-u-and-orientation-orbit",
@@ -160,9 +162,7 @@
     "v014-legacy-succ-u-equals-l-rejected",
     "v014-candidate-does-not-change-current-accepted-pointer"
   ],
-  "plannedExecutableGates": [
-    "pending:v014-independent-readiness-audit"
-  ],
+  "plannedExecutableGates": [],
   "crossRepositoryAcceptanceDependencies": [
     {
       "repository": "netkeep80/amemory",
@@ -207,13 +207,16 @@
     ],
     "traceability": [
       "ts/test/v014-traceability-candidate.test.ts"
+    ],
+    "readiness": [
+      "ts/test/v014-independent-readiness-audit.test.ts"
     ]
   },
   "blockers": {
     "a4FinalChoice": "GREEN_AUTHOR_FROZEN",
     "formalSurfaceGrammar": "GREEN_RESEARCH",
     "traceability": "GREEN_CANDIDATE",
-    "readinessAudit": "BLOCKING_PENDING",
+    "readinessAudit": "GREEN_INDEPENDENT_AUDIT",
     "explicitAuthorAcceptance": "BLOCKING_PENDING"
   },
   "lifecycle": {
@@ -235,7 +238,19 @@
     "v014-generalized-mp-nonregression-grounded",
     "v014-orientation-gauge-research-grounded",
     "v014-a4-operational-equivalence-grounded",
-    "v014-a4prime-chiral-torsor-bootstrap-grounded"
+    "v014-a4prime-chiral-torsor-bootstrap-grounded",
+    "v014-independent-readiness-grounded"
   ],
-  "traceabilityManifest": "traceability/mts-v0.14.json"
+  "traceabilityManifest": "traceability/mts-v0.14.json",
+  "readinessAudit": {
+    "status": "GREEN_INDEPENDENT_AUDIT",
+    "issue": 1666,
+    "requiredExecutableGateCount": 63,
+    "plannedExecutableGateCount": 0,
+    "candidateSemanticReady": true,
+    "accepted": false,
+    "productionCutoverPerformed": false,
+    "documentationPostAcceptanceIssue": 1585,
+    "onlyRemainingBlocker": "explicit author acceptance"
+  }
 }

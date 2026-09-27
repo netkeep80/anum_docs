@@ -2,7 +2,7 @@
   "schema": "mts-traceability/v0.2",
   "status": "candidate",
   "accepted": false,
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "contract": "contracts/mts-contract-v0.14.json",
   "conformance": "contracts/mts-conformance-v0.14.json",
   "issue": 1658,

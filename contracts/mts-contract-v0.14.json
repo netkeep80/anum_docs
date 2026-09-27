@@ -7,7 +7,7 @@
   "semanticBase": "mts-contract/v0.13",
   "observableSemanticDelta": true,
   "conformanceCorpus": "contracts/mts-conformance-v0.14.json",
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "previousAcceptedRelease": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13",
@@ -23,9 +23,12 @@
     "package": "@mts/core",
     "acceptedRuntime": "mts-contract/v0.13",
     "candidateRuntimeSelectable": false,
-    "implementationComplete": false,
+    "implementationComplete": true,
     "productionBehaviorChanged": false,
-    "singleLiveSemanticRuntime": true
+    "singleLiveSemanticRuntime": true,
+    "candidateKernelBehaviorImplemented": true,
+    "implementationCompleteMeaning": "declared-v0.14-candidate-scope complete with all mandatory executable gates; production cutover/current-pointer rotation not yet performed",
+    "productionBehaviorChangedMeaning": "N18 readiness adds no new ts/src production behavior; the single live v0.13 runtime remains current until explicit v0.14 acceptance/cutover"
   },
   "inheritedFoundation": {
     "ontology": "Link",
@@ -250,23 +253,29 @@
     "formalSurfaceGrammarComplete": true,
     "traceabilityComplete": true,
     "documentationComplete": false,
-    "readinessAuditComplete": false,
+    "readinessAuditComplete": true,
     "explicitAuthorAcceptanceRecorded": false
   },
   "acceptanceBoundary": {
     "accepted": false,
-    "acceptanceReady": false,
+    "acceptanceReady": true,
     "automaticAcceptanceForbidden": true,
     "explicitAuthorApprovalRequired": true,
     "authorDecisionRequired": "ACCEPT MTS v0.14",
     "currentAcceptedRemains": "mts-contract/v0.13",
     "blockers": [
-      "final A4/A4' semantic freeze",
-      "independent readiness audit",
       "explicit author acceptance"
     ],
     "documentationReconstructionIssue": 1585,
     "documentationReconstructionUnblocked": false
   },
-  "traceabilityManifest": "traceability/mts-v0.14.json"
+  "traceabilityManifest": "traceability/mts-v0.14.json",
+  "readinessAudit": {
+    "status": "GREEN_INDEPENDENT_AUDIT",
+    "issue": 1666,
+    "candidateSemanticReady": true,
+    "productionCutoverPerformed": false,
+    "documentationPostAcceptanceIssue": 1585,
+    "onlyRemainingBlocker": "explicit author acceptance"
+  }
 }
