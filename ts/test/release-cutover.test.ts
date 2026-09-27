@@ -176,7 +176,7 @@ assert(
   "package root must expose matching declaration and runtime outputs",
 );
 
-const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.13.json"), "utf8")) as {
+const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.14.json"), "utf8")) as {
   readonly schema?: string;
   readonly status?: string;
   readonly accepted?: boolean;
@@ -190,28 +190,32 @@ const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-
     readonly compatibilityRuntimeSelectable?: boolean;
   };
 };
-assert(contract.schema === "mts-contract/v0.13", "current contract must be v0.13");
-assert(contract.status === "accepted" && contract.accepted === true, "current v0.13 contract must be accepted");
-assert(contract.semanticBase === "mts-contract/v0.12", "v0.13 semantic base must be accepted v0.12");
-assert(contract.observableSemanticDelta === true, "v0.13 must retain its explicit semantic delta");
-assert(contract.acceptanceReady === true, "accepted v0.13 must retain proven readiness");
+assert(contract.schema === "mts-contract/v0.14", "current contract must be v0.14");
+assert(contract.status === "accepted" && contract.accepted === true, "current v0.14 contract must be accepted");
+assert(contract.semanticBase === "mts-contract/v0.13", "v0.14 semantic base must be accepted v0.13");
+assert(contract.observableSemanticDelta === true, "v0.14 must retain its explicit semantic delta");
+assert(contract.acceptanceReady === true, "accepted v0.14 must retain proven readiness");
 assert(contract.implementation?.language === "TypeScript", "current implementation must be TypeScript");
 assert(contract.implementation?.pythonRuntimePresent === false, "current contract must reject Python runtime ownership");
 assert(contract.implementation?.singleLiveSemanticRuntime === true, "accepted runtime must remain single");
 assert(contract.implementation?.compatibilityRuntimeSelectable === false, "compatibility runtime must remain unavailable");
 
 const conformance = JSON.parse(
-  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.13.json"), "utf8"),
+  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.14.json"), "utf8"),
 ) as ConformanceBoundary;
-assert(conformance.status === "accepted" && conformance.accepted === true, "current v0.13 conformance must be accepted");
-assert(conformance.acceptanceReady === true, "accepted v0.13 conformance must retain proven readiness");
+assert(conformance.status === "accepted" && conformance.accepted === true, "current v0.14 conformance must be accepted");
+assert(conformance.acceptanceReady === true, "accepted v0.14 conformance must retain proven readiness");
 
 // Keep the immediately previous accepted release independently checkable.
 const previousConformance = JSON.parse(
+  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.13.json"), "utf8"),
+) as ConformanceBoundary;
+assert(previousConformance.status === "accepted" && previousConformance.accepted === true, "previous v0.13 conformance must remain accepted evidence");
+assert(previousConformance.acceptanceReady === true, "previous v0.13 conformance must retain proven readiness");
+
+const historicalV012Conformance = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-conformance-v0.12.json"), "utf8"),
 ) as ConformanceBoundary;
-assert(previousConformance.status === "accepted" && previousConformance.accepted === true, "previous v0.12 conformance must remain accepted evidence");
-assert(previousConformance.acceptanceReady === true, "previous v0.12 conformance must retain proven readiness");
 
 const historicalConformance = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-conformance-v0.11.json"), "utf8"),
@@ -265,39 +269,39 @@ negativeVector("v011-dot-is-not-q-abit", mappedNegativeVector(historicalConforma
 negativeVector("v011-colon-is-not-q-abit", mappedNegativeVector(historicalConformance, "v011-colon-is-not-q-abit"));
 negativeVector("v011-host-stack-is-not-semantic-authority", mappedNegativeVector(historicalConformance, "v011-host-stack-is-not-semantic-authority"));
 
-// Previous-v0.12 anchors remain independently checkable through their accepted evidence map.
-assert((previousConformance.requiredExecutableGates ?? []).length === 16, "previous accepted v0.12 keeps all 16 mandatory executable gates");
-negativeVector("v012-string-glyph-one-is-not-q-abit-one", mappedNegativeVector(previousConformance, "v012-string-glyph-one-is-not-q-abit-one"));
-negativeVector("v012-formal-square-brackets-do-not-select-q-child", mappedNegativeVector(previousConformance, "v012-formal-square-brackets-do-not-select-q-child"));
-negativeVector("v012-representation-is-not-interpretation", mappedNegativeVector(previousConformance, "v012-representation-is-not-interpretation"));
-negativeVector("v012-formal-empty-parentheses-are-not-a-valid-result", mappedNegativeVector(previousConformance, "v012-formal-empty-parentheses-are-not-a-valid-result"));
-negativeVector("v012-child-creation-does-not-auto-select-contextual-k", mappedNegativeVector(previousConformance, "v012-child-creation-does-not-auto-select-contextual-k"));
-negativeVector("v012-nearest-lexical-frame-is-not-semantic-authority", mappedNegativeVector(previousConformance, "v012-nearest-lexical-frame-is-not-semantic-authority"));
-negativeVector("v012-ambient-current-is-not-semantic-authority", mappedNegativeVector(previousConformance, "v012-ambient-current-is-not-semantic-authority"));
-negativeVector("v012-hidden-parent-traversal-is-not-semantic-authority", mappedNegativeVector(previousConformance, "v012-hidden-parent-traversal-is-not-semantic-authority"));
-negativeVector("v012-link-left-association-is-not-formal-grammar", mappedNegativeVector(previousConformance, "v012-link-left-association-is-not-formal-grammar"));
-negativeVector("v012-generic-flat-reader-is-not-formal-grammar", mappedNegativeVector(previousConformance, "v012-generic-flat-reader-is-not-formal-grammar"));
-negativeVector("v012-formal-square-bracket-low-level-open-is-not-authority", mappedNegativeVector(previousConformance, "v012-formal-square-bracket-low-level-open-is-not-authority"));
-negativeVector("v012-formal-square-bracket-missing-rule-does-not-open", mappedNegativeVector(previousConformance, "v012-formal-square-bracket-missing-rule-does-not-open"));
-negativeVector("v012-formal-square-bracket-substituted-q-rule-does-not-open", mappedNegativeVector(previousConformance, "v012-formal-square-bracket-substituted-q-rule-does-not-open"));
+// Historical v0.12 anchors remain independently checkable through their accepted evidence map.
+assert((historicalV012Conformance.requiredExecutableGates ?? []).length === 16, "historical accepted v0.12 keeps all 16 mandatory executable gates");
+negativeVector("v012-string-glyph-one-is-not-q-abit-one", mappedNegativeVector(historicalV012Conformance, "v012-string-glyph-one-is-not-q-abit-one"));
+negativeVector("v012-formal-square-brackets-do-not-select-q-child", mappedNegativeVector(historicalV012Conformance, "v012-formal-square-brackets-do-not-select-q-child"));
+negativeVector("v012-representation-is-not-interpretation", mappedNegativeVector(historicalV012Conformance, "v012-representation-is-not-interpretation"));
+negativeVector("v012-formal-empty-parentheses-are-not-a-valid-result", mappedNegativeVector(historicalV012Conformance, "v012-formal-empty-parentheses-are-not-a-valid-result"));
+negativeVector("v012-child-creation-does-not-auto-select-contextual-k", mappedNegativeVector(historicalV012Conformance, "v012-child-creation-does-not-auto-select-contextual-k"));
+negativeVector("v012-nearest-lexical-frame-is-not-semantic-authority", mappedNegativeVector(historicalV012Conformance, "v012-nearest-lexical-frame-is-not-semantic-authority"));
+negativeVector("v012-ambient-current-is-not-semantic-authority", mappedNegativeVector(historicalV012Conformance, "v012-ambient-current-is-not-semantic-authority"));
+negativeVector("v012-hidden-parent-traversal-is-not-semantic-authority", mappedNegativeVector(historicalV012Conformance, "v012-hidden-parent-traversal-is-not-semantic-authority"));
+negativeVector("v012-link-left-association-is-not-formal-grammar", mappedNegativeVector(historicalV012Conformance, "v012-link-left-association-is-not-formal-grammar"));
+negativeVector("v012-generic-flat-reader-is-not-formal-grammar", mappedNegativeVector(historicalV012Conformance, "v012-generic-flat-reader-is-not-formal-grammar"));
+negativeVector("v012-formal-square-bracket-low-level-open-is-not-authority", mappedNegativeVector(historicalV012Conformance, "v012-formal-square-bracket-low-level-open-is-not-authority"));
+negativeVector("v012-formal-square-bracket-missing-rule-does-not-open", mappedNegativeVector(historicalV012Conformance, "v012-formal-square-bracket-missing-rule-does-not-open"));
+negativeVector("v012-formal-square-bracket-substituted-q-rule-does-not-open", mappedNegativeVector(historicalV012Conformance, "v012-formal-square-bracket-substituted-q-rule-does-not-open"));
 
-// Current v0.13 keeps the exact accepted executable boundary.
-assert((conformance.requiredExecutableGates ?? []).length === 39, "accepted v0.13 keeps all 39 mandatory executable gates");
-negativeVector("v013-flat-relative-glyph-collision-not-canonical", mappedV013NegativeVector(conformance, "v013-flat-relative-glyph-collision-not-canonical"));
-negativeVector("v013-noncanonical-pair-188-rejected", mappedV013NegativeVector(conformance, "v013-noncanonical-pair-188-rejected"));
-negativeVector("v013-noncanonical-pair-1988-rejected", mappedV013NegativeVector(conformance, "v013-noncanonical-pair-1988-rejected"));
-negativeVector("v013-noncanonical-pair-1868-rejected", mappedV013NegativeVector(conformance, "v013-noncanonical-pair-1868-rejected"));
-negativeVector("v013-description-does-not-materialize-target", mappedV013NegativeVector(conformance, "v013-description-does-not-materialize-target"));
-negativeVector("v013-wrong-structural-rule-writes-zero-target-links", mappedV013NegativeVector(conformance, "v013-wrong-structural-rule-writes-zero-target-links"));
-negativeVector("v013-invalid-physical-opcode-fails-before-representation-writes", mappedV013NegativeVector(conformance, "v013-invalid-physical-opcode-fails-before-representation-writes"));
-negativeVector("v013-empty-wire-is-not-root", mappedV013NegativeVector(conformance, "v013-empty-wire-is-not-root"));
-negativeVector("v013-unrooted-sequence-lookalike-rejected", mappedV013NegativeVector(conformance, "v013-unrooted-sequence-lookalike-rejected"));
-negativeVector("v013-unrooted-anum-hierarchy-rejected", mappedV013NegativeVector(conformance, "v013-unrooted-anum-hierarchy-rejected"));
+// Previous v0.13 keeps the exact accepted executable boundary.
+assert((previousConformance.requiredExecutableGates ?? []).length === 39, "previous accepted v0.13 keeps all 39 mandatory executable gates");
+negativeVector("v013-flat-relative-glyph-collision-not-canonical", mappedV013NegativeVector(previousConformance, "v013-flat-relative-glyph-collision-not-canonical"));
+negativeVector("v013-noncanonical-pair-188-rejected", mappedV013NegativeVector(previousConformance, "v013-noncanonical-pair-188-rejected"));
+negativeVector("v013-noncanonical-pair-1988-rejected", mappedV013NegativeVector(previousConformance, "v013-noncanonical-pair-1988-rejected"));
+negativeVector("v013-noncanonical-pair-1868-rejected", mappedV013NegativeVector(previousConformance, "v013-noncanonical-pair-1868-rejected"));
+negativeVector("v013-description-does-not-materialize-target", mappedV013NegativeVector(previousConformance, "v013-description-does-not-materialize-target"));
+negativeVector("v013-wrong-structural-rule-writes-zero-target-links", mappedV013NegativeVector(previousConformance, "v013-wrong-structural-rule-writes-zero-target-links"));
+negativeVector("v013-invalid-physical-opcode-fails-before-representation-writes", mappedV013NegativeVector(previousConformance, "v013-invalid-physical-opcode-fails-before-representation-writes"));
+negativeVector("v013-empty-wire-is-not-root", mappedV013NegativeVector(previousConformance, "v013-empty-wire-is-not-root"));
+negativeVector("v013-unrooted-sequence-lookalike-rejected", mappedV013NegativeVector(previousConformance, "v013-unrooted-sequence-lookalike-rejected"));
+negativeVector("v013-unrooted-anum-hierarchy-rejected", mappedV013NegativeVector(previousConformance, "v013-unrooted-anum-hierarchy-rejected"));
 negativeVector("v013-nonroot-both-selfclosed-rejected-by-root-uniqueness", rejectsSecondBothSelfClosedSemanticLink());
 negativeVector("v013-foreign-abit-handle-rejected", rejectsForeignAbitHandle());
-negativeVector("v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence", mappedV013NegativeVector(conformance, "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"));
-negativeVector("v013-formal-root-wrong-rule-rejected", mappedV013NegativeVector(conformance, "v013-formal-root-wrong-rule-rejected"));
-negativeVector("v013-formal-root-wrong-theory-rejected", mappedV013NegativeVector(conformance, "v013-formal-root-wrong-theory-rejected"));
-negativeVector("v013-formal-root-malformed-prefix-rejected", mappedV013NegativeVector(conformance, "v013-formal-root-malformed-prefix-rejected"));
-negativeVector("v013-formal-root-noncanonical-pair-alias-rejected", mappedV013NegativeVector(conformance, "v013-formal-root-noncanonical-pair-alias-rejected"));
-negativeVector("v013-formal-root-no-host-term-special-case", mappedV013NegativeVector(conformance, "v013-formal-root-no-host-term-special-case"));
+negativeVector("v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence", mappedV013NegativeVector(previousConformance, "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"));
+negativeVector("v013-formal-root-wrong-rule-rejected", mappedV013NegativeVector(previousConformance, "v013-formal-root-wrong-rule-rejected"));
+negativeVector("v013-formal-root-wrong-theory-rejected", mappedV013NegativeVector(previousConformance, "v013-formal-root-wrong-theory-rejected"));
+negativeVector("v013-formal-root-malformed-prefix-rejected", mappedV013NegativeVector(previousConformance, "v013-formal-root-malformed-prefix-rejected"));
+negativeVector("v013-formal-root-noncanonical-pair-alias-rejected", mappedV013NegativeVector(previousConformance, "v013-formal-root-noncanonical-pair-alias-rejected"));
+negativeVector("v013-formal-root-no-host-term-special-case", mappedV013NegativeVector(previousConformance, "v013-formal-root-no-host-term-special-case"));
