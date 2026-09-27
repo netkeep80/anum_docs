@@ -290,7 +290,7 @@
   "traceabilitySource": {
     "path": "traceability/mts-v0.14.json"
   },
-  "projectionState": "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585",
+  "projectionState": "MATERIALIZED",
   "documentSurface": {
     "README.md": {
       "mode": "hybrid"
@@ -334,5 +334,352 @@
     "authorDecisionIssue": 1586,
     "authorDecisionComment": 5858021017,
     "freezeIssue": 1683
+  },
+  "terminology": {
+    "schema": "mts-terminology-projection/v0.1",
+    "purpose": "Projection metadata only: canonical names, layers, owners and alias guards. Semantic definitions remain owned by accepted laws and human owner sections.",
+    "terms": [
+      {
+        "termId": "link",
+        "canonicalRu": "Связь",
+        "canonicalEn": "Link",
+        "layer": "ontology",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/theory/Система аксиом МТС.md",
+          "anchor": "mts-v014-v14-l5"
+        },
+        "forbiddenCurrentAliases": [],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L5",
+          "V14-L14"
+        ]
+      },
+      {
+        "termId": "recursiveAlphabet",
+        "canonicalRu": "рекурсивный алфавит МТС",
+        "canonicalEn": "recursive MTS alphabet",
+        "layer": "recursive-structure",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/theory/Система аксиом МТС.md",
+          "anchor": "mts-v014-v14-l1"
+        },
+        "forbiddenCurrentAliases": [
+          "структурное ачисло",
+          "структурный абит"
+        ],
+        "historicalAliases": [
+          "структурный квартет"
+        ],
+        "relatedFactIds": [
+          "V14-L1",
+          "V14-L14"
+        ]
+      },
+      {
+        "termId": "root",
+        "canonicalRu": "корневой аспект",
+        "canonicalEn": "ROOT",
+        "layer": "recursive-structure",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/theory/Система аксиом МТС.md",
+          "anchor": "mts-v014-v14-l1"
+        },
+        "forbiddenCurrentAliases": [],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L1"
+        ]
+      },
+      {
+        "termId": "startEnd",
+        "canonicalRu": "локальные роли START/END",
+        "canonicalEn": "START_K / END_K",
+        "layer": "recursive-structure",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/theory/Система аксиом МТС.md",
+          "anchor": "mts-v014-v14-l12"
+        },
+        "forbiddenCurrentAliases": [
+          "абсолютный START",
+          "абсолютный END"
+        ],
+        "historicalAliases": [
+          "начальный аспект",
+          "конечный аспект"
+        ],
+        "relatedFactIds": [
+          "V14-L1",
+          "V14-L12"
+        ]
+      },
+      {
+        "termId": "anum",
+        "canonicalRu": "ачисло",
+        "canonicalEn": "Anum",
+        "layer": "representations-codecs",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/specs/Ачисла и сериализация.md",
+          "anchor": "mts-v014-v14-l13"
+        },
+        "forbiddenCurrentAliases": [
+          "структурное ачисло"
+        ],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L13",
+          "V14-L14"
+        ]
+      },
+      {
+        "termId": "abit",
+        "canonicalRu": "абит",
+        "canonicalEn": "abit",
+        "layer": "representations-codecs",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/specs/Ачисла и сериализация.md",
+          "anchor": "mts-v014-v14-l3"
+        },
+        "forbiddenCurrentAliases": [
+          "структурный абит"
+        ],
+        "historicalAliases": [
+          "Q-абит"
+        ],
+        "relatedFactIds": [
+          "V14-L3",
+          "V14-L13"
+        ]
+      },
+      {
+        "termId": "exactSequence",
+        "canonicalRu": "точная последовательность",
+        "canonicalEn": "ExactSequence",
+        "layer": "representations-codecs",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/specs/Ачисла и сериализация.md",
+          "anchor": "mts-v014-v14-l13"
+        },
+        "forbiddenCurrentAliases": [],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L7",
+          "V14-L13"
+        ]
+      },
+      {
+        "termId": "q",
+        "canonicalRu": "Q-кодек / Q-интерпретатор",
+        "canonicalEn": "Q",
+        "layer": "representations-codecs",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/specs/Ачисла и сериализация.md",
+          "anchor": "mts-v014-v14-l3"
+        },
+        "forbiddenCurrentAliases": [
+          "рекурсивный алфавит Q"
+        ],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L3",
+          "V14-L13"
+        ]
+      },
+      {
+        "termId": "string",
+        "canonicalRu": "строковый носитель",
+        "canonicalEn": "STRING",
+        "layer": "byte-text",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/specs/Ачисла и сериализация.md",
+          "anchor": "mts-term-string"
+        },
+        "forbiddenCurrentAliases": [],
+        "historicalAliases": [
+          "строковое ачисло"
+        ],
+        "relatedFactIds": [
+          "V14-L14"
+        ]
+      },
+      {
+        "termId": "formal",
+        "canonicalRu": "формальная нотация FORMAL",
+        "canonicalEn": "FORMAL",
+        "layer": "symbolic-metanotation",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/specs/Формальная нотация МТС.md",
+          "anchor": "mts-v014-v14-l2"
+        },
+        "forbiddenCurrentAliases": [],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L2",
+          "V14-L14"
+        ]
+      },
+      {
+        "termId": "contextOrientation",
+        "canonicalRu": "ориентация контекста",
+        "canonicalEn": "Context orientation",
+        "layer": "foundation",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/theory/Система аксиом МТС.md",
+          "anchor": "mts-v014-v14-l12"
+        },
+        "forbiddenCurrentAliases": [
+          "глобально выбранный W",
+          "абсолютная ориентация Foundation"
+        ],
+        "historicalAliases": [
+          "global gauge"
+        ],
+        "relatedFactIds": [
+          "V14-L12"
+        ]
+      },
+      {
+        "termId": "reaction",
+        "canonicalRu": "реакция",
+        "canonicalEn": "reaction",
+        "layer": "execution",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/specs/Апамять и управление сетью связей.md",
+          "anchor": "mts-v014-v14-l4"
+        },
+        "forbiddenCurrentAliases": [],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L4",
+          "V14-L11"
+        ]
+      },
+      {
+        "termId": "generalizedModusPonens",
+        "canonicalRu": "обобщённый Modus Ponens",
+        "canonicalEn": "generalized modus ponens",
+        "layer": "execution",
+        "status": "inherited-v0.13",
+        "owner": {
+          "path": "docs/theory/Система аксиом МТС.md",
+          "anchor": "mts-v014-v14-l11"
+        },
+        "forbiddenCurrentAliases": [],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L11"
+        ]
+      },
+      {
+        "termId": "nat",
+        "canonicalRu": "натуральное число Nat",
+        "canonicalEn": "Nat",
+        "layer": "derived",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/theory/Система аксиом МТС.md",
+          "anchor": "mts-v014-v14-l6"
+        },
+        "forbiddenCurrentAliases": [
+          "степень связности как Nat"
+        ],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L6",
+          "V14-L7"
+        ]
+      },
+      {
+        "termId": "degree",
+        "canonicalRu": "степень Degree",
+        "canonicalEn": "Degree",
+        "layer": "derived",
+        "status": "accepted-separated-scale",
+        "owner": {
+          "path": "docs/theory/Система аксиом МТС.md",
+          "anchor": "mts-v014-v14-l6"
+        },
+        "forbiddenCurrentAliases": [
+          "Nat"
+        ],
+        "historicalAliases": [
+          "F5 scale"
+        ],
+        "relatedFactIds": [
+          "V14-L6"
+        ]
+      },
+      {
+        "termId": "add",
+        "canonicalRu": "каноническое сложение Add",
+        "canonicalEn": "Add",
+        "layer": "derived",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/theory/Система аксиом МТС.md",
+          "anchor": "mts-v014-v14-l8"
+        },
+        "forbiddenCurrentAliases": [],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L8",
+          "V14-L9"
+        ]
+      },
+      {
+        "termId": "le",
+        "canonicalRu": "порядок Le",
+        "canonicalEn": "Le",
+        "layer": "derived",
+        "status": "accepted",
+        "owner": {
+          "path": "docs/theory/Система аксиом МТС.md",
+          "anchor": "mts-v014-v14-l9"
+        },
+        "forbiddenCurrentAliases": [],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L9"
+        ]
+      },
+      {
+        "termId": "amemory",
+        "canonicalRu": "апамять",
+        "canonicalEn": "A-memory",
+        "layer": "execution-profile",
+        "status": "accepted-foundation-plus-profile",
+        "owner": {
+          "path": "docs/specs/Апамять и управление сетью связей.md",
+          "anchor": "mts-term-amemory"
+        },
+        "forbiddenCurrentAliases": [
+          "онтология МТС"
+        ],
+        "historicalAliases": [],
+        "relatedFactIds": [
+          "V14-L4",
+          "V14-L11"
+        ]
+      }
+    ]
+  },
+  "documentationReconstruction": {
+    "issue": 1585,
+    "status": "MATERIALIZED_CURRENT_V014",
+    "ownerBlocks": 14,
+    "researchRetention": "DEFERRED_NOT_REJECTED",
+    "terminologyProjection": true
   }
 }

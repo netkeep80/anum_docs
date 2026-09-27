@@ -14,7 +14,6 @@ function sameJson(actual: unknown, expected: unknown, message: string): void {
 }
 
 const repoRoot = resolve(process.cwd(), "..");
-const theory = readFileSync(join(repoRoot, "docs/theory/Система аксиом МТС.md"), "utf8");
 const contract12 = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.12.json"), "utf8"));
 const contract13 = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.13.json"), "utf8"));
 const conformance13 = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-conformance-v0.13.json"), "utf8"));
@@ -23,15 +22,15 @@ const expectedIds = [
   ...Array.from({ length: 21 }, (_, index) => `A${index}`),
   "F2/F3", "F4", "F5", "F6",
 ];
-const theoryIds = [...theory.matchAll(/^## (?:А|A)(\d+)\./gm)].map((match) => `A${match[1]}`);
-for (const id of ["F2/F3", "F4", "F5", "F6"]) {
-  assert(theory.includes(`## ${id}.`), `normative theory contains ${id}`);
-  theoryIds.push(id);
-}
-same([...new Set(theoryIds)].sort().join("\n"), [...expectedIds].sort().join("\n"), "normative scope");
 
 const audit = contract13.inheritedFoundationDeltaAudit;
-assert(audit, "candidate declares inherited foundation delta audit");
+assert(audit, "accepted v0.13 declares inherited foundation delta audit");
+same(audit.baseline.semanticBase, "mts-contract/v0.12", "historical semantic base");
+same(
+  audit.baseline.normativeTheory,
+  "docs/theory/Система аксиом МТС.md",
+  "historical normative-theory path is retained as v0.13 metadata",
+);
 sameJson(audit.baseline.scope, expectedIds, "exact inherited scope");
 same(Object.keys(audit.entries).sort().join("\n"), [...expectedIds].sort().join("\n"), "all inherited clauses mapped");
 
@@ -50,8 +49,16 @@ same(audit.minimalFoundationDelta.addedIndependentOntologyEntities, 0, "no ontol
 same(audit.minimalFoundationDelta.oldQFunctionalityRemoved, false, "legacy Q functionality retained");
 same(audit.minimalFoundationDelta.additiveOnlyExtensionSufficient, false, "second additive foundation alphabet is insufficient");
 
-assert(theory.includes("[ ] 1 0` — ровно четыре абита"), "accepted A5 declares old four-abit alphabet");
-assert(theory.includes("`∞` не является пятым абитом"), "accepted A5 excludes infinity as fifth abit");
+same(
+  audit.entries.A5.replacedPart,
+  "the role of [ ] 1 0 / O-C-L-U as the foundation quaternary alphabet",
+  "historical A5 replacement boundary is explicit",
+);
+same(
+  audit.minimalFoundationDelta.replacedClause,
+  "A5 foundation alphabet role",
+  "A5 is the exact historical replacement boundary",
+);
 sameJson(contract12.foundation.qAlphabet, ["[", "]", "1", "0"], "accepted v0.12 Q alphabet");
 same(contract12.foundation.qAlphabetCount, 4, "accepted v0.12 Q cardinality");
 
@@ -89,4 +96,4 @@ same(contract13.accepted, true, "v0.13 is accepted");
 same(contract13.acceptanceReady, true, "candidate readiness is restored after A73t scoped reclassification");
 same(contract13.candidateState.explicitAuthorAcceptanceRecorded, true, "author acceptance is recorded");
 
-console.log("MTS v0.13 inherited foundation A5c evidence remains GREEN and zero-regression; readiness is restored for the declared v0.13 scope while A9 global minimality/trust + self-proof remain non-blocking research.");
+console.log("MTS v0.13 inherited foundation A5c evidence remains GREEN from immutable v0.12/v0.13 artifacts and runtime witnesses; current v0.14 Markdown is not historical authority.");

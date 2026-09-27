@@ -26,7 +26,7 @@ assert(
 );
 assert(
   acceptance.acceptance?.proseDocumentationReconstructionPendingIssue === 1585,
-  "v0.13 prose surface is temporary only under explicit post-acceptance reconstruction #1585",
+  "v0.14 prose reconstruction is governed by #1585",
 );
 
 const policy = JSON.parse(
@@ -58,11 +58,12 @@ const current = Object.freeze([
 same(new Set(current).size, current.length, "current documentation paths are unique");
 same(current.length, 10, "current reader-facing documentation surface cardinality");
 
-const previousVersionPattern = /v0\.(?:9|10|11|12)\b/gi;
+const obsoleteCurrentMarkerPattern = /mts-doc-version:\s*v0\.(?:9|10|11|12|13)\b/gi;
 const versionedNamePattern = /(?:^|[\s._-])v?\d+\.\d+(?:$|[\s._-])/i;
 const visibleVersionLabels = Object.freeze([
-  "> **Версия МТС: v0.13**",
-  "> **Документ относится к МТС v0.13**",
+  "> **Версия МТС: v0.14**",
+  "> **Документ относится к МТС v0.14**",
+  "> **Текущая МТС: v0.14.",
 ]);
 
 for (const relativePath of current) {
@@ -73,25 +74,30 @@ for (const relativePath of current) {
   assert(source.startsWith("# "), `${relativePath}: H1 must be the first line`);
 
   same(
-    source.split("mts-doc-version: v0.13").length - 1,
+    source.split("mts-doc-version: v0.14").length - 1,
     1,
-    `${relativePath}: exactly one v0.13 machine marker`,
+    `${relativePath}: exactly one v0.14 machine marker`,
   );
   assert(
-    source.indexOf("mts-doc-version: v0.13") < 300,
+    source.indexOf("mts-doc-version: v0.14") < 300,
     `${relativePath}: version marker must be near the title`,
   );
   assert(
     visibleVersionLabels.some((label) => source.includes(label)),
-    `${relativePath}: visible v0.13 label is required`,
+    `${relativePath}: visible v0.14 label is required`,
   );
 
-  const oldVersions = [...source.matchAll(previousVersionPattern)]
+  const obsoleteMarkers = [...source.matchAll(obsoleteCurrentMarkerPattern)]
     .map((match) => match[0]);
   same(
-    oldVersions.length,
+    obsoleteMarkers.length,
     0,
-    `${relativePath}: previous MTS version prose is forbidden`,
+    `${relativePath}: previous MTS version must not remain as a current document marker`,
+  );
+  assert(
+    !source.includes("> **Версия МТС: v0.13**")
+      && !source.includes("> **Документ относится к МТС v0.13**"),
+    `${relativePath}: v0.13 may be historical/profile evidence but not the visible current version label`,
   );
 
   assert(
@@ -122,12 +128,12 @@ assert(
 assert(existsSync(glossary), "glossary exists");
 
 console.log([
-  "MTS v0.14 accepted / v0.13 prose staging: GREEN",
+  "MTS v0.14 current documentation surface: GREEN",
   `CURRENT_DOCS=${current.length}`,
   "VERSION_MARKER=EXACTLY_ONE_PER_DOC",
   "VISIBLE_VERSION_LABEL=REQUIRED",
-  "PREVIOUS_VERSION_PROSE=0",
+  "OBSOLETE_CURRENT_VERSION_MARKERS=0",
   "VERSIONED_CURRENT_FILENAMES=0",
   "OBSOLETE_BUNDLE_PATH=ABSENT",
-  "POST_ACCEPTANCE_RECONSTRUCTION_1585=PENDING",
+  "CURRENT_VERSION=v0.14",
 ].join(" "));

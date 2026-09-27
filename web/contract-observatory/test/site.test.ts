@@ -120,10 +120,23 @@ assert(realHtml.includes("Зависимые требования"), "reverse de
 assert(realHtml.includes("неразрешённых или отсутствующих обязательных метаданных = 0"), "clean validated IR has explicit zero diagnostics");
 assert(realHtml.includes("Сравнение по стабильному ID недоступно"), "missing previous compiler registry is explicit instead of inferred");
 same(realMarkdownCoverage.summary.documentCount, 12, "P5 renders all registered Markdown documents");
-same(realMarkdownCoverage.summary.headingCount, 306, "P5 preserves P4 heading baseline");
-same(realMarkdownCoverage.summary.canonicalNodeCount, 22, "P5 preserves canonical node baseline");
-same(realMarkdownCoverage.summary.unanchoredHeadingCount, 284, "P5 makes unanchored knowledge explicit");
-same(realMarkdownCoverage.summary.currentlyUnclassifiedSectionCount, 292, "A75 preserves conservative pre-#1585 prose baseline");
+same(realMarkdownCoverage.projectionState, "MATERIALIZED", "P5 observes materialized v0.14 prose projection");
+same(realMarkdownCoverage.proseMaterializationPending, false, "P5 has no pending prose materialization");
+same(realMarkdownCoverage.summary.requirementCount, 14, "P5 renders all accepted v0.14 requirements");
+same(realMarkdownCoverage.summary.requirementBackedSectionCount, 14, "P5 materializes every accepted requirement owner");
+same(realMarkdownCoverage.summary.ownedBlockCount, 14, "P5 exposes exactly one compiler-owned block per requirement");
+assert(realMarkdownCoverage.summary.researchHistoricalSectionCount > 0, "P5 keeps research/history reader-visible");
+same(
+  realMarkdownCoverage.summary.headingCount,
+  realMarkdownCoverage.summary.requirementBackedSectionCount
+    + realMarkdownCoverage.summary.researchHistoricalSectionCount
+    + realMarkdownCoverage.summary.currentlyUnclassifiedSectionCount,
+  "P5 heading inventory is completely classified",
+);
+assert(
+  realMarkdownCoverage.summary.stableAnchorCount >= realMarkdownCoverage.summary.canonicalNodeCount,
+  "P5 canonical nodes are backed by stable anchors",
+);
 assert(realHtml.includes('id="coverage-title"'), "Markdown coverage diagnostics are rendered");
 assert(realHtml.includes("Авторский текст:</strong> PRESERVE"), "authored prose preservation boundary is visible");
 assert(realHtml.includes("NOT AUTHORIZED"), "destructive whole-node mutation boundary is visible");

@@ -22,10 +22,10 @@ export const CURRENT_DOC_SIZE_SURFACE = [
 ] as const;
 
 export const CURRENT_DOC_SIZE_BUDGET = Object.freeze({
-  baselineCodePoints: 162787,
-  baselineLines: 5499,
-  baselineWords: 19967,
-  hardCeilingCodePoints: 170926,
+  baselineCodePoints: 111381,
+  baselineLines: 3475,
+  baselineWords: 15454,
+  hardCeilingCodePoints: 116951,
 });
 
 export interface DocumentationSizeMeasurement {
@@ -183,8 +183,13 @@ interface MarkdownFacts {
   readonly visible: readonly boolean[];
 }
 
-const OWNER_LINE = /^<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>\s*<!--\s*нормативный владелец\s*-->$/;
+const LEGACY_OWNER_LINE = /^<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>\s*<!--\s*нормативный владелец\s*-->$/;
+const REQUIREMENT_OWNER_LINE = /^<!--\s*мтс:требование:(V14-L\d+):начало\s*-->$/;
 const REFERENCE = /<!--\s*ссылка:mts-law-([A-Za-z][A-Za-z0-9]*)\s*-->/g;
+
+function ownerLawId(line: string): string | undefined {
+  return line.match(LEGACY_OWNER_LINE)?.[1] ?? line.match(REQUIREMENT_OWNER_LINE)?.[1];
+}
 
 function markdownFacts(path: string, source: string): MarkdownFacts {
   const lines = source.split(/\r?\n/);
@@ -204,8 +209,8 @@ function markdownFacts(path: string, source: string): MarkdownFacts {
     visible.push(!inFence);
     if (inFence) continue;
 
-    const owner = trimmed.match(OWNER_LINE);
-    if (owner?.[1]) owners.push({ lawId: owner[1], path, line: index + 1 });
+    const lawId = ownerLawId(trimmed);
+    if (lawId !== undefined) owners.push({ lawId, path, line: index + 1 });
 
     REFERENCE.lastIndex = 0;
     for (const match of line.matchAll(REFERENCE)) {
@@ -222,7 +227,7 @@ function ownerHasBody(facts: MarkdownFacts, owner: SemanticLawAnchor): boolean {
     if (!facts.visible[index]) continue;
     const trimmed = (facts.lines[index] ?? "").trim();
     if (!trimmed) continue;
-    if (OWNER_LINE.test(trimmed)) return false;
+    if (ownerLawId(trimmed) !== undefined) return false;
     if (/^<!--.*-->$/.test(trimmed)) continue;
     if (/^#{1,6}\s+/.test(trimmed)) continue;
     return true;
