@@ -22,6 +22,15 @@ function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
 }
 
+function escapeHtmlForAssertion(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function throws(action: () => void, message: string): void {
   let rejected = false;
   try {
@@ -100,7 +109,7 @@ assert(renderedRequirement !== undefined, "V14-L12 requirement exists in current
 assert(realHtml.includes('data-requirement-id="V14-L12"'), "stable requirement ID is rendered");
 assert(realHtml.includes(renderedRequirement.classificationPath), "contract classification path is rendered");
 assert(realHtml.includes(renderedRequirement.statementDigest), "statement digest is rendered");
-assert(realHtml.includes(renderedRequirement.statement), "exact current contract statement is rendered");
+assert(realHtml.includes(escapeHtmlForAssertion(renderedRequirement.statement)), "exact current contract statement is rendered");
 assert(realHtml.includes("https://github.com/netkeep80/anum_docs/blob/main/docs/theory/"), "human Markdown projection has direct source navigation");
 assert(realHtml.includes('data-requirement-filter-axis="kind"'), "P3b kind filter is rendered from validated IR");
 assert(realHtml.includes('data-requirement-filter-axis="status"'), "P3b status filter is rendered from validated IR");
