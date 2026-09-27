@@ -22,7 +22,7 @@ if (registry.version !== "v0.13") fail("unexpected registry version");
 if (!Array.isArray(registry.theorems)) fail("theorems must be an array");
 
 const statuses = new Set(["conjecture", "proven", "falsified", "scoped"]);
-const evidenceKinds = ["typescript", "lean", "mtsNative", "aprover"];
+const evidenceKinds = ["typescript", "lean", "coq", "mtsNative", "aprover"];
 const byId = new Map();
 
 for (const theorem of registry.theorems) {

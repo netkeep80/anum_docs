@@ -21,7 +21,7 @@
       "scope": "MTS v0.13 accepted foundation",
       "exclusions": "Не считать host enum или codec-метку доказательством классификации.",
       "sources": ["#1431"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FND-02",
@@ -32,7 +32,7 @@
       "scope": "MTS v0.13 accepted foundation",
       "exclusions": "Физический адрес или новый handle не создаёт второй Root.",
       "sources": ["#1431"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FND-03",
@@ -43,7 +43,7 @@
       "scope": "MTS v0.13 accepted root basis",
       "exclusions": "Не выводить смысл только из символических имён R/O/C/L.",
       "sources": ["#1431"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FND-04",
@@ -54,7 +54,7 @@
       "scope": "MTS v0.13 accepted root basis",
       "exclusions": "Не считать роль U отдельным self-incidence классом.",
       "sources": ["#1431"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FND-05",
@@ -65,7 +65,7 @@
       "scope": "Only the exact carrier/domain claimed by accepted v0.13",
       "exclusions": "Не распространять автоматически на произвольные неукоренённые циклические структуры вне заявленного carrier.",
       "sources": ["#1431"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FND-06",
@@ -76,7 +76,7 @@
       "scope": "Accepted v0.13 transport/reconstruction scope",
       "exclusions": "Адреса памяти не являются семантическим тождеством.",
       "sources": ["#1431"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FND-07",
@@ -87,7 +87,7 @@
       "scope": "MTS v0.13 contextual truth",
       "exclusions": "Не отождествлять membership in Memory и truth in Context.",
       "sources": ["#1431"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FND-08",
@@ -98,7 +98,7 @@
       "scope": "Exact accepted v0.13 execution scope",
       "exclusions": "Не расширять до неограниченного host rewriting или глобальной подстановки.",
       "sources": ["#1431"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FND-09",
@@ -109,7 +109,7 @@
       "scope": "Exact accepted v0.13 execution scope",
       "exclusions": "Не вводить новый multivalued-function primitive как скрытую семантическую власть.",
       "sources": ["#1431"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FND-10",
@@ -120,7 +120,7 @@
       "scope": "Metatheoretical boundary for v0.13 claims",
       "exclusions": "Никакого неявного перехода от bounded execution witness к unrestricted self-verification.",
       "sources": ["#1431"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "INV-01",
@@ -131,7 +131,7 @@
       "scope": "Accepted finite v0.13 semantic Link carrier; executable witness in #1544",
       "exclusions": "Графовая модель, host field order и codec labels не являются семантическим основанием определения.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "INV-02",
@@ -142,7 +142,7 @@
       "scope": "Accepted finite v0.13 semantic Link carrier; executable witness in #1544",
       "exclusions": "Не расширять область доказательства за пределы той, где J формально определена.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "INV-03",
@@ -153,7 +153,7 @@
       "scope": "Accepted finite v0.13 semantic Link carrier; executable witness in #1544",
       "exclusions": "",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "INV-04",
@@ -164,7 +164,7 @@
       "scope": "Accepted finite v0.13 semantic Link carrier; executable witness in #1544",
       "exclusions": "Это не утверждение о привилегированности одной абсолютной ориентации.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "INV-05",
@@ -175,7 +175,7 @@
       "scope": "Accepted finite v0.13 semantic Link carrier; executable witness in #1544",
       "exclusions": "",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "INV-06",
@@ -186,7 +186,7 @@
       "scope": "Accepted finite v0.13 semantic Link carrier; executable witness in #1544",
       "exclusions": "Это scoped executable result для принятого конечного carrier; не считать его ещё классификацией полной MTS Theory.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "INV-07",
@@ -197,7 +197,7 @@
       "scope": "Accepted finite v0.13 semantic Link carrier; executable witness in #1544",
       "exclusions": "Асимметрия/хиральность не тождественна абсолютной привилегированности START; full-MTS orientation ещё должна быть классифицирована INV-08.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "INV-09",
@@ -208,7 +208,7 @@
       "scope": "Accepted finite v0.13 relative-form carrier; executable witness in #1544",
       "exclusions": "Сохранение relative-form геометрии не означает сохранение принятого Context constructor/reader.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-context-dualization-a75b.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-context-dualization-a75b.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "CTX-01",
@@ -219,7 +219,7 @@
       "scope": "Accepted finite v0.13 Context law; executable witness in #1544",
       "exclusions": "Это falsifier автоморфизма при фиксированном текущем Context law, но ещё не доказательство dualization всех остальных слоёв MTS.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-context-dualization-a75b.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-context-dualization-a75b.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "CTX-02",
@@ -230,7 +230,7 @@
       "scope": "Accepted finite v0.13 relative-position layer; executable witness in #1544",
       "exclusions": "FORMAL, Theory и grounded execution этим результатом ещё не классифицированы.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-context-dualization-a75b.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-context-dualization-a75b.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FRM-01",
@@ -241,7 +241,7 @@
       "scope": "Accepted finite canonical FORMAL prefix programs exercised in #1544",
       "exclusions": "Это не доказывает J(PortableTheoryArtifact)=PortableTheoryArtifact и не классифицирует трансформацию source-specific Theory membership.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-formal-duality-a75c.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-formal-duality-a75c.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "FRM-02",
@@ -252,7 +252,7 @@
       "scope": "Accepted finite v0.13 StructuralRule/Theory authority layer; executable witness in #1544",
       "exclusions": "Это подтверждает Theory dualization на structural-authority слое, но grounded execution ещё должен быть проверен отдельно.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-theory-authority-dualization-a75d.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-theory-authority-dualization-a75d.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "EXE-01",
@@ -263,7 +263,7 @@
       "scope": "Accepted finite v0.13 grounded execution with MANY, ZERO and NOT_FOUND branches; executable witness in #1544",
       "exclusions": "Это не заменяет итоговый аудит всех L1-L13/AC obligations и не превращает dual executor в принятую production semantics.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-grounded-execution-dualization-a75e.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-grounded-execution-dualization-a75e.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "INV-10",
@@ -274,7 +274,7 @@
       "scope": "Accepted MTS v0.13 semantic domain and L1-L13/AC1-AC10 obligations; final executable coverage audit in #1544",
       "exclusions": "Не распространять на deferred non-well-founded distinct-node cycles; Lean и MTS-native proof backends остаются независимым последующим этапом #1431.",
       "sources": ["#1544"],
-      "evidence": {"typescript": ["ts/test/research-v013-full-duality-audit-a75f.test.ts"], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": ["ts/test/research-v013-full-duality-audit-a75f.test.ts"], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     },
     {
       "id": "INV-08",
@@ -285,7 +285,7 @@
       "scope": "Post-v0.13 research in #1544",
       "exclusions": "Не считать локальную перестановку labels доказательством автоморфизма полной theory.",
       "sources": ["#1544"],
-      "evidence": {"typescript": [], "lean": [], "mtsNative": [], "aprover": []}
+      "evidence": {"typescript": [], "lean": [], "coq": [], "mtsNative": [], "aprover": []}
     }
   ]
 }
