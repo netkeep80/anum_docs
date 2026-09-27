@@ -58,6 +58,12 @@ function selfIncidenceCase(
     "11" | "10" | "01" | "00";
 }
 
+/**
+ * Materialization uses the current Memory convenience helpers only as
+ * technical constructors for the two raw self-incidence shapes. The semantic
+ * claim is the structural 10/01 split itself; these helper names are not four
+ * primitive A-memory opcodes.
+ */
 function discoverOneSidedOrbit(
   memory: Memory,
   body: LinkHandle,
