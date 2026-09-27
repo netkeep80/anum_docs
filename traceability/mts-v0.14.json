@@ -284,8 +284,6 @@
       "positive": {
         "requiredPositiveVectors": [
           "v014-orientation-gauge-research-grounded",
-          "v014-a4-operational-equivalence-grounded",
-          "v014-a4prime-chiral-torsor-bootstrap-grounded",
           "v014-context-relative-a4prime-grounded"
         ]
       },
@@ -299,18 +297,29 @@
         ]
       },
       "requiredExecutableGates": [
-        "ts/test/research-v014-foundation-orientation-witness.test.ts",
-        "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
         "ts/test/research-v014-orientation-gauge-view.test.ts",
-        "ts/test/research-v014-a4-operational-equivalence.test.ts",
-        "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
-        "ts/test/research-v014-context-relative-a4prime.test.ts"
+        "ts/test/research-v014-context-relative-a4prime.test.ts",
+        "ts/test/research-v014-preacceptance-closure.test.ts"
       ],
       "documentationOwner": {
         "registry": "requirements/mts-v0.14.json",
         "path": "docs/theory/Система аксиом МТС.md",
         "anchor": "mts-v014-v14-l12",
         "state": "PREDECLARED_POST_ACCEPTANCE_MATERIALIZATION"
+      },
+      "historicalCompatibilityEvidence": {
+        "status": "SUPERSEDED_AS_NORMATIVE_AUTHORITY_RETAINED_AS_REGRESSION_EVIDENCE",
+        "positiveVectors": [
+          "v014-a4-operational-equivalence-grounded",
+          "v014-a4prime-chiral-torsor-bootstrap-grounded"
+        ],
+        "executableGates": [
+          "ts/test/research-v014-foundation-orientation-witness.test.ts",
+          "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
+          "ts/test/research-v014-a4-operational-equivalence.test.ts",
+          "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts"
+        ],
+        "interpretation": "These gates exercise bounded Foundation-global gauge fixings and historical bootstrap models. They remain mandatory regression/compatibility witnesses but are not direct normative authority for the final Context-relative A4′ law."
       }
     },
     "V14-L13": {

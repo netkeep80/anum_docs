@@ -193,12 +193,9 @@
   ],
   "researchEvidence": {
     "foundationOrientation": [
-      "ts/test/research-v014-foundation-orientation-witness.test.ts",
-      "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
       "ts/test/research-v014-orientation-gauge-view.test.ts",
-      "ts/test/research-v014-a4-operational-equivalence.test.ts",
-      "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
-      "ts/test/research-v014-context-relative-a4prime.test.ts"
+      "ts/test/research-v014-context-relative-a4prime.test.ts",
+      "ts/test/research-v014-preacceptance-closure.test.ts"
     ],
     "q14": [
       "ts/test/v014-q14-versioned-interpreter.test.ts"
@@ -244,6 +241,12 @@
     ],
     "documentationProjection": [
       "ts/test/research-v014-preacceptance-closure.test.ts"
+    ],
+    "foundationOrientationHistoricalCompatibility": [
+      "ts/test/research-v014-foundation-orientation-witness.test.ts",
+      "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
+      "ts/test/research-v014-a4-operational-equivalence.test.ts",
+      "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts"
     ]
   },
   "blockers": {
