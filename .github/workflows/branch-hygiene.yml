@@ -72,9 +72,10 @@ jobs:
             rm -f "$error_file"
             echo "Created draft PR for $BRANCH -> $BASE."
             exit 0
+          else
+            status=$?
           fi
 
-          status=$?
           error_text="$(cat "$error_file")"
           rm -f "$error_file"
 
