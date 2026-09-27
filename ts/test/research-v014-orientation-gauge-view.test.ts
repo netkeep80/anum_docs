@@ -1,4 +1,6 @@
 // mts-version-evidence: candidate-from=0.14
+// Gauge covariance witness retained under N20b: DIRECT/MIRROR are local
+// Context frames, not one Foundation-global selected orientation.
 
 import {
   decomposeV013SemanticLink,
@@ -255,7 +257,7 @@ function main(): void {
   same(fm.W, outR, "mirror semantic InR is technical OutR");
 
   // Recursive alphabet semantics are gauge-invariant once pole orientation is
-  // read through the foundation-selected semantic view.
+  // read through a selected local Context semantic view.
   const expected = Object.freeze({
     R: "8",
     O: "98",
@@ -337,7 +339,9 @@ function main(): void {
     "TECHNICAL_POLE_POSITIONS=COORDINATES_NOT_SEMANTIC_AUTHORITY",
     "DIRECT_WITNESS=INR",
     "MIRROR_WITNESS=OUTR",
-    "SEMANTIC_START_END=FOUNDATION_GAUGE_DERIVED",
+    "SEMANTIC_START_END=CONTEXT_GAUGE_DERIVED",
+    "GLOBAL_SELECTED_W_NORMATIVE_AUTHORITY=FALSE",
+    "FINAL_A4_MODEL=CONTEXT_RELATIVE_N20B",
     "SEMANTIC_RECURSIVE_ALPHABET=GAUGE_INVARIANT",
     "R=8",
     "O=98",
