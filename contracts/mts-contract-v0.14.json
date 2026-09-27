@@ -7,7 +7,7 @@
   "semanticBase": "mts-contract/v0.13",
   "observableSemanticDelta": true,
   "conformanceCorpus": "contracts/mts-conformance-v0.14.json",
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "previousAcceptedRelease": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13",
@@ -250,23 +250,29 @@
     "formalSurfaceGrammarComplete": true,
     "traceabilityComplete": true,
     "documentationComplete": false,
-    "readinessAuditComplete": false,
+    "readinessAuditComplete": true,
     "explicitAuthorAcceptanceRecorded": false
   },
   "acceptanceBoundary": {
     "accepted": false,
-    "acceptanceReady": false,
+    "acceptanceReady": true,
     "automaticAcceptanceForbidden": true,
     "explicitAuthorApprovalRequired": true,
     "authorDecisionRequired": "ACCEPT MTS v0.14",
     "currentAcceptedRemains": "mts-contract/v0.13",
     "blockers": [
-      "final A4/A4' semantic freeze",
-      "independent readiness audit",
       "explicit author acceptance"
     ],
     "documentationReconstructionIssue": 1585,
     "documentationReconstructionUnblocked": false
   },
-  "traceabilityManifest": "traceability/mts-v0.14.json"
+  "traceabilityManifest": "traceability/mts-v0.14.json",
+  "readinessAudit": {
+    "status": "GREEN_INDEPENDENT_AUDIT",
+    "issue": 1666,
+    "candidateSemanticReady": true,
+    "productionCutoverPerformed": false,
+    "documentationPostAcceptanceIssue": 1585,
+    "onlyRemainingBlocker": "explicit author acceptance"
+  }
 }
