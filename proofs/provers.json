@@ -1,0 +1,62 @@
+{
+  "schema": "mts-proof-infrastructure/v0.1",
+  "authority": "routing-and-provenance-only",
+  "theoremRegistry": "theorems/registry.json",
+  "evidenceRecordSchema": "proofs/evidence-record.schema.json",
+  "lanes": {
+    "typescript": {
+      "registryEvidenceKey": "typescript",
+      "role": "executable-witness",
+      "proofAuthority": "none",
+      "trustedAproverInput": false,
+      "exactSourcePinRequired": true
+    },
+    "lean4": {
+      "registryEvidenceKey": "lean",
+      "role": "external-cross-check",
+      "proofAuthority": "external-only",
+      "trustedAproverInput": false,
+      "exactSourcePinRequired": true,
+      "exactToolchainPinRequired": true
+    },
+    "coq": {
+      "registryEvidenceKey": "coq",
+      "role": "external-cross-check",
+      "proofAuthority": "external-only",
+      "trustedAproverInput": false,
+      "exactSourcePinRequired": true,
+      "exactToolchainPinRequired": true
+    },
+    "mtsNative": {
+      "registryEvidenceKey": "mtsNative",
+      "role": "native-proof",
+      "proofAuthority": "native-replay-under-exact-theory",
+      "trustedAproverInput": true,
+      "exactSourcePinRequired": true,
+      "exactTheoryPinRequired": true
+    },
+    "aprover": {
+      "registryEvidenceKey": "aprover",
+      "role": "independent-consumer-replay",
+      "proofAuthority": "independent-replay",
+      "trustedAproverInput": false,
+      "exactSourcePinRequired": true,
+      "acceptedInputLanes": [
+        "mtsNative"
+      ],
+      "rejectedAuthorityInputLanes": [
+        "typescript",
+        "lean4",
+        "coq"
+      ]
+    }
+  },
+  "invariants": [
+    "one theorem ID across all proof lanes",
+    "theorem registry is index-only and never proof authority",
+    "Lean4 and Coq are external differential evidence, not MTS semantic authority",
+    "aprover trusted verdicts consume portable MTS-native evidence only",
+    "proof evidence records require exact MTS source and prover source/toolchain provenance",
+    "stored JSON, hashes, caches, theorem names and UI state are never proof truth"
+  ]
+}
