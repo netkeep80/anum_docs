@@ -79,9 +79,9 @@ assert(text(traceability.schema, "traceability schema") === "mts-traceability/v0
 assert(bool(contract.accepted, "contract accepted") === false, "candidate contract must remain nonaccepted");
 assert(bool(conformance.accepted, "conformance accepted") === false, "candidate conformance must remain nonaccepted");
 assert(bool(traceability.accepted, "traceability accepted") === false, "candidate traceability must remain nonaccepted");
-assert(bool(contract.acceptanceReady, "contract readiness") === false, "N20 invalidates previous readiness");
-assert(bool(conformance.acceptanceReady, "conformance readiness") === false, "N20 conformance awaits re-audit");
-assert(bool(traceability.acceptanceReady, "traceability readiness") === false, "N20 traceability awaits re-audit");
+assert(bool(contract.acceptanceReady, "contract readiness") === false, "N20/N20b invalidates previous readiness");
+assert(bool(conformance.acceptanceReady, "conformance readiness") === false, "N20b conformance awaits re-audit");
+assert(bool(traceability.acceptanceReady, "traceability readiness") === false, "N20b traceability awaits re-audit");
 assert(traceability.acceptance === null, "candidate traceability must not claim an acceptance manifest");
 
 assert(
@@ -139,29 +139,42 @@ for (const id of Object.keys(laws).sort()) {
 
 assert(
   text(record(invariants["V14-L12"], "V14-L12").status, "V14-L12 status") ===
-    "GREEN_AUTHOR_FROZEN",
-  "A4' author semantic freeze must be projected",
+    "GREEN_AUTHOR_REFINED_N20B",
+  "A4' context-relative author refinement must be projected",
 );
+
+const orientation = record(contract.foundationOrientation, "foundation orientation");
+assert(bool(orientation.contextRelativeOrientation, "context-relative orientation") === true, "A4 prime is context-relative");
+assert(bool(orientation.globalSelectedWitnessRequired, "global selected witness") === false, "global selected W is not authority");
+const contextCarrier = record(orientation.contextOrientationCarrier, "Context orientation carrier");
+assert(text(contextCarrier.kind, "Context carrier kind") === "ONE_SIDED_SELF_INCIDENCE_LINK", "Context carrier is Link-native one-sided self-incidence");
+assert(bool(contextCarrier.exactSequenceDependency, "ExactSequence dependency") === false, "Context orientation does not depend on ExactSequence");
+const relativeTransport = record(orientation.relativeTransport, "relative transport");
+assert(text(relativeTransport.group, "transport group") === "Z2 = {Id,J}", "relative transport is Z2");
+assert(text(relativeTransport.composition, "transport composition") === "g_AB ∘ g_BC = g_AC", "relative transport composition is explicit");
 
 const candidateState = record(contract.candidateState, "candidate state");
 assert(bool(candidateState.traceabilityComplete, "traceabilityComplete") === true, "candidate traceability graph is complete");
 assert(bool(candidateState.foundationOrientationFinalChoiceComplete, "orientation freeze") === true, "A4' author choice is frozen");
 assert(bool(candidateState.adversarialClosureComplete, "N20 adversarial closure") === true, "N20 closure is implemented");
 assert(bool(candidateState.documentationOwnershipMapComplete, "documentation ownership map") === true, "v0.14 owner map is complete");
-assert(bool(candidateState.readinessAuditComplete, "readiness audit") === false, "post-N20 independent readiness audit remains pending");
+assert(bool(candidateState.a4ContextRelativeClosureComplete, "N20b A4 closure") === true, "context-relative A4 prime closure is implemented");
+assert(bool(candidateState.a4GlobalSelectedWitnessModelSuperseded, "global selected-W supersession") === true, "global selected-W model is superseded");
+assert(bool(candidateState.readinessAuditComplete, "readiness audit") === false, "post-N20b independent readiness audit remains pending");
 assert(bool(candidateState.explicitAuthorAcceptanceRecorded, "author acceptance") === false, "author acceptance remains absent");
 
 const blockers = record(conformance.blockers, "conformance blockers");
 assert(text(blockers.traceability, "traceability blocker") === "GREEN_CANDIDATE", "traceability blocker closes only as candidate");
-assert(text(blockers.a4FinalChoice, "A4 blocker") === "GREEN_AUTHOR_FROZEN", "A4 blocker closes only by explicit author freeze");
-assert(text(blockers.readinessAudit, "readiness blocker") === "BLOCKING_PENDING_POST_N20_REAUDIT", "post-N20 readiness audit remains blocking");
+assert(text(blockers.a4FinalChoice, "A4 blocker") === "GREEN_AUTHOR_REFINED_CONTEXT_RELATIVE_N20B", "A4 blocker reflects context-relative N20b refinement");
+assert(text(blockers.readinessAudit, "readiness blocker") === "BLOCKING_PENDING_POST_N20B_REAUDIT", "post-N20b readiness audit remains blocking");
 assert(text(blockers.explicitAuthorAcceptance, "author blocker") === "BLOCKING_PENDING", "author acceptance blocker remains");
 
 const planned = strings(conformance.plannedExecutableGates, "planned gates");
 assert(!planned.includes("pending:v014-traceability"), "traceability must no longer be planned-only");
 assert(!planned.includes("pending:v014-a4-semantic-freeze-projection"), "A4 freeze is no longer planned-only");
 assert(!planned.includes("pending:v014-independent-readiness-audit"), "superseded N18 pending token is absent");
-assert(planned.includes("pending:v014-post-n20-independent-readiness-audit"), "new independent readiness audit is explicit");
+assert(!planned.includes("pending:v014-post-n20-independent-readiness-audit"), "superseded post-N20 audit token is absent");
+assert(planned.includes("pending:v014-post-n20b-independent-readiness-audit"), "new post-N20b independent readiness audit is explicit");
 assert(planned.length === 1, "exactly one planned executable gate remains");
 
 const current = record(record(policy.packs, "policy packs")["contract-conformance"], "contract pack");
@@ -189,11 +202,13 @@ console.log([
   "POSITIVE_VECTORS_RESOLVE=TRUE",
   "NEGATIVE_VECTORS_RESOLVE=TRUE",
   "EXECUTABLE_GATES_RESOLVE=TRUE",
-  "A4_FINAL_CHOICE=GREEN_AUTHOR_FROZEN",
-  "A4_PRIME_MODEL=GLOBAL_Z2_TORSOR_WITH_DERIVED_START_END",
+  "A4_FINAL_CHOICE=GREEN_AUTHOR_REFINED_CONTEXT_RELATIVE_N20B",
+  "A4_PRIME_MODEL=GLOBAL_Z2_TORSOR_WITH_CONTEXT_RELATIVE_LOCAL_FRAMES",
+  "A4_CONTEXT_CARRIER=ONE_SIDED_SELF_INCIDENCE_LINK",
+  "GLOBAL_SELECTED_W_REQUIRED=FALSE",
   "N20_ADVERSARIAL_CLOSURE=GREEN",
   "DOCUMENTATION_OWNER_MAP=GREEN",
-  "READINESS_AUDIT=BLOCKING_PENDING_POST_N20_REAUDIT",
+  "READINESS_AUDIT=BLOCKING_PENDING_POST_N20B_REAUDIT",
   "ACCEPTANCE_READY=FALSE",
   "EXPLICIT_AUTHOR_ACCEPTANCE=BLOCKING_PENDING",
   "V014_ACCEPTED=FALSE",
