@@ -231,7 +231,7 @@
     "arithmeticAcceptanceScopeClosed": true,
     "foundationOrientationFinalChoiceComplete": false,
     "formalSurfaceGrammarComplete": true,
-    "traceabilityComplete": false,
+    "traceabilityComplete": true,
     "documentationComplete": false,
     "readinessAuditComplete": false,
     "explicitAuthorAcceptanceRecorded": false
@@ -245,11 +245,11 @@
     "currentAcceptedRemains": "mts-contract/v0.13",
     "blockers": [
       "final A4/A4' semantic freeze",
-      "v0.14 traceability",
       "independent readiness audit",
       "explicit author acceptance"
     ],
     "documentationReconstructionIssue": 1585,
     "documentationReconstructionUnblocked": false
-  }
+  },
+  "traceabilityManifest": "traceability/mts-v0.14.json"
 }
