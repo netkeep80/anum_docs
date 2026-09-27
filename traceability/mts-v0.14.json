@@ -2,7 +2,7 @@
   "schema": "mts-traceability/v0.2",
   "status": "candidate",
   "accepted": false,
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "contract": "contracts/mts-contract-v0.14.json",
   "conformance": "contracts/mts-conformance-v0.14.json",
   "issue": 1677,
@@ -365,5 +365,14 @@
   },
   "documentationProjectionRegistry": "requirements/mts-v0.14.json",
   "adversarialClosureIssue": 1677,
-  "contextRelativeA4ResearchIssue": 1673
+  "contextRelativeA4ResearchIssue": 1673,
+  "readinessAudit": {
+    "status": "GREEN_INDEPENDENT_POST_N20C_AUDIT",
+    "issue": 1679,
+    "previousAuditIssue": 1666,
+    "invalidatedFrozenDossier": 1668,
+    "newFreezeRequired": true,
+    "accepted": false,
+    "onlyRemainingBlocker": "explicit author acceptance"
+  }
 }

@@ -74,9 +74,9 @@ assert(text(traceability.schema, "traceability schema") === "mts-traceability/v0
 assert(bool(contract.accepted, "contract accepted") === false, "candidate contract remains nonaccepted");
 assert(bool(conformance.accepted, "conformance accepted") === false, "candidate conformance remains nonaccepted");
 assert(bool(traceability.accepted, "traceability accepted") === false, "candidate traceability remains nonaccepted");
-assert(bool(contract.acceptanceReady, "contract readiness") === false, "N20c requires fresh readiness audit");
-assert(bool(conformance.acceptanceReady, "conformance readiness") === false, "N20c conformance requires fresh readiness audit");
-assert(bool(traceability.acceptanceReady, "traceability readiness") === false, "N20c traceability requires fresh readiness audit");
+assert(bool(contract.acceptanceReady, "contract readiness") === true, "N21 readiness is green");
+assert(bool(conformance.acceptanceReady, "conformance readiness") === true, "N21 conformance readiness is green");
+assert(bool(traceability.acceptanceReady, "traceability readiness") === true, "N21 traceability readiness is green");
 assert(traceability.acceptance === null, "candidate traceability has no acceptance manifest");
 
 const laws = record(contract.requiredSemanticLaws, "contract laws");
@@ -127,18 +127,18 @@ const candidateState = record(contract.candidateState, "candidate state");
 assert(bool(candidateState.foundationOrientationFinalChoiceComplete, "A4 choice") === true, "A4 context choice complete");
 assert(bool(candidateState.traceabilityComplete, "traceability") === true, "traceability complete");
 assert(bool(candidateState.documentationOwnershipMapComplete, "doc owners") === true, "doc ownership complete");
-assert(bool(candidateState.readinessAuditComplete, "readiness audit") === false, "post-N20c readiness audit remains pending");
+assert(bool(candidateState.readinessAuditComplete, "readiness audit") === true, "post-N20c readiness audit is complete");
 assert(bool(candidateState.explicitAuthorAcceptanceRecorded, "author acceptance") === false, "author acceptance absent");
 
 const blockers = record(conformance.blockers, "conformance blockers");
 assert(text(blockers.a4FinalChoice, "A4 blocker") === "GREEN_CONTEXT_RELATIVE_AUTHOR_REFINED", "A4 blocker closed by context-relative result");
 assert(text(blockers.traceability, "traceability blocker") === "GREEN_CANDIDATE", "traceability candidate green");
-assert(text(blockers.readinessAudit, "readiness blocker") === "BLOCKING_PENDING_POST_N20C_REAUDIT", "fresh readiness audit required");
+assert(text(blockers.readinessAudit, "readiness blocker") === "GREEN_INDEPENDENT_POST_N20C_AUDIT", "fresh readiness audit is green");
 assert(text(blockers.explicitAuthorAcceptance, "acceptance blocker") === "BLOCKING_PENDING", "explicit acceptance still required");
 
 const planned = strings(conformance.plannedExecutableGates, "planned gates");
-assert(planned.length === 1, "exactly one planned readiness gate remains");
-assert(planned[0] === "pending:v014-post-n20c-independent-readiness-audit", "correct readiness pending token");
+assert(planned.length === 0, "no planned executable gates remain after N21");
+assert(gateAuthority.has("ts/test/v014-post-n20c-independent-readiness-audit.test.ts"), "N21 readiness audit is mandatory");
 
 const current = record(record(policy.packs, "policy packs")["contract-conformance"], "contract pack");
 const currentPair = record(current.current, "current pair");
@@ -158,8 +158,8 @@ console.log([
   "EVIDENCE_VECTORS_RESOLVE=TRUE",
   "EXECUTABLE_GATES_RESOLVE=TRUE",
   "DOCUMENTATION_OWNER_MAP=GREEN",
-  "READINESS_AUDIT=BLOCKING_PENDING_POST_N20C_REAUDIT",
-  "ACCEPTANCE_READY=FALSE",
+  "READINESS_AUDIT=GREEN_INDEPENDENT_POST_N20C_AUDIT",
+  "ACCEPTANCE_READY=TRUE",
   "V014_ACCEPTED=FALSE",
   "V013_CURRENT_POINTER_UNCHANGED=TRUE",
 ].join(" "));

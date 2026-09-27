@@ -189,9 +189,9 @@ same(contract.candidateState.documentationOwnershipMapComplete, true, "documenta
 same(contract.candidateState.documentationComplete, false, "human prose reconstruction remains deferred");
 same(contract.acceptanceBoundary.documentationReconstructionUnblocked, false, "#1585 remains blocked before acceptance");
 
-same(contract.acceptanceReady, false, "N20c candidate still requires re-audit");
-same(conformance.acceptanceReady, false, "conformance still requires re-audit");
-same(traceability.acceptanceReady, false, "traceability still requires re-audit");
+same(contract.acceptanceReady, true, "N20c semantic closure is now independently readiness-audited");
+same(conformance.acceptanceReady, true, "conformance readiness is now independently audited");
+same(traceability.acceptanceReady, true, "traceability readiness is now independently audited");
 same(contract.accepted, false, "v0.14 remains nonaccepted");
 
 console.log([
@@ -207,6 +207,6 @@ console.log([
   "REPRESENTATION_LAYERS_EXPLICIT=TRUE",
   "GENERALIZED_MP_FULL_CHAIN_REQUIRED=TRUE",
   "ONE_CANONICAL_DOC_OWNER_PER_LAW=TRUE",
-  "POST_N20C_READINESS_AUDIT=PENDING",
+  "POST_N20C_READINESS_AUDIT=GREEN_N21",
   "MTS_V014_ACCEPTED=FALSE",
 ].join(" "));
