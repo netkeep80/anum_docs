@@ -4,6 +4,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { Memory, ensureRootBasis } from "../src/memory.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error("v0.14 historical N18 readiness guard: " + message);
@@ -17,6 +18,15 @@ const readJson=(path:string):any=>JSON.parse(readFileSync(join(repoRoot,path),"u
 const contract=readJson("contracts/mts-contract-v0.14.json");
 const conformance=readJson("contracts/mts-conformance-v0.14.json");
 const traceability=readJson("traceability/mts-v0.14.json");
+
+// Historical N18 remains an executable kernel-backed guard even though its
+// readiness verdict was superseded by N20. This prevents lifecycle evidence
+// from degrading into paper-only JSON assertions.
+const memory = new Memory();
+const basis = ensureRootBasis(memory);
+assert(basis.R !== basis.O && basis.O !== basis.C, "live kernel root basis remains proper");
+same(memory.ensure(basis.O, basis.C), basis.L, "live kernel L remains canonical");
+same(memory.ensure(basis.C, basis.O), basis.U, "live kernel U remains canonical");
 
 same(contract.accepted,false,"candidate remains nonaccepted");
 same(conformance.accepted,false,"conformance remains nonaccepted");
