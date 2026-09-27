@@ -7,7 +7,7 @@
   "semanticBase": "mts-contract/v0.13",
   "observableSemanticDelta": true,
   "conformanceCorpus": "contracts/mts-conformance-v0.14.json",
-  "acceptanceReady": false,
+  "acceptanceReady": true,
   "previousAcceptedRelease": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13",
@@ -27,7 +27,7 @@
     "productionBehaviorChanged": false,
     "singleLiveSemanticRuntime": true,
     "candidateKernelBehaviorImplemented": true,
-    "implementationCompleteMeaning": "declared v0.14 candidate semantic scope is implemented with mandatory executable evidence; independent post-N20c readiness re-audit and production cutover/current-pointer rotation are not yet performed",
+    "implementationCompleteMeaning": "declared v0.14 candidate semantic scope is implemented and independently post-N20c readiness-audited with all mandatory executable gates; production cutover/current-pointer rotation is not yet performed",
     "productionBehaviorChangedMeaning": "N20c changes candidate contracts/evidence only; the single live v0.13 runtime remains current until explicit v0.14 acceptance/cutover"
   },
   "inheritedFoundation": {
@@ -314,20 +314,19 @@
     "formalSurfaceGrammarComplete": true,
     "traceabilityComplete": true,
     "documentationComplete": false,
-    "readinessAuditComplete": false,
+    "readinessAuditComplete": true,
     "explicitAuthorAcceptanceRecorded": false,
     "documentationOwnershipMapComplete": true,
     "adversarialClosureComplete": true
   },
   "acceptanceBoundary": {
     "accepted": false,
-    "acceptanceReady": false,
+    "acceptanceReady": true,
     "automaticAcceptanceForbidden": true,
     "explicitAuthorApprovalRequired": true,
     "authorDecisionRequired": "ACCEPT MTS v0.14",
     "currentAcceptedRemains": "mts-contract/v0.13",
     "blockers": [
-      "independent post-N20c readiness audit",
       "explicit author acceptance"
     ],
     "documentationReconstructionIssue": 1585,
@@ -335,7 +334,8 @@
   },
   "traceabilityManifest": "traceability/mts-v0.14.json",
   "readinessAudit": {
-    "status": "BLOCKING_PENDING_POST_N20C_REAUDIT",
+    "status": "GREEN_INDEPENDENT_POST_N20C_AUDIT",
+    "issue": 1679,
     "convergenceIssue": 1677,
     "previousAudit": {
       "issue": 1666,
@@ -343,13 +343,11 @@
       "frozenDossier": 1668,
       "validForAcceptance": false
     },
-    "candidateSemanticReady": false,
+    "candidateSemanticReady": true,
     "productionCutoverPerformed": false,
     "documentationPostAcceptanceIssue": 1585,
-    "blockers": [
-      "independent post-N20c readiness audit",
-      "explicit author acceptance"
-    ]
+    "newFreezeRequired": true,
+    "onlyRemainingBlocker": "explicit author acceptance"
   },
   "representationLayers": {
     "status": "GREEN_RESEARCH",
