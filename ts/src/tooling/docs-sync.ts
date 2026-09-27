@@ -59,22 +59,6 @@ export interface CurrentProjection {
   readonly previousContractPath: string;
   readonly previousConformancePath: string;
   readonly acceptancePath: string;
-  readonly semanticBase: string;
-  readonly observableSemanticDelta: boolean;
-  readonly implementationLanguage: string;
-  readonly singleLiveSemanticRuntime: boolean;
-  readonly pythonRuntimePresent: boolean;
-  readonly compatibilityRuntimeSelectable: boolean;
-  readonly internalSigns: readonly string[];
-  readonly deferredSigns: readonly string[];
-  readonly metaOnlySigns: readonly string[];
-  readonly rootBasis: Readonly<Record<string, string>>;
-  readonly readMayMaterialize: boolean;
-  readonly notFoundImpliesNonExistence: boolean;
-  readonly stringCarrierUnit: string;
-  readonly byteEnvelope: string;
-  readonly bitsPerEnvelope: number;
-  readonly bitOrder: string;
 }
 
 function fail(message: string): never {
@@ -165,17 +149,6 @@ export function loadCurrentProjection(root = findRepositoryRoot()): CurrentProje
     fail(`current conformance targets ${conformanceContract}, current contract is ${contractSchema}`);
   }
 
-  const implementation = nested(contract, "implementation", currentContractPath);
-  const foundation = nested(contract, "foundation", currentContractPath);
-  const rootBasis = nested(contract, "rootBasisTarget", currentContractPath);
-  const effects = nested(contract, "effects", currentContractPath);
-  const carrier = nested(contract, "canonicalStringQuaternaryCarrier", currentContractPath);
-
-  const rootEntries = Object.entries(rootBasis);
-  if (rootEntries.length === 0 || rootEntries.some(([, value]) => typeof value !== "string")) {
-    fail(`${currentContractPath}.rootBasisTarget must contain string equations`);
-  }
-
   return {
     currentContract: contractSchema,
     currentConformance: conformanceSchema,
@@ -186,22 +159,6 @@ export function loadCurrentProjection(root = findRepositoryRoot()): CurrentProje
     previousContractPath,
     previousConformancePath,
     acceptancePath,
-    semanticBase: string(contract.semanticBase, `${currentContractPath}.semanticBase`),
-    observableSemanticDelta: boolean(contract.observableSemanticDelta, `${currentContractPath}.observableSemanticDelta`),
-    implementationLanguage: string(implementation.language, `${currentContractPath}.implementation.language`),
-    singleLiveSemanticRuntime: boolean(implementation.singleLiveSemanticRuntime, `${currentContractPath}.implementation.singleLiveSemanticRuntime`),
-    pythonRuntimePresent: boolean(implementation.pythonRuntimePresent, `${currentContractPath}.implementation.pythonRuntimePresent`),
-    compatibilityRuntimeSelectable: boolean(implementation.compatibilityRuntimeSelectable, `${currentContractPath}.implementation.compatibilityRuntimeSelectable`),
-    internalSigns: strings(foundation.minimalInternalSigns, `${currentContractPath}.foundation.minimalInternalSigns`),
-    deferredSigns: strings(foundation.deferredSigns, `${currentContractPath}.foundation.deferredSigns`),
-    metaOnlySigns: strings(foundation.metaOnlySigns, `${currentContractPath}.foundation.metaOnlySigns`),
-    rootBasis: Object.fromEntries(rootEntries) as Readonly<Record<string, string>>,
-    readMayMaterialize: boolean(effects.readMayMaterialize, `${currentContractPath}.effects.readMayMaterialize`),
-    notFoundImpliesNonExistence: boolean(effects.notFoundImpliesNonExistence, `${currentContractPath}.effects.notFoundImpliesNonExistence`),
-    stringCarrierUnit: string(carrier.canonicalUnit, `${currentContractPath}.canonicalStringQuaternaryCarrier.canonicalUnit`),
-    byteEnvelope: string(carrier.byteEnvelope, `${currentContractPath}.canonicalStringQuaternaryCarrier.byteEnvelope`),
-    bitsPerEnvelope: finiteNumber(carrier.bitsPerEnvelope, `${currentContractPath}.canonicalStringQuaternaryCarrier.bitsPerEnvelope`),
-    bitOrder: string(carrier.bitOrder, `${currentContractPath}.canonicalStringQuaternaryCarrier.bitOrder`),
   };
 }
 
@@ -397,7 +354,7 @@ export function checkRepositorySemanticLawDocumentation(root = findRepositoryRoo
 export function renderCurrentProjection(value: CurrentProjection): string {
   return [
     PROJECTION_START,
-    "> **Текущий принятый выпуск МТС: v0.13.** Этот блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.",
+    `> **Текущий принятый выпуск МТС: ${value.currentContract.replace("mts-contract/", "")}.** Этот блок строится из принятых указателей командой \`npm --prefix ts run docs:sync\`.`,
     ">",
     `> - Контракт: \`${value.currentContract}\` — [файл контракта](${value.currentContractPath}).`,
     `> - Корпус соответствия: \`${value.currentConformance}\` — [файл корпуса](${value.currentConformancePath}).`,
