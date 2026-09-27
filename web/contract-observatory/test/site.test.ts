@@ -122,9 +122,9 @@ assert(realHtml.includes("Сравнение по стабильному ID не
 same(realMarkdownCoverage.summary.documentCount, 12, "P5 renders all registered Markdown documents");
 same(realMarkdownCoverage.projectionState, "MATERIALIZED", "P5 observes materialized v0.14 prose projection");
 same(realMarkdownCoverage.proseMaterializationPending, false, "P5 has no pending prose materialization");
-same(realMarkdownCoverage.summary.requirementCount, 14, "P5 renders all accepted v0.14 requirements");
-same(realMarkdownCoverage.summary.requirementBackedSectionCount, 14, "P5 materializes every accepted requirement owner");
-same(realMarkdownCoverage.summary.ownedBlockCount, 14, "P5 exposes exactly one compiler-owned block per requirement");
+same(realMarkdownCoverage.summary.requirementCount, 16, "P5 renders semantic + repository requirements");
+same(realMarkdownCoverage.summary.requirementBackedSectionCount, 16, "P5 materializes every projected requirement owner");
+same(realMarkdownCoverage.summary.ownedBlockCount, 16, "P5 exposes exactly one compiler-owned block per projected requirement");
 assert(realMarkdownCoverage.summary.researchHistoricalSectionCount > 0, "P5 keeps research/history reader-visible");
 same(
   realMarkdownCoverage.summary.headingCount,
