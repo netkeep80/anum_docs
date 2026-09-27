@@ -16,63 +16,63 @@ function includes(values: readonly string[], value: string, message: string): vo
 const repositoryRoot = process.cwd();
 const projection = buildMethodologyProjection(repositoryRoot, buildContractObservatoryIndex(repositoryRoot));
 const config = buildObservatoryInteractionConfig(projection);
-const current = config.versions.find((version) => version.id === "mts-contract/v0.13");
+const current = config.versions.find((version) => version.id === "mts-contract/v0.14");
 assert(current !== undefined, "current interaction version exists");
 
-includes(current.itemIds, "invariant:L12", "semantic invariant is selectable");
+includes(current.itemIds, "invariant:V14-L12", "semantic invariant is selectable");
 includes(
   current.itemIds,
-  "gate:ts/test/v013-root-aspect-formal-composition.test.ts",
+  "gate:ts/test/research-v014-context-relative-a4prime.test.ts",
   "manifest-required executable gate is selectable",
 );
 
 const kernel = createObservatoryInteractionKernel(config);
 const invariantState = kernel.reduce(kernel.initialState(), {
   type: "select-item",
-  itemId: "invariant:L12",
+  itemId: "invariant:V14-L12",
 });
-assert(invariantState.selectedItemId === "invariant:L12", "invariant selection survives normalization");
+assert(invariantState.selectedItemId === "invariant:V14-L12", "invariant selection survives normalization");
 const invariantHighlights = kernel.highlightedItemIds(invariantState);
-includes(invariantHighlights, "invariant:L12", "selected invariant highlights itself");
+includes(invariantHighlights, "invariant:V14-L12", "selected invariant highlights itself");
 includes(
   invariantHighlights,
-  "vector:v013-formal-root-R-from-8",
+  "vector:v014-context-relative-a4prime-grounded",
   "invariant highlights its manifest-declared positive vector",
 );
 includes(
   invariantHighlights,
-  "vector:v013-formal-root-wrong-rule-rejected",
+  "vector:v014-global-selected-w-required-rejected",
   "invariant highlights its manifest-declared negative vector",
 );
 includes(
   invariantHighlights,
-  "gate:ts/test/v013-root-aspect-formal-composition.test.ts",
+  "gate:ts/test/research-v014-context-relative-a4prime.test.ts",
   "invariant highlights its manifest-declared executable gate",
 );
 assert(
-  !invariantHighlights.includes("vector:v013-empty-wire-is-not-root"),
+  !invariantHighlights.includes("vector:v014-q13-rejects-t-f-source"),
   "forward highlighting never guesses unrelated Q-boundary evidence",
 );
 
 const gateState = kernel.reduce(kernel.initialState(), {
   type: "select-item",
-  itemId: "gate:ts/test/v013-root-aspect-formal-composition.test.ts",
+  itemId: "gate:ts/test/research-v014-context-relative-a4prime.test.ts",
 });
 const gateHighlights = kernel.highlightedItemIds(gateState);
-includes(gateHighlights, "gate:ts/test/v013-root-aspect-formal-composition.test.ts", "selected gate highlights itself");
+includes(gateHighlights, "gate:ts/test/research-v014-context-relative-a4prime.test.ts", "selected gate highlights itself");
 includes(
   gateHighlights,
-  "invariant:L12",
+  "invariant:V14-L12",
   "gate walks backwards through the manifest-declared invariant relation",
 );
 assert(
   !gateHighlights.includes("evidence:ts/test/v013-root-aspect-formal-composition.test.ts"),
-  "v0.13 does not invent vectorEvidence that its conformance does not declare",
+  "v0.14 does not invent vectorEvidence that its conformance does not declare",
 );
 
 const previousState = kernel.reduce(kernel.initialState(), {
   type: "select-version",
-  versionId: "mts-contract/v0.12",
+  versionId: "mts-contract/v0.13",
 });
 assert(
   kernel.highlightedItemIds(previousState).length === 0,
