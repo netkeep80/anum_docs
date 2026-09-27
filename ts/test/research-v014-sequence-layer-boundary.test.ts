@@ -289,6 +289,82 @@ function composeTransport(
   return left === right ? "ID" : "J";
 }
 
+function matchedTargetForSource(
+  m: Memory,
+  sourceState: LinkHandle,
+  targetOrbit: readonly LinkHandle[],
+  carrier: LinkHandle,
+): LinkHandle | "UNRESOLVED" {
+  const matches = new Set<LinkHandle>();
+  for (const edge of matchingEdges(m, carrier)) {
+    for (const target of targetOrbit) {
+      if (unorderedIncident(m, edge, sourceState, target)) matches.add(target);
+    }
+  }
+  return matches.size === 1 ? [...matches][0]! : "UNRESOLVED";
+}
+
+function contextStateForWitness(
+  m: Memory,
+  contextOrbit: readonly LinkHandle[],
+  witnessOrbit: readonly LinkHandle[],
+  selectionCarrier: LinkHandle,
+  witness: LinkHandle,
+): LinkHandle | "UNRESOLVED" {
+  const matches = contextOrbit.filter(
+    (state) => selectedWitnessForContext(m, state, witnessOrbit, selectionCarrier) === witness,
+  );
+  return matches.length === 1 ? matches[0]! : "UNRESOLVED";
+}
+
+function relativeTransportCarrier(
+  m: Memory,
+  R: LinkHandle,
+  sourceState: LinkHandle,
+  sourceOrbit: readonly LinkHandle[],
+  sourceSelection: LinkHandle,
+  targetOrbit: readonly LinkHandle[],
+  targetSelection: LinkHandle,
+  witnessOrbit: readonly LinkHandle[],
+): LinkHandle | "UNRESOLVED" {
+  assert(sourceOrbit.includes(sourceState), "source state belongs to source Context orbit");
+  const sourceWitness = selectedWitnessForContext(m, sourceState, witnessOrbit, sourceSelection);
+  if (sourceWitness === "UNRESOLVED") return "UNRESOLVED";
+  const targetState = contextStateForWitness(
+    m,
+    targetOrbit,
+    witnessOrbit,
+    targetSelection,
+    sourceWitness,
+  );
+  if (targetState === "UNRESOLVED") return "UNRESOLVED";
+  return jFixedMatchingCarrier(m, R, sourceState, targetState);
+}
+
+function classifyTransportCarrier(
+  m: Memory,
+  sourceState: LinkHandle,
+  targetState: LinkHandle,
+  targetMirror: LinkHandle,
+  carrier: LinkHandle,
+): GaugeTransport | "UNRESOLVED" {
+  const matched = matchedTargetForSource(
+    m,
+    sourceState,
+    Object.freeze([targetState, targetMirror]),
+    carrier,
+  );
+  if (matched === targetState) return "ID";
+  if (matched === targetMirror) return "J";
+  return "UNRESOLVED";
+}
+
+function selfIncidenceCase(m: Memory, link: LinkHandle): "11" | "10" | "01" | "00" {
+  const p = m.poles(link);
+  return (p.start === link ? "1" : "0") + (p.end === link ? "1" : "0") as
+    "11" | "10" | "01" | "00";
+}
+
 function makeChiralContextOrbit(
   m: Memory,
   R: LinkHandle,
@@ -305,18 +381,41 @@ function makeChiralContextOrbit(
   return Object.freeze([K, JK]);
 }
 
-function exerciseContextRelativeGauge(): void {
+function exerciseContextRelativeGauge(reverseBootstrap: boolean): void {
   const m = new Memory();
   const R = m.root;
 
-  // Materialize only the raw two-position root neighbourhood.
-  m.ensureStartSelfClosed(R);
-  m.ensureEndSelfClosed(R);
+  // Materialize only the raw two-position root neighbourhood. Creation order
+  // is deliberately varied: technical issuance order cannot be orientation
+  // authority.
+  if (reverseBootstrap) {
+    m.ensureEndSelfClosed(R);
+    m.ensureStartSelfClosed(R);
+  } else {
+    m.ensureStartSelfClosed(R);
+    m.ensureEndSelfClosed(R);
+  }
   const omega = discoverWitnessOrbit(m, R);
   same(omega.length, 2, "objective witness orbit has two members before any Context orientation");
   assert(omega[0] !== omega[1], "W differs from J(W)");
   same(rawInvertLink(m, R, omega[0]!), omega[1]!, "J exchanges the witness orbit");
   same(rawInvertLink(m, R, omega[1]!), omega[0]!, "J returns the witness orbit");
+
+  // One Link-forming ontology yields exactly four structural self-incidence
+  // cases. The API helpers are bootstrap conveniences, not four semantic
+  // primitive opcodes.
+  const neighbours = discoverRootNeighbourOrbit(m, R);
+  const ordinaryPair = m.ensure(neighbours[0]!, neighbours[1]!);
+  const structuralCases = new Set([
+    selfIncidenceCase(m, R),
+    ...neighbours.map((link) => selfIncidenceCase(m, link)),
+    selfIncidenceCase(m, ordinaryPair),
+  ]);
+  same(
+    JSON.stringify([...structuralCases].sort()),
+    JSON.stringify(["00", "01", "10", "11"]),
+    "single Link ontology exposes all four emergent self-incidence cases",
+  );
 
   // Build three independent chiral Context orbits.
   const seedA = m.ensure(omega[0]!, omega[0]!);
@@ -373,6 +472,28 @@ function exerciseContextRelativeGauge(): void {
     "g_AA = Id",
   );
 
+  // Materialize g_AB itself as a pre-oriented J-fixed Link matching between
+  // Context torsors. The host ID/J strings above are only diagnostics.
+  const tAB = relativeTransportCarrier(m, R, A[0], A, selA, B, selB, omega);
+  const tBC = relativeTransportCarrier(m, R, B[0], B, selB, C, selC, omega);
+  const tAC = relativeTransportCarrier(m, R, A[0], A, selA, C, selC, omega);
+  assert(tAB !== "UNRESOLVED" && tBC !== "UNRESOLVED" && tAC !== "UNRESOLVED", "Link-native relative transports materialize");
+  same(rawInvertLink(m, R, tAB), tAB, "g_AB carrier is J-fixed");
+  same(rawInvertLink(m, R, tBC), tBC, "g_BC carrier is J-fixed");
+  same(rawInvertLink(m, R, tAC), tAC, "g_AC carrier is J-fixed");
+  same(classifyTransportCarrier(m, A[0], B[0], B[1], tAB), "ID", "Link carrier g_AB = Id");
+  same(classifyTransportCarrier(m, B[0], C[0], C[1], tBC), "J", "Link carrier g_BC = J");
+  same(classifyTransportCarrier(m, A[0], C[0], C[1], tAC), "J", "Link carrier g_AC = J");
+
+  // Composition is checked relationally, not via a host XOR opcode:
+  // A-state --g_AB--> B-state --g_BC--> C-state equals A-state --g_AC--> C-state.
+  const viaB = matchedTargetForSource(m, A[0], B, tAB);
+  assert(viaB !== "UNRESOLVED", "g_AB maps A state to one B state");
+  const viaC = matchedTargetForSource(m, viaB, C, tBC);
+  const directC = matchedTargetForSource(m, A[0], C, tAC);
+  assert(viaC !== "UNRESOLVED" && directC !== "UNRESOLVED", "transport composition targets resolve");
+  same(viaC, directC, "Link-native g_AB o g_BC = g_AC");
+
   // No-go theorem for an achiral Context:
   //
   // If K = J(K), a J-equivariant selection relation cannot choose only W.
@@ -390,6 +511,17 @@ function exerciseContextRelativeGauge(): void {
   const parallel = jFixedMatchingCarrier(m, R, A[0], omega[0]!);
   const crossed = jFixedMatchingCarrier(m, R, A[0], omega[1]!);
   assert(parallel !== crossed, "parallel and crossed J-equivariant matchings are distinct");
+  const allRepresentativeChoices = [
+    jFixedMatchingCarrier(m, R, A[0], omega[0]!),
+    jFixedMatchingCarrier(m, R, A[0], omega[1]!),
+    jFixedMatchingCarrier(m, R, A[1], omega[0]!),
+    jFixedMatchingCarrier(m, R, A[1], omega[1]!),
+  ];
+  same(
+    new Set(allRepresentativeChoices).size,
+    2,
+    "two two-point J-torsors admit exactly two equivariant matching carriers",
+  );
   same(rawInvertLink(m, R, parallel), parallel, "parallel matching is objective/J-fixed");
   same(rawInvertLink(m, R, crossed), crossed, "crossed matching is objective/J-fixed");
 
@@ -508,7 +640,8 @@ function exerciseContextRelativeGauge(): void {
   same(fingerprintA, fingerprintC, "mirror Context frames preserve local semantic equations");
 }
 
-exerciseContextRelativeGauge();
+exerciseContextRelativeGauge(false);
+exerciseContextRelativeGauge(true);
 
 // Pre-acceptance documentation ownership is metadata over the real kernel,
 // never a replacement for executable semantics.
@@ -562,4 +695,11 @@ console.log([
   "MIRROR_FRAME_CONTEXTS_COVARIANT=TRUE",
   "TRANSPORT_ID_J_COMPOSITION=TRUE",
   "GLOBAL_SELECTED_W_REQUIRED=FALSE",
+  "ONTOLOGY_PRIMITIVE_LINK=ONE",
+  "EMERGENT_SELF_INCIDENCE_CASES=FOUR",
+  "PREORIENTED_J_ORBIT_CLASSES=THREE",
+  "EQUIVARIANT_CONTEXT_WITNESS_MATCHINGS=2",
+  "RELATIVE_TRANSPORT_CARRIER=J_FIXED_LINK_MATCHING",
+  "TRANSPORT_COMPOSITION_USES_LINK_RELATION=TRUE",
+  "TECHNICAL_BOOTSTRAP_ORDER_AUTHORITY=FALSE",
 ].join(" "));
