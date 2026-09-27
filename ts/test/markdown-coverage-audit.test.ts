@@ -27,18 +27,20 @@ const report = buildMarkdownCoverageAudit(root);
 const again = buildMarkdownCoverageAudit(root);
 
 same(report.schema, "mts-markdown-coverage/v0.1", "coverage schema");
-same(report.contract, "mts-contract/v0.13", "coverage targets accepted current contract");
+same(report.contract, "mts-contract/v0.14", "coverage targets accepted current contract");
+same(report.projectionState, "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585", "projection staging state");
+same(report.proseMaterializationPending, true, "v0.14 prose materialization pending #1585");
 same(report.summary.documentCount, 12, "registered Markdown surface");
 same(report.summary.headingCount, 306, "all visible headings are inventoried");
 same(report.summary.stableAnchorCount, 40, "all stable anchors are counted");
 same(report.summary.canonicalNodeCount, 22, "canonical node baseline");
 same(report.summary.nonCanonicalAnchorCount, 18, "generic non-node anchors remain visible");
-same(report.summary.requirementCount, 13, "accepted requirement registry count");
-same(report.summary.requirementBackedSectionCount, 13, "accepted requirement projections resolve to sections");
+same(report.summary.requirementCount, 14, "accepted requirement registry count");
+same(report.summary.requirementBackedSectionCount, 0, "v0.14 prose projections are not materialized before #1585");
 same(report.summary.ownedBlockCount, 13, "compiler-owned block count");
 same(report.summary.unanchoredHeadingCount, 284, "unanchored authored surface is explicit");
 same(report.summary.researchHistoricalSectionCount, 14, "research path is classified conservatively");
-same(report.summary.currentlyUnclassifiedSectionCount, 279, "non-backed non-research knowledge remains unclassified");
+same(report.summary.currentlyUnclassifiedSectionCount, 292, "old prose remains preservation-classified until #1585");
 same(JSON.stringify(again), JSON.stringify(report), "coverage audit is deterministic");
 
 for (const document of report.documents) {
@@ -104,5 +106,5 @@ throws(
 );
 
 console.log(
-  `Markdown coverage P4: GREEN headings=${report.summary.headingCount} canonical=${report.summary.canonicalNodeCount} unanchored=${report.summary.unanchoredHeadingCount}`,
+  `Markdown coverage A75: GREEN accepted=${report.summary.requirementCount} materialized=${report.summary.requirementBackedSectionCount} historicalBlocks=${report.summary.ownedBlockCount}`,
 );
