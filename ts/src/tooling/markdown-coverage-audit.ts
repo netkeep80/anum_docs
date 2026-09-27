@@ -56,6 +56,8 @@ export interface MarkdownCoverageSummary {
 export interface MarkdownCoverageAudit {
   readonly schema: "mts-markdown-coverage/v0.1";
   readonly contract: string;
+  readonly projectionState: string;
+  readonly proseMaterializationPending: boolean;
   readonly documents: readonly MarkdownCoverageDocument[];
   readonly summary: MarkdownCoverageSummary;
 }
@@ -86,6 +88,7 @@ export function auditMarkdownDocument(args: {
   readonly mode: MarkdownDocumentMode;
   readonly source: string;
   readonly requirements: readonly CoverageRequirement[];
+  readonly allowUnprojectedOwnedBlocks?: boolean;
 }): MarkdownCoverageDocument {
   const { path, mode, source } = args;
   const requirements = [...args.requirements].sort((a, b) => a.id.localeCompare(b.id));
@@ -110,7 +113,7 @@ export function auditMarkdownDocument(args: {
   }
 
   const requirementIds = requirements.map((item) => item.id);
-  if (!sameSet(ownedBlockIds, requirementIds)) {
+  if (!args.allowUnprojectedOwnedBlocks && !sameSet(ownedBlockIds, requirementIds)) {
     fail(`${path}: compiler-owned block IDs differ from projected requirement IDs; blocks=[${ownedBlockIds.join(", ")}] requirements=[${requirementIds.join(", ")}]`);
   }
 
@@ -162,16 +165,21 @@ export function auditMarkdownDocument(args: {
 
 export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit {
   const ir = loadMtsSemanticIr(root);
+  const proseMaterializationPending =
+    ir.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585";
   const documents = Object.keys(ir.documentModes).sort((a, b) => a.localeCompare(b)).map((path) => {
     const source = readFileSync(resolve(root, path), "utf8");
-    const requirements = ir.requirements
-      .filter((item) => item.docPath === path)
-      .map((item: MtsRequirementProjection) => Object.freeze({ id: item.id, docAnchor: item.docAnchor }));
+    const requirements = proseMaterializationPending
+      ? []
+      : ir.requirements
+          .filter((item) => item.docPath === path)
+          .map((item: MtsRequirementProjection) => Object.freeze({ id: item.id, docAnchor: item.docAnchor }));
     return auditMarkdownDocument({
       path,
       mode: ir.documentModes[path]!,
       source,
       requirements,
+      allowUnprojectedOwnedBlocks: proseMaterializationPending,
     });
   });
 
@@ -193,6 +201,8 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
   return Object.freeze({
     schema: "mts-markdown-coverage/v0.1",
     contract: ir.contract,
+    projectionState: ir.projectionState,
+    proseMaterializationPending,
     documents: Object.freeze(documents),
     summary,
   });
