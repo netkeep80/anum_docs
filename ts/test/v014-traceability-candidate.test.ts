@@ -58,12 +58,14 @@ const conformancePath = join(repoRoot, "contracts/mts-conformance-v0.14.json");
 const traceabilityPath = join(repoRoot, "traceability/mts-v0.14.json");
 const policyPath = join(repoRoot, "repo-policy.json");
 const acceptance13Path = join(repoRoot, "cutover/typescript-c1-acceptance-v0.6.json");
+const requirements14Path = join(repoRoot, "requirements/mts-v0.14.json");
 
 const contract = json(contractPath);
 const conformance = json(conformancePath);
 const traceability = json(traceabilityPath);
 const policy = json(policyPath);
 const acceptance13 = json(acceptance13Path);
+const requirements14 = json(requirements14Path);
 
 // This audit is still attached to the live @mts/core kernel rather than being
 // a paper-only JSON assertion.
@@ -77,9 +79,9 @@ assert(text(traceability.schema, "traceability schema") === "mts-traceability/v0
 assert(bool(contract.accepted, "contract accepted") === false, "candidate contract must remain nonaccepted");
 assert(bool(conformance.accepted, "conformance accepted") === false, "candidate conformance must remain nonaccepted");
 assert(bool(traceability.accepted, "traceability accepted") === false, "candidate traceability must remain nonaccepted");
-assert(bool(contract.acceptanceReady, "contract readiness") === true, "candidate contract is readiness-complete");
-assert(bool(conformance.acceptanceReady, "conformance readiness") === true, "candidate conformance is readiness-complete");
-assert(bool(traceability.acceptanceReady, "traceability readiness") === true, "candidate traceability is readiness-complete");
+assert(bool(contract.acceptanceReady, "contract readiness") === false, "N20 invalidates previous readiness");
+assert(bool(conformance.acceptanceReady, "conformance readiness") === false, "N20 conformance awaits re-audit");
+assert(bool(traceability.acceptanceReady, "traceability readiness") === false, "N20 traceability awaits re-audit");
 assert(traceability.acceptance === null, "candidate traceability must not claim an acceptance manifest");
 
 assert(
@@ -100,6 +102,11 @@ const negativeAuthority = new Set(strings(conformance.requiredNegativeVectors, "
 const gateAuthority = new Set(strings(conformance.requiredExecutableGates, "required executable gates"));
 const traceabilityGate = "ts/test/v014-traceability-candidate.test.ts";
 assert(gateAuthority.has(traceabilityGate), "traceability audit itself must be a required candidate gate");
+const requirementEntries = record(requirements14, "v0.14 requirement registry");
+const requirementList = requirementEntries.requirements;
+assert(Array.isArray(requirementList), "v0.14 requirement registry entries");
+const requirementsById = new Map((requirementList as JsonRecord[]).map((item) => [text(item.id, "requirement id"), item] as const));
+sameSet([...requirementsById.keys()], Object.keys(laws), "every law has exactly one predeclared documentation owner");
 
 for (const id of Object.keys(laws).sort()) {
   const invariant = record(invariants[id], id + " invariant");
@@ -120,6 +127,14 @@ for (const id of Object.keys(laws).sort()) {
   assert(gates.length > 0, id + " must have executable evidence");
   subset(gates, gateAuthority, id + " gate outside conformance authority");
   for (const gate of gates) assert(existsSync(join(repoRoot, gate)), id + " missing gate path: " + gate);
+
+  const requirement = record(requirementsById.get(id), id + " requirement projection");
+  const docProjection = record(requirement.docProjection, id + " doc projection");
+  const docOwner = record(invariant.documentationOwner, id + " trace documentation owner");
+  assert(text(docOwner.registry, id + " owner registry") === "requirements/mts-v0.14.json", id + " owner registry");
+  assert(text(docOwner.path, id + " owner path") === text(docProjection.path, id + " projection path"), id + " owner path matches registry");
+  assert(text(docOwner.anchor, id + " owner anchor") === text(docProjection.anchor, id + " projection anchor"), id + " owner anchor matches registry");
+  assert(existsSync(join(repoRoot, text(docProjection.path, id + " projection path"))), id + " owner document exists");
 }
 
 assert(
@@ -131,20 +146,23 @@ assert(
 const candidateState = record(contract.candidateState, "candidate state");
 assert(bool(candidateState.traceabilityComplete, "traceabilityComplete") === true, "candidate traceability graph is complete");
 assert(bool(candidateState.foundationOrientationFinalChoiceComplete, "orientation freeze") === true, "A4' author choice is frozen");
-assert(bool(candidateState.readinessAuditComplete, "readiness audit") === true, "independent readiness audit is complete");
+assert(bool(candidateState.adversarialClosureComplete, "N20 adversarial closure") === true, "N20 closure is implemented");
+assert(bool(candidateState.documentationOwnershipMapComplete, "documentation ownership map") === true, "v0.14 owner map is complete");
+assert(bool(candidateState.readinessAuditComplete, "readiness audit") === false, "post-N20 independent readiness audit remains pending");
 assert(bool(candidateState.explicitAuthorAcceptanceRecorded, "author acceptance") === false, "author acceptance remains absent");
 
 const blockers = record(conformance.blockers, "conformance blockers");
 assert(text(blockers.traceability, "traceability blocker") === "GREEN_CANDIDATE", "traceability blocker closes only as candidate");
 assert(text(blockers.a4FinalChoice, "A4 blocker") === "GREEN_AUTHOR_FROZEN", "A4 blocker closes only by explicit author freeze");
-assert(text(blockers.readinessAudit, "readiness blocker") === "GREEN_INDEPENDENT_AUDIT", "readiness blocker is closed by N18");
+assert(text(blockers.readinessAudit, "readiness blocker") === "BLOCKING_PENDING_POST_N20_REAUDIT", "post-N20 readiness audit remains blocking");
 assert(text(blockers.explicitAuthorAcceptance, "author blocker") === "BLOCKING_PENDING", "author acceptance blocker remains");
 
 const planned = strings(conformance.plannedExecutableGates, "planned gates");
 assert(!planned.includes("pending:v014-traceability"), "traceability must no longer be planned-only");
 assert(!planned.includes("pending:v014-a4-semantic-freeze-projection"), "A4 freeze is no longer planned-only");
-assert(!planned.includes("pending:v014-independent-readiness-audit"), "readiness audit is no longer planned-only");
-assert(planned.length === 0, "no planned executable gates remain");
+assert(!planned.includes("pending:v014-independent-readiness-audit"), "superseded N18 pending token is absent");
+assert(planned.includes("pending:v014-post-n20-independent-readiness-audit"), "new independent readiness audit is explicit");
+assert(planned.length === 1, "exactly one planned executable gate remains");
 
 const current = record(record(policy.packs, "policy packs")["contract-conformance"], "contract pack");
 const currentPair = record(current.current, "current contract pair");
@@ -166,15 +184,17 @@ assert(!existsSync(join(repoRoot, "cutover/typescript-c1-acceptance-v0.7.json"))
 console.log([
   "MTS v0.14 N16: CANDIDATE_TRACEABILITY=GREEN",
   "INVARIANT_IDENTITY_EXACT=TRUE",
-  "LAW_COUNT=12",
+  "LAW_COUNT=14",
   "CONTRACT_POINTERS_RESOLVE=TRUE",
   "POSITIVE_VECTORS_RESOLVE=TRUE",
   "NEGATIVE_VECTORS_RESOLVE=TRUE",
   "EXECUTABLE_GATES_RESOLVE=TRUE",
   "A4_FINAL_CHOICE=GREEN_AUTHOR_FROZEN",
   "A4_PRIME_MODEL=GLOBAL_Z2_TORSOR_WITH_DERIVED_START_END",
-  "READINESS_AUDIT=GREEN_INDEPENDENT_AUDIT",
-  "ACCEPTANCE_READY=TRUE",
+  "N20_ADVERSARIAL_CLOSURE=GREEN",
+  "DOCUMENTATION_OWNER_MAP=GREEN",
+  "READINESS_AUDIT=BLOCKING_PENDING_POST_N20_REAUDIT",
+  "ACCEPTANCE_READY=FALSE",
   "EXPLICIT_AUTHOR_ACCEPTANCE=BLOCKING_PENDING",
   "V014_ACCEPTED=FALSE",
   "V013_CURRENT_POINTER_UNCHANGED=TRUE",
