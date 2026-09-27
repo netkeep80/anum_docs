@@ -2,45 +2,44 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) throw new Error(`v0.13 documentation ownership: ${message}`);
+  if (!condition) throw new Error(`v0.13 historical documentation ownership: ${message}`);
 }
-
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: values differ`);
 }
 
 const repoRoot = resolve(process.cwd(), "..");
-const contractPath = join(repoRoot, "contracts/mts-contract-v0.13.json");
-const contract = JSON.parse(readFileSync(contractPath, "utf8")) as {
-  status?: unknown;
-  accepted?: unknown;
-  acceptanceReady?: unknown;
-  acceptedCurrent?: { contract?: unknown; conformance?: unknown };
-  requiredSemanticLaws?: Record<string, unknown>;
-  normativeDocumentation?: {
-    ownerRule?: unknown;
-    owners?: Record<string, { path?: unknown; anchor?: unknown }>;
-  };
-};
+const contract = JSON.parse(
+  readFileSync(join(repoRoot, "contracts/mts-contract-v0.13.json"), "utf8"),
+) as any;
+const policy = JSON.parse(
+  readFileSync(join(repoRoot, "repo-policy.json"), "utf8"),
+) as any;
+const acceptance13 = JSON.parse(
+  readFileSync(join(repoRoot, "cutover/typescript-c1-acceptance-v0.6.json"), "utf8"),
+) as any;
 
-same(contract.status, "accepted", "documentation evidence belongs to accepted v0.13");
-same(contract.accepted, true, "v0.13 documentation is on the accepted boundary");
-same(contract.acceptanceReady, true, "documentation convergence remains valid in the restored ready lifecycle");
-same(contract.acceptedCurrent?.contract, "mts-contract/v0.13", "accepted contract is v0.13");
-same(contract.acceptedCurrent?.conformance, "mts-conformance/v0.13", "accepted conformance is v0.13");
+same(contract.status, "accepted", "v0.13 remains accepted historical evidence");
+same(contract.accepted, true, "v0.13 accepted flag");
+same(contract.acceptanceReady, true, "v0.13 readiness remains proven");
+same(contract.acceptedCurrent?.contract, "mts-contract/v0.13", "historical acceptance current contract");
+same(contract.acceptedCurrent?.conformance, "mts-conformance/v0.13", "historical acceptance current conformance");
 
-function compareLawIds(left: string, right: string): number {
-  return Number(left.slice(1)) - Number(right.slice(1));
-}
+same(
+  policy.packs["contract-conformance"].previous.contract.path,
+  "contracts/mts-contract-v0.13.json",
+  "v0.13 is previous accepted release after A75",
+);
+same(
+  acceptance13.current.contract,
+  "contracts/mts-contract-v0.13.json",
+  "immutable v0.6 manifest remains bound to v0.13",
+);
 
-const laws = Object.keys(contract.requiredSemanticLaws ?? {}).sort(compareLawIds);
-same(laws.join(","), Array.from({ length: 13 }, (_, index) => `L${index + 1}`).join(","), "candidate law identity");
-
-const allowedDocuments = Object.freeze([
-  "docs/specs/Формальная нотация МТС.md",
-  "docs/specs/Ачисла и сериализация.md",
-  "docs/specs/Апамять и управление сетью связей.md",
-]);
+const laws = Object.keys(contract.requiredSemanticLaws ?? {}).sort(
+  (a, b) => Number(a.slice(1)) - Number(b.slice(1)),
+);
+same(laws.join(","), Array.from({ length: 13 }, (_, i) => `L${i + 1}`).join(","), "v0.13 law identity");
 
 const expectedOwnerDocument = Object.freeze<Record<string, string>>({
   L1: "docs/specs/Апамять и управление сетью связей.md",
@@ -58,51 +57,21 @@ const expectedOwnerDocument = Object.freeze<Record<string, string>>({
   L13: "docs/specs/Ачисла и сериализация.md",
 });
 
-const ownerPattern =
-  /<a id="mts-law-([A-Za-z][A-Za-z0-9]*)"><\/a>\s*<!--\s*нормативный владелец\s*-->/g;
-const owners = new Map<string, string[]>();
-
-for (const path of allowedDocuments) {
-  const source = readFileSync(join(repoRoot, path), "utf8");
-  const hasCurrentVersionBoundary =
-    source.includes("mts-doc-version: v0.13") ||
-    source.includes("MTS v0.13");
-  assert(hasCurrentVersionBoundary, `${path}: explicit v0.13 boundary`);
-
-  for (const match of source.matchAll(ownerPattern)) {
-    const law = match[1]!;
-    if (!laws.includes(law)) continue;
-    const locations = owners.get(law) ?? [];
-    locations.push(path);
-    owners.set(law, locations);
-  }
-}
-
-for (const law of laws) {
-  const locations = owners.get(law) ?? [];
-  same(locations.length, 1, `${law}: exactly one normative owner`);
-  same(locations[0], expectedOwnerDocument[law], `${law}: canonical owner document`);
-}
-
 const ownerMap = contract.normativeDocumentation?.owners ?? {};
-same(
-  Object.keys(ownerMap).sort(compareLawIds).join(","),
-  laws.join(","),
-  "contract owner map covers exactly L1-L13",
-);
+same(Object.keys(ownerMap).sort().length, 13, "v0.13 owner map cardinality");
 same(
   contract.normativeDocumentation?.ownerRule,
   "one accepted semantic law -> one canonical accepted normative owner anchor",
-  "contract declares the ownership invariant",
+  "historical owner invariant",
 );
 
 for (const law of laws) {
   const declared = ownerMap[law];
-  assert(declared !== undefined, `${law}: declared owner exists`);
-  same(declared.path, expectedOwnerDocument[law], `${law}: contract path matches document owner`);
-  same(declared.anchor, `mts-law-${law}`, `${law}: contract anchor identity`);
+  assert(declared !== undefined, `${law}: historical owner exists`);
+  same(declared.path, expectedOwnerDocument[law], `${law}: historical owner path`);
+  same(declared.anchor, `mts-law-${law}`, `${law}: historical owner anchor`);
 }
 
 console.log(
-  "MTS v0.13 R7d documentation ownership: L1-L13 each have exactly one canonical accepted normative owner; accepted current is v0.13: GREEN.",
+  "MTS v0.13 historical documentation ownership: immutable owner map L1-L13 retained; current Markdown is free to represent accepted v0.14: GREEN.",
 );
