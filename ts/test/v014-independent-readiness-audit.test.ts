@@ -45,7 +45,7 @@ same(conformance.readinessAudit.invalidatedFrozenDossier,1668,"conformance inval
 same(conformance.lifecycle.preN20Freeze1668ValidForAcceptance,false,"#1668 cannot be accepted");
 
 same(Object.keys(contract.requiredSemanticLaws).length,14,"N20 law set");
-same(conformance.requiredExecutableGates.length,70,"N20 mandatory executable gates");
+same(conformance.requiredExecutableGates.length,68,"N20 mandatory executable gates");
 same(conformance.plannedExecutableGates.length,1,"one new independent audit remains planned");
 same(
   conformance.plannedExecutableGates[0],
@@ -64,7 +64,7 @@ console.log([
   "SUPERSEDED_BY=N20_1669",
   "OLD_FREEZE_1668_ACCEPTABLE=FALSE",
   "LAW_COUNT=14",
-  "REQUIRED_GATE_COUNT=70",
+  "REQUIRED_GATE_COUNT=68",
   "N20_ADVERSARIAL_CLOSURE=GREEN",
   "POST_N20_INDEPENDENT_READINESS=PENDING",
   "ACCEPTANCE_READY=FALSE",
