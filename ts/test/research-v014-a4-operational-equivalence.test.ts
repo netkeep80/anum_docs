@@ -1,5 +1,6 @@
 // mts-version-evidence: candidate-from=0.14
-// research-owner: #1662
+// research-owner: #1664
+// decision-owner: #1662
 
 import {
   decomposeV013SemanticLink,
