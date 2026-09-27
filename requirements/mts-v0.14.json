@@ -1,0 +1,332 @@
+{
+  "schema": "mts-requirement-registry/v0.2",
+  "status": "candidate",
+  "issue": 1669,
+  "contract": "mts-contract/v0.14",
+  "semanticSource": {
+    "path": "contracts/mts-contract-v0.14.json",
+    "pointer": "/requiredSemanticLaws"
+  },
+  "requirements": [
+    {
+      "id": "V14-L1",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "theory/foundation/recursive-alphabet"
+      },
+      "order": 10,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L1"
+      },
+      "docProjection": {
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l1"
+      }
+    },
+    {
+      "id": "V14-L2",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "notation/formal/ostensive-grammar"
+      },
+      "order": 20,
+      "dependsOn": [
+        "V14-L1"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L2"
+      },
+      "docProjection": {
+        "path": "docs/specs/Формальная нотация МТС.md",
+        "anchor": "mts-v014-v14-l2"
+      }
+    },
+    {
+      "id": "V14-L3",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "representation/anum/q14-version-separation"
+      },
+      "order": 30,
+      "dependsOn": [
+        "V14-L13"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L3"
+      },
+      "docProjection": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-v014-v14-l3"
+      }
+    },
+    {
+      "id": "V14-L4",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "execution/reaction/result-basis"
+      },
+      "order": 40,
+      "dependsOn": [
+        "V14-L11",
+        "V14-L12"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L4"
+      },
+      "docProjection": {
+        "path": "docs/specs/Апамять и управление сетью связей.md",
+        "anchor": "mts-v014-v14-l4"
+      }
+    },
+    {
+      "id": "V14-L5",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "theory/foundation/link-identity-immutability"
+      },
+      "order": 50,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L5"
+      },
+      "docProjection": {
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l5"
+      }
+    },
+    {
+      "id": "V14-L6",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "derived/nat/zero-rooted-successor"
+      },
+      "order": 60,
+      "dependsOn": [
+        "V14-L5"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L6"
+      },
+      "docProjection": {
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l6"
+      }
+    },
+    {
+      "id": "V14-L7",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "derived/count/exact-sequence"
+      },
+      "order": 70,
+      "dependsOn": [
+        "V14-L6",
+        "V14-L13"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L7"
+      },
+      "docProjection": {
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l7"
+      }
+    },
+    {
+      "id": "V14-L8",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "derived/add/canonical-constructor"
+      },
+      "order": 80,
+      "dependsOn": [
+        "V14-L6"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L8"
+      },
+      "docProjection": {
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l8"
+      }
+    },
+    {
+      "id": "V14-L9",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "derived/order/canonical-add"
+      },
+      "order": 90,
+      "dependsOn": [
+        "V14-L8"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L9"
+      },
+      "docProjection": {
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l9"
+      }
+    },
+    {
+      "id": "V14-L10",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "derived/mul/deferred-scope"
+      },
+      "order": 100,
+      "dependsOn": [
+        "V14-L8"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L10"
+      },
+      "docProjection": {
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l10"
+      }
+    },
+    {
+      "id": "V14-L11",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "execution/generalized-modus-ponens"
+      },
+      "order": 110,
+      "dependsOn": [
+        "V14-L12"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L11"
+      },
+      "docProjection": {
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l11"
+      }
+    },
+    {
+      "id": "V14-L12",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "theory/foundation/chiral-torsor-orientation"
+      },
+      "order": 120,
+      "dependsOn": [],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L12"
+      },
+      "docProjection": {
+        "path": "docs/theory/Система аксиом МТС.md",
+        "anchor": "mts-v014-v14-l12"
+      }
+    },
+    {
+      "id": "V14-L13",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "representation/anum/sequence-semantics"
+      },
+      "order": 130,
+      "dependsOn": [
+        "V14-L5"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L13"
+      },
+      "docProjection": {
+        "path": "docs/specs/Ачисла и сериализация.md",
+        "anchor": "mts-v014-v14-l13"
+      }
+    },
+    {
+      "id": "V14-L14",
+      "kind": "semantic-law",
+      "status": "candidate",
+      "classification": {
+        "path": "architecture/semantic-representation-layers"
+      },
+      "order": 140,
+      "dependsOn": [
+        "V14-L1",
+        "V14-L2",
+        "V14-L13"
+      ],
+      "authority": {
+        "document": "contracts/mts-contract-v0.14.json",
+        "pointer": "/requiredSemanticLaws/V14-L14"
+      },
+      "docProjection": {
+        "path": "docs/theory/Основания МТС.md",
+        "anchor": "mts-v014-v14-l14"
+      }
+    }
+  ],
+  "traceabilitySource": {
+    "path": "traceability/mts-v0.14.json"
+  },
+  "projectionState": "PREDECLARED_OWNER_ONLY_PROSE_DEFERRED_TO_1585",
+  "documentSurface": {
+    "README.md": {
+      "mode": "hybrid"
+    },
+    "PORTFOLIO.md": {
+      "mode": "source"
+    },
+    "docs/CONTRIBUTING.md": {
+      "mode": "source"
+    },
+    "docs/research/Исходные мысли МТС.md": {
+      "mode": "source"
+    },
+    "docs/research/Новое осмысление МТС.md": {
+      "mode": "source"
+    },
+    "docs/specs/Апамять и управление сетью связей.md": {
+      "mode": "hybrid"
+    },
+    "docs/specs/Ачисла и сериализация.md": {
+      "mode": "hybrid"
+    },
+    "docs/specs/Пучки связей.md": {
+      "mode": "source"
+    },
+    "docs/specs/Формальная нотация МТС.md": {
+      "mode": "hybrid"
+    },
+    "docs/theory/Основания МТС.md": {
+      "mode": "hybrid"
+    },
+    "docs/theory/Система аксиом МТС.md": {
+      "mode": "hybrid"
+    },
+    "docs/Словарь терминов МТС.md": {
+      "mode": "hybrid"
+    }
+  }
+}
