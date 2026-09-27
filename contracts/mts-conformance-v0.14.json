@@ -9,7 +9,7 @@
   "semanticBase": "mts-conformance/v0.13",
   "observableSemanticDelta": true,
   "coverageState": "partial-blocking",
-  "coverageStateMeaning": "Research evidence is projected for the declared v0.14 delta, but A4/A4' semantic freeze, final FORMAL surface grammar, traceability, readiness audit and explicit author acceptance remain blocking.",
+  "coverageStateMeaning": "Research evidence is projected for the declared v0.14 delta; A4/A4' semantic freeze, traceability, readiness audit and explicit author acceptance remain blocking.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13"
@@ -74,7 +74,8 @@
     "ts/test/research-v014-constructor-scoped-proof.test.ts",
     "ts/test/research-v014-constructor-inversion.test.ts",
     "ts/test/research-v014-add-general-functionality.test.ts",
-    "ts/test/research-v014-order-replay-mul-scope.test.ts"
+    "ts/test/research-v014-order-replay-mul-scope.test.ts",
+    "ts/test/research-v014-ostensive-formal-grammar.test.ts"
   ],
   "requiredExecutableGates": [
     "ts/test/v013-relative-form-quartet.test.ts",
@@ -134,7 +135,8 @@
     "ts/test/research-v014-constructor-scoped-proof.test.ts",
     "ts/test/research-v014-constructor-inversion.test.ts",
     "ts/test/research-v014-add-general-functionality.test.ts",
-    "ts/test/research-v014-order-replay-mul-scope.test.ts"
+    "ts/test/research-v014-order-replay-mul-scope.test.ts",
+    "ts/test/research-v014-ostensive-formal-grammar.test.ts"
   ],
   "requiredNegativeVectors": [
     "v014-local-unordered-collapses-o-c-l-u-and-orientation-orbit",
@@ -153,7 +155,6 @@
     "v014-candidate-does-not-change-current-accepted-pointer"
   ],
   "plannedExecutableGates": [
-    "pending:v014-final-ostensive-formal-grammar",
     "pending:v014-a4-semantic-freeze-projection",
     "pending:v014-traceability",
     "pending:v014-independent-readiness-audit"
@@ -194,11 +195,14 @@
     ],
     "order": [
       "ts/test/research-v014-order-replay-mul-scope.test.ts"
+    ],
+    "ostensiveFormal": [
+      "ts/test/research-v014-ostensive-formal-grammar.test.ts"
     ]
   },
   "blockers": {
     "a4FinalChoice": "BLOCKING_PENDING",
-    "formalSurfaceGrammar": "BLOCKING_PENDING",
+    "formalSurfaceGrammar": "GREEN_RESEARCH",
     "traceability": "BLOCKING_PENDING",
     "readinessAudit": "BLOCKING_PENDING",
     "explicitAuthorAcceptance": "BLOCKING_PENDING"
