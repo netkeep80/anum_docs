@@ -1,5 +1,6 @@
 // mts-version-evidence: candidate-from=0.14
 // research-owner: #1669
+// context-relative A4-prime research-owner: #1673
 
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -168,6 +169,781 @@ function exerciseLinkCarriedOrientation(reverseBootstrap: boolean): void {
 exerciseLinkCarriedOrientation(false);
 exerciseLinkCarriedOrientation(true);
 
+
+// ---------------------------------------------------------------------------
+// N20b / #1673: context-relative A4' gauge orientation.
+//
+// The carrier below is intentionally BELOW ExactSequence/Anum/Q/FORMAL.
+// It uses only Links and raw incidence. Pole order is never interpreted as
+// semantic START/END; whenever an edge is inspected, its poles are treated
+// extensionally as an unordered incidence pair.
+//
+// Key construction:
+//
+//   context orbit  {K, J(K)}
+//   witness orbit  {W, J(W)}
+//
+// There are exactly two J-equivariant perfect matchings between the two
+// two-point torsors. A matching is materialized as two mirror incidence
+// edges e and J(e), then packed into one J-fixed Link:
+//
+//   M(e) = Link(e, J(e))
+//
+// because:
+//   J(M(e)) = Link(J(J(e)), J(e)) = Link(e, J(e)) = M(e)
+//
+// Thus the MATCHING carrier is objective/J-invariant even though it relates
+// chiral states. No global choice of W is required.
+
+type GaugeTransport = "ID" | "J";
+
+function rawInvertLink(
+  m: Memory,
+  R: LinkHandle,
+  source: LinkHandle,
+  memo = new Map<LinkHandle, LinkHandle>(),
+): LinkHandle {
+  const known = memo.get(source);
+  if (known !== undefined) return known;
+
+  const p = m.poles(source);
+  let result: LinkHandle;
+
+  if (p.start === source && p.end === source) {
+    same(source, R, "only R is the raw self-self fixed root in this witness");
+    result = R;
+  } else if (p.start === source) {
+    result = m.ensureEndSelfClosed(rawInvertLink(m, R, p.end, memo));
+  } else if (p.end === source) {
+    result = m.ensureStartSelfClosed(rawInvertLink(m, R, p.start, memo));
+  } else {
+    result = m.ensure(
+      rawInvertLink(m, R, p.end, memo),
+      rawInvertLink(m, R, p.start, memo),
+    );
+  }
+
+  memo.set(source, result);
+  return result;
+}
+
+function unorderedIncident(
+  m: Memory,
+  edge: LinkHandle,
+  a: LinkHandle,
+  b: LinkHandle,
+): boolean {
+  const p = m.poles(edge);
+  return (p.start === a && p.end === b) || (p.start === b && p.end === a);
+}
+
+function jFixedMatchingCarrier(
+  m: Memory,
+  R: LinkHandle,
+  contextState: LinkHandle,
+  witnessState: LinkHandle,
+): LinkHandle {
+  const edge = m.ensure(contextState, witnessState);
+  const mirrorEdge = rawInvertLink(m, R, edge);
+  const carrier = m.ensure(edge, mirrorEdge);
+  same(rawInvertLink(m, R, carrier), carrier, "matching carrier is J-fixed");
+  return carrier;
+}
+
+function matchingEdges(m: Memory, carrier: LinkHandle): readonly [LinkHandle, LinkHandle] {
+  const p = m.poles(carrier);
+  assert(p.start !== carrier && p.end !== carrier, "matching carrier is an ordinary pair Link");
+  return Object.freeze([p.start, p.end]);
+}
+
+function selectedWitnessForContext(
+  m: Memory,
+  contextState: LinkHandle,
+  witnessOrbit: readonly LinkHandle[],
+  carrier: LinkHandle,
+): LinkHandle | "UNRESOLVED" {
+  const matches = new Set<LinkHandle>();
+  for (const edge of matchingEdges(m, carrier)) {
+    for (const witness of witnessOrbit) {
+      if (unorderedIncident(m, edge, contextState, witness)) matches.add(witness);
+    }
+  }
+  return matches.size === 1 ? [...matches][0]! : "UNRESOLVED";
+}
+
+function transportBetweenSelections(
+  m: Memory,
+  R: LinkHandle,
+  fromWitness: LinkHandle,
+  toWitness: LinkHandle,
+): GaugeTransport | "UNRESOLVED" {
+  if (fromWitness === toWitness) return "ID";
+  if (rawInvertLink(m, R, fromWitness) === toWitness) return "J";
+  return "UNRESOLVED";
+}
+
+function composeTransport(
+  left: GaugeTransport,
+  right: GaugeTransport,
+): GaugeTransport {
+  return left === right ? "ID" : "J";
+}
+
+function matchedTargetForSource(
+  m: Memory,
+  sourceState: LinkHandle,
+  targetOrbit: readonly LinkHandle[],
+  carrier: LinkHandle,
+): LinkHandle | "UNRESOLVED" {
+  const matches = new Set<LinkHandle>();
+  for (const edge of matchingEdges(m, carrier)) {
+    for (const target of targetOrbit) {
+      if (unorderedIncident(m, edge, sourceState, target)) matches.add(target);
+    }
+  }
+  return matches.size === 1 ? [...matches][0]! : "UNRESOLVED";
+}
+
+function contextStateForWitness(
+  m: Memory,
+  contextOrbit: readonly LinkHandle[],
+  witnessOrbit: readonly LinkHandle[],
+  selectionCarrier: LinkHandle,
+  witness: LinkHandle,
+): LinkHandle | "UNRESOLVED" {
+  const matches = contextOrbit.filter(
+    (state) => selectedWitnessForContext(m, state, witnessOrbit, selectionCarrier) === witness,
+  );
+  return matches.length === 1 ? matches[0]! : "UNRESOLVED";
+}
+
+function relativeTransportCarrier(
+  m: Memory,
+  R: LinkHandle,
+  sourceState: LinkHandle,
+  sourceOrbit: readonly LinkHandle[],
+  sourceSelection: LinkHandle,
+  targetOrbit: readonly LinkHandle[],
+  targetSelection: LinkHandle,
+  witnessOrbit: readonly LinkHandle[],
+): LinkHandle | "UNRESOLVED" {
+  assert(sourceOrbit.includes(sourceState), "source state belongs to source Context orbit");
+  const sourceWitness = selectedWitnessForContext(m, sourceState, witnessOrbit, sourceSelection);
+  if (sourceWitness === "UNRESOLVED") return "UNRESOLVED";
+  const targetState = contextStateForWitness(
+    m,
+    targetOrbit,
+    witnessOrbit,
+    targetSelection,
+    sourceWitness,
+  );
+  if (targetState === "UNRESOLVED") return "UNRESOLVED";
+  return jFixedMatchingCarrier(m, R, sourceState, targetState);
+}
+
+function classifyTransportCarrier(
+  m: Memory,
+  sourceState: LinkHandle,
+  targetState: LinkHandle,
+  targetMirror: LinkHandle,
+  carrier: LinkHandle,
+): GaugeTransport | "UNRESOLVED" {
+  const matched = matchedTargetForSource(
+    m,
+    sourceState,
+    Object.freeze([targetState, targetMirror]),
+    carrier,
+  );
+  if (matched === targetState) return "ID";
+  if (matched === targetMirror) return "J";
+  return "UNRESOLVED";
+}
+
+function selfIncidenceCase(m: Memory, link: LinkHandle): "11" | "10" | "01" | "00" {
+  const p = m.poles(link);
+  return (p.start === link ? "1" : "0") + (p.end === link ? "1" : "0") as
+    "11" | "10" | "01" | "00";
+}
+
+function makeChiralContextOrbit(
+  m: Memory,
+  R: LinkHandle,
+  witnessOrbit: readonly LinkHandle[],
+  seed: LinkHandle,
+): readonly [LinkHandle, LinkHandle] {
+  // This creates one arbitrary chiral Context state and then takes its J-image.
+  // The semantic object is the orbit as a set; the technical construction order
+  // carries no authority.
+  const K = m.ensure(seed, witnessOrbit[0]!);
+  const JK = rawInvertLink(m, R, K);
+  assert(K !== JK, "Context state must itself be chiral");
+  same(rawInvertLink(m, R, JK), K, "Context orbit is a two-point J-torsor");
+  return Object.freeze([K, JK]);
+}
+
+function exerciseContextRelativeGauge(reverseBootstrap: boolean): void {
+  const m = new Memory();
+  const R = m.root;
+
+  // Materialize only the raw two-position root neighbourhood. Creation order
+  // is deliberately varied: technical issuance order cannot be orientation
+  // authority.
+  if (reverseBootstrap) {
+    m.ensureEndSelfClosed(R);
+    m.ensureStartSelfClosed(R);
+  } else {
+    m.ensureStartSelfClosed(R);
+    m.ensureEndSelfClosed(R);
+  }
+  const omega = discoverWitnessOrbit(m, R);
+  same(omega.length, 2, "objective witness orbit has two members before any Context orientation");
+  assert(omega[0] !== omega[1], "W differs from J(W)");
+  same(rawInvertLink(m, R, omega[0]!), omega[1]!, "J exchanges the witness orbit");
+  same(rawInvertLink(m, R, omega[1]!), omega[0]!, "J returns the witness orbit");
+
+  // One Link-forming ontology yields exactly four structural self-incidence
+  // cases. The API helpers are bootstrap conveniences, not four semantic
+  // primitive opcodes.
+  const neighbours = discoverRootNeighbourOrbit(m, R);
+  const ordinaryPair = m.ensure(neighbours[0]!, neighbours[1]!);
+  const structuralCases = new Set([
+    selfIncidenceCase(m, R),
+    ...neighbours.map((link) => selfIncidenceCase(m, link)),
+    selfIncidenceCase(m, ordinaryPair),
+  ]);
+  same(
+    JSON.stringify([...structuralCases].sort()),
+    JSON.stringify(["00", "01", "10", "11"]),
+    "single Link ontology exposes all four emergent self-incidence cases",
+  );
+
+  // Build three independent chiral Context orbits.
+  const seedA = m.ensure(omega[0]!, omega[0]!);
+  const seedB = m.ensure(omega[1]!, omega[1]!);
+  const seedC = m.ensure(seedA, seedB);
+  const A = makeChiralContextOrbit(m, R, omega, seedA);
+  const B = makeChiralContextOrbit(m, R, omega, seedB);
+  const C = makeChiralContextOrbit(m, R, omega, seedC);
+
+  // Same orientation: A0 and B0 are both matched to omega[0].
+  const selA = jFixedMatchingCarrier(m, R, A[0], omega[0]!);
+  const selB = jFixedMatchingCarrier(m, R, B[0], omega[0]!);
+
+  // Opposite orientation: C0 is matched to J(omega[0]).
+  const selC = jFixedMatchingCarrier(m, R, C[0], omega[1]!);
+
+  const chiA = selectedWitnessForContext(m, A[0], omega, selA);
+  const chiB = selectedWitnessForContext(m, B[0], omega, selB);
+  const chiC = selectedWitnessForContext(m, C[0], omega, selC);
+  assert(chiA !== "UNRESOLVED" && chiB !== "UNRESOLVED" && chiC !== "UNRESOLVED", "all oriented Contexts resolve χ(K)");
+  same(chiA, omega[0], "χ(A)=W");
+  same(chiB, omega[0], "χ(B)=W");
+  same(chiC, omega[1], "χ(C)=J(W)");
+
+  // The SAME objective matching also orients the mirror Context state
+  // covariantly: J(K) is matched to J(χ(K)).
+  same(
+    selectedWitnessForContext(m, A[1], omega, selA),
+    omega[1],
+    "same J-fixed carrier gives χ(J(A))=J(χ(A))",
+  );
+  same(
+    selectedWitnessForContext(m, C[1], omega, selC),
+    omega[0],
+    "opposite carrier remains J-covariant on mirror Context",
+  );
+
+  const gAB = transportBetweenSelections(m, R, chiA, chiB);
+  const gBC = transportBetweenSelections(m, R, chiB, chiC);
+  const gAC = transportBetweenSelections(m, R, chiA, chiC);
+  assert(gAB !== "UNRESOLVED" && gBC !== "UNRESOLVED" && gAC !== "UNRESOLVED", "pairwise transports resolve in Z2");
+  same(gAB, "ID", "same-chirality Contexts have Id transport");
+  same(gBC, "J", "opposite-chirality Contexts have J transport");
+  same(gAC, "J", "A to C transport is J");
+  same(composeTransport(gAB, gBC), gAC, "g_AB o g_BC = g_AC");
+
+  const gCA = transportBetweenSelections(m, R, chiC, chiA);
+  assert(gCA !== "UNRESOLVED", "reverse transport resolves in Z2");
+  same(gCA, "J", "g_AB = g_BA for Z2 transport");
+  same(composeTransport(gAC, gCA), "ID", "J o J = Id");
+  same(
+    transportBetweenSelections(m, R, chiA, chiA),
+    "ID",
+    "g_AA = Id",
+  );
+
+  // Materialize g_AB itself as a pre-oriented J-fixed Link matching between
+  // Context torsors. The host ID/J strings above are only diagnostics.
+  const tAB = relativeTransportCarrier(m, R, A[0], A, selA, B, selB, omega);
+  const tBC = relativeTransportCarrier(m, R, B[0], B, selB, C, selC, omega);
+  const tAC = relativeTransportCarrier(m, R, A[0], A, selA, C, selC, omega);
+  assert(tAB !== "UNRESOLVED" && tBC !== "UNRESOLVED" && tAC !== "UNRESOLVED", "Link-native relative transports materialize");
+  same(rawInvertLink(m, R, tAB), tAB, "g_AB carrier is J-fixed");
+  same(rawInvertLink(m, R, tBC), tBC, "g_BC carrier is J-fixed");
+  same(rawInvertLink(m, R, tAC), tAC, "g_AC carrier is J-fixed");
+  same(classifyTransportCarrier(m, A[0], B[0], B[1], tAB), "ID", "Link carrier g_AB = Id");
+  same(classifyTransportCarrier(m, B[0], C[0], C[1], tBC), "J", "Link carrier g_BC = J");
+  same(classifyTransportCarrier(m, A[0], C[0], C[1], tAC), "J", "Link carrier g_AC = J");
+
+  // Composition is checked relationally, not via a host XOR opcode:
+  // A-state --g_AB--> B-state --g_BC--> C-state equals A-state --g_AC--> C-state.
+  const viaB = matchedTargetForSource(m, A[0], B, tAB);
+  assert(viaB !== "UNRESOLVED", "g_AB maps A state to one B state");
+  const viaC = matchedTargetForSource(m, viaB, C, tBC);
+  const directC = matchedTargetForSource(m, A[0], C, tAC);
+  assert(viaC !== "UNRESOLVED" && directC !== "UNRESOLVED", "transport composition targets resolve");
+  same(viaC, directC, "Link-native g_AB o g_BC = g_AC");
+
+  // No-go theorem for an achiral Context:
+  //
+  // If K = J(K), a J-equivariant selection relation cannot choose only W.
+  // The mirror of any K--W incidence is another K--J(W) incidence.
+  // We demonstrate this with R, which is J-fixed.
+  const achiralSelection = jFixedMatchingCarrier(m, R, R, omega[0]!);
+  same(
+    selectedWitnessForContext(m, R, omega, achiralSelection),
+    "UNRESOLVED",
+    "J-fixed Context cannot select exactly one member of a nontrivial witness torsor",
+  );
+
+  // There are exactly two equivariant matchings between two two-point torsors:
+  // parallel and crossed. They are distinct objective J-fixed carriers.
+  const parallel = jFixedMatchingCarrier(m, R, A[0], omega[0]!);
+  const crossed = jFixedMatchingCarrier(m, R, A[0], omega[1]!);
+  assert(parallel !== crossed, "parallel and crossed J-equivariant matchings are distinct");
+  const allRepresentativeChoices = [
+    jFixedMatchingCarrier(m, R, A[0], omega[0]!),
+    jFixedMatchingCarrier(m, R, A[0], omega[1]!),
+    jFixedMatchingCarrier(m, R, A[1], omega[0]!),
+    jFixedMatchingCarrier(m, R, A[1], omega[1]!),
+  ];
+  same(
+    new Set(allRepresentativeChoices).size,
+    4,
+    "single-Link J-fixed matching packing is noncanonical: two semantic matchings have four raw encodings",
+  );
+  same(rawInvertLink(m, R, parallel), parallel, "parallel matching is objective/J-fixed");
+  same(rawInvertLink(m, R, crossed), crossed, "crossed matching is objective/J-fixed");
+
+  // Each context-oriented semantic view derives the same local equations.
+  type LocalFrame = "DIRECT" | "MIRROR";
+
+  class LocalOrientationView {
+    constructor(
+      readonly localMemory: Memory,
+      readonly localFrame: LocalFrame,
+    ) {}
+
+    get root(): LinkHandle {
+      return this.localMemory.root;
+    }
+
+    poles(link: LinkHandle) {
+      const technical = this.localMemory.poles(link);
+      return this.localFrame === "DIRECT"
+        ? technical
+        : Object.freeze({ start: technical.end, end: technical.start });
+    }
+
+    ensure(a: LinkHandle, b: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensure(a, b)
+        : this.localMemory.ensure(b, a);
+    }
+
+    ensureStartSelfClosed(other: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensureStartSelfClosed(other)
+        : this.localMemory.ensureEndSelfClosed(other);
+    }
+
+    ensureEndSelfClosed(other: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensureEndSelfClosed(other)
+        : this.localMemory.ensureStartSelfClosed(other);
+    }
+  }
+
+  function localFoundation(view: LocalOrientationView) {
+    const localR = view.root;
+    const O = view.ensureStartSelfClosed(localR);
+    const C = view.ensureEndSelfClosed(localR);
+    const L = view.ensure(O, C);
+    const U = view.ensure(C, O);
+    return Object.freeze({ R: localR, O, C, L, U });
+  }
+
+  function localSemanticWire(
+    view: LocalOrientationView,
+    link: LinkHandle,
+    active = new Set<LinkHandle>(),
+  ): string {
+    assert(!active.has(link), "unexpected non-self cycle in local semantic wire");
+    const p = view.poles(link);
+    if (p.start === link && p.end === link) return "8";
+
+    if (p.start === link) {
+      active.add(link);
+      try {
+        return "9" + localSemanticWire(view, p.end, active);
+      } finally {
+        active.delete(link);
+      }
+    }
+
+    if (p.end === link) {
+      active.add(link);
+      try {
+        return "6" + localSemanticWire(view, p.start, active);
+      } finally {
+        active.delete(link);
+      }
+    }
+
+    active.add(link);
+    try {
+      return "1" +
+        localSemanticWire(view, p.start, active) +
+        localSemanticWire(view, p.end, active);
+    } finally {
+      active.delete(link);
+    }
+  }
+
+  function frameFor(w: LinkHandle): LocalFrame {
+    const p = m.poles(w);
+    if (p.end === R && p.start !== R) return "DIRECT";
+    if (p.start === R && p.end !== R) return "MIRROR";
+    throw new Error("v0.14 N20b: witness does not resolve a local frame");
+  }
+
+  const viewA = new LocalOrientationView(m, frameFor(chiA));
+  const viewC = new LocalOrientationView(m, frameFor(chiC));
+  const fA = localFoundation(viewA);
+  const fC = localFoundation(viewC);
+  const fingerprintA = [
+    localSemanticWire(viewA, fA.R),
+    localSemanticWire(viewA, fA.O),
+    localSemanticWire(viewA, fA.C),
+    localSemanticWire(viewA, fA.L),
+    localSemanticWire(viewA, fA.U),
+    localSemanticWire(viewA, chiA),
+  ].join("|");
+  const fingerprintC = [
+    localSemanticWire(viewC, fC.R),
+    localSemanticWire(viewC, fC.O),
+    localSemanticWire(viewC, fC.C),
+    localSemanticWire(viewC, fC.L),
+    localSemanticWire(viewC, fC.U),
+    localSemanticWire(viewC, chiC),
+  ].join("|");
+  same(fingerprintA, fingerprintC, "mirror Context frames preserve local semantic equations");
+}
+
+
+exerciseContextRelativeGauge(false);
+exerciseContextRelativeGauge(true);
+
+// ---------------------------------------------------------------------------
+// N20b positive result: local Context orientation is carried by the primordial
+// one-sided self-incidence split itself.
+//
+// For any Context body K there are two proper self-incidence markers:
+//
+//   X = X ? K
+//   Y = K ? Y
+//
+// Before orientation neither side receives an absolute START/END name.
+// The pair is exchanged by J. Choosing one marker is therefore exactly one
+// local Z2 frame choice, with no third/fourth raw encoding.
+//
+// Relative chirality between two markers is objective: "same one-sided class"
+// is invariant when J swaps both technical pole coordinates simultaneously.
+
+function localOrientationMarkerOrbit(
+  m: Memory,
+  body: LinkHandle,
+): readonly [LinkHandle, LinkHandle] {
+  const first = m.ensureStartSelfClosed(body);
+  const second = m.ensureEndSelfClosed(body);
+  assert(first !== second, "one-sided Context orientation markers are distinct");
+  return Object.freeze([first, second]);
+}
+
+function properOneSidedMarker(
+  m: Memory,
+  marker: LinkHandle,
+  body: LinkHandle,
+): boolean {
+  const p = m.poles(marker);
+  const firstForm = p.start === marker && p.end === body && marker !== body;
+  const secondForm = p.start === body && p.end === marker && marker !== body;
+  return firstForm !== secondForm;
+}
+
+function sameOneSidedChiralClass(
+  m: Memory,
+  a: LinkHandle,
+  b: LinkHandle,
+): boolean {
+  const pa = m.poles(a);
+  const pb = m.poles(b);
+  const aFirst = pa.start === a && pa.end !== a;
+  const aSecond = pa.end === a && pa.start !== a;
+  const bFirst = pb.start === b && pb.end !== b;
+  const bSecond = pb.end === b && pb.start !== b;
+  assert(aFirst !== aSecond && bFirst !== bSecond, "comparison requires proper one-sided self-incidence markers");
+  return (aFirst && bFirst) || (aSecond && bSecond);
+}
+
+function markerForRelativeClass(
+  m: Memory,
+  reference: LinkHandle,
+  candidates: readonly LinkHandle[],
+  sameClass: boolean,
+): LinkHandle {
+  const matches = candidates.filter(
+    (candidate) => sameOneSidedChiralClass(m, reference, candidate) === sameClass,
+  );
+  same(matches.length, 1, "relative chiral class selects exactly one local marker");
+  return matches[0]!;
+}
+
+function chiFromContextMarker(
+  m: Memory,
+  R: LinkHandle,
+  rootMarkerOrbit: readonly LinkHandle[],
+  marker: LinkHandle,
+): LinkHandle {
+  const matches = rootMarkerOrbit.filter((rootMarker) =>
+    sameOneSidedChiralClass(m, marker, rootMarker)
+  );
+  same(matches.length, 1, "Context marker aligns with exactly one root chiral marker");
+  return complementaryRootAdjacency(m, R, matches[0]!);
+}
+
+function gaugeBetweenMarkers(
+  m: Memory,
+  a: LinkHandle,
+  b: LinkHandle,
+): GaugeTransport {
+  return sameOneSidedChiralClass(m, a, b) ? "ID" : "J";
+}
+
+function exerciseSelfIncidenceContextGauge(reverseBootstrap: boolean): void {
+  const m = new Memory();
+  const R = m.root;
+
+  // The root local orientation torsor is created in both technical orders.
+  if (reverseBootstrap) {
+    m.ensureEndSelfClosed(R);
+    m.ensureStartSelfClosed(R);
+  } else {
+    m.ensureStartSelfClosed(R);
+    m.ensureEndSelfClosed(R);
+  }
+
+  const rootMarkers = discoverRootNeighbourOrbit(m, R);
+  same(rootMarkers.length, 2, "root exposes the primordial two-member chiral marker orbit");
+  for (const marker of rootMarkers) {
+    assert(properOneSidedMarker(m, marker, R), "root marker is a proper one-sided self-incidence Link");
+  }
+
+  // Build two additional J-fixed Context bodies without assigning orientation:
+  // reversing both poles and applying J leaves each body unchanged.
+  const bodyB = m.ensure(rootMarkers[0]!, rootMarkers[1]!);
+  const bodyC = m.ensure(rootMarkers[1]!, rootMarkers[0]!);
+  same(rawInvertLink(m, R, bodyB), bodyB, "Context body B is pre-oriented/J-fixed");
+  same(rawInvertLink(m, R, bodyC), bodyC, "Context body C is pre-oriented/J-fixed");
+
+  const markersA = localOrientationMarkerOrbit(m, R);
+  const markersB = localOrientationMarkerOrbit(m, bodyB);
+  const markersC = localOrientationMarkerOrbit(m, bodyC);
+
+  // Choose A as an arbitrary local frame. B is selected in the same relative
+  // chiral class, C in the opposite class. No absolute pole name is used.
+  const markerA = markersA[0]!;
+  const markerB = markerForRelativeClass(m, markerA, markersB, true);
+  const markerC = markerForRelativeClass(m, markerA, markersC, false);
+
+  // J swaps the two possible markers over each J-fixed Context body.
+  const mirrorA = rawInvertLink(m, R, markerA);
+  const mirrorB = rawInvertLink(m, R, markerB);
+  const mirrorC = rawInvertLink(m, R, markerC);
+  assert(markersA.includes(mirrorA) && mirrorA !== markerA, "J exchanges A marker choices");
+  assert(markersB.includes(mirrorB) && mirrorB !== markerB, "J exchanges B marker choices");
+  assert(markersC.includes(mirrorC) && mirrorC !== markerC, "J exchanges C marker choices");
+
+  // The relative-class predicate itself is gauge invariant.
+  same(
+    sameOneSidedChiralClass(m, markerA, markerB),
+    sameOneSidedChiralClass(m, mirrorA, mirrorB),
+    "simultaneous J preserves same-frame relation",
+  );
+  same(
+    sameOneSidedChiralClass(m, markerA, markerC),
+    sameOneSidedChiralClass(m, mirrorA, mirrorC),
+    "simultaneous J preserves opposite-frame relation",
+  );
+
+  const chiA = chiFromContextMarker(m, R, rootMarkers, markerA);
+  const chiB = chiFromContextMarker(m, R, rootMarkers, markerB);
+  const chiC = chiFromContextMarker(m, R, rootMarkers, markerC);
+  same(chiA, chiB, "same local chiral class yields same χ");
+  same(rawInvertLink(m, R, chiA), chiC, "opposite local chiral class yields J(χ)");
+
+  const gAB = gaugeBetweenMarkers(m, markerA, markerB);
+  const gBC = gaugeBetweenMarkers(m, markerB, markerC);
+  const gAC = gaugeBetweenMarkers(m, markerA, markerC);
+  same(gAB, "ID", "same marker class gives Id transport");
+  same(gBC, "J", "opposite marker class gives J transport");
+  same(gAC, "J", "A to C gives J transport");
+  same(composeTransport(gAB, gBC), gAC, "relative marker transport composes");
+  same(gaugeBetweenMarkers(m, markerA, markerA), "ID", "g_AA = Id");
+  same(
+    gaugeBetweenMarkers(m, markerA, markerC),
+    gaugeBetweenMarkers(m, markerC, markerA),
+    "g_AB = g_BA in Z2",
+  );
+
+  // Derive local semantic pole views only AFTER the Context marker exists.
+  type MarkerFrame = "DIRECT" | "MIRROR";
+
+  class MarkerOrientationView {
+    constructor(
+      readonly localMemory: Memory,
+      readonly localFrame: MarkerFrame,
+    ) {}
+
+    get root(): LinkHandle {
+      return this.localMemory.root;
+    }
+
+    poles(link: LinkHandle) {
+      const technical = this.localMemory.poles(link);
+      return this.localFrame === "DIRECT"
+        ? technical
+        : Object.freeze({ start: technical.end, end: technical.start });
+    }
+
+    ensure(a: LinkHandle, b: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensure(a, b)
+        : this.localMemory.ensure(b, a);
+    }
+
+    ensureStartSelfClosed(other: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensureStartSelfClosed(other)
+        : this.localMemory.ensureEndSelfClosed(other);
+    }
+
+    ensureEndSelfClosed(other: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensureEndSelfClosed(other)
+        : this.localMemory.ensureStartSelfClosed(other);
+    }
+  }
+
+  function markerFoundation(view: MarkerOrientationView) {
+    const localR = view.root;
+    const O = view.ensureStartSelfClosed(localR);
+    const C = view.ensureEndSelfClosed(localR);
+    const L = view.ensure(O, C);
+    const U = view.ensure(C, O);
+    return Object.freeze({ R: localR, O, C, L, U });
+  }
+
+  function markerSemanticWire(
+    view: MarkerOrientationView,
+    link: LinkHandle,
+    active = new Set<LinkHandle>(),
+  ): string {
+    assert(!active.has(link), "unexpected non-self cycle in marker semantic wire");
+    const p = view.poles(link);
+    if (p.start === link && p.end === link) return "8";
+    if (p.start === link) {
+      active.add(link);
+      try {
+        return "9" + markerSemanticWire(view, p.end, active);
+      } finally {
+        active.delete(link);
+      }
+    }
+    if (p.end === link) {
+      active.add(link);
+      try {
+        return "6" + markerSemanticWire(view, p.start, active);
+      } finally {
+        active.delete(link);
+      }
+    }
+    active.add(link);
+    try {
+      return "1" +
+        markerSemanticWire(view, p.start, active) +
+        markerSemanticWire(view, p.end, active);
+    } finally {
+      active.delete(link);
+    }
+  }
+
+  function frameFromMarker(marker: LinkHandle): MarkerFrame {
+    const alignedRootMarker = rootMarkers.find((rootMarker) =>
+      sameOneSidedChiralClass(m, marker, rootMarker)
+    );
+    assert(alignedRootMarker !== undefined, "marker aligns with a root frame member");
+    const p = m.poles(alignedRootMarker);
+    if (p.start === alignedRootMarker && p.end === R) return "DIRECT";
+    if (p.start === R && p.end === alignedRootMarker) return "MIRROR";
+    throw new Error("v0.14 N20b: invalid root marker");
+  }
+
+  const viewA = new MarkerOrientationView(m, frameFromMarker(markerA));
+  const viewB = new MarkerOrientationView(m, frameFromMarker(markerB));
+  const viewC = new MarkerOrientationView(m, frameFromMarker(markerC));
+
+  // Direct START/END covariance check on one J-fixed probe Link.
+  const probe = bodyB;
+  const pA = viewA.poles(probe);
+  const pB = viewB.poles(probe);
+  const pC = viewC.poles(probe);
+  same(pA.start, pB.start, "same frame: START_A corresponds to START_B");
+  same(pA.end, pB.end, "same frame: END_A corresponds to END_B");
+  same(pA.start, pC.end, "mirror frame: START_A corresponds to END_C");
+  same(pA.end, pC.start, "mirror frame: END_A corresponds to START_C");
+
+  const fA = markerFoundation(viewA);
+  const fB = markerFoundation(viewB);
+  const fC = markerFoundation(viewC);
+  const fingerprint = (
+    view: MarkerOrientationView,
+    foundation: ReturnType<typeof markerFoundation>,
+    chi: LinkHandle,
+  ) => [
+    markerSemanticWire(view, foundation.R),
+    markerSemanticWire(view, foundation.O),
+    markerSemanticWire(view, foundation.C),
+    markerSemanticWire(view, foundation.L),
+    markerSemanticWire(view, foundation.U),
+    markerSemanticWire(view, chi),
+  ].join("|");
+
+  const fpA = fingerprint(viewA, fA, chiA);
+  const fpB = fingerprint(viewB, fB, chiB);
+  const fpC = fingerprint(viewC, fC, chiC);
+  same(fpA, fpB, "same-frame Contexts expose identical semantic equations");
+  same(fpA, fpC, "mirror-frame Contexts expose covariant identical semantic equations");
+
+  // Exactly two local orientation markers exist over each Context body.
+  same(new Set(markersA).size, 2, "Context A has exactly two local frame states");
+  same(new Set(markersB).size, 2, "Context B has exactly two local frame states");
+  same(new Set(markersC).size, 2, "Context C has exactly two local frame states");
+}
+
+exerciseSelfIncidenceContextGauge(false);
+exerciseSelfIncidenceContextGauge(true);
+
 // Pre-acceptance documentation ownership is metadata over the real kernel,
 // never a replacement for executable semantics.
 const trace = JSON.parse(readFileSync(join(repoRoot, "traceability/mts-v0.14.json"), "utf8"));
@@ -212,4 +988,20 @@ console.log([
   "HOST_SELECTED_WITNESS_ARGUMENT_AUTHORITY=FALSE",
   "ONE_CANONICAL_DOC_OWNER_PER_LAW=TRUE",
   "PROSE_RECONSTRUCTION=DEFERRED_TO_1585",
+  "A4_CONTEXT_RELATIVE_GAUGE=GREEN_RESEARCH",
+  "OBJECTIVE_CHIRAL_ORBIT_BEFORE_OBSERVER=TRUE",
+  "J_FIXED_MATCHING_SINGLE_LINK_CARRIER=REJECTED_NONCANONICAL",
+  "PREORIENTED_SELECTION_CARRIER=ONE_SIDED_SELF_INCIDENCE_MARKER",
+  "ACHIRAL_CONTEXT_CAN_BE_ORIENTED_BY_CHIRAL_MARKER=TRUE",
+  "SAME_FRAME_CONTEXTS_SAME_SEMANTICS=TRUE",
+  "MIRROR_FRAME_CONTEXTS_COVARIANT=TRUE",
+  "TRANSPORT_ID_J_COMPOSITION=TRUE",
+  "GLOBAL_SELECTED_W_REQUIRED=FALSE",
+  "ONTOLOGY_PRIMITIVE_LINK=ONE",
+  "EMERGENT_SELF_INCIDENCE_CASES=FOUR",
+  "PREORIENTED_J_ORBIT_CLASSES=THREE",
+  "LOCAL_CONTEXT_FRAME_STATES=2",
+  "RELATIVE_TRANSPORT=SELF_INCIDENCE_CLASS_ID_OR_J",
+  "TRANSPORT_COMPOSITION_USES_RELATIVE_LINK_STRUCTURE=TRUE",
+  "TECHNICAL_BOOTSTRAP_ORDER_AUTHORITY=FALSE",
 ].join(" "));
