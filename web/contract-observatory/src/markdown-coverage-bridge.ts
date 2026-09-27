@@ -34,6 +34,8 @@ export interface ObservatoryMarkdownCoverageSummary {
 export interface ObservatoryMarkdownCoverage {
   readonly schema: string;
   readonly contract: string;
+  readonly projectionState: string;
+  readonly proseMaterializationPending: boolean;
   readonly documents: readonly ObservatoryMarkdownCoverageDocument[];
   readonly summary: ObservatoryMarkdownCoverageSummary;
 }
@@ -56,6 +58,11 @@ function text(value: unknown, source: string): string {
 
 function count(value: unknown, source: string): number {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 0) fail(`${source} must be a non-negative integer`);
+  return value;
+}
+
+function boolean(value: unknown, source: string): boolean {
+  if (typeof value !== "boolean") fail(`${source} must be a boolean`);
   return value;
 }
 
@@ -178,13 +185,35 @@ export function validateMarkdownCoverage(value: unknown): ObservatoryMarkdownCov
     researchHistoricalSectionCount: sum("researchHistoricalSectionCount"),
     currentlyUnclassifiedSectionCount: sum("currentlyUnclassifiedSectionCount"),
   };
+  const projectionState = typeof root.projectionState === "string"
+    ? text(root.projectionState, "coverage.projectionState")
+    : "MATERIALIZED";
+  const proseMaterializationPending = root.proseMaterializationPending === undefined
+    ? false
+    : boolean(root.proseMaterializationPending, "coverage.proseMaterializationPending");
+
   for (const key of Object.keys(observed) as Array<keyof typeof observed>) {
+    if (key === "requirementCount" && proseMaterializationPending) continue;
     if (summary[key] !== observed[key]) fail(`summary mismatch for ${key}: ${summary[key]} != ${observed[key]}`);
+  }
+
+  if (proseMaterializationPending) {
+    if (projectionState !== "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585") {
+      fail("pending prose materialization requires the accepted owner-projection staging state");
+    }
+    if (observed.requirementCount !== 0 || observed.requirementBackedSectionCount !== 0) {
+      fail("pending prose materialization must not expose partially materialized v0.14 requirement sections");
+    }
+    if (summary.requirementCount === 0) {
+      fail("pending prose materialization must retain accepted requirement-owner count");
+    }
   }
 
   return Object.freeze({
     schema: text(root.schema, "coverage.schema"),
     contract: text(root.contract, "coverage.contract"),
+    projectionState,
+    proseMaterializationPending,
     documents: Object.freeze(documents),
     summary,
   });
