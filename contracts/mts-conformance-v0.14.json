@@ -8,7 +8,7 @@
   "contract": "mts-contract/v0.14",
   "semanticBase": "mts-conformance/v0.13",
   "observableSemanticDelta": true,
-  "coverageState": "complete-ready",
+  "coverageState": "complete",
   "coverageStateMeaning": "Declared MTS v0.14 acceptance-scope evidence is complete and independently readiness-audited; the candidate remains nonaccepted until explicit author acceptance.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.13",
