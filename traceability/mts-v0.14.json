@@ -19,17 +19,20 @@
       "contractPointer": "/requiredSemanticLaws/V14-L1",
       "positive": {
         "requiredPositiveVectors": [
-          "v014-recursive-link-alphabet-grounded"
+          "v014-recursive-link-alphabet-grounded",
+          "v014-single-link-primitive-four-self-incidence-cases-grounded"
         ]
       },
       "negative": {
         "requiredNegativeVectors": [
-          "v014-recursive-alphabet-is-not-anum-q-alphabet"
+          "v014-recursive-alphabet-is-not-anum-q-alphabet",
+          "v014-four-recursive-symbols-are-not-four-primitive-opcodes"
         ]
       },
       "requiredExecutableGates": [
         "ts/test/research-v014-foundation-orientation-witness.test.ts",
-        "ts/test/research-v014-ostensive-formal-grammar.test.ts"
+        "ts/test/research-v014-ostensive-formal-grammar.test.ts",
+        "ts/test/research-v014-sequence-layer-boundary.test.ts"
       ],
       "documentationOwner": {
         "registry": "requirements/mts-v0.14.json",
@@ -275,22 +278,25 @@
       }
     },
     "V14-L12": {
-      "status": "GREEN_AUTHOR_FROZEN",
+      "status": "GREEN_AUTHOR_REFINED_N20B",
       "contractPointer": "/requiredSemanticLaws/V14-L12",
       "positive": {
         "requiredPositiveVectors": [
           "v014-orientation-gauge-research-grounded",
           "v014-a4-operational-equivalence-grounded",
           "v014-a4prime-chiral-torsor-bootstrap-grounded",
-          "v014-a4prime-link-carried-selection-grounded"
+          "v014-a4prime-context-relative-self-incidence-marker-grounded",
+          "v014-a4prime-relative-transport-composition-grounded"
         ]
       },
       "negative": {
         "requiredNegativeVectors": [
           "v014-local-unordered-collapses-o-c-l-u-and-orientation-orbit",
           "v014-raw-inr-outr-presence-is-not-orientation-authority",
-          "v014-zero-or-two-selected-orientation-witnesses-unresolved",
-          "v014-host-selected-witness-argument-is-not-orientation-authority"
+          "v014-host-selected-witness-argument-is-not-orientation-authority",
+          "v014-global-selected-w-is-not-required",
+          "v014-exact-sequence-is-not-orientation-authority",
+          "v014-j-fixed-single-link-matching-carrier-is-noncanonical"
         ]
       },
       "requiredExecutableGates": [
@@ -359,5 +365,9 @@
     }
   },
   "adversarialClosureIssue": 1669,
-  "documentationProjectionRegistry": "requirements/mts-v0.14.json"
+  "documentationProjectionRegistry": "requirements/mts-v0.14.json",
+  "contextRelativeA4Issue": 1673,
+  "a4NormativeState": "GREEN_AUTHOR_REFINED_CONTEXT_RELATIVE_N20B",
+  "globalSelectedWitnessModel": "SUPERSEDED",
+  "readinessState": "BLOCKING_PENDING_POST_N20B_REAUDIT"
 }
