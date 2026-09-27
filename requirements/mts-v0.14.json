@@ -13,7 +13,7 @@
       "kind": "semantic-law",
       "status": "candidate",
       "classification": {
-        "path": "theory/foundation/recursive-alphabet"
+        "path": "theory/foundation/emergent-recursive-alphabet"
       },
       "order": 10,
       "dependsOn": [],
@@ -231,7 +231,7 @@
       "kind": "semantic-law",
       "status": "candidate",
       "classification": {
-        "path": "theory/foundation/chiral-torsor-orientation"
+        "path": "theory/foundation/context-relative-chiral-gauge"
       },
       "order": 120,
       "dependsOn": [],
