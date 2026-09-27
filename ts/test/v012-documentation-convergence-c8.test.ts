@@ -1,6 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { checkRepositorySemanticLawDocumentation } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.12 C8 normative convergence: ${message}`);
@@ -34,21 +33,13 @@ assert(
   "traceability invariant IDs exactly match contract semantic laws",
 );
 
-const lawDocumentationIssues = checkRepositorySemanticLawDocumentation(repoRoot);
 assert(
-  lawDocumentationIssues.length === 0,
-  `all accepted semantic laws have one stable normative owner and valid references: ${lawDocumentationIssues
-    .map((issue) => issue.message)
-    .join("; ")}`,
+  contract.candidateState?.documentationComplete === true,
+  "immutable v0.12 contract records documentation completion",
+);
+assert(
+  conformance.evidenceState?.documentationC8 === "green-confirmed",
+  "immutable v0.12 conformance records C8 documentation convergence",
 );
 
-const ownerDocs = [
-  "docs/specs/Формальная нотация МТС.md",
-  "docs/specs/Ачисла и сериализация.md",
-  "docs/specs/Апамять и управление сетью связей.md",
-] as const;
-for (const path of ownerDocs) {
-  assert(read(path).includes('<a id="mts-law-'), `${path} contains stable semantic-law owner anchors`);
-}
-
-console.log("MTS v0.12 C8 normative documentation and traceability convergence: GREEN.");
+console.log("MTS v0.12 C8 historical documentation and traceability convergence: GREEN from immutable v0.12 artifacts; current v0.14 Markdown is not historical authority.");
