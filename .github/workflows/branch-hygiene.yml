@@ -37,6 +37,19 @@ jobs:
             exit 0
           fi
 
+          base_uri="$(jq -nr --arg v "$BASE" '$v|@uri')"
+          branch_uri="$(jq -nr --arg v "$BRANCH" '$v|@uri')"
+          if ! compare="$(gh api "repos/$REPO/compare/$base_uri...$branch_uri" 2>/dev/null)"; then
+            echo "::warning::Could not compare $BRANCH with $BASE; PR creation deferred without failing CI."
+            exit 0
+          fi
+
+          ahead_by="$(jq -r '.ahead_by' <<< "$compare")"
+          if [ "$ahead_by" = "0" ]; then
+            echo "Branch $BRANCH has no unique commits relative to $BASE; draft PR creation is deferred until the first unique commit."
+            exit 0
+          fi
+
           title="draft: ${BRANCH//\// }"
           body="$(printf '%s\n' \
             "Automatically opened by repository branch-hygiene policy." \
@@ -47,15 +60,44 @@ jobs:
             "" \
             "Please replace this placeholder title/body with the task-specific PR description before marking the PR ready.")"
 
-          gh api --method POST "repos/$REPO/pulls" \
+          error_file="$(mktemp)"
+          if gh api --method POST "repos/$REPO/pulls" \
             -f title="$title" \
             -f head="$BRANCH" \
             -f base="$BASE" \
             -f body="$body" \
             -F draft=true \
-            --silent
+            --silent 2>"$error_file"
+          then
+            rm -f "$error_file"
+            echo "Created draft PR for $BRANCH -> $BASE."
+            exit 0
+          else
+            status=$?
+          fi
 
-          echo "Created draft PR for $BRANCH -> $BASE."
+          error_text="$(cat "$error_file")"
+          rm -f "$error_file"
+
+          if grep -Fq "GitHub Actions is not permitted to create or approve pull requests" <<< "$error_text"; then
+            echo "::warning::Automatic draft PR creation is disabled by the repository Actions setting. Enable Settings -> Actions -> General -> Workflow permissions -> Allow GitHub Actions to create and approve pull requests."
+            {
+              echo "### Branch hygiene warning"
+              echo
+              echo "Could not auto-create a draft PR for `$BRANCH` because the repository-level GitHub Actions PR-creation setting is disabled."
+              echo
+              echo "Enable: Settings -> Actions -> General -> Workflow permissions -> Allow GitHub Actions to create and approve pull requests."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if grep -Fq "No commits between" <<< "$error_text"; then
+            echo "::notice::GitHub reports no PR-eligible commits between $BASE and $BRANCH; creation deferred."
+            exit 0
+          fi
+
+          printf '%s\n' "$error_text" >&2
+          exit "$status"
 
   delete-merged-head:
     name: Delete merged PR head branch
@@ -89,7 +131,7 @@ jobs:
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - name: Delete only branches with no unique commits
+      - name: Delete only safely proven merged branches
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -100,14 +142,34 @@ jobs:
 
           open_heads="$(gh api --paginate "repos/$REPO/pulls?state=open&per_page=100" --jq '.[].head.ref' | sort -u)"
 
+          # A squash-merged PR leaves its original branch commits formally
+          # ahead of main. Exact equality with the merged PR head snapshot is
+          # therefore an independent safe deletion proof: it also proves that
+          # no later commits were added to the branch after that PR snapshot.
+          declare -A merged_pr_snapshots=()
+          while IFS=$'\t' read -r ref sha; do
+            if [ -n "$ref" ] && [ -n "$sha" ]; then
+              merged_pr_snapshots["$ref|$sha"]=1
+            fi
+          done < <(
+            gh api --paginate "repos/$REPO/pulls?state=closed&per_page=100&sort=updated&direction=desc" \
+              --jq '.[] | select(.merged_at != null and .head.repo.full_name == .base.repo.full_name) | [.head.ref, .head.sha] | @tsv'
+          )
+
           mapfile -t branches < <(
-            gh api --paginate "repos/$REPO/branches?per_page=100" --jq '.[] | select(.protected == false) | .name'
+            gh api --paginate "repos/$REPO/branches?per_page=100" \
+              --jq '.[] | select(.protected == false) | [.name, .commit.sha] | @tsv'
           )
 
           deleted=0
+          deleted_merged_pr_heads=0
+          deleted_zero_ahead=0
           skipped=0
 
-          for branch in "${branches[@]}"; do
+          for row in "${branches[@]}"; do
+            branch="${row%%$'\t'*}"
+            sha="${row#*$'\t'}"
+
             if [ "$branch" = "$BASE" ]; then
               continue
             fi
@@ -115,6 +177,18 @@ jobs:
             if grep -Fxq "$branch" <<< "$open_heads"; then
               echo "KEEP open-PR branch: $branch"
               skipped=$((skipped + 1))
+              continue
+            fi
+
+            if [ -n "${merged_pr_snapshots["$branch|$sha"]+x}" ]; then
+              if gh api --method DELETE "repos/$REPO/git/refs/heads/$branch" --silent 2>/dev/null; then
+                echo "DELETE exact merged-PR head: $branch @ $sha"
+                deleted=$((deleted + 1))
+                deleted_merged_pr_heads=$((deleted_merged_pr_heads + 1))
+              else
+                echo "KEEP delete failed: $branch"
+                skipped=$((skipped + 1))
+              fi
               continue
             fi
 
@@ -135,13 +209,16 @@ jobs:
             fi
 
             if gh api --method DELETE "repos/$REPO/git/refs/heads/$branch" --silent 2>/dev/null; then
-              echo "DELETE fully merged branch: $branch"
+              echo "DELETE zero-ahead branch: $branch"
               deleted=$((deleted + 1))
+              deleted_zero_ahead=$((deleted_zero_ahead + 1))
             else
               echo "KEEP delete failed: $branch"
               skipped=$((skipped + 1))
             fi
           done
 
-          echo "Deleted: $deleted"
+          echo "Deleted total: $deleted"
+          echo "Deleted exact merged-PR heads: $deleted_merged_pr_heads"
+          echo "Deleted zero-ahead branches: $deleted_zero_ahead"
           echo "Kept/skipped: $skipped"
