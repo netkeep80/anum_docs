@@ -1,7 +1,7 @@
 {
   "schema": "mts-contract/v0.14",
-  "status": "candidate",
-  "accepted": false,
+  "status": "accepted",
+  "accepted": true,
   "issue": 1586,
   "candidateLifecycleIssue": 1586,
   "semanticBase": "mts-contract/v0.13",
@@ -12,23 +12,27 @@
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13",
     "immutable": true,
-    "liveRuntimeSelectable": true
+    "liveRuntimeSelectable": false
   },
   "acceptedCurrent": {
-    "contract": "mts-contract/v0.13",
-    "conformance": "mts-conformance/v0.13"
+    "contract": "mts-contract/v0.14",
+    "conformance": "mts-conformance/v0.14"
   },
   "implementation": {
     "language": "TypeScript",
     "package": "@mts/core",
-    "acceptedRuntime": "mts-contract/v0.13",
+    "acceptedRuntime": "mts-contract/v0.14",
     "candidateRuntimeSelectable": false,
     "implementationComplete": true,
     "productionBehaviorChanged": false,
     "singleLiveSemanticRuntime": true,
     "candidateKernelBehaviorImplemented": true,
-    "implementationCompleteMeaning": "declared v0.14 candidate semantic scope is implemented and independently post-N20c readiness-audited with all mandatory executable gates; production cutover/current-pointer rotation is not yet performed",
-    "productionBehaviorChangedMeaning": "N20c changes candidate contracts/evidence only; the single live v0.13 runtime remains current until explicit v0.14 acceptance/cutover"
+    "implementationCompleteMeaning": "accepted-v0.14 declared semantic scope; 14 laws, 70 mandatory executable gates, N20c closure, independent N21 readiness and explicit author acceptance complete",
+    "productionBehaviorChangedMeaning": "A75 is an acceptance/pointer cutover only; it introduces no new semantic runtime code beyond the frozen v0.14 candidate",
+    "publicFacade": "ts/src/public.ts",
+    "packageManifest": "ts/package.json",
+    "pythonRuntimePresent": false,
+    "compatibilityRuntimeSelectable": false
   },
   "inheritedFoundation": {
     "ontology": "Link",
@@ -315,22 +319,20 @@
     "traceabilityComplete": true,
     "documentationComplete": false,
     "readinessAuditComplete": true,
-    "explicitAuthorAcceptanceRecorded": false,
+    "explicitAuthorAcceptanceRecorded": true,
     "documentationOwnershipMapComplete": true,
     "adversarialClosureComplete": true
   },
   "acceptanceBoundary": {
-    "accepted": false,
+    "accepted": true,
     "acceptanceReady": true,
     "automaticAcceptanceForbidden": true,
     "explicitAuthorApprovalRequired": true,
     "authorDecisionRequired": "ACCEPT MTS v0.14",
-    "currentAcceptedRemains": "mts-contract/v0.13",
-    "blockers": [
-      "explicit author acceptance"
-    ],
+    "currentAcceptedRemains": "mts-contract/v0.14",
+    "blockers": [],
     "documentationReconstructionIssue": 1585,
-    "documentationReconstructionUnblocked": false
+    "documentationReconstructionUnblocked": true
   },
   "traceabilityManifest": "traceability/mts-v0.14.json",
   "readinessAudit": {
@@ -344,10 +346,12 @@
       "validForAcceptance": false
     },
     "candidateSemanticReady": true,
-    "productionCutoverPerformed": false,
+    "productionCutoverPerformed": true,
     "documentationPostAcceptanceIssue": 1585,
-    "newFreezeRequired": true,
-    "onlyRemainingBlocker": "explicit author acceptance"
+    "newFreezeRequired": false,
+    "onlyRemainingBlocker": null,
+    "accepted": true,
+    "acceptanceManifest": "cutover/typescript-c1-acceptance-v0.7.json"
   },
   "representationLayers": {
     "status": "GREEN_RESEARCH",
@@ -410,5 +414,39 @@
       "introducesOntologyEntity": false
     }
   },
-  "documentationProjectionRegistry": "requirements/mts-v0.14.json"
+  "documentationProjectionRegistry": "requirements/mts-v0.14.json",
+  "currentPointer": "cutover/typescript-c1-acceptance-v0.7.json",
+  "acceptedMtsVersion": "mts-contract/v0.14",
+  "owners": {
+    "memory": "ts/src/memory.ts",
+    "exactSequence": "ts/src/exact-sequence.ts",
+    "stringAnum": "ts/src/v012-string-anum.ts",
+    "structuralRule": "ts/src/structural-rule.ts",
+    "hierarchicalCarrierResearch": "ts/src/v013-hierarchical-carrier.ts",
+    "relativePoleContextResearch": "ts/src/v013-relative-pole-context.ts",
+    "relativePoleExecutionResearch": "ts/src/v013-relative-pole-execution.ts",
+    "relativeFormMaterializationResearch": "ts/src/v013-relative-form-materialization.ts",
+    "formalAspectEvaluatorResearch": "ts/src/v013-formal-aspect-evaluator.ts",
+    "structuralExecutionResearch": "ts/src/v013-structural-execution.ts",
+    "groundedExecutionResearch": "ts/src/v013-grounded-execution.ts"
+  },
+  "acceptance": {
+    "performedHere": true,
+    "acceptedMtsVersion": "mts-contract/v0.14",
+    "previousAcceptedVersion": "mts-contract/v0.13",
+    "authorDecisionIssue": 1586,
+    "authorDecisionComment": 5858021017,
+    "authorDecision": "ACCEPT_MTS_V0_14",
+    "preAcceptanceReadyMainSha": "05c4bf3362b559d67dafd2892b937f14c2b89f18",
+    "exactFreezeIssue": 1683,
+    "cutoverIssue": 1684,
+    "cutoverManifest": "cutover/typescript-c1-acceptance-v0.7.json"
+  },
+  "releaseState": {
+    "currentAccepted": "mts-contract/v0.14",
+    "previousAccepted": "mts-contract/v0.13",
+    "accepted": true,
+    "acceptanceReady": true,
+    "candidateRuntimeSelectable": false
+  }
 }
