@@ -1,4 +1,6 @@
 // mts-version-evidence: candidate-from=0.14
+// Historical N17 operational-equivalence witness. DIRECT/MIRROR equivalence
+// remains valid; N20b/#1673 supplies the normative Context-local frame carrier.
 // research-owner: #1664
 // decision-owner: #1662
 
@@ -220,7 +222,8 @@ function main(): void {
   }
 
   // ---------------------------------------------------------------------
-  // N17.3 — frame authority is explicit foundation selection only.
+  // N17.3 — historical one-Context frame selection experiment.
+  // N20b supersedes this as normative authority with Context-local markers.
   // ---------------------------------------------------------------------
 
   // Both links exist physically, but raw Memory presence selects nothing.
@@ -284,7 +287,9 @@ function main(): void {
     "TWO_WITNESSES=UNRESOLVED",
     "RAW_MEMORY_PRESENCE_AUTHORITY=FALSE",
     "UNRELATED_WITNESS_AUTHORITY=FALSE",
-    "FINAL_NORMATIVE_A4_CHOICE=PENDING_AUTHOR_SEMANTIC_FREEZE",
+    "HISTORICAL_GLOBAL_SELECTION_MODEL=ONE_CONTEXT_SPECIAL_CASE",
+    "FINAL_NORMATIVE_A4_CHOICE=CONTEXT_RELATIVE_N20B",
+    "GLOBAL_SELECTED_W_NORMATIVE_AUTHORITY=FALSE",
     "PRODUCTION_DELTA=NONE",
     "MTS_V014_ACCEPTED=FALSE",
   ].join(" "));
