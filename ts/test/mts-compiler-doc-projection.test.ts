@@ -254,6 +254,19 @@ assert.deepEqual(ir.requirements.map((x) => x.id), [
   "V14-L8", "V14-L9", "V14-L10", "V14-L11", "V14-L12", "V14-L13", "V14-L14",
 ]);
 assert.ok(ir.requirements.every((x) => x.status === "accepted"));
+assert.deepEqual(ir.repositoryRequirements.map((x) => x.id), [
+  "README-AUTHORS",
+  "README-OBSERVATORY",
+]);
+assert.ok(ir.repositoryRequirements.every((x) => x.status === "required"));
+assert.match(
+  ir.repositoryRequirements.find((x) => x.id === "README-OBSERVATORY")?.generatedContent ?? "",
+  /https:\/\/netkeep80\.github\.io\/anum_docs\//,
+);
+assert.match(
+  ir.repositoryRequirements.find((x) => x.id === "README-AUTHORS")?.generatedContent ?? "",
+  /Дьяченко Константин Константинович/,
+);
 assert.equal(Object.values(ir.documentModes).includes("generated"), false);
 
 const a4 = ir.requirements.find((x) => x.id === "V14-L12");
@@ -301,9 +314,36 @@ try {
     ...surface,
   ]) copy(path);
 
-  assert.equal(loadMtsSemanticIr(tempRoot).requirements.length, 14);
+  const tempIr = loadMtsSemanticIr(tempRoot);
+  assert.equal(tempIr.requirements.length, 14);
+  assert.equal(tempIr.repositoryRequirements.length, 2);
   assert.deepEqual(compileRequirementDocuments(tempRoot, false), []);
   assert.deepEqual(compileRequirementDocuments(tempRoot, true), []);
+
+  const readmePath = resolve(tempRoot, "README.md");
+  const readmeSource = readFileSync(readmePath, "utf8");
+  const withoutAuthors = readmeSource.replace(
+    /<!-- мтс:требование:README-AUTHORS:начало -->[\s\S]*?<!-- мтс:требование:README-AUTHORS:конец -->/,
+    "",
+  );
+  writeFileSync(readmePath, withoutAuthors, "utf8");
+  assert.deepEqual(
+    compileRequirementDocuments(tempRoot, false),
+    ["README.md"],
+    "missing required README metadata must make compiler check RED",
+  );
+  assert.deepEqual(compileRequirementDocuments(tempRoot, true), ["README.md"]);
+  const restoredReadme = readFileSync(readmePath, "utf8");
+  for (const requiredText of [
+    "https://netkeep80.github.io/anum_docs/",
+    "Вертушкин Роман Павлович",
+    "Дьяченко Константин Константинович",
+    "Шакиров Тимур Эдуардович",
+    "Бурдуков Александр Николаевич",
+    "Глазунов Иван Сергеевич",
+  ]) {
+    assert.ok(restoredReadme.includes(requiredText), `docs:sync must restore README metadata: ${requiredText}`);
+  }
 
   const registrySource = readFileSync(resolve(tempRoot, registryPath), "utf8");
   const cases: Array<[(r: any) => void, RegExp]> = [
@@ -312,6 +352,9 @@ try {
     [(r) => { r.requirements.find((x: any) => x.id === "V14-L12").dependsOn = ["NO_SUCH"]; }, /unknown requirement/],
     [(r) => { r.requirements.find((x: any) => x.id === "V14-L12").docProjection.path = "docs/specs/Формальная нотация МТС.md"; }, /differs from traceability documentation owner/],
     [(r) => { r.requirements = r.requirements.filter((x: any) => x.id !== "V14-L14"); }, /requirement id set differs/],
+    [(r) => { r.repositoryRequirements = r.repositoryRequirements.filter((x: any) => x.id !== "README-AUTHORS"); }, /repository requirement id set differs/],
+    [(r) => { r.repositoryRequirements.find((x: any) => x.id === "README-OBSERVATORY").url = "http://example.test"; }, /absolute https URL/],
+    [(r) => { r.repositoryRequirements.find((x: any) => x.id === "README-AUTHORS").contributors = []; }, /contributors must be a non-empty array/],
   ];
   for (const [mutate, pattern] of cases) {
     const registry = readRegistry();
@@ -342,4 +385,4 @@ try {
   rmSync(tempRoot, { recursive: true, force: true });
 }
 
-console.log("MTS Compiler D20: GREEN REQUIREMENTS=14 REGISTRY=v0.2 PROSE_MATERIALIZATION=MATERIALIZED");
+console.log("MTS Compiler D20: GREEN REQUIREMENTS=14 REPOSITORY_REQUIREMENTS=2 REGISTRY=v0.2 PROSE_MATERIALIZATION=MATERIALIZED");
