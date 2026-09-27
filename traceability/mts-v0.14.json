@@ -208,7 +208,8 @@
       "contractPointer": "/requiredSemanticLaws/V14-L12",
       "positive": {
         "requiredPositiveVectors": [
-          "v014-orientation-gauge-research-grounded"
+          "v014-orientation-gauge-research-grounded",
+          "v014-a4-operational-equivalence-grounded"
         ]
       },
       "negative": {
@@ -221,7 +222,8 @@
       "requiredExecutableGates": [
         "ts/test/research-v014-foundation-orientation-witness.test.ts",
         "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
-        "ts/test/research-v014-orientation-gauge-view.test.ts"
+        "ts/test/research-v014-orientation-gauge-view.test.ts",
+        "ts/test/research-v014-a4-operational-equivalence.test.ts"
       ]
     }
   }
