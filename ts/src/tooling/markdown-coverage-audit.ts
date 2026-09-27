@@ -5,9 +5,10 @@ import {
   listMarkdownSections,
   listOwnedMarkdownBlockIds,
   readOwnedMarkdownBlock,
+  resolveMarkdownAnchor,
   type MarkdownDocumentMode,
 } from "./markdown-section-adapter.js";
-import { loadMtsSemanticIr, type MtsRequirementProjection } from "./mts-compiler.js";
+import { loadMtsSemanticIr } from "./mts-compiler.js";
 
 export type MarkdownKnowledgeClass =
   | "requirements-backed"
@@ -65,6 +66,7 @@ export interface MarkdownCoverageAudit {
 interface CoverageRequirement {
   readonly id: string;
   readonly docAnchor: string;
+  readonly canonicalNodeRequired?: boolean;
 }
 
 function fail(message: string): never {
@@ -100,16 +102,27 @@ export function auditMarkdownDocument(args: {
     .filter((anchorId): anchorId is string => anchorId !== null);
   const canonicalAnchorSet = new Set(canonicalAnchorIds);
 
+  const requirementSection = new Map<string, number>();
   for (const requirement of requirements) {
-    if (!canonicalAnchorSet.has(requirement.docAnchor)) {
+    const canonicalNodeRequired = requirement.canonicalNodeRequired !== false;
+    let section = sections.find((candidate) => candidate.anchorId === requirement.docAnchor);
+    if (canonicalNodeRequired && !canonicalAnchorSet.has(requirement.docAnchor)) {
       fail(`${path}: requirement ${requirement.id} projection anchor is not a canonical node: ${requirement.docAnchor}`);
     }
+    if (section === undefined && !canonicalNodeRequired) {
+      const anchor = resolveMarkdownAnchor(source, requirement.docAnchor);
+      section = sections.find((candidate) => anchor.offset >= candidate.start && anchor.offset < candidate.end);
+    }
+    if (section === undefined) {
+      fail(`${path}: requirement ${requirement.id} projection anchor is outside a Markdown section: ${requirement.docAnchor}`);
+    }
+
     const block = readOwnedMarkdownBlock(source, requirement.id);
     if (block === null) fail(`${path}: requirement ${requirement.id} has no compiler-owned block`);
-    const section = sections.find((candidate) => candidate.anchorId === requirement.docAnchor)!;
     if (block.start < section.start || block.end > section.end) {
-      fail(`${path}: requirement ${requirement.id} owned block is outside node ${requirement.docAnchor}`);
+      fail(`${path}: requirement ${requirement.id} owned block is outside section for ${requirement.docAnchor}`);
     }
+    requirementSection.set(requirement.id, section.diagnosticLine);
   }
 
   const requirementIds = requirements.map((item) => item.id);
@@ -117,17 +130,11 @@ export function auditMarkdownDocument(args: {
     fail(`${path}: compiler-owned block IDs differ from projected requirement IDs; blocks=[${ownedBlockIds.join(", ")}] requirements=[${requirementIds.join(", ")}]`);
   }
 
-  const requirementByAnchor = new Map<string, string[]>();
-  for (const requirement of requirements) {
-    const ids = requirementByAnchor.get(requirement.docAnchor) ?? [];
-    ids.push(requirement.id);
-    requirementByAnchor.set(requirement.docAnchor, ids);
-  }
-
   const resultSections = sections.map((section) => {
-    const ids = section.anchorId === null
-      ? []
-      : [...(requirementByAnchor.get(section.anchorId) ?? [])].sort((a, b) => a.localeCompare(b));
+    const ids = requirements
+      .filter((requirement) => requirementSection.get(requirement.id) === section.diagnosticLine)
+      .map((requirement) => requirement.id)
+      .sort((a, b) => a.localeCompare(b));
     const blocks = ownedBlockIds.filter((id) => {
       const block = readOwnedMarkdownBlock(source, id)!;
       return block.start >= section.start && block.end <= section.end;
@@ -171,9 +178,22 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
     const source = readFileSync(resolve(root, path), "utf8");
     const requirements = proseMaterializationPending
       ? []
-      : ir.requirements
-          .filter((item) => item.docPath === path)
-          .map((item: MtsRequirementProjection) => Object.freeze({ id: item.id, docAnchor: item.docAnchor }));
+      : [
+          ...ir.requirements
+            .filter((item) => item.docPath === path)
+            .map((item) => Object.freeze({
+              id: item.id,
+              docAnchor: item.docAnchor,
+              canonicalNodeRequired: true,
+            })),
+          ...ir.repositoryRequirements
+            .filter((item) => item.docPath === path)
+            .map((item) => Object.freeze({
+              id: item.id,
+              docAnchor: item.docAnchor,
+              canonicalNodeRequired: false,
+            })),
+        ];
     return auditMarkdownDocument({
       path,
       mode: ir.documentModes[path]!,
@@ -190,7 +210,7 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
     stableAnchorCount: documents.reduce((sum, document) => sum + document.stableAnchorCount, 0),
     canonicalNodeCount: documents.reduce((sum, document) => sum + document.canonicalNodeCount, 0),
     nonCanonicalAnchorCount: documents.reduce((sum, document) => sum + document.nonCanonicalAnchorIds.length, 0),
-    requirementCount: ir.requirements.length,
+    requirementCount: ir.requirements.length + ir.repositoryRequirements.length,
     requirementBackedSectionCount: sections.filter((section) => section.knowledgeClass === "requirements-backed").length,
     ownedBlockCount: documents.reduce((sum, document) => sum + document.ownedBlockCount, 0),
     unanchoredHeadingCount: sections.filter((section) => section.anchorId === null).length,
