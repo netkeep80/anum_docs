@@ -1,0 +1,256 @@
+{
+  "schema": "mts-contract/v0.14",
+  "status": "candidate",
+  "accepted": false,
+  "issue": 1586,
+  "candidateLifecycleIssue": 1586,
+  "semanticBase": "mts-contract/v0.13",
+  "observableSemanticDelta": true,
+  "conformanceCorpus": "contracts/mts-conformance-v0.14.json",
+  "acceptanceReady": false,
+  "previousAcceptedRelease": {
+    "contract": "mts-contract/v0.13",
+    "conformance": "mts-conformance/v0.13",
+    "immutable": true,
+    "liveRuntimeSelectable": true
+  },
+  "acceptedCurrent": {
+    "contract": "mts-contract/v0.13",
+    "conformance": "mts-conformance/v0.13"
+  },
+  "implementation": {
+    "language": "TypeScript",
+    "package": "@mts/core",
+    "acceptedRuntime": "mts-contract/v0.13",
+    "candidateRuntimeSelectable": false,
+    "implementationComplete": false,
+    "productionBehaviorChanged": false,
+    "singleLiveSemanticRuntime": true
+  },
+  "inheritedFoundation": {
+    "ontology": "Link",
+    "rootBasis": "R/O/C/L/U",
+    "structuralLinkIdentity": "ordered local pole positions in accepted v0.13 implementation coordinates",
+    "acceptedV013Immutable": true,
+    "generalizedReactionInherited": true
+  },
+  "foundationOrientation": {
+    "literalLocallyUnorderedPoles": "FALSIFIED",
+    "globalPolarityModel": "EXECUTABLY_SUPPORTED",
+    "globalDuality": "J",
+    "chiralOrbit": [
+      "InR = C ⟼ R",
+      "OutR = R ⟼ O"
+    ],
+    "recursiveWires": {
+      "InR": "1688",
+      "OutR": "1898"
+    },
+    "rawMemoryPresenceIsAuthority": false,
+    "selectedExactlyOneWitnessResolvesOrientation": true,
+    "zeroOrTwoSelectedWitnesses": "UNRESOLVED",
+    "gaugeDerivationOfStartEnd": "EXECUTABLY_SUPPORTED",
+    "finalNormativeChoice": "PENDING_AUTHOR_SEMANTIC_FREEZE",
+    "choices": [
+      "preserve v0.13 ordered-pole A4 wording",
+      "adopt global-polarity + distinguished-chiral-witness A4'"
+    ]
+  },
+  "recursiveAlphabet": {
+    "name": "recursive MTS alphabet",
+    "symbols": {
+      "ROOT": "8",
+      "START": "9",
+      "END": "6",
+      "PAIR": "1"
+    },
+    "selfIncidence": {
+      "ROOT": "11",
+      "START": "10",
+      "END": "01",
+      "PAIR": "00"
+    },
+    "isOntology": false,
+    "isCodec": false,
+    "isAnumAlphabet": false
+  },
+  "recursivePrefixCodec": {
+    "grammar": "S ::= 8 | 9 S | 6 S | 1 S S",
+    "examples": {
+      "R": "8",
+      "O": "98",
+      "C": "68",
+      "L": "19868",
+      "U": "16898"
+    },
+    "canonicalTopologyCheckRequired": true,
+    "twoMemoryIdentityRequired": true
+  },
+  "ostensiveFormalNotation": {
+    "synonyms": {
+      "∞": "8",
+      "♂": "9",
+      "♀": "6",
+      "⟼": "1"
+    },
+    "positionalForms": [
+      "∞",
+      "♂S",
+      "S♀",
+      "A ⟼ B"
+    ],
+    "implicitPairAssociativity": "NONE",
+    "ambiguousUngroupedFormsRejected": true,
+    "finalSurfaceGrammar": "PLANNED_BLOCKING_GATE"
+  },
+  "sequenceSemantics": {
+    "anum": "rooted compact representation/coding of a sequence of Links",
+    "exactSequenceDistinctFromFoldDenotation": true,
+    "recursiveLinkCodecDistinct": true,
+    "rootOrigin": "R"
+  },
+  "q14Interpreter": {
+    "alphabet": [
+      "[",
+      "]",
+      "T",
+      "F"
+    ],
+    "status": "GREEN_RESEARCH",
+    "acceptsLegacy10": false,
+    "mixedSourceAllowed": false
+  },
+  "legacyQ13Compatibility": {
+    "interpreter": "I_Q@v0.13",
+    "alphabet": [
+      "[",
+      "]",
+      "1",
+      "0"
+    ],
+    "immutable": true,
+    "acceptsTF": false,
+    "explicitVersionedTranscodeAllowed": true,
+    "transcodePreservesDenotation": true,
+    "transcodePreservesExactStringIdentity": false
+  },
+  "stringAndUtf8Boundary": {
+    "inheritedFrom": "mts-contract/v0.13",
+    "exactBytesDefineStringIdentity": true,
+    "unicodeNormalizationDefinesIdentity": false
+  },
+  "reactionResultBasis": {
+    "cases": [
+      "A -> {}",
+      "A -> A",
+      "A -> A♀",
+      "A -> ♂A"
+    ],
+    "successfulEmptyNotation": "{}",
+    "zeroMayMeanSuccessfulEmpty": false,
+    "emptySuccessEqualsNoRelation": false,
+    "identityTransitionEqualsQuiescence": false,
+    "startEndContinuationsDistinct": true
+  },
+  "linkImmutabilityAndRewrite": {
+    "semanticLinkImmutableByStructuralIdentity": true,
+    "inPlacePoleMutation": false,
+    "membershipReplacementDistinctFromStructuralSubstitution": true,
+    "physicalDeletionDistinct": true
+  },
+  "natTheory": {
+    "status": "GREEN_RESEARCH",
+    "zero": "N0 = U",
+    "successor": "Succ(N) = N ⟼ L",
+    "one": "N1 = U ⟼ L",
+    "oneEqualsDegreeOne": false,
+    "successorInjective": true,
+    "zeroNotSuccessor": true,
+    "uniquePredecessor": true,
+    "leastClosedAuthority": "GREEN_RESEARCH"
+  },
+  "connectivityDegreeTheory": {
+    "preservedSeparately": true,
+    "one": "D1 = L",
+    "successor": "NextDegree(D) = D ⟼ L"
+  },
+  "countTheory": {
+    "status": "GREEN_RESEARCH",
+    "domain": "canonical ExactSequence",
+    "codomain": "Nat",
+    "empty": "N0",
+    "positionSensitive": true
+  },
+  "addTheory": {
+    "status": "GREEN_RESEARCH",
+    "base": "Add(A,U,A)",
+    "recursiveStep": "Add(A,B,C) + Succ(B,B1) + Succ(C,C1) -> Add(A,B1,C1)",
+    "canonicalProofAuthority": "selected BASE/STEP constructor authority",
+    "constructiveTotality": "GREEN_RESEARCH",
+    "functionality": "GREEN_RESEARCH",
+    "ambientAddIsAuthority": false
+  },
+  "orderTheory": {
+    "status": "GREEN_RESEARCH",
+    "derivedRule": "Add(a,k,b) -> Le(a,b)",
+    "canonicalAddProofRequired": true,
+    "ambientAddCanWitnessLe": false
+  },
+  "multiplicationScope": {
+    "status": "EXPLICITLY_DEFERRED",
+    "requiredForV014Acceptance": false,
+    "fullSemiring": "DOWNSTREAM_DERIVED_RESEARCH"
+  },
+  "generalizedMpNonRegression": {
+    "status": "GREEN_RESEARCH",
+    "law": "K ⟼ A + A ⟼ B -> K ⟼ B",
+    "newV014ExecutionLaw": false
+  },
+  "executionProfileNonRegression": {
+    "status": "GREEN_RESEARCH",
+    "zeroOneManyPreserved": true,
+    "selectedTheoryRuleAuthorityPreserved": true,
+    "canonicalDuplicateConvergencePreserved": true
+  },
+  "requiredSemanticLaws": {
+    "V14-L1": "Recursive 8/9/6/1 is the Link structural alphabet and is not the Anum/Q alphabet.",
+    "V14-L2": "Ostensive ∞/♂/♀/⟼ denote ROOT/START/END/PAIR through an explicit grammar.",
+    "V14-L3": "Q14 [ ] T F is version-separated from immutable legacy Q13 [ ] 1 0.",
+    "V14-L4": "Successful empty reaction {}, active identity, START continuation and END continuation are distinct results.",
+    "V14-L5": "Semantic Link identity is immutable; rewrite changes membership/structure rather than poles in place.",
+    "V14-L6": "Nat starts at U and uses uniform successor N⟼L; Degree remains a separate scale starting at L.",
+    "V14-L7": "Count over canonical ExactSequence returns Nat cardinality.",
+    "V14-L8": "Canonical Add is constructor-scoped and is total/function-like over selected Nat evidence.",
+    "V14-L9": "Derived Le requires canonical Add proof authority.",
+    "V14-L10": "Multiplication/full semiring is explicitly outside the v0.14 acceptance scope.",
+    "V14-L11": "Generalized modus ponens/reaction is preserved from accepted v0.13.",
+    "V14-L12": "Absolute START/END foundation naming awaits explicit A4/A4' semantic freeze."
+  },
+  "candidateState": {
+    "researchEvidenceSubstantial": true,
+    "arithmeticAcceptanceScopeClosed": true,
+    "foundationOrientationFinalChoiceComplete": false,
+    "formalSurfaceGrammarComplete": false,
+    "traceabilityComplete": false,
+    "documentationComplete": false,
+    "readinessAuditComplete": false,
+    "explicitAuthorAcceptanceRecorded": false
+  },
+  "acceptanceBoundary": {
+    "accepted": false,
+    "acceptanceReady": false,
+    "automaticAcceptanceForbidden": true,
+    "explicitAuthorApprovalRequired": true,
+    "authorDecisionRequired": "ACCEPT MTS v0.14",
+    "currentAcceptedRemains": "mts-contract/v0.13",
+    "blockers": [
+      "final A4/A4' semantic freeze",
+      "final v0.14 ostensive FORMAL grammar surface",
+      "v0.14 traceability",
+      "independent readiness audit",
+      "explicit author acceptance"
+    ],
+    "documentationReconstructionIssue": 1585,
+    "documentationReconstructionUnblocked": false
+  }
+}
