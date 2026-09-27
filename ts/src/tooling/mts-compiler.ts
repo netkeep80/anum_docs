@@ -36,6 +36,7 @@ export interface MtsSemanticIr {
   readonly contractPath: string;
   readonly requirements: readonly MtsRequirementProjection[];
   readonly documentModes: Readonly<Record<string, MarkdownDocumentMode>>;
+  readonly projectionState: string;
 }
 
 function fail(message: string): never {
@@ -157,6 +158,9 @@ export function loadMtsSemanticIr(
       )
     : null;
 
+  const projectionState = typeof registry.projectionState === "string"
+    ? registry.projectionState
+    : "MATERIALIZED";
   const documentSurface = object(registry.documentSurface, `${registryPath}.documentSurface`);
   const documentModes: Record<string, MarkdownDocumentMode> = {};
   for (const [path, rawMode] of Object.entries(documentSurface)) {
@@ -273,6 +277,7 @@ export function loadMtsSemanticIr(
     contractPath,
     requirements: Object.freeze(requirements),
     documentModes: Object.freeze(documentModes),
+    projectionState,
   });
 }
 
@@ -308,6 +313,9 @@ export function upsertRequirementProjection(
 
 export function compileRequirementDocuments(root: string, write: boolean): string[] {
   const ir = loadMtsSemanticIr(root);
+  if (ir.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585") {
+    return [];
+  }
   const grouped = new Map<string, MtsRequirementProjection[]>();
   for (const requirement of ir.requirements) {
     const items = grouped.get(requirement.docPath) ?? [];
