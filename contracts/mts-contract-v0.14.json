@@ -54,7 +54,11 @@
     "choices": [
       "preserve v0.13 ordered-pole A4 wording",
       "adopt global-polarity + distinguished-chiral-witness A4'"
-    ]
+    ],
+    "operationalEquivalenceAudit": "GREEN_RESEARCH",
+    "directGaugeMatchesCurrentKernel": true,
+    "mirrorGaugeIsExactJImage": true,
+    "resolvedGaugeCount": 2
   },
   "recursiveAlphabet": {
     "name": "recursive MTS alphabet",

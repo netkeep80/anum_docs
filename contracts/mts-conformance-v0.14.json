@@ -9,7 +9,7 @@
   "semanticBase": "mts-conformance/v0.13",
   "observableSemanticDelta": true,
   "coverageState": "partial-blocking",
-  "coverageStateMeaning": "Research evidence and candidate traceability are projected for the declared v0.14 delta; A4/A4' semantic freeze, independent readiness audit and explicit author acceptance remain blocking.",
+  "coverageStateMeaning": "Research evidence, candidate traceability and A4 operational equivalence are projected; final A4/A4' normative freeze, independent readiness audit and explicit author acceptance remain blocking.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13"
@@ -76,7 +76,8 @@
     "ts/test/research-v014-add-general-functionality.test.ts",
     "ts/test/research-v014-order-replay-mul-scope.test.ts",
     "ts/test/research-v014-ostensive-formal-grammar.test.ts",
-    "ts/test/v014-traceability-candidate.test.ts"
+    "ts/test/v014-traceability-candidate.test.ts",
+    "ts/test/research-v014-a4-operational-equivalence.test.ts"
   ],
   "requiredExecutableGates": [
     "ts/test/v013-relative-form-quartet.test.ts",
@@ -138,7 +139,8 @@
     "ts/test/research-v014-add-general-functionality.test.ts",
     "ts/test/research-v014-order-replay-mul-scope.test.ts",
     "ts/test/research-v014-ostensive-formal-grammar.test.ts",
-    "ts/test/v014-traceability-candidate.test.ts"
+    "ts/test/v014-traceability-candidate.test.ts",
+    "ts/test/research-v014-a4-operational-equivalence.test.ts"
   ],
   "requiredNegativeVectors": [
     "v014-local-unordered-collapses-o-c-l-u-and-orientation-orbit",
@@ -172,7 +174,8 @@
     "foundationOrientation": [
       "ts/test/research-v014-foundation-orientation-witness.test.ts",
       "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
-      "ts/test/research-v014-orientation-gauge-view.test.ts"
+      "ts/test/research-v014-orientation-gauge-view.test.ts",
+      "ts/test/research-v014-a4-operational-equivalence.test.ts"
     ],
     "q14": [
       "ts/test/v014-q14-versioned-interpreter.test.ts"
@@ -228,7 +231,8 @@
     "v014-order-from-canonical-add-grounded",
     "v014-multiplication-scope-deferred-grounded",
     "v014-generalized-mp-nonregression-grounded",
-    "v014-orientation-gauge-research-grounded"
+    "v014-orientation-gauge-research-grounded",
+    "v014-a4-operational-equivalence-grounded"
   ],
   "traceabilityManifest": "traceability/mts-v0.14.json"
 }
