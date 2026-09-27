@@ -208,7 +208,7 @@
     ]
   },
   "blockers": {
-    "a4FinalChoice": "BLOCKING_PENDING_AUTHOR_DECISION",
+    "a4FinalChoice": "BLOCKING_PENDING",
     "formalSurfaceGrammar": "GREEN_RESEARCH",
     "traceability": "GREEN_CANDIDATE",
     "readinessAudit": "BLOCKING_PENDING",
