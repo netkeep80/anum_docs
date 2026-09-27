@@ -40,10 +40,10 @@
   "foundationOrientation": {
     "literalLocallyUnorderedPoles": "FALSIFIED",
     "unorderedPoleQuotientUsed": false,
-    "preOrientationPoleModel": "GLOBAL_Z2_TORSOR",
+    "preOrientationPoleModel": "GLOBAL_Z2_TORSOR_WITH_CONTEXT_RELATIVE_LOCAL_FRAMES",
     "absolutePoleNamesBeforeWitness": false,
     "technicalCarrierCoordinatesAreSemanticAuthority": false,
-    "globalPolarityModel": "EXECUTABLY_SUPPORTED_AND_AUTHOR_FROZEN",
+    "globalPolarityModel": "OBJECTIVE_GLOBAL_Z2_CHIRAL_STRUCTURE_LOCAL_CONTEXT_GAUGE",
     "globalDuality": "J",
     "distinguishedChiralWitness": "W",
     "witnessDefinedBeforeStartEnd": true,
@@ -52,34 +52,69 @@
       "J(W)"
     ],
     "rawMemoryPresenceIsAuthority": false,
-    "selectedExactlyOneWitnessResolvesOrientation": true,
-    "zeroOrTwoSelectedWitnesses": "UNRESOLVED",
-    "gaugeDerivationOfStartEnd": "EXECUTABLY_SUPPORTED",
+    "gaugeDerivationOfStartEnd": "EXECUTABLY_SUPPORTED_CONTEXT_RELATIVE",
     "derivedRolesAfterWitness": [
-      "START",
-      "END"
+      "START_K",
+      "END_K"
     ],
     "postOrientationIdentification": {
-      "selectedW": "InR = C ⟼ R",
-      "mirrorJW": "OutR = R ⟼ O"
+      "localSelectedChiK": "InR_K = C_K ⟼ R",
+      "localMirrorJChiK": "OutR_K = R ⟼ O_K"
     },
     "recursiveWiresAfterOrientation": {
-      "InR": "1688",
-      "OutR": "1898"
+      "InR_K": "1688",
+      "OutR_K": "1898"
     },
     "operationalEquivalenceAudit": "GREEN_RESEARCH",
     "directGaugeMatchesCurrentKernel": true,
     "mirrorGaugeIsExactJImage": true,
     "resolvedGaugeCount": 2,
-    "finalNormativeChoice": "A4_PRIME_CHIRAL_TORSOR_DERIVED_START_END",
-    "normativeStatus": "AUTHOR_FROZEN",
-    "authorDecisionIssue": "#1662",
+    "finalNormativeChoice": "A4_PRIME_CONTEXT_RELATIVE_CHIRAL_TORSOR",
+    "normativeStatus": "AUTHOR_REFINED_EXECUTABLE_N20B",
+    "authorDecisionIssue": "#1673",
     "authorDecisionDate": "2026-09-27",
-    "distinguishedWitnessAuthority": "FOUNDATION_LINK_CARRIER",
-    "selectionCarrier": "ExactSequence of distinguished chiral witness Links rooted at R",
     "hostSelectedWitnessArgumentSemanticAuthority": false,
-    "selectionCarrierTechnicalCoordinatesSemanticAuthority": false,
-    "exactlyOneDistinctSelectedWitnessRequired": true
+    "objectiveChiralityExistsWithoutObserver": true,
+    "observerCreatesChirality": false,
+    "globalSelectedWitnessRequired": false,
+    "foundationGlobalFrameRequired": false,
+    "contextRelativeOrientation": true,
+    "contextFrameStateCount": 2,
+    "contextOrientationCarrier": {
+      "kind": "ONE_SIDED_SELF_INCIDENCE_LINK",
+      "layer": "ONTOLOGY_LINK_NATIVE",
+      "representationLayerDependency": false,
+      "exactSequenceDependency": false,
+      "anumDependency": false,
+      "qDependency": false,
+      "formalDependency": false,
+      "usesSemanticStartEndBeforeSelection": false,
+      "description": "For Context body K, exactly one of the two proper one-sided self-incidence marker Links is selected as the local frame marker."
+    },
+    "contextMarkerOrbit": "{marker(K), J(marker(J(K)))} / for J-fixed K exactly the two one-sided self-incidence markers over K",
+    "relativeChiralityPredicate": "same one-sided self-incidence class under simultaneous global pole inversion",
+    "relativeChiralityPredicateJInvariant": true,
+    "chiK": "the root chiral witness aligned with the selected Context marker by the J-invariant relative self-incidence class",
+    "relativeTransport": {
+      "carrier": "derived relative self-incidence class between selected Context markers",
+      "group": "Z2 = {Id,J}",
+      "identity": "g_AA = Id",
+      "symmetry": "g_AB = g_BA",
+      "composition": "g_AB ∘ g_BC = g_AC",
+      "involution": "J ∘ J = Id",
+      "sameFrame": "START_A↔START_B; END_A↔END_B",
+      "mirrorFrame": "START_A↔END_B; END_A↔START_B"
+    },
+    "semanticCovariance": {
+      "sameFrameContextsSameSemantics": true,
+      "mirrorFrameContextsCovariant": true,
+      "bothChiralSelectionsSameOrientedEquations": true
+    },
+    "supersededCarrierResearch": {
+      "exactSequenceSelectedWitness": "REPRESENTATION_LAYER_ONLY_NOT_FOUNDATIONAL_AUTHORITY",
+      "jFixedSingleLinkMatching": "REJECTED_NONCANONICAL_4_RAW_ENCODINGS_FOR_2_SEMANTIC_MATCHINGS"
+    },
+    "legacyGlobalSelectedWitnessModel": "VALID_SINGLE_CONTEXT_GAUGE_SPECIAL_CASE_NOT_NORMATIVE_GLOBAL_AUTHORITY"
   },
   "recursiveAlphabet": {
     "name": "recursive MTS alphabet",
@@ -252,7 +287,7 @@
     "canonicalDuplicateConvergencePreserved": true
   },
   "requiredSemanticLaws": {
-    "V14-L1": "Recursive 8/9/6/1 is the Link structural alphabet and is not the Anum/Q alphabet.",
+    "V14-L1": "MTS has one ontological primitive Link and one abstract Link-forming operation; the recursive 8/9/6/1 alphabet is the emergent four-way self-incidence classification of that one operation, not four primitive opcodes and not the Anum/Q alphabet. Before a Context frame, the two one-sided cases form an unnamed J-chiral pair; after local orientation they receive START_K/END_K roles.",
     "V14-L2": "Ostensive ∞/♂/♀/⟼ denote ROOT/START/END/PAIR through an explicit grammar.",
     "V14-L3": "Q14 [ ] T F is version-separated from immutable legacy Q13 [ ] 1 0.",
     "V14-L4": "Successful empty reaction {}, active identity, START continuation and END continuation are distinct results.",
@@ -263,7 +298,7 @@
     "V14-L9": "Derived Le requires canonical Add proof authority.",
     "V14-L10": "Multiplication/full semiring is explicitly outside the v0.14 acceptance scope.",
     "V14-L11": "Generalized modus ponens/reaction is preserved from accepted v0.13 through the explicit A14 -> A16 -> A17 -> A72w witness chain covering 1->0, 1->1, 1->N, N->1 and N->M without host function/cardinality opcodes.",
-    "V14-L12": "A4': before orientation, Link pole positions form a global Z2 torsor with no primitive absolute START/END naming; exactly one distinguished chiral witness W from {W,J(W)} is selected by Foundation-carried Link structure rather than a host-selected witness argument, fixing the global frame, after which START/END and O/C/L/U are derived and W is identified as InR = C ⟼ R.",
+    "V14-L12": "A4': before orientation, Link pole positions carry objective global Z2 chirality with no primitive absolute START/END. A Context K is locally oriented by choosing one of its two Link-native one-sided self-incidence markers; this choice determines χ(K) in the objective orbit {W,J(W)} by a J-invariant relative-chirality relation, derives START_K/END_K, and induces relative transport g_AB∈{Id,J} with g_AA=Id, g_AB=g_BA and g_AB∘g_BC=g_AC. No Foundation-global selected W, ExactSequence carrier, host witness argument, or raw Link presence is orientation authority.",
     "V14-L13": "Anum is a rooted compact representation/coding of a sequence of Links; ExactSequence preserves exact positional sequence identity distinct from fold denotation, the recursive Link codec is not Anum, Q is a versioned sequence codec/interpreter, and every local sequence origin is R.",
     "V14-L14": "MTS representation layers are explicit and non-ontological above Link: recursive alphabet, representations/codecs, byte-text and symbolic metanotation introduce no second ontology entity."
   },
@@ -277,7 +312,9 @@
     "readinessAuditComplete": false,
     "explicitAuthorAcceptanceRecorded": false,
     "adversarialClosureComplete": true,
-    "documentationOwnershipMapComplete": true
+    "documentationOwnershipMapComplete": true,
+    "a4ContextRelativeClosureComplete": true,
+    "a4GlobalSelectedWitnessModelSuperseded": true
   },
   "acceptanceBoundary": {
     "accepted": false,
@@ -287,7 +324,7 @@
     "authorDecisionRequired": "ACCEPT MTS v0.14",
     "currentAcceptedRemains": "mts-contract/v0.13",
     "blockers": [
-      "independent post-N20 readiness audit",
+      "independent post-N20/N20b readiness audit",
       "explicit author acceptance"
     ],
     "documentationReconstructionIssue": 1585,
@@ -295,18 +332,18 @@
   },
   "traceabilityManifest": "traceability/mts-v0.14.json",
   "readinessAudit": {
-    "status": "BLOCKING_PENDING_POST_N20_REAUDIT",
+    "status": "BLOCKING_PENDING_POST_N20B_REAUDIT",
     "previousAudit": {
       "status": "HISTORICAL_SUPERSEDED_BY_N20",
       "issue": 1666,
       "frozenDossier": 1668
     },
-    "issue": 1669,
+    "issue": 1673,
     "candidateSemanticReady": false,
     "productionCutoverPerformed": false,
     "documentationPostAcceptanceIssue": 1585,
     "blockers": [
-      "independent post-N20 readiness audit",
+      "independent post-N20/N20b readiness audit",
       "explicit author acceptance"
     ]
   },
@@ -370,5 +407,49 @@
       "introducesOntologyEntity": false
     }
   },
-  "documentationProjectionRegistry": "requirements/mts-v0.14.json"
+  "documentationProjectionRegistry": "requirements/mts-v0.14.json",
+  "selfIncidenceEmergence": {
+    "status": "GREEN_RESEARCH_N20B",
+    "ontologyPrimitive": "Link",
+    "abstractPrimitiveOperation": "Link formation / ensure",
+    "ontologyPrimitiveCount": 1,
+    "independentlyPostulatedRecursiveOperations": 0,
+    "selfIncidenceCases": [
+      "11",
+      "10",
+      "01",
+      "00"
+    ],
+    "selfIncidenceCaseCount": 4,
+    "preOrientationOrbitClasses": [
+      {
+        "kind": "J_FIXED",
+        "case": "11",
+        "semanticRole": "ROOT"
+      },
+      {
+        "kind": "J_ORBIT",
+        "cases": [
+          "10",
+          "01"
+        ],
+        "semanticRole": "UNNAMED_CHIRAL_PAIR_BEFORE_CONTEXT_FRAME"
+      },
+      {
+        "kind": "J_FIXED",
+        "case": "00",
+        "semanticRole": "PAIR"
+      }
+    ],
+    "preOrientationOrbitClassCount": 3,
+    "orientedRecursiveAlphabet": {
+      "ROOT": "8",
+      "START_K": "9",
+      "END_K": "6",
+      "PAIR": "1"
+    },
+    "fourRecursiveSymbolsArePrimitiveProcessorOpcodes": false,
+    "technicalMemoryHelpersArePrimitiveSemanticOpcodes": false,
+    "rule": "The four recursive forms are the complete emergent classification of one Link operation by self-incidence to its two relational pole positions."
+  }
 }
