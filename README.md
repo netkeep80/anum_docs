@@ -56,11 +56,11 @@ U = 16898
 `U` — обычный `PAIR(C,O)`, а не пятый аспект и не пятый абит.
 
 <!-- мтс-текущая-проекция:начало -->
-> **Текущий принятый выпуск МТС: v0.13.** Этот блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.
+> **Текущий принятый выпуск МТС: v0.14.** Этот блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.
 >
-> - Контракт: `mts-contract/v0.13` — [файл контракта](contracts/mts-contract-v0.13.json).
-> - Корпус соответствия: `mts-conformance/v0.13` — [файл корпуса](contracts/mts-conformance-v0.13.json).
-> - Свидетельство принятия: [файл принятия](cutover/typescript-c1-acceptance-v0.6.json).
+> - Контракт: `mts-contract/v0.14` — [файл контракта](contracts/mts-contract-v0.14.json).
+> - Корпус соответствия: `mts-conformance/v0.14` — [файл корпуса](contracts/mts-conformance-v0.14.json).
+> - Свидетельство принятия: [файл принятия](cutover/typescript-c1-acceptance-v0.7.json).
 <!-- мтс-текущая-проекция:конец -->
 
 ## Что уже определено в v0.13
