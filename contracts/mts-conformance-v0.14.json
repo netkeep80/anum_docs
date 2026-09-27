@@ -8,8 +8,8 @@
   "contract": "mts-contract/v0.14",
   "semanticBase": "mts-conformance/v0.13",
   "observableSemanticDelta": true,
-  "coverageState": "complete-pending-independent-reaudit",
-  "coverageStateMeaning": "N20 closes the adversarial semantic/traceability gaps, but the previous independent readiness audit/freeze is invalidated and a new post-N20 audit is mandatory before author acceptance.",
+  "coverageState": "complete-pending-independent-post-n20b-reaudit",
+  "coverageStateMeaning": "N20b replaces the provisional Foundation-global selected-W carrier with executable context-relative one-sided self-incidence markers; a new independent readiness audit is mandatory before acceptance.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13"
@@ -159,7 +159,6 @@
   "requiredNegativeVectors": [
     "v014-local-unordered-collapses-o-c-l-u-and-orientation-orbit",
     "v014-raw-inr-outr-presence-is-not-orientation-authority",
-    "v014-zero-or-two-selected-orientation-witnesses-unresolved",
     "v014-recursive-alphabet-is-not-anum-q-alphabet",
     "v014-q14-rejects-legacy-1-0-source",
     "v014-q13-rejects-t-f-source",
@@ -175,10 +174,14 @@
     "v014-anum-exact-sequence-is-not-fold-denotation",
     "v014-recursive-codec-is-not-anum-carrier",
     "v014-representation-layer-does-not-create-ontology-sort",
-    "v014-accepted-law-without-doc-owner-rejected"
+    "v014-accepted-law-without-doc-owner-rejected",
+    "v014-global-selected-w-is-not-required",
+    "v014-exact-sequence-is-not-orientation-authority",
+    "v014-j-fixed-single-link-matching-carrier-is-noncanonical",
+    "v014-four-recursive-symbols-are-not-four-primitive-opcodes"
   ],
   "plannedExecutableGates": [
-    "pending:v014-post-n20-independent-readiness-audit"
+    "pending:v014-post-n20b-independent-readiness-audit"
   ],
   "crossRepositoryAcceptanceDependencies": [
     {
@@ -243,10 +246,10 @@
     ]
   },
   "blockers": {
-    "a4FinalChoice": "GREEN_AUTHOR_FROZEN",
+    "a4FinalChoice": "GREEN_AUTHOR_REFINED_CONTEXT_RELATIVE_N20B",
     "formalSurfaceGrammar": "GREEN_RESEARCH",
     "traceability": "GREEN_CANDIDATE",
-    "readinessAudit": "BLOCKING_PENDING_POST_N20_REAUDIT",
+    "readinessAudit": "BLOCKING_PENDING_POST_N20B_REAUDIT",
     "explicitAuthorAcceptance": "BLOCKING_PENDING",
     "n20AdversarialClosure": "GREEN_IMPLEMENTED"
   },
@@ -255,7 +258,9 @@
     "acceptedV013Mutated": false,
     "candidatePresenceImpliesAcceptance": false,
     "preN20Freeze1668ValidForAcceptance": false,
-    "n20Issue": 1669
+    "n20Issue": 1669,
+    "n20bIssue": 1673,
+    "globalSelectedWitnessModelSuperseded": true
   },
   "requiredPositiveVectors": [
     "v014-recursive-link-alphabet-grounded",
@@ -274,15 +279,17 @@
     "v014-a4prime-chiral-torsor-bootstrap-grounded",
     "v014-independent-readiness-grounded",
     "v014-generalized-mp-full-chain-grounded",
-    "v014-a4prime-link-carried-selection-grounded",
     "v014-anum-sequence-semantics-grounded",
     "v014-representation-layer-registry-grounded",
-    "v014-documentation-owner-map-grounded"
+    "v014-documentation-owner-map-grounded",
+    "v014-a4prime-context-relative-self-incidence-marker-grounded",
+    "v014-a4prime-relative-transport-composition-grounded",
+    "v014-single-link-primitive-four-self-incidence-cases-grounded"
   ],
   "traceabilityManifest": "traceability/mts-v0.14.json",
   "readinessAudit": {
-    "status": "BLOCKING_PENDING_POST_N20_REAUDIT",
-    "issue": 1669,
+    "status": "BLOCKING_PENDING_POST_N20B_REAUDIT",
+    "issue": 1673,
     "previousAuditIssue": 1666,
     "invalidatedFrozenDossier": 1668,
     "requiredExecutableGateCount": 68,
@@ -292,7 +299,7 @@
     "productionCutoverPerformed": false,
     "documentationPostAcceptanceIssue": 1585,
     "blockers": [
-      "independent post-N20 readiness audit",
+      "independent post-N20/N20b readiness audit",
       "explicit author acceptance"
     ]
   }
