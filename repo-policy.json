@@ -2042,6 +2042,11 @@
             "kind": "regex",
             "glob": "ts/test/release-cutover.test.ts",
             "pattern": "negativeVector\\(\"([^\"]+)\""
+          },
+          {
+            "kind": "regex",
+            "glob": "ts/test/v014-release-cutover-a75.test.ts",
+            "pattern": "negativeVector\\(\\\"([^\\\"]+)\\\""
           }
         ]
       },
