@@ -248,7 +248,7 @@ assert.ok(surface.includes("docs/theory/Система аксиом МТС.md"))
 const ir = loadMtsSemanticIr(root);
 assert.equal(ir.schema, "mts-requirement-registry/v0.2");
 assert.equal(ir.contract, "mts-contract/v0.14");
-assert.equal(ir.projectionState, "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585");
+assert.equal(ir.projectionState, "MATERIALIZED");
 assert.deepEqual(ir.requirements.map((x) => x.id), [
   "V14-L1", "V14-L2", "V14-L3", "V14-L4", "V14-L5", "V14-L6", "V14-L7",
   "V14-L8", "V14-L9", "V14-L10", "V14-L11", "V14-L12", "V14-L13", "V14-L14",
@@ -276,7 +276,7 @@ const a4Updated = upsertRequirementProjection(a4Source, a4, "hybrid");
 assert.match(a4Updated, /мтс:требование:V14-L12:начало/);
 assert.ok(a4Updated.includes("Авторский текст A4."), "compiler projection must preserve authored bytes");
 
-// A75 accepts the owner registry, but #1585 still owns prose materialization.
+// #1585 materialized all accepted owners; compiler must be idempotent.
 assert.deepEqual(compileRequirementDocuments(root, false), []);
 assert.deepEqual(compileRequirementDocuments(root, true), []);
 
@@ -326,16 +326,20 @@ try {
   expect(() => loadMtsSemanticIr(tempRoot), /Markdown document surface differs/);
   rmSync(rogue);
 
-  const materialized = readRegistry();
-  materialized.projectionState = "MATERIALIZED";
-  writeRegistry(materialized);
+  const a4OwnerPath = resolve(tempRoot, "docs/theory/Система аксиом МТС.md");
+  const a4OwnerSource = readFileSync(a4OwnerPath, "utf8");
+  writeFileSync(
+    a4OwnerPath,
+    a4OwnerSource.replace('<a id="mts-v014-v14-l12"></a>\n', ""),
+    "utf8",
+  );
   expect(
     () => compileRequirementDocuments(tempRoot, false),
     /anchor not found/,
-    "materialization must not invent missing stable anchors before #1585",
+    "materialized projection must fail closed when a stable owner anchor disappears",
   );
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
 
-console.log("MTS Compiler A75: GREEN REQUIREMENTS=14 REGISTRY=v0.2 PROSE_MATERIALIZATION=PENDING_1585");
+console.log("MTS Compiler D20: GREEN REQUIREMENTS=14 REGISTRY=v0.2 PROSE_MATERIALIZATION=MATERIALIZED");
