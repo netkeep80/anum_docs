@@ -258,11 +258,21 @@ function main(): void {
   const ambientAddClaim = add(N1, N1, N2);
   memory.ensure(theory, ambientAddClaim);
   const ambientLe = occurrence(memory, le(N1, N2), leFromAdd, [ambientAddClaim]);
+
+  // Host metadata is deliberately external to Memory. Even strongly suggestive
+  // names cannot turn an ambient claim into selected proof authority.
+  const hostMetadata = new Map<LinkHandle, Readonly<{ ruleKind: string }>>([
+    [ambientAddClaim, Object.freeze({ ruleKind: "Add" })],
+    [ambientLe, Object.freeze({ ruleKind: "Le" })],
+  ]);
+  same(hostMetadata.get(ambientAddClaim)?.ruleKind, "Add", "host Add tag exists");
+  same(hostMetadata.get(ambientLe)?.ruleKind, "Le", "host Le tag exists");
+
   expectReplayReject(
     () => replayConstructorScopedStructuralOccurrence(
       memory, arithmeticAuthority, arithmeticAuthorityAdmission, ambientLe,
     ),
-    "ambient Add claim without ProofOccurrence",
+    "ambient Add claim without ProofOccurrence despite host tags",
   );
 
   // -----------------------------------------------------------------------
@@ -351,6 +361,7 @@ function main(): void {
     "ADD_CONSTRUCTOR_SCOPE_ENFORCED=TRUE",
     "FORGED_ADD_CANNOT_WITNESS_LE=TRUE",
     "AMBIENT_ADD_CANNOT_WITNESS_LE=TRUE",
+    "HOST_METADATA_AUTHORITY=NONE",
     "ZERO_ROOTED_SUCCESSOR_USED=TRUE",
     "N1_NOT_DEGREE_ONE=TRUE",
     "LEGACY_ZERO_SUCCESSOR_REJECTED=TRUE",
