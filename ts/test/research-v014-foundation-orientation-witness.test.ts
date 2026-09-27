@@ -1,4 +1,7 @@
 // mts-version-evidence: candidate-from=0.14
+// Historical Y1 global-witness experiment retained as a one-Context gauge falsifier.
+// N20b/#1673 supersedes global selected-W authority with Context-local
+// one-sided self-incidence orientation markers.
 
 import {
   decomposeV013SemanticLink,
@@ -327,8 +330,10 @@ function main(): void {
     "UNORDERED_COLLAPSE_L_U=CONFIRMED",
     "UNORDERED_COLLAPSE_INR_OUTR=CONFIRMED",
     "RAW_LINK_PRESENCE_AUTHORITY=FALSE",
-    "EXACTLY_ONE_DISTINGUISHED_WITNESS=REQUIRED",
-    "ZERO_OR_TWO_WITNESSES=UNRESOLVED",
+    "HISTORICAL_SINGLE_CONTEXT_ONE_WITNESS_RESOLVES_GAUGE=TRUE",
+    "GLOBAL_SELECTED_W_NORMATIVE_AUTHORITY=FALSE",
+    "HISTORICAL_ZERO_OR_TWO_WITNESSES=UNRESOLVED",
+    "FINAL_A4_MODEL=CONTEXT_RELATIVE_N20B",
     "START_END_CONTINUATION_CHIRALITY=PRESERVED",
     "ACCEPTED_V013_MUTATED=FALSE",
   ].join(" "));
