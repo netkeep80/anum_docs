@@ -252,7 +252,7 @@
   "blockers": {
     "a4FinalChoice": "GREEN_CONTEXT_RELATIVE_AUTHOR_REFINED",
     "formalSurfaceGrammar": "GREEN_RESEARCH",
-    "traceability": "GREEN_CANDIDATE",
+    "traceability": "GREEN_ACCEPTED_A75",
     "readinessAudit": "GREEN_INDEPENDENT_POST_N20C_AUDIT",
     "explicitAuthorAcceptance": "GREEN_ACCEPTED_A75"
   },
