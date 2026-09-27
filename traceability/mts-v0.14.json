@@ -299,7 +299,7 @@
         "ts/test/research-v014-orientation-gauge-view.test.ts",
         "ts/test/research-v014-a4-operational-equivalence.test.ts",
         "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
-        "ts/test/research-v014-a4prime-link-carried-selection.test.ts"
+        "ts/test/research-v014-sequence-layer-boundary.test.ts"
       ],
       "documentationOwner": {
         "registry": "requirements/mts-v0.14.json",
