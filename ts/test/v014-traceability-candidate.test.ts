@@ -77,9 +77,9 @@ assert(text(traceability.schema, "traceability schema") === "mts-traceability/v0
 assert(bool(contract.accepted, "contract accepted") === false, "candidate contract must remain nonaccepted");
 assert(bool(conformance.accepted, "conformance accepted") === false, "candidate conformance must remain nonaccepted");
 assert(bool(traceability.accepted, "traceability accepted") === false, "candidate traceability must remain nonaccepted");
-assert(bool(contract.acceptanceReady, "contract readiness") === false, "candidate contract must remain nonready");
-assert(bool(conformance.acceptanceReady, "conformance readiness") === false, "candidate conformance must remain nonready");
-assert(bool(traceability.acceptanceReady, "traceability readiness") === false, "candidate traceability must remain nonready");
+assert(bool(contract.acceptanceReady, "contract readiness") === true, "candidate contract is readiness-complete");
+assert(bool(conformance.acceptanceReady, "conformance readiness") === true, "candidate conformance is readiness-complete");
+assert(bool(traceability.acceptanceReady, "traceability readiness") === true, "candidate traceability is readiness-complete");
 assert(traceability.acceptance === null, "candidate traceability must not claim an acceptance manifest");
 
 assert(
@@ -131,19 +131,20 @@ assert(
 const candidateState = record(contract.candidateState, "candidate state");
 assert(bool(candidateState.traceabilityComplete, "traceabilityComplete") === true, "candidate traceability graph is complete");
 assert(bool(candidateState.foundationOrientationFinalChoiceComplete, "orientation freeze") === true, "A4' author choice is frozen");
-assert(bool(candidateState.readinessAuditComplete, "readiness audit") === false, "readiness audit remains open");
+assert(bool(candidateState.readinessAuditComplete, "readiness audit") === true, "independent readiness audit is complete");
 assert(bool(candidateState.explicitAuthorAcceptanceRecorded, "author acceptance") === false, "author acceptance remains absent");
 
 const blockers = record(conformance.blockers, "conformance blockers");
 assert(text(blockers.traceability, "traceability blocker") === "GREEN_CANDIDATE", "traceability blocker closes only as candidate");
 assert(text(blockers.a4FinalChoice, "A4 blocker") === "GREEN_AUTHOR_FROZEN", "A4 blocker closes only by explicit author freeze");
-assert(text(blockers.readinessAudit, "readiness blocker") === "BLOCKING_PENDING", "readiness blocker remains");
+assert(text(blockers.readinessAudit, "readiness blocker") === "GREEN_INDEPENDENT_AUDIT", "readiness blocker is closed by N18");
 assert(text(blockers.explicitAuthorAcceptance, "author blocker") === "BLOCKING_PENDING", "author acceptance blocker remains");
 
 const planned = strings(conformance.plannedExecutableGates, "planned gates");
 assert(!planned.includes("pending:v014-traceability"), "traceability must no longer be planned-only");
 assert(!planned.includes("pending:v014-a4-semantic-freeze-projection"), "A4 freeze is no longer planned-only");
-assert(planned.includes("pending:v014-independent-readiness-audit"), "readiness audit remains planned");
+assert(!planned.includes("pending:v014-independent-readiness-audit"), "readiness audit is no longer planned-only");
+assert(planned.length === 0, "no planned executable gates remain");
 
 const current = record(record(policy.packs, "policy packs")["contract-conformance"], "contract pack");
 const currentPair = record(current.current, "current contract pair");
@@ -172,7 +173,8 @@ console.log([
   "EXECUTABLE_GATES_RESOLVE=TRUE",
   "A4_FINAL_CHOICE=GREEN_AUTHOR_FROZEN",
   "A4_PRIME_MODEL=GLOBAL_Z2_TORSOR_WITH_DERIVED_START_END",
-  "READINESS_AUDIT=BLOCKING_PENDING",
+  "READINESS_AUDIT=GREEN_INDEPENDENT_AUDIT",
+  "ACCEPTANCE_READY=TRUE",
   "EXPLICIT_AUTHOR_ACCEPTANCE=BLOCKING_PENDING",
   "V014_ACCEPTED=FALSE",
   "V013_CURRENT_POINTER_UNCHANGED=TRUE",
