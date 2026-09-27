@@ -101,7 +101,7 @@
     ],
     "implicitPairAssociativity": "NONE",
     "ambiguousUngroupedFormsRejected": true,
-    "finalSurfaceGrammar": "PLANNED_BLOCKING_GATE"
+    "finalSurfaceGrammar": "GREEN_RESEARCH"
   },
   "sequenceSemantics": {
     "anum": "rooted compact representation/coding of a sequence of Links",
@@ -230,7 +230,7 @@
     "researchEvidenceSubstantial": true,
     "arithmeticAcceptanceScopeClosed": true,
     "foundationOrientationFinalChoiceComplete": false,
-    "formalSurfaceGrammarComplete": false,
+    "formalSurfaceGrammarComplete": true,
     "traceabilityComplete": false,
     "documentationComplete": false,
     "readinessAuditComplete": false,
@@ -245,7 +245,6 @@
     "currentAcceptedRemains": "mts-contract/v0.13",
     "blockers": [
       "final A4/A4' semantic freeze",
-      "final v0.14 ostensive FORMAL grammar surface",
       "v0.14 traceability",
       "independent readiness audit",
       "explicit author acceptance"
