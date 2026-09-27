@@ -9,7 +9,7 @@
   "semanticBase": "mts-conformance/v0.13",
   "observableSemanticDelta": true,
   "coverageState": "partial-blocking",
-  "coverageStateMeaning": "Research evidence, candidate traceability and A4 operational equivalence are projected; final A4/A4' normative freeze, independent readiness audit and explicit author acceptance remain blocking.",
+  "coverageStateMeaning": "Research evidence, candidate traceability and the author-frozen A4' chiral-torsor orientation law are projected; independent readiness audit and explicit author acceptance remain blocking.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13"
@@ -77,7 +77,8 @@
     "ts/test/research-v014-order-replay-mul-scope.test.ts",
     "ts/test/research-v014-ostensive-formal-grammar.test.ts",
     "ts/test/v014-traceability-candidate.test.ts",
-    "ts/test/research-v014-a4-operational-equivalence.test.ts"
+    "ts/test/research-v014-a4-operational-equivalence.test.ts",
+    "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts"
   ],
   "requiredExecutableGates": [
     "ts/test/v013-relative-form-quartet.test.ts",
@@ -140,7 +141,8 @@
     "ts/test/research-v014-order-replay-mul-scope.test.ts",
     "ts/test/research-v014-ostensive-formal-grammar.test.ts",
     "ts/test/v014-traceability-candidate.test.ts",
-    "ts/test/research-v014-a4-operational-equivalence.test.ts"
+    "ts/test/research-v014-a4-operational-equivalence.test.ts",
+    "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts"
   ],
   "requiredNegativeVectors": [
     "v014-local-unordered-collapses-o-c-l-u-and-orientation-orbit",
@@ -159,7 +161,6 @@
     "v014-candidate-does-not-change-current-accepted-pointer"
   ],
   "plannedExecutableGates": [
-    "pending:v014-a4-semantic-freeze-projection",
     "pending:v014-independent-readiness-audit"
   ],
   "crossRepositoryAcceptanceDependencies": [
@@ -175,7 +176,8 @@
       "ts/test/research-v014-foundation-orientation-witness.test.ts",
       "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
       "ts/test/research-v014-orientation-gauge-view.test.ts",
-      "ts/test/research-v014-a4-operational-equivalence.test.ts"
+      "ts/test/research-v014-a4-operational-equivalence.test.ts",
+      "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts"
     ],
     "q14": [
       "ts/test/v014-q14-versioned-interpreter.test.ts"
@@ -208,7 +210,7 @@
     ]
   },
   "blockers": {
-    "a4FinalChoice": "BLOCKING_PENDING",
+    "a4FinalChoice": "GREEN_AUTHOR_FROZEN",
     "formalSurfaceGrammar": "GREEN_RESEARCH",
     "traceability": "GREEN_CANDIDATE",
     "readinessAudit": "BLOCKING_PENDING",
@@ -232,7 +234,8 @@
     "v014-multiplication-scope-deferred-grounded",
     "v014-generalized-mp-nonregression-grounded",
     "v014-orientation-gauge-research-grounded",
-    "v014-a4-operational-equivalence-grounded"
+    "v014-a4-operational-equivalence-grounded",
+    "v014-a4prime-chiral-torsor-bootstrap-grounded"
   ],
   "traceabilityManifest": "traceability/mts-v0.14.json"
 }

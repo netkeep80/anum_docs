@@ -36,29 +36,42 @@
   },
   "foundationOrientation": {
     "literalLocallyUnorderedPoles": "FALSIFIED",
-    "globalPolarityModel": "EXECUTABLY_SUPPORTED",
+    "unorderedPoleQuotientUsed": false,
+    "preOrientationPoleModel": "GLOBAL_Z2_TORSOR",
+    "absolutePoleNamesBeforeWitness": false,
+    "technicalCarrierCoordinatesAreSemanticAuthority": false,
+    "globalPolarityModel": "EXECUTABLY_SUPPORTED_AND_AUTHOR_FROZEN",
     "globalDuality": "J",
+    "distinguishedChiralWitness": "W",
+    "witnessDefinedBeforeStartEnd": true,
     "chiralOrbit": [
-      "InR = C ⟼ R",
-      "OutR = R ⟼ O"
+      "W",
+      "J(W)"
     ],
-    "recursiveWires": {
-      "InR": "1688",
-      "OutR": "1898"
-    },
     "rawMemoryPresenceIsAuthority": false,
     "selectedExactlyOneWitnessResolvesOrientation": true,
     "zeroOrTwoSelectedWitnesses": "UNRESOLVED",
     "gaugeDerivationOfStartEnd": "EXECUTABLY_SUPPORTED",
-    "finalNormativeChoice": "PENDING_AUTHOR_SEMANTIC_FREEZE",
-    "choices": [
-      "preserve v0.13 ordered-pole A4 wording",
-      "adopt global-polarity + distinguished-chiral-witness A4'"
+    "derivedRolesAfterWitness": [
+      "START",
+      "END"
     ],
+    "postOrientationIdentification": {
+      "selectedW": "InR = C ⟼ R",
+      "mirrorJW": "OutR = R ⟼ O"
+    },
+    "recursiveWiresAfterOrientation": {
+      "InR": "1688",
+      "OutR": "1898"
+    },
     "operationalEquivalenceAudit": "GREEN_RESEARCH",
     "directGaugeMatchesCurrentKernel": true,
     "mirrorGaugeIsExactJImage": true,
-    "resolvedGaugeCount": 2
+    "resolvedGaugeCount": 2,
+    "finalNormativeChoice": "A4_PRIME_CHIRAL_TORSOR_DERIVED_START_END",
+    "normativeStatus": "AUTHOR_FROZEN",
+    "authorDecisionIssue": "#1662",
+    "authorDecisionDate": "2026-09-27"
   },
   "recursiveAlphabet": {
     "name": "recursive MTS alphabet",
@@ -228,12 +241,12 @@
     "V14-L9": "Derived Le requires canonical Add proof authority.",
     "V14-L10": "Multiplication/full semiring is explicitly outside the v0.14 acceptance scope.",
     "V14-L11": "Generalized modus ponens/reaction is preserved from accepted v0.13.",
-    "V14-L12": "Absolute START/END foundation naming awaits explicit A4/A4' semantic freeze."
+    "V14-L12": "A4': before orientation, Link pole positions form a global Z2 torsor with no primitive absolute START/END naming; exactly one selected chiral witness W from {W,J(W)} fixes the global frame, after which START/END and O/C/L/U are derived and W is identified as InR = C ⟼ R."
   },
   "candidateState": {
     "researchEvidenceSubstantial": true,
     "arithmeticAcceptanceScopeClosed": true,
-    "foundationOrientationFinalChoiceComplete": false,
+    "foundationOrientationFinalChoiceComplete": true,
     "formalSurfaceGrammarComplete": true,
     "traceabilityComplete": true,
     "documentationComplete": false,

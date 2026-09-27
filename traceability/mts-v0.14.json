@@ -204,12 +204,13 @@
       ]
     },
     "V14-L12": {
-      "status": "BLOCKING_PENDING_AUTHOR_SEMANTIC_FREEZE",
+      "status": "GREEN_AUTHOR_FROZEN",
       "contractPointer": "/requiredSemanticLaws/V14-L12",
       "positive": {
         "requiredPositiveVectors": [
           "v014-orientation-gauge-research-grounded",
-          "v014-a4-operational-equivalence-grounded"
+          "v014-a4-operational-equivalence-grounded",
+          "v014-a4prime-chiral-torsor-bootstrap-grounded"
         ]
       },
       "negative": {
@@ -223,7 +224,8 @@
         "ts/test/research-v014-foundation-orientation-witness.test.ts",
         "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
         "ts/test/research-v014-orientation-gauge-view.test.ts",
-        "ts/test/research-v014-a4-operational-equivalence.test.ts"
+        "ts/test/research-v014-a4-operational-equivalence.test.ts",
+        "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts"
       ]
     }
   }

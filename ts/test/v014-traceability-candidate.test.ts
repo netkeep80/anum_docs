@@ -124,25 +124,25 @@ for (const id of Object.keys(laws).sort()) {
 
 assert(
   text(record(invariants["V14-L12"], "V14-L12").status, "V14-L12 status") ===
-    "BLOCKING_PENDING_AUTHOR_SEMANTIC_FREEZE",
-  "A4/A4' must remain explicitly blocking",
+    "GREEN_AUTHOR_FROZEN",
+  "A4' author semantic freeze must be projected",
 );
 
 const candidateState = record(contract.candidateState, "candidate state");
 assert(bool(candidateState.traceabilityComplete, "traceabilityComplete") === true, "candidate traceability graph is complete");
-assert(bool(candidateState.foundationOrientationFinalChoiceComplete, "orientation freeze") === false, "A4/A4' choice remains open");
+assert(bool(candidateState.foundationOrientationFinalChoiceComplete, "orientation freeze") === true, "A4' author choice is frozen");
 assert(bool(candidateState.readinessAuditComplete, "readiness audit") === false, "readiness audit remains open");
 assert(bool(candidateState.explicitAuthorAcceptanceRecorded, "author acceptance") === false, "author acceptance remains absent");
 
 const blockers = record(conformance.blockers, "conformance blockers");
 assert(text(blockers.traceability, "traceability blocker") === "GREEN_CANDIDATE", "traceability blocker closes only as candidate");
-assert(text(blockers.a4FinalChoice, "A4 blocker") === "BLOCKING_PENDING", "A4 blocker remains");
+assert(text(blockers.a4FinalChoice, "A4 blocker") === "GREEN_AUTHOR_FROZEN", "A4 blocker closes only by explicit author freeze");
 assert(text(blockers.readinessAudit, "readiness blocker") === "BLOCKING_PENDING", "readiness blocker remains");
 assert(text(blockers.explicitAuthorAcceptance, "author blocker") === "BLOCKING_PENDING", "author acceptance blocker remains");
 
 const planned = strings(conformance.plannedExecutableGates, "planned gates");
 assert(!planned.includes("pending:v014-traceability"), "traceability must no longer be planned-only");
-assert(planned.includes("pending:v014-a4-semantic-freeze-projection"), "A4 freeze remains planned");
+assert(!planned.includes("pending:v014-a4-semantic-freeze-projection"), "A4 freeze is no longer planned-only");
 assert(planned.includes("pending:v014-independent-readiness-audit"), "readiness audit remains planned");
 
 const current = record(record(policy.packs, "policy packs")["contract-conformance"], "contract pack");
@@ -170,7 +170,8 @@ console.log([
   "POSITIVE_VECTORS_RESOLVE=TRUE",
   "NEGATIVE_VECTORS_RESOLVE=TRUE",
   "EXECUTABLE_GATES_RESOLVE=TRUE",
-  "A4_FINAL_CHOICE=BLOCKING_PENDING",
+  "A4_FINAL_CHOICE=GREEN_AUTHOR_FROZEN",
+  "A4_PRIME_MODEL=GLOBAL_Z2_TORSOR_WITH_DERIVED_START_END",
   "READINESS_AUDIT=BLOCKING_PENDING",
   "EXPLICIT_AUTHOR_ACCEPTANCE=BLOCKING_PENDING",
   "V014_ACCEPTED=FALSE",
