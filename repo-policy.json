@@ -2031,7 +2031,7 @@
         "projection": "object_keys",
         "type": "string_set"
       },
-      "target_anchor_type": "semantic_law_owner"
+      "target_anchor_type": "semantic_law_registry_owner"
     }
   ],
   "anchors": {
@@ -2075,6 +2075,15 @@
             "kind": "regex",
             "glob": "docs/**/*.md",
             "pattern": "<!--\\s*ссылка:mts-law-([A-Za-z][A-Za-z0-9]*)\\s*-->"
+          }
+        ]
+      },
+      "semantic_law_registry_owner": {
+        "sources": [
+          {
+            "kind": "regex",
+            "glob": "requirements/mts-v0.14.json",
+            "pattern": "\\\"id\\\"\\s*:\\s*\\\"(V14-L[0-9]+)\\\""
           }
         ]
       }
