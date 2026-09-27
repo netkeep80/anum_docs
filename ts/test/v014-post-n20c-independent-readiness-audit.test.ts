@@ -2,7 +2,7 @@
 // research-owner: #1679
 //
 // N21: fresh independent post-N20c readiness audit.
-// This gate certifies readiness only. It MUST NOT accept or cut over v0.14.
+// This gate preserves the independent readiness proof after A75 consumes it; the gate itself never performs acceptance.
 
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -30,7 +30,7 @@ const conformance=readJson("contracts/mts-conformance-v0.14.json");
 const traceability=readJson("traceability/mts-v0.14.json");
 const requirements=readJson("requirements/mts-v0.14.json");
 const policy=readJson("repo-policy.json");
-const acceptance13=readJson("cutover/typescript-c1-acceptance-v0.6.json");
+const acceptance14=readJson("cutover/typescript-c1-acceptance-v0.7.json");
 
 // Live-kernel anchor: this is not a JSON-only readiness declaration.
 const memory=new Memory();
@@ -47,23 +47,23 @@ assert(explicitRoot!==empty,"one explicit R position is distinct from empty sequ
 same(memory.ensure(basis.R,basis.R),basis.R,"ordinary fold of R over R collapses to R");
 
 // Candidate lifecycle.
-same(contract.status,"candidate","contract status");
-same(conformance.status,"candidate","conformance status");
-same(traceability.status,"candidate","traceability status");
-same(contract.accepted,false,"contract remains nonaccepted");
-same(conformance.accepted,false,"conformance remains nonaccepted");
-same(traceability.accepted,false,"traceability remains nonaccepted");
+same(contract.status,"accepted","contract status");
+same(conformance.status,"accepted","conformance status");
+same(traceability.status,"accepted","traceability status");
+same(contract.accepted,true,"contract is accepted by A75");
+same(conformance.accepted,true,"conformance is accepted by A75");
+same(traceability.accepted,true,"traceability is accepted by A75");
 same(contract.acceptanceReady,true,"contract readiness");
 same(conformance.acceptanceReady,true,"conformance readiness");
 same(traceability.acceptanceReady,true,"traceability readiness");
-same(traceability.acceptance,null,"candidate has no acceptance manifest");
+same(traceability.acceptance,"cutover/typescript-c1-acceptance-v0.7.json","accepted traceability manifest");
 same(contract.candidateState.readinessAuditComplete,true,"N21 readiness complete");
-same(contract.candidateState.explicitAuthorAcceptanceRecorded,false,"author acceptance absent");
-same(contract.implementation.acceptedRuntime,"mts-contract/v0.13","accepted runtime remains v0.13");
+same(contract.candidateState.explicitAuthorAcceptanceRecorded,true,"author acceptance recorded");
+same(contract.implementation.acceptedRuntime,"mts-contract/v0.14","accepted runtime rotated to v0.14");
 same(contract.implementation.candidateRuntimeSelectable,false,"candidate runtime not selectable");
 same(contract.implementation.productionBehaviorChanged,false,"no production behavior change");
 same(contract.implementation.singleLiveSemanticRuntime,true,"single live runtime");
-assert(!existsSync(join(repoRoot,"cutover/typescript-c1-acceptance-v0.7.json")),"no v0.14 cutover exists");
+assert(existsSync(join(repoRoot,"cutover/typescript-c1-acceptance-v0.7.json")),"v0.14 cutover exists");
 
 // Exact semantic graph.
 const laws=Object.keys(contract.requiredSemanticLaws).sort();
@@ -189,8 +189,8 @@ for(const gate of [
 // Documentation remains projection-only before acceptance.
 same(contract.candidateState.documentationOwnershipMapComplete,true,"doc owner map complete");
 same(contract.candidateState.documentationComplete,false,"human prose remains post-acceptance");
-same(contract.acceptanceBoundary.documentationReconstructionUnblocked,false,"#1585 remains blocked");
-same(requirements.projectionState,"PREDECLARED_OWNER_ONLY_PROSE_DEFERRED_TO_1585","projection state");
+same(contract.acceptanceBoundary.documentationReconstructionUnblocked,true,"#1585 is unblocked after acceptance");
+same(requirements.projectionState,"ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585","projection state");
 
 // Readiness provenance and old-freeze invalidation.
 same(contract.readinessAudit.status,"GREEN_INDEPENDENT_POST_N20C_AUDIT","contract readiness status");
@@ -198,19 +198,19 @@ same(contract.readinessAudit.issue,1679,"current readiness issue");
 same(contract.readinessAudit.previousAudit.issue,1666,"historical audit issue");
 same(contract.readinessAudit.previousAudit.frozenDossier,1668,"historical freeze");
 same(contract.readinessAudit.previousAudit.validForAcceptance,false,"old freeze invalid");
-same(contract.readinessAudit.newFreezeRequired,true,"fresh freeze required");
-same(contract.readinessAudit.onlyRemainingBlocker,"explicit author acceptance","only blocker");
+same(contract.readinessAudit.newFreezeRequired,false,"accepted freeze consumed by A75");
+same(contract.readinessAudit.onlyRemainingBlocker,null,"acceptance blocker cleared");
 same(conformance.readinessAudit.requiredExecutableGateCount,70,"conformance gate count");
 same(conformance.readinessAudit.plannedExecutableGateCount,0,"conformance planned gates");
 same(conformance.readinessAudit.candidateSemanticReady,true,"semantic readiness");
-same(conformance.readinessAudit.accepted,false,"readiness does not accept");
+same(conformance.readinessAudit.accepted,true,"readiness consumed by accepted lifecycle");
 same(traceability.readinessAudit.issue,1679,"traceability readiness issue");
 
 // Current accepted release remains immutable/current.
-same(policy.packs["contract-conformance"].current.contract.path,"contracts/mts-contract-v0.13.json","policy current contract");
-same(policy.packs["contract-conformance"].current.conformance.path,"contracts/mts-conformance-v0.13.json","policy current conformance");
-same(acceptance13.current.contract,"contracts/mts-contract-v0.13.json","accepted current contract");
-same(acceptance13.current.conformance,"contracts/mts-conformance-v0.13.json","accepted current conformance");
+same(policy.packs["contract-conformance"].current.contract.path,"contracts/mts-contract-v0.14.json","policy current contract");
+same(policy.packs["contract-conformance"].current.conformance.path,"contracts/mts-conformance-v0.14.json","policy current conformance");
+same(acceptance14.current.contract,"contracts/mts-contract-v0.14.json","accepted current contract");
+same(acceptance14.current.conformance,"contracts/mts-conformance-v0.14.json","accepted current conformance");
 
 console.log([
   "MTS v0.14 N21: POST_N20C_INDEPENDENT_READINESS=GREEN",
@@ -224,8 +224,8 @@ console.log([
   "GENERALIZED_MP_FULL_CHAIN=GREEN",
   "DOCUMENTATION_OWNER_MAP=GREEN",
   "OLD_FREEZE_1668_VALID=FALSE",
-  "NEW_FREEZE_REQUIRED=TRUE",
+  "NEW_FREEZE_REQUIRED=FALSE",
   "ACCEPTANCE_READY=TRUE",
-  "MTS_V014_ACCEPTED=FALSE",
-  "ONLY_REMAINING_BLOCKER=EXPLICIT_AUTHOR_ACCEPTANCE",
+  "MTS_V014_ACCEPTED=TRUE",
+  "ONLY_REMAINING_BLOCKER=NONE",
 ].join(" "));
