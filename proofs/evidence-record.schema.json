@@ -158,5 +158,113 @@
     "notes": {
       "type": "string"
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "lane": {
+            "enum": [
+              "lean4",
+              "coq"
+            ]
+          }
+        },
+        "required": [
+          "lane"
+        ]
+      },
+      "then": {
+        "properties": {
+          "proofSource": {
+            "required": [
+              "repository",
+              "commitSha",
+              "toolchain"
+            ]
+          },
+          "authority": {
+            "const": "external-cross-check"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lane": {
+            "const": "typescript"
+          }
+        },
+        "required": [
+          "lane"
+        ]
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "const": "executable-witness"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lane": {
+            "const": "mtsNative"
+          }
+        },
+        "required": [
+          "lane"
+        ]
+      },
+      "then": {
+        "properties": {
+          "mts": {
+            "required": [
+              "acceptedVersion",
+              "sourceCommitSha",
+              "theoryRevision"
+            ]
+          },
+          "authority": {
+            "const": "native-replay"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lane": {
+            "const": "aprover"
+          }
+        },
+        "required": [
+          "lane"
+        ]
+      },
+      "then": {
+        "properties": {
+          "mts": {
+            "required": [
+              "acceptedVersion",
+              "sourceCommitSha",
+              "theoryRevision"
+            ]
+          },
+          "authority": {
+            "const": "independent-consumer-replay"
+          },
+          "result": {
+            "enum": [
+              "accepted",
+              "rejected"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }
