@@ -166,15 +166,10 @@ implementation notes
 GitHub — источник текущего состояния проекта; `immutable` `acceptance` `artifacts` сохраняют границы принятых версий.
 
 ## Обозреватель контрактов
-
-`Contract` `Observatory` строится из `machine-readable` `contract`/`traceability`/`requirements` и позволяет проследить:
-
-```text
-law
--> vectors
--> executable gates
--> documentation owner
-```
+<a id="mts-readme-contract-observatory"></a>
+<!-- мтс:требование:README-OBSERVATORY:начало -->
+[Открыть Обозреватель контрактов](https://netkeep80.github.io/anum_docs/) — Производная визуализация принятых машинных свидетельств только для чтения; она не является смысловым авторитетом.
+<!-- мтс:требование:README-OBSERVATORY:конец -->
 
 ## Разработка
 
@@ -193,7 +188,11 @@ new semantic claim
 ```
 
 ## Авторы и соавторы
-
-Основной автор МТС: **Роман Вертушкин**.
-
-Исследования и реализация развиваются совместно с участниками проекта и проверяются через GitHub `history`, `executable` `witnesses` и `contract-driven` `governance`.
+<a id="mts-readme-authors"></a>
+<!-- мтс:требование:README-AUTHORS:начало -->
+- [Вертушкин Роман Павлович](https://github.com/netkeep80)
+- [Дьяченко Константин Константинович](https://github.com/konard)
+- [Шакиров Тимур Эдуардович](https://github.com/TimaxLacs)
+- [Бурдуков Александр Николаевич](https://github.com/InAiwetrustAGI)
+- [Глазунов Иван Сергеевич](https://github.com/ivansglazunov)
+<!-- мтс:требование:README-AUTHORS:конец -->
