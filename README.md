@@ -2,7 +2,7 @@
 <!-- версия документа МТС; mts-doc-version: v0.14 -->
 > **Версия МТС: v0.14**
 
-![anum_docs — Метатеория Связей](docs/assets/anum_docs-banner.png)
+![anum_docs — Метатеория Связей](docs/assets/anum_docs-banner.jpg)
 
 **Метатеория связей (МТС)** — формальная система с одной первичной сущностью: **Связью (Link)**.
 
