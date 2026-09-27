@@ -72,12 +72,10 @@ negativeVector("v014-ambient-add-link-is-not-canonical-proof-authority", mapped(
 negativeVector("v014-forged-add-constructor-cannot-witness-functionality", mapped("v014-forged-add-constructor-cannot-witness-functionality"));
 negativeVector("v014-forged-add-constructor-cannot-witness-le", mapped("v014-forged-add-constructor-cannot-witness-le"));
 negativeVector("v014-legacy-succ-u-equals-l-rejected", mapped("v014-legacy-succ-u-equals-l-rejected"));
-negativeVector(
-  "v014-candidate-does-not-change-current-accepted-pointer",
+negativeVector("v014-candidate-does-not-change-current-accepted-pointer",
   previousAcceptance.current.contract === "contracts/mts-contract-v0.13.json"
     && acceptance.evidence.preAcceptanceReadyMainSha === "05c4bf3362b559d67dafd2892b937f14c2b89f18"
-    && acceptance.evidence.authorDecisionComment === 5858021017,
-);
+    && acceptance.evidence.authorDecisionComment === 5858021017);
 negativeVector("v014-global-selected-w-required-rejected", mapped("v014-global-selected-w-required-rejected"));
 negativeVector("v014-exact-sequence-is-not-orientation-authority", mapped("v014-exact-sequence-is-not-orientation-authority"));
 negativeVector("v014-four-recursive-forms-are-not-primitive-opcodes", mapped("v014-four-recursive-forms-are-not-primitive-opcodes"));
@@ -90,13 +88,11 @@ const lawIds = Object.keys(contract.requiredSemanticLaws).sort();
 const ownerKeys = requirements.requirements.map(
   (item: any) => String(item.docProjection?.path) + "#" + String(item.docProjection?.anchor),
 );
-negativeVector(
-  "v014-accepted-law-without-doc-owner-rejected",
+negativeVector("v014-accepted-law-without-doc-owner-rejected",
   requirements.status === "accepted"
     && JSON.stringify(requirementIds) === JSON.stringify(lawIds)
     && new Set(ownerKeys).size === ownerKeys.length
-    && ownerKeys.every((key: string) => !key.includes("undefined")),
-);
+    && ownerKeys.every((key: string) => !key.includes("undefined")));
 
 console.log([
   "MTS v0.14 A75: ACCEPTANCE_CUTOVER=GREEN",
