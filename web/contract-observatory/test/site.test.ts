@@ -22,6 +22,15 @@ function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
 }
 
+function escapeHtmlForAssertion(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function throws(action: () => void, message: string): void {
   let rejected = false;
   try {
@@ -93,18 +102,20 @@ assert(realHtml.includes("<main class=\"versions\""), "V3 version overview retai
 assert(realHtml.includes(":focus-visible"), "visible keyboard focus styling");
 assert(realHtml.includes("@media (max-width: 680px)"), "responsive baseline");
 assert(!realHtml.includes('<script src="http') && !realHtml.includes('<link rel="stylesheet" href="http'), "no external runtime asset dependency");
-same(realSemanticIr.requirements.length, 13, "P3a renders compiler-supported v0.13 requirements");
+same(realSemanticIr.requirements.length, 14, "P3a renders compiler-supported v0.14 requirements");
 assert(realHtml.includes('id="requirements-title"'), "semantic requirement hierarchy is rendered");
-assert(realHtml.includes('data-requirement-id="L4"'), "stable requirement ID is rendered");
-assert(realHtml.includes("representation/recursive-alphabet/prefix-codec"), "contract classification path is rendered");
-assert(realHtml.includes("f740e98eade6204d"), "statement digest is rendered");
-assert(realHtml.includes(realSemanticIr.requirements.find((item) => item.id === "L4")!.statement), "exact contract statement is rendered");
-assert(realHtml.includes("https://github.com/netkeep80/anum_docs/blob/main/docs/specs/"), "human Markdown projection has direct source navigation");
+const renderedRequirement = realSemanticIr.requirements.find((item) => item.id === "V14-L12");
+assert(renderedRequirement !== undefined, "V14-L12 requirement exists in current semantic IR");
+assert(realHtml.includes('data-requirement-id="V14-L12"'), "stable requirement ID is rendered");
+assert(realHtml.includes(renderedRequirement.classificationPath), "contract classification path is rendered");
+assert(realHtml.includes(renderedRequirement.statementDigest), "statement digest is rendered");
+assert(realHtml.includes(escapeHtmlForAssertion(renderedRequirement.statement)), "exact current contract statement is rendered");
+assert(realHtml.includes("https://github.com/netkeep80/anum_docs/blob/main/docs/theory/"), "human Markdown projection has direct source navigation");
 assert(realHtml.includes('data-requirement-filter-axis="kind"'), "P3b kind filter is rendered from validated IR");
 assert(realHtml.includes('data-requirement-filter-axis="status"'), "P3b status filter is rendered from validated IR");
 assert(realHtml.includes('data-requirement-filter-axis="layer"'), "P3b layer filter is rendered from classification path");
 assert(realHtml.includes('data-requirement-controller="validated-ir"'), "P3b requirement filter controller is embedded");
-assert(realHtml.includes('href="#requirement-L4"'), "stable requirement ID is URL-addressable");
+assert(realHtml.includes('href="#requirement-V14-L12"'), "stable requirement ID is URL-addressable");
 assert(realHtml.includes("Зависимые требования"), "reverse dependency backlinks are rendered");
 assert(realHtml.includes("неразрешённых или отсутствующих обязательных метаданных = 0"), "clean validated IR has explicit zero diagnostics");
 assert(realHtml.includes("Сравнение по стабильному ID недоступно"), "missing previous compiler registry is explicit instead of inferred");
@@ -112,7 +123,7 @@ same(realMarkdownCoverage.summary.documentCount, 12, "P5 renders all registered 
 same(realMarkdownCoverage.summary.headingCount, 306, "P5 preserves P4 heading baseline");
 same(realMarkdownCoverage.summary.canonicalNodeCount, 22, "P5 preserves canonical node baseline");
 same(realMarkdownCoverage.summary.unanchoredHeadingCount, 284, "P5 makes unanchored knowledge explicit");
-same(realMarkdownCoverage.summary.currentlyUnclassifiedSectionCount, 279, "P5 preserves conservative unclassified baseline");
+same(realMarkdownCoverage.summary.currentlyUnclassifiedSectionCount, 292, "A75 preserves conservative pre-#1585 prose baseline");
 assert(realHtml.includes('id="coverage-title"'), "Markdown coverage diagnostics are rendered");
 assert(realHtml.includes("Авторский текст:</strong> PRESERVE"), "authored prose preservation boundary is visible");
 assert(realHtml.includes("NOT AUTHORIZED"), "destructive whole-node mutation boundary is visible");
@@ -122,8 +133,8 @@ throws(() => validateMarkdownCoverage({ schema: "mts-markdown-coverage/v0.1", co
 assert(realHtml.includes("<section class=\"methodology-map\""), "V4c methodology map is rendered as the primary explanatory view");
 assert(realHtml.includes("aria-label=\"Стадии методологии\""), "methodology stages expose a semantic keyboard-navigation group");
 assert(realHtml.includes("data-methodology-stage=\"challenged\""), "methodology stage controls carry deterministic stage identity");
-assert(realHtml.includes("data-version-id=\"mts-contract/v0.12\""), "previous version lane carries exact projected contract identity");
-assert(realHtml.includes("data-version-id=\"mts-contract/v0.13\""), "current version lane carries exact projected contract identity");
+assert(realHtml.includes("data-version-id=\"mts-contract/v0.13\""), "previous version lane carries exact projected contract identity");
+assert(realHtml.includes("data-version-id=\"mts-contract/v0.14\""), "current version lane carries exact projected contract identity");
 assert(realHtml.includes("ТЕКУЩАЯ"), "current classification remains explicit in V4c");
 assert(realHtml.includes("ПРЕДЫДУЩАЯ"), "previous classification remains explicit in V4c");
 for (const candidate of realIndex.versions.filter((entry) => entry.status === "candidate" || !entry.accepted)) {
@@ -134,9 +145,9 @@ assert(realHtml.includes("Семантические Связи МТС: в эт�
 assert(realHtml.includes("data-observatory-controller=\"shared-kernel\""), "static page embeds the shared canonical interaction kernel controller");
 assert(!realHtml.includes("const readState ="), "static page no longer owns the old handwritten hash parser");
 
-const v012Position = realHtml.indexOf('data-version-id="mts-contract/v0.12"');
 const v013Position = realHtml.indexOf('data-version-id="mts-contract/v0.13"');
-assert(v012Position >= 0 && v013Position > v012Position, "timeline preserves current active-pair natural order");
+const v014Position = realHtml.indexOf('data-version-id="mts-contract/v0.14"');
+assert(v013Position >= 0 && v014Position > v013Position, "timeline preserves current active-pair natural order");
 assert(!realHtml.includes('data-version-id="mts-contract/v0.10"'), "removed v0.10 active pair has no version lane");
 assert(realHtml.includes(realIndex.acceptancePath), "acceptance provenance visible");
 assert(realHtml.includes(realIndex.currentContractPath), "current contract provenance visible");
@@ -146,12 +157,12 @@ const current = realIndex.versions.find((entry) => entry.isCurrent);
 const previous = realIndex.versions.find((entry) => entry.isPrevious);
 assert(current !== undefined, "real current version exists");
 assert(previous !== undefined, "real previous version exists");
-same(current.contractId, "mts-contract/v0.13", "real current is accepted v0.13");
+same(current.contractId, "mts-contract/v0.14", "real current is accepted v0.14");
 same(current.status, "accepted", "real current status is accepted");
 same(current.accepted, true, "real current accepted flag is explicit");
 same(current.acceptanceReady, true, "real current retains readiness evidence");
-same(current.requiredExecutableGateCount, 39, "real current preserves all v0.13 gates");
-same(previous.contractId, "mts-contract/v0.12", "real previous is accepted v0.12");
+same(current.requiredExecutableGateCount, 70, "real current preserves all v0.14 gates");
+same(previous.contractId, "mts-contract/v0.13", "real previous is accepted v0.13");
 assert(realHtml.includes(String(current.requiredExecutableGateCount)), "current gate count rendered");
 assert(realHtml.includes(String(current.requiredNegativeVectorCount)), "current negative-vector count rendered");
 assert(realHtml.includes(`id=\"version-${realIndex.versions.indexOf(current) + 1}\" class=\"version-card current\"`), "current section classified");

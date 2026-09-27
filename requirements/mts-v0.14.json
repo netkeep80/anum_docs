@@ -1,6 +1,6 @@
 {
   "schema": "mts-requirement-registry/v0.2",
-  "status": "candidate",
+  "status": "accepted",
   "issue": 1677,
   "contract": "mts-contract/v0.14",
   "semanticSource": {
@@ -11,7 +11,7 @@
     {
       "id": "V14-L1",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "theory/foundation/emergent-recursive-forms"
       },
@@ -29,7 +29,7 @@
     {
       "id": "V14-L2",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "notation/formal/ostensive-grammar"
       },
@@ -49,7 +49,7 @@
     {
       "id": "V14-L3",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "representation/anum/q14-version-separation"
       },
@@ -69,7 +69,7 @@
     {
       "id": "V14-L4",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "execution/reaction/result-basis"
       },
@@ -90,7 +90,7 @@
     {
       "id": "V14-L5",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "theory/foundation/link-identity-immutability"
       },
@@ -108,7 +108,7 @@
     {
       "id": "V14-L6",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "derived/nat/zero-rooted-successor"
       },
@@ -128,7 +128,7 @@
     {
       "id": "V14-L7",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "derived/count/exact-sequence"
       },
@@ -149,7 +149,7 @@
     {
       "id": "V14-L8",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "derived/add/canonical-constructor"
       },
@@ -169,7 +169,7 @@
     {
       "id": "V14-L9",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "derived/order/canonical-add"
       },
@@ -189,7 +189,7 @@
     {
       "id": "V14-L10",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "derived/mul/deferred-scope"
       },
@@ -209,7 +209,7 @@
     {
       "id": "V14-L11",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "execution/generalized-modus-ponens"
       },
@@ -229,7 +229,7 @@
     {
       "id": "V14-L12",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "theory/foundation/context-relative-chiral-gauge"
       },
@@ -247,7 +247,7 @@
     {
       "id": "V14-L13",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "representation/anum/sequence-semantics"
       },
@@ -267,7 +267,7 @@
     {
       "id": "V14-L14",
       "kind": "semantic-law",
-      "status": "candidate",
+      "status": "accepted",
       "classification": {
         "path": "architecture/semantic-representation-layers"
       },
@@ -290,7 +290,7 @@
   "traceabilitySource": {
     "path": "traceability/mts-v0.14.json"
   },
-  "projectionState": "PREDECLARED_OWNER_ONLY_PROSE_DEFERRED_TO_1585",
+  "projectionState": "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585",
   "documentSurface": {
     "README.md": {
       "mode": "hybrid"
@@ -328,5 +328,11 @@
     "docs/Словарь терминов МТС.md": {
       "mode": "hybrid"
     }
+  },
+  "acceptance": {
+    "manifest": "cutover/typescript-c1-acceptance-v0.7.json",
+    "authorDecisionIssue": 1586,
+    "authorDecisionComment": 5858021017,
+    "freezeIssue": 1683
   }
 }

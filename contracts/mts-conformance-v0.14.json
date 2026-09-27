@@ -1,7 +1,7 @@
 {
   "schema": "mts-conformance/v0.14",
-  "status": "candidate",
-  "accepted": false,
+  "status": "accepted",
+  "accepted": true,
   "acceptanceReady": true,
   "issue": 1586,
   "candidateLifecycleIssue": 1586,
@@ -9,10 +9,10 @@
   "semanticBase": "mts-conformance/v0.13",
   "observableSemanticDelta": true,
   "coverageState": "complete",
-  "coverageStateMeaning": "The converged post-N20c MTS v0.14 candidate has complete mandatory executable evidence and a fresh independent N21 readiness audit; it remains nonaccepted until explicit author acceptance.",
+  "coverageStateMeaning": "Accepted MTS v0.14 scope: 14 semantic laws, 70 mandatory executable gates, zero planned gates, context-relative A4′, explicit Anum/layer boundaries, full generalized-MP witness chain, independent N21 readiness and explicit author acceptance.",
   "acceptedCurrent": {
-    "contract": "mts-contract/v0.13",
-    "conformance": "mts-conformance/v0.13"
+    "contract": "mts-contract/v0.14",
+    "conformance": "mts-conformance/v0.14"
   },
   "inheritedExecutableGates": [
     "ts/test/v013-relative-form-quartet.test.ts",
@@ -252,16 +252,18 @@
   "blockers": {
     "a4FinalChoice": "GREEN_CONTEXT_RELATIVE_AUTHOR_REFINED",
     "formalSurfaceGrammar": "GREEN_RESEARCH",
-    "traceability": "GREEN_CANDIDATE",
+    "traceability": "GREEN_ACCEPTED_A75",
     "readinessAudit": "GREEN_INDEPENDENT_POST_N20C_AUDIT",
-    "explicitAuthorAcceptance": "BLOCKING_PENDING"
+    "explicitAuthorAcceptance": "GREEN_ACCEPTED_A75"
   },
   "lifecycle": {
-    "currentPointerChanged": false,
+    "currentPointerChanged": true,
     "acceptedV013Mutated": false,
     "candidatePresenceImpliesAcceptance": false,
     "preN20Freeze1668ValidForAcceptance": false,
-    "n20cConvergenceIssue": 1677
+    "n20cConvergenceIssue": 1677,
+    "acceptedV014": true,
+    "acceptanceManifest": "cutover/typescript-c1-acceptance-v0.7.json"
   },
   "requiredPositiveVectors": [
     "v014-recursive-link-alphabet-grounded",
@@ -296,10 +298,22 @@
     "requiredExecutableGateCount": 70,
     "plannedExecutableGateCount": 0,
     "candidateSemanticReady": true,
-    "accepted": false,
-    "productionCutoverPerformed": false,
+    "accepted": true,
+    "productionCutoverPerformed": true,
     "documentationPostAcceptanceIssue": 1585,
-    "newFreezeRequired": true,
-    "onlyRemainingBlocker": "explicit author acceptance"
+    "newFreezeRequired": false,
+    "onlyRemainingBlocker": null
+  },
+  "acceptance": {
+    "performedHere": true,
+    "acceptedMtsVersion": "mts-contract/v0.14",
+    "previousAcceptedVersion": "mts-contract/v0.13",
+    "authorDecisionIssue": 1586,
+    "authorDecisionComment": 5858021017,
+    "authorDecision": "ACCEPT_MTS_V0_14",
+    "preAcceptanceReadyMainSha": "05c4bf3362b559d67dafd2892b937f14c2b89f18",
+    "exactFreezeIssue": 1683,
+    "cutoverIssue": 1684,
+    "cutoverManifest": "cutover/typescript-c1-acceptance-v0.7.json"
   }
 }

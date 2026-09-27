@@ -1,6 +1,6 @@
 // mts-version-evidence: candidate-from=0.14
 // research-owner: #1677
-// Candidate traceability audit. This gate is fail-closed and does not accept v0.14.
+// Traceability audit retained across candidate -> accepted A75 lifecycle.
 
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -59,7 +59,7 @@ const conformance = json(join(repoRoot, "contracts/mts-conformance-v0.14.json"))
 const traceability = json(join(repoRoot, "traceability/mts-v0.14.json"));
 const requirements = json(join(repoRoot, "requirements/mts-v0.14.json"));
 const policy = json(join(repoRoot, "repo-policy.json"));
-const acceptance13 = json(join(repoRoot, "cutover/typescript-c1-acceptance-v0.6.json"));
+const acceptance14 = json(join(repoRoot, "cutover/typescript-c1-acceptance-v0.7.json"));
 
 // Mandatory semantic audit remains attached to the real kernel.
 const kernel = new Memory();
@@ -71,13 +71,13 @@ assert(kernel.ensure(basis.C, basis.O) === basis.U, "live kernel U remains canon
 assert(text(contract.schema, "contract schema") === "mts-contract/v0.14", "contract identity");
 assert(text(conformance.schema, "conformance schema") === "mts-conformance/v0.14", "conformance identity");
 assert(text(traceability.schema, "traceability schema") === "mts-traceability/v0.2", "traceability identity");
-assert(bool(contract.accepted, "contract accepted") === false, "candidate contract remains nonaccepted");
-assert(bool(conformance.accepted, "conformance accepted") === false, "candidate conformance remains nonaccepted");
-assert(bool(traceability.accepted, "traceability accepted") === false, "candidate traceability remains nonaccepted");
+assert(bool(contract.accepted, "contract accepted") === true, "contract is accepted by A75");
+assert(bool(conformance.accepted, "conformance accepted") === true, "conformance is accepted by A75");
+assert(bool(traceability.accepted, "traceability accepted") === true, "traceability is accepted by A75");
 assert(bool(contract.acceptanceReady, "contract readiness") === true, "N21 readiness is green");
 assert(bool(conformance.acceptanceReady, "conformance readiness") === true, "N21 conformance readiness is green");
 assert(bool(traceability.acceptanceReady, "traceability readiness") === true, "N21 traceability readiness is green");
-assert(traceability.acceptance === null, "candidate traceability has no acceptance manifest");
+assert(traceability.acceptance === "cutover/typescript-c1-acceptance-v0.7.json", "accepted traceability has v0.7 manifest");
 
 const laws = record(contract.requiredSemanticLaws, "contract laws");
 const invariants = record(traceability.invariants, "traceability invariants");
@@ -128,13 +128,13 @@ assert(bool(candidateState.foundationOrientationFinalChoiceComplete, "A4 choice"
 assert(bool(candidateState.traceabilityComplete, "traceability") === true, "traceability complete");
 assert(bool(candidateState.documentationOwnershipMapComplete, "doc owners") === true, "doc ownership complete");
 assert(bool(candidateState.readinessAuditComplete, "readiness audit") === true, "post-N20c readiness audit is complete");
-assert(bool(candidateState.explicitAuthorAcceptanceRecorded, "author acceptance") === false, "author acceptance absent");
+assert(bool(candidateState.explicitAuthorAcceptanceRecorded, "author acceptance") === true, "author acceptance recorded");
 
 const blockers = record(conformance.blockers, "conformance blockers");
 assert(text(blockers.a4FinalChoice, "A4 blocker") === "GREEN_CONTEXT_RELATIVE_AUTHOR_REFINED", "A4 blocker closed by context-relative result");
-assert(text(blockers.traceability, "traceability blocker") === "GREEN_CANDIDATE", "traceability candidate green");
+assert(text(blockers.traceability, "traceability blocker") === "GREEN_ACCEPTED_A75", "traceability accepted green");
 assert(text(blockers.readinessAudit, "readiness blocker") === "GREEN_INDEPENDENT_POST_N20C_AUDIT", "fresh readiness audit is green");
-assert(text(blockers.explicitAuthorAcceptance, "acceptance blocker") === "BLOCKING_PENDING", "explicit acceptance still required");
+assert(text(blockers.explicitAuthorAcceptance, "acceptance blocker") === "GREEN_ACCEPTED_A75", "explicit acceptance recorded");
 
 const planned = strings(conformance.plannedExecutableGates, "planned gates");
 assert(planned.length === 0, "no planned executable gates remain after N21");
@@ -142,13 +142,13 @@ assert(gateAuthority.has("ts/test/v014-post-n20c-independent-readiness-audit.tes
 
 const current = record(record(policy.packs, "policy packs")["contract-conformance"], "contract pack");
 const currentPair = record(current.current, "current pair");
-assert(text(record(currentPair.contract, "current contract").path, "current contract path") === "contracts/mts-contract-v0.13.json", "repo-policy current remains v0.13");
-assert(text(record(currentPair.conformance, "current conformance").path, "current conformance path") === "contracts/mts-conformance-v0.13.json", "repo-policy conformance remains v0.13");
+assert(text(record(currentPair.contract, "current contract").path, "current contract path") === "contracts/mts-contract-v0.14.json", "repo-policy current is v0.14");
+assert(text(record(currentPair.conformance, "current conformance").path, "current conformance path") === "contracts/mts-conformance-v0.14.json", "repo-policy conformance is v0.14");
 
-const acceptedCurrent = record(acceptance13.current, "accepted current");
-assert(text(acceptedCurrent.contract, "accepted contract") === "contracts/mts-contract-v0.13.json", "cutover current contract remains v0.13");
-assert(text(acceptedCurrent.conformance, "accepted conformance") === "contracts/mts-conformance-v0.13.json", "cutover current conformance remains v0.13");
-assert(!existsSync(join(repoRoot, "cutover/typescript-c1-acceptance-v0.7.json")), "no v0.14 cutover exists");
+const acceptedCurrent = record(acceptance14.current, "accepted current");
+assert(text(acceptedCurrent.contract, "accepted contract") === "contracts/mts-contract-v0.14.json", "cutover current contract is v0.14");
+assert(text(acceptedCurrent.conformance, "accepted conformance") === "contracts/mts-conformance-v0.14.json", "cutover current conformance is v0.14");
+assert(existsSync(join(repoRoot, "cutover/typescript-c1-acceptance-v0.7.json")), "v0.14 cutover exists");
 
 console.log([
   "MTS v0.14 N20c: CANDIDATE_TRACEABILITY=GREEN",
@@ -160,6 +160,6 @@ console.log([
   "DOCUMENTATION_OWNER_MAP=GREEN",
   "READINESS_AUDIT=GREEN_INDEPENDENT_POST_N20C_AUDIT",
   "ACCEPTANCE_READY=TRUE",
-  "V014_ACCEPTED=FALSE",
-  "V013_CURRENT_POINTER_UNCHANGED=TRUE",
+  "V014_ACCEPTED=TRUE",
+  "V014_CURRENT_POINTER=TRUE",
 ].join(" "));

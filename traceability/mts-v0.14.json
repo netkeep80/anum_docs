@@ -1,12 +1,12 @@
 {
   "schema": "mts-traceability/v0.2",
-  "status": "candidate",
-  "accepted": false,
+  "status": "accepted",
+  "accepted": true,
   "acceptanceReady": true,
   "contract": "contracts/mts-contract-v0.14.json",
   "conformance": "contracts/mts-conformance-v0.14.json",
-  "issue": 1677,
-  "acceptance": null,
+  "issue": 1586,
+  "acceptance": "cutover/typescript-c1-acceptance-v0.7.json",
   "currentAccepted": {
     "contract": "contracts/mts-contract-v0.13.json",
     "conformance": "contracts/mts-conformance-v0.13.json",
@@ -380,8 +380,16 @@
     "issue": 1679,
     "previousAuditIssue": 1666,
     "invalidatedFrozenDossier": 1668,
-    "newFreezeRequired": true,
-    "accepted": false,
-    "onlyRemainingBlocker": "explicit author acceptance"
+    "newFreezeRequired": false,
+    "accepted": true,
+    "onlyRemainingBlocker": null,
+    "acceptanceManifest": "cutover/typescript-c1-acceptance-v0.7.json"
+  },
+  "authorDecision": {
+    "issue": 1586,
+    "comment": 5858021017,
+    "decision": "ACCEPT_MTS_V0_14",
+    "frozenCandidateMainSha": "05c4bf3362b559d67dafd2892b937f14c2b89f18",
+    "freezeIssue": 1683
   }
 }

@@ -20,26 +20,26 @@ assert(current !== undefined, "current version exists");
 assert(previous !== undefined, "previous version exists");
 assert(historicalV011 !== undefined, "historical v0.11 version exists");
 
-same(current.contractId, "mts-contract/v0.13", "current release is v0.13 after A74");
-same(current.semanticInvariants.length, 13, "current v0.13 exposes L1-L13 through traceability authority");
-same(current.traceabilityManifestPath, "traceability/mts-v0.13.json", "current v0.13 traceability manifest source is explicit");
-assert(!current.unresolvedRelations.includes("traceability-manifest"), "current v0.13 traceability manifest is resolved");
+same(current.contractId, "mts-contract/v0.14", "current release is v0.14 after A75");
+same(current.semanticInvariants.length, 14, "current v0.14 exposes V14-L1..V14-L14 through traceability authority");
+same(current.traceabilityManifestPath, "traceability/mts-v0.14.json", "current v0.14 traceability manifest source is explicit");
+assert(!current.unresolvedRelations.includes("traceability-manifest"), "current v0.14 traceability manifest is resolved");
 
-const currentFormal = current.semanticInvariants.find((invariant) => invariant.id === "L12");
-assert(currentFormal !== undefined, "current v0.13 FORMAL grounding invariant L12 is projected");
+const currentA4 = current.semanticInvariants.find((invariant) => invariant.id === "V14-L12");
+assert(currentA4 !== undefined, "current v0.14 context-relative A4 prime invariant V14-L12 is projected");
 assert(
-  currentFormal.requiredExecutableGates.includes("ts/test/v013-root-aspect-formal-composition.test.ts"),
-  "current v0.13 L12 is bound to its executable FORMAL gate",
+  currentA4.requiredExecutableGates.includes("ts/test/research-v014-context-relative-a4prime.test.ts"),
+  "current v0.14 V14-L12 is bound to its executable context-relative A4 prime gate",
 );
-const formalGroup = currentFormal.positiveGroups?.find((group) => group.sourceSet === "requiredPositiveVectors");
-assert(formalGroup !== undefined, "v0.2 preserves requiredPositiveVectors as an explicit source set");
+const a4Group = currentA4.positiveGroups?.find((group) => group.sourceSet === "requiredPositiveVectors");
+assert(a4Group !== undefined, "v0.14 preserves requiredPositiveVectors as an explicit source set");
 assert(
-  formalGroup.vectorIds.includes("v013-formal-root-R-from-8"),
-  "v0.13 L12 source set carries its exact conformance vector",
+  a4Group.vectorIds.includes("v014-context-relative-a4prime-grounded"),
+  "v0.14 V14-L12 source set carries its exact context-relative positive vector",
 );
 
-same(previous.contractId, "mts-contract/v0.12", "previous release is immutable v0.12 evidence");
-same(previous.semanticInvariants.length, 18, "previous v0.12 exposes exactly eighteen authority invariants");
+same(previous.contractId, "mts-contract/v0.13", "previous release is immutable v0.13 evidence");
+same(previous.semanticInvariants.length, 13, "previous v0.13 exposes exactly thirteen authority invariants");
 const topLevelDot = historicalV011.semanticInvariants.find((invariant) => invariant.id === "topLevelDot");
 assert(topLevelDot !== undefined, "topLevelDot invariant is projected from traceability authority");
 same(topLevelDot.traceabilitySourcePath, "traceability/mts-v0.11.json", "manifest source path remains explicit");
@@ -90,6 +90,7 @@ assert(html.includes(". -&gt; R under TopBind(R,S)"), "resolved contract law is 
 assert(html.includes("traceability/mts-v0.11.json"), "traceability manifest provenance is visible");
 assert(html.includes("traceability/mts-v0.12.json"), "v0.12 traceability provenance is visible");
 assert(html.includes("traceability/mts-v0.13.json"), "v0.13 traceability provenance is visible");
+assert(html.includes("traceability/mts-v0.14.json"), "v0.14 traceability provenance is visible");
 assert(html.includes("Векторы формальной нотации"), "v0.2 FORMAL positive source set has a Russian presentation label");
 assert(html.includes("Межслойные векторы"), "v0.2 cross-layer positive source set has a Russian presentation label");
 for (const label of [

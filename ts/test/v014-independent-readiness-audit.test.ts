@@ -24,7 +24,7 @@ const contract=readJson("contracts/mts-contract-v0.14.json");
 const conformance=readJson("contracts/mts-conformance-v0.14.json");
 const traceability=readJson("traceability/mts-v0.14.json");
 const policy=readJson("repo-policy.json");
-const acceptance13=readJson("cutover/typescript-c1-acceptance-v0.6.json");
+const acceptance14=readJson("cutover/typescript-c1-acceptance-v0.7.json");
 
 const memory=new Memory();
 const basis=ensureRootBasis(memory);
@@ -32,9 +32,9 @@ assert(basis.R!==basis.O&&basis.O!==basis.C,"live kernel RootBasis remains prope
 same(memory.ensure(basis.O,basis.C),basis.L,"L remains canonical");
 same(memory.ensure(basis.C,basis.O),basis.U,"U remains canonical");
 
-same(contract.accepted,false,"v0.14 remains nonaccepted");
-same(conformance.accepted,false,"conformance remains nonaccepted");
-same(traceability.accepted,false,"traceability remains nonaccepted");
+same(contract.accepted,true,"v0.14 is accepted by A75");
+same(conformance.accepted,true,"conformance is accepted by A75");
+same(traceability.accepted,true,"traceability is accepted by A75");
 same(contract.acceptanceReady,true,"fresh N21 readiness may be green");
 same(conformance.acceptanceReady,true,"fresh conformance readiness");
 same(traceability.acceptanceReady,true,"fresh traceability readiness");
@@ -45,7 +45,7 @@ same(contract.readinessAudit.previousAudit.issue,1666,"N18 is historical");
 same(contract.readinessAudit.previousAudit.status,"HISTORICAL_SUPERSEDED_BY_N20C","N18 superseded");
 same(contract.readinessAudit.previousAudit.frozenDossier,1668,"old freeze identity");
 same(contract.readinessAudit.previousAudit.validForAcceptance,false,"old freeze remains invalid");
-same(contract.readinessAudit.newFreezeRequired,true,"new freeze remains required");
+same(contract.readinessAudit.newFreezeRequired,false,"A75 consumed the exact freeze");
 
 same(contract.foundationOrientation.finalNormativeChoice,"A4_PRIME_CONTEXT_RELATIVE_Z2_GAUGE","current A4 model");
 same(contract.foundationOrientation.globalSelectedWitnessRequired,false,"global selected W rejected");
@@ -61,13 +61,13 @@ same(conformance.plannedExecutableGates.length,0,"no planned gates remain");
 assert(conformance.requiredExecutableGates.includes("ts/test/v014-post-n20c-independent-readiness-audit.test.ts"),"N21 audit is mandatory");
 
 same(contract.candidateState.documentationComplete,false,"prose remains post-acceptance");
-same(contract.acceptanceBoundary.documentationReconstructionUnblocked,false,"#1585 still blocked");
-same(contract.implementation.acceptedRuntime,"mts-contract/v0.13","accepted runtime remains v0.13");
+same(contract.acceptanceBoundary.documentationReconstructionUnblocked,true,"#1585 unblocked after acceptance");
+same(contract.implementation.acceptedRuntime,"mts-contract/v0.14","accepted runtime is v0.14");
 same(contract.implementation.candidateRuntimeSelectable,false,"candidate not selectable");
 same(contract.implementation.productionBehaviorChanged,false,"no production behavior delta");
-same(policy.packs["contract-conformance"].current.contract.path,"contracts/mts-contract-v0.13.json","policy current remains v0.13");
-same(acceptance13.current.contract,"contracts/mts-contract-v0.13.json","cutover current remains v0.13");
-assert(!existsSync(join(repoRoot,"cutover/typescript-c1-acceptance-v0.7.json")),"no v0.14 cutover");
+same(policy.packs["contract-conformance"].current.contract.path,"contracts/mts-contract-v0.14.json","policy current is v0.14");
+same(acceptance14.current.contract,"contracts/mts-contract-v0.14.json","cutover current is v0.14");
+assert(existsSync(join(repoRoot,"cutover/typescript-c1-acceptance-v0.7.json")),"v0.14 cutover exists");
 
 console.log([
   "MTS v0.14 N18: HISTORICAL_READINESS_SUPERSEDED=GREEN",
@@ -77,5 +77,5 @@ console.log([
   "REQUIRED_GATE_COUNT=70",
   "CONTEXT_RELATIVE_A4_PRIME=TRUE",
   "ACCEPTANCE_READY=TRUE",
-  "V014_ACCEPTED=FALSE",
+  "V014_ACCEPTED=TRUE",
 ].join(" "));

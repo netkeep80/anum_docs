@@ -246,96 +246,96 @@ assert.ok(surface.includes("docs/research/Исходные мысли МТС.md"
 assert.ok(surface.includes("docs/theory/Система аксиом МТС.md"));
 
 const ir = loadMtsSemanticIr(root);
-assert.equal(ir.contract, "mts-contract/v0.13");
+assert.equal(ir.schema, "mts-requirement-registry/v0.2");
+assert.equal(ir.contract, "mts-contract/v0.14");
+assert.equal(ir.projectionState, "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585");
 assert.deepEqual(ir.requirements.map((x) => x.id), [
-  "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12", "L13",
+  "V14-L1", "V14-L2", "V14-L3", "V14-L4", "V14-L5", "V14-L6", "V14-L7",
+  "V14-L8", "V14-L9", "V14-L10", "V14-L11", "V14-L12", "V14-L13", "V14-L14",
 ]);
+assert.ok(ir.requirements.every((x) => x.status === "accepted"));
 assert.equal(Object.values(ir.documentModes).includes("generated"), false);
 
-const l4 = ir.requirements.find((x) => x.id === "L4");
-assert.ok(l4);
-assert.equal(l4.classificationPath, "representation/recursive-alphabet/prefix-codec");
-assert.equal(l4.statementDigest, "f740e98eade6204d");
-assert.deepEqual(
-  [l4.positiveVectorCount, l4.negativeVectorCount, l4.executableGateCount],
-  [7, 1, 2],
-);
-assert.match(renderRequirementProjection(l4), /мтс:требование:L4:начало/);
+const a4 = ir.requirements.find((x) => x.id === "V14-L12");
+assert.ok(a4);
+assert.equal(a4.classificationPath, "theory/foundation/context-relative-chiral-gauge");
+assert.match(a4.statementDigest, /^[0-9a-f]{16}$/);
+assert.ok(a4.positiveVectorCount > 0);
+assert.ok(a4.negativeVectorCount > 0);
+assert.ok(a4.executableGateCount > 0);
+assert.match(renderRequirementProjection(a4), /мтс:требование:V14-L12:начало/);
 
-for (const item of ir.requirements) {
-  const source = readFileSync(resolve(root, item.docPath), "utf8");
-  assert.equal(upsertRequirementProjection(source, item, ir.documentModes[item.docPath]), source);
-}
+const a4Source = [
+  markdownDb,
+  "",
+  '<a id="mts-v014-v14-l12"></a>',
+  "## A4 prime",
+  "Авторский текст A4.",
+].join("\n");
+const a4Updated = upsertRequirementProjection(a4Source, a4, "hybrid");
+assert.match(a4Updated, /мтс:требование:V14-L12:начало/);
+assert.ok(a4Updated.includes("Авторский текст A4."), "compiler projection must preserve authored bytes");
+
+// A75 accepts the owner registry, but #1585 still owns prose materialization.
 assert.deepEqual(compileRequirementDocuments(root, false), []);
+assert.deepEqual(compileRequirementDocuments(root, true), []);
 
-const tempRoot = mkdtempSync(resolve(tmpdir(), "mts-compiler-"));
+const tempRoot = mkdtempSync(resolve(tmpdir(), "mts-compiler-v014-"));
 const copy = (path: string): void => {
   const target = resolve(tempRoot, path);
   mkdirSync(dirname(target), { recursive: true });
   writeFileSync(target, readFileSync(resolve(root, path), "utf8"), "utf8");
 };
+const registryPath = "requirements/mts-v0.14.json";
 const readRegistry = (): any =>
-  JSON.parse(readFileSync(resolve(tempRoot, "requirements/mts-v0.13.json"), "utf8"));
+  JSON.parse(readFileSync(resolve(tempRoot, registryPath), "utf8"));
 const writeRegistry = (value: unknown): void =>
-  writeFileSync(resolve(tempRoot, "requirements/mts-v0.13.json"), JSON.stringify(value), "utf8");
+  writeFileSync(resolve(tempRoot, registryPath), JSON.stringify(value), "utf8");
 
 try {
   for (const path of [
     "repo-policy.json",
-    "contracts/mts-contract-v0.13.json",
-    "traceability/mts-v0.13.json",
-    "requirements/mts-v0.13.json",
+    "contracts/mts-contract-v0.14.json",
+    "traceability/mts-v0.14.json",
+    registryPath,
     ...surface,
   ]) copy(path);
 
-  const contractPath = resolve(tempRoot, "contracts/mts-contract-v0.13.json");
-  const contractSource = readFileSync(contractPath, "utf8");
-  const contract = JSON.parse(contractSource);
-  contract.requiredSemanticLaws.L4 += " changed";
-  writeFileSync(contractPath, JSON.stringify(contract), "utf8");
-  assert.deepEqual(compileRequirementDocuments(tempRoot, false), ["docs/specs/Ачисла и сериализация.md"]);
-  writeFileSync(contractPath, contractSource, "utf8");
+  assert.equal(loadMtsSemanticIr(tempRoot).requirements.length, 14);
+  assert.deepEqual(compileRequirementDocuments(tempRoot, false), []);
+  assert.deepEqual(compileRequirementDocuments(tempRoot, true), []);
 
-  const tracePath = resolve(tempRoot, "traceability/mts-v0.13.json");
-  const traceSource = readFileSync(tracePath, "utf8");
-  const trace = JSON.parse(traceSource);
-  trace.invariants.L4.requiredExecutableGates.push("ts/test/synthetic-gate.test.ts");
-  writeFileSync(tracePath, JSON.stringify(trace), "utf8");
-  assert.deepEqual(compileRequirementDocuments(tempRoot, false), ["docs/specs/Ачисла и сериализация.md"]);
-  writeFileSync(tracePath, traceSource, "utf8");
-
-  const registryPath = resolve(tempRoot, "requirements/mts-v0.13.json");
-  const registrySource = readFileSync(registryPath, "utf8");
-  const changedClass = readRegistry();
-  changedClass.requirements.find((x: any) => x.id === "L4").classification.path += "-v2";
-  writeRegistry(changedClass);
-  assert.deepEqual(compileRequirementDocuments(tempRoot, false), ["docs/specs/Ачисла и сериализация.md"]);
-  writeFileSync(registryPath, registrySource, "utf8");
-
-  const rogue = resolve(tempRoot, "docs/Новый неизвестный документ.md");
-  writeFileSync(rogue, "# Новый документ\n", "utf8");
-  expect(() => loadMtsSemanticIr(tempRoot), /Markdown document surface differs/);
-  rmSync(rogue);
-
+  const registrySource = readFileSync(resolve(tempRoot, registryPath), "utf8");
   const cases: Array<[(r: any) => void, RegExp]> = [
-    [(r) => { r.documentSurface["docs/specs/Ачисла и сериализация.md"].mode = "source"; }, /must be HYBRID/],
-    [(r) => { r.documentSurface["docs/specs/Ачисла и сериализация.md"].mode = "generated"; }, /GENERATED mode is forbidden/],
-    [(r) => { r.requirements.find((x: any) => x.id === "L4").classification.path = "flat"; }, /hierarchical path/],
-    [(r) => { r.requirements.find((x: any) => x.id === "L4").dependsOn = ["NO_SUCH"]; }, /unknown requirement/],
-    [(r) => { r.requirements.find((x: any) => x.id === "L4").docProjection.path = "docs/specs/Формальная нотация МТС.md"; }, /differs from accepted normative owner/],
+    [(r) => { r.schema = "mts-requirement-registry/v9"; }, /unsupported registry schema/],
+    [(r) => { r.requirements.find((x: any) => x.id === "V14-L12").classification.path = "flat"; }, /hierarchical path/],
+    [(r) => { r.requirements.find((x: any) => x.id === "V14-L12").dependsOn = ["NO_SUCH"]; }, /unknown requirement/],
+    [(r) => { r.requirements.find((x: any) => x.id === "V14-L12").docProjection.path = "docs/specs/Формальная нотация МТС.md"; }, /differs from traceability documentation owner/],
+    [(r) => { r.requirements = r.requirements.filter((x: any) => x.id !== "V14-L14"); }, /requirement id set differs/],
   ];
   for (const [mutate, pattern] of cases) {
     const registry = readRegistry();
     mutate(registry);
     writeRegistry(registry);
     expect(() => loadMtsSemanticIr(tempRoot), pattern);
-    writeFileSync(registryPath, registrySource, "utf8");
+    writeFileSync(resolve(tempRoot, registryPath), registrySource, "utf8");
   }
 
-  assert.deepEqual(compileRequirementDocuments(tempRoot, false), []);
-  assert.deepEqual(compileRequirementDocuments(tempRoot, true), []);
+  const rogue = resolve(tempRoot, "docs/Новый неизвестный документ.md");
+  writeFileSync(rogue, "# Новый документ\n", "utf8");
+  expect(() => loadMtsSemanticIr(tempRoot), /Markdown document surface differs/);
+  rmSync(rogue);
+
+  const materialized = readRegistry();
+  materialized.projectionState = "MATERIALIZED";
+  writeRegistry(materialized);
+  expect(
+    () => compileRequirementDocuments(tempRoot, false),
+    /anchor not found/,
+    "materialization must not invent missing stable anchors before #1585",
+  );
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
 
-console.log("MTS Compiler P2: GREEN REQUIREMENTS=13 MARKDOWN_TREE_DB=GREEN INSERT_CHILD=GREEN AUTHORED_BYTES_PRESERVED=GREEN");
+console.log("MTS Compiler A75: GREEN REQUIREMENTS=14 REGISTRY=v0.2 PROSE_MATERIALIZATION=PENDING_1585");

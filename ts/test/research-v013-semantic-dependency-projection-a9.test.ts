@@ -1086,30 +1086,67 @@ same(
   JSON.stringify(typedReadMemberCounts),
   "typed ReadMemory member counts",
 );
+const a75ToolingDeltaFiles = new Set([
+  "ts/src/tooling/docs-sync.ts",
+  "ts/src/tooling/markdown-coverage-audit.ts",
+  "ts/src/tooling/mts-compiler.ts",
+]);
+
+// The v0.13 S3 projection is immutable historical evidence. A75 changes only
+// post-v0.13 governance/documentation tooling, so the historical aggregate
+// fingerprint is not rewritten. Every file outside the explicit A75 tooling
+// boundary must remain count-identical to the frozen projection.
+const projectedDecisionCountsByFile = decisionAudit.decisionOwnerCountsByFile as Record<string, number>;
+const driftFiles = [...new Set([
+  ...Object.keys(projectedDecisionCountsByFile),
+  ...Object.keys(observedDecisionCountsByFile),
+])].filter((file) =>
+  (projectedDecisionCountsByFile[file] ?? 0) !== (observedDecisionCountsByFile[file] ?? 0)
+);
+assert(
+  driftFiles.every((file) => a75ToolingDeltaFiles.has(file)),
+  `A75 static decision drift is tooling-only: ${driftFiles.join(", ")}`,
+);
+assert(
+  decisionCandidates.length <= decisionAudit.decisionCandidateOwnerCount,
+  "A75 tooling refactor must not increase whole-package host-decision owner count",
+);
 same(
+  decisionAudit.decisionCandidateOwnerCount - decisionCandidates.length,
+  3,
+  "A75 removes exactly three tooling decision owners from the historical S3 snapshot",
+);
+
+for (const [file, projectedCount] of Object.entries(projectedDecisionCountsByFile)) {
+  if (a75ToolingDeltaFiles.has(file)) continue;
+  same(
+    observedDecisionCountsByFile[file] ?? 0,
+    projectedCount,
+    `${file}: historical decision owner count remains exact outside A75 tooling`,
+  );
+}
+
+for (const [category, projectedCount] of Object.entries(
+  decisionAudit.decisionOwnerCountsByCategory as Record<string, number>,
+)) {
+  if (category === "tooling") continue;
+  same(
+    observedDecisionCountsByCategory[category] ?? 0,
+    projectedCount,
+    `${category}: historical category count remains exact outside tooling`,
+  );
+}
+
+// Historical aggregate identity remains frozen in the projection itself.
+same(
+  projection.metrics.staticSemanticDecisionCandidateOwnerCount,
   decisionAudit.decisionCandidateOwnerCount,
-  decisionCandidates.length,
-  "static semantic decision candidate owner count",
+  "historical static semantic decision candidate metric remains frozen",
 );
 same(
-  decisionAudit.decisionCandidateFingerprintFNV64,
-  fnv1a64(decisionSignatures),
-  "static semantic decision candidate fingerprint",
-);
-same(
-  JSON.stringify(decisionAudit.decisionOwnerCountsByFile),
-  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionCountsByFile).sort())),
-  "decision owner counts by file",
-);
-same(
-  JSON.stringify(decisionAudit.decisionSignalCounts),
-  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionSignalCounts).sort())),
-  "decision signal counts",
-);
-same(
-  JSON.stringify(decisionAudit.decisionOwnerCountsByCategory),
-  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionCountsByCategory).sort())),
-  "decision owner counts by category",
+  projection.metrics.staticDecisionOwnersByCategory.tooling,
+  decisionAudit.decisionOwnerCountsByCategory.tooling,
+  "historical tooling category metric remains frozen",
 );
 same(
   decisionAudit.unclassifiedDecisionCandidateOwnerCount,
@@ -1150,21 +1187,25 @@ same(
   typedWriteOwners.length,
   "metric: typed direct Memory write owners",
 );
-same(
-  projection.metrics.staticSemanticDecisionCandidateOwnerCount,
-  decisionCandidates.length,
-  "metric: static decision candidate owners",
+assert(
+  decisionCandidates.length <= projection.metrics.staticSemanticDecisionCandidateOwnerCount,
+  "current static decision candidates do not exceed frozen v0.13 S3 metric",
 );
 same(
   projection.metrics.unclassifiedStaticDecisionCandidateOwnerCount,
   0,
   "metric: unclassified static decision candidates",
 );
-same(
-  JSON.stringify(projection.metrics.staticDecisionOwnersByCategory),
-  JSON.stringify(Object.fromEntries(Object.entries(observedDecisionCountsByCategory).sort())),
-  "metric: decision owners by category",
-);
+for (const [category, projectedCount] of Object.entries(
+  projection.metrics.staticDecisionOwnersByCategory as Record<string, number>,
+)) {
+  if (category === "tooling") continue;
+  same(
+    observedDecisionCountsByCategory[category] ?? 0,
+    projectedCount,
+    `metric: decision owners by non-tooling category ${category}`,
+  );
+}
 same(
   projection.metrics.packageWideExactWireLiteralDispatchCount,
   observedDecisionSignalCounts["wire-literal-dispatch"] ?? 0,
@@ -1266,5 +1307,5 @@ same(contract.implementation.candidateRuntimeSelectable, false, "candidate remai
 same(contract.candidateState.explicitAuthorAcceptanceRecorded, true, "author acceptance is recorded");
 
 console.log(
-  `MTS v0.13 A9 P1f: ${typedReadOwners.length} typed ReadMemory owners / ${typedReadSites.length} sites, ${decisionCandidates.length} static host-decision candidates, ${typedWriteOwners.length} typed direct Memory write owners; S3 static audit complete, runtime trust closure remains intentionally unclaimed: GREEN.`,
+  `MTS v0.13 A9 P1f/A75: ${typedReadOwners.length} typed ReadMemory owners / ${typedReadSites.length} sites, historical=${decisionAudit.decisionCandidateOwnerCount} current=${decisionCandidates.length} static host-decision candidates, drift=[${driftFiles.join(",")}], ${typedWriteOwners.length} typed direct Memory write owners; runtime/semantic files remain frozen, A75 tooling-only delta classified: GREEN.`,
 );

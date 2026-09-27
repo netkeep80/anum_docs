@@ -2,7 +2,7 @@
 // research-owner: #1677
 //
 // Final pre-acceptance closure witness for N20c.
-// This gate remains kernel-backed and does not accept v0.14.
+// This kernel-backed closure witness is retained after A75 acceptance.
 
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -152,7 +152,7 @@ same(contract.generalizedMpNonRegression.fullInheritedWitnessChainRequired, true
 // Requirement/documentation projection exists before prose reconstruction.
 
 same(registry.schema, "mts-requirement-registry/v0.2", "registry schema");
-same(registry.status, "candidate", "registry stays pre-acceptance");
+same(registry.status, "accepted", "registry accepted by A75");
 same(registry.issue, 1677, "registry owner issue");
 same(contract.documentationProjectionRegistry, "requirements/mts-v0.14.json", "contract points to registry");
 same(traceability.documentationProjectionRegistry, "requirements/mts-v0.14.json", "traceability points to registry");
@@ -164,7 +164,7 @@ same(JSON.stringify(reqIds), JSON.stringify(lawIds), "one requirement projection
 
 const ownerKeys = new Set<string>();
 for (const requirement of registry.requirements as any[]) {
-  same(requirement.status, "candidate", requirement.id + " remains candidate");
+  same(requirement.status, "accepted", requirement.id + " accepted by A75");
   same(
     requirement.authority.pointer,
     "/requiredSemanticLaws/" + requirement.id,
@@ -187,12 +187,12 @@ for (const requirement of registry.requirements as any[]) {
 
 same(contract.candidateState.documentationOwnershipMapComplete, true, "documentation owner map complete");
 same(contract.candidateState.documentationComplete, false, "human prose reconstruction remains deferred");
-same(contract.acceptanceBoundary.documentationReconstructionUnblocked, false, "#1585 remains blocked before acceptance");
+same(contract.acceptanceBoundary.documentationReconstructionUnblocked, true, "#1585 unblocked after acceptance");
 
 same(contract.acceptanceReady, true, "N20c semantic closure is now independently readiness-audited");
 same(conformance.acceptanceReady, true, "conformance readiness is now independently audited");
 same(traceability.acceptanceReady, true, "traceability readiness is now independently audited");
-same(contract.accepted, false, "v0.14 remains nonaccepted");
+same(contract.accepted, true, "v0.14 accepted by A75");
 
 console.log([
   "MTS v0.14 N20c: PREACCEPTANCE_CLOSURE=GREEN",
@@ -208,5 +208,5 @@ console.log([
   "GENERALIZED_MP_FULL_CHAIN_REQUIRED=TRUE",
   "ONE_CANONICAL_DOC_OWNER_PER_LAW=TRUE",
   "POST_N20C_READINESS_AUDIT=GREEN_N21",
-  "MTS_V014_ACCEPTED=FALSE",
+  "MTS_V014_ACCEPTED=TRUE",
 ].join(" "));

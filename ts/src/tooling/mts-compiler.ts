@@ -9,7 +9,7 @@ import {
 
 type JsonObject = Record<string, unknown>;
 
-export const MTS_REQUIREMENT_REGISTRY_PATH = "requirements/mts-v0.13.json";
+export const MTS_REQUIREMENT_REGISTRY_PATH = "requirements/mts-v0.14.json";
 
 export interface MtsRequirementProjection {
   readonly id: string;
@@ -36,6 +36,7 @@ export interface MtsSemanticIr {
   readonly contractPath: string;
   readonly requirements: readonly MtsRequirementProjection[];
   readonly documentModes: Readonly<Record<string, MarkdownDocumentMode>>;
+  readonly projectionState: string;
 }
 
 function fail(message: string): never {
@@ -120,7 +121,9 @@ export function loadMtsSemanticIr(
 ): MtsSemanticIr {
   const registry = readJson(root, registryPath);
   const schema = string(registry.schema, `${registryPath}.schema`);
-  if (schema !== "mts-requirement-registry/v0.1") fail(`unsupported registry schema ${schema}`);
+  if (schema !== "mts-requirement-registry/v0.1" && schema !== "mts-requirement-registry/v0.2") {
+    fail(`unsupported registry schema ${schema}`);
+  }
 
   const contractPath = currentContractPath(root);
   const contract = readJson(root, contractPath);
@@ -148,9 +151,16 @@ export function loadMtsSemanticIr(
     fail(`${traceabilityPath} conformance does not match current contract`);
   }
   const invariants = object(traceability.invariants, `${traceabilityPath}.invariants`);
-  const docs = object(contract.normativeDocumentation, `${contractPath}.normativeDocumentation`);
-  const owners = object(docs.owners, `${contractPath}.normativeDocumentation.owners`);
+  const legacyOwners = schema === "mts-requirement-registry/v0.1"
+    ? object(
+        object(contract.normativeDocumentation, `${contractPath}.normativeDocumentation`).owners,
+        `${contractPath}.normativeDocumentation.owners`,
+      )
+    : null;
 
+  const projectionState = typeof registry.projectionState === "string"
+    ? registry.projectionState
+    : "MATERIALIZED";
   const documentSurface = object(registry.documentSurface, `${registryPath}.documentSurface`);
   const documentModes: Record<string, MarkdownDocumentMode> = {};
   for (const [path, rawMode] of Object.entries(documentSurface)) {
@@ -216,9 +226,20 @@ export function loadMtsSemanticIr(
     const docProjection = object(value.docProjection, `requirements[${index}].docProjection`);
     const docPath = string(docProjection.path, `requirements[${index}].docProjection.path`);
     const docAnchor = string(docProjection.anchor, `requirements[${index}].docProjection.anchor`);
-    const owner = object(owners[id], `${contractPath}.normativeDocumentation.owners.${id}`);
-    if (string(owner.path, `owner.${id}.path`) !== docPath || string(owner.anchor, `owner.${id}.anchor`) !== docAnchor) {
-      fail(`${id} doc projection differs from accepted normative owner`);
+
+    if (schema === "mts-requirement-registry/v0.1") {
+      const owner = object(legacyOwners?.[id], `${contractPath}.normativeDocumentation.owners.${id}`);
+      if (string(owner.path, `owner.${id}.path`) !== docPath || string(owner.anchor, `owner.${id}.anchor`) !== docAnchor) {
+        fail(`${id} doc projection differs from accepted normative owner`);
+      }
+    } else {
+      const owner = object(invariant.documentationOwner, `${traceabilityPath}.invariants.${id}.documentationOwner`);
+      if (string(owner.registry, `owner.${id}.registry`) !== registryPath) {
+        fail(`${id} traceability documentation owner does not point to current registry`);
+      }
+      if (string(owner.path, `owner.${id}.path`) !== docPath || string(owner.anchor, `owner.${id}.anchor`) !== docAnchor) {
+        fail(`${id} doc projection differs from traceability documentation owner`);
+      }
     }
     if (!existsSync(resolve(root, docPath))) fail(`${id} doc projection target does not exist: ${docPath}`);
     if (documentModes[docPath] !== "hybrid") {
@@ -256,6 +277,7 @@ export function loadMtsSemanticIr(
     contractPath,
     requirements: Object.freeze(requirements),
     documentModes: Object.freeze(documentModes),
+    projectionState,
   });
 }
 
@@ -291,6 +313,9 @@ export function upsertRequirementProjection(
 
 export function compileRequirementDocuments(root: string, write: boolean): string[] {
   const ir = loadMtsSemanticIr(root);
+  if (ir.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585") {
+    return [];
+  }
   const grouped = new Map<string, MtsRequirementProjection[]>();
   for (const requirement of ir.requirements) {
     const items = grouped.get(requirement.docPath) ?? [];
