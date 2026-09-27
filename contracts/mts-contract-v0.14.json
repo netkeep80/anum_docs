@@ -7,7 +7,7 @@
   "semanticBase": "mts-contract/v0.13",
   "observableSemanticDelta": true,
   "conformanceCorpus": "contracts/mts-conformance-v0.14.json",
-  "acceptanceReady": true,
+  "acceptanceReady": false,
   "previousAcceptedRelease": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13",
@@ -74,7 +74,12 @@
     "finalNormativeChoice": "A4_PRIME_CHIRAL_TORSOR_DERIVED_START_END",
     "normativeStatus": "AUTHOR_FROZEN",
     "authorDecisionIssue": "#1662",
-    "authorDecisionDate": "2026-09-27"
+    "authorDecisionDate": "2026-09-27",
+    "distinguishedWitnessAuthority": "FOUNDATION_LINK_CARRIER",
+    "selectionCarrier": "ExactSequence of distinguished chiral witness Links rooted at R",
+    "hostSelectedWitnessArgumentSemanticAuthority": false,
+    "selectionCarrierTechnicalCoordinatesSemanticAuthority": false,
+    "exactlyOneDistinctSelectedWitnessRequired": true
   },
   "recursiveAlphabet": {
     "name": "recursive MTS alphabet",
@@ -224,7 +229,21 @@
   "generalizedMpNonRegression": {
     "status": "GREEN_RESEARCH",
     "law": "K ⟼ A + A ⟼ B -> K ⟼ B",
-    "newV014ExecutionLaw": false
+    "newV014ExecutionLaw": false,
+    "theoremChain": [
+      "A14 root asymmetry/chirality",
+      "A16 contextual detachment",
+      "A17 recursive application-closed frontier",
+      "A72w flat generalized modus ponens"
+    ],
+    "coveredProfiles": [
+      "1->0",
+      "1->1",
+      "1->N",
+      "N->1",
+      "N->M"
+    ],
+    "fullInheritedWitnessChainRequired": true
   },
   "executionProfileNonRegression": {
     "status": "GREEN_RESEARCH",
@@ -243,8 +262,10 @@
     "V14-L8": "Canonical Add is constructor-scoped and is total/function-like over selected Nat evidence.",
     "V14-L9": "Derived Le requires canonical Add proof authority.",
     "V14-L10": "Multiplication/full semiring is explicitly outside the v0.14 acceptance scope.",
-    "V14-L11": "Generalized modus ponens/reaction is preserved from accepted v0.13.",
-    "V14-L12": "A4': before orientation, Link pole positions form a global Z2 torsor with no primitive absolute START/END naming; exactly one selected chiral witness W from {W,J(W)} fixes the global frame, after which START/END and O/C/L/U are derived and W is identified as InR = C ⟼ R."
+    "V14-L11": "Generalized modus ponens/reaction is preserved from accepted v0.13 through the explicit A14 -> A16 -> A17 -> A72w witness chain covering 1->0, 1->1, 1->N, N->1 and N->M without host function/cardinality opcodes.",
+    "V14-L12": "A4': before orientation, Link pole positions form a global Z2 torsor with no primitive absolute START/END naming; exactly one distinguished chiral witness W from {W,J(W)} is selected by Foundation-carried Link structure rather than a host-selected witness argument, fixing the global frame, after which START/END and O/C/L/U are derived and W is identified as InR = C ⟼ R.",
+    "V14-L13": "Anum is a rooted compact representation/coding of a sequence of Links; ExactSequence preserves exact positional sequence identity distinct from fold denotation, the recursive Link codec is not Anum, Q is a versioned sequence codec/interpreter, and every local sequence origin is R.",
+    "V14-L14": "MTS representation layers are explicit and non-ontological above Link: recursive alphabet, representations/codecs, byte-text and symbolic metanotation introduce no second ontology entity."
   },
   "candidateState": {
     "researchEvidenceSubstantial": true,
@@ -253,17 +274,20 @@
     "formalSurfaceGrammarComplete": true,
     "traceabilityComplete": true,
     "documentationComplete": false,
-    "readinessAuditComplete": true,
-    "explicitAuthorAcceptanceRecorded": false
+    "readinessAuditComplete": false,
+    "explicitAuthorAcceptanceRecorded": false,
+    "adversarialClosureComplete": true,
+    "documentationOwnershipMapComplete": true
   },
   "acceptanceBoundary": {
     "accepted": false,
-    "acceptanceReady": true,
+    "acceptanceReady": false,
     "automaticAcceptanceForbidden": true,
     "explicitAuthorApprovalRequired": true,
     "authorDecisionRequired": "ACCEPT MTS v0.14",
     "currentAcceptedRemains": "mts-contract/v0.13",
     "blockers": [
+      "independent post-N20 readiness audit",
       "explicit author acceptance"
     ],
     "documentationReconstructionIssue": 1585,
@@ -271,11 +295,80 @@
   },
   "traceabilityManifest": "traceability/mts-v0.14.json",
   "readinessAudit": {
-    "status": "GREEN_INDEPENDENT_AUDIT",
-    "issue": 1666,
-    "candidateSemanticReady": true,
+    "status": "BLOCKING_PENDING_POST_N20_REAUDIT",
+    "previousAudit": {
+      "status": "HISTORICAL_SUPERSEDED_BY_N20",
+      "issue": 1666,
+      "frozenDossier": 1668
+    },
+    "issue": 1669,
+    "candidateSemanticReady": false,
     "productionCutoverPerformed": false,
     "documentationPostAcceptanceIssue": 1585,
-    "onlyRemainingBlocker": "explicit author acceptance"
-  }
+    "blockers": [
+      "independent post-N20 readiness audit",
+      "explicit author acceptance"
+    ]
+  },
+  "representationLayers": {
+    "status": "GREEN_RESEARCH",
+    "ontology": {
+      "level": 0,
+      "id": "ontology",
+      "members": [
+        "Link"
+      ],
+      "introducesOntologyEntity": true
+    },
+    "recursiveAlphabet": {
+      "level": 1,
+      "id": "recursive-alphabet",
+      "members": [
+        "8",
+        "9",
+        "6",
+        "1"
+      ],
+      "meaning": [
+        "ROOT",
+        "START",
+        "END",
+        "PAIR"
+      ],
+      "introducesOntologyEntity": false
+    },
+    "representationsAndCodecs": {
+      "level": 2,
+      "id": "representations-codecs",
+      "members": [
+        "recursive Link codec",
+        "Anum",
+        "ExactSequence",
+        "Q"
+      ],
+      "introducesOntologyEntity": false
+    },
+    "byteText": {
+      "level": 3,
+      "id": "byte-text",
+      "members": [
+        "STRING",
+        "UTF-8"
+      ],
+      "introducesOntologyEntity": false
+    },
+    "symbolicMetanotation": {
+      "level": 4,
+      "id": "symbolic-metanotation",
+      "members": [
+        "names",
+        "Dictionary",
+        "Grammar",
+        "Theory",
+        "FORMAL"
+      ],
+      "introducesOntologyEntity": false
+    }
+  },
+  "documentationProjectionRegistry": "requirements/mts-v0.14.json"
 }
