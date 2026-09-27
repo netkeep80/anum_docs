@@ -77,22 +77,6 @@ function string(value: unknown, name: string): string {
   return value;
 }
 
-function boolean(value: unknown, name: string): boolean {
-  if (typeof value !== "boolean") fail(`${name} must be a boolean`);
-  return value;
-}
-
-function finiteNumber(value: unknown, name: string): number {
-  if (typeof value !== "number" || !Number.isFinite(value)) fail(`${name} must be a finite number`);
-  return value;
-}
-
-function strings(value: unknown, name: string): readonly string[] {
-  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
-    fail(`${name} must be an array of strings`);
-  }
-  return value as string[];
-}
 
 function readJson(root: string, path: string): JsonObject {
   const fullPath = resolve(root, path);
