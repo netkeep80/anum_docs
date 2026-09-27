@@ -92,7 +92,14 @@ function discoverWitnessOrbit(localMemory: Memory, R: LinkHandle): readonly Link
   return Object.freeze(orbit);
 }
 
-function deriveFrameFromFoundationCarrier(
+/**
+ * Historical N20 provisional representation only.
+ *
+ * After N20b/#1673 this is NOT foundational orientation authority:
+ * ExactSequence belongs to the representation layer. The actual pre-oriented
+ * Context frame carrier is the one-sided self-incidence marker exercised below.
+ */
+function deriveFrameFromProvisionalExactSequenceCarrier(
   localMemory: Memory,
   R: LinkHandle,
   witnessOrbit: readonly LinkHandle[],
@@ -122,14 +129,14 @@ function exerciseLinkCarriedOrientation(reverseBootstrap: boolean): void {
 
   const orbit = discoverWitnessOrbit(localMemory, R);
   const none = materializeExactSequence(localMemory, []);
-  same(deriveFrameFromFoundationCarrier(localMemory, R, orbit, none), "UNRESOLVED", "zero selected witnesses");
+  same(deriveFrameFromProvisionalExactSequenceCarrier(localMemory, R, orbit, none), "UNRESOLVED", "zero selected witnesses");
 
   const both = materializeExactSequence(localMemory, orbit);
-  same(deriveFrameFromFoundationCarrier(localMemory, R, orbit, both), "UNRESOLVED", "two selected witnesses");
+  same(deriveFrameFromProvisionalExactSequenceCarrier(localMemory, R, orbit, both), "UNRESOLVED", "two selected witnesses");
 
   const unrelated = localMemory.ensure(orbit[0]!, orbit[1]!);
   same(
-    deriveFrameFromFoundationCarrier(
+    deriveFrameFromProvisionalExactSequenceCarrier(
       localMemory,
       R,
       orbit,
@@ -139,13 +146,13 @@ function exerciseLinkCarriedOrientation(reverseBootstrap: boolean): void {
     "unrelated selected Link",
   );
 
-  const first = deriveFrameFromFoundationCarrier(
+  const first = deriveFrameFromProvisionalExactSequenceCarrier(
     localMemory,
     R,
     orbit,
     materializeExactSequence(localMemory, [orbit[0]!]),
   );
-  const second = deriveFrameFromFoundationCarrier(
+  const second = deriveFrameFromProvisionalExactSequenceCarrier(
     localMemory,
     R,
     orbit,
@@ -155,7 +162,7 @@ function exerciseLinkCarriedOrientation(reverseBootstrap: boolean): void {
   assert(first !== second, "two witness orbit members resolve opposite frames");
 
   same(
-    deriveFrameFromFoundationCarrier(
+    deriveFrameFromProvisionalExactSequenceCarrier(
       localMemory,
       R,
       orbit,
@@ -984,11 +991,13 @@ console.log([
   "ONTOLOGY=LINK_ONLY",
   "REPRESENTATION_LAYERS_EXPLICIT=TRUE",
   "NON_ONTOLOGY_LAYERS_INTRODUCE_ENTITY=FALSE",
-  "FOUNDATION_SELECTION_AUTHORITY=EXACT_SEQUENCE_OF_LINKS",
+  "PROVISIONAL_EXACT_SEQUENCE_WITNESS=REPRESENTATION_LAYER_ONLY",
+  "EXACT_SEQUENCE_ORIENTATION_AUTHORITY=FALSE",
   "HOST_SELECTED_WITNESS_ARGUMENT_AUTHORITY=FALSE",
   "ONE_CANONICAL_DOC_OWNER_PER_LAW=TRUE",
   "PROSE_RECONSTRUCTION=DEFERRED_TO_1585",
   "A4_CONTEXT_RELATIVE_GAUGE=GREEN_RESEARCH",
+  "N20B_OUTCOME=B_CONTEXT_RELATIVE_FRAME",
   "OBJECTIVE_CHIRAL_ORBIT_BEFORE_OBSERVER=TRUE",
   "J_FIXED_MATCHING_SINGLE_LINK_CARRIER=REJECTED_NONCANONICAL",
   "PREORIENTED_SELECTION_CARRIER=ONE_SIDED_SELF_INCIDENCE_MARKER",
