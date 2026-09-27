@@ -7,7 +7,7 @@
   "semanticBase": "mts-contract/v0.13",
   "observableSemanticDelta": true,
   "conformanceCorpus": "contracts/mts-conformance-v0.14.json",
-  "acceptanceReady": true,
+  "acceptanceReady": false,
   "previousAcceptedRelease": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13",
@@ -27,8 +27,8 @@
     "productionBehaviorChanged": false,
     "singleLiveSemanticRuntime": true,
     "candidateKernelBehaviorImplemented": true,
-    "implementationCompleteMeaning": "declared-v0.14-candidate-scope complete with all mandatory executable gates; production cutover/current-pointer rotation not yet performed",
-    "productionBehaviorChangedMeaning": "N18 readiness adds no new ts/src production behavior; the single live v0.13 runtime remains current until explicit v0.14 acceptance/cutover"
+    "implementationCompleteMeaning": "declared v0.14 candidate semantic scope is implemented with mandatory executable evidence; independent post-N20c readiness re-audit and production cutover/current-pointer rotation are not yet performed",
+    "productionBehaviorChangedMeaning": "N20c changes candidate contracts/evidence only; the single live v0.13 runtime remains current until explicit v0.14 acceptance/cutover"
   },
   "inheritedFoundation": {
     "ontology": "Link",
@@ -40,41 +40,72 @@
   "foundationOrientation": {
     "literalLocallyUnorderedPoles": "FALSIFIED",
     "unorderedPoleQuotientUsed": false,
-    "preOrientationPoleModel": "GLOBAL_Z2_TORSOR",
-    "absolutePoleNamesBeforeWitness": false,
+    "preOrientationPoleModel": "OBJECTIVE_GLOBAL_Z2_TORSOR",
+    "objectiveChiralityExistsBeforeObserver": true,
+    "observerCreatesChirality": false,
+    "absolutePoleNamesBeforeContext": false,
     "technicalCarrierCoordinatesAreSemanticAuthority": false,
-    "globalPolarityModel": "EXECUTABLY_SUPPORTED_AND_AUTHOR_FROZEN",
     "globalDuality": "J",
-    "distinguishedChiralWitness": "W",
-    "witnessDefinedBeforeStartEnd": true,
     "chiralOrbit": [
       "W",
       "J(W)"
     ],
+    "witnessDefinedBeforeStartEnd": true,
+    "globalSelectedWitnessRequired": false,
+    "foundationGlobalFrameRequired": false,
+    "contextRelativeFrame": true,
+    "contextOrientationCarrier": "ONE_SIDED_SELF_INCIDENCE_LINK",
+    "contextFrameStates": 2,
+    "exactSequenceOrientationAuthority": false,
     "rawMemoryPresenceIsAuthority": false,
-    "selectedExactlyOneWitnessResolvesOrientation": true,
-    "zeroOrTwoSelectedWitnesses": "UNRESOLVED",
-    "gaugeDerivationOfStartEnd": "EXECUTABLY_SUPPORTED",
-    "derivedRolesAfterWitness": [
-      "START",
-      "END"
+    "derivedRolesAfterContextMarker": [
+      "START_K",
+      "END_K"
     ],
+    "relativeTransport": {
+      "group": "Z2",
+      "elements": [
+        "Id",
+        "J"
+      ],
+      "laws": [
+        "g_AA = Id",
+        "g_AB = g_BA",
+        "g_AB ∘ g_BC = g_AC",
+        "J ∘ J = Id"
+      ],
+      "mirrorRoleTransport": [
+        "START_A ↔ END_B",
+        "END_A ↔ START_B"
+      ],
+      "sameRoleTransport": [
+        "START_A ↔ START_B",
+        "END_A ↔ END_B"
+      ]
+    },
+    "semanticCovariance": {
+      "sameFrameContextsSameSemantics": true,
+      "mirrorFrameContextsCovariant": true,
+      "bothChiralSelectionsSameSemanticEquations": true
+    },
     "postOrientationIdentification": {
-      "selectedW": "InR = C ⟼ R",
-      "mirrorJW": "OutR = R ⟼ O"
+      "chiK": "InR_K = C_K ⟼_K R",
+      "mirrorJChiK": "OutR_K = R ⟼_K O_K"
     },
     "recursiveWiresAfterOrientation": {
-      "InR": "1688",
-      "OutR": "1898"
+      "InR_K": "1688",
+      "OutR_K": "1898"
     },
     "operationalEquivalenceAudit": "GREEN_RESEARCH",
+    "contextRelativeExecutableWitness": "ts/test/research-v014-context-relative-a4prime.test.ts",
     "directGaugeMatchesCurrentKernel": true,
     "mirrorGaugeIsExactJImage": true,
-    "resolvedGaugeCount": 2,
-    "finalNormativeChoice": "A4_PRIME_CHIRAL_TORSOR_DERIVED_START_END",
-    "normativeStatus": "AUTHOR_FROZEN",
-    "authorDecisionIssue": "#1662",
-    "authorDecisionDate": "2026-09-27"
+    "localResolvedGaugeCount": 2,
+    "finalNormativeChoice": "A4_PRIME_CONTEXT_RELATIVE_Z2_GAUGE",
+    "normativeStatus": "AUTHOR_REFINED_PRE_ACCEPTANCE",
+    "authorDecisionIssue": "#1673",
+    "authorDecisionDate": "2026-09-27",
+    "supersedesFoundationGlobalSelectedWitnessModel": true
   },
   "recursiveAlphabet": {
     "name": "recursive MTS alphabet",
@@ -92,7 +123,21 @@
     },
     "isOntology": false,
     "isCodec": false,
-    "isAnumAlphabet": false
+    "isAnumAlphabet": false,
+    "abstractLinkFormingPrimitiveCount": 1,
+    "abstractLinkFormingPrimitive": "form/canonicalize one Link from two relational pole positions",
+    "emergentStructuralCaseCount": 4,
+    "preOrientedJOrbitClassCount": 3,
+    "preOrientationClasses": {
+      "ROOT": "11",
+      "CHIRAL_PAIR": [
+        "10",
+        "01"
+      ],
+      "PAIR": "00"
+    },
+    "orientedRolesRelativeToContext": true,
+    "primitivePhysicalOpcodes": false
   },
   "recursivePrefixCodec": {
     "grammar": "S ::= 8 | 9 S | 6 S | 1 S S",
@@ -224,7 +269,21 @@
   "generalizedMpNonRegression": {
     "status": "GREEN_RESEARCH",
     "law": "K ⟼ A + A ⟼ B -> K ⟼ B",
-    "newV014ExecutionLaw": false
+    "newV014ExecutionLaw": false,
+    "theoremChain": [
+      "A14 root asymmetry/chirality",
+      "A16 contextual detachment",
+      "A17 recursive application-closed frontier",
+      "A72w flat generalized modus ponens"
+    ],
+    "coveredProfiles": [
+      "1->0",
+      "1->1",
+      "1->N",
+      "N->1",
+      "N->M"
+    ],
+    "fullInheritedWitnessChainRequired": true
   },
   "executionProfileNonRegression": {
     "status": "GREEN_RESEARCH",
@@ -233,7 +292,7 @@
     "canonicalDuplicateConvergencePreserved": true
   },
   "requiredSemanticLaws": {
-    "V14-L1": "Recursive 8/9/6/1 is the Link structural alphabet and is not the Anum/Q alphabet.",
+    "V14-L1": "One Link ontology and one abstract Link-forming primitive induce exactly four self-incidence structural cases 11/10/01/00; after Context orientation these are named ROOT/START_K/END_K/PAIR and encoded by recursive 8/9/6/1, which is not the Anum/Q alphabet.",
     "V14-L2": "Ostensive ∞/♂/♀/⟼ denote ROOT/START/END/PAIR through an explicit grammar.",
     "V14-L3": "Q14 [ ] T F is version-separated from immutable legacy Q13 [ ] 1 0.",
     "V14-L4": "Successful empty reaction {}, active identity, START continuation and END continuation are distinct results.",
@@ -243,8 +302,10 @@
     "V14-L8": "Canonical Add is constructor-scoped and is total/function-like over selected Nat evidence.",
     "V14-L9": "Derived Le requires canonical Add proof authority.",
     "V14-L10": "Multiplication/full semiring is explicitly outside the v0.14 acceptance scope.",
-    "V14-L11": "Generalized modus ponens/reaction is preserved from accepted v0.13.",
-    "V14-L12": "A4': before orientation, Link pole positions form a global Z2 torsor with no primitive absolute START/END naming; exactly one selected chiral witness W from {W,J(W)} fixes the global frame, after which START/END and O/C/L/U are derived and W is identified as InR = C ⟼ R."
+    "V14-L11": "Generalized modus ponens/reaction is preserved from accepted v0.13 through the explicit A14 -> A16 -> A17 -> A72w witness chain covering 1->0, 1->1, 1->N, N->1 and N->M without host function/cardinality opcodes.",
+    "V14-L12": "A4': objective chirality Ω={W,J(W)} exists before any observer and J²=Id; an oriented Context K carries one of two Link-native one-sided self-incidence markers, deriving χ(K) and local START_K/END_K roles. Relative frame transport g_AB lies in {Id,J}, composes as Z2, and semantic laws are covariant; no Foundation-global selected W, ExactSequence, host boolean, or four primitive opcodes are orientation authority.",
+    "V14-L13": "Anum is a rooted compact representation/coding of a sequence of Links; ExactSequence preserves exact positional sequence identity distinct from fold denotation, the recursive Link codec is not Anum, Q is a versioned sequence codec/interpreter, and every local sequence origin is R.",
+    "V14-L14": "MTS representation layers are explicit and non-ontological above Link: recursive structure, representations/codecs, byte-text and symbolic metanotation introduce no second ontology entity."
   },
   "candidateState": {
     "researchEvidenceSubstantial": true,
@@ -253,17 +314,20 @@
     "formalSurfaceGrammarComplete": true,
     "traceabilityComplete": true,
     "documentationComplete": false,
-    "readinessAuditComplete": true,
-    "explicitAuthorAcceptanceRecorded": false
+    "readinessAuditComplete": false,
+    "explicitAuthorAcceptanceRecorded": false,
+    "documentationOwnershipMapComplete": true,
+    "adversarialClosureComplete": true
   },
   "acceptanceBoundary": {
     "accepted": false,
-    "acceptanceReady": true,
+    "acceptanceReady": false,
     "automaticAcceptanceForbidden": true,
     "explicitAuthorApprovalRequired": true,
     "authorDecisionRequired": "ACCEPT MTS v0.14",
     "currentAcceptedRemains": "mts-contract/v0.13",
     "blockers": [
+      "independent post-N20c readiness audit",
       "explicit author acceptance"
     ],
     "documentationReconstructionIssue": 1585,
@@ -271,11 +335,82 @@
   },
   "traceabilityManifest": "traceability/mts-v0.14.json",
   "readinessAudit": {
-    "status": "GREEN_INDEPENDENT_AUDIT",
-    "issue": 1666,
-    "candidateSemanticReady": true,
+    "status": "BLOCKING_PENDING_POST_N20C_REAUDIT",
+    "convergenceIssue": 1677,
+    "previousAudit": {
+      "issue": 1666,
+      "status": "HISTORICAL_SUPERSEDED_BY_N20C",
+      "frozenDossier": 1668,
+      "validForAcceptance": false
+    },
+    "candidateSemanticReady": false,
     "productionCutoverPerformed": false,
     "documentationPostAcceptanceIssue": 1585,
-    "onlyRemainingBlocker": "explicit author acceptance"
-  }
+    "blockers": [
+      "independent post-N20c readiness audit",
+      "explicit author acceptance"
+    ]
+  },
+  "representationLayers": {
+    "status": "GREEN_RESEARCH",
+    "ontology": {
+      "level": 0,
+      "id": "ontology",
+      "members": [
+        "Link"
+      ],
+      "introducesOntologyEntity": true
+    },
+    "recursiveStructure": {
+      "level": 1,
+      "id": "recursive-structure",
+      "members": [
+        "8",
+        "9",
+        "6",
+        "1"
+      ],
+      "meaning": [
+        "ROOT",
+        "START_K",
+        "END_K",
+        "PAIR"
+      ],
+      "derivedFrom": "four emergent self-incidence cases of one Link-forming primitive",
+      "introducesOntologyEntity": false
+    },
+    "representationsAndCodecs": {
+      "level": 2,
+      "id": "representations-codecs",
+      "members": [
+        "recursive Link codec",
+        "Anum",
+        "ExactSequence",
+        "Q"
+      ],
+      "introducesOntologyEntity": false
+    },
+    "byteText": {
+      "level": 3,
+      "id": "byte-text",
+      "members": [
+        "STRING",
+        "UTF-8"
+      ],
+      "introducesOntologyEntity": false
+    },
+    "symbolicMetanotation": {
+      "level": 4,
+      "id": "symbolic-metanotation",
+      "members": [
+        "names",
+        "Dictionary",
+        "Grammar",
+        "Theory",
+        "FORMAL"
+      ],
+      "introducesOntologyEntity": false
+    }
+  },
+  "documentationProjectionRegistry": "requirements/mts-v0.14.json"
 }

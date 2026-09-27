@@ -2,14 +2,14 @@
   "schema": "mts-conformance/v0.14",
   "status": "candidate",
   "accepted": false,
-  "acceptanceReady": true,
+  "acceptanceReady": false,
   "issue": 1586,
   "candidateLifecycleIssue": 1586,
   "contract": "mts-contract/v0.14",
   "semanticBase": "mts-conformance/v0.13",
   "observableSemanticDelta": true,
-  "coverageState": "complete",
-  "coverageStateMeaning": "Declared MTS v0.14 acceptance-scope evidence is complete and independently readiness-audited; the candidate remains nonaccepted until explicit author acceptance.",
+  "coverageState": "complete-pending-independent-reaudit",
+  "coverageStateMeaning": "The converged v0.14 candidate has mandatory executable evidence for the declared scope, including context-relative A4′ and N20 closure, but the superseded N18 readiness verdict cannot be reused; a fresh independent post-N20c audit is mandatory.",
   "acceptedCurrent": {
     "contract": "mts-contract/v0.13",
     "conformance": "mts-conformance/v0.13"
@@ -53,7 +53,11 @@
     "ts/test/anum-two-memory-conformance.test.ts",
     "ts/test/string-anum-two-memory-conformance.test.ts",
     "ts/test/v012-source-authority.test.ts",
-    "ts/test/v012-public-facade-c7.test.ts"
+    "ts/test/v012-public-facade-c7.test.ts",
+    "ts/test/research-v013-root-asymmetry-chirality-a14.test.ts",
+    "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
+    "ts/test/research-v013-application-closed-frontier-a17.test.ts",
+    "ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts"
   ],
   "v014ResearchExecutableGates": [
     "ts/test/research-v014-foundation-orientation-witness.test.ts",
@@ -79,7 +83,9 @@
     "ts/test/v014-traceability-candidate.test.ts",
     "ts/test/research-v014-a4-operational-equivalence.test.ts",
     "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
-    "ts/test/v014-independent-readiness-audit.test.ts"
+    "ts/test/v014-independent-readiness-audit.test.ts",
+    "ts/test/research-v014-context-relative-a4prime.test.ts",
+    "ts/test/research-v014-preacceptance-closure.test.ts"
   ],
   "requiredExecutableGates": [
     "ts/test/v013-relative-form-quartet.test.ts",
@@ -144,12 +150,17 @@
     "ts/test/v014-traceability-candidate.test.ts",
     "ts/test/research-v014-a4-operational-equivalence.test.ts",
     "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
-    "ts/test/v014-independent-readiness-audit.test.ts"
+    "ts/test/v014-independent-readiness-audit.test.ts",
+    "ts/test/research-v013-root-asymmetry-chirality-a14.test.ts",
+    "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
+    "ts/test/research-v013-application-closed-frontier-a17.test.ts",
+    "ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts",
+    "ts/test/research-v014-context-relative-a4prime.test.ts",
+    "ts/test/research-v014-preacceptance-closure.test.ts"
   ],
   "requiredNegativeVectors": [
     "v014-local-unordered-collapses-o-c-l-u-and-orientation-orbit",
     "v014-raw-inr-outr-presence-is-not-orientation-authority",
-    "v014-zero-or-two-selected-orientation-witnesses-unresolved",
     "v014-recursive-alphabet-is-not-anum-q-alphabet",
     "v014-q14-rejects-legacy-1-0-source",
     "v014-q13-rejects-t-f-source",
@@ -160,9 +171,18 @@
     "v014-forged-add-constructor-cannot-witness-functionality",
     "v014-forged-add-constructor-cannot-witness-le",
     "v014-legacy-succ-u-equals-l-rejected",
-    "v014-candidate-does-not-change-current-accepted-pointer"
+    "v014-candidate-does-not-change-current-accepted-pointer",
+    "v014-global-selected-w-required-rejected",
+    "v014-exact-sequence-is-not-orientation-authority",
+    "v014-four-recursive-forms-are-not-primitive-opcodes",
+    "v014-anum-exact-sequence-is-not-fold-denotation",
+    "v014-recursive-codec-is-not-anum-carrier",
+    "v014-representation-layer-does-not-create-ontology-sort",
+    "v014-accepted-law-without-doc-owner-rejected"
   ],
-  "plannedExecutableGates": [],
+  "plannedExecutableGates": [
+    "pending:v014-post-n20c-independent-readiness-audit"
+  ],
   "crossRepositoryAcceptanceDependencies": [
     {
       "repository": "netkeep80/amemory",
@@ -177,7 +197,8 @@
       "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
       "ts/test/research-v014-orientation-gauge-view.test.ts",
       "ts/test/research-v014-a4-operational-equivalence.test.ts",
-      "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts"
+      "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
+      "ts/test/research-v014-context-relative-a4prime.test.ts"
     ],
     "q14": [
       "ts/test/v014-q14-versioned-interpreter.test.ts"
@@ -210,19 +231,33 @@
     ],
     "readiness": [
       "ts/test/v014-independent-readiness-audit.test.ts"
+    ],
+    "generalizedMp": [
+      "ts/test/research-v013-root-asymmetry-chirality-a14.test.ts",
+      "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
+      "ts/test/research-v013-application-closed-frontier-a17.test.ts",
+      "ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts"
+    ],
+    "sequenceAndLayers": [
+      "ts/test/research-v014-preacceptance-closure.test.ts"
+    ],
+    "documentationProjection": [
+      "ts/test/research-v014-preacceptance-closure.test.ts"
     ]
   },
   "blockers": {
-    "a4FinalChoice": "GREEN_AUTHOR_FROZEN",
+    "a4FinalChoice": "GREEN_CONTEXT_RELATIVE_AUTHOR_REFINED",
     "formalSurfaceGrammar": "GREEN_RESEARCH",
     "traceability": "GREEN_CANDIDATE",
-    "readinessAudit": "GREEN_INDEPENDENT_AUDIT",
+    "readinessAudit": "BLOCKING_PENDING_POST_N20C_REAUDIT",
     "explicitAuthorAcceptance": "BLOCKING_PENDING"
   },
   "lifecycle": {
     "currentPointerChanged": false,
     "acceptedV013Mutated": false,
-    "candidatePresenceImpliesAcceptance": false
+    "candidatePresenceImpliesAcceptance": false,
+    "preN20Freeze1668ValidForAcceptance": false,
+    "n20cConvergenceIssue": 1677
   },
   "requiredPositiveVectors": [
     "v014-recursive-link-alphabet-grounded",
@@ -239,18 +274,29 @@
     "v014-orientation-gauge-research-grounded",
     "v014-a4-operational-equivalence-grounded",
     "v014-a4prime-chiral-torsor-bootstrap-grounded",
-    "v014-independent-readiness-grounded"
+    "v014-independent-readiness-grounded",
+    "v014-context-relative-a4prime-grounded",
+    "v014-one-link-four-emergent-forms-grounded",
+    "v014-generalized-mp-full-chain-grounded",
+    "v014-anum-sequence-semantics-grounded",
+    "v014-representation-layer-registry-grounded",
+    "v014-documentation-owner-map-grounded"
   ],
   "traceabilityManifest": "traceability/mts-v0.14.json",
   "readinessAudit": {
-    "status": "GREEN_INDEPENDENT_AUDIT",
-    "issue": 1666,
-    "requiredExecutableGateCount": 63,
-    "plannedExecutableGateCount": 0,
-    "candidateSemanticReady": true,
+    "status": "BLOCKING_PENDING_POST_N20C_REAUDIT",
+    "convergenceIssue": 1677,
+    "previousAuditIssue": 1666,
+    "invalidatedFrozenDossier": 1668,
+    "requiredExecutableGateCount": 69,
+    "plannedExecutableGateCount": 1,
+    "candidateSemanticReady": false,
     "accepted": false,
     "productionCutoverPerformed": false,
     "documentationPostAcceptanceIssue": 1585,
-    "onlyRemainingBlocker": "explicit author acceptance"
+    "blockers": [
+      "independent post-N20c readiness audit",
+      "explicit author acceptance"
+    ]
   }
 }
