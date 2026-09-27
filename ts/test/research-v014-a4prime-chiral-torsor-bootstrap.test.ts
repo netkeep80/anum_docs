@@ -1,5 +1,7 @@
 // mts-version-evidence: candidate-from=0.14
 // research-owner: #1662
+// Historical N17b one-Context bootstrap retained for DIRECT/MIRROR covariance.
+// N20b/#1673 supersedes Foundation-global selected-W authority.
 
 import {
   decomposeV013SemanticLink,
@@ -83,8 +85,9 @@ interface DerivedFoundation {
 }
 
 function buildDerivedFoundation(view: SemanticOrientationView): DerivedFoundation {
-  // START/END semantic roles first appear here, after a chiral W has selected
-  // the global frame. Before this point the bootstrap code never receives O/C.
+  // START/END semantic roles first appear here for this historical one-Context
+  // gauge after one chiral representative is selected. N20b generalizes this
+  // to Context-local markers; before this point the bootstrap receives no O/C.
   const R = view.root;
   const O = view.ensureStartSelfClosed(R);
   const C = view.ensureEndSelfClosed(R);
@@ -378,8 +381,10 @@ function main(): void {
     "CHIRAL_WITNESS_ORBIT_SIZE=2",
     "ZERO_OR_TWO_SELECTED_W=UNRESOLVED",
     "UNRELATED_W=UNRESOLVED",
-    "SELECTED_W_DERIVES_GLOBAL_FRAME=TRUE",
-    "START_END_DERIVED_AFTER_W=TRUE",
+    "HISTORICAL_SELECTED_W_DERIVES_ONE_CONTEXT_FRAME=TRUE",
+    "GLOBAL_SELECTED_W_NORMATIVE_AUTHORITY=FALSE",
+    "START_END_DERIVED_AFTER_LOCAL_GAUGE=TRUE",
+    "FINAL_A4_MODEL=CONTEXT_RELATIVE_N20B",
     "W_POST_ORIENTATION_NAME=INR",
     "J_W_POST_ORIENTATION_NAME=OUTR",
     "TECHNICAL_START_END_COORDINATES_SEMANTIC_AUTHORITY=FALSE",
