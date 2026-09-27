@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { compileRequirementDocuments } from "./mts-compiler.js";
+import { compileRequirementDocuments, MTS_REQUIREMENT_REGISTRY_PATH } from "./mts-compiler.js";
 import { auditRepositoryMarkdownLinks } from "./markdown-link-audit.js";
 import { auditRepositoryStableAnchors } from "./markdown-anchor-baseline.js";
 import { auditRepositoryFoundationProvenance } from "./foundation-provenance-audit.js";
@@ -233,10 +233,11 @@ function ownerHasBody(facts: MarkdownFacts, owner: SemanticLawAnchor): boolean {
 export function validateSemanticLawDocumentation(
   requiredLawIds: readonly string[],
   documents: Readonly<Record<string, string>>,
+  ownerById: Readonly<Record<string, string>> = SEMANTIC_LAW_OWNER_BY_ID,
 ): SemanticLawDocumentationIssue[] {
   const issues: SemanticLawDocumentationIssue[] = [];
   const required = new Set(requiredLawIds);
-  const configured = new Set(Object.keys(SEMANTIC_LAW_OWNER_BY_ID));
+  const configured = new Set(Object.keys(ownerById));
 
   const missingFromConfig = [...required].filter((id) => !configured.has(id));
   const extraInConfig = [...configured].filter((id) => !required.has(id));
@@ -257,7 +258,7 @@ export function validateSemanticLawDocumentation(
     // retain owner anchors as immutable acceptance evidence. Only owner IDs
     // required by the current contract participate in current-owner checks.
     if (!required.has(owner.lawId)) continue;
-    const expectedPath = SEMANTIC_LAW_OWNER_BY_ID[owner.lawId];
+    const expectedPath = ownerById[owner.lawId];
     if (expectedPath !== owner.path) {
       issues.push({
         code: "wrong-owner",
@@ -321,8 +322,40 @@ export function checkRepositorySemanticLawDocumentation(root = findRepositoryRoo
   const laws = nested(contract, "requiredSemanticLaws", currentContractPath);
   const requiredLawIds = Object.keys(laws);
 
+  const registryPath = typeof contract.documentationProjectionRegistry === "string"
+    ? contract.documentationProjectionRegistry
+    : MTS_REQUIREMENT_REGISTRY_PATH;
+  const registry = readJson(root, registryPath);
+  if (!Array.isArray(registry.requirements)) fail(`${registryPath}.requirements must be an array`);
+
+  const ownerById: Record<string, string> = {};
+  const ownerKeys = new Set<string>();
+  for (const [index, raw] of (registry.requirements as unknown[]).entries()) {
+    const requirement = object(raw, `${registryPath}.requirements[${index}]`);
+    const id = string(requirement.id, `${registryPath}.requirements[${index}].id`);
+    const projection = object(requirement.docProjection, `${registryPath}.requirements[${index}].docProjection`);
+    const path = string(projection.path, `${registryPath}.requirements[${index}].docProjection.path`);
+    const anchor = string(projection.anchor, `${registryPath}.requirements[${index}].docProjection.anchor`);
+    if (ownerById[id] !== undefined) fail(`${registryPath}: duplicate requirement owner ${id}`);
+    const ownerKey = `${path}#${anchor}`;
+    if (ownerKeys.has(ownerKey)) fail(`${registryPath}: duplicate document owner ${ownerKey}`);
+    ownerKeys.add(ownerKey);
+    ownerById[id] = path;
+    if (!existsSync(resolve(root, path))) fail(`${registryPath}: owner document does not exist: ${path}`);
+  }
+
+  const required = [...requiredLawIds].sort();
+  const configured = Object.keys(ownerById).sort();
+  if (required.join("\n") !== configured.join("\n")) {
+    fail(`${registryPath}: owner law set differs from current contract`);
+  }
+
+  if (registry.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585") {
+    return [];
+  }
+
   const paths = new Set<string>([
-    ...Object.values(SEMANTIC_LAW_OWNER_BY_ID),
+    ...Object.values(ownerById),
     ...((nested(policy, "paths", "repo-policy.json").canonical_docs as unknown[]) ?? [])
       .filter((value): value is string => typeof value === "string"),
   ]);
@@ -332,7 +365,7 @@ export function checkRepositorySemanticLawDocumentation(root = findRepositoryRoo
     if (!existsSync(fullPath)) continue;
     documents[path] = readFileSync(fullPath, "utf8");
   }
-  return validateSemanticLawDocumentation(requiredLawIds, documents);
+  return validateSemanticLawDocumentation(requiredLawIds, documents, ownerById);
 }
 
 export function renderCurrentProjection(value: CurrentProjection): string {
