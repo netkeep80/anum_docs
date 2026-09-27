@@ -330,7 +330,7 @@ try {
   const a4OwnerSource = readFileSync(a4OwnerPath, "utf8");
   writeFileSync(
     a4OwnerPath,
-    a4OwnerSource.replace('<a id="mts-v014-v14-l12"></a>\n', ""),
+    a4OwnerSource.replace(/^<a id="mts-v014-v14-l12"><\/a>.*\r?\n/m, ""),
     "utf8",
   );
   expect(
