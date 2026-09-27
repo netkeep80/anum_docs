@@ -29,6 +29,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: Diagnostic repo-guard text report
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          cli="$(find "${RUNNER_WORKSPACE}/.." -path "*/_actions/netkeep80/repo-guard/a2cb2ae98596c5b673eed2548abef40edcf4bdce/dist/repo-guard.mjs" -print -quit)"
+          test -n "$cli"
+          node "$cli" --repo-root "$GITHUB_WORKSPACE" --enforcement blocking check-pr || true
+
       - name: Publish repo-guard summary
         if: always()
         run: |
