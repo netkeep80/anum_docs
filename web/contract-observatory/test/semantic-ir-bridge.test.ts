@@ -13,23 +13,23 @@ function same<T>(actual: T, expected: T, message: string): void {
 
 const repositoryRoot = process.cwd();
 const ir = loadCompiledMtsSemanticIr(repositoryRoot);
-same(ir.contract, "mts-contract/v0.13", "current compiler contract");
-same(ir.contractPath, "contracts/mts-contract-v0.13.json", "current compiler contract path");
-same(ir.requirements.length, 13, "accepted v0.13 requirement count");
+same(ir.contract, "mts-contract/v0.14", "current compiler contract");
+same(ir.contractPath, "contracts/mts-contract-v0.14.json", "current compiler contract path");
+same(ir.requirements.length, 14, "accepted v0.14 requirement count");
 
 const ids = ir.requirements.map((item) => item.id);
-same(new Set(ids).size, 13, "stable requirement IDs are unique");
-const l4 = ir.requirements.find((item) => item.id === "L4");
-assert(l4 !== undefined, "L4 is projected");
-same(l4.classificationPath, "representation/recursive-alphabet/prefix-codec", "L4 hierarchy");
-same(l4.statementDigest, "f740e98eade6204d", "L4 statement digest");
-same(l4.docPath, "docs/specs/Ачисла и сериализация.md", "L4 Markdown owner");
-same(l4.docAnchor, "mts-law-L4", "L4 Markdown anchor");
+same(new Set(ids).size, 14, "stable requirement IDs are unique");
+const a4 = ir.requirements.find((item) => item.id === "V14-L12");
+assert(a4 !== undefined, "V14-L12 is projected");
+same(a4.classificationPath, "theory/foundation/context-relative-chiral-gauge", "V14-L12 hierarchy");
+assert(/^[0-9a-f]{16}$/.test(a4.statementDigest), "V14-L12 statement digest is stable-shape");
+same(a4.docPath, "docs/theory/Система аксиом МТС.md", "V14-L12 Markdown owner");
+same(a4.docAnchor, "mts-v014-v14-l12", "V14-L12 future Markdown anchor");
 
 const contract = JSON.parse(
   readFileSync(resolve(repositoryRoot, ir.contractPath), "utf8"),
 ) as { requiredSemanticLaws: Record<string, string> };
-same(l4.statement, contract.requiredSemanticLaws.L4, "statement comes through compiler from contract authority");
+same(a4.statement, contract.requiredSemanticLaws["V14-L12"], "statement comes through compiler from contract authority");
 
 const clone = JSON.parse(JSON.stringify(ir)) as any;
 clone.requirements.push({ ...clone.requirements[0] });
@@ -47,4 +47,4 @@ rejected = false;
 try { validateSemanticIr({ schema: ir.schema, contract: ir.contract, contractPath: ir.contractPath }); } catch { rejected = true; }
 assert(rejected, "missing requirement array fails closed");
 
-console.log("Contract Observatory P3a semantic IR bridge: GREEN requirements=13 source=MTS_COMPILER");
+console.log("Contract Observatory P3a semantic IR bridge: GREEN requirements=14 source=MTS_COMPILER");
