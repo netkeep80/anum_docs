@@ -807,7 +807,88 @@ function exerciseSelfIncidenceContextGauge(reverseBootstrap: boolean): void {
   );
 
   // Derive local semantic pole views only AFTER the Context marker exists.
-  function frameFromMarker(marker: LinkHandle): "DIRECT" | "MIRROR" {
+  type MarkerFrame = "DIRECT" | "MIRROR";
+
+  class MarkerOrientationView {
+    constructor(
+      readonly localMemory: Memory,
+      readonly localFrame: MarkerFrame,
+    ) {}
+
+    get root(): LinkHandle {
+      return this.localMemory.root;
+    }
+
+    poles(link: LinkHandle) {
+      const technical = this.localMemory.poles(link);
+      return this.localFrame === "DIRECT"
+        ? technical
+        : Object.freeze({ start: technical.end, end: technical.start });
+    }
+
+    ensure(a: LinkHandle, b: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensure(a, b)
+        : this.localMemory.ensure(b, a);
+    }
+
+    ensureStartSelfClosed(other: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensureStartSelfClosed(other)
+        : this.localMemory.ensureEndSelfClosed(other);
+    }
+
+    ensureEndSelfClosed(other: LinkHandle): LinkHandle {
+      return this.localFrame === "DIRECT"
+        ? this.localMemory.ensureEndSelfClosed(other)
+        : this.localMemory.ensureStartSelfClosed(other);
+    }
+  }
+
+  function markerFoundation(view: MarkerOrientationView) {
+    const localR = view.root;
+    const O = view.ensureStartSelfClosed(localR);
+    const C = view.ensureEndSelfClosed(localR);
+    const L = view.ensure(O, C);
+    const U = view.ensure(C, O);
+    return Object.freeze({ R: localR, O, C, L, U });
+  }
+
+  function markerSemanticWire(
+    view: MarkerOrientationView,
+    link: LinkHandle,
+    active = new Set<LinkHandle>(),
+  ): string {
+    assert(!active.has(link), "unexpected non-self cycle in marker semantic wire");
+    const p = view.poles(link);
+    if (p.start === link && p.end === link) return "8";
+    if (p.start === link) {
+      active.add(link);
+      try {
+        return "9" + markerSemanticWire(view, p.end, active);
+      } finally {
+        active.delete(link);
+      }
+    }
+    if (p.end === link) {
+      active.add(link);
+      try {
+        return "6" + markerSemanticWire(view, p.start, active);
+      } finally {
+        active.delete(link);
+      }
+    }
+    active.add(link);
+    try {
+      return "1" +
+        markerSemanticWire(view, p.start, active) +
+        markerSemanticWire(view, p.end, active);
+    } finally {
+      active.delete(link);
+    }
+  }
+
+  function frameFromMarker(marker: LinkHandle): MarkerFrame {
     const alignedRootMarker = rootMarkers.find((rootMarker) =>
       sameOneSidedChiralClass(m, marker, rootMarker)
     );
@@ -818,9 +899,9 @@ function exerciseSelfIncidenceContextGauge(reverseBootstrap: boolean): void {
     throw new Error("v0.14 N20b: invalid root marker");
   }
 
-  const viewA = new LocalOrientationView(m, frameFromMarker(markerA));
-  const viewB = new LocalOrientationView(m, frameFromMarker(markerB));
-  const viewC = new LocalOrientationView(m, frameFromMarker(markerC));
+  const viewA = new MarkerOrientationView(m, frameFromMarker(markerA));
+  const viewB = new MarkerOrientationView(m, frameFromMarker(markerB));
+  const viewC = new MarkerOrientationView(m, frameFromMarker(markerC));
 
   // Direct START/END covariance check on one J-fixed probe Link.
   const probe = bodyB;
@@ -832,16 +913,20 @@ function exerciseSelfIncidenceContextGauge(reverseBootstrap: boolean): void {
   same(pA.start, pC.end, "mirror frame: START_A corresponds to END_C");
   same(pA.end, pC.start, "mirror frame: END_A corresponds to START_C");
 
-  const fA = localFoundation(viewA);
-  const fB = localFoundation(viewB);
-  const fC = localFoundation(viewC);
-  const fingerprint = (view: LocalOrientationView, foundation: ReturnType<typeof localFoundation>, chi: LinkHandle) => [
-    localSemanticWire(view, foundation.R),
-    localSemanticWire(view, foundation.O),
-    localSemanticWire(view, foundation.C),
-    localSemanticWire(view, foundation.L),
-    localSemanticWire(view, foundation.U),
-    localSemanticWire(view, chi),
+  const fA = markerFoundation(viewA);
+  const fB = markerFoundation(viewB);
+  const fC = markerFoundation(viewC);
+  const fingerprint = (
+    view: MarkerOrientationView,
+    foundation: ReturnType<typeof markerFoundation>,
+    chi: LinkHandle,
+  ) => [
+    markerSemanticWire(view, foundation.R),
+    markerSemanticWire(view, foundation.O),
+    markerSemanticWire(view, foundation.C),
+    markerSemanticWire(view, foundation.L),
+    markerSemanticWire(view, foundation.U),
+    markerSemanticWire(view, chi),
   ].join("|");
 
   const fpA = fingerprint(viewA, fA, chiA);
