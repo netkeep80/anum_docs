@@ -14,7 +14,7 @@ Link связывает Links
 
 ## Основание v0.14
 
-У Link есть две реляционно различимые полюсные позиции. Одна операция образования/канонизации Link даёт четыре возможных класса самоинцидентности:
+У `Link` есть две реляционно различимые полюсные позиции. Одна операция образования/канонизации `Link` даёт четыре возможных класса самоинцидентности:
 
 ```text
 11
@@ -47,7 +47,7 @@ ROOT / {chiral pair} / PAIR
 1 = PAIR
 ```
 
-Это **рекурсивный алфавит МТС**, а не Anum/Q-алфавит и не обязательный набор hardware opcode.
+Это **рекурсивный алфавит МТС**, а не `Anum`/Q-алфавит и не обязательный набор `hardware` `opcode`.
 
 ## Контекстная ориентация
 
@@ -63,9 +63,9 @@ Context K
   -> START_K / END_K
 ```
 
-Observer/Context не создаёт хиральность. Он выбирает локальную ориентацию внутри уже существующей Z2-структуры.
+`Observer`/`Context` не создаёт хиральность. Он выбирает локальную ориентацию внутри уже существующей Z2-структуры.
 
-Для Context `A/B` относительный transport:
+Для `Context` `A/B` относительный `transport`:
 
 ```text
 g_AB ∈ {Id, J}
@@ -86,11 +86,11 @@ L4  names / Dictionary / Grammar / Theory / FORMAL
 
 Только `Link` является онтологической сущностью.
 
-`Anum` — укоренённое компактное кодирование **последовательности Links**. `ExactSequence` сохраняет точную позиционную идентичность, которая не сводится к fold-denotation.
+`Anum` — укоренённое компактное кодирование **последовательности `Links`**. `ExactSequence` сохраняет точную позиционную идентичность, которая не сводится к `fold-denotation`.
 
 ## Исполнение
 
-Generalized Modus Ponens был установлен в v0.13 и сохранён v0.14:
+`Generalized` `Modus` `Ponens` был установлен в v0.13 и сохранён v0.14:
 
 ```text
 K ⟼ {A}
@@ -101,7 +101,7 @@ K ⟼ {B}
 
 Один общий kernel покрывает `1→0`, `1→1`, `1→N`, `N→1`, `N→M`.
 
-A-memory execution profile управляется отдельно от 14-law contract МТС и не превращает backend scheduling/storage в семантику.
+`A-memory` `execution` `profile` управляется отдельно от 14-`law` `contract` МТС и не превращает `backend` `scheduling`/`storage` в семантику.
 
 <!-- мтс-текущая-проекция:начало -->
 > **Текущий принятый выпуск МТС: v0.14.** Этот блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.
@@ -115,20 +115,20 @@ A-memory execution profile управляется отдельно от 14-law c
 
 Текущая поверхность включает 14 законов `V14-L1…V14-L14`, среди которых:
 
-- одна Link-онтология и четыре возникающих structural cases;
-- context-relative A4′ orientation;
-- immutable structural Link identity;
-- Nat с `N0=U`, отдельная шкала Degree;
-- `Count`, canonical `Add`, derived `Le`;
-- явная граница: multiplication/full semiring вне acceptance scope;
-- сохранённый generalized Modus Ponens;
-- Anum sequence semantics и явные representation layers.
+- одна `Link-`онтология и четыре возникающих `structural` `cases`;
+- `context-relative` A4′ `orientation`;
+- `immutable` `structural` `Link` `identity`;
+- `Nat` с `N0=U`, отдельная шкала `Degree`;
+- `Count`, `canonical` `Add`, `derived` `Le`;
+- явная граница: `multiplication`/`full` `semiring` вне `acceptance` `scope`;
+- сохранённый `generalized` `Modus` `Ponens`;
+- `Anum` `sequence` `semantics` и явные `representation` `layers`.
 
-Полный normative registry: [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md).
+Полный `normative` `registry`: [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md).
 
 ## Полезные неподтверждённые идеи не выбрасываются
 
-Current docs различают:
+`Current` `docs` различают:
 
 ```text
 accepted
@@ -137,17 +137,17 @@ research/deferred
 historical alias
 ```
 
-`DEFERRED != REJECTED`: идеи, для которых ещё нет достаточного witness, сохраняются в canonical owner как явно ненормативные research lines и в Git/issue history; они не удаляются только потому, что не входят в текущие 14 законов.
+`DEFERRED != REJECTED`: идеи, для которых ещё нет достаточного `witness`, сохраняются в `canonical` `owner` как явно ненормативные `research` `lines` и в Git/`issue` `history`; они не удаляются только потому, что не входят в текущие 14 законов.
 
 ## Как читать документацию
 
 - [Основания МТС](docs/theory/Основания%20МТС.md) — почему из Link возникает структура v0.14;
 - [Система аксиом МТС](docs/theory/Система%20аксиом%20МТС.md) — 14 принятых законов и их классификация;
-- [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) — Anum/ExactSequence/Q/STRING;
-- [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) — Dictionary/Grammar/Theory/FORMAL;
-- [Апамять и управление сетью связей](docs/specs/Апамять%20и%20управление%20сетью%20связей.md) — execution/profile/substrate и retained research;
+- [Ачисла и сериализация](docs/specs/Ачисла%20и%20сериализация.md) — `Anum`/`ExactSequence`/Q/`STRING`;
+- [Формальная нотация МТС](docs/specs/Формальная%20нотация%20МТС.md) — `Dictionary`/`Grammar`/`Theory`/`FORMAL`;
+- [Апамять и управление сетью связей](docs/specs/Апамять%20и%20управление%20сетью%20связей.md) — `execution`/`profile`/`substrate` и `retained` `research`;
 - [Пучки связей](docs/specs/Пучки%20связей.md) — производная bundle-поверхность;
-- [Словарь терминов МТС](docs/Словарь%20терминов%20МТС.md) — current/profile/research/historical terminology.
+- [Словарь терминов МТС](docs/Словарь%20терминов%20МТС.md) — `current`/`profile`/`research`/`historical` `terminology`.
 
 ## Источники истины
 
@@ -163,11 +163,11 @@ current human documentation
 implementation notes
 ```
 
-GitHub — источник текущего состояния проекта; immutable acceptance artifacts сохраняют границы принятых версий.
+GitHub — источник текущего состояния проекта; `immutable` `acceptance` `artifacts` сохраняют границы принятых версий.
 
 ## Обозреватель контрактов
 
-Contract Observatory строится из machine-readable contract/traceability/requirements и позволяет проследить:
+`Contract` `Observatory` строится из `machine-readable` `contract`/`traceability`/`requirements` и позволяет проследить:
 
 ```text
 law
@@ -194,6 +194,6 @@ new semantic claim
 
 ## Авторы и соавторы
 
-Основной автор МТС: **Roman Vertushkin**.
+Основной автор МТС: **Роман Вертушкин**.
 
-Исследования и реализация развиваются совместно с участниками проекта и проверяются через GitHub history, executable witnesses и contract-driven governance.
+Исследования и реализация развиваются совместно с участниками проекта и проверяются через GitHub `history`, `executable` `witnesses` и `contract-driven` `governance`.
