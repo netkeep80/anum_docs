@@ -148,17 +148,23 @@ Qed.
 
    Historical MTS source 1e529a23... describes finite recursive forms modulo
    the least relation ~=, with one alpha-neutral normal form per semantic
-   class.  This record captures the exact dependency needed by A6 without
-   assuming pole extensionality or a reconstruction axiom. *)
-Record F2F3Normalization (F : Foundation) : Type := {
+   class.
+
+   The normalization package is indexed by a previously established unique
+   ROOT proof.  In the accepted proof order that proof is supplied by FND-02.
+   FND-13 then uses the recursive normal-form equation and completeness, not
+   pole extensionality as a premise. *)
+Definition RootUniqueness (F : Foundation) : Prop :=
+  forall x : Link F,
+    FullSelf F x ->
+    x = R F.
+
+Record F2F3Normalization
+    (F : Foundation)
+    (_uniqueRoot : RootUniqueness F) : Type := {
   NormalForm : Type;
   compose_nf : NormalForm -> NormalForm -> NormalForm;
   normal_form : Link F -> NormalForm;
-
-  root_unique_fnd02 :
-    forall x : Link F,
-      FullSelf F x ->
-      x = R F;
 
   normal_form_equation :
     forall x : Link F,
@@ -174,10 +180,11 @@ Record F2F3Normalization (F : Foundation) : Type := {
 }.
 
 (* FND-13 / historical A6 — identity by ordered poles, derived from the
-   accepted F2/F3 recursive-normalization interface. *)
+   accepted F2/F3 recursive-normalization interface after FND-02. *)
 Theorem FND_13_identity_by_poles
     (F : Foundation)
-    (N : F2F3Normalization F)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
     (x y : Link F) :
     x = y <->
     start F x = start F y /\
@@ -189,9 +196,12 @@ Proof.
     split; reflexivity.
   - intros H.
     destruct H as [Hs Hf].
-    apply (normal_form_complete F N x y).
-    rewrite (normal_form_equation F N x).
-    rewrite (normal_form_equation F N y).
+    apply (normal_form_complete
+      F (FND_02_unique_root F A1) N x y).
+    rewrite (normal_form_equation
+      F (FND_02_unique_root F A1) N x).
+    rewrite (normal_form_equation
+      F (FND_02_unique_root F A1) N y).
     rewrite Hs, Hf.
     reflexivity.
 Qed.
