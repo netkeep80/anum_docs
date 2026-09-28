@@ -3,7 +3,7 @@
   "theoremId": "FND-02",
   "mts": {
     "acceptedVersion": "v0.14",
-    "sourceCommitSha": "05c4bf3362b559d67dafd2892b937f14c2b89f18",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
@@ -28,5 +28,5 @@
       "sha256": "ec67d469b43c8bb6fcd6f207f289f132de80c0a0466e38bfe2457db715483949"
     }
   ],
-  "notes": "External differential proof only. FND_02_unique_root is derived from explicit A1RecursiveSeparation plus finite Grounded evidence; no A6/pole-extensionality or root-uniqueness axiom is assumed."
+  "notes": "External differential proof only. FND_02_unique_root is derived from explicit A1RecursiveSeparation plus finite Grounded evidence; no A6/pole-extensionality or root-uniqueness axiom is assumed. Accepted MTS source is pinned to the post-acceptance A75 cutover commit; the pre-acceptance ready SHA remains a separate semantic-freeze provenance point."
 }
