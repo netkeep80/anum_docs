@@ -29,7 +29,12 @@ jobs:
         run: npm ci --prefix ts --ignore-scripts --no-audit --no-fund
 
       - name: Typecheck, test and browser-check current MTS core
-        run: npm --prefix ts run check
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npm --prefix ts run check:current
+          else
+            npm --prefix ts run check:full
+          fi
 
       - name: Install MTS visual browser companion dependencies
         run: npm ci --prefix packages/visual --ignore-scripts --no-audit --no-fund
