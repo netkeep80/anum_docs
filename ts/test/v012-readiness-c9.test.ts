@@ -100,9 +100,23 @@ assert(
 );
 
 const rules = new Map<string, any>((policy.document_relations?.rules ?? []).map((rule: any) => [rule.id, rule]));
-assert(rules.get("v012-contract-ready")?.value === true, "policy positively pins contract readiness");
-assert(rules.get("v012-conformance-ready")?.value === true, "policy positively pins conformance readiness");
-assert(rules.get("v012-conformance-complete")?.value === "complete", "policy positively pins complete coverage");
+const legacyReadinessPins =
+  rules.get("v012-contract-ready")?.value === true
+  && rules.get("v012-conformance-ready")?.value === true
+  && rules.get("v012-conformance-complete")?.value === "complete";
+const immutablePaths = new Set<string>(policy.paths?.pr_immutable ?? []);
+const acceptedSnapshotFrozen =
+  acceptedLifecycle
+  && [
+    "contracts/mts-contract-v0.12.json",
+    "contracts/mts-conformance-v0.12.json",
+    "traceability/mts-v0.12.json",
+    "cutover/typescript-c1-acceptance-v0.5.json",
+  ].every((path) => immutablePaths.has(path));
+assert(
+  legacyReadinessPins || acceptedSnapshotFrozen,
+  "accepted v0.12 readiness evidence is protected by legacy pins or atomic PR immutability",
+);
 const temporaryPreAcceptancePins = [
   ["v012-contract-status-candidate", "candidate"],
   ["v012-conformance-status-candidate", "candidate"],
