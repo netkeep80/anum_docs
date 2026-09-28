@@ -1213,4 +1213,184 @@ theorem poles_recompose_after_fnd13
     F.form_finish (F.start x) (F.finish x)
   ⟩
 
+
+/--
+Every source admitted by the INV-01 structural graph is itself in the exact
+finite Grounded domain.  This is derived from the inversion proof tree; no
+larger domain is introduced for INV-02.
+-/
+theorem recursive_inversion_source_grounded
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    {x y : F.Link}
+    (h : RecursiveInversion F D x y) :
+    Grounded F x := by
+  induction h with
+  | root =>
+      exact grounded_of_full_self F (root_full_self F)
+  | start hStart _ ih =>
+      apply Grounded.node
+      · intro hNot
+        exact False.elim (hNot hStart.1)
+      · intro _
+        exact ih
+  | finish hFinish _ ih =>
+      apply Grounded.node
+      · intro _
+        exact ih
+      · intro hNot
+        exact False.elim (hNot hFinish.2)
+  | pair hPair _ _ ihFinish ihStart =>
+      apply Grounded.node
+      · intro _
+        exact ihStart
+      · intro _
+        exact ihFinish
+
+/--
+INV-02 relational core: applying the same structural inversion graph twice
+returns the original semantic Link.
+
+The induction is over the first INV-01 proof tree, so INV-02 has exactly the
+same declared domain as INV-01.  START/END branches use the already derived
+F2/F3 canonical one-sided forms.  PAIR reverses the two recursively inverted
+poles again and then uses post-FND-13 pole reconstruction.
+-/
+theorem INV_02_recursive_inversion_involutive
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {x y z : F.Link}
+    (hxy : RecursiveInversion F D x y)
+    (hyz : RecursiveInversion F D y z) :
+    z = x := by
+  induction hxy generalizing z with
+  | root =>
+      cases hyz with
+      | root =>
+          rfl
+      | start hStart _ =>
+          exact False.elim
+            (recursive_full_start_disjoint F (root_full_self F) hStart)
+      | finish hFinish _ =>
+          exact False.elim
+            (recursive_full_finish_disjoint F (root_full_self F) hFinish)
+      | pair hPair _ _ =>
+          exact False.elim
+            (recursive_full_pair_disjoint F (root_full_self F) hPair)
+  | @start x childInverse hStart hChild ih =>
+      have hYFinish : FinishOnly F (D.endForm childInverse) :=
+        recursive_end_form_pattern F a1 E D childInverse
+      have gx : Grounded F x := by
+        apply Grounded.node
+        · intro hNot
+          exact False.elim (hNot hStart.1)
+        · intro _
+          exact recursive_inversion_source_grounded F D hChild
+      cases hyz with
+      | root =>
+          exact False.elim
+            (recursive_full_finish_disjoint F (root_full_self F) hYFinish)
+      | start hYStart _ =>
+          exact False.elim
+            (recursive_start_finish_disjoint F hYStart hYFinish)
+      | @finish _ secondChild _ hSecond =>
+          have hSecond' :
+              RecursiveInversion F D childInverse secondChild := by
+            simpa only [recursive_end_start F D childInverse] using hSecond
+          have hSecondEq : secondChild = F.finish x :=
+            ih hSecond'
+          calc
+            D.startForm secondChild =
+                D.startForm (F.finish x) := congrArg D.startForm hSecondEq
+            _ = x :=
+              (recursive_start_form_canonical F a1 E D x gx hStart).symm
+      | pair hYPair _ _ =>
+          exact False.elim
+            (recursive_finish_pair_disjoint F hYFinish hYPair)
+  | @finish x childInverse hFinish hChild ih =>
+      have hYStart : StartOnly F (D.startForm childInverse) :=
+        recursive_start_form_pattern F a1 E D childInverse
+      have gx : Grounded F x := by
+        apply Grounded.node
+        · intro _
+          exact recursive_inversion_source_grounded F D hChild
+        · intro hNot
+          exact False.elim (hNot hFinish.2)
+      cases hyz with
+      | root =>
+          exact False.elim
+            (recursive_full_start_disjoint F (root_full_self F) hYStart)
+      | @start _ secondChild _ hSecond =>
+          have hSecond' :
+              RecursiveInversion F D childInverse secondChild := by
+            simpa only [recursive_start_finish F D childInverse] using hSecond
+          have hSecondEq : secondChild = F.start x :=
+            ih hSecond'
+          calc
+            D.endForm secondChild =
+                D.endForm (F.start x) := congrArg D.endForm hSecondEq
+            _ = x :=
+              (recursive_end_form_canonical F a1 E D x gx hFinish).symm
+      | finish hYFinish _ =>
+          exact False.elim
+            (recursive_start_finish_disjoint F hYStart hYFinish)
+      | pair hYPair _ _ =>
+          exact False.elim
+            (recursive_start_pair_disjoint F hYStart hYPair)
+  | @pair x inverseFinish inverseStart hPair hFinishInv hStartInv ihFinish ihStart =>
+      rcases INV_01_recursive_pole_reversal F D hyz with
+        ⟨secondFinish, secondStart, hSecondFinish, hSecondStart, hzForm⟩
+      have hSecondFinish' :
+          RecursiveInversion F D inverseStart secondFinish := by
+        simpa only [F.form_finish] using hSecondFinish
+      have hSecondStart' :
+          RecursiveInversion F D inverseFinish secondStart := by
+        simpa only [F.form_start] using hSecondStart
+      have hFinishEq : secondFinish = F.start x :=
+        ihStart hSecondFinish'
+      have hStartEq : secondStart = F.finish x :=
+        ihFinish hSecondStart'
+      calc
+        z = F.form secondFinish secondStart := hzForm
+        _ = F.form (F.start x) (F.finish x) := by
+          rw [hFinishEq, hStartEq]
+        _ = x := poles_recompose_after_fnd13 F a1 N x
+
+/--
+Function-level INV-02 witness without choosing a host function: INV-01
+totality produces the first and second graph images, and the relational
+involution theorem identifies the second image with the original Link.
+-/
+theorem INV_02_unique_total_involution
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {x : F.Link}
+    (gx : Grounded F x) :
+    ∃ y z : F.Link,
+      RecursiveInversion F D x y ∧
+      RecursiveInversion F D y z ∧
+      z = x := by
+  rcases INV_01_recursive_inversion_total F a1 N E D gx with
+    ⟨y, hxy⟩
+  have gy : Grounded F y :=
+    recursive_inversion_image_grounded F D hxy
+  rcases INV_01_recursive_inversion_total F a1 N E D gy with
+    ⟨z, hyz⟩
+  exact ⟨
+    y,
+    z,
+    hxy,
+    hyz,
+    INV_02_recursive_inversion_involutive F a1 N E D hxy hyz
+  ⟩
+
 end MTS.External
