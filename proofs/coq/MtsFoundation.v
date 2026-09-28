@@ -315,3 +315,237 @@ Proof.
         apply (proj2 (FND_13_identity_by_poles F A1 N x y)).
         split; assumption.
 Qed.
+
+
+(* Minimal F2/F3 existence premise for FND-01 realizability.
+   Only the two proper one-sided recursive forms around ROOT are supplied.
+   The ordinary pair representative is derived through the single Link-forming
+   primitive. *)
+Record F2F3OneSidedExistence (F : Foundation) : Type := {
+  f2f3_start_root : Link F;
+  f2f3_finish_root : Link F;
+
+  f2f3_start_root_equation :
+    f2f3_start_root =
+    form F f2f3_start_root (R F);
+
+  f2f3_finish_root_equation :
+    f2f3_finish_root =
+    form F (R F) f2f3_finish_root;
+
+  f2f3_start_root_ne_root :
+    f2f3_start_root <> R F;
+
+  f2f3_finish_root_ne_root :
+    f2f3_finish_root <> R F
+}.
+
+Lemma f2f3_start_root_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    start F (f2f3_start_root F E) = f2f3_start_root F E.
+Proof.
+  pose proof
+    (f_equal (start F) (f2f3_start_root_equation F E)) as H.
+  rewrite (form_start F (f2f3_start_root F E) (R F)) in H.
+  exact H.
+Qed.
+
+Lemma f2f3_start_root_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    finish F (f2f3_start_root F E) = R F.
+Proof.
+  pose proof
+    (f_equal (finish F) (f2f3_start_root_equation F E)) as H.
+  rewrite (form_finish F (f2f3_start_root F E) (R F)) in H.
+  exact H.
+Qed.
+
+Lemma f2f3_finish_root_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    start F (f2f3_finish_root F E) = R F.
+Proof.
+  pose proof
+    (f_equal (start F) (f2f3_finish_root_equation F E)) as H.
+  rewrite (form_start F (R F) (f2f3_finish_root F E)) in H.
+  exact H.
+Qed.
+
+Lemma f2f3_finish_root_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    finish F (f2f3_finish_root F E) = f2f3_finish_root F E.
+Proof.
+  pose proof
+    (f_equal (finish F) (f2f3_finish_root_equation F E)) as H.
+  rewrite (form_finish F (R F) (f2f3_finish_root F E)) in H.
+  exact H.
+Qed.
+
+Lemma f2f3_start_root_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    StartOnly F (f2f3_start_root F E).
+Proof.
+  unfold StartOnly, StartSelf, FinishSelf.
+  split.
+  - apply f2f3_start_root_start.
+  - intros H.
+    apply (f2f3_start_root_ne_root F E).
+    transitivity (finish F (f2f3_start_root F E)).
+    + symmetry. exact H.
+    + apply f2f3_start_root_finish.
+Qed.
+
+Lemma f2f3_finish_root_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    FinishOnly F (f2f3_finish_root F E).
+Proof.
+  unfold FinishOnly, StartSelf, FinishSelf.
+  split.
+  - intros H.
+    apply (f2f3_finish_root_ne_root F E).
+    transitivity (start F (f2f3_finish_root F E)).
+    + symmetry. exact H.
+    + apply f2f3_finish_root_start.
+  - apply f2f3_finish_root_finish.
+Qed.
+
+Lemma f2f3_start_root_grounded
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    Grounded F (f2f3_start_root F E).
+Proof.
+  apply grounded_node.
+  - intros Hnot.
+    exact (False_rect _ (Hnot (f2f3_start_root_start F E))).
+  - intros Hnot.
+    rewrite (f2f3_start_root_finish F E).
+    apply grounded_of_full_self.
+    apply root_full_self.
+Qed.
+
+Lemma f2f3_finish_root_grounded
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    Grounded F (f2f3_finish_root F E).
+Proof.
+  apply grounded_node.
+  - intros Hnot.
+    rewrite (f2f3_finish_root_start F E).
+    apply grounded_of_full_self.
+    apply root_full_self.
+  - intros Hnot.
+    exact (False_rect _ (Hnot (f2f3_finish_root_finish F E))).
+Qed.
+
+Lemma f2f3_pair_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F
+      (form F (f2f3_start_root F E) (f2f3_finish_root F E)).
+Proof.
+  unfold PairLocal, StartSelf, FinishSelf.
+  split.
+  - intros Hself.
+    pose proof
+      (form_start F (f2f3_start_root F E) (f2f3_finish_root F E))
+      as Hstart.
+    assert (
+      HstartPair :
+      f2f3_start_root F E =
+      form F (f2f3_start_root F E) (f2f3_finish_root F E)
+    ).
+    {
+      transitivity
+        (start F
+          (form F (f2f3_start_root F E) (f2f3_finish_root F E))).
+      - symmetry. exact Hstart.
+      - exact Hself.
+    }
+    apply (f2f3_finish_root_ne_root F E).
+    transitivity
+      (finish F
+        (form F (f2f3_start_root F E) (f2f3_finish_root F E))).
+    + symmetry.
+      apply form_finish.
+    + transitivity (finish F (f2f3_start_root F E)).
+      * symmetry.
+        exact (f_equal (finish F) HstartPair).
+      * apply f2f3_start_root_finish.
+  - intros Hself.
+    pose proof
+      (form_finish F (f2f3_start_root F E) (f2f3_finish_root F E))
+      as Hfinish.
+    assert (
+      HfinishPair :
+      f2f3_finish_root F E =
+      form F (f2f3_start_root F E) (f2f3_finish_root F E)
+    ).
+    {
+      transitivity
+        (finish F
+          (form F (f2f3_start_root F E) (f2f3_finish_root F E))).
+      - symmetry. exact Hfinish.
+      - exact Hself.
+    }
+    apply (f2f3_start_root_ne_root F E).
+    transitivity
+      (start F
+        (form F (f2f3_start_root F E) (f2f3_finish_root F E))).
+    + symmetry.
+      apply form_start.
+    + transitivity (start F (f2f3_finish_root F E)).
+      * symmetry.
+        exact (f_equal (start F) HfinishPair).
+      * apply f2f3_finish_root_start.
+Qed.
+
+Lemma f2f3_pair_grounded
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    Grounded F
+      (form F (f2f3_start_root F E) (f2f3_finish_root F E)).
+Proof.
+  apply grounded_node.
+  - intros Hnot.
+    rewrite (form_start F (f2f3_start_root F E) (f2f3_finish_root F E)).
+    apply f2f3_start_root_grounded.
+  - intros Hnot.
+    rewrite (form_finish F (f2f3_start_root F E) (f2f3_finish_root F E)).
+    apply f2f3_finish_root_grounded.
+Qed.
+
+(* FND-01 C2 — grounded realizability of all four proposition patterns.
+
+   ROOT is realized by R. F2/F3 contributes the two proper one-sided recursive
+   witnesses. The neither-self representative is derived with the same one
+   Link-forming primitive. *)
+Theorem FND_01_grounded_realizability
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    FullSelf F (R F) /\
+    exists startWitness finishWitness pairWitness : Link F,
+      Grounded F startWitness /\
+      Grounded F finishWitness /\
+      Grounded F pairWitness /\
+      StartOnly F startWitness /\
+      FinishOnly F finishWitness /\
+      PairLocal F pairWitness.
+Proof.
+  split.
+  - apply root_full_self.
+  - exists (f2f3_start_root F E).
+    exists (f2f3_finish_root F E).
+    exists (form F (f2f3_start_root F E) (f2f3_finish_root F E)).
+    repeat split.
+    + apply f2f3_start_root_grounded.
+    + apply f2f3_finish_root_grounded.
+    + apply f2f3_pair_grounded.
+    + apply f2f3_start_root_pattern.
+    + apply f2f3_finish_root_pattern.
+    + apply f2f3_pair_pattern.
+Qed.
