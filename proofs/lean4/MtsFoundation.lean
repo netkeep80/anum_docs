@@ -596,4 +596,337 @@ theorem FND_01_context_names_only
     f2f3_pair_pattern F E
   ⟩
 
+
+/--
+Generic F2/F3 recursive formation for the already accepted finite domain.
+
+FND-01 used the ROOT instances to prove four-pattern realizability.  INV-01
+needs the historical generic START(F) / END(F) domain closure.  This interface
+does not add a new Link kind: both forms are ordinary Links satisfying the
+same single form equation.
+-/
+structure F2F3RecursiveFormation
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) where
+  startForm : F.Link → F.Link
+  finishForm : F.Link → F.Link
+
+  startEquation :
+    ∀ x : F.Link,
+      startForm x = F.form (startForm x) x
+
+  finishEquation :
+    ∀ x : F.Link,
+      finishForm x = F.form x (finishForm x)
+
+  startRootAgreement :
+    startForm F.R = E.startRoot
+
+  finishRootAgreement :
+    finishForm F.R = E.finishRoot
+
+theorem f2f3_start_form_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : F.Link) :
+    F.start (D.startForm x) = D.startForm x := by
+  calc
+    F.start (D.startForm x) =
+        F.start (F.form (D.startForm x) x) :=
+      congrArg F.start (D.startEquation x)
+    _ = D.startForm x := F.form_start (D.startForm x) x
+
+theorem f2f3_start_form_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : F.Link) :
+    F.finish (D.startForm x) = x := by
+  calc
+    F.finish (D.startForm x) =
+        F.finish (F.form (D.startForm x) x) :=
+      congrArg F.finish (D.startEquation x)
+    _ = x := F.form_finish (D.startForm x) x
+
+theorem f2f3_finish_form_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : F.Link) :
+    F.start (D.finishForm x) = x := by
+  calc
+    F.start (D.finishForm x) =
+        F.start (F.form x (D.finishForm x)) :=
+      congrArg F.start (D.finishEquation x)
+    _ = x := F.form_start x (D.finishForm x)
+
+theorem f2f3_finish_form_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : F.Link) :
+    F.finish (D.finishForm x) = D.finishForm x := by
+  calc
+    F.finish (D.finishForm x) =
+        F.finish (F.form x (D.finishForm x)) :=
+      congrArg F.finish (D.finishEquation x)
+    _ = D.finishForm x := F.form_finish x (D.finishForm x)
+
+theorem f2f3_start_form_proper
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : F.Link) :
+    D.startForm x ≠ x := by
+  intro hCollapse
+  have hEquation := D.startEquation x
+  rw [hCollapse] at hEquation
+  have hFull : FullSelf F x := by
+    constructor
+    · calc
+        F.start x = F.start (F.form x x) := congrArg F.start hEquation
+        _ = x := F.form_start x x
+    · calc
+        F.finish x = F.finish (F.form x x) := congrArg F.finish hEquation
+        _ = x := F.form_finish x x
+  have hxRoot : x = F.R := FND_02_unique_root F a1 hFull
+  apply E.startRootNeRoot
+  calc
+    E.startRoot = D.startForm F.R := D.startRootAgreement.symm
+    _ = D.startForm x := congrArg D.startForm hxRoot.symm
+    _ = x := hCollapse
+    _ = F.R := hxRoot
+
+theorem f2f3_finish_form_proper
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : F.Link) :
+    D.finishForm x ≠ x := by
+  intro hCollapse
+  have hEquation := D.finishEquation x
+  rw [hCollapse] at hEquation
+  have hFull : FullSelf F x := by
+    constructor
+    · calc
+        F.start x = F.start (F.form x x) := congrArg F.start hEquation
+        _ = x := F.form_start x x
+    · calc
+        F.finish x = F.finish (F.form x x) := congrArg F.finish hEquation
+        _ = x := F.form_finish x x
+  have hxRoot : x = F.R := FND_02_unique_root F a1 hFull
+  apply E.finishRootNeRoot
+  calc
+    E.finishRoot = D.finishForm F.R := D.finishRootAgreement.symm
+    _ = D.finishForm x := congrArg D.finishForm hxRoot.symm
+    _ = x := hCollapse
+    _ = F.R := hxRoot
+
+theorem f2f3_start_form_pattern
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : F.Link) :
+    StartOnly F (D.startForm x) := by
+  constructor
+  · exact f2f3_start_form_start F E D x
+  · intro hFinishSelf
+    exact (f2f3_start_form_proper F a1 E D x) <| by
+      calc
+        D.startForm x = F.finish (D.startForm x) := hFinishSelf.symm
+        _ = x := f2f3_start_form_finish F E D x
+
+theorem f2f3_finish_form_pattern
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : F.Link) :
+    FinishOnly F (D.finishForm x) := by
+  constructor
+  · intro hStartSelf
+    exact (f2f3_finish_form_proper F a1 E D x) <| by
+      calc
+        D.finishForm x = F.start (D.finishForm x) := hStartSelf.symm
+        _ = x := f2f3_finish_form_start F E D x
+  · exact f2f3_finish_form_finish F E D x
+
+/--
+A constructive decision object.  Unlike DecidableEq, this carries authority
+only for the exact proposition supplied at one recursive node.
+-/
+inductive ProofDecision (P : Prop) : Type
+  | yes : P → ProofDecision P
+  | no : (P → False) → ProofDecision P
+
+def proofDecisionOr {P : Prop} : ProofDecision P → (P ∨ ¬ P)
+  | .yes h => Or.inl h
+  | .no h => Or.inr h
+
+/--
+Finite recursive traversal evidence for INV-01.
+
+There is one node constructor, not a four-case semantic datatype.  Recursive
+evidence is required only for poles that are not self-incidences.
+-/
+inductive InversionReady (F : Foundation) : F.Link → Type
+  | node {x : F.Link} :
+      ProofDecision (StartSelf F x) →
+      ProofDecision (FinishSelf F x) →
+      (F.start x ≠ x → InversionReady F (F.start x)) →
+      (F.finish x ≠ x → InversionReady F (F.finish x)) →
+      InversionReady F x
+
+def inversionReadyDecision
+    (F : Foundation)
+    {x : F.Link} :
+    InversionReady F x → LocalSelfDecision F x
+  | .node startDecision finishDecision _ _ =>
+      ⟨proofDecisionOr startDecision, proofDecisionOr finishDecision⟩
+
+theorem inversion_ready_grounded
+    (F : Foundation)
+    {x : F.Link}
+    (ready : InversionReady F x) :
+    Grounded F x := by
+  induction ready with
+  | node startDecision finishDecision startReady finishReady startIH finishIH =>
+      exact Grounded.node
+        (fun h => startIH h)
+        (fun h => finishIH h)
+
+/--
+INV-01 semantic relation.
+
+The relation is defined over Links themselves.  START/END target formation is
+the accepted F2/F3 recursive domain closure; PAIR uses the one Link-forming
+primitive with recursively inverted poles in reverse order.
+-/
+inductive RecursiveInverse
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E) :
+    F.Link → F.Link → Prop
+  | rootCase :
+      RecursiveInverse F E D F.R F.R
+  | startCase {x childInverse : F.Link} :
+      StartOnly F x →
+      RecursiveInverse F E D (F.finish x) childInverse →
+      RecursiveInverse F E D x (D.finishForm childInverse)
+  | finishCase {x childInverse : F.Link} :
+      FinishOnly F x →
+      RecursiveInverse F E D (F.start x) childInverse →
+      RecursiveInverse F E D x (D.startForm childInverse)
+  | pairCase {x startInverse finishInverse : F.Link} :
+      PairLocal F x →
+      RecursiveInverse F E D (F.start x) startInverse →
+      RecursiveInverse F E D (F.finish x) finishInverse →
+      RecursiveInverse F E D x (F.form finishInverse startInverse)
+
+theorem recursive_inverse_exists
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    {x : F.Link}
+    (ready : InversionReady F x) :
+    ∃ y : F.Link, RecursiveInverse F E D x y := by
+  induction ready with
+  | @node x startDecision finishDecision startReady finishReady startIH finishIH =>
+      have localDecision : LocalSelfDecision F x :=
+        ⟨proofDecisionOr startDecision, proofDecisionOr finishDecision⟩
+      have cases :=
+        (FND_01_four_structural_cases F a1 N E localDecision).1
+      rcases cases with hFull | hStart | hFinish | hPair
+      · have hxRoot : x = F.R := FND_02_unique_root F a1 hFull
+        subst x
+        exact ⟨F.R, RecursiveInverse.rootCase⟩
+      · rcases finishIH hStart.2 with ⟨childInverse, hChild⟩
+        exact ⟨D.finishForm childInverse,
+          RecursiveInverse.startCase hStart hChild⟩
+      · rcases startIH hFinish.1 with ⟨childInverse, hChild⟩
+        exact ⟨D.startForm childInverse,
+          RecursiveInverse.finishCase hFinish hChild⟩
+      · rcases startIH hPair.1 with ⟨startInverse, hStartInverse⟩
+        rcases finishIH hPair.2 with ⟨finishInverse, hFinishInverse⟩
+        exact ⟨F.form finishInverse startInverse,
+          RecursiveInverse.pairCase hPair hStartInverse hFinishInverse⟩
+
+theorem recursive_inverse_functional
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    {x y z : F.Link}
+    (left : RecursiveInverse F E D x y)
+    (right : RecursiveInverse F E D x z) :
+    y = z := by
+  induction left generalizing z with
+  | rootCase =>
+      cases right with
+      | rootCase => rfl
+      | startCase hStart _ =>
+          exact False.elim (hStart.2 (root_full_self F).2)
+      | finishCase hFinish _ =>
+          exact False.elim (hFinish.1 (root_full_self F).1)
+      | pairCase hPair _ _ =>
+          exact False.elim (hPair.1 (root_full_self F).1)
+  | startCase hStart hChild childIH =>
+      cases right with
+      | rootCase =>
+          exact False.elim (hStart.2 (root_full_self F).2)
+      | startCase _ hOtherChild =>
+          exact congrArg D.finishForm (childIH hOtherChild)
+      | finishCase hFinish _ =>
+          exact False.elim (hFinish.1 hStart.1)
+      | pairCase hPair _ _ =>
+          exact False.elim (hPair.1 hStart.1)
+  | finishCase hFinish hChild childIH =>
+      cases right with
+      | rootCase =>
+          exact False.elim (hFinish.1 (root_full_self F).1)
+      | startCase hStart _ =>
+          exact False.elim (hFinish.1 hStart.1)
+      | finishCase _ hOtherChild =>
+          exact congrArg D.startForm (childIH hOtherChild)
+      | pairCase hPair _ _ =>
+          exact False.elim (hPair.2 hFinish.2)
+  | pairCase hPair hStartChild hFinishChild startIH finishIH =>
+      cases right with
+      | rootCase =>
+          exact False.elim (hPair.1 (root_full_self F).1)
+      | startCase hStart _ =>
+          exact False.elim (hPair.1 hStart.1)
+      | finishCase hFinish _ =>
+          exact False.elim (hPair.2 hFinish.2)
+      | pairCase _ hOtherStart hOtherFinish =>
+          have hs := startIH hOtherStart
+          have hf := finishIH hOtherFinish
+          rw [hs, hf]
+
+/--
+INV-01 — recursive Link inversion is uniquely defined on the declared finite
+recursive domain equipped with exact local decision evidence.
+
+The result is a unique semantic Link.  No host graph, codec, handle identity or
+global equality decision participates in the definition.
+-/
+theorem INV_01_recursive_inversion
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    {x : F.Link}
+    (ready : InversionReady F x) :
+    ∃! y : F.Link, RecursiveInverse F E D x y := by
+  rcases recursive_inverse_exists F a1 N E D ready with ⟨y, hy⟩
+  exact ⟨y, hy, fun z hz => recursive_inverse_functional F E D hz hy⟩
+
 end MTS.External
