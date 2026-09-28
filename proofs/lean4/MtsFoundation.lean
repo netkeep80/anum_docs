@@ -29,18 +29,25 @@ def FullSelf (F : Foundation) (x : F.Link) : Prop :=
 /--
 Finite F2/F3 grounding without a four-constructor Aspect datatype.
 
-Each pole contributes one independent obligation:
-- it may be self; or
-- its external Link must itself have finite grounding evidence.
-
-The four familiar self-incidence cases therefore arise from the two binary
-pole obligations rather than being assumed as four primitive constructors.
+Grounded and PoleGrounded are mutually inductive so recursion is explicit
+rather than hidden under a generic Or.  Each pole contributes one independent
+obligation: self, or an external Link with finite Grounded evidence.
 -/
-inductive Grounded (F : Foundation) : F.Link → Prop
-  | node {x : F.Link} :
-      (F.start x = x ∨ Grounded F (F.start x)) →
-      (F.finish x = x ∨ Grounded F (F.finish x)) →
-      Grounded F x
+mutual
+  inductive Grounded (F : Foundation) : F.Link → Prop
+    | node {x : F.Link} :
+        PoleGrounded F x (F.start x) →
+        PoleGrounded F x (F.finish x) →
+        Grounded F x
+
+  inductive PoleGrounded (F : Foundation) : F.Link → F.Link → Prop
+    | self {whole pole : F.Link} :
+        pole = whole →
+        PoleGrounded F whole pole
+    | external {whole pole : F.Link} :
+        Grounded F pole →
+        PoleGrounded F whole pole
+end
 
 /--
 A finite, name-neutral witness that two Links are recursively distinguishable.
@@ -103,7 +110,9 @@ theorem root_full_self (F : Foundation) : FullSelf F F.R := by
 
 theorem grounded_of_full_self
     (F : Foundation) {x : F.Link} (h : FullSelf F x) : Grounded F x :=
-  Grounded.node (Or.inl h.1) (Or.inl h.2)
+  Grounded.node
+    (PoleGrounded.self h.1)
+    (PoleGrounded.self h.2)
 
 theorem full_self_not_distinguishable
     (F : Foundation) {x y : F.Link}
