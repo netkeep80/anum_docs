@@ -869,3 +869,243 @@ Proof.
     + exact HFinishInv.
     + exact HStartInv.
 Qed.
+
+
+Lemma recursive_full_start_disjoint
+    (F : Foundation)
+    (x : Link F) :
+    FullSelf F x ->
+    StartOnly F x ->
+    False.
+Proof.
+  intros HFull HStart.
+  exact ((proj2 HStart) (proj2 HFull)).
+Qed.
+
+Lemma recursive_full_finish_disjoint
+    (F : Foundation)
+    (x : Link F) :
+    FullSelf F x ->
+    FinishOnly F x ->
+    False.
+Proof.
+  intros HFull HFinish.
+  exact ((proj1 HFinish) (proj1 HFull)).
+Qed.
+
+Lemma recursive_full_pair_disjoint
+    (F : Foundation)
+    (x : Link F) :
+    FullSelf F x ->
+    PairLocal F x ->
+    False.
+Proof.
+  intros HFull HPair.
+  exact ((proj1 HPair) (proj1 HFull)).
+Qed.
+
+Lemma recursive_start_finish_disjoint
+    (F : Foundation)
+    (x : Link F) :
+    StartOnly F x ->
+    FinishOnly F x ->
+    False.
+Proof.
+  intros HStart HFinish.
+  exact ((proj1 HFinish) (proj1 HStart)).
+Qed.
+
+Lemma recursive_start_pair_disjoint
+    (F : Foundation)
+    (x : Link F) :
+    StartOnly F x ->
+    PairLocal F x ->
+    False.
+Proof.
+  intros HStart HPair.
+  exact ((proj1 HPair) (proj1 HStart)).
+Qed.
+
+Lemma recursive_finish_pair_disjoint
+    (F : Foundation)
+    (x : Link F) :
+    FinishOnly F x ->
+    PairLocal F x ->
+    False.
+Proof.
+  intros HFinish HPair.
+  exact ((proj2 HPair) (proj2 HFinish)).
+Qed.
+
+(* Relational spelling of J(A -> B) = J(B) -> J(A), including the
+   self-incidence cases where one recursively inverted pole is the current
+   inverse Link itself. *)
+Theorem INV_01_recursive_pole_reversal
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x y : Link F) :
+    RecursiveInversion F E D x y ->
+    exists inverseFinish inverseStart : Link F,
+      RecursiveInversion F E D (finish F x) inverseFinish /\
+      RecursiveInversion F E D (start F x) inverseStart /\
+      y = form F inverseFinish inverseStart.
+Proof.
+  intros H.
+  destruct H as
+    [ | x childInverse HStart HChild
+      | x childInverse HFinish HChild
+      | x inverseFinish inverseStart HPair HFinishInv HStartInv ].
+  - exists (R F).
+    exists (R F).
+    split.
+    + rewrite (proj2 (root_full_self F)).
+      apply recursive_inversion_root.
+    + split.
+      * rewrite (proj1 (root_full_self F)).
+        apply recursive_inversion_root.
+      * symmetry.
+        apply root_self.
+  - exists childInverse.
+    exists (recursive_end_form F E D childInverse).
+    split.
+    + exact HChild.
+    + split.
+      * rewrite (proj1 HStart).
+        apply recursive_inversion_start.
+        -- exact HStart.
+        -- exact HChild.
+      * apply recursive_end_equation.
+  - exists (recursive_start_form F E D childInverse).
+    exists childInverse.
+    split.
+    + rewrite (proj2 HFinish).
+      apply recursive_inversion_finish.
+      * exact HFinish.
+      * exact HChild.
+    + split.
+      * exact HChild.
+      * apply recursive_start_equation.
+  - exists inverseFinish.
+    exists inverseStart.
+    split.
+    + exact HFinishInv.
+    + split.
+      * exact HStartInv.
+      * reflexivity.
+Qed.
+
+(* Functional uniqueness of the structural inversion graph. *)
+Theorem recursive_inversion_functional
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    forall x y z : Link F,
+      RecursiveInversion F E D x y ->
+      RecursiveInversion F E D x z ->
+      y = z.
+Proof.
+  intros x y z Hy.
+  revert z.
+  induction Hy; intros z Hz.
+  - inversion Hz; subst.
+    + reflexivity.
+    + exfalso.
+      eapply recursive_full_start_disjoint.
+      * apply root_full_self.
+      * eassumption.
+    + exfalso.
+      eapply recursive_full_finish_disjoint.
+      * apply root_full_self.
+      * eassumption.
+    + exfalso.
+      eapply recursive_full_pair_disjoint.
+      * apply root_full_self.
+      * eassumption.
+  - inversion Hz; subst.
+    + exfalso.
+      eapply recursive_full_start_disjoint.
+      * apply root_full_self.
+      * exact H.
+    + apply f_equal.
+      apply IHHy.
+      assumption.
+    + exfalso.
+      eapply recursive_start_finish_disjoint.
+      * exact H.
+      * eassumption.
+    + exfalso.
+      eapply recursive_start_pair_disjoint.
+      * exact H.
+      * eassumption.
+  - inversion Hz; subst.
+    + exfalso.
+      eapply recursive_full_finish_disjoint.
+      * apply root_full_self.
+      * exact H.
+    + exfalso.
+      eapply recursive_start_finish_disjoint.
+      * eassumption.
+      * exact H.
+    + apply f_equal.
+      apply IHHy.
+      assumption.
+    + exfalso.
+      eapply recursive_finish_pair_disjoint.
+      * exact H.
+      * eassumption.
+  - inversion Hz; subst.
+    + exfalso.
+      eapply recursive_full_pair_disjoint.
+      * apply root_full_self.
+      * exact H.
+    + exfalso.
+      eapply recursive_start_pair_disjoint.
+      * eassumption.
+      * exact H.
+    + exfalso.
+      eapply recursive_finish_pair_disjoint.
+      * eassumption.
+      * exact H.
+    + assert (HF : inverseFinish = inverseFinish0).
+      {
+        apply IHHy1.
+        assumption.
+      }
+      assert (HS : inverseStart = inverseStart0).
+      {
+        apply IHHy2.
+        assumption.
+      }
+      rewrite HF, HS.
+      reflexivity.
+Qed.
+
+(* INV-01 capstone: J is a unique total graph on every Grounded Link in the
+   declared finite recursive domain.  No choice principle is required. *)
+Theorem INV_01_recursive_inversion_unique_total
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x : Link F) :
+    Grounded F x ->
+    exists y : Link F,
+      RecursiveInversion F E D x y /\
+      forall z : Link F,
+        RecursiveInversion F E D x z ->
+        z = y.
+Proof.
+  intros G.
+  destruct (INV_01_recursive_inversion_total F A1 N E D x G)
+    as [y Hy].
+  exists y.
+  split.
+  - exact Hy.
+  - intros z Hz.
+    symmetry.
+    apply (recursive_inversion_functional F E D x y z).
+    + exact Hy.
+    + exact Hz.
+Qed.
