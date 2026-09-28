@@ -239,16 +239,25 @@ same(
   "author decision must reference exact ready artifacts",
 );
 
-// Governance retains the readiness pins after acceptance and rotates current/previous separately.
+// Governance preserves accepted v0.13 readiness either through the legacy scalar pins
+// or through the stronger accepted-snapshot PR immutability boundary.
 const rules = new Map<string, any>(
   (policy.document_relations?.rules ?? []).map((rule: any) => [rule.id, rule]),
 );
-same(rules.get("v013-contract-ready")?.value, true, "policy pins v0.13 contract ready");
-same(rules.get("v013-conformance-ready")?.value, true, "policy pins v0.13 conformance ready");
-same(
-  rules.get("v013-conformance-complete")?.value,
-  "complete",
-  "policy pins v0.13 complete coverage",
+const legacyReadinessPins =
+  rules.get("v013-contract-ready")?.value === true
+  && rules.get("v013-conformance-ready")?.value === true
+  && rules.get("v013-conformance-complete")?.value === "complete";
+const immutablePaths = new Set<string>(policy.paths?.pr_immutable ?? []);
+const acceptedSnapshotFrozen = [
+  "contracts/mts-contract-v0.13.json",
+  "contracts/mts-conformance-v0.13.json",
+  "traceability/mts-v0.13.json",
+  "cutover/typescript-c1-acceptance-v0.6.json",
+].every((path) => immutablePaths.has(path));
+assert(
+  legacyReadinessPins || acceptedSnapshotFrozen,
+  "accepted v0.13 readiness evidence is protected by legacy pins or atomic PR immutability",
 );
 
 console.log(
