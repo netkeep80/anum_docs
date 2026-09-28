@@ -1191,9 +1191,10 @@ same(
   typedWriteOwners.length,
   "metric: typed direct Memory write owners",
 );
-assert(
-  decisionCandidates.length <= projection.metrics.staticSemanticDecisionCandidateOwnerCount,
-  "current static decision candidates do not exceed frozen v0.13 S3 metric",
+same(
+  decisionCandidates.length - observedPostV013ToolingDecisionOwners,
+  projection.metrics.staticSemanticDecisionCandidateOwnerCount - projectedPostV013ToolingDecisionOwners,
+  "metric: frozen non-tooling static decision candidate owners",
 );
 same(
   projection.metrics.unclassifiedStaticDecisionCandidateOwnerCount,
