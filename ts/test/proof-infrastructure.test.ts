@@ -237,6 +237,43 @@ for (const record of fnd02) {
     `FND-02 ${record.lane} proof source commit`,
   );
 }
+
+const fnd13 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-13")
+  .map(({ record }) => record);
+assert.equal(fnd13.length, 2, "FND-13 has exactly two external evidence records");
+assert.deepEqual(
+  fnd13.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "FND-13 external lanes",
+);
+for (const record of fnd13) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "4d9c33d0e37735756f4dd0f0190b01964db2aac7",
+    `FND-13 ${record.lane} proof source commit`,
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit),
+      "FND-13 Lean evidence pin includes exact release commit",
+    );
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "FND-13 Lean evidence pin includes release artifact digest",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit),
+      "FND-13 Rocq evidence pin includes exact release commit",
+    );
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "FND-13 Rocq evidence pin includes exact image digest",
+    );
+  }
+}
 const leanEvidence = fnd02.find((record) => record.lane === "lean4");
 const coqEvidence = fnd02.find((record) => record.lane === "coq");
 assert.ok(leanEvidence !== undefined && coqEvidence !== undefined);
@@ -258,5 +295,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq aprover-input=mtsNative-only`,
 );
