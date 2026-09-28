@@ -1020,4 +1020,197 @@ theorem INV_01_recursive_inversion_unique_total
   intro z hz
   exact recursive_inversion_functional F D hz hy
 
+
+/--
+Finite recursive distinction is irreflexive.
+
+This is needed to show that two grounded one-sided Links with the same external
+pole carry no recursive distinction.  It follows directly from the proof
+relation itself; no equality decision procedure is used.
+-/
+theorem distinguishable_irreflexive
+    (F : Foundation)
+    {x : F.Link} :
+    ¬ Distinguishable F x x := by
+  intro h
+  induction h with
+  | startSelfLeft hSelf hNot =>
+      exact hNot hSelf
+  | startSelfRight hNot hSelf =>
+      exact hNot hSelf
+  | finishSelfLeft hSelf hNot =>
+      exact hNot hSelf
+  | finishSelfRight hNot hSelf =>
+      exact hNot hSelf
+  | startChild _ _ _ ih =>
+      exact ih
+  | finishChild _ _ _ ih =>
+      exact ih
+
+theorem grounded_start_of_nonself
+    (F : Foundation)
+    {x : F.Link}
+    (gx : Grounded F x)
+    (hNot : F.start x ≠ x) :
+    Grounded F (F.start x) := by
+  cases gx with
+  | node startStep _ =>
+      exact startStep hNot
+
+theorem grounded_finish_of_nonself
+    (F : Foundation)
+    {x : F.Link}
+    (gx : Grounded F x)
+    (hNot : F.finish x ≠ x) :
+    Grounded F (F.finish x) := by
+  cases gx with
+  | node _ finishStep =>
+      exact finishStep hNot
+
+/--
+Generic F2/F3 START(F) is a proper one-sided form, not an accidental ROOT.
+-/
+theorem recursive_start_form_pattern
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a : F.Link) :
+    StartOnly F (D.startForm a) := by
+  constructor
+  · exact recursive_start_start F D a
+  · intro hFinishSelf
+    have hFull : FullSelf F (D.startForm a) :=
+      ⟨recursive_start_start F D a, hFinishSelf⟩
+    have hRoot := FND_02_unique_root F a1 hFull
+    have haRoot : a = F.R := by
+      calc
+        a = F.finish (D.startForm a) :=
+          (recursive_start_finish F D a).symm
+        _ = F.finish F.R := congrArg F.finish hRoot
+        _ = F.R := (root_full_self F).2
+    apply E.startRootNeRoot
+    calc
+      E.startRoot = D.startForm F.R := D.startRootCompat.symm
+      _ = D.startForm a := congrArg D.startForm haRoot.symm
+      _ = F.R := hRoot
+
+/--
+Generic F2/F3 END(F) is a proper one-sided form, not an accidental ROOT.
+-/
+theorem recursive_end_form_pattern
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a : F.Link) :
+    FinishOnly F (D.endForm a) := by
+  constructor
+  · intro hStartSelf
+    have hFull : FullSelf F (D.endForm a) :=
+      ⟨hStartSelf, recursive_end_finish F D a⟩
+    have hRoot := FND_02_unique_root F a1 hFull
+    have haRoot : a = F.R := by
+      calc
+        a = F.start (D.endForm a) :=
+          (recursive_end_start F D a).symm
+        _ = F.start F.R := congrArg F.start hRoot
+        _ = F.R := (root_full_self F).1
+    apply E.finishRootNeRoot
+    calc
+      E.finishRoot = D.endForm F.R := D.endRootCompat.symm
+      _ = D.endForm a := congrArg D.endForm haRoot.symm
+      _ = F.R := hRoot
+  · exact recursive_end_finish F D a
+
+/--
+A grounded StartOnly Link is the unique semantic START of its external finish
+pole.  This is derived from A1 recursive separation, not added as a domain
+field.
+-/
+theorem recursive_start_form_canonical
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {x : F.Link}
+    (gx : Grounded F x)
+    (hStart : StartOnly F x) :
+    x = D.startForm (F.finish x) := by
+  have gFinish := grounded_finish_of_nonself F gx hStart.2
+  have gCanonical := recursive_start_grounded F D gFinish
+  have hCanonical :=
+    recursive_start_form_pattern F a1 E D (F.finish x)
+  apply a1 gx gCanonical
+  intro hDist
+  cases hDist with
+  | startSelfLeft _ hNot =>
+      exact hNot hCanonical.1
+  | startSelfRight hNot _ =>
+      exact hNot hStart.1
+  | finishSelfLeft hSelf _ =>
+      exact hStart.2 hSelf
+  | finishSelfRight _ hSelf =>
+      exact hCanonical.2 hSelf
+  | startChild hNot _ _ =>
+      exact hNot hStart.1
+  | finishChild _ _ hChild =>
+      apply distinguishable_irreflexive F
+      simpa only [recursive_start_finish F D (F.finish x)] using hChild
+
+/--
+A grounded FinishOnly Link is the unique semantic END of its external start
+pole.
+-/
+theorem recursive_end_form_canonical
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {x : F.Link}
+    (gx : Grounded F x)
+    (hFinish : FinishOnly F x) :
+    x = D.endForm (F.start x) := by
+  have gStart := grounded_start_of_nonself F gx hFinish.1
+  have gCanonical := recursive_end_grounded F D gStart
+  have hCanonical :=
+    recursive_end_form_pattern F a1 E D (F.start x)
+  apply a1 gx gCanonical
+  intro hDist
+  cases hDist with
+  | startSelfLeft hSelf _ =>
+      exact hFinish.1 hSelf
+  | startSelfRight _ hSelf =>
+      exact hCanonical.1 hSelf
+  | finishSelfLeft _ hNot =>
+      exact hNot hCanonical.2
+  | finishSelfRight hNot _ =>
+      exact hNot hFinish.2
+  | startChild _ _ hChild =>
+      apply distinguishable_irreflexive F
+      simpa only [recursive_end_start F D (F.start x)] using hChild
+  | finishChild hNot _ _ =>
+      exact hNot hFinish.2
+
+/--
+After FND-13, a Link is derivably equal to the form built from its ordered
+poles.  This is a theorem downstream of identity-by-poles, not a reconstruction
+axiom.
+-/
+theorem poles_recompose_after_fnd13
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (x : F.Link) :
+    let s := F.start x
+    let t := F.finish x
+    F.form s t = x := by
+  dsimp
+  apply (FND_13_identity_by_poles F a1 N).2
+  exact ⟨
+    F.form_start (F.start x) (F.finish x),
+    F.form_finish (F.start x) (F.finish x)
+  ⟩
+
 end MTS.External
