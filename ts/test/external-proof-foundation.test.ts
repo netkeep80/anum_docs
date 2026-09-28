@@ -552,6 +552,35 @@ assert(
     rocq.includes("FND_02_unique_root F A1 x HFull"),
   "Rocq INV-01 totality consumes FND-01 partition and FND-02 unique ROOT",
 );
+for (const source of [lean, rocq]) {
+  assert(
+    source.includes("INV_01_recursive_pole_reversal"),
+    "external source proves relational J(A->B)=J(B)->J(A)",
+  );
+  assert(
+    source.includes("recursive_inversion_functional"),
+    "external source proves structural inversion graph functionality",
+  );
+  assert(
+    source.includes("INV_01_recursive_inversion_unique_total"),
+    "external source closes INV-01 with unique total graph",
+  );
+}
+assert(
+  lean.includes("∃! y : F.Link, RecursiveInversion F D x y"),
+  "Lean INV-01 capstone states unique existence directly",
+);
+assert(
+  rocq.includes("forall z : Link F,") &&
+    rocq.includes("RecursiveInversion F E D x z ->") &&
+    rocq.includes("z = y"),
+  "Rocq INV-01 capstone states constructive unique existence",
+);
+assert(
+  lean.includes("y = F.form inverseFinish inverseStart") &&
+    rocq.includes("y = form F inverseFinish inverseStart"),
+  "both external proofs state recursive pole reversal equation",
+);
 const leanInvStart = lean.indexOf("structure RecursiveInversionDomain");
 const leanInvEnd = lean.indexOf("theorem INV_01_recursive_inversion_total", leanInvStart);
 const rocqInvStart = rocq.indexOf("Record RecursiveInversionDomain");
@@ -625,7 +654,10 @@ console.log([
   "INV01_GRAPH=PROP_VALUED_STRUCTURAL",
   "INV01_TOTAL=GROUNDED_DOMAIN",
   "INV01_IMAGE=GROUNDED",
-  "INV01_UNIQUENESS=DEFERRED",
+  "INV01_POLE_REVERSAL=GREEN_SOURCE",
+  "INV01_FUNCTIONAL=GREEN_SOURCE",
+  "INV01_UNIQUE_TOTAL=GREEN_SOURCE",
+  "INV01_UNIQUENESS=EXPLICIT",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
