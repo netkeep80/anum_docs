@@ -873,13 +873,12 @@ theorem INV_01_recursive_pole_reversal
       y = F.form inverseFinish inverseStart := by
   cases h with
   | root =>
-      exact ⟨
-        F.R,
-        F.R,
-        RecursiveInversion.root,
-        RecursiveInversion.root,
-        F.root_self.symm
-      ⟩
+      have hRoot := root_full_self F
+      refine ⟨F.R, F.R, ?_, ?_, F.root_self.symm⟩
+      · simpa only [hRoot.2] using
+          (RecursiveInversion.root (F := F) (D := D))
+      · simpa only [hRoot.1] using
+          (RecursiveInversion.root (F := F) (D := D))
   | start hStart hChild =>
       have selfInverse :=
         RecursiveInversion.start (D := D) hStart hChild
@@ -890,7 +889,8 @@ theorem INV_01_recursive_pole_reversal
         ?_,
         D.endEquation _
       ⟩
-      simpa only [hStart.1] using selfInverse
+      rw [hStart.1]
+      exact selfInverse
   | finish hFinish hChild =>
       have selfInverse :=
         RecursiveInversion.finish (D := D) hFinish hChild
@@ -901,7 +901,8 @@ theorem INV_01_recursive_pole_reversal
         hChild,
         D.startEquation _
       ⟩
-      simpa only [hFinish.2] using selfInverse
+      rw [hFinish.2]
+      exact selfInverse
   | pair hPair hFinishInv hStartInv =>
       exact ⟨
         _,
@@ -997,7 +998,7 @@ theorem INV_01_recursive_inversion_unique_total
     (D : RecursiveInversionDomain F E)
     {x : F.Link}
     (gx : Grounded F x) :
-    ∃! y : F.Link, RecursiveInversion F D x y := by
+    ExistsUnique (fun y : F.Link => RecursiveInversion F D x y) := by
   rcases INV_01_recursive_inversion_total F a1 N E D gx with
     ⟨y, hy⟩
   refine ⟨y, hy, ?_⟩
