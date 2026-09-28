@@ -194,5 +194,4 @@ new semantic claim
 - [Дьяченко Константин Константинович](https://github.com/konard)
 - [Шакиров Тимур Эдуардович](https://github.com/TimaxLacs)
 - [Бурдуков Александр Николаевич](https://github.com/InAiwetrustAGI)
-- [Глазунов Иван Сергеевич](https://github.com/ivansglazunov)
 <!-- мтс:требование:README-AUTHORS:конец -->
