@@ -274,6 +274,53 @@ for (const record of fnd13) {
     );
   }
 }
+const fnd01 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-01")
+  .map(({ record }) => record);
+assert.equal(fnd01.length, 2, "FND-01 has exactly two external evidence records");
+assert.deepEqual(
+  fnd01.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "FND-01 external lanes",
+);
+for (const record of fnd01) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "21e6e5c4328af4e6e70bf1c9953e2aeab4c2f907",
+    `FND-01 ${record.lane} proof source commit`,
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit),
+      "FND-01 Lean evidence pin includes exact release commit",
+    );
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "FND-01 Lean evidence pin includes release artifact digest",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit),
+      "FND-01 Rocq evidence pin includes exact release commit",
+    );
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "FND-01 Rocq evidence pin includes exact image digest",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /LocalSelfDecision.*explicit|explicit LocalSelfDecision/i,
+    "FND-01 evidence discloses the local-decision classifier boundary",
+  );
+  assert.match(
+    String(record.notes),
+    /ContextOneSidedNames.*alias-only|alias-only.*ContextOneSidedNames/i,
+    "FND-01 evidence discloses Context naming as alias-only",
+  );
+}
+
 const leanEvidence = fnd02.find((record) => record.lane === "lean4");
 const coqEvidence = fnd02.find((record) => record.lane === "coq");
 assert.ok(leanEvidence !== undefined && coqEvidence !== undefined);
@@ -295,5 +342,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq aprover-input=mtsNative-only`,
 );
