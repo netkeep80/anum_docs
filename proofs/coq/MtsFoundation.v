@@ -553,3 +553,81 @@ Proof.
               ** apply f2f3_finish_root_pattern.
               ** apply f2f3_pair_pattern.
 Qed.
+
+
+(* FND-01 C3 structural capstone.
+
+   C1 proves the exhaustive/exclusive proposition partition.
+   C2 proves grounded realizability of every proposition pattern.
+   FND-02 and FND-13 remain the identity boundaries consumed by C1. *)
+Theorem FND_01_four_structural_cases
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (x : Link F) :
+    LocalSelfDecision F x ->
+    LocalSelfIncidenceExhaustive F x /\
+    LocalSelfIncidenceExclusive F x /\
+    (FullSelf F x -> x = R F) /\
+    (forall y : Link F,
+      start F x = start F y ->
+      finish F x = finish F y ->
+      x = y) /\
+    (FullSelf F (R F) /\
+      exists startWitness finishWitness pairWitness : Link F,
+        Grounded F startWitness /\
+        Grounded F finishWitness /\
+        Grounded F pairWitness /\
+        StartOnly F startWitness /\
+        FinishOnly F finishWitness /\
+        PairLocal F pairWitness).
+Proof.
+  intros D.
+  pose proof (FND_01_local_partition F A1 N x D) as C1.
+  pose proof (FND_01_grounded_realizability F E) as C2.
+  destruct C1 as [HEx [HExclusive [HRoot HIdentity]]].
+  split.
+  - exact HEx.
+  - split.
+    + exact HExclusive.
+    + split.
+      * exact HRoot.
+      * split.
+        -- exact HIdentity.
+        -- exact C2.
+Qed.
+
+(* Context-relative START_K / END_K naming is presentation only.
+   This predicate does not create Links. It only identifies Context-provided
+   names with the already existing F2/F3 one-sided witnesses. Actual frame
+   selection/chirality belongs to CTX-03. *)
+Definition ContextOneSidedNames
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (START_K END_K : Link F) : Prop :=
+  START_K = f2f3_start_root F E /\
+  END_K = f2f3_finish_root F E.
+
+Theorem FND_01_context_names_only
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (START_K END_K : Link F) :
+    ContextOneSidedNames F E START_K END_K ->
+    FullSelf F (R F) /\
+    StartOnly F START_K /\
+    FinishOnly F END_K /\
+    PairLocal F (form F START_K END_K).
+Proof.
+  intros Names.
+  destruct Names as [HStartName HEndName].
+  subst START_K.
+  subst END_K.
+  split.
+  - apply root_full_self.
+  - split.
+    + apply f2f3_start_root_pattern.
+    + split.
+      * apply f2f3_finish_root_pattern.
+      * apply f2f3_pair_pattern.
+Qed.
