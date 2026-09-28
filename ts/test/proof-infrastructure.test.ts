@@ -134,8 +134,8 @@ function sha256File(path: string): string {
 const evidenceFiles = collectJsonFiles(resolve(root, "proofs", "evidence"));
 assert.ok(evidenceFiles.length >= 2, "external proof evidence records must exist");
 
-const p0Targets = new Map(
-  p0.targets.map((target: any) => [String(target.id), target]),
+const p0Targets = new Map<string, any>(
+  p0.targets.map((target: any) => [String(target.id), target] as const),
 );
 
 const evidenceRecords = evidenceFiles.map((path) => ({
