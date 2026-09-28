@@ -631,3 +631,241 @@ Proof.
       * apply f2f3_finish_root_pattern.
       * apply f2f3_pair_pattern.
 Qed.
+
+
+(* Declared finite recursive domain used by structural inversion.
+
+   Historical F2/F3 forms START(F) and END(F) are available for arbitrary
+   grounded F. These are proof-level constructors over the one Link-forming
+   primitive, not ontology kinds. *)
+Record RecursiveInversionDomain
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) : Type := {
+  recursive_start_form : Link F -> Link F;
+  recursive_end_form : Link F -> Link F;
+
+  recursive_start_equation :
+    forall a : Link F,
+      recursive_start_form a =
+      form F (recursive_start_form a) a;
+
+  recursive_end_equation :
+    forall a : Link F,
+      recursive_end_form a =
+      form F a (recursive_end_form a);
+
+  recursive_start_root_compat :
+    recursive_start_form (R F) = f2f3_start_root F E;
+
+  recursive_end_root_compat :
+    recursive_end_form (R F) = f2f3_finish_root F E;
+
+  recursive_local_decision :
+    forall x : Link F,
+      Grounded F x ->
+      LocalSelfDecision F x
+}.
+
+Lemma recursive_start_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a : Link F) :
+    start F (recursive_start_form F E D a) =
+    recursive_start_form F E D a.
+Proof.
+  pose proof
+    (f_equal (start F) (recursive_start_equation F E D a)) as H.
+  rewrite (form_start F (recursive_start_form F E D a) a) in H.
+  exact H.
+Qed.
+
+Lemma recursive_start_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a : Link F) :
+    finish F (recursive_start_form F E D a) = a.
+Proof.
+  pose proof
+    (f_equal (finish F) (recursive_start_equation F E D a)) as H.
+  rewrite (form_finish F (recursive_start_form F E D a) a) in H.
+  exact H.
+Qed.
+
+Lemma recursive_end_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a : Link F) :
+    start F (recursive_end_form F E D a) = a.
+Proof.
+  pose proof
+    (f_equal (start F) (recursive_end_equation F E D a)) as H.
+  rewrite (form_start F a (recursive_end_form F E D a)) in H.
+  exact H.
+Qed.
+
+Lemma recursive_end_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a : Link F) :
+    finish F (recursive_end_form F E D a) =
+    recursive_end_form F E D a.
+Proof.
+  pose proof
+    (f_equal (finish F) (recursive_end_equation F E D a)) as H.
+  rewrite (form_finish F a (recursive_end_form F E D a)) in H.
+  exact H.
+Qed.
+
+Lemma recursive_start_grounded
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a : Link F) :
+    Grounded F a ->
+    Grounded F (recursive_start_form F E D a).
+Proof.
+  intros Ga.
+  apply grounded_node.
+  - intros Hnot.
+    exact (False_rect _ (Hnot (recursive_start_start F E D a))).
+  - intros Hnot.
+    rewrite (recursive_start_finish F E D a).
+    exact Ga.
+Qed.
+
+Lemma recursive_end_grounded
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a : Link F) :
+    Grounded F a ->
+    Grounded F (recursive_end_form F E D a).
+Proof.
+  intros Ga.
+  apply grounded_node.
+  - intros Hnot.
+    rewrite (recursive_end_start F E D a).
+    exact Ga.
+  - intros Hnot.
+    exact (False_rect _ (Hnot (recursive_end_finish F E D a))).
+Qed.
+
+Lemma recursive_pair_grounded
+    (F : Foundation)
+    (a b : Link F) :
+    Grounded F a ->
+    Grounded F b ->
+    Grounded F (form F a b).
+Proof.
+  intros Ga Gb.
+  apply grounded_node.
+  - intros Hnot.
+    rewrite (form_start F a b).
+    exact Ga.
+  - intros Hnot.
+    rewrite (form_finish F a b).
+    exact Gb.
+Qed.
+
+(* Prop-valued graph of recursive structural inversion.
+
+   This is not a four-case ontology datatype.  These are proof rules for the
+   structural action of J itself. *)
+Inductive RecursiveInversion
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    Link F -> Link F -> Prop :=
+| recursive_inversion_root :
+    RecursiveInversion F E D (R F) (R F)
+| recursive_inversion_start :
+    forall x childInverse : Link F,
+      StartOnly F x ->
+      RecursiveInversion F E D (finish F x) childInverse ->
+      RecursiveInversion F E D x
+        (recursive_end_form F E D childInverse)
+| recursive_inversion_finish :
+    forall x childInverse : Link F,
+      FinishOnly F x ->
+      RecursiveInversion F E D (start F x) childInverse ->
+      RecursiveInversion F E D x
+        (recursive_start_form F E D childInverse)
+| recursive_inversion_pair :
+    forall x inverseFinish inverseStart : Link F,
+      PairLocal F x ->
+      RecursiveInversion F E D (finish F x) inverseFinish ->
+      RecursiveInversion F E D (start F x) inverseStart ->
+      RecursiveInversion F E D x
+        (form F inverseFinish inverseStart).
+
+Lemma recursive_inversion_image_grounded
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x y : Link F) :
+    RecursiveInversion F E D x y ->
+    Grounded F y.
+Proof.
+  intros H.
+  induction H.
+  - apply grounded_of_full_self.
+    apply root_full_self.
+  - apply recursive_end_grounded.
+    exact IHRecursiveInversion.
+  - apply recursive_start_grounded.
+    exact IHRecursiveInversion.
+  - apply recursive_pair_grounded.
+    + exact IHRecursiveInversion1.
+    + exact IHRecursiveInversion2.
+Qed.
+
+(* INV-01 totality on the declared finite recursive domain.
+
+   The proof recurses only through non-self poles supplied by finite Grounded
+   evidence.  The local four-way split is imported from FND-01; the fully self
+   case is identified with ROOT by FND-02. *)
+Theorem INV_01_recursive_inversion_total
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x : Link F) :
+    Grounded F x ->
+    exists y : Link F, RecursiveInversion F E D x y.
+Proof.
+  intros G.
+  induction G as [x StartStep IHStart FinishStep IHFinish].
+  pose proof
+    (recursive_local_decision F E D x
+      (grounded_node F x StartStep FinishStep)) as Decision.
+  pose proof
+    (FND_01_local_partition F A1 N x Decision) as Partition.
+  destruct Partition as [Cases _].
+  destruct Cases as [HFull | [HStart | [HFinish | HPair]]].
+  - pose proof (FND_02_unique_root F A1 x HFull) as HRoot.
+    subst x.
+    exists (R F).
+    apply recursive_inversion_root.
+  - destruct (IHFinish (proj2 HStart)) as [childInverse HChild].
+    exists (recursive_end_form F E D childInverse).
+    apply recursive_inversion_start.
+    + exact HStart.
+    + exact HChild.
+  - destruct (IHStart (proj1 HFinish)) as [childInverse HChild].
+    exists (recursive_start_form F E D childInverse).
+    apply recursive_inversion_finish.
+    + exact HFinish.
+    + exact HChild.
+  - destruct (IHFinish (proj2 HPair)) as [inverseFinish HFinishInv].
+    destruct (IHStart (proj1 HPair)) as [inverseStart HStartInv].
+    exists (form F inverseFinish inverseStart).
+    apply recursive_inversion_pair.
+    + exact HPair.
+    + exact HFinishInv.
+    + exact HStartInv.
+Qed.

@@ -596,4 +596,211 @@ theorem FND_01_context_names_only
     f2f3_pair_pattern F E
   ⟩
 
+
+/--
+Declared finite recursive domain used by structural inversion.
+
+The domain realizes the historical F2/F3 recursive forms START(F) and END(F)
+for arbitrary grounded F.  These are proof-level constructors over the one
+Link-forming primitive, not new ontology kinds.
+
+Local self-incidence decisions are explicit proof inputs for the declared
+finite domain; they are not host handles, codec digits, or graph labels.
+-/
+structure RecursiveInversionDomain
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) where
+  startForm : F.Link → F.Link
+  endForm : F.Link → F.Link
+
+  startEquation :
+    ∀ a : F.Link,
+      startForm a = F.form (startForm a) a
+
+  endEquation :
+    ∀ a : F.Link,
+      endForm a = F.form a (endForm a)
+
+  startRootCompat :
+    startForm F.R = E.startRoot
+
+  endRootCompat :
+    endForm F.R = E.finishRoot
+
+  decide :
+    ∀ {x : F.Link},
+      Grounded F x →
+      LocalSelfDecision F x
+
+theorem recursive_start_start
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    (a : F.Link) :
+    F.start (D.startForm a) = D.startForm a := by
+  calc
+    F.start (D.startForm a) =
+        F.start (F.form (D.startForm a) a) :=
+      congrArg F.start (D.startEquation a)
+    _ = D.startForm a := F.form_start (D.startForm a) a
+
+theorem recursive_start_finish
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    (a : F.Link) :
+    F.finish (D.startForm a) = a := by
+  calc
+    F.finish (D.startForm a) =
+        F.finish (F.form (D.startForm a) a) :=
+      congrArg F.finish (D.startEquation a)
+    _ = a := F.form_finish (D.startForm a) a
+
+theorem recursive_end_start
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    (a : F.Link) :
+    F.start (D.endForm a) = a := by
+  calc
+    F.start (D.endForm a) =
+        F.start (F.form a (D.endForm a)) :=
+      congrArg F.start (D.endEquation a)
+    _ = a := F.form_start a (D.endForm a)
+
+theorem recursive_end_finish
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    (a : F.Link) :
+    F.finish (D.endForm a) = D.endForm a := by
+  calc
+    F.finish (D.endForm a) =
+        F.finish (F.form a (D.endForm a)) :=
+      congrArg F.finish (D.endEquation a)
+    _ = D.endForm a := F.form_finish a (D.endForm a)
+
+theorem recursive_start_grounded
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    {a : F.Link}
+    (ga : Grounded F a) :
+    Grounded F (D.startForm a) := by
+  apply Grounded.node
+  · intro hNot
+    exact False.elim (hNot (recursive_start_start F D a))
+  · intro _
+    simpa only [recursive_start_finish F D a] using ga
+
+theorem recursive_end_grounded
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    {a : F.Link}
+    (ga : Grounded F a) :
+    Grounded F (D.endForm a) := by
+  apply Grounded.node
+  · intro _
+    simpa only [recursive_end_start F D a] using ga
+  · intro hNot
+    exact False.elim (hNot (recursive_end_finish F D a))
+
+theorem recursive_pair_grounded
+    (F : Foundation)
+    {a b : F.Link}
+    (ga : Grounded F a)
+    (gb : Grounded F b) :
+    Grounded F (F.form a b) := by
+  apply Grounded.node
+  · intro _
+    simpa only [F.form_start] using ga
+  · intro _
+    simpa only [F.form_finish] using gb
+
+/--
+Prop-valued graph of recursive structural inversion.
+
+This is not an Aspect datatype.  The proof rules are the structural action of
+J itself:
+  ROOT      -> ROOT
+  START(F)  -> END(J(F))
+  END(F)    -> START(J(F))
+  PAIR(F,G) -> PAIR(J(G), J(F))
+-/
+inductive RecursiveInversion
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E) :
+    F.Link → F.Link → Prop
+  | root :
+      RecursiveInversion F D F.R F.R
+  | start {x childInverse : F.Link} :
+      StartOnly F x →
+      RecursiveInversion F D (F.finish x) childInverse →
+      RecursiveInversion F D x (D.endForm childInverse)
+  | finish {x childInverse : F.Link} :
+      FinishOnly F x →
+      RecursiveInversion F D (F.start x) childInverse →
+      RecursiveInversion F D x (D.startForm childInverse)
+  | pair {x inverseFinish inverseStart : F.Link} :
+      PairLocal F x →
+      RecursiveInversion F D (F.finish x) inverseFinish →
+      RecursiveInversion F D (F.start x) inverseStart →
+      RecursiveInversion F D x (F.form inverseFinish inverseStart)
+
+theorem recursive_inversion_image_grounded
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    {x y : F.Link}
+    (h : RecursiveInversion F D x y) :
+    Grounded F y := by
+  induction h with
+  | root =>
+      exact grounded_of_full_self F (root_full_self F)
+  | start _ _ ih =>
+      exact recursive_end_grounded F D ih
+  | finish _ _ ih =>
+      exact recursive_start_grounded F D ih
+  | pair _ _ _ ihFinish ihStart =>
+      exact recursive_pair_grounded F ihFinish ihStart
+
+/--
+INV-01 totality on the declared finite recursive domain.
+
+The proof recurses only through non-self poles supplied by finite Grounded
+evidence.  The local four-way split is imported from FND-01; the fully self
+case is identified with ROOT by FND-02.
+-/
+theorem INV_01_recursive_inversion_total
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {x : F.Link}
+    (gx : Grounded F x) :
+    ∃ y : F.Link, RecursiveInversion F D x y := by
+  induction gx with
+  | node startStep finishStep ihStart ihFinish =>
+      have decision := D.decide (Grounded.node startStep finishStep)
+      have partition := FND_01_local_partition F a1 N decision
+      rcases partition.1 with hFull | hStart | hFinish | hPair
+      · have hxRoot := FND_02_unique_root F a1 hFull
+        refine ⟨F.R, ?_⟩
+        simpa only [hxRoot] using
+          (RecursiveInversion.root (F := F) (D := D))
+      · rcases ihFinish hStart.2 with ⟨childInverse, hChild⟩
+        exact ⟨D.endForm childInverse, RecursiveInversion.start hStart hChild⟩
+      · rcases ihStart hFinish.1 with ⟨childInverse, hChild⟩
+        exact ⟨D.startForm childInverse, RecursiveInversion.finish hFinish hChild⟩
+      · rcases ihFinish hPair.2 with ⟨inverseFinish, hFinishInv⟩
+        rcases ihStart hPair.1 with ⟨inverseStart, hStartInv⟩
+        exact ⟨
+          F.form inverseFinish inverseStart,
+          RecursiveInversion.pair hPair hFinishInv hStartInv
+        ⟩
+
 end MTS.External
