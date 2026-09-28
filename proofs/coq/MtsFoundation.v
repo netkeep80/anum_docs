@@ -631,3 +631,394 @@ Proof.
       * apply f2f3_finish_root_pattern.
       * apply f2f3_pair_pattern.
 Qed.
+
+
+(* Generic F2/F3 recursive formation for the already accepted finite domain.
+   It exposes historical START(F) / END(F) formation through ordinary Links,
+   not new ontology kinds. *)
+Record F2F3RecursiveFormation
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) : Type := {
+  f2f3_start_form : Link F -> Link F;
+  f2f3_finish_form : Link F -> Link F;
+
+  f2f3_start_equation :
+    forall x : Link F,
+      f2f3_start_form x =
+      form F (f2f3_start_form x) x;
+
+  f2f3_finish_equation :
+    forall x : Link F,
+      f2f3_finish_form x =
+      form F x (f2f3_finish_form x);
+
+  f2f3_start_root_agreement :
+    f2f3_start_form (R F) = f2f3_start_root F E;
+
+  f2f3_finish_root_agreement :
+    f2f3_finish_form (R F) = f2f3_finish_root F E
+}.
+
+Lemma f2f3_start_form_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : Link F) :
+    start F (f2f3_start_form F E D x) =
+    f2f3_start_form F E D x.
+Proof.
+  pose proof
+    (f_equal (start F) (f2f3_start_equation F E D x)) as H.
+  rewrite (form_start F (f2f3_start_form F E D x) x) in H.
+  exact H.
+Qed.
+
+Lemma f2f3_start_form_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : Link F) :
+    finish F (f2f3_start_form F E D x) = x.
+Proof.
+  pose proof
+    (f_equal (finish F) (f2f3_start_equation F E D x)) as H.
+  rewrite (form_finish F (f2f3_start_form F E D x) x) in H.
+  exact H.
+Qed.
+
+Lemma f2f3_finish_form_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : Link F) :
+    start F (f2f3_finish_form F E D x) = x.
+Proof.
+  pose proof
+    (f_equal (start F) (f2f3_finish_equation F E D x)) as H.
+  rewrite (form_start F x (f2f3_finish_form F E D x)) in H.
+  exact H.
+Qed.
+
+Lemma f2f3_finish_form_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : Link F) :
+    finish F (f2f3_finish_form F E D x) =
+    f2f3_finish_form F E D x.
+Proof.
+  pose proof
+    (f_equal (finish F) (f2f3_finish_equation F E D x)) as H.
+  rewrite (form_finish F x (f2f3_finish_form F E D x)) in H.
+  exact H.
+Qed.
+
+Lemma f2f3_start_form_proper
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : Link F) :
+    f2f3_start_form F E D x <> x.
+Proof.
+  intros HCollapse.
+  pose proof (f2f3_start_equation F E D x) as Heq.
+  rewrite HCollapse in Heq.
+  assert (HFull : FullSelf F x).
+  {
+    unfold FullSelf.
+    split.
+    - transitivity (start F (form F x x)).
+      + exact (f_equal (start F) Heq).
+      + apply form_start.
+    - transitivity (finish F (form F x x)).
+      + exact (f_equal (finish F) Heq).
+      + apply form_finish.
+  }
+  pose proof (FND_02_unique_root F A1 x HFull) as HRoot.
+  apply (f2f3_start_root_ne_root F E).
+  transitivity (f2f3_start_form F E D (R F)).
+  - symmetry. apply f2f3_start_root_agreement.
+  - transitivity (f2f3_start_form F E D x).
+    + exact (f_equal (f2f3_start_form F E D) (eq_sym HRoot)).
+    + transitivity x.
+      * exact HCollapse.
+      * exact HRoot.
+Qed.
+
+Lemma f2f3_finish_form_proper
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : Link F) :
+    f2f3_finish_form F E D x <> x.
+Proof.
+  intros HCollapse.
+  pose proof (f2f3_finish_equation F E D x) as Heq.
+  rewrite HCollapse in Heq.
+  assert (HFull : FullSelf F x).
+  {
+    unfold FullSelf.
+    split.
+    - transitivity (start F (form F x x)).
+      + exact (f_equal (start F) Heq).
+      + apply form_start.
+    - transitivity (finish F (form F x x)).
+      + exact (f_equal (finish F) Heq).
+      + apply form_finish.
+  }
+  pose proof (FND_02_unique_root F A1 x HFull) as HRoot.
+  apply (f2f3_finish_root_ne_root F E).
+  transitivity (f2f3_finish_form F E D (R F)).
+  - symmetry. apply f2f3_finish_root_agreement.
+  - transitivity (f2f3_finish_form F E D x).
+    + exact (f_equal (f2f3_finish_form F E D) (eq_sym HRoot)).
+    + transitivity x.
+      * exact HCollapse.
+      * exact HRoot.
+Qed.
+
+Lemma f2f3_start_form_pattern
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : Link F) :
+    StartOnly F (f2f3_start_form F E D x).
+Proof.
+  unfold StartOnly, StartSelf, FinishSelf.
+  split.
+  - apply f2f3_start_form_start.
+  - intros H.
+    apply (f2f3_start_form_proper F A1 E D x).
+    transitivity (finish F (f2f3_start_form F E D x)).
+    + symmetry. exact H.
+    + apply f2f3_start_form_finish.
+Qed.
+
+Lemma f2f3_finish_form_pattern
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : Link F) :
+    FinishOnly F (f2f3_finish_form F E D x).
+Proof.
+  unfold FinishOnly, StartSelf, FinishSelf.
+  split.
+  - intros H.
+    apply (f2f3_finish_form_proper F A1 E D x).
+    transitivity (start F (f2f3_finish_form F E D x)).
+    + symmetry. exact H.
+    + apply f2f3_finish_form_start.
+  - apply f2f3_finish_form_finish.
+Qed.
+
+(* A decision object for one exact proposition, not a global equality
+   decision procedure. *)
+Inductive ProofDecision (P : Prop) : Type :=
+| proof_yes : P -> ProofDecision P
+| proof_no : (P -> False) -> ProofDecision P.
+
+Definition proof_decision_or
+    (P : Prop)
+    (D : ProofDecision P) :
+    P \/ ~ P :=
+  match D with
+  | proof_yes _ H => or_introl H
+  | proof_no _ H => or_intror H
+  end.
+
+(* Finite recursive traversal evidence. There is one node constructor, not a
+   four-case semantic datatype. *)
+Inductive InversionReady (F : Foundation) : Link F -> Type :=
+| inversion_ready_node :
+    forall x : Link F,
+      ProofDecision (StartSelf F x) ->
+      ProofDecision (FinishSelf F x) ->
+      (start F x <> x -> InversionReady F (start F x)) ->
+      (finish F x <> x -> InversionReady F (finish F x)) ->
+      InversionReady F x.
+
+Definition inversion_ready_decision
+    (F : Foundation)
+    (x : Link F)
+    (Ready : InversionReady F x) :
+    LocalSelfDecision F x.
+Proof.
+  destruct Ready as [x StartDecision FinishDecision StartReady FinishReady].
+  split.
+  - exact (proof_decision_or (StartSelf F x) StartDecision).
+  - exact (proof_decision_or (FinishSelf F x) FinishDecision).
+Defined.
+
+Lemma inversion_ready_grounded
+    (F : Foundation) :
+    forall x : Link F,
+      InversionReady F x ->
+      Grounded F x.
+Proof.
+  fix IH 2.
+  intros x Ready.
+  destruct Ready as [x StartDecision FinishDecision StartReady FinishReady].
+  apply grounded_node.
+  - intros H. apply IH. exact (StartReady H).
+  - intros H. apply IH. exact (FinishReady H).
+Qed.
+
+(* INV-01 semantic relation over Links themselves. *)
+Inductive RecursiveInverse
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E) :
+    Link F -> Link F -> Prop :=
+| inverse_root :
+    RecursiveInverse F E D (R F) (R F)
+| inverse_start :
+    forall x childInverse : Link F,
+      StartOnly F x ->
+      RecursiveInverse F E D (finish F x) childInverse ->
+      RecursiveInverse F E D x (f2f3_finish_form F E D childInverse)
+| inverse_finish :
+    forall x childInverse : Link F,
+      FinishOnly F x ->
+      RecursiveInverse F E D (start F x) childInverse ->
+      RecursiveInverse F E D x (f2f3_start_form F E D childInverse)
+| inverse_pair :
+    forall x startInverse finishInverse : Link F,
+      PairLocal F x ->
+      RecursiveInverse F E D (start F x) startInverse ->
+      RecursiveInverse F E D (finish F x) finishInverse ->
+      RecursiveInverse F E D x (form F finishInverse startInverse).
+
+Theorem recursive_inverse_exists
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E) :
+    forall x : Link F,
+      InversionReady F x ->
+      exists y : Link F, RecursiveInverse F E D x y.
+Proof.
+  fix IH 2.
+  intros x Ready.
+  pose proof (inversion_ready_decision F x Ready) as LocalDecision.
+  pose proof
+    (FND_01_four_structural_cases F A1 N E x LocalDecision)
+    as Cases.
+  destruct Cases as [HCase _].
+  destruct Ready as [x StartDecision FinishDecision StartReady FinishReady].
+  destruct HCase as [HFull | [HStart | [HFinish | HPair]]].
+  - pose proof (FND_02_unique_root F A1 x HFull) as HRoot.
+    subst x.
+    exists (R F).
+    apply inverse_root.
+  - destruct (IH (finish F x) (FinishReady (proj2 HStart)))
+      as [ChildInverse HChild].
+    exists (f2f3_finish_form F E D ChildInverse).
+    apply inverse_start.
+    + exact HStart.
+    + exact HChild.
+  - destruct (IH (start F x) (StartReady (proj1 HFinish)))
+      as [ChildInverse HChild].
+    exists (f2f3_start_form F E D ChildInverse).
+    apply inverse_finish.
+    + exact HFinish.
+    + exact HChild.
+  - destruct (IH (start F x) (StartReady (proj1 HPair)))
+      as [StartInverse HStartInverse].
+    destruct (IH (finish F x) (FinishReady (proj2 HPair)))
+      as [FinishInverse HFinishInverse].
+    exists (form F FinishInverse StartInverse).
+    apply inverse_pair.
+    + exact HPair.
+    + exact HStartInverse.
+    + exact HFinishInverse.
+Qed.
+
+Theorem recursive_inverse_functional
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E) :
+    forall x y z : Link F,
+      RecursiveInverse F E D x y ->
+      RecursiveInverse F E D x z ->
+      y = z.
+Proof.
+  intros x y z Left.
+  revert z.
+  induction Left as
+    [|x childInverse HStart HChild ChildIH
+     |x childInverse HFinish HChild ChildIH
+     |x startInverse finishInverse HPair HStartChild StartIH HFinishChild FinishIH].
+  - intros z Right.
+    destruct Right as
+      [|x child HStart HChild
+       |x child HFinish HChild
+       |x s f HPair Hs Hf].
+    + reflexivity.
+    + exact (False_rect _ ((proj2 HStart) (proj2 (root_full_self F)))).
+    + exact (False_rect _ ((proj1 HFinish) (proj1 (root_full_self F)))).
+    + exact (False_rect _ ((proj1 HPair) (proj1 (root_full_self F)))).
+  - intros z Right.
+    destruct Right as
+      [|x child HStart2 HChild2
+       |x child HFinish2 HChild2
+       |x s f HPair2 Hs2 Hf2].
+    + exact (False_rect _ ((proj2 HStart) (proj2 (root_full_self F)))).
+    + exact (f_equal (f2f3_finish_form F E D) (ChildIH child HChild2)).
+    + exact (False_rect _ ((proj1 HFinish2) (proj1 HStart))).
+    + exact (False_rect _ ((proj1 HPair2) (proj1 HStart))).
+  - intros z Right.
+    destruct Right as
+      [|x child HStart2 HChild2
+       |x child HFinish2 HChild2
+       |x s f HPair2 Hs2 Hf2].
+    + exact (False_rect _ ((proj1 HFinish) (proj1 (root_full_self F)))).
+    + exact (False_rect _ ((proj1 HFinish) (proj1 HStart2))).
+    + exact (f_equal (f2f3_start_form F E D) (ChildIH child HChild2)).
+    + exact (False_rect _ ((proj2 HPair2) (proj2 HFinish))).
+  - intros z Right.
+    destruct Right as
+      [|x child HStart2 HChild2
+       |x child HFinish2 HChild2
+       |x s f HPair2 Hs2 Hf2].
+    + exact (False_rect _ ((proj1 HPair) (proj1 (root_full_self F)))).
+    + exact (False_rect _ ((proj1 HPair) (proj1 HStart2))).
+    + exact (False_rect _ ((proj2 HPair) (proj2 HFinish2))).
+    + pose proof (StartIH s Hs2) as HS.
+      pose proof (FinishIH f Hf2) as HF.
+      subst s.
+      subst f.
+      reflexivity.
+Qed.
+
+(* INV-01 — recursive Link inversion has exactly one result on the declared
+   finite recursive domain with explicit local-decision evidence. *)
+Theorem INV_01_recursive_inversion
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : F2F3RecursiveFormation F E)
+    (x : Link F) :
+    InversionReady F x ->
+    exists y : Link F,
+      RecursiveInverse F E D x y /\
+      forall z : Link F,
+        RecursiveInverse F E D x z ->
+        z = y.
+Proof.
+  intros Ready.
+  destruct (recursive_inverse_exists F A1 N E D x Ready) as [y Hy].
+  exists y.
+  split.
+  - exact Hy.
+  - intros z Hz.
+    symmetry.
+    apply (recursive_inverse_functional F E D x y z).
+    + exact Hy.
+    + exact Hz.
+Qed.
