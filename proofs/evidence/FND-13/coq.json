@@ -1,0 +1,35 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-13",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "A1 recursive distinguishability / finite grounding principle",
+    "F2/F3 name-neutral grounded normal-form principle",
+    "FND-02 unique ROOT"
+  ],
+  "dependencies": [
+    "FND-02"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "4d9c33d0e37735756f4dd0f0190b01964db2aac7",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "c7c2073852bbcff07335c84e654567d9569648211c839c94d7f74701f0f60d36"
+    }
+  ],
+  "notes": "External differential proof only. FND_13_identity_by_poles is derived on the accepted finite R-grounded F2/F3-normalized domain. The normalization witness is indexed by the already proved FND-02 unique-ROOT result; no pole-extensionality axiom, reconstruction axiom, name equality, or bundle equality is used as semantic Link identity authority."
+}
