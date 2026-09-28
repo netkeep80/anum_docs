@@ -1111,13 +1111,14 @@ assert(
   driftFiles.every((file) => postV013ToolingDeltaFiles.has(file)),
   `post-v0.13 static decision drift is tooling-only: ${driftFiles.join(", ")}`,
 );
-assert(
-  decisionCandidates.length <= decisionAudit.decisionCandidateOwnerCount,
-  "post-v0.13 tooling refactor must not increase whole-package host-decision owner count",
-);
-assert(
-  decisionAudit.decisionCandidateOwnerCount - decisionCandidates.length >= 0,
-  "current tooling decision-owner count remains within the frozen historical S3 boundary",
+const projectedPostV013ToolingDecisionOwners = [...postV013ToolingDeltaFiles]
+  .reduce((sum, file) => sum + (projectedDecisionCountsByFile[file] ?? 0), 0);
+const observedPostV013ToolingDecisionOwners = [...postV013ToolingDeltaFiles]
+  .reduce((sum, file) => sum + (observedDecisionCountsByFile[file] ?? 0), 0);
+same(
+  decisionCandidates.length - observedPostV013ToolingDecisionOwners,
+  decisionAudit.decisionCandidateOwnerCount - projectedPostV013ToolingDecisionOwners,
+  "non-tooling host-decision owner count remains frozen while post-v0.13 tooling may evolve",
 );
 
 for (const [file, projectedCount] of Object.entries(projectedDecisionCountsByFile)) {
