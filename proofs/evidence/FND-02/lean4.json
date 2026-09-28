@@ -1,0 +1,32 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-02",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "A1 recursive distinguishability / finite grounding principle",
+    "F2/F3 name-neutral grounded normal-form principle"
+  ],
+  "dependencies": [],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "lean4",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "209b46d1bb376b31ad151694886cf0114102d631",
+    "toolchain": {
+      "name": "Lean",
+      "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/lean4/MtsFoundation.lean",
+      "sha256": "de0733ad04ee2175476855a2e5c0b78e68cebff7ec9dfb8abd54f4ccecef60af"
+    }
+  ],
+  "notes": "External differential proof only. FND_02_unique_root is derived from explicit A1RecursiveSeparation plus finite Grounded evidence; no A6/pole-extensionality or root-uniqueness axiom is assumed. Accepted MTS source is pinned to the post-acceptance A75 cutover commit; the pre-acceptance ready SHA remains a separate semantic-freeze provenance point."
+}
