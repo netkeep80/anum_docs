@@ -756,8 +756,8 @@ theorem f2f3_finish_form_pattern
   · exact f2f3_finish_form_finish F E D x
 
 /--
-A constructive decision object.  Unlike DecidableEq, this carries authority
-only for the exact proposition supplied at one recursive node.
+A constructive decision object.  It carries authority only for the exact
+proposition supplied at one recursive node, not a global equality procedure.
 -/
 inductive ProofDecision (P : Prop) : Type
   | yes : P → ProofDecision P
