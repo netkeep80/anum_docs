@@ -131,6 +131,11 @@ jobs:
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository history for patch-equivalence audit
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Delete only safely proven merged branches
         env:
           GH_TOKEN: ${{ github.token }}
@@ -165,6 +170,19 @@ jobs:
           deleted_merged_pr_heads=0
           deleted_zero_ahead=0
           skipped=0
+          patch_equivalent_individual=0
+          patch_equivalent_squash=0
+          empty_net_patch=0
+          unclassified_unique=0
+
+          declare -A main_patch_ids=()
+          while read -r patch_id commit_id; do
+            if [ -n "$patch_id" ] && [ -n "$commit_id" ]; then
+              main_patch_ids["$patch_id"]="$commit_id"
+            fi
+          done < <(
+            git log --no-merges --patch --pretty=format:%H "origin/$BASE" | git patch-id --stable
+          )
 
           for row in "${branches[@]}"; do
             branch="${row%%$'\t'*}"
@@ -203,7 +221,49 @@ jobs:
 
             ahead_by="$(jq -r '.ahead_by' <<< "$compare")"
             if [ "$ahead_by" != "0" ]; then
-              echo "KEEP unique commits ($ahead_by): $branch"
+              if ! git fetch --quiet --no-tags origin                 "+refs/heads/$BASE:refs/remotes/origin/$BASE"                 "+refs/heads/$branch:refs/remotes/origin/$branch"
+              then
+                echo "KEEP unique commits ($ahead_by), patch audit fetch failed: $branch"
+                skipped=$((skipped + 1))
+                unclassified_unique=$((unclassified_unique + 1))
+                continue
+              fi
+
+              merge_base="$(git merge-base "origin/$BASE" "origin/$branch" 2>/dev/null || true)"
+              if [ -z "$merge_base" ]; then
+                echo "KEEP unique commits ($ahead_by), no merge-base: $branch"
+                skipped=$((skipped + 1))
+                unclassified_unique=$((unclassified_unique + 1))
+                continue
+              fi
+
+              if git diff --quiet "$merge_base" "origin/$branch"; then
+                echo "REPORT EMPTY_NET_PATCH ($ahead_by): $branch @ $sha"
+                empty_net_patch=$((empty_net_patch + 1))
+                skipped=$((skipped + 1))
+                continue
+              fi
+
+              cherry_output="$(git cherry "origin/$BASE" "origin/$branch" 2>/dev/null || true)"
+              if [ -n "$cherry_output" ] && ! grep -q '^+' <<< "$cherry_output"; then
+                echo "REPORT INDIVIDUAL_EQUIVALENT ($ahead_by): $branch @ $sha"
+                patch_equivalent_individual=$((patch_equivalent_individual + 1))
+                skipped=$((skipped + 1))
+                continue
+              fi
+
+              aggregate_patch_id="$(
+                git diff --binary "$merge_base" "origin/$branch"                   | git patch-id --stable                   | awk 'NR == 1 { print $1 }'
+              )"
+              if [ -n "$aggregate_patch_id" ] && [ -n "${main_patch_ids["$aggregate_patch_id"]+x}" ]; then
+                echo "REPORT AGGREGATE_SQUASH_EQUIVALENT ($ahead_by): $branch @ $sha -> ${main_patch_ids["$aggregate_patch_id"]}"
+                patch_equivalent_squash=$((patch_equivalent_squash + 1))
+                skipped=$((skipped + 1))
+                continue
+              fi
+
+              echo "KEEP UNCLASSIFIED_UNIQUE ($ahead_by): $branch @ $sha"
+              unclassified_unique=$((unclassified_unique + 1))
               skipped=$((skipped + 1))
               continue
             fi
@@ -221,4 +281,8 @@ jobs:
           echo "Deleted total: $deleted"
           echo "Deleted exact merged-PR heads: $deleted_merged_pr_heads"
           echo "Deleted zero-ahead branches: $deleted_zero_ahead"
+          echo "Report-only individual patch-equivalent: $patch_equivalent_individual"
+          echo "Report-only aggregate squash-equivalent: $patch_equivalent_squash"
+          echo "Report-only empty net patch: $empty_net_patch"
+          echo "Unclassified unique branches: $unclassified_unique"
           echo "Kept/skipped: $skipped"
