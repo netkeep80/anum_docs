@@ -174,6 +174,17 @@ jobs:
           patch_equivalent_squash=0
           empty_net_patch=0
           unclassified_unique=0
+          patch_equivalent_candidates=()
+
+          declare -A closed_pr_refs=()
+          while IFS= read -r ref; do
+            if [ -n "$ref" ]; then
+              closed_pr_refs["$ref"]=1
+            fi
+          done < <(
+            gh api --paginate "repos/$REPO/pulls?state=closed&per_page=100&sort=updated&direction=desc" \
+              --jq '.[] | select(.head.repo.full_name == .base.repo.full_name) | .head.ref'
+          )
 
           declare -A main_patch_ids=()
           while read -r patch_id commit_id; do
@@ -240,6 +251,7 @@ jobs:
               if git diff --quiet "$merge_base" "origin/$branch"; then
                 echo "REPORT EMPTY_NET_PATCH ($ahead_by): $branch @ $sha"
                 empty_net_patch=$((empty_net_patch + 1))
+                patch_equivalent_candidates+=("EMPTY_NET_PATCH|$branch|$sha")
                 skipped=$((skipped + 1))
                 continue
               fi
@@ -248,6 +260,7 @@ jobs:
               if [ -n "$cherry_output" ] && ! grep -q '^+' <<< "$cherry_output"; then
                 echo "REPORT INDIVIDUAL_EQUIVALENT ($ahead_by): $branch @ $sha"
                 patch_equivalent_individual=$((patch_equivalent_individual + 1))
+                patch_equivalent_candidates+=("INDIVIDUAL_EQUIVALENT|$branch|$sha")
                 skipped=$((skipped + 1))
                 continue
               fi
@@ -258,6 +271,7 @@ jobs:
               if [ -n "$aggregate_patch_id" ] && [ -n "${main_patch_ids["$aggregate_patch_id"]+x}" ]; then
                 echo "REPORT AGGREGATE_SQUASH_EQUIVALENT ($ahead_by): $branch @ $sha -> ${main_patch_ids["$aggregate_patch_id"]}"
                 patch_equivalent_squash=$((patch_equivalent_squash + 1))
+                patch_equivalent_candidates+=("AGGREGATE_SQUASH_EQUIVALENT|$branch|$sha")
                 skipped=$((skipped + 1))
                 continue
               fi
@@ -278,7 +292,28 @@ jobs:
             fi
           done
 
+          deleted_patch_equivalent=0
+          kept_equivalent_without_pr=0
+          for candidate in "${patch_equivalent_candidates[@]}"; do
+            IFS='|' read -r class branch sha <<< "$candidate"
+            if [ -z "${closed_pr_refs["$branch"]+x}" ]; then
+              echo "KEEP $class without closed PR provenance: $branch @ $sha"
+              kept_equivalent_without_pr=$((kept_equivalent_without_pr + 1))
+              continue
+            fi
+            if gh api --method DELETE "repos/$REPO/git/refs/heads/$branch" --silent 2>/dev/null; then
+              echo "DELETE $class with closed PR provenance: $branch @ $sha"
+              deleted=$((deleted + 1))
+              deleted_patch_equivalent=$((deleted_patch_equivalent + 1))
+            else
+              echo "KEEP $class delete failed: $branch"
+              skipped=$((skipped + 1))
+            fi
+          done
+
           echo "Deleted total: $deleted"
+          echo "Deleted patch-equivalent with closed PR provenance: $deleted_patch_equivalent"
+          echo "Kept patch-equivalent without closed PR provenance: $kept_equivalent_without_pr"
           echo "Deleted exact merged-PR heads: $deleted_merged_pr_heads"
           echo "Deleted zero-ahead branches: $deleted_zero_ahead"
           echo "Report-only individual patch-equivalent: $patch_equivalent_individual"
