@@ -48,6 +48,7 @@ const manifest = JSON.parse(
 ) as ToolchainManifest;
 const lean = readFileSync(join(root, "proofs/lean4/MtsFoundation.lean"), "utf8");
 const rocq = readFileSync(join(root, "proofs/coq/MtsFoundation.v"), "utf8");
+const ci = readFileSync(join(root, ".github/workflows/ci.yml"), "utf8");
 
 same(manifest.schema, "mts-external-proof-toolchains/v0.1", "toolchain schema");
 same(manifest.status, "compiler-ci-active", "compiler CI phase");
@@ -166,6 +167,32 @@ assert(
 assert(
   rocq.includes("form R R = R"),
   "Rocq states root self-closure without root uniqueness",
+);
+
+assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
+assert(
+  ci.includes("Compile pinned Lean external foundation"),
+  "CI compiles Lean foundation",
+);
+assert(
+  ci.includes("linuxReleaseSha256"),
+  "CI reads Lean release digest from provenance manifest",
+);
+assert(
+  ci.includes("Compile pinned Rocq external foundation"),
+  "CI compiles Rocq foundation",
+);
+assert(
+  ci.includes("rocq.dockerImage"),
+  "CI reads digest-pinned Rocq image from provenance manifest",
+);
+assert(
+  ci.includes("steps.external-proof-diff.outputs.run == 'true'"),
+  "external compilers are conditional inside existing CI job",
+);
+assert(
+  !ci.includes("jobs:\n  external-proofs:"),
+  "no additional external-proof VM/job is introduced",
 );
 
 console.log([
