@@ -1,4 +1,4 @@
-// #1583 post-v0.14 research/tooling classification; not semantic authority.
+// #1583 R18/R19 post-v0.14 representation research; not semantic authority.
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
