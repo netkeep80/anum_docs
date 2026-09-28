@@ -925,7 +925,11 @@ theorem INV_01_recursive_inversion
     (D : F2F3RecursiveFormation F E)
     {x : F.Link}
     (ready : InversionReady F x) :
-    ∃! y : F.Link, RecursiveInverse F E D x y := by
+    ∃ y : F.Link,
+      RecursiveInverse F E D x y ∧
+      ∀ z : F.Link,
+        RecursiveInverse F E D x z →
+        z = y := by
   rcases recursive_inverse_exists F a1 N E D ready with ⟨y, hy⟩
   exact ⟨y, hy, fun z hz => recursive_inverse_functional F E D hz hy⟩
 
