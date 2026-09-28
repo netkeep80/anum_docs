@@ -275,8 +275,22 @@ assert(
   "Rocq FND-13 is a theorem, not an axiom",
 );
 assert(
-  lean.includes("rootUnique") && rocq.includes("root_unique_fnd02"),
-  "F2/F3 normalization interface explicitly consumes FND-02 unique ROOT",
+  lean.includes("def RootUniqueness") && rocq.includes("Definition RootUniqueness"),
+  "external sources name the unique-ROOT proof boundary",
+);
+assert(
+  lean.includes("(a1 : A1RecursiveSeparation F)") &&
+    lean.includes("FND_02_unique_root F a1 hx"),
+  "Lean FND-13 normalization witness is indexed by the FND-02 result",
+);
+assert(
+  rocq.includes("(A1 : A1RecursiveSeparation F)") &&
+    rocq.includes("F2F3Normalization F (FND_02_unique_root F A1)"),
+  "Rocq FND-13 normalization witness is indexed by the FND-02 result",
+);
+assert(
+  !lean.includes("rootUnique :") && !rocq.includes("root_unique_fnd02"),
+  "unique ROOT is not duplicated as a free normalization record field",
 );
 assert(
   !lean.includes("form (F.start x) (F.finish x) = x"),
@@ -332,7 +346,7 @@ console.log([
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
   "FND13_ROCQ=PROOF_SOURCE_PRESENT",
-  "FND13_BASIS=F2F3_NORMALIZATION",
+  "FND13_BASIS=FND02_INDEXED_F2F3_NORMALIZATION",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
