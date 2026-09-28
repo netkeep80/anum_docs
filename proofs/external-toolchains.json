@@ -1,0 +1,38 @@
+{
+  "schema": "mts-external-proof-toolchains/v0.1",
+  "status": "source-interface-only",
+  "acceptedMtsVersion": "v0.14",
+  "p0Inventory": "theorems/p0-v0.14.json",
+  "authority": "external-differential-evidence-only",
+  "execution": "DEFERRED_TO_P_INFRA2B",
+  "lean4": {
+    "role": "external-differential-proof",
+    "stable": true,
+    "version": "4.34.1",
+    "tag": "v4.34.1",
+    "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "repository": "https://github.com/leanprover/lean4",
+    "releaseDate": "2026-09-24",
+    "mathlibDependency": false
+  },
+  "rocq": {
+    "role": "external-differential-proof",
+    "stable": true,
+    "version": "9.2.0",
+    "tag": "V9.2.0",
+    "tagObject": "f4392b61e195f1554260589b8778eec39c4834ac",
+    "commit": "adfbf1855c348766beb4b790dcc8ebc02f908f63",
+    "repository": "https://github.com/rocq-prover/rocq",
+    "releaseDate": "2026-03-27",
+    "releaseTarballSha256": "a45280ab4fbaac7540b136a6b073b4a6db15739ec1e149bded43fa6f4fc25f20",
+    "standardLibraryDependency": false
+  },
+  "constraints": {
+    "normativeMtsAuthority": false,
+    "theoremProofClaimsAllowed": false,
+    "fourCaseDatatypeAllowed": false,
+    "fourCaseAxiomAllowed": false,
+    "rootUniquenessAxiomAllowed": false,
+    "sorryOrAdmitAllowed": false
+  }
+}
