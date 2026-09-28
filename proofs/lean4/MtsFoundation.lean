@@ -803,4 +803,221 @@ theorem INV_01_recursive_inversion_total
           RecursiveInversion.pair hPair hFinishInv hStartInv
         ⟩
 
+
+theorem recursive_full_start_disjoint
+    (F : Foundation)
+    {x : F.Link}
+    (hFull : FullSelf F x)
+    (hStart : StartOnly F x) :
+    False :=
+  hStart.2 hFull.2
+
+theorem recursive_full_finish_disjoint
+    (F : Foundation)
+    {x : F.Link}
+    (hFull : FullSelf F x)
+    (hFinish : FinishOnly F x) :
+    False :=
+  hFinish.1 hFull.1
+
+theorem recursive_full_pair_disjoint
+    (F : Foundation)
+    {x : F.Link}
+    (hFull : FullSelf F x)
+    (hPair : PairLocal F x) :
+    False :=
+  hPair.1 hFull.1
+
+theorem recursive_start_finish_disjoint
+    (F : Foundation)
+    {x : F.Link}
+    (hStart : StartOnly F x)
+    (hFinish : FinishOnly F x) :
+    False :=
+  hFinish.1 hStart.1
+
+theorem recursive_start_pair_disjoint
+    (F : Foundation)
+    {x : F.Link}
+    (hStart : StartOnly F x)
+    (hPair : PairLocal F x) :
+    False :=
+  hPair.1 hStart.1
+
+theorem recursive_finish_pair_disjoint
+    (F : Foundation)
+    {x : F.Link}
+    (hFinish : FinishOnly F x)
+    (hPair : PairLocal F x) :
+    False :=
+  hPair.2 hFinish.2
+
+/--
+Relational spelling of the defining equation
+
+  J(A ⟼ B) = J(B) ⟼ J(A).
+
+For self-incidence, one recursively inverted pole is the current inverse Link
+itself.  This theorem makes that recursion explicit without expanding J into a
+host data representation.
+-/
+theorem INV_01_recursive_pole_reversal
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    {x y : F.Link}
+    (h : RecursiveInversion F D x y) :
+    ∃ inverseFinish inverseStart : F.Link,
+      RecursiveInversion F D (F.finish x) inverseFinish ∧
+      RecursiveInversion F D (F.start x) inverseStart ∧
+      y = F.form inverseFinish inverseStart := by
+  cases h with
+  | root =>
+      have hRoot := root_full_self F
+      refine ⟨F.R, F.R, ?_, ?_, F.root_self.symm⟩
+      · simpa only [hRoot.2] using
+          (RecursiveInversion.root (F := F) (D := D))
+      · simpa only [hRoot.1] using
+          (RecursiveInversion.root (F := F) (D := D))
+  | start hStart hChild =>
+      have selfInverse :=
+        RecursiveInversion.start (D := D) hStart hChild
+      refine ⟨
+        _,
+        _,
+        hChild,
+        ?_,
+        D.endEquation _
+      ⟩
+      rw [hStart.1]
+      exact selfInverse
+  | finish hFinish hChild =>
+      have selfInverse :=
+        RecursiveInversion.finish (D := D) hFinish hChild
+      refine ⟨
+        _,
+        _,
+        ?_,
+        hChild,
+        D.startEquation _
+      ⟩
+      rw [hFinish.2]
+      exact selfInverse
+  | pair hPair hFinishInv hStartInv =>
+      exact ⟨
+        _,
+        _,
+        hFinishInv,
+        hStartInv,
+        rfl
+      ⟩
+
+/--
+The structural inversion graph is functional: one source Link cannot have two
+different structural inverses.
+
+The proof uses only recursive uniqueness and disjoint self-incidence
+propositions; no host enum or representation equality participates.
+-/
+theorem recursive_inversion_functional
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    {x y z : F.Link}
+    (hy : RecursiveInversion F D x y)
+    (hz : RecursiveInversion F D x z) :
+    y = z := by
+  induction hy generalizing z with
+  | root =>
+      cases hz with
+      | root => rfl
+      | start hStart _ =>
+          exact False.elim
+            (recursive_full_start_disjoint F (root_full_self F) hStart)
+      | finish hFinish _ =>
+          exact False.elim
+            (recursive_full_finish_disjoint F (root_full_self F) hFinish)
+      | pair hPair _ _ =>
+          exact False.elim
+            (recursive_full_pair_disjoint F (root_full_self F) hPair)
+  | start hStart hChild ih =>
+      cases hz with
+      | root =>
+          exact False.elim
+            (recursive_full_start_disjoint F (root_full_self F) hStart)
+      | start _ hOther =>
+          exact congrArg D.endForm (ih hOther)
+      | finish hFinish _ =>
+          exact False.elim
+            (recursive_start_finish_disjoint F hStart hFinish)
+      | pair hPair _ _ =>
+          exact False.elim
+            (recursive_start_pair_disjoint F hStart hPair)
+  | finish hFinish hChild ih =>
+      cases hz with
+      | root =>
+          exact False.elim
+            (recursive_full_finish_disjoint F (root_full_self F) hFinish)
+      | start hStart _ =>
+          exact False.elim
+            (recursive_start_finish_disjoint F hStart hFinish)
+      | finish _ hOther =>
+          exact congrArg D.startForm (ih hOther)
+      | pair hPair _ _ =>
+          exact False.elim
+            (recursive_finish_pair_disjoint F hFinish hPair)
+  | pair hPair hFinishInv hStartInv ihFinish ihStart =>
+      cases hz with
+      | root =>
+          exact False.elim
+            (recursive_full_pair_disjoint F (root_full_self F) hPair)
+      | start hStart _ =>
+          exact False.elim
+            (recursive_start_pair_disjoint F hStart hPair)
+      | finish hFinish _ =>
+          exact False.elim
+            (recursive_finish_pair_disjoint F hFinish hPair)
+      | pair _ hOtherFinish hOtherStart =>
+          have hf := ihFinish hOtherFinish
+          have hs := ihStart hOtherStart
+          rw [hf, hs]
+
+/--
+Constructive unique-image proposition used without importing library-level
+ExistsUnique notation.
+-/
+def UniqueRecursiveInverse
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    (x : F.Link) : Prop :=
+  ∃ y : F.Link,
+    RecursiveInversion F D x y ∧
+    ∀ z : F.Link,
+      RecursiveInversion F D x z →
+      z = y
+
+/--
+INV-01 capstone: recursive structural inversion is a unique total graph on the
+declared finite Grounded domain.
+
+This is the external proof meaning of a function J without invoking classical
+choice: every source has exactly one graph image.
+-/
+theorem INV_01_recursive_inversion_unique_total
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {x : F.Link}
+    (gx : Grounded F x) :
+    UniqueRecursiveInverse F D x := by
+  rcases INV_01_recursive_inversion_total F a1 N E D gx with
+    ⟨y, hy⟩
+  refine ⟨y, hy, ?_⟩
+  intro z hz
+  exact recursive_inversion_functional F D hz hy
+
 end MTS.External
