@@ -18,12 +18,11 @@ structure Foundation where
   form_start : ∀ a b, start (form a b) = a
   form_finish : ∀ a b, finish (form a b) = b
 
-  link_ext :
-    ∀ {x y : Link},
-      start x = start y →
-      finish x = finish y →
-      x = y
-
+  /--
+  Accepted historical dependency order forbids pole extensionality here:
+  A2/unique ROOT is derived from A1 + F2/F3 finite grounding first;
+  A6/identity by ordered poles is downstream of that result.
+  -/
   root_self : form R R = R
 
 end MTS.External
