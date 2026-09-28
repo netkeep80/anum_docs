@@ -205,3 +205,113 @@ Proof.
     rewrite Hs, Hf.
     reflexivity.
 Qed.
+
+
+(* Local self-incidence predicates for FND-01.
+   No four-constructor datatype is introduced: these are four proposition
+   patterns induced by two independent self-incidence questions. *)
+Definition StartSelf (F : Foundation) (x : Link F) : Prop :=
+  start F x = x.
+
+Definition FinishSelf (F : Foundation) (x : Link F) : Prop :=
+  finish F x = x.
+
+Definition StartOnly (F : Foundation) (x : Link F) : Prop :=
+  StartSelf F x /\ ~ FinishSelf F x.
+
+Definition FinishOnly (F : Foundation) (x : Link F) : Prop :=
+  ~ StartSelf F x /\ FinishSelf F x.
+
+Definition PairLocal (F : Foundation) (x : Link F) : Prop :=
+  ~ StartSelf F x /\ ~ FinishSelf F x.
+
+(* Constructive classification receives exact local decision evidence rather
+   than assuming arbitrary Link equality is globally decidable. *)
+Definition LocalSelfDecision (F : Foundation) (x : Link F) : Prop :=
+  (StartSelf F x \/ ~ StartSelf F x) /\
+  (FinishSelf F x \/ ~ FinishSelf F x).
+
+Definition LocalSelfIncidenceExhaustive
+    (F : Foundation) (x : Link F) : Prop :=
+  FullSelf F x \/
+  StartOnly F x \/
+  FinishOnly F x \/
+  PairLocal F x.
+
+Definition LocalSelfIncidenceExclusive
+    (F : Foundation) (x : Link F) : Prop :=
+  ~ (FullSelf F x /\ StartOnly F x) /\
+  ~ (FullSelf F x /\ FinishOnly F x) /\
+  ~ (FullSelf F x /\ PairLocal F x) /\
+  ~ (StartOnly F x /\ FinishOnly F x) /\
+  ~ (StartOnly F x /\ PairLocal F x) /\
+  ~ (FinishOnly F x /\ PairLocal F x).
+
+Lemma local_self_incidence_exhaustive
+    (F : Foundation)
+    (x : Link F) :
+    LocalSelfDecision F x ->
+    LocalSelfIncidenceExhaustive F x.
+Proof.
+  intros D.
+  destruct D as [Ds Df].
+  destruct Ds as [Hs | Hns].
+  - destruct Df as [Hf | Hnf].
+    + left. split; assumption.
+    + right. left. split; assumption.
+  - destruct Df as [Hf | Hnf].
+    + right. right. left. split; assumption.
+    + right. right. right. split; assumption.
+Qed.
+
+Lemma local_self_incidence_exclusive
+    (F : Foundation)
+    (x : Link F) :
+    LocalSelfIncidenceExclusive F x.
+Proof.
+  unfold LocalSelfIncidenceExclusive.
+  split.
+  - intros [H0 H1]. exact ((proj2 H1) (proj2 H0)).
+  - split.
+    + intros [H0 H2]. exact ((proj1 H2) (proj1 H0)).
+    + split.
+      * intros [H0 H3]. exact ((proj1 H3) (proj1 H0)).
+      * split.
+        -- intros [H1 H2]. exact ((proj1 H2) (proj1 H1)).
+        -- split.
+           ++ intros [H1 H3]. exact ((proj1 H3) (proj1 H1)).
+           ++ intros [H2 H3]. exact ((proj2 H3) (proj2 H2)).
+Qed.
+
+(* FND-01 C1 — proposition-level local partition only.
+
+   This is intentionally not the full realizability claim.  Given explicit
+   decisions for the two local identity questions, exactly one proposition
+   pattern is possible.  The full-self branch is identified with ROOT by
+   FND-02, while actual Link identity remains ordered-pole identity from
+   FND-13.  Context orientation only names the two one-sided cases later. *)
+Theorem FND_01_local_partition
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (x : Link F) :
+    LocalSelfDecision F x ->
+    LocalSelfIncidenceExhaustive F x /\
+    LocalSelfIncidenceExclusive F x /\
+    (FullSelf F x -> x = R F) /\
+    (forall y : Link F,
+      start F x = start F y ->
+      finish F x = finish F y ->
+      x = y).
+Proof.
+  intros D.
+  split.
+  - apply local_self_incidence_exhaustive. exact D.
+  - split.
+    + apply local_self_incidence_exclusive.
+    + split.
+      * intros H. apply (FND_02_unique_root F A1 x H).
+      * intros y Hs Hf.
+        apply (proj2 (FND_13_identity_by_poles F A1 N x y)).
+        split; assumption.
+Qed.
