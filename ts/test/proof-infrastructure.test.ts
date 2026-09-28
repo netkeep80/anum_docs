@@ -321,6 +321,58 @@ for (const record of fnd01) {
   );
 }
 
+const inv01 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "INV-01")
+  .map(({ record }) => record);
+assert.equal(inv01.length, 2, "INV-01 has exactly two external evidence records");
+assert.deepEqual(
+  inv01.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "INV-01 external lanes",
+);
+for (const record of inv01) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "840f2829a93313384c7405a2e3db31e1999adf67",
+    `INV-01 ${record.lane} proof source commit`,
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit),
+      "INV-01 Lean evidence pin includes exact release commit",
+    );
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "INV-01 Lean evidence pin includes release artifact digest",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit),
+      "INV-01 Rocq evidence pin includes exact release commit",
+    );
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "INV-01 Rocq evidence pin includes exact image digest",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /Prop-valued structural graph/i,
+    "INV-01 evidence discloses structural graph boundary",
+  );
+  assert.match(
+    String(record.notes),
+    /exactly one structural inverse|total and functional/i,
+    "INV-01 evidence discloses unique-total function boundary",
+  );
+  assert.match(
+    String(record.notes),
+    /J\(A⟼B\)=J\(B\)⟼J\(A\)/,
+    "INV-01 evidence records exact recursive pole-reversal equation",
+  );
+}
+
 const leanEvidence = fnd02.find((record) => record.lane === "lean4");
 const coqEvidence = fnd02.find((record) => record.lane === "coq");
 assert.ok(leanEvidence !== undefined && coqEvidence !== undefined);
@@ -342,5 +394,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq aprover-input=mtsNative-only`,
 );
