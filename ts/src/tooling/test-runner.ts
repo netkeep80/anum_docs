@@ -55,7 +55,9 @@ console.log(
   ].join(" "),
 );
 
-for (const test of selectedBuiltTests) {
+const selectedBuiltSet = new Set(selectedBuiltTests);
+for (const test of builtTests) {
+  if (!selectedBuiltSet.has(test)) continue;
   console.log(`\n[test] ${test}`);
   const result = spawnSync(process.execPath, [join(builtDirectory, test)], {
     stdio: "inherit",
