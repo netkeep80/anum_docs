@@ -1,6 +1,6 @@
 {
   "schema": "mts-external-proof-toolchains/v0.1",
-  "status": "compiler-ci-active",
+  "status": "external-proof-active",
   "acceptedMtsVersion": "v0.14",
   "p0Inventory": "theorems/p0-v0.14.json",
   "authority": "external-differential-evidence-only",
@@ -37,7 +37,7 @@
   },
   "constraints": {
     "normativeMtsAuthority": false,
-    "theoremProofClaimsAllowed": false,
+    "theoremProofClaimsAllowed": true,
     "fourCaseDatatypeAllowed": false,
     "fourCaseAxiomAllowed": false,
     "rootUniquenessAxiomAllowed": false,
