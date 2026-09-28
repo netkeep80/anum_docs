@@ -145,6 +145,8 @@ const leanForbidden = [
   "root_unique",
   "link_ext",
   "axiom FND_02",
+  "axiom FND_13",
+  "link_reconstruct",
   "Mathlib",
 ] as const;
 for (const token of leanForbidden) {
@@ -158,6 +160,8 @@ const rocqForbidden = [
   "root_unique",
   "Axiom link_ext",
   "Axiom FND_02",
+  "Axiom FND_13",
+  "link_reconstruct",
   "Admitted.",
   "admit.",
   "Require Import",
@@ -237,6 +241,52 @@ assert(
   "Rocq proof derives absence of distinction for full self-closure",
 );
 
+const fnd13 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-13");
+assert(fnd13 !== undefined, "P0 contains recovered FND-13/A6");
+same(
+  fnd13.origin,
+  "historical-unregistered-restated",
+  "FND-13 is recovered historical A6 rather than a new v0.14 theorem",
+);
+assert(
+  (fnd13.dependsOn as string[]).length === 1 &&
+    (fnd13.dependsOn as string[])[0] === "FND-02",
+  "FND-13 depends on unique ROOT before pole identity",
+);
+for (const source of [lean, rocq]) {
+  assert(source.includes("F2F3Normalization"), "external source names F2/F3 normalization premise");
+  assert(source.includes("normalForm") || source.includes("normal_form"), "external source carries normal-form projection");
+  assert(
+    source.includes("recursiveEquation") || source.includes("normal_form_equation"),
+    "external source carries recursive normal-form equation",
+  );
+  assert(
+    source.includes("complete") || source.includes("normal_form_complete"),
+    "external source carries one-normal-form-per-semantic-Link completeness",
+  );
+  assert(source.includes("FND_13_identity_by_poles"), "external source contains FND-13 theorem");
+}
+assert(
+  lean.includes("theorem FND_13_identity_by_poles"),
+  "Lean FND-13 is a theorem, not an axiom",
+);
+assert(
+  rocq.includes("Theorem FND_13_identity_by_poles"),
+  "Rocq FND-13 is a theorem, not an axiom",
+);
+assert(
+  lean.includes("rootUnique") && rocq.includes("root_unique_fnd02"),
+  "F2/F3 normalization interface explicitly consumes FND-02 unique ROOT",
+);
+assert(
+  !lean.includes("form (F.start x) (F.finish x) = x"),
+  "Lean does not smuggle A6 as a reconstruction axiom",
+);
+assert(
+  !rocq.includes("form F (start F x) (finish F x) = x"),
+  "Rocq does not smuggle A6 as a reconstruction axiom",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -277,9 +327,12 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=1",
+  "THEOREM_PROOF_CLAIMS=2",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
+  "FND13_LEAN=PROOF_SOURCE_PRESENT",
+  "FND13_ROCQ=PROOF_SOURCE_PRESENT",
+  "FND13_BASIS=F2F3_NORMALIZATION",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
