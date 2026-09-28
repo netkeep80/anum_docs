@@ -983,6 +983,21 @@ theorem recursive_inversion_functional
           rw [hf, hs]
 
 /--
+Constructive unique-image proposition used without importing library-level
+ExistsUnique notation.
+-/
+def UniqueRecursiveInverse
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    (x : F.Link) : Prop :=
+  ∃ y : F.Link,
+    RecursiveInversion F D x y ∧
+    ∀ z : F.Link,
+      RecursiveInversion F D x z →
+      z = y
+
+/--
 INV-01 capstone: recursive structural inversion is a unique total graph on the
 declared finite Grounded domain.
 
@@ -998,7 +1013,7 @@ theorem INV_01_recursive_inversion_unique_total
     (D : RecursiveInversionDomain F E)
     {x : F.Link}
     (gx : Grounded F x) :
-    ExistsUnique (fun y : F.Link => RecursiveInversion F D x y) := by
+    UniqueRecursiveInverse F D x := by
   rcases INV_01_recursive_inversion_total F a1 N E D gx with
     ⟨y, hy⟩
   refine ⟨y, hy, ?_⟩
