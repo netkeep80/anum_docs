@@ -163,16 +163,31 @@ for (const { path, record } of evidenceRecords) {
   assert.ok(expectedLanes.includes(record.lane), `${path} known lane`);
   assert.ok(p0Targets.has(record.theoremId), `${path} theorem exists in v0.14 P0 inventory`);
   assert.equal(record.mts.acceptedVersion, "v0.14", `${path} accepted MTS version`);
-  assert.equal(
-    record.mts.sourceCommitSha,
-    p0.acceptedFreezeMainSha,
-    `${path} accepted MTS source freeze`,
-  );
+  assert.match(record.mts.sourceCommitSha, /^[0-9a-f]{40}$/, `${path} accepted MTS source commit`);
   assert.match(record.mts.contractBlobSha, /^[0-9a-f]{40}$/, `${path} contract blob SHA`);
   assert.equal(
     gitBlobSha(record.mts.sourceCommitSha, "contracts/mts-contract-v0.14.json"),
     record.mts.contractBlobSha,
-    `${path} contract blob belongs to accepted source freeze`,
+    `${path} contract blob belongs to pinned accepted source commit`,
+  );
+  const acceptedContract = JSON.parse(
+    gitObjectBytes(record.mts.sourceCommitSha, "contracts/mts-contract-v0.14.json").toString("utf8"),
+  );
+  assert.equal(acceptedContract.accepted, true, `${path} pinned source is post-acceptance`);
+  assert.equal(
+    acceptedContract.releaseState.currentAccepted,
+    "mts-contract/v0.14",
+    `${path} pinned source selects v0.14 as current accepted`,
+  );
+  assert.equal(
+    acceptedContract.acceptance.authorDecision,
+    "ACCEPT_MTS_V0_14",
+    `${path} pinned source carries explicit author acceptance`,
+  );
+  assert.equal(
+    acceptedContract.acceptance.preAcceptanceReadyMainSha,
+    p0.acceptedFreezeMainSha,
+    `${path} accepted source consumes the exact P0 semantic freeze`,
   );
   assert.equal(record.proofSource.repository, "netkeep80/anum_docs", `${path} source repository`);
   assert.match(record.proofSource.commitSha, /^[0-9a-f]{40}$/, `${path} proof source commit`);
