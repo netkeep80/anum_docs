@@ -681,5 +681,50 @@
     "ownerBlocks": 14,
     "researchRetention": "DEFERRED_NOT_REJECTED",
     "terminologyProjection": true
-  }
+  },
+  "repositoryRequirements": [
+    {
+      "id": "README-OBSERVATORY",
+      "kind": "readme-link",
+      "status": "required",
+      "projection": {
+        "path": "README.md",
+        "anchor": "mts-readme-contract-observatory"
+      },
+      "label": "Открыть Обозреватель контрактов",
+      "url": "https://netkeep80.github.io/anum_docs/",
+      "description": "Производная визуализация принятых машинных свидетельств только для чтения; она не является смысловым авторитетом."
+    },
+    {
+      "id": "README-AUTHORS",
+      "kind": "readme-contributors",
+      "status": "required",
+      "projection": {
+        "path": "README.md",
+        "anchor": "mts-readme-authors"
+      },
+      "contributors": [
+        {
+          "name": "Вертушкин Роман Павлович",
+          "url": "https://github.com/netkeep80"
+        },
+        {
+          "name": "Дьяченко Константин Константинович",
+          "url": "https://github.com/konard"
+        },
+        {
+          "name": "Шакиров Тимур Эдуардович",
+          "url": "https://github.com/TimaxLacs"
+        },
+        {
+          "name": "Бурдуков Александр Николаевич",
+          "url": "https://github.com/InAiwetrustAGI"
+        },
+        {
+          "name": "Глазунов Иван Сергеевич",
+          "url": "https://github.com/ivansglazunov"
+        }
+      ]
+    }
+  ]
 }

@@ -30,11 +30,21 @@ export interface MtsRequirementProjection {
   readonly docAnchor: string;
 }
 
+export interface RepositoryRequirementProjection {
+  readonly id: string;
+  readonly kind: "readme-link" | "readme-contributors";
+  readonly status: "required";
+  readonly docPath: string;
+  readonly docAnchor: string;
+  readonly generatedContent: string;
+}
+
 export interface MtsSemanticIr {
   readonly schema: string;
   readonly contract: string;
   readonly contractPath: string;
   readonly requirements: readonly MtsRequirementProjection[];
+  readonly repositoryRequirements: readonly RepositoryRequirementProjection[];
   readonly documentModes: Readonly<Record<string, MarkdownDocumentMode>>;
   readonly projectionState: string;
 }
@@ -88,6 +98,95 @@ function exactSet(name: string, left: readonly string[], right: readonly string[
   if (a.join("\n") !== b.join("\n")) {
     fail(`${name} differs: registry=[${a.join(", ")}] contract=[${b.join(", ")}]`);
   }
+}
+
+const REQUIRED_REPOSITORY_REQUIREMENT_IDS = Object.freeze([
+  "README-AUTHORS",
+  "README-OBSERVATORY",
+] as const);
+
+function loadRepositoryRequirements(
+  root: string,
+  registry: JsonObject,
+  registryPath: string,
+  documentModes: Readonly<Record<string, MarkdownDocumentMode>>,
+): readonly RepositoryRequirementProjection[] {
+  if (!Array.isArray(registry.repositoryRequirements)) {
+    fail(`${registryPath}.repositoryRequirements must be an array`);
+  }
+
+  const seen = new Set<string>();
+  const requirements = (registry.repositoryRequirements as unknown[]).map((raw, index) => {
+    const value = object(raw, `${registryPath}.repositoryRequirements[${index}]`);
+    const id = string(value.id, `repositoryRequirements[${index}].id`);
+    if (seen.has(id)) fail(`duplicate repository requirement id ${id}`);
+    seen.add(id);
+
+    const status = string(value.status, `repositoryRequirements[${index}].status`);
+    if (status !== "required") fail(`${id} repository requirement status must be required`);
+
+    const projection = object(value.projection, `repositoryRequirements[${index}].projection`);
+    const docPath = string(projection.path, `repositoryRequirements[${index}].projection.path`);
+    const docAnchor = string(projection.anchor, `repositoryRequirements[${index}].projection.anchor`);
+    if (!existsSync(resolve(root, docPath))) fail(`${id} projection target does not exist: ${docPath}`);
+    if (documentModes[docPath] !== "hybrid") {
+      fail(`${id} projection target must be HYBRID, found ${documentModes[docPath] ?? "unclassified"}: ${docPath}`);
+    }
+
+    const kind = string(value.kind, `repositoryRequirements[${index}].kind`);
+    let generatedContent: string;
+    if (kind === "readme-link") {
+      const label = string(value.label, `repositoryRequirements[${index}].label`);
+      const url = string(value.url, `repositoryRequirements[${index}].url`);
+      const description = string(value.description, `repositoryRequirements[${index}].description`);
+      if (!/^https:\/\//.test(url)) fail(`${id}.url must be an absolute https URL`);
+      generatedContent = `[${label}](${url}) — ${description}`;
+    } else if (kind === "readme-contributors") {
+      if (!Array.isArray(value.contributors) || value.contributors.length === 0) {
+        fail(`${id}.contributors must be a non-empty array`);
+      }
+      const contributorKeys = new Set<string>();
+      generatedContent = (value.contributors as unknown[]).map((rawContributor, contributorIndex) => {
+        const contributor = object(
+          rawContributor,
+          `repositoryRequirements[${index}].contributors[${contributorIndex}]`,
+        );
+        const name = string(
+          contributor.name,
+          `repositoryRequirements[${index}].contributors[${contributorIndex}].name`,
+        );
+        const url = string(
+          contributor.url,
+          `repositoryRequirements[${index}].contributors[${contributorIndex}].url`,
+        );
+        if (!/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/?$/.test(url)) {
+          fail(`${id}.contributors[${contributorIndex}].url must be a GitHub profile URL`);
+        }
+        const key = `${name}\n${url}`;
+        if (contributorKeys.has(key)) fail(`${id} has duplicate contributor ${name}`);
+        contributorKeys.add(key);
+        return `- [${name}](${url})`;
+      }).join("\n");
+    } else {
+      fail(`${id} has unsupported repository requirement kind ${kind}`);
+    }
+
+    return Object.freeze({
+      id,
+      kind: kind as RepositoryRequirementProjection["kind"],
+      status: "required" as const,
+      docPath,
+      docAnchor,
+      generatedContent,
+    });
+  });
+
+  exactSet(
+    "repository requirement id set",
+    requirements.map((item) => item.id),
+    REQUIRED_REPOSITORY_REQUIREMENT_IDS,
+  );
+  return Object.freeze(requirements.sort((left, right) => left.id.localeCompare(right.id)));
 }
 
 function validateDependencyGraph(requirements: readonly MtsRequirementProjection[]): void {
@@ -175,6 +274,8 @@ export function loadMtsSemanticIr(
     documentModes[path] = mode;
   }
   exactSet("Markdown document surface", Object.keys(documentModes), listRepositoryMarkdownSurface(root));
+
+  const repositoryRequirements = loadRepositoryRequirements(root, registry, registryPath, documentModes);
 
   if (!Array.isArray(registry.requirements)) fail(`${registryPath}.requirements must be an array`);
   const rawRequirements = registry.requirements as unknown[];
@@ -276,6 +377,7 @@ export function loadMtsSemanticIr(
     contract: contractId,
     contractPath,
     requirements: Object.freeze(requirements),
+    repositoryRequirements,
     documentModes: Object.freeze(documentModes),
     projectionState,
   });
@@ -323,7 +425,7 @@ export function compileRequirementDocuments(root: string, write: boolean): strin
     grouped.set(requirement.docPath, items);
   }
 
-  const changed: string[] = [];
+  const changed = new Set<string>();
   for (const [path, items] of grouped) {
     const fullPath = resolve(root, path);
     const source = readFileSync(fullPath, "utf8");
@@ -331,8 +433,35 @@ export function compileRequirementDocuments(root: string, write: boolean): strin
     if (mode === undefined) fail(`${path}: Markdown mode is not classified`);
     const updated = items.reduce((text, item) => upsertRequirementProjection(text, item, mode), source);
     if (updated === source) continue;
-    changed.push(path);
+    changed.add(path);
     if (write) writeFileSync(fullPath, updated, "utf8");
   }
-  return changed.sort();
+
+  const repositoryGrouped = new Map<string, RepositoryRequirementProjection[]>();
+  for (const requirement of ir.repositoryRequirements) {
+    const items = repositoryGrouped.get(requirement.docPath) ?? [];
+    items.push(requirement);
+    repositoryGrouped.set(requirement.docPath, items);
+  }
+  for (const [path, items] of repositoryGrouped) {
+    const fullPath = resolve(root, path);
+    const source = readFileSync(fullPath, "utf8");
+    const mode = ir.documentModes[path];
+    if (mode === undefined) fail(`${path}: Markdown mode is not classified`);
+    const updated = items.reduce(
+      (text, item) => replaceOwnedMarkdownSection({
+        source: text,
+        mode,
+        anchorId: item.docAnchor,
+        blockId: item.id,
+        generatedContent: item.generatedContent,
+      }),
+      source,
+    );
+    if (updated === source) continue;
+    changed.add(path);
+    if (write) writeFileSync(fullPath, updated, "utf8");
+  }
+
+  return [...changed].sort();
 }
