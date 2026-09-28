@@ -371,6 +371,58 @@ assert(
   "Rocq FND-01 C1 does not smuggle classical excluded middle",
 );
 
+for (const source of [lean, rocq]) {
+  assert(
+    source.includes("F2F3OneSidedExistence"),
+    "external source names the minimal F2/F3 one-sided existence premise",
+  );
+  assert(
+    source.includes("startRootEquation") || source.includes("f2f3_start_root_equation"),
+    "external source carries proper start-self recursive equation",
+  );
+  assert(
+    source.includes("finishRootEquation") || source.includes("f2f3_finish_root_equation"),
+    "external source carries proper finish-self recursive equation",
+  );
+  assert(
+    source.includes("startRootNeRoot") || source.includes("f2f3_start_root_ne_root"),
+    "external source keeps start-self witness distinct from ROOT",
+  );
+  assert(
+    source.includes("finishRootNeRoot") || source.includes("f2f3_finish_root_ne_root"),
+    "external source keeps finish-self witness distinct from ROOT",
+  );
+  assert(
+    source.includes("f2f3_pair_pattern"),
+    "PAIR proposition pattern is derived from the one Link-forming primitive",
+  );
+  assert(
+    source.includes("f2f3_pair_grounded"),
+    "derived PAIR representative is finitely grounded",
+  );
+  assert(
+    source.includes("FND_01_grounded_realizability"),
+    "external source contains FND-01 C2 realizability theorem",
+  );
+}
+assert(
+  lean.includes("theorem FND_01_grounded_realizability"),
+  "Lean FND-01 C2 is a theorem, not an axiom",
+);
+assert(
+  rocq.includes("Theorem FND_01_grounded_realizability"),
+  "Rocq FND-01 C2 is a theorem, not an axiom",
+);
+assert(
+  lean.includes("F.form E.startRoot E.finishRoot") &&
+    rocq.includes("form F (f2f3_start_root F E) (f2f3_finish_root F E)"),
+  "PAIR witness is constructed through the single Link-forming primitive",
+);
+assert(
+  !lean.includes("  pairRoot :") && !rocq.includes("f2f3_pair_root :"),
+  "F2/F3 C2 premise does not postulate a fourth ready-made PAIR witness",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -411,7 +463,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=3",
+  "THEOREM_PROOF_CLAIMS=4",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -419,7 +471,10 @@ console.log([
   "FND13_BASIS=FND02_INDEXED_F2F3_NORMALIZATION",
   "FND01_C1=PROPOSITION_PARTITION_ONLY",
   "FND01_DECIDABILITY=EXPLICIT_LOCAL_EVIDENCE",
-  "FND01_REALIZABILITY=DEFERRED_TO_C2",
+  "FND01_C2=GROUNDED_REALIZABILITY",
+  "FND01_C2_PREMISE=TWO_PROPER_ONE_SIDED_FORMS",
+  "FND01_PAIR=DERIVED_BY_SINGLE_FORM",
+  "FND01_CAPSTONE=DEFERRED_TO_C3",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
