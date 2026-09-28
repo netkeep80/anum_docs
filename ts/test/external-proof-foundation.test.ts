@@ -567,8 +567,9 @@ for (const source of [lean, rocq]) {
   );
 }
 assert(
-  lean.includes("ExistsUnique (fun y : F.Link => RecursiveInversion F D x y)"),
-  "Lean INV-01 capstone states unique existence directly",
+  lean.includes("def UniqueRecursiveInverse") &&
+    lean.includes("UniqueRecursiveInverse F D x"),
+  "Lean INV-01 capstone states unique existence in core Prop only",
 );
 assert(
   rocq.includes("forall z : Link F,") &&
