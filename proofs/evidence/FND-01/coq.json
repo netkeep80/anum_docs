@@ -1,0 +1,38 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-01",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "one Link-forming primitive",
+    "accepted finite R-grounded domain",
+    "semantic Link identity equality supplied by FND-13",
+    "F2/F3 grounded-form existence/sufficiency for the declared domain",
+    "Context orientation only names one-sided cases; it does not create them"
+  ],
+  "dependencies": [
+    "FND-02",
+    "FND-13"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "21e6e5c4328af4e6e70bf1c9953e2aeab4c2f907",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "aa95553eb977a163b2e2e857f835b29ed38538001134cbe9fbe57f8914fa4406"
+    }
+  ],
+  "notes": "External differential proof only. FND-01 is split deliberately: proposition-level four-pattern exclusivity is constructive; all four patterns are grounded and realized from ROOT plus two proper one-sided F2/F3 witnesses, with PAIR derived by the single Link-forming primitive; producing a direct exhaustive classifier for an arbitrary Link requires explicit LocalSelfDecision evidence for the two local identity questions, rather than hidden global decidable equality or classical excluded middle. FND-02 supplies unique ROOT, FND-13 supplies semantic ordered-pole identity, and ContextOneSidedNames is alias-only: START_K/END_K name existing one-sided witnesses and do not create structural cases. CTX-03 orientation selection remains downstream."
+}
