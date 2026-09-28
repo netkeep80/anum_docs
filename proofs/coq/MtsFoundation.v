@@ -12,12 +12,8 @@ Axiom form_start :
 Axiom form_finish :
   forall a b : Link, finish (form a b) = b.
 
-Axiom link_ext :
-  forall x y : Link,
-    start x = start y ->
-    finish x = finish y ->
-    x = y.
-
+(* Pole extensionality/A6 is deliberately absent here.
+   Accepted proof order is A1 + F2/F3 -> A2 unique ROOT -> A6. *)
 Axiom root_self :
   form R R = R.
 
