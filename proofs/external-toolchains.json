@@ -1,10 +1,10 @@
 {
   "schema": "mts-external-proof-toolchains/v0.1",
-  "status": "source-interface-only",
+  "status": "compiler-ci-active",
   "acceptedMtsVersion": "v0.14",
   "p0Inventory": "theorems/p0-v0.14.json",
   "authority": "external-differential-evidence-only",
-  "execution": "DEFERRED_TO_P_INFRA2B",
+  "execution": "CI_ACTIVE_ON_PROOF_DIFF",
   "lean4": {
     "role": "external-differential-proof",
     "stable": true,
@@ -13,7 +13,10 @@
     "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
     "repository": "https://github.com/leanprover/lean4",
     "releaseDate": "2026-09-24",
-    "mathlibDependency": false
+    "mathlibDependency": false,
+    "linuxReleaseAsset": "lean-4.34.1-linux.tar.zst",
+    "linuxReleaseUrl": "https://github.com/leanprover/lean4/releases/download/v4.34.1/lean-4.34.1-linux.tar.zst",
+    "linuxReleaseSha256": "47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
   },
   "rocq": {
     "role": "external-differential-proof",
@@ -25,7 +28,12 @@
     "repository": "https://github.com/rocq-prover/rocq",
     "releaseDate": "2026-03-27",
     "releaseTarballSha256": "a45280ab4fbaac7540b136a6b073b4a6db15739ec1e149bded43fa6f4fc25f20",
-    "standardLibraryDependency": false
+    "standardLibraryDependency": false,
+    "dockerTag": "9.2.0-native-ocaml-4.14.2-flambda",
+    "dockerImage": "rocq/rocq-prover@sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+    "dockerManifestSha256": "61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+    "imageOcaml": "4.14.2+flambda",
+    "imageVcsRef": "V9.2.0"
   },
   "constraints": {
     "normativeMtsAuthority": false,

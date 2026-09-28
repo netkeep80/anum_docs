@@ -48,13 +48,14 @@ const manifest = JSON.parse(
 ) as ToolchainManifest;
 const lean = readFileSync(join(root, "proofs/lean4/MtsFoundation.lean"), "utf8");
 const rocq = readFileSync(join(root, "proofs/coq/MtsFoundation.v"), "utf8");
+const ci = readFileSync(join(root, ".github/workflows/ci.yml"), "utf8");
 
 same(manifest.schema, "mts-external-proof-toolchains/v0.1", "toolchain schema");
-same(manifest.status, "source-interface-only", "source-only phase");
+same(manifest.status, "compiler-ci-active", "compiler CI phase");
 same(manifest.acceptedMtsVersion, "v0.14", "accepted MTS version");
 same(manifest.p0Inventory, "theorems/p0-v0.14.json", "P0 inventory binding");
 same(manifest.authority, "external-differential-evidence-only", "external prover role");
-same(manifest.execution, "DEFERRED_TO_P_INFRA2B", "execution gate");
+same(manifest.execution, "CI_ACTIVE_ON_PROOF_DIFF", "execution gate");
 
 same(manifest.lean4.stable, true, "Lean stable pin");
 same(manifest.lean4.version, "4.34.1", "Lean version");
@@ -65,6 +66,16 @@ same(
   "Lean release commit",
 );
 same(manifest.lean4.mathlibDependency, false, "Lean foundation has no mathlib dependency");
+same(
+  (manifest.lean4 as Toolchain & { readonly linuxReleaseAsset?: string }).linuxReleaseAsset,
+  "lean-4.34.1-linux.tar.zst",
+  "Lean Linux release asset",
+);
+same(
+  (manifest.lean4 as Toolchain & { readonly linuxReleaseSha256?: string }).linuxReleaseSha256,
+  "47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+  "Lean Linux release digest",
+);
 
 same(manifest.rocq.stable, true, "Rocq stable pin");
 same(manifest.rocq.version, "9.2.0", "Rocq version");
@@ -88,6 +99,16 @@ same(
   manifest.rocq.standardLibraryDependency,
   false,
   "Rocq foundation has no standard-library dependency",
+);
+same(
+  (manifest.rocq as ToolchainManifest["rocq"] & { readonly dockerManifestSha256?: string }).dockerManifestSha256,
+  "61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+  "Rocq Docker manifest digest",
+);
+same(
+  (manifest.rocq as ToolchainManifest["rocq"] & { readonly imageOcaml?: string }).imageOcaml,
+  "4.14.2+flambda",
+  "Rocq image OCaml",
 );
 
 for (const [name, value] of Object.entries(manifest.constraints)) {
@@ -148,6 +169,35 @@ assert(
   "Rocq states root self-closure without root uniqueness",
 );
 
+assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
+assert(
+  ci.includes("Compile pinned Lean external foundation"),
+  "CI compiles Lean foundation",
+);
+assert(
+  ci.includes("linuxReleaseSha256"),
+  "CI reads Lean release digest from provenance manifest",
+);
+assert(
+  ci.includes("Compile pinned Rocq external foundation"),
+  "CI compiles Rocq foundation",
+);
+assert(
+  ci.includes("rocq.dockerImage"),
+  "CI reads digest-pinned Rocq image from provenance manifest",
+);
+assert(
+  ci.includes("steps.external-proof-diff.outputs.run == 'true'"),
+  "external compilers are conditional inside existing CI job",
+);
+assert(
+  !ci.includes("jobs:\n  external-proofs:"),
+  "no additional external-proof VM/job is introduced",
+);
+// P-INFRA2B validates that the pinned compilers accept the foundation sources;
+// it does not promote any P0 theorem from target status to proved status.
+same(manifest.constraints.theoremProofClaimsAllowed, false, "compiler CI grants no theorem proof claim");
+
 console.log([
   "MTS #1431 P-INFRA2A:",
   "LEAN=4.34.1@5045d005",
@@ -158,6 +208,6 @@ console.log([
   "ROOT_UNIQUENESS_AXIOM=ABSENT",
   "SORRY_ADMIT=ABSENT",
   "THEOREM_PROOF_CLAIMS=0",
-  "EXECUTION=DEFERRED_TO_P_INFRA2B",
+  "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
