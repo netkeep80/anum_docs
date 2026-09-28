@@ -541,11 +541,15 @@ Proof.
   - exists (f2f3_start_root F E).
     exists (f2f3_finish_root F E).
     exists (form F (f2f3_start_root F E) (f2f3_finish_root F E)).
-    repeat split.
+    split.
     + apply f2f3_start_root_grounded.
-    + apply f2f3_finish_root_grounded.
-    + apply f2f3_pair_grounded.
-    + apply f2f3_start_root_pattern.
-    + apply f2f3_finish_root_pattern.
-    + apply f2f3_pair_pattern.
+    + split.
+      * apply f2f3_finish_root_grounded.
+      * split.
+        -- apply f2f3_pair_grounded.
+        -- split.
+           ++ apply f2f3_start_root_pattern.
+           ++ split.
+              ** apply f2f3_finish_root_pattern.
+              ** apply f2f3_pair_pattern.
 Qed.
