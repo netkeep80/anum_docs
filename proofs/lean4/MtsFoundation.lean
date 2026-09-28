@@ -206,4 +206,125 @@ theorem FND_13_identity_by_poles
         rw [h.1, h.2]
       _ = N.normalForm y := (N.recursiveEquation y).symm
 
+
+/--
+Local self-incidence predicates for FND-01.
+
+These are propositions over one Link.  They are deliberately not encoded as a
+four-constructor datatype: the four cases arise from two independent
+self-incidence questions.
+-/
+def StartSelf (F : Foundation) (x : F.Link) : Prop :=
+  F.start x = x
+
+def FinishSelf (F : Foundation) (x : F.Link) : Prop :=
+  F.finish x = x
+
+def StartOnly (F : Foundation) (x : F.Link) : Prop :=
+  StartSelf F x ∧ ¬ FinishSelf F x
+
+def FinishOnly (F : Foundation) (x : F.Link) : Prop :=
+  ¬ StartSelf F x ∧ FinishSelf F x
+
+def PairLocal (F : Foundation) (x : F.Link) : Prop :=
+  ¬ StartSelf F x ∧ ¬ FinishSelf F x
+
+/--
+Constructive external proof does not silently assume that arbitrary Link
+identity is decidable.  A caller that wants the exhaustive local classifier
+supplies the two exact decisions it has authority to make.
+-/
+def LocalSelfDecision (F : Foundation) (x : F.Link) : Prop :=
+  (StartSelf F x ∨ ¬ StartSelf F x) ∧
+  (FinishSelf F x ∨ ¬ FinishSelf F x)
+
+def LocalSelfIncidenceExhaustive (F : Foundation) (x : F.Link) : Prop :=
+  FullSelf F x ∨
+  StartOnly F x ∨
+  FinishOnly F x ∨
+  PairLocal F x
+
+def LocalSelfIncidenceExclusive (F : Foundation) (x : F.Link) : Prop :=
+  ¬ (FullSelf F x ∧ StartOnly F x) ∧
+  ¬ (FullSelf F x ∧ FinishOnly F x) ∧
+  ¬ (FullSelf F x ∧ PairLocal F x) ∧
+  ¬ (StartOnly F x ∧ FinishOnly F x) ∧
+  ¬ (StartOnly F x ∧ PairLocal F x) ∧
+  ¬ (FinishOnly F x ∧ PairLocal F x)
+
+theorem local_self_incidence_exhaustive
+    (F : Foundation)
+    {x : F.Link}
+    (decision : LocalSelfDecision F x) :
+    LocalSelfIncidenceExhaustive F x := by
+  rcases decision with ⟨hs, hf⟩
+  cases hs with
+  | inl hSelfStart =>
+      cases hf with
+      | inl hSelfFinish =>
+          exact Or.inl ⟨hSelfStart, hSelfFinish⟩
+      | inr hNotSelfFinish =>
+          exact Or.inr (Or.inl ⟨hSelfStart, hNotSelfFinish⟩)
+  | inr hNotSelfStart =>
+      cases hf with
+      | inl hSelfFinish =>
+          exact Or.inr (Or.inr (Or.inl ⟨hNotSelfStart, hSelfFinish⟩))
+      | inr hNotSelfFinish =>
+          exact Or.inr (Or.inr (Or.inr ⟨hNotSelfStart, hNotSelfFinish⟩))
+
+theorem local_self_incidence_exclusive
+    (F : Foundation)
+    {x : F.Link} :
+    LocalSelfIncidenceExclusive F x := by
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+  · intro h
+    exact h.2.2 h.1.2
+  · intro h
+    exact h.2.1 h.1.1
+  · intro h
+    exact h.2.1 h.1.1
+  · intro h
+    exact h.2.1 h.1.1
+  · intro h
+    exact h.2.1 h.1.1
+  · intro h
+    exact h.2.2 h.1.2
+
+/--
+FND-01 C1 — proposition-level local partition only.
+
+This is not yet the full FND-01 realizability claim.  It proves that, once the
+two local identity questions have explicit decision evidence, the accepted
+Link has exactly one of the four self-incidence proposition patterns.
+
+The full-self branch is tied to unique ROOT through FND-02.  Equality of actual
+Links remains structural ordered-pole equality through FND-13.  Context
+orientation is intentionally absent here: it later names the two one-sided
+patterns but does not create them.
+-/
+theorem FND_01_local_partition
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    {x : F.Link}
+    (decision : LocalSelfDecision F x) :
+    LocalSelfIncidenceExhaustive F x ∧
+    LocalSelfIncidenceExclusive F x ∧
+    (FullSelf F x → x = F.R) ∧
+    (∀ {y : F.Link},
+      F.start x = F.start y →
+      F.finish x = F.finish y →
+      x = y) := by
+  refine ⟨
+    local_self_incidence_exhaustive F decision,
+    local_self_incidence_exclusive F,
+    ?_,
+    ?_
+  ⟩
+  · intro h
+    exact FND_02_unique_root F a1 h
+  · intro y hs hf
+    exact (FND_13_identity_by_poles F a1 N).2 ⟨hs, hf⟩
+
 end MTS.External
