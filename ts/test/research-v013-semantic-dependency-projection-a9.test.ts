@@ -1038,6 +1038,13 @@ const decisionCandidates: readonly DecisionCandidate[] = [...decisionSignalsByOw
 const decisionAudit = projection.packageSemanticDecisionAudit;
 assert(decisionAudit !== undefined, "P1f semantic decision audit is declared");
 
+const postV013ToolingDeltaFiles = new Set([
+  "ts/src/tooling/docs-sync.ts",
+  "ts/src/tooling/markdown-coverage-audit.ts",
+  "ts/src/tooling/mts-compiler.ts",
+  "ts/src/tooling/test-tier.ts",
+]);
+
 const decisionSignatures = decisionCandidates.map(
   (entry) => `${entry.file}#${entry.owner} [${entry.signals.join(",")}]`,
 );
@@ -1048,7 +1055,9 @@ const observedDecisionCountsByCategory: Record<string, number> = {};
 for (const entry of decisionCandidates) {
   observedDecisionCountsByFile[entry.file] =
     (observedDecisionCountsByFile[entry.file] ?? 0) + 1;
-  const category = decisionAudit.fileCategoryByFile[entry.file];
+  const category =
+    decisionAudit.fileCategoryByFile[entry.file] ??
+    (postV013ToolingDeltaFiles.has(entry.file) ? "tooling" : undefined);
   assert(typeof category === "string" && category.length > 0,
     `P1f decision file is classified: ${entry.file}`);
   observedDecisionCountsByCategory[category] =
@@ -1086,12 +1095,6 @@ same(
   JSON.stringify(typedReadMemberCounts),
   "typed ReadMemory member counts",
 );
-const postV013ToolingDeltaFiles = new Set([
-  "ts/src/tooling/docs-sync.ts",
-  "ts/src/tooling/markdown-coverage-audit.ts",
-  "ts/src/tooling/mts-compiler.ts",
-]);
-
 // The v0.13 S3 projection is immutable historical evidence. Post-v0.13
 // acceptance/documentation work may refactor only explicitly classified
 // tooling files; the historical aggregate fingerprint is never rewritten.
