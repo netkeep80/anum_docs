@@ -210,6 +210,11 @@ expectDictionaryError(
     x,
     target,
   );
+  assertDeepEqual(
+    names.poles(xFirst.entry),
+    { start: x, end: target },
+    "exact STRING name carrier is the Dictionary Entry source",
+  );
   const aliasEffect = defineDictionaryEffect(
     names,
     xFirst.afterScope,
