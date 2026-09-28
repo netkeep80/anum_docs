@@ -485,6 +485,88 @@ assert(
   "Rocq Context naming predicate does not construct a Link",
 );
 
+const inv01 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-01");
+assert(inv01 !== undefined, "P0 contains INV-01");
+assert(
+  JSON.stringify(inv01.dependsOn) === JSON.stringify(["FND-01", "FND-02"]),
+  "INV-01 depends exactly on FND-01 and FND-02",
+);
+assert(
+  /Host field order, graph labels, or codec digits are not the semantic definition of J/.test(
+    inv01.exclusions as string,
+  ),
+  "INV-01 excludes representation order and codec authority",
+);
+for (const source of [lean, rocq]) {
+  assert(
+    source.includes("RecursiveInversionDomain"),
+    "external source defines the declared finite recursive inversion domain",
+  );
+  assert(
+    source.includes("RecursiveInversion"),
+    "external source defines the Prop-valued structural inversion graph",
+  );
+  assert(
+    source.includes("recursive_start") || source.includes("recursive_inversion_start"),
+    "external source carries START to mirrored one-sided inversion rule",
+  );
+  assert(
+    source.includes("recursive_end") || source.includes("recursive_inversion_finish"),
+    "external source carries END to mirrored one-sided inversion rule",
+  );
+  assert(
+    source.includes("recursive_inversion_pair") || source.includes("| pair"),
+    "external source carries PAIR child-reversal inversion rule",
+  );
+  assert(
+    source.includes("INV_01_recursive_inversion_total"),
+    "external source proves total structural inversion on grounded domain",
+  );
+  assert(
+    source.includes("recursive_inversion_image_grounded"),
+    "external source proves inversion image remains grounded",
+  );
+}
+assert(
+  lean.includes("inductive RecursiveInversion") &&
+    lean.includes("F.Link → F.Link → Prop"),
+  "Lean inversion is a Prop-valued proof graph, not an ontology datatype",
+);
+assert(
+  rocq.includes("Inductive RecursiveInversion") &&
+    rocq.includes("Link F -> Link F -> Prop"),
+  "Rocq inversion is a Prop-valued proof graph, not an ontology datatype",
+);
+assert(
+  lean.includes("F.form inverseFinish inverseStart") &&
+    rocq.includes("form F inverseFinish inverseStart"),
+  "recursive PAIR inversion reverses the two recursively inverted poles",
+);
+assert(
+  lean.includes("FND_01_local_partition F a1 N decision") &&
+    lean.includes("FND_02_unique_root F a1 hFull"),
+  "Lean INV-01 totality consumes FND-01 partition and FND-02 unique ROOT",
+);
+assert(
+  rocq.includes("FND_01_local_partition F A1 N x Decision") &&
+    rocq.includes("FND_02_unique_root F A1 x HFull"),
+  "Rocq INV-01 totality consumes FND-01 partition and FND-02 unique ROOT",
+);
+const leanInvStart = lean.indexOf("structure RecursiveInversionDomain");
+const leanInvEnd = lean.indexOf("theorem INV_01_recursive_inversion_total", leanInvStart);
+const rocqInvStart = rocq.indexOf("Record RecursiveInversionDomain");
+const rocqInvEnd = rocq.indexOf("Theorem INV_01_recursive_inversion_total", rocqInvStart);
+for (const [label, source, start, end] of [
+  ["Lean", lean, leanInvStart, leanInvEnd],
+  ["Rocq", rocq, rocqInvStart, rocqInvEnd],
+] as const) {
+  assert(start >= 0 && end > start, `${label} INV-01 proof region exists`);
+  const region = source.slice(start, end);
+  for (const forbidden of ["ExactSequence", "canonicalWire", "LinkHandle", "codec", "opcode"]) {
+    assert(!region.includes(forbidden), `${label} INV-01 structural region excludes ${forbidden}`);
+  }
+}
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -525,7 +607,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=6",
+  "THEOREM_PROOF_CLAIMS=7",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -539,7 +621,11 @@ console.log([
   "FND01_CAPSTONE=EXTERNAL_PROOF_COMPLETE",
   "FND01_CONTEXT=NAMES_ONLY",
   "FND01_CTX03_DEPENDENCY=NONE",
-  "FND01_PORTABLE_EVIDENCE=DEFERRED",
+  "FND01_PORTABLE_EVIDENCE=LEAN4+ROCQ",
+  "INV01_GRAPH=PROP_VALUED_STRUCTURAL",
+  "INV01_TOTAL=GROUNDED_DOMAIN",
+  "INV01_IMAGE=GROUNDED",
+  "INV01_UNIQUENESS=DEFERRED",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
