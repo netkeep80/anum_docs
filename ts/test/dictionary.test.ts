@@ -8,10 +8,14 @@ import {
 } from "../src/dictionary.js";
 import {
   Memory,
+  ensureRootBasis,
   type LinkHandle,
   type LinkPoles,
   type ReadMemory,
 } from "../src/memory.js";
+import {
+  materializeV012SourceContent,
+} from "../src/v012-source.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -179,6 +183,134 @@ expectDictionaryError(
   () => lookupScopedDictionary(memory, forgedScope, sourceX),
   "invalid-predecessor-snapshot",
 );
+
+// #1583 R21: exact STRING source content participates in the existing
+// Dictionary topology; naming is a role of Links, not a second ontology.
+{
+  const names = new Memory();
+  const basis = ensureRootBasis(names);
+  const encode = (value: string): LinkHandle =>
+    materializeV012SourceContent(names, basis, new TextEncoder().encode(value));
+
+  const x = encode("x");
+  const alias = encode("alias");
+  assert(x !== alias, "different exact STRING names have different source identity");
+
+  const target = names.ensure(basis.U, basis.L);
+  const alternative = names.ensure(basis.L, basis.U);
+  assert(target !== alternative, "fixture targets differ");
+
+  const baseScope = defineDictionaryScope(names, basis.R, basis.R);
+
+  const xFirst = defineDictionaryEffect(
+    names,
+    baseScope,
+    basis.R,
+    basis.R,
+    x,
+    target,
+  );
+  assertDeepEqual(
+    names.poles(xFirst.entry),
+    { start: x, end: target },
+    "exact STRING name carrier is the Dictionary Entry source",
+  );
+  const aliasEffect = defineDictionaryEffect(
+    names,
+    xFirst.afterScope,
+    basis.R,
+    xFirst.historyAfter,
+    alias,
+    target,
+  );
+  const xRepeated = defineDictionaryEffect(
+    names,
+    aliasEffect.afterScope,
+    basis.R,
+    aliasEffect.historyAfter,
+    x,
+    target,
+  );
+
+  const xResolution = lookupScopedDictionary(names, xRepeated.afterScope, x);
+  assert(xResolution !== undefined, "exact STRING x resolves");
+  assertSame(xResolution.form, target, "x resolves to exact target Link");
+  assertSame(
+    xResolution.occurrences.length,
+    2,
+    "repeated same name/target keeps two occurrence provenance events",
+  );
+  assertSame(
+    lookupScopedDictionary(names, xRepeated.afterScope, alias)?.form,
+    target,
+    "alias resolves to the same target Link identity",
+  );
+
+  // Same exact name may mean something else in another selected Dictionary
+  // snapshot. Meaning is contextual; STRING bytes are not global authority.
+  const independent = defineDictionaryEffect(
+    names,
+    baseScope,
+    basis.R,
+    basis.R,
+    x,
+    alternative,
+  );
+  assertSame(
+    lookupScopedDictionary(names, xFirst.afterScope, x)?.form,
+    target,
+    "first Dictionary snapshot keeps x -> target",
+  );
+  assertSame(
+    lookupScopedDictionary(names, independent.afterScope, x)?.form,
+    alternative,
+    "independent Dictionary snapshot may select x -> alternative",
+  );
+
+  // A conflict inside one local history fails closed rather than choosing by
+  // insertion order or latest-write convention.
+  const conflict = defineDictionaryEffect(
+    names,
+    xRepeated.afterScope,
+    basis.R,
+    xRepeated.historyAfter,
+    x,
+    alternative,
+  );
+  expectDictionaryError(
+    () => lookupScopedDictionary(names, conflict.afterScope, x),
+    "local-form-conflict",
+  );
+
+  // Child scope shadowing changes only the selected child view; the frozen
+  // parent Dictionary snapshot remains unchanged.
+  const childBase = defineDictionaryScope(names, xRepeated.afterScope, basis.R);
+  const child = defineDictionaryEffect(
+    names,
+    childBase,
+    xRepeated.afterScope,
+    basis.R,
+    x,
+    alternative,
+  );
+  assertSame(
+    lookupScopedDictionary(names, xRepeated.afterScope, x)?.form,
+    target,
+    "parent Dictionary remains immutable under child shadowing",
+  );
+  assertSame(
+    lookupScopedDictionary(names, child.afterScope, x)?.form,
+    alternative,
+    "child Dictionary shadows x locally",
+  );
+
+  const unknown = encode("unknown");
+  assertSame(
+    lookupScopedDictionary(names, xRepeated.afterScope, unknown),
+    undefined,
+    "exact STRING without visible Dictionary entry has no semantic name authority",
+  );
+}
 
 function fake(): LinkHandle {
   return Object.freeze({}) as LinkHandle;
