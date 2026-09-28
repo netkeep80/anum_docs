@@ -146,6 +146,8 @@ const leanForbidden = [
   "link_ext",
   "axiom FND_02",
   "axiom FND_13",
+  "axiom INV_01",
+  "inductive InversionAspect",
   "link_reconstruct",
   "open Classical",
   "Classical.em",
@@ -164,6 +166,8 @@ const rocqForbidden = [
   "Axiom link_ext",
   "Axiom FND_02",
   "Axiom FND_13",
+  "Axiom INV_01",
+  "Inductive InversionAspect",
   "link_reconstruct",
   "classic.",
   "Admitted.",
@@ -485,6 +489,111 @@ assert(
   "Rocq Context naming predicate does not construct a Link",
 );
 
+const inv01 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-01");
+assert(inv01 !== undefined, "P0 contains INV-01");
+assert(
+  JSON.stringify(inv01.dependsOn) === JSON.stringify(["FND-01", "FND-02"]),
+  "INV-01 depends exactly on FND-01 and FND-02",
+);
+assert(
+  /finite recursive Link domain/i.test(inv01.scope as string),
+  "INV-01 remains scoped to the declared finite recursive Link domain",
+);
+assert(
+  /Host field order, graph labels, or codec digits/i.test(inv01.exclusions as string),
+  "INV-01 excludes host/graph/codec semantic authority",
+);
+
+for (const source of [lean, rocq]) {
+  assert(
+    source.includes("F2F3RecursiveFormation"),
+    "INV-01 source exposes generic accepted F2/F3 START/END formation",
+  );
+  assert(
+    source.includes("ProofDecision"),
+    "INV-01 source carries exact local proposition decisions",
+  );
+  assert(
+    source.includes("InversionReady"),
+    "INV-01 source carries finite recursive traversal evidence",
+  );
+  assert(
+    source.includes("RecursiveInverse"),
+    "INV-01 source defines inversion as a Link-level recursive relation",
+  );
+  assert(
+    source.includes("recursive_inverse_exists"),
+    "INV-01 source proves inversion existence on its declared ready domain",
+  );
+  assert(
+    source.includes("recursive_inverse_functional"),
+    "INV-01 source proves inversion result uniqueness",
+  );
+  assert(
+    source.includes("INV_01_recursive_inversion"),
+    "INV-01 source contains the theorem claim",
+  );
+}
+assert(
+  lean.includes("theorem INV_01_recursive_inversion"),
+  "Lean INV-01 is a theorem, not an axiom",
+);
+assert(
+  rocq.includes("Theorem INV_01_recursive_inversion"),
+  "Rocq INV-01 is a theorem, not an axiom",
+);
+assert(
+  lean.includes("FND_01_four_structural_cases F a1 N E localDecision"),
+  "Lean INV-01 existence consumes the proved FND-01 partition",
+);
+assert(
+  rocq.includes("FND_01_four_structural_cases F A1 N E x LocalDecision"),
+  "Rocq INV-01 existence consumes the proved FND-01 partition",
+);
+assert(
+  lean.includes("FND_02_unique_root F a1 hFull") &&
+    rocq.includes("FND_02_unique_root F A1 x HFull"),
+  "INV-01 consumes FND-02 for the full-self ROOT branch",
+);
+assert(
+  lean.includes("RecursiveInverse.startCase hStart hChild") &&
+    lean.includes("RecursiveInverse.finishCase hFinish hChild") &&
+    lean.includes("RecursiveInverse.pairCase hPair hStartInverse hFinishInverse"),
+  "Lean INV-01 derives START/END/PAIR recursive rules structurally",
+);
+assert(
+  rocq.includes("apply inverse_start") &&
+    rocq.includes("apply inverse_finish") &&
+    rocq.includes("apply inverse_pair"),
+  "Rocq INV-01 derives START/END/PAIR recursive rules structurally",
+);
+assert(
+  lean.includes("F.form finishInverse startInverse") &&
+    rocq.includes("form F finishInverse startInverse"),
+  "PAIR inversion reverses recursively inverted pole order",
+);
+const leanInvStart = lean.indexOf("structure F2F3RecursiveFormation");
+const rocqInvStart = rocq.indexOf("Record F2F3RecursiveFormation");
+assert(leanInvStart >= 0 && rocqInvStart >= 0, "INV-01 source slices exist");
+const leanInv = lean.slice(leanInvStart);
+const rocqInv = rocq.slice(rocqInvStart);
+for (const token of [".poles(", ".outgoing(", ".incoming(", "DecidableEq", "Classical.em"]) {
+  assert(!leanInv.includes(token), `Lean INV-01 excludes host/global-decision shortcut: ${token}`);
+}
+for (const token of ["Require Import", "classic."]) {
+  assert(!rocqInv.includes(token), `Rocq INV-01 excludes imported/classical shortcut: ${token}`);
+}
+assert(
+  !leanInv.includes("inductive InversionAspect") &&
+    !rocqInv.includes("Inductive InversionAspect"),
+  "INV-01 does not encode inversion authority as a four-case Aspect datatype",
+);
+assert(
+  lean.includes("inductive InversionReady") &&
+    rocq.includes("Inductive InversionReady"),
+  "INV-01 readiness is one recursive evidence relation",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -525,7 +634,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=6",
+  "THEOREM_PROOF_CLAIMS=7",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -539,7 +648,10 @@ console.log([
   "FND01_CAPSTONE=EXTERNAL_PROOF_COMPLETE",
   "FND01_CONTEXT=NAMES_ONLY",
   "FND01_CTX03_DEPENDENCY=NONE",
-  "FND01_PORTABLE_EVIDENCE=DEFERRED",
+  "FND01_PORTABLE_EVIDENCE=RECORDED",
+  "INV01=UNIQUE_STRUCTURAL_RELATION",
+  "INV01_DOMAIN=FINITE_READY_WITH_LOCAL_DECISIONS",
+  "INV01_FORMATION=F2F3_GENERIC_START_END",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
