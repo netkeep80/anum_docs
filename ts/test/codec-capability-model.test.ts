@@ -1,4 +1,5 @@
-// #1583 R18/R19 post-v0.14 representation research; not semantic authority.
+// #1583 R18/R19/R20 post-v0.14 representation research; not semantic authority.
+// Cost order is defined only under the same workload and preserved-identity contract.
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -584,6 +585,128 @@ export const TRANSFORMATION_RELATIONS = Object.freeze([
   }),
 ] as const satisfies readonly TransformationRelation[]);
 
+type RandomAccessShape =
+  | "TREE_TRAVERSAL"
+  | "PREDECESSOR_CHAIN"
+  | "SEQUENTIAL_TOKEN_STREAM"
+  | "FLAT_BYTES_EXTERNAL_CHAIN_INTERNAL";
+
+type CanonicalizationMode =
+  | "STRUCTURAL_BY_CONSTRUCTION"
+  | "POSITIONAL_BY_CONSTRUCTION"
+  | "LEXICAL_NORMALIZATION"
+  | "EXACT_BYTES_BY_CONSTRUCTION";
+
+type SharingBehavior =
+  | "WIRE_TREE_EXPANSION"
+  | "VALUE_REUSE_POSITION_CELLS"
+  | "NO_REFERENCE_SYNTAX"
+  | "BYTE_VALUE_REUSE_POSITION_CELLS";
+
+type TransportDependencies =
+  | "ROOT_BASIS"
+  | "VALUE_CODEC_REQUIRED"
+  | "Q14_INTERPRETER_AND_ALGEBRA"
+  | "BYTE_DEFINITION_FOR_LINK_CARRIER";
+
+type GpuAccessShape =
+  | "TREE_STACK"
+  | "POINTER_CHAIN"
+  | "STACK_SEQUENTIAL"
+  | "FLAT_BYTE_STREAM_PLUS_POSITION_CHAIN";
+
+interface CostShapeProfile {
+  readonly representation: string;
+  readonly randomAccess: RandomAccessShape;
+  readonly canonicalization: CanonicalizationMode;
+  readonly sharing: SharingBehavior;
+  readonly transportDependencies: TransportDependencies;
+  readonly gpuAccessShape: GpuAccessShape;
+}
+
+export const COST_SHAPE_PROFILES = Object.freeze([
+  Object.freeze({
+    representation: "recursive-link-prefix-8-9-6-1",
+    randomAccess: "TREE_TRAVERSAL",
+    canonicalization: "STRUCTURAL_BY_CONSTRUCTION",
+    sharing: "WIRE_TREE_EXPANSION",
+    transportDependencies: "ROOT_BASIS",
+    gpuAccessShape: "TREE_STACK",
+  }),
+  Object.freeze({
+    representation: "exact-sequence",
+    randomAccess: "PREDECESSOR_CHAIN",
+    canonicalization: "POSITIONAL_BY_CONSTRUCTION",
+    sharing: "VALUE_REUSE_POSITION_CELLS",
+    transportDependencies: "VALUE_CODEC_REQUIRED",
+    gpuAccessShape: "POINTER_CHAIN",
+  }),
+  Object.freeze({
+    representation: "q14-source-interpreter",
+    randomAccess: "SEQUENTIAL_TOKEN_STREAM",
+    canonicalization: "LEXICAL_NORMALIZATION",
+    sharing: "NO_REFERENCE_SYNTAX",
+    transportDependencies: "Q14_INTERPRETER_AND_ALGEBRA",
+    gpuAccessShape: "STACK_SEQUENTIAL",
+  }),
+  Object.freeze({
+    representation: "canonical-string-exact-bytes",
+    randomAccess: "FLAT_BYTES_EXTERNAL_CHAIN_INTERNAL",
+    canonicalization: "EXACT_BYTES_BY_CONSTRUCTION",
+    sharing: "BYTE_VALUE_REUSE_POSITION_CELLS",
+    transportDependencies: "BYTE_DEFINITION_FOR_LINK_CARRIER",
+    gpuAccessShape: "FLAT_BYTE_STREAM_PLUS_POSITION_CHAIN",
+  }),
+] as const satisfies readonly CostShapeProfile[]);
+
+interface CostObservation {
+  readonly id: string;
+  readonly workload: string;
+  readonly preservedIdentityContract: string;
+  readonly sourceUnits: number;
+  readonly decodeSteps: number;
+  readonly materializedPositionCells: number;
+  readonly structuralDepth: number;
+  readonly uniqueSemanticNodes: number;
+  readonly expandedWireNodes: number;
+}
+
+type CostOrder =
+  | "LEFT_DOMINATES"
+  | "RIGHT_DOMINATES"
+  | "EQUAL"
+  | "TRADEOFF"
+  | "INCOMPARABLE_REQUIREMENTS";
+
+function compareCost(left: CostObservation, right: CostObservation): CostOrder {
+  if (
+    left.workload !== right.workload ||
+    left.preservedIdentityContract !== right.preservedIdentityContract
+  ) {
+    return "INCOMPARABLE_REQUIREMENTS";
+  }
+
+  const keys = Object.freeze([
+    "sourceUnits",
+    "decodeSteps",
+    "materializedPositionCells",
+    "structuralDepth",
+    "uniqueSemanticNodes",
+    "expandedWireNodes",
+  ] as const);
+
+  let leftBetter = false;
+  let rightBetter = false;
+  for (const key of keys) {
+    if (left[key] < right[key]) leftBetter = true;
+    if (right[key] < left[key]) rightBetter = true;
+  }
+  if (!leftBetter && !rightBetter) return "EQUAL";
+  if (leftBetter && !rightBetter) return "LEFT_DOMINATES";
+  if (rightBetter && !leftBetter) return "RIGHT_DOMINATES";
+  return "TRADEOFF";
+}
+
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`codec capability model: ${message}`);
 }
@@ -845,18 +968,130 @@ for (const representation of CODEC_CAPABILITY_MODEL) {
   assert(q14.includes('["[]", "R"]'), "Q14 [] denotation collision evidence");
 }
 
+// R20: cost is a vector under an explicit preservation contract, never a
+// universal scalar score. A shorter source cannot dominate a stronger carrier.
+{
+  same(COST_SHAPE_PROFILES.length, CODEC_CAPABILITY_MODEL.length, "cost profile coverage");
+  const profileIds = new Set(COST_SHAPE_PROFILES.map((profile) => profile.representation));
+  for (const representation of CODEC_CAPABILITY_MODEL) {
+    assert(profileIds.has(representation.id), `missing cost profile for ${representation.id}`);
+  }
+
+  const q14L: CostObservation = Object.freeze({
+    id: "q14-L",
+    workload: "represent-L",
+    preservedIdentityContract: "Q14_DENOTATION",
+    sourceUnits: 1,
+    decodeSteps: 1,
+    materializedPositionCells: 0,
+    structuralDepth: 0,
+    uniqueSemanticNodes: 1,
+    expandedWireNodes: 1,
+  });
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  const recursiveLWire = serializeV013HierarchicalCarrier(
+    memory,
+    basis,
+    materializeV013HierarchicalCarrierFromSemanticLink(memory, basis, basis.L),
+  );
+  const recursiveL: CostObservation = Object.freeze({
+    id: "recursive-L",
+    workload: "represent-L",
+    preservedIdentityContract: "RECURSIVE_LINK_TOPOLOGY",
+    sourceUnits: recursiveLWire.length,
+    decodeSteps: recursiveLWire.length,
+    materializedPositionCells: 0,
+    structuralDepth: 2,
+    uniqueSemanticNodes: 4,
+    expandedWireNodes: recursiveLWire.length,
+  });
+  same(q14L.sourceUnits, 1, "Q14 L compact source");
+  same(recursiveL.sourceUnits, 5, "recursive L topology source");
+  same(
+    compareCost(q14L, recursiveL),
+    "INCOMPARABLE_REQUIREMENTS",
+    "compact Q14 cannot globally dominate stronger recursive topology contract",
+  );
+}
+
+// Reference-free recursive prefix transport expands shared DAGs. Semantic growth
+// is one new canonical Link per level; the tree wire duplicates both branches.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  let current = basis.U;
+  const lengths: number[] = [];
+
+  for (let depth = 0; depth <= 8; depth += 1) {
+    const carrier = materializeV013HierarchicalCarrierFromSemanticLink(memory, basis, current);
+    const wire = serializeV013HierarchicalCarrier(memory, basis, carrier);
+    const expected = 6 * (2 ** depth) - 1;
+    same(wire.length, expected, `shared-DAG recursive wire depth ${depth}`);
+    lengths.push(wire.length);
+    if (depth < 8) current = memory.ensure(current, current);
+  }
+
+  assert(lengths[8]! > 100 * 8, "shared-DAG wire expansion is decisively superlinear");
+}
+
+// ExactSequence scales one positional Cell per occurrence while equal values
+// keep one canonical value identity.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  for (const length of [0, 1, 2, 4, 8]) {
+    const values = Array.from({ length }, () => basis.L);
+    const carrier = materializeExactSequence(memory, values);
+    const read = readExactSequence(memory, carrier);
+    same(read.values.length, length, `ExactSequence values n=${length}`);
+    same(read.cells.length, length, `ExactSequence position cells n=${length}`);
+    if (length > 0) {
+      same(new Set(read.values).size, 1, `ExactSequence shared value identity n=${length}`);
+    }
+  }
+}
+
+// STRING external transport is linear in exact bytes. Internal positional Cells
+// are also linear, while repeated equal bytes reuse canonical Byte(p) identity.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  for (const length of [0, 1, 2, 4, 8]) {
+    const bytes = Uint8Array.from(Array.from({ length }, () => 0x41));
+    const carrier = materializeCanonicalByteSequence(memory, basis, bytes);
+    const read = readCanonicalByteSequence(memory, basis, carrier);
+    same(read.bytes.length, length, `STRING external source units n=${length}`);
+    same(read.cells.length, length, `STRING position cells n=${length}`);
+    if (length > 0) {
+      same(new Set(read.byteLinks).size, 1, `STRING shared Byte(p) identity n=${length}`);
+    }
+  }
+}
+
+// The old bounded comparison remains useful evidence that generic recursive wire
+// cost and specialized transport cost must not be collapsed into one score.
+{
+  const comparison = readFileSync(
+    join(repositoryRoot, "ts/test/v013-codec-comparison.test.ts"),
+    "utf8",
+  );
+  assert(comparison.includes("shared-DAG"), "existing shared-DAG cost witness retained");
+  assert(comparison.includes("v012PhysicalBytes"), "existing specialized STRING cost witness retained");
+}
+
 console.log(
   [
-    "MTS #1583 R18/R19:",
+    "MTS #1583 R18/R19/R20:",
     `REPRESENTATIONS=${CODEC_CAPABILITY_MODEL.length}`,
     `CAPABILITIES=${CAPS.length}`,
     `RELATIONS=${TRANSFORMATION_RELATIONS.length}`,
-    "MATRIX=TOTAL",
-    "RECURSIVE_WIRE=GREEN",
-    "EXACT_SEQUENCE=GREEN",
-    "STRING_BYTES=GREEN",
-    "ROUNDTRIP_CLASSIFICATION=GREEN",
-    "Q14_EVIDENCE_REUSED=YES",
+    `COST_PROFILES=${COST_SHAPE_PROFILES.length}`,
+    "COST_ORDER=PARTIAL",
+    "GLOBAL_SCALAR_SCORE=FORBIDDEN",
+    "SHARED_DAG_EXPANSION=GREEN",
+    "POSITIONAL_LINEARITY=GREEN",
+    "STRING_LINEARITY=GREEN",
     "SEMANTIC_DELTA=NONE",
   ].join(" "),
 );
