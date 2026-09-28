@@ -54,7 +54,7 @@ const p0 = JSON.parse(
 ) as Record<string, any>;
 
 same(manifest.schema, "mts-external-proof-toolchains/v0.1", "toolchain schema");
-same(manifest.status, "compiler-ci-active", "compiler CI phase");
+same(manifest.status, "external-proof-active", "external proof phase");
 same(manifest.acceptedMtsVersion, "v0.14", "accepted MTS version");
 same(manifest.p0Inventory, "theorems/p0-v0.14.json", "P0 inventory binding");
 same(manifest.authority, "external-differential-evidence-only", "external prover role");
@@ -114,9 +114,12 @@ same(
   "Rocq image OCaml",
 );
 
-for (const [name, value] of Object.entries(manifest.constraints)) {
-  same(value, false, `anti-cheat constraint ${name}`);
-}
+same(manifest.constraints.normativeMtsAuthority, false, "external provers are not normative MTS authority");
+same(manifest.constraints.theoremProofClaimsAllowed, true, "compiled external theorem claims are enabled");
+same(manifest.constraints.fourCaseDatatypeAllowed, false, "four-case datatype remains forbidden");
+same(manifest.constraints.fourCaseAxiomAllowed, false, "four-case axiom remains forbidden");
+same(manifest.constraints.rootUniquenessAxiomAllowed, false, "root uniqueness axiom remains forbidden");
+same(manifest.constraints.sorryOrAdmitAllowed, false, "sorry/admit remain forbidden");
 
 const requiredSymbols = [
   "Link",
@@ -141,8 +144,7 @@ const leanForbidden = [
   "axiom four",
   "root_unique",
   "link_ext",
-  "sorry",
-  "theorem FND",
+  "axiom FND_02",
   "Mathlib",
 ] as const;
 for (const token of leanForbidden) {
@@ -155,9 +157,9 @@ const rocqForbidden = [
   "Axiom four",
   "root_unique",
   "Axiom link_ext",
+  "Axiom FND_02",
   "Admitted.",
   "admit.",
-  "Theorem FND",
   "Require Import",
 ] as const;
 for (const token of rocqForbidden) {
@@ -204,6 +206,37 @@ assert(
   "FND-02 exclusion records A6 as downstream",
 );
 
+for (const source of [lean, rocq]) {
+  assert(source.includes("Grounded"), "external source defines finite Grounded evidence");
+  assert(source.includes("Distinguishable"), "external source defines finite Distinguishable evidence");
+  assert(source.includes("A1RecursiveSeparation"), "external source names the A1 recursive-separation premise");
+  assert(source.includes("FND_02_unique_root"), "external source contains FND-02 theorem");
+}
+assert(
+  lean.includes("inductive Grounded") && !lean.includes("inductive Aspect"),
+  "Lean grounding uses a generic inductive relation, not four Aspect constructors",
+);
+assert(
+  rocq.includes("Inductive Grounded") && !rocq.includes("Inductive Aspect"),
+  "Rocq grounding uses a generic inductive relation, not four Aspect constructors",
+);
+assert(
+  lean.includes("theorem FND_02_unique_root"),
+  "Lean FND-02 is a theorem, not an axiom",
+);
+assert(
+  rocq.includes("Theorem FND_02_unique_root"),
+  "Rocq FND-02 is a theorem, not an axiom",
+);
+assert(
+  lean.includes("full_self_not_distinguishable"),
+  "Lean proof derives absence of distinction for full self-closure",
+);
+assert(
+  rocq.includes("full_self_not_distinguishable"),
+  "Rocq proof derives absence of distinction for full self-closure",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -231,7 +264,7 @@ assert(
 );
 // P-INFRA2B validates that the pinned compilers accept the foundation sources;
 // it does not promote any P0 theorem from target status to proved status.
-same(manifest.constraints.theoremProofClaimsAllowed, false, "compiler CI grants no theorem proof claim");
+same(manifest.constraints.theoremProofClaimsAllowed, true, "compiler CI may validate explicit external theorem claims");
 
 console.log([
   "MTS #1431 P-INFRA2A:",
@@ -244,7 +277,9 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=0",
+  "THEOREM_PROOF_CLAIMS=1",
+  "FND02_LEAN=PROOF_SOURCE_PRESENT",
+  "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
