@@ -194,6 +194,9 @@ assert(
   !ci.includes("jobs:\n  external-proofs:"),
   "no additional external-proof VM/job is introduced",
 );
+// P-INFRA2B validates that the pinned compilers accept the foundation sources;
+// it does not promote any P0 theorem from target status to proved status.
+same(manifest.constraints.theoremProofClaimsAllowed, false, "compiler CI grants no theorem proof claim");
 
 console.log([
   "MTS #1431 P-INFRA2A:",
