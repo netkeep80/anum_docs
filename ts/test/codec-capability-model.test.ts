@@ -3,8 +3,11 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 import {
+  ByteCarrierError,
   materializeCanonicalByteSequence,
   readCanonicalByteSequence,
+  textToUtf8Bytes,
+  utf8BytesToText,
 } from "../src/byte-carrier.js";
 import {
   materializeExactSequence,
@@ -16,6 +19,7 @@ import {
   type LinkHandle,
 } from "../src/memory.js";
 import {
+  materializeV013HierarchicalCarrier,
   materializeV013HierarchicalCarrierFromSemanticLink,
   serializeV013HierarchicalCarrier,
 } from "../src/v013-hierarchical-carrier.js";
@@ -447,6 +451,139 @@ export const CODEC_CAPABILITY_MODEL = Object.freeze([
   }),
 ] as const satisfies readonly RepresentationRecord[]);
 
+type TransformationClass =
+  | "EXACT_ISOMORPHISM"
+  | "EXACT_ON_SUBDOMAIN"
+  | "CANONICAL_QUOTIENT"
+  | "LOSSY_WITH_EXPLICIT_CONTEXT"
+  | "PARTIAL_OVERLAP"
+  | "INCOMPARABLE"
+  | "OPEN";
+
+type InverseAvailability =
+  | "AVAILABLE"
+  | "AUTHORITY_GATED"
+  | "PARTIAL"
+  | "NONE"
+  | "OPEN";
+
+interface TransformationRelation {
+  readonly id: string;
+  readonly from: string;
+  readonly to: string;
+  readonly relation: TransformationClass;
+  readonly preservedIdentity: string;
+  readonly lostOrRestricted: string;
+  readonly requiredContext: string;
+  readonly inverse: InverseAvailability;
+  readonly evidence: readonly string[];
+}
+
+export const TRANSFORMATION_RELATIONS = Object.freeze([
+  Object.freeze({
+    id: "recursive-carrier-prefix-wire",
+    from: "quoted recursive Link carrier",
+    to: "8/9/6/1 prefix wire",
+    relation: "EXACT_ISOMORPHISM",
+    preservedIdentity: "canonical recursive carrier topology on the declared finite domain",
+    lostOrRestricted: "general graph cycles remain outside the declared domain",
+    requiredContext: "verified root basis",
+    inverse: "AVAILABLE",
+    evidence: Object.freeze([
+      here,
+      "ts/src/v013-hierarchical-carrier.ts",
+      "ts/test/v013-file-wire-conformance.test.ts",
+    ]),
+  }),
+  Object.freeze({
+    id: "semantic-link-recursive-wire",
+    from: "finite semantic Link topology",
+    to: "recursive quoted carrier / prefix wire",
+    relation: "EXACT_ON_SUBDOMAIN",
+    preservedIdentity: "recursive ROOT/START/END/PAIR topology",
+    lostOrRestricted: "the representation parser is not authorized to materialize the semantic target",
+    requiredContext: "verified root basis and semantic materialization authority for the inverse",
+    inverse: "AUTHORITY_GATED",
+    evidence: Object.freeze([
+      here,
+      "ts/src/v013-hierarchical-carrier.ts",
+      "ts/test/v013-hierarchical-carrier-two-memory.test.ts",
+    ]),
+  }),
+  Object.freeze({
+    id: "exact-sequence-rooted-fold",
+    from: "ExactSequence positional identity",
+    to: "rooted left-fold Link denotation",
+    relation: "CANONICAL_QUOTIENT",
+    preservedIdentity: "fold denotation only",
+    lostOrRestricted: "different exact position sequences may collapse to the same Link",
+    requiredContext: "chosen fold operation; witness uses ordinary Link formation from R",
+    inverse: "NONE",
+    evidence: Object.freeze([
+      here,
+      "ts/test/v013-dual-encoding-boundary.test.ts",
+    ]),
+  }),
+  Object.freeze({
+    id: "q14-raw-normalized-source",
+    from: "raw Q14 source",
+    to: "normalized Q14 token source",
+    relation: "CANONICAL_QUOTIENT",
+    preservedIdentity: "ordered Q14 signs",
+    lostOrRestricted: "whitespace, comments and exact textual source spelling",
+    requiredContext: "Q14 lexical version",
+    inverse: "NONE",
+    evidence: Object.freeze([
+      here,
+      "ts/test/v014-q14-versioned-interpreter.test.ts",
+    ]),
+  }),
+  Object.freeze({
+    id: "q14-normalized-source-denotation",
+    from: "normalized Q14 token source",
+    to: "Q14 StackAlgebra denotation",
+    relation: "CANONICAL_QUOTIENT",
+    preservedIdentity: "selected sequence denotation",
+    lostOrRestricted: "source distinctions such as epsilon versus [] may collapse",
+    requiredContext: "selected Q14 StackAlgebra/interpreter",
+    inverse: "NONE",
+    evidence: Object.freeze([
+      here,
+      "ts/test/v014-q14-versioned-interpreter.test.ts",
+    ]),
+  }),
+  Object.freeze({
+    id: "exact-bytes-canonical-string-carrier",
+    from: "finite exact byte sequence",
+    to: "canonical STRING Link carrier",
+    relation: "EXACT_ISOMORPHISM",
+    preservedIdentity: "ordered exact bytes including repeated occurrences",
+    lostOrRestricted: "none inside the declared byte-carrier domain",
+    requiredContext: "canonical Byte(p) and ExactSequence structural definitions",
+    inverse: "AVAILABLE",
+    evidence: Object.freeze([
+      here,
+      "ts/src/byte-carrier.ts",
+      "ts/test/v09-byte-carrier.test.ts",
+    ]),
+  }),
+  Object.freeze({
+    id: "exact-bytes-utf8-text",
+    from: "finite exact byte sequence",
+    to: "UTF-8 text interpretation",
+    relation: "EXACT_ON_SUBDOMAIN",
+    preservedIdentity: "exact bytes for valid UTF-8 text",
+    lostOrRestricted: "malformed UTF-8 bytes have no text image",
+    requiredContext: "strict UTF-8 interpreter; no normalization",
+    inverse: "PARTIAL",
+    evidence: Object.freeze([
+      here,
+      "ts/src/byte-carrier.ts",
+      "ts/test/v013-v012-utf8-carrier-parity.test.ts",
+    ]),
+  }),
+] as const satisfies readonly TransformationRelation[]);
+
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`codec capability model: ${message}`);
 }
@@ -599,15 +736,126 @@ for (const representation of CODEC_CAPABILITY_MODEL) {
   );
 }
 
+// R19 relation table is also total over its declared edges and every edge has
+// preserved/lost identity stated explicitly instead of implied by a codec name.
+{
+  const ids = new Set<string>();
+  for (const relation of TRANSFORMATION_RELATIONS) {
+    assert(!ids.has(relation.id), `duplicate transformation relation ${relation.id}`);
+    ids.add(relation.id);
+    assert(relation.evidence.length > 0, `${relation.id}: evidence required`);
+    for (const path of relation.evidence) {
+      assert(existsSync(join(repositoryRoot, path)), `missing relation evidence: ${path}`);
+    }
+    if (relation.relation === "EXACT_ISOMORPHISM") {
+      same(relation.inverse, "AVAILABLE", `${relation.id}: exact isomorphism inverse`);
+    }
+  }
+}
+
+// Recursive quoted carrier <-> prefix wire is an actual round-trip on the
+// declared recursive domain. This does NOT grant semantic target authority.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  const left = memory.ensureStartSelfClosed(basis.C);
+  const right = memory.ensureEndSelfClosed(basis.O);
+  const semantic = memory.ensure(left, right);
+
+  const carrier = materializeV013HierarchicalCarrierFromSemanticLink(memory, basis, semantic);
+  const wire = serializeV013HierarchicalCarrier(memory, basis, carrier);
+  const rebuilt = materializeV013HierarchicalCarrier(memory, basis, wire);
+  same(rebuilt, carrier, "recursive carrier/wire exact round-trip");
+
+  const source = readFileSync(
+    join(repositoryRoot, "ts/src/v013-hierarchical-carrier.ts"),
+    "utf8",
+  );
+  assert(
+    source.includes("This parser has no authority to materialize the semantic Link described"),
+    "recursive wire inverse remains semantic-authority gated",
+  );
+}
+
+// ExactSequence -> rooted Link fold is a quotient, not an identity-preserving
+// inverse. [] and [R] are distinct exact sequences but both fold to R.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+
+  const empty = materializeExactSequence(memory, []);
+  const oneRoot = materializeExactSequence(memory, [basis.R]);
+  assert(empty !== oneRoot, "exact [] and [R] carrier identities differ");
+
+  const fold = (values: readonly LinkHandle[]): LinkHandle => {
+    let current = basis.R;
+    for (const value of values) current = memory.ensure(current, value);
+    return current;
+  };
+
+  same(fold([]), basis.R, "empty rooted fold");
+  same(fold([basis.R]), basis.R, "[R] rooted fold collision");
+}
+
+// Exact bytes <-> canonical STRING carrier is exact on its declared byte domain.
+{
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  const vectors = Object.freeze([
+    Uint8Array.from([]),
+    Uint8Array.from([0]),
+    Uint8Array.from([0, 255, 0, 65]),
+  ]);
+
+  for (const bytes of vectors) {
+    const carrier = materializeCanonicalByteSequence(memory, basis, bytes);
+    const decoded = readCanonicalByteSequence(memory, basis, carrier).bytes;
+    same(decoded.length, bytes.length, "STRING relation byte length");
+    for (let i = 0; i < bytes.length; i += 1) {
+      same(decoded[i], bytes[i], `STRING relation byte[${i}]`);
+    }
+  }
+}
+
+// UTF-8 is an exact inverse only on the valid UTF-8 subdomain. Malformed bytes
+// remain legitimate exact bytes below the text interpretation boundary.
+{
+  const text = "A∞🙂";
+  const bytes = textToUtf8Bytes(text);
+  same(utf8BytesToText(bytes), text, "strict UTF-8 valid subdomain round-trip");
+
+  try {
+    utf8BytesToText(Uint8Array.from([0xff]));
+    throw new Error("codec capability model: malformed UTF-8 must reject");
+  } catch (error) {
+    assert(error instanceof ByteCarrierError, "malformed UTF-8 rejection type");
+    same(error.code, "invalid-utf8", "malformed UTF-8 rejection code");
+  }
+}
+
+// Reuse Q14's existing executable witness rather than adding another parser.
+// It proves both raw-source canonicalization and denotation collision.
+{
+  const q14 = readFileSync(
+    join(repositoryRoot, "ts/test/v014-q14-versioned-interpreter.test.ts"),
+    "utf8",
+  );
+  assert(q14.includes("Q14 raw normalization"), "Q14 raw->normalized quotient evidence");
+  assert(q14.includes('["", "R"]'), "Q14 epsilon denotation evidence");
+  assert(q14.includes('["[]", "R"]'), "Q14 [] denotation collision evidence");
+}
+
 console.log(
   [
-    "MTS #1583 R18:",
+    "MTS #1583 R18/R19:",
     `REPRESENTATIONS=${CODEC_CAPABILITY_MODEL.length}`,
     `CAPABILITIES=${CAPS.length}`,
+    `RELATIONS=${TRANSFORMATION_RELATIONS.length}`,
     "MATRIX=TOTAL",
     "RECURSIVE_WIRE=GREEN",
     "EXACT_SEQUENCE=GREEN",
     "STRING_BYTES=GREEN",
+    "ROUNDTRIP_CLASSIFICATION=GREEN",
     "Q14_EVIDENCE_REUSED=YES",
     "SEMANTIC_DELTA=NONE",
   ].join(" "),
