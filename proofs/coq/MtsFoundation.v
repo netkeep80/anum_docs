@@ -18,23 +18,15 @@ Record Foundation : Type := {
 Definition FullSelf (F : Foundation) (x : Link F) : Prop :=
   start F x = x /\ finish F x = x.
 
-(* Finite grounding is split into a whole-Link witness and an independent
-   per-pole witness.  ROOT/START/END/PAIR are not assumed as constructors. *)
+(* Finite F2/F3 grounding uses one constructor.  Each pole contributes
+   one conditional recursive obligation: if it is not self, its external Link
+   must itself have finite Grounded evidence. *)
 Inductive Grounded (F : Foundation) : Link F -> Prop :=
 | grounded_node :
     forall x : Link F,
-      PoleGrounded F x (start F x) ->
-      PoleGrounded F x (finish F x) ->
-      Grounded F x
-with PoleGrounded (F : Foundation) : Link F -> Link F -> Prop :=
-| pole_grounded_self :
-    forall whole pole : Link F,
-      pole = whole ->
-      PoleGrounded F whole pole
-| pole_grounded_external :
-    forall whole pole : Link F,
-      Grounded F pole ->
-      PoleGrounded F whole pole.
+      (start F x <> x -> Grounded F (start F x)) ->
+      (finish F x <> x -> Grounded F (finish F x)) ->
+      Grounded F x.
 
 (* Finite recursive evidence that two Links are distinguishable. *)
 Inductive Distinguishable (F : Foundation) : Link F -> Link F -> Prop :=
@@ -103,8 +95,8 @@ Proof.
   intros H.
   destruct H as [Hs Hf].
   apply grounded_node.
-  - apply pole_grounded_self. exact Hs.
-  - apply pole_grounded_self. exact Hf.
+  - intros Hnot. exact (False_rect _ (Hnot Hs)).
+  - intros Hnot. exact (False_rect _ (Hnot Hf)).
 Qed.
 
 Lemma full_self_not_distinguishable
