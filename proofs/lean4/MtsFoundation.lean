@@ -327,4 +327,193 @@ theorem FND_01_local_partition
   · intro y hs hf
     exact (FND_13_identity_by_poles F a1 N).2 ⟨hs, hf⟩
 
+
+/--
+Minimal F2/F3 existence premise needed for FND-01 realizability.
+
+It does not postulate four ready-made aspect objects.  It supplies only the two
+proper one-sided recursive forms around the already established ROOT.  Their
+non-collapse to ROOT is the executable boundary corresponding to the accepted
+F2/F3 claim that START(ROOT) and END(ROOT) have their own alpha-neutral normal
+forms.  The ordinary PAIR representative is derived with the one Link-forming
+primitive.
+-/
+structure F2F3OneSidedExistence (F : Foundation) where
+  startRoot : F.Link
+  finishRoot : F.Link
+
+  startRootEquation :
+    startRoot = F.form startRoot F.R
+
+  finishRootEquation :
+    finishRoot = F.form F.R finishRoot
+
+  startRootNeRoot :
+    startRoot ≠ F.R
+
+  finishRootNeRoot :
+    finishRoot ≠ F.R
+
+theorem f2f3_start_root_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    F.start E.startRoot = E.startRoot := by
+  calc
+    F.start E.startRoot =
+        F.start (F.form E.startRoot F.R) := congrArg F.start E.startRootEquation
+    _ = E.startRoot := F.form_start E.startRoot F.R
+
+theorem f2f3_start_root_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    F.finish E.startRoot = F.R := by
+  calc
+    F.finish E.startRoot =
+        F.finish (F.form E.startRoot F.R) := congrArg F.finish E.startRootEquation
+    _ = F.R := F.form_finish E.startRoot F.R
+
+theorem f2f3_finish_root_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    F.start E.finishRoot = F.R := by
+  calc
+    F.start E.finishRoot =
+        F.start (F.form F.R E.finishRoot) := congrArg F.start E.finishRootEquation
+    _ = F.R := F.form_start F.R E.finishRoot
+
+theorem f2f3_finish_root_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    F.finish E.finishRoot = E.finishRoot := by
+  calc
+    F.finish E.finishRoot =
+        F.finish (F.form F.R E.finishRoot) := congrArg F.finish E.finishRootEquation
+    _ = E.finishRoot := F.form_finish F.R E.finishRoot
+
+theorem f2f3_start_root_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    StartOnly F E.startRoot := by
+  constructor
+  · exact f2f3_start_root_start F E
+  · intro h
+    apply E.startRootNeRoot
+    calc
+      E.startRoot = F.finish E.startRoot := h.symm
+      _ = F.R := f2f3_start_root_finish F E
+
+theorem f2f3_finish_root_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    FinishOnly F E.finishRoot := by
+  constructor
+  · intro h
+    apply E.finishRootNeRoot
+    calc
+      E.finishRoot = F.start E.finishRoot := h.symm
+      _ = F.R := f2f3_finish_root_start F E
+  · exact f2f3_finish_root_finish F E
+
+theorem f2f3_start_root_grounded
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    Grounded F E.startRoot := by
+  apply Grounded.node
+  · intro hNot
+    exact False.elim (hNot (f2f3_start_root_start F E))
+  · intro _
+    simpa only [f2f3_start_root_finish F E] using
+      grounded_of_full_self F (root_full_self F)
+
+theorem f2f3_finish_root_grounded
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    Grounded F E.finishRoot := by
+  apply Grounded.node
+  · intro _
+    simpa only [f2f3_finish_root_start F E] using
+      grounded_of_full_self F (root_full_self F)
+  · intro hNot
+    exact False.elim (hNot (f2f3_finish_root_finish F E))
+
+theorem f2f3_pair_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F (F.form E.startRoot E.finishRoot) := by
+  constructor
+  · intro h
+    have hStartRootIsPair :
+        E.startRoot = F.form E.startRoot E.finishRoot := by
+      calc
+        E.startRoot =
+            F.start (F.form E.startRoot E.finishRoot) :=
+          (F.form_start E.startRoot E.finishRoot).symm
+        _ = F.form E.startRoot E.finishRoot := h
+    apply E.finishRootNeRoot
+    calc
+      E.finishRoot =
+          F.finish (F.form E.startRoot E.finishRoot) :=
+        (F.form_finish E.startRoot E.finishRoot).symm
+      _ = F.finish E.startRoot := (congrArg F.finish hStartRootIsPair).symm
+      _ = F.R := f2f3_start_root_finish F E
+  · intro h
+    have hFinishRootIsPair :
+        E.finishRoot = F.form E.startRoot E.finishRoot := by
+      calc
+        E.finishRoot =
+            F.finish (F.form E.startRoot E.finishRoot) :=
+          (F.form_finish E.startRoot E.finishRoot).symm
+        _ = F.form E.startRoot E.finishRoot := h
+    apply E.startRootNeRoot
+    calc
+      E.startRoot =
+          F.start (F.form E.startRoot E.finishRoot) :=
+        (F.form_start E.startRoot E.finishRoot).symm
+      _ = F.start E.finishRoot := (congrArg F.start hFinishRootIsPair).symm
+      _ = F.R := f2f3_finish_root_start F E
+
+theorem f2f3_pair_grounded
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    Grounded F (F.form E.startRoot E.finishRoot) := by
+  apply Grounded.node
+  · intro _
+    simpa only [F.form_start] using f2f3_start_root_grounded F E
+  · intro _
+    simpa only [F.form_finish] using f2f3_finish_root_grounded F E
+
+/--
+FND-01 C2 — grounded realizability of all four proposition patterns.
+
+ROOT is already realized by R.  F2/F3 contributes only two proper one-sided
+recursive witnesses.  The neither-self representative is then derived by the
+single Link-forming primitive from those two witnesses.
+
+No host enum, four-opcode model, global equality decision, technical handle, or
+storage canonicalization is used as existence authority.
+-/
+theorem FND_01_grounded_realizability
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    FullSelf F F.R ∧
+    ∃ startWitness finishWitness pairWitness : F.Link,
+      Grounded F startWitness ∧
+      Grounded F finishWitness ∧
+      Grounded F pairWitness ∧
+      StartOnly F startWitness ∧
+      FinishOnly F finishWitness ∧
+      PairLocal F pairWitness := by
+  refine ⟨root_full_self F, ?_⟩
+  exact ⟨
+    E.startRoot,
+    E.finishRoot,
+    F.form E.startRoot E.finishRoot,
+    f2f3_start_root_grounded F E,
+    f2f3_finish_root_grounded F E,
+    f2f3_pair_grounded F E,
+    f2f3_start_root_pattern F E,
+    f2f3_finish_root_pattern F E,
+    f2f3_pair_pattern F E
+  ⟩
+
 end MTS.External
