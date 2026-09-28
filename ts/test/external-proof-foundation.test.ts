@@ -147,6 +147,9 @@ const leanForbidden = [
   "axiom FND_02",
   "axiom FND_13",
   "link_reconstruct",
+  "open Classical",
+  "Classical.em",
+  "[DecidableEq",
   "Mathlib",
 ] as const;
 for (const token of leanForbidden) {
@@ -162,6 +165,7 @@ const rocqForbidden = [
   "Axiom FND_02",
   "Axiom FND_13",
   "link_reconstruct",
+  "classic.",
   "Admitted.",
   "admit.",
   "Require Import",
@@ -301,6 +305,73 @@ assert(
   "Rocq does not smuggle A6 as a reconstruction axiom",
 );
 
+const fnd01 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-01");
+assert(fnd01 !== undefined, "P0 contains FND-01");
+assert.deepEqual(
+  fnd01.dependsOn,
+  ["FND-02", "FND-13"],
+  "FND-01 follows unique ROOT and ordered-pole identity",
+);
+assert(
+  (fnd01.assumptions as string[]).some((value) => value.includes("F2/F3 grounded-form existence")),
+  "FND-01 P0 keeps F2/F3 realizability explicit",
+);
+assert(
+  /separate the four proposition-level combinations from implementation decidability/i.test(
+    fnd01.exclusions as string,
+  ),
+  "FND-01 P0 requires proposition-level classification to stay separate from implementation decidability",
+);
+for (const source of [lean, rocq]) {
+  assert(source.includes("StartSelf"), "external source defines start-self proposition");
+  assert(source.includes("FinishSelf"), "external source defines finish-self proposition");
+  assert(source.includes("StartOnly"), "external source defines one-sided start-self proposition");
+  assert(source.includes("FinishOnly"), "external source defines one-sided finish-self proposition");
+  assert(source.includes("PairLocal"), "external source defines neither-self proposition");
+  assert(source.includes("LocalSelfDecision"), "external source requires explicit local identity decisions");
+  assert(
+    source.includes("LocalSelfIncidenceExhaustive"),
+    "external source states four-way proposition exhaustiveness",
+  );
+  assert(
+    source.includes("LocalSelfIncidenceExclusive"),
+    "external source states pairwise proposition exclusivity",
+  );
+  assert(source.includes("FND_01_local_partition"), "external source contains FND-01 C1 theorem");
+}
+assert(
+  lean.includes("theorem FND_01_local_partition"),
+  "Lean FND-01 C1 is a theorem, not an axiom",
+);
+assert(
+  rocq.includes("Theorem FND_01_local_partition"),
+  "Rocq FND-01 C1 is a theorem, not an axiom",
+);
+assert(
+  lean.includes("FND_02_unique_root F a1 h") &&
+    lean.includes("FND_13_identity_by_poles F a1 N"),
+  "Lean FND-01 C1 explicitly consumes FND-02 and FND-13",
+);
+assert(
+  rocq.includes("FND_02_unique_root F A1 x H") &&
+    rocq.includes("FND_13_identity_by_poles F A1 N x y"),
+  "Rocq FND-01 C1 explicitly consumes FND-02 and FND-13",
+);
+assert(
+  !lean.includes("inductive SelfIncidence") && !rocq.includes("Inductive SelfIncidence"),
+  "FND-01 C1 uses propositions rather than a four-case authority datatype",
+);
+assert(
+  !lean.includes("open Classical") &&
+    !lean.includes("Classical.em") &&
+    !lean.includes("[DecidableEq"),
+  "Lean FND-01 C1 does not smuggle global equality decidability",
+);
+assert(
+  !rocq.includes("classic."),
+  "Rocq FND-01 C1 does not smuggle classical excluded middle",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -341,12 +412,15 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=2",
+  "THEOREM_PROOF_CLAIMS=3",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
   "FND13_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_BASIS=FND02_INDEXED_F2F3_NORMALIZATION",
+  "FND01_C1=PROPOSITION_PARTITION_ONLY",
+  "FND01_DECIDABILITY=EXPLICIT_LOCAL_EVIDENCE",
+  "FND01_REALIZABILITY=DEFERRED_TO_C2",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
