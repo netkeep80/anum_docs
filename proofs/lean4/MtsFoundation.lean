@@ -516,4 +516,84 @@ theorem FND_01_grounded_realizability
     f2f3_pair_pattern F E
   ⟩
 
+
+/--
+FND-01 C3 structural capstone.
+
+C1 provides an exhaustive and exclusive four-way proposition partition for any
+Link once the two local self-incidence questions are explicitly decidable.
+C2 proves that all four proposition patterns are realized in the accepted
+finite R-grounded domain.
+
+The capstone keeps both facts together and also preserves the already proved
+identity boundaries:
+- full self-closure is unique ROOT through FND-02;
+- actual semantic Link identity is ordered-pole identity through FND-13.
+-/
+theorem FND_01_four_structural_cases
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    {x : F.Link}
+    (decision : LocalSelfDecision F x) :
+    LocalSelfIncidenceExhaustive F x ∧
+    LocalSelfIncidenceExclusive F x ∧
+    (FullSelf F x → x = F.R) ∧
+    (∀ {y : F.Link},
+      F.start x = F.start y →
+      F.finish x = F.finish y →
+      x = y) ∧
+    (FullSelf F F.R ∧
+      ∃ startWitness finishWitness pairWitness : F.Link,
+        Grounded F startWitness ∧
+        Grounded F finishWitness ∧
+        Grounded F pairWitness ∧
+        StartOnly F startWitness ∧
+        FinishOnly F finishWitness ∧
+        PairLocal F pairWitness) := by
+  have c1 := FND_01_local_partition F a1 N decision
+  have c2 := FND_01_grounded_realizability F E
+  exact ⟨
+    c1.1,
+    c1.2.1,
+    c1.2.2.1,
+    c1.2.2.2,
+    c2
+  ⟩
+
+/--
+Context-relative START_K / END_K naming is presentation only.
+
+The predicate does not create Links and does not classify anything.  It merely
+states that two Context-provided names refer to the two one-sided witnesses
+already supplied by F2/F3.  Which orientation/frame chooses these names belongs
+to CTX-03 and is intentionally not assumed by FND-01.
+-/
+def ContextOneSidedNames
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (START_K END_K : F.Link) : Prop :=
+  START_K = E.startRoot ∧ END_K = E.finishRoot
+
+theorem FND_01_context_names_only
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    {START_K END_K : F.Link}
+    (names : ContextOneSidedNames F E START_K END_K) :
+    FullSelf F F.R ∧
+    StartOnly F START_K ∧
+    FinishOnly F END_K ∧
+    PairLocal F (F.form START_K END_K) := by
+  rcases names with ⟨hStartName, hEndName⟩
+  subst START_K
+  subst END_K
+  exact ⟨
+    root_full_self F,
+    f2f3_start_root_pattern F E,
+    f2f3_finish_root_pattern F E,
+    f2f3_pair_pattern F E
+  ⟩
+
 end MTS.External
