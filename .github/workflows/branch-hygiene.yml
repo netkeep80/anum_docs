@@ -152,13 +152,194 @@ jobs:
           # therefore an independent safe deletion proof: it also proves that
           # no later commits were added to the branch after that PR snapshot.
           declare -A merged_pr_snapshots=()
-          while IFS=$'\t' read -r ref sha; do
+          while IFS=
+
+          mapfile -t branches < <(
+            gh api --paginate "repos/$REPO/branches?per_page=100" \
+              --jq '.[] | select(.protected == false) | [.name, .commit.sha] | @tsv'
+          )
+
+          deleted=0
+          deleted_merged_pr_heads=0
+          deleted_zero_ahead=0
+          skipped=0
+          patch_equivalent_individual=0
+          patch_equivalent_squash=0
+          empty_net_patch=0
+          unclassified_unique=0
+          deleted_individual_equivalent=0
+          deleted_squash_equivalent=0
+          deleted_empty_net_patch=0
+          kept_equivalent_without_pr=0
+
+          declare -A main_patch_ids=()
+          while read -r patch_id commit_id; do
+            if [ -n "$patch_id" ] && [ -n "$commit_id" ]; then
+              main_patch_ids["$patch_id"]="$commit_id"
+            fi
+          done < <(
+            git log --no-merges --patch --pretty=format:%H "origin/$BASE" | git patch-id --stable
+          )
+
+          for row in "${branches[@]}"; do
+            branch="${row%%$'\t'*}"
+            sha="${row#*$'\t'}"
+
+            if [ "$branch" = "$BASE" ]; then
+              continue
+            fi
+
+            if grep -Fxq "$branch" <<< "$open_heads"; then
+              echo "KEEP open-PR branch: $branch"
+              skipped=$((skipped + 1))
+              continue
+            fi
+
+            if [ -n "${merged_pr_snapshots["$branch|$sha"]+x}" ]; then
+              if gh api --method DELETE "repos/$REPO/git/refs/heads/$branch" --silent 2>/dev/null; then
+                echo "DELETE exact merged-PR head: $branch @ $sha"
+                deleted=$((deleted + 1))
+                deleted_merged_pr_heads=$((deleted_merged_pr_heads + 1))
+              else
+                echo "KEEP delete failed: $branch"
+                skipped=$((skipped + 1))
+              fi
+              continue
+            fi
+
+            base_uri="$(jq -nr --arg v "$BASE" '$v|@uri')"
+            branch_uri="$(jq -nr --arg v "$branch" '$v|@uri')"
+
+            if ! compare="$(gh api "repos/$REPO/compare/$base_uri...$branch_uri" 2>/dev/null)"; then
+              echo "KEEP unverified branch: $branch"
+              skipped=$((skipped + 1))
+              continue
+            fi
+
+            ahead_by="$(jq -r '.ahead_by' <<< "$compare")"
+            if [ "$ahead_by" != "0" ]; then
+              if ! git fetch --quiet --no-tags origin                 "+refs/heads/$BASE:refs/remotes/origin/$BASE"                 "+refs/heads/$branch:refs/remotes/origin/$branch"
+              then
+                echo "KEEP unique commits ($ahead_by), patch audit fetch failed: $branch"
+                skipped=$((skipped + 1))
+                unclassified_unique=$((unclassified_unique + 1))
+                continue
+              fi
+
+              merge_base="$(git merge-base "origin/$BASE" "origin/$branch" 2>/dev/null || true)"
+              if [ -z "$merge_base" ]; then
+                echo "KEEP unique commits ($ahead_by), no merge-base: $branch"
+                skipped=$((skipped + 1))
+                unclassified_unique=$((unclassified_unique + 1))
+                continue
+              fi
+
+              if git diff --quiet "$merge_base" "origin/$branch"; then
+                empty_net_patch=$((empty_net_patch + 1))
+                if [ -z "${closed_pr_refs["$branch"]+x}" ]; then
+                  echo "KEEP EMPTY_NET_PATCH without closed PR provenance ($ahead_by): $branch @ $sha"
+                  kept_equivalent_without_pr=$((kept_equivalent_without_pr + 1))
+                  skipped=$((skipped + 1))
+                  continue
+                fi
+                if gh api --method DELETE "repos/$REPO/git/refs/heads/$branch" --silent 2>/dev/null; then
+                  echo "DELETE EMPTY_NET_PATCH with closed PR provenance ($ahead_by): $branch @ $sha"
+                  deleted=$((deleted + 1))
+                  deleted_empty_net_patch=$((deleted_empty_net_patch + 1))
+                else
+                  echo "KEEP EMPTY_NET_PATCH delete failed: $branch"
+                  skipped=$((skipped + 1))
+                fi
+                continue
+              fi
+
+              cherry_output="$(git cherry "origin/$BASE" "origin/$branch" 2>/dev/null || true)"
+              if [ -n "$cherry_output" ] && ! grep -q '^+' <<< "$cherry_output"; then
+                patch_equivalent_individual=$((patch_equivalent_individual + 1))
+                if [ -z "${closed_pr_refs["$branch"]+x}" ]; then
+                  echo "KEEP INDIVIDUAL_EQUIVALENT without closed PR provenance ($ahead_by): $branch @ $sha"
+                  kept_equivalent_without_pr=$((kept_equivalent_without_pr + 1))
+                  skipped=$((skipped + 1))
+                  continue
+                fi
+                if gh api --method DELETE "repos/$REPO/git/refs/heads/$branch" --silent 2>/dev/null; then
+                  echo "DELETE INDIVIDUAL_EQUIVALENT with closed PR provenance ($ahead_by): $branch @ $sha"
+                  deleted=$((deleted + 1))
+                  deleted_individual_equivalent=$((deleted_individual_equivalent + 1))
+                else
+                  echo "KEEP INDIVIDUAL_EQUIVALENT delete failed: $branch"
+                  skipped=$((skipped + 1))
+                fi
+                continue
+              fi
+
+              aggregate_patch_id="$(
+                git diff --binary "$merge_base" "origin/$branch"                   | git patch-id --stable                   | awk 'NR == 1 { print $1 }'
+              )"
+              if [ -n "$aggregate_patch_id" ] && [ -n "${main_patch_ids["$aggregate_patch_id"]+x}" ]; then
+                patch_equivalent_squash=$((patch_equivalent_squash + 1))
+                if [ -z "${closed_pr_refs["$branch"]+x}" ]; then
+                  echo "KEEP AGGREGATE_SQUASH_EQUIVALENT without closed PR provenance ($ahead_by): $branch @ $sha -> ${main_patch_ids["$aggregate_patch_id"]}"
+                  kept_equivalent_without_pr=$((kept_equivalent_without_pr + 1))
+                  skipped=$((skipped + 1))
+                  continue
+                fi
+                if gh api --method DELETE "repos/$REPO/git/refs/heads/$branch" --silent 2>/dev/null; then
+                  echo "DELETE AGGREGATE_SQUASH_EQUIVALENT with closed PR provenance ($ahead_by): $branch @ $sha -> ${main_patch_ids["$aggregate_patch_id"]}"
+                  deleted=$((deleted + 1))
+                  deleted_squash_equivalent=$((deleted_squash_equivalent + 1))
+                else
+                  echo "KEEP AGGREGATE_SQUASH_EQUIVALENT delete failed: $branch"
+                  skipped=$((skipped + 1))
+                fi
+                continue
+              fi
+
+              echo "KEEP UNCLASSIFIED_UNIQUE ($ahead_by): $branch @ $sha"
+              unclassified_unique=$((unclassified_unique + 1))
+              skipped=$((skipped + 1))
+              continue
+            fi
+
+            if gh api --method DELETE "repos/$REPO/git/refs/heads/$branch" --silent 2>/dev/null; then
+              echo "DELETE zero-ahead branch: $branch"
+              deleted=$((deleted + 1))
+              deleted_zero_ahead=$((deleted_zero_ahead + 1))
+            else
+              echo "KEEP delete failed: $branch"
+              skipped=$((skipped + 1))
+            fi
+          done
+
+          echo "Deleted total: $deleted"
+          echo "Deleted exact merged-PR heads: $deleted_merged_pr_heads"
+          echo "Deleted zero-ahead branches: $deleted_zero_ahead"
+          echo "Classified individual patch-equivalent: $patch_equivalent_individual"
+          echo "Classified aggregate squash-equivalent: $patch_equivalent_squash"
+          echo "Classified empty net patch: $empty_net_patch"
+          echo "Deleted individual patch-equivalent with PR provenance: $deleted_individual_equivalent"
+          echo "Deleted aggregate squash-equivalent with PR provenance: $deleted_squash_equivalent"
+          echo "Deleted empty net patch with PR provenance: $deleted_empty_net_patch"
+          echo "Kept equivalent without closed PR provenance: $kept_equivalent_without_pr"
+          echo "Unclassified unique branches: $unclassified_unique"
+          echo "Kept/skipped: $skipped"
+\t' read -r ref sha; do
             if [ -n "$ref" ] && [ -n "$sha" ]; then
               merged_pr_snapshots["$ref|$sha"]=1
             fi
           done < <(
             gh api --paginate "repos/$REPO/pulls?state=closed&per_page=100&sort=updated&direction=desc" \
               --jq '.[] | select(.merged_at != null and .head.repo.full_name == .base.repo.full_name) | [.head.ref, .head.sha] | @tsv'
+          )
+
+          declare -A closed_pr_refs=()
+          while IFS= read -r ref; do
+            if [ -n "$ref" ]; then
+              closed_pr_refs["$ref"]=1
+            fi
+          done < <(
+            gh api --paginate "repos/$REPO/pulls?state=closed&per_page=100&sort=updated&direction=desc" \
+              --jq '.[] | select(.head.repo.full_name == .base.repo.full_name) | .head.ref'
           )
 
           mapfile -t branches < <(
