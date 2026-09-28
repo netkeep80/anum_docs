@@ -789,8 +789,9 @@ theorem INV_01_recursive_inversion_total
       have partition := FND_01_local_partition F a1 N decision
       rcases partition.1 with hFull | hStart | hFinish | hPair
       · have hxRoot := FND_02_unique_root F a1 hFull
-        subst x
-        exact ⟨F.R, RecursiveInversion.root⟩
+        refine ⟨F.R, ?_⟩
+        simpa only [hxRoot] using
+          (RecursiveInversion.root (F := F) (D := D))
       · rcases ihFinish hStart.2 with ⟨childInverse, hChild⟩
         exact ⟨D.endForm childInverse, RecursiveInversion.start hStart hChild⟩
       · rcases ihStart hFinish.1 with ⟨childInverse, hChild⟩
