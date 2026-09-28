@@ -19,6 +19,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Detect external proof diff
+        id: external-proof-diff
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          PUSH_HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            BASE_SHA="$PR_BASE_SHA"
+            HEAD_SHA="$PR_HEAD_SHA"
+          else
+            BASE_SHA="$PUSH_BEFORE_SHA"
+            HEAD_SHA="$PUSH_HEAD_SHA"
+          fi
+          echo "External proof diff: $BASE_SHA..$HEAD_SHA"
+          changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
+          printf '%s\n' "$changed"
+          if printf '%s\n' "$changed" | grep -Eq '^(proofs/(lean4|coq)/|proofs/external-toolchains\.json$|theorems/p0-v0\.14\.json$|\.github/workflows/ci\.yml$)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -35,6 +63,35 @@ jobs:
           else
             npm --prefix ts run check:full
           fi
+
+      - name: Compile pinned Lean external foundation
+        if: steps.external-proof-diff.outputs.run == 'true'
+        shell: bash
+        run: |
+          LEAN_URL="$(node -p "require('./proofs/external-toolchains.json').lean4.linuxReleaseUrl")"
+          LEAN_SHA="$(node -p "require('./proofs/external-toolchains.json').lean4.linuxReleaseSha256")"
+          rm -rf /tmp/mts-lean /tmp/mts-lean.tar.zst
+          curl --fail --location --retry 3 --retry-delay 2 "$LEAN_URL" -o /tmp/mts-lean.tar.zst
+          echo "$LEAN_SHA  /tmp/mts-lean.tar.zst" | sha256sum --check --strict
+          mkdir -p /tmp/mts-lean
+          tar --zstd -xf /tmp/mts-lean.tar.zst -C /tmp/mts-lean --strip-components=1
+          /tmp/mts-lean/bin/lean --version
+          /tmp/mts-lean/bin/lean proofs/lean4/MtsFoundation.lean
+
+      - name: Compile pinned Rocq external foundation
+        if: steps.external-proof-diff.outputs.run == 'true'
+        shell: bash
+        run: |
+          ROCQ_IMAGE="$(node -p "require('./proofs/external-toolchains.json').rocq.dockerImage")"
+          EXPECTED_VCS="$(node -p "require('./proofs/external-toolchains.json').rocq.imageVcsRef")"
+          docker pull "$ROCQ_IMAGE"
+          ACTUAL_VCS="$(docker inspect --format '{{ index .Config.Labels "org.label-schema.vcs-ref" }}' "$ROCQ_IMAGE")"
+          test "$ACTUAL_VCS" = "$EXPECTED_VCS"
+          docker run --rm "$ROCQ_IMAGE" rocq -v
+          docker run --rm \
+            -v "$PWD/proofs/coq:/input:ro" \
+            "$ROCQ_IMAGE" \
+            sh -lc 'cp /input/MtsFoundation.v /tmp/MtsFoundation.v && cd /tmp && rocq compile MtsFoundation.v'
 
       - name: Install MTS visual browser companion dependencies
         run: npm ci --prefix packages/visual --ignore-scripts --no-audit --no-fund
