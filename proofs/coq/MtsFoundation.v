@@ -142,3 +142,66 @@ Proof.
     + exact Hx.
     + apply root_full_self.
 Qed.
+
+
+(* External F2/F3 normalization interface.
+
+   Historical MTS source 1e529a23... describes finite recursive forms modulo
+   the least relation ~=, with one alpha-neutral normal form per semantic
+   class.
+
+   The normalization package is indexed by a previously established unique
+   ROOT proof.  In the accepted proof order that proof is supplied by FND-02.
+   FND-13 then uses the recursive normal-form equation and completeness, not
+   pole extensionality as a premise. *)
+Definition RootUniqueness (F : Foundation) : Prop :=
+  forall x : Link F,
+    FullSelf F x ->
+    x = R F.
+
+Record F2F3Normalization
+    (F : Foundation)
+    (_uniqueRoot : RootUniqueness F) : Type := {
+  NormalForm : Type;
+  compose_nf : NormalForm -> NormalForm -> NormalForm;
+  normal_form : Link F -> NormalForm;
+
+  normal_form_equation :
+    forall x : Link F,
+      normal_form x =
+      compose_nf
+        (normal_form (start F x))
+        (normal_form (finish F x));
+
+  normal_form_complete :
+    forall x y : Link F,
+      normal_form x = normal_form y ->
+      x = y
+}.
+
+(* FND-13 / historical A6 — identity by ordered poles, derived from the
+   accepted F2/F3 recursive-normalization interface after FND-02. *)
+Theorem FND_13_identity_by_poles
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (x y : Link F) :
+    x = y <->
+    start F x = start F y /\
+    finish F x = finish F y.
+Proof.
+  split.
+  - intros Hxy.
+    subst y.
+    split; reflexivity.
+  - intros H.
+    destruct H as [Hs Hf].
+    apply (normal_form_complete
+      F (FND_02_unique_root F A1) N x y).
+    rewrite (normal_form_equation
+      F (FND_02_unique_root F A1) N x).
+    rewrite (normal_form_equation
+      F (FND_02_unique_root F A1) N y).
+    rewrite Hs, Hf.
+    reflexivity.
+Qed.

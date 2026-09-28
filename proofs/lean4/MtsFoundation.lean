@@ -142,4 +142,68 @@ theorem FND_02_unique_root
     (grounded_of_full_self F (root_full_self F))
     (full_self_not_distinguishable F hx (root_full_self F))
 
+
+/--
+External F2/F3 normalization interface.
+
+Historical MTS source 1e529a23... describes finite recursive forms modulo the
+least relation ≈, with one alpha-neutral normal form per semantic class.
+
+The normalization package is indexed by a previously established unique-ROOT
+proof.  For the accepted proof order that proof is supplied by FND-02.  The
+A6/FND-13 step itself then uses only the recursive normal-form equation and
+normal-form completeness; it does not re-prove or silently assume Link
+extensionality.
+-/
+def RootUniqueness (F : Foundation) : Prop :=
+  ∀ {x : F.Link}, FullSelf F x → x = F.R
+
+structure F2F3Normalization
+    (F : Foundation)
+    (_uniqueRoot : RootUniqueness F) where
+  NormalForm : Type
+  compose : NormalForm → NormalForm → NormalForm
+  normalForm : F.Link → NormalForm
+
+  recursiveEquation :
+    ∀ x : F.Link,
+      normalForm x =
+        compose (normalForm (F.start x)) (normalForm (F.finish x))
+
+  complete :
+    ∀ {x y : F.Link},
+      normalForm x = normalForm y →
+      x = y
+
+/--
+FND-13 / historical A6 — semantic Link identity is exactly identity of the
+ordered poles on the accepted F2/F3-normalized domain.
+
+The normalization witness is explicitly indexed by the unique-ROOT result
+proved by FND-02.  Same ordered poles imply the same recursively composed
+normal form; F2/F3 completeness then yields one semantic Link.
+-/
+theorem FND_13_identity_by_poles
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    {x y : F.Link} :
+    x = y ↔
+      (F.start x = F.start y ∧ F.finish x = F.finish y) := by
+  constructor
+  · intro h
+    cases h
+    exact ⟨rfl, rfl⟩
+  · intro h
+    apply N.complete
+    calc
+      N.normalForm x =
+          N.compose (N.normalForm (F.start x)) (N.normalForm (F.finish x)) :=
+        N.recursiveEquation x
+      _ =
+          N.compose (N.normalForm (F.start y)) (N.normalForm (F.finish y)) := by
+        rw [h.1, h.2]
+      _ = N.normalForm y := (N.recursiveEquation y).symm
+
 end MTS.External
