@@ -423,6 +423,68 @@ assert(
   "F2/F3 C2 premise does not postulate a fourth ready-made PAIR witness",
 );
 
+assert(
+  (fnd01.assumptions as string[]).some((value) =>
+    value.includes("Context orientation only names one-sided cases")
+  ),
+  "FND-01 P0 keeps Context orientation at the naming-only boundary",
+);
+for (const source of [lean, rocq]) {
+  assert(
+    source.includes("FND_01_four_structural_cases"),
+    "external source contains the FND-01 structural capstone theorem",
+  );
+  assert(
+    source.includes("ContextOneSidedNames"),
+    "external source names the Context one-sided alias relation",
+  );
+  assert(
+    source.includes("FND_01_context_names_only"),
+    "external source proves Context naming does not create structural cases",
+  );
+}
+assert(
+  lean.includes("theorem FND_01_four_structural_cases"),
+  "Lean FND-01 capstone is a theorem, not an axiom",
+);
+assert(
+  rocq.includes("Theorem FND_01_four_structural_cases"),
+  "Rocq FND-01 capstone is a theorem, not an axiom",
+);
+assert(
+  lean.includes("have c1 := FND_01_local_partition") &&
+    lean.includes("have c2 := FND_01_grounded_realizability"),
+  "Lean capstone explicitly composes C1 and C2",
+);
+assert(
+  rocq.includes("FND_01_local_partition F A1 N x D") &&
+    rocq.includes("FND_01_grounded_realizability F E"),
+  "Rocq capstone explicitly composes C1 and C2",
+);
+assert(
+  lean.includes("START_K = E.startRoot ∧ END_K = E.finishRoot"),
+  "Lean Context naming relation is alias-only",
+);
+assert(
+  rocq.includes("START_K = f2f3_start_root F E /\\") &&
+    rocq.includes("END_K = f2f3_finish_root F E"),
+  "Rocq Context naming relation is alias-only",
+);
+const leanNamesStart = lean.indexOf("def ContextOneSidedNames");
+const leanNamesEnd = lean.indexOf("theorem FND_01_context_names_only", leanNamesStart);
+const rocqNamesStart = rocq.indexOf("Definition ContextOneSidedNames");
+const rocqNamesEnd = rocq.indexOf("Theorem FND_01_context_names_only", rocqNamesStart);
+assert(
+  leanNamesStart >= 0 && leanNamesEnd > leanNamesStart &&
+    !lean.slice(leanNamesStart, leanNamesEnd).includes("F.form"),
+  "Lean Context naming predicate does not construct a Link",
+);
+assert(
+  rocqNamesStart >= 0 && rocqNamesEnd > rocqNamesStart &&
+    !rocq.slice(rocqNamesStart, rocqNamesEnd).includes("form F"),
+  "Rocq Context naming predicate does not construct a Link",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -463,7 +525,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=4",
+  "THEOREM_PROOF_CLAIMS=6",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -474,7 +536,10 @@ console.log([
   "FND01_C2=GROUNDED_REALIZABILITY",
   "FND01_C2_PREMISE=TWO_PROPER_ONE_SIDED_FORMS",
   "FND01_PAIR=DERIVED_BY_SINGLE_FORM",
-  "FND01_CAPSTONE=DEFERRED_TO_C3",
+  "FND01_CAPSTONE=EXTERNAL_PROOF_COMPLETE",
+  "FND01_CONTEXT=NAMES_ONLY",
+  "FND01_CTX03_DEPENDENCY=NONE",
+  "FND01_PORTABLE_EVIDENCE=DEFERRED",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
