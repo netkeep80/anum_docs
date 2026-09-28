@@ -49,6 +49,9 @@ const manifest = JSON.parse(
 const lean = readFileSync(join(root, "proofs/lean4/MtsFoundation.lean"), "utf8");
 const rocq = readFileSync(join(root, "proofs/coq/MtsFoundation.v"), "utf8");
 const ci = readFileSync(join(root, ".github/workflows/ci.yml"), "utf8");
+const p0 = JSON.parse(
+  readFileSync(join(root, "theorems/p0-v0.14.json"), "utf8"),
+) as Record<string, any>;
 
 same(manifest.schema, "mts-external-proof-toolchains/v0.1", "toolchain schema");
 same(manifest.status, "compiler-ci-active", "compiler CI phase");
@@ -123,7 +126,6 @@ const requiredSymbols = [
   "R",
   "form_start",
   "form_finish",
-  "link_ext",
   "root_self",
 ] as const;
 
@@ -138,6 +140,7 @@ const leanForbidden = [
   "ROOT | START",
   "axiom four",
   "root_unique",
+  "link_ext",
   "sorry",
   "theorem FND",
   "Mathlib",
@@ -151,6 +154,7 @@ const rocqForbidden = [
   "Inductive SelfIncidence",
   "Axiom four",
   "root_unique",
+  "Axiom link_ext",
   "Admitted.",
   "admit.",
   "Theorem FND",
@@ -167,6 +171,37 @@ assert(
 assert(
   rocq.includes("form R R = R"),
   "Rocq states root self-closure without root uniqueness",
+);
+
+const fnd02 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-02");
+assert(fnd02 !== undefined, "P0 contains FND-02");
+same(
+  p0.constraints.fnd02MayAssumePoleExtensionality,
+  false,
+  "FND-02 cannot assume A6/pole extensionality",
+);
+same(
+  p0.constraints.poleExtensionalityAvailableAfterFnd02,
+  true,
+  "A6/pole extensionality is downstream of FND-02",
+);
+assert(
+  (fnd02.assumptions as string[]).some((value) => value.includes("A1")),
+  "FND-02 explicitly depends on A1 recursive distinguishability",
+);
+assert(
+  (fnd02.assumptions as string[]).some((value) => value.includes("F2/F3")),
+  "FND-02 explicitly depends on F2/F3 grounded normalization",
+);
+assert(
+  !(fnd02.assumptions as string[]).some((value) =>
+    /pole extensionality|identity\/equality laws/i.test(value)
+  ),
+  "FND-02 assumptions do not smuggle A6 identity-by-poles",
+);
+assert(
+  /A6.*downstream/i.test(fnd02.exclusions as string),
+  "FND-02 exclusion records A6 as downstream",
 );
 
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
@@ -206,6 +241,8 @@ console.log([
   "FOUR_CASE_DATATYPE=ABSENT",
   "FOUR_CASE_AXIOM=ABSENT",
   "ROOT_UNIQUENESS_AXIOM=ABSENT",
+  "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
+  "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
   "THEOREM_PROOF_CLAIMS=0",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
