@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
@@ -127,8 +128,22 @@ function collectJsonFiles(directory: string): string[] {
   return result.sort();
 }
 
-function sha256File(path: string): string {
-  return createHash("sha256").update(readFileSync(path)).digest("hex");
+function gitObjectBytes(commitSha: string, path: string): Buffer {
+  return execFileSync("git", ["show", `${commitSha}:${path}`], {
+    cwd: root,
+    encoding: "buffer",
+  });
+}
+
+function gitBlobSha(commitSha: string, path: string): string {
+  return execFileSync("git", ["rev-parse", `${commitSha}:${path}`], {
+    cwd: root,
+    encoding: "utf8",
+  }).trim();
+}
+
+function sha256AtCommit(commitSha: string, path: string): string {
+  return createHash("sha256").update(gitObjectBytes(commitSha, path)).digest("hex");
 }
 
 const evidenceFiles = collectJsonFiles(resolve(root, "proofs", "evidence"));
@@ -154,6 +169,11 @@ for (const { path, record } of evidenceRecords) {
     `${path} accepted MTS source freeze`,
   );
   assert.match(record.mts.contractBlobSha, /^[0-9a-f]{40}$/, `${path} contract blob SHA`);
+  assert.equal(
+    gitBlobSha(record.mts.sourceCommitSha, "contracts/mts-contract-v0.14.json"),
+    record.mts.contractBlobSha,
+    `${path} contract blob belongs to accepted source freeze`,
+  );
   assert.equal(record.proofSource.repository, "netkeep80/anum_docs", `${path} source repository`);
   assert.match(record.proofSource.commitSha, /^[0-9a-f]{40}$/, `${path} proof source commit`);
 
@@ -177,11 +197,11 @@ for (const { path, record } of evidenceRecords) {
 
   for (const artifact of record.artifacts) {
     const artifactPath = resolve(root, artifact.path);
-    assert.ok(existsSync(artifactPath), `${path} artifact exists: ${artifact.path}`);
+    assert.ok(existsSync(artifactPath), `${path} current artifact path exists: ${artifact.path}`);
     assert.equal(
-      sha256File(artifactPath),
+      sha256AtCommit(record.proofSource.commitSha, artifact.path),
       artifact.sha256,
-      `${path} artifact SHA-256: ${artifact.path}`,
+      `${path} historical proof-source SHA-256: ${artifact.path}`,
     );
   }
 }
