@@ -1042,6 +1042,7 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/docs-sync.ts",
   "ts/src/tooling/markdown-coverage-audit.ts",
   "ts/src/tooling/mts-compiler.ts",
+  "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
 
