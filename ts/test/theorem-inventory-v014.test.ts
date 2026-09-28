@@ -86,11 +86,16 @@ same(
 sameSet(
   inventory.proposedNewIds as string[],
   ["CTX-03", "EXE-02", "FND-11", "FND-12"],
-  "exact proposed v0.14 theorem IDs",
+  "exact genuinely new v0.14 theorem IDs",
+);
+sameSet(
+  inventory.recoveredHistoricalIds as string[],
+  ["FND-13"],
+  "exact recovered historical theorem IDs",
 );
 
 const targets = inventory.targets as Json[];
-same(targets.length, 20, "current P0 target count");
+same(targets.length, 21, "current P0 target count");
 const targetIds = targets.map((target) => target.id as string);
 same(new Set(targetIds).size, targetIds.length, "target IDs unique");
 
@@ -98,9 +103,10 @@ const historicalIdSet = new Set(historicalIds);
 for (const target of targets) {
   const id = target.id as string;
   const isNew = (inventory.proposedNewIds as string[]).includes(id);
+  const isRecovered = (inventory.recoveredHistoricalIds as string[]).includes(id);
   assert(
-    isNew || historicalIdSet.has(id),
-    `${id} must be either a historical stable ID or an explicitly proposed new ID`,
+    isNew || isRecovered || historicalIdSet.has(id),
+    `${id} must be a historical stable ID, recovered historical ID, or explicitly proposed new ID`,
   );
   assert(target.wave === "A" || target.wave === "B", `${id} wave must be A or B`);
   assert(
@@ -138,14 +144,41 @@ same(firstWave.length, 8, "first differential wave size");
 same(new Set(firstWave).size, 8, "first differential wave unique IDs");
 sameSet(
   firstWave,
-  ["FND-01", "FND-02", "INV-01", "INV-02", "CTX-03", "FND-07", "FND-08", "FND-11"],
+  ["FND-02", "FND-13", "FND-01", "INV-01", "INV-02", "CTX-03", "FND-07", "FND-11"],
   "first differential wave exact target set",
+);
+same(
+  JSON.stringify(firstWave.slice(0, 3)),
+  JSON.stringify(["FND-02", "FND-13", "FND-01"]),
+  "foundation proof order begins FND-02 -> FND-13 -> FND-01",
 );
 for (const id of firstWave) {
   const target = targets.find((candidate) => candidate.id === id);
   assert(target !== undefined, `first-wave target ${id} exists`);
   same(target.wave, "A", `${id} first-wave marker`);
 }
+
+const fnd02 = targets.find((target) => target.id === "FND-02")!;
+const fnd13 = targets.find((target) => target.id === "FND-13")!;
+const fnd01 = targets.find((target) => target.id === "FND-01")!;
+const fnd08 = targets.find((target) => target.id === "FND-08")!;
+sameSet(fnd13.dependsOn as string[], ["FND-02"], "FND-13 depends only on unique ROOT");
+sameSet(
+  fnd01.dependsOn as string[],
+  ["FND-02", "FND-13"],
+  "FND-01 depends on unique ROOT and explicit A6 identity",
+);
+assert(
+  !(fnd02.dependsOn as string[]).includes("FND-13"),
+  "FND-02 must not depend on downstream A6/FND-13",
+);
+same(fnd08.wave, "B", "FND-08 moves behind the foundation wave");
+assert(!firstWave.includes("FND-08"), "FND-08 is not in the first differential wave");
+same(
+  inventory.constraints.poleExtensionalityRequiresExplicitFnd13,
+  true,
+  "pole extensionality requires explicit FND-13 theorem target",
+);
 
 const blockedFromFirstWave = new Set(
   dispositions
@@ -218,6 +251,7 @@ console.log([
   `HISTORICAL=${historicalIds.length}`,
   `TARGETS=${targets.length}`,
   `NEW_IDS=${inventory.proposedNewIds.length}`,
+  `RECOVERED_IDS=${inventory.recoveredHistoricalIds.length}`,
   `FIRST_WAVE=${firstWave.length}`,
   `V14_LAWS=${lawIds.length}`,
   "REGISTRY_MUTATION=NO",
