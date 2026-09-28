@@ -307,9 +307,8 @@ assert(
 
 const fnd01 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-01");
 assert(fnd01 !== undefined, "P0 contains FND-01");
-assert.deepEqual(
-  fnd01.dependsOn,
-  ["FND-02", "FND-13"],
+assert(
+  JSON.stringify(fnd01.dependsOn) === JSON.stringify(["FND-02", "FND-13"]),
   "FND-01 follows unique ROOT and ordered-pole identity",
 );
 assert(
