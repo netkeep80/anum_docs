@@ -1,4 +1,5 @@
 // #1583 R18/R19/R20 post-v0.14 representation research; not semantic authority.
+// Cost order is defined only under the same workload and preserved-identity contract.
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
