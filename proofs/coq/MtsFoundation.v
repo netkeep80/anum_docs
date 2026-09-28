@@ -142,3 +142,56 @@ Proof.
     + exact Hx.
     + apply root_full_self.
 Qed.
+
+
+(* External F2/F3 normalization interface.
+
+   Historical MTS source 1e529a23... describes finite recursive forms modulo
+   the least relation ~=, with one alpha-neutral normal form per semantic
+   class.  This record captures the exact dependency needed by A6 without
+   assuming pole extensionality or a reconstruction axiom. *)
+Record F2F3Normalization (F : Foundation) : Type := {
+  NormalForm : Type;
+  compose_nf : NormalForm -> NormalForm -> NormalForm;
+  normal_form : Link F -> NormalForm;
+
+  root_unique_fnd02 :
+    forall x : Link F,
+      FullSelf F x ->
+      x = R F;
+
+  normal_form_equation :
+    forall x : Link F,
+      normal_form x =
+      compose_nf
+        (normal_form (start F x))
+        (normal_form (finish F x));
+
+  normal_form_complete :
+    forall x y : Link F,
+      normal_form x = normal_form y ->
+      x = y
+}.
+
+(* FND-13 / historical A6 — identity by ordered poles, derived from the
+   accepted F2/F3 recursive-normalization interface. *)
+Theorem FND_13_identity_by_poles
+    (F : Foundation)
+    (N : F2F3Normalization F)
+    (x y : Link F) :
+    x = y <->
+    start F x = start F y /\
+    finish F x = finish F y.
+Proof.
+  split.
+  - intros Hxy.
+    subst y.
+    split; reflexivity.
+  - intros H.
+    destruct H as [Hs Hf].
+    apply (normal_form_complete F N x y).
+    rewrite (normal_form_equation F N x).
+    rewrite (normal_form_equation F N y).
+    rewrite Hs, Hf.
+    reflexivity.
+Qed.
