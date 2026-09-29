@@ -2451,3 +2451,427 @@ Proof.
   - apply (ctx03_inversion_is_mirror_transport F A1 N E D).
 Qed.
 
+
+
+(* CTX-03 Link-native Context orientation carrier.
+
+   A Context body K has two canonical one-sided markers supplied by the
+   existing recursive F2/F3 forms.  This proposition is external proof
+   vocabulary only; it does not introduce a native MTS frame datatype or
+   absolute START/END names. *)
+Definition ContextOrientationMarker
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (body marker : Link F) : Prop :=
+  marker = recursive_start_form F E D body \/
+  marker = recursive_end_form F E D body.
+
+Definition ContextLocalStartRole
+    (F : Foundation)
+    (selected candidate : Link F) : Prop :=
+  SameChiralClass F selected candidate.
+
+Definition ContextLocalEndRole
+    (F : Foundation)
+    (selected candidate : Link F) : Prop :=
+  OppositeChiralClass F selected candidate.
+
+Theorem context_orientation_markers_distinct
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (body : Link F) :
+    recursive_start_form F E D body <>
+    recursive_end_form F E D body.
+Proof.
+  intros Heq.
+  pose proof
+    (recursive_start_form_pattern F A1 E D body)
+    as HStart.
+  pose proof
+    (recursive_end_form_pattern F A1 E D body)
+    as HFinish.
+  assert (
+    HFinishAtStart :
+    FinishOnly F (recursive_start_form F E D body)
+  ).
+  {
+    rewrite Heq.
+    exact HFinish.
+  }
+  eapply recursive_start_finish_disjoint.
+  - exact HStart.
+  - exact HFinishAtStart.
+Qed.
+
+Theorem context_orientation_marker_one_sided
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (body marker : Link F) :
+    ContextOrientationMarker F E D body marker ->
+    ProperOneSided F marker.
+Proof.
+  intros HMarker.
+  destruct HMarker as [HStart | HFinish].
+  - subst marker.
+    left.
+    exact (recursive_start_form_pattern F A1 E D body).
+  - subst marker.
+    right.
+    exact (recursive_end_form_pattern F A1 E D body).
+Qed.
+
+(* Context selection induces local START_K / END_K roles from the Link-native
+   marker.  No Foundation-global orientation is selected. *)
+Theorem CTX_03_context_selection_induces_local_roles
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (body selected : Link F) :
+    ContextOrientationMarker F E D body selected ->
+    exists localStart localEnd : Link F,
+      ContextOrientationMarker F E D body localStart /\
+      ContextOrientationMarker F E D body localEnd /\
+      ContextLocalStartRole F selected localStart /\
+      ContextLocalEndRole F selected localEnd /\
+      localStart <> localEnd.
+Proof.
+  intros HSelected.
+  destruct HSelected as [HSelectedStart | HSelectedEnd].
+  - subst selected.
+    exists (recursive_start_form F E D body).
+    exists (recursive_end_form F E D body).
+    split.
+    + left. reflexivity.
+    + split.
+      * right. reflexivity.
+      * split.
+        -- unfold ContextLocalStartRole, SameChiralClass.
+           left.
+           split.
+           ++ exact (recursive_start_form_pattern F A1 E D body).
+           ++ exact (recursive_start_form_pattern F A1 E D body).
+        -- split.
+           ++ unfold ContextLocalEndRole, OppositeChiralClass.
+              left.
+              split.
+              ** exact (recursive_start_form_pattern F A1 E D body).
+              ** exact (recursive_end_form_pattern F A1 E D body).
+           ++ exact (context_orientation_markers_distinct F A1 E D body).
+  - subst selected.
+    exists (recursive_end_form F E D body).
+    exists (recursive_start_form F E D body).
+    split.
+    + right. reflexivity.
+    + split.
+      * left. reflexivity.
+      * split.
+        -- unfold ContextLocalStartRole, SameChiralClass.
+           right.
+           split.
+           ++ exact (recursive_end_form_pattern F A1 E D body).
+           ++ exact (recursive_end_form_pattern F A1 E D body).
+        -- split.
+           ++ unfold ContextLocalEndRole, OppositeChiralClass.
+              right.
+              split.
+              ** exact (recursive_end_form_pattern F A1 E D body).
+              ** exact (recursive_start_form_pattern F A1 E D body).
+           ++ intros Heq.
+              apply (context_orientation_markers_distinct F A1 E D body).
+              symmetry.
+              exact Heq.
+Qed.
+
+(* Objective chirality exists before any Context selection.  The witness order
+   in this external theorem is technical only and does not define an absolute
+   MTS orientation. *)
+Theorem CTX_03_objective_chiral_orbit_before_context
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    exists w jw : Link F,
+      RecursiveInversion F E D w jw /\
+      RecursiveInversion F E D jw w /\
+      w <> jw /\
+      OppositeChiralClass F w jw /\
+      (forall z : Link F,
+        RecursiveInversion F E D jw z -> z = w).
+Proof.
+  assert (HR : RecursiveInversion F E D (R F) (R F)).
+  {
+    apply recursive_inversion_root.
+  }
+  assert (
+    HOC :
+    RecursiveInversion F E D
+      (f2f3_start_root F E)
+      (f2f3_finish_root F E)
+  ).
+  {
+    assert (
+      HChild :
+      RecursiveInversion F E D
+        (finish F (f2f3_start_root F E))
+        (R F)
+    ).
+    {
+      rewrite (f2f3_start_root_finish F E).
+      exact HR.
+    }
+    assert (
+      HRaw :
+      RecursiveInversion F E D
+        (f2f3_start_root F E)
+        (recursive_end_form F E D (R F))
+    ).
+    {
+      apply recursive_inversion_start.
+      - exact (f2f3_start_root_pattern F E).
+      - exact HChild.
+    }
+    rewrite (recursive_end_root_compat F E D) in HRaw.
+    exact HRaw.
+  }
+  assert (
+    HCO :
+    RecursiveInversion F E D
+      (f2f3_finish_root F E)
+      (f2f3_start_root F E)
+  ).
+  {
+    assert (
+      HChild :
+      RecursiveInversion F E D
+        (start F (f2f3_finish_root F E))
+        (R F)
+    ).
+    {
+      rewrite (f2f3_finish_root_start F E).
+      exact HR.
+    }
+    assert (
+      HRaw :
+      RecursiveInversion F E D
+        (f2f3_finish_root F E)
+        (recursive_start_form F E D (R F))
+    ).
+    {
+      apply recursive_inversion_finish.
+      - exact (f2f3_finish_root_pattern F E).
+      - exact HChild.
+    }
+    rewrite (recursive_start_root_compat F E D) in HRaw.
+    exact HRaw.
+  }
+  pose proof
+    (ctx03_inversion_is_mirror_transport F A1 N E D)
+    as HMirrorLaw.
+  unfold InversionIsMirrorTransport in HMirrorLaw.
+  pose proof
+    (HMirrorLaw
+      (f2f3_start_root F E)
+      (f2f3_finish_root F E)
+      HOC
+      (or_introl (f2f3_start_root_pattern F E)))
+    as HMirror.
+  exists (f2f3_start_root F E).
+  exists (f2f3_finish_root F E).
+  split.
+  - exact HOC.
+  - split.
+    + exact HCO.
+    + split.
+      * intros Heq.
+        pose proof (f2f3_start_root_pattern F E) as HStart.
+        assert (HFinish : FinishOnly F (f2f3_start_root F E)).
+        {
+          rewrite Heq.
+          exact (f2f3_finish_root_pattern F E).
+        }
+        eapply recursive_start_finish_disjoint.
+        -- exact HStart.
+        -- exact HFinish.
+      * split.
+        -- exact (proj2 HMirror).
+        -- intros z Hz.
+           exact
+             (INV_02_recursive_inversion_involutive
+               F A1 N E D
+               (f2f3_start_root F E)
+               (f2f3_finish_root F E)
+               z
+               HOC
+               Hz).
+Qed.
+
+(* Simultaneous global inversion preserves the relative Same/Opposite
+   relation of two one-sided Context markers. *)
+Theorem CTX_03_simultaneous_inversion_covariance
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a b ja jb : Link F) :
+    RecursiveInversion F E D a ja ->
+    RecursiveInversion F E D b jb ->
+    (SameChiralClass F a b ->
+      SameChiralClass F ja jb) /\
+    (OppositeChiralClass F a b ->
+      OppositeChiralClass F ja jb).
+Proof.
+  intros HJa HJb.
+  pose proof
+    (ctx03_inversion_is_mirror_transport F A1 N E D)
+    as HMirrorLaw.
+  unfold InversionIsMirrorTransport in HMirrorLaw.
+  split.
+  - intros HSame.
+    destruct HSame as [[HAStart HBStart] | [HAFinish HBFinish]].
+    + pose proof
+        (HMirrorLaw a ja HJa (or_introl HAStart))
+        as HMa.
+      pose proof
+        (HMirrorLaw b jb HJb (or_introl HBStart))
+        as HMb.
+      pose proof
+        (ctx03_opposite_symm F a ja (proj2 HMa))
+        as HJaA.
+      pose proof
+        (ctx03_opposite_same
+          F ja a b
+          HJaA
+          (or_introl (conj HAStart HBStart)))
+        as HJaB.
+      exact
+        (ctx03_opposite_opposite
+          F ja b jb
+          HJaB
+          (proj2 HMb)).
+    + pose proof
+        (HMirrorLaw a ja HJa (or_intror HAFinish))
+        as HMa.
+      pose proof
+        (HMirrorLaw b jb HJb (or_intror HBFinish))
+        as HMb.
+      pose proof
+        (ctx03_opposite_symm F a ja (proj2 HMa))
+        as HJaA.
+      pose proof
+        (ctx03_opposite_same
+          F ja a b
+          HJaA
+          (or_intror (conj HAFinish HBFinish)))
+        as HJaB.
+      exact
+        (ctx03_opposite_opposite
+          F ja b jb
+          HJaB
+          (proj2 HMb)).
+  - intros HOpposite.
+    destruct HOpposite as [[HAStart HBFinish] | [HAFinish HBStart]].
+    + pose proof
+        (HMirrorLaw a ja HJa (or_introl HAStart))
+        as HMa.
+      pose proof
+        (HMirrorLaw b jb HJb (or_intror HBFinish))
+        as HMb.
+      pose proof
+        (ctx03_opposite_symm F a ja (proj2 HMa))
+        as HJaA.
+      pose proof
+        (ctx03_opposite_opposite
+          F ja a b
+          HJaA
+          (or_introl (conj HAStart HBFinish)))
+        as HJaB.
+      exact
+        (ctx03_same_opposite
+          F ja b jb
+          HJaB
+          (proj2 HMb)).
+    + pose proof
+        (HMirrorLaw a ja HJa (or_intror HAFinish))
+        as HMa.
+      pose proof
+        (HMirrorLaw b jb HJb (or_introl HBStart))
+        as HMb.
+      pose proof
+        (ctx03_opposite_symm F a ja (proj2 HMa))
+        as HJaA.
+      pose proof
+        (ctx03_opposite_opposite
+          F ja a b
+          HJaA
+          (or_intror (conj HAFinish HBStart)))
+        as HJaB.
+      exact
+        (ctx03_same_opposite
+          F ja b jb
+          HJaB
+          (proj2 HMb)).
+Qed.
+
+(* CTX-03 capstone: objective chirality predates observation, Context selection
+   induces only local START_K/END_K roles, and relative transport composes as
+   the already-proved relational Z2 layer.
+
+   The Z2 terminology is an explicitly marked external group-theory
+   projection; native MTS content remains Link-native and Context-relative. *)
+Theorem CTX_03_context_relative_gauge
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    RelativeZ2Law F /\
+    InversionIsMirrorTransport F E D /\
+    (exists w jw : Link F,
+      RecursiveInversion F E D w jw /\
+      RecursiveInversion F E D jw w /\
+      w <> jw /\
+      OppositeChiralClass F w jw /\
+      (forall z : Link F,
+        RecursiveInversion F E D jw z -> z = w)) /\
+    (forall body selected : Link F,
+      ContextOrientationMarker F E D body selected ->
+      exists localStart localEnd : Link F,
+        ContextOrientationMarker F E D body localStart /\
+        ContextOrientationMarker F E D body localEnd /\
+        ContextLocalStartRole F selected localStart /\
+        ContextLocalEndRole F selected localEnd /\
+        localStart <> localEnd) /\
+    (forall a b ja jb : Link F,
+      RecursiveInversion F E D a ja ->
+      RecursiveInversion F E D b jb ->
+      (SameChiralClass F a b -> SameChiralClass F ja jb) /\
+      (OppositeChiralClass F a b -> OppositeChiralClass F ja jb)).
+Proof.
+  pose proof
+    (CTX_03_relational_z2_support F A1 N E D)
+    as HSupport.
+  destruct HSupport as [HZ2 HMirror].
+  split.
+  - exact HZ2.
+  - split.
+    + exact HMirror.
+    + split.
+      * exact (CTX_03_objective_chiral_orbit_before_context F A1 N E D).
+      * split.
+        -- intros body selected HSelected.
+           exact
+             (CTX_03_context_selection_induces_local_roles
+               F A1 E D body selected HSelected).
+        -- intros a b ja jb HJa HJb.
+           exact
+             (CTX_03_simultaneous_inversion_covariance
+               F A1 N E D a b ja jb HJa HJb).
+Qed.

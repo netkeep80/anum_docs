@@ -944,6 +944,54 @@ assert(
   "CTX-03 relational support is proved rather than postulated",
 );
 
+for (const [label, source, marker] of [
+  ["Lean", lean, "def ContextOrientationMarker"],
+  ["Rocq", rocq, "Definition ContextOrientationMarker"],
+] as const) {
+  const start = source.indexOf(marker);
+  assert(start >= 0, `${label} contains Link-native Context orientation markers`);
+  const region = source.slice(start);
+  for (const symbol of [
+    "ContextLocalStartRole",
+    "ContextLocalEndRole",
+    "CTX_03_context_selection_induces_local_roles",
+    "CTX_03_objective_chiral_orbit_before_context",
+    "CTX_03_simultaneous_inversion_covariance",
+    "CTX_03_context_relative_gauge",
+  ]) {
+    assert(region.includes(symbol), `${label} CTX-03 capstone contains ${symbol}`);
+  }
+  assert(
+    region.includes("CTX_03_relational_z2_support"),
+    `${label} CTX-03 capstone consumes the canonical relational Z2 support layer`,
+  );
+  assert(
+    region.includes("INV_02_recursive_inversion_involutive") ||
+      region.includes("ctx03_inversion_is_mirror_transport"),
+    `${label} CTX-03 capstone keeps inversion provenance explicit`,
+  );
+  for (const forbidden of [
+    "structure ContextFrame",
+    "inductive ContextFrame",
+    "Record ContextFrame",
+    "ContextFrame : Type",
+    "DIRECT",
+    "MIRROR",
+    "ExactSequence",
+    "FORMAL",
+  ]) {
+    assert(
+      !region.includes(forbidden),
+      `${label} CTX-03 Context layer forbids host orientation authority: ${forbidden}`,
+    );
+  }
+}
+assert(
+  !lean.includes("axiom CTX_03_context_relative_gauge") &&
+    !rocq.includes("Axiom CTX_03_context_relative_gauge"),
+  "CTX-03 capstone is proved rather than postulated",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -1028,6 +1076,11 @@ console.log([
   "CTX03_RELATIONAL_SUPPORT=Z2_SAME_OPPOSITE",
   "CTX03_ORIENTATION_CARRIER=LINK_NATIVE_ONE_SIDED",
   "CTX03_HOST_FRAME_DATATYPE=NONE",
+  "CTX03_CONTEXT_MARKER=LINK_NATIVE_ONE_SIDED",
+  "CTX03_LOCAL_ROLES=CONTEXT_RELATIVE",
+  "CTX03_OBJECTIVE_ORBIT=PRE_SELECTION",
+  "CTX03_COVARIANCE=SIMULTANEOUS_J",
+  "CTX03_CAPSTONE=RELATIONAL_Z2+CONTEXT_SELECTION",
   "CTX03_J_TRANSPORT=INV07_DERIVED",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
