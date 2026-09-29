@@ -3169,3 +3169,221 @@ Proof.
       (recursive_description_functional
         F x other code HOther HCode).
 Qed.
+
+
+(* FND-11 external proof vocabulary for representation identity targets.
+
+   EXTERNAL THEORY PROJECTION NOTE:
+   RepresentationIdentityTarget is a host-side classifier of already accepted
+   representation contracts. It is not an MTS ontology datatype and does not
+   add entities beside Link. No additional external mathematical theory is
+   introduced here; the proof uses only constructive propositions, equality,
+   functions and small inductive host syntax. *)
+Inductive RepresentationIdentityTarget : Type :=
+| representation_recursive_link_structure
+| representation_anum_rooted_sequence
+| representation_exact_positional_sequence
+| representation_rooted_fold_denotation
+| representation_versioned_q_denotation.
+
+Definition recursive_codec_identity_target : RepresentationIdentityTarget :=
+  representation_recursive_link_structure.
+
+Definition anum_identity_target : RepresentationIdentityTarget :=
+  representation_anum_rooted_sequence.
+
+Definition exact_sequence_identity_target : RepresentationIdentityTarget :=
+  representation_exact_positional_sequence.
+
+Definition fold_denotation_identity_target : RepresentationIdentityTarget :=
+  representation_rooted_fold_denotation.
+
+Definition q_identity_target : RepresentationIdentityTarget :=
+  representation_versioned_q_denotation.
+
+Lemma recursive_codec_target_ne_anum :
+    recursive_codec_identity_target <> anum_identity_target.
+Proof.
+  discriminate.
+Qed.
+
+Lemma exact_sequence_target_ne_fold :
+    exact_sequence_identity_target <> fold_denotation_identity_target.
+Proof.
+  discriminate.
+Qed.
+
+(* Projection of the accepted v0.14 representation-layer definitions.
+
+   Anum and ExactSequence are modeled as predicates over the one Link carrier,
+   not as new MTS sorts. QVersion/QSource are external source/interpreter
+   syntax, not ontology entities.
+
+   The concrete witnesses correspond to accepted executable vectors:
+   - ExactSequence [] and [R] are distinct carriers but share rooted fold R;
+   - Q14 empty source and [] are distinct sources but both denote R. *)
+Record AcceptedV014RepresentationDefinitions (F : Foundation) : Type := {
+  anum_carrier : Link F -> Prop;
+  exact_sequence_carrier : Link F -> Prop;
+
+  anum_origin : Link F -> Link F;
+  exact_sequence_origin : Link F -> Link F;
+
+  anum_origin_root :
+    forall a : Link F,
+      anum_carrier a ->
+      anum_origin a = R F;
+
+  exact_sequence_origin_root :
+    forall s : Link F,
+      exact_sequence_carrier s ->
+      exact_sequence_origin s = R F;
+
+  exact_fold : Link F -> Link F;
+
+  exact_empty : Link F;
+  exact_one_root : Link F;
+  exact_empty_carrier : exact_sequence_carrier exact_empty;
+  exact_one_root_carrier : exact_sequence_carrier exact_one_root;
+  exact_empty_ne_one_root : exact_empty <> exact_one_root;
+  exact_fold_empty : exact_fold exact_empty = R F;
+  exact_fold_one_root : exact_fold exact_one_root = R F;
+
+  q_version : Type;
+  q_source : Type;
+
+  q_origin : q_version -> q_source -> Link F;
+  q_interpret : q_version -> q_source -> Link F;
+
+  q_origin_root :
+    forall (version : q_version) (source : q_source),
+      q_origin version source = R F;
+
+  q14 : q_version;
+  q_empty : q_source;
+  q_nested_empty : q_source;
+  q_empty_ne_nested : q_empty <> q_nested_empty;
+  q_empty_denotes_root : q_interpret q14 q_empty = R F;
+  q_nested_denotes_root : q_interpret q14 q_nested_empty = R F
+}.
+
+(* The established FND-05 result recast as a dependency proposition.
+
+   FND-11 receives a proof of this proposition as its declared theorem
+   dependency; FND-05 premises are not imported as new FND-11 assumptions. *)
+Definition FND05Canonicality (F : Foundation) : Prop :=
+  forall x : Link F,
+    Grounded F x ->
+    exists code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription F x code /\
+      forall other : RecursiveDescriptionCode,
+        CanonicalRecursiveDescription F x other ->
+        other = code.
+
+Theorem fnd05_dependency_witness
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (D : FiniteRecursiveCarrierDecision F) :
+    FND05Canonicality F.
+Proof.
+  unfold FND05Canonicality.
+  intros x G.
+  exact (FND_05_canonical_recursive_description_unique F A1 D x G).
+Qed.
+
+Definition ExactSequenceFoldCollision
+    (F : Foundation)
+    (B : AcceptedV014RepresentationDefinitions F) : Prop :=
+  exists left right : Link F,
+    exact_sequence_carrier F B left /\
+    exact_sequence_carrier F B right /\
+    left <> right /\
+    exact_fold F B left = exact_fold F B right.
+
+Definition QDenotationCollision
+    (F : Foundation)
+    (B : AcceptedV014RepresentationDefinitions F) : Prop :=
+  exists left right : q_source F B,
+    left <> right /\
+    q_interpret F B (q14 F B) left =
+    q_interpret F B (q14 F B) right.
+
+Theorem exact_sequence_fold_collision
+    (F : Foundation)
+    (B : AcceptedV014RepresentationDefinitions F) :
+    ExactSequenceFoldCollision F B.
+Proof.
+  exists (exact_empty F B).
+  exists (exact_one_root F B).
+  split.
+  - exact (exact_empty_carrier F B).
+  - split.
+    + exact (exact_one_root_carrier F B).
+    + split.
+      * exact (exact_empty_ne_one_root F B).
+      * transitivity (R F).
+        -- exact (exact_fold_empty F B).
+        -- symmetry.
+           exact (exact_fold_one_root F B).
+Qed.
+
+Theorem q_denotation_collision
+    (F : Foundation)
+    (B : AcceptedV014RepresentationDefinitions F) :
+    QDenotationCollision F B.
+Proof.
+  exists (q_empty F B).
+  exists (q_nested_empty F B).
+  split.
+  - exact (q_empty_ne_nested F B).
+  - transitivity (R F).
+    + exact (q_empty_denotes_root F B).
+    + symmetry.
+      exact (q_nested_denotes_root F B).
+Qed.
+
+(* FND-11 capstone.
+
+   Accepted representation definitions plus the already-established FND-05
+   result imply separated identity roles:
+   recursive structural canonicality, rooted sequence origins, ExactSequence
+   positional identity distinct from fold denotation, and versioned Q
+   interpretation whose source identity may collapse at denotation.
+
+   No global recursive-structure/Q isomorphism and no representation-strength
+   ranking are asserted. *)
+Theorem FND_11_representation_identities_separated
+    (F : Foundation)
+    (B : AcceptedV014RepresentationDefinitions F) :
+    FND05Canonicality F ->
+    FND05Canonicality F /\
+    recursive_codec_identity_target <> anum_identity_target /\
+    (forall a : Link F,
+      anum_carrier F B a ->
+      anum_origin F B a = R F) /\
+    (forall s : Link F,
+      exact_sequence_carrier F B s ->
+      exact_sequence_origin F B s = R F) /\
+    ExactSequenceFoldCollision F B /\
+    (forall (version : q_version F B) (source : q_source F B),
+      q_origin F B version source = R F) /\
+    QDenotationCollision F B.
+Proof.
+  intros FND05.
+  split.
+  - exact FND05.
+  - split.
+    + exact recursive_codec_target_ne_anum.
+    + split.
+      * intros a HA.
+        exact (anum_origin_root F B a HA).
+      * split.
+        -- intros s HS.
+           exact (exact_sequence_origin_root F B s HS).
+        -- split.
+           ++ exact (exact_sequence_fold_collision F B).
+           ++ split.
+              ** intros version source.
+                 exact (q_origin_root F B version source).
+              ** exact (q_denotation_collision F B).
+Qed.
