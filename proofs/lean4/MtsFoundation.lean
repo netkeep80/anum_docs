@@ -2963,30 +2963,58 @@ def ContextualTruth
   CurrentScopeMember (ContextualTruthWitness F K A)
 
 /--
-The external parameter L denotes the accepted MTS truth-value Link L.
-Keeping this separate from ContextualTruthWitness records the semantic-role
-distinction: L is a truth value; K ⟼ A is a truth witness. No universal
-structural disequality between those Links is asserted.
+Accepted root truth-aspect L projected from the same F2/F3 root basis already
+used throughout the external foundation proof.
+
+This is not an arbitrary host-selected Link.  It is the structural root-basis
+Link O⟼C.  Calling it the truth value is an accepted contextual-truth semantic
+premise inherited from A16/V14-L11; the definition does not claim to derive
+the semantic role "truth" from bare Foundation.
 -/
 def TruthValueL
-    {F : Foundation}
-    (L : F.Link) : F.Link :=
-  L
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) : F.Link :=
+  F.form E.startRoot E.finishRoot
+
+def ContextualRuleWitness
+    (F : Foundation)
+    (A B : F.Link) : F.Link :=
+  F.form A B
+
+def ContextualRule
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (A B : F.Link) : Prop :=
+  CurrentScopeMember (ContextualRuleWitness F A B)
 
 /--
-FND-07 boundary theorem.
+External proof projection of the accepted A16 closure law.
 
-Even the exact structural Link K ⟼ A may exist as an ambient Link while not
-being current. In that case it is not contextual truth. Conversely,
-contextual truth is witnessed by the currentness of exactly that Link.
+It says only that the current Scope is closed under the directed composition
+used by contextual detachment.  It is an explicit semantic premise, not a
+theorem of bare Foundation and not a host function/opcode.
+-/
+def ContextualScopeCompositionLaw
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop) : Prop :=
+  ∀ K A B : F.Link,
+    CurrentScopeMember (F.form K A) →
+    CurrentScopeMember (F.form A B) →
+    CurrentScopeMember (F.form K B)
+
+/--
+FND-07 currentness/contextual-witness boundary lemma.
+
+Even the exact structural Link K⟼A may exist as an ambient Link while not
+being current.  In that case it is not contextual truth.  Conversely,
+contextual truth is witnessed by currentness of exactly that Link.
 
 No host Bool, Set, Finset, map/environment, or collection object carries truth
 authority here.
 -/
 theorem FND_07_contextual_truth_boundary
     (F : Foundation)
-    (CurrentScopeMember : F.Link → Prop)
-    (L : F.Link) :
+    (CurrentScopeMember : F.Link → Prop) :
     (∀ K A : F.Link,
       ContextualTruth F CurrentScopeMember K A ↔
       CurrentScopeMember (F.form K A)) ∧
@@ -2994,16 +3022,92 @@ theorem FND_07_contextual_truth_boundary
       ¬ CurrentScopeMember (F.form K A) →
       ∃ ambientWitness : F.Link,
         ambientWitness = F.form K A ∧
-        ¬ ContextualTruth F CurrentScopeMember K A) ∧
-    TruthValueL L = L := by
+        ¬ ContextualTruth F CurrentScopeMember K A) := by
   constructor
   · intro K A
     rfl
-  · constructor
-    · intro K A hNotCurrent
-      refine ⟨F.form K A, rfl, ?_⟩
-      exact hNotCurrent
-    · rfl
+  · intro K A hNotCurrent
+    refine ⟨F.form K A, rfl, ?_⟩
+    exact hNotCurrent
+
+/--
+The accepted root truth-value carrier is structurally the root-basis PAIR
+O⟼C.  This proves the structural side of the A16 statement ROOT_TRUE_ASPECT=L;
+the semantic role itself remains an accepted contextual-truth premise.
+-/
+theorem FND_07_root_truth_aspect_L
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    TruthValueL F E = F.form E.startRoot E.finishRoot ∧
+    PairLocal F (TruthValueL F E) := by
+  exact ⟨rfl, f2f3_pair_pattern F E⟩
+
+/--
+Accepted A16 detachment becomes an actual theorem once the explicit current
+Scope composition law is supplied:
+
+  K⟼A current
+  A⟼B current
+  -----------
+  K⟼B current
+-/
+theorem FND_07_contextual_detachment
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (closure : ContextualScopeCompositionLaw F CurrentScopeMember) :
+    ∀ K A B : F.Link,
+      ContextualTruth F CurrentScopeMember K A →
+      ContextualRule F CurrentScopeMember A B →
+      ContextualTruth F CurrentScopeMember K B := by
+  intro K A B hTruth hRule
+  exact closure K A B hTruth hRule
+
+/--
+The same ambient proposition A can have different truth status in two distinct
+Contexts without changing A itself.
+-/
+theorem FND_07_context_relative_truth_status
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    {K₁ K₂ A : F.Link}
+    (hContexts : K₁ ≠ K₂)
+    (hTrue : CurrentScopeMember (F.form K₁ A))
+    (hFalse : ¬ CurrentScopeMember (F.form K₂ A)) :
+    K₁ ≠ K₂ ∧
+    ContextualTruth F CurrentScopeMember K₁ A ∧
+    ¬ ContextualTruth F CurrentScopeMember K₂ A := by
+  exact ⟨hContexts, hTrue, hFalse⟩
+
+/--
+Strengthened FND-07 semantic capstone.
+
+It deliberately keeps three roles distinct:
+- L = O⟼C is the accepted root truth-value aspect;
+- K⟼A is the Context-specific current truth witness;
+- directed Scope composition is the explicit accepted A16 execution law.
+
+Nothing here promotes ambient Memory membership, host collection membership,
+or an arbitrary Link parameter to truth authority.
+-/
+theorem FND_07_semantic_truth_capstone
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (CurrentScopeMember : F.Link → Prop)
+    (closure : ContextualScopeCompositionLaw F CurrentScopeMember) :
+    (TruthValueL F E = F.form E.startRoot E.finishRoot ∧
+      PairLocal F (TruthValueL F E)) ∧
+    (∀ K A : F.Link,
+      ContextualTruth F CurrentScopeMember K A ↔
+      CurrentScopeMember (F.form K A)) ∧
+    (∀ K A B : F.Link,
+      ContextualTruth F CurrentScopeMember K A →
+      ContextualRule F CurrentScopeMember A B →
+      ContextualTruth F CurrentScopeMember K B) := by
+  exact ⟨
+    FND_07_root_truth_aspect_L F E,
+    (FND_07_contextual_truth_boundary F CurrentScopeMember).1,
+    FND_07_contextual_detachment F CurrentScopeMember closure
+  ⟩
 
 
 /--
