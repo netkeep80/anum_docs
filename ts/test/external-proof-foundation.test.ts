@@ -60,6 +60,8 @@ same(manifest.p0Inventory, "theorems/p0-v0.14.json", "P0 inventory binding");
 same(manifest.authority, "external-differential-evidence-only", "external prover role");
 same(manifest.execution, "CI_ACTIVE_ON_PROOF_DIFF", "execution gate");
 
+// Integration pulse after portable INV-03/04 evidence merged to main:
+// the external proof boundary is rechecked on the actual combined PR merge ref.
 for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
   assert(
     source.includes("EXTERNAL PROJECTION BOUNDARY"),
