@@ -2335,7 +2335,7 @@ Relational bridge from a selected Link-native Context marker to chi(K).
 If the selected marker is in the root START class, local END_K is the root
 finish-self representative and chi(K)=C_K⟼R.  If the selected marker is in the
 root END class, the semantic frame is mirrored and chi(K)=R⟼O_K in technical
-coordinates.  No host Frame/Bool/Gauge value is semantic authority.
+coordinates.  No host orientation datatype value is semantic authority.
 -/
 def ContextChiWitness
     (F : Foundation)
