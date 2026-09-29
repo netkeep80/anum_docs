@@ -681,8 +681,8 @@ assert(
 );
 assert(
   rocq.includes("INV_01_recursive_pole_reversal") &&
-    rocq.includes("apply poles_recompose_after_fnd13"),
-  "Rocq PAIR involution reverses poles twice and reconstructs the original Link",
+    rocq.includes("poles_recompose_after_fnd13 F A1 N x"),
+  "Rocq PAIR involution reverses poles twice and reconstructs the original Link through FND-13",
 );
 for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
   const inv02Start = source.indexOf(
