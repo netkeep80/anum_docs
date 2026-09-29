@@ -759,7 +759,7 @@ assert.deepEqual(
 for (const record of ctx03) {
   assert.equal(
     record.proofSource.commitSha,
-    "c89eeb80e878504896d8fe517b43fb10a80236ff",
+    "c0e8257eb88011aad748ae88c0599f44d275a66c",
     `CTX-03 ${record.lane} proof source commit`,
   );
   assert.deepEqual(
@@ -810,6 +810,21 @@ for (const record of ctx03) {
     String(record.notes),
     /no Foundation-global selected orientation|No Foundation-global selected orientation/i,
     "CTX-03 evidence excludes a global selected frame",
+  );
+  assert.match(
+    String(record.notes),
+    /unique chi\(K\)/i,
+    "CTX-03 evidence records unique Context chi selection",
+  );
+  assert.match(
+    String(record.notes),
+    /generalized.*K->A.*A->B.*K->B.*covariant|generalized.*step.*covariant/i,
+    "CTX-03 evidence records generalized-MP semantic covariance",
+  );
+  assert.match(
+    String(record.notes),
+    /TechnicalStartOperation.*not automatically.*semantic-covariant|counterexample.*technical first-pole/i,
+    "CTX-03 evidence records a non-covariant technical-operation falsifier",
   );
 }
 
