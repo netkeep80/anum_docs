@@ -1002,97 +1002,98 @@ theorem natLink_injective :
 /--
 #1797 cyclic-boundary witness.
 
-The existing noncanonical fallback values form a genuine two-Link semantic
-pole cycle.  This theorem shows that the finite inductive FND-05 description
-relation has no derivation for either endpoint.  The failure is totality, not
-uniqueness: `recursive_description_functional` remains generic for any two
-derivations that actually exist.
+Under the current inductive proof semantics, existence of a finite canonical
+recursive description already implies Grounded source structure. Combined with
+FND-05 totality on Grounded Links, this identifies Grounded as the exact
+existence domain of the current finite description relation.
 -/
-theorem fallback_cycle_no_recursive_description
+theorem recursive_description_source_grounded
     {x : ModelLink}
     {code : RecursiveDescriptionCode}
     (h : CanonicalRecursiveDescription ExplicitFoundation x code) :
-    x = badStart ∨ x = badFinish → False := by
+    Grounded ExplicitFoundation x := by
   induction h with
   | root =>
-      intro hBad
-      rcases hBad with hBad | hBad <;>
-        simp [ExplicitFoundation, root, badStart, badFinish] at hBad
-  | @startSelf x child hStart hChild ih =>
-      intro hBad
-      rcases hBad with rfl | rfl
-      · apply ih
-        exact Or.inr finish_badStart
-      · exact hStart.2 finish_badFinish
-  | @finishSelf x child hFinish hChild ih =>
-      intro hBad
-      rcases hBad with rfl | rfl
-      · exact hFinish.1 start_badStart
-      · apply ih
-        exact Or.inl start_badFinish
-  | @pair x startCode finishCode hPair hStartChild hFinishChild ihStart ihFinish =>
-      intro hBad
-      rcases hBad with rfl | rfl
-      · exact hPair.1 start_badStart
-      · exact hPair.2 finish_badFinish
+      exact grounded_of_full_self ExplicitFoundation
+        (root_full_self ExplicitFoundation)
+  | startSelf hStart _ ih =>
+      apply Grounded.node
+      · intro hNot
+        exact False.elim (hNot hStart.1)
+      · intro _
+        exact ih
+  | finishSelf hFinish _ ih =>
+      apply Grounded.node
+      · intro _
+        exact ih
+      · intro hNot
+        exact False.elim (hNot hFinish.2)
+  | pair hPair _ _ ihStart ihFinish =>
+      apply Grounded.node
+      · intro _
+        exact ihStart
+      · intro _
+        exact ihFinish
 
 theorem badStart_no_recursive_description :
     ¬ ∃ code : RecursiveDescriptionCode,
       CanonicalRecursiveDescription ExplicitFoundation badStart code := by
   rintro ⟨code, h⟩
-  exact fallback_cycle_no_recursive_description h (Or.inl rfl)
+  exact badStart_not_grounded (recursive_description_source_grounded h)
 
 theorem badFinish_no_recursive_description :
     ¬ ∃ code : RecursiveDescriptionCode,
       CanonicalRecursiveDescription ExplicitFoundation badFinish code := by
   rintro ⟨code, h⟩
-  exact fallback_cycle_no_recursive_description h (Or.inr rfl)
+  exact badFinish_not_grounded (recursive_description_source_grounded h)
 
 /--
-The same cycle has no finite RecursiveInversion derivation.
+Likewise, every finite RecursiveInversion derivation implies that its source is
+Grounded. Together with INV-01 totality on Grounded Links, the source domain of
+the current inductive inversion graph is exactly Grounded.
 
-Again the existing theorem `recursive_inversion_functional` remains globally
-valid whenever inverse derivations exist; the counterexample falsifies an
-all-Link totality claim.
+The generic theorem `recursive_inversion_functional` remains stronger in a
+different direction: whenever two derivations exist for any source, their
+images are equal. The cycle falsifies totality/existence, not functionality.
 -/
-theorem fallback_cycle_no_recursive_inversion
+theorem recursive_inversion_source_grounded
     {x y : ModelLink}
     (h : RecursiveInversion ExplicitFoundation ExplicitInversionDomain x y) :
-    x = badStart ∨ x = badFinish → False := by
+    Grounded ExplicitFoundation x := by
   induction h with
   | root =>
-      intro hBad
-      rcases hBad with hBad | hBad <;>
-        simp [ExplicitFoundation, root, badStart, badFinish] at hBad
-  | @start x childInverse hStart hChild ih =>
-      intro hBad
-      rcases hBad with rfl | rfl
-      · apply ih
-        exact Or.inr finish_badStart
-      · exact hStart.2 finish_badFinish
-  | @finish x childInverse hFinish hChild ih =>
-      intro hBad
-      rcases hBad with rfl | rfl
-      · exact hFinish.1 start_badStart
-      · apply ih
-        exact Or.inl start_badFinish
-  | @pair x inverseFinish inverseStart hPair hFinishInv hStartInv ihFinish ihStart =>
-      intro hBad
-      rcases hBad with rfl | rfl
-      · exact hPair.1 start_badStart
-      · exact hPair.2 finish_badFinish
+      exact grounded_of_full_self ExplicitFoundation
+        (root_full_self ExplicitFoundation)
+  | start hStart _ ih =>
+      apply Grounded.node
+      · intro hNot
+        exact False.elim (hNot hStart.1)
+      · intro _
+        exact ih
+  | finish hFinish _ ih =>
+      apply Grounded.node
+      · intro _
+        exact ih
+      · intro hNot
+        exact False.elim (hNot hFinish.2)
+  | pair hPair _ _ ihFinish ihStart =>
+      apply Grounded.node
+      · intro _
+        exact ihStart
+      · intro _
+        exact ihFinish
 
 theorem badStart_no_recursive_inverse :
     ¬ ∃ y : ModelLink,
       RecursiveInversion ExplicitFoundation ExplicitInversionDomain badStart y := by
   rintro ⟨y, h⟩
-  exact fallback_cycle_no_recursive_inversion h (Or.inl rfl)
+  exact badStart_not_grounded (recursive_inversion_source_grounded h)
 
 theorem badFinish_no_recursive_inverse :
     ¬ ∃ y : ModelLink,
       RecursiveInversion ExplicitFoundation ExplicitInversionDomain badFinish y := by
   rintro ⟨y, h⟩
-  exact fallback_cycle_no_recursive_inversion h (Or.inr rfl)
+  exact badFinish_not_grounded (recursive_inversion_source_grounded h)
 
 /--
 Sharing control for #1797.
