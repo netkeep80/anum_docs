@@ -373,6 +373,63 @@ for (const record of inv01) {
   );
 }
 
+const inv02 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "INV-02")
+  .map(({ record }) => record);
+assert.equal(inv02.length, 2, "INV-02 has exactly two external evidence records");
+assert.deepEqual(
+  inv02.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "INV-02 external lanes",
+);
+for (const record of inv02) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "2305f259426dfcda5920fa485040ee6c0af05902",
+    `INV-02 ${record.lane} proof source commit`,
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit),
+      "INV-02 Lean evidence pin includes exact release commit",
+    );
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "INV-02 Lean evidence pin includes release artifact digest",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit),
+      "INV-02 Rocq evidence pin includes exact release commit",
+    );
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "INV-02 Rocq evidence pin includes exact image digest",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /same finite Grounded domain as INV-01|same.*domain.*INV-01/i,
+    "INV-02 evidence records exact-domain reuse",
+  );
+  assert.match(
+    String(record.notes),
+    /same Prop-valued RecursiveInversion graph|no second inversion function/i,
+    "INV-02 evidence discloses same inversion graph boundary",
+  );
+  assert.match(
+    String(record.notes),
+    /FND-13/,
+    "INV-02 evidence records downstream FND-13 reconstruction",
+  );
+  assert.match(
+    String(record.notes),
+    /J\(J\(X\)\)=X/,
+    "INV-02 evidence records involution statement",
+  );
+}
+
 const leanEvidence = fnd02.find((record) => record.lane === "lean4");
 const coqEvidence = fnd02.find((record) => record.lane === "coq");
 assert.ok(leanEvidence !== undefined && coqEvidence !== undefined);
@@ -394,5 +451,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq aprover-input=mtsNative-only`,
 );
