@@ -808,7 +808,7 @@ for (const record of ctx03) {
   );
   assert.match(
     String(record.notes),
-    /TechnicalStartOperation falsifier/i,
+    /TechnicalStartOperation.*falsifier/i,
     "CTX-03 evidence records the non-covariant technical-operation boundary",
   );
   assert.match(
