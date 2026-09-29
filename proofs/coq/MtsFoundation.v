@@ -188,13 +188,35 @@ Qed.
    FND-13 then uses the recursive normal-form equation and completeness, not
    pole extensionality as a premise. *)
 Definition RootUniqueness (F : Foundation) : Prop :=
-  forall x : Link F,
-    FullSelf F x ->
-    x = R F.
+  forall x : Link F, FullSelf F x -> x = R F.
 
-Record F2F3Normalization
-    (F : Foundation)
-    (_uniqueRoot : RootUniqueness F) : Type := {
+(* Exact finite grounded normalization premise used by accepted FND-13. *)
+Record F2F3GroundedNormalization (F : Foundation) : Type := {
+  GroundedNormalForm : Type;
+  grounded_compose_nf :
+    GroundedNormalForm -> GroundedNormalForm -> GroundedNormalForm;
+  grounded_normal_form : Link F -> GroundedNormalForm;
+
+  grounded_normal_form_equation :
+    forall x : Link F,
+      Grounded F x ->
+      grounded_normal_form x =
+      grounded_compose_nf
+        (grounded_normal_form (start F x))
+        (grounded_normal_form (finish F x));
+
+  grounded_normal_form_complete :
+    forall x y : Link F,
+      Grounded F x ->
+      Grounded F y ->
+      grounded_normal_form x = grounded_normal_form y ->
+      x = y
+}.
+
+(* Stronger global normalization completeness retained only for downstream
+   proof slices that explicitly quantify over arbitrary Links.  It is not
+   indexed by FND-02 because its fields do not consume unique ROOT. *)
+Record F2F3Normalization (F : Foundation) : Type := {
   NormalForm : Type;
   compose_nf : NormalForm -> NormalForm -> NormalForm;
   normal_form : Link F -> NormalForm;
@@ -212,12 +234,61 @@ Record F2F3Normalization
       x = y
 }.
 
-(* FND-13 / historical A6 — identity by ordered poles, derived from the
-   accepted F2/F3 recursive-normalization interface after FND-02. *)
+(* Constructor injectivity follows directly from primitive projection laws.
+   It is weaker than arbitrary-Link extensionality. *)
+Theorem fnd13_form_injective
+    (F : Foundation)
+    (a b c d : Link F) :
+    form F a b = form F c d <->
+    a = c /\ b = d.
+Proof.
+  split.
+  - intros H.
+    split.
+    + transitivity (start F (form F a b)).
+      * symmetry. apply form_start.
+      * transitivity (start F (form F c d)).
+        -- apply f_equal. exact H.
+        -- apply form_start.
+    + transitivity (finish F (form F a b)).
+      * symmetry. apply form_finish.
+      * transitivity (finish F (form F c d)).
+        -- apply f_equal. exact H.
+        -- apply form_finish.
+  - intros [Hac Hbd].
+    subst c. subst d. reflexivity.
+Qed.
+
+(* FND-13 / historical A6 — ordered-pole identity on the accepted finite
+   R-grounded semantic domain.  No FND-02 dependency is claimed here. *)
 Theorem FND_13_identity_by_poles
     (F : Foundation)
-    (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3GroundedNormalization F)
+    (x y : Link F) :
+    Grounded F x ->
+    Grounded F y ->
+    (x = y <->
+      start F x = start F y /\
+      finish F x = finish F y).
+Proof.
+  intros GX GY.
+  split.
+  - intros Hxy.
+    subst y.
+    split; reflexivity.
+  - intros [Hs Hf].
+    apply (grounded_normal_form_complete F N x y GX GY).
+    rewrite (grounded_normal_form_equation F N x GX).
+    rewrite (grounded_normal_form_equation F N y GY).
+    rewrite Hs, Hf.
+    reflexivity.
+Qed.
+
+(* Explicit stronger auxiliary theorem from global normalization completeness.
+   This is not the accepted finite-grounded FND-13 domain statement. *)
+Theorem global_identity_by_poles_from_complete_normalization
+    (F : Foundation)
+    (N : F2F3Normalization F)
     (x y : Link F) :
     x = y <->
     start F x = start F y /\
@@ -227,14 +298,10 @@ Proof.
   - intros Hxy.
     subst y.
     split; reflexivity.
-  - intros H.
-    destruct H as [Hs Hf].
-    apply (normal_form_complete
-      F (FND_02_unique_root F A1) N x y).
-    rewrite (normal_form_equation
-      F (FND_02_unique_root F A1) N x).
-    rewrite (normal_form_equation
-      F (FND_02_unique_root F A1) N y).
+  - intros [Hs Hf].
+    apply (normal_form_complete F N x y).
+    rewrite (normal_form_equation F N x).
+    rewrite (normal_form_equation F N y).
     rewrite Hs, Hf.
     reflexivity.
 Qed.
@@ -326,7 +393,7 @@ Qed.
 Theorem FND_01_local_partition
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (x : Link F) :
     LocalSelfDecision F x ->
     LocalSelfIncidenceExhaustive F x /\
@@ -345,7 +412,7 @@ Proof.
     + split.
       * intros H. apply (FND_02_unique_root F A1 x H).
       * intros y Hs Hf.
-        apply (proj2 (FND_13_identity_by_poles F A1 N x y)).
+        apply (proj2 (global_identity_by_poles_from_complete_normalization F N x y)).
         split; assumption.
 Qed.
 
@@ -596,7 +663,7 @@ Qed.
 Theorem FND_01_four_structural_cases
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (x : Link F) :
     LocalSelfDecision F x ->
@@ -864,7 +931,7 @@ Qed.
 Theorem INV_01_recursive_inversion_total
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x : Link F) :
@@ -1119,7 +1186,7 @@ Qed.
 Theorem INV_01_recursive_inversion_unique_total
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x : Link F) :
@@ -1394,16 +1461,17 @@ Proof.
     apply recursive_end_start.
 Qed.
 
-(* FND-13 entails reconstruction from the ordered poles.  This is downstream
-   theorem use, not an extensionality/reconstruction axiom. *)
-Theorem poles_recompose_after_fnd13
+(* The explicitly stronger global normalization-completeness premise entails
+   reconstruction from ordered poles.  This auxiliary theorem is not
+   attributed to the accepted finite-grounded FND-13 statement. *)
+Theorem poles_recompose_from_global_normalization
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (x : Link F) :
     form F (start F x) (finish F x) = x.
 Proof.
-  apply (proj2 (FND_13_identity_by_poles F A1 N
+  apply (proj2 (global_identity_by_poles_from_complete_normalization F N
     (form F (start F x) (finish F x)) x)).
   split.
   - apply form_start.
@@ -1522,7 +1590,7 @@ Qed.
 Theorem INV_02_recursive_inversion_involutive
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     forall x y z : Link F,
@@ -1661,7 +1729,7 @@ Proof.
     transitivity (form F secondFinish secondStart).
     + exact HzForm.
     + rewrite HFinishEq, HStartEq.
-      apply (poles_recompose_after_fnd13 F A1 N x).
+      apply (poles_recompose_from_global_normalization F A1 N x).
 Qed.
 
 (* Function-level INV-02 witness without choosing a host function: INV-01
@@ -1670,7 +1738,7 @@ Qed.
 Theorem INV_02_unique_total_involution
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x : Link F) :
@@ -1789,7 +1857,7 @@ Qed.
 Theorem INV_05_pair_preserved_and_reversed
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x y : Link F) :
@@ -1937,7 +2005,7 @@ Qed.
 Theorem INV_06_root_basis
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     let O := f2f3_start_root F E in
@@ -2102,7 +2170,7 @@ Qed.
 Theorem INV_07_objective_chirality
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x y : Link F) :
@@ -2404,7 +2472,7 @@ Qed.
 Theorem ctx03_inversion_is_mirror_transport
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     InversionIsMirrorTransport F E D.
@@ -2440,7 +2508,7 @@ Qed.
 Theorem CTX_03_relational_z2_support
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     RelativeZ2Law F /\
@@ -2594,7 +2662,7 @@ Qed.
 Theorem CTX_03_objective_chiral_orbit_before_context
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     exists w jw : Link F,
@@ -2717,7 +2785,7 @@ Qed.
 Theorem CTX_03_simultaneous_inversion_covariance
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (a b ja jb : Link F) :
@@ -2829,7 +2897,7 @@ Qed.
 Theorem CTX_03_context_relative_gauge
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     RelativeZ2Law F /\
