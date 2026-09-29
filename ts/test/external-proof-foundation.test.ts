@@ -1180,8 +1180,12 @@ const fnd07 = (p0.targets as Record<string, any>[]).find((target) => target.id =
 assert(fnd07 !== undefined, "P0 contains FND-07");
 same(
   JSON.stringify(fnd07.assumptions),
-  JSON.stringify(["accepted contextual truth semantics"]),
-  "FND-07 assumptions remain exactly the accepted contextual-truth semantics",
+  JSON.stringify([
+    "accepted A16 contextual truth semantics",
+    "accepted A16 current-Scope composition law",
+    "F2/F3 root-basis witnesses for structural L = O⟼C",
+  ]),
+  "FND-07 exposes the accepted truth, detachment, and structural-L premises",
 );
 same(
   JSON.stringify(fnd07.dependsOn),
@@ -1201,7 +1205,14 @@ for (const [label, source, marker] of [
     "ContextualTruthWitness",
     "ContextualTruth",
     "TruthValueL",
+    "ContextualRuleWitness",
+    "ContextualRule",
+    "ContextualScopeCompositionLaw",
     "FND_07_contextual_truth_boundary",
+    "FND_07_root_truth_aspect_L",
+    "FND_07_contextual_detachment",
+    "FND_07_context_relative_truth_status",
+    "FND_07_semantic_truth_capstone",
     "CurrentScopeMember",
   ]) {
     assert(region.includes(symbol), label + " FND-07 contains " + symbol);
@@ -1225,6 +1236,24 @@ for (const [label, source, marker] of [
     region.includes("truth value") &&
       region.includes("truth witness"),
     label + " FND-07 separates L value role from K-to-A witness role",
+  );
+  assert(
+    region.includes("ContextualScopeCompositionLaw") &&
+      region.includes("FND_07_contextual_detachment"),
+    label + " FND-07 makes A16 detachment an explicit semantic premise and theorem",
+  );
+  assert(
+    region.includes("FND_07_context_relative_truth_status"),
+    label + " FND-07 proves truth may differ across distinct Contexts for the same A",
+  );
+  assert(
+    region.includes("FND_07_root_truth_aspect_L") &&
+      region.includes("PairLocal"),
+    label + " FND-07 fixes L to the structural root-basis O-to-C aspect",
+  );
+  assert(
+    !/TruthValueL[\s\S]{0,160}\(L\s*:/.test(region),
+    label + " FND-07 no longer accepts an arbitrary Link parameter as truth-value L",
   );
 }
 const leanFnd07 = lean.slice(lean.indexOf("def ContextualTruthWitness"));
@@ -1252,6 +1281,11 @@ for (const forbidden of [
 assert(
   !lean.includes("axiom FND_07") && !rocq.includes("Axiom FND_07"),
   "FND-07 is proved rather than postulated",
+);
+assert(
+  !lean.includes("axiom FND_07_semantic_truth_capstone") &&
+    !rocq.includes("Axiom FND_07_semantic_truth_capstone"),
+  "FND-07 semantic truth capstone is proved rather than postulated",
 );
 
 const fnd05 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-05");
