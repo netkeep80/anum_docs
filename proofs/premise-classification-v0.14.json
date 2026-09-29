@@ -1,0 +1,264 @@
+{
+  "schema": "mts-proof-premise-classification/v0.1",
+  "mtsVersion": "v0.14",
+  "status": "active-hardening",
+  "ownerIssue": 1796,
+  "parentIssue": 1789,
+  "proofProgramIssue": 1431,
+  "authority": "external-proof-boundary-classification-only",
+  "classificationVocabulary": [
+    "DERIVED",
+    "INDEPENDENT_MODEL_CHOICE",
+    "DOMAIN_RESTRICTION",
+    "EXECUTION_REPRESENTATION_ASSUMPTION",
+    "UNRESOLVED"
+  ],
+  "interpretation": {
+    "independentModelChoice": "Independent relative to the weaker external Foundation interface. If the premise is already accepted by MTS v0.14, this does not make it optional inside accepted v0.14; it records that the current proof does not derive it from weaker Foundation structure.",
+    "domainRestriction": "Restricts the theorem carrier/domain and is not an ontology claim about all possible Links.",
+    "executionRepresentationAssumption": "Host/proof-side decidability, representation, or execution evidence required to run a constructive proof; it is not semantic authority.",
+    "unresolved": "Current proof uses a stronger premise whose derivation/necessity has not yet been closed."
+  },
+  "modelObligation": {
+    "ambientLinkCarrier": "INFINITE_REQUIRED",
+    "groundedReplayDomain": "FINITE_EXPLICIT_WITNESSES_REQUIRED",
+    "reason": [
+      "Foundation.form_start and Foundation.form_finish make form injective from Link×Link to Link.",
+      "Foundation.R makes Link non-empty.",
+      "F2F3OneSidedExistence.startRootNeRoot requires a second distinct Link.",
+      "Therefore no finite ambient Link carrier can satisfy the current Foundation plus one-sided existence bundle."
+    ],
+    "noBackflow": "Host carrier/model machinery is external evidence only and must not become MTS ontology."
+  },
+  "premises": [
+    {
+      "id": "A1RecursiveSeparation",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "accepted A1/F2/F3 semantic separation premise",
+      "leanSymbols": [
+        "A1RecursiveSeparation"
+      ],
+      "rocqSymbols": [
+        "A1RecursiveSeparation"
+      ],
+      "consumedBy": [
+        "FND-02",
+        "FND-01",
+        "INV-01",
+        "INV-02"
+      ],
+      "rationale": "The current external development assumes recursive separation on finite Grounded Links; it is not derived from the weaker Foundation projection fields."
+    },
+    {
+      "id": "F2F3OneSidedExistence",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "accepted F2/F3 existence witness for the two proper one-sided recursive forms",
+      "leanSymbols": [
+        "F2F3OneSidedExistence"
+      ],
+      "rocqSymbols": [
+        "F2F3OneSidedExistence"
+      ],
+      "consumedBy": [
+        "FND-01",
+        "INV-01",
+        "CTX-03"
+      ],
+      "rationale": "The one-sided witnesses are supplied explicitly and then used to derive their local self-incidence patterns; bare Foundation does not currently construct them."
+    },
+    {
+      "id": "F2F3GroundedNormalization",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "finite Grounded normal-form witness used by accepted FND-13",
+      "leanSymbols": [
+        "F2F3GroundedNormalization"
+      ],
+      "rocqSymbols": [
+        "F2F3GroundedNormalization"
+      ],
+      "consumedBy": [
+        "FND-13"
+      ],
+      "rationale": "The exact finite-domain normalization package is explicit proof input. FND-13 derives pole identity from it but does not derive the package itself."
+    },
+    {
+      "id": "F2F3GroundedNormalization.complete",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "normal-form completeness on the declared Grounded theorem domain",
+      "leanSymbols": [
+        "F2F3GroundedNormalization.complete"
+      ],
+      "rocqSymbols": [
+        "grounded_normal_form_complete"
+      ],
+      "consumedBy": [
+        "FND-13"
+      ],
+      "rationale": "Completeness is the substantive identity premise behind FND-13 on Grounded Links and remains explicit."
+    },
+    {
+      "id": "F2F3Normalization",
+      "classification": "UNRESOLVED",
+      "normativeRole": "stronger global normalization package retained by older FND-01/INV proof slices",
+      "leanSymbols": [
+        "F2F3Normalization"
+      ],
+      "rocqSymbols": [
+        "F2F3Normalization"
+      ],
+      "consumedBy": [
+        "FND-01",
+        "INV-01",
+        "INV-02"
+      ],
+      "rationale": "This is strictly stronger than the accepted Grounded FND-13 boundary. #1796 must either derive/justify it, replace its uses with Grounded-local premises, or retain it as an explicitly stronger auxiliary model assumption.",
+      "targetDisposition": "MINIMIZE_OR_REMOVE_FROM_ACCEPTED_CAPSTONES"
+    },
+    {
+      "id": "F2F3Normalization.complete",
+      "classification": "UNRESOLVED",
+      "normativeRole": "global normal-form completeness over arbitrary Links",
+      "leanSymbols": [
+        "F2F3Normalization.complete"
+      ],
+      "rocqSymbols": [
+        "normal_form_complete"
+      ],
+      "consumedBy": [
+        "global_identity_by_poles_from_complete_normalization",
+        "FND-01",
+        "INV-01",
+        "INV-02"
+      ],
+      "rationale": "Global completeness implies arbitrary-Link pole extensionality and is stronger than the accepted finite Grounded FND-13 statement.",
+      "targetDisposition": "MINIMIZE_OR_ISOLATE"
+    },
+    {
+      "id": "Grounded",
+      "classification": "DOMAIN_RESTRICTION",
+      "normativeRole": "finite recursive theorem carrier witness",
+      "leanSymbols": [
+        "Grounded"
+      ],
+      "rocqSymbols": [
+        "Grounded"
+      ],
+      "consumedBy": [
+        "FND-02",
+        "FND-05",
+        "FND-13",
+        "INV-01",
+        "INV-02"
+      ],
+      "rationale": "Grounded bounds structural induction to finitely witnessed recursive decomposition. It does not assert that all possible Links are well-founded."
+    },
+    {
+      "id": "LocalSelfDecision",
+      "classification": "EXECUTION_REPRESENTATION_ASSUMPTION",
+      "normativeRole": "constructive local decision evidence for the two self-incidence questions",
+      "leanSymbols": [
+        "LocalSelfDecision"
+      ],
+      "rocqSymbols": [
+        "LocalSelfDecision"
+      ],
+      "consumedBy": [
+        "FND-01",
+        "INV-01"
+      ],
+      "rationale": "The proof requests exact local decisions instead of assuming global host equality decidability. A concrete model may derive these decisions."
+    },
+    {
+      "id": "RecursiveInversionDomain.structuralForms",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "external witness for recursive START(F)/END(F) forms used by structural inversion",
+      "leanSymbols": [
+        "RecursiveInversionDomain",
+        "startEquation",
+        "endEquation"
+      ],
+      "rocqSymbols": [
+        "RecursiveInversionDomain",
+        "recursive_start_equation",
+        "recursive_end_equation"
+      ],
+      "consumedBy": [
+        "INV-01",
+        "INV-02",
+        "INV-03",
+        "INV-04",
+        "INV-05",
+        "INV-06",
+        "INV-07",
+        "CTX-03"
+      ],
+      "rationale": "The current external model supplies recursive one-sided forms for arbitrary Grounded children; this existence is not yet derived from bare Foundation."
+    },
+    {
+      "id": "RecursiveInversionDomain.decide",
+      "classification": "EXECUTION_REPRESENTATION_ASSUMPTION",
+      "normativeRole": "constructive classification evidence on Grounded inversion inputs",
+      "leanSymbols": [
+        "RecursiveInversionDomain.decide"
+      ],
+      "rocqSymbols": [
+        "recursive_local_decision"
+      ],
+      "consumedBy": [
+        "INV-01",
+        "INV-02"
+      ],
+      "rationale": "This is proof-side decision evidence needed to choose the local structural branch; it is not an orientation or ontology primitive."
+    },
+    {
+      "id": "A16ContextualTruthSemantics",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "accepted semantic role of L=O->C and current K->A as contextual truth witness",
+      "leanSymbols": [
+        "FND_07_root_truth_aspect_L",
+        "FND_07_contextual_truth_boundary"
+      ],
+      "rocqSymbols": [
+        "FND_07_root_truth_aspect_L",
+        "FND_07_contextual_truth_boundary"
+      ],
+      "consumedBy": [
+        "FND-07",
+        "FND-08",
+        "FND-09"
+      ],
+      "rationale": "The semantic role called truth is explicitly accepted A16/V14-L11 semantics and is not derived from bare Foundation."
+    },
+    {
+      "id": "ContextualScopeCompositionLaw",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "accepted A16 current-Scope closure/detachment premise",
+      "leanSymbols": [
+        "ContextualScopeCompositionLaw"
+      ],
+      "rocqSymbols": [
+        "ContextualScopeCompositionLaw"
+      ],
+      "consumedBy": [
+        "FND-07",
+        "FND-08"
+      ],
+      "rationale": "Contextual detachment is derived once this law is supplied; the law itself remains an accepted semantic premise."
+    },
+    {
+      "id": "ContextOrientationChi",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "accepted v0.14 Context-relative orientation/chi marker semantics",
+      "leanSymbols": [
+        "CTX_03_chi_direction_bridge"
+      ],
+      "rocqSymbols": [
+        "CTX_03_chi_direction_bridge"
+      ],
+      "consumedBy": [
+        "CTX-03"
+      ],
+      "rationale": "Foundation provides objective chirality structure, while an oriented Context supplies the local selection semantics. No Foundation-global orientation is derived."
+    }
+  ]
+}
