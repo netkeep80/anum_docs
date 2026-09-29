@@ -2277,8 +2277,8 @@ theorem ctx03_chi_transport
   have hStartToFinish := hOrbit.2.1
   have hFinishToStart := hOrbit.2.2.1
   intro bodyA markerA chiA bodyB markerB chiB hA hB
-  rcases hA with hA | hA
-  · rcases hB with hB | hB
+  rcases hA with ⟨hMarkerA, hChiA⟩ | ⟨hMarkerA, hChiA⟩
+  · rcases hB with ⟨hMarkerB, hChiB⟩ | ⟨hMarkerB, hChiB⟩
     · subst markerA
       subst chiA
       subst markerB
@@ -2309,7 +2309,7 @@ theorem ctx03_chi_transport
             ⟩))
       · intro _
         exact hStartToFinish
-  · rcases hB with hB | hB
+  · rcases hB with ⟨hMarkerB, hChiB⟩ | ⟨hMarkerB, hChiB⟩
     · subst markerA
       subst chiA
       subst markerB
