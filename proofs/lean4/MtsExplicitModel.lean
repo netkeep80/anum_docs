@@ -475,14 +475,19 @@ theorem pairCode_ne_left (left right : ModelLink) :
   intro h
   have hGrow :
       (encodeLeft left).length <
-        (encodeLeft left).length + (1 + (1 + right.length)) :=
-    Nat.lt_add_of_pos_right (Nat.succ_pos (1 + right.length))
+        (encodeLeft left).length + (right.length + 2) :=
+    Nat.lt_add_of_pos_right (Nat.succ_pos (right.length + 1))
   have hLt0 :
       left.length <
-        (encodeLeft left).length + (1 + (1 + right.length)) :=
+        (encodeLeft left).length + (right.length + 2) :=
     Nat.lt_trans (encodeLeft_length_gt left) hGrow
+  have hPairLength :
+      (pairCode left right).length =
+        right.length + (2 + (encodeLeft left).length) := by
+    simp [pairCode, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
   have hLt : left.length < (pairCode left right).length := by
-    simpa [pairCode, Nat.succ_eq_add_one, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hLt0
+    rw [hPairLength]
+    simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hLt0
   have hLength : left.length = (pairCode left right).length :=
     congrArg List.length h.symm
   exact (Nat.ne_of_lt hLt) hLength
@@ -492,10 +497,15 @@ theorem pairCode_ne_right (left right : ModelLink) :
   intro h
   have hGrow :
       right.length <
-        right.length + (1 + (1 + (encodeLeft left).length)) :=
-    Nat.lt_add_of_pos_right (Nat.succ_pos (1 + (encodeLeft left).length))
+        right.length + ((encodeLeft left).length + 2) :=
+    Nat.lt_add_of_pos_right (Nat.succ_pos ((encodeLeft left).length + 1))
+  have hPairLength :
+      (pairCode left right).length =
+        right.length + (2 + (encodeLeft left).length) := by
+    simp [pairCode, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
   have hLt : right.length < (pairCode left right).length := by
-    simpa [pairCode, Nat.succ_eq_add_one, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hGrow
+    rw [hPairLength]
+    simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hGrow
   have hLength : right.length = (pairCode left right).length :=
     congrArg List.length h.symm
   exact (Nat.ne_of_lt hLt) hLength
@@ -515,11 +525,11 @@ theorem left_fixed_root_or_start
     · exact Or.inr hStart
     · by_cases hEnd : b = endForm a
       · subst b
-      have hForm : form a (endForm a) = endForm a := by
-        simp [form, no_start_end_overlap, endForm_ne_root]
-      have hSelf : a = endForm a :=
-        h.trans hForm
-      exact False.elim (endForm_ne_self a hSelf.symm)
+        have hForm : form a (endForm a) = endForm a := by
+          simp [form, no_start_end_overlap, endForm_ne_root]
+        have hSelf : a = endForm a :=
+          h.trans hForm
+        exact False.elim (endForm_ne_self a hSelf.symm)
       · have hPair : a = pairCode a b := by
           simpa [form, hRoot, hStart, hEnd] using h
         exact False.elim (pairCode_ne_left a b hPair.symm)
