@@ -172,8 +172,10 @@ Proof.
   intros a b.
   unfold model_start.
   rewrite decode_model_form.
-  destruct (link_eq_dec (model_form a b) (model_form a b));
-    [reflexivity | contradiction].
+  cbn.
+  destruct (link_eq_dec (model_form a b) (model_form a b)) as [Heq | Hneq].
+  - reflexivity.
+  - exfalso. apply Hneq. reflexivity.
 Qed.
 
 Lemma model_finish_form_projection :
@@ -183,8 +185,10 @@ Proof.
   intros a b.
   unfold model_finish.
   rewrite decode_model_form.
-  destruct (link_eq_dec (model_form a b) (model_form a b));
-    [reflexivity | contradiction].
+  cbn.
+  destruct (link_eq_dec (model_form a b) (model_form a b)) as [Heq | Hneq].
+  - reflexivity.
+  - exfalso. apply Hneq. reflexivity.
 Qed.
 
 Lemma model_start_form_ne_root :
