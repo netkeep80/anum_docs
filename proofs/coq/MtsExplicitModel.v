@@ -372,9 +372,7 @@ Proof.
       change (model_finish model_bad_start <> model_bad_start).
       intro Hreverse.
       apply model_bad_start_ne_bad_finish.
-      transitivity (model_finish model_bad_start).
-      - symmetry. exact Hreverse.
-      - exact model_finish_bad_start.
+      exact (eq_trans (eq_sym Hreverse) model_finish_bad_start).
     }
     apply (IHFinish Hneq).
     right.
