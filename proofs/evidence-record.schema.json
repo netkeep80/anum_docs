@@ -265,6 +265,93 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "const": "proved"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "then": {
+        "properties": {
+          "artifacts": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lane": {
+            "const": "lean4"
+          },
+          "result": {
+            "const": "proved"
+          }
+        },
+        "required": [
+          "lane",
+          "result"
+        ]
+      },
+      "then": {
+        "properties": {
+          "artifacts": {
+            "minItems": 1,
+            "contains": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "const": "proofs/lean4/MtsFoundation.lean"
+                }
+              },
+              "required": [
+                "path"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lane": {
+            "const": "coq"
+          },
+          "result": {
+            "const": "proved"
+          }
+        },
+        "required": [
+          "lane",
+          "result"
+        ]
+      },
+      "then": {
+        "properties": {
+          "artifacts": {
+            "minItems": 1,
+            "contains": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "const": "proofs/coq/MtsFoundation.v"
+                }
+              },
+              "required": [
+                "path"
+              ]
+            }
+          }
+        }
+      }
     }
   ]
 }

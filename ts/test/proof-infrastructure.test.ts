@@ -29,6 +29,9 @@ const p0 = JSON.parse(
 const externalToolchains = JSON.parse(
   readFileSync(resolve(root, "proofs", "external-toolchains.json"), "utf8"),
 );
+const externalProofAssurance = JSON.parse(
+  readFileSync(resolve(root, "proofs", "external-proof-assurance.json"), "utf8"),
+);
 
 assert.equal(infrastructure.schema, "mts-proof-infrastructure/v0.1");
 assert.equal(infrastructure.authority, "routing-and-provenance-only");
@@ -107,6 +110,38 @@ for (const field of [
   );
 }
 
+const provedArtifactRule = evidenceSchema.allOf.find(
+  (rule: any) => rule.if?.properties?.result?.const === "proved",
+);
+assert.ok(provedArtifactRule, "proved evidence must have an artifact rule");
+assert.equal(
+  provedArtifactRule.then?.properties?.artifacts?.minItems,
+  1,
+  "proved evidence schema requires at least one artifact",
+);
+
+for (const [lane, expectedPath] of [
+  ["lean4", "proofs/lean4/MtsFoundation.lean"],
+  ["coq", "proofs/coq/MtsFoundation.v"],
+] as const) {
+  const laneRule = evidenceSchema.allOf.find(
+    (rule: any) =>
+      rule.if?.properties?.lane?.const === lane &&
+      rule.if?.properties?.result?.const === "proved",
+  );
+  assert.ok(laneRule, `${lane} proved evidence must have a lane artifact rule`);
+  assert.equal(
+    laneRule.then?.properties?.artifacts?.minItems,
+    1,
+    `${lane} proved evidence requires a non-empty artifact list`,
+  );
+  assert.equal(
+    laneRule.then?.properties?.artifacts?.contains?.properties?.path?.const,
+    expectedPath,
+    `${lane} proved evidence requires its exact proof-source artifact`,
+  );
+}
+
 const authorityValues = new Set(evidenceSchema.properties.authority.enum);
 for (const authority of [
   "executable-witness",
@@ -146,6 +181,71 @@ function sha256AtCommit(commitSha: string, path: string): string {
   return createHash("sha256").update(gitObjectBytes(commitSha, path)).digest("hex");
 }
 
+const assuranceTargets = new Map<string, any>(
+  externalProofAssurance.targets.map((target: any) => [String(target.id), target] as const),
+);
+
+function externalLaneProofPath(lane: string): string | null {
+  if (lane === "lean4") return "proofs/lean4/MtsFoundation.lean";
+  if (lane === "coq") return "proofs/coq/MtsFoundation.v";
+  return null;
+}
+
+function assertionFailure(action: () => void): boolean {
+  try {
+    action();
+    return false;
+  } catch {
+    return true;
+  }
+}
+
+function assertEvidenceArtifactIntegrity(path: string, record: any): void {
+  if (record.result !== "proved") return;
+
+  assert.ok(
+    Array.isArray(record.artifacts) && record.artifacts.length >= 1,
+    `${path} proved evidence must carry at least one verifiable artifact`,
+  );
+
+  const expectedProofPath = externalLaneProofPath(String(record.lane));
+  if (expectedProofPath === null) return;
+
+  const proofArtifact = record.artifacts.find(
+    (artifact: any) => artifact?.path === expectedProofPath,
+  );
+  assert.ok(
+    proofArtifact,
+    `${path} ${record.lane} proved evidence must pin ${expectedProofPath}`,
+  );
+
+  const target = assuranceTargets.get(String(record.theoremId));
+  assert.ok(target, `${path} theorem is declared in external proof assurance manifest`);
+  const historicalSource = gitObjectBytes(
+    String(record.proofSource.commitSha),
+    expectedProofPath,
+  ).toString("utf8");
+  const symbols: string[] =
+    record.lane === "lean4" ? [...target.lean4] : [...target.rocq];
+  assert.ok(symbols.length > 0, `${path} has at least one assured theorem symbol`);
+
+  for (const symbol of symbols) {
+    const sourceSymbol =
+      record.lane === "lean4"
+        ? String(symbol).replace(/^MTS\.External\./, "")
+        : String(symbol);
+    const declaration =
+      record.lane === "lean4"
+        ? new RegExp(`\\btheorem\\s+${sourceSymbol}\\b`)
+        : new RegExp(`\\bTheorem\\s+${sourceSymbol}\\b`);
+    assert.match(
+      historicalSource,
+      declaration,
+      `${path} historical pinned proof bytes declare ${symbol}`,
+    );
+  }
+}
+
 const evidenceFiles = collectJsonFiles(resolve(root, "proofs", "evidence"));
 assert.ok(evidenceFiles.length >= 2, "external proof evidence records must exist");
 
@@ -157,6 +257,27 @@ const evidenceRecords = evidenceFiles.map((path) => ({
   path,
   record: JSON.parse(readFileSync(path, "utf8")),
 }));
+
+const firstProvedExternal = evidenceRecords.find(
+  ({ record }) =>
+    record.result === "proved" &&
+    (record.lane === "lean4" || record.lane === "coq"),
+);
+assert.ok(firstProvedExternal, "at least one proved external evidence record exists");
+const emptyArtifactMutation = {
+  ...firstProvedExternal.record,
+  artifacts: [],
+};
+assert.equal(
+  assertionFailure(() =>
+    assertEvidenceArtifactIntegrity(
+      firstProvedExternal.path + "#mutation-artifacts-empty",
+      emptyArtifactMutation,
+    ),
+  ),
+  true,
+  "proved evidence mutation with artifacts: [] must be rejected",
+);
 
 for (const { path, record } of evidenceRecords) {
   assert.equal(record.schema, "mts-proof-evidence/v0.1", `${path} schema`);
@@ -209,6 +330,8 @@ for (const { path, record } of evidenceRecords) {
     assert.equal(record.result, "proved", `${path} external proof result`);
     assert.ok(record.proofSource.toolchain, `${path} external toolchain required`);
   }
+
+  assertEvidenceArtifactIntegrity(path, record);
 
   for (const artifact of record.artifacts) {
     const artifactPath = resolve(root, artifact.path);
