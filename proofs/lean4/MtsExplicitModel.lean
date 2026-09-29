@@ -473,25 +473,21 @@ theorem encodeLeft_length_gt (a : ModelLink) :
 theorem pairCode_ne_left (left right : ModelLink) :
     pairCode left right ≠ left := by
   intro h
-  have hAppend :
+  have hAppendLe :
       (encodeLeft left).length ≤ (encodeLeft left ++ right).length := by
     simpa only [List.length_append] using
       (Nat.le_add_right (encodeLeft left).length right.length)
-  have hBody :
-      left.length < (encodeLeft left ++ right).length :=
-    Nat.lt_of_lt_of_le (encodeLeft_length_gt left) hAppend
-  have hPrefix1 :
-      (encodeLeft left ++ right).length <
-        Nat.succ (encodeLeft left ++ right).length :=
-    Nat.lt_succ_self _
-  have hPrefix2 :
-      Nat.succ (encodeLeft left ++ right).length <
+  have hPrefixLt :
+      (encodeLeft left).length <
         Nat.succ (Nat.succ (encodeLeft left ++ right).length) :=
-    Nat.lt_succ_self _
-  have hLt : left.length < (pairCode left right).length := by
-    change left.length <
-      Nat.succ (Nat.succ (encodeLeft left ++ right).length)
-    exact Nat.lt_trans hBody (Nat.lt_trans hPrefix1 hPrefix2)
+    Nat.lt_trans
+      (Nat.lt_succ_of_le hAppendLe)
+      (Nat.lt_succ_self (Nat.succ (encodeLeft left ++ right).length))
+  have hEncPair :
+      (encodeLeft left).length < (pairCode left right).length := by
+    simpa only [pairCode, List.length_cons] using hPrefixLt
+  have hLt : left.length < (pairCode left right).length :=
+    Nat.lt_trans (encodeLeft_length_gt left) hEncPair
   have hLength : left.length = (pairCode left right).length :=
     congrArg List.length h.symm
   exact (Nat.ne_of_lt hLt) hLength
@@ -499,24 +495,23 @@ theorem pairCode_ne_left (left right : ModelLink) :
 theorem pairCode_ne_right (left right : ModelLink) :
     pairCode left right ≠ right := by
   intro h
-  have hAppend :
+  have hRightLe0 :
+      right.length ≤ right.length + (encodeLeft left).length :=
+    Nat.le_add_right right.length (encodeLeft left).length
+  have hRightLe :
       right.length ≤ (encodeLeft left ++ right).length := by
-    simpa only [List.length_append] using
-      (Nat.le_add_left right.length (encodeLeft left).length)
-  have hPrefix1 :
-      right.length < Nat.succ (encodeLeft left ++ right).length :=
-    Nat.lt_of_le_of_lt hAppend (Nat.lt_succ_self _)
-  have hPrefix2 :
-      Nat.succ (encodeLeft left ++ right).length <
+    simpa only [List.length_append, Nat.add_comm] using hRightLe0
+  have hLt :
+      right.length <
         Nat.succ (Nat.succ (encodeLeft left ++ right).length) :=
-    Nat.lt_succ_self _
-  have hLt : right.length < (pairCode left right).length := by
-    change right.length <
-      Nat.succ (Nat.succ (encodeLeft left ++ right).length)
-    exact Nat.lt_trans hPrefix1 hPrefix2
+    Nat.lt_trans
+      (Nat.lt_succ_of_le hRightLe)
+      (Nat.lt_succ_self (Nat.succ (encodeLeft left ++ right).length))
+  have hPairLt : right.length < (pairCode left right).length := by
+    simpa only [pairCode, List.length_cons] using hLt
   have hLength : right.length = (pairCode left right).length :=
     congrArg List.length h.symm
-  exact (Nat.ne_of_lt hLt) hLength
+  exact (Nat.ne_of_lt hPairLt) hLength
 
 /--
 If the left pole of a canonical form is the whole itself, the only possibilities
