@@ -429,6 +429,326 @@ theorem explicit_fnd13_replay
     ExplicitFoundation ExplicitGroundedNormalization gx gy
 
 /--
+Strict growth helpers for the host encodings. They establish uniqueness of the
+recursive fixed-point sections in this external model only.
+-/
+theorem startForm_ne_self (a : ModelLink) :
+    startForm a ≠ a := by
+  intro h
+  have hLength : a.length = (startForm a).length :=
+    congrArg List.length h.symm
+  have h1 : a.length < Nat.succ a.length :=
+    Nat.lt_succ_self a.length
+  have h2 : Nat.succ a.length < Nat.succ (Nat.succ a.length) :=
+    Nat.lt_succ_self (Nat.succ a.length)
+  have hLt : a.length < (startForm a).length := by
+    simpa [startForm] using Nat.lt_trans h1 h2
+  exact (Nat.ne_of_lt hLt) hLength
+
+theorem endForm_ne_self (a : ModelLink) :
+    endForm a ≠ a := by
+  intro h
+  have hLength : a.length = (endForm a).length :=
+    congrArg List.length h.symm
+  have h1 : a.length < Nat.succ a.length :=
+    Nat.lt_succ_self a.length
+  have h2 : Nat.succ a.length < Nat.succ (Nat.succ a.length) :=
+    Nat.lt_succ_self (Nat.succ a.length)
+  have hLt : a.length < (endForm a).length := by
+    simpa [endForm] using Nat.lt_trans h1 h2
+  exact (Nat.ne_of_lt hLt) hLength
+
+theorem encodeLeft_length_gt (a : ModelLink) :
+    a.length < (encodeLeft a).length := by
+  induction a with
+  | nil =>
+      simp [encodeLeft]
+  | cons bit tail ih =>
+      cases bit <;>
+        simpa [encodeLeft] using
+          Nat.lt_trans
+            (Nat.succ_lt_succ ih)
+            (Nat.lt_succ_self (Nat.succ (encodeLeft tail).length))
+
+theorem pairCode_ne_left (left right : ModelLink) :
+    pairCode left right ≠ left := by
+  intro h
+  have hAppendLe :
+      (encodeLeft left).length ≤ (encodeLeft left ++ right).length := by
+    simpa only [List.length_append] using
+      (Nat.le_add_right (encodeLeft left).length right.length)
+  have hPrefixLt :
+      (encodeLeft left).length <
+        Nat.succ (Nat.succ (encodeLeft left ++ right).length) :=
+    Nat.lt_trans
+      (Nat.lt_succ_of_le hAppendLe)
+      (Nat.lt_succ_self (Nat.succ (encodeLeft left ++ right).length))
+  have hEncPair :
+      (encodeLeft left).length < (pairCode left right).length := by
+    simpa only [pairCode, List.length_cons] using hPrefixLt
+  have hLt : left.length < (pairCode left right).length :=
+    Nat.lt_trans (encodeLeft_length_gt left) hEncPair
+  have hLength : left.length = (pairCode left right).length :=
+    congrArg List.length h.symm
+  exact (Nat.ne_of_lt hLt) hLength
+
+theorem pairCode_ne_right (left right : ModelLink) :
+    pairCode left right ≠ right := by
+  intro h
+  have hRightLe0 :
+      right.length ≤ right.length + (encodeLeft left).length :=
+    Nat.le_add_right right.length (encodeLeft left).length
+  have hRightLe :
+      right.length ≤ (encodeLeft left ++ right).length := by
+    simpa only [List.length_append, Nat.add_comm] using hRightLe0
+  have hLt :
+      right.length <
+        Nat.succ (Nat.succ (encodeLeft left ++ right).length) :=
+    Nat.lt_trans
+      (Nat.lt_succ_of_le hRightLe)
+      (Nat.lt_succ_self (Nat.succ (encodeLeft left ++ right).length))
+  have hPairLt : right.length < (pairCode left right).length := by
+    simpa only [pairCode, List.length_cons] using hLt
+  have hLength : right.length = (pairCode left right).length :=
+    congrArg List.length h.symm
+  exact (Nat.ne_of_lt hPairLt) hLength
+
+/--
+If the left pole of a canonical form is the whole itself, the only possibilities
+are ROOT or the dedicated START section. The END and generic PAIR branches
+cannot create an additional finite fixed point.
+-/
+theorem left_fixed_root_or_start
+    (a b : ModelLink)
+    (h : a = form a b) :
+    (a = root ∧ b = root) ∨ a = startForm b := by
+  by_cases hRoot : a = root ∧ b = root
+  · exact Or.inl hRoot
+  · by_cases hStart : a = startForm b
+    · exact Or.inr hStart
+    · by_cases hEnd : b = endForm a
+      · subst b
+        have hForm : form a (endForm a) = endForm a := by
+          simp [form, no_start_end_overlap, endForm_ne_root]
+        have hSelf : a = endForm a :=
+          h.trans hForm
+        exact False.elim (endForm_ne_self a hSelf.symm)
+      · have hPair : a = pairCode a b := by
+          simpa [form, hRoot, hStart, hEnd] using h
+        exact False.elim (pairCode_ne_left a b hPair.symm)
+
+/-- Symmetric uniqueness of the END fixed-point section. -/
+theorem right_fixed_root_or_end
+    (a b : ModelLink)
+    (h : b = form a b) :
+    (a = root ∧ b = root) ∨ b = endForm a := by
+  by_cases hRoot : a = root ∧ b = root
+  · exact Or.inl hRoot
+  · by_cases hStart : a = startForm b
+    · subst a
+      have hForm : form (startForm b) b = startForm b := by
+        simp [form, startForm_ne_root]
+      have hSelf : b = startForm b :=
+        h.trans hForm
+      exact False.elim (startForm_ne_self b hSelf.symm)
+    · by_cases hEnd : b = endForm a
+      · exact Or.inr hEnd
+      · have hPair : b = pairCode a b := by
+          simpa [form, hRoot, hStart, hEnd] using h
+        exact False.elim (pairCode_ne_right a b hPair.symm)
+
+theorem explicit_full_self_eq_root
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x)
+    (hFull : FullSelf ExplicitFoundation x) :
+    x = root := by
+  rcases grounded_is_canonical gx with ⟨a, b, hx⟩
+  have ha : a = x := by
+    calc
+      a = start (form a b) := (start_form a b).symm
+      _ = start x := by rw [hx]
+      _ = x := hFull.1
+  have hb : b = x := by
+    calc
+      b = finish (form a b) := (finish_form a b).symm
+      _ = finish x := by rw [hx]
+      _ = x := hFull.2
+  subst a
+  subst b
+  rcases left_fixed_root_or_start x x hx with hRoot | hStart
+  · exact hRoot.1
+  · exact False.elim (startForm_ne_self x hStart.symm)
+
+theorem explicit_start_only_shape
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x)
+    (hStart : StartOnly ExplicitFoundation x) :
+    x = startForm (finish x) := by
+  rcases grounded_is_canonical gx with ⟨a, b, hx⟩
+  have ha : a = x := by
+    calc
+      a = start (form a b) := (start_form a b).symm
+      _ = start x := by rw [hx]
+      _ = x := hStart.1
+  have hb : b = finish x := by
+    calc
+      b = finish (form a b) := (finish_form a b).symm
+      _ = finish x := by rw [hx]
+  subst a
+  subst b
+  rcases left_fixed_root_or_start x (finish x) hx with hRoot | hSection
+  · exact False.elim (hStart.2 (by
+      calc
+        finish x = root := hRoot.2
+        _ = x := hRoot.1.symm))
+  · exact hSection
+
+theorem explicit_finish_only_shape
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x)
+    (hFinish : FinishOnly ExplicitFoundation x) :
+    x = endForm (start x) := by
+  rcases grounded_is_canonical gx with ⟨a, b, hx⟩
+  have ha : a = start x := by
+    calc
+      a = start (form a b) := (start_form a b).symm
+      _ = start x := by rw [hx]
+  have hb : b = x := by
+    calc
+      b = finish (form a b) := (finish_form a b).symm
+      _ = finish x := by rw [hx]
+      _ = x := hFinish.2
+  subst a
+  subst b
+  rcases right_fixed_root_or_end (start x) x hx with hRoot | hSection
+  · exact False.elim (hFinish.1 (by
+      calc
+        start x = root := hRoot.1
+        _ = x := hRoot.2.symm))
+  · exact hSection
+
+theorem start_status_same_of_not_distinguishable
+    {x y : ModelLink}
+    (dx : StartSelf ExplicitFoundation x ∨ ¬ StartSelf ExplicitFoundation x)
+    (dy : StartSelf ExplicitFoundation y ∨ ¬ StartSelf ExplicitFoundation y)
+    (hNo : ¬ Distinguishable ExplicitFoundation x y) :
+    (StartSelf ExplicitFoundation x ∧ StartSelf ExplicitFoundation y) ∨
+    (¬ StartSelf ExplicitFoundation x ∧ ¬ StartSelf ExplicitFoundation y) := by
+  rcases dx with hx | hx <;> rcases dy with hy | hy
+  · exact Or.inl ⟨hx, hy⟩
+  · exact False.elim (hNo (Distinguishable.startSelfLeft hx hy))
+  · exact False.elim (hNo (Distinguishable.startSelfRight hx hy))
+  · exact Or.inr ⟨hx, hy⟩
+
+theorem finish_status_same_of_not_distinguishable
+    {x y : ModelLink}
+    (dx : FinishSelf ExplicitFoundation x ∨ ¬ FinishSelf ExplicitFoundation x)
+    (dy : FinishSelf ExplicitFoundation y ∨ ¬ FinishSelf ExplicitFoundation y)
+    (hNo : ¬ Distinguishable ExplicitFoundation x y) :
+    (FinishSelf ExplicitFoundation x ∧ FinishSelf ExplicitFoundation y) ∨
+    (¬ FinishSelf ExplicitFoundation x ∧ ¬ FinishSelf ExplicitFoundation y) := by
+  rcases dx with hx | hx <;> rcases dy with hy | hy
+  · exact Or.inl ⟨hx, hy⟩
+  · exact False.elim (hNo (Distinguishable.finishSelfLeft hx hy))
+  · exact False.elim (hNo (Distinguishable.finishSelfRight hx hy))
+  · exact Or.inr ⟨hx, hy⟩
+
+/--
+Concrete discharge of A1 on the explicit infinite model.
+
+No host extensionality axiom is added. Absence of finite Distinguishable
+evidence synchronizes the two local self-incidence bits; the external poles
+then recurse through the finite Grounded proof. START/END fixed-point
+uniqueness is supplied by the explicit host encoding, and PAIR closes through
+the independently constructed Grounded normalization / FND-13 replay.
+-/
+theorem explicit_a1 :
+    A1RecursiveSeparation ExplicitFoundation := by
+  intro x y gx gy hNo
+  induction gx generalizing y with
+  | @node current startStep finishStep ihStart ihFinish =>
+      rcases explicit_local_decision current with ⟨dxStart, dxFinish⟩
+      rcases explicit_local_decision y with ⟨dyStart, dyFinish⟩
+      have hStartStatus :=
+        start_status_same_of_not_distinguishable dxStart dyStart hNo
+      have hFinishStatus :=
+        finish_status_same_of_not_distinguishable dxFinish dyFinish hNo
+      rcases hStartStatus with ⟨hxStart, hyStart⟩ | ⟨hxNotStart, hyNotStart⟩
+      · rcases hFinishStatus with ⟨hxFinish, hyFinish⟩ | ⟨hxNotFinish, hyNotFinish⟩
+        · have gxCurrent : Grounded ExplicitFoundation current :=
+            Grounded.node startStep finishStep
+          have hxRoot :=
+            explicit_full_self_eq_root gxCurrent ⟨hxStart, hxFinish⟩
+          have hyRoot :=
+            explicit_full_self_eq_root gy ⟨hyStart, hyFinish⟩
+          exact hxRoot.trans hyRoot.symm
+        · have gxCurrent : Grounded ExplicitFoundation current :=
+            Grounded.node startStep finishStep
+          have gyFinish :=
+            grounded_finish_of_nonself ExplicitFoundation gy hyNotFinish
+          have hChildNo :
+              ¬ Distinguishable ExplicitFoundation
+                (finish current) (finish y) := by
+            intro hChild
+            exact hNo
+              (Distinguishable.finishChild hxNotFinish hyNotFinish hChild)
+          have hFinishEq :=
+            ihFinish hxNotFinish gyFinish hChildNo
+          have hxShape :=
+            explicit_start_only_shape gxCurrent ⟨hxStart, hxNotFinish⟩
+          have hyShape :=
+            explicit_start_only_shape gy ⟨hyStart, hyNotFinish⟩
+          calc
+            current = startForm (finish current) := hxShape
+            _ = startForm (finish y) := congrArg startForm hFinishEq
+            _ = y := hyShape.symm
+      · rcases hFinishStatus with ⟨hxFinish, hyFinish⟩ | ⟨hxNotFinish, hyNotFinish⟩
+        · have gxCurrent : Grounded ExplicitFoundation current :=
+            Grounded.node startStep finishStep
+          have gyStart :=
+            grounded_start_of_nonself ExplicitFoundation gy hyNotStart
+          have hChildNo :
+              ¬ Distinguishable ExplicitFoundation
+                (start current) (start y) := by
+            intro hChild
+            exact hNo
+              (Distinguishable.startChild hxNotStart hyNotStart hChild)
+          have hStartEq :=
+            ihStart hxNotStart gyStart hChildNo
+          have hxShape :=
+            explicit_finish_only_shape gxCurrent ⟨hxNotStart, hxFinish⟩
+          have hyShape :=
+            explicit_finish_only_shape gy ⟨hyNotStart, hyFinish⟩
+          calc
+            current = endForm (start current) := hxShape
+            _ = endForm (start y) := congrArg endForm hStartEq
+            _ = y := hyShape.symm
+        · have gxCurrent : Grounded ExplicitFoundation current :=
+            Grounded.node startStep finishStep
+          have gyStart :=
+            grounded_start_of_nonself ExplicitFoundation gy hyNotStart
+          have gyFinish :=
+            grounded_finish_of_nonself ExplicitFoundation gy hyNotFinish
+          have hStartChildNo :
+              ¬ Distinguishable ExplicitFoundation
+                (start current) (start y) := by
+            intro hChild
+            exact hNo
+              (Distinguishable.startChild hxNotStart hyNotStart hChild)
+          have hFinishChildNo :
+              ¬ Distinguishable ExplicitFoundation
+                (finish current) (finish y) := by
+            intro hChild
+            exact hNo
+              (Distinguishable.finishChild hxNotFinish hyNotFinish hChild)
+          have hStartEq :=
+            ihStart hxNotStart gyStart hStartChildNo
+          have hFinishEq :=
+            ihFinish hxNotFinish gyFinish hFinishChildNo
+          exact (explicit_fnd13_replay gxCurrent gy).2
+            ⟨hStartEq, hFinishEq⟩
+
+/--
 Explicit finite Grounded witness slice inside the infinite ambient carrier.
 -/
 theorem explicit_grounded_slice :
