@@ -1158,4 +1158,197 @@ Proof.
   now injection Hlen.
 Qed.
 
+
+(*
+#1797 cyclic-boundary witness.
+
+The existing fallback values form a genuine two-Link semantic pole cycle.
+Finite inductive FND-05 descriptions cannot derive either endpoint. This
+falsifies all-Link totality, while recursive_description_functional remains
+globally valid whenever derivations actually exist.
+*)
+Theorem fallback_cycle_no_recursive_description :
+  forall (x : ModelLink) (code : RecursiveDescriptionCode),
+    CanonicalRecursiveDescription ExplicitFoundation x code ->
+    (x = model_bad_start \/ x = model_bad_finish) ->
+    False.
+Proof.
+  intros x code H.
+  induction H as
+    [ | x child HStart HChild IH
+      | x child HFinish HChild IH
+      | x startCode finishCode HPair HStartChild IHStart HFinishChild IHFinish ];
+    intros Hbad.
+  - destruct Hbad as [Hbad | Hbad]; discriminate Hbad.
+  - destruct Hbad as [Hbad | Hbad].
+    + subst x.
+      apply IH.
+      right.
+      change (model_finish model_bad_start = model_bad_finish).
+      apply model_finish_bad_start.
+    + subst x.
+      apply (proj2 HStart).
+      unfold FinishSelf.
+      change (model_finish model_bad_finish = model_bad_finish).
+      apply model_finish_bad_finish.
+  - destruct Hbad as [Hbad | Hbad].
+    + subst x.
+      apply (proj1 HFinish).
+      unfold StartSelf.
+      change (model_start model_bad_start = model_bad_start).
+      apply model_start_bad_start.
+    + subst x.
+      apply IH.
+      left.
+      change (model_start model_bad_finish = model_bad_start).
+      apply model_start_bad_finish.
+  - destruct Hbad as [Hbad | Hbad].
+    + subst x.
+      apply (proj1 HPair).
+      unfold StartSelf.
+      change (model_start model_bad_start = model_bad_start).
+      apply model_start_bad_start.
+    + subst x.
+      apply (proj2 HPair).
+      unfold FinishSelf.
+      change (model_finish model_bad_finish = model_bad_finish).
+      apply model_finish_bad_finish.
+Qed.
+
+Theorem model_bad_start_no_recursive_description :
+  ~ exists code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription ExplicitFoundation
+        model_bad_start code.
+Proof.
+  intros [code H].
+  apply (fallback_cycle_no_recursive_description model_bad_start code H).
+  left. reflexivity.
+Qed.
+
+Theorem model_bad_finish_no_recursive_description :
+  ~ exists code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription ExplicitFoundation
+        model_bad_finish code.
+Proof.
+  intros [code H].
+  apply (fallback_cycle_no_recursive_description model_bad_finish code H).
+  right. reflexivity.
+Qed.
+
+(*
+The same cycle has no finite RecursiveInversion derivation. The generic
+recursive_inversion_functional theorem remains valid whenever two derivations
+exist; the counterexample is totality/existence only.
+*)
+Theorem fallback_cycle_no_recursive_inversion :
+  forall (x y : ModelLink),
+    RecursiveInversion
+      ExplicitFoundation ExplicitOneSided ExplicitInversionDomain x y ->
+    (x = model_bad_start \/ x = model_bad_finish) ->
+    False.
+Proof.
+  intros x y H.
+  induction H as
+    [ | x childInverse HStart HChild IH
+      | x childInverse HFinish HChild IH
+      | x inverseFinish inverseStart HPair HFinishInv IHFinish HStartInv IHStart ];
+    intros Hbad.
+  - destruct Hbad as [Hbad | Hbad]; discriminate Hbad.
+  - destruct Hbad as [Hbad | Hbad].
+    + subst x.
+      apply IH.
+      right.
+      change (model_finish model_bad_start = model_bad_finish).
+      apply model_finish_bad_start.
+    + subst x.
+      apply (proj2 HStart).
+      unfold FinishSelf.
+      change (model_finish model_bad_finish = model_bad_finish).
+      apply model_finish_bad_finish.
+  - destruct Hbad as [Hbad | Hbad].
+    + subst x.
+      apply (proj1 HFinish).
+      unfold StartSelf.
+      change (model_start model_bad_start = model_bad_start).
+      apply model_start_bad_start.
+    + subst x.
+      apply IH.
+      left.
+      change (model_start model_bad_finish = model_bad_start).
+      apply model_start_bad_finish.
+  - destruct Hbad as [Hbad | Hbad].
+    + subst x.
+      apply (proj1 HPair).
+      unfold StartSelf.
+      change (model_start model_bad_start = model_bad_start).
+      apply model_start_bad_start.
+    + subst x.
+      apply (proj2 HPair).
+      unfold FinishSelf.
+      change (model_finish model_bad_finish = model_bad_finish).
+      apply model_finish_bad_finish.
+Qed.
+
+Theorem model_bad_start_no_recursive_inverse :
+  ~ exists y : ModelLink,
+      RecursiveInversion
+        ExplicitFoundation ExplicitOneSided ExplicitInversionDomain
+        model_bad_start y.
+Proof.
+  intros [y H].
+  apply (fallback_cycle_no_recursive_inversion model_bad_start y H).
+  left. reflexivity.
+Qed.
+
+Theorem model_bad_finish_no_recursive_inverse :
+  ~ exists y : ModelLink,
+      RecursiveInversion
+        ExplicitFoundation ExplicitOneSided ExplicitInversionDomain
+        model_bad_finish y.
+Proof.
+  intros [y H].
+  apply (fallback_cycle_no_recursive_inversion model_bad_finish y H).
+  right. reflexivity.
+Qed.
+
+(*
+Sharing control for #1797.
+
+The same Grounded semantic child is used on both poles of one parent. This is
+still Grounded and therefore demonstrates that repeated/shared substructure is
+not the same obstruction as a true distinct-node non-well-founded cycle.
+Physical pointer/heap sharing remains outside this proof boundary.
+*)
+Definition shared_grounded_child : ModelLink :=
+  f2f3_start_root ExplicitFoundation ExplicitOneSided.
+
+Definition shared_grounded_parent : ModelLink :=
+  form ExplicitFoundation shared_grounded_child shared_grounded_child.
+
+Theorem shared_grounded_parent_start :
+  start ExplicitFoundation shared_grounded_parent =
+  shared_grounded_child.
+Proof.
+  unfold shared_grounded_parent.
+  apply form_start.
+Qed.
+
+Theorem shared_grounded_parent_finish :
+  finish ExplicitFoundation shared_grounded_parent =
+  shared_grounded_child.
+Proof.
+  unfold shared_grounded_parent.
+  apply form_finish.
+Qed.
+
+Theorem shared_grounded_parent_grounded :
+  Grounded ExplicitFoundation shared_grounded_parent.
+Proof.
+  unfold shared_grounded_parent, shared_grounded_child.
+  apply recursive_pair_grounded.
+  - apply f2f3_start_root_grounded.
+  - apply f2f3_start_root_grounded.
+Qed.
+
+
 End Model1796.
