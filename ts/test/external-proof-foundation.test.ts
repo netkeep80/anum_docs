@@ -726,8 +726,14 @@ for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
       ? "theorem recursive_inversion_source_grounded"
       : "Lemma recursive_inversion_source_grounded",
   );
-  assert(inv02Start >= 0, `${label} INV-02 proof region exists`);
-  const region = source.slice(inv02Start);
+  const inv02End = source.indexOf(
+    label === "Lean"
+      ? "theorem INV_03_root_fixed"
+      : "Theorem INV_03_root_fixed",
+    inv02Start,
+  );
+  assert(inv02Start >= 0 && inv02End > inv02Start, `${label} INV-02 proof region exists`);
+  const region = source.slice(inv02Start, inv02End);
   for (const forbidden of [
     "ExactSequence",
     "canonicalWire",
@@ -1069,6 +1075,87 @@ assert(
   "FND-07 is proved rather than postulated",
 );
 
+const fnd05 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-05");
+assert(fnd05 !== undefined, "P0 contains FND-05");
+same(
+  JSON.stringify(fnd05.assumptions),
+  JSON.stringify(["FND-01", "FND-02", "declared finite recursive carrier domain"]),
+  "FND-05 assumptions remain exactly FND-01/FND-02/declared finite carrier",
+);
+same(
+  JSON.stringify(fnd05.dependsOn),
+  JSON.stringify(["FND-01", "FND-02"]),
+  "FND-05 dependencies remain exactly FND-01/FND-02",
+);
+assert(
+  /finite ROOT-decomposable carrier domain/i.test(String(fnd05.statement)),
+  "FND-05 statement remains restricted to the finite ROOT-decomposable domain",
+);
+assert(
+  /non-well-founded.*cycles/i.test(String(fnd05.exclusions)) &&
+    /Anum\/Q identity/i.test(String(fnd05.exclusions)),
+  "FND-05 keeps cycle and sequential identity exclusions explicit",
+);
+
+for (const [label, source, marker] of [
+  ["Lean", lean, "FND-05 external proof projection"],
+  ["Rocq", rocq, "FND-05 external proof projection"],
+] as const) {
+  const start = source.indexOf(marker);
+  assert(start >= 0, label + " contains FND-05 external projection");
+  const region = source.slice(start);
+  for (const symbol of [
+    "RecursiveDescriptionCode",
+    "FiniteRecursiveCarrierDecision",
+    "CanonicalRecursiveDescription",
+    "FND_05_recursive_description_total",
+    "recursive_description_functional",
+    "FND_05_canonical_recursive_description_unique",
+  ]) {
+    assert(region.includes(symbol), label + " FND-05 contains " + symbol);
+  }
+  assert(
+    region.includes("EXTERNAL THEORY PROJECTION NOTE") &&
+      region.includes("host inductive proof syntax"),
+    label + " FND-05 marks the recursive code as prover-side syntax",
+  );
+  assert(
+    /not[\s\S]{0,80}MTS ontology[\s\S]{0,40}datatype/i.test(region) &&
+      /not[\s\S]{0,80}Anum\/Q[\s\S]{0,40}carrier/i.test(region),
+    label + " FND-05 forbids host recursive code from becoming MTS ontology",
+  );
+  assert(
+    region.includes("no additional external mathematical theory") ||
+      region.includes("No additional external mathematical theory"),
+    label + " FND-05 introduces no undeclared external mathematical theory",
+  );
+  assert(
+    region.includes("Grounded"),
+    label + " FND-05 remains on the finite Grounded carrier",
+  );
+  assert(
+    region.includes("FND_02_unique_root"),
+    label + " FND-05 consumes established unique ROOT",
+  );
+  assert(
+    !region.includes("ExactSequence"),
+    label + " FND-05 does not import ExactSequence identity",
+  );
+  assert(
+    !region.includes("canonicalWire"),
+    label + " FND-05 does not use implementation wire spelling as semantic authority",
+  );
+}
+assert(
+  !lean.includes("axiom FND_05") && !rocq.includes("Axiom FND_05"),
+  "FND-05 is proved rather than postulated",
+);
+assert(
+  !lean.includes("structure RecursiveDescriptionCode") &&
+    !rocq.includes("Record RecursiveDescriptionCode"),
+  "FND-05 proof code is not disguised as a record carrying semantic authority",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -1110,7 +1197,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=17",
+  "THEOREM_PROOF_CLAIMS=18",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -1162,6 +1249,11 @@ console.log([
   "FND07_AMBIENT_EXISTENCE_AUTHORITY=NONE",
   "FND07_TRUTH_VALUE=L",
   "FND07_HOST_SET_MEMBERSHIP=NONE",
+  "FND05_DOMAIN=FINITE_GROUNDED_ROOT_DECOMPOSABLE",
+  "FND05_CANONICAL_DESCRIPTION=UNIQUE",
+  "FND05_HOST_CODE=EXTERNAL_PROJECTION_ONLY",
+  "FND05_GENERAL_CYCLES=EXCLUDED",
+  "FND05_ANUM_Q_IDENTITY=EXCLUDED",
   "CTX03_J_TRANSPORT=INV07_DERIVED",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",

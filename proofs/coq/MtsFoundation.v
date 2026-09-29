@@ -2943,3 +2943,229 @@ Proof.
         exact HNotCurrent.
     + reflexivity.
 Qed.
+
+
+(* FND-05 external proof projection of the accepted finite recursive Link
+   codec.
+
+   EXTERNAL THEORY PROJECTION NOTE:
+   RecursiveDescriptionCode is a host inductive proof syntax used only by
+   Rocq. It mirrors the recursive structural grammar ROOT /
+   one-sided-start / one-sided-finish / PAIR, but it is not an MTS ontology
+   datatype, not an Anum/Q carrier, and not semantic authority.
+
+   No additional external mathematical theory is introduced here beyond the
+   already-declared constructive inductive/propositional host proof methods. *)
+Inductive RecursiveDescriptionCode : Type :=
+| recursive_description_root : RecursiveDescriptionCode
+| recursive_description_start_self :
+    RecursiveDescriptionCode -> RecursiveDescriptionCode
+| recursive_description_finish_self :
+    RecursiveDescriptionCode -> RecursiveDescriptionCode
+| recursive_description_pair :
+    RecursiveDescriptionCode ->
+    RecursiveDescriptionCode ->
+    RecursiveDescriptionCode.
+
+(* The declared finite recursive carrier supplies only the exact local
+   self-incidence decisions required to read the structural grammar on a
+   Grounded Link. Finiteness itself remains in the Grounded proof object. *)
+Definition FiniteRecursiveCarrierDecision (F : Foundation) : Prop :=
+  forall x : Link F,
+    Grounded F x ->
+    LocalSelfDecision F x.
+
+(* Relational interpretation of one external recursive proof code as one Link.
+   These constructors are proof rules over existing Link structure, not a
+   second native MTS entity. *)
+Inductive CanonicalRecursiveDescription
+    (F : Foundation) :
+    Link F -> RecursiveDescriptionCode -> Prop :=
+| canonical_recursive_description_root :
+    CanonicalRecursiveDescription F
+      (R F)
+      recursive_description_root
+| canonical_recursive_description_start_self :
+    forall (x : Link F) (child : RecursiveDescriptionCode),
+      StartOnly F x ->
+      CanonicalRecursiveDescription F (finish F x) child ->
+      CanonicalRecursiveDescription F x
+        (recursive_description_start_self child)
+| canonical_recursive_description_finish_self :
+    forall (x : Link F) (child : RecursiveDescriptionCode),
+      FinishOnly F x ->
+      CanonicalRecursiveDescription F (start F x) child ->
+      CanonicalRecursiveDescription F x
+        (recursive_description_finish_self child)
+| canonical_recursive_description_pair :
+    forall (x : Link F)
+      (startCode finishCode : RecursiveDescriptionCode),
+      PairLocal F x ->
+      CanonicalRecursiveDescription F (start F x) startCode ->
+      CanonicalRecursiveDescription F (finish F x) finishCode ->
+      CanonicalRecursiveDescription F x
+        (recursive_description_pair startCode finishCode).
+
+(* Every Link in the declared finite ROOT-decomposable carrier has a recursive
+   description. This consumes the proposition-level FND-01 four-way partition
+   and FND-02 unique ROOT only. *)
+Theorem FND_05_recursive_description_total
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (D : FiniteRecursiveCarrierDecision F)
+    (x : Link F) :
+    Grounded F x ->
+    exists code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription F x code.
+Proof.
+  intros G.
+  induction G as [x StartStep IHStart FinishStep IHFinish].
+  pose proof
+    (D x (grounded_node F x StartStep FinishStep))
+    as Decision.
+  pose proof
+    (local_self_incidence_exhaustive F x Decision)
+    as Cases.
+  destruct Cases as [HFull | [HStart | [HFinish | HPair]]].
+  - pose proof (FND_02_unique_root F A1 x HFull) as HRoot.
+    subst x.
+    exists recursive_description_root.
+    apply canonical_recursive_description_root.
+  - destruct (IHFinish (proj2 HStart)) as [child HChild].
+    exists (recursive_description_start_self child).
+    apply canonical_recursive_description_start_self.
+    + exact HStart.
+    + exact HChild.
+  - destruct (IHStart (proj1 HFinish)) as [child HChild].
+    exists (recursive_description_finish_self child).
+    apply canonical_recursive_description_finish_self.
+    + exact HFinish.
+    + exact HChild.
+  - destruct (IHStart (proj1 HPair)) as [startCode HStartChild].
+    destruct (IHFinish (proj2 HPair)) as [finishCode HFinishChild].
+    exists (recursive_description_pair startCode finishCode).
+    apply canonical_recursive_description_pair.
+    + exact HPair.
+    + exact HStartChild.
+    + exact HFinishChild.
+Qed.
+
+(* One Link cannot have two different canonical recursive descriptions on the
+   declared structural grammar. *)
+Theorem recursive_description_functional
+    (F : Foundation) :
+    forall (x : Link F)
+      (left right : RecursiveDescriptionCode),
+      CanonicalRecursiveDescription F x left ->
+      CanonicalRecursiveDescription F x right ->
+      left = right.
+Proof.
+  intros x left right HLeft.
+  revert right.
+  induction HLeft as
+    [ | x child HStart HChild IH
+      | x child HFinish HChild IH
+      | x startCode finishCode HPair HStartChild IHStart HFinishChild IHFinish ];
+    intros right HRight.
+  - inversion HRight; subst.
+    + reflexivity.
+    + exfalso.
+      eapply recursive_full_start_disjoint.
+      * apply root_full_self.
+      * eassumption.
+    + exfalso.
+      eapply recursive_full_finish_disjoint.
+      * apply root_full_self.
+      * eassumption.
+    + exfalso.
+      eapply recursive_full_pair_disjoint.
+      * apply root_full_self.
+      * eassumption.
+  - inversion HRight; subst.
+    + exfalso.
+      eapply recursive_full_start_disjoint.
+      * apply root_full_self.
+      * exact HStart.
+    + apply f_equal.
+      apply IH.
+      assumption.
+    + exfalso.
+      eapply recursive_start_finish_disjoint.
+      * exact HStart.
+      * eassumption.
+    + exfalso.
+      eapply recursive_start_pair_disjoint.
+      * exact HStart.
+      * eassumption.
+  - inversion HRight; subst.
+    + exfalso.
+      eapply recursive_full_finish_disjoint.
+      * apply root_full_self.
+      * exact HFinish.
+    + exfalso.
+      eapply recursive_start_finish_disjoint.
+      * eassumption.
+      * exact HFinish.
+    + apply f_equal.
+      apply IH.
+      assumption.
+    + exfalso.
+      eapply recursive_finish_pair_disjoint.
+      * exact HFinish.
+      * eassumption.
+  - inversion HRight; subst.
+    + exfalso.
+      eapply recursive_full_pair_disjoint.
+      * apply root_full_self.
+      * exact HPair.
+    + exfalso.
+      eapply recursive_start_pair_disjoint.
+      * eassumption.
+      * exact HPair.
+    + exfalso.
+      eapply recursive_finish_pair_disjoint.
+      * eassumption.
+      * exact HPair.
+    + assert (HS : startCode = startCode0).
+      {
+        apply IHStart.
+        assumption.
+      }
+      assert (HF : finishCode = finishCode0).
+      {
+        apply IHFinish.
+        assumption.
+      }
+      rewrite HS, HF.
+      reflexivity.
+Qed.
+
+(* FND-05 capstone: canonical recursive structural description exists uniquely
+   on the explicitly declared finite ROOT-decomposable carrier domain.
+
+   This does not extend to arbitrary non-well-founded distinct-node cycles and
+   says nothing about sequential Anum/Q identity. *)
+Theorem FND_05_canonical_recursive_description_unique
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (D : FiniteRecursiveCarrierDecision F)
+    (x : Link F) :
+    Grounded F x ->
+    exists code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription F x code /\
+      forall other : RecursiveDescriptionCode,
+        CanonicalRecursiveDescription F x other ->
+        other = code.
+Proof.
+  intros G.
+  destruct
+    (FND_05_recursive_description_total F A1 D x G)
+    as [code HCode].
+  exists code.
+  split.
+  - exact HCode.
+  - intros other HOther.
+    exact
+      (recursive_description_functional
+        F x other code HOther HCode).
+Qed.
