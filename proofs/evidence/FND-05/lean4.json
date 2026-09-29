@@ -1,0 +1,36 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-05",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "FND-01",
+    "FND-02",
+    "declared finite recursive carrier domain"
+  ],
+  "dependencies": [
+    "FND-01",
+    "FND-02"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "lean4",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "284921e3e23ebfe7f3bf692c5adfe0142d412a39",
+    "toolchain": {
+      "name": "Lean",
+      "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/lean4/MtsFoundation.lean",
+      "sha256": "ef8d71ac448dfd8398a4614e5aab3cda65fc44bd9371a8c7891764327b40a0f4"
+    }
+  ],
+  "notes": "External differential proof only. FND-05 proves unique canonical recursive structural description on the explicitly declared finite Grounded / ROOT-decomposable carrier domain. RecursiveDescriptionCode is prover-side inductive proof syntax mirroring ROOT/one-sided-start/one-sided-finish/PAIR and is not MTS ontology, not a second native entity, not Anum/Q, not ExactSequence, and not implementation wire authority. No additional external mathematical theory is introduced beyond the declared Lean/Rocq constructive inductive/propositional host foundations. Arbitrary non-well-founded distinct-node cycles and sequential Anum/Q identity remain explicitly outside this theorem's scope."
+}
