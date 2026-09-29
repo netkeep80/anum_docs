@@ -858,6 +858,97 @@ for (const record of ctx03) {
   );
 }
 
+const fnd07 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-07")
+  .map(({ record }) => record);
+assert.equal(fnd07.length, 2, "FND-07 has exactly two external evidence records");
+assert.deepEqual(
+  fnd07.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "FND-07 external lanes",
+);
+for (const record of fnd07) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "64a0109002a0c5158db4c173e0288d03c2357906",
+    "FND-07 " + record.lane + " proof source commit",
+  );
+  assert.deepEqual(
+    record.assumptions,
+    ["accepted contextual truth semantics"],
+    "FND-07 assumptions preserve the P0 semantic boundary",
+  );
+  assert.deepEqual(
+    record.dependencies,
+    [],
+    "FND-07 has no theorem dependency",
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "FND-07 Lean evidence keeps exact compiler/artifact pins",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "FND-07 Rocq evidence keeps exact compiler/image pins",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /root truth-value aspect L.*O->C|O->C.*root truth-value aspect L/i,
+    "FND-07 evidence ties L to the root-basis O->C carrier",
+  );
+  assert.match(
+    String(record.notes),
+    /accepted A16\/V14-L11 semantic premise/i,
+    "FND-07 evidence marks the truth role as an accepted semantic premise",
+  );
+  assert.match(
+    String(record.notes),
+    /K->A.*current|current Link K->A/i,
+    "FND-07 evidence records the Context-specific current truth witness",
+  );
+  assert.match(
+    String(record.notes),
+    /ambient structural existence alone is not truth in Context/i,
+    "FND-07 evidence separates ambient existence from contextual truth",
+  );
+  assert.match(
+    String(record.notes),
+    /K->A current.*A->B current.*K->B current/i,
+    "FND-07 evidence records accepted A16 contextual detachment",
+  );
+  assert.match(
+    String(record.notes),
+    /same ambient proposition A.*different truth status.*distinct Contexts/i,
+    "FND-07 evidence records Context-relative truth status",
+  );
+  assert.match(
+    String(record.notes),
+    /No universal structural disequality L != K->A/i,
+    "FND-07 evidence preserves semantic-role rather than structural-disequality distinction",
+  );
+  assert.match(
+    String(record.notes),
+    /host Prop-valued proof projections only/i,
+    "FND-07 evidence marks host predicates as external proof projection",
+  );
+  assert.match(
+    String(record.notes),
+    /no Set\/Bool\/map\/environment.*truth authority/i,
+    "FND-07 evidence excludes host collection truth authority",
+  );
+  assert.match(
+    String(record.notes),
+    /No additional external mathematical theory is introduced/i,
+    "FND-07 evidence declares no extra external mathematical theory",
+  );
+}
+
 const fnd05 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-05")
   .map(({ record }) => record);
