@@ -746,6 +746,97 @@ for (const record of fnd05) {
   );
 }
 
+const fnd11 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-11")
+  .map(({ record }) => record);
+assert.equal(fnd11.length, 2, "FND-11 has exactly two external evidence records");
+assert.deepEqual(
+  fnd11.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "FND-11 external lanes",
+);
+for (const record of fnd11) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "ce5faa19423feaf892abaa83d1ecdb2d56662e6a",
+    "FND-11 " + record.lane + " proof source commit",
+  );
+  assert.deepEqual(
+    record.assumptions,
+    ["accepted v0.14 representation-layer definitions"],
+    "FND-11 assumptions preserve the P0 boundary",
+  );
+  assert.deepEqual(
+    record.dependencies,
+    ["FND-05"],
+    "FND-11 dependency remains exactly FND-05",
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "FND-11 Lean evidence keeps exact compiler/artifact pins",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "FND-11 Rocq evidence keeps exact compiler/image pins",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /FND-05.*sole theorem dependency|sole theorem dependency.*FND-05/i,
+    "FND-11 evidence records its exact theorem dependency",
+  );
+  assert.match(
+    String(record.notes),
+    /recursive Link codec identity.*Anum|Anum.*recursive Link codec identity/i,
+    "FND-11 evidence records recursive-codec versus Anum target separation",
+  );
+  assert.match(
+    String(record.notes),
+    /ExactSequence positional identity.*fold denotation/i,
+    "FND-11 evidence records the exact-sequence/fold boundary",
+  );
+  assert.match(
+    String(record.notes),
+    /Q source identity.*versioned denotation/i,
+    "FND-11 evidence records the Q source/denotation boundary",
+  );
+  assert.match(
+    String(record.notes),
+    /every projected local sequence origin is R/i,
+    "FND-11 evidence records the root-origin law",
+  );
+  assert.match(
+    String(record.notes),
+    /views\/predicates over Link|predicates over Link/i,
+    "FND-11 evidence preserves one-Link ontology",
+  );
+  assert.match(
+    String(record.notes),
+    /No additional external mathematical theory/i,
+    "FND-11 evidence declares no extra external mathematical theory",
+  );
+  assert.match(
+    String(record.notes),
+    /no global recursive-structure\/Q isomorphism/i,
+    "FND-11 evidence preserves the no-global-isomorphism exclusion",
+  );
+  assert.match(
+    String(record.notes),
+    /no representation-strength ranking/i,
+    "FND-11 evidence preserves the no-ranking exclusion",
+  );
+  assert.match(
+    String(record.notes),
+    /not.*MTS ontology|no host representation classifier is promoted into MTS ontology/i,
+    "FND-11 evidence preserves the no-backflow boundary",
+  );
+}
+
 const leanEvidence = fnd02.find((record) => record.lane === "lean4");
 const coqEvidence = fnd02.find((record) => record.lane === "coq");
 assert.ok(leanEvidence !== undefined && coqEvidence !== undefined);
@@ -767,5 +858,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq fnd05=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq fnd05=lean4+coq fnd11=lean4+coq aprover-input=mtsNative-only`,
 );
