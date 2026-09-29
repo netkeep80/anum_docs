@@ -1,3 +1,16 @@
+/-
+EXTERNAL PROJECTION BOUNDARY
+
+This file is a prover-side projection of MTS into Lean's metalanguage.
+Lean vocabulary such as Type, Prop, structure, inductive, and theorem is
+verification machinery only; it is not MTS ontology, native notation, or
+semantic authority.
+
+External proof constructs may expose hidden assumptions or falsifiers, but
+they must not leak back into MTS as ontology or axioms unless MTS derives the
+corresponding structure internally.
+-/
+
 namespace MTS.External
 
 /--
