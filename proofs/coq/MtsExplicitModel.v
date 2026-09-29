@@ -103,10 +103,8 @@ Proof.
 Qed.
 
 Definition link_eq_dec :
-  forall lhs rhs : ModelLink, {lhs = rhs} + {lhs <> rhs}.
-Proof.
-  decide equality.
-Defined.
+  forall lhs rhs : ModelLink, {lhs = rhs} + {lhs <> rhs} :=
+  list_eq_dec Bool.bool_dec.
 
 Definition nonroot_form (a b : ModelLink) : ModelLink :=
   if link_eq_dec a (model_start_form b) then
