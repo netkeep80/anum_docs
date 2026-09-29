@@ -48,10 +48,18 @@
     {
       "id": "FND-07",
       "lean4": [
-        "MTS.External.FND_07_contextual_truth_boundary"
+        "MTS.External.FND_07_contextual_truth_boundary",
+        "MTS.External.FND_07_root_truth_aspect_L",
+        "MTS.External.FND_07_contextual_detachment",
+        "MTS.External.FND_07_context_relative_truth_status",
+        "MTS.External.FND_07_semantic_truth_capstone"
       ],
       "rocq": [
-        "FND_07_contextual_truth_boundary"
+        "FND_07_contextual_truth_boundary",
+        "FND_07_root_truth_aspect_L",
+        "FND_07_contextual_detachment",
+        "FND_07_context_relative_truth_status",
+        "FND_07_semantic_truth_capstone"
       ]
     },
     {
