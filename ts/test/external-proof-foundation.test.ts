@@ -759,6 +759,55 @@ assert(
   "INV-05 does not add a pair-preservation field to the inversion domain",
 );
 
+const inv06 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-06");
+assert(inv06 !== undefined, "P0 contains INV-06");
+assert.deepEqual(
+  inv06.assumptions,
+  ["INV-03", "INV-04", "INV-05"],
+  "INV-06 assumptions remain exactly the supporting inversion theorems",
+);
+assert.deepEqual(
+  inv06.dependsOn,
+  ["INV-03", "INV-04", "INV-05"],
+  "INV-06 dependencies remain exactly INV-03/04/05",
+);
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  assert(
+    source.includes("f2f3_reverse_pair_pattern"),
+    `${label} derives mirror C->O as an ordinary PAIR`,
+  );
+  assert(source.includes("INV_06_root_basis"), `${label} contains INV-06 capstone`);
+  const start = source.indexOf(
+    label === "Lean" ? "theorem INV_06_root_basis" : "Theorem INV_06_root_basis",
+  );
+  assert(start >= 0, `${label} INV-06 region exists`);
+  const region = source.slice(start);
+  for (const support of [
+    "INV_03_root_fixed",
+    "INV_04_start_to_finish",
+    "INV_04_finish_to_start",
+    "INV_05_pair_preserved_and_reversed",
+  ]) {
+    assert(region.includes(support), `${label} INV-06 explicitly consumes ${support}`);
+  }
+  assert(
+    region.includes("startRoot") || region.includes("f2f3_start_root"),
+    `${label} O is the selected START-side F2/F3 representative`,
+  );
+  assert(
+    region.includes("finishRoot") || region.includes("f2f3_finish_root"),
+    `${label} C is the selected END-side F2/F3 representative`,
+  );
+}
+assert(
+  !lean.includes("structure RootBasis") && !rocq.includes("Record RootBasis"),
+  "INV-06 introduces no RootBasis ontology datatype",
+);
+assert(
+  !lean.includes("axiom INV_06") && !rocq.includes("Axiom INV_06"),
+  "INV-06 is proved rather than postulated",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -799,7 +848,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=13",
+  "THEOREM_PROOF_CLAIMS=15",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -832,6 +881,10 @@ console.log([
   "INV05_PAIR_PRESERVED=GREEN_SOURCE",
   "INV05_POLE_REVERSAL=INV01_REUSED",
   "INV05_NEW_DOMAIN_AXIOM=NONE",
+  "INV06_ROOT_BASIS=R_FIXED_O_C_EXCHANGED_L_U_FIXED",
+  "INV06_O_C=F2F3_ORIENTATION_REPRESENTATIVES",
+  "INV06_L_U=PAIR_DERIVED",
+  "INV06_ABSOLUTE_ORIENTATION=NONE",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
