@@ -151,13 +151,19 @@ Qed.
 
 Definition model_start (x : ModelLink) : ModelLink :=
   match model_decode x with
-  | Some poles => fst poles
+  | Some poles =>
+      if link_eq_dec x (model_form (fst poles) (snd poles))
+      then fst poles
+      else model_bad_start
   | None => model_bad_start
   end.
 
 Definition model_finish (x : ModelLink) : ModelLink :=
   match model_decode x with
-  | Some poles => snd poles
+  | Some poles =>
+      if link_eq_dec x (model_form (fst poles) (snd poles))
+      then snd poles
+      else model_bad_finish
   | None => model_bad_finish
   end.
 
