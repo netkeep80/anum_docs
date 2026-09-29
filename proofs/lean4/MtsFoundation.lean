@@ -867,10 +867,10 @@ theorem INV_01_recursive_inversion_total
     (D : RecursiveInversionDomain F E)
     {x : F.Link}
     (gx : Grounded F x) :
-    ∃ y : F.Link, RecursiveInversion F D x y := by
+    ∃ y : F.Link, RecursiveInversion F D current y := by
   induction gx with
-  | node startStep finishStep ihStart ihFinish =>
-      have gxCurrent : Grounded F x :=
+  | @node current startStep finishStep ihStart ihFinish =>
+      have gxCurrent : Grounded F current :=
         Grounded.node startStep finishStep
       have decision := D.decide gxCurrent
       have partition := FND_01_local_partition F a1 decision
