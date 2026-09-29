@@ -321,6 +321,185 @@ Proof.
   - intros x _GX. apply explicit_local_decision.
 Defined.
 
+(*
+External model-only predicate: a Link is canonical exactly when it is in the
+image of the one primitive form. This is host evidence about this concrete
+model, not a new MTS ontology predicate.
+*)
+Definition CanonicalImage (x : ModelLink) : Prop :=
+  exists a b : ModelLink, x = model_form a b.
+
+Lemma model_start_bad_start :
+  model_start model_bad_start = model_bad_start.
+Proof. reflexivity. Qed.
+
+Lemma model_finish_bad_start :
+  model_finish model_bad_start = model_bad_finish.
+Proof. reflexivity. Qed.
+
+Lemma model_start_bad_finish :
+  model_start model_bad_finish = model_bad_start.
+Proof. reflexivity. Qed.
+
+Lemma model_finish_bad_finish :
+  model_finish model_bad_finish = model_bad_finish.
+Proof. reflexivity. Qed.
+
+Lemma model_bad_start_ne_bad_finish :
+  model_bad_start <> model_bad_finish.
+Proof. discriminate. Qed.
+
+(*
+The fallback Links form a non-well-founded two-node obligation cycle.
+Finite inductive Grounded evidence therefore cannot contain either endpoint.
+*)
+Theorem fallback_cycle_not_grounded :
+  forall x : ModelLink,
+    Grounded ExplicitFoundation x ->
+    (x = model_bad_start \/ x = model_bad_finish) ->
+    False.
+Proof.
+  intros x G.
+  induction G as [x StartStep IHStart FinishStep IHFinish].
+  intros Hbad.
+  destruct Hbad as [Hbad | Hbad].
+  - subst x.
+    assert (
+      Hneq :
+      finish ExplicitFoundation model_bad_start <> model_bad_start
+    ).
+    {
+      change (model_finish model_bad_start <> model_bad_start).
+      intro Hreverse.
+      apply model_bad_start_ne_bad_finish.
+      exact (eq_trans (eq_sym Hreverse) model_finish_bad_start).
+    }
+    apply (IHFinish Hneq).
+    right.
+    change (model_finish model_bad_start = model_bad_finish).
+    apply model_finish_bad_start.
+  - subst x.
+    assert (
+      Hneq :
+      start ExplicitFoundation model_bad_finish <> model_bad_finish
+    ).
+    {
+      change (model_start model_bad_finish <> model_bad_finish).
+      rewrite model_start_bad_finish.
+      exact model_bad_start_ne_bad_finish.
+    }
+    apply (IHStart Hneq).
+    left.
+    change (model_start model_bad_finish = model_bad_start).
+    apply model_start_bad_finish.
+Qed.
+
+Theorem model_bad_start_not_grounded :
+  ~ Grounded ExplicitFoundation model_bad_start.
+Proof.
+  intros G.
+  apply (fallback_cycle_not_grounded model_bad_start G).
+  left. reflexivity.
+Qed.
+
+Theorem model_bad_finish_not_grounded :
+  ~ Grounded ExplicitFoundation model_bad_finish.
+Proof.
+  intros G.
+  apply (fallback_cycle_not_grounded model_bad_finish G).
+  right. reflexivity.
+Qed.
+
+Lemma canonical_or_start_fallback :
+  forall x : ModelLink,
+    CanonicalImage x \/ model_start x = model_bad_start.
+Proof.
+  intro x.
+  unfold model_start.
+  destruct (model_decode x) as [[a b] |] eqn:Hdecode.
+  - cbn.
+    destruct (link_eq_dec x (model_form a b)) as [Hcanonical | Hnoncanonical].
+    + left. exists a, b. exact Hcanonical.
+    + right. reflexivity.
+  - right. reflexivity.
+Qed.
+
+(*
+Finite Grounded evidence can exist only for an exact image of form.
+The proof is constructive: decode plus exact re-encoding decides the relevant
+model branch, without excluded middle over CanonicalImage.
+*)
+Theorem grounded_is_canonical :
+  forall x : ModelLink,
+    Grounded ExplicitFoundation x ->
+    CanonicalImage x.
+Proof.
+  intros x G.
+  destruct (canonical_or_start_fallback x) as [Hcanonical | Hstart].
+  - exact Hcanonical.
+  - destruct (link_eq_dec x model_bad_start) as [Hx | Hx].
+    + subst x.
+      exfalso.
+      apply model_bad_start_not_grounded.
+      exact G.
+    + assert (
+        Hstart_ne :
+        start ExplicitFoundation x <> x
+      ).
+      {
+        change (model_start x <> x).
+        intros Heq.
+        apply Hx.
+        exact (eq_trans (eq_sym Heq) Hstart).
+      }
+      pose proof
+        (grounded_start_of_nonself ExplicitFoundation x G Hstart_ne)
+        as Gbad.
+      change (Grounded ExplicitFoundation (model_start x)) in Gbad.
+      rewrite Hstart in Gbad.
+      exfalso.
+      apply model_bad_start_not_grounded.
+      exact Gbad.
+Qed.
+
+(*
+Concrete Grounded normalization for the explicit infinite model.
+The normal form is the canonical host Link itself; recursive decomposition is
+valid because every Grounded Link is an exact form image.
+*)
+Definition ExplicitGroundedNormalization :
+    F2F3GroundedNormalization ExplicitFoundation.
+Proof.
+  refine (@Build_F2F3GroundedNormalization
+    ExplicitFoundation
+    ModelLink
+    model_form
+    (fun x => x)
+    _ _).
+  - intros x G.
+    destruct (grounded_is_canonical x G) as [a [b Hx]].
+    subst x.
+    simpl.
+    rewrite model_start_form_projection.
+    rewrite model_finish_form_projection.
+    reflexivity.
+  - intros x y _GX _GY Hxy.
+    exact Hxy.
+Defined.
+
+Theorem explicit_fnd13_replay :
+  forall x y : ModelLink,
+    Grounded ExplicitFoundation x ->
+    Grounded ExplicitFoundation y ->
+    (x = y <->
+      start ExplicitFoundation x = start ExplicitFoundation y /\
+      finish ExplicitFoundation x = finish ExplicitFoundation y).
+Proof.
+  intros x y GX GY.
+  apply (FND_13_identity_by_poles
+    ExplicitFoundation ExplicitGroundedNormalization x y GX GY).
+Qed.
+
 Theorem explicit_grounded_slice :
   Grounded ExplicitFoundation (R ExplicitFoundation) /\
   Grounded ExplicitFoundation (f2f3_start_root ExplicitFoundation ExplicitOneSided) /\

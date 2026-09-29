@@ -51,6 +51,26 @@ for (const [lane, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
     /external model|model\/proof machinery|external model machinery/i.test(source),
     `${lane} source states the no-backflow external-model boundary`,
   );
+  assert(
+    /CanonicalImage/.test(source),
+    `${lane} model exposes external canonical-image evidence`,
+  );
+  assert(
+    /fallback_cycle_not_grounded/.test(source),
+    `${lane} model proves fallback cycle is outside Grounded`,
+  );
+  assert(
+    /grounded_is_canonical/.test(source),
+    `${lane} model proves Grounded implies exact form image`,
+  );
+  assert(
+    /ExplicitGroundedNormalization/.test(source),
+    `${lane} model instantiates Grounded normalization`,
+  );
+  assert(
+    /explicit_fnd13_replay/.test(source),
+    `${lane} model replays FND-13 on concrete Grounded links`,
+  );
 }
 
 assert(
