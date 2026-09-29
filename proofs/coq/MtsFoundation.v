@@ -2875,3 +2875,71 @@ Proof.
              (CTX_03_simultaneous_inversion_covariance
                F A1 N E D a b ja jb HJa HJb).
 Qed.
+
+
+(* FND-07 external projection of accepted contextual-truth semantics.
+
+   EXTERNAL THEORY PROJECTION NOTE:
+   no additional external mathematical theory is introduced here.
+   CurrentScopeMember is only a Prop-valued relation in the Rocq host
+   foundation. It projects the one published current Scope; it is not a native
+   MTS predicate object and not an axiomatic-set-theory membership model.
+
+   The structural truth witness remains the Link K -> A. *)
+Definition ContextualTruthWitness
+    (F : Foundation)
+    (K A : Link F) : Link F :=
+  form F K A.
+
+Definition ContextualTruth
+    (F : Foundation)
+    (CurrentScopeMember : Link F -> Prop)
+    (K A : Link F) : Prop :=
+  CurrentScopeMember (ContextualTruthWitness F K A).
+
+(* The parameter L denotes the accepted MTS truth-value Link L.  It is kept
+   separate from ContextualTruthWitness because L is the truth value while
+   K -> A is the contextual truth witness.  No universal structural
+   disequality between them is asserted. *)
+Definition TruthValueL
+    (F : Foundation)
+    (L : Link F) : Link F :=
+  L.
+
+(* FND-07 boundary theorem.
+
+   Even the exact structural Link K -> A may exist as an ambient Link while
+   not being current.  In that case it is not contextual truth. Conversely,
+   contextual truth is witnessed by currentness of exactly that Link.
+
+   No host Bool, Set, finite-set, map/environment, or collection object carries
+   truth authority here. *)
+Theorem FND_07_contextual_truth_boundary
+    (F : Foundation)
+    (CurrentScopeMember : Link F -> Prop)
+    (L : Link F) :
+    (forall K A : Link F,
+      ContextualTruth F CurrentScopeMember K A <->
+      CurrentScopeMember (form F K A)) /\
+    (forall K A : Link F,
+      ~ CurrentScopeMember (form F K A) ->
+      exists ambientWitness : Link F,
+        ambientWitness = form F K A /\
+        ~ ContextualTruth F CurrentScopeMember K A) /\
+    TruthValueL F L = L.
+Proof.
+  split.
+  - intros K A.
+    unfold ContextualTruth, ContextualTruthWitness.
+    split.
+    + intros H. exact H.
+    + intros H. exact H.
+  - split.
+    + intros K A HNotCurrent.
+      exists (form F K A).
+      split.
+      * reflexivity.
+      * unfold ContextualTruth, ContextualTruthWitness.
+        exact HNotCurrent.
+    + reflexivity.
+Qed.
