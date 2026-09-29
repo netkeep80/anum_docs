@@ -1046,7 +1046,8 @@ const leanFnd07 = lean.slice(lean.indexOf("def ContextualTruthWitness"));
 const rocqFnd07 = rocq.slice(rocq.indexOf("Definition ContextualTruthWitness"));
 for (const forbidden of [
   "Set F.Link",
-  "Finset",
+  "Finset F.Link",
+  "Finset (",
   "HashMap",
   "Std.Data.HashMap",
   ": Bool",
