@@ -1,0 +1,33 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "INV-05",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "INV-01"
+  ],
+  "dependencies": [
+    "INV-01"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "lean4",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "54af5c6c1f9bfdaa7c23331cb431355a886794ec",
+    "toolchain": {
+      "name": "Lean",
+      "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/lean4/MtsFoundation.lean",
+      "sha256": "67e3c7f2f3177ae4231efaaa3569b721c52f70add38cf38dfe8fac66e89ad7cc"
+    }
+  ],
+  "notes": "External differential proof only. INV-05 proves that a PAIR source remains PairLocal under the existing structural RecursiveInversion graph while its poles are recursively exchanged by INV-01. The non-collapse argument uses INV-02 only as an already-derived consequence of the same INV-01 assumptions; no pairPreserved field, new inversion-domain axiom, host inverse function, codec/handle identity, or representation order is introduced."
+}
