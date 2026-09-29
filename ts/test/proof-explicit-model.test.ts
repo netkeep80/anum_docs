@@ -82,6 +82,28 @@ assert(
   "Rocq explicit model discharges A1RecursiveSeparation",
 );
 
+const replaySymbols = [
+  "ExplicitCarrierDecision",
+  "explicit_fnd02_replay",
+  "explicit_fnd01_replay",
+  "explicit_fnd05_replay",
+  "explicit_inv01_replay",
+  "explicit_inv02_replay",
+  "explicit_inv03_replay",
+  "explicit_inv04_start_replay",
+  "explicit_inv04_finish_replay",
+  "explicit_inv05_replay",
+  "explicit_inv06_replay",
+  "explicit_inv07_replay",
+  "explicit_ctx03_replay",
+];
+
+for (const [lane, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  for (const symbol of replaySymbols) {
+    assert(source.includes(symbol), `${lane} explicit model exposes chain replay ${symbol}`);
+  }
+}
+
 assert(
   ci.includes(
     "cat proofs/lean4/MtsFoundation.lean proofs/lean4/MtsExplicitModel.lean > /tmp/MtsFoundationWithExplicitModel.lean",
