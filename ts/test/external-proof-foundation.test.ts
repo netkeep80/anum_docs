@@ -296,14 +296,29 @@ assert(
   !lean.includes("rootUnique :") && !rocq.includes("root_unique_fnd02"),
   "unique ROOT is not duplicated as a free normalization record field",
 );
+const leanFnd13Start = lean.indexOf("theorem FND_13_identity_by_poles");
+const rocqFnd13Start = rocq.indexOf("Theorem FND_13_identity_by_poles");
+assert(leanFnd13Start >= 0 && rocqFnd13Start >= 0, "FND-13 theorem boundary exists");
 assert(
-  !lean.includes("form (F.start x) (F.finish x) = x"),
-  "Lean does not smuggle A6 as a reconstruction axiom",
+  !lean.slice(0, leanFnd13Start).includes("form (F.start x) (F.finish x) = x"),
+  "Lean does not smuggle A6 reconstruction before FND-13",
 );
 assert(
-  !rocq.includes("form F (start F x) (finish F x) = x"),
-  "Rocq does not smuggle A6 as a reconstruction axiom",
+  !rocq.slice(0, rocqFnd13Start).includes("form F (start F x) (finish F x) = x"),
+  "Rocq does not smuggle A6 reconstruction before FND-13",
 );
+if (lean.includes("theorem poles_recompose_after_fnd13")) {
+  assert(
+    lean.indexOf("theorem poles_recompose_after_fnd13") > leanFnd13Start,
+    "Lean pole reconstruction is explicitly downstream of FND-13",
+  );
+}
+if (rocq.includes("Theorem poles_recompose_after_fnd13")) {
+  assert(
+    rocq.indexOf("Theorem poles_recompose_after_fnd13") > rocqFnd13Start,
+    "Rocq pole reconstruction is explicitly downstream of FND-13",
+  );
+}
 
 const fnd01 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-01");
 assert(fnd01 !== undefined, "P0 contains FND-01");

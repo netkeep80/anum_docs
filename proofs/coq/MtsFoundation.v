@@ -1109,3 +1109,270 @@ Proof.
     + exact Hy.
     + exact Hz.
 Qed.
+
+
+(* Finite recursive distinction cannot distinguish a Link from itself. *)
+Lemma distinguishable_same_false
+    (F : Foundation) :
+    forall x y : Link F,
+      Distinguishable F x y ->
+      x = y ->
+      False.
+Proof.
+  intros x y H.
+  induction H as
+    [x y Hs Hn
+    |x y Hn Hs
+    |x y Hs Hn
+    |x y Hn Hs
+    |x y Hnx Hny Hchild IH
+    |x y Hnx Hny Hchild IH];
+    intro Heq; subst y.
+  - exact (Hn Hs).
+  - exact (Hn Hs).
+  - exact (Hn Hs).
+  - exact (Hn Hs).
+  - apply IH. reflexivity.
+  - apply IH. reflexivity.
+Qed.
+
+Lemma distinguishable_irreflexive
+    (F : Foundation)
+    (x : Link F) :
+    ~ Distinguishable F x x.
+Proof.
+  intros H.
+  exact (distinguishable_same_false F x x H eq_refl).
+Qed.
+
+Lemma start_only_same_finish_not_distinguishable
+    (F : Foundation)
+    (x y : Link F) :
+    StartOnly F x ->
+    StartOnly F y ->
+    finish F x = finish F y ->
+    ~ Distinguishable F x y.
+Proof.
+  intros Hx Hy Hfinish Hdist.
+  destruct Hx as [Hxs Hxnf].
+  destruct Hy as [Hys Hynf].
+  destruct Hdist as
+    [a b Hsa Hnb
+    |a b Hna Hsb
+    |a b Hfa Hnfb
+    |a b Hnfa Hfb
+    |a b Hna Hnb Hchild
+    |a b Hnfa Hnfb Hchild].
+  - exact (Hnb Hys).
+  - exact (Hna Hxs).
+  - exact (Hxnf Hfa).
+  - exact (Hynf Hfb).
+  - exact (Hna Hxs).
+  - eapply distinguishable_same_false.
+    + exact Hchild.
+    + exact Hfinish.
+Qed.
+
+Lemma finish_only_same_start_not_distinguishable
+    (F : Foundation)
+    (x y : Link F) :
+    FinishOnly F x ->
+    FinishOnly F y ->
+    start F x = start F y ->
+    ~ Distinguishable F x y.
+Proof.
+  intros Hx Hy Hstart Hdist.
+  destruct Hx as [Hxns Hxf].
+  destruct Hy as [Hyns Hyf].
+  destruct Hdist as
+    [a b Hsa Hnb
+    |a b Hna Hsb
+    |a b Hfa Hnfb
+    |a b Hnfa Hfb
+    |a b Hna Hnb Hchild
+    |a b Hnfa Hnfb Hchild].
+  - exact (Hxns Hsa).
+  - exact (Hyns Hsb).
+  - exact (Hnfb Hyf).
+  - exact (Hnfa Hxf).
+  - eapply distinguishable_same_false.
+    + exact Hchild.
+    + exact Hstart.
+  - exact (Hnfa Hxf).
+Qed.
+
+Lemma grounded_start_of_nonself
+    (F : Foundation)
+    (x : Link F) :
+    Grounded F x ->
+    start F x <> x ->
+    Grounded F (start F x).
+Proof.
+  intros G Hnot.
+  inversion G as [x0 StartStep FinishStep].
+  exact (StartStep Hnot).
+Qed.
+
+Lemma grounded_finish_of_nonself
+    (F : Foundation)
+    (x : Link F) :
+    Grounded F x ->
+    finish F x <> x ->
+    Grounded F (finish F x).
+Proof.
+  intros G Hnot.
+  inversion G as [x0 StartStep FinishStep].
+  exact (FinishStep Hnot).
+Qed.
+
+(* Generic F2/F3 START(F) is a proper one-sided form. *)
+Theorem recursive_start_form_pattern
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a : Link F) :
+    StartOnly F (recursive_start_form F E D a).
+Proof.
+  unfold StartOnly, StartSelf, FinishSelf.
+  split.
+  - apply recursive_start_start.
+  - intros Hfinish.
+    assert (
+      Hfull :
+      FullSelf F (recursive_start_form F E D a)
+    ).
+    {
+      split.
+      - apply recursive_start_start.
+      - exact Hfinish.
+    }
+    pose proof
+      (FND_02_unique_root F A1 (recursive_start_form F E D a) Hfull)
+      as Hroot.
+    assert (HaRoot : a = R F).
+    {
+      transitivity (finish F (recursive_start_form F E D a)).
+      - symmetry. apply recursive_start_finish.
+      - rewrite Hroot.
+        exact (proj2 (root_full_self F)).
+    }
+    apply (f2f3_start_root_ne_root F E).
+    rewrite <- (recursive_start_root_compat F E D).
+    rewrite HaRoot in Hroot.
+    exact Hroot.
+Qed.
+
+(* Generic F2/F3 END(F) is a proper one-sided form. *)
+Theorem recursive_end_form_pattern
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (a : Link F) :
+    FinishOnly F (recursive_end_form F E D a).
+Proof.
+  unfold FinishOnly, StartSelf, FinishSelf.
+  split.
+  - intros Hstart.
+    assert (
+      Hfull :
+      FullSelf F (recursive_end_form F E D a)
+    ).
+    {
+      split.
+      - exact Hstart.
+      - apply recursive_end_finish.
+    }
+    pose proof
+      (FND_02_unique_root F A1 (recursive_end_form F E D a) Hfull)
+      as Hroot.
+    assert (HaRoot : a = R F).
+    {
+      transitivity (start F (recursive_end_form F E D a)).
+      - symmetry. apply recursive_end_start.
+      - rewrite Hroot.
+        exact (proj1 (root_full_self F)).
+    }
+    apply (f2f3_finish_root_ne_root F E).
+    rewrite <- (recursive_end_root_compat F E D).
+    rewrite HaRoot in Hroot.
+    exact Hroot.
+  - apply recursive_end_finish.
+Qed.
+
+(* A grounded StartOnly Link is the unique semantic START of its external
+   finish pole. *)
+Theorem recursive_start_form_canonical
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x : Link F) :
+    Grounded F x ->
+    StartOnly F x ->
+    x = recursive_start_form F E D (finish F x).
+Proof.
+  intros G Hstart.
+  pose proof
+    (grounded_finish_of_nonself F x G (proj2 Hstart))
+    as Gfinish.
+  pose proof
+    (recursive_start_grounded F E D (finish F x) Gfinish)
+    as Gcanonical.
+  pose proof
+    (recursive_start_form_pattern F A1 E D (finish F x))
+    as Hcanonical.
+  apply (A1 x (recursive_start_form F E D (finish F x)) G Gcanonical).
+  apply start_only_same_finish_not_distinguishable.
+  - exact Hstart.
+  - exact Hcanonical.
+  - symmetry.
+    apply recursive_start_finish.
+Qed.
+
+(* A grounded FinishOnly Link is the unique semantic END of its external
+   start pole. *)
+Theorem recursive_end_form_canonical
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x : Link F) :
+    Grounded F x ->
+    FinishOnly F x ->
+    x = recursive_end_form F E D (start F x).
+Proof.
+  intros G Hfinish.
+  pose proof
+    (grounded_start_of_nonself F x G (proj1 Hfinish))
+    as Gstart.
+  pose proof
+    (recursive_end_grounded F E D (start F x) Gstart)
+    as Gcanonical.
+  pose proof
+    (recursive_end_form_pattern F A1 E D (start F x))
+    as Hcanonical.
+  apply (A1 x (recursive_end_form F E D (start F x)) G Gcanonical).
+  apply finish_only_same_start_not_distinguishable.
+  - exact Hfinish.
+  - exact Hcanonical.
+  - symmetry.
+    apply recursive_end_start.
+Qed.
+
+(* FND-13 entails reconstruction from the ordered poles.  This is downstream
+   theorem use, not an extensionality/reconstruction axiom. *)
+Theorem poles_recompose_after_fnd13
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (x : Link F) :
+    form F (start F x) (finish F x) = x.
+Proof.
+  apply (proj2 (FND_13_identity_by_poles F A1 N
+    (form F (start F x) (finish F x)) x)).
+  split.
+  - apply form_start.
+  - apply form_finish.
+Qed.
