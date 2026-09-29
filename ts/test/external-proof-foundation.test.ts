@@ -1102,6 +1102,80 @@ assert(
   "CTX-03 chi bridge is proved rather than postulated",
 );
 
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  const semanticStart = source.indexOf(
+    label === "Lean"
+      ? "def ContextSemanticArrow"
+      : "Definition ContextSemanticArrow",
+  );
+  const semanticEnd = source.indexOf(
+    label === "Lean"
+      ? "FND-07 external projection of accepted contextual-truth semantics"
+      : "FND-07 external projection of accepted contextual-truth semantics",
+    semanticStart,
+  );
+  assert(
+    semanticStart >= 0 && semanticEnd > semanticStart,
+    `${label} contains CTX-03 semantic covariance region`,
+  );
+  const semanticRegion = source.slice(semanticStart, semanticEnd);
+
+  for (const symbol of [
+    "ContextSemanticArrow",
+    "CTX_03_semantic_arrow_covariant",
+    "ContextGeneralizedMPStep",
+    "ContextGeneralizedMPCovarianceLaw",
+    "CTX_03_generalized_mp_semantic_covariance",
+    "TechnicalStartOperation",
+    "InversionCovariantUnaryOperation",
+    "CTX_03_technical_start_not_covariant",
+    "CTX_03_semantic_covariance_capstone",
+  ]) {
+    assert(
+      semanticRegion.includes(symbol),
+      `${label} CTX-03 semantic covariance contains ${symbol}`,
+    );
+  }
+
+  assert(
+    semanticRegion.includes("INV_01_recursive_pole_reversal") &&
+      semanticRegion.includes("recursive_inversion_functional") &&
+      semanticRegion.includes("INV_07_objective_chirality"),
+    `${label} semantic covariance is derived from structural J evidence`,
+  );
+  assert(
+    semanticRegion.includes("K") &&
+      semanticRegion.includes("A") &&
+      semanticRegion.includes("B") &&
+      semanticRegion.includes("truth") &&
+      semanticRegion.includes("rule") &&
+      semanticRegion.includes("result"),
+    `${label} generalized-MP semantic relation carries K/A/B truth/rule/result`,
+  );
+
+  for (const forbidden of [
+    "DIRECT",
+    "MIRROR",
+    "ExactSequence",
+    "ContextFrame",
+    "SemanticOrientationView",
+    "inductive Gauge",
+    "structure Gauge",
+    "Record Gauge",
+    "Definition Gauge",
+  ]) {
+    assert(
+      !semanticRegion.includes(forbidden),
+      `${label} semantic covariance excludes host orientation authority: ${forbidden}`,
+    );
+  }
+}
+assert(
+  !lean.includes("axiom CTX_03_semantic_covariance_capstone") &&
+    !rocq.includes("Axiom CTX_03_semantic_covariance_capstone"),
+  "CTX-03 semantic covariance capstone is proved rather than postulated",
+);
+
 const fnd07 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-07");
 assert(fnd07 !== undefined, "P0 contains FND-07");
 same(
