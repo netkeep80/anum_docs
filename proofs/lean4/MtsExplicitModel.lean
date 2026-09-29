@@ -114,12 +114,20 @@ def decode : ModelLink → Option (ModelLink × ModelLink)
 theorem no_start_end_overlap (a : ModelLink) :
     a ≠ startForm (endForm a) := by
   intro h
-  have hLength := congrArg List.length h
-  have hLength' : a.length = a.length + 4 := by
-    simpa [startForm, endForm] using hLength
-  have hLt : a.length < a.length + 4 :=
-    Nat.lt_add_of_pos_right (by decide)
-  exact (Nat.ne_of_lt hLt) hLength'
+  have hLength :
+      a.length = a.length + 1 + 1 + 1 + 1 := by
+    simpa [startForm, endForm] using congrArg List.length h
+  have h1 : a.length < a.length + 1 :=
+    Nat.lt_succ_self a.length
+  have h2 : a.length + 1 < a.length + 1 + 1 :=
+    Nat.lt_succ_self (a.length + 1)
+  have h3 : a.length + 1 + 1 < a.length + 1 + 1 + 1 :=
+    Nat.lt_succ_self (a.length + 1 + 1)
+  have h4 : a.length + 1 + 1 + 1 < a.length + 1 + 1 + 1 + 1 :=
+    Nat.lt_succ_self (a.length + 1 + 1 + 1)
+  have hLt : a.length < a.length + 1 + 1 + 1 + 1 :=
+    Nat.lt_trans h1 (Nat.lt_trans h2 (Nat.lt_trans h3 h4))
+  exact (Nat.ne_of_lt hLt) hLength
 
 /--
 One total Link-forming primitive.
@@ -222,8 +230,14 @@ theorem explicit_local_decision
   letI : DecidableEq ExplicitFoundation.Link := by
     change DecidableEq ModelLink
     infer_instance
-  unfold LocalSelfDecision
-  exact ⟨Decidable.em _, Decidable.em _⟩
+  unfold LocalSelfDecision StartSelf FinishSelf
+  constructor
+  · by_cases h : ExplicitFoundation.start x = x
+    · exact Or.inl h
+    · exact Or.inr h
+  · by_cases h : ExplicitFoundation.finish x = x
+    · exact Or.inl h
+    · exact Or.inr h
 
 /--
 The historical recursive START(F)/END(F) witness exists for every ambient Link.
