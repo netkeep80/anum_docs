@@ -388,34 +388,24 @@ Qed.
    This is intentionally not the full realizability claim.  Given explicit
    decisions for the two local identity questions, exactly one proposition
    pattern is possible.  The full-self branch is identified with ROOT by
-   FND-02, while actual Link identity remains ordered-pole identity from
-   FND-13.  Context orientation only names the two one-sided cases later. *)
+   FND-02. Ordered-pole identity remains the separate FND-13 theorem and is
+   intentionally not imported into this local classification. Context
+   orientation only names the two one-sided cases later. *)
 Theorem FND_01_local_partition
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3GroundedNormalization F)
     (x : Link F) :
-    Grounded F x ->
     LocalSelfDecision F x ->
     LocalSelfIncidenceExhaustive F x /\
     LocalSelfIncidenceExclusive F x /\
-    (FullSelf F x -> x = R F) /\
-    (forall y : Link F,
-      Grounded F y ->
-      start F x = start F y ->
-      finish F x = finish F y ->
-      x = y).
+    (FullSelf F x -> x = R F).
 Proof.
-  intros GX D.
+  intros D.
   split.
   - apply local_self_incidence_exhaustive. exact D.
   - split.
     + apply local_self_incidence_exclusive.
-    + split.
-      * intros H. apply (FND_02_unique_root F A1 x H).
-      * intros y GY Hs Hf.
-        apply (proj2 (FND_13_identity_by_poles F N x y GX GY)).
-        split; assumption.
+    + intros H. apply (FND_02_unique_root F A1 x H).
 Qed.
 
 
@@ -661,23 +651,17 @@ Qed.
 
    C1 proves the exhaustive/exclusive proposition partition.
    C2 proves grounded realizability of every proposition pattern.
-   FND-02 and FND-13 remain the identity boundaries consumed by C1. *)
+   FND-02 identifies the full-self branch with unique ROOT; ordered-pole
+   identity remains the separate FND-13 theorem. *)
 Theorem FND_01_four_structural_cases
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (x : Link F) :
-    Grounded F x ->
     LocalSelfDecision F x ->
     LocalSelfIncidenceExhaustive F x /\
     LocalSelfIncidenceExclusive F x /\
     (FullSelf F x -> x = R F) /\
-    (forall y : Link F,
-      Grounded F y ->
-      start F x = start F y ->
-      finish F x = finish F y ->
-      x = y) /\
     (FullSelf F (R F) /\
       exists startWitness finishWitness pairWitness : Link F,
         Grounded F startWitness /\
@@ -687,19 +671,17 @@ Theorem FND_01_four_structural_cases
         FinishOnly F finishWitness /\
         PairLocal F pairWitness).
 Proof.
-  intros GX D.
-  pose proof (FND_01_local_partition F A1 N x GX D) as C1.
+  intros D.
+  pose proof (FND_01_local_partition F A1 x D) as C1.
   pose proof (FND_01_grounded_realizability F E) as C2.
-  destruct C1 as [HEx [HExclusive [HRoot HIdentity]]].
+  destruct C1 as [HEx [HExclusive HRoot]].
   split.
   - exact HEx.
   - split.
     + exact HExclusive.
     + split.
       * exact HRoot.
-      * split.
-        -- exact HIdentity.
-        -- exact C2.
+      * exact C2.
 Qed.
 
 (* Context-relative START_K / END_K naming is presentation only.
@@ -935,7 +917,6 @@ Qed.
 Theorem INV_01_recursive_inversion_total
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x : Link F) :
@@ -949,7 +930,7 @@ Proof.
   pose proof
     (recursive_local_decision F E D x GX) as Decision.
   pose proof
-    (FND_01_local_partition F A1 N x GX Decision) as Partition.
+    (FND_01_local_partition F A1 x Decision) as Partition.
   destruct Partition as [Cases _].
   destruct Cases as [HFull | [HStart | [HFinish | HPair]]].
   - pose proof (FND_02_unique_root F A1 x HFull) as HRoot.
@@ -1191,7 +1172,6 @@ Qed.
 Theorem INV_01_recursive_inversion_unique_total
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x : Link F) :
@@ -1203,7 +1183,7 @@ Theorem INV_01_recursive_inversion_unique_total
         z = y.
 Proof.
   intros G.
-  destruct (INV_01_recursive_inversion_total F A1 N E D x G)
+  destruct (INV_01_recursive_inversion_total F A1 E D x G)
     as [y Hy].
   exists y.
   split.
@@ -1781,12 +1761,12 @@ Theorem INV_02_unique_total_involution
       z = x.
 Proof.
   intros GX.
-  destruct (INV_01_recursive_inversion_total F A1 N E D x GX)
+  destruct (INV_01_recursive_inversion_total F A1 E D x GX)
     as [y Hxy].
   pose proof
     (recursive_inversion_image_grounded F E D x y Hxy)
     as GY.
-  destruct (INV_01_recursive_inversion_total F A1 N E D y GY)
+  destruct (INV_01_recursive_inversion_total F A1 E D y GY)
     as [z Hyz].
   exists y.
   exists z.
@@ -1905,7 +1885,7 @@ Proof.
   pose proof
     (recursive_inversion_image_grounded F E D x y Hxy)
     as GY.
-  destruct (INV_01_recursive_inversion_total F A1 N E D y GY)
+  destruct (INV_01_recursive_inversion_total F A1 E D y GY)
     as [z Hyz].
   pose proof
     (INV_02_recursive_inversion_involutive F A1 N E D x y z Hxy Hyz)
@@ -1914,7 +1894,7 @@ Proof.
     (recursive_local_decision F E D y GY)
     as Decision.
   pose proof
-    (FND_01_local_partition F A1 N y GY Decision)
+    (FND_01_local_partition F A1 y Decision)
     as Partition.
   destruct Partition as [Cases _].
   assert (HPairY : PairLocal F y).
