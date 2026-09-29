@@ -759,8 +759,10 @@ theorem explicit_finite_recursive_carrier_decision :
   intro x _gx
   exact explicit_local_decision x
 
-def explicit_fnd02_replay :=
-  FND_02_unique_root ExplicitFoundation explicit_a1
+def explicit_fnd02_replay
+    {x : ModelLink}
+    (hFull : FullSelf ExplicitFoundation x) :=
+  FND_02_unique_root ExplicitFoundation explicit_a1 hFull
 
 def explicit_fnd01_replay (x : ModelLink) :=
   FND_01_four_structural_cases
@@ -769,53 +771,84 @@ def explicit_fnd01_replay (x : ModelLink) :=
     ExplicitOneSided
     (explicit_local_decision x)
 
-def explicit_fnd05_replay :=
+def explicit_fnd05_replay
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x) :=
   FND_05_canonical_recursive_description_unique
     ExplicitFoundation
     explicit_a1
     explicit_finite_recursive_carrier_decision
+    gx
 
-def explicit_inv01_replay :=
+def explicit_inv01_replay
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x) :=
   INV_01_recursive_inversion_unique_total
     ExplicitFoundation
     explicit_a1
     ExplicitOneSided
     ExplicitInversionDomain
+    gx
 
-def explicit_inv02_replay :=
+def explicit_inv02_replay
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x) :=
   INV_02_unique_total_involution
     ExplicitFoundation
     explicit_a1
     ExplicitGroundedNormalization
     ExplicitOneSided
     ExplicitInversionDomain
+    gx
 
-def explicit_inv03_replay :=
+def explicit_inv03_replay
+    {y : ModelLink}
+    (h : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain ExplicitFoundation.R y) :=
   INV_03_root_fixed
     ExplicitFoundation
     ExplicitInversionDomain
+    h
 
-def explicit_inv04_start_replay :=
+def explicit_inv04_start_replay
+    {x y : ModelLink}
+    (hStart : StartOnly ExplicitFoundation x)
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y) :=
   INV_04_start_to_finish
     ExplicitFoundation
     explicit_a1
     ExplicitOneSided
     ExplicitInversionDomain
+    hStart
+    hxy
 
-def explicit_inv04_finish_replay :=
+def explicit_inv04_finish_replay
+    {x y : ModelLink}
+    (hFinish : FinishOnly ExplicitFoundation x)
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y) :=
   INV_04_finish_to_start
     ExplicitFoundation
     explicit_a1
     ExplicitOneSided
     ExplicitInversionDomain
+    hFinish
+    hxy
 
-def explicit_inv05_replay :=
+def explicit_inv05_replay
+    {x y : ModelLink}
+    (hPair : PairLocal ExplicitFoundation x)
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y) :=
   INV_05_pair_preserved_and_reversed
     ExplicitFoundation
     explicit_a1
     ExplicitGroundedNormalization
     ExplicitOneSided
     ExplicitInversionDomain
+    hPair
+    hxy
 
 def explicit_inv06_replay :=
   INV_06_root_basis
