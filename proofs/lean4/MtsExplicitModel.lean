@@ -998,4 +998,129 @@ theorem natLink_injective :
     simpa [natLink] using hLength
   exact Nat.add_right_cancel hSucc
 
+
+/--
+#1797 cyclic-boundary witness.
+
+The existing noncanonical fallback values form a genuine two-Link semantic
+pole cycle.  This theorem shows that the finite inductive FND-05 description
+relation has no derivation for either endpoint.  The failure is totality, not
+uniqueness: `recursive_description_functional` remains generic for any two
+derivations that actually exist.
+-/
+theorem fallback_cycle_no_recursive_description
+    {x : ModelLink}
+    {code : RecursiveDescriptionCode}
+    (h : CanonicalRecursiveDescription ExplicitFoundation x code) :
+    x = badStart ∨ x = badFinish → False := by
+  induction h with
+  | root =>
+      intro hBad
+      rcases hBad with hBad | hBad <;>
+        simp [ExplicitFoundation, root, badStart, badFinish] at hBad
+  | @startSelf x child hStart hChild ih =>
+      intro hBad
+      rcases hBad with rfl | rfl
+      · apply ih
+        exact Or.inr finish_badStart
+      · exact hStart.2 finish_badFinish
+  | @finishSelf x child hFinish hChild ih =>
+      intro hBad
+      rcases hBad with rfl | rfl
+      · exact hFinish.1 start_badStart
+      · apply ih
+        exact Or.inl start_badFinish
+  | @pair x startCode finishCode hPair hStartChild hFinishChild ihStart ihFinish =>
+      intro hBad
+      rcases hBad with rfl | rfl
+      · exact hPair.1 start_badStart
+      · exact hPair.2 finish_badFinish
+
+theorem badStart_no_recursive_description :
+    ¬ ∃ code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription ExplicitFoundation badStart code := by
+  rintro ⟨code, h⟩
+  exact fallback_cycle_no_recursive_description h (Or.inl rfl)
+
+theorem badFinish_no_recursive_description :
+    ¬ ∃ code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription ExplicitFoundation badFinish code := by
+  rintro ⟨code, h⟩
+  exact fallback_cycle_no_recursive_description h (Or.inr rfl)
+
+/--
+The same cycle has no finite RecursiveInversion derivation.
+
+Again the existing theorem `recursive_inversion_functional` remains globally
+valid whenever inverse derivations exist; the counterexample falsifies an
+all-Link totality claim.
+-/
+theorem fallback_cycle_no_recursive_inversion
+    {x y : ModelLink}
+    (h : RecursiveInversion ExplicitFoundation ExplicitInversionDomain x y) :
+    x = badStart ∨ x = badFinish → False := by
+  induction h with
+  | root =>
+      intro hBad
+      rcases hBad with hBad | hBad <;>
+        simp [ExplicitFoundation, root, badStart, badFinish] at hBad
+  | @start x childInverse hStart hChild ih =>
+      intro hBad
+      rcases hBad with rfl | rfl
+      · apply ih
+        exact Or.inr finish_badStart
+      · exact hStart.2 finish_badFinish
+  | @finish x childInverse hFinish hChild ih =>
+      intro hBad
+      rcases hBad with rfl | rfl
+      · exact hFinish.1 start_badStart
+      · apply ih
+        exact Or.inl start_badFinish
+  | @pair x inverseFinish inverseStart hPair hFinishInv hStartInv ihFinish ihStart =>
+      intro hBad
+      rcases hBad with rfl | rfl
+      · exact hPair.1 start_badStart
+      · exact hPair.2 finish_badFinish
+
+theorem badStart_no_recursive_inverse :
+    ¬ ∃ y : ModelLink,
+      RecursiveInversion ExplicitFoundation ExplicitInversionDomain badStart y := by
+  rintro ⟨y, h⟩
+  exact fallback_cycle_no_recursive_inversion h (Or.inl rfl)
+
+theorem badFinish_no_recursive_inverse :
+    ¬ ∃ y : ModelLink,
+      RecursiveInversion ExplicitFoundation ExplicitInversionDomain badFinish y := by
+  rintro ⟨y, h⟩
+  exact fallback_cycle_no_recursive_inversion h (Or.inr rfl)
+
+/--
+Sharing control for #1797.
+
+Both poles of this parent are the same semantic Grounded Link.  The parent is
+still Grounded, so repeated/shared substructure does not by itself create the
+non-well-founded obstruction seen in the two-Link cycle.  Heap/pointer sharing
+is outside this theorem: only semantic Link equality and pole recursion matter.
+-/
+def sharedGroundedChild : ModelLink :=
+  ExplicitOneSided.startRoot
+
+def sharedGroundedParent : ModelLink :=
+  ExplicitFoundation.form sharedGroundedChild sharedGroundedChild
+
+theorem sharedGroundedParent_start :
+    ExplicitFoundation.start sharedGroundedParent = sharedGroundedChild := by
+  exact ExplicitFoundation.form_start _ _
+
+theorem sharedGroundedParent_finish :
+    ExplicitFoundation.finish sharedGroundedParent = sharedGroundedChild := by
+  exact ExplicitFoundation.form_finish _ _
+
+theorem sharedGroundedParent_grounded :
+    Grounded ExplicitFoundation sharedGroundedParent := by
+  apply recursive_pair_grounded ExplicitFoundation
+  · exact f2f3_start_root_grounded ExplicitFoundation ExplicitOneSided
+  · exact f2f3_start_root_grounded ExplicitFoundation ExplicitOneSided
+
+
 end MTS.External.Model1796
