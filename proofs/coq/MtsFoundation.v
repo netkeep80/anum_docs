@@ -1376,3 +1376,231 @@ Proof.
   - apply form_start.
   - apply form_finish.
 Qed.
+
+
+(* Every source admitted by the INV-01 graph is in the same finite Grounded
+   domain. INV-02 therefore does not enlarge the domain of J. *)
+Lemma recursive_inversion_source_grounded
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    forall x y : Link F,
+      RecursiveInversion F E D x y ->
+      Grounded F x.
+Proof.
+  intros x y H.
+  induction H.
+  - apply grounded_of_full_self.
+    apply root_full_self.
+  - apply grounded_node.
+    + intros Hnot.
+      exact (False_rect _ (Hnot (proj1 H))).
+    + intros Hnot.
+      exact IHRecursiveInversion.
+  - apply grounded_node.
+    + intros Hnot.
+      exact IHRecursiveInversion.
+    + intros Hnot.
+      exact (False_rect _ (Hnot (proj2 H))).
+  - apply grounded_node.
+    + intros Hnot.
+      exact IHRecursiveInversion2.
+    + intros Hnot.
+      exact IHRecursiveInversion1.
+Qed.
+
+(* INV-02 relational core: applying the same structural inversion graph twice
+   returns the original semantic Link on exactly the INV-01 domain. *)
+Theorem INV_02_recursive_inversion_involutive
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    forall x y z : Link F,
+      RecursiveInversion F E D x y ->
+      RecursiveInversion F E D y z ->
+      z = x.
+Proof.
+  intros x y z Hxy.
+  revert z.
+  induction Hxy as
+    [
+    |x childInverse HStart HChild IH
+    |x childInverse HFinish HChild IH
+    |x inverseFinish inverseStart HPair HFinishInv IHFinish HStartInv IHStart
+    ];
+    intros z Hyz.
+  - inversion Hyz as
+      [|y0 secondChild HYStart HSecond
+       |y0 secondChild HYFinish HSecond
+       |y0 secondFinish secondStart HYPair HSecondFinish HSecondStart];
+      subst.
+    + reflexivity.
+    + exfalso.
+      eapply recursive_full_start_disjoint.
+      * apply root_full_self.
+      * exact HYStart.
+    + exfalso.
+      eapply recursive_full_finish_disjoint.
+      * apply root_full_self.
+      * exact HYFinish.
+    + exfalso.
+      eapply recursive_full_pair_disjoint.
+      * apply root_full_self.
+      * exact HYPair.
+  - pose proof
+      (recursive_end_form_pattern F A1 E D childInverse)
+      as HYFinishPattern.
+    assert (GX : Grounded F x).
+    {
+      apply grounded_node.
+      - intros Hnot.
+        exact (False_rect _ (Hnot (proj1 HStart))).
+      - intros Hnot.
+        eapply recursive_inversion_source_grounded.
+        exact HChild.
+    }
+    inversion Hyz as
+      [|y0 secondChild HYStart HSecond
+       |y0 secondChild HYFinish HSecond
+       |y0 secondFinish secondStart HYPair HSecondFinish HSecondStart];
+      subst.
+    + exfalso.
+      eapply recursive_full_finish_disjoint.
+      * apply root_full_self.
+      * exact HYFinishPattern.
+    + exfalso.
+      eapply recursive_start_finish_disjoint.
+      * exact HYStart.
+      * exact HYFinishPattern.
+    + assert (
+        HSecond' :
+        RecursiveInversion F E D childInverse secondChild
+      ).
+      {
+        rewrite <- (recursive_end_start F E D childInverse).
+        exact HSecond.
+      }
+      pose proof (IH secondChild HSecond') as HSecondEq.
+      rewrite HSecondEq.
+      symmetry.
+      apply recursive_start_form_canonical.
+      * exact GX.
+      * exact HStart.
+    + exfalso.
+      eapply recursive_finish_pair_disjoint.
+      * exact HYFinishPattern.
+      * exact HYPair.
+  - pose proof
+      (recursive_start_form_pattern F A1 E D childInverse)
+      as HYStartPattern.
+    assert (GX : Grounded F x).
+    {
+      apply grounded_node.
+      - intros Hnot.
+        eapply recursive_inversion_source_grounded.
+        exact HChild.
+      - intros Hnot.
+        exact (False_rect _ (Hnot (proj2 HFinish))).
+    }
+    inversion Hyz as
+      [|y0 secondChild HYStart HSecond
+       |y0 secondChild HYFinish HSecond
+       |y0 secondFinish secondStart HYPair HSecondFinish HSecondStart];
+      subst.
+    + exfalso.
+      eapply recursive_full_start_disjoint.
+      * apply root_full_self.
+      * exact HYStartPattern.
+    + assert (
+        HSecond' :
+        RecursiveInversion F E D childInverse secondChild
+      ).
+      {
+        rewrite <- (recursive_start_finish F E D childInverse).
+        exact HSecond.
+      }
+      pose proof (IH secondChild HSecond') as HSecondEq.
+      rewrite HSecondEq.
+      symmetry.
+      apply recursive_end_form_canonical.
+      * exact GX.
+      * exact HFinish.
+    + exfalso.
+      eapply recursive_start_finish_disjoint.
+      * exact HYStartPattern.
+      * exact HYFinish.
+    + exfalso.
+      eapply recursive_start_pair_disjoint.
+      * exact HYStartPattern.
+      * exact HYPair.
+  - destruct
+      (INV_01_recursive_pole_reversal
+        F E D
+        (form F inverseFinish inverseStart)
+        z
+        Hyz)
+      as
+        [secondFinish
+          [secondStart
+            [HSecondFinish
+              [HSecondStart HzForm]]]].
+    assert (
+      HSecondFinish' :
+      RecursiveInversion F E D inverseStart secondFinish
+    ).
+    {
+      rewrite <- (form_finish F inverseFinish inverseStart).
+      exact HSecondFinish.
+    }
+    assert (
+      HSecondStart' :
+      RecursiveInversion F E D inverseFinish secondStart
+    ).
+    {
+      rewrite <- (form_start F inverseFinish inverseStart).
+      exact HSecondStart.
+    }
+    pose proof (IHStart secondFinish HSecondFinish') as HFinishEq.
+    pose proof (IHFinish secondStart HSecondStart') as HStartEq.
+    transitivity (form F secondFinish secondStart).
+    + exact HzForm.
+    + rewrite HFinishEq, HStartEq.
+      apply poles_recompose_after_fnd13.
+Qed.
+
+(* Function-level INV-02 witness without choosing a host function: INV-01
+   totality yields both graph images and relational involution identifies the
+   second image with the original Link. *)
+Theorem INV_02_unique_total_involution
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x : Link F) :
+    Grounded F x ->
+    exists y z : Link F,
+      RecursiveInversion F E D x y /\
+      RecursiveInversion F E D y z /\
+      z = x.
+Proof.
+  intros GX.
+  destruct (INV_01_recursive_inversion_total F A1 N E D x GX)
+    as [y Hxy].
+  pose proof
+    (recursive_inversion_image_grounded F E D x y Hxy)
+    as GY.
+  destruct (INV_01_recursive_inversion_total F A1 N E D y GY)
+    as [z Hyz].
+  exists y.
+  exists z.
+  split.
+  - exact Hxy.
+  - split.
+    + exact Hyz.
+    + apply (INV_02_recursive_inversion_involutive F A1 N E D x y z).
+      * exact Hxy.
+      * exact Hyz.
+Qed.
