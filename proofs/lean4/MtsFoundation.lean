@@ -2370,4 +2370,184 @@ theorem FND_07_contextual_truth_boundary
       exact hNotCurrent
     · rfl
 
+
+/--
+FND-05 external proof projection of the accepted finite recursive Link codec.
+
+EXTERNAL THEORY PROJECTION NOTE:
+RecursiveDescriptionCode is a host inductive proof syntax used only by Lean.
+It mirrors the recursive structural grammar ROOT / one-sided-start /
+one-sided-finish / PAIR, but it is not an MTS ontology datatype, not an Anum/Q
+carrier, and not semantic authority.
+
+No additional external mathematical theory is introduced here beyond the
+already-declared constructive inductive/propositional host proof methods.
+-/
+inductive RecursiveDescriptionCode where
+  | root
+  | startSelf (child : RecursiveDescriptionCode)
+  | finishSelf (child : RecursiveDescriptionCode)
+  | pair (startChild finishChild : RecursiveDescriptionCode)
+
+/--
+The declared finite recursive carrier supplies only the exact local
+self-incidence decisions required to read the structural grammar on a
+Grounded Link. Finiteness itself remains in the Grounded proof object.
+-/
+def FiniteRecursiveCarrierDecision (F : Foundation) : Prop :=
+  ∀ {x : F.Link}, Grounded F x → LocalSelfDecision F x
+
+/--
+Relational interpretation of one external recursive proof code as one Link.
+The four constructors are proof rules over existing Link structure, not a
+second native MTS entity.
+-/
+inductive CanonicalRecursiveDescription
+    (F : Foundation) : F.Link → RecursiveDescriptionCode → Prop
+  | root :
+      CanonicalRecursiveDescription F F.R .root
+  | startSelf {x : F.Link} {child : RecursiveDescriptionCode} :
+      StartOnly F x →
+      CanonicalRecursiveDescription F (F.finish x) child →
+      CanonicalRecursiveDescription F x (.startSelf child)
+  | finishSelf {x : F.Link} {child : RecursiveDescriptionCode} :
+      FinishOnly F x →
+      CanonicalRecursiveDescription F (F.start x) child →
+      CanonicalRecursiveDescription F x (.finishSelf child)
+  | pair {x : F.Link}
+      {startCode finishCode : RecursiveDescriptionCode} :
+      PairLocal F x →
+      CanonicalRecursiveDescription F (F.start x) startCode →
+      CanonicalRecursiveDescription F (F.finish x) finishCode →
+      CanonicalRecursiveDescription F x (.pair startCode finishCode)
+
+/--
+Every Link in the declared finite ROOT-decomposable carrier has a recursive
+description.
+
+This consumes the proposition-level FND-01 four-way partition and FND-02
+unique ROOT only. No host tree equality or codec implementation is semantic
+authority.
+-/
+theorem FND_05_recursive_description_total
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (D : FiniteRecursiveCarrierDecision F)
+    {x : F.Link}
+    (gx : Grounded F x) :
+    ∃ code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription F x code := by
+  induction gx with
+  | node startStep finishStep ihStart ihFinish =>
+      have grounded : Grounded F x :=
+        Grounded.node startStep finishStep
+      have decision := D grounded
+      have cases := local_self_incidence_exhaustive F decision
+      rcases cases with hFull | hStart | hFinish | hPair
+      · have hxRoot := FND_02_unique_root F a1 hFull
+        subst x
+        exact ⟨.root, CanonicalRecursiveDescription.root⟩
+      · rcases ihFinish hStart.2 with ⟨child, hChild⟩
+        exact ⟨.startSelf child,
+          CanonicalRecursiveDescription.startSelf hStart hChild⟩
+      · rcases ihStart hFinish.1 with ⟨child, hChild⟩
+        exact ⟨.finishSelf child,
+          CanonicalRecursiveDescription.finishSelf hFinish hChild⟩
+      · rcases ihStart hPair.1 with ⟨startCode, hStartChild⟩
+        rcases ihFinish hPair.2 with ⟨finishCode, hFinishChild⟩
+        exact ⟨.pair startCode finishCode,
+          CanonicalRecursiveDescription.pair
+            hPair hStartChild hFinishChild⟩
+
+/--
+One Link cannot have two different canonical recursive descriptions on the
+declared structural grammar.
+-/
+theorem recursive_description_functional
+    (F : Foundation)
+    {x : F.Link}
+    {left right : RecursiveDescriptionCode}
+    (hLeft : CanonicalRecursiveDescription F x left)
+    (hRight : CanonicalRecursiveDescription F x right) :
+    left = right := by
+  induction hLeft generalizing right with
+  | root =>
+      cases hRight with
+      | root => rfl
+      | startSelf hStart _ =>
+          exact False.elim
+            (recursive_full_start_disjoint F (root_full_self F) hStart)
+      | finishSelf hFinish _ =>
+          exact False.elim
+            (recursive_full_finish_disjoint F (root_full_self F) hFinish)
+      | pair hPair _ _ =>
+          exact False.elim
+            (recursive_full_pair_disjoint F (root_full_self F) hPair)
+  | startSelf hStart hChild ih =>
+      cases hRight with
+      | root =>
+          exact False.elim
+            (recursive_full_start_disjoint F (root_full_self F) hStart)
+      | startSelf _ hOther =>
+          exact congrArg RecursiveDescriptionCode.startSelf (ih hOther)
+      | finishSelf hFinish _ =>
+          exact False.elim
+            (recursive_start_finish_disjoint F hStart hFinish)
+      | pair hPair _ _ =>
+          exact False.elim
+            (recursive_start_pair_disjoint F hStart hPair)
+  | finishSelf hFinish hChild ih =>
+      cases hRight with
+      | root =>
+          exact False.elim
+            (recursive_full_finish_disjoint F (root_full_self F) hFinish)
+      | startSelf hStart _ =>
+          exact False.elim
+            (recursive_start_finish_disjoint F hStart hFinish)
+      | finishSelf _ hOther =>
+          exact congrArg RecursiveDescriptionCode.finishSelf (ih hOther)
+      | pair hPair _ _ =>
+          exact False.elim
+            (recursive_finish_pair_disjoint F hFinish hPair)
+  | pair hPair hStartChild hFinishChild ihStart ihFinish =>
+      cases hRight with
+      | root =>
+          exact False.elim
+            (recursive_full_pair_disjoint F (root_full_self F) hPair)
+      | startSelf hStart _ =>
+          exact False.elim
+            (recursive_start_pair_disjoint F hStart hPair)
+      | finishSelf hFinish _ =>
+          exact False.elim
+            (recursive_finish_pair_disjoint F hFinish hPair)
+      | pair _ hOtherStart hOtherFinish =>
+          have hs := ihStart hOtherStart
+          have hf := ihFinish hOtherFinish
+          rw [hs, hf]
+
+/--
+FND-05 capstone: canonical recursive structural description exists uniquely
+on the explicitly declared finite ROOT-decomposable carrier domain.
+
+The conclusion is restricted to Grounded Links admitted by the declared
+recursive carrier decision. It does not extend to arbitrary non-well-founded
+distinct-node cycles and says nothing about sequential Anum/Q identity.
+-/
+theorem FND_05_canonical_recursive_description_unique
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (D : FiniteRecursiveCarrierDecision F)
+    {x : F.Link}
+    (gx : Grounded F x) :
+    ∃ code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription F x code ∧
+      ∀ other : RecursiveDescriptionCode,
+        CanonicalRecursiveDescription F x other →
+        other = code := by
+  rcases FND_05_recursive_description_total F a1 D gx with
+    ⟨code, hCode⟩
+  refine ⟨code, hCode, ?_⟩
+  intro other hOther
+  exact recursive_description_functional F hOther hCode
+
 end MTS.External
