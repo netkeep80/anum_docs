@@ -42,26 +42,26 @@ Fixpoint decode_left (source : ModelLink)
   | false :: false :: rest =>
       match decode_left rest with
       | None => None
-      | Some (left, right) => Some (false :: left, right)
+      | Some (lhs, rhs) => Some (false :: lhs, rhs)
       end
   | false :: true :: rest =>
       match decode_left rest with
       | None => None
-      | Some (left, right) => Some (true :: left, right)
+      | Some (lhs, rhs) => Some (true :: lhs, rhs)
       end
   end.
 
 Lemma decode_left_encode_left_append :
-  forall left right : ModelLink,
-    decode_left (encode_left left ++ right) = Some (left, right).
+  forall lhs rhs : ModelLink,
+    decode_left (encode_left lhs ++ rhs) = Some (lhs, rhs).
 Proof.
-  induction left as [|bit tail IH]; intros right.
+  induction lhs as [|bit tail IH]; intros rhs.
   - reflexivity.
   - destruct bit; simpl; rewrite IH; reflexivity.
 Qed.
 
-Definition pair_code (left right : ModelLink) : ModelLink :=
-  true :: true :: (encode_left left ++ right).
+Definition pair_code (lhs rhs : ModelLink) : ModelLink :=
+  true :: true :: (encode_left lhs ++ rhs).
 
 Definition model_decode (source : ModelLink)
     : option (ModelLink * ModelLink) :=
@@ -103,7 +103,7 @@ Proof.
 Qed.
 
 Definition link_eq_dec :
-  forall left right : ModelLink, {left = right} + {left <> right}.
+  forall lhs rhs : ModelLink, {lhs = rhs} + {lhs <> rhs}.
 Proof.
   decide equality.
 Defined.
@@ -287,11 +287,11 @@ Proof.
   unfold LocalSelfDecision, StartSelf, FinishSelf.
   split.
   - destruct (link_eq_dec (start ExplicitFoundation x) x) as [H | H].
-    + left. exact H.
-    + right. exact H.
+    + lhs. exact H.
+    + rhs. exact H.
   - destruct (link_eq_dec (finish ExplicitFoundation x) x) as [H | H].
-    + left. exact H.
-    + right. exact H.
+    + lhs. exact H.
+    + rhs. exact H.
 Qed.
 
 Definition ExplicitInversionDomain :
@@ -341,14 +341,14 @@ Proof.
 Qed.
 
 Theorem nat_link_injective :
-  forall left right : nat,
-    nat_link left = nat_link right ->
-    left = right.
+  forall lhs rhs : nat,
+    nat_link lhs = nat_link rhs ->
+    lhs = rhs.
 Proof.
-  intros left right H.
+  intros lhs rhs H.
   pose proof (f_equal (@length bool) H) as Hlen.
-  rewrite (nat_link_length left) in Hlen.
-  rewrite (nat_link_length right) in Hlen.
+  rewrite (nat_link_length lhs) in Hlen.
+  rewrite (nat_link_length rhs) in Hlen.
   now injection Hlen.
 Qed.
 
