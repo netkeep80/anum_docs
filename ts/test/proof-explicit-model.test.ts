@@ -74,6 +74,11 @@ for (const [lane, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
 }
 
 assert(
+  /theorem explicit_a1\s*:\s*A1RecursiveSeparation ExplicitFoundation/.test(lean),
+  "Lean explicit model discharges A1RecursiveSeparation",
+);
+
+assert(
   ci.includes(
     "cat proofs/lean4/MtsFoundation.lean proofs/lean4/MtsExplicitModel.lean > /tmp/MtsFoundationWithExplicitModel.lean",
   ),
