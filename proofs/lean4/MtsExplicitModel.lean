@@ -882,6 +882,88 @@ def explicit_ctx03_semantic_replay :=
     ExplicitOneSided
     ExplicitInversionDomain
 
+
+/--
+EXTERNAL THEORY PROJECTION: constructive infinitude witness.
+
+This is a prover-side cardinality witness only.  It records a consequence of
+the existing Foundation projections plus one proper END(ROOT) witness and does
+not introduce a new MTS entity or semantic primitive.
+
+The map x ↦ form(x,R) is injective because START projects its left argument.
+The proper END(ROOT) witness is outside that map's image because every image
+has finish=R while END(ROOT) has finish=END(ROOT) ≠ R.  Iterating this
+injective non-surjective endomap from END(ROOT) therefore embeds Nat into Link.
+-/
+def HasNatInjection (F : Foundation) : Prop :=
+  ∃ encode : Nat → F.Link, Function.Injective encode
+
+theorem left_root_embed_injective
+    (F : Foundation) :
+    Function.Injective (fun x : F.Link => F.form x F.R) := by
+  intro a b h
+  have hStart := congrArg F.start h
+  simpa only [F.form_start] using hStart
+
+theorem finish_root_not_left_root_image
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (x : F.Link) :
+    F.form x F.R ≠ E.finishRoot := by
+  intro h
+  have hFinish := congrArg F.finish h
+  have hRootEq : F.R = E.finishRoot := by
+    simpa only [F.form_finish, f2f3_finish_root_finish F E] using hFinish
+  exact E.finishRootNeRoot hRootEq.symm
+
+def leftRootOrbit
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    Nat → F.Link
+  | 0 => E.finishRoot
+  | n + 1 => F.form (leftRootOrbit F E n) F.R
+
+theorem leftRootOrbit_succ_ne_zero
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (n : Nat) :
+    leftRootOrbit F E (n + 1) ≠ leftRootOrbit F E 0 := by
+  change F.form (leftRootOrbit F E n) F.R ≠ E.finishRoot
+  exact finish_root_not_left_root_image F E (leftRootOrbit F E n)
+
+theorem leftRootOrbit_injective
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    Function.Injective (leftRootOrbit F E) := by
+  intro m
+  induction m with
+  | zero =>
+      intro n h
+      cases n with
+      | zero => rfl
+      | succ n =>
+          exact False.elim
+            (leftRootOrbit_succ_ne_zero F E n h.symm)
+  | succ m ih =>
+      intro n h
+      cases n with
+      | zero =>
+          exact False.elim
+            (leftRootOrbit_succ_ne_zero F E m h)
+      | succ n =>
+          have hPrev :
+              leftRootOrbit F E m = leftRootOrbit F E n := by
+            apply left_root_embed_injective F
+            exact h
+          exact congrArg Nat.succ (ih hPrev)
+
+theorem one_sided_existence_implies_nat_injection
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    HasNatInjection F :=
+  ⟨leftRootOrbit F E, leftRootOrbit_injective F E⟩
+
+
 /--
 Explicit finite Grounded witness slice inside the infinite ambient carrier.
 -/
