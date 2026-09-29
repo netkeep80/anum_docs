@@ -2304,4 +2304,70 @@ theorem CTX_03_context_relative_gauge
     exact CTX_03_simultaneous_inversion_covariance
       F a1 N E D hJa hJb
 
+
+/--
+FND-07 external projection of accepted contextual-truth semantics.
+
+EXTERNAL THEORY PROJECTION NOTE:
+no additional external mathematical theory is introduced here.
+CurrentScopeMember is intentionally a Prop-valued prover relation. It projects
+membership in the one published current Scope; it is NOT a native MTS
+predicate object and is NOT an axiomatic-set-theory Set/Membership model.
+
+The structural witness itself remains the Link K ⟼ A.
+-/
+def ContextualTruthWitness
+    (F : Foundation)
+    (K A : F.Link) : F.Link :=
+  F.form K A
+
+def ContextualTruth
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (K A : F.Link) : Prop :=
+  CurrentScopeMember (ContextualTruthWitness F K A)
+
+/--
+The external parameter L denotes the accepted MTS truth-value Link L.
+Keeping this separate from ContextualTruthWitness records the semantic-role
+distinction: L is a truth value; K ⟼ A is a truth witness. No universal
+structural disequality between those Links is asserted.
+-/
+def TruthValueL
+    {F : Foundation}
+    (L : F.Link) : F.Link :=
+  L
+
+/--
+FND-07 boundary theorem.
+
+Even the exact structural Link K ⟼ A may exist as an ambient Link while not
+being current. In that case it is not contextual truth. Conversely,
+contextual truth is witnessed by the currentness of exactly that Link.
+
+No host Bool, Set, Finset, map/environment, or collection object carries truth
+authority here.
+-/
+theorem FND_07_contextual_truth_boundary
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (L : F.Link) :
+    (∀ K A : F.Link,
+      ContextualTruth F CurrentScopeMember K A ↔
+      CurrentScopeMember (F.form K A)) ∧
+    (∀ K A : F.Link,
+      ¬ CurrentScopeMember (F.form K A) →
+      ∃ ambientWitness : F.Link,
+        ambientWitness = F.form K A ∧
+        ¬ ContextualTruth F CurrentScopeMember K A) ∧
+    TruthValueL L = L := by
+  constructor
+  · intro K A
+    rfl
+  · constructor
+    · intro K A hNotCurrent
+      refine ⟨F.form K A, rfl, ?_⟩
+      exact hNotCurrent
+    · rfl
+
 end MTS.External
