@@ -140,11 +140,21 @@ function chiForContext(
   rootMarkers: readonly LinkHandle[],
   contextMarker: LinkHandle,
 ): LinkHandle {
-  const aligned = rootMarkers.filter((rootMarker) =>
-    sameChiralClass(memory, contextMarker, rootMarker)
+  const opposite = rootMarkers.filter((rootMarker) =>
+    !sameChiralClass(memory, contextMarker, rootMarker)
   );
-  same(aligned.length, 1, "Context marker aligns with exactly one root marker");
-  return witnessForRootMarker(memory, root, aligned[0]!);
+  same(opposite.length, 1, "Context marker has exactly one opposite root marker");
+
+  // Accepted v0.14 semantics:
+  //
+  //   chi(K)    = InR_K  = C_K -> R
+  //   J(chi(K)) = OutR_K = R -> O_K
+  //
+  // The selected Context marker names local START_K.  Therefore chi(K) is
+  // constructed from the opposite one-sided class, local END_K.  Selecting
+  // the same-class root marker here would return J(chi(K)) and invert the
+  // accepted semantic polarity.
+  return witnessForRootMarker(memory, root, opposite[0]!);
 }
 
 function gaugeBetween(
@@ -342,6 +352,40 @@ function exercise(reverseBootstrap: boolean): void {
   const chiA = chiForContext(memory, R, rootMarkers, markerA);
   const chiB = chiForContext(memory, R, rootMarkers, markerB);
   const chiC = chiForContext(memory, R, rootMarkers, markerC);
+
+  const directRootStart = rootMarkers.find((rootMarker) =>
+    sameChiralClass(memory, markerA, rootMarker)
+  );
+  const directRootEnd = rootMarkers.find((rootMarker) =>
+    !sameChiralClass(memory, markerA, rootMarker)
+  );
+  assert(directRootStart !== undefined, "direct Context has one root START marker");
+  assert(directRootEnd !== undefined, "direct Context has one root END marker");
+
+  const expectedInR = memory.ensure(directRootEnd, R);
+  const expectedOutR = memory.ensure(R, directRootStart);
+  same(chiA, expectedInR, "DIRECT chi(K) is accepted InR_K = C_K->R");
+  same(
+    rawInvert(memory, R, chiA),
+    expectedOutR,
+    "J(chi(K)) is accepted OutR_K = R->O_K",
+  );
+
+  const wrongSameClassWitness = witnessForRootMarker(
+    memory,
+    R,
+    directRootStart,
+  );
+  same(
+    wrongSameClassWitness,
+    expectedOutR,
+    "same-class root marker constructs J(chi), not chi",
+  );
+  assert(
+    wrongSameClassWitness !== chiA,
+    "same-marker polarity must not be accepted as chi(K)",
+  );
+
   same(chiA, chiB, "same chirality yields same chi");
   same(rawInvert(memory, R, chiA), chiC, "opposite chirality yields J(chi)");
 
@@ -423,6 +467,9 @@ console.log([
   "GLOBAL_SELECTED_W_REQUIRED=FALSE",
   "SAME_FRAME_CONTEXTS_SAME_SEMANTICS=TRUE",
   "MIRROR_FRAME_CONTEXTS_COVARIANT=TRUE",
+  "CHI_K=INR_K_C_TO_R",
+  "J_CHI_K=OUTR_K_R_TO_O",
+  "SAME_CLASS_ROOT_MARKER_WITNESS=J_CHI_NOT_CHI",
   "RELATIVE_TRANSPORT_GROUP=Z2",
   "TRANSPORT_COMPOSITION=TRUE",
   "TECHNICAL_BOOTSTRAP_ORDER_AUTHORITY=FALSE",
