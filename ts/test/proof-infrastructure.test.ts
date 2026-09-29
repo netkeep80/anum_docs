@@ -373,7 +373,7 @@ assert.deepEqual(
 for (const record of fnd13) {
   assert.equal(
     record.proofSource.commitSha,
-    "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
+    "006b0397d0a5160c47d34db0f20a377edd224132",
     `FND-13 ${record.lane} proof source commit`,
   );
   if (record.lane === "lean4") {
@@ -424,7 +424,7 @@ assert.deepEqual(
 for (const record of fnd01) {
   assert.equal(
     record.proofSource.commitSha,
-    "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
+    "006b0397d0a5160c47d34db0f20a377edd224132",
     `FND-01 ${record.lane} proof source commit`,
   );
   if (record.lane === "lean4") {
@@ -471,7 +471,7 @@ assert.deepEqual(
 for (const record of inv01) {
   assert.equal(
     record.proofSource.commitSha,
-    "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
+    "006b0397d0a5160c47d34db0f20a377edd224132",
     `INV-01 ${record.lane} proof source commit`,
   );
   if (record.lane === "lean4") {
@@ -523,7 +523,7 @@ assert.deepEqual(
 for (const record of inv02) {
   assert.equal(
     record.proofSource.commitSha,
-    "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
+    "006b0397d0a5160c47d34db0f20a377edd224132",
     `INV-02 ${record.lane} proof source commit`,
   );
   if (record.lane === "lean4") {
@@ -582,7 +582,7 @@ for (const theoremId of inv0304) {
   for (const record of records) {
     assert.equal(
       record.proofSource.commitSha,
-      "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
+      "006b0397d0a5160c47d34db0f20a377edd224132",
       `${theoremId} ${record.lane} proof source commit`,
     );
   }
@@ -617,8 +617,8 @@ for (const record of evidenceRecords
 }
 
 const inv0506 = [
-  ["INV-05", "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616"],
-  ["INV-06", "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616"],
+  ["INV-05", "006b0397d0a5160c47d34db0f20a377edd224132"],
+  ["INV-06", "006b0397d0a5160c47d34db0f20a377edd224132"],
 ] as const;
 for (const [theoremId, proofCommit] of inv0506) {
   const records = evidenceRecords
@@ -698,7 +698,7 @@ assert.deepEqual(
 for (const record of inv07) {
   assert.equal(
     record.proofSource.commitSha,
-    "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
+    "006b0397d0a5160c47d34db0f20a377edd224132",
     `INV-07 ${record.lane} proof source commit`,
   );
   if (record.lane === "lean4") {
@@ -759,7 +759,7 @@ assert.deepEqual(
 for (const record of ctx03) {
   assert.equal(
     record.proofSource.commitSha,
-    "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
+    "006b0397d0a5160c47d34db0f20a377edd224132",
     `CTX-03 ${record.lane} proof source commit`,
   );
   assert.deepEqual(
