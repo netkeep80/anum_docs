@@ -1409,6 +1409,81 @@ Proof.
       exact IHRecursiveInversion1.
 Qed.
 
+(* A structural inverse whose source is StartOnly must use the INV-01 START
+   rule.  This is elimination over the existing proof graph, not a new case
+   classifier. *)
+Lemma recursive_inversion_from_start_only
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x y : Link F) :
+    StartOnly F x ->
+    RecursiveInversion F E D x y ->
+    exists childInverse : Link F,
+      RecursiveInversion F E D (finish F x) childInverse /\
+      y = recursive_end_form F E D childInverse.
+Proof.
+  intros HStart H.
+  inversion H as
+    [|x0 childInverse HStart0 HChild
+     |x0 childInverse HFinish0 HChild
+     |x0 inverseFinish inverseStart HPair0 HFinishInv HStartInv];
+    subst.
+  - exfalso.
+    eapply recursive_full_start_disjoint.
+    + apply root_full_self.
+    + exact HStart.
+  - exists childInverse.
+    split.
+    + exact HChild.
+    + reflexivity.
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HStart.
+    + exact HFinish0.
+  - exfalso.
+    eapply recursive_start_pair_disjoint.
+    + exact HStart.
+    + exact HPair0.
+Qed.
+
+(* A structural inverse whose source is FinishOnly must use the INV-01 FINISH
+   rule. *)
+Lemma recursive_inversion_from_finish_only
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x y : Link F) :
+    FinishOnly F x ->
+    RecursiveInversion F E D x y ->
+    exists childInverse : Link F,
+      RecursiveInversion F E D (start F x) childInverse /\
+      y = recursive_start_form F E D childInverse.
+Proof.
+  intros HFinish H.
+  inversion H as
+    [|x0 childInverse HStart0 HChild
+     |x0 childInverse HFinish0 HChild
+     |x0 inverseFinish inverseStart HPair0 HFinishInv HStartInv];
+    subst.
+  - exfalso.
+    eapply recursive_full_finish_disjoint.
+    + apply root_full_self.
+    + exact HFinish.
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HStart0.
+    + exact HFinish.
+  - exists childInverse.
+    split.
+    + exact HChild.
+    + reflexivity.
+  - exfalso.
+    eapply recursive_finish_pair_disjoint.
+    + exact HFinish.
+    + exact HPair0.
+Qed.
+
 (* INV-02 relational core: applying the same structural inversion graph twice
    returns the original semantic Link on exactly the INV-01 domain. *)
 Theorem INV_02_recursive_inversion_involutive
@@ -1461,37 +1536,30 @@ Proof.
         eapply recursive_inversion_source_grounded.
         exact HChild.
     }
-    inversion Hyz as
-      [|y0 secondChild HYStart HSecond
-       |y0 secondChild HYFinish HSecond
-       |y0 secondFinish secondStart HYPair HSecondFinish HSecondStart];
-      subst.
-    + exfalso.
-      eapply recursive_full_finish_disjoint.
-      * apply root_full_self.
-      * exact HYFinishPattern.
-    + exfalso.
-      eapply recursive_start_finish_disjoint.
-      * exact HYStart.
-      * exact HYFinishPattern.
-    + assert (
-        HSecond' :
-        RecursiveInversion F E D childInverse secondChild
-      ).
-      {
-        rewrite <- (recursive_end_start F E D childInverse).
-        exact HSecond.
-      }
-      pose proof (IH secondChild HSecond') as HSecondEq.
-      rewrite HSecondEq.
+    destruct
+      (recursive_inversion_from_finish_only
+        F E D
+        (recursive_end_form F E D childInverse)
+        z
+        HYFinishPattern
+        Hyz)
+      as [secondChild [HSecond Hz]].
+    assert (
+      HSecond' :
+      RecursiveInversion F E D childInverse secondChild
+    ).
+    {
+      rewrite <- (recursive_end_start F E D childInverse).
+      exact HSecond.
+    }
+    pose proof (IH secondChild HSecond') as HSecondEq.
+    transitivity (recursive_start_form F E D secondChild).
+    + exact Hz.
+    + rewrite HSecondEq.
       symmetry.
       apply recursive_start_form_canonical.
       * exact GX.
       * exact HStart.
-    + exfalso.
-      eapply recursive_finish_pair_disjoint.
-      * exact HYFinishPattern.
-      * exact HYPair.
   - pose proof
       (recursive_start_form_pattern F A1 E D childInverse)
       as HYStartPattern.
@@ -1504,37 +1572,30 @@ Proof.
       - intros Hnot.
         exact (False_rect _ (Hnot (proj2 HFinish))).
     }
-    inversion Hyz as
-      [|y0 secondChild HYStart HSecond
-       |y0 secondChild HYFinish HSecond
-       |y0 secondFinish secondStart HYPair HSecondFinish HSecondStart];
-      subst.
-    + exfalso.
-      eapply recursive_full_start_disjoint.
-      * apply root_full_self.
-      * exact HYStartPattern.
-    + assert (
-        HSecond' :
-        RecursiveInversion F E D childInverse secondChild
-      ).
-      {
-        rewrite <- (recursive_start_finish F E D childInverse).
-        exact HSecond.
-      }
-      pose proof (IH secondChild HSecond') as HSecondEq.
-      rewrite HSecondEq.
+    destruct
+      (recursive_inversion_from_start_only
+        F E D
+        (recursive_start_form F E D childInverse)
+        z
+        HYStartPattern
+        Hyz)
+      as [secondChild [HSecond Hz]].
+    assert (
+      HSecond' :
+      RecursiveInversion F E D childInverse secondChild
+    ).
+    {
+      rewrite <- (recursive_start_finish F E D childInverse).
+      exact HSecond.
+    }
+    pose proof (IH secondChild HSecond') as HSecondEq.
+    transitivity (recursive_end_form F E D secondChild).
+    + exact Hz.
+    + rewrite HSecondEq.
       symmetry.
       apply recursive_end_form_canonical.
       * exact GX.
       * exact HFinish.
-    + exfalso.
-      eapply recursive_start_finish_disjoint.
-      * exact HYStartPattern.
-      * exact HYFinish.
-    + exfalso.
-      eapply recursive_start_pair_disjoint.
-      * exact HYStartPattern.
-      * exact HYPair.
   - destruct
       (INV_01_recursive_pole_reversal
         F E D
