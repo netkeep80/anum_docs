@@ -1583,4 +1583,154 @@ theorem INV_05_pair_preserved_and_reversed
     INV_01_recursive_pole_reversal F D hxy
   ⟩
 
+
+/--
+The mirror ordered pair C⟼O is an ordinary PAIR representative as well.
+This is derived from the same two proper one-sided F2/F3 witnesses; U is not
+introduced as a primitive or a fifth self-incidence case.
+-/
+theorem f2f3_reverse_pair_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F (F.form E.finishRoot E.startRoot) := by
+  constructor
+  · intro hSelf
+    have hFinishRootIsPair :
+        E.finishRoot = F.form E.finishRoot E.startRoot := by
+      calc
+        E.finishRoot =
+            F.start (F.form E.finishRoot E.startRoot) :=
+          (F.form_start E.finishRoot E.startRoot).symm
+        _ = F.form E.finishRoot E.startRoot := hSelf
+    have hEq := congrArg F.start hFinishRootIsPair
+    apply E.finishRootNeRoot
+    simpa only [
+      f2f3_finish_root_start F E,
+      F.form_start E.finishRoot E.startRoot
+    ] using hEq.symm
+  · intro hSelf
+    have hStartRootIsPair :
+        E.startRoot = F.form E.finishRoot E.startRoot := by
+      calc
+        E.startRoot =
+            F.finish (F.form E.finishRoot E.startRoot) :=
+          (F.form_finish E.finishRoot E.startRoot).symm
+        _ = F.form E.finishRoot E.startRoot := hSelf
+    have hEq := congrArg F.finish hStartRootIsPair
+    apply E.startRootNeRoot
+    simpa only [
+      f2f3_start_root_finish F E,
+      F.form_finish E.finishRoot E.startRoot
+    ] using hEq.symm
+
+/--
+INV-06 root-basis calculation under one chosen orientation.
+
+O and C are only the two F2/F3 one-sided representatives supplied by the
+chosen orientation; L=O⟼C and U=C⟼O are ordinary PAIR-derived Links.  The
+theorem therefore records a representative calculation, not a Foundation-
+global choice of which one-sided class must be called START.
+-/
+theorem INV_06_root_basis
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    let O := E.startRoot
+    let C := E.finishRoot
+    let L := F.form O C
+    let U := F.form C O
+    RecursiveInversion F D F.R F.R ∧
+    RecursiveInversion F D O C ∧
+    RecursiveInversion F D C O ∧
+    RecursiveInversion F D L L ∧
+    RecursiveInversion F D U U := by
+  dsimp
+  have hR : RecursiveInversion F D F.R F.R :=
+    RecursiveInversion.root (F := F) (D := D)
+  have hO : RecursiveInversion F D E.startRoot E.finishRoot := by
+    have hChild : RecursiveInversion F D (F.finish E.startRoot) F.R := by
+      simpa only [f2f3_start_root_finish F E] using hR
+    have h :=
+      RecursiveInversion.start
+        (D := D)
+        (f2f3_start_root_pattern F E)
+        hChild
+    simpa only [D.endRootCompat] using h
+  have hC : RecursiveInversion F D E.finishRoot E.startRoot := by
+    have hChild : RecursiveInversion F D (F.start E.finishRoot) F.R := by
+      simpa only [f2f3_finish_root_start F E] using hR
+    have h :=
+      RecursiveInversion.finish
+        (D := D)
+        (f2f3_finish_root_pattern F E)
+        hChild
+    simpa only [D.startRootCompat] using h
+  have hL :
+      RecursiveInversion F D
+        (F.form E.startRoot E.finishRoot)
+        (F.form E.startRoot E.finishRoot) := by
+    have hFinish :
+        RecursiveInversion F D
+          (F.finish (F.form E.startRoot E.finishRoot))
+          E.startRoot := by
+      simpa only [F.form_finish] using hC
+    have hStart :
+        RecursiveInversion F D
+          (F.start (F.form E.startRoot E.finishRoot))
+          E.finishRoot := by
+      simpa only [F.form_start] using hO
+    exact RecursiveInversion.pair
+      (f2f3_pair_pattern F E)
+      hFinish
+      hStart
+  have hU :
+      RecursiveInversion F D
+        (F.form E.finishRoot E.startRoot)
+        (F.form E.finishRoot E.startRoot) := by
+    have hFinish :
+        RecursiveInversion F D
+          (F.finish (F.form E.finishRoot E.startRoot))
+          E.finishRoot := by
+      simpa only [F.form_finish] using hO
+    have hStart :
+        RecursiveInversion F D
+          (F.start (F.form E.finishRoot E.startRoot))
+          E.startRoot := by
+      simpa only [F.form_start] using hC
+    exact RecursiveInversion.pair
+      (f2f3_reverse_pair_pattern F E)
+      hFinish
+      hStart
+
+  -- Cross-check the named P0 support boundaries against the direct graph
+  -- calculation above.  These are structural-class audits, not hidden
+  -- premises for constructing hR/hO/hC/hL/hU.
+  have _hRootAudit : F.R = F.R :=
+    INV_03_root_fixed F D hR
+  have _hFinishAudit : FinishOnly F E.finishRoot :=
+    (INV_04_start_to_finish
+      F a1 E D
+      (f2f3_start_root_pattern F E)
+      hO).1
+  have _hStartAudit : StartOnly F E.startRoot :=
+    (INV_04_finish_to_start
+      F a1 E D
+      (f2f3_finish_root_pattern F E)
+      hC).1
+  have _hLPairAudit : PairLocal F (F.form E.startRoot E.finishRoot) :=
+    (INV_05_pair_preserved_and_reversed
+      F a1 N E D
+      (f2f3_pair_pattern F E)
+      hL).1
+  have _hUPairAudit : PairLocal F (F.form E.finishRoot E.startRoot) :=
+    (INV_05_pair_preserved_and_reversed
+      F a1 N E D
+      (f2f3_reverse_pair_pattern F E)
+      hU).1
+
+  exact ⟨hR, hO, hC, hL, hU⟩
+
 end MTS.External

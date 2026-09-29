@@ -1845,3 +1845,216 @@ Proof.
   - exact HPairY.
   - exact (INV_01_recursive_pole_reversal F E D x y Hxy).
 Qed.
+
+
+(* The mirror ordered pair C->O is an ordinary PAIR representative as well.
+   It is derived from the same proper one-sided F2/F3 witnesses; U is not a
+   primitive or a fifth local self-incidence class. *)
+Theorem f2f3_reverse_pair_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F
+      (form F (f2f3_finish_root F E) (f2f3_start_root F E)).
+Proof.
+  unfold PairLocal, StartSelf, FinishSelf.
+  split.
+  - intros Hself.
+    assert (
+      HfinishRootIsPair :
+      f2f3_finish_root F E =
+      form F (f2f3_finish_root F E) (f2f3_start_root F E)
+    ).
+    {
+      transitivity
+        (start F
+          (form F (f2f3_finish_root F E) (f2f3_start_root F E))).
+      - symmetry. apply form_start.
+      - exact Hself.
+    }
+    pose proof (f_equal (start F) HfinishRootIsPair) as H.
+    rewrite (f2f3_finish_root_start F E) in H.
+    rewrite (form_start F (f2f3_finish_root F E) (f2f3_start_root F E)) in H.
+    apply (f2f3_finish_root_ne_root F E).
+    symmetry.
+    exact H.
+  - intros Hself.
+    assert (
+      HstartRootIsPair :
+      f2f3_start_root F E =
+      form F (f2f3_finish_root F E) (f2f3_start_root F E)
+    ).
+    {
+      transitivity
+        (finish F
+          (form F (f2f3_finish_root F E) (f2f3_start_root F E))).
+      - symmetry. apply form_finish.
+      - exact Hself.
+    }
+    pose proof (f_equal (finish F) HstartRootIsPair) as H.
+    rewrite (f2f3_start_root_finish F E) in H.
+    rewrite (form_finish F (f2f3_finish_root F E) (f2f3_start_root F E)) in H.
+    apply (f2f3_start_root_ne_root F E).
+    symmetry.
+    exact H.
+Qed.
+
+(* INV-06 root-basis representative calculation under one chosen orientation.
+   O/C are the F2/F3 one-sided representatives; L=O->C and U=C->O are derived
+   PAIR Links.  No Foundation-global absolute START side is selected here. *)
+Theorem INV_06_root_basis
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    let O := f2f3_start_root F E in
+    let C := f2f3_finish_root F E in
+    let L := form F O C in
+    let U := form F C O in
+    RecursiveInversion F E D (R F) (R F) /\
+    RecursiveInversion F E D O C /\
+    RecursiveInversion F E D C O /\
+    RecursiveInversion F E D L L /\
+    RecursiveInversion F E D U U.
+Proof.
+  cbv beta.
+  assert (HR : RecursiveInversion F E D (R F) (R F)).
+  {
+    apply recursive_inversion_root.
+  }
+  assert (
+    HO :
+    RecursiveInversion F E D
+      (f2f3_start_root F E)
+      (f2f3_finish_root F E)
+  ).
+  {
+    assert (
+      HChild :
+      RecursiveInversion F E D
+        (finish F (f2f3_start_root F E))
+        (R F)
+    ).
+    {
+      rewrite (f2f3_start_root_finish F E).
+      exact HR.
+    }
+    assert (
+      HRaw :
+      RecursiveInversion F E D
+        (f2f3_start_root F E)
+        (recursive_end_form F E D (R F))
+    ).
+    {
+      apply recursive_inversion_start.
+      - apply f2f3_start_root_pattern.
+      - exact HChild.
+    }
+    rewrite (recursive_end_root_compat F E D) in HRaw.
+    exact HRaw.
+  }
+  assert (
+    HC :
+    RecursiveInversion F E D
+      (f2f3_finish_root F E)
+      (f2f3_start_root F E)
+  ).
+  {
+    assert (
+      HChild :
+      RecursiveInversion F E D
+        (start F (f2f3_finish_root F E))
+        (R F)
+    ).
+    {
+      rewrite (f2f3_finish_root_start F E).
+      exact HR.
+    }
+    assert (
+      HRaw :
+      RecursiveInversion F E D
+        (f2f3_finish_root F E)
+        (recursive_start_form F E D (R F))
+    ).
+    {
+      apply recursive_inversion_finish.
+      - apply f2f3_finish_root_pattern.
+      - exact HChild.
+    }
+    rewrite (recursive_start_root_compat F E D) in HRaw.
+    exact HRaw.
+  }
+  assert (
+    HL :
+    RecursiveInversion F E D
+      (form F (f2f3_start_root F E) (f2f3_finish_root F E))
+      (form F (f2f3_start_root F E) (f2f3_finish_root F E))
+  ).
+  {
+    apply recursive_inversion_pair.
+    - apply f2f3_pair_pattern.
+    - rewrite (form_finish F (f2f3_start_root F E) (f2f3_finish_root F E)).
+      exact HC.
+    - rewrite (form_start F (f2f3_start_root F E) (f2f3_finish_root F E)).
+      exact HO.
+  }
+  assert (
+    HU :
+    RecursiveInversion F E D
+      (form F (f2f3_finish_root F E) (f2f3_start_root F E))
+      (form F (f2f3_finish_root F E) (f2f3_start_root F E))
+  ).
+  {
+    apply recursive_inversion_pair.
+    - apply f2f3_reverse_pair_pattern.
+    - rewrite (form_finish F (f2f3_finish_root F E) (f2f3_start_root F E)).
+      exact HO.
+    - rewrite (form_start F (f2f3_finish_root F E) (f2f3_start_root F E)).
+      exact HC.
+  }
+
+  (* Cross-check the named P0 support boundaries against the direct graph
+     calculation above.  These theorems audit the structural class effects;
+     they are not hidden premises for constructing HR/HO/HC/HL/HU. *)
+  pose proof
+    (INV_03_root_fixed F E D (R F) HR)
+    as HRootAudit.
+  pose proof
+    (proj1
+      (INV_04_start_to_finish
+        F A1 E D
+        (f2f3_start_root F E)
+        (f2f3_finish_root F E)
+        (f2f3_start_root_pattern F E)
+        HO))
+    as HFinishAudit.
+  pose proof
+    (proj1
+      (INV_04_finish_to_start
+        F A1 E D
+        (f2f3_finish_root F E)
+        (f2f3_start_root F E)
+        (f2f3_finish_root_pattern F E)
+        HC))
+    as HStartAudit.
+  pose proof
+    (proj1
+      (INV_05_pair_preserved_and_reversed
+        F A1 N E D
+        (form F (f2f3_start_root F E) (f2f3_finish_root F E))
+        (form F (f2f3_start_root F E) (f2f3_finish_root F E))
+        (f2f3_pair_pattern F E)
+        HL))
+    as HLPairAudit.
+  pose proof
+    (proj1
+      (INV_05_pair_preserved_and_reversed
+        F A1 N E D
+        (form F (f2f3_finish_root F E) (f2f3_start_root F E))
+        (form F (f2f3_finish_root F E) (f2f3_start_root F E))
+        (f2f3_reverse_pair_pattern F E)
+        HU))
+    as HUPairAudit.
+
+  repeat split; assumption.
+Qed.
