@@ -2888,6 +2888,401 @@ Proof.
           (proj2 HMb)).
 Qed.
 
+(* Accepted post-orientation direction witnesses, expressed only as existing
+   Links.  These names are external proof aliases; before Context selection
+   neither one is a Foundation-global preferred orientation. *)
+Definition ContextInRWitness
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) : Link F :=
+  form F (f2f3_finish_root F E) (R F).
+
+Definition ContextOutRWitness
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) : Link F :=
+  form F (R F) (f2f3_start_root F E).
+
+(* Relational marker -> chi(K) bridge.  The selected one-sided marker fixes the
+   local semantic polarity; no host orientation datatype carries orientation. *)
+Definition ContextChiWitness
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (selected chi : Link F) : Prop :=
+  (SameChiralClass F selected (f2f3_start_root F E) /\
+    chi = ContextInRWitness F E) \/
+  (SameChiralClass F selected (f2f3_finish_root F E) /\
+    chi = ContextOutRWitness F E).
+
+Theorem ctx03_inr_pair_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F (ContextInRWitness F E).
+Proof.
+  unfold PairLocal, StartSelf, FinishSelf.
+  split.
+  - intros HSelf.
+    assert (
+      HEq :
+      f2f3_finish_root F E = ContextInRWitness F E
+    ).
+    {
+      transitivity (start F (ContextInRWitness F E)).
+      - symmetry.
+        unfold ContextInRWitness.
+        apply form_start.
+      - exact HSelf.
+    }
+    pose proof (f_equal (finish F) HEq) as HFinish.
+    apply (f2f3_finish_root_ne_root F E).
+    unfold ContextInRWitness in HFinish.
+    rewrite (f2f3_finish_root_finish F E) in HFinish.
+    rewrite (form_finish F (f2f3_finish_root F E) (R F)) in HFinish.
+    exact HFinish.
+  - intros HSelf.
+    assert (
+      HEq :
+      R F = ContextInRWitness F E
+    ).
+    {
+      transitivity (finish F (ContextInRWitness F E)).
+      - symmetry.
+        unfold ContextInRWitness.
+        apply form_finish.
+      - exact HSelf.
+    }
+    pose proof (f_equal (start F) HEq) as HStart.
+    assert (HRootStart : start F (R F) = R F).
+    {
+      exact (proj1 (root_full_self F)).
+    }
+    apply (f2f3_finish_root_ne_root F E).
+    symmetry.
+    transitivity (start F (R F)).
+    + symmetry. exact HRootStart.
+    + transitivity (start F (ContextInRWitness F E)).
+      * exact HStart.
+      * unfold ContextInRWitness.
+        apply form_start.
+Qed.
+
+Theorem ctx03_outr_pair_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F (ContextOutRWitness F E).
+Proof.
+  unfold PairLocal, StartSelf, FinishSelf.
+  split.
+  - intros HSelf.
+    assert (
+      HEq :
+      R F = ContextOutRWitness F E
+    ).
+    {
+      transitivity (start F (ContextOutRWitness F E)).
+      - symmetry.
+        unfold ContextOutRWitness.
+        apply form_start.
+      - exact HSelf.
+    }
+    pose proof (f_equal (finish F) HEq) as HFinish.
+    assert (HRootFinish : finish F (R F) = R F).
+    {
+      exact (proj2 (root_full_self F)).
+    }
+    apply (f2f3_start_root_ne_root F E).
+    symmetry.
+    transitivity (finish F (R F)).
+    + symmetry. exact HRootFinish.
+    + transitivity (finish F (ContextOutRWitness F E)).
+      * exact HFinish.
+      * unfold ContextOutRWitness.
+        apply form_finish.
+  - intros HSelf.
+    assert (
+      HEq :
+      f2f3_start_root F E = ContextOutRWitness F E
+    ).
+    {
+      transitivity (finish F (ContextOutRWitness F E)).
+      - symmetry.
+        unfold ContextOutRWitness.
+        apply form_finish.
+      - exact HSelf.
+    }
+    pose proof (f_equal (start F) HEq) as HStart.
+    apply (f2f3_start_root_ne_root F E).
+    unfold ContextOutRWitness in HStart.
+    rewrite (f2f3_start_root_start F E) in HStart.
+    rewrite (form_start F (R F) (f2f3_start_root F E)) in HStart.
+    exact HStart.
+Qed.
+
+Theorem ctx03_direction_witnesses_distinct
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    ContextInRWitness F E <> ContextOutRWitness F E.
+Proof.
+  intros HEq.
+  pose proof (f_equal (start F) HEq) as HStart.
+  apply (f2f3_finish_root_ne_root F E).
+  unfold ContextInRWitness, ContextOutRWitness in HStart.
+  rewrite (form_start F (f2f3_finish_root F E) (R F)) in HStart.
+  rewrite (form_start F (R F) (f2f3_start_root F E)) in HStart.
+  exact HStart.
+Qed.
+
+(* J exchanges the two accepted direction-witness Links. *)
+Theorem CTX_03_direction_witness_inversion
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    RecursiveInversion F E D
+      (ContextInRWitness F E)
+      (ContextOutRWitness F E) /\
+    RecursiveInversion F E D
+      (ContextOutRWitness F E)
+      (ContextInRWitness F E).
+Proof.
+  assert (HR : RecursiveInversion F E D (R F) (R F)).
+  {
+    apply recursive_inversion_root.
+  }
+  assert (
+    HOC :
+    RecursiveInversion F E D
+      (f2f3_start_root F E)
+      (f2f3_finish_root F E)
+  ).
+  {
+    assert (
+      HChild :
+      RecursiveInversion F E D
+        (finish F (f2f3_start_root F E))
+        (R F)
+    ).
+    {
+      rewrite (f2f3_start_root_finish F E).
+      exact HR.
+    }
+    assert (
+      HRaw :
+      RecursiveInversion F E D
+        (f2f3_start_root F E)
+        (recursive_end_form F E D (R F))
+    ).
+    {
+      apply recursive_inversion_start.
+      - apply f2f3_start_root_pattern.
+      - exact HChild.
+    }
+    rewrite (recursive_end_root_compat F E D) in HRaw.
+    exact HRaw.
+  }
+  assert (
+    HCO :
+    RecursiveInversion F E D
+      (f2f3_finish_root F E)
+      (f2f3_start_root F E)
+  ).
+  {
+    assert (
+      HChild :
+      RecursiveInversion F E D
+        (start F (f2f3_finish_root F E))
+        (R F)
+    ).
+    {
+      rewrite (f2f3_finish_root_start F E).
+      exact HR.
+    }
+    assert (
+      HRaw :
+      RecursiveInversion F E D
+        (f2f3_finish_root F E)
+        (recursive_start_form F E D (R F))
+    ).
+    {
+      apply recursive_inversion_finish.
+      - apply f2f3_finish_root_pattern.
+      - exact HChild.
+    }
+    rewrite (recursive_start_root_compat F E D) in HRaw.
+    exact HRaw.
+  }
+  split.
+  - unfold ContextInRWitness, ContextOutRWitness.
+    apply recursive_inversion_pair.
+    + apply ctx03_inr_pair_pattern.
+    + rewrite (form_finish F (f2f3_finish_root F E) (R F)).
+      exact HR.
+    + rewrite (form_start F (f2f3_finish_root F E) (R F)).
+      exact HCO.
+  - unfold ContextInRWitness, ContextOutRWitness.
+    apply recursive_inversion_pair.
+    + apply ctx03_outr_pair_pattern.
+    + rewrite (form_finish F (R F) (f2f3_start_root F E)).
+      exact HOC.
+    + rewrite (form_start F (R F) (f2f3_start_root F E)).
+      exact HR.
+Qed.
+
+(* A Link-native Context marker selects exactly one chi(K). *)
+Theorem CTX_03_context_marker_selects_unique_chi
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (body selected : Link F) :
+    ContextOrientationMarker F E D body selected ->
+    exists chi : Link F,
+      ContextChiWitness F E selected chi /\
+      forall other : Link F,
+        ContextChiWitness F E selected other ->
+        other = chi.
+Proof.
+  intros HSelected.
+  destruct HSelected as [HSelectedStart | HSelectedEnd].
+  - subst selected.
+    assert (
+      HSelectedPattern :
+      StartOnly F (recursive_start_form F E D body)
+    ).
+    {
+      apply recursive_start_form_pattern.
+      exact A1.
+    }
+    assert (
+      HSameStart :
+      SameChiralClass F
+        (recursive_start_form F E D body)
+        (f2f3_start_root F E)
+    ).
+    {
+      left. split.
+      - exact HSelectedPattern.
+      - apply f2f3_start_root_pattern.
+    }
+    assert (
+      HOppFinish :
+      OppositeChiralClass F
+        (recursive_start_form F E D body)
+        (f2f3_finish_root F E)
+    ).
+    {
+      left. split.
+      - exact HSelectedPattern.
+      - apply f2f3_finish_root_pattern.
+    }
+    exists (ContextInRWitness F E).
+    split.
+    + left. split.
+      * exact HSameStart.
+      * reflexivity.
+    + intros other HOther.
+      destruct HOther as [[HSame HEq] | [HSame HEq]].
+      * exact HEq.
+      * exfalso.
+        eapply ctx03_transport_disjoint.
+        -- exact HSame.
+        -- exact HOppFinish.
+  - subst selected.
+    assert (
+      HSelectedPattern :
+      FinishOnly F (recursive_end_form F E D body)
+    ).
+    {
+      apply recursive_end_form_pattern.
+      exact A1.
+    }
+    assert (
+      HSameFinish :
+      SameChiralClass F
+        (recursive_end_form F E D body)
+        (f2f3_finish_root F E)
+    ).
+    {
+      right. split.
+      - exact HSelectedPattern.
+      - apply f2f3_finish_root_pattern.
+    }
+    assert (
+      HOppStart :
+      OppositeChiralClass F
+        (recursive_end_form F E D body)
+        (f2f3_start_root F E)
+    ).
+    {
+      right. split.
+      - exact HSelectedPattern.
+      - apply f2f3_start_root_pattern.
+    }
+    exists (ContextOutRWitness F E).
+    split.
+    + right. split.
+      * exact HSameFinish.
+      * reflexivity.
+    + intros other HOther.
+      destruct HOther as [[HSame HEq] | [HSame HEq]].
+      * exfalso.
+        eapply ctx03_transport_disjoint.
+        -- exact HSame.
+        -- exact HOppStart.
+      * exact HEq.
+Qed.
+
+(* Every selected Context marker yields a unique chi(K); J maps it to the other
+   accepted direction witness and cannot leave it fixed. *)
+Theorem CTX_03_chi_direction_bridge
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (body selected : Link F) :
+    ContextOrientationMarker F E D body selected ->
+    exists chi jchi : Link F,
+      ContextChiWitness F E selected chi /\
+      RecursiveInversion F E D chi jchi /\
+      chi <> jchi /\
+      ((chi = ContextInRWitness F E /\
+        jchi = ContextOutRWitness F E) \/
+       (chi = ContextOutRWitness F E /\
+        jchi = ContextInRWitness F E)).
+Proof.
+  intros HSelected.
+  destruct
+    (CTX_03_context_marker_selects_unique_chi
+      F A1 E D body selected HSelected)
+    as [chi [HChi HUnique]].
+  pose proof (CTX_03_direction_witness_inversion F E D) as HDirections.
+  destruct HChi as [[HSame HEq] | [HSame HEq]].
+  - subst chi.
+    exists (ContextInRWitness F E).
+    exists (ContextOutRWitness F E).
+    split.
+    + left. split.
+      * exact HSame.
+      * reflexivity.
+    + split.
+      * exact (proj1 HDirections).
+      * split.
+        -- apply ctx03_direction_witnesses_distinct.
+        -- left. split; reflexivity.
+  - subst chi.
+    exists (ContextOutRWitness F E).
+    exists (ContextInRWitness F E).
+    split.
+    + right. split.
+      * exact HSame.
+      * reflexivity.
+    + split.
+      * exact (proj2 HDirections).
+      * split.
+        -- intros HEq.
+           apply (ctx03_direction_witnesses_distinct F E).
+           symmetry. exact HEq.
+        -- right. split; reflexivity.
+Qed.
+
+
 (* CTX-03 capstone: objective chirality predates observation, Context selection
    induces only local START_K/END_K roles, and relative transport composes as
    the already-proved relational Z2 layer.

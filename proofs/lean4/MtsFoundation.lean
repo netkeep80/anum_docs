@@ -2315,6 +2315,285 @@ theorem CTX_03_simultaneous_inversion_covariance
     exact ctx03_same_opposite F hJaB hMb.2
 
 /--
+Accepted post-orientation direction witnesses, expressed only as existing
+Links. These names are external proof aliases; before Context selection neither
+one is a Foundation-global preferred orientation.
+-/
+def ContextInRWitness
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) : F.Link :=
+  F.form E.finishRoot F.R
+
+def ContextOutRWitness
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) : F.Link :=
+  F.form F.R E.startRoot
+
+/--
+Relational bridge from a selected Link-native Context marker to chi(K).
+
+If the selected marker is in the root START class, local END_K is the root
+finish-self representative and chi(K)=C_K⟼R.  If the selected marker is in the
+root END class, the semantic frame is mirrored and chi(K)=R⟼O_K in technical
+coordinates.  No host orientation datatype value is semantic authority.
+-/
+def ContextChiWitness
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (selected chi : F.Link) : Prop :=
+  (SameChiralClass F selected E.startRoot ∧
+    chi = ContextInRWitness F E) ∨
+  (SameChiralClass F selected E.finishRoot ∧
+    chi = ContextOutRWitness F E)
+
+theorem ctx03_inr_pair_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F (ContextInRWitness F E) := by
+  constructor
+  · intro hSelf
+    have hEq :
+        E.finishRoot = ContextInRWitness F E := by
+      calc
+        E.finishRoot =
+            F.start (ContextInRWitness F E) := by
+          simp only [ContextInRWitness, F.form_start]
+        _ = ContextInRWitness F E := hSelf
+    have hFinish := congrArg F.finish hEq
+    apply E.finishRootNeRoot
+    simpa only [
+      ContextInRWitness,
+      f2f3_finish_root_finish F E,
+      F.form_finish
+    ] using hFinish
+  · intro hSelf
+    have hEq :
+        F.R = ContextInRWitness F E := by
+      calc
+        F.R =
+            F.finish (ContextInRWitness F E) := by
+          simp only [ContextInRWitness, F.form_finish]
+        _ = ContextInRWitness F E := hSelf
+    have hStart := congrArg F.start hEq
+    have hRootStart : F.start F.R = F.R := (root_full_self F).1
+    have hRootEq : F.R = E.finishRoot := by
+      calc
+        F.R = F.start F.R := hRootStart.symm
+        _ = F.start (ContextInRWitness F E) := hStart
+        _ = E.finishRoot := by
+          simp only [ContextInRWitness, F.form_start]
+    exact E.finishRootNeRoot hRootEq.symm
+
+theorem ctx03_outr_pair_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F (ContextOutRWitness F E) := by
+  constructor
+  · intro hSelf
+    have hEq :
+        F.R = ContextOutRWitness F E := by
+      calc
+        F.R =
+            F.start (ContextOutRWitness F E) := by
+          simp only [ContextOutRWitness, F.form_start]
+        _ = ContextOutRWitness F E := hSelf
+    have hFinish := congrArg F.finish hEq
+    have hRootFinish : F.finish F.R = F.R := (root_full_self F).2
+    have hRootEq : F.R = E.startRoot := by
+      calc
+        F.R = F.finish F.R := hRootFinish.symm
+        _ = F.finish (ContextOutRWitness F E) := hFinish
+        _ = E.startRoot := by
+          simp only [ContextOutRWitness, F.form_finish]
+    exact E.startRootNeRoot hRootEq.symm
+  · intro hSelf
+    have hEq :
+        E.startRoot = ContextOutRWitness F E := by
+      calc
+        E.startRoot =
+            F.finish (ContextOutRWitness F E) := by
+          simp only [ContextOutRWitness, F.form_finish]
+        _ = ContextOutRWitness F E := hSelf
+    have hStart := congrArg F.start hEq
+    apply E.startRootNeRoot
+    simpa only [
+      ContextOutRWitness,
+      f2f3_start_root_start F E,
+      F.form_start
+    ] using hStart
+
+theorem ctx03_direction_witnesses_distinct
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    ContextInRWitness F E ≠ ContextOutRWitness F E := by
+  intro hEq
+  have hStart := congrArg F.start hEq
+  apply E.finishRootNeRoot
+  simpa only [
+    ContextInRWitness,
+    ContextOutRWitness,
+    F.form_start
+  ] using hStart
+
+/--
+J exchanges the two accepted direction-witness Links.  This is a structural
+statement over RecursiveInversion, not a host-side function definition.
+-/
+theorem CTX_03_direction_witness_inversion
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    RecursiveInversion F D
+      (ContextInRWitness F E)
+      (ContextOutRWitness F E) ∧
+    RecursiveInversion F D
+      (ContextOutRWitness F E)
+      (ContextInRWitness F E) := by
+  have hR : RecursiveInversion F D F.R F.R :=
+    RecursiveInversion.root (F := F) (D := D)
+  have hOC : RecursiveInversion F D E.startRoot E.finishRoot := by
+    have hChild : RecursiveInversion F D (F.finish E.startRoot) F.R := by
+      simpa only [f2f3_start_root_finish F E] using hR
+    have h :=
+      RecursiveInversion.start
+        (D := D)
+        (f2f3_start_root_pattern F E)
+        hChild
+    simpa only [D.endRootCompat] using h
+  have hCO : RecursiveInversion F D E.finishRoot E.startRoot := by
+    have hChild : RecursiveInversion F D (F.start E.finishRoot) F.R := by
+      simpa only [f2f3_finish_root_start F E] using hR
+    have h :=
+      RecursiveInversion.finish
+        (D := D)
+        (f2f3_finish_root_pattern F E)
+        hChild
+    simpa only [D.startRootCompat] using h
+  constructor
+  · have hFinish :
+        RecursiveInversion F D
+          (F.finish (ContextInRWitness F E))
+          F.R := by
+      simpa only [ContextInRWitness, F.form_finish] using hR
+    have hStart :
+        RecursiveInversion F D
+          (F.start (ContextInRWitness F E))
+          E.startRoot := by
+      simpa only [ContextInRWitness, F.form_start] using hCO
+    simpa only [ContextInRWitness, ContextOutRWitness] using
+      (RecursiveInversion.pair
+        (D := D)
+        (ctx03_inr_pair_pattern F E)
+        hFinish
+        hStart)
+  · have hFinish :
+        RecursiveInversion F D
+          (F.finish (ContextOutRWitness F E))
+          E.finishRoot := by
+      simpa only [ContextOutRWitness, F.form_finish] using hOC
+    have hStart :
+        RecursiveInversion F D
+          (F.start (ContextOutRWitness F E))
+          F.R := by
+      simpa only [ContextOutRWitness, F.form_start] using hR
+    simpa only [ContextInRWitness, ContextOutRWitness] using
+      (RecursiveInversion.pair
+        (D := D)
+        (ctx03_outr_pair_pattern F E)
+        hFinish
+        hStart)
+
+/--
+A Link-native Context marker selects exactly one chi(K).  The two branches are
+the accepted InR_K / OutR_K representatives; uniqueness follows from the
+one-sided chiral classes, not from a host orientation enum.
+-/
+theorem CTX_03_context_marker_selects_unique_chi
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {body selected : F.Link}
+    (hSelected : ContextOrientationMarker F D body selected) :
+    ∃ chi : F.Link,
+      ContextChiWitness F E selected chi ∧
+      ∀ other : F.Link,
+        ContextChiWitness F E selected other →
+        other = chi := by
+  rcases hSelected with hSelectedStart | hSelectedEnd
+  · subst selected
+    have hSelectedPattern := recursive_start_form_pattern F a1 E D body
+    have hSameStart :
+        SameChiralClass F (D.startForm body) E.startRoot :=
+      Or.inl ⟨hSelectedPattern, f2f3_start_root_pattern F E⟩
+    have hOppFinish :
+        OppositeChiralClass F (D.startForm body) E.finishRoot :=
+      Or.inl ⟨hSelectedPattern, f2f3_finish_root_pattern F E⟩
+    refine ⟨ContextInRWitness F E, Or.inl ⟨hSameStart, rfl⟩, ?_⟩
+    intro other hOther
+    rcases hOther with hIn | hOut
+    · exact hIn.2
+    · exact False.elim
+        (ctx03_transport_disjoint F hOut.1 hOppFinish)
+  · subst selected
+    have hSelectedPattern := recursive_end_form_pattern F a1 E D body
+    have hSameFinish :
+        SameChiralClass F (D.endForm body) E.finishRoot :=
+      Or.inr ⟨hSelectedPattern, f2f3_finish_root_pattern F E⟩
+    have hOppStart :
+        OppositeChiralClass F (D.endForm body) E.startRoot :=
+      Or.inr ⟨hSelectedPattern, f2f3_start_root_pattern F E⟩
+    refine ⟨ContextOutRWitness F E, Or.inr ⟨hSameFinish, rfl⟩, ?_⟩
+    intro other hOther
+    rcases hOther with hIn | hOut
+    · exact False.elim
+        (ctx03_transport_disjoint F hIn.1 hOppStart)
+    · exact hOut.2
+
+/--
+Formal chi(K) bridge: every selected Context marker yields a unique direction
+witness, and its structural J-image is the other accepted witness.  The image
+is distinct from chi, which is the formal negative control against accepting
+the same-polarity root witness as chi(K).
+-/
+theorem CTX_03_chi_direction_bridge
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {body selected : F.Link}
+    (hSelected : ContextOrientationMarker F D body selected) :
+    ∃ chi jchi : F.Link,
+      ContextChiWitness F E selected chi ∧
+      RecursiveInversion F D chi jchi ∧
+      chi ≠ jchi ∧
+      ((chi = ContextInRWitness F E ∧
+        jchi = ContextOutRWitness F E) ∨
+       (chi = ContextOutRWitness F E ∧
+        jchi = ContextInRWitness F E)) := by
+  rcases CTX_03_context_marker_selects_unique_chi
+    F a1 E D hSelected with ⟨chi, hChi, _⟩
+  have hDirections := CTX_03_direction_witness_inversion F E D
+  rcases hChi with hIn | hOut
+  · exact ⟨
+      ContextInRWitness F E,
+      ContextOutRWitness F E,
+      Or.inl ⟨hIn.1, rfl⟩,
+      hDirections.1,
+      ctx03_direction_witnesses_distinct F E,
+      Or.inl ⟨rfl, rfl⟩
+    ⟩
+  · exact ⟨
+      ContextOutRWitness F E,
+      ContextInRWitness F E,
+      Or.inr ⟨hOut.1, rfl⟩,
+      hDirections.2,
+      (ctx03_direction_witnesses_distinct F E).symm,
+      Or.inr ⟨rfl, rfl⟩
+    ⟩
+
+
+/--
 CTX-03 capstone: objective chirality predates observation, Context selection
 induces only local START_K/END_K roles, and relative transport composes as the
 already-proved relational Z2 layer.
