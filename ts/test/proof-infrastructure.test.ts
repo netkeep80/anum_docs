@@ -875,8 +875,12 @@ for (const record of fnd07) {
   );
   assert.deepEqual(
     record.assumptions,
-    ["accepted contextual truth semantics"],
-    "FND-07 assumptions preserve the P0 semantic boundary",
+    [
+      "accepted A16 contextual truth semantics",
+      "accepted A16 current-Scope composition law",
+      "F2/F3 root-basis witnesses for structural L = O⟼C",
+    ],
+    "FND-07 assumptions preserve the explicit P0 semantic boundary",
   );
   assert.deepEqual(
     record.dependencies,
