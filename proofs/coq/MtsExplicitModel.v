@@ -637,17 +637,19 @@ Proof.
   destruct (grounded_is_canonical x GX) as [a [b Hx]].
   assert (Ha : a = x).
   {
-    change (model_start x = x) in Hstart.
-    rewrite Hx in Hstart.
-    rewrite model_start_form_projection in Hstart.
-    exact Hstart.
+    transitivity (model_start x).
+    - rewrite Hx.
+      symmetry.
+      apply model_start_form_projection.
+    - exact Hstart.
   }
   assert (Hb : b = x).
   {
-    change (model_finish x = x) in Hfinish.
-    rewrite Hx in Hfinish.
-    rewrite model_finish_form_projection in Hfinish.
-    exact Hfinish.
+    transitivity (model_finish x).
+    - rewrite Hx.
+      symmetry.
+      apply model_finish_form_projection.
+    - exact Hfinish.
   }
   subst a. subst b.
   destruct (left_fixed_root_or_start x x Hx) as [Hroot | Hsection].
@@ -668,14 +670,16 @@ Proof.
   destruct (grounded_is_canonical x GX) as [a [b Hx]].
   assert (Ha : a = x).
   {
-    change (model_start x = x) in Hstart.
-    rewrite Hx in Hstart.
-    rewrite model_start_form_projection in Hstart.
-    exact Hstart.
+    transitivity (model_start x).
+    - rewrite Hx.
+      symmetry.
+      apply model_start_form_projection.
+    - exact Hstart.
   }
   assert (Hb : b = model_finish x).
   {
     rewrite Hx.
+    symmetry.
     apply model_finish_form_projection.
   }
   subst a. subst b.
@@ -703,14 +707,16 @@ Proof.
   assert (Ha : a = model_start x).
   {
     rewrite Hx.
+    symmetry.
     apply model_start_form_projection.
   }
   assert (Hb : b = x).
   {
-    change (model_finish x = x) in Hfinish.
-    rewrite Hx in Hfinish.
-    rewrite model_finish_form_projection in Hfinish.
-    exact Hfinish.
+    transitivity (model_finish x).
+    - rewrite Hx.
+      symmetry.
+      apply model_finish_form_projection.
+    - exact Hfinish.
   }
   subst a. subst b.
   destruct (right_fixed_root_or_end (model_start x) x Hx)
