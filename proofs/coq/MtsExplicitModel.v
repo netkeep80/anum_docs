@@ -500,6 +500,410 @@ Proof.
     ExplicitFoundation ExplicitGroundedNormalization x y GX GY).
 Qed.
 
+(*
+Concrete A1 discharge on the explicit infinite model.
+Host list-length arguments below prove only uniqueness properties of this
+external model encoding; they do not add MTS ontology or semantic authority.
+*)
+Lemma model_start_form_ne_self :
+  forall a : ModelLink, model_start_form a <> a.
+Proof.
+  intros a H.
+  pose proof (f_equal (@length bool) H) as Hlen.
+  unfold model_start_form in Hlen.
+  simpl in Hlen.
+  lia.
+Qed.
+
+Lemma model_end_form_ne_self :
+  forall a : ModelLink, model_end_form a <> a.
+Proof.
+  intros a H.
+  pose proof (f_equal (@length bool) H) as Hlen.
+  unfold model_end_form in Hlen.
+  simpl in Hlen.
+  lia.
+Qed.
+
+Lemma encode_left_length_gt :
+  forall a : ModelLink, length a < length (encode_left a).
+Proof.
+  induction a as [|bit tail IH].
+  - simpl. lia.
+  - destruct bit; simpl; lia.
+Qed.
+
+Lemma pair_code_ne_left :
+  forall lhs rhs : ModelLink, pair_code lhs rhs <> lhs.
+Proof.
+  intros lhs rhs H.
+  pose proof (f_equal (@length bool) H) as Hlen.
+  unfold pair_code in Hlen.
+  simpl in Hlen.
+  rewrite app_length in Hlen.
+  pose proof (encode_left_length_gt lhs) as Hgrow.
+  lia.
+Qed.
+
+Lemma pair_code_ne_right :
+  forall lhs rhs : ModelLink, pair_code lhs rhs <> rhs.
+Proof.
+  intros lhs rhs H.
+  pose proof (f_equal (@length bool) H) as Hlen.
+  unfold pair_code in Hlen.
+  simpl in Hlen.
+  rewrite app_length in Hlen.
+  lia.
+Qed.
+
+Lemma left_fixed_root_or_start :
+  forall a b : ModelLink,
+    a = model_form a b ->
+    (a = model_root /\ b = model_root) \/
+    a = model_start_form b.
+Proof.
+  intros a b H.
+  unfold model_form in H.
+  destruct (link_eq_dec a model_root) as [Ha | Ha].
+  - destruct (link_eq_dec b model_root) as [Hb | Hb].
+    + left. split; assumption.
+    + subst a.
+      unfold nonroot_form in H.
+      destruct (link_eq_dec model_root (model_start_form b)) as [Hs | Hs].
+      * exfalso.
+        apply (model_start_form_ne_root b).
+        symmetry. exact Hs.
+      * destruct (link_eq_dec b (model_end_form model_root)) as [He | He].
+        -- exfalso. apply Hb. symmetry. exact H.
+        -- exfalso.
+           apply (pair_code_ne_left model_root b).
+           symmetry. exact H.
+  - unfold nonroot_form in H.
+    destruct (link_eq_dec a (model_start_form b)) as [Hs | Hs].
+    + right. exact Hs.
+    + destruct (link_eq_dec b (model_end_form a)) as [He | He].
+      * exfalso.
+        apply (model_end_form_ne_self a).
+        symmetry.
+        exact (eq_trans H He).
+      * exfalso.
+        apply (pair_code_ne_left a b).
+        symmetry. exact H.
+Qed.
+
+Lemma right_fixed_root_or_end :
+  forall a b : ModelLink,
+    b = model_form a b ->
+    (a = model_root /\ b = model_root) \/
+    b = model_end_form a.
+Proof.
+  intros a b H.
+  unfold model_form in H.
+  destruct (link_eq_dec a model_root) as [Ha | Ha].
+  - destruct (link_eq_dec b model_root) as [Hb | Hb].
+    + left. split; assumption.
+    + subst a.
+      unfold nonroot_form in H.
+      destruct (link_eq_dec model_root (model_start_form b)) as [Hs | Hs].
+      * exfalso.
+        apply (model_start_form_ne_root b).
+        symmetry. exact Hs.
+      * destruct (link_eq_dec b (model_end_form model_root)) as [He | He].
+        -- right. exact He.
+        -- exfalso.
+           apply (pair_code_ne_right model_root b).
+           symmetry. exact H.
+  - unfold nonroot_form in H.
+    destruct (link_eq_dec a (model_start_form b)) as [Hs | Hs].
+    + exfalso.
+      apply (model_start_form_ne_self b).
+      symmetry.
+      exact (eq_trans H Hs).
+    + destruct (link_eq_dec b (model_end_form a)) as [He | He].
+      * right. exact He.
+      * exfalso.
+        apply (pair_code_ne_right a b).
+        symmetry. exact H.
+Qed.
+
+Lemma explicit_full_self_eq_root :
+  forall x : ModelLink,
+    Grounded ExplicitFoundation x ->
+    FullSelf ExplicitFoundation x ->
+    x = model_root.
+Proof.
+  intros x GX Hfull.
+  destruct Hfull as [Hstart Hfinish].
+  destruct (grounded_is_canonical x GX) as [a [b Hx]].
+  assert (Ha : a = x).
+  {
+    change (model_start x = x) in Hstart.
+    rewrite Hx in Hstart.
+    rewrite model_start_form_projection in Hstart.
+    exact Hstart.
+  }
+  assert (Hb : b = x).
+  {
+    change (model_finish x = x) in Hfinish.
+    rewrite Hx in Hfinish.
+    rewrite model_finish_form_projection in Hfinish.
+    exact Hfinish.
+  }
+  subst a. subst b.
+  destruct (left_fixed_root_or_start x x Hx) as [Hroot | Hsection].
+  - exact (proj1 Hroot).
+  - exfalso.
+    apply (model_start_form_ne_self x).
+    symmetry. exact Hsection.
+Qed.
+
+Lemma explicit_start_only_shape :
+  forall x : ModelLink,
+    Grounded ExplicitFoundation x ->
+    StartOnly ExplicitFoundation x ->
+    x = model_start_form (model_finish x).
+Proof.
+  intros x GX Hshape.
+  destruct Hshape as [Hstart Hnotfinish].
+  destruct (grounded_is_canonical x GX) as [a [b Hx]].
+  assert (Ha : a = x).
+  {
+    change (model_start x = x) in Hstart.
+    rewrite Hx in Hstart.
+    rewrite model_start_form_projection in Hstart.
+    exact Hstart.
+  }
+  assert (Hb : b = model_finish x).
+  {
+    rewrite Hx.
+    apply model_finish_form_projection.
+  }
+  subst a. subst b.
+  destruct (left_fixed_root_or_start x (model_finish x) Hx)
+    as [Hroot | Hsection].
+  - exfalso.
+    apply Hnotfinish.
+    unfold FinishSelf.
+    change (model_finish x = x).
+    transitivity model_root.
+    + exact (proj2 Hroot).
+    + symmetry. exact (proj1 Hroot).
+  - exact Hsection.
+Qed.
+
+Lemma explicit_finish_only_shape :
+  forall x : ModelLink,
+    Grounded ExplicitFoundation x ->
+    FinishOnly ExplicitFoundation x ->
+    x = model_end_form (model_start x).
+Proof.
+  intros x GX Hshape.
+  destruct Hshape as [Hnotstart Hfinish].
+  destruct (grounded_is_canonical x GX) as [a [b Hx]].
+  assert (Ha : a = model_start x).
+  {
+    rewrite Hx.
+    apply model_start_form_projection.
+  }
+  assert (Hb : b = x).
+  {
+    change (model_finish x = x) in Hfinish.
+    rewrite Hx in Hfinish.
+    rewrite model_finish_form_projection in Hfinish.
+    exact Hfinish.
+  }
+  subst a. subst b.
+  destruct (right_fixed_root_or_end (model_start x) x Hx)
+    as [Hroot | Hsection].
+  - exfalso.
+    apply Hnotstart.
+    unfold StartSelf.
+    change (model_start x = x).
+    transitivity model_root.
+    + exact (proj1 Hroot).
+    + symmetry. exact (proj2 Hroot).
+  - exact Hsection.
+Qed.
+
+Lemma start_status_same_of_not_distinguishable :
+  forall x y : ModelLink,
+    (StartSelf ExplicitFoundation x \/ ~ StartSelf ExplicitFoundation x) ->
+    (StartSelf ExplicitFoundation y \/ ~ StartSelf ExplicitFoundation y) ->
+    ~ Distinguishable ExplicitFoundation x y ->
+    (StartSelf ExplicitFoundation x /\ StartSelf ExplicitFoundation y) \/
+    (~ StartSelf ExplicitFoundation x /\ ~ StartSelf ExplicitFoundation y).
+Proof.
+  intros x y Dx Dy HNo.
+  destruct Dx as [Hx | Hx]; destruct Dy as [Hy | Hy].
+  - left. split; assumption.
+  - exfalso. apply HNo.
+    exact (distinguished_start_self_left ExplicitFoundation x y Hx Hy).
+  - exfalso. apply HNo.
+    exact (distinguished_start_self_right ExplicitFoundation x y Hx Hy).
+  - right. split; assumption.
+Qed.
+
+Lemma finish_status_same_of_not_distinguishable :
+  forall x y : ModelLink,
+    (FinishSelf ExplicitFoundation x \/ ~ FinishSelf ExplicitFoundation x) ->
+    (FinishSelf ExplicitFoundation y \/ ~ FinishSelf ExplicitFoundation y) ->
+    ~ Distinguishable ExplicitFoundation x y ->
+    (FinishSelf ExplicitFoundation x /\ FinishSelf ExplicitFoundation y) \/
+    (~ FinishSelf ExplicitFoundation x /\ ~ FinishSelf ExplicitFoundation y).
+Proof.
+  intros x y Dx Dy HNo.
+  destruct Dx as [Hx | Hx]; destruct Dy as [Hy | Hy].
+  - left. split; assumption.
+  - exfalso. apply HNo.
+    exact (distinguished_finish_self_left ExplicitFoundation x y Hx Hy).
+  - exfalso. apply HNo.
+    exact (distinguished_finish_self_right ExplicitFoundation x y Hx Hy).
+  - right. split; assumption.
+Qed.
+
+Theorem explicit_a1 :
+  A1RecursiveSeparation ExplicitFoundation.
+Proof.
+  unfold A1RecursiveSeparation.
+  intros x y GX.
+  revert y.
+  induction GX as [current StartStep IHStart FinishStep IHFinish].
+  intros y GY HNo.
+  destruct (explicit_local_decision current) as [DXStart DXFinish].
+  destruct (explicit_local_decision y) as [DYStart DYFinish].
+  pose proof
+    (start_status_same_of_not_distinguishable
+      current y DXStart DYStart HNo) as HStartStatus.
+  pose proof
+    (finish_status_same_of_not_distinguishable
+      current y DXFinish DYFinish HNo) as HFinishStatus.
+  destruct HStartStatus as [[HXStart HYStart] | [HXNotStart HYNotStart]].
+  - destruct HFinishStatus as [[HXFinish HYFinish] | [HXNotFinish HYNotFinish]].
+    + assert (GXCurrent : Grounded ExplicitFoundation current).
+      { exact (grounded_node ExplicitFoundation current StartStep FinishStep). }
+      pose proof
+        (explicit_full_self_eq_root current GXCurrent
+          (conj HXStart HXFinish)) as HXRoot.
+      pose proof
+        (explicit_full_self_eq_root y GY
+          (conj HYStart HYFinish)) as HYRoot.
+      exact (eq_trans HXRoot (eq_sym HYRoot)).
+    + assert (GXCurrent : Grounded ExplicitFoundation current).
+      { exact (grounded_node ExplicitFoundation current StartStep FinishStep). }
+      pose proof
+        (grounded_finish_of_nonself
+          ExplicitFoundation y GY HYNotFinish) as GYFinish.
+      assert (
+        HChildNo :
+        ~ Distinguishable ExplicitFoundation
+          (finish ExplicitFoundation current)
+          (finish ExplicitFoundation y)
+      ).
+      {
+        intro D.
+        apply HNo.
+        exact (distinguished_finish_child
+          ExplicitFoundation current y
+          HXNotFinish HYNotFinish D).
+      }
+      pose proof
+        (IHFinish HXNotFinish
+          (finish ExplicitFoundation y) GYFinish HChildNo)
+        as HFinishEq.
+      pose proof
+        (explicit_start_only_shape current GXCurrent
+          (conj HXStart HXNotFinish)) as HXShape.
+      pose proof
+        (explicit_start_only_shape y GY
+          (conj HYStart HYNotFinish)) as HYShape.
+      transitivity (model_start_form (model_finish current)).
+      * exact HXShape.
+      * transitivity (model_start_form (model_finish y)).
+        -- f_equal.
+           exact HFinishEq.
+        -- symmetry. exact HYShape.
+  - destruct HFinishStatus as [[HXFinish HYFinish] | [HXNotFinish HYNotFinish]].
+    + assert (GXCurrent : Grounded ExplicitFoundation current).
+      { exact (grounded_node ExplicitFoundation current StartStep FinishStep). }
+      pose proof
+        (grounded_start_of_nonself
+          ExplicitFoundation y GY HYNotStart) as GYStart.
+      assert (
+        HChildNo :
+        ~ Distinguishable ExplicitFoundation
+          (start ExplicitFoundation current)
+          (start ExplicitFoundation y)
+      ).
+      {
+        intro D.
+        apply HNo.
+        exact (distinguished_start_child
+          ExplicitFoundation current y
+          HXNotStart HYNotStart D).
+      }
+      pose proof
+        (IHStart HXNotStart
+          (start ExplicitFoundation y) GYStart HChildNo)
+        as HStartEq.
+      pose proof
+        (explicit_finish_only_shape current GXCurrent
+          (conj HXNotStart HXFinish)) as HXShape.
+      pose proof
+        (explicit_finish_only_shape y GY
+          (conj HYNotStart HYFinish)) as HYShape.
+      transitivity (model_end_form (model_start current)).
+      * exact HXShape.
+      * transitivity (model_end_form (model_start y)).
+        -- f_equal.
+           exact HStartEq.
+        -- symmetry. exact HYShape.
+    + assert (GXCurrent : Grounded ExplicitFoundation current).
+      { exact (grounded_node ExplicitFoundation current StartStep FinishStep). }
+      pose proof
+        (grounded_start_of_nonself
+          ExplicitFoundation y GY HYNotStart) as GYStart.
+      pose proof
+        (grounded_finish_of_nonself
+          ExplicitFoundation y GY HYNotFinish) as GYFinish.
+      assert (
+        HStartChildNo :
+        ~ Distinguishable ExplicitFoundation
+          (start ExplicitFoundation current)
+          (start ExplicitFoundation y)
+      ).
+      {
+        intro D.
+        apply HNo.
+        exact (distinguished_start_child
+          ExplicitFoundation current y
+          HXNotStart HYNotStart D).
+      }
+      assert (
+        HFinishChildNo :
+        ~ Distinguishable ExplicitFoundation
+          (finish ExplicitFoundation current)
+          (finish ExplicitFoundation y)
+      ).
+      {
+        intro D.
+        apply HNo.
+        exact (distinguished_finish_child
+          ExplicitFoundation current y
+          HXNotFinish HYNotFinish D).
+      }
+      pose proof
+        (IHStart HXNotStart
+          (start ExplicitFoundation y) GYStart HStartChildNo)
+        as HStartEq.
+      pose proof
+        (IHFinish HXNotFinish
+          (finish ExplicitFoundation y) GYFinish HFinishChildNo)
+        as HFinishEq.
+      apply (proj2
+        (explicit_fnd13_replay current y GXCurrent GY)).
+      split; assumption.
+Qed.
+
 Theorem explicit_grounded_slice :
   Grounded ExplicitFoundation (R ExplicitFoundation) /\
   Grounded ExplicitFoundation (f2f3_start_root ExplicitFoundation ExplicitOneSided) /\
