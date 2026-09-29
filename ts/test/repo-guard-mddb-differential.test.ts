@@ -18,6 +18,7 @@ import {
 
 const REPO_GUARD_SHA = "a2e6c6ad95bc38bdd8983190e7922e7ef23375a5";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
+assert.match(REPO_GUARD_SHA, /^[0-9a-f]{40}$/, "repo-guard differential pin must be an exact commit SHA");
 
 function run(command: string, args: readonly string[], cwd?: string): void {
   const result = spawnSync(command, args, {
