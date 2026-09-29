@@ -3663,25 +3663,25 @@ Theorem CTX_03_semantic_covariance_capstone
     (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
-    CTX_03_context_relative_gauge F A1 N E D /\
     ContextChiBridgeLaw F E D /\
     ContextGeneralizedMPCovarianceLaw F E D /\
     ~ InversionCovariantUnaryOperation
       F E D (TechnicalStartOperation F).
 Proof.
+  pose proof
+    (CTX_03_context_relative_gauge F A1 N E D)
+    as HStructuralLayer.
   split.
-  - exact (CTX_03_context_relative_gauge F A1 N E D).
+  - unfold ContextChiBridgeLaw.
+    intros body selected HSelected.
+    exact
+      (CTX_03_chi_direction_bridge
+        F A1 E D body selected HSelected).
   - split.
-    + unfold ContextChiBridgeLaw.
-      intros body selected HSelected.
-      exact
-        (CTX_03_chi_direction_bridge
-          F A1 E D body selected HSelected).
-    + split.
-      * exact
-          (CTX_03_generalized_mp_semantic_covariance F A1 N E D).
-      * exact
-          (CTX_03_technical_start_not_covariant F E D).
+    + exact
+        (CTX_03_generalized_mp_semantic_covariance F A1 N E D).
+    + exact
+        (CTX_03_technical_start_not_covariant F E D).
 Qed.
 
 
