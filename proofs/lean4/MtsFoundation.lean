@@ -1028,24 +1028,38 @@ This is needed to show that two grounded one-sided Links with the same external
 pole carry no recursive distinction.  It follows directly from the proof
 relation itself; no equality decision procedure is used.
 -/
+theorem distinguishable_same_false
+    (F : Foundation)
+    {x y : F.Link}
+    (h : Distinguishable F x y)
+    (hxy : x = y) :
+    False := by
+  induction h with
+  | startSelfLeft hSelf hNot =>
+      cases hxy
+      exact hNot hSelf
+  | startSelfRight hNot hSelf =>
+      cases hxy
+      exact hNot hSelf
+  | finishSelfLeft hSelf hNot =>
+      cases hxy
+      exact hNot hSelf
+  | finishSelfRight hNot hSelf =>
+      cases hxy
+      exact hNot hSelf
+  | startChild _ _ _ ih =>
+      cases hxy
+      exact ih rfl
+  | finishChild _ _ _ ih =>
+      cases hxy
+      exact ih rfl
+
 theorem distinguishable_irreflexive
     (F : Foundation)
     {x : F.Link} :
     ¬ Distinguishable F x x := by
   intro h
-  induction h with
-  | startSelfLeft hSelf hNot =>
-      exact hNot hSelf
-  | startSelfRight hNot hSelf =>
-      exact hNot hSelf
-  | finishSelfLeft hSelf hNot =>
-      exact hNot hSelf
-  | finishSelfRight hNot hSelf =>
-      exact hNot hSelf
-  | startChild _ _ _ ih =>
-      exact ih
-  | finishChild _ _ _ ih =>
-      exact ih
+  exact distinguishable_same_false F h rfl
 
 theorem grounded_start_of_nonself
     (F : Foundation)
@@ -1249,6 +1263,61 @@ theorem recursive_inversion_source_grounded
         exact ihFinish
 
 /--
+A structural inverse whose source is StartOnly must use the INV-01 START rule.
+This is an elimination lemma for the existing proof graph, not a new case
+classifier.
+-/
+theorem recursive_inversion_from_start_only
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    {x y : F.Link}
+    (hStart : StartOnly F x)
+    (h : RecursiveInversion F D x y) :
+    ∃ childInverse : F.Link,
+      RecursiveInversion F D (F.finish x) childInverse ∧
+      y = D.endForm childInverse := by
+  cases h with
+  | root =>
+      exact False.elim
+        (recursive_full_start_disjoint F (root_full_self F) hStart)
+  | start _ hChild =>
+      exact ⟨_, hChild, rfl⟩
+  | finish hFinish _ =>
+      exact False.elim
+        (recursive_start_finish_disjoint F hStart hFinish)
+  | pair hPair _ _ =>
+      exact False.elim
+        (recursive_start_pair_disjoint F hStart hPair)
+
+/--
+A structural inverse whose source is FinishOnly must use the INV-01 FINISH
+rule.
+-/
+theorem recursive_inversion_from_finish_only
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    {x y : F.Link}
+    (hFinish : FinishOnly F x)
+    (h : RecursiveInversion F D x y) :
+    ∃ childInverse : F.Link,
+      RecursiveInversion F D (F.start x) childInverse ∧
+      y = D.startForm childInverse := by
+  cases h with
+  | root =>
+      exact False.elim
+        (recursive_full_finish_disjoint F (root_full_self F) hFinish)
+  | start hStart _ =>
+      exact False.elim
+        (recursive_start_finish_disjoint F hStart hFinish)
+  | finish _ hChild =>
+      exact ⟨_, hChild, rfl⟩
+  | pair hPair _ _ =>
+      exact False.elim
+        (recursive_finish_pair_disjoint F hFinish hPair)
+
+/--
 INV-02 relational core: applying the same structural inversion graph twice
 returns the original semantic Link.
 
@@ -1291,27 +1360,18 @@ theorem INV_02_recursive_inversion_involutive
           exact False.elim (hNot hStart.1)
         · intro _
           exact recursive_inversion_source_grounded F D hChild
-      cases hyz with
-      | root =>
-          exact False.elim
-            (recursive_full_finish_disjoint F (root_full_self F) hYFinish)
-      | start hYStart _ =>
-          exact False.elim
-            (recursive_start_finish_disjoint F hYStart hYFinish)
-      | @finish _ secondChild _ hSecond =>
-          have hSecond' :
-              RecursiveInversion F D childInverse secondChild := by
-            simpa only [recursive_end_start F D childInverse] using hSecond
-          have hSecondEq : secondChild = F.finish x :=
-            ih hSecond'
-          calc
-            D.startForm secondChild =
-                D.startForm (F.finish x) := congrArg D.startForm hSecondEq
-            _ = x :=
-              (recursive_start_form_canonical F a1 E D x gx hStart).symm
-      | pair hYPair _ _ =>
-          exact False.elim
-            (recursive_finish_pair_disjoint F hYFinish hYPair)
+      rcases recursive_inversion_from_finish_only F D hYFinish hyz with
+        ⟨secondChild, hSecond, hz⟩
+      have hSecond' :
+          RecursiveInversion F D childInverse secondChild := by
+        simpa only [recursive_end_start F D childInverse] using hSecond
+      have hSecondEq : secondChild = F.finish x :=
+        ih hSecond'
+      calc
+        z = D.startForm secondChild := hz
+        _ = D.startForm (F.finish x) := congrArg D.startForm hSecondEq
+        _ = x :=
+          (recursive_start_form_canonical F a1 E D x gx hStart).symm
   | @finish x childInverse hFinish hChild ih =>
       have hYStart : StartOnly F (D.startForm childInverse) :=
         recursive_start_form_pattern F a1 E D childInverse
@@ -1321,27 +1381,18 @@ theorem INV_02_recursive_inversion_involutive
           exact recursive_inversion_source_grounded F D hChild
         · intro hNot
           exact False.elim (hNot hFinish.2)
-      cases hyz with
-      | root =>
-          exact False.elim
-            (recursive_full_start_disjoint F (root_full_self F) hYStart)
-      | @start _ secondChild _ hSecond =>
-          have hSecond' :
-              RecursiveInversion F D childInverse secondChild := by
-            simpa only [recursive_start_finish F D childInverse] using hSecond
-          have hSecondEq : secondChild = F.start x :=
-            ih hSecond'
-          calc
-            D.endForm secondChild =
-                D.endForm (F.start x) := congrArg D.endForm hSecondEq
-            _ = x :=
-              (recursive_end_form_canonical F a1 E D x gx hFinish).symm
-      | finish hYFinish _ =>
-          exact False.elim
-            (recursive_start_finish_disjoint F hYStart hYFinish)
-      | pair hYPair _ _ =>
-          exact False.elim
-            (recursive_start_pair_disjoint F hYStart hYPair)
+      rcases recursive_inversion_from_start_only F D hYStart hyz with
+        ⟨secondChild, hSecond, hz⟩
+      have hSecond' :
+          RecursiveInversion F D childInverse secondChild := by
+        simpa only [recursive_start_finish F D childInverse] using hSecond
+      have hSecondEq : secondChild = F.start x :=
+        ih hSecond'
+      calc
+        z = D.endForm secondChild := hz
+        _ = D.endForm (F.start x) := congrArg D.endForm hSecondEq
+        _ = x :=
+          (recursive_end_form_canonical F a1 E D x gx hFinish).symm
   | @pair x inverseFinish inverseStart hPair hFinishInv hStartInv ihFinish ihStart =>
       rcases INV_01_recursive_pole_reversal F D hyz with
         ⟨secondFinish, secondStart, hSecondFinish, hSecondStart, hzForm⟩
