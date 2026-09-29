@@ -373,7 +373,7 @@ assert.deepEqual(
 for (const record of fnd13) {
   assert.equal(
     record.proofSource.commitSha,
-    "4d9c33d0e37735756f4dd0f0190b01964db2aac7",
+    "b0f1da0f3e4d1a8048cdc378fc2ccb914c736c79",
     `FND-13 ${record.lane} proof source commit`,
   );
   if (record.lane === "lean4") {
@@ -396,6 +396,21 @@ for (const record of fnd13) {
       "FND-13 Rocq evidence pin includes exact image digest",
     );
   }
+  assert.match(
+    String(record.notes),
+    /exactly restricted to the accepted finite Grounded domain/i,
+    "FND-13 evidence states exact Grounded theorem scope",
+  );
+  assert.match(
+    String(record.notes),
+    /FND-02 unique ROOT is no longer presented as a dependency/i,
+    "FND-13 evidence removes fake FND-02 provenance",
+  );
+  assert.match(
+    String(record.notes),
+    /stronger global normalization-completeness premise/i,
+    "FND-13 evidence separates stronger arbitrary-Link extensionality",
+  );
 }
 const fnd01 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-01")
@@ -409,7 +424,7 @@ assert.deepEqual(
 for (const record of fnd01) {
   assert.equal(
     record.proofSource.commitSha,
-    "21e6e5c4328af4e6e70bf1c9953e2aeab4c2f907",
+    "b0f1da0f3e4d1a8048cdc378fc2ccb914c736c79",
     `FND-01 ${record.lane} proof source commit`,
   );
   if (record.lane === "lean4") {
