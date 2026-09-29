@@ -992,6 +992,78 @@ assert(
   "CTX-03 capstone is proved rather than postulated",
 );
 
+const fnd07 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-07");
+assert(fnd07 !== undefined, "P0 contains FND-07");
+assert.deepEqual(
+  fnd07.assumptions,
+  ["accepted contextual truth semantics"],
+  "FND-07 assumptions remain exactly the accepted contextual-truth semantics",
+);
+assert.deepEqual(fnd07.dependsOn, [], "FND-07 adds no theorem dependency");
+
+for (const [label, source, marker] of [
+  ["Lean", lean, "def ContextualTruthWitness"],
+  ["Rocq", rocq, "Definition ContextualTruthWitness"],
+] as const) {
+  const start = source.indexOf(marker);
+  assert(start >= 0, label + " contains FND-07 contextual-truth projection");
+  const region = source.slice(start);
+  for (const symbol of [
+    "ContextualTruthWitness",
+    "ContextualTruth",
+    "TruthValueL",
+    "FND_07_contextual_truth_boundary",
+    "CurrentScopeMember",
+  ]) {
+    assert(region.includes(symbol), label + " FND-07 contains " + symbol);
+  }
+  assert(
+    region.includes("EXTERNAL THEORY PROJECTION NOTE") &&
+      region.includes("no additional external mathematical theory"),
+    label + " FND-07 declares that no new external mathematical theory is used",
+  );
+  assert(
+    region.includes("axiomatic-set-theory") &&
+      region.includes("not"),
+    label + " FND-07 rejects set-theory membership as semantic authority",
+  );
+  assert(
+    region.includes("ambient Link") &&
+      region.includes("not contextual truth"),
+    label + " FND-07 separates ambient structural existence from contextual truth",
+  );
+  assert(
+    region.includes("truth value") &&
+      region.includes("truth witness"),
+    label + " FND-07 separates L value role from K-to-A witness role",
+  );
+}
+const leanFnd07 = lean.slice(lean.indexOf("def ContextualTruthWitness"));
+const rocqFnd07 = rocq.slice(rocq.indexOf("Definition ContextualTruthWitness"));
+for (const forbidden of [
+  "Set F.Link",
+  "Finset",
+  "HashMap",
+  "Std.Data.HashMap",
+  ": Bool",
+  "→ Bool",
+]) {
+  assert(!leanFnd07.includes(forbidden), "Lean FND-07 forbids host truth carrier " + forbidden);
+}
+for (const forbidden of [
+  "Ensemble",
+  "MSet",
+  "FSet",
+  ": bool",
+  "-> bool",
+]) {
+  assert(!rocqFnd07.includes(forbidden), "Rocq FND-07 forbids host truth carrier " + forbidden);
+}
+assert(
+  !lean.includes("axiom FND_07") && !rocq.includes("Axiom FND_07"),
+  "FND-07 is proved rather than postulated",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -1033,7 +1105,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=16",
+  "THEOREM_PROOF_CLAIMS=17",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -1081,6 +1153,10 @@ console.log([
   "CTX03_OBJECTIVE_ORBIT=PRE_SELECTION",
   "CTX03_COVARIANCE=SIMULTANEOUS_J",
   "CTX03_CAPSTONE=RELATIONAL_Z2+CONTEXT_SELECTION",
+  "FND07_TRUTH_WITNESS=K_TO_A_CURRENT_LINK",
+  "FND07_AMBIENT_EXISTENCE_AUTHORITY=NONE",
+  "FND07_TRUTH_VALUE=L",
+  "FND07_HOST_SET_MEMBERSHIP=NONE",
   "CTX03_J_TRANSPORT=INV07_DERIVED",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
