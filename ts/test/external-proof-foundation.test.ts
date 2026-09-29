@@ -709,6 +709,56 @@ assert(
   "INV-02 is not postulated as an axiom",
 );
 
+const invSupportIds = ["INV-03", "INV-04", "INV-05"] as const;
+for (const id of invSupportIds) {
+  const target = (p0.targets as Record<string, any>[]).find((candidate) => candidate.id === id);
+  assert(target !== undefined, `P0 contains ${id}`);
+  assert(
+    JSON.stringify(target.assumptions) === JSON.stringify(["INV-01"]),
+    `${id} assumptions remain exactly INV-01`,
+  );
+  assert(
+    JSON.stringify(target.dependsOn) === JSON.stringify(["INV-01"]),
+    `${id} dependency remains exactly INV-01`,
+  );
+}
+for (const source of [lean, rocq]) {
+  assert(source.includes("INV_03_root_fixed"), "external source proves INV-03 ROOT fixed");
+  assert(source.includes("INV_04_start_to_finish"), "external source proves INV-04 START to END");
+  assert(source.includes("INV_04_finish_to_start"), "external source proves INV-04 END to START");
+  assert(
+    source.includes("INV_05_pair_preserved_and_reversed"),
+    "external source proves INV-05 PAIR preservation and pole reversal",
+  );
+  assert(
+    source.includes("INV_01_recursive_pole_reversal"),
+    "INV-05 reuses INV-01 recursive pole reversal",
+  );
+  assert(
+    source.includes("INV_02_recursive_inversion_involutive"),
+    "INV-05 non-collapse reuses derived INV-02 rather than a new domain axiom",
+  );
+}
+assert(
+  lean.includes("theorem INV_03_root_fixed") &&
+    lean.includes("theorem INV_04_start_to_finish") &&
+    lean.includes("theorem INV_04_finish_to_start") &&
+    lean.includes("theorem INV_05_pair_preserved_and_reversed"),
+  "Lean INV-03/04/05 are theorems",
+);
+assert(
+  rocq.includes("Theorem INV_03_root_fixed") &&
+    rocq.includes("Theorem INV_04_start_to_finish") &&
+    rocq.includes("Theorem INV_04_finish_to_start") &&
+    rocq.includes("Theorem INV_05_pair_preserved_and_reversed"),
+  "Rocq INV-03/04/05 are theorems",
+);
+assert(
+  !lean.includes("pairPreserved :") &&
+    !rocq.includes("recursive_pair_preserved :"),
+  "INV-05 does not add a pair-preservation field to the inversion domain",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -749,7 +799,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=9",
+  "THEOREM_PROOF_CLAIMS=13",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -776,6 +826,12 @@ console.log([
   "INV02_RELATIONAL_INVOLUTION=GREEN_SOURCE",
   "INV02_UNIQUE_TOTAL_INVOLUTION=GREEN_SOURCE",
   "INV02_DOMAIN_EXPANSION=NONE",
+  "INV03_ROOT_FIXED=GREEN_SOURCE",
+  "INV04_ONE_SIDED_EXCHANGE=GREEN_SOURCE",
+  "INV04_NO_IDENTIFICATION=GREEN_SOURCE",
+  "INV05_PAIR_PRESERVED=GREEN_SOURCE",
+  "INV05_POLE_REVERSAL=INV01_REUSED",
+  "INV05_NEW_DOMAIN_AXIOM=NONE",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
