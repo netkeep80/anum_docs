@@ -345,32 +345,46 @@ theorem start_fallback_of_not_canonical
       · exact False.elim (hNot ⟨poles.1, poles.2, hCanonical⟩)
       · simp [hDecode, hCanonical]
 
+theorem canonical_or_start_fallback
+    (x : ModelLink) :
+    CanonicalImage x ∨ start x = badStart := by
+  unfold start
+  cases hDecode : decode x with
+  | none =>
+      exact Or.inr rfl
+  | some poles =>
+      by_cases hCanonical : x = form poles.1 poles.2
+      · exact Or.inl ⟨poles.1, poles.2, hCanonical⟩
+      · exact Or.inr (by simp [hDecode, hCanonical])
+
 /--
 Finite Grounded evidence can therefore exist only for an exact image of
 `form`. Malformed and duplicate host encodings remain ambient Links, but
 cannot enter the finite semantic replay domain.
+
+The proof is constructive: it uses the computable decode/re-encode decision,
+not excluded middle over the existential CanonicalImage proposition.
 -/
 theorem grounded_is_canonical
     {x : ModelLink}
     (gx : Grounded ExplicitFoundation x) :
     CanonicalImage x := by
-  by_contra hNot
-  have hStart : start x = badStart :=
-    start_fallback_of_not_canonical hNot
-  by_cases hx : x = badStart
-  · subst x
-    exact badStart_not_grounded gx
-  · cases gx with
-    | node startStep finishStep =>
-        have hStartNe : ExplicitFoundation.start x ≠ x := by
-          intro hEq
-          apply hx
-          calc
-            x = ExplicitFoundation.start x := hEq.symm
-            _ = badStart := hStart
-        have gBad : Grounded ExplicitFoundation badStart := by
-          simpa [hStart] using startStep hStartNe
-        exact badStart_not_grounded gBad
+  rcases canonical_or_start_fallback x with hCanonical | hStart
+  · exact hCanonical
+  · by_cases hx : x = badStart
+    · subst x
+      exact False.elim (badStart_not_grounded gx)
+    · cases gx with
+      | node startStep finishStep =>
+          have hStartNe : ExplicitFoundation.start x ≠ x := by
+            intro hEq
+            apply hx
+            calc
+              x = ExplicitFoundation.start x := hEq.symm
+              _ = badStart := hStart
+          have gBad : Grounded ExplicitFoundation badStart := by
+            simpa [hStart] using startStep hStartNe
+          exact False.elim (badStart_not_grounded gBad)
 
 /--
 Concrete Grounded normalization for the explicit model.
