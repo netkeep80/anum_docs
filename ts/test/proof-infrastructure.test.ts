@@ -759,7 +759,7 @@ assert.deepEqual(
 for (const record of ctx03) {
   assert.equal(
     record.proofSource.commitSha,
-    "07d1808d1ba24b45bff9c000cbdd8aefae4a4e44",
+    "92d9259d38e8ea7cf81725221904ae6513540b21",
     `CTX-03 ${record.lane} proof source commit`,
   );
   assert.deepEqual(
