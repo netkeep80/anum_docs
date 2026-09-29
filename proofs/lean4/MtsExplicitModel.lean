@@ -473,21 +473,25 @@ theorem encodeLeft_length_gt (a : ModelLink) :
 theorem pairCode_ne_left (left right : ModelLink) :
     pairCode left right ≠ left := by
   intro h
-  have hGrow :
-      (encodeLeft left).length <
-        (encodeLeft left).length + (right.length + 2) :=
-    Nat.lt_add_of_pos_right (Nat.succ_pos (right.length + 1))
-  have hLt0 :
-      left.length <
-        (encodeLeft left).length + (right.length + 2) :=
-    Nat.lt_trans (encodeLeft_length_gt left) hGrow
-  have hPairLength :
-      (pairCode left right).length =
-        right.length + (2 + (encodeLeft left).length) := by
-    simp [pairCode, Nat.one_add, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+  have hAppend :
+      (encodeLeft left).length ≤ (encodeLeft left ++ right).length := by
+    simpa only [List.length_append] using
+      (Nat.le_add_right (encodeLeft left).length right.length)
+  have hBody :
+      left.length < (encodeLeft left ++ right).length :=
+    Nat.lt_of_lt_of_le (encodeLeft_length_gt left) hAppend
+  have hPrefix1 :
+      (encodeLeft left ++ right).length <
+        Nat.succ (encodeLeft left ++ right).length :=
+    Nat.lt_succ_self _
+  have hPrefix2 :
+      Nat.succ (encodeLeft left ++ right).length <
+        Nat.succ (Nat.succ (encodeLeft left ++ right).length) :=
+    Nat.lt_succ_self _
   have hLt : left.length < (pairCode left right).length := by
-    rw [hPairLength]
-    simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hLt0
+    change left.length <
+      Nat.succ (Nat.succ (encodeLeft left ++ right).length)
+    exact Nat.lt_trans hBody (Nat.lt_trans hPrefix1 hPrefix2)
   have hLength : left.length = (pairCode left right).length :=
     congrArg List.length h.symm
   exact (Nat.ne_of_lt hLt) hLength
@@ -495,17 +499,21 @@ theorem pairCode_ne_left (left right : ModelLink) :
 theorem pairCode_ne_right (left right : ModelLink) :
     pairCode left right ≠ right := by
   intro h
-  have hGrow :
-      right.length <
-        right.length + ((encodeLeft left).length + 2) :=
-    Nat.lt_add_of_pos_right (Nat.succ_pos ((encodeLeft left).length + 1))
-  have hPairLength :
-      (pairCode left right).length =
-        right.length + (2 + (encodeLeft left).length) := by
-    simp [pairCode, Nat.one_add, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+  have hAppend :
+      right.length ≤ (encodeLeft left ++ right).length := by
+    simpa only [List.length_append] using
+      (Nat.le_add_left right.length (encodeLeft left).length)
+  have hPrefix1 :
+      right.length < Nat.succ (encodeLeft left ++ right).length :=
+    Nat.lt_of_le_of_lt hAppend (Nat.lt_succ_self _)
+  have hPrefix2 :
+      Nat.succ (encodeLeft left ++ right).length <
+        Nat.succ (Nat.succ (encodeLeft left ++ right).length) :=
+    Nat.lt_succ_self _
   have hLt : right.length < (pairCode left right).length := by
-    rw [hPairLength]
-    simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hGrow
+    change right.length <
+      Nat.succ (Nat.succ (encodeLeft left ++ right).length)
+    exact Nat.lt_trans hPrefix1 hPrefix2
   have hLength : right.length = (pairCode left right).length :=
     congrArg List.length h.symm
   exact (Nat.ne_of_lt hLt) hLength
