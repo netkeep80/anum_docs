@@ -1350,5 +1350,27 @@ Proof.
   - apply f2f3_start_root_grounded.
 Qed.
 
+Theorem shared_grounded_parent_ne_child :
+  shared_grounded_parent <> shared_grounded_child.
+Proof.
+  intros Heq.
+  assert (
+    HfinishSelf :
+    FinishSelf ExplicitFoundation shared_grounded_child
+  ).
+  {
+    unfold FinishSelf.
+    transitivity (finish ExplicitFoundation shared_grounded_parent).
+    - apply f_equal.
+      symmetry. exact Heq.
+    - apply shared_grounded_parent_finish.
+  }
+  pose proof
+    (f2f3_start_root_pattern ExplicitFoundation ExplicitOneSided)
+    as HstartOnly.
+  unfold shared_grounded_child in HstartOnly.
+  exact ((proj2 HstartOnly) HfinishSelf).
+Qed.
+
 
 End Model1796.
