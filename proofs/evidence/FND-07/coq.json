@@ -7,7 +7,9 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "accepted contextual truth semantics"
+    "accepted A16 contextual truth semantics",
+    "accepted A16 current-Scope composition law",
+    "F2/F3 root-basis witnesses for structural L = O⟼C"
   ],
   "dependencies": [],
   "result": "proved",
