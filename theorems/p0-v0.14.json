@@ -154,16 +154,15 @@
       "assumptions": [
         "one Link-forming primitive",
         "accepted finite R-grounded domain",
-        "semantic Link identity equality supplied by FND-13",
+        "explicit global F2/F3 normalization completeness used only for the auxiliary arbitrary-Link pole-identity conjunct",
         "F2/F3 grounded-form existence/sufficiency for the declared domain",
         "Context orientation only names one-sided cases; it does not create them"
       ],
       "dependsOn": [
-        "FND-02",
-        "FND-13"
+        "FND-02"
       ],
       "scope": "Accepted finite R-grounded Link self-incidence classification inherited by v0.14.",
-      "exclusions": "No host enum, codec digit, host handle equality, Memory canonical-map identity, or four-opcode implementation may serve as classification authority. External proof must separate the four proposition-level combinations from implementation decidability.",
+      "exclusions": "No host enum, codec digit, host handle equality, Memory canonical-map identity, or four-opcode implementation may serve as classification authority. External proof must separate the four proposition-level combinations from implementation decidability. The structural four-case classification itself does not depend on the Grounded FND-13 capstone; its auxiliary arbitrary-Link identity conjunct is conditional on the separately named stronger global normalization-completeness premise.",
       "typescriptEvidence": [
         "ts/test/research-v014-foundation-orientation-witness.test.ts",
         "ts/test/research-v014-preacceptance-closure.test.ts"
