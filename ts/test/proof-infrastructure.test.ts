@@ -675,6 +675,77 @@ for (const record of ctx03) {
   );
 }
 
+const fnd05 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-05")
+  .map(({ record }) => record);
+assert.equal(fnd05.length, 2, "FND-05 has exactly two external evidence records");
+assert.deepEqual(
+  fnd05.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "FND-05 external lanes",
+);
+for (const record of fnd05) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "284921e3e23ebfe7f3bf692c5adfe0142d412a39",
+    "FND-05 " + record.lane + " proof source commit",
+  );
+  assert.deepEqual(
+    record.assumptions,
+    ["FND-01", "FND-02", "declared finite recursive carrier domain"],
+    "FND-05 assumptions preserve the P0 boundary",
+  );
+  assert.deepEqual(
+    record.dependencies,
+    ["FND-01", "FND-02"],
+    "FND-05 dependencies preserve the P0 boundary",
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "FND-05 Lean evidence keeps exact compiler/artifact pins",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "FND-05 Rocq evidence keeps exact compiler/image pins",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /finite Grounded.*ROOT-decomposable|ROOT-decomposable.*Grounded/i,
+    "FND-05 evidence records the finite recursive carrier boundary",
+  );
+  assert.match(
+    String(record.notes),
+    /prover-side inductive proof syntax/i,
+    "FND-05 evidence records the host-code projection role",
+  );
+  assert.match(
+    String(record.notes),
+    /not MTS ontology|not a second native entity/i,
+    "FND-05 evidence forbids host proof code from becoming MTS ontology",
+  );
+  assert.match(
+    String(record.notes),
+    /No additional external mathematical theory/i,
+    "FND-05 evidence declares no extra external mathematical theory",
+  );
+  assert.match(
+    String(record.notes),
+    /non-well-founded.*cycles/i,
+    "FND-05 evidence keeps arbitrary graph cycles outside scope",
+  );
+  assert.match(
+    String(record.notes),
+    /Anum\/Q identity/i,
+    "FND-05 evidence keeps sequential Anum/Q identity outside scope",
+  );
+}
+
 const leanEvidence = fnd02.find((record) => record.lane === "lean4");
 const coqEvidence = fnd02.find((record) => record.lane === "coq");
 assert.ok(leanEvidence !== undefined && coqEvidence !== undefined);
@@ -696,5 +767,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq fnd05=lean4+coq aprover-input=mtsNative-only`,
 );
