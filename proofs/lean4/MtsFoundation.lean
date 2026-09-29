@@ -1705,34 +1705,32 @@ theorem INV_06_root_basis
       hFinish
       hStart
 
-  -- Consume the already-proved supporting theorems at the P0 boundary.  These
-  -- checks add no assumptions: they certify the exact class effects of the
-  -- five graph equations above.
-  have support :
-      F.R = F.R ∧
-      FinishOnly F E.finishRoot ∧
-      StartOnly F E.startRoot ∧
-      PairLocal F (F.form E.startRoot E.finishRoot) ∧
-      PairLocal F (F.form E.finishRoot E.startRoot) := ⟨
-    INV_03_root_fixed F D hR,
+  -- Cross-check the named P0 support boundaries against the direct graph
+  -- calculation above.  These are structural-class audits, not hidden
+  -- premises for constructing hR/hO/hC/hL/hU.
+  have _hRootAudit : F.R = F.R :=
+    INV_03_root_fixed F D hR
+  have _hFinishAudit : FinishOnly F E.finishRoot :=
     (INV_04_start_to_finish
       F a1 E D
       (f2f3_start_root_pattern F E)
-      hO).1,
+      hO).1
+  have _hStartAudit : StartOnly F E.startRoot :=
     (INV_04_finish_to_start
       F a1 E D
       (f2f3_finish_root_pattern F E)
-      hC).1,
+      hC).1
+  have _hLPairAudit : PairLocal F (F.form E.startRoot E.finishRoot) :=
     (INV_05_pair_preserved_and_reversed
       F a1 N E D
       (f2f3_pair_pattern F E)
-      hL).1,
+      hL).1
+  have _hUPairAudit : PairLocal F (F.form E.finishRoot E.startRoot) :=
     (INV_05_pair_preserved_and_reversed
       F a1 N E D
       (f2f3_reverse_pair_pattern F E)
       hU).1
-  ⟩
-  rcases support with ⟨_, _, _, _, _⟩
+
   exact ⟨hR, hO, hC, hL, hU⟩
 
 end MTS.External
