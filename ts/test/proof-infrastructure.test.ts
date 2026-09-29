@@ -793,7 +793,7 @@ for (const record of ctx03) {
   );
   assert.match(
     String(record.notes),
-    /unique marker-selected chi\(K\)/i,
+    /unique chi\(K\).*Context marker|Context marker.*unique chi\(K\)/i,
     "CTX-03 evidence records the formal marker-to-chi bridge",
   );
   assert.match(
