@@ -475,11 +475,11 @@ theorem pairCode_ne_left (left right : ModelLink) :
   intro h
   have hGrow :
       (encodeLeft left).length <
-        (encodeLeft left).length + (right.length + 2) :=
-    Nat.lt_add_of_pos_right (Nat.succ_pos (right.length + 1))
+        (encodeLeft left).length + (1 + (1 + right.length)) :=
+    Nat.lt_add_of_pos_right (Nat.succ_pos (1 + right.length))
   have hLt0 :
       left.length <
-        (encodeLeft left).length + (right.length + 2) :=
+        (encodeLeft left).length + (1 + (1 + right.length)) :=
     Nat.lt_trans (encodeLeft_length_gt left) hGrow
   have hLt : left.length < (pairCode left right).length := by
     simpa [pairCode, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hLt0
@@ -492,8 +492,8 @@ theorem pairCode_ne_right (left right : ModelLink) :
   intro h
   have hGrow :
       right.length <
-        right.length + ((encodeLeft left).length + 2) :=
-    Nat.lt_add_of_pos_right (Nat.succ_pos ((encodeLeft left).length + 1))
+        right.length + (1 + (1 + (encodeLeft left).length)) :=
+    Nat.lt_add_of_pos_right (Nat.succ_pos (1 + (encodeLeft left).length))
   have hLt : right.length < (pairCode left right).length := by
     simpa [pairCode, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hGrow
   have hLength : right.length = (pairCode left right).length :=
@@ -514,10 +514,12 @@ theorem left_fixed_root_or_start
   · by_cases hStart : a = startForm b
     · exact Or.inr hStart
     · by_cases hEnd : b = endForm a
-      · have hab : a = b := by
-          simpa [form, hRoot, hStart, hEnd] using h
-        have hSelf : a = endForm a := hab.trans hEnd
-        exact False.elim (endForm_ne_self a hSelf.symm)
+      · subst b
+      have hStart' : a ≠ startForm (endForm a) :=
+        no_start_end_overlap a
+      have hSelf : a = endForm a := by
+        simpa [form, hRoot, hStart'] using h
+      exact False.elim (endForm_ne_self a hSelf.symm)
       · have hPair : a = pairCode a b := by
           simpa [form, hRoot, hStart, hEnd] using h
         exact False.elim (pairCode_ne_left a b hPair.symm)
