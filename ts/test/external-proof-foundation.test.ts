@@ -909,8 +909,12 @@ for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
       ? "def ProperOneSided"
       : "Definition ProperOneSided";
   const start = source.indexOf(startName);
-  assert(start >= 0, `${label} contains CTX-03 relational support vocabulary`);
-  const region = source.slice(start);
+  const end = source.indexOf(
+    label === "Lean" ? "def ContextOrientationMarker" : "Definition ContextOrientationMarker",
+    start,
+  );
+  assert(start >= 0 && end > start, `${label} contains CTX-03 relational support vocabulary`);
+  const region = source.slice(start, end);
   for (const symbol of [
     "SameChiralClass",
     "OppositeChiralClass",
@@ -955,8 +959,9 @@ for (const [label, source, marker] of [
   ["Rocq", rocq, "Definition ContextOrientationMarker"],
 ] as const) {
   const start = source.indexOf(marker);
-  assert(start >= 0, `${label} contains Link-native Context orientation markers`);
-  const region = source.slice(start);
+  const end = source.indexOf("FND-07 external projection of accepted contextual-truth semantics", start);
+  assert(start >= 0 && end > start, `${label} contains Link-native Context orientation markers`);
+  const region = source.slice(start, end);
   for (const symbol of [
     "ContextLocalStartRole",
     "ContextLocalEndRole",
@@ -1016,8 +1021,9 @@ for (const [label, source, marker] of [
   ["Rocq", rocq, "FND-07 external projection of accepted contextual-truth semantics"],
 ] as const) {
   const start = source.indexOf(marker);
-  assert(start >= 0, label + " contains FND-07 contextual-truth projection");
-  const region = source.slice(start);
+  const end = source.indexOf("FND-05 external proof projection", start);
+  assert(start >= 0 && end > start, label + " contains FND-07 contextual-truth projection");
+  const region = source.slice(start, end);
   for (const symbol of [
     "ContextualTruthWitness",
     "ContextualTruth",
@@ -1102,8 +1108,9 @@ for (const [label, source, marker] of [
   ["Rocq", rocq, "FND-05 external proof projection"],
 ] as const) {
   const start = source.indexOf(marker);
-  assert(start >= 0, label + " contains FND-05 external projection");
-  const region = source.slice(start);
+  const end = source.indexOf("FND-11 external proof vocabulary", start);
+  assert(start >= 0 && end > start, label + " contains FND-05 external projection");
+  const region = source.slice(start, end);
   for (const symbol of [
     "RecursiveDescriptionCode",
     "FiniteRecursiveCarrierDecision",
@@ -1156,6 +1163,109 @@ assert(
   "FND-05 proof code is not disguised as a record carrying semantic authority",
 );
 
+const fnd11 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-11");
+assert(fnd11 !== undefined, "P0 contains FND-11");
+same(
+  JSON.stringify(fnd11.assumptions),
+  JSON.stringify(["accepted v0.14 representation-layer definitions"]),
+  "FND-11 assumptions remain exactly the accepted representation-layer definitions",
+);
+same(
+  JSON.stringify(fnd11.dependsOn),
+  JSON.stringify(["FND-05"]),
+  "FND-11 dependency remains exactly FND-05",
+);
+assert(
+  /representation\/codec boundary/i.test(String(fnd11.scope)),
+  "FND-11 scope remains the accepted representation/codec boundary",
+);
+assert(
+  /No claim.*globally isomorphic/i.test(String(fnd11.exclusions)) &&
+    /shorter source.*stronger representation contract/i.test(String(fnd11.exclusions)),
+  "FND-11 keeps global-isomorphism and representation-ranking exclusions",
+);
+
+for (const [label, source, marker] of [
+  ["Lean", lean, "FND-11 external proof vocabulary"],
+  ["Rocq", rocq, "FND-11 external proof vocabulary"],
+] as const) {
+  const start = source.indexOf(marker);
+  assert(start >= 0, label + " contains FND-11 representation boundary");
+  const region = source.slice(start);
+
+  for (const symbol of [
+    "RepresentationIdentityTarget",
+    "AcceptedV014RepresentationDefinitions",
+    "FND05Canonicality",
+    "fnd05_dependency_witness",
+    "ExactSequenceFoldCollision",
+    "QDenotationCollision",
+    "FND_11_representation_identities_separated",
+  ]) {
+    assert(region.includes(symbol), label + " FND-11 contains " + symbol);
+  }
+
+  assert(
+    region.includes("EXTERNAL THEORY PROJECTION NOTE") &&
+      /not an MTS ontology datatype/i.test(region) &&
+      /No additional external mathematical theory/i.test(region),
+    label + " FND-11 marks host representation classification as external only",
+  );
+
+  assert(
+    region.includes("FND_05_canonical_recursive_description_unique"),
+    label + " FND-11 dependency adapter consumes the proved FND-05 capstone",
+  );
+
+  assert(
+    region.includes("recursive_codec_target_ne_anum") &&
+      region.includes("exact_sequence_target_ne_fold"),
+    label + " FND-11 proves distinct identity-target classifications",
+  );
+
+  assert(
+    region.includes("exact_sequence_fold_collision") &&
+      region.includes("q_denotation_collision"),
+    label + " FND-11 has concrete non-injective denotation witnesses",
+  );
+
+  assert(
+    /anumOriginRoot|anum_origin_root/.test(region) &&
+      /exactSequenceOriginRoot|exact_sequence_origin_root/.test(region) &&
+      /qOriginRoot|q_origin_root/.test(region),
+    label + " FND-11 makes every projected local sequence origin R",
+  );
+
+  assert(
+    /Anum and ExactSequence are modeled as predicates over the one Link carrier/i.test(region),
+    label + " FND-11 keeps Anum/ExactSequence as Link-carrier views rather than ontology sorts",
+  );
+
+  for (const forbidden of [
+    "structure Anum",
+    "inductive Anum",
+    "Record Anum",
+    "Inductive Anum",
+    "structure ExactSequence",
+    "inductive ExactSequence",
+    "Record ExactSequence",
+    "Inductive ExactSequence",
+    "Equiv",
+    "CategoryTheory",
+    "NaturalTransformation",
+  ]) {
+    assert(
+      !region.includes(forbidden),
+      label + " FND-11 forbids undeclared representation/ontology machinery: " + forbidden,
+    );
+  }
+}
+
+assert(
+  !lean.includes("axiom FND_11") && !rocq.includes("Axiom FND_11"),
+  "FND-11 is proved rather than postulated",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -1197,7 +1307,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=18",
+  "THEOREM_PROOF_CLAIMS=19",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -1254,6 +1364,12 @@ console.log([
   "FND05_HOST_CODE=EXTERNAL_PROJECTION_ONLY",
   "FND05_GENERAL_CYCLES=EXCLUDED",
   "FND05_ANUM_Q_IDENTITY=EXCLUDED",
+  "FND11_DEPENDENCY=FND05",
+  "FND11_RECURSIVE_CODEC_NE_ANUM=PROVED_TARGET_SEPARATION",
+  "FND11_EXACT_SEQUENCE_NE_FOLD=COLLISION_WITNESS",
+  "FND11_Q_SOURCE_NE_DENOTATION=COLLISION_WITNESS",
+  "FND11_LOCAL_SEQUENCE_ORIGIN=R",
+  "FND11_SECOND_ONTOLOGY=NONE",
   "CTX03_J_TRANSPORT=INV07_DERIVED",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
