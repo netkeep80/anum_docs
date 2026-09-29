@@ -793,6 +793,26 @@ for (const record of ctx03) {
   );
   assert.match(
     String(record.notes),
+    /unique marker-selected chi\(K\)/i,
+    "CTX-03 evidence records the formal marker-to-chi bridge",
+  );
+  assert.match(
+    String(record.notes),
+    /InR_K\/OutR_K.*exchanged by structural J|exchanged by structural J.*InR_K\/OutR_K/i,
+    "CTX-03 evidence records accepted direction witnesses and J exchange",
+  );
+  assert.match(
+    String(record.notes),
+    /generalized-MP semantic-arrow covariance/i,
+    "CTX-03 evidence records generalized-MP semantic covariance",
+  );
+  assert.match(
+    String(record.notes),
+    /TechnicalStartOperation falsifier/i,
+    "CTX-03 evidence records the non-covariant technical-operation boundary",
+  );
+  assert.match(
+    String(record.notes),
     /START_K\/END_K|START_K.*END_K/i,
     "CTX-03 evidence records Context-local orientation roles",
   );
