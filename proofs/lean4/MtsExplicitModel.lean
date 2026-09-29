@@ -998,4 +998,133 @@ theorem natLink_injective :
     simpa [natLink] using hLength
   exact Nat.add_right_cancel hSucc
 
+
+/--
+#1797 cyclic-boundary witness.
+
+Under the current inductive proof semantics, existence of a finite canonical
+recursive description already implies Grounded source structure. Combined with
+FND-05 totality on Grounded Links, this identifies Grounded as the exact
+existence domain of the current finite description relation.
+-/
+def recursive_description_source_grounded :
+    {x : ModelLink} →
+    {code : RecursiveDescriptionCode} →
+    CanonicalRecursiveDescription ExplicitFoundation x code →
+    Grounded ExplicitFoundation x
+  | _, _, .root =>
+      grounded_of_full_self ExplicitFoundation
+        (root_full_self ExplicitFoundation)
+  | _, _, .startSelf hStart hChild =>
+      Grounded.node
+        (fun hNot => False.elim (hNot hStart.1))
+        (fun _ => recursive_description_source_grounded hChild)
+  | _, _, .finishSelf hFinish hChild =>
+      Grounded.node
+        (fun _ => recursive_description_source_grounded hChild)
+        (fun hNot => False.elim (hNot hFinish.2))
+  | _, _, .pair hPair hStartChild hFinishChild =>
+      Grounded.node
+        (fun _ => recursive_description_source_grounded hStartChild)
+        (fun _ => recursive_description_source_grounded hFinishChild)
+
+theorem badStart_no_recursive_description :
+    ¬ ∃ code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription ExplicitFoundation badStart code := by
+  rintro ⟨code, h⟩
+  exact badStart_not_grounded (recursive_description_source_grounded h)
+
+theorem badFinish_no_recursive_description :
+    ¬ ∃ code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription ExplicitFoundation badFinish code := by
+  rintro ⟨code, h⟩
+  exact badFinish_not_grounded (recursive_description_source_grounded h)
+
+/--
+Likewise, every finite RecursiveInversion derivation implies that its source is
+Grounded. Together with INV-01 totality on Grounded Links, the source domain of
+the current inductive inversion graph is exactly Grounded.
+
+The generic theorem `recursive_inversion_functional` remains stronger in a
+different direction: whenever two derivations exist for any source, their
+images are equal. The cycle falsifies totality/existence, not functionality.
+-/
+def recursive_inversion_source_grounded :
+    {x y : ModelLink} →
+    RecursiveInversion ExplicitFoundation ExplicitInversionDomain x y →
+    Grounded ExplicitFoundation x
+  | _, _, .root =>
+      grounded_of_full_self ExplicitFoundation
+        (root_full_self ExplicitFoundation)
+  | _, _, .start hStart hChild =>
+      Grounded.node
+        (fun hNot => False.elim (hNot hStart.1))
+        (fun _ => recursive_inversion_source_grounded hChild)
+  | _, _, .finish hFinish hChild =>
+      Grounded.node
+        (fun _ => recursive_inversion_source_grounded hChild)
+        (fun hNot => False.elim (hNot hFinish.2))
+  | _, _, .pair hPair hFinishInv hStartInv =>
+      Grounded.node
+        (fun _ => recursive_inversion_source_grounded hStartInv)
+        (fun _ => recursive_inversion_source_grounded hFinishInv)
+
+theorem badStart_no_recursive_inverse :
+    ¬ ∃ y : ModelLink,
+      RecursiveInversion ExplicitFoundation ExplicitInversionDomain badStart y := by
+  rintro ⟨y, h⟩
+  exact badStart_not_grounded (recursive_inversion_source_grounded h)
+
+theorem badFinish_no_recursive_inverse :
+    ¬ ∃ y : ModelLink,
+      RecursiveInversion ExplicitFoundation ExplicitInversionDomain badFinish y := by
+  rintro ⟨y, h⟩
+  exact badFinish_not_grounded (recursive_inversion_source_grounded h)
+
+/--
+Sharing control for #1797.
+
+Both poles of this parent are the same semantic Grounded Link.  The parent is
+still Grounded, so repeated/shared substructure does not by itself create the
+non-well-founded obstruction seen in the two-Link cycle.  Heap/pointer sharing
+is outside this theorem: only semantic Link equality and pole recursion matter.
+-/
+def sharedGroundedChild : ModelLink :=
+  ExplicitOneSided.startRoot
+
+def sharedGroundedParent : ModelLink :=
+  ExplicitFoundation.form sharedGroundedChild sharedGroundedChild
+
+theorem sharedGroundedParent_start :
+    ExplicitFoundation.start sharedGroundedParent = sharedGroundedChild := by
+  exact ExplicitFoundation.form_start _ _
+
+theorem sharedGroundedParent_finish :
+    ExplicitFoundation.finish sharedGroundedParent = sharedGroundedChild := by
+  exact ExplicitFoundation.form_finish _ _
+
+theorem sharedGroundedParent_grounded :
+    Grounded ExplicitFoundation sharedGroundedParent := by
+  apply recursive_pair_grounded ExplicitFoundation
+  · exact f2f3_start_root_grounded ExplicitFoundation ExplicitOneSided
+  · exact f2f3_start_root_grounded ExplicitFoundation ExplicitOneSided
+
+theorem sharedGroundedParent_ne_child :
+    sharedGroundedParent ≠ sharedGroundedChild := by
+  intro hEq
+  have hFinishSelf :
+      FinishSelf ExplicitFoundation sharedGroundedChild := by
+    unfold FinishSelf
+    calc
+      ExplicitFoundation.finish sharedGroundedChild =
+          ExplicitFoundation.finish sharedGroundedParent :=
+        congrArg ExplicitFoundation.finish hEq.symm
+      _ = sharedGroundedChild := sharedGroundedParent_finish
+  have hStartOnly :
+      StartOnly ExplicitFoundation sharedGroundedChild := by
+    unfold sharedGroundedChild
+    exact f2f3_start_root_pattern ExplicitFoundation ExplicitOneSided
+  exact hStartOnly.2 hFinishSelf
+
+
 end MTS.External.Model1796

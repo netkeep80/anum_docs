@@ -1158,4 +1158,193 @@ Proof.
   now injection Hlen.
 Qed.
 
+
+(*
+#1797 cyclic-boundary witness.
+
+Under the current inductive proof semantics, existence of a finite canonical
+recursive description implies Grounded source structure. Together with FND-05
+totality on Grounded Links, this identifies Grounded as the exact existence
+domain of the current finite description relation.
+*)
+Theorem recursive_description_source_grounded :
+  forall (x : ModelLink) (code : RecursiveDescriptionCode),
+    CanonicalRecursiveDescription ExplicitFoundation x code ->
+    Grounded ExplicitFoundation x.
+Proof.
+  intros x code H.
+  induction H as
+    [ | x child HStart HChild IH
+      | x child HFinish HChild IH
+      | x startCode finishCode HPair HStartChild IHStart HFinishChild IHFinish ].
+  - apply grounded_of_full_self.
+    apply root_full_self.
+  - apply grounded_node.
+    + intros Hnot.
+      exfalso.
+      apply Hnot.
+      exact (proj1 HStart).
+    + intros _.
+      exact IH.
+  - apply grounded_node.
+    + intros _.
+      exact IH.
+    + intros Hnot.
+      exfalso.
+      apply Hnot.
+      exact (proj2 HFinish).
+  - apply grounded_node.
+    + intros _.
+      exact IHStart.
+    + intros _.
+      exact IHFinish.
+Qed.
+
+Theorem model_bad_start_no_recursive_description :
+  ~ exists code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription ExplicitFoundation
+        model_bad_start code.
+Proof.
+  intros [code H].
+  apply model_bad_start_not_grounded.
+  exact (recursive_description_source_grounded model_bad_start code H).
+Qed.
+
+Theorem model_bad_finish_no_recursive_description :
+  ~ exists code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription ExplicitFoundation
+        model_bad_finish code.
+Proof.
+  intros [code H].
+  apply model_bad_finish_not_grounded.
+  exact (recursive_description_source_grounded model_bad_finish code H).
+Qed.
+
+(*
+Likewise, any finite RecursiveInversion derivation implies Grounded source
+structure. Together with INV-01 totality on Grounded Links, the source domain
+of the current inductive inversion graph is exactly Grounded.
+
+The generic recursive_inversion_functional theorem remains Grounded-free:
+whenever two derivations exist, their images are equal. The cycle falsifies
+totality/existence, not functionality.
+*)
+Theorem recursive_inversion_source_grounded :
+  forall (x y : ModelLink),
+    RecursiveInversion
+      ExplicitFoundation ExplicitOneSided ExplicitInversionDomain x y ->
+    Grounded ExplicitFoundation x.
+Proof.
+  intros x y H.
+  induction H as
+    [ | x childInverse HStart HChild IH
+      | x childInverse HFinish HChild IH
+      | x inverseFinish inverseStart HPair HFinishInv IHFinish HStartInv IHStart ].
+  - apply grounded_of_full_self.
+    apply root_full_self.
+  - apply grounded_node.
+    + intros Hnot.
+      exfalso.
+      apply Hnot.
+      exact (proj1 HStart).
+    + intros _.
+      exact IH.
+  - apply grounded_node.
+    + intros _.
+      exact IH.
+    + intros Hnot.
+      exfalso.
+      apply Hnot.
+      exact (proj2 HFinish).
+  - apply grounded_node.
+    + intros _.
+      exact IHStart.
+    + intros _.
+      exact IHFinish.
+Qed.
+
+Theorem model_bad_start_no_recursive_inverse :
+  ~ exists y : ModelLink,
+      RecursiveInversion
+        ExplicitFoundation ExplicitOneSided ExplicitInversionDomain
+        model_bad_start y.
+Proof.
+  intros [y H].
+  apply model_bad_start_not_grounded.
+  exact (recursive_inversion_source_grounded model_bad_start y H).
+Qed.
+
+Theorem model_bad_finish_no_recursive_inverse :
+  ~ exists y : ModelLink,
+      RecursiveInversion
+        ExplicitFoundation ExplicitOneSided ExplicitInversionDomain
+        model_bad_finish y.
+Proof.
+  intros [y H].
+  apply model_bad_finish_not_grounded.
+  exact (recursive_inversion_source_grounded model_bad_finish y H).
+Qed.
+
+(*
+Sharing control for #1797.
+
+The same Grounded semantic child is used on both poles of one parent. This is
+still Grounded and therefore demonstrates that repeated/shared substructure is
+not the same obstruction as a true distinct-node non-well-founded cycle.
+Physical pointer/heap sharing remains outside this proof boundary.
+*)
+Definition shared_grounded_child : ModelLink :=
+  f2f3_start_root ExplicitFoundation ExplicitOneSided.
+
+Definition shared_grounded_parent : ModelLink :=
+  form ExplicitFoundation shared_grounded_child shared_grounded_child.
+
+Theorem shared_grounded_parent_start :
+  start ExplicitFoundation shared_grounded_parent =
+  shared_grounded_child.
+Proof.
+  unfold shared_grounded_parent.
+  apply form_start.
+Qed.
+
+Theorem shared_grounded_parent_finish :
+  finish ExplicitFoundation shared_grounded_parent =
+  shared_grounded_child.
+Proof.
+  unfold shared_grounded_parent.
+  apply form_finish.
+Qed.
+
+Theorem shared_grounded_parent_grounded :
+  Grounded ExplicitFoundation shared_grounded_parent.
+Proof.
+  unfold shared_grounded_parent, shared_grounded_child.
+  apply recursive_pair_grounded.
+  - apply f2f3_start_root_grounded.
+  - apply f2f3_start_root_grounded.
+Qed.
+
+Theorem shared_grounded_parent_ne_child :
+  shared_grounded_parent <> shared_grounded_child.
+Proof.
+  intros Heq.
+  assert (
+    HfinishSelf :
+    FinishSelf ExplicitFoundation shared_grounded_child
+  ).
+  {
+    unfold FinishSelf.
+    transitivity (finish ExplicitFoundation shared_grounded_parent).
+    - apply f_equal.
+      symmetry. exact Heq.
+    - apply shared_grounded_parent_finish.
+  }
+  pose proof
+    (f2f3_start_root_pattern ExplicitFoundation ExplicitOneSided)
+    as HstartOnly.
+  unfold shared_grounded_child in HstartOnly.
+  exact ((proj2 HstartOnly) HfinishSelf).
+Qed.
+
+
 End Model1796.
