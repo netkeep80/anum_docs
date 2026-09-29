@@ -548,6 +548,67 @@ for (const record of evidenceRecords
   );
 }
 
+const inv07 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "INV-07")
+  .map(({ record }) => record);
+assert.equal(inv07.length, 2, "INV-07 has exactly two external evidence records");
+assert.deepEqual(
+  inv07.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "INV-07 external lanes",
+);
+for (const record of inv07) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "ad2f3128d61401c56ef24fe724d859a23f0aa9f9",
+    `INV-07 ${record.lane} proof source commit`,
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "INV-07 Lean evidence keeps exact compiler/artifact pins",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "INV-07 Rocq evidence keeps exact compiler/image pins",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /objective chirality/i,
+    "INV-07 evidence records objective chirality",
+  );
+  assert.match(
+    String(record.notes),
+    /StartOnly.*FinishOnly|FinishOnly.*StartOnly/i,
+    "INV-07 evidence records one-sided exchange",
+  );
+  assert.match(
+    String(record.notes),
+    /second inversion.*original Link|INV-02.*original Link/i,
+    "INV-07 evidence records involutive return",
+  );
+  assert.match(
+    String(record.notes),
+    /PairLocal/,
+    "INV-07 evidence records PAIR stability",
+  );
+  assert.match(
+    String(record.notes),
+    /no.*Foundation-global absolute orientation|without selecting.*Foundation-global/i,
+    "INV-07 evidence preserves relative-orientation boundary",
+  );
+  assert.match(
+    String(record.notes),
+    /prover-side projection|not MTS ontology/i,
+    "INV-07 evidence records the external projection boundary",
+  );
+}
+
 const leanEvidence = fnd02.find((record) => record.lane === "lean4");
 const coqEvidence = fnd02.find((record) => record.lane === "coq");
 assert.ok(leanEvidence !== undefined && coqEvidence !== undefined);
@@ -569,5 +630,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq aprover-input=mtsNative-only`,
 );
