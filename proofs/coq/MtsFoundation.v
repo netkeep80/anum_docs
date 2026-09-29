@@ -1628,7 +1628,7 @@ Proof.
     transitivity (form F secondFinish secondStart).
     + exact HzForm.
     + rewrite HFinishEq, HStartEq.
-      apply poles_recompose_after_fnd13.
+      apply (poles_recompose_after_fnd13 F A1 N x).
 Qed.
 
 (* Function-level INV-02 witness without choosing a host function: INV-01
