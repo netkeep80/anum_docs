@@ -612,6 +612,103 @@ for (const [label, source, start, end] of [
   }
 }
 
+const inv02 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-02");
+assert(inv02 !== undefined, "P0 contains INV-02");
+assert(
+  JSON.stringify(inv02.assumptions) === JSON.stringify(["INV-01"]),
+  "INV-02 assumes only INV-01",
+);
+assert(
+  JSON.stringify(inv02.dependsOn) === JSON.stringify(["INV-01"]),
+  "INV-02 depends exactly on INV-01",
+);
+assert(
+  /Exact domain on which INV-01 is defined/.test(inv02.scope as string),
+  "INV-02 scope is exactly the INV-01 domain",
+);
+assert(
+  /No claim outside the declared recursive\/inversion domain/.test(inv02.exclusions as string),
+  "INV-02 explicitly excludes domain expansion",
+);
+for (const source of [lean, rocq]) {
+  assert(
+    source.includes("recursive_start_form_canonical"),
+    "external source derives canonical semantic START form before INV-02",
+  );
+  assert(
+    source.includes("recursive_end_form_canonical"),
+    "external source derives canonical semantic END form before INV-02",
+  );
+  assert(
+    source.includes("poles_recompose_after_fnd13"),
+    "external source uses downstream FND-13 pole reconstruction rather than an axiom",
+  );
+  assert(
+    source.includes("recursive_inversion_source_grounded"),
+    "external source proves INV-01 graph sources stay in the exact Grounded domain",
+  );
+  assert(
+    source.includes("INV_02_recursive_inversion_involutive"),
+    "external source proves relational INV-02 involution",
+  );
+  assert(
+    source.includes("INV_02_unique_total_involution"),
+    "external source proves function-level double inversion witness from INV-01 totality",
+  );
+}
+assert(
+  lean.includes("theorem INV_02_recursive_inversion_involutive"),
+  "Lean INV-02 is a theorem, not an axiom",
+);
+assert(
+  rocq.includes("Theorem INV_02_recursive_inversion_involutive"),
+  "Rocq INV-02 is a theorem, not an axiom",
+);
+assert(
+  lean.includes("INV_01_recursive_inversion_total F a1 N E D gx") &&
+    lean.includes("recursive_inversion_image_grounded F D hxy"),
+  "Lean INV-02 capstone reuses INV-01 totality and its exact image domain",
+);
+assert(
+  rocq.includes("INV_01_recursive_inversion_total F A1 N E D x GX") &&
+    rocq.includes("recursive_inversion_image_grounded F E D x y Hxy"),
+  "Rocq INV-02 capstone reuses INV-01 totality and its exact image domain",
+);
+assert(
+  lean.includes("INV_01_recursive_pole_reversal F D hyz") &&
+    lean.includes("poles_recompose_after_fnd13 F a1 N x"),
+  "Lean PAIR involution reverses poles twice and reconstructs the original Link",
+);
+assert(
+  rocq.includes("INV_01_recursive_pole_reversal") &&
+    rocq.includes("poles_recompose_after_fnd13 F A1 N x"),
+  "Rocq PAIR involution reverses poles twice and reconstructs the original Link through FND-13",
+);
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  const inv02Start = source.indexOf(
+    label === "Lean"
+      ? "theorem recursive_inversion_source_grounded"
+      : "Lemma recursive_inversion_source_grounded",
+  );
+  assert(inv02Start >= 0, `${label} INV-02 proof region exists`);
+  const region = source.slice(inv02Start);
+  for (const forbidden of [
+    "ExactSequence",
+    "canonicalWire",
+    "LinkHandle",
+    "codec",
+    "opcode",
+    "RecursiveInversionV2",
+    "RecursiveInversionDomainV2",
+  ]) {
+    assert(!region.includes(forbidden), `${label} INV-02 region excludes ${forbidden}`);
+  }
+}
+assert(
+  !lean.includes("axiom INV_02") && !rocq.includes("Axiom INV_02"),
+  "INV-02 is not postulated as an axiom",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -652,7 +749,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=7",
+  "THEOREM_PROOF_CLAIMS=9",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -674,6 +771,11 @@ console.log([
   "INV01_FUNCTIONAL=GREEN_SOURCE",
   "INV01_UNIQUE_TOTAL=GREEN_SOURCE",
   "INV01_UNIQUENESS=EXPLICIT",
+  "INV02_DOMAIN=SAME_AS_INV01",
+  "INV02_ONE_SIDED_CANONICALITY=DERIVED",
+  "INV02_RELATIONAL_INVOLUTION=GREEN_SOURCE",
+  "INV02_UNIQUE_TOTAL_INVOLUTION=GREEN_SOURCE",
+  "INV02_DOMAIN_EXPANSION=NONE",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
