@@ -8,9 +8,9 @@
   },
   "assumptions": [
     "one Link-forming primitive",
-    "accepted finite R-grounded domain",
-    "explicit global F2/F3 normalization completeness used only for the auxiliary arbitrary-Link pole-identity conjunct",
-    "F2/F3 grounded-form existence/sufficiency for the declared domain",
+    "A1 recursive separation for unique full self-closure / FND-02",
+    "F2/F3 grounded-form existence/sufficiency for the declared realizability domain",
+    "explicit local self-incidence decision evidence for the classified Link",
     "Context orientation only names one-sided cases; it does not create them"
   ],
   "dependencies": [
@@ -21,7 +21,7 @@
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "b0f1da0f3e4d1a8048cdc378fc2ccb914c736c79",
+    "commitSha": "006b0397d0a5160c47d34db0f20a377edd224132",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
@@ -30,8 +30,8 @@
   "artifacts": [
     {
       "path": "proofs/coq/MtsFoundation.v",
-      "sha256": "fa4b92e827f3f7a9b43bd4972712c630dcdad0e205ddf62524c2f83d1a2138a0"
+      "sha256": "01adf311071e9310899a3f1d0b5eb1004031636061418a2beb5125a3b468d2a4"
     }
   ],
-  "notes": "External differential proof only. FND-01 proves the four proposition-level self-incidence classes and their grounded realizability. Unique ROOT is consumed through FND-02. The classification itself does not depend on the Grounded FND-13 capstone. An additional arbitrary-Link pole-identity conjunct in the external capstone is explicitly conditional on the separately named stronger global F2/F3 normalization-completeness premise. LocalSelfDecision remains explicit, ContextOneSidedNames remains alias-only, and no host enum/codec/handle becomes authority."
+  "notes": "External differential proof only. FND-01 proves the four proposition-level self-incidence classes and their finite Grounded realizability without importing normalization or ordered-pole extensionality. Unique ROOT is consumed through FND-02/A1. Ordered-pole identity remains the separate FND-13 theorem. LocalSelfDecision remains explicit, ContextOneSidedNames remains alias-only, and no host enum/codec/handle becomes authority."
 }

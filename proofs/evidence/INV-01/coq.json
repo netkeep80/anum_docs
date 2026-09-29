@@ -19,7 +19,7 @@
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "840f2829a93313384c7405a2e3db31e1999adf67",
+    "commitSha": "006b0397d0a5160c47d34db0f20a377edd224132",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
@@ -28,8 +28,8 @@
   "artifacts": [
     {
       "path": "proofs/coq/MtsFoundation.v",
-      "sha256": "bb5c06f4193e267ea535f6ad612f9452f48e8fc3a26a288eeae6551076677345"
+      "sha256": "01adf311071e9310899a3f1d0b5eb1004031636061418a2beb5125a3b468d2a4"
     }
   ],
-  "notes": "External differential proof only. INV-01 defines J as a Prop-valued structural graph over the declared finite Grounded F2/F3 recursive domain, not as a host enum or representation transform. The graph is total and functional, hence every Grounded source has exactly one structural inverse. The proof states the recursive pole-reversal equation J(A⟼B)=J(B)⟼J(A), treats self-incidence explicitly, keeps the image Grounded, consumes FND-01 for the local structural partition and FND-02 for unique ROOT, and excludes ExactSequence, handles, codec digits, labels, opcodes, and host field order as semantic authority. No classical choice is used."
+  "notes": "External differential proof only. INV-01 defines J as a Prop-valued structural graph over the declared finite Grounded F2/F3 recursive domain, not as a host enum or representation transform. The graph is total and functional, hence every Grounded source has exactly one structural inverse. The proof is normalization-free: it consumes the FND-01 structural partition and FND-02 unique ROOT, states J(A⟼B)=J(B)⟼J(A), keeps the image Grounded, and excludes ExactSequence, handles, codec digits, labels, opcodes, host field order, and classical choice as semantic authority."
 }

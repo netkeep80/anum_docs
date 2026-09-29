@@ -21,7 +21,7 @@
   "lane": "lean4",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "b23eed9dad473e992915d3c1d52b189faec456d9",
+    "commitSha": "006b0397d0a5160c47d34db0f20a377edd224132",
     "toolchain": {
       "name": "Lean",
       "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
@@ -30,8 +30,8 @@
   "artifacts": [
     {
       "path": "proofs/lean4/MtsFoundation.lean",
-      "sha256": "10ff51cb80479d644e638ec6fdc6cbb1f0604597b2742c9d9030fdd99a94fbfd"
+      "sha256": "849a925d29375d18631c9775b5daf98ad429eb30c986ee4066bfc975c0f6dac4"
     }
   ],
-  "notes": "External differential proof only. INV-06 is a representative root-basis calculation under one chosen Context-relative orientation: J(R)=R, J(O)=C, J(C)=O, J(L)=L, J(U)=U. O/C are the accepted F2/F3 one-sided representatives and L/U are ordinary PAIR-derived Links; U is derived PairLocal rather than postulated. No RootBasis ontology datatype, Foundation-global absolute START side, observer authority, or full-Theory automorphism claim is introduced."
+  "notes": "External differential proof only. INV-06 is a representative root-basis calculation under one chosen Context-relative orientation: J(R)=R, J(O)=C, J(C)=O, J(L)=L, J(U)=U. O/C are the accepted F2/F3 one-sided representatives and L/U are ordinary PAIR-derived Links; U is derived PairLocal rather than postulated. No RootBasis ontology datatype, Foundation-global absolute START side, observer authority, or full-Theory automorphism claim is introduced. Proof source is repinned after #1796 normalization-premise minimization; the stronger global arbitrary-Link normalization package is not imported by this accepted chain."
 }

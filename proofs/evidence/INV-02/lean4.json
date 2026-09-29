@@ -7,17 +7,19 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "INV-01"
+    "INV-01",
+    "FND-13"
   ],
   "dependencies": [
-    "INV-01"
+    "INV-01",
+    "FND-13"
   ],
   "result": "proved",
   "authority": "external-cross-check",
   "lane": "lean4",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "2305f259426dfcda5920fa485040ee6c0af05902",
+    "commitSha": "006b0397d0a5160c47d34db0f20a377edd224132",
     "toolchain": {
       "name": "Lean",
       "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
@@ -26,8 +28,8 @@
   "artifacts": [
     {
       "path": "proofs/lean4/MtsFoundation.lean",
-      "sha256": "cdda9c352bc924f9402796b88d9ab14bfa5086129bc50a148e29d69787cd0974"
+      "sha256": "849a925d29375d18631c9775b5daf98ad429eb30c986ee4066bfc975c0f6dac4"
     }
   ],
-  "notes": "External differential proof only. INV-02 proves involution J(J(X))=X on exactly the same finite Grounded domain as INV-01 by reusing the same Prop-valued RecursiveInversion graph; no second inversion function or enlarged domain is introduced. START/END use derived one-sided canonicality, PAIR reverses both poles again through INV-01 and reconstructs the original semantic Link only downstream of FND-13. The first inversion image is proved Grounded before the second application. No classical choice, representation/codec authority, handles, labels, opcodes, or host field order participate."
+  "notes": "External differential proof only. INV-02 proves involution J(J(X))=X on the same finite Grounded domain as INV-01 and reuses the same Prop-valued RecursiveInversion graph; no second inversion function or enlarged domain is introduced. START/END use derived one-sided canonicality. The PAIR branch reverses both poles again through INV-01 and reconstructs the original Link only through the separate Grounded FND-13 identity boundary. No stronger global arbitrary-Link normalization/extensionality premise, classical choice, codec/handle identity, labels, opcodes, or host field order is introduced."
 }

@@ -19,7 +19,7 @@
   "lane": "lean4",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "840f2829a93313384c7405a2e3db31e1999adf67",
+    "commitSha": "006b0397d0a5160c47d34db0f20a377edd224132",
     "toolchain": {
       "name": "Lean",
       "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
@@ -28,8 +28,8 @@
   "artifacts": [
     {
       "path": "proofs/lean4/MtsFoundation.lean",
-      "sha256": "35ba049e5f6e4c56a356b118cb8014dcfae72f8df0210284b4434bc590049cbe"
+      "sha256": "849a925d29375d18631c9775b5daf98ad429eb30c986ee4066bfc975c0f6dac4"
     }
   ],
-  "notes": "External differential proof only. INV-01 defines J as a Prop-valued structural graph over the declared finite Grounded F2/F3 recursive domain, not as a host enum or representation transform. The graph is total and functional, hence every Grounded source has exactly one structural inverse. The proof states the recursive pole-reversal equation J(A⟼B)=J(B)⟼J(A), treats self-incidence explicitly, keeps the image Grounded, consumes FND-01 for the local structural partition and FND-02 for unique ROOT, and excludes ExactSequence, handles, codec digits, labels, opcodes, and host field order as semantic authority. No classical choice is used."
+  "notes": "External differential proof only. INV-01 defines J as a Prop-valued structural graph over the declared finite Grounded F2/F3 recursive domain, not as a host enum or representation transform. The graph is total and functional, hence every Grounded source has exactly one structural inverse. The proof is normalization-free: it consumes the FND-01 structural partition and FND-02 unique ROOT, states J(A⟼B)=J(B)⟼J(A), keeps the image Grounded, and excludes ExactSequence, handles, codec digits, labels, opcodes, host field order, and classical choice as semantic authority."
 }

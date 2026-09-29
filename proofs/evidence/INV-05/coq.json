@@ -7,17 +7,21 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "INV-01"
+    "INV-01",
+    "INV-02",
+    "INV-04"
   ],
   "dependencies": [
-    "INV-01"
+    "INV-01",
+    "INV-02",
+    "INV-04"
   ],
   "result": "proved",
   "authority": "external-cross-check",
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "54af5c6c1f9bfdaa7c23331cb431355a886794ec",
+    "commitSha": "006b0397d0a5160c47d34db0f20a377edd224132",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
@@ -26,8 +30,8 @@
   "artifacts": [
     {
       "path": "proofs/coq/MtsFoundation.v",
-      "sha256": "a5018c308cca896ab56964da6200271d6d83079c36eddbdf13b847e441d4dbec"
+      "sha256": "01adf311071e9310899a3f1d0b5eb1004031636061418a2beb5125a3b468d2a4"
     }
   ],
-  "notes": "External differential proof only. INV-05 proves that a PAIR source remains PairLocal under the existing structural RecursiveInversion graph while its poles are recursively exchanged by INV-01. The non-collapse argument uses INV-02 only as an already-derived consequence of the same INV-01 assumptions; no pairPreserved field, new inversion-domain axiom, host inverse function, codec/handle identity, or representation order is introduced."
+  "notes": "External differential proof only. INV-05 proves that a PAIR source remains PairLocal under the existing structural RecursiveInversion graph while its poles are recursively exchanged. The non-collapse proof explicitly reuses the already-derived INV-02 involution and INV-04 one-sided exchange on the same finite Grounded domain, while pole reversal comes from INV-01. No pairPreserved field, new inversion-domain axiom, global arbitrary-Link extensionality, host inverse function, codec/handle identity, or representation order is introduced."
 }

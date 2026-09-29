@@ -392,10 +392,18 @@ assert(
   "FND-01 structural classification depends only on unique ROOT",
 );
 assert(
-  (fnd01.assumptions as string[]).some((value) =>
+  !(fnd01.assumptions as string[]).some((value) =>
     value.includes("global F2/F3 normalization completeness")
   ),
-  "FND-01 exposes stronger global normalization only for its auxiliary identity conjunct",
+  "FND-01 no longer imports the stronger global normalization premise",
+);
+assert(
+  (fnd01.assumptions as string[]).some((value) => value.includes("A1 recursive separation")),
+  "FND-01 keeps unique full-self closure grounded in A1/FND-02",
+);
+assert(
+  (fnd01.assumptions as string[]).some((value) => value.includes("local self-incidence decision")),
+  "FND-01 keeps constructive local decision evidence explicit",
 );
 assert(
   (fnd01.assumptions as string[]).some((value) => value.includes("F2/F3 grounded-form existence")),
@@ -432,15 +440,23 @@ assert(
   rocq.includes("Theorem FND_01_local_partition"),
   "Rocq FND-01 C1 is a theorem, not an axiom",
 );
+const leanFnd01C1Start = lean.indexOf("theorem FND_01_local_partition");
+const leanFnd01C1End = lean.indexOf("structure F2F3OneSidedExistence", leanFnd01C1Start);
+const rocqFnd01C1Start = rocq.indexOf("Theorem FND_01_local_partition");
+const rocqFnd01C1End = rocq.indexOf("Record F2F3OneSidedExistence", rocqFnd01C1Start);
 assert(
-  lean.includes("FND_02_unique_root F a1 h") &&
-    lean.includes("global_identity_by_poles_from_complete_normalization F N"),
-  "Lean FND-01 C1 consumes FND-02 plus the explicitly stronger global identity auxiliary",
+  leanFnd01C1Start >= 0 && leanFnd01C1End > leanFnd01C1Start &&
+    lean.slice(leanFnd01C1Start, leanFnd01C1End).includes("FND_02_unique_root") &&
+    !lean.slice(leanFnd01C1Start, leanFnd01C1End).includes("F2F3Normalization") &&
+    !lean.slice(leanFnd01C1Start, leanFnd01C1End).includes("FND_13_identity_by_poles"),
+  "Lean FND-01 C1 consumes unique ROOT but no normalization/extensionality premise",
 );
 assert(
-  rocq.includes("FND_02_unique_root F A1 x H") &&
-    rocq.includes("global_identity_by_poles_from_complete_normalization F N x y"),
-  "Rocq FND-01 C1 consumes FND-02 plus the explicitly stronger global identity auxiliary",
+  rocqFnd01C1Start >= 0 && rocqFnd01C1End > rocqFnd01C1Start &&
+    rocq.slice(rocqFnd01C1Start, rocqFnd01C1End).includes("FND_02_unique_root") &&
+    !rocq.slice(rocqFnd01C1Start, rocqFnd01C1End).includes("F2F3Normalization") &&
+    !rocq.slice(rocqFnd01C1Start, rocqFnd01C1End).includes("FND_13_identity_by_poles"),
+  "Rocq FND-01 C1 consumes unique ROOT but no normalization/extensionality premise",
 );
 assert(
   !lean.includes("inductive SelfIncidence") && !rocq.includes("Inductive SelfIncidence"),
@@ -543,9 +559,9 @@ assert(
   "Lean capstone explicitly composes C1 and C2",
 );
 assert(
-  rocq.includes("FND_01_local_partition F A1 N x D") &&
+  rocq.includes("FND_01_local_partition F A1 x D") &&
     rocq.includes("FND_01_grounded_realizability F E"),
-  "Rocq capstone explicitly composes C1 and C2",
+  "Rocq capstone explicitly composes normalization-free C1 and grounded C2",
 );
 assert(
   lean.includes("START_K = E.startRoot ∧ END_K = E.finishRoot"),
@@ -629,14 +645,14 @@ assert(
   "recursive PAIR inversion reverses the two recursively inverted poles",
 );
 assert(
-  lean.includes("FND_01_local_partition F a1 N decision") &&
+  lean.includes("FND_01_local_partition F a1 decision") &&
     lean.includes("FND_02_unique_root F a1 hFull"),
-  "Lean INV-01 totality consumes FND-01 partition and FND-02 unique ROOT",
+  "Lean INV-01 totality consumes normalization-free FND-01 partition and FND-02 unique ROOT",
 );
 assert(
-  rocq.includes("FND_01_local_partition F A1 N x Decision") &&
+  rocq.includes("FND_01_local_partition F A1 x Decision") &&
     rocq.includes("FND_02_unique_root F A1 x HFull"),
-  "Rocq INV-01 totality consumes FND-01 partition and FND-02 unique ROOT",
+  "Rocq INV-01 totality consumes normalization-free FND-01 partition and FND-02 unique ROOT",
 );
 for (const source of [lean, rocq]) {
   assert(
@@ -686,16 +702,17 @@ for (const [label, source, start, end] of [
 const inv02 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-02");
 assert(inv02 !== undefined, "P0 contains INV-02");
 assert(
-  JSON.stringify(inv02.assumptions) === JSON.stringify(["INV-01"]),
-  "INV-02 assumes only INV-01",
+  JSON.stringify(inv02.assumptions) === JSON.stringify(["INV-01", "FND-13"]),
+  "INV-02 exposes INV-01 plus the exact Grounded identity boundary",
 );
 assert(
-  JSON.stringify(inv02.dependsOn) === JSON.stringify(["INV-01"]),
-  "INV-02 depends exactly on INV-01",
+  JSON.stringify(inv02.dependsOn) === JSON.stringify(["INV-01", "FND-13"]),
+  "INV-02 depends exactly on INV-01 and FND-13",
 );
 assert(
-  /Exact domain on which INV-01 is defined/.test(inv02.scope as string),
-  "INV-02 scope is exactly the INV-01 domain",
+  /finite Grounded domain on which INV-01 is defined/i.test(inv02.scope as string) &&
+    /FND-13/i.test(inv02.scope as string),
+  "INV-02 scope records finite Grounded inversion plus FND-13 reconstruction",
 );
 assert(
   /No claim outside the declared recursive\/inversion domain/.test(inv02.exclusions as string),
@@ -712,7 +729,11 @@ for (const source of [lean, rocq]) {
   );
   assert(
     source.includes("poles_recompose_from_global_normalization"),
-    "external source uses explicit global-normalization pole reconstruction rather than an axiom",
+    "external source retains the stronger global-reconstruction theorem only as an explicit auxiliary",
+  );
+  assert(
+    source.includes("FND_13_identity_by_poles"),
+    "INV-02 can reconstruct Grounded PAIR sources through the accepted FND-13 boundary",
   );
   assert(
     source.includes("recursive_inversion_source_grounded"),
@@ -736,27 +757,35 @@ assert(
   "Rocq INV-02 is a theorem, not an axiom",
 );
 assert(
-  lean.includes("INV_01_recursive_inversion_total F a1 N E D gx") &&
+  lean.includes("INV_01_recursive_inversion_total F a1 E D gx") &&
     lean.includes("recursive_inversion_image_grounded F D hxy"),
-  "Lean INV-02 capstone reuses INV-01 totality and its exact image domain",
+  "Lean INV-02 capstone reuses normalization-free INV-01 totality and its exact image domain",
 );
 assert(
-  rocq.includes("INV_01_recursive_inversion_total F A1 N E D x GX") &&
+  rocq.includes("INV_01_recursive_inversion_total F A1 E D x GX") &&
     rocq.includes("recursive_inversion_image_grounded F E D x y Hxy"),
-  "Rocq INV-02 capstone reuses INV-01 totality and its exact image domain",
+  "Rocq INV-02 capstone reuses normalization-free INV-01 totality and its exact image domain",
+);
+const leanInv02Start = lean.indexOf("theorem INV_02_recursive_inversion_involutive");
+const leanInv02End = lean.indexOf("theorem INV_02_unique_total_involution", leanInv02Start);
+const rocqInv02Start = rocq.indexOf("Theorem INV_02_recursive_inversion_involutive");
+const rocqInv02End = rocq.indexOf("Theorem INV_02_unique_total_involution", rocqInv02Start);
+assert(
+  leanInv02Start >= 0 && leanInv02End > leanInv02Start &&
+    lean.slice(leanInv02Start, leanInv02End).includes("INV_01_recursive_pole_reversal F D hyz") &&
+    lean.slice(leanInv02Start, leanInv02End).includes("FND_13_identity_by_poles F N") &&
+    !lean.slice(leanInv02Start, leanInv02End).includes("poles_recompose_from_global_normalization"),
+  "Lean PAIR involution reverses poles twice and reconstructs only through Grounded FND-13",
 );
 assert(
-  lean.includes("INV_01_recursive_pole_reversal F D hyz") &&
-    lean.includes("poles_recompose_from_global_normalization F a1 N x"),
-  "Lean PAIR involution reverses poles twice and reconstructs the original Link",
-);
-assert(
-  rocq.includes("INV_01_recursive_pole_reversal") &&
-    rocq.includes("poles_recompose_from_global_normalization F A1 N x"),
-  "Rocq PAIR involution reverses poles twice and reconstructs the original Link through explicit global normalization",
+  rocqInv02Start >= 0 && rocqInv02End > rocqInv02Start &&
+    rocq.slice(rocqInv02Start, rocqInv02End).includes("INV_01_recursive_pole_reversal") &&
+    rocq.slice(rocqInv02Start, rocqInv02End).includes("FND_13_identity_by_poles") &&
+    !rocq.slice(rocqInv02Start, rocqInv02End).includes("poles_recompose_from_global_normalization"),
+  "Rocq PAIR involution reverses poles twice and reconstructs only through Grounded FND-13",
 );
 for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
-  const inv02Start = source.indexOf(
+  const inv02RegionStart = source.indexOf(
     label === "Lean"
       ? "theorem recursive_inversion_source_grounded"
       : "Lemma recursive_inversion_source_grounded",
@@ -765,10 +794,10 @@ for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
     label === "Lean"
       ? "theorem INV_03_root_fixed"
       : "Theorem INV_03_root_fixed",
-    inv02Start,
+    inv02RegionStart,
   );
-  assert(inv02Start >= 0 && inv02End > inv02Start, `${label} INV-02 proof region exists`);
-  const region = source.slice(inv02Start, inv02End);
+  assert(inv02RegionStart >= 0 && inv02End > inv02RegionStart, `${label} INV-02 proof region exists`);
+  const region = source.slice(inv02RegionStart, inv02End);
   for (const forbidden of [
     "ExactSequence",
     "canonicalWire",
@@ -786,8 +815,8 @@ assert(
   "INV-02 is not postulated as an axiom",
 );
 
-const invSupportIds = ["INV-03", "INV-04", "INV-05"] as const;
-for (const id of invSupportIds) {
+const invSimpleSupportIds = ["INV-03", "INV-04"] as const;
+for (const id of invSimpleSupportIds) {
   const target = (p0.targets as Record<string, any>[]).find((candidate) => candidate.id === id);
   assert(target !== undefined, `P0 contains ${id}`);
   assert(
@@ -799,6 +828,16 @@ for (const id of invSupportIds) {
     `${id} dependency remains exactly INV-01`,
   );
 }
+const inv05 = (p0.targets as Record<string, any>[]).find((candidate) => candidate.id === "INV-05");
+assert(inv05 !== undefined, "P0 contains INV-05");
+assert(
+  JSON.stringify(inv05.assumptions) === JSON.stringify(["INV-01", "INV-02", "INV-04"]),
+  "INV-05 exposes its actual INV-01/INV-02/INV-04 proof dependencies",
+);
+assert(
+  JSON.stringify(inv05.dependsOn) === JSON.stringify(["INV-01", "INV-02", "INV-04"]),
+  "INV-05 dependency graph matches the formal proof chain",
+);
 for (const source of [lean, rocq]) {
   assert(source.includes("INV_03_root_fixed"), "external source proves INV-03 ROOT fixed");
   assert(source.includes("INV_04_start_to_finish"), "external source proves INV-04 START to END");

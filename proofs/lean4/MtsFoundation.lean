@@ -403,34 +403,24 @@ This is not yet the full FND-01 realizability claim.  It proves that, once the
 two local identity questions have explicit decision evidence, the accepted
 Link has exactly one of the four self-incidence proposition patterns.
 
-The full-self branch is tied to unique ROOT through FND-02.  Equality of actual
-Links remains structural ordered-pole equality through FND-13.  Context
-orientation is intentionally absent here: it later names the two one-sided
-patterns but does not create them.
+The full-self branch is tied to unique ROOT through FND-02.  Ordered-pole
+identity remains the separate FND-13 theorem and is intentionally not imported
+into this local classification.  Context orientation later names the two
+one-sided patterns but does not create them.
 -/
 theorem FND_01_local_partition
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
     {x : F.Link}
     (decision : LocalSelfDecision F x) :
     LocalSelfIncidenceExhaustive F x ∧
     LocalSelfIncidenceExclusive F x ∧
-    (FullSelf F x → x = F.R) ∧
-    (∀ {y : F.Link},
-      F.start x = F.start y →
-      F.finish x = F.finish y →
-      x = y) := by
-  refine ⟨
+    (FullSelf F x → x = F.R) := by
+  exact ⟨
     local_self_incidence_exhaustive F decision,
     local_self_incidence_exclusive F,
-    ?_,
-    ?_
+    fun h => FND_02_unique_root F a1 h
   ⟩
-  · intro h
-    exact FND_02_unique_root F a1 h
-  · intro y hs hf
-    exact (global_identity_by_poles_from_complete_normalization F N).2 ⟨hs, hf⟩
 
 
 /--
@@ -630,25 +620,19 @@ Link once the two local self-incidence questions are explicitly decidable.
 C2 proves that all four proposition patterns are realized in the accepted
 finite R-grounded domain.
 
-The capstone keeps both facts together and also preserves the already proved
-identity boundaries:
-- full self-closure is unique ROOT through FND-02;
-- actual semantic Link identity is ordered-pole identity through FND-13.
+The capstone keeps the structural classification and grounded realizability
+together.  Full self-closure is identified with unique ROOT through FND-02;
+ordered-pole identity remains the separate FND-13 theorem.
 -/
 theorem FND_01_four_structural_cases
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     {x : F.Link}
     (decision : LocalSelfDecision F x) :
     LocalSelfIncidenceExhaustive F x ∧
     LocalSelfIncidenceExclusive F x ∧
     (FullSelf F x → x = F.R) ∧
-    (∀ {y : F.Link},
-      F.start x = F.start y →
-      F.finish x = F.finish y →
-      x = y) ∧
     (FullSelf F F.R ∧
       ∃ startWitness finishWitness pairWitness : F.Link,
         Grounded F startWitness ∧
@@ -657,13 +641,12 @@ theorem FND_01_four_structural_cases
         StartOnly F startWitness ∧
         FinishOnly F finishWitness ∧
         PairLocal F pairWitness) := by
-  have c1 := FND_01_local_partition F a1 N decision
+  have c1 := FND_01_local_partition F a1 decision
   have c2 := FND_01_grounded_realizability F E
   exact ⟨
     c1.1,
     c1.2.1,
-    c1.2.2.1,
-    c1.2.2.2,
+    c1.2.2,
     c2
   ⟩
 
@@ -880,16 +863,17 @@ case is identified with ROOT by FND-02.
 theorem INV_01_recursive_inversion_total
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     {x : F.Link}
     (gx : Grounded F x) :
     ∃ y : F.Link, RecursiveInversion F D x y := by
   induction gx with
-  | node startStep finishStep ihStart ihFinish =>
-      have decision := D.decide (Grounded.node startStep finishStep)
-      have partition := FND_01_local_partition F a1 N decision
+  | @node current startStep finishStep ihStart ihFinish =>
+      have gxCurrent : Grounded F current :=
+        Grounded.node startStep finishStep
+      have decision := D.decide gxCurrent
+      have partition := FND_01_local_partition F a1 decision
       rcases partition.1 with hFull | hStart | hFinish | hPair
       · have hxRoot := FND_02_unique_root F a1 hFull
         refine ⟨F.R, ?_⟩
@@ -1110,13 +1094,12 @@ choice: every source has exactly one graph image.
 theorem INV_01_recursive_inversion_unique_total
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     {x : F.Link}
     (gx : Grounded F x) :
     UniqueRecursiveInverse F D x := by
-  rcases INV_01_recursive_inversion_total F a1 N E D gx with
+  rcases INV_01_recursive_inversion_total F a1 E D gx with
     ⟨y, hy⟩
   refine ⟨y, hy, ?_⟩
   intro z hz
@@ -1427,12 +1410,12 @@ returns the original semantic Link.
 The induction is over the first INV-01 proof tree, so INV-02 has exactly the
 same declared domain as INV-01.  START/END branches use the already derived
 F2/F3 canonical one-sided forms.  PAIR reverses the two recursively inverted
-poles again and then uses post-FND-13 pole reconstruction.
+poles again and then uses the exact Grounded FND-13 pole reconstruction.
 -/
 theorem INV_02_recursive_inversion_involutive
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     {x y z : F.Link}
@@ -1508,11 +1491,27 @@ theorem INV_02_recursive_inversion_involutive
         ihStart hSecondFinish'
       have hStartEq : secondStart = F.finish x :=
         ihFinish hSecondStart'
+      have gx : Grounded F x := by
+        apply Grounded.node
+        · intro _
+          exact recursive_inversion_source_grounded F D hStartInv
+        · intro _
+          exact recursive_inversion_source_grounded F D hFinishInv
+      have gStart : Grounded F (F.start x) :=
+        grounded_start_of_nonself F gx hPair.1
+      have gFinish : Grounded F (F.finish x) :=
+        grounded_finish_of_nonself F gx hPair.2
+      have gForm : Grounded F (F.form (F.start x) (F.finish x)) :=
+        recursive_pair_grounded F gStart gFinish
       calc
         z = F.form secondFinish secondStart := hzForm
         _ = F.form (F.start x) (F.finish x) := by
           rw [hFinishEq, hStartEq]
-        _ = x := poles_recompose_from_global_normalization F a1 N x
+        _ = x :=
+          (FND_13_identity_by_poles F N gForm gx).2 ⟨
+            F.form_start (F.start x) (F.finish x),
+            F.form_finish (F.start x) (F.finish x)
+          ⟩
 
 /--
 Function-level INV-02 witness without choosing a host function: INV-01
@@ -1522,7 +1521,7 @@ involution theorem identifies the second image with the original Link.
 theorem INV_02_unique_total_involution
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     {x : F.Link}
@@ -1531,11 +1530,11 @@ theorem INV_02_unique_total_involution
       RecursiveInversion F D x y ∧
       RecursiveInversion F D y z ∧
       z = x := by
-  rcases INV_01_recursive_inversion_total F a1 N E D gx with
+  rcases INV_01_recursive_inversion_total F a1 E D gx with
     ⟨y, hxy⟩
   have gy : Grounded F y :=
     recursive_inversion_image_grounded F D hxy
-  rcases INV_01_recursive_inversion_total F a1 N E D gy with
+  rcases INV_01_recursive_inversion_total F a1 E D gy with
     ⟨z, hyz⟩
   exact ⟨
     y,
@@ -1625,7 +1624,7 @@ No new domain field or pair-preservation axiom is introduced.
 theorem INV_05_pair_preserved_and_reversed
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     {x y : F.Link}
@@ -1638,12 +1637,12 @@ theorem INV_05_pair_preserved_and_reversed
       y = F.form inverseFinish inverseStart := by
   have gy : Grounded F y :=
     recursive_inversion_image_grounded F D hxy
-  rcases INV_01_recursive_inversion_total F a1 N E D gy with
+  rcases INV_01_recursive_inversion_total F a1 E D gy with
     ⟨z, hyz⟩
   have hzx : z = x :=
     INV_02_recursive_inversion_involutive F a1 N E D hxy hyz
   have decision := D.decide gy
-  have partition := FND_01_local_partition F a1 N decision
+  have partition := FND_01_local_partition F a1 decision
   have hPairY : PairLocal F y := by
     rcases partition.1 with hFull | hStart | hFinish | hPair
     · have hyRoot : y = F.R :=
@@ -1734,7 +1733,7 @@ global choice of which one-sided class must be called START.
 theorem INV_06_root_basis
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     let O := E.startRoot
@@ -1850,7 +1849,7 @@ observer-dependent semantic primitive.
 theorem INV_07_objective_chirality
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x y : F.Link)
@@ -2077,7 +2076,7 @@ theorem ctx03_relative_z2
 theorem ctx03_inversion_is_mirror_transport
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     InversionIsMirrorTransport F D := by
@@ -2101,7 +2100,7 @@ and disjunctions are external projection machinery only.
 theorem CTX_03_relational_z2_support
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     RelativeZ2Law F ∧ InversionIsMirrorTransport F D := by
@@ -2222,7 +2221,7 @@ orientation.
 theorem CTX_03_objective_chiral_orbit_before_context
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     ∃ w jw : F.Link,
@@ -2273,7 +2272,7 @@ two one-sided Context markers.
 theorem CTX_03_simultaneous_inversion_covariance
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     {a b ja jb : F.Link}
@@ -2669,7 +2668,7 @@ semantic start/end roles are preserved.
 theorem CTX_03_semantic_arrow_covariant
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     {selected jselected
@@ -2784,7 +2783,7 @@ def ContextGeneralizedMPCovarianceLaw
 theorem CTX_03_generalized_mp_semantic_covariance
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     ContextGeneralizedMPCovarianceLaw F D := by
@@ -2893,7 +2892,7 @@ the native MTS content remains Link-native and Context-relative.
 theorem CTX_03_context_relative_gauge
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     RelativeZ2Law F ∧
@@ -2945,7 +2944,7 @@ It composes the previously proved structural orientation layer with:
 theorem CTX_03_semantic_covariance_capstone
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     ContextChiBridgeLaw F E D ∧

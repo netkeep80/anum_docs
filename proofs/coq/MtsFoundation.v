@@ -388,32 +388,24 @@ Qed.
    This is intentionally not the full realizability claim.  Given explicit
    decisions for the two local identity questions, exactly one proposition
    pattern is possible.  The full-self branch is identified with ROOT by
-   FND-02, while actual Link identity remains ordered-pole identity from
-   FND-13.  Context orientation only names the two one-sided cases later. *)
+   FND-02. Ordered-pole identity remains the separate FND-13 theorem and is
+   intentionally not imported into this local classification. Context
+   orientation only names the two one-sided cases later. *)
 Theorem FND_01_local_partition
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
     (x : Link F) :
     LocalSelfDecision F x ->
     LocalSelfIncidenceExhaustive F x /\
     LocalSelfIncidenceExclusive F x /\
-    (FullSelf F x -> x = R F) /\
-    (forall y : Link F,
-      start F x = start F y ->
-      finish F x = finish F y ->
-      x = y).
+    (FullSelf F x -> x = R F).
 Proof.
   intros D.
   split.
   - apply local_self_incidence_exhaustive. exact D.
   - split.
     + apply local_self_incidence_exclusive.
-    + split.
-      * intros H. apply (FND_02_unique_root F A1 x H).
-      * intros y Hs Hf.
-        apply (proj2 (global_identity_by_poles_from_complete_normalization F N x y)).
-        split; assumption.
+    + intros H. apply (FND_02_unique_root F A1 x H).
 Qed.
 
 
@@ -659,21 +651,17 @@ Qed.
 
    C1 proves the exhaustive/exclusive proposition partition.
    C2 proves grounded realizability of every proposition pattern.
-   FND-02 and FND-13 remain the identity boundaries consumed by C1. *)
+   FND-02 identifies the full-self branch with unique ROOT; ordered-pole
+   identity remains the separate FND-13 theorem. *)
 Theorem FND_01_four_structural_cases
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (x : Link F) :
     LocalSelfDecision F x ->
     LocalSelfIncidenceExhaustive F x /\
     LocalSelfIncidenceExclusive F x /\
     (FullSelf F x -> x = R F) /\
-    (forall y : Link F,
-      start F x = start F y ->
-      finish F x = finish F y ->
-      x = y) /\
     (FullSelf F (R F) /\
       exists startWitness finishWitness pairWitness : Link F,
         Grounded F startWitness /\
@@ -684,18 +672,16 @@ Theorem FND_01_four_structural_cases
         PairLocal F pairWitness).
 Proof.
   intros D.
-  pose proof (FND_01_local_partition F A1 N x D) as C1.
+  pose proof (FND_01_local_partition F A1 x D) as C1.
   pose proof (FND_01_grounded_realizability F E) as C2.
-  destruct C1 as [HEx [HExclusive [HRoot HIdentity]]].
+  destruct C1 as [HEx [HExclusive HRoot]].
   split.
   - exact HEx.
   - split.
     + exact HExclusive.
     + split.
       * exact HRoot.
-      * split.
-        -- exact HIdentity.
-        -- exact C2.
+      * exact C2.
 Qed.
 
 (* Context-relative START_K / END_K naming is presentation only.
@@ -931,7 +917,6 @@ Qed.
 Theorem INV_01_recursive_inversion_total
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x : Link F) :
@@ -941,10 +926,11 @@ Proof.
   intros G.
   induction G as [x StartStep IHStart FinishStep IHFinish].
   pose proof
-    (recursive_local_decision F E D x
-      (grounded_node F x StartStep FinishStep)) as Decision.
+    (grounded_node F x StartStep FinishStep) as GX.
   pose proof
-    (FND_01_local_partition F A1 N x Decision) as Partition.
+    (recursive_local_decision F E D x GX) as Decision.
+  pose proof
+    (FND_01_local_partition F A1 x Decision) as Partition.
   destruct Partition as [Cases _].
   destruct Cases as [HFull | [HStart | [HFinish | HPair]]].
   - pose proof (FND_02_unique_root F A1 x HFull) as HRoot.
@@ -1186,7 +1172,6 @@ Qed.
 Theorem INV_01_recursive_inversion_unique_total
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x : Link F) :
@@ -1198,7 +1183,7 @@ Theorem INV_01_recursive_inversion_unique_total
         z = y.
 Proof.
   intros G.
-  destruct (INV_01_recursive_inversion_total F A1 N E D x G)
+  destruct (INV_01_recursive_inversion_total F A1 E D x G)
     as [y Hy].
   exists y.
   split.
@@ -1590,7 +1575,7 @@ Qed.
 Theorem INV_02_recursive_inversion_involutive
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     forall x y z : Link F,
@@ -1726,10 +1711,37 @@ Proof.
     }
     pose proof (IHStart secondFinish HSecondFinish') as HFinishEq.
     pose proof (IHFinish secondStart HSecondStart') as HStartEq.
+    assert (GX : Grounded F x).
+    {
+      apply grounded_node.
+      - intros Hnot.
+        eapply recursive_inversion_source_grounded.
+        exact HStartInv.
+      - intros Hnot.
+        eapply recursive_inversion_source_grounded.
+        exact HFinishInv.
+    }
+    pose proof
+      (grounded_start_of_nonself F x GX (proj1 HPair))
+      as GStart.
+    pose proof
+      (grounded_finish_of_nonself F x GX (proj2 HPair))
+      as GFinish.
+    pose proof
+      (recursive_pair_grounded F (start F x) (finish F x) GStart GFinish)
+      as GForm.
     transitivity (form F secondFinish secondStart).
     + exact HzForm.
     + rewrite HFinishEq, HStartEq.
-      apply (poles_recompose_from_global_normalization F A1 N x).
+      apply (proj2
+        (FND_13_identity_by_poles
+          F N
+          (form F (start F x) (finish F x))
+          x
+          GForm GX)).
+      split.
+      * apply form_start.
+      * apply form_finish.
 Qed.
 
 (* Function-level INV-02 witness without choosing a host function: INV-01
@@ -1738,7 +1750,7 @@ Qed.
 Theorem INV_02_unique_total_involution
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x : Link F) :
@@ -1749,12 +1761,12 @@ Theorem INV_02_unique_total_involution
       z = x.
 Proof.
   intros GX.
-  destruct (INV_01_recursive_inversion_total F A1 N E D x GX)
+  destruct (INV_01_recursive_inversion_total F A1 E D x GX)
     as [y Hxy].
   pose proof
     (recursive_inversion_image_grounded F E D x y Hxy)
     as GY.
-  destruct (INV_01_recursive_inversion_total F A1 N E D y GY)
+  destruct (INV_01_recursive_inversion_total F A1 E D y GY)
     as [z Hyz].
   exists y.
   exists z.
@@ -1857,7 +1869,7 @@ Qed.
 Theorem INV_05_pair_preserved_and_reversed
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x y : Link F) :
@@ -1873,7 +1885,7 @@ Proof.
   pose proof
     (recursive_inversion_image_grounded F E D x y Hxy)
     as GY.
-  destruct (INV_01_recursive_inversion_total F A1 N E D y GY)
+  destruct (INV_01_recursive_inversion_total F A1 E D y GY)
     as [z Hyz].
   pose proof
     (INV_02_recursive_inversion_involutive F A1 N E D x y z Hxy Hyz)
@@ -1882,7 +1894,7 @@ Proof.
     (recursive_local_decision F E D y GY)
     as Decision.
   pose proof
-    (FND_01_local_partition F A1 N y Decision)
+    (FND_01_local_partition F A1 y Decision)
     as Partition.
   destruct Partition as [Cases _].
   assert (HPairY : PairLocal F y).
@@ -2005,7 +2017,7 @@ Qed.
 Theorem INV_06_root_basis
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     let O := f2f3_start_root F E in
@@ -2170,7 +2182,7 @@ Qed.
 Theorem INV_07_objective_chirality
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (x y : Link F) :
@@ -2472,7 +2484,7 @@ Qed.
 Theorem ctx03_inversion_is_mirror_transport
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     InversionIsMirrorTransport F E D.
@@ -2508,7 +2520,7 @@ Qed.
 Theorem CTX_03_relational_z2_support
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     RelativeZ2Law F /\
@@ -2662,7 +2674,7 @@ Qed.
 Theorem CTX_03_objective_chiral_orbit_before_context
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     exists w jw : Link F,
@@ -2785,7 +2797,7 @@ Qed.
 Theorem CTX_03_simultaneous_inversion_covariance
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (a b ja jb : Link F) :
@@ -3330,7 +3342,7 @@ Qed.
 Theorem CTX_03_semantic_arrow_covariant
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     (selected jselected
@@ -3460,7 +3472,7 @@ Definition ContextGeneralizedMPCovarianceLaw
 Theorem CTX_03_generalized_mp_semantic_covariance
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     ContextGeneralizedMPCovarianceLaw F E D.
@@ -3608,7 +3620,7 @@ Definition ContextChiBridgeLaw
 Theorem CTX_03_context_relative_gauge
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     RelativeZ2Law F /\
@@ -3660,7 +3672,7 @@ Qed.
 Theorem CTX_03_semantic_covariance_capstone
     (F : Foundation)
     (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
+    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
     ContextChiBridgeLaw F E D /\

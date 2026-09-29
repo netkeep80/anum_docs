@@ -77,9 +77,14 @@
         "F2F3GroundedNormalization"
       ],
       "consumedBy": [
-        "FND-13"
+        "FND-13",
+        "INV-02",
+        "INV-05",
+        "INV-06",
+        "INV-07",
+        "CTX-03"
       ],
-      "rationale": "The exact finite-domain normalization package is explicit proof input. FND-13 derives pole identity from it but does not derive the package itself."
+      "rationale": "The finite-domain normalization package is explicit proof input for FND-13 and is reused only where Grounded ordered-pole identity is actually needed downstream. FND-01 and INV-01 no longer consume normalization."
     },
     {
       "id": "F2F3GroundedNormalization.complete",
@@ -92,9 +97,10 @@
         "grounded_normal_form_complete"
       ],
       "consumedBy": [
-        "FND-13"
+        "FND-13",
+        "INV-02"
       ],
-      "rationale": "Completeness is the substantive identity premise behind FND-13 on Grounded Links and remains explicit."
+      "rationale": "Completeness is the substantive identity premise behind FND-13 on Grounded Links; downstream inversion uses it only through the Grounded FND-13 boundary."
     },
     {
       "id": "F2F3Normalization",
@@ -107,12 +113,11 @@
         "F2F3Normalization"
       ],
       "consumedBy": [
-        "FND-01",
-        "INV-01",
-        "INV-02"
+        "global_identity_by_poles_from_complete_normalization",
+        "poles_recompose_from_global_normalization"
       ],
-      "rationale": "This is strictly stronger than the accepted Grounded FND-13 boundary. #1796 must either derive/justify it, replace its uses with Grounded-local premises, or retain it as an explicitly stronger auxiliary model assumption.",
-      "targetDisposition": "MINIMIZE_OR_REMOVE_FROM_ACCEPTED_CAPSTONES"
+      "rationale": "The stronger arbitrary-Link normalization package is now isolated to explicitly stronger auxiliary theorems and is no longer consumed by the accepted FND/INV/CTX capstone chain.",
+      "targetDisposition": "ISOLATED_AUXILIARY_NOT_ACCEPTED_CHAIN"
     },
     {
       "id": "F2F3Normalization.complete",
@@ -126,12 +131,10 @@
       ],
       "consumedBy": [
         "global_identity_by_poles_from_complete_normalization",
-        "FND-01",
-        "INV-01",
-        "INV-02"
+        "poles_recompose_from_global_normalization"
       ],
-      "rationale": "Global completeness implies arbitrary-Link pole extensionality and is stronger than the accepted finite Grounded FND-13 statement.",
-      "targetDisposition": "MINIMIZE_OR_ISOLATE"
+      "rationale": "Global completeness remains an unresolved stronger auxiliary assumption, but no accepted first-wave capstone consumes it after #1810.",
+      "targetDisposition": "ISOLATED_AUXILIARY_NOT_ACCEPTED_CHAIN"
     },
     {
       "id": "Grounded",

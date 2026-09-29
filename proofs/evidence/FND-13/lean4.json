@@ -15,7 +15,7 @@
   "lane": "lean4",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "b0f1da0f3e4d1a8048cdc378fc2ccb914c736c79",
+    "commitSha": "006b0397d0a5160c47d34db0f20a377edd224132",
     "toolchain": {
       "name": "Lean",
       "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
@@ -24,8 +24,8 @@
   "artifacts": [
     {
       "path": "proofs/lean4/MtsFoundation.lean",
-      "sha256": "3af7053dc87893635a3e27d4bf945747fca6778d36c6fc65214ab4ac50065824"
+      "sha256": "849a925d29375d18631c9775b5daf98ad429eb30c986ee4066bfc975c0f6dac4"
     }
   ],
-  "notes": "External differential proof only. FND_13_identity_by_poles is now exactly restricted to the accepted finite Grounded domain and consumes an explicit grounded normal-form completeness premise. Constructor injectivity is proved separately from primitive form projections. FND-02 unique ROOT is no longer presented as a dependency because the FND-13 proof does not consume it. The older arbitrary-Link extensionality strength is preserved only as global_identity_by_poles_from_complete_normalization under a separately named stronger global normalization-completeness premise; ungrounded distinct-node cycles remain outside FND-13."
+  "notes": "External differential proof only. FND_13_identity_by_poles is now exactly restricted to the accepted finite Grounded domain and consumes an explicit grounded normal-form completeness premise. Constructor injectivity is proved separately from primitive form projections. FND-02 unique ROOT is no longer presented as a dependency because the FND-13 proof does not consume it. The older arbitrary-Link extensionality strength is preserved only as global_identity_by_poles_from_complete_normalization under a separately named stronger global normalization-completeness premise; ungrounded distinct-node cycles remain outside FND-13. Proof source is repinned to the #1796 minimized proof bundle; the FND-13 theorem boundary itself is unchanged."
 }
