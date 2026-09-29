@@ -60,6 +60,18 @@ same(manifest.p0Inventory, "theorems/p0-v0.14.json", "P0 inventory binding");
 same(manifest.authority, "external-differential-evidence-only", "external prover role");
 same(manifest.execution, "CI_ACTIVE_ON_PROOF_DIFF", "execution gate");
 
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  assert(
+    source.includes("EXTERNAL PROJECTION BOUNDARY"),
+    `${label} source declares the external projection boundary`,
+  );
+  assert(
+    source.includes("not MTS ontology") &&
+      source.includes("not leak back into MTS"),
+    `${label} source forbids prover vocabulary from becoming MTS ontology`,
+  );
+}
+
 same(manifest.lean4.stable, true, "Lean stable pin");
 same(manifest.lean4.version, "4.34.1", "Lean version");
 same(manifest.lean4.tag, "v4.34.1", "Lean tag");
@@ -880,6 +892,7 @@ console.log([
   "LEAN=4.34.1@5045d005",
   "ROCQ=9.2.0@adfbf185",
   "FOUNDATION_INTERFACES=2",
+  "EXTERNAL_PROJECTION_BOUNDARY=GUARDED",
   "FOUR_CASE_DATATYPE=ABSENT",
   "FOUR_CASE_AXIOM=ABSENT",
   "ROOT_UNIQUENESS_AXIOM=ABSENT",
