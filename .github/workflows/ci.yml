@@ -145,6 +145,11 @@ jobs:
             "$ROCQ_IMAGE" \
             sh -lc 'cp /input/MtsFoundation.v /tmp/MtsFoundation.v && cd /tmp && rocq compile MtsFoundation.v'
 
+          docker run --rm \
+            -v "$PWD/proofs/coq:/input:ro" \
+            "$ROCQ_IMAGE" \
+            sh -lc 'cat /input/MtsFoundation.v /input/MtsExplicitModel.v > /tmp/MtsFoundationWithExplicitModel.v && cd /tmp && rocq compile MtsFoundationWithExplicitModel.v'
+
           rm -rf /tmp/mts-coq-assurance
           mkdir -p /tmp/mts-coq-assurance
           cp proofs/coq/MtsFoundation.v /tmp/mts-coq-assurance/MtsFoundationAssurance.v
