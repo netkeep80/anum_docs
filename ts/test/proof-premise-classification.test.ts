@@ -25,9 +25,20 @@ const read = (path: string): string => readFileSync(join(root, path), "utf8");
 const matrix = JSON.parse(read("proofs/premise-classification-v0.14.json")) as Json;
 const lean = read("proofs/lean4/MtsFoundation.lean");
 const rocq = read("proofs/coq/MtsFoundation.v");
+const leanModel = read("proofs/lean4/MtsExplicitModel.lean");
+const rocqModel = read("proofs/coq/MtsExplicitModel.v");
 
 same(matrix.schema, "mts-proof-premise-classification/v0.1", "schema");
 same(matrix.mtsVersion, "v0.14", "MTS version");
+same(matrix.status, "accepted-chain-converged", "matrix convergence status");
+same(matrix.convergence.acceptedChain, "CONVERGED", "accepted-chain convergence");
+same(
+  matrix.convergence.strongerGlobalNormalization,
+  "ISOLATED_AUXILIARY_UNRESOLVED",
+  "stronger global normalization remains explicitly isolated",
+);
+same(matrix.convergence.acceptedSemanticDelta, "NONE", "no accepted semantic delta");
+same(matrix.convergence.nextBoundaryIssue, 1797, "next cyclic boundary owner");
 same(matrix.ownerIssue, 1796, "owner issue");
 same(matrix.parentIssue, 1789, "parent hardening issue");
 same(matrix.proofProgramIssue, 1431, "proof program issue");
@@ -160,6 +171,86 @@ assert(
   "model machinery cannot backflow into MTS ontology",
 );
 
+same(
+  matrix.modelObligation.evidenceStatus,
+  "CONSTRUCTIVELY_PROVEN",
+  "ambient infinitude model obligation is machine-closed",
+);
+same(
+  matrix.explicitModelEvidence.ambientCarrier,
+  "INFINITE_BY_EXPLICIT_NAT_INJECTION",
+  "explicit model records constructive ambient infinitude",
+);
+same(
+  matrix.explicitModelEvidence.pairedKernelStatus,
+  "GREEN",
+  "explicit model is paired-kernel checked",
+);
+same(
+  matrix.explicitModelEvidence.groundedReplay,
+  "FINITE_INDUCTIVE_GROUNDED_EVIDENCE",
+  "finite Grounded replay boundary recorded",
+);
+
+for (const source of [leanModel, rocqModel]) {
+  for (const symbol of [
+    "HasNatInjection",
+    "one_sided_existence_implies_nat_injection",
+    "grounded_is_canonical",
+    "ExplicitGroundedNormalization",
+    "explicit_fnd13_replay",
+    "explicit_a1",
+    "explicit_fnd02_replay",
+    "explicit_fnd01_replay",
+    "explicit_fnd05_replay",
+    "explicit_inv01_replay",
+    "explicit_inv02_replay",
+    "explicit_inv06_replay",
+    "explicit_inv07_replay",
+    "explicit_ctx03_replay",
+    "explicit_ctx03_semantic_replay",
+  ]) {
+    assert(source.includes(symbol), `explicit model source missing convergence evidence ${symbol}`);
+  }
+}
+
+for (const entry of premises) {
+  const target = entry.falsificationTarget as Json | undefined;
+  assert(target && typeof target.kind === "string", `${entry.id} falsification target required`);
+  assert(
+    typeof target.condition === "string" && target.condition.length > 20,
+    `${entry.id} falsification condition required`,
+  );
+  assert(
+    typeof target.status === "string" && target.status.length > 5,
+    `${entry.id} falsification status required`,
+  );
+  assert(
+    typeof entry.explicitModelStatus === "string" && entry.explicitModelStatus.length > 10,
+    `${entry.id} explicit-model disposition required`,
+  );
+  if (target.kind === "EXECUTABLE_SEMANTIC_VECTOR") {
+    assert(typeof target.target === "string", `${entry.id} executable target path required`);
+    assert(read(target.target as string).length > 0, `${entry.id} executable target must resolve`);
+  }
+}
+
+same(
+  byId.get("F2F3Normalization")?.explicitModelStatus,
+  "NOT_REQUIRED_BY_ACCEPTED_CHAIN",
+  "stronger global normalization is not smuggled back through model closure",
+);
+same(
+  byId.get("F2F3Normalization.complete")?.explicitModelStatus,
+  "NOT_REQUIRED_BY_ACCEPTED_CHAIN",
+  "stronger global completeness is not smuggled back through model closure",
+);
+same(
+  byId.get("Grounded")?.falsificationTarget?.ownerIssue,
+  1797,
+  "cyclic/non-well-founded boundary is delegated explicitly",
+);
+
 for (const source of [lean, rocq]) {
   for (const symbol of [
     "A1RecursiveSeparation",
@@ -194,5 +285,5 @@ assert(
 );
 
 console.log(
-  `v0.14 proof premise classification: ${premises.length} premises, global-normalization=UNRESOLVED, finite-ambient=IMPOSSIBLE`,
+  `v0.14 proof premise classification: ${premises.length} premises, accepted-chain=CONVERGED, global-normalization=ISOLATED_UNRESOLVED, ambient=NAT_INJECTION_PROVEN`,
 );
