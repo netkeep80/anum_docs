@@ -1006,8 +1006,8 @@ same(
 );
 
 for (const [label, source, marker] of [
-  ["Lean", lean, "def ContextualTruthWitness"],
-  ["Rocq", rocq, "Definition ContextualTruthWitness"],
+  ["Lean", lean, "FND-07 external projection of accepted contextual-truth semantics"],
+  ["Rocq", rocq, "FND-07 external projection of accepted contextual-truth semantics"],
 ] as const) {
   const start = source.indexOf(marker);
   assert(start >= 0, label + " contains FND-07 contextual-truth projection");
