@@ -3599,35 +3599,6 @@ Definition ContextChiBridgeLaw
        (chi = ContextOutRWitness F E /\
         jchi = ContextInRWitness F E)).
 
-(* Strengthened CTX-03 semantic capstone. *)
-Theorem CTX_03_semantic_covariance_capstone
-    (F : Foundation)
-    (A1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
-    (E : F2F3OneSidedExistence F)
-    (D : RecursiveInversionDomain F E) :
-    CTX_03_context_relative_gauge F A1 N E D /\
-    ContextChiBridgeLaw F E D /\
-    ContextGeneralizedMPCovarianceLaw F E D /\
-    ~ InversionCovariantUnaryOperation
-      F E D (TechnicalStartOperation F).
-Proof.
-  split.
-  - exact (CTX_03_context_relative_gauge F A1 N E D).
-  - split.
-    + unfold ContextChiBridgeLaw.
-      intros body selected HSelected.
-      exact
-        (CTX_03_chi_direction_bridge
-          F A1 E D body selected HSelected).
-    + split.
-      * exact
-          (CTX_03_generalized_mp_semantic_covariance F A1 N E D).
-      * exact
-          (CTX_03_technical_start_not_covariant F E D).
-Qed.
-
-
 (* CTX-03 capstone: objective chirality predates observation, Context selection
    induces only local START_K/END_K roles, and relative transport composes as
    the already-proved relational Z2 layer.
@@ -3683,6 +3654,36 @@ Proof.
              (CTX_03_simultaneous_inversion_covariance
                F A1 N E D a b ja jb HJa HJb).
 Qed.
+
+
+(* Strengthened CTX-03 semantic capstone. *)
+Theorem CTX_03_semantic_covariance_capstone
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    CTX_03_context_relative_gauge F A1 N E D /\
+    ContextChiBridgeLaw F E D /\
+    ContextGeneralizedMPCovarianceLaw F E D /\
+    ~ InversionCovariantUnaryOperation
+      F E D (TechnicalStartOperation F).
+Proof.
+  split.
+  - exact (CTX_03_context_relative_gauge F A1 N E D).
+  - split.
+    + unfold ContextChiBridgeLaw.
+      intros body selected HSelected.
+      exact
+        (CTX_03_chi_direction_bridge
+          F A1 E D body selected HSelected).
+    + split.
+      * exact
+          (CTX_03_generalized_mp_semantic_covariance F A1 N E D).
+      * exact
+          (CTX_03_technical_start_not_covariant F E D).
+Qed.
+
 
 
 (* FND-07 external projection of accepted contextual-truth semantics.
