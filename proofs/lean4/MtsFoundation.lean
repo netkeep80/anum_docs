@@ -2924,13 +2924,13 @@ theorem CTX_03_semantic_covariance_capstone
     (N : F2F3Normalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E) :
-    CTX_03_context_relative_gauge F a1 N E D ∧
     ContextChiBridgeLaw F E D ∧
     ContextGeneralizedMPCovarianceLaw F D ∧
     ¬ InversionCovariantUnaryOperation
       F D (TechnicalStartOperation F) := by
+  have _structuralLayer :=
+    CTX_03_context_relative_gauge F a1 N E D
   refine ⟨
-    CTX_03_context_relative_gauge F a1 N E D,
     ?_,
     CTX_03_generalized_mp_semantic_covariance F a1 N E D,
     CTX_03_technical_start_not_covariant F E D
