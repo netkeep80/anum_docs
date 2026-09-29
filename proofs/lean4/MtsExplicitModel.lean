@@ -269,6 +269,144 @@ def ExplicitInversionDomain :
     exact explicit_local_decision x
 
 /--
+External model-only predicate: a Link is canonical exactly when it is in the
+image of the one primitive `form`. This is host evidence about this concrete
+model, not a new MTS ontology predicate.
+-/
+def CanonicalImage (x : ModelLink) : Prop :=
+  ∃ a b : ModelLink, x = form a b
+
+@[simp] theorem start_badStart :
+    start badStart = badStart := by
+  rfl
+
+@[simp] theorem finish_badStart :
+    finish badStart = badFinish := by
+  rfl
+
+@[simp] theorem start_badFinish :
+    start badFinish = badStart := by
+  rfl
+
+@[simp] theorem finish_badFinish :
+    finish badFinish = badFinish := by
+  rfl
+
+@[simp] theorem badStart_ne_badFinish :
+    badStart ≠ badFinish := by
+  simp [badStart, badFinish]
+
+/--
+The two fallback Links form a non-well-founded two-node obligation cycle.
+Because `Grounded` is finite inductive evidence, neither endpoint of this
+cycle can be Grounded.
+-/
+theorem fallback_cycle_not_grounded
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x) :
+    x = badStart ∨ x = badFinish → False := by
+  induction gx with
+  | @node current startStep finishStep ihStart ihFinish =>
+      intro hBad
+      rcases hBad with hStart | hFinish
+      · subst current
+        have hne : ExplicitFoundation.finish badStart ≠ badStart := by
+          simpa using badStart_ne_badFinish.symm
+        exact ihFinish hne (Or.inr finish_badStart)
+      · subst current
+        have hne : ExplicitFoundation.start badFinish ≠ badFinish := by
+          simpa using badStart_ne_badFinish
+        exact ihStart hne (Or.inl start_badFinish)
+
+theorem badStart_not_grounded :
+    ¬ Grounded ExplicitFoundation badStart := by
+  intro gx
+  exact fallback_cycle_not_grounded gx (Or.inl rfl)
+
+theorem badFinish_not_grounded :
+    ¬ Grounded ExplicitFoundation badFinish := by
+  intro gx
+  exact fallback_cycle_not_grounded gx (Or.inr rfl)
+
+/--
+Any decodable value that is not the exact re-encoding of its poles is rejected
+by the projection boundary and receives the fallback start pole.
+-/
+theorem start_fallback_of_not_canonical
+    {x : ModelLink}
+    (hNot : ¬ CanonicalImage x) :
+    start x = badStart := by
+  unfold start
+  cases hDecode : decode x with
+  | none =>
+      rfl
+  | some poles =>
+      by_cases hCanonical : x = form poles.1 poles.2
+      · exact False.elim (hNot ⟨poles.1, poles.2, hCanonical⟩)
+      · simp [hDecode, hCanonical]
+
+/--
+Finite Grounded evidence can therefore exist only for an exact image of
+`form`. Malformed and duplicate host encodings remain ambient Links, but
+cannot enter the finite semantic replay domain.
+-/
+theorem grounded_is_canonical
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x) :
+    CanonicalImage x := by
+  by_contra hNot
+  have hStart : start x = badStart :=
+    start_fallback_of_not_canonical hNot
+  by_cases hx : x = badStart
+  · subst x
+    exact badStart_not_grounded gx
+  · cases gx with
+    | node startStep finishStep =>
+        have hStartNe : ExplicitFoundation.start x ≠ x := by
+          intro hEq
+          apply hx
+          calc
+            x = ExplicitFoundation.start x := hEq.symm
+            _ = badStart := hStart
+        have gBad : Grounded ExplicitFoundation badStart := by
+          simpa [hStart] using startStep hStartNe
+        exact badStart_not_grounded gBad
+
+/--
+Concrete Grounded normalization for the explicit model.
+
+The normal form is the canonical Link itself. Recursive decomposition is valid
+exactly because Grounded Links were proved to be in the image of `form`;
+completeness is therefore ordinary host equality on this external model carrier.
+-/
+abbrev ExplicitGroundedNormalization :
+    F2F3GroundedNormalization ExplicitFoundation where
+  NormalForm := ModelLink
+  compose := form
+  normalForm := fun x => x
+
+  recursiveEquation := by
+    intro x gx
+    change x = form (start x) (finish x)
+    rcases grounded_is_canonical gx with ⟨a, b, hx⟩
+    subst x
+    simp
+
+  complete := by
+    intro x y _gx _gy h
+    exact h
+
+theorem explicit_fnd13_replay
+    {x y : ModelLink}
+    (gx : Grounded ExplicitFoundation x)
+    (gy : Grounded ExplicitFoundation y) :
+    x = y ↔
+      (ExplicitFoundation.start x = ExplicitFoundation.start y ∧
+       ExplicitFoundation.finish x = ExplicitFoundation.finish y) :=
+  FND_13_identity_by_poles
+    ExplicitFoundation ExplicitGroundedNormalization gx gy
+
+/--
 Explicit finite Grounded witness slice inside the infinite ambient carrier.
 -/
 theorem explicit_grounded_slice :
