@@ -2439,9 +2439,7 @@ theorem FND_05_recursive_description_total
       CanonicalRecursiveDescription F x code := by
   induction gx with
   | node startStep finishStep ihStart ihFinish =>
-      have grounded : Grounded F x :=
-        Grounded.node startStep finishStep
-      have decision := D grounded
+      have decision := D (Grounded.node startStep finishStep)
       have cases := local_self_incidence_exhaustive F decision
       rcases cases with hFull | hStart | hFinish | hPair
       · have hxRoot := FND_02_unique_root F a1 hFull
