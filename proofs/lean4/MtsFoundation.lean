@@ -1028,24 +1028,38 @@ This is needed to show that two grounded one-sided Links with the same external
 pole carry no recursive distinction.  It follows directly from the proof
 relation itself; no equality decision procedure is used.
 -/
+theorem distinguishable_same_false
+    (F : Foundation)
+    {x y : F.Link}
+    (h : Distinguishable F x y)
+    (hxy : x = y) :
+    False := by
+  induction h with
+  | startSelfLeft hSelf hNot =>
+      cases hxy
+      exact hNot hSelf
+  | startSelfRight hNot hSelf =>
+      cases hxy
+      exact hNot hSelf
+  | finishSelfLeft hSelf hNot =>
+      cases hxy
+      exact hNot hSelf
+  | finishSelfRight hNot hSelf =>
+      cases hxy
+      exact hNot hSelf
+  | startChild _ _ _ ih =>
+      cases hxy
+      exact ih rfl
+  | finishChild _ _ _ ih =>
+      cases hxy
+      exact ih rfl
+
 theorem distinguishable_irreflexive
     (F : Foundation)
     {x : F.Link} :
     ¬ Distinguishable F x x := by
   intro h
-  induction h with
-  | startSelfLeft hSelf hNot =>
-      exact hNot hSelf
-  | startSelfRight hNot hSelf =>
-      exact hNot hSelf
-  | finishSelfLeft hSelf hNot =>
-      exact hNot hSelf
-  | finishSelfRight hNot hSelf =>
-      exact hNot hSelf
-  | startChild _ _ _ ih =>
-      exact ih
-  | finishChild _ _ _ ih =>
-      exact ih
+  exact distinguishable_same_false F h rfl
 
 theorem grounded_start_of_nonself
     (F : Foundation)
