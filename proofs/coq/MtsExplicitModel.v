@@ -308,10 +308,12 @@ Qed.
 Definition ExplicitInversionDomain :
     RecursiveInversionDomain ExplicitFoundation ExplicitOneSided.
 Proof.
-  refine {|
-    recursive_start_form := model_start_form;
-    recursive_end_form := model_end_form
-  |}.
+  refine (@Build_RecursiveInversionDomain
+    ExplicitFoundation
+    ExplicitOneSided
+    model_start_form
+    model_end_form
+    _ _ _ _ _).
   - intro a. symmetry. apply model_form_start_fixed.
   - intro a. symmetry. apply model_form_end_fixed.
   - reflexivity.
