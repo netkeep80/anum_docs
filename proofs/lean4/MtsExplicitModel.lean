@@ -484,7 +484,7 @@ theorem pairCode_ne_left (left right : ModelLink) :
   have hPairLength :
       (pairCode left right).length =
         right.length + (2 + (encodeLeft left).length) := by
-    simp [pairCode, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+    simp [pairCode, Nat.one_add, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
   have hLt : left.length < (pairCode left right).length := by
     rw [hPairLength]
     simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hLt0
@@ -502,7 +502,7 @@ theorem pairCode_ne_right (left right : ModelLink) :
   have hPairLength :
       (pairCode left right).length =
         right.length + (2 + (encodeLeft left).length) := by
-    simp [pairCode, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+    simp [pairCode, Nat.one_add, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
   have hLt : right.length < (pairCode left right).length := by
     rw [hPairLength]
     simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hGrow
