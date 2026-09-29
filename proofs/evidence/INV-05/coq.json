@@ -33,5 +33,5 @@
       "sha256": "01adf311071e9310899a3f1d0b5eb1004031636061418a2beb5125a3b468d2a4"
     }
   ],
-  "notes": "External differential proof only. INV-05 proves that a PAIR source remains PairLocal under the existing structural RecursiveInversion graph while its poles are recursively exchanged. The non-collapse proof explicitly reuses INV-02 involution and INV-04 one-sided exchange on the same finite Grounded domain, while pole reversal comes from INV-01. No pairPreserved field, new inversion-domain axiom, global arbitrary-Link extensionality, host inverse function, codec/handle identity, or representation order is introduced."
+  "notes": "External differential proof only. INV-05 proves that a PAIR source remains PairLocal under the existing structural RecursiveInversion graph while its poles are recursively exchanged. The non-collapse proof explicitly reuses the already-derived INV-02 involution and INV-04 one-sided exchange on the same finite Grounded domain, while pole reversal comes from INV-01. No pairPreserved field, new inversion-domain axiom, global arbitrary-Link extensionality, host inverse function, codec/handle identity, or representation order is introduced."
 }
