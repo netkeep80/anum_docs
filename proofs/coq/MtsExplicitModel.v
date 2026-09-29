@@ -450,9 +450,7 @@ Proof.
         change (model_start x <> x).
         intros Heq.
         apply Hx.
-        transitivity (model_start x).
-        - symmetry. exact Heq.
-        - exact Hstart.
+        exact (eq_trans (eq_sym Heq) Hstart).
       }
       pose proof
         (grounded_start_of_nonself ExplicitFoundation x G Hstart_ne)
