@@ -161,12 +161,14 @@ theorem decode_form (a b : ModelLink) :
 
 def start (x : ModelLink) : ModelLink :=
   match decode x with
-  | some poles => poles.1
+  | some poles =>
+      if x = form poles.1 poles.2 then poles.1 else badStart
   | none => badStart
 
 def finish (x : ModelLink) : ModelLink :=
   match decode x with
-  | some poles => poles.2
+  | some poles =>
+      if x = form poles.1 poles.2 then poles.2 else badFinish
   | none => badFinish
 
 @[simp] theorem start_form (a b : ModelLink) :
