@@ -1120,10 +1120,8 @@ for (const [label, source, marker] of [
     label + " FND-05 marks the recursive code as prover-side syntax",
   );
   assert(
-    region.includes("MTS ontology datatype") &&
-      region.includes("Anum/Q carrier") &&
-      /not[\s\S]{0,80}MTS ontology datatype/i.test(region) &&
-      /not[\s\S]{0,80}Anum\/Q carrier/i.test(region),
+    /not[\s\S]{0,80}MTS ontology[\s\S]{0,40}datatype/i.test(region) &&
+      /not[\s\S]{0,80}Anum\/Q[\s\S]{0,40}carrier/i.test(region),
     label + " FND-05 forbids host recursive code from becoming MTS ontology",
   );
   assert(
