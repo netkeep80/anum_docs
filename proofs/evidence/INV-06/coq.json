@@ -1,0 +1,37 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "INV-06",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "INV-03",
+    "INV-04",
+    "INV-05"
+  ],
+  "dependencies": [
+    "INV-03",
+    "INV-04",
+    "INV-05"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "b23eed9dad473e992915d3c1d52b189faec456d9",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "fbbeb427eaba05845f217fd2573d7d05d5d2d6046b50be3ca0306eda1387294b"
+    }
+  ],
+  "notes": "External differential proof only. INV-06 is a representative root-basis calculation under one chosen Context-relative orientation: J(R)=R, J(O)=C, J(C)=O, J(L)=L, J(U)=U. O/C are the accepted F2/F3 one-sided representatives and L/U are ordinary PAIR-derived Links; U is derived PairLocal rather than postulated. No RootBasis ontology datatype, Foundation-global absolute START side, observer authority, or full-Theory automorphism claim is introduced."
+}

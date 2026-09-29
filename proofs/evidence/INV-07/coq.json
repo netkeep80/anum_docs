@@ -1,0 +1,37 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "INV-07",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "INV-02",
+    "INV-04",
+    "INV-05"
+  ],
+  "dependencies": [
+    "INV-02",
+    "INV-04",
+    "INV-05"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "ad2f3128d61401c56ef24fe724d859a23f0aa9f9",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "bcafd9f93e3f9267b1cc7a886a0ba37753a0b0c31324361e363c3fccdf18c688"
+    }
+  ],
+  "notes": "External differential proof only. INV-07 proves objective chirality structurally: RecursiveInversion exchanges proper StartOnly/FinishOnly classes without identification, INV-02 returns a second inversion to the original Link, and INV-05 preserves PairLocal. The distinction survives inversion without selecting a Foundation-global absolute orientation or introducing an observer semantic primitive. Lean/Rocq Type/Prop/Record/structure vocabulary is prover-side projection machinery only and is not MTS ontology, native notation, or semantic authority."
+}

@@ -60,6 +60,42 @@ same(manifest.p0Inventory, "theorems/p0-v0.14.json", "P0 inventory binding");
 same(manifest.authority, "external-differential-evidence-only", "external prover role");
 same(manifest.execution, "CI_ACTIVE_ON_PROOF_DIFF", "execution gate");
 
+// Integration pulse after portable INV-03/04 evidence merged to main:
+// the external proof boundary is rechecked on the actual combined PR merge ref.
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  assert(
+    source.includes("EXTERNAL PROJECTION BOUNDARY"),
+    `${label} source declares the external projection boundary`,
+  );
+  assert(
+    source.includes("not MTS ontology") &&
+      source.includes("not leak back into MTS"),
+    `${label} source forbids prover vocabulary from becoming MTS ontology`,
+  );
+}
+
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  assert(
+    source.includes("EXTERNAL THEORY PROJECTION MANIFEST"),
+    `${label} source declares the external-theory projection manifest`,
+  );
+  assert(
+    source.includes("HOST FOUNDATION:") &&
+      source.includes("USED EXTERNAL LOGIC / PROOF METHODS:") &&
+      source.includes("ADDITIONAL EXTERNAL MATHEMATICAL THEORY:"),
+    `${label} manifest separates prover foundation from additional theory`,
+  );
+  assert(
+    source.includes("elementary group theory (Z2)") &&
+      source.includes("EXTERNAL THEORY PROJECTION: elementary group theory (Z2)"),
+    `${label} marks the Z2 group-theory projection explicitly`,
+  );
+  assert(
+    source.includes("not MTS ontology or semantic authority"),
+    `${label} keeps the external-theory no-backflow boundary`,
+  );
+}
+
 same(manifest.lean4.stable, true, "Lean stable pin");
 same(manifest.lean4.version, "4.34.1", "Lean version");
 same(manifest.lean4.tag, "v4.34.1", "Lean tag");
@@ -709,6 +745,253 @@ assert(
   "INV-02 is not postulated as an axiom",
 );
 
+const invSupportIds = ["INV-03", "INV-04", "INV-05"] as const;
+for (const id of invSupportIds) {
+  const target = (p0.targets as Record<string, any>[]).find((candidate) => candidate.id === id);
+  assert(target !== undefined, `P0 contains ${id}`);
+  assert(
+    JSON.stringify(target.assumptions) === JSON.stringify(["INV-01"]),
+    `${id} assumptions remain exactly INV-01`,
+  );
+  assert(
+    JSON.stringify(target.dependsOn) === JSON.stringify(["INV-01"]),
+    `${id} dependency remains exactly INV-01`,
+  );
+}
+for (const source of [lean, rocq]) {
+  assert(source.includes("INV_03_root_fixed"), "external source proves INV-03 ROOT fixed");
+  assert(source.includes("INV_04_start_to_finish"), "external source proves INV-04 START to END");
+  assert(source.includes("INV_04_finish_to_start"), "external source proves INV-04 END to START");
+  assert(
+    source.includes("INV_05_pair_preserved_and_reversed"),
+    "external source proves INV-05 PAIR preservation and pole reversal",
+  );
+  assert(
+    source.includes("INV_01_recursive_pole_reversal"),
+    "INV-05 reuses INV-01 recursive pole reversal",
+  );
+  assert(
+    source.includes("INV_02_recursive_inversion_involutive"),
+    "INV-05 non-collapse reuses derived INV-02 rather than a new domain axiom",
+  );
+}
+assert(
+  lean.includes("theorem INV_03_root_fixed") &&
+    lean.includes("theorem INV_04_start_to_finish") &&
+    lean.includes("theorem INV_04_finish_to_start") &&
+    lean.includes("theorem INV_05_pair_preserved_and_reversed"),
+  "Lean INV-03/04/05 are theorems",
+);
+assert(
+  rocq.includes("Theorem INV_03_root_fixed") &&
+    rocq.includes("Theorem INV_04_start_to_finish") &&
+    rocq.includes("Theorem INV_04_finish_to_start") &&
+    rocq.includes("Theorem INV_05_pair_preserved_and_reversed"),
+  "Rocq INV-03/04/05 are theorems",
+);
+assert(
+  !lean.includes("pairPreserved :") &&
+    !rocq.includes("recursive_pair_preserved :"),
+  "INV-05 does not add a pair-preservation field to the inversion domain",
+);
+
+const inv06 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-06");
+assert(inv06 !== undefined, "P0 contains INV-06");
+assert(
+  JSON.stringify(inv06.assumptions) === JSON.stringify(["INV-03", "INV-04", "INV-05"]),
+  "INV-06 assumptions remain exactly the supporting inversion theorems",
+);
+assert(
+  JSON.stringify(inv06.dependsOn) === JSON.stringify(["INV-03", "INV-04", "INV-05"]),
+  "INV-06 dependencies remain exactly INV-03/04/05",
+);
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  assert(
+    source.includes("f2f3_reverse_pair_pattern"),
+    `${label} derives mirror C->O as an ordinary PAIR`,
+  );
+  assert(source.includes("INV_06_root_basis"), `${label} contains INV-06 capstone`);
+  const start = source.indexOf(
+    label === "Lean" ? "theorem INV_06_root_basis" : "Theorem INV_06_root_basis",
+  );
+  assert(start >= 0, `${label} INV-06 region exists`);
+  const region = source.slice(start);
+  for (const support of [
+    "INV_03_root_fixed",
+    "INV_04_start_to_finish",
+    "INV_04_finish_to_start",
+    "INV_05_pair_preserved_and_reversed",
+  ]) {
+    assert(region.includes(support), `${label} INV-06 cross-checks ${support}`);
+  }
+  assert(
+    region.includes("startRoot") || region.includes("f2f3_start_root"),
+    `${label} O is the selected START-side F2/F3 representative`,
+  );
+  assert(
+    region.includes("finishRoot") || region.includes("f2f3_finish_root"),
+    `${label} C is the selected END-side F2/F3 representative`,
+  );
+}
+assert(
+  !lean.includes("structure RootBasis") && !rocq.includes("Record RootBasis"),
+  "INV-06 introduces no RootBasis ontology datatype",
+);
+assert(
+  !lean.includes("axiom INV_06") && !rocq.includes("Axiom INV_06"),
+  "INV-06 is proved rather than postulated",
+);
+
+
+const inv07 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-07");
+assert(inv07 !== undefined, "P0 contains INV-07");
+assert(
+  JSON.stringify(inv07.assumptions) === JSON.stringify(["INV-02", "INV-04", "INV-05"]),
+  "INV-07 assumptions remain exactly INV-02/04/05",
+);
+assert(
+  JSON.stringify(inv07.dependsOn) === JSON.stringify(["INV-02", "INV-04", "INV-05"]),
+  "INV-07 dependencies remain exactly INV-02/04/05",
+);
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  const theoremName =
+    label === "Lean"
+      ? "theorem INV_07_objective_chirality"
+      : "Theorem INV_07_objective_chirality";
+  const start = source.indexOf(theoremName);
+  assert(start >= 0, `${label} contains INV-07 objective chirality capstone`);
+  const region = source.slice(start);
+  for (const support of [
+    "INV_02_recursive_inversion_involutive",
+    "INV_04_start_to_finish",
+    "INV_04_finish_to_start",
+    "INV_05_pair_preserved_and_reversed",
+  ]) {
+    assert(region.includes(support), `${label} INV-07 derives through ${support}`);
+  }
+  assert(region.includes("StartOnly"), `${label} INV-07 keeps START structural`);
+  assert(region.includes("FinishOnly"), `${label} INV-07 keeps END structural`);
+  assert(region.includes("PairLocal"), `${label} INV-07 keeps PAIR structural`);
+}
+assert(
+  !lean.includes("axiom INV_07") && !rocq.includes("Axiom INV_07"),
+  "INV-07 is proved rather than postulated",
+);
+assert(
+  !lean.includes("structure Chirality") && !rocq.includes("Record Chirality"),
+  "INV-07 introduces no chirality ontology datatype",
+);
+
+const ctx03 = (p0.targets as Record<string, any>[]).find((target) => target.id === "CTX-03");
+assert(ctx03 !== undefined, "P0 contains CTX-03");
+assert(
+  JSON.stringify(ctx03.assumptions) === JSON.stringify([
+    "INV-02",
+    "INV-07",
+    "accepted Link-native Context orientation markers",
+  ]),
+  "CTX-03 assumptions remain exactly INV-02/INV-07/Link-native markers",
+);
+assert(
+  JSON.stringify(ctx03.dependsOn) === JSON.stringify(["INV-02", "INV-07"]),
+  "CTX-03 dependencies remain exactly INV-02/INV-07",
+);
+
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  const startName =
+    label === "Lean"
+      ? "def ProperOneSided"
+      : "Definition ProperOneSided";
+  const start = source.indexOf(startName);
+  assert(start >= 0, `${label} contains CTX-03 relational support vocabulary`);
+  const region = source.slice(start);
+  for (const symbol of [
+    "SameChiralClass",
+    "OppositeChiralClass",
+    "RelativeZ2Law",
+    "InversionIsMirrorTransport",
+    "CTX_03_relational_z2_support",
+  ]) {
+    assert(region.includes(symbol), `${label} CTX-03 support contains ${symbol}`);
+  }
+  assert(
+    region.includes("INV_07_objective_chirality"),
+    `${label} mirror transport derives through INV-07`,
+  );
+  for (const forbidden of [
+    "inductive Gauge",
+    "structure Gauge",
+    "def Gauge",
+    "Inductive Gauge",
+    "Record Gauge",
+    "Definition Gauge",
+    "inductive Frame",
+    "structure Frame",
+    "def Frame",
+    "Inductive Frame",
+    "Record Frame",
+    "Definition Frame",
+    "DIRECT",
+    "MIRROR",
+    "ExactSequence",
+  ]) {
+    assert(!region.includes(forbidden), `${label} CTX-03 support forbids host orientation carrier: ${forbidden}`);
+  }
+}
+assert(
+  !lean.includes("axiom CTX_03_relational_z2_support") &&
+    !rocq.includes("Axiom CTX_03_relational_z2_support"),
+  "CTX-03 relational support is proved rather than postulated",
+);
+
+for (const [label, source, marker] of [
+  ["Lean", lean, "def ContextOrientationMarker"],
+  ["Rocq", rocq, "Definition ContextOrientationMarker"],
+] as const) {
+  const start = source.indexOf(marker);
+  assert(start >= 0, `${label} contains Link-native Context orientation markers`);
+  const region = source.slice(start);
+  for (const symbol of [
+    "ContextLocalStartRole",
+    "ContextLocalEndRole",
+    "CTX_03_context_selection_induces_local_roles",
+    "CTX_03_objective_chiral_orbit_before_context",
+    "CTX_03_simultaneous_inversion_covariance",
+    "CTX_03_context_relative_gauge",
+  ]) {
+    assert(region.includes(symbol), `${label} CTX-03 capstone contains ${symbol}`);
+  }
+  assert(
+    region.includes("CTX_03_relational_z2_support"),
+    `${label} CTX-03 capstone consumes the canonical relational Z2 support layer`,
+  );
+  assert(
+    region.includes("INV_02_recursive_inversion_involutive") ||
+      region.includes("ctx03_inversion_is_mirror_transport"),
+    `${label} CTX-03 capstone keeps inversion provenance explicit`,
+  );
+  for (const forbidden of [
+    "structure ContextFrame",
+    "inductive ContextFrame",
+    "Record ContextFrame",
+    "ContextFrame : Type",
+    "DIRECT",
+    "MIRROR",
+    "ExactSequence",
+    "FORMAL",
+  ]) {
+    assert(
+      !region.includes(forbidden),
+      `${label} CTX-03 Context layer forbids host orientation authority: ${forbidden}`,
+    );
+  }
+}
+assert(
+  !lean.includes("axiom CTX_03_context_relative_gauge") &&
+    !rocq.includes("Axiom CTX_03_context_relative_gauge"),
+  "CTX-03 capstone is proved rather than postulated",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -743,13 +1026,14 @@ console.log([
   "LEAN=4.34.1@5045d005",
   "ROCQ=9.2.0@adfbf185",
   "FOUNDATION_INTERFACES=2",
+  "EXTERNAL_PROJECTION_BOUNDARY=GUARDED",
   "FOUR_CASE_DATATYPE=ABSENT",
   "FOUR_CASE_AXIOM=ABSENT",
   "ROOT_UNIQUENESS_AXIOM=ABSENT",
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=9",
+  "THEOREM_PROOF_CLAIMS=16",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -776,6 +1060,28 @@ console.log([
   "INV02_RELATIONAL_INVOLUTION=GREEN_SOURCE",
   "INV02_UNIQUE_TOTAL_INVOLUTION=GREEN_SOURCE",
   "INV02_DOMAIN_EXPANSION=NONE",
+  "INV03_ROOT_FIXED=GREEN_SOURCE",
+  "INV04_ONE_SIDED_EXCHANGE=GREEN_SOURCE",
+  "INV04_NO_IDENTIFICATION=GREEN_SOURCE",
+  "INV05_PAIR_PRESERVED=GREEN_SOURCE",
+  "INV05_POLE_REVERSAL=INV01_REUSED",
+  "INV05_NEW_DOMAIN_AXIOM=NONE",
+  "INV06_ROOT_BASIS=R_FIXED_O_C_EXCHANGED_L_U_FIXED",
+  "INV06_O_C=F2F3_ORIENTATION_REPRESENTATIVES",
+  "INV06_L_U=PAIR_DERIVED",
+  "INV06_ABSOLUTE_ORIENTATION=NONE",
+  "INV07_OBJECTIVE_CHIRALITY=ONE_SIDED_EXCHANGE+INVOLUTION+PAIR_STABILITY",
+  "INV07_DEPENDENCIES=INV02+INV04+INV05",
+  "INV07_GLOBAL_ORIENTATION=NONE",
+  "CTX03_RELATIONAL_SUPPORT=Z2_SAME_OPPOSITE",
+  "CTX03_ORIENTATION_CARRIER=LINK_NATIVE_ONE_SIDED",
+  "CTX03_HOST_FRAME_DATATYPE=NONE",
+  "CTX03_CONTEXT_MARKER=LINK_NATIVE_ONE_SIDED",
+  "CTX03_LOCAL_ROLES=CONTEXT_RELATIVE",
+  "CTX03_OBJECTIVE_ORBIT=PRE_SELECTION",
+  "CTX03_COVARIANCE=SIMULTANEOUS_J",
+  "CTX03_CAPSTONE=RELATIONAL_Z2+CONTEXT_SELECTION",
+  "CTX03_J_TRANSPORT=INV07_DERIVED",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
