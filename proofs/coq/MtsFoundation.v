@@ -2058,3 +2058,78 @@ Proof.
 
   repeat split; assumption.
 Qed.
+
+
+(* INV-07 objective chirality capstone.
+
+   The existing structural inversion graph reverses the two proper one-sided
+   classes without identifying them; a second inversion returns the original
+   Link; PAIR remains PAIR.  This preserves an objective structural
+   distinction without selecting a Foundation-global absolute orientation. *)
+Theorem INV_07_objective_chirality
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x y : Link F) :
+    RecursiveInversion F E D x y ->
+    (StartOnly F x ->
+      FinishOnly F y /\
+      x <> y /\
+      ~ StartOnly F y /\
+      forall z : Link F,
+        RecursiveInversion F E D y z -> z = x) /\
+    (FinishOnly F x ->
+      StartOnly F y /\
+      x <> y /\
+      ~ FinishOnly F y /\
+      forall z : Link F,
+        RecursiveInversion F E D y z -> z = x) /\
+    (PairLocal F x -> PairLocal F y).
+Proof.
+  intros Hxy.
+  split.
+  - intros HStart.
+    pose proof
+      (INV_04_start_to_finish F A1 E D x y HStart Hxy)
+      as HSwap.
+    destruct HSwap as [HFinishY Hneq].
+    split.
+    + exact HFinishY.
+    + split.
+      * exact Hneq.
+      * split.
+        -- intros HStartY.
+           eapply recursive_start_finish_disjoint.
+           ++ exact HStartY.
+           ++ exact HFinishY.
+        -- intros z Hyz.
+           exact
+             (INV_02_recursive_inversion_involutive
+               F A1 N E D x y z Hxy Hyz).
+  - split.
+    + intros HFinish.
+      pose proof
+        (INV_04_finish_to_start F A1 E D x y HFinish Hxy)
+        as HSwap.
+      destruct HSwap as [HStartY Hneq].
+      split.
+      * exact HStartY.
+      * split.
+        -- exact Hneq.
+        -- split.
+           ++ intros HFinishY.
+              eapply recursive_start_finish_disjoint.
+              ** exact HStartY.
+              ** exact HFinishY.
+           ++ intros z Hyz.
+              exact
+                (INV_02_recursive_inversion_involutive
+                  F A1 N E D x y z Hxy Hyz).
+    + intros HPair.
+      exact
+        (proj1
+          (INV_05_pair_preserved_and_reversed
+            F A1 N E D x y HPair Hxy)).
+Qed.
