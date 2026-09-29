@@ -74,6 +74,28 @@ for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
   );
 }
 
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  assert(
+    source.includes("EXTERNAL THEORY PROJECTION MANIFEST"),
+    `${label} source declares the external-theory projection manifest`,
+  );
+  assert(
+    source.includes("HOST FOUNDATION:") &&
+      source.includes("USED EXTERNAL LOGIC / PROOF METHODS:") &&
+      source.includes("ADDITIONAL EXTERNAL MATHEMATICAL THEORY:"),
+    `${label} manifest separates prover foundation from additional theory`,
+  );
+  assert(
+    source.includes("elementary group theory (Z2)") &&
+      source.includes("EXTERNAL THEORY PROJECTION: elementary group theory (Z2)"),
+    `${label} marks the Z2 group-theory projection explicitly`,
+  );
+  assert(
+    source.includes("not MTS ontology or semantic authority"),
+    `${label} keeps the external-theory no-backflow boundary`,
+  );
+}
+
 same(manifest.lean4.stable, true, "Lean stable pin");
 same(manifest.lean4.version, "4.34.1", "Lean version");
 same(manifest.lean4.tag, "v4.34.1", "Lean tag");
