@@ -15,7 +15,7 @@
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "b0f1da0f3e4d1a8048cdc378fc2ccb914c736c79",
+    "commitSha": "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
@@ -24,8 +24,8 @@
   "artifacts": [
     {
       "path": "proofs/coq/MtsFoundation.v",
-      "sha256": "fa4b92e827f3f7a9b43bd4972712c630dcdad0e205ddf62524c2f83d1a2138a0"
+      "sha256": "01adf311071e9310899a3f1d0b5eb1004031636061418a2beb5125a3b468d2a4"
     }
   ],
-  "notes": "External differential proof only. FND_13_identity_by_poles is now exactly restricted to the accepted finite Grounded domain and consumes an explicit grounded normal-form completeness premise. Constructor injectivity is proved separately from primitive form projections. FND-02 unique ROOT is no longer presented as a dependency because the FND-13 proof does not consume it. The older arbitrary-Link extensionality strength is preserved only as global_identity_by_poles_from_complete_normalization under a separately named stronger global normalization-completeness premise; ungrounded distinct-node cycles remain outside FND-13."
+  "notes": "External differential proof only. FND_13_identity_by_poles is now exactly restricted to the accepted finite Grounded domain and consumes an explicit grounded normal-form completeness premise. Constructor injectivity is proved separately from primitive form projections. FND-02 unique ROOT is no longer presented as a dependency because the FND-13 proof does not consume it. The older arbitrary-Link extensionality strength is preserved only as global_identity_by_poles_from_complete_normalization under a separately named stronger global normalization-completeness premise; ungrounded distinct-node cycles remain outside FND-13. Proof source is repinned to the #1796 minimized proof bundle; the FND-13 theorem boundary itself is unchanged."
 }
