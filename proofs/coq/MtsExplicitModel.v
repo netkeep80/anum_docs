@@ -376,7 +376,7 @@ Proof.
     }
     apply (IHFinish Hneq).
     right.
-    change model_finish model_bad_start = model_bad_finish.
+    change (model_finish model_bad_start = model_bad_finish).
     apply model_finish_bad_start.
   - subst x.
     assert (
@@ -390,7 +390,7 @@ Proof.
     }
     apply (IHStart Hneq).
     left.
-    change model_start model_bad_finish = model_bad_start.
+    change (model_start model_bad_finish = model_bad_start).
     apply model_start_bad_finish.
 Qed.
 
@@ -455,7 +455,7 @@ Proof.
       pose proof
         (grounded_start_of_nonself ExplicitFoundation x G Hstart_ne)
         as Gbad.
-      change Grounded ExplicitFoundation (model_start x) in Gbad.
+      change (Grounded ExplicitFoundation (model_start x)) in Gbad.
       rewrite Hstart in Gbad.
       exfalso.
       apply model_bad_start_not_grounded.
