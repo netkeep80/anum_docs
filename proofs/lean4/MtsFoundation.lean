@@ -6,6 +6,26 @@ Lean vocabulary such as Type, Prop, structure, inductive, and theorem is
 verification machinery only; it is not MTS ontology, native notation, or
 semantic authority.
 
+EXTERNAL THEORY PROJECTION MANIFEST
+
+HOST FOUNDATION:
+- Lean 4 dependent type theory / kernel metalanguage.
+
+USED EXTERNAL LOGIC / PROOF METHODS:
+- constructive propositions and equality;
+- inductive predicates and structural induction;
+- relational encoding of Link structure and RecursiveInversion.
+
+ADDITIONAL EXTERNAL MATHEMATICAL THEORY:
+- elementary group theory (Z2), used only to describe the same/opposite
+  relative transport composition table in CTX-03 support.
+
+The relational encoding and Z2 description are external verification tools,
+not MTS ontology or semantic authority.
+
+Any additional external theory introduced below must be marked locally with:
+  EXTERNAL THEORY PROJECTION: <theory-name>
+
 External proof constructs may expose hidden assumptions or falsifiers, but
 they must not leak back into MTS as ontology or axioms unless MTS derives the
 corresponding structure internally.
@@ -1831,8 +1851,11 @@ def OppositeChiralClass (F : Foundation) (x y : F.Link) : Prop :=
   (FinishOnly F x ∧ StartOnly F y)
 
 /--
+EXTERNAL THEORY PROJECTION: elementary group theory (Z2)
+
 The Z2 transport table is stated relationally: Same acts as Id and Opposite
-acts as J.  No two-valued semantic carrier is introduced.
+acts as J.  No two-valued semantic carrier is introduced, and the group
+description is external proof vocabulary only.
 -/
 def RelativeZ2Law (F : Foundation) : Prop :=
   (∀ x : F.Link, ProperOneSided F x → SameChiralClass F x x) ∧
