@@ -123,6 +123,22 @@ same(
   "UNRESOLVED",
   "strong global normalization completeness remains unresolved",
 );
+
+assert(
+  JSON.stringify(byId.get("F2F3Normalization")?.consumedBy) ===
+    JSON.stringify(["global_identity_by_poles_from_complete_normalization", "poles_recompose_from_global_normalization"]),
+  "strong global normalization is isolated to explicit auxiliary theorems",
+);
+assert(
+  JSON.stringify(byId.get("F2F3Normalization.complete")?.consumedBy) ===
+    JSON.stringify(["global_identity_by_poles_from_complete_normalization", "poles_recompose_from_global_normalization"]),
+  "global completeness is outside accepted FND/INV/CTX capstones",
+);
+assert(
+  !(byId.get("F2F3GroundedNormalization")?.consumedBy as string[]).includes("FND-01") &&
+    !(byId.get("F2F3GroundedNormalization")?.consumedBy as string[]).includes("INV-01"),
+  "FND-01 and INV-01 are normalization-free after premise minimization",
+);
 same(
   byId.get("ContextualScopeCompositionLaw")?.classification,
   "INDEPENDENT_MODEL_CHOICE",
