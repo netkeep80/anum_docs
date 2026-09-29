@@ -1557,7 +1557,7 @@ Proof.
     + exact Hz.
     + rewrite HSecondEq.
       symmetry.
-      apply recursive_start_form_canonical.
+      apply (recursive_start_form_canonical F A1 E D x).
       * exact GX.
       * exact HStart.
   - pose proof
@@ -1593,7 +1593,7 @@ Proof.
     + exact Hz.
     + rewrite HSecondEq.
       symmetry.
-      apply recursive_end_form_canonical.
+      apply (recursive_end_form_canonical F A1 E D x).
       * exact GX.
       * exact HFinish.
   - destruct
