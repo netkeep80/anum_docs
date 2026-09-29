@@ -1233,8 +1233,8 @@ for (const [label, source, marker] of [
     label + " FND-07 separates ambient structural existence from contextual truth",
   );
   assert(
-    region.includes("truth value") &&
-      region.includes("truth witness"),
+    /truth[- ]value/i.test(region) &&
+      /truth witness/i.test(region),
     label + " FND-07 separates L value role from K-to-A witness role",
   );
   assert(
