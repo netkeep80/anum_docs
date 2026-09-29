@@ -21,7 +21,7 @@
   "lane": "lean4",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
+    "commitSha": "006b0397d0a5160c47d34db0f20a377edd224132",
     "toolchain": {
       "name": "Lean",
       "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
@@ -30,7 +30,7 @@
   "artifacts": [
     {
       "path": "proofs/lean4/MtsFoundation.lean",
-      "sha256": "d5d896bb28651511c25b4c385aa85c97acb0d298f821ae1547053277735052fe"
+      "sha256": "849a925d29375d18631c9775b5daf98ad429eb30c986ee4066bfc975c0f6dac4"
     }
   ],
   "notes": "External differential proof only. INV-07 proves objective chirality structurally: RecursiveInversion exchanges proper StartOnly/FinishOnly classes without identification, INV-02 returns a second inversion to the original Link, and INV-05 preserves PairLocal. The distinction survives inversion without selecting a Foundation-global absolute orientation or introducing an observer semantic primitive. Lean/Rocq Type/Prop/Record/structure vocabulary is prover-side projection machinery only and is not MTS ontology, native notation, or semantic authority. Proof source is repinned after #1796 normalization-premise minimization; the stronger global arbitrary-Link normalization package is not imported by this accepted chain."
