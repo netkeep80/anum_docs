@@ -144,6 +144,11 @@ try {
   assert.equal(checked.status, 0);
   assert.equal(checked.stdout.trim(), REPO_GUARD_SHA, "differential must execute the pinned repo-guard SHA");
 
+  // projection-api.mjs is the released public consumer surface. Resolve its
+  // production dependencies from the exact pinned checkout, rather than
+  // reaching into an internal leaf module that happened to be dependency-free.
+  run("npm", ["ci", "--ignore-scripts", "--no-audit", "--no-fund", "--omit=dev"], cloneRoot);
+
   const upstream = await import(
     pathToFileURL(resolve(cloneRoot, "dist/projection-api.mjs")).href
   );
