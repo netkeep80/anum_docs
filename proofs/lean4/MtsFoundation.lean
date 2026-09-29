@@ -1708,37 +1708,31 @@ theorem INV_06_root_basis
   -- Consume the already-proved supporting theorems at the P0 boundary.  These
   -- checks add no assumptions: they certify the exact class effects of the
   -- five graph equations above.
-  have hRFixed : F.R = F.R :=
-    INV_03_root_fixed F D hR
-  have hOExchange : FinishOnly F E.finishRoot :=
+  have support :
+      F.R = F.R ∧
+      FinishOnly F E.finishRoot ∧
+      StartOnly F E.startRoot ∧
+      PairLocal F (F.form E.startRoot E.finishRoot) ∧
+      PairLocal F (F.form E.finishRoot E.startRoot) := ⟨
+    INV_03_root_fixed F D hR,
     (INV_04_start_to_finish
       F a1 E D
       (f2f3_start_root_pattern F E)
-      hO).1
-  have hCExchange : StartOnly F E.startRoot :=
+      hO).1,
     (INV_04_finish_to_start
       F a1 E D
       (f2f3_finish_root_pattern F E)
-      hC).1
-  have hLPair : PairLocal F (F.form E.startRoot E.finishRoot) :=
+      hC).1,
     (INV_05_pair_preserved_and_reversed
       F a1 N E D
       (f2f3_pair_pattern F E)
-      hL).1
-  have hUPair : PairLocal F (F.form E.finishRoot E.startRoot) :=
+      hL).1,
     (INV_05_pair_preserved_and_reversed
       F a1 N E D
       (f2f3_reverse_pair_pattern F E)
       hU).1
-
-  -- Force the support certificates into the proof term without granting them
-  -- any new authority over the representative construction.
-  exact ⟨
-    hRFixed ▸ hR,
-    hOExchange.2.elim hO hO,
-    hCExchange.1.elim hC hC,
-    hLPair.1.elim hL hL,
-    hUPair.1.elim hU hU
   ⟩
+  rcases support with ⟨_, _, _, _, _⟩
+  exact ⟨hR, hO, hC, hL, hU⟩
 
 end MTS.External
