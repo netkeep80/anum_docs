@@ -482,7 +482,7 @@ theorem pairCode_ne_left (left right : ModelLink) :
         (encodeLeft left).length + (1 + (1 + right.length)) :=
     Nat.lt_trans (encodeLeft_length_gt left) hGrow
   have hLt : left.length < (pairCode left right).length := by
-    simpa [pairCode, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hLt0
+    simpa [pairCode, Nat.succ_eq_add_one, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hLt0
   have hLength : left.length = (pairCode left right).length :=
     congrArg List.length h.symm
   exact (Nat.ne_of_lt hLt) hLength
@@ -495,7 +495,7 @@ theorem pairCode_ne_right (left right : ModelLink) :
         right.length + (1 + (1 + (encodeLeft left).length)) :=
     Nat.lt_add_of_pos_right (Nat.succ_pos (1 + (encodeLeft left).length))
   have hLt : right.length < (pairCode left right).length := by
-    simpa [pairCode, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hGrow
+    simpa [pairCode, Nat.succ_eq_add_one, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hGrow
   have hLength : right.length = (pairCode left right).length :=
     congrArg List.length h.symm
   exact (Nat.ne_of_lt hLt) hLength
@@ -515,10 +515,10 @@ theorem left_fixed_root_or_start
     · exact Or.inr hStart
     · by_cases hEnd : b = endForm a
       · subst b
-      have hStart' : a ≠ startForm (endForm a) :=
-        no_start_end_overlap a
-      have hSelf : a = endForm a := by
-        simpa [form, hRoot, hStart'] using h
+      have hForm : form a (endForm a) = endForm a := by
+        simp [form, no_start_end_overlap, endForm_ne_root]
+      have hSelf : a = endForm a :=
+        h.trans hForm
       exact False.elim (endForm_ne_self a hSelf.symm)
       · have hPair : a = pairCode a b := by
           simpa [form, hRoot, hStart, hEnd] using h
@@ -532,9 +532,11 @@ theorem right_fixed_root_or_end
   by_cases hRoot : a = root ∧ b = root
   · exact Or.inl hRoot
   · by_cases hStart : a = startForm b
-    · have hab : b = a := by
-        simpa [form, hRoot, hStart] using h
-      have hSelf : b = startForm b := hab.trans hStart
+    · subst a
+      have hForm : form (startForm b) b = startForm b := by
+        simp [form, startForm_ne_root]
+      have hSelf : b = startForm b :=
+        h.trans hForm
       exact False.elim (startForm_ne_self b hSelf.symm)
     · by_cases hEnd : b = endForm a
       · exact Or.inr hEnd
