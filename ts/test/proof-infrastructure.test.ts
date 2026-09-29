@@ -430,6 +430,54 @@ for (const record of inv02) {
   );
 }
 
+const inv0304 = ["INV-03", "INV-04"] as const;
+for (const theoremId of inv0304) {
+  const records = evidenceRecords
+    .filter(({ record }) => record.theoremId === theoremId)
+    .map(({ record }) => record);
+  assert.equal(records.length, 2, `${theoremId} has exactly two external evidence records`);
+  assert.deepEqual(
+    records.map((record) => record.lane).sort(),
+    ["coq", "lean4"],
+    `${theoremId} external lanes`,
+  );
+  for (const record of records) {
+    assert.equal(
+      record.proofSource.commitSha,
+      "54af5c6c1f9bfdaa7c23331cb431355a886794ec",
+      `${theoremId} ${record.lane} proof source commit`,
+    );
+  }
+}
+for (const record of evidenceRecords
+  .filter(({ record }) => record.theoremId === "INV-03")
+  .map(({ record }) => record)) {
+  assert.match(
+    String(record.notes),
+    /ROOT.*fixed point|fixed point.*ROOT/i,
+    "INV-03 evidence records ROOT fixed-point statement",
+  );
+  assert.match(
+    String(record.notes),
+    /functionality/i,
+    "INV-03 evidence records INV-01 graph-functionality boundary",
+  );
+}
+for (const record of evidenceRecords
+  .filter(({ record }) => record.theoremId === "INV-04")
+  .map(({ record }) => record)) {
+  assert.match(
+    String(record.notes),
+    /StartOnly.*FinishOnly|FinishOnly.*StartOnly/i,
+    "INV-04 evidence records one-sided exchange",
+  );
+  assert.match(
+    String(record.notes),
+    /Context-relative|no Foundation-global absolute orientation/i,
+    "INV-04 evidence preserves relative-orientation boundary",
+  );
+}
+
 const leanEvidence = fnd02.find((record) => record.lane === "lean4");
 const coqEvidence = fnd02.find((record) => record.lane === "coq");
 assert.ok(leanEvidence !== undefined && coqEvidence !== undefined);
@@ -451,5 +499,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq aprover-input=mtsNative-only`,
 );
