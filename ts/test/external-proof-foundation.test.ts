@@ -1288,6 +1288,22 @@ assert(
   "external compilers are conditional inside existing CI job",
 );
 assert(
+  ci.includes("#print axioms"),
+  "CI extracts actual Lean theorem axiom dependencies",
+);
+assert(
+  ci.includes("Print Assumptions"),
+  "CI extracts actual Rocq theorem assumptions",
+);
+assert(
+  ci.includes("KERNEL_ASSUMPTIONS_LEAN=CHECKED"),
+  "CI reports successful Lean assumption assurance only after checking",
+);
+assert(
+  ci.includes("KERNEL_ASSUMPTIONS_ROCQ=CHECKED"),
+  "CI reports successful Rocq assumption assurance only after checking",
+);
+assert(
   !ci.includes("jobs:\n  external-proofs:"),
   "no additional external-proof VM/job is introduced",
 );
@@ -1306,7 +1322,7 @@ console.log([
   "ROOT_UNIQUENESS_AXIOM=ABSENT",
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
-  "SORRY_ADMIT=ABSENT",
+  "SORRY_ADMIT_STATUS=CHECKED_BY_EXTERNAL_PROOF_ASSURANCE",
   "THEOREM_PROOF_CLAIMS=19",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",

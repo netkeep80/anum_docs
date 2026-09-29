@@ -1,0 +1,141 @@
+{
+  "schema": "mts-external-proof-assurance/v0.1",
+  "status": "active",
+  "ownerIssue": "#1791",
+  "premiseClosureOwnerIssue": "#1789",
+  "authority": "external-proof-assurance-only",
+  "allowedGlobalAxioms": {
+    "lean4": [],
+    "rocq": []
+  },
+  "targets": [
+    {
+      "id": "FND-01",
+      "lean4": [
+        "MTS.External.FND_01_four_structural_cases"
+      ],
+      "rocq": [
+        "FND_01_four_structural_cases"
+      ]
+    },
+    {
+      "id": "FND-02",
+      "lean4": [
+        "MTS.External.FND_02_unique_root"
+      ],
+      "rocq": [
+        "FND_02_unique_root"
+      ]
+    },
+    {
+      "id": "FND-13",
+      "lean4": [
+        "MTS.External.FND_13_identity_by_poles"
+      ],
+      "rocq": [
+        "FND_13_identity_by_poles"
+      ]
+    },
+    {
+      "id": "FND-05",
+      "lean4": [
+        "MTS.External.FND_05_canonical_recursive_description_unique"
+      ],
+      "rocq": [
+        "FND_05_canonical_recursive_description_unique"
+      ]
+    },
+    {
+      "id": "FND-07",
+      "lean4": [
+        "MTS.External.FND_07_contextual_truth_boundary"
+      ],
+      "rocq": [
+        "FND_07_contextual_truth_boundary"
+      ]
+    },
+    {
+      "id": "FND-11",
+      "lean4": [
+        "MTS.External.FND_11_representation_identities_separated"
+      ],
+      "rocq": [
+        "FND_11_representation_identities_separated"
+      ]
+    },
+    {
+      "id": "INV-01",
+      "lean4": [
+        "MTS.External.INV_01_recursive_inversion_unique_total"
+      ],
+      "rocq": [
+        "INV_01_recursive_inversion_unique_total"
+      ]
+    },
+    {
+      "id": "INV-02",
+      "lean4": [
+        "MTS.External.INV_02_unique_total_involution"
+      ],
+      "rocq": [
+        "INV_02_unique_total_involution"
+      ]
+    },
+    {
+      "id": "INV-03",
+      "lean4": [
+        "MTS.External.INV_03_root_fixed"
+      ],
+      "rocq": [
+        "INV_03_root_fixed"
+      ]
+    },
+    {
+      "id": "INV-04",
+      "lean4": [
+        "MTS.External.INV_04_start_to_finish",
+        "MTS.External.INV_04_finish_to_start"
+      ],
+      "rocq": [
+        "INV_04_start_to_finish",
+        "INV_04_finish_to_start"
+      ]
+    },
+    {
+      "id": "INV-05",
+      "lean4": [
+        "MTS.External.INV_05_pair_preserved_and_reversed"
+      ],
+      "rocq": [
+        "INV_05_pair_preserved_and_reversed"
+      ]
+    },
+    {
+      "id": "INV-06",
+      "lean4": [
+        "MTS.External.INV_06_root_basis"
+      ],
+      "rocq": [
+        "INV_06_root_basis"
+      ]
+    },
+    {
+      "id": "INV-07",
+      "lean4": [
+        "MTS.External.INV_07_objective_chirality"
+      ],
+      "rocq": [
+        "INV_07_objective_chirality"
+      ]
+    },
+    {
+      "id": "CTX-03",
+      "lean4": [
+        "MTS.External.CTX_03_context_relative_gauge"
+      ],
+      "rocq": [
+        "CTX_03_context_relative_gauge"
+      ]
+    }
+  ]
+}
