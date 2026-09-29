@@ -910,6 +910,110 @@ Proof.
       split; assumption.
 Qed.
 
+(*
+Concrete replay of the stabilized FND/INV/CTX chain on the explicit model.
+These are checked aliases/instantiations of existing generic theorems; they
+introduce no new premise and no model-specific semantic rule.
+*)
+Definition ExplicitFiniteRecursiveCarrierDecision :
+    FiniteRecursiveCarrierDecision ExplicitFoundation.
+Proof.
+  intros x _GX.
+  apply explicit_local_decision.
+Defined.
+
+Definition explicit_fnd02_replay :=
+  FND_02_unique_root ExplicitFoundation explicit_a1.
+
+Definition explicit_fnd01_replay (x : ModelLink) :=
+  FND_01_four_structural_cases
+    ExplicitFoundation
+    explicit_a1
+    ExplicitOneSided
+    x
+    (explicit_local_decision x).
+
+Definition explicit_fnd05_replay :=
+  FND_05_canonical_recursive_description_unique
+    ExplicitFoundation
+    explicit_a1
+    ExplicitFiniteRecursiveCarrierDecision.
+
+Definition explicit_inv01_replay :=
+  INV_01_recursive_inversion_unique_total
+    ExplicitFoundation
+    explicit_a1
+    ExplicitOneSided
+    ExplicitInversionDomain.
+
+Definition explicit_inv02_replay :=
+  INV_02_unique_total_involution
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain.
+
+Definition explicit_inv03_replay :=
+  INV_03_root_fixed
+    ExplicitFoundation
+    ExplicitOneSided
+    ExplicitInversionDomain.
+
+Definition explicit_inv04_start_replay :=
+  INV_04_start_to_finish
+    ExplicitFoundation
+    explicit_a1
+    ExplicitOneSided
+    ExplicitInversionDomain.
+
+Definition explicit_inv04_finish_replay :=
+  INV_04_finish_to_start
+    ExplicitFoundation
+    explicit_a1
+    ExplicitOneSided
+    ExplicitInversionDomain.
+
+Definition explicit_inv05_replay :=
+  INV_05_pair_preserved_and_reversed
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain.
+
+Definition explicit_inv06_replay :=
+  INV_06_root_basis
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain.
+
+Definition explicit_inv07_replay :=
+  INV_07_objective_chirality
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain.
+
+Definition explicit_ctx03_replay :=
+  CTX_03_context_relative_gauge
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain.
+
+Definition explicit_ctx03_semantic_replay :=
+  CTX_03_semantic_covariance_capstone
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain.
+
 Theorem explicit_grounded_slice :
   Grounded ExplicitFoundation (R ExplicitFoundation) /\
   Grounded ExplicitFoundation (f2f3_start_root ExplicitFoundation ExplicitOneSided) /\

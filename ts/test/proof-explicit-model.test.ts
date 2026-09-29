@@ -82,6 +82,33 @@ assert(
   "Rocq explicit model discharges A1RecursiveSeparation",
 );
 
+const replaySymbols = [
+  "explicit_fnd02_replay",
+  "explicit_fnd01_replay",
+  "explicit_fnd05_replay",
+  "explicit_inv01_replay",
+  "explicit_inv02_replay",
+  "explicit_inv03_replay",
+  "explicit_inv04_start_replay",
+  "explicit_inv04_finish_replay",
+  "explicit_inv05_replay",
+  "explicit_inv06_replay",
+  "explicit_inv07_replay",
+  "explicit_ctx03_replay",
+  "explicit_ctx03_semantic_replay",
+];
+
+for (const symbol of replaySymbols) {
+  assert(
+    lean.includes(symbol),
+    `Lean explicit model exposes concrete replay symbol ${symbol}`,
+  );
+  assert(
+    rocq.includes(symbol),
+    `Rocq explicit model exposes concrete replay symbol ${symbol}`,
+  );
+}
+
 assert(
   ci.includes(
     "cat proofs/lean4/MtsFoundation.lean proofs/lean4/MtsExplicitModel.lean > /tmp/MtsFoundationWithExplicitModel.lean",

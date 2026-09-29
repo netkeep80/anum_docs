@@ -749,6 +749,140 @@ theorem explicit_a1 :
             ⟨hStartEq, hFinishEq⟩
 
 /--
+Concrete replay of the stabilized FND/INV/CTX chain on the explicit model.
+
+These declarations add no new premise: they instantiate the already-proved
+generic capstones with the concrete witnesses built above.
+-/
+theorem explicit_finite_recursive_carrier_decision :
+    FiniteRecursiveCarrierDecision ExplicitFoundation := by
+  intro x _gx
+  exact explicit_local_decision x
+
+def explicit_fnd02_replay
+    {x : ModelLink}
+    (hFull : FullSelf ExplicitFoundation x) :=
+  FND_02_unique_root ExplicitFoundation explicit_a1 hFull
+
+def explicit_fnd01_replay (x : ModelLink) :=
+  FND_01_four_structural_cases
+    ExplicitFoundation
+    explicit_a1
+    ExplicitOneSided
+    (explicit_local_decision x)
+
+def explicit_fnd05_replay
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x) :=
+  FND_05_canonical_recursive_description_unique
+    ExplicitFoundation
+    explicit_a1
+    explicit_finite_recursive_carrier_decision
+    gx
+
+def explicit_inv01_replay
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x) :=
+  INV_01_recursive_inversion_unique_total
+    ExplicitFoundation
+    explicit_a1
+    ExplicitOneSided
+    ExplicitInversionDomain
+    gx
+
+def explicit_inv02_replay
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x) :=
+  INV_02_unique_total_involution
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain
+    gx
+
+def explicit_inv03_replay
+    {y : ModelLink}
+    (h : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain ExplicitFoundation.R y) :=
+  INV_03_root_fixed
+    ExplicitFoundation
+    ExplicitInversionDomain
+    h
+
+def explicit_inv04_start_replay
+    {x y : ModelLink}
+    (hStart : StartOnly ExplicitFoundation x)
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y) :=
+  INV_04_start_to_finish
+    ExplicitFoundation
+    explicit_a1
+    ExplicitOneSided
+    ExplicitInversionDomain
+    hStart
+    hxy
+
+def explicit_inv04_finish_replay
+    {x y : ModelLink}
+    (hFinish : FinishOnly ExplicitFoundation x)
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y) :=
+  INV_04_finish_to_start
+    ExplicitFoundation
+    explicit_a1
+    ExplicitOneSided
+    ExplicitInversionDomain
+    hFinish
+    hxy
+
+def explicit_inv05_replay
+    {x y : ModelLink}
+    (hPair : PairLocal ExplicitFoundation x)
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y) :=
+  INV_05_pair_preserved_and_reversed
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain
+    hPair
+    hxy
+
+def explicit_inv06_replay :=
+  INV_06_root_basis
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain
+
+def explicit_inv07_replay :=
+  INV_07_objective_chirality
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain
+
+def explicit_ctx03_replay :=
+  CTX_03_context_relative_gauge
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain
+
+def explicit_ctx03_semantic_replay :=
+  CTX_03_semantic_covariance_capstone
+    ExplicitFoundation
+    explicit_a1
+    ExplicitGroundedNormalization
+    ExplicitOneSided
+    ExplicitInversionDomain
+
+/--
 Explicit finite Grounded witness slice inside the infinite ambient carrier.
 -/
 theorem explicit_grounded_slice :
