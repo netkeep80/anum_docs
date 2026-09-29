@@ -2575,8 +2575,7 @@ theorem CTX_03_chi_direction_bridge
     F a1 E D hSelected with ⟨chi, hChi, _⟩
   have hDirections := CTX_03_direction_witness_inversion F E D
   rcases hChi with hIn | hOut
-  · subst chi
-    exact ⟨
+  · exact ⟨
       ContextInRWitness F E,
       ContextOutRWitness F E,
       Or.inl ⟨hIn.1, rfl⟩,
@@ -2584,8 +2583,7 @@ theorem CTX_03_chi_direction_bridge
       ctx03_direction_witnesses_distinct F E,
       Or.inl ⟨rfl, rfl⟩
     ⟩
-  · subst chi
-    exact ⟨
+  · exact ⟨
       ContextOutRWitness F E,
       ContextInRWitness F E,
       Or.inr ⟨hOut.1, rfl⟩,
