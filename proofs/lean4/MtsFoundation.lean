@@ -2308,6 +2308,8 @@ theorem CTX_03_context_relative_gauge
 /--
 FND-07 external projection of accepted contextual-truth semantics.
 
+EXTERNAL THEORY PROJECTION NOTE:
+no additional external mathematical theory is introduced here.
 CurrentScopeMember is intentionally a Prop-valued prover relation. It projects
 membership in the one published current Scope; it is NOT a native MTS
 predicate object and is NOT an axiomatic-set-theory Set/Membership model.
