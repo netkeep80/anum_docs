@@ -2859,36 +2859,6 @@ def ContextChiBridgeLaw
         jchi = ContextInRWitness F E))
 
 /--
-Strengthened CTX-03 semantic capstone.
-
-It composes the previously proved structural orientation layer with:
-- marker -> chi(K) direction-witness semantics;
-- covariance of the generalized-MP structural semantic step under J;
-- an explicit falsifier showing raw technical first-pole operations are not
-  admitted as semantic operations merely because they are definable.
--/
-theorem CTX_03_semantic_covariance_capstone
-    (F : Foundation)
-    (a1 : A1RecursiveSeparation F)
-    (N : F2F3Normalization F)
-    (E : F2F3OneSidedExistence F)
-    (D : RecursiveInversionDomain F E) :
-    CTX_03_context_relative_gauge F a1 N E D ∧
-    ContextChiBridgeLaw F E D ∧
-    ContextGeneralizedMPCovarianceLaw F D ∧
-    ¬ InversionCovariantUnaryOperation
-      F D (TechnicalStartOperation F) := by
-  refine ⟨
-    CTX_03_context_relative_gauge F a1 N E D,
-    ?_,
-    CTX_03_generalized_mp_semantic_covariance F a1 N E D,
-    CTX_03_technical_start_not_covariant F E D
-  ⟩
-  intro body selected hSelected
-  exact CTX_03_chi_direction_bridge F a1 E D hSelected
-
-
-/--
 CTX-03 capstone: objective chirality predates observation, Context selection
 induces only local START_K/END_K roles, and relative transport composes as the
 already-proved relational Z2 layer.
@@ -2937,6 +2907,37 @@ theorem CTX_03_context_relative_gauge
   · intro a b ja jb hJa hJb
     exact CTX_03_simultaneous_inversion_covariance
       F a1 N E D hJa hJb
+
+
+/--
+Strengthened CTX-03 semantic capstone.
+
+It composes the previously proved structural orientation layer with:
+- marker -> chi(K) direction-witness semantics;
+- covariance of the generalized-MP structural semantic step under J;
+- an explicit falsifier showing raw technical first-pole operations are not
+  admitted as semantic operations merely because they are definable.
+-/
+theorem CTX_03_semantic_covariance_capstone
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    CTX_03_context_relative_gauge F a1 N E D ∧
+    ContextChiBridgeLaw F E D ∧
+    ContextGeneralizedMPCovarianceLaw F D ∧
+    ¬ InversionCovariantUnaryOperation
+      F D (TechnicalStartOperation F) := by
+  refine ⟨
+    CTX_03_context_relative_gauge F a1 N E D,
+    ?_,
+    CTX_03_generalized_mp_semantic_covariance F a1 N E D,
+    CTX_03_technical_start_not_covariant F E D
+  ⟩
+  intro body selected hSelected
+  exact CTX_03_chi_direction_bridge F a1 E D hSelected
+
 
 
 /--
