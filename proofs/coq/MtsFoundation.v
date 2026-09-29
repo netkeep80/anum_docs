@@ -1145,6 +1145,62 @@ Proof.
   exact (distinguishable_same_false F x x H eq_refl).
 Qed.
 
+Lemma start_only_same_finish_not_distinguishable
+    (F : Foundation)
+    (x y : Link F) :
+    StartOnly F x ->
+    StartOnly F y ->
+    finish F x = finish F y ->
+    ~ Distinguishable F x y.
+Proof.
+  intros Hx Hy Hfinish Hdist.
+  destruct Hx as [Hxs Hxnf].
+  destruct Hy as [Hys Hynf].
+  destruct Hdist as
+    [a b Hsa Hnb
+    |a b Hna Hsb
+    |a b Hfa Hnfb
+    |a b Hnfa Hfb
+    |a b Hna Hnb Hchild
+    |a b Hnfa Hnfb Hchild].
+  - exact (Hnb Hys).
+  - exact (Hna Hxs).
+  - exact (Hxnf Hfa).
+  - exact (Hynf Hfb).
+  - exact (Hna Hxs).
+  - eapply distinguishable_same_false.
+    + exact Hchild.
+    + exact Hfinish.
+Qed.
+
+Lemma finish_only_same_start_not_distinguishable
+    (F : Foundation)
+    (x y : Link F) :
+    FinishOnly F x ->
+    FinishOnly F y ->
+    start F x = start F y ->
+    ~ Distinguishable F x y.
+Proof.
+  intros Hx Hy Hstart Hdist.
+  destruct Hx as [Hxns Hxf].
+  destruct Hy as [Hyns Hyf].
+  destruct Hdist as
+    [a b Hsa Hnb
+    |a b Hna Hsb
+    |a b Hfa Hnfb
+    |a b Hnfa Hfb
+    |a b Hna Hnb Hchild
+    |a b Hnfa Hnfb Hchild].
+  - exact (Hxns Hsa).
+  - exact (Hyns Hsb).
+  - exact (Hnfb Hyf).
+  - exact (Hnfa Hxf).
+  - eapply distinguishable_same_false.
+    + exact Hchild.
+    + exact Hstart.
+  - exact (Hnfa Hxf).
+Qed.
+
 Lemma grounded_start_of_nonself
     (F : Foundation)
     (x : Link F) :
@@ -1268,21 +1324,11 @@ Proof.
     (recursive_start_form_pattern F A1 E D (finish F x))
     as Hcanonical.
   apply (A1 x (recursive_start_form F E D (finish F x)) G Gcanonical).
-  intros Hdist.
-  destruct Hdist as
-    [a b Hsa Hnb
-    |a b Hna Hsb
-    |a b Hfa Hnfb
-    |a b Hnfa Hfb
-    |a b Hna Hnb Hchild
-    |a b Hnfa Hnfb Hchild].
-  - exact (Hnb (proj1 Hcanonical)).
-  - exact (Hna (proj1 Hstart)).
-  - exact ((proj2 Hstart) Hfa).
-  - exact ((proj2 Hcanonical) Hfb).
-  - exact (Hna (proj1 Hstart)).
-  - rewrite (recursive_start_finish F E D (finish F a)) in Hchild.
-    exact (distinguishable_irreflexive F (finish F a) Hchild).
+  apply start_only_same_finish_not_distinguishable.
+  - exact Hstart.
+  - exact Hcanonical.
+  - symmetry.
+    apply recursive_start_finish.
 Qed.
 
 (* A grounded FinishOnly Link is the unique semantic END of its external
@@ -1308,21 +1354,11 @@ Proof.
     (recursive_end_form_pattern F A1 E D (start F x))
     as Hcanonical.
   apply (A1 x (recursive_end_form F E D (start F x)) G Gcanonical).
-  intros Hdist.
-  destruct Hdist as
-    [a b Hsa Hnb
-    |a b Hna Hsb
-    |a b Hfa Hnfb
-    |a b Hnfa Hfb
-    |a b Hna Hnb Hchild
-    |a b Hnfa Hnfb Hchild].
-  - exact ((proj1 Hfinish) Hsa).
-  - exact ((proj1 Hcanonical) Hsb).
-  - exact (Hnfb (proj2 Hcanonical)).
-  - exact (Hnfa (proj2 Hfinish)).
-  - rewrite (recursive_end_start F E D (start F a)) in Hchild.
-    exact (distinguishable_irreflexive F (start F a) Hchild).
-  - exact (Hnfa (proj2 Hfinish)).
+  apply finish_only_same_start_not_distinguishable.
+  - exact Hfinish.
+  - exact Hcanonical.
+  - symmetry.
+    apply recursive_end_start.
 Qed.
 
 (* FND-13 entails reconstruction from the ordered poles.  This is downstream
