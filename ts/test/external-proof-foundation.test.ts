@@ -786,7 +786,7 @@ for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
     "INV_04_finish_to_start",
     "INV_05_pair_preserved_and_reversed",
   ]) {
-    assert(region.includes(support), `${label} INV-06 explicitly consumes ${support}`);
+    assert(region.includes(support), `${label} INV-06 cross-checks ${support}`);
   }
   assert(
     region.includes("startRoot") || region.includes("f2f3_start_root"),
