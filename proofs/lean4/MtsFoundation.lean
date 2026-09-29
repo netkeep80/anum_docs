@@ -2429,11 +2429,9 @@ theorem ctx03_direction_witnesses_distinct
   intro hEq
   have hStart := congrArg F.start hEq
   apply E.finishRootNeRoot
-  simpa only [
-    ContextInRWitness,
-    ContextOutRWitness,
-    F.form_start
-  ] using hStart
+  unfold ContextInRWitness ContextOutRWitness at hStart
+  rw [F.form_start, F.form_start] at hStart
+  exact hStart
 
 /--
 J exchanges the two accepted direction-witness Links.  This is a structural
@@ -2453,55 +2451,67 @@ theorem CTX_03_direction_witness_inversion
     RecursiveInversion.root (F := F) (D := D)
   have hOC : RecursiveInversion F D E.startRoot E.finishRoot := by
     have hChild : RecursiveInversion F D (F.finish E.startRoot) F.R := by
-      simpa only [f2f3_start_root_finish F E] using hR
+      rw [f2f3_start_root_finish F E]
+      exact hR
     have h :=
       RecursiveInversion.start
         (D := D)
         (f2f3_start_root_pattern F E)
         hChild
-    simpa only [D.endRootCompat] using h
+    rw [D.endRootCompat] at h
+    exact h
   have hCO : RecursiveInversion F D E.finishRoot E.startRoot := by
     have hChild : RecursiveInversion F D (F.start E.finishRoot) F.R := by
-      simpa only [f2f3_finish_root_start F E] using hR
+      rw [f2f3_finish_root_start F E]
+      exact hR
     have h :=
       RecursiveInversion.finish
         (D := D)
         (f2f3_finish_root_pattern F E)
         hChild
-    simpa only [D.startRootCompat] using h
+    rw [D.startRootCompat] at h
+    exact h
   constructor
   · have hFinish :
         RecursiveInversion F D
           (F.finish (ContextInRWitness F E))
           F.R := by
-      simpa only [ContextInRWitness, F.form_finish] using hR
+      unfold ContextInRWitness
+      rw [F.form_finish]
+      exact hR
     have hStart :
         RecursiveInversion F D
           (F.start (ContextInRWitness F E))
           E.startRoot := by
-      simpa only [ContextInRWitness, F.form_start] using hCO
-    simpa only [ContextInRWitness, ContextOutRWitness] using
-      (RecursiveInversion.pair
+      unfold ContextInRWitness
+      rw [F.form_start]
+      exact hCO
+    exact
+      RecursiveInversion.pair
         (D := D)
         (ctx03_inr_pair_pattern F E)
         hFinish
-        hStart)
+        hStart
   · have hFinish :
         RecursiveInversion F D
           (F.finish (ContextOutRWitness F E))
           E.finishRoot := by
-      simpa only [ContextOutRWitness, F.form_finish] using hOC
+      unfold ContextOutRWitness
+      rw [F.form_finish]
+      exact hOC
     have hStart :
         RecursiveInversion F D
           (F.start (ContextOutRWitness F E))
           F.R := by
-      simpa only [ContextOutRWitness, F.form_start] using hR
-    simpa only [ContextInRWitness, ContextOutRWitness] using
-      (RecursiveInversion.pair
+      unfold ContextOutRWitness
+      rw [F.form_start]
+      exact hR
+    exact
+      RecursiveInversion.pair
         (D := D)
         (ctx03_outr_pair_pattern F E)
         hFinish
-        hStart)
+        hStart
 
 /--
 A Link-native Context marker selects exactly one chi(K).  The two branches are
@@ -2818,18 +2828,20 @@ theorem CTX_03_technical_start_not_covariant
     RecursiveInversion.root (F := F) (D := D)
   have hCO : RecursiveInversion F D E.finishRoot E.startRoot := by
     have hChild : RecursiveInversion F D (F.start E.finishRoot) F.R := by
-      simpa only [f2f3_finish_root_start F E] using hR
+      rw [f2f3_finish_root_start F E]
+      exact hR
     have h :=
       RecursiveInversion.finish
         (D := D)
         (f2f3_finish_root_pattern F E)
         hChild
-    simpa only [D.startRootCompat] using h
+    rw [D.startRootCompat] at h
+    exact h
   have hSource :
       TechnicalStartOperation
         F (ContextInRWitness F E) E.finishRoot := by
     unfold TechnicalStartOperation ContextInRWitness
-    simp only [F.form_start]
+    rw [F.form_start]
   have hMirror :=
     hCovariant
       (ContextInRWitness F E)
@@ -2840,7 +2852,7 @@ theorem CTX_03_technical_start_not_covariant
       hCO
       hSource
   unfold TechnicalStartOperation ContextOutRWitness at hMirror
-  simp only [F.form_start] at hMirror
+  rw [F.form_start] at hMirror
   exact E.startRootNeRoot hMirror
 
 def ContextChiBridgeLaw
