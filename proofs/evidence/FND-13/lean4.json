@@ -7,19 +7,15 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "A1 recursive distinguishability / finite grounding principle",
-    "F2/F3 name-neutral grounded normal-form principle",
-    "FND-02 unique ROOT"
+    "F2/F3 name-neutral grounded normal-form completeness on the declared finite R-grounded theorem domain"
   ],
-  "dependencies": [
-    "FND-02"
-  ],
+  "dependencies": [],
   "result": "proved",
   "authority": "external-cross-check",
   "lane": "lean4",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "4d9c33d0e37735756f4dd0f0190b01964db2aac7",
+    "commitSha": "b0f1da0f3e4d1a8048cdc378fc2ccb914c736c79",
     "toolchain": {
       "name": "Lean",
       "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
@@ -28,8 +24,8 @@
   "artifacts": [
     {
       "path": "proofs/lean4/MtsFoundation.lean",
-      "sha256": "5bee771220410ad917856bf041b8755401f0b724e1d0d8285c5ed0408353004d"
+      "sha256": "3af7053dc87893635a3e27d4bf945747fca6778d36c6fc65214ab4ac50065824"
     }
   ],
-  "notes": "External differential proof only. FND_13_identity_by_poles is derived on the accepted finite R-grounded F2/F3-normalized domain. The normalization witness is indexed by the already proved FND-02 unique-ROOT result; no pole-extensionality axiom, reconstruction axiom, name equality, or bundle equality is used as semantic Link identity authority."
+  "notes": "External differential proof only. FND_13_identity_by_poles is now exactly restricted to the accepted finite Grounded domain and consumes an explicit grounded normal-form completeness premise. Constructor injectivity is proved separately from primitive form projections. FND-02 unique ROOT is no longer presented as a dependency because the FND-13 proof does not consume it. The older arbitrary-Link extensionality strength is preserved only as global_identity_by_poles_from_complete_normalization under a separately named stronger global normalization-completeness premise; ungrounded distinct-node cycles remain outside FND-13."
 }

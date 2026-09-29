@@ -9,20 +9,19 @@
   "assumptions": [
     "one Link-forming primitive",
     "accepted finite R-grounded domain",
-    "semantic Link identity equality supplied by FND-13",
+    "explicit global F2/F3 normalization completeness used only for the auxiliary arbitrary-Link pole-identity conjunct",
     "F2/F3 grounded-form existence/sufficiency for the declared domain",
     "Context orientation only names one-sided cases; it does not create them"
   ],
   "dependencies": [
-    "FND-02",
-    "FND-13"
+    "FND-02"
   ],
   "result": "proved",
   "authority": "external-cross-check",
   "lane": "lean4",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "21e6e5c4328af4e6e70bf1c9953e2aeab4c2f907",
+    "commitSha": "b0f1da0f3e4d1a8048cdc378fc2ccb914c736c79",
     "toolchain": {
       "name": "Lean",
       "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
@@ -31,8 +30,8 @@
   "artifacts": [
     {
       "path": "proofs/lean4/MtsFoundation.lean",
-      "sha256": "f313700a79375fb949f4785fc41ad4e8aa4b53b190d245ca28d15bae89cac93c"
+      "sha256": "3af7053dc87893635a3e27d4bf945747fca6778d36c6fc65214ab4ac50065824"
     }
   ],
-  "notes": "External differential proof only. FND-01 is split deliberately: proposition-level four-pattern exclusivity is constructive; all four patterns are grounded and realized from ROOT plus two proper one-sided F2/F3 witnesses, with PAIR derived by the single Link-forming primitive; producing a direct exhaustive classifier for an arbitrary Link requires explicit LocalSelfDecision evidence for the two local identity questions, rather than hidden global DecidableEq or classical excluded middle. FND-02 supplies unique ROOT, FND-13 supplies semantic ordered-pole identity, and ContextOneSidedNames is alias-only: START_K/END_K name existing one-sided witnesses and do not create structural cases. CTX-03 orientation selection remains downstream."
+  "notes": "External differential proof only. FND-01 proves the four proposition-level self-incidence classes and their grounded realizability. Unique ROOT is consumed through FND-02. The classification itself does not depend on the Grounded FND-13 capstone. An additional arbitrary-Link pole-identity conjunct in the external capstone is explicitly conditional on the separately named stronger global F2/F3 normalization-completeness premise. LocalSelfDecision remains explicit, ContextOneSidedNames remains alias-only, and no host enum/codec/handle becomes authority."
 }

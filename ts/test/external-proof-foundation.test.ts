@@ -228,8 +228,8 @@ same(
 );
 same(
   p0.constraints.poleExtensionalityAvailableAfterFnd02,
-  true,
-  "A6/pole extensionality is downstream of FND-02",
+  false,
+  "A6/pole extensionality is not inferred merely from completing FND-02",
 );
 assert(
   (fnd02.assumptions as string[]).some((value) => value.includes("A1")),
@@ -246,8 +246,9 @@ assert(
   "FND-02 assumptions do not smuggle A6 identity-by-poles",
 );
 assert(
-  /A6.*downstream/i.test(fnd02.exclusions as string),
-  "FND-02 exclusion records A6 as downstream",
+  /separate explicit premises/i.test(fnd02.exclusions as string) &&
+    /no dependency between them/i.test(fnd02.exclusions as string),
+  "FND-02 exclusion records FND-13 as independent unless a bridge is proved",
 );
 
 for (const source of [lean, rocq]) {
@@ -289,78 +290,112 @@ same(
   "FND-13 is recovered historical A6 rather than a new v0.14 theorem",
 );
 assert(
-  (fnd13.dependsOn as string[]).length === 1 &&
-    (fnd13.dependsOn as string[])[0] === "FND-02",
-  "FND-13 depends on unique ROOT before pole identity",
+  JSON.stringify(fnd13.dependsOn) === JSON.stringify([]),
+  "FND-13 no longer claims a fake FND-02 dependency",
 );
+assert(
+  JSON.stringify(fnd13.lawRefs) === JSON.stringify(["V14-L5"]),
+  "FND-13 structural identity authority is V14-L5",
+);
+assert(
+  JSON.stringify(fnd13.assumptions) === JSON.stringify([
+    "F2/F3 name-neutral grounded normal-form completeness on the declared finite R-grounded theorem domain",
+  ]),
+  "FND-13 exposes exactly the grounded normalization-completeness premise",
+);
+assert(
+  /finite R-grounded/i.test(String(fnd13.statement)) &&
+    /Grounding|grounding|grounded/i.test(String(fnd13.scope)),
+  "FND-13 P0 statement and scope remain explicitly finite-grounded",
+);
+assert(
+  /stronger arbitrary-Link extensionality/i.test(String(fnd13.exclusions)) &&
+    /not a premise of FND-13/i.test(String(fnd13.exclusions)),
+  "FND-13 excludes global extensionality and fake FND-02 dependency",
+);
+
 for (const source of [lean, rocq]) {
-  assert(source.includes("F2F3Normalization"), "external source names F2/F3 normalization premise");
-  assert(source.includes("normalForm") || source.includes("normal_form"), "external source carries normal-form projection");
   assert(
-    source.includes("recursiveEquation") || source.includes("normal_form_equation"),
-    "external source carries recursive normal-form equation",
+    source.includes("F2F3GroundedNormalization"),
+    "external source names exact Grounded normalization premise",
   );
   assert(
-    source.includes("complete") || source.includes("normal_form_complete"),
-    "external source carries one-normal-form-per-semantic-Link completeness",
+    source.includes("F2F3Normalization"),
+    "external source separately names stronger global normalization premise",
   );
-  assert(source.includes("FND_13_identity_by_poles"), "external source contains FND-13 theorem");
+  assert(
+    source.includes("fnd13_form_injective"),
+    "external source proves constructor injectivity independently",
+  );
+  assert(
+    source.includes("FND_13_identity_by_poles"),
+    "external source contains grounded FND-13 theorem",
+  );
+  assert(
+    source.includes("global_identity_by_poles_from_complete_normalization"),
+    "external source names stronger global extensionality auxiliary",
+  );
+  assert(
+    source.includes("poles_recompose_from_global_normalization"),
+    "external source attributes arbitrary-Link reconstruction to global normalization",
+  );
 }
 assert(
-  lean.includes("theorem FND_13_identity_by_poles"),
-  "Lean FND-13 is a theorem, not an axiom",
+  lean.includes("theorem FND_13_identity_by_poles") &&
+    lean.includes("(gx : Grounded F x)") &&
+    lean.includes("(gy : Grounded F y)"),
+  "Lean FND-13 theorem requires Grounded evidence for both Links",
 );
 assert(
-  rocq.includes("Theorem FND_13_identity_by_poles"),
-  "Rocq FND-13 is a theorem, not an axiom",
+  rocq.includes("Theorem FND_13_identity_by_poles") &&
+    rocq.includes("Grounded F x ->") &&
+    rocq.includes("Grounded F y ->"),
+  "Rocq FND-13 theorem requires Grounded evidence for both Links",
 );
 assert(
-  lean.includes("def RootUniqueness") && rocq.includes("Definition RootUniqueness"),
-  "external sources name the unique-ROOT proof boundary",
+  !/F2F3Normalization F\s*\(/.test(lean) &&
+    !/F2F3Normalization F\s*\(/.test(rocq),
+  "global normalization is not fake-indexed by FND-02 or another proof",
+);
+const leanGlobalNormStart = lean.indexOf("structure F2F3Normalization");
+const leanGlobalNormEnd = lean.indexOf("theorem fnd13_form_injective", leanGlobalNormStart);
+const rocqGlobalNormStart = rocq.indexOf("Record F2F3Normalization");
+const rocqGlobalNormEnd = rocq.indexOf("Theorem fnd13_form_injective", rocqGlobalNormStart);
+assert(
+  leanGlobalNormStart >= 0 && leanGlobalNormEnd > leanGlobalNormStart &&
+    !lean.slice(leanGlobalNormStart, leanGlobalNormEnd).includes("FND_02"),
+  "Lean global normalization fields do not smuggle FND-02",
 );
 assert(
-  lean.includes("(a1 : A1RecursiveSeparation F)") &&
-    lean.includes("FND_02_unique_root F a1 hx"),
-  "Lean FND-13 normalization witness is indexed by the FND-02 result",
-);
-assert(
-  rocq.includes("(A1 : A1RecursiveSeparation F)") &&
-    rocq.includes("F2F3Normalization F (FND_02_unique_root F A1)"),
-  "Rocq FND-13 normalization witness is indexed by the FND-02 result",
-);
-assert(
-  !lean.includes("rootUnique :") && !rocq.includes("root_unique_fnd02"),
-  "unique ROOT is not duplicated as a free normalization record field",
+  rocqGlobalNormStart >= 0 && rocqGlobalNormEnd > rocqGlobalNormStart &&
+    !rocq.slice(rocqGlobalNormStart, rocqGlobalNormEnd).includes("FND_02"),
+  "Rocq global normalization fields do not smuggle FND-02",
 );
 const leanFnd13Start = lean.indexOf("theorem FND_13_identity_by_poles");
 const rocqFnd13Start = rocq.indexOf("Theorem FND_13_identity_by_poles");
 assert(leanFnd13Start >= 0 && rocqFnd13Start >= 0, "FND-13 theorem boundary exists");
 assert(
-  !lean.slice(0, leanFnd13Start).includes("form (F.start x) (F.finish x) = x"),
-  "Lean does not smuggle A6 reconstruction before FND-13",
+  lean.indexOf("theorem fnd13_form_injective") < leanFnd13Start &&
+    rocq.indexOf("Theorem fnd13_form_injective") < rocqFnd13Start,
+  "constructor injectivity is separated before the grounded FND-13 theorem",
 );
 assert(
-  !rocq.slice(0, rocqFnd13Start).includes("form F (start F x) (finish F x) = x"),
-  "Rocq does not smuggle A6 reconstruction before FND-13",
+  lean.indexOf("global_identity_by_poles_from_complete_normalization") > leanFnd13Start &&
+    rocq.indexOf("global_identity_by_poles_from_complete_normalization") > rocqFnd13Start,
+  "strong global extensionality is explicitly downstream/separate from grounded FND-13",
 );
-if (lean.includes("theorem poles_recompose_after_fnd13")) {
-  assert(
-    lean.indexOf("theorem poles_recompose_after_fnd13") > leanFnd13Start,
-    "Lean pole reconstruction is explicitly downstream of FND-13",
-  );
-}
-if (rocq.includes("Theorem poles_recompose_after_fnd13")) {
-  assert(
-    rocq.indexOf("Theorem poles_recompose_after_fnd13") > rocqFnd13Start,
-    "Rocq pole reconstruction is explicitly downstream of FND-13",
-  );
-}
 
 const fnd01 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-01");
 assert(fnd01 !== undefined, "P0 contains FND-01");
 assert(
-  JSON.stringify(fnd01.dependsOn) === JSON.stringify(["FND-02", "FND-13"]),
-  "FND-01 follows unique ROOT and ordered-pole identity",
+  JSON.stringify(fnd01.dependsOn) === JSON.stringify(["FND-02"]),
+  "FND-01 structural classification depends only on unique ROOT",
+);
+assert(
+  (fnd01.assumptions as string[]).some((value) =>
+    value.includes("global F2/F3 normalization completeness")
+  ),
+  "FND-01 exposes stronger global normalization only for its auxiliary identity conjunct",
 );
 assert(
   (fnd01.assumptions as string[]).some((value) => value.includes("F2/F3 grounded-form existence")),
@@ -399,13 +434,13 @@ assert(
 );
 assert(
   lean.includes("FND_02_unique_root F a1 h") &&
-    lean.includes("FND_13_identity_by_poles F a1 N"),
-  "Lean FND-01 C1 explicitly consumes FND-02 and FND-13",
+    lean.includes("global_identity_by_poles_from_complete_normalization F N"),
+  "Lean FND-01 C1 consumes FND-02 plus the explicitly stronger global identity auxiliary",
 );
 assert(
   rocq.includes("FND_02_unique_root F A1 x H") &&
-    rocq.includes("FND_13_identity_by_poles F A1 N x y"),
-  "Rocq FND-01 C1 explicitly consumes FND-02 and FND-13",
+    rocq.includes("global_identity_by_poles_from_complete_normalization F N x y"),
+  "Rocq FND-01 C1 consumes FND-02 plus the explicitly stronger global identity auxiliary",
 );
 assert(
   !lean.includes("inductive SelfIncidence") && !rocq.includes("Inductive SelfIncidence"),
@@ -676,8 +711,8 @@ for (const source of [lean, rocq]) {
     "external source derives canonical semantic END form before INV-02",
   );
   assert(
-    source.includes("poles_recompose_after_fnd13"),
-    "external source uses downstream FND-13 pole reconstruction rather than an axiom",
+    source.includes("poles_recompose_from_global_normalization"),
+    "external source uses explicit global-normalization pole reconstruction rather than an axiom",
   );
   assert(
     source.includes("recursive_inversion_source_grounded"),
@@ -712,13 +747,13 @@ assert(
 );
 assert(
   lean.includes("INV_01_recursive_pole_reversal F D hyz") &&
-    lean.includes("poles_recompose_after_fnd13 F a1 N x"),
+    lean.includes("poles_recompose_from_global_normalization F a1 N x"),
   "Lean PAIR involution reverses poles twice and reconstructs the original Link",
 );
 assert(
   rocq.includes("INV_01_recursive_pole_reversal") &&
-    rocq.includes("poles_recompose_after_fnd13 F A1 N x"),
-  "Rocq PAIR involution reverses poles twice and reconstructs the original Link through FND-13",
+    rocq.includes("poles_recompose_from_global_normalization F A1 N x"),
+  "Rocq PAIR involution reverses poles twice and reconstructs the original Link through explicit global normalization",
 );
 for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
   const inv02Start = source.indexOf(
