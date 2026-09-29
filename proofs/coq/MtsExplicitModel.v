@@ -1162,57 +1162,42 @@ Qed.
 (*
 #1797 cyclic-boundary witness.
 
-The existing fallback values form a genuine two-Link semantic pole cycle.
-Finite inductive FND-05 descriptions cannot derive either endpoint. This
-falsifies all-Link totality, while recursive_description_functional remains
-globally valid whenever derivations actually exist.
+Under the current inductive proof semantics, existence of a finite canonical
+recursive description implies Grounded source structure. Together with FND-05
+totality on Grounded Links, this identifies Grounded as the exact existence
+domain of the current finite description relation.
 *)
-Theorem fallback_cycle_no_recursive_description :
+Theorem recursive_description_source_grounded :
   forall (x : ModelLink) (code : RecursiveDescriptionCode),
     CanonicalRecursiveDescription ExplicitFoundation x code ->
-    (x = model_bad_start \/ x = model_bad_finish) ->
-    False.
+    Grounded ExplicitFoundation x.
 Proof.
   intros x code H.
   induction H as
     [ | x child HStart HChild IH
       | x child HFinish HChild IH
-      | x startCode finishCode HPair HStartChild IHStart HFinishChild IHFinish ];
-    intros Hbad.
-  - destruct Hbad as [Hbad | Hbad]; discriminate Hbad.
-  - destruct Hbad as [Hbad | Hbad].
-    + subst x.
-      apply IH.
-      right.
-      change (model_finish model_bad_start = model_bad_finish).
-      apply model_finish_bad_start.
-    + subst x.
-      apply (proj2 HStart).
-      unfold FinishSelf.
-      change (model_finish model_bad_finish = model_bad_finish).
-      apply model_finish_bad_finish.
-  - destruct Hbad as [Hbad | Hbad].
-    + subst x.
-      apply (proj1 HFinish).
-      unfold StartSelf.
-      change (model_start model_bad_start = model_bad_start).
-      apply model_start_bad_start.
-    + subst x.
-      apply IH.
-      left.
-      change (model_start model_bad_finish = model_bad_start).
-      apply model_start_bad_finish.
-  - destruct Hbad as [Hbad | Hbad].
-    + subst x.
-      apply (proj1 HPair).
-      unfold StartSelf.
-      change (model_start model_bad_start = model_bad_start).
-      apply model_start_bad_start.
-    + subst x.
-      apply (proj2 HPair).
-      unfold FinishSelf.
-      change (model_finish model_bad_finish = model_bad_finish).
-      apply model_finish_bad_finish.
+      | x startCode finishCode HPair HStartChild IHStart HFinishChild IHFinish ].
+  - apply grounded_of_full_self.
+    apply root_full_self.
+  - apply grounded_node.
+    + intros Hnot.
+      exfalso.
+      apply Hnot.
+      exact (proj1 HStart).
+    + intros _.
+      exact IH.
+  - apply grounded_node.
+    + intros _.
+      exact IH.
+    + intros Hnot.
+      exfalso.
+      apply Hnot.
+      exact (proj2 HFinish).
+  - apply grounded_node.
+    + intros _.
+      exact IHStart.
+    + intros _.
+      exact IHFinish.
 Qed.
 
 Theorem model_bad_start_no_recursive_description :
@@ -1221,8 +1206,8 @@ Theorem model_bad_start_no_recursive_description :
         model_bad_start code.
 Proof.
   intros [code H].
-  apply (fallback_cycle_no_recursive_description model_bad_start code H).
-  left. reflexivity.
+  apply model_bad_start_not_grounded.
+  exact (recursive_description_source_grounded model_bad_start code H).
 Qed.
 
 Theorem model_bad_finish_no_recursive_description :
@@ -1231,62 +1216,51 @@ Theorem model_bad_finish_no_recursive_description :
         model_bad_finish code.
 Proof.
   intros [code H].
-  apply (fallback_cycle_no_recursive_description model_bad_finish code H).
-  right. reflexivity.
+  apply model_bad_finish_not_grounded.
+  exact (recursive_description_source_grounded model_bad_finish code H).
 Qed.
 
 (*
-The same cycle has no finite RecursiveInversion derivation. The generic
-recursive_inversion_functional theorem remains valid whenever two derivations
-exist; the counterexample is totality/existence only.
+Likewise, any finite RecursiveInversion derivation implies Grounded source
+structure. Together with INV-01 totality on Grounded Links, the source domain
+of the current inductive inversion graph is exactly Grounded.
+
+The generic recursive_inversion_functional theorem remains Grounded-free:
+whenever two derivations exist, their images are equal. The cycle falsifies
+totality/existence, not functionality.
 *)
-Theorem fallback_cycle_no_recursive_inversion :
+Theorem recursive_inversion_source_grounded :
   forall (x y : ModelLink),
     RecursiveInversion
       ExplicitFoundation ExplicitOneSided ExplicitInversionDomain x y ->
-    (x = model_bad_start \/ x = model_bad_finish) ->
-    False.
+    Grounded ExplicitFoundation x.
 Proof.
   intros x y H.
   induction H as
     [ | x childInverse HStart HChild IH
       | x childInverse HFinish HChild IH
-      | x inverseFinish inverseStart HPair HFinishInv IHFinish HStartInv IHStart ];
-    intros Hbad.
-  - destruct Hbad as [Hbad | Hbad]; discriminate Hbad.
-  - destruct Hbad as [Hbad | Hbad].
-    + subst x.
-      apply IH.
-      right.
-      change (model_finish model_bad_start = model_bad_finish).
-      apply model_finish_bad_start.
-    + subst x.
-      apply (proj2 HStart).
-      unfold FinishSelf.
-      change (model_finish model_bad_finish = model_bad_finish).
-      apply model_finish_bad_finish.
-  - destruct Hbad as [Hbad | Hbad].
-    + subst x.
-      apply (proj1 HFinish).
-      unfold StartSelf.
-      change (model_start model_bad_start = model_bad_start).
-      apply model_start_bad_start.
-    + subst x.
-      apply IH.
-      left.
-      change (model_start model_bad_finish = model_bad_start).
-      apply model_start_bad_finish.
-  - destruct Hbad as [Hbad | Hbad].
-    + subst x.
-      apply (proj1 HPair).
-      unfold StartSelf.
-      change (model_start model_bad_start = model_bad_start).
-      apply model_start_bad_start.
-    + subst x.
-      apply (proj2 HPair).
-      unfold FinishSelf.
-      change (model_finish model_bad_finish = model_bad_finish).
-      apply model_finish_bad_finish.
+      | x inverseFinish inverseStart HPair HFinishInv IHFinish HStartInv IHStart ].
+  - apply grounded_of_full_self.
+    apply root_full_self.
+  - apply grounded_node.
+    + intros Hnot.
+      exfalso.
+      apply Hnot.
+      exact (proj1 HStart).
+    + intros _.
+      exact IH.
+  - apply grounded_node.
+    + intros _.
+      exact IH.
+    + intros Hnot.
+      exfalso.
+      apply Hnot.
+      exact (proj2 HFinish).
+  - apply grounded_node.
+    + intros _.
+      exact IHStart.
+    + intros _.
+      exact IHFinish.
 Qed.
 
 Theorem model_bad_start_no_recursive_inverse :
@@ -1296,8 +1270,8 @@ Theorem model_bad_start_no_recursive_inverse :
         model_bad_start y.
 Proof.
   intros [y H].
-  apply (fallback_cycle_no_recursive_inversion model_bad_start y H).
-  left. reflexivity.
+  apply model_bad_start_not_grounded.
+  exact (recursive_inversion_source_grounded model_bad_start y H).
 Qed.
 
 Theorem model_bad_finish_no_recursive_inverse :
@@ -1307,8 +1281,8 @@ Theorem model_bad_finish_no_recursive_inverse :
         model_bad_finish y.
 Proof.
   intros [y H].
-  apply (fallback_cycle_no_recursive_inversion model_bad_finish y H).
-  right. reflexivity.
+  apply model_bad_finish_not_grounded.
+  exact (recursive_inversion_source_grounded model_bad_finish y H).
 Qed.
 
 (*
