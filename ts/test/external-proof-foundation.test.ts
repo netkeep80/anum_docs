@@ -1038,6 +1038,70 @@ assert(
   "CTX-03 capstone is proved rather than postulated",
 );
 
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  const chiStart = source.indexOf(
+    label === "Lean"
+      ? "def ContextInRWitness"
+      : "Definition ContextInRWitness",
+  );
+  const chiEnd = source.indexOf(
+    label === "Lean"
+      ? "CTX-03 capstone: objective chirality"
+      : "CTX-03 capstone: objective chirality",
+    chiStart,
+  );
+  assert(chiStart >= 0 && chiEnd > chiStart, `${label} contains CTX-03 chi bridge region`);
+  const chiRegion = source.slice(chiStart, chiEnd);
+
+  for (const symbol of [
+    "ContextInRWitness",
+    "ContextOutRWitness",
+    "ContextChiWitness",
+    "ctx03_direction_witnesses_distinct",
+    "CTX_03_direction_witness_inversion",
+    "CTX_03_context_marker_selects_unique_chi",
+    "CTX_03_chi_direction_bridge",
+  ]) {
+    assert(chiRegion.includes(symbol), `${label} CTX-03 chi bridge contains ${symbol}`);
+  }
+
+  assert(
+    chiRegion.includes("SameChiralClass") &&
+      chiRegion.includes("ContextInRWitness") &&
+      chiRegion.includes("ContextOutRWitness"),
+    `${label} chi selection is relationally tied to chiral class and accepted witnesses`,
+  );
+  assert(
+    chiRegion.includes("RecursiveInversion"),
+    `${label} chi bridge proves structural J transport rather than host remapping`,
+  );
+
+  for (const forbidden of [
+    "Bool",
+    "DIRECT",
+    "MIRROR",
+    "structure ContextFrame",
+    "inductive ContextFrame",
+    "Record ContextFrame",
+    "Definition ContextFrame",
+    "inductive Gauge",
+    "structure Gauge",
+    "Record Gauge",
+    "Definition Gauge",
+    "ExactSequence",
+  ]) {
+    assert(
+      !chiRegion.includes(forbidden),
+      `${label} chi bridge excludes host orientation authority: ${forbidden}`,
+    );
+  }
+}
+assert(
+  !lean.includes("axiom CTX_03_chi_direction_bridge") &&
+    !rocq.includes("Axiom CTX_03_chi_direction_bridge"),
+  "CTX-03 chi bridge is proved rather than postulated",
+);
+
 const fnd07 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-07");
 assert(fnd07 !== undefined, "P0 contains FND-07");
 same(
