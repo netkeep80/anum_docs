@@ -20,7 +20,7 @@
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
+    "commitSha": "006b0397d0a5160c47d34db0f20a377edd224132",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
