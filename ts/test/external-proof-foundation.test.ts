@@ -702,16 +702,17 @@ for (const [label, source, start, end] of [
 const inv02 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-02");
 assert(inv02 !== undefined, "P0 contains INV-02");
 assert(
-  JSON.stringify(inv02.assumptions) === JSON.stringify(["INV-01"]),
-  "INV-02 assumes only INV-01",
+  JSON.stringify(inv02.assumptions) === JSON.stringify(["INV-01", "FND-13"]),
+  "INV-02 exposes INV-01 plus the exact Grounded identity boundary",
 );
 assert(
-  JSON.stringify(inv02.dependsOn) === JSON.stringify(["INV-01"]),
-  "INV-02 depends exactly on INV-01",
+  JSON.stringify(inv02.dependsOn) === JSON.stringify(["INV-01", "FND-13"]),
+  "INV-02 depends exactly on INV-01 and FND-13",
 );
 assert(
-  /Exact domain on which INV-01 is defined/.test(inv02.scope as string),
-  "INV-02 scope is exactly the INV-01 domain",
+  /finite Grounded domain on which INV-01 is defined/i.test(inv02.scope as string) &&
+    /FND-13/i.test(inv02.scope as string),
+  "INV-02 scope records finite Grounded inversion plus FND-13 reconstruction",
 );
 assert(
   /No claim outside the declared recursive\/inversion domain/.test(inv02.exclusions as string),
@@ -814,8 +815,8 @@ assert(
   "INV-02 is not postulated as an axiom",
 );
 
-const invSupportIds = ["INV-03", "INV-04", "INV-05"] as const;
-for (const id of invSupportIds) {
+const invSimpleSupportIds = ["INV-03", "INV-04"] as const;
+for (const id of invSimpleSupportIds) {
   const target = (p0.targets as Record<string, any>[]).find((candidate) => candidate.id === id);
   assert(target !== undefined, `P0 contains ${id}`);
   assert(
@@ -827,6 +828,16 @@ for (const id of invSupportIds) {
     `${id} dependency remains exactly INV-01`,
   );
 }
+const inv05 = (p0.targets as Record<string, any>[]).find((candidate) => candidate.id === "INV-05");
+assert(inv05 !== undefined, "P0 contains INV-05");
+assert(
+  JSON.stringify(inv05.assumptions) === JSON.stringify(["INV-01", "INV-02", "INV-04"]),
+  "INV-05 exposes its actual INV-01/INV-02/INV-04 proof dependencies",
+);
+assert(
+  JSON.stringify(inv05.dependsOn) === JSON.stringify(["INV-01", "INV-02", "INV-04"]),
+  "INV-05 dependency graph matches the formal proof chain",
+);
 for (const source of [lean, rocq]) {
   assert(source.includes("INV_03_root_fixed"), "external source proves INV-03 ROOT fixed");
   assert(source.includes("INV_04_start_to_finish"), "external source proves INV-04 START to END");
