@@ -759,7 +759,7 @@ assert.deepEqual(
 for (const record of ctx03) {
   assert.equal(
     record.proofSource.commitSha,
-    "07d1808d1ba24b45bff9c000cbdd8aefae4a4e44",
+    "92d9259d38e8ea7cf81725221904ae6513540b21",
     `CTX-03 ${record.lane} proof source commit`,
   );
   assert.deepEqual(
@@ -790,6 +790,31 @@ for (const record of ctx03) {
     String(record.notes),
     /Link-native one-sided Context markers/i,
     "CTX-03 evidence records the Link-native Context carrier",
+  );
+  assert.match(
+    String(record.notes),
+    /unique chi\(K\)/i,
+    "CTX-03 evidence records unique Context chi selection",
+  );
+  assert.match(
+    String(record.notes),
+    /InR_K\/OutR_K.*exchanged by structural J|exchanged by structural J.*InR_K\/OutR_K/i,
+    "CTX-03 evidence records direction-witness J exchange",
+  );
+  assert.match(
+    String(record.notes),
+    /generalized-MP semantic-arrow covariance/i,
+    "CTX-03 evidence records generalized-MP semantic covariance",
+  );
+  assert.match(
+    String(record.notes),
+    /TechnicalStartOperation falsifier/i,
+    "CTX-03 evidence records the explicit non-covariant technical-operation boundary",
+  );
+  assert.match(
+    String(record.notes),
+    /global axiom allowlists remain empty/i,
+    "CTX-03 evidence records fail-closed axiom assurance",
   );
   assert.match(
     String(record.notes),
