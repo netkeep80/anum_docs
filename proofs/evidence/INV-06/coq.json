@@ -21,7 +21,7 @@
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "b23eed9dad473e992915d3c1d52b189faec456d9",
+    "commitSha": "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
@@ -30,8 +30,8 @@
   "artifacts": [
     {
       "path": "proofs/coq/MtsFoundation.v",
-      "sha256": "fbbeb427eaba05845f217fd2573d7d05d5d2d6046b50be3ca0306eda1387294b"
+      "sha256": "01adf311071e9310899a3f1d0b5eb1004031636061418a2beb5125a3b468d2a4"
     }
   ],
-  "notes": "External differential proof only. INV-06 is a representative root-basis calculation under one chosen Context-relative orientation: J(R)=R, J(O)=C, J(C)=O, J(L)=L, J(U)=U. O/C are the accepted F2/F3 one-sided representatives and L/U are ordinary PAIR-derived Links; U is derived PairLocal rather than postulated. No RootBasis ontology datatype, Foundation-global absolute START side, observer authority, or full-Theory automorphism claim is introduced."
+  "notes": "External differential proof only. INV-06 is a representative root-basis calculation under one chosen Context-relative orientation: J(R)=R, J(O)=C, J(C)=O, J(L)=L, J(U)=U. O/C are the accepted F2/F3 one-sided representatives and L/U are ordinary PAIR-derived Links; U is derived PairLocal rather than postulated. No RootBasis ontology datatype, Foundation-global absolute START side, observer authority, or full-Theory automorphism claim is introduced. Proof source is repinned after #1796 normalization-premise minimization; the stronger global arbitrary-Link normalization package is not imported by this accepted chain."
 }

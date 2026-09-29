@@ -7,17 +7,19 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "INV-01"
+    "INV-01",
+    "FND-13"
   ],
   "dependencies": [
-    "INV-01"
+    "INV-01",
+    "FND-13"
   ],
   "result": "proved",
   "authority": "external-cross-check",
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "2305f259426dfcda5920fa485040ee6c0af05902",
+    "commitSha": "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
@@ -26,8 +28,8 @@
   "artifacts": [
     {
       "path": "proofs/coq/MtsFoundation.v",
-      "sha256": "78910fed803c6de09912e16832128739a69b5efd0e6a711c0af8efa182563c4d"
+      "sha256": "01adf311071e9310899a3f1d0b5eb1004031636061418a2beb5125a3b468d2a4"
     }
   ],
-  "notes": "External differential proof only. INV-02 proves involution J(J(X))=X on exactly the same finite Grounded domain as INV-01 by reusing the same Prop-valued RecursiveInversion graph; no second inversion function or enlarged domain is introduced. START/END use derived one-sided canonicality, PAIR reverses both poles again through INV-01 and reconstructs the original semantic Link only downstream of FND-13. The first inversion image is proved Grounded before the second application. No classical choice, representation/codec authority, handles, labels, opcodes, or host field order participate."
+  "notes": "External differential proof only. INV-02 proves involution J(J(X))=X on exactly the finite Grounded domain of INV-01. START/END use derived one-sided canonicality. The PAIR branch reverses both poles again through INV-01 and reconstructs the original Link only through the separate Grounded FND-13 identity boundary. No stronger global arbitrary-Link normalization/extensionality premise, second inversion function, enlarged domain, classical choice, codec/handle identity, labels, opcodes, or host field order is introduced."
 }
