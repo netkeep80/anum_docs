@@ -16,7 +16,7 @@ import {
   resolveMarkdownAnchor as localResolveMarkdownAnchor,
 } from "../src/tooling/markdown-section-adapter.js";
 
-const REPO_GUARD_SHA = "a2e6c6ad95bc38bdd8983190e7922e7ef23375a5";
+const REPO_GUARD_SHA = "756944656fa14de752f44bb404e1dca852f5fa6a";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
 assert.match(REPO_GUARD_SHA, /^[0-9a-f]{40}$/, "repo-guard differential pin must be an exact commit SHA");
 
@@ -145,7 +145,7 @@ try {
   assert.equal(checked.stdout.trim(), REPO_GUARD_SHA, "differential must execute the pinned repo-guard SHA");
 
   const upstream = await import(
-    pathToFileURL(resolve(cloneRoot, "dist/markdown-structure.mjs")).href
+    pathToFileURL(resolve(cloneRoot, "dist/projection-api.mjs")).href
   );
 
   assert.deepEqual(
