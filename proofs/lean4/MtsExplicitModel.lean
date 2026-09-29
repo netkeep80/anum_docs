@@ -305,18 +305,26 @@ theorem fallback_cycle_not_grounded
     {x : ModelLink}
     (gx : Grounded ExplicitFoundation x) :
     x = badStart ∨ x = badFinish → False := by
-  induction gx with
-  | @node current startStep finishStep ihStart ihFinish =>
-      intro hBad
+  exact Grounded.rec
+    (motive := fun current _ =>
+      current = badStart ∨ current = badFinish → False)
+    (fun {current} _startStep _finishStep ihStart ihFinish hBad => by
       rcases hBad with hStart | hFinish
-      · subst current
-        have hne : ExplicitFoundation.finish badStart ≠ badStart := by
+      · have hne : ExplicitFoundation.finish current ≠ current := by
+          rw [hStart]
           simpa using badStart_ne_badFinish.symm
-        exact ihFinish hne (Or.inr finish_badStart)
-      · subst current
-        have hne : ExplicitFoundation.start badFinish ≠ badFinish := by
+        have hChild : ExplicitFoundation.finish current = badFinish := by
+          rw [hStart]
+          exact finish_badStart
+        exact ihFinish hne (Or.inr hChild)
+      · have hne : ExplicitFoundation.start current ≠ current := by
+          rw [hFinish]
           simpa using badStart_ne_badFinish
-        exact ihStart hne (Or.inl start_badFinish)
+        have hChild : ExplicitFoundation.start current = badStart := by
+          rw [hFinish]
+          exact start_badFinish
+        exact ihStart hne (Or.inl hChild))
+    gx
 
 theorem badStart_not_grounded :
     ¬ Grounded ExplicitFoundation badStart := by
@@ -374,17 +382,17 @@ theorem grounded_is_canonical
   · by_cases hx : x = badStart
     · subst x
       exact False.elim (badStart_not_grounded gx)
-    · cases gx with
-      | node startStep finishStep =>
-          have hStartNe : ExplicitFoundation.start x ≠ x := by
-            intro hEq
-            apply hx
-            calc
-              x = ExplicitFoundation.start x := hEq.symm
-              _ = badStart := hStart
-          have gBad : Grounded ExplicitFoundation badStart := by
-            simpa [hStart] using startStep hStartNe
-          exact False.elim (badStart_not_grounded gBad)
+    · have hStartNe : ExplicitFoundation.start x ≠ x := by
+        intro hEq
+        apply hx
+        calc
+          x = ExplicitFoundation.start x := hEq.symm
+          _ = badStart := hStart
+      have gStart :=
+        grounded_start_of_nonself ExplicitFoundation gx hStartNe
+      have gBad : Grounded ExplicitFoundation badStart := by
+        simpa [hStart] using gStart
+      exact False.elim (badStart_not_grounded gBad)
 
 /--
 Concrete Grounded normalization for the explicit model.
