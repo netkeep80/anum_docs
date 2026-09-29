@@ -279,10 +279,11 @@ Defined.
 
 Definition ExplicitOneSided : F2F3OneSidedExistence ExplicitFoundation.
 Proof.
-  refine {|
-    f2f3_start_root := model_start_form model_root;
-    f2f3_finish_root := model_end_form model_root
-  |}.
+  refine (@Build_F2F3OneSidedExistence
+    ExplicitFoundation
+    (model_start_form model_root)
+    (model_end_form model_root)
+    _ _ _ _).
   - symmetry. apply model_form_start_fixed.
   - symmetry. apply model_form_end_fixed.
   - apply model_start_form_ne_root.
@@ -297,11 +298,11 @@ Proof.
   unfold LocalSelfDecision, StartSelf, FinishSelf.
   split.
   - destruct (link_eq_dec (start ExplicitFoundation x) x) as [H | H].
-    + lhs. exact H.
-    + rhs. exact H.
+    + left. exact H.
+    + right. exact H.
   - destruct (link_eq_dec (finish ExplicitFoundation x) x) as [H | H].
-    + lhs. exact H.
-    + rhs. exact H.
+    + left. exact H.
+    + right. exact H.
 Qed.
 
 Definition ExplicitInversionDomain :
