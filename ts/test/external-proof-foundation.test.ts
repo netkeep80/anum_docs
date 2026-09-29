@@ -228,8 +228,8 @@ same(
 );
 same(
   p0.constraints.poleExtensionalityAvailableAfterFnd02,
-  true,
-  "A6/pole extensionality is downstream of FND-02",
+  false,
+  "A6/pole extensionality is not inferred merely from completing FND-02",
 );
 assert(
   (fnd02.assumptions as string[]).some((value) => value.includes("A1")),
@@ -246,8 +246,9 @@ assert(
   "FND-02 assumptions do not smuggle A6 identity-by-poles",
 );
 assert(
-  /A6.*downstream/i.test(fnd02.exclusions as string),
-  "FND-02 exclusion records A6 as downstream",
+  /separate explicit premises/i.test(fnd02.exclusions as string) &&
+    /no dependency between them/i.test(fnd02.exclusions as string),
+  "FND-02 exclusion records FND-13 as independent unless a bridge is proved",
 );
 
 for (const source of [lean, rocq]) {
