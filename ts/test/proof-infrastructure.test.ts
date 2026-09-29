@@ -478,6 +478,76 @@ for (const record of evidenceRecords
   );
 }
 
+const inv0506 = [
+  ["INV-05", "54af5c6c1f9bfdaa7c23331cb431355a886794ec"],
+  ["INV-06", "b23eed9dad473e992915d3c1d52b189faec456d9"],
+] as const;
+for (const [theoremId, proofCommit] of inv0506) {
+  const records = evidenceRecords
+    .filter(({ record }) => record.theoremId === theoremId)
+    .map(({ record }) => record);
+  assert.equal(records.length, 2, `${theoremId} has exactly two external evidence records`);
+  assert.deepEqual(
+    records.map((record) => record.lane).sort(),
+    ["coq", "lean4"],
+    `${theoremId} external lanes`,
+  );
+  for (const record of records) {
+    assert.equal(
+      record.proofSource.commitSha,
+      proofCommit,
+      `${theoremId} ${record.lane} proof source commit`,
+    );
+    if (record.lane === "lean4") {
+      assert.ok(
+        record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit) &&
+          record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+        `${theoremId} Lean evidence keeps exact compiler/artifact pins`,
+      );
+    }
+    if (record.lane === "coq") {
+      assert.ok(
+        record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit) &&
+          record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+        `${theoremId} Rocq evidence keeps exact compiler/image pins`,
+      );
+    }
+  }
+}
+for (const record of evidenceRecords
+  .filter(({ record }) => record.theoremId === "INV-05")
+  .map(({ record }) => record)) {
+  assert.match(
+    String(record.notes),
+    /PAIR.*PairLocal|PairLocal.*PAIR/i,
+    "INV-05 evidence records PAIR preservation",
+  );
+  assert.match(
+    String(record.notes),
+    /no pairPreserved|no.*new inversion-domain axiom/i,
+    "INV-05 evidence records no new preservation axiom",
+  );
+  assert.match(
+    String(record.notes),
+    /INV-02.*derived|derived.*INV-02/i,
+    "INV-05 evidence records INV-02 as a derived same-basis lemma",
+  );
+}
+for (const record of evidenceRecords
+  .filter(({ record }) => record.theoremId === "INV-06")
+  .map(({ record }) => record)) {
+  assert.match(
+    String(record.notes),
+    /J\(R\)=R.*J\(O\)=C.*J\(C\)=O.*J\(L\)=L.*J\(U\)=U/i,
+    "INV-06 evidence records root-basis calculation",
+  );
+  assert.match(
+    String(record.notes),
+    /Context-relative|no RootBasis ontology|no.*Foundation-global/i,
+    "INV-06 evidence preserves representative/orientation boundary",
+  );
+}
+
 const leanEvidence = fnd02.find((record) => record.lane === "lean4");
 const coqEvidence = fnd02.find((record) => record.lane === "coq");
 assert.ok(leanEvidence !== undefined && coqEvidence !== undefined);
@@ -499,5 +569,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq aprover-input=mtsNative-only`,
 );
