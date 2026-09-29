@@ -82,6 +82,21 @@ assert(
   "Rocq explicit model discharges A1RecursiveSeparation",
 );
 
+for (const [lane, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  for (const symbol of [
+    "HasNatInjection",
+    "left_root_embed_injective",
+    "finish_root_not_left_root_image",
+    lane === "Lean" ? "leftRootOrbit_injective" : "left_root_orbit_injective",
+    "one_sided_existence_implies_nat_injection",
+  ]) {
+    assert(
+      source.includes(symbol),
+      `${lane} explicit proof boundary exposes constructive infinitude witness ${symbol}`,
+    );
+  }
+}
+
 const replaySymbols = [
   "explicit_fnd02_replay",
   "explicit_fnd01_replay",

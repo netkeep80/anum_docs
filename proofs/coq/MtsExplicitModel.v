@@ -1014,6 +1014,106 @@ Definition explicit_ctx03_semantic_replay :=
     ExplicitOneSided
     ExplicitInversionDomain.
 
+
+(*
+EXTERNAL THEORY PROJECTION: constructive infinitude witness.
+
+This is prover-side cardinality evidence only. It introduces no MTS entity.
+The endomap x |-> form(x,R) is injective by the START projection. The proper
+END(ROOT) witness is not in its image because every image has finish=R while
+END(ROOT) finishes at itself and is distinct from R. Iteration therefore
+embeds nat into Link.
+*)
+Definition HasNatInjection (F : Foundation) : Prop :=
+  exists encode : nat -> Link F,
+    forall m n : nat, encode m = encode n -> m = n.
+
+Lemma left_root_embed_injective :
+  forall (F : Foundation) (a b : Link F),
+    form F a (R F) = form F b (R F) ->
+    a = b.
+Proof.
+  intros F a b H.
+  pose proof (f_equal (start F) H) as Hstart.
+  rewrite (form_start F a (R F)) in Hstart.
+  rewrite (form_start F b (R F)) in Hstart.
+  exact Hstart.
+Qed.
+
+Lemma finish_root_not_left_root_image :
+  forall (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (x : Link F),
+    form F x (R F) <> f2f3_finish_root F E.
+Proof.
+  intros F E x H.
+  pose proof (f_equal (finish F) H) as Hfinish.
+  rewrite (form_finish F x (R F)) in Hfinish.
+  rewrite (f2f3_finish_root_finish F E) in Hfinish.
+  apply (f2f3_finish_root_ne_root F E).
+  symmetry.
+  exact Hfinish.
+Qed.
+
+Fixpoint left_root_orbit
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (n : nat) : Link F :=
+  match n with
+  | O => f2f3_finish_root F E
+  | S k => form F (left_root_orbit F E k) (R F)
+  end.
+
+Lemma left_root_orbit_succ_ne_zero :
+  forall (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (n : nat),
+    left_root_orbit F E (S n) <> left_root_orbit F E O.
+Proof.
+  intros F E n.
+  simpl.
+  apply finish_root_not_left_root_image.
+Qed.
+
+Theorem left_root_orbit_injective :
+  forall (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (m n : nat),
+    left_root_orbit F E m = left_root_orbit F E n ->
+    m = n.
+Proof.
+  intros F E m.
+  induction m as [|m IH].
+  - intros n H.
+    destruct n as [|n].
+    + reflexivity.
+    + exfalso.
+      apply (left_root_orbit_succ_ne_zero F E n).
+      symmetry.
+      exact H.
+  - intros n H.
+    destruct n as [|n].
+    + exfalso.
+      apply (left_root_orbit_succ_ne_zero F E m).
+      exact H.
+    + f_equal.
+      apply IH.
+      apply (left_root_embed_injective F).
+      exact H.
+Qed.
+
+Theorem one_sided_existence_implies_nat_injection :
+  forall (F : Foundation)
+    (E : F2F3OneSidedExistence F),
+    HasNatInjection F.
+Proof.
+  intros F E.
+  exists (left_root_orbit F E).
+  intros m n H.
+  exact (left_root_orbit_injective F E m n H).
+Qed.
+
+
 Theorem explicit_grounded_slice :
   Grounded ExplicitFoundation (R ExplicitFoundation) /\
   Grounded ExplicitFoundation (f2f3_start_root ExplicitFoundation ExplicitOneSided) /\
