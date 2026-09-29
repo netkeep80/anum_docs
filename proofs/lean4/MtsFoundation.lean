@@ -1371,7 +1371,7 @@ theorem INV_02_recursive_inversion_involutive
         z = D.startForm secondChild := hz
         _ = D.startForm (F.finish x) := congrArg D.startForm hSecondEq
         _ = x :=
-          (recursive_start_form_canonical F a1 E D x gx hStart).symm
+          (recursive_start_form_canonical F a1 E D gx hStart).symm
   | @finish x childInverse hFinish hChild ih =>
       have hYStart : StartOnly F (D.startForm childInverse) :=
         recursive_start_form_pattern F a1 E D childInverse
@@ -1392,7 +1392,7 @@ theorem INV_02_recursive_inversion_involutive
         z = D.endForm secondChild := hz
         _ = D.endForm (F.start x) := congrArg D.endForm hSecondEq
         _ = x :=
-          (recursive_end_form_canonical F a1 E D x gx hFinish).symm
+          (recursive_end_form_canonical F a1 E D gx hFinish).symm
   | @pair x inverseFinish inverseStart hPair hFinishInv hStartInv ihFinish ihStart =>
       rcases INV_01_recursive_pole_reversal F D hyz with
         ⟨secondFinish, secondStart, hSecondFinish, hSecondStart, hzForm⟩
