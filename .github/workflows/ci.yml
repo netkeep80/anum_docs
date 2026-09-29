@@ -77,6 +77,8 @@ jobs:
           tar --zstd -xf /tmp/mts-lean.tar.zst -C /tmp/mts-lean --strip-components=1
           /tmp/mts-lean/bin/lean --version
           /tmp/mts-lean/bin/lean proofs/lean4/MtsFoundation.lean
+          cat proofs/lean4/MtsFoundation.lean proofs/lean4/MtsExplicitModel.lean > /tmp/MtsFoundationWithExplicitModel.lean
+          /tmp/mts-lean/bin/lean /tmp/MtsFoundationWithExplicitModel.lean
 
           cp proofs/lean4/MtsFoundation.lean /tmp/MtsFoundationAssurance.lean
           node <<'NODE'
