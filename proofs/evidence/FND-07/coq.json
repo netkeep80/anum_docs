@@ -1,0 +1,31 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-07",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "accepted contextual truth semantics"
+  ],
+  "dependencies": [],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "64a0109002a0c5158db4c173e0288d03c2357906",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "8724b2b7434fae22da4b18ffb048fc24803b6d25d72f3f11524e7aa3ce081679"
+    }
+  ],
+  "notes": "External differential proof only. FND-07 now separates three roles explicitly. The accepted root truth-value aspect L is the structural root-basis PAIR O->C supplied by the existing F2/F3 one-sided representatives; calling that carrier the truth value is an accepted A16/V14-L11 semantic premise, not a derivation from bare Foundation. Contextual truth is witnessed by the current Link K->A, so ambient structural existence alone is not truth in Context. The accepted current-Scope composition premise yields contextual detachment K->A current + A->B current => K->B current. The same ambient proposition A can therefore have different truth status in distinct Contexts while A itself is unchanged. No universal structural disequality L != K->A is asserted. CurrentScopeMember and ContextualScopeCompositionLaw are host Prop-valued proof projections only; no Set/Bool/map/environment or other host collection becomes truth authority. No additional external mathematical theory is introduced."
+}
