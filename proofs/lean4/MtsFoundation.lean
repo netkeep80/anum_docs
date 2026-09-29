@@ -1812,4 +1812,565 @@ theorem INV_07_objective_chirality
         (INV_05_pair_preserved_and_reversed
           F a1 N E D hPair hxy).1
 
+
+/--
+CTX-03 prover-side vocabulary.
+
+These are propositions over existing Links, not a Frame/Gauge ontology.  In
+particular there is no Bool/enum whose value is semantic orientation authority.
+-/
+def ProperOneSided (F : Foundation) (x : F.Link) : Prop :=
+  StartOnly F x ∨ FinishOnly F x
+
+def SameChiralClass (F : Foundation) (x y : F.Link) : Prop :=
+  (StartOnly F x ∧ StartOnly F y) ∨
+  (FinishOnly F x ∧ FinishOnly F y)
+
+def OppositeChiralClass (F : Foundation) (x y : F.Link) : Prop :=
+  (StartOnly F x ∧ FinishOnly F y) ∨
+  (FinishOnly F x ∧ StartOnly F y)
+
+def ContextOrientationMarker
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    (body marker : F.Link) : Prop :=
+  marker = D.startForm body ∨ marker = D.endForm body
+
+def ContextFrameRoles
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    (body marker startK endK : F.Link) : Prop :=
+  (marker = D.startForm body ∧
+    startK = D.startForm body ∧
+    endK = D.endForm body) ∨
+  (marker = D.endForm body ∧
+    startK = D.endForm body ∧
+    endK = D.startForm body)
+
+def ContextSelectsChi
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (body marker chi : F.Link) : Prop :=
+  (marker = D.startForm body ∧
+    chi = F.form F.R E.startRoot) ∨
+  (marker = D.endForm body ∧
+    chi = F.form E.finishRoot F.R)
+
+def ObjectiveChiralOrbit
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) : Prop :=
+  let wStart := F.form F.R E.startRoot
+  let wFinish := F.form E.finishRoot F.R
+  wStart ≠ wFinish ∧
+  RecursiveInversion F D wStart wFinish ∧
+  RecursiveInversion F D wFinish wStart ∧
+  ∀ z : F.Link,
+    RecursiveInversion F D wFinish z →
+    z = wStart
+
+def ContextSelectionLaw
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) : Prop :=
+  ∀ body marker : F.Link,
+    ContextOrientationMarker F D body marker →
+    ∃ startK endK chi : F.Link,
+      ContextFrameRoles F D body marker startK endK ∧
+      ContextSelectsChi F E D body marker chi ∧
+      ProperOneSided F startK ∧
+      ProperOneSided F endK ∧
+      startK ≠ endK
+
+def RelativeZ2Law (F : Foundation) : Prop :=
+  (∀ x : F.Link, ProperOneSided F x → SameChiralClass F x x) ∧
+  (∀ x y : F.Link, SameChiralClass F x y → SameChiralClass F y x) ∧
+  (∀ x y : F.Link, OppositeChiralClass F x y → OppositeChiralClass F y x) ∧
+  (∀ x y : F.Link,
+    ProperOneSided F x →
+    ProperOneSided F y →
+    SameChiralClass F x y ∨ OppositeChiralClass F x y) ∧
+  (∀ x y : F.Link,
+    SameChiralClass F x y →
+    OppositeChiralClass F x y →
+    False) ∧
+  (∀ a b c : F.Link,
+    SameChiralClass F a b →
+    SameChiralClass F b c →
+    SameChiralClass F a c) ∧
+  (∀ a b c : F.Link,
+    SameChiralClass F a b →
+    OppositeChiralClass F b c →
+    OppositeChiralClass F a c) ∧
+  (∀ a b c : F.Link,
+    OppositeChiralClass F a b →
+    SameChiralClass F b c →
+    OppositeChiralClass F a c) ∧
+  (∀ a b c : F.Link,
+    OppositeChiralClass F a b →
+    OppositeChiralClass F b c →
+    SameChiralClass F a c)
+
+def InversionIsMirrorTransport
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E) : Prop :=
+  ∀ x y : F.Link,
+    RecursiveInversion F D x y →
+    ProperOneSided F x →
+    ProperOneSided F y ∧ OppositeChiralClass F x y
+
+def ContextChiTransportLaw
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) : Prop :=
+  ∀ bodyA markerA chiA bodyB markerB chiB : F.Link,
+    ContextSelectsChi F E D bodyA markerA chiA →
+    ContextSelectsChi F E D bodyB markerB chiB →
+    (SameChiralClass F markerA markerB → chiA = chiB) ∧
+    (OppositeChiralClass F markerA markerB →
+      RecursiveInversion F D chiA chiB)
+
+theorem ctx03_root_start_witness_pair
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F (F.form F.R E.startRoot) := by
+  constructor
+  · intro hSelf
+    have hEq : F.R = F.form F.R E.startRoot := by
+      calc
+        F.R = F.start (F.form F.R E.startRoot) :=
+          (F.form_start F.R E.startRoot).symm
+        _ = F.form F.R E.startRoot := hSelf
+    have h := congrArg F.finish hEq
+    have hRootStart : F.R = E.startRoot := by
+      simpa only [(root_full_self F).2, F.form_finish] using h
+    exact E.startRootNeRoot hRootStart.symm
+  · intro hSelf
+    have hEq : E.startRoot = F.form F.R E.startRoot := by
+      calc
+        E.startRoot = F.finish (F.form F.R E.startRoot) :=
+          (F.form_finish F.R E.startRoot).symm
+        _ = F.form F.R E.startRoot := hSelf
+    have h := congrArg F.start hEq
+    have hStartRoot : E.startRoot = F.R := by
+      simpa only [f2f3_start_root_start F E, F.form_start] using h
+    exact E.startRootNeRoot hStartRoot
+
+theorem ctx03_root_finish_witness_pair
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F (F.form E.finishRoot F.R) := by
+  constructor
+  · intro hSelf
+    have hEq : E.finishRoot = F.form E.finishRoot F.R := by
+      calc
+        E.finishRoot = F.start (F.form E.finishRoot F.R) :=
+          (F.form_start E.finishRoot F.R).symm
+        _ = F.form E.finishRoot F.R := hSelf
+    have h := congrArg F.finish hEq
+    have hFinishRoot : E.finishRoot = F.R := by
+      simpa only [f2f3_finish_root_finish F E, F.form_finish] using h
+    exact E.finishRootNeRoot hFinishRoot
+  · intro hSelf
+    have hEq : F.R = F.form E.finishRoot F.R := by
+      calc
+        F.R = F.finish (F.form E.finishRoot F.R) :=
+          (F.form_finish E.finishRoot F.R).symm
+        _ = F.form E.finishRoot F.R := hSelf
+    have h := congrArg F.start hEq
+    have hRootFinish : F.R = E.finishRoot := by
+      simpa only [(root_full_self F).1, F.form_start] using h
+    exact E.finishRootNeRoot hRootFinish.symm
+
+theorem ctx03_root_marker_inversions
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    RecursiveInversion F D E.startRoot E.finishRoot ∧
+    RecursiveInversion F D E.finishRoot E.startRoot := by
+  have hR : RecursiveInversion F D F.R F.R :=
+    RecursiveInversion.root (F := F) (D := D)
+  have hO : RecursiveInversion F D E.startRoot E.finishRoot := by
+    have hChild :
+        RecursiveInversion F D (F.finish E.startRoot) F.R := by
+      simpa only [f2f3_start_root_finish F E] using hR
+    have h :=
+      RecursiveInversion.start
+        (D := D)
+        (f2f3_start_root_pattern F E)
+        hChild
+    simpa only [D.endRootCompat] using h
+  have hC : RecursiveInversion F D E.finishRoot E.startRoot := by
+    have hChild :
+        RecursiveInversion F D (F.start E.finishRoot) F.R := by
+      simpa only [f2f3_finish_root_start F E] using hR
+    have h :=
+      RecursiveInversion.finish
+        (D := D)
+        (f2f3_finish_root_pattern F E)
+        hChild
+    simpa only [D.startRootCompat] using h
+  exact ⟨hO, hC⟩
+
+theorem ctx03_objective_chiral_orbit
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    ObjectiveChiralOrbit F E D := by
+  dsimp [ObjectiveChiralOrbit]
+  have hR : RecursiveInversion F D F.R F.R :=
+    RecursiveInversion.root (F := F) (D := D)
+  have hMarkers := ctx03_root_marker_inversions F E D
+  have hStartPair := ctx03_root_start_witness_pair F E
+  have hFinishPair := ctx03_root_finish_witness_pair F E
+  have hStartToFinish :
+      RecursiveInversion F D
+        (F.form F.R E.startRoot)
+        (F.form E.finishRoot F.R) := by
+    apply RecursiveInversion.pair hStartPair
+    · simpa only [F.form_finish] using hMarkers.1
+    · simpa only [F.form_start] using hR
+  have hFinishToStart :
+      RecursiveInversion F D
+        (F.form E.finishRoot F.R)
+        (F.form F.R E.startRoot) := by
+    apply RecursiveInversion.pair hFinishPair
+    · simpa only [F.form_finish] using hR
+    · simpa only [F.form_start] using hMarkers.2
+  have hDistinct :
+      F.form F.R E.startRoot ≠ F.form E.finishRoot F.R := by
+    intro hEq
+    have h := congrArg F.start hEq
+    have hRootFinish : F.R = E.finishRoot := by
+      simpa only [F.form_start] using h
+    exact E.finishRootNeRoot hRootFinish.symm
+  refine ⟨hDistinct, hStartToFinish, hFinishToStart, ?_⟩
+  intro z hz
+  exact INV_02_recursive_inversion_involutive
+    F a1 N E D hStartToFinish hz
+
+theorem ctx03_context_marker_proper
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {body marker : F.Link}
+    (hMarker : ContextOrientationMarker F D body marker) :
+    ProperOneSided F marker := by
+  rcases hMarker with h | h
+  · rw [h]
+    exact Or.inl (recursive_start_form_pattern F a1 E D body)
+  · rw [h]
+    exact Or.inr (recursive_end_form_pattern F a1 E D body)
+
+theorem ctx03_context_marker_forms_distinct
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (body : F.Link) :
+    D.startForm body ≠ D.endForm body := by
+  intro hEq
+  have hStart := recursive_start_form_pattern F a1 E D body
+  have hFinish := recursive_end_form_pattern F a1 E D body
+  rw [← hEq] at hFinish
+  exact recursive_start_finish_disjoint F hStart hFinish
+
+theorem ctx03_context_selection
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    ContextSelectionLaw F E D := by
+  intro body marker hMarker
+  rcases hMarker with hStart | hFinish
+  · refine ⟨
+      D.startForm body,
+      D.endForm body,
+      F.form F.R E.startRoot,
+      ?_, ?_, ?_, ?_, ?_
+    ⟩
+    · exact Or.inl ⟨hStart, rfl, rfl⟩
+    · exact Or.inl ⟨hStart, rfl⟩
+    · exact Or.inl (recursive_start_form_pattern F a1 E D body)
+    · exact Or.inr (recursive_end_form_pattern F a1 E D body)
+    · exact ctx03_context_marker_forms_distinct F a1 E D body
+  · refine ⟨
+      D.endForm body,
+      D.startForm body,
+      F.form E.finishRoot F.R,
+      ?_, ?_, ?_, ?_, ?_
+    ⟩
+    · exact Or.inr ⟨hFinish, rfl, rfl⟩
+    · exact Or.inr ⟨hFinish, rfl⟩
+    · exact Or.inr (recursive_end_form_pattern F a1 E D body)
+    · exact Or.inl (recursive_start_form_pattern F a1 E D body)
+    · exact (ctx03_context_marker_forms_distinct F a1 E D body).symm
+
+theorem ctx03_same_refl
+    (F : Foundation)
+    {x : F.Link}
+    (hx : ProperOneSided F x) :
+    SameChiralClass F x x := by
+  rcases hx with hStart | hFinish
+  · exact Or.inl ⟨hStart, hStart⟩
+  · exact Or.inr ⟨hFinish, hFinish⟩
+
+theorem ctx03_same_symm
+    (F : Foundation)
+    {x y : F.Link}
+    (h : SameChiralClass F x y) :
+    SameChiralClass F y x := by
+  rcases h with h | h
+  · exact Or.inl ⟨h.2, h.1⟩
+  · exact Or.inr ⟨h.2, h.1⟩
+
+theorem ctx03_opposite_symm
+    (F : Foundation)
+    {x y : F.Link}
+    (h : OppositeChiralClass F x y) :
+    OppositeChiralClass F y x := by
+  rcases h with h | h
+  · exact Or.inr ⟨h.2, h.1⟩
+  · exact Or.inl ⟨h.2, h.1⟩
+
+theorem ctx03_transport_total
+    (F : Foundation)
+    {x y : F.Link}
+    (hx : ProperOneSided F x)
+    (hy : ProperOneSided F y) :
+    SameChiralClass F x y ∨ OppositeChiralClass F x y := by
+  rcases hx with hx | hx
+  · rcases hy with hy | hy
+    · exact Or.inl (Or.inl ⟨hx, hy⟩)
+    · exact Or.inr (Or.inl ⟨hx, hy⟩)
+  · rcases hy with hy | hy
+    · exact Or.inr (Or.inr ⟨hx, hy⟩)
+    · exact Or.inl (Or.inr ⟨hx, hy⟩)
+
+theorem ctx03_transport_disjoint
+    (F : Foundation)
+    {x y : F.Link}
+    (hSame : SameChiralClass F x y)
+    (hOpposite : OppositeChiralClass F x y) :
+    False := by
+  rcases hSame with hSame | hSame
+  · rcases hOpposite with hOpposite | hOpposite
+    · exact recursive_start_finish_disjoint F hSame.2 hOpposite.2
+    · exact recursive_start_finish_disjoint F hSame.1 hOpposite.1
+  · rcases hOpposite with hOpposite | hOpposite
+    · exact recursive_start_finish_disjoint F hOpposite.1 hSame.1
+    · exact recursive_start_finish_disjoint F hOpposite.2 hSame.2
+
+theorem ctx03_same_same
+    (F : Foundation)
+    {a b c : F.Link}
+    (hab : SameChiralClass F a b)
+    (hbc : SameChiralClass F b c) :
+    SameChiralClass F a c := by
+  rcases hab with hab | hab
+  · rcases hbc with hbc | hbc
+    · exact Or.inl ⟨hab.1, hbc.2⟩
+    · exact False.elim
+        (recursive_start_finish_disjoint F hab.2 hbc.1)
+  · rcases hbc with hbc | hbc
+    · exact False.elim
+        (recursive_start_finish_disjoint F hbc.1 hab.2)
+    · exact Or.inr ⟨hab.1, hbc.2⟩
+
+theorem ctx03_same_opposite
+    (F : Foundation)
+    {a b c : F.Link}
+    (hab : SameChiralClass F a b)
+    (hbc : OppositeChiralClass F b c) :
+    OppositeChiralClass F a c := by
+  rcases hab with hab | hab
+  · rcases hbc with hbc | hbc
+    · exact Or.inl ⟨hab.1, hbc.2⟩
+    · exact False.elim
+        (recursive_start_finish_disjoint F hab.2 hbc.1)
+  · rcases hbc with hbc | hbc
+    · exact False.elim
+        (recursive_start_finish_disjoint F hbc.1 hab.2)
+    · exact Or.inr ⟨hab.1, hbc.2⟩
+
+theorem ctx03_opposite_same
+    (F : Foundation)
+    {a b c : F.Link}
+    (hab : OppositeChiralClass F a b)
+    (hbc : SameChiralClass F b c) :
+    OppositeChiralClass F a c := by
+  rcases hab with hab | hab
+  · rcases hbc with hbc | hbc
+    · exact False.elim
+        (recursive_start_finish_disjoint F hbc.1 hab.2)
+    · exact Or.inl ⟨hab.1, hbc.2⟩
+  · rcases hbc with hbc | hbc
+    · exact Or.inr ⟨hab.1, hbc.2⟩
+    · exact False.elim
+        (recursive_start_finish_disjoint F hab.2 hbc.1)
+
+theorem ctx03_opposite_opposite
+    (F : Foundation)
+    {a b c : F.Link}
+    (hab : OppositeChiralClass F a b)
+    (hbc : OppositeChiralClass F b c) :
+    SameChiralClass F a c := by
+  rcases hab with hab | hab
+  · rcases hbc with hbc | hbc
+    · exact False.elim
+        (recursive_start_finish_disjoint F hbc.1 hab.2)
+    · exact Or.inl ⟨hab.1, hbc.2⟩
+  · rcases hbc with hbc | hbc
+    · exact Or.inr ⟨hab.1, hbc.2⟩
+    · exact False.elim
+        (recursive_start_finish_disjoint F hab.2 hbc.1)
+
+theorem ctx03_relative_z2
+    (F : Foundation) :
+    RelativeZ2Law F := by
+  exact ⟨
+    fun _ hx => ctx03_same_refl F hx,
+    fun _ _ h => ctx03_same_symm F h,
+    fun _ _ h => ctx03_opposite_symm F h,
+    fun _ _ hx hy => ctx03_transport_total F hx hy,
+    fun _ _ hs ho => ctx03_transport_disjoint F hs ho,
+    fun _ _ _ hab hbc => ctx03_same_same F hab hbc,
+    fun _ _ _ hab hbc => ctx03_same_opposite F hab hbc,
+    fun _ _ _ hab hbc => ctx03_opposite_same F hab hbc,
+    fun _ _ _ hab hbc => ctx03_opposite_opposite F hab hbc
+  ⟩
+
+theorem ctx03_inversion_is_mirror_transport
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    InversionIsMirrorTransport F D := by
+  intro x y hxy hx
+  rcases hx with hStart | hFinish
+  · have h := INV_07_objective_chirality F a1 N E D x y hxy
+    have hY := (h.1 hStart).1
+    exact ⟨Or.inr hY, Or.inl ⟨hStart, hY⟩⟩
+  · have h := INV_07_objective_chirality F a1 N E D x y hxy
+    have hY := (h.2.1 hFinish).1
+    exact ⟨Or.inl hY, Or.inr ⟨hFinish, hY⟩⟩
+
+theorem ctx03_chi_transport
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    ContextChiTransportLaw F E D := by
+  have hOrbit := ctx03_objective_chiral_orbit F a1 N E D
+  have hStartToFinish := hOrbit.2.1
+  have hFinishToStart := hOrbit.2.2.1
+  intro bodyA markerA chiA bodyB markerB chiB hA hB
+  rcases hA with hA | hA
+  · rcases hB with hB | hB
+    · subst markerA
+      subst chiA
+      subst markerB
+      subst chiB
+      constructor
+      · intro _
+        rfl
+      · intro hOpp
+        exact False.elim
+          (ctx03_transport_disjoint F
+            (Or.inl ⟨
+              recursive_start_form_pattern F a1 E D bodyA,
+              recursive_start_form_pattern F a1 E D bodyB
+            ⟩)
+            hOpp)
+    · subst markerA
+      subst chiA
+      subst markerB
+      subst chiB
+      constructor
+      · intro hSame
+        exact False.elim
+          (ctx03_transport_disjoint F
+            hSame
+            (Or.inl ⟨
+              recursive_start_form_pattern F a1 E D bodyA,
+              recursive_end_form_pattern F a1 E D bodyB
+            ⟩))
+      · intro _
+        exact hStartToFinish
+  · rcases hB with hB | hB
+    · subst markerA
+      subst chiA
+      subst markerB
+      subst chiB
+      constructor
+      · intro hSame
+        exact False.elim
+          (ctx03_transport_disjoint F
+            hSame
+            (Or.inr ⟨
+              recursive_end_form_pattern F a1 E D bodyA,
+              recursive_start_form_pattern F a1 E D bodyB
+            ⟩))
+      · intro _
+        exact hFinishToStart
+    · subst markerA
+      subst chiA
+      subst markerB
+      subst chiB
+      constructor
+      · intro _
+        rfl
+      · intro hOpp
+        exact False.elim
+          (ctx03_transport_disjoint F
+            (Or.inr ⟨
+              recursive_end_form_pattern F a1 E D bodyA,
+              recursive_end_form_pattern F a1 E D bodyB
+            ⟩)
+            hOpp)
+
+/--
+CTX-03 capstone.
+
+The objective orbit exists before Context selection.  A Context marker is an
+ordinary one-sided Link around its body and selects local START_K/END_K roles
+and chi(K) only relationally.  Relative frame transport is the Same/Opposite
+Z2 law, and structural inversion J is exactly the mirror relation on one-sided
+markers.
+
+No host Bool, enum, ordered frame token, ExactSequence, codec coordinate or
+technical pole address is orientation authority.
+-/
+theorem CTX_03_context_relative_z2
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    ObjectiveChiralOrbit F E D ∧
+    ContextSelectionLaw F E D ∧
+    RelativeZ2Law F ∧
+    InversionIsMirrorTransport F D ∧
+    ContextChiTransportLaw F E D := by
+  exact ⟨
+    ctx03_objective_chiral_orbit F a1 N E D,
+    ctx03_context_selection F a1 E D,
+    ctx03_relative_z2 F,
+    ctx03_inversion_is_mirror_transport F a1 N E D,
+    ctx03_chi_transport F a1 N E D
+  ⟩
+
 end MTS.External
