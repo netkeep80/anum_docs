@@ -1281,8 +1281,8 @@ Proof.
   - exact ((proj2 Hstart) Hfa).
   - exact ((proj2 Hcanonical) Hfb).
   - exact (Hna (proj1 Hstart)).
-  - rewrite (recursive_start_finish F E D (finish F x)) in Hchild.
-    exact (distinguishable_irreflexive F (finish F x) Hchild).
+  - rewrite (recursive_start_finish F E D (finish F a)) in Hchild.
+    exact (distinguishable_irreflexive F (finish F a) Hchild).
 Qed.
 
 (* A grounded FinishOnly Link is the unique semantic END of its external
@@ -1320,8 +1320,8 @@ Proof.
   - exact ((proj1 Hcanonical) Hsb).
   - exact (Hnfb (proj2 Hcanonical)).
   - exact (Hnfa (proj2 Hfinish)).
-  - rewrite (recursive_end_start F E D (start F x)) in Hchild.
-    exact (distinguishable_irreflexive F (start F x) Hchild).
+  - rewrite (recursive_end_start F E D (start F a)) in Hchild.
+    exact (distinguishable_irreflexive F (start F a) Hchild).
   - exact (Hnfa (proj2 Hfinish)).
 Qed.
 
