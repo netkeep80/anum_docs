@@ -369,7 +369,7 @@ Proof.
       finish ExplicitFoundation model_bad_start <> model_bad_start
     ).
     {
-      change model_finish model_bad_start <> model_bad_start.
+      change (model_finish model_bad_start <> model_bad_start).
       rewrite model_finish_bad_start.
       exact model_bad_start_ne_bad_finish.
     }
@@ -383,7 +383,7 @@ Proof.
       start ExplicitFoundation model_bad_finish <> model_bad_finish
     ).
     {
-      change model_start model_bad_finish <> model_bad_finish.
+      change (model_start model_bad_finish <> model_bad_finish).
       rewrite model_start_bad_finish.
       exact model_bad_start_ne_bad_finish.
     }
@@ -446,7 +446,7 @@ Proof.
         start ExplicitFoundation x <> x
       ).
       {
-        change model_start x <> x.
+        change (model_start x <> x).
         intros Heq.
         apply Hx.
         transitivity (model_start x).
