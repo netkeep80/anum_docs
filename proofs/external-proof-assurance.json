@@ -131,10 +131,12 @@
     {
       "id": "CTX-03",
       "lean4": [
-        "MTS.External.CTX_03_context_relative_gauge"
+        "MTS.External.CTX_03_context_relative_gauge",
+        "MTS.External.CTX_03_semantic_covariance_capstone"
       ],
       "rocq": [
-        "CTX_03_context_relative_gauge"
+        "CTX_03_context_relative_gauge",
+        "CTX_03_semantic_covariance_capstone"
       ]
     }
   ]
