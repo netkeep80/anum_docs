@@ -150,7 +150,7 @@ sameSet(
 same(
   JSON.stringify(firstWave.slice(0, 3)),
   JSON.stringify(["FND-02", "FND-13", "FND-01"]),
-  "foundation proof order begins FND-02 -> FND-13 -> FND-01",
+  "foundation differential review order remains FND-02 -> FND-13 -> FND-01 without implying dependency",
 );
 for (const id of firstWave) {
   const target = targets.find((candidate) => candidate.id === id);
@@ -162,11 +162,11 @@ const fnd02 = targets.find((target) => target.id === "FND-02")!;
 const fnd13 = targets.find((target) => target.id === "FND-13")!;
 const fnd01 = targets.find((target) => target.id === "FND-01")!;
 const fnd08 = targets.find((target) => target.id === "FND-08")!;
-sameSet(fnd13.dependsOn as string[], ["FND-02"], "FND-13 depends only on unique ROOT");
+sameSet(fnd13.dependsOn as string[], [], "FND-13 has no fake FND-02 dependency");
 sameSet(
   fnd01.dependsOn as string[],
-  ["FND-02", "FND-13"],
-  "FND-01 depends on unique ROOT and explicit A6 identity",
+  ["FND-02"],
+  "FND-01 structural classification depends only on unique ROOT",
 );
 assert(
   !(fnd02.dependsOn as string[]).includes("FND-13"),
@@ -178,6 +178,11 @@ same(
   inventory.constraints.poleExtensionalityRequiresExplicitFnd13,
   true,
   "pole extensionality requires explicit FND-13 theorem target",
+);
+same(
+  inventory.constraints.poleExtensionalityAvailableAfterFnd02,
+  false,
+  "completing FND-02 alone does not make pole extensionality available",
 );
 
 const blockedFromFirstWave = new Set(
