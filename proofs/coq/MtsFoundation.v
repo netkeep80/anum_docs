@@ -3736,7 +3736,11 @@ Definition ContextualScopeCompositionLaw
     CurrentScopeMember (form F A B) ->
     CurrentScopeMember (form F K B).
 
-(* FND-07 currentness/contextual-witness boundary lemma. *)
+(* FND-07 currentness/contextual-witness boundary lemma.
+
+   Even the exact ambient Link K->A may structurally exist while not being
+   current; in that case it is not contextual truth. Conversely contextual
+   truth is witnessed by currentness of exactly that Link. *)
 Theorem FND_07_contextual_truth_boundary
     (F : Foundation)
     (CurrentScopeMember : Link F -> Prop) :
