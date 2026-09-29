@@ -127,10 +127,10 @@ for (const symbol of replaySymbols) {
 }
 
 const cycleEvidence = [
-  ["fallback_cycle_no_recursive_description", "fallback_cycle_no_recursive_description"],
+  ["recursive_description_source_grounded", "recursive_description_source_grounded"],
   ["badStart_no_recursive_description", "model_bad_start_no_recursive_description"],
   ["badFinish_no_recursive_description", "model_bad_finish_no_recursive_description"],
-  ["fallback_cycle_no_recursive_inversion", "fallback_cycle_no_recursive_inversion"],
+  ["recursive_inversion_source_grounded", "recursive_inversion_source_grounded"],
   ["badStart_no_recursive_inverse", "model_bad_start_no_recursive_inverse"],
   ["badFinish_no_recursive_inverse", "model_bad_finish_no_recursive_inverse"],
   ["sharedGroundedParent_grounded", "shared_grounded_parent_grounded"],
