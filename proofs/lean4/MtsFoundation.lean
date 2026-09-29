@@ -2443,8 +2443,9 @@ theorem FND_05_recursive_description_total
       have cases := local_self_incidence_exhaustive F decision
       rcases cases with hFull | hStart | hFinish | hPair
       · have hxRoot := FND_02_unique_root F a1 hFull
-        subst x
-        exact ⟨.root, CanonicalRecursiveDescription.root⟩
+        refine ⟨.root, ?_⟩
+        simpa only [hxRoot] using
+          (CanonicalRecursiveDescription.root (F := F))
       · rcases ihFinish hStart.2 with ⟨child, hChild⟩
         exact ⟨.startSelf child,
           CanonicalRecursiveDescription.startSelf hStart hChild⟩
