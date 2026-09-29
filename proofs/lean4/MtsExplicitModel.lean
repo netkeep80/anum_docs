@@ -1007,33 +1007,26 @@ recursive description already implies Grounded source structure. Combined with
 FND-05 totality on Grounded Links, this identifies Grounded as the exact
 existence domain of the current finite description relation.
 -/
-theorem recursive_description_source_grounded
-    {x : ModelLink}
-    {code : RecursiveDescriptionCode}
-    (h : CanonicalRecursiveDescription ExplicitFoundation x code) :
-    Grounded ExplicitFoundation x := by
-  induction h with
-  | root =>
-      exact grounded_of_full_self ExplicitFoundation
+def recursive_description_source_grounded :
+    {x : ModelLink} →
+    {code : RecursiveDescriptionCode} →
+    CanonicalRecursiveDescription ExplicitFoundation x code →
+    Grounded ExplicitFoundation x
+  | _, _, .root =>
+      grounded_of_full_self ExplicitFoundation
         (root_full_self ExplicitFoundation)
-  | startSelf hStart _ ih =>
-      apply Grounded.node
-      · intro hNot
-        exact False.elim (hNot hStart.1)
-      · intro _
-        exact ih
-  | finishSelf hFinish _ ih =>
-      apply Grounded.node
-      · intro _
-        exact ih
-      · intro hNot
-        exact False.elim (hNot hFinish.2)
-  | pair hPair _ _ ihStart ihFinish =>
-      apply Grounded.node
-      · intro _
-        exact ihStart
-      · intro _
-        exact ihFinish
+  | _, _, .startSelf hStart hChild =>
+      Grounded.node
+        (fun hNot => False.elim (hNot hStart.1))
+        (fun _ => recursive_description_source_grounded hChild)
+  | _, _, .finishSelf hFinish hChild =>
+      Grounded.node
+        (fun _ => recursive_description_source_grounded hChild)
+        (fun hNot => False.elim (hNot hFinish.2))
+  | _, _, .pair hPair hStartChild hFinishChild =>
+      Grounded.node
+        (fun _ => recursive_description_source_grounded hStartChild)
+        (fun _ => recursive_description_source_grounded hFinishChild)
 
 theorem badStart_no_recursive_description :
     ¬ ∃ code : RecursiveDescriptionCode,
@@ -1056,32 +1049,25 @@ The generic theorem `recursive_inversion_functional` remains stronger in a
 different direction: whenever two derivations exist for any source, their
 images are equal. The cycle falsifies totality/existence, not functionality.
 -/
-theorem recursive_inversion_source_grounded
-    {x y : ModelLink}
-    (h : RecursiveInversion ExplicitFoundation ExplicitInversionDomain x y) :
-    Grounded ExplicitFoundation x := by
-  induction h with
-  | root =>
-      exact grounded_of_full_self ExplicitFoundation
+def recursive_inversion_source_grounded :
+    {x y : ModelLink} →
+    RecursiveInversion ExplicitFoundation ExplicitInversionDomain x y →
+    Grounded ExplicitFoundation x
+  | _, _, .root =>
+      grounded_of_full_self ExplicitFoundation
         (root_full_self ExplicitFoundation)
-  | start hStart _ ih =>
-      apply Grounded.node
-      · intro hNot
-        exact False.elim (hNot hStart.1)
-      · intro _
-        exact ih
-  | finish hFinish _ ih =>
-      apply Grounded.node
-      · intro _
-        exact ih
-      · intro hNot
-        exact False.elim (hNot hFinish.2)
-  | pair hPair _ _ ihFinish ihStart =>
-      apply Grounded.node
-      · intro _
-        exact ihStart
-      · intro _
-        exact ihFinish
+  | _, _, .start hStart hChild =>
+      Grounded.node
+        (fun hNot => False.elim (hNot hStart.1))
+        (fun _ => recursive_inversion_source_grounded hChild)
+  | _, _, .finish hFinish hChild =>
+      Grounded.node
+        (fun _ => recursive_inversion_source_grounded hChild)
+        (fun hNot => False.elim (hNot hFinish.2))
+  | _, _, .pair hPair hFinishInv hStartInv =>
+      Grounded.node
+        (fun _ => recursive_inversion_source_grounded hStartInv)
+        (fun _ => recursive_inversion_source_grounded hFinishInv)
 
 theorem badStart_no_recursive_inverse :
     ¬ ∃ y : ModelLink,
