@@ -131,10 +131,22 @@
     {
       "id": "CTX-03",
       "lean4": [
-        "MTS.External.CTX_03_context_relative_gauge"
+        "MTS.External.CTX_03_context_relative_gauge",
+        "MTS.External.CTX_03_direction_witness_inversion",
+        "MTS.External.CTX_03_chi_direction_bridge",
+        "MTS.External.CTX_03_semantic_arrow_covariant",
+        "MTS.External.CTX_03_generalized_mp_semantic_covariance",
+        "MTS.External.CTX_03_technical_start_not_covariant",
+        "MTS.External.CTX_03_semantic_covariance_capstone"
       ],
       "rocq": [
-        "CTX_03_context_relative_gauge"
+        "CTX_03_context_relative_gauge",
+        "CTX_03_direction_witness_inversion",
+        "CTX_03_chi_direction_bridge",
+        "CTX_03_semantic_arrow_covariant",
+        "CTX_03_generalized_mp_semantic_covariance",
+        "CTX_03_technical_start_not_covariant",
+        "CTX_03_semantic_covariance_capstone"
       ]
     }
   ]

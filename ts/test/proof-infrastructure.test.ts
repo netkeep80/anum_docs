@@ -759,7 +759,7 @@ assert.deepEqual(
 for (const record of ctx03) {
   assert.equal(
     record.proofSource.commitSha,
-    "c89eeb80e878504896d8fe517b43fb10a80236ff",
+    "07d1808d1ba24b45bff9c000cbdd8aefae4a4e44",
     `CTX-03 ${record.lane} proof source commit`,
   );
   assert.deepEqual(
@@ -790,6 +790,26 @@ for (const record of ctx03) {
     String(record.notes),
     /Link-native one-sided Context markers/i,
     "CTX-03 evidence records the Link-native Context carrier",
+  );
+  assert.match(
+    String(record.notes),
+    /unique chi\(K\).*Context marker|Context marker.*unique chi\(K\)/i,
+    "CTX-03 evidence records unique marker-selected chi",
+  );
+  assert.match(
+    String(record.notes),
+    /InR_K\/OutR_K.*structural J|structural J.*InR_K\/OutR_K/i,
+    "CTX-03 evidence records direction-witness J exchange",
+  );
+  assert.match(
+    String(record.notes),
+    /generalized K->A.*A->B.*K->B.*covariant under J/i,
+    "CTX-03 evidence records generalized-MP semantic covariance",
+  );
+  assert.match(
+    String(record.notes),
+    /TechnicalStartOperation.*falsifier|TechnicalStartOperation.*counterexample/i,
+    "CTX-03 evidence records the technical non-covariance falsifier",
   );
   assert.match(
     String(record.notes),
