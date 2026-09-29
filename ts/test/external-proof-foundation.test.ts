@@ -761,14 +761,12 @@ assert(
 
 const inv06 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-06");
 assert(inv06 !== undefined, "P0 contains INV-06");
-assert.deepEqual(
-  inv06.assumptions,
-  ["INV-03", "INV-04", "INV-05"],
+assert(
+  JSON.stringify(inv06.assumptions) === JSON.stringify(["INV-03", "INV-04", "INV-05"]),
   "INV-06 assumptions remain exactly the supporting inversion theorems",
 );
-assert.deepEqual(
-  inv06.dependsOn,
-  ["INV-03", "INV-04", "INV-05"],
+assert(
+  JSON.stringify(inv06.dependsOn) === JSON.stringify(["INV-03", "INV-04", "INV-05"]),
   "INV-06 dependencies remain exactly INV-03/04/05",
 );
 for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
