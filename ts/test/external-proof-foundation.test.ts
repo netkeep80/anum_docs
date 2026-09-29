@@ -994,12 +994,16 @@ assert(
 
 const fnd07 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-07");
 assert(fnd07 !== undefined, "P0 contains FND-07");
-assert.deepEqual(
-  fnd07.assumptions,
-  ["accepted contextual truth semantics"],
+same(
+  JSON.stringify(fnd07.assumptions),
+  JSON.stringify(["accepted contextual truth semantics"]),
   "FND-07 assumptions remain exactly the accepted contextual-truth semantics",
 );
-assert.deepEqual(fnd07.dependsOn, [], "FND-07 adds no theorem dependency");
+same(
+  JSON.stringify(fnd07.dependsOn),
+  JSON.stringify([]),
+  "FND-07 adds no theorem dependency",
+);
 
 for (const [label, source, marker] of [
   ["Lean", lean, "def ContextualTruthWitness"],
