@@ -2902,7 +2902,7 @@ Definition ContextOutRWitness
   form F (R F) (f2f3_start_root F E).
 
 (* Relational marker -> chi(K) bridge.  The selected one-sided marker fixes the
-   local semantic polarity; no host Frame/Gauge/Bool carries orientation. *)
+   local semantic polarity; no host orientation datatype carries orientation. *)
 Definition ContextChiWitness
     (F : Foundation)
     (E : F2F3OneSidedExistence F)
