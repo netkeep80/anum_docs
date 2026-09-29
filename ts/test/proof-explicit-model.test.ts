@@ -10,6 +10,8 @@ const read = (path: string): string => readFileSync(join(root, path), "utf8");
 
 const lean = read("proofs/lean4/MtsExplicitModel.lean");
 const rocq = read("proofs/coq/MtsExplicitModel.v");
+const leanFoundation = read("proofs/lean4/MtsFoundation.lean");
+const rocqFoundation = read("proofs/coq/MtsFoundation.v");
 const ci = read(".github/workflows/ci.yml");
 
 for (const [lane, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
@@ -121,6 +123,41 @@ for (const symbol of replaySymbols) {
   assert(
     rocq.includes(symbol),
     `Rocq explicit model exposes concrete replay symbol ${symbol}`,
+  );
+}
+
+const cycleEvidence = [
+  ["fallback_cycle_no_recursive_description", "fallback_cycle_no_recursive_description"],
+  ["badStart_no_recursive_description", "model_bad_start_no_recursive_description"],
+  ["badFinish_no_recursive_description", "model_bad_finish_no_recursive_description"],
+  ["fallback_cycle_no_recursive_inversion", "fallback_cycle_no_recursive_inversion"],
+  ["badStart_no_recursive_inverse", "model_bad_start_no_recursive_inverse"],
+  ["badFinish_no_recursive_inverse", "model_bad_finish_no_recursive_inverse"],
+  ["sharedGroundedParent_grounded", "shared_grounded_parent_grounded"],
+  ["sharedGroundedParent_ne_child", "shared_grounded_parent_ne_child"],
+] as const;
+
+for (const [leanSymbol, rocqSymbol] of cycleEvidence) {
+  assert(lean.includes(leanSymbol), `Lean cycle boundary missing ${leanSymbol}`);
+  assert(rocq.includes(rocqSymbol), `Rocq cycle boundary missing ${rocqSymbol}`);
+}
+
+function declarationHeader(source: string, symbol: string, terminator: string): string {
+  const start = source.indexOf(symbol);
+  assert(start >= 0, `missing declaration ${symbol}`);
+  const end = source.indexOf(terminator, start);
+  assert(end > start, `missing declaration terminator for ${symbol}`);
+  return source.slice(start, end);
+}
+
+for (const symbol of ["recursive_description_functional", "recursive_inversion_functional"]) {
+  assert(
+    !declarationHeader(leanFoundation, symbol, ":= by").includes("Grounded"),
+    `Lean ${symbol} remains functionality/uniqueness without Grounded totality premise`,
+  );
+  assert(
+    !declarationHeader(rocqFoundation, symbol, "Proof.").includes("Grounded"),
+    `Rocq ${symbol} remains functionality/uniqueness without Grounded totality premise`,
   );
 }
 
