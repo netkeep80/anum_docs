@@ -1530,11 +1530,11 @@ theorem INV_02_unique_total_involution
       RecursiveInversion F D x y ∧
       RecursiveInversion F D y z ∧
       z = x := by
-  rcases INV_01_recursive_inversion_total F a1 N E D gx with
+  rcases INV_01_recursive_inversion_total F a1 E D gx with
     ⟨y, hxy⟩
   have gy : Grounded F y :=
     recursive_inversion_image_grounded F D hxy
-  rcases INV_01_recursive_inversion_total F a1 N E D gy with
+  rcases INV_01_recursive_inversion_total F a1 E D gy with
     ⟨z, hyz⟩
   exact ⟨
     y,
@@ -1637,7 +1637,7 @@ theorem INV_05_pair_preserved_and_reversed
       y = F.form inverseFinish inverseStart := by
   have gy : Grounded F y :=
     recursive_inversion_image_grounded F D hxy
-  rcases INV_01_recursive_inversion_total F a1 N E D gy with
+  rcases INV_01_recursive_inversion_total F a1 E D gy with
     ⟨z, hyz⟩
   have hzx : z = x :=
     INV_02_recursive_inversion_involutive F a1 N E D hxy hyz
