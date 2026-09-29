@@ -6,6 +6,26 @@ Rocq vocabulary such as Type, Prop, Record, Inductive, and Theorem is
 verification machinery only; it is not MTS ontology, native notation, or
 semantic authority.
 
+EXTERNAL THEORY PROJECTION MANIFEST
+
+HOST FOUNDATION:
+- Rocq Calculus of Inductive Constructions / dependent type-theoretic kernel.
+
+USED EXTERNAL LOGIC / PROOF METHODS:
+- constructive propositions and equality;
+- inductive predicates and structural induction;
+- relational encoding of Link structure and RecursiveInversion.
+
+ADDITIONAL EXTERNAL MATHEMATICAL THEORY:
+- elementary group theory (Z2), used only to describe the same/opposite
+  relative transport composition table in CTX-03 support.
+
+The relational encoding and Z2 description are external verification tools,
+not MTS ontology or semantic authority.
+
+Any additional external theory introduced below must be marked locally with:
+  EXTERNAL THEORY PROJECTION: <theory-name>
+
 External proof constructs may expose hidden assumptions or falsifiers, but
 they must not leak back into MTS as ontology or axioms unless MTS derives the
 corresponding structure internally.
@@ -2146,3 +2166,288 @@ Proof.
           (INV_05_pair_preserved_and_reversed
             F A1 N E D x y HPair Hxy)).
 Qed.
+
+
+(* CTX-03 relational support vocabulary.
+   These are propositions over existing Links, not a Frame/Gauge ontology.
+   No Bool/enum value is semantic orientation authority. *)
+Definition ProperOneSided (F : Foundation) (x : Link F) : Prop :=
+  StartOnly F x \/ FinishOnly F x.
+
+Definition SameChiralClass
+    (F : Foundation) (x y : Link F) : Prop :=
+  (StartOnly F x /\ StartOnly F y) \/
+  (FinishOnly F x /\ FinishOnly F y).
+
+Definition OppositeChiralClass
+    (F : Foundation) (x y : Link F) : Prop :=
+  (StartOnly F x /\ FinishOnly F y) \/
+  (FinishOnly F x /\ StartOnly F y).
+
+(* EXTERNAL THEORY PROJECTION: elementary group theory (Z2)
+
+   The Z2 transport table is stated relationally: Same acts as Id and Opposite
+   acts as J.  No two-valued semantic carrier is introduced, and the group
+   description is external proof vocabulary only. *)
+Definition RelativeZ2Law (F : Foundation) : Prop :=
+  (forall x : Link F,
+    ProperOneSided F x -> SameChiralClass F x x) /\
+  (forall x y : Link F,
+    SameChiralClass F x y -> SameChiralClass F y x) /\
+  (forall x y : Link F,
+    OppositeChiralClass F x y -> OppositeChiralClass F y x) /\
+  (forall x y : Link F,
+    ProperOneSided F x ->
+    ProperOneSided F y ->
+    SameChiralClass F x y \/ OppositeChiralClass F x y) /\
+  (forall x y : Link F,
+    SameChiralClass F x y ->
+    OppositeChiralClass F x y ->
+    False) /\
+  (forall a b c : Link F,
+    SameChiralClass F a b ->
+    SameChiralClass F b c ->
+    SameChiralClass F a c) /\
+  (forall a b c : Link F,
+    SameChiralClass F a b ->
+    OppositeChiralClass F b c ->
+    OppositeChiralClass F a c) /\
+  (forall a b c : Link F,
+    OppositeChiralClass F a b ->
+    SameChiralClass F b c ->
+    OppositeChiralClass F a c) /\
+  (forall a b c : Link F,
+    OppositeChiralClass F a b ->
+    OppositeChiralClass F b c ->
+    SameChiralClass F a c).
+
+Definition InversionIsMirrorTransport
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) : Prop :=
+  forall x y : Link F,
+    RecursiveInversion F E D x y ->
+    ProperOneSided F x ->
+    ProperOneSided F y /\ OppositeChiralClass F x y.
+
+Theorem ctx03_same_refl
+    (F : Foundation)
+    (x : Link F) :
+    ProperOneSided F x ->
+    SameChiralClass F x x.
+Proof.
+  intros [HStart | HFinish].
+  - left. split; exact HStart.
+  - right. split; exact HFinish.
+Qed.
+
+Theorem ctx03_same_symm
+    (F : Foundation)
+    (x y : Link F) :
+    SameChiralClass F x y ->
+    SameChiralClass F y x.
+Proof.
+  intros [[HX HY] | [HX HY]].
+  - left. split; assumption.
+  - right. split; assumption.
+Qed.
+
+Theorem ctx03_opposite_symm
+    (F : Foundation)
+    (x y : Link F) :
+    OppositeChiralClass F x y ->
+    OppositeChiralClass F y x.
+Proof.
+  intros [[HX HY] | [HX HY]].
+  - right. split; assumption.
+  - left. split; assumption.
+Qed.
+
+Theorem ctx03_transport_total
+    (F : Foundation)
+    (x y : Link F) :
+    ProperOneSided F x ->
+    ProperOneSided F y ->
+    SameChiralClass F x y \/ OppositeChiralClass F x y.
+Proof.
+  intros [HX | HX] [HY | HY].
+  - left. left. split; assumption.
+  - right. left. split; assumption.
+  - right. right. split; assumption.
+  - left. right. split; assumption.
+Qed.
+
+Theorem ctx03_transport_disjoint
+    (F : Foundation)
+    (x y : Link F) :
+    SameChiralClass F x y ->
+    OppositeChiralClass F x y ->
+    False.
+Proof.
+  intros [[HXS HYS] | [HXF HYF]]
+         [[HXS' HYF'] | [HXF' HYS']].
+  - eapply recursive_start_finish_disjoint.
+    + exact HYS.
+    + exact HYF'.
+  - eapply recursive_start_finish_disjoint.
+    + exact HXS.
+    + exact HXF'.
+  - eapply recursive_start_finish_disjoint.
+    + exact HXS'.
+    + exact HXF.
+  - eapply recursive_start_finish_disjoint.
+    + exact HYS'.
+    + exact HYF.
+Qed.
+
+Theorem ctx03_same_same
+    (F : Foundation)
+    (a b c : Link F) :
+    SameChiralClass F a b ->
+    SameChiralClass F b c ->
+    SameChiralClass F a c.
+Proof.
+  intros [[HAS HBS] | [HAF HBF]]
+         [[HBS' HCS] | [HBF' HCF]].
+  - left. split; assumption.
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HBS.
+    + exact HBF'.
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HBS'.
+    + exact HBF.
+  - right. split; assumption.
+Qed.
+
+Theorem ctx03_same_opposite
+    (F : Foundation)
+    (a b c : Link F) :
+    SameChiralClass F a b ->
+    OppositeChiralClass F b c ->
+    OppositeChiralClass F a c.
+Proof.
+  intros [[HAS HBS] | [HAF HBF]]
+         [[HBS' HCF] | [HBF' HCS]].
+  - left. split; assumption.
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HBS.
+    + exact HBF'.
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HBS'.
+    + exact HBF.
+  - right. split; assumption.
+Qed.
+
+Theorem ctx03_opposite_same
+    (F : Foundation)
+    (a b c : Link F) :
+    OppositeChiralClass F a b ->
+    SameChiralClass F b c ->
+    OppositeChiralClass F a c.
+Proof.
+  intros [[HAS HBF] | [HAF HBS]]
+         [[HBS' HCS] | [HBF' HCF]].
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HBS'.
+    + exact HBF.
+  - left. split; assumption.
+  - right. split; assumption.
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HBS.
+    + exact HBF'.
+Qed.
+
+Theorem ctx03_opposite_opposite
+    (F : Foundation)
+    (a b c : Link F) :
+    OppositeChiralClass F a b ->
+    OppositeChiralClass F b c ->
+    SameChiralClass F a c.
+Proof.
+  intros [[HAS HBF] | [HAF HBS]]
+         [[HBS' HCF] | [HBF' HCS]].
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HBS'.
+    + exact HBF.
+  - left. split; assumption.
+  - right. split; assumption.
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HBS.
+    + exact HBF'.
+Qed.
+
+Theorem ctx03_relative_z2
+    (F : Foundation) :
+    RelativeZ2Law F.
+Proof.
+  unfold RelativeZ2Law.
+  repeat split.
+  - intros x HX. apply (ctx03_same_refl F x HX).
+  - intros x y H. apply (ctx03_same_symm F x y H).
+  - intros x y H. apply (ctx03_opposite_symm F x y H).
+  - intros x y HX HY. apply (ctx03_transport_total F x y HX HY).
+  - intros x y HS HO. apply (ctx03_transport_disjoint F x y HS HO).
+  - intros a b c H1 H2. apply (ctx03_same_same F a b c H1 H2).
+  - intros a b c H1 H2. apply (ctx03_same_opposite F a b c H1 H2).
+  - intros a b c H1 H2. apply (ctx03_opposite_same F a b c H1 H2).
+  - intros a b c H1 H2. apply (ctx03_opposite_opposite F a b c H1 H2).
+Qed.
+
+Theorem ctx03_inversion_is_mirror_transport
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    InversionIsMirrorTransport F E D.
+Proof.
+  unfold InversionIsMirrorTransport.
+  intros x y Hxy [HStart | HFinish].
+  - pose proof
+      (INV_07_objective_chirality F A1 N E D x y Hxy)
+      as HChiral.
+    destruct HChiral as [HStartCase [_ _]].
+    pose proof (HStartCase HStart) as H.
+    destruct H as [HFinishY _].
+    split.
+    + right. exact HFinishY.
+    + left. split; assumption.
+  - pose proof
+      (INV_07_objective_chirality F A1 N E D x y Hxy)
+      as HChiral.
+    destruct HChiral as [_ [HFinishCase _]].
+    pose proof (HFinishCase HFinish) as H.
+    destruct H as [HStartY _].
+    split.
+    + left. exact HStartY.
+    + right. split; assumption.
+Qed.
+
+(* Supporting CTX-03 result: relative orientation transport is the Z2
+   same/opposite relation on Link-native one-sided structural classes, and J
+   is the mirror transport on that carrier.
+
+   This introduces no semantic Frame/Gauge datatype; Rocq propositions and
+   disjunctions are external projection machinery only. *)
+Theorem CTX_03_relational_z2_support
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    RelativeZ2Law F /\
+    InversionIsMirrorTransport F E D.
+Proof.
+  split.
+  - apply ctx03_relative_z2.
+  - apply (ctx03_inversion_is_mirror_transport F A1 N E D).
+Qed.
+

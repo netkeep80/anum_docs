@@ -74,6 +74,28 @@ for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
   );
 }
 
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  assert(
+    source.includes("EXTERNAL THEORY PROJECTION MANIFEST"),
+    `${label} source declares the external-theory projection manifest`,
+  );
+  assert(
+    source.includes("HOST FOUNDATION:") &&
+      source.includes("USED EXTERNAL LOGIC / PROOF METHODS:") &&
+      source.includes("ADDITIONAL EXTERNAL MATHEMATICAL THEORY:"),
+    `${label} manifest separates prover foundation from additional theory`,
+  );
+  assert(
+    source.includes("elementary group theory (Z2)") &&
+      source.includes("EXTERNAL THEORY PROJECTION: elementary group theory (Z2)"),
+    `${label} marks the Z2 group-theory projection explicitly`,
+  );
+  assert(
+    source.includes("not MTS ontology or semantic authority"),
+    `${label} keeps the external-theory no-backflow boundary`,
+  );
+}
+
 same(manifest.lean4.stable, true, "Lean stable pin");
 same(manifest.lean4.version, "4.34.1", "Lean version");
 same(manifest.lean4.tag, "v4.34.1", "Lean tag");
@@ -860,6 +882,68 @@ assert(
   "INV-07 introduces no chirality ontology datatype",
 );
 
+const ctx03 = (p0.targets as Record<string, any>[]).find((target) => target.id === "CTX-03");
+assert(ctx03 !== undefined, "P0 contains CTX-03");
+assert(
+  JSON.stringify(ctx03.assumptions) === JSON.stringify([
+    "INV-02",
+    "INV-07",
+    "accepted Link-native Context orientation markers",
+  ]),
+  "CTX-03 assumptions remain exactly INV-02/INV-07/Link-native markers",
+);
+assert(
+  JSON.stringify(ctx03.dependsOn) === JSON.stringify(["INV-02", "INV-07"]),
+  "CTX-03 dependencies remain exactly INV-02/INV-07",
+);
+
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  const startName =
+    label === "Lean"
+      ? "def ProperOneSided"
+      : "Definition ProperOneSided";
+  const start = source.indexOf(startName);
+  assert(start >= 0, `${label} contains CTX-03 relational support vocabulary`);
+  const region = source.slice(start);
+  for (const symbol of [
+    "SameChiralClass",
+    "OppositeChiralClass",
+    "RelativeZ2Law",
+    "InversionIsMirrorTransport",
+    "CTX_03_relational_z2_support",
+  ]) {
+    assert(region.includes(symbol), `${label} CTX-03 support contains ${symbol}`);
+  }
+  assert(
+    region.includes("INV_07_objective_chirality"),
+    `${label} mirror transport derives through INV-07`,
+  );
+  for (const forbidden of [
+    "inductive Gauge",
+    "structure Gauge",
+    "def Gauge",
+    "Inductive Gauge",
+    "Record Gauge",
+    "Definition Gauge",
+    "inductive Frame",
+    "structure Frame",
+    "def Frame",
+    "Inductive Frame",
+    "Record Frame",
+    "Definition Frame",
+    "DIRECT",
+    "MIRROR",
+    "ExactSequence",
+  ]) {
+    assert(!region.includes(forbidden), `${label} CTX-03 support forbids host orientation carrier: ${forbidden}`);
+  }
+}
+assert(
+  !lean.includes("axiom CTX_03_relational_z2_support") &&
+    !rocq.includes("Axiom CTX_03_relational_z2_support"),
+  "CTX-03 relational support is proved rather than postulated",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -941,6 +1025,10 @@ console.log([
   "INV07_OBJECTIVE_CHIRALITY=ONE_SIDED_EXCHANGE+INVOLUTION+PAIR_STABILITY",
   "INV07_DEPENDENCIES=INV02+INV04+INV05",
   "INV07_GLOBAL_ORIENTATION=NONE",
+  "CTX03_RELATIONAL_SUPPORT=Z2_SAME_OPPOSITE",
+  "CTX03_ORIENTATION_CARRIER=LINK_NATIVE_ONE_SIDED",
+  "CTX03_HOST_FRAME_DATATYPE=NONE",
+  "CTX03_J_TRANSPORT=INV07_DERIVED",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));

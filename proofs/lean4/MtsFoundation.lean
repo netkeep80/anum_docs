@@ -6,6 +6,26 @@ Lean vocabulary such as Type, Prop, structure, inductive, and theorem is
 verification machinery only; it is not MTS ontology, native notation, or
 semantic authority.
 
+EXTERNAL THEORY PROJECTION MANIFEST
+
+HOST FOUNDATION:
+- Lean 4 dependent type theory / kernel metalanguage.
+
+USED EXTERNAL LOGIC / PROOF METHODS:
+- constructive propositions and equality;
+- inductive predicates and structural induction;
+- relational encoding of Link structure and RecursiveInversion.
+
+ADDITIONAL EXTERNAL MATHEMATICAL THEORY:
+- elementary group theory (Z2), used only to describe the same/opposite
+  relative transport composition table in CTX-03 support.
+
+The relational encoding and Z2 description are external verification tools,
+not MTS ontology or semantic authority.
+
+Any additional external theory introduced below must be marked locally with:
+  EXTERNAL THEORY PROJECTION: <theory-name>
+
 External proof constructs may expose hidden assumptions or falsifiers, but
 they must not leak back into MTS as ontology or axioms unless MTS derives the
 corresponding structure internally.
@@ -1811,5 +1831,220 @@ theorem INV_07_objective_chirality
       exact
         (INV_05_pair_preserved_and_reversed
           F a1 N E D hPair hxy).1
+
+
+/--
+CTX-03 relational support vocabulary.
+
+These are propositions over existing Links, not a Frame/Gauge ontology.  There
+is no Bool/enum whose value is semantic orientation authority.
+-/
+def ProperOneSided (F : Foundation) (x : F.Link) : Prop :=
+  StartOnly F x ∨ FinishOnly F x
+
+def SameChiralClass (F : Foundation) (x y : F.Link) : Prop :=
+  (StartOnly F x ∧ StartOnly F y) ∨
+  (FinishOnly F x ∧ FinishOnly F y)
+
+def OppositeChiralClass (F : Foundation) (x y : F.Link) : Prop :=
+  (StartOnly F x ∧ FinishOnly F y) ∨
+  (FinishOnly F x ∧ StartOnly F y)
+
+/--
+EXTERNAL THEORY PROJECTION: elementary group theory (Z2)
+
+The Z2 transport table is stated relationally: Same acts as Id and Opposite
+acts as J.  No two-valued semantic carrier is introduced, and the group
+description is external proof vocabulary only.
+-/
+def RelativeZ2Law (F : Foundation) : Prop :=
+  (∀ x : F.Link, ProperOneSided F x → SameChiralClass F x x) ∧
+  (∀ x y : F.Link, SameChiralClass F x y → SameChiralClass F y x) ∧
+  (∀ x y : F.Link, OppositeChiralClass F x y → OppositeChiralClass F y x) ∧
+  (∀ x y : F.Link,
+    ProperOneSided F x →
+    ProperOneSided F y →
+    SameChiralClass F x y ∨ OppositeChiralClass F x y) ∧
+  (∀ x y : F.Link,
+    SameChiralClass F x y →
+    OppositeChiralClass F x y →
+    False) ∧
+  (∀ a b c : F.Link,
+    SameChiralClass F a b →
+    SameChiralClass F b c →
+    SameChiralClass F a c) ∧
+  (∀ a b c : F.Link,
+    SameChiralClass F a b →
+    OppositeChiralClass F b c →
+    OppositeChiralClass F a c) ∧
+  (∀ a b c : F.Link,
+    OppositeChiralClass F a b →
+    SameChiralClass F b c →
+    OppositeChiralClass F a c) ∧
+  (∀ a b c : F.Link,
+    OppositeChiralClass F a b →
+    OppositeChiralClass F b c →
+    SameChiralClass F a c)
+
+def InversionIsMirrorTransport
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E) : Prop :=
+  ∀ x y : F.Link,
+    RecursiveInversion F D x y →
+    ProperOneSided F x →
+    ProperOneSided F y ∧ OppositeChiralClass F x y
+
+theorem ctx03_same_refl
+    (F : Foundation)
+    {x : F.Link}
+    (hx : ProperOneSided F x) :
+    SameChiralClass F x x := by
+  rcases hx with h | h
+  · exact Or.inl ⟨h, h⟩
+  · exact Or.inr ⟨h, h⟩
+
+theorem ctx03_same_symm
+    (F : Foundation)
+    {x y : F.Link}
+    (h : SameChiralClass F x y) :
+    SameChiralClass F y x := by
+  rcases h with h | h
+  · exact Or.inl ⟨h.2, h.1⟩
+  · exact Or.inr ⟨h.2, h.1⟩
+
+theorem ctx03_opposite_symm
+    (F : Foundation)
+    {x y : F.Link}
+    (h : OppositeChiralClass F x y) :
+    OppositeChiralClass F y x := by
+  rcases h with h | h
+  · exact Or.inr ⟨h.2, h.1⟩
+  · exact Or.inl ⟨h.2, h.1⟩
+
+theorem ctx03_transport_total
+    (F : Foundation)
+    {x y : F.Link}
+    (hx : ProperOneSided F x)
+    (hy : ProperOneSided F y) :
+    SameChiralClass F x y ∨ OppositeChiralClass F x y := by
+  rcases hx with hx | hx <;> rcases hy with hy | hy
+  · exact Or.inl (Or.inl ⟨hx, hy⟩)
+  · exact Or.inr (Or.inl ⟨hx, hy⟩)
+  · exact Or.inr (Or.inr ⟨hx, hy⟩)
+  · exact Or.inl (Or.inr ⟨hx, hy⟩)
+
+theorem ctx03_transport_disjoint
+    (F : Foundation)
+    {x y : F.Link}
+    (hs : SameChiralClass F x y)
+    (ho : OppositeChiralClass F x y) :
+    False := by
+  rcases hs with hs | hs <;> rcases ho with ho | ho
+  · exact recursive_start_finish_disjoint F hs.2 ho.2
+  · exact recursive_start_finish_disjoint F hs.1 ho.1
+  · exact recursive_start_finish_disjoint F ho.1 hs.1
+  · exact recursive_start_finish_disjoint F ho.2 hs.2
+
+theorem ctx03_same_same
+    (F : Foundation)
+    {a b c : F.Link}
+    (hab : SameChiralClass F a b)
+    (hbc : SameChiralClass F b c) :
+    SameChiralClass F a c := by
+  rcases hab with hab | hab <;> rcases hbc with hbc | hbc
+  · exact Or.inl ⟨hab.1, hbc.2⟩
+  · exact False.elim (recursive_start_finish_disjoint F hab.2 hbc.1)
+  · exact False.elim (recursive_start_finish_disjoint F hbc.1 hab.2)
+  · exact Or.inr ⟨hab.1, hbc.2⟩
+
+theorem ctx03_same_opposite
+    (F : Foundation)
+    {a b c : F.Link}
+    (hab : SameChiralClass F a b)
+    (hbc : OppositeChiralClass F b c) :
+    OppositeChiralClass F a c := by
+  rcases hab with hab | hab <;> rcases hbc with hbc | hbc
+  · exact Or.inl ⟨hab.1, hbc.2⟩
+  · exact False.elim (recursive_start_finish_disjoint F hab.2 hbc.1)
+  · exact False.elim (recursive_start_finish_disjoint F hbc.1 hab.2)
+  · exact Or.inr ⟨hab.1, hbc.2⟩
+
+theorem ctx03_opposite_same
+    (F : Foundation)
+    {a b c : F.Link}
+    (hab : OppositeChiralClass F a b)
+    (hbc : SameChiralClass F b c) :
+    OppositeChiralClass F a c := by
+  rcases hab with hab | hab <;> rcases hbc with hbc | hbc
+  · exact False.elim (recursive_start_finish_disjoint F hbc.1 hab.2)
+  · exact Or.inl ⟨hab.1, hbc.2⟩
+  · exact Or.inr ⟨hab.1, hbc.2⟩
+  · exact False.elim (recursive_start_finish_disjoint F hab.2 hbc.1)
+
+theorem ctx03_opposite_opposite
+    (F : Foundation)
+    {a b c : F.Link}
+    (hab : OppositeChiralClass F a b)
+    (hbc : OppositeChiralClass F b c) :
+    SameChiralClass F a c := by
+  rcases hab with hab | hab <;> rcases hbc with hbc | hbc
+  · exact False.elim (recursive_start_finish_disjoint F hbc.1 hab.2)
+  · exact Or.inl ⟨hab.1, hbc.2⟩
+  · exact Or.inr ⟨hab.1, hbc.2⟩
+  · exact False.elim (recursive_start_finish_disjoint F hab.2 hbc.1)
+
+theorem ctx03_relative_z2
+    (F : Foundation) :
+    RelativeZ2Law F := by
+  exact ⟨
+    fun _ h => ctx03_same_refl F h,
+    fun _ _ h => ctx03_same_symm F h,
+    fun _ _ h => ctx03_opposite_symm F h,
+    fun _ _ hx hy => ctx03_transport_total F hx hy,
+    fun _ _ hs ho => ctx03_transport_disjoint F hs ho,
+    fun _ _ _ hab hbc => ctx03_same_same F hab hbc,
+    fun _ _ _ hab hbc => ctx03_same_opposite F hab hbc,
+    fun _ _ _ hab hbc => ctx03_opposite_same F hab hbc,
+    fun _ _ _ hab hbc => ctx03_opposite_opposite F hab hbc
+  ⟩
+
+theorem ctx03_inversion_is_mirror_transport
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    InversionIsMirrorTransport F D := by
+  intro x y hxy hx
+  rcases hx with hStart | hFinish
+  · have h := INV_07_objective_chirality F a1 N E D x y hxy
+    have hy := (h.1 hStart).1
+    exact ⟨Or.inr hy, Or.inl ⟨hStart, hy⟩⟩
+  · have h := INV_07_objective_chirality F a1 N E D x y hxy
+    have hy := (h.2.1 hFinish).1
+    exact ⟨Or.inl hy, Or.inr ⟨hFinish, hy⟩⟩
+
+/--
+Supporting CTX-03 result: relative orientation transport is the Z2
+same/opposite relation on Link-native one-sided structural classes, and J is
+the mirror transport on that carrier.
+
+The result introduces no semantic Frame/Gauge datatype; Lean's propositions
+and disjunctions are external projection machinery only.
+-/
+theorem CTX_03_relational_z2_support
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    RelativeZ2Law F ∧ InversionIsMirrorTransport F D := by
+  exact ⟨
+    ctx03_relative_z2 F,
+    ctx03_inversion_is_mirror_transport F a1 N E D
+  ⟩
 
 end MTS.External
