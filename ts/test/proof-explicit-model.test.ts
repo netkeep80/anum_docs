@@ -42,6 +42,12 @@ for (const [lane, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
     `${lane} model exposes an infinite-carrier injection witness`,
   );
   assert(
+    lane === "Lean"
+      ? /if x = form poles\.1 poles\.2 then/.test(source)
+      : /link_eq_dec x \(model_form \(fst poles\) \(snd poles\)\)/.test(source),
+    `${lane} projections reject decoded values that are not canonical form images`,
+  );
+  assert(
     /external model|model\/proof machinery|external model machinery/i.test(source),
     `${lane} source states the no-backflow external-model boundary`,
   );
