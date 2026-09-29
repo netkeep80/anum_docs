@@ -1,3 +1,16 @@
+/-
+EXTERNAL PROJECTION BOUNDARY
+
+This file is a prover-side projection of MTS into Lean's metalanguage.
+Lean vocabulary such as Type, Prop, structure, inductive, and theorem is
+verification machinery only; it is not MTS ontology, native notation, or
+semantic authority.
+
+External proof constructs may expose hidden assumptions or falsifiers, but
+they must not leak back into MTS as ontology or axioms unless MTS derives the
+corresponding structure internally.
+-/
+
 namespace MTS.External
 
 /--
@@ -1732,5 +1745,71 @@ theorem INV_06_root_basis
       hU).1
 
   exact ⟨hR, hO, hC, hL, hU⟩
+
+
+/--
+INV-07 objective chirality capstone.
+
+For any admitted structural inversion edge x ~J~ y:
+- a proper START source becomes proper END, remains distinct from its image, and
+  the image cannot simultaneously be proper START;
+- symmetrically, a proper END source becomes proper START;
+- any second inversion edge returns to x by INV-02;
+- PAIR stays PAIR by INV-05.
+
+The theorem preserves the objective distinction of the structural classes.  It
+does not select a Foundation-global absolute orientation and introduces no
+observer-dependent semantic primitive.
+-/
+theorem INV_07_objective_chirality
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x y : F.Link)
+    (hxy : RecursiveInversion F D x y) :
+    (StartOnly F x ->
+      FinishOnly F y ∧
+      x ≠ y ∧
+      ¬ StartOnly F y ∧
+      ∀ z : F.Link, RecursiveInversion F D y z -> z = x) ∧
+    (FinishOnly F x ->
+      StartOnly F y ∧
+      x ≠ y ∧
+      ¬ FinishOnly F y ∧
+      ∀ z : F.Link, RecursiveInversion F D y z -> z = x) ∧
+    (PairLocal F x -> PairLocal F y) := by
+  constructor
+  · intro hStart
+    have hSwap :=
+      INV_04_start_to_finish F a1 E D hStart hxy
+    have hNotStartY : ¬ StartOnly F y := by
+      intro hStartY
+      exact recursive_start_finish_disjoint F hStartY hSwap.1
+    have hRoundTrip :
+        ∀ z : F.Link, RecursiveInversion F D y z -> z = x := by
+      intro z hyz
+      exact INV_02_recursive_inversion_involutive
+        F a1 N E D hxy hyz
+    exact ⟨hSwap.1, hSwap.2, hNotStartY, hRoundTrip⟩
+  · constructor
+    · intro hFinish
+      have hSwap :=
+        INV_04_finish_to_start F a1 E D hFinish hxy
+      have hNotFinishY : ¬ FinishOnly F y := by
+        intro hFinishY
+        exact recursive_start_finish_disjoint F hSwap.1 hFinishY
+      have hRoundTrip :
+          ∀ z : F.Link, RecursiveInversion F D y z -> z = x := by
+        intro z hyz
+        exact INV_02_recursive_inversion_involutive
+          F a1 N E D hxy hyz
+      exact ⟨hSwap.1, hSwap.2, hNotFinishY, hRoundTrip⟩
+    · intro hPair
+      exact
+        (INV_05_pair_preserved_and_reversed
+          F a1 N E D hPair hxy).1
 
 end MTS.External

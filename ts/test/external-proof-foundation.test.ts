@@ -60,6 +60,20 @@ same(manifest.p0Inventory, "theorems/p0-v0.14.json", "P0 inventory binding");
 same(manifest.authority, "external-differential-evidence-only", "external prover role");
 same(manifest.execution, "CI_ACTIVE_ON_PROOF_DIFF", "execution gate");
 
+// Integration pulse after portable INV-03/04 evidence merged to main:
+// the external proof boundary is rechecked on the actual combined PR merge ref.
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  assert(
+    source.includes("EXTERNAL PROJECTION BOUNDARY"),
+    `${label} source declares the external projection boundary`,
+  );
+  assert(
+    source.includes("not MTS ontology") &&
+      source.includes("not leak back into MTS"),
+    `${label} source forbids prover vocabulary from becoming MTS ontology`,
+  );
+}
+
 same(manifest.lean4.stable, true, "Lean stable pin");
 same(manifest.lean4.version, "4.34.1", "Lean version");
 same(manifest.lean4.tag, "v4.34.1", "Lean tag");
@@ -806,6 +820,46 @@ assert(
   "INV-06 is proved rather than postulated",
 );
 
+
+const inv07 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-07");
+assert(inv07 !== undefined, "P0 contains INV-07");
+assert(
+  JSON.stringify(inv07.assumptions) === JSON.stringify(["INV-02", "INV-04", "INV-05"]),
+  "INV-07 assumptions remain exactly INV-02/04/05",
+);
+assert(
+  JSON.stringify(inv07.dependsOn) === JSON.stringify(["INV-02", "INV-04", "INV-05"]),
+  "INV-07 dependencies remain exactly INV-02/04/05",
+);
+for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
+  const theoremName =
+    label === "Lean"
+      ? "theorem INV_07_objective_chirality"
+      : "Theorem INV_07_objective_chirality";
+  const start = source.indexOf(theoremName);
+  assert(start >= 0, `${label} contains INV-07 objective chirality capstone`);
+  const region = source.slice(start);
+  for (const support of [
+    "INV_02_recursive_inversion_involutive",
+    "INV_04_start_to_finish",
+    "INV_04_finish_to_start",
+    "INV_05_pair_preserved_and_reversed",
+  ]) {
+    assert(region.includes(support), `${label} INV-07 derives through ${support}`);
+  }
+  assert(region.includes("StartOnly"), `${label} INV-07 keeps START structural`);
+  assert(region.includes("FinishOnly"), `${label} INV-07 keeps END structural`);
+  assert(region.includes("PairLocal"), `${label} INV-07 keeps PAIR structural`);
+}
+assert(
+  !lean.includes("axiom INV_07") && !rocq.includes("Axiom INV_07"),
+  "INV-07 is proved rather than postulated",
+);
+assert(
+  !lean.includes("structure Chirality") && !rocq.includes("Record Chirality"),
+  "INV-07 introduces no chirality ontology datatype",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),
@@ -840,13 +894,14 @@ console.log([
   "LEAN=4.34.1@5045d005",
   "ROCQ=9.2.0@adfbf185",
   "FOUNDATION_INTERFACES=2",
+  "EXTERNAL_PROJECTION_BOUNDARY=GUARDED",
   "FOUR_CASE_DATATYPE=ABSENT",
   "FOUR_CASE_AXIOM=ABSENT",
   "ROOT_UNIQUENESS_AXIOM=ABSENT",
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT=ABSENT",
-  "THEOREM_PROOF_CLAIMS=15",
+  "THEOREM_PROOF_CLAIMS=16",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -883,6 +938,9 @@ console.log([
   "INV06_O_C=F2F3_ORIENTATION_REPRESENTATIVES",
   "INV06_L_U=PAIR_DERIVED",
   "INV06_ABSOLUTE_ORIENTATION=NONE",
+  "INV07_OBJECTIVE_CHIRALITY=ONE_SIDED_EXCHANGE+INVOLUTION+PAIR_STABILITY",
+  "INV07_DEPENDENCIES=INV02+INV04+INV05",
+  "INV07_GLOBAL_ORIENTATION=NONE",
   "EXECUTION=CI_ACTIVE_ON_PROOF_DIFF",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
