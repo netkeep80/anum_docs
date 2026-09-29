@@ -174,7 +174,8 @@ Proof.
   intros a b.
   unfold model_start.
   rewrite decode_model_form.
-  reflexivity.
+  destruct (link_eq_dec (model_form a b) (model_form a b));
+    [reflexivity | contradiction].
 Qed.
 
 Lemma model_finish_form_projection :
@@ -184,7 +185,8 @@ Proof.
   intros a b.
   unfold model_finish.
   rewrite decode_model_form.
-  reflexivity.
+  destruct (link_eq_dec (model_form a b) (model_form a b));
+    [reflexivity | contradiction].
 Qed.
 
 Lemma model_start_form_ne_root :
