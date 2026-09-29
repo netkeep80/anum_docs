@@ -201,9 +201,11 @@
         "kind": "DOMAIN_BOUNDARY",
         "condition": "Audit distinct-node cyclic/non-well-founded Links against the finite Grounded theorem boundary.",
         "ownerIssue": 1797,
-        "status": "DELEGATED_TO_CYCLE_BOUNDARY_AUDIT"
+        "status": "RESOLVED_NECESSARY_RESTRICTION",
+        "outcome": "NECESSARY_RESTRICTION",
+        "resolution": "Paired Lean/Rocq proofs show any finite CanonicalRecursiveDescription or RecursiveInversion derivation implies Grounded source; the explicit two-Link cycle is not Grounded and therefore has no such derivation. Existing functionality theorems remain Grounded-free whenever derivations exist."
       },
-      "explicitModelStatus": "FINITE_INDUCTIVE_DOMAIN_BOUNDARY_VALIDATED"
+      "explicitModelStatus": "FINITE_INDUCTIVE_DOMAIN_BOUNDARY_PROVEN_NECESSARY_FOR_TOTALITY"
     },
     {
       "id": "LocalSelfDecision",
@@ -397,5 +399,33 @@
       ]
     },
     "noBackflow": "Host carrier/model/prover machinery remains external evidence only."
+  },
+  "cycleBoundaryDecision": {
+    "issue": 1797,
+    "outcome": "NECESSARY_RESTRICTION",
+    "scope": "CURRENT_INDUCTIVE_FINITE_PROOF_SEMANTICS",
+    "totality": "GROUNDED_REQUIRED_AND_EXACT_FOR_EXISTENCE",
+    "functionality": "GLOBAL_WHEN_DERIVATIONS_EXIST",
+    "sharing": "GROUNDED_SHARED_SUBSTRUCTURE_IS_NOT_A_TRUE_CYCLE",
+    "physicalIdentity": "OUTSIDE_SEMANTIC_LINK_IDENTITY_PROOF",
+    "coinductionBisimulation": "NOT_INTRODUCED",
+    "acceptedSemanticDelta": "NONE",
+    "evidence": {
+      "merge": "320e0a03a6b6568ad7a4c672cbe6458cfbc73a21",
+      "leanSource": "proofs/lean4/MtsExplicitModel.lean",
+      "rocqSource": "proofs/coq/MtsExplicitModel.v",
+      "test": "ts/test/proof-explicit-model.test.ts",
+      "pairedKernelStatus": "GREEN",
+      "symbols": {
+        "descriptionSourceGrounded": "recursive_description_source_grounded",
+        "inversionSourceGrounded": "recursive_inversion_source_grounded",
+        "noDescriptionStart": "badStart_no_recursive_description",
+        "noDescriptionFinish": "badFinish_no_recursive_description",
+        "noInverseStart": "badStart_no_recursive_inverse",
+        "noInverseFinish": "badFinish_no_recursive_inverse",
+        "sharingGrounded": "sharedGroundedParent_grounded",
+        "sharingDistinct": "sharedGroundedParent_ne_child"
+      }
+    }
   }
 }

@@ -248,7 +248,52 @@ same(
 same(
   byId.get("Grounded")?.falsificationTarget?.ownerIssue,
   1797,
-  "cyclic/non-well-founded boundary is delegated explicitly",
+  "cyclic/non-well-founded boundary owner remains #1797",
+);
+same(
+  byId.get("Grounded")?.falsificationTarget?.status,
+  "RESOLVED_NECESSARY_RESTRICTION",
+  "cyclic/non-well-founded boundary is resolved",
+);
+same(
+  byId.get("Grounded")?.falsificationTarget?.outcome,
+  "NECESSARY_RESTRICTION",
+  "Grounded restriction is retained for totality/existence",
+);
+same(
+  matrix.cycleBoundaryDecision?.outcome,
+  "NECESSARY_RESTRICTION",
+  "cycle boundary records exactly one allowed closure outcome",
+);
+same(
+  matrix.cycleBoundaryDecision?.totality,
+  "GROUNDED_REQUIRED_AND_EXACT_FOR_EXISTENCE",
+  "finite inductive description/inversion existence domain is exactly Grounded",
+);
+same(
+  matrix.cycleBoundaryDecision?.functionality,
+  "GLOBAL_WHEN_DERIVATIONS_EXIST",
+  "functionality remains global conditional on derivation existence",
+);
+same(
+  matrix.cycleBoundaryDecision?.sharing,
+  "GROUNDED_SHARED_SUBSTRUCTURE_IS_NOT_A_TRUE_CYCLE",
+  "shared Grounded substructure is separated from true non-well-founded cycles",
+);
+same(
+  matrix.cycleBoundaryDecision?.coinductionBisimulation,
+  "NOT_INTRODUCED",
+  "no coinductive/bisimulation extension is smuggled into accepted semantics",
+);
+same(
+  matrix.cycleBoundaryDecision?.acceptedSemanticDelta,
+  "NONE",
+  "cycle-boundary closure does not mutate accepted v0.14 semantics",
+);
+same(
+  matrix.cycleBoundaryDecision?.evidence?.pairedKernelStatus,
+  "GREEN",
+  "cycle-boundary decision is backed by paired kernels",
 );
 
 for (const source of [lean, rocq]) {
@@ -285,5 +330,5 @@ assert(
 );
 
 console.log(
-  `v0.14 proof premise classification: ${premises.length} premises, accepted-chain=CONVERGED, global-normalization=ISOLATED_UNRESOLVED, ambient=NAT_INJECTION_PROVEN`,
+  `v0.14 proof premise classification: ${premises.length} premises, accepted-chain=CONVERGED, cycle-boundary=NECESSARY_RESTRICTION, global-normalization=ISOLATED_UNRESOLVED, ambient=NAT_INJECTION_PROVEN`,
 );
