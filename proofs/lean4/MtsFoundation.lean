@@ -867,7 +867,7 @@ theorem INV_01_recursive_inversion_total
     (D : RecursiveInversionDomain F E)
     {x : F.Link}
     (gx : Grounded F x) :
-    ∃ y : F.Link, RecursiveInversion F D current y := by
+    ∃ y : F.Link, RecursiveInversion F D x y := by
   induction gx with
   | @node current startStep finishStep ihStart ihFinish =>
       have gxCurrent : Grounded F current :=
