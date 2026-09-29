@@ -3283,6 +3283,322 @@ Proof.
 Qed.
 
 
+(* Semantic Link construction relative to a selected Context marker.
+   Pole order is expressed relationally; no host frame value is authority. *)
+Definition ContextSemanticArrow
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (selected semanticStart semanticEnd technicalLink : Link F) : Prop :=
+  (SameChiralClass F selected (f2f3_start_root F E) /\
+    technicalLink = form F semanticStart semanticEnd) \/
+  (SameChiralClass F selected (f2f3_finish_root F E) /\
+    technicalLink = form F semanticEnd semanticStart).
+
+Theorem ctx03_same_start_root_implies_start
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (selected : Link F) :
+    SameChiralClass F selected (f2f3_start_root F E) ->
+    StartOnly F selected.
+Proof.
+  intros H.
+  destruct H as [[HSelected HRoot] | [HSelected HRoot]].
+  - exact HSelected.
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + apply f2f3_start_root_pattern.
+    + exact HRoot.
+Qed.
+
+Theorem ctx03_same_finish_root_implies_finish
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (selected : Link F) :
+    SameChiralClass F selected (f2f3_finish_root F E) ->
+    FinishOnly F selected.
+Proof.
+  intros H.
+  destruct H as [[HSelected HRoot] | [HSelected HRoot]].
+  - exfalso.
+    eapply recursive_start_finish_disjoint.
+    + exact HRoot.
+    + apply f2f3_finish_root_pattern.
+  - exact HSelected.
+Qed.
+
+(* One semantic arrow is covariant under simultaneous structural inversion. *)
+Theorem CTX_03_semantic_arrow_covariant
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (selected jselected
+      semanticStart semanticEnd
+      jStart jEnd
+      technicalLink jTechnicalLink : Link F) :
+    RecursiveInversion F E D selected jselected ->
+    RecursiveInversion F E D semanticStart jStart ->
+    RecursiveInversion F E D semanticEnd jEnd ->
+    RecursiveInversion F E D technicalLink jTechnicalLink ->
+    ContextSemanticArrow
+      F E selected semanticStart semanticEnd technicalLink ->
+    ContextSemanticArrow
+      F E jselected jStart jEnd jTechnicalLink.
+Proof.
+  intros HMarkerInv HStartInv HEndInv HLinkInv HArrow.
+  destruct HArrow as [[HClass HLinkEq] | [HClass HLinkEq]].
+  - pose proof
+      (ctx03_same_start_root_implies_start F E selected HClass)
+      as HSelectedStart.
+    pose proof
+      (INV_07_objective_chirality
+        F A1 N E D selected jselected HMarkerInv)
+      as HChiral.
+    pose proof ((proj1 HChiral) HSelectedStart) as HSwap.
+    pose proof (proj1 HSwap) as HJSelectedFinish.
+    assert (
+      HTargetClass :
+      SameChiralClass F jselected (f2f3_finish_root F E)
+    ).
+    {
+      right. split.
+      - exact HJSelectedFinish.
+      - apply f2f3_finish_root_pattern.
+    }
+    destruct
+      (INV_01_recursive_pole_reversal
+        F E D technicalLink jTechnicalLink HLinkInv)
+      as [inverseFinish [inverseStart [HFinishInv [HStartPoleInv HRebuild]]]].
+    rewrite HLinkEq in HFinishInv, HStartPoleInv.
+    rewrite (form_finish F semanticStart semanticEnd) in HFinishInv.
+    rewrite (form_start F semanticStart semanticEnd) in HStartPoleInv.
+    pose proof
+      (recursive_inversion_functional
+        F E D semanticEnd inverseFinish jEnd
+        HFinishInv HEndInv)
+      as HFinishEq.
+    pose proof
+      (recursive_inversion_functional
+        F E D semanticStart inverseStart jStart
+        HStartPoleInv HStartInv)
+      as HStartEq.
+    rewrite HFinishEq, HStartEq in HRebuild.
+    right. split.
+    + exact HTargetClass.
+    + exact HRebuild.
+  - pose proof
+      (ctx03_same_finish_root_implies_finish F E selected HClass)
+      as HSelectedFinish.
+    pose proof
+      (INV_07_objective_chirality
+        F A1 N E D selected jselected HMarkerInv)
+      as HChiral.
+    pose proof ((proj1 (proj2 HChiral)) HSelectedFinish) as HSwap.
+    pose proof (proj1 HSwap) as HJSelectedStart.
+    assert (
+      HTargetClass :
+      SameChiralClass F jselected (f2f3_start_root F E)
+    ).
+    {
+      left. split.
+      - exact HJSelectedStart.
+      - apply f2f3_start_root_pattern.
+    }
+    destruct
+      (INV_01_recursive_pole_reversal
+        F E D technicalLink jTechnicalLink HLinkInv)
+      as [inverseFinish [inverseStart [HFinishInv [HStartPoleInv HRebuild]]]].
+    rewrite HLinkEq in HFinishInv, HStartPoleInv.
+    rewrite (form_finish F semanticEnd semanticStart) in HFinishInv.
+    rewrite (form_start F semanticEnd semanticStart) in HStartPoleInv.
+    pose proof
+      (recursive_inversion_functional
+        F E D semanticStart inverseFinish jStart
+        HFinishInv HStartInv)
+      as HFinishEq.
+    pose proof
+      (recursive_inversion_functional
+        F E D semanticEnd inverseStart jEnd
+        HStartPoleInv HEndInv)
+      as HStartEq.
+    rewrite HFinishEq, HStartEq in HRebuild.
+    left. split.
+    + exact HTargetClass.
+    + exact HRebuild.
+Qed.
+
+(* One-relation structural kernel of generalized modus ponens:
+     K -> A, A -> B  ==>  K -> B
+   represented through ContextSemanticArrow. *)
+Definition ContextGeneralizedMPStep
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (selected K A B truth rule result : Link F) : Prop :=
+  ContextSemanticArrow F E selected K A truth /\
+  ContextSemanticArrow F E selected A B rule /\
+  ContextSemanticArrow F E selected K B result.
+
+Definition ContextGeneralizedMPCovarianceLaw
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) : Prop :=
+  forall selected jselected
+    K A B jK jA jB
+    truth rule result jtruth jrule jresult : Link F,
+    RecursiveInversion F E D selected jselected ->
+    RecursiveInversion F E D K jK ->
+    RecursiveInversion F E D A jA ->
+    RecursiveInversion F E D B jB ->
+    RecursiveInversion F E D truth jtruth ->
+    RecursiveInversion F E D rule jrule ->
+    RecursiveInversion F E D result jresult ->
+    ContextGeneralizedMPStep F E selected K A B truth rule result ->
+    ContextGeneralizedMPStep
+      F E jselected jK jA jB jtruth jrule jresult.
+
+Theorem CTX_03_generalized_mp_semantic_covariance
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    ContextGeneralizedMPCovarianceLaw F E D.
+Proof.
+  unfold ContextGeneralizedMPCovarianceLaw.
+  intros selected jselected
+    K A B jK jA jB
+    truth rule result jtruth jrule jresult
+    HMarkerInv HKInv HAInv HBInv
+    HTruthInv HRuleInv HResultInv HStep.
+  destruct HStep as [HTruth [HRule HResult]].
+  split.
+  - exact
+      (CTX_03_semantic_arrow_covariant
+        F A1 N E D
+        selected jselected
+        K A jK jA
+        truth jtruth
+        HMarkerInv HKInv HAInv HTruthInv HTruth).
+  - split.
+    + exact
+        (CTX_03_semantic_arrow_covariant
+          F A1 N E D
+          selected jselected
+          A B jA jB
+          rule jrule
+          HMarkerInv HAInv HBInv HRuleInv HRule).
+    + exact
+        (CTX_03_semantic_arrow_covariant
+          F A1 N E D
+          selected jselected
+          K B jK jB
+          result jresult
+          HMarkerInv HKInv HBInv HResultInv HResult).
+Qed.
+
+(* Explicit non-covariant negative control.  Reading the technical first pole
+   is definable, but it is not a Context-semantic operation. *)
+Definition TechnicalStartOperation
+    (F : Foundation)
+    (input output : Link F) : Prop :=
+  output = start F input.
+
+Definition InversionCovariantUnaryOperation
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (Op : Link F -> Link F -> Prop) : Prop :=
+  forall input jinput output joutput : Link F,
+    RecursiveInversion F E D input jinput ->
+    RecursiveInversion F E D output joutput ->
+    Op input output ->
+    Op jinput joutput.
+
+Theorem CTX_03_technical_start_not_covariant
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    ~ InversionCovariantUnaryOperation
+      F E D (TechnicalStartOperation F).
+Proof.
+  intros HCovariant.
+  pose proof (CTX_03_direction_witness_inversion F E D) as HDirections.
+  assert (HR : RecursiveInversion F E D (R F) (R F)).
+  {
+    apply recursive_inversion_root.
+  }
+  assert (
+    HCO :
+    RecursiveInversion F E D
+      (f2f3_finish_root F E)
+      (f2f3_start_root F E)
+  ).
+  {
+    assert (
+      HChild :
+      RecursiveInversion F E D
+        (start F (f2f3_finish_root F E))
+        (R F)
+    ).
+    {
+      rewrite (f2f3_finish_root_start F E).
+      exact HR.
+    }
+    assert (
+      HRaw :
+      RecursiveInversion F E D
+        (f2f3_finish_root F E)
+        (recursive_start_form F E D (R F))
+    ).
+    {
+      apply recursive_inversion_finish.
+      - apply f2f3_finish_root_pattern.
+      - exact HChild.
+    }
+    rewrite (recursive_start_root_compat F E D) in HRaw.
+    exact HRaw.
+  }
+  assert (
+    HSource :
+    TechnicalStartOperation
+      F (ContextInRWitness F E) (f2f3_finish_root F E)
+  ).
+  {
+    unfold TechnicalStartOperation, ContextInRWitness.
+    rewrite (form_start F (f2f3_finish_root F E) (R F)).
+    reflexivity.
+  }
+  pose proof
+    (HCovariant
+      (ContextInRWitness F E)
+      (ContextOutRWitness F E)
+      (f2f3_finish_root F E)
+      (f2f3_start_root F E)
+      (proj1 HDirections)
+      HCO
+      HSource)
+    as HMirror.
+  unfold TechnicalStartOperation, ContextOutRWitness in HMirror.
+  rewrite (form_start F (R F) (f2f3_start_root F E)) in HMirror.
+  exact ((f2f3_start_root_ne_root F E) HMirror).
+Qed.
+
+Definition ContextChiBridgeLaw
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) : Prop :=
+  forall body selected : Link F,
+    ContextOrientationMarker F E D body selected ->
+    exists chi jchi : Link F,
+      ContextChiWitness F E selected chi /\
+      RecursiveInversion F E D chi jchi /\
+      chi <> jchi /\
+      ((chi = ContextInRWitness F E /\
+        jchi = ContextOutRWitness F E) \/
+       (chi = ContextOutRWitness F E /\
+        jchi = ContextInRWitness F E)).
+
 (* CTX-03 capstone: objective chirality predates observation, Context selection
    induces only local START_K/END_K roles, and relative transport composes as
    the already-proved relational Z2 layer.
@@ -3338,6 +3654,36 @@ Proof.
              (CTX_03_simultaneous_inversion_covariance
                F A1 N E D a b ja jb HJa HJb).
 Qed.
+
+
+(* Strengthened CTX-03 semantic capstone. *)
+Theorem CTX_03_semantic_covariance_capstone
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E) :
+    ContextChiBridgeLaw F E D /\
+    ContextGeneralizedMPCovarianceLaw F E D /\
+    ~ InversionCovariantUnaryOperation
+      F E D (TechnicalStartOperation F).
+Proof.
+  pose proof
+    (CTX_03_context_relative_gauge F A1 N E D)
+    as HStructuralLayer.
+  split.
+  - unfold ContextChiBridgeLaw.
+    intros body selected HSelected.
+    exact
+      (CTX_03_chi_direction_bridge
+        F A1 E D body selected HSelected).
+  - split.
+    + exact
+        (CTX_03_generalized_mp_semantic_covariance F A1 N E D).
+    + exact
+        (CTX_03_technical_start_not_covariant F E D).
+Qed.
+
 
 
 (* FND-07 external projection of accepted contextual-truth semantics.
