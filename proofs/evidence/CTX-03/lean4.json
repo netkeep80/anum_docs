@@ -20,7 +20,7 @@
   "lane": "lean4",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "c89eeb80e878504896d8fe517b43fb10a80236ff",
+    "commitSha": "07d1808d1ba24b45bff9c000cbdd8aefae4a4e44",
     "toolchain": {
       "name": "Lean",
       "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
@@ -29,8 +29,8 @@
   "artifacts": [
     {
       "path": "proofs/lean4/MtsFoundation.lean",
-      "sha256": "24259e1b3f0c22caccd4af8cbdf92eedafc517cac1227e9d2eade04e7f0046d3"
+      "sha256": "20c2e76c4fe7b458021ef944c644ef87199a4352a2fde6adcfd05510b21a2861"
     }
   ],
-  "notes": "External differential proof only. CTX-03 proves an objective pre-selection chiral orbit, Link-native one-sided Context markers, Context-local START_K/END_K roles after marker selection, simultaneous-inversion covariance, and relative Same/Opposite transport composing as Z2. Lean/Rocq host foundations and elementary group theory (Z2) are explicitly external proof projections; none is promoted into MTS ontology, native notation, or semantic authority. No Foundation-global selected orientation, host Bool/Frame/Gauge carrier, ExactSequence/Anum/Q/FORMAL authority, raw-memory-presence authority, or second ontology entity is introduced."
+  "notes": "External differential proof only. CTX-03 has kernel-checked structural and semantic layers: CTX_03_context_relative_gauge proves the objective pre-selection chiral orbit, Link-native one-sided Context markers, local START_K/END_K roles, simultaneous-inversion covariance, and relational Z2 transport. The strengthened semantic chain proves unique chi(K) selected by the Link-native Context marker; accepted InR_K/OutR_K Link witnesses are exchanged by structural J; the generalized K->A + A->B => K->B semantic step is covariant under J; and TechnicalStartOperation is an explicit falsifier/counterexample showing that a technical first-pole operation is not automatically semantic-covariant. Lean/Rocq host foundations and elementary group theory (Z2) remain external proof projections only. No Foundation-global selected orientation, host Frame/Gauge/Bool/ExactSequence authority, raw carrier pole order, or second ontology entity is introduced."
 }
