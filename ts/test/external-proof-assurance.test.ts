@@ -194,11 +194,11 @@ expectRejected("Rocq Admitted theorem", () =>
 const fnd07LeanStart = lean.indexOf("theorem FND_07_contextual_truth_boundary");
 assert(fnd07LeanStart >= 0, "Lean FND-07 theorem exists for mutation test");
 const fnd07LeanTail = lean.slice(fnd07LeanStart);
-const leanBranchNeedle = "    · rfl";
+const leanBranchNeedle = "  · intro K A\n    rfl";
 assert(fnd07LeanTail.includes(leanBranchNeedle), "Lean FND-07 has a concrete branch to mutate");
 const leanFnd07Mutation =
   lean.slice(0, fnd07LeanStart) +
-  fnd07LeanTail.replace(leanBranchNeedle, "    · sorry");
+  fnd07LeanTail.replace(leanBranchNeedle, "  · intro K A\n    sorry");
 expectRejected("real Lean FND-07 branch replaced by sorry", () =>
   assertLeanFailClosed(leanFnd07Mutation),
 );
