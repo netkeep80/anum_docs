@@ -103,6 +103,24 @@ def decode : ModelLink → Option (ModelLink × ModelLink)
     decode (pairCode a b) = some (a, b) := by
   simp [pairCode, decode, decodeLeft_encodeLeft_append]
 
+@[simp] theorem startForm_ne_root (a : ModelLink) :
+    startForm a ≠ root := by
+  simp [startForm, root]
+
+@[simp] theorem endForm_ne_root (a : ModelLink) :
+    endForm a ≠ root := by
+  simp [endForm, root]
+
+theorem no_start_end_overlap (a : ModelLink) :
+    a ≠ startForm (endForm a) := by
+  intro h
+  have hLength := congrArg List.length h
+  have hLength' : a.length = a.length + 4 := by
+    simpa [startForm, endForm] using hLength
+  have hLt : a.length < a.length + 4 :=
+    Nat.lt_add_of_pos_right (by decide)
+  exact (Nat.ne_of_lt hLt) hLength'
+
 /--
 One total Link-forming primitive.
 
@@ -126,9 +144,11 @@ theorem decode_form (a b : ModelLink) :
   · rcases hRoot with ⟨rfl, rfl⟩
     simp [form]
   · by_cases hStart : a = startForm b
-    · simp [form, hRoot, hStart]
+    · rw [hStart]
+      simp [form]
     · by_cases hEnd : b = endForm a
-      · simp [form, hRoot, hStart, hEnd]
+      · rw [hEnd]
+        simp [form, hStart, no_start_end_overlap]
       · simp [form, hRoot, hStart, hEnd]
 
 def start (x : ModelLink) : ModelLink :=
@@ -153,7 +173,7 @@ def finish (x : ModelLink) : ModelLink :=
     form root root = root := by
   simp [form]
 
-def ExplicitFoundation : Foundation where
+abbrev ExplicitFoundation : Foundation where
   Link := ModelLink
   form := form
   start := start
@@ -164,29 +184,19 @@ def ExplicitFoundation : Foundation where
   form_finish := finish_form
   root_self := form_root_root
 
-@[simp] theorem startForm_ne_root (a : ModelLink) :
-    startForm a ≠ root := by
-  simp [startForm, root]
-
-@[simp] theorem endForm_ne_root (a : ModelLink) :
-    endForm a ≠ root := by
-  simp [endForm, root]
-
 @[simp] theorem form_startForm (a : ModelLink) :
     form (startForm a) a = startForm a := by
-  simp [form, startForm_ne_root]
+  simp [form]
 
 @[simp] theorem form_endForm (a : ModelLink) :
     form a (endForm a) = endForm a := by
-  by_cases h : a = startForm (endForm a)
-  · simp [form, h]
-  · simp [form, h, endForm_ne_root]
+  simp [form, no_start_end_overlap]
 
 /--
 The model supplies proper one-sided witnesses around ROOT without adding
 one-sided constructors to the MTS Foundation interface.
 -/
-def ExplicitOneSided : F2F3OneSidedExistence ExplicitFoundation where
+abbrev ExplicitOneSided : F2F3OneSidedExistence ExplicitFoundation where
   startRoot := startForm root
   finishRoot := endForm root
 
@@ -199,14 +209,19 @@ def ExplicitOneSided : F2F3OneSidedExistence ExplicitFoundation where
     simp
 
   startRootNeRoot := by
-    simp [startForm, root]
+    change startForm root ≠ root
+    exact startForm_ne_root root
 
   finishRootNeRoot := by
-    simp [endForm, root]
+    change endForm root ≠ root
+    exact endForm_ne_root root
 
 theorem explicit_local_decision
     (x : ExplicitFoundation.Link) :
     LocalSelfDecision ExplicitFoundation x := by
+  letI : DecidableEq ExplicitFoundation.Link := by
+    change DecidableEq ModelLink
+    infer_instance
   unfold LocalSelfDecision
   exact ⟨Decidable.em _, Decidable.em _⟩
 
