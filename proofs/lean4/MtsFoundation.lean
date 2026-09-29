@@ -403,36 +403,24 @@ This is not yet the full FND-01 realizability claim.  It proves that, once the
 two local identity questions have explicit decision evidence, the accepted
 Link has exactly one of the four self-incidence proposition patterns.
 
-The full-self branch is tied to unique ROOT through FND-02.  Equality of actual
-Links remains structural ordered-pole equality through FND-13.  Context
-orientation is intentionally absent here: it later names the two one-sided
-patterns but does not create them.
+The full-self branch is tied to unique ROOT through FND-02.  Ordered-pole
+identity remains the separate FND-13 theorem and is intentionally not imported
+into this local classification.  Context orientation later names the two
+one-sided patterns but does not create them.
 -/
 theorem FND_01_local_partition
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3GroundedNormalization F)
     {x : F.Link}
-    (gx : Grounded F x)
     (decision : LocalSelfDecision F x) :
     LocalSelfIncidenceExhaustive F x ∧
     LocalSelfIncidenceExclusive F x ∧
-    (FullSelf F x → x = F.R) ∧
-    (∀ {y : F.Link},
-      Grounded F y →
-      F.start x = F.start y →
-      F.finish x = F.finish y →
-      x = y) := by
-  refine ⟨
+    (FullSelf F x → x = F.R) := by
+  exact ⟨
     local_self_incidence_exhaustive F decision,
     local_self_incidence_exclusive F,
-    ?_,
-    ?_
+    fun h => FND_02_unique_root F a1 h
   ⟩
-  · intro h
-    exact FND_02_unique_root F a1 h
-  · intro y gy hs hf
-    exact (FND_13_identity_by_poles F N gx gy).2 ⟨hs, hf⟩
 
 
 /--
@@ -632,27 +620,19 @@ Link once the two local self-incidence questions are explicitly decidable.
 C2 proves that all four proposition patterns are realized in the accepted
 finite R-grounded domain.
 
-The capstone keeps both facts together and also preserves the already proved
-identity boundaries:
-- full self-closure is unique ROOT through FND-02;
-- actual semantic Link identity is ordered-pole identity through FND-13.
+The capstone keeps the structural classification and grounded realizability
+together.  Full self-closure is identified with unique ROOT through FND-02;
+ordered-pole identity remains the separate FND-13 theorem.
 -/
 theorem FND_01_four_structural_cases
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     {x : F.Link}
-    (gx : Grounded F x)
     (decision : LocalSelfDecision F x) :
     LocalSelfIncidenceExhaustive F x ∧
     LocalSelfIncidenceExclusive F x ∧
     (FullSelf F x → x = F.R) ∧
-    (∀ {y : F.Link},
-      Grounded F y →
-      F.start x = F.start y →
-      F.finish x = F.finish y →
-      x = y) ∧
     (FullSelf F F.R ∧
       ∃ startWitness finishWitness pairWitness : F.Link,
         Grounded F startWitness ∧
@@ -661,13 +641,12 @@ theorem FND_01_four_structural_cases
         StartOnly F startWitness ∧
         FinishOnly F finishWitness ∧
         PairLocal F pairWitness) := by
-  have c1 := FND_01_local_partition F a1 N gx decision
+  have c1 := FND_01_local_partition F a1 decision
   have c2 := FND_01_grounded_realizability F E
   exact ⟨
     c1.1,
     c1.2.1,
-    c1.2.2.1,
-    c1.2.2.2,
+    c1.2.2,
     c2
   ⟩
 
@@ -884,7 +863,6 @@ case is identified with ROOT by FND-02.
 theorem INV_01_recursive_inversion_total
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     {x : F.Link}
@@ -895,7 +873,7 @@ theorem INV_01_recursive_inversion_total
       have gxCurrent : Grounded F x :=
         Grounded.node startStep finishStep
       have decision := D.decide gxCurrent
-      have partition := FND_01_local_partition F a1 N gxCurrent decision
+      have partition := FND_01_local_partition F a1 decision
       rcases partition.1 with hFull | hStart | hFinish | hPair
       · have hxRoot := FND_02_unique_root F a1 hFull
         refine ⟨F.R, ?_⟩
@@ -1116,13 +1094,12 @@ choice: every source has exactly one graph image.
 theorem INV_01_recursive_inversion_unique_total
     (F : Foundation)
     (a1 : A1RecursiveSeparation F)
-    (N : F2F3GroundedNormalization F)
     (E : F2F3OneSidedExistence F)
     (D : RecursiveInversionDomain F E)
     {x : F.Link}
     (gx : Grounded F x) :
     UniqueRecursiveInverse F D x := by
-  rcases INV_01_recursive_inversion_total F a1 N E D gx with
+  rcases INV_01_recursive_inversion_total F a1 E D gx with
     ⟨y, hy⟩
   refine ⟨y, hy, ?_⟩
   intro z hz
@@ -1665,7 +1642,7 @@ theorem INV_05_pair_preserved_and_reversed
   have hzx : z = x :=
     INV_02_recursive_inversion_involutive F a1 N E D hxy hyz
   have decision := D.decide gy
-  have partition := FND_01_local_partition F a1 N gy decision
+  have partition := FND_01_local_partition F a1 decision
   have hPairY : PairLocal F y := by
     rcases partition.1 with hFull | hStart | hFinish | hPair
     · have hyRoot : y = F.R :=
