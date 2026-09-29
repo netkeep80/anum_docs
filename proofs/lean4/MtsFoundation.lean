@@ -2357,22 +2357,27 @@ theorem ctx03_inr_pair_pattern
       calc
         E.finishRoot =
             F.start (ContextInRWitness F E) := by
-          simp only [ContextInRWitness, F.form_start]
+          unfold ContextInRWitness
+          rw [F.form_start]
         _ = ContextInRWitness F E := hSelf
     have hFinish := congrArg F.finish hEq
-    apply E.finishRootNeRoot
-    simpa only [
-      ContextInRWitness,
-      f2f3_finish_root_finish F E,
-      F.form_finish
-    ] using hFinish
+    have hBad : E.finishRoot = F.R := by
+      calc
+        E.finishRoot = F.finish E.finishRoot :=
+          (f2f3_finish_root_finish F E).symm
+        _ = F.finish (ContextInRWitness F E) := hFinish
+        _ = F.R := by
+          unfold ContextInRWitness
+          rw [F.form_finish]
+    exact E.finishRootNeRoot hBad
   · intro hSelf
     have hEq :
         F.R = ContextInRWitness F E := by
       calc
         F.R =
             F.finish (ContextInRWitness F E) := by
-          simp only [ContextInRWitness, F.form_finish]
+          unfold ContextInRWitness
+          rw [F.form_finish]
         _ = ContextInRWitness F E := hSelf
     have hStart := congrArg F.start hEq
     have hRootStart : F.start F.R = F.R := (root_full_self F).1
@@ -2381,7 +2386,8 @@ theorem ctx03_inr_pair_pattern
         F.R = F.start F.R := hRootStart.symm
         _ = F.start (ContextInRWitness F E) := hStart
         _ = E.finishRoot := by
-          simp only [ContextInRWitness, F.form_start]
+          unfold ContextInRWitness
+          rw [F.form_start]
     exact E.finishRootNeRoot hRootEq.symm
 
 theorem ctx03_outr_pair_pattern
@@ -2395,7 +2401,8 @@ theorem ctx03_outr_pair_pattern
       calc
         F.R =
             F.start (ContextOutRWitness F E) := by
-          simp only [ContextOutRWitness, F.form_start]
+          unfold ContextOutRWitness
+          rw [F.form_start]
         _ = ContextOutRWitness F E := hSelf
     have hFinish := congrArg F.finish hEq
     have hRootFinish : F.finish F.R = F.R := (root_full_self F).2
@@ -2404,7 +2411,8 @@ theorem ctx03_outr_pair_pattern
         F.R = F.finish F.R := hRootFinish.symm
         _ = F.finish (ContextOutRWitness F E) := hFinish
         _ = E.startRoot := by
-          simp only [ContextOutRWitness, F.form_finish]
+          unfold ContextOutRWitness
+          rw [F.form_finish]
     exact E.startRootNeRoot hRootEq.symm
   · intro hSelf
     have hEq :
@@ -2412,15 +2420,19 @@ theorem ctx03_outr_pair_pattern
       calc
         E.startRoot =
             F.finish (ContextOutRWitness F E) := by
-          simp only [ContextOutRWitness, F.form_finish]
+          unfold ContextOutRWitness
+          rw [F.form_finish]
         _ = ContextOutRWitness F E := hSelf
     have hStart := congrArg F.start hEq
-    apply E.startRootNeRoot
-    simpa only [
-      ContextOutRWitness,
-      f2f3_start_root_start F E,
-      F.form_start
-    ] using hStart
+    have hBad : E.startRoot = F.R := by
+      calc
+        E.startRoot = F.start E.startRoot :=
+          (f2f3_start_root_start F E).symm
+        _ = F.start (ContextOutRWitness F E) := hStart
+        _ = F.R := by
+          unfold ContextOutRWitness
+          rw [F.form_start]
+    exact E.startRootNeRoot hBad
 
 theorem ctx03_direction_witnesses_distinct
     (F : Foundation)
