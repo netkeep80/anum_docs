@@ -782,4 +782,105 @@ theorem natLink_injective :
     simpa [natLink] using hLength
   exact Nat.add_right_cancel hSucc
 
+/--
+Concrete decision package for FND-05 on the explicit model.
+
+This is only the host-computable local self-incidence decision already used by
+the inversion domain, restricted to Grounded Links by the theorem interface.
+-/
+def ExplicitCarrierDecision :
+    FiniteRecursiveCarrierDecision ExplicitFoundation := by
+  intro x _gx
+  exact explicit_local_decision x
+
+/--
+Replay the stabilized FND/INV/CTX proof chain on one explicit infinite ambient
+model with finite Grounded proof objects.  These declarations introduce no new
+premises: every argument is one of the concrete Explicit* witnesses proved in
+this file.
+-/
+def explicit_fnd02_replay
+    {x : ModelLink}
+    (hFull : FullSelf ExplicitFoundation x) :=
+  FND_02_unique_root ExplicitFoundation explicit_a1 hFull
+
+def explicit_fnd01_replay (x : ModelLink) :=
+  FND_01_four_structural_cases
+    ExplicitFoundation explicit_a1 ExplicitOneSided
+    (explicit_local_decision x)
+
+def explicit_fnd05_replay
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x) :=
+  FND_05_recursive_description_total
+    ExplicitFoundation explicit_a1 ExplicitCarrierDecision gx
+
+def explicit_inv01_replay
+    {x : ModelLink}
+    (gx : Grounded ExplicitFoundation x) :=
+  INV_01_recursive_inversion_total
+    ExplicitFoundation explicit_a1 ExplicitOneSided ExplicitInversionDomain gx
+
+def explicit_inv02_replay
+    {x y z : ModelLink}
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y)
+    (hyz : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain y z) :=
+  INV_02_recursive_inversion_involutive
+    ExplicitFoundation explicit_a1 ExplicitGroundedNormalization
+    ExplicitOneSided ExplicitInversionDomain hxy hyz
+
+def explicit_inv03_replay
+    {y : ModelLink}
+    (h : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain ExplicitFoundation.R y) :=
+  INV_03_root_fixed
+    ExplicitFoundation ExplicitInversionDomain h
+
+def explicit_inv04_start_replay
+    {x y : ModelLink}
+    (hStart : StartOnly ExplicitFoundation x)
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y) :=
+  INV_04_start_to_finish
+    ExplicitFoundation explicit_a1 ExplicitOneSided ExplicitInversionDomain
+    hStart hxy
+
+def explicit_inv04_finish_replay
+    {x y : ModelLink}
+    (hFinish : FinishOnly ExplicitFoundation x)
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y) :=
+  INV_04_finish_to_start
+    ExplicitFoundation explicit_a1 ExplicitOneSided ExplicitInversionDomain
+    hFinish hxy
+
+def explicit_inv05_replay
+    {x y : ModelLink}
+    (hPair : PairLocal ExplicitFoundation x)
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y) :=
+  INV_05_pair_preserved_and_reversed
+    ExplicitFoundation explicit_a1 ExplicitGroundedNormalization
+    ExplicitOneSided ExplicitInversionDomain hPair hxy
+
+def explicit_inv06_replay :=
+  INV_06_root_basis
+    ExplicitFoundation explicit_a1 ExplicitGroundedNormalization
+    ExplicitOneSided ExplicitInversionDomain
+
+def explicit_inv07_replay
+    (x y : ModelLink)
+    (hxy : RecursiveInversion
+      ExplicitFoundation ExplicitInversionDomain x y) :=
+  INV_07_objective_chirality
+    ExplicitFoundation explicit_a1 ExplicitGroundedNormalization
+    ExplicitOneSided ExplicitInversionDomain x y hxy
+
+def explicit_ctx03_replay :=
+  CTX_03_context_relative_gauge
+    ExplicitFoundation explicit_a1 ExplicitGroundedNormalization
+    ExplicitOneSided ExplicitInversionDomain
+
 end MTS.External.Model1796
