@@ -609,6 +609,72 @@ for (const record of inv07) {
   );
 }
 
+const ctx03 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "CTX-03")
+  .map(({ record }) => record);
+assert.equal(ctx03.length, 2, "CTX-03 has exactly two external evidence records");
+assert.deepEqual(
+  ctx03.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "CTX-03 external lanes",
+);
+for (const record of ctx03) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "c89eeb80e878504896d8fe517b43fb10a80236ff",
+    `CTX-03 ${record.lane} proof source commit`,
+  );
+  assert.deepEqual(
+    record.assumptions,
+    ["INV-02", "INV-07", "accepted Link-native Context orientation markers"],
+    "CTX-03 assumptions preserve the P0 boundary",
+  );
+  assert.deepEqual(
+    record.dependencies,
+    ["INV-02", "INV-07"],
+    "CTX-03 dependencies preserve the P0 boundary",
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "CTX-03 Lean evidence keeps exact compiler/artifact pins",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "CTX-03 Rocq evidence keeps exact compiler/image pins",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /Link-native one-sided Context markers/i,
+    "CTX-03 evidence records the Link-native Context carrier",
+  );
+  assert.match(
+    String(record.notes),
+    /START_K\/END_K|START_K.*END_K/i,
+    "CTX-03 evidence records Context-local orientation roles",
+  );
+  assert.match(
+    String(record.notes),
+    /group theory.*Z2|Z2.*external proof projection/i,
+    "CTX-03 evidence explicitly marks the external group-theory projection",
+  );
+  assert.match(
+    String(record.notes),
+    /not.*MTS ontology|none is promoted into MTS ontology/i,
+    "CTX-03 evidence preserves the no-backflow boundary",
+  );
+  assert.match(
+    String(record.notes),
+    /no Foundation-global selected orientation|No Foundation-global selected orientation/i,
+    "CTX-03 evidence excludes a global selected frame",
+  );
+}
+
 const leanEvidence = fnd02.find((record) => record.lane === "lean4");
 const coqEvidence = fnd02.find((record) => record.lane === "coq");
 assert.ok(leanEvidence !== undefined && coqEvidence !== undefined);
@@ -630,5 +696,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq aprover-input=mtsNative-only`,
 );

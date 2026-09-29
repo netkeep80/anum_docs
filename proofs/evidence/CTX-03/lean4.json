@@ -1,0 +1,36 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "CTX-03",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "INV-02",
+    "INV-07",
+    "accepted Link-native Context orientation markers"
+  ],
+  "dependencies": [
+    "INV-02",
+    "INV-07"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "lean4",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "c89eeb80e878504896d8fe517b43fb10a80236ff",
+    "toolchain": {
+      "name": "Lean",
+      "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/lean4/MtsFoundation.lean",
+      "sha256": "24259e1b3f0c22caccd4af8cbdf92eedafc517cac1227e9d2eade04e7f0046d3"
+    }
+  ],
+  "notes": "External differential proof only. CTX-03 proves an objective pre-selection chiral orbit, Link-native one-sided Context markers, Context-local START_K/END_K roles after marker selection, simultaneous-inversion covariance, and relative Same/Opposite transport composing as Z2. Lean/Rocq host foundations and elementary group theory (Z2) are explicitly external proof projections; none is promoted into MTS ontology, native notation, or semantic authority. No Foundation-global selected orientation, host Bool/Frame/Gauge carrier, ExactSequence/Anum/Q/FORMAL authority, raw-memory-presence authority, or second ontology entity is introduced."
+}
