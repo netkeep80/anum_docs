@@ -31,5 +31,5 @@
       "sha256": "d5d896bb28651511c25b4c385aa85c97acb0d298f821ae1547053277735052fe"
     }
   ],
-  "notes": "External differential proof only. INV-02 proves involution J(J(X))=X on exactly the finite Grounded domain of INV-01. START/END use derived one-sided canonicality. The PAIR branch reverses both poles again through INV-01 and reconstructs the original Link only through the separate Grounded FND-13 identity boundary. No stronger global arbitrary-Link normalization/extensionality premise, second inversion function, enlarged domain, classical choice, codec/handle identity, labels, opcodes, or host field order is introduced."
+  "notes": "External differential proof only. INV-02 proves involution J(J(X))=X on the same finite Grounded domain as INV-01 and reuses the same Prop-valued RecursiveInversion graph; no second inversion function or enlarged domain is introduced. START/END use derived one-sided canonicality. The PAIR branch reverses both poles again through INV-01 and reconstructs the original Link only through the separate Grounded FND-13 identity boundary. No stronger global arbitrary-Link normalization/extensionality premise, classical choice, codec/handle identity, labels, opcodes, or host field order is introduced."
 }
