@@ -347,7 +347,8 @@ Theorem nat_link_injective :
 Proof.
   intros left right H.
   pose proof (f_equal (@length bool) H) as Hlen.
-  rewrite !nat_link_length in Hlen.
+  rewrite (nat_link_length left) in Hlen.
+  rewrite (nat_link_length right) in Hlen.
   now injection Hlen.
 Qed.
 
