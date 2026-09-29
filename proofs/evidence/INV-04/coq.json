@@ -17,7 +17,7 @@
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "54af5c6c1f9bfdaa7c23331cb431355a886794ec",
+    "commitSha": "ab0dc7f53ec7ee7fa32942be3684062c5b8bd616",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
@@ -26,8 +26,8 @@
   "artifacts": [
     {
       "path": "proofs/coq/MtsFoundation.v",
-      "sha256": "a5018c308cca896ab56964da6200271d6d83079c36eddbdf13b847e441d4dbec"
+      "sha256": "01adf311071e9310899a3f1d0b5eb1004031636061418a2beb5125a3b468d2a4"
     }
   ],
-  "notes": "External differential proof only. INV-04 proves that RecursiveInversion exchanges the two proper one-sided self-incidence classes: StartOnly maps to FinishOnly and FinishOnly maps to StartOnly. Source and image are not identified, by the already-derived disjointness of the one-sided classes. START_K and END_K remain Context-relative names; the proof selects no Foundation-global absolute orientation and uses no representation order."
+  "notes": "External differential proof only. INV-04 proves that RecursiveInversion exchanges the two proper one-sided self-incidence classes: StartOnly maps to FinishOnly and FinishOnly maps to StartOnly. Source and image are not identified, by the already-derived disjointness of the one-sided classes. START_K and END_K remain Context-relative names; the proof selects no Foundation-global absolute orientation and uses no representation order. Proof source is repinned to the #1796 minimized proof bundle; this supporting theorem boundary is unchanged."
 }
