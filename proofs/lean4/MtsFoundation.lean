@@ -1444,4 +1444,143 @@ theorem INV_02_unique_total_involution
     INV_02_recursive_inversion_involutive F a1 N E D hxy hyz
   ⟩
 
+
+/--
+INV-03: ROOT is a fixed point of the existing INV-01 structural graph, and
+functionality makes that image unique.
+-/
+theorem INV_03_root_fixed
+    (F : Foundation)
+    {E : F2F3OneSidedExistence F}
+    (D : RecursiveInversionDomain F E)
+    {y : F.Link}
+    (h : RecursiveInversion F D F.R y) :
+    y = F.R := by
+  exact recursive_inversion_functional F D h
+    (RecursiveInversion.root (F := F) (D := D))
+
+/--
+INV-04, START side: a proper START source is sent to a proper END image, and
+the two Links cannot be identified because the one-sided predicates are
+disjoint.
+-/
+theorem INV_04_start_to_finish
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {x y : F.Link}
+    (hStart : StartOnly F x)
+    (hxy : RecursiveInversion F D x y) :
+    FinishOnly F y ∧ x ≠ y := by
+  rcases recursive_inversion_from_start_only F D hStart hxy with
+    ⟨childInverse, _hChild, hy⟩
+  have hFinishImage :
+      FinishOnly F (D.endForm childInverse) :=
+    recursive_end_form_pattern F a1 E D childInverse
+  subst y
+  refine ⟨hFinishImage, ?_⟩
+  intro hEq
+  have hFinishX : FinishOnly F x := by
+    rw [hEq]
+    exact hFinishImage
+  exact recursive_start_finish_disjoint F hStart hFinishX
+
+/--
+INV-04, END side: a proper END source is sent to a proper START image, again
+without identifying the two one-sided classes.
+-/
+theorem INV_04_finish_to_start
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {x y : F.Link}
+    (hFinish : FinishOnly F x)
+    (hxy : RecursiveInversion F D x y) :
+    StartOnly F y ∧ x ≠ y := by
+  rcases recursive_inversion_from_finish_only F D hFinish hxy with
+    ⟨childInverse, _hChild, hy⟩
+  have hStartImage :
+      StartOnly F (D.startForm childInverse) :=
+    recursive_start_form_pattern F a1 E D childInverse
+  subst y
+  refine ⟨hStartImage, ?_⟩
+  intro hEq
+  have hStartX : StartOnly F x := by
+    rw [hEq]
+    exact hStartImage
+  exact recursive_start_finish_disjoint F hStartX hFinish
+
+/--
+INV-05: a PAIR source remains PAIR under structural inversion and its poles
+are recursively exchanged.
+
+The non-collapse argument uses INV-02 only as an already-derived theorem of the
+same INV-01 assumptions: if the image collapsed to ROOT/START/END, inverting it
+again would force the original PAIR into the corresponding disjoint class.
+No new domain field or pair-preservation axiom is introduced.
+-/
+theorem INV_05_pair_preserved_and_reversed
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F
+      (fun {x} hx => FND_02_unique_root F a1 hx))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    {x y : F.Link}
+    (hPairX : PairLocal F x)
+    (hxy : RecursiveInversion F D x y) :
+    PairLocal F y ∧
+    ∃ inverseFinish inverseStart : F.Link,
+      RecursiveInversion F D (F.finish x) inverseFinish ∧
+      RecursiveInversion F D (F.start x) inverseStart ∧
+      y = F.form inverseFinish inverseStart := by
+  have gy : Grounded F y :=
+    recursive_inversion_image_grounded F D hxy
+  rcases INV_01_recursive_inversion_total F a1 N E D gy with
+    ⟨z, hyz⟩
+  have hzx : z = x :=
+    INV_02_recursive_inversion_involutive F a1 N E D hxy hyz
+  have decision := D.decide gy
+  have partition := FND_01_local_partition F a1 N decision
+  have hPairY : PairLocal F y := by
+    rcases partition.1 with hFull | hStart | hFinish | hPair
+    · have hyRoot : y = F.R :=
+        FND_02_unique_root F a1 hFull
+      have hyzRoot : RecursiveInversion F D F.R z := by
+        rw [← hyRoot]
+        exact hyz
+      have hzRoot : z = F.R :=
+        recursive_inversion_functional F D hyzRoot
+          (RecursiveInversion.root (F := F) (D := D))
+      have hxRoot : x = F.R := by
+        calc
+          x = z := hzx.symm
+          _ = F.R := hzRoot
+      have hFullX : FullSelf F x := by
+        rw [hxRoot]
+        exact root_full_self F
+      exact False.elim
+        (recursive_full_pair_disjoint F hFullX hPairX)
+    · have hzFinish : FinishOnly F z :=
+        (INV_04_start_to_finish F a1 E D hStart hyz).1
+      have hFinishX : FinishOnly F x := by
+        rw [← hzx]
+        exact hzFinish
+      exact False.elim
+        (recursive_finish_pair_disjoint F hFinishX hPairX)
+    · have hzStart : StartOnly F z :=
+        (INV_04_finish_to_start F a1 E D hFinish hyz).1
+      have hStartX : StartOnly F x := by
+        rw [← hzx]
+        exact hzStart
+      exact False.elim
+        (recursive_start_pair_disjoint F hStartX hPairX)
+    · exact hPair
+  exact ⟨
+    hPairY,
+    INV_01_recursive_pole_reversal F D hxy
+  ⟩
+
 end MTS.External

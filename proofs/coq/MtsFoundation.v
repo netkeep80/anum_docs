@@ -1665,3 +1665,183 @@ Proof.
       * exact Hxy.
       * exact Hyz.
 Qed.
+
+
+(* INV-03: ROOT is the unique image of ROOT under the existing INV-01 graph. *)
+Theorem INV_03_root_fixed
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (y : Link F) :
+    RecursiveInversion F E D (R F) y ->
+    y = R F.
+Proof.
+  intros H.
+  apply (recursive_inversion_functional F E D (R F) y (R F)).
+  - exact H.
+  - apply recursive_inversion_root.
+Qed.
+
+(* INV-04, START side: proper START maps to proper END and cannot be
+   identified with its image. *)
+Theorem INV_04_start_to_finish
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x y : Link F) :
+    StartOnly F x ->
+    RecursiveInversion F E D x y ->
+    FinishOnly F y /\
+    x <> y.
+Proof.
+  intros HStart Hxy.
+  destruct
+    (recursive_inversion_from_start_only F E D x y HStart Hxy)
+    as [childInverse [HChild Hy]].
+  subst y.
+  pose proof
+    (recursive_end_form_pattern F A1 E D childInverse)
+    as HFinishImage.
+  split.
+  - exact HFinishImage.
+  - intros Heq.
+    assert (HFinishX : FinishOnly F x).
+    {
+      rewrite Heq.
+      exact HFinishImage.
+    }
+    eapply recursive_start_finish_disjoint.
+    + exact HStart.
+    + exact HFinishX.
+Qed.
+
+(* INV-04, END side: proper END maps to proper START and cannot be
+   identified with its image. *)
+Theorem INV_04_finish_to_start
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x y : Link F) :
+    FinishOnly F x ->
+    RecursiveInversion F E D x y ->
+    StartOnly F y /\
+    x <> y.
+Proof.
+  intros HFinish Hxy.
+  destruct
+    (recursive_inversion_from_finish_only F E D x y HFinish Hxy)
+    as [childInverse [HChild Hy]].
+  subst y.
+  pose proof
+    (recursive_start_form_pattern F A1 E D childInverse)
+    as HStartImage.
+  split.
+  - exact HStartImage.
+  - intros Heq.
+    assert (HStartX : StartOnly F x).
+    {
+      rewrite Heq.
+      exact HStartImage.
+    }
+    eapply recursive_start_finish_disjoint.
+    + exact HStartX.
+    + exact HFinish.
+Qed.
+
+(* INV-05: PAIR remains PAIR and its poles are recursively exchanged.
+   INV-02 is used only as a derived consequence of the same INV-01
+   assumptions to rule out collapse of the target into ROOT/START/END. *)
+Theorem INV_05_pair_preserved_and_reversed
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (N : F2F3Normalization F (FND_02_unique_root F A1))
+    (E : F2F3OneSidedExistence F)
+    (D : RecursiveInversionDomain F E)
+    (x y : Link F) :
+    PairLocal F x ->
+    RecursiveInversion F E D x y ->
+    PairLocal F y /\
+    exists inverseFinish inverseStart : Link F,
+      RecursiveInversion F E D (finish F x) inverseFinish /\
+      RecursiveInversion F E D (start F x) inverseStart /\
+      y = form F inverseFinish inverseStart.
+Proof.
+  intros HPairX Hxy.
+  pose proof
+    (recursive_inversion_image_grounded F E D x y Hxy)
+    as GY.
+  destruct (INV_01_recursive_inversion_total F A1 N E D y GY)
+    as [z Hyz].
+  pose proof
+    (INV_02_recursive_inversion_involutive F A1 N E D x y z Hxy Hyz)
+    as Hzx.
+  pose proof
+    (recursive_local_decision F E D y GY)
+    as Decision.
+  pose proof
+    (FND_01_local_partition F A1 N y Decision)
+    as Partition.
+  destruct Partition as [Cases _].
+  assert (HPairY : PairLocal F y).
+  {
+    destruct Cases as [HFull | [HStart | [HFinish | HPair]]].
+    - pose proof (FND_02_unique_root F A1 y HFull) as HyRoot.
+      assert (HyzRoot : RecursiveInversion F E D (R F) z).
+      {
+        rewrite <- HyRoot.
+        exact Hyz.
+      }
+      assert (HzRoot : z = R F).
+      {
+        apply (INV_03_root_fixed F E D z).
+        exact HyzRoot.
+      }
+      assert (HxRoot : x = R F).
+      {
+        transitivity z.
+        - symmetry. exact Hzx.
+        - exact HzRoot.
+      }
+      assert (HFullX : FullSelf F x).
+      {
+        rewrite HxRoot.
+        apply root_full_self.
+      }
+      exfalso.
+      eapply recursive_full_pair_disjoint.
+      + exact HFullX.
+      + exact HPairX.
+    - pose proof
+        (INV_04_start_to_finish F A1 E D y z HStart Hyz)
+        as HExchange.
+      destruct HExchange as [HZFinish _].
+      assert (HXFinish : FinishOnly F x).
+      {
+        rewrite <- Hzx.
+        exact HZFinish.
+      }
+      exfalso.
+      eapply recursive_finish_pair_disjoint.
+      + exact HXFinish.
+      + exact HPairX.
+    - pose proof
+        (INV_04_finish_to_start F A1 E D y z HFinish Hyz)
+        as HExchange.
+      destruct HExchange as [HZStart _].
+      assert (HXStart : StartOnly F x).
+      {
+        rewrite <- Hzx.
+        exact HZStart.
+      }
+      exfalso.
+      eapply recursive_start_pair_disjoint.
+      + exact HXStart.
+      + exact HPairX.
+    - exact HPair.
+  }
+  split.
+  - exact HPairY.
+  - exact (INV_01_recursive_pole_reversal F E D x y Hxy).
+Qed.
