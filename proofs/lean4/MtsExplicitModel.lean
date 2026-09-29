@@ -1122,5 +1122,22 @@ theorem sharedGroundedParent_grounded :
   · exact f2f3_start_root_grounded ExplicitFoundation ExplicitOneSided
   · exact f2f3_start_root_grounded ExplicitFoundation ExplicitOneSided
 
+theorem sharedGroundedParent_ne_child :
+    sharedGroundedParent ≠ sharedGroundedChild := by
+  intro hEq
+  have hFinishSelf :
+      FinishSelf ExplicitFoundation sharedGroundedChild := by
+    unfold FinishSelf
+    calc
+      ExplicitFoundation.finish sharedGroundedChild =
+          ExplicitFoundation.finish sharedGroundedParent :=
+        congrArg ExplicitFoundation.finish hEq.symm
+      _ = sharedGroundedChild := sharedGroundedParent_finish
+  have hStartOnly :
+      StartOnly ExplicitFoundation sharedGroundedChild := by
+    unfold sharedGroundedChild
+    exact f2f3_start_root_pattern ExplicitFoundation ExplicitOneSided
+  exact hStartOnly.2 hFinishSelf
+
 
 end MTS.External.Model1796
