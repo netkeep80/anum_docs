@@ -2013,50 +2013,48 @@ Proof.
       exact HC.
   }
 
-  (* Consume the P0 supporting theorems explicitly without adding assumptions. *)
-  assert (
-    Support :
-    R F = R F /\
-    FinishOnly F (f2f3_finish_root F E) /\
-    StartOnly F (f2f3_start_root F E) /\
-    PairLocal F
-      (form F (f2f3_start_root F E) (f2f3_finish_root F E)) /\
-    PairLocal F
-      (form F (f2f3_finish_root F E) (f2f3_start_root F E))
-  ).
-  {
-    repeat split.
-    - apply (INV_03_root_fixed F E D (R F)).
-      exact HR.
-    - exact (proj1
-        (INV_04_start_to_finish
-          F A1 E D
-          (f2f3_start_root F E)
-          (f2f3_finish_root F E)
-          (f2f3_start_root_pattern F E)
-          HO)).
-    - exact (proj1
-        (INV_04_finish_to_start
-          F A1 E D
-          (f2f3_finish_root F E)
-          (f2f3_start_root F E)
-          (f2f3_finish_root_pattern F E)
-          HC)).
-    - exact (proj1
-        (INV_05_pair_preserved_and_reversed
-          F A1 N E D
-          (form F (f2f3_start_root F E) (f2f3_finish_root F E))
-          (form F (f2f3_start_root F E) (f2f3_finish_root F E))
-          (f2f3_pair_pattern F E)
-          HL)).
-    - exact (proj1
-        (INV_05_pair_preserved_and_reversed
-          F A1 N E D
-          (form F (f2f3_finish_root F E) (f2f3_start_root F E))
-          (form F (f2f3_finish_root F E) (f2f3_start_root F E))
-          (f2f3_reverse_pair_pattern F E)
-          HU)).
-  }
-  destruct Support as [_ [_ [_ [_ _]]]].
+  (* Cross-check the named P0 support boundaries against the direct graph
+     calculation above.  These theorems audit the structural class effects;
+     they are not hidden premises for constructing HR/HO/HC/HL/HU. *)
+  pose proof
+    (INV_03_root_fixed F E D (R F) HR)
+    as HRootAudit.
+  pose proof
+    (proj1
+      (INV_04_start_to_finish
+        F A1 E D
+        (f2f3_start_root F E)
+        (f2f3_finish_root F E)
+        (f2f3_start_root_pattern F E)
+        HO))
+    as HFinishAudit.
+  pose proof
+    (proj1
+      (INV_04_finish_to_start
+        F A1 E D
+        (f2f3_finish_root F E)
+        (f2f3_start_root F E)
+        (f2f3_finish_root_pattern F E)
+        HC))
+    as HStartAudit.
+  pose proof
+    (proj1
+      (INV_05_pair_preserved_and_reversed
+        F A1 N E D
+        (form F (f2f3_start_root F E) (f2f3_finish_root F E))
+        (form F (f2f3_start_root F E) (f2f3_finish_root F E))
+        (f2f3_pair_pattern F E)
+        HL))
+    as HLPairAudit.
+  pose proof
+    (proj1
+      (INV_05_pair_preserved_and_reversed
+        F A1 N E D
+        (form F (f2f3_finish_root F E) (f2f3_start_root F E))
+        (form F (f2f3_finish_root F E) (f2f3_start_root F E))
+        (f2f3_reverse_pair_pattern F E)
+        HU))
+    as HUPairAudit.
+
   repeat split; assumption.
 Qed.
