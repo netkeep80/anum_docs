@@ -1,0 +1,33 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-11",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "accepted v0.14 representation-layer definitions"
+  ],
+  "dependencies": [
+    "FND-05"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "ce5faa19423feaf892abaa83d1ecdb2d56662e6a",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "d02d7489a767c358c7d3d10300164b79b4673697a930c0da95044c0774813d8f"
+    }
+  ],
+  "notes": "External differential proof only. FND-11 separates representation identity contracts while preserving the one-Link ontology. The already-proved FND-05 canonicality result is consumed as the sole theorem dependency. Recursive Link codec identity is separated from the Anum rooted-sequence target; ExactSequence positional identity is separated from rooted fold denotation by the accepted [] versus [R] collision witness; Q source identity is separated from versioned denotation by the accepted empty-source versus [] collision witness. Anum and ExactSequence are modeled only as views/predicates over Link, while QVersion/QSource and RepresentationIdentityTarget are prover-side syntax/classification. Every projected local sequence origin is R. No additional external mathematical theory is introduced, no global recursive-structure/Q isomorphism is claimed, no representation-strength ranking is claimed, and no host representation classifier is promoted into MTS ontology or semantic authority."
+}
