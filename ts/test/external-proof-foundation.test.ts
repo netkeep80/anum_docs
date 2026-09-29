@@ -793,7 +793,7 @@ for (const [label, source] of [["Lean", lean], ["Rocq", rocq]] as const) {
     label === "Lean"
       ? "theorem INV_03_root_fixed"
       : "Theorem INV_03_root_fixed",
-    inv02Start,
+    inv02RegionStart,
   );
   assert(inv02RegionStart >= 0 && inv02End > inv02RegionStart, `${label} INV-02 proof region exists`);
   const region = source.slice(inv02RegionStart, inv02End);
