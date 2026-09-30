@@ -319,10 +319,9 @@
         "ContextualScopeCompositionLaw"
       ],
       "consumedBy": [
-        "FND-07",
-        "FND-08"
+        "FND-07"
       ],
-      "rationale": "Contextual detachment is derived once this law is supplied; the law itself remains an accepted semantic premise.",
+      "rationale": "Contextual detachment inside the A16/FND-07 current-Scope projection is derived once this law is supplied; the law itself remains an accepted semantic premise. Generalized FND-08 execution does not consume it because selected Theory relations are a distinct authority frontier, not CurrentScopeMember rules.",
       "falsificationTarget": {
         "kind": "EXECUTABLE_SEMANTIC_VECTOR",
         "target": "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
@@ -334,17 +333,17 @@
     {
       "id": "SelectedTheoryReactionSemantics",
       "classification": "INDEPENDENT_MODEL_CHOICE",
-      "normativeRole": "accepted V14-L11/V14-L4 selected-Theory admission, applicability, emitted-image and reaction-occurrence boundary for generalized reaction",
+      "normativeRole": "accepted V14-L11/V14-L4 selected-Theory authority, distinct from current Scope membership, covering admission, applicability, emitted image and reaction occurrence",
       "leanSymbols": [],
       "rocqSymbols": [],
       "consumedBy": [
         "FND-08"
       ],
-      "rationale": "FND-08 is not derivable from A16 contextual detachment alone. Accepted generalized reaction additionally determines which structural relations are executable through selected Theory admission, distinguishes an admitted applicable relation with empty emission from absence of any admitted relation, unions positive emissions without host cardinality dispatch, and retains whether any admitted relation matched so active identity remains distinct from quiescence even when successor membership is extensionally unchanged. This is inherited accepted execution semantics, not a theorem of bare Foundation.",
+      "rationale": "FND-08 uses FND-07 only for the current contextual-truth boundary. Accepted generalized reaction is a separate selected-Theory semantic premise: Theory admission is not CurrentScopeMember, determines which relations are executable, distinguishes an admitted applicable relation with empty emission from absence of any admitted relation, unions all positive emissions without host cardinality dispatch, and retains whether any admitted relation matched so active identity remains distinct from quiescence.",
       "falsificationTarget": {
         "kind": "EXECUTABLE_SEMANTIC_VECTOR",
         "target": "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
-        "condition": "Collapse NO_ADMITTED_RELATION into explicit ZERO, allow ambient unadmitted relations to fire, equate an extensionally unchanged active identity transition with quiescence, or fail the all-matching admitted-relation union boundary retained from A72w.",
+        "condition": "Coerce selected-Theory admission into CurrentScopeMember/ContextualRule, collapse NO_ADMITTED_RELATION into explicit ZERO, allow ambient unadmitted relations to fire, equate an extensionally unchanged active identity transition with quiescence, or fail the all-matching admitted-relation union boundary retained through A72w/A72y.",
         "status": "REGISTERED_EXISTING_VECTOR"
       },
       "explicitModelStatus": "ACCEPTED_SEMANTIC_PREMISE_NOT_DERIVED_FROM_BARE_FOUNDATION"
