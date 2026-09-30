@@ -75,6 +75,7 @@ const required = [
   "RecursiveInversionDomain.decide",
   "A16ContextualTruthSemantics",
   "ContextualScopeCompositionLaw",
+  "SelectedTheoryReactionSemantics",
   "ContextOrientationChi",
 ];
 for (const id of required) {
@@ -133,6 +134,25 @@ same(
   byId.get("F2F3Normalization.complete")?.classification,
   "UNRESOLVED",
   "strong global normalization completeness remains unresolved",
+);
+same(
+  byId.get("SelectedTheoryReactionSemantics")?.classification,
+  "INDEPENDENT_MODEL_CHOICE",
+  "selected-Theory reaction semantics is an explicit accepted semantic premise",
+);
+sameSet(
+  byId.get("SelectedTheoryReactionSemantics")?.consumedBy as string[],
+  ["FND-08"],
+  "selected-Theory reaction semantics is consumed directly by FND-08 only",
+);
+same(
+  byId.get("SelectedTheoryReactionSemantics")?.falsificationTarget?.target,
+  "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+  "reaction premise is falsified by the explicit-zero/no-match executable vector",
+);
+assert(
+  !(byId.get("A16ContextualTruthSemantics")?.consumedBy as string[]).includes("FND-09"),
+  "FND-09 consumes FND-08 rather than re-importing A16 directly",
 );
 
 assert(
