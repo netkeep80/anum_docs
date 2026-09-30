@@ -104,6 +104,10 @@ function buildFixture(noise: boolean): Fixture {
  * Frontier values are contextual truths K->A.
  * Selected A->B continuations propagate truth to K->B.
  * B may itself already be another application-shaped Link.
+ *
+ * Important historical boundary: an empty NEXT frontier here is only an empty
+ * positive continuation image. It is not the later full-reaction ZERO of
+ * A72y/V14-L4; no selected continuation is NO MATCH at that later layer.
  */
 function step(
   memory: Memory,
@@ -305,8 +309,8 @@ function main(): void {
     "SECOND_FANOUT=2",
     "CONVERGENCE_DISTINCT_TRUTH_LINKS=1",
     "CONVERGENCE_OCCURRENCES=2",
-    "TERMINAL_RESULT=ZERO_NEXT",
-    "UNKNOWN_APPLICATION_WITHOUT_CONTINUATION=ZERO",
+    "TERMINAL_POSITIVE_FRONTIER=EMPTY",
+    "UNKNOWN_APPLICATION_WITHOUT_CONTINUATION=EMPTY_POSITIVE_FRONTIER_NOT_REACTION_ZERO",
     "LATE_AMBIENT_TRANSITION=IGNORED",
     "RUNTIME_EVENT_PARAMETER=0",
     "RUNTIME_PAIR_CONSTRUCTION=0",
