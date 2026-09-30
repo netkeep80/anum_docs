@@ -4286,8 +4286,8 @@ Qed.
    but it cannot change the poles of one already identified semantic Link in
    place.
 
-   This proof uses only form/start/finish projection equations. Explicit
-   structural substitution of a child creates distinct dependent formed Links
+   This proof uses only form/start/finish projection equations.
+   Explicit structural substitution creates distinct dependent formed Links
    whenever the substituted child differs. *)
 Definition LinkPoleReading
     (F : Foundation)
