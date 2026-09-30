@@ -1476,6 +1476,51 @@ assert(
   "FND-05 proof code is not disguised as a record carrying semantic authority",
 );
 
+const fnd06 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-06");
+assert(fnd06 !== undefined, "P0 contains FND-06");
+same(
+  JSON.stringify(fnd06.assumptions),
+  JSON.stringify(["FND-05"]),
+  "FND-06 dependency premise remains exactly FND-05",
+);
+same(
+  JSON.stringify(fnd06.dependsOn),
+  JSON.stringify(["FND-05"]),
+  "FND-06 dependency edge remains exactly FND-05",
+);
+
+for (const [label, source, endMarker] of [
+  ["Lean", lean, "def ExactSequenceFoldCollision"],
+  ["Rocq", rocq, "Definition ExactSequenceFoldCollision"],
+] as const) {
+  const start = source.indexOf("External host projection of one local Memory");
+  const end = source.indexOf(endMarker, start);
+  assert(start >= 0 && end > start, label + " contains FND-06 Memory projection");
+  const region = source.slice(start, end);
+  for (const symbol of [
+    "LocalMemoryProjection",
+    "FND_06_memory_handle_transport_invariant",
+    "FND05Canonicality",
+    "CanonicalRecursiveDescription",
+    "Grounded",
+  ]) {
+    assert(region.includes(symbol), label + " FND-06 contains " + symbol);
+  }
+  assert(
+    /not an MTS ontology sort/i.test(region) &&
+      /materialization authority/i.test(region),
+    label + " FND-06 keeps Memory handles outside MTS ontology/authority",
+  );
+  assert(
+    /same recursive code implies same Link/i.test(region),
+    label + " FND-06 explicitly rejects converse code-to-Link extensionality",
+  );
+}
+assert(
+  !lean.includes("axiom FND_06") && !rocq.includes("Axiom FND_06"),
+  "FND-06 is proved rather than postulated",
+);
+
 const fnd11 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-11");
 assert(fnd11 !== undefined, "P0 contains FND-11");
 same(
