@@ -1507,7 +1507,7 @@ for (const [label, source, endMarker] of [
     assert(region.includes(symbol), label + " FND-06 contains " + symbol);
   }
   assert(
-    /not an MTS ontology sort/i.test(region) &&
+    /not an MTS ontology\s+sort/i.test(region) &&
       /materialization authority/i.test(region),
     label + " FND-06 keeps Memory handles outside MTS ontology/authority",
   );
