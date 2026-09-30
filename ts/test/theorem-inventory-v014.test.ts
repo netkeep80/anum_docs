@@ -32,9 +32,10 @@ const inventory = readJson("theorems/p0-v0.14.json");
 const registry = readJson("theorems/registry.json");
 const contract = readJson("contracts/mts-contract-v0.14.json");
 const traceability = readJson("traceability/mts-v0.14.json");
+const premiseMatrix = readJson("proofs/premise-classification-v0.14.json");
 
 same(inventory.schema, "mts-theorem-inventory/v0.1", "inventory schema");
-same(inventory.status, "p0-frozen-candidate", "inventory status");
+same(inventory.status, "p0-frozen", "inventory status");
 same(inventory.mtsVersion, "v0.14", "inventory MTS version");
 same(inventory.acceptedContract, "contracts/mts-contract-v0.14.json", "accepted contract path");
 same(inventory.acceptedTraceability, "traceability/mts-v0.14.json", "traceability path");
@@ -45,6 +46,43 @@ same(
 );
 same(contract.acceptance.acceptedMtsVersion, "mts-contract/v0.14", "accepted v0.14 contract");
 same(traceability.accepted, true, "traceability accepted");
+
+same(
+  inventory.premiseClassification,
+  "proofs/premise-classification-v0.14.json",
+  "P0 premise-classification binding",
+);
+same(inventory.boundaryFreeze.status, "STABILIZED", "P0 boundary freeze status");
+same(inventory.boundaryFreeze.issue, 1820, "P0 freeze owner");
+same(inventory.boundaryFreeze.predecessorHardening, 1789, "hardening predecessor");
+same(
+  inventory.boundaryFreeze.cycleBoundaryOutcome,
+  "NECESSARY_RESTRICTION",
+  "resolved cycle-boundary outcome",
+);
+same(
+  premiseMatrix.cycleBoundaryDecision.outcome,
+  "NECESSARY_RESTRICTION",
+  "P0 cycle boundary agrees with premise matrix",
+);
+same(
+  inventory.boundaryFreeze.strongerGlobalNormalization,
+  "ISOLATED_AUXILIARY_UNRESOLVED",
+  "stronger global normalization remains isolated",
+);
+same(inventory.boundaryFreeze.acceptedSemanticDelta, "NONE", "P0 freeze semantic delta");
+same(inventory.boundaryFreeze.externalProversNormativeAuthority, false, "external provers remain non-normative");
+same(inventory.boundaryFreeze.jsonProofAuthority, false, "P0 JSON is not proof authority");
+same(
+  inventory.constraints.allLinkFiniteDerivationTotalityClaimAllowed,
+  false,
+  "all-Link finite-derivation totality remains forbidden",
+);
+same(
+  inventory.constraints.groundedBoundaryRequiredForCurrentFiniteDerivationTotality,
+  true,
+  "Grounded remains required for current finite-derivation totality",
+);
 
 same(registry.schema, "mts-theorem-registry/v0.1", "historical registry schema");
 same(registry.version, "v0.13", "historical registry remains v0.13");
@@ -98,6 +136,24 @@ const targets = inventory.targets as Json[];
 same(targets.length, 21, "current P0 target count");
 const targetIds = targets.map((target) => target.id as string);
 same(new Set(targetIds).size, targetIds.length, "target IDs unique");
+
+const formalPremises = new Map(
+  targets.map((target) => [target.id as string, target.formalPremises as string[] | undefined]),
+);
+const expectedWaveAFormalPremises: Record<string, string[]> = {
+  "FND-02": ["A1RecursiveSeparation"],
+  "FND-13": ["F2F3GroundedNormalization", "Grounded:x", "Grounded:y"],
+  "FND-01": ["A1RecursiveSeparation", "F2F3OneSidedExistence", "LocalSelfDecision:x"],
+  "INV-01": ["A1RecursiveSeparation", "F2F3OneSidedExistence", "RecursiveInversionDomain", "Grounded:x"],
+  "INV-02": ["A1RecursiveSeparation", "F2F3GroundedNormalization", "F2F3OneSidedExistence", "RecursiveInversionDomain", "Grounded:x"],
+  "CTX-03": ["A1RecursiveSeparation", "F2F3GroundedNormalization", "F2F3OneSidedExistence", "RecursiveInversionDomain"],
+  "FND-07": ["F2F3OneSidedExistence", "CurrentScopeMember", "ContextualScopeCompositionLaw"],
+  "FND-11": ["AcceptedV014RepresentationDefinitions", "FND05Canonicality"],
+};
+for (const [id, expected] of Object.entries(expectedWaveAFormalPremises)) {
+  assert(Array.isArray(formalPremises.get(id)), `${id} formalPremises required by frozen P0`);
+  sameSet(formalPremises.get(id)!, expected, `${id} exact frozen formal premises`);
+}
 
 const historicalIdSet = new Set(historicalIds);
 for (const target of targets) {
@@ -162,6 +218,12 @@ const fnd02 = targets.find((target) => target.id === "FND-02")!;
 const fnd13 = targets.find((target) => target.id === "FND-13")!;
 const fnd01 = targets.find((target) => target.id === "FND-01")!;
 const fnd08 = targets.find((target) => target.id === "FND-08")!;
+
+const inv01 = targets.find((target) => target.id === "INV-01")!;
+const inv02 = targets.find((target) => target.id === "INV-02")!;
+const ctx03 = targets.find((target) => target.id === "CTX-03")!;
+const fnd07 = targets.find((target) => target.id === "FND-07")!;
+const fnd11 = targets.find((target) => target.id === "FND-11")!;
 sameSet(fnd13.dependsOn as string[], [], "FND-13 has no fake FND-02 dependency");
 sameSet(
   fnd01.dependsOn as string[],
@@ -171,6 +233,40 @@ sameSet(
 assert(
   !(fnd02.dependsOn as string[]).includes("FND-13"),
   "FND-02 must not depend on downstream A6/FND-13",
+);
+
+sameSet(
+  fnd02.assumptions as string[],
+  ["A1RecursiveSeparation"],
+  "FND-02 frozen assumptions do not smuggle normalization",
+);
+assert(
+  !(inv01.assumptions as string[]).some((value) => /Normalization/.test(value)),
+  "INV-01 does not consume normalization",
+);
+assert(
+  (inv01.assumptions as string[]).includes("Grounded source Link"),
+  "INV-01 exact Grounded totality domain is explicit",
+);
+assert(
+  (inv02.assumptions as string[]).includes("F2F3GroundedNormalization"),
+  "INV-02 consumes Grounded normalization only",
+);
+assert(
+  !(inv02.assumptions as string[]).some((value) => value === "F2F3Normalization"),
+  "INV-02 cannot reacquire stronger global normalization",
+);
+assert(
+  (ctx03.assumptions as string[]).includes("F2F3GroundedNormalization"),
+  "CTX-03 structural/semantic capstone is pinned to Grounded normalization",
+);
+assert(
+  (fnd07.assumptions as string[]).includes("ContextualScopeCompositionLaw as the accepted A16 semantic premise"),
+  "FND-07 accepted semantic premise is explicit",
+);
+assert(
+  (fnd11.assumptions as string[]).includes("FND05Canonicality witness"),
+  "FND-11 exact FND-05 dependency witness is explicit",
 );
 same(fnd08.wave, "B", "FND-08 moves behind the foundation wave");
 assert(!firstWave.includes("FND-08"), "FND-08 is not in the first differential wave");
@@ -262,5 +358,7 @@ console.log([
   "REGISTRY_MUTATION=NO",
   "LEAN_COQ_INSTALL=DEFERRED",
   "APROVER_REPIN=DEFERRED",
+  "BOUNDARY_FREEZE=STABILIZED",
+  "CYCLE_BOUNDARY=NECESSARY_RESTRICTION",
   "SEMANTIC_DELTA=NONE",
 ].join(" "));
