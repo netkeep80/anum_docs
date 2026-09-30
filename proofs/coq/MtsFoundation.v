@@ -3942,6 +3942,341 @@ Proof.
 Qed.
 
 
+(* FND-08/FND-09 external projection of selected-Theory relational reaction.
+
+   This layer uses two distinct external Scope projections:
+   CurrentScopeMember for the published pre-reaction Scope and
+   NextScopeMember for the published successor Scope.
+
+   Selected Theory authority remains separate through Prop-valued Admitted,
+   Matches and Emits relations over the one Link carrier. An admitted Theory
+   relation is not coerced into ContextualRule/current-Scope membership.
+   No host reaction collection, RuleKind, cardinality opcode or
+   multivalued-function ontology is introduced.
+
+   ZERO is a local zero contribution from one matched antecedent, not global
+   absence of the same semantic Link. Reacted remains independent from
+   successor membership so active identity stays distinct from quiescence. *)
+Definition ReactionMatched
+    (F : Foundation)
+    (Admitted : Link F -> Prop)
+    (Matches : Link F -> Link F -> Prop)
+    (A : Link F) : Prop :=
+  exists r : Link F, Admitted r /\ Matches r A.
+
+Definition ReactionImage
+    (F : Foundation)
+    (Admitted : Link F -> Prop)
+    (Matches Emits : Link F -> Link F -> Prop)
+    (A B : Link F) : Prop :=
+  exists r : Link F,
+    Admitted r /\ Matches r A /\ Emits r B.
+
+Definition ReactionProduced
+    (F : Foundation)
+    (CurrentScopeMember : Link F -> Prop)
+    (K : Link F)
+    (Admitted : Link F -> Prop)
+    (Matches Emits : Link F -> Link F -> Prop)
+    (B : Link F) : Prop :=
+  exists A : Link F,
+    ContextualTruth F CurrentScopeMember K A /\
+    ReactionImage F Admitted Matches Emits A B.
+
+Definition ReactionZeroAt
+    (F : Foundation)
+    (CurrentScopeMember : Link F -> Prop)
+    (K : Link F)
+    (Admitted : Link F -> Prop)
+    (Matches Emits : Link F -> Link F -> Prop)
+    (A : Link F) : Prop :=
+  ContextualTruth F CurrentScopeMember K A /\
+  ReactionMatched F Admitted Matches A /\
+  forall B : Link F,
+    ~ ReactionImage F Admitted Matches Emits A B.
+
+Definition ReactionOneAt
+    (F : Foundation)
+    (CurrentScopeMember : Link F -> Prop)
+    (K : Link F)
+    (Admitted : Link F -> Prop)
+    (Matches Emits : Link F -> Link F -> Prop)
+    (A B : Link F) : Prop :=
+  ContextualTruth F CurrentScopeMember K A /\
+  ReactionImage F Admitted Matches Emits A B /\
+  forall B' : Link F,
+    ReactionImage F Admitted Matches Emits A B' ->
+    B' = B.
+
+Definition ReactionManyAt
+    (F : Foundation)
+    (CurrentScopeMember : Link F -> Prop)
+    (K : Link F)
+    (Admitted : Link F -> Prop)
+    (Matches Emits : Link F -> Link F -> Prop)
+    (A B1 B2 : Link F) : Prop :=
+  ContextualTruth F CurrentScopeMember K A /\
+  ReactionImage F Admitted Matches Emits A B1 /\
+  ReactionImage F Admitted Matches Emits A B2 /\
+  B1 <> B2.
+
+(* Explicit accepted semantic premise for the dynamic selected-Theory step.
+   It is not derived from bare Foundation or FND-07 current-Scope composition. *)
+Definition SelectedTheoryReactionSemantics
+    (F : Foundation)
+    (CurrentScopeMember NextScopeMember : Link F -> Prop)
+    (K : Link F)
+    (Admitted : Link F -> Prop)
+    (Matches Emits : Link F -> Link F -> Prop)
+    (Reacted : Prop) : Prop :=
+  (forall X : Link F,
+    ContextualTruth F NextScopeMember K X <->
+      (ContextualTruth F CurrentScopeMember K X /\
+        ~ ReactionMatched F Admitted Matches X) \/
+      ReactionProduced
+        F CurrentScopeMember K Admitted Matches Emits X) /\
+  (Reacted <->
+    exists A : Link F,
+      ContextualTruth F CurrentScopeMember K A /\
+      ReactionMatched F Admitted Matches A).
+
+Theorem reaction_image_implies_matched
+    (F : Foundation)
+    (Admitted : Link F -> Prop)
+    (Matches Emits : Link F -> Link F -> Prop)
+    (A B : Link F) :
+    ReactionImage F Admitted Matches Emits A B ->
+    ReactionMatched F Admitted Matches A.
+Proof.
+  intros [r [HAdmitted [HMatches HEmits]]].
+  exists r.
+  split; assumption.
+Qed.
+
+(* FND-08: FND-07 is consumed only for the exact current contextual-truth
+   boundary. Dynamic successor construction comes only from
+   SelectedTheoryReactionSemantics. *)
+Theorem FND_08_generalized_relational_reaction
+    (F : Foundation)
+    (CurrentScopeMember NextScopeMember : Link F -> Prop)
+    (K : Link F)
+    (Admitted : Link F -> Prop)
+    (Matches Emits : Link F -> Link F -> Prop)
+    (Reacted : Prop) :
+    SelectedTheoryReactionSemantics
+      F CurrentScopeMember NextScopeMember K
+      Admitted Matches Emits Reacted ->
+    (forall A : Link F,
+      ContextualTruth F CurrentScopeMember K A <->
+      CurrentScopeMember (form F K A)) /\
+    (forall A : Link F,
+      ContextualTruth F CurrentScopeMember K A ->
+      ~ ReactionMatched F Admitted Matches A ->
+      ContextualTruth F NextScopeMember K A) /\
+    (forall A B : Link F,
+      ContextualTruth F CurrentScopeMember K A ->
+      ReactionImage F Admitted Matches Emits A B ->
+      ContextualTruth F NextScopeMember K B) /\
+    (Reacted <->
+      exists A : Link F,
+        ContextualTruth F CurrentScopeMember K A /\
+        ReactionMatched F Admitted Matches A).
+Proof.
+  intros [HNextSem HReactedSem].
+  split.
+  - intros A.
+    exact ((proj1 (FND_07_contextual_truth_boundary F CurrentScopeMember)) K A).
+  - split.
+    + intros A HCurrent HNoMatch.
+      destruct (HNextSem A) as [_ HBack].
+      apply HBack.
+      left.
+      split; assumption.
+    + split.
+      * intros A B HCurrent HImage.
+        destruct (HNextSem B) as [_ HBack].
+        apply HBack.
+        right.
+        exists A.
+        split; assumption.
+      * exact HReactedSem.
+Qed.
+
+(* Quiescence is absence of a matched current antecedent, not mere equality of
+   extensional membership after an active identity transition. *)
+Theorem FND_08_quiescence_extensional
+    (F : Foundation)
+    (CurrentScopeMember NextScopeMember : Link F -> Prop)
+    (K : Link F)
+    (Admitted : Link F -> Prop)
+    (Matches Emits : Link F -> Link F -> Prop)
+    (Reacted : Prop) :
+    SelectedTheoryReactionSemantics
+      F CurrentScopeMember NextScopeMember K
+      Admitted Matches Emits Reacted ->
+    ~ Reacted ->
+    forall X : Link F,
+      ContextualTruth F NextScopeMember K X <->
+      ContextualTruth F CurrentScopeMember K X.
+Proof.
+  intros [HNextSem HReactedSem] HQuiescent X.
+  split.
+  - intro HNext.
+    destruct (HNextSem X) as [HForward _].
+    destruct (HForward HNext) as [[HCurrent HNoMatch] | HProduced].
+    + exact HCurrent.
+    + destruct HProduced as [A [HCurrent HImage]].
+      exfalso.
+      apply HQuiescent.
+      destruct HReactedSem as [_ HReactBack].
+      apply HReactBack.
+      exists A.
+      split.
+      * exact HCurrent.
+      * exact
+          (reaction_image_implies_matched
+            F Admitted Matches Emits A X HImage).
+  - intro HCurrent.
+    destruct (HNextSem X) as [_ HBack].
+    apply HBack.
+    left.
+    split.
+    + exact HCurrent.
+    + intro HMatched.
+      apply HQuiescent.
+      destruct HReactedSem as [_ HReactBack].
+      apply HReactBack.
+      exists X.
+      split; assumption.
+Qed.
+
+(* FND-09: ZERO/ONE/MANY and N->M are derived relational properties of the
+   same generic reaction law, never semantic result constructors/cardinality
+   opcodes. The last conjunct makes the local-ZERO boundary explicit. *)
+Theorem FND_09_zero_one_many_are_relational
+    (F : Foundation)
+    (CurrentScopeMember NextScopeMember : Link F -> Prop)
+    (K : Link F)
+    (Admitted : Link F -> Prop)
+    (Matches Emits : Link F -> Link F -> Prop)
+    (Reacted : Prop) :
+    SelectedTheoryReactionSemantics
+      F CurrentScopeMember NextScopeMember K
+      Admitted Matches Emits Reacted ->
+    (forall A : Link F,
+      ContextualTruth F CurrentScopeMember K A ->
+      ~ ReactionMatched F Admitted Matches A ->
+      ContextualTruth F NextScopeMember K A) /\
+    (forall A : Link F,
+      ReactionZeroAt
+        F CurrentScopeMember K Admitted Matches Emits A ->
+      Reacted) /\
+    (forall A B : Link F,
+      ReactionOneAt
+        F CurrentScopeMember K Admitted Matches Emits A B ->
+      ContextualTruth F NextScopeMember K B) /\
+    (forall A B1 B2 : Link F,
+      ReactionManyAt
+        F CurrentScopeMember K Admitted Matches Emits A B1 B2 ->
+      ContextualTruth F NextScopeMember K B1 /\
+      ContextualTruth F NextScopeMember K B2) /\
+    (forall A1 A2 B : Link F,
+      ContextualTruth F CurrentScopeMember K A1 ->
+      ContextualTruth F CurrentScopeMember K A2 ->
+      A1 <> A2 ->
+      ReactionImage F Admitted Matches Emits A1 B ->
+      ReactionImage F Admitted Matches Emits A2 B ->
+      ContextualTruth F NextScopeMember K B) /\
+    (forall A B : Link F,
+      ContextualTruth F CurrentScopeMember K A ->
+      ReactionImage F Admitted Matches Emits A B ->
+      ContextualTruth F NextScopeMember K B) /\
+    (forall A : Link F,
+      ContextualTruth F CurrentScopeMember K A ->
+      ReactionImage F Admitted Matches Emits A A ->
+      ContextualTruth F NextScopeMember K A /\ Reacted) /\
+    (forall A B : Link F,
+      ReactionZeroAt
+        F CurrentScopeMember K Admitted Matches Emits A ->
+      (exists A2 : Link F,
+        A2 <> A /\
+        ContextualTruth F CurrentScopeMember K A2 /\
+        ReactionImage F Admitted Matches Emits A2 B) ->
+      ContextualTruth F NextScopeMember K B).
+Proof.
+  intros [HNextSem HReactedSem].
+  split.
+  - intros A HCurrent HNoMatch.
+    destruct (HNextSem A) as [_ HBack].
+    apply HBack.
+    left.
+    split; assumption.
+  - split.
+    + intros A [HCurrent [HMatched HNoImage]].
+      destruct HReactedSem as [_ HReactBack].
+      apply HReactBack.
+      exists A.
+      split; assumption.
+    + split.
+      * intros A B [HCurrent [HImage HUnique]].
+        destruct (HNextSem B) as [_ HBack].
+        apply HBack.
+        right.
+        exists A.
+        split; assumption.
+      * split.
+        -- intros A B1 B2 [HCurrent [HImage1 [HImage2 HDistinct]]].
+           split.
+           ++ destruct (HNextSem B1) as [_ HBack1].
+              apply HBack1.
+              right.
+              exists A.
+              split; assumption.
+           ++ destruct (HNextSem B2) as [_ HBack2].
+              apply HBack2.
+              right.
+              exists A.
+              split; assumption.
+        -- split.
+           ++ intros A1 A2 B HCurrent1 HCurrent2 HDistinct HImage1 HImage2.
+              destruct (HNextSem B) as [_ HBack].
+              apply HBack.
+              right.
+              exists A1.
+              split; assumption.
+           ++ split.
+              ** intros A B HCurrent HImage.
+                 destruct (HNextSem B) as [_ HBack].
+                 apply HBack.
+                 right.
+                 exists A.
+                 split; assumption.
+              ** split.
+                 --- intros A HCurrent HIdentity.
+                     split.
+                     +++ destruct (HNextSem A) as [_ HBack].
+                         apply HBack.
+                         right.
+                         exists A.
+                         split; assumption.
+                     +++ destruct HReactedSem as [_ HReactBack].
+                         apply HReactBack.
+                         exists A.
+                         split.
+                         *** exact HCurrent.
+                         *** exact
+                               (reaction_image_implies_matched
+                                 F Admitted Matches Emits A A HIdentity).
+                 --- intros A B HZero
+                       [A2 [HDifferent [HCurrent2 HImage2]]].
+                     destruct (HNextSem B) as [_ HBack].
+                     apply HBack.
+                     right.
+                     exists A2.
+                     split; assumption.
+Qed.
+
+
 (* FND-05 external proof projection of the accepted finite recursive Link
    codec.
 
