@@ -19,10 +19,18 @@ const assurance = JSON.parse(
   readFileSync(resolve(root, "proofs", "external-proof-assurance.json"), "utf8"),
 );
 
+const expectedStatements: Record<string, string> = {
+  "FND-03":
+    "R/O/C/L are derived structural representatives of the accepted Link foundation under an orientation convention, not four independent ontology primitives.",
+  "FND-04":
+    "U = C ⟼ O is an ordinary PAIR-derived representative and not a fifth self-incidence class.",
+};
+
 for (const id of ["FND-03", "FND-04"]) {
   const target = p0.targets.find((entry: any) => entry.id === id);
   assert.ok(target, `${id} must exist in frozen P0`);
   assert.equal(target.wave, "B", `${id} remains a Wave-B target`);
+  assert.equal(target.statement, expectedStatements[id], `${id} frozen statement`);
 
   const assured = assurance.targets.find((entry: any) => entry.id === id);
   assert.ok(assured, `${id} must be registered in external proof assurance`);
