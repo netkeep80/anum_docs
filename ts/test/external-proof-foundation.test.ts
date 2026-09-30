@@ -232,23 +232,23 @@ same(
   "A6/pole extensionality is not inferred merely from completing FND-02",
 );
 assert(
-  (fnd02.assumptions as string[]).some((value) => value.includes("A1")),
-  "FND-02 explicitly depends on A1 recursive distinguishability",
+  JSON.stringify(fnd02.formalPremises) === JSON.stringify(["A1RecursiveSeparation"]),
+  "FND-02 frozen kernel boundary is exactly A1RecursiveSeparation",
 );
 assert(
-  (fnd02.assumptions as string[]).some((value) => value.includes("F2/F3")),
-  "FND-02 explicitly depends on F2/F3 grounded normalization",
+  JSON.stringify(fnd02.assumptions) === JSON.stringify(["A1RecursiveSeparation"]),
+  "FND-02 P0 assumptions match the frozen kernel boundary",
 );
 assert(
   !(fnd02.assumptions as string[]).some((value) =>
-    /pole extensionality|identity\/equality laws/i.test(value)
+    /F2\/F3|Normalization|pole extensionality|identity\/equality laws/i.test(value)
   ),
-  "FND-02 assumptions do not smuggle A6 identity-by-poles",
+  "FND-02 does not smuggle normalization or A6 identity-by-poles",
 );
 assert(
-  /separate explicit premises/i.test(fnd02.exclusions as string) &&
-    /no dependency between them/i.test(fnd02.exclusions as string),
-  "FND-02 exclusion records FND-13 as independent unless a bridge is proved",
+  /Do not assume FND-13 pole extensionality/i.test(fnd02.exclusions as string) &&
+    /F2F3 normalization/i.test(fnd02.exclusions as string),
+  "FND-02 exclusions pin FND-13 and normalization outside the theorem premise boundary",
 );
 
 for (const source of [lean, rocq]) {
@@ -298,10 +298,19 @@ assert(
   "FND-13 structural identity authority is V14-L5",
 );
 assert(
-  JSON.stringify(fnd13.assumptions) === JSON.stringify([
-    "F2/F3 name-neutral grounded normal-form completeness on the declared finite R-grounded theorem domain",
+  JSON.stringify(fnd13.formalPremises) === JSON.stringify([
+    "F2F3GroundedNormalization",
+    "Grounded:x",
+    "Grounded:y",
   ]),
-  "FND-13 exposes exactly the grounded normalization-completeness premise",
+  "FND-13 frozen kernel boundary exposes Grounded normalization plus both Grounded sources",
+);
+assert(
+  JSON.stringify(fnd13.assumptions) === JSON.stringify([
+    "F2F3GroundedNormalization",
+    "Grounded evidence for both Links under comparison",
+  ]),
+  "FND-13 P0 assumptions match the hardened Grounded identity boundary",
 );
 assert(
   /finite R-grounded/i.test(String(fnd13.statement)) &&
@@ -398,16 +407,24 @@ assert(
   "FND-01 no longer imports the stronger global normalization premise",
 );
 assert(
-  (fnd01.assumptions as string[]).some((value) => value.includes("A1 recursive separation")),
-  "FND-01 keeps unique full-self closure grounded in A1/FND-02",
+  JSON.stringify(fnd01.formalPremises) === JSON.stringify([
+    "A1RecursiveSeparation",
+    "F2F3OneSidedExistence",
+    "LocalSelfDecision:x",
+  ]),
+  "FND-01 frozen kernel boundary matches A1 + one-sided existence + local decision",
 );
 assert(
-  (fnd01.assumptions as string[]).some((value) => value.includes("local self-incidence decision")),
+  (fnd01.assumptions as string[]).includes("A1RecursiveSeparation"),
+  "FND-01 keeps A1 recursive separation explicit",
+);
+assert(
+  (fnd01.assumptions as string[]).includes("LocalSelfDecision for the classified Link"),
   "FND-01 keeps constructive local decision evidence explicit",
 );
 assert(
-  (fnd01.assumptions as string[]).some((value) => value.includes("F2/F3 grounded-form existence")),
-  "FND-01 P0 keeps F2/F3 realizability explicit",
+  (fnd01.assumptions as string[]).some((value) => value.includes("F2F3OneSidedExistence")),
+  "FND-01 P0 keeps one-sided grounded realizability explicit",
 );
 assert(
   /separate the four proposition-level combinations from implementation decidability/i.test(
@@ -526,8 +543,8 @@ assert(
 );
 
 assert(
-  (fnd01.assumptions as string[]).some((value) =>
-    value.includes("Context orientation only names one-sided cases")
+  /Context orientation only names the one-sided cases after classification/i.test(
+    fnd01.scope as string,
   ),
   "FND-01 P0 keeps Context orientation at the naming-only boundary",
 );
@@ -592,6 +609,20 @@ assert(inv01 !== undefined, "P0 contains INV-01");
 assert(
   JSON.stringify(inv01.dependsOn) === JSON.stringify(["FND-01", "FND-02"]),
   "INV-01 depends exactly on FND-01 and FND-02",
+);
+assert(
+  JSON.stringify(inv01.formalPremises) === JSON.stringify([
+    "A1RecursiveSeparation",
+    "F2F3OneSidedExistence",
+    "RecursiveInversionDomain",
+    "Grounded:x",
+  ]),
+  "INV-01 frozen kernel boundary exposes A1 + one-sided + domain + Grounded source",
+);
+assert(
+  (inv01.assumptions as string[]).includes("Grounded source Link") &&
+    !(inv01.assumptions as string[]).some((value) => /Normalization/.test(value)),
+  "INV-01 P0 keeps exact Grounded totality domain without normalization",
 );
 assert(
   /Host field order, graph labels, or codec digits are not the semantic definition of J/.test(
@@ -702,21 +733,38 @@ for (const [label, source, start, end] of [
 const inv02 = (p0.targets as Record<string, any>[]).find((target) => target.id === "INV-02");
 assert(inv02 !== undefined, "P0 contains INV-02");
 assert(
-  JSON.stringify(inv02.assumptions) === JSON.stringify(["INV-01", "FND-13"]),
-  "INV-02 exposes INV-01 plus the exact Grounded identity boundary",
+  JSON.stringify(inv02.formalPremises) === JSON.stringify([
+    "A1RecursiveSeparation",
+    "F2F3GroundedNormalization",
+    "F2F3OneSidedExistence",
+    "RecursiveInversionDomain",
+    "Grounded:x",
+  ]),
+  "INV-02 frozen kernel boundary matches the exact Grounded involution premises",
+);
+assert(
+  JSON.stringify(inv02.assumptions) === JSON.stringify([
+    "A1RecursiveSeparation",
+    "F2F3GroundedNormalization",
+    "F2F3OneSidedExistence",
+    "RecursiveInversionDomain",
+    "Grounded source Link",
+  ]),
+  "INV-02 P0 assumptions match the explicit hardened theorem parameters",
 );
 assert(
   JSON.stringify(inv02.dependsOn) === JSON.stringify(["INV-01", "FND-13"]),
   "INV-02 depends exactly on INV-01 and FND-13",
 );
 assert(
-  /finite Grounded domain on which INV-01 is defined/i.test(inv02.scope as string) &&
-    /FND-13/i.test(inv02.scope as string),
-  "INV-02 scope records finite Grounded inversion plus FND-13 reconstruction",
+  /exact Grounded domain of INV-01/i.test(inv02.scope as string) &&
+    /Grounded normalization\/pole reconstruction/i.test(inv02.scope as string),
+  "INV-02 scope records the exact Grounded inversion/reconstruction boundary",
 );
 assert(
-  /No claim outside the declared recursive\/inversion domain/.test(inv02.exclusions as string),
-  "INV-02 explicitly excludes domain expansion",
+  /No arbitrary-Link\/global-normalization premise/i.test(inv02.exclusions as string) &&
+    /non-Grounded distinct-node cycles/i.test(inv02.exclusions as string),
+  "INV-02 explicitly excludes global normalization and cycle-domain expansion",
 );
 for (const source of [lean, rocq]) {
   assert(
@@ -965,12 +1013,22 @@ assert(
 const ctx03 = (p0.targets as Record<string, any>[]).find((target) => target.id === "CTX-03");
 assert(ctx03 !== undefined, "P0 contains CTX-03");
 assert(
-  JSON.stringify(ctx03.assumptions) === JSON.stringify([
-    "INV-02",
-    "INV-07",
-    "accepted Link-native Context orientation markers",
+  JSON.stringify(ctx03.formalPremises) === JSON.stringify([
+    "A1RecursiveSeparation",
+    "F2F3GroundedNormalization",
+    "F2F3OneSidedExistence",
+    "RecursiveInversionDomain",
   ]),
-  "CTX-03 assumptions remain exactly INV-02/INV-07/Link-native markers",
+  "CTX-03 frozen kernel boundary matches the structural/semantic capstone parameters",
+);
+assert(
+  JSON.stringify(ctx03.assumptions) === JSON.stringify([
+    "A1RecursiveSeparation",
+    "F2F3GroundedNormalization",
+    "F2F3OneSidedExistence",
+    "RecursiveInversionDomain",
+  ]),
+  "CTX-03 P0 assumptions match the explicit hardened theorem parameters",
 );
 assert(
   JSON.stringify(ctx03.dependsOn) === JSON.stringify(["INV-02", "INV-07"]),
@@ -1218,13 +1276,22 @@ assert(
 const fnd07 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-07");
 assert(fnd07 !== undefined, "P0 contains FND-07");
 same(
+  JSON.stringify(fnd07.formalPremises),
+  JSON.stringify([
+    "F2F3OneSidedExistence",
+    "CurrentScopeMember",
+    "ContextualScopeCompositionLaw",
+  ]),
+  "FND-07 frozen kernel boundary exposes the exact structural-L/current-Scope inputs",
+);
+same(
   JSON.stringify(fnd07.assumptions),
   JSON.stringify([
-    "accepted A16 contextual truth semantics",
-    "accepted A16 current-Scope composition law",
-    "F2/F3 root-basis witnesses for structural L = O⟼C",
+    "F2F3OneSidedExistence for structural L = O⟼C",
+    "CurrentScopeMember as the external projection of the published current Scope",
+    "ContextualScopeCompositionLaw as the accepted A16 semantic premise",
   ]),
-  "FND-07 exposes the accepted truth, detachment, and structural-L premises",
+  "FND-07 P0 assumptions distinguish structural witness, Scope projection, and accepted semantic premise",
 );
 same(
   JSON.stringify(fnd07.dependsOn),
@@ -1412,9 +1479,17 @@ assert(
 const fnd11 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-11");
 assert(fnd11 !== undefined, "P0 contains FND-11");
 same(
+  JSON.stringify(fnd11.formalPremises),
+  JSON.stringify(["AcceptedV014RepresentationDefinitions", "FND05Canonicality"]),
+  "FND-11 frozen kernel boundary matches the representation projection plus FND-05 witness",
+);
+same(
   JSON.stringify(fnd11.assumptions),
-  JSON.stringify(["accepted v0.14 representation-layer definitions"]),
-  "FND-11 assumptions remain exactly the accepted representation-layer definitions",
+  JSON.stringify([
+    "AcceptedV014RepresentationDefinitions external projection of accepted representation contracts",
+    "FND05Canonicality witness",
+  ]),
+  "FND-11 P0 assumptions expose the exact representation projection and theorem witness",
 );
 same(
   JSON.stringify(fnd11.dependsOn),
