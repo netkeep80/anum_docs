@@ -4078,7 +4078,7 @@ theorem fnd01_link_only_structure_from_capstone
     (E : F2F3OneSidedExistence F) :
     FND01LinkOnlyStructure F := by
   intro x decision
-  have h := FND_01_four_structural_cases F a1 E x decision
+  have h := FND_01_four_structural_cases F a1 E decision
   exact ⟨h.1, h.2.1⟩
 
 /--
