@@ -1,0 +1,33 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-09",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "FND-08"
+  ],
+  "dependencies": [
+    "FND-08"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "lean4",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "2fda28a8e7be8f9d824fd376622fb9ee21d66f2d",
+    "toolchain": {
+      "name": "Lean",
+      "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/lean4/MtsFoundation.lean",
+      "sha256": "676fd1af9ccee430cdb8288082b767ecf7c789e2158c7fd48eccafe4d0fef0fb"
+    }
+  ],
+  "notes": "External differential proof only. FND-09 derives NO MATCH, ZERO, ONE, MANY, N->1, N->M and active identity behavior from the generic FND-08 selected-Theory reaction projection rather than introducing result-cardinality constructors. ZERO is a local matched empty contribution: it implies a reaction occurred but does not imply global absence of the same semantic Link when another current antecedent emits it. N->1 convergence is extensional propositional membership over the same semantic Link while derivation provenance may remain multiple. Active identity may preserve successor membership while Reacted is true, so it is not quiescence. The proof adds no host collection or deduplication semantic primitive and preserves accepted v0.14 semantics."
+}

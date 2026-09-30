@@ -1,0 +1,34 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-08",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "FND-07 current contextual-truth boundary only; selected Theory relations are not CurrentScopeMember rules",
+    "SelectedTheoryReactionSemantics as the accepted V14-L11/V14-L4 admission/match/emission/reaction premise"
+  ],
+  "dependencies": [
+    "FND-07"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "2fda28a8e7be8f9d824fd376622fb9ee21d66f2d",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "94d7ebc4c9ca707ed58460bceb6040a19dde604adc56578bf40dec8ac76c2543"
+    }
+  ],
+  "notes": "External differential proof only. FND-08 uses two distinct Prop-valued Scope projections: CurrentScopeMember for the published pre-reaction Scope and NextScopeMember for the successor Scope. FND-07 is consumed only for the current contextual-truth boundary; ContextualScopeCompositionLaw is not consumed by FND-08 and no selected-Theory relation is coerced into CurrentScopeMember/ContextualRule. SelectedTheoryReactionSemantics is the explicitly classified accepted V14-L11/V14-L4 premise supplying Theory selection, applicability, emitted image and reaction occurrence. The theorem proves unmatched-current survival, positive emitted-image contribution, and Reacted iff some current antecedent has a selected matching relation. Quiescence is proved extensionally only from not Reacted, so active identity remains distinct from quiescence. Host predicates are proof vocabulary over the single Link carrier only; no host collection, rule-kind, multivalued-function or cardinality opcode becomes MTS semantic authority."
+}

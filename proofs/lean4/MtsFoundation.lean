@@ -3201,6 +3201,303 @@ theorem FND_07_semantic_truth_capstone
 
 
 /--
+FND-08/FND-09 external projection of selected-Theory relational reaction.
+
+This layer uses two distinct external Scope projections:
+- CurrentScopeMember projects the published pre-reaction Scope;
+- NextScopeMember projects the published successor Scope.
+
+Selected Theory authority remains separate through Prop-valued TheorySelected, Matches
+and Emits relations over the one Link carrier.  In particular, an admitted
+Theory relation is not coerced into ContextualRule/current-Scope membership.
+The projection introduces no host collection reaction object, host rule-kind
+classification, cardinality opcode or multivalued-function ontology.
+
+ZERO below means a local zero contribution from one matched antecedent, not
+global absence of the same semantic Link.  Reacted is kept independently from
+successor membership so an active identity transition remains distinct from
+quiescence.
+-/
+def ReactionMatched
+    (F : Foundation)
+    (TheorySelected : F.Link → Prop)
+    (Matches : F.Link → F.Link → Prop)
+    (A : F.Link) : Prop :=
+  ∃ r : F.Link, TheorySelected r ∧ Matches r A
+
+def ReactionImage
+    (F : Foundation)
+    (TheorySelected : F.Link → Prop)
+    (Matches Emits : F.Link → F.Link → Prop)
+    (A B : F.Link) : Prop :=
+  ∃ r : F.Link, TheorySelected r ∧ Matches r A ∧ Emits r B
+
+def ReactionProduced
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (K : F.Link)
+    (TheorySelected : F.Link → Prop)
+    (Matches Emits : F.Link → F.Link → Prop)
+    (B : F.Link) : Prop :=
+  ∃ A : F.Link,
+    ContextualTruth F CurrentScopeMember K A ∧
+    ReactionImage F TheorySelected Matches Emits A B
+
+def ReactionZeroAt
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (K : F.Link)
+    (TheorySelected : F.Link → Prop)
+    (Matches Emits : F.Link → F.Link → Prop)
+    (A : F.Link) : Prop :=
+  ContextualTruth F CurrentScopeMember K A ∧
+  ReactionMatched F TheorySelected Matches A ∧
+  ∀ B : F.Link, ¬ ReactionImage F TheorySelected Matches Emits A B
+
+def ReactionOneAt
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (K : F.Link)
+    (TheorySelected : F.Link → Prop)
+    (Matches Emits : F.Link → F.Link → Prop)
+    (A B : F.Link) : Prop :=
+  ContextualTruth F CurrentScopeMember K A ∧
+  ReactionImage F TheorySelected Matches Emits A B ∧
+  ∀ B' : F.Link,
+    ReactionImage F TheorySelected Matches Emits A B' →
+    B' = B
+
+def ReactionManyAt
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (K : F.Link)
+    (TheorySelected : F.Link → Prop)
+    (Matches Emits : F.Link → F.Link → Prop)
+    (A B₁ B₂ : F.Link) : Prop :=
+  ContextualTruth F CurrentScopeMember K A ∧
+  ReactionImage F TheorySelected Matches Emits A B₁ ∧
+  ReactionImage F TheorySelected Matches Emits A B₂ ∧
+  B₁ ≠ B₂
+
+/--
+Explicit accepted semantic premise for the dynamic selected-Theory step.
+
+External kernels do not derive this execution law from bare Foundation or from
+FND-07 current-Scope composition.  They cross-check consequences of this
+classified V14-L11/V14-L4 premise while keeping current and successor Scope
+membership distinct.
+-/
+def SelectedTheoryReactionSemantics
+    (F : Foundation)
+    (CurrentScopeMember NextScopeMember : F.Link → Prop)
+    (K : F.Link)
+    (TheorySelected : F.Link → Prop)
+    (Matches Emits : F.Link → F.Link → Prop)
+    (Reacted : Prop) : Prop :=
+  (∀ X : F.Link,
+    ContextualTruth F NextScopeMember K X ↔
+      (ContextualTruth F CurrentScopeMember K X ∧
+        ¬ ReactionMatched F TheorySelected Matches X) ∨
+      ReactionProduced
+        F CurrentScopeMember K TheorySelected Matches Emits X) ∧
+  (Reacted ↔
+    ∃ A : F.Link,
+      ContextualTruth F CurrentScopeMember K A ∧
+      ReactionMatched F TheorySelected Matches A)
+
+theorem reaction_image_implies_matched
+    (F : Foundation)
+    (TheorySelected : F.Link → Prop)
+    (Matches Emits : F.Link → F.Link → Prop)
+    {A B : F.Link}
+    (hImage : ReactionImage F TheorySelected Matches Emits A B) :
+    ReactionMatched F TheorySelected Matches A := by
+  rcases hImage with ⟨r, hTheorySelected, hMatches, _hEmits⟩
+  exact ⟨r, hTheorySelected, hMatches⟩
+
+/--
+FND-08 — generalized relational reaction.
+
+FND-07 is consumed only for the exact current contextual-truth/currentness
+boundary.  Dynamic successor construction comes solely from the independently
+classified SelectedTheoryReactionSemantics premise.
+-/
+theorem FND_08_generalized_relational_reaction
+    (F : Foundation)
+    (CurrentScopeMember NextScopeMember : F.Link → Prop)
+    (K : F.Link)
+    (TheorySelected : F.Link → Prop)
+    (Matches Emits : F.Link → F.Link → Prop)
+    (Reacted : Prop)
+    (semantics :
+      SelectedTheoryReactionSemantics
+        F CurrentScopeMember NextScopeMember K
+        TheorySelected Matches Emits Reacted) :
+    (∀ A : F.Link,
+      ContextualTruth F CurrentScopeMember K A ↔
+      CurrentScopeMember (F.form K A)) ∧
+    (∀ A : F.Link,
+      ContextualTruth F CurrentScopeMember K A →
+      ¬ ReactionMatched F TheorySelected Matches A →
+      ContextualTruth F NextScopeMember K A) ∧
+    (∀ A B : F.Link,
+      ContextualTruth F CurrentScopeMember K A →
+      ReactionImage F TheorySelected Matches Emits A B →
+      ContextualTruth F NextScopeMember K B) ∧
+    (Reacted ↔
+      ∃ A : F.Link,
+        ContextualTruth F CurrentScopeMember K A ∧
+        ReactionMatched F TheorySelected Matches A) := by
+  constructor
+  · intro A
+    exact (FND_07_contextual_truth_boundary F CurrentScopeMember).1 K A
+  constructor
+  · intro A hCurrent hNoMatch
+    exact (semantics.1 A).2 (Or.inl ⟨hCurrent, hNoMatch⟩)
+  constructor
+  · intro A B hCurrent hImage
+    exact (semantics.1 B).2 (Or.inr ⟨A, hCurrent, hImage⟩)
+  · exact semantics.2
+
+/--
+If no current antecedent matched an admitted Theory relation, the transition is
+quiescent and successor contextual truth is extensionally identical to current
+contextual truth.  This is stronger than observing equal membership after one
+identity transition: identity may have Reacted=true and is therefore not
+quiescence.
+-/
+theorem FND_08_quiescence_extensional
+    (F : Foundation)
+    (CurrentScopeMember NextScopeMember : F.Link → Prop)
+    (K : F.Link)
+    (TheorySelected : F.Link → Prop)
+    (Matches Emits : F.Link → F.Link → Prop)
+    (Reacted : Prop)
+    (semantics :
+      SelectedTheoryReactionSemantics
+        F CurrentScopeMember NextScopeMember K
+        TheorySelected Matches Emits Reacted)
+    (hQuiescent : ¬ Reacted) :
+    ∀ X : F.Link,
+      ContextualTruth F NextScopeMember K X ↔
+      ContextualTruth F CurrentScopeMember K X := by
+  intro X
+  constructor
+  · intro hNext
+    rcases (semantics.1 X).1 hNext with hSurvives | hProduced
+    · exact hSurvives.1
+    · rcases hProduced with ⟨A, hCurrent, hImage⟩
+      have hReacted : Reacted :=
+        semantics.2.mpr
+          ⟨A, hCurrent,
+            reaction_image_implies_matched
+              F TheorySelected Matches Emits hImage⟩
+      exact False.elim (hQuiescent hReacted)
+  · intro hCurrent
+    apply (semantics.1 X).2
+    apply Or.inl
+    refine ⟨hCurrent, ?_⟩
+    intro hMatched
+    apply hQuiescent
+    exact semantics.2.mpr ⟨X, hCurrent, hMatched⟩
+
+/--
+FND-09 — ZERO/ONE/MANY and N→M are derived relational properties of one
+generic selected-Theory reaction law.  They are not result constructors or
+cardinality opcodes.
+
+The final conjunct is the local-ZERO boundary: a zero contribution from A does
+not imply global absence of B when another current antecedent contributes B.
+-/
+theorem FND_09_zero_one_many_are_relational
+    (F : Foundation)
+    (CurrentScopeMember NextScopeMember : F.Link → Prop)
+    (K : F.Link)
+    (TheorySelected : F.Link → Prop)
+    (Matches Emits : F.Link → F.Link → Prop)
+    (Reacted : Prop)
+    (semantics :
+      SelectedTheoryReactionSemantics
+        F CurrentScopeMember NextScopeMember K
+        TheorySelected Matches Emits Reacted) :
+    (∀ A : F.Link,
+      ContextualTruth F CurrentScopeMember K A →
+      ¬ ReactionMatched F TheorySelected Matches A →
+      ContextualTruth F NextScopeMember K A) ∧
+    (∀ A : F.Link,
+      ReactionZeroAt
+        F CurrentScopeMember K TheorySelected Matches Emits A →
+      Reacted) ∧
+    (∀ A B : F.Link,
+      ReactionOneAt
+        F CurrentScopeMember K TheorySelected Matches Emits A B →
+      ContextualTruth F NextScopeMember K B) ∧
+    (∀ A B₁ B₂ : F.Link,
+      ReactionManyAt
+        F CurrentScopeMember K TheorySelected Matches Emits A B₁ B₂ →
+      ContextualTruth F NextScopeMember K B₁ ∧
+      ContextualTruth F NextScopeMember K B₂) ∧
+    (∀ A₁ A₂ B : F.Link,
+      ContextualTruth F CurrentScopeMember K A₁ →
+      ContextualTruth F CurrentScopeMember K A₂ →
+      A₁ ≠ A₂ →
+      ReactionImage F TheorySelected Matches Emits A₁ B →
+      ReactionImage F TheorySelected Matches Emits A₂ B →
+      ContextualTruth F NextScopeMember K B) ∧
+    (∀ A B : F.Link,
+      ContextualTruth F CurrentScopeMember K A →
+      ReactionImage F TheorySelected Matches Emits A B →
+      ContextualTruth F NextScopeMember K B) ∧
+    (∀ A : F.Link,
+      ContextualTruth F CurrentScopeMember K A →
+      ReactionImage F TheorySelected Matches Emits A A →
+      ContextualTruth F NextScopeMember K A ∧ Reacted) ∧
+    (∀ A B : F.Link,
+      ReactionZeroAt
+        F CurrentScopeMember K TheorySelected Matches Emits A →
+      (∃ A₂ : F.Link,
+        A₂ ≠ A ∧
+        ContextualTruth F CurrentScopeMember K A₂ ∧
+        ReactionImage F TheorySelected Matches Emits A₂ B) →
+      ContextualTruth F NextScopeMember K B) := by
+  constructor
+  · intro A hCurrent hNoMatch
+    exact (semantics.1 A).2 (Or.inl ⟨hCurrent, hNoMatch⟩)
+  constructor
+  · intro A hZero
+    rcases hZero with ⟨hCurrent, hMatched, _hNoImage⟩
+    exact semantics.2.mpr ⟨A, hCurrent, hMatched⟩
+  constructor
+  · intro A B hOne
+    rcases hOne with ⟨hCurrent, hImage, _hUnique⟩
+    exact (semantics.1 B).2 (Or.inr ⟨A, hCurrent, hImage⟩)
+  constructor
+  · intro A B₁ B₂ hMany
+    rcases hMany with ⟨hCurrent, hImage₁, hImage₂, _hDistinct⟩
+    constructor
+    · exact (semantics.1 B₁).2 (Or.inr ⟨A, hCurrent, hImage₁⟩)
+    · exact (semantics.1 B₂).2 (Or.inr ⟨A, hCurrent, hImage₂⟩)
+  constructor
+  · intro A₁ A₂ B hCurrent₁ _hCurrent₂ _hDistinct hImage₁ _hImage₂
+    exact (semantics.1 B).2 (Or.inr ⟨A₁, hCurrent₁, hImage₁⟩)
+  constructor
+  · intro A B hCurrent hImage
+    exact (semantics.1 B).2 (Or.inr ⟨A, hCurrent, hImage⟩)
+  constructor
+  · intro A hCurrent hIdentity
+    constructor
+    · exact (semantics.1 A).2 (Or.inr ⟨A, hCurrent, hIdentity⟩)
+    · exact
+        semantics.2.mpr
+          ⟨A, hCurrent,
+            reaction_image_implies_matched
+              F TheorySelected Matches Emits hIdentity⟩
+  · intro A B _hZero hOther
+    rcases hOther with ⟨A₂, _hDifferent, hCurrent₂, hImage₂⟩
+    exact (semantics.1 B).2 (Or.inr ⟨A₂, hCurrent₂, hImage₂⟩)
+
+
+/--
 FND-05 external proof projection of the accepted finite recursive Link codec.
 
 EXTERNAL THEORY PROJECTION NOTE:
