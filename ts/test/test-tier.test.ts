@@ -28,6 +28,29 @@ const allSet = new Set(plan.allSourceTests);
 const currentSet = new Set(plan.currentSourceTests);
 const referencedSet = new Set(plan.machineReferencedSourceTests);
 
+assert.ok(
+  plan.authoritySources.includes("theorems/current-v0.14.json"),
+  "current theorem projection participates in current test-tier authority",
+);
+assert.equal(
+  plan.authoritySources.includes("theorems/registry.json"),
+  false,
+  "historical v0.13 theorem registry must not control current test-tier selection",
+);
+assert.ok(
+  currentSet.has("ts/test/research-v013-recursive-link-inversion-a75a.test.ts"),
+  "historical-named witness remains current when frozen v0.14 P0 still references it",
+);
+for (const path of [
+  "ts/test/research-v013-context-dualization-a75b.test.ts",
+  "ts/test/research-v013-formal-duality-a75c.test.ts",
+  "ts/test/research-v013-full-duality-audit-a75f.test.ts",
+  "ts/test/research-v013-grounded-execution-dualization-a75e.test.ts",
+  "ts/test/research-v013-theory-authority-dualization-a75d.test.ts",
+]) {
+  assert.equal(currentSet.has(path), false, `historical registry-only witness stays full-only: ${path}`);
+}
+
 for (const path of plan.currentSourceTests) {
   assert.ok(allSet.has(path), `current test must exist in full tier: ${path}`);
 }

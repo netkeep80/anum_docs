@@ -152,14 +152,37 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
     readJson(repositoryRoot, proofInfrastructurePath),
     proofInfrastructurePath,
   );
-  const theoremRegistryPath = string(
-    proofInfrastructure.theoremRegistry,
-    `${proofInfrastructurePath}.theoremRegistry`,
+  const currentTheoremIndexPath = string(
+    proofInfrastructure.currentTheoremIndex,
+    `${proofInfrastructurePath}.currentTheoremIndex`,
   );
-  const theoremRegistry = readJson(repositoryRoot, theoremRegistryPath);
+  const historicalTheoremRegistryPath = string(
+    proofInfrastructure.historicalTheoremRegistry,
+    `${proofInfrastructurePath}.historicalTheoremRegistry`,
+  );
+  if (currentTheoremIndexPath === historicalTheoremRegistryPath) {
+    fail("current theorem index must differ from historical theorem registry");
+  }
+
+  const currentTheoremIndex = object(
+    readJson(repositoryRoot, currentTheoremIndexPath),
+    currentTheoremIndexPath,
+  );
+  if (
+    string(currentTheoremIndex.schema, `${currentTheoremIndexPath}.schema`) !==
+    "mts-current-theorem-index/v0.1"
+  ) {
+    fail("unexpected current theorem index schema");
+  }
+  if (
+    string(currentTheoremIndex.authority, `${currentTheoremIndexPath}.authority`) !==
+    "generated-index-only"
+  ) {
+    fail("current theorem index must remain a generated projection");
+  }
 
   const references = new Set<string>();
-  for (const surface of [contract, conformance, traceability, theoremRegistry]) {
+  for (const surface of [contract, conformance, traceability, currentTheoremIndex]) {
     collectExactTestReferences(surface, references);
   }
 
@@ -171,7 +194,7 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
       contractPath,
       conformancePath,
       traceabilityPath,
-      theoremRegistryPath,
+      currentTheoremIndexPath,
     ]),
   });
 }
