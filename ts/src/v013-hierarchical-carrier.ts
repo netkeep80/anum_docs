@@ -236,6 +236,119 @@ export function materializeV013HierarchicalCarrierFromSemanticLink(
   return project(semantic);
 }
 
+type ValidatedV013CarrierNode =
+  | Readonly<{ aspect: "ROOT"; carrier: LinkHandle }>
+  | Readonly<{ aspect: "START"; carrier: LinkHandle; child: ValidatedV013CarrierNode }>
+  | Readonly<{ aspect: "END"; carrier: LinkHandle; child: ValidatedV013CarrierNode }>
+  | Readonly<{
+      aspect: "PAIR";
+      carrier: LinkHandle;
+      left: ValidatedV013CarrierNode;
+      right: ValidatedV013CarrierNode;
+    }>;
+
+/**
+ * Explicit authority-gated semantic inverse for the quoted recursive carrier.
+ *
+ * The carrier itself has representation authority only. Semantic materialization
+ * occurs only when a caller invokes this operation explicitly. Validation is
+ * completed for the whole carrier before the first semantic Link is written, so
+ * malformed/cyclic representation data cannot leave a partially reconstructed
+ * semantic target behind.
+ *
+ * The supported domain is exactly the accepted finite recursive
+ * ROOT/START/END/PAIR domain of this codec. General distinct-node graph cycles
+ * remain outside that domain.
+ */
+export function materializeV013SemanticLinkFromHierarchicalCarrier(
+  memory: WriteMemory,
+  basis: RootBasis,
+  carrier: LinkHandle,
+): LinkHandle {
+  const verified = requireBasis(memory, basis);
+  const validated = new Map<LinkHandle, ValidatedV013CarrierNode>();
+  const active = new Set<LinkHandle>();
+
+  const validate = (node: LinkHandle): ValidatedV013CarrierNode => {
+    const known = validated.get(node);
+    if (known !== undefined) return known;
+
+    if (node === verified.R) {
+      const root = Object.freeze({ aspect: "ROOT" as const, carrier: node });
+      validated.set(node, root);
+      return root;
+    }
+
+    if (active.has(node)) return fail("invalid-carrier");
+    active.add(node);
+    try {
+      const values = readQuotedNode(memory, verified, node);
+      let result: ValidatedV013CarrierNode;
+
+      if (values.length === 2 && values[0] === verified.O) {
+        result = Object.freeze({
+          aspect: "START" as const,
+          carrier: node,
+          child: validate(values[1]!),
+        });
+      } else if (values.length === 2 && values[0] === verified.C) {
+        result = Object.freeze({
+          aspect: "END" as const,
+          carrier: node,
+          child: validate(values[1]!),
+        });
+      } else if (values.length === 3 && values[0] === verified.L) {
+        result = Object.freeze({
+          aspect: "PAIR" as const,
+          carrier: node,
+          left: validate(values[1]!),
+          right: validate(values[2]!),
+        });
+      } else {
+        return fail("invalid-carrier");
+      }
+
+      validated.set(node, result);
+      return result;
+    } finally {
+      active.delete(node);
+    }
+  };
+
+  // Phase 1: complete read-only validation. No ensure/materialization call is
+  // reachable before this returns successfully.
+  const root = validate(carrier);
+
+  // Phase 2: materialize only the already-validated semantic topology.
+  const materialized = new Map<LinkHandle, LinkHandle>();
+  const build = (node: ValidatedV013CarrierNode): LinkHandle => {
+    const known = materialized.get(node.carrier);
+    if (known !== undefined) return known;
+
+    let semantic: LinkHandle;
+    switch (node.aspect) {
+      case "ROOT":
+        semantic = verified.R;
+        break;
+      case "START":
+        semantic = memory.ensureStartSelfClosed(build(node.child));
+        break;
+      case "END":
+        semantic = memory.ensureEndSelfClosed(build(node.child));
+        break;
+      case "PAIR":
+        semantic = memory.ensure(build(node.left), build(node.right));
+        break;
+    }
+
+    materialized.set(node.carrier, semantic);
+    return semantic;
+  };
+
+  return build(root);
+}
+
+
 /**
  * Read-only canonical physical serialization of the quoted v0.13 hierarchy.
  *
