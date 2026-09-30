@@ -60,6 +60,57 @@
         "K1 historically inherits ordered-pole identity foundation authority",
         "rootless cyclic grounding remains outside accepted replay"
       ]
+    },
+    {
+      "id": "FND-07",
+      "classification": "DERIVED_CLOSED_PROOF_ANET",
+      "independent": true,
+      "evidenceRecord": "proofs/evidence/FND-07/mtsNative.json",
+      "components": [
+        {
+          "id": "contextual-detachment",
+          "assurance": "DERIVED_CLOSED_PROOF_ANET",
+          "independent": true,
+          "theoryRevision": "3606347cf99b67a3c48da83d930a42e52e40e7fd92ac4840c444e6896bc20116"
+        },
+        {
+          "id": "root-pair-structure",
+          "assurance": "KERNEL_REALIZED_NOT_INDEPENDENT",
+          "independent": false,
+          "boundary": "L=O⟼C structural root-basis component only; PAIR topology does not imply the semantic truth role"
+        },
+        {
+          "id": "a16-truth-role",
+          "assurance": "ACCEPTED_SEMANTIC_BOUNDARY_EXPLICIT",
+          "independent": false,
+          "theoryRevision": "d2616afc7f358724b4abdf1fee6a0276d8db12ed571a357a8035767c253a8e58"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "ts/test/native-fnd07-contextual-detachment.test.ts",
+          "gitBlobSha": "d2194d4aa1ab6f10026c9f6e384746b700d0d55a"
+        },
+        {
+          "path": "ts/test/native-fnd07-root-truth-aspect.test.ts",
+          "gitBlobSha": "7e8aec1b3c8b9daafac4e437fbebcc46d88391db"
+        },
+        {
+          "path": "proofs/native/FND-07/contextual-detachment.anum",
+          "gitBlobSha": "bef1bb91bf69d1da2c9cfc3936c803dee951db19"
+        },
+        {
+          "path": "proofs/native/FND-07/a16-truth-role.anum",
+          "gitBlobSha": "f0aa43e0925c67aaf74ba6c5ef6fb75c3ef6ceec"
+        }
+      ],
+      "overclaimVeto": [
+        "FND-07 is not a new trusted kernel law; its detachment conclusion is derived through ordinary CLOSED rooted proof replay",
+        "L=O⟼C structural replay is not an independent proof that PAIR topology implies the semantic truth role",
+        "A16TruthValueRole(L) is an explicit accepted semantic boundary and not derived from bare Foundation",
+        "portable bytes, hashes, theorem metadata and composite Theory revision grant zero proof authority",
+        "CurrentScope runtime publication is not claimed implemented"
+      ]
     }
   ]
 }
