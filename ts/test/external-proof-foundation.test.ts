@@ -1874,9 +1874,21 @@ assert(
 );
 
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
+const proofDiffPattern = ci.match(/grep -Eq '([^']+)'/)?.[1];
+assert(proofDiffPattern, "CI external proof diff regex is parseable");
+const proofDiffRegex = new RegExp(proofDiffPattern);
 assert(
-  ci.includes("proofs/evidence/"),
+  proofDiffRegex.test("proofs/evidence/FND-03/lean4.json"),
   "evidence provenance changes must trigger external Lean/Rocq kernel recompilation",
+);
+assert(
+  proofDiffRegex.test("proofs/lean4/MtsFoundation.lean") &&
+    proofDiffRegex.test("proofs/coq/MtsFoundation.v"),
+  "existing external proof source triggers remain active",
+);
+assert(
+  !proofDiffRegex.test("docs/theory/Основания МТС.md"),
+  "unrelated documentation changes do not trigger external kernels",
 );
 assert(
   ci.includes("Compile pinned Lean external foundation"),
