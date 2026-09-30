@@ -1476,6 +1476,51 @@ assert(
   "FND-05 proof code is not disguised as a record carrying semantic authority",
 );
 
+const fnd06 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-06");
+assert(fnd06 !== undefined, "P0 contains FND-06");
+same(
+  JSON.stringify(fnd06.assumptions),
+  JSON.stringify(["FND-05"]),
+  "FND-06 dependency premise remains exactly FND-05",
+);
+same(
+  JSON.stringify(fnd06.dependsOn),
+  JSON.stringify(["FND-05"]),
+  "FND-06 dependency edge remains exactly FND-05",
+);
+
+for (const [label, source, endMarker] of [
+  ["Lean", lean, "def ExactSequenceFoldCollision"],
+  ["Rocq", rocq, "Definition ExactSequenceFoldCollision"],
+] as const) {
+  const start = source.indexOf("External host projection of one local Memory");
+  const end = source.indexOf(endMarker, start);
+  assert(start >= 0 && end > start, label + " contains FND-06 Memory projection");
+  const region = source.slice(start, end);
+  for (const symbol of [
+    "LocalMemoryProjection",
+    "FND_06_memory_handle_transport_invariant",
+    "FND05Canonicality",
+    "CanonicalRecursiveDescription",
+    "Grounded",
+  ]) {
+    assert(region.includes(symbol), label + " FND-06 contains " + symbol);
+  }
+  assert(
+    /not an MTS ontology\s+sort/i.test(region) &&
+      /materialization authority/i.test(region),
+    label + " FND-06 keeps Memory handles outside MTS ontology/authority",
+  );
+  assert(
+    /same recursive code implies same Link/i.test(region),
+    label + " FND-06 explicitly rejects converse code-to-Link extensionality",
+  );
+}
+assert(
+  !lean.includes("axiom FND_06") && !rocq.includes("Axiom FND_06"),
+  "FND-06 is proved rather than postulated",
+);
+
 const fnd11 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-11");
 assert(fnd11 !== undefined, "P0 contains FND-11");
 same(
@@ -1644,7 +1689,7 @@ console.log([
   "POLE_EXTENSIONALITY_PRE_FND02=ABSENT",
   "FND02_BASIS=A1_F2_F3",
   "SORRY_ADMIT_STATUS=CHECKED_BY_EXTERNAL_PROOF_ASSURANCE",
-  "THEOREM_PROOF_CLAIMS=21",
+  "THEOREM_PROOF_CLAIMS=22",
   "FND02_LEAN=PROOF_SOURCE_PRESENT",
   "FND02_ROCQ=PROOF_SOURCE_PRESENT",
   "FND13_LEAN=PROOF_SOURCE_PRESENT",
@@ -1703,6 +1748,7 @@ console.log([
   "FND05_HOST_CODE=EXTERNAL_PROJECTION_ONLY",
   "FND05_GENERAL_CYCLES=EXCLUDED",
   "FND05_ANUM_Q_IDENTITY=EXCLUDED",
+  "FND06_MEMORY_HANDLE_INVARIANCE=GREEN_SOURCE",
   "FND11_DEPENDENCY=FND05",
   "FND11_RECURSIVE_CODEC_NE_ANUM=PROVED_TARGET_SEPARATION",
   "FND11_EXACT_SEQUENCE_NE_FOLD=COLLISION_WITNESS",

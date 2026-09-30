@@ -364,6 +364,43 @@ for (const theoremId of waveB1) {
   }
 }
 
+const fnd06Target = p0Targets.get("FND-06");
+assert.ok(fnd06Target, "FND-06 exists in frozen P0");
+assert.equal(
+  fnd06Target.statement,
+  "Accepted structural transport/reconstruction is invariant under fresh local Memory handles within its declared transport domain.",
+  "FND-06 frozen statement",
+);
+assert.deepEqual(fnd06Target.assumptions, ["FND-05"], "FND-06 frozen assumptions");
+assert.deepEqual(fnd06Target.dependsOn, ["FND-05"], "FND-06 frozen dependency");
+assert.equal(
+  fnd06Target.scope,
+  "Accepted recursive structural transport and exact declared carrier boundaries.",
+  "FND-06 frozen scope",
+);
+assert.equal(
+  fnd06Target.exclusions,
+  "Memory addresses/handles are not semantic identity and this does not grant semantic materialization authority.",
+  "FND-06 frozen exclusions",
+);
+
+const fnd06 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-06")
+  .map(({ record }) => record);
+assert.equal(fnd06.length, 2, "FND-06 has exactly two external evidence records");
+assert.deepEqual(
+  fnd06.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "FND-06 external lanes",
+);
+for (const record of fnd06) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "91df3c548d8f46c4cdeb42980d1bfa91a69d563d",
+    `FND-06 ${record.lane} exact kernel-GREEN proof source`,
+  );
+}
+
 const fnd02 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-02")
   .map(({ record }) => record);
@@ -1152,5 +1189,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd03=lean4+coq fnd04=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq fnd05=lean4+coq fnd11=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd03=lean4+coq fnd04=lean4+coq fnd06=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq fnd05=lean4+coq fnd11=lean4+coq aprover-input=mtsNative-only`,
 );
