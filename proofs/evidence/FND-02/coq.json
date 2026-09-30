@@ -7,8 +7,7 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "A1 recursive distinguishability / finite grounding principle",
-    "F2/F3 name-neutral grounded normal-form principle"
+    "A1RecursiveSeparation"
   ],
   "dependencies": [],
   "result": "proved",
@@ -28,5 +27,5 @@
       "sha256": "ec67d469b43c8bb6fcd6f207f289f132de80c0a0466e38bfe2457db715483949"
     }
   ],
-  "notes": "External differential proof only. FND_02_unique_root is derived from explicit A1RecursiveSeparation plus finite Grounded evidence; no A6/pole-extensionality or root-uniqueness axiom is assumed. Accepted MTS source is pinned to the post-acceptance A75 cutover commit; the pre-acceptance ready SHA remains a separate semantic-freeze provenance point."
+  "notes": "External differential proof only. FND_02_unique_root is derived from explicit A1RecursiveSeparation plus finite Grounded evidence; no A6/pole-extensionality or root-uniqueness axiom is assumed. Accepted MTS source is pinned to the post-acceptance A75 cutover commit; the pre-acceptance ready SHA remains a separate semantic-freeze provenance point. Assumptions metadata aligned with the stabilized P0 boundary in #1820; theorem dependencies and historical exact proof-artifact/source pins are intentionally unchanged."
 }
