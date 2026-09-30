@@ -411,7 +411,12 @@
       "derivationFrom": [
         "FND-05"
       ],
-      "explicitModelStatus": "DERIVED_FROM_ASSURED_FND-05"
+      "explicitModelStatus": "DERIVED_FROM_ASSURED_FND-05",
+      "falsificationTarget": {
+        "kind": "PROVENANCE_NEGATIVE_CHECK",
+        "condition": "Attempt to consume FND05Canonicality without a proved FND-05 predecessor witness on its declared finite Grounded domain.",
+        "status": "REGISTERED_PROVENANCE_GUARD"
+      }
     },
     {
       "id": "AcceptedRepresentationLayerBoundary",
@@ -452,7 +457,12 @@
       "derivationFrom": [
         "FND-01"
       ],
-      "explicitModelStatus": "DERIVED_FROM_ASSURED_FND-01"
+      "explicitModelStatus": "DERIVED_FROM_ASSURED_FND-01",
+      "falsificationTarget": {
+        "kind": "PROVENANCE_NEGATIVE_CHECK",
+        "condition": "Attempt to consume FND01LinkOnlyStructure without an established FND-01 structural-partition dependency witness.",
+        "status": "REGISTERED_PROVENANCE_GUARD"
+      }
     },
     {
       "id": "FND11RepresentationSeparation",
@@ -471,7 +481,12 @@
       "derivationFrom": [
         "FND-11"
       ],
-      "explicitModelStatus": "DERIVED_FROM_ASSURED_FND-11"
+      "explicitModelStatus": "DERIVED_FROM_ASSURED_FND-11",
+      "falsificationTarget": {
+        "kind": "PROVENANCE_NEGATIVE_CHECK",
+        "condition": "Attempt to consume FND11RepresentationSeparation without an established FND-11 representation-separation dependency witness.",
+        "status": "REGISTERED_PROVENANCE_GUARD"
+      }
     }
   ],
   "convergence": {
