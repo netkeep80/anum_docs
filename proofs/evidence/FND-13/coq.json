@@ -7,7 +7,8 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "F2/F3 name-neutral grounded normal-form completeness on the declared finite R-grounded theorem domain"
+    "F2F3GroundedNormalization",
+    "Grounded evidence for both Links under comparison"
   ],
   "dependencies": [],
   "result": "proved",
@@ -27,5 +28,5 @@
       "sha256": "01adf311071e9310899a3f1d0b5eb1004031636061418a2beb5125a3b468d2a4"
     }
   ],
-  "notes": "External differential proof only. FND_13_identity_by_poles is now exactly restricted to the accepted finite Grounded domain and consumes an explicit grounded normal-form completeness premise. Constructor injectivity is proved separately from primitive form projections. FND-02 unique ROOT is no longer presented as a dependency because the FND-13 proof does not consume it. The older arbitrary-Link extensionality strength is preserved only as global_identity_by_poles_from_complete_normalization under a separately named stronger global normalization-completeness premise; ungrounded distinct-node cycles remain outside FND-13. Proof source is repinned to the #1796 minimized proof bundle; the FND-13 theorem boundary itself is unchanged."
+  "notes": "External differential proof only. FND_13_identity_by_poles is now exactly restricted to the accepted finite Grounded domain and consumes an explicit grounded normal-form completeness premise. Constructor injectivity is proved separately from primitive form projections. FND-02 unique ROOT is no longer presented as a dependency because the FND-13 proof does not consume it. The older arbitrary-Link extensionality strength is preserved only as global_identity_by_poles_from_complete_normalization under a separately named stronger global normalization-completeness premise; ungrounded distinct-node cycles remain outside FND-13. Proof source is repinned to the #1796 minimized proof bundle; the FND-13 theorem boundary itself is unchanged. Assumptions metadata aligned with the stabilized P0 boundary in #1820; theorem dependencies and historical exact proof-artifact/source pins are intentionally unchanged."
 }
