@@ -429,8 +429,8 @@ for (const theoremId of waveB1) {
   for (const record of records) {
     assert.equal(
       record.proofSource.commitSha,
-      "6a6cfc3fa47aa310676cccfddf4f166f459d3cba",
-      `${theoremId} ${record.lane} exact kernel-GREEN proof source`,
+      "2ef10b56c611e947f4cd0f535afceebd4eaf6a5c",
+      `${theoremId} ${record.lane} reachable byte-identical kernel-GREEN proof source`,
     );
   }
 }
