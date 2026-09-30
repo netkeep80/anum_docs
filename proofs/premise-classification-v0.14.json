@@ -297,8 +297,7 @@
       ],
       "consumedBy": [
         "FND-07",
-        "FND-08",
-        "FND-09"
+        "FND-08"
       ],
       "rationale": "The semantic role called truth is explicitly accepted A16/V14-L11 semantics and is not derived from bare Foundation.",
       "falsificationTarget": {
@@ -320,14 +319,31 @@
         "ContextualScopeCompositionLaw"
       ],
       "consumedBy": [
-        "FND-07",
-        "FND-08"
+        "FND-07"
       ],
-      "rationale": "Contextual detachment is derived once this law is supplied; the law itself remains an accepted semantic premise.",
+      "rationale": "Contextual detachment inside the A16/FND-07 current-Scope projection is derived once this law is supplied; the law itself remains an accepted semantic premise. Generalized FND-08 execution does not consume it because selected Theory relations are a distinct authority frontier, not CurrentScopeMember rules.",
       "falsificationTarget": {
         "kind": "EXECUTABLE_SEMANTIC_VECTOR",
         "target": "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
         "condition": "Break accepted current-Scope detachment K->A + A->B => K->B while preserving the tested input boundary.",
+        "status": "REGISTERED_EXISTING_VECTOR"
+      },
+      "explicitModelStatus": "ACCEPTED_SEMANTIC_PREMISE_NOT_DERIVED_FROM_BARE_FOUNDATION"
+    },
+    {
+      "id": "SelectedTheoryReactionSemantics",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "accepted V14-L11/V14-L4 selected-Theory authority, distinct from current Scope membership, covering admission, applicability, emitted image and reaction occurrence",
+      "leanSymbols": [],
+      "rocqSymbols": [],
+      "consumedBy": [
+        "FND-08"
+      ],
+      "rationale": "FND-08 uses FND-07 only for the current contextual-truth boundary. Accepted generalized reaction is a separate selected-Theory semantic premise: Theory admission is not CurrentScopeMember, determines which relations are executable, distinguishes an admitted applicable relation with empty emission from absence of any admitted relation, unions all positive emissions without host cardinality dispatch, and retains whether any admitted relation matched so active identity remains distinct from quiescence.",
+      "falsificationTarget": {
+        "kind": "EXECUTABLE_SEMANTIC_VECTOR",
+        "target": "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+        "condition": "Coerce selected-Theory admission into CurrentScopeMember/ContextualRule, collapse NO_ADMITTED_RELATION into explicit ZERO, allow ambient unadmitted relations to fire, equate an extensionally unchanged active identity transition with quiescence, or fail the all-matching admitted-relation union boundary retained through A72w/A72y.",
         "status": "REGISTERED_EXISTING_VECTOR"
       },
       "explicitModelStatus": "ACCEPTED_SEMANTIC_PREMISE_NOT_DERIVED_FROM_BARE_FOUNDATION"
@@ -427,5 +443,15 @@
         "sharingDistinct": "sharedGroundedParent_ne_child"
       }
     }
-  }
+  },
+  "postConvergenceErrata": [
+    {
+      "issue": 1830,
+      "pullRequest": 1832,
+      "kind": "SEMANTIC_PRESERVING_PROOF_PROJECTION_CORRECTION",
+      "premise": "SelectedTheoryReactionSemantics",
+      "acceptedSemanticDelta": "NONE",
+      "correction": "Separate current contextual-truth membership from selected-Theory reaction authority; ContextualScopeCompositionLaw remains an FND-07 premise only, while FND-08 consumes SelectedTheoryReactionSemantics for admission/match/emission/reaction."
+    }
+  ]
 }

@@ -268,9 +268,15 @@ function instantiateTemplate(
  *
  * The braces are only mathematical shorthand for ordinary Link bundles.
  *
- * One and the same kernel handles 1->0, 1->1, 1->N, N->1 and N->M.
- * All matching Rules fire. Duplicate successors collapse by canonical Link
- * identity. No Context lifecycle exists in this witness.
+ * Historically this witness also exercised a 1->0 control by taking zero
+ * matching Rules and publishing an empty successor. A72y later superseded that
+ * ZERO_MATCH_DELETE interpretation: in accepted full-reaction semantics,
+ * NO MATCH preserves currentness, while explicit 1->0 requires an admitted
+ * matching relation with an empty image.
+ *
+ * The retained authority of this witness is therefore positive generalized
+ * fan-out/convergence (1->1, 1->N, N->1, N->M), all-matching firing and
+ * canonical duplicate convergence. No Context lifecycle exists here.
  */
 function reactFlatScope(
   memory: Memory,
@@ -470,8 +476,10 @@ function exercise(): void {
   defineTransitionRule(memory, theory, b, at(57), ANMb, BNM2);
   defineTransitionRule(memory, theory, b, at(58), ANMb, BNM3);
 
+  // Historical A72w zero-match-delete control. Retained only as the
+  // superseded floor that A72y explicitly corrects.
   exerciseCase(memory, interpreter, K, {
-    label: "1->0",
+    label: "historical-zero-match-delete",
     inputs: [A10],
     expected: [],
     rawRuleMatches: 0,
@@ -633,7 +641,7 @@ function main(): void {
   console.log([
     "MTS v0.13 A72w: FLAT_GENERALIZED_MODUS_PONENS=GREEN_SCOPED_RESEARCH",
     "LAW=K_TO_AI_PLUS_STRUCTURAL_RULES_GIVES_K_TO_BJ",
-    "ONE_TO_ZERO=GREEN",
+    "HISTORICAL_ONE_TO_ZERO_ZERO_MATCH_DELETE=GREEN_SUPERSEDED_BY_A72Y",
     "ONE_TO_ONE=GREEN",
     "ONE_TO_N=GREEN",
     "N_TO_ONE=GREEN",

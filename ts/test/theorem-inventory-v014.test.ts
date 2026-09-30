@@ -27,12 +27,16 @@ function sameSet(
 const root = resolve(process.cwd(), "..");
 const readJson = (path: string): Json =>
   JSON.parse(readFileSync(join(root, path), "utf8")) as Json;
+const readText = (path: string): string =>
+  readFileSync(join(root, path), "utf8");
 
 const inventory = readJson("theorems/p0-v0.14.json");
 const registry = readJson("theorems/registry.json");
 const contract = readJson("contracts/mts-contract-v0.14.json");
 const traceability = readJson("traceability/mts-v0.14.json");
 const premiseMatrix = readJson("proofs/premise-classification-v0.14.json");
+const a72w = readText("ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts");
+const a72y = readText("ts/test/research-v013-explicit-zero-image-a72y.test.ts");
 
 same(inventory.schema, "mts-theorem-inventory/v0.1", "inventory schema");
 same(inventory.status, "p0-frozen", "inventory status");
@@ -71,6 +75,35 @@ same(
   "stronger global normalization remains isolated",
 );
 same(inventory.boundaryFreeze.acceptedSemanticDelta, "NONE", "P0 freeze semantic delta");
+assert(
+  Array.isArray(inventory.boundaryFreeze.errata) &&
+    inventory.boundaryFreeze.errata.some(
+      (entry: Json) =>
+        entry.issue === 1830 &&
+        entry.pullRequest === 1832 &&
+        entry.kind === "SEMANTIC_PRESERVING_PROOF_PROJECTION_CORRECTION" &&
+        entry.acceptedSemanticDelta === "NONE" &&
+        typeof entry.provenanceCorrection === "string" &&
+        entry.provenanceCorrection.includes("A72w") &&
+        entry.provenanceCorrection.includes("A72y") &&
+        Array.isArray(entry.provenanceEvidence) &&
+        entry.provenanceEvidence.includes(
+          "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+        ),
+    ),
+  "post-freeze FND-08/FND-09 projection correction is explicit rather than silent",
+);
+assert(
+  a72w.includes("HISTORICAL_ONE_TO_ZERO_ZERO_MATCH_DELETE=GREEN_SUPERSEDED_BY_A72Y"),
+  "A72w retains its old 1->0 control only as explicitly superseded historical evidence",
+);
+assert(
+  a72y.includes("A72W_ZERO_MATCH_DELETE=SUPERSEDED") &&
+    a72y.includes("NO_MATCH=INERT_CURRENT_MEMBER") &&
+    a72y.includes("EXPLICIT_ZERO_IMAGE=EMPTY_EXACT_SEQUENCE") &&
+    a72y.includes("ONE_TO_ZERO=GREEN_EXPLICIT_RULE"),
+  "A72y owns the corrected explicit-zero/no-match reaction boundary",
+);
 same(inventory.boundaryFreeze.externalProversNormativeAuthority, false, "external provers remain non-normative");
 same(inventory.boundaryFreeze.jsonProofAuthority, false, "P0 JSON is not proof authority");
 same(
@@ -218,6 +251,7 @@ const fnd02 = targets.find((target) => target.id === "FND-02")!;
 const fnd13 = targets.find((target) => target.id === "FND-13")!;
 const fnd01 = targets.find((target) => target.id === "FND-01")!;
 const fnd08 = targets.find((target) => target.id === "FND-08")!;
+const fnd09 = targets.find((target) => target.id === "FND-09")!;
 
 const inv01 = targets.find((target) => target.id === "INV-01")!;
 const inv02 = targets.find((target) => target.id === "INV-02")!;
@@ -270,6 +304,74 @@ assert(
 );
 same(fnd08.wave, "B", "FND-08 moves behind the foundation wave");
 assert(!firstWave.includes("FND-08"), "FND-08 is not in the first differential wave");
+assert(
+  (fnd08.assumptions as string[]).includes(
+    "FND-07 current contextual-truth boundary only; selected Theory relations are not CurrentScopeMember rules",
+  ),
+  "FND-08 consumes FND-07 only for current contextual-truth boundary",
+);
+assert(
+  (fnd08.assumptions as string[]).includes(
+    "SelectedTheoryReactionSemantics as the accepted V14-L11/V14-L4 admission/match/emission/reaction premise",
+  ),
+  "FND-08 names selected-Theory reaction semantics explicitly",
+);
+assert(
+  /selected-Theory admission must not be reclassified as CurrentScopeMember\/ContextualRule/i.test(
+    fnd08.exclusions as string,
+  ) &&
+    /ContextualScopeCompositionLaw is not an FND-08 reaction premise/i.test(
+      fnd08.exclusions as string,
+    ),
+  "FND-08 forbids the false Theory-to-current-Scope bridge",
+);
+sameSet(
+  fnd08.formalPremises as string[],
+  ["SelectedTheoryReactionSemantics"],
+  "FND-08 formal premise keeps admission/match/emission distinct from FND-07",
+);
+assert(
+  /unmatched current members survive/i.test(fnd08.statement as string) &&
+    /matched empty image remains distinct from no match/i.test(fnd08.statement as string) &&
+    /reaction occurrence remains distinct from extensional successor membership/i.test(
+      fnd08.statement as string,
+    ),
+  "FND-08 frozen statement retains image, no-match and reaction-event distinctions",
+);
+assert(
+  !(fnd08.statement as string).includes("admitted relations {A_i ⟼ B_j}"),
+  "FND-08 no longer encodes explicit 1->0 as absence of binary A->B pairs",
+);
+assert(
+  (fnd08.typescriptEvidence as string[]).includes(
+    "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+  ),
+  "FND-08 pins the explicit-zero/no-match witness",
+);
+assert(
+  /NO MATCH preserves currentness/i.test(fnd09.statement as string) &&
+    /explicit ZERO is a matched empty image/i.test(fnd09.statement as string),
+  "FND-09 distinguishes no-match from ZERO",
+);
+assert(
+  /absence of emitted B/i.test(fnd09.exclusions as string),
+  "FND-09 forbids inferring no admitted match from an empty emitted image",
+);
+assert(
+  /zero contribution from that matched antecedent/i.test(fnd09.exclusions as string) &&
+    /does not imply global absence/i.test(fnd09.exclusions as string),
+  "FND-09 keeps per-antecedent ZERO distinct from global successor absence",
+);
+same(
+  contract.reactionResultBasis.emptySuccessEqualsNoRelation,
+  false,
+  "accepted v0.14 keeps successful empty distinct from no relation",
+);
+same(
+  contract.reactionResultBasis.identityTransitionEqualsQuiescence,
+  false,
+  "accepted v0.14 keeps active identity distinct from quiescence",
+);
 same(
   inventory.constraints.poleExtensionalityRequiresExplicitFnd13,
   true,

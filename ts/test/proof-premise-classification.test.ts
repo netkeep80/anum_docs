@@ -38,6 +38,21 @@ same(
   "stronger global normalization remains explicitly isolated",
 );
 same(matrix.convergence.acceptedSemanticDelta, "NONE", "no accepted semantic delta");
+assert(
+  Array.isArray(matrix.postConvergenceErrata) &&
+    matrix.postConvergenceErrata.some(
+      (entry: Json) =>
+        entry.issue === 1830 &&
+        entry.pullRequest === 1832 &&
+        entry.premise === "SelectedTheoryReactionSemantics" &&
+        entry.acceptedSemanticDelta === "NONE" &&
+        typeof entry.correction === "string" &&
+        entry.correction.includes("ContextualScopeCompositionLaw") &&
+        entry.correction.includes("FND-07") &&
+        entry.correction.includes("FND-08"),
+    ),
+  "post-convergence reaction projection erratum is explicit",
+);
 same(matrix.convergence.nextBoundaryIssue, 1797, "next cyclic boundary owner");
 same(matrix.ownerIssue, 1796, "owner issue");
 same(matrix.parentIssue, 1789, "parent hardening issue");
@@ -75,6 +90,7 @@ const required = [
   "RecursiveInversionDomain.decide",
   "A16ContextualTruthSemantics",
   "ContextualScopeCompositionLaw",
+  "SelectedTheoryReactionSemantics",
   "ContextOrientationChi",
 ];
 for (const id of required) {
@@ -134,6 +150,31 @@ same(
   "UNRESOLVED",
   "strong global normalization completeness remains unresolved",
 );
+same(
+  byId.get("SelectedTheoryReactionSemantics")?.classification,
+  "INDEPENDENT_MODEL_CHOICE",
+  "selected-Theory reaction semantics is an explicit accepted semantic premise",
+);
+sameSet(
+  byId.get("SelectedTheoryReactionSemantics")?.consumedBy as string[],
+  ["FND-08"],
+  "selected-Theory reaction semantics is consumed directly by FND-08 only",
+);
+same(
+  byId.get("SelectedTheoryReactionSemantics")?.falsificationTarget?.target,
+  "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+  "reaction premise is falsified by the explicit-zero/no-match executable vector",
+);
+assert(
+  /identity transition with quiescence/i.test(
+    byId.get("SelectedTheoryReactionSemantics")?.falsificationTarget?.condition as string,
+  ),
+  "reaction premise also guards active identity versus quiescence",
+);
+assert(
+  !(byId.get("A16ContextualTruthSemantics")?.consumedBy as string[]).includes("FND-09"),
+  "FND-09 consumes FND-08 rather than re-importing A16 directly",
+);
 
 assert(
   JSON.stringify(byId.get("F2F3Normalization")?.consumedBy) ===
@@ -154,6 +195,23 @@ same(
   byId.get("ContextualScopeCompositionLaw")?.classification,
   "INDEPENDENT_MODEL_CHOICE",
   "A16 closure remains explicit semantic premise",
+);
+sameSet(
+  byId.get("ContextualScopeCompositionLaw")?.consumedBy as string[],
+  ["FND-07"],
+  "A16 current-Scope closure is not reused as selected-Theory reaction authority",
+);
+assert(
+  /selected Theory relations are a distinct authority frontier/i.test(
+    byId.get("ContextualScopeCompositionLaw")?.rationale as string,
+  ),
+  "premise matrix separates current Scope composition from selected Theory",
+);
+assert(
+  /coerce selected-Theory admission into CurrentScopeMember\/ContextualRule/i.test(
+    byId.get("SelectedTheoryReactionSemantics")?.falsificationTarget?.condition as string,
+  ),
+  "FND-08 rejects the false admitted-rule-to-currentness bridge",
 );
 
 same(matrix.modelObligation.ambientLinkCarrier, "INFINITE_REQUIRED", "ambient carrier cardinality");
