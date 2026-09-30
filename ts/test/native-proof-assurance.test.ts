@@ -137,7 +137,7 @@ assert(
   "FND-13 native realization must fail closed on cyclic grounding",
 );
 
-assert.equal(seen.size, 2);
+assert.equal(seen.size, 3);
 assert.equal(p0.targets.length, 21);
 
 const fnd07 = assurance.targets.find((target: any) => target.id === "FND-07");
