@@ -71,6 +71,17 @@ same(
   "stronger global normalization remains isolated",
 );
 same(inventory.boundaryFreeze.acceptedSemanticDelta, "NONE", "P0 freeze semantic delta");
+assert(
+  Array.isArray(inventory.boundaryFreeze.errata) &&
+    inventory.boundaryFreeze.errata.some(
+      (entry: Json) =>
+        entry.issue === 1830 &&
+        entry.pullRequest === 1832 &&
+        entry.kind === "SEMANTIC_PRESERVING_PROOF_PROJECTION_CORRECTION" &&
+        entry.acceptedSemanticDelta === "NONE",
+    ),
+  "post-freeze FND-08/FND-09 projection correction is explicit rather than silent",
+);
 same(inventory.boundaryFreeze.externalProversNormativeAuthority, false, "external provers remain non-normative");
 same(inventory.boundaryFreeze.jsonProofAuthority, false, "P0 JSON is not proof authority");
 same(
@@ -284,8 +295,11 @@ sameSet(
 );
 assert(
   /unmatched current members survive/i.test(fnd08.statement as string) &&
-    /matched empty image remains distinct from no match/i.test(fnd08.statement as string),
-  "FND-08 frozen statement distinguishes complete successor from positive image",
+    /matched empty image remains distinct from no match/i.test(fnd08.statement as string) &&
+    /reaction occurrence remains distinct from extensional successor membership/i.test(
+      fnd08.statement as string,
+    ),
+  "FND-08 frozen statement retains image, no-match and reaction-event distinctions",
 );
 assert(
   !(fnd08.statement as string).includes("admitted relations {A_i ⟼ B_j}"),
@@ -310,6 +324,11 @@ same(
   contract.reactionResultBasis.emptySuccessEqualsNoRelation,
   false,
   "accepted v0.14 keeps successful empty distinct from no relation",
+);
+same(
+  contract.reactionResultBasis.identityTransitionEqualsQuiescence,
+  false,
+  "accepted v0.14 keeps active identity distinct from quiescence",
 );
 same(
   inventory.constraints.poleExtensionalityRequiresExplicitFnd13,
