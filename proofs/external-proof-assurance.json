@@ -90,6 +90,26 @@
       ]
     },
     {
+      "id": "FND-08",
+      "lean4": [
+        "MTS.External.FND_08_generalized_relational_reaction",
+        "MTS.External.FND_08_quiescence_extensional"
+      ],
+      "rocq": [
+        "FND_08_generalized_relational_reaction",
+        "FND_08_quiescence_extensional"
+      ]
+    },
+    {
+      "id": "FND-09",
+      "lean4": [
+        "MTS.External.FND_09_zero_one_many_are_relational"
+      ],
+      "rocq": [
+        "FND_09_zero_one_many_are_relational"
+      ]
+    },
+    {
       "id": "FND-11",
       "lean4": [
         "MTS.External.FND_11_representation_identities_separated"
