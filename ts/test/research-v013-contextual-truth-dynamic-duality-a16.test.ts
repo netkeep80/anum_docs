@@ -99,14 +99,21 @@ function exercise(memory: Memory, withNoise: boolean): void {
 
   const fresh = freshFactory(memory, basis);
 
-  // ZERO: K->A is true in context K, but A has no selected continuation.
+  // Empty positive detachment image: K->A is true in context K, but A has
+  // no selected continuation. This is NOT the explicit full-reaction ZERO of
+  // A72y/V14-L4: at the reaction layer it is NO MATCH and K->A survives.
   {
     const K = fresh();
     const A = fresh();
     const truthA = memory.ensure(K, A);
-    const zero = propagateContextLinkage(memory, K, Object.freeze([truthA]));
-    same(zero.links.size, 0, "ZERO contextual detachment");
-    same(zero.occurrences.length, 0, "ZERO has no provenance occurrences");
+    const emptyImage =
+      propagateContextLinkage(memory, K, Object.freeze([truthA]));
+    same(emptyImage.links.size, 0, "empty positive detachment image");
+    same(
+      emptyImage.occurrences.length,
+      0,
+      "empty positive image has no provenance occurrences",
+    );
   }
 
   // ONE: K->A and A->B propagate to K->B.
@@ -250,7 +257,9 @@ function main(): void {
     "TRUE_CARRIER=K_TO_A",
     "ROOT_TRUE_ASPECT=L",
     "DETACHMENT=K_TO_A_PLUS_A_TO_B_GIVES_K_TO_B",
-    "RESULT_CARDINALITY=ZERO_ONE_MANY",
+    "POSITIVE_DETACHMENT_IMAGE_CARDINALITY=ZERO_ONE_MANY",
+    "EMPTY_POSITIVE_IMAGE_IS_NOT_REACTION_ZERO=TRUE",
+    "NO_MATCH_REACTION_BEHAVIOR=DEFERRED_TO_A72Y_V14_L4",
     "AMBIENT_UNSELECTED_RULE=IGNORED",
     "UNLINKED_ANTECEDENT=IGNORED",
     "CONVERGENCE_DISTINCT_TRUTH_LINKS=1",
