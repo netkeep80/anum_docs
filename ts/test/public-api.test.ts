@@ -185,6 +185,7 @@ const expectedRuntimeExports = [
   "materializeV012StringByteAnum",
   "materializeV013HierarchicalCarrier",
   "materializeV013HierarchicalCarrierFromSemanticLink",
+  "materializeV013SemanticLinkFromHierarchicalCarrier",
   "normalizeRawForm",
   "parseRawQuaternary",
   "readV012SourceContent",
@@ -239,7 +240,7 @@ const expectedRuntimeExports = [
   "verifyPortableStructuralProofTheoryRevision",
 ].sort();
 
-assert(expectedRuntimeExports.length === 144, "public runtime export budget must be exactly 144 after bounded v0.13 facade projection");
+assert(expectedRuntimeExports.length === 145, "public runtime export budget must be exactly 145 after bounded recursive-carrier inverse projection");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
