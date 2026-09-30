@@ -4288,6 +4288,74 @@ Proof.
   exact (FND_05_canonical_recursive_description_unique F A1 D x G).
 Qed.
 
+(* External host projection of one local Memory's handles onto the single MTS
+   Link carrier. Handle is arbitrary host identity; two Memories may use
+   different Handle types, and no cross-Memory handle equality is assumed.
+
+   This record is external evidence vocabulary only. It is not an MTS ontology
+   sort, creates no Links and grants no materialization authority. *)
+Record LocalMemoryProjection (F : Foundation) : Type := {
+  local_memory_handle : Type;
+  local_memory_semantic : local_memory_handle -> Link F
+}.
+
+Arguments local_memory_handle {F} _.
+Arguments local_memory_semantic {F} _ _.
+
+(* FND-06 — canonical structural transport is invariant under fresh local
+   Memory handles on the declared FND-05 transport domain.
+
+   The only semantic bridge between the two handle spaces is the explicit fact
+   that the chosen handles denote the same existing Link. FND-05 canonicality
+   then gives one unique recursive structural description for that Link.
+
+   This theorem does not prove "same recursive code implies same Link", does
+   not compare host handles, and grants no reconstruction/materialization
+   authority from a handle or code. *)
+Theorem FND_06_memory_handle_transport_invariant
+    (F : Foundation)
+    (Canonical : FND05Canonicality F)
+    (Left Right : LocalMemoryProjection F)
+    (leftHandle : local_memory_handle Left)
+    (rightHandle : local_memory_handle Right) :
+    local_memory_semantic Left leftHandle =
+      local_memory_semantic Right rightHandle ->
+    Grounded F (local_memory_semantic Left leftHandle) ->
+    exists code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription F
+        (local_memory_semantic Left leftHandle) code /\
+      CanonicalRecursiveDescription F
+        (local_memory_semantic Right rightHandle) code /\
+      (forall other : RecursiveDescriptionCode,
+        CanonicalRecursiveDescription F
+          (local_memory_semantic Left leftHandle) other ->
+        other = code) /\
+      (forall other : RecursiveDescriptionCode,
+        CanonicalRecursiveDescription F
+          (local_memory_semantic Right rightHandle) other ->
+        other = code).
+Proof.
+  intros SameSemantic GroundedLeft.
+  destruct
+    (Canonical
+      (local_memory_semantic Left leftHandle)
+      GroundedLeft)
+    as [code [HCode HUnique]].
+  exists code.
+  split.
+  - exact HCode.
+  - split.
+    + rewrite <- SameSemantic.
+      exact HCode.
+    + split.
+      * exact HUnique.
+      * intros other HOther.
+        apply HUnique.
+        rewrite SameSemantic.
+        exact HOther.
+Qed.
+
+
 Definition ExactSequenceFoldCollision
     (F : Foundation)
     (B : AcceptedV014RepresentationDefinitions F) : Prop :=
