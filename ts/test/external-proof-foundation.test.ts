@@ -1503,6 +1503,62 @@ assert(
   "FND-08/FND-09 must be proved rather than postulated",
 );
 
+const exe02 = (p0.targets as Record<string, any>[]).find((target) => target.id === "EXE-02");
+assert(exe02 !== undefined, "P0 contains corrected EXE-02");
+same(JSON.stringify(exe02.assumptions), JSON.stringify([]), "EXE-02 has no independent assumptions");
+same(JSON.stringify(exe02.dependsOn), JSON.stringify([]), "EXE-02 has no theorem dependency");
+same(JSON.stringify(exe02.formalPremises), JSON.stringify([]), "EXE-02 has no formal premise");
+
+for (const [label, source, endMarker] of [
+  ["Lean", lean, "FND-05 external proof projection"],
+  ["Rocq", rocq, "FND-05 external proof projection"],
+] as const) {
+  const start = source.indexOf("EXE-02 external projection of immutable Link identity");
+  const end = source.indexOf(endMarker, start);
+  assert(start >= 0 && end > start, label + " contains EXE-02 immutable-Link projection");
+  const region = source.slice(start, end);
+
+  for (const symbol of [
+    "LinkPoleReading",
+    "link_pole_reading_unique",
+    "formed_link_changed_start_distinct",
+    "formed_link_changed_finish_distinct",
+    "formed_link_changed_pole_distinct",
+    "EXE_02_immutable_link_rewrite_boundary",
+  ]) {
+    assert(region.includes(symbol), label + " EXE-02 contains " + symbol);
+  }
+
+  assert(
+    /changing either pole|changed pole/i.test(region) &&
+      /different semantic Link|distinct semantic Link/i.test(region),
+    label + " EXE-02 states changed-pole distinctness",
+  );
+  assert(
+    /explicit structural substitution/i.test(region) &&
+      /dependent/i.test(region),
+    label + " EXE-02 covers explicit dependent-Link substitution",
+  );
+
+  for (const forbidden of [
+    "Grounded",
+    "FND_13",
+    "FND13",
+    "Memory",
+    "Handle",
+    "address",
+    "mutable object",
+    "object identity",
+  ]) {
+    assert(!region.includes(forbidden), label + " EXE-02 excludes stronger/runtime premise: " + forbidden);
+  }
+}
+
+assert(
+  !lean.includes("axiom EXE_02") && !rocq.includes("Axiom EXE_02"),
+  "EXE-02 is proved rather than postulated",
+);
+
 const fnd05 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-05");
 assert(fnd05 !== undefined, "P0 contains FND-05");
 same(
