@@ -141,7 +141,7 @@ function buildCurrentIndex(root) {
 
 const root = findRepositoryRoot();
 const outputPath = resolve(root, "theorems", "current-v0.14.json");
-const serialized = JSON.stringify(buildCurrentIndex(root), null, 2) + "\n";
+const serialized = JSON.stringify(buildCurrentIndex(root)) + "\n";
 const mode = process.argv[2] ?? "--check";
 
 if (mode === "--write") {
