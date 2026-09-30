@@ -1,7 +1,6 @@
 {
   "schema": "mts-proof-infrastructure/v0.1",
   "authority": "routing-and-provenance-only",
-  "theoremRegistry": "theorems/registry.json",
   "evidenceRecordSchema": "proofs/evidence-record.schema.json",
   "lanes": {
     "typescript": {
@@ -53,10 +52,12 @@
   },
   "invariants": [
     "one theorem ID across all proof lanes",
-    "theorem registry is index-only and never proof authority",
+    "current theorem index is a generated projection and never proof authority; historical theorem registry is never a current selector",
     "Lean4 and Coq are external differential evidence, not MTS semantic authority",
     "aprover trusted verdicts consume portable MTS-native evidence only",
     "proof evidence records require exact MTS source and prover source/toolchain provenance",
     "stored JSON, hashes, caches, theorem names and UI state are never proof truth"
-  ]
+  ],
+  "currentTheoremIndex": "theorems/current-v0.14.json",
+  "historicalTheoremRegistry": "theorems/registry.json"
 }
