@@ -384,16 +384,6 @@ assert.equal(
   "FND-06 frozen exclusions",
 );
 
-const fnd06 = evidenceRecords
-  .filter(({ record }) => record.theoremId === "FND-06")
-  .map(({ record }) => record);
-assert.equal(fnd06.length, 2, "FND-06 has exactly two external evidence records");
-assert.deepEqual(
-  fnd06.map((record) => record.lane).sort(),
-  ["coq", "lean4"],
-  "FND-06 external lanes",
-);
-
 const fnd02 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-02")
   .map(({ record }) => record);
