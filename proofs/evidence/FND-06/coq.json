@@ -1,0 +1,33 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-06",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "FND-05"
+  ],
+  "dependencies": [
+    "FND-05"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "91df3c548d8f46c4cdeb42980d1bfa91a69d563d",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "84e4f2284e6827cf92ec812c67c57a1886e5d9d59f50beecbd63330f86720c60"
+    }
+  ],
+  "notes": "External differential proof only. FND-06 treats Memory handles as arbitrary host-local identities projected onto the single Foundation.Link carrier. Two local Memories may use different Handle types; the theorem assumes only that the selected handles denote the same existing Grounded Link and consumes FND05Canonicality as its sole theorem dependency. The resulting canonical recursive structural description is identical and unique in both handle spaces. No handle/address/object identity becomes semantic Link identity, no converse same-code-implies-same-Link extensionality is claimed, and no handle/code grants semantic reconstruction or materialization authority."
+}
