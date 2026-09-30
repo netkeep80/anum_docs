@@ -247,6 +247,7 @@ function main(): void {
   // A same-Claim proof admitted only in a foreign Theory passes construction
   // claim matching but must fail the independent CLOSED K1 replay under Theory T.
   const foreignTheory = memory.ensure(U, C);
+  assert(foreignTheory !== theory, "foreign premise Theory is structurally distinct");
   const foreignPProof = primitivePremiseProof(memory, foreignTheory, pValue);
   const foreignClosed = materializeHeterogeneousDerivedClosedRootedDischarge(
     memory,
