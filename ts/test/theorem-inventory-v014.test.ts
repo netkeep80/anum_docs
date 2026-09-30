@@ -306,9 +306,24 @@ same(fnd08.wave, "B", "FND-08 moves behind the foundation wave");
 assert(!firstWave.includes("FND-08"), "FND-08 is not in the first differential wave");
 assert(
   (fnd08.assumptions as string[]).includes(
-    "SelectedTheoryReactionSemantics as the accepted V14-L11/V14-L4 admission/match/emission premise",
+    "FND-07 current contextual-truth boundary only; selected Theory relations are not CurrentScopeMember rules",
+  ),
+  "FND-08 consumes FND-07 only for current contextual-truth boundary",
+);
+assert(
+  (fnd08.assumptions as string[]).includes(
+    "SelectedTheoryReactionSemantics as the accepted V14-L11/V14-L4 admission/match/emission/reaction premise",
   ),
   "FND-08 names selected-Theory reaction semantics explicitly",
+);
+assert(
+  /selected-Theory admission must not be reclassified as CurrentScopeMember\/ContextualRule/i.test(
+    fnd08.exclusions as string,
+  ) &&
+    /ContextualScopeCompositionLaw is not an FND-08 reaction premise/i.test(
+      fnd08.exclusions as string,
+    ),
+  "FND-08 forbids the false Theory-to-current-Scope bridge",
 );
 sameSet(
   fnd08.formalPremises as string[],
