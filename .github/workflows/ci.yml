@@ -42,7 +42,7 @@ jobs:
           echo "External proof diff: $BASE_SHA..$HEAD_SHA"
           changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
           printf '%s\n' "$changed"
-          if printf '%s\n' "$changed" | grep -Eq '^(proofs/(lean4|coq)/|proofs/external-toolchains\.json$|proofs/external-proof-assurance\.json$|theorems/p0-v0\.14\.json$|\.github/workflows/ci\.yml$)'; then
+          if printf '%s\n' "$changed" | grep -Eq '^(proofs/(lean4|coq|evidence)/|proofs/external-toolchains\.json$|proofs/external-proof-assurance\.json$|theorems/p0-v0\.14\.json$|\.github/workflows/ci\.yml$)'; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
