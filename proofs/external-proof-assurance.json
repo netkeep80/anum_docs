@@ -64,6 +64,15 @@
       ]
     },
     {
+      "id": "FND-06",
+      "lean4": [
+        "MTS.External.FND_06_memory_handle_transport_invariant"
+      ],
+      "rocq": [
+        "FND_06_memory_handle_transport_invariant"
+      ]
+    },
+    {
       "id": "FND-07",
       "lean4": [
         "MTS.External.FND_07_contextual_truth_boundary",
