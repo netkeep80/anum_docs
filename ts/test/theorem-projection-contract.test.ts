@@ -70,6 +70,7 @@ async function main(): Promise<void> {
   const root = repositoryRoot();
   const current = readJson(root, "theorems/current-v0.14.json");
   const provers = readJson(root, "proofs/provers.json");
+  const acceptedContract = readJson(root, "contracts/mts-contract-v0.14.json");
 
   assert.equal(current.schema, "mts-current-theorem-index/v0.1");
   assert.equal(current.mtsVersion, "v0.14");
@@ -86,6 +87,7 @@ async function main(): Promise<void> {
       "proofs/provers.json",
       "proofs/external-proof-assurance.json",
       "proofs/native-proof-assurance.json",
+      "contracts/mts-contract-v0.14.json",
     ],
   );
   assert.equal(
@@ -129,6 +131,21 @@ async function main(): Promise<void> {
   assert.deepEqual(
     THEOREM_CATALOG_INTEGRATION_CONTRACT.readModel.evidenceLanes,
     ["typescript", "lean4", "coq", "mtsNative", "aprover"],
+  );
+
+  const acceptedLawIds = new Set(Object.keys(acceptedContract.requiredSemanticLaws ?? {}));
+  assert(acceptedLawIds.size > 0, "accepted semantic law inventory must be non-empty");
+  for (const theorem of current.theorems) {
+    for (const lawRef of theorem.lawRefs ?? []) {
+      assert(
+        acceptedLawIds.has(lawRef),
+        `unresolved current theorem lawRef ${theorem.id} -> ${lawRef}`,
+      );
+    }
+  }
+  assert.equal(
+    THEOREM_CATALOG_INTEGRATION_CONTRACT.authority.semanticLawInventory,
+    "contracts/mts-contract-v0.14.json",
   );
 
   assert.equal(provers.lanes.typescript.role, "executable-witness");
