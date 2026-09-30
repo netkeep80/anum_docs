@@ -7,8 +7,10 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "FND-01",
-    "FND-02"
+    "A1RecursiveSeparation",
+    "F2F3OneSidedExistence",
+    "RecursiveInversionDomain",
+    "Grounded source Link"
   ],
   "dependencies": [
     "FND-01",
@@ -31,5 +33,5 @@
       "sha256": "01adf311071e9310899a3f1d0b5eb1004031636061418a2beb5125a3b468d2a4"
     }
   ],
-  "notes": "External differential proof only. INV-01 defines J as a Prop-valued structural graph over the declared finite Grounded F2/F3 recursive domain, not as a host enum or representation transform. The graph is total and functional, hence every Grounded source has exactly one structural inverse. The proof is normalization-free: it consumes the FND-01 structural partition and FND-02 unique ROOT, states J(A⟼B)=J(B)⟼J(A), keeps the image Grounded, and excludes ExactSequence, handles, codec digits, labels, opcodes, host field order, and classical choice as semantic authority."
+  "notes": "External differential proof only. INV-01 defines J as a Prop-valued structural graph over the declared finite Grounded F2/F3 recursive domain, not as a host enum or representation transform. The graph is total and functional, hence every Grounded source has exactly one structural inverse. The proof is normalization-free: it consumes the FND-01 structural partition and FND-02 unique ROOT, states J(A⟼B)=J(B)⟼J(A), keeps the image Grounded, and excludes ExactSequence, handles, codec digits, labels, opcodes, host field order, and classical choice as semantic authority. Assumptions metadata aligned with the stabilized P0 boundary in #1820; theorem dependencies and historical exact proof-artifact/source pins are intentionally unchanged."
 }
