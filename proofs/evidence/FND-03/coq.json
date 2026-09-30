@@ -1,0 +1,36 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-03",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "FND-01",
+    "FND-02",
+    "accepted Context-relative orientation"
+  ],
+  "dependencies": [
+    "FND-01",
+    "FND-02"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "6a6cfc3fa47aa310676cccfddf4f166f459d3cba",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "4e59e97b3cbb7b40557d63bc31095a489f96802f034bc1cb0a9d9b8463358c7d"
+    }
+  ],
+  "notes": "External differential proof only. FND-03 derives the named R/O/C/L representatives inside the single Foundation.Link carrier: R is the existing Foundation root, O/C are ContextOneSidedNames for the already supplied proper one-sided F2/F3 witnesses, and L is formed by the ordinary Link-forming primitive. FND-02 is consumed only for unique full-self/root identification. Context-relative naming labels existing Links and introduces no absolute Foundation-global orientation. No four-constructor datatype, symbolic name, implementation handle, codec digit, or host representation becomes MTS ontology or semantic authority. No additional external mathematical theory is introduced."
+}
