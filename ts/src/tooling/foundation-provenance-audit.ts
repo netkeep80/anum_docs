@@ -1,7 +1,9 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { relative, resolve, sep } from "node:path";
 
-export const KNOWN_FOUNDATION_EVIDENCE_GAPS = Object.freeze(["A4", "A15", "F4", "F5"] as const);
+export const V013_FOUNDATION_CONTRACT_PATH = "contracts/mts-contract-v0.13.json";
+export const V013_FOUNDATION_REQUIREMENTS_PATH = "requirements/mts-v0.13.json";
+export const KNOWN_V013_FOUNDATION_EVIDENCE_GAPS = Object.freeze(["A4", "A15", "F4", "F5"] as const);
 
 type JsonObject = Record<string, unknown>;
 
@@ -23,6 +25,13 @@ export interface FoundationProvenanceSummary {
   readonly directEvidenceClauseCount: number;
   readonly gapClauseIds: readonly string[];
   readonly issues: readonly FoundationProvenanceIssue[];
+}
+
+export interface HistoricalV013FoundationProvenanceSummary extends FoundationProvenanceSummary {
+  readonly authority: "historical-v0.13-foundation-baseline-only";
+  readonly mtsVersion: "v0.13";
+  readonly contractPath: typeof V013_FOUNDATION_CONTRACT_PATH;
+  readonly requirementsPath: typeof V013_FOUNDATION_REQUIREMENTS_PATH;
 }
 
 function isObject(value: unknown): value is JsonObject {
@@ -48,9 +57,9 @@ export function validateFoundationProvenance(args: {
   readonly entries: Readonly<Record<string, unknown>>;
   readonly requirementIds: ReadonlySet<string>;
   readonly localEvidenceExists: (path: string) => boolean;
-  readonly expectedGapClauseIds?: readonly string[];
+  readonly expectedGapClauseIds: readonly string[];
 }): FoundationProvenanceSummary {
-  const expectedGaps = [...(args.expectedGapClauseIds ?? KNOWN_FOUNDATION_EVIDENCE_GAPS)];
+  const expectedGaps = [...args.expectedGapClauseIds];
   const issues: FoundationProvenanceIssue[] = [];
   const scope = [...args.scope];
   const uniqueScope = new Set(scope);
@@ -137,40 +146,50 @@ function parseJson(path: string): unknown {
   return JSON.parse(readFileSync(path, "utf8")) as unknown;
 }
 
-export function auditRepositoryFoundationProvenance(root: string): FoundationProvenanceSummary {
+function historicalV013Summary(summary: FoundationProvenanceSummary): HistoricalV013FoundationProvenanceSummary {
+  return Object.freeze({
+    ...summary,
+    authority: "historical-v0.13-foundation-baseline-only",
+    mtsVersion: "v0.13",
+    contractPath: V013_FOUNDATION_CONTRACT_PATH,
+    requirementsPath: V013_FOUNDATION_REQUIREMENTS_PATH,
+  });
+}
+
+export function auditHistoricalV013FoundationProvenance(root: string): HistoricalV013FoundationProvenanceSummary {
   const repositoryRoot = resolve(root);
-  const contractPath = resolve(repositoryRoot, "contracts/mts-contract-v0.13.json");
-  const requirementsPath = resolve(repositoryRoot, "requirements/mts-v0.13.json");
+  const contractPath = resolve(repositoryRoot, V013_FOUNDATION_CONTRACT_PATH);
+  const requirementsPath = resolve(repositoryRoot, V013_FOUNDATION_REQUIREMENTS_PATH);
   const contract = parseJson(contractPath);
   const requirements = parseJson(requirementsPath);
 
   if (!isObject(contract) || !isObject(requirements)) {
-    return Object.freeze({
+    return historicalV013Summary(Object.freeze({
       clauseCount: 0,
       directEvidenceClauseCount: 0,
       gapClauseIds: Object.freeze([]),
       issues: Object.freeze([issue("malformed-contract", "contract and requirement registry must be JSON objects")]),
-    });
+    }));
   }
 
   const audit = contract.inheritedFoundationDeltaAudit;
   if (!isObject(audit) || !isObject(audit.baseline) || !isObject(audit.entries) || !Array.isArray(audit.baseline.scope)) {
-    return Object.freeze({
+    return historicalV013Summary(Object.freeze({
       clauseCount: 0,
       directEvidenceClauseCount: 0,
       gapClauseIds: Object.freeze([]),
       issues: Object.freeze([issue("malformed-contract", "inheritedFoundationDeltaAudit baseline/scope/entries are malformed")]),
-    });
+    }));
   }
 
   const scope = audit.baseline.scope;
   if (scope.some((value) => typeof value !== "string")) {
-    return Object.freeze({
+    return historicalV013Summary(Object.freeze({
       clauseCount: scope.length,
       directEvidenceClauseCount: 0,
       gapClauseIds: Object.freeze([]),
       issues: Object.freeze([issue("malformed-contract", "foundation provenance scope must contain strings")]),
-    });
+    }));
   }
 
   const requirementItems = requirements.requirements;
@@ -188,10 +207,11 @@ export function auditRepositoryFoundationProvenance(root: string): FoundationPro
     return existsSync(fullPath) && statSync(fullPath).isFile();
   };
 
-  return validateFoundationProvenance({
+  return historicalV013Summary(validateFoundationProvenance({
     scope: scope as string[],
     entries: audit.entries,
     requirementIds,
     localEvidenceExists,
-  });
+    expectedGapClauseIds: KNOWN_V013_FOUNDATION_EVIDENCE_GAPS,
+  }));
 }
