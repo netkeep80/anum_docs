@@ -719,86 +719,6 @@ theorem FND_03_derived_aspect_basis
     exact FND_02_unique_root F a1 hFull
 
 /--
-The opposite ordering of the same two one-sided witnesses is still an ordinary
-PAIR-local Link.  This supporting lemma is the structural core of FND-04.
--/
-theorem f2f3_reverse_pair_pattern
-    (F : Foundation)
-    (E : F2F3OneSidedExistence F) :
-    PairLocal F (F.form E.finishRoot E.startRoot) := by
-  have hDistinct : E.startRoot ≠ E.finishRoot := by
-    intro hEq
-    apply E.startRootNeRoot
-    calc
-      E.startRoot = F.start E.startRoot :=
-        (f2f3_start_root_start F E).symm
-      _ = F.start E.finishRoot := congrArg F.start hEq
-      _ = F.R := f2f3_finish_root_start F E
-  constructor
-  · intro hStartSelf
-    have hLeftIsPair :
-        E.finishRoot = F.form E.finishRoot E.startRoot := by
-      calc
-        E.finishRoot =
-            F.start (F.form E.finishRoot E.startRoot) :=
-          (F.form_start E.finishRoot E.startRoot).symm
-        _ = F.form E.finishRoot E.startRoot := hStartSelf
-    apply hDistinct
-    calc
-      E.startRoot =
-          F.finish (F.form E.finishRoot E.startRoot) :=
-        (F.form_finish E.finishRoot E.startRoot).symm
-      _ = F.finish E.finishRoot := congrArg F.finish hLeftIsPair.symm
-      _ = E.finishRoot := f2f3_finish_root_finish F E
-  · intro hFinishSelf
-    have hRightIsPair :
-        E.startRoot = F.form E.finishRoot E.startRoot := by
-      calc
-        E.startRoot =
-            F.finish (F.form E.finishRoot E.startRoot) :=
-          (F.form_finish E.finishRoot E.startRoot).symm
-        _ = F.form E.finishRoot E.startRoot := hFinishSelf
-    apply hDistinct
-    calc
-      E.startRoot = F.start E.startRoot :=
-        (f2f3_start_root_start F E).symm
-      _ = F.start (F.form E.finishRoot E.startRoot) :=
-        congrArg F.start hRightIsPair
-      _ = E.finishRoot := F.form_start E.finishRoot E.startRoot
-
-/--
-FND-04 — U = C ⟼ O is derived by the same Link-forming primitive.
-
-The witness is PairLocal and therefore incompatible with the other three local
-self-incidence patterns.  Nothing in the theorem introduces a fifth recursive
-alphabet symbol, constructor, opcode, or ontology primitive.
--/
-theorem FND_04_u_is_ordinary_pair
-    (F : Foundation)
-    (E : F2F3OneSidedExistence F)
-    {O C : F.Link}
-    (names : ContextOneSidedNames F E O C) :
-    ∃ U : F.Link,
-      U = F.form C O ∧
-      PairLocal F U ∧
-      ¬ FullSelf F U ∧
-      ¬ StartOnly F U ∧
-      ¬ FinishOnly F U := by
-  rcases names with ⟨hO, hC⟩
-  subst O
-  subst C
-  let U := F.form E.finishRoot E.startRoot
-  have hPair : PairLocal F U := by
-    exact f2f3_reverse_pair_pattern F E
-  refine ⟨U, rfl, hPair, ?_, ?_, ?_⟩
-  · intro hFull
-    exact hPair.1 hFull.1
-  · intro hStart
-    exact hPair.1 hStart.1
-  · intro hFinish
-    exact hPair.2 hFinish.2
-
-/--
 Declared finite recursive domain used by structural inversion.
 
 The domain realizes the historical F2/F3 recursive forms START(F) and END(F)
@@ -1835,6 +1755,39 @@ theorem f2f3_reverse_pair_pattern
       f2f3_start_root_finish F E,
       F.form_finish E.finishRoot E.startRoot
     ] using hEq.symm
+
+/--
+FND-04 — U = C ⟼ O is derived by the same Link-forming primitive.
+
+The existing reverse-pair lemma already proves this ordering is PairLocal.
+The witness is therefore incompatible with the other three local
+self-incidence patterns.  Nothing here introduces a fifth recursive alphabet
+symbol, constructor, opcode, or ontology primitive.
+-/
+theorem FND_04_u_is_ordinary_pair
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    {O C : F.Link}
+    (names : ContextOneSidedNames F E O C) :
+    ∃ U : F.Link,
+      U = F.form C O ∧
+      PairLocal F U ∧
+      ¬ FullSelf F U ∧
+      ¬ StartOnly F U ∧
+      ¬ FinishOnly F U := by
+  rcases names with ⟨hO, hC⟩
+  subst O
+  subst C
+  let U := F.form E.finishRoot E.startRoot
+  have hPair : PairLocal F U :=
+    f2f3_reverse_pair_pattern F E
+  refine ⟨U, rfl, hPair, ?_, ?_, ?_⟩
+  · intro hFull
+    exact hPair.1 hFull.1
+  · intro hStart
+    exact hPair.1 hStart.1
+  · intro hFinish
+    exact hPair.2 hFinish.2
 
 /--
 INV-06 root-basis calculation under one chosen orientation.
