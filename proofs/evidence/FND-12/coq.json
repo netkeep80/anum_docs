@@ -1,0 +1,34 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-12",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "AcceptedRepresentationLayerBoundary"
+  ],
+  "dependencies": [
+    "FND-01",
+    "FND-11"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "59d45182354ecc28bf29126abf263bc35e2f994f",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "f0d08431c264eb90d49166222408a31966e1e3f15f355d5f475944b3d55a2fbb"
+    }
+  ],
+  "notes": "External differential proof only. FND-12 does not derive ontology policy from host type theory. AcceptedRepresentationLayerBoundary is the explicit V14-L14 architecture premise: Link is the sole semantic carrier named by accepted MTS, while recursive structure, representations/codecs, byte-text and symbolic metanotation are non-ontological layers. FND01LinkOnlyStructure is a DERIVED dependency witness from FND-01 showing that structural self-incidence cases remain predicates/classifications over the one Link carrier. FND11RepresentationSeparation is a DERIVED dependency witness from FND-11 preserving recursive/Anum/ExactSequence/Q identity separation and rooted representation facts. The pre-existing FND-11 premise-accounting gap is also closed: AcceptedV014RepresentationDefinitions is explicitly classified as an accepted representation semantic premise and FND05Canonicality as DERIVED from FND-05. No host layer enum, Bool flag, Type inequality, representation-strength ranking, or second semantic carrier is used as proof authority. Representation/source objects may keep distinct local identities and need not themselves be Links. Accepted v0.14 semantic delta is NONE."
+}
