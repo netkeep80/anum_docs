@@ -344,6 +344,26 @@ for (const { path, record } of evidenceRecords) {
   }
 }
 
+const waveB1 = ["FND-03", "FND-04"] as const;
+for (const theoremId of waveB1) {
+  const records = evidenceRecords
+    .filter(({ record }) => record.theoremId === theoremId)
+    .map(({ record }) => record);
+  assert.equal(records.length, 2, `${theoremId} has exactly two external evidence records`);
+  assert.deepEqual(
+    records.map((record) => record.lane).sort(),
+    ["coq", "lean4"],
+    `${theoremId} external lanes`,
+  );
+  for (const record of records) {
+    assert.equal(
+      record.proofSource.commitSha,
+      "6a6cfc3fa47aa310676cccfddf4f166f459d3cba",
+      `${theoremId} ${record.lane} exact kernel-GREEN proof source`,
+    );
+  }
+}
+
 const fnd02 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-02")
   .map(({ record }) => record);
@@ -1132,5 +1152,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq fnd05=lean4+coq fnd11=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd03=lean4+coq fnd04=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq fnd05=lean4+coq fnd11=lean4+coq aprover-input=mtsNative-only`,
 );
