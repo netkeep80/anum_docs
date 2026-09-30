@@ -1521,6 +1521,69 @@ assert(
   "FND-06 is proved rather than postulated",
 );
 
+const fnd08 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-08");
+const fnd09 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-09");
+assert(fnd08 !== undefined, "P0 contains FND-08");
+assert(fnd09 !== undefined, "P0 contains FND-09");
+same(
+  JSON.stringify(fnd08.assumptions),
+  JSON.stringify(["FND-07", "accepted admitted relation/reaction authority"]),
+  "FND-08 frozen assumptions",
+);
+same(JSON.stringify(fnd08.dependsOn), JSON.stringify(["FND-07"]), "FND-08 dependency");
+same(JSON.stringify(fnd09.assumptions), JSON.stringify(["FND-08"]), "FND-09 frozen assumptions");
+same(JSON.stringify(fnd09.dependsOn), JSON.stringify(["FND-08"]), "FND-09 dependency");
+
+for (const [label, source, endMarker] of [
+  ["Lean", lean, "FND-05 external proof projection"],
+  ["Rocq", rocq, "FND-05 external proof projection"],
+] as const) {
+  const start = source.indexOf("External proof projection of the generalized reaction image");
+  const end = source.indexOf(endMarker, start);
+  assert(start >= 0 && end > start, label + " contains FND-08/09 relational execution projection");
+  const region = source.slice(start, end);
+
+  for (const symbol of [
+    "RelationalReactionOutcome",
+    "GeneralizedRelationalDetachmentLaw",
+    "FND_08_generalized_relational_detachment",
+    "FND_09_zero_one_many_are_relational_image",
+    "FND_07_contextual_detachment",
+  ]) {
+    assert(region.includes(symbol), label + " FND-08/09 contains " + symbol);
+  }
+
+  assert(
+    /no native Set\/List result object/i.test(region) &&
+      /no result-cardinality parameter/i.test(region),
+    label + " keeps host result collections/cardinality outside MTS semantics",
+  );
+  assert(
+    /no deduplication primitive/i.test(region),
+    label + " models N->1 convergence by ordinary semantic Link identity",
+  );
+
+  for (const forbidden of [
+    "inductive ReactionCardinality",
+    "structure ReactionCardinality",
+    "Inductive ReactionCardinality",
+    "Record ReactionCardinality",
+    "ResultCardinality",
+    "MultivaluedFunction",
+    "CardinalityOpcode",
+  ]) {
+    assert(!region.includes(forbidden), label + " forbids hidden cardinality/multivalue primitive: " + forbidden);
+  }
+}
+
+assert(
+  !lean.includes("axiom FND_08") &&
+    !lean.includes("axiom FND_09") &&
+    !rocq.includes("Axiom FND_08") &&
+    !rocq.includes("Axiom FND_09"),
+  "FND-08/09 are proved rather than postulated",
+);
+
 const fnd11 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-11");
 assert(fnd11 !== undefined, "P0 contains FND-11");
 same(
