@@ -1,0 +1,34 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-07",
+  "lane": "mtsNative",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f",
+    "theoryRevision": "fnd07-component-theories/sha-256/v0.1:d5807308da2f258d66e30443d72ed4e0b78bddc019107d5edbdfe61a205f9219"
+  },
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "040b69e0288db08b6f63efff9925d47d4128142a"
+  },
+  "assumptions": [
+    "F2F3OneSidedExistence for structural L = O⟼C",
+    "CurrentScopeMember as the external projection of the published current Scope",
+    "ContextualScopeCompositionLaw as the accepted A16 semantic premise"
+  ],
+  "dependencies": [],
+  "result": "accepted",
+  "authority": "native-replay",
+  "artifacts": [
+    {
+      "path": "proofs/native/FND-07/contextual-detachment.anum",
+      "sha256": "a565b72a9caa77007f297490b5cccf3b2945388b006431395b6f117cd6375347"
+    },
+    {
+      "path": "proofs/native/FND-07/a16-truth-role.anum",
+      "sha256": "8e03a22c06fe93b1e645785cbdf635347427a5f8e50d024aef6b2d6c15d1aea3"
+    }
+  ],
+  "notes": "First theorem-level MTS-native evidence for FND-07. The contextual-detachment component is a derived CLOSED rooted proof Anet and fresh-replays after recursive 8/9/6/1 transport. The structural L=O⟼C component remains kernel-replayed and is not counted as an independent derivation that PAIR means truth. A16TruthValueRole(L) is an explicit accepted semantic-boundary proof coordinate and fresh-replays separately. No synthetic capstone Rule is introduced; the composite Theory revision is provenance over the two labeled component Theory revisions only and grants no proof authority. CurrentScope runtime publication is not claimed implemented. Artifact bytes, hashes, theorem metadata and file order grant zero proof authority; trusted fresh rooted K1 replay remains the ACCEPT/REJECT boundary."
+}

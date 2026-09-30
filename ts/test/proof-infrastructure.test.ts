@@ -987,7 +987,11 @@ for (const record of ctx03) {
 }
 
 const fnd07 = evidenceRecords
-  .filter(({ record }) => record.theoremId === "FND-07")
+  .filter(
+    ({ record }) =>
+      record.theoremId === "FND-07" &&
+      (record.lane === "lean4" || record.lane === "coq"),
+  )
   .map(({ record }) => record);
 assert.equal(fnd07.length, 2, "FND-07 has exactly two external evidence records");
 assert.deepEqual(
@@ -1076,6 +1080,18 @@ for (const record of fnd07) {
     "FND-07 evidence declares no extra external mathematical theory",
   );
 }
+
+const fnd07Native = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-07" && record.lane === "mtsNative")
+  .map(({ record }) => record);
+assert.equal(fnd07Native.length, 1, "FND-07 has exactly one MTS-native evidence record");
+assert.equal(fnd07Native[0]!.authority, "native-replay", "FND-07 native authority");
+assert.equal(fnd07Native[0]!.result, "accepted", "FND-07 native replay result");
+assert.equal(
+  fnd07Native[0]!.mts.theoryRevision,
+  "fnd07-component-theories/sha-256/v0.1:d5807308da2f258d66e30443d72ed4e0b78bddc019107d5edbdfe61a205f9219",
+  "FND-07 native composite component Theory revision",
+);
 
 const fnd08 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-08")
