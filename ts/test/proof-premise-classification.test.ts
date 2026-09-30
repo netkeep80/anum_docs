@@ -45,7 +45,11 @@ assert(
         entry.issue === 1830 &&
         entry.pullRequest === 1832 &&
         entry.premise === "SelectedTheoryReactionSemantics" &&
-        entry.acceptedSemanticDelta === "NONE",
+        entry.acceptedSemanticDelta === "NONE" &&
+        typeof entry.correction === "string" &&
+        entry.correction.includes("ContextualScopeCompositionLaw") &&
+        entry.correction.includes("FND-07") &&
+        entry.correction.includes("FND-08"),
     ),
   "post-convergence reaction projection erratum is explicit",
 );
