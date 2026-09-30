@@ -342,6 +342,11 @@ assert(
   /absence of emitted B/i.test(fnd09.exclusions as string),
   "FND-09 forbids inferring no admitted match from an empty emitted image",
 );
+assert(
+  /zero contribution from that matched antecedent/i.test(fnd09.exclusions as string) &&
+    /does not imply global absence/i.test(fnd09.exclusions as string),
+  "FND-09 keeps per-antecedent ZERO distinct from global successor absence",
+);
 same(
   contract.reactionResultBasis.emptySuccessEqualsNoRelation,
   false,
