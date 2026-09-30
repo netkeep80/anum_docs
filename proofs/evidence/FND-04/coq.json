@@ -17,7 +17,7 @@
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "6a6cfc3fa47aa310676cccfddf4f166f459d3cba",
+    "commitSha": "2ef10b56c611e947f4cd0f535afceebd4eaf6a5c",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
@@ -29,5 +29,5 @@
       "sha256": "4e59e97b3cbb7b40557d63bc31095a489f96802f034bc1cb0a9d9b8463358c7d"
     }
   ],
-  "notes": "External differential proof only. FND-04 constructs U as the ordinary Link form C⟼O over the same Context-relative derived O/C basis. The pre-existing reverse-pair theorem proves U is PairLocal; PairLocal directly excludes FullSelf, StartOnly, and FinishOnly, so U is not a fifth self-incidence class, recursive alphabet symbol, opcode, constructor, or ontology primitive. The proof reuses existing Link structure rather than adding a new carrier. No additional external mathematical theory is introduced."
+  "notes": "External differential proof only. FND-04 constructs U as the ordinary Link form C⟼O over the same Context-relative derived O/C basis. The pre-existing reverse-pair theorem proves U is PairLocal; PairLocal directly excludes FullSelf, StartOnly, and FinishOnly, so U is not a fifth self-incidence class, recursive alphabet symbol, opcode, constructor, or ontology primitive. The proof reuses existing Link structure rather than adding a new carrier. No additional external mathematical theory is introduced. Provenance repair: proofSource is pinned to the reachable merge commit carrying byte-identical kernel-GREEN proof artifacts from the original Wave-B1 source."
 }

@@ -226,6 +226,18 @@ function gitBlobSha(commitSha: string, path: string): string {
   }).trim();
 }
 
+function gitCommitIsAncestorOfHead(commitSha: string): boolean {
+  try {
+    execFileSync("git", ["merge-base", "--is-ancestor", commitSha, "HEAD"], {
+      cwd: root,
+      stdio: "ignore",
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function sha256AtCommit(commitSha: string, path: string): string {
   return createHash("sha256").update(gitObjectBytes(commitSha, path)).digest("hex");
 }
@@ -334,6 +346,11 @@ for (const { path, record } of evidenceRecords) {
   assert.ok(p0Targets.has(record.theoremId), `${path} theorem exists in v0.14 P0 inventory`);
   assert.equal(record.mts.acceptedVersion, "v0.14", `${path} accepted MTS version`);
   assert.match(record.mts.sourceCommitSha, /^[0-9a-f]{40}$/, `${path} accepted MTS source commit`);
+  assert.equal(
+    gitCommitIsAncestorOfHead(record.mts.sourceCommitSha),
+    true,
+    `${path} accepted MTS source commit must be reachable from current HEAD`,
+  );
   assert.match(record.mts.contractBlobSha, /^[0-9a-f]{40}$/, `${path} contract blob SHA`);
   assert.equal(
     gitBlobSha(record.mts.sourceCommitSha, "contracts/mts-contract-v0.14.json"),
@@ -361,6 +378,11 @@ for (const { path, record } of evidenceRecords) {
   );
   assert.equal(record.proofSource.repository, "netkeep80/anum_docs", `${path} source repository`);
   assert.match(record.proofSource.commitSha, /^[0-9a-f]{40}$/, `${path} proof source commit`);
+  assert.equal(
+    gitCommitIsAncestorOfHead(record.proofSource.commitSha),
+    true,
+    `${path} proof source commit must be reachable from current HEAD`,
+  );
 
   const target = p0Targets.get(record.theoremId)!;
   assert.deepEqual(
@@ -407,8 +429,8 @@ for (const theoremId of waveB1) {
   for (const record of records) {
     assert.equal(
       record.proofSource.commitSha,
-      "6a6cfc3fa47aa310676cccfddf4f166f459d3cba",
-      `${theoremId} ${record.lane} exact kernel-GREEN proof source`,
+      "2ef10b56c611e947f4cd0f535afceebd4eaf6a5c",
+      `${theoremId} ${record.lane} reachable byte-identical kernel-GREEN proof source`,
     );
   }
 }

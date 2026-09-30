@@ -20,7 +20,7 @@
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "6a6cfc3fa47aa310676cccfddf4f166f459d3cba",
+    "commitSha": "2ef10b56c611e947f4cd0f535afceebd4eaf6a5c",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
@@ -32,5 +32,5 @@
       "sha256": "4e59e97b3cbb7b40557d63bc31095a489f96802f034bc1cb0a9d9b8463358c7d"
     }
   ],
-  "notes": "External differential proof only. FND-03 derives the named R/O/C/L representatives inside the single Foundation.Link carrier: R is the existing Foundation root, O/C are ContextOneSidedNames for the already supplied proper one-sided F2/F3 witnesses, and L is formed by the ordinary Link-forming primitive. FND-02 is consumed only for unique full-self/root identification. Context-relative naming labels existing Links and introduces no absolute Foundation-global orientation. No four-constructor datatype, symbolic name, implementation handle, codec digit, or host representation becomes MTS ontology or semantic authority. No additional external mathematical theory is introduced."
+  "notes": "External differential proof only. FND-03 derives the named R/O/C/L representatives inside the single Foundation.Link carrier: R is the existing Foundation root, O/C are ContextOneSidedNames for the already supplied proper one-sided F2/F3 witnesses, and L is formed by the ordinary Link-forming primitive. FND-02 is consumed only for unique full-self/root identification. Context-relative naming labels existing Links and introduces no absolute Foundation-global orientation. No four-constructor datatype, symbolic name, implementation handle, codec digit, or host representation becomes MTS ontology or semantic authority. No additional external mathematical theory is introduced. Provenance repair: proofSource is pinned to the reachable merge commit carrying byte-identical kernel-GREEN proof artifacts from the original Wave-B1 source."
 }
