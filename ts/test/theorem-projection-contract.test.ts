@@ -17,6 +17,7 @@ import {
   collectCurrentTheoremEvidenceRecordPaths,
 } from "../src/tooling/theorem-projection-contract.js";
 
+// T0 RED: this test intentionally lands before the MTS-specific contract module.
 const REPO_GUARD_SHA = "756944656fa14de752f44bb404e1dca852f5fa6a";
 const REPO_GUARD_VERSION = "3.2.0";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
