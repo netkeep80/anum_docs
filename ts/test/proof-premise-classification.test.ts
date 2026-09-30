@@ -192,6 +192,23 @@ same(
   "INDEPENDENT_MODEL_CHOICE",
   "A16 closure remains explicit semantic premise",
 );
+sameSet(
+  byId.get("ContextualScopeCompositionLaw")?.consumedBy as string[],
+  ["FND-07"],
+  "A16 current-Scope closure is not reused as selected-Theory reaction authority",
+);
+assert(
+  /selected Theory relations are a distinct authority frontier/i.test(
+    byId.get("ContextualScopeCompositionLaw")?.rationale as string,
+  ),
+  "premise matrix separates current Scope composition from selected Theory",
+);
+assert(
+  /coerce selected-Theory admission into CurrentScopeMember\/ContextualRule/i.test(
+    byId.get("SelectedTheoryReactionSemantics")?.falsificationTarget?.condition as string,
+  ),
+  "FND-08 rejects the false admitted-rule-to-currentness bridge",
+);
 
 same(matrix.modelObligation.ambientLinkCarrier, "INFINITE_REQUIRED", "ambient carrier cardinality");
 same(
