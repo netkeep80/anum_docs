@@ -27,12 +27,16 @@ function sameSet(
 const root = resolve(process.cwd(), "..");
 const readJson = (path: string): Json =>
   JSON.parse(readFileSync(join(root, path), "utf8")) as Json;
+const readText = (path: string): string =>
+  readFileSync(join(root, path), "utf8");
 
 const inventory = readJson("theorems/p0-v0.14.json");
 const registry = readJson("theorems/registry.json");
 const contract = readJson("contracts/mts-contract-v0.14.json");
 const traceability = readJson("traceability/mts-v0.14.json");
 const premiseMatrix = readJson("proofs/premise-classification-v0.14.json");
+const a72w = readText("ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts");
+const a72y = readText("ts/test/research-v013-explicit-zero-image-a72y.test.ts");
 
 same(inventory.schema, "mts-theorem-inventory/v0.1", "inventory schema");
 same(inventory.status, "p0-frozen", "inventory status");
@@ -78,9 +82,27 @@ assert(
         entry.issue === 1830 &&
         entry.pullRequest === 1832 &&
         entry.kind === "SEMANTIC_PRESERVING_PROOF_PROJECTION_CORRECTION" &&
-        entry.acceptedSemanticDelta === "NONE",
+        entry.acceptedSemanticDelta === "NONE" &&
+        typeof entry.provenanceCorrection === "string" &&
+        entry.provenanceCorrection.includes("A72w") &&
+        entry.provenanceCorrection.includes("A72y") &&
+        Array.isArray(entry.provenanceEvidence) &&
+        entry.provenanceEvidence.includes(
+          "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+        ),
     ),
   "post-freeze FND-08/FND-09 projection correction is explicit rather than silent",
+);
+assert(
+  a72w.includes("HISTORICAL_ONE_TO_ZERO_ZERO_MATCH_DELETE=GREEN_SUPERSEDED_BY_A72Y"),
+  "A72w retains its old 1->0 control only as explicitly superseded historical evidence",
+);
+assert(
+  a72y.includes("A72W_ZERO_MATCH_DELETE=SUPERSEDED") &&
+    a72y.includes("NO_MATCH=INERT_CURRENT_MEMBER") &&
+    a72y.includes("EXPLICIT_ZERO_IMAGE=EMPTY_EXACT_SEQUENCE") &&
+    a72y.includes("ONE_TO_ZERO=GREEN_EXPLICIT_RULE"),
+  "A72y owns the corrected explicit-zero/no-match reaction boundary",
 );
 same(inventory.boundaryFreeze.externalProversNormativeAuthority, false, "external provers remain non-normative");
 same(inventory.boundaryFreeze.jsonProofAuthority, false, "P0 JSON is not proof authority");
