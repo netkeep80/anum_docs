@@ -1,0 +1,65 @@
+{
+  "schema": "mts-native-proof-assurance/v0.1",
+  "status": "active",
+  "ownerIssue": "#1847",
+  "parentProofProgram": "#1431",
+  "authority": "native-proof-assurance-classification-only",
+  "proofTruthAuthority": "trusted-rooted-proof-anet-replay",
+  "independentCrossCheckAuthority": "external-lean4-rocq-kernel-lane",
+  "allowedClassifications": [
+    "KERNEL_REALIZED_NOT_INDEPENDENT",
+    "DERIVED_CLOSED_PROOF_ANET"
+  ],
+  "targets": [
+    {
+      "id": "FND-02",
+      "classification": "KERNEL_REALIZED_NOT_INDEPENDENT",
+      "independent": false,
+      "kernelLaw": "recursive-link-identity/full-full-canonical-root-base",
+      "evidence": [
+        {
+          "path": "ts/src/recursive-link-identity-proof.ts",
+          "gitBlobSha": "e0a0eb16a16f3f0749e223e08fb35b196480a44f"
+        },
+        {
+          "path": "ts/test/recursive-link-identity-proof.test.ts",
+          "gitBlobSha": "e104f05033b4d46230b4f3f1d22d3773f2d0bd0f"
+        },
+        {
+          "path": "ts/test/v013-aspect-foundation-theorem.test.ts",
+          "gitBlobSha": "5d75fc3c96f1115535e85cc444c613850d1a00b4"
+        }
+      ],
+      "overclaimVeto": [
+        "not an independent proof of FND-02",
+        "kernel realization cannot be counted as an independent cross-check",
+        "external Lean/Rocq remains the independent theorem lane"
+      ]
+    },
+    {
+      "id": "FND-13",
+      "classification": "KERNEL_REALIZED_NOT_INDEPENDENT",
+      "independent": false,
+      "kernelLaw": "recursive-link-identity/ordered-pole-grounded-closure",
+      "evidence": [
+        {
+          "path": "ts/src/recursive-link-identity-proof.ts",
+          "gitBlobSha": "e0a0eb16a16f3f0749e223e08fb35b196480a44f"
+        },
+        {
+          "path": "ts/test/recursive-link-identity-proof.test.ts",
+          "gitBlobSha": "e104f05033b4d46230b4f3f1d22d3773f2d0bd0f"
+        },
+        {
+          "path": "ts/test/v013-cyclic-grounding-boundary.test.ts",
+          "gitBlobSha": "72d1584c05d0e00e00d1f1c2f2af167f71287fab"
+        }
+      ],
+      "overclaimVeto": [
+        "not an independent proof of FND-13",
+        "K1 historically inherits ordered-pole identity foundation authority",
+        "rootless cyclic grounding remains outside accepted replay"
+      ]
+    }
+  ]
+}
