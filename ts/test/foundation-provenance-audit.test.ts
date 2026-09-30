@@ -2,23 +2,27 @@ import assert from "node:assert/strict";
 
 import { findRepositoryRoot } from "../src/tooling/docs-sync.js";
 import {
-  KNOWN_FOUNDATION_EVIDENCE_GAPS,
-  auditRepositoryFoundationProvenance,
+  KNOWN_V013_FOUNDATION_EVIDENCE_GAPS,
+  auditHistoricalV013FoundationProvenance,
   validateFoundationProvenance,
 } from "../src/tooling/foundation-provenance-audit.js";
 
 const repositoryRoot = findRepositoryRoot();
-const current = auditRepositoryFoundationProvenance(repositoryRoot);
+const historicalV013 = auditHistoricalV013FoundationProvenance(repositoryRoot);
 
-assert.equal(current.clauseCount, 25, "accepted v0.13 baseline clause count");
-assert.equal(current.directEvidenceClauseCount, 21, "accepted v0.13 direct-evidence clause count");
+assert.equal(historicalV013.authority, "historical-v0.13-foundation-baseline-only", "repository audit declares historical-only authority");
+assert.equal(historicalV013.mtsVersion, "v0.13", "repository audit is explicitly versioned");
+assert.equal(historicalV013.contractPath, "contracts/mts-contract-v0.13.json", "repository audit pins historical contract");
+assert.equal(historicalV013.requirementsPath, "requirements/mts-v0.13.json", "repository audit pins historical requirements");
+assert.equal(historicalV013.clauseCount, 25, "accepted v0.13 baseline clause count");
+assert.equal(historicalV013.directEvidenceClauseCount, 21, "accepted v0.13 direct-evidence clause count");
 assert.deepEqual(
-  current.gapClauseIds,
+  historicalV013.gapClauseIds,
   ["A4", "A15", "F4", "F5"],
   "known accepted-v0.13 direct evidence gaps remain explicit",
 );
-assert.deepEqual(current.gapClauseIds, [...KNOWN_FOUNDATION_EVIDENCE_GAPS]);
-assert.deepEqual(current.issues, [], "current accepted v0.13 provenance baseline must validate");
+assert.deepEqual(historicalV013.gapClauseIds, [...KNOWN_V013_FOUNDATION_EVIDENCE_GAPS]);
+assert.deepEqual(historicalV013.issues, [], "current accepted v0.13 provenance baseline must validate");
 
 const scope = ["A0", "A1", "A2"];
 const entries = {
@@ -130,5 +134,5 @@ assert.ok(
 );
 
 console.log(
-  `Foundation provenance audit: GREEN ${current.directEvidenceClauseCount}/${current.clauseCount}, gaps=${current.gapClauseIds.join(",")}.`,
+  `Historical v0.13 foundation provenance baseline: GREEN ${historicalV013.directEvidenceClauseCount}/${historicalV013.clauseCount}, gaps=${historicalV013.gapClauseIds.join(",")}.`,
 );
