@@ -364,6 +364,21 @@ for (const theoremId of waveB1) {
   }
 }
 
+for (const theoremId of ["FND-08", "FND-09"] as const) {
+  const target = p0Targets.get(theoremId);
+  assert.ok(target, `${theoremId} exists in frozen P0`);
+
+  const records = evidenceRecords
+    .filter(({ record }) => record.theoremId === theoremId)
+    .map(({ record }) => record);
+  assert.equal(records.length, 2, `${theoremId} has exactly two external evidence records`);
+  assert.deepEqual(
+    records.map((record) => record.lane).sort(),
+    ["coq", "lean4"],
+    `${theoremId} external lanes`,
+  );
+}
+
 const fnd06Target = p0Targets.get("FND-06");
 assert.ok(fnd06Target, "FND-06 exists in frozen P0");
 assert.equal(
