@@ -3210,8 +3210,8 @@ This layer uses two distinct external Scope projections:
 Selected Theory authority remains separate through Prop-valued TheorySelected, Matches
 and Emits relations over the one Link carrier.  In particular, an admitted
 Theory relation is not coerced into ContextualRule/current-Scope membership.
-The projection introduces no Set/List/Finset reaction object, RuleKind,
-cardinality opcode or multivalued-function ontology.
+The projection introduces no host collection reaction object, host rule-kind
+classification, cardinality opcode or multivalued-function ontology.
 
 ZERO below means a local zero contribution from one matched antecedent, not
 global absence of the same semantic Link.  Reacted is kept independently from
