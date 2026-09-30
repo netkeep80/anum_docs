@@ -3207,7 +3207,7 @@ This layer uses two distinct external Scope projections:
 - CurrentScopeMember projects the published pre-reaction Scope;
 - NextScopeMember projects the published successor Scope.
 
-Selected Theory authority remains separate through Prop-valued Admitted, Matches
+Selected Theory authority remains separate through Prop-valued TheorySelected, Matches
 and Emits relations over the one Link carrier.  In particular, an admitted
 Theory relation is not coerced into ContextualRule/current-Scope membership.
 The projection introduces no Set/List/Finset reaction object, RuleKind,
@@ -3220,63 +3220,63 @@ quiescence.
 -/
 def ReactionMatched
     (F : Foundation)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches : F.Link → F.Link → Prop)
     (A : F.Link) : Prop :=
-  ∃ r : F.Link, Admitted r ∧ Matches r A
+  ∃ r : F.Link, TheorySelected r ∧ Matches r A
 
 def ReactionImage
     (F : Foundation)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches Emits : F.Link → F.Link → Prop)
     (A B : F.Link) : Prop :=
-  ∃ r : F.Link, Admitted r ∧ Matches r A ∧ Emits r B
+  ∃ r : F.Link, TheorySelected r ∧ Matches r A ∧ Emits r B
 
 def ReactionProduced
     (F : Foundation)
     (CurrentScopeMember : F.Link → Prop)
     (K : F.Link)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches Emits : F.Link → F.Link → Prop)
     (B : F.Link) : Prop :=
   ∃ A : F.Link,
     ContextualTruth F CurrentScopeMember K A ∧
-    ReactionImage F Admitted Matches Emits A B
+    ReactionImage F TheorySelected Matches Emits A B
 
 def ReactionZeroAt
     (F : Foundation)
     (CurrentScopeMember : F.Link → Prop)
     (K : F.Link)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches Emits : F.Link → F.Link → Prop)
     (A : F.Link) : Prop :=
   ContextualTruth F CurrentScopeMember K A ∧
-  ReactionMatched F Admitted Matches A ∧
-  ∀ B : F.Link, ¬ ReactionImage F Admitted Matches Emits A B
+  ReactionMatched F TheorySelected Matches A ∧
+  ∀ B : F.Link, ¬ ReactionImage F TheorySelected Matches Emits A B
 
 def ReactionOneAt
     (F : Foundation)
     (CurrentScopeMember : F.Link → Prop)
     (K : F.Link)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches Emits : F.Link → F.Link → Prop)
     (A B : F.Link) : Prop :=
   ContextualTruth F CurrentScopeMember K A ∧
-  ReactionImage F Admitted Matches Emits A B ∧
+  ReactionImage F TheorySelected Matches Emits A B ∧
   ∀ B' : F.Link,
-    ReactionImage F Admitted Matches Emits A B' →
+    ReactionImage F TheorySelected Matches Emits A B' →
     B' = B
 
 def ReactionManyAt
     (F : Foundation)
     (CurrentScopeMember : F.Link → Prop)
     (K : F.Link)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches Emits : F.Link → F.Link → Prop)
     (A B₁ B₂ : F.Link) : Prop :=
   ContextualTruth F CurrentScopeMember K A ∧
-  ReactionImage F Admitted Matches Emits A B₁ ∧
-  ReactionImage F Admitted Matches Emits A B₂ ∧
+  ReactionImage F TheorySelected Matches Emits A B₁ ∧
+  ReactionImage F TheorySelected Matches Emits A B₂ ∧
   B₁ ≠ B₂
 
 /--
@@ -3291,29 +3291,29 @@ def SelectedTheoryReactionSemantics
     (F : Foundation)
     (CurrentScopeMember NextScopeMember : F.Link → Prop)
     (K : F.Link)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches Emits : F.Link → F.Link → Prop)
     (Reacted : Prop) : Prop :=
   (∀ X : F.Link,
     ContextualTruth F NextScopeMember K X ↔
       (ContextualTruth F CurrentScopeMember K X ∧
-        ¬ ReactionMatched F Admitted Matches X) ∨
+        ¬ ReactionMatched F TheorySelected Matches X) ∨
       ReactionProduced
-        F CurrentScopeMember K Admitted Matches Emits X) ∧
+        F CurrentScopeMember K TheorySelected Matches Emits X) ∧
   (Reacted ↔
     ∃ A : F.Link,
       ContextualTruth F CurrentScopeMember K A ∧
-      ReactionMatched F Admitted Matches A)
+      ReactionMatched F TheorySelected Matches A)
 
 theorem reaction_image_implies_matched
     (F : Foundation)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches Emits : F.Link → F.Link → Prop)
     {A B : F.Link}
-    (hImage : ReactionImage F Admitted Matches Emits A B) :
-    ReactionMatched F Admitted Matches A := by
-  rcases hImage with ⟨r, hAdmitted, hMatches, _hEmits⟩
-  exact ⟨r, hAdmitted, hMatches⟩
+    (hImage : ReactionImage F TheorySelected Matches Emits A B) :
+    ReactionMatched F TheorySelected Matches A := by
+  rcases hImage with ⟨r, hTheorySelected, hMatches, _hEmits⟩
+  exact ⟨r, hTheorySelected, hMatches⟩
 
 /--
 FND-08 — generalized relational reaction.
@@ -3326,28 +3326,28 @@ theorem FND_08_generalized_relational_reaction
     (F : Foundation)
     (CurrentScopeMember NextScopeMember : F.Link → Prop)
     (K : F.Link)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches Emits : F.Link → F.Link → Prop)
     (Reacted : Prop)
     (semantics :
       SelectedTheoryReactionSemantics
         F CurrentScopeMember NextScopeMember K
-        Admitted Matches Emits Reacted) :
+        TheorySelected Matches Emits Reacted) :
     (∀ A : F.Link,
       ContextualTruth F CurrentScopeMember K A ↔
       CurrentScopeMember (F.form K A)) ∧
     (∀ A : F.Link,
       ContextualTruth F CurrentScopeMember K A →
-      ¬ ReactionMatched F Admitted Matches A →
+      ¬ ReactionMatched F TheorySelected Matches A →
       ContextualTruth F NextScopeMember K A) ∧
     (∀ A B : F.Link,
       ContextualTruth F CurrentScopeMember K A →
-      ReactionImage F Admitted Matches Emits A B →
+      ReactionImage F TheorySelected Matches Emits A B →
       ContextualTruth F NextScopeMember K B) ∧
     (Reacted ↔
       ∃ A : F.Link,
         ContextualTruth F CurrentScopeMember K A ∧
-        ReactionMatched F Admitted Matches A) := by
+        ReactionMatched F TheorySelected Matches A) := by
   constructor
   · intro A
     exact (FND_07_contextual_truth_boundary F CurrentScopeMember).1 K A
@@ -3370,13 +3370,13 @@ theorem FND_08_quiescence_extensional
     (F : Foundation)
     (CurrentScopeMember NextScopeMember : F.Link → Prop)
     (K : F.Link)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches Emits : F.Link → F.Link → Prop)
     (Reacted : Prop)
     (semantics :
       SelectedTheoryReactionSemantics
         F CurrentScopeMember NextScopeMember K
-        Admitted Matches Emits Reacted)
+        TheorySelected Matches Emits Reacted)
     (hQuiescent : ¬ Reacted) :
     ∀ X : F.Link,
       ContextualTruth F NextScopeMember K X ↔
@@ -3391,7 +3391,7 @@ theorem FND_08_quiescence_extensional
         semantics.2.mpr
           ⟨A, hCurrent,
             reaction_image_implies_matched
-              F Admitted Matches Emits hImage⟩
+              F TheorySelected Matches Emits hImage⟩
       exact False.elim (hQuiescent hReacted)
   · intro hCurrent
     apply (semantics.1 X).2
@@ -3413,52 +3413,52 @@ theorem FND_09_zero_one_many_are_relational
     (F : Foundation)
     (CurrentScopeMember NextScopeMember : F.Link → Prop)
     (K : F.Link)
-    (Admitted : F.Link → Prop)
+    (TheorySelected : F.Link → Prop)
     (Matches Emits : F.Link → F.Link → Prop)
     (Reacted : Prop)
     (semantics :
       SelectedTheoryReactionSemantics
         F CurrentScopeMember NextScopeMember K
-        Admitted Matches Emits Reacted) :
+        TheorySelected Matches Emits Reacted) :
     (∀ A : F.Link,
       ContextualTruth F CurrentScopeMember K A →
-      ¬ ReactionMatched F Admitted Matches A →
+      ¬ ReactionMatched F TheorySelected Matches A →
       ContextualTruth F NextScopeMember K A) ∧
     (∀ A : F.Link,
       ReactionZeroAt
-        F CurrentScopeMember K Admitted Matches Emits A →
+        F CurrentScopeMember K TheorySelected Matches Emits A →
       Reacted) ∧
     (∀ A B : F.Link,
       ReactionOneAt
-        F CurrentScopeMember K Admitted Matches Emits A B →
+        F CurrentScopeMember K TheorySelected Matches Emits A B →
       ContextualTruth F NextScopeMember K B) ∧
     (∀ A B₁ B₂ : F.Link,
       ReactionManyAt
-        F CurrentScopeMember K Admitted Matches Emits A B₁ B₂ →
+        F CurrentScopeMember K TheorySelected Matches Emits A B₁ B₂ →
       ContextualTruth F NextScopeMember K B₁ ∧
       ContextualTruth F NextScopeMember K B₂) ∧
     (∀ A₁ A₂ B : F.Link,
       ContextualTruth F CurrentScopeMember K A₁ →
       ContextualTruth F CurrentScopeMember K A₂ →
       A₁ ≠ A₂ →
-      ReactionImage F Admitted Matches Emits A₁ B →
-      ReactionImage F Admitted Matches Emits A₂ B →
+      ReactionImage F TheorySelected Matches Emits A₁ B →
+      ReactionImage F TheorySelected Matches Emits A₂ B →
       ContextualTruth F NextScopeMember K B) ∧
     (∀ A B : F.Link,
       ContextualTruth F CurrentScopeMember K A →
-      ReactionImage F Admitted Matches Emits A B →
+      ReactionImage F TheorySelected Matches Emits A B →
       ContextualTruth F NextScopeMember K B) ∧
     (∀ A : F.Link,
       ContextualTruth F CurrentScopeMember K A →
-      ReactionImage F Admitted Matches Emits A A →
+      ReactionImage F TheorySelected Matches Emits A A →
       ContextualTruth F NextScopeMember K A ∧ Reacted) ∧
     (∀ A B : F.Link,
       ReactionZeroAt
-        F CurrentScopeMember K Admitted Matches Emits A →
+        F CurrentScopeMember K TheorySelected Matches Emits A →
       (∃ A₂ : F.Link,
         A₂ ≠ A ∧
         ContextualTruth F CurrentScopeMember K A₂ ∧
-        ReactionImage F Admitted Matches Emits A₂ B) →
+        ReactionImage F TheorySelected Matches Emits A₂ B) →
       ContextualTruth F NextScopeMember K B) := by
   constructor
   · intro A hCurrent hNoMatch
@@ -3491,7 +3491,7 @@ theorem FND_09_zero_one_many_are_relational
         semantics.2.mpr
           ⟨A, hCurrent,
             reaction_image_implies_matched
-              F Admitted Matches Emits hIdentity⟩
+              F TheorySelected Matches Emits hIdentity⟩
   · intro A B _hZero hOther
     rcases hOther with ⟨A₂, _hDifferent, hCurrent₂, hImage₂⟩
     exact (semantics.1 B).2 (Or.inr ⟨A₂, hCurrent₂, hImage₂⟩)
