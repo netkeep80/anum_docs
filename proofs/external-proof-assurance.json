@@ -110,6 +110,15 @@
       ]
     },
     {
+      "id": "EXE-02",
+      "lean4": [
+        "MTS.External.EXE_02_immutable_link_rewrite_boundary"
+      ],
+      "rocq": [
+        "EXE_02_immutable_link_rewrite_boundary"
+      ]
+    },
+    {
       "id": "FND-11",
       "lean4": [
         "MTS.External.FND_11_representation_identities_separated"
