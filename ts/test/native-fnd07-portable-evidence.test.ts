@@ -290,6 +290,8 @@ async function compositeRevision(
   return `${scheme}:${value}`;
 }
 
+// Phase-1 CI intentionally prints canonical transport bytes and revisions so
+// phase-2 can pin tracked artifacts from GitHub-generated evidence, not guesses.
 async function main(): Promise<void> {
   const detachment = buildContextualDetachment();
   const truthRole = buildA16TruthRole();
