@@ -137,6 +137,10 @@ function main(): void {
     assert(globalRole !== localRole, "global and local proof roles stay distinct");
   }
   const localDictionary = defineStructuralRoleDictionary(memory, [s, k, a, b]);
+  assert(
+    localDictionary !== globalDictionary,
+    "premise role dictionary is structurally distinct from theorem target dictionary",
+  );
   const localKA = memory.ensure(k, a);
   const localAB = memory.ensure(a, b);
   const localKB = memory.ensure(k, b);
