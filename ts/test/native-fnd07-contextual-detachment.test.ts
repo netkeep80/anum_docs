@@ -105,7 +105,7 @@ function main(): void {
   // The tag is proof syntax, not runtime publication authority.
   const currentTag = fresh();
   const current = (scope: LinkHandle, witness: LinkHandle): LinkHandle =>
-    materializeExactSequence(memory, [currentTag, scope, witness]);
+    memory.ensure(currentTag, memory.ensure(scope, witness));
 
   // Global theorem roles.
   const S = fresh();
