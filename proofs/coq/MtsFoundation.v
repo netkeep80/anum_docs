@@ -4996,12 +4996,11 @@ Theorem FND_12_no_second_ontology_entity
 Proof.
   intros Boundary FND01 FND11.
   destruct Boundary as [HLink [HRecursive [HRepresentations [HByteText HSymbolic]]]].
-  repeat split.
-  - exact HLink.
-  - exact HRecursive.
-  - exact HRepresentations.
-  - exact HByteText.
-  - exact HSymbolic.
-  - exact FND01.
-  - exact FND11.
+  exact
+    (conj HLink
+      (conj HRecursive
+        (conj HRepresentations
+          (conj HByteText
+            (conj HSymbolic
+              (conj FND01 FND11)))))).
 Qed.
