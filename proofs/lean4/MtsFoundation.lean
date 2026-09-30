@@ -3201,6 +3201,171 @@ theorem FND_07_semantic_truth_capstone
 
 
 /--
+External proof projection of the generalized reaction image.
+
+Active and AdmittedRelation are Prop-valued host projections of current
+ordinary Link truth/rule topology.  Outcome is only their relational image:
+there is no native Set/List result object, no cardinality tag and no
+multivalued-function primitive in MTS.
+-/
+def RelationalReactionOutcome
+    (F : Foundation)
+    (Active : F.Link → Prop)
+    (AdmittedRelation : F.Link → F.Link → Prop)
+    (B : F.Link) : Prop :=
+  ∃ A : F.Link, Active A ∧ AdmittedRelation A B
+
+/--
+The FND-08 result as a reusable law for FND-09.
+-/
+def GeneralizedRelationalDetachmentLaw
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (K : F.Link)
+    (Active : F.Link → Prop)
+    (AdmittedRelation : F.Link → F.Link → Prop) : Prop :=
+  ∀ B : F.Link,
+    RelationalReactionOutcome F Active AdmittedRelation B →
+    ContextualTruth F CurrentScopeMember K B
+
+/--
+FND-08 — generalized relational detachment.
+
+Each matching admitted ordinary Link relation A⟼B contributes B to the
+relational reaction image.  Current K⟼A truth and admission authority for
+A⟼B are bridged to the already-proved FND-07 contextual detachment law.
+
+The theorem has no result-cardinality parameter, no host rewrite/global
+substitution authority, and no collection object promoted to MTS semantics.
+-/
+theorem FND_08_generalized_relational_detachment
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (closure : ContextualScopeCompositionLaw F CurrentScopeMember)
+    (K : F.Link)
+    (Active : F.Link → Prop)
+    (AdmittedRelation : F.Link → F.Link → Prop)
+    (activeTruth :
+      ∀ A : F.Link,
+        Active A →
+        ContextualTruth F CurrentScopeMember K A)
+    (admissionAuthority :
+      ∀ A B : F.Link,
+        AdmittedRelation A B →
+        ContextualRule F CurrentScopeMember A B) :
+    GeneralizedRelationalDetachmentLaw
+      F CurrentScopeMember K Active AdmittedRelation := by
+  intro B hOutcome
+  rcases hOutcome with ⟨A, hActive, hRelation⟩
+  exact
+    FND_07_contextual_detachment
+      F CurrentScopeMember closure K A B
+      (activeTruth A hActive)
+      (admissionAuthority A B hRelation)
+
+/--
+FND-09 — ZERO/ONE/MANY and N→M are meta-properties of the same ordinary
+relational image, not semantic constructors or dispatch opcodes.
+
+The five conjuncts witness:
+1. 1→0 / ZERO: no matching relation means no outcome;
+2. 1→1 / ONE: a unique ordinary target gives a unique outcome;
+3. 1→N / MANY: two distinct ordinary targets give two outcomes;
+4. N→1 convergence: two antecedents may support the same semantic B;
+5. N→M: every matching ordinary admitted relation contributes its B.
+
+Because Outcome is a proposition over B, convergence to one B creates no
+second semantic B and requires no deduplication primitive.
+-/
+theorem FND_09_zero_one_many_are_relational_image
+    (F : Foundation)
+    (CurrentScopeMember : F.Link → Prop)
+    (K : F.Link)
+    (Active : F.Link → Prop)
+    (AdmittedRelation : F.Link → F.Link → Prop)
+    (execution :
+      GeneralizedRelationalDetachmentLaw
+        F CurrentScopeMember K Active AdmittedRelation) :
+    ((∀ A B : F.Link,
+        Active A →
+        ¬ AdmittedRelation A B) →
+      ∀ B : F.Link,
+        ¬ RelationalReactionOutcome F Active AdmittedRelation B) ∧
+    (∀ A B : F.Link,
+      Active A →
+      AdmittedRelation A B →
+      (∀ A' B' : F.Link,
+        Active A' →
+        AdmittedRelation A' B' →
+        B' = B) →
+      RelationalReactionOutcome F Active AdmittedRelation B ∧
+      ContextualTruth F CurrentScopeMember K B ∧
+      (∀ B' : F.Link,
+        RelationalReactionOutcome F Active AdmittedRelation B' →
+        B' = B)) ∧
+    (∀ A B₁ B₂ : F.Link,
+      Active A →
+      AdmittedRelation A B₁ →
+      AdmittedRelation A B₂ →
+      B₁ ≠ B₂ →
+      RelationalReactionOutcome F Active AdmittedRelation B₁ ∧
+      RelationalReactionOutcome F Active AdmittedRelation B₂ ∧
+      ContextualTruth F CurrentScopeMember K B₁ ∧
+      ContextualTruth F CurrentScopeMember K B₂) ∧
+    (∀ A₁ A₂ B : F.Link,
+      Active A₁ →
+      Active A₂ →
+      A₁ ≠ A₂ →
+      AdmittedRelation A₁ B →
+      AdmittedRelation A₂ B →
+      RelationalReactionOutcome F Active AdmittedRelation B ∧
+      ContextualTruth F CurrentScopeMember K B) ∧
+    (∀ A B : F.Link,
+      Active A →
+      AdmittedRelation A B →
+      RelationalReactionOutcome F Active AdmittedRelation B ∧
+      ContextualTruth F CurrentScopeMember K B) := by
+  constructor
+  · intro hNoMatch B hOutcome
+    rcases hOutcome with ⟨A, hActive, hRelation⟩
+    exact (hNoMatch A B hActive) hRelation
+  constructor
+  · intro A B hActive hRelation hUnique
+    have hOutcome :
+        RelationalReactionOutcome F Active AdmittedRelation B :=
+      ⟨A, hActive, hRelation⟩
+    refine ⟨hOutcome, execution B hOutcome, ?_⟩
+    intro B' hOther
+    rcases hOther with ⟨A', hActive', hRelation'⟩
+    exact hUnique A' B' hActive' hRelation'
+  constructor
+  · intro A B₁ B₂ hActive hB₁ hB₂ hDistinct
+    have hOutcome₁ :
+        RelationalReactionOutcome F Active AdmittedRelation B₁ :=
+      ⟨A, hActive, hB₁⟩
+    have hOutcome₂ :
+        RelationalReactionOutcome F Active AdmittedRelation B₂ :=
+      ⟨A, hActive, hB₂⟩
+    exact ⟨
+      hOutcome₁,
+      hOutcome₂,
+      execution B₁ hOutcome₁,
+      execution B₂ hOutcome₂
+    ⟩
+  constructor
+  · intro A₁ A₂ B hActive₁ hActive₂ hDistinct hRel₁ hRel₂
+    have hOutcome :
+        RelationalReactionOutcome F Active AdmittedRelation B :=
+      ⟨A₁, hActive₁, hRel₁⟩
+    exact ⟨hOutcome, execution B hOutcome⟩
+  · intro A B hActive hRelation
+    have hOutcome :
+        RelationalReactionOutcome F Active AdmittedRelation B :=
+      ⟨A, hActive, hRelation⟩
+    exact ⟨hOutcome, execution B hOutcome⟩
+
+
+/--
 FND-05 external proof projection of the accepted finite recursive Link codec.
 
 EXTERNAL THEORY PROJECTION NOTE:
