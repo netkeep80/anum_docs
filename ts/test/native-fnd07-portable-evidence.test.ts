@@ -312,6 +312,7 @@ async function compositeRevision(
   return `${scheme}:${value}`;
 }
 
+// Final N5 gate: tracked artifacts, revisions and fresh replay must stay exact.
 const EXPECTED_DETACHMENT_SHA256 =
   "a565b72a9caa77007f297490b5cccf3b2945388b006431395b6f117cd6375347";
 const EXPECTED_TRUTH_ROLE_SHA256 =
