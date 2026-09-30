@@ -133,6 +133,7 @@ async function main(): Promise<void> {
     ["typescript", "lean4", "coq", "mtsNative", "aprover"],
   );
 
+  // T0.1 RED: accepted lawRefs must resolve through a declared semantic-law source.
   const acceptedLawIds = new Set(Object.keys(acceptedContract.requiredSemanticLaws ?? {}));
   assert(acceptedLawIds.size > 0, "accepted semantic law inventory must be non-empty");
   for (const theorem of current.theorems) {
