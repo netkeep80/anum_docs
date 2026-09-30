@@ -100,6 +100,7 @@ export {
   decomposeV013SemanticLink,
   materializeV013HierarchicalCarrier,
   materializeV013HierarchicalCarrierFromSemanticLink,
+  materializeV013SemanticLinkFromHierarchicalCarrier,
   serializeV013HierarchicalCarrier,
 } from "./v013-hierarchical-carrier.js";
 export type {
