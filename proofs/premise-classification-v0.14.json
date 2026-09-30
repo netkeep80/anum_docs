@@ -369,6 +369,109 @@
         "status": "REGISTERED_EXISTING_VECTOR"
       },
       "explicitModelStatus": "ACCEPTED_SEMANTIC_PREMISE_NOT_DERIVED_FROM_BARE_FOUNDATION"
+    },
+    {
+      "id": "AcceptedV014RepresentationDefinitions",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "accepted V14-L13 representation/codec definition bundle projected into the external prover",
+      "leanSymbols": [
+        "AcceptedV014RepresentationDefinitions"
+      ],
+      "rocqSymbols": [
+        "AcceptedV014RepresentationDefinitions"
+      ],
+      "consumedBy": [
+        "FND-11"
+      ],
+      "rationale": "FND-11 cross-checks accepted representation semantics that are not derivable from the bare Foundation interface. The bundle supplies rooted Anum/ExactSequence origins, fold behavior and versioned Q source/interpretation behavior while remaining external projection machinery rather than a second ontology.",
+      "falsificationTarget": {
+        "kind": "EXECUTABLE_SEMANTIC_VECTOR",
+        "target": "ts/test/codec-capability-model.test.ts",
+        "condition": "Collapse recursive structure into Anum identity, collapse ExactSequence identity into fold denotation, or erase the accepted Q/version/source capability distinctions.",
+        "status": "REGISTERED_EXISTING_VECTOR"
+      },
+      "explicitModelStatus": "ACCEPTED_REPRESENTATION_SEMANTIC_PREMISE_NOT_DERIVED_FROM_BARE_FOUNDATION"
+    },
+    {
+      "id": "FND05Canonicality",
+      "classification": "DERIVED",
+      "normativeRole": "dependency proposition exposing the already-proved FND-05 canonical recursive-description result to FND-11",
+      "leanSymbols": [
+        "FND05Canonicality",
+        "fnd05_dependency_witness"
+      ],
+      "rocqSymbols": [
+        "FND05Canonicality",
+        "fnd05_dependency_witness"
+      ],
+      "consumedBy": [
+        "FND-11"
+      ],
+      "rationale": "This is not an independent semantic premise. It is the theorem-dependency adapter for FND-05 and inherits FND-05's finite Grounded domain boundary.",
+      "derivationFrom": [
+        "FND-05"
+      ],
+      "explicitModelStatus": "DERIVED_FROM_ASSURED_FND-05"
+    },
+    {
+      "id": "AcceptedRepresentationLayerBoundary",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "accepted V14-L14 architecture semantics: Link is the sole ontology carrier and every accepted layer above Link is representational/non-ontological",
+      "leanSymbols": [
+        "AcceptedRepresentationLayerBoundary"
+      ],
+      "rocqSymbols": [
+        "AcceptedRepresentationLayerBoundary"
+      ],
+      "consumedBy": [
+        "FND-12"
+      ],
+      "rationale": "Whether an accepted representation layer counts as ontology is an architectural semantic boundary of v0.14, not a consequence of host type theory or FND-11 identity separation. The external proof must consume this classification explicitly instead of inferring it from host Type inequality, enums or booleans.",
+      "falsificationTarget": {
+        "kind": "EXECUTABLE_SEMANTIC_VECTOR",
+        "target": "ts/test/research-v014-preacceptance-closure.test.ts",
+        "condition": "Mark any accepted layer above Link as introducing an ontology entity, or replace the Link-only ontology declaration with a second semantic carrier.",
+        "status": "REGISTERED_EXISTING_VECTOR"
+      },
+      "explicitModelStatus": "ACCEPTED_SEMANTIC_PREMISE_NOT_DERIVED_FROM_BARE_FOUNDATION"
+    },
+    {
+      "id": "FND01LinkOnlyStructure",
+      "classification": "DERIVED",
+      "normativeRole": "dependency proposition exposing FND-01's structural-role result on the single Link carrier",
+      "leanSymbols": [
+        "FND01LinkOnlyStructure"
+      ],
+      "rocqSymbols": [
+        "FND01LinkOnlyStructure"
+      ],
+      "consumedBy": [
+        "FND-12"
+      ],
+      "rationale": "FND-12 consumes the established FND-01 result that the four structural cases are predicates/roles of Links rather than four ontology sorts. This witness is derived from FND-01 and adds no premise.",
+      "derivationFrom": [
+        "FND-01"
+      ],
+      "explicitModelStatus": "DERIVED_FROM_ASSURED_FND-01"
+    },
+    {
+      "id": "FND11RepresentationSeparation",
+      "classification": "DERIVED",
+      "normativeRole": "dependency proposition exposing FND-11 representation identity separation to FND-12",
+      "leanSymbols": [
+        "FND11RepresentationSeparation"
+      ],
+      "rocqSymbols": [
+        "FND11RepresentationSeparation"
+      ],
+      "consumedBy": [
+        "FND-12"
+      ],
+      "rationale": "FND-12 reuses the proved FND-11 separation between recursive structural, Anum/ExactSequence and Q source/denotation identity roles. This witness is derived from FND-11 and adds no independent semantic premise.",
+      "derivationFrom": [
+        "FND-11"
+      ],
+      "explicitModelStatus": "DERIVED_FROM_ASSURED_FND-11"
     }
   ],
   "convergence": {
@@ -461,6 +564,13 @@
       "resolution": "DERIVED_FROM_FOUNDATION_FORM_START_FINISH_INTERFACE",
       "independentPremiseAdded": false,
       "acceptedSemanticDelta": "NONE"
+    },
+    {
+      "issue": 1836,
+      "kind": "SEMANTIC_PRESERVING_PREMISE_ACCOUNTING_COMPLETION",
+      "target": "FND-12",
+      "acceptedSemanticDelta": "NONE",
+      "correction": "Classify the previously unlisted FND-11 representation-definition premise and FND-05 dependency adapter; add the explicit V14-L14 AcceptedRepresentationLayerBoundary plus derived FND-01/FND-11 dependency witnesses for FND-12."
     }
   ]
 }
