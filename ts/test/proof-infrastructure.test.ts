@@ -1006,6 +1006,118 @@ for (const record of fnd07) {
   );
 }
 
+const fnd08 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-08")
+  .map(({ record }) => record);
+assert.equal(fnd08.length, 2, "FND-08 has exactly two external evidence records");
+assert.deepEqual(
+  fnd08.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "FND-08 external lanes",
+);
+for (const record of fnd08) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "2fda28a8e7be8f9d824fd376622fb9ee21d66f2d",
+    "FND-08 " + record.lane + " exact kernel-GREEN proof source",
+  );
+  assert.deepEqual(
+    record.assumptions,
+    p0Targets.get("FND-08")!.assumptions,
+    "FND-08 assumptions preserve corrected P0 boundary",
+  );
+  assert.deepEqual(
+    record.dependencies,
+    ["FND-07"],
+    "FND-08 dependency remains exactly FND-07",
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "FND-08 Lean evidence keeps exact compiler/artifact pins",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "FND-08 Rocq evidence keeps exact compiler/image pins",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /CurrentScopeMember.*NextScopeMember/i,
+    "FND-08 evidence separates current and successor Scope projections",
+  );
+  assert.match(
+    String(record.notes),
+    /ContextualScopeCompositionLaw is not consumed by FND-08/i,
+    "FND-08 evidence excludes current-Scope closure from reaction authority",
+  );
+  assert.match(
+    String(record.notes),
+    /active identity remains distinct from quiescence/i,
+    "FND-08 evidence preserves identity-versus-quiescence distinction",
+  );
+}
+
+const fnd09 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-09")
+  .map(({ record }) => record);
+assert.equal(fnd09.length, 2, "FND-09 has exactly two external evidence records");
+assert.deepEqual(
+  fnd09.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "FND-09 external lanes",
+);
+for (const record of fnd09) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "2fda28a8e7be8f9d824fd376622fb9ee21d66f2d",
+    "FND-09 " + record.lane + " exact kernel-GREEN proof source",
+  );
+  assert.deepEqual(
+    record.assumptions,
+    p0Targets.get("FND-09")!.assumptions,
+    "FND-09 assumptions preserve corrected P0 boundary",
+  );
+  assert.deepEqual(
+    record.dependencies,
+    ["FND-08"],
+    "FND-09 dependency remains exactly FND-08",
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "FND-09 Lean evidence keeps exact compiler/artifact pins",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "FND-09 Rocq evidence keeps exact compiler/image pins",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /ZERO is a local matched empty contribution/i,
+    "FND-09 evidence keeps ZERO local to one matched antecedent",
+  );
+  assert.match(
+    String(record.notes),
+    /does not imply global absence/i,
+    "FND-09 evidence rejects local-ZERO to global-absence collapse",
+  );
+  assert.match(
+    String(record.notes),
+    /N->1 convergence is extensional/i,
+    "FND-09 evidence records extensional duplicate convergence",
+  );
+}
+
 const fnd05 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-05")
   .map(({ record }) => record);
