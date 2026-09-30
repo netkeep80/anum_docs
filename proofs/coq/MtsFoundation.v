@@ -719,6 +719,153 @@ Proof.
 Qed.
 
 
+(*
+FND-03 external projection of the derived root/aspect basis.
+
+No four-constructor datatype or ontology sort is introduced. R is the existing
+Foundation root; O/C are Context-relative names for the existing one-sided
+F2/F3 witnesses; L is formed by the ordinary Link-forming primitive.
+*)
+Theorem FND_03_derived_aspect_basis
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (O C : Link F) :
+    ContextOneSidedNames F E O C ->
+    exists R0 L : Link F,
+      R0 = R F /\
+      L = form F O C /\
+      FullSelf F R0 /\
+      StartOnly F O /\
+      FinishOnly F C /\
+      PairLocal F L /\
+      (forall x : Link F, FullSelf F x -> x = R0).
+Proof.
+  intros Names.
+  pose proof (FND_01_context_names_only F E O C Names) as HBasis.
+  exists (R F), (form F O C).
+  split.
+  - reflexivity.
+  - split.
+    + reflexivity.
+    + split.
+      * exact (proj1 HBasis).
+      * split.
+        -- exact (proj1 (proj2 HBasis)).
+        -- split.
+           ++ exact (proj1 (proj2 (proj2 HBasis))).
+           ++ split.
+              ** exact (proj2 (proj2 (proj2 HBasis))).
+              ** intros x HFull.
+                 apply (FND_02_unique_root F A1 x HFull).
+Qed.
+
+Lemma f2f3_start_finish_root_distinct
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    f2f3_start_root F E <> f2f3_finish_root F E.
+Proof.
+  intros Heq.
+  apply (f2f3_start_root_ne_root F E).
+  transitivity (start F (f2f3_start_root F E)).
+  - symmetry. apply f2f3_start_root_start.
+  - rewrite Heq.
+    apply f2f3_finish_root_start.
+Qed.
+
+(* Opposite ordering of the same two one-sided witnesses remains PAIR-local. *)
+Lemma f2f3_reverse_pair_pattern
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F) :
+    PairLocal F
+      (form F (f2f3_finish_root F E) (f2f3_start_root F E)).
+Proof.
+  unfold PairLocal, StartSelf, FinishSelf.
+  split.
+  - intros Hself.
+    assert (
+      HleftPair :
+      f2f3_finish_root F E =
+      form F (f2f3_finish_root F E) (f2f3_start_root F E)
+    ).
+    {
+      transitivity
+        (start F
+          (form F (f2f3_finish_root F E) (f2f3_start_root F E))).
+      - symmetry. apply form_start.
+      - exact Hself.
+    }
+    apply (f2f3_start_finish_root_distinct F E).
+    transitivity
+      (finish F
+        (form F (f2f3_finish_root F E) (f2f3_start_root F E))).
+    + symmetry. apply form_finish.
+    + transitivity (finish F (f2f3_finish_root F E)).
+      * symmetry. exact (f_equal (finish F) HleftPair).
+      * apply f2f3_finish_root_finish.
+  - intros Hself.
+    assert (
+      HrightPair :
+      f2f3_start_root F E =
+      form F (f2f3_finish_root F E) (f2f3_start_root F E)
+    ).
+    {
+      transitivity
+        (finish F
+          (form F (f2f3_finish_root F E) (f2f3_start_root F E))).
+      - symmetry. apply form_finish.
+      - exact Hself.
+    }
+    apply (f2f3_start_finish_root_distinct F E).
+    transitivity (start F (f2f3_start_root F E)).
+    + symmetry. apply f2f3_start_root_start.
+    + transitivity
+        (start F
+          (form F (f2f3_finish_root F E) (f2f3_start_root F E))).
+      * exact (f_equal (start F) HrightPair).
+      * apply form_start.
+Qed.
+
+(*
+FND-04 — U = C -> O is an ordinary PAIR-derived Link.
+
+PairLocal already excludes all three other local self-incidence patterns, so U
+does not create a fifth recursive alphabet symbol, constructor, or ontology
+primitive.
+*)
+Theorem FND_04_u_is_ordinary_pair
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (O C : Link F) :
+    ContextOneSidedNames F E O C ->
+    exists U : Link F,
+      U = form F C O /\
+      PairLocal F U /\
+      ~ FullSelf F U /\
+      ~ StartOnly F U /\
+      ~ FinishOnly F U.
+Proof.
+  intros Names.
+  destruct Names as [HO HC].
+  subst O.
+  subst C.
+  exists (form F (f2f3_finish_root F E) (f2f3_start_root F E)).
+  pose proof (f2f3_reverse_pair_pattern F E) as HPair.
+  split.
+  - reflexivity.
+  - split.
+    + exact HPair.
+    + split.
+      * intros HFull.
+        exact ((proj1 HPair) (proj1 HFull)).
+      * split.
+        -- intros HStart.
+           exact ((proj1 HPair) (proj1 HStart)).
+        -- intros HFinish.
+           exact ((proj2 HPair) (proj2 HFinish)).
+Qed.
+
+
 (* Declared finite recursive domain used by structural inversion.
 
    Historical F2/F3 forms START(F) and END(F) are available for arbitrary
