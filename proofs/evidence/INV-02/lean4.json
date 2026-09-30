@@ -7,8 +7,11 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "INV-01",
-    "FND-13"
+    "A1RecursiveSeparation",
+    "F2F3GroundedNormalization",
+    "F2F3OneSidedExistence",
+    "RecursiveInversionDomain",
+    "Grounded source Link"
   ],
   "dependencies": [
     "INV-01",
@@ -31,5 +34,5 @@
       "sha256": "849a925d29375d18631c9775b5daf98ad429eb30c986ee4066bfc975c0f6dac4"
     }
   ],
-  "notes": "External differential proof only. INV-02 proves involution J(J(X))=X on the same finite Grounded domain as INV-01 and reuses the same Prop-valued RecursiveInversion graph; no second inversion function or enlarged domain is introduced. START/END use derived one-sided canonicality. The PAIR branch reverses both poles again through INV-01 and reconstructs the original Link only through the separate Grounded FND-13 identity boundary. No stronger global arbitrary-Link normalization/extensionality premise, classical choice, codec/handle identity, labels, opcodes, or host field order is introduced."
+  "notes": "External differential proof only. INV-02 proves involution J(J(X))=X on the same finite Grounded domain as INV-01 and reuses the same Prop-valued RecursiveInversion graph; no second inversion function or enlarged domain is introduced. START/END use derived one-sided canonicality. The PAIR branch reverses both poles again through INV-01 and reconstructs the original Link only through the separate Grounded FND-13 identity boundary. No stronger global arbitrary-Link normalization/extensionality premise, classical choice, codec/handle identity, labels, opcodes, or host field order is introduced. Assumptions metadata aligned with the stabilized P0 boundary in #1820; theorem dependencies and historical exact proof-artifact/source pins are intentionally unchanged."
 }

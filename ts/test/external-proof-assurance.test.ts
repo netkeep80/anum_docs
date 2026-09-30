@@ -145,6 +145,9 @@ const root = resolve(process.cwd(), "..");
 const manifest = JSON.parse(
   readFileSync(join(root, "proofs/external-proof-assurance.json"), "utf8"),
 ) as AssuranceManifest;
+const p0 = JSON.parse(
+  readFileSync(join(root, "theorems/p0-v0.14.json"), "utf8"),
+) as Record<string, any>;
 const lean = readFileSync(join(root, "proofs/lean4/MtsFoundation.lean"), "utf8");
 const rocq = readFileSync(join(root, "proofs/coq/MtsFoundation.v"), "utf8");
 
@@ -152,6 +155,15 @@ assert(manifest.schema === "mts-external-proof-assurance/v0.1", "assurance schem
 assert(manifest.status === "active", "assurance manifest active");
 assert(manifest.ownerIssue === "#1791", "assurance owner is #1791");
 assert(manifest.premiseClosureOwnerIssue === "#1789", "premise closure stays in #1789");
+assert(p0.status === "p0-frozen", "assurance consumes frozen P0 boundary");
+assert(
+  p0.boundaryFreeze?.predecessorHardening === 1789,
+  "frozen P0 records #1789 as completed predecessor hardening",
+);
+assert(
+  p0.boundaryFreeze?.status === "STABILIZED",
+  "frozen P0 records stabilized premise/domain closure",
+);
 assert(
   manifest.authority === "external-proof-assurance-only",
   "assurance does not become MTS semantic authority",
@@ -224,6 +236,6 @@ console.log(
     "GLOBAL_AXIOM_ALLOWLIST=EMPTY",
     "MUTATION_FIXTURES=7_REJECTED",
     "KERNEL_ASSUMPTIONS=CHECKED_IN_PINNED_CI",
-    "PREMISE_CLOSURE_STATUS=OPEN:#1789",
+    "PREMISE_CLOSURE_STATUS=CLOSED:#1789",
   ].join(" "),
 );

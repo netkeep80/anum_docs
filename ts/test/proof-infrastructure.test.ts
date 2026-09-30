@@ -764,8 +764,8 @@ for (const record of ctx03) {
   );
   assert.deepEqual(
     record.assumptions,
-    ["INV-02", "INV-07", "accepted Link-native Context orientation markers"],
-    "CTX-03 assumptions preserve the P0 boundary",
+    p0Targets.get("CTX-03")!.assumptions,
+    "CTX-03 assumptions preserve the frozen P0 boundary",
   );
   assert.deepEqual(
     record.dependencies,
@@ -875,12 +875,8 @@ for (const record of fnd07) {
   );
   assert.deepEqual(
     record.assumptions,
-    [
-      "accepted A16 contextual truth semantics",
-      "accepted A16 current-Scope composition law",
-      "F2/F3 root-basis witnesses for structural L = O⟼C",
-    ],
-    "FND-07 assumptions preserve the explicit P0 semantic boundary",
+    p0Targets.get("FND-07")!.assumptions,
+    "FND-07 assumptions preserve the frozen P0 semantic boundary",
   );
   assert.deepEqual(
     record.dependencies,
@@ -1041,8 +1037,8 @@ for (const record of fnd11) {
   );
   assert.deepEqual(
     record.assumptions,
-    ["accepted v0.14 representation-layer definitions"],
-    "FND-11 assumptions preserve the P0 boundary",
+    p0Targets.get("FND-11")!.assumptions,
+    "FND-11 assumptions preserve the frozen P0 boundary",
   );
   assert.deepEqual(
     record.dependencies,

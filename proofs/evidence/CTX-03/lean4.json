@@ -7,9 +7,10 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "INV-02",
-    "INV-07",
-    "accepted Link-native Context orientation markers"
+    "A1RecursiveSeparation",
+    "F2F3GroundedNormalization",
+    "F2F3OneSidedExistence",
+    "RecursiveInversionDomain"
   ],
   "dependencies": [
     "INV-02",
@@ -32,5 +33,5 @@
       "sha256": "849a925d29375d18631c9775b5daf98ad429eb30c986ee4066bfc975c0f6dac4"
     }
   ],
-  "notes": "External differential proof only. CTX-03 is covered by a kernel-checked structural capstone plus an axiom-free semantic hardening chain. The structural layer proves objective pre-selection chirality, Link-native one-sided Context markers, local START_K/END_K roles, simultaneous-inversion covariance, and relational Z2 transport. The strengthened layer proves unique chi(K) selected by the Link-native Context marker, accepted InR_K/OutR_K Link witnesses exchanged by structural J, generalized-MP semantic-arrow covariance (the generalized K->A, A->B => K->B step is covariant under J), and an explicit non-covariant TechnicalStartOperation falsifier. Lean #print axioms and Rocq Print Assumptions cover the structural capstone, direction-witness inversion, chi bridge, semantic-arrow covariance, generalized-MP covariance, negative control, and semantic capstone; the global axiom allowlists remain empty. Lean/Rocq host foundations and elementary group theory (Z2) remain external proof projections only; none is promoted into MTS ontology, native notation, or semantic authority. No Foundation-global selected orientation, host Frame/Gauge/Bool/ExactSequence authority, raw carrier pole order, or second ontology entity is introduced. Proof source is repinned after #1796 normalization-premise minimization; the stronger global arbitrary-Link normalization package is not imported by this accepted chain."
+  "notes": "External differential proof only. CTX-03 is covered by a kernel-checked structural capstone plus an axiom-free semantic hardening chain. The structural layer proves objective pre-selection chirality, Link-native one-sided Context markers, local START_K/END_K roles, simultaneous-inversion covariance, and relational Z2 transport. The strengthened layer proves unique chi(K) selected by the Link-native Context marker, accepted InR_K/OutR_K Link witnesses exchanged by structural J, generalized-MP semantic-arrow covariance (the generalized K->A, A->B => K->B step is covariant under J), and an explicit non-covariant TechnicalStartOperation falsifier. Lean #print axioms and Rocq Print Assumptions cover the structural capstone, direction-witness inversion, chi bridge, semantic-arrow covariance, generalized-MP covariance, negative control, and semantic capstone; the global axiom allowlists remain empty. Lean/Rocq host foundations and elementary group theory (Z2) remain external proof projections only; none is promoted into MTS ontology, native notation, or semantic authority. No Foundation-global selected orientation, host Frame/Gauge/Bool/ExactSequence authority, raw carrier pole order, or second ontology entity is introduced. Proof source is repinned after #1796 normalization-premise minimization; the stronger global arbitrary-Link normalization package is not imported by this accepted chain. Assumptions metadata aligned with the stabilized P0 boundary in #1820; theorem dependencies and historical exact proof-artifact/source pins are intentionally unchanged."
 }

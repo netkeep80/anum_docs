@@ -7,7 +7,8 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "accepted v0.14 representation-layer definitions"
+    "AcceptedV014RepresentationDefinitions external projection of accepted representation contracts",
+    "FND05Canonicality witness"
   ],
   "dependencies": [
     "FND-05"
@@ -29,5 +30,5 @@
       "sha256": "bb868f17193e355c8cd15544ac9040e7007dbd9f49d07c6bb26d4cd80a2a95c0"
     }
   ],
-  "notes": "External differential proof only. FND-11 separates representation identity contracts while preserving the one-Link ontology. The already-proved FND-05 canonicality result is consumed as the sole theorem dependency. Recursive Link codec identity is separated from the Anum rooted-sequence target; ExactSequence positional identity is separated from rooted fold denotation by the accepted [] versus [R] collision witness; Q source identity is separated from versioned denotation by the accepted empty-source versus [] collision witness. Anum and ExactSequence are modeled only as views/predicates over Link, while QVersion/QSource and RepresentationIdentityTarget are prover-side syntax/classification. Every projected local sequence origin is R. No additional external mathematical theory is introduced, no global recursive-structure/Q isomorphism is claimed, no representation-strength ranking is claimed, and no host representation classifier is promoted into MTS ontology or semantic authority."
+  "notes": "External differential proof only. FND-11 separates representation identity contracts while preserving the one-Link ontology. The already-proved FND-05 canonicality result is consumed as the sole theorem dependency. Recursive Link codec identity is separated from the Anum rooted-sequence target; ExactSequence positional identity is separated from rooted fold denotation by the accepted [] versus [R] collision witness; Q source identity is separated from versioned denotation by the accepted empty-source versus [] collision witness. Anum and ExactSequence are modeled only as views/predicates over Link, while QVersion/QSource and RepresentationIdentityTarget are prover-side syntax/classification. Every projected local sequence origin is R. No additional external mathematical theory is introduced, no global recursive-structure/Q isomorphism is claimed, no representation-strength ranking is claimed, and no host representation classifier is promoted into MTS ontology or semantic authority. Assumptions metadata aligned with the stabilized P0 boundary in #1820; theorem dependencies and historical exact proof-artifact/source pins are intentionally unchanged."
 }

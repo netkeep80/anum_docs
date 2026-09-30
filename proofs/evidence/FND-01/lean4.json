@@ -7,11 +7,9 @@
     "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
   },
   "assumptions": [
-    "one Link-forming primitive",
-    "A1 recursive separation for unique full self-closure / FND-02",
-    "F2/F3 grounded-form existence/sufficiency for the declared realizability domain",
-    "explicit local self-incidence decision evidence for the classified Link",
-    "Context orientation only names one-sided cases; it does not create them"
+    "A1RecursiveSeparation",
+    "F2F3OneSidedExistence for grounded realizability of one-sided/root-basis witnesses",
+    "LocalSelfDecision for the classified Link"
   ],
   "dependencies": [
     "FND-02"
@@ -33,5 +31,5 @@
       "sha256": "849a925d29375d18631c9775b5daf98ad429eb30c986ee4066bfc975c0f6dac4"
     }
   ],
-  "notes": "External differential proof only. FND-01 proves the four proposition-level self-incidence classes and their finite Grounded realizability without importing normalization or ordered-pole extensionality. Unique ROOT is consumed through FND-02/A1. Ordered-pole identity remains the separate FND-13 theorem. LocalSelfDecision remains explicit, ContextOneSidedNames remains alias-only, and no host enum/codec/handle becomes authority."
+  "notes": "External differential proof only. FND-01 proves the four proposition-level self-incidence classes and their finite Grounded realizability without importing normalization or ordered-pole extensionality. Unique ROOT is consumed through FND-02/A1. Ordered-pole identity remains the separate FND-13 theorem. LocalSelfDecision remains explicit, ContextOneSidedNames remains alias-only, and no host enum/codec/handle becomes authority. Assumptions metadata aligned with the stabilized P0 boundary in #1820; theorem dependencies and historical exact proof-artifact/source pins are intentionally unchanged."
 }
