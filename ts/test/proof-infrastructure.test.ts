@@ -364,9 +364,17 @@ for (const theoremId of waveB1) {
   }
 }
 
+const waveB3Statements: Record<string, string> = {
+  "FND-08":
+    "Generalized relational detachment: from K ⟼ {A_i} and admitted relations {A_i ⟼ B_j}, execution derives K ⟼ {B_j} under the accepted reaction semantics.",
+  "FND-09":
+    "ZERO/ONE/MANY and generalized N→M outcomes arise from ordinary admitted Link relations rather than a separate multivalued-function primitive.",
+};
+
 for (const theoremId of ["FND-08", "FND-09"] as const) {
   const target = p0Targets.get(theoremId);
   assert.ok(target, `${theoremId} exists in frozen P0`);
+  assert.equal(target.statement, waveB3Statements[theoremId], `${theoremId} frozen statement`);
 
   const records = evidenceRecords
     .filter(({ record }) => record.theoremId === theoremId)
