@@ -248,7 +248,19 @@ function main(): void {
   // claim matching but must fail the independent CLOSED K1 replay under Theory T.
   const foreignTheory = memory.ensure(U, C);
   assert(foreignTheory !== theory, "foreign premise Theory is structurally distinct");
-  const foreignPProof = primitivePremiseProof(memory, foreignTheory, pValue);
+  const foreignRole = memory.ensure(pValue, foreignTheory);
+  const foreignDictionary = defineStructuralRoleDictionary(memory, [foreignRole]);
+  const foreignRule = defineStructuralRule(memory, foreignDictionary, pValue);
+  const foreignDR = defineStructuralDerivationRule(memory, foreignRule, []);
+  admitStructuralRule(memory, foreignTheory, foreignRule);
+  admitStructuralDerivationRule(memory, foreignTheory, foreignDR);
+  assert(memory.find(theory, foreignRule) === undefined, "foreign Rule is not admitted in selected Theory");
+  assert(memory.find(theory, foreignDR) === undefined, "foreign DR is not admitted in selected Theory");
+  const foreignPProof = memory.ensure(
+    pValue,
+    memory.ensure(foreignDR, materializeExactSequence(memory, [])),
+  );
+  assert(foreignPProof !== pProof, "foreign same-Claim proof has distinct Support");
   const foreignClosed = materializeHeterogeneousDerivedClosedRootedDischarge(
     memory,
     { generic, concreteRoot: openRoot },
@@ -258,15 +270,17 @@ function main(): void {
     ],
   ).closedRoot;
 
+  let foreignRejected = false;
   try {
     replayStructuralRootedProofAset(memory, foreignClosed);
-    throw new Error("foreign-Theory premise proof must fail CLOSED K1");
   } catch (error) {
     assert(
       error instanceof StructuralRootedProofAsetReplayError,
       "foreign-Theory premise proof rejected by CLOSED K1",
     );
+    foreignRejected = true;
   }
+  assert(foreignRejected, "foreign-Theory premise proof must fail CLOSED K1");
 
   console.log("EXISTING_K1D4_PREMISE_CARRIER_SUFFICIENT = SUPPORTED");
   console.log("TWO_DISTINCT_NATIVE_PREMISES = SUPPORTED");
