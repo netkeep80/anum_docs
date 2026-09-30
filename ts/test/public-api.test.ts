@@ -167,6 +167,7 @@ const expectedRuntimeExports = [
   "evaluateV013FormalAspectProgram",
   "executeAuthorizedRelativePoleSource",
   "executeAbits",
+  "exportPortableClosedRootedProof",
   "exportPortableProofSubAnetProjection",
   "exportPortableStructuralDerivation",
   "exportPortableStructuralDerivationWithAssumptions",
@@ -201,6 +202,7 @@ const expectedRuntimeExports = [
   "replayFlatSubselectionReading",
   "replayIntegratedProof",
   "replayPersistentSequenceMaterialization",
+  "replayPortableClosedRootedProof",
   "replayPortableProofSubAnetProjection",
   "replayPortableStructuralDerivation",
   "replayPortableStructuralDerivationWithAssumptions",
@@ -240,7 +242,7 @@ const expectedRuntimeExports = [
   "verifyPortableStructuralProofTheoryRevision",
 ].sort();
 
-assert(expectedRuntimeExports.length === 145, "public runtime export budget must be exactly 145 after bounded recursive-carrier inverse projection");
+assert(expectedRuntimeExports.length === 147, "public runtime export budget must be exactly 147 after bounded CLOSED proof transport projection");
 assert(
   JSON.stringify(Object.keys(publicApi).sort()) === JSON.stringify(expectedRuntimeExports),
   `unexpected runtime exports: ${Object.keys(publicApi).sort().join(",")}`,
