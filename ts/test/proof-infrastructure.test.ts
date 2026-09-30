@@ -373,6 +373,16 @@ assert.equal(
 );
 assert.deepEqual(fnd06Target.assumptions, ["FND-05"], "FND-06 frozen assumptions");
 assert.deepEqual(fnd06Target.dependsOn, ["FND-05"], "FND-06 frozen dependency");
+assert.equal(
+  fnd06Target.scope,
+  "Accepted recursive structural transport and exact declared carrier boundaries.",
+  "FND-06 frozen scope",
+);
+assert.equal(
+  fnd06Target.exclusions,
+  "Memory addresses/handles are not semantic identity and this does not grant semantic materialization authority.",
+  "FND-06 frozen exclusions",
+);
 
 const fnd06 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-06")
