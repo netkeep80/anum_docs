@@ -1394,6 +1394,115 @@ assert(
   "FND-07 semantic truth capstone is proved rather than postulated",
 );
 
+const fnd08 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-08");
+const fnd09 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-09");
+assert(fnd08 !== undefined, "P0 contains corrected FND-08");
+assert(fnd09 !== undefined, "P0 contains corrected FND-09");
+same(
+  JSON.stringify(fnd08.dependsOn),
+  JSON.stringify(["FND-07"]),
+  "FND-08 retains FND-07 only as contextual-truth predecessor",
+);
+same(
+  JSON.stringify(fnd09.dependsOn),
+  JSON.stringify(["FND-08"]),
+  "FND-09 depends exactly on corrected FND-08",
+);
+assert(
+  (fnd08.assumptions as string[]).some((value) =>
+    value.includes("selected Theory relations are not CurrentScopeMember rules"),
+  ),
+  "FND-08 P0 forbids Theory/current-Scope conflation",
+);
+assert(
+  /ContextualScopeCompositionLaw is not an FND-08 reaction premise/i.test(
+    fnd08.exclusions as string,
+  ),
+  "FND-08 P0 excludes A16 current-Scope closure from dynamic reaction authority",
+);
+
+for (const [label, source, endMarker] of [
+  ["Lean", lean, "FND-05 external proof projection"],
+  ["Rocq", rocq, "FND-05 external proof projection"],
+] as const) {
+  const start = source.indexOf(
+    "FND-08/FND-09 external projection of selected-Theory relational reaction",
+  );
+  const end = source.indexOf(endMarker, start);
+  assert(start >= 0 && end > start, label + " contains corrected FND-08/FND-09 projection");
+  const region = source.slice(start, end);
+
+  for (const symbol of [
+    "ReactionMatched",
+    "ReactionImage",
+    "ReactionProduced",
+    "ReactionZeroAt",
+    "ReactionOneAt",
+    "ReactionManyAt",
+    "SelectedTheoryReactionSemantics",
+    "FND_08_generalized_relational_reaction",
+    "FND_08_quiescence_extensional",
+    "FND_09_zero_one_many_are_relational",
+  ]) {
+    assert(region.includes(symbol), label + " corrected reaction projection contains " + symbol);
+  }
+
+  for (const requiredText of [
+    "CurrentScopeMember",
+    "NextScopeMember",
+    "Admitted",
+    "Matches",
+    "Emits",
+    "Reacted",
+    "ContextualTruth",
+    "FND_07_contextual_truth_boundary",
+  ]) {
+    assert(region.includes(requiredText), label + " reaction projection contains " + requiredText);
+  }
+
+  assert(
+    !region.includes("ContextualScopeCompositionLaw") &&
+      !region.includes("ContextualRule F") &&
+      !region.includes("ContextualRule F "),
+    label + " FND-08/09 does not coerce selected Theory relations into current-Scope rules",
+  );
+  assert(
+    /two distinct external Scope projections|CurrentScopeMember.*NextScopeMember/is.test(region),
+    label + " reaction projection separates current and successor Scope membership",
+  );
+  assert(
+    /zero contribution|ZERO.*local|local.*ZERO/is.test(region),
+    label + " reaction projection keeps ZERO local to one antecedent contribution",
+  );
+  assert(
+    /identity.*quiescence|quiescence.*identity/is.test(region),
+    label + " reaction projection distinguishes active identity from quiescence",
+  );
+
+  for (const forbidden of [
+    "Set F.Link",
+    "Finset",
+    "List F.Link",
+    "Ensemble",
+    "MSet",
+    "FSet",
+    "ReactionCardinality",
+    "ResultCardinality",
+    "MultivaluedFunction",
+    "RuleKind",
+  ]) {
+    assert(!region.includes(forbidden), label + " forbids host reaction ontology: " + forbidden);
+  }
+}
+
+assert(
+  !lean.includes("axiom FND_08") &&
+    !lean.includes("axiom FND_09") &&
+    !rocq.includes("Axiom FND_08") &&
+    !rocq.includes("Axiom FND_09"),
+  "FND-08/FND-09 must be proved rather than postulated",
+);
+
 const fnd05 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-05");
 assert(fnd05 !== undefined, "P0 contains FND-05");
 same(
