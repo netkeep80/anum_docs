@@ -685,6 +685,40 @@ theorem FND_01_context_names_only
 
 
 /--
+FND-03 external projection of the derived root/aspect basis.
+
+The theorem deliberately introduces no four-constructor datatype and no new
+ontology sort.  R is the existing Foundation root.  O/C are merely the two
+Context-relative names for the already supplied one-sided F2/F3 witnesses.
+L is formed by the one ordinary Link-forming primitive.
+
+A1 is used only through FND-02 to retain the unique-full-self/root boundary.
+The Context naming premise selects labels; it does not create or classify Links.
+-/
+theorem FND_03_derived_aspect_basis
+    (F : Foundation)
+    (a1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    {O C : F.Link}
+    (names : ContextOneSidedNames F E O C) :
+    ∃ R L : F.Link,
+      R = F.R ∧
+      L = F.form O C ∧
+      FullSelf F R ∧
+      StartOnly F O ∧
+      FinishOnly F C ∧
+      PairLocal F L ∧
+      (∀ x : F.Link, FullSelf F x → x = R) := by
+  have hBasis := FND_01_context_names_only F E names
+  refine ⟨F.R, F.form O C, rfl, rfl, ?_, ?_, ?_, ?_, ?_⟩
+  · exact hBasis.1
+  · exact hBasis.2.1
+  · exact hBasis.2.2.1
+  · exact hBasis.2.2.2
+  · intro x hFull
+    exact FND_02_unique_root F a1 hFull
+
+/--
 Declared finite recursive domain used by structural inversion.
 
 The domain realizes the historical F2/F3 recursive forms START(F) and END(F)
@@ -1721,6 +1755,39 @@ theorem f2f3_reverse_pair_pattern
       f2f3_start_root_finish F E,
       F.form_finish E.finishRoot E.startRoot
     ] using hEq.symm
+
+/--
+FND-04 — U = C ⟼ O is derived by the same Link-forming primitive.
+
+The existing reverse-pair lemma already proves this ordering is PairLocal.
+The witness is therefore incompatible with the other three local
+self-incidence patterns.  Nothing here introduces a fifth recursive alphabet
+symbol, constructor, opcode, or ontology primitive.
+-/
+theorem FND_04_u_is_ordinary_pair
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    {O C : F.Link}
+    (names : ContextOneSidedNames F E O C) :
+    ∃ U : F.Link,
+      U = F.form C O ∧
+      PairLocal F U ∧
+      ¬ FullSelf F U ∧
+      ¬ StartOnly F U ∧
+      ¬ FinishOnly F U := by
+  rcases names with ⟨hO, hC⟩
+  subst O
+  subst C
+  let U := F.form E.finishRoot E.startRoot
+  have hPair : PairLocal F U :=
+    f2f3_reverse_pair_pattern F E
+  refine ⟨U, rfl, hPair, ?_, ?_, ?_⟩
+  · intro hFull
+    exact hPair.1 hFull.1
+  · intro hStart
+    exact hPair.1 hStart.1
+  · intro hFinish
+    exact hPair.2 hFinish.2
 
 /--
 INV-06 root-basis calculation under one chosen orientation.

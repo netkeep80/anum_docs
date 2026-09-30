@@ -1,0 +1,33 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "FND-04",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [
+    "FND-03"
+  ],
+  "dependencies": [
+    "FND-03"
+  ],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "coq",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "6a6cfc3fa47aa310676cccfddf4f166f459d3cba",
+    "toolchain": {
+      "name": "Rocq",
+      "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/coq/MtsFoundation.v",
+      "sha256": "4e59e97b3cbb7b40557d63bc31095a489f96802f034bc1cb0a9d9b8463358c7d"
+    }
+  ],
+  "notes": "External differential proof only. FND-04 constructs U as the ordinary Link form C⟼O over the same Context-relative derived O/C basis. The pre-existing reverse-pair theorem proves U is PairLocal; PairLocal directly excludes FullSelf, StartOnly, and FinishOnly, so U is not a fifth self-incidence class, recursive alphabet symbol, opcode, constructor, or ontology primitive. The proof reuses existing Link structure rather than adding a new carrier. No additional external mathematical theory is introduced."
+}

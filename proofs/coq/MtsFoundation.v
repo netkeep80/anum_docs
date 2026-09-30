@@ -719,6 +719,47 @@ Proof.
 Qed.
 
 
+(*
+FND-03 external projection of the derived root/aspect basis.
+
+No four-constructor datatype or ontology sort is introduced. R is the existing
+Foundation root; O/C are Context-relative names for the existing one-sided
+F2/F3 witnesses; L is formed by the ordinary Link-forming primitive.
+*)
+Theorem FND_03_derived_aspect_basis
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F)
+    (O C : Link F) :
+    ContextOneSidedNames F E O C ->
+    exists R0 L : Link F,
+      R0 = R F /\
+      L = form F O C /\
+      FullSelf F R0 /\
+      StartOnly F O /\
+      FinishOnly F C /\
+      PairLocal F L /\
+      (forall x : Link F, FullSelf F x -> x = R0).
+Proof.
+  intros Names.
+  pose proof (FND_01_context_names_only F E O C Names) as HBasis.
+  exists (R F), (form F O C).
+  split.
+  - reflexivity.
+  - split.
+    + reflexivity.
+    + split.
+      * exact (proj1 HBasis).
+      * split.
+        -- exact (proj1 (proj2 HBasis)).
+        -- split.
+           ++ exact (proj1 (proj2 (proj2 HBasis))).
+           ++ split.
+              ** exact (proj2 (proj2 (proj2 HBasis))).
+              ** intros x HFull.
+                 apply (FND_02_unique_root F A1 x HFull).
+Qed.
+
 (* Declared finite recursive domain used by structural inversion.
 
    Historical F2/F3 forms START(F) and END(F) are available for arbitrary
@@ -2010,6 +2051,47 @@ Proof.
     symmetry.
     exact H.
 Qed.
+
+(*
+FND-04 — U = C -> O is derived by the same Link-forming primitive.
+
+The existing reverse-pair theorem already proves this ordering is PairLocal.
+The witness is therefore incompatible with the other three local
+self-incidence patterns. Nothing here introduces a fifth recursive alphabet
+symbol, constructor, opcode, or ontology primitive.
+*)
+Theorem FND_04_u_is_ordinary_pair
+    (F : Foundation)
+    (E : F2F3OneSidedExistence F)
+    (O C : Link F) :
+    ContextOneSidedNames F E O C ->
+    exists U : Link F,
+      U = form F C O /\
+      PairLocal F U /\
+      ~ FullSelf F U /\
+      ~ StartOnly F U /\
+      ~ FinishOnly F U.
+Proof.
+  intros Names.
+  destruct Names as [HO HC].
+  subst O.
+  subst C.
+  exists (form F (f2f3_finish_root F E) (f2f3_start_root F E)).
+  pose proof (f2f3_reverse_pair_pattern F E) as HPair.
+  split.
+  - reflexivity.
+  - split.
+    + exact HPair.
+    + split.
+      * intros HFull.
+        exact ((proj1 HPair) (proj1 HFull)).
+      * split.
+        -- intros HStart.
+           exact ((proj1 HPair) (proj1 HStart)).
+        -- intros HFinish.
+           exact ((proj2 HPair) (proj2 HFinish)).
+Qed.
+
 
 (* INV-06 root-basis representative calculation under one chosen orientation.
    O/C are the F2/F3 one-sided representatives; L=O->C and U=C->O are derived
