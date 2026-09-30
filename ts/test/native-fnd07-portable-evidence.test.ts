@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   Memory,
   computePortableStructuralTheoryRevision,
@@ -40,6 +42,26 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
+}
+
+function sameBytes(
+  actual: readonly number[] | Uint8Array,
+  expected: readonly number[] | Uint8Array,
+  message: string,
+): void {
+  same(actual.length, expected.length, `${message}: byte length`);
+  for (let index = 0; index < actual.length; index += 1) {
+    same(actual[index], expected[index], `${message}: byte ${index}`);
+  }
+}
+
+function repositoryRoot(): string {
+  const candidates = [resolve(process.cwd(), ".."), process.cwd()];
+  const root = candidates.find((candidate) =>
+    existsSync(resolve(candidate, "proofs", "native", "FND-07")),
+  );
+  if (root === undefined) throw new Error("FND-07 native artifact root not found");
+  return root;
 }
 
 function morphism(
@@ -290,45 +312,88 @@ async function compositeRevision(
   return `${scheme}:${value}`;
 }
 
-// Phase-1 CI intentionally prints canonical transport bytes and revisions so
-// phase-2 can pin tracked artifacts from GitHub-generated evidence, not guesses.
+const EXPECTED_DETACHMENT_SHA256 =
+  "a565b72a9caa77007f297490b5cccf3b2945388b006431395b6f117cd6375347";
+const EXPECTED_TRUTH_ROLE_SHA256 =
+  "8e03a22c06fe93b1e645785cbdf635347427a5f8e50d024aef6b2d6c15d1aea3";
+const EXPECTED_DETACHMENT_THEORY_REVISION =
+  "3606347cf99b67a3c48da83d930a42e52e40e7fd92ac4840c444e6896bc20116";
+const EXPECTED_TRUTH_ROLE_THEORY_REVISION =
+  "d2616afc7f358724b4abdf1fee6a0276d8db12ed571a357a8035767c253a8e58";
+const EXPECTED_COMPOSITE_THEORY_REVISION =
+  "fnd07-component-theories/sha-256/v0.1:d5807308da2f258d66e30443d72ed4e0b78bddc019107d5edbdfe61a205f9219";
+
 async function main(): Promise<void> {
   const detachment = buildContextualDetachment();
   const truthRole = buildA16TruthRole();
 
-  const detachmentBytes = exportPortableClosedRootedProof(
+  const generatedDetachment = exportPortableClosedRootedProof(
     detachment.memory,
     detachment.basis,
     detachment.proofRoot,
   );
-  const truthRoleBytes = exportPortableClosedRootedProof(
+  const generatedTruthRole = exportPortableClosedRootedProof(
     truthRole.memory,
     truthRole.basis,
     truthRole.proofRoot,
   );
 
-  const detached = await componentTheoryRevision(detachmentBytes);
-  const role = await componentTheoryRevision(truthRoleBytes);
+  const root = repositoryRoot();
+  const trackedDetachment = readFileSync(
+    resolve(root, "proofs", "native", "FND-07", "contextual-detachment.anum"),
+  );
+  const trackedTruthRole = readFileSync(
+    resolve(root, "proofs", "native", "FND-07", "a16-truth-role.anum"),
+  );
+
+  sameBytes(generatedDetachment, trackedDetachment, "detachment artifact is reproducible");
+  sameBytes(generatedTruthRole, trackedTruthRole, "A16 truth-role artifact is reproducible");
+
+  const decoder = new TextDecoder();
+  assert(
+    /^[8961]+$/.test(decoder.decode(trackedDetachment)),
+    "detachment artifact remains canonical 8/9/6/1",
+  );
+  assert(
+    /^[8961]+$/.test(decoder.decode(trackedTruthRole)),
+    "truth-role artifact remains canonical 8/9/6/1",
+  );
+
+  same(
+    await sha256(trackedDetachment),
+    EXPECTED_DETACHMENT_SHA256,
+    "detachment artifact SHA-256",
+  );
+  same(
+    await sha256(trackedTruthRole),
+    EXPECTED_TRUTH_ROLE_SHA256,
+    "truth-role artifact SHA-256",
+  );
+
+  const detached = await componentTheoryRevision(trackedDetachment);
+  const role = await componentTheoryRevision(trackedTruthRole);
+
+  same(
+    detached.value,
+    EXPECTED_DETACHMENT_THEORY_REVISION,
+    "detachment Theory revision",
+  );
+  same(
+    role.value,
+    EXPECTED_TRUTH_ROLE_THEORY_REVISION,
+    "A16 truth-role Theory revision",
+  );
+  same(
+    await compositeRevision(detached.value, role.value),
+    EXPECTED_COMPOSITE_THEORY_REVISION,
+    "composite component Theory revision",
+  );
 
   same(detached.replay.replay.declaredAssumptionCount, 0, "portable detachment remains CLOSED");
   same(role.replay.replay.declaredAssumptionCount, 0, "portable A16 role remains CLOSED");
 
-  const decoder = new TextDecoder();
-  const detachmentText = decoder.decode(detachmentBytes);
-  const truthRoleText = decoder.decode(truthRoleBytes);
-  assert(/^[8961]+$/.test(detachmentText), "detachment artifact is canonical 8/9/6/1");
-  assert(/^[8961]+$/.test(truthRoleText), "truth-role artifact is canonical 8/9/6/1");
-
-  const composite = await compositeRevision(detached.value, role.value);
-
-  console.log(`FND07_DETACHMENT_ANUM=${detachmentText}`);
-  console.log(`FND07_TRUTH_ROLE_ANUM=${truthRoleText}`);
-  console.log(`FND07_DETACHMENT_SHA256=${await sha256(detachmentBytes)}`);
-  console.log(`FND07_TRUTH_ROLE_SHA256=${await sha256(truthRoleBytes)}`);
-  console.log(`FND07_DETACHMENT_THEORY_REVISION=${detached.value}`);
-  console.log(`FND07_TRUTH_ROLE_THEORY_REVISION=${role.value}`);
-  console.log(`FND07_COMPOSITE_THEORY_REVISION=${composite}`);
   console.log("FND07_PORTABLE_NATIVE_COMPONENTS = FRESH_REPLAY_GREEN");
+  console.log("FND07_TRACKED_ARTIFACTS = REPRODUCIBLE");
   console.log("PAIR_STRUCTURE_IMPLIES_TRUTH_ROLE = FALSE");
   console.log("SYNTHETIC_CAPSTONE_RULE = NONE");
   console.log("accepted semantic delta = NONE");
