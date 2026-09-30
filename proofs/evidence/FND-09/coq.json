@@ -17,7 +17,7 @@
   "lane": "coq",
   "proofSource": {
     "repository": "netkeep80/anum_docs",
-    "commitSha": "2fda28a8e7be8f9d824fd376622fb9ee21d66f2d",
+    "commitSha": "23584eb5269f684054e649b32b98ab38a333e76a",
     "toolchain": {
       "name": "Rocq",
       "pin": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7"
@@ -29,5 +29,5 @@
       "sha256": "94d7ebc4c9ca707ed58460bceb6040a19dde604adc56578bf40dec8ac76c2543"
     }
   ],
-  "notes": "External differential proof only. FND-09 derives NO MATCH, ZERO, ONE, MANY, N->1, N->M and active identity behavior from the generic FND-08 selected-Theory reaction projection rather than introducing result-cardinality constructors. ZERO is a local matched empty contribution: it implies a reaction occurred but does not imply global absence of the same semantic Link when another current antecedent emits it. N->1 convergence is extensional propositional membership over the same semantic Link while derivation provenance may remain multiple. Active identity may preserve successor membership while Reacted is true, so it is not quiescence. The proof adds no host collection or deduplication semantic primitive and preserves accepted v0.14 semantics."
+  "notes": "External differential proof only. FND-09 derives NO MATCH, ZERO, ONE, MANY, N->1, N->M and active identity behavior from the generic FND-08 selected-Theory reaction projection rather than introducing result-cardinality constructors. ZERO is a local matched empty contribution: it implies a reaction occurred but does not imply global absence of the same semantic Link when another current antecedent emits it. N->1 convergence is extensional propositional membership over the same semantic Link while derivation provenance may remain multiple. Active identity may preserve successor membership while Reacted is true, so it is not quiescence. The proof adds no host collection or deduplication semantic primitive and preserves accepted v0.14 semantics. Provenance reachability bridge after squash merge #1833: proofSource now anchors the byte-identical proof artifact in reachable main commit 23584eb5269f684054e649b32b98ab38a333e76a. Kernel validation CI #8552 ran before squash on the exact artifact SHA-256 recorded in this evidence; the merged main proof blob is byte-identical."
 }

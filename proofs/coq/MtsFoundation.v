@@ -4277,6 +4277,113 @@ Proof.
 Qed.
 
 
+(* EXE-02 external projection of immutable Link identity.
+
+   A semantic Link has one ordered pole reading through the Foundation
+   projections. Changing either pole denotes a distinct semantic Link under
+   the ordinary Link-forming primitive. Rewrite may therefore select
+   another existing Link or form an explicitly substituted surrounding Link,
+   but it cannot change the poles of one already identified semantic Link in
+   place.
+
+   This proof uses only form/start/finish projection equations.
+   Explicit structural substitution creates distinct dependent formed Links
+   whenever the substituted child differs. *)
+Definition LinkPoleReading
+    (F : Foundation)
+    (x a b : Link F) : Prop :=
+  start F x = a /\ finish F x = b.
+
+Theorem link_pole_reading_unique
+    (F : Foundation)
+    (x a b a' b' : Link F) :
+    LinkPoleReading F x a b ->
+    LinkPoleReading F x a' b' ->
+    a = a' /\ b = b'.
+Proof.
+  intros [Hs1 Hf1] [Hs2 Hf2].
+  split.
+  - transitivity (start F x).
+    + symmetry. exact Hs1.
+    + exact Hs2.
+  - transitivity (finish F x).
+    + symmetry. exact Hf1.
+    + exact Hf2.
+Qed.
+
+Theorem formed_link_changed_start_distinct
+    (F : Foundation)
+    (a a' b b' : Link F) :
+    a <> a' ->
+    form F a b <> form F a' b'.
+Proof.
+  intros HStart HEq.
+  apply HStart.
+  transitivity (start F (form F a b)).
+  - symmetry. apply form_start.
+  - transitivity (start F (form F a' b')).
+    + now rewrite HEq.
+    + apply form_start.
+Qed.
+
+Theorem formed_link_changed_finish_distinct
+    (F : Foundation)
+    (a a' b b' : Link F) :
+    b <> b' ->
+    form F a b <> form F a' b'.
+Proof.
+  intros HFinish HEq.
+  apply HFinish.
+  transitivity (finish F (form F a b)).
+  - symmetry. apply form_finish.
+  - transitivity (finish F (form F a' b')).
+    + now rewrite HEq.
+    + apply form_finish.
+Qed.
+
+Theorem formed_link_changed_pole_distinct
+    (F : Foundation)
+    (a a' b b' : Link F) :
+    (a <> a' \/ b <> b') ->
+    form F a b <> form F a' b'.
+Proof.
+  intros [HStart | HFinish].
+  - apply formed_link_changed_start_distinct.
+    exact HStart.
+  - apply formed_link_changed_finish_distinct.
+    exact HFinish.
+Qed.
+
+Theorem EXE_02_immutable_link_rewrite_boundary
+    (F : Foundation) :
+    (forall a a' b b' : Link F,
+      (a <> a' \/ b <> b') ->
+      form F a b <> form F a' b') /\
+    (forall x a b a' b' : Link F,
+      LinkPoleReading F x a b ->
+      LinkPoleReading F x a' b' ->
+      a = a' /\ b = b') /\
+    (forall X Y c : Link F,
+      X <> Y ->
+      form F X c <> form F Y c) /\
+    (forall X Y d : Link F,
+      X <> Y ->
+      form F d X <> form F d Y).
+Proof.
+  split.
+  - intros a a' b b' HChanged.
+    exact (formed_link_changed_pole_distinct F a a' b b' HChanged).
+  - split.
+    + intros x a b a' b' H1 H2.
+      exact (link_pole_reading_unique F x a b a' b' H1 H2).
+    + split.
+      * intros X Y c HDifferent.
+        exact (formed_link_changed_start_distinct F X Y c c HDifferent).
+      * intros X Y d HDifferent.
+        exact (formed_link_changed_finish_distinct F d d X Y HDifferent).
+Qed.
+
+
 (* FND-05 external proof projection of the accepted finite recursive Link
    codec.
 

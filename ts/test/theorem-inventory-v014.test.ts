@@ -104,6 +104,18 @@ assert(
     a72y.includes("ONE_TO_ZERO=GREEN_EXPLICIT_RULE"),
   "A72y owns the corrected explicit-zero/no-match reaction boundary",
 );
+assert(
+  inventory.boundaryFreeze.errata.some(
+    (entry: Json) =>
+      entry.issue === 1834 &&
+      entry.target === "EXE-02" &&
+      entry.kind === "SEMANTIC_PRESERVING_PREMISE_DISCHARGE" &&
+      entry.resolution === "DERIVED_FROM_FOUNDATION_FORM_START_FINISH_INTERFACE" &&
+      entry.acceptedSemanticDelta === "NONE",
+  ),
+  "EXE-02 vague Link-identity premise is explicitly discharged rather than silently assumed",
+);
+
 same(inventory.boundaryFreeze.externalProversNormativeAuthority, false, "external provers remain non-normative");
 same(inventory.boundaryFreeze.jsonProofAuthority, false, "P0 JSON is not proof authority");
 same(
@@ -227,6 +239,21 @@ for (const target of targets) {
     assert(existsSync(join(root, path)), `${id} missing evidence path ${path}`);
   }
 }
+
+const exe02 = targets.find((target) => target.id === "EXE-02")!;
+sameSet(exe02.assumptions as string[], [], "EXE-02 has no independent assumptions after premise discharge");
+sameSet(exe02.dependsOn as string[], [], "EXE-02 has no theorem dependency");
+sameSet(exe02.formalPremises as string[], [], "EXE-02 has no formal premise");
+assert(
+  /changing either pole denotes a distinct semantic Link/i.test(exe02.statement as string),
+  "EXE-02 states structural immutability through changed-pole distinctness",
+);
+assert(
+  /No FND-13, Grounded, Memory-handle or host object-identity premise/i.test(
+    exe02.exclusions as string,
+  ),
+  "EXE-02 excludes stronger identity/runtime premises",
+);
 
 const firstWave = inventory.firstDifferentialWave as string[];
 same(firstWave.length, 8, "first differential wave size");

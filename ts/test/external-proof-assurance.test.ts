@@ -170,9 +170,10 @@ assert(
 );
 assert(manifest.allowedGlobalAxioms.lean4.length === 0, "Lean global axiom allowlist is empty");
 assert(manifest.allowedGlobalAxioms.rocq.length === 0, "Rocq global axiom allowlist is empty");
-assert(manifest.targets.length === 19, "19 completed external theorem IDs are assured");
+assert(manifest.targets.length === 20, "20 completed external theorem IDs are assured");
 assert(manifest.targets.some((target) => target.id === "FND-08"), "FND-08 is assured");
 assert(manifest.targets.some((target) => target.id === "FND-09"), "FND-09 is assured");
+assert(manifest.targets.some((target) => target.id === "EXE-02"), "EXE-02 is assured");
 
 assertLeanFailClosed(lean);
 assertRocqFailClosed(rocq);

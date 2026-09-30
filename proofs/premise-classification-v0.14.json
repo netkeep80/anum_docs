@@ -452,6 +452,15 @@
       "premise": "SelectedTheoryReactionSemantics",
       "acceptedSemanticDelta": "NONE",
       "correction": "Separate current contextual-truth membership from selected-Theory reaction authority; ContextualScopeCompositionLaw remains an FND-07 premise only, while FND-08 consumes SelectedTheoryReactionSemantics for admission/match/emission/reaction."
+    },
+    {
+      "issue": 1834,
+      "kind": "SEMANTIC_PRESERVING_PREMISE_DISCHARGE",
+      "target": "EXE-02",
+      "dischargedPremise": "accepted Link identity semantics",
+      "resolution": "DERIVED_FROM_FOUNDATION_FORM_START_FINISH_INTERFACE",
+      "independentPremiseAdded": false,
+      "acceptedSemanticDelta": "NONE"
     }
   ]
 }

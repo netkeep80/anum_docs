@@ -1,0 +1,29 @@
+{
+  "schema": "mts-proof-evidence/v0.1",
+  "theoremId": "EXE-02",
+  "mts": {
+    "acceptedVersion": "v0.14",
+    "sourceCommitSha": "fcbc97e2279471c2c5effed57685c5f49ec856be",
+    "contractBlobSha": "956fe6e79ddf7a7ba2664113e97633d6fa8a486f"
+  },
+  "assumptions": [],
+  "dependencies": [],
+  "result": "proved",
+  "authority": "external-cross-check",
+  "lane": "lean4",
+  "proofSource": {
+    "repository": "netkeep80/anum_docs",
+    "commitSha": "606aed871ca46c7ffc983c1ddabb44a94b2c4b11",
+    "toolchain": {
+      "name": "Lean",
+      "pin": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "proofs/lean4/MtsFoundation.lean",
+      "sha256": "a180d9c1bcc7f0a00a1af624841c4b75b8a22783210ee5df4e705334beeb0b2a"
+    }
+  ],
+  "notes": "External differential proof only. EXE-02 discharges the former vague 'accepted Link identity semantics' premise: no independent identity premise remains. The proof uses only the existing Foundation form/start/finish projection equations. One semantic Link has a unique ordered pole reading; changing either requested pole denotes a distinct formed semantic Link. Explicit substitution of a distinct child therefore forms distinct dependent Links on either pole. The theorem does not consume FND-13, Grounded recursion, Memory handles, storage addresses, host object identity, or a physical object-immutability model. Constructing a new Link and replacing selected membership remain allowed; the result only excludes in-place mutation of the poles of one already identified semantic Link. Accepted v0.14 semantic delta is NONE."
+}
