@@ -10,6 +10,7 @@ export const THEOREM_CATALOG_INTEGRATION_CONTRACT = Object.freeze({
     "proofs/provers.json",
     "proofs/external-proof-assurance.json",
     "proofs/native-proof-assurance.json",
+    "contracts/mts-contract-v0.14.json",
   ]),
   evidenceSelection: "current-index-referenced-proofs/evidence-json" as const,
   targetPath: "docs/theory/Теоремы МТС.md",
@@ -46,6 +47,7 @@ export const THEOREM_CATALOG_INTEGRATION_CONTRACT = Object.freeze({
     laneRoles: "proofs/provers.json",
     externalAssurance: "proofs/external-proof-assurance.json",
     nativeAssurance: "proofs/native-proof-assurance.json",
+    semanticLawInventory: "contracts/mts-contract-v0.14.json",
     markdown: "derived-projection-only",
   }),
 });
