@@ -218,6 +218,7 @@ const fnd02 = targets.find((target) => target.id === "FND-02")!;
 const fnd13 = targets.find((target) => target.id === "FND-13")!;
 const fnd01 = targets.find((target) => target.id === "FND-01")!;
 const fnd08 = targets.find((target) => target.id === "FND-08")!;
+const fnd09 = targets.find((target) => target.id === "FND-09")!;
 
 const inv01 = targets.find((target) => target.id === "INV-01")!;
 const inv02 = targets.find((target) => target.id === "INV-02")!;
@@ -270,6 +271,46 @@ assert(
 );
 same(fnd08.wave, "B", "FND-08 moves behind the foundation wave");
 assert(!firstWave.includes("FND-08"), "FND-08 is not in the first differential wave");
+assert(
+  (fnd08.assumptions as string[]).includes(
+    "SelectedTheoryReactionSemantics as the accepted V14-L11/V14-L4 admission/match/emission premise",
+  ),
+  "FND-08 names selected-Theory reaction semantics explicitly",
+);
+sameSet(
+  fnd08.formalPremises as string[],
+  ["SelectedTheoryReactionSemantics"],
+  "FND-08 formal premise keeps admission/match/emission distinct from FND-07",
+);
+assert(
+  /unmatched current members survive/i.test(fnd08.statement as string) &&
+    /matched empty image remains distinct from no match/i.test(fnd08.statement as string),
+  "FND-08 frozen statement distinguishes complete successor from positive image",
+);
+assert(
+  !(fnd08.statement as string).includes("admitted relations {A_i ⟼ B_j}"),
+  "FND-08 no longer encodes explicit 1->0 as absence of binary A->B pairs",
+);
+assert(
+  (fnd08.typescriptEvidence as string[]).includes(
+    "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+  ),
+  "FND-08 pins the explicit-zero/no-match witness",
+);
+assert(
+  /NO MATCH preserves currentness/i.test(fnd09.statement as string) &&
+    /explicit ZERO is a matched empty image/i.test(fnd09.statement as string),
+  "FND-09 distinguishes no-match from ZERO",
+);
+assert(
+  /absence of emitted B/i.test(fnd09.exclusions as string),
+  "FND-09 forbids inferring no admitted match from an empty emitted image",
+);
+same(
+  contract.reactionResultBasis.emptySuccessEqualsNoRelation,
+  false,
+  "accepted v0.14 keeps successful empty distinct from no relation",
+);
 same(
   inventory.constraints.poleExtensionalityRequiresExplicitFnd13,
   true,
