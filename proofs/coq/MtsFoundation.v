@@ -3951,8 +3951,8 @@ Qed.
    Selected Theory authority remains separate through Prop-valued TheorySelected,
    Matches and Emits relations over the one Link carrier. An admitted Theory
    relation is not coerced into ContextualRule/current-Scope membership.
-   No host reaction collection, RuleKind, cardinality opcode or
-   multivalued-function ontology is introduced.
+   No host reaction collection, host rule-kind classification, cardinality
+   opcode or multivalued-function ontology is introduced.
 
    ZERO is a local zero contribution from one matched antecedent, not global
    absence of the same semantic Link. Reacted remains independent from
