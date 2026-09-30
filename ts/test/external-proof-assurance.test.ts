@@ -170,7 +170,7 @@ assert(
 );
 assert(manifest.allowedGlobalAxioms.lean4.length === 0, "Lean global axiom allowlist is empty");
 assert(manifest.allowedGlobalAxioms.rocq.length === 0, "Rocq global axiom allowlist is empty");
-assert(manifest.targets.length === 14, "14 completed external theorem IDs are assured");
+assert(manifest.targets.length === 16, "16 completed external theorem IDs are assured");
 
 assertLeanFailClosed(lean);
 assertRocqFailClosed(rocq);
