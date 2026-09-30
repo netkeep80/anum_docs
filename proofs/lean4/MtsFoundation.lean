@@ -3494,6 +3494,68 @@ theorem fnd05_dependency_witness
   intro x gx
   exact FND_05_canonical_recursive_description_unique F a1 D gx
 
+/--
+External host projection of one local Memory's handles onto the single MTS Link
+carrier.  Handle is deliberately arbitrary host identity: two Memories may use
+different Handle types and there is no cross-Memory handle equality in this
+projection.
+
+The projection is evidence vocabulary only.  It is not an MTS ontology sort,
+does not create Links and grants no materialization authority.
+-/
+structure LocalMemoryProjection (F : Foundation) where
+  Handle : Type
+  semantic : Handle → F.Link
+
+/--
+FND-06 — canonical structural transport is invariant under fresh local Memory
+handles on the declared FND-05 transport domain.
+
+The only semantic bridge between two local handle spaces is the explicit fact
+that the chosen handles denote the same existing Link. FND-05 canonicality
+then supplies one unique recursive structural description for that Link, so
+changing local handle identity cannot change the transported structural
+description.
+
+This theorem intentionally does NOT prove the converse
+"same recursive code implies same Link", does not compare host handles, and
+does not grant reconstruction/materialization authority from a handle or code.
+-/
+theorem FND_06_memory_handle_transport_invariant
+    (F : Foundation)
+    (canonical : FND05Canonicality F)
+    (left right : LocalMemoryProjection F)
+    (leftHandle : left.Handle)
+    (rightHandle : right.Handle)
+    (sameSemantic :
+      left.semantic leftHandle = right.semantic rightHandle)
+    (grounded : Grounded F (left.semantic leftHandle)) :
+    ∃ code : RecursiveDescriptionCode,
+      CanonicalRecursiveDescription F
+        (left.semantic leftHandle) code ∧
+      CanonicalRecursiveDescription F
+        (right.semantic rightHandle) code ∧
+      (∀ other : RecursiveDescriptionCode,
+        CanonicalRecursiveDescription F
+          (left.semantic leftHandle) other →
+        other = code) ∧
+      (∀ other : RecursiveDescriptionCode,
+        CanonicalRecursiveDescription F
+          (right.semantic rightHandle) other →
+        other = code) := by
+  rcases canonical grounded with ⟨code, hCode, hUnique⟩
+  have hRightCode :
+      CanonicalRecursiveDescription F
+        (right.semantic rightHandle) code := by
+    rw [← sameSemantic]
+    exact hCode
+  refine ⟨code, hCode, hRightCode, hUnique, ?_⟩
+  intro other hOther
+  apply hUnique
+  rw [sameSemantic]
+  exact hOther
+
+
 def ExactSequenceFoldCollision
     (F : Foundation)
     (B : AcceptedV014RepresentationDefinitions F) : Prop :=
