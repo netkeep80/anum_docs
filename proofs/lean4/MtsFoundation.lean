@@ -3501,8 +3501,8 @@ theorem FND_09_zero_one_many_are_relational
 EXE-02 external projection of immutable Link identity.
 
 A semantic Link has one ordered pole reading through the Foundation projections.
-If either requested pole changes, the ordinary Link-forming primitive denotes a
-different semantic Link.  Rewrite may therefore select another existing Link or
+Changing either pole denotes a distinct semantic Link under the ordinary
+Link-forming primitive.  Rewrite may therefore select another existing Link or
 form an explicitly substituted surrounding Link, but it cannot change the poles
 of one already identified semantic Link in place.
 
