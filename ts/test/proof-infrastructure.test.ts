@@ -1018,8 +1018,8 @@ assert.deepEqual(
 for (const record of fnd08) {
   assert.equal(
     record.proofSource.commitSha,
-    "2fda28a8e7be8f9d824fd376622fb9ee21d66f2d",
-    "FND-08 " + record.lane + " exact kernel-GREEN proof source",
+    "23584eb5269f684054e649b32b98ab38a333e76a",
+    "FND-08 " + record.lane + " reachable proof-source anchor",
   );
   assert.deepEqual(
     record.assumptions,
@@ -1060,6 +1060,11 @@ for (const record of fnd08) {
     /active identity remains distinct from quiescence/i,
     "FND-08 evidence preserves identity-versus-quiescence distinction",
   );
+  assert.match(
+    String(record.notes),
+    /Kernel validation CI #8552.*exact artifact SHA-256.*byte-identical/i,
+    "FND-08 evidence records the squash provenance bridge to kernel validation",
+  );
 }
 
 const fnd09 = evidenceRecords
@@ -1074,8 +1079,8 @@ assert.deepEqual(
 for (const record of fnd09) {
   assert.equal(
     record.proofSource.commitSha,
-    "2fda28a8e7be8f9d824fd376622fb9ee21d66f2d",
-    "FND-09 " + record.lane + " exact kernel-GREEN proof source",
+    "23584eb5269f684054e649b32b98ab38a333e76a",
+    "FND-09 " + record.lane + " reachable proof-source anchor",
   );
   assert.deepEqual(
     record.assumptions,
@@ -1115,6 +1120,11 @@ for (const record of fnd09) {
     String(record.notes),
     /N->1 convergence is extensional/i,
     "FND-09 evidence records extensional duplicate convergence",
+  );
+  assert.match(
+    String(record.notes),
+    /Kernel validation CI #8552.*exact artifact SHA-256.*byte-identical/i,
+    "FND-09 evidence records the squash provenance bridge to kernel validation",
   );
 }
 
