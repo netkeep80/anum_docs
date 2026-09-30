@@ -1,0 +1,28 @@
+{
+  "schema": "mts-traceability-errata/v0.1",
+  "mtsVersion": "v0.14",
+  "authority": "historical-correction-only",
+  "selectorAuthority": false,
+  "source": "traceability/mts-v0.14.json",
+  "sourceImmutable": true,
+  "ownerIssue": 1838,
+  "acceptedSemanticDelta": "NONE",
+  "corrections": [
+    {
+      "pointer": "/currentAccepted",
+      "classification": "STALE_PRE_ACCEPTANCE_SNAPSHOT",
+      "reason": "The accepted v0.14 cutover updated the top-level acceptance/current release surfaces but retained the candidate-era currentAccepted snapshot. The immutable accepted traceability artifact is preserved; this record prevents that stale block from being interpreted as current selection authority.",
+      "observed": {
+        "contract": "contracts/mts-contract-v0.13.json",
+        "conformance": "contracts/mts-conformance-v0.13.json",
+        "acceptance": "cutover/typescript-c1-acceptance-v0.6.json"
+      },
+      "authoritativeCurrent": {
+        "policy": "repo-policy.json",
+        "acceptance": "cutover/typescript-c1-acceptance-v0.7.json",
+        "contract": "contracts/mts-contract-v0.14.json",
+        "conformance": "contracts/mts-conformance-v0.14.json"
+      }
+    }
+  ]
+}

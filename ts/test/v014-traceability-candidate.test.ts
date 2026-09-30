@@ -57,6 +57,7 @@ const repoRoot = resolve(process.cwd(), "..");
 const contract = json(join(repoRoot, "contracts/mts-contract-v0.14.json"));
 const conformance = json(join(repoRoot, "contracts/mts-conformance-v0.14.json"));
 const traceability = json(join(repoRoot, "traceability/mts-v0.14.json"));
+const traceabilityErrata = json(join(repoRoot, "traceability/mts-v0.14-errata.json"));
 const requirements = json(join(repoRoot, "requirements/mts-v0.14.json"));
 const policy = json(join(repoRoot, "repo-policy.json"));
 const acceptance14 = json(join(repoRoot, "cutover/typescript-c1-acceptance-v0.7.json"));
@@ -149,6 +150,26 @@ const acceptedCurrent = record(acceptance14.current, "accepted current");
 assert(text(acceptedCurrent.contract, "accepted contract") === "contracts/mts-contract-v0.14.json", "cutover current contract is v0.14");
 assert(text(acceptedCurrent.conformance, "accepted conformance") === "contracts/mts-conformance-v0.14.json", "cutover current conformance is v0.14");
 assert(existsSync(join(repoRoot, "cutover/typescript-c1-acceptance-v0.7.json")), "v0.14 cutover exists");
+
+assert(text(traceabilityErrata.schema, "traceability errata schema") === "mts-traceability-errata/v0.1", "traceability errata schema");
+assert(text(traceabilityErrata.authority, "traceability errata authority") === "historical-correction-only", "errata is not current selector authority");
+assert(bool(traceabilityErrata.selectorAuthority, "traceability errata selector authority") === false, "errata cannot select current release");
+assert(text(traceabilityErrata.acceptedSemanticDelta, "traceability errata semantic delta") === "NONE", "erratum has no accepted semantic delta");
+const corrections = traceabilityErrata.corrections;
+assert(Array.isArray(corrections) && corrections.length === 1, "exactly one v0.14 traceability correction");
+const correction = record(corrections[0], "traceability correction");
+assert(text(correction.pointer, "correction pointer") === "/currentAccepted", "erratum identifies stale currentAccepted block");
+assert(text(correction.classification, "correction classification") === "STALE_PRE_ACCEPTANCE_SNAPSHOT", "stale block is classified as historical snapshot");
+const observed = record(correction.observed, "observed stale snapshot");
+const staleCurrentAccepted = record(traceability.currentAccepted, "traceability stale currentAccepted");
+assert(JSON.stringify(staleCurrentAccepted) === JSON.stringify(observed), "immutable traceability retains exactly the recorded stale snapshot");
+const authoritative = record(correction.authoritativeCurrent, "authoritative current selection");
+assert(text(authoritative.policy, "erratum policy") === "repo-policy.json", "repo-policy is current selection authority");
+assert(text(authoritative.acceptance, "erratum acceptance") === "cutover/typescript-c1-acceptance-v0.7.json", "acceptance manifest is v0.7");
+assert(text(authoritative.contract, "erratum contract") === text(record(currentPair.contract, "current contract").path, "current contract path"), "erratum contract matches repo-policy current");
+assert(text(authoritative.conformance, "erratum conformance") === text(record(currentPair.conformance, "current conformance").path, "current conformance path"), "erratum conformance matches repo-policy current");
+assert(text(authoritative.contract, "erratum contract") === text(acceptedCurrent.contract, "accepted contract"), "erratum contract matches accepted cutover");
+assert(text(authoritative.conformance, "erratum conformance") === text(acceptedCurrent.conformance, "accepted conformance"), "erratum conformance matches accepted cutover");
 
 console.log([
   "MTS v0.14 N20c: CANDIDATE_TRACEABILITY=GREEN",
