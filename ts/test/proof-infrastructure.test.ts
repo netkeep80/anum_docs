@@ -20,7 +20,11 @@ const infrastructure = JSON.parse(
 const evidenceSchema = JSON.parse(
   readFileSync(resolve(root, "proofs", "evidence-record.schema.json"), "utf8"),
 );
-const registry = JSON.parse(
+const currentIndexPath = String(infrastructure.currentTheoremIndex);
+const currentIndex = JSON.parse(
+  readFileSync(resolve(root, currentIndexPath), "utf8"),
+);
+const historicalRegistry = JSON.parse(
   readFileSync(resolve(root, "theorems", "registry.json"), "utf8"),
 );
 const p0 = JSON.parse(
@@ -35,7 +39,13 @@ const externalProofAssurance = JSON.parse(
 
 assert.equal(infrastructure.schema, "mts-proof-infrastructure/v0.1");
 assert.equal(infrastructure.authority, "routing-and-provenance-only");
-assert.equal(infrastructure.theoremRegistry, "theorems/registry.json");
+assert.equal(infrastructure.currentTheoremIndex, "theorems/current-v0.14.json");
+assert.equal(infrastructure.historicalTheoremRegistry, "theorems/registry.json");
+assert.notEqual(
+  infrastructure.currentTheoremIndex,
+  infrastructure.historicalTheoremRegistry,
+  "historical theorem registry must never be the current selector",
+);
 assert.equal(
   infrastructure.evidenceRecordSchema,
   "proofs/evidence-record.schema.json",
@@ -51,7 +61,7 @@ const registryKeys = new Map(
   ]),
 );
 assert.equal(registryKeys.get("typescript"), "typescript");
-assert.equal(registryKeys.get("lean4"), "lean");
+assert.equal(registryKeys.get("lean4"), "lean4");
 assert.equal(registryKeys.get("coq"), "coq");
 assert.equal(registryKeys.get("mtsNative"), "mtsNative");
 assert.equal(registryKeys.get("aprover"), "aprover");
@@ -78,12 +88,51 @@ assert.deepEqual(
   ["typescript", "lean4", "coq"].sort(),
 );
 
-const expectedEvidenceKeys = ["typescript", "lean", "coq", "mtsNative", "aprover"];
-for (const theorem of registry.theorems) {
+execFileSync(
+  process.execPath,
+  [resolve(root, "theorems", "generate-current-index.mjs"), "--check"],
+  { cwd: root, stdio: "pipe" },
+);
+
+assert.equal(currentIndex.schema, "mts-current-theorem-index/v0.1");
+assert.equal(currentIndex.authority, "generated-index-only");
+assert.equal(currentIndex.mtsVersion, "v0.14");
+assert.equal(currentIndex.sourceInventory, "theorems/p0-v0.14.json");
+assert.equal(currentIndex.historicalRegistry.path, "theorems/registry.json");
+assert.equal(currentIndex.historicalRegistry.version, "v0.13");
+assert.equal(currentIndex.historicalRegistry.currentSelector, false);
+assert.equal(historicalRegistry.schema, "mts-theorem-registry/v0.1");
+assert.equal(historicalRegistry.version, "v0.13");
+
+assert.deepEqual(
+  currentIndex.theorems.map((theorem: any) => theorem.id),
+  p0.targets.map((target: any) => target.id),
+  "current theorem index preserves exact frozen P0 theorem order and ID set",
+);
+
+const expectedEvidenceKeys = ["typescript", "lean4", "coq", "mtsNative", "aprover"];
+for (const [index, theorem] of currentIndex.theorems.entries()) {
+  const target = p0.targets[index];
+  assert.equal(theorem.id, target.id, `${theorem.id} generated ID`);
+  for (const field of ["statement", "scope", "exclusions"]) {
+    assert.equal(theorem[field], target[field], `${theorem.id} generated ${field}`);
+  }
+  for (const field of ["lawRefs", "assumptions", "dependsOn", "formalPremises"]) {
+    assert.deepEqual(
+      theorem[field],
+      target[field] ?? [],
+      `${theorem.id} generated ${field}`,
+    );
+  }
   assert.deepEqual(
     Object.keys(theorem.evidence).sort(),
     [...expectedEvidenceKeys].sort(),
     `${theorem.id} evidence lanes must match proof infrastructure`,
+  );
+  assert.deepEqual(
+    theorem.evidence.typescript,
+    target.typescriptEvidence ?? [],
+    `${theorem.id} generated TypeScript evidence`,
   );
 }
 
@@ -1438,5 +1487,5 @@ assert.ok(
 );
 
 console.log(
-  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${registry.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd03=lean4+coq fnd04=lean4+coq fnd06=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq fnd05=lean4+coq fnd11=lean4+coq aprover-input=mtsNative-only`,
+  `proof infrastructure: GREEN lanes=${expectedLanes.length} theorems=${currentIndex.theorems.length} evidence=${evidenceRecords.length} fnd02=lean4+coq fnd03=lean4+coq fnd04=lean4+coq fnd06=lean4+coq fnd13=lean4+coq fnd01=lean4+coq inv01=lean4+coq inv02=lean4+coq inv03=lean4+coq inv04=lean4+coq inv05=lean4+coq inv06=lean4+coq inv07=lean4+coq ctx03=lean4+coq fnd05=lean4+coq fnd11=lean4+coq aprover-input=mtsNative-only`,
 );
