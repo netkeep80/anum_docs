@@ -3,29 +3,24 @@ import {
   readFileSync,
 } from "node:fs";
 import { dirname, resolve } from "node:path";
-
 import {
   THEOREM_CATALOG_INTEGRATION_CONTRACT,
   collectCurrentTheoremEvidenceRecordPaths,
 } from "./theorem-projection-contract.js";
-
 export type TheoremProjectionEvidenceLane =
   | "typescript"
   | "lean4"
   | "coq"
   | "mtsNative"
   | "aprover";
-
 export interface TheoremProjectionLaneAuthority {
   role: string;
   proofAuthority: string;
 }
-
 export interface TheoremProjectionEvidenceArtifact {
   path: string;
   sha256: string;
 }
-
 export interface TheoremProjectionEvidenceRecord {
   schema: string;
   theoremId: string;
@@ -51,7 +46,6 @@ export interface TheoremProjectionEvidenceRecord {
   artifacts: TheoremProjectionEvidenceArtifact[];
   notes?: string;
 }
-
 export interface TheoremProjectionEvidence {
   kind: "executable-witness" | "evidence-record";
   lane: TheoremProjectionEvidenceLane;
@@ -60,7 +54,6 @@ export interface TheoremProjectionEvidence {
   proofAuthority: string;
   record?: TheoremProjectionEvidenceRecord;
 }
-
 export interface TheoremProjectionNativeAssurance {
   id: string;
   classification: string;
@@ -71,7 +64,6 @@ export interface TheoremProjectionNativeAssurance {
   evidence: unknown[];
   overclaimVeto: string[];
 }
-
 export interface TheoremProjectionTheorem {
   id: string;
   statement: string;
@@ -99,7 +91,6 @@ export interface TheoremProjectionTheorem {
     evidenceRecords: string[];
   };
 }
-
 export interface TheoremProjectionModel {
   schema: "mts-theorem-projection-model/v0.1";
   mtsVersion: string;
@@ -115,7 +106,6 @@ export interface TheoremProjectionModel {
   lanes: Record<TheoremProjectionEvidenceLane, TheoremProjectionLaneAuthority>;
   theorems: TheoremProjectionTheorem[];
 }
-
 export interface TheoremProjectionSources {
   currentIndex: any;
   provers: any;
@@ -125,48 +115,39 @@ export interface TheoremProjectionSources {
   evidenceRecords: Record<string, any>;
   availablePaths: string[];
 }
-
 const LANES: readonly TheoremProjectionEvidenceLane[] =
   THEOREM_CATALOG_INTEGRATION_CONTRACT.readModel
     .evidenceLanes as readonly TheoremProjectionEvidenceLane[];
-
 function fail(message: string): never {
   throw new Error(`theorem-projection-model: ${message}`);
 }
-
 function object(value: unknown, label: string): Record<string, any> {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
     return fail(`${label} must be an object`);
   }
   return value as Record<string, any>;
 }
-
 function text(value: unknown, label: string): string {
   if (typeof value !== "string" || value.length === 0) {
     return fail(`${label} must be a non-empty string`);
   }
   return value;
 }
-
 function optionalText(value: unknown, label: string): string | null {
   if (value === undefined || value === null) return null;
   return text(value, label);
 }
-
 function strings(value: unknown, label: string): string[] {
   if (!Array.isArray(value)) return fail(`${label} must be an array`);
   return value.map((item, index) => text(item, `${label}[${index}]`));
 }
-
 function jsonClone<T>(value: T): T {
   if (value === undefined) return value;
   return JSON.parse(JSON.stringify(value)) as T;
 }
-
 function sameStrings(left: readonly string[], right: readonly string[]): boolean {
   return JSON.stringify(left) === JSON.stringify(right);
 }
-
 function findRepositoryRoot(start = process.cwd()): string {
   let current = resolve(start);
   while (true) {
@@ -176,7 +157,6 @@ function findRepositoryRoot(start = process.cwd()): string {
     current = parent;
   }
 }
-
 function readJson(root: string, path: string): any {
   try {
     return JSON.parse(readFileSync(resolve(root, path), "utf8"));
@@ -186,7 +166,6 @@ function readJson(root: string, path: string): any {
     );
   }
 }
-
 function laneAuthorities(proversValue: unknown): Record<
   TheoremProjectionEvidenceLane,
   TheoremProjectionLaneAuthority
@@ -197,7 +176,6 @@ function laneAuthorities(proversValue: unknown): Record<
     TheoremProjectionEvidenceLane,
     TheoremProjectionLaneAuthority
   >;
-
   for (const lane of LANES) {
     const source = object(lanesSource[lane], `proofs/provers.json.lanes.${lane}`);
     result[lane] = Object.freeze({
@@ -210,7 +188,6 @@ function laneAuthorities(proversValue: unknown): Record<
   }
   return Object.freeze(result);
 }
-
 function normalizeEvidenceRecord(
   value: unknown,
   path: string,
@@ -227,7 +204,6 @@ function normalizeEvidenceRecord(
   if (recordLane !== lane) {
     fail(`evidence lane mismatch for ${theoremId}: expected ${lane}, found ${recordLane} at ${path}`);
   }
-
   const mtsSource = object(record.mts, `${path}.mts`);
   const proofSource = object(record.proofSource, `${path}.proofSource`);
   const artifactsSource = Array.isArray(record.artifacts)
@@ -244,7 +220,6 @@ function normalizeEvidenceRecord(
       sha256: text(artifact.sha256, `${path}.artifacts[${index}].sha256`),
     });
   });
-
   let toolchain: { name: string; pin: string } | undefined;
   if (proofSource.toolchain !== undefined) {
     const source = object(proofSource.toolchain, `${path}.proofSource.toolchain`);
@@ -253,7 +228,6 @@ function normalizeEvidenceRecord(
       pin: text(source.pin, `${path}.proofSource.toolchain.pin`),
     });
   }
-
   const result: TheoremProjectionEvidenceRecord = {
     schema: text(record.schema, `${path}.schema`),
     theoremId: recordTheoremId,
@@ -282,7 +256,6 @@ function normalizeEvidenceRecord(
   };
   return Object.freeze(result);
 }
-
 function normalizeNativeAssurance(value: unknown): TheoremProjectionNativeAssurance {
   const source = object(value, "native assurance target");
   const result: TheoremProjectionNativeAssurance = {
@@ -312,11 +285,9 @@ function normalizeNativeAssurance(value: unknown): TheoremProjectionNativeAssura
   };
   return Object.freeze(result);
 }
-
 function pathSet(sources: TheoremProjectionSources): Set<string> {
   return new Set(strings(sources.availablePaths, "availablePaths"));
 }
-
 function indexTargets(value: unknown, label: string): Map<string, Record<string, any>> {
   const source = object(value, label);
   if (!Array.isArray(source.targets)) return fail(`${label}.targets must be an array`);
@@ -329,7 +300,6 @@ function indexTargets(value: unknown, label: string): Map<string, Record<string,
   }
   return result;
 }
-
 function theoremEvidence(
   theorem: Record<string, any>,
   theoremId: string,
@@ -342,7 +312,6 @@ function theoremEvidence(
     TheoremProjectionEvidenceLane,
     TheoremProjectionEvidence[]
   >;
-
   for (const lane of LANES) {
     const paths = strings(source[lane], `${theoremId}.evidence.${lane}`);
     result[lane] = paths.map((path) => {
@@ -374,7 +343,6 @@ function theoremEvidence(
   }
   return Object.freeze(result);
 }
-
 function collectRepositoryPaths(
   root: string,
   currentIndex: any,
@@ -382,7 +350,6 @@ function collectRepositoryPaths(
   evidenceRecords: Record<string, any>,
 ): string[] {
   const paths = new Set<string>(THEOREM_CATALOG_INTEGRATION_CONTRACT.fixedSources);
-
   const theorems = Array.isArray(currentIndex.theorems)
     ? currentIndex.theorems
     : fail("current theorem index must contain theorems[]");
@@ -395,7 +362,6 @@ function collectRepositoryPaths(
       }
     }
   }
-
   for (const [path, recordValue] of Object.entries(evidenceRecords)) {
     paths.add(path);
     const record = object(recordValue, path);
@@ -405,7 +371,6 @@ function collectRepositoryPaths(
       paths.add(text(artifact.path, `${path}.artifacts[${index}].path`));
     }
   }
-
   const native = object(nativeAssurance, "proofs/native-proof-assurance.json");
   if (Array.isArray(native.targets)) {
     for (const targetValue of native.targets) {
@@ -418,14 +383,12 @@ function collectRepositoryPaths(
       }
     }
   }
-
   const sorted = [...paths].sort();
   for (const path of sorted) {
     if (!existsSync(resolve(root, path))) fail(`registered path does not exist: ${path}`);
   }
   return sorted;
 }
-
 export function loadRepositoryTheoremProjectionSources(
   root = findRepositoryRoot(),
 ): TheoremProjectionSources {
@@ -434,12 +397,10 @@ export function loadRepositoryTheoremProjectionSources(
   const externalAssurance = readJson(root, "proofs/external-proof-assurance.json");
   const nativeAssurance = readJson(root, "proofs/native-proof-assurance.json");
   const semanticLawInventory = readJson(root, "contracts/mts-contract-v0.14.json");
-
   const evidenceRecords: Record<string, any> = {};
   for (const path of collectCurrentTheoremEvidenceRecordPaths(currentIndex)) {
     evidenceRecords[path] = readJson(root, path);
   }
-
   return {
     currentIndex,
     provers,
@@ -455,7 +416,6 @@ export function loadRepositoryTheoremProjectionSources(
     ),
   };
 }
-
 export function buildTheoremProjectionModel(
   sources: TheoremProjectionSources,
 ): TheoremProjectionModel {
@@ -469,11 +429,9 @@ export function buildTheoremProjectionModel(
         object(value, `current theorem index.theorems[${index}]`),
       )
     : fail("current theorem index.theorems must be an array");
-
   const theoremIds = theoremSources.map((theorem) => text(theorem.id, "theorem.id"));
   if (new Set(theoremIds).size !== theoremIds.length) fail("duplicate current theorem id");
   const theoremIdSet = new Set(theoremIds);
-
   const lawInventory = object(
     object(sources.semanticLawInventory, "contracts/mts-contract-v0.14.json")
       .requiredSemanticLaws,
@@ -481,7 +439,6 @@ export function buildTheoremProjectionModel(
   );
   const acceptedLawIds = new Set(Object.keys(lawInventory));
   if (acceptedLawIds.size === 0) fail("accepted semantic law inventory is empty");
-
   const authorities = laneAuthorities(sources.provers);
   const externalTargets = indexTargets(
     sources.externalAssurance,
@@ -492,7 +449,6 @@ export function buildTheoremProjectionModel(
     "proofs/native-proof-assurance.json",
   );
   const available = pathSet(sources);
-
   if (externalTargets.size !== theoremIdSet.size) {
     fail("external assurance target set differs from current theorem inventory");
   }
@@ -502,7 +458,6 @@ export function buildTheoremProjectionModel(
   for (const id of nativeTargets.keys()) {
     if (!theoremIdSet.has(id)) fail(`native assurance has non-current theorem ${id}`);
   }
-
   const theorems = theoremSources.map((source): TheoremProjectionTheorem => {
     const id = text(source.id, "theorem.id");
     const lawRefs = strings(source.lawRefs, `${id}.lawRefs`);
@@ -511,14 +466,12 @@ export function buildTheoremProjectionModel(
         fail(`unresolved accepted law for ${id}: ${lawRef}`);
       }
     }
-
     const dependsOn = strings(source.dependsOn, `${id}.dependsOn`);
     for (const dependency of dependsOn) {
       if (!theoremIdSet.has(dependency)) {
         fail(`unresolved theorem dependency for ${id}: ${dependency}`);
       }
     }
-
     const assumptions = strings(source.assumptions, `${id}.assumptions`);
     const formalPremises = strings(source.formalPremises, `${id}.formalPremises`);
     const evidence = theoremEvidence(
@@ -528,7 +481,6 @@ export function buildTheoremProjectionModel(
       sources.evidenceRecords,
       available,
     );
-
     for (const lane of LANES) {
       for (const item of evidence[lane]) {
         if (item.record === undefined) continue;
@@ -540,7 +492,6 @@ export function buildTheoremProjectionModel(
         }
       }
     }
-
     const external = externalTargets.get(id);
     if (external === undefined) fail(`external assurance missing theorem ${id}`);
     const externalProjection = Object.freeze({
@@ -555,7 +506,6 @@ export function buildTheoremProjectionModel(
     ) {
       fail(`external assurance mismatch for ${id}`);
     }
-
     const nativeSource = nativeTargets.get(id);
     const nativeAssurance =
       nativeSource === undefined ? null : normalizeNativeAssurance(nativeSource);
@@ -574,7 +524,6 @@ export function buildTheoremProjectionModel(
     ) {
       fail(`native assurance evidenceRecord mismatch for ${id}: ${nativeAssurance.evidenceRecord}`);
     }
-
     if (nativeAssurance !== null) {
       for (const raw of nativeAssurance.evidence) {
         const item = object(raw, `native assurance ${id}.evidence`);
@@ -582,13 +531,11 @@ export function buildTheoremProjectionModel(
         if (!available.has(path)) fail(`registered native assurance path does not exist: ${path}`);
       }
     }
-
     const evidenceRecordPaths = LANES.flatMap((lane) =>
       evidence[lane]
         .filter((item) => item.kind === "evidence-record")
         .map((item) => item.path),
     );
-
     return Object.freeze({
       id,
       statement: text(source.statement, `${id}.statement`),
@@ -613,7 +560,6 @@ export function buildTheoremProjectionModel(
       }),
     });
   });
-
   return Object.freeze({
     schema: "mts-theorem-projection-model/v0.1" as const,
     mtsVersion,
@@ -625,7 +571,6 @@ export function buildTheoremProjectionModel(
     theorems: Object.freeze(theorems) as TheoremProjectionTheorem[],
   });
 }
-
 export function loadRepositoryTheoremProjectionModel(
   root = findRepositoryRoot(),
 ): TheoremProjectionModel {
