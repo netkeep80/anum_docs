@@ -297,8 +297,7 @@
       ],
       "consumedBy": [
         "FND-07",
-        "FND-08",
-        "FND-09"
+        "FND-08"
       ],
       "rationale": "The semantic role called truth is explicitly accepted A16/V14-L11 semantics and is not derived from bare Foundation.",
       "falsificationTarget": {
@@ -328,6 +327,24 @@
         "kind": "EXECUTABLE_SEMANTIC_VECTOR",
         "target": "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
         "condition": "Break accepted current-Scope detachment K->A + A->B => K->B while preserving the tested input boundary.",
+        "status": "REGISTERED_EXISTING_VECTOR"
+      },
+      "explicitModelStatus": "ACCEPTED_SEMANTIC_PREMISE_NOT_DERIVED_FROM_BARE_FOUNDATION"
+    },
+    {
+      "id": "SelectedTheoryReactionSemantics",
+      "classification": "INDEPENDENT_MODEL_CHOICE",
+      "normativeRole": "accepted V14-L11/V14-L4 selected-Theory admission, applicability and emitted-image boundary for generalized reaction",
+      "leanSymbols": [],
+      "rocqSymbols": [],
+      "consumedBy": [
+        "FND-08"
+      ],
+      "rationale": "FND-08 is not derivable from A16 contextual detachment alone. Accepted generalized reaction additionally determines which structural relations are executable through selected Theory admission, distinguishes an admitted applicable relation with empty emission from absence of any admitted relation, and unions positive emissions without host cardinality dispatch. This is inherited accepted execution semantics, not a theorem of bare Foundation.",
+      "falsificationTarget": {
+        "kind": "EXECUTABLE_SEMANTIC_VECTOR",
+        "target": "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+        "condition": "Collapse NO_ADMITTED_RELATION into explicit ZERO, allow ambient unadmitted relations to fire, or fail the all-matching admitted-relation union boundary retained from A72w.",
         "status": "REGISTERED_EXISTING_VECTOR"
       },
       "explicitModelStatus": "ACCEPTED_SEMANTIC_PREMISE_NOT_DERIVED_FROM_BARE_FOUNDATION"
