@@ -4894,3 +4894,114 @@ Proof.
                  exact (q_origin_root F B version source).
               ** exact (q_denotation_collision F B).
 Qed.
+
+
+(* FND-12 external projection of the accepted representation-layer boundary.
+
+   The ontology classification is an explicit accepted architecture premise
+   (V14-L14). It is not derived from host types, host equality, a layer enum,
+   or representation identity inequality. The sole semantic carrier named by
+   the accepted theory remains Link.
+
+   FND-01 and FND-11 enter only through dependency propositions. FND-01 keeps
+   the structural self-incidence roles as predicates over the same Link
+   carrier. FND-11 keeps upper representation identities separated while
+   accepted origins/denotational observations target the Link foundation.
+
+   No host representation object is denied its own local identity, and no
+   claim is made that every representation source object is itself a Link. *)
+Definition AcceptedRepresentationLayerBoundary
+    (soleSemanticCarrierIsLink
+      recursiveStructureNonOntological
+      representationsCodecsNonOntological
+      byteTextNonOntological
+      symbolicMetanotationNonOntological : Prop) : Prop :=
+  soleSemanticCarrierIsLink /\
+  recursiveStructureNonOntological /\
+  representationsCodecsNonOntological /\
+  byteTextNonOntological /\
+  symbolicMetanotationNonOntological.
+
+Definition FND01LinkOnlyStructure (F : Foundation) : Prop :=
+  forall x : Link F,
+    LocalSelfDecision F x ->
+    LocalSelfIncidenceExhaustive F x /\
+    LocalSelfIncidenceExclusive F x.
+
+Theorem fnd01_link_only_structure_from_capstone
+    (F : Foundation)
+    (A1 : A1RecursiveSeparation F)
+    (E : F2F3OneSidedExistence F) :
+    FND01LinkOnlyStructure F.
+Proof.
+  unfold FND01LinkOnlyStructure.
+  intros x Decision.
+  pose proof (FND_01_four_structural_cases F A1 E x Decision) as H.
+  split.
+  - exact (proj1 H).
+  - exact (proj1 (proj2 H)).
+Qed.
+
+Definition FND11RepresentationSeparation
+    (F : Foundation)
+    (B : AcceptedV014RepresentationDefinitions F) : Prop :=
+  recursive_codec_identity_target <> anum_identity_target /\
+  (forall a : Link F,
+    anum_carrier F B a ->
+    anum_origin F B a = R F) /\
+  (forall s : Link F,
+    exact_sequence_carrier F B s ->
+    exact_sequence_origin F B s = R F) /\
+  ExactSequenceFoldCollision F B /\
+  (forall (version : q_version F B) (source : q_source F B),
+    q_origin F B version source = R F) /\
+  QDenotationCollision F B.
+
+Theorem fnd11_representation_separation_from_capstone
+    (F : Foundation)
+    (B : AcceptedV014RepresentationDefinitions F) :
+    FND05Canonicality F ->
+    FND11RepresentationSeparation F B.
+Proof.
+  intros FND05.
+  pose proof
+    (FND_11_representation_identities_separated F B FND05)
+    as H.
+  exact (proj2 H).
+Qed.
+
+Theorem FND_12_no_second_ontology_entity
+    (F : Foundation)
+    (B : AcceptedV014RepresentationDefinitions F)
+    (soleSemanticCarrierIsLink
+      recursiveStructureNonOntological
+      representationsCodecsNonOntological
+      byteTextNonOntological
+      symbolicMetanotationNonOntological : Prop) :
+    AcceptedRepresentationLayerBoundary
+      soleSemanticCarrierIsLink
+      recursiveStructureNonOntological
+      representationsCodecsNonOntological
+      byteTextNonOntological
+      symbolicMetanotationNonOntological ->
+    FND01LinkOnlyStructure F ->
+    FND11RepresentationSeparation F B ->
+    soleSemanticCarrierIsLink /\
+    recursiveStructureNonOntological /\
+    representationsCodecsNonOntological /\
+    byteTextNonOntological /\
+    symbolicMetanotationNonOntological /\
+    FND01LinkOnlyStructure F /\
+    FND11RepresentationSeparation F B.
+Proof.
+  intros Boundary FND01 FND11.
+  destruct Boundary as [HLink [HRecursive [HRepresentations [HByteText HSymbolic]]]].
+  repeat split.
+  - exact HLink.
+  - exact HRecursive.
+  - exact HRepresentations.
+  - exact HByteText.
+  - exact HSymbolic.
+  - exact FND01.
+  - exact FND11.
+Qed.
