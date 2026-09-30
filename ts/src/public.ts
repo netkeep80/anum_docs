@@ -430,6 +430,14 @@ export type {
 } from "./portable-proof-anet-digest.js";
 
 export {
+  exportPortableClosedRootedProof,
+  replayPortableClosedRootedProof,
+} from "./portable-closed-rooted-proof.js";
+export type {
+  PortableClosedRootedProofReplayResult,
+} from "./portable-closed-rooted-proof.js";
+
+export {
   replayClosedProofOccurrence,
 } from "./rooted-proof-aset.js";
 export type {
