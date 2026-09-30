@@ -364,6 +364,26 @@ for (const theoremId of waveB1) {
   }
 }
 
+const fnd06Target = p0Targets.get("FND-06");
+assert.ok(fnd06Target, "FND-06 exists in frozen P0");
+assert.equal(
+  fnd06Target.statement,
+  "Accepted structural transport/reconstruction is invariant under fresh local Memory handles within its declared transport domain.",
+  "FND-06 frozen statement",
+);
+assert.deepEqual(fnd06Target.assumptions, ["FND-05"], "FND-06 frozen assumptions");
+assert.deepEqual(fnd06Target.dependsOn, ["FND-05"], "FND-06 frozen dependency");
+
+const fnd06 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-06")
+  .map(({ record }) => record);
+assert.equal(fnd06.length, 2, "FND-06 has exactly two external evidence records");
+assert.deepEqual(
+  fnd06.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "FND-06 external lanes",
+);
+
 const fnd02 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-02")
   .map(({ record }) => record);
