@@ -64,10 +64,15 @@ for (const target of assurance.targets) {
 
   if (target.classification === "KERNEL_REALIZED_NOT_INDEPENDENT") {
     assert.equal(target.independent, false, `${target.id}: kernel realization is not independent`);
+    assert.equal(typeof target.kernelLaw, "string");
+    assert(target.kernelLaw.length > 0, `${target.id}: kernel law required`);
+  } else if (target.classification === "DERIVED_CLOSED_PROOF_ANET") {
+    assert.equal(target.independent, true, `${target.id}: derived theorem must be independently replayed`);
+    assert.equal("kernelLaw" in target, false, `${target.id}: derived theorem must not masquerade as a kernel law`);
+    assert.equal(typeof target.evidenceRecord, "string", `${target.id}: native evidence record required`);
+    assert(Array.isArray(target.components) && target.components.length > 0, `${target.id}: component boundary required`);
   }
 
-  assert.equal(typeof target.kernelLaw, "string");
-  assert(target.kernelLaw.length > 0, `${target.id}: kernel law required`);
   assert(Array.isArray(target.evidence) && target.evidence.length > 0);
   assert(Array.isArray(target.overclaimVeto) && target.overclaimVeto.length > 0);
 
@@ -91,8 +96,8 @@ for (const target of assurance.targets) {
 
 assert.deepEqual(
   [...seen].sort(),
-  ["FND-02", "FND-13"],
-  "Native-N2 initial assured target set is exact",
+  ["FND-02", "FND-07", "FND-13"],
+  "native assured target set is exact after FND-07 N5",
 );
 
 const kernelSource = readFileSync(
@@ -135,11 +140,44 @@ assert(
 assert.equal(seen.size, 2);
 assert.equal(p0.targets.length, 21);
 
+const fnd07 = assurance.targets.find((target: any) => target.id === "FND-07");
+assert.ok(fnd07, "FND-07 native assurance entry exists");
+assert.equal(fnd07.classification, "DERIVED_CLOSED_PROOF_ANET");
+assert.equal(fnd07.independent, true);
+assert.equal(fnd07.evidenceRecord, "proofs/evidence/FND-07/mtsNative.json");
+assert.deepEqual(
+  fnd07.components.map((component: any) => [component.id, component.assurance, component.independent]),
+  [
+    ["contextual-detachment", "DERIVED_CLOSED_PROOF_ANET", true],
+    ["root-pair-structure", "KERNEL_REALIZED_NOT_INDEPENDENT", false],
+    ["a16-truth-role", "ACCEPTED_SEMANTIC_BOUNDARY_EXPLICIT", false],
+  ],
+  "FND-07 component assurance boundary",
+);
+
+const nativeRecord = JSON.parse(
+  readFileSync(resolve(root, fnd07.evidenceRecord), "utf8"),
+);
+assert.equal(nativeRecord.theoremId, "FND-07");
+assert.equal(nativeRecord.lane, "mtsNative");
+assert.equal(nativeRecord.authority, "native-replay");
+assert.equal(nativeRecord.result, "accepted");
+assert.equal(
+  nativeRecord.mts.theoryRevision,
+  "fnd07-component-theories/sha-256/v0.1:d5807308da2f258d66e30443d72ed4e0b78bddc019107d5edbdfe61a205f9219",
+  "FND-07 composite component Theory revision",
+);
+
 const independent = assurance.targets.filter((target: any) => target.independent === true);
-assert.equal(independent.length, 0, "Native-N2 must not claim an independent native theorem proof");
+assert.deepEqual(
+  independent.map((target: any) => target.id),
+  ["FND-07"],
+  "FND-07 is the first derived independent native theorem",
+);
 
 console.log(`NATIVE_ASSURANCE_TARGETS = ${seen.size}/${p0.targets.length}`);
 console.log("FND02_NATIVE = KERNEL_REALIZED_NOT_INDEPENDENT");
 console.log("FND13_NATIVE = KERNEL_REALIZED_NOT_INDEPENDENT");
+console.log("FND07_NATIVE = DERIVED_CLOSED_PROOF_ANET");
 console.log(`INDEPENDENT_NATIVE_PROOFS = ${independent.length}`);
 console.log("accepted semantic delta = NONE");
