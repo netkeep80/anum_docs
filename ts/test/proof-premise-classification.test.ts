@@ -38,6 +38,17 @@ same(
   "stronger global normalization remains explicitly isolated",
 );
 same(matrix.convergence.acceptedSemanticDelta, "NONE", "no accepted semantic delta");
+assert(
+  Array.isArray(matrix.postConvergenceErrata) &&
+    matrix.postConvergenceErrata.some(
+      (entry: Json) =>
+        entry.issue === 1830 &&
+        entry.pullRequest === 1832 &&
+        entry.premise === "SelectedTheoryReactionSemantics" &&
+        entry.acceptedSemanticDelta === "NONE",
+    ),
+  "post-convergence reaction projection erratum is explicit",
+);
 same(matrix.convergence.nextBoundaryIssue, 1797, "next cyclic boundary owner");
 same(matrix.ownerIssue, 1796, "owner issue");
 same(matrix.parentIssue, 1789, "parent hardening issue");
@@ -149,6 +160,12 @@ same(
   byId.get("SelectedTheoryReactionSemantics")?.falsificationTarget?.target,
   "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
   "reaction premise is falsified by the explicit-zero/no-match executable vector",
+);
+assert(
+  /identity transition with quiescence/i.test(
+    byId.get("SelectedTheoryReactionSemantics")?.falsificationTarget?.condition as string,
+  ),
+  "reaction premise also guards active identity versus quiescence",
 );
 assert(
   !(byId.get("A16ContextualTruthSemantics")?.consumedBy as string[]).includes("FND-09"),
