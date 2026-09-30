@@ -28,6 +28,24 @@
       ]
     },
     {
+      "id": "FND-03",
+      "lean4": [
+        "MTS.External.FND_03_derived_aspect_basis"
+      ],
+      "rocq": [
+        "FND_03_derived_aspect_basis"
+      ]
+    },
+    {
+      "id": "FND-04",
+      "lean4": [
+        "MTS.External.FND_04_u_is_ordinary_pair"
+      ],
+      "rocq": [
+        "FND_04_u_is_ordinary_pair"
+      ]
+    },
+    {
       "id": "FND-13",
       "lean4": [
         "MTS.External.FND_13_identity_by_poles"
