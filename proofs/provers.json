@@ -11,7 +11,7 @@
       "exactSourcePinRequired": true
     },
     "lean4": {
-      "registryEvidenceKey": "lean",
+      "registryEvidenceKey": "lean4",
       "role": "external-cross-check",
       "proofAuthority": "external-only",
       "trustedAproverInput": false,
