@@ -1450,7 +1450,7 @@ for (const [label, source, endMarker] of [
   for (const requiredText of [
     "CurrentScopeMember",
     "NextScopeMember",
-    "Admitted",
+    "TheorySelected",
     "Matches",
     "Emits",
     "Reacted",
