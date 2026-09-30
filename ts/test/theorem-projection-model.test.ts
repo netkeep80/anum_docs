@@ -8,6 +8,7 @@ import {
   loadRepositoryTheoremProjectionSources,
 } from "../src/tooling/theorem-projection-model.js";
 
+// T1 RED: the normalized model module intentionally lands after this consumer.
 function repositoryRoot(): string {
   const candidates = [resolve(process.cwd(), ".."), process.cwd()];
   const root = candidates.find((candidate) =>
