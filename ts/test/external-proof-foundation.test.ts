@@ -1797,6 +1797,82 @@ assert(
   "FND-11 is proved rather than postulated",
 );
 
+const fnd12 = (p0.targets as Record<string, any>[]).find((target) => target.id === "FND-12");
+assert(fnd12 !== undefined, "P0 contains corrected FND-12");
+same(
+  JSON.stringify(fnd12.assumptions),
+  JSON.stringify(["AcceptedRepresentationLayerBoundary"]),
+  "FND-12 has one explicit accepted architecture premise",
+);
+same(
+  JSON.stringify(fnd12.dependsOn),
+  JSON.stringify(["FND-01", "FND-11"]),
+  "FND-12 depends exactly on FND-01 and FND-11",
+);
+same(
+  JSON.stringify(fnd12.formalPremises),
+  JSON.stringify([
+    "AcceptedRepresentationLayerBoundary",
+    "FND01LinkOnlyStructure",
+    "FND11RepresentationSeparation",
+  ]),
+  "FND-12 external proof inputs are explicit",
+);
+
+for (const [label, source] of [
+  ["Lean", lean],
+  ["Rocq", rocq],
+] as const) {
+  const start = source.indexOf("FND-12 external projection of the accepted representation-layer boundary");
+  assert(start >= 0, label + " contains FND-12 representation-layer projection");
+  const region = source.slice(start);
+
+  for (const symbol of [
+    "AcceptedRepresentationLayerBoundary",
+    "FND01LinkOnlyStructure",
+    "FND11RepresentationSeparation",
+    "FND_12_no_second_ontology_entity",
+  ]) {
+    assert(region.includes(symbol), label + " FND-12 contains " + symbol);
+  }
+
+  assert(
+    /sole semantic carrier.*Link|Link.*sole semantic carrier/is.test(region),
+    label + " FND-12 keeps Link as the sole semantic carrier",
+  );
+  assert(
+    /architecture premise|accepted architecture/i.test(region),
+    label + " FND-12 marks ontology classification as an explicit accepted premise",
+  );
+  assert(
+    /does not derive.*ontology.*host|not derived.*host/i.test(region),
+    label + " FND-12 refuses to infer ontology from host machinery",
+  );
+  assert(
+    /FND-01/i.test(region) && /FND-11/i.test(region),
+    label + " FND-12 consumes both theorem dependencies",
+  );
+
+  for (const forbidden of [
+    "inductive RepresentationLayer",
+    "Inductive RepresentationLayer",
+    "structure RepresentationLayer",
+    "Record RepresentationLayer",
+    "LayerKind",
+    "OntologyKind",
+    ": Bool",
+    ": bool",
+    "DecidableEq RepresentationLayer",
+  ]) {
+    assert(!region.includes(forbidden), label + " FND-12 forbids host ontology classifier: " + forbidden);
+  }
+}
+
+assert(
+  !lean.includes("axiom FND_12") && !rocq.includes("Axiom FND_12"),
+  "FND-12 is proved rather than postulated",
+);
+
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
   ci.includes("Compile pinned Lean external foundation"),

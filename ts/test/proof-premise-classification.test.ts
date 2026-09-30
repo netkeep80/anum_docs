@@ -91,6 +91,11 @@ const required = [
   "A16ContextualTruthSemantics",
   "ContextualScopeCompositionLaw",
   "SelectedTheoryReactionSemantics",
+  "AcceptedV014RepresentationDefinitions",
+  "FND05Canonicality",
+  "AcceptedRepresentationLayerBoundary",
+  "FND01LinkOnlyStructure",
+  "FND11RepresentationSeparation",
   "ContextOrientationChi",
 ];
 for (const id of required) {
@@ -154,6 +159,51 @@ same(
   byId.get("SelectedTheoryReactionSemantics")?.classification,
   "INDEPENDENT_MODEL_CHOICE",
   "selected-Theory reaction semantics is an explicit accepted semantic premise",
+);
+same(
+  byId.get("AcceptedV014RepresentationDefinitions")?.classification,
+  "INDEPENDENT_MODEL_CHOICE",
+  "accepted representation definitions are explicit relative to bare Foundation",
+);
+same(
+  byId.get("FND05Canonicality")?.classification,
+  "DERIVED",
+  "FND05Canonicality is a theorem-dependency adapter, not a new premise",
+);
+sameSet(
+  byId.get("FND05Canonicality")?.derivationFrom as string[],
+  ["FND-05"],
+  "FND05Canonicality derives from FND-05",
+);
+same(
+  byId.get("AcceptedRepresentationLayerBoundary")?.classification,
+  "INDEPENDENT_MODEL_CHOICE",
+  "V14-L14 ontology-layer boundary is explicit accepted architecture semantics",
+);
+same(
+  byId.get("AcceptedRepresentationLayerBoundary")?.falsificationTarget?.target,
+  "ts/test/research-v014-preacceptance-closure.test.ts",
+  "V14-L14 premise is tied to the accepted layer-registry executable vector",
+);
+same(
+  byId.get("FND01LinkOnlyStructure")?.classification,
+  "DERIVED",
+  "FND-01 dependency witness is derived",
+);
+sameSet(
+  byId.get("FND01LinkOnlyStructure")?.derivationFrom as string[],
+  ["FND-01"],
+  "FND-01 dependency witness provenance",
+);
+same(
+  byId.get("FND11RepresentationSeparation")?.classification,
+  "DERIVED",
+  "FND-11 dependency witness is derived",
+);
+sameSet(
+  byId.get("FND11RepresentationSeparation")?.derivationFrom as string[],
+  ["FND-11"],
+  "FND-11 dependency witness provenance",
 );
 sameSet(
   byId.get("SelectedTheoryReactionSemantics")?.consumedBy as string[],

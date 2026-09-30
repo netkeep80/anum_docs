@@ -212,6 +212,15 @@
         "CTX_03_technical_start_not_covariant",
         "CTX_03_semantic_covariance_capstone"
       ]
+    },
+    {
+      "id": "FND-12",
+      "lean4": [
+        "MTS.External.FND_12_no_second_ontology_entity"
+      ],
+      "rocq": [
+        "FND_12_no_second_ontology_entity"
+      ]
     }
   ]
 }

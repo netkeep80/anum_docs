@@ -116,6 +116,19 @@ assert(
   "EXE-02 vague Link-identity premise is explicitly discharged rather than silently assumed",
 );
 
+assert(
+  inventory.boundaryFreeze.errata.some(
+    (entry: Json) =>
+      entry.issue === 1836 &&
+      entry.target === "FND-12" &&
+      entry.kind === "SEMANTIC_PRESERVING_PREMISE_ACCOUNTING_COMPLETION" &&
+      entry.acceptedSemanticDelta === "NONE" &&
+      Array.isArray(entry.relatedPremiseAccounting) &&
+      entry.relatedPremiseAccounting.includes("AcceptedRepresentationLayerBoundary"),
+  ),
+  "FND-12 representation-layer premise accounting correction is explicit",
+);
+
 same(inventory.boundaryFreeze.externalProversNormativeAuthority, false, "external provers remain non-normative");
 same(inventory.boundaryFreeze.jsonProofAuthority, false, "P0 JSON is not proof authority");
 same(
@@ -253,6 +266,27 @@ assert(
     exe02.exclusions as string,
   ),
   "EXE-02 excludes stronger identity/runtime premises",
+);
+
+const fnd12 = targets.find((target) => target.id === "FND-12")!;
+sameSet(
+  fnd12.assumptions as string[],
+  ["AcceptedRepresentationLayerBoundary"],
+  "FND-12 has one explicit accepted architecture premise",
+);
+sameSet(
+  fnd12.dependsOn as string[],
+  ["FND-01", "FND-11"],
+  "FND-12 dependencies remain exactly FND-01 and FND-11",
+);
+sameSet(
+  fnd12.formalPremises as string[],
+  ["AcceptedRepresentationLayerBoundary", "FND01LinkOnlyStructure", "FND11RepresentationSeparation"],
+  "FND-12 exact external formal inputs",
+);
+assert(
+  /does not derive ontology policy from host Type inequality/i.test(fnd12.exclusions as string),
+  "FND-12 forbids host type inequality as ontology authority",
 );
 
 const firstWave = inventory.firstDifferentialWave as string[];
