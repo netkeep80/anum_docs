@@ -1189,6 +1189,72 @@ for (const record of exe02) {
   );
 }
 
+const fnd12 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "FND-12")
+  .map(({ record }) => record);
+assert.equal(fnd12.length, 2, "FND-12 has exactly two external evidence records");
+assert.deepEqual(
+  fnd12.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "FND-12 external lanes",
+);
+for (const record of fnd12) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "59d45182354ecc28bf29126abf263bc35e2f994f",
+    "FND-12 " + record.lane + " exact kernel-GREEN proof source",
+  );
+  assert.deepEqual(
+    record.assumptions,
+    ["AcceptedRepresentationLayerBoundary"],
+    "FND-12 keeps exactly one explicit architecture premise",
+  );
+  assert.deepEqual(
+    record.dependencies,
+    ["FND-01", "FND-11"],
+    "FND-12 dependencies remain exactly FND-01/FND-11",
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "FND-12 Lean evidence keeps exact compiler/artifact pins",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "FND-12 Rocq evidence keeps exact compiler/image pins",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /does not derive ontology policy from host type theory/i,
+    "FND-12 evidence keeps ontology classification explicit",
+  );
+  assert.match(
+    String(record.notes),
+    /FND01LinkOnlyStructure is a DERIVED dependency witness from FND-01/i,
+    "FND-12 evidence records FND-01 dependency provenance",
+  );
+  assert.match(
+    String(record.notes),
+    /FND11RepresentationSeparation is a DERIVED dependency witness from FND-11/i,
+    "FND-12 evidence records FND-11 dependency provenance",
+  );
+  assert.match(
+    String(record.notes),
+    /AcceptedV014RepresentationDefinitions.*explicitly classified.*FND05Canonicality as DERIVED from FND-05/i,
+    "FND-12 evidence records repaired FND-11 premise accounting",
+  );
+  assert.match(
+    String(record.notes),
+    /No host layer enum, Bool flag, Type inequality/i,
+    "FND-12 evidence rejects host ontology classifiers",
+  );
+}
+
 const fnd05 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-05")
   .map(({ record }) => record);
