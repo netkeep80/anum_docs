@@ -216,7 +216,11 @@ function main(): void {
     concreteRoot: openRoot,
   });
   same(openReplay.theory, theory, "OPEN replay selects exact proof Theory");
-  same(openReplay.conclusion, currentResult, "OPEN theorem conclusion is exact current K->B proposition");
+  same(
+    memory.poles(openReplay.concreteTargetOccurrence).start,
+    currentResult,
+    "OPEN theorem target occurrence carries exact current K->B proposition",
+  );
 
   const openIdentity = memory.poles(openRoot).start;
   const truthAssumption = memory.ensure(currentTruth, openIdentity);
