@@ -3942,6 +3942,180 @@ Proof.
 Qed.
 
 
+(* External proof projection of the generalized reaction image.
+
+   Active and AdmittedRelation are Prop-valued host projections of current
+   ordinary Link truth/rule topology. Outcome is only their relational image:
+   there is no native Set/List result object, cardinality tag, or
+   multivalued-function primitive in MTS. *)
+Definition RelationalReactionOutcome
+    (F : Foundation)
+    (Active : Link F -> Prop)
+    (AdmittedRelation : Link F -> Link F -> Prop)
+    (B : Link F) : Prop :=
+  exists A : Link F, Active A /\ AdmittedRelation A B.
+
+(* Reusable FND-08 result consumed by FND-09. *)
+Definition GeneralizedRelationalDetachmentLaw
+    (F : Foundation)
+    (CurrentScopeMember : Link F -> Prop)
+    (K : Link F)
+    (Active : Link F -> Prop)
+    (AdmittedRelation : Link F -> Link F -> Prop) : Prop :=
+  forall B : Link F,
+    RelationalReactionOutcome F Active AdmittedRelation B ->
+    ContextualTruth F CurrentScopeMember K B.
+
+(* FND-08 — generalized relational detachment.
+
+   Each matching admitted ordinary Link relation A->B contributes B to the
+   relational image. Current K->A truth plus admission authority for A->B
+   are discharged through already-proved FND-07 contextual detachment.
+
+   There is no result-cardinality parameter, host rewrite/global-substitution
+   authority, or collection object promoted to MTS semantics. *)
+Theorem FND_08_generalized_relational_detachment
+    (F : Foundation)
+    (CurrentScopeMember : Link F -> Prop)
+    (Closure : ContextualScopeCompositionLaw F CurrentScopeMember)
+    (K : Link F)
+    (Active : Link F -> Prop)
+    (AdmittedRelation : Link F -> Link F -> Prop)
+    (ActiveTruth :
+      forall A : Link F,
+        Active A ->
+        ContextualTruth F CurrentScopeMember K A)
+    (AdmissionAuthority :
+      forall A B : Link F,
+        AdmittedRelation A B ->
+        ContextualRule F CurrentScopeMember A B) :
+    GeneralizedRelationalDetachmentLaw
+      F CurrentScopeMember K Active AdmittedRelation.
+Proof.
+  unfold GeneralizedRelationalDetachmentLaw.
+  intros B HOutcome.
+  destruct HOutcome as [A [HActive HRelation]].
+  exact
+    (FND_07_contextual_detachment
+      F CurrentScopeMember Closure K A B
+      (ActiveTruth A HActive)
+      (AdmissionAuthority A B HRelation)).
+Qed.
+
+(* FND-09 — ZERO/ONE/MANY and N->M are meta-properties of the same ordinary
+   relational image, not semantic constructors or dispatch opcodes.
+
+   Conjuncts witness 1->0, 1->1, 1->N, N->1 convergence, and generic N->M.
+   Because Outcome is a proposition over B, convergence to one B creates no
+   duplicate semantic B and requires no deduplication primitive. *)
+Theorem FND_09_zero_one_many_are_relational_image
+    (F : Foundation)
+    (CurrentScopeMember : Link F -> Prop)
+    (K : Link F)
+    (Active : Link F -> Prop)
+    (AdmittedRelation : Link F -> Link F -> Prop)
+    (Execution :
+      GeneralizedRelationalDetachmentLaw
+        F CurrentScopeMember K Active AdmittedRelation) :
+    ((forall A B : Link F,
+        Active A ->
+        ~ AdmittedRelation A B) ->
+      forall B : Link F,
+        ~ RelationalReactionOutcome F Active AdmittedRelation B) /\
+    (forall A B : Link F,
+      Active A ->
+      AdmittedRelation A B ->
+      (forall A' B' : Link F,
+        Active A' ->
+        AdmittedRelation A' B' ->
+        B' = B) ->
+      RelationalReactionOutcome F Active AdmittedRelation B /\
+      ContextualTruth F CurrentScopeMember K B /\
+      (forall B' : Link F,
+        RelationalReactionOutcome F Active AdmittedRelation B' ->
+        B' = B)) /\
+    (forall A B1 B2 : Link F,
+      Active A ->
+      AdmittedRelation A B1 ->
+      AdmittedRelation A B2 ->
+      B1 <> B2 ->
+      RelationalReactionOutcome F Active AdmittedRelation B1 /\
+      RelationalReactionOutcome F Active AdmittedRelation B2 /\
+      ContextualTruth F CurrentScopeMember K B1 /\
+      ContextualTruth F CurrentScopeMember K B2) /\
+    (forall A1 A2 B : Link F,
+      Active A1 ->
+      Active A2 ->
+      A1 <> A2 ->
+      AdmittedRelation A1 B ->
+      AdmittedRelation A2 B ->
+      RelationalReactionOutcome F Active AdmittedRelation B /\
+      ContextualTruth F CurrentScopeMember K B) /\
+    (forall A B : Link F,
+      Active A ->
+      AdmittedRelation A B ->
+      RelationalReactionOutcome F Active AdmittedRelation B /\
+      ContextualTruth F CurrentScopeMember K B).
+Proof.
+  split.
+  - intros HNoMatch B HOutcome.
+    destruct HOutcome as [A [HActive HRelation]].
+    exact ((HNoMatch A B HActive) HRelation).
+  - split.
+    + intros A B HActive HRelation HUnique.
+      assert (
+        HOutcome :
+        RelationalReactionOutcome F Active AdmittedRelation B
+      ).
+      { exists A. split; assumption. }
+      split.
+      * exact HOutcome.
+      * split.
+        -- exact (Execution B HOutcome).
+        -- intros B' HOther.
+           destruct HOther as [A' [HActive' HRelation']].
+           exact (HUnique A' B' HActive' HRelation').
+    + split.
+      * intros A B1 B2 HActive HB1 HB2 HDistinct.
+        assert (
+          HOutcome1 :
+          RelationalReactionOutcome F Active AdmittedRelation B1
+        ).
+        { exists A. split; assumption. }
+        assert (
+          HOutcome2 :
+          RelationalReactionOutcome F Active AdmittedRelation B2
+        ).
+        { exists A. split; assumption. }
+        split.
+        -- exact HOutcome1.
+        -- split.
+           ++ exact HOutcome2.
+           ++ split.
+              ** exact (Execution B1 HOutcome1).
+              ** exact (Execution B2 HOutcome2).
+      * split.
+        -- intros A1 A2 B HActive1 HActive2 HDistinct HRel1 HRel2.
+           assert (
+             HOutcome :
+             RelationalReactionOutcome F Active AdmittedRelation B
+           ).
+           { exists A1. split; assumption. }
+           split.
+           ++ exact HOutcome.
+           ++ exact (Execution B HOutcome).
+        -- intros A B HActive HRelation.
+           assert (
+             HOutcome :
+             RelationalReactionOutcome F Active AdmittedRelation B
+           ).
+           { exists A. split; assumption. }
+           split.
+           ++ exact HOutcome.
+           ++ exact (Execution B HOutcome).
+Qed.
+
+
 (* FND-05 external proof projection of the accepted finite recursive Link
    codec.
 
