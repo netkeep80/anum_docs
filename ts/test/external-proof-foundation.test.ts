@@ -1875,6 +1875,10 @@ assert(
 
 assert(ci.includes("Detect external proof diff"), "CI has conditional proof-diff gate");
 assert(
+  ci.includes("proofs/evidence/"),
+  "evidence provenance changes must trigger external Lean/Rocq kernel recompilation",
+);
+assert(
   ci.includes("Compile pinned Lean external foundation"),
   "CI compiles Lean foundation",
 );
