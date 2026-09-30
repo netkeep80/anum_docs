@@ -1128,6 +1128,67 @@ for (const record of fnd09) {
   );
 }
 
+const exe02 = evidenceRecords
+  .filter(({ record }) => record.theoremId === "EXE-02")
+  .map(({ record }) => record);
+assert.equal(exe02.length, 2, "EXE-02 has exactly two external evidence records");
+assert.deepEqual(
+  exe02.map((record) => record.lane).sort(),
+  ["coq", "lean4"],
+  "EXE-02 external lanes",
+);
+for (const record of exe02) {
+  assert.equal(
+    record.proofSource.commitSha,
+    "606aed871ca46c7ffc983c1ddabb44a94b2c4b11",
+    "EXE-02 " + record.lane + " exact kernel-GREEN reachable proof source",
+  );
+  assert.deepEqual(
+    record.assumptions,
+    p0Targets.get("EXE-02")!.assumptions,
+    "EXE-02 assumptions preserve discharged P0 boundary",
+  );
+  assert.deepEqual(
+    record.dependencies,
+    [],
+    "EXE-02 has no theorem dependency",
+  );
+  if (record.lane === "lean4") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.lean4.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.lean4.linuxReleaseSha256),
+      "EXE-02 Lean evidence keeps exact compiler/artifact pins",
+    );
+  }
+  if (record.lane === "coq") {
+    assert.ok(
+      record.proofSource.toolchain.pin.includes(externalToolchains.rocq.commit) &&
+        record.proofSource.toolchain.pin.includes(externalToolchains.rocq.dockerManifestSha256),
+      "EXE-02 Rocq evidence keeps exact compiler/image pins",
+    );
+  }
+  assert.match(
+    String(record.notes),
+    /discharges the former vague.*accepted Link identity semantics/i,
+    "EXE-02 evidence records premise discharge",
+  );
+  assert.match(
+    String(record.notes),
+    /changing either requested pole denotes a distinct formed semantic Link/i,
+    "EXE-02 evidence records changed-pole distinctness",
+  );
+  assert.match(
+    String(record.notes),
+    /does not consume FND-13, Grounded recursion, Memory handles/i,
+    "EXE-02 evidence excludes stronger/runtime premises",
+  );
+  assert.match(
+    String(record.notes),
+    /Constructing a new Link and replacing selected membership remain allowed/i,
+    "EXE-02 evidence preserves construction and membership replacement",
+  );
+}
+
 const fnd05 = evidenceRecords
   .filter(({ record }) => record.theoremId === "FND-05")
   .map(({ record }) => record);
