@@ -6,7 +6,6 @@ import {
   replaceOwnedMarkdownSection,
   type MarkdownDocumentMode,
 } from "./markdown-section-adapter.js";
-import { THEOREM_CATALOG_PATH } from "./theorem-catalog-markdown.js";
 
 type JsonObject = Record<string, unknown>;
 
@@ -274,10 +273,7 @@ export function loadMtsSemanticIr(
     }
     documentModes[path] = mode;
   }
-  const semanticMarkdownSurface = listRepositoryMarkdownSurface(root).filter(
-    (path) => path !== THEOREM_CATALOG_PATH,
-  );
-  exactSet("Markdown document surface", Object.keys(documentModes), semanticMarkdownSurface);
+  exactSet("Markdown document surface", Object.keys(documentModes), listRepositoryMarkdownSurface(root));
 
   const repositoryRequirements = loadRepositoryRequirements(root, registry, registryPath, documentModes);
 

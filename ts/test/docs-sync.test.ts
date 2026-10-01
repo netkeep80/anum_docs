@@ -19,7 +19,6 @@ import {
   validateSemanticLawDocumentation,
 } from "../src/tooling/docs-sync.js";
 import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
-import { loadRepositoryTheoremProjectionSources } from "../src/tooling/theorem-projection-model.js";
 
 function expectThrow(action: () => unknown, pattern: RegExp): void {
   assert.throws(action, pattern);
@@ -80,11 +79,7 @@ assert.ok(
   "README current release projection must not expose previous MTS releases",
 );
 
-assert.deepEqual(
-  checkRepositoryDocs(repositoryRoot),
-  [],
-  "all generated documentation projections must be synchronized; README remains the sole release-projection marker owner",
-);
+assert.deepEqual(checkRepositoryDocs(repositoryRoot), [], "ветка должна хранить одну актуальную release projection только в README");
 for (const path of PROJECTION_FORBIDDEN_DOCS) {
   const source = readFileSync(resolve(repositoryRoot, path), "utf8");
   assert.ok(!source.includes(PROJECTION_START) && !source.includes(PROJECTION_END), `${path} must not contain release projection markers`);
@@ -193,7 +188,6 @@ try {
   copy("traceability/mts-v0.14.json");
   copy("requirements/mts-v0.14.json");
   copy("cutover/typescript-c1-acceptance-v0.7.json");
-  for (const path of loadRepositoryTheoremProjectionSources(repositoryRoot).availablePaths) copy(path);
   for (const path of listRepositoryMarkdownSurface(repositoryRoot)) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);

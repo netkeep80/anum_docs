@@ -5,8 +5,6 @@ import { compileRequirementDocuments, MTS_REQUIREMENT_REGISTRY_PATH } from "./mt
 import { auditRepositoryMarkdownLinks } from "./markdown-link-audit.js";
 import { auditRepositoryStableAnchors } from "./markdown-anchor-baseline.js";
 import { auditHistoricalV013FoundationProvenance } from "./foundation-provenance-audit.js";
-import { THEOREM_CATALOG_PATH, renderTheoremCatalogMarkdown } from "./theorem-catalog-markdown.js";
-import { loadRepositoryTheoremProjectionModel } from "./theorem-projection-model.js";
 
 export const PROJECTION_START = "<!-- мтс-текущая-проекция:начало -->";
 export const PROJECTION_END = "<!-- мтс-текущая-проекция:конец -->";
@@ -459,27 +457,20 @@ export function currentDocumentationSizeWithinBudget(
 
 export function checkRepositoryDocs(root = findRepositoryRoot()): string[] {
   const projection = renderCurrentProjection(loadCurrentProjection(root));
-  const theoremCatalog = renderTheoremCatalogMarkdown(loadRepositoryTheoremProjectionModel(root));
   const stale = CANONICAL_DOCS.filter((path) => {
     const source = readFileSync(resolve(root, path), "utf8");
     return !checkProjectionText(source, projection);
   });
-  const theoremCatalogStale =
-    !existsSync(resolve(root, THEOREM_CATALOG_PATH)) ||
-    readFileSync(resolve(root, THEOREM_CATALOG_PATH), "utf8") !== theoremCatalog
-      ? [THEOREM_CATALOG_PATH]
-      : [];
   const duplicated = PROJECTION_FORBIDDEN_DOCS.filter((path) => {
     const source = readFileSync(resolve(root, path), "utf8");
     return source.includes(PROJECTION_START) || source.includes(PROJECTION_END);
   });
   const compiledRequirements = compileRequirementDocuments(root, false);
-  return [...new Set([...stale, ...theoremCatalogStale, ...duplicated, ...compiledRequirements])].sort();
+  return [...new Set([...stale, ...duplicated, ...compiledRequirements])].sort();
 }
 
 export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {
   const projection = renderCurrentProjection(loadCurrentProjection(root));
-  const theoremCatalog = renderTheoremCatalogMarkdown(loadRepositoryTheoremProjectionModel(root));
   const changed: string[] = [];
   for (const path of CANONICAL_DOCS) {
     const fullPath = resolve(root, path);
@@ -488,14 +479,6 @@ export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {
     if (updated === source) continue;
     writeFileSync(fullPath, updated, "utf8");
     changed.push(path);
-  }
-  const theoremCatalogFullPath = resolve(root, THEOREM_CATALOG_PATH);
-  if (
-    !existsSync(theoremCatalogFullPath) ||
-    readFileSync(theoremCatalogFullPath, "utf8") !== theoremCatalog
-  ) {
-    writeFileSync(theoremCatalogFullPath, theoremCatalog, "utf8");
-    changed.push(THEOREM_CATALOG_PATH);
   }
   for (const path of compileRequirementDocuments(root, true)) {
     if (!changed.includes(path)) changed.push(path);
@@ -516,10 +499,7 @@ function main(): void {
   if (stale.length) fail(`устарела автоматическая проекция: ${stale.join(", ")}; запустите npm --prefix ts run docs:sync`);
   const lawIssues = checkRepositorySemanticLawDocumentation(root);
   if (lawIssues.length) fail(`нарушена документационная канонизация законов: ${lawIssues.map((issue) => issue.message).join("; ")}`);
-  const linkIssues = auditRepositoryMarkdownLinks(
-    root,
-    [...CURRENT_DOC_SIZE_SURFACE, THEOREM_CATALOG_PATH],
-  );
+  const linkIssues = auditRepositoryMarkdownLinks(root, CURRENT_DOC_SIZE_SURFACE);
   if (linkIssues.length) {
     fail(`нарушена целостность локальных Markdown-ссылок: ${linkIssues.map((issue) => issue.message).join("; ")}`);
   }
