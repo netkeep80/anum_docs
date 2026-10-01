@@ -150,6 +150,7 @@ for (const statement of publicSource.statements) {
   }
 }
 
+// Post-v0.13 representation additions are explicit audit deltas, not retroactive historical semantics.
 const postV013RepresentationPublicFunctions = new Set<string>([
   "materializeV013SemanticLinkFromHierarchicalCarrier",
 ]);
