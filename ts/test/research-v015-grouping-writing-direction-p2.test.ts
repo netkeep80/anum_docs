@@ -9,11 +9,11 @@ import {
   v015Atom,
   v015Direct,
   v015Group,
-  type V015DirectAssociationAlgebra,
   type V015ProjectionToken,
   type V015SurfaceExpression,
   type V015WritingProjection,
 } from "../src/v015-writing-projection.js";
+import type { V015DirectAssociationAlgebra } from "../src/v015-direct-association.js";
 import {
   Memory,
   ensureRootBasis,
