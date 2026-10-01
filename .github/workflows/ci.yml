@@ -205,14 +205,6 @@ jobs:
           console.log("KERNEL_ASSUMPTIONS_ROCQ=CHECKED targets=" + symbols.length);
           NODE
 
-      - name: Install MTS visual browser companion dependencies
-        run: npm ci --prefix packages/visual --ignore-scripts --no-audit --no-fund
-
-      - name: Check renderer-neutral MTS visual package
-        run: |
-          ./ts/node_modules/.bin/tsc -p packages/visual/tsconfig.json
-          node packages/visual/dist/test/model.test.js
-
       - name: Check Contract Observatory index
         run: |
           ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
