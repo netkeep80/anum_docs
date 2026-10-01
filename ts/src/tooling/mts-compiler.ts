@@ -1,4 +1,3 @@
-// V15-P1 RED trigger only: comment-only Pages path touch; remove before final head.
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
