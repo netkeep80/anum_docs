@@ -8,10 +8,11 @@ import {
   type ReadMemory,
 } from "./memory.js";
 import {
+  StructuralRuleError,
   readStructuralRoleDictionary,
   readStructuralRule,
 } from "./structural-rule.js";
-import { readStructuralDerivationRule } from "./derivation.js";
+import { StructuralDerivationReplayError, readStructuralDerivationRule } from "./derivation.js";
 
 export interface StructuralDerivedDerivationAssumptionEvidence {
   readonly occurrence: LinkHandle;
@@ -113,10 +114,7 @@ export function replayStructuralDerivedDerivationSchema(
       const identity = memory.poles(evidence.identity);
       targetDerivationRule = identity.start;
       theory = identity.end;
-    } catch (error) {
-      if (error instanceof MemoryError) replayFail("invalid-identity");
-      throw error;
-    }
+    } catch (error) { if (error instanceof MemoryError) replayFail("invalid-identity"); throw error; }
 
     let targetSchema: ReturnType<typeof readStructuralDerivationRule>;
     let targetRule: ReturnType<typeof readStructuralRule>;
@@ -124,9 +122,7 @@ export function replayStructuralDerivedDerivationSchema(
       targetSchema = readStructuralDerivationRule(memory, targetDerivationRule);
       targetRule = readStructuralRule(memory, targetSchema.structuralRule);
       readStructuralRoleDictionary(memory, targetRule.roleDictionary);
-    } catch {
-      replayFail("invalid-target-schema");
-    }
+    } catch (error) { if (error instanceof StructuralDerivationReplayError || error instanceof StructuralRuleError) replayFail("invalid-target-schema"); throw error; }
 
     if (evidence.assumptions.length !== targetSchema.premiseTemplates.length) {
       replayFail("target-assumption-mismatch");
@@ -183,9 +179,7 @@ export function replayStructuralDerivedDerivationSchema(
           schema = readStructuralDerivationRule(memory, node.derivationRule);
           rule = readStructuralRule(memory, schema.structuralRule);
           readStructuralRoleDictionary(memory, rule.roleDictionary);
-        } catch {
-          replayFail("invalid-node");
-        }
+        } catch (error) { if (error instanceof StructuralDerivationReplayError || error instanceof StructuralRuleError) replayFail("invalid-node"); throw error; }
 
         if (rule.roleDictionary !== targetRule.roleDictionary) {
           replayFail("role-dictionary-mismatch");

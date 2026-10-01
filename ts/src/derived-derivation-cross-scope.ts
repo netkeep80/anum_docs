@@ -1,11 +1,12 @@
-import { type LinkHandle, type ReadMemory } from "./memory.js";
-import { readStructuralDerivationRule } from "./derivation.js";
+import { MemoryError, type LinkHandle, type ReadMemory } from "./memory.js";
+import { StructuralDerivationReplayError, readStructuralDerivationRule } from "./derivation.js";
 import {
+  StructuralDerivedDerivationReplayError,
   replayStructuralDerivedDerivationSchema,
   type StructuralDerivedDerivationEvidence,
   type StructuralDerivedDerivationReplayResult,
 } from "./derived-derivation-schema.js";
-import { readStructuralRoleDictionary, readStructuralRule } from "./structural-rule.js";
+import { StructuralRuleError, readStructuralRoleDictionary, readStructuralRule } from "./structural-rule.js";
 import {
   StructuralRoleMorphismError,
   replayStructuralRoleMorphism,
@@ -93,9 +94,7 @@ export function replayStructuralDerivedDerivationCrossScopeApplication(
     let source: StructuralDerivedDerivationReplayResult;
     try {
       source = replayStructuralDerivedDerivationSchema(memory, evidence.source);
-    } catch {
-      fail("invalid-source-schema");
-    }
+    } catch (error) { if (error instanceof StructuralDerivedDerivationReplayError) fail("invalid-source-schema"); throw error; }
 
     let sourceSchema: ReturnType<typeof readStructuralDerivationRule>;
     let sourceRule: ReturnType<typeof readStructuralRule>;
@@ -104,17 +103,13 @@ export function replayStructuralDerivedDerivationCrossScopeApplication(
       sourceSchema = readStructuralDerivationRule(memory, source.derivationRule);
       sourceRule = readStructuralRule(memory, sourceSchema.structuralRule);
       sourceRoles = readStructuralRoleDictionary(memory, sourceRule.roleDictionary).roles;
-    } catch {
-      fail("invalid-source-schema");
-    }
+    } catch (error) { if (error instanceof StructuralDerivationReplayError || error instanceof StructuralRuleError) fail("invalid-source-schema"); throw error; }
 
     let targetDerivationRule: LinkHandle;
     let targetTheory: LinkHandle;
     try {
       ({ start: targetDerivationRule, end: targetTheory } = memory.poles(evidence.targetIdentity));
-    } catch {
-      fail("invalid-target-identity");
-    }
+    } catch (error) { if (error instanceof MemoryError) fail("invalid-target-identity"); throw error; }
     if (targetTheory !== source.theory) fail("theory-mismatch");
 
     let targetSchema: ReturnType<typeof readStructuralDerivationRule>;
@@ -124,9 +119,7 @@ export function replayStructuralDerivedDerivationCrossScopeApplication(
       targetSchema = readStructuralDerivationRule(memory, targetDerivationRule);
       targetRule = readStructuralRule(memory, targetSchema.structuralRule);
       targetRoles = readStructuralRoleDictionary(memory, targetRule.roleDictionary).roles;
-    } catch {
-      fail("invalid-target-identity");
-    }
+    } catch (error) { if (error instanceof StructuralDerivationReplayError || error instanceof StructuralRuleError) fail("invalid-target-identity"); throw error; }
 
     let bindings: readonly CrossScopeRoleMorphismBinding[];
     try {
@@ -137,10 +130,7 @@ export function replayStructuralDerivedDerivationCrossScopeApplication(
         sourceRoles,
         targetRoles,
       }).bindings;
-    } catch (error) {
-      if (error instanceof StructuralRoleMorphismError) mapMorphismError(error);
-      throw error;
-    }
+    } catch (error) { if (error instanceof StructuralRoleMorphismError) mapMorphismError(error); throw error; }
 
     if (sourceSchema.premiseTemplates.length !== targetSchema.premiseTemplates.length) {
       fail("premise-count-mismatch");
