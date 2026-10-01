@@ -1,4 +1,4 @@
-import { findRepositoryRoot } from "./docs-sync.js";
+// Diagnostic branch only: comment-only touch to trigger the Pages path filter; never merge.\nimport { findRepositoryRoot } from "./docs-sync.js";
 import { buildMarkdownCoverageAudit } from "./markdown-coverage-audit.js";
 
 const report = buildMarkdownCoverageAudit(findRepositoryRoot());
