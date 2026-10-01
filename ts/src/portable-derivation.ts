@@ -75,7 +75,7 @@ export interface PortableStructuralDerivationNode {
   readonly premiseOccurrenceSequence: number;
 }
 
-interface PortableStructuralDerivationCoordinates {
+export interface PortableStructuralDerivationCoordinates {
   readonly theoryCoordinate: number;
   readonly targetOccurrenceCoordinate: number;
   readonly nodes: readonly PortableStructuralDerivationNode[];
@@ -152,7 +152,7 @@ function record(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-function exactRecord(value: unknown, keys: readonly string[]): Record<string, unknown> {
+export function exactRecord(value: unknown, keys: readonly string[]): Record<string, unknown> {
   const candidate = record(value);
   const actual = Object.keys(candidate).sort();
   const expected = [...keys].sort();
@@ -165,14 +165,14 @@ function exactRecord(value: unknown, keys: readonly string[]): Record<string, un
   return candidate;
 }
 
-function coordinate(value: unknown): number {
+export function coordinate(value: unknown): number {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
     fail("invalid-coordinate");
   }
   return value;
 }
 
-function parseTopology(value: unknown): StorageTopologyImage {
+export function parseTopology(value: unknown): StorageTopologyImage {
   const image = exactRecord(value, ["schema", "root", "links"]);
   if (image.schema !== STORAGE_TOPOLOGY_SCHEMA) fail("invalid-topology");
   const root = coordinate(image.root);
@@ -250,7 +250,7 @@ function parseNode(value: unknown): PortableStructuralDerivationNode {
   });
 }
 
-function parseNodes(value: unknown): readonly PortableStructuralDerivationNode[] {
+export function parseNodes(value: unknown): readonly PortableStructuralDerivationNode[] {
   if (!Array.isArray(value)) fail("invalid-envelope");
   const nodes = value.map(parseNode);
   for (let index = 1; index < nodes.length; index += 1) {
@@ -320,7 +320,7 @@ function parseArtifactWithAssumptions(
   });
 }
 
-function sameTopology(left: StorageTopologyImage, right: StorageTopologyImage): boolean {
+export function sameTopology(left: StorageTopologyImage, right: StorageTopologyImage): boolean {
   if (
     left.schema !== right.schema ||
     left.root !== right.root ||
@@ -334,7 +334,7 @@ function sameTopology(left: StorageTopologyImage, right: StorageTopologyImage): 
   });
 }
 
-function sourceCoordinate(
+export function sourceCoordinate(
   coordinates: ReadonlyMap<LinkHandle, number>,
   handle: LinkHandle,
 ): number {
@@ -375,7 +375,7 @@ function encodeNode(
   });
 }
 
-function encodeNodes(
+export function encodeNodes(
   coordinates: ReadonlyMap<LinkHandle, number>,
   evidence: StructuralDerivationEvidence,
 ): readonly PortableStructuralDerivationNode[] {
@@ -443,7 +443,7 @@ export function exportPortableStructuralDerivationWithAssumptions(
   }
 }
 
-function restoreCanonicalTopology(topology: StorageTopologyImage): {
+export function restoreCanonicalTopology(topology: StorageTopologyImage): {
   readonly memory: Memory;
   readonly refs: ReadonlyMap<number, LinkHandle>;
 } {
@@ -473,13 +473,13 @@ function restoreCanonicalTopology(topology: StorageTopologyImage): {
   return Object.freeze({ memory, refs });
 }
 
-function freshHandle(refs: ReadonlyMap<number, LinkHandle>, local: number): LinkHandle {
+export function freshHandle(refs: ReadonlyMap<number, LinkHandle>, local: number): LinkHandle {
   const handle = refs.get(local);
   if (handle === undefined) fail("invalid-coordinate");
   return handle;
 }
 
-function reconstructEvidence(
+export function reconstructEvidence(
   artifact: PortableStructuralDerivationCoordinates,
   refs: ReadonlyMap<number, LinkHandle>,
 ): StructuralDerivationEvidence {
