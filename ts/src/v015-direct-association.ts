@@ -25,8 +25,7 @@ export interface V015DirectAssociationAlgebra<T> {
 
 export type V015DirectAssociationErrorCode =
   | "empty-semantic-source-order"
-  | "invalid-semantic-source-order"
-  | "unimplemented";
+  | "invalid-semantic-source-order";
 
 export class V015DirectAssociationError extends Error {
   override readonly name = "V015DirectAssociationError";
@@ -49,7 +48,19 @@ export function directSequentialAssociation<T>(
   source: V015SemanticSourceOrder<T>,
   algebra: V015DirectAssociationAlgebra<T>,
 ): T {
-  void source;
-  void algebra;
-  throw new V015DirectAssociationError("unimplemented");
+  if (
+    source.schema !== V015_SEMANTIC_SOURCE_ORDER_SCHEMA
+    || !Array.isArray(source.values)
+  ) {
+    throw new V015DirectAssociationError("invalid-semantic-source-order");
+  }
+  if (source.values.length === 0) {
+    throw new V015DirectAssociationError("empty-semantic-source-order");
+  }
+
+  let current = source.values[0]!;
+  for (let index = 1; index < source.values.length; index += 1) {
+    current = algebra.link(current, source.values[index]!);
+  }
+  return current;
 }
