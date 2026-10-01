@@ -1175,6 +1175,7 @@ same(
   "whole-ts-src-package",
   "S3 identifies whole-package audit counts",
 );
+console.log("P1F_TYPED_READ_COUNTS", JSON.stringify(typedReadMemberCounts));
 same(decisionAudit.typedReadSiteCount, typedReadSites.length, "typed ReadMemory site count");
 same(decisionAudit.typedReadOwnerCount, typedReadOwners.length, "typed ReadMemory owner count");
 same(
