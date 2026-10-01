@@ -182,6 +182,14 @@ const v015FormalRolesResearchFunctions = new Set<string>([
   "resolveV015DotRole",
   "validateV015Rebinding",
 ]);
+// v0.15 P4 canonical Grammar/AST bridge is current research, never retroactive v0.13 evidence.
+const v015FormalGrammarResearchPath = "ts/src/v015-formal-grammar.ts";
+const v015FormalGrammarResearchFunctions = new Set<string>([
+  "elaborateV015FormalProjection",
+  "denoteV015FormalAst",
+  "normalizeV015FormalAst",
+  "v015FormalAstStructureEqual",
+]);
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
 function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<string> {
@@ -190,6 +198,7 @@ function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<strin
   if (sourcePath === v015DirectAssociationResearchPath) return v015DirectAssociationResearchFunctions;
   if (sourcePath === v015WritingProjectionResearchPath) return v015WritingProjectionResearchFunctions;
   if (sourcePath === v015FormalRolesResearchPath) return v015FormalRolesResearchFunctions;
+  if (sourcePath === v015FormalGrammarResearchPath) return v015FormalGrammarResearchFunctions;
   return new Set<string>();
 }
 
