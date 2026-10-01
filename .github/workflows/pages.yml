@@ -9,6 +9,9 @@ on:
       - "repo-policy.json"
       - "requirements/**"
       - "traceability/**"
+      # v0.15 research stays outside current-tier authority but must run the full semantic suite.
+      - "ts/src/v015-*.ts"
+      - "ts/test/research-v015-*.test.ts"
       - "ts/src/tooling/mts-compiler.ts"
       - "ts/src/tooling/markdown-section-adapter.ts"
       - "web/contract-observatory/**"
@@ -21,6 +24,9 @@ on:
       - "repo-policy.json"
       - "requirements/**"
       - "traceability/**"
+      # v0.15 research stays outside current-tier authority but must run the full semantic suite.
+      - "ts/src/v015-*.ts"
+      - "ts/test/research-v015-*.test.ts"
       - "ts/src/tooling/mts-compiler.ts"
       - "ts/src/tooling/markdown-section-adapter.ts"
       - "web/contract-observatory/**"
