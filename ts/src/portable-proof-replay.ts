@@ -47,12 +47,6 @@ import {
 export const PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_SCHEMA =
   "mts-portable-structural-derivation-with-theorems/v0.1" as const;
 
-interface PortableStructuralDerivationCoordinates {
-  readonly theoryCoordinate: number;
-  readonly targetOccurrenceCoordinate: number;
-  readonly nodes: readonly PortableStructuralDerivationNode[];
-}
-
 export interface PortableStructuralTheoremEvidenceCoordinates {
   readonly theoremCoordinate: number;
   readonly proof: PortableStructuralDerivationCoordinates;
