@@ -175,7 +175,7 @@ const v015WritingProjectionResearchFunctions = new Set<string>([
   "semanticStructureEqual",
 ]);
 // v0.15 P3 FORMAL-role resolution is current research, never retroactive v0.13 evidence.
-const v015FormalRolesResearchPath = "ts/src/v015-formal-roles.ts";
+// Exclusion remains exact by path+function; unrelated P3 growth still fails closed.\nconst v015FormalRolesResearchPath = "ts/src/v015-formal-roles.ts";
 const v015FormalRolesResearchFunctions = new Set<string>([
   "resolveV015ParenthesesRole",
   "resolveV015DotRole",
