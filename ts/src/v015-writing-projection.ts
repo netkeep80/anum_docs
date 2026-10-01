@@ -6,7 +6,8 @@ import {
   type V015SemanticSourceOrder,
 } from "./v015-direct-association.js";
 
-// P2 keeps semantic/source structure separate from physical writing order.\nexport const V015_WRITING_PROJECTION_SCHEMA =
+// P2 keeps semantic/source structure separate from physical writing order.
+export const V015_WRITING_PROJECTION_SCHEMA =
   "mts-v0.15/writing-direction-projection/research-v0" as const;
 
 export const V015_WRITING_DIRECTION_RESEARCH = Object.freeze({
