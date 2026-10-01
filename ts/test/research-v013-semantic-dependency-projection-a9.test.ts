@@ -1124,6 +1124,7 @@ const decisionCandidates: readonly DecisionCandidate[] = [...decisionSignalsByOw
 const decisionAudit = projection.packageSemanticDecisionAudit;
 assert(decisionAudit !== undefined, "P1f semantic decision audit is declared");
 
+// Derived documentation tooling is non-semantic but remains path-classified and fail-closed.
 const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/docs-sync.ts",
   "ts/src/tooling/markdown-coverage-audit.ts",
