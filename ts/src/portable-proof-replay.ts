@@ -21,24 +21,19 @@ import {
   PORTABLE_MTS_SEMANTIC_BASE,
   PORTABLE_STRUCTURAL_DERIVATION_WITH_ASSUMPTIONS_SCHEMA,
   PortableStructuralDerivationError,
-  coordinate,
-  encodeNodes,
-  exactRecord,
-  freshHandle,
-  parseNodes,
-  parseTopology,
-  reconstructEvidence,
   replayPortableStructuralDerivation,
   replayPortableStructuralDerivationWithAssumptions,
-  restoreCanonicalTopology,
-  sameTopology,
-  sourceCoordinate,
-  type PortableStructuralDerivationCoordinates,
   type PortableStructuralDerivationErrorCode,
+  type PortableStructuralDerivationNode,
   type PortableStructuralDerivationReplayResult,
   type PortableStructuralDerivationWithAssumptionsReplayResult,
 } from "./portable-derivation.js";
-import type { StorageTopologyImage } from "./persistence-topology.js";
+import {
+  PersistenceTopologyError,
+  STORAGE_TOPOLOGY_SCHEMA,
+  restoreTopology,
+  type StorageTopologyImage,
+} from "./persistence-topology.js";
 import {
   StructuralDerivationSupportTopologyError,
   exportStructuralDerivationSupportTopology,
@@ -46,6 +41,12 @@ import {
 
 export const PORTABLE_STRUCTURAL_DERIVATION_WITH_THEOREMS_SCHEMA =
   "mts-portable-structural-derivation-with-theorems/v0.1" as const;
+
+interface PortableStructuralDerivationCoordinates {
+  readonly theoryCoordinate: number;
+  readonly targetOccurrenceCoordinate: number;
+  readonly nodes: readonly PortableStructuralDerivationNode[];
+}
 
 export interface PortableStructuralTheoremEvidenceCoordinates {
   readonly theoremCoordinate: number;
@@ -76,6 +77,118 @@ export type PortableStructuralProofReplayResult =
 
 function fail(code: PortableStructuralDerivationErrorCode): never {
   throw new PortableStructuralDerivationError(code);
+}
+
+function record(value: unknown): Record<string, unknown> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    fail("invalid-envelope");
+  }
+  return value as Record<string, unknown>;
+}
+
+function exactRecord(value: unknown, keys: readonly string[]): Record<string, unknown> {
+  const candidate = record(value);
+  const actual = Object.keys(candidate).sort();
+  const expected = [...keys].sort();
+  if (
+    actual.length !== expected.length ||
+    actual.some((key, index) => key !== expected[index])
+  ) {
+    fail("invalid-envelope");
+  }
+  return candidate;
+}
+
+function coordinate(value: unknown): number {
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+    fail("invalid-coordinate");
+  }
+  return value;
+}
+
+function parseTopology(value: unknown): StorageTopologyImage {
+  const image = exactRecord(value, ["schema", "root", "links"]);
+  if (image.schema !== STORAGE_TOPOLOGY_SCHEMA) fail("invalid-topology");
+  const root = coordinate(image.root);
+  if (!Array.isArray(image.links) || image.links.length === 0) fail("invalid-topology");
+  const links = image.links.map((item) => {
+    if (!Array.isArray(item) || item.length !== 2) fail("invalid-topology");
+    return Object.freeze([coordinate(item[0]), coordinate(item[1])] as const);
+  });
+  return Object.freeze({
+    schema: STORAGE_TOPOLOGY_SCHEMA,
+    root,
+    links: Object.freeze(links),
+  });
+}
+
+function parseInterpreter(value: unknown) {
+  const item = exactRecord(value, ["dictionary", "grammar", "theory"]);
+  return Object.freeze({
+    dictionary: coordinate(item.dictionary),
+    grammar: coordinate(item.grammar),
+    theory: coordinate(item.theory),
+  });
+}
+
+function parseApplication(value: unknown) {
+  const item = exactRecord(value, [
+    "act",
+    "rule",
+    "ruleAdmission",
+    "claimedBody",
+    "expectedInterpreter",
+    "expectedAfterContext",
+  ]);
+  return Object.freeze({
+    act: coordinate(item.act),
+    rule: coordinate(item.rule),
+    ruleAdmission: coordinate(item.ruleAdmission),
+    claimedBody: coordinate(item.claimedBody),
+    expectedInterpreter: parseInterpreter(item.expectedInterpreter),
+    expectedAfterContext: coordinate(item.expectedAfterContext),
+  });
+}
+
+function parseJudgment(value: unknown) {
+  const item = exactRecord(value, ["application", "judgment"]);
+  const judgment = exactRecord(item.judgment, ["theory", "context", "claim"]);
+  return Object.freeze({
+    application: parseApplication(item.application),
+    judgment: Object.freeze({
+      theory: coordinate(judgment.theory),
+      context: coordinate(judgment.context),
+      claim: coordinate(judgment.claim),
+    }),
+  });
+}
+
+function parseNode(value: unknown): PortableStructuralDerivationNode {
+  const item = exactRecord(value, [
+    "occurrence",
+    "judgment",
+    "derivationRule",
+    "derivationRuleAdmission",
+    "premiseOccurrenceSequence",
+  ]);
+  return Object.freeze({
+    occurrence: coordinate(item.occurrence),
+    judgment: parseJudgment(item.judgment),
+    derivationRule: coordinate(item.derivationRule),
+    derivationRuleAdmission: coordinate(item.derivationRuleAdmission),
+    premiseOccurrenceSequence: coordinate(item.premiseOccurrenceSequence),
+  });
+}
+
+function parseNodes(value: unknown): readonly PortableStructuralDerivationNode[] {
+  if (!Array.isArray(value)) fail("invalid-envelope");
+  const nodes = value.map(parseNode);
+  for (let index = 1; index < nodes.length; index += 1) {
+    if (nodes[index - 1]!.occurrence >= nodes[index]!.occurrence) {
+      fail("noncanonical-node-order");
+    }
+  }
+  return Object.freeze(nodes);
 }
 
 function parseDerivation(value: unknown): PortableStructuralDerivationCoordinates {
@@ -226,16 +339,67 @@ function exportWithTheoremsSupport(
   }
 }
 
+function sourceCoordinate(
+  coordinates: ReadonlyMap<LinkHandle, number>,
+  handle: LinkHandle,
+): number {
+  const found = coordinates.get(handle);
+  if (found === undefined) fail("invalid-coordinate");
+  return found;
+}
+
+function encodeNode(
+  coordinates: ReadonlyMap<LinkHandle, number>,
+  node: StructuralDerivationEvidence["nodes"][number],
+): PortableStructuralDerivationNode {
+  const c = (handle: LinkHandle): number => sourceCoordinate(coordinates, handle);
+  return Object.freeze({
+    occurrence: c(node.occurrence),
+    judgment: Object.freeze({
+      application: Object.freeze({
+        act: c(node.judgment.application.act),
+        rule: c(node.judgment.application.rule),
+        ruleAdmission: c(node.judgment.application.ruleAdmission),
+        claimedBody: c(node.judgment.application.claimedBody),
+        expectedInterpreter: Object.freeze({
+          dictionary: c(node.judgment.application.expectedInterpreter.dictionary),
+          grammar: c(node.judgment.application.expectedInterpreter.grammar),
+          theory: c(node.judgment.application.expectedInterpreter.theory),
+        }),
+        expectedAfterContext: c(node.judgment.application.expectedAfterContext),
+      }),
+      judgment: Object.freeze({
+        theory: c(node.judgment.judgment.theory),
+        context: c(node.judgment.judgment.context),
+        claim: c(node.judgment.judgment.claim),
+      }),
+    }),
+    derivationRule: c(node.derivationRule),
+    derivationRuleAdmission: c(node.derivationRuleAdmission),
+    premiseOccurrenceSequence: c(node.premiseOccurrenceSequence),
+  });
+}
+
 function encodeDerivation(
   coordinates: ReadonlyMap<LinkHandle, number>,
   evidence: StructuralDerivationEvidence,
 ): PortableStructuralDerivationCoordinates {
+  const c = (handle: LinkHandle): number => sourceCoordinate(coordinates, handle);
+  const nodes = evidence.nodes
+    .map((node) => encodeNode(coordinates, node))
+    .sort((left, right) => left.occurrence - right.occurrence);
+  for (let index = 1; index < nodes.length; index += 1) {
+    if (nodes[index - 1]!.occurrence === nodes[index]!.occurrence) {
+      fail("noncanonical-node-order");
+    }
+  }
   return Object.freeze({
-    theoryCoordinate: sourceCoordinate(coordinates, evidence.theory),
-    targetOccurrenceCoordinate: sourceCoordinate(coordinates, evidence.targetOccurrence),
-    nodes: encodeNodes(coordinates, evidence),
+    theoryCoordinate: c(evidence.theory),
+    targetOccurrenceCoordinate: c(evidence.targetOccurrence),
+    nodes: Object.freeze(nodes),
   });
 }
+
 export function exportPortableStructuralDerivationWithTheorems(
   memory: ReadMemory,
   evidence: StructuralDerivationWithTheoremsEvidence,
@@ -257,13 +421,93 @@ export function exportPortableStructuralDerivationWithTheorems(
   });
 }
 
+function sameTopology(left: StorageTopologyImage, right: StorageTopologyImage): boolean {
+  return left.schema === right.schema &&
+    left.root === right.root &&
+    left.links.length === right.links.length &&
+    left.links.every((pair, index) => {
+      const other = right.links[index];
+      return other !== undefined && pair[0] === other[0] && pair[1] === other[1];
+    });
+}
+
+function restoreCanonicalTopology(topology: StorageTopologyImage): {
+  readonly memory: Memory;
+  readonly refs: ReadonlyMap<number, LinkHandle>;
+} {
+  let memory: Memory;
+  try {
+    memory = restoreTopology(topology);
+  } catch (error) {
+    if (error instanceof PersistenceTopologyError) fail("invalid-topology");
+    throw error;
+  }
+  let canonical;
+  try {
+    canonical = exportCanonicalTopology(memory);
+  } catch (error) {
+    if (error instanceof CanonicalTopologyError) fail("invalid-topology");
+    throw error;
+  }
+  if (!sameTopology(canonical.topology, topology)) fail("noncanonical-topology");
+  const refs = new Map<number, LinkHandle>();
+  for (const [handle, local] of canonical.coordinates) {
+    if (refs.has(local)) fail("invalid-topology");
+    refs.set(local, handle);
+  }
+  if (refs.size !== topology.links.length) fail("invalid-topology");
+  return Object.freeze({ memory, refs });
+}
+
+function freshHandle(refs: ReadonlyMap<number, LinkHandle>, local: number): LinkHandle {
+  const handle = refs.get(local);
+  if (handle === undefined) fail("invalid-coordinate");
+  return handle;
+}
+
+function reconstructDerivation(
+  artifact: PortableStructuralDerivationCoordinates,
+  refs: ReadonlyMap<number, LinkHandle>,
+): StructuralDerivationEvidence {
+  const h = (local: number): LinkHandle => freshHandle(refs, local);
+  return Object.freeze({
+    theory: h(artifact.theoryCoordinate),
+    targetOccurrence: h(artifact.targetOccurrenceCoordinate),
+    nodes: Object.freeze(artifact.nodes.map((node) => Object.freeze({
+      occurrence: h(node.occurrence),
+      judgment: Object.freeze({
+        application: Object.freeze({
+          act: h(node.judgment.application.act),
+          rule: h(node.judgment.application.rule),
+          ruleAdmission: h(node.judgment.application.ruleAdmission),
+          claimedBody: h(node.judgment.application.claimedBody),
+          expectedInterpreter: Object.freeze({
+            dictionary: h(node.judgment.application.expectedInterpreter.dictionary),
+            grammar: h(node.judgment.application.expectedInterpreter.grammar),
+            theory: h(node.judgment.application.expectedInterpreter.theory),
+          }),
+          expectedAfterContext: h(node.judgment.application.expectedAfterContext),
+        }),
+        judgment: Object.freeze({
+          theory: h(node.judgment.judgment.theory),
+          context: h(node.judgment.judgment.context),
+          claim: h(node.judgment.judgment.claim),
+        }),
+      }),
+      derivationRule: h(node.derivationRule),
+      derivationRuleAdmission: h(node.derivationRuleAdmission),
+      premiseOccurrenceSequence: h(node.premiseOccurrenceSequence),
+    }))),
+  });
+}
+
 function reconstructTheorem(
   artifact: PortableStructuralTheoremEvidenceCoordinates,
   refs: ReadonlyMap<number, LinkHandle>,
 ): StructuralTheoremEvidence {
   return Object.freeze({
     theorem: freshHandle(refs, artifact.theoremCoordinate),
-    proof: reconstructEvidence(artifact.proof, refs),
+    proof: reconstructDerivation(artifact.proof, refs),
   });
 }
 
@@ -273,7 +517,7 @@ export function replayPortableStructuralDerivationWithTheorems(
   const artifact = parseArtifactWithTheorems(input);
   const restored = restoreCanonicalTopology(artifact.topology);
   const evidence: StructuralDerivationWithTheoremsEvidence = Object.freeze({
-    derivation: reconstructEvidence(artifact, restored.refs),
+    derivation: reconstructDerivation(artifact, restored.refs),
     theorems: Object.freeze(artifact.theorems.map((theorem) => reconstructTheorem(theorem, restored.refs))),
   });
   const beforeReplay = restored.memory.linkCount;
