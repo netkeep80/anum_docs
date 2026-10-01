@@ -1,7 +1,6 @@
 import {
   V015_SEMANTIC_SOURCE_ORDER_SCHEMA,
   declareV015SemanticSourceOrder,
-  directSequentialAssociation,
   type V015DirectAssociationAlgebra,
   type V015SemanticSourceOrder,
 } from "./v015-direct-association.js";
