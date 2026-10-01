@@ -183,7 +183,7 @@ const v015FormalRolesResearchFunctions = new Set<string>([
   "validateV015Rebinding",
 ]);
 // v0.15 P4 canonical Grammar/AST bridge is current research, never retroactive v0.13 evidence.
-const v015FormalGrammarResearchPath = "ts/src/v015-formal-grammar.ts";
+// P4 exclusion is exact by path+function; future unlisted candidate growth remains fail-closed.\nconst v015FormalGrammarResearchPath = "ts/src/v015-formal-grammar.ts";
 const v015FormalGrammarResearchFunctions = new Set<string>([
   "elaborateV015FormalProjection",
   "denoteV015FormalAst",
