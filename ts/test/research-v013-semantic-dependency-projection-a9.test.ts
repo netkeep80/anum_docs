@@ -158,6 +158,7 @@ const postV013CarrierPath = "ts/src/v013-hierarchical-carrier.ts";
 const postV013ProofTransportPath = "ts/src/portable-closed-rooted-proof.ts";
 const postV013ProofTransportFunctions = new Set<string>([
   "exportPortableClosedRootedProof",
+  "replayPortableClosedRootedProof",
 ]);
 
 // Exceptions are path+function exact so any unrelated post-v0.13 growth still fails closed.
