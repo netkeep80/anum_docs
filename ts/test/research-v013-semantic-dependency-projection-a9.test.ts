@@ -174,6 +174,13 @@ const v015WritingProjectionResearchFunctions = new Set<string>([
   "denoteV015SurfaceExpression",
   "semanticStructureEqual",
 ]);
+// v0.15 P3 FORMAL-role resolution is current research, never retroactive v0.13 evidence.
+const v015FormalRolesResearchPath = "ts/src/v015-formal-roles.ts";
+const v015FormalRolesResearchFunctions = new Set<string>([
+  "resolveV015ParenthesesRole",
+  "resolveV015DotRole",
+  "validateV015Rebinding",
+]);
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
 function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<string> {
@@ -181,6 +188,7 @@ function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<strin
   if (sourcePath === postV013ProofTransportPath) return postV013ProofTransportFunctions;
   if (sourcePath === v015DirectAssociationResearchPath) return v015DirectAssociationResearchFunctions;
   if (sourcePath === v015WritingProjectionResearchPath) return v015WritingProjectionResearchFunctions;
+  if (sourcePath === v015FormalRolesResearchPath) return v015FormalRolesResearchFunctions;
   return new Set<string>();
 }
 
