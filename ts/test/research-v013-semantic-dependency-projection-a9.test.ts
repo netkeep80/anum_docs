@@ -166,7 +166,7 @@ const v015DirectAssociationResearchPath = "ts/src/v015-direct-association.ts";
 const v015DirectAssociationResearchFunctions = new Set<string>([
   "directSequentialAssociation",
 ]);
-const v015WritingProjectionResearchPath = "ts/src/v015-writing-projection.ts";
+// v0.15 P2 writing projection is current research, never retroactive v0.13 evidence.\nconst v015WritingProjectionResearchPath = "ts/src/v015-writing-projection.ts";
 const v015WritingProjectionResearchFunctions = new Set<string>([
   "renderV015WritingProjection",
   "parseV015WritingProjection",
