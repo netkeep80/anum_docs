@@ -20,9 +20,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      # repo-guard 3.2.1 exact accepted pin
       - name: Run repo-guard
         id: repo_guard
-        uses: netkeep80/repo-guard@756944656fa14de752f44bb404e1dca852f5fa6a
+        uses: netkeep80/repo-guard@4eb9aea595f749f431de59fb26fd44e01ad6b1af
         with:
           mode: check-pr
           enforcement: blocking
