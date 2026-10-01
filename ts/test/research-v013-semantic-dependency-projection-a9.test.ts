@@ -186,7 +186,10 @@ const memoryMembers = new Set([
   "ensure",
 ]);
 
-function observedDirectDependencies(sourcePath: string): readonly string[] {
+function observedDirectDependencies(
+  sourcePath: string,
+  excludedFunctions: ReadonlySet<string> = new Set<string>(),
+): readonly string[] {
   const source = ts.createSourceFile(
     sourcePath,
     read(sourcePath),
@@ -217,6 +220,14 @@ function observedDirectDependencies(sourcePath: string): readonly string[] {
 
   const observed = new Set<string>();
   const visit = (node: ts.Node): void => {
+    if (
+      ts.isFunctionDeclaration(node) &&
+      node.name !== undefined &&
+      excludedFunctions.has(node.name.text)
+    ) {
+      return;
+    }
+
     if (ts.isCallExpression(node)) {
       if (ts.isIdentifier(node.expression)) {
         const imported = imports.get(node.expression.text);
@@ -242,8 +253,16 @@ function observedDirectDependencies(sourcePath: string): readonly string[] {
 }
 
 let undocumentedDirectDependencyCount = 0;
+// Historical P1 metrics exclude only the explicitly measured post-v0.13 inverse body.
+const postV013CarrierPath = "ts/src/v013-hierarchical-carrier.ts";
+
 for (const sourcePath of projection.auditScope.candidateKernelFiles as string[]) {
-  const observed = observedDirectDependencies(sourcePath);
+  const observed = observedDirectDependencies(
+    sourcePath,
+    sourcePath === postV013CarrierPath
+      ? postV013RepresentationPublicFunctions
+      : new Set<string>(),
+  );
   const declared = projection.auditScope.directDependenciesByFile[sourcePath] ?? [];
   setEqual(observed, declared, `${sourcePath}: direct dependency projection`);
 
@@ -258,7 +277,20 @@ same(
   projection.metrics.directUndocumentedDependencyCount,
   "direct undocumented dependency metric",
 );
-same(undocumentedDirectDependencyCount, 0, "no direct candidate-kernel dependency is undocumented");
+same(undocumentedDirectDependencyCount, 0, "no historical candidate-kernel dependency is undocumented");
+
+const historicalCarrierDependencies = observedDirectDependencies(
+  postV013CarrierPath,
+  postV013RepresentationPublicFunctions,
+);
+const currentCarrierDependencies = observedDirectDependencies(postV013CarrierPath);
+setEqual(
+  currentCarrierDependencies.filter(
+    (dependency) => !historicalCarrierDependencies.includes(dependency),
+  ),
+  ["memory#ensureEndSelfClosed", "memory#ensureStartSelfClosed"],
+  "post-v0.13 representation inverse direct dependency delta is exact",
+);
 
 // Every dependency relation is closed over declared capability IDs.
 const capabilities = new Map<string, any>(
@@ -557,7 +589,10 @@ function memberName(name: ts.PropertyName | undefined): string | undefined {
   return undefined;
 }
 
-function discoverDirectWriteSinks(sourcePath: string): readonly WriteSink[] {
+function discoverDirectWriteSinks(
+  sourcePath: string,
+  excludedFunctions: ReadonlySet<string> = new Set<string>(),
+): readonly WriteSink[] {
   const source = ts.createSourceFile(
     sourcePath,
     read(sourcePath),
@@ -571,6 +606,7 @@ function discoverDirectWriteSinks(sourcePath: string): readonly WriteSink[] {
     let nestedOwner = owner;
 
     if (ts.isFunctionDeclaration(node) && node.name !== undefined) {
+      if (excludedFunctions.has(node.name.text)) return;
       nestedOwner = node.name.text;
     } else if (ts.isMethodDeclaration(node)) {
       const method = memberName(node.name) ?? "<computed-method>";
@@ -615,7 +651,14 @@ function discoverDirectWriteSinks(sourcePath: string): readonly WriteSink[] {
 }
 
 const observedDirectWriteSinks = tsSourceFiles("ts/src")
-  .flatMap(discoverDirectWriteSinks)
+  .flatMap((sourcePath) =>
+    discoverDirectWriteSinks(
+      sourcePath,
+      sourcePath === postV013CarrierPath
+        ? postV013RepresentationPublicFunctions
+        : new Set<string>(),
+    )
+  )
   .sort((left, right) =>
     left.file.localeCompare(right.file) ||
     left.owner.localeCompare(right.owner) ||
@@ -625,6 +668,17 @@ const observedDirectWriteSinks = tsSourceFiles("ts/src")
 const observedDirectWriteOwners = [...new Set(
   observedDirectWriteSinks.map((sink) => `${sink.file}#${sink.owner}`),
 )].sort();
+
+const currentDirectWriteOwners = [...new Set(
+  tsSourceFiles("ts/src")
+    .flatMap((sourcePath) => discoverDirectWriteSinks(sourcePath))
+    .map((sink) => `${sink.file}#${sink.owner}`),
+)].sort();
+setEqual(
+  currentDirectWriteOwners.filter((owner) => !observedDirectWriteOwners.includes(owner)),
+  ["ts/src/v013-hierarchical-carrier.ts#build"],
+  "post-v0.13 representation inverse direct write owner delta is exact",
+);
 
 if (projection.packageDirectSemanticWriteAudit === undefined) {
   console.log(
@@ -932,6 +986,14 @@ for (const sourcePath of sourcePaths) {
   };
 
   const visit = (node: ts.Node): void => {
+    if (
+      ts.isFunctionDeclaration(node) &&
+      node.name !== undefined &&
+      postV013RepresentationPublicFunctions.has(node.name.text)
+    ) {
+      return;
+    }
+
     if (ts.isPropertyAccessExpression(node)) {
       const member = node.name.text;
       const symbol = typeChecker.getSymbolAtLocation(node.name);
