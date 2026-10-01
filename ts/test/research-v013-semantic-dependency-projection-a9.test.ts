@@ -150,10 +150,22 @@ for (const statement of publicSource.statements) {
   }
 }
 
-// Post-v0.13 representation additions are explicit audit deltas, not retroactive historical semantics.
+// Post-v0.13 additions are explicit audit deltas, not retroactive historical semantics.
 const postV013RepresentationPublicFunctions = new Set<string>([
   "materializeV013SemanticLinkFromHierarchicalCarrier",
 ]);
+const postV013CarrierPath = "ts/src/v013-hierarchical-carrier.ts";
+const postV013ProofTransportPath = "ts/src/portable-closed-rooted-proof.ts";
+const postV013ProofTransportFunctions = new Set<string>([
+  "exportPortableClosedRootedProof",
+]);
+
+// Exceptions are path+function exact so any unrelated post-v0.13 growth still fails closed.
+function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<string> {
+  if (sourcePath === postV013CarrierPath) return postV013RepresentationPublicFunctions;
+  if (sourcePath === postV013ProofTransportPath) return postV013ProofTransportFunctions;
+  return new Set<string>();
+}
 
 setEqual(
   [...observedPublicFunctions].filter(
@@ -253,15 +265,11 @@ function observedDirectDependencies(
 }
 
 let undocumentedDirectDependencyCount = 0;
-// Historical P1 metrics exclude only the explicitly measured post-v0.13 inverse body.
-const postV013CarrierPath = "ts/src/v013-hierarchical-carrier.ts";
-
+// Historical P1 metrics exclude only explicitly classified post-v0.13 function bodies.
 for (const sourcePath of projection.auditScope.candidateKernelFiles as string[]) {
   const observed = observedDirectDependencies(
     sourcePath,
-    sourcePath === postV013CarrierPath
-      ? postV013RepresentationPublicFunctions
-      : new Set<string>(),
+    historicalAuditExcludedFunctions(sourcePath),
   );
   const declared = projection.auditScope.directDependenciesByFile[sourcePath] ?? [];
   setEqual(observed, declared, `${sourcePath}: direct dependency projection`);
@@ -654,9 +662,7 @@ const observedDirectWriteSinks = tsSourceFiles("ts/src")
   .flatMap((sourcePath) =>
     discoverDirectWriteSinks(
       sourcePath,
-      sourcePath === postV013CarrierPath
-        ? postV013RepresentationPublicFunctions
-        : new Set<string>(),
+      historicalAuditExcludedFunctions(sourcePath),
     )
   )
   .sort((left, right) =>
@@ -676,8 +682,11 @@ const currentDirectWriteOwners = [...new Set(
 )].sort();
 setEqual(
   currentDirectWriteOwners.filter((owner) => !observedDirectWriteOwners.includes(owner)),
-  ["ts/src/v013-hierarchical-carrier.ts#build"],
-  "post-v0.13 representation inverse direct write owner delta is exact",
+  [
+    "ts/src/portable-closed-rooted-proof.ts#exportPortableClosedRootedProof",
+    "ts/src/v013-hierarchical-carrier.ts#build",
+  ],
+  "post-v0.13 non-semantic direct write owner delta is exact",
 );
 
 if (projection.packageDirectSemanticWriteAudit === undefined) {
@@ -974,6 +983,7 @@ const decisionSignalsByOwner = new Map<string, Set<string>>();
 for (const sourcePath of sourcePaths) {
   const source = typedProgram.getSourceFile(join(repoRoot, sourcePath));
   assert(source !== undefined, `typed source is available: ${sourcePath}`);
+  const excludedFunctions = historicalAuditExcludedFunctions(sourcePath);
 
   const addDecision = (node: ts.Node, signal: string): void => {
     const owner = `${sourcePath}#${nodeOwner(node)}`;
@@ -989,7 +999,7 @@ for (const sourcePath of sourcePaths) {
     if (
       ts.isFunctionDeclaration(node) &&
       node.name !== undefined &&
-      postV013RepresentationPublicFunctions.has(node.name.text)
+      excludedFunctions.has(node.name.text)
     ) {
       return;
     }
