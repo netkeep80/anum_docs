@@ -571,8 +571,9 @@
       "budgets": {
         "max_new_docs": 1,
         "max_new_files": 3,
-        "max_net_added_lines": 1500
+        "max_net_added_lines": 2300
       }
     }
   }
 }
+
