@@ -1,1 +1,579 @@
-{"policy_format_version":"0.3.0","repository_kind":"documentation","enforcement":{"mode":"blocking"},"packs":{"contract-conformance":{"current":{"contract":{"path":"contracts/mts-contract-v0.14.json","format":"json"},"conformance":{"path":"contracts/mts-conformance-v0.14.json","format":"json"}},"previous":{"contract":{"path":"contracts/mts-contract-v0.13.json","format":"json"},"conformance":{"path":"contracts/mts-conformance-v0.13.json","format":"json"}},"pair_fields":{"contract_id":"/schema","conformance_contract_id":"/contract","contract_conformance_path":"/conformanceCorpus","contract_status":"/status","conformance_status":"/status","contract_accepted":"/accepted","conformance_accepted":"/accepted"},"accepted_state":{"status":"accepted","accepted":true},"acceptance":{"document":{"path":"cutover/typescript-c1-acceptance-v0.7.json","format":"json"},"current_contract_path":"/current/contract","current_conformance_path":"/current/conformance"},"required_paths":[{"document":"current.contract","pointer":"/owners","projection":"object_values"},{"document":"current.conformance","pointer":"/requiredExecutableGates","projection":"array_items"},{"document":"acceptance","pointer":"/current","projection":"object_values"}],"cochange":["current.contract","current.conformance","acceptance"],"control_paths":["contracts/mts-contract-v*.json","contracts/mts-conformance-v*.json","cutover/typescript-c1-acceptance-v*.json"]}},"document_relations":{"documents":{"repo-guard-workflow":{"path":".github/workflows/repo-guard.yml","format":"yaml"},"branch-hygiene-workflow":{"path":".github/workflows/branch-hygiene.yml","format":"yaml"},"v014-requirements":{"path":"requirements/mts-v0.14.json","format":"json"}},"rules":[{"id":"repo-guard-workflow-mode","kind":"scalar_equals_literal","source":{"document":"repo-guard-workflow","pointer":"/jobs/policy-check/steps/1/with/mode","type":"string"},"value":"check-pr"},{"id":"repo-guard-workflow-enforcement","kind":"scalar_equals_literal","source":{"document":"repo-guard-workflow","pointer":"/jobs/policy-check/steps/1/with/enforcement","type":"string"},"value":"blocking"},{"id":"repo-guard-workflow-permission-contents","kind":"scalar_equals_literal","source":{"document":"repo-guard-workflow","pointer":"/permissions/contents","type":"string"},"value":"read"},{"id":"repo-guard-workflow-permission-issues","kind":"scalar_equals_literal","source":{"document":"repo-guard-workflow","pointer":"/permissions/issues","type":"string"},"value":"read"},{"id":"repo-guard-workflow-permission-pull-requests","kind":"scalar_equals_literal","source":{"document":"repo-guard-workflow","pointer":"/permissions/pull-requests","type":"string"},"value":"read"},{"id":"repo-guard-workflow-action-pin","kind":"scalar_equals_literal","source":{"document":"repo-guard-workflow","pointer":"/jobs/policy-check/steps/1/uses","type":"string"},"value":"netkeep80/repo-guard@756944656fa14de752f44bb404e1dca852f5fa6a"},{"id":"branch-hygiene-permission-contents-write","kind":"scalar_equals_literal","source":{"document":"branch-hygiene-workflow","pointer":"/permissions/contents","type":"string"},"value":"write"},{"id":"branch-hygiene-permission-pull-requests-write","kind":"scalar_equals_literal","source":{"document":"branch-hygiene-workflow","pointer":"/permissions/pull-requests","type":"string"},"value":"write"},{"id":"branch-hygiene-ensure-pr-job","kind":"scalar_equals_literal","source":{"document":"branch-hygiene-workflow","pointer":"/jobs/ensure-pr/name","type":"string"},"value":"Ensure draft PR for side branch"},{"id":"branch-hygiene-delete-merged-job","kind":"scalar_equals_literal","source":{"document":"branch-hygiene-workflow","pointer":"/jobs/delete-merged-head/name","type":"string"},"value":"Delete merged PR head branch"},{"id":"branch-hygiene-sweep-job","kind":"scalar_equals_literal","source":{"document":"branch-hygiene-workflow","pointer":"/jobs/sweep-fully-merged/name","type":"string"},"value":"Sweep fully merged stale branches"},{"id":"v014-requirements-status","kind":"scalar_equals_literal","source":{"document":"v014-requirements","pointer":"/status","type":"string"},"value":"accepted"},{"id":"v014-requirements-contract","kind":"scalar_equal","left":{"document":"v014-requirements","pointer":"/contract","type":"string"},"right":{"document":"contract-conformance.current.contract","pointer":"/schema","type":"string"}}]},"evidence_bindings":[{"id":"negative-vectors-have-test-evidence","kind":"anchor_value_coverage","source":{"document":"contract-conformance.current.conformance","pointer":"/requiredNegativeVectors","projection":"array_items","type":"string_set"},"target_anchor_type":"negative_vector_test"},{"id":"accepted-semantic-laws-have-doc-owners","kind":"anchor_value_coverage","source":{"document":"contract-conformance.current.contract","pointer":"/requiredSemanticLaws","projection":"object_keys","type":"string_set"},"target_anchor_type":"semantic_law_registry_owner"}],"anchors":{"types":{"negative_vector_test":{"sources":[{"kind":"regex","glob":"ts/test/release-cutover.test.ts","pattern":"negativeVector\\(\"([^\"]+)\""},{"kind":"regex","glob":"ts/test/v014-release-cutover-a75.test.ts","pattern":"negativeVector\\(\\\"([^\\\"]+)\\\""}]},"semantic_law_owner":{"sources":[{"kind":"regex","glob":"docs/specs/Формальная нотация МТС.md","pattern":"<a id=\"mts-law-([A-Za-z][A-Za-z0-9]*)\"></a>\\s*<!--\\s*нормативный владелец\\s*-->"},{"kind":"regex","glob":"docs/specs/Ачисла и сериализация.md","pattern":"<a id=\"mts-law-([A-Za-z][A-Za-z0-9]*)\"></a>\\s*<!--\\s*нормативный владелец\\s*-->"},{"kind":"regex","glob":"docs/specs/Апамять и управление сетью связей.md","pattern":"<a id=\"mts-law-([A-Za-z][A-Za-z0-9]*)\"></a>\\s*<!--\\s*нормативный владелец\\s*-->"}]},"semantic_law_reference":{"sources":[{"kind":"regex","glob":"README.md","pattern":"<!--\\s*ссылка:mts-law-([A-Za-z][A-Za-z0-9]*)\\s*-->"},{"kind":"regex","glob":"docs/**/*.md","pattern":"<!--\\s*ссылка:mts-law-([A-Za-z][A-Za-z0-9]*)\\s*-->"}]},"semantic_law_registry_owner":{"sources":[{"kind":"regex","glob":"requirements/mts-v0.14.json","pattern":"\\\"id\\\"\\s*:\\s*\\\"(V14-L[0-9]+)\\\""}]}}},"paths":{"forbidden":["legacy/**","archive/**","old/**","deprecated/**","*.bak","*.tmp","*.orig","docs/research/Новое осмысление МТС.md"],"canonical_docs":["README.md","docs/theory/Основания МТС.md","docs/theory/Система аксиом МТС.md","docs/specs/Формальная нотация МТС.md","docs/specs/Ачисла и сериализация.md","docs/specs/Апамять и управление сетью связей.md","docs/specs/Пучки связей.md","docs/Словарь терминов МТС.md"],"governance_paths":["repo-policy.json",".github/workflows/repo-guard.yml",".github/workflows/ci.yml","docs/research/Новое осмысление МТС.md",".github/workflows/branch-hygiene.yml"],"pr_immutable":["contracts/mts-conformance-v0.11.json","contracts/mts-conformance-v0.12.json","contracts/mts-conformance-v0.13.json","contracts/mts-conformance-v0.14.json","contracts/mts-contract-v0.11.json","contracts/mts-contract-v0.12.json","contracts/mts-contract-v0.13.json","contracts/mts-contract-v0.14.json","cutover/typescript-c1-acceptance-v0.1.json","cutover/typescript-c1-acceptance-v0.2.json","cutover/typescript-c1-acceptance-v0.3.json","cutover/typescript-c1-acceptance-v0.4.json","cutover/typescript-c1-acceptance-v0.5.json","cutover/typescript-c1-acceptance-v0.6.json","cutover/typescript-c1-acceptance-v0.7.json","docs/research/Новое осмысление МТС.md","traceability/mts-v0.11.json","traceability/mts-v0.12.json","traceability/mts-v0.13-self-proof-authority-profile.json","traceability/mts-v0.13-semantic-dependency-projection.json","traceability/mts-v0.13.json","traceability/mts-v0.14.json"],"operational_paths":[]},"diff_rules":{"max_new_docs":0,"max_new_files":4,"max_net_added_lines":800},"size_rules":[{"id":"contracts-file-count-no-growth","scope":"directory","metric":"files","glob":"contracts/**","max":8,"max_growth":2,"count":"all_tracked","level":"blocking"},{"id":"typescript-tests-controlled-growth","scope":"directory","metric":"files","glob":"ts/test/**","max":1000,"max_growth":1,"count":"all_tracked","level":"blocking"}],"content_rules":[{"id":"readme-russian-first","glob":"README.md","mode":"markdown_language","language":"ru","allow_words":["API","ASCII","CI","CLI","Git","GitHub","JSON","Python","TypeScript","UTF","mts-readme-contract-observatory","mts-readme-authors"],"max_unapproved_latin_words_per_line":1},{"id":"readme-required-project-metadata","glob":"README.md","mode":"required_regex","require_regex":["https://netkeep80\\.github\\.io/anum_docs/","Вертушкин Роман Павлович","Дьяченко Константин Константинович","Шакиров Тимур Эдуардович","Бурдуков Александр Николаевич","Глазунов Иван Сергеевич"]},{"id":"mts-docs-russian-first","glob":"docs/**/*.md","mode":"markdown_language","language":"ru","allow_words":["API","ASCII","CI","CLI","Git","GitHub","JSON","Python","TypeScript","UTF"],"max_unapproved_latin_words_per_line":1},{"id":"observatory-site-russian-presentation","glob":"web/contract-observatory/src/site.ts","mode":"added_lines","forbid_regex":["MTS Contract Observatory",">Contract Observatory<",">Timeline<",">Version Overview<","Primary explanatory view","Methodology map \\+ version lifecycle lanes","Method/lifecycle relation","Traceability/evidence relation","Semantic topology Link: not rendered in this view","Methodology stages","Version and evidence filters","Reset viewport","Invariant anatomy","Source-derived provenance view","Contract JSON Pointer","Genesis vectors","Meaning vectors","Compatibility vectors","Negative vectors","Executable gates","Existing evidence","Acceptance provenance","Raw provenance","Source-derived traceability relations","Evidence/source endpoint","Obligation/target endpoint","Generated deterministically"]},{"id":"observatory-controller-russian-presentation","glob":"web/contract-observatory/src/browser-controller.ts","mode":"added_lines","forbid_regex":["Selected:"]}],"cochange_rules":[{"if_changed":["web/contract-observatory/src/site.ts","web/contract-observatory/src/browser-controller.ts"],"must_change_any":["web/contract-observatory/test/localization.test.ts"]},{"if_changed":["requirements/mts-v0.13.json","contracts/mts-contract-v0.13.json","traceability/mts-v0.13.json"],"must_change_any":["docs/specs/Формальная нотация МТС.md","docs/specs/Ачисла и сериализация.md","docs/specs/Апамять и управление сетью связей.md"]}],"trace_rules":[{"id":"semantic-law-references-resolve","kind":"must_resolve","from_anchor_type":"semantic_law_reference","to_anchor_type":"semantic_law_owner"}]}
+{
+  "policy_format_version": "0.3.0",
+  "repository_kind": "documentation",
+  "enforcement": {
+    "mode": "blocking"
+  },
+  "packs": {
+    "contract-conformance": {
+      "current": {
+        "contract": {
+          "path": "contracts/mts-contract-v0.14.json",
+          "format": "json"
+        },
+        "conformance": {
+          "path": "contracts/mts-conformance-v0.14.json",
+          "format": "json"
+        }
+      },
+      "previous": {
+        "contract": {
+          "path": "contracts/mts-contract-v0.13.json",
+          "format": "json"
+        },
+        "conformance": {
+          "path": "contracts/mts-conformance-v0.13.json",
+          "format": "json"
+        }
+      },
+      "pair_fields": {
+        "contract_id": "/schema",
+        "conformance_contract_id": "/contract",
+        "contract_conformance_path": "/conformanceCorpus",
+        "contract_status": "/status",
+        "conformance_status": "/status",
+        "contract_accepted": "/accepted",
+        "conformance_accepted": "/accepted"
+      },
+      "accepted_state": {
+        "status": "accepted",
+        "accepted": true
+      },
+      "acceptance": {
+        "document": {
+          "path": "cutover/typescript-c1-acceptance-v0.7.json",
+          "format": "json"
+        },
+        "current_contract_path": "/current/contract",
+        "current_conformance_path": "/current/conformance"
+      },
+      "required_paths": [
+        {
+          "document": "current.contract",
+          "pointer": "/owners",
+          "projection": "object_values"
+        },
+        {
+          "document": "current.conformance",
+          "pointer": "/requiredExecutableGates",
+          "projection": "array_items"
+        },
+        {
+          "document": "acceptance",
+          "pointer": "/current",
+          "projection": "object_values"
+        }
+      ],
+      "cochange": [
+        "current.contract",
+        "current.conformance",
+        "acceptance"
+      ],
+      "control_paths": [
+        "contracts/mts-contract-v*.json",
+        "contracts/mts-conformance-v*.json",
+        "cutover/typescript-c1-acceptance-v*.json"
+      ]
+    }
+  },
+  "document_relations": {
+    "documents": {
+      "repo-guard-workflow": {
+        "path": ".github/workflows/repo-guard.yml",
+        "format": "yaml"
+      },
+      "branch-hygiene-workflow": {
+        "path": ".github/workflows/branch-hygiene.yml",
+        "format": "yaml"
+      },
+      "v014-requirements": {
+        "path": "requirements/mts-v0.14.json",
+        "format": "json"
+      }
+    },
+    "rules": [
+      {
+        "id": "repo-guard-workflow-mode",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "repo-guard-workflow",
+          "pointer": "/jobs/policy-check/steps/1/with/mode",
+          "type": "string"
+        },
+        "value": "check-pr"
+      },
+      {
+        "id": "repo-guard-workflow-enforcement",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "repo-guard-workflow",
+          "pointer": "/jobs/policy-check/steps/1/with/enforcement",
+          "type": "string"
+        },
+        "value": "blocking"
+      },
+      {
+        "id": "repo-guard-workflow-permission-contents",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "repo-guard-workflow",
+          "pointer": "/permissions/contents",
+          "type": "string"
+        },
+        "value": "read"
+      },
+      {
+        "id": "repo-guard-workflow-permission-issues",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "repo-guard-workflow",
+          "pointer": "/permissions/issues",
+          "type": "string"
+        },
+        "value": "read"
+      },
+      {
+        "id": "repo-guard-workflow-permission-pull-requests",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "repo-guard-workflow",
+          "pointer": "/permissions/pull-requests",
+          "type": "string"
+        },
+        "value": "read"
+      },
+      {
+        "id": "repo-guard-workflow-action-pin",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "repo-guard-workflow",
+          "pointer": "/jobs/policy-check/steps/1/uses",
+          "type": "string"
+        },
+        "value": "netkeep80/repo-guard@756944656fa14de752f44bb404e1dca852f5fa6a"
+      },
+      {
+        "id": "branch-hygiene-permission-contents-write",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "branch-hygiene-workflow",
+          "pointer": "/permissions/contents",
+          "type": "string"
+        },
+        "value": "write"
+      },
+      {
+        "id": "branch-hygiene-permission-pull-requests-write",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "branch-hygiene-workflow",
+          "pointer": "/permissions/pull-requests",
+          "type": "string"
+        },
+        "value": "write"
+      },
+      {
+        "id": "branch-hygiene-ensure-pr-job",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "branch-hygiene-workflow",
+          "pointer": "/jobs/ensure-pr/name",
+          "type": "string"
+        },
+        "value": "Ensure draft PR for side branch"
+      },
+      {
+        "id": "branch-hygiene-delete-merged-job",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "branch-hygiene-workflow",
+          "pointer": "/jobs/delete-merged-head/name",
+          "type": "string"
+        },
+        "value": "Delete merged PR head branch"
+      },
+      {
+        "id": "branch-hygiene-sweep-job",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "branch-hygiene-workflow",
+          "pointer": "/jobs/sweep-fully-merged/name",
+          "type": "string"
+        },
+        "value": "Sweep fully merged stale branches"
+      },
+      {
+        "id": "v014-requirements-status",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "v014-requirements",
+          "pointer": "/status",
+          "type": "string"
+        },
+        "value": "accepted"
+      },
+      {
+        "id": "v014-requirements-contract",
+        "kind": "scalar_equal",
+        "left": {
+          "document": "v014-requirements",
+          "pointer": "/contract",
+          "type": "string"
+        },
+        "right": {
+          "document": "contract-conformance.current.contract",
+          "pointer": "/schema",
+          "type": "string"
+        }
+      }
+    ]
+  },
+  "evidence_bindings": [
+    {
+      "id": "negative-vectors-have-test-evidence",
+      "kind": "anchor_value_coverage",
+      "source": {
+        "document": "contract-conformance.current.conformance",
+        "pointer": "/requiredNegativeVectors",
+        "projection": "array_items",
+        "type": "string_set"
+      },
+      "target_anchor_type": "negative_vector_test"
+    },
+    {
+      "id": "accepted-semantic-laws-have-doc-owners",
+      "kind": "anchor_value_coverage",
+      "source": {
+        "document": "contract-conformance.current.contract",
+        "pointer": "/requiredSemanticLaws",
+        "projection": "object_keys",
+        "type": "string_set"
+      },
+      "target_anchor_type": "semantic_law_registry_owner"
+    }
+  ],
+  "anchors": {
+    "types": {
+      "negative_vector_test": {
+        "sources": [
+          {
+            "kind": "regex",
+            "glob": "ts/test/release-cutover.test.ts",
+            "pattern": "negativeVector\\(\"([^\"]+)\""
+          },
+          {
+            "kind": "regex",
+            "glob": "ts/test/v014-release-cutover-a75.test.ts",
+            "pattern": "negativeVector\\(\\\"([^\\\"]+)\\\""
+          }
+        ]
+      },
+      "semantic_law_owner": {
+        "sources": [
+          {
+            "kind": "regex",
+            "glob": "docs/specs/Формальная нотация МТС.md",
+            "pattern": "<a id=\"mts-law-([A-Za-z][A-Za-z0-9]*)\"></a>\\s*<!--\\s*нормативный владелец\\s*-->"
+          },
+          {
+            "kind": "regex",
+            "glob": "docs/specs/Ачисла и сериализация.md",
+            "pattern": "<a id=\"mts-law-([A-Za-z][A-Za-z0-9]*)\"></a>\\s*<!--\\s*нормативный владелец\\s*-->"
+          },
+          {
+            "kind": "regex",
+            "glob": "docs/specs/Апамять и управление сетью связей.md",
+            "pattern": "<a id=\"mts-law-([A-Za-z][A-Za-z0-9]*)\"></a>\\s*<!--\\s*нормативный владелец\\s*-->"
+          }
+        ]
+      },
+      "semantic_law_reference": {
+        "sources": [
+          {
+            "kind": "regex",
+            "glob": "README.md",
+            "pattern": "<!--\\s*ссылка:mts-law-([A-Za-z][A-Za-z0-9]*)\\s*-->"
+          },
+          {
+            "kind": "regex",
+            "glob": "docs/**/*.md",
+            "pattern": "<!--\\s*ссылка:mts-law-([A-Za-z][A-Za-z0-9]*)\\s*-->"
+          }
+        ]
+      },
+      "semantic_law_registry_owner": {
+        "sources": [
+          {
+            "kind": "regex",
+            "glob": "requirements/mts-v0.14.json",
+            "pattern": "\\\"id\\\"\\s*:\\s*\\\"(V14-L[0-9]+)\\\""
+          }
+        ]
+      }
+    }
+  },
+  "paths": {
+    "forbidden": [
+      "legacy/**",
+      "archive/**",
+      "old/**",
+      "deprecated/**",
+      "*.bak",
+      "*.tmp",
+      "*.orig",
+      "docs/research/Новое осмысление МТС.md"
+    ],
+    "canonical_docs": [
+      "README.md",
+      "docs/theory/Основания МТС.md",
+      "docs/theory/Система аксиом МТС.md",
+      "docs/specs/Формальная нотация МТС.md",
+      "docs/specs/Ачисла и сериализация.md",
+      "docs/specs/Апамять и управление сетью связей.md",
+      "docs/specs/Пучки связей.md",
+      "docs/Словарь терминов МТС.md"
+    ],
+    "governance_paths": [
+      "repo-policy.json",
+      ".github/workflows/repo-guard.yml",
+      ".github/workflows/ci.yml",
+      "docs/research/Новое осмысление МТС.md",
+      ".github/workflows/branch-hygiene.yml"
+    ],
+    "pr_immutable": [
+      "contracts/mts-conformance-v0.11.json",
+      "contracts/mts-conformance-v0.12.json",
+      "contracts/mts-conformance-v0.13.json",
+      "contracts/mts-conformance-v0.14.json",
+      "contracts/mts-contract-v0.11.json",
+      "contracts/mts-contract-v0.12.json",
+      "contracts/mts-contract-v0.13.json",
+      "contracts/mts-contract-v0.14.json",
+      "cutover/typescript-c1-acceptance-v0.1.json",
+      "cutover/typescript-c1-acceptance-v0.2.json",
+      "cutover/typescript-c1-acceptance-v0.3.json",
+      "cutover/typescript-c1-acceptance-v0.4.json",
+      "cutover/typescript-c1-acceptance-v0.5.json",
+      "cutover/typescript-c1-acceptance-v0.6.json",
+      "cutover/typescript-c1-acceptance-v0.7.json",
+      "docs/research/Новое осмысление МТС.md",
+      "traceability/mts-v0.11.json",
+      "traceability/mts-v0.12.json",
+      "traceability/mts-v0.13-self-proof-authority-profile.json",
+      "traceability/mts-v0.13-semantic-dependency-projection.json",
+      "traceability/mts-v0.13.json",
+      "traceability/mts-v0.14.json"
+    ],
+    "operational_paths": []
+  },
+  "diff_rules": {
+    "max_new_docs": 0,
+    "max_new_files": 4,
+    "max_net_added_lines": 800
+  },
+  "size_rules": [
+    {
+      "id": "contracts-file-count-no-growth",
+      "scope": "directory",
+      "metric": "files",
+      "glob": "contracts/**",
+      "max": 8,
+      "max_growth": 2,
+      "count": "all_tracked",
+      "level": "blocking"
+    },
+    {
+      "id": "typescript-tests-controlled-growth",
+      "scope": "directory",
+      "metric": "files",
+      "glob": "ts/test/**",
+      "max": 1000,
+      "max_growth": 1,
+      "count": "all_tracked",
+      "level": "blocking"
+    }
+  ],
+  "content_rules": [
+    {
+      "id": "readme-russian-first",
+      "glob": "README.md",
+      "mode": "markdown_language",
+      "language": "ru",
+      "allow_words": [
+        "API",
+        "ASCII",
+        "CI",
+        "CLI",
+        "Git",
+        "GitHub",
+        "JSON",
+        "Python",
+        "TypeScript",
+        "UTF",
+        "mts-readme-contract-observatory",
+        "mts-readme-authors"
+      ],
+      "max_unapproved_latin_words_per_line": 1
+    },
+    {
+      "id": "readme-required-project-metadata",
+      "glob": "README.md",
+      "mode": "required_regex",
+      "require_regex": [
+        "https://netkeep80\\.github\\.io/anum_docs/",
+        "Вертушкин Роман Павлович",
+        "Дьяченко Константин Константинович",
+        "Шакиров Тимур Эдуардович",
+        "Бурдуков Александр Николаевич",
+        "Глазунов Иван Сергеевич"
+      ]
+    },
+    {
+      "id": "mts-docs-russian-first",
+      "glob": "docs/**/*.md",
+      "mode": "markdown_language",
+      "language": "ru",
+      "allow_words": [
+        "API",
+        "ASCII",
+        "CI",
+        "CLI",
+        "Git",
+        "GitHub",
+        "JSON",
+        "Python",
+        "TypeScript",
+        "UTF"
+      ],
+      "max_unapproved_latin_words_per_line": 1
+    },
+    {
+      "id": "observatory-site-russian-presentation",
+      "glob": "web/contract-observatory/src/site.ts",
+      "mode": "added_lines",
+      "forbid_regex": [
+        "MTS Contract Observatory",
+        ">Contract Observatory<",
+        ">Timeline<",
+        ">Version Overview<",
+        "Primary explanatory view",
+        "Methodology map \\+ version lifecycle lanes",
+        "Method/lifecycle relation",
+        "Traceability/evidence relation",
+        "Semantic topology Link: not rendered in this view",
+        "Methodology stages",
+        "Version and evidence filters",
+        "Reset viewport",
+        "Invariant anatomy",
+        "Source-derived provenance view",
+        "Contract JSON Pointer",
+        "Genesis vectors",
+        "Meaning vectors",
+        "Compatibility vectors",
+        "Negative vectors",
+        "Executable gates",
+        "Existing evidence",
+        "Acceptance provenance",
+        "Raw provenance",
+        "Source-derived traceability relations",
+        "Evidence/source endpoint",
+        "Obligation/target endpoint",
+        "Generated deterministically"
+      ]
+    },
+    {
+      "id": "observatory-controller-russian-presentation",
+      "glob": "web/contract-observatory/src/browser-controller.ts",
+      "mode": "added_lines",
+      "forbid_regex": [
+        "Selected:"
+      ]
+    }
+  ],
+  "cochange_rules": [
+    {
+      "if_changed": [
+        "web/contract-observatory/src/site.ts",
+        "web/contract-observatory/src/browser-controller.ts"
+      ],
+      "must_change_any": [
+        "web/contract-observatory/test/localization.test.ts"
+      ]
+    },
+    {
+      "if_changed": [
+        "requirements/mts-v0.13.json",
+        "contracts/mts-contract-v0.13.json",
+        "traceability/mts-v0.13.json"
+      ],
+      "must_change_any": [
+        "docs/specs/Формальная нотация МТС.md",
+        "docs/specs/Ачисла и сериализация.md",
+        "docs/specs/Апамять и управление сетью связей.md"
+      ]
+    }
+  ],
+  "trace_rules": [
+    {
+      "id": "semantic-law-references-resolve",
+      "kind": "must_resolve",
+      "from_anchor_type": "semantic_law_reference",
+      "to_anchor_type": "semantic_law_owner"
+    }
+  ],
+  "surfaces": {
+    "theorem-catalog-generated-doc": [
+      "docs/theory/Теоремы МТС.md"
+    ],
+    "theorem-catalog-tooling": [
+      "ts/src/tooling/theorem-catalog-markdown.ts",
+      "ts/src/tooling/docs-sync.ts",
+      "ts/src/tooling/mts-compiler.ts",
+      "ts/test/theorem-catalog-markdown.test.ts",
+      "ts/test/docs-sync.test.ts"
+    ]
+  },
+  "new_file_classes": {
+    "theorem-catalog-generated-doc": [
+      "docs/theory/Теоремы МТС.md"
+    ],
+    "theorem-catalog-tooling-source": [
+      "ts/src/tooling/theorem-catalog-markdown.ts"
+    ],
+    "theorem-catalog-test": [
+      "ts/test/theorem-catalog-markdown.test.ts"
+    ]
+  },
+  "change_profiles": {
+    "generated-theorem-catalog": {
+      "allow_surfaces": [
+        "theorem-catalog-generated-doc",
+        "theorem-catalog-tooling"
+      ],
+      "require_surfaces": [
+        "theorem-catalog-generated-doc",
+        "theorem-catalog-tooling"
+      ],
+      "allow_unclassified_surfaces": false,
+      "new_files": {
+        "allow_classes": [
+          "theorem-catalog-generated-doc",
+          "theorem-catalog-tooling-source",
+          "theorem-catalog-test"
+        ],
+        "max_per_class": {
+          "theorem-catalog-generated-doc": 1,
+          "theorem-catalog-tooling-source": 1,
+          "theorem-catalog-test": 1
+        },
+        "max_new_files": 3
+      },
+      "budgets": {
+        "max_new_docs": 1,
+        "max_new_files": 3,
+        "max_net_added_lines": 1500
+      }
+    }
+  }
+}
+
