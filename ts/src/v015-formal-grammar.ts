@@ -122,7 +122,7 @@ export class V015FormalGrammarError extends Error {
   }
 }
 
-export function elaborateV015FormalProjection<T>(
+// Every P4 entrypoint revalidates canonical Grammar provenance; host AST/parser state is never authority.\nexport function elaborateV015FormalProjection<T>(
   projection: V015WritingProjection<T>,
   grammar: V015FormalGrammarSelection,
 ): V015FormalLinkAst<T> {
