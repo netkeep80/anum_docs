@@ -45,7 +45,7 @@ function rootedFold(memory: Memory, values: readonly LinkHandle[]): LinkHandle {
 const memory = new Memory();
 const { R, O, C, L, U } = ensureRootBasis(memory);
 const algebra: V015DirectAssociationAlgebra<LinkHandle> = Object.freeze({
-  link: (start, end) => memory.ensure(start, end),
+  link: (start: LinkHandle, end: LinkHandle) => memory.ensure(start, end),
 });
 const source = (...values: LinkHandle[]): V015SemanticSourceOrder<LinkHandle> =>
   declareV015SemanticSourceOrder(values);
