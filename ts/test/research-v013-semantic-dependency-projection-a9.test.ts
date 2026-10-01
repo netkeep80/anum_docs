@@ -161,11 +161,17 @@ const postV013ProofTransportFunctions = new Set<string>([
   "exportPortableClosedRootedProof",
   "replayPortableClosedRootedProof",
 ]);
+// v0.15 candidate code is current research, never retroactive v0.13 evidence.
+const v015DirectAssociationResearchPath = "ts/src/v015-direct-association.ts";
+const v015DirectAssociationResearchFunctions = new Set<string>([
+  "directSequentialAssociation",
+]);
 
-// Exceptions are path+function exact so any unrelated post-v0.13 growth still fails closed.
+// Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
 function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<string> {
   if (sourcePath === postV013CarrierPath) return postV013RepresentationPublicFunctions;
   if (sourcePath === postV013ProofTransportPath) return postV013ProofTransportFunctions;
+  if (sourcePath === v015DirectAssociationResearchPath) return v015DirectAssociationResearchFunctions;
   return new Set<string>();
 }
 
