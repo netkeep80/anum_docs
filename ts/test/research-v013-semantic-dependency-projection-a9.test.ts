@@ -253,6 +253,7 @@ function observedDirectDependencies(
 }
 
 let undocumentedDirectDependencyCount = 0;
+// Historical P1 metrics exclude only the explicitly measured post-v0.13 inverse body.
 const postV013CarrierPath = "ts/src/v013-hierarchical-carrier.ts";
 
 for (const sourcePath of projection.auditScope.candidateKernelFiles as string[]) {
