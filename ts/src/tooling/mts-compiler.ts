@@ -1,4 +1,3 @@
-// TEMP diagnostic trigger only; remove before final T2.
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -7,6 +6,7 @@ import {
   replaceOwnedMarkdownSection,
   type MarkdownDocumentMode,
 } from "./markdown-section-adapter.js";
+import { THEOREM_CATALOG_PATH } from "./theorem-catalog-markdown.js";
 
 type JsonObject = Record<string, unknown>;
 
@@ -274,7 +274,10 @@ export function loadMtsSemanticIr(
     }
     documentModes[path] = mode;
   }
-  exactSet("Markdown document surface", Object.keys(documentModes), listRepositoryMarkdownSurface(root));
+  const semanticMarkdownSurface = listRepositoryMarkdownSurface(root).filter(
+    (path) => path !== THEOREM_CATALOG_PATH,
+  );
+  exactSet("Markdown document surface", Object.keys(documentModes), semanticMarkdownSurface);
 
   const repositoryRequirements = loadRepositoryRequirements(root, registry, registryPath, documentModes);
 

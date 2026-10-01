@@ -156,6 +156,7 @@ const postV013RepresentationPublicFunctions = new Set<string>([
 ]);
 const postV013CarrierPath = "ts/src/v013-hierarchical-carrier.ts";
 const postV013ProofTransportPath = "ts/src/portable-closed-rooted-proof.ts";
+// Portable CLOSED proof transport is post-v0.13 infrastructure; exclude only named functions, never the whole file.
 const postV013ProofTransportFunctions = new Set<string>([
   "exportPortableClosedRootedProof",
   "replayPortableClosedRootedProof",
