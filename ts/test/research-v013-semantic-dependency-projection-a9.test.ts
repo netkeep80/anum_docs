@@ -150,10 +150,24 @@ for (const statement of publicSource.statements) {
   }
 }
 
+// Post-v0.13 representation additions are explicit audit deltas, not retroactive historical semantics.
+const postV013RepresentationPublicFunctions = new Set<string>([
+  "materializeV013SemanticLinkFromHierarchicalCarrier",
+]);
+
 setEqual(
-  [...observedPublicFunctions],
+  [...observedPublicFunctions].filter(
+    (symbol) => !postV013RepresentationPublicFunctions.has(symbol),
+  ),
   projection.publicSemanticEntrypoints.map((entry: any) => entry.symbol),
-  "all public v0.13 runtime functions are classified as semantic entrypoints",
+  "historical public v0.13 semantic entrypoints remain exact after explicit post-v0.13 representation delta",
+);
+setEqual(
+  [...observedPublicFunctions].filter((symbol) =>
+    postV013RepresentationPublicFunctions.has(symbol)
+  ),
+  [...postV013RepresentationPublicFunctions],
+  "post-v0.13 public representation/materialization entrypoint set is exact",
 );
 
 // Static direct-dependency observation over the declared candidate-kernel files.
