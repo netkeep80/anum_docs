@@ -166,12 +166,21 @@ const v015DirectAssociationResearchPath = "ts/src/v015-direct-association.ts";
 const v015DirectAssociationResearchFunctions = new Set<string>([
   "directSequentialAssociation",
 ]);
+// v0.15 P2 writing projection is current research, never retroactive v0.13 evidence.
+const v015WritingProjectionResearchPath = "ts/src/v015-writing-projection.ts";
+const v015WritingProjectionResearchFunctions = new Set<string>([
+  "renderV015WritingProjection",
+  "parseV015WritingProjection",
+  "denoteV015SurfaceExpression",
+  "semanticStructureEqual",
+]);
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
 function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<string> {
   if (sourcePath === postV013CarrierPath) return postV013RepresentationPublicFunctions;
   if (sourcePath === postV013ProofTransportPath) return postV013ProofTransportFunctions;
   if (sourcePath === v015DirectAssociationResearchPath) return v015DirectAssociationResearchFunctions;
+  if (sourcePath === v015WritingProjectionResearchPath) return v015WritingProjectionResearchFunctions;
   return new Set<string>();
 }
 
