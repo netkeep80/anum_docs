@@ -1,3 +1,4 @@
+// TEMP diagnostic trigger only; remove before final T2.
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
