@@ -1,7 +1,8 @@
 import { ExactSequenceError, readExactSequence } from "./exact-sequence.js";
 import { MemoryError, type LinkHandle, type ReadMemory } from "./memory.js";
-import { readStructuralDerivationRule } from "./derivation.js";
+import { StructuralDerivationReplayError, readStructuralDerivationRule } from "./derivation.js";
 import {
+  StructuralRootedProofAsetReplayError,
   replayStructuralRootedProofAset,
   type StructuralRootedProofAsetReplayResult,
 } from "./rooted-proof-aset.js";
@@ -235,10 +236,7 @@ function readBaseSpecialization(
     try {
       const poles = memory.poles(entry);
       return [poles.start, poles.end] as const;
-    } catch (error) {
-      if (error instanceof MemoryError) fail(code);
-      throw error;
-    }
+    } catch (error) { if (error instanceof MemoryError) fail(code); throw error; }
   };
 
   for (const entry of sequence(memory, roleEntriesHandle, code)) {
@@ -326,10 +324,7 @@ function readDependentBaseSpecialization(
     try {
       const poles = memory.poles(entry);
       return [poles.start, poles.end] as const;
-    } catch (error) {
-      if (error instanceof MemoryError) fail(code);
-      throw error;
-    }
+    } catch (error) { if (error instanceof MemoryError) fail(code); throw error; }
   };
 
   for (const entry of sequence(memory, roleEntriesHandle, code)) {
@@ -384,10 +379,7 @@ function verifyMapping(
   try {
     matchStructuralTemplate(memory, source, target,
       bindings.map(({ sourceRole: role, targetRole: value }) => ({ role, value })));
-  } catch (error) {
-    if (error instanceof StructuralRuleError || error instanceof MemoryError) fail(mismatch);
-    throw error;
-  }
+  } catch (error) { if (error instanceof StructuralRuleError || error instanceof MemoryError) fail(mismatch); throw error; }
   const replacements = new Map(bindings.map(({ sourceRole, targetRole }) => [sourceRole, targetRole]));
   const targetSet = new Set(targetRoles);
   const visited = new Map<LinkHandle, Set<LinkHandle>>();
@@ -437,7 +429,7 @@ export function replayStructuralClosureApplication(
 
     let authorityRoles: readonly LinkHandle[];
     try { authorityRoles = readStructuralRoleDictionary(memory, authorityDictionary!).roles; }
-    catch { fail("invalid-authority"); }
+    catch (error) { if (error instanceof StructuralRuleError) fail("invalid-authority"); throw error; }
     if (authorityRoles.length !== 2 || authorityRoles.includes(generator!)) fail("invalid-authority");
     const [x, x1] = authorityRoles;
     if (x === undefined || x1 === undefined) fail("invalid-authority");
@@ -447,14 +439,14 @@ export function replayStructuralClosureApplication(
     let base: StructuralRootedProofAsetReplayResult;
     let step: StructuralRootedProofAsetReplayResult;
     try { base = replayStructuralRootedProofAset(memory, evidence.baseRoot); }
-    catch { fail("invalid-base"); }
+    catch (error) { if (error instanceof StructuralRootedProofAsetReplayError) fail("invalid-base"); throw error; }
     try { step = replayStructuralRootedProofAset(memory, evidence.stepRoot); }
-    catch { fail("invalid-step"); }
+    catch (error) { if (error instanceof StructuralRootedProofAsetReplayError) fail("invalid-step"); throw error; }
     if (base.theory !== theory || step.theory !== theory) fail("theory-mismatch");
 
     let resultDerivationRule: LinkHandle, resultTheory: LinkHandle;
     try { ({ start: resultDerivationRule, end: resultTheory } = memory.poles(evidence.resultIdentity)); }
-    catch { fail("invalid-result-identity"); }
+    catch (error) { if (error instanceof MemoryError) fail("invalid-result-identity"); throw error; }
     if (resultTheory !== theory) fail("theory-mismatch");
 
     let baseParts: ReturnType<typeof schemaParts>, stepParts: ReturnType<typeof schemaParts>, resultParts: ReturnType<typeof schemaParts>;
@@ -462,7 +454,7 @@ export function replayStructuralClosureApplication(
       baseParts = schemaParts(memory, base.targetDerivationRule);
       stepParts = schemaParts(memory, step.targetDerivationRule);
       resultParts = schemaParts(memory, resultDerivationRule);
-    } catch { fail("invalid-result-identity"); }
+    } catch (error) { if (error instanceof StructuralDerivationReplayError || error instanceof StructuralRuleError) fail("invalid-result-identity"); throw error; }
     if (memory.find(theory!, resultParts.schema.structuralRule) === undefined) fail("invalid-result-identity");
     if (memory.find(theory!, resultDerivationRule) !== undefined) fail("result-primitive-admission");
 
@@ -556,9 +548,7 @@ export function replayStructuralParametricClosureApplication(
     let authorityRoles: readonly LinkHandle[];
     try {
       authorityRoles = readStructuralRoleDictionary(memory, authorityDictionary!).roles;
-    } catch {
-      fail("invalid-authority");
-    }
+    } catch (error) { if (error instanceof StructuralRuleError) fail("invalid-authority"); throw error; }
     if (authorityRoles.length !== 2 || authorityRoles.includes(generator!)) {
       fail("invalid-authority");
     }
@@ -585,14 +575,10 @@ export function replayStructuralParametricClosureApplication(
     let step: StructuralRootedProofAsetReplayResult;
     try {
       base = replayStructuralRootedProofAset(memory, evidence.baseRoot);
-    } catch {
-      fail("invalid-base");
-    }
+    } catch (error) { if (error instanceof StructuralRootedProofAsetReplayError) fail("invalid-base"); throw error; }
     try {
       step = replayStructuralRootedProofAset(memory, evidence.stepRoot);
-    } catch {
-      fail("invalid-step");
-    }
+    } catch (error) { if (error instanceof StructuralRootedProofAsetReplayError) fail("invalid-step"); throw error; }
     if (base.theory !== theory || step.theory !== theory) fail("theory-mismatch");
 
     let resultDerivationRule: LinkHandle;
@@ -600,9 +586,7 @@ export function replayStructuralParametricClosureApplication(
     try {
       ({ start: resultDerivationRule, end: resultTheory } =
         memory.poles(evidence.resultIdentity));
-    } catch {
-      fail("invalid-result-identity");
-    }
+    } catch (error) { if (error instanceof MemoryError) fail("invalid-result-identity"); throw error; }
     if (resultTheory !== theory) fail("theory-mismatch");
 
     let baseParts: ReturnType<typeof schemaParts>;
@@ -612,9 +596,7 @@ export function replayStructuralParametricClosureApplication(
       baseParts = schemaParts(memory, base.targetDerivationRule);
       stepParts = schemaParts(memory, step.targetDerivationRule);
       resultParts = schemaParts(memory, resultDerivationRule);
-    } catch {
-      fail("invalid-result-identity");
-    }
+    } catch (error) { if (error instanceof StructuralDerivationReplayError || error instanceof StructuralRuleError) fail("invalid-result-identity"); throw error; }
     if (memory.find(theory!, resultParts.schema.structuralRule) === undefined) {
       fail("invalid-result-identity");
     }
@@ -853,9 +835,7 @@ export function replayStructuralDependentWitnessClosureApplication(
     let authorityRoles: readonly LinkHandle[];
     try {
       authorityRoles = readStructuralRoleDictionary(memory, authorityDictionary!).roles;
-    } catch {
-      fail("invalid-authority");
-    }
+    } catch (error) { if (error instanceof StructuralRuleError) fail("invalid-authority"); throw error; }
     if (authorityRoles.length !== 2 || authorityRoles.includes(generator!)) {
       fail("invalid-authority");
     }
@@ -882,14 +862,10 @@ export function replayStructuralDependentWitnessClosureApplication(
     let step: StructuralRootedProofAsetReplayResult;
     try {
       base = replayStructuralRootedProofAset(memory, evidence.baseRoot);
-    } catch {
-      fail("invalid-base");
-    }
+    } catch (error) { if (error instanceof StructuralRootedProofAsetReplayError) fail("invalid-base"); throw error; }
     try {
       step = replayStructuralRootedProofAset(memory, evidence.stepRoot);
-    } catch {
-      fail("invalid-step");
-    }
+    } catch (error) { if (error instanceof StructuralRootedProofAsetReplayError) fail("invalid-step"); throw error; }
     if (base.theory !== theory || step.theory !== theory) fail("theory-mismatch");
 
     let resultDerivationRule: LinkHandle;
@@ -897,9 +873,7 @@ export function replayStructuralDependentWitnessClosureApplication(
     try {
       ({ start: resultDerivationRule, end: resultTheory } =
         memory.poles(evidence.resultIdentity));
-    } catch {
-      fail("invalid-result-identity");
-    }
+    } catch (error) { if (error instanceof MemoryError) fail("invalid-result-identity"); throw error; }
     if (resultTheory !== theory) fail("theory-mismatch");
 
     let baseParts: ReturnType<typeof schemaParts>;
@@ -909,9 +883,7 @@ export function replayStructuralDependentWitnessClosureApplication(
       baseParts = schemaParts(memory, base.targetDerivationRule);
       stepParts = schemaParts(memory, step.targetDerivationRule);
       resultParts = schemaParts(memory, resultDerivationRule);
-    } catch {
-      fail("invalid-result-identity");
-    }
+    } catch (error) { if (error instanceof StructuralDerivationReplayError || error instanceof StructuralRuleError) fail("invalid-result-identity"); throw error; }
     if (memory.find(theory!, resultParts.schema.structuralRule) === undefined) {
       fail("invalid-result-identity");
     }

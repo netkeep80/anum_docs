@@ -1,12 +1,14 @@
-import { readStructuralDerivationRule } from "./derivation.js";
-import { readExactSequence } from "./exact-sequence.js";
-import type { LinkHandle, ReadMemory } from "./memory.js";
+import { StructuralDerivationReplayError, readStructuralDerivationRule } from "./derivation.js";
+import { ExactSequenceError, readExactSequence } from "./exact-sequence.js";
+import { MemoryError, type LinkHandle, type ReadMemory } from "./memory.js";
 import {
+  StructuralDerivedDerivationReplayError,
   replayStructuralDerivedDerivationSchema,
   type StructuralDerivedDerivationEvidence,
   type StructuralDerivedDerivationReplayResult,
 } from "./derived-derivation-schema.js";
 import {
+  StructuralRuleError,
   matchStructuralTemplate,
   readStructuralRoleDictionary,
   readStructuralRule,
@@ -79,7 +81,7 @@ function schemaParts(memory: ReadMemory, derivationRule: LinkHandle) {
 
 function exactValues(memory: ReadMemory, sequence: LinkHandle, code: StructuralDerivedDerivationSpecializationReplayErrorCode) {
   try { return readExactSequence(memory, sequence).values; }
-  catch { return fail(code); }
+  catch (error) { if (error instanceof ExactSequenceError) return fail(code); throw error; }
 }
 
 function verifyMapped(
@@ -92,7 +94,7 @@ function verifyMapped(
   mismatch: "premise-mapping-mismatch" | "conclusion-mismatch",
 ): void {
   try { matchStructuralTemplate(memory, source, target, bindings); }
-  catch { fail(mismatch); }
+  catch (error) { if (error instanceof StructuralRuleError) fail(mismatch); throw error; }
 
   const visited = new Map<LinkHandle, Set<LinkHandle>>();
   const walk = (left: LinkHandle, right: LinkHandle): void => {
@@ -113,7 +115,8 @@ function verifyMapped(
       walk(lp.end, rp.end);
     } catch (error) {
       if (error instanceof StructuralDerivedDerivationSpecializationReplayError) throw error;
-      fail(mismatch);
+      if (error instanceof MemoryError) fail(mismatch);
+      throw error;
     }
   };
   walk(source, target);
@@ -125,11 +128,11 @@ function replayBody(
 ): StructuralDerivedDerivationSpecializationReplayResult {
   let source: StructuralDerivedDerivationReplayResult;
   try { source = replayStructuralDerivedDerivationSchema(memory, evidence.source); }
-  catch { fail("invalid-source-schema"); }
+  catch (error) { if (error instanceof StructuralDerivedDerivationReplayError) fail("invalid-source-schema"); throw error; }
 
   let sourceParts: ReturnType<typeof schemaParts>;
   try { sourceParts = schemaParts(memory, source.derivationRule); }
-  catch { fail("invalid-source-schema"); }
+  catch (error) { if (error instanceof StructuralDerivationReplayError || error instanceof StructuralRuleError) fail("invalid-source-schema"); throw error; }
   const sourceDictionary = sourceParts.rule.roleDictionary;
   const sourceRoleSet = new Set(sourceParts.roles);
 
@@ -140,11 +143,12 @@ function replayBody(
     targetDerivationRule = identity.start;
   } catch (error) {
     if (error instanceof StructuralDerivedDerivationSpecializationReplayError) throw error;
-    fail("invalid-target-identity");
+    if (error instanceof MemoryError) fail("invalid-target-identity");
+    throw error;
   }
   let targetParts: ReturnType<typeof schemaParts>;
   try { targetParts = schemaParts(memory, targetDerivationRule); }
-  catch { fail("invalid-target-identity"); }
+  catch (error) { if (error instanceof StructuralDerivationReplayError || error instanceof StructuralRuleError) fail("invalid-target-identity"); throw error; }
   const targetDictionary = targetParts.rule.roleDictionary;
   const targetRoleSet = new Set(targetParts.roles);
   if (memory.find(source.theory, targetDerivationRule) !== undefined) fail("target-primitive-admission");
@@ -166,7 +170,7 @@ function replayBody(
 
   const readBinding = (entry: LinkHandle): readonly [LinkHandle, LinkHandle] => {
     try { const p = memory.poles(entry); return [p.start, p.end] as const; }
-    catch { return fail("invalid-specialization-carrier"); }
+    catch (error) { if (error instanceof MemoryError) return fail("invalid-specialization-carrier"); throw error; }
   };
   for (const entry of roleEntries) {
     const [role, value] = readBinding(entry);
@@ -184,7 +188,7 @@ function replayBody(
     seenGroundPartition.add(role);
     if (seenRolePartition.has(role)) fail("binding-partition-overlap");
     try { memory.poles(value); }
-    catch { fail("invalid-specialization-carrier"); }
+    catch (error) { if (error instanceof MemoryError) fail("invalid-specialization-carrier"); throw error; }
     if (targetRoleSet.has(value)) fail("grounded-target-role-capture");
     replacements.set(role, value);
     roleBindings.push(Object.freeze({ role, value }));
@@ -229,7 +233,8 @@ function replayBody(
       if (p.start !== actual.template || p.end !== evidence.targetIdentity) fail("invalid-assumption-occurrence");
     } catch (error) {
       if (error instanceof StructuralDerivedDerivationSpecializationReplayError) throw error;
-      fail("invalid-assumption-occurrence");
+      if (error instanceof MemoryError) fail("invalid-assumption-occurrence");
+      throw error;
     }
     occurrenceByTemplate.set(actual.template, actual.occurrence);
   }
@@ -241,7 +246,8 @@ function replayBody(
     premiseOccurrenceSequence = targetOccurrence.end;
   } catch (error) {
     if (error instanceof StructuralDerivedDerivationSpecializationReplayError) throw error;
-    fail("premise-slot-mismatch");
+    if (error instanceof MemoryError) fail("premise-slot-mismatch");
+    throw error;
   }
   const slots = exactValues(memory, premiseOccurrenceSequence, "premise-slot-mismatch");
   if (slots.length !== targetParts.schema.premiseTemplates.length) fail("premise-slot-mismatch");
@@ -271,8 +277,5 @@ export function replayStructuralDerivedDerivationSpecialization(
     const result = replayBody(memory, evidence);
     if (memory.linkCount !== before) fail("specialization-wrote");
     return result;
-  } catch (error) {
-    if (memory.linkCount !== before) fail("specialization-wrote");
-    throw error;
-  }
+  } catch (error) { if (memory.linkCount !== before) fail("specialization-wrote"); throw error; }
 }

@@ -16,6 +16,7 @@ import {
   type StructuralDerivationWithAssumptionsEvidence,
 } from "./derivation.js";
 import {
+  StructuralRuleError,
   readStructuralInterpreter,
   readStructuralRoleDictionary,
   readStructuralRule,
@@ -86,9 +87,7 @@ export function instantiateStructuralDerivedDerivationSchema(
     let interpreterStructure: ReturnType<typeof readStructuralInterpreter>;
     try {
       interpreterStructure = readStructuralInterpreter(memory, interpreter);
-    } catch {
-      fail("invalid-interpreter");
-    }
+    } catch (error) { if (error instanceof StructuralRuleError) fail("invalid-interpreter"); throw error; }
     if (interpreterStructure.theory !== theory) fail("interpreter-theory-mismatch");
 
     const roleSet = new Set(roleDictionary.roles);
@@ -99,10 +98,7 @@ export function instantiateStructuralDerivedDerivationSchema(
       if (roleSet.has(binding.value)) fail("role-valued-binding");
       try {
         memory.poles(binding.value);
-      } catch (error) {
-        if (error instanceof MemoryError) fail("invalid-generic-evidence");
-        throw error;
-      }
+      } catch (error) { if (error instanceof MemoryError) fail("invalid-generic-evidence"); throw error; }
       rho.set(binding.role, binding.value);
     }
     for (const role of roleDictionary.roles) {
