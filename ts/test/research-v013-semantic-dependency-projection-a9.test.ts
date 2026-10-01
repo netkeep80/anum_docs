@@ -158,6 +158,7 @@ const postV013CarrierPath = "ts/src/v013-hierarchical-carrier.ts";
 const postV013ProofTransportPath = "ts/src/portable-closed-rooted-proof.ts";
 const postV013ProofTransportFunctions = new Set<string>([
   "exportPortableClosedRootedProof",
+  "replayPortableClosedRootedProof",
 ]);
 
 // Exceptions are path+function exact so any unrelated post-v0.13 growth still fails closed.
@@ -1175,8 +1176,6 @@ same(
   "whole-ts-src-package",
   "S3 identifies whole-package audit counts",
 );
-console.log("P1F_TYPED_READ_COUNTS", JSON.stringify(typedReadMemberCounts));
-console.log("P1F_POLES_SITES", JSON.stringify(typedReadSites.filter((site) => site.member === "poles").map((site) => `${site.file}#${site.owner}`).sort()));
 same(decisionAudit.typedReadSiteCount, typedReadSites.length, "typed ReadMemory site count");
 same(decisionAudit.typedReadOwnerCount, typedReadOwners.length, "typed ReadMemory owner count");
 same(
