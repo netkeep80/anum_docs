@@ -87,20 +87,37 @@ export interface V015RebindingInput {
 export function resolveV015ParenthesesRole(
   role: V015ParenthesesRole | undefined,
 ): V015ParenthesesRole {
-  void role;
-  throw new V015FormalRoleError("unimplemented");
+  if (role === undefined) {
+    throw new V015FormalRoleError("ambiguous-parentheses-role");
+  }
+  if (role === "GROUPING" || role === "CONTEXT" || role === "APPLICATION") {
+    return role;
+  }
+  throw new V015FormalRoleError("invalid-parentheses-role");
 }
 
 export function resolveV015DotRole(
   role: V015DotRole | undefined,
 ): V015DotRole {
-  void role;
-  throw new V015FormalRoleError("unimplemented");
+  if (role === undefined) {
+    throw new V015FormalRoleError("ambiguous-dot-role");
+  }
+  if (role === "CURRENT_OCCURRENCE" || role === "CONTEXTUAL_NAME_QUALIFIER") {
+    return role;
+  }
+  throw new V015FormalRoleError("invalid-dot-role");
 }
 
 export function validateV015Rebinding(
   input: V015RebindingInput,
 ): V015RebindingDecision {
-  void input;
-  throw new V015FormalRoleError("unimplemented");
+  if (!input.hasPreviousBinding) return "INITIAL_BINDING";
+  if (input.sameSemanticValue) return "IDENTICAL_BINDING";
+  if (input.scopeRelation === "SAME_SCOPE") {
+    throw new V015FormalRoleError("same-scope-rebinding-conflict");
+  }
+  if (input.mutability === "CONSTANT") {
+    throw new V015FormalRoleError("constant-rebinding");
+  }
+  return "VARIABLE_SHADOW";
 }
