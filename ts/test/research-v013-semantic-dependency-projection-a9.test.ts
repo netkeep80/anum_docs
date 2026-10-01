@@ -161,6 +161,7 @@ const postV013ProofTransportFunctions = new Set<string>([
   "exportPortableClosedRootedProof",
   "replayPortableClosedRootedProof",
 ]);
+// v0.15 candidate code is current research, never retroactive v0.13 evidence.
 const v015DirectAssociationResearchPath = "ts/src/v015-direct-association.ts";
 const v015DirectAssociationResearchFunctions = new Set<string>([
   "directSequentialAssociation",
