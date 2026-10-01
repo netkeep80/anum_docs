@@ -160,6 +160,7 @@ const postV013ProofTransportFunctions = new Set<string>([
   "exportPortableClosedRootedProof",
 ]);
 
+// Exceptions are path+function exact so any unrelated post-v0.13 growth still fails closed.
 function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<string> {
   if (sourcePath === postV013CarrierPath) return postV013RepresentationPublicFunctions;
   if (sourcePath === postV013ProofTransportPath) return postV013ProofTransportFunctions;
