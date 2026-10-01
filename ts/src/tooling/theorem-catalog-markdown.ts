@@ -144,7 +144,7 @@ function renderAssurance(theorem: TheoremProjectionTheorem): string[] {
 
 function renderCard(theorem: TheoremProjectionTheorem): string {
   const lines = [
-    `<a id="theorem-${theorem.id.toLowerCase()}"></a>`,
+    `<a id="theorem-${theorem.id.toLowerCase()}"></a> <!-- якорь теоремы -->`,
     `## Теорема ${theorem.id}`,
     "",
     `**Статус:** текущая теорема; нативная классификация: ${theorem.nativeAssurance === null ? "нет" : inlineCode(theorem.nativeAssurance.classification)}.`,
