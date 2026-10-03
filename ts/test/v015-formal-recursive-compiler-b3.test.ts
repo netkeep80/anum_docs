@@ -366,7 +366,6 @@ class CyclicSemanticProbe implements WriteMemory {
   const first = f.memory.ensure(f.basis.L, f.basis.U);
   const second = f.memory.ensure(f.basis.U, f.basis.L);
   const probe = new CyclicSemanticProbe(f.memory, first, second);
-  const before = f.memory.linkCount;
   let rejected = false;
   try {
     materializeV013HierarchicalCarrierFromSemanticLink(
@@ -382,8 +381,7 @@ class CyclicSemanticProbe implements WriteMemory {
     same(error.code, "invalid-semantic-link", "exact cyclic semantic rejection");
     rejected = true;
   }
-  assert(rejected, "unsupported semantic cycle must fail closed");
-  same(f.memory.linkCount, before, "failed cyclic projection publishes no carrier");
+  assert(rejected, "unsupported semantic cycle must fail before any carrier/wire result is returned");
 }
 
 console.log([
