@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
@@ -76,6 +77,10 @@ function differentBytes(
   }
   throw new Error(`v0.15 P0 FND-07 FORMAL: ${message}: bytes unexpectedly equal`);
 }
+function sha256(bytes: Uint8Array): string {
+  return createHash("sha256").update(bytes).digest("hex");
+}
+
 function repositoryRoot(): string {
   const candidates = [resolve(process.cwd(), ".."), process.cwd()];
   const root = candidates.find((candidate) =>
@@ -549,6 +554,17 @@ const trackedDetachment = readFileSync(
 );
 const trackedTruthRole = readFileSync(
   resolve(root, "proofs", "native", "FND-07", "a16-truth-role.anum"),
+);
+
+same(
+  sha256(trackedDetachment),
+  "a565b72a9caa77007f297490b5cccf3b2945388b006431395b6f117cd6375347",
+  "tracked detachment SHA-256 remains accepted",
+);
+same(
+  sha256(trackedTruthRole),
+  "8e03a22c06fe93b1e645785cbdf635347427a5f8e50d024aef6b2d6c15d1aea3",
+  "tracked A16 truth-role SHA-256 remains accepted",
 );
 
 {
