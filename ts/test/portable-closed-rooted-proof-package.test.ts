@@ -18,6 +18,7 @@ import {
   StructuralRootedProofAsetReplayError,
   replayStructuralRootedProofAset,
 } from "../src/rooted-proof-aset.js";
+import { exportObservedReplaySupportTopology } from "../src/replay-support-topology.js";
 import {
   materializeV013HierarchicalCarrierFromSemanticLink,
   serializeV013HierarchicalCarrier,
@@ -77,6 +78,77 @@ function buildFixture(admit = true): Fixture {
   return Object.freeze({ memory, basis, theory, claim, proofRoot });
 }
 
+function buildOpenFixture(useDeclaredAssumption: boolean): Fixture {
+  const memory = new Memory();
+  const basis = ensureRootBasis(memory);
+  const theory = memory.ensure(basis.L, basis.U);
+  let cursor = memory.ensure(basis.U, basis.R);
+  const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, basis.R));
+
+  const a = fresh();
+  const b = fresh();
+
+  let primitiveDerivationRule: LinkHandle;
+  let dependencies: readonly LinkHandle[];
+
+  if (useDeclaredAssumption) {
+    const s = fresh();
+    const t = fresh();
+    const sourceDictionary = defineStructuralRoleDictionary(memory, [s, t]);
+    const primitiveRule = defineStructuralRule(memory, sourceDictionary, t);
+    admitStructuralRule(memory, theory, primitiveRule);
+    primitiveDerivationRule = defineStructuralDerivationRule(
+      memory,
+      primitiveRule,
+      [s],
+    );
+    admitStructuralDerivationRule(memory, theory, primitiveDerivationRule);
+  } else {
+    const sourceDictionary = defineStructuralRoleDictionary(memory, []);
+    const primitiveRule = defineStructuralRule(memory, sourceDictionary, b);
+    admitStructuralRule(memory, theory, primitiveRule);
+    primitiveDerivationRule = defineStructuralDerivationRule(
+      memory,
+      primitiveRule,
+      [],
+    );
+    admitStructuralDerivationRule(memory, theory, primitiveDerivationRule);
+  }
+
+  const targetDictionary = defineStructuralRoleDictionary(memory, [a, b]);
+  const targetRule = defineStructuralRule(memory, targetDictionary, b);
+  admitStructuralRule(memory, theory, targetRule);
+  const targetDerivationRule = defineStructuralDerivationRule(
+    memory,
+    targetRule,
+    [a],
+  );
+  const targetIdentity = memory.ensure(targetDerivationRule, theory);
+
+  if (useDeclaredAssumption) {
+    dependencies = [memory.ensure(a, targetIdentity)];
+  } else {
+    dependencies = [];
+  }
+
+  const occurrence = memory.ensure(
+    b,
+    memory.ensure(
+      primitiveDerivationRule,
+      materializeExactSequence(memory, dependencies),
+    ),
+  );
+  const proofRoot = memory.ensure(targetIdentity, occurrence);
+
+  return Object.freeze({
+    memory,
+    basis,
+    theory,
+    claim: b,
+    proofRoot,
+  });
+}
+
 function semanticWire(
   memory: Memory,
   basis: RootBasis,
@@ -87,6 +159,35 @@ function semanticWire(
     basis,
     materializeV013HierarchicalCarrierFromSemanticLink(memory, basis, semantic),
   );
+}
+
+function exportUncheckedPortableRootedProof(
+  memory: Memory,
+  basis: RootBasis,
+  proofRoot: LinkHandle,
+): Uint8Array {
+  const observed = exportObservedReplaySupportTopology(
+    memory,
+    (observedMemory) => replayStructuralRootedProofAset(observedMemory, proofRoot),
+    [proofRoot],
+  );
+  const supportSequence = materializeExactSequence(memory, observed.links);
+  const envelope = memory.ensure(proofRoot, supportSequence);
+  return semanticWire(memory, basis, envelope);
+}
+
+function expectNotClosedReject(effect: () => unknown, label: string): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(
+      error instanceof StructuralRootedProofAsetReplayError,
+      `${label}: wrong error type`,
+    );
+    same(error.code, "proof-not-closed", `${label}: exact rejection code`);
+    return;
+  }
+  throw new Error(`${label}: expected CLOSED-boundary rejection`);
 }
 
 function expectRootedReject(effect: () => unknown, label: string): void {
@@ -136,6 +237,77 @@ function main(): void {
   replayStructuralRootedProofAset(restored.memory, restored.proofRoot);
   same(restored.memory.linkCount, beforeReplay, "fresh trusted replay is read-only");
 
+  // The CLOSED-labelled exporter must reject a semantically valid rooted proof
+  // that still depends on a declared premise, before writing package scaffolding.
+  const usedOpen = buildOpenFixture(true);
+  const usedReplay = replayStructuralRootedProofAset(
+    usedOpen.memory,
+    usedOpen.proofRoot,
+  );
+  same(usedReplay.declaredAssumptionCount, 1, "open fixture declares one premise");
+  same(usedReplay.usedAssumptionCount, 1, "open fixture uses one premise");
+  const beforeOpenExport = usedOpen.memory.linkCount;
+  expectNotClosedReject(
+    () => exportPortableClosedRootedProof(
+      usedOpen.memory,
+      usedOpen.basis,
+      usedOpen.proofRoot,
+    ),
+    "export rejects declared+used premise",
+  );
+  same(
+    usedOpen.memory.linkCount,
+    beforeOpenExport,
+    "rejected open export writes no package scaffolding",
+  );
+
+  // Receiver validation is independent of the trusted sender. Build hostile
+  // bytes through the lower transport primitives and require the CLOSED API to
+  // reject after fresh rooted replay.
+  const hostileUsed = exportUncheckedPortableRootedProof(
+    usedOpen.memory,
+    usedOpen.basis,
+    usedOpen.proofRoot,
+  );
+  expectNotClosedReject(
+    () => replayPortableClosedRootedProof(hostileUsed),
+    "receiver rejects declared+used premise",
+  );
+
+  // A declared but unused premise is still not CLOSED. This prevents a package
+  // from gaining CLOSED classification merely because its open premise was not
+  // needed by the selected derivation.
+  const unusedOpen = buildOpenFixture(false);
+  const unusedReplay = replayStructuralRootedProofAset(
+    unusedOpen.memory,
+    unusedOpen.proofRoot,
+  );
+  same(unusedReplay.declaredAssumptionCount, 1, "unused fixture declares one premise");
+  same(unusedReplay.usedAssumptionCount, 0, "unused fixture uses no premise");
+  const beforeUnusedExport = unusedOpen.memory.linkCount;
+  expectNotClosedReject(
+    () => exportPortableClosedRootedProof(
+      unusedOpen.memory,
+      unusedOpen.basis,
+      unusedOpen.proofRoot,
+    ),
+    "export rejects declared-but-unused premise",
+  );
+  same(
+    unusedOpen.memory.linkCount,
+    beforeUnusedExport,
+    "rejected unused-premise export writes no package scaffolding",
+  );
+  const hostileUnused = exportUncheckedPortableRootedProof(
+    unusedOpen.memory,
+    unusedOpen.basis,
+    unusedOpen.proofRoot,
+  );
+  expectNotClosedReject(
+    () => replayPortableClosedRootedProof(hostileUnused),
+    "receiver rejects declared-but-unused premise",
+  );
+
   // A reconstructed semantic proof root without its ambient Theory admissions is
   // still not proof authority. Feeding root-only bytes into the envelope API must
   // fail at rooted K1 rather than being auto-accepted after reconstruction.
@@ -169,6 +341,7 @@ function main(): void {
   console.log("FRESH_MEMORY_STRUCTURAL_ENTRY_RECOVERY = SUPPORTED");
   console.log("FRESH_MEMORY_THEORY_RECOVERY = SUPPORTED");
   console.log("FRESH_MEMORY_K1_REPLAY_REQUIRED = TRUE");
+  console.log("CLOSED_BOUNDARY_REJECTS_OPEN_PROOFS = TRUE");
   console.log("ROOT_ONLY_AUTO_ACCEPT = FALSE");
   console.log("THEOREM_METADATA_AUTHORITY = NONE");
   console.log("accepted semantic delta = NONE");
