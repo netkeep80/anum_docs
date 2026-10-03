@@ -86,8 +86,9 @@ function repositoryRoot(): string {
   return root;
 }
 function formalOverlayEntry(id: string): FormalOverlayEntry {
-  const overlay = JSON.parse(readFileSync(resolve(repositoryRoot(), "theorems/formal-v0.15.json"), "utf8"))
-    as { entries?: FormalOverlayEntry[] };
+  const overlay = JSON.parse(
+    readFileSync(resolve(repositoryRoot(), "theorems/formal-v0.15.json"), "utf8"),
+  ) as { entries?: FormalOverlayEntry[] };
   const entry = overlay.entries?.find((candidate) => candidate.id === id);
   assert(entry !== undefined, "FORMAL overlay entry " + id);
   return entry;
