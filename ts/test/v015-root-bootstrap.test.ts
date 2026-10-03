@@ -326,7 +326,7 @@ function assertBasis(read: V015RootBootstrapRead, n: BootstrapNames, basis: Root
   const bn = names(b, ["R", "O", "C", "L", "U"]);
   const ar = resolve(a, buildBootstrap(a, an));
   const br = resolve(b, buildBootstrap(b, bn));
-  assert(a.basis.R !== b.basis.R, "independent Memories use local handles");
+  assert(a.memory !== b.memory, "independent Memories remain separate authorities");
   assertBasis(ar, an, a.basis);
   assertBasis(br, bn, b.basis);
 }
@@ -388,12 +388,15 @@ function assertBasis(read: V015RootBootstrapRead, n: BootstrapNames, basis: Root
     value,
   })));
   const aset = b.finish(block);
+  let rejected = false;
   try {
     resolve(f, aset);
   } catch (error) {
     assert(error instanceof SourceNamespaceError, "duplicate name rejected by #1919 boundary");
     same(error.code, "duplicate-local-name", "exact duplicate-name error");
+    rejected = true;
   }
+  assert(rejected, "duplicate local name must fail closed");
 }
 
 console.log([
