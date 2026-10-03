@@ -379,3 +379,390 @@ export function materializeV015ProofSource(
   const result = asKind(build(source.root), "closed");
   return Object.freeze({ closedRoot: result.root });
 }
+
+export interface V015ProofDenotationProfile {
+  readonly dictionaryTag: LinkHandle;
+  readonly ruleTag: LinkHandle;
+  readonly derivationTag: LinkHandle;
+  readonly mappingTag: LinkHandle;
+  readonly morphismTag: LinkHandle;
+  readonly genericTag: LinkHandle;
+  readonly bindingTag: LinkHandle;
+  readonly openTag: LinkHandle;
+  readonly primitiveTag: LinkHandle;
+  readonly coordinateTag: LinkHandle;
+  readonly dischargeTag: LinkHandle;
+}
+
+const denotationProfileKeys = [
+  "dictionaryTag",
+  "ruleTag",
+  "derivationTag",
+  "mappingTag",
+  "morphismTag",
+  "genericTag",
+  "bindingTag",
+  "openTag",
+  "primitiveTag",
+  "coordinateTag",
+  "dischargeTag",
+] as const;
+
+export function readV015ProofDenotationProfile(
+  memory: WriteMemory,
+  root: LinkHandle,
+): V015ProofDenotationProfile {
+  let values: readonly LinkHandle[];
+  try {
+    values = readExactSequence(memory, root).values;
+  } catch {
+    return fail("invalid-profile");
+  }
+  if (values.length !== denotationProfileKeys.length) {
+    return fail("invalid-profile");
+  }
+  const out: Partial<Record<
+    (typeof denotationProfileKeys)[number],
+    LinkHandle
+  >> = {};
+  denotationProfileKeys.forEach((key, index) => {
+    const value = values[index];
+    if (value === undefined) fail("invalid-profile");
+    out[key] = value;
+  });
+  const tags = denotationProfileKeys.map((key) => out[key]!);
+  if (new Set(tags).size !== tags.length) fail("invalid-profile");
+  return Object.freeze(out as unknown as V015ProofDenotationProfile);
+}
+
+function denotationSequence(
+  memory: WriteMemory,
+  handle: LinkHandle,
+  length?: number,
+): readonly LinkHandle[] {
+  let values: readonly LinkHandle[];
+  try {
+    values = readExactSequence(memory, handle).values;
+  } catch {
+    return fail("invalid-source");
+  }
+  if (length !== undefined && values.length !== length) {
+    return fail("invalid-source");
+  }
+  return values;
+}
+
+function denotationPayload(
+  memory: WriteMemory,
+  form: LinkHandle,
+  tag: LinkHandle,
+): LinkHandle {
+  try {
+    const poles = memory.poles(form);
+    if (poles.start !== tag) return fail("unexpected-form");
+    return poles.end;
+  } catch (error) {
+    if (error instanceof V015ProofFormError) throw error;
+    return fail("invalid-source");
+  }
+}
+
+export function materializeV015ProofDenotation(
+  memory: WriteMemory,
+  profileRoot: LinkHandle,
+  sourceRoot: LinkHandle,
+): V015ProofFormMaterializeResult {
+  const profile = readV015ProofDenotationProfile(memory, profileRoot);
+
+  const dictionaries = new Map<LinkHandle, LinkHandle>();
+  const rules = new Map<LinkHandle, LinkHandle>();
+  const derivations = new Map<LinkHandle, LinkHandle>();
+  const mappings = new Map<LinkHandle, Readonly<{
+    source: LinkHandle;
+    target: LinkHandle;
+  }>>();
+  const morphisms = new Map<LinkHandle, LinkHandle>();
+  const generics = new Map<
+    LinkHandle,
+    StructuralHeterogeneousDerivedDerivationEvidence
+  >();
+  const bindings = new Map<LinkHandle, Readonly<{
+    role: LinkHandle;
+    value: LinkHandle;
+  }>>();
+  const opens = new Map<LinkHandle, Readonly<{
+    generic: StructuralHeterogeneousDerivedDerivationEvidence;
+    root: LinkHandle;
+  }>>();
+  const primitives = new Map<LinkHandle, Readonly<{
+    claim: LinkHandle;
+    occurrence: LinkHandle;
+  }>>();
+  const coordinates = new Map<LinkHandle, Readonly<{
+    claim: LinkHandle;
+    occurrence: LinkHandle;
+  }>>();
+
+  const dictionary = (form: LinkHandle): LinkHandle => {
+    const known = dictionaries.get(form);
+    if (known !== undefined) return known;
+    const roles = denotationSequence(
+      memory,
+      denotationPayload(memory, form, profile.dictionaryTag),
+    );
+    const result = defineStructuralRoleDictionary(memory, roles);
+    dictionaries.set(form, result);
+    return result;
+  };
+
+  const rule = (form: LinkHandle): LinkHandle => {
+    const known = rules.get(form);
+    if (known !== undefined) return known;
+    const values = denotationSequence(
+      memory,
+      denotationPayload(memory, form, profile.ruleTag),
+      2,
+    );
+    const dictionaryForm = values[0] ?? fail("invalid-source");
+    const body = values[1] ?? fail("invalid-source");
+    const result = defineStructuralRule(
+      memory,
+      dictionary(dictionaryForm),
+      body,
+    );
+    rules.set(form, result);
+    return result;
+  };
+
+  const derivation = (form: LinkHandle): LinkHandle => {
+    const known = derivations.get(form);
+    if (known !== undefined) return known;
+    const values = denotationSequence(
+      memory,
+      denotationPayload(memory, form, profile.derivationTag),
+      2,
+    );
+    const ruleForm = values[0] ?? fail("invalid-source");
+    const premisesCarrier = values[1] ?? fail("invalid-source");
+    const result = defineStructuralDerivationRule(
+      memory,
+      rule(ruleForm),
+      denotationSequence(memory, premisesCarrier),
+    );
+    derivations.set(form, result);
+    return result;
+  };
+
+  const mapping = (form: LinkHandle) => {
+    const known = mappings.get(form);
+    if (known !== undefined) return known;
+    const values = denotationSequence(
+      memory,
+      denotationPayload(memory, form, profile.mappingTag),
+      2,
+    );
+    const result = Object.freeze({
+      source: values[0] ?? fail("invalid-source"),
+      target: values[1] ?? fail("invalid-source"),
+    });
+    mappings.set(form, result);
+    return result;
+  };
+
+  const morphism = (form: LinkHandle): LinkHandle => {
+    const known = morphisms.get(form);
+    if (known !== undefined) return known;
+    const values = denotationSequence(
+      memory,
+      denotationPayload(memory, form, profile.morphismTag),
+      4,
+    );
+    const theory = values[0] ?? fail("invalid-source");
+    const sourceDictionaryForm = values[1] ?? fail("invalid-source");
+    const targetDictionaryForm = values[2] ?? fail("invalid-source");
+    const mappingCarrier = values[3] ?? fail("invalid-source");
+    const mappingForms = denotationSequence(memory, mappingCarrier);
+    const result = materializeExactSequence(memory, [
+      theory,
+      dictionary(sourceDictionaryForm),
+      dictionary(targetDictionaryForm),
+      materializeExactSequence(
+        memory,
+        mappingForms.map((entry) => {
+          const pair = mapping(entry);
+          return memory.ensure(pair.source, pair.target);
+        }),
+      ),
+    ]);
+    morphisms.set(form, result);
+    return result;
+  };
+
+  const generic = (
+    form: LinkHandle,
+  ): StructuralHeterogeneousDerivedDerivationEvidence => {
+    const known = generics.get(form);
+    if (known !== undefined) return known;
+    const values = denotationSequence(
+      memory,
+      denotationPayload(memory, form, profile.genericTag),
+      4,
+    );
+    const targetDerivationForm = values[0] ?? fail("invalid-source");
+    const theory = values[1] ?? fail("invalid-source");
+    const localDerivationForm = values[2] ?? fail("invalid-source");
+    const morphismForm = values[3] ?? fail("invalid-source");
+
+    const targetDR = derivation(targetDerivationForm);
+    const localDR = derivation(localDerivationForm);
+    const localSchema = readStructuralDerivationRule(memory, localDR);
+    admitStructuralRule(memory, theory, localSchema.structuralRule);
+    admitStructuralDerivationRule(memory, theory, localDR);
+
+    const targetSchema = readStructuralDerivationRule(memory, targetDR);
+    const targetRule = readStructuralRule(
+      memory,
+      targetSchema.structuralRule,
+    );
+    const identity = memory.ensure(targetDR, theory);
+    const dependencies = targetSchema.premiseTemplates.map((premise) =>
+      memory.ensure(premise, identity)
+    );
+    const targetOccurrence = memory.ensure(
+      targetRule.body,
+      memory.ensure(
+        localDR,
+        memory.ensure(
+          morphism(morphismForm),
+          materializeExactSequence(memory, dependencies),
+        ),
+      ),
+    );
+    const evidence = Object.freeze({ identity, targetOccurrence });
+    replayStructuralHeterogeneousDerivedDerivationSchema(memory, evidence);
+    generics.set(form, evidence);
+    return evidence;
+  };
+
+  const binding = (form: LinkHandle) => {
+    const known = bindings.get(form);
+    if (known !== undefined) return known;
+    const values = denotationSequence(
+      memory,
+      denotationPayload(memory, form, profile.bindingTag),
+      2,
+    );
+    const result = Object.freeze({
+      role: values[0] ?? fail("invalid-source"),
+      value: values[1] ?? fail("invalid-source"),
+    });
+    bindings.set(form, result);
+    return result;
+  };
+
+  const open = (form: LinkHandle) => {
+    const known = opens.get(form);
+    if (known !== undefined) return known;
+    const values = denotationSequence(
+      memory,
+      denotationPayload(memory, form, profile.openTag),
+      2,
+    );
+    const genericForm = values[0] ?? fail("invalid-source");
+    const bindingsCarrier = values[1] ?? fail("invalid-source");
+    const genericEvidence = generic(genericForm);
+    const root = materializeHeterogeneousDerivedOpenRootedExpansion(
+      memory,
+      genericEvidence,
+      denotationSequence(memory, bindingsCarrier).map((entry) => {
+        const item = binding(entry);
+        return { role: item.role, value: item.value };
+      }),
+    ).concreteRoot;
+    const result = Object.freeze({
+      generic: genericEvidence,
+      root,
+    });
+    opens.set(form, result);
+    return result;
+  };
+
+  const primitive = (form: LinkHandle) => {
+    const known = primitives.get(form);
+    if (known !== undefined) return known;
+    const values = denotationSequence(
+      memory,
+      denotationPayload(memory, form, profile.primitiveTag),
+      2,
+    );
+    const theory = values[0] ?? fail("invalid-source");
+    const claim = values[1] ?? fail("invalid-source");
+    const dictionary = defineStructuralRoleDictionary(memory, []);
+    const structuralRule = defineStructuralRule(memory, dictionary, claim);
+    const dr = defineStructuralDerivationRule(
+      memory,
+      structuralRule,
+      [],
+    );
+    admitStructuralRule(memory, theory, structuralRule);
+    admitStructuralDerivationRule(memory, theory, dr);
+    const result = Object.freeze({
+      claim,
+      occurrence: memory.ensure(
+        claim,
+        memory.ensure(
+          dr,
+          materializeExactSequence(memory, []),
+        ),
+      ),
+    });
+    primitives.set(form, result);
+    return result;
+  };
+
+  const coordinate = (form: LinkHandle) => {
+    const known = coordinates.get(form);
+    if (known !== undefined) return known;
+    const values = denotationSequence(
+      memory,
+      denotationPayload(memory, form, profile.coordinateTag),
+      2,
+    );
+    const claim = values[0] ?? fail("invalid-source");
+    const primitiveForm = values[1] ?? fail("invalid-source");
+    const proof = primitive(primitiveForm);
+    if (proof.claim !== claim) fail("invalid-reference");
+    const result = Object.freeze({
+      claim,
+      occurrence: proof.occurrence,
+    });
+    coordinates.set(form, result);
+    return result;
+  };
+
+  const dischargePayload = denotationSequence(
+    memory,
+    denotationPayload(memory, sourceRoot, profile.dischargeTag),
+    2,
+  );
+  const openForm = dischargePayload[0] ?? fail("invalid-source");
+  const coordinateCarrier =
+    dischargePayload[1] ?? fail("invalid-source");
+  const opened = open(openForm);
+  const openIdentity = memory.poles(opened.root).start;
+  const closed = materializeHeterogeneousDerivedClosedRootedDischarge(
+    memory,
+    {
+      generic: opened.generic,
+      concreteRoot: opened.root,
+    },
+    denotationSequence(memory, coordinateCarrier).map((entry) => {
+      const item = coordinate(entry);
+      return {
+        assumptionOccurrence: memory.ensure(item.claim, openIdentity),
+        proofOccurrence: item.occurrence,
+      };
+    }),
+  ).closedRoot;
+  return Object.freeze({ closedRoot: closed });
+}
