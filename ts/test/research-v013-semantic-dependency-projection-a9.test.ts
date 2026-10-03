@@ -211,6 +211,7 @@ const v015FormalEvaluationResearchFunctions = new Set<string>([
   "materializeV015EvaluationRequest",
   "materializeV015RootEvaluationBoundary",
 ]);
+const v015SourceNamespaceResearchPath = "ts/src/source-namespace.ts";
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
 function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<string> {
@@ -1208,8 +1209,13 @@ const postV013ToolingDeltaFiles = new Set([
 const postV013CandidateDeltaFiles = new Set([
   postV013CarrierPath,
   postV013ProofTransportPath,
-  "ts/src/native-syntax-grammar.ts",
-  "ts/src/v015-formal-evaluation.ts",
+  v015DirectAssociationResearchPath,
+  v015WritingProjectionResearchPath,
+  v015FormalRolesResearchPath,
+  v015FormalGrammarResearchPath,
+  v015NativeSyntaxGrammarResearchPath,
+  v015FormalEvaluationResearchPath,
+  v015SourceNamespaceResearchPath,
 ]);
 const postV013DecisionDeltaFiles = new Set([
   ...postV013ToolingDeltaFiles,
