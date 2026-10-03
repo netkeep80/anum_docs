@@ -2,7 +2,9 @@ import {
   Memory,
   ensureRootBasis,
   type LinkHandle,
+  type LinkPoles,
   type RootBasis,
+  type WriteMemory,
 } from "../src/memory.js";
 import {
   materializeNativeSyntaxGrammar,
@@ -23,6 +25,9 @@ import {
   type V015FormalRecursiveCompileResult,
 } from "../src/v015-formal-recursive-compiler.js";
 import {
+  V013HierarchicalCarrierError,
+  materializeV013HierarchicalCarrier,
+  materializeV013HierarchicalCarrierFromSemanticLink,
   materializeV013SemanticLinkFromHierarchicalCarrier,
 } from "../src/v013-hierarchical-carrier.js";
 import {
@@ -194,10 +199,14 @@ const unicode = [
       materializeV013SemanticLinkFromHierarchicalCarrier(
         f.memory,
         f.basis,
-        definition.recursiveCarrier,
+        materializeV013HierarchicalCarrier(
+          f.memory,
+          f.basis,
+          definition.wire,
+        ),
       ),
       definition.semantic,
-      `${name}: recursive representation round-trip returns same semantic Link`,
+      `${name}: physical wire -> carrier -> semantic round-trip returns same Link`,
     );
   }
 }
@@ -237,10 +246,10 @@ const unicode = [
     materializeV013SemanticLinkFromHierarchicalCarrier(
       f.memory,
       f.basis,
-      x.recursiveCarrier,
+      materializeV013HierarchicalCarrier(f.memory, f.basis, x.wire),
     ),
     x.semantic,
-    "generic X recursive round-trip",
+    "generic X physical wire round-trip",
   );
 }
 
@@ -312,6 +321,69 @@ const unicode = [
     semanticRejected = true;
   }
   assert(semanticRejected, "unbound semantic source produces no representation result");
+}
+
+class CyclicSemanticProbe implements WriteMemory {
+  constructor(
+    private readonly source: Memory,
+    private readonly first: LinkHandle,
+    private readonly second: LinkHandle,
+  ) {}
+  get root(): LinkHandle { return this.source.root; }
+  get linkCount(): number { return this.source.linkCount; }
+  poles(link: LinkHandle): LinkPoles {
+    if (link === this.first) {
+      return Object.freeze({ start: this.second, end: this.source.root });
+    }
+    if (link === this.second) {
+      return Object.freeze({ start: this.first, end: this.source.root });
+    }
+    return this.source.poles(link);
+  }
+  find(start: LinkHandle, end: LinkHandle): LinkHandle | undefined {
+    return this.source.find(start, end);
+  }
+  outgoing(start: LinkHandle): readonly LinkHandle[] {
+    return this.source.outgoing(start);
+  }
+  incoming(end: LinkHandle): readonly LinkHandle[] {
+    return this.source.incoming(end);
+  }
+  ensureRoot(): LinkHandle { return this.source.ensureRoot(); }
+  ensureStartSelfClosed(end: LinkHandle): LinkHandle {
+    return this.source.ensureStartSelfClosed(end);
+  }
+  ensureEndSelfClosed(start: LinkHandle): LinkHandle {
+    return this.source.ensureEndSelfClosed(start);
+  }
+  ensure(start: LinkHandle, end: LinkHandle): LinkHandle {
+    return this.source.ensure(start, end);
+  }
+}
+
+{
+  const f = fixture();
+  const first = f.memory.ensure(f.basis.L, f.basis.U);
+  const second = f.memory.ensure(f.basis.U, f.basis.L);
+  const probe = new CyclicSemanticProbe(f.memory, first, second);
+  const before = f.memory.linkCount;
+  let rejected = false;
+  try {
+    materializeV013HierarchicalCarrierFromSemanticLink(
+      probe,
+      f.basis,
+      first,
+    );
+  } catch (error) {
+    assert(
+      error instanceof V013HierarchicalCarrierError,
+      "unsupported semantic cycle fails in representation stage",
+    );
+    same(error.code, "invalid-semantic-link", "exact cyclic semantic rejection");
+    rejected = true;
+  }
+  assert(rejected, "unsupported semantic cycle must fail closed");
+  same(f.memory.linkCount, before, "failed cyclic projection publishes no carrier");
 }
 
 console.log([
