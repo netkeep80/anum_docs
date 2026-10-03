@@ -107,7 +107,19 @@ function main(): void {
   assert.match(fnd01, /NOT_MIGRATED/);
 
   const fnd02 = section(first, "FND-02");
+  assert.match(fnd02, /FORMAL_MIGRATED/);
+  assert.match(fnd02, /N_A_FOR_KERNEL_REALIZATION/);
+  assert.match(fnd02, /FND02_STATEMENT : FND02_PREMISES->FND02_RULE/);
+  assert.match(fnd02, /A1RecursiveSeparation/);
+  assert.match(fnd02, /X : Link/);
+  assert.match(fnd02, /Grounded\(X\)/);
+  assert.match(fnd02, /F2\/F3 normalization/);
+  assert.match(fnd02, /FND-13/);
   assert.match(fnd02, /KERNEL_REALIZED_NOT_INDEPENDENT/);
+  assert.match(fnd02, /recursive-link-identity\/full-full-canonical-root-base/);
+  assert.match(fnd02, /Независимое нативное доказательство:\*\* нет/i);
+  assert.match(fnd02, /NOT_RECORDED/);
+  assert.match(fnd02, /v015-formal-bound-link-role-b12\.test\.ts/);
   assert.match(
     fnd02,
     /зарегистрированных нативных записей доказательств:\s*0/i,
