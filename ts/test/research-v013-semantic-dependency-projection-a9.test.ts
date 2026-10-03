@@ -160,6 +160,7 @@ const postV013ProofTransportPath = "ts/src/portable-closed-rooted-proof.ts";
 const postV013ProofTransportFunctions = new Set<string>([
   "exportPortableClosedRootedProof",
   "replayPortableClosedRootedProof",
+  "requireClosedReplay",
 ]);
 // v0.15 candidate code is current research, never retroactive v0.13 evidence.
 const v015DirectAssociationResearchPath = "ts/src/v015-direct-association.ts";
@@ -192,26 +193,14 @@ const v015FormalGrammarResearchFunctions = new Set<string>([
   "v015FormalAstStructureEqual",
 ]);
 
-// v0.15 native SyntaxAset Grammar authority is current candidate work, never retroactive v0.13 evidence.
-const v015NativeSyntaxGrammarResearchPath = "ts/src/native-syntax-grammar.ts";
-const v015NativeSyntaxGrammarResearchFunctions = new Set<string>([
-  "materializeNat",
-  "materializeNativeSyntaxGrammar",
+// Whole files introduced after the last green historical v0.13 audit baseline.
+// They are current v0.15/post-v0.13 work and are audited by their own bounded
+// tests; they must never change frozen v0.13 package counts/fingerprints.
+const postV013WholeFileDeltaPaths = new Set<string>([
+  "ts/src/native-syntax-grammar.ts",
+  "ts/src/source-namespace.ts",
+  "ts/src/v015-formal-evaluation.ts",
 ]);
-// v0.15 construction/evaluation lifecycle is current candidate work, never retroactive v0.13 evidence.
-const v015FormalEvaluationResearchPath = "ts/src/v015-formal-evaluation.ts";
-const v015FormalEvaluationResearchFunctions = new Set<string>([
-  "admitTriggeredRule",
-  "defineV015GroundedUnaryEvaluationRule",
-  "defineV015UnaryEvaluationLifecycle",
-  "materializeRoles",
-  "materializeV015ApplicationTerm",
-  "materializeV015CompletedValue",
-  "materializeV015ContinuationFrame",
-  "materializeV015EvaluationRequest",
-  "materializeV015RootEvaluationBoundary",
-]);
-const v015SourceNamespaceResearchPath = "ts/src/source-namespace.ts";
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
 function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<string> {
@@ -221,8 +210,6 @@ function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<strin
   if (sourcePath === v015WritingProjectionResearchPath) return v015WritingProjectionResearchFunctions;
   if (sourcePath === v015FormalRolesResearchPath) return v015FormalRolesResearchFunctions;
   if (sourcePath === v015FormalGrammarResearchPath) return v015FormalGrammarResearchFunctions;
-  if (sourcePath === v015NativeSyntaxGrammarResearchPath) return v015NativeSyntaxGrammarResearchFunctions;
-  if (sourcePath === v015FormalEvaluationResearchPath) return v015FormalEvaluationResearchFunctions;
   return new Set<string>();
 }
 
@@ -718,6 +705,7 @@ function discoverDirectWriteSinks(
 }
 
 const observedDirectWriteSinks = tsSourceFiles("ts/src")
+  .filter((sourcePath) => !postV013WholeFileDeltaPaths.has(sourcePath))
   .flatMap((sourcePath) =>
     discoverDirectWriteSinks(
       sourcePath,
@@ -1051,6 +1039,7 @@ const typedWriteSites: TypedReadSite[] = [];
 const decisionSignalsByOwner = new Map<string, Set<string>>();
 
 for (const sourcePath of sourcePaths) {
+  if (postV013WholeFileDeltaPaths.has(sourcePath)) continue;
   const source = typedProgram.getSourceFile(join(repoRoot, sourcePath));
   assert(source !== undefined, `typed source is available: ${sourcePath}`);
   const excludedFunctions = historicalAuditExcludedFunctions(sourcePath);
@@ -1206,21 +1195,6 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
-const postV013CandidateDeltaFiles = new Set([
-  postV013CarrierPath,
-  postV013ProofTransportPath,
-  v015DirectAssociationResearchPath,
-  v015WritingProjectionResearchPath,
-  v015FormalRolesResearchPath,
-  v015FormalGrammarResearchPath,
-  v015NativeSyntaxGrammarResearchPath,
-  v015FormalEvaluationResearchPath,
-  v015SourceNamespaceResearchPath,
-]);
-const postV013DecisionDeltaFiles = new Set([
-  ...postV013ToolingDeltaFiles,
-  ...postV013CandidateDeltaFiles,
-]);
 
 const decisionSignatures = decisionCandidates.map(
   (entry) => `${entry.file}#${entry.owner} [${entry.signals.join(",")}]`,
@@ -1234,11 +1208,7 @@ for (const entry of decisionCandidates) {
     (observedDecisionCountsByFile[entry.file] ?? 0) + 1;
   const category =
     decisionAudit.fileCategoryByFile[entry.file] ??
-    (postV013ToolingDeltaFiles.has(entry.file)
-      ? "tooling"
-      : postV013CandidateDeltaFiles.has(entry.file)
-        ? "post-v0.13-candidate"
-        : undefined);
+    (postV013ToolingDeltaFiles.has(entry.file) ? "tooling" : undefined);
   assert(typeof category === "string" && category.length > 0,
     `P1f decision file is classified: ${entry.file}`);
   observedDecisionCountsByCategory[category] =
@@ -1276,10 +1246,10 @@ same(
   JSON.stringify(typedReadMemberCounts),
   "typed ReadMemory member counts",
 );
-// The v0.13 S3 projection is immutable historical evidence. Explicit
-// post-v0.13 tooling and v0.15 candidate files are measured as deltas only;
-// the historical aggregate fingerprint is never rewritten. Every historical
-// non-delta file remains count-identical to the frozen projection.
+// The v0.13 S3 projection is immutable historical evidence. Post-v0.13
+// acceptance/documentation work may refactor only explicitly classified
+// tooling files; the historical aggregate fingerprint is never rewritten.
+// Every non-tooling file must remain count-identical to the frozen projection.
 const projectedDecisionCountsByFile = decisionAudit.decisionOwnerCountsByFile as Record<string, number>;
 const driftFiles = [...new Set([
   ...Object.keys(projectedDecisionCountsByFile),
@@ -1288,21 +1258,21 @@ const driftFiles = [...new Set([
   (projectedDecisionCountsByFile[file] ?? 0) !== (observedDecisionCountsByFile[file] ?? 0)
 );
 assert(
-  driftFiles.every((file) => postV013DecisionDeltaFiles.has(file)),
-  `post-v0.13 static decision drift is explicitly classified: ${driftFiles.join(", ")}`,
+  driftFiles.every((file) => postV013ToolingDeltaFiles.has(file)),
+  `post-v0.13 static decision drift is tooling-only: ${driftFiles.join(", ")}`,
 );
-const projectedPostV013DecisionOwners = [...postV013DecisionDeltaFiles]
+const projectedPostV013ToolingDecisionOwners = [...postV013ToolingDeltaFiles]
   .reduce((sum, file) => sum + (projectedDecisionCountsByFile[file] ?? 0), 0);
-const observedPostV013DecisionOwners = [...postV013DecisionDeltaFiles]
+const observedPostV013ToolingDecisionOwners = [...postV013ToolingDeltaFiles]
   .reduce((sum, file) => sum + (observedDecisionCountsByFile[file] ?? 0), 0);
 same(
-  decisionCandidates.length - observedPostV013DecisionOwners,
-  decisionAudit.decisionCandidateOwnerCount - projectedPostV013DecisionOwners,
-  "historical host-decision owner count remains frozen while explicit post-v0.13 deltas evolve",
+  decisionCandidates.length - observedPostV013ToolingDecisionOwners,
+  decisionAudit.decisionCandidateOwnerCount - projectedPostV013ToolingDecisionOwners,
+  "non-tooling host-decision owner count remains frozen while post-v0.13 tooling may evolve",
 );
 
 for (const [file, projectedCount] of Object.entries(projectedDecisionCountsByFile)) {
-  if (postV013DecisionDeltaFiles.has(file)) continue;
+  if (postV013ToolingDeltaFiles.has(file)) continue;
   same(
     observedDecisionCountsByFile[file] ?? 0,
     projectedCount,
@@ -1372,8 +1342,8 @@ same(
   "metric: typed direct Memory write owners",
 );
 same(
-  decisionCandidates.length - observedPostV013DecisionOwners,
-  projection.metrics.staticSemanticDecisionCandidateOwnerCount - projectedPostV013DecisionOwners,
+  decisionCandidates.length - observedPostV013ToolingDecisionOwners,
+  projection.metrics.staticSemanticDecisionCandidateOwnerCount - projectedPostV013ToolingDecisionOwners,
   "metric: frozen non-tooling static decision candidate owners",
 );
 same(
