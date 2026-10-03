@@ -1364,8 +1364,8 @@ same(
   "metric: typed direct Memory write owners",
 );
 same(
-  decisionCandidates.length - observedPostV013ToolingDecisionOwners,
-  projection.metrics.staticSemanticDecisionCandidateOwnerCount - projectedPostV013ToolingDecisionOwners,
+  decisionCandidates.length - observedPostV013DecisionOwners,
+  projection.metrics.staticSemanticDecisionCandidateOwnerCount - projectedPostV013DecisionOwners,
   "metric: frozen non-tooling static decision candidate owners",
 );
 same(
