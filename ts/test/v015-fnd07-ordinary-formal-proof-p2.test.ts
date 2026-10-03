@@ -209,9 +209,15 @@ differentOrReject(
   ()=>artifact(source.replace("MAP_A_DATA : [a,A]","MAP_A_DATA : [a,B]").replace("MAP_B_DATA : [b,B]","MAP_B_DATA : [b,A]")),
   golden,"swapped A/B morphism",
 );
-differentOrReject(
-  ()=>artifact(source.replace("GLOBAL_ROLES : [S,K,A,B]","GLOBAL_ROLES : [S,K,B,A]")),
-  golden,"reordered global roles",
+sameBytes(
+  artifact(
+    source.replace(
+      "GLOBAL_ROLES : [S,K,A,B]",
+      "GLOBAL_ROLES : [S,K,B,A]",
+    ),
+  ),
+  golden,
+  "role enumeration order is not proof authority under explicit role identity",
 );
 differentOrReject(
   ()=>artifact(source.replace("COORDS : [COORD_TRUTH,COORD_RULE]","COORDS : [COORD_TRUTH]")),
@@ -236,6 +242,7 @@ console.log([
   "JSON_J1_PROOF_SOURCE=BYTE_EXACT",
   "RENAMING_INVARIANCE=GREEN",
   "MORPHISM_MUTATION=REJECT_OR_DIFF",
+  "ROLE_ENUMERATION_ORDER=NON_AUTHORITY",
   "MISSING_COORDINATE=REJECT_OR_DIFF",
   "PAIR_NE_ROLE_SEQUENCE=GREEN",
   "THEOREM_ID_DISPATCH=0",
