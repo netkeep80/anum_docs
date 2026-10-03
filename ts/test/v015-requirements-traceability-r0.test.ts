@@ -108,7 +108,7 @@ function validateCandidate(req: Json, trace: Json): void {
   const current = record(trace.currentAccepted, "currentAccepted");
   assert(text(current.mtsVersion, "current accepted version") === "v0.14", "v0.14 remains accepted/current");
   assert(text(current.requirements, "current accepted requirements") === "requirements/mts-v0.14.json", "accepted requirements pointer");
-  assert(bool(accepted14.accepted, "v0.14 accepted") === true, "accepted v0.14 registry remains accepted");
+  assert(text(accepted14.status, "v0.14 status") === "accepted", "accepted v0.14 registry remains accepted");
 
   const list = req.requirements;
   assert(Array.isArray(list), "requirements array");
