@@ -30,8 +30,6 @@ export type V015LinkDefinitionErrorCode =
   | "unsupported-expression"
   | "unbound-name"
   | "unresolved-constraint"
-  | "no-structural-solution"
-  | "ambiguous-structural-solution"
   | "replay-wrote";
 
 export class V015LinkDefinitionError extends Error {
@@ -102,7 +100,7 @@ function readProfile(
       pairLeftRole === pairRightRole
     ) {
       return fail("invalid-profile");
-    }
+  }
     return Object.freeze({
       pairForm,
       nameRefForm,
@@ -197,71 +195,26 @@ function requireFlatDefinitions(
   }
 }
 
-function selfStartCandidates(
-  memory: ReadMemory,
-  end: LinkHandle,
-): readonly LinkHandle[] {
-  return memory.incoming(end).filter((candidate) => {
-    const poles = memory.poles(candidate);
-    return poles.start === candidate && poles.end === end;
-  });
-}
-
-function selfEndCandidates(
-  memory: ReadMemory,
-  start: LinkHandle,
-): readonly LinkHandle[] {
-  return memory.outgoing(start).filter((candidate) => {
-    const poles = memory.poles(candidate);
-    return poles.start === start && poles.end === candidate;
-  });
-}
-
-function oneCandidate(candidates: readonly LinkHandle[]): LinkHandle {
-  const unique = [...new Set(candidates)];
-  if (unique.length === 0) fail("no-structural-solution");
-  if (unique.length !== 1) fail("ambiguous-structural-solution");
-  return unique[0]!;
-}
-
-function solvePair(
-  memory: ReadMemory,
-  left: SymbolicValue,
-  right: SymbolicValue,
+function resolveOperand(
+  profile: V015LinkDefinitionProfile,
+  occurrences: ReadonlyMap<LinkHandle, SyntaxAsetOccurrence>,
+  declaredNames: ReadonlySet<LinkHandle>,
+  resolved: ReadonlyMap<LinkHandle, LinkHandle>,
+  targetName: LinkHandle,
+  operand: LinkHandle,
 ): SymbolicValue {
-  if (left.kind === "pending" || right.kind === "pending") {
-    return Object.freeze({ kind: "pending" });
-  }
-  if (left.kind === "link" && right.kind === "link") {
-    const found = memory.find(left.value, right.value);
-    if (found === undefined) fail("no-structural-solution");
-    return Object.freeze({ kind: "link", value: found });
-  }
-  if (left.kind === "self" && right.kind === "self") {
-    const root = memory.root;
-    const poles = memory.poles(root);
-    if (poles.start !== root || poles.end !== root) {
-      return fail("no-structural-solution");
-    }
-    return Object.freeze({ kind: "link", value: root });
-  }
-  if (left.kind === "self" && right.kind === "link") {
-    return Object.freeze({
-      kind: "link",
-      value: oneCandidate(selfStartCandidates(memory, right.value)),
-    });
-  }
-  if (left.kind === "link" && right.kind === "self") {
-    return Object.freeze({
-      kind: "link",
-      value: oneCandidate(selfEndCandidates(memory, left.value)),
-    });
-  }
-  return fail("unsupported-expression");
+  const occurrence = occurrences.get(operand) ?? fail("unsupported-expression");
+  if (occurrence.kind !== profile.nameRefForm) fail("unsupported-expression");
+  const name = fieldValue(occurrence, profile.referencedNameRole);
+  if (name === targetName) return Object.freeze({ kind: "self" });
+  const value = resolved.get(name);
+  if (value !== undefined) return Object.freeze({ kind: "link", value });
+  if (!declaredNames.has(name)) fail("unbound-name");
+  return Object.freeze({ kind: "pending" });
 }
 
-function resolveExpression(
-  memory: ReadMemory,
+function materializeExpression(
+  memory: WriteMemory,
   profile: V015LinkDefinitionProfile,
   occurrences: ReadonlyMap<LinkHandle, SyntaxAsetOccurrence>,
   declaredNames: ReadonlySet<LinkHandle>,
@@ -270,41 +223,55 @@ function resolveExpression(
   expression: LinkHandle,
 ): SymbolicValue {
   const occurrence = occurrences.get(expression) ?? fail("unsupported-expression");
-  if (occurrence.kind === profile.nameRefForm) {
-    const name = fieldValue(occurrence, profile.referencedNameRole);
-    if (name === targetName) return Object.freeze({ kind: "self" });
-    const value = resolved.get(name);
-    if (value !== undefined) return Object.freeze({ kind: "link", value });
-    if (!declaredNames.has(name)) fail("unbound-name");
-    return Object.freeze({ kind: "pending" });
-  }
-  if (occurrence.kind !== profile.pairForm) return fail("unsupported-expression");
-  const left = resolveExpression(
-    memory, profile, occurrences, declaredNames, resolved, targetName,
+  if (occurrence.kind !== profile.pairForm) fail("unsupported-expression");
+  const left = resolveOperand(
+    profile, occurrences, declaredNames, resolved, targetName,
     fieldValue(occurrence, profile.pairLeftRole),
   );
-  const right = resolveExpression(
-    memory, profile, occurrences, declaredNames, resolved, targetName,
+  const right = resolveOperand(
+    profile, occurrences, declaredNames, resolved, targetName,
     fieldValue(occurrence, profile.pairRightRole),
   );
-  return solvePair(memory, left, right);
+  if (left.kind === "pending" || right.kind === "pending") {
+    return Object.freeze({ kind: "pending" });
+  }
+  if (left.kind === "self" && right.kind === "self") {
+    return Object.freeze({ kind: "link", value: memory.ensureRoot() });
+  }
+  if (left.kind === "self" && right.kind === "link") {
+    return Object.freeze({
+      kind: "link",
+      value: memory.ensureStartSelfClosed(right.value),
+    });
+  }
+  if (left.kind === "link" && right.kind === "self") {
+    return Object.freeze({
+      kind: "link",
+      value: memory.ensureEndSelfClosed(left.value),
+    });
+  }
+  if (left.kind === "link" && right.kind === "link") {
+    return Object.freeze({
+      kind: "link",
+      value: memory.ensure(left.value, right.value),
+    });
+  }
+  return fail("unsupported-expression");
 }
 
-export function resolveV015LinkDefinitions(
-  memory: ReadMemory,
+export function materializeV015LinkDefinitions(
+  memory: WriteMemory,
   basis: RootBasis,
   grammarRoot: LinkHandle,
   sourceNamespaceProfileRoot: LinkHandle,
   definitionProfileRoot: LinkHandle,
   syntaxAset: LinkHandle,
 ): V015LinkDefinitionRead {
-  const before = memory.linkCount;
+  let verified: RootBasis;
   try {
-    let verified: RootBasis;
-    try {
-      verified = verifyRootBasis(memory, basis);
-    } catch {
-      return fail("invalid-basis");
+    verified = verifyRootBasis(memory, basis);
+  } catch {
+    return fail("invalid-basis");
     }
     const grammar = readNativeSyntaxGrammar(memory, verified, grammarRoot);
     const profile = readProfile(memory, definitionProfileRoot);
@@ -330,7 +297,7 @@ export function resolveV015LinkDefinitions(
       progress = false;
       for (const declaration of namespaces.declarations) {
         if (resolved.has(declaration.nameCarrier)) continue;
-        const candidate = resolveExpression(
+        const candidate = materializeExpression(
           memory,
           profile,
           occurrences,
@@ -357,13 +324,10 @@ export function resolveV015LinkDefinitions(
         value: resolved.get(declaration.nameCarrier)!,
       }),
     );
-    return Object.freeze({
-      rootNamespace: namespaces.rootNamespace,
-      definitions: Object.freeze(definitions),
-    });
-  } finally {
-    if (memory.linkCount !== before) fail("replay-wrote");
-  }
+  return Object.freeze({
+    rootNamespace: namespaces.rootNamespace,
+    definitions: Object.freeze(definitions),
+  });
 }
 
 export function evaluateV015LinkIdentityEquality(
@@ -374,7 +338,7 @@ export function evaluateV015LinkIdentityEquality(
 ): LinkHandle {
   const before = memory.linkCount;
   try {
-    let verified: RootBasis;
+  let verified: RootBasis;
     try {
       verified = verifyRootBasis(memory, basis);
       memory.poles(left);
