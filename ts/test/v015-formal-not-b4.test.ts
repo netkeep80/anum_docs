@@ -283,7 +283,10 @@ function run(
   same(r.F, f.basis.U, "compiled F is exact U");
 
   const term = value(f, r.compiled, "TERM_T");
+  const request = value(f, r.compiled, "REQ_T");
   same(term, f.memory.ensure(r.NOT, r.T), "FORMAL TERM_T is exact NOT->T");
+  same(request, f.memory.ensure(r.CALL, term), "FORMAL REQ_T is exact CALL->TERM_T");
+  assert(request !== term, "construction term and evaluation request are distinct Links");
   const cursor = scope(f, r.interpreter, active(f, r.K, term));
   const step = reactV013StructuralScope(f.memory, cursor, f.fresh());
   same(step.quiescent, true, "plain NOT->T remains passive");
