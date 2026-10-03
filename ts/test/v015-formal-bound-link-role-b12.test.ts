@@ -990,7 +990,20 @@ function identityProof(
   same(replay.bindings[1]?.role, yRole, "FND-13 second binding role");
   same(replay.bindings[1]?.value, b, "FND-13 second binding value");
 
-  const missing = defineActHeader(f.memory, interpreter, roleDictionary, afterContext);
+  // Act headers are canonical Links. Give each negative case its own
+  // after-Context so a previously attached field cannot be inherited by
+  // reusing the same semantic Act header.
+  const missingAfterContext = defineContext(
+    f.memory,
+    value(f, result, "CTX_PARENT"),
+    c,
+  );
+  const missing = defineActHeader(
+    f.memory,
+    interpreter,
+    roleDictionary,
+    missingAfterContext,
+  );
   defineActField(f.memory, missing, xRole, a);
   expectRuleError(
     "missing-role-binding",
@@ -1000,12 +1013,22 @@ function identityProof(
       ruleAdmission: admission,
       claimedBody: abStatement,
       expectedInterpreter,
-      expectedAfterContext: afterContext,
+      expectedAfterContext: missingAfterContext,
     }),
     "FND-13 missing y binding",
   );
 
-  const duplicate = defineActHeader(f.memory, interpreter, roleDictionary, afterContext);
+  const duplicateAfterContext = defineContext(
+    f.memory,
+    value(f, result, "CTX_PARENT"),
+    d,
+  );
+  const duplicate = defineActHeader(
+    f.memory,
+    interpreter,
+    roleDictionary,
+    duplicateAfterContext,
+  );
   defineActField(f.memory, duplicate, xRole, a);
   defineActField(f.memory, duplicate, xRole, c);
   defineActField(f.memory, duplicate, yRole, b);
@@ -1017,7 +1040,7 @@ function identityProof(
       ruleAdmission: admission,
       claimedBody: abStatement,
       expectedInterpreter,
-      expectedAfterContext: afterContext,
+      expectedAfterContext: duplicateAfterContext,
     }),
     "FND-13 duplicate x binding",
   );
