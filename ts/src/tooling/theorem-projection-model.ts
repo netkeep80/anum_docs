@@ -69,7 +69,12 @@ export interface TheoremProjectionFormalV015 {
   proofClosure: string | null;
   formalStatement: string | null;
   formalPremises: string[];
+  formalDomain: string[];
+  formalNonPremises: string[];
   formalSourcePath: string | null;
+  nativeClassification: string | null;
+  kernelLaw: string | null;
+  nativeIndependent: boolean | null;
   aproverStatus: string | null;
 }
 export interface TheoremProjectionTheorem {
@@ -102,7 +107,7 @@ export interface TheoremProjectionTheorem {
   };
 }
 export interface TheoremProjectionModel {
-  schema: "mts-theorem-projection-model/v0.2";
+  schema: "mts-theorem-projection-model/v0.3";
   mtsVersion: string;
   formalCandidateVersion: string;
   sourceInventory: "theorems/current-v0.14.json";
@@ -460,7 +465,7 @@ export function buildTheoremProjectionModel(
   const theoremIdSet = new Set(theoremIds);
 
   const overlay = object(sources.formalOverlay, "theorems/formal-v0.15.json");
-  if (overlay.schema !== "mts-formal-theorem-overlay/v0.1") {
+  if (overlay.schema !== "mts-formal-theorem-overlay/v0.2") {
     fail("unexpected FORMAL theorem overlay schema");
   }
   if (overlay.baseInventory !== "theorems/current-v0.14.json") {
@@ -487,12 +492,34 @@ export function buildTheoremProjectionModel(
       fail(`${id}.migrationStatus must be FORMAL_MIGRATED`);
     }
     const proofClosure = text(entry.proofClosure, `${id}.proofClosure`);
-    if (proofClosure !== "CLOSED" && proofClosure !== "OPEN_CONDITIONAL") {
-      fail(`${id}.proofClosure must be CLOSED or OPEN_CONDITIONAL`);
+    if (
+      proofClosure !== "CLOSED" &&
+      proofClosure !== "OPEN_CONDITIONAL" &&
+      proofClosure !== "N_A_FOR_KERNEL_REALIZATION"
+    ) {
+      fail(`${id}.proofClosure must be CLOSED, OPEN_CONDITIONAL or N_A_FOR_KERNEL_REALIZATION`);
     }
     const formalStatement = text(entry.formalStatement, `${id}.formalStatement`);
     const formalPremises = strings(entry.formalPremises, `${id}.formalPremises`);
+    const formalDomain =
+      entry.formalDomain === undefined ? [] : strings(entry.formalDomain, `${id}.formalDomain`);
+    const formalNonPremises =
+      entry.formalNonPremises === undefined
+        ? []
+        : strings(entry.formalNonPremises, `${id}.formalNonPremises`);
     const formalSourcePath = text(entry.formalSourcePath, `${id}.formalSourcePath`);
+    const nativeClassification =
+      entry.nativeClassification === undefined
+        ? null
+        : text(entry.nativeClassification, `${id}.nativeClassification`);
+    const kernelLaw =
+      entry.kernelLaw === undefined ? null : text(entry.kernelLaw, `${id}.kernelLaw`);
+    const nativeIndependent =
+      entry.nativeIndependent === undefined
+        ? null
+        : typeof entry.nativeIndependent === "boolean"
+          ? entry.nativeIndependent
+          : fail(`${id}.nativeIndependent must be boolean`);
     const aproverStatus = text(entry.aproverStatus, `${id}.aproverStatus`);
     if (!sources.availablePaths.includes(formalSourcePath)) {
       fail(`${id}.formalSourcePath does not exist: ${formalSourcePath}`);
@@ -502,7 +529,12 @@ export function buildTheoremProjectionModel(
       proofClosure,
       formalStatement,
       formalPremises: Object.freeze(formalPremises) as string[],
+      formalDomain: Object.freeze(formalDomain) as string[],
+      formalNonPremises: Object.freeze(formalNonPremises) as string[],
       formalSourcePath,
+      nativeClassification,
+      kernelLaw,
+      nativeIndependent,
       aproverStatus,
     }));
   }
@@ -554,7 +586,12 @@ export function buildTheoremProjectionModel(
       proofClosure: null,
       formalStatement: null,
       formalPremises: [] as string[],
+      formalDomain: [] as string[],
+      formalNonPremises: [] as string[],
       formalSourcePath: null,
+      nativeClassification: null,
+      kernelLaw: null,
+      nativeIndependent: null,
       aproverStatus: null,
     });
     const evidence = theoremEvidence(
@@ -607,6 +644,43 @@ export function buildTheoremProjectionModel(
     ) {
       fail(`native assurance evidenceRecord mismatch for ${id}: ${nativeAssurance.evidenceRecord}`);
     }
+    if (
+      formalV015.nativeClassification === "KERNEL_REALIZED_NOT_INDEPENDENT" &&
+      formalV015.proofClosure !== "N_A_FOR_KERNEL_REALIZATION"
+    ) {
+      fail(`${id}: KERNEL_REALIZED_NOT_INDEPENDENT cannot be represented as ${formalV015.proofClosure}`);
+    }
+    if (formalV015.nativeClassification !== null) {
+      if (nativeAssurance === null) {
+        fail(`FORMAL native classification for ${id} has no native assurance authority`);
+      }
+      if (formalV015.nativeClassification !== nativeAssurance.classification) {
+        fail(`FORMAL/native classification mismatch for ${id}`);
+      }
+      if (formalV015.kernelLaw !== (nativeAssurance.kernelLaw ?? null)) {
+        fail(`FORMAL/native kernel law mismatch for ${id}`);
+      }
+      if (formalV015.nativeIndependent !== nativeAssurance.independent) {
+        fail(`FORMAL/native independence mismatch for ${id}`);
+      }
+    }
+    if (formalV015.proofClosure === "N_A_FOR_KERNEL_REALIZATION") {
+      if (formalV015.nativeClassification !== "KERNEL_REALIZED_NOT_INDEPENDENT") {
+        fail(`${id}: kernel-realized closure requires KERNEL_REALIZED_NOT_INDEPENDENT`);
+      }
+      if (nativeAssurance === null || nativeAssurance.kernelLaw === undefined) {
+        fail(`${id}: kernel-realized FORMAL migration requires authoritative kernel law`);
+      }
+      if (!sameStrings(formalV015.formalPremises, formalPremises)) {
+        fail(`${id}: kernel-realized FORMAL premises must match accepted theorem boundary`);
+      }
+    }
+    if (formalV015.aproverStatus === "ACCEPT" && evidence.aprover.length === 0) {
+      fail(`${id}: aprover ACCEPT requires registered aprover evidence`);
+    }
+    if (formalV015.aproverStatus === "NOT_RECORDED" && evidence.aprover.length !== 0) {
+      fail(`${id}: aprover NOT_RECORDED conflicts with registered aprover evidence`);
+    }
     if (nativeAssurance !== null) {
       for (const raw of nativeAssurance.evidence) {
         const item = object(raw, `native assurance ${id}.evidence`);
@@ -646,7 +720,7 @@ export function buildTheoremProjectionModel(
     });
   });
   return Object.freeze({
-    schema: "mts-theorem-projection-model/v0.2" as const,
+    schema: "mts-theorem-projection-model/v0.3" as const,
     mtsVersion,
     formalCandidateVersion,
     sourceInventory: "theorems/current-v0.14.json" as const,
