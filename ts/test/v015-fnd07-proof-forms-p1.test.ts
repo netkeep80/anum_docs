@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { Memory, ensureRootBasis, type LinkHandle, type RootBasis } from "../src/memory.js";
 import {
   materializeNativeSyntaxGrammar,
+  readNativeSyntaxGrammar,
   type NativeSyntaxGrammarRuleSpec,
 } from "../src/native-syntax-grammar.js";
 import { materializeSourceNamespaceProfile } from "../src/source-namespace.js";
@@ -113,7 +114,6 @@ interface ProofFixture {
   readonly grammarRoot: LinkHandle;
   readonly profileRoot: LinkHandle;
   readonly profile: V015ProofFormProfile;
-  readonly builder: SyntaxAsetBuilder;
 }
 
 function proofFixture(memory: Memory, basis: RootBasis): ProofFixture {
@@ -167,10 +167,7 @@ function proofFixture(memory: Memory, basis: RootBasis): ProofFixture {
     syntaxTag:fresh(), markerSeed:fresh(), rules,
   });
   const profileRoot = materializeV015ProofFormProfile(memory, profile);
-  return Object.freeze({
-    grammarRoot, profileRoot, profile,
-    builder:new SyntaxAsetBuilder(memory, { tag:memory.poles(grammarRoot).start as never, knownRoles:[], rules:[], childRoles:[] } as never),
-  });
+  return Object.freeze({ grammarRoot, profileRoot, profile });
 }
 
 function proofSource(
@@ -180,9 +177,7 @@ function proofSource(
 ): Readonly<{ grammarRoot: LinkHandle; profileRoot: LinkHandle; sourceRoot: LinkHandle }> {
   const { memory, basis, value } = semantic;
   const pf = proofFixture(memory, basis);
-  const grammar = (awaitImport => awaitImport)(undefined);
-  void grammar;
-  const native = readProofGrammar(memory, basis, pf.grammarRoot);
+  const native = readNativeSyntaxGrammar(memory, basis, pf.grammarRoot).vocabulary;
   const b = new SyntaxAsetBuilder(memory, native);
   const p = pf.profile;
   const add = (form: LinkHandle, fs: readonly {role:LinkHandle;value:LinkHandle}[]) =>
@@ -269,7 +264,6 @@ function proofSource(
   });
 }
 
-import { readNativeSyntaxGrammar as readProofGrammar } from "../src/native-syntax-grammar.js";
 
 const tracked = readFileSync(
   resolve(repoRoot(),"proofs","native","FND-07","contextual-detachment.anum"),
