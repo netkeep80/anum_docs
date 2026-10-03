@@ -160,6 +160,7 @@ const postV013ProofTransportPath = "ts/src/portable-closed-rooted-proof.ts";
 const postV013ProofTransportFunctions = new Set<string>([
   "exportPortableClosedRootedProof",
   "replayPortableClosedRootedProof",
+  "requireClosedReplay",
 ]);
 // v0.15 candidate code is current research, never retroactive v0.13 evidence.
 const v015DirectAssociationResearchPath = "ts/src/v015-direct-association.ts";
@@ -190,6 +191,15 @@ const v015FormalGrammarResearchFunctions = new Set<string>([
   "denoteV015FormalAst",
   "normalizeV015FormalAst",
   "v015FormalAstStructureEqual",
+]);
+
+// Whole files introduced after the last green historical v0.13 audit baseline.
+// They are current v0.15/post-v0.13 work and are audited by their own bounded
+// tests; they must never change frozen v0.13 package counts/fingerprints.
+const postV013WholeFileDeltaPaths = new Set<string>([
+  "ts/src/native-syntax-grammar.ts",
+  "ts/src/source-namespace.ts",
+  "ts/src/v015-formal-evaluation.ts",
 ]);
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
@@ -695,6 +705,7 @@ function discoverDirectWriteSinks(
 }
 
 const observedDirectWriteSinks = tsSourceFiles("ts/src")
+  .filter((sourcePath) => !postV013WholeFileDeltaPaths.has(sourcePath))
   .flatMap((sourcePath) =>
     discoverDirectWriteSinks(
       sourcePath,
@@ -719,10 +730,21 @@ const currentDirectWriteOwners = [...new Set(
 setEqual(
   currentDirectWriteOwners.filter((owner) => !observedDirectWriteOwners.includes(owner)),
   [
+    "ts/src/native-syntax-grammar.ts#materializeNat",
+    "ts/src/native-syntax-grammar.ts#materializeNativeSyntaxGrammar",
     "ts/src/portable-closed-rooted-proof.ts#exportPortableClosedRootedProof",
     "ts/src/v013-hierarchical-carrier.ts#build",
+    "ts/src/v015-formal-evaluation.ts#admitTriggeredRule",
+    "ts/src/v015-formal-evaluation.ts#defineV015GroundedUnaryEvaluationRule",
+    "ts/src/v015-formal-evaluation.ts#defineV015UnaryEvaluationLifecycle",
+    "ts/src/v015-formal-evaluation.ts#materializeRoles",
+    "ts/src/v015-formal-evaluation.ts#materializeV015ApplicationTerm",
+    "ts/src/v015-formal-evaluation.ts#materializeV015CompletedValue",
+    "ts/src/v015-formal-evaluation.ts#materializeV015ContinuationFrame",
+    "ts/src/v015-formal-evaluation.ts#materializeV015EvaluationRequest",
+    "ts/src/v015-formal-evaluation.ts#materializeV015RootEvaluationBoundary",
   ],
-  "post-v0.13 non-semantic direct write owner delta is exact",
+  "explicit post-v0.13 direct write owner delta is exact",
 );
 
 if (projection.packageDirectSemanticWriteAudit === undefined) {
@@ -1017,6 +1039,7 @@ const typedWriteSites: TypedReadSite[] = [];
 const decisionSignalsByOwner = new Map<string, Set<string>>();
 
 for (const sourcePath of sourcePaths) {
+  if (postV013WholeFileDeltaPaths.has(sourcePath)) continue;
   const source = typedProgram.getSourceFile(join(repoRoot, sourcePath));
   assert(source !== undefined, `typed source is available: ${sourcePath}`);
   const excludedFunctions = historicalAuditExcludedFunctions(sourcePath);
