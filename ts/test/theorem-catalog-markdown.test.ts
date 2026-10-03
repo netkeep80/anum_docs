@@ -44,7 +44,7 @@ function main(): void {
     /генерируемая человекочитаемая проекция.*не является.*источником.*доказательной.*истины/is,
     "catalog must disclose derived/no-proof-authority status",
   );
-  assert.match(first, /formal candidate overlay/i);
+  assert.match(first, /кандидатная проекция FORMAL/i);
   assert.match(first, /theorems\/formal-v0\.15\.json/);
 
   const anchors = [...first.matchAll(/<a id="theorem-([^"]+)"><\/a>/g)].map((match) => match[1]);
