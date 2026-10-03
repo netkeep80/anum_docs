@@ -56,10 +56,16 @@ const source=[
   const round=decodeV015FormalSourceAsetJson(f.memory,f.basis,f.grammarRoot,f.namespaceProfileRoot,f.definitionProfileRoot,canonical);
   same(round.sourceAset,text.sourceAset,"JSON round-trip exact native source Aset");
   bytes(round.canonicalJson,canonical,"canonical JSON byte round-trip");
-  const swapped=enc.encode(dec.decode(canonical).replace(
+  const canonicalText=dec.decode(canonical);
+  const entriesFirst=canonicalText.replace(
     `{"schema":"${V015_FORMAL_JSON_J1_SCHEMA}","entries":`,
-    `{"entries":`
-  ).replace(/]}\n$/u,`],"schema":"${V015_FORMAL_JSON_J1_SCHEMA}"}\n`));
+    `{"entries":`,
+  );
+  assert(entriesFirst.endsWith("]}\\n"),"canonical JSON expected suffix");
+  const swapped=enc.encode(
+    entriesFirst.slice(0,-3) +
+    `],"schema":"${V015_FORMAL_JSON_J1_SCHEMA}"}\\n`,
+  );
   const reordered=decodeV015FormalSourceAsetJson(f.memory,f.basis,f.grammarRoot,f.namespaceProfileRoot,f.definitionProfileRoot,swapped);
   same(reordered.sourceAset,text.sourceAset,"JSON object key order is not source authority");
   bytes(reordered.canonicalJson,canonical,"reordered object canonicalizes");
