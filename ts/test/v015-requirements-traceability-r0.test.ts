@@ -105,6 +105,7 @@ function validateCandidate(req: Json, trace: Json): void {
   assert(bool(trace.acceptanceReady, "trace readiness") === false, "R0 trace cannot claim release readiness");
   assert(text(trace.releaseState, "releaseState") === "OPEN", "R0 releaseState remains OPEN");
 
+  assert(text(trace.requirementsRegistry, "requirementsRegistry") === "requirements/mts-v0.15.json", "traceability points to the candidate requirements registry");
   const current = record(trace.currentAccepted, "currentAccepted");
   assert(text(current.mtsVersion, "current accepted version") === "v0.14", "v0.14 remains accepted/current");
   assert(text(current.requirements, "current accepted requirements") === "requirements/mts-v0.14.json", "accepted requirements pointer");
