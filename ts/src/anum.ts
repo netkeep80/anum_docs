@@ -109,7 +109,10 @@ export class IncrementalQuaternaryDecoder {
       emitted.push(Object.freeze({ abit: symbol, offset: absoluteOffset }));
     }
 
-    this.committedTokens.push(...emitted);
+    // Avoid spreading an unbounded token batch into Function arguments.
+    // Large STRING/FORMAL carriers can legitimately decode to hundreds of
+    // thousands of quaternary tokens in one chunk.
+    for (const token of emitted) this.committedTokens.push(token);
     this.inComment = nextCommentState;
     this.committedOffset += consumedCodePoints;
     return Object.freeze([...emitted]);
