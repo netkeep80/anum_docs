@@ -1,5 +1,5 @@
 {
-  "schema": "mts-formal-theorem-overlay/v0.1",
+  "schema": "mts-formal-theorem-overlay/v0.2",
   "mtsVersion": "v0.15-candidate",
   "baseInventory": "theorems/current-v0.14.json",
   "authority": "formal-migration-descriptor-only",
@@ -37,6 +37,28 @@
         "G_SEM"
       ],
       "formalSourcePath": "ts/test/v015-fnd09-open-formal-b14b2.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-02",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "N_A_FOR_KERNEL_REALIZATION",
+      "formalStatement": "FND02_STATEMENT : FND02_PREMISES->FND02_RULE",
+      "formalPremises": [
+        "A1RecursiveSeparation"
+      ],
+      "formalDomain": [
+        "X : Link"
+      ],
+      "formalNonPremises": [
+        "Grounded(X)",
+        "F2/F3 normalization",
+        "FND-13"
+      ],
+      "formalSourcePath": "ts/test/v015-formal-bound-link-role-b12.test.ts",
+      "nativeClassification": "KERNEL_REALIZED_NOT_INDEPENDENT",
+      "kernelLaw": "recursive-link-identity/full-full-canonical-root-base",
+      "nativeIndependent": false,
       "aproverStatus": "NOT_RECORDED"
     }
   ]
