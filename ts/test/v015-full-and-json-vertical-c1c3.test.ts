@@ -214,6 +214,18 @@ for(const name of ["INTERP","RULE_FF","RULE_FT","RULE_TF","RULE_TT","ENTRY"]){
   same(reaction.nextMembers[0],current,"mutated TT request stays quiescent");
 }
 
+const recursivePackage = Object.freeze({
+  schema: "mts-v015-recursive-execution-package/v0.1",
+  links: ["INDEX_FF","INDEX_FT","INDEX_TF","INDEX_TT"].map(
+    (name) => new TextDecoder().decode(wire(a,fromJson.compiled,name)),
+  ),
+  entry: new TextDecoder().decode(wire(a,fromJson.compiled,"ENTRY")),
+  negativeEntry: new TextDecoder().decode(
+    wire(a,fromJson.compiled,"FOREIGN_LAUNCH_TT"),
+  ),
+});
+console.log("AMEMORY_RECURSIVE_PACKAGE="+JSON.stringify(recursivePackage));
+
 console.log([
   "MTS_V015_FULL_AND=COMPONENT_GREEN",
   "FORMAL_SOURCE=TRACKED",
