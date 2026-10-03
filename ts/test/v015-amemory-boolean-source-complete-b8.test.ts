@@ -30,7 +30,6 @@ import {
   readExactSequence,
 } from "../src/exact-sequence.js";
 import { materializeV012StringAnum } from "../src/v012-string-anum.js";
-
 const AMEMORY_ORACLE = Object.freeze({
   main: "f7d2f85e61b157b45d498b7d9b60f766cf9610eb",
   version: "0.159.0",
@@ -41,7 +40,6 @@ const AMEMORY_ORACLE = Object.freeze({
   xorManifestBlob: "3b1e5ad694d53af9e65864806d3fd0be1c8ec48b",
   notManifestBlob: "3f3dbef40f5c3e771964a980bcf0a4441a98517b",
 });
-
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
     throw new Error(`v0.15 B8 source-complete amemory logic: ${message}`);
@@ -63,7 +61,6 @@ function sameBytes(
     same(actual[i], expected[i], `${message}: byte ${i}`);
   }
 }
-
 interface Fixture {
   readonly memory: Memory;
   readonly basis: RootBasis;
@@ -72,7 +69,6 @@ interface Fixture {
   readonly definitionProfileRoot: LinkHandle;
   readonly fresh: () => LinkHandle;
 }
-
 function fixture(noise = 0): Fixture {
   const memory = new Memory();
   const basis = ensureRootBasis(memory);
@@ -86,7 +82,6 @@ function fixture(noise = 0): Fixture {
   const fresh = (): LinkHandle => (
     cursor = memory.ensure(cursor, basis.C)
   );
-
   const syntaxTag = fresh();
   const markerSeed = fresh();
   const pairForm = fresh();
@@ -101,7 +96,6 @@ function fixture(noise = 0): Fixture {
   const declarationBodyRole = fresh();
   const blockItemRole = fresh();
   const sequenceItemRole = fresh();
-
   const rules: readonly NativeSyntaxGrammarRuleSpec[] = [
     {
       form: pairForm,
@@ -145,7 +139,6 @@ function fixture(noise = 0): Fixture {
       }],
     },
   ];
-
   const grammarRoot = materializeNativeSyntaxGrammar(
     memory,
     basis,
@@ -173,7 +166,6 @@ function fixture(noise = 0): Fixture {
       sequenceItemRole,
     },
   );
-
   return Object.freeze({
     memory,
     basis,
@@ -183,7 +175,6 @@ function fixture(noise = 0): Fixture {
     fresh,
   });
 }
-
 const enc = new TextEncoder();
 const source = [
   "R : R->R",
@@ -218,7 +209,6 @@ const source = [
   "FGT : GRAM->FOREIGN_THEORY",
   "FINTERP : DICT->FGT",
 ].join("\n");
-
 function compile(f: Fixture): V015FormalRecursiveCompileResult {
   return compileV015FormalDefinitionsToRecursive(
     f.memory,
@@ -229,7 +219,6 @@ function compile(f: Fixture): V015FormalRecursiveCompileResult {
     enc.encode(source),
   );
 }
-
 function nameCarrier(f: Fixture, name: string): LinkHandle {
   return materializeV012StringAnum(
     f.memory,
@@ -237,7 +226,6 @@ function nameCarrier(f: Fixture, name: string): LinkHandle {
     enc.encode(name),
   ).anumLink;
 }
-
 function definition(
   f: Fixture,
   result: V015FormalRecursiveCompileResult,
@@ -251,10 +239,8 @@ function definition(
   assert(found.wire.length > 0, `${name} has recursive wire`);
   return found;
 }
-
 type BinaryName = "AND" | "OR" | "XOR";
 type BinaryRow = "FF" | "FT" | "TF" | "TT";
-
 interface Runtime {
   readonly compiled: V015FormalRecursiveCompileResult;
   readonly AND: LinkHandle;
@@ -273,7 +259,6 @@ interface Runtime {
   readonly outF: LinkHandle;
   readonly outT: LinkHandle;
 }
-
 function field(
   f: Fixture,
   r: V015FormalRecursiveCompileResult,
@@ -281,7 +266,6 @@ function field(
 ): LinkHandle {
   return definition(f, r, name).semantic;
 }
-
 function admitGateRow(
   f: Fixture,
   theory: LinkHandle,
@@ -290,7 +274,6 @@ function admitGateRow(
   outputCarrier: LinkHandle,
 ): void {
   const callerRole = f.fresh();
-
   // Exact retained amemory GateSet ABI:
   // caller -> (O -> (function -> ExactSequence(args)))
   const invocation = f.memory.ensure(
@@ -298,10 +281,8 @@ function admitGateRow(
     f.memory.ensure(fn, args),
   );
   const before = f.memory.ensure(callerRole, invocation);
-
   // Output carrier is supplied by FORMAL (OUT_F / OUT_T).
   const after = f.memory.ensure(callerRole, outputCarrier);
-
   // Generic reaction image bundle belongs to structural Rule machinery.
   const dictionary = defineStructuralRoleDictionary(
     f.memory,
@@ -321,23 +302,19 @@ function admitGateRow(
     theory,
     rule,
   );
-
   // Current amemory logic_n.rs indexes gate rows under O.
   f.memory.ensure(f.basis.O, admission);
 }
-
 function runtime(
   f: Fixture,
   omit?: Readonly<{ fn: BinaryName; row: BinaryRow }>,
 ): Runtime {
   const compiled = compile(f);
-
   const AND = field(f, compiled, "AND");
   const OR = field(f, compiled, "OR");
   const XOR = field(f, compiled, "XOR");
   const NOT = field(f, compiled, "NOT");
   const theory = field(f, compiled, "THEORY");
-
   const interpreter = defineStructuralInterpreter(
     f.memory,
     field(f, compiled, "DICT"),
@@ -349,7 +326,6 @@ function runtime(
     field(f, compiled, "INTERP"),
     "FORMAL interpreter topology",
   );
-
   const foreignInterpreter = defineStructuralInterpreter(
     f.memory,
     field(f, compiled, "DICT"),
@@ -361,7 +337,6 @@ function runtime(
     field(f, compiled, "FINTERP"),
     "FORMAL foreign interpreter topology",
   );
-
   const argsF = field(f, compiled, "ARGS_F");
   const argsT = field(f, compiled, "ARGS_T");
   const argsFF = field(f, compiled, "ARGS_FF");
@@ -370,7 +345,6 @@ function runtime(
   const argsTT = field(f, compiled, "ARGS_TT");
   const outF = field(f, compiled, "OUT_F");
   const outT = field(f, compiled, "OUT_T");
-
   const rows = [
     ["AND", "FF", AND, argsFF, outF],
     ["AND", "FT", AND, argsFT, outF],
@@ -385,14 +359,12 @@ function runtime(
     ["XOR", "TF", XOR, argsTF, outT],
     ["XOR", "TT", XOR, argsTT, outF],
   ] as const;
-
   for (const [fnName, row, fn, args, output] of rows) {
     if (omit?.fn === fnName && omit.row === row) continue;
     admitGateRow(f, theory, fn, args, output);
   }
   admitGateRow(f, theory, NOT, argsF, outT);
   admitGateRow(f, theory, NOT, argsT, outF);
-
   return Object.freeze({
     compiled,
     AND,
@@ -412,7 +384,6 @@ function runtime(
     outT,
   });
 }
-
 function scope(
   f: Fixture,
   interpreter: LinkHandle,
@@ -428,7 +399,6 @@ function scope(
     ),
   );
 }
-
 function runGate(
   f: Fixture,
   r: Runtime,
@@ -447,7 +417,6 @@ function runGate(
     ),
   );
   const cursor = scope(f, interpreter, request);
-
   const reaction = reactV013StructuralScope(
     f.memory,
     cursor,
@@ -455,11 +424,9 @@ function runGate(
   );
   same(reaction.quiescent, false, `${label}: reacts`);
   same(reaction.handoffCount, 1, `${label}: one handoff`);
-
   const expected = f.memory.ensure(caller, outputCarrier);
   same(cursor.members().length, 1, `${label}: one successor`);
   same(cursor.members()[0], expected, `${label}: exact successor`);
-
   const stable = reactV013StructuralScope(
     f.memory,
     cursor,
@@ -468,7 +435,6 @@ function runGate(
   same(stable.quiescent, true, `${label}: quiescent after row`);
   return outputCarrier;
 }
-
 function binaryArgs(
   r: Runtime,
   aOne: boolean,
@@ -479,7 +445,6 @@ function binaryArgs(
   if (aOne && !bOne) return r.argsTF;
   return r.argsTT;
 }
-
 function expectedBinaryOne(
   name: BinaryName,
   aOne: boolean,
@@ -489,7 +454,6 @@ function expectedBinaryOne(
   if (name === "OR") return aOne || bOne;
   return aOne !== bOne;
 }
-
 function runWordBinary(
   f: Fixture,
   r: Runtime,
@@ -519,7 +483,6 @@ function runWordBinary(
   }
   return result >>> 0;
 }
-
 function runWordNot(
   f: Fixture,
   r: Runtime,
@@ -542,11 +505,9 @@ function runWordNot(
   }
   return result >>> 0;
 }
-
 {
   const f = fixture();
   const r = runtime(f);
-
   // Host ExactSequence construction is differential oracle only.
   same(
     r.argsF,
@@ -589,11 +550,9 @@ function runWordNot(
     "FORMAL OUT_T equals canonical host singleton",
   );
   assert(r.argsFT !== r.argsTF, "FORMAL binary sequence order preserved");
-
   const ft = readExactSequence(f.memory, r.argsFT).values;
   same(ft[0], f.basis.U, "ARGS_FT[0]=F/U");
   same(ft[1], f.basis.L, "ARGS_FT[1]=T/L");
-
   for (const [name, fn, rows] of [
     ["AND", r.AND, [
       [r.argsFF, r.outF],
@@ -626,7 +585,6 @@ function runWordNot(
       );
     }
   }
-
   runGate(
     f,
     r,
@@ -646,11 +604,9 @@ function runWordNot(
     "NOT(T)",
   );
 }
-
 {
   const f = fixture();
   const r = runtime(f);
-
   // Missing Apply=O envelope must remain passive.
   const caller = f.fresh();
   const plain = f.memory.ensure(r.OR, r.argsTT);
@@ -665,7 +621,6 @@ function runWordNot(
     "Function->FORMAL Args without Apply=O is inert",
   );
 }
-
 {
   const f = fixture();
   const r = runtime(f, { fn: "XOR", row: "TT" });
@@ -684,7 +639,6 @@ function runWordNot(
     "missing XOR/TT row has no fallback",
   );
 }
-
 {
   const f = fixture();
   const r = runtime(f);
@@ -703,7 +657,6 @@ function runWordNot(
     "FORMAL gate rows inert under foreign selected Theory",
   );
 }
-
 {
   // Retained amemory Scenario manifests, replayed through FORMAL-produced
   // argument/result carriers and structural GateSet-compatible rows.
@@ -727,10 +680,8 @@ function runWordNot(
     [0x12345678, 0xedcba987],
     [0x00000000, 0xffffffff],
   ] as const;
-
   const f = fixture();
   const r = runtime(f);
-
   for (const [name, a, b, expected] of binaryVectors) {
     same(
       runWordBinary(
@@ -753,7 +704,6 @@ function runWordNot(
     );
   }
 }
-
 {
   const a = fixture(0);
   const b = fixture(23);
@@ -782,7 +732,6 @@ function runWordNot(
     );
   }
 }
-
 console.log([
   "MTS v0.15 B8 source-complete amemory logic:",
   `AMEMORY_MAIN=${AMEMORY_ORACLE.main}`,
