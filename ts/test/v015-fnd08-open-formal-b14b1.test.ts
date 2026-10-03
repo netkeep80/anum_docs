@@ -575,8 +575,12 @@ const fnd08Replay = replayStructuralRootedProofAset(
   fnd08.openRoot,
 );
 same(fnd08Replay.conclusion, fnd08.value("I_RESULT"), "FND-08 concrete result");
+const fnd08ConcreteSchema = readStructuralDerivationRule(
+  fnd08.f.memory,
+  fnd08Replay.targetDerivationRule,
+);
 sameMembers(
-  fnd08Replay.assumptionClaims,
+  fnd08ConcreteSchema.premiseTemplates,
   [fnd08.value("I_SEM"), fnd08.value("I_BOUNDARY")],
   "FND-08 concrete premise claims",
 );
