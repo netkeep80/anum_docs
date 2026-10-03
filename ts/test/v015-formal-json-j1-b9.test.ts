@@ -6,7 +6,7 @@ import { decodeV015FormalDefinitions } from "../src/v015-formal-decoder.js";
 import {
   V015_FORMAL_JSON_J1_SCHEMA, V015FormalJsonError,
   decodeV015FormalSourceAsetJson, encodeV015FormalSourceAsetJson,
-} from "../src/v015-formal-json.js";
+} from "../src/v015-formal-decoder.js";
 import { materializeExactSequence } from "../src/exact-sequence.js";
 import { materializeV012StringAnum } from "../src/v012-string-anum.js";
 import {
