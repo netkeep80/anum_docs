@@ -89,6 +89,22 @@ export interface V015ProofFormMaterializeResult {
   readonly closedRoot: LinkHandle;
 }
 
+export interface V015OpenProofFormMaterializeResult {
+  readonly generic: StructuralHeterogeneousDerivedDerivationEvidence;
+  readonly openRoot: LinkHandle;
+}
+
+type V015ProofDenotationEntryResult =
+  | Readonly<{
+      kind: "open";
+      generic: StructuralHeterogeneousDerivedDerivationEvidence;
+      openRoot: LinkHandle;
+    }>
+  | Readonly<{
+      kind: "closed";
+      closedRoot: LinkHandle;
+    }>;
+
 function fail(code: V015ProofFormErrorCode): never {
   throw new V015ProofFormError(code);
 }
@@ -467,11 +483,11 @@ function denotationPayload(
   }
 }
 
-export function materializeV015ProofDenotation(
+function materializeV015ProofDenotationEntry(
   memory: WriteMemory,
   profileRoot: LinkHandle,
   sourceRoot: LinkHandle,
-): V015ProofFormMaterializeResult {
+): V015ProofDenotationEntryResult {
   const profile = readV015ProofDenotationProfile(memory, profileRoot);
 
   const dictionaries = new Map<LinkHandle, LinkHandle>();
@@ -740,6 +756,25 @@ export function materializeV015ProofDenotation(
     return result;
   };
 
+  let sourceTag: LinkHandle;
+  try {
+    sourceTag = memory.poles(sourceRoot).start;
+  } catch {
+    return fail("invalid-source");
+  }
+
+  if (sourceTag === profile.openTag) {
+    const opened = open(sourceRoot);
+    return Object.freeze({
+      kind: "open" as const,
+      generic: opened.generic,
+      openRoot: opened.root,
+    });
+  }
+  if (sourceTag !== profile.dischargeTag) {
+    return fail("unexpected-form");
+  }
+
   const dischargePayload = denotationSequence(
     memory,
     denotationPayload(memory, sourceRoot, profile.dischargeTag),
@@ -764,5 +799,39 @@ export function materializeV015ProofDenotation(
       };
     }),
   ).closedRoot;
-  return Object.freeze({ closedRoot: closed });
+  return Object.freeze({
+    kind: "closed" as const,
+    closedRoot: closed,
+  });
+}
+
+export function materializeV015OpenProofDenotation(
+  memory: WriteMemory,
+  profileRoot: LinkHandle,
+  sourceRoot: LinkHandle,
+): V015OpenProofFormMaterializeResult {
+  const result = materializeV015ProofDenotationEntry(
+    memory,
+    profileRoot,
+    sourceRoot,
+  );
+  if (result.kind !== "open") return fail("unexpected-form");
+  return Object.freeze({
+    generic: result.generic,
+    openRoot: result.openRoot,
+  });
+}
+
+export function materializeV015ProofDenotation(
+  memory: WriteMemory,
+  profileRoot: LinkHandle,
+  sourceRoot: LinkHandle,
+): V015ProofFormMaterializeResult {
+  const result = materializeV015ProofDenotationEntry(
+    memory,
+    profileRoot,
+    sourceRoot,
+  );
+  if (result.kind !== "closed") return fail("unexpected-form");
+  return Object.freeze({ closedRoot: result.closedRoot });
 }
