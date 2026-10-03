@@ -47,6 +47,9 @@ export interface V015LinkDefinitionProfile {
   readonly referencedNameRole: LinkHandle;
   readonly sequenceForm?: LinkHandle;
   readonly sequenceItemRole?: LinkHandle;
+  readonly equalityForm?: LinkHandle;
+  readonly equalityLeftRole?: LinkHandle;
+  readonly equalityRightRole?: LinkHandle;
 }
 
 export interface V015ResolvedDefinition {
@@ -78,6 +81,15 @@ export function materializeV015LinkDefinitionProfile(
   const hasSequenceForm = profile.sequenceForm !== undefined;
   const hasSequenceItemRole = profile.sequenceItemRole !== undefined;
   if (hasSequenceForm !== hasSequenceItemRole) fail("invalid-profile");
+
+  const equalityParts = [
+    profile.equalityForm,
+    profile.equalityLeftRole,
+    profile.equalityRightRole,
+  ];
+  const equalityCount = equalityParts.filter((value) => value !== undefined).length;
+  if (equalityCount !== 0 && equalityCount !== 3) fail("invalid-profile");
+
   const values: LinkHandle[] = [
     profile.pairForm,
     profile.nameRefForm,
@@ -91,6 +103,17 @@ export function materializeV015LinkDefinitionProfile(
   ) {
     values.push(profile.sequenceForm, profile.sequenceItemRole);
   }
+  if (
+    profile.equalityForm !== undefined &&
+    profile.equalityLeftRole !== undefined &&
+    profile.equalityRightRole !== undefined
+  ) {
+    values.push(
+      profile.equalityForm,
+      profile.equalityLeftRole,
+      profile.equalityRightRole,
+    );
+  }
   return materializeExactSequence(memory, values);
 }
 
@@ -100,16 +123,13 @@ function readProfile(
 ): V015LinkDefinitionProfile {
   try {
     const values = readExactSequence(memory, root).values;
-    if (values.length !== 5 && values.length !== 7) fail("invalid-profile");
-    const [
-      pairForm,
-      nameRefForm,
-      pairLeftRole,
-      pairRightRole,
-      referencedNameRole,
-      sequenceForm,
-      sequenceItemRole,
-    ] = values;
+    if (![5, 7, 8, 10].includes(values.length)) fail("invalid-profile");
+
+    const pairForm = values[0];
+    const nameRefForm = values[1];
+    const pairLeftRole = values[2];
+    const pairRightRole = values[3];
+    const referencedNameRole = values[4];
     if (
       pairForm === undefined ||
       nameRefForm === undefined ||
@@ -121,7 +141,22 @@ function readProfile(
     ) {
       return fail("invalid-profile");
     }
+
+    const base = {
+      pairForm,
+      nameRefForm,
+      pairLeftRole,
+      pairRightRole,
+      referencedNameRole,
+    };
+
+    if (values.length === 5) {
+      return Object.freeze(base);
+    }
+
     if (values.length === 7) {
+      const sequenceForm = values[5];
+      const sequenceItemRole = values[6];
       if (
         sequenceForm === undefined ||
         sequenceItemRole === undefined ||
@@ -131,21 +166,61 @@ function readProfile(
         return fail("invalid-profile");
       }
       return Object.freeze({
-        pairForm,
-        nameRefForm,
-        pairLeftRole,
-        pairRightRole,
-        referencedNameRole,
+        ...base,
         sequenceForm,
         sequenceItemRole,
       });
     }
+
+    if (values.length === 8) {
+      const equalityForm = values[5];
+      const equalityLeftRole = values[6];
+      const equalityRightRole = values[7];
+      if (
+        equalityForm === undefined ||
+        equalityLeftRole === undefined ||
+        equalityRightRole === undefined ||
+        equalityLeftRole === equalityRightRole ||
+        equalityForm === pairForm ||
+        equalityForm === nameRefForm
+      ) {
+        return fail("invalid-profile");
+      }
+      return Object.freeze({
+        ...base,
+        equalityForm,
+        equalityLeftRole,
+        equalityRightRole,
+      });
+    }
+
+    const sequenceForm = values[5];
+    const sequenceItemRole = values[6];
+    const equalityForm = values[7];
+    const equalityLeftRole = values[8];
+    const equalityRightRole = values[9];
+    if (
+      sequenceForm === undefined ||
+      sequenceItemRole === undefined ||
+      equalityForm === undefined ||
+      equalityLeftRole === undefined ||
+      equalityRightRole === undefined ||
+      sequenceForm === pairForm ||
+      sequenceForm === nameRefForm ||
+      equalityForm === pairForm ||
+      equalityForm === nameRefForm ||
+      equalityForm === sequenceForm ||
+      equalityLeftRole === equalityRightRole
+    ) {
+      return fail("invalid-profile");
+    }
     return Object.freeze({
-      pairForm,
-      nameRefForm,
-      pairLeftRole,
-      pairRightRole,
-      referencedNameRole,
+      ...base,
+      sequenceForm,
+      sequenceItemRole,
+      equalityForm,
+      equalityLeftRole,
+      equalityRightRole,
     });
   } catch (error) {
     if (error instanceof V015LinkDefinitionError) throw error;
@@ -205,6 +280,34 @@ function requireProfileCompatibility(
       sequence.fields[0]?.target !== "child" ||
       sequence.fields[0]?.min !== 0 ||
       sequence.fields[0]?.max !== null
+    ) {
+      fail("incompatible-profile");
+    }
+  }
+
+  if (
+    profile.equalityForm !== undefined ||
+    profile.equalityLeftRole !== undefined ||
+    profile.equalityRightRole !== undefined
+  ) {
+    if (
+      profile.equalityForm === undefined ||
+      profile.equalityLeftRole === undefined ||
+      profile.equalityRightRole === undefined
+    ) {
+      fail("incompatible-profile");
+    }
+    const equality = rule(rules, profile.equalityForm);
+    if (
+      equality.fields.length !== 2 ||
+      equality.fields[0]?.role !== profile.equalityLeftRole ||
+      equality.fields[0]?.target !== "child" ||
+      equality.fields[0]?.min !== 1 ||
+      equality.fields[0]?.max !== 1 ||
+      equality.fields[1]?.role !== profile.equalityRightRole ||
+      equality.fields[1]?.target !== "child" ||
+      equality.fields[1]?.min !== 1 ||
+      equality.fields[1]?.max !== 1
     ) {
       fail("incompatible-profile");
     }
@@ -286,6 +389,7 @@ function resolveOperand(
 
 function materializeExpression(
   memory: WriteMemory,
+  basis: RootBasis,
   profile: V015LinkDefinitionProfile,
   occurrences: ReadonlyMap<LinkHandle, SyntaxAsetOccurrence>,
   declaredNames: ReadonlySet<LinkHandle>,
@@ -324,6 +428,45 @@ function materializeExpression(
           if (item.kind !== "link") return fail("unsupported-expression");
           return item.value;
         }),
+      ),
+    });
+  }
+
+  if (
+    profile.equalityForm !== undefined &&
+    profile.equalityLeftRole !== undefined &&
+    profile.equalityRightRole !== undefined &&
+    occurrence.kind === profile.equalityForm
+  ) {
+    const left = resolveOperand(
+      profile,
+      occurrences,
+      declaredNames,
+      resolved,
+      targetName,
+      fieldValue(occurrence, profile.equalityLeftRole),
+    );
+    const right = resolveOperand(
+      profile,
+      occurrences,
+      declaredNames,
+      resolved,
+      targetName,
+      fieldValue(occurrence, profile.equalityRightRole),
+    );
+    if (left.kind === "pending" || right.kind === "pending") {
+      return Object.freeze({ kind: "pending" });
+    }
+    if (left.kind !== "link" || right.kind !== "link") {
+      return fail("unsupported-expression");
+    }
+    return Object.freeze({
+      kind: "link",
+      value: evaluateV015LinkIdentityEquality(
+        memory,
+        basis,
+        left.value,
+        right.value,
       ),
     });
   }
@@ -404,6 +547,7 @@ export function materializeV015LinkDefinitions(
         if (resolved.has(declaration.nameCarrier)) continue;
         const candidate = materializeExpression(
           memory,
+          verified,
           profile,
           occurrences,
           declaredNames,
