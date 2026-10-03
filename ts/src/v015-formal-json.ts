@@ -91,7 +91,7 @@ class StrictJsonReader {
     const ch = this.text[this.index];
     if (ch === "{") return this.object();
     if (ch === "[") return this.array();
-    if (ch === """) return this.string();
+    if (ch === "\"") return this.string();
     if (this.text.startsWith("true", this.index)) {
       this.index += 4;
       return true;
@@ -116,11 +116,11 @@ class StrictJsonReader {
 
   private string(): string {
     const start = this.index;
-    if (this.text[this.index] !== """) return fail("invalid-json");
+    if (this.text[this.index] !== "\"") return fail("invalid-json");
     this.index += 1;
     while (this.index < this.text.length) {
       const ch = this.text[this.index];
-      if (ch === """) {
+      if (ch === "\"") {
         this.index += 1;
         try {
           const value = JSON.parse(
@@ -151,7 +151,7 @@ class StrictJsonReader {
     }
     while (true) {
       this.space();
-      if (this.text[this.index] !== """) return fail("invalid-json");
+      if (this.text[this.index] !== "\"") return fail("invalid-json");
       const key = this.string();
       if (result.has(key)) return fail("duplicate-key");
       this.space();
