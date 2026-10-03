@@ -16,6 +16,7 @@ import {
   encodeV015FormalSourceAsetJson,
 } from "../src/v015-formal-decoder.js";
 import { materializeV012StringAnum } from "../src/v012-string-anum.js";
+import { readExactSequence } from "../src/exact-sequence.js";
 import { materializeV015ProofDenotation } from "../src/v015-proof-source.js";
 import {
   exportPortableClosedRootedProof,
@@ -125,6 +126,7 @@ const source=[
   "COORD_TRUTH_DATA : [CURRENT_TRUTH,PRIM_TRUTH]","COORD_TRUTH : COORD_TAG->COORD_TRUTH_DATA",
   "COORD_RULE_DATA : [CURRENT_RULE,PRIM_RULE]","COORD_RULE : COORD_TAG->COORD_RULE_DATA",
   "COORDS : [COORD_TRUTH,COORD_RULE]","DISCHARGE_DATA : [OPEN_PROOF,COORDS]","DISCHARGE : DISCHARGE_TAG->DISCHARGE_DATA",
+  "ENTRY : [PROOF_PROFILE,DISCHARGE]",
 ].join("\n");
 
 function resolveSource(text:string){
@@ -140,13 +142,19 @@ function resolveSource(text:string){
     const d=read.definitions.find(x=>x.nameCarrier===carrier(n));
     assert(d!==undefined,`definition ${n}`); return d.value;
   };
-  return {f,decoded,value};
+  const entryDefinition=read.definitions[read.definitions.length-1];
+  assert(entryDefinition!==undefined,"explicit proof entry declaration");
+  const entryValues=readExactSequence(f.memory,entryDefinition.value).values;
+  same(entryValues.length,2,"proof entry arity");
+  const profileRoot=entryValues[0];
+  const sourceRoot=entryValues[1];
+  assert(profileRoot!==undefined && sourceRoot!==undefined,"proof entry coordinates");
+  return {f,decoded,read,value,profileRoot,sourceRoot};
 }
 function artifact(text:string):Uint8Array {
-  const {f,value}=resolveSource(text);
-  const proof=materializeV015ProofDenotation(f.memory,value("PROOF_PROFILE"),value("DISCHARGE"));
+  const {f,profileRoot,sourceRoot}=resolveSource(text);
+  const proof=materializeV015ProofDenotation(f.memory,profileRoot,sourceRoot);
   const replay=replayStructuralRootedProofAset(f.memory,proof.closedRoot);
-  same(replay.conclusion,value("CONCLUSION"),"exact source conclusion");
   same(replay.declaredAssumptionCount,0,"CLOSED declared assumptions");
   same(replay.usedAssumptionCount,0,"CLOSED used assumptions");
   return exportPortableClosedRootedProof(f.memory,f.basis,proof.closedRoot);
@@ -161,7 +169,7 @@ const golden=readFileSync(resolve(repoRoot(),"proofs/native/FND-07/contextual-de
   same(fresh.replay.usedAssumptionCount,0,"fresh CLOSED used assumptions");
 }
 {
-  const {f,decoded,value}=resolveSource(source);
+  const {f,decoded,value,profileRoot,sourceRoot}=resolveSource(source);
   const json=encodeV015FormalSourceAsetJson(
     f.memory,f.basis,f.grammarRoot,f.namespaceProfileRoot,f.definitionProfileRoot,decoded.sourceAset,
   );
@@ -176,9 +184,16 @@ const golden=readFileSync(resolve(repoRoot(),"proofs/native/FND-07/contextual-de
   const val=(n:string):LinkHandle=>{
     const d=read.definitions.find(x=>x.nameCarrier===carrier(n)); assert(d!==undefined,`round ${n}`); return d.value;
   };
-  same(val("PROOF_PROFILE"),value("PROOF_PROFILE"),"JSON preserves proof profile");
-  same(val("DISCHARGE"),value("DISCHARGE"),"JSON preserves proof root");
-  const proof=materializeV015ProofDenotation(f.memory,val("PROOF_PROFILE"),val("DISCHARGE"));
+  const roundEntry=read.definitions[read.definitions.length-1];
+  assert(roundEntry!==undefined,"JSON preserves explicit proof entry");
+  const roundEntryValues=readExactSequence(f.memory,roundEntry.value).values;
+  same(roundEntryValues[0],profileRoot,"JSON preserves structural proof profile coordinate");
+  same(roundEntryValues[1],sourceRoot,"JSON preserves structural proof root coordinate");
+  const proof=materializeV015ProofDenotation(
+    f.memory,
+    roundEntryValues[0]!,
+    roundEntryValues[1]!,
+  );
   sameBytes(exportPortableClosedRootedProof(f.memory,f.basis,proof.closedRoot),golden,"JSON proof source reproduces golden");
 }
 {
@@ -186,7 +201,8 @@ const golden=readFileSync(resolve(repoRoot(),"proofs/native/FND-07/contextual-de
     .replaceAll("GLOBAL_","G_").replaceAll("TARGET_","TGT_").replaceAll("LOCAL_","LOC_")
     .replaceAll("MORPH","MU").replaceAll("GENERIC","GEN").replaceAll("BIND_","BD_")
     .replaceAll("OPEN_PROOF","OP").replaceAll("PRIM_","P_").replaceAll("COORD_","CRD_")
-    .replaceAll("DISCHARGE","DSG").replaceAll("PROOF_PROFILE","PP");
+    .replaceAll("DISCHARGE","DSG").replaceAll("PROOF_PROFILE","PP")
+    .replaceAll("CONCLUSION","Z").replaceAll("ENTRY","E");
   sameBytes(artifact(renamed),golden,"proof presentation renaming preserves artifact");
 }
 differentOrReject(
