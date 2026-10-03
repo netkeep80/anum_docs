@@ -122,7 +122,11 @@ export function readV015ProofFormProfile(
   catch { return fail("invalid-profile"); }
   if (values.length !== profileKeys.length) fail("invalid-profile");
   const out: Partial<Record<(typeof profileKeys)[number], LinkHandle>> = {};
-  profileKeys.forEach((key, index) => { out[key] = values[index]; });
+  profileKeys.forEach((key, index) => {
+    const value = values[index];
+    if (value === undefined) fail("invalid-profile");
+    out[key] = value;
+  });
   for (const key of profileKeys) if (out[key] === undefined) fail("invalid-profile");
   const forms = profileKeys.slice(0, 11).map((key) => out[key]!);
   if (new Set(forms).size !== forms.length) fail("invalid-profile");
