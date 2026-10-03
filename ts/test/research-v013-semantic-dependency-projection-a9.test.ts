@@ -1206,6 +1206,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/test-tier.ts",
 ]);
 const postV013CandidateDeltaFiles = new Set([
+  postV013CarrierPath,
+  postV013ProofTransportPath,
   "ts/src/native-syntax-grammar.ts",
   "ts/src/v015-formal-evaluation.ts",
 ]);
