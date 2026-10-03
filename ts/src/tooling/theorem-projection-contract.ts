@@ -1,5 +1,5 @@
 export const THEOREM_CATALOG_INTEGRATION_CONTRACT = Object.freeze({
-  schema: "mts-theorem-catalog-integration/v0.2" as const,
+  schema: "mts-theorem-catalog-integration/v0.3" as const,
   repoGuard: Object.freeze({
     version: "3.2.0",
     commitSha: "756944656fa14de752f44bb404e1dca852f5fa6a",
@@ -16,9 +16,9 @@ export const THEOREM_CATALOG_INTEGRATION_CONTRACT = Object.freeze({
   evidenceSelection: "current-index-referenced-proofs/evidence-json" as const,
   targetPath: "docs/theory/Теоремы МТС.md",
   targetOwnership: "generated" as const,
-  generatorContractId: "mts.theorem-catalog/v0.2",
+  generatorContractId: "mts.theorem-catalog/v0.3",
   readModel: Object.freeze({
-    schema: "mts-theorem-projection-model/v0.2",
+    schema: "mts-theorem-projection-model/v0.3",
     theoremFields: Object.freeze([
       "id",
       "statement",
