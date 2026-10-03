@@ -1,0 +1,275 @@
+// mts-version-evidence: candidate-v0.15-r0
+// requirements-owner: #1976
+// traceability-owner: #1977
+// approved-json-regression-owner: #1978
+
+import { existsSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+
+type Json = Record<string, unknown>;
+type State =
+  | "OPEN"
+  | "EXPERIMENT_GREEN"
+  | "COMPONENT_GREEN"
+  | "AUTHOR_REVIEW_PENDING"
+  | "VERTICAL_GREEN"
+  | "RELEASE_READY"
+  | "ACCEPTED"
+  | "REJECTED";
+
+function assert(value: unknown, message: string): asserts value {
+  if (!value) throw new Error("v0.15 R0 requirements: " + message);
+}
+function record(value: unknown, message: string): Json {
+  assert(value !== null && typeof value === "object" && !Array.isArray(value), message);
+  return value as Json;
+}
+function text(value: unknown, message: string): string {
+  assert(typeof value === "string", message);
+  return value;
+}
+function bool(value: unknown, message: string): boolean {
+  assert(typeof value === "boolean", message);
+  return value;
+}
+function strings(value: unknown, message: string): readonly string[] {
+  assert(Array.isArray(value) && value.every((item) => typeof item === "string"), message);
+  return value as readonly string[];
+}
+function json(path: string): Json {
+  return JSON.parse(readFileSync(path, "utf8")) as Json;
+}
+function clone<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+function reject(effect: () => void, label: string): void {
+  try { effect(); } catch { return; }
+  throw new Error("v0.15 R0 requirements: expected rejection: " + label);
+}
+
+const repoRoot = resolve(process.cwd(), "..");
+const requirements = json(join(repoRoot, "requirements/mts-v0.15.json"));
+const traceability = json(join(repoRoot, "traceability/mts-v0.15.json"));
+const accepted14 = json(join(repoRoot, "requirements/mts-v0.14.json"));
+
+const allowedStates = new Set<State>([
+  "OPEN",
+  "EXPERIMENT_GREEN",
+  "COMPONENT_GREEN",
+  "AUTHOR_REVIEW_PENDING",
+  "VERTICAL_GREEN",
+  "RELEASE_READY",
+  "ACCEPTED",
+  "REJECTED",
+]);
+
+const verticalEvidenceFields = [
+  "canonicalSource",
+  "sourceDigest",
+  "sourceEntry",
+  "grammarProfileRevision",
+  "textModelValidated",
+  "jsonRoundTripComplete",
+  "freshMemoryFormalReplay",
+  "freshMemoryJsonReplay",
+  "twoMemoryReplay",
+  "executionOrProofResult",
+  "mutationFalsifiers",
+  "semanticInjectionCount",
+  "generatedProjectionCurrent",
+] as const;
+
+function validateApprovedJsonEntry(entry: Json): void {
+  const id = text(entry.id, "approved JSON id");
+  const jsonArtifact = text(entry.canonicalJsonArtifact, id + " canonicalJsonArtifact");
+  const jsonDigest = text(entry.canonicalJsonDigest, id + " canonicalJsonDigest");
+  text(entry.formalSourceArtifact, id + " formalSourceArtifact");
+  text(entry.formalSourceDigest, id + " formalSourceDigest");
+  text(entry.metacompilerProfile, id + " metacompilerProfile");
+  text(entry.expectedRecursiveDigest, id + " expectedRecursiveDigest");
+  text(entry.amemoryExecutionProfile, id + " amemoryExecutionProfile");
+  assert(entry.expectedSemanticResult !== undefined, id + " expectedSemanticResult");
+  const review = record(entry.authorJsonReview, id + " authorJsonReview");
+  assert(text(review.state, id + " review state") === "APPROVED", id + " requires explicit APPROVED");
+  assert(text(review.artifact, id + " review artifact") === jsonArtifact, id + " approval artifact mismatch");
+  assert(text(review.revisionOrDigest, id + " review digest") === jsonDigest, id + " approval stale after artifact change");
+  text(review.decisionEvidence, id + " decisionEvidence");
+}
+
+function validateCandidate(req: Json, trace: Json): void {
+  assert(text(req.schema, "requirements schema") === "mts-requirement-registry/v0.3-candidate", "requirements schema");
+  assert(text(trace.schema, "traceability schema") === "mts-traceability/v0.3-candidate", "traceability schema");
+  assert(bool(req.accepted, "requirements accepted") === false, "candidate requirements cannot be accepted");
+  assert(bool(trace.accepted, "trace accepted") === false, "candidate traceability cannot be accepted");
+  assert(bool(req.acceptanceReady, "requirements readiness") === false, "R0 cannot claim release readiness");
+  assert(bool(trace.acceptanceReady, "trace readiness") === false, "R0 trace cannot claim release readiness");
+  assert(text(trace.releaseState, "releaseState") === "OPEN", "R0 releaseState remains OPEN");
+
+  const current = record(trace.currentAccepted, "currentAccepted");
+  assert(text(current.mtsVersion, "current accepted version") === "v0.14", "v0.14 remains accepted/current");
+  assert(text(current.requirements, "current accepted requirements") === "requirements/mts-v0.14.json", "accepted requirements pointer");
+  assert(text(accepted14.status, "v0.14 status") === "accepted", "accepted v0.14 registry remains accepted");
+
+  const list = req.requirements;
+  assert(Array.isArray(list), "requirements array");
+  const ids = (list as Json[]).map((item) => text(item.id, "requirement id"));
+  assert(new Set(ids).size === ids.length, "requirement IDs unique");
+  const idSet = new Set(ids);
+  const traces = record(trace.requirements, "trace requirements");
+  assert(Object.keys(traces).length === ids.length, "one trace record per requirement");
+  for (const id of ids) assert(Object.prototype.hasOwnProperty.call(traces, id), "missing trace " + id);
+
+  const byId = new Map((list as Json[]).map((item) => [text(item.id, "id"), item]));
+  const visiting = new Set<string>();
+  const done = new Set<string>();
+  const visit = (id: string): void => {
+    if (done.has(id)) return;
+    assert(!visiting.has(id), "dependency cycle at " + id);
+    visiting.add(id);
+    const item = byId.get(id);
+    assert(item !== undefined, "known dependency node " + id);
+    for (const dep of strings(item.dependsOn, id + " dependsOn")) {
+      assert(idSet.has(dep), id + " unknown dependency " + dep);
+      visit(dep);
+    }
+    visiting.delete(id);
+    done.add(id);
+  };
+  ids.forEach(visit);
+
+  for (const item of list as Json[]) {
+    const id = text(item.id, "id");
+    const state = text(item.state, id + " state") as State;
+    assert(allowedStates.has(state), id + " allowed state");
+    assert(state !== "ACCEPTED" && state !== "RELEASE_READY", id + " cannot be accepted/release-ready in R0");
+    const evidence = record(item.evidence, id + " evidence");
+    strings(evidence.positiveVectors, id + " positiveVectors");
+    strings(evidence.negativeVectors, id + " negativeVectors");
+    strings(evidence.requiredExecutableGates, id + " requiredExecutableGates");
+
+    const traced = record(traces[id], id + " trace");
+    assert(text(traced.state, id + " trace state") === state, id + " state matches traceability");
+    assert(JSON.stringify(strings(traced.dependsOn, id + " trace dependsOn")) === JSON.stringify(strings(item.dependsOn, id + " dependsOn")), id + " dependency projection exact");
+  }
+
+  const gov = byId.get("V15-GOV-01");
+  assert(gov !== undefined, "V15-GOV-01 exists");
+  assert(text(gov.state, "V15-GOV-01 state") === "COMPONENT_GREEN", "R0 registry itself is only COMPONENT_GREEN");
+  const govEvidence = record(gov.evidence, "V15-GOV-01 evidence");
+  assert(strings(govEvidence.positiveVectors, "GOV positive").length > 0, "GOV positive evidence");
+  assert(strings(govEvidence.negativeVectors, "GOV negative").length >= 3, "GOV overclaim negatives");
+  for (const gate of strings(govEvidence.requiredExecutableGates, "GOV gates")) {
+    assert(existsSync(join(repoRoot, gate)), "GOV gate exists: " + gate);
+  }
+
+  const corpus = record(trace.approvedJsonCorpus, "approvedJsonCorpus");
+  const entries = corpus.entries;
+  assert(Array.isArray(entries), "approved corpus entries");
+  for (const entry of entries as Json[]) validateApprovedJsonEntry(entry);
+}
+
+function validateVerticalPromotion(requirement: Json, evidence: Json): void {
+  assert(text(requirement.state, "promotion state") === "VERTICAL_GREEN", "promotion target");
+  for (const field of verticalEvidenceFields) {
+    assert(Object.prototype.hasOwnProperty.call(evidence, field), "missing vertical evidence " + field);
+  }
+  assert(Number(evidence.semanticInjectionCount) === 0, "semantic injection must be zero");
+  assert(evidence.textModelValidated === true, "text model validation");
+  assert(evidence.jsonRoundTripComplete === true, "full JSON round-trip");
+  assert(evidence.freshMemoryFormalReplay === true, "fresh FORMAL replay");
+  assert(evidence.freshMemoryJsonReplay === true, "fresh JSON replay");
+  assert(evidence.twoMemoryReplay === true, "two-Memory replay");
+  assert(evidence.generatedProjectionCurrent === true, "projection current");
+  assert(Array.isArray(evidence.mutationFalsifiers) && evidence.mutationFalsifiers.length > 0, "mutation falsifiers");
+  const review = record(evidence.authorJsonReview, "authorJsonReview");
+  assert(text(review.state, "author review state") === "APPROVED", "explicit Author JSON approval");
+  const jsonDigest = text(evidence.canonicalJsonDigest, "canonicalJsonDigest");
+  assert(text(review.revisionOrDigest, "review digest") === jsonDigest, "approval bound to exact JSON digest");
+}
+
+validateCandidate(requirements, traceability);
+
+// Negative: a mere state flip cannot promote an R0 requirement to VERTICAL_GREEN.
+{
+  const req = { id: "X", state: "VERTICAL_GREEN" };
+  reject(() => validateVerticalPromotion(req, {}), "illegal VERTICAL_GREEN without evidence");
+}
+
+// Negative: even complete technical evidence cannot bypass explicit Author JSON approval.
+{
+  const req = { id: "AND", state: "VERTICAL_GREEN" };
+  const evidence: Json = {
+    canonicalSource: "formal/and.mts",
+    sourceDigest: "s1",
+    sourceEntry: "AND",
+    grammarProfileRevision: "g1",
+    textModelValidated: true,
+    jsonRoundTripComplete: true,
+    freshMemoryFormalReplay: true,
+    freshMemoryJsonReplay: true,
+    twoMemoryReplay: true,
+    executionOrProofResult: "GREEN",
+    mutationFalsifiers: ["remove-tt-row"],
+    semanticInjectionCount: 0,
+    generatedProjectionCurrent: true,
+    canonicalJsonDigest: "j1",
+    authorJsonReview: { state: "PENDING", revisionOrDigest: "j1" },
+  };
+  reject(() => validateVerticalPromotion(req, evidence), "missing explicit Author JSON approval");
+}
+
+// Negative: approval is tied to the exact artifact digest and becomes stale after a material change.
+{
+  const entry: Json = {
+    id: "AND",
+    canonicalJsonArtifact: "formal/and.json",
+    canonicalJsonDigest: "new-digest",
+    formalSourceArtifact: "formal/and.mts",
+    formalSourceDigest: "formal-digest",
+    metacompilerProfile: "v0.15",
+    expectedRecursiveDigest: "recursive-digest",
+    amemoryExecutionProfile: "amemory#482",
+    expectedSemanticResult: "FF=F;FT=F;TF=F;TT=T",
+    authorJsonReview: {
+      state: "APPROVED",
+      artifact: "formal/and.json",
+      revisionOrDigest: "old-digest",
+      decisionEvidence: "author-decision",
+    },
+  };
+  reject(() => validateApprovedJsonEntry(entry), "stale approval after JSON digest change");
+}
+
+// Negative: an approved-corpus entry cannot omit the real A-memory replay profile.
+{
+  const entry: Json = {
+    id: "AND",
+    canonicalJsonArtifact: "formal/and.json",
+    canonicalJsonDigest: "j1",
+    formalSourceArtifact: "formal/and.mts",
+    formalSourceDigest: "s1",
+    metacompilerProfile: "v0.15",
+    expectedRecursiveDigest: "r1",
+    expectedSemanticResult: "GREEN",
+    authorJsonReview: {
+      state: "APPROVED",
+      artifact: "formal/and.json",
+      revisionOrDigest: "j1",
+      decisionEvidence: "author-decision",
+    },
+  };
+  reject(() => validateApprovedJsonEntry(entry), "approved corpus requires real A-memory profile");
+}
+
+console.log([
+  "MTS_V015_R0_REQUIREMENTS=COMPONENT_GREEN",
+  "CANDIDATE_ACCEPTED=FALSE",
+  "CURRENT_ACCEPTED=v0.14",
+  "DEPENDENCY_DAG=GREEN",
+  "VERTICAL_OVERCLAIM_REJECTED=TRUE",
+  "AUTHOR_JSON_APPROVAL_REQUIRED=TRUE",
+  "STALE_JSON_APPROVAL_REJECTED=TRUE",
+  "REAL_AMEMORY_PROFILE_REQUIRED=TRUE",
+  "APPROVED_JSON_CORPUS_OWNER=1978",
+  "REAL_AMEMORY_REPLAY_OWNER=amemory#482",
+].join(" "));
