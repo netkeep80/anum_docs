@@ -263,6 +263,9 @@ function run(
   const r = runtime(f);
   same(r.T, f.basis.L, "T is exact L");
   same(r.F, f.basis.U, "F is exact U");
+  assert(r.AND !== r.CALL, "function identity differs from CALL role");
+  assert(r.AND !== r.DONE, "function identity differs from DONE role");
+  assert(r.CALL !== r.DONE, "CALL and DONE remain distinct profile roles");
 
   const ft = value(f, r.compiled, "ARGS_FT");
   const tf = value(f, r.compiled, "ARGS_TF");
@@ -278,6 +281,7 @@ function run(
 
   same(termFT, f.memory.ensure(r.AND, ft), "TERM_FT = AND->ARGS_FT");
   same(reqFT, f.memory.ensure(r.CALL, termFT), "REQ_FT = CALL->TERM_FT");
+  assert(reqFT !== termFT, "binary construction term differs from evaluation request");
 
   const passive = scope(f, r.interpreter, active(f, r.K, termFT));
   const passiveStep = reactV013StructuralScope(f.memory, passive, f.fresh());
