@@ -176,7 +176,7 @@ function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
     ...(formal.nativeClassification === null
       ? []
       : [
-          `- **Нативная классификация, сверенная с native assurance:** ${inlineCode(formal.nativeClassification)}.`,
+          `- **Нативная классификация, сверенная с реестром подтверждений:** ${inlineCode(formal.nativeClassification)}.`,
           ...(formal.kernelLaw === null
             ? []
             : [`- **Доверенный закон ядра:** ${inlineCode(formal.kernelLaw)}.`]),
