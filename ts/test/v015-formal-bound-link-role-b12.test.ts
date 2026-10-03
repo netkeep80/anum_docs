@@ -1,13 +1,22 @@
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   materializeExactSequence,
   readExactSequence,
 } from "../src/exact-sequence.js";
 import {
   Memory,
+  MemoryError,
   ensureRootBasis,
   type LinkHandle,
+  type LinkPoles,
+  type ReadMemory,
   type RootBasis,
 } from "../src/memory.js";
+import {
+  RecursiveLinkIdentityProofReplayError,
+  replayRecursiveLinkIdentityProofAset,
+} from "../src/recursive-link-identity-proof.js";
 import {
   materializeNativeSyntaxGrammar,
   type NativeSyntaxGrammarRuleSpec,
@@ -62,6 +71,40 @@ function expectRuleError(
     return;
   }
   throw new Error(`v0.15 B12 bound Link role: ${label}: expected ${code}`);
+}
+
+function expectKernelError(
+  code: RecursiveLinkIdentityProofReplayError["code"],
+  effect: () => unknown,
+  label: string,
+): void {
+  try {
+    effect();
+  } catch (error) {
+    assert(error instanceof RecursiveLinkIdentityProofReplayError, `${label}: kernel error type`);
+    same(error.code, code, label);
+    return;
+  }
+  throw new Error(`v0.15 B15 FND-02 kernel boundary: ${label}: expected ${code}`);
+}
+
+class SyntheticReadMemory implements ReadMemory {
+  constructor(
+    readonly root: LinkHandle,
+    private readonly cells: ReadonlyMap<LinkHandle, LinkPoles>,
+  ) {}
+
+  get linkCount(): number { return this.cells.size; }
+
+  poles(link: LinkHandle): LinkPoles {
+    const value = this.cells.get(link);
+    if (value === undefined) throw new MemoryError("synthetic unknown Link");
+    return value;
+  }
+
+  find(): LinkHandle | undefined { return undefined; }
+  outgoing(): readonly LinkHandle[] { return []; }
+  incoming(): readonly LinkHandle[] { return []; }
 }
 
 interface Fixture {
@@ -162,6 +205,41 @@ function fixture(): Fixture {
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
+interface FormalOverlayEntry {
+  readonly id: string;
+  readonly migrationStatus: string;
+  readonly proofClosure: string;
+  readonly formalStatement: string;
+  readonly formalPremises: readonly string[];
+  readonly formalDomain?: readonly string[];
+  readonly formalNonPremises?: readonly string[];
+  readonly formalSourcePath: string;
+  readonly nativeClassification?: string;
+  readonly kernelLaw?: string;
+  readonly nativeIndependent?: boolean;
+  readonly aproverStatus: string;
+}
+
+function repositoryRoot(): string {
+  const roots = [resolve(process.cwd(), ".."), process.cwd()];
+  const root = roots.find((candidate) =>
+    existsSync(resolve(candidate, "theorems/formal-v0.15.json"))
+  );
+  assert(root !== undefined, "repository root");
+  return root;
+}
+
+function formalOverlayEntry(id: string): FormalOverlayEntry {
+  const overlay = JSON.parse(
+    readFileSync(resolve(repositoryRoot(), "theorems/formal-v0.15.json"), "utf8"),
+  ) as { entries?: FormalOverlayEntry[] };
+  const entry = overlay.entries?.find((candidate) => candidate.id === id);
+  assert(entry !== undefined, `FORMAL overlay entry ${id}`);
+  return entry;
+}
+
+const fnd02Formal = formalOverlayEntry("FND-02");
+
 function boundSource(roleName: string, roleDefinition = "U->L"): string {
   return [
     "R : R->R",
@@ -170,18 +248,26 @@ function boundSource(roleName: string, roleDefinition = "U->L"): string {
     "L : O->C",
     "U : C->O",
     `${roleName} : ${roleDefinition}`,
+    "LINK_DOMAIN_TAG : U->R",
+    "A1RecursiveSeparation : R->O",
     "FULL_SELF_TAG : R->U",
     "ROOT_ID_TAG : O->U",
     "INTERP_DICT : L->R",
     "INTERP_GRAM : C->L",
     "THEORY : U->C",
     "CTX_PARENT : L->U",
+    `X_LINK_DOMAIN : LINK_DOMAIN_TAG->${roleName}`,
     `FULL_SELF_PAIR : ${roleName}(${roleName})`,
     `FULL_SELF_ARGS : [${roleName},FULL_SELF_PAIR]`,
     "FULL_SELF_CLAIM : FULL_SELF_TAG->FULL_SELF_ARGS",
     `ROOT_ID_ARGS : [${roleName},R]`,
     "ROOT_ID_CLAIM : ROOT_ID_TAG->ROOT_ID_ARGS",
-    "FND02_STATEMENT : FULL_SELF_CLAIM->ROOT_ID_CLAIM",
+    `FND02_PREMISES : [${fnd02Formal.formalPremises.join(",")}]`,
+    "FND02_RULE : FULL_SELF_CLAIM->ROOT_ID_CLAIM",
+    fnd02Formal.formalStatement,
+    "KERNEL_REALIZATION_TAG : C->U",
+    "KERNEL_REALIZATION_ARGS : [FND02_STATEMENT,R]",
+    "KERNEL_REALIZATION_BOUNDARY : KERNEL_REALIZATION_TAG->KERNEL_REALIZATION_ARGS",
     `BOUND_ROLES : [${roleName}]`,
     "A : R->L",
     "B : L->C",
@@ -258,7 +344,8 @@ function expectedStatement(
     value(f, result, "ROOT_ID_TAG"),
     rootIdArgs,
   );
-  return f.memory.ensure(fullSelfClaim, rootIdClaim);
+  const rule = f.memory.ensure(fullSelfClaim, rootIdClaim);
+  return f.memory.ensure(value(f, result, "FND02_PREMISES"), rule);
 }
 
 function inspectInstantiatedStatement(
@@ -268,7 +355,20 @@ function inspectInstantiatedStatement(
   candidate: LinkHandle,
   label: string,
 ): void {
-  const statementPoles = f.memory.poles(statement);
+  const theoremPoles = f.memory.poles(statement);
+  same(
+    theoremPoles.start,
+    value(f, result, "FND02_PREMISES"),
+    `${label} exact A1 premise carrier`,
+  );
+  const premiseValues = readExactSequence(f.memory, theoremPoles.start).values;
+  same(premiseValues.length, 1, `${label} one formal premise`);
+  same(
+    premiseValues[0],
+    value(f, result, "A1RecursiveSeparation"),
+    `${label} A1 premise`,
+  );
+  const statementPoles = f.memory.poles(theoremPoles.end);
   const fullSelf = f.memory.poles(statementPoles.start);
   const fullSelfArgs = readExactSequence(f.memory, fullSelf.end).values;
   same(fullSelf.start, value(f, result, "FULL_SELF_TAG"), `${label} FullSelf tag`);
@@ -289,9 +389,31 @@ function inspectInstantiatedStatement(
 }
 
 {
+  same(fnd02Formal.migrationStatus, "FORMAL_MIGRATED", "FND-02 migration status");
+  same(fnd02Formal.proofClosure, "N_A_FOR_KERNEL_REALIZATION", "FND-02 closure boundary");
+  same(
+    fnd02Formal.formalStatement,
+    "FND02_STATEMENT : FND02_PREMISES->FND02_RULE",
+    "FND-02 canonical FORMAL statement",
+  );
+  same(fnd02Formal.formalPremises.length, 1, "FND-02 one external premise");
+  same(fnd02Formal.formalPremises[0], "A1RecursiveSeparation", "FND-02 exact A1 premise");
+  same(fnd02Formal.formalDomain?.length, 1, "FND-02 one bound domain");
+  same(fnd02Formal.formalDomain?.[0], "X : Link", "FND-02 bound Link domain");
+  assert(fnd02Formal.formalNonPremises?.includes("Grounded(X)"), "Grounded is explicitly non-premise");
+  assert(fnd02Formal.formalNonPremises?.includes("F2/F3 normalization"), "F2/F3 are explicitly non-premises");
+  assert(fnd02Formal.formalNonPremises?.includes("FND-13"), "FND-13 is explicitly non-premise");
+  same(fnd02Formal.nativeClassification, "KERNEL_REALIZED_NOT_INDEPENDENT", "FND-02 native classification");
+  same(fnd02Formal.kernelLaw, "recursive-link-identity/full-full-canonical-root-base", "FND-02 kernel law");
+  same(fnd02Formal.nativeIndependent, false, "FND-02 kernel realization is not independent");
+  same(fnd02Formal.aproverStatus, "NOT_RECORDED", "FND-02 aprover boundary");
+
   const f = fixture();
   const source = boundSource("X");
-  assert(!source.includes("="), "B12 theorem template must not use eager runtime equality");
+  assert(!source.includes("="), "B15 theorem template must not use eager runtime equality");
+  assert(!source.includes("Grounded"), "B15 source must not add external Grounded premise");
+  assert(!source.includes("F2") && !source.includes("F3"), "B15 source must not add F2/F3 normalization");
+  assert(!source.includes("FND-13"), "B15 source must not add FND-13 dependency");
 
   const result = compile(f, source);
   const xRole = value(f, result, "X");
@@ -302,12 +424,53 @@ function inspectInstantiatedStatement(
   same(roleValues.length, 1, "one admitted bound role");
   same(roleValues[0], xRole, "bound role comes from FORMAL source");
 
+  const domainClaim = f.memory.poles(value(f, result, "X_LINK_DOMAIN"));
+  same(domainClaim.start, value(f, result, "LINK_DOMAIN_TAG"), "bound Link domain tag");
+  same(domainClaim.end, xRole, "bound Link domain targets exact role identity");
+
   const roleDictionary = defineStructuralRoleDictionary(f.memory, roleValues);
   const dictionary = readStructuralRoleDictionary(f.memory, roleDictionary);
   same(dictionary.roles.length, 1, "role dictionary arity");
   same(dictionary.roles[0], xRole, "role dictionary binds exact Link identity");
 
   const template = value(f, result, "FND02_STATEMENT");
+  const kernelBoundary = f.memory.poles(value(f, result, "KERNEL_REALIZATION_BOUNDARY"));
+  same(
+    kernelBoundary.start,
+    value(f, result, "KERNEL_REALIZATION_TAG"),
+    "kernel realization boundary tag",
+  );
+  const kernelArgs = readExactSequence(f.memory, kernelBoundary.end).values;
+  same(kernelArgs.length, 2, "kernel realization boundary arity");
+  same(kernelArgs[0], template, "kernel realization boundary references exact theorem statement");
+  same(kernelArgs[1], f.basis.R, "kernel realization boundary references canonical ROOT");
+
+  const kernelBefore = f.memory.linkCount;
+  const kernelReplay = replayRecursiveLinkIdentityProofAset(f.memory, f.basis.R);
+  same(kernelReplay.left, f.basis.R, "canonical ROOT full/full kernel left");
+  same(kernelReplay.right, f.basis.R, "canonical ROOT full/full kernel right");
+  same(f.memory.linkCount, kernelBefore, "kernel replay remains read-only");
+
+  const synthetic = (): LinkHandle => Object.freeze({}) as unknown as LinkHandle;
+  const syntheticRoot = synthetic();
+  const nonRootFull = synthetic();
+  const nonRootClaim = synthetic();
+  const nonRootProof = synthetic();
+  const nonRootMemory = new SyntheticReadMemory(
+    syntheticRoot,
+    new Map<LinkHandle, LinkPoles>([
+      [syntheticRoot, Object.freeze({ start: syntheticRoot, end: syntheticRoot })],
+      [nonRootFull, Object.freeze({ start: nonRootFull, end: nonRootFull })],
+      [nonRootClaim, Object.freeze({ start: nonRootFull, end: nonRootFull })],
+      [nonRootProof, Object.freeze({ start: nonRootClaim, end: syntheticRoot })],
+    ]),
+  );
+  expectKernelError(
+    "invalid-root-base",
+    () => replayRecursiveLinkIdentityProofAset(nonRootMemory, nonRootProof),
+    "synthetic non-root full/full base",
+  );
+
   const a = value(f, result, "A");
   const b = value(f, result, "B");
   assert(a !== b && a !== xRole && b !== xRole, "distinct concrete substitutions");
@@ -477,8 +640,16 @@ console.log([
   "INTRINSIC_VARIABLE_LINK_KIND=0",
   "NEW_BINDER_SYNTAX=0",
   "JSON_PROFILE=J1_UNCHANGED",
-  "FND02_BOUNDARY=FORALL_LINK_FULLSELF_IMPLIES_ROOT",
+  "FND02_BOUNDARY=A1_FORALL_LINK_FULLSELF_IMPLIES_ROOT",
+  "A1_PREMISE=EXPLICIT",
+  "LINK_DOMAIN=X:LINK",
   "EXTERNAL_GROUNDED_PREMISE=0",
+  "F2_F3_PREMISE=0",
+  "FND13_PREMISE=0",
+  "KERNEL_CLASSIFICATION=KERNEL_REALIZED_NOT_INDEPENDENT",
+  "KERNEL_ROOT_BASE=ACCEPT",
+  "KERNEL_NONROOT_FULL_BASE=REJECT",
+  "KERNEL_REPLAY_READ_ONLY=GREEN",
   "RUNTIME_EQUALITY_IN_TEMPLATE=0",
   "TWO_INSTANTIATIONS=GREEN",
   "CONSISTENT_SUBSTITUTION=GREEN",
