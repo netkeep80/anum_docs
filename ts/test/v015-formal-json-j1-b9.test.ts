@@ -61,10 +61,10 @@ const source=[
     `{"schema":"${V015_FORMAL_JSON_J1_SCHEMA}","entries":`,
     `{"entries":`,
   );
-  assert(entriesFirst.endsWith("]}\\n"),"canonical JSON expected suffix");
+  assert(entriesFirst.endsWith("]}\n"),"canonical JSON expected suffix");
   const swapped=enc.encode(
     entriesFirst.slice(0,-3) +
-    `],"schema":"${V015_FORMAL_JSON_J1_SCHEMA}"}\\n`,
+    `],"schema":"${V015_FORMAL_JSON_J1_SCHEMA}"}\n`,
   );
   const reordered=decodeV015FormalSourceAsetJson(f.memory,f.basis,f.grammarRoot,f.namespaceProfileRoot,f.definitionProfileRoot,swapped);
   same(reordered.sourceAset,text.sourceAset,"JSON object key order is not source authority");
