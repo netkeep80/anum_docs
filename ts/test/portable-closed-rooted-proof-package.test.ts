@@ -227,6 +227,7 @@ function main(): void {
   assert(restored.proofRoot !== source.proofRoot, "proofRoot handle stays Memory-local");
   assert(restored.replay.theory !== source.theory, "Theory handle stays Memory-local");
   same(restored.replay.declaredAssumptionCount, 0, "restored proof remains CLOSED");
+  same(restored.replay.usedAssumptionCount, 0, "restored proof uses no assumptions");
   sameBytes(
     semanticWire(restored.memory, restored.basis, restored.replay.conclusion),
     claimWire,
