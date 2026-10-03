@@ -200,6 +200,7 @@ const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/native-syntax-grammar.ts",
   "ts/src/source-namespace.ts",
   "ts/src/v015-formal-evaluation.ts",
+  "ts/src/v015-root-bootstrap.ts",
 ]);
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
