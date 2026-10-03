@@ -1205,6 +1205,14 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
+const postV013CandidateDeltaFiles = new Set([
+  "ts/src/native-syntax-grammar.ts",
+  "ts/src/v015-formal-evaluation.ts",
+]);
+const postV013DecisionDeltaFiles = new Set([
+  ...postV013ToolingDeltaFiles,
+  ...postV013CandidateDeltaFiles,
+]);
 
 const decisionSignatures = decisionCandidates.map(
   (entry) => `${entry.file}#${entry.owner} [${entry.signals.join(",")}]`,
@@ -1218,7 +1226,11 @@ for (const entry of decisionCandidates) {
     (observedDecisionCountsByFile[entry.file] ?? 0) + 1;
   const category =
     decisionAudit.fileCategoryByFile[entry.file] ??
-    (postV013ToolingDeltaFiles.has(entry.file) ? "tooling" : undefined);
+    (postV013ToolingDeltaFiles.has(entry.file)
+      ? "tooling"
+      : postV013CandidateDeltaFiles.has(entry.file)
+        ? "post-v0.13-candidate"
+        : undefined);
   assert(typeof category === "string" && category.length > 0,
     `P1f decision file is classified: ${entry.file}`);
   observedDecisionCountsByCategory[category] =
@@ -1256,10 +1268,10 @@ same(
   JSON.stringify(typedReadMemberCounts),
   "typed ReadMemory member counts",
 );
-// The v0.13 S3 projection is immutable historical evidence. Post-v0.13
-// acceptance/documentation work may refactor only explicitly classified
-// tooling files; the historical aggregate fingerprint is never rewritten.
-// Every non-tooling file must remain count-identical to the frozen projection.
+// The v0.13 S3 projection is immutable historical evidence. Explicit
+// post-v0.13 tooling and v0.15 candidate files are measured as deltas only;
+// the historical aggregate fingerprint is never rewritten. Every historical
+// non-delta file remains count-identical to the frozen projection.
 const projectedDecisionCountsByFile = decisionAudit.decisionOwnerCountsByFile as Record<string, number>;
 const driftFiles = [...new Set([
   ...Object.keys(projectedDecisionCountsByFile),
@@ -1268,21 +1280,21 @@ const driftFiles = [...new Set([
   (projectedDecisionCountsByFile[file] ?? 0) !== (observedDecisionCountsByFile[file] ?? 0)
 );
 assert(
-  driftFiles.every((file) => postV013ToolingDeltaFiles.has(file)),
-  `post-v0.13 static decision drift is tooling-only: ${driftFiles.join(", ")}`,
+  driftFiles.every((file) => postV013DecisionDeltaFiles.has(file)),
+  `post-v0.13 static decision drift is explicitly classified: ${driftFiles.join(", ")}`,
 );
-const projectedPostV013ToolingDecisionOwners = [...postV013ToolingDeltaFiles]
+const projectedPostV013DecisionOwners = [...postV013DecisionDeltaFiles]
   .reduce((sum, file) => sum + (projectedDecisionCountsByFile[file] ?? 0), 0);
-const observedPostV013ToolingDecisionOwners = [...postV013ToolingDeltaFiles]
+const observedPostV013DecisionOwners = [...postV013DecisionDeltaFiles]
   .reduce((sum, file) => sum + (observedDecisionCountsByFile[file] ?? 0), 0);
 same(
-  decisionCandidates.length - observedPostV013ToolingDecisionOwners,
-  decisionAudit.decisionCandidateOwnerCount - projectedPostV013ToolingDecisionOwners,
-  "non-tooling host-decision owner count remains frozen while post-v0.13 tooling may evolve",
+  decisionCandidates.length - observedPostV013DecisionOwners,
+  decisionAudit.decisionCandidateOwnerCount - projectedPostV013DecisionOwners,
+  "historical host-decision owner count remains frozen while explicit post-v0.13 deltas evolve",
 );
 
 for (const [file, projectedCount] of Object.entries(projectedDecisionCountsByFile)) {
-  if (postV013ToolingDeltaFiles.has(file)) continue;
+  if (postV013DecisionDeltaFiles.has(file)) continue;
   same(
     observedDecisionCountsByFile[file] ?? 0,
     projectedCount,
