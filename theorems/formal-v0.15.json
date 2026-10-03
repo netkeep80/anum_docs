@@ -1,0 +1,43 @@
+{
+  "schema": "mts-formal-theorem-overlay/v0.1",
+  "mtsVersion": "v0.15-candidate",
+  "baseInventory": "theorems/current-v0.14.json",
+  "authority": "formal-migration-descriptor-only",
+  "entries": [
+    {
+      "id": "FND-07",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "CLOSED",
+      "formalStatement": "FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION",
+      "formalPremises": [
+        "TARGET_P1",
+        "TARGET_P2"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd07-ordinary-formal-proof-p2.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-08",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "OPEN_CONDITIONAL",
+      "formalStatement": "FND08_STATEMENT : TARGET_PREMISES->G_RESULT",
+      "formalPremises": [
+        "G_SEM",
+        "G_BOUNDARY"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd08-open-formal-b14b1.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-09",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "OPEN_CONDITIONAL",
+      "formalStatement": "FND09_STATEMENT : TARGET_PREMISES->G_RESULT",
+      "formalPremises": [
+        "G_SEM"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd09-open-formal-b14b2.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    }
+  ]
+}
