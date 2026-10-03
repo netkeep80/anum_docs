@@ -76,6 +76,11 @@ type ParsedExpression =
   | Readonly<{
       kind: "sequence";
       items: readonly string[];
+    }>
+  | Readonly<{
+      kind: "equality";
+      leftName: string;
+      rightName: string;
     }>;
 
 interface ParsedDefinition {
@@ -152,7 +157,12 @@ export function isV015FormalName(name: string): boolean {
   return (
     name.length > 0 &&
     !/[\t\r\n :()]/u.test(name) &&
-    !name.includes("->")
+    !name.includes("->") &&
+    !name.includes("[") &&
+    !name.includes("]") &&
+    !name.includes(",") &&
+    !name.includes("=") &&
+    !name.includes("≡")
   );
 }
 
@@ -190,6 +200,39 @@ function parseExpression(
 
   if (source.includes("[") || source.includes("]")) {
     return fail("invalid-expression");
+  }
+
+  if (source.includes("≡")) return fail("invalid-expression");
+
+  const equality = source.indexOf("=");
+  if (equality >= 0) {
+    if (
+      source.indexOf("=", equality + 1) >= 0 ||
+      source.includes("->") ||
+      source.includes("(") ||
+      source.includes(")")
+    ) {
+      return fail("invalid-expression");
+    }
+    const [leftStart, leftEnd] = trimAsciiBounds(source, 0, equality);
+    const [rightStart, rightEnd] = trimAsciiBounds(
+      source,
+      equality + 1,
+      source.length,
+    );
+    const leftName = source.slice(leftStart, leftEnd);
+    const rightName = source.slice(rightStart, rightEnd);
+    if (
+      !isV015FormalName(leftName) ||
+      !isV015FormalName(rightName)
+    ) {
+      return fail("invalid-name");
+    }
+    return Object.freeze({
+      kind: "equality",
+      leftName,
+      rightName,
+    });
   }
 
   const direct = source.indexOf("->");
@@ -334,7 +377,7 @@ export function decodeV015FormalDefinitions(
         { role: definitionProfile.pairLeftRole, value: left },
         { role: definitionProfile.pairRightRole, value: right },
       ]);
-    } else {
+    } else if (definition.expression.kind === "sequence") {
       if (
         definitionProfile.sequenceForm === undefined ||
         definitionProfile.sequenceItemRole === undefined
@@ -348,6 +391,20 @@ export function decodeV015FormalDefinitions(
           value: reference(name),
         })),
       );
+    } else {
+      if (
+        definitionProfile.equalityForm === undefined ||
+        definitionProfile.equalityLeftRole === undefined ||
+        definitionProfile.equalityRightRole === undefined
+      ) {
+        return fail("invalid-expression");
+      }
+      const left = reference(definition.expression.leftName);
+      const right = reference(definition.expression.rightName);
+      body = builder.addOccurrence(definitionProfile.equalityForm, [
+        { role: definitionProfile.equalityLeftRole, value: left },
+        { role: definitionProfile.equalityRightRole, value: right },
+      ]);
     }
 
     const declaration = builder.addOccurrence(namespaceProfile.declarationForm, [
@@ -389,6 +446,15 @@ export function decodeV015FormalDefinitions(
 
 // Strict JSON J1 projection converges on the same native SyntaxAset.
 export const V015_FORMAL_JSON_J1_SCHEMA = "mts-formal-json/v0.15-j1";
+export const V015_FORMAL_JSON_J2_SCHEMA = "mts-formal-json/v0.15-j2";
+
+function jsonSchemaForProfile(
+  profile: V015LinkDefinitionProfile,
+): string {
+  return profile.equalityForm === undefined
+    ? V015_FORMAL_JSON_J1_SCHEMA
+    : V015_FORMAL_JSON_J2_SCHEMA;
+}
 
 export type V015FormalJsonErrorCode =
   | "invalid-basis"
@@ -721,6 +787,28 @@ export function encodeV015FormalSourceAsetJson(
           );
         encodedValue =
           `{"sequence":[${items.map(quote).join(",")}]}`;
+      } else if (
+        profile.equalityForm !== undefined &&
+        profile.equalityLeftRole !== undefined &&
+        profile.equalityRightRole !== undefined &&
+        body.kind === profile.equalityForm
+      ) {
+        const left = nameRef(
+          memory,
+          verified,
+          occurrences,
+          profile,
+          oneField(body, profile.equalityLeftRole),
+        );
+        const right = nameRef(
+          memory,
+          verified,
+          occurrences,
+          profile,
+          oneField(body, profile.equalityRightRole),
+        );
+        encodedValue =
+          `{"equality":[${quote(left)},${quote(right)}]}`;
       } else {
         return jsonFail("unsupported-source");
       }
@@ -728,7 +816,7 @@ export function encodeV015FormalSourceAsetJson(
     });
 
     const text =
-      `{"schema":${quote(V015_FORMAL_JSON_J1_SCHEMA)},"entries":[${entries.join(",")}]}
+      `{"schema":${quote(jsonSchemaForProfile(profile))},"entries":[${entries.join(",")}]}
 `;
     return new TextEncoder().encode(text);
   } finally {
@@ -760,10 +848,6 @@ export function decodeV015FormalSourceAsetJson(
 
   const root = object(new StrictJsonReader(text).read());
   exactKeys(root, ["schema", "entries"]);
-  if (string(root.get("schema")!) !== V015_FORMAL_JSON_J1_SCHEMA) {
-    jsonFail("unsupported-profile");
-  }
-  const entries = array(root.get("entries")!);
 
   const grammar = readNativeSyntaxGrammar(memory, verified, grammarRoot);
   const namespaceProfile = readSourceNamespaceProfile(
@@ -778,6 +862,10 @@ export function decodeV015FormalSourceAsetJson(
     grammarRoot,
     definitionProfileRoot,
   );
+  if (string(root.get("schema")!) !== jsonSchemaForProfile(profile)) {
+    jsonFail("unsupported-profile");
+  }
+  const entries = array(root.get("entries")!);
   const builder = new SyntaxAsetBuilder(memory, grammar.vocabulary);
   const nameCache = new Map<string, LinkHandle>();
   const nameCarrier = (value: string): LinkHandle => {
@@ -833,6 +921,26 @@ export function decodeV015FormalSourceAsetJson(
           value: ref(item),
         })),
       );
+    } else if (value.has("equality")) {
+      if (
+        profile.equalityForm === undefined ||
+        profile.equalityLeftRole === undefined ||
+        profile.equalityRightRole === undefined
+      ) {
+        return jsonFail("unsupported-source");
+      }
+      const parts = array(value.get("equality")!);
+      if (parts.length !== 2) jsonFail("invalid-shape");
+      body = builder.addOccurrence(profile.equalityForm, [
+        {
+          role: profile.equalityLeftRole,
+          value: ref(name(parts[0]!)),
+        },
+        {
+          role: profile.equalityRightRole,
+          value: ref(name(parts[1]!)),
+        },
+      ]);
     } else {
       return jsonFail("invalid-shape");
     }
