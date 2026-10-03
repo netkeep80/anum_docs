@@ -142,52 +142,85 @@ function readProfile(
       return fail("invalid-profile");
     }
 
-    const hasSequence = values.length === 7 || values.length === 10;
-    const equalityOffset = hasSequence ? 7 : 5;
-    const hasEquality = values.length === 8 || values.length === 10;
-
-    const sequenceForm = hasSequence ? values[5] : undefined;
-    const sequenceItemRole = hasSequence ? values[6] : undefined;
-    if (
-      hasSequence &&
-      (
-        sequenceForm === undefined ||
-        sequenceItemRole === undefined ||
-        sequenceForm === pairForm ||
-        sequenceForm === nameRefForm
-      )
-    ) {
-      return fail("invalid-profile");
-    }
-
-    const equalityForm = hasEquality ? values[equalityOffset] : undefined;
-    const equalityLeftRole = hasEquality ? values[equalityOffset + 1] : undefined;
-    const equalityRightRole = hasEquality ? values[equalityOffset + 2] : undefined;
-    if (
-      hasEquality &&
-      (
-        equalityForm === undefined ||
-        equalityLeftRole === undefined ||
-        equalityRightRole === undefined ||
-        equalityLeftRole === equalityRightRole ||
-        equalityForm === pairForm ||
-        equalityForm === nameRefForm ||
-        equalityForm === sequenceForm
-      )
-    ) {
-      return fail("invalid-profile");
-    }
-
-    return Object.freeze({
+    const base = {
       pairForm,
       nameRefForm,
       pairLeftRole,
       pairRightRole,
       referencedNameRole,
-      ...(hasSequence ? { sequenceForm, sequenceItemRole } : {}),
-      ...(hasEquality
-        ? { equalityForm, equalityLeftRole, equalityRightRole }
-        : {}),
+    };
+
+    if (values.length === 5) {
+      return Object.freeze(base);
+    }
+
+    if (values.length === 7) {
+      const sequenceForm = values[5];
+      const sequenceItemRole = values[6];
+      if (
+        sequenceForm === undefined ||
+        sequenceItemRole === undefined ||
+        sequenceForm === pairForm ||
+        sequenceForm === nameRefForm
+      ) {
+        return fail("invalid-profile");
+      }
+      return Object.freeze({
+        ...base,
+        sequenceForm,
+        sequenceItemRole,
+      });
+    }
+
+    if (values.length === 8) {
+      const equalityForm = values[5];
+      const equalityLeftRole = values[6];
+      const equalityRightRole = values[7];
+      if (
+        equalityForm === undefined ||
+        equalityLeftRole === undefined ||
+        equalityRightRole === undefined ||
+        equalityLeftRole === equalityRightRole ||
+        equalityForm === pairForm ||
+        equalityForm === nameRefForm
+      ) {
+        return fail("invalid-profile");
+      }
+      return Object.freeze({
+        ...base,
+        equalityForm,
+        equalityLeftRole,
+        equalityRightRole,
+      });
+    }
+
+    const sequenceForm = values[5];
+    const sequenceItemRole = values[6];
+    const equalityForm = values[7];
+    const equalityLeftRole = values[8];
+    const equalityRightRole = values[9];
+    if (
+      sequenceForm === undefined ||
+      sequenceItemRole === undefined ||
+      equalityForm === undefined ||
+      equalityLeftRole === undefined ||
+      equalityRightRole === undefined ||
+      sequenceForm === pairForm ||
+      sequenceForm === nameRefForm ||
+      equalityForm === pairForm ||
+      equalityForm === nameRefForm ||
+      equalityForm === sequenceForm ||
+      equalityLeftRole === equalityRightRole
+    ) {
+      return fail("invalid-profile");
+    }
+    return Object.freeze({
+      ...base,
+      sequenceForm,
+      sequenceItemRole,
+      equalityForm,
+      equalityLeftRole,
+      equalityRightRole,
     });
   } catch (error) {
     if (error instanceof V015LinkDefinitionError) throw error;
