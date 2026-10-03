@@ -67,6 +67,17 @@ interface PhysicalLine {
   readonly bytes: Uint8Array;
 }
 
+type ParsedEqualityOperand =
+  | Readonly<{
+      kind: "name";
+      name: string;
+    }>
+  | Readonly<{
+      kind: "pair";
+      leftName: string;
+      rightName: string;
+    }>;
+
 type ParsedExpression =
   | Readonly<{
       kind: "pair";
@@ -79,8 +90,8 @@ type ParsedExpression =
     }>
   | Readonly<{
       kind: "equality";
-      leftName: string;
-      rightName: string;
+      left: ParsedEqualityOperand;
+      right: ParsedEqualityOperand;
     }>;
 
 interface ParsedDefinition {
@@ -166,6 +177,53 @@ export function isV015FormalName(name: string): boolean {
   );
 }
 
+function parseEqualityOperand(
+  source: string,
+): ParsedEqualityOperand {
+  const [start, end] = trimAsciiBounds(source, 0, source.length);
+  const value = source.slice(start, end);
+  if (isV015FormalName(value)) {
+    return Object.freeze({ kind: "name", name: value });
+  }
+
+  if (
+    value.includes("->") ||
+    value.includes("=") ||
+    value.includes("≡") ||
+    value.includes("[") ||
+    value.includes("]")
+  ) {
+    return fail("invalid-expression");
+  }
+
+  const open = value.indexOf("(");
+  const close = value.lastIndexOf(")");
+  if (
+    open <= 0 ||
+    close !== value.length - 1 ||
+    value.indexOf("(", open + 1) >= 0 ||
+    value.indexOf(")") !== close
+  ) {
+    return fail("invalid-expression");
+  }
+
+  const [leftStart, leftEnd] = trimAsciiBounds(value, 0, open);
+  const [rightStart, rightEnd] = trimAsciiBounds(value, open + 1, close);
+  const leftName = value.slice(leftStart, leftEnd);
+  const rightName = value.slice(rightStart, rightEnd);
+  if (
+    !isV015FormalName(leftName) ||
+    !isV015FormalName(rightName)
+  ) {
+    return fail("invalid-name");
+  }
+  return Object.freeze({
+    kind: "pair",
+    leftName,
+    rightName,
+  });
+}
+
 function parseExpression(
   source: string,
 ): ParsedExpression {
@@ -208,30 +266,14 @@ function parseExpression(
   if (equality >= 0) {
     if (
       source.indexOf("=", equality + 1) >= 0 ||
-      source.includes("->") ||
-      source.includes("(") ||
-      source.includes(")")
+      source.includes("->")
     ) {
       return fail("invalid-expression");
     }
-    const [leftStart, leftEnd] = trimAsciiBounds(source, 0, equality);
-    const [rightStart, rightEnd] = trimAsciiBounds(
-      source,
-      equality + 1,
-      source.length,
-    );
-    const leftName = source.slice(leftStart, leftEnd);
-    const rightName = source.slice(rightStart, rightEnd);
-    if (
-      !isV015FormalName(leftName) ||
-      !isV015FormalName(rightName)
-    ) {
-      return fail("invalid-name");
-    }
     return Object.freeze({
       kind: "equality",
-      leftName,
-      rightName,
+      left: parseEqualityOperand(source.slice(0, equality)),
+      right: parseEqualityOperand(source.slice(equality + 1)),
     });
   }
 
@@ -368,6 +410,20 @@ export function decodeV015FormalDefinitions(
       value: nameCarrier(name),
     }]);
 
+  const equalityOperand = (operand: ParsedEqualityOperand): LinkHandle => {
+    if (operand.kind === "name") return reference(operand.name);
+    return builder.addOccurrence(definitionProfile.pairForm, [
+      {
+        role: definitionProfile.pairLeftRole,
+        value: reference(operand.leftName),
+      },
+      {
+        role: definitionProfile.pairRightRole,
+        value: reference(operand.rightName),
+      },
+    ]);
+  };
+
   for (const definition of parsed) {
     let body: LinkHandle;
     if (definition.expression.kind === "pair") {
@@ -399,8 +455,8 @@ export function decodeV015FormalDefinitions(
       ) {
         return fail("invalid-expression");
       }
-      const left = reference(definition.expression.leftName);
-      const right = reference(definition.expression.rightName);
+      const left = equalityOperand(definition.expression.left);
+      const right = equalityOperand(definition.expression.right);
       body = builder.addOccurrence(definitionProfile.equalityForm, [
         { role: definitionProfile.equalityLeftRole, value: left },
         { role: definitionProfile.equalityRightRole, value: right },
