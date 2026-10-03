@@ -553,7 +553,7 @@ export function buildTheoremProjectionModel(
       migrationStatus: "NOT_MIGRATED",
       proofClosure: null,
       formalStatement: null,
-      formalPremises: Object.freeze([]) as string[],
+      formalPremises: [] as string[],
       formalSourcePath: null,
       aproverStatus: null,
     });
