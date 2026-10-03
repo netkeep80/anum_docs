@@ -89,6 +89,11 @@ export interface V015ProofFormMaterializeResult {
   readonly closedRoot: LinkHandle;
 }
 
+export interface V015OpenProofFormMaterializeResult {
+  readonly generic: StructuralHeterogeneousDerivedDerivationEvidence;
+  readonly openRoot: LinkHandle;
+}
+
 function fail(code: V015ProofFormErrorCode): never {
   throw new V015ProofFormError(code);
 }
@@ -467,12 +472,10 @@ function denotationPayload(
   }
 }
 
-export function materializeV015ProofDenotation(
+function createV015ProofDenotationBuilders(
   memory: WriteMemory,
-  profileRoot: LinkHandle,
-  sourceRoot: LinkHandle,
-): V015ProofFormMaterializeResult {
-  const profile = readV015ProofDenotationProfile(memory, profileRoot);
+  profile: V015ProofDenotationProfile,
+) {
 
   const dictionaries = new Map<LinkHandle, LinkHandle>();
   const rules = new Map<LinkHandle, LinkHandle>();
@@ -740,6 +743,41 @@ export function materializeV015ProofDenotation(
     return result;
   };
 
+  return Object.freeze({ open, coordinate });
+}
+
+export function materializeV015OpenProofDenotation(
+  memory: WriteMemory,
+  profileRoot: LinkHandle,
+  sourceRoot: LinkHandle,
+): V015OpenProofFormMaterializeResult {
+  const profile = readV015ProofDenotationProfile(memory, profileRoot);
+  let sourceTag: LinkHandle;
+  try {
+    sourceTag = memory.poles(sourceRoot).start;
+  } catch {
+    return fail("invalid-source");
+  }
+  if (sourceTag !== profile.openTag) return fail("unexpected-form");
+
+  const { open } = createV015ProofDenotationBuilders(memory, profile);
+  const opened = open(sourceRoot);
+  return Object.freeze({
+    generic: opened.generic,
+    openRoot: opened.root,
+  });
+}
+
+export function materializeV015ProofDenotation(
+  memory: WriteMemory,
+  profileRoot: LinkHandle,
+  sourceRoot: LinkHandle,
+): V015ProofFormMaterializeResult {
+  const profile = readV015ProofDenotationProfile(memory, profileRoot);
+  const { open, coordinate } = createV015ProofDenotationBuilders(
+    memory,
+    profile,
+  );
   const dischargePayload = denotationSequence(
     memory,
     denotationPayload(memory, sourceRoot, profile.dischargeTag),
