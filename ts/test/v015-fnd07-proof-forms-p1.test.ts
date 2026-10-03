@@ -245,17 +245,17 @@ function proofSource(
     current(value("SCOPE"),memory.ensure(value("CONTEXT"),value("ANTECEDENT"))),
     current(value("SCOPE"),memory.ensure(value("ANTECEDENT"),value("CONSEQUENT"))),
   ];
-  const primitives = concreteClaims.map((claim) => add(p.primitiveForm, [
+  const selectedClaims = omitSecondProof ? concreteClaims.slice(0,1) : concreteClaims;
+  const primitives = selectedClaims.map((claim) => add(p.primitiveForm, [
     { role:p.primitiveTheoryRole,value:theory }, { role:p.primitiveClaimRole,value:claim },
   ]));
   const coords = primitives.map((proof,index) => add(p.coordinateForm, [
-    { role:p.coordinateClaimRole,value:concreteClaims[index]! },
+    { role:p.coordinateClaimRole,value:selectedClaims[index]! },
     { role:p.coordinateProofRole,value:proof },
   ]));
-  const selected = omitSecondProof ? coords.slice(0,1) : coords;
   const discharge = add(p.dischargeForm, [
     { role:p.dischargeOpenRole,value:open },
-    ...selected.map((value) => ({ role:p.dischargeCoordinateRole,value })),
+    ...coords.map((value) => ({ role:p.dischargeCoordinateRole,value })),
   ]);
   return Object.freeze({
     grammarRoot:pf.grammarRoot,
