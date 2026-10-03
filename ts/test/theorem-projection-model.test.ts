@@ -39,7 +39,7 @@ function main(): void {
     JSON.stringify(first),
     "projection model must be byte-deterministic under repeated load",
   );
-  assert.equal(first.schema, "mts-theorem-projection-model/v0.4");
+  assert.equal(first.schema, "mts-theorem-projection-model/v0.5");
   assert.equal(first.mtsVersion, "v0.14");
   assert.equal(first.sourceInventory, "theorems/current-v0.14.json");
   assert.equal(first.formalOverlay, "theorems/formal-v0.15.json");
@@ -106,6 +106,7 @@ function main(): void {
   assert.equal(fnd07.evidence.typescript[0]?.record, undefined);
   assert.equal(fnd07.formalV015.migrationStatus, "FORMAL_MIGRATED");
   assert.equal(fnd07.formalV015.proofClosure, "CLOSED");
+  assert.equal(fnd07.formalV015.formalArtifactKind, "CLOSED_PROOF");
   assert.equal(
     fnd07.formalV015.formalStatement,
     "FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION",
@@ -121,12 +122,14 @@ function main(): void {
   assert.ok(fnd08);
   assert.equal(fnd08.formalV015.migrationStatus, "FORMAL_MIGRATED");
   assert.equal(fnd08.formalV015.proofClosure, "OPEN_CONDITIONAL");
+  assert.equal(fnd08.formalV015.formalArtifactKind, "OPEN_PROOF");
   assert.deepEqual(fnd08.formalV015.formalPremises, ["G_SEM", "G_BOUNDARY"]);
 
   const fnd09 = first.theorems.find((theorem) => theorem.id === "FND-09");
   assert.ok(fnd09);
   assert.equal(fnd09.formalV015.migrationStatus, "FORMAL_MIGRATED");
   assert.equal(fnd09.formalV015.proofClosure, "OPEN_CONDITIONAL");
+  assert.equal(fnd09.formalV015.formalArtifactKind, "OPEN_PROOF");
   assert.deepEqual(fnd09.formalV015.formalPremises, ["G_SEM"]);
 
   assert.deepEqual(
@@ -143,6 +146,7 @@ function main(): void {
   assert.equal(fnd02.nativeAssurance?.independent, false);
   assert.equal(fnd02.formalV015.migrationStatus, "FORMAL_MIGRATED");
   assert.equal(fnd02.formalV015.proofClosure, "N_A_FOR_KERNEL_REALIZATION");
+  assert.equal(fnd02.formalV015.formalArtifactKind, "KERNEL_REALIZATION");
   assert.equal(
     fnd02.formalV015.formalStatement,
     "FND02_STATEMENT : FND02_PREMISES->FND02_RULE",
@@ -178,6 +182,7 @@ function main(): void {
   assert.equal(fnd13.nativeAssurance?.independent, false);
   assert.equal(fnd13.formalV015.migrationStatus, "FORMAL_MIGRATED");
   assert.equal(fnd13.formalV015.proofClosure, "N_A_FOR_KERNEL_REALIZATION");
+  assert.equal(fnd13.formalV015.formalArtifactKind, "KERNEL_REALIZATION");
   assert.equal(
     fnd13.formalV015.formalStatement,
     "FND13_STATEMENT : FND13_PREMISES->FND13_RULES",
@@ -212,6 +217,9 @@ function main(): void {
   assert.equal(exe02.nativeAssurance, null);
   assert.equal(exe02.formalV015.migrationStatus, "FORMAL_MIGRATED");
   assert.equal(exe02.formalV015.proofClosure, "NO_PROOF_ARTIFACT");
+  assert.equal(exe02.formalV015.formalArtifactKind, "STATEMENT_ONLY");
+  assert.deepEqual(exe02.formalV015.formalDependencies, []);
+  assert.deepEqual(exe02.formalV015.formalExistentialDomain, []);
   assert.equal(
     exe02.formalV015.formalStatement,
     "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
@@ -239,14 +247,121 @@ function main(): void {
     null,
     "native assurance must not be inferred from TypeScript or file naming",
   );
-  assert.equal(fnd01.formalV015.migrationStatus, "NOT_MIGRATED");
-  assert.equal(fnd01.formalV015.formalStatement, null);
-  assert.deepEqual(fnd01.formalV015.formalPremises, []);
-  assert.deepEqual(fnd01.formalV015.formalDomain, []);
-  assert.deepEqual(fnd01.formalV015.formalNonPremises, []);
+  assert.equal(fnd01.formalV015.migrationStatus, "FORMAL_MIGRATED");
+  assert.equal(fnd01.formalV015.proofClosure, "NO_PROOF_ARTIFACT");
+  assert.equal(fnd01.formalV015.formalArtifactKind, "STATEMENT_ONLY");
+  assert.equal(
+    fnd01.formalV015.formalStatement,
+    "FND01_STATEMENT : FND01_PREMISES->FND01_CONCLUSION",
+  );
+  assert.deepEqual(
+    fnd01.formalV015.formalPremises,
+    ["A1RecursiveSeparation", "F2F3OneSidedExistence", "LocalSelfDecision:x"],
+  );
+  assert.deepEqual(fnd01.formalV015.formalDependencies, ["FND-02"]);
+  assert.deepEqual(fnd01.formalV015.formalDomain, ["x : Link"]);
+  assert.deepEqual(
+    fnd01.formalV015.formalExistentialDomain,
+    ["startWitness : Link", "finishWitness : Link", "pairWitness : Link"],
+  );
+  assert.deepEqual(
+    fnd01.formalV015.formalNonPremises,
+    ["FND-02 as premise", "FND-13", "Grounded:x"],
+  );
   assert.equal(fnd01.formalV015.nativeClassification, null);
   assert.equal(fnd01.formalV015.kernelLaw, null);
   assert.equal(fnd01.formalV015.nativeIndependent, null);
+  assert.equal(fnd01.formalV015.aproverStatus, "NOT_RECORDED");
+  assert.equal(fnd01.evidence.mtsNative.length, 0);
+  assert.equal(fnd01.evidence.aprover.length, 0);
+
+  const fnd01OverlayIndex = sources.formalOverlay.entries.findIndex(
+    (entry: any) => entry.id === "FND-01",
+  );
+  assert.notEqual(fnd01OverlayIndex, -1);
+
+  const fnd01MissingDependency = clone(sources);
+  fnd01MissingDependency.formalOverlay.entries[fnd01OverlayIndex].formalDependencies = [];
+  expectReject(
+    () => buildTheoremProjectionModel(fnd01MissingDependency),
+    /statement-only FORMAL dependencies must match accepted theorem boundary/i,
+    "FND-01 must preserve FND-02 as theorem dependency",
+  );
+
+  const fnd01UnknownDependency = clone(sources);
+  fnd01UnknownDependency.formalOverlay.entries[fnd01OverlayIndex].formalDependencies = ["FND-999"];
+  expectReject(
+    () => buildTheoremProjectionModel(fnd01UnknownDependency),
+    /formalDependencies has non-current theorem FND-999/i,
+    "FND-01 rejects unknown FORMAL dependency",
+  );
+
+  const fnd01DuplicateDependency = clone(sources);
+  fnd01DuplicateDependency.formalOverlay.entries[fnd01OverlayIndex].formalDependencies =
+    ["FND-02", "FND-02"];
+  expectReject(
+    () => buildTheoremProjectionModel(fnd01DuplicateDependency),
+    /formalDependencies contains duplicates/i,
+    "FND-01 rejects duplicate FORMAL dependency",
+  );
+
+  const fnd01ForeignDependency = clone(sources);
+  fnd01ForeignDependency.formalOverlay.entries[fnd01OverlayIndex].formalDependencies.push("FND-13");
+  expectReject(
+    () => buildTheoremProjectionModel(fnd01ForeignDependency),
+    /FORMAL dependency FND-13 is not an accepted theorem dependency/i,
+    "FND-01 must not acquire FND-13 dependency",
+  );
+
+  for (const forbiddenPremise of ["FND-02", "Grounded:x"]) {
+    const badPremise = clone(sources);
+    badPremise.formalOverlay.entries[fnd01OverlayIndex].formalPremises.push(forbiddenPremise);
+    expectReject(
+      () => buildTheoremProjectionModel(badPremise),
+      /statement-only FORMAL premises must match accepted theorem boundary/i,
+      `FND-01 forbidden formal premise ${forbiddenPremise}`,
+    );
+  }
+
+  const fnd01FalseOpen = clone(sources);
+  fnd01FalseOpen.formalOverlay.entries[fnd01OverlayIndex].proofClosure = "OPEN_CONDITIONAL";
+  expectReject(
+    () => buildTheoremProjectionModel(fnd01FalseOpen),
+    /formalArtifactKind STATEMENT_ONLY is incompatible with proofClosure OPEN_CONDITIONAL/i,
+    "FND-01 statement-only source cannot be relabeled OPEN",
+  );
+
+  const fnd01FalseClosed = clone(sources);
+  fnd01FalseClosed.formalOverlay.entries[fnd01OverlayIndex].proofClosure = "CLOSED";
+  expectReject(
+    () => buildTheoremProjectionModel(fnd01FalseClosed),
+    /CLOSED FORMAL proof requires registered mtsNative evidence/i,
+    "FND-01 statement-only source cannot be relabeled CLOSED",
+  );
+
+  const fnd01ForgedKernel = clone(sources);
+  fnd01ForgedKernel.formalOverlay.entries[fnd01OverlayIndex].proofClosure =
+    "N_A_FOR_KERNEL_REALIZATION";
+  fnd01ForgedKernel.formalOverlay.entries[fnd01OverlayIndex].formalArtifactKind =
+    "KERNEL_REALIZATION";
+  fnd01ForgedKernel.formalOverlay.entries[fnd01OverlayIndex].nativeClassification =
+    "KERNEL_REALIZED_NOT_INDEPENDENT";
+  fnd01ForgedKernel.formalOverlay.entries[fnd01OverlayIndex].kernelLaw =
+    "recursive-link-identity/full-full-canonical-root-base";
+  fnd01ForgedKernel.formalOverlay.entries[fnd01OverlayIndex].nativeIndependent = false;
+  expectReject(
+    () => buildTheoremProjectionModel(fnd01ForgedKernel),
+    /FORMAL native classification for FND-01 has no native assurance authority/i,
+    "FND-01 cannot invent kernel realization",
+  );
+
+  const fnd01ForgedAprover = clone(sources);
+  fnd01ForgedAprover.formalOverlay.entries[fnd01OverlayIndex].aproverStatus = "ACCEPT";
+  expectReject(
+    () => buildTheoremProjectionModel(fnd01ForgedAprover),
+    /NO_PROOF_ARTIFACT cannot claim aprover evidence|aprover ACCEPT requires registered aprover evidence/i,
+    "FND-01 aprover ACCEPT without evidence",
+  );
 
   const fnd02OverlayIndex = sources.formalOverlay.entries.findIndex(
     (entry: any) => entry.id === "FND-02",
