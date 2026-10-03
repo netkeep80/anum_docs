@@ -153,17 +153,17 @@ function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
   return [
     "### FORMAL v0.15",
     `- **Статус миграции:** ${inlineCode(formal.migrationStatus)}.`,
-    `- **Замкнутость proof artifact:** ${inlineCode(formal.proofClosure ?? "UNKNOWN")}.`,
+    `- **Замкнутость доказательного артефакта:** ${inlineCode(formal.proofClosure ?? "UNKNOWN")}.`,
     `- **Статус aprover:** ${inlineCode(formal.aproverStatus ?? "UNKNOWN")}.`,
     "- **Каноническая FORMAL-формулировка:**",
     "~~~text",
     formal.formalStatement ?? "",
     "~~~",
-    "- **FORMAL-предпосылки исходного proof source:**",
+    "- **FORMAL-предпосылки исходного доказательства:**",
     ...list(formal.formalPremises).map((line) => `  ${line}`),
     ...(formal.formalSourcePath === null
       ? []
-      : [`- **FORMAL source:** ${repositoryLink(formal.formalSourcePath)}.`]),
+      : [`- **Источник FORMAL:** ${repositoryLink(formal.formalSourcePath)}.`]),
   ];
 }
 
@@ -217,7 +217,7 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
     "",
     "### Происхождение данных",
     `- Текущий индекс теорем: ${repositoryLink(theorem.provenance.currentIndex)}.`,
-    `- FORMAL v0.15 overlay: ${repositoryLink(theorem.provenance.formalOverlay)}.`,
+    `- Проекция FORMAL v0.15: ${repositoryLink(theorem.provenance.formalOverlay)}.`,
     `- Авторитет ролей доказательных каналов: ${repositoryLink(theorem.provenance.laneAuthority)}.`,
     `- Внешнее подтверждение: ${repositoryLink(theorem.provenance.externalAssurance)}.`,
     `- Нативное подтверждение: ${repositoryLink(theorem.provenance.nativeAssurance)}.`,
@@ -241,7 +241,7 @@ export function renderTheoremCatalogMarkdown(model: TheoremProjectionModel): str
     "> Семантический авторитет остаётся в принятых контрактах; доказательный авторитет определяется зарегистрированными каналами и подтверждениями. Этот Markdown — только производная проекция.",
     "",
     `Источник принятого реестра: ${repositoryLink(model.sourceInventory)}. Версия: ${inlineCode(model.mtsVersion)}.`,
-    `FORMAL candidate overlay: ${repositoryLink(model.formalOverlay)}. Версия: ${inlineCode(model.formalCandidateVersion)}.`,
+    `Кандидатная проекция FORMAL: ${repositoryLink(model.formalOverlay)}. Версия: ${inlineCode(model.formalCandidateVersion)}.`,
     "",
     "## Сводка",
     "",
