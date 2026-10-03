@@ -7,6 +7,7 @@ import {
   type WriteMemory,
 } from "./memory.js";
 import {
+  StructuralRootedProofAsetReplayError,
   replayStructuralRootedProofAset,
   type StructuralRootedProofAsetReplayResult,
 } from "./rooted-proof-aset.js";
@@ -24,6 +25,17 @@ export interface PortableClosedRootedProofReplayResult {
   readonly envelope: LinkHandle;
   readonly proofRoot: LinkHandle;
   readonly replay: StructuralRootedProofAsetReplayResult;
+}
+
+function requireClosedReplay(
+  replay: StructuralRootedProofAsetReplayResult,
+): void {
+  if (
+    replay.declaredAssumptionCount !== 0
+    || replay.usedAssumptionCount !== 0
+  ) {
+    throw new StructuralRootedProofAsetReplayError("proof-not-closed");
+  }
 }
 
 /**
@@ -47,6 +59,7 @@ export function exportPortableClosedRootedProof(
     (observedMemory) => replayStructuralRootedProofAset(observedMemory, proofRoot),
     [proofRoot],
   );
+  requireClosedReplay(observed.replay);
 
   const supportSequence = materializeExactSequence(memory, observed.links);
   const envelope = memory.ensure(proofRoot, supportSequence);
@@ -80,6 +93,7 @@ export function replayPortableClosedRootedProof(
   );
   const proofRoot = memory.poles(envelope).start;
   const replay = replayStructuralRootedProofAset(memory, proofRoot);
+  requireClosedReplay(replay);
 
   return Object.freeze({
     memory,

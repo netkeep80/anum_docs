@@ -38,6 +38,7 @@ export type StructuralRootedProofAsetReplayErrorCode =
   | "premise-arity-mismatch"
   | "template-mismatch"
   | "cyclic-dependency"
+  | "proof-not-closed"
   | "replay-wrote";
 
 export class StructuralRootedProofAsetReplayError extends Error {
