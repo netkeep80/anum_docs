@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { readExactSequence } from "../src/exact-sequence.js";
@@ -154,6 +154,43 @@ function fixture(): Fixture {
 }
 
 const enc = new TextEncoder();
+
+interface FormalOverlayEntry {
+  readonly id: string;
+  readonly migrationStatus: string;
+  readonly proofClosure: string;
+  readonly formalStatement: string;
+  readonly formalPremises: readonly string[];
+  readonly formalSourcePath: string;
+  readonly aproverStatus: string;
+}
+
+function repositoryRoot(): string {
+  const roots = [resolve(process.cwd(), ".."), process.cwd()];
+  const root = roots.find((candidate) =>
+    existsSync(resolve(candidate, "theorems/formal-v0.15.json"))
+  );
+  assert(root !== undefined, "repository root");
+  return root;
+}
+
+function formalOverlayEntry(id: string): FormalOverlayEntry {
+  const overlay = JSON.parse(
+    readFileSync(resolve(repositoryRoot(), "theorems/formal-v0.15.json"), "utf8"),
+  ) as { entries?: FormalOverlayEntry[] };
+  const entry = overlay.entries?.find((candidate) => candidate.id === id);
+  assert(entry !== undefined, `FORMAL overlay entry ${id}`);
+  return entry;
+}
+
+const fnd09Formal = formalOverlayEntry("FND-09");
+same(
+  fnd09Formal.formalSourcePath,
+  "ts/test/v015-fnd09-open-formal-b14b2.test.ts",
+  "FND-09 overlay source path",
+);
+same(fnd09Formal.proofClosure, "OPEN_CONDITIONAL", "FND-09 overlay closure");
+same(fnd09Formal.aproverStatus, "NOT_RECORDED", "FND-09 aprover status");
 
 function pairChain(name: string, items: readonly string[]): readonly string[] {
   assert(items.length >= 2, `${name}: pair chain needs at least two items`);
@@ -392,6 +429,7 @@ const source = [
   "TARGET_RULE_DATA : [GLOBAL_DICT,G_RESULT]",
   "TARGET_RULE : RULE_TAG->TARGET_RULE_DATA",
   "TARGET_PREMISES : [G_SEM]",
+  fnd09Formal.formalStatement,
   "TARGET_DR_DATA : [TARGET_RULE,TARGET_PREMISES]",
   "TARGET_DR : DR_TAG->TARGET_DR_DATA",
 
@@ -414,6 +452,12 @@ const source = [
   "OPEN_PROOF : OPEN_TAG->OPEN_DATA",
   "ENTRY : [PROOF_PROFILE,OPEN_PROOF]",
 ].join("\n");
+
+same(
+  JSON.stringify(fnd09Formal.formalPremises),
+  JSON.stringify(["G_SEM"]),
+  "FND-09 overlay source-premise names",
+);
 
 interface Resolved {
   readonly f: Fixture;
@@ -700,7 +744,7 @@ same(wire(renamed), baseline, "presentation alpha-renaming");
 
 {
   const production = readFileSync(
-    resolve(process.cwd(), "../ts/src/v015-proof-source.ts"),
+    resolve(repositoryRoot(), "ts/src/v015-proof-source.ts"),
     "utf8",
   );
   assert(!production.includes("FND-08"), "production has no FND-08 dispatch");
@@ -709,11 +753,11 @@ same(wire(renamed), baseline, "presentation alpha-renaming");
 
 {
   const lean = readFileSync(
-    resolve(process.cwd(), "../proofs/lean4/MtsFoundation.lean"),
+    resolve(repositoryRoot(), "proofs/lean4/MtsFoundation.lean"),
     "utf8",
   );
   const rocq = readFileSync(
-    resolve(process.cwd(), "../proofs/coq/MtsFoundation.v"),
+    resolve(repositoryRoot(), "proofs/coq/MtsFoundation.v"),
     "utf8",
   );
   for (const external of [lean, rocq]) {

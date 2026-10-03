@@ -39,9 +39,11 @@ function main(): void {
     JSON.stringify(first),
     "projection model must be byte-deterministic under repeated load",
   );
-  assert.equal(first.schema, "mts-theorem-projection-model/v0.1");
+  assert.equal(first.schema, "mts-theorem-projection-model/v0.2");
   assert.equal(first.mtsVersion, "v0.14");
   assert.equal(first.sourceInventory, "theorems/current-v0.14.json");
+  assert.equal(first.formalOverlay, "theorems/formal-v0.15.json");
+  assert.equal(first.formalCandidateVersion, "v0.15-candidate");
   assert.equal(first.theorems.length, 21);
   const sourceIds = sources.currentIndex.theorems.map((theorem: any) => theorem.id);
   assert.deepEqual(
@@ -102,6 +104,31 @@ function main(): void {
   assert.equal(fnd07.evidence.typescript[0]?.role, "executable-witness");
   assert.equal(fnd07.evidence.typescript[0]?.proofAuthority, "none");
   assert.equal(fnd07.evidence.typescript[0]?.record, undefined);
+  assert.equal(fnd07.formalV015.migrationStatus, "FORMAL_MIGRATED");
+  assert.equal(fnd07.formalV015.proofClosure, "CLOSED");
+  assert.equal(
+    fnd07.formalV015.formalStatement,
+    "FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION",
+  );
+  assert.deepEqual(fnd07.formalV015.formalPremises, ["TARGET_P1", "TARGET_P2"]);
+  assert.equal(
+    fnd07.formalV015.formalSourcePath,
+    "ts/test/v015-fnd07-ordinary-formal-proof-p2.test.ts",
+  );
+  assert.equal(fnd07.formalV015.aproverStatus, "NOT_RECORDED");
+
+  const fnd08 = first.theorems.find((theorem) => theorem.id === "FND-08");
+  assert.ok(fnd08);
+  assert.equal(fnd08.formalV015.migrationStatus, "FORMAL_MIGRATED");
+  assert.equal(fnd08.formalV015.proofClosure, "OPEN_CONDITIONAL");
+  assert.deepEqual(fnd08.formalV015.formalPremises, ["G_SEM", "G_BOUNDARY"]);
+
+  const fnd09 = first.theorems.find((theorem) => theorem.id === "FND-09");
+  assert.ok(fnd09);
+  assert.equal(fnd09.formalV015.migrationStatus, "FORMAL_MIGRATED");
+  assert.equal(fnd09.formalV015.proofClosure, "OPEN_CONDITIONAL");
+  assert.deepEqual(fnd09.formalV015.formalPremises, ["G_SEM"]);
+
   assert.deepEqual(
     fnd07.externalAssurance,
     sources.externalAssurance.targets.find((target: any) => target.id === "FND-07"),
@@ -126,6 +153,9 @@ function main(): void {
     null,
     "native assurance must not be inferred from TypeScript or file naming",
   );
+  assert.equal(fnd01.formalV015.migrationStatus, "NOT_MIGRATED");
+  assert.equal(fnd01.formalV015.formalStatement, null);
+  assert.deepEqual(fnd01.formalV015.formalPremises, []);
   for (const theorem of first.theorems) {
     for (const lane of ["typescript", "lean4", "coq", "mtsNative", "aprover"] as const) {
       for (const evidence of theorem.evidence[lane]) {
@@ -205,6 +235,41 @@ function main(): void {
     /registered path does not exist.*mtsNative\.json/i,
     "missing registered path",
   );
+  const duplicateOverlay = clone(sources);
+  duplicateOverlay.formalOverlay.entries.push(
+    clone(duplicateOverlay.formalOverlay.entries[0]),
+  );
+  expectReject(
+    () => buildTheoremProjectionModel(duplicateOverlay),
+    /duplicate theorem FND-07/i,
+    "duplicate FORMAL overlay theorem",
+  );
+
+  const foreignOverlay = clone(sources);
+  foreignOverlay.formalOverlay.entries[0].id = "FND-999";
+  expectReject(
+    () => buildTheoremProjectionModel(foreignOverlay),
+    /non-current theorem FND-999/i,
+    "foreign FORMAL overlay theorem",
+  );
+
+  const missingFormalSource = clone(sources);
+  missingFormalSource.formalOverlay.entries[0].formalSourcePath =
+    "ts/test/does-not-exist.test.ts";
+  expectReject(
+    () => buildTheoremProjectionModel(missingFormalSource),
+    /formalSourcePath does not exist/i,
+    "missing FORMAL source",
+  );
+
+  const authorityEscalation = clone(sources);
+  authorityEscalation.formalOverlay.authority = "proof-authority";
+  expectReject(
+    () => buildTheoremProjectionModel(authorityEscalation),
+    /must not claim proof authority/i,
+    "FORMAL overlay authority escalation",
+  );
+
   console.log("THEOREM_PROJECTION_MODEL = COMPLETE_CURRENT_INVENTORY");
   console.log("LEAN_ROCQ_ROLE = EXTERNAL_CROSS_CHECK");
   console.log("MTS_NATIVE_ROLE = NATIVE_PROOF_AUTHORITY_FROM_ASSURANCE");

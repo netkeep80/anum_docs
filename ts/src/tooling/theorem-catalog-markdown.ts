@@ -142,6 +142,31 @@ function renderAssurance(theorem: TheoremProjectionTheorem): string[] {
   return lines;
 }
 
+function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
+  const formal = theorem.formalV015;
+  if (formal.migrationStatus === "NOT_MIGRATED") {
+    return [
+      "### Формальная запись FORMAL v0.15",
+      "- **Статус миграции:** `NOT_MIGRATED`.",
+    ];
+  }
+  return [
+    "### Формальная запись FORMAL v0.15",
+    `- **Статус миграции:** ${inlineCode(formal.migrationStatus)}.`,
+    `- **Замкнутость доказательного артефакта:** ${inlineCode(formal.proofClosure ?? "UNKNOWN")}.`,
+    `- **Статус aprover:** ${inlineCode(formal.aproverStatus ?? "UNKNOWN")}.`,
+    "- **Каноническая FORMAL-формулировка:**",
+    "~~~text",
+    formal.formalStatement ?? "",
+    "~~~",
+    "- **FORMAL-предпосылки исходного доказательства:**",
+    ...list(formal.formalPremises).map((line) => `  ${line}`),
+    ...(formal.formalSourcePath === null
+      ? []
+      : [`- **Источник FORMAL:** ${repositoryLink(formal.formalSourcePath)}.`]),
+  ];
+}
+
 function renderCard(theorem: TheoremProjectionTheorem): string {
   const lines = [
     `<a id="theorem-${theorem.id.toLowerCase()}"></a> <!-- якорь теоремы -->`,
@@ -155,6 +180,8 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
     "~~~text",
     theorem.statement,
     "~~~",
+    "",
+    ...renderFormalV015(theorem),
     "",
     "**Область действия:**",
     "~~~text",
@@ -190,6 +217,7 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
     "",
     "### Происхождение данных",
     `- Текущий индекс теорем: ${repositoryLink(theorem.provenance.currentIndex)}.`,
+    `- Проекция FORMAL v0.15: ${repositoryLink(theorem.provenance.formalOverlay)}.`,
     `- Авторитет ролей доказательных каналов: ${repositoryLink(theorem.provenance.laneAuthority)}.`,
     `- Внешнее подтверждение: ${repositoryLink(theorem.provenance.externalAssurance)}.`,
     `- Нативное подтверждение: ${repositoryLink(theorem.provenance.nativeAssurance)}.`,
@@ -212,7 +240,8 @@ export function renderTheoremCatalogMarkdown(model: TheoremProjectionModel): str
     "> Не является самостоятельным источником нормативной или доказательной истины.",
     "> Семантический авторитет остаётся в принятых контрактах; доказательный авторитет определяется зарегистрированными каналами и подтверждениями. Этот Markdown — только производная проекция.",
     "",
-    `Источник текущего реестра: ${repositoryLink(model.sourceInventory)}. Версия: ${inlineCode(model.mtsVersion)}.`,
+    `Источник принятого реестра: ${repositoryLink(model.sourceInventory)}. Версия: ${inlineCode(model.mtsVersion)}.`,
+    `Кандидатная проекция FORMAL: ${repositoryLink(model.formalOverlay)}. Версия: ${inlineCode(model.formalCandidateVersion)}.`,
     "",
     "## Сводка",
     "",

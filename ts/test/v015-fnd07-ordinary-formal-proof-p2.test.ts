@@ -51,6 +51,28 @@ function repoRoot():string {
   return root;
 }
 
+interface FormalOverlayEntry {
+  readonly id:string;
+  readonly migrationStatus:string;
+  readonly proofClosure:string;
+  readonly formalStatement:string;
+  readonly formalPremises:readonly string[];
+  readonly formalSourcePath:string;
+  readonly aproverStatus:string;
+}
+function formalOverlayEntry(id:string):FormalOverlayEntry {
+  const overlay=JSON.parse(
+    readFileSync(resolve(repoRoot(),"theorems/formal-v0.15.json"),"utf8"),
+  ) as {entries?:FormalOverlayEntry[]};
+  const entry=overlay.entries?.find(candidate=>candidate.id===id);
+  assert(entry!==undefined,`FORMAL overlay entry ${id}`);
+  return entry;
+}
+const fnd07Formal=formalOverlayEntry("FND-07");
+same(fnd07Formal.formalSourcePath,"ts/test/v015-fnd07-ordinary-formal-proof-p2.test.ts","FND-07 overlay source path");
+same(fnd07Formal.proofClosure,"CLOSED","FND-07 overlay closure");
+same(fnd07Formal.aproverStatus,"NOT_RECORDED","FND-07 aprover status");
+
 interface Fixture {
   memory:Memory; basis:RootBasis; grammarRoot:LinkHandle;
   namespaceProfileRoot:LinkHandle; definitionProfileRoot:LinkHandle;
@@ -109,7 +131,8 @@ const source=[
   "PROOF_PROFILE : [DICT_TAG,RULE_TAG,DR_TAG,MAP_TAG,MORPH_TAG,GENERIC_TAG,BIND_TAG,OPEN_TAG,PRIM_TAG,COORD_TAG,DISCHARGE_TAG]",
   "GLOBAL_ROLES : [S,K,A,B]","GLOBAL_DICT : DICT_TAG->GLOBAL_ROLES",
   "TARGET_RULE_DATA : [GLOBAL_DICT,TARGET_CONCLUSION]","TARGET_RULE : RULE_TAG->TARGET_RULE_DATA",
-  "TARGET_PREMISES : [TARGET_P1,TARGET_P2]","TARGET_DR_DATA : [TARGET_RULE,TARGET_PREMISES]","TARGET_DR : DR_TAG->TARGET_DR_DATA",
+  "TARGET_PREMISES : [TARGET_P1,TARGET_P2]",fnd07Formal.formalStatement,
+  "TARGET_DR_DATA : [TARGET_RULE,TARGET_PREMISES]","TARGET_DR : DR_TAG->TARGET_DR_DATA",
   "LOCAL_ROLES : [s,k,a,b]","LOCAL_DICT : DICT_TAG->LOCAL_ROLES",
   "LOCAL_RULE_DATA : [LOCAL_DICT,LOCAL_CONCLUSION]","LOCAL_RULE : RULE_TAG->LOCAL_RULE_DATA",
   "LOCAL_PREMISES : [LOCAL_P1,LOCAL_P2]","LOCAL_DR_DATA : [LOCAL_RULE,LOCAL_PREMISES]","LOCAL_DR : DR_TAG->LOCAL_DR_DATA",
@@ -160,6 +183,11 @@ function artifact(text:string):Uint8Array {
   return exportPortableClosedRootedProof(f.memory,f.basis,proof.closedRoot);
 }
 
+same(
+  JSON.stringify(fnd07Formal.formalPremises),
+  JSON.stringify(["TARGET_P1","TARGET_P2"]),
+  "FND-07 overlay source-premise names",
+);
 const golden=readFileSync(resolve(repoRoot(),"proofs/native/FND-07/contextual-detachment.anum"));
 {
   const actual=artifact(source);

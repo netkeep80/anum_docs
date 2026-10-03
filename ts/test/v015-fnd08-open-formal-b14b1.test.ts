@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import {
@@ -165,6 +165,40 @@ function fixture(): Fixture {
 
 const enc = new TextEncoder();
 
+interface FormalOverlayEntry {
+  readonly id: string;
+  readonly migrationStatus: string;
+  readonly proofClosure: string;
+  readonly formalStatement: string;
+  readonly formalPremises: readonly string[];
+  readonly formalSourcePath: string;
+  readonly aproverStatus: string;
+}
+function repositoryRoot(): string {
+  const roots = [resolve(process.cwd(), ".."), process.cwd()];
+  const root = roots.find((candidate) =>
+    existsSync(resolve(candidate, "theorems/formal-v0.15.json"))
+  );
+  assert(root !== undefined, "repository root");
+  return root;
+}
+function formalOverlayEntry(id: string): FormalOverlayEntry {
+  const overlay = JSON.parse(
+    readFileSync(resolve(repositoryRoot(), "theorems/formal-v0.15.json"), "utf8"),
+  ) as { entries?: FormalOverlayEntry[] };
+  const entry = overlay.entries?.find((candidate) => candidate.id === id);
+  assert(entry !== undefined, `FORMAL overlay entry ${id}`);
+  return entry;
+}
+const fnd08Formal = formalOverlayEntry("FND-08");
+same(
+  fnd08Formal.formalSourcePath,
+  "ts/test/v015-fnd08-open-formal-b14b1.test.ts",
+  "FND-08 overlay source path",
+);
+same(fnd08Formal.proofClosure, "OPEN_CONDITIONAL", "FND-08 overlay closure");
+same(fnd08Formal.aproverStatus, "NOT_RECORDED", "FND-08 aprover status");
+
 const commonPrefix = [
   "R : R->R",
   "O : O->R",
@@ -295,6 +329,7 @@ function scaffold(spec: ProofScaffoldSpec): string {
     `TARGET_RULE_DATA : [GLOBAL_DICT,${spec.targetConclusion}]`,
     "TARGET_RULE : RULE_TAG->TARGET_RULE_DATA",
     `TARGET_PREMISES : [${spec.targetPremises.join(",")}]`,
+    fnd08Formal.formalStatement,
     "TARGET_DR_DATA : [TARGET_RULE,TARGET_PREMISES]",
     "TARGET_DR : DR_TAG->TARGET_DR_DATA",
     `LOCAL_ROLES : [${spec.localRoles.join(",")}]`,
@@ -406,6 +441,11 @@ const fnd08Source = scaffold({
   targetPremises: ["G_SEM", "G_BOUNDARY"],
   localPremises: ["L_SEM", "L_BOUNDARY"],
 });
+same(
+  JSON.stringify(fnd08Formal.formalPremises),
+  JSON.stringify(["G_SEM", "G_BOUNDARY"]),
+  "FND-08 overlay source-premise names",
+);
 
 interface ResolvedProof {
   readonly f: Fixture;
@@ -654,7 +694,7 @@ same(wire(renamed08), fnd08Wire, "FND-08 presentation alpha-renaming");
 
 {
   const production = readFileSync(
-    resolve(process.cwd(), "../ts/src/v015-proof-source.ts"),
+    resolve(repositoryRoot(), "ts/src/v015-proof-source.ts"),
     "utf8",
   );
   assert(!production.includes("FND-08"), "production has no FND-08 dispatch");

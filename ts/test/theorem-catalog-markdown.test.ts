@@ -44,6 +44,8 @@ function main(): void {
     /генерируемая человекочитаемая проекция.*не является.*источником.*доказательной.*истины/is,
     "catalog must disclose derived/no-proof-authority status",
   );
+  assert.match(first, /кандидатная проекция FORMAL/i);
+  assert.match(first, /theorems\/formal-v0\.15\.json/);
 
   const anchors = [...first.matchAll(/<a id="theorem-([^"]+)"><\/a>/g)].map((match) => match[1]);
   assert.deepEqual(
@@ -76,11 +78,33 @@ function main(): void {
   }
 
   const fnd07 = section(first, "FND-07");
+  assert.match(fnd07, /### Формальная запись FORMAL v0\.15/);
+  assert.match(fnd07, /FORMAL_MIGRATED/);
+  assert.match(fnd07, /CLOSED/);
+  assert.match(fnd07, /FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION/);
+  assert.match(fnd07, /v015-fnd07-ordinary-formal-proof-p2\.test\.ts/);
   assert.match(fnd07, /Lean4.*внешняя перекрёстная проверка/is);
   assert.match(fnd07, /Rocq.*внешняя перекрёстная проверка/is);
   assert.match(fnd07, /TypeScript.*исполняемый свидетель.*доказательный авторитет.*none/is);
   assert.match(fnd07, /DERIVED_CLOSED_PROOF_ANET/);
   assert.match(fnd07, /MTS-native.*нативное доказательство/is);
+
+  const fnd08 = section(first, "FND-08");
+  assert.match(fnd08, /OPEN_CONDITIONAL/);
+  assert.match(fnd08, /FND08_STATEMENT : TARGET_PREMISES->G_RESULT/);
+  assert.match(fnd08, /G_SEM/);
+  assert.match(fnd08, /G_BOUNDARY/);
+  assert.match(fnd08, /NOT_RECORDED/);
+
+  const fnd09 = section(first, "FND-09");
+  assert.match(fnd09, /OPEN_CONDITIONAL/);
+  assert.match(fnd09, /FND09_STATEMENT : TARGET_PREMISES->G_RESULT/);
+  assert.match(fnd09, /G_SEM/);
+  assert.match(fnd09, /NOT_RECORDED/);
+
+  const fnd01 = section(first, "FND-01");
+  assert.match(fnd01, /FORMAL v0\.15/);
+  assert.match(fnd01, /NOT_MIGRATED/);
 
   const fnd02 = section(first, "FND-02");
   assert.match(fnd02, /KERNEL_REALIZED_NOT_INDEPENDENT/);

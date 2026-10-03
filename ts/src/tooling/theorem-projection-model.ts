@@ -64,6 +64,14 @@ export interface TheoremProjectionNativeAssurance {
   evidence: unknown[];
   overclaimVeto: string[];
 }
+export interface TheoremProjectionFormalV015 {
+  migrationStatus: string;
+  proofClosure: string | null;
+  formalStatement: string | null;
+  formalPremises: string[];
+  formalSourcePath: string | null;
+  aproverStatus: string | null;
+}
 export interface TheoremProjectionTheorem {
   id: string;
   statement: string;
@@ -72,6 +80,7 @@ export interface TheoremProjectionTheorem {
   lawRefs: string[];
   assumptions: string[];
   formalPremises: string[];
+  formalV015: TheoremProjectionFormalV015;
   dependsOn: string[];
   scope: unknown;
   exclusions: unknown;
@@ -84,6 +93,7 @@ export interface TheoremProjectionTheorem {
   nativeAssurance: TheoremProjectionNativeAssurance | null;
   provenance: {
     currentIndex: string;
+    formalOverlay: string;
     laneAuthority: string;
     externalAssurance: string;
     nativeAssurance: string;
@@ -92,11 +102,14 @@ export interface TheoremProjectionTheorem {
   };
 }
 export interface TheoremProjectionModel {
-  schema: "mts-theorem-projection-model/v0.1";
+  schema: "mts-theorem-projection-model/v0.2";
   mtsVersion: string;
+  formalCandidateVersion: string;
   sourceInventory: "theorems/current-v0.14.json";
+  formalOverlay: "theorems/formal-v0.15.json";
   authority: {
     theoremInventory: string;
+    formalOverlay: string;
     laneRoles: string;
     externalAssurance: string;
     nativeAssurance: string;
@@ -108,6 +121,7 @@ export interface TheoremProjectionModel {
 }
 export interface TheoremProjectionSources {
   currentIndex: any;
+  formalOverlay: any;
   provers: any;
   externalAssurance: any;
   nativeAssurance: any;
@@ -346,6 +360,7 @@ function theoremEvidence(
 function collectRepositoryPaths(
   root: string,
   currentIndex: any,
+  formalOverlay: any,
   nativeAssurance: any,
   evidenceRecords: Record<string, any>,
 ): string[] {
@@ -361,6 +376,14 @@ function collectRepositoryPaths(
         paths.add(path);
       }
     }
+  }
+  const overlay = object(formalOverlay, "theorems/formal-v0.15.json");
+  if (!Array.isArray(overlay.entries)) {
+    fail("formal theorem overlay must contain entries[]");
+  }
+  for (const [index, entryValue] of overlay.entries.entries()) {
+    const entry = object(entryValue, `formal theorem overlay.entries[${index}]`);
+    paths.add(text(entry.formalSourcePath, `formal theorem overlay.entries[${index}].formalSourcePath`));
   }
   for (const [path, recordValue] of Object.entries(evidenceRecords)) {
     paths.add(path);
@@ -393,6 +416,7 @@ export function loadRepositoryTheoremProjectionSources(
   root = findRepositoryRoot(),
 ): TheoremProjectionSources {
   const currentIndex = readJson(root, "theorems/current-v0.14.json");
+  const formalOverlay = readJson(root, "theorems/formal-v0.15.json");
   const provers = readJson(root, "proofs/provers.json");
   const externalAssurance = readJson(root, "proofs/external-proof-assurance.json");
   const nativeAssurance = readJson(root, "proofs/native-proof-assurance.json");
@@ -403,6 +427,7 @@ export function loadRepositoryTheoremProjectionSources(
   }
   return {
     currentIndex,
+    formalOverlay,
     provers,
     externalAssurance,
     nativeAssurance,
@@ -411,6 +436,7 @@ export function loadRepositoryTheoremProjectionSources(
     availablePaths: collectRepositoryPaths(
       root,
       currentIndex,
+      formalOverlay,
       nativeAssurance,
       evidenceRecords,
     ),
@@ -432,6 +458,55 @@ export function buildTheoremProjectionModel(
   const theoremIds = theoremSources.map((theorem) => text(theorem.id, "theorem.id"));
   if (new Set(theoremIds).size !== theoremIds.length) fail("duplicate current theorem id");
   const theoremIdSet = new Set(theoremIds);
+
+  const overlay = object(sources.formalOverlay, "theorems/formal-v0.15.json");
+  if (overlay.schema !== "mts-formal-theorem-overlay/v0.1") {
+    fail("unexpected FORMAL theorem overlay schema");
+  }
+  if (overlay.baseInventory !== "theorems/current-v0.14.json") {
+    fail("FORMAL theorem overlay base inventory mismatch");
+  }
+  if (overlay.authority !== "formal-migration-descriptor-only") {
+    fail("FORMAL theorem overlay must not claim proof authority");
+  }
+  const formalCandidateVersion = text(
+    overlay.mtsVersion,
+    "FORMAL theorem overlay.mtsVersion",
+  );
+  if (!Array.isArray(overlay.entries)) {
+    fail("FORMAL theorem overlay must contain entries[]");
+  }
+  const formalById = new Map<string, TheoremProjectionFormalV015>();
+  for (const [index, raw] of overlay.entries.entries()) {
+    const entry = object(raw, `FORMAL theorem overlay.entries[${index}]`);
+    const id = text(entry.id, `FORMAL theorem overlay.entries[${index}].id`);
+    if (!theoremIdSet.has(id)) fail(`FORMAL theorem overlay has non-current theorem ${id}`);
+    if (formalById.has(id)) fail(`FORMAL theorem overlay has duplicate theorem ${id}`);
+    const migrationStatus = text(entry.migrationStatus, `${id}.migrationStatus`);
+    if (migrationStatus !== "FORMAL_MIGRATED") {
+      fail(`${id}.migrationStatus must be FORMAL_MIGRATED`);
+    }
+    const proofClosure = text(entry.proofClosure, `${id}.proofClosure`);
+    if (proofClosure !== "CLOSED" && proofClosure !== "OPEN_CONDITIONAL") {
+      fail(`${id}.proofClosure must be CLOSED or OPEN_CONDITIONAL`);
+    }
+    const formalStatement = text(entry.formalStatement, `${id}.formalStatement`);
+    const formalPremises = strings(entry.formalPremises, `${id}.formalPremises`);
+    const formalSourcePath = text(entry.formalSourcePath, `${id}.formalSourcePath`);
+    const aproverStatus = text(entry.aproverStatus, `${id}.aproverStatus`);
+    if (!sources.availablePaths.includes(formalSourcePath)) {
+      fail(`${id}.formalSourcePath does not exist: ${formalSourcePath}`);
+    }
+    formalById.set(id, Object.freeze({
+      migrationStatus,
+      proofClosure,
+      formalStatement,
+      formalPremises: Object.freeze(formalPremises) as string[],
+      formalSourcePath,
+      aproverStatus,
+    }));
+  }
+
   const lawInventory = object(
     object(sources.semanticLawInventory, "contracts/mts-contract-v0.14.json")
       .requiredSemanticLaws,
@@ -474,6 +549,14 @@ export function buildTheoremProjectionModel(
     }
     const assumptions = strings(source.assumptions, `${id}.assumptions`);
     const formalPremises = strings(source.formalPremises, `${id}.formalPremises`);
+    const formalV015 = formalById.get(id) ?? Object.freeze({
+      migrationStatus: "NOT_MIGRATED",
+      proofClosure: null,
+      formalStatement: null,
+      formalPremises: [] as string[],
+      formalSourcePath: null,
+      aproverStatus: null,
+    });
     const evidence = theoremEvidence(
       source,
       id,
@@ -544,6 +627,7 @@ export function buildTheoremProjectionModel(
       lawRefs: Object.freeze(lawRefs) as string[],
       assumptions: Object.freeze(assumptions) as string[],
       formalPremises: Object.freeze(formalPremises) as string[],
+      formalV015,
       dependsOn: Object.freeze(dependsOn) as string[],
       scope: jsonClone(source.scope),
       exclusions: jsonClone(source.exclusions),
@@ -552,6 +636,7 @@ export function buildTheoremProjectionModel(
       nativeAssurance,
       provenance: Object.freeze({
         currentIndex: "theorems/current-v0.14.json",
+        formalOverlay: "theorems/formal-v0.15.json",
         laneAuthority: "proofs/provers.json",
         externalAssurance: "proofs/external-proof-assurance.json",
         nativeAssurance: "proofs/native-proof-assurance.json",
@@ -561,9 +646,11 @@ export function buildTheoremProjectionModel(
     });
   });
   return Object.freeze({
-    schema: "mts-theorem-projection-model/v0.1" as const,
+    schema: "mts-theorem-projection-model/v0.2" as const,
     mtsVersion,
+    formalCandidateVersion,
     sourceInventory: "theorems/current-v0.14.json" as const,
+    formalOverlay: "theorems/formal-v0.15.json" as const,
     authority: Object.freeze({
       ...THEOREM_CATALOG_INTEGRATION_CONTRACT.authority,
     }),
