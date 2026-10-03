@@ -78,7 +78,7 @@ function main(): void {
   }
 
   const fnd07 = section(first, "FND-07");
-  assert.match(fnd07, /### FORMAL v0\.15/);
+  assert.match(fnd07, /### Формальная запись FORMAL v0\.15/);
   assert.match(fnd07, /FORMAL_MIGRATED/);
   assert.match(fnd07, /CLOSED/);
   assert.match(fnd07, /FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION/);
