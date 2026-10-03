@@ -45,6 +45,8 @@ export interface V015LinkDefinitionProfile {
   readonly pairLeftRole: LinkHandle;
   readonly pairRightRole: LinkHandle;
   readonly referencedNameRole: LinkHandle;
+  readonly sequenceForm?: LinkHandle;
+  readonly sequenceItemRole?: LinkHandle;
 }
 
 export interface V015ResolvedDefinition {
@@ -73,13 +75,23 @@ export function materializeV015LinkDefinitionProfile(
   memory: WriteMemory,
   profile: V015LinkDefinitionProfile,
 ): LinkHandle {
-  return materializeExactSequence(memory, [
+  const hasSequenceForm = profile.sequenceForm !== undefined;
+  const hasSequenceItemRole = profile.sequenceItemRole !== undefined;
+  if (hasSequenceForm !== hasSequenceItemRole) fail("invalid-profile");
+  const values: LinkHandle[] = [
     profile.pairForm,
     profile.nameRefForm,
     profile.pairLeftRole,
     profile.pairRightRole,
     profile.referencedNameRole,
-  ]);
+  ];
+  if (
+    profile.sequenceForm !== undefined &&
+    profile.sequenceItemRole !== undefined
+  ) {
+    values.push(profile.sequenceForm, profile.sequenceItemRole);
+  }
+  return materializeExactSequence(memory, values);
 }
 
 function readProfile(
@@ -88,8 +100,16 @@ function readProfile(
 ): V015LinkDefinitionProfile {
   try {
     const values = readExactSequence(memory, root).values;
-    if (values.length !== 5) fail("invalid-profile");
-    const [pairForm, nameRefForm, pairLeftRole, pairRightRole, referencedNameRole] = values;
+    if (values.length !== 5 && values.length !== 7) fail("invalid-profile");
+    const [
+      pairForm,
+      nameRefForm,
+      pairLeftRole,
+      pairRightRole,
+      referencedNameRole,
+      sequenceForm,
+      sequenceItemRole,
+    ] = values;
     if (
       pairForm === undefined ||
       nameRefForm === undefined ||
@@ -100,7 +120,26 @@ function readProfile(
       pairLeftRole === pairRightRole
     ) {
       return fail("invalid-profile");
-  }
+    }
+    if (values.length === 7) {
+      if (
+        sequenceForm === undefined ||
+        sequenceItemRole === undefined ||
+        sequenceForm === pairForm ||
+        sequenceForm === nameRefForm
+      ) {
+        return fail("invalid-profile");
+      }
+      return Object.freeze({
+        pairForm,
+        nameRefForm,
+        pairLeftRole,
+        pairRightRole,
+        referencedNameRole,
+        sequenceForm,
+        sequenceItemRole,
+      });
+    }
     return Object.freeze({
       pairForm,
       nameRefForm,
@@ -149,6 +188,27 @@ function requireProfileCompatibility(
   ) {
     fail("incompatible-profile");
   }
+  if (
+    profile.sequenceForm !== undefined ||
+    profile.sequenceItemRole !== undefined
+  ) {
+    if (
+      profile.sequenceForm === undefined ||
+      profile.sequenceItemRole === undefined
+    ) {
+      fail("incompatible-profile");
+    }
+    const sequence = rule(rules, profile.sequenceForm);
+    if (
+      sequence.fields.length !== 1 ||
+      sequence.fields[0]?.role !== profile.sequenceItemRole ||
+      sequence.fields[0]?.target !== "child" ||
+      sequence.fields[0]?.min !== 0 ||
+      sequence.fields[0]?.max !== null
+    ) {
+      fail("incompatible-profile");
+    }
+  }
 }
 
 export function readV015LinkDefinitionProfile(
@@ -184,6 +244,17 @@ function fieldValue(
 ): LinkHandle {
   return occurrence.fields.find((field) => field.role === role)?.value
     ?? fail("incompatible-profile");
+}
+
+function fieldValues(
+  occurrence: SyntaxAsetOccurrence,
+  role: LinkHandle,
+): readonly LinkHandle[] {
+  return Object.freeze(
+    occurrence.fields
+      .filter((field) => field.role === role)
+      .map((field) => field.value),
+  );
 }
 
 function requireFlatDefinitions(
@@ -223,6 +294,40 @@ function materializeExpression(
   expression: LinkHandle,
 ): SymbolicValue {
   const occurrence = occurrences.get(expression) ?? fail("unsupported-expression");
+
+  if (
+    profile.sequenceForm !== undefined &&
+    profile.sequenceItemRole !== undefined &&
+    occurrence.kind === profile.sequenceForm
+  ) {
+    const items = fieldValues(occurrence, profile.sequenceItemRole).map((item) =>
+      resolveOperand(
+        profile,
+        occurrences,
+        declaredNames,
+        resolved,
+        targetName,
+        item,
+      ),
+    );
+    if (items.some((item) => item.kind === "pending")) {
+      return Object.freeze({ kind: "pending" });
+    }
+    if (items.some((item) => item.kind === "self")) {
+      return fail("unsupported-expression");
+    }
+    return Object.freeze({
+      kind: "link",
+      value: materializeExactSequence(
+        memory,
+        items.map((item) => {
+          if (item.kind !== "link") return fail("unsupported-expression");
+          return item.value;
+        }),
+      ),
+    });
+  }
+
   if (occurrence.kind !== profile.pairForm) fail("unsupported-expression");
   const left = resolveOperand(
     profile, occurrences, declaredNames, resolved, targetName,

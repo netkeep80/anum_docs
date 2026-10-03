@@ -62,10 +62,20 @@ interface PhysicalLine {
   readonly bytes: Uint8Array;
 }
 
+type ParsedExpression =
+  | Readonly<{
+      kind: "pair";
+      leftName: string;
+      rightName: string;
+    }>
+  | Readonly<{
+      kind: "sequence";
+      items: readonly string[];
+    }>;
+
 interface ParsedDefinition {
   readonly localName: string;
-  readonly leftName: string;
-  readonly rightName: string;
+  readonly expression: ParsedExpression;
   readonly span: V015FormalDefinitionSpan;
 }
 
@@ -143,7 +153,40 @@ function validName(name: string): boolean {
 
 function parseExpression(
   source: string,
-): Readonly<{ leftName: string; rightName: string }> {
+): ParsedExpression {
+  if (source.startsWith("[")) {
+    if (!source.endsWith("]")) fail("invalid-expression");
+    const inner = source.slice(1, -1);
+    if (inner.includes("[") || inner.includes("]")) {
+      return fail("invalid-expression");
+    }
+    const [contentStart, contentEnd] = trimAsciiBounds(
+      inner,
+      0,
+      inner.length,
+    );
+    if (contentStart === contentEnd) {
+      return Object.freeze({
+        kind: "sequence",
+        items: Object.freeze([]),
+      });
+    }
+    const items = inner.split(",").map((raw) => {
+      const [start, end] = trimAsciiBounds(raw, 0, raw.length);
+      const name = raw.slice(start, end);
+      if (!validName(name)) fail("invalid-name");
+      return name;
+    });
+    return Object.freeze({
+      kind: "sequence",
+      items: Object.freeze(items),
+    });
+  }
+
+  if (source.includes("[") || source.includes("]")) {
+    return fail("invalid-expression");
+  }
+
   const direct = source.indexOf("->");
   if (direct >= 0) {
     if (
@@ -158,7 +201,7 @@ function parseExpression(
     const leftName = source.slice(leftStart, leftEnd);
     const rightName = source.slice(rightStart, rightEnd);
     if (!validName(leftName) || !validName(rightName)) fail("invalid-name");
-    return Object.freeze({ leftName, rightName });
+    return Object.freeze({ kind: "pair", leftName, rightName });
   }
 
   const open = source.indexOf("(");
@@ -179,7 +222,7 @@ function parseExpression(
   const leftName = source.slice(leftStart, leftEnd);
   const rightName = source.slice(rightStart, rightEnd);
   if (!validName(leftName) || !validName(rightName)) fail("invalid-name");
-  return Object.freeze({ leftName, rightName });
+  return Object.freeze({ kind: "pair", leftName, rightName });
 }
 
 function parseDefinition(line: PhysicalLine): ParsedDefinition {
@@ -198,8 +241,7 @@ function parseDefinition(line: PhysicalLine): ParsedDefinition {
   const expression = parseExpression(body);
   return Object.freeze({
     localName,
-    leftName: expression.leftName,
-    rightName: expression.rightName,
+    expression,
     span: Object.freeze({
       line: line.number,
       startByte: line.startByte,
@@ -272,19 +314,37 @@ export function decodeV015FormalDefinitions(
   };
 
   const declarations: LinkHandle[] = [];
+  const reference = (name: string): LinkHandle =>
+    builder.addOccurrence(definitionProfile.nameRefForm, [{
+      role: definitionProfile.referencedNameRole,
+      value: nameCarrier(name),
+    }]);
+
   for (const definition of parsed) {
-    const left = builder.addOccurrence(definitionProfile.nameRefForm, [{
-      role: definitionProfile.referencedNameRole,
-      value: nameCarrier(definition.leftName),
-    }]);
-    const right = builder.addOccurrence(definitionProfile.nameRefForm, [{
-      role: definitionProfile.referencedNameRole,
-      value: nameCarrier(definition.rightName),
-    }]);
-    const body = builder.addOccurrence(definitionProfile.pairForm, [
-      { role: definitionProfile.pairLeftRole, value: left },
-      { role: definitionProfile.pairRightRole, value: right },
-    ]);
+    let body: LinkHandle;
+    if (definition.expression.kind === "pair") {
+      const left = reference(definition.expression.leftName);
+      const right = reference(definition.expression.rightName);
+      body = builder.addOccurrence(definitionProfile.pairForm, [
+        { role: definitionProfile.pairLeftRole, value: left },
+        { role: definitionProfile.pairRightRole, value: right },
+      ]);
+    } else {
+      if (
+        definitionProfile.sequenceForm === undefined ||
+        definitionProfile.sequenceItemRole === undefined
+      ) {
+        return fail("invalid-expression");
+      }
+      body = builder.addOccurrence(
+        definitionProfile.sequenceForm,
+        definition.expression.items.map((name) => ({
+          role: definitionProfile.sequenceItemRole!,
+          value: reference(name),
+        })),
+      );
+    }
+
     const declaration = builder.addOccurrence(namespaceProfile.declarationForm, [
       {
         role: namespaceProfile.declarationNameRole,
