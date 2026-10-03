@@ -428,7 +428,7 @@ function main(): void {
   exe02FakeKernel.formalOverlay.entries[exe02OverlayIndex].nativeIndependent = false;
   expectReject(
     () => buildTheoremProjectionModel(exe02FakeKernel),
-    /FORMAL native classification for EXE-02 has no native assurance authority/i,
+    /KERNEL_REALIZED_NOT_INDEPENDENT cannot be represented as NO_PROOF_ARTIFACT/i,
     "EXE-02 cannot invent kernel realization",
   );
 
