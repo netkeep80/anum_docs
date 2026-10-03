@@ -154,6 +154,9 @@ function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
     "### Формальная запись FORMAL v0.15",
     `- **Статус миграции:** ${inlineCode(formal.migrationStatus)}.`,
     `- **Замкнутость доказательного артефакта:** ${inlineCode(formal.proofClosure ?? "UNKNOWN")}.`,
+    ...(formal.formalArtifactKind === null
+      ? []
+      : [`- **Тип FORMAL-артефакта:** ${inlineCode(formal.formalArtifactKind)}.`]),
     ...(formal.proofClosure === "NO_PROOF_ARTIFACT"
       ? ["- **Нативный доказательный артефакт:** отсутствует."]
       : []),
@@ -164,11 +167,23 @@ function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
     "~~~",
     "- **FORMAL-предпосылки исходного доказательства:**",
     ...list(formal.formalPremises).map((line) => `  ${line}`),
+    ...(formal.formalDependencies.length === 0
+      ? []
+      : [
+          "- **FORMAL-зависимости теоремы:**",
+          ...list(formal.formalDependencies).map((line) => `  ${line}`),
+        ]),
     ...(formal.formalDomain.length === 0
       ? []
       : [
           "- **FORMAL-область связывания:**",
           ...list(formal.formalDomain).map((line) => `  ${line}`),
+        ]),
+    ...(formal.formalExistentialDomain.length === 0
+      ? []
+      : [
+          "- **FORMAL-область экзистенциальных свидетелей:**",
+          ...list(formal.formalExistentialDomain).map((line) => `  ${line}`),
         ]),
     ...(formal.formalNonPremises.length === 0
       ? []

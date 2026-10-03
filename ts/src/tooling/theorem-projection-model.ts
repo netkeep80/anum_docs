@@ -67,9 +67,12 @@ export interface TheoremProjectionNativeAssurance {
 export interface TheoremProjectionFormalV015 {
   migrationStatus: string;
   proofClosure: string | null;
+  formalArtifactKind: string | null;
   formalStatement: string | null;
   formalPremises: string[];
+  formalDependencies: string[];
   formalDomain: string[];
+  formalExistentialDomain: string[];
   formalNonPremises: string[];
   formalSourcePath: string | null;
   nativeClassification: string | null;
@@ -107,7 +110,7 @@ export interface TheoremProjectionTheorem {
   };
 }
 export interface TheoremProjectionModel {
-  schema: "mts-theorem-projection-model/v0.4";
+  schema: "mts-theorem-projection-model/v0.5";
   mtsVersion: string;
   formalCandidateVersion: string;
   sourceInventory: "theorems/current-v0.14.json";
@@ -465,7 +468,7 @@ export function buildTheoremProjectionModel(
   const theoremIdSet = new Set(theoremIds);
 
   const overlay = object(sources.formalOverlay, "theorems/formal-v0.15.json");
-  if (overlay.schema !== "mts-formal-theorem-overlay/v0.3") {
+  if (overlay.schema !== "mts-formal-theorem-overlay/v0.4") {
     fail("unexpected FORMAL theorem overlay schema");
   }
   if (overlay.baseInventory !== "theorems/current-v0.14.json") {
@@ -502,10 +505,38 @@ export function buildTheoremProjectionModel(
         `${id}.proofClosure must be CLOSED, OPEN_CONDITIONAL, N_A_FOR_KERNEL_REALIZATION or NO_PROOF_ARTIFACT`,
       );
     }
+    const formalArtifactKind = text(entry.formalArtifactKind, `${id}.formalArtifactKind`);
+    if (
+      formalArtifactKind !== "CLOSED_PROOF" &&
+      formalArtifactKind !== "OPEN_PROOF" &&
+      formalArtifactKind !== "KERNEL_REALIZATION" &&
+      formalArtifactKind !== "STATEMENT_ONLY"
+    ) {
+      fail(`${id}.formalArtifactKind must be CLOSED_PROOF, OPEN_PROOF, KERNEL_REALIZATION or STATEMENT_ONLY`);
+    }
     const formalStatement = text(entry.formalStatement, `${id}.formalStatement`);
     const formalPremises = strings(entry.formalPremises, `${id}.formalPremises`);
+    const formalDependencies =
+      entry.formalDependencies === undefined
+        ? []
+        : strings(entry.formalDependencies, `${id}.formalDependencies`);
+    if (new Set(formalDependencies).size !== formalDependencies.length) {
+      fail(`${id}.formalDependencies contains duplicates`);
+    }
+    for (const dependency of formalDependencies) {
+      if (!theoremIdSet.has(dependency)) {
+        fail(`${id}.formalDependencies has non-current theorem ${dependency}`);
+      }
+      if (dependency === id) {
+        fail(`${id}.formalDependencies must not contain self-dependency`);
+      }
+    }
     const formalDomain =
       entry.formalDomain === undefined ? [] : strings(entry.formalDomain, `${id}.formalDomain`);
+    const formalExistentialDomain =
+      entry.formalExistentialDomain === undefined
+        ? []
+        : strings(entry.formalExistentialDomain, `${id}.formalExistentialDomain`);
     const formalNonPremises =
       entry.formalNonPremises === undefined
         ? []
@@ -530,9 +561,12 @@ export function buildTheoremProjectionModel(
     formalById.set(id, Object.freeze({
       migrationStatus,
       proofClosure,
+      formalArtifactKind,
       formalStatement,
       formalPremises: Object.freeze(formalPremises) as string[],
+      formalDependencies: Object.freeze(formalDependencies) as string[],
       formalDomain: Object.freeze(formalDomain) as string[],
+      formalExistentialDomain: Object.freeze(formalExistentialDomain) as string[],
       formalNonPremises: Object.freeze(formalNonPremises) as string[],
       formalSourcePath,
       nativeClassification,
@@ -587,9 +621,12 @@ export function buildTheoremProjectionModel(
     const formalV015 = formalById.get(id) ?? Object.freeze({
       migrationStatus: "NOT_MIGRATED",
       proofClosure: null,
+      formalArtifactKind: null,
       formalStatement: null,
       formalPremises: [] as string[],
+      formalDependencies: [] as string[],
       formalDomain: [] as string[],
+      formalExistentialDomain: [] as string[],
       formalNonPremises: [] as string[],
       formalSourcePath: null,
       nativeClassification: null,
@@ -671,6 +708,21 @@ export function buildTheoremProjectionModel(
     ) {
       fail(`${id}: CLOSED FORMAL proof requires registered mtsNative evidence`);
     }
+    if (formalV015.migrationStatus === "FORMAL_MIGRATED") {
+      const expectedFormalArtifactKind =
+        formalV015.proofClosure === "CLOSED"
+          ? "CLOSED_PROOF"
+          : formalV015.proofClosure === "OPEN_CONDITIONAL"
+            ? "OPEN_PROOF"
+            : formalV015.proofClosure === "N_A_FOR_KERNEL_REALIZATION"
+              ? "KERNEL_REALIZATION"
+              : "STATEMENT_ONLY";
+      if (formalV015.formalArtifactKind !== expectedFormalArtifactKind) {
+        fail(
+          `${id}: formalArtifactKind ${formalV015.formalArtifactKind} is incompatible with proofClosure ${formalV015.proofClosure}`,
+        );
+      }
+    }
     if (formalV015.nativeClassification !== null) {
       if (nativeAssurance === null) {
         fail(`FORMAL native classification for ${id} has no native assurance authority`);
@@ -683,6 +735,11 @@ export function buildTheoremProjectionModel(
       }
       if (formalV015.nativeIndependent !== nativeAssurance.independent) {
         fail(`FORMAL/native independence mismatch for ${id}`);
+      }
+    }
+    for (const dependency of formalV015.formalDependencies) {
+      if (!dependsOn.includes(dependency)) {
+        fail(`${id}: FORMAL dependency ${dependency} is not an accepted theorem dependency`);
       }
     }
     if (formalV015.proofClosure === "NO_PROOF_ARTIFACT") {
@@ -698,6 +755,9 @@ export function buildTheoremProjectionModel(
       }
       if (!sameStrings(formalV015.formalPremises, formalPremises)) {
         fail(`${id}: statement-only FORMAL premises must match accepted theorem boundary`);
+      }
+      if (!sameStrings(formalV015.formalDependencies, dependsOn)) {
+        fail(`${id}: statement-only FORMAL dependencies must match accepted theorem boundary`);
       }
       if (formalV015.aproverStatus !== "NOT_RECORDED" || evidence.aprover.length !== 0) {
         fail(`${id}: NO_PROOF_ARTIFACT cannot claim aprover evidence`);
@@ -759,7 +819,7 @@ export function buildTheoremProjectionModel(
     });
   });
   return Object.freeze({
-    schema: "mts-theorem-projection-model/v0.4" as const,
+    schema: "mts-theorem-projection-model/v0.5" as const,
     mtsVersion,
     formalCandidateVersion,
     sourceInventory: "theorems/current-v0.14.json" as const,

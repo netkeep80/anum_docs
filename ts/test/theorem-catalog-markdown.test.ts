@@ -103,12 +103,37 @@ function main(): void {
   assert.match(fnd09, /NOT_RECORDED/);
 
   const fnd01 = section(first, "FND-01");
-  assert.match(fnd01, /FORMAL v0\.15/);
-  assert.match(fnd01, /NOT_MIGRATED/);
+  assert.match(fnd01, /FORMAL_MIGRATED/);
+  assert.match(fnd01, /NO_PROOF_ARTIFACT/);
+  assert.match(fnd01, /STATEMENT_ONLY/);
+  assert.match(fnd01, /Нативный доказательный артефакт:\*\* отсутствует/i);
+  assert.match(fnd01, /FND01_STATEMENT : FND01_PREMISES->FND01_CONCLUSION/);
+  assert.match(fnd01, /A1RecursiveSeparation/);
+  assert.match(fnd01, /F2F3OneSidedExistence/);
+  assert.match(fnd01, /LocalSelfDecision:x/);
+  assert.match(fnd01, /FORMAL-зависимости теоремы/);
+  assert.match(fnd01, /FND-02/);
+  assert.match(fnd01, /x : Link/);
+  assert.match(fnd01, /FORMAL-область экзистенциальных свидетелей/);
+  assert.match(fnd01, /startWitness : Link/);
+  assert.match(fnd01, /finishWitness : Link/);
+  assert.match(fnd01, /pairWitness : Link/);
+  assert.match(fnd01, /FND-02 as premise/);
+  assert.match(fnd01, /FND-13/);
+  assert.match(fnd01, /Grounded:x/);
+  assert.match(fnd01, /NOT_RECORDED/);
+  assert.match(fnd01, /v015-fnd01-formal-statement-b18\.test\.ts/);
+  assert.match(
+    fnd01,
+    /зарегистрированных нативных записей доказательств:\s*0/i,
+    "FND-01 statement migration must not fabricate native evidence",
+  );
+  assert.match(fnd01, /Нативное подтверждение:\*\* нет/i);
 
   const fnd02 = section(first, "FND-02");
   assert.match(fnd02, /FORMAL_MIGRATED/);
   assert.match(fnd02, /N_A_FOR_KERNEL_REALIZATION/);
+  assert.match(fnd02, /KERNEL_REALIZATION/);
   assert.match(fnd02, /FND02_STATEMENT : FND02_PREMISES->FND02_RULE/);
   assert.match(fnd02, /A1RecursiveSeparation/);
   assert.match(fnd02, /X : Link/);
@@ -152,6 +177,7 @@ function main(): void {
   const exe02 = section(first, "EXE-02");
   assert.match(exe02, /FORMAL_MIGRATED/);
   assert.match(exe02, /NO_PROOF_ARTIFACT/);
+  assert.match(exe02, /STATEMENT_ONLY/);
   assert.match(exe02, /Нативный доказательный артефакт:\*\* отсутствует/i);
   assert.match(exe02, /EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES/);
   assert.match(exe02, /a : Link/);
