@@ -96,7 +96,7 @@ const source=[
   "R : R->R","O : O->R","C : R->C","L : O->C","U : C->O",
   "EQ_R : R=R(R)","EQ_O : O=O(R)","EQ_C : C=R(C)",
   "EQ_L : L=O(C)","EQ_U : U=C(O)","EQ_FALSE : L=C(O)",
-  "EQ_PAIR_PAIR : R(R)=R(R)",
+  "EQ_PAIR_NAME : R(R)=R","EQ_PAIR_PAIR : R(R)=R(R)",
   "ARGS_EQ_R : [EQ_R]","ARGS_EQ_FALSE : [EQ_FALSE]",
   "ARGS_EQ_RF : [EQ_R,EQ_FALSE]","OUT_U : [U]","OUT_L : [L]",
   "AND_SEED : R->L","AND : AND_SEED->O",
