@@ -192,6 +192,26 @@ const v015FormalGrammarResearchFunctions = new Set<string>([
   "v015FormalAstStructureEqual",
 ]);
 
+// v0.15 native SyntaxAset Grammar authority is current candidate work, never retroactive v0.13 evidence.
+const v015NativeSyntaxGrammarResearchPath = "ts/src/native-syntax-grammar.ts";
+const v015NativeSyntaxGrammarResearchFunctions = new Set<string>([
+  "materializeNat",
+  "materializeNativeSyntaxGrammar",
+]);
+// v0.15 construction/evaluation lifecycle is current candidate work, never retroactive v0.13 evidence.
+const v015FormalEvaluationResearchPath = "ts/src/v015-formal-evaluation.ts";
+const v015FormalEvaluationResearchFunctions = new Set<string>([
+  "admitTriggeredRule",
+  "defineV015GroundedUnaryEvaluationRule",
+  "defineV015UnaryEvaluationLifecycle",
+  "materializeRoles",
+  "materializeV015ApplicationTerm",
+  "materializeV015CompletedValue",
+  "materializeV015ContinuationFrame",
+  "materializeV015EvaluationRequest",
+  "materializeV015RootEvaluationBoundary",
+]);
+
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
 function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<string> {
   if (sourcePath === postV013CarrierPath) return postV013RepresentationPublicFunctions;
@@ -200,6 +220,8 @@ function historicalAuditExcludedFunctions(sourcePath: string): ReadonlySet<strin
   if (sourcePath === v015WritingProjectionResearchPath) return v015WritingProjectionResearchFunctions;
   if (sourcePath === v015FormalRolesResearchPath) return v015FormalRolesResearchFunctions;
   if (sourcePath === v015FormalGrammarResearchPath) return v015FormalGrammarResearchFunctions;
+  if (sourcePath === v015NativeSyntaxGrammarResearchPath) return v015NativeSyntaxGrammarResearchFunctions;
+  if (sourcePath === v015FormalEvaluationResearchPath) return v015FormalEvaluationResearchFunctions;
   return new Set<string>();
 }
 
@@ -719,10 +741,21 @@ const currentDirectWriteOwners = [...new Set(
 setEqual(
   currentDirectWriteOwners.filter((owner) => !observedDirectWriteOwners.includes(owner)),
   [
+    "ts/src/native-syntax-grammar.ts#materializeNat",
+    "ts/src/native-syntax-grammar.ts#materializeNativeSyntaxGrammar",
     "ts/src/portable-closed-rooted-proof.ts#exportPortableClosedRootedProof",
     "ts/src/v013-hierarchical-carrier.ts#build",
+    "ts/src/v015-formal-evaluation.ts#admitTriggeredRule",
+    "ts/src/v015-formal-evaluation.ts#defineV015GroundedUnaryEvaluationRule",
+    "ts/src/v015-formal-evaluation.ts#defineV015UnaryEvaluationLifecycle",
+    "ts/src/v015-formal-evaluation.ts#materializeRoles",
+    "ts/src/v015-formal-evaluation.ts#materializeV015ApplicationTerm",
+    "ts/src/v015-formal-evaluation.ts#materializeV015CompletedValue",
+    "ts/src/v015-formal-evaluation.ts#materializeV015ContinuationFrame",
+    "ts/src/v015-formal-evaluation.ts#materializeV015EvaluationRequest",
+    "ts/src/v015-formal-evaluation.ts#materializeV015RootEvaluationBoundary",
   ],
-  "post-v0.13 non-semantic direct write owner delta is exact",
+  "explicit post-v0.13 direct write owner delta is exact",
 );
 
 if (projection.packageDirectSemanticWriteAudit === undefined) {
