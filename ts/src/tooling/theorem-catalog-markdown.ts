@@ -146,12 +146,12 @@ function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
   const formal = theorem.formalV015;
   if (formal.migrationStatus === "NOT_MIGRATED") {
     return [
-      "### FORMAL v0.15",
+      "### Формальная запись FORMAL v0.15",
       "- **Статус миграции:** `NOT_MIGRATED`.",
     ];
   }
   return [
-    "### FORMAL v0.15",
+    "### Формальная запись FORMAL v0.15",
     `- **Статус миграции:** ${inlineCode(formal.migrationStatus)}.`,
     `- **Замкнутость доказательного артефакта:** ${inlineCode(formal.proofClosure ?? "UNKNOWN")}.`,
     `- **Статус aprover:** ${inlineCode(formal.aproverStatus ?? "UNKNOWN")}.`,
