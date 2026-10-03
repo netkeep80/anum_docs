@@ -143,7 +143,7 @@ function byteOffset(text: string, charOffset: number): number {
   return new TextEncoder().encode(text.slice(0, charOffset)).length;
 }
 
-function validName(name: string): boolean {
+export function isV015FormalName(name: string): boolean {
   return (
     name.length > 0 &&
     !/[\t\r\n :()]/u.test(name) &&
@@ -174,7 +174,7 @@ function parseExpression(
     const items = inner.split(",").map((raw) => {
       const [start, end] = trimAsciiBounds(raw, 0, raw.length);
       const name = raw.slice(start, end);
-      if (!validName(name)) fail("invalid-name");
+      if (!isV015FormalName(name)) fail("invalid-name");
       return name;
     });
     return Object.freeze({
@@ -200,7 +200,7 @@ function parseExpression(
     const [rightStart, rightEnd] = trimAsciiBounds(source, direct + 2, source.length);
     const leftName = source.slice(leftStart, leftEnd);
     const rightName = source.slice(rightStart, rightEnd);
-    if (!validName(leftName) || !validName(rightName)) fail("invalid-name");
+    if (!isV015FormalName(leftName) || !isV015FormalName(rightName)) fail("invalid-name");
     return Object.freeze({ kind: "pair", leftName, rightName });
   }
 
@@ -221,7 +221,7 @@ function parseExpression(
   const [rightStart, rightEnd] = trimAsciiBounds(source, open + 1, close);
   const leftName = source.slice(leftStart, leftEnd);
   const rightName = source.slice(rightStart, rightEnd);
-  if (!validName(leftName) || !validName(rightName)) fail("invalid-name");
+  if (!isV015FormalName(leftName) || !isV015FormalName(rightName)) fail("invalid-name");
   return Object.freeze({ kind: "pair", leftName, rightName });
 }
 
@@ -235,7 +235,7 @@ function parseDefinition(line: PhysicalLine): ParsedDefinition {
   const [bodyStart, bodyEnd] = trimAsciiBounds(text, colon + 1, text.length);
   const localName = text.slice(nameStart, nameEnd);
   const body = text.slice(bodyStart, bodyEnd);
-  if (!validName(localName)) fail("invalid-name");
+  if (!isV015FormalName(localName)) fail("invalid-name");
   if (body.length === 0) fail("invalid-expression");
 
   const expression = parseExpression(body);
