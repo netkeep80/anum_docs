@@ -39,7 +39,7 @@ function main(): void {
     JSON.stringify(first),
     "projection model must be byte-deterministic under repeated load",
   );
-  assert.equal(first.schema, "mts-theorem-projection-model/v0.3");
+  assert.equal(first.schema, "mts-theorem-projection-model/v0.4");
   assert.equal(first.mtsVersion, "v0.14");
   assert.equal(first.sourceInventory, "theorems/current-v0.14.json");
   assert.equal(first.formalOverlay, "theorems/formal-v0.15.json");
@@ -207,6 +207,31 @@ function main(): void {
     "FND-13 kernel realization is not fabricated into an mtsNative evidence record",
   );
 
+  const exe02 = first.theorems.find((theorem) => theorem.id === "EXE-02");
+  assert.ok(exe02);
+  assert.equal(exe02.nativeAssurance, null);
+  assert.equal(exe02.formalV015.migrationStatus, "FORMAL_MIGRATED");
+  assert.equal(exe02.formalV015.proofClosure, "NO_PROOF_ARTIFACT");
+  assert.equal(
+    exe02.formalV015.formalStatement,
+    "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
+  );
+  assert.deepEqual(exe02.formalV015.formalPremises, []);
+  assert.deepEqual(
+    exe02.formalV015.formalDomain,
+    ["a : Link", "a' : Link", "b : Link", "b' : Link", "x : Link", "y : Link", "c : Link", "d : Link"],
+  );
+  assert.deepEqual(
+    exe02.formalV015.formalNonPremises,
+    ["FND-13", "Grounded", "Memory handle/object identity"],
+  );
+  assert.equal(exe02.formalV015.nativeClassification, null);
+  assert.equal(exe02.formalV015.kernelLaw, null);
+  assert.equal(exe02.formalV015.nativeIndependent, null);
+  assert.equal(exe02.formalV015.aproverStatus, "NOT_RECORDED");
+  assert.equal(exe02.evidence.mtsNative.length, 0);
+  assert.equal(exe02.evidence.aprover.length, 0);
+
   const fnd01 = first.theorems.find((theorem) => theorem.id === "FND-01");
   assert.ok(fnd01);
   assert.equal(
@@ -362,6 +387,57 @@ function main(): void {
     () => buildTheoremProjectionModel(fnd13ForgedAprover),
     /aprover ACCEPT requires registered aprover evidence/i,
     "FND-13 aprover ACCEPT without evidence",
+  );
+
+  const exe02OverlayIndex = sources.formalOverlay.entries.findIndex(
+    (entry: any) => entry.id === "EXE-02",
+  );
+  assert.notEqual(exe02OverlayIndex, -1);
+
+  const exe02FalseClosed = clone(sources);
+  exe02FalseClosed.formalOverlay.entries[exe02OverlayIndex].proofClosure = "CLOSED";
+  expectReject(
+    () => buildTheoremProjectionModel(exe02FalseClosed),
+    /CLOSED FORMAL proof requires registered mtsNative evidence/i,
+    "EXE-02 cannot become CLOSED without native evidence",
+  );
+
+  const exe02FalseOpen = clone(sources);
+  exe02FalseOpen.formalOverlay.entries[exe02OverlayIndex].proofClosure = "OPEN_CONDITIONAL";
+  expectReject(
+    () => buildTheoremProjectionModel(exe02FalseOpen),
+    /OPEN_CONDITIONAL requires at least one formal premise/i,
+    "EXE-02 zero-premise statement is not an OPEN conditional proof artifact",
+  );
+
+  for (const forbiddenPremise of ["FND-13", "Grounded", "Memory handle/object identity"]) {
+    const badPremise = clone(sources);
+    badPremise.formalOverlay.entries[exe02OverlayIndex].formalPremises.push(forbiddenPremise);
+    expectReject(
+      () => buildTheoremProjectionModel(badPremise),
+      /statement-only FORMAL premises must match accepted theorem boundary/i,
+      `EXE-02 forbidden premise ${forbiddenPremise}`,
+    );
+  }
+
+  const exe02FakeKernel = clone(sources);
+  exe02FakeKernel.formalOverlay.entries[exe02OverlayIndex].nativeClassification =
+    "KERNEL_REALIZED_NOT_INDEPENDENT";
+  exe02FakeKernel.formalOverlay.entries[exe02OverlayIndex].kernelLaw =
+    "recursive-link-identity/ordered-pole-grounded-closure";
+  exe02FakeKernel.formalOverlay.entries[exe02OverlayIndex].nativeIndependent = false;
+  expectReject(
+    () => buildTheoremProjectionModel(exe02FakeKernel),
+    /KERNEL_REALIZED_NOT_INDEPENDENT cannot be represented as NO_PROOF_ARTIFACT/i,
+    "EXE-02 cannot invent kernel realization",
+  );
+
+  const exe02ForgedAprover = clone(sources);
+  exe02ForgedAprover.formalOverlay.entries[exe02OverlayIndex].aproverStatus = "ACCEPT";
+  expectReject(
+    () => buildTheoremProjectionModel(exe02ForgedAprover),
+    /NO_PROOF_ARTIFACT cannot claim aprover evidence|aprover ACCEPT requires registered aprover evidence/i,
+    "EXE-02 aprover ACCEPT without evidence",
   );
 
   for (const theorem of first.theorems) {

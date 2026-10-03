@@ -149,6 +149,31 @@ function main(): void {
     "FND-13 kernel realization must not be displayed as fabricated native evidence",
   );
 
+  const exe02 = section(first, "EXE-02");
+  assert.match(exe02, /FORMAL_MIGRATED/);
+  assert.match(exe02, /NO_PROOF_ARTIFACT/);
+  assert.match(exe02, /Нативный доказательный артефакт:\*\* отсутствует/i);
+  assert.match(exe02, /EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES/);
+  assert.match(exe02, /a : Link/);
+  assert.match(exe02, /a' : Link/);
+  assert.match(exe02, /b : Link/);
+  assert.match(exe02, /b' : Link/);
+  assert.match(exe02, /x : Link/);
+  assert.match(exe02, /y : Link/);
+  assert.match(exe02, /c : Link/);
+  assert.match(exe02, /d : Link/);
+  assert.match(exe02, /FND-13/);
+  assert.match(exe02, /Grounded/);
+  assert.match(exe02, /Memory handle\/object identity/);
+  assert.match(exe02, /NOT_RECORDED/);
+  assert.match(exe02, /v015-exe02-formal-statement-b17\.test\.ts/);
+  assert.match(
+    exe02,
+    /зарегистрированных нативных записей доказательств:\s*0/i,
+    "EXE-02 statement migration must not fabricate native evidence",
+  );
+  assert.match(exe02, /Нативное подтверждение:\*\* нет/i);
+
   const tracked = readFileSync(resolve(root, THEOREM_CATALOG_PATH), "utf8");
   assert.equal(tracked, first, "tracked theorem catalog must equal deterministic renderer output");
   assert.equal(

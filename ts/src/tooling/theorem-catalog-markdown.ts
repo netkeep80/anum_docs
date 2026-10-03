@@ -154,6 +154,9 @@ function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
     "### Формальная запись FORMAL v0.15",
     `- **Статус миграции:** ${inlineCode(formal.migrationStatus)}.`,
     `- **Замкнутость доказательного артефакта:** ${inlineCode(formal.proofClosure ?? "UNKNOWN")}.`,
+    ...(formal.proofClosure === "NO_PROOF_ARTIFACT"
+      ? ["- **Нативный доказательный артефакт:** отсутствует."]
+      : []),
     `- **Статус aprover:** ${inlineCode(formal.aproverStatus ?? "UNKNOWN")}.`,
     "- **Каноническая FORMAL-формулировка:**",
     "~~~text",
