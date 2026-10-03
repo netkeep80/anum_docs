@@ -216,9 +216,22 @@ const proofProfile = [
   "PROOF_PROFILE : [DICT_TAG,RULE_TAG,DR_TAG,MAP_TAG,MORPH_TAG,GENERIC_TAG,BIND_TAG,OPEN_TAG,PRIM_TAG,COORD_TAG,DISCHARGE_TAG]",
 ];
 
+function pairChain(name: string, items: readonly string[]): readonly string[] {
+  assert(items.length >= 2, `${name}: pair chain needs at least two items`);
+  const lines: string[] = [];
+  let current = items[0]!;
+  for (let index = 1; index < items.length; index += 1) {
+    const final = index === items.length - 1;
+    const nextName = final ? name : `${name}_P${index}`;
+    lines.push(`${nextName} : ${current}->${items[index]!}`);
+    current = nextName;
+  }
+  return lines;
+}
+
 function claim(name: string, tag: string, args: readonly string[]): readonly string[] {
   return [
-    `${name}_ARGS : [${args.join(",")}]`,
+    ...pairChain(`${name}_ARGS`, args),
     `${name} : ${tag}->${name}_ARGS`,
   ];
 }
@@ -348,7 +361,7 @@ const fnd08Prelude = [
   ...claim("G_REACTED", "ACTIVE_ID_TAG", [
     "G_CUR", "G_K", "G_SEL", "G_MATCH", "G_REACT", "G_A",
   ]),
-  "G_RESULT : [G_BOUNDARY,G_NO_MATCH,G_IMAGE,G_REACTED]",
+  ...pairChain("G_RESULT", ["G_BOUNDARY", "G_NO_MATCH", "G_IMAGE", "G_REACTED"]),
 
   ...claim("L_SEM", "SEM_TAG", [
     "l_cur", "l_next", "l_k", "l_sel", "l_match", "l_emit", "l_react",
@@ -363,7 +376,7 @@ const fnd08Prelude = [
   ...claim("L_REACTED", "ACTIVE_ID_TAG", [
     "l_cur", "l_k", "l_sel", "l_match", "l_react", "l_a",
   ]),
-  "L_RESULT : [L_BOUNDARY,L_NO_MATCH,L_IMAGE,L_REACTED]",
+  ...pairChain("L_RESULT", ["L_BOUNDARY", "L_NO_MATCH", "L_IMAGE", "L_REACTED"]),
 
   ...claim("I_SEM", "SEM_TAG", [
     "CURRENT_SCOPE", "NEXT_SCOPE", "K0", "SELECTED_THEORY", "MATCHES_REL",
@@ -380,7 +393,7 @@ const fnd08Prelude = [
   ...claim("I_REACTED", "ACTIVE_ID_TAG", [
     "CURRENT_SCOPE", "K0", "SELECTED_THEORY", "MATCHES_REL", "REACTED_VALUE", "A0",
   ]),
-  "I_RESULT : [I_BOUNDARY,I_NO_MATCH,I_IMAGE,I_REACTED]",
+  ...pairChain("I_RESULT", ["I_BOUNDARY", "I_NO_MATCH", "I_IMAGE", "I_REACTED"]),
 ];
 
 const fnd08Source = scaffold({
