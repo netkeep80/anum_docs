@@ -78,12 +78,13 @@ async function main(): Promise<void> {
 
   assert.equal(
     THEOREM_CATALOG_INTEGRATION_CONTRACT.schema,
-    "mts-theorem-catalog-integration/v0.1",
+    "mts-theorem-catalog-integration/v0.2",
   );
   assert.deepEqual(
     THEOREM_CATALOG_INTEGRATION_CONTRACT.fixedSources,
     [
       "theorems/current-v0.14.json",
+      "theorems/formal-v0.15.json",
       "proofs/provers.json",
       "proofs/external-proof-assurance.json",
       "proofs/native-proof-assurance.json",
@@ -119,6 +120,7 @@ async function main(): Promise<void> {
       "lawRefs",
       "assumptions",
       "formalPremises",
+      "formalV015",
       "dependsOn",
       "scope",
       "exclusions",
@@ -147,6 +149,10 @@ async function main(): Promise<void> {
   assert.equal(
     THEOREM_CATALOG_INTEGRATION_CONTRACT.authority.semanticLawInventory,
     "contracts/mts-contract-v0.14.json",
+  );
+  assert.equal(
+    THEOREM_CATALOG_INTEGRATION_CONTRACT.authority.formalOverlay,
+    "theorems/formal-v0.15.json",
   );
 
   assert.equal(provers.lanes.typescript.role, "executable-witness");
@@ -180,7 +186,7 @@ async function main(): Promise<void> {
     ownership: "generated",
   });
   assert.deepEqual(declaration.generator, {
-    contract_id: "mts.theorem-catalog/v0.1",
+    contract_id: "mts.theorem-catalog/v0.2",
   });
   assert.deepEqual(
     declaration.required_evidence,
