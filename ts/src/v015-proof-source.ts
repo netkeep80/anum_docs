@@ -16,6 +16,7 @@ import {
 } from "./derived-derivation-heterogeneous.js";
 import {
   type LinkHandle,
+  type RootBasis,
   type WriteMemory,
 } from "./memory.js";
 import { readNativeSyntaxGrammar } from "./native-syntax-grammar.js";
@@ -223,17 +224,12 @@ function asKind<T extends Built["kind"]>(
 
 export function materializeV015ProofSource(
   memory: WriteMemory,
+  basis: RootBasis,
   grammarRoot: LinkHandle,
   profileRoot: LinkHandle,
   sourceRoot: LinkHandle,
 ): V015ProofFormMaterializeResult {
-  const grammar = readNativeSyntaxGrammar(memory, {
-    R: memory.root,
-    O: memory.ensureStartSelfClosed(memory.root),
-    C: memory.ensureEndSelfClosed(memory.root),
-    L: memory.ensure(memory.ensureStartSelfClosed(memory.root), memory.ensureEndSelfClosed(memory.root)),
-    U: memory.ensure(memory.ensureEndSelfClosed(memory.root), memory.ensureStartSelfClosed(memory.root)),
-  }, grammarRoot);
+  const grammar = readNativeSyntaxGrammar(memory, basis, grammarRoot);
   const profile = readV015ProofFormProfile(memory, profileRoot);
   validateProfile(grammar.vocabulary.rules, profile);
   const source = readSyntaxAset(memory, sourceRoot, grammar.vocabulary);
