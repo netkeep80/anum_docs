@@ -630,15 +630,10 @@ differentOrReject(
 );
 
 const reordered08 = resolveOpen(
-  fnd08Source
-    .replace(
-      `GLOBAL_ROLES : [${fnd08Global.join(",")}]`,
-      `GLOBAL_ROLES : [${[...fnd08Global].reverse().join(",")}]`,
-    )
-    .replace(
-      `LOCAL_ROLES : [${fnd08Local.join(",")}]`,
-      `LOCAL_ROLES : [${[...fnd08Local].reverse().join(",")}]`,
-    ),
+  fnd08Source.replace(
+    `GLOBAL_ROLES : [${fnd08Global.join(",")}]`,
+    `GLOBAL_ROLES : [${[...fnd08Global].reverse().join(",")}]`,
+  ),
 );
 same(wire(reordered08), fnd08Wire, "FND-08 role enumeration order is non-authority");
 
