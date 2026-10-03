@@ -22,19 +22,15 @@ import {
   readSyntaxAset,
   type SyntaxAsetVocabulary,
 } from "../src/syntax-aset-contract.js";
-
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`native syntax grammar: ${message}`);
 }
-
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: ${String(actual)} !== ${String(expected)}`);
 }
-
 function exactJson(actual: unknown, expected: unknown, message: string): void {
   same(JSON.stringify(actual), JSON.stringify(expected), message);
 }
-
 function expectGrammarReject(
   code: NativeSyntaxGrammarError["code"],
   effect: () => unknown,
@@ -49,7 +45,6 @@ function expectGrammarReject(
   }
   throw new Error(`native syntax grammar: ${label}: expected rejection`);
 }
-
 function expectSyntaxReject(
   code: SyntaxAsetContractError["code"],
   effect: () => unknown,
@@ -64,7 +59,6 @@ function expectSyntaxReject(
   }
   throw new Error(`native syntax grammar: ${label}: expected rejection`);
 }
-
 interface Fixture {
   readonly memory: Memory;
   readonly basis: RootBasis;
@@ -78,21 +72,17 @@ interface Fixture {
   readonly grammarRoot: LinkHandle;
   readonly grammar: NativeSyntaxGrammarRead;
 }
-
 function fixture(noise = false): Fixture {
   const memory = new Memory();
   const basis = ensureRootBasis(memory);
   let cursor = basis.U;
   const fresh = (): LinkHandle => (cursor = memory.ensure(cursor, basis.R));
-
   if (noise) {
     const n0 = memory.ensure(basis.C, basis.U);
     memory.ensureStartSelfClosed(n0);
   }
-
   const syntaxTag = fresh();
   const markerSeed = fresh();
-
   const leafForm = fresh();
   const binaryForm = fresh();
   const definitionForm = fresh();
@@ -103,7 +93,6 @@ function fixture(noise = false): Fixture {
     definitionForm,
     containerForm,
   ]);
-
   const valueRole = fresh();
   const startRole = fresh();
   const endRole = fresh();
@@ -118,10 +107,8 @@ function fixture(noise = false): Fixture {
     bodyRole,
     itemRole,
   ]);
-
   const carrierA = fresh();
   const carrierB = fresh();
-
   const rules: readonly NativeSyntaxGrammarRuleSpec[] = Object.freeze([
     Object.freeze({
       form: leafForm,
@@ -150,14 +137,12 @@ function fixture(noise = false): Fixture {
       ]),
     }),
   ]);
-
   const grammarRoot = materializeNativeSyntaxGrammar(memory, basis, {
     syntaxTag,
     markerSeed,
     rules,
   });
   const grammar = readNativeSyntaxGrammar(memory, basis, grammarRoot);
-
   return Object.freeze({
     memory,
     basis,
@@ -172,7 +157,6 @@ function fixture(noise = false): Fixture {
     grammar,
   });
 }
-
 function normalizedShape(f: Fixture): unknown {
   const formIndex = new Map(f.forms.map((form, index) => [form, index]));
   const roleIndex = new Map(f.roles.map((role, index) => [role, index]));
@@ -186,7 +170,6 @@ function normalizedShape(f: Fixture): unknown {
     })),
   }));
 }
-
 function buildSyntax(f: Fixture): LinkHandle {
   const [leafForm, binaryForm, definitionForm, containerForm] = f.forms;
   const [valueRole, startRole, endRole, nameRole, bodyRole, itemRole] = f.roles;
@@ -203,7 +186,6 @@ function buildSyntax(f: Fixture): LinkHandle {
     itemRole !== undefined,
     "fixture roles/forms exist",
   );
-
   const builder = new SyntaxAsetBuilder(f.memory, f.grammar.vocabulary);
   const left = builder.addOccurrence(leafForm, [
     { role: valueRole, value: f.carrierA },
@@ -225,7 +207,6 @@ function buildSyntax(f: Fixture): LinkHandle {
   ]);
   return builder.finish(root);
 }
-
 function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
   let current = basis.U;
   for (let index = 0; index < value; index += 1) {
@@ -233,9 +214,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
   }
   return current;
 }
-
-// Same structural Grammar in independent Memories reconstructs the same
-// normalized host read. Host handles are intentionally unrelated.
 {
   const a = fixture(false);
   const b = fixture(true);
@@ -247,9 +225,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
   same(a.grammar.vocabulary.rules[3]?.fields[0]?.min, 0, "zero minimum read from U");
   same(a.grammar.vocabulary.rules[3]?.fields[0]?.max, null, "unbounded maximum remains explicit");
 }
-
-// Exact selected native Grammar validates the existing canonical SyntaxAset,
-// preserves repeated ordered fields, and replay is read-only.
 {
   const f = fixture();
   const syntax = buildSyntax(f);
@@ -266,10 +241,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
   same(root.fields.length, 2, "ordered repeated container items preserved");
   same(root.fields[0]?.value, root.fields[1]?.value, "same child may occupy two positions");
 }
-
-// A structurally different selected Grammar rejects the same source. A caller
-// can still fabricate a legacy host descriptor, but cannot pass it to the
-// v0.15 native-Grammar boundary to widen authority.
 {
   const f = fixture();
   const syntax = buildSyntax(f);
@@ -288,7 +259,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
     itemRole !== undefined,
     "restrictive grammar fixture exists",
   );
-
   const restrictiveRoot = materializeNativeSyntaxGrammar(f.memory, f.basis, {
     syntaxTag: f.syntaxTag,
     markerSeed: f.memory.ensureStartSelfClosed(f.markerSeed),
@@ -311,13 +281,11 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
       { form: containerForm, fields: [{ role: itemRole, target: "child", min: 0, max: 1 }] },
     ],
   });
-
   expectSyntaxReject(
     "invalid-grammar",
     () => readSyntaxAsetWithNativeGrammar(f.memory, f.basis, restrictiveRoot, syntax),
     "selected restrictive Grammar rejects repeated item",
   );
-
   const restrictive = readNativeSyntaxGrammar(f.memory, f.basis, restrictiveRoot);
   const forgedRules = restrictive.vocabulary.rules.map((rule) => {
     if (rule.kind !== containerForm) return rule;
@@ -334,7 +302,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
     ...restrictive.vocabulary,
     rules: Object.freeze(forgedRules),
   });
-
   same(
     readSyntaxAset(f.memory, syntax, forgedVocabulary).root,
     readSyntaxAset(f.memory, syntax, f.grammar.vocabulary).root,
@@ -346,15 +313,12 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
     "native Grammar API ignores forged host widening",
   );
 }
-
-// Untrusted Grammar reader rejects duplicate form/role authority.
 {
   const f = fixture();
   const rootPoles = f.memory.poles(f.grammarRoot);
   const ruleLinks = readExactSequence(f.memory, rootPoles.end).values;
   const firstRule = ruleLinks[0];
   assert(firstRule !== undefined, "first native rule exists");
-
   const duplicateForms = materializeExactSequence(f.memory, [firstRule, firstRule]);
   const duplicateFormsRoot = f.memory.ensure(rootPoles.start, duplicateForms);
   expectGrammarReject(
@@ -362,7 +326,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
     () => readNativeSyntaxGrammar(f.memory, f.basis, duplicateFormsRoot),
     "duplicate form",
   );
-
   const firstRulePoles = f.memory.poles(firstRule);
   const firstField = readExactSequence(f.memory, firstRulePoles.end).values[0];
   assert(firstField !== undefined, "first native field exists");
@@ -378,9 +341,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
     "duplicate role",
   );
 }
-
-// Target class and cardinality are selected structurally by the Grammar header,
-// never by host enum/integer authority.
 {
   const f = fixture();
   const rootPoles = f.memory.poles(f.grammarRoot);
@@ -396,7 +356,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
   const min = firstSpec[1];
   const max = firstSpec[2];
   assert(min !== undefined && max !== undefined, "first field cardinality exists");
-
   const rogueTarget = f.memory.ensure(f.carrierA, f.carrierB);
   const badTargetSpec = materializeExactSequence(f.memory, [rogueTarget, min, max]);
   const badTargetField = f.memory.ensure(firstFieldPoles.start, badTargetSpec);
@@ -413,7 +372,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
     () => readNativeSyntaxGrammar(f.memory, f.basis, badTargetRoot),
     "unknown target marker",
   );
-
   const target = firstSpec[0];
   assert(target !== undefined, "first target marker exists");
   const reversedCardinalitySpec = materializeExactSequence(f.memory, [
@@ -435,7 +393,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
     () => readNativeSyntaxGrammar(f.memory, f.basis, reversedRoot),
     "max below min",
   );
-
   const invalidHeader = materializeExactSequence(f.memory, [
     header[0]!,
     header[1]!,
@@ -449,9 +406,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
     "unbounded marker cannot also be finite Nat",
   );
 }
-
-// RootBasis is selected structural authority too; foreign handles cannot be
-// smuggled in as the Nat decoder basis.
 {
   const f = fixture();
   const foreign = new Memory();
@@ -462,7 +416,6 @@ function nat(memory: Memory, basis: RootBasis, value: number): LinkHandle {
     "foreign RootBasis",
   );
 }
-
 console.log([
   "MTS v0.15 G0 native syntax Grammar:",
   "CANONICAL_SYNTAX_ASET_TOPOLOGY=REUSED",
