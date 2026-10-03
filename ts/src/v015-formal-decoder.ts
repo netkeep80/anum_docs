@@ -500,16 +500,32 @@ export function decodeV015FormalDefinitions(
   });
 }
 
-// Strict JSON J1 projection converges on the same native SyntaxAset.
+// Versioned strict JSON projection converges on the same native SyntaxAset.
 export const V015_FORMAL_JSON_J1_SCHEMA = "mts-formal-json/v0.15-j1";
 export const V015_FORMAL_JSON_J2_SCHEMA = "mts-formal-json/v0.15-j2";
+export const V015_FORMAL_JSON_J3_SCHEMA = "mts-formal-json/v0.15-j3";
 
 function jsonSchemaForProfile(
   profile: V015LinkDefinitionProfile,
+  usesStructuredEqualityOperand = false,
 ): string {
-  return profile.equalityForm === undefined
-    ? V015_FORMAL_JSON_J1_SCHEMA
+  if (profile.equalityForm === undefined) return V015_FORMAL_JSON_J1_SCHEMA;
+  return usesStructuredEqualityOperand
+    ? V015_FORMAL_JSON_J3_SCHEMA
     : V015_FORMAL_JSON_J2_SCHEMA;
+}
+
+function jsonSchemaMatchesProfile(
+  profile: V015LinkDefinitionProfile,
+  schema: string,
+): boolean {
+  if (profile.equalityForm === undefined) {
+    return schema === V015_FORMAL_JSON_J1_SCHEMA;
+  }
+  return (
+    schema === V015_FORMAL_JSON_J2_SCHEMA ||
+    schema === V015_FORMAL_JSON_J3_SCHEMA
+  );
 }
 
 export type V015FormalJsonErrorCode =
@@ -809,6 +825,39 @@ export function encodeV015FormalSourceAsetJson(
       syntax.occurrences.map((entry) => [entry.occurrence, entry]),
     );
 
+    let usesStructuredEqualityOperand = false;
+    const equalityOperand = (handle: LinkHandle): string => {
+      const operand = occurrences.get(handle) ?? jsonFail("unsupported-source");
+      if (operand.kind === profile.nameRefForm) {
+        return quote(nameRef(
+          memory,
+          verified,
+          occurrences,
+          profile,
+          handle,
+        ));
+      }
+      if (operand.kind !== profile.pairForm) {
+        return jsonFail("unsupported-source");
+      }
+      const left = nameRef(
+        memory,
+        verified,
+        occurrences,
+        profile,
+        oneField(operand, profile.pairLeftRole),
+      );
+      const right = nameRef(
+        memory,
+        verified,
+        occurrences,
+        profile,
+        oneField(operand, profile.pairRightRole),
+      );
+      usesStructuredEqualityOperand = true;
+      return `{"pair":[${quote(left)},${quote(right)}]}`;
+    };
+
     const entries = namespaces.declarations.map((declaration) => {
       const localName = utf8Name(memory, verified, declaration.nameCarrier);
       const body = occurrences.get(declaration.bodyOccurrence)
@@ -849,22 +898,14 @@ export function encodeV015FormalSourceAsetJson(
         profile.equalityRightRole !== undefined &&
         body.kind === profile.equalityForm
       ) {
-        const left = nameRef(
-          memory,
-          verified,
-          occurrences,
-          profile,
+        const left = equalityOperand(
           oneField(body, profile.equalityLeftRole),
         );
-        const right = nameRef(
-          memory,
-          verified,
-          occurrences,
-          profile,
+        const right = equalityOperand(
           oneField(body, profile.equalityRightRole),
         );
         encodedValue =
-          `{"equality":[${quote(left)},${quote(right)}]}`;
+          `{"equality":[${left},${right}]}`;
       } else {
         return jsonFail("unsupported-source");
       }
@@ -872,7 +913,10 @@ export function encodeV015FormalSourceAsetJson(
     });
 
     const text =
-      `{"schema":${quote(jsonSchemaForProfile(profile))},"entries":[${entries.join(",")}]}
+      `{"schema":${quote(jsonSchemaForProfile(
+        profile,
+        usesStructuredEqualityOperand,
+      ))},"entries":[${entries.join(",")}]}
 `;
     return new TextEncoder().encode(text);
   } finally {
@@ -918,9 +962,12 @@ export function decodeV015FormalSourceAsetJson(
     grammarRoot,
     definitionProfileRoot,
   );
-  if (string(root.get("schema")!) !== jsonSchemaForProfile(profile)) {
+  const schema = string(root.get("schema")!);
+  if (!jsonSchemaMatchesProfile(profile, schema)) {
     jsonFail("unsupported-profile");
   }
+  const allowsStructuredEqualityOperand =
+    schema === V015_FORMAL_JSON_J3_SCHEMA;
   const entries = array(root.get("entries")!);
   const builder = new SyntaxAsetBuilder(memory, grammar.vocabulary);
   const nameCache = new Map<string, LinkHandle>();
@@ -940,6 +987,20 @@ export function decodeV015FormalSourceAsetJson(
       role: profile.referencedNameRole,
       value: nameCarrier(value),
     }]);
+  const equalityOperand = (value: JsonValue): LinkHandle => {
+    if (typeof value === "string") return ref(name(value));
+    if (!allowsStructuredEqualityOperand) return jsonFail("invalid-shape");
+    const operand = object(value);
+    exactKeys(operand, ["pair"]);
+    const parts = array(operand.get("pair")!);
+    if (parts.length !== 2) return jsonFail("invalid-shape");
+    const left = ref(name(parts[0]!));
+    const right = ref(name(parts[1]!));
+    return builder.addOccurrence(profile.pairForm, [
+      { role: profile.pairLeftRole, value: left },
+      { role: profile.pairRightRole, value: right },
+    ]);
+  };
 
   const seenNames = new Set<string>();
   const declarations: LinkHandle[] = [];
@@ -990,11 +1051,11 @@ export function decodeV015FormalSourceAsetJson(
       body = builder.addOccurrence(profile.equalityForm, [
         {
           role: profile.equalityLeftRole,
-          value: ref(name(parts[0]!)),
+          value: equalityOperand(parts[0]!),
         },
         {
           role: profile.equalityRightRole,
-          value: ref(name(parts[1]!)),
+          value: equalityOperand(parts[1]!),
         },
       ]);
     } else {
