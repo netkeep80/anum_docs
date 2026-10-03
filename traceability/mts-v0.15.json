@@ -6,7 +6,7 @@
   "acceptanceReady": false,
   "releaseState": "OPEN",
   "issue": 1977,
-  "requirements": "requirements/mts-v0.15.json",
+  "requirementsRegistry": "requirements/mts-v0.15.json",
   "normativeRequirementsIssue": 1976,
   "correctiveOwner": 1975,
   "approvedJsonRegressionOwner": 1978,
