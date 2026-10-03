@@ -36,10 +36,14 @@ export interface V015RecursiveCompiledDefinition {
   readonly wire: Uint8Array;
 }
 
-export interface V015FormalRecursiveCompileResult {
-  readonly source: V015FormalDecodeResult;
+export interface V015FormalSourceAsetRecursiveCompileResult {
   readonly resolved: V015LinkDefinitionRead;
   readonly definitions: readonly V015RecursiveCompiledDefinition[];
+}
+
+export interface V015FormalRecursiveCompileResult
+  extends V015FormalSourceAsetRecursiveCompileResult {
+  readonly source: V015FormalDecodeResult;
 }
 
 function fail(code: V015FormalRecursiveCompilerErrorCode): never {
@@ -59,6 +63,67 @@ function fail(code: V015FormalRecursiveCompilerErrorCode): never {
  * dispatch. Local Link handles are returned only as stage evidence; the wire is
  * the canonical cross-Memory representation output.
  */
+function compileResolvedToRecursive(
+  memory: WriteMemory,
+  basis: RootBasis,
+  resolved: V015LinkDefinitionRead,
+): V015FormalSourceAsetRecursiveCompileResult {
+  const definitions = resolved.definitions.map((definition) => {
+    const recursiveCarrier = materializeV013HierarchicalCarrierFromSemanticLink(
+      memory,
+      basis,
+      definition.value,
+    );
+    const wire = Uint8Array.from(
+      serializeV013HierarchicalCarrier(memory, basis, recursiveCarrier),
+    );
+    return Object.freeze({
+      nameCarrier: definition.nameCarrier,
+      declarationOccurrence: definition.declarationOccurrence,
+      semantic: definition.value,
+      recursiveCarrier,
+      wire,
+    });
+  });
+  return Object.freeze({
+    resolved,
+    definitions: Object.freeze(definitions),
+  });
+}
+
+/**
+ * Shared semantic metacompiler boundary for every decoded v0.15 source.
+ *
+ * Text and canonical JSON are representation inputs only. Both must decode to
+ * the same native source Aset and enter this exact lowering path.
+ */
+export function compileV015FormalSourceAsetToRecursive(
+  memory: WriteMemory,
+  basis: RootBasis,
+  grammarRoot: LinkHandle,
+  sourceNamespaceProfileRoot: LinkHandle,
+  definitionProfileRoot: LinkHandle,
+  sourceAset: LinkHandle,
+): V015FormalSourceAsetRecursiveCompileResult {
+  try {
+    verifyRootBasis(memory, basis);
+  } catch {
+    return fail("invalid-basis");
+  }
+  return compileResolvedToRecursive(
+    memory,
+    basis,
+    materializeV015LinkDefinitions(
+      memory,
+      basis,
+      grammarRoot,
+      sourceNamespaceProfileRoot,
+      definitionProfileRoot,
+      sourceAset,
+    ),
+  );
+}
+
 export function compileV015FormalDefinitionsToRecursive(
   memory: WriteMemory,
   basis: RootBasis,
@@ -81,7 +146,7 @@ export function compileV015FormalDefinitionsToRecursive(
     definitionProfileRoot,
     bytes,
   );
-  const resolved = materializeV015LinkDefinitions(
+  const compiled = compileV015FormalSourceAsetToRecursive(
     memory,
     basis,
     grammarRoot,
@@ -90,35 +155,13 @@ export function compileV015FormalDefinitionsToRecursive(
     source.sourceAset,
   );
 
-  if (resolved.definitions.length !== source.definitionSpans.length) {
+  if (compiled.resolved.definitions.length !== source.definitionSpans.length) {
     return fail("definition-count-mismatch");
   }
 
-  const definitions = resolved.definitions.map((definition) => {
-    const recursiveCarrier = materializeV013HierarchicalCarrierFromSemanticLink(
-      memory,
-      basis,
-      definition.value,
-    );
-    const wire = Uint8Array.from(
-      serializeV013HierarchicalCarrier(
-        memory,
-        basis,
-        recursiveCarrier,
-      ),
-    );
-    return Object.freeze({
-      nameCarrier: definition.nameCarrier,
-      declarationOccurrence: definition.declarationOccurrence,
-      semantic: definition.value,
-      recursiveCarrier,
-      wire,
-    });
-  });
-
   return Object.freeze({
     source,
-    resolved,
-    definitions: Object.freeze(definitions),
+    resolved: compiled.resolved,
+    definitions: compiled.definitions,
   });
 }
