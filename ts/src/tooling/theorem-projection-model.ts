@@ -514,19 +514,6 @@ export function buildTheoremProjectionModel(
     ) {
       fail(`${id}.formalArtifactKind must be CLOSED_PROOF, OPEN_PROOF, KERNEL_REALIZATION or STATEMENT_ONLY`);
     }
-    const expectedArtifactKind =
-      proofClosure === "CLOSED"
-        ? "CLOSED_PROOF"
-        : proofClosure === "OPEN_CONDITIONAL"
-          ? "OPEN_PROOF"
-          : proofClosure === "N_A_FOR_KERNEL_REALIZATION"
-            ? "KERNEL_REALIZATION"
-            : "STATEMENT_ONLY";
-    if (formalArtifactKind !== expectedArtifactKind) {
-      fail(
-        `${id}.formalArtifactKind ${formalArtifactKind} is incompatible with proofClosure ${proofClosure}`,
-      );
-    }
     const formalStatement = text(entry.formalStatement, `${id}.formalStatement`);
     const formalPremises = strings(entry.formalPremises, `${id}.formalPremises`);
     const formalDependencies =
@@ -720,6 +707,19 @@ export function buildTheoremProjectionModel(
       evidence.mtsNative.length === 0
     ) {
       fail(`${id}: CLOSED FORMAL proof requires registered mtsNative evidence`);
+    }
+    const expectedFormalArtifactKind =
+      formalV015.proofClosure === "CLOSED"
+        ? "CLOSED_PROOF"
+        : formalV015.proofClosure === "OPEN_CONDITIONAL"
+          ? "OPEN_PROOF"
+          : formalV015.proofClosure === "N_A_FOR_KERNEL_REALIZATION"
+            ? "KERNEL_REALIZATION"
+            : "STATEMENT_ONLY";
+    if (formalV015.formalArtifactKind !== expectedFormalArtifactKind) {
+      fail(
+        `${id}: formalArtifactKind ${formalV015.formalArtifactKind} is incompatible with proofClosure ${formalV015.proofClosure}`,
+      );
     }
     if (formalV015.nativeClassification !== null) {
       if (nativeAssurance === null) {
