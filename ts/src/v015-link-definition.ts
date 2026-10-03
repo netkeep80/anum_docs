@@ -387,6 +387,58 @@ function resolveOperand(
   return Object.freeze({ kind: "pending" });
 }
 
+function resolveEqualityOperand(
+  memory: WriteMemory,
+  profile: V015LinkDefinitionProfile,
+  occurrences: ReadonlyMap<LinkHandle, SyntaxAsetOccurrence>,
+  declaredNames: ReadonlySet<LinkHandle>,
+  resolved: ReadonlyMap<LinkHandle, LinkHandle>,
+  targetName: LinkHandle,
+  operand: LinkHandle,
+): SymbolicValue {
+  const occurrence = occurrences.get(operand) ?? fail("unsupported-expression");
+  if (occurrence.kind === profile.nameRefForm) {
+    return resolveOperand(
+      profile,
+      occurrences,
+      declaredNames,
+      resolved,
+      targetName,
+      operand,
+    );
+  }
+  if (occurrence.kind !== profile.pairForm) {
+    return fail("unsupported-expression");
+  }
+
+  const left = resolveOperand(
+    profile,
+    occurrences,
+    declaredNames,
+    resolved,
+    targetName,
+    fieldValue(occurrence, profile.pairLeftRole),
+  );
+  const right = resolveOperand(
+    profile,
+    occurrences,
+    declaredNames,
+    resolved,
+    targetName,
+    fieldValue(occurrence, profile.pairRightRole),
+  );
+  if (left.kind === "pending" || right.kind === "pending") {
+    return Object.freeze({ kind: "pending" });
+  }
+  if (left.kind !== "link" || right.kind !== "link") {
+    return fail("unsupported-expression");
+  }
+  return Object.freeze({
+    kind: "link",
+    value: memory.ensure(left.value, right.value),
+  });
+}
+
 function materializeExpression(
   memory: WriteMemory,
   basis: RootBasis,
@@ -438,7 +490,8 @@ function materializeExpression(
     profile.equalityRightRole !== undefined &&
     occurrence.kind === profile.equalityForm
   ) {
-    const left = resolveOperand(
+    const left = resolveEqualityOperand(
+      memory,
       profile,
       occurrences,
       declaredNames,
@@ -446,7 +499,8 @@ function materializeExpression(
       targetName,
       fieldValue(occurrence, profile.equalityLeftRole),
     );
-    const right = resolveOperand(
+    const right = resolveEqualityOperand(
+      memory,
       profile,
       occurrences,
       declaredNames,

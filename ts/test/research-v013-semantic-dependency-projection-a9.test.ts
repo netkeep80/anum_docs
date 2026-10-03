@@ -749,6 +749,7 @@ setEqual(
     "ts/src/v015-formal-evaluation.ts#materializeV015EvaluationRequest",
     "ts/src/v015-formal-evaluation.ts#materializeV015RootEvaluationBoundary",
     "ts/src/v015-link-definition.ts#materializeExpression",
+    "ts/src/v015-link-definition.ts#resolveEqualityOperand",
     "ts/src/v015-proof-source.ts#build",
     "ts/src/v015-proof-source.ts#generic",
     "ts/src/v015-proof-source.ts#materializeV015ProofDenotation",
