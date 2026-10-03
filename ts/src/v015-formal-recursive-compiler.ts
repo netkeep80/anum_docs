@@ -36,10 +36,15 @@ export interface V015RecursiveCompiledDefinition {
   readonly wire: Uint8Array;
 }
 
-export interface V015FormalRecursiveCompileResult {
-  readonly source: V015FormalDecodeResult;
+export interface V015FormalSourceAsetRecursiveCompileResult {
+  readonly sourceAset: LinkHandle;
   readonly resolved: V015LinkDefinitionRead;
   readonly definitions: readonly V015RecursiveCompiledDefinition[];
+}
+
+export interface V015FormalRecursiveCompileResult
+  extends V015FormalSourceAsetRecursiveCompileResult {
+  readonly source: V015FormalDecodeResult;
 }
 
 function fail(code: V015FormalRecursiveCompilerErrorCode): never {
@@ -59,41 +64,28 @@ function fail(code: V015FormalRecursiveCompilerErrorCode): never {
  * dispatch. Local Link handles are returned only as stage evidence; the wire is
  * the canonical cross-Memory representation output.
  */
-export function compileV015FormalDefinitionsToRecursive(
+export function compileV015FormalSourceAsetToRecursive(
   memory: WriteMemory,
   basis: RootBasis,
   grammarRoot: LinkHandle,
   sourceNamespaceProfileRoot: LinkHandle,
   definitionProfileRoot: LinkHandle,
-  bytes: Uint8Array,
-): V015FormalRecursiveCompileResult {
+  sourceAset: LinkHandle,
+): V015FormalSourceAsetRecursiveCompileResult {
   try {
     verifyRootBasis(memory, basis);
   } catch {
     return fail("invalid-basis");
   }
 
-  const source = decodeV015FormalDefinitions(
-    memory,
-    basis,
-    grammarRoot,
-    sourceNamespaceProfileRoot,
-    definitionProfileRoot,
-    bytes,
-  );
   const resolved = materializeV015LinkDefinitions(
     memory,
     basis,
     grammarRoot,
     sourceNamespaceProfileRoot,
     definitionProfileRoot,
-    source.sourceAset,
+    sourceAset,
   );
-
-  if (resolved.definitions.length !== source.definitionSpans.length) {
-    return fail("definition-count-mismatch");
-  }
-
   const definitions = resolved.definitions.map((definition) => {
     const recursiveCarrier = materializeV013HierarchicalCarrierFromSemanticLink(
       memory,
@@ -117,8 +109,45 @@ export function compileV015FormalDefinitionsToRecursive(
   });
 
   return Object.freeze({
-    source,
+    sourceAset,
     resolved,
     definitions: Object.freeze(definitions),
+  });
+}
+
+export function compileV015FormalDefinitionsToRecursive(
+  memory: WriteMemory,
+  basis: RootBasis,
+  grammarRoot: LinkHandle,
+  sourceNamespaceProfileRoot: LinkHandle,
+  definitionProfileRoot: LinkHandle,
+  bytes: Uint8Array,
+): V015FormalRecursiveCompileResult {
+  const source = decodeV015FormalDefinitions(
+    memory,
+    basis,
+    grammarRoot,
+    sourceNamespaceProfileRoot,
+    definitionProfileRoot,
+    bytes,
+  );
+  const compiled = compileV015FormalSourceAsetToRecursive(
+    memory,
+    basis,
+    grammarRoot,
+    sourceNamespaceProfileRoot,
+    definitionProfileRoot,
+    source.sourceAset,
+  );
+
+  if (compiled.resolved.definitions.length !== source.definitionSpans.length) {
+    return fail("definition-count-mismatch");
+  }
+
+  return Object.freeze({
+    source,
+    sourceAset: compiled.sourceAset,
+    resolved: compiled.resolved,
+    definitions: compiled.definitions,
   });
 }
