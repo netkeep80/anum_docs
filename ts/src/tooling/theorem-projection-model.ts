@@ -107,7 +107,7 @@ export interface TheoremProjectionTheorem {
   };
 }
 export interface TheoremProjectionModel {
-  schema: "mts-theorem-projection-model/v0.3";
+  schema: "mts-theorem-projection-model/v0.4";
   mtsVersion: string;
   formalCandidateVersion: string;
   sourceInventory: "theorems/current-v0.14.json";
@@ -465,7 +465,7 @@ export function buildTheoremProjectionModel(
   const theoremIdSet = new Set(theoremIds);
 
   const overlay = object(sources.formalOverlay, "theorems/formal-v0.15.json");
-  if (overlay.schema !== "mts-formal-theorem-overlay/v0.2") {
+  if (overlay.schema !== "mts-formal-theorem-overlay/v0.3") {
     fail("unexpected FORMAL theorem overlay schema");
   }
   if (overlay.baseInventory !== "theorems/current-v0.14.json") {
@@ -495,9 +495,12 @@ export function buildTheoremProjectionModel(
     if (
       proofClosure !== "CLOSED" &&
       proofClosure !== "OPEN_CONDITIONAL" &&
-      proofClosure !== "N_A_FOR_KERNEL_REALIZATION"
+      proofClosure !== "N_A_FOR_KERNEL_REALIZATION" &&
+      proofClosure !== "NO_PROOF_ARTIFACT"
     ) {
-      fail(`${id}.proofClosure must be CLOSED, OPEN_CONDITIONAL or N_A_FOR_KERNEL_REALIZATION`);
+      fail(
+        `${id}.proofClosure must be CLOSED, OPEN_CONDITIONAL, N_A_FOR_KERNEL_REALIZATION or NO_PROOF_ARTIFACT`,
+      );
     }
     const formalStatement = text(entry.formalStatement, `${id}.formalStatement`);
     const formalPremises = strings(entry.formalPremises, `${id}.formalPremises`);
@@ -645,6 +648,24 @@ export function buildTheoremProjectionModel(
       fail(`native assurance evidenceRecord mismatch for ${id}: ${nativeAssurance.evidenceRecord}`);
     }
     if (
+      formalV015.proofClosure === "CLOSED" &&
+      evidence.mtsNative.length === 0
+    ) {
+      fail(`${id}: CLOSED FORMAL proof requires registered mtsNative evidence`);
+    }
+    if (
+      formalV015.proofClosure === "OPEN_CONDITIONAL" &&
+      formalV015.formalPremises.length === 0
+    ) {
+      fail(`${id}: OPEN_CONDITIONAL requires at least one formal premise`);
+    }
+    if (
+      formalV015.nativeClassification === null &&
+      (formalV015.kernelLaw !== null || formalV015.nativeIndependent !== null)
+    ) {
+      fail(`${id}: kernel/native independence metadata requires native classification`);
+    }
+    if (
       formalV015.nativeClassification === "KERNEL_REALIZED_NOT_INDEPENDENT" &&
       formalV015.proofClosure !== "N_A_FOR_KERNEL_REALIZATION"
     ) {
@@ -662,6 +683,24 @@ export function buildTheoremProjectionModel(
       }
       if (formalV015.nativeIndependent !== nativeAssurance.independent) {
         fail(`FORMAL/native independence mismatch for ${id}`);
+      }
+    }
+    if (formalV015.proofClosure === "NO_PROOF_ARTIFACT") {
+      if (nativeAssurance !== null || evidence.mtsNative.length !== 0) {
+        fail(`${id}: NO_PROOF_ARTIFACT conflicts with native proof authority`);
+      }
+      if (
+        formalV015.nativeClassification !== null ||
+        formalV015.kernelLaw !== null ||
+        formalV015.nativeIndependent !== null
+      ) {
+        fail(`${id}: NO_PROOF_ARTIFACT must not carry native classification metadata`);
+      }
+      if (!sameStrings(formalV015.formalPremises, formalPremises)) {
+        fail(`${id}: statement-only FORMAL premises must match accepted theorem boundary`);
+      }
+      if (formalV015.aproverStatus !== "NOT_RECORDED" || evidence.aprover.length !== 0) {
+        fail(`${id}: NO_PROOF_ARTIFACT cannot claim aprover evidence`);
       }
     }
     if (formalV015.proofClosure === "N_A_FOR_KERNEL_REALIZATION") {
@@ -720,7 +759,7 @@ export function buildTheoremProjectionModel(
     });
   });
   return Object.freeze({
-    schema: "mts-theorem-projection-model/v0.3" as const,
+    schema: "mts-theorem-projection-model/v0.4" as const,
     mtsVersion,
     formalCandidateVersion,
     sourceInventory: "theorems/current-v0.14.json" as const,
