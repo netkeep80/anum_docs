@@ -204,6 +204,7 @@ const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/v015-link-definition.ts",
   "ts/src/v015-formal-decoder.ts",
   "ts/src/v015-formal-recursive-compiler.ts",
+  "ts/src/v015-proof-source.ts",
 ]);
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
