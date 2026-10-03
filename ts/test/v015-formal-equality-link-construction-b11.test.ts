@@ -149,7 +149,7 @@ function runGate(
 
 {
   const f=fixture(), r=compile(f);
-  for(const name of ["EQ_R","EQ_O","EQ_C","EQ_L","EQ_U","EQ_PAIR_PAIR"]) {
+  for(const name of ["EQ_R","EQ_O","EQ_C","EQ_L","EQ_U","EQ_PAIR_NAME","EQ_PAIR_PAIR"]) {
     same(value(f,r,name),f.basis.L,`${name} returns exact L`);
   }
   same(value(f,r,"EQ_FALSE"),f.basis.U,"EQ_FALSE returns exact U");
