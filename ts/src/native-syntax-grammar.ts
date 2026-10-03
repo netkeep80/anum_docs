@@ -19,7 +19,6 @@ import {
   type SyntaxAsetTargetClass,
   type SyntaxAsetVocabulary,
 } from "./syntax-aset-contract.js";
-
 export type NativeSyntaxGrammarErrorCode =
   | "invalid-root-basis"
   | "invalid-grammar-envelope"
@@ -30,58 +29,41 @@ export type NativeSyntaxGrammarErrorCode =
   | "invalid-target-class"
   | "invalid-cardinality"
   | "invalid-cardinality-order";
-
 export class NativeSyntaxGrammarError extends Error {
   override readonly name = "NativeSyntaxGrammarError";
-
   constructor(readonly code: NativeSyntaxGrammarErrorCode) {
     super(code);
   }
 }
-
 export interface NativeSyntaxGrammarFieldSpec {
   readonly role: LinkHandle;
   readonly target: SyntaxAsetTargetClass;
   readonly min: number;
   readonly max: number | null;
 }
-
 export interface NativeSyntaxGrammarRuleSpec {
   readonly form: LinkHandle;
   readonly fields: readonly NativeSyntaxGrammarFieldSpec[];
 }
-
 export interface NativeSyntaxGrammarMaterializeOptions {
   readonly syntaxTag: LinkHandle;
-  /**
-   * Caller-owned structural seed used only to derive three local representation
-   * markers carried inside the Grammar header. The seed is not a global kind or
-   * semantic name.
-   */
   readonly markerSeed: LinkHandle;
   readonly rules: readonly NativeSyntaxGrammarRuleSpec[];
 }
-
 export interface NativeSyntaxGrammarRead {
   readonly root: LinkHandle;
   readonly syntaxTag: LinkHandle;
   readonly childTargetMarker: LinkHandle;
   readonly carrierTargetMarker: LinkHandle;
   readonly unboundedMaxMarker: LinkHandle;
-  /**
-   * Derived host read/cache only. The selected Grammar root is authoritative.
-   */
   readonly vocabulary: SyntaxAsetVocabulary;
 }
-
 function fail(code: NativeSyntaxGrammarErrorCode): never {
   throw new NativeSyntaxGrammarError(code);
 }
-
 function validHostCardinality(value: number): boolean {
   return Number.isSafeInteger(value) && value >= 0;
 }
-
 function requireRootBasis(memory: ReadMemory, basis: RootBasis): RootBasis {
   try {
     return verifyRootBasis(memory, basis);
@@ -89,7 +71,6 @@ function requireRootBasis(memory: ReadMemory, basis: RootBasis): RootBasis {
     return fail("invalid-root-basis");
   }
 }
-
 function materializeNat(
   memory: WriteMemory,
   basis: RootBasis,
@@ -102,7 +83,6 @@ function materializeNat(
   }
   return current;
 }
-
 function readNat(
   memory: ReadMemory,
   basis: RootBasis,
@@ -111,7 +91,6 @@ function readNat(
   let current = carrier;
   let value = 0;
   const visited = new Set<LinkHandle>();
-
   try {
     while (current !== basis.U) {
       if (visited.has(current)) fail("invalid-cardinality");
@@ -127,10 +106,8 @@ function readNat(
     if (error instanceof MemoryError) return fail("invalid-cardinality");
     throw error;
   }
-
   return value;
 }
-
 function isNat(
   memory: ReadMemory,
   basis: RootBasis,
@@ -149,7 +126,6 @@ function isNat(
     throw error;
   }
 }
-
 function exactValues(
   memory: ReadMemory,
   carrier: LinkHandle,
@@ -164,7 +140,6 @@ function exactValues(
     throw error;
   }
 }
-
 function validateMaterializeSpec(
   options: NativeSyntaxGrammarMaterializeOptions,
 ): void {
@@ -172,7 +147,6 @@ function validateMaterializeSpec(
   for (const rule of options.rules) {
     if (forms.has(rule.form)) fail("duplicate-form-rule");
     forms.add(rule.form);
-
     const roles = new Set<LinkHandle>();
     for (const field of rule.fields) {
       if (roles.has(field.role)) fail("duplicate-role-rule");
@@ -188,7 +162,6 @@ function validateMaterializeSpec(
     }
   }
 }
-
 export function materializeNativeSyntaxGrammar(
   memory: WriteMemory,
   basis: RootBasis,
@@ -196,16 +169,13 @@ export function materializeNativeSyntaxGrammar(
 ): LinkHandle {
   const verified = requireRootBasis(memory, basis);
   validateMaterializeSpec(options);
-
   if (options.markerSeed === memory.root) {
     return fail("invalid-grammar-header");
   }
-
   const markerScope = memory.ensure(options.markerSeed, options.markerSeed);
   const childTargetMarker = memory.ensureStartSelfClosed(markerScope);
   const carrierTargetMarker = memory.ensureEndSelfClosed(markerScope);
   const unboundedMaxMarker = memory.ensure(markerScope, childTargetMarker);
-
   const headerValues = [
     options.syntaxTag,
     childTargetMarker,
@@ -218,7 +188,6 @@ export function materializeNativeSyntaxGrammar(
   if (isNat(memory, verified, unboundedMaxMarker)) {
     return fail("invalid-grammar-header");
   }
-
   const ruleLinks = options.rules.map((rule) => {
     const fieldRuleLinks = rule.fields.map((field) => {
       const targetMarker =
@@ -240,24 +209,18 @@ export function materializeNativeSyntaxGrammar(
       materializeExactSequence(memory, fieldRuleLinks),
     );
   });
-
   const header = materializeExactSequence(memory, headerValues);
   const rules = materializeExactSequence(memory, ruleLinks);
   const root = memory.ensure(header, rules);
-
-  // The producer is convenience only; the emitted structural Grammar must pass
-  // the same trusted reader that downstream consumers use.
   readNativeSyntaxGrammar(memory, verified, root);
   return root;
 }
-
 export function readNativeSyntaxGrammar(
   memory: ReadMemory,
   basis: RootBasis,
   root: LinkHandle,
 ): NativeSyntaxGrammarRead {
   const verified = requireRootBasis(memory, basis);
-
   let headerCarrier: LinkHandle;
   let ruleSequenceCarrier: LinkHandle;
   try {
@@ -268,14 +231,12 @@ export function readNativeSyntaxGrammar(
     if (error instanceof MemoryError) return fail("invalid-grammar-envelope");
     throw error;
   }
-
   const header = exactValues(
     memory,
     headerCarrier,
     "invalid-grammar-header",
   );
   if (header.length !== 4) fail("invalid-grammar-header");
-
   const syntaxTag = header[0];
   const childTargetMarker = header[1];
   const carrierTargetMarker = header[2];
@@ -292,7 +253,6 @@ export function readNativeSyntaxGrammar(
   if (isNat(memory, verified, unboundedMaxMarker)) {
     return fail("invalid-grammar-header");
   }
-
   const ruleLinks = exactValues(
     memory,
     ruleSequenceCarrier,
@@ -304,7 +264,6 @@ export function readNativeSyntaxGrammar(
   const childRoles: LinkHandle[] = [];
   const childRoleSet = new Set<LinkHandle>();
   const rules: SyntaxAsetKindRule[] = [];
-
   for (const ruleLink of ruleLinks) {
     let form: LinkHandle;
     let fieldSequence: LinkHandle;
@@ -318,11 +277,9 @@ export function readNativeSyntaxGrammar(
     }
     if (forms.has(form)) fail("duplicate-form-rule");
     forms.add(form);
-
     const fieldLinks = exactValues(memory, fieldSequence, "invalid-rule");
     const roleSet = new Set<LinkHandle>();
     const fields: SyntaxAsetFieldRule[] = [];
-
     for (const fieldLink of fieldLinks) {
       let role: LinkHandle;
       let specification: LinkHandle;
@@ -334,14 +291,12 @@ export function readNativeSyntaxGrammar(
         if (error instanceof MemoryError) return fail("invalid-rule");
         throw error;
       }
-
       if (roleSet.has(role)) fail("duplicate-role-rule");
       roleSet.add(role);
       if (!knownRoleSet.has(role)) {
         knownRoleSet.add(role);
         knownRoles.push(role);
       }
-
       const spec = exactValues(memory, specification, "invalid-rule");
       if (spec.length !== 3) fail("invalid-rule");
       const targetMarker = spec[0];
@@ -354,7 +309,6 @@ export function readNativeSyntaxGrammar(
       ) {
         return fail("invalid-rule");
       }
-
       let target: SyntaxAsetTargetClass;
       if (targetMarker === childTargetMarker) {
         target = "child";
@@ -363,7 +317,6 @@ export function readNativeSyntaxGrammar(
       } else {
         return fail("invalid-target-class");
       }
-
       const min = readNat(memory, verified, minCarrier);
       const max =
         maxCarrier === unboundedMaxMarker
@@ -372,27 +325,23 @@ export function readNativeSyntaxGrammar(
       if (max !== null && max < min) {
         return fail("invalid-cardinality-order");
       }
-
       if (target === "child" && !childRoleSet.has(role)) {
         childRoleSet.add(role);
         childRoles.push(role);
       }
       fields.push(Object.freeze({ role, target, min, max }));
     }
-
     rules.push(Object.freeze({
       kind: form,
       fields: Object.freeze(fields),
     }));
   }
-
   const vocabulary: SyntaxAsetVocabulary = Object.freeze({
     tag: syntaxTag,
     knownRoles: Object.freeze(knownRoles),
     rules: Object.freeze(rules),
     childRoles: Object.freeze(childRoles),
   });
-
   return Object.freeze({
     root,
     syntaxTag,
@@ -402,7 +351,6 @@ export function readNativeSyntaxGrammar(
     vocabulary,
   });
 }
-
 export function readSyntaxAsetWithNativeGrammar(
   memory: ReadMemory,
   basis: RootBasis,
