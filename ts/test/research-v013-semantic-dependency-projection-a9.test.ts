@@ -749,6 +749,7 @@ setEqual(
     "ts/src/v015-formal-evaluation.ts#materializeV015EvaluationRequest",
     "ts/src/v015-formal-evaluation.ts#materializeV015RootEvaluationBoundary",
     "ts/src/v015-link-definition.ts#materializeExpression",
+    "ts/src/v015-proof-source.ts#build",
   ],
   "explicit post-v0.13 direct write owner delta is exact",
 );
