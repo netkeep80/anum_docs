@@ -201,6 +201,7 @@ const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/source-namespace.ts",
   "ts/src/v015-formal-evaluation.ts",
   "ts/src/v015-root-bootstrap.ts",
+  "ts/src/v015-link-definition.ts",
 ]);
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
