@@ -1,5 +1,5 @@
 {
-  "schema": "mts-formal-theorem-overlay/v0.2",
+  "schema": "mts-formal-theorem-overlay/v0.3",
   "mtsVersion": "v0.15-candidate",
   "baseInventory": "theorems/current-v0.14.json",
   "authority": "formal-migration-descriptor-only",
@@ -84,6 +84,30 @@
       "nativeClassification": "KERNEL_REALIZED_NOT_INDEPENDENT",
       "kernelLaw": "recursive-link-identity/ordered-pole-grounded-closure",
       "nativeIndependent": false,
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "EXE-02",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalStatement": "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
+      "formalPremises": [],
+      "formalDomain": [
+        "a : Link",
+        "a' : Link",
+        "b : Link",
+        "b' : Link",
+        "x : Link",
+        "y : Link",
+        "c : Link",
+        "d : Link"
+      ],
+      "formalNonPremises": [
+        "FND-13",
+        "Grounded",
+        "Memory handle/object identity"
+      ],
+      "formalSourcePath": "ts/test/v015-exe02-formal-statement-b17.test.ts",
       "aproverStatus": "NOT_RECORDED"
     }
   ]
