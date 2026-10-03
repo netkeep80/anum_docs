@@ -708,18 +708,20 @@ export function buildTheoremProjectionModel(
     ) {
       fail(`${id}: CLOSED FORMAL proof requires registered mtsNative evidence`);
     }
-    const expectedFormalArtifactKind =
-      formalV015.proofClosure === "CLOSED"
-        ? "CLOSED_PROOF"
-        : formalV015.proofClosure === "OPEN_CONDITIONAL"
-          ? "OPEN_PROOF"
-          : formalV015.proofClosure === "N_A_FOR_KERNEL_REALIZATION"
-            ? "KERNEL_REALIZATION"
-            : "STATEMENT_ONLY";
-    if (formalV015.formalArtifactKind !== expectedFormalArtifactKind) {
-      fail(
-        `${id}: formalArtifactKind ${formalV015.formalArtifactKind} is incompatible with proofClosure ${formalV015.proofClosure}`,
-      );
+    if (formalV015.migrationStatus === "FORMAL_MIGRATED") {
+      const expectedFormalArtifactKind =
+        formalV015.proofClosure === "CLOSED"
+          ? "CLOSED_PROOF"
+          : formalV015.proofClosure === "OPEN_CONDITIONAL"
+            ? "OPEN_PROOF"
+            : formalV015.proofClosure === "N_A_FOR_KERNEL_REALIZATION"
+              ? "KERNEL_REALIZATION"
+              : "STATEMENT_ONLY";
+      if (formalV015.formalArtifactKind !== expectedFormalArtifactKind) {
+        fail(
+          `${id}: formalArtifactKind ${formalV015.formalArtifactKind} is incompatible with proofClosure ${formalV015.proofClosure}`,
+        );
+      }
     }
     if (formalV015.nativeClassification !== null) {
       if (nativeAssurance === null) {
