@@ -181,3 +181,11 @@ assertDeepEqual(astralRetry.finish().tokens.map((token) => token.offset), [3, 4]
 const pythonSeparator = parseRawQuaternary("\u001c1");
 assertDeepEqual(pythonSeparator.tokens.map((token) => token.offset), [1], "Python control separator is whitespace");
 expectDecodeError(() => parseRawQuaternary("\ufeff1"), 0);
+
+const largeSingleFeed = new IncrementalQuaternaryDecoder();
+const largeTokenCount = 200_000;
+const largeTokens = largeSingleFeed.feed("1".repeat(largeTokenCount));
+assertSame(largeTokens.length, largeTokenCount, "large single feed token count");
+assertSame(largeSingleFeed.finish().tokens.length, largeTokenCount, "large single feed committed token count");
+assertSame(largeTokens[largeTokenCount - 1]?.offset, largeTokenCount - 1, "large single feed final offset");
+
