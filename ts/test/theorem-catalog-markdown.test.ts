@@ -126,6 +126,29 @@ function main(): void {
     "kernel realization must not be displayed as a fabricated native evidence record",
   );
 
+  const fnd13 = section(first, "FND-13");
+  assert.match(fnd13, /FORMAL_MIGRATED/);
+  assert.match(fnd13, /N_A_FOR_KERNEL_REALIZATION/);
+  assert.match(fnd13, /FND13_STATEMENT : FND13_PREMISES->FND13_RULES/);
+  assert.match(fnd13, /F2F3GroundedNormalization/);
+  assert.match(fnd13, /Grounded:x/);
+  assert.match(fnd13, /Grounded:y/);
+  assert.match(fnd13, /x : Link/);
+  assert.match(fnd13, /y : Link/);
+  assert.match(fnd13, /FND-02/);
+  assert.match(fnd13, /F2F3Normalization/);
+  assert.match(fnd13, /arbitrary non-grounded Link extensionality/);
+  assert.match(fnd13, /KERNEL_REALIZED_NOT_INDEPENDENT/);
+  assert.match(fnd13, /recursive-link-identity\/ordered-pole-grounded-closure/);
+  assert.match(fnd13, /Независимое нативное доказательство:\*\* нет/i);
+  assert.match(fnd13, /NOT_RECORDED/);
+  assert.match(fnd13, /v015-formal-bound-link-role-b12\.test\.ts/);
+  assert.match(
+    fnd13,
+    /зарегистрированных нативных записей доказательств:\s*0/i,
+    "FND-13 kernel realization must not be displayed as fabricated native evidence",
+  );
+
   const tracked = readFileSync(resolve(root, THEOREM_CATALOG_PATH), "utf8");
   assert.equal(tracked, first, "tracked theorem catalog must equal deterministic renderer output");
   assert.equal(

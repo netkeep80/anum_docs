@@ -60,6 +60,31 @@
       "kernelLaw": "recursive-link-identity/full-full-canonical-root-base",
       "nativeIndependent": false,
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-13",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "N_A_FOR_KERNEL_REALIZATION",
+      "formalStatement": "FND13_STATEMENT : FND13_PREMISES->FND13_RULES",
+      "formalPremises": [
+        "F2F3GroundedNormalization",
+        "Grounded:x",
+        "Grounded:y"
+      ],
+      "formalDomain": [
+        "x : Link",
+        "y : Link"
+      ],
+      "formalNonPremises": [
+        "FND-02",
+        "F2F3Normalization",
+        "arbitrary non-grounded Link extensionality"
+      ],
+      "formalSourcePath": "ts/test/v015-formal-bound-link-role-b12.test.ts",
+      "nativeClassification": "KERNEL_REALIZED_NOT_INDEPENDENT",
+      "kernelLaw": "recursive-link-identity/ordered-pole-grounded-closure",
+      "nativeIndependent": false,
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }

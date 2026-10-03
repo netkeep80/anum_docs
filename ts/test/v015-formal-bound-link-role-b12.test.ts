@@ -239,6 +239,7 @@ function formalOverlayEntry(id: string): FormalOverlayEntry {
 }
 
 const fnd02Formal = formalOverlayEntry("FND-02");
+const fnd13Formal = formalOverlayEntry("FND-13");
 
 function boundSource(roleName: string, roleDefinition = "U->L"): string {
   return [
@@ -386,6 +387,186 @@ function inspectInstantiatedStatement(
   same(rootIdentityArgs.length, 2, `${label} identity arity`);
   same(rootIdentityArgs[0], candidate, `${label} identity subject`);
   same(rootIdentityArgs[1], f.basis.R, `${label} identity root`);
+}
+
+function fnd13Source(xRoleName: string, yRoleName: string): string {
+  return [
+    "R : R->R",
+    "O : O->R",
+    "C : R->C",
+    "L : O->C",
+    "U : C->O",
+    `${xRoleName} : U->L`,
+    `${yRoleName} : L->U`,
+    "LINK_DOMAIN_TAG : U->R",
+    "GROUNDED_TAG : C->L",
+    "START_OF_TAG : R->U",
+    "FINISH_OF_TAG : O->C",
+    "LINK_ID_TAG : O->U",
+    "POLE_ID_TAG : C->U",
+    "ORDERED_POLE_ID_TAG : L->R",
+    "F2F3GroundedNormalization : R->C",
+    "INTERP_DICT : L->R",
+    "INTERP_GRAM : C->L",
+    "THEORY : U->C",
+    "CTX_PARENT : L->U",
+    `X_LINK_DOMAIN : LINK_DOMAIN_TAG->${xRoleName}`,
+    `Y_LINK_DOMAIN : LINK_DOMAIN_TAG->${yRoleName}`,
+    `GROUNDED_X_CLAIM : GROUNDED_TAG->${xRoleName}`,
+    `GROUNDED_Y_CLAIM : GROUNDED_TAG->${yRoleName}`,
+    "FND13_PREMISES : [F2F3GroundedNormalization,GROUNDED_X_CLAIM,GROUNDED_Y_CLAIM]",
+    `LINK_ID_ARGS : [${xRoleName},${yRoleName}]`,
+    "LINK_ID_CLAIM : LINK_ID_TAG->LINK_ID_ARGS",
+    `START_X : START_OF_TAG->${xRoleName}`,
+    `START_Y : START_OF_TAG->${yRoleName}`,
+    "START_POLE_ID_ARGS : [START_X,START_Y]",
+    "START_POLE_ID_CLAIM : POLE_ID_TAG->START_POLE_ID_ARGS",
+    `FINISH_X : FINISH_OF_TAG->${xRoleName}`,
+    `FINISH_Y : FINISH_OF_TAG->${yRoleName}`,
+    "FINISH_POLE_ID_ARGS : [FINISH_X,FINISH_Y]",
+    "FINISH_POLE_ID_CLAIM : POLE_ID_TAG->FINISH_POLE_ID_ARGS",
+    "ORDERED_POLE_ID_ARGS : [START_POLE_ID_CLAIM,FINISH_POLE_ID_CLAIM]",
+    "ORDERED_POLE_ID_CLAIM : ORDERED_POLE_ID_TAG->ORDERED_POLE_ID_ARGS",
+    "FND13_FORWARD : LINK_ID_CLAIM->ORDERED_POLE_ID_CLAIM",
+    "FND13_REVERSE : ORDERED_POLE_ID_CLAIM->LINK_ID_CLAIM",
+    "FND13_RULES : [FND13_FORWARD,FND13_REVERSE]",
+    fnd13Formal.formalStatement,
+    "KERNEL_REALIZATION_TAG13 : R->O",
+    `KERNEL_REALIZATION_ARGS13 : [FND13_STATEMENT,${xRoleName},${yRoleName}]`,
+    "KERNEL_REALIZATION_BOUNDARY13 : KERNEL_REALIZATION_TAG13->KERNEL_REALIZATION_ARGS13",
+    `BOUND_ROLES13 : [${xRoleName},${yRoleName}]`,
+    "A13 : R->L",
+    "B13 : L->C",
+    "C13 : C->R",
+    "D13 : O->L",
+  ].join("\n");
+}
+
+function fnd13FreeSameSpellingSource(): string {
+  return [
+    "R : R->R",
+    "O : O->R",
+    "C : R->C",
+    "L : O->C",
+    "U : C->O",
+    "X : R->U",
+    "Y : C->R",
+    "FREE13_TAG : U->R",
+    "FREE13_ARGS : [X,Y]",
+    "FREE13_CLAIM : FREE13_TAG->FREE13_ARGS",
+  ].join("\n");
+}
+
+function expectedFnd13Statement(
+  f: Fixture,
+  result: V015FormalRecursiveCompileResult,
+  x: LinkHandle,
+  y: LinkHandle,
+): LinkHandle {
+  const groundedX = f.memory.ensure(value(f, result, "GROUNDED_TAG"), x);
+  const groundedY = f.memory.ensure(value(f, result, "GROUNDED_TAG"), y);
+  const premises = materializeExactSequence(f.memory, [
+    value(f, result, "F2F3GroundedNormalization"),
+    groundedX,
+    groundedY,
+  ]);
+
+  const linkIdArgs = materializeExactSequence(f.memory, [x, y]);
+  const linkId = f.memory.ensure(value(f, result, "LINK_ID_TAG"), linkIdArgs);
+
+  const startX = f.memory.ensure(value(f, result, "START_OF_TAG"), x);
+  const startY = f.memory.ensure(value(f, result, "START_OF_TAG"), y);
+  const startArgs = materializeExactSequence(f.memory, [startX, startY]);
+  const startId = f.memory.ensure(value(f, result, "POLE_ID_TAG"), startArgs);
+
+  const finishX = f.memory.ensure(value(f, result, "FINISH_OF_TAG"), x);
+  const finishY = f.memory.ensure(value(f, result, "FINISH_OF_TAG"), y);
+  const finishArgs = materializeExactSequence(f.memory, [finishX, finishY]);
+  const finishId = f.memory.ensure(value(f, result, "POLE_ID_TAG"), finishArgs);
+
+  const orderedArgs = materializeExactSequence(f.memory, [startId, finishId]);
+  const ordered = f.memory.ensure(value(f, result, "ORDERED_POLE_ID_TAG"), orderedArgs);
+  const forward = f.memory.ensure(linkId, ordered);
+  const reverse = f.memory.ensure(ordered, linkId);
+  const rules = materializeExactSequence(f.memory, [forward, reverse]);
+  return f.memory.ensure(premises, rules);
+}
+
+function inspectFnd13Statement(
+  f: Fixture,
+  result: V015FormalRecursiveCompileResult,
+  statement: LinkHandle,
+  x: LinkHandle,
+  y: LinkHandle,
+  label: string,
+): void {
+  const theorem = f.memory.poles(statement);
+  const premises = readExactSequence(f.memory, theorem.start).values;
+  same(premises.length, 3, `${label} three exact FND-13 premises`);
+  same(
+    premises[0],
+    value(f, result, "F2F3GroundedNormalization"),
+    `${label} grounded normalization premise`,
+  );
+  same(
+    premises[1],
+    f.memory.ensure(value(f, result, "GROUNDED_TAG"), x),
+    `${label} Grounded:x premise`,
+  );
+  same(
+    premises[2],
+    f.memory.ensure(value(f, result, "GROUNDED_TAG"), y),
+    `${label} Grounded:y premise`,
+  );
+
+  const rules = readExactSequence(f.memory, theorem.end).values;
+  same(rules.length, 2, `${label} biconditional direction count`);
+  const forward = f.memory.poles(rules[0]!);
+  const reverse = f.memory.poles(rules[1]!);
+  same(forward.start, reverse.end, `${label} shared Link-identity claim`);
+  same(forward.end, reverse.start, `${label} shared ordered-pole claim`);
+
+  const linkId = f.memory.poles(forward.start);
+  same(linkId.start, value(f, result, "LINK_ID_TAG"), `${label} Link-identity tag`);
+  const linkArgs = readExactSequence(f.memory, linkId.end).values;
+  same(linkArgs.length, 2, `${label} Link-identity arity`);
+  same(linkArgs[0], x, `${label} Link-identity x`);
+  same(linkArgs[1], y, `${label} Link-identity y`);
+
+  const ordered = f.memory.poles(forward.end);
+  same(
+    ordered.start,
+    value(f, result, "ORDERED_POLE_ID_TAG"),
+    `${label} ordered-pole identity tag`,
+  );
+  const poleClaims = readExactSequence(f.memory, ordered.end).values;
+  same(poleClaims.length, 2, `${label} ordered start/finish claim count`);
+
+  for (const [poleLabel, claim, projectionTag] of [
+    ["start", poleClaims[0]!, value(f, result, "START_OF_TAG")],
+    ["finish", poleClaims[1]!, value(f, result, "FINISH_OF_TAG")],
+  ] as const) {
+    const poleId = f.memory.poles(claim);
+    same(poleId.start, value(f, result, "POLE_ID_TAG"), `${label} ${poleLabel} identity tag`);
+    const poleArgs = readExactSequence(f.memory, poleId.end).values;
+    same(poleArgs.length, 2, `${label} ${poleLabel} identity arity`);
+    const leftProjection = f.memory.poles(poleArgs[0]!);
+    const rightProjection = f.memory.poles(poleArgs[1]!);
+    same(leftProjection.start, projectionTag, `${label} ${poleLabel} left projection tag`);
+    same(leftProjection.end, x, `${label} ${poleLabel} left subject`);
+    same(rightProjection.start, projectionTag, `${label} ${poleLabel} right projection tag`);
+    same(rightProjection.end, y, `${label} ${poleLabel} right subject`);
+  }
+}
+
+function identityProof(
+  memory: Memory,
+  left: LinkHandle,
+  right: LinkHandle,
+  children: readonly LinkHandle[],
+): LinkHandle {
+  const claim = memory.ensure(left, right);
+  return memory.ensure(claim, materializeExactSequence(memory, children));
 }
 
 {
@@ -634,6 +815,276 @@ function inspectInstantiatedStatement(
   );
 }
 
+{
+  same(fnd13Formal.migrationStatus, "FORMAL_MIGRATED", "FND-13 migration status");
+  same(fnd13Formal.proofClosure, "N_A_FOR_KERNEL_REALIZATION", "FND-13 closure boundary");
+  same(
+    fnd13Formal.formalStatement,
+    "FND13_STATEMENT : FND13_PREMISES->FND13_RULES",
+    "FND-13 canonical FORMAL statement",
+  );
+  same(fnd13Formal.formalPremises.length, 3, "FND-13 exact premise count");
+  same(fnd13Formal.formalPremises[0], "F2F3GroundedNormalization", "FND-13 grounded normalization");
+  same(fnd13Formal.formalPremises[1], "Grounded:x", "FND-13 Grounded:x");
+  same(fnd13Formal.formalPremises[2], "Grounded:y", "FND-13 Grounded:y");
+  same(fnd13Formal.formalDomain?.length, 2, "FND-13 bound Link domain arity");
+  same(fnd13Formal.formalDomain?.[0], "x : Link", "FND-13 x domain");
+  same(fnd13Formal.formalDomain?.[1], "y : Link", "FND-13 y domain");
+  assert(fnd13Formal.formalNonPremises?.includes("FND-02"), "FND-02 explicitly non-premise");
+  assert(fnd13Formal.formalNonPremises?.includes("F2F3Normalization"), "global normalization explicitly non-premise");
+  assert(
+    fnd13Formal.formalNonPremises?.includes("arbitrary non-grounded Link extensionality"),
+    "arbitrary non-grounded extensionality explicitly excluded",
+  );
+  same(fnd13Formal.nativeClassification, "KERNEL_REALIZED_NOT_INDEPENDENT", "FND-13 native classification");
+  same(fnd13Formal.kernelLaw, "recursive-link-identity/ordered-pole-grounded-closure", "FND-13 kernel law");
+  same(fnd13Formal.nativeIndependent, false, "FND-13 native realization is not independent");
+  same(fnd13Formal.aproverStatus, "NOT_RECORDED", "FND-13 aprover boundary");
+
+  const f = fixture();
+  const source = fnd13Source("X", "Y");
+  assert(!source.includes("="), "B16 theorem source must not use eager runtime equality");
+  assert(!source.includes("FND-02"), "B16 theorem source must not depend on FND-02");
+  assert(!source.includes("F2F3Normalization"), "B16 theorem source must not widen to global normalization");
+
+  const result = compile(f, source);
+  const xRole = value(f, result, "X");
+  const yRole = value(f, result, "Y");
+  assert(xRole !== yRole, "FND-13 binds two distinct role Links");
+
+  for (const [domainName, role, label] of [
+    ["X_LINK_DOMAIN", xRole, "x"],
+    ["Y_LINK_DOMAIN", yRole, "y"],
+  ] as const) {
+    const domain = f.memory.poles(value(f, result, domainName));
+    same(domain.start, value(f, result, "LINK_DOMAIN_TAG"), `${label} Link-domain tag`);
+    same(domain.end, role, `${label} Link-domain exact role identity`);
+  }
+
+  const roleValues = readExactSequence(f.memory, value(f, result, "BOUND_ROLES13")).values;
+  same(roleValues.length, 2, "FND-13 role dictionary arity");
+  same(roleValues[0], xRole, "FND-13 first role is x");
+  same(roleValues[1], yRole, "FND-13 second role is y");
+  const roleDictionary = defineStructuralRoleDictionary(f.memory, roleValues);
+  const dictionary = readStructuralRoleDictionary(f.memory, roleDictionary);
+  same(dictionary.roles.length, 2, "generic RoleDictionary carries two roles");
+
+  const template = value(f, result, "FND13_STATEMENT");
+  const kernelBoundary = f.memory.poles(value(f, result, "KERNEL_REALIZATION_BOUNDARY13"));
+  same(
+    kernelBoundary.start,
+    value(f, result, "KERNEL_REALIZATION_TAG13"),
+    "FND-13 kernel boundary tag",
+  );
+  const kernelArgs = readExactSequence(f.memory, kernelBoundary.end).values;
+  same(kernelArgs.length, 3, "FND-13 kernel boundary arity");
+  same(kernelArgs[0], template, "FND-13 kernel boundary references exact statement");
+  same(kernelArgs[1], xRole, "FND-13 kernel boundary references x role");
+  same(kernelArgs[2], yRole, "FND-13 kernel boundary references y role");
+
+  const rootProof = identityProof(f.memory, f.basis.R, f.basis.R, []);
+  const oProof = identityProof(f.memory, f.basis.O, f.basis.O, [rootProof]);
+  const cProof = identityProof(f.memory, f.basis.C, f.basis.C, [rootProof]);
+  const lProof = identityProof(f.memory, f.basis.L, f.basis.L, [oProof, cProof]);
+  const kernelBefore = f.memory.linkCount;
+  const kernelReplay = replayRecursiveLinkIdentityProofAset(f.memory, lProof);
+  same(kernelReplay.left, f.basis.L, "finite Grounded ordered-pole kernel left");
+  same(kernelReplay.right, f.basis.L, "finite Grounded ordered-pole kernel right");
+  same(f.memory.linkCount, kernelBefore, "FND-13 kernel replay remains read-only");
+
+  const wrongChildProof = identityProof(f.memory, f.basis.L, f.basis.L, [cProof, oProof]);
+  const wrongChildBefore = f.memory.linkCount;
+  expectKernelError(
+    "child-claim-mismatch",
+    () => replayRecursiveLinkIdentityProofAset(f.memory, wrongChildProof),
+    "ordered pole child mismatch",
+  );
+  same(f.memory.linkCount, wrongChildBefore, "failed ordered-pole replay remains read-only");
+
+  const synthetic = (): LinkHandle => Object.freeze({}) as unknown as LinkHandle;
+  const sr = synthetic();
+  const aCycle = synthetic();
+  const bCycle = synthetic();
+  const claimAA = synthetic();
+  const claimBB = synthetic();
+  const pCycle = synthetic();
+  const qCycle = synthetic();
+  const seqQ = synthetic();
+  const payloadQ = synthetic();
+  const seqP = synthetic();
+  const payloadP = synthetic();
+  const cyclicMemory = new SyntheticReadMemory(sr, new Map<LinkHandle, LinkPoles>([
+    [sr, Object.freeze({ start: sr, end: sr })],
+    [aCycle, Object.freeze({ start: aCycle, end: bCycle })],
+    [bCycle, Object.freeze({ start: bCycle, end: aCycle })],
+    [claimAA, Object.freeze({ start: aCycle, end: aCycle })],
+    [claimBB, Object.freeze({ start: bCycle, end: bCycle })],
+    [payloadQ, Object.freeze({ start: sr, end: qCycle })],
+    [seqQ, Object.freeze({ start: seqQ, end: payloadQ })],
+    [payloadP, Object.freeze({ start: sr, end: pCycle })],
+    [seqP, Object.freeze({ start: seqP, end: payloadP })],
+    [pCycle, Object.freeze({ start: claimAA, end: seqQ })],
+    [qCycle, Object.freeze({ start: claimBB, end: seqP })],
+  ]));
+  const cycleBefore = cyclicMemory.linkCount;
+  expectKernelError(
+    "cyclic-grounding",
+    () => replayRecursiveLinkIdentityProofAset(cyclicMemory, pCycle),
+    "rootless cyclic grounding",
+  );
+  same(cyclicMemory.linkCount, cycleBefore, "cyclic rejection remains read-only");
+
+  const a = value(f, result, "A13");
+  const b = value(f, result, "B13");
+  const c = value(f, result, "C13");
+  const d = value(f, result, "D13");
+  assert(
+    new Set([a, b, c, d, xRole, yRole]).size === 6,
+    "FND-13 concrete values and roles are distinct",
+  );
+
+  const abStatement = instantiateV013StructuralTemplate(
+    f.memory,
+    template,
+    [{ role: xRole, value: a }, { role: yRole, value: b }],
+  );
+  const cdStatement = instantiateV013StructuralTemplate(
+    f.memory,
+    template,
+    [{ role: xRole, value: c }, { role: yRole, value: d }],
+  );
+  same(abStatement, expectedFnd13Statement(f, result, a, b), "FND-13 A/B exact statement");
+  same(cdStatement, expectedFnd13Statement(f, result, c, d), "FND-13 C/D exact statement");
+  assert(abStatement !== cdStatement, "two-role substitutions change the theorem instance");
+  inspectFnd13Statement(f, result, abStatement, a, b, "A/B");
+  inspectFnd13Statement(f, result, cdStatement, c, d, "C/D");
+
+  const expectedInterpreter: StructuralInterpreter = Object.freeze({
+    dictionary: value(f, result, "INTERP_DICT"),
+    grammar: value(f, result, "INTERP_GRAM"),
+    theory: value(f, result, "THEORY"),
+  });
+  const interpreter = defineStructuralInterpreter(
+    f.memory,
+    expectedInterpreter.dictionary,
+    expectedInterpreter.grammar,
+    expectedInterpreter.theory,
+  );
+  const rule = defineStructuralRule(f.memory, roleDictionary, template);
+  const admission = admitStructuralRule(f.memory, expectedInterpreter.theory, rule);
+  const afterContext = defineContext(f.memory, value(f, result, "CTX_PARENT"), a);
+  const act = defineActHeader(f.memory, interpreter, roleDictionary, afterContext);
+  defineActField(f.memory, act, xRole, a);
+  defineActField(f.memory, act, yRole, b);
+  const replay = replayStructuralRule(f.memory, {
+    act,
+    rule,
+    ruleAdmission: admission,
+    claimedBody: abStatement,
+    expectedInterpreter,
+    expectedAfterContext: afterContext,
+  });
+  same(replay.bindings.length, 2, "FND-13 two exact structural bindings");
+  same(replay.bindings[0]?.role, xRole, "FND-13 first binding role");
+  same(replay.bindings[0]?.value, a, "FND-13 first binding value");
+  same(replay.bindings[1]?.role, yRole, "FND-13 second binding role");
+  same(replay.bindings[1]?.value, b, "FND-13 second binding value");
+
+  // Act headers are canonical Links. Give each negative case its own
+  // after-Context so a previously attached field cannot be inherited by
+  // reusing the same semantic Act header.
+  const missingAfterContext = defineContext(
+    f.memory,
+    value(f, result, "CTX_PARENT"),
+    c,
+  );
+  const missing = defineActHeader(
+    f.memory,
+    interpreter,
+    roleDictionary,
+    missingAfterContext,
+  );
+  defineActField(f.memory, missing, xRole, a);
+  expectRuleError(
+    "missing-role-binding",
+    () => replayStructuralRule(f.memory, {
+      act: missing,
+      rule,
+      ruleAdmission: admission,
+      claimedBody: abStatement,
+      expectedInterpreter,
+      expectedAfterContext: missingAfterContext,
+    }),
+    "FND-13 missing y binding",
+  );
+
+  const duplicateAfterContext = defineContext(
+    f.memory,
+    value(f, result, "CTX_PARENT"),
+    d,
+  );
+  const duplicate = defineActHeader(
+    f.memory,
+    interpreter,
+    roleDictionary,
+    duplicateAfterContext,
+  );
+  defineActField(f.memory, duplicate, xRole, a);
+  defineActField(f.memory, duplicate, xRole, c);
+  defineActField(f.memory, duplicate, yRole, b);
+  expectRuleError(
+    "multiple-role-bindings",
+    () => replayStructuralRule(f.memory, {
+      act: duplicate,
+      rule,
+      ruleAdmission: admission,
+      claimedBody: abStatement,
+      expectedInterpreter,
+      expectedAfterContext: duplicateAfterContext,
+    }),
+    "FND-13 duplicate x binding",
+  );
+
+  const json = encodeV015FormalSourceAsetJson(
+    f.memory,
+    f.basis,
+    f.grammarRoot,
+    f.namespaceProfileRoot,
+    f.definitionProfileRoot,
+    result.source.sourceAset,
+  );
+  const round = decodeV015FormalSourceAsetJson(
+    f.memory,
+    f.basis,
+    f.grammarRoot,
+    f.namespaceProfileRoot,
+    f.definitionProfileRoot,
+    json,
+  );
+  same(round.sourceAset, result.source.sourceAset, "FND-13 J1 exact source-Aset round-trip");
+
+  const alpha = compile(f, fnd13Source("P", "Q"));
+  same(value(f, alpha, "P"), xRole, "FND-13 alpha-renamed x role identity");
+  same(value(f, alpha, "Q"), yRole, "FND-13 alpha-renamed y role identity");
+  same(
+    value(f, alpha, "FND13_STATEMENT"),
+    template,
+    "FND-13 alpha rename preserves statement topology",
+  );
+
+  const free = compile(f, fnd13FreeSameSpellingSource());
+  const freeX = value(f, free, "X");
+  const freeY = value(f, free, "Y");
+  assert(freeX !== xRole && freeY !== yRole, "FND-13 same spelling resolves distinct free Links");
+  const freeClaim = value(f, free, "FREE13_CLAIM");
+  const untouchedFree = instantiateV013StructuralTemplate(
+    f.memory,
+    freeClaim,
+    [{ role: xRole, value: a }, { role: yRole, value: b }],
+  );
+  same(untouchedFree, freeClaim, "FND-13 same-spelling free Links are not captured");
+}
+
 console.log([
   "MTS v0.15 B12 bound Link role:",
   "BOUNDNESS=CONTEXTUAL_ROLE_DICTIONARY",
@@ -658,4 +1109,14 @@ console.log([
   "ALPHA_RENAME=SEMANTICALLY_STABLE",
   "SAME_SPELLING_FREE_CAPTURE=REJECTED_BY_IDENTITY",
   "UNIVERSAL_PROOF=NOT_CLAIMED",
+  "FND13_BOUNDARY=GROUNDED_ORDERED_POLE_IDENTITY",
+  "FND13_BOUND_ROLES=2",
+  "FND13_PREMISES=F2F3_GROUNDED_NORMALIZATION+GROUNDED_X+GROUNDED_Y",
+  "FND13_FND02_DEPENDENCY=0",
+  "FND13_GLOBAL_NORMALIZATION=0",
+  "FND13_KERNEL_CLASSIFICATION=KERNEL_REALIZED_NOT_INDEPENDENT",
+  "FND13_FINITE_GROUNDED=ACCEPT",
+  "FND13_ORDERED_POLE_MISMATCH=REJECT",
+  "FND13_ROOTLESS_CYCLE=REJECT",
+  "FND13_REPLAY_READ_ONLY=GREEN",
 ].join(" "));
