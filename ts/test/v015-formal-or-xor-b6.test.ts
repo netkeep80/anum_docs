@@ -377,16 +377,22 @@ function runWordBinary(
   for (let bit = 0; bit < 32; bit += 1) {
     const av = ((a >>> bit) & 1) === 1 ? f.basis.L : f.basis.U;
     const bv = ((b >>> bit) & 1) === 1 ? f.basis.L : f.basis.U;
-    const out = runGate(f, r, fn, [av, bv], f.basis.U, `${label}/bit${bit}`);
-    void out;
-    // Read the actual truth table by operation, exactly matching pinned GateSet.
     const one =
       fn === r.AND
         ? av === f.basis.L && bv === f.basis.L
         : fn === r.OR
           ? av === f.basis.L || bv === f.basis.L
           : av !== bv;
-    if (one) result = (result | (1 << bit)) >>> 0;
+    const expected = one ? f.basis.L : f.basis.U;
+    const out = runGate(
+      f,
+      r,
+      fn,
+      [av, bv],
+      expected,
+      `${label}/bit${bit}`,
+    );
+    if (out === f.basis.L) result = (result | (1 << bit)) >>> 0;
   }
   return result >>> 0;
 }
@@ -527,7 +533,9 @@ function expectedBinary(
 }
 
 {
-  // Pinned retained amemory scenario vectors.
+  // Pinned retained amemory scenario vectors. These are executed bit-by-bit
+  // through the structural gate Rules above; host bitwise operators are only
+  // an independent sanity check, never the execution oracle.
   const binaryVectors = [
     ["AND", 0x00000000, 0xffffffff, 0x00000000],
     ["AND", 0xaaaaaaaa, 0x55555555, 0x00000000],
@@ -543,16 +551,27 @@ function expectedBinary(
     ["XOR", 0x00000000, 0xffffffff, 0xffffffff],
   ] as const;
 
+  const f = fixture();
+  const r = runtime(f);
+
   for (const [name, a, b, expected] of binaryVectors) {
+    const fn = name === "AND" ? r.AND : name === "OR" ? r.OR : r.XOR;
+    const actual = runWordBinary(
+      f,
+      r,
+      fn,
+      a,
+      b,
+      `pinned amemory ${name}32`,
+    );
+    same(actual, expected >>> 0, `pinned amemory ${name}32 manifest vector`);
     same(
       expectedBinary(name, a, b),
       expected >>> 0,
-      `pinned amemory ${name}32 manifest vector`,
+      `host sanity ${name}32 vector`,
     );
   }
 
-  const f = fixture();
-  const r = runtime(f);
   same(
     runWordNot(f, r, 0x00000000, "NOT32 zero"),
     0xffffffff,
