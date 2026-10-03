@@ -648,12 +648,6 @@ export function buildTheoremProjectionModel(
       fail(`native assurance evidenceRecord mismatch for ${id}: ${nativeAssurance.evidenceRecord}`);
     }
     if (
-      formalV015.proofClosure === "CLOSED" &&
-      evidence.mtsNative.length === 0
-    ) {
-      fail(`${id}: CLOSED FORMAL proof requires registered mtsNative evidence`);
-    }
-    if (
       formalV015.proofClosure === "OPEN_CONDITIONAL" &&
       formalV015.formalPremises.length === 0
     ) {
@@ -670,6 +664,12 @@ export function buildTheoremProjectionModel(
       formalV015.proofClosure !== "N_A_FOR_KERNEL_REALIZATION"
     ) {
       fail(`${id}: KERNEL_REALIZED_NOT_INDEPENDENT cannot be represented as ${formalV015.proofClosure}`);
+    }
+    if (
+      formalV015.proofClosure === "CLOSED" &&
+      evidence.mtsNative.length === 0
+    ) {
+      fail(`${id}: CLOSED FORMAL proof requires registered mtsNative evidence`);
     }
     if (formalV015.nativeClassification !== null) {
       if (nativeAssurance === null) {
