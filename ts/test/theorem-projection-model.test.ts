@@ -39,7 +39,7 @@ function main(): void {
     JSON.stringify(first),
     "projection model must be byte-deterministic under repeated load",
   );
-  assert.equal(first.schema, "mts-theorem-projection-model/v0.2");
+  assert.equal(first.schema, "mts-theorem-projection-model/v0.3");
   assert.equal(first.mtsVersion, "v0.14");
   assert.equal(first.sourceInventory, "theorems/current-v0.14.json");
   assert.equal(first.formalOverlay, "theorems/formal-v0.15.json");
@@ -141,6 +141,28 @@ function main(): void {
     "KERNEL_REALIZED_NOT_INDEPENDENT",
   );
   assert.equal(fnd02.nativeAssurance?.independent, false);
+  assert.equal(fnd02.formalV015.migrationStatus, "FORMAL_MIGRATED");
+  assert.equal(fnd02.formalV015.proofClosure, "N_A_FOR_KERNEL_REALIZATION");
+  assert.equal(
+    fnd02.formalV015.formalStatement,
+    "FND02_STATEMENT : FND02_PREMISES->FND02_RULE",
+  );
+  assert.deepEqual(fnd02.formalV015.formalPremises, ["A1RecursiveSeparation"]);
+  assert.deepEqual(fnd02.formalV015.formalDomain, ["X : Link"]);
+  assert.deepEqual(
+    fnd02.formalV015.formalNonPremises,
+    ["Grounded(X)", "F2/F3 normalization", "FND-13"],
+  );
+  assert.equal(
+    fnd02.formalV015.nativeClassification,
+    "KERNEL_REALIZED_NOT_INDEPENDENT",
+  );
+  assert.equal(
+    fnd02.formalV015.kernelLaw,
+    "recursive-link-identity/full-full-canonical-root-base",
+  );
+  assert.equal(fnd02.formalV015.nativeIndependent, false);
+  assert.equal(fnd02.formalV015.aproverStatus, "NOT_RECORDED");
   assert.equal(
     fnd02.evidence.mtsNative.length,
     0,
@@ -156,6 +178,76 @@ function main(): void {
   assert.equal(fnd01.formalV015.migrationStatus, "NOT_MIGRATED");
   assert.equal(fnd01.formalV015.formalStatement, null);
   assert.deepEqual(fnd01.formalV015.formalPremises, []);
+  assert.deepEqual(fnd01.formalV015.formalDomain, []);
+  assert.deepEqual(fnd01.formalV015.formalNonPremises, []);
+  assert.equal(fnd01.formalV015.nativeClassification, null);
+  assert.equal(fnd01.formalV015.kernelLaw, null);
+  assert.equal(fnd01.formalV015.nativeIndependent, null);
+
+  const fnd02OverlayIndex = sources.formalOverlay.entries.findIndex(
+    (entry: any) => entry.id === "FND-02",
+  );
+  assert.notEqual(fnd02OverlayIndex, -1);
+
+  const badKernelClassification = clone(sources);
+  badKernelClassification.formalOverlay.entries[fnd02OverlayIndex].nativeClassification =
+    "DERIVED_CLOSED_PROOF_ANET";
+  expectReject(
+    () => buildTheoremProjectionModel(badKernelClassification),
+    /FORMAL\/native classification mismatch.*FND-02/i,
+    "kernel classification mismatch",
+  );
+
+  const badKernelLaw = clone(sources);
+  badKernelLaw.formalOverlay.entries[fnd02OverlayIndex].kernelLaw = "forged/kernel-law";
+  expectReject(
+    () => buildTheoremProjectionModel(badKernelLaw),
+    /FORMAL\/native kernel law mismatch.*FND-02/i,
+    "kernel law mismatch",
+  );
+
+  const badKernelIndependence = clone(sources);
+  badKernelIndependence.formalOverlay.entries[fnd02OverlayIndex].nativeIndependent = true;
+  expectReject(
+    () => buildTheoremProjectionModel(badKernelIndependence),
+    /FORMAL\/native independence mismatch.*FND-02/i,
+    "kernel independence mismatch",
+  );
+
+  const falseClosedKernel = clone(sources);
+  falseClosedKernel.formalOverlay.entries[fnd02OverlayIndex].proofClosure = "CLOSED";
+  expectReject(
+    () => buildTheoremProjectionModel(falseClosedKernel),
+    /KERNEL_REALIZED_NOT_INDEPENDENT cannot be represented as CLOSED/i,
+    "kernel realization cannot become CLOSED",
+  );
+
+  for (const forbiddenPremise of ["Grounded(X)", "F2/F3 normalization", "FND-13"]) {
+    const badPremise = clone(sources);
+    badPremise.formalOverlay.entries[fnd02OverlayIndex].formalPremises.push(forbiddenPremise);
+    expectReject(
+      () => buildTheoremProjectionModel(badPremise),
+      /kernel-realized FORMAL premises must match accepted theorem boundary/i,
+      `forbidden FND-02 premise ${forbiddenPremise}`,
+    );
+  }
+
+  const missingA1 = clone(sources);
+  missingA1.formalOverlay.entries[fnd02OverlayIndex].formalPremises = [];
+  expectReject(
+    () => buildTheoremProjectionModel(missingA1),
+    /kernel-realized FORMAL premises must match accepted theorem boundary/i,
+    "missing FND-02 A1 premise",
+  );
+
+  const forgedAproverAccept = clone(sources);
+  forgedAproverAccept.formalOverlay.entries[fnd02OverlayIndex].aproverStatus = "ACCEPT";
+  expectReject(
+    () => buildTheoremProjectionModel(forgedAproverAccept),
+    /aprover ACCEPT requires registered aprover evidence/i,
+    "aprover ACCEPT without evidence",
+  );
+
   for (const theorem of first.theorems) {
     for (const lane of ["typescript", "lean4", "coq", "mtsNative", "aprover"] as const) {
       for (const evidence of theorem.evidence[lane]) {

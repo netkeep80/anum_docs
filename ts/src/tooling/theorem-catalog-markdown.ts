@@ -161,6 +161,29 @@ function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
     "~~~",
     "- **FORMAL-предпосылки исходного доказательства:**",
     ...list(formal.formalPremises).map((line) => `  ${line}`),
+    ...(formal.formalDomain.length === 0
+      ? []
+      : [
+          "- **FORMAL-область связывания:**",
+          ...list(formal.formalDomain).map((line) => `  ${line}`),
+        ]),
+    ...(formal.formalNonPremises.length === 0
+      ? []
+      : [
+          "- **Не являются внешними FORMAL-предпосылками:**",
+          ...list(formal.formalNonPremises).map((line) => `  ${line}`),
+        ]),
+    ...(formal.nativeClassification === null
+      ? []
+      : [
+          `- **Нативная классификация, сверенная с реестром подтверждений:** ${inlineCode(formal.nativeClassification)}.`,
+          ...(formal.kernelLaw === null
+            ? []
+            : [`- **Доверенный закон ядра:** ${inlineCode(formal.kernelLaw)}.`]),
+          ...(formal.nativeIndependent === null
+            ? []
+            : [`- **Независимое нативное доказательство:** ${formal.nativeIndependent ? "да" : "нет"}.`]),
+        ]),
     ...(formal.formalSourcePath === null
       ? []
       : [`- **Источник FORMAL:** ${repositoryLink(formal.formalSourcePath)}.`]),

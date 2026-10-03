@@ -78,7 +78,7 @@ async function main(): Promise<void> {
 
   assert.equal(
     THEOREM_CATALOG_INTEGRATION_CONTRACT.schema,
-    "mts-theorem-catalog-integration/v0.2",
+    "mts-theorem-catalog-integration/v0.3",
   );
   assert.deepEqual(
     THEOREM_CATALOG_INTEGRATION_CONTRACT.fixedSources,
@@ -186,7 +186,7 @@ async function main(): Promise<void> {
     ownership: "generated",
   });
   assert.deepEqual(declaration.generator, {
-    contract_id: "mts.theorem-catalog/v0.2",
+    contract_id: "mts.theorem-catalog/v0.3",
   });
   assert.deepEqual(
     declaration.required_evidence,
