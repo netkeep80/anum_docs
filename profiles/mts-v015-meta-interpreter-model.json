@@ -147,6 +147,14 @@
       "evidence": [
         "ts/test/v015-structural-aset-one-command-a9.test.ts"
       ]
+    },
+    {
+      "id": "MI-B14",
+      "status": "PROVED_RESEARCH",
+      "statement": "A fixed finite exact-identity Theory has finite antecedent support: arbitrarily fresh structured Links outside that support remain NO_MATCH regardless of internal poles. Enumerating N observed fresh identities requires N exact admissions and the next fresh N+1 escapes again, while one generic structural rule covers the tested fresh family with constant rule count.",
+      "evidence": [
+        "ts/test/v015-exact-finite-support-necessity-a10.test.ts"
+      ]
     }
   ],
   "targetOrganization": {
@@ -312,7 +320,7 @@
       "id": "MI-D05",
       "question": "Can meta-grounding become fully self-hosted without hidden host structural matcher/constructor semantics?",
       "status": "OPEN",
-      "currentEvidence": "A9 proves a structural-unary one-command Aset reaction can realize S1+S2 + 0/1/N + atomic currentness rewrite and next-generation self-admission for the tested vector. This removes the external pre-grounder for that vector but does not yet prove necessity or final FORMAL/JSON representation."
+      "currentEvidence": "M6B + A10 show finite exact S0 cannot generically transform arbitrarily fresh structured Links; A9 shows one structural-unary command with S1+S2 is sufficient for the tested self-contained vector. The remaining decision is whether to accept equivalent structure-sensitive power inside generalized reaction, or weaken the one-command requirement and retain external bootstrap grounding."
     }
   ],
   "maintenanceLaw": {
@@ -468,5 +476,30 @@
       "necessity versus weaker grounded+bootstrap architecture still requires Author decision"
     ],
     "acceptanceStatus": "AUTHOR_DECISION_REQUIRED"
+  },
+  "finiteExactSupportNecessity": {
+    "status": "PROVED_RESEARCH",
+    "evidence": "ts/test/v015-exact-finite-support-necessity-a10.test.ts",
+    "statement": "Finite exact identity alone cannot be a generic fresh-structure transformer over an unbounded input family.",
+    "reasoning": [
+      "Support(F) of a finite exact Theory F is the finite set of exact antecedent identities appearing in F",
+      "an actual Link A outside Support(F) cannot match by exact identity, irrespective of A's internal poles",
+      "adding exact rules for N observed fresh inputs expands support by N concrete identities but does not generalize to a fresh N+1 identity",
+      "a generic transformation over arbitrarily fresh structured inputs therefore requires either unbounded pre-enumeration or some additional structure-sensitive reflection/matching plus construction authority"
+    ],
+    "testedFamilies": [
+      1,
+      2,
+      5,
+      17
+    ],
+    "structuralComparison": "one two-role structural template handles every tested fresh pair and the additional N+1 pair with constant rule count",
+    "doesNotProve": [
+      "that one unique structural matcher API is necessary",
+      "that S1/S2 must be exposed as separate semantic suboperations",
+      "that cross-current-member join is necessary",
+      "that the current TypeScript implementation is the final kernel"
+    ],
+    "consequence": "Under the strong one-command/self-contained requirement, an exact-only finite executor needs some internally available capability equivalent in power to fresh structure observation/binding and corresponding construction; external pre-grounding is otherwise required."
   }
 }
