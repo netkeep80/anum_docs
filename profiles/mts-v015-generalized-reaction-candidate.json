@@ -171,5 +171,34 @@
       "stronger structural-unary generalized reaction if necessity is author-reviewed"
     ],
     "trueCrossMemberJoinRequired": false
+  },
+  "sequenceCarrierBoundary": {
+    "status": "AUTHOR_REVIEW_REQUIRED",
+    "approvedSourceCandidate": {
+      "empty": "R",
+      "recurrence": "Seq(xs,x)=Seq(xs)->x"
+    },
+    "rootedFoldFindings": {
+      "exactPositionalIdentity": false,
+      "collisions": [
+        "Seq() = Seq(R) = Seq(R,R) = R",
+        "Seq(R,C) = Seq(C)",
+        "Seq(C) = C (sequence carrier identity collides with scalar Link C)"
+      ]
+    },
+    "acceptedV014Constraint": "ExactSequence preserves exact positional sequence identity distinct from fold denotation",
+    "historicalExactSequence": {
+      "empty": "R",
+      "cell": "START(prev->value)",
+      "permitsRootAsOrdinaryValue": true,
+      "preservesRepeatedPositions": true,
+      "distinguishesSequenceCarrierFromScalarValue": true
+    },
+    "unresolvedDecision": [
+      "treat approved R-fold equations as non-injective fold denotation/projection and use ExactSequence (or equivalent root-safe positional carrier) for JSON array identity",
+      "accept quotient/non-positional array semantics explicitly",
+      "define a new injective positional lowering; do not silently equate it with the rooted fold"
+    ],
+    "forbiddenShortcut": "Do not identify the approved JSON array source rule with historical ExactSequence physical identity without an explicit lowering decision."
   }
 }
