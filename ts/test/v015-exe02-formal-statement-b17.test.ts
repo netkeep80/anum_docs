@@ -475,10 +475,10 @@ same(exe02Formal.aproverStatus, "NOT_RECORDED", "EXE-02 aprover boundary");
     f.definitionProfileRoot,
     result.source.sourceAset,
   );
-  assert(
-    decoder.decode(json).includes('"schema":"' + V015_FORMAL_JSON_J1_SCHEMA + '"'),
-    "EXE-02 source stays on strict JSON J1",
-  );
+  const jsonText = decoder.decode(json);
+  assert(jsonText.startsWith('{"R":"R->R"'), "EXE-02 uses direct JSON bundle");
+  assert(jsonText.includes('"EXE02_PREMISES":[]'), "empty R-rooted sequence stays JSON array");
+  assert(!jsonText.includes('"pair"'), "EXE-02 JSON has no pair host tag");
   const round = decodeV015FormalSourceAsetJson(
     f.memory,
     f.basis,
@@ -487,7 +487,7 @@ same(exe02Formal.aproverStatus, "NOT_RECORDED", "EXE-02 aprover boundary");
     f.definitionProfileRoot,
     json,
   );
-  same(round.sourceAset, result.source.sourceAset, "J1 exact EXE-02 source-Aset round-trip");
+  same(round.sourceAset, result.source.sourceAset, "direct JSON exact EXE-02 source-Aset round-trip");
 
   const alphaNames = ["P", "Q", "S", "T", "V", "W", "Z", "H"];
   const alpha = compile(f, exe02Source(alphaNames));
