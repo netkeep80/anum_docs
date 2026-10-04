@@ -591,6 +591,64 @@ E -> K
 Исполняемый guard:
 `CURRENTNESS_WITNESS_REMOVAL_PRESERVES_OVERLAPPING_LINK_ROLES=TRUE`.
 
+## 14e. A9 — одна structural generalized reaction над Aset
+
+A9 объединяет A8 и M7 в один исполняемый кандидат:
+
+```text
+Gamma_structural(M_t)
+    ↓
+S1: structural match/bind по одному current endpoint
+    [read-only, полный reaction-start plan]
+    ↓
+S2: substitution + canonical Link construction
+    [только после завершения полного плана]
+    ↓
+0 / 1 / N image
+    ↓
+atomic replacement E->K currentness witnesses
+    ↓
+M_(t+1)
+```
+
+Снаружи этому кандидату не передаются:
+
+```text
+current Context pointer
+current Scope pointer
+selected Theory pointer
+program counter
+pre-grounder command
+install-rule command
+```
+
+Ключевой self-modification witness:
+
+```text
+current: Theory -> BOOT
+bootstrap output: candidateRule
+
+generic K-preservation
+        ↓
+Theory -> candidateRule
+```
+
+Полученный Link одновременно является обычным результатом реакции и новым admission выбранной Theory. Он **не исполняется в том же поколении**, потому что S1 использует reaction-start snapshot, но исполняется в следующем.
+
+A9 также проходит freeze/transfer/restore между этими поколениями и получает тот же финальный canonical carrier + Aset membership.
+
+Результат:
+
+```text
+STRUCTURAL_ASET_ONE_COMMAND=GREEN_RESEARCH
+PRE_GROUNDER_COMMAND=0_FOR_TESTED_VECTOR
+SAME_REACTION_NEW_ADMISSION_EXECUTABLE=FALSE
+NEXT_REACTION_NEW_ADMISSION_EXECUTABLE=TRUE
+CROSS_MEMBER_JOIN=0
+```
+
+Это сильный кандидат на требуемый «один исполнитель», но **не accepted v0.15 law**. Пока не доказаны необходимость именно structural match power, аппаратный refinement и окончательное FORMAL/JSON представление.
+
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
