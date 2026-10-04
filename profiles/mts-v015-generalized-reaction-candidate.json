@@ -72,7 +72,8 @@
     "example": "K->A + K->C + joint{A,C}->D",
     "implicitPackingForbidden": true,
     "requiredForV015": false,
-    "acceptanceCondition": "only if a required v0.15 artifact cannot be expressed by explicit Link packing, generic pre-grounding, or repeated ordinary reactions without changing required observable semantics"
+    "acceptanceCondition": "only if a required v0.15 artifact cannot be expressed by explicit Link packing, generic pre-grounding, or repeated ordinary reactions without changing required observable semantics",
+    "status": "NOT_PROVEN_NECESSARY"
   },
   "dimensionSeparation": [
     "N arguments in one carrier",
@@ -107,5 +108,35 @@
     "FOREIGN_THEORY",
     "PACKED_ANTECEDENT",
     "UNPACKED_CROSS_MEMBER_NON_MATCH"
+  ],
+  "candidateFamily": "GROUNDED_EXACT_REACTION_FLOOR",
+  "capabilityAxes": {
+    "matchPower": "EXACT_ANTECEDENT_IDENTITY",
+    "jointAntecedentArity": "ONE_CURRENT_MEMBER",
+    "imageArity": "ZERO_ONE_MANY",
+    "scopeLift": "POINTWISE_N_CURRENT_MEMBERS",
+    "eventPublication": "MATCH_AWARE_ATOMIC_SUCCESSOR"
+  },
+  "competingCandidate": {
+    "id": "STRUCTURAL_UNARY_TEMPLATE_REACTION",
+    "status": "OPEN_NECESSITY_COMPARISON",
+    "matchPower": "STRUCTURAL_TEMPLATE_WITH_ROLES",
+    "jointAntecedentArity": "ONE_CURRENT_MEMBER",
+    "imageArity": "ZERO_ONE_MANY",
+    "scopeLift": "POINTWISE_N_CURRENT_MEMBERS",
+    "eventPublication": "MATCH_AWARE_ATOMIC_SUCCESSOR",
+    "evidence": [
+      "A72r",
+      "v015-multirole-grounding-m4",
+      "v015-variadic-grounding-m5"
+    ],
+    "question": "Can v0.15 self-host generic grounding with the grounded floor, or must structural-unary template matching itself be part of generalized MP?"
+  },
+  "notEquivalentDimensions": [
+    "argument arity",
+    "image cardinality",
+    "current Scope cardinality",
+    "structural template role count",
+    "joint current-member antecedent arity"
   ]
 }
