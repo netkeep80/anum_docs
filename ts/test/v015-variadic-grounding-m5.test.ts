@@ -145,11 +145,17 @@ function groundApplicableSourceRules(
   for (const rule of f.sourceRules) {
     let bindings: readonly StructuralRoleBinding[];
     try {
+      const beforeUnify = f.memory.linkCount;
       bindings = unifyStructuralRuleTemplate(
         f.memory,
         rule.antecedentTemplate,
         actualAntecedent,
         rule.roles,
+      );
+      same(
+        f.memory.linkCount,
+        beforeUnify,
+        "variadic meta-unification is read-only",
       );
     } catch (error) {
       if (error instanceof StructuralRuleError && error.code === "template-mismatch") {
@@ -288,6 +294,7 @@ console.log([
   "TESTED_ARITIES=1_2_3_5",
   "GROUNDED_RULE_PER_INPUT_TUPLE_AUTHORED=0",
   "META_GROUNDING=DYNAMIC_PER_EXPLICIT_APPLICATION",
+  "META_UNIFICATION=READ_ONLY",
   "EXECUTION=GROUNDED_UNARY_MP1",
   "EXECUTION_KERNEL_ARITY_BLIND=TRUE",
   "CROSS_MEMBER_JOIN_REQUIRED=FALSE",
