@@ -300,5 +300,72 @@
     "classification": "EXECUTION_REFINEMENT_BOUNDARY_NOT_ONTOLOGY_CARDINALITY_AXIOM",
     "atomicPublication": "PREMISE_NOT_DERIVED_FROM_FINITE_WORK",
     "infiniteDenotationalReaction": "NOT_RULED_OUT"
+  },
+  "theoremPremiseSplit": {
+    "status": "GREEN_RESEARCH_AUTHOR_REVIEW_PENDING",
+    "localReactionPower": {
+      "classification": "OPEN_ARCHITECTURE_DECISION",
+      "alternatives": [
+        "exact grounded local reaction plus internally derivable/self-hosted meta-grounding",
+        "structural-unary local reaction with S1+S2 inside the one command"
+      ],
+      "evidence": [
+        "M6B",
+        "A9",
+        "A10"
+      ],
+      "notClaimed": "A10 does not prove one unique primitive API."
+    },
+    "derivedTheoremCandidates": {
+      "BUNDLE_LIFT": {
+        "classification": "DERIVED_GIVEN_LOCAL_REACTION_AND_EXHAUSTIVE_SELECTED_RELATIONS",
+        "statement": "All applicable local contributions for one current member reduce to one match occurrence plus canonical union of their outputs.",
+        "evidence": [
+          "A11"
+        ]
+      },
+      "POINTWISE_CURRENT_LIFT": {
+        "classification": "DERIVED_GIVEN_MEMBER_INDEPENDENCE_AND_ONE_REACTION_START_SNAPSHOT",
+        "statement": "N independent current members may be reacted pointwise and their successors canonically unioned; this does not imply cross-member join.",
+        "evidence": [
+          "A7",
+          "A11"
+        ]
+      },
+      "PARTITION_ORDER_INVARIANCE": {
+        "classification": "PROVED_RESEARCH",
+        "statement": "Finite Rule/current partitioning and worker order are nonsemantic under the A11 reduction algebra.",
+        "evidence": [
+          "A11"
+        ]
+      },
+      "FINITE_ONE_GENERATION_COMPLETION": {
+        "classification": "PROVED_RESEARCH_GIVEN_EXPLICIT_FINITE_EXECUTION_PREMISES",
+        "statement": "Finite materialized current/admission/image slices with terminating local match have finite complete one-generation work and staged successor.",
+        "evidence": [
+          "A12"
+        ]
+      }
+    },
+    "executionPremises": {
+      "SELECTED_THEORY_AUTHORITY": "PREMISE_OR_ARCHITECTURE_RULE_NOT_DERIVED_FROM_MP",
+      "REACTION_START_SNAPSHOT": "PREMISE_NOT_DERIVED_FROM_LOCAL_MP",
+      "EXHAUSTIVE_DISCOVERY": "PREMISE_NOT_DERIVED_FROM_LOCAL_MP",
+      "NO_MATCH_PRESERVATION": "REACTION_SEMANTICS_RULE_NOT_POSITIVE_DETACHMENT_THEOREM",
+      "MATCHED_EMPTY_ZERO": "REACTION_SEMANTICS_RULE_NOT_POSITIVE_DETACHMENT_THEOREM",
+      "GENERATION_ISOLATION": "PREMISE_NOT_DERIVED_FROM_LOCAL_MP",
+      "COMPLETE_SUCCESSOR_BEFORE_PUBLICATION": "PREMISE_NOT_DERIVED_FROM_LOCAL_MP",
+      "ATOMIC_PUBLICATION": "PREMISE_NOT_DERIVED_FROM_LOCAL_MP",
+      "FINITE_MATERIALIZED_EXECUTION_SLICE": "PHYSICAL_EXECUTION_REFINEMENT_PREMISE"
+    },
+    "explicitNonClaims": [
+      "scalar positive detachment alone does not derive NO_MATCH semantics",
+      "scalar positive detachment alone does not derive matched-empty semantics",
+      "scalar positive detachment alone does not derive Theory snapshotting",
+      "scalar positive detachment alone does not derive generation isolation",
+      "scalar positive detachment alone does not derive atomic publication",
+      "parallel partition invariance does not prove provenance/order equivalence",
+      "finite executable completion does not make the ambient Link ontology finite"
+    ]
   }
 }
