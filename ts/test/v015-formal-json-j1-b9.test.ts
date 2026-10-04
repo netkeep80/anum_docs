@@ -4,7 +4,7 @@ import { materializeSourceNamespaceProfile } from "../src/source-namespace.js";
 import { materializeV015LinkDefinitionProfile, materializeV015LinkDefinitions } from "../src/v015-link-definition.js";
 import { decodeV015FormalDefinitions } from "../src/v015-formal-decoder.js";
 import {
-  V015_FORMAL_JSON_J1_SCHEMA, V015FormalJsonError,
+  V015FormalJsonError,
   decodeV015FormalSourceAsetJson, encodeV015FormalSourceAsetJson,
 } from "../src/v015-formal-decoder.js";
 import { materializeExactSequence } from "../src/exact-sequence.js";
@@ -57,21 +57,25 @@ const source=[
   same(round.sourceAset,text.sourceAset,"JSON round-trip exact native source Aset");
   bytes(round.canonicalJson,canonical,"canonical JSON byte round-trip");
   const canonicalText=dec.decode(canonical);
-  const entriesFirst=canonicalText.replace(
-    `{"schema":"${V015_FORMAL_JSON_J1_SCHEMA}","entries":`,
-    `{"entries":`,
-  );
-  assert(entriesFirst.endsWith("]}\n"),"canonical JSON expected suffix");
-  const swapped=enc.encode(
-    entriesFirst.slice(0,-3) +
-    `],"schema":"${V015_FORMAL_JSON_J1_SCHEMA}"}\n`,
-  );
-  const reordered=decodeV015FormalSourceAsetJson(f.memory,f.basis,f.grammarRoot,f.namespaceProfileRoot,f.definitionProfileRoot,swapped);
-  same(reordered.sourceAset,text.sourceAset,"JSON object key order is not source authority");
-  bytes(reordered.canonicalJson,canonical,"reordered object canonicalizes");
+  assert(canonicalText.startsWith('{"R":"R->R"'),"canonical JSON is direct bundle");
+  assert(canonicalText.includes('"ARGS_FT":["F","T"]'),"JSON array carries rooted sequence");
+  assert(canonicalText.includes('"LINK_FT":"F->T"'),"JSON string carries Link expression");
+  assert(!canonicalText.includes('"pair"'),"no pair host tag");
+  assert(!canonicalText.includes('"sequence"'),"no sequence host tag");
+  assert(!canonicalText.includes('"schema"'),"profile metadata is not an Aset member");
 
   const resolved=materializeV015LinkDefinitions(f.memory,f.basis,f.grammarRoot,f.namespaceProfileRoot,f.definitionProfileRoot,round.sourceAset);
+  const parsed=JSON.parse(canonicalText) as Record<string, unknown>;
+  const swapped=enc.encode(JSON.stringify(Object.fromEntries(Object.entries(parsed).reverse()))+"\n");
+  const reordered=decodeV015FormalSourceAsetJson(f.memory,f.basis,f.grammarRoot,f.namespaceProfileRoot,f.definitionProfileRoot,swapped);
+  const reorderedResolved=materializeV015LinkDefinitions(f.memory,f.basis,f.grammarRoot,f.namespaceProfileRoot,f.definitionProfileRoot,reordered.sourceAset);
   const carrier=(n:string)=>materializeV012StringAnum(f.memory,f.basis,enc.encode(n)).anumLink;
+  for(const n of ["R","ARGS_FT","INTERP"]) {
+    const a=resolved.definitions.find(d=>d.nameCarrier===carrier(n));
+    const b=reorderedResolved.definitions.find(d=>d.nameCarrier===carrier(n));
+    assert(a!==undefined && b!==undefined,`reordered resolved ${n}`);
+    same(b.value,a.value,`object order does not change ${n} denotation`);
+  }
   const value=(n:string):LinkHandle=>{
     const x=resolved.definitions.find(d=>d.nameCarrier===carrier(n)); assert(x!==undefined,`resolved ${n}`); return x.value;
   };
@@ -102,11 +106,11 @@ const source=[
 
 {
   const f=fixture(), d=(s:string)=>decodeV015FormalSourceAsetJson(f.memory,f.basis,f.grammarRoot,f.namespaceProfileRoot,f.definitionProfileRoot,enc.encode(s));
-  reject(()=>d(`{"schema":"${V015_FORMAL_JSON_J1_SCHEMA}","\\u0073chema":"${V015_FORMAL_JSON_J1_SCHEMA}","entries":[]}`),"duplicate-key","escaped duplicate key");
-  reject(()=>d(`{"schema":"wrong","entries":[]}`),"unsupported-profile","wrong schema");
-  reject(()=>d(`{"schema":"${V015_FORMAL_JSON_J1_SCHEMA}","entries":[],"extra":0}`),"invalid-shape","unknown field");
-  reject(()=>d(`{"schema":"${V015_FORMAL_JSON_J1_SCHEMA}","entries":[{"name":"A","value":{"pair":["A","A"]}},{"name":"A","value":{"pair":["A","A"]}}]}`),"duplicate-local-name","duplicate local name");
-  reject(()=>d(`{"schema":"${V015_FORMAL_JSON_J1_SCHEMA}","entries":[{"name":"A","value":null}]}`),"invalid-shape","null has no J1 semantics");
+  reject(()=>d('{"A":"A->A","\\u0041":"A->A"}'),"duplicate-key","escaped duplicate binder");
+  reject(()=>d('{"A":null}'),"invalid-shape","null has no pair-sequence semantics");
+  reject(()=>d('{"A":{"B":"B->B"}}'),"nested-namespace","nested bundle waits for contextual-name slice");
+  reject(()=>d('{"A":"[A]"}'),"invalid-shape","rooted sequence must use JSON array");
+  reject(()=>d('{"A":["A",0]}'),"invalid-shape","sequence items are names");
 }
 
-console.log("MTS v0.15 B9 JSON J1: SOURCE_ASET_ROUNDTRIP=EXACT DUPLICATE_KEYS=REJECT CANONICAL_BYTES=STABLE PAIR_NE_SEQUENCE=GREEN AMEMORY_BOOLEAN_EXECUTION=GREEN");
+console.log("MTS v0.15 B9 direct JSON bundle: SOURCE_ASET_ROUNDTRIP=EXACT DUPLICATE_KEYS=REJECT DIRECT_BINDERS=GREEN LINK_STRING=GREEN R_ROOTED_ARRAY=GREEN PAIR_NE_SEQUENCE=GREEN AMEMORY_BOOLEAN_EXECUTION=GREEN");
