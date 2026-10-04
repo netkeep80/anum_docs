@@ -119,7 +119,7 @@
   },
   "competingCandidate": {
     "id": "STRUCTURAL_UNARY_TEMPLATE_REACTION",
-    "status": "OPEN_NECESSITY_COMPARISON",
+    "status": "GREEN_RESEARCH_ONE_COMMAND_CANDIDATE_AUTHOR_DECISION_PENDING",
     "matchPower": "STRUCTURAL_TEMPLATE_WITH_ROLES",
     "jointAntecedentArity": "ONE_CURRENT_MEMBER",
     "imageArity": "ZERO_ONE_MANY",
@@ -128,7 +128,8 @@
     "evidence": [
       "A72r",
       "v015-multirole-grounding-m4",
-      "v015-variadic-grounding-m5"
+      "v015-variadic-grounding-m5",
+      "v015-structural-aset-one-command-a9"
     ],
     "question": "Can v0.15 self-host generic grounding with the grounded floor, or must structural-unary template matching itself be part of generalized MP?"
   },
@@ -196,6 +197,18 @@
         "requiresCrossMemberJoinJ1": false,
         "note": "If v0.15 rejects bootstrap META-A but requires generic fresh structural grounding inside the one-command machine, the missing capability is specifically S1+S2 over one explicit current structured endpoint; J1 is still not implicated."
       }
+    },
+    "structuralAsetOneCommand": {
+      "status": "GREEN_RESEARCH_AUTHOR_DECISION_PENDING",
+      "result": "For the tested vector, S1+S2 can be treated as internal phases of the single generalized reaction over semantic Aset membership, eliminating a separate pre-grounder command.",
+      "causalBoundary": "S1 complete read-only plan precedes S2 construction/publication; new Theory admissions are visible next reaction only.",
+      "evidence": "ts/test/v015-structural-aset-one-command-a9.test.ts",
+      "doesNotProve": [
+        "that this stronger command is necessary rather than merely sufficient",
+        "that cross-member join is needed",
+        "final accepted FORMAL/JSON representation",
+        "hardware refinement proof"
+      ]
     }
   },
   "sequenceCarrierBoundary": {
