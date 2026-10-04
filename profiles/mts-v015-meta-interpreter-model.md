@@ -649,6 +649,57 @@ CROSS_MEMBER_JOIN=0
 
 Это сильный кандидат на требуемый «один исполнитель», но **не accepted v0.15 law**. Пока не доказаны необходимость именно structural match power, аппаратный refinement и окончательное FORMAL/JSON представление.
 
+## 14f. A10 — finite exact support и необходимость structure-sensitive power
+
+A10 отделяет необходимость от конкретной реализации.
+
+Для фиксированной конечной exact-Theory:
+
+```text
+Support(F) = { A | в F существует exact antecedent A }
+```
+
+конечно.
+
+Следовательно:
+
+```text
+fresh A ∉ Support(F)
+        ↓
+exact identity reaction
+        ↓
+NO_MATCH
+```
+
+вне зависимости от внутренней структуры `A`.
+
+Проверены семейства свежих pair Links размеров:
+
+```text
+1, 2, 5, 17
+```
+
+Если добавить N конкретных exact admissions, эти N случаев начинают работать, но свежий `N+1` снова NO_MATCH. То есть exact enumeration не является generic grounding.
+
+Одна двухролевая structural template-rule при этом обрабатывает всё семейство и следующий свежий вход без роста rule count.
+
+Результат:
+
+```text
+EXACT_FINITE_SUPPORT_NECESSITY_PRESSURE=GREEN_RESEARCH
+EXACT_ENUMERATION_COST=ONE_ADMISSION_PER_FRESH_IDENTITY
+N_PLUS_1_FRESH_INPUT_ESCAPES_FINITE_ENUMERATION=TRUE
+ADDITIONAL_STRUCTURE_SENSITIVE_CAPABILITY_NEEDED_FOR_GENERIC_FRESH_TRANSFORM=SUPPORTED
+UNIQUE_REQUIRED_API=NOT_PROVEN
+CROSS_MEMBER_JOIN_REQUIRED=FALSE
+```
+
+Итак, если сохраняется сильное требование:
+
+> снаружи A-memory существует только одна generalized reaction и нет bootstrap grounder,
+
+то внутри этой единственной команды должна существовать **некоторая эквивалентная по мощности способность** читать структуру свежего Link, связывать роли и построить соответствующий новый Link. A10 не утверждает, что API обязан называться S1/S2 или StructuralRule.
+
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
