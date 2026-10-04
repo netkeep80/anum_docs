@@ -215,7 +215,8 @@
       "canonical convergence",
       "NO_MATCH vs matched-empty distinction",
       "hardware decomposition/refinement theorem"
-    ]
+    ],
+    "currentEvidence": "A7/A8 establish pointwise current-state behavior; A11 proves extensional partition/order invariance under the explicit snapshot, global-match reduction, generation-isolation and atomic-publication premises."
   },
   "metaInterpreterBoundary": {
     "status": "OPEN",
@@ -314,7 +315,7 @@
       "id": "MI-D04",
       "question": "Is generalized parallel MP derived from scalar MP plus reaction/publication laws, and what exact premises are irreducible?",
       "status": "OPEN",
-      "currentEvidence": "A7/A8 establish pointwise parallel current-state semantics over Context/Aset membership; A9 supplies a stronger structural-unary one-command candidate with read-only planning and generation-isolated publication. Mathematical derivation/refinement proofs remain OPEN."
+      "currentEvidence": "A10 establishes finite exact-support pressure for fresh generic structure; A11 proves the extensional parallel reduction/refinement law. Whether structure-sensitive power is primitive or self-hosted/derived remains the Author decision."
     },
     {
       "id": "MI-D05",
@@ -501,5 +502,42 @@
       "that the current TypeScript implementation is the final kernel"
     ],
     "consequence": "Under the strong one-command/self-contained requirement, an exact-only finite executor needs some internally available capability equivalent in power to fresh structure observation/binding and corresponding construction; external pre-grounding is otherwise required."
+  },
+  "parallelReactionReduction": {
+    "status": "PROVED_RESEARCH",
+    "evidence": "ts/test/v015-parallel-reaction-reduction-a11.test.ts",
+    "contribution": "(matched:boolean, outputs:set<Link>)",
+    "combine": "(m1,O1) ⊕ (m2,O2) = (m1 OR m2, O1 UNION O2)",
+    "algebra": {
+      "neutral": "(false, empty)",
+      "associative": true,
+      "commutative": true,
+      "idempotent": true
+    },
+    "refinementPremises": [
+      "all shards read the same reaction-start current state and immutable Theory/admission snapshot",
+      "each shard contributes both a match-occurrence bit and its output set",
+      "global reduction completes before NO_MATCH preservation is decided",
+      "same-generation results are not readable as new antecedents",
+      "the complete successor is staged before publication",
+      "publication of semantic Aset membership is atomic"
+    ],
+    "proven": [
+      "rule partition invariance",
+      "rule-shard scheduling-order invariance",
+      "current-member partition invariance",
+      "two-dimensional current/rule partition invariance",
+      "local shard NO_MATCH publication is observably wrong",
+      "NO_MATCH remains distinct from matched-empty",
+      "active identity remains distinct from quiescence despite equal extensional state",
+      "read-your-own-writes within one generation is observably wrong"
+    ],
+    "interpretation": "This is the executable hardware-refinement law for extensional generalized-reaction results: CPU threads, GPU workgroups or future associative hardware may partition work arbitrarily if they implement the same reduction and generation barrier.",
+    "notProven": [
+      "full provenance trace equivalence",
+      "preservation of any semantically significant order inside an individual relation image before extensional union",
+      "termination/completion for infinite applicable fan-out",
+      "a concrete hardware memory-consistency protocol"
+    ]
   }
 }
