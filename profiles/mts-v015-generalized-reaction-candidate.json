@@ -119,7 +119,7 @@
   },
   "competingCandidate": {
     "id": "STRUCTURAL_UNARY_TEMPLATE_REACTION",
-    "status": "OPEN_NECESSITY_COMPARISON",
+    "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
     "matchPower": "STRUCTURAL_TEMPLATE_WITH_ROLES",
     "jointAntecedentArity": "ONE_CURRENT_MEMBER",
     "imageArity": "ZERO_ONE_MANY",
@@ -131,9 +131,10 @@
       "v015-variadic-grounding-m5",
       "v015-structural-aset-one-command-a9"
     ],
-    "question": "Can v0.15 self-host generic grounding with the grounded floor, or must structural-unary template matching itself be part of generalized MP?",
+    "question": "Formalize and prove the Author-approved structural-unary repeated reaction Γ; close the multi-generation exact-S0 opacity/refinement obligations without introducing J1.",
     "researchEvidenceStatus": "GREEN_FOR_A9_TESTED_ONE_COMMAND_VECTOR",
-    "authorDecision": "PENDING",
+    "authorDecision": "APPROVED_STRUCTURAL_UNARY_REPEATED_REACTION",
+    "proofClosureOwner": "#2001",
     "necessityEvidence": [
       "M6B exact-S0 freshness opacity",
       "A10 finite exact support lower-bound pressure",
@@ -271,7 +272,8 @@
   "parallelReactionReduction": {
     "status": "GREEN_RESEARCH",
     "evidence": "ts/test/v015-parallel-reaction-reduction-a11.test.ts",
-    "algebra": "(match OR, canonical output union)",
+    "algebra": "(match OR, mathematical extensional output union)",
+    "unionSemantics": "Proof/reduction notation only: canonical Link identity plus extensional Aset membership already converges duplicate derived Links; there is no separate semantic dedup/UNION machine phase.",
     "laws": [
       "associative",
       "commutative",
