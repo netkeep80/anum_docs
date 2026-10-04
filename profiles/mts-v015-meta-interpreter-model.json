@@ -353,7 +353,8 @@
         "Truth0": "K->A",
         "K0": "♂(E->Truth0)",
         "E->K0": null
-      }
+      },
+      "loweringOwner": "#2002"
     }
   ],
   "formalJsonRules": [
@@ -710,7 +711,8 @@
       "an ambient physical V->Z outside M_t is not a role",
       "zero-role rule preserves exact identity matching",
       "the same existing structural matcher/instantiator consumes the derived role set",
-      "dedicated START(ExactSequence(roles)) RoleDictionary is not necessary for the tested vector"
+      "dedicated START(ExactSequence(roles)) RoleDictionary is not necessary for the tested vector",
+      "A72r-like three-role recursive template matches and instantiates through the same candidate topology"
     ],
     "nonClaims": [
       "This does not yet prove the candidate for every v0.15 rule/program/proof.",
@@ -744,8 +746,9 @@
         "prove a bare structured object key with null contributes its denoted Link directly to Aset membership",
         "prove alpha-renaming/presentation-name changes preserve behavior modulo contextual identity",
         "falsify collisions with ordinary non-role bundle members",
-        "run the candidate against variable-arity A72r and theorem/proof FORMAL before Author approval"
+        "run full historical A72r execution differential and theorem/proof FORMAL before Author approval; the three-role recursive A72r-like shape is already GREEN research"
       ]
-    }
+    },
+    "loweringOwner": "#2002"
   }
 }
