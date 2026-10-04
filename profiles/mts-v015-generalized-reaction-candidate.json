@@ -253,5 +253,33 @@
       "define a new injective positional lowering; do not silently equate it with the rooted fold"
     ],
     "forbiddenShortcut": "Do not identify the approved JSON array source rule with historical ExactSequence physical identity without an explicit lowering decision."
+  },
+  "parallelReactionReduction": {
+    "status": "GREEN_RESEARCH",
+    "evidence": "ts/test/v015-parallel-reaction-reduction-a11.test.ts",
+    "algebra": "(match OR, canonical output union)",
+    "laws": [
+      "associative",
+      "commutative",
+      "idempotent",
+      "neutral=(false,empty)"
+    ],
+    "partitionInvariance": [
+      "rules",
+      "rule scheduling order",
+      "current members",
+      "two-dimensional current/rule partition"
+    ],
+    "requiredPremises": [
+      "one reaction-start snapshot",
+      "global match reduction before NO_MATCH preservation",
+      "no same-generation read-your-own-writes",
+      "complete successor before atomic publication"
+    ],
+    "counterexamples": [
+      "shard-local NO_MATCH publication leaks stale current truth beside a real successor",
+      "same-generation cascading collapses A->B->C into one generation"
+    ],
+    "boundary": "Extensional successor equivalence only; provenance and semantically significant per-image order remain separate obligations."
   }
 }
