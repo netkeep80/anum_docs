@@ -421,6 +421,34 @@ FULL_SELF_HOSTED_GENERALIZED_REACTION=NOT_YET_PROVEN
 
 То есть внешний указатель состояния уже не нужен как информация, но алгоритм вывода current frontier ещё требуется выразить/обосновать внутри общей семантики МТС.
 
+## 14b. Theory внутри ancestry Context
+
+A6 проверяет кандидат, в котором выбранная Theory больше не приходит снаружи:
+
+```text
+E  = C -> Theory
+K0 = START(E  -> (X->A))
+K1 = START(K0 -> (X->B))
+```
+
+Результат:
+
+```text
+SELF_CONTAINED_CONTEXT_THEORY=GREEN_RESEARCH
+EXTERNAL_SELECTED_THEORY_POINTER=0
+THEORY_DERIVED_FROM_CONTEXT_ANCESTRY=TRUE
+REACTION_START_THEORY_SNAPSHOT=TRUE
+SAME_REACTION_NEW_ADMISSION_EXECUTABLE=FALSE
+NEXT_REACTION_NEW_ADMISSION_EXECUTABLE=TRUE
+FORWARD_ENTRY_ORDER_MATCHES=1_1_0
+REVERSE_ENTRY_ORDER_MATCHES=1_1_0
+FINAL_CANONICAL_TOPOLOGY_SAME=TRUE
+```
+
+Это также исправляет важную историческую ловушку A73j/A73k. Старый live-Memory эксперимент мог дать `2,0` при generator-first и `1,1,0` при target-first: вновь созданный `Theory->relation` становился видим позднему sibling в том же проходе. Текущий execution profile требует reaction-start snapshot, поэтому новое admission становится причинно доступно только следующему поколению.
+
+A6 пока **не утверждает**, что `E=C->Theory` — окончательная принятая форма environment, и не устраняет host read-only traversal/matching oracle.
+
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
