@@ -4,7 +4,7 @@ import { readExactSequence } from "../src/exact-sequence.js";
 import { Memory, ensureRootBasis, type LinkHandle, type RootBasis } from "../src/memory.js";
 import { materializeNativeSyntaxGrammar, type NativeSyntaxGrammarRuleSpec } from "../src/native-syntax-grammar.js";
 import { materializeSourceNamespaceProfile } from "../src/source-namespace.js";
-import { V015_FORMAL_JSON_J1_SCHEMA, decodeV015FormalSourceAsetJson, encodeV015FormalSourceAsetJson } from "../src/v015-formal-decoder.js";
+import { decodeV015FormalSourceAsetJson, encodeV015FormalSourceAsetJson } from "../src/v015-formal-decoder.js";
 import { compileV015FormalDefinitionsToRecursive, type V015FormalRecursiveCompileResult } from "../src/v015-formal-recursive-compiler.js";
 import { materializeV015LinkDefinitionProfile } from "../src/v015-link-definition.js";
 import { materializeV012StringAnum } from "../src/v012-string-anum.js";
@@ -283,7 +283,7 @@ same(fnd01Formal.aproverStatus, "NOT_RECORDED", "aprover boundary");
     f.memory, f.basis, f.grammarRoot, f.namespaceProfileRoot,
     f.definitionProfileRoot, result.source.sourceAset,
   );
-  assert(decoder.decode(json).includes('"schema":"' + V015_FORMAL_JSON_J1_SCHEMA + '"'),
+  assert(decoder.decode(json).includes('"schema":"' + V015_FORMAL_JSON_DIRECT_BUNDLE_SCHEMA + '"'),
     "strict JSON J1");
   const round = decodeV015FormalSourceAsetJson(
     f.memory, f.basis, f.grammarRoot, f.namespaceProfileRoot,
@@ -313,6 +313,6 @@ console.log([
   "C2=ROOT_FULLSELF+EXISTENTIAL_GROUNDED_REALIZABILITY", "C3=C1_PLUS_C2",
   "FND13_DEPENDENCY=0", "GROUNDED_X_PREMISE=0", "OUTER_SUBSTITUTION_CAPTURES_WITNESSES=0",
   "TWO_X_INSTANTIATIONS=GREEN", "ALPHA_RENAME=SEMANTICALLY_STABLE",
-  "SAME_SPELLING_FREE_CAPTURE=REJECTED_BY_IDENTITY", "JSON_J1=EXACT",
+  "SAME_SPELLING_FREE_CAPTURE=REJECTED_BY_IDENTITY", "JSON_DIRECT_BUNDLE=EXACT",
   "RUNTIME_EQUALITY_IN_TEMPLATE=0", "NATIVE_PROOF=NOT_CLAIMED", "APROVER_ACCEPT=NOT_CLAIMED",
 ].join(" "));
