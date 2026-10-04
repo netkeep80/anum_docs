@@ -283,13 +283,15 @@ same(fnd01Formal.aproverStatus, "NOT_RECORDED", "aprover boundary");
     f.memory, f.basis, f.grammarRoot, f.namespaceProfileRoot,
     f.definitionProfileRoot, result.source.sourceAset,
   );
-  assert(decoder.decode(json).includes('"schema":"' + V015_FORMAL_JSON_DIRECT_BUNDLE_SCHEMA + '"'),
-    "strict JSON J1");
+  const jsonText = decoder.decode(json);
+  assert(jsonText.startsWith('{"R":"R->R"'), "FND-01 uses direct JSON bundle");
+  assert(jsonText.includes('"FND01_PREMISES":['), "FND-01 rooted sequences stay arrays");
+  assert(!jsonText.includes('"pair"'), "FND-01 JSON has no pair host tag");
   const round = decodeV015FormalSourceAsetJson(
     f.memory, f.basis, f.grammarRoot, f.namespaceProfileRoot,
     f.definitionProfileRoot, json,
   );
-  same(round.sourceAset, result.source.sourceAset, "J1 exact source-Aset round-trip");
+  same(round.sourceAset, result.source.sourceAset, "direct JSON exact source-Aset round-trip");
 
   const alpha = compile(f, fnd01Source("Y", "SW", "FW", "PW"));
   same(value(f, alpha, "Y"), outer, "alpha outer role");
