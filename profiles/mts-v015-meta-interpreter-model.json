@@ -181,6 +181,18 @@
       "evidence": [
         "ts/test/v015-exact-finite-support-necessity-a10.test.ts"
       ]
+    },
+    {
+      "id": "MI-B18",
+      "status": "PROVED_RESEARCH",
+      "statement": "Author decision: use the direct-gauge C = END(R) boundary as the root of v0.15 execution-context space. The decision is accepted for v0.15 design because A5-A9 execute/recover the tested state without external current Context, Scope, program-counter or selected-Theory pointers. C remains gauge-relative/chirality-covariant rather than an absolute Foundation-global privilege.",
+      "evidence": [
+        "ts/test/v015-self-contained-context-freeze-resume-a5.test.ts",
+        "ts/test/v015-context-theory-self-contained-a6.test.ts",
+        "ts/test/v015-context-tree-reaction-cardinality-a7.test.ts",
+        "ts/test/v015-positive-aset-currentness-a8.test.ts",
+        "ts/test/v015-structural-aset-one-command-a9.test.ts"
+      ]
     }
   ],
   "targetOrganization": {
@@ -209,7 +221,7 @@
     ]
   },
   "contextCandidate": {
-    "status": "STRONGLY_SUPPORTED_CANDIDATE",
+    "status": "PROVED_RESEARCH",
     "directGaugeBoundary": "C",
     "entry": "K0 = START(C->S0)",
     "child": "K(n+1) = START(Kn->S(n+1))",
@@ -220,7 +232,18 @@
       "childStart": "positive execution growth / successor Context",
       "endClosure": "branch-local completion witness"
     },
-    "chiralityNote": "C is not promoted to an absolute Foundation-global privilege. v0.14 chirality is Context-relative/covariant; mirror gauge must remain equivalent."
+    "chiralityNote": "C is not promoted to an absolute Foundation-global privilege. v0.14 chirality is Context-relative/covariant; mirror gauge must remain equivalent.",
+    "authorDecision": "APPROVED_FOR_V015",
+    "authorDecisionDate": "2026-10-04",
+    "acceptanceScope": "V0.15_DESIGN_DECISION_NOT_FULL_VERSION_ACCEPTANCE",
+    "rationale": [
+      "A5 derives the direct-gauge C/END execution-space boundary from ROOT topology without an external Context/Scope/program-counter pointer",
+      "A5 whole-memory freeze/transfer/restore reconstructs entries/frontier without serialized execution handles",
+      "A6 carries selected Theory through Link ancestry with reaction-start snapshot isolation",
+      "A7 reproduces generalized-reaction branching over the C-rooted Context tree",
+      "A8 replaces negative frontier authority with positive semantic Aset currentness",
+      "A9 executes the tested one-command self-contained structural reaction without an external current/Scope/Theory pointer"
+    ]
   },
   "frontierCandidate": {
     "status": "OPEN",
@@ -323,8 +346,9 @@
     {
       "id": "MI-D01",
       "question": "Execution-space boundary: O or C/direct-gauge END boundary?",
-      "status": "OPEN",
-      "currentEvidence": "C strongly supported; O has proven role collision/ancestry ambiguity."
+      "status": "PROVED_RESEARCH",
+      "currentEvidence": "RESOLVED: direct-gauge C = END(R) is Author-approved for v0.15 after A5-A9 demonstrated self-contained execution without external current/Scope/program-counter/Theory pointers. Chirality-covariant mirror equivalence remains mandatory; this does not make C an absolute Foundation-global privilege.",
+      "decision": "AUTHOR_APPROVED_FOR_V015"
     },
     {
       "id": "MI-D02",
