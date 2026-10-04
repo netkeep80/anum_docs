@@ -23,7 +23,6 @@ import {
 } from "../src/native-syntax-grammar.js";
 import { materializeSourceNamespaceProfile } from "../src/source-namespace.js";
 import {
-  V015_FORMAL_JSON_J1_SCHEMA,
   decodeV015FormalSourceAsetJson,
   encodeV015FormalSourceAsetJson,
 } from "../src/v015-formal-decoder.js";
@@ -1090,7 +1089,7 @@ console.log([
   "BOUNDNESS=CONTEXTUAL_ROLE_DICTIONARY",
   "INTRINSIC_VARIABLE_LINK_KIND=0",
   "NEW_BINDER_SYNTAX=0",
-  "JSON_PROFILE=J1_UNCHANGED",
+  "JSON_PROFILE=DIRECT_BUNDLE",
   "FND02_BOUNDARY=A1_FORALL_LINK_FULLSELF_IMPLIES_ROOT",
   "A1_PREMISE=EXPLICIT",
   "LINK_DOMAIN=X:LINK",
