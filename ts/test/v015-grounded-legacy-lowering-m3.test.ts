@@ -48,6 +48,7 @@ function sameMembers(
 interface Fixture {
   readonly memory: Memory;
   readonly groundedTheory: LinkHandle;
+  readonly O: LinkHandle;
   readonly K: LinkHandle;
   readonly A: LinkHandle;
   readonly B: LinkHandle;
@@ -67,6 +68,7 @@ function fixture(): Fixture {
   return Object.freeze({
     memory,
     groundedTheory: fresh(),
+    O: basis.O,
     K: fresh(),
     A: fresh(),
     B: fresh(),
@@ -232,12 +234,27 @@ function sameDifferential(actual: Differential, label: string): void {
   same(actual.legacyQuiescent, actual.groundedQuiescent, label + " quiescence");
 }
 
-// NO_MATCH.
+// The fixture deliberately demonstrates One-Link role overlap:
+// K = groundedTheory -> O, while O = O -> R and R is the empty ExactSequence.
+// Therefore K is ALSO a valid Theory admission for the grounded relation O->[].
+// It must be preserved by compatibility lowering even though the same Link is
+// used below as an ordinary caller/context value.
 {
   const f = fixture();
   const lowered = lowerGroundedTheoryToLegacyStructural(f);
-  same(lowered.rules.length, 0, "no-match lowering has zero generated rules");
-  sameDifferential(differential(f, [active(f, f.A)], lowered), "NO_MATCH");
+  same(lowered.rules.length, 1, "structurally real O->[] admission is preserved");
+
+  // It is inert for A, so this remains a genuine NO_MATCH for the selected
+  // current antecedent.
+  sameDifferential(differential(f, [active(f, f.A)], lowered), "NO_MATCH_A");
+
+  // The exact same admitted relation becomes active for O and removes the O
+  // contribution through the explicit empty image on both execution paths.
+  const onO = differential(f, [active(f, f.O)], lowered);
+  sameDifferential(onO, "OVERLAPPED_ROLE_O_TO_ZERO");
+  same(onO.groundedMatches, 1, "O->[] grounded admission is active");
+  same(onO.groundedHandoff, 1, "O->[] is reaction, not no-match");
+  same(onO.groundedMembers.length, 0, "O->[] yields empty successor");
 }
 
 // ACTIVE IDENTITY.
@@ -368,7 +385,9 @@ console.log([
   "SOURCE_SEMANTICS=GROUNDED_THEORY_RELATIONS",
   "LEGACY_STRUCTURAL_RULES=GENERATED_BACKEND_REPRESENTATION",
   "SHARED_ROLE_DICTIONARY=TRUE",
+  "ONE_LINK_ROLE_OVERLAP=THEORY_ADMISSION_AND_CALLER_CONTEXT",
   "NO_MATCH=PARITY",
+  "OVERLAPPED_O_TO_ZERO=PARITY",
   "ACTIVE_IDENTITY=PARITY",
   "ONE_TO_ZERO=PARITY",
   "ONE_TO_N=PARITY",
