@@ -825,6 +825,48 @@ export function encodeV015FormalSourceAsetJson(
       syntax.occurrences.map((entry) => [entry.occurrence, entry]),
     );
 
+    if (profile.equalityForm === undefined) {
+      const members = namespaces.declarations.map((declaration) => {
+        const localName = utf8Name(memory, verified, declaration.nameCarrier);
+        const body = occurrences.get(declaration.bodyOccurrence)
+          ?? jsonFail("unsupported-source");
+
+        let encodedValue: string;
+        if (body.kind === profile.pairForm) {
+          const left = nameRef(
+            memory,
+            verified,
+            occurrences,
+            profile,
+            oneField(body, profile.pairLeftRole),
+          );
+          const right = nameRef(
+            memory,
+            verified,
+            occurrences,
+            profile,
+            oneField(body, profile.pairRightRole),
+          );
+          encodedValue = quote(`${left}->${right}`);
+        } else if (
+          profile.sequenceForm !== undefined &&
+          profile.sequenceItemRole !== undefined &&
+          body.kind === profile.sequenceForm
+        ) {
+          const items = body.fields
+            .filter((field) => field.role === profile.sequenceItemRole)
+            .map((field) =>
+              nameRef(memory, verified, occurrences, profile, field.value)
+            );
+          encodedValue = `[${items.map(quote).join(",")}]`;
+        } else {
+          return jsonFail("unsupported-source");
+        }
+        return `${quote(localName)}:${encodedValue}`;
+      });
+      return new TextEncoder().encode(`{${members.join(",")}}\n`);
+    }
+
     let usesStructuredEqualityOperand = false;
     const equalityOperand = (handle: LinkHandle): string => {
       const operand = occurrences.get(handle) ?? jsonFail("unsupported-source");
@@ -947,7 +989,6 @@ export function decodeV015FormalSourceAsetJson(
   }
 
   const root = object(new StrictJsonReader(text).read());
-  exactKeys(root, ["schema", "entries"]);
 
   const grammar = readNativeSyntaxGrammar(memory, verified, grammarRoot);
   const namespaceProfile = readSourceNamespaceProfile(
@@ -962,6 +1003,113 @@ export function decodeV015FormalSourceAsetJson(
     grammarRoot,
     definitionProfileRoot,
   );
+  if (profile.equalityForm === undefined) {
+    const builder = new SyntaxAsetBuilder(memory, grammar.vocabulary);
+    const nameCache = new Map<string, LinkHandle>();
+    const nameCarrier = (value: string): LinkHandle => {
+      const known = nameCache.get(value);
+      if (known !== undefined) return known;
+      const carrier = materializeV012StringAnum(
+        memory,
+        verified,
+        new TextEncoder().encode(value),
+      ).anumLink;
+      nameCache.set(value, carrier);
+      return carrier;
+    };
+    const ref = (value: string): LinkHandle =>
+      builder.addOccurrence(profile.nameRefForm, [{
+        role: profile.referencedNameRole,
+        value: nameCarrier(value),
+      }]);
+
+    const declarations: LinkHandle[] = [];
+    for (const [rawLocalName, rawValue] of root.entries()) {
+      const localName = name(rawLocalName);
+      let body: LinkHandle;
+
+      if (typeof rawValue === "string") {
+        let expression: ParsedExpression;
+        try {
+          expression = parseExpression(rawValue);
+        } catch {
+          return jsonFail("invalid-shape");
+        }
+        if (expression.kind !== "pair") {
+          return jsonFail("invalid-shape");
+        }
+        body = builder.addOccurrence(profile.pairForm, [
+          {
+            role: profile.pairLeftRole,
+            value: ref(expression.leftName),
+          },
+          {
+            role: profile.pairRightRole,
+            value: ref(expression.rightName),
+          },
+        ]);
+      } else if (Array.isArray(rawValue)) {
+        if (
+          profile.sequenceForm === undefined ||
+          profile.sequenceItemRole === undefined
+        ) {
+          return jsonFail("unsupported-source");
+        }
+        body = builder.addOccurrence(
+          profile.sequenceForm,
+          rawValue.map((item) => ({
+            role: profile.sequenceItemRole!,
+            value: ref(name(item)),
+          })),
+        );
+      } else if (rawValue instanceof Map) {
+        return jsonFail("nested-namespace");
+      } else {
+        return jsonFail("invalid-shape");
+      }
+
+      declarations.push(builder.addOccurrence(
+        namespaceProfile.declarationForm,
+        [
+          {
+            role: namespaceProfile.declarationNameRole,
+            value: nameCarrier(localName),
+          },
+          {
+            role: namespaceProfile.declarationBodyRole,
+            value: body,
+          },
+        ],
+      ));
+    }
+
+    const block = builder.addOccurrence(
+      namespaceProfile.blockForm,
+      declarations.map((value) => ({
+        role: namespaceProfile.blockItemRole,
+        value,
+      })),
+    );
+    const sourceAset = builder.finish(block);
+    readSourceNamespaces(
+      memory,
+      verified,
+      grammarRoot,
+      sourceNamespaceProfileRoot,
+      sourceAset,
+    );
+    const canonicalJson = encodeV015FormalSourceAsetJson(
+      memory,
+      verified,
+      grammarRoot,
+      sourceNamespaceProfileRoot,
+      definitionProfileRoot,
+      sourceAset,
+    );
+    return Object.freeze({ sourceAset, canonicalJson });
+  }
+
+  exactKeys(root, ["schema", "entries"]);
   const schema = string(root.get("schema")!);
   if (!jsonSchemaMatchesProfile(profile, schema)) {
     jsonFail("unsupported-profile");
