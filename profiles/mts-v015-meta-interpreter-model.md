@@ -700,6 +700,55 @@ CROSS_MEMBER_JOIN_REQUIRED=FALSE
 
 то внутри этой единственной команды должна существовать **некоторая эквивалентная по мощности способность** читать структуру свежего Link, связывать роли и построить соответствующий новый Link. A10 не утверждает, что API обязан называться S1/S2 или StructuralRule.
 
+## 14f. A11 — редукция параллельной реакции
+
+A11 проверяет уже не форму Context, а то, **как одну реакцию можно физически распараллелить**.
+
+Для каждого current member / shard вычисляется вклад:
+
+```text
+Contribution = (matched, outputs)
+```
+
+а объединение задаётся:
+
+```text
+(m1,O1) ⊕ (m2,O2)
+  =
+(m1 OR m2, O1 UNION O2)
+```
+
+Исполняемо подтверждены:
+
+```text
+ASSOCIATIVE=TRUE
+COMMUTATIVE=TRUE
+IDEMPOTENT=TRUE
+RULE_PARTITION_INVARIANT=TRUE
+RULE_SHARD_ORDER_INVARIANT=TRUE
+CURRENT_PARTITION_INVARIANT=TRUE
+TWO_DIMENSIONAL_PARTITION_INVARIANT=TRUE
+```
+
+Это как раз даёт требуемую независимость от реализации: один CPU, тысячи GPU workers или будущая ассоциативная матрица могут делить миллиард MP между собой произвольно.
+
+Но обязательны границы:
+
+```text
+same reaction-start snapshot
+global match reduction before NO_MATCH
+no read-your-own-writes inside generation
+complete successor before publication
+atomic semantic publication
+```
+
+A11 отдельно фальсифицирует два неправильных варианта:
+
+1. **локальный NO_MATCH** на одном shard нельзя публиковать — другой shard может иметь настоящий match;
+2. результат `A->B` нельзя тут же использовать для `B->C` в том же поколении.
+
+Важно: A11 доказывает **экстенсиональный successor**. Полный provenance и возможный значимый порядок внутри image остаются отдельной задачей.
+
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
