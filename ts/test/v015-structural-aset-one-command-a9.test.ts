@@ -931,6 +931,94 @@ function nativeRoleBundleCandidateExperiment(): void {
       error.code === "template-mismatch";
   }
   assert(mismatch, "zero-role grounded rule remains exact identity matching");
+
+  // A72r-like recursive pressure: three contextual roles in one nested
+  // positive-arity pattern. This is not the full historical A72r runtime;
+  // it checks that the native role-bundle candidate carries the same generic
+  // structural matching/instantiation power without an ordered RoleDictionary.
+  const variadicRoleBundle = fresh();
+  const kRole = memory.ensure(variadicRoleBundle, fresh());
+  const headRole = memory.ensure(variadicRoleBundle, fresh());
+  const restRole = memory.ensure(variadicRoleBundle, fresh());
+
+  const ALL = fresh();
+  const TRUE = fresh();
+
+  const templateTail = memory.ensure(headRole, restRole);
+  const templateArgs = memory.ensure(TRUE, templateTail);
+  const templateApplication = memory.ensure(ALL, templateArgs);
+  const templateBefore = memory.ensureStartSelfClosed(
+    memory.ensure(kRole, templateApplication),
+  );
+  const templateResumed = memory.ensure(ALL, templateTail);
+  const templateAfter = memory.ensureStartSelfClosed(
+    memory.ensure(kRole, templateResumed),
+  );
+  const variadicBody = memory.ensure(
+    templateBefore,
+    materializeExactSequence(memory, [templateAfter]),
+  );
+  const variadicRule = memory.ensure(variadicRoleBundle, variadicBody);
+  const variadicAdmission = memory.ensure(theory, variadicRule);
+
+  const variadicState = aset([
+    variadicAdmission,
+    kRole,
+    headRole,
+    restRole,
+  ]);
+  const variadicSnapshots = nativeRoleBundleRuleSnapshots(
+    memory,
+    variadicState,
+    theory,
+  );
+  same(
+    variadicSnapshots.length,
+    1,
+    "native role-bundle candidate: A72r-like one admitted rule",
+  );
+  const variadic = variadicSnapshots[0]!;
+  setSame(
+    variadic.roles,
+    [kRole, headRole, restRole],
+    "native role-bundle candidate: A72r-like three-role bundle",
+  );
+
+  const actualK = fresh();
+  const actualHead = fresh();
+  const actualRest = fresh();
+  const actualTail = memory.ensure(actualHead, actualRest);
+  const actualArgs = memory.ensure(TRUE, actualTail);
+  const actualApplication = memory.ensure(ALL, actualArgs);
+  const actualBefore = memory.ensureStartSelfClosed(
+    memory.ensure(actualK, actualApplication),
+  );
+  const expectedResumed = memory.ensure(ALL, actualTail);
+  const expectedAfter = memory.ensureStartSelfClosed(
+    memory.ensure(actualK, expectedResumed),
+  );
+
+  const variadicBindings = unifyStructuralRuleTemplate(
+    memory,
+    variadic.antecedentTemplate,
+    actualBefore,
+    variadic.roles,
+  );
+  same(
+    variadicBindings.length,
+    3,
+    "native role-bundle candidate: A72r-like three bindings",
+  );
+  const variadicOutput = instantiateV013StructuralTemplate(
+    memory,
+    variadic.outputTemplates[0]!,
+    variadicBindings,
+  );
+  same(
+    variadicOutput,
+    expectedAfter,
+    "native role-bundle candidate: A72r-like recursive output",
+  );
 }
 
 function staticGuards(): void {
@@ -1063,6 +1151,7 @@ function main(): void {
     "ROLE_ORDER_SEMANTIC=FALSE",
     "AMBIENT_OUTGOING_LINK_IS_ROLE=FALSE",
     "GROUNDED_RULE=EMPTY_ROLE_BUNDLE_REFINEMENT",
+    "NATIVE_ROLE_BUNDLE_A72R_SHAPE=GREEN_RESEARCH",
     "FORMAL_JSON_SURFACE=AUTHOR_REVIEW_PENDING",
     "FULL_EXTERNAL_PROOF=NOT_YET",
     "ACCEPTED_V014_UNCHANGED",
