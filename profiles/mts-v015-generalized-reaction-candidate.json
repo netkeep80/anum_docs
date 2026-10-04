@@ -1,0 +1,111 @@
+{
+  "id": "mts-v015-generalized-reaction-candidate",
+  "version": "0.1.0-development",
+  "status": "DEVELOPMENT_ONLY_AUTHOR_REVIEW_PENDING",
+  "owners": {
+    "architectureIssue": 1987,
+    "mpNecessityIssue": 1988,
+    "historicalAuditIssue": 1913
+  },
+  "acceptedBase": {
+    "mtsVersion": "v0.14",
+    "acceptedExecutionSemantics": "preserved-from-v0.13",
+    "acceptedProfile": "profiles/amemory-execution-profile.json"
+  },
+  "decision": {
+    "scalarPositiveLaw": "MP0_RETAINED",
+    "minimalCompleteLocalReaction": "MP1_CANDIDATE",
+    "scopeLift": "MP2_DERIVED_CANDIDATE",
+    "packedStructuralAntecedent": "MP1_ON_EXPLICIT_COMPOSITE_LINK",
+    "trueCrossMemberJoin": "MP4_DEFERRED_NOT_REQUIRED_BY_CURRENT_CORPUS",
+    "strongerHyperReaction": "MP5_NOT_INTRODUCED"
+  },
+  "mp0": {
+    "form": [
+      "K->A",
+      "A->B",
+      "=> K->B"
+    ],
+    "supplies": [
+      "positive-detachment"
+    ],
+    "doesNotSupply": [
+      "selected-Theory-admission",
+      "match-occurrence",
+      "no-match-preservation",
+      "matched-empty-image",
+      "ordered-multi-image",
+      "whole-successor-publication"
+    ]
+  },
+  "mp1": {
+    "current": "K->A",
+    "selectedAdmission": "Theory->(A->ExactSequence(B...))",
+    "result": "for each emitted B: K->B",
+    "imageCardinality": "0|1|N",
+    "relationDiscovery": "exhaustive-over-selected-theory-snapshot",
+    "noMatch": "preserve-current-truth",
+    "matchedEmpty": "zero-successor-contribution-with-reaction-occurrence",
+    "multipleMatches": "union-all-ordered-images-before-successor-projection",
+    "duplicateSuccessors": "canonical-Link-identity-convergence"
+  },
+  "mp2": {
+    "candidateClassification": "DERIVED_LIFT_NOT_SEPARATE_PRIMITIVE",
+    "domain": "N current members, each independently consumed by MP1",
+    "premises": [
+      "one-reaction-start-selected-Theory-snapshot",
+      "same-snapshot-for-all-current-members",
+      "pointwise-exhaustive-MP1",
+      "no-match-preservation",
+      "matched-empty-local-zero",
+      "canonical-union-of-pointwise-contributions",
+      "complete-successor-before-publication",
+      "one-atomic-current-root-handoff-iff-reaction-occurs"
+    ]
+  },
+  "packedAntecedent": {
+    "example": "K->Pair(A,C) + Pair(A,C)->[D] => K->D",
+    "executionArity": "unary",
+    "separateMembersDoNotImplicitlyPack": true
+  },
+  "crossMemberJoin": {
+    "example": "K->A + K->C + joint{A,C}->D",
+    "implicitPackingForbidden": true,
+    "requiredForV015": false,
+    "acceptanceCondition": "only if a required v0.15 artifact cannot be expressed by explicit Link packing, generic pre-grounding, or repeated ordinary reactions without changing required observable semantics"
+  },
+  "dimensionSeparation": [
+    "N arguments in one carrier",
+    "N outputs in one image",
+    "N current Scope members",
+    "N jointly required antecedents"
+  ],
+  "frozenExecutionBackend": {
+    "repository": "netkeep80/amemory",
+    "main": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "semanticAuthority": false,
+    "role": "external compatibility/conformance backend only"
+  },
+  "compatibilityLowering": {
+    "allowed": true,
+    "target": "legacy OptimizedStructuralEngine",
+    "semanticAuthority": false,
+    "mustBeGeneric": true,
+    "canonicalProgramSourceContainsGeneratedLegacyScaffold": false
+  },
+  "requiredVectors": [
+    "NO_MATCH",
+    "ACTIVE_IDENTITY",
+    "MATCHED_EMPTY_1_TO_0",
+    "1_TO_1",
+    "1_TO_N",
+    "MULTIPLE_MATCHES",
+    "N_TO_1",
+    "N_TO_M",
+    "ORDERED_IMAGE_WITH_REPETITION",
+    "FOREIGN_THEORY",
+    "PACKED_ANTECEDENT",
+    "UNPACKED_CROSS_MEMBER_NON_MATCH"
+  ]
+}
