@@ -246,10 +246,12 @@
     ]
   },
   "frontierCandidate": {
-    "status": "OPEN",
-    "testedResearchRule": "active leaf = reachable C-rooted Context with no START child and no END closure",
-    "problem": "The tested frontier reader relies on absence checks performed by host traversal. Full self-hosting must prove whether frontier/currentness is derivable by the generalized reaction itself or needs a positive Link-native representation.",
-    "forbiddenShortcut": "Do not reintroduce an external current-scope cursor merely because it is convenient."
+    "status": "SUPERSEDED_BY_POSITIVE_ASET_CURRENTNESS",
+    "historicalRule": "active leaf = reachable C-rooted Context with no START child and no END closure",
+    "historicalProblem": "This relied on negative absence checks performed by host traversal.",
+    "currentRule": "currentness is positive semantic Aset membership witnessed by E->K in M_t; physical existence of K or ancestry Links alone is not currentness.",
+    "transition": "Gamma atomically removes transitioned E->K witnesses and adds successor E->K_i witnesses; NO_MATCH preserves the old witness.",
+    "forbiddenShortcut": "Do not reintroduce negative leaf tests or an external current-scope cursor as semantic authority."
   },
   "reactionCandidate": {
     "status": "OPEN",
@@ -333,11 +335,31 @@
         "K0": "♂(C->S0)",
         "CloseK0": "K0♀"
       }
+    },
+    {
+      "id": "MI-J06",
+      "status": "CANDIDATE",
+      "meaning": "Positive currentness is carried by ordinary Link membership E->K in the denoted Aset. The presentation name W0 is arbitrary and carries no currentness authority.",
+      "formalJson": {
+        "Theory": "T",
+        "E": "C->Theory",
+        "Truth0": "K->A",
+        "K0": "♂(E->Truth0)",
+        "W0": "E->K0"
+      },
+      "requiredDifferentials": [
+        "renaming W0 while preserving the RHS E->K0 does not change execution",
+        "removing the E->K0 denoted member removes currentness even if K0 physically exists",
+        "replacing E->K0 by E->K1 moves currentness structurally",
+        "no current=true/active=true/runtime cursor field has semantic authority"
+      ],
+      "openLoweringObligation": "Prove that the direct JSON/source-Aset definition contributes the RHS Link E->K0 to the denoted semantic Aset membership used by Gamma, rather than merely naming a physically materialized Link outside M_t."
     }
   ],
   "formalJsonRules": [
     "Examples are semantic Aset fragments, not JSON metadata schemas.",
     "Object keys are contextual binders/names; string values are FORMAL expressions.",
+    "JSON null is a candidate source marker only for an object member with no RHS (bare entry); it is not an MTS value. Top-level/array null remains fail-closed pending final Author gate.",
     "No type=Context, active=true, programCounter, currentPointer or other host semantic tags are permitted.",
     "The ostensive START/END glyphs reuse accepted v0.14 FORMAL structural notation; exact v0.15 surface spelling remains subject to the Author gate.",
     "Document/provenance metadata in this file is outside the embedded semantic Aset fragments and carries no MTS semantic authority."
@@ -354,7 +376,7 @@
       "id": "MI-D02",
       "question": "How is active frontier/currentness represented without an external cursor?",
       "status": "CANDIDATE",
-      "currentEvidence": "A8 removes the negative-frontier blocker for the tested vector by using positive mutable Aset membership E->K as currentness. Final FORMAL/JSON representation and Author acceptance remain open."
+      "currentEvidence": "A8 removes the negative-frontier blocker by using positive semantic Aset membership E->K as currentness. MI-J06 gives the direct-JSON candidate: an arbitrary presentation name binds the ordinary RHS Link E->K; renaming that presentation name must not affect execution. Final source-Aset -> denoted-Aset membership lowering and Author acceptance remain open."
     },
     {
       "id": "MI-D03",
