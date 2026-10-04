@@ -801,11 +801,19 @@
       "Do not use host insertion order, current=true, active=true, selectedScope or a host pointer as semantic authority."
     ],
     "openBeforeApproval": [
-      "Integrate the law with the canonical native source ANet rather than the bounded post-resolution research carrier.",
-      "Resolve exact bare/null and nested-object FORMAL/JSON lowering into the same resolved-source roles.",
-      "Prove compatibility with the Author-approved native role-bundle Rule topology.",
-      "Run theorem/proof FORMAL pressure and full approved JSON regression after an exact artifact is Author-approved."
+      "Implement/test strict direct JSON -> the same native source ANet roles; JSON must not bypass source ANet/resolution.",
+      "Resolve exact null/string/array/nested-object source mapping and canonical round-trip.",
+      "Replay the Author-approved native role-bundle Rule through JSON -> source ANet -> DAS -> Gamma.",
+      "Run theorem/proof FORMAL pressure and permanent approved JSON regression after explicit Author approval."
     ],
-    "jsonStatus": "AUTHOR_REVIEW_REQUIRED"
+    "jsonStatus": "AUTHOR_REVIEW_REQUIRED",
+    "nativeSourceEvidence": "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+    "nativeSourceResult": [
+      "The canonical native SyntaxAset infrastructure can carry block/bare/binding/bundle source roles selected by a Link-native NativeSyntaxGrammar.",
+      "Reading the canonical source ANet and applying the same denotation law yields the same extensional semantic ANet members as DAS-A1.",
+      "The custom DAS-A1 resolved-source carrier is not required by the candidate architecture.",
+      "Duplicate source occurrences remain distinct in source while equal Link denotations converge extensionally.",
+      "Removing bare E->K membership leaves the same physical/named Link non-current."
+    ]
   }
 }
