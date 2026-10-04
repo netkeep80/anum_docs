@@ -395,6 +395,45 @@ function staticGuards(): void {
   assert(core.includes("memory.outgoing(C)"), "entry discovery is C-scoped");
   assert(core.includes("memory.incoming(payload)"), "START activation observed structurally");
   assert(core.includes("closureOf(memory, context)"), "branch completion is Link-native END evidence");
+
+  const model = JSON.parse(
+    readFileSync(
+      resolve(process.cwd(), "../profiles/mts-v015-meta-interpreter-model.json"),
+      "utf8",
+    ),
+  ) as {
+    contextCandidate: {
+      status: string;
+      directGaugeBoundary: string;
+      authorDecision: string;
+      acceptanceScope: string;
+      chiralityNote: string;
+    };
+    decisionLedger: readonly {
+      id: string;
+      status: string;
+      decision?: string;
+    }[];
+  };
+
+  same(model.contextCandidate.status, "PROVED_RESEARCH", "C boundary evidence status");
+  same(model.contextCandidate.directGaugeBoundary, "C", "direct-gauge execution boundary");
+  same(model.contextCandidate.authorDecision, "APPROVED_FOR_V015", "Author decision for C boundary");
+  same(
+    model.contextCandidate.acceptanceScope,
+    "V0.15_DESIGN_DECISION_NOT_FULL_VERSION_ACCEPTANCE",
+    "C approval scope",
+  );
+  assert(
+    /not promoted to an absolute Foundation-global privilege/i.test(
+      model.contextCandidate.chiralityNote,
+    ),
+    "C boundary remains chirality/gauge relative",
+  );
+  const d1 = model.decisionLedger.find((entry) => entry.id === "MI-D01");
+  assert(d1 !== undefined, "MI-D01 exists");
+  same(d1.status, "PROVED_RESEARCH", "MI-D01 resolved evidence status");
+  same(d1.decision, "AUTHOR_APPROVED_FOR_V015", "MI-D01 Author resolution");
 }
 
 function main(): void {
@@ -405,6 +444,7 @@ function main(): void {
   console.log([
     "MTS v0.15 A5: SELF_CONTAINED_CONTEXT_FREEZE_RESUME=GREEN_RESEARCH",
     "DIRECT_GAUGE_CONTEXT_BOUNDARY=C_DERIVED_FROM_ROOT_TO_END_SELF_CLOSURE",
+    "DIRECT_GAUGE_C_AUTHOR_DECISION=APPROVED_FOR_V015",
     "EXTERNAL_CURRENT_CONTEXT_POINTER=0",
     "EXTERNAL_CURRENT_SCOPE_POINTER=0",
     "EXTERNAL_PROGRAM_COUNTER=0",
