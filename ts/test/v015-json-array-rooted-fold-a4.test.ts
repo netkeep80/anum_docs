@@ -75,9 +75,10 @@ function rootedJsonDenotation(value: JsonVector): LinkHandle {
  * Research comparison only:
  * recursively use historical ExactSequence as an array carrier.
  *
- * Important: a nested array is passed outward by its resulting carrier Link.
- * Therefore ExactSequence can preserve positions while still losing the
- * distinction between a nested empty array (carrier R) and scalar R.
+ * A nested array is passed outward by its denoted/resulting Link.
+ * Since the empty sequence is R by definition, [[]] and [R] are expected to
+ * supply the same element value R to the outer ExactSequence. This is semantic
+ * composition, not a positional-carrier defect.
  */
 function exactJsonCarrier(value: JsonVector): LinkHandle {
   if (typeof value === "string") return scalar(value);
@@ -165,16 +166,16 @@ distinct(exact.get('["R","R"]'), exact.get('["R"]'), "Exact repeated R preserves
 distinct(exact.get('["C"]'), basis.C, "Exact [C] stays distinct from scalar C");
 distinct(exact.get('["R","C"]'), exact.get('["C"]'), "Exact leading R position is preserved");
 
-// Critical new falsifier: nested empty array lowers to the same Link R as scalar R.
+// Expected composition law: [] denotes R, so an outer sequence sees the same value R.
 same(
   exact.get("[[]]"),
   exact.get('["R"]'),
-  "recursive ExactSequence alone aliases nested [] element with scalar R",
+  "recursive ExactSequence composes []=R as the same outer element value",
 );
 same(
   exact.get('[[],"C"]'),
   exact.get('["R","C"]'),
-  "recursive ExactSequence alone aliases nested [] prefix with scalar R prefix",
+  "recursive ExactSequence composes nested []=R in the outer prefix",
 );
 distinct(
   exact.get("[[[]]]"),
@@ -290,8 +291,8 @@ same(
   exactNestedCarriers.length,
   "recursive ExactSequence carriers distinguish nested-empty depths 1..32",
 );
-// ...but depth 2 ([[]]) still aliases the unrelated scalar-element source [R].
-same(exactNestedCarriers[1], exact.get('["R"]'), "Exact nested-empty depth 2 aliases scalar [R]");
+// Depth 2 ([[]]) equals [R] after element denotation because [] = R by definition.
+same(exactNestedCarriers[1], exact.get('["R"]'), "Exact nested-empty depth 2 composes []=R");
 
 same(
   new Set(qNestedCarriers).size,
@@ -305,7 +306,8 @@ console.log([
   "ROOTED_FOLD_NESTED_EMPTY_DENOTATION=R",
   "ROOTED_FOLD_POSITIONAL_IDENTITY=NO",
   "EXACT_SEQUENCE_POSITION_IDENTITY=YES",
-  "EXACT_SEQUENCE_NESTED_EMPTY_VS_SCALAR_R_BOUNDARY=ALIASED",
+  "EMPTY_SEQUENCE_DENOTATION=R",
+  "EXACT_SEQUENCE_NESTED_EMPTY_EQUALS_R_ELEMENT=EXPECTED",
   "Q_SOURCE_NESTING_ROUNDTRIP=YES",
   "Q_INTERPRETED_NESTED_EMPTY_DENOTATION=R",
   "Q_ABIT_CARRIER_NESTING_IDENTITY=YES",
