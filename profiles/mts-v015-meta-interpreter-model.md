@@ -488,6 +488,78 @@ HOST_RELATION_SNAPSHOT_MATCH=RESIDUAL_READ_ONLY_ORACLE
 NEGATIVE no-child / no-END tests = RESIDUAL
 ```
 
+## 14d. Положительная currentness как membership самой Aset
+
+A72n когда-то уже доказал:
+
+```text
+append-only CURRENT -> Scope
++ ещё один CURRENT -> Scope'
+!= замена currentness
+```
+
+Две физически существующие связи становятся неоднозначны. Минимальная развилка была:
+
+```text
+MUTABLE_CURRENTNESS
+OR EXTERNAL_ROOT
+OR EXPLICIT_LIFECYCLE_SEMANTICS
+```
+
+A8 проверяет **первую** ветку без внешнего root.
+
+Пусть:
+
+```text
+E = C -> Theory
+K = Context(...)
+```
+
+Текущесть положительно представлена membership самой исполняемой Aset:
+
+```text
+E
+K
+K.current
+E -> K       <- active membership witness
+```
+
+При реакции membership меняется атомарно:
+
+```text
+NO_MATCH:
+  E->K остаётся
+
+ZERO:
+  E->K уходит из M_(t+1)
+
+ONE/MANY:
+  E->K уходит
+  E->K1, E->K2, ... входят в M_(t+1)
+```
+
+Физические canonical Links старого состояния могут остаться в carrier. Это не currentness:
+
+```text
+physical Link existence != membership in M_t
+```
+
+Исполняемый A8 дал:
+
+```text
+POSITIVE_ASET_CURRENTNESS=GREEN_RESEARCH
+NO_NEGATIVE_LEAF_TEST_REQUIRED=TRUE
+EXTERNAL_CURRENT_POINTER=0
+EXTERNAL_SCOPE_POINTER=0
+REACTION_ATOMICALLY_REPLACES_SEMANTIC_MEMBERSHIP=TRUE
+FREEZE_TRANSFER_RESTORE_INCLUDES_ASET_MEMBERSHIP=GREEN
+CURRENT_TRUTHS_RECONSTRUCT_WITHOUT_POINTER=TRUE
+```
+
+Это лучше согласуется с исходным требованием: **A-memory сама является самомодифицирующейся Aset**, а не append-only графом плюс внешний указатель на «актуальную часть».
+
+Как backend физически хранит membership — таблицей, bitmap, GPU buffer или будущей ассоциативной аппаратурой — не должно входить в МТС.
+
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
