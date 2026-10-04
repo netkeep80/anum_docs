@@ -769,5 +769,43 @@
         "proof/theorem FORMAL surface"
       ]
     }
+  },
+  "denotedAnetMembershipCandidate": {
+    "status": "GREEN_RESEARCH_AUTHOR_REVIEW_REQUIRED",
+    "owner": "#2002",
+    "terminology": "ANet",
+    "evidence": "ts/test/v015-denoted-anet-membership-das-a1.test.ts",
+    "stage": "resolved source metamodel -> denoted extensional semantic ANet M_t",
+    "coreLaws": [
+      "M_t is the complete extensional semantic ANet state, not a Link anchor and not a second ontology object.",
+      "A root binding Name:X provides metamodel/name-resolution information and does not by itself imply X ∈ M_t.",
+      "A root bare resolved Link X explicitly contributes X ∈ M_t.",
+      "Inside anchored V, bare X contributes contextual Link V->X ∈ M_t.",
+      "Inside anchored V, a named binding A:X contributes contextual-name coordinate V->A ∈ M_t while the RHS binding remains metamodel information.",
+      "Nested bundle B under V contributes V->B ∈ M_t and recursively uses V->B as the next anchor.",
+      "Physical existence of a Link is insufficient for semantic ANet membership.",
+      "Duplicate source occurrences resolving to the same Link converge extensionally in M_t.",
+      "Resolved source entry order is nonsemantic."
+    ],
+    "testedConsequences": [
+      "Rule name binding can erase before execution while Theory->Rule membership remains executable.",
+      "Current alias binding can erase while E->K membership remains the positive currentness witness.",
+      "Empty root bundle contributes zero semantic members.",
+      "A [] RHS denotes R but does not imply R membership merely because it is a binding value.",
+      "Removing the bare current member removes currentness while the same E->K Link remains physically materialized and named."
+    ],
+    "forbiddenShortcuts": [
+      "Do not reify ANet generically as M->x Link membership unless separately proved and approved.",
+      "Do not treat every resolved or physically materialized Link as a member of M_t.",
+      "Do not treat a source binding/name as execution membership merely because its RHS is executable.",
+      "Do not use host insertion order, current=true, active=true, selectedScope or a host pointer as semantic authority."
+    ],
+    "openBeforeApproval": [
+      "Integrate the law with the canonical native source ANet rather than the bounded post-resolution research carrier.",
+      "Resolve exact bare/null and nested-object FORMAL/JSON lowering into the same resolved-source roles.",
+      "Prove compatibility with the Author-approved native role-bundle Rule topology.",
+      "Run theorem/proof FORMAL pressure and full approved JSON regression after an exact artifact is Author-approved."
+    ],
+    "jsonStatus": "AUTHOR_REVIEW_REQUIRED"
   }
 }
