@@ -130,6 +130,15 @@
       "evidence": [
         "ts/test/v015-context-tree-reaction-cardinality-a7.test.ts"
       ]
+    },
+    {
+      "id": "MI-B12",
+      "status": "PROVED_RESEARCH",
+      "statement": "For the tested generalized-reaction vector, currentness can be carried by positive mutable Aset membership inside A-memory: E->K membership witnesses an active Context, and one atomic reaction replaces old membership with successor memberships. No external current pointer, Scope pointer, latest-order rule, or negative no-child/no-END frontier test is required.",
+      "evidence": [
+        "ts/test/v015-positive-aset-currentness-a8.test.ts",
+        "ts/test/research-v013-append-only-currentness-falsifier-a72n.test.ts"
+      ]
     }
   ],
   "targetOrganization": {
@@ -276,8 +285,8 @@
     {
       "id": "MI-D02",
       "question": "How is active frontier/currentness represented without an external cursor?",
-      "status": "OPEN",
-      "currentEvidence": "A5 proves freeze/restore of self-describing Context state; A7 proves Context frontier reproduces the tested generalized reaction without external Scope handoff. Remaining blocker is deriving frontier/currentness without host negative traversal."
+      "status": "CANDIDATE",
+      "currentEvidence": "A8 removes the negative-frontier blocker for the tested vector by using positive mutable Aset membership E->K as currentness. Final FORMAL/JSON representation and Author acceptance remain open."
     },
     {
       "id": "MI-D03",
@@ -379,6 +388,31 @@
       "host read-only grounded relation snapshot/matching",
       "negative no-child/no-END checks",
       "full self-hosted generalized reaction remains unproven"
+    ]
+  },
+  "positiveAsetCurrentness": {
+    "status": "PROVED_RESEARCH",
+    "evidence": "ts/test/v015-positive-aset-currentness-a8.test.ts",
+    "semanticState": "M_t is the Aset membership itself; physical canonical Link storage is a carrier and does not define currentness.",
+    "activeWitness": "E -> K is a member of M_t, where E=C->Theory and K is a Context rooted at E; K and K.current are also members of M_t.",
+    "atomicRewrite": {
+      "NO_MATCH": "keep E->K, K and current truth in M_(t+1)",
+      "ZERO": "remove current membership; optionally retain END(K) closure evidence",
+      "ONE_MANY": "remove old current membership and add complete successor truth/Context/E->K memberships"
+    },
+    "proven": [
+      "no negative leaf test is required for currentness in the tested model",
+      "append-only physical stale active-edge Links do not regain semantic authority",
+      "temporary predecessor Context can leave semantic Aset membership while remaining physically referenced as carrier ancestry",
+      "whole topology plus whole Aset membership freezes/transfers/restores current state without a current pointer",
+      "entry construction order does not change final canonical carrier or final semantic membership"
+    ],
+    "relationToA72n": "A72n falsified plain append-only CURRENT->Scope. A8 takes the remaining mutable-currentness branch: semantic Aset membership is actually replaced, while physical carrier Links may remain.",
+    "implementationBoundary": "How a backend stores mutable Aset membership (bitset, table, GPU buffer, associative hardware, etc.) is nonsemantic as long as generalized reaction atomically transforms the same M_t into M_(t+1).",
+    "notProven": [
+      "exact final FORMAL/JSON surface for runtime Aset membership",
+      "full self-hosted meta-grounding",
+      "hardware atomicity implementation"
     ]
   }
 }
