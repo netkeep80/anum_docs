@@ -259,6 +259,20 @@ function run(
       version: string;
       semanticAuthority: boolean;
     };
+    theoremPremiseSplit: {
+      status: string;
+      localReactionPower: {
+        classification: string;
+      };
+      derivedTheoremCandidates: {
+        BUNDLE_LIFT: { classification: string };
+        POINTWISE_CURRENT_LIFT: { classification: string };
+        PARTITION_ORDER_INVARIANCE: { classification: string };
+        FINITE_ONE_GENERATION_COMPLETION: { classification: string };
+      };
+      executionPremises: Record<string, string>;
+      explicitNonClaims: readonly string[];
+    };
   };
   const accepted = JSON.parse(
     readFileSync(
@@ -309,6 +323,67 @@ function run(
   );
   same(candidate.frozenExecutionBackend.version, "0.175.0", "frozen backend version");
 
+  same(
+    candidate.theoremPremiseSplit.status,
+    "GREEN_RESEARCH_AUTHOR_REVIEW_PENDING",
+    "theorem/premise split status",
+  );
+  same(
+    candidate.theoremPremiseSplit.localReactionPower.classification,
+    "OPEN_ARCHITECTURE_DECISION",
+    "local reaction power remains an Author decision",
+  );
+  same(
+    candidate.theoremPremiseSplit.derivedTheoremCandidates.BUNDLE_LIFT.classification,
+    "DERIVED_GIVEN_LOCAL_REACTION_AND_EXHAUSTIVE_SELECTED_RELATIONS",
+    "bundle lift is classified as derived under explicit premises",
+  );
+  same(
+    candidate.theoremPremiseSplit.derivedTheoremCandidates.POINTWISE_CURRENT_LIFT.classification,
+    "DERIVED_GIVEN_MEMBER_INDEPENDENCE_AND_ONE_REACTION_START_SNAPSHOT",
+    "pointwise lift is classified as derived under explicit premises",
+  );
+  same(
+    candidate.theoremPremiseSplit.derivedTheoremCandidates.PARTITION_ORDER_INVARIANCE.classification,
+    "PROVED_RESEARCH",
+    "partition invariance evidence classification",
+  );
+  same(
+    candidate.theoremPremiseSplit.derivedTheoremCandidates.FINITE_ONE_GENERATION_COMPLETION.classification,
+    "PROVED_RESEARCH_GIVEN_EXPLICIT_FINITE_EXECUTION_PREMISES",
+    "finite completion evidence classification",
+  );
+  for (const premise of [
+    "REACTION_START_SNAPSHOT",
+    "EXHAUSTIVE_DISCOVERY",
+    "GENERATION_ISOLATION",
+    "COMPLETE_SUCCESSOR_BEFORE_PUBLICATION",
+    "ATOMIC_PUBLICATION",
+  ] as const) {
+    assert(
+      candidate.theoremPremiseSplit.executionPremises[premise]?.includes("PREMISE"),
+      premise + " remains a premise rather than a fake MP theorem",
+    );
+  }
+  assert(
+    candidate.theoremPremiseSplit.executionPremises.NO_MATCH_PRESERVATION.includes(
+      "REACTION_SEMANTICS_RULE",
+    ),
+    "NO_MATCH preservation remains explicit reaction semantics",
+  );
+  assert(
+    candidate.theoremPremiseSplit.executionPremises.MATCHED_EMPTY_ZERO.includes(
+      "REACTION_SEMANTICS_RULE",
+    ),
+    "matched-empty remains explicit reaction semantics",
+  );
+  assert(
+    candidate.theoremPremiseSplit.explicitNonClaims.some((value) =>
+      value.includes("atomic publication")
+    ),
+    "profile explicitly forbids deriving atomic publication from scalar MP",
+  );
+
   same(accepted.theory.visibility, "reaction-start-snapshot", "accepted Theory snapshot");
   same(
     accepted.theory.sameSnapshotForAllCurrentMembers,
@@ -337,6 +412,9 @@ console.log([
   "GROUNDED_CANDIDATE=EXACT_ONE_MEMBER",
   "STRUCTURAL_UNARY_CANDIDATE=OPEN_COMPARISON",
   "MP4=DEFERRED_NOT_REQUIRED_BY_CURRENT_CORPUS",
+  "THEOREM_PREMISE_SPLIT=EXPLICIT_GREEN_RESEARCH",
+  "ATOMIC_PUBLICATION=PREMISE_NOT_MP_THEOREM",
+  "SNAPSHOT=PREMISE_NOT_MP_THEOREM",
   "NO_MATCH_VS_IDENTITY=DISTINCT",
   "MATCHED_EMPTY=EXPLICIT",
   "ONE_TO_ZERO=GREEN",
