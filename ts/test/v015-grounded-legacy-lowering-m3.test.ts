@@ -17,6 +17,7 @@ import {
   defineStructuralInterpreter,
   defineStructuralRoleDictionary,
   defineStructuralRule,
+  readStructuralRule,
 } from "../src/structural-rule.js";
 import {
   defineV013GroundedExecutionScope,
@@ -263,12 +264,26 @@ function sameDifferential(actual: Differential, label: string): void {
   admitGrounded(f, f.A, [f.C, f.D]);
   const lowered = lowerGroundedTheoryToLegacyStructural(f);
   same(lowered.rules.length, 2, "two grounded relations -> two generated wrappers");
-  same(
-    new Set(lowered.rules.map(() => lowered.roleDictionary)).size,
-    1,
-    "all generated wrappers share one RoleDictionary",
-  );
+  for (const rule of lowered.rules) {
+    same(
+      readStructuralRule(f.memory, rule).roleDictionary,
+      lowered.roleDictionary,
+      "all generated wrappers share one RoleDictionary",
+    );
+  }
   sameDifferential(differential(f, [active(f, f.A)], lowered), "ONE_TO_N_MULTI_MATCH");
+}
+
+// N->1 is the same canonical convergence on both execution paths.
+{
+  const f = fixture();
+  admitGrounded(f, f.A, [f.B]);
+  admitGrounded(f, f.C, [f.B]);
+  const lowered = lowerGroundedTheoryToLegacyStructural(f);
+  sameDifferential(
+    differential(f, [active(f, f.A), active(f, f.C)], lowered),
+    "N_TO_ONE",
+  );
 }
 
 // N->M pointwise lift with matched-empty, positive siblings and one NO_MATCH.
@@ -358,6 +373,7 @@ console.log([
   "ONE_TO_ZERO=PARITY",
   "ONE_TO_N=PARITY",
   "MULTIPLE_MATCHES=PARITY",
+  "N_TO_ONE=PARITY",
   "N_TO_M=PARITY",
   "PACKED_ANTECEDENT=PARITY",
   "PROGRAM_SPECIFIC_DISPATCH=0",
