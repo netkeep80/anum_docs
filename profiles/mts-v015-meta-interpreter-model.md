@@ -972,7 +972,11 @@ Exact grounded Modus Ponens должен быть формально доказ�
 
 Тест, issue, старый runtime или комментарий сами по себе не имеют права незаметно изменить архитектурную модель.
 
-## 16a. Native role-bundle candidate вместо отдельного RoleDictionary
+## 16a. Author-approved native role-bundle design вместо отдельного RoleDictionary
+
+**Author decision 2026-10-05: APPROVED AS v0.15 DESIGN DIRECTION, PROOF PENDING.**
+
+Одобрена именно Link-native архитектура ниже. Это ещё не утверждение теоремы и не approval конкретной JSON-записи.
 
 A9 теперь содержит отдельный исполняемый эксперимент, не меняющий сам `Γ`.
 
@@ -1047,7 +1051,7 @@ Grounded special case:
 
 Denotation/lowering owner: **#2002**.
 
-До Author approval надо проверить:
+После архитектурного Author approval остаются обязательными:
 
 1. exact lowering nested `V{}` в нужные contextual member Links;
 2. bare structured key + `null` как прямое Aset membership;
@@ -1055,6 +1059,8 @@ Denotation/lowering owner: **#2002**.
 4. отсутствие ложных roles при ordinary bundle-members;
 5. полный historical A72r execution differential (трёхролевый рекурсивный shape уже GREEN research);
 6. proof/theorem FORMAL, чтобы не получить executable-only синтаксис.
+
+Конкретная JSON surface-форма (`V`, `R`, `Theory->R` как показано выше) **не одобрена автоматически** этим решением и остаётся под отдельным Author gate после #2002.
 
 ## 17. Author gates
 
