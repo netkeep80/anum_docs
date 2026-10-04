@@ -307,7 +307,11 @@ function run(
   same(candidate.capabilityAxes.imageArity, "ZERO_ONE_MANY", "grounded image cardinality");
   same(candidate.capabilityAxes.scopeLift, "POINTWISE_N_CURRENT_MEMBERS", "grounded pointwise scope lift");
   same(candidate.competingCandidate.id, "STRUCTURAL_UNARY_TEMPLATE_REACTION", "structural-unary comparison retained");
-  same(candidate.competingCandidate.status, "OPEN_NECESSITY_COMPARISON", "structural-unary decision remains open");
+  same(
+    candidate.competingCandidate.status,
+    "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
+    "structural-unary Γ design approved with proof closure pending",
+  );
   same(candidate.competingCandidate.matchPower, "STRUCTURAL_TEMPLATE_WITH_ROLES", "structural-unary match axis");
   same(candidate.competingCandidate.jointAntecedentArity, "ONE_CURRENT_MEMBER", "structural-unary is not cross-member join");
   same(candidate.decision.scalarPositiveLaw, "MP0_RETAINED", "MP0 retained");
