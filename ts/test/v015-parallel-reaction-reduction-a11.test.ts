@@ -50,9 +50,10 @@ function contribution(
   matched: boolean,
   outputs: Iterable<LinkHandle>,
 ): Contribution {
+  const canonicalOutputs = [...new Set(outputs)].sort((a, b) => a - b);
   return Object.freeze({
     matched,
-    outputs: Object.freeze([...new Set(outputs)]),
+    outputs: Object.freeze(canonicalOutputs),
   });
 }
 
