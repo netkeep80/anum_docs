@@ -138,5 +138,38 @@
     "current Scope cardinality",
     "structural template role count",
     "joint current-member antecedent arity"
-  ]
+  ],
+  "metaGroundingBoundary": {
+    "status": "OPEN_ARCHITECTURE_DECISION",
+    "s0ExactMpSelfHostsFreshStructuralGrounding": false,
+    "evidence": [
+      "v015-matchpower-falsifier-m6",
+      "v015-meta-selfhost-s0-opacity-m6b"
+    ],
+    "reason": [
+      "exact antecedent identity does not bind roles inside a fresh structured Link",
+      "pointwise Scope lift does not correlate an independent control member with a payload member",
+      "packing alone does not convert exact identity into structural matching",
+      "K preservation transports an opaque Link identity but does not expose its poles",
+      "fresh substituted output construction requires authority beyond S0 exact reaction"
+    ],
+    "acceptedV013RelatedCapabilities": {
+      "relativePoleNavigationExists": true,
+      "relativeFormMaterializationExists": true,
+      "currentImplementationUses": [
+        "memory.poles",
+        "memory.ensure / ensureStartSelfClosed / ensureEndSelfClosed",
+        "explicit source/Rule/Theory/context authority replay"
+      ],
+      "provesS0AsetSelfHosting": false,
+      "note": "These accepted Link-native capabilities show that decomposition/construction are legitimate MTS operations, but their current authority-gated host implementation is not evidence that an Aset executed only by S0 exact MP can realize them."
+    },
+    "metaBCriterion": "META-B is proven only if reflection/decomposition/binding/construction needed for generic grounding are themselves realized as ordinary approved Aset data executed by the selected single generalized-reaction command, without hidden host poles/ensure semantics.",
+    "unresolvedChoices": [
+      "META-A bootstrap/compiler generic grounding + S0 exact MP",
+      "self-hosted grounding with an independently derived Aset-level reflection/construction mechanism",
+      "stronger structural-unary generalized reaction if necessity is author-reviewed"
+    ],
+    "trueCrossMemberJoinRequired": false
+  }
 }
