@@ -11,6 +11,8 @@ import {
   reactV013GroundedScope,
   V013GroundedScopeCursor,
 } from "../src/v013-grounded-execution.js";
+import { unifyStructuralRuleTemplate } from "../src/structural-unification.js";
+import { instantiateV013StructuralTemplate } from "../src/v013-structural-execution.js";
 
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 M6B S0 self-host opacity: " + message);
@@ -220,7 +222,41 @@ same(
   );
 }
 
-// 5. META-A-style external grounding immediately removes the barrier:
+// 5. S1 and S2 are separable missing capabilities.
+{
+  const before = f.memory.linkCount;
+  const bindings = unifyStructuralRuleTemplate(
+    f.memory,
+    f.template,
+    actual,
+    [f.X, f.Y],
+  );
+
+  same(bindings.length, 2, "S1 binds both declared roles");
+  same(bindings[0]?.role, f.X, "S1 binding[0] role");
+  same(bindings[0]?.value, A, "S1 infers X=A");
+  same(bindings[1]?.role, f.Y, "S1 binding[1] role");
+  same(bindings[1]?.value, C, "S1 infers Y=C");
+  same(f.memory.linkCount, before, "S1 structural binding is read-only");
+  same(
+    f.memory.find(C, A),
+    undefined,
+    "S1 alone does not construct the substituted output",
+  );
+
+  const instantiated = instantiateV013StructuralTemplate(
+    f.memory,
+    f.swapTemplate,
+    bindings,
+  );
+  same(instantiated, f.memory.find(C, A), "S2 constructs canonical swapped output");
+  assert(
+    f.memory.linkCount > before,
+    "S2 construction crosses the write/materialization boundary",
+  );
+}
+
+// 6. META-A-style external grounding immediately removes the barrier:
 // host structural knowledge materializes the fresh output and exact admission;
 // the unchanged S0 executor then succeeds.
 //
@@ -252,6 +288,10 @@ console.log([
   "PACKING_WITHOUT_STRUCTURAL_MATCH_DOES_NOT_BIND=TRUE",
   "K_PRESERVATION_IS_NOT_LINK_DECOMPOSITION=TRUE",
   "S0_ALONE_SYNTHESIZES_FRESH_SWAP=FALSE",
+  "S1_STRUCTURAL_BINDING_READ_ONLY=TRUE",
+  "S1_ALONE_CONSTRUCTS_OUTPUT=FALSE",
+  "S2_CONSTRUCTION_REQUIRES_BINDINGS=TRUE",
+  "S1_PLUS_S2_SOLVES_FRESH_SWAP=TRUE",
   "META_A_EXTERNAL_GROUNDING_RESCUES_UNCHANGED_S0=TRUE",
   "META_B_WITH_S0_REQUIRES_ADDITIONAL_REFLECTION_OR_CONSTRUCTION_AUTHORITY=TRUE",
   "CROSS_MEMBER_JOIN_REQUIRED=FALSE",
