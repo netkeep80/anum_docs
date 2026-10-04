@@ -50,11 +50,19 @@ function contribution(
   matched: boolean,
   outputs: Iterable<LinkHandle>,
 ): Contribution {
-  const canonicalOutputs = [...new Set(outputs)].sort((a, b) => a - b);
   return Object.freeze({
     matched,
-    outputs: Object.freeze(canonicalOutputs),
+    outputs: Object.freeze([...new Set(outputs)]),
   });
+}
+
+function sameContribution(
+  actual: Contribution,
+  expected: Contribution,
+  message: string,
+): void {
+  same(actual.matched, expected.matched, `${message}: matched bit`);
+  setSame(actual.outputs, expected.outputs, `${message}: output union`);
 }
 
 function combine(a: Contribution, b: Contribution): Contribution {
@@ -281,33 +289,33 @@ const currents = Object.freeze([
   ] as const;
 
   for (const a of samples) {
-    same(
-      JSON.stringify(combine(a, ZERO_CONTRIBUTION)),
-      JSON.stringify(a),
+    sameContribution(
+      combine(a, ZERO_CONTRIBUTION),
+      a,
       "right neutral element",
     );
-    same(
-      JSON.stringify(combine(ZERO_CONTRIBUTION, a)),
-      JSON.stringify(a),
+    sameContribution(
+      combine(ZERO_CONTRIBUTION, a),
+      a,
       "left neutral element",
     );
-    same(
-      JSON.stringify(combine(a, a)),
-      JSON.stringify(a),
+    sameContribution(
+      combine(a, a),
+      a,
       "idempotence",
     );
 
     for (const bb of samples) {
-      same(
-        JSON.stringify(combine(a, bb)),
-        JSON.stringify(combine(bb, a)),
+      sameContribution(
+        combine(a, bb),
+        combine(bb, a),
         "commutativity",
       );
 
       for (const c of samples) {
-        same(
-          JSON.stringify(combine(combine(a, bb), c)),
-          JSON.stringify(combine(a, combine(bb, c))),
+        sameContribution(
+          combine(combine(a, bb), c),
+          combine(a, combine(bb, c)),
           "associativity",
         );
       }
