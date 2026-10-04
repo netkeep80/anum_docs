@@ -339,21 +339,21 @@
     {
       "id": "MI-J06",
       "status": "CANDIDATE",
-      "meaning": "Positive currentness is carried by ordinary Link membership E->K in the denoted Aset. The presentation name W0 is arbitrary and carries no currentness authority.",
-      "formalJson": {
+      "meaning": "Positive currentness is carried by ordinary Link membership E->K in the denoted Aset; no presentation alias is semantically required.",
+      "requiredDifferentials": [
+        "renaming unrelated presentation aliases does not change execution",
+        "removing the bare denoted member E->K0 removes currentness even if K0 physically exists",
+        "replacing E->K0 by E->K1 moves currentness structurally",
+        "no current=true/active=true/runtime cursor field has semantic authority"
+      ],
+      "openLoweringObligation": "Prove that a bare structured JSON member key with null reconstructs the direct denoted Aset member E->K0. This exact surface remains Author-review pending.",
+      "formalJsonCandidate": {
         "Theory": "T",
         "E": "C->Theory",
         "Truth0": "K->A",
         "K0": "♂(E->Truth0)",
-        "W0": "E->K0"
-      },
-      "requiredDifferentials": [
-        "renaming W0 while preserving the RHS E->K0 does not change execution",
-        "removing the E->K0 denoted member removes currentness even if K0 physically exists",
-        "replacing E->K0 by E->K1 moves currentness structurally",
-        "no current=true/active=true/runtime cursor field has semantic authority"
-      ],
-      "openLoweringObligation": "Prove that the direct JSON/source-Aset definition contributes the RHS Link E->K0 to the denoted semantic Aset membership used by Gamma, rather than merely naming a physically materialized Link outside M_t."
+        "E->K0": null
+      }
     }
   ],
   "formalJsonRules": [
@@ -691,5 +691,61 @@
       "full provenance and ordered-image refinement",
       "denotational semantics of an infinite reaction"
     ]
+  },
+  "nativeRoleBundleRuleCandidate": {
+    "status": "AUTHOR_REVIEW_REQUIRED",
+    "evidence": "ts/test/v015-structural-aset-one-command-a9.test.ts",
+    "purpose": "Eliminate the dedicated RoleDictionary wrapper while retaining an explicit Link-native witness for structural bindable roles.",
+    "semanticTopology": {
+      "roleBundle": "V is an ordinary Aset/bundle anchor.",
+      "roleMembership": "A role is the MEMBER LINK V->name_i itself, and it counts only when that Link belongs to M_t. Physical outgoing existence alone is insufficient.",
+      "body": "Body = AntecedentTemplate -> ExactSequence(OutputTemplates)",
+      "rule": "Rule = V -> Body",
+      "admission": "Theory -> Rule belongs to M_t",
+      "groundedRefinement": "An empty role bundle gives the zero-role exact grounded rule special case."
+    },
+    "testedFindings": [
+      "two-role swap template binds and instantiates correctly",
+      "role membership order is nonsemantic",
+      "an ambient physical V->Z outside M_t is not a role",
+      "zero-role rule preserves exact identity matching",
+      "the same existing structural matcher/instantiator consumes the derived role set",
+      "dedicated START(ExactSequence(roles)) RoleDictionary is not necessary for the tested vector"
+    ],
+    "nonClaims": [
+      "This does not yet prove the candidate for every v0.15 rule/program/proof.",
+      "This does not make host scanning of state.members the accepted implementation.",
+      "This does not approve a concrete JSON spelling.",
+      "This does not make the presentation names V/Rule/Theory semantically privileged."
+    ],
+    "jsonSurfaceCandidate": {
+      "status": "AUTHOR_REVIEW_REQUIRED",
+      "parametericExample": {
+        "V": {
+          "X": null,
+          "Y": null
+        },
+        "R": "V->((tag->(V:X->V:Y))->[V:Y->V:X])",
+        "Theory->R": null
+      },
+      "groundedExample": {
+        "V0": {},
+        "R0": "V0->(A->[B])",
+        "Theory->R0": null
+      },
+      "interpretation": [
+        "nested object V is intended as the anchored role bundle",
+        "V:X and V:Y are qualified references to the contextual role-member Links",
+        "Theory->R is a direct bare Aset member/admission, not an active/admitted JSON tag",
+        "empty {} role bundle corresponds to the grounded zero-role refinement"
+      ],
+      "openObligations": [
+        "prove nested object/contextual-name lowering gives exactly the required role-member Links",
+        "prove a bare structured object key with null contributes its denoted Link directly to Aset membership",
+        "prove alpha-renaming/presentation-name changes preserve behavior modulo contextual identity",
+        "falsify collisions with ordinary non-role bundle members",
+        "run the candidate against variable-arity A72r and theorem/proof FORMAL before Author approval"
+      ]
+    }
   }
 }
