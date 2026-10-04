@@ -776,10 +776,9 @@ function identityProof(
     f.definitionProfileRoot,
     result.source.sourceAset,
   );
-  assert(
-    decoder.decode(json).includes(`"schema":"${V015_FORMAL_JSON_J1_SCHEMA}"`),
-    "contextual binder needs no new JSON syntax/profile",
-  );
+  const jsonText = decoder.decode(json);
+  assert(jsonText.startsWith('{"R":"R->R"'), "contextual binder uses direct JSON bundle");
+  assert(!jsonText.includes('"pair"'), "contextual binder JSON has no pair host tag");
   const round = decodeV015FormalSourceAsetJson(
     f.memory,
     f.basis,
