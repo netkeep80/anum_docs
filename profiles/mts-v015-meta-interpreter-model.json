@@ -365,20 +365,20 @@
     {
       "id": "MI-D04",
       "question": "Is generalized parallel MP derived from scalar MP plus reaction/publication laws, and what exact premises are irreducible?",
-      "status": "OPEN",
-      "currentEvidence": "A10 gives the finite-exact fresh-structure lower bound; A11 gives the parallel reduction law; A12 separates infinite ambient ontology from finite executable reaction completion. Primitive-vs-derived structure sensitivity remains open."
+      "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
+      "currentEvidence": "Author-approved v0.15 design: one repeated structural-unary reaction Γ = analysis(read-only M_t snapshot) -> synthesis(materialization/staging) -> atomic publication of M_(t+1). A10/A11/A12 are research evidence; #2001 owns formal closure. Exact grounded MP must be shown as a refinement/special case; no J1 cross-current join is introduced."
     },
     {
       "id": "MI-D05",
       "question": "Can meta-grounding become fully self-hosted without hidden host structural matcher/constructor semantics?",
-      "status": "OPEN",
-      "currentEvidence": "M6B+A10 now give both operational and information-theoretic lower-bound pressure: finite exact identity cannot distinguish fresh out-of-support structures by their poles, while A9 shows structural-unary S1+S2 is sufficient. Whether that capability is primitive or derivable by a Link-native meta-layer remains OPEN."
+      "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
+      "currentEvidence": "The structural capability is accepted as part of the one repeated Γ reaction semantics, not as an external grounder command. S1/S2 are explanatory analysis/synthesis subphases, not separate opcodes. #2001 must still prove the multi-generation exact-S0 opacity lower bound and grounded-MP refinement; final FORMAL/JSON representation remains Author-gated."
     }
   ],
   "maintenanceLaw": {
     "rule": "Any v0.15 decision that changes execution/meta-interpreter organization must update this model in the same change. Research tests/issues may provide evidence but do not silently supersede this model.",
     "humanProjection": "profiles/mts-v015-meta-interpreter-model.md",
-    "authorGate": "No C-root choice, frontier rule, meta-grounding power or FORMAL-JSON executable representation becomes accepted without explicit Author confirmation."
+    "authorGate": "C=END(R) and the structural-unary Γ analysis->synthesis cycle are Author-approved v0.15 design decisions. Final FORMAL/JSON executable representation, any stronger reaction power, and any later semantic change still require explicit Author confirmation."
   },
   "freezeResume": {
     "status": "PROVED_RESEARCH",
@@ -522,12 +522,26 @@
       "no cross-current-member join is used"
     ],
     "residuals": [
-      "host matcher/constructor functions are currently the implementation of the candidate generalized command; this is not yet an external formal proof of the primitive",
+      "host matcher/constructor functions are currently only an implementation witness for the approved Γ capability; #2001 must prove the semantic/refinement claims independently",
       "physical atomic staging/commit on CPU/GPU/ASIC remains an implementation/refinement obligation",
       "final Link-native FORMAL/JSON representation of runtime Aset membership and structural rules remains Author-gated",
-      "necessity versus weaker grounded+bootstrap architecture still requires Author decision"
+      "multi-generation exact-S0 opacity and grounded-MP refinement still require formal closure in #2001"
     ],
-    "acceptanceStatus": "AUTHOR_DECISION_REQUIRED"
+    "acceptanceStatus": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING"
+  },
+  "reactionCycleDecision": {
+    "status": "AUTHOR_APPROVED_FOR_V015_DESIGN_PROOF_PENDING",
+    "proofClosureOwner": "#2001",
+    "stateTransformer": "Gamma(M_t)=M_(t+1)",
+    "repetition": "The same Gamma is applied repeatedly to successive A-memory/Aset states.",
+    "analysis": "Read one immutable reaction-start M_t; recover currentness/admission, determine all applicable structural-unary relations and bindings; no synthesis write is visible during analysis.",
+    "synthesis": "Instantiate/canonically construct required Links and stage Aset-membership/currentness changes from the completed analysis result.",
+    "publication": "Publish the complete successor M_(t+1) atomically; only then may it become the next reaction input.",
+    "phaseSemantics": "Analysis and synthesis are internal phases of one semantic reaction, not separate A-memory commands or program opcodes.",
+    "dedupSemantics": "No separate deduplication phase: duplicate derivations of the same canonical Link converge automatically at extensional Aset-membership level. UNION remains mathematical reduction notation.",
+    "exactSequenceBoundary": "Positional repetition inside ordered carriers such as ExactSequence is preserved and is not erased by Aset-level idempotence.",
+    "groundedRefinement": "Exact grounded Modus Ponens must be proved as a special/refinement case of Gamma.",
+    "jointness": "J0 structural-unary only; no true cross-current-member J1 join in the approved v0.15 design."
   },
   "finiteExactSupportNecessity": {
     "status": "PROVED_RESEARCH",
@@ -567,6 +581,7 @@
     "evidence": "ts/test/v015-parallel-reaction-reduction-a11.test.ts",
     "contribution": "(matched:boolean, outputs:set<Link>)",
     "combine": "(m1,O1) ⊕ (m2,O2) = (m1 OR m2, O1 UNION O2)",
+    "unionSemantics": "UNION is theorem/reduction notation over extensional successor membership. Canonical Link identity and Aset membership already converge duplicate derived Links; no separate runtime dedup/UNION phase exists. ExactSequence/internal ordered multiplicity is outside this idempotent Aset-membership rule.",
     "algebra": {
       "neutral": "(false, empty)",
       "associative": true,
@@ -650,7 +665,7 @@
       "finite materialized execution slice for physical completion"
     ],
     "unresolved": [
-      "whether structure-sensitive S1+S2 is primitive reaction power or derivable/self-hosted meta-Aset behavior",
+      "formal proof closure for the Author-approved structural-unary Γ power, including multi-generation exact-S0 opacity and grounded-MP refinement (#2001)",
       "full provenance and ordered-image refinement",
       "denotational semantics of an infinite reaction"
     ]
