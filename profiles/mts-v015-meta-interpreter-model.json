@@ -173,6 +173,14 @@
         "profiles/mts-v015-generalized-reaction-candidate.json",
         "ts/test/v015-mp-necessity-a2.test.ts"
       ]
+    },
+    {
+      "id": "MI-B17",
+      "status": "PROVED_RESEARCH",
+      "statement": "For a fixed finite exact-identity Theory, all fresh Links outside antecedent support share the same all-false exact observation signature. Therefore exact identity plus K-preservation cannot determine distinct outputs that depend on hidden Link poles; some structure-sensitive information source is required somewhere for generic fresh structural transformation.",
+      "evidence": [
+        "ts/test/v015-exact-finite-support-necessity-a10.test.ts"
+      ]
     }
   ],
   "targetOrganization": {
@@ -340,7 +348,7 @@
       "id": "MI-D05",
       "question": "Can meta-grounding become fully self-hosted without hidden host structural matcher/constructor semantics?",
       "status": "OPEN",
-      "currentEvidence": "M6B + A10 show finite exact S0 cannot generically transform arbitrarily fresh structured Links; A9 shows one structural-unary command with S1+S2 is sufficient for the tested self-contained vector. The remaining decision is whether to accept equivalent structure-sensitive power inside generalized reaction, or weaken the one-command requirement and retain external bootstrap grounding."
+      "currentEvidence": "M6B+A10 now give both operational and information-theoretic lower-bound pressure: finite exact identity cannot distinguish fresh out-of-support structures by their poles, while A9 shows structural-unary S1+S2 is sufficient. Whether that capability is primitive or derivable by a Link-native meta-layer remains OPEN."
     }
   ],
   "maintenanceLaw": {
@@ -505,7 +513,8 @@
       "Support(F) of a finite exact Theory F is the finite set of exact antecedent identities appearing in F",
       "an actual Link A outside Support(F) cannot match by exact identity, irrespective of A's internal poles",
       "adding exact rules for N observed fresh inputs expands support by N concrete identities but does not generalize to a fresh N+1 identity",
-      "a generic transformation over arbitrarily fresh structured inputs therefore requires either unbounded pre-enumeration or some additional structure-sensitive reflection/matching plus construction authority"
+      "a generic transformation over arbitrarily fresh structured inputs therefore requires either unbounded pre-enumeration or some additional structure-sensitive reflection/matching plus construction authority",
+      "all fresh Links outside finite exact support share the same all-false exact observation signature, while a structural transform can require distinct outputs for those inputs"
     ],
     "testedFamilies": [
       1,
@@ -520,7 +529,14 @@
       "that cross-current-member join is necessary",
       "that the current TypeScript implementation is the final kernel"
     ],
-    "consequence": "Under the strong one-command/self-contained requirement, an exact-only finite executor needs some internally available capability equivalent in power to fresh structure observation/binding and corresponding construction; external pre-grounding is otherwise required."
+    "consequence": "Under the strong one-command/self-contained requirement, an exact-only finite executor lacks enough information for generic structure-dependent transforms on arbitrarily fresh Links unless structure-sensitive observation/construction power appears somewhere inside the semantic system; an external grounder is otherwise required.",
+    "informationOpacity": {
+      "exactObservation": "For fixed finite exact Theory F, a fresh whole Link is observed only by equality against the finitely many supported antecedent identities.",
+      "equivalenceClass": "Every fresh Link outside Support(F) has the same all-false exact observation signature.",
+      "consequence": "If the required transformation maps fresh structured inputs to distinct outputs depending on hidden poles, exact observation alone cannot select those outputs.",
+      "kPreservation": "K-preservation can retain the opaque whole-Link identity but does not reveal its start/end poles or synthesize a different Link derived from those poles.",
+      "evidence": "ts/test/v015-exact-finite-support-necessity-a10.test.ts"
+    }
   },
   "parallelReactionReduction": {
     "status": "PROVED_RESEARCH",
