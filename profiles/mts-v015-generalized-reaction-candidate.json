@@ -242,32 +242,58 @@
   },
   "sequenceCarrierBoundary": {
     "status": "AUTHOR_REVIEW_REQUIRED",
+    "evidence": "ts/test/v015-json-array-rooted-fold-a4.test.ts",
+    "layerNotation": {
+      "jsonSource": "J[...]",
+      "rootedDenotation": "F_R(...)",
+      "exactPositionalCarrier": "Exact(...)",
+      "anumQInterpretation": "Q⟦...⟧",
+      "recursiveLinkCodec": "Enc8961(Link)"
+    },
     "approvedSourceCandidate": {
       "empty": "R",
-      "recurrence": "Seq(xs,x)=Seq(xs)->x"
+      "recurrence": "F_R(xs,x)=F_R(xs)->x",
+      "meaning": "R-rooted denotation candidate; not an assertion of exact source/carrier identity"
     },
     "rootedFoldFindings": {
       "exactPositionalIdentity": false,
-      "collisions": [
-        "Seq() = Seq(R) = Seq(R,R) = R",
-        "Seq(R,C) = Seq(C)",
-        "Seq(C) = C (sequence carrier identity collides with scalar Link C)"
-      ]
+      "denotationalEquivalences": [
+        "F_R([])=F_R([R])=F_R([R,R])=R",
+        "F_R([R,C])=F_R([C])=C",
+        "F_R([[]])=F_R([[[]]])=R",
+        "F_R([[],C])=C"
+      ],
+      "classification": "These are denotational equalities of the rooted fold. They are not by themselves source-identity failures."
     },
-    "acceptedV014Constraint": "ExactSequence preserves exact positional sequence identity distinct from fold denotation",
+    "acceptedV014Constraint": "ExactSequence preserves exact positional sequence identity distinct from fold denotation; Anum/Q source/carrier identity is also distinct from interpreted denotation.",
     "historicalExactSequence": {
       "empty": "R",
       "cell": "START(prev->value)",
       "permitsRootAsOrdinaryValue": true,
       "preservesRepeatedPositions": true,
-      "distinguishesSequenceCarrierFromScalarValue": true
+      "distinguishesSequenceCarrierFromScalarValue": true,
+      "newBoundaryFalsifier": "Recursive ExactSequence lowering still maps nested empty [] to carrier R, so outer [[]] aliases outer [R]. Position marking alone does not preserve nested-container/source-kind identity."
+    },
+    "anumQPrecedent": {
+      "sameGlyphWarning": "Square brackets in Q/Anum are abits OPEN/CLOSE, not JSON array syntax.",
+      "nestedEmptyInterpretation": "Q⟦[]⟧ = Q⟦[[]]⟧ = Q⟦[[[]]]⟧ = R is allowed at denotation level.",
+      "sourceCarrier": "The rooted abit carrier over O/C/L/U preserves the exact bracket stream and therefore distinguishes nested-empty sources even when their interpreted Link denotation is R."
+    },
+    "recursive8961Boundary": "8/9/6/1 serializes the selected Link structure only. If two sources already denote the same Link R, both serialize as 8; it does not recover JSON or Q source identity.",
+    "deepNestedEmptyResult": {
+      "testedDepth": 32,
+      "rootedDenotation": "all R",
+      "recursiveExactCarrierDepths": "distinct along the nested-depth chain",
+      "but": "Exact([[]]) still aliases Exact([R]); nested depth is not the same question as nested-container-vs-scalar identity",
+      "qAbitCarrierDepths": "distinct and exact-round-trippable"
     },
     "unresolvedDecision": [
-      "treat approved R-fold equations as non-injective fold denotation/projection and use ExactSequence (or equivalent root-safe positional carrier) for JSON array identity",
-      "accept quotient/non-positional array semantics explicitly",
-      "define a new injective positional lowering; do not silently equate it with the rooted fold"
+      "decide which JSON-array distinctions belong only to source/model identity and which must survive into executable Link structure",
+      "if nested-array boundary is semantically observable, provide an explicit Link-native source/container witness rather than assuming ExactSequence positions are sufficient",
+      "decide whether rooted fold is the semantic denotation while a separate source representation preserves array boundaries",
+      "do not require Link->original-JSON inversion unless an executable semantic role actually needs that distinction"
     ],
-    "forbiddenShortcut": "Do not identify the approved JSON array source rule with historical ExactSequence physical identity without an explicit lowering decision."
+    "forbiddenShortcut": "Do not identify JSON array source, R-rooted denotation, ExactSequence, Anum/Q bracket source, or recursive 8/9/6/1 encoding. In particular, do not claim ExactSequence alone preserves nested-array boundaries."
   },
   "parallelReactionReduction": {
     "status": "GREEN_RESEARCH",
