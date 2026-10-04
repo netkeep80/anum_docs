@@ -136,7 +136,8 @@
     "authorDecision": "PENDING",
     "necessityEvidence": [
       "M6B exact-S0 freshness opacity",
-      "A10 finite exact support lower-bound pressure"
+      "A10 finite exact support lower-bound pressure",
+      "A10 exact-observation opacity"
     ]
   },
   "notEquivalentDimensions": [
@@ -223,6 +224,19 @@
       "implication": "Strong one-command self-contained execution needs internal structure-sensitive reflection/matching+construction power or an equivalent mechanism; otherwise an external grounder is required.",
       "uniqueStructuralApiRequired": false,
       "crossMemberJoinRequired": false
+    },
+    "exactObservationLowerBound": {
+      "status": "GREEN_RESEARCH",
+      "evidence": "ts/test/v015-exact-finite-support-necessity-a10.test.ts",
+      "finiteSupport": "A fixed finite exact Theory can distinguish only the whole-Link identities explicitly present as antecedents.",
+      "freshObservationClass": "Every fresh Link outside support yields the same all-false antecedent-equality signature.",
+      "structuralDemand": "A generic fresh transformation may require different outputs determined by the hidden poles of those indistinguishable whole Links.",
+      "lowerBound": "Some structure-sensitive observation/binding and corresponding construction capability must exist somewhere in a self-contained generic system.",
+      "notProven": [
+        "that the capability must be exposed as the exact S1/S2 API used by the TypeScript oracle",
+        "that the capability must be primitive rather than derivable by a lower-level Link-native meta-Aset",
+        "that cross-current-member join is required"
+      ]
     }
   },
   "sequenceCarrierBoundary": {
