@@ -749,6 +749,51 @@ A11 отдельно фальсифицирует два неправильны�
 
 Важно: A11 доказывает **экстенсиональный successor**. Полный provenance и возможный значимый порядок внутри image остаются отдельной задачей.
 
+## 14g. A12 — бесконечная онтология, конечный исполняемый срез
+
+В принятой proof-границе уже есть:
+
+```text
+ambient Link carrier = INFINITE_REQUIRED
+grounded replay      = FINITE_EXPLICIT_WITNESSES_REQUIRED
+```
+
+A12 переносит это различие на исполнение.
+
+Если для конкретного шага:
+
+```text
+M_t                         finite materialized Aset
+Current(M_t)                finite
+Admissions_T(M_t)           finite
+каждая matched image        finite
+каждый local match          terminating
+```
+
+то:
+
+```text
+|Current| × |Admissions|    finite work
+полный staged successor     finite
+```
+
+Следовательно, один физический CPU/GPU/ASIC-шаг можно закончить до atomic publication даже при **бесконечной математической Link-вселенной**.
+
+Это не означает:
+
+```text
+вся MTS конечна
+каждая мыслимая Aset конечна
+infinite denotational reaction запрещена
+atomic commit выводится из одной лишь конечности
+```
+
+Правильная граница:
+
+> конечность — premise материализованного исполняемого среза и hardware refinement, а не ограничение one-Link ontology.
+
+Это позволяет МТС описывать и обычную память, и GPU, и будущую ассоциативную машину с триллионами физических Links одной и той же семантикой.
+
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
