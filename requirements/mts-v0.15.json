@@ -60,7 +60,9 @@
         "negativeVectors": [
           "new-v015-normative-prose-must-not-introduce-aset-as-term"
         ],
-        "requiredExecutableGates": []
+        "requiredExecutableGates": [
+          "ts/test/v015-requirements-traceability-r0.test.ts"
+        ]
       }
     },
     {
