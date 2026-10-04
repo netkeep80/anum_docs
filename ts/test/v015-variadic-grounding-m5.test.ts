@@ -273,6 +273,18 @@ const specs: readonly RunSpec[] = Object.freeze([
 
 for (const spec of specs) runSpec(f, spec);
 
+// Function identity is part of the explicit structured antecedent. A foreign
+// function with an otherwise identical recursive argument carrier must not be
+// grounded by the ALL source rules.
+{
+  const foreignFunction = f.fresh();
+  const sameArgs = buildArgumentChain(f.memory, [T, T, F]);
+  const foreignApplication = f.memory.ensure(foreignFunction, sameArgs);
+  const foreign = groundApplicableSourceRules(f, foreignApplication);
+  same(foreign.matchedSourceRules, 0, "foreign function has no ALL source match");
+  same(foreign.groundedRelations.length, 0, "foreign function emits no grounded relation");
+}
+
 // No grounded truth-table-per-tuple is authored. Grounded relations arise only
 // for actual encountered applications, while source rule count remains 3.
 assert(specs.length > f.sourceRules.length, "tested applications exceed generic rule count");
