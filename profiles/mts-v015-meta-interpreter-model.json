@@ -252,7 +252,7 @@
   ],
   "maintenanceLaw": {
     "rule": "Any v0.15 decision that changes execution/meta-interpreter organization must update this model in the same change. Research tests/issues may provide evidence but do not silently supersede this model.",
-    "humanProjection": "docs/research/Метаинтерпретатор A-memory v0.15.md",
+    "humanProjection": "profiles/mts-v015-meta-interpreter-model.md",
     "authorGate": "No C-root choice, frontier rule, meta-grounding power or FORMAL-JSON executable representation becomes accepted without explicit Author confirmation."
   }
 }
