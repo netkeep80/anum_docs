@@ -155,6 +155,15 @@
       "evidence": [
         "ts/test/v015-exact-finite-support-necessity-a10.test.ts"
       ]
+    },
+    {
+      "id": "MI-B15",
+      "status": "PROVED_RESEARCH",
+      "statement": "The accepted infinite ambient Link carrier is compatible with physically finite one-generation execution. Under explicit premises that the materialized semantic Aset, active current set, selected admissions and every matched image are finite and each local match terminates, the complete one-generation work and staged successor are finite.",
+      "evidence": [
+        "ts/test/v015-finite-materialized-reaction-a12.test.ts",
+        "proofs/premise-classification-v0.14.json"
+      ]
     }
   ],
   "targetOrganization": {
@@ -216,7 +225,8 @@
       "NO_MATCH vs matched-empty distinction",
       "hardware decomposition/refinement theorem"
     ],
-    "currentEvidence": "A7/A8 establish pointwise current-state behavior; A11 proves extensional partition/order invariance under the explicit snapshot, global-match reduction, generation-isolation and atomic-publication premises."
+    "currentEvidence": "A7/A8 establish pointwise current-state behavior; A11 proves extensional partition/order invariance under the explicit snapshot, global-match reduction, generation-isolation and atomic-publication premises.",
+    "completionBoundary": "Physical completion is derived only for a finite materialized M_t/current/admission/image slice with terminating local matches; ambient Link carrier remains infinite."
   },
   "metaInterpreterBoundary": {
     "status": "OPEN",
@@ -315,7 +325,7 @@
       "id": "MI-D04",
       "question": "Is generalized parallel MP derived from scalar MP plus reaction/publication laws, and what exact premises are irreducible?",
       "status": "OPEN",
-      "currentEvidence": "A10 establishes finite exact-support pressure for fresh generic structure; A11 proves the extensional parallel reduction/refinement law. Whether structure-sensitive power is primitive or self-hosted/derived remains the Author decision."
+      "currentEvidence": "A10 gives the finite-exact fresh-structure lower bound; A11 gives the parallel reduction law; A12 separates infinite ambient ontology from finite executable reaction completion. Primitive-vs-derived structure sensitivity remains open."
     },
     {
       "id": "MI-D05",
@@ -539,5 +549,34 @@
       "termination/completion for infinite applicable fan-out",
       "a concrete hardware memory-consistency protocol"
     ]
+  },
+  "finiteMaterializedReaction": {
+    "status": "PROVED_RESEARCH",
+    "evidence": "ts/test/v015-finite-materialized-reaction-a12.test.ts",
+    "acceptedBaseline": {
+      "ambientLinkCarrier": "INFINITE_REQUIRED",
+      "groundedReplayDomain": "FINITE_EXPLICIT_WITNESSES_REQUIRED",
+      "source": "proofs/premise-classification-v0.14.json"
+    },
+    "executionPremisesCandidate": [
+      "materialized semantic Aset M_t is finite",
+      "active current set selected from M_t is finite",
+      "selected Theory/admission set in the reaction-start snapshot is finite",
+      "each matched relation image is finite",
+      "each local match/bind operation terminates on the materialized input/template"
+    ],
+    "derived": [
+      "current×Rule candidate work is finite",
+      "raw output occurrence work has a finite bound",
+      "the complete extensional staged successor has a finite cardinality bound",
+      "A11 finite partition/reduction can distribute the work without changing the extensional result"
+    ],
+    "notDerived": [
+      "atomic publication itself",
+      "a global claim that every mathematical MTS Aset must be finite",
+      "impossibility of denotationally infinite reactions",
+      "sufficient physical capacity for any chosen materialized slice"
+    ],
+    "interpretation": "Finiteness belongs to the executable materialized slice/refinement contract, not to the ambient one-Link ontology."
   }
 }
