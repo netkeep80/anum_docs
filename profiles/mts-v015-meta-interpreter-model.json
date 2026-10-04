@@ -817,7 +817,7 @@
     ]
   },
   "directJsonSourceMapping": {
-    "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
+    "status": "AUTHOR_APPROVED_DESIGN_GREEN_RESEARCH",
     "authorDecision": {
       "date": "2026-10-05",
       "decision": "APPROVED_FOR_IMPLEMENTATION_AND_FALSIFICATION"
@@ -831,6 +831,23 @@
     "structuredKeyRule": "Object keys are resolved by ordinary FORMAL expression resolution before source-role lowering; a bare structured key such as Theory->R contributes that resolved Link as a bare source entry.",
     "invariant": "JSON must reconstruct the same native source ANet roles as FORMAL/native source and must not bypass resolver or DAS.",
     "nextEvidence": "DAS-A3 direct JSON -> native source ANet -> DAS -> semantic ANet",
-    "artifactApproval": "Each concrete logical/proof JSON artifact remains separately Author-gated."
+    "artifactApproval": "Each concrete logical/proof JSON artifact remains separately Author-gated.",
+    "executableEvidence": {
+      "path": "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+      "run": "CI 37244766554",
+      "result": "SUCCESS",
+      "tested": [
+        "object-member null -> bare native source entry",
+        "string RHS -> metamodel binding",
+        "empty array RHS -> R binding",
+        "nested object -> anchored source ANet",
+        "structured bare key -> resolved direct semantic membership after DAS",
+        "duplicate and escaped-duplicate keys reject",
+        "top-level null and array-position null reject",
+        "object member order is nonsemantic",
+        "physical/named E->K without bare membership is not current"
+      ]
+    },
+    "nextGate": "First concrete native role-bundle meta-rule JSON artifact; explicit Author approval required before canonicalization."
   }
 }
