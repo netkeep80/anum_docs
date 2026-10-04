@@ -1,0 +1,258 @@
+{
+  "schema": "mts-v015-meta-interpreter-document/v0.1",
+  "status": "RESEARCH_CANDIDATE",
+  "semanticAuthority": false,
+  "acceptedBaseline": "MTS v0.14",
+  "versionTarget": "MTS v0.15",
+  "owners": {
+    "architecture": "#1987",
+    "generalizedMp": "#1988",
+    "metaGrounding": "#1990",
+    "formalModel": "#1901",
+    "jsonProfile": "#1188",
+    "version": "#1876",
+    "researchPr": "#1989"
+  },
+  "purpose": [
+    "Be the machine-readable architectural memory for A-memory meta-interpreter/execution organization.",
+    "Keep accepted facts, proved research results, candidates, falsified ideas and open questions explicitly separated.",
+    "Carry FORMAL-in-JSON examples showing the intended Link-native structure without host semantic type tags.",
+    "Prevent an old research implementation from silently becoming semantic authority."
+  ],
+  "statusVocabulary": [
+    "ACCEPTED_BASELINE",
+    "PROVED_RESEARCH",
+    "STRONGLY_SUPPORTED_CANDIDATE",
+    "CANDIDATE",
+    "OPEN",
+    "FALSIFIED",
+    "IMPLEMENTATION_ONLY"
+  ],
+  "coreGoal": {
+    "status": "CANDIDATE",
+    "statement": "A complete A-memory state contains everything required to start, pause, serialize, transfer and resume execution. The external substrate supplies only the generalized parallel MP/reaction implementation and no semantic current-context/program-counter pointer.",
+    "stateTransition": "M_t -> Gamma(M_t) -> M_(t+1)"
+  },
+  "knownBoundaries": [
+    {
+      "id": "MI-B01",
+      "status": "ACCEPTED_BASELINE",
+      "statement": "MTS has one Link ontology; Context/Theory/Scope roles are contextual/structural roles, not intrinsic host types.",
+      "evidence": ["V14-L1", "V14-L12", "#1901"]
+    },
+    {
+      "id": "MI-B02",
+      "status": "ACCEPTED_BASELINE",
+      "statement": "Generalized reaction preserves 1->0, 1->1, 1->N, N->1 and N->M behavior with explicit reaction semantics.",
+      "evidence": ["V14-L11", "#1988"]
+    },
+    {
+      "id": "MI-B03",
+      "status": "PROVED_RESEARCH",
+      "statement": "O is structurally ambiguous as an execution-space sentinel because O = START(R) = Context(R,R) and is also readable as ExactSequence([R]).",
+      "evidence": ["ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts"]
+    },
+    {
+      "id": "MI-B04",
+      "status": "STRONGLY_SUPPORTED_CANDIDATE",
+      "statement": "In the current direct gauge, C = END(R) is a natural execution-context-space boundary: C itself is not a Context, C-rooted START Context ancestry terminates intrinsically at C, and C-rooted Context chains do not alias ordinary ExactSequence chains.",
+      "evidence": [
+        "ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts",
+        "ts/test/research-v013-entry-discovery-a68d.test.ts"
+      ]
+    },
+    {
+      "id": "MI-B05",
+      "status": "PROVED_RESEARCH",
+      "statement": "A concrete entry candidate can be represented by physical existence of K0 = START(C->S0); bare C->S0 is inert, no separate active flag/entry registry is needed for the tested discovery model.",
+      "evidence": ["ts/test/research-v013-entry-discovery-a68d.test.ts"]
+    },
+    {
+      "id": "MI-B06",
+      "status": "PROVED_RESEARCH",
+      "statement": "For the tested append-only Context tree, START child growth moves activity to descendants and END(K) closes a branch; sibling START children form a parallel frontier. No deletion of historical Context Links is required.",
+      "evidence": ["ts/test/research-v013-link-native-frontier-a70e.test.ts"]
+    },
+    {
+      "id": "MI-B07",
+      "status": "IMPLEMENTATION_ONLY",
+      "statement": "Frozen A-memory 0.175.0 still receives initial/current Scope and interpreter/Theory from host runtime APIs. This is compatibility behavior, not the desired self-hosted semantic authority.",
+      "evidence": [
+        "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+        "experiments/a-circuit/src/runtime_session.rs",
+        "experiments/optimized-cpu-rust/src/structural.rs"
+      ]
+    }
+  ],
+  "targetOrganization": {
+    "externalSubstrate": {
+      "allowed": [
+        "store/canonicalize physical Links",
+        "execute one generalized parallel reaction law",
+        "perform implementation scheduling/parallelization that is observationally equivalent to the reaction law"
+      ],
+      "forbiddenSemanticInputs": [
+        "external current Context pointer",
+        "external program counter",
+        "external selected Scope pointer",
+        "program-specific opcode dispatch",
+        "logical-element-specific executor"
+      ]
+    },
+    "insideAMemory": [
+      "program/data Asets",
+      "causal/admission structure",
+      "Context execution tree",
+      "execution entries",
+      "branch closure/history",
+      "all state needed for freeze/resume",
+      "meta-interpreter structures once their exact self-hosted form is proved"
+    ]
+  },
+  "contextCandidate": {
+    "status": "STRONGLY_SUPPORTED_CANDIDATE",
+    "directGaugeBoundary": "C",
+    "entry": "K0 = START(C->S0)",
+    "child": "K(n+1) = START(Kn->S(n+1))",
+    "closure": "END(K)",
+    "interpretation": {
+      "C": "execution-context-space END boundary in the direct gauge, not itself a Context",
+      "K0": "concrete state-carrying execution entry",
+      "childStart": "positive execution growth / successor Context",
+      "endClosure": "branch-local completion witness"
+    },
+    "chiralityNote": "C is not promoted to an absolute Foundation-global privilege. v0.14 chirality is Context-relative/covariant; mirror gauge must remain equivalent."
+  },
+  "frontierCandidate": {
+    "status": "OPEN",
+    "testedResearchRule": "active leaf = reachable C-rooted Context with no START child and no END closure",
+    "problem": "The tested frontier reader relies on absence checks performed by host traversal. Full self-hosting must prove whether frontier/currentness is derivable by the generalized reaction itself or needs a positive Link-native representation.",
+    "forbiddenShortcut": "Do not reintroduce an external current-scope cursor merely because it is convenient."
+  },
+  "reactionCandidate": {
+    "status": "OPEN",
+    "principle": "One reaction consumes one immutable causal snapshot, computes all applicable MP consequences, and atomically publishes the complete successor state.",
+    "implementationIndependence": "The same result must be obtained whether scalar MP instances run sequentially, on CPU threads, on GPU, or on a future associative architecture.",
+    "openProofs": [
+      "fan-out completeness",
+      "order independence",
+      "partition invariance",
+      "generation isolation",
+      "atomic publication",
+      "canonical convergence",
+      "NO_MATCH vs matched-empty distinction",
+      "hardware decomposition/refinement theorem"
+    ]
+  },
+  "metaInterpreterBoundary": {
+    "status": "OPEN",
+    "question": "Can all meta-grounding/reflection needed for fresh structured inputs be expressed inside the self-contained A-memory and driven by the same generalized reaction, or is extra semantic match/construct power required?",
+    "knownFalsifier": "Exact S0 grounded MP alone cannot generically bind fresh nested structures and instantiate substituted outputs.",
+    "mustNotConflate": [
+      "parallel/fan-out MP",
+      "structural matching/binding",
+      "output instantiation",
+      "cross-current-member join"
+    ]
+  },
+  "formalJsonExamples": [
+    {
+      "id": "MI-J01",
+      "status": "CANDIDATE",
+      "meaning": "Bare C->S0 payload exists as data but does not by itself mark an entry.",
+      "formalJson": {
+        "S0": "A",
+        "EntryPayload": "C->S0"
+      }
+    },
+    {
+      "id": "MI-J02",
+      "status": "CANDIDATE",
+      "meaning": "Physical START lift marks a concrete C-rooted execution entry without a host Context type tag.",
+      "formalJson": {
+        "S0": "A",
+        "K0": "♂(C->S0)"
+      }
+    },
+    {
+      "id": "MI-J03",
+      "status": "CANDIDATE",
+      "meaning": "Execution growth is represented by child Context structure in the Aset itself.",
+      "formalJson": {
+        "S0": "A",
+        "S1": "B",
+        "K0": "♂(C->S0)",
+        "K1": "♂(K0->S1)"
+      }
+    },
+    {
+      "id": "MI-J04",
+      "status": "CANDIDATE",
+      "meaning": "Parallel branching is represented by multiple child Contexts under one parent.",
+      "formalJson": {
+        "S0": "A",
+        "S1": "B",
+        "S2A": "X",
+        "S2B": "Y",
+        "K0": "♂(C->S0)",
+        "K1": "♂(K0->S1)",
+        "K2A": "♂(K1->S2A)",
+        "K2B": "♂(K1->S2B)"
+      }
+    },
+    {
+      "id": "MI-J05",
+      "status": "CANDIDATE",
+      "meaning": "Branch closure is carried by Link structure, not by host deletion or an active=false flag.",
+      "formalJson": {
+        "S0": "A",
+        "K0": "♂(C->S0)",
+        "CloseK0": "K0♀"
+      }
+    }
+  ],
+  "formalJsonRules": [
+    "Examples are semantic Aset fragments, not JSON metadata schemas.",
+    "Object keys are contextual binders/names; string values are FORMAL expressions.",
+    "No type=Context, active=true, programCounter, currentPointer or other host semantic tags are permitted.",
+    "The ostensive START/END glyphs reuse accepted v0.14 FORMAL structural notation; exact v0.15 surface spelling remains subject to the Author gate.",
+    "Document/provenance metadata in this file is outside the embedded semantic Aset fragments and carries no MTS semantic authority."
+  ],
+  "decisionLedger": [
+    {
+      "id": "MI-D01",
+      "question": "Execution-space boundary: O or C/direct-gauge END boundary?",
+      "status": "OPEN",
+      "currentEvidence": "C strongly supported; O has proven role collision/ancestry ambiguity."
+    },
+    {
+      "id": "MI-D02",
+      "question": "How is active frontier/currentness represented without an external cursor?",
+      "status": "OPEN",
+      "currentEvidence": "Topology-derived leaf frontier works in research but currently uses host absence/traversal checks."
+    },
+    {
+      "id": "MI-D03",
+      "question": "How is Theory/admission/current causal authority discovered entirely from A-memory?",
+      "status": "OPEN",
+      "currentEvidence": "Frozen A-memory still receives interpreter/Theory from host; self-contained selection remains to be proved."
+    },
+    {
+      "id": "MI-D04",
+      "question": "Is generalized parallel MP derived from scalar MP plus reaction/publication laws, and what exact premises are irreducible?",
+      "status": "OPEN",
+      "currentEvidence": "#1988 / PR #1989."
+    },
+    {
+      "id": "MI-D05",
+      "question": "Can meta-grounding become fully self-hosted without hidden host structural matcher/constructor semantics?",
+      "status": "OPEN",
+      "currentEvidence": "#1990 M6B falsifies S0-only fresh structural grounding."
+    }
+  ],
+  "maintenanceLaw": {
+    "rule": "Any v0.15 decision that changes execution/meta-interpreter organization must update this model in the same change. Research tests/issues may provide evidence but do not silently supersede this model.",
+    "humanProjection": "docs/research/Метаинтерпретатор A-memory v0.15.md",
+    "authorGate": "No C-root choice, frontier rule, meta-grounding power or FORMAL-JSON executable representation becomes accepted without explicit Author confirmation."
+  }
+}
