@@ -255,11 +255,15 @@ active leaf =
 - END закрывает только соответствующую ветвь;
 - завершённое дерево остаётся физически в памяти, но не перезапускается.
 
-Однако здесь остаётся **критический OPEN**:
+Этот отрицательный frontier-кандидат теперь **superseded** A8.
 
-> отсутствие child/END пока проверялось host traversal. Полный self-hosting должен либо вывести frontier самой generalized reaction, либо заменить отрицательное условие положительной Link-native currentness-структурой.
+Текущая модель не определяет currentness через отсутствие child/END. Она использует положительный witness членства самой семантической Aset:
 
-Внешний `currentScope` нельзя вернуть как удобный shortcut.
+```text
+E -> K ∈ M_t
+```
+
+Физическое существование `K`, его детей или ancestry само по себе currentness не задаёт. Внешний `currentScope` и отрицательный leaf-test нельзя возвращать как shortcut.
 
 ## 10. Generalized parallel MP
 
@@ -590,6 +594,43 @@ E -> K
 
 Исполняемый guard:
 `CURRENTNESS_WITNESS_REMOVAL_PRESERVES_OVERLAPPING_LINK_ROLES=TRUE`.
+
+### JSON-кандидат positive currentness
+
+Если direct JSON действительно является проекцией исходной/семантической Aset, то currentness не требует специального поля:
+
+```json
+{
+  "Theory": "T",
+  "E": "C->Theory",
+  "Truth0": "K->A",
+  "K0": "♂(E->Truth0)",
+  "W0": "E->K0"
+}
+```
+
+Здесь `W0` — только произвольное presentation-имя. Семантический witness — обычная Link:
+
+```text
+E -> K0
+```
+
+Поэтому обязательны дифференциалы:
+
+- переименование `W0` не меняет исполнение;
+- удаление denoted-member `E->K0` снимает currentness, даже если `K0` физически существует;
+- замена его на `E->K1` переносит currentness;
+- `current:true`, `active:true`, host cursor и специальные имена не имеют authority.
+
+Остаётся один точный lowering-вопрос: надо доказать, что JSON/source-Aset definition с RHS `E->K0` действительно включает эту Link в **denoted semantic Aset membership** `M_t`, а не только материализует и именует её вне текущего множества членов.
+
+Отдельно для JSON source рассматривается естественный кандидат:
+
+```json
+{"A": null}
+```
+
+как проекция bare `A`: `null` означает отсутствие RHS, а не значение MTS Null. Поэтому `{}`, `{"A":null}`, `{"A":{}}` и `{"A":[]}` остаются разными source/model-конструкциями.
 
 ## 14e. A9 — одна structural generalized reaction над Aset
 
