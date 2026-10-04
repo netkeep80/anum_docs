@@ -1150,13 +1150,45 @@ Additional GREEN differentials:
 - `[] = R` as a binding RHS does not automatically publish `R`;
 - removing explicit current membership makes `E->K` non-current even while the same Link remains physically present and named.
 
+### DAS-A2 — canonical native source ANet
+
+DAS-A2 removes the last custom source carrier from DAS-A1.
+
+Executable witness:
+`ts/test/v015-native-source-anet-denotation-das-a2.test.ts`.
+
+GREEN path:
+
+```text
+NativeSyntaxGrammar
+        ↓
+SyntaxAsetBuilder
+        ↓
+canonical native source ANet
+        ↓ readSyntaxAset
+selected bare/binding/bundle roles
+        ↓ same DAS law
+extensional semantic ANet M_t
+```
+
+The native source test reproduces the same semantic members and falsifiers as DAS-A1:
+
+- root binding does not imply execution membership;
+- root bare Link does;
+- nested anchored bundle produces contextual Links;
+- nested binding keeps coordinate and RHS distinct;
+- duplicate denotations converge only after denotation;
+- source occurrence/order identity does not become semantic order;
+- currentness still requires exact `E->K ∈ M_t`.
+
+Therefore the custom post-resolution carrier in DAS-A1 is research scaffolding only. The candidate architecture now reuses the existing Link-native source ANet machinery.
+
 Still open before concrete JSON approval:
 
-1. lower the canonical native source ANet into these resolved roles;
-2. prove exact `null`/bare and nested-object lowering;
-3. replay the Author-approved native role-bundle Rule through the complete path;
-4. pressure with theorem/proof FORMAL;
-5. show exact JSON and request the mandatory Author approval.
+1. prove exact strict JSON `null`/string/array/nested-object lowering into the same native source ANet roles;
+2. replay the Author-approved native role-bundle Rule through JSON -> source ANet -> DAS -> Γ;
+3. pressure with theorem/proof FORMAL;
+4. show exact JSON and request the mandatory Author approval.
 
 ## 17. Author gates
 
