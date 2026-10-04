@@ -133,7 +133,11 @@
     ],
     "question": "Can v0.15 self-host generic grounding with the grounded floor, or must structural-unary template matching itself be part of generalized MP?",
     "researchEvidenceStatus": "GREEN_FOR_A9_TESTED_ONE_COMMAND_VECTOR",
-    "authorDecision": "PENDING"
+    "authorDecision": "PENDING",
+    "necessityEvidence": [
+      "M6B exact-S0 freshness opacity",
+      "A10 finite exact support lower-bound pressure"
+    ]
   },
   "notEquivalentDimensions": [
     "argument arity",
@@ -211,6 +215,14 @@
         "final accepted FORMAL/JSON representation",
         "hardware refinement proof"
       ]
+    },
+    "finiteExactSupportNecessity": {
+      "status": "GREEN_RESEARCH",
+      "evidence": "ts/test/v015-exact-finite-support-necessity-a10.test.ts",
+      "result": "A fixed finite exact-identity Theory has finite support and cannot generically transform arbitrarily fresh structured identities. Per-instance exact enumeration grows with observed identities and fails again on fresh N+1.",
+      "implication": "Strong one-command self-contained execution needs internal structure-sensitive reflection/matching+construction power or an equivalent mechanism; otherwise an external grounder is required.",
+      "uniqueStructuralApiRequired": false,
+      "crossMemberJoinRequired": false
     }
   },
   "sequenceCarrierBoundary": {
