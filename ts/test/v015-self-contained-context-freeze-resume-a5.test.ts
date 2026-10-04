@@ -334,7 +334,7 @@ function exercise(noise: boolean): void {
   const resumedChild = defineContext(restored, resumedParent, resumedState);
 
   const frontierAfterResume = deriveActiveFrontier(restored);
-  assert(!frontierAfterResume.includes(resumedParent), "resumed parent becomes history");
+  assert(!frontierAfterResume.includes(resumedParent), "resumed parent leaves the active frontier");
   assert(frontierAfterResume.includes(resumedChild), "new child becomes active");
 
   const canonicalAfterResume = exportCanonicalTopology(restored);
@@ -414,7 +414,7 @@ function main(): void {
     "ENTRY_IDENTITY_RECONSTRUCTED_AFTER_RESTORE=TRUE",
     "FRONTIER_RECONSTRUCTED_AFTER_RESTORE=TRUE",
     "RESUME_WITHOUT_SERIALIZED_CONTEXT_HANDLE=GREEN",
-    "HISTORY_LINKS_IMMUTABLE=TRUE",
+    "NONCURRENT_CONTEXT_LINKS_MAY_REMAIN_PHYSICALLY=TRUE",
     "HOST_FRONTIER_TRAVERSAL=RESIDUAL_READ_ONLY_ORACLE",
     "NEGATIVE_ABSENCE_TESTS=RESIDUAL",
     "FULL_SELF_HOSTED_GENERALIZED_REACTION=NOT_YET_PROVEN",
