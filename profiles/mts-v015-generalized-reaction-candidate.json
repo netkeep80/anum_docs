@@ -170,7 +170,33 @@
       "self-hosted grounding with an independently derived Aset-level reflection/construction mechanism",
       "stronger structural-unary generalized reaction if necessity is author-reviewed"
     ],
-    "trueCrossMemberJoinRequired": false
+    "trueCrossMemberJoinRequired": false,
+    "structuralCapabilityDecomposition": {
+      "S1": {
+        "role": "read-only structural decomposition/matching/binding",
+        "witness": "unifyStructuralRuleTemplate(template, freshActual, roles)",
+        "readsStructure": true,
+        "writesSemanticLinks": false,
+        "freshBindingExample": [
+          "X=A",
+          "Y=C"
+        ],
+        "sufficientAlone": false
+      },
+      "S2": {
+        "role": "recursive substitution/instantiation + canonical Link construction",
+        "witness": "instantiateV013StructuralTemplate(outputTemplate, bindings)",
+        "consumesBindings": true,
+        "infersBindings": false,
+        "mayConstructSemanticLinks": true,
+        "sufficientAlone": false
+      },
+      "composition": {
+        "S1PlusS2SolvesFreshStructuralSubstitution": true,
+        "requiresCrossMemberJoinJ1": false,
+        "note": "If v0.15 rejects bootstrap META-A but requires generic fresh structural grounding inside the one-command machine, the missing capability is specifically S1+S2 over one explicit current structured endpoint; J1 is still not implicated."
+      }
+    }
   },
   "sequenceCarrierBoundary": {
     "status": "AUTHOR_REVIEW_REQUIRED",
