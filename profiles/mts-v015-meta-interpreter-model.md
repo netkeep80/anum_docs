@@ -794,6 +794,60 @@ atomic commit выводится из одной лишь конечности
 
 Это позволяет МТС описывать и обычную память, и GPU, и будущую ассоциативную машину с триллионами физических Links одной и той же семантикой.
 
+## 14h. A13 — что является теоремой, а что premise
+
+После A10–A12 важно не смешать математические следствия и правила execution profile.
+
+### Derived / theorem candidates
+
+```text
+bundle lift
+  <- local reaction + exhaustive selected relations
+
+pointwise N-current lift
+  <- local reaction + J0/member independence + one snapshot
+
+partition/order invariance
+  <- A11 algebra (OR, UNION)
+
+finite one-generation completion
+  <- A12 finite materialized execution premises
+```
+
+### НЕ выводится из scalar MP
+
+```text
+selected Theory authority
+reaction-start snapshot
+exhaustive discovery
+NO_MATCH preservation
+matched-empty ZERO semantics
+generation isolation
+complete successor before publication
+atomic publication
+finite materialized physical execution slice
+```
+
+Это либо явные правила семантики реакции, либо execution/refinement premises.
+
+Особенно запрещено писать:
+
+```text
+MP => atomic transaction
+MP => snapshot
+MP => NO_MATCH preservation
+```
+
+Правильно:
+
+```text
+local MP/reaction law
++ explicit reaction semantics/premises
+=> bundle/pointwise/parallel refinement theorems
+```
+
+A2 теперь машинно проверяет эту классификацию, чтобы она снова не расползлась.
+
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
