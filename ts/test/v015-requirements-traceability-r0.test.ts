@@ -51,6 +51,7 @@ const repoRoot = resolve(process.cwd(), "..");
 const requirements = json(join(repoRoot, "requirements/mts-v0.15.json"));
 const traceability = json(join(repoRoot, "traceability/mts-v0.15.json"));
 const accepted14 = json(join(repoRoot, "requirements/mts-v0.14.json"));
+const glossary = readFileSync(join(repoRoot, "docs/Словарь терминов МТС.md"), "utf8");
 
 const allowedStates = new Set<State>([
   "OPEN",
@@ -189,6 +190,31 @@ function validateVerticalPromotion(requirement: Json, evidence: Json): void {
 }
 
 validateCandidate(requirements, traceability);
+// Terminology lock: English MTS term is ANet, never Aset.
+{
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for terminology");
+  const term = (list as Json[]).find((item) => item.id === "V15-TERM-01");
+  assert(term !== undefined, "V15-TERM-01 is registered");
+  assert(
+    text(term.summary, "V15-TERM-01 summary").includes("ANet"),
+    "V15-TERM-01 names ANet",
+  );
+  assert(
+    glossary.includes("### Асеть (`ANet`)"),
+    "glossary defines Асеть (ANet)",
+  );
+  assert(
+    glossary.includes("Aset` не является английским термином МТС"),
+    "glossary rejects Aset as English MTS term",
+  );
+  const traces = record(traceability.requirements, "trace requirements");
+  assert(
+    Object.prototype.hasOwnProperty.call(traces, "V15-TERM-01"),
+    "traceability contains V15-TERM-01",
+  );
+}
+
 
 // Negative: a mere state flip cannot promote an R0 requirement to VERTICAL_GREEN.
 {
@@ -273,4 +299,5 @@ console.log([
   "REAL_AMEMORY_PROFILE_REQUIRED=TRUE",
   "APPROVED_JSON_CORPUS_OWNER=1978",
   "REAL_AMEMORY_REPLAY_OWNER=amemory#482",
+  "ANET_TERMINOLOGY=GREEN",
 ].join(" "));
