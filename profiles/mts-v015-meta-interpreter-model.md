@@ -390,6 +390,37 @@ hostCallStack
 
 Если без него исполнение не продолжается тождественно — self-hosted модель не закрыта.
 
+## 14a. Исполняемая проверка freeze / transfer / resume
+
+Новый v0.15 falsifier:
+
+`ts/test/v015-self-contained-context-freeze-resume-a5.test.ts`
+
+получил:
+
+```text
+SELF_CONTAINED_CONTEXT_FREEZE_RESUME=GREEN_RESEARCH
+EXTERNAL_CURRENT_CONTEXT_POINTER=0
+EXTERNAL_CURRENT_SCOPE_POINTER=0
+EXTERNAL_PROGRAM_COUNTER=0
+WHOLE_MEMORY_CANONICAL_FREEZE_TRANSFER_RESTORE=GREEN
+ENTRY_IDENTITY_RECONSTRUCTED_AFTER_RESTORE=TRUE
+FRONTIER_RECONSTRUCTED_AFTER_RESTORE=TRUE
+RESUME_WITHOUT_SERIALIZED_CONTEXT_HANDLE=GREEN
+```
+
+Проверка строит C-rooted execution tree с двумя entries, ветвлением и закрытой ветвью, экспортирует **всю Link topology без execution sidecar**, восстанавливает её в новой Memory, заново выводит entries/frontier и продолжает рост дерева. После продолжения выполняется ещё один freeze/restore.
+
+Это доказывает **self-describing execution state**, но пока не доказывает полный self-hosting:
+
+```text
+HOST_FRONTIER_TRAVERSAL=RESIDUAL_READ_ONLY_ORACLE
+NEGATIVE_ABSENCE_TESTS=RESIDUAL
+FULL_SELF_HOSTED_GENERALIZED_REACTION=NOT_YET_PROVEN
+```
+
+То есть внешний указатель состояния уже не нужен как информация, но алгоритм вывода current frontier ещё требуется выразить/обосновать внутри общей семантики МТС.
+
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
