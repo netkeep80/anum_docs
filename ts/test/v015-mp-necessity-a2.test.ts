@@ -270,7 +270,17 @@ function run(
         PARTITION_ORDER_INVARIANCE: { classification: string };
         FINITE_ONE_GENERATION_COMPLETION: { classification: string };
       };
-      executionPremises: Record<string, string>;
+      executionPremises: {
+        SELECTED_THEORY_AUTHORITY: string;
+        REACTION_START_SNAPSHOT: string;
+        EXHAUSTIVE_DISCOVERY: string;
+        NO_MATCH_PRESERVATION: string;
+        MATCHED_EMPTY_ZERO: string;
+        GENERATION_ISOLATION: string;
+        COMPLETE_SUCCESSOR_BEFORE_PUBLICATION: string;
+        ATOMIC_PUBLICATION: string;
+        FINITE_MATERIALIZED_EXECUTION_SLICE: string;
+      };
       explicitNonClaims: readonly string[];
     };
   };
