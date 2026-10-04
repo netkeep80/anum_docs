@@ -66,7 +66,7 @@ function deriveDirectGaugeEndBoundary(memory: ReadMemory): LinkHandle {
  *
  * It is an ordinary non-Context Link rooted at the END boundary. A Context
  * below this environment therefore carries its Theory selection in ancestry
- * rather than receiving a selectedTheory pointer from the host.
+ * rather than receiving an external Theory-selection pointer from the host.
  */
 function readExecutionEnvironment(
   memory: ReadMemory,
