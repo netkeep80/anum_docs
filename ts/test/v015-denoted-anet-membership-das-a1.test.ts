@@ -219,9 +219,12 @@ function denoteResolvedSourceAnet(
 
 const memory = new Memory();
 const R = memory.ensureRoot();
-let cursor = memory.ensureStartSelfClosed(R);
+let cursor = memory.ensure(
+  R,
+  memory.ensureStartSelfClosed(R),
+);
 const fresh = (): LinkHandle => {
-  cursor = memory.ensure(cursor, R);
+  cursor = memory.ensureStartSelfClosed(cursor);
   return cursor;
 };
 
