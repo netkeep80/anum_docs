@@ -1007,7 +1007,8 @@ Y -> X
 - порядок членов role-bundle не влияет на результат;
 - физическая `V->Z`, отсутствующая в `M_t`, ролью не становится;
 - пустой role-bundle даёт zero-role grounded exact rule;
-- отдельный `START(ExactSequence(roles))` RoleDictionary для этого вектора не требуется.
+- A72r-подобный рекурсивный шаблон с тремя ролями проходит тем же matcher/instantiator;
+- отдельный `START(ExactSequence(roles))` RoleDictionary для этих проверенных векторов не требуется.
 
 Это пока **не универсальная теорема** и не финальный JSON.
 
@@ -1044,13 +1045,15 @@ Grounded special case:
 
 Пустой `{}` здесь принципиально полезен: он задаёт явный пустой role-bundle, то есть точное grounded rule без bindable roles.
 
+Denotation/lowering owner: **#2002**.
+
 До Author approval надо проверить:
 
 1. exact lowering nested `V{}` в нужные contextual member Links;
 2. bare structured key + `null` как прямое Aset membership;
 3. alpha-renaming имён `V/R/X/Y`;
 4. отсутствие ложных roles при ordinary bundle-members;
-5. A72r variable arity;
+5. полный historical A72r execution differential (трёхролевый рекурсивный shape уже GREEN research);
 6. proof/theorem FORMAL, чтобы не получить executable-only синтаксис.
 
 ## 17. Author gates
