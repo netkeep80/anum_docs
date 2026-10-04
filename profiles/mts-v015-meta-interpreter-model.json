@@ -113,6 +113,23 @@
         "profiles/amemory-execution-profile.json",
         "ts/test/research-v013-self-activation-schedule-invariance-a73k.test.ts"
       ]
+    },
+    {
+      "id": "MI-B10",
+      "status": "ACCEPTED_BASELINE",
+      "statement": "Context is temporary execution scaffold, not semantic history/Result. Retained physical Context Links are carrier ancestry only; physical existence is not currentness authority.",
+      "evidence": [
+        "historical v0.13/v0.14 Context boundary",
+        "profiles/mts-v015-meta-interpreter-model.md"
+      ]
+    },
+    {
+      "id": "MI-B11",
+      "status": "PROVED_RESEARCH",
+      "statement": "For the tested generalized grounded-reaction corpus, active Context frontier reproduces NO_MATCH, matched-empty ZERO, ONE, MANY, N->M, exhaustive multiple matches, duplicate convergence and foreign-Theory isolation without an external current-Scope pointer or atomic Scope-root handoff.",
+      "evidence": [
+        "ts/test/v015-context-tree-reaction-cardinality-a7.test.ts"
+      ]
     }
   ],
   "targetOrganization": {
@@ -135,7 +152,7 @@
       "causal/admission structure",
       "Context execution tree",
       "execution entries",
-      "branch closure/history",
+      "temporary Context execution scaffold, branch closure and carrier ancestry; not semantic execution history",
       "all state needed for freeze/resume",
       "meta-interpreter structures once their exact self-hosted form is proved"
     ]
@@ -260,7 +277,7 @@
       "id": "MI-D02",
       "question": "How is active frontier/currentness represented without an external cursor?",
       "status": "OPEN",
-      "currentEvidence": "A70e topology rule plus v0.15 A5 freeze/restore prove self-describing frontier state; host incidence traversal and negative absence tests remain residual."
+      "currentEvidence": "A5 proves freeze/restore of self-describing Context state; A7 proves Context frontier reproduces the tested generalized reaction without external Scope handoff. Remaining blocker is deriving frontier/currentness without host negative traversal."
     },
     {
       "id": "MI-D03",
@@ -329,6 +346,39 @@
       "host Context/frontier traversal remains residual",
       "grounded relation discovery remains a test-side read-only oracle",
       "full self-hosted meta-grounding remains open"
+    ]
+  },
+  "contextSemanticsInvariant": {
+    "status": "ACCEPTED_INTENT_RESTORED_FROM_PRIOR_ARCHITECTURE",
+    "statement": "Context is a temporary execution scaffold, not semantic execution history and not Result. A non-current Context Link may remain physically in an append-only carrier because descendants structurally reference it, but physical persistence does not grant currentness/history authority.",
+    "consequences": [
+      "Context depth is not Result depth",
+      "physical Context ancestry may remain as carrier structure after currentness moves",
+      "stable Result and current execution state must not be conflated with retained Context Links",
+      "freeze/resume evidence may use retained carrier ancestry without promoting it to semantic history"
+    ],
+    "evidence": [
+      "historical v0.13 Context/scaffold decisions",
+      "ts/test/v015-self-contained-context-freeze-resume-a5.test.ts"
+    ]
+  },
+  "contextTreeReaction": {
+    "status": "PROVED_RESEARCH",
+    "evidence": "ts/test/v015-context-tree-reaction-cardinality-a7.test.ts",
+    "mapping": {
+      "NO_MATCH": "preserve the same active leaf",
+      "ZERO": "END(K) closes the active leaf",
+      "ONE": "one START child Context",
+      "MANY": "sibling START child Contexts",
+      "N_TO_M": "pointwise reaction over all active frontier leaves",
+      "DUPLICATE_OUTPUT": "one canonical successor truth/child identity"
+    },
+    "result": "For the tested vector, current Scope as a separate semantic carrier and atomic Scope-root handoff are not required; the Context frontier itself carries currentness.",
+    "residuals": [
+      "host read-only frontier traversal",
+      "host read-only grounded relation snapshot/matching",
+      "negative no-child/no-END checks",
+      "full self-hosted generalized reaction remains unproven"
     ]
   }
 }
