@@ -262,7 +262,7 @@ function sameDifferential(actual: Differential, label: string): void {
   const f = fixture();
   admitGrounded(f, f.A, [f.A]);
   const lowered = lowerGroundedTheoryToLegacyStructural(f);
-  same(lowered.rules.length, 1, "identity one generated wrapper");
+  same(lowered.rules.length, 2, "baseline O->[] plus identity wrapper");
   sameDifferential(differential(f, [active(f, f.A)], lowered), "ACTIVE_IDENTITY");
 }
 
@@ -280,7 +280,7 @@ function sameDifferential(actual: Differential, label: string): void {
   admitGrounded(f, f.A, [f.B, f.C]);
   admitGrounded(f, f.A, [f.C, f.D]);
   const lowered = lowerGroundedTheoryToLegacyStructural(f);
-  same(lowered.rules.length, 2, "two grounded relations -> two generated wrappers");
+  same(lowered.rules.length, 3, "baseline O->[] plus two explicit grounded wrappers");
   for (const rule of lowered.rules) {
     same(
       readStructuralRule(f.memory, rule).roleDictionary,
@@ -310,7 +310,7 @@ function sameDifferential(actual: Differential, label: string): void {
   admitGrounded(f, f.A, [f.B]);
   admitGrounded(f, f.C, [f.D, f.E]);
   const lowered = lowerGroundedTheoryToLegacyStructural(f);
-  same(lowered.rules.length, 3, "N->M three generated wrappers");
+  same(lowered.rules.length, 4, "baseline O->[] plus three explicit grounded wrappers");
   sameDifferential(
     differential(
       f,
