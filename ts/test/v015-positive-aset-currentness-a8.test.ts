@@ -450,18 +450,31 @@ function run(reverseEntryCreation: boolean): {
     memory.ensure(caller, antecedents[i]!),
   );
 
-  const created = truths.map((truth) => {
+  const createdSlots: Array<{
+    readonly truth: LinkHandle;
+    readonly context: LinkHandle;
+    readonly activeEdge: LinkHandle;
+  } | undefined> = new Array(truths.length);
+  const creationOrder = reverseEntryCreation
+    ? [3, 2, 1, 0] as const
+    : [0, 1, 2, 3] as const;
+  for (const index of creationOrder) {
+    const truth = truths[index]!;
     const context = defineContext(memory, environment, truth);
     const activeEdge = memory.ensure(environment, context);
-    return Object.freeze({ truth, context, activeEdge });
+    createdSlots[index] = Object.freeze({ truth, context, activeEdge });
+  }
+  const created = createdSlots.map((item, index) => {
+    assert(item !== undefined, `created semantic slot ${index}`);
+    return item;
   });
-  if (reverseEntryCreation) created.reverse();
 
   const members = new Set<LinkHandle>([
     environment,
     ...admissions,
   ]);
-  for (const item of created) {
+  for (const index of creationOrder) {
+    const item = created[index]!;
     members.add(item.truth);
     members.add(item.context);
     members.add(item.activeEdge);
