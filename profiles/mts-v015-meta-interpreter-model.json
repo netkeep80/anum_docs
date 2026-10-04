@@ -38,19 +38,28 @@
       "id": "MI-B01",
       "status": "ACCEPTED_BASELINE",
       "statement": "MTS has one Link ontology; Context/Theory/Scope roles are contextual/structural roles, not intrinsic host types.",
-      "evidence": ["V14-L1", "V14-L12", "#1901"]
+      "evidence": [
+        "V14-L1",
+        "V14-L12",
+        "#1901"
+      ]
     },
     {
       "id": "MI-B02",
       "status": "ACCEPTED_BASELINE",
       "statement": "Generalized reaction preserves 1->0, 1->1, 1->N, N->1 and N->M behavior with explicit reaction semantics.",
-      "evidence": ["V14-L11", "#1988"]
+      "evidence": [
+        "V14-L11",
+        "#1988"
+      ]
     },
     {
       "id": "MI-B03",
       "status": "PROVED_RESEARCH",
       "statement": "O is structurally ambiguous as an execution-space sentinel because O = START(R) = Context(R,R) and is also readable as ExactSequence([R]).",
-      "evidence": ["ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts"]
+      "evidence": [
+        "ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts"
+      ]
     },
     {
       "id": "MI-B04",
@@ -65,13 +74,17 @@
       "id": "MI-B05",
       "status": "PROVED_RESEARCH",
       "statement": "A concrete entry candidate can be represented by physical existence of K0 = START(C->S0); bare C->S0 is inert, no separate active flag/entry registry is needed for the tested discovery model.",
-      "evidence": ["ts/test/research-v013-entry-discovery-a68d.test.ts"]
+      "evidence": [
+        "ts/test/research-v013-entry-discovery-a68d.test.ts"
+      ]
     },
     {
       "id": "MI-B06",
       "status": "PROVED_RESEARCH",
       "statement": "For the tested append-only Context tree, START child growth moves activity to descendants and END(K) closes a branch; sibling START children form a parallel frontier. No deletion of historical Context Links is required.",
-      "evidence": ["ts/test/research-v013-link-native-frontier-a70e.test.ts"]
+      "evidence": [
+        "ts/test/research-v013-link-native-frontier-a70e.test.ts"
+      ]
     },
     {
       "id": "MI-B07",
@@ -81,6 +94,14 @@
         "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
         "experiments/a-circuit/src/runtime_session.rs",
         "experiments/optimized-cpu-rust/src/structural.rs"
+      ]
+    },
+    {
+      "id": "MI-B08",
+      "status": "PROVED_RESEARCH",
+      "statement": "A complete C-rooted Context execution tree can be frozen as whole canonical Link topology, transferred, restored into a fresh Memory and have its execution entries/active frontier reconstructed without serialized current-Context/current-Scope/program-counter handles. Continued Context growth remains reconstructible after a second freeze/restore.",
+      "evidence": [
+        "ts/test/v015-self-contained-context-freeze-resume-a5.test.ts"
       ]
     }
   ],
@@ -229,7 +250,7 @@
       "id": "MI-D02",
       "question": "How is active frontier/currentness represented without an external cursor?",
       "status": "OPEN",
-      "currentEvidence": "Topology-derived leaf frontier works in research but currently uses host absence/traversal checks."
+      "currentEvidence": "A70e topology rule plus v0.15 A5 freeze/restore prove self-describing frontier state; host incidence traversal and negative absence tests remain residual."
     },
     {
       "id": "MI-D03",
@@ -254,5 +275,21 @@
     "rule": "Any v0.15 decision that changes execution/meta-interpreter organization must update this model in the same change. Research tests/issues may provide evidence but do not silently supersede this model.",
     "humanProjection": "profiles/mts-v015-meta-interpreter-model.md",
     "authorGate": "No C-root choice, frontier rule, meta-grounding power or FORMAL-JSON executable representation becomes accepted without explicit Author confirmation."
+  },
+  "freezeResume": {
+    "status": "PROVED_RESEARCH",
+    "evidence": "ts/test/v015-self-contained-context-freeze-resume-a5.test.ts",
+    "proven": [
+      "whole-memory canonical topology is sufficient to preserve the tested Context execution state",
+      "entry identities are reconstructed after restore without a sidecar handle",
+      "active frontier is reconstructed after restore without a current Context/Scope/PC sidecar",
+      "execution growth can resume from the reconstructed frontier and survive a second freeze/restore"
+    ],
+    "notProven": [
+      "frontier/currentness is not yet derived by generalized MP itself",
+      "host incidence traversal remains a read-only oracle",
+      "negative absence checks for no child/no END remain residual",
+      "internal Theory/admission discovery without external semantic selection remains open"
+    ]
   }
 }
