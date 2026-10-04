@@ -57,6 +57,67 @@ function exactReaction(
   });
 }
 
+function exactObservationSignature(
+  actual: LinkHandle,
+  theory: readonly ExactRule[],
+): string {
+  return theory
+    .map((rule) => (rule.antecedent === actual ? "1" : "0"))
+    .join("");
+}
+
+/**
+ * Exact-identity observation can only ask whether the current whole Link is
+ * identical to one of the explicitly supported antecedent identities.
+ *
+ * Therefore every fresh Link outside Support(F) belongs to the same
+ * observation class: all equality bits are false. K-preservation may carry
+ * that whole opaque identity forward, but cannot recover its hidden poles.
+ */
+function verifyFreshObservationOpacity(
+  family: readonly FamilyCase[],
+  exactTheory: readonly ExactRule[],
+): void {
+  assert(family.length > 0, "fresh opacity family non-empty");
+
+  const signatures = new Set(
+    family.map((item) => exactObservationSignature(item.actual, exactTheory)),
+  );
+  same(
+    signatures.size,
+    1,
+    "all fresh actuals outside exact support have one observation signature",
+  );
+
+  const onlySignature = [...signatures][0];
+  assert(onlySignature !== undefined, "fresh observation signature exists");
+  assert(
+    !onlySignature.includes("1"),
+    "fresh observation signature contains no exact antecedent hit",
+  );
+
+  const expectedOutputs = new Set(family.map((item) => item.expected));
+  same(
+    expectedOutputs.size,
+    family.length,
+    "fresh structural family requires distinct structure-dependent outputs",
+  );
+
+  for (const item of family) {
+    assert(
+      item.expected !== item.actual,
+      "required structural result is not opaque identity preservation",
+    );
+  }
+
+  if (family.length > 1) {
+    assert(
+      expectedOutputs.size > signatures.size,
+      "one exact observation class cannot determine many distinct structural outputs",
+    );
+  }
+}
+
 interface StructuralRuleFixture {
   readonly rule: LinkHandle;
   readonly template: LinkHandle;
@@ -181,6 +242,8 @@ function exerciseFamily(size: number): void {
   // Fresh runtime inputs are created only after the finite exact Theory exists.
   const family = buildFreshSwapFamily(memory, anchors, 20, size);
 
+  verifyFreshObservationOpacity(family, exactTheory);
+
   for (const item of family) {
     assert(
       !exactTheory.some((rule) => rule.antecedent === item.actual),
@@ -232,6 +295,10 @@ function exerciseFamily(size: number): void {
 
   const exactNext = exactReaction(next.actual, enumerated);
   same(exactNext.matched, 0, "finite exact enumeration fails again on N+1 fresh input");
+  assert(
+    !exactObservationSignature(next.actual, enumerated).includes("1"),
+    "N+1 fresh input remains in the all-false exact observation class",
+  );
 
   const structuralNext = structuralSwap(memory, structural, next.actual);
   same(
@@ -261,6 +328,15 @@ for (const size of [1, 2, 5, 17] as const) {
  * Exact S0 can transition only A in Support(F). Therefore any fresh A outside
  * Support(F) is opaque regardless of its internal Link poles.
  *
+ * More strongly, every fresh A outside Support(F) has the SAME exact
+ * observation signature relative to F: all antecedent equality tests are
+ * false. A deterministic local mechanism whose only observation is exact
+ * identity therefore has no information from which to choose among many
+ * distinct structure-dependent outputs such as swap(left(A),right(A)).
+ *
+ * K-preservation can retain the opaque whole A identity; it does not reveal
+ * left(A)/right(A) or construct a different Link derived from those poles.
+ *
  * A generic transformation required on arbitrarily fresh structured A cannot
  * be implemented by one fixed finite exact F unless:
  *   (1) every future A is pre-enumerated (not finite for unbounded freshness),
@@ -277,6 +353,9 @@ console.log([
   "S0_EXACT_SUPPORT=FINITE_ANTECEDENT_IDENTITY_SET",
   "FRESH_STRUCTURED_INPUT_OUTSIDE_SUPPORT=NO_MATCH",
   "INTERNAL_POLES_VISIBLE_TO_S0=FALSE",
+  "ALL_FRESH_OUTSIDE_SUPPORT_SHARE_EXACT_OBSERVATION_CLASS=TRUE",
+  "STRUCTURE_DEPENDENT_FRESH_OUTPUTS_REQUIRE_MORE_INFORMATION_THAN_EXACT_SIGNATURE=TRUE",
+  "K_PRESERVATION_REVEALS_POLES=FALSE",
   "EXACT_ENUMERATION_COST=ONE_ADMISSION_PER_FRESH_IDENTITY",
   "N_PLUS_1_FRESH_INPUT_ESCAPES_FINITE_ENUMERATION=TRUE",
   "ONE_GENERIC_STRUCTURAL_RULE_HANDLES_1_2_5_17_AND_N_PLUS_1=TRUE",
