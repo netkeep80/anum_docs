@@ -1150,6 +1150,57 @@ Additional GREEN differentials:
 - `[] = R` as a binding RHS does not automatically publish `R`;
 - removing explicit current membership makes `E->K` non-current even while the same Link remains physically present and named.
 
+### Author-approved direct JSON source-role mapping
+
+**Author decision 2026-10-05: APPROVED AS DESIGN DIRECTION / PROOF PENDING.**
+
+JSON is only another source projection into the **same native source ANet**:
+
+```text
+{"A": null}
+    -> bare source entry A
+    -> explicit membership after DAS
+
+{"A": "X"}
+    -> source binding A:X
+    -> metamodel definition
+    -> RHS is not automatic membership
+
+{"A": []}
+    -> source binding A:Seq([])
+    -> Seq([])=R
+    -> R is not automatic membership
+
+{"A": {...}}
+    -> anchored nested source ANet A
+    -> contextual Links after DAS
+```
+
+Structured object keys are resolved by the ordinary FORMAL expression resolver before role lowering. Candidate:
+
+```json
+{"Theory->Rule": null}
+```
+
+means a **bare resolved Link**; after common DAS denotation:
+
+```text
+Theory->Rule ∈ M_t
+```
+
+No separate JSON execution semantics are allowed:
+
+```text
+FORMAL text ----\
+                -> SAME native source ANet
+direct JSON ----/        -> SAME resolver
+                         -> SAME DAS
+                         -> M_t
+                         -> Γ
+```
+
+The generic mapping is Author-approved. A concrete JSON representation of a logical element or proof is **not** automatically approved by this decision and still requires its own explicit Author gate.
+
 ### DAS-A2 — canonical native source ANet
 
 DAS-A2 removes the last custom source carrier from DAS-A1.
