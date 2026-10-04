@@ -605,24 +605,20 @@ E -> K
   "E": "C->Theory",
   "Truth0": "K->A",
   "K0": "♂(E->Truth0)",
-  "W0": "E->K0"
+  "E->K0": null
 }
 ```
 
-Здесь `W0` — только произвольное presentation-имя. Семантический witness — обычная Link:
-
-```text
-E -> K0
-```
+Здесь вообще не требуется presentation-имя для witness. Кандидат читает bare structured member `"E->K0": null` как прямого члена Aset с денотацией `E->K0`.
 
 Поэтому обязательны дифференциалы:
 
-- переименование `W0` не меняет исполнение;
-- удаление denoted-member `E->K0` снимает currentness, даже если `K0` физически существует;
+- переименование любых несущественных aliases не меняет исполнение;
+- удаление bare-member `E->K0` снимает currentness, даже если `K0` физически существует;
 - замена его на `E->K1` переносит currentness;
 - `current:true`, `active:true`, host cursor и специальные имена не имеют authority.
 
-Остаётся один точный lowering-вопрос: надо доказать, что JSON/source-Aset definition с RHS `E->K0` действительно включает эту Link в **denoted semantic Aset membership** `M_t`, а не только материализует и именует её вне текущего множества членов.
+Остаётся один точный lowering-вопрос: доказать, что bare structured JSON key + `null` действительно реконструирует **denoted semantic Aset member** `E->K0`. Эта конкретная surface-форма пока только кандидат и требует Author review.
 
 Отдельно для JSON source рассматривается естественный кандидат:
 
@@ -975,6 +971,87 @@ Exact grounded Modus Ponens должен быть формально доказ�
 4. статус: accepted / research / candidate / open / falsified.
 
 Тест, issue, старый runtime или комментарий сами по себе не имеют права незаметно изменить архитектурную модель.
+
+## 16a. Native role-bundle candidate вместо отдельного RoleDictionary
+
+A9 теперь содержит отдельный исполняемый эксперимент, не меняющий сам `Γ`.
+
+Кандидат:
+
+```text
+V       = обычный anchor пучка ролей
+
+roles(V, M_t)
+        = { r ∈ M_t | START(r) = V }
+
+Body    = AntecedentTemplate -> ExactSequence(OutputTemplates)
+
+Rule    = V -> Body
+
+Admission
+        = Theory -> Rule ∈ M_t
+```
+
+Существенно: ролью является **сама member-Link** `V->name_i`, а не её endpoint. Простого физического существования outgoing Link из `V` недостаточно — Link должна входить в исполняемую Aset `M_t`.
+
+Исполняемый тест показал для двухролевого swap:
+
+```text
+tag -> (X -> Y)
+      ↓
+Y -> X
+```
+
+- structural match/bind работает тем же matcher;
+- substitution/instantiation работает тем же constructor;
+- порядок членов role-bundle не влияет на результат;
+- физическая `V->Z`, отсутствующая в `M_t`, ролью не становится;
+- пустой role-bundle даёт zero-role grounded exact rule;
+- отдельный `START(ExactSequence(roles))` RoleDictionary для этого вектора не требуется.
+
+Это пока **не универсальная теорема** и не финальный JSON.
+
+Предлагаемый direct-JSON surface для проверки:
+
+```json
+{
+  "V": {
+    "X": null,
+    "Y": null
+  },
+  "R": "V->((tag->(V:X->V:Y))->[V:Y->V:X])",
+  "Theory->R": null
+}
+```
+
+Здесь предполагается:
+
+- nested object `V` — anchored Aset ролей;
+- `V:X` и `V:Y` — qualified contextual role-member Links;
+- `R` — лишь удобное имя обычной Link `V->Body`;
+- `Theory->R` — прямой bare Aset-member admission;
+- никаких `Rule`, `pattern`, `bind`, `instantiate`, `active` JSON-тегов нет.
+
+Grounded special case:
+
+```json
+{
+  "V0": {},
+  "R0": "V0->(A->[B])",
+  "Theory->R0": null
+}
+```
+
+Пустой `{}` здесь принципиально полезен: он задаёт явный пустой role-bundle, то есть точное grounded rule без bindable roles.
+
+До Author approval надо проверить:
+
+1. exact lowering nested `V{}` в нужные contextual member Links;
+2. bare structured key + `null` как прямое Aset membership;
+3. alpha-renaming имён `V/R/X/Y`;
+4. отсутствие ложных roles при ordinary bundle-members;
+5. A72r variable arity;
+6. proof/theorem FORMAL, чтобы не получить executable-only синтаксис.
 
 ## 17. Author gates
 
