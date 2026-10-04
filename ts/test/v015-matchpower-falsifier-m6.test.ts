@@ -206,6 +206,7 @@ let groundedRelation: LinkHandle;
     "structural-unary direct reaction result",
   );
   same(reaction.rawRuleMatches, 1, "structural-unary one template match");
+  same(reaction.oldMembers.length, 1, "structural-unary sees exactly one current member");
   same(reaction.transitionedMembers, 1, "structural-unary one current member");
   same(reaction.handoffCount, 1, "structural-unary one atomic handoff");
 }
@@ -247,6 +248,7 @@ console.log([
   "GENERIC_META_GROUNDING=CREATES_EXACT_RELATION",
   "GROUNDED_EXACT_AFTER_META=GREEN",
   "STRUCTURAL_UNARY_DIRECT=GREEN",
+  "STRUCTURAL_UNARY_CURRENT_MEMBER_COUNT=1",
   "STRUCTURAL_UNARY_JOINT_MEMBER_ARITY=1",
   "CROSS_MEMBER_JOIN_USED=0",
   "MATCH_POWER_CHOICE=PROVEN_DISTINCT",
