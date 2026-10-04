@@ -164,6 +164,15 @@
         "ts/test/v015-finite-materialized-reaction-a12.test.ts",
         "proofs/premise-classification-v0.14.json"
       ]
+    },
+    {
+      "id": "MI-B16",
+      "status": "PROVED_RESEARCH",
+      "statement": "v0.15 reaction analysis now explicitly separates derived lift/refinement theorems from execution-profile premises. Snapshot, NO_MATCH/matched-empty semantics, generation isolation, complete-successor staging and atomic publication are not claimed as consequences of scalar positive detachment.",
+      "evidence": [
+        "profiles/mts-v015-generalized-reaction-candidate.json",
+        "ts/test/v015-mp-necessity-a2.test.ts"
+      ]
     }
   ],
   "targetOrganization": {
@@ -578,5 +587,32 @@
       "sufficient physical capacity for any chosen materialized slice"
     ],
     "interpretation": "Finiteness belongs to the executable materialized slice/refinement contract, not to the ambient one-Link ontology."
+  },
+  "theoremPremiseSplit": {
+    "status": "PROVED_RESEARCH_CLASSIFICATION",
+    "source": "profiles/mts-v015-generalized-reaction-candidate.json",
+    "rule": "Never promote execution-profile premises to logical consequences of scalar or generalized MP.",
+    "derived": [
+      "bundle reduction from local contributions under exhaustive selected relations",
+      "pointwise current-member lift under member independence/J0 and one reaction-start snapshot",
+      "partition/order invariance from A11 reduction algebra",
+      "finite one-generation completion from A12 finite execution premises"
+    ],
+    "premises": [
+      "selected Theory authority",
+      "reaction-start snapshot",
+      "exhaustive discovery",
+      "NO_MATCH preservation semantics",
+      "matched-empty ZERO semantics",
+      "generation isolation",
+      "complete successor before publication",
+      "atomic publication",
+      "finite materialized execution slice for physical completion"
+    ],
+    "unresolved": [
+      "whether structure-sensitive S1+S2 is primitive reaction power or derivable/self-hosted meta-Aset behavior",
+      "full provenance and ordered-image refinement",
+      "denotational semantics of an infinite reaction"
+    ]
   }
 }
