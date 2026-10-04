@@ -204,6 +204,62 @@ for (const source of ['["R"]', '["R","R"]', '["C"]', '["R","C"]'] as const) {
   }
 }
 
+
+/*
+ * RULE IMAGE CARDINALITY PRESSURE
+ *
+ * The Author-approved v0.15 Rule topology carries:
+ *
+ *   Body = AntecedentTemplate -> ExactSequence(OutputTemplates)
+ *
+ * Therefore the image carrier must distinguish zero, one and repeated outputs
+ * even when the output Link itself is R.
+ */
+const imageAntecedent = memory.ensure(basis.L, basis.U);
+
+const rootedImage0 = rootedJsonDenotation(parseJsonVector("[]"));
+const rootedImage1R = rootedJsonDenotation(parseJsonVector('["R"]'));
+const rootedImage2R = rootedJsonDenotation(parseJsonVector('["R","R"]'));
+
+same(rootedImage0, basis.R, "rooted rule image []");
+same(rootedImage1R, basis.R, "rooted rule image [R]");
+same(rootedImage2R, basis.R, "rooted rule image [R,R]");
+same(
+  memory.ensure(imageAntecedent, rootedImage0),
+  memory.ensure(imageAntecedent, rootedImage1R),
+  "rooted fold cannot distinguish zero vs one R output in Rule Body",
+);
+same(
+  memory.ensure(imageAntecedent, rootedImage1R),
+  memory.ensure(imageAntecedent, rootedImage2R),
+  "rooted fold cannot distinguish one vs two R outputs in Rule Body",
+);
+
+const exactImage0 = exactJsonCarrier(parseJsonVector("[]"));
+const exactImage1R = exactJsonCarrier(parseJsonVector('["R"]'));
+const exactImage2R = exactJsonCarrier(parseJsonVector('["R","R"]'));
+
+distinct(
+  exactImage0,
+  exactImage1R,
+  "ExactSequence distinguishes zero vs one R output",
+);
+distinct(
+  exactImage1R,
+  exactImage2R,
+  "ExactSequence distinguishes one vs two R outputs",
+);
+distinct(
+  memory.ensure(imageAntecedent, exactImage0),
+  memory.ensure(imageAntecedent, exactImage1R),
+  "ExactSequence Rule Body distinguishes zero vs one output",
+);
+distinct(
+  memory.ensure(imageAntecedent, exactImage1R),
+  memory.ensure(imageAntecedent, exactImage2R),
+  "ExactSequence Rule Body distinguishes one vs two outputs",
+);
+
 // ---------------------------------------------------------------------------
 // 4. Anum/Q: same square-bracket glyphs, different layer.
 //    Nested empty Q sources retain exact source/carrier structure while their
@@ -312,5 +368,8 @@ console.log([
   "Q_INTERPRETED_NESTED_EMPTY_DENOTATION=R",
   "Q_ABIT_CARRIER_NESTING_IDENTITY=YES",
   "RECURSIVE_8961=ENCODES_SELECTED_LINK_NOT_JSON_OR_Q_SOURCE",
+  "RULE_IMAGE_ROOTED_FOLD_CARDINALITY=FAIL",
+  "RULE_IMAGE_EXACT_SEQUENCE_CARDINALITY=SUPPORTED",
+  "A4_EXECUTION_CARRIER_CANDIDATE=EXACT_SEQUENCE",
   "A4_DECISION=AUTHOR_REVIEW_REQUIRED",
 ].join(" "));
