@@ -103,6 +103,16 @@
       "evidence": [
         "ts/test/v015-self-contained-context-freeze-resume-a5.test.ts"
       ]
+    },
+    {
+      "id": "MI-B09",
+      "status": "PROVED_RESEARCH",
+      "statement": "For the tested grounded-reaction vector, an execution environment E=C->Theory carried in Link ancestry lets every active Context recover its Theory without an external selected-Theory pointer. Reaction-start Theory snapshot isolation makes generated admissions visible only in the next reaction and removes the historical A73j/A73k sibling-order timing anomaly.",
+      "evidence": [
+        "ts/test/v015-context-theory-self-contained-a6.test.ts",
+        "profiles/amemory-execution-profile.json",
+        "ts/test/research-v013-self-activation-schedule-invariance-a73k.test.ts"
+      ]
     }
   ],
   "targetOrganization": {
@@ -256,7 +266,7 @@
       "id": "MI-D03",
       "question": "How is Theory/admission/current causal authority discovered entirely from A-memory?",
       "status": "OPEN",
-      "currentEvidence": "Frozen A-memory still receives interpreter/Theory from host; self-contained selection remains to be proved."
+      "currentEvidence": "v0.15 A6 proves a C->Theory execution-environment candidate can recover Theory from Context ancestry with reaction-start snapshot isolation; final representation and self-hosted relation discovery remain open."
     },
     {
       "id": "MI-D04",
@@ -290,6 +300,35 @@
       "host incidence traversal remains a read-only oracle",
       "negative absence checks for no child/no END remain residual",
       "internal Theory/admission discovery without external semantic selection remains open"
+    ]
+  },
+  "contextTheoryCandidate": {
+    "status": "PROVED_RESEARCH",
+    "evidence": "ts/test/v015-context-theory-self-contained-a6.test.ts",
+    "topology": {
+      "environment": "E = C -> Theory",
+      "entry": "K0 = START(E -> contextualTruth)",
+      "descendant": "K(n+1) = START(Kn -> contextualTruthNext)"
+    },
+    "proven": [
+      "Theory is recoverable from Context ancestry without an external selected-Theory pointer",
+      "foreign Theory relations remain inert",
+      "one reaction-start Theory snapshot is shared by the tested current frontier",
+      "new Theory admissions are not executable in the same reaction",
+      "new Theory admissions are executable in the next reaction",
+      "entry creation/allocation order does not change the tested causal match schedule or final canonical topology"
+    ],
+    "supersededHistoricalTrap": {
+      "evidence": "ts/test/research-v013-self-activation-schedule-invariance-a73k.test.ts",
+      "oldBehavior": "live Memory allowed same-reaction generated admission visibility, yielding generator-first 2,0 versus target-first 1,1,0",
+      "currentProfile": "reaction-start snapshot; both tested entry orders yield 1,1,0",
+      "status": "SUPERSEDED_BY_EXECUTION_PROFILE_FOR_V015_CANDIDATE"
+    },
+    "notProven": [
+      "E=C->Theory is not yet the final accepted execution-environment representation",
+      "host Context/frontier traversal remains residual",
+      "grounded relation discovery remains a test-side read-only oracle",
+      "full self-hosted meta-grounding remains open"
     ]
   }
 }
