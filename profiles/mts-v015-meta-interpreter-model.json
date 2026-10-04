@@ -134,7 +134,7 @@
     {
       "id": "MI-B12",
       "status": "PROVED_RESEARCH",
-      "statement": "For the tested generalized-reaction vector, currentness can be carried by positive mutable Aset membership inside A-memory: E->K membership witnesses an active Context, and one atomic reaction replaces old membership with successor memberships. No external current pointer, Scope pointer, latest-order rule, or negative no-child/no-END frontier test is required.",
+      "statement": "For the tested generalized-reaction vector, currentness is a positive contextual role witnessed by mutable Aset membership E->K. Atomic reaction replaces that witness without deleting K/K.current Links that may simultaneously carry other One-Link semantic roles. No external current/Scope pointer or negative no-child/no-END frontier test is required.",
       "evidence": [
         "ts/test/v015-positive-aset-currentness-a8.test.ts",
         "ts/test/research-v013-append-only-currentness-falsifier-a72n.test.ts"
@@ -393,19 +393,21 @@
   "positiveAsetCurrentness": {
     "status": "PROVED_RESEARCH",
     "evidence": "ts/test/v015-positive-aset-currentness-a8.test.ts",
-    "semanticState": "M_t is the Aset membership itself; physical canonical Link storage is a carrier and does not define currentness.",
-    "activeWitness": "E -> K is a member of M_t, where E=C->Theory and K is a Context rooted at E; K and K.current are also members of M_t.",
+    "semanticState": "M_t is semantic Aset membership; physical canonical Link storage is a carrier and does not define currentness. Currentness is one contextual role witnessed positively by E->K membership.",
+    "activeWitness": "E -> K membership positively witnesses currentness. K and K.current may also be members for other roles, but their membership is not itself currentness authority.",
     "atomicRewrite": {
-      "NO_MATCH": "keep E->K, K and current truth in M_(t+1)",
-      "ZERO": "remove current membership; optionally retain END(K) closure evidence",
-      "ONE_MANY": "remove old current membership and add complete successor truth/Context/E->K memberships"
+      "NO_MATCH": "keep the same E->K currentness witness",
+      "ZERO": "remove E->K currentness witness; branch may add END(K) closure evidence",
+      "ONE_MANY": "remove old E->K currentness witness and add complete successor E->Knext witnesses",
+      "ONE_LINK_ROLE_SAFETY": "do not delete K or K.current merely to deactivate currentness; the same Link may simultaneously carry another semantic role such as Theory admission"
     },
     "proven": [
       "no negative leaf test is required for currentness in the tested model",
       "append-only physical stale active-edge Links do not regain semantic authority",
       "temporary predecessor Context can leave semantic Aset membership while remaining physically referenced as carrier ancestry",
       "whole topology plus whole Aset membership freezes/transfers/restores current state without a current pointer",
-      "entry construction order does not change final canonical carrier or final semantic membership"
+      "entry construction order does not change final canonical carrier or final semantic membership",
+      "removing currentness preserves independent semantic roles of an overlapping Link"
     ],
     "relationToA72n": "A72n falsified plain append-only CURRENT->Scope. A8 takes the remaining mutable-currentness branch: semantic Aset membership is actually replaced, while physical carrier Links may remain.",
     "implementationBoundary": "How a backend stores mutable Aset membership (bitset, table, GPU buffer, associative hardware, etc.) is nonsemantic as long as generalized reaction atomically transforms the same M_t into M_(t+1).",
