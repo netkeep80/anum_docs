@@ -199,40 +199,32 @@
     }
   },
   "sequenceCarrierBoundary": {
-    "status": "AUTHOR_DIRECTION_RECORDED_RESEARCH_GREEN",
-    "sourceSemantics": {
+    "status": "AUTHOR_REVIEW_REQUIRED",
+    "approvedSourceCandidate": {
       "empty": "R",
-      "recurrence": "Seq(xs,x)=Seq(xs)->x",
-      "rootRole": "R is the initial cursor and backward-decoding terminator",
-      "decode": "while cursor != R: emit END(cursor), cursor := START(cursor), then reverse emitted values in the direct gauge"
+      "recurrence": "Seq(xs,x)=Seq(xs)->x"
     },
-    "intendedNormalization": [
-      "Seq() = Seq(R) = Seq(R,R) = R because leading R is the terminator, not an ordinary first payload",
-      "Seq(R,C) = Seq(C)",
-      "a carrier may be identical to a scalar Link (for example Seq(C)=C) because sequence role is contextual rather than a second ontology identity"
-    ],
-    "preservedCapabilities": [
-      "non-leading R payload remains representable",
-      "ordinary element order is preserved",
-      "ordinary repeated elements are preserved",
-      "backward decoding terminates structurally at R"
-    ],
-    "acceptedV014Compatibility": "V14-L13 keeps ExactSequence as a distinct stronger positional representation from rooted fold/Anum denotation. The JSON-array candidate need not inherit ExactSequence identity.",
+    "rootedFoldFindings": {
+      "exactPositionalIdentity": false,
+      "collisions": [
+        "Seq() = Seq(R) = Seq(R,R) = R",
+        "Seq(R,C) = Seq(C)",
+        "Seq(C) = C (sequence carrier identity collides with scalar Link C)"
+      ]
+    },
+    "acceptedV014Constraint": "ExactSequence preserves exact positional sequence identity distinct from fold denotation",
     "historicalExactSequence": {
-      "role": "separate positional representation",
       "empty": "R",
       "cell": "START(prev->value)",
-      "leadingRootAsOrdinaryValue": true
+      "permitsRootAsOrdinaryValue": true,
+      "preservesRepeatedPositions": true,
+      "distinguishesSequenceCarrierFromScalarValue": true
     },
-    "supersedesPreviousFinding": "The prior A4 wording treated []=[R], [R,C]=[C], and Seq(C)=C as identity collisions requiring repair. Author clarified that R is intentionally the rooted-sequence terminator and scalar/carrier identity overlap is allowed by contextual role.",
-    "remainingOpen": [
-      "prove/characterize the exact domain on which backward rooted decoding is total and unique",
-      "transport the direct-gauge START/END decoding statement through the accepted context-relative chirality model",
-      "settle canonical JSON presentation normalization for redundant leading R spellings"
+    "unresolvedDecision": [
+      "treat approved R-fold equations as non-injective fold denotation/projection and use ExactSequence (or equivalent root-safe positional carrier) for JSON array identity",
+      "accept quotient/non-positional array semantics explicitly",
+      "define a new injective positional lowering; do not silently equate it with the rooted fold"
     ],
-    "evidence": [
-      "ts/test/v015-json-array-rooted-fold-a4.test.ts"
-    ],
-    "forbiddenShortcut": "Do not reclassify intended terminator normalization or contextual scalar/carrier identity overlap as a defect merely to force ExactSequence lowering."
+    "forbiddenShortcut": "Do not identify the approved JSON array source rule with historical ExactSequence physical identity without an explicit lowering decision."
   }
 }
