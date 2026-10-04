@@ -321,6 +321,80 @@ function sameDifferential(actual: Differential, label: string): void {
   );
 }
 
+// Compatibility lowering is explicitly snapshot-scoped. A grounded Theory
+// admission added after lowering is visible to the grounded executor but not to
+// the stale legacy snapshot. Re-lowering into a fresh selected legacy Theory
+// restores parity without changing the semantic program.
+{
+  const f = fixture();
+  const stale = lowerGroundedTheoryToLegacyStructural(f);
+
+  admitGrounded(f, f.A, [f.B]);
+
+  // Grounded execution sees the newly admitted relation.
+  const groundedScope = defineV013GroundedExecutionScope(
+    f.memory,
+    f.fresh(),
+    f.groundedTheory,
+    [active(f, f.A)],
+  );
+  const groundedCursor = new V013GroundedScopeCursor(f.memory, groundedScope);
+  const grounded = reactV013GroundedScope(f.memory, groundedCursor, f.fresh());
+  sameMembers(
+    groundedCursor.members(),
+    [active(f, f.B)],
+    "new admission visible to grounded next reaction",
+  );
+  same(grounded.matchedRelations, 1, "new grounded admission matched");
+
+  // Stale legacy snapshot does not magically acquire a generated wrapper.
+  const staleScope = defineV013WorkingScope(
+    f.memory,
+    f.fresh(),
+    stale.interpreter,
+    [active(f, f.A)],
+  );
+  const staleCursor = new V013CurrentScopeCursor(f.memory, staleScope);
+  const staleReaction = reactV013StructuralScope(f.memory, staleCursor, f.fresh());
+  sameMembers(
+    staleCursor.members(),
+    [active(f, f.A)],
+    "stale legacy snapshot preserves unmatched A",
+  );
+  same(staleReaction.rawRuleMatches, 0, "stale legacy snapshot has no new wrapper");
+
+  // Generic refresh creates a fresh legacy Theory snapshot from the now-current
+  // grounded Theory and restores exact observation parity.
+  const refreshed = lowerGroundedTheoryToLegacyStructural(f);
+  const refreshedScope = defineV013WorkingScope(
+    f.memory,
+    f.fresh(),
+    refreshed.interpreter,
+    [active(f, f.A)],
+  );
+  const refreshedCursor = new V013CurrentScopeCursor(f.memory, refreshedScope);
+  const refreshedReaction = reactV013StructuralScope(
+    f.memory,
+    refreshedCursor,
+    f.fresh(),
+  );
+  sameMembers(
+    refreshedCursor.members(),
+    groundedCursor.members(),
+    "refreshed legacy snapshot matches grounded result",
+  );
+  same(
+    refreshedReaction.rawRuleMatches,
+    grounded.matchedRelations,
+    "refreshed legacy snapshot match count",
+  );
+  same(
+    refreshedReaction.handoffCount,
+    grounded.handoffCount,
+    "refreshed legacy snapshot handoff",
+  );
+}
+
 // Packed antecedent remains just another exact grounded antecedent.
 {
   const f = fixture();
@@ -395,6 +469,8 @@ console.log([
   "N_TO_ONE=PARITY",
   "N_TO_M=PARITY",
   "PACKED_ANTECEDENT=PARITY",
+  "LEGACY_LOWERING=SINGLE_THEORY_SNAPSHOT",
+  "NEW_ADMISSION_REQUIRES_GENERIC_REFRESH=TRUE",
   "PROGRAM_SPECIFIC_DISPATCH=0",
   "CANONICAL_PROGRAM_CONTAINS_LEGACY_SCAFFOLD=FALSE",
 ].join(" "));
