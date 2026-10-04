@@ -17,7 +17,6 @@ import {
 } from "../src/native-syntax-grammar.js";
 import { materializeSourceNamespaceProfile } from "../src/source-namespace.js";
 import {
-  V015_FORMAL_JSON_J1_SCHEMA,
   decodeV015FormalSourceAsetJson,
   encodeV015FormalSourceAsetJson,
 } from "../src/v015-formal-decoder.js";
@@ -529,7 +528,7 @@ console.log([
   "TWO_INSTANTIATIONS=GREEN",
   "ALPHA_RENAME=SEMANTICALLY_STABLE",
   "SAME_SPELLING_FREE_CAPTURE=REJECTED_BY_IDENTITY",
-  "JSON_J1=EXACT",
+  "JSON_DIRECT_BUNDLE=EXACT",
   "RUNTIME_EQUALITY_IN_TEMPLATE=0",
   "FND13_PREMISE=0",
   "GROUNDED_PREMISE=0",
