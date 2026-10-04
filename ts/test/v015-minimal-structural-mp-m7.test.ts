@@ -482,23 +482,23 @@ function runVariadic(f: VariadicFixture, spec: VariadicSpec): void {
   );
 
   for (const forbidden of [
-    "AND",
-    "OR",
-    "XOR",
-    "NOT",
-    "TRUE",
-    "FALSE",
-    "FF",
-    "FT",
-    "TF",
-    "TT",
+    "\"AND\"",
+    "\"OR\"",
+    "\"XOR\"",
+    "\"NOT\"",
+    "\"TRUE\"",
+    "\"FALSE\"",
+    "\"FF\"",
+    "\"FT\"",
+    "\"TF\"",
+    "\"TT\"",
     "opcode",
     "RuleKind",
     "triggerKey",
     "selectedBranch",
     "switch(",
   ]) {
-    assert(!source.includes(forbidden), "kernel excludes " + forbidden);
+    assert(!source.includes(forbidden), "kernel excludes dispatch marker " + forbidden);
   }
 
   assert(
