@@ -694,7 +694,7 @@
     ]
   },
   "nativeRoleBundleRuleCandidate": {
-    "status": "AUTHOR_REVIEW_REQUIRED",
+    "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
     "evidence": "ts/test/v015-structural-aset-one-command-a9.test.ts",
     "purpose": "Eliminate the dedicated RoleDictionary wrapper while retaining an explicit Link-native witness for structural bindable roles.",
     "semanticTopology": {
@@ -749,6 +749,25 @@
         "run full historical A72r execution differential and theorem/proof FORMAL before Author approval; the three-role recursive A72r-like shape is already GREEN research"
       ]
     },
-    "loweringOwner": "#2002"
+    "loweringOwner": "#2002",
+    "authorDecision": {
+      "date": "2026-10-05",
+      "decision": "APPROVED_AS_V015_DESIGN_DIRECTION",
+      "approvedTopology": [
+        "V is an ordinary Aset/bundle anchor for bindable roles.",
+        "Role membership is Link-native/extensional: role Links are members of the role bundle in semantic Aset state; physical existence alone has no authority.",
+        "Body = AntecedentTemplate -> ExactSequence(OutputTemplates).",
+        "Rule = V -> Body.",
+        "Theory -> Rule membership in M_t is the admission witness.",
+        "Empty role bundle is the grounded exact-rule refinement."
+      ],
+      "notYetApproved": [
+        "concrete final JSON spelling",
+        "exact source-Aset -> semantic M_t lowering",
+        "universal theorem/proof closure",
+        "full A72r historical differential",
+        "proof/theorem FORMAL surface"
+      ]
+    }
   }
 }
