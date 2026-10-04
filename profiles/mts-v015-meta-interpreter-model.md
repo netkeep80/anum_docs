@@ -649,6 +649,17 @@ CROSS_MEMBER_JOIN=0
 
 Это сильный кандидат на требуемый «один исполнитель», но **не accepted v0.15 law**. Пока не доказаны необходимость именно structural match power, аппаратный refinement и окончательное FORMAL/JSON представление.
 
+### A10 — finite exact-support + information-opacity lower bound
+- fixed finite exact-identity Theory has finite antecedent support;
+- fresh structured identities outside that support are NO_MATCH regardless of internal poles;
+- **all** fresh Links outside support have the same exact observation signature: every antecedent-equality bit is false;
+- nevertheless a structural transform such as swap(left,right) requires different outputs for different fresh structures;
+- K-preservation can carry the opaque whole Link forward, but does not reveal its poles;
+- covering N observed fresh inputs with exact rules requires N concrete admissions, and N+1 escapes again;
+- one generic two-role structural rule covers tested families 1/2/5/17 plus N+1 with constant rule count;
+- therefore generic fresh transformation requires some structure-sensitive information/binding + construction power somewhere, or an external grounder;
+- this does NOT prove one unique API, does NOT prove S1/S2 must be primitive, and gives no evidence for cross-member join.
+
 ## 14f. A10 — finite exact support и необходимость structure-sensitive power
 
 A10 отделяет необходимость от конкретной реализации.
