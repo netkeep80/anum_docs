@@ -338,12 +338,12 @@ setSame(baseline.successors, expected, "monolithic successor");
   same(empty.matched, true, "matched-empty event bit");
   same(empty.outputs.length, 0, "matched-empty output");
   setSame(
-    finalizeCurrent(memory, currents[0], no),
-    [currents[0]],
+    finalizeCurrent(memory, currents[0]!, no),
+    [currents[0]!],
     "NO_MATCH preserves current",
   );
   same(
-    finalizeCurrent(memory, currents[1], empty).length,
+    finalizeCurrent(memory, currents[1]!, empty).length,
     0,
     "matched-empty removes current",
   );
