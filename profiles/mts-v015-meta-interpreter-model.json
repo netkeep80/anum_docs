@@ -815,5 +815,22 @@
       "Duplicate source occurrences remain distinct in source while equal Link denotations converge extensionally.",
       "Removing bare E->K membership leaves the same physical/named Link non-current."
     ]
+  },
+  "directJsonSourceMapping": {
+    "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
+    "authorDecision": {
+      "date": "2026-10-05",
+      "decision": "APPROVED_FOR_IMPLEMENTATION_AND_FALSIFICATION"
+    },
+    "mapping": [
+      "{\"A\":null} -> bare resolved source entry A -> explicit membership after common DAS",
+      "{\"A\":\"X\"} -> source binding A:X -> metamodel definition, no automatic RHS membership",
+      "{\"A\":[]} -> source binding A:Seq([]) -> Seq([])=R, no automatic R membership",
+      "{\"A\":{...}} -> anchored nested source ANet A -> contextual members through the same DAS"
+    ],
+    "structuredKeyRule": "Object keys are resolved by ordinary FORMAL expression resolution before source-role lowering; a bare structured key such as Theory->R contributes that resolved Link as a bare source entry.",
+    "invariant": "JSON must reconstruct the same native source ANet roles as FORMAL/native source and must not bypass resolver or DAS.",
+    "nextEvidence": "DAS-A3 direct JSON -> native source ANet -> DAS -> semantic ANet",
+    "artifactApproval": "Each concrete logical/proof JSON artifact remains separately Author-gated."
   }
 }
