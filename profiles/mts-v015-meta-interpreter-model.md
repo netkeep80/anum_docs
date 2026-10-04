@@ -647,7 +647,7 @@ NEXT_REACTION_NEW_ADMISSION_EXECUTABLE=TRUE
 CROSS_MEMBER_JOIN=0
 ```
 
-Это сильный кандидат на требуемый «один исполнитель», но **не accepted v0.15 law**. Пока не доказаны необходимость именно structural match power, аппаратный refinement и окончательное FORMAL/JSON представление.
+Это теперь **Author-approved направление архитектуры v0.15**, но ещё не закрытая математическая теорема и не принятие v0.15 целиком. #2001 обязан формально закрыть multi-generation S0-opacity, grounded-MP refinement, фазовое разделение и hardware/schedule refinement; окончательное FORMAL/JSON представление остаётся отдельным Author gate.
 
 ### A10 — finite exact-support + information-opacity lower bound
 - fixed finite exact-identity Theory has finite antecedent support;
@@ -728,6 +728,8 @@ Contribution = (matched, outputs)
   =
 (m1 OR m2, O1 UNION O2)
 ```
+
+Здесь `UNION` — только математическая запись экстенсионального результата. В самой A-memory отдельной операции дедупликации нет: одинаковая каноническая Link имеет одну identity, а членство Aset идемпотентно. Это не относится к повторениям внутри `ExactSequence`: `[X,X]` и `[X]` остаются различными там, где последовательность позиционна.
 
 Исполняемо подтверждены:
 
@@ -881,15 +883,46 @@ STATUS = APPROVED_FOR_V015
 
 Также `C` не объявляется абсолютной привилегированной сущностью Foundation. В прямой gauge это END-граница пространства исполнения; зеркальное представление должно оставаться эквивалентным по chirality.
 
+## 14j. Author decision — единый цикл Γ
+
+2026-10-04 Author decision:
+
+```text
+M_t --Γ--> M_(t+1) --Γ--> M_(t+2) ...
+
+Γ = ANALYSIS(M_t)
+    -> SYNTHESIS(plan)
+    -> ATOMIC_PUBLISH(M_(t+1))
+```
+
+Главное архитектурное свойство A-memory: над ней снова и снова выполняется **один и тот же универсальный цикл преобразования связей**.
+
+Двухфазность внутри реакции не создаёт двух команд. Анализ и синтез — внутренние стороны одной трансформации. Во время анализа читается только неизменный reaction-start срез `M_t`; синтез материализует следствия и готовит изменения; полный `M_(t+1)` публикуется атомарно и только после этого становится входом следующего такого же `Γ`.
+
+Старые метки S1/S2 сохраняются только как пояснение:
+
+- S1 = analysis-side structural applicability / match / bind;
+- S2 = synthesis-side substitution / canonical Link construction.
+
+Они не являются отдельными командами A-memory, программными opcode или внешним grounder.
+
+Если несколько применимых отношений выводят одну и ту же Link, отдельная dedup-фаза не нужна: каноническая identity Link и экстенсиональное членство Aset автоматически дают один член. `O1 UNION O2` остаётся математической записью для доказательства редукции/распараллеливания.
+
+Граница: повторения внутри позиционного значения, например `ExactSequence[X,X]`, не являются повторным Aset-membership и не схлопываются.
+
+Exact grounded Modus Ponens должен быть формально доказан как частный/refinement-случай `Γ`; классическому MP не приписывается скрытая унификация. Истинный J1 cross-current-member join в v0.15 не вводится.
+
+Все универсальные утверждения этого решения имеют release-blocking proof owner **#2001**.
+
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
 |---|---|---|
-| MI-D01 | O или C/END-boundary как execution-space root? | **OPEN**, C strongly supported; O collision доказан |
+| MI-D01 | O или C/END-boundary как execution-space root? | **RESOLVED / AUTHOR-APPROVED:** `C = END(R)` в direct gauge; chirality covariance обязательна |
 | MI-D02 | Как вывести active frontier без host cursor? | **OPEN**, A70e topology works but host absence traversal remains |
 | MI-D03 | Как Theory/admission выбираются из самой A-memory? | **OPEN**, frozen runtime пока получает authority снаружи |
-| MI-D04 | Точный математический generalized parallel MP | **OPEN**, #1988 / #1989 |
-| MI-D05 | Полностью self-hosted meta-grounding | **OPEN**, S0-only falsified for fresh structural substitution |
+| MI-D04 | Точный математический generalized reaction | **AUTHOR-APPROVED DESIGN / PROOF PENDING:** единый повторяемый `Γ`, анализ→синтез→atomic publish; formal closure #2001 |
+| MI-D05 | Structural capability без внешнего grounder-командного слоя | **AUTHOR-APPROVED DESIGN / PROOF PENDING:** structural-unary capability внутри `Γ`; S1/S2 не отдельные команды; #2001 закрывает lower bound/refinement |
 
 ## 16. Правило сопровождения
 
@@ -906,11 +939,10 @@ STATUS = APPROVED_FOR_V015
 
 Без явного подтверждения автора нельзя объявлять принятыми:
 
-- `C`/END-boundary как окончательный execution-space root;
-- конкретное правило frontier/currentness;
-- степень generalized MP;
-- полномочия structural match/instantiate;
-- конкретное FORMAL-JSON представление meta-interpreter;
-- окончательный self-hosted bootstrap.
+- изменение уже принятого `C = END(R)` решения или его chirality boundary;
+- конкретное окончательное FORMAL/JSON представление frontier/currentness;
+- любое усиление `Γ` сверх structural-unary J0 (например J1 cross-current join);
+- конкретное FORMAL/JSON представление meta-interpreter/reaction rules;
+- изменение bootstrap/self-hosting boundary, которое вводит внешний semantic grounder.
 
 До этого документ служит **архитектурной памятью и falsifier-картой**, а не новым accepted contract.
