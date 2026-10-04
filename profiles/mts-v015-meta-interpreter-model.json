@@ -139,6 +139,14 @@
         "ts/test/v015-positive-aset-currentness-a8.test.ts",
         "ts/test/research-v013-append-only-currentness-falsifier-a72n.test.ts"
       ]
+    },
+    {
+      "id": "MI-B13",
+      "status": "PROVED_RESEARCH",
+      "statement": "A single structural-unary generalized reaction over semantic Aset membership can, for the tested vector, derive currentness and Theory authority from M_t, perform read-only structural match/bind over one current endpoint, defer substitution/construction until the complete plan exists, atomically replace currentness witnesses, and self-admit a newly emitted parameteric Rule for execution in the next causal generation without an external grounder/install command.",
+      "evidence": [
+        "ts/test/v015-structural-aset-one-command-a9.test.ts"
+      ]
     }
   ],
   "targetOrganization": {
@@ -298,13 +306,13 @@
       "id": "MI-D04",
       "question": "Is generalized parallel MP derived from scalar MP plus reaction/publication laws, and what exact premises are irreducible?",
       "status": "OPEN",
-      "currentEvidence": "#1988 / PR #1989."
+      "currentEvidence": "A7/A8 establish pointwise parallel current-state semantics over Context/Aset membership; A9 supplies a stronger structural-unary one-command candidate with read-only planning and generation-isolated publication. Mathematical derivation/refinement proofs remain OPEN."
     },
     {
       "id": "MI-D05",
       "question": "Can meta-grounding become fully self-hosted without hidden host structural matcher/constructor semantics?",
       "status": "OPEN",
-      "currentEvidence": "#1990 M6B falsifies S0-only fresh structural grounding."
+      "currentEvidence": "A9 proves a structural-unary one-command Aset reaction can realize S1+S2 + 0/1/N + atomic currentness rewrite and next-generation self-admission for the tested vector. This removes the external pre-grounder for that vector but does not yet prove necessity or final FORMAL/JSON representation."
     }
   ],
   "maintenanceLaw": {
@@ -416,5 +424,49 @@
       "full self-hosted meta-grounding",
       "hardware atomicity implementation"
     ]
+  },
+  "structuralAsetOneCommand": {
+    "status": "PROVED_RESEARCH",
+    "evidence": "ts/test/v015-structural-aset-one-command-a9.test.ts",
+    "candidateCommand": "Gamma_structural(M_t) -> M_(t+1)",
+    "capabilityVector": {
+      "matchPower": "STRUCTURAL_TEMPLATE_WITH_ROLES",
+      "jointAntecedentArity": "ONE_CURRENT_ENDPOINT",
+      "imageArity": "ZERO_ONE_MANY",
+      "currentLift": "ALL_POSITIVELY_ACTIVE_CONTEXTS_IN_M_t",
+      "publication": "ATOMIC_SEMANTIC_ASET_MEMBERSHIP_REWRITE"
+    },
+    "authority": {
+      "currentness": "positive E->K membership witness",
+      "theory": "Theory->Rule Links belonging to the reaction-start Aset snapshot",
+      "externalCurrentPointer": false,
+      "externalScopePointer": false,
+      "externalSelectedTheoryPointer": false,
+      "separatePreGrounderCommand": false
+    },
+    "causalBarrier": {
+      "S1": "structural match/bind is read-only and complete before publication",
+      "S2": "substitution/canonical construction begins only after the complete S1 plan exists",
+      "generatedAdmission": "ordinary K-preserving output with K=Theory produces Theory->Rule",
+      "sameReactionVisibility": false,
+      "nextReactionVisibility": true
+    },
+    "proven": [
+      "exact zero-role and parameteric structural rules share one matcher family",
+      "matched-empty, one-output and many-output images execute in the same command",
+      "fresh two-role structured input executes without a pre-grounded exact relation",
+      "generated Theory admission is both an ordinary result Link and next-generation Theory authority",
+      "the same generated admission may simultaneously be current truth and Theory authority",
+      "freeze/transfer/restore between causal generations preserves the final canonical state",
+      "entry creation order does not change the final canonical carrier or Aset membership",
+      "no cross-current-member join is used"
+    ],
+    "residuals": [
+      "host matcher/constructor functions are currently the implementation of the candidate generalized command; this is not yet an external formal proof of the primitive",
+      "physical atomic staging/commit on CPU/GPU/ASIC remains an implementation/refinement obligation",
+      "final Link-native FORMAL/JSON representation of runtime Aset membership and structural rules remains Author-gated",
+      "necessity versus weaker grounded+bootstrap architecture still requires Author decision"
+    ],
+    "acceptanceStatus": "AUTHOR_DECISION_REQUIRED"
   }
 }
