@@ -104,12 +104,14 @@ function groundTemplate(
   outputTemplates: readonly LinkHandle[],
   actualAntecedent: LinkHandle,
 ): GroundedTemplateResult {
+  const beforeUnify = memory.linkCount;
   const bindings = unifyStructuralRuleTemplate(
     memory,
     antecedentTemplate,
     actualAntecedent,
     roles,
   );
+  same(memory.linkCount, beforeUnify, "generic meta-unification is read-only");
   const outputs = outputTemplates.map((template) =>
     instantiateV013StructuralTemplate(memory, template, bindings)
   );
@@ -301,6 +303,7 @@ console.log([
   "MTS_V015_META_M4=MULTIROLE_GROUNDING_GREEN",
   "SOURCE_RULE_ROLES=2",
   "REPEATED_ROLE_CONSTRAINT=GREEN",
+  "META_UNIFICATION=READ_ONLY",
   "SELF_INCIDENCE_PRESERVATION=GREEN",
   "GROUNDING_INPUT=ONE_EXPLICIT_STRUCTURED_ANTECEDENT",
   "GROUNDED_RUNTIME_RELATION=UNARY_MP1",
