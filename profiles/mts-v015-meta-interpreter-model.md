@@ -560,6 +560,37 @@ CURRENT_TRUTHS_RECONSTRUCT_WITHOUT_POINTER=TRUE
 
 Как backend физически хранит membership — таблицей, bitmap, GPU buffer или будущей ассоциативной аппаратурой — не должно входить в МТС.
 
+## 14d. One-Link role-overlap guard для currentness
+
+A8 дополнительно проверяет случай, когда **один и тот же Link** одновременно играет две роли:
+
+```text
+Theory -> relation
+```
+
+одновременно является:
+- admitted relation authority;
+- current contextual truth некоторого Context.
+
+Следствие:
+
+```text
+deactivate(K)
+!=
+delete(K.current Link from Aset)
+```
+
+Для снятия currentness удаляется только положительный witness:
+
+```text
+E -> K
+```
+
+Сам `K` и `K.current` могут оставаться членами Aset, если имеют другие роли. Иначе runtime-currentness начинает разрушать One-Link semantics.
+
+Исполняемый guard:
+`CURRENTNESS_WITNESS_REMOVAL_PRESERVES_OVERLAPPING_LINK_ROLES=TRUE`.
+
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
