@@ -71,7 +71,7 @@ C = END(R)
 - не читается как ExactSequence;
 - даёт естественный END-boundary;
 - позволяет START-growing Context chain, ancestry которой останавливается на `C`;
-- не смешивает execution history с обычной R-rooted sequence history.
+- не смешивает execution scaffold ancestry с обычной R-rooted sequence topology.
 
 Исторический вывод исследования уже был:
 
@@ -160,7 +160,7 @@ programCounter=K0
 
 > Синтаксис `♂(...)` здесь — рабочая v0.15-проекция с использованием принятого v0.14 остенсивного START. Точное surface spelling должно пройти Author gate.
 
-## 6. Дерево исполнения хранит собственную историю
+## 6. Context tree хранит carrier ancestry, но не semantic history
 
 Рост:
 
@@ -172,7 +172,7 @@ K2 = START(K1 -> S2)
 
 не требует изменения полюсов `K0` и `K1`.
 
-Старые Context остаются immutable history.
+Старые Context могут физически оставаться как неизменяемая carrier ancestry, потому что на них ссылаются потомки. **Это не semantic history и не Result. Context остаётся временным execution scaffold; физическое существование Link не означает currentness.**
 
 ### FORMAL JSON
 
@@ -234,7 +234,7 @@ END(K)
 }
 ```
 
-Исторический Context при этом не удаляется.
+В append-only carrier физический Context может остаться, но после закрытия он не является current state и не превращается в semantic history.
 
 ## 9. Рабочее правило frontier
 
@@ -448,6 +448,45 @@ FINAL_CANONICAL_TOPOLOGY_SAME=TRUE
 Это также исправляет важную историческую ловушку A73j/A73k. Старый live-Memory эксперимент мог дать `2,0` при generator-first и `1,1,0` при target-first: вновь созданный `Theory->relation` становился видим позднему sibling в том же проходе. Текущий execution profile требует reaction-start snapshot, поэтому новое admission становится причинно доступно только следующему поколению.
 
 A6 пока **не утверждает**, что `E=C->Theory` — окончательная принятая форма environment, и не устраняет host read-only traversal/matching oracle.
+
+## 14c. Context-frontier вместо Scope
+
+A7 связал старую Context-lifecycle идею с текущим generalized-reaction profile:
+
+```text
+NO_MATCH      -> тот же active leaf
+matched ZERO  -> END(K)
+ONE           -> один START-child
+MANY          -> несколько sibling START-children
+N -> M        -> pointwise reaction всего active frontier
+duplicates    -> canonical convergence
+```
+
+Исполняемая проверка:
+
+`ts/test/v015-context-tree-reaction-cardinality-a7.test.ts`
+
+дала:
+
+```text
+CONTEXT_TREE_GENERALIZED_REACTION=GREEN_RESEARCH
+EXTERNAL_CURRENT_SCOPE_POINTER=0
+CONTEXT_TREE_SUCCESSOR_EQUALS_POINTWISE_REFERENCE=TRUE
+OLD_SCOPE_HANDOFF_REQUIRED=FALSE_FOR_TESTED_VECTOR
+FORWARD_REVERSE_ENTRY_ORDER=CANONICAL_SAME
+```
+
+Это означает только то, что **для проверенного профиля отдельный semantic Scope-root/handoff не обязателен**: current state можно представить active frontier дерева Context.
+
+Но Context по-прежнему является временным execution scaffold, а не историей. Физически сохранённая ancestry в append-only carrier не получает от этого semantic authority.
+
+Открытый остаток:
+
+```text
+HOST_FRONTIER_TRAVERSAL=RESIDUAL
+HOST_RELATION_SNAPSHOT_MATCH=RESIDUAL_READ_ONLY_ORACLE
+NEGATIVE no-child / no-END tests = RESIDUAL
+```
 
 ## 15. Решения, которые нельзя снова потерять
 
