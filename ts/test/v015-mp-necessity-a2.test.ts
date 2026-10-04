@@ -229,6 +229,20 @@ function run(
     ),
   ) as {
     status: string;
+    candidateFamily: string;
+    capabilityAxes: {
+      matchPower: string;
+      jointAntecedentArity: string;
+      imageArity: string;
+      scopeLift: string;
+      eventPublication: string;
+    };
+    competingCandidate: {
+      id: string;
+      status: string;
+      matchPower: string;
+      jointAntecedentArity: string;
+    };
     decision: {
       scalarPositiveLaw: string;
       minimalCompleteLocalReaction: string;
@@ -263,6 +277,15 @@ function run(
   };
 
   same(candidate.status, "DEVELOPMENT_ONLY_AUTHOR_REVIEW_PENDING", "candidate status");
+  same(candidate.candidateFamily, "GROUNDED_EXACT_REACTION_FLOOR", "grounded candidate family");
+  same(candidate.capabilityAxes.matchPower, "EXACT_ANTECEDENT_IDENTITY", "grounded exact match axis");
+  same(candidate.capabilityAxes.jointAntecedentArity, "ONE_CURRENT_MEMBER", "grounded one-member antecedent");
+  same(candidate.capabilityAxes.imageArity, "ZERO_ONE_MANY", "grounded image cardinality");
+  same(candidate.capabilityAxes.scopeLift, "POINTWISE_N_CURRENT_MEMBERS", "grounded pointwise scope lift");
+  same(candidate.competingCandidate.id, "STRUCTURAL_UNARY_TEMPLATE_REACTION", "structural-unary comparison retained");
+  same(candidate.competingCandidate.status, "OPEN_NECESSITY_COMPARISON", "structural-unary decision remains open");
+  same(candidate.competingCandidate.matchPower, "STRUCTURAL_TEMPLATE_WITH_ROLES", "structural-unary match axis");
+  same(candidate.competingCandidate.jointAntecedentArity, "ONE_CURRENT_MEMBER", "structural-unary is not cross-member join");
   same(candidate.decision.scalarPositiveLaw, "MP0_RETAINED", "MP0 retained");
   same(candidate.decision.minimalCompleteLocalReaction, "MP1_CANDIDATE", "MP1 candidate");
   same(candidate.decision.scopeLift, "MP2_DERIVED_CANDIDATE", "MP2 derived candidate");
@@ -310,6 +333,9 @@ console.log([
   "MP1=MINIMAL_COMPLETE_LOCAL_REACTION_CANDIDATE",
   "MP2=DERIVED_POINTWISE_LIFT_CANDIDATE",
   "MP3=EXPLICIT_PACKING_NOT_STRONGER_RUNTIME_PRIMITIVE",
+  "MP_MATCH_AXES=EXPLICIT",
+  "GROUNDED_CANDIDATE=EXACT_ONE_MEMBER",
+  "STRUCTURAL_UNARY_CANDIDATE=OPEN_COMPARISON",
   "MP4=DEFERRED_NOT_REQUIRED_BY_CURRENT_CORPUS",
   "NO_MATCH_VS_IDENTITY=DISTINCT",
   "MATCHED_EMPTY=EXPLICIT",
