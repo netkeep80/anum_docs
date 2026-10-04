@@ -281,5 +281,24 @@
       "same-generation cascading collapses A->B->C into one generation"
     ],
     "boundary": "Extensional successor equivalence only; provenance and semantically significant per-image order remain separate obligations."
+  },
+  "finiteMaterializedReaction": {
+    "status": "GREEN_RESEARCH",
+    "evidence": "ts/test/v015-finite-materialized-reaction-a12.test.ts",
+    "acceptedAmbientCarrier": "INFINITE_REQUIRED",
+    "executionPremises": [
+      "FINITE_MATERIALIZED_ASET",
+      "FINITE_ACTIVE_CURRENT_SET",
+      "FINITE_SELECTED_ADMISSION_SET",
+      "FINITE_MATCHED_IMAGES",
+      "TERMINATING_LOCAL_MATCH"
+    ],
+    "derived": [
+      "FINITE_CURRENT_X_RULE_WORK",
+      "FINITE_STAGED_SUCCESSOR_BOUND"
+    ],
+    "classification": "EXECUTION_REFINEMENT_BOUNDARY_NOT_ONTOLOGY_CARDINALITY_AXIOM",
+    "atomicPublication": "PREMISE_NOT_DERIVED_FROM_FINITE_WORK",
+    "infiniteDenotationalReaction": "NOT_RULED_OUT"
   }
 }
