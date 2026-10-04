@@ -119,7 +119,7 @@
   },
   "competingCandidate": {
     "id": "STRUCTURAL_UNARY_TEMPLATE_REACTION",
-    "status": "GREEN_RESEARCH_ONE_COMMAND_CANDIDATE_AUTHOR_DECISION_PENDING",
+    "status": "OPEN_NECESSITY_COMPARISON",
     "matchPower": "STRUCTURAL_TEMPLATE_WITH_ROLES",
     "jointAntecedentArity": "ONE_CURRENT_MEMBER",
     "imageArity": "ZERO_ONE_MANY",
@@ -131,7 +131,9 @@
       "v015-variadic-grounding-m5",
       "v015-structural-aset-one-command-a9"
     ],
-    "question": "Can v0.15 self-host generic grounding with the grounded floor, or must structural-unary template matching itself be part of generalized MP?"
+    "question": "Can v0.15 self-host generic grounding with the grounded floor, or must structural-unary template matching itself be part of generalized MP?",
+    "researchEvidenceStatus": "GREEN_FOR_A9_TESTED_ONE_COMMAND_VECTOR",
+    "authorDecision": "PENDING"
   },
   "notEquivalentDimensions": [
     "argument arity",
