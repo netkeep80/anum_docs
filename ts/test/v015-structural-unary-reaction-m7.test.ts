@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import {
   ExactSequenceError,
   materializeExactSequence,
@@ -404,6 +406,36 @@ function run(
   same(reaction.transitionedMembers, 1, "still one current antecedent");
 }
 
+// Static architecture guards: candidate B must not regress into the legacy
+// trigger-index/caller-role architecture.
+{
+  const root = resolve(process.cwd(), "..");
+  const source = readFileSync(
+    join(root, "ts/test/v015-structural-unary-reaction-m7.test.ts"),
+    "utf8",
+  );
+
+  const discoverStart = source.indexOf("function discoverStructuralUnaryImages(");
+  const discoverEnd = source.indexOf("\ninterface StructuralUnaryReaction", discoverStart);
+  assert(discoverStart >= 0 && discoverEnd > discoverStart, "discovery source slice");
+  const discover = source.slice(discoverStart, discoverEnd);
+  assert(discover.includes("memory.outgoing(theory)"),
+    "selected Theory is direct rule authority");
+  for (const forbidden of ["triggerKey", "INDEX_", "memory.outgoing(antecedent)"]) {
+    assert(!discover.includes(forbidden),
+      "candidate discovery excludes legacy index path: " + forbidden);
+  }
+
+  const reactStart = source.indexOf("function reactStructuralUnaryScope(");
+  const reactEnd = source.indexOf("\nfunction anchors(", reactStart);
+  assert(reactStart >= 0 && reactEnd > reactStart, "reaction source slice");
+  const reaction = source.slice(reactStart, reactEnd);
+  assert(reaction.includes("memory.ensure(truthPoles.start, output)"),
+    "reaction law preserves contextual K");
+  assert(!reaction.includes("kRole"),
+    "reaction does not require caller K role in program Rule");
+}
+
 console.log([
   "MTS_V015_META_M7=STRUCTURAL_UNARY_REACTION_CANDIDATE_GREEN",
   "MATCHES=STRUCTURAL_TEMPLATE_WITH_ROLES",
@@ -414,6 +446,7 @@ console.log([
   "MULTIPLE_MATCHES=ALL_FIRE",
   "POINTWISE_SCOPE_LIFT=SUPPORTED",
   "TRIGGER_INDEX_REQUIRED=FALSE",
+  "K_ROLE_IN_PROGRAM_RULE_REQUIRED=FALSE",
   "DYNAMIC_THEORY_ADMISSION=VISIBLE_NEXT_REACTION",
   "CROSS_MEMBER_JOIN=ABSENT",
   "PROGRAM_SPECIFIC_DISPATCH=0",
