@@ -292,11 +292,8 @@ for (const row of ["FF", "FT", "TF", "TT"] as const) {
 }
 
 {
-  const raw = JSON.parse(dec.decode(jsonBytes)) as {
-    schema: string;
-    entries: Array<{ name: string; value: unknown }>;
-  };
-  raw.entries = raw.entries.filter((entry) => entry.name !== "INDEX_TT");
+  const raw = JSON.parse(dec.decode(jsonBytes)) as Record<string, unknown>;
+  delete raw.INDEX_TT;
   const mutatedBytes = enc.encode(JSON.stringify(raw) + "\n");
   const m = fixture();
   const mutated = compileJson(m, mutatedBytes).compiled;
@@ -344,7 +341,9 @@ console.log([
   "MTS_V015_C3=AUTHOR_REVIEW_PENDING",
   "CANONICAL_FORMAL=TRACKED",
   "CANONICAL_JSON=EXACT",
-  "JSON_FORMS=PAIR_SEQUENCE_ONLY",
+  "JSON_FORM=DIRECT_BINDERS",
+  "JSON_LINK_VALUE=FORMAL_STRING",
+  "JSON_ARRAY=R_ROOTED_SEQUENCE",
   "SOURCE_ASET_IDENTITY=EXACT",
   "SHARED_METACOMPILER=TRUE",
   "RECURSIVE_8961=DETERMINISTIC",
