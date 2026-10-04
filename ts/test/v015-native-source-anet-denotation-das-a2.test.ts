@@ -402,6 +402,413 @@ const currentPoles = memory.poles(current);
 same(currentPoles.start, E, "physical current Link start remains E");
 same(currentPoles.end, K, "physical current Link end remains K");
 
+
+type DirectJsonValue =
+  | null
+  | string
+  | readonly DirectJsonValue[]
+  | ReadonlyMap<string, DirectJsonValue>;
+
+class DirectJsonError extends Error {
+  override readonly name = "DirectJsonError";
+
+  constructor(
+    readonly code:
+      | "invalid-json"
+      | "duplicate-key"
+      | "invalid-shape"
+      | "invalid-null-position"
+      | "unknown-name"
+      | "cyclic-binding",
+  ) {
+    super(code);
+  }
+}
+
+function directJsonFail(code: DirectJsonError["code"]): never {
+  throw new DirectJsonError(code);
+}
+
+class StrictDirectJsonReader {
+  private index = 0;
+
+  constructor(private readonly text: string) {}
+
+  read(): DirectJsonValue {
+    this.space();
+    const value = this.value();
+    this.space();
+    if (this.index !== this.text.length) directJsonFail("invalid-json");
+    return value;
+  }
+
+  private space(): void {
+    while (
+      this.index < this.text.length &&
+      /[\x20\x09\x0a\x0d]/u.test(this.text[this.index]!)
+    ) {
+      this.index += 1;
+    }
+  }
+
+  private value(): DirectJsonValue {
+    this.space();
+    const ch = this.text[this.index];
+    if (ch === "{") return this.object();
+    if (ch === "[") return this.array();
+    if (ch === "\"") return this.string();
+    if (this.text.startsWith("null", this.index)) {
+      this.index += 4;
+      return null;
+    }
+    return directJsonFail("invalid-json");
+  }
+
+  private string(): string {
+    const start = this.index;
+    if (this.text[this.index] !== "\"") directJsonFail("invalid-json");
+    this.index += 1;
+
+    while (this.index < this.text.length) {
+      const ch = this.text[this.index];
+      if (ch === "\"") {
+        this.index += 1;
+        try {
+          const decoded = JSON.parse(
+            this.text.slice(start, this.index),
+          ) as unknown;
+          if (typeof decoded !== "string") directJsonFail("invalid-json");
+          return decoded;
+        } catch (error) {
+          if (error instanceof DirectJsonError) throw error;
+          return directJsonFail("invalid-json");
+        }
+      }
+      if (ch === "\\") {
+        this.index += 2;
+      } else {
+        this.index += 1;
+      }
+    }
+
+    return directJsonFail("invalid-json");
+  }
+
+  private object(): ReadonlyMap<string, DirectJsonValue> {
+    this.index += 1;
+    this.space();
+    const result = new Map<string, DirectJsonValue>();
+
+    if (this.text[this.index] === "}") {
+      this.index += 1;
+      return result;
+    }
+
+    while (true) {
+      this.space();
+      if (this.text[this.index] !== "\"") directJsonFail("invalid-json");
+      const key = this.string();
+      if (result.has(key)) directJsonFail("duplicate-key");
+
+      this.space();
+      if (this.text[this.index] !== ":") directJsonFail("invalid-json");
+      this.index += 1;
+      result.set(key, this.value());
+
+      this.space();
+      const next = this.text[this.index];
+      if (next === "}") {
+        this.index += 1;
+        return result;
+      }
+      if (next !== ",") directJsonFail("invalid-json");
+      this.index += 1;
+    }
+  }
+
+  private array(): readonly DirectJsonValue[] {
+    this.index += 1;
+    this.space();
+    const result: DirectJsonValue[] = [];
+
+    if (this.text[this.index] === "]") {
+      this.index += 1;
+      return Object.freeze(result);
+    }
+
+    while (true) {
+      const value = this.value();
+      if (value === null) directJsonFail("invalid-null-position");
+      result.push(value);
+
+      this.space();
+      const next = this.text[this.index];
+      if (next === "]") {
+        this.index += 1;
+        return Object.freeze(result);
+      }
+      if (next !== ",") directJsonFail("invalid-json");
+      this.index += 1;
+    }
+  }
+}
+
+const Body = memory.poles(Rule).end;
+
+const directAtoms = new Map<string, LinkHandle>([
+  ["Theory", Theory],
+  ["V", V],
+  ["X", X],
+  ["Y", Y],
+  ["Body", Body],
+  ["E", E],
+  ["K", K],
+]);
+
+const directNameCarriers = new Map<string, LinkHandle>([
+  ["Rule", RULE_NAME],
+  ["Current", CURRENT_ALIAS],
+  ["Empty", EMPTY_SEQUENCE_NAME],
+]);
+
+function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
+  const parsed = new StrictDirectJsonReader(text).read();
+  if (!(parsed instanceof Map)) directJsonFail("invalid-shape");
+
+  const rawBindings = new Map<string, DirectJsonValue>();
+  for (const [key, value] of parsed) {
+    if (typeof value === "string" || Array.isArray(value)) {
+      rawBindings.set(key, value);
+    }
+  }
+
+  const resolvedBindings = new Map<string, LinkHandle>();
+  const resolving = new Set<string>();
+
+  const resolveName = (name: string): LinkHandle => {
+    const bound = resolvedBindings.get(name);
+    if (bound !== undefined) return bound;
+
+    const atom = directAtoms.get(name);
+    if (atom !== undefined) return atom;
+
+    const raw = rawBindings.get(name);
+    if (raw === undefined) directJsonFail("unknown-name");
+    if (resolving.has(name)) directJsonFail("cyclic-binding");
+
+    resolving.add(name);
+    const resolved = resolveRhs(raw);
+    resolving.delete(name);
+    resolvedBindings.set(name, resolved);
+    return resolved;
+  };
+
+  const resolveExpr = (source: string): LinkHandle => {
+    const parts = source.split("->").map((part) => part.trim());
+    if (parts.length === 0 || parts.some((part) => part.length === 0)) {
+      directJsonFail("invalid-shape");
+    }
+
+    let currentValue = resolveName(parts[0]!);
+    for (let index = 1; index < parts.length; index += 1) {
+      currentValue = memory.ensure(
+        currentValue,
+        resolveName(parts[index]!),
+      );
+    }
+    return currentValue;
+  };
+
+  function resolveRhs(value: DirectJsonValue): LinkHandle {
+    if (typeof value === "string") return resolveExpr(value);
+
+    if (Array.isArray(value)) {
+      if (value.length === 0) return basis.R;
+      directJsonFail("invalid-shape");
+    }
+
+    return directJsonFail("invalid-shape");
+  }
+
+  for (const key of rawBindings.keys()) resolveName(key);
+
+  const builder = new SyntaxAsetBuilder(
+    memory,
+    readNativeSyntaxGrammar(memory, basis, grammarRoot).vocabulary,
+  );
+
+  const compileObject = (
+    object: ReadonlyMap<string, DirectJsonValue>,
+  ): LinkHandle => {
+    const entries: LinkHandle[] = [];
+
+    for (const [key, value] of object) {
+      if (value instanceof Map) {
+        const body = compileObject(value);
+        entries.push(addBundle(builder, resolveExpr(key), body));
+        continue;
+      }
+
+      if (value === null) {
+        entries.push(addBare(builder, resolveExpr(key)));
+        continue;
+      }
+
+      if (typeof value === "string" || Array.isArray(value)) {
+        const nameCarrier = directNameCarriers.get(key);
+        if (nameCarrier === undefined) directJsonFail("unknown-name");
+        entries.push(
+          addBinding(builder, nameCarrier, resolveRhs(value)),
+        );
+        continue;
+      }
+
+      directJsonFail("invalid-shape");
+    }
+
+    return addBlock(builder, entries);
+  };
+
+  return builder.finish(compileObject(parsed));
+}
+
+const directJson = [
+  "{",
+  "  \"Rule\": \"V->Body\",",
+  "  \"Current\": \"E->K\",",
+  "  \"Empty\": [],",
+  "  \"V\": {",
+  "    \"X\": null,",
+  "    \"Y\": null",
+  "  },",
+  "  \"Theory->Rule\": null,",
+  "  \"E->K\": null",
+  "}",
+].join("\n");
+
+const directSource = compileDirectJsonToNativeSourceAnet(directJson);
+const direct = denoteNativeResolvedSourceAnet(
+  memory,
+  grammarRoot,
+  profile,
+  directSource,
+);
+
+setSame(
+  direct.members,
+  [VX, VY, admission, current],
+  "direct JSON -> native source ANet -> semantic ANet",
+);
+
+assert(
+  !direct.members.has(Rule),
+  "direct JSON Rule binding is metamodel-only",
+);
+assert(
+  !direct.members.has(basis.R),
+  "direct JSON Empty:[] binds R without implicit membership",
+);
+
+assert(
+  direct.bindings.some((binding) =>
+    binding.coordinate === null &&
+    binding.name === RULE_NAME &&
+    binding.value === Rule
+  ),
+  "direct JSON preserves Rule binding",
+);
+
+assert(
+  direct.bindings.some((binding) =>
+    binding.coordinate === null &&
+    binding.name === CURRENT_ALIAS &&
+    binding.value === current
+  ),
+  "direct JSON preserves Current binding",
+);
+
+const reverseDirectJson = [
+  "{",
+  "  \"E->K\": null,",
+  "  \"Theory->Rule\": null,",
+  "  \"V\": {",
+  "    \"Y\": null,",
+  "    \"X\": null",
+  "  },",
+  "  \"Empty\": [],",
+  "  \"Current\": \"E->K\",",
+  "  \"Rule\": \"V->Body\"",
+  "}",
+].join("\n");
+
+const reverseDirectSource =
+  compileDirectJsonToNativeSourceAnet(reverseDirectJson);
+const reverseDirect = denoteNativeResolvedSourceAnet(
+  memory,
+  grammarRoot,
+  profile,
+  reverseDirectSource,
+);
+setSame(
+  reverseDirect.members,
+  [...direct.members],
+  "direct JSON object order is nonsemantic",
+);
+
+const noCurrentDirectJson = [
+  "{",
+  "  \"Rule\": \"V->Body\",",
+  "  \"Current\": \"E->K\",",
+  "  \"V\": {",
+  "    \"X\": null,",
+  "    \"Y\": null",
+  "  },",
+  "  \"Theory->Rule\": null",
+  "}",
+].join("\n");
+
+const noCurrentDirect = denoteNativeResolvedSourceAnet(
+  memory,
+  grammarRoot,
+  profile,
+  compileDirectJsonToNativeSourceAnet(noCurrentDirectJson),
+);
+assert(
+  !noCurrentDirect.members.has(current),
+  "direct JSON binding/physical E->K without bare member is not current",
+);
+
+for (const bad of [
+  "{\"A\":null,\"A\":null}",
+  "{\"A\":null,\"\\u0041\":null}",
+]) {
+  let rejected = false;
+  try {
+    compileDirectJsonToNativeSourceAnet(bad);
+  } catch (error) {
+    rejected = error instanceof DirectJsonError &&
+      error.code === "duplicate-key";
+  }
+  assert(rejected, "duplicate decoded JSON key fails closed");
+}
+
+for (const bad of [
+  "null",
+  "[null]",
+]) {
+  let rejected = false;
+  try {
+    compileDirectJsonToNativeSourceAnet(bad);
+  } catch (error) {
+    rejected = error instanceof DirectJsonError &&
+      (
+        error.code === "invalid-shape" ||
+        error.code === "invalid-null-position"
+      );
+  }
+  assert(rejected, "null outside object-member RHS fails closed");
+}
+
 console.log([
   "MTS_V015_DAS_A2=GREEN_RESEARCH",
   "SOURCE_CARRIER=NATIVE_SYNTAX_ANET",
@@ -418,5 +825,17 @@ console.log([
   "CURRENTNESS_REQUIRES_MEMBERSHIP=TRUE",
   "METAMODEL_BINDINGS_CAN_ERASE_BEFORE_EXECUTION=TRUE",
   "CUSTOM_DAS_A1_SOURCE_CARRIER_REQUIRED=FALSE",
-  "FINAL_JSON_SURFACE=AUTHOR_REVIEW_PENDING",
+  "DIRECT_JSON_TO_NATIVE_SOURCE_ANET=GREEN_RESEARCH",
+  "JSON_BYPASS_TO_SEMANTIC_ANET=FALSE",
+  "OBJECT_MEMBER_NULL=BARE_SOURCE_ENTRY",
+  "STRING_RHS=METAMODEL_BINDING",
+  "EMPTY_ARRAY_RHS=R_BINDING",
+  "NESTED_OBJECT=ANCHORED_SOURCE_ANET",
+  "STRUCTURED_BARE_KEY=RESOLVED_DIRECT_MEMBERSHIP",
+  "DUPLICATE_JSON_KEY=FAIL_CLOSED",
+  "ESCAPED_DUPLICATE_JSON_KEY=FAIL_CLOSED",
+  "TOP_LEVEL_NULL=FAIL_CLOSED",
+  "ARRAY_NULL=FAIL_CLOSED",
+  "CONCRETE_LOGIC_ARTIFACT_APPROVAL=STILL_REQUIRED",
+  "FINAL_JSON_SURFACE=AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
 ].join(" "));
