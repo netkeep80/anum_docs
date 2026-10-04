@@ -299,7 +299,7 @@
       "ownerIssue": "#1188",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "FORMAL text and JSON converge to the same validation/elaboration path before semantics.",
+      "summary": "FORMAL text and direct JSON converge to the same native source ANet roles, resolver and DAS denotation path before semantics.",
       "dependsOn": [
         "V15-JSON-01"
       ],
@@ -307,9 +307,22 @@
         "issue": 1188
       },
       "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
+        "positiveVectors": [
+          "direct-json-null-to-bare-source-entry",
+          "direct-json-string-rhs-to-binding",
+          "direct-json-empty-array-to-R-binding",
+          "direct-json-nested-object-to-anchored-source-anet",
+          "direct-json-structured-bare-key-to-resolved-membership"
+        ],
+        "negativeVectors": [
+          "duplicate-decoded-json-key-rejects",
+          "top-level-null-rejects",
+          "array-null-rejects",
+          "json-must-not-bypass-native-source-anet"
+        ],
+        "requiredExecutableGates": [
+          "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+        ]
       }
     },
     {
@@ -649,9 +662,15 @@
         "issue": 1901
       },
       "evidence": {
-        "positiveVectors": [],
+        "positiveVectors": [
+          "resolved-metamodel-can-erase-before-execution",
+          "physical-link-existence-not-semantic-membership"
+        ],
         "negativeVectors": [],
-        "requiredExecutableGates": []
+        "requiredExecutableGates": [
+          "ts/test/v015-denoted-anet-membership-das-a1.test.ts",
+          "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+        ]
       }
     },
     {
