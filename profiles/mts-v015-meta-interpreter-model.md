@@ -1062,6 +1062,102 @@ Denotation/lowering owner: **#2002**.
 
 Конкретная JSON surface-форма (`V`, `R`, `Theory->R` как показано выше) **не одобрена автоматически** этим решением и остаётся под отдельным Author gate после #2002.
 
+## 16b. DAS-A1 — resolved metamodel → denoted semantic ANet
+
+Owner: **#2002**. Executable witness:
+`ts/test/v015-denoted-anet-membership-das-a1.test.ts`.
+
+Status: **GREEN research / Author review required before final FORMAL/JSON freeze**.
+
+The missing stage is now explicit:
+
+```text
+FORMAL / JSON source
+        ↓
+native source ANet
+        ↓
+name/expression resolution
+        ↓
+resolved metamodel
+        ↓ DAS-A1
+semantic ANet M_t
+        ↓
+Γ
+```
+
+The tested candidate deliberately keeps ANet distinct from Link ontology:
+
+```text
+M_t = extensional semantic ANet of Links
+```
+
+A test-side `Set<LinkHandle>` is only the carrier of the complete ANet state, exactly as in A9. The candidate does **not** introduce a generic Link anchor `M_t->x`.
+
+Tested laws:
+
+```text
+root Name : X
+    -> metamodel binding only
+    -> does not by itself imply X ∈ M_t
+
+root bare X
+    -> X ∈ M_t
+
+inside anchored V:
+    bare X
+        -> V->X ∈ M_t
+
+    A : X
+        -> contextual coordinate V->A ∈ M_t
+        -> RHS X remains binding/metamodel information
+
+    B : { ... }
+        -> V->B ∈ M_t
+        -> nested anchor = V->B
+```
+
+Therefore:
+
+```text
+physical Link existence
+    !=
+semantic ANet membership
+```
+
+and source/metamodel information may legitimately erase before execution.
+
+The executable witness already demonstrates this with the meta-rule/currentness case:
+
+```text
+RULE_NAME : Rule
+CURRENT_ALIAS : E->K
+```
+
+may remain construction/name-resolution information, while the executable ANet contains the exact semantic Links:
+
+```text
+Theory->Rule ∈ M_t
+E->K          ∈ M_t
+```
+
+Thus FORMAL really can carry more metamodel information than the final executable ANet requires.
+
+Additional GREEN differentials:
+
+- duplicate source occurrences with one Link denotation converge extensionally;
+- source entry order is nonsemantic;
+- an explicit empty root bundle contributes zero members;
+- `[] = R` as a binding RHS does not automatically publish `R`;
+- removing explicit current membership makes `E->K` non-current even while the same Link remains physically present and named.
+
+Still open before concrete JSON approval:
+
+1. lower the canonical native source ANet into these resolved roles;
+2. prove exact `null`/bare and nested-object lowering;
+3. replay the Author-approved native role-bundle Rule through the complete path;
+4. pressure with theorem/proof FORMAL;
+5. show exact JSON and request the mandatory Author approval.
+
 ## 17. Author gates
 
 Без явного подтверждения автора нельзя объявлять принятыми:
