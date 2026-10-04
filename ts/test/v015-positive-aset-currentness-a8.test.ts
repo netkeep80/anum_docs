@@ -309,10 +309,10 @@ function react(
     transitioned += 1;
     matchedRelations += item.matches;
 
-    // The temporary current scaffold leaves semantic Aset membership.
+    // Only the positive currentness witness leaves semantic membership.
+    // Context/truth Links may simultaneously carry unrelated semantic roles
+    // (One-Link ontology), so deactivation must not delete those memberships.
     next.delete(item.active.edge);
-    next.delete(item.active.context);
-    next.delete(item.active.truth);
 
     if (item.outputs.length === 0) {
       const closure = memory.ensureEndSelfClosed(item.active.context);
@@ -429,14 +429,20 @@ function run(reverseEntryCreation: boolean): {
   const BOne = memory.ensure(at(20), at(21));
   const BMany1 = memory.ensure(at(22), at(23));
   const BMany2 = memory.ensure(at(24), at(25));
+  const BOverlap = memory.ensure(at(26), at(27));
 
   const relZero = relation(memory, AZero, []);
   const relOne = relation(memory, AOne, [BOne]);
   const relMany = relation(memory, AMany, [BMany1, BMany2]);
+  // This relation consumes relOne itself. Its active current truth below is
+  // exactly the already-admitted Link Theory->relOne, exercising One-Link
+  // role overlap: current truth and Theory admission are the same Link.
+  const relOverlap = relation(memory, relOne, [BOverlap]);
   const admissions = [
     admission(memory, theory, relZero),
     admission(memory, theory, relOne),
     admission(memory, theory, relMany),
+    admission(memory, theory, relOverlap),
   ] as const;
 
   const callers = [
@@ -445,10 +451,16 @@ function run(reverseEntryCreation: boolean): {
     memory.ensure(at(34), at(35)),
     memory.ensure(at(36), at(37)),
   ] as const;
-  const antecedents = [ANo, AZero, AOne, AMany] as const;
-  const truths = callers.map((caller, i) =>
-    memory.ensure(caller, antecedents[i]!),
-  );
+  const truths = [
+    memory.ensure(callers[0], ANo),
+    memory.ensure(callers[1], AZero),
+    memory.ensure(callers[2], AOne),
+    memory.ensure(callers[3], AMany),
+    // One Link, two simultaneous roles:
+    // - Theory admission for relOne;
+    // - active contextual truth whose K happens to be Theory.
+    admissions[1],
+  ] as const;
 
   const createdSlots: Array<{
     readonly truth: LinkHandle;
@@ -456,8 +468,8 @@ function run(reverseEntryCreation: boolean): {
     readonly activeEdge: LinkHandle;
   } | undefined> = new Array(truths.length);
   const creationOrder = reverseEntryCreation
-    ? [3, 2, 1, 0] as const
-    : [0, 1, 2, 3] as const;
+    ? [4, 3, 2, 1, 0] as const
+    : [0, 1, 2, 3, 4] as const;
   for (const index of creationOrder) {
     const truth = truths[index]!;
     const context = defineContext(memory, environment, truth);
@@ -481,8 +493,8 @@ function run(reverseEntryCreation: boolean): {
   }
   const initial = aset(members);
 
-  same(activeMemberships(memory, initial).length, 4,
-    "four positive active memberships");
+  same(activeMemberships(memory, initial).length, 5,
+    "five positive active memberships");
   setSame(currentTruths(memory, initial), truths, "initial current truths");
 
   // Physical stale topology must not override positive Aset membership.
@@ -500,17 +512,18 @@ function run(reverseEntryCreation: boolean): {
   );
 
   const first = react(memory, initial);
-  same(first.matchedRelations, 3, "ZERO/ONE/MANY relations all match");
-  same(first.transitioned, 3, "three of four active Contexts transition");
+  same(first.matchedRelations, 4, "ZERO/ONE/MANY/role-overlap relations all match");
+  same(first.transitioned, 4, "four of five active Contexts transition");
   same(first.noMatch, 1, "one NO_MATCH Context");
   same(first.zero, 1, "one ZERO Context");
-  same(first.positive, 2, "ONE and MANY are positive");
+  same(first.positive, 3, "ONE/MANY/role-overlap are positive");
 
   const expected = [
     truths[0],
     memory.find(callers[2], BOne)!,
     memory.find(callers[3], BMany1)!,
     memory.find(callers[3], BMany2)!,
+    memory.find(theory, BOverlap)!,
   ];
   for (const truth of expected) assert(truth !== undefined, "expected truth exists");
   setSame(currentTruths(memory, first.after), expected,
@@ -520,7 +533,7 @@ function run(reverseEntryCreation: boolean): {
   // transitioned edges are no longer semantic members.
   same(
     created.filter((x) => memory.find(environment, x.context) !== undefined).length,
-    4,
+    5,
     "all original active-edge Links remain physically allocated",
   );
   same(
@@ -536,6 +549,16 @@ function run(reverseEntryCreation: boolean): {
     "ONE replaces old current membership");
   assert(!first.after.members.has(created[3]!.activeEdge),
     "MANY replaces old current membership");
+  assert(!first.after.members.has(created[4]!.activeEdge),
+    "role-overlap currentness witness is removed");
+  assert(first.after.members.has(admissions[1]),
+    "deactivation preserves the same Link in its independent Theory-admission role");
+  assert(
+    theorySnapshot(memory, first.after, theory).some(
+      (item) => item.antecedent === AOne && item.outputs.includes(BOne),
+    ),
+    "role-overlap Theory admission remains authoritative after currentness moves",
+  );
 
   // Freeze/transfer/restore includes the whole Aset membership, not a pointer.
   const frozen = transfer(freeze(memory, first.after));
@@ -623,7 +646,11 @@ function staticGuards(): void {
   const reactionEnd = own.indexOf("\nfunction currentTruths(", reactionStart);
   const reaction = own.slice(reactionStart, reactionEnd);
   assert(reaction.includes("next.delete(item.active.edge)"),
-    "reaction removes transitioned current membership");
+    "reaction removes transitioned currentness witness");
+  assert(!reaction.includes("next.delete(item.active.context)"),
+    "reaction does not delete Context membership merely to deactivate it");
+  assert(!reaction.includes("next.delete(item.active.truth)"),
+    "reaction does not delete overlapping truth/authority membership");
   assert(reaction.includes("next.add(activeEdge)"),
     "reaction adds successor current membership");
   assert(reaction.includes("const planned = plan(memory, before)"),
@@ -644,8 +671,8 @@ function main(): void {
   const forward = run(false);
   const reverse = run(true);
 
-  same(forward.stats, "3,3,1,1,2", "forward reaction statistics");
-  same(reverse.stats, "3,3,1,1,2", "reverse reaction statistics");
+  same(forward.stats, "4,4,1,1,3", "forward reaction statistics");
+  same(reverse.stats, "4,4,1,1,3", "reverse reaction statistics");
   same(forward.finalTopology, reverse.finalTopology,
     "entry construction order does not change final canonical carrier");
   same(forward.finalMemberCoordinates, reverse.finalMemberCoordinates,
@@ -663,6 +690,7 @@ function main(): void {
     "EXTERNAL_SCOPE_POINTER=0",
     "APPEND_ONLY_PHYSICAL_LINK_PRESENCE_IS_CURRENTNESS_AUTHORITY=FALSE",
     "REACTION_ATOMICALLY_REPLACES_SEMANTIC_MEMBERSHIP=TRUE",
+    "CURRENTNESS_WITNESS_REMOVAL_PRESERVES_OVERLAPPING_LINK_ROLES=TRUE",
     "NO_MATCH=PRESERVE_ACTIVE_MEMBERSHIP",
     "ZERO=REMOVE_ACTIVE_MEMBERSHIP_PLUS_END_CLOSURE",
     "ONE_MANY=REPLACE_WITH_SUCCESSOR_ACTIVE_MEMBERSHIPS",
