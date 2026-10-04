@@ -188,11 +188,28 @@
       "dependsOn": [
         "V15-JSON-01"
       ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
-      "authorJsonReview": "NOT_APPLICABLE"
+      "positiveVectors": [
+        "direct-json-null-to-bare-source-entry",
+        "direct-json-string-rhs-to-binding",
+        "direct-json-empty-array-to-R-binding",
+        "direct-json-nested-object-to-anchored-source-anet",
+        "direct-json-structured-bare-key-to-resolved-membership"
+      ],
+      "negativeVectors": [
+        "duplicate-decoded-json-key-rejects",
+        "top-level-null-rejects",
+        "array-null-rejects",
+        "json-must-not-bypass-native-source-anet"
+      ],
+      "requiredExecutableGates": [
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+      ],
+      "evidenceRefs": [
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "#1188",
+        "#2002"
+      ],
+      "authorJsonReview": "GENERIC_MAPPING_APPROVED_ARTIFACTS_PENDING"
     },
     "V15-JSON-03": {
       "state": "OPEN",
@@ -430,10 +447,21 @@
         "V15-AUTH-01",
         "V15-TERM-01"
       ],
-      "positiveVectors": [],
+      "positiveVectors": [
+        "resolved-metamodel-can-erase-before-execution",
+        "physical-link-existence-not-semantic-membership"
+      ],
       "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "requiredExecutableGates": [
+        "ts/test/v015-denoted-anet-membership-das-a1.test.ts",
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+      ],
+      "evidenceRefs": [
+        "ts/test/v015-denoted-anet-membership-das-a1.test.ts",
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "#1901",
+        "#2002"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-STAGE-02": {
