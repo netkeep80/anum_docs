@@ -756,6 +756,8 @@ setEqual(
     "ts/src/v015-proof-source.ts#materializeV015ProofDenotation",
     "ts/src/v015-proof-source.ts#morphism",
     "ts/src/v015-proof-source.ts#primitive",
+    "ts/src/v015-structural-mp.ts#defineV015StructuralMpRule",
+    "ts/src/v015-structural-mp.ts#reactV015StructuralMpScope",
   ],
   "explicit post-v0.13 direct write owner delta is exact",
 );
