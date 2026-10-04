@@ -112,22 +112,8 @@ interface BindingProjection {
 }
 
 interface DenotationEvidence {
-  readonly target: LinkHandle;
-  readonly members: readonly LinkHandle[];
+  readonly members: ReadonlySet<LinkHandle>;
   readonly bindings: readonly BindingProjection[];
-}
-
-function targetMembers(
-  memory: Memory,
-  target: LinkHandle,
-): readonly LinkHandle[] {
-  const result: LinkHandle[] = [];
-  for (const membership of memory.outgoing(target)) {
-    if (membership === target) continue;
-    const poles = memory.poles(membership);
-    if (poles.start === target) result.push(poles.end);
-  }
-  return Object.freeze(result);
 }
 
 /**
@@ -143,22 +129,24 @@ function targetMembers(
  *   A : X        -> contextual name/member V->A + metamodel binding to X
  *   B : { ... }  -> contextual member V->B; nested anchor becomes V->B
  *
- * Final membership is Link-native:
+ * Final membership is extensional ANet state:
  *
- *   x in M  iff  M->x exists.
+ *   x in M
  *
- * Returned JS arrays are read/evidence projections only.
+ * The test-side Set is only a carrier/projection of the complete semantic ANet
+ * state, exactly as in A9. It is not a second ontology object, not a Link
+ * anchor, and not an external current/Scope pointer.
  */
 function denoteResolvedSourceAnet(
   memory: Memory,
   profile: ResolvedSourceProfile,
   source: LinkHandle,
-  target: LinkHandle,
 ): DenotationEvidence {
   const bindings: BindingProjection[] = [];
+  const members = new Set<LinkHandle>();
 
   const publish = (member: LinkHandle): void => {
-    memory.ensure(target, member);
+    members.add(member);
   };
 
   const walk = (
@@ -211,8 +199,7 @@ function denoteResolvedSourceAnet(
   walk(source, null);
 
   return Object.freeze({
-    target,
-    members: targetMembers(memory, target),
+    members,
     bindings: Object.freeze(bindings),
   });
 }
@@ -290,14 +277,7 @@ source.addBare(current);
 // Distinct source occurrences, same denotation.
 source.addBare(admission);
 
-const M = fresh();
-
-assert(
-  !targetMembers(memory, M).includes(admission),
-  "physical admission exists before membership publication",
-);
-
-const result = denoteResolvedSourceAnet(memory, profile, source.source, M);
+const result = denoteResolvedSourceAnet(memory, profile, source.source);
 
 const VX = memory.ensure(V, X);
 const VY = memory.ensure(V, Y);
@@ -306,41 +286,33 @@ const VB = memory.ensure(V, B);
 const VBC = memory.ensure(VB, C);
 
 setSame(
-  result.members,
+  [...result.members],
   [VX, VY, VA, VB, VBC, admission, current],
   "exact denoted semantic ANet members",
 );
 
 assert(
-  !result.members.includes(Rule),
+  !result.members.has(Rule),
   "named Rule binding is not implicit membership",
 );
 assert(
-  !result.members.includes(R),
+  !result.members.has(R),
   "empty-sequence binding []=R is not implicit membership",
 );
 assert(
-  !result.members.includes(EMPTY_BUNDLE_NAME),
+  !result.members.has(EMPTY_BUNDLE_NAME),
   "root empty bundle contributes zero members",
 );
 assert(
-  !result.members.includes(physicalNoise),
+  !result.members.has(physicalNoise),
   "unrelated physical Link is not semantic membership",
 );
 
 same(
-  result.members.filter((member) => member === admission).length,
-  1,
-  "duplicate denotation converges extensionally",
+  result.members.size,
+  7,
+  "duplicate source denotation converges to one extensional ANet member",
 );
-
-for (const member of result.members) {
-  const witness = memory.ensure(M, member);
-  assert(
-    memory.outgoing(M).includes(witness),
-    "membership authority is ordinary M->member Link",
-  );
-}
 
 assert(
   result.bindings.some((binding) =>
@@ -378,16 +350,14 @@ reverse.addBinding(EMPTY_SEQUENCE_NAME, R);
 reverse.addBinding(CURRENT_ALIAS, current);
 reverse.addBinding(RULE_NAME, Rule);
 
-const M2 = fresh();
 const reversed = denoteResolvedSourceAnet(
   memory,
   profile,
   reverse.source,
-  M2,
 );
 setSame(
-  reversed.members,
-  result.members,
+  [...reversed.members],
+  [...result.members],
   "source entry order is nonsemantic",
 );
 
@@ -399,15 +369,13 @@ noCurrent.addBinding(CURRENT_ALIAS, current);
 noCurrent.addBundle(V, reverseVChildren.source);
 noCurrent.addBare(admission);
 
-const M3 = fresh();
 const withoutCurrent = denoteResolvedSourceAnet(
   memory,
   profile,
   noCurrent.source,
-  M3,
 );
 assert(
-  !withoutCurrent.members.includes(current),
+  !withoutCurrent.members.has(current),
   "physical/current alias without membership is not current",
 );
 const currentPoles = memory.poles(current);
@@ -425,8 +393,9 @@ console.log([
   "EMPTY_ROOT_BUNDLE_MEMBER_COUNT=0",
   "EMPTY_SEQUENCE_DENOTATION=R",
   "PHYSICAL_EXISTENCE_IMPLIES_MEMBERSHIP=FALSE",
-  "SEMANTIC_MEMBERSHIP_WITNESS=M_TO_MEMBER",
-  "DUPLICATE_DENOTATION=CANONICAL_CONVERGENCE",
+  "SEMANTIC_ANET_MEMBERSHIP=EXTENSIONAL_STATE",
+  "ANET_REIFIED_AS_LINK_ANCHOR=FALSE",
+  "DUPLICATE_DENOTATION=EXTENSIONAL_CONVERGENCE",
   "SOURCE_ENTRY_ORDER_SEMANTIC=FALSE",
   "CURRENTNESS_REQUIRES_MEMBERSHIP=TRUE",
   "FINAL_JSON_SURFACE=AUTHOR_REVIEW_PENDING",
