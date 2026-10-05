@@ -130,6 +130,22 @@
         "FRM_07_approved_artifact_refinement",
         "FRM_07_exact_sequence_injective_from_left_inverse"
       ]
+    },
+    {
+      "id": "FRM-08",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL_WITH_PRODUCTION_WITNESS_PENDING",
+      "premises": [],
+      "exclusions": [
+        "does not enable arbitrary recursive/cyclic FORMAL bindings",
+        "production parser/lowering refinement is executable evidence and must remain separately tracked",
+        "structural aspects are Link forms, not proof-specific opcodes"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_08_structural_aspect_denotation"
+      ],
+      "rocq": [
+        "FRM_08_structural_aspect_denotation"
+      ]
     }
   ]
 }
