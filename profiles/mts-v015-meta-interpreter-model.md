@@ -1034,7 +1034,7 @@ grounded exact step
 - `proofs/lean4/MtsV015GeneralizedReaction.lean`;
 - `proofs/coq/MtsV015GeneralizedReaction.v`;
 - `proofs/v015-external-proof-assurance.json`;
-- `proofs/evidence/v015-gpr07-zero-role-refinement.json`;
+- `proofs/v015-evidence/gpr07-zero-role-refinement.json`;
 - CI `37335710302` SUCCESS.
 
 Классификация: **GPR-07 = PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS**.
