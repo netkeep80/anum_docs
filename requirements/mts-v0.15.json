@@ -222,7 +222,8 @@
       "mandatory": true,
       "summary": "FORMAL artifact reconstructs executable/proof package in fresh Memory using only fixed generic authorities.",
       "dependsOn": [
-        "V15-CLOSE-03"
+        "V15-CLOSE-03",
+        "V15-NAME-01"
       ],
       "authority": {
         "issue": 1976
@@ -242,7 +243,8 @@
       "summary": "Canonical JSON alone reconstructs the same package in fresh Memory without source-specific repair.",
       "dependsOn": [
         "V15-FRESH-01",
-        "V15-JSON-01"
+        "V15-JSON-01",
+        "V15-NAME-01"
       ],
       "authority": {
         "issue": 1976
@@ -273,6 +275,32 @@
       }
     },
     {
+      "id": "V15-NAME-01",
+      "group": "NAME",
+      "ownerIssue": "#1901",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "Every FORMAL name is contextual. Absolute name :A is shorthand for R:A; no host-global atom namespace is semantic authority. Structured expressions resolve their endpoint names through the same contextual-name resolver before Link construction.",
+      "dependsOn": [
+        "V15-TERM-01",
+        "V15-AUTH-01"
+      ],
+      "authority": {
+        "issue": 1901
+      },
+      "evidence": {
+        "positiveVectors": [
+          "absolute-name-colon-A-equals-R-colon-A",
+          "absolute-link-colon-Theory-to-colon-GroundRule-resolves-through-root-context"
+        ],
+        "negativeVectors": [
+          "unqualified-host-global-atom-must-not-be-semantic-authority",
+          "same-spelling-name-in-different-contexts-must-not-alias-without-resolution"
+        ],
+        "requiredExecutableGates": []
+      }
+    },
+    {
       "id": "V15-JSON-01",
       "group": "JSON",
       "ownerIssue": "#1188",
@@ -282,7 +310,8 @@
       "dependsOn": [
         "V15-AUTH-01",
         "V15-CLOSE-01",
-        "V15-TERM-01"
+        "V15-TERM-01",
+        "V15-NAME-01"
       ],
       "authority": {
         "issue": 1188
@@ -301,7 +330,8 @@
       "mandatory": true,
       "summary": "FORMAL text and direct JSON converge to the same native source ANet roles, resolver and DAS denotation path before semantics.",
       "dependsOn": [
-        "V15-JSON-01"
+        "V15-JSON-01",
+        "V15-NAME-01"
       ],
       "authority": {
         "issue": 1188
