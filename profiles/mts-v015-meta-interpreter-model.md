@@ -1292,7 +1292,17 @@ The native source test reproduces the same semantic members and falsifiers as DA
 
 Therefore the custom post-resolution carrier in DAS-A1 is research scaffolding only. The candidate architecture now reuses the existing Link-native source ANet machinery.
 
-Current status before canonicalizing a concrete meta-rule JSON:
+The previously test-local implementation has now been extracted into production modules without changing the tested law:
+
+- `ts/src/v015-source-anet.ts` — selected `block/bare/binding/bundle` native-source profile and common source-ANet → semantic-ANet denotation;
+- `ts/src/v015-direct-json-source.ts` — strict compact JSON → the same native source ANet;
+- `ts/test/v015-native-source-anet-denotation-das-a2.test.ts` now consumes those production modules instead of carrying its own parser/denotator copies.
+
+Exact extraction checkpoint: `4129fc1e30d69d7b9cbf1bb7d9188cc3b09e1b88`; CI `37316173741` SUCCESS; Contract Observatory Pages `37316172884` SUCCESS; repo-guard was SKIPPED.
+
+This closes the test-scaffolding gap for direct JSON. It does **not** yet close FORMAL `{}`/bare/bundle parsing or the full #1978 replay chain.
+
+Current status after production extraction:
 
 - strict JSON `null`/string/array/nested-object -> native source ANet lowering: **GREEN**;
 - ExactSequence array carrier including non-empty/nested arrays: **GREEN**;
