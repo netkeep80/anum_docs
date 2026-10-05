@@ -1,0 +1,63 @@
+{
+  "schema": "mts-v015-formal-proof-evidence/v0.1",
+  "id": "FORMAL-BOOTSTRAP-FRM-01-06",
+  "ownerIssue": 2004,
+  "status": "PAIRED_BOOTSTRAP_GREEN_PRODUCTION_REFINEMENT_OPEN",
+  "exactHead": "9a0e8347537e8da2929b79a588188f01edba4acc",
+  "externalCrossCheck": {
+    "workflow": "CI",
+    "ciRun": 37361190964,
+    "lean4": "SUCCESS",
+    "rocq": "SUCCESS",
+    "allowedGlobalAxioms": {
+      "lean4": [],
+      "rocq": []
+    }
+  },
+  "regressions": {
+    "frozenAmemoryWorkflowRun": 37361191066,
+    "frozenAmemory": "SUCCESS",
+    "contractObservatoryPagesRun": 37361191137,
+    "contractObservatoryPages": "SUCCESS"
+  },
+  "sources": {
+    "lean4": "proofs/lean4/MtsV015Formal.lean",
+    "rocq": "proofs/coq/MtsV015Formal.v",
+    "assurance": "proofs/v015-formal-proof-assurance.json",
+    "guardTest": "ts/test/v015-formal-proof-assurance-f0.test.ts"
+  },
+  "targets": [
+    {
+      "id": "FRM-01",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL"
+    },
+    {
+      "id": "FRM-02",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL"
+    },
+    {
+      "id": "FRM-03",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL"
+    },
+    {
+      "id": "FRM-04",
+      "classification": "PROVED_UNDER_EXACT_SEQUENCE_INJECTIVITY"
+    },
+    {
+      "id": "FRM-05",
+      "classification": "PROVED_UNDER_SHARED_NATIVE_SOURCE_PREMISE"
+    },
+    {
+      "id": "FRM-06",
+      "classification": "PROVED_UNDER_METACOMPILER_ROUNDTRIP_PREMISE"
+    }
+  ],
+  "explicitNonClaims": [
+    "production FORMAL parser is not yet proved as a refinement of the mathematical model",
+    "production contextual-name resolver is not yet fully proved against recursive bundle semantics",
+    "production ExactSequence encoder injectivity remains a refinement obligation",
+    "production metacompiler round-trip/preservation remains a refinement obligation",
+    "FORMAL v0.15 as a whole is not yet classified externally proved",
+    "native aprover execution in A-memory is separately owned by #2003"
+  ]
+}
