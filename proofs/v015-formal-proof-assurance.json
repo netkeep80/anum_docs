@@ -108,6 +108,28 @@
       "rocq": [
         "FRM_06_metacompiler_preserves_semantics"
       ]
+    },
+    {
+      "id": "FRM-07",
+      "classification": "PROVED_UNDER_EXPLICIT_PRODUCTION_REFINEMENT_PREMISES",
+      "premises": [
+        "production FORMAL and canonical JSON reconstruct the same native source ANet for the approved artifact",
+        "production recursive codec is a semantic left inverse on every selected semantic member",
+        "production ExactSequence read(materialize(values))=values on its declared canonical domain"
+      ],
+      "exclusions": [
+        "does not mechanically verify TypeScript source code inside Lean/Rocq",
+        "concrete production premises must be carried by executable regression evidence",
+        "general parser/resolver completeness outside the declared supported fragment remains separate"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_07_approved_artifact_refinement",
+        "MTS.V015.FormalExternal.FRM_07_exact_sequence_injective_from_left_inverse"
+      ],
+      "rocq": [
+        "FRM_07_approved_artifact_refinement",
+        "FRM_07_exact_sequence_injective_from_left_inverse"
+      ]
     }
   ]
 }
