@@ -825,7 +825,7 @@
     "mapping": [
       "{\"A\":null} -> bare resolved source entry A -> explicit membership after common DAS",
       "{\"A\":\"X\"} -> source binding A:X -> metamodel definition, no automatic RHS membership",
-      "{\"A\":[]} -> source binding A:Seq([]) -> Seq([])=R, no automatic R membership",
+      "{\"A\":[]} -> source binding A:ExactSequence([])=R -> no automatic R membership",
       "{\"A\":{...}} -> anchored nested source ANet A -> contextual members through the same DAS"
     ],
     "structuredKeyRule": "Object keys are resolved by ordinary FORMAL expression resolution before source-role lowering; a bare structured key such as Theory->R contributes that resolved Link as a bare source entry.",
@@ -849,5 +849,28 @@
       ]
     },
     "nextGate": "First concrete native role-bundle meta-rule JSON artifact; explicit Author approval required before canonicalization."
+  },
+  "jsonArrayCarrier": {
+    "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
+    "authorDecision": {
+      "date": "2026-10-05",
+      "decision": "APPROVED_FOR_IMPLEMENTATION_AND_FALSIFICATION"
+    },
+    "law": [
+      "Den([])=ExactSequence([])=R",
+      "Den([e1,...,en])=ExactSequence([Den(e1),...,Den(en)])"
+    ],
+    "derivedProjection": "F_R remains an explicit derived rooted-fold projection only; it is not the canonical positional/execution carrier.",
+    "executableEvidence": [
+      "ts/test/v015-json-array-rooted-fold-a4.test.ts",
+      "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+    ],
+    "rationale": [
+      "Rule images require exact 0/1/N output cardinality.",
+      "Rooted fold collapses [], [R] and [R,R] to R.",
+      "ExactSequence preserves [] vs [R] vs [R,R].",
+      "Nested [] first denotes R, so Exact([[]])=Exact([R]) is expected."
+    ],
+    "artifactApproval": "Concrete logical/proof JSON artifacts remain separately Author-gated."
   }
 }
