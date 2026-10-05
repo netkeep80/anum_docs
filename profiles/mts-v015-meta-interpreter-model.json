@@ -997,7 +997,21 @@
       ]
     },
     "implication": "Grounded exact matching is supported as the zero-role refinement of the same Author-approved native role-bundle Rule topology and same generic matcher/constructor.",
-    "remainingGate": "Author gate is closed for this exact JSON source artifact. Direct FORMAL -> exact same native source ANet parity is GREEN on 1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a. Full #1978 evidence still requires persisted exact FORMAL + digest -> recursive 8/9/6/1 + digest -> fresh frozen A-memory replay; theorem/proof closure #2001 remains pending."
+    "recursiveRegressionEvidence": {
+      "evidenceManifest": "formal/v0.15/regression/grounded-zero-role.evidence.json",
+      "formalArtifact": "formal/v0.15/regression/grounded-zero-role.formal",
+      "formalSha256": "b0e5760786c900ab125f775f9f30d897336220ee2393f3c0e3fd5cff2296d51a",
+      "jsonArtifact": "formal/v0.15/regression/grounded-zero-role.json",
+      "jsonSha256": "d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61",
+      "recursiveArtifact": "formal/v0.15/regression/grounded-zero-role.recursive",
+      "recursiveSha256": "570950556cc0703a915c39e4e6f181ed55103f13544f8f8a1a5e25a099f76b11",
+      "test": "ts/test/v015-grounded-approved-recursive-r1.test.ts",
+      "ciRun": 37321650052,
+      "result": "SUCCESS",
+      "twoMemoryParity": "GREEN",
+      "amemoryReplay": "PENDING"
+    },
+    "remainingGate": "Author gate, exact FORMAL projection, source parity, persisted digests and canonical recursive 8/9/6/1 artifact are GREEN. Full #1978 closure now requires fresh frozen A-memory 0.175.0 replay through amemory#482 plus normalized replay evidence; theorem/proof closure #2001 remains pending."
   },
   "contextualNameResolution": {
     "status": "AUTHOR_APPROVED_DESIGN_GREEN_ROOT_FORMAL_SURFACE_PROOF_PENDING",
