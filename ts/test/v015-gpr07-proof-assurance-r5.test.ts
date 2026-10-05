@@ -31,7 +31,7 @@ const v015 = JSON.parse(
 };
 const evidence = JSON.parse(
   readFileSync(
-    resolve(repo, "proofs/evidence/v015-gpr07-zero-role-refinement.json"),
+    resolve(repo, "proofs/v015-evidence/gpr07-zero-role-refinement.json"),
     "utf8",
   ),
 ) as {
