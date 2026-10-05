@@ -343,12 +343,12 @@ function absoluteName(name: string): LinkHandle {
 
 function contextualPath(source: string): LinkHandle {
   const compact = source.replace(/[()]/gu, "").trim();
-  if (compact.length === 0) directJsonFail("invalid-shape");
+  if (compact.length === 0) (() => { throw new Error("v0.15 DAS-A2 native source ANet: invalid contextual path"); })();
 
   if (compact.startsWith(":")) {
     const segments = compact.slice(1).split(":");
     if (segments.some((segment) => segment.length === 0)) {
-      directJsonFail("invalid-shape");
+      (() => { throw new Error("v0.15 DAS-A2 native source ANet: invalid contextual path"); })();
     }
     return materializeV015ContextualNamePath(
       memory,
@@ -361,7 +361,7 @@ function contextualPath(source: string): LinkHandle {
 
   const segments = compact.split(":");
   if (segments.some((segment) => segment.length === 0)) {
-    directJsonFail("invalid-shape");
+    (() => { throw new Error("v0.15 DAS-A2 native source ANet: invalid contextual path"); })();
   }
   if (segments[0] === "R") {
     if (segments.length === 1) return basis.R;
