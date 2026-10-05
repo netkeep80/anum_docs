@@ -956,5 +956,44 @@
     },
     "implication": "Grounded exact matching is supported as the zero-role refinement of the same Author-approved native role-bundle Rule topology and same generic matcher/constructor.",
     "remainingGate": "Explicit Author approval of this exact grounded JSON artifact before canonicalization; theorem/proof closure remains #2001."
+  },
+  "contextualNameResolution": {
+    "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
+    "owner": "#1901",
+    "requirement": "V15-NAME-01",
+    "laws": [
+      ":A ≡ R:A",
+      ":Theory -> :GroundRule ≡ R:Theory -> R:GroundRule",
+      "Colon ':' qualifies/resolves a name in a context; it is not the Link constructor.",
+      "Arrow '->' constructs Link structure between already-resolved Links.",
+      "No host-global atom namespace has semantic authority."
+    ],
+    "correctionToCurrentResearchTests": "Current bounded DAS/meta-rule test resolver uses host Maps for atomic name fixtures. Those fixtures are research scaffolding only and must be replayed through a true contextual-name resolver before FORMAL/JSON acceptance."
+  },
+  "ruleRoleCardinalityLaw": {
+    "status": "GREEN_RESEARCH_PROOF_PENDING",
+    "owner": "#2001",
+    "law": "roles(V,M_t) = { r ∈ M_t | START(r)=V }",
+    "classification": [
+      "|roles(V,M_t)| = 0 -> grounded exact rule",
+      "|roles(V,M_t)| > 0 -> structural generic rule"
+    ],
+    "invariants": [
+      "There is no semantic RuleKind/grounded/generic tag.",
+      "V exists in both cases; empty V means zero role members, not absence of V.",
+      "The same structural matcher/constructor is used for both cases.",
+      "With zero roles, match reduces to exact structural identity and instantiation uses an empty binding set.",
+      "Grounded exact MP is therefore a boundary/refinement case of the same generalized structural Rule topology."
+    ],
+    "evidence": {
+      "path": "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+      "ciRun": "37289366373",
+      "markers": [
+        "GROUNDED_ROLE_COUNT=0",
+        "GROUNDED_EXACT_MATCH=IDENTITY",
+        "GROUNDED_NONIDENTICAL_MATCH=REJECT",
+        "META_RULE_STRUCTURAL_SWAP=GREEN"
+      ]
+    }
   }
 }
