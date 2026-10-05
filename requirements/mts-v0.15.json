@@ -648,6 +648,36 @@
       }
     },
     {
+      "id": "V15-JSON-04",
+      "group": "JSON",
+      "ownerIssue": "#1188",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "JSON arrays lower canonically to ExactSequence of already-denoted element Links; []=R. R-rooted fold F_R is a separate derived projection, not the positional/execution carrier.",
+      "dependsOn": [
+        "V15-JSON-02",
+        "V15-ONTO-02"
+      ],
+      "authority": {
+        "issue": 1188
+      },
+      "evidence": {
+        "positiveVectors": [
+          "json-array-empty-exactsequence-equals-R",
+          "json-array-one-R-distinct-from-empty",
+          "json-array-two-R-distinct-from-one-R",
+          "nested-empty-array-composes-through-R"
+        ],
+        "negativeVectors": [
+          "rooted-fold-cannot-carry-rule-image-0-1-2-R-cardinality"
+        ],
+        "requiredExecutableGates": [
+          "ts/test/v015-json-array-rooted-fold-a4.test.ts",
+          "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+        ]
+      }
+    },
+    {
       "id": "V15-STAGE-01",
       "group": "STAGE",
       "ownerIssue": "#1901",
