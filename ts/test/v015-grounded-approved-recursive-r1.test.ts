@@ -191,6 +191,18 @@ const jsonBytes = Uint8Array.from(
     resolve(root, "formal/v0.15/regression/grounded-zero-role.json"),
   ),
 );
+const expectedRecursiveBytes = Uint8Array.from(
+  readFileSync(
+    resolve(root, "formal/v0.15/regression/grounded-zero-role.recursive"),
+  ),
+);
+
+const EXPECTED_FORMAL_SHA256 =
+  "b0e5760786c900ab125f775f9f30d897336220ee2393f3c0e3fd5cff2296d51a";
+const EXPECTED_JSON_SHA256 =
+  "d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61";
+const EXPECTED_RECURSIVE_SHA256 =
+  "570950556cc0703a915c39e4e6f181ed55103f13544f8f8a1a5e25a099f76b11";
 
 function compileOne(noise = 0): Readonly<{
   sourceAset: LinkHandle;
@@ -309,6 +321,15 @@ const formalDigest = sha256(formalBytes);
 const jsonDigest = sha256(jsonBytes);
 const recursiveDigest = sha256(first.wire);
 const recursiveWire = new TextDecoder().decode(first.wire);
+
+same(formalDigest, EXPECTED_FORMAL_SHA256, "approved FORMAL digest");
+same(jsonDigest, EXPECTED_JSON_SHA256, "approved JSON digest");
+same(recursiveDigest, EXPECTED_RECURSIVE_SHA256, "recursive digest");
+bytesSame(
+  first.wire,
+  expectedRecursiveBytes,
+  "persisted recursive artifact matches computed canonical wire",
+);
 
 console.log([
   "MTS_V015_GROUNDED_APPROVED_RECURSIVE=GREEN",
