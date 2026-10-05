@@ -1,7 +1,7 @@
 {
   "schema": "mts-v015-approved-artifact-evidence/v0.1",
   "id": "grounded-zero-role-rule",
-  "status": "RECURSIVE_EVIDENCE_GREEN_AMEMORY_REPLAY_PENDING",
+  "status": "FULL_REGRESSION_GREEN",
   "kind": "EXECUTABLE",
   "authorJsonReview": {
     "state": "APPROVED",
@@ -43,6 +43,34 @@
     "version": "0.175.0",
     "adapterIssue": 482,
     "adapter": "experiments/a-circuit/src/bin/formal_recursive_replay.rs",
-    "status": "PENDING"
+    "rustToolchain": "1.98.1",
+    "workflow": ".github/workflows/amemory-v015-regression.yml",
+    "workflowRun": 37324057317,
+    "evidenceArtifact": "formal/v0.15/regression/grounded-zero-role.amemory-evidence.json",
+    "positive": {
+      "rawRuleMatches": 1,
+      "transitionedMembers": 1,
+      "quiescent": false,
+      "handoffCount": 1,
+      "resultEqualsExpected": true
+    },
+    "negative": {
+      "rawRuleMatches": 0,
+      "transitionedMembers": 0,
+      "quiescent": true,
+      "handoffCount": 0,
+      "resultEqualsExpected": true
+    },
+    "exactPersistedEvidenceMatch": true,
+    "status": "SUCCESS"
+  },
+  "backendCompatibility": {
+    "lowering": "generic zero-role Rule -> generated one-context-role legacy StructuralRule",
+    "canonicalSemanticsChanged": false,
+    "programSpecificDispatch": 0,
+    "packageArtifact": "formal/v0.15/regression/grounded-zero-role.amemory-package.json",
+    "packageSha256": "354be494b42c78d310a868144f5c63fec915fec932a01d1d36b274d79258fce4",
+    "test": "ts/test/v015-grounded-approved-amemory-package-r2.test.ts",
+    "localDifferential": "GREEN"
   }
 }
