@@ -206,7 +206,9 @@ const sourceFresh = (): LinkHandle => {
   return sourceCursor;
 };
 
-const sourceTheory = sourceFresh();
+// Keep the Theory anchor outside the fresh-name chain so the fixture itself
+// does not accidentally create unrelated START=Theory Links.
+const sourceTheory = source.ensure(sb.L, sb.U);
 const sourceRuleA = sourceFresh();
 const sourceRuleB = sourceFresh();
 const sourceRuleC = sourceFresh();
