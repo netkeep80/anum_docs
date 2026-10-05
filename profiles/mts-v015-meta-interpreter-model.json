@@ -984,7 +984,8 @@
         "approved two-role meta-rule JSON preserves semantic ANet and swap behavior",
         "grounded zero-role candidate preserves admission-only semantic ANet and exact behavior",
         "no host-global atom namespace is semantic authority"
-      ]
+      ],
+      "remainingBoundary": "This GREEN evidence covers the Link-native coordinate/resolution kernel plus direct-JSON -> native source ANet -> DAS replay. The existing v015-formal-decoder text grammar still rejects ':' inside names; exact FORMAL surface parsing, namespace-path lowering and convergence onto the same resolver remain OPEN under #1901/#1911. The DAS-A2 contextualPath parser is a bounded test fixture, not final FORMAL Grammar authority."
     }
   },
   "ruleRoleCardinalityLaw": {
