@@ -34,7 +34,62 @@
   "explicitAuthorDecisionRequiredForAcceptance": true,
   "approvedJsonCorpus": {
     "ownerIssue": 1978,
-    "entries": [],
+    "entries": [
+      {
+            "id": "grounded-zero-role-rule",
+            "kind": "EXECUTABLE",
+            "authorApprovalEvidence": "netkeep80/anum_docs#1978 issuecomment-5994922633",
+            "formalSourceArtifact": "formal/v0.15/regression/grounded-zero-role.formal",
+            "formalSourceDigest": "b0e5760786c900ab125f775f9f30d897336220ee2393f3c0e3fd5cff2296d51a",
+            "canonicalJsonArtifact": "formal/v0.15/regression/grounded-zero-role.json",
+            "canonicalJsonDigest": "d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61",
+            "jsonProfileRevision": "direct-source-anet@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
+            "grammarProfileRevision": "v015-source-anet:block-bare-binding-bundle@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
+            "metacompilerRevision": "d7787f8d44e4dd98b2e812dfb163fe0bd35fd8d6",
+            "metacompilerProfile": "direct source ANet -> semantic ANet -> canonical v0.13 hierarchical 8/9/6/1",
+            "semanticEntry": "Theory->GroundRule",
+            "expectedRecursiveRepresentation": "formal/v0.15/regression/grounded-zero-role.recursive",
+            "expectedRecursiveDigest": "570950556cc0703a915c39e4e6f181ed55103f13544f8f8a1a5e25a099f76b11",
+            "amemoryExecutionProfile": "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d:formal_recursive_replay",
+            "amemoryReplayPackage": "formal/v0.15/regression/grounded-zero-role.amemory-package.json",
+            "amemoryReplayPackageDigest": "354be494b42c78d310a868144f5c63fec915fec932a01d1d36b274d79258fce4",
+            "amemoryReplayEvidence": "formal/v0.15/regression/grounded-zero-role.amemory-evidence.json",
+            "expectedSemanticResult": {
+                  "positive": {
+                        "rawRuleMatches": 1,
+                        "transitionedMembers": 1,
+                        "handoffCount": 1,
+                        "quiescent": false,
+                        "resultEqualsExpected": true
+                  },
+                  "negativeMismatch": {
+                        "rawRuleMatches": 0,
+                        "transitionedMembers": 0,
+                        "handoffCount": 0,
+                        "quiescent": true,
+                        "resultEqualsExpected": true
+                  }
+            },
+            "externalDependencies": {
+                  "amemoryMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+                  "amemoryVersion": "0.175.0",
+                  "amemoryAdapterIssue": 482,
+                  "rustToolchain": "1.98.1"
+            },
+            "regressionEvidence": {
+                  "manifest": "formal/v0.15/regression/grounded-zero-role.evidence.json",
+                  "recursiveCiRun": 37321650052,
+                  "frozenAmemoryWorkflowRun": 37324057317,
+                  "exactPersistedAmemoryEvidenceMatch": true
+            },
+            "authorJsonReview": {
+                  "state": "APPROVED",
+                  "artifact": "formal/v0.15/regression/grounded-zero-role.json",
+                  "revisionOrDigest": "d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61",
+                  "decisionEvidence": "netkeep80/anum_docs#1978 issuecomment-5994922633"
+            }
+      }
+    ],
     "rule": "Every explicitly Author-approved JSON artifact becomes a permanent executable regression witness."
   },
   "requirements": {
