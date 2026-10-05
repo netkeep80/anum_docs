@@ -1330,6 +1330,93 @@ match(GA, Other, ∅) -> reject
 Therefore grounded exact matching is not a second mechanism: it is the zero-role refinement of the same native role-bundle Rule topology and same generic structural matcher/constructor.
 
 Status: **GREEN research / exact JSON artifact still requires explicit Author approval**.
+## 16d. Contextual names and absolute-root shorthand
+
+Author-approved v0.15 name-resolution direction:
+
+```text
+:A ≡ R:A
+```
+
+Therefore:
+
+```text
+:Theory -> :GroundRule
+≡
+R:Theory -> R:GroundRule
+```
+
+The operators have different roles:
+
+```text
+context:name
+    = contextual name resolution / qualification
+
+A -> B
+    = Link construction over already-resolved Links
+```
+
+There is no semantically privileged host-global atom namespace. An «absolute» name is simply a name resolved relative to the root context `R`.
+
+Important correction to current research fixtures: bounded DAS/meta-rule tests currently seed names such as `Theory`, `V`, `X`, `GA` through host Maps. This is acceptable only as temporary research scaffolding. Before FORMAL/JSON acceptance, the same approved artifacts must be replayed through a real contextual-name resolver implementing `:A ≡ R:A` and context-local name distinctions.
+
+Owner: **#1901**, requirement **V15-NAME-01**.
+
+## 16e. Rule kind is derived from role cardinality
+
+The accepted Rule topology has no separate semantic kind/tag:
+
+```text
+Rule = V -> (Antecedent -> Image)
+```
+
+Roles are recovered from the semantic ANet:
+
+```text
+roles(V,M_t) = { r ∈ M_t | START(r)=V }
+```
+
+Classification is therefore derived:
+
+```text
+|roles(V,M_t)| = 0
+    -> grounded exact rule
+
+|roles(V,M_t)| > 0
+    -> structural generic rule
+```
+
+`V` exists in both cases. `V0:{}` means that the role ANet anchored at `V0` has no role members; it does not mean that `V0` is absent.
+
+One generic matcher/constructor is used:
+
+```text
+roles != {}
+    -> structural binding/substitution
+
+roles = {}
+    -> no variables may bind
+    -> exact structural identity check
+    -> empty binding set
+    -> identity instantiation of grounded output
+```
+
+Executable evidence is GREEN:
+
+```text
+generic two-role:
+Tag->(A->B) -> B->A
+
+grounded zero-role:
+match(GA,GA,{})    -> {}
+instantiate(GB,{}) -> GB
+match(GA,Other,{}) -> reject
+```
+
+Thus grounded exact MP is supported constructively as the zero-role boundary/refinement of the same generalized structural Rule model, not as a second opcode or RuleKind.
+
+Owner: **#2001**. Formal proof closure remains open.
+
 ## 17. Author gates
 
 Без явного подтверждения автора нельзя объявлять принятыми:
