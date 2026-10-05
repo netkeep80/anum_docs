@@ -919,5 +919,42 @@
       "direct JSON [[]] equals ExactSequence([R]) because inner [] denotes R",
       "array RHS remains metamodel binding unless separately included as a bare ANet member"
     ]
+  },
+  "groundedZeroRoleRuleCandidate": {
+    "status": "GREEN_RESEARCH_AUTHOR_REVIEW_REQUIRED",
+    "jsonArtifact": {
+      "V0": {},
+      "GroundAntecedent": "GA",
+      "GroundOutput": "GB",
+      "GroundImage": [
+        "GroundOutput"
+      ],
+      "GroundBody": "GroundAntecedent->GroundImage",
+      "GroundRule": "V0->GroundBody",
+      "Theory->GroundRule": null
+    },
+    "resolvedTopology": [
+      "roles(V0,M_t)=∅",
+      "Image=ExactSequence([GB])",
+      "Body=GA->Image",
+      "Rule=V0->Body",
+      "Admission=Theory->Rule"
+    ],
+    "denotedSemanticAnet": [
+      "Theory->Rule"
+    ],
+    "executableEvidence": {
+      "path": "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+      "ciRun": "37289366373",
+      "result": "SUCCESS",
+      "markers": [
+        "GROUNDED_SEMANTIC_MEMBERS=ADMISSION_ONLY",
+        "GROUNDED_ROLE_COUNT=0",
+        "GROUNDED_EXACT_MATCH=IDENTITY",
+        "GROUNDED_NONIDENTICAL_MATCH=REJECT"
+      ]
+    },
+    "implication": "Grounded exact matching is supported as the zero-role refinement of the same Author-approved native role-bundle Rule topology and same generic matcher/constructor.",
+    "remainingGate": "Explicit Author approval of this exact grounded JSON artifact before canonicalization; theorem/proof closure remains #2001."
   }
 }
