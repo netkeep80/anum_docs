@@ -125,6 +125,7 @@ jobs:
     env:
       PACKAGE_PATH: formal/v0.15/regression/two-role-meta-rule.amemory-package.json
       PACKAGE_SHA256: ce8758fbe3ca6de992c1382db8af543f17aa55495cf0bad542e290c336e4be03
+      EVIDENCE_PATH: formal/v0.15/regression/two-role-meta-rule.amemory-evidence.json
 
     steps:
       - name: Checkout anum_docs
@@ -202,9 +203,12 @@ jobs:
           assert negative["handoff_count"] == 0
           assert negative["quiescent"] is True
 
+          import os
+          expected = json.load(open(os.environ["EVIDENCE_PATH"], "r", encoding="utf-8"))
+          assert data == expected, "frozen A-memory two-role evidence drift"
+
           print(
               "FROZEN_AMEMORY_TWO_ROLE_REPLAY=PASS "
-              "positive_matches=1 negative_matches=0"
+              "positive_matches=1 negative_matches=0 exact_evidence=1"
           )
-          print("TWO_ROLE_AMEMORY_EVIDENCE=" + json.dumps(data, separators=(",", ":")))
           PY
