@@ -26,6 +26,7 @@ env:
   AMEMORY_RUST_TOOLCHAIN: 1.98.1
   PACKAGE_PATH: formal/v0.15/regression/grounded-zero-role.amemory-package.json
   PACKAGE_SHA256: 354be494b42c78d310a868144f5c63fec915fec932a01d1d36b274d79258fce4
+  EVIDENCE_PATH: formal/v0.15/regression/grounded-zero-role.amemory-evidence.json
 
 jobs:
   grounded-zero-role:
@@ -104,8 +105,12 @@ jobs:
           assert negative["handoff_count"] == 0
           assert negative["quiescent"] is True
 
+          import os
+          expected = json.load(open(os.environ["EVIDENCE_PATH"], "r", encoding="utf-8"))
+          assert data == expected, "frozen A-memory evidence drift"
+
           print(
               "FROZEN_AMEMORY_GROUNDED_REPLAY=PASS "
-              "positive_matches=1 negative_matches=0"
+              "positive_matches=1 negative_matches=0 exact_evidence=1"
           )
           PY
