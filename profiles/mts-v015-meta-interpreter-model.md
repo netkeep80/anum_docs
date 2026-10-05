@@ -1292,6 +1292,44 @@ Current status before canonicalizing a concrete meta-rule JSON:
 - next vertical: empty `V0:{}` grounded exact-rule refinement through the same JSON/source/DAS path;
 - other logical/proof JSON artifacts still require their own explicit Author gate.
 
+## 16c. Grounded zero-role JSON refinement
+
+Executable witness: `ts/test/v015-native-source-anet-denotation-das-a2.test.ts`.
+
+GREEN candidate:
+
+```json
+{
+  "V0": {},
+  "GroundAntecedent": "GA",
+  "GroundOutput": "GB",
+  "GroundImage": ["GroundOutput"],
+  "GroundBody": "GroundAntecedent->GroundImage",
+  "GroundRule": "V0->GroundBody",
+  "Theory->GroundRule": null
+}
+```
+
+After resolution + DAS the semantic ANet contains only the admission:
+
+```text
+Theory->GroundRule
+```
+
+because `V0:{}` contributes zero bindable roles.
+
+Executable result:
+
+```text
+roles(V0,M_t) = ∅
+match(GA, GA, ∅) -> {}
+instantiate(GB,{}) = GB
+match(GA, Other, ∅) -> reject
+```
+
+Therefore grounded exact matching is not a second mechanism: it is the zero-role refinement of the same native role-bundle Rule topology and same generic structural matcher/constructor.
+
+Status: **GREEN research / exact JSON artifact still requires explicit Author approval**.
 ## 17. Author gates
 
 Без явного подтверждения автора нельзя объявлять принятыми:
