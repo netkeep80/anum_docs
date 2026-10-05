@@ -21,6 +21,10 @@ import {
   type SyntaxAsetKindRule,
   type SyntaxAsetOccurrence,
 } from "./syntax-aset-contract.js";
+import {
+  materializeV012StringAnum,
+  readV012StringAnum,
+} from "./v012-string-anum.js";
 
 export type V015LinkDefinitionErrorCode =
   | "invalid-basis"
@@ -456,7 +460,102 @@ function requireFlatDefinitions(
   }
 }
 
+function isContextualNameSegment(segment: string): boolean {
+  return (
+    segment.length > 0 &&
+    !/[\t\r\n :()]/u.test(segment) &&
+    !segment.includes("->") &&
+    !segment.includes("[") &&
+    !segment.includes("]") &&
+    !segment.includes(",") &&
+    !segment.includes("=") &&
+    !segment.includes("≡")
+  );
+}
+
+interface ContextualReferencePath {
+  readonly absolute: boolean;
+  readonly segments: readonly string[];
+}
+
+/**
+ * Decode only the contextual-name role of a reference carrier.
+ *
+ * Plain names remain on the historical local-definition path.  References
+ * containing ':' are contextual paths:
+ *   :A      = R:A
+ *   R:A     = R:A
+ *   K:A:B   = ((R:K):A):B in the current flat/root bootstrap context
+ *
+ * Nested source bundles will later supply their own current context.  This
+ * slice intentionally does not infer a host scope stack.
+ */
+function contextualReferencePath(
+  memory: ReadMemory,
+  basis: RootBasis,
+  nameCarrier: LinkHandle,
+): ContextualReferencePath | null {
+  let source: string;
+  try {
+    source = new TextDecoder("utf-8", { fatal: true }).decode(
+      readV012StringAnum(memory, basis, nameCarrier).bytes,
+    );
+  } catch {
+    return fail("unbound-name");
+  }
+
+  if (!source.includes(":")) return null;
+
+  let absolute = source.startsWith(":");
+  const body = absolute ? source.slice(1) : source;
+  if (body.length === 0) return fail("unbound-name");
+
+  let segments = body.split(":");
+  if (segments.some((segment) => !isContextualNameSegment(segment))) {
+    return fail("unbound-name");
+  }
+
+  // The Author-approved law is :A ≡ R:A.
+  if (!absolute && segments[0] === "R") {
+    if (segments.length < 2) return fail("unbound-name");
+    absolute = true;
+    segments = segments.slice(1);
+  }
+
+  return Object.freeze({
+    absolute,
+    segments: Object.freeze(segments),
+  });
+}
+
+function materializeContextualReference(
+  memory: WriteMemory,
+  basis: RootBasis,
+  nameCarrier: LinkHandle,
+): LinkHandle | null {
+  const path = contextualReferencePath(memory, basis, nameCarrier);
+  if (path === null) return null;
+
+  const localNameCarriers = path.segments.map((segment) =>
+    materializeV012StringAnum(
+      memory,
+      basis,
+      new TextEncoder().encode(segment),
+    ).anumLink
+  );
+
+  return materializeV015ContextualNamePath(
+    memory,
+    basis,
+    basis.R,
+    localNameCarriers,
+    path.absolute,
+  );
+}
+
 function resolveOperand(
+  memory: WriteMemory,
+  basis: RootBasis,
   profile: V015LinkDefinitionProfile,
   occurrences: ReadonlyMap<LinkHandle, SyntaxAsetOccurrence>,
   declaredNames: ReadonlySet<LinkHandle>,
@@ -467,7 +566,14 @@ function resolveOperand(
   const occurrence = occurrences.get(operand) ?? fail("unsupported-expression");
   if (occurrence.kind !== profile.nameRefForm) fail("unsupported-expression");
   const name = fieldValue(occurrence, profile.referencedNameRole);
+
   if (name === targetName) return Object.freeze({ kind: "self" });
+
+  const contextual = materializeContextualReference(memory, basis, name);
+  if (contextual !== null) {
+    return Object.freeze({ kind: "link", value: contextual });
+  }
+
   const value = resolved.get(name);
   if (value !== undefined) return Object.freeze({ kind: "link", value });
   if (!declaredNames.has(name)) fail("unbound-name");
@@ -476,6 +582,7 @@ function resolveOperand(
 
 function resolveEqualityOperand(
   memory: WriteMemory,
+  basis: RootBasis,
   profile: V015LinkDefinitionProfile,
   occurrences: ReadonlyMap<LinkHandle, SyntaxAsetOccurrence>,
   declaredNames: ReadonlySet<LinkHandle>,
@@ -486,6 +593,8 @@ function resolveEqualityOperand(
   const occurrence = occurrences.get(operand) ?? fail("unsupported-expression");
   if (occurrence.kind === profile.nameRefForm) {
     return resolveOperand(
+      memory,
+      basis,
       profile,
       occurrences,
       declaredNames,
@@ -499,6 +608,8 @@ function resolveEqualityOperand(
   }
 
   const left = resolveOperand(
+    memory,
+    basis,
     profile,
     occurrences,
     declaredNames,
@@ -507,6 +618,8 @@ function resolveEqualityOperand(
     fieldValue(occurrence, profile.pairLeftRole),
   );
   const right = resolveOperand(
+    memory,
+    basis,
     profile,
     occurrences,
     declaredNames,
@@ -545,6 +658,8 @@ function materializeExpression(
   ) {
     const items = fieldValues(occurrence, profile.sequenceItemRole).map((item) =>
       resolveOperand(
+        memory,
+        basis,
         profile,
         occurrences,
         declaredNames,
@@ -579,6 +694,7 @@ function materializeExpression(
   ) {
     const left = resolveEqualityOperand(
       memory,
+      basis,
       profile,
       occurrences,
       declaredNames,
@@ -588,6 +704,7 @@ function materializeExpression(
     );
     const right = resolveEqualityOperand(
       memory,
+      basis,
       profile,
       occurrences,
       declaredNames,
@@ -614,11 +731,23 @@ function materializeExpression(
 
   if (occurrence.kind !== profile.pairForm) fail("unsupported-expression");
   const left = resolveOperand(
-    profile, occurrences, declaredNames, resolved, targetName,
+    memory,
+    basis,
+    profile,
+    occurrences,
+    declaredNames,
+    resolved,
+    targetName,
     fieldValue(occurrence, profile.pairLeftRole),
   );
   const right = resolveOperand(
-    profile, occurrences, declaredNames, resolved, targetName,
+    memory,
+    basis,
+    profile,
+    occurrences,
+    declaredNames,
+    resolved,
+    targetName,
     fieldValue(occurrence, profile.pairRightRole),
   );
   if (left.kind === "pending" || right.kind === "pending") {
