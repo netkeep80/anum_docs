@@ -258,6 +258,14 @@ theorem FRM_08_structural_aspect_denotation
     denoteStructuralAspect root start finish pair
       (.start (.pair (.atom a) (.atom b))) =
       start (pair a b) := by
-  simp [denoteStructuralAspect]
+  constructor
+  · rfl
+  constructor
+  · rfl
+  constructor
+  · rfl
+  constructor
+  · rfl
+  · rfl
 
 end MTS.V015.FormalExternal
