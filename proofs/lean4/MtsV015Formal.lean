@@ -213,7 +213,8 @@ theorem FRM_07_exact_sequence_injective_from_left_inverse
     Function.Injective E.encode := by
   intro a b encodedEq
   have readEq := congrArg E.read encodedEq
-  simpa [E.leftInverse] using readEq
+  rw [E.leftInverse a, E.leftInverse b] at readEq
+  exact readEq
 
 inductive StructuralAspectExpr (Link : Type) where
   | root
@@ -257,6 +258,6 @@ theorem FRM_08_structural_aspect_denotation
     denoteStructuralAspect root start finish pair
       (.start (.pair (.atom a) (.atom b))) =
       start (pair a b) := by
-  rfl
+  simp [denoteStructuralAspect]
 
 end MTS.V015.FormalExternal
