@@ -135,7 +135,8 @@
       "state": "OPEN",
       "ownerIssue": 1976,
       "dependsOn": [
-        "V15-CLOSE-03"
+        "V15-CLOSE-03",
+        "V15-NAME-01"
       ],
       "positiveVectors": [],
       "negativeVectors": [],
@@ -148,7 +149,8 @@
       "ownerIssue": 1976,
       "dependsOn": [
         "V15-FRESH-01",
-        "V15-JSON-01"
+        "V15-JSON-01",
+        "V15-NAME-01"
       ],
       "positiveVectors": [],
       "negativeVectors": [],
@@ -174,7 +176,8 @@
       "dependsOn": [
         "V15-AUTH-01",
         "V15-CLOSE-01",
-        "V15-TERM-01"
+        "V15-TERM-01",
+        "V15-NAME-01"
       ],
       "positiveVectors": [],
       "negativeVectors": [],
@@ -186,7 +189,8 @@
       "state": "OPEN",
       "ownerIssue": 1188,
       "dependsOn": [
-        "V15-JSON-01"
+        "V15-JSON-01",
+        "V15-NAME-01"
       ],
       "positiveVectors": [
         "direct-json-null-to-bare-source-entry",
@@ -717,6 +721,29 @@
         "#1987"
       ],
       "authorJsonReview": "GENERIC_ARRAY_MAPPING_APPROVED_ARTIFACTS_PENDING"
+    },
+    "V15-NAME-01": {
+      "state": "OPEN",
+      "ownerIssue": 1901,
+      "dependsOn": [
+        "V15-TERM-01",
+        "V15-AUTH-01"
+      ],
+      "positiveVectors": [
+        "absolute-name-colon-A-equals-R-colon-A",
+        "absolute-link-colon-Theory-to-colon-GroundRule-resolves-through-root-context"
+      ],
+      "negativeVectors": [
+        "unqualified-host-global-atom-must-not-be-semantic-authority",
+        "same-spelling-name-in-different-contexts-must-not-alias-without-resolution"
+      ],
+      "requiredExecutableGates": [],
+      "evidenceRefs": [
+        "#1901",
+        "#2002",
+        "profiles/mts-v015-meta-interpreter-model.json"
+      ],
+      "authorJsonReview": "NOT_APPLICABLE"
     }
   }
 }
