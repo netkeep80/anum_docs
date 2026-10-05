@@ -1016,7 +1016,7 @@ Y -> X
 
 Это пока **не универсальная теорема** и не финальный JSON.
 
-Проверенный direct-JSON candidate (**GREEN research, Author approval required**):
+Первый конкретный direct-JSON meta-rule (**AUTHOR-APPROVED ARTIFACT / proof pending**):
 
 ```json
 {
@@ -1047,6 +1047,8 @@ Theory->MetaRule
 Промежуточные имена `RoleX`, `RoleY`, `PairXY`, `Antecedent`, `Output`, `Image`, `MetaBody`, `MetaRule` — метамодельные bindings и не становятся членами `M_t` автоматически.
 
 Executable witness уже подтвердил: `Tag->(A->B)` связывает две роли и инстанцирует `B->A` тем же generic structural matcher/constructor.
+
+**Author decision 2026-10-05:** этот точный JSON-артефакт принят. Это не распространяет approval автоматически на другие logical/proof JSON.
 
 Здесь предполагается:
 
@@ -1286,7 +1288,9 @@ Current status before canonicalizing a concrete meta-rule JSON:
 - native role-bundle meta-rule JSON -> source ANet -> DAS -> structural match/instantiate: **GREEN**;
 - exact tested artifact is shown above;
 - theorem/proof FORMAL pressure remains open;
-- **explicit Author approval of this exact meta-rule JSON is still mandatory before canonicalization**.
+- exact meta-rule JSON shown above: **AUTHOR-APPROVED ARTIFACT / proof pending**;
+- next vertical: empty `V0:{}` grounded exact-rule refinement through the same JSON/source/DAS path;
+- other logical/proof JSON artifacts still require their own explicit Author gate.
 
 ## 17. Author gates
 
