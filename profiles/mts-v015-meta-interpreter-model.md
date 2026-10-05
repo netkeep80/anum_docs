@@ -1014,7 +1014,32 @@ Y -> X
 - A72r-подобный рекурсивный шаблон с тремя ролями проходит тем же matcher/instantiator;
 - отдельный `START(ExactSequence(roles))` RoleDictionary для этих проверенных векторов не требуется.
 
-Это пока **не универсальная теорема** и не финальный JSON.
+Для всей role-bundle архитектуры это пока **не универсальная теорема**. Но её zero-role граница теперь формально закрыта как GPR-07:
+
+```text
+roles(V,M_t) = ∅
++ match([],template,actual,ρ)
+    iff template=actual and ρ=[]
++ instantiate([],value)=value
+
+=>
+
+generic Rule step
+    iff
+grounded exact step
+```
+
+Это доказано парно в Lean4 и Rocq без разрешённых глобальных аксиом:
+
+- `proofs/lean4/MtsV015GeneralizedReaction.lean`;
+- `proofs/coq/MtsV015GeneralizedReaction.v`;
+- `proofs/v015-external-proof-assurance.json`;
+- `proofs/evidence/v015-gpr07-zero-role-refinement.json`;
+- CI `37335710302` SUCCESS.
+
+Классификация: **GPR-07 = PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS**.
+
+Граница доказательства принципиальна: оно не приписывает точному MP структурную унификацию. На нулевом пучке ролей подстановка пуста, поэтому общий механизм просто вырождается в точное совпадение и тождественную подстановку результата. Законы самого общего matcher/instantiator перечислены как явные предпосылки, а не выданы за следствие v0.14 Foundation.
 
 Первый конкретный direct-JSON meta-rule (**AUTHOR-APPROVED ARTIFACT / FULL REGRESSION GREEN**):
 
@@ -1108,7 +1133,7 @@ Denotation/lowering owner: **#2002**.
 1. alpha-renaming beyond the same-spelling-different-context vector;
 2. полный historical A72r execution differential;
 3. proof/theorem FORMAL, чтобы не получить executable-only синтаксис;
-4. универсальная theorem/proof closure #2001 и release-level gates v0.15.
+4. оставшиеся GPR-01..06, GPR-08..09 в #2001 и release-level gates v0.15; GPR-07 уже классифицирован как доказанный при явных законах generic kernel.
 
 ## 16b. DAS-A1 — resolved metamodel → denoted semantic ANet
 
