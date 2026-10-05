@@ -721,7 +721,7 @@
       "This does not make the presentation names V/Rule/Theory semantically privileged."
     ],
     "jsonSurfaceCandidate": {
-      "status": "GREEN_RESEARCH_AUTHOR_REVIEW_REQUIRED",
+      "status": "AUTHOR_APPROVED_ARTIFACT_PROOF_PENDING",
       "testedArtifact": {
         "V": {
           "X": null,
@@ -777,7 +777,12 @@
         "Intermediate names belong to the metamodel and erase before execution.",
         "The only semantic ANet members required by this isolated rule artifact are the two role Links and the Theory->Rule admission."
       ],
-      "remainingGate": "Explicit Author approval of this exact meta-rule JSON artifact before canonicalization."
+      "remainingGate": "Proof/theorem closure and grounded zero-role refinement vertical remain open; future logical/proof JSON artifacts still require their own Author gate.",
+      "authorDecision": {
+        "date": "2026-10-05",
+        "decision": "APPROVED_EXACT_META_RULE_JSON_ARTIFACT",
+        "note": "Exact GREEN artifact accepted by Author; theorem/proof closure and broader artifact families remain open."
+      }
     },
     "loweringOwner": "#2002",
     "authorDecision": {
@@ -878,7 +883,7 @@
         "physical/named E->K without bare membership is not current"
       ]
     },
-    "nextGate": "Explicit Author review of the first GREEN native role-bundle meta-rule JSON artifact."
+    "nextGate": "Grounded empty-role-bundle rule vertical through the same JSON -> native source ANet -> DAS -> matcher path."
   },
   "jsonArrayCarrier": {
     "status": "AUTHOR_APPROVED_DESIGN_GREEN_RESEARCH",
