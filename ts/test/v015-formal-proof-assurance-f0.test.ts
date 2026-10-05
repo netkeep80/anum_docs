@@ -102,8 +102,8 @@ assert(
 );
 assert(
   byId.get("FRM-08")?.classification ===
-    "PROVED_IN_SELECTED_MATHEMATICAL_MODEL_WITH_PRODUCTION_WITNESS_PENDING",
-  "FRM-08 separates mathematical structural forms from production refinement",
+    "PROVED_IN_SELECTED_MATHEMATICAL_MODEL_WITH_PRODUCTION_WITNESS",
+  "FRM-08 keeps mathematical structural forms distinct from its production witness",
 );
 
 for (const target of manifest.targets) {
