@@ -742,6 +742,17 @@ same(
   "(K:B):C is a Link-native contextual-name path",
 );
 
+same(
+  contextualPath("PathK:PathA"),
+  PATH_KA,
+  "relative K:A surface resolves through the contextual path",
+);
+same(
+  contextualPath("(PathK:PathB):PathC"),
+  PATH_KBC,
+  "parenthesized (K:B):C resolves to the same Link-native path",
+);
+
 function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
   const parsed = new StrictDirectJsonReader(text).read();
   if (!(parsed instanceof Map)) directJsonFail("invalid-shape");
@@ -849,6 +860,29 @@ function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
 
   return builder.finish(compileObject(parsed));
 }
+
+const absoluteLinkLawJson = [
+  "{",
+  "  \":Theory->:GroundRule\": null,",
+  "  \"R:Theory->R:GroundRule\": null",
+  "}",
+].join("\n");
+const absoluteLinkLaw = denoteNativeResolvedSourceAnet(
+  memory,
+  grammarRoot,
+  profile,
+  compileDirectJsonToNativeSourceAnet(absoluteLinkLawJson),
+);
+const DIRECT_GROUND_RULE_ABSOLUTE = contextualPath(":GroundRule");
+const ABSOLUTE_ADMISSION = memory.ensure(
+  DIRECT_THEORY,
+  DIRECT_GROUND_RULE_ABSOLUTE,
+);
+setSame(
+  absoluteLinkLaw.members,
+  [ABSOLUTE_ADMISSION],
+  ":Theory->:GroundRule equals R:Theory->R:GroundRule",
+);
 
 const directJson = [
   "{",
