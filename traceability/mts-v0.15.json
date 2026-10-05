@@ -879,7 +879,8 @@
       "dependsOn": [
         "V15-DUAL-01",
         "V15-PROOF-01",
-        "V15-STAGE-01"
+        "V15-STAGE-01",
+        "V15-STRUCT-01"
       ],
       "positiveVectors": [],
       "negativeVectors": [
@@ -930,7 +931,8 @@
       "dependsOn": [
         "V15-AUTH-01",
         "V15-DUAL-01",
-        "V15-JSON-04"
+        "V15-JSON-04",
+        "V15-STRUCT-01"
       ],
       "positiveVectors": [],
       "negativeVectors": [],
@@ -956,6 +958,27 @@
       "evidenceRefs": [
         "proofs/v015-evidence/formal-bootstrap-frm01-06.json"
       ],
+      "authorJsonReview": "NOT_APPLICABLE"
+    },
+    "V15-STRUCT-01": {
+      "state": "OPEN",
+      "ownerIssue": 1901,
+      "dependsOn": [
+        "V15-AUTH-01",
+        "V15-ONTO-02",
+        "V15-JSON-02"
+      ],
+      "positiveVectors": [
+        "direct-formal-root-start-end-pair",
+        "exactsequence-cell-pattern-with-start-aspect"
+      ],
+      "negativeVectors": [
+        "arbitrary-cyclic-binding-remains-rejected",
+        "start-end-distinct",
+        "structural-aspect-is-not-host-kind"
+      ],
+      "requiredExecutableGates": [],
+      "evidenceRefs": [],
       "authorJsonReview": "NOT_APPLICABLE"
     }
   }
