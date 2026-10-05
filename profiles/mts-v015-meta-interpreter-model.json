@@ -958,7 +958,7 @@
     "remainingGate": "Explicit Author approval of this exact grounded JSON artifact before canonicalization; theorem/proof closure remains #2001."
   },
   "contextualNameResolution": {
-    "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
+    "status": "AUTHOR_APPROVED_DESIGN_GREEN_RESEARCH_PROOF_PENDING",
     "owner": "#1901",
     "requirement": "V15-NAME-01",
     "laws": [
@@ -968,7 +968,24 @@
       "Arrow '->' constructs Link structure between already-resolved Links.",
       "No host-global atom namespace has semantic authority."
     ],
-    "correctionToCurrentResearchTests": "Current bounded DAS/meta-rule test resolver uses host Maps for atomic name fixtures. Those fixtures are research scaffolding only and must be replayed through a true contextual-name resolver before FORMAL/JSON acceptance."
+    "correctionToCurrentResearchTests": "Superseded by DAS-A2 contextual-name replay: direct JSON no longer obtains Theory/V/X/GA/etc from a host-global atom Map. Local STRING carriers are qualified through explicit Link-native Context coordinates; Root R is the absolute authority. Host Maps remain cache/index structures only, not semantic name authority.",
+    "executableEvidence": {
+      "test": "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+      "run": 37298755977,
+      "evidenceHead": "6834291694318ac3929af220cf64c20c208c689e",
+      "findings": [
+        ":Theory and R:Theory resolve to the same root-qualified name",
+        ":Theory -> :GroundRule and R:Theory -> R:GroundRule denote the same Link",
+        "relative K:A and nested (K:B):C use Link-native contextual coordinates",
+        "same spelling under different Context anchors remains distinct",
+        "context:name qualification remains distinct from resolved A->B Link construction",
+        "resolve of an existing contextual coordinate is read-only",
+        "missing contextual coordinate fails closed without synthesis",
+        "approved two-role meta-rule JSON preserves semantic ANet and swap behavior",
+        "grounded zero-role candidate preserves admission-only semantic ANet and exact behavior",
+        "no host-global atom namespace is semantic authority"
+      ]
+    }
   },
   "ruleRoleCardinalityLaw": {
     "status": "GREEN_RESEARCH_PROOF_PENDING",
