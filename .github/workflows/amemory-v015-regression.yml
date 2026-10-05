@@ -1,0 +1,111 @@
+name: Frozen A-memory v0.15 regression
+
+on:
+  pull_request:
+    branches: ["**"]
+    paths:
+      - "formal/v0.15/regression/**"
+      - "ts/src/v015-direct-source.ts"
+      - "ts/src/v015-direct-formal-source.ts"
+      - "ts/src/v015-direct-json-source.ts"
+      - "ts/src/v015-source-anet.ts"
+      - "ts/src/v015-link-definition.ts"
+      - "ts/src/v013-hierarchical-carrier.ts"
+      - "ts/src/exact-sequence.ts"
+      - "ts/test/v015-grounded-approved-recursive-r1.test.ts"
+      - "ts/test/v015-grounded-approved-amemory-package-r2.test.ts"
+      - ".github/workflows/amemory-v015-regression.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  AMEMORY_FROZEN_SHA: 832daa89f15fd0f3b7b40819b6d3670c7fd57e7d
+  AMEMORY_FROZEN_VERSION: 0.175.0
+  AMEMORY_RUST_TOOLCHAIN: 1.98.1
+  PACKAGE_PATH: formal/v0.15/regression/grounded-zero-role.amemory-package.json
+  PACKAGE_SHA256: 354be494b42c78d310a868144f5c63fec915fec932a01d1d36b274d79258fce4
+
+jobs:
+  grounded-zero-role:
+    name: grounded zero-role / frozen A-memory
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout anum_docs
+        uses: actions/checkout@v6
+
+      - name: Checkout exact frozen A-memory
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/amemory
+          ref: ${{ env.AMEMORY_FROZEN_SHA }}
+          path: _amemory
+
+      - name: Verify frozen A-memory identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C _amemory rev-parse HEAD)" = "$AMEMORY_FROZEN_SHA"
+          test "$(tr -d '\r\n' < _amemory/VERSION)" = "$AMEMORY_FROZEN_VERSION"
+          test -f _amemory/experiments/a-circuit/src/bin/formal_recursive_replay.rs
+          echo "AMEMORY_FROZEN_IDENTITY=PASS sha=$AMEMORY_FROZEN_SHA version=$AMEMORY_FROZEN_VERSION"
+
+      - name: Verify approved replay package
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "$PACKAGE_SHA256  $PACKAGE_PATH" | sha256sum --check --strict
+          python3 - <<'PY'
+          import json, os
+          p = os.environ["PACKAGE_PATH"]
+          data = json.load(open(p, "r", encoding="utf-8"))
+          assert data["schema"] == "mts-v015-recursive-execution-package/v0.1"
+          assert len(data["links"]) == 2
+          assert isinstance(data["entry"], str) and data["entry"]
+          assert isinstance(data["negativeEntry"], str) and data["negativeEntry"]
+          assert all(set(x) <= set("8961") for x in data["links"])
+          assert set(data["entry"]) <= set("8961")
+          assert set(data["negativeEntry"]) <= set("8961")
+          print("GROUNDED_REPLAY_PACKAGE=VERIFIED")
+          PY
+
+      - name: Install exact A-memory Rust toolchain
+        run: rustup toolchain install "$AMEMORY_RUST_TOOLCHAIN" --profile minimal
+
+      - name: Replay through real frozen A-memory
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +"$AMEMORY_RUST_TOOLCHAIN" run             --quiet             --locked             --manifest-path _amemory/experiments/a-circuit/Cargo.toml             --bin formal_recursive_replay             -- "$PACKAGE_PATH" | tee /tmp/grounded-amemory-evidence.json
+
+          python3 - <<'PY'
+          import json
+          p = "/tmp/grounded-amemory-evidence.json"
+          data = json.load(open(p, "r", encoding="utf-8"))
+          assert data["schema"] == "mts-v015-recursive-execution-evidence/v0.1"
+
+          runs = data["runs"]
+          assert len(runs) == 1
+          positive = runs[0]
+          assert positive["raw_rule_matches"] == 1
+          assert positive["transitioned_members"] == 1
+          assert positive["result"] == positive["expected"]
+          assert positive["handoff_count"] == 1
+          assert positive["quiescent"] is False
+
+          negative = data["negative_run"]
+          assert negative is not None
+          assert negative["raw_rule_matches"] == 0
+          assert negative["transitioned_members"] == 0
+          assert negative["result"] == negative["expected"]
+          assert negative["handoff_count"] == 0
+          assert negative["quiescent"] is True
+
+          print(
+              "FROZEN_AMEMORY_GROUNDED_REPLAY=PASS "
+              "positive_matches=1 negative_matches=0"
+          )
+          PY
