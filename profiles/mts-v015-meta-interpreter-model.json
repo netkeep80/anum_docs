@@ -721,7 +721,7 @@
       "This does not make the presentation names V/Rule/Theory semantically privileged."
     ],
     "jsonSurfaceCandidate": {
-      "status": "AUTHOR_APPROVED_ARTIFACT_PROOF_PENDING",
+      "status": "AUTHOR_APPROVED_ARTIFACT_FULL_REGRESSION_GREEN",
       "testedArtifact": {
         "V": {
           "X": null,
@@ -777,7 +777,28 @@
         "Intermediate names belong to the metamodel and erase before execution.",
         "The only semantic ANet members required by this isolated rule artifact are the two role Links and the Theory->Rule admission."
       ],
-      "remainingGate": "The exact JSON source artifact is Author-approved, but contextual-name replay, full #1978 FORMAL→recursive→frozen-A-memory evidence, proof/theorem closure, and grounded zero-role artifact review remain open.",
+      "fullRegressionEvidence": {
+        "evidenceManifest": "formal/v0.15/regression/two-role-meta-rule.evidence.json",
+        "formalArtifact": "formal/v0.15/regression/two-role-meta-rule.formal",
+        "formalSha256": "f68e8629b5d476f49366f3f59e65ef64d523d5b5f8964dcf918283144ba292f9",
+        "jsonArtifact": "formal/v0.15/regression/two-role-meta-rule.json",
+        "jsonSha256": "7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56",
+        "recursiveArtifact": "formal/v0.15/regression/two-role-meta-rule.recursive",
+        "recursiveSha256": "ca6a6d39913a7a5947edaeaad9d45a43603781e7b2188fd5bc34a59712da8ed9",
+        "recursiveMemberCount": 3,
+        "recursiveTest": "ts/test/v015-two-role-approved-recursive-r3.test.ts",
+        "packageTest": "ts/test/v015-two-role-approved-amemory-package-r4.test.ts",
+        "ciRun": 37332835410,
+        "amemoryPackage": "formal/v0.15/regression/two-role-meta-rule.amemory-package.json",
+        "amemoryPackageSha256": "ce8758fbe3ca6de992c1382db8af543f17aa55495cf0bad542e290c336e4be03",
+        "amemoryFrozenMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+        "amemoryVersion": "0.175.0",
+        "amemoryWorkflowRun": 37333704049,
+        "amemoryEvidence": "formal/v0.15/regression/two-role-meta-rule.amemory-evidence.json",
+        "exactPersistedEvidenceMatch": true,
+        "result": "SUCCESS"
+      },
+      "remainingGate": "The complete #1978 regression chain for this exact two-role artifact is GREEN, including contextual-name replay, exact FORMAL/JSON source parity, canonical recursive member-set evidence and frozen A-memory 0.175.0 replay. Only broader theorem/proof closure #2001 and future separately Author-approved artifact families remain open.",
       "authorDecision": {
         "date": "2026-10-05",
         "decision": "APPROVED_EXACT_META_RULE_JSON_ARTIFACT",
