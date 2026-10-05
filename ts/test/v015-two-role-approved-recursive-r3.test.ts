@@ -147,6 +147,16 @@ const formalBytes = Uint8Array.from(readFileSync(
 const jsonBytes = Uint8Array.from(readFileSync(
   resolve(root, "formal/v0.15/regression/two-role-meta-rule.json"),
 ));
+const expectedRecursiveSetBytes = Uint8Array.from(readFileSync(
+  resolve(root, "formal/v0.15/regression/two-role-meta-rule.recursive"),
+));
+
+const EXPECTED_FORMAL_SHA256 =
+  "f68e8629b5d476f49366f3f59e65ef64d523d5b5f8964dcf918283144ba292f9";
+const EXPECTED_JSON_SHA256 =
+  "7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56";
+const EXPECTED_RECURSIVE_SET_SHA256 =
+  "ca6a6d39913a7a5947edaeaad9d45a43603781e7b2188fd5bc34a59712da8ed9";
 
 function compileOne(noise = 0): Readonly<{
   recursiveSetBytes: Uint8Array;
@@ -285,6 +295,15 @@ same(
 const formalDigest = sha256(formalBytes);
 const jsonDigest = sha256(jsonBytes);
 const recursiveDigest = sha256(first.recursiveSetBytes);
+
+same(formalDigest, EXPECTED_FORMAL_SHA256, "approved FORMAL digest");
+same(jsonDigest, EXPECTED_JSON_SHA256, "approved JSON digest");
+same(recursiveDigest, EXPECTED_RECURSIVE_SET_SHA256, "recursive set digest");
+same(
+  new TextDecoder().decode(first.recursiveSetBytes),
+  new TextDecoder().decode(expectedRecursiveSetBytes),
+  "persisted recursive set matches computed canonical member listing",
+);
 
 console.log([
   "MTS_V015_TWO_ROLE_APPROVED_RECURSIVE=GREEN",
