@@ -1396,6 +1396,8 @@ The Author-approved two-role meta-rule JSON and the grounded zero-role candidate
 
 Evidence: `ts/test/v015-native-source-anet-denotation-das-a2.test.ts`, CI run `37298755977` on evidence head `6834291694318ac3929af220cf64c20c208c689e`.
 
+Scope boundary: this is the **Link-native resolver kernel + direct-JSON/DAS replay**, not yet the final FORMAL text Grammar. `v015-formal-decoder.ts` still rejects `:` inside names, so FORMAL surface parsing, namespace-path lowering and convergence onto this same resolver remain OPEN under #1901/#1911. The bounded `contextualPath` helper inside DAS-A2 is a falsification fixture, not semantic Grammar authority.
+
 Owner: **#1901**, requirement **V15-NAME-01**.
 
 ## 16e. Rule kind is derived from role cardinality
