@@ -678,6 +678,30 @@
       }
     },
     {
+      "id": "V15-GAMMA-01",
+      "group": "GAMMA",
+      "ownerIssue": "#2001",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "One generalized reaction Γ is the shared semantic execution operation for ordinary executable ANets, meta/interpreter ANets and the native aprover ANet; no consumer-specific semantic opcode is permitted.",
+      "dependsOn": [
+        "V15-CLOSE-03",
+        "V15-CTX-01"
+      ],
+      "authority": {
+        "issue": 2001
+      },
+      "evidence": {
+        "positiveVectors": [
+          "grounded-zero-role-is-generic-refinement"
+        ],
+        "negativeVectors": [
+          "proof-specific-opcode-forbidden"
+        ],
+        "requiredExecutableGates": []
+      }
+    },
+    {
       "id": "V15-PROOF-EXEC-01",
       "group": "PROOF_EXEC",
       "ownerIssue": "#2003",
