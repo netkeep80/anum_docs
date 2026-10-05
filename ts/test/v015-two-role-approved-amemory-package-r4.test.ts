@@ -190,8 +190,7 @@ function lowerNativeRoleBundleToLegacy(
   const rulePoles = memory.poles(rule);
   const roleAnchor = rulePoles.start;
   const canonicalRoles = [...members]
-    .filter((member) => memory.poles(member).start === roleAnchor)
-    .sort((a, b) => a - b);
+    .filter((member) => memory.poles(member).start === roleAnchor);
   same(canonicalRoles.length, 2, "two canonical role members");
 
   const body = memory.poles(rulePoles.end);
