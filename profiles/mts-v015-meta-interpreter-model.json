@@ -1119,7 +1119,7 @@
         "lean4": "proofs/lean4/MtsV015GeneralizedReaction.lean",
         "rocq": "proofs/coq/MtsV015GeneralizedReaction.v",
         "assurance": "proofs/v015-external-proof-assurance.json",
-        "manifest": "proofs/evidence/v015-gpr07-zero-role-refinement.json",
+        "manifest": "proofs/v015-evidence/gpr07-zero-role-refinement.json",
         "ciRun": 37335710302,
         "globalAxiomAllowlist": []
       },
