@@ -651,6 +651,13 @@ const DIRECT_BODY = absoluteName("Body");
 const DIRECT_E = absoluteName("E");
 const DIRECT_K = absoluteName("K");
 
+const DIRECT_V_COLON_X = contextualPath("V:X");
+const DIRECT_V_ARROW_X = memory.ensure(DIRECT_V, DIRECT_X);
+assert(
+  DIRECT_V_COLON_X !== DIRECT_V_ARROW_X,
+  "contextual qualification V:X must not collapse into Link construction V->X",
+);
+
 const DIRECT_RULE_NAME = absoluteName("Rule");
 const DIRECT_CURRENT_ALIAS = absoluteName("Current");
 const DIRECT_ONE_R_NAME = absoluteName("OneR");
@@ -1254,6 +1261,7 @@ console.log([
   "CONTEXTUAL_NAME_ABSOLUTE_ROOT_EQUIVALENCE=GREEN",
   "CONTEXTUAL_NAME_RESOLVE_READ_ONLY=TRUE",
   "CONTEXTUAL_NAME_MISSING_FAIL_CLOSED=TRUE",
+  "CONTEXT_QUALIFICATION_NE_LINK_CONSTRUCTION=TRUE",
   "HOST_GLOBAL_ATOM_NAMESPACE_AUTHORITY=FALSE",
   "SAME_SPELLING_DIFFERENT_CONTEXT=TRUE",
   "NESTED_CONTEXTUAL_PATH=SUPPORTED",
