@@ -62,7 +62,7 @@ theorem FRM_02_root_source_role_separation
     semanticMembers pair none (.bare value) = [value] ∧
     semanticMembers pair none (.binding name value) = [] ∧
     semanticMembers pair none (.emptyBundle name) = [] := by
-  rfl
+  simp [semanticMembers]
 
 /--
 FRM-02b: inside an explicit context, bare values and local names publish the
@@ -78,7 +78,7 @@ theorem FRM_02_nested_source_role_membership
         [pair context name] ∧
     semanticMembers pair (some context) (.emptyBundle name) =
         [pair context name] := by
-  rfl
+  simp [semanticMembers]
 
 def directSequentialAssociation {Link : Type}
     (pair : Link → Link → Link) : List Link → Option Link
