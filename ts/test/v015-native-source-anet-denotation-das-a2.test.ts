@@ -375,8 +375,8 @@ same(forward.members.size, 7, "duplicate bare denotation converges extensionally
 assert(
   forward.bindings.some((binding) =>
     binding.coordinate === null &&
-    binding.name === RULE_NAME &&
-    binding.value === Rule
+    binding.name === DIRECT_RULE_NAME &&
+    binding.value === DIRECT_RULE
   ),
   "root Rule binding preserved as metamodel projection",
 );
@@ -864,14 +864,20 @@ const direct = denoteNativeResolvedSourceAnet(
   directSource,
 );
 
+const DIRECT_RULE = memory.ensure(DIRECT_V, DIRECT_BODY);
+const DIRECT_CURRENT = memory.ensure(DIRECT_E, DIRECT_K);
+const DIRECT_VX = memory.ensure(DIRECT_V, DIRECT_X);
+const DIRECT_VY = memory.ensure(DIRECT_V, DIRECT_Y);
+const DIRECT_ADMISSION = memory.ensure(DIRECT_THEORY, DIRECT_RULE);
+
 setSame(
   direct.members,
-  [VX, VY, admission, current],
+  [DIRECT_VX, DIRECT_VY, DIRECT_ADMISSION, DIRECT_CURRENT],
   "direct JSON -> native source ANet -> semantic ANet",
 );
 
 assert(
-  !direct.members.has(Rule),
+  !direct.members.has(DIRECT_RULE),
   "direct JSON Rule binding is metamodel-only",
 );
 assert(
@@ -891,8 +897,8 @@ assert(
 assert(
   direct.bindings.some((binding) =>
     binding.coordinate === null &&
-    binding.name === CURRENT_ALIAS &&
-    binding.value === current
+    binding.name === DIRECT_CURRENT_ALIAS &&
+    binding.value === DIRECT_CURRENT
   ),
   "direct JSON preserves Current binding",
 );
@@ -905,7 +911,7 @@ assert(twoRCarrier !== oneRCarrier, "ExactSequence [R,R] is distinct from [R]");
 assert(
   direct.bindings.some((binding) =>
     binding.coordinate === null &&
-    binding.name === ONE_R_NAME &&
+    binding.name === DIRECT_ONE_R_NAME &&
     binding.value === oneRCarrier
   ),
   "direct JSON OneR uses ExactSequence",
@@ -913,7 +919,7 @@ assert(
 assert(
   direct.bindings.some((binding) =>
     binding.coordinate === null &&
-    binding.name === TWO_R_NAME &&
+    binding.name === DIRECT_TWO_R_NAME &&
     binding.value === twoRCarrier
   ),
   "direct JSON TwoR preserves second R position",
@@ -921,7 +927,7 @@ assert(
 assert(
   direct.bindings.some((binding) =>
     binding.coordinate === null &&
-    binding.name === NESTED_EMPTY_NAME &&
+    binding.name === DIRECT_NESTED_EMPTY_NAME &&
     binding.value === oneRCarrier
   ),
   "direct JSON [[]] composes inner []=R to ExactSequence [R]",
@@ -981,7 +987,7 @@ const noCurrentDirect = denoteNativeResolvedSourceAnet(
   compileDirectJsonToNativeSourceAnet(noCurrentDirectJson),
 );
 assert(
-  !noCurrentDirect.members.has(current),
+  !noCurrentDirect.members.has(DIRECT_CURRENT),
   "direct JSON binding/physical E->K without bare member is not current",
 );
 
@@ -1027,15 +1033,15 @@ const metaRuleDenotation = denoteNativeResolvedSourceAnet(
   metaRuleSource,
 );
 
-const roleX = memory.ensure(V, X);
-const roleY = memory.ensure(V, Y);
+const roleX = memory.ensure(DIRECT_V, DIRECT_X);
+const roleY = memory.ensure(DIRECT_V, DIRECT_Y);
 const pairXY = memory.ensure(roleX, roleY);
 const antecedent = memory.ensure(DIRECT_TAG, pairXY);
 const output = memory.ensure(roleY, roleX);
 const image = materializeExactSequence(memory, [output]);
 const metaBody = memory.ensure(antecedent, image);
-const metaRule = memory.ensure(V, metaBody);
-const metaAdmission = memory.ensure(Theory, metaRule);
+const metaRule = memory.ensure(DIRECT_V, metaBody);
+const metaAdmission = memory.ensure(DIRECT_THEORY, metaRule);
 
 setSame(
   metaRuleDenotation.members,
@@ -1058,7 +1064,7 @@ for (const helper of [
 }
 
 const discoveredRoles = [...metaRuleDenotation.members].filter((member) =>
-  memory.poles(member).start === V
+  memory.poles(member).start === DIRECT_V
 );
 setSame(
   new Set(discoveredRoles),
@@ -1118,7 +1124,7 @@ const groundedRuleDenotation = denoteNativeResolvedSourceAnet(
 const groundedImage = materializeExactSequence(memory, [DIRECT_GB]);
 const groundedBody = memory.ensure(DIRECT_GA, groundedImage);
 const groundedRule = memory.ensure(DIRECT_V0, groundedBody);
-const groundedAdmission = memory.ensure(Theory, groundedRule);
+const groundedAdmission = memory.ensure(DIRECT_THEORY, groundedRule);
 
 setSame(
   groundedRuleDenotation.members,
