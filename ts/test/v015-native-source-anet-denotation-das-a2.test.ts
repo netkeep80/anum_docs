@@ -12,6 +12,11 @@ import {
   type NativeSyntaxGrammarRuleSpec,
 } from "../src/native-syntax-grammar.js";
 import { StructuralRuleError } from "../src/structural-rule.js";
+import {
+  materializeV015ContextualNamePath,
+  resolveV015ContextualNameCoordinate,
+} from "../src/v015-link-definition.js";
+import { materializeV012StringAnum } from "../src/v012-string-anum.js";
 import { unifyStructuralRuleTemplate } from "../src/structural-unification.js";
 import { instantiateV013StructuralTemplate } from "../src/v013-structural-execution.js";
 import {
