@@ -11,6 +11,7 @@ import {
   readNativeSyntaxGrammar,
   type NativeSyntaxGrammarRuleSpec,
 } from "../src/native-syntax-grammar.js";
+import { StructuralRuleError } from "../src/structural-rule.js";
 import { unifyStructuralRuleTemplate } from "../src/structural-unification.js";
 import { instantiateV013StructuralTemplate } from "../src/v013-structural-execution.js";
 import {
@@ -563,9 +564,17 @@ const Body = memory.poles(Rule).end;
 const DIRECT_TAG = fresh();
 const DIRECT_A = fresh();
 const DIRECT_B = fresh();
+const DIRECT_V0 = fresh();
+const DIRECT_GA = fresh();
+const DIRECT_GB = fresh();
+const DIRECT_OTHER = fresh();
 
 const directAtoms = new Map<string, LinkHandle>([
   ["Tag", DIRECT_TAG],
+  ["V0", DIRECT_V0],
+  ["GA", DIRECT_GA],
+  ["GB", DIRECT_GB],
+  ["Other", DIRECT_OTHER],
   ["R", basis.R],
   ["Theory", Theory],
   ["V", V],
@@ -584,6 +593,11 @@ const OUTPUT_NAME = fresh();
 const IMAGE_NAME = fresh();
 const META_BODY_NAME = fresh();
 const META_RULE_NAME = fresh();
+const GROUND_ANTECEDENT_NAME = fresh();
+const GROUND_OUTPUT_NAME = fresh();
+const GROUND_IMAGE_NAME = fresh();
+const GROUND_BODY_NAME = fresh();
+const GROUND_RULE_NAME = fresh();
 
 const ONE_R_NAME = fresh();
 const TWO_R_NAME = fresh();
@@ -604,6 +618,11 @@ const directNameCarriers = new Map<string, LinkHandle>([
   ["Image", IMAGE_NAME],
   ["MetaBody", META_BODY_NAME],
   ["MetaRule", META_RULE_NAME],
+  ["GroundAntecedent", GROUND_ANTECEDENT_NAME],
+  ["GroundOutput", GROUND_OUTPUT_NAME],
+  ["GroundImage", GROUND_IMAGE_NAME],
+  ["GroundBody", GROUND_BODY_NAME],
+  ["GroundRule", GROUND_RULE_NAME],
 ]);
 
 function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
@@ -964,6 +983,90 @@ assert(
   "meta-rule JSON publishes Theory->Rule admission",
 );
 
+
+
+const groundedRuleJson = [
+  "{",
+  "  \"V0\": {},",
+  "  \"GroundAntecedent\": \"GA\",",
+  "  \"GroundOutput\": \"GB\",",
+  "  \"GroundImage\": [\"GroundOutput\"],",
+  "  \"GroundBody\": \"GroundAntecedent->GroundImage\",",
+  "  \"GroundRule\": \"V0->GroundBody\",",
+  "  \"Theory->GroundRule\": null",
+  "}",
+].join("\n");
+
+const groundedRuleSource =
+  compileDirectJsonToNativeSourceAnet(groundedRuleJson);
+const groundedRuleDenotation = denoteNativeResolvedSourceAnet(
+  memory,
+  grammarRoot,
+  profile,
+  groundedRuleSource,
+);
+
+const groundedImage = materializeExactSequence(memory, [DIRECT_GB]);
+const groundedBody = memory.ensure(DIRECT_GA, groundedImage);
+const groundedRule = memory.ensure(DIRECT_V0, groundedBody);
+const groundedAdmission = memory.ensure(Theory, groundedRule);
+
+setSame(
+  groundedRuleDenotation.members,
+  [groundedAdmission],
+  "grounded JSON semantic ANet contains admission only",
+);
+
+const groundedRoles = [...groundedRuleDenotation.members].filter((member) =>
+  memory.poles(member).start === DIRECT_V0
+);
+same(groundedRoles.length, 0, "empty V0 yields zero bindable roles");
+
+const groundedBindings = unifyStructuralRuleTemplate(
+  memory,
+  DIRECT_GA,
+  DIRECT_GA,
+  groundedRoles,
+);
+same(
+  groundedBindings.length,
+  0,
+  "grounded exact match produces no variable bindings",
+);
+
+const groundedInstantiated = instantiateV013StructuralTemplate(
+  memory,
+  DIRECT_GB,
+  groundedBindings,
+);
+same(
+  groundedInstantiated,
+  DIRECT_GB,
+  "grounded exact output is identity instantiation",
+);
+
+let groundedMismatch = false;
+try {
+  unifyStructuralRuleTemplate(
+    memory,
+    DIRECT_GA,
+    DIRECT_OTHER,
+    groundedRoles,
+  );
+} catch (error) {
+  groundedMismatch = error instanceof StructuralRuleError &&
+    error.code === "template-mismatch";
+}
+assert(
+  groundedMismatch,
+  "zero-role grounded rule rejects non-identical antecedent",
+);
+
+assert(
+  groundedRuleDenotation.members.has(groundedAdmission),
+  "grounded JSON publishes Theory->GroundRule admission",
+);
+
 for (const bad of [
   "null",
   "[null]",
@@ -1017,7 +1120,13 @@ console.log([
   "META_RULE_SEMANTIC_MEMBERS=ROLES_PLUS_ADMISSION_ONLY",
   "META_RULE_HELPER_BINDINGS_ERASE_BEFORE_EXECUTION=TRUE",
   "META_RULE_STRUCTURAL_SWAP=GREEN",
-  "META_RULE_ARTIFACT_APPROVAL=AUTHOR_REVIEW_REQUIRED",
+  "META_RULE_ARTIFACT_APPROVAL=AUTHOR_APPROVED",
+  "JSON_GROUNDED_EMPTY_ROLE_RULE=GREEN_RESEARCH",
+  "GROUNDED_SEMANTIC_MEMBERS=ADMISSION_ONLY",
+  "GROUNDED_ROLE_COUNT=0",
+  "GROUNDED_EXACT_MATCH=IDENTITY",
+  "GROUNDED_NONIDENTICAL_MATCH=REJECT",
+  "GROUNDED_RULE_ARTIFACT_APPROVAL=AUTHOR_REVIEW_REQUIRED",
   "CONCRETE_LOGIC_ARTIFACT_APPROVAL=STILL_REQUIRED",
   "FINAL_JSON_SURFACE=AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
 ].join(" "));
