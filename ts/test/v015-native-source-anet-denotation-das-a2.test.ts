@@ -11,6 +11,8 @@ import {
   readNativeSyntaxGrammar,
   type NativeSyntaxGrammarRuleSpec,
 } from "../src/native-syntax-grammar.js";
+import { unifyStructuralRuleTemplate } from "../src/structural-unification.js";
+import { instantiateV013StructuralTemplate } from "../src/v013-structural-execution.js";
 import {
   SyntaxAsetBuilder,
   readSyntaxAset,
@@ -558,7 +560,12 @@ class StrictDirectJsonReader {
 
 const Body = memory.poles(Rule).end;
 
+const DIRECT_TAG = fresh();
+const DIRECT_A = fresh();
+const DIRECT_B = fresh();
+
 const directAtoms = new Map<string, LinkHandle>([
+  ["Tag", DIRECT_TAG],
   ["R", basis.R],
   ["Theory", Theory],
   ["V", V],
@@ -568,6 +575,15 @@ const directAtoms = new Map<string, LinkHandle>([
   ["E", E],
   ["K", K],
 ]);
+
+const ROLE_X_NAME = fresh();
+const ROLE_Y_NAME = fresh();
+const PAIR_XY_NAME = fresh();
+const ANTECEDENT_NAME = fresh();
+const OUTPUT_NAME = fresh();
+const IMAGE_NAME = fresh();
+const META_BODY_NAME = fresh();
+const META_RULE_NAME = fresh();
 
 const ONE_R_NAME = fresh();
 const TWO_R_NAME = fresh();
@@ -580,6 +596,14 @@ const directNameCarriers = new Map<string, LinkHandle>([
   ["OneR", ONE_R_NAME],
   ["TwoR", TWO_R_NAME],
   ["NestedEmpty", NESTED_EMPTY_NAME],
+  ["RoleX", ROLE_X_NAME],
+  ["RoleY", ROLE_Y_NAME],
+  ["PairXY", PAIR_XY_NAME],
+  ["Antecedent", ANTECEDENT_NAME],
+  ["Output", OUTPUT_NAME],
+  ["Image", IMAGE_NAME],
+  ["MetaBody", META_BODY_NAME],
+  ["MetaRule", META_RULE_NAME],
 ]);
 
 function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
@@ -847,6 +871,99 @@ for (const bad of [
   assert(rejected, "duplicate decoded JSON key fails closed");
 }
 
+
+
+const metaRuleJson = [
+  "{",
+  "  \"V\": {",
+  "    \"X\": null,",
+  "    \"Y\": null",
+  "  },",
+  "  \"RoleX\": \"V->X\",",
+  "  \"RoleY\": \"V->Y\",",
+  "  \"PairXY\": \"RoleX->RoleY\",",
+  "  \"Antecedent\": \"Tag->PairXY\",",
+  "  \"Output\": \"RoleY->RoleX\",",
+  "  \"Image\": [\"Output\"],",
+  "  \"MetaBody\": \"Antecedent->Image\",",
+  "  \"MetaRule\": \"V->MetaBody\",",
+  "  \"Theory->MetaRule\": null",
+  "}",
+].join("\n");
+
+const metaRuleSource = compileDirectJsonToNativeSourceAnet(metaRuleJson);
+const metaRuleDenotation = denoteNativeResolvedSourceAnet(
+  memory,
+  grammarRoot,
+  profile,
+  metaRuleSource,
+);
+
+const roleX = memory.ensure(V, X);
+const roleY = memory.ensure(V, Y);
+const pairXY = memory.ensure(roleX, roleY);
+const antecedent = memory.ensure(DIRECT_TAG, pairXY);
+const output = memory.ensure(roleY, roleX);
+const image = materializeExactSequence(memory, [output]);
+const metaBody = memory.ensure(antecedent, image);
+const metaRule = memory.ensure(V, metaBody);
+const metaAdmission = memory.ensure(Theory, metaRule);
+
+setSame(
+  metaRuleDenotation.members,
+  [roleX, roleY, metaAdmission],
+  "meta-rule JSON erases helper bindings and keeps roles + admission",
+);
+
+for (const helper of [
+  pairXY,
+  antecedent,
+  output,
+  image,
+  metaBody,
+  metaRule,
+]) {
+  assert(
+    !metaRuleDenotation.members.has(helper),
+    "meta-rule helper/model Link is not implicit semantic membership",
+  );
+}
+
+const discoveredRoles = [...metaRuleDenotation.members].filter((member) =>
+  memory.poles(member).start === V
+);
+setSame(
+  new Set(discoveredRoles),
+  [roleX, roleY],
+  "meta-rule JSON exposes exactly the two bindable role members",
+);
+
+const actualPair = memory.ensure(DIRECT_A, DIRECT_B);
+const actualAntecedent = memory.ensure(DIRECT_TAG, actualPair);
+const bindings = unifyStructuralRuleTemplate(
+  memory,
+  antecedent,
+  actualAntecedent,
+  discoveredRoles,
+);
+same(bindings.length, 2, "meta-rule JSON produces two structural bindings");
+
+const instantiated = instantiateV013StructuralTemplate(
+  memory,
+  output,
+  bindings,
+);
+same(
+  instantiated,
+  memory.ensure(DIRECT_B, DIRECT_A),
+  "meta-rule JSON structural output swaps the matched pair",
+);
+
+assert(
+  metaRuleDenotation.members.has(metaAdmission),
+  "meta-rule JSON publishes Theory->Rule admission",
+);
+
 for (const bad of [
   "null",
   "[null]",
@@ -896,6 +1013,11 @@ console.log([
   "ESCAPED_DUPLICATE_JSON_KEY=FAIL_CLOSED",
   "TOP_LEVEL_NULL=FAIL_CLOSED",
   "ARRAY_NULL=FAIL_CLOSED",
+  "JSON_NATIVE_ROLE_BUNDLE_META_RULE=GREEN_RESEARCH",
+  "META_RULE_SEMANTIC_MEMBERS=ROLES_PLUS_ADMISSION_ONLY",
+  "META_RULE_HELPER_BINDINGS_ERASE_BEFORE_EXECUTION=TRUE",
+  "META_RULE_STRUCTURAL_SWAP=GREEN",
+  "META_RULE_ARTIFACT_APPROVAL=AUTHOR_REVIEW_REQUIRED",
   "CONCRETE_LOGIC_ARTIFACT_APPROVAL=STILL_REQUIRED",
   "FINAL_JSON_SURFACE=AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
 ].join(" "));
