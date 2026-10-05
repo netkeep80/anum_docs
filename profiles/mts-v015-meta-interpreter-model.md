@@ -976,7 +976,7 @@ Exact grounded Modus Ponens должен быть формально доказ�
 
 **Author decision 2026-10-05: APPROVED AS v0.15 DESIGN DIRECTION, PROOF PENDING.**
 
-Одобрена именно Link-native архитектура ниже. Это ещё не утверждение теоремы и не approval конкретной JSON-записи.
+Одобрена именно Link-native архитектура ниже. Это ещё не утверждение теоремы. Отдельно ниже зафиксирован уже состоявшийся Author approval первого точного two-role meta-rule JSON; он не распространяется на другие JSON-артефакты.
 
 A9 теперь содержит отдельный исполняемый эксперимент, не меняющий сам `Γ`.
 
@@ -1050,38 +1050,43 @@ Executable witness уже подтвердил: `Tag->(A->B)` связывает
 
 **Author decision 2026-10-05:** этот точный JSON-артефакт принят. Это не распространяет approval автоматически на другие logical/proof JSON.
 
-Здесь предполагается:
+Для **уже одобренного exact artifact** действует следующая интерпретация:
 
-- nested object `V` — anchored Aset ролей;
-- `V:X` и `V:Y` — qualified contextual role-member Links;
-- `R` — лишь удобное имя обычной Link `V->Body`;
-- `Theory->R` — прямой bare Aset-member admission;
+- nested object `V` — anchored ANet ролей;
+- `V->X` и `V->Y` — обычные role-member Links, входящие в semantic ANet;
+- `RoleX`, `RoleY`, `PairXY`, `Antecedent`, `Output`, `Image`, `MetaBody`, `MetaRule` — metamodel bindings и сами по себе не добавляют membership;
+- `Theory->MetaRule` — bare admission member;
 - никаких `Rule`, `pattern`, `bind`, `instantiate`, `active` JSON-тегов нет.
 
-Grounded special case:
+Отдельный grounded zero-role artifact пока **не Author-approved**. Текущий GREEN candidate:
 
 ```json
 {
   "V0": {},
-  "R0": "V0->(A->[B])",
-  "Theory->R0": null
+  "GroundAntecedent": "GA",
+  "GroundOutput": "GB",
+  "GroundImage": ["GroundOutput"],
+  "GroundBody": "GroundAntecedent->GroundImage",
+  "GroundRule": "V0->GroundBody",
+  "Theory->GroundRule": null
 }
 ```
 
-Пустой `{}` здесь принципиально полезен: он задаёт явный пустой role-bundle, то есть точное grounded rule без bindable roles.
+После common resolver + DAS его semantic ANet должна содержать только `Theory->GroundRule`; `V0` существует как пустой role-bundle с нулём members. Exact artifact остаётся под отдельным Author gate.
 
 Denotation/lowering owner: **#2002**.
 
-После архитектурного Author approval остаются обязательными:
+После Author approval two-role artifact остаются обязательными:
 
-1. exact lowering nested `V{}` в нужные contextual member Links;
-2. bare structured key + `null` как прямое Aset membership;
-3. alpha-renaming имён `V/R/X/Y`;
-4. отсутствие ложных roles при ordinary bundle-members;
-5. полный historical A72r execution differential (трёхролевый рекурсивный shape уже GREEN research);
-6. proof/theorem FORMAL, чтобы не получить executable-only синтаксис.
+1. настоящий contextual-name resolver с законом `:A ≡ R:A` без host-global namespace;
+2. replay approved meta-rule через этот resolver без изменения semantic ANet/behavior;
+3. полный #1978 chain: exact FORMAL artifact + digest → recursive 8/9/6/1 + digest → fresh frozen A-memory replay;
+4. grounded zero-role differential и отдельный Author review exact grounded JSON;
+5. alpha-renaming / same-spelling-different-context falsifiers;
+6. полный historical A72r execution differential;
+7. proof/theorem FORMAL, чтобы не получить executable-only синтаксис.
 
-Конкретная JSON surface-форма (`V`, `R`, `Theory->R` как показано выше) **не одобрена автоматически** этим решением и остаётся под отдельным Author gate после #2002.
+Первый two-role meta-rule JSON уже Author-approved как **точный source artifact**; его full regression evidence всё ещё pending и не должна подменяться placeholder digest/result.
 
 ## 16b. DAS-A1 — resolved metamodel → denoted semantic ANet
 
