@@ -1404,9 +1404,20 @@ match(GA, Other, ∅) -> reject
 
 Therefore grounded exact matching is not a second mechanism: it is the zero-role refinement of the same native role-bundle Rule topology and same generic structural matcher/constructor.
 
-Status: **AUTHOR-APPROVED SOURCE ARTIFACT / REGRESSION EVIDENCE PENDING**.
+Status: **AUTHOR-APPROVED SOURCE ARTIFACT / RECURSIVE EVIDENCE GREEN / A-MEMORY REPLAY PENDING**.
 
-Это означает: точная JSON-запись принята. Её FORMAL-проекция, digest, рекурсивное представление 8/9/6/1 и свежий прогон через замороженную A-memory всё ещё должны быть получены и зафиксированы по #1978.
+Точная JSON-запись принята. Теперь зафиксированы и проверяются CI:
+
+- JSON: `formal/v0.15/regression/grounded-zero-role.json`, SHA-256 `d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61`;
+- FORMAL-проекция: `formal/v0.15/regression/grounded-zero-role.formal`, SHA-256 `b0e5760786c900ab125f775f9f30d897336220ee2393f3c0e3fd5cff2296d51a`;
+- обе поверхности строят **точно один и тот же native source ANet**;
+- semantic ANet содержит ровно `Theory->GroundRule`;
+- канонический recursive 8/9/6/1 сохранён как `formal/v0.15/regression/grounded-zero-role.recursive`;
+- recursive SHA-256: `570950556cc0703a915c39e4e6f181ed55103f13544f8f8a1a5e25a099f76b11`;
+- two-Memory recursive parity: **GREEN**;
+- executable witness: `ts/test/v015-grounded-approved-recursive-r1.test.ts`, CI `37321650052` SUCCESS.
+
+Остаётся последняя часть цепочки #1978 для этого артефакта: свежий прогон полученного recursive-пакета через замороженную A-memory `0.175.0` / adapter #482 и фиксация нормализованного результата.
 ## 16d. Contextual names and absolute-root shorthand
 
 Author-approved v0.15 name-resolution direction:
