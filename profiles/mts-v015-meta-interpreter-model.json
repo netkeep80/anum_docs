@@ -891,6 +891,38 @@
     },
     "nextGate": "Direct FORMAL must reconstruct the same block/bare/binding/bundle native source ANet, including V0:{} and bare Theory->GroundRule; then the Author-approved grounded artifact can enter the full #1978 FORMAL/digest/recursive/A-memory chain."
   },
+  "directFormalSourceMapping": {
+    "status": "GREEN_RESEARCH_EXACT_JSON_SOURCE_PARITY",
+    "productionPath": [
+      "ts/src/v015-direct-formal-source.ts",
+      "ts/src/v015-direct-source.ts",
+      "ts/src/v015-source-anet.ts"
+    ],
+    "sharedLoweringLaw": "Direct FORMAL and direct JSON are syntax-only projections into the same V015DirectSourceEntry model, then the same block/bare/binding/bundle native source ANet and the same DAS denotation.",
+    "supportedSurface": [
+      "{ A } -> bare source member",
+      "{ A : X } -> source binding",
+      "{ A : [] } -> ExactSequence binding",
+      "{ A : {...} } -> anchored nested bundle"
+    ],
+    "groundedExactFormalCandidate": "{\n  V0 : {},\n  GroundAntecedent : GA,\n  GroundOutput : GB,\n  GroundImage : [GroundOutput],\n  GroundBody : GroundAntecedent->GroundImage,\n  GroundRule : V0->GroundBody,\n  Theory->GroundRule\n}",
+    "executableEvidence": {
+      "test": "ts/test/v015-direct-formal-source-b20.test.ts",
+      "head": "1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
+      "ciRun": 37317390018,
+      "pagesRun": 37317390059,
+      "result": "SUCCESS",
+      "findings": [
+        "Author-approved grounded JSON and direct FORMAL reconstruct the exact same native source ANet",
+        "JSON and FORMAL denotations produce the same semantic ANet",
+        "V0:{} yields zero roles through the common path",
+        "grounded exact match and mismatch behavior are unchanged",
+        "{}, {A}, {A:{}}, {A:[]} remain distinct source identities",
+        "equivalent JSON and FORMAL source-role forms produce identical native source ANets"
+      ]
+    },
+    "remainingBoundary": "This establishes exact source-ANet parity for the grounded artifact candidate, but does not yet provide the #1978 formalSourceDigest, recursive 8/9/6/1 artifact/digest, or fresh frozen A-memory replay. Ambiguous bare relative contextual paths at block-entry position remain deliberately outside this bounded parser until Grammar chooses an unambiguous form."
+  },
   "jsonArrayCarrier": {
     "status": "AUTHOR_APPROVED_DESIGN_GREEN_RESEARCH",
     "authorDecision": {
@@ -965,7 +997,7 @@
       ]
     },
     "implication": "Grounded exact matching is supported as the zero-role refinement of the same Author-approved native role-bundle Rule topology and same generic matcher/constructor.",
-    "remainingGate": "Author gate is closed for this exact JSON source artifact. Full #1978 evidence chain (exact FORMAL + digest -> recursive 8/9/6/1 + digest -> fresh frozen A-memory replay) and theorem/proof closure #2001 remain pending."
+    "remainingGate": "Author gate is closed for this exact JSON source artifact. Direct FORMAL -> exact same native source ANet parity is GREEN on 1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a. Full #1978 evidence still requires persisted exact FORMAL + digest -> recursive 8/9/6/1 + digest -> fresh frozen A-memory replay; theorem/proof closure #2001 remains pending."
   },
   "contextualNameResolution": {
     "status": "AUTHOR_APPROVED_DESIGN_GREEN_ROOT_FORMAL_SURFACE_PROOF_PENDING",
