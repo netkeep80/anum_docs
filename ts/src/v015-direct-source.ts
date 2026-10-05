@@ -218,18 +218,127 @@ export function compileV015DirectSourceEntries(
     return resolveName(trimmed);
   };
 
-  const resolveExpr = (source: string): LinkHandle => {
-    const parts = source.split("->").map((part) => part.trim());
-    if (parts.length === 0 || parts.some((part) => part.length === 0)) {
-      return fail("invalid-shape");
+  /**
+   * Direct structural FORMAL expression reader.
+   *
+   * This restores the already accepted ostensive v0.14 structural forms
+   * without introducing a second ontology or enabling recursive bindings:
+   *
+   *   ∞       = ROOT
+   *   ♂S      = START(S)
+   *   S♀      = END(S)
+   *   A⟼B     = PAIR(A,B)
+   *
+   * ASCII "->" remains the v0.15 direct Link constructor and keeps Direct
+   * Sequential Association: A->B->C = (A->B)->C. Parentheses only group the
+   * structural expression. Contextual ':' remains part of an atom/name path.
+   */
+  class StructuralExpressionReader {
+    private index = 0;
+
+    constructor(private readonly source: string) {}
+
+    read(): LinkHandle {
+      this.space();
+      const value = this.pairChain();
+      this.space();
+      if (this.index !== this.source.length) fail("invalid-shape");
+      return value;
     }
 
-    let current = resolveEndpoint(parts[0]!);
-    for (let index = 1; index < parts.length; index += 1) {
-      current = memory.ensure(current, resolveEndpoint(parts[index]!));
+    private space(): void {
+      while (
+        this.index < this.source.length &&
+        /[\x20\x09\x0a\x0d]/u.test(this.source[this.index]!)
+      ) {
+        this.index += 1;
+      }
     }
-    return current;
-  };
+
+    private pairChain(): LinkHandle {
+      let current = this.unary();
+      while (true) {
+        this.space();
+        if (this.source.startsWith("->", this.index)) {
+          this.index += 2;
+        } else if (this.source[this.index] === "⟼") {
+          this.index += 1;
+        } else {
+          return current;
+        }
+        const right = this.unary();
+        current = memory.ensure(current, right);
+      }
+    }
+
+    private unary(): LinkHandle {
+      this.space();
+
+      let startDepth = 0;
+      while (this.source[this.index] === "♂") {
+        startDepth += 1;
+        this.index += 1;
+        this.space();
+      }
+
+      let value = this.primary();
+
+      this.space();
+      while (this.source[this.index] === "♀") {
+        value = memory.ensureEndSelfClosed(value);
+        this.index += 1;
+        this.space();
+      }
+
+      while (startDepth > 0) {
+        value = memory.ensureStartSelfClosed(value);
+        startDepth -= 1;
+      }
+      return value;
+    }
+
+    private primary(): LinkHandle {
+      this.space();
+      const ch = this.source[this.index];
+
+      if (ch === "∞") {
+        this.index += 1;
+        return verified.R;
+      }
+
+      if (ch === "(") {
+        this.index += 1;
+        const value = this.pairChain();
+        this.space();
+        if (this.source[this.index] !== ")") fail("invalid-shape");
+        this.index += 1;
+        return value;
+      }
+
+      const start = this.index;
+      while (this.index < this.source.length) {
+        if (
+          this.source.startsWith("->", this.index) ||
+          this.source[this.index] === "⟼" ||
+          this.source[this.index] === "♂" ||
+          this.source[this.index] === "♀" ||
+          this.source[this.index] === "(" ||
+          this.source[this.index] === ")" ||
+          /[\x20\x09\x0a\x0d]/u.test(this.source[this.index]!)
+        ) {
+          break;
+        }
+        this.index += 1;
+      }
+
+      const atom = this.source.slice(start, this.index).trim();
+      if (atom.length === 0) fail("invalid-shape");
+      return resolveEndpoint(atom);
+    }
+  }
+
+  const resolveExpr = (source: string): LinkHandle =>
+    new StructuralExpressionReader(source).read();
 
   const resolveSequenceItem = (
     item: V015DirectSourceSequenceItem,
