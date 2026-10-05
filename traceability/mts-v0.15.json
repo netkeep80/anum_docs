@@ -36,112 +36,112 @@
     "ownerIssue": 1978,
     "entries": [
       {
-            "id": "grounded-zero-role-rule",
-            "kind": "EXECUTABLE",
-            "authorApprovalEvidence": "netkeep80/anum_docs#1978 issuecomment-5994922633",
-            "formalSourceArtifact": "formal/v0.15/regression/grounded-zero-role.formal",
-            "formalSourceDigest": "b0e5760786c900ab125f775f9f30d897336220ee2393f3c0e3fd5cff2296d51a",
-            "canonicalJsonArtifact": "formal/v0.15/regression/grounded-zero-role.json",
-            "canonicalJsonDigest": "d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61",
-            "jsonProfileRevision": "direct-source-anet@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
-            "grammarProfileRevision": "v015-source-anet:block-bare-binding-bundle@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
-            "metacompilerRevision": "d7787f8d44e4dd98b2e812dfb163fe0bd35fd8d6",
-            "metacompilerProfile": "direct source ANet -> semantic ANet -> canonical v0.13 hierarchical 8/9/6/1",
-            "semanticEntry": "Theory->GroundRule",
-            "expectedRecursiveRepresentation": "formal/v0.15/regression/grounded-zero-role.recursive",
-            "expectedRecursiveDigest": "570950556cc0703a915c39e4e6f181ed55103f13544f8f8a1a5e25a099f76b11",
-            "amemoryExecutionProfile": "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d:formal_recursive_replay",
-            "amemoryReplayPackage": "formal/v0.15/regression/grounded-zero-role.amemory-package.json",
-            "amemoryReplayPackageDigest": "354be494b42c78d310a868144f5c63fec915fec932a01d1d36b274d79258fce4",
-            "amemoryReplayEvidence": "formal/v0.15/regression/grounded-zero-role.amemory-evidence.json",
-            "expectedSemanticResult": {
-                  "positive": {
-                        "rawRuleMatches": 1,
-                        "transitionedMembers": 1,
-                        "handoffCount": 1,
-                        "quiescent": false,
-                        "resultEqualsExpected": true
-                  },
-                  "negativeMismatch": {
-                        "rawRuleMatches": 0,
-                        "transitionedMembers": 0,
-                        "handoffCount": 0,
-                        "quiescent": true,
-                        "resultEqualsExpected": true
-                  }
-            },
-            "externalDependencies": {
-                  "amemoryMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
-                  "amemoryVersion": "0.175.0",
-                  "amemoryAdapterIssue": 482,
-                  "rustToolchain": "1.98.1"
-            },
-            "regressionEvidence": {
-                  "manifest": "formal/v0.15/regression/grounded-zero-role.evidence.json",
-                  "recursiveCiRun": 37321650052,
-                  "frozenAmemoryWorkflowRun": 37324057317,
-                  "exactPersistedAmemoryEvidenceMatch": true
-            },
-            "authorJsonReview": {
-                  "state": "APPROVED",
-                  "artifact": "formal/v0.15/regression/grounded-zero-role.json",
-                  "revisionOrDigest": "d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61",
-                  "decisionEvidence": "netkeep80/anum_docs#1978 issuecomment-5994922633"
-            }
+        "id": "grounded-zero-role-rule",
+        "kind": "EXECUTABLE",
+        "authorApprovalEvidence": "netkeep80/anum_docs#1978 issuecomment-5994922633",
+        "formalSourceArtifact": "formal/v0.15/regression/grounded-zero-role.formal",
+        "formalSourceDigest": "b0e5760786c900ab125f775f9f30d897336220ee2393f3c0e3fd5cff2296d51a",
+        "canonicalJsonArtifact": "formal/v0.15/regression/grounded-zero-role.json",
+        "canonicalJsonDigest": "d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61",
+        "jsonProfileRevision": "direct-source-anet@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
+        "grammarProfileRevision": "v015-source-anet:block-bare-binding-bundle@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
+        "metacompilerRevision": "d7787f8d44e4dd98b2e812dfb163fe0bd35fd8d6",
+        "metacompilerProfile": "direct source ANet -> semantic ANet -> canonical v0.13 hierarchical 8/9/6/1",
+        "semanticEntry": "Theory->GroundRule",
+        "expectedRecursiveRepresentation": "formal/v0.15/regression/grounded-zero-role.recursive",
+        "expectedRecursiveDigest": "570950556cc0703a915c39e4e6f181ed55103f13544f8f8a1a5e25a099f76b11",
+        "amemoryExecutionProfile": "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d:formal_recursive_replay",
+        "amemoryReplayPackage": "formal/v0.15/regression/grounded-zero-role.amemory-package.json",
+        "amemoryReplayPackageDigest": "354be494b42c78d310a868144f5c63fec915fec932a01d1d36b274d79258fce4",
+        "amemoryReplayEvidence": "formal/v0.15/regression/grounded-zero-role.amemory-evidence.json",
+        "expectedSemanticResult": {
+          "positive": {
+            "rawRuleMatches": 1,
+            "transitionedMembers": 1,
+            "handoffCount": 1,
+            "quiescent": false,
+            "resultEqualsExpected": true
+          },
+          "negativeMismatch": {
+            "rawRuleMatches": 0,
+            "transitionedMembers": 0,
+            "handoffCount": 0,
+            "quiescent": true,
+            "resultEqualsExpected": true
+          }
+        },
+        "externalDependencies": {
+          "amemoryMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+          "amemoryVersion": "0.175.0",
+          "amemoryAdapterIssue": 482,
+          "rustToolchain": "1.98.1"
+        },
+        "regressionEvidence": {
+          "manifest": "formal/v0.15/regression/grounded-zero-role.evidence.json",
+          "recursiveCiRun": 37321650052,
+          "frozenAmemoryWorkflowRun": 37324057317,
+          "exactPersistedAmemoryEvidenceMatch": true
+        },
+        "authorJsonReview": {
+          "state": "APPROVED",
+          "artifact": "formal/v0.15/regression/grounded-zero-role.json",
+          "revisionOrDigest": "d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61",
+          "decisionEvidence": "netkeep80/anum_docs#1978 issuecomment-5994922633"
+        }
       },
       {
-            "id": "two-role-meta-rule",
-            "kind": "EXECUTABLE",
-            "authorApprovalEvidence": "netkeep80/anum_docs#1188 issuecomment-5991612725",
-            "formalSourceArtifact": "formal/v0.15/regression/two-role-meta-rule.formal",
-            "formalSourceDigest": "f68e8629b5d476f49366f3f59e65ef64d523d5b5f8964dcf918283144ba292f9",
-            "canonicalJsonArtifact": "formal/v0.15/regression/two-role-meta-rule.json",
-            "canonicalJsonDigest": "7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56",
-            "jsonProfileRevision": "direct-source-anet@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
-            "grammarProfileRevision": "v015-source-anet:block-bare-binding-bundle@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
-            "metacompilerRevision": "77d82b9244e8fb4a77bfcf01a88ea345d474e13c",
-            "metacompilerProfile": "direct source ANet -> semantic ANet -> canonical extensional member listing of v0.13 hierarchical 8/9/6/1 wires",
-            "semanticEntry": "V->X; V->Y; Theory->MetaRule",
-            "expectedRecursiveRepresentation": "formal/v0.15/regression/two-role-meta-rule.recursive",
-            "expectedRecursiveDigest": "ca6a6d39913a7a5947edaeaad9d45a43603781e7b2188fd5bc34a59712da8ed9",
-            "amemoryExecutionProfile": "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d:formal_recursive_replay",
-            "amemoryReplayPackage": "formal/v0.15/regression/two-role-meta-rule.amemory-package.json",
-            "amemoryReplayPackageDigest": "ce8758fbe3ca6de992c1382db8af543f17aa55495cf0bad542e290c336e4be03",
-            "amemoryReplayEvidence": "formal/v0.15/regression/two-role-meta-rule.amemory-evidence.json",
-            "expectedSemanticResult": {
-                  "positiveSwap": {
-                        "rawRuleMatches": 1,
-                        "transitionedMembers": 1,
-                        "handoffCount": 1,
-                        "quiescent": false,
-                        "resultEqualsExpected": true
-                  },
-                  "negativeRootPayloadMismatch": {
-                        "rawRuleMatches": 0,
-                        "transitionedMembers": 0,
-                        "handoffCount": 0,
-                        "quiescent": true,
-                        "resultEqualsExpected": true
-                  }
-            },
-            "externalDependencies": {
-                  "amemoryMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
-                  "amemoryVersion": "0.175.0",
-                  "amemoryAdapterIssue": 482,
-                  "rustToolchain": "1.98.1"
-            },
-            "regressionEvidence": {
-                  "manifest": "formal/v0.15/regression/two-role-meta-rule.evidence.json",
-                  "recursiveCiRun": 37332835410,
-                  "frozenAmemoryWorkflowRun": 37333704049,
-                  "exactPersistedAmemoryEvidenceMatch": true
-            },
-            "authorJsonReview": {
-                  "state": "APPROVED",
-                  "artifact": "formal/v0.15/regression/two-role-meta-rule.json",
-                  "revisionOrDigest": "7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56",
-                  "decisionEvidence": "netkeep80/anum_docs#1188 issuecomment-5991612725"
-            }
+        "id": "two-role-meta-rule",
+        "kind": "EXECUTABLE",
+        "authorApprovalEvidence": "netkeep80/anum_docs#1188 issuecomment-5991612725",
+        "formalSourceArtifact": "formal/v0.15/regression/two-role-meta-rule.formal",
+        "formalSourceDigest": "f68e8629b5d476f49366f3f59e65ef64d523d5b5f8964dcf918283144ba292f9",
+        "canonicalJsonArtifact": "formal/v0.15/regression/two-role-meta-rule.json",
+        "canonicalJsonDigest": "7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56",
+        "jsonProfileRevision": "direct-source-anet@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
+        "grammarProfileRevision": "v015-source-anet:block-bare-binding-bundle@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
+        "metacompilerRevision": "77d82b9244e8fb4a77bfcf01a88ea345d474e13c",
+        "metacompilerProfile": "direct source ANet -> semantic ANet -> canonical extensional member listing of v0.13 hierarchical 8/9/6/1 wires",
+        "semanticEntry": "V->X; V->Y; Theory->MetaRule",
+        "expectedRecursiveRepresentation": "formal/v0.15/regression/two-role-meta-rule.recursive",
+        "expectedRecursiveDigest": "ca6a6d39913a7a5947edaeaad9d45a43603781e7b2188fd5bc34a59712da8ed9",
+        "amemoryExecutionProfile": "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d:formal_recursive_replay",
+        "amemoryReplayPackage": "formal/v0.15/regression/two-role-meta-rule.amemory-package.json",
+        "amemoryReplayPackageDigest": "ce8758fbe3ca6de992c1382db8af543f17aa55495cf0bad542e290c336e4be03",
+        "amemoryReplayEvidence": "formal/v0.15/regression/two-role-meta-rule.amemory-evidence.json",
+        "expectedSemanticResult": {
+          "positiveSwap": {
+            "rawRuleMatches": 1,
+            "transitionedMembers": 1,
+            "handoffCount": 1,
+            "quiescent": false,
+            "resultEqualsExpected": true
+          },
+          "negativeRootPayloadMismatch": {
+            "rawRuleMatches": 0,
+            "transitionedMembers": 0,
+            "handoffCount": 0,
+            "quiescent": true,
+            "resultEqualsExpected": true
+          }
+        },
+        "externalDependencies": {
+          "amemoryMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+          "amemoryVersion": "0.175.0",
+          "amemoryAdapterIssue": 482,
+          "rustToolchain": "1.98.1"
+        },
+        "regressionEvidence": {
+          "manifest": "formal/v0.15/regression/two-role-meta-rule.evidence.json",
+          "recursiveCiRun": 37332835410,
+          "frozenAmemoryWorkflowRun": 37333704049,
+          "exactPersistedAmemoryEvidenceMatch": true
+        },
+        "authorJsonReview": {
+          "state": "APPROVED",
+          "artifact": "formal/v0.15/regression/two-role-meta-rule.json",
+          "revisionOrDigest": "7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56",
+          "decisionEvidence": "netkeep80/anum_docs#1188 issuecomment-5991612725"
+        }
       }
     ],
     "rule": "Every explicitly Author-approved JSON artifact becomes a permanent executable regression witness."
@@ -667,7 +667,9 @@
       "dependsOn": [
         "V15-CORPUS-01",
         "V15-THM-03",
-        "V15-REG-02"
+        "V15-REG-02",
+        "V15-PROOF-EXEC-03",
+        "V15-FORMAL-PROOF-02"
       ],
       "positiveVectors": [],
       "negativeVectors": [],
@@ -852,6 +854,104 @@
         "#2002",
         "profiles/mts-v015-meta-interpreter-model.json"
       ],
+      "authorJsonReview": "NOT_APPLICABLE"
+    },
+    "V15-GAMMA-01": {
+      "state": "OPEN",
+      "ownerIssue": 2001,
+      "dependsOn": [
+        "V15-CLOSE-03",
+        "V15-CTX-01"
+      ],
+      "positiveVectors": [
+        "grounded-zero-role-is-generic-refinement"
+      ],
+      "negativeVectors": [
+        "proof-specific-opcode-forbidden"
+      ],
+      "requiredExecutableGates": [],
+      "evidenceRefs": [],
+      "authorJsonReview": "NOT_APPLICABLE"
+    },
+    "V15-PROOF-EXEC-01": {
+      "state": "OPEN",
+      "ownerIssue": 2003,
+      "dependsOn": [
+        "V15-DUAL-01",
+        "V15-PROOF-01",
+        "V15-STAGE-01"
+      ],
+      "positiveVectors": [],
+      "negativeVectors": [
+        "host-proof-semantics-forbidden"
+      ],
+      "requiredExecutableGates": [],
+      "evidenceRefs": [],
+      "authorJsonReview": "NOT_APPLICABLE"
+    },
+    "V15-PROOF-EXEC-02": {
+      "state": "OPEN",
+      "ownerIssue": 2003,
+      "dependsOn": [
+        "V15-PROOF-EXEC-01",
+        "V15-GAMMA-01"
+      ],
+      "positiveVectors": [
+        "fnd07-aprover-anet-amemory-accept"
+      ],
+      "negativeVectors": [
+        "forged-target-reject",
+        "missing-premise-reject",
+        "foreign-theory-reject"
+      ],
+      "requiredExecutableGates": [],
+      "evidenceRefs": [],
+      "authorJsonReview": "NOT_APPLICABLE"
+    },
+    "V15-PROOF-EXEC-03": {
+      "state": "OPEN",
+      "ownerIssue": 2003,
+      "dependsOn": [
+        "V15-PROOF-EXEC-02"
+      ],
+      "positiveVectors": [],
+      "negativeVectors": [
+        "search-result-is-not-proof",
+        "metadata-accept-forbidden",
+        "theorem-id-dispatch-forbidden"
+      ],
+      "requiredExecutableGates": [],
+      "evidenceRefs": [],
+      "authorJsonReview": "NOT_APPLICABLE"
+    },
+    "V15-FORMAL-PROOF-01": {
+      "state": "OPEN",
+      "ownerIssue": 2004,
+      "dependsOn": [
+        "V15-AUTH-01",
+        "V15-DUAL-01",
+        "V15-JSON-04"
+      ],
+      "positiveVectors": [],
+      "negativeVectors": [],
+      "requiredExecutableGates": [],
+      "evidenceRefs": [],
+      "authorJsonReview": "NOT_APPLICABLE"
+    },
+    "V15-FORMAL-PROOF-02": {
+      "state": "OPEN",
+      "ownerIssue": 2004,
+      "dependsOn": [
+        "V15-FORMAL-PROOF-01",
+        "V15-REG-01"
+      ],
+      "positiveVectors": [
+        "grounded-zero-role-refinement-witness",
+        "two-role-meta-rule-refinement-witness"
+      ],
+      "negativeVectors": [],
+      "requiredExecutableGates": [],
+      "evidenceRefs": [],
       "authorJsonReview": "NOT_APPLICABLE"
     }
   }
