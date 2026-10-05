@@ -310,9 +310,9 @@ function compilePackage(noise = 0): CompiledPackage {
   );
   const entry = materializeExactSequence(f.memory, [launch]);
 
-  // Same Tag but wrong structural shape: Tag->A cannot satisfy the approved
-  // Tag->(roleX->roleY) template, so it must remain quiescent.
-  const negativeAntecedent = f.memory.ensure(Tag, A);
+  // Same Tag but ROOT in the payload position. ROOT has both-self incidence
+  // and therefore cannot satisfy the ordinary PAIR(roleX,roleY) template.
+  const negativeAntecedent = f.memory.ensure(Tag, f.basis.R);
   const negativeCurrent = f.memory.ensure(caller, negativeAntecedent);
   const negativeLaunch = materializeExactSequence(
     f.memory,
