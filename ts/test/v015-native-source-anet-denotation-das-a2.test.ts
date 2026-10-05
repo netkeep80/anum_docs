@@ -20,11 +20,7 @@ import {
 import { materializeV012StringAnum } from "../src/v012-string-anum.js";
 import { unifyStructuralRuleTemplate } from "../src/structural-unification.js";
 import { instantiateV013StructuralTemplate } from "../src/v013-structural-execution.js";
-import {
-  SyntaxAsetBuilder,
-  readSyntaxAset,
-  type SyntaxAsetOccurrence,
-} from "../src/syntax-aset-contract.js";
+import { SyntaxAsetBuilder } from "../src/syntax-aset-contract.js";
 import {
   denoteV015ResolvedSourceAnet,
   materializeV015SourceAnetProfile,
