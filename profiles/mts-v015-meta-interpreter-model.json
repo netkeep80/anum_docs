@@ -698,7 +698,7 @@
     "evidence": "ts/test/v015-structural-aset-one-command-a9.test.ts",
     "purpose": "Eliminate the dedicated RoleDictionary wrapper while retaining an explicit Link-native witness for structural bindable roles.",
     "semanticTopology": {
-      "roleBundle": "V is an ordinary Aset/bundle anchor.",
+      "roleBundle": "V is an ordinary ANet/bundle anchor.",
       "roleMembership": "A role is the MEMBER LINK V->name_i itself, and it counts only when that Link belongs to M_t. Physical outgoing existence alone is insufficient.",
       "body": "Body = AntecedentTemplate -> ExactSequence(OutputTemplates)",
       "rule": "Rule = V -> Body",
@@ -717,7 +717,7 @@
     "nonClaims": [
       "This does not yet prove the candidate for every v0.15 rule/program/proof.",
       "This does not make host scanning of state.members the accepted implementation.",
-      "This does not approve a concrete JSON spelling.",
+      "Approval of the exact tested meta-rule JSON is artifact-specific and does not approve future logical/proof JSON spellings.",
       "This does not make the presentation names V/Rule/Theory semantically privileged."
     ],
     "jsonSurfaceCandidate": {
@@ -777,7 +777,7 @@
         "Intermediate names belong to the metamodel and erase before execution.",
         "The only semantic ANet members required by this isolated rule artifact are the two role Links and the Theory->Rule admission."
       ],
-      "remainingGate": "Proof/theorem closure and grounded zero-role refinement vertical remain open; future logical/proof JSON artifacts still require their own Author gate.",
+      "remainingGate": "The exact JSON source artifact is Author-approved, but contextual-name replay, full #1978 FORMAL→recursive→frozen-A-memory evidence, proof/theorem closure, and grounded zero-role artifact review remain open.",
       "authorDecision": {
         "date": "2026-10-05",
         "decision": "APPROVED_EXACT_META_RULE_JSON_ARTIFACT",
@@ -797,8 +797,8 @@
         "Empty role bundle is the grounded exact-rule refinement."
       ],
       "notYetApproved": [
-        "concrete final JSON spelling",
-        "exact source-Aset -> semantic M_t lowering",
+        "future logical/proof JSON artifact spellings beyond the approved two-role meta-rule",
+        "exact source-ANet -> semantic M_t lowering",
         "universal theorem/proof closure",
         "full A72r historical differential",
         "proof/theorem FORMAL surface"
