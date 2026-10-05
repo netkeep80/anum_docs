@@ -77,6 +77,9 @@ function sha256(text: string): string {
   return createHash("sha256").update(text, "utf8").digest("hex");
 }
 
+const EXPECTED_PACKAGE_SHA256 =
+  "ce8758fbe3ca6de992c1382db8af543f17aa55495cf0bad542e290c336e4be03";
+
 interface Fixture {
   readonly memory: Memory;
   readonly basis: RootBasis;
@@ -377,10 +380,28 @@ same(
   "two-role A-memory execution package is two-Memory deterministic",
 );
 
+const persistedPackage = readFileSync(
+  resolve(
+    repositoryRoot(),
+    "formal/v0.15/regression/two-role-meta-rule.amemory-package.json",
+  ),
+  "utf8",
+);
+same(
+  first.packageJson,
+  persistedPackage,
+  "persisted frozen A-memory package is exact generated package",
+);
+same(
+  first.packageDigest,
+  EXPECTED_PACKAGE_SHA256,
+  "two-role frozen A-memory package digest",
+);
+
 console.log([
   "MTS_V015_TWO_ROLE_AMEMORY_PACKAGE=GREEN",
   "PACKAGE_SHA256=" + first.packageDigest,
-  "AMEMORY_PACKAGE=" + first.packageJson,
+  "AMEMORY_PACKAGE_ARTIFACT=formal/v0.15/regression/two-role-meta-rule.amemory-package.json",
   "LOCAL_LEGACY_DIFFERENTIAL=GREEN",
   "CANONICAL_ROLE_BUNDLE=UNCHANGED",
   "PROGRAM_SPECIFIC_DISPATCH=0",
