@@ -1,0 +1,113 @@
+{
+  "schema": "mts-v015-formal-proof-assurance/v0.1",
+  "status": "bootstrap-proof-active",
+  "ownerIssue": "#2004",
+  "authority": "external-cross-check-only",
+  "allowedGlobalAxioms": {
+    "lean4": [],
+    "rocq": []
+  },
+  "targets": [
+    {
+      "id": "FRM-01",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL",
+      "premises": [],
+      "exclusions": [
+        "does not yet prove the production parser implementation",
+        "does not introduce a host-global atom namespace"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_01_absolute_contextual_name"
+      ],
+      "rocq": [
+        "FRM_01_absolute_contextual_name"
+      ]
+    },
+    {
+      "id": "FRM-02",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL",
+      "premises": [],
+      "exclusions": [
+        "bootstrap slice covers bare, binding and explicit empty-bundle membership roles",
+        "non-empty recursive bundle refinement remains a later production-refinement obligation"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_02_root_source_role_separation",
+        "MTS.V015.FormalExternal.FRM_02_nested_source_role_membership"
+      ],
+      "rocq": [
+        "FRM_02_root_source_role_separation",
+        "FRM_02_nested_source_role_membership"
+      ]
+    },
+    {
+      "id": "FRM-03",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL",
+      "premises": [],
+      "exclusions": [
+        "proves Direct Sequential Association for the three-term bootstrap case",
+        "does not assert algebraic associativity"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_03_direct_sequential_association_three"
+      ],
+      "rocq": [
+        "FRM_03_direct_sequential_association_three"
+      ]
+    },
+    {
+      "id": "FRM-04",
+      "classification": "PROVED_UNDER_EXACT_SEQUENCE_INJECTIVITY",
+      "premises": [
+        "ExactSequence encoding is injective over positional Link lists",
+        "ExactSequence([]) equals the declared root"
+      ],
+      "exclusions": [
+        "does not prove the production ExactSequence encoder satisfies injectivity; that is a refinement obligation"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_04_empty_exact_sequence_is_root",
+        "MTS.V015.FormalExternal.FRM_04_single_root_distinct_from_empty",
+        "MTS.V015.FormalExternal.FRM_04_two_roots_distinct_from_one"
+      ],
+      "rocq": [
+        "FRM_04_empty_exact_sequence_is_root",
+        "FRM_04_single_root_distinct_from_empty",
+        "FRM_04_two_roots_distinct_from_one"
+      ]
+    },
+    {
+      "id": "FRM-05",
+      "classification": "PROVED_UNDER_SHARED_NATIVE_SOURCE_PREMISE",
+      "premises": [
+        "FORMAL and canonical JSON reconstruct the same native source ANet"
+      ],
+      "exclusions": [
+        "production decoder equality is executable/refinement evidence, not assumed globally"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_05_shared_source_implies_shared_denotation"
+      ],
+      "rocq": [
+        "FRM_05_shared_source_implies_shared_denotation"
+      ]
+    },
+    {
+      "id": "FRM-06",
+      "classification": "PROVED_UNDER_METACOMPILER_ROUNDTRIP_PREMISE",
+      "premises": [
+        "decode(compile(semantic)) = semantic for the declared recursive profile"
+      ],
+      "exclusions": [
+        "production metacompiler refinement to this law remains open",
+        "does not claim every arbitrary recursive byte string is valid"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_06_metacompiler_preserves_semantics"
+      ],
+      "rocq": [
+        "FRM_06_metacompiler_preserves_semantics"
+      ]
+    }
+  ]
+}
