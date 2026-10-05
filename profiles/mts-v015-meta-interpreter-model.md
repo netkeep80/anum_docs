@@ -1396,11 +1396,29 @@ in general. The left side is contextual qualification/resolution; the right side
 
 `resolveV015ContextualNameCoordinate` is read-only and fails closed when the qualified coordinate does not exist; it does not synthesize the missing name. Explicit materialization is a separate operation and is registered as a direct write owner by the dependency audit.
 
-The Author-approved two-role meta-rule JSON and the grounded zero-role candidate both replay through this resolver/DAS path with unchanged tested behavior.
+The Author-approved two-role meta-rule JSON and the Author-approved grounded zero-role JSON both replay through this resolver/DAS path with unchanged tested behavior.
 
-Evidence: `ts/test/v015-native-source-anet-denotation-das-a2.test.ts`, CI run `37298755977` on evidence head `6834291694318ac3929af220cf64c20c208c689e`.
+Evidence now has two layers:\n\n- resolver/DAS: `ts/test/v015-native-source-anet-denotation-das-a2.test.ts`, CI `37298755977` on `6834291694318ac3929af220cf64c20c208c689e`;\n- FORMAL surface: `ts/test/v015-formal-decoder-b2.test.ts`, CI `37314219581` on `1f788fd4f6a0ba98ad505f530e109f571fddedd9`.
 
-Scope boundary: this is the **Link-native resolver kernel + direct-JSON/DAS replay**, not yet the final FORMAL text Grammar. `v015-formal-decoder.ts` still rejects `:` inside names, so FORMAL surface parsing, namespace-path lowering and convergence onto this same resolver remain OPEN under #1901/#1911. The bounded `contextualPath` helper inside DAS-A2 is a falsification fixture, not semantic Grammar authority.
+Root/flat FORMAL surface convergence is now **GREEN**. The decoder distinguishes:
+
+```text
+A       local reference (existing local-definition semantics)
+:A      absolute contextual reference from R
+K:A     relative contextual path in the current root source context
+K:A:B   deeper relative contextual path
+```
+
+and contextual references lower through the same Link-native contextual-name path materializer. Executable markers:
+
+```text
+CONTEXTUAL_NAME_PATHS=GREEN
+ABSOLUTE_SHORTHAND_EQUIVALENCE=GREEN
+```
+
+The parser's first `:` still separates a flat declaration binder from its body, while later `:` characters in the body belong to contextual references. Therefore compact `A::Theory->:GroundRule` and spaced `A : :Theory->:GroundRule` lower to the same source ANet.
+
+Remaining boundary: nested `{}`/bundle source contexts are not yet wired into this FORMAL decoder; they must provide an explicit current contextual anchor rather than a host scope stack. Full #1978 FORMAL artifact/digest → recursive 8/9/6/1 → frozen A-memory replay also remains open.
 
 Owner: **#1901**, requirement **V15-NAME-01**.
 
