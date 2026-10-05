@@ -865,11 +865,17 @@
     ],
     "structuredKeyRule": "Object keys are resolved by ordinary FORMAL expression resolution before source-role lowering; a bare structured key such as Theory->R contributes that resolved Link as a bare source entry.",
     "invariant": "JSON must reconstruct the same native source ANet roles as FORMAL/native source and must not bypass resolver or DAS.",
-    "nextEvidence": "DAS-A3 direct JSON -> native source ANet -> DAS -> semantic ANet",
+    "productionPath": [
+      "ts/src/v015-direct-json-source.ts",
+      "ts/src/v015-source-anet.ts"
+    ],
+    "productionStatus": "GREEN_EXTRACTED_FROM_TEST_SCAFFOLD",
+    "nextEvidence": "FORMAL direct source bundle/bare/binding surface -> same native source ANet profile -> same DAS",
     "artifactApproval": "Each concrete logical/proof JSON artifact remains separately Author-gated.",
     "executableEvidence": {
       "path": "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
-      "run": "CI 37244766554",
+      "run": "CI 37316173741 / Pages 37316172884",
+      "head": "4129fc1e30d69d7b9cbf1bb7d9188cc3b09e1b88",
       "result": "SUCCESS",
       "tested": [
         "object-member null -> bare native source entry",
@@ -883,7 +889,7 @@
         "physical/named E->K without bare membership is not current"
       ]
     },
-    "nextGate": "Grounded empty-role-bundle rule vertical through the same JSON -> native source ANet -> DAS -> matcher path."
+    "nextGate": "Direct FORMAL must reconstruct the same block/bare/binding/bundle native source ANet, including V0:{} and bare Theory->GroundRule; then the Author-approved grounded artifact can enter the full #1978 FORMAL/digest/recursive/A-memory chain."
   },
   "jsonArrayCarrier": {
     "status": "AUTHOR_APPROVED_DESIGN_GREEN_RESEARCH",
