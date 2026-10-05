@@ -215,4 +215,48 @@ theorem FRM_07_exact_sequence_injective_from_left_inverse
   have readEq := congrArg E.read encodedEq
   simpa [E.leftInverse] using readEq
 
+inductive StructuralAspectExpr (Link : Type) where
+  | root
+  | atom (value : Link)
+  | start (child : StructuralAspectExpr Link)
+  | finish (child : StructuralAspectExpr Link)
+  | pair (left right : StructuralAspectExpr Link)
+
+def denoteStructuralAspect {Link : Type}
+    (root : Link)
+    (start finish : Link → Link)
+    (pair : Link → Link → Link) :
+    StructuralAspectExpr Link → Link
+  | .root => root
+  | .atom value => value
+  | .start child => start (denoteStructuralAspect root start finish pair child)
+  | .finish child => finish (denoteStructuralAspect root start finish pair child)
+  | .pair left right =>
+      pair
+        (denoteStructuralAspect root start finish pair left)
+        (denoteStructuralAspect root start finish pair right)
+
+/--
+FRM-08: the accepted ostensive FORMAL structural forms are direct notation for
+the four Link structural constructors. No recursive binding or proof-specific
+operator is needed to denote an ExactSequence cell START(PAIR(prev,value)).
+-/
+theorem FRM_08_structural_aspect_denotation
+    {Link : Type}
+    (root : Link)
+    (start finish : Link → Link)
+    (pair : Link → Link → Link)
+    (a b : Link) :
+    denoteStructuralAspect root start finish pair (.root) = root ∧
+    denoteStructuralAspect root start finish pair (.start (.atom a)) =
+      start a ∧
+    denoteStructuralAspect root start finish pair (.finish (.atom a)) =
+      finish a ∧
+    denoteStructuralAspect root start finish pair (.pair (.atom a) (.atom b)) =
+      pair a b ∧
+    denoteStructuralAspect root start finish pair
+      (.start (.pair (.atom a) (.atom b))) =
+      start (pair a b) := by
+  rfl
+
 end MTS.V015.FormalExternal
