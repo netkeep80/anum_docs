@@ -255,10 +255,10 @@ Fixpoint denote_structural_aspect
       start (denote_structural_aspect root start finish pair child)
   | SA_Finish child =>
       finish (denote_structural_aspect root start finish pair child)
-  | SA_Pair left right =>
+  | SA_Pair lhs rhs =>
       pair
-        (denote_structural_aspect root start finish pair left)
-        (denote_structural_aspect root start finish pair right)
+        (denote_structural_aspect root start finish pair lhs)
+        (denote_structural_aspect root start finish pair rhs)
   end.
 
 Theorem FRM_08_structural_aspect_denotation
