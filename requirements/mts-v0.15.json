@@ -157,6 +157,34 @@
       }
     },
     {
+      "id": "V15-STRUCT-01",
+      "group": "STRUCT",
+      "ownerIssue": "#1901",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "The v0.15 direct FORMAL/JSON source path preserves the already accepted ROOT/START/END/PAIR structural aspect constructors and lowers them to native Link topology / recursive 8/9/6/1 without enabling arbitrary cyclic bindings.",
+      "dependsOn": [
+        "V15-AUTH-01",
+        "V15-ONTO-02",
+        "V15-JSON-02"
+      ],
+      "authority": {
+        "issue": 1901
+      },
+      "evidence": {
+        "positiveVectors": [
+          "direct-formal-root-start-end-pair",
+          "exactsequence-cell-pattern-with-start-aspect"
+        ],
+        "negativeVectors": [
+          "arbitrary-cyclic-binding-remains-rejected",
+          "start-end-distinct",
+          "structural-aspect-is-not-host-kind"
+        ],
+        "requiredExecutableGates": []
+      }
+    },
+    {
       "id": "V15-CLOSE-01",
       "group": "CLOSE",
       "ownerIssue": "#1976",
@@ -711,7 +739,8 @@
       "dependsOn": [
         "V15-DUAL-01",
         "V15-PROOF-01",
-        "V15-STAGE-01"
+        "V15-STAGE-01",
+        "V15-STRUCT-01"
       ],
       "authority": {
         "issue": 2003
@@ -783,7 +812,8 @@
       "dependsOn": [
         "V15-AUTH-01",
         "V15-DUAL-01",
-        "V15-JSON-04"
+        "V15-JSON-04",
+        "V15-STRUCT-01"
       ],
       "authority": {
         "issue": 2004
