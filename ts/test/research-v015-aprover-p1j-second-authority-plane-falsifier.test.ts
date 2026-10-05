@@ -131,6 +131,56 @@ same(
   "existing Γ cannot distinguish those worlds under one AproverTheory",
 );
 
+// Obvious escape hatch: externally switch the one engine authority to
+// ObjectTheory. That does not compose the two authority planes: the aprover
+// checker Rule is no longer admitted under the selected primary Theory and the
+// request is quiescent.
+const objectInterpreter = defineStructuralInterpreter(
+  memory,
+  authorityDictionary,
+  grammar,
+  objectTheory,
+);
+{
+  const scope = defineV013WorkingScope(
+    memory,
+    fresh(),
+    objectInterpreter,
+    [request],
+  );
+  const current = new V013CurrentScopeCursor(memory, scope);
+  const step = reactV013StructuralScope(memory, current, fresh());
+  same(step.rawRuleMatches, 0, "ObjectTheory alone has no aprover checker Rule");
+  same(step.handoffCount, 0, "external interpreter switch cannot validate");
+  same(current.members()[0], request, "request remains quiescent");
+}
+
+// If we admit the checker Rule into ObjectTheory, execution becomes possible,
+// but that mutates/augments the exact ObjectTheory authority being checked.
+// This is therefore a falsifier for the naive "merge both theories" escape.
+const augmentedCheckerAdmission = admitStructuralRule(
+  memory,
+  objectTheory,
+  checkerRule,
+);
+memory.ensure(triggerKey, augmentedCheckerAdmission);
+{
+  const scope = defineV013WorkingScope(
+    memory,
+    fresh(),
+    objectInterpreter,
+    [request],
+  );
+  const current = new V013CurrentScopeCursor(memory, scope);
+  const step = reactV013StructuralScope(memory, current, fresh());
+  same(step.rawRuleMatches, 1, "augmented ObjectTheory can run checker");
+  same(current.members()[0], accepted, "augmented Theory accepts request");
+}
+assert(
+  augmentedCheckerAdmission !== checkerAdmission,
+  "checker admission into ObjectTheory is a distinct authority Link",
+);
+
 console.log([
   "MTS_V015_APROVER_P1J_SECOND_AUTHORITY_PLANE_EXISTING_GAMMA=FALSIFIED",
   "PHYSICAL_MEMORY=SAME",
@@ -141,7 +191,8 @@ console.log([
   "EXISTING_GAMMA_RESULT=IDENTICAL",
   "PRESENT_PHYSICAL_ADMISSION_AS_WITNESS=INSUFFICIENT",
   "STRUCTURAL_J0_MATCH=INSUFFICIENT_FOR_SECOND_PLANE_AUTHORITY",
-  "HOST_INTERPRETER_SWITCH_USED=FALSE",
+  "HOST_INTERPRETER_SWITCH_AS_COMPOSITION=FALSIFIED",
+  "OBJECT_THEORY_PLUS_APROVER_RULES=MUTATED_AUTHORITY",
   "NEW_OPCODE_USED=FALSE",
   "SECOND_PLANE_SELECTION_INPUT_TO_GAMMA=ABSENT",
   "MINIMAL_GENERIC_CAPABILITY_GAP=SECOND_AUTHORITY_PLANE_READ",
