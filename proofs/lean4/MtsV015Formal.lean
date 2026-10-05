@@ -168,4 +168,51 @@ theorem FRM_06_metacompiler_preserves_semantics
     M.decode (M.compile semantic) = semantic :=
   M.roundTrip semantic
 
+structure ProductionArtifactRefinement
+    (Formal Json Source Semantic Recursive : Type) where
+  fromFormal : Formal → Source
+  fromJson : Json → Source
+  denote : Source → Semantic
+  compile : Semantic → Recursive
+  decode : Recursive → Semantic
+  recursiveLeftInverse : ∀ semantic, decode (compile semantic) = semantic
+
+/--
+FRM-07: if the two source surfaces converge to one native source ANet and the
+production recursive codec is a left inverse on the selected semantic value,
+then FORMAL -> native source ANet -> semantic ANet -> recursive -> semantic
+preserves exactly the JSON-side semantic denotation as well.
+
+This theorem deliberately leaves the two production premises explicit.
+Concrete approved-artifact witnesses are supplied by executable refinement
+tests; this theorem does not pretend to prove TypeScript implementation code.
+-/
+theorem FRM_07_approved_artifact_refinement
+    {Formal Json Source Semantic Recursive : Type}
+    (P : ProductionArtifactRefinement Formal Json Source Semantic Recursive)
+    (formal : Formal)
+    (json : Json)
+    (sameSource : P.fromFormal formal = P.fromJson json) :
+    P.decode (P.compile (P.denote (P.fromFormal formal))) =
+      P.denote (P.fromJson json) := by
+  rw [P.recursiveLeftInverse]
+  exact congrArg P.denote sameSource
+
+structure ExactSequenceLeftInverse (Link : Type) where
+  encode : List Link → Link
+  read : Link → List Link
+  leftInverse : ∀ values, read (encode values) = values
+
+/--
+FRM-07b: the production-style ExactSequence left-inverse law is sufficient to
+derive injectivity; injectivity need not be postulated independently.
+-/
+theorem FRM_07_exact_sequence_injective_from_left_inverse
+    {Link : Type}
+    (E : ExactSequenceLeftInverse Link) :
+    Function.Injective E.encode := by
+  intro a b encodedEq
+  have readEq := congrArg E.read encodedEq
+  simpa [E.leftInverse] using readEq
+
 end MTS.V015.FormalExternal
