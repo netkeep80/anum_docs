@@ -84,6 +84,7 @@ interface Fixture {
   readonly basis: RootBasis;
   readonly grammarRoot: LinkHandle;
   readonly sourceAnetProfileRoot: LinkHandle;
+  readonly fresh: () => LinkHandle;
 }
 
 function fixture(noise = 0): Fixture {
@@ -176,6 +177,7 @@ function fixture(noise = 0): Fixture {
     basis,
     grammarRoot,
     sourceAnetProfileRoot,
+    fresh,
   });
 }
 
@@ -385,15 +387,16 @@ function compilePackage(noise = 0): CompiledPackage {
   // Local differential before external A-memory replay.
   const positiveScope = defineV013WorkingScope(
     f.memory,
-    f.memory.ensureEndSelfClosed(caller),
+    f.fresh(),
     lowered.interpreter,
     [current],
   );
   const positiveCursor = new V013CurrentScopeCursor(f.memory, positiveScope);
+  same(positiveCursor.members().length, 1, "local positive Scope has one member");
   const positive = reactV013StructuralScope(
     f.memory,
     positiveCursor,
-    f.memory.ensureEndSelfClosed(positiveScope),
+    f.fresh(),
   );
   same(positive.rawRuleMatches, 1, "legacy compatibility positive match count");
   same(positive.nextMembers.length, 1, "legacy compatibility positive result count");
@@ -401,15 +404,16 @@ function compilePackage(noise = 0): CompiledPackage {
 
   const negativeScope = defineV013WorkingScope(
     f.memory,
-    f.memory.ensureEndSelfClosed(negativeCurrent),
+    f.fresh(),
     lowered.interpreter,
     [negativeCurrent],
   );
   const negativeCursor = new V013CurrentScopeCursor(f.memory, negativeScope);
+  same(negativeCursor.members().length, 1, "local negative Scope has one member");
   const negative = reactV013StructuralScope(
     f.memory,
     negativeCursor,
-    f.memory.ensureEndSelfClosed(negativeScope),
+    f.fresh(),
   );
   same(negative.rawRuleMatches, 0, "legacy compatibility mismatch is inert");
   same(
