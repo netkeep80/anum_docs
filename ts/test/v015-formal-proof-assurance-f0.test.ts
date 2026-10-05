@@ -48,7 +48,16 @@ assert(manifest.ownerIssue === "#2004", "FORMAL proof owner is #2004");
 assert(manifest.allowedGlobalAxioms.lean4.length === 0, "Lean axiom allowlist empty");
 assert(manifest.allowedGlobalAxioms.rocq.length === 0, "Rocq axiom allowlist empty");
 
-const expectedIds = ["FRM-01", "FRM-02", "FRM-03", "FRM-04", "FRM-05", "FRM-06"];
+const expectedIds = [
+  "FRM-01",
+  "FRM-02",
+  "FRM-03",
+  "FRM-04",
+  "FRM-05",
+  "FRM-06",
+  "FRM-07",
+  "FRM-08",
+];
 assert(
   JSON.stringify(manifest.targets.map((target) => target.id)) ===
     JSON.stringify(expectedIds),
@@ -86,6 +95,16 @@ assert(
     "PROVED_UNDER_METACOMPILER_ROUNDTRIP_PREMISE",
   "FRM-06 keeps metacompiler round-trip premise explicit",
 );
+assert(
+  byId.get("FRM-07")?.classification ===
+    "PROVED_UNDER_EXPLICIT_PRODUCTION_REFINEMENT_PREMISES",
+  "FRM-07 keeps production refinement premises explicit",
+);
+assert(
+  byId.get("FRM-08")?.classification ===
+    "PROVED_IN_SELECTED_MATHEMATICAL_MODEL_WITH_PRODUCTION_WITNESS_PENDING",
+  "FRM-08 separates mathematical structural forms from production refinement",
+);
 
 for (const target of manifest.targets) {
   assert(target.lean4.length > 0, target.id + " Lean symbols");
@@ -118,7 +137,7 @@ assert(
 
 console.log([
   "MTS_V015_FORMAL_PROOF_BOOTSTRAP=GREEN",
-  "FRM_TARGETS=6",
+  "FRM_TARGETS=8",
   "PAIRED_LEAN_ROCQ=TRUE",
   "GLOBAL_AXIOM_ALLOWLIST=EMPTY",
   "PRODUCTION_REFINEMENT=STILL_OPEN",
