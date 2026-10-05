@@ -564,71 +564,172 @@ class StrictDirectJsonReader {
   }
 }
 
-const Body = memory.poles(Rule).end;
+const contextualNameCarrierCache = new Map<string, LinkHandle>();
 
-const DIRECT_TAG = fresh();
-const DIRECT_A = fresh();
-const DIRECT_B = fresh();
-const DIRECT_V0 = fresh();
-const DIRECT_GA = fresh();
-const DIRECT_GB = fresh();
-const DIRECT_OTHER = fresh();
+/**
+ * Host Map is cache only. Semantic identity comes from:
+ * UTF-8 source carrier + explicit contextual Link coordinate.
+ */
+function localNameCarrier(name: string): LinkHandle {
+  const known = contextualNameCarrierCache.get(name);
+  if (known !== undefined) return known;
+  const carrier = materializeV012StringAnum(
+    memory,
+    basis,
+    new TextEncoder().encode(name),
+  ).anumLink;
+  contextualNameCarrierCache.set(name, carrier);
+  return carrier;
+}
 
-const directAtoms = new Map<string, LinkHandle>([
-  ["Tag", DIRECT_TAG],
-  ["V0", DIRECT_V0],
-  ["GA", DIRECT_GA],
-  ["GB", DIRECT_GB],
-  ["Other", DIRECT_OTHER],
-  ["R", basis.R],
-  ["Theory", Theory],
-  ["V", V],
-  ["X", X],
-  ["Y", Y],
-  ["Body", Body],
-  ["E", E],
-  ["K", K],
-]);
+function absoluteName(name: string): LinkHandle {
+  // R is selected RootBasis authority, not a host-global atom binding.
+  if (name === "R") return basis.R;
+  return materializeV015ContextualNamePath(
+    memory,
+    basis,
+    basis.R,
+    [localNameCarrier(name)],
+    true,
+  );
+}
 
-const ROLE_X_NAME = fresh();
-const ROLE_Y_NAME = fresh();
-const PAIR_XY_NAME = fresh();
-const ANTECEDENT_NAME = fresh();
-const OUTPUT_NAME = fresh();
-const IMAGE_NAME = fresh();
-const META_BODY_NAME = fresh();
-const META_RULE_NAME = fresh();
-const GROUND_ANTECEDENT_NAME = fresh();
-const GROUND_OUTPUT_NAME = fresh();
-const GROUND_IMAGE_NAME = fresh();
-const GROUND_BODY_NAME = fresh();
-const GROUND_RULE_NAME = fresh();
+function contextualPath(source: string): LinkHandle {
+  const compact = source.replace(/[()]/gu, "").trim();
+  if (compact.length === 0) directJsonFail("invalid-shape");
 
-const ONE_R_NAME = fresh();
-const TWO_R_NAME = fresh();
-const NESTED_EMPTY_NAME = fresh();
+  if (compact.startsWith(":")) {
+    const segments = compact.slice(1).split(":");
+    if (segments.some((segment) => segment.length === 0)) {
+      directJsonFail("invalid-shape");
+    }
+    return materializeV015ContextualNamePath(
+      memory,
+      basis,
+      basis.R,
+      segments.map(localNameCarrier),
+      true,
+    );
+  }
 
-const directNameCarriers = new Map<string, LinkHandle>([
-  ["Rule", RULE_NAME],
-  ["Current", CURRENT_ALIAS],
-  ["Empty", EMPTY_SEQUENCE_NAME],
-  ["OneR", ONE_R_NAME],
-  ["TwoR", TWO_R_NAME],
-  ["NestedEmpty", NESTED_EMPTY_NAME],
-  ["RoleX", ROLE_X_NAME],
-  ["RoleY", ROLE_Y_NAME],
-  ["PairXY", PAIR_XY_NAME],
-  ["Antecedent", ANTECEDENT_NAME],
-  ["Output", OUTPUT_NAME],
-  ["Image", IMAGE_NAME],
-  ["MetaBody", META_BODY_NAME],
-  ["MetaRule", META_RULE_NAME],
-  ["GroundAntecedent", GROUND_ANTECEDENT_NAME],
-  ["GroundOutput", GROUND_OUTPUT_NAME],
-  ["GroundImage", GROUND_IMAGE_NAME],
-  ["GroundBody", GROUND_BODY_NAME],
-  ["GroundRule", GROUND_RULE_NAME],
-]);
+  const segments = compact.split(":");
+  if (segments.some((segment) => segment.length === 0)) {
+    directJsonFail("invalid-shape");
+  }
+  if (segments[0] === "R") {
+    if (segments.length === 1) return basis.R;
+    return materializeV015ContextualNamePath(
+      memory,
+      basis,
+      basis.R,
+      segments.slice(1).map(localNameCarrier),
+      true,
+    );
+  }
+  return materializeV015ContextualNamePath(
+    memory,
+    basis,
+    basis.R,
+    segments.map(localNameCarrier),
+    false,
+  );
+}
+
+const DIRECT_THEORY = absoluteName("Theory");
+const DIRECT_TAG = absoluteName("Tag");
+const DIRECT_A = absoluteName("A");
+const DIRECT_B = absoluteName("B");
+const DIRECT_V0 = absoluteName("V0");
+const DIRECT_GA = absoluteName("GA");
+const DIRECT_GB = absoluteName("GB");
+const DIRECT_OTHER = absoluteName("Other");
+const DIRECT_V = absoluteName("V");
+const DIRECT_X = absoluteName("X");
+const DIRECT_Y = absoluteName("Y");
+const DIRECT_BODY = absoluteName("Body");
+const DIRECT_E = absoluteName("E");
+const DIRECT_K = absoluteName("K");
+
+const DIRECT_RULE_NAME = absoluteName("Rule");
+const DIRECT_CURRENT_ALIAS = absoluteName("Current");
+const DIRECT_EMPTY_SEQUENCE_NAME = absoluteName("Empty");
+const DIRECT_ONE_R_NAME = absoluteName("OneR");
+const DIRECT_TWO_R_NAME = absoluteName("TwoR");
+const DIRECT_NESTED_EMPTY_NAME = absoluteName("NestedEmpty");
+const DIRECT_ROLE_X_NAME = absoluteName("RoleX");
+const DIRECT_ROLE_Y_NAME = absoluteName("RoleY");
+const DIRECT_PAIR_XY_NAME = absoluteName("PairXY");
+const DIRECT_ANTECEDENT_NAME = absoluteName("Antecedent");
+const DIRECT_OUTPUT_NAME = absoluteName("Output");
+const DIRECT_IMAGE_NAME = absoluteName("Image");
+const DIRECT_META_BODY_NAME = absoluteName("MetaBody");
+const DIRECT_META_RULE_NAME = absoluteName("MetaRule");
+const DIRECT_GROUND_ANTECEDENT_NAME = absoluteName("GroundAntecedent");
+const DIRECT_GROUND_OUTPUT_NAME = absoluteName("GroundOutput");
+const DIRECT_GROUND_IMAGE_NAME = absoluteName("GroundImage");
+const DIRECT_GROUND_BODY_NAME = absoluteName("GroundBody");
+const DIRECT_GROUND_RULE_NAME = absoluteName("GroundRule");
+
+const absoluteTheoryByColon = contextualPath(":Theory");
+const absoluteTheoryByExplicitRoot = contextualPath("R:Theory");
+same(
+  absoluteTheoryByColon,
+  DIRECT_THEORY,
+  ":Theory resolves relative to Root R",
+);
+same(
+  absoluteTheoryByExplicitRoot,
+  DIRECT_THEORY,
+  "R:Theory equals :Theory",
+);
+
+const nameResolveCount = memory.linkCount;
+same(
+  resolveV015ContextualNameCoordinate(
+    memory,
+    basis.R,
+    localNameCarrier("Theory"),
+  ),
+  DIRECT_THEORY,
+  "contextual-name Resolve reads existing root-qualified name",
+);
+same(memory.linkCount, nameResolveCount, "contextual-name Resolve is read-only");
+
+const PATH_K = absoluteName("PathK");
+const PATH_K2 = absoluteName("PathK2");
+const PATH_A_CARRIER = localNameCarrier("PathA");
+const PATH_B_CARRIER = localNameCarrier("PathB");
+const PATH_C_CARRIER = localNameCarrier("PathC");
+const PATH_KA = materializeV015ContextualNamePath(
+  memory,
+  basis,
+  PATH_K,
+  [PATH_A_CARRIER],
+);
+const PATH_K2A = materializeV015ContextualNamePath(
+  memory,
+  basis,
+  PATH_K2,
+  [PATH_A_CARRIER],
+);
+const PATH_KB = materializeV015ContextualNamePath(
+  memory,
+  basis,
+  PATH_K,
+  [PATH_B_CARRIER],
+);
+const PATH_KBC = materializeV015ContextualNamePath(
+  memory,
+  basis,
+  PATH_KB,
+  [PATH_C_CARRIER],
+);
+assert(PATH_KA !== PATH_K2A, "same spelling in different contexts stays distinct");
+same(
+  PATH_KBC,
+  memory.ensure(PATH_KB, PATH_C_CARRIER),
+  "(K:B):C is a Link-native contextual-name path",
+);
 
 function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
   const parsed = new StrictDirectJsonReader(text).read();
@@ -648,18 +749,23 @@ function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
     const bound = resolvedBindings.get(name);
     if (bound !== undefined) return bound;
 
-    const atom = directAtoms.get(name);
-    if (atom !== undefined) return atom;
-
     const raw = rawBindings.get(name);
-    if (raw === undefined) directJsonFail("unknown-name");
-    if (resolving.has(name)) directJsonFail("cyclic-binding");
+    if (raw !== undefined) {
+      if (resolving.has(name)) directJsonFail("cyclic-binding");
+      resolving.add(name);
+      const resolved = resolveRhs(raw);
+      resolving.delete(name);
+      resolvedBindings.set(name, resolved);
+      return resolved;
+    }
 
-    resolving.add(name);
-    const resolved = resolveRhs(raw);
-    resolving.delete(name);
-    resolvedBindings.set(name, resolved);
-    return resolved;
+    return absoluteName(name);
+  };
+
+  const resolveEndpoint = (source: string): LinkHandle => {
+    const trimmed = source.trim();
+    if (trimmed.includes(":")) return contextualPath(trimmed);
+    return resolveName(trimmed);
   };
 
   const resolveExpr = (source: string): LinkHandle => {
@@ -668,11 +774,11 @@ function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
       directJsonFail("invalid-shape");
     }
 
-    let currentValue = resolveName(parts[0]!);
+    let currentValue = resolveEndpoint(parts[0]!);
     for (let index = 1; index < parts.length; index += 1) {
       currentValue = memory.ensure(
         currentValue,
-        resolveName(parts[index]!),
+        resolveEndpoint(parts[index]!),
       );
     }
     return currentValue;
@@ -718,10 +824,8 @@ function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
       }
 
       if (typeof value === "string" || Array.isArray(value)) {
-        const nameCarrier = directNameCarriers.get(key);
-        if (nameCarrier === undefined) directJsonFail("unknown-name");
         entries.push(
-          addBinding(builder, nameCarrier, resolveRhs(value)),
+          addBinding(builder, absoluteName(key), resolveRhs(value)),
         );
         continue;
       }
