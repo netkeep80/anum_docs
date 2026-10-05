@@ -18,12 +18,12 @@ No structural-unification power is attributed to classical grounded MP.
 namespace MTS.V015.External
 
 structure GenericRuleKernel (Link Binding : Type) where
-  matches : List Link → Link → Link → List Binding → Prop
+  matchRel : List Link → Link → Link → List Binding → Prop
   instantiate : List Binding → Link → Link
 
   emptyRolesMatch :
     ∀ {template actual bindings},
-      matches [] template actual bindings ↔
+      matchRel [] template actual bindings ↔
         template = actual ∧ bindings = []
 
   emptySubstitutionIdentity :
@@ -41,7 +41,7 @@ def GenericStep
     (current : Link)
     (result : List Link) : Prop :=
   ∃ bindings,
-    K.matches rule.roles rule.antecedent current bindings ∧
+    K.matchRel rule.roles rule.antecedent current bindings ∧
     result = rule.outputs.map (K.instantiate bindings)
 
 def GroundedExactStep
@@ -111,7 +111,7 @@ theorem GPR_07_zero_role_has_empty_substitution
     (K : GenericRuleKernel Link Binding)
     {template actual : Link}
     {bindings : List Binding}
-    (matched : K.matches [] template actual bindings) :
+    (matched : K.matchRel [] template actual bindings) :
     template = actual ∧ bindings = [] :=
   (K.emptyRolesMatch).mp matched
 
