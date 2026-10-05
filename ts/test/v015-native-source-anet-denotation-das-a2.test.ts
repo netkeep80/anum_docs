@@ -4,6 +4,9 @@ import {
   type LinkHandle,
 } from "../src/memory.js";
 import {
+  materializeExactSequence,
+} from "../src/exact-sequence.js";
+import {
   materializeNativeSyntaxGrammar,
   readNativeSyntaxGrammar,
   type NativeSyntaxGrammarRuleSpec,
@@ -556,6 +559,7 @@ class StrictDirectJsonReader {
 const Body = memory.poles(Rule).end;
 
 const directAtoms = new Map<string, LinkHandle>([
+  ["R", basis.R],
   ["Theory", Theory],
   ["V", V],
   ["X", X],
@@ -565,10 +569,17 @@ const directAtoms = new Map<string, LinkHandle>([
   ["K", K],
 ]);
 
+const ONE_R_NAME = fresh();
+const TWO_R_NAME = fresh();
+const NESTED_EMPTY_NAME = fresh();
+
 const directNameCarriers = new Map<string, LinkHandle>([
   ["Rule", RULE_NAME],
   ["Current", CURRENT_ALIAS],
   ["Empty", EMPTY_SEQUENCE_NAME],
+  ["OneR", ONE_R_NAME],
+  ["TwoR", TWO_R_NAME],
+  ["NestedEmpty", NESTED_EMPTY_NAME],
 ]);
 
 function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
@@ -623,8 +634,12 @@ function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
     if (typeof value === "string") return resolveExpr(value);
 
     if (Array.isArray(value)) {
-      if (value.length === 0) return basis.R;
-      directJsonFail("invalid-shape");
+      const elements = value.map((item) => {
+        if (typeof item === "string") return resolveExpr(item);
+        if (Array.isArray(item)) return resolveRhs(item);
+        return directJsonFail("invalid-shape");
+      });
+      return materializeExactSequence(memory, elements);
     }
 
     return directJsonFail("invalid-shape");
@@ -677,6 +692,9 @@ const directJson = [
   "  \"Rule\": \"V->Body\",",
   "  \"Current\": \"E->K\",",
   "  \"Empty\": [],",
+  "  \"OneR\": [\"R\"],",
+  "  \"TwoR\": [\"R\",\"R\"],",
+  "  \"NestedEmpty\": [[]],",
   "  \"V\": {",
   "    \"X\": null,",
   "    \"Y\": null",
@@ -727,6 +745,40 @@ assert(
   "direct JSON preserves Current binding",
 );
 
+const oneRCarrier = materializeExactSequence(memory, [basis.R]);
+const twoRCarrier = materializeExactSequence(memory, [basis.R, basis.R]);
+assert(oneRCarrier !== basis.R, "ExactSequence [R] is distinct from []=R");
+assert(twoRCarrier !== oneRCarrier, "ExactSequence [R,R] is distinct from [R]");
+
+assert(
+  direct.bindings.some((binding) =>
+    binding.coordinate === null &&
+    binding.name === ONE_R_NAME &&
+    binding.value === oneRCarrier
+  ),
+  "direct JSON OneR uses ExactSequence",
+);
+assert(
+  direct.bindings.some((binding) =>
+    binding.coordinate === null &&
+    binding.name === TWO_R_NAME &&
+    binding.value === twoRCarrier
+  ),
+  "direct JSON TwoR preserves second R position",
+);
+assert(
+  direct.bindings.some((binding) =>
+    binding.coordinate === null &&
+    binding.name === NESTED_EMPTY_NAME &&
+    binding.value === oneRCarrier
+  ),
+  "direct JSON [[]] composes inner []=R to ExactSequence [R]",
+);
+assert(
+  !direct.members.has(oneRCarrier) && !direct.members.has(twoRCarrier),
+  "array RHS carriers remain metamodel bindings without bare membership",
+);
+
 const reverseDirectJson = [
   "{",
   "  \"E->K\": null,",
@@ -735,6 +787,9 @@ const reverseDirectJson = [
   "    \"Y\": null,",
   "    \"X\": null",
   "  },",
+  "  \"NestedEmpty\": [[]],",
+  "  \"TwoR\": [\"R\",\"R\"],",
+  "  \"OneR\": [\"R\"],",
   "  \"Empty\": [],",
   "  \"Current\": \"E->K\",",
   "  \"Rule\": \"V->Body\"",
@@ -829,7 +884,12 @@ console.log([
   "JSON_BYPASS_TO_SEMANTIC_ANET=FALSE",
   "OBJECT_MEMBER_NULL=BARE_SOURCE_ENTRY",
   "STRING_RHS=METAMODEL_BINDING",
-  "EMPTY_ARRAY_RHS=R_BINDING",
+  "EMPTY_ARRAY_RHS=EXACT_SEQUENCE_EMPTY_EQUALS_R",
+  "NONEMPTY_ARRAY_RHS=EXACT_SEQUENCE",
+  "ARRAY_ONE_R_DISTINCT_FROM_EMPTY=TRUE",
+  "ARRAY_TWO_R_DISTINCT_FROM_ONE_R=TRUE",
+  "NESTED_EMPTY_ARRAY_EQUALS_ONE_R=TRUE",
+  "ARRAY_BINDING_IMPLIES_MEMBERSHIP=FALSE",
   "NESTED_OBJECT=ANCHORED_SOURCE_ANET",
   "STRUCTURED_BARE_KEY=RESOLVED_DIRECT_MEMBERSHIP",
   "DUPLICATE_JSON_KEY=FAIL_CLOSED",
