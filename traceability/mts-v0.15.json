@@ -689,6 +689,34 @@
         "#1976"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
+    },
+    "V15-JSON-04": {
+      "state": "OPEN",
+      "ownerIssue": 1188,
+      "dependsOn": [
+        "V15-JSON-02",
+        "V15-ONTO-02"
+      ],
+      "positiveVectors": [
+        "json-array-empty-exactsequence-equals-R",
+        "json-array-one-R-distinct-from-empty",
+        "json-array-two-R-distinct-from-one-R",
+        "nested-empty-array-composes-through-R"
+      ],
+      "negativeVectors": [
+        "rooted-fold-cannot-carry-rule-image-0-1-2-R-cardinality"
+      ],
+      "requiredExecutableGates": [
+        "ts/test/v015-json-array-rooted-fold-a4.test.ts",
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+      ],
+      "evidenceRefs": [
+        "ts/test/v015-json-array-rooted-fold-a4.test.ts",
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "#1188",
+        "#1987"
+      ],
+      "authorJsonReview": "GENERIC_ARRAY_MAPPING_APPROVED_ARTIFACTS_PENDING"
     }
   }
 }
