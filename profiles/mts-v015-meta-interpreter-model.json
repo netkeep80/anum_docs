@@ -1081,11 +1081,11 @@
         "approved grounded zero-role JSON preserves admission-only semantic ANet and exact behavior",
         "no host-global atom namespace is semantic authority"
       ],
-      "remainingBoundary": "Root/flat FORMAL surface convergence is GREEN. Nested bundle/Aset source contexts still need to supply their own current contextual anchor instead of the flat Root context; full #1978 FORMAL artifact/digest/recursive/A-memory chain and proof closure remain open. No host scope stack is allowed."
+      "remainingBoundary": "Root/flat FORMAL surface convergence is GREEN, and the two currently Author-approved JSON artifacts have complete #1978 regression evidence. Broader nested-context Grammar semantics beyond the proved direct-source bundle path, alpha-renaming pressure, theorem/proof FORMAL and remaining #2001 proof obligations stay open. No host scope stack is allowed."
     }
   },
   "ruleRoleCardinalityLaw": {
-    "status": "GREEN_RESEARCH_PROOF_PENDING",
+    "status": "GPR07_PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
     "owner": "#2001",
     "law": "roles(V,M_t) = { r ∈ M_t | START(r)=V }",
     "classification": [
@@ -1100,13 +1100,34 @@
       "Grounded exact MP is therefore a boundary/refinement case of the same generalized structural Rule topology."
     ],
     "evidence": {
-      "path": "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
-      "ciRun": "37289366373",
-      "markers": [
-        "GROUNDED_ROLE_COUNT=0",
-        "GROUNDED_EXACT_MATCH=IDENTITY",
-        "GROUNDED_NONIDENTICAL_MATCH=REJECT",
-        "META_RULE_STRUCTURAL_SWAP=GREEN"
+      "executable": {
+        "path": "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "ciRun": "37289366373",
+        "markers": [
+          "GROUNDED_ROLE_COUNT=0",
+          "GROUNDED_EXACT_MATCH=IDENTITY",
+          "GROUNDED_NONIDENTICAL_MATCH=REJECT",
+          "META_RULE_STRUCTURAL_SWAP=GREEN"
+        ]
+      },
+      "approvedRegressionCorpus": [
+        "grounded-zero-role-rule",
+        "two-role-meta-rule"
+      ],
+      "pairedProof": {
+        "classification": "PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
+        "lean4": "proofs/lean4/MtsV015GeneralizedReaction.lean",
+        "rocq": "proofs/coq/MtsV015GeneralizedReaction.v",
+        "assurance": "proofs/v015-external-proof-assurance.json",
+        "manifest": "proofs/evidence/v015-gpr07-zero-role-refinement.json",
+        "ciRun": 37335710302,
+        "globalAxiomAllowlist": []
+      },
+      "proofBoundary": [
+        "empty-role generic match iff exact antecedent identity plus empty substitution is an explicit generic-kernel law",
+        "empty substitution instantiation identity is an explicit generic-kernel law",
+        "GPR-07 does not derive those kernel laws from v0.14 Foundation",
+        "GPR-07 does not grant structural unification to classical grounded MP"
       ]
     }
   }
