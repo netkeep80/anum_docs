@@ -935,7 +935,9 @@
       "positiveVectors": [],
       "negativeVectors": [],
       "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "proofs/v015-evidence/formal-bootstrap-frm01-06.json"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-FORMAL-PROOF-02": {
@@ -951,7 +953,9 @@
       ],
       "negativeVectors": [],
       "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "proofs/v015-evidence/formal-bootstrap-frm01-06.json"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     }
   }
