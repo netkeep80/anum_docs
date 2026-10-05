@@ -1,0 +1,33 @@
+{
+  "schema": "mts-v015-external-proof-assurance/v0.1",
+  "status": "research-proof-active",
+  "ownerIssue": "#2001",
+  "authority": "external-cross-check-only",
+  "allowedGlobalAxioms": {
+    "lean4": [],
+    "rocq": []
+  },
+  "targets": [
+    {
+      "id": "GPR-07",
+      "classification": "PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
+      "premises": [
+        "empty role bundle: generic matcher succeeds iff antecedent identity holds and substitution is empty",
+        "empty substitution instantiation is identity"
+      ],
+      "exclusions": [
+        "does not grant structural binding power to classical grounded MP",
+        "does not prove the generic matcher laws from MTS Foundation alone",
+        "does not introduce RuleKind or a second execution path"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_07_grounded_zero_role_refinement",
+        "MTS.V015.External.GPR_07_zero_role_has_empty_substitution"
+      ],
+      "rocq": [
+        "GPR_07_grounded_zero_role_refinement",
+        "GPR_07_zero_role_has_empty_substitution"
+      ]
+    }
+  ]
+}
