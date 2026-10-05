@@ -996,7 +996,7 @@ Admission
         = Theory -> Rule ∈ M_t
 ```
 
-Существенно: ролью является **сама member-Link** `V->name_i`, а не её endpoint. Простого физического существования outgoing Link из `V` недостаточно — Link должна входить в исполняемую Aset `M_t`.
+Существенно: ролью является **сама member-Link** `V->name_i`, а не её endpoint. Простого физического существования outgoing Link из `V` недостаточно — Link должна входить в исполняемую ANet `M_t`.
 
 Исполняемый тест показал для двухролевого swap:
 
@@ -1016,7 +1016,7 @@ Y -> X
 
 Это пока **не универсальная теорема** и не финальный JSON.
 
-Предлагаемый direct-JSON surface для проверки:
+Проверенный direct-JSON candidate (**GREEN research, Author approval required**):
 
 ```json
 {
@@ -1024,10 +1024,29 @@ Y -> X
     "X": null,
     "Y": null
   },
-  "R": "V->((tag->(V:X->V:Y))->[V:Y->V:X])",
-  "Theory->R": null
+  "RoleX": "V->X",
+  "RoleY": "V->Y",
+  "PairXY": "RoleX->RoleY",
+  "Antecedent": "Tag->PairXY",
+  "Output": "RoleY->RoleX",
+  "Image": ["Output"],
+  "MetaBody": "Antecedent->Image",
+  "MetaRule": "V->MetaBody",
+  "Theory->MetaRule": null
 }
 ```
+
+После resolution + DAS в исполняемой ANet остаются только:
+
+```text
+V->X
+V->Y
+Theory->MetaRule
+```
+
+Промежуточные имена `RoleX`, `RoleY`, `PairXY`, `Antecedent`, `Output`, `Image`, `MetaBody`, `MetaRule` — метамодельные bindings и не становятся членами `M_t` автоматически.
+
+Executable witness уже подтвердил: `Tag->(A->B)` связывает две роли и инстанцирует `B->A` тем же generic structural matcher/constructor.
 
 Здесь предполагается:
 
@@ -1167,8 +1186,8 @@ JSON is only another source projection into the **same native source ANet**:
     -> RHS is not automatic membership
 
 {"A": []}
-    -> source binding A:Seq([])
-    -> Seq([])=R
+    -> source binding A:ExactSequence([])
+    -> ExactSequence([])=R
     -> R is not automatic membership
 
 {"A": {...}}
@@ -1201,6 +1220,32 @@ direct JSON ----/        -> SAME resolver
 
 The generic mapping is Author-approved. A concrete JSON representation of a logical element or proof is **not** automatically approved by this decision and still requires its own explicit Author gate.
 
+### Author-approved JSON array carrier
+
+**Author decision 2026-10-05: APPROVED AS DESIGN DIRECTION; executable evidence GREEN.**
+
+```text
+Den([])          = ExactSequence([]) = R
+Den([e1,...,en]) = ExactSequence([Den(e1),...,Den(en)])
+```
+
+`F_R` остаётся отдельной rooted-fold проекцией и не является canonical positional/execution carrier массива.
+
+Executable pressure:
+
+```text
+F_R([])      = R
+F_R([R])     = R
+F_R([R,R])   = R
+
+Exact([])      = R
+Exact([R])     != R
+Exact([R,R])   != Exact([R])
+```
+
+Поэтому ExactSequence необходим для сохранения 0/1/N cardinality у `Rule.Image`. При этом `Exact([[]]) = Exact([R])` ожидаемо, потому что внутренний `[]` сначала денотирует `R`.
+
+Direct JSON path также GREEN для `[]`, `[R]`, `[R,R]`, `[[]]`; array RHS остаётся metamodel binding и не публикуется в `M_t` без отдельного bare membership.
 ### DAS-A2 — canonical native source ANet
 
 DAS-A2 removes the last custom source carrier from DAS-A1.
@@ -1234,12 +1279,14 @@ The native source test reproduces the same semantic members and falsifiers as DA
 
 Therefore the custom post-resolution carrier in DAS-A1 is research scaffolding only. The candidate architecture now reuses the existing Link-native source ANet machinery.
 
-Still open before concrete JSON approval:
+Current status before canonicalizing a concrete meta-rule JSON:
 
-1. prove exact strict JSON `null`/string/array/nested-object lowering into the same native source ANet roles;
-2. replay the Author-approved native role-bundle Rule through JSON -> source ANet -> DAS -> Γ;
-3. pressure with theorem/proof FORMAL;
-4. show exact JSON and request the mandatory Author approval.
+- strict JSON `null`/string/array/nested-object -> native source ANet lowering: **GREEN**;
+- ExactSequence array carrier including non-empty/nested arrays: **GREEN**;
+- native role-bundle meta-rule JSON -> source ANet -> DAS -> structural match/instantiate: **GREEN**;
+- exact tested artifact is shown above;
+- theorem/proof FORMAL pressure remains open;
+- **explicit Author approval of this exact meta-rule JSON is still mandatory before canonicalization**.
 
 ## 17. Author gates
 
