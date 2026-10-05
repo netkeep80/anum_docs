@@ -1,0 +1,15 @@
+{
+  V : {
+    X,
+    Y
+  },
+  RoleX : V->X,
+  RoleY : V->Y,
+  PairXY : RoleX->RoleY,
+  Antecedent : Tag->PairXY,
+  Output : RoleY->RoleX,
+  Image : [Output],
+  MetaBody : Antecedent->Image,
+  MetaRule : V->MetaBody,
+  Theory->MetaRule
+}
