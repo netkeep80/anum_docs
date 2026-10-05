@@ -678,6 +678,122 @@
       }
     },
     {
+      "id": "V15-PROOF-EXEC-01",
+      "group": "PROOF_EXEC",
+      "ownerIssue": "#2003",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "The trusted native aprover is a FORMAL/ANet program compiled through the same source/metacompiler path as executable MTS artifacts; host code is orchestration only.",
+      "dependsOn": [
+        "V15-DUAL-01",
+        "V15-PROOF-01",
+        "V15-STAGE-01"
+      ],
+      "authority": {
+        "issue": 2003
+      },
+      "evidence": {
+        "positiveVectors": [],
+        "negativeVectors": [
+          "host-proof-semantics-forbidden"
+        ],
+        "requiredExecutableGates": []
+      }
+    },
+    {
+      "id": "V15-PROOF-EXEC-02",
+      "group": "PROOF_EXEC",
+      "ownerIssue": "#2003",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "Proof ANet plus aprover ANet execute in pinned A-memory using the same generalized reaction Γ and produce a structural verdict ANet; no proof-specific A-memory opcode exists.",
+      "dependsOn": [
+        "V15-PROOF-EXEC-01",
+        "V15-GAMMA-01"
+      ],
+      "authority": {
+        "issue": 2003
+      },
+      "evidence": {
+        "positiveVectors": [
+          "fnd07-aprover-anet-amemory-accept"
+        ],
+        "negativeVectors": [
+          "forged-target-reject",
+          "missing-premise-reject",
+          "foreign-theory-reject"
+        ],
+        "requiredExecutableGates": []
+      }
+    },
+    {
+      "id": "V15-PROOF-EXEC-03",
+      "group": "PROOF_EXEC",
+      "ownerIssue": "#2003",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "Search/UI/cache/metadata and host replay helpers have zero proof authority; every accepted candidate is replayed from scratch by aprover ANet inside A-memory.",
+      "dependsOn": [
+        "V15-PROOF-EXEC-02"
+      ],
+      "authority": {
+        "issue": 2003
+      },
+      "evidence": {
+        "positiveVectors": [],
+        "negativeVectors": [
+          "search-result-is-not-proof",
+          "metadata-accept-forbidden",
+          "theorem-id-dispatch-forbidden"
+        ],
+        "requiredExecutableGates": []
+      }
+    },
+    {
+      "id": "V15-FORMAL-PROOF-01",
+      "group": "FORMAL_PROOF",
+      "ownerIssue": "#2004",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "Lean4 and Rocq independently formalize the supported v0.15 FORMAL mathematical core and classify exact premises/domain/exclusions for contextual names, source denotation, DAS and ExactSequence.",
+      "dependsOn": [
+        "V15-AUTH-01",
+        "V15-DUAL-01",
+        "V15-JSON-04"
+      ],
+      "authority": {
+        "issue": 2004
+      },
+      "evidence": {
+        "positiveVectors": [],
+        "negativeVectors": [],
+        "requiredExecutableGates": []
+      }
+    },
+    {
+      "id": "V15-FORMAL-PROOF-02",
+      "group": "FORMAL_PROOF",
+      "ownerIssue": "#2004",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "Paired external assurance proves/cross-checks semantic preservation of FORMAL/JSON convergence and canonical recursive 8/9/6/1 metacompilation for the declared fragment; corpus GREEN alone is not proof of soundness.",
+      "dependsOn": [
+        "V15-FORMAL-PROOF-01",
+        "V15-REG-01"
+      ],
+      "authority": {
+        "issue": 2004
+      },
+      "evidence": {
+        "positiveVectors": [
+          "grounded-zero-role-refinement-witness",
+          "two-role-meta-rule-refinement-witness"
+        ],
+        "negativeVectors": [],
+        "requiredExecutableGates": []
+      }
+    },
+    {
       "id": "V15-JSON-04",
       "group": "JSON",
       "ownerIssue": "#1188",
@@ -866,7 +982,9 @@
       "dependsOn": [
         "V15-CORPUS-01",
         "V15-THM-03",
-        "V15-REG-02"
+        "V15-REG-02",
+        "V15-PROOF-EXEC-03",
+        "V15-FORMAL-PROOF-02"
       ],
       "authority": {
         "issue": 1876
