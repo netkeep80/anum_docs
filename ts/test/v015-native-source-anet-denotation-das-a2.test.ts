@@ -25,6 +25,11 @@ import {
   readSyntaxAset,
   type SyntaxAsetOccurrence,
 } from "../src/syntax-aset-contract.js";
+import {
+  denoteV015ResolvedSourceAnet,
+  materializeV015SourceAnetProfile,
+  type V015SourceAnetProfile,
+} from "../src/v015-source-anet.js";
 
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 DAS-A2 native source ANet: " + message);
@@ -46,123 +51,6 @@ function setSame(
   for (const value of expected) assert(actual.has(value), message + ": member");
 }
 
-interface DenotationProfile {
-  readonly blockForm: LinkHandle;
-  readonly bareForm: LinkHandle;
-  readonly bindingForm: LinkHandle;
-  readonly bundleForm: LinkHandle;
-  readonly itemRole: LinkHandle;
-  readonly bareValueRole: LinkHandle;
-  readonly bindingNameRole: LinkHandle;
-  readonly bindingValueRole: LinkHandle;
-  readonly bundleAnchorRole: LinkHandle;
-  readonly bundleBodyRole: LinkHandle;
-}
-
-interface BindingProjection {
-  readonly coordinate: LinkHandle | null;
-  readonly name: LinkHandle;
-  readonly value: LinkHandle;
-}
-
-interface DenotationRead {
-  readonly members: ReadonlySet<LinkHandle>;
-  readonly bindings: readonly BindingProjection[];
-}
-
-function oneField(
-  occurrence: SyntaxAsetOccurrence,
-  role: LinkHandle,
-): LinkHandle {
-  const values = occurrence.fields
-    .filter((field) => field.role === role)
-    .map((field) => field.value);
-  assert(values.length === 1, "exactly one field for selected role");
-  return values[0]!;
-}
-
-/**
- * Read one canonical native SyntaxAset and lower its already-resolved carrier
- * values into the extensional semantic ANet.
- *
- * The selected native Grammar + profile Links are source-role authority.
- * Host object labels below are only the executable reader implementation.
- */
-function denoteNativeResolvedSourceAnet(
-  memory: Memory,
-  grammarRoot: LinkHandle,
-  profile: DenotationProfile,
-  sourceAnet: LinkHandle,
-): DenotationRead {
-  const grammar = readNativeSyntaxGrammar(
-    memory,
-    ensureRootBasis(memory),
-    grammarRoot,
-  );
-  const source = readSyntaxAset(memory, sourceAnet, grammar.vocabulary);
-  const occurrences = new Map(
-    source.occurrences.map((entry) => [entry.occurrence, entry]),
-  );
-  const members = new Set<LinkHandle>();
-  const bindings: BindingProjection[] = [];
-
-  const walkBlock = (
-    blockHandle: LinkHandle,
-    contextAnchor: LinkHandle | null,
-  ): void => {
-    const block = occurrences.get(blockHandle);
-    assert(block !== undefined, "block occurrence exists");
-    same(block.kind, profile.blockForm, "selected block form");
-
-    for (const field of block.fields) {
-      if (field.role !== profile.itemRole) continue;
-      const entry = occurrences.get(field.value);
-      assert(entry !== undefined, "entry occurrence exists");
-
-      if (entry.kind === profile.bareForm) {
-        const resolved = oneField(entry, profile.bareValueRole);
-        members.add(
-          contextAnchor === null
-            ? resolved
-            : memory.ensure(contextAnchor, resolved),
-        );
-        continue;
-      }
-
-      if (entry.kind === profile.bindingForm) {
-        const name = oneField(entry, profile.bindingNameRole);
-        const value = oneField(entry, profile.bindingValueRole);
-        const coordinate = contextAnchor === null
-          ? null
-          : memory.ensure(contextAnchor, name);
-        if (coordinate !== null) members.add(coordinate);
-        bindings.push(Object.freeze({ coordinate, name, value }));
-        continue;
-      }
-
-      if (entry.kind === profile.bundleForm) {
-        const localAnchor = oneField(entry, profile.bundleAnchorRole);
-        const body = oneField(entry, profile.bundleBodyRole);
-        const nestedAnchor = contextAnchor === null
-          ? localAnchor
-          : memory.ensure(contextAnchor, localAnchor);
-        if (contextAnchor !== null) members.add(nestedAnchor);
-        walkBlock(body, nestedAnchor);
-        continue;
-      }
-
-      throw new Error("v0.15 DAS-A2 native source ANet: unsupported entry form");
-    }
-  };
-
-  walkBlock(source.root, null);
-
-  return Object.freeze({
-    members,
-    bindings: Object.freeze(bindings),
-  });
-}
-
 const memory = new Memory();
 const basis = ensureRootBasis(memory);
 
@@ -175,7 +63,7 @@ const fresh = (): LinkHandle => {
 const syntaxTag = fresh();
 const markerSeed = fresh();
 
-const profile: DenotationProfile = Object.freeze({
+const profile: V015SourceAnetProfile = Object.freeze({
   blockForm: fresh(),
   bareForm: fresh(),
   bindingForm: fresh(),
@@ -222,6 +110,11 @@ const grammarRoot = materializeNativeSyntaxGrammar(memory, basis, {
   markerSeed,
   rules,
 });
+
+const sourceAnetProfileRoot = materializeV015SourceAnetProfile(
+  memory,
+  profile,
+);
 
 const Theory = fresh();
 const E = fresh();
@@ -346,10 +239,11 @@ function buildSource(reverse: boolean, includeCurrent: boolean): LinkHandle {
 }
 
 const forwardSource = buildSource(false, true);
-const forward = denoteNativeResolvedSourceAnet(
+const forward = denoteV015ResolvedSourceAnet(
   memory,
+  basis,
   grammarRoot,
-  profile,
+  sourceAnetProfileRoot,
   forwardSource,
 );
 
@@ -391,19 +285,21 @@ assert(
 );
 
 const reverseSource = buildSource(true, true);
-const reverse = denoteNativeResolvedSourceAnet(
+const reverse = denoteV015ResolvedSourceAnet(
   memory,
+  basis,
   grammarRoot,
-  profile,
+  sourceAnetProfileRoot,
   reverseSource,
 );
 setSame(reverse.members, [...forward.members], "source order is nonsemantic");
 
 const noCurrentSource = buildSource(false, false);
-const noCurrent = denoteNativeResolvedSourceAnet(
+const noCurrent = denoteV015ResolvedSourceAnet(
   memory,
+  basis,
   grammarRoot,
-  profile,
+  sourceAnetProfileRoot,
   noCurrentSource,
 );
 assert(
@@ -874,10 +770,11 @@ const absoluteLinkLawJson = [
   "  \"R:Theory->R:GroundRule\": null",
   "}",
 ].join("\n");
-const absoluteLinkLaw = denoteNativeResolvedSourceAnet(
+const absoluteLinkLaw = denoteV015ResolvedSourceAnet(
   memory,
+  basis,
   grammarRoot,
-  profile,
+  sourceAnetProfileRoot,
   compileDirectJsonToNativeSourceAnet(absoluteLinkLawJson),
 );
 const DIRECT_GROUND_RULE_ABSOLUTE = contextualPath(":GroundRule");
@@ -909,10 +806,11 @@ const directJson = [
 ].join("\n");
 
 const directSource = compileDirectJsonToNativeSourceAnet(directJson);
-const direct = denoteNativeResolvedSourceAnet(
+const direct = denoteV015ResolvedSourceAnet(
   memory,
+  basis,
   grammarRoot,
-  profile,
+  sourceAnetProfileRoot,
   directSource,
 );
 
@@ -1008,10 +906,11 @@ const reverseDirectJson = [
 
 const reverseDirectSource =
   compileDirectJsonToNativeSourceAnet(reverseDirectJson);
-const reverseDirect = denoteNativeResolvedSourceAnet(
+const reverseDirect = denoteV015ResolvedSourceAnet(
   memory,
+  basis,
   grammarRoot,
-  profile,
+  sourceAnetProfileRoot,
   reverseDirectSource,
 );
 setSame(
@@ -1032,10 +931,11 @@ const noCurrentDirectJson = [
   "}",
 ].join("\n");
 
-const noCurrentDirect = denoteNativeResolvedSourceAnet(
+const noCurrentDirect = denoteV015ResolvedSourceAnet(
   memory,
+  basis,
   grammarRoot,
-  profile,
+  sourceAnetProfileRoot,
   compileDirectJsonToNativeSourceAnet(noCurrentDirectJson),
 );
 assert(
@@ -1078,10 +978,11 @@ const metaRuleJson = [
 ].join("\n");
 
 const metaRuleSource = compileDirectJsonToNativeSourceAnet(metaRuleJson);
-const metaRuleDenotation = denoteNativeResolvedSourceAnet(
+const metaRuleDenotation = denoteV015ResolvedSourceAnet(
   memory,
+  basis,
   grammarRoot,
-  profile,
+  sourceAnetProfileRoot,
   metaRuleSource,
 );
 
@@ -1166,10 +1067,11 @@ const groundedRuleJson = [
 
 const groundedRuleSource =
   compileDirectJsonToNativeSourceAnet(groundedRuleJson);
-const groundedRuleDenotation = denoteNativeResolvedSourceAnet(
+const groundedRuleDenotation = denoteV015ResolvedSourceAnet(
   memory,
+  basis,
   grammarRoot,
-  profile,
+  sourceAnetProfileRoot,
   groundedRuleSource,
 );
 
