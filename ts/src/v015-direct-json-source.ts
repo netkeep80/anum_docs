@@ -1,18 +1,16 @@
-import { materializeExactSequence } from "./exact-sequence.js";
 import {
   verifyRootBasis,
   type LinkHandle,
   type RootBasis,
   type WriteMemory,
 } from "./memory.js";
-import { readNativeSyntaxGrammar } from "./native-syntax-grammar.js";
-import { SyntaxAsetBuilder } from "./syntax-aset-contract.js";
 import {
-  materializeV015ContextualNamePath,
-} from "./v015-link-definition.js";
-import {
-  readV015SourceAnetProfile,
-} from "./v015-source-anet.js";
+  V015DirectSourceError,
+  compileV015DirectSourceEntries,
+  type V015DirectSourceEntry,
+  type V015DirectSourceRhs,
+  type V015DirectSourceSequenceItem,
+} from "./v015-direct-source.js";
 import { materializeV012StringAnum } from "./v012-string-anum.js";
 
 export type V015DirectJsonSourceErrorCode =
@@ -26,7 +24,6 @@ export type V015DirectJsonSourceErrorCode =
 
 export class V015DirectJsonSourceError extends Error {
   override readonly name = "V015DirectJsonSourceError";
-
   constructor(readonly code: V015DirectJsonSourceErrorCode) {
     super(code);
   }
@@ -37,11 +34,11 @@ export interface V015DirectJsonSourceCompileResult {
   readonly sourceAset: LinkHandle;
 }
 
-type DirectJsonValue =
+type JsonValue =
   | null
   | string
-  | readonly DirectJsonValue[]
-  | ReadonlyMap<string, DirectJsonValue>;
+  | readonly JsonValue[]
+  | ReadonlyMap<string, JsonValue>;
 
 function fail(code: V015DirectJsonSourceErrorCode): never {
   throw new V015DirectJsonSourceError(code);
@@ -52,7 +49,7 @@ class StrictDirectJsonReader {
 
   constructor(private readonly text: string) {}
 
-  read(): DirectJsonValue {
+  read(): JsonValue {
     this.space();
     const value = this.value();
     this.space();
@@ -69,7 +66,7 @@ class StrictDirectJsonReader {
     }
   }
 
-  private value(): DirectJsonValue {
+  private value(): JsonValue {
     this.space();
     const ch = this.text[this.index];
     if (ch === "{") return this.object();
@@ -102,22 +99,16 @@ class StrictDirectJsonReader {
           return fail("invalid-json");
         }
       }
-
-      if (ch === "\\") {
-        this.index += 2;
-      } else {
-        this.index += 1;
-      }
+      this.index += ch === "\\" ? 2 : 1;
     }
 
     return fail("invalid-json");
   }
 
-  private object(): ReadonlyMap<string, DirectJsonValue> {
+  private object(): ReadonlyMap<string, JsonValue> {
     this.index += 1;
     this.space();
-    const result = new Map<string, DirectJsonValue>();
-
+    const result = new Map<string, JsonValue>();
     if (this.text[this.index] === "}") {
       this.index += 1;
       return result;
@@ -128,12 +119,10 @@ class StrictDirectJsonReader {
       if (this.text[this.index] !== "\"") return fail("invalid-json");
       const key = this.string();
       if (result.has(key)) return fail("duplicate-key");
-
       this.space();
       if (this.text[this.index] !== ":") return fail("invalid-json");
       this.index += 1;
       result.set(key, this.value());
-
       this.space();
       const next = this.text[this.index];
       if (next === "}") {
@@ -145,11 +134,10 @@ class StrictDirectJsonReader {
     }
   }
 
-  private array(): readonly DirectJsonValue[] {
+  private array(): readonly JsonValue[] {
     this.index += 1;
     this.space();
-    const result: DirectJsonValue[] = [];
-
+    const result: JsonValue[] = [];
     if (this.text[this.index] === "]") {
       this.index += 1;
       return Object.freeze(result);
@@ -159,7 +147,6 @@ class StrictDirectJsonReader {
       const value = this.value();
       if (value === null) fail("invalid-null-position");
       result.push(value);
-
       this.space();
       const next = this.text[this.index];
       if (next === "]") {
@@ -172,26 +159,59 @@ class StrictDirectJsonReader {
   }
 }
 
-function isContextualNameSegment(segment: string): boolean {
-  return (
-    segment.length > 0 &&
-    !/[\t\r\n :()]/u.test(segment) &&
-    !segment.includes("->") &&
-    !segment.includes("[") &&
-    !segment.includes("]") &&
-    !segment.includes(",") &&
-    !segment.includes("=") &&
-    !segment.includes("≡")
+function sequenceItem(value: JsonValue): V015DirectSourceSequenceItem {
+  if (typeof value === "string") {
+    return Object.freeze({ kind: "expression", source: value });
+  }
+  if (Array.isArray(value)) {
+    return Object.freeze({
+      kind: "sequence",
+      items: Object.freeze(value.map(sequenceItem)),
+    });
+  }
+  return fail("invalid-shape");
+}
+
+function rhs(value: JsonValue): V015DirectSourceRhs | null {
+  if (value === null) return null;
+  if (typeof value === "string") {
+    return Object.freeze({ kind: "expression", source: value });
+  }
+  if (Array.isArray(value)) {
+    return Object.freeze({
+      kind: "sequence",
+      items: Object.freeze(value.map(sequenceItem)),
+    });
+  }
+  if (value instanceof Map) {
+    return Object.freeze({
+      kind: "bundle",
+      entries: entries(value),
+    });
+  }
+  return fail("invalid-shape");
+}
+
+function entries(
+  object: ReadonlyMap<string, JsonValue>,
+): readonly V015DirectSourceEntry[] {
+  return Object.freeze(
+    [...object].map(([head, value]) =>
+      Object.freeze({ head, rhs: rhs(value) })
+    ),
   );
 }
 
+function mapLoweringError(error: V015DirectSourceError): never {
+  if (error.code === "invalid-basis") return fail("invalid-basis");
+  if (error.code === "cyclic-binding") return fail("cyclic-binding");
+  return fail("invalid-shape");
+}
+
 /**
- * Compile the Author-selected compact JSON source surface into the same native
- * SyntaxAset carrier consumed by source-ANet denotation.
- *
- * This compiler does not publish semantic ANet membership.  It only resolves
- * source expressions and constructs source occurrences.  Membership is a
- * separate stage owned by denoteV015ResolvedSourceAnet.
+ * Strict compact JSON projection into the shared direct-source lowering.
+ * JSON contributes syntax only; native source ANet roles and semantic ANet
+ * denotation are shared with FORMAL.
  */
 export function compileV015DirectJsonSourceAnet(
   memory: WriteMemory,
@@ -207,14 +227,6 @@ export function compileV015DirectJsonSourceAnet(
     return fail("invalid-basis");
   }
 
-  const grammar = readNativeSyntaxGrammar(memory, verified, grammarRoot);
-  const profile = readV015SourceAnetProfile(
-    memory,
-    verified,
-    grammarRoot,
-    sourceAnetProfileRoot,
-  );
-
   let text: string;
   try {
     text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
@@ -223,7 +235,7 @@ export function compileV015DirectJsonSourceAnet(
   }
 
   const parsed = new StrictDirectJsonReader(text).read();
-  if (!(parsed instanceof Map)) fail("invalid-shape");
+  if (!(parsed instanceof Map)) return fail("invalid-shape");
 
   const sourceContent = materializeV012StringAnum(
     memory,
@@ -231,206 +243,17 @@ export function compileV015DirectJsonSourceAnet(
     bytes,
   ).anumLink;
 
-  const nameCarrierCache = new Map<string, LinkHandle>();
-  const localNameCarrier = (name: string): LinkHandle => {
-    const known = nameCarrierCache.get(name);
-    if (known !== undefined) return known;
-    const carrier = materializeV012StringAnum(
+  try {
+    const sourceAset = compileV015DirectSourceEntries(
       memory,
       verified,
-      new TextEncoder().encode(name),
-    ).anumLink;
-    nameCarrierCache.set(name, carrier);
-    return carrier;
-  };
-
-  const absoluteName = (name: string): LinkHandle => {
-    if (name === "R") return verified.R;
-    return materializeV015ContextualNamePath(
-      memory,
-      verified,
-      verified.R,
-      [localNameCarrier(name)],
-      true,
+      grammarRoot,
+      sourceAnetProfileRoot,
+      entries(parsed),
     );
-  };
-
-  const contextualPath = (source: string): LinkHandle => {
-    const compact = source.replace(/[()]/gu, "").trim();
-    if (compact.length === 0) fail("invalid-shape");
-
-    if (compact.startsWith(":")) {
-      const segments = compact.slice(1).split(":");
-      if (segments.some((segment) => !isContextualNameSegment(segment))) {
-        fail("invalid-shape");
-      }
-      return materializeV015ContextualNamePath(
-        memory,
-        verified,
-        verified.R,
-        segments.map(localNameCarrier),
-        true,
-      );
-    }
-
-    const segments = compact.split(":");
-    if (segments.some((segment) => !isContextualNameSegment(segment))) {
-      fail("invalid-shape");
-    }
-    if (segments[0] === "R") {
-      if (segments.length === 1) return verified.R;
-      return materializeV015ContextualNamePath(
-        memory,
-        verified,
-        verified.R,
-        segments.slice(1).map(localNameCarrier),
-        true,
-      );
-    }
-
-    return materializeV015ContextualNamePath(
-      memory,
-      verified,
-      verified.R,
-      segments.map(localNameCarrier),
-      false,
-    );
-  };
-
-  const rawBindings = new Map<string, DirectJsonValue>();
-  for (const [key, value] of parsed) {
-    if (typeof value === "string" || Array.isArray(value)) {
-      rawBindings.set(key, value);
-    }
+    return Object.freeze({ sourceContent, sourceAset });
+  } catch (error) {
+    if (error instanceof V015DirectSourceError) return mapLoweringError(error);
+    throw error;
   }
-
-  const resolvedBindings = new Map<string, LinkHandle>();
-  const resolving = new Set<string>();
-
-  let resolveRhs: (value: DirectJsonValue) => LinkHandle;
-
-  const resolveName = (name: string): LinkHandle => {
-    const bound = resolvedBindings.get(name);
-    if (bound !== undefined) return bound;
-
-    const raw = rawBindings.get(name);
-    if (raw !== undefined) {
-      if (resolving.has(name)) fail("cyclic-binding");
-      resolving.add(name);
-      const resolved = resolveRhs(raw);
-      resolving.delete(name);
-      resolvedBindings.set(name, resolved);
-      return resolved;
-    }
-
-    return absoluteName(name);
-  };
-
-  const resolveEndpoint = (source: string): LinkHandle => {
-    const trimmed = source.trim();
-    if (trimmed.includes(":")) return contextualPath(trimmed);
-    return resolveName(trimmed);
-  };
-
-  const resolveExpr = (source: string): LinkHandle => {
-    const parts = source.split("->").map((part) => part.trim());
-    if (parts.length === 0 || parts.some((part) => part.length === 0)) {
-      return fail("invalid-shape");
-    }
-
-    let currentValue = resolveEndpoint(parts[0]!);
-    for (let index = 1; index < parts.length; index += 1) {
-      currentValue = memory.ensure(
-        currentValue,
-        resolveEndpoint(parts[index]!),
-      );
-    }
-    return currentValue;
-  };
-
-  resolveRhs = (value: DirectJsonValue): LinkHandle => {
-    if (typeof value === "string") return resolveExpr(value);
-
-    if (Array.isArray(value)) {
-      const elements = value.map((item) => {
-        if (typeof item === "string") return resolveExpr(item);
-        if (Array.isArray(item)) return resolveRhs(item);
-        return fail("invalid-shape");
-      });
-      return materializeExactSequence(memory, elements);
-    }
-
-    return fail("invalid-shape");
-  };
-
-  for (const key of rawBindings.keys()) resolveName(key);
-
-  const builder = new SyntaxAsetBuilder(
-    memory,
-    grammar.vocabulary,
-  );
-
-  const addBare = (value: LinkHandle): LinkHandle =>
-    builder.addOccurrence(profile.bareForm, [
-      { role: profile.bareValueRole, value },
-    ]);
-
-  const addBinding = (
-    name: LinkHandle,
-    value: LinkHandle,
-  ): LinkHandle =>
-    builder.addOccurrence(profile.bindingForm, [
-      { role: profile.bindingNameRole, value: name },
-      { role: profile.bindingValueRole, value },
-    ]);
-
-  const addBundle = (
-    anchor: LinkHandle,
-    body: LinkHandle,
-  ): LinkHandle =>
-    builder.addOccurrence(profile.bundleForm, [
-      { role: profile.bundleAnchorRole, value: anchor },
-      { role: profile.bundleBodyRole, value: body },
-    ]);
-
-  const addBlock = (entries: readonly LinkHandle[]): LinkHandle =>
-    builder.addOccurrence(
-      profile.blockForm,
-      entries.map((value) => ({ role: profile.itemRole, value })),
-    );
-
-  const compileObject = (
-    object: ReadonlyMap<string, DirectJsonValue>,
-  ): LinkHandle => {
-    const entries: LinkHandle[] = [];
-
-    for (const [key, value] of object) {
-      if (value instanceof Map) {
-        const body = compileObject(value);
-        entries.push(addBundle(resolveExpr(key), body));
-        continue;
-      }
-
-      if (value === null) {
-        entries.push(addBare(resolveExpr(key)));
-        continue;
-      }
-
-      if (typeof value === "string" || Array.isArray(value)) {
-        entries.push(
-          addBinding(absoluteName(key), resolveRhs(value)),
-        );
-        continue;
-      }
-
-      return fail("invalid-shape");
-    }
-
-    return addBlock(entries);
-  };
-
-  return Object.freeze({
-    sourceContent,
-    sourceAset: builder.finish(compileObject(parsed)),
-  });
 }
