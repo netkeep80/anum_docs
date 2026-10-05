@@ -959,7 +959,7 @@
     ]
   },
   "groundedZeroRoleRuleCandidate": {
-    "status": "AUTHOR_APPROVED_SOURCE_ARTIFACT_REGRESSION_EVIDENCE_PENDING",
+    "status": "AUTHOR_APPROVED_SOURCE_ARTIFACT_FULL_REGRESSION_GREEN",
     "authorApproval": {
       "date": "2026-10-05",
       "decision": "APPROVED_EXACT_JSON_SOURCE_ARTIFACT"
@@ -1009,9 +1009,16 @@
       "ciRun": 37321650052,
       "result": "SUCCESS",
       "twoMemoryParity": "GREEN",
-      "amemoryReplay": "PENDING"
+      "amemoryReplay": {
+        "status": "SUCCESS",
+        "frozenMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+        "version": "0.175.0",
+        "workflowRun": 37324057317,
+        "evidenceArtifact": "formal/v0.15/regression/grounded-zero-role.amemory-evidence.json",
+        "exactPersistedEvidenceMatch": true
+      }
     },
-    "remainingGate": "Author gate, exact FORMAL projection, source parity, persisted digests and canonical recursive 8/9/6/1 artifact are GREEN. Full #1978 closure now requires fresh frozen A-memory 0.175.0 replay through amemory#482 plus normalized replay evidence; theorem/proof closure #2001 remains pending."
+    "remainingGate": "The complete #1978 regression chain for this exact grounded artifact is GREEN, including frozen A-memory 0.175.0 replay and normalized persisted evidence. Only broader theorem/proof closure #2001 and v0.15 release-level gates remain pending."
   },
   "contextualNameResolution": {
     "status": "AUTHOR_APPROVED_DESIGN_GREEN_ROOT_FORMAL_SURFACE_PROOF_PENDING",
