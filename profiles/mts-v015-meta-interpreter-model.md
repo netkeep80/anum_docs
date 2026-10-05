@@ -1313,6 +1313,60 @@ Current status after production extraction:
 - next vertical: empty `V0:{}` grounded exact-rule refinement through the same JSON/source/DAS path;
 - other logical/proof JSON artifacts still require their own explicit Author gate.
 
+## 16b.1. Direct FORMAL и JSON теперь сходятся в одну исходную ANet
+
+Исполняемый тест: `ts/test/v015-direct-formal-source-b20.test.ts`.
+
+Теперь два входных синтаксиса устроены так:
+
+```text
+FORMAL text ----\
+                 -> V015DirectSourceEntry
+direct JSON ----/          |
+                           v
+                 SAME native source ANet
+                           |
+                           v
+                    SAME DAS denotation
+                           |
+                           v
+                          M_t
+```
+
+Общий нижний слой — `ts/src/v015-direct-source.ts`. Поэтому JSON больше не имеет собственного значения `null/string/array/object` после разбора, а FORMAL не имеет отдельного способа трактовать bare/binding/bundle.
+
+Проверены попарно:
+
+```text
+{}              == {}
+{ A }           == {"A":null}
+{ A : {} }      == {"A":{}}
+{ A : [] }      == {"A":[]}
+{ V : { X, Y }} == {"V":{"X":null,"Y":null}}
+```
+
+Знак `==` здесь означает **точно тот же native source ANet**, а не просто похожий конечный результат.
+
+Для уже Author-approved grounded JSON получена точная FORMAL-проекция-кандидат:
+
+```text
+{
+  V0 : {},
+  GroundAntecedent : GA,
+  GroundOutput : GB,
+  GroundImage : [GroundOutput],
+  GroundBody : GroundAntecedent->GroundImage,
+  GroundRule : V0->GroundBody,
+  Theory->GroundRule
+}
+```
+
+Она даёт ровно тот же source ANet, затем тот же semantic ANet с единственным admission `Theory->GroundRule`, ноль ролей у `V0`, точное совпадение `GA` и результат `GB`.
+
+Checkpoint: `1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a`; CI `37317390018` SUCCESS; Pages `37317390059` SUCCESS; repo-guard SKIPPED.
+
+Это ещё **не закрывает #1978**. Пока нет persisted FORMAL artifact + digest, рекурсивного 8/9/6/1 artifact + digest и свежего прогона через замороженную A-memory.
+
 ## 16c. Grounded zero-role JSON refinement
 
 Executable witness: `ts/test/v015-native-source-anet-denotation-das-a2.test.ts`.
