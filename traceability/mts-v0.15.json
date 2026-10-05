@@ -88,6 +88,60 @@
                   "revisionOrDigest": "d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61",
                   "decisionEvidence": "netkeep80/anum_docs#1978 issuecomment-5994922633"
             }
+      },
+      {
+            "id": "two-role-meta-rule",
+            "kind": "EXECUTABLE",
+            "authorApprovalEvidence": "netkeep80/anum_docs#1188 issuecomment-5991612725",
+            "formalSourceArtifact": "formal/v0.15/regression/two-role-meta-rule.formal",
+            "formalSourceDigest": "f68e8629b5d476f49366f3f59e65ef64d523d5b5f8964dcf918283144ba292f9",
+            "canonicalJsonArtifact": "formal/v0.15/regression/two-role-meta-rule.json",
+            "canonicalJsonDigest": "7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56",
+            "jsonProfileRevision": "direct-source-anet@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
+            "grammarProfileRevision": "v015-source-anet:block-bare-binding-bundle@1ebc3e0d6ce61b47ea966ed4aed74e57dec1059a",
+            "metacompilerRevision": "77d82b9244e8fb4a77bfcf01a88ea345d474e13c",
+            "metacompilerProfile": "direct source ANet -> semantic ANet -> canonical extensional member listing of v0.13 hierarchical 8/9/6/1 wires",
+            "semanticEntry": "V->X; V->Y; Theory->MetaRule",
+            "expectedRecursiveRepresentation": "formal/v0.15/regression/two-role-meta-rule.recursive",
+            "expectedRecursiveDigest": "ca6a6d39913a7a5947edaeaad9d45a43603781e7b2188fd5bc34a59712da8ed9",
+            "amemoryExecutionProfile": "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d:formal_recursive_replay",
+            "amemoryReplayPackage": "formal/v0.15/regression/two-role-meta-rule.amemory-package.json",
+            "amemoryReplayPackageDigest": "ce8758fbe3ca6de992c1382db8af543f17aa55495cf0bad542e290c336e4be03",
+            "amemoryReplayEvidence": "formal/v0.15/regression/two-role-meta-rule.amemory-evidence.json",
+            "expectedSemanticResult": {
+                  "positiveSwap": {
+                        "rawRuleMatches": 1,
+                        "transitionedMembers": 1,
+                        "handoffCount": 1,
+                        "quiescent": false,
+                        "resultEqualsExpected": true
+                  },
+                  "negativeRootPayloadMismatch": {
+                        "rawRuleMatches": 0,
+                        "transitionedMembers": 0,
+                        "handoffCount": 0,
+                        "quiescent": true,
+                        "resultEqualsExpected": true
+                  }
+            },
+            "externalDependencies": {
+                  "amemoryMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+                  "amemoryVersion": "0.175.0",
+                  "amemoryAdapterIssue": 482,
+                  "rustToolchain": "1.98.1"
+            },
+            "regressionEvidence": {
+                  "manifest": "formal/v0.15/regression/two-role-meta-rule.evidence.json",
+                  "recursiveCiRun": 37332835410,
+                  "frozenAmemoryWorkflowRun": 37333704049,
+                  "exactPersistedAmemoryEvidenceMatch": true
+            },
+            "authorJsonReview": {
+                  "state": "APPROVED",
+                  "artifact": "formal/v0.15/regression/two-role-meta-rule.json",
+                  "revisionOrDigest": "7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56",
+                  "decisionEvidence": "netkeep80/anum_docs#1188 issuecomment-5991612725"
+            }
       }
     ],
     "rule": "Every explicitly Author-approved JSON artifact becomes a permanent executable regression witness."
