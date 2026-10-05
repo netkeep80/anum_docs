@@ -851,7 +851,7 @@
     "nextGate": "First concrete native role-bundle meta-rule JSON artifact; explicit Author approval required before canonicalization."
   },
   "jsonArrayCarrier": {
-    "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
+    "status": "AUTHOR_APPROVED_DESIGN_GREEN_RESEARCH",
     "authorDecision": {
       "date": "2026-10-05",
       "decision": "APPROVED_FOR_IMPLEMENTATION_AND_FALSIFICATION"
@@ -871,6 +871,18 @@
       "ExactSequence preserves [] vs [R] vs [R,R].",
       "Nested [] first denotes R, so Exact([[]])=Exact([R]) is expected."
     ],
-    "artifactApproval": "Concrete logical/proof JSON artifacts remain separately Author-gated."
+    "artifactApproval": "Concrete logical/proof JSON artifacts remain separately Author-gated.",
+    "ci": {
+      "head": "cde313702f065c837c35b9658074169d3dcc083a",
+      "run": "37284659165",
+      "result": "SUCCESS"
+    },
+    "executableResult": [
+      "direct JSON [] lowers to ExactSequence([])=R",
+      "direct JSON [R] lowers to ExactSequence([R]) and is distinct from []",
+      "direct JSON [R,R] preserves the second R position",
+      "direct JSON [[]] equals ExactSequence([R]) because inner [] denotes R",
+      "array RHS remains metamodel binding unless separately included as a bare ANet member"
+    ]
   }
 }
