@@ -453,13 +453,31 @@ same(
   "A-memory recursive execution package is two-Memory deterministic",
 );
 
+const persistedPackage = readFileSync(
+  resolve(
+    repositoryRoot(),
+    "formal/v0.15/regression/grounded-zero-role.amemory-package.json",
+  ),
+  "utf8",
+);
+same(
+  first.packageJson,
+  persistedPackage,
+  "persisted frozen A-memory package is exact generated package",
+);
+same(
+  first.packageDigest,
+  "354be494b42c78d310a868144f5c63fec915fec932a01d1d36b274d79258fce4",
+  "frozen A-memory package digest",
+);
+
 console.log([
   "MTS_V015_GROUNDED_AMEMORY_PACKAGE=GREEN",
   "PACKAGE_SHA256=" + first.packageDigest,
   "POSITIVE_CURRENT=" + first.positiveCurrentWire,
   "POSITIVE_EXPECTED=" + first.positiveExpectedWire,
   "NEGATIVE_CURRENT=" + first.negativeCurrentWire,
-  "AMEMORY_PACKAGE=" + first.packageJson,
+  "AMEMORY_PACKAGE_ARTIFACT=formal/v0.15/regression/grounded-zero-role.amemory-package.json",
   "LOCAL_LEGACY_DIFFERENTIAL=GREEN",
   "PROGRAM_SPECIFIC_DISPATCH=0",
   "REAL_AMEMORY_REPLAY=PENDING",
