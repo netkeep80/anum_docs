@@ -13,6 +13,7 @@ import {
 } from "../src/native-syntax-grammar.js";
 import { StructuralRuleError } from "../src/structural-rule.js";
 import {
+  V015LinkDefinitionError,
   materializeV015ContextualNamePath,
   resolveV015ContextualNameCoordinate,
 } from "../src/v015-link-definition.js";
@@ -681,6 +682,30 @@ same(
 );
 same(memory.linkCount, nameResolveCount, "contextual-name Resolve is read-only");
 
+const MISSING_NAME_CARRIER = localNameCarrier("DefinitelyMissingContextualName");
+const missingResolveCount = memory.linkCount;
+let missingContextualNameRejected = false;
+try {
+  resolveV015ContextualNameCoordinate(
+    memory,
+    basis.R,
+    MISSING_NAME_CARRIER,
+  );
+} catch (error) {
+  missingContextualNameRejected =
+    error instanceof V015LinkDefinitionError &&
+    error.code === "unbound-name";
+}
+assert(
+  missingContextualNameRejected,
+  "missing contextual name fails closed instead of becoming a host atom",
+);
+same(
+  memory.linkCount,
+  missingResolveCount,
+  "failed contextual-name Resolve does not materialize",
+);
+
 const PATH_K = absoluteName("PathK");
 const PATH_K2 = absoluteName("PathK2");
 const PATH_A_CARRIER = localNameCarrier("PathA");
@@ -1192,6 +1217,11 @@ console.log([
   "RESOLVED_METAMODEL_TO_SEMANTIC_ANET=SUPPORTED",
   "ROOT_BINDING_IMPLIES_MEMBERSHIP=FALSE",
   "ROOT_BARE_IMPLIES_DIRECT_MEMBERSHIP=TRUE",
+  "CONTEXTUAL_NAME_ABSOLUTE_ROOT_EQUIVALENCE=GREEN",
+  "CONTEXTUAL_NAME_RESOLVE_READ_ONLY=TRUE",
+  "CONTEXTUAL_NAME_MISSING_FAIL_CLOSED=TRUE",
+  "HOST_GLOBAL_ATOM_NAMESPACE_AUTHORITY=FALSE",
+  "SAME_SPELLING_DIFFERENT_CONTEXT=TRUE",
   "NESTED_CONTEXTUAL_PATH=SUPPORTED",
   "EMPTY_BUNDLE_MEMBER_COUNT=0",
   "EMPTY_SEQUENCE_DENOTATION=R",
@@ -1222,6 +1252,7 @@ console.log([
   "META_RULE_HELPER_BINDINGS_ERASE_BEFORE_EXECUTION=TRUE",
   "META_RULE_STRUCTURAL_SWAP=GREEN",
   "META_RULE_ARTIFACT_APPROVAL=AUTHOR_APPROVED",
+  "META_RULE_CONTEXTUAL_NAME_REPLAY=GREEN",
   "JSON_GROUNDED_EMPTY_ROLE_RULE=GREEN_RESEARCH",
   "GROUNDED_SEMANTIC_MEMBERS=ADMISSION_ONLY",
   "GROUNDED_ROLE_COUNT=0",
