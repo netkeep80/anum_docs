@@ -936,9 +936,14 @@
       ],
       "positiveVectors": [],
       "negativeVectors": [],
-      "requiredExecutableGates": [],
+      "requiredExecutableGates": [
+        "ts/test/v015-formal-proof-assurance-f0.test.ts"
+      ],
       "evidenceRefs": [
-        "proofs/v015-evidence/formal-bootstrap-frm01-06.json"
+        "proofs/v015-evidence/formal-bootstrap-frm01-06.json",
+        "proofs/v015-evidence/formal-refinement-frm07-08.json",
+        "proofs/v015-formal-proof-assurance.json",
+        "ts/test/v015-formal-proof-assurance-f0.test.ts"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
@@ -954,9 +959,15 @@
         "two-role-meta-rule-refinement-witness"
       ],
       "negativeVectors": [],
-      "requiredExecutableGates": [],
+      "requiredExecutableGates": [
+        "ts/test/v015-formal-production-refinement-f1.test.ts"
+      ],
       "evidenceRefs": [
-        "proofs/v015-evidence/formal-bootstrap-frm01-06.json"
+        "proofs/v015-evidence/formal-bootstrap-frm01-06.json",
+        "proofs/v015-evidence/formal-refinement-frm07-08.json",
+        "ts/test/v015-formal-production-refinement-f1.test.ts",
+        "formal/v0.15/regression/grounded-zero-role.evidence.json",
+        "formal/v0.15/regression/two-role-meta-rule.evidence.json"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
@@ -977,8 +988,14 @@
         "start-end-distinct",
         "structural-aspect-is-not-host-kind"
       ],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "requiredExecutableGates": [
+        "ts/test/v015-direct-structural-aspects-s1.test.ts"
+      ],
+      "evidenceRefs": [
+        "proofs/v015-evidence/formal-refinement-frm07-08.json",
+        "ts/test/v015-direct-structural-aspects-s1.test.ts",
+        "proofs/v015-formal-proof-assurance.json"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     }
   }

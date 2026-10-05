@@ -133,7 +133,7 @@
     },
     {
       "id": "FRM-08",
-      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL_WITH_PRODUCTION_WITNESS_PENDING",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL_WITH_PRODUCTION_WITNESS",
       "premises": [],
       "exclusions": [
         "does not enable arbitrary recursive/cyclic FORMAL bindings",

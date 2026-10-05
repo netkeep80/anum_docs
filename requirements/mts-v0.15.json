@@ -181,7 +181,9 @@
           "start-end-distinct",
           "structural-aspect-is-not-host-kind"
         ],
-        "requiredExecutableGates": []
+        "requiredExecutableGates": [
+          "ts/test/v015-direct-structural-aspects-s1.test.ts"
+        ]
       }
     },
     {
@@ -821,7 +823,9 @@
       "evidence": {
         "positiveVectors": [],
         "negativeVectors": [],
-        "requiredExecutableGates": []
+        "requiredExecutableGates": [
+          "ts/test/v015-formal-proof-assurance-f0.test.ts"
+        ]
       }
     },
     {
@@ -844,7 +848,9 @@
           "two-role-meta-rule-refinement-witness"
         ],
         "negativeVectors": [],
-        "requiredExecutableGates": []
+        "requiredExecutableGates": [
+          "ts/test/v015-formal-production-refinement-f1.test.ts"
+        ]
       }
     },
     {
