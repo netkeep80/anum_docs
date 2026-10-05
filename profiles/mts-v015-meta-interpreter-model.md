@@ -1016,7 +1016,7 @@ Y -> X
 
 Это пока **не универсальная теорема** и не финальный JSON.
 
-Первый конкретный direct-JSON meta-rule (**AUTHOR-APPROVED ARTIFACT / proof pending**):
+Первый конкретный direct-JSON meta-rule (**AUTHOR-APPROVED ARTIFACT / FULL REGRESSION GREEN**):
 
 ```json
 {
@@ -1050,6 +1050,18 @@ Executable witness уже подтвердил: `Tag->(A->B)` связывает
 
 **Author decision 2026-10-05:** этот точный JSON-артефакт принят. Это не распространяет approval автоматически на другие logical/proof JSON.
 
+Полная regression-цепочка #1978 для него теперь **GREEN**:
+
+- JSON: `formal/v0.15/regression/two-role-meta-rule.json`, SHA-256 `7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56`;
+- FORMAL: `formal/v0.15/regression/two-role-meta-rule.formal`, SHA-256 `f68e8629b5d476f49366f3f59e65ef64d523d5b5f8964dcf918283144ba292f9`;
+- FORMAL и JSON строят один и тот же native source ANet;
+- semantic ANet содержит ровно `V->X`, `V->Y`, `Theory->MetaRule`;
+- recursive 8/9/6/1 member-set: `formal/v0.15/regression/two-role-meta-rule.recursive`, SHA-256 `ca6a6d39913a7a5947edaeaad9d45a43603781e7b2188fd5bc34a59712da8ed9`;
+- recursive member count = 3; порядок строк в artifact является только канонизацией представления для digest, а не семантическим порядком ANet;
+- A-memory package: SHA-256 `ce8758fbe3ca6de992c1382db8af543f17aa55495cf0bad542e290c336e4be03`;
+- frozen A-memory `0.175.0` / `832daa89...`: positive swap = 1 match, wrong-shape negative = 0 matches;
+- normalized persisted A-memory evidence совпадает точно; workflow `37333704049` SUCCESS.
+
 Для **уже одобренного exact artifact** действует следующая интерпретация:
 
 - nested object `V` — anchored ANet ролей;
@@ -1058,7 +1070,7 @@ Executable witness уже подтвердил: `Tag->(A->B)` связывает
 - `Theory->MetaRule` — bare admission member;
 - никаких `Rule`, `pattern`, `bind`, `instantiate`, `active` JSON-тегов нет.
 
-Отдельный grounded zero-role artifact теперь **AUTHOR-APPROVED SOURCE ARTIFACT / REGRESSION EVIDENCE PENDING**. Утверждён ровно следующий JSON:
+Отдельный grounded zero-role artifact теперь **AUTHOR-APPROVED SOURCE ARTIFACT / FULL REGRESSION GREEN**. Утверждён ровно следующий JSON:
 
 ```json
 {
@@ -1074,7 +1086,7 @@ Executable witness уже подтвердил: `Tag->(A->B)` связывает
 
 На contextual-name resolver + DAS vertical этот exact artifact остаётся GREEN: semantic ANet содержит только `Theory->GroundRule`; `V0` существует как пустой role-bundle с нулём members; exact matching и identity instantiation сохраняются.
 
-**Author decision 2026-10-05:** этот точный grounded zero-role JSON принят как исходный артефакт. Это закрывает только Author gate на сам JSON. Полная доказательная цепочка #1978 всё ещё обязательна и не может быть заменена заглушками.
+**Author decision 2026-10-05:** этот точный grounded zero-role JSON принят как исходный артефакт. Его полная цепочка #1978 теперь также GREEN: exact JSON/FORMAL, recursive 8/9/6/1, frozen A-memory 0.175.0 и нормализованное persisted evidence зафиксированы в regression corpus.
 
 Denotation/lowering owner: **#2002**.
 
@@ -1084,15 +1096,19 @@ Denotation/lowering owner: **#2002**.
 - **DONE / GREEN research:** approved two-role meta-rule replay без host-global atom namespace, с тем же semantic ANet и swap behavior;
 - **DONE / GREEN research:** Author-approved grounded zero-role exact JSON replay через тот же resolver/DAS.
 
-Остаются обязательными:
+Для **двух уже одобренных JSON-артефактов** полный #1978 chain теперь закрыт и является постоянным cumulative regression corpus:
 
-1. полный #1978 chain: exact FORMAL artifact + digest → recursive 8/9/6/1 + digest → fresh frozen A-memory replay;
-2. для grounded zero-role JSON Author review закрыт; остаётся полный #1978 regression/evidence chain;
-3. alpha-renaming beyond the same-spelling-different-context vector;
-4. полный historical A72r execution differential;
-5. proof/theorem FORMAL, чтобы не получить executable-only синтаксис.
+1. `grounded-zero-role-rule` — FULL_REGRESSION_GREEN;
+2. `two-role-meta-rule` — FULL_REGRESSION_GREEN.
 
-Первый two-role meta-rule JSON уже Author-approved как **точный source artifact**; его full regression evidence всё ещё pending и не должна подменяться placeholder digest/result.
+Каждый следующий отдельно Author-approved logical/theorem/proof JSON обязан проходить тот же путь без shortcut и добавляться в тот же накопительный corpus.
+
+Остаются отдельными задачами:
+
+1. alpha-renaming beyond the same-spelling-different-context vector;
+2. полный historical A72r execution differential;
+3. proof/theorem FORMAL, чтобы не получить executable-only синтаксис;
+4. универсальная theorem/proof closure #2001 и release-level gates v0.15.
 
 ## 16b. DAS-A1 — resolved metamodel → denoted semantic ANet
 
