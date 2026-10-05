@@ -1,0 +1,48 @@
+{
+  "schema": "mts-v015-approved-artifact-evidence/v0.1",
+  "id": "grounded-zero-role-rule",
+  "status": "RECURSIVE_EVIDENCE_GREEN_AMEMORY_REPLAY_PENDING",
+  "kind": "EXECUTABLE",
+  "authorJsonReview": {
+    "state": "APPROVED",
+    "artifact": "formal/v0.15/regression/grounded-zero-role.json",
+    "sha256": "d3304cee2d4037c8b144ac4c112b40591c8c1bf3bbd939f2e01393fa723a9f61",
+    "decisionEvidence": "netkeep80/anum_docs#1978 issuecomment-5994922633",
+    "date": "2026-10-05"
+  },
+  "formalSource": {
+    "artifact": "formal/v0.15/regression/grounded-zero-role.formal",
+    "sha256": "b0e5760786c900ab125f775f9f30d897336220ee2393f3c0e3fd5cff2296d51a",
+    "relationToJson": "EXACT_SAME_NATIVE_SOURCE_ANET"
+  },
+  "semanticDenotation": {
+    "members": [
+      "Theory->GroundRule"
+    ],
+    "memberCount": 1,
+    "ruleRoleCount": 0,
+    "exactMatch": "GA->GA",
+    "mismatch": "GA->Other rejects",
+    "outputInstantiation": "GB identity"
+  },
+  "recursive": {
+    "artifact": "formal/v0.15/regression/grounded-zero-role.recursive",
+    "alphabet": "8/9/6/1",
+    "sha256": "570950556cc0703a915c39e4e6f181ed55103f13544f8f8a1a5e25a099f76b11",
+    "twoMemoryParity": "GREEN"
+  },
+  "executableEvidence": {
+    "test": "ts/test/v015-grounded-approved-recursive-r1.test.ts",
+    "evidenceHead": "d7787f8d44e4dd98b2e812dfb163fe0bd35fd8d6",
+    "ciRun": 37321650052,
+    "result": "SUCCESS"
+  },
+  "amemoryReplay": {
+    "repository": "netkeep80/amemory",
+    "frozenMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "adapterIssue": 482,
+    "adapter": "experiments/a-circuit/src/bin/formal_recursive_replay.rs",
+    "status": "PENDING"
+  }
+}
