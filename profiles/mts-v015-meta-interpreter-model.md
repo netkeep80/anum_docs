@@ -1072,19 +1072,23 @@ Executable witness уже подтвердил: `Tag->(A->B)` связывает
 }
 ```
 
-После common resolver + DAS его semantic ANet должна содержать только `Theory->GroundRule`; `V0` существует как пустой role-bundle с нулём members. Exact artifact остаётся под отдельным Author gate.
+На contextual-name resolver + DAS vertical этот candidate остаётся GREEN: semantic ANet содержит только `Theory->GroundRule`; `V0` существует как пустой role-bundle с нулём members; exact matching и identity instantiation сохраняются. Exact artifact всё ещё остаётся под отдельным Author gate.
 
 Denotation/lowering owner: **#2002**.
 
-После Author approval two-role artifact остаются обязательными:
+После contextual-name vertical:
 
-1. настоящий contextual-name resolver с законом `:A ≡ R:A` без host-global namespace;
-2. replay approved meta-rule через этот resolver без изменения semantic ANet/behavior;
-3. полный #1978 chain: exact FORMAL artifact + digest → recursive 8/9/6/1 + digest → fresh frozen A-memory replay;
-4. grounded zero-role differential и отдельный Author review exact grounded JSON;
-5. alpha-renaming / same-spelling-different-context falsifiers;
-6. полный historical A72r execution differential;
-7. proof/theorem FORMAL, чтобы не получить executable-only синтаксис.
+- **DONE / GREEN research:** Link-native root/contextual coordinates, `:A ≡ R:A`, relative/nested paths, same-spelling-different-context falsifier, read-only Resolve and fail-closed missing-name behavior;
+- **DONE / GREEN research:** approved two-role meta-rule replay без host-global atom namespace, с тем же semantic ANet и swap behavior;
+- **DONE / GREEN research:** grounded zero-role candidate replay через тот же resolver/DAS.
+
+Остаются обязательными:
+
+1. полный #1978 chain: exact FORMAL artifact + digest → recursive 8/9/6/1 + digest → fresh frozen A-memory replay;
+2. отдельный Author review exact grounded JSON;
+3. alpha-renaming beyond the same-spelling-different-context vector;
+4. полный historical A72r execution differential;
+5. proof/theorem FORMAL, чтобы не получить executable-only синтаксис.
 
 Первый two-role meta-rule JSON уже Author-approved как **точный source artifact**; его full regression evidence всё ещё pending и не должна подменяться placeholder digest/result.
 
@@ -1363,7 +1367,34 @@ A -> B
 
 There is no semantically privileged host-global atom namespace. An «absolute» name is simply a name resolved relative to the root context `R`.
 
-Important correction to current research fixtures: bounded DAS/meta-rule tests currently seed names such as `Theory`, `V`, `X`, `GA` through host Maps. This is acceptable only as temporary research scaffolding. Before FORMAL/JSON acceptance, the same approved artifacts must be replayed through a real contextual-name resolver implementing `:A ≡ R:A` and context-local name distinctions.
+Executable DAS-A2 evidence now replaces the old host-global fixture. Local name spellings are first represented by Link-native STRING carriers and then qualified by an explicit Context Link. Host Maps may cache/index those carriers but are no longer semantic name authority.
+
+Confirmed GREEN research vectors:
+
+```text
+:Theory = R:Theory
+:Theory -> :GroundRule
+    =
+R:Theory -> R:GroundRule
+
+K:A
+(K:B):C
+same spelling under K1 and K2 -> distinct qualified names
+```
+
+A critical negative vector is also explicit:
+
+```text
+V:X  !=  V -> X
+```
+
+in general. The left side is contextual qualification/resolution; the right side constructs a Link between already-resolved endpoint Links. This prevents `:` from silently becoming another spelling of the Link constructor.
+
+`resolveV015ContextualNameCoordinate` is read-only and fails closed when the qualified coordinate does not exist; it does not synthesize the missing name. Explicit materialization is a separate operation and is registered as a direct write owner by the dependency audit.
+
+The Author-approved two-role meta-rule JSON and the grounded zero-role candidate both replay through this resolver/DAS path with unchanged tested behavior.
+
+Evidence: `ts/test/v015-native-source-anet-denotation-das-a2.test.ts`, CI run `37298755977` on evidence head `6834291694318ac3929af220cf64c20c208c689e`.
 
 Owner: **#1901**, requirement **V15-NAME-01**.
 
