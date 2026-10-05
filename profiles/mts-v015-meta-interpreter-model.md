@@ -1058,7 +1058,7 @@ Executable witness уже подтвердил: `Tag->(A->B)` связывает
 - `Theory->MetaRule` — bare admission member;
 - никаких `Rule`, `pattern`, `bind`, `instantiate`, `active` JSON-тегов нет.
 
-Отдельный grounded zero-role artifact пока **не Author-approved**. Текущий GREEN candidate:
+Отдельный grounded zero-role artifact теперь **AUTHOR-APPROVED SOURCE ARTIFACT / REGRESSION EVIDENCE PENDING**. Утверждён ровно следующий JSON:
 
 ```json
 {
@@ -1072,7 +1072,9 @@ Executable witness уже подтвердил: `Tag->(A->B)` связывает
 }
 ```
 
-На contextual-name resolver + DAS vertical этот candidate остаётся GREEN: semantic ANet содержит только `Theory->GroundRule`; `V0` существует как пустой role-bundle с нулём members; exact matching и identity instantiation сохраняются. Exact artifact всё ещё остаётся под отдельным Author gate.
+На contextual-name resolver + DAS vertical этот exact artifact остаётся GREEN: semantic ANet содержит только `Theory->GroundRule`; `V0` существует как пустой role-bundle с нулём members; exact matching и identity instantiation сохраняются.
+
+**Author decision 2026-10-05:** этот точный grounded zero-role JSON принят как исходный артефакт. Это закрывает только Author gate на сам JSON. Полная доказательная цепочка #1978 всё ещё обязательна и не может быть заменена заглушками.
 
 Denotation/lowering owner: **#2002**.
 
@@ -1080,12 +1082,12 @@ Denotation/lowering owner: **#2002**.
 
 - **DONE / GREEN research:** Link-native root/contextual coordinates, `:A ≡ R:A`, relative/nested paths, same-spelling-different-context falsifier, read-only Resolve and fail-closed missing-name behavior;
 - **DONE / GREEN research:** approved two-role meta-rule replay без host-global atom namespace, с тем же semantic ANet и swap behavior;
-- **DONE / GREEN research:** grounded zero-role candidate replay через тот же resolver/DAS.
+- **DONE / GREEN research:** Author-approved grounded zero-role exact JSON replay через тот же resolver/DAS.
 
 Остаются обязательными:
 
 1. полный #1978 chain: exact FORMAL artifact + digest → recursive 8/9/6/1 + digest → fresh frozen A-memory replay;
-2. отдельный Author review exact grounded JSON;
+2. для grounded zero-role JSON Author review закрыт; остаётся полный #1978 regression/evidence chain;
 3. alpha-renaming beyond the same-spelling-different-context vector;
 4. полный historical A72r execution differential;
 5. proof/theorem FORMAL, чтобы не получить executable-only синтаксис.
@@ -1305,7 +1307,7 @@ Current status before canonicalizing a concrete meta-rule JSON:
 
 Executable witness: `ts/test/v015-native-source-anet-denotation-das-a2.test.ts`.
 
-GREEN candidate:
+AUTHOR-APPROVED exact source artifact:
 
 ```json
 {
@@ -1338,7 +1340,9 @@ match(GA, Other, ∅) -> reject
 
 Therefore grounded exact matching is not a second mechanism: it is the zero-role refinement of the same native role-bundle Rule topology and same generic structural matcher/constructor.
 
-Status: **GREEN research / exact JSON artifact still requires explicit Author approval**.
+Status: **AUTHOR-APPROVED SOURCE ARTIFACT / REGRESSION EVIDENCE PENDING**.
+
+Это означает: точная JSON-запись принята. Её FORMAL-проекция, digest, рекурсивное представление 8/9/6/1 и свежий прогон через замороженную A-memory всё ещё должны быть получены и зафиксированы по #1978.
 ## 16d. Contextual names and absolute-root shorthand
 
 Author-approved v0.15 name-resolution direction:
