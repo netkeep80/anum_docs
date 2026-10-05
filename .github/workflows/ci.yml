@@ -42,7 +42,7 @@ jobs:
           echo "External proof diff: $BASE_SHA..$HEAD_SHA"
           changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
           printf '%s\n' "$changed"
-          if printf '%s\n' "$changed" | grep -Eq '^(proofs/(lean4|coq|evidence)/|proofs/external-toolchains\.json$|proofs/external-proof-assurance\.json$|proofs/v015-external-proof-assurance\.json$|theorems/p0-v0\.14\.json$|\.github/workflows/ci\.yml$)'; then
+          if printf '%s\n' "$changed" | grep -Eq '^(proofs/(lean4|coq|evidence)/|proofs/external-toolchains\.json$|proofs/external-proof-assurance\.json$|proofs/v015-external-proof-assurance\.json$|proofs/v015-formal-proof-assurance\.json$|theorems/p0-v0\.14\.json$|\.github/workflows/ci\.yml$)'; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -176,6 +176,51 @@ jobs:
           console.log("V015_KERNEL_ASSUMPTIONS_LEAN=CHECKED targets=" + symbols.length);
           NODE
 
+          # FORMAL soundness bootstrap is tracked separately from Γ proofs.
+          cp proofs/lean4/MtsV015Formal.lean /tmp/MtsV015FormalAssurance.lean
+          node <<'NODE'
+          const fs = require("node:fs");
+          const manifest = require("./proofs/v015-formal-proof-assurance.json");
+          const path = "/tmp/MtsV015FormalAssurance.lean";
+          let source = fs.readFileSync(path, "utf8");
+          for (const target of manifest.targets) {
+            for (const symbol of target.lean4) {
+              source += "\n#eval IO.println \"V015_FORMAL_ASSURANCE_TARGET " + symbol + "\"\n";
+              source += "#print axioms " + symbol + "\n";
+            }
+          }
+          fs.writeFileSync(path, source);
+          NODE
+          /tmp/mts-lean/bin/lean /tmp/MtsV015FormalAssurance.lean 2>&1 | tee /tmp/mts-v015-formal-lean-assurance.log
+          node <<'NODE'
+          const fs = require("node:fs");
+          const manifest = require("./proofs/v015-formal-proof-assurance.json");
+          const log = fs.readFileSync("/tmp/mts-v015-formal-lean-assurance.log", "utf8");
+          const allowed = new Set(manifest.allowedGlobalAxioms.lean4);
+          const symbols = manifest.targets.flatMap((target) => target.lean4);
+          if (log.includes("sorryAx")) throw new Error("v0.15 FORMAL Lean assurance found sorryAx");
+          for (let index = 0; index < symbols.length; index += 1) {
+            const symbol = symbols[index];
+            const marker = "V015_FORMAL_ASSURANCE_TARGET " + symbol;
+            const start = log.indexOf(marker);
+            if (start < 0) throw new Error("missing v0.15 FORMAL Lean assurance marker: " + symbol);
+            const nextMarker =
+              index + 1 < symbols.length
+                ? log.indexOf("V015_FORMAL_ASSURANCE_TARGET " + symbols[index + 1], start + marker.length)
+                : log.length;
+            const segment = log.slice(start, nextMarker < 0 ? log.length : nextMarker);
+            if (segment.includes("does not depend on any axioms")) continue;
+            const match = segment.match(/depends on axioms:\s*\[([^\]]*)\]/);
+            if (!match) throw new Error("unparsed v0.15 FORMAL Lean axiom report for " + symbol + "\n" + segment);
+            const axioms = match[1].split(",").map((value) => value.trim()).filter(Boolean);
+            const unexpected = axioms.filter((axiom) => !allowed.has(axiom));
+            if (unexpected.length > 0) {
+              throw new Error("unexpected v0.15 FORMAL Lean axioms for " + symbol + ": " + unexpected.join(", "));
+            }
+          }
+          console.log("V015_FORMAL_KERNEL_ASSUMPTIONS_LEAN=CHECKED targets=" + symbols.length);
+          NODE
+
       - name: Compile pinned Rocq external foundation
         if: steps.external-proof-diff.outputs.run == 'true'
         shell: bash
@@ -302,6 +347,59 @@ jobs:
             }
           }
           console.log("V015_KERNEL_ASSUMPTIONS_ROCQ=CHECKED targets=" + symbols.length);
+          NODE
+
+          rm -rf /tmp/mts-v015-formal-coq-assurance
+          mkdir -p /tmp/mts-v015-formal-coq-assurance
+          cp proofs/coq/MtsV015Formal.v /tmp/mts-v015-formal-coq-assurance/MtsV015FormalAssurance.v
+          node <<'NODE'
+          const fs = require("node:fs");
+          const manifest = require("./proofs/v015-formal-proof-assurance.json");
+          const path = "/tmp/mts-v015-formal-coq-assurance/MtsV015FormalAssurance.v";
+          let source = fs.readFileSync(path, "utf8");
+          for (const target of manifest.targets) {
+            for (const symbol of target.rocq) {
+              source += "\nGoal True. idtac \"V015_FORMAL_ASSURANCE_TARGET " + symbol + "\". exact I. Qed.\n";
+              source += "Print Assumptions " + symbol + ".\n";
+            }
+          }
+          fs.writeFileSync(path, source);
+          NODE
+          docker run --rm \
+            -v "/tmp/mts-v015-formal-coq-assurance:/input:ro" \
+            "$ROCQ_IMAGE" \
+            sh -lc 'cp /input/MtsV015FormalAssurance.v /tmp/MtsV015FormalAssurance.v && cd /tmp && rocq compile MtsV015FormalAssurance.v' \
+            2>&1 | tee /tmp/mts-v015-formal-coq-assurance.log
+          node <<'NODE'
+          const fs = require("node:fs");
+          const manifest = require("./proofs/v015-formal-proof-assurance.json");
+          const log = fs.readFileSync("/tmp/mts-v015-formal-coq-assurance.log", "utf8");
+          const allowed = new Set(manifest.allowedGlobalAxioms.rocq);
+          const symbols = manifest.targets.flatMap((target) => target.rocq);
+          for (let index = 0; index < symbols.length; index += 1) {
+            const symbol = symbols[index];
+            const marker = "V015_FORMAL_ASSURANCE_TARGET " + symbol;
+            const start = log.indexOf(marker);
+            if (start < 0) throw new Error("missing v0.15 FORMAL Rocq assurance marker: " + symbol);
+            const nextMarker =
+              index + 1 < symbols.length
+                ? log.indexOf("V015_FORMAL_ASSURANCE_TARGET " + symbols[index + 1], start + marker.length)
+                : log.length;
+            const segment = log.slice(start, nextMarker < 0 ? log.length : nextMarker);
+            if (segment.includes("Closed under the global context")) continue;
+            const axiomBlock = segment.match(/Axioms?:\s*([\s\S]*)/);
+            if (!axiomBlock) throw new Error("unparsed v0.15 FORMAL Rocq assumption report for " + symbol + "\n" + segment);
+            const unexpected = axiomBlock[1]
+              .split("\n")
+              .map((line) => line.trim())
+              .filter((line) => line.includes(":"))
+              .map((line) => line.split(":")[0].trim())
+              .filter((name) => name.length > 0 && !allowed.has(name));
+            if (unexpected.length > 0) {
+              throw new Error("unexpected v0.15 FORMAL Rocq axioms for " + symbol + ": " + unexpected.join(", "));
+            }
+          }
+          console.log("V015_FORMAL_KERNEL_ASSUMPTIONS_ROCQ=CHECKED targets=" + symbols.length);
           NODE
 
       - name: Check Contract Observatory index
