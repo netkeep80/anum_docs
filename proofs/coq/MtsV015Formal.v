@@ -48,14 +48,18 @@ Definition semantic_members
 
 Theorem FRM_02_root_source_role_separation
     (name value : Link) :
-    semantic_members None (Bare value) = [value] /    semantic_members None (Binding name value) = [] /    semantic_members None (EmptyBundle name) = [].
+    semantic_members None (Bare value) = [value] /\
+    semantic_members None (Binding name value) = [] /\
+    semantic_members None (EmptyBundle name) = [].
 Proof.
   repeat split; reflexivity.
 Qed.
 
 Theorem FRM_02_nested_source_role_membership
     (context name value : Link) :
-    semantic_members (Some context) (Bare value) = [pair context value] /    semantic_members (Some context) (Binding name value) = [pair context name] /    semantic_members (Some context) (EmptyBundle name) = [pair context name].
+    semantic_members (Some context) (Bare value) = [pair context value] /\
+    semantic_members (Some context) (Binding name value) = [pair context name] /\
+    semantic_members (Some context) (EmptyBundle name) = [pair context name].
 Proof.
   repeat split; reflexivity.
 Qed.
