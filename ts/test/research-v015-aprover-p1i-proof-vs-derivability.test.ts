@@ -52,6 +52,21 @@ class SelectedTheoryView implements ReadMemory {
     }
     return found;
   }
+
+  outgoing(start: LinkHandle): readonly LinkHandle[] {
+    const found = this.source.outgoing(start);
+    if (start !== this.theory) return found;
+    return Object.freeze(found.filter((link) => this.selectedAdmissions.has(link)));
+  }
+
+  incoming(end: LinkHandle): readonly LinkHandle[] {
+    return Object.freeze(
+      this.source.incoming(end).filter((link) => {
+        const poles = this.source.poles(link);
+        return poles.start !== this.theory || this.selectedAdmissions.has(link);
+      }),
+    );
+  }
 }
 
 const memory = new Memory();
