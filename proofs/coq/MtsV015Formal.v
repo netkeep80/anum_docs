@@ -173,3 +173,60 @@ Print Assumptions FRM_04_single_root_distinct_from_empty.
 Print Assumptions FRM_04_two_roots_distinct_from_one.
 Print Assumptions FRM_05_shared_source_implies_shared_denotation.
 Print Assumptions FRM_06_metacompiler_preserves_semantics.
+
+Section ProductionRefinement.
+
+Context {Formal Json Source Semantic Recursive : Type}.
+
+Record ProductionArtifactRefinement : Type := {
+  pr_from_formal : Formal -> Source;
+  pr_from_json : Json -> Source;
+  pr_denote : Source -> Semantic;
+  pr_compile : Semantic -> Recursive;
+  pr_decode : Recursive -> Semantic;
+  pr_recursive_left_inverse :
+    forall semantic,
+      pr_decode (pr_compile semantic) = semantic
+}.
+
+Theorem FRM_07_approved_artifact_refinement
+    (P : ProductionArtifactRefinement)
+    (formal : Formal)
+    (json : Json)
+    (same_source : pr_from_formal P formal = pr_from_json P json) :
+    pr_decode P (pr_compile P (pr_denote P (pr_from_formal P formal))) =
+      pr_denote P (pr_from_json P json).
+Proof.
+  rewrite (pr_recursive_left_inverse P (pr_denote P (pr_from_formal P formal))).
+  now rewrite same_source.
+Qed.
+
+End ProductionRefinement.
+
+Section ExactSequenceLeftInverse.
+
+Context {Link : Type}.
+
+Record ExactSequenceLeftInverse : Type := {
+  es_encode : list Link -> Link;
+  es_read : Link -> list Link;
+  es_left_inverse :
+    forall values,
+      es_read (es_encode values) = values
+}.
+
+Theorem FRM_07_exact_sequence_injective_from_left_inverse
+    (E : ExactSequenceLeftInverse) :
+    forall a b,
+      es_encode E a = es_encode E b ->
+      a = b.
+Proof.
+  intros a b H.
+  apply (f_equal (es_read E)) in H.
+  now rewrite (es_left_inverse E a), (es_left_inverse E b) in H.
+Qed.
+
+End ExactSequenceLeftInverse.
+
+Print Assumptions FRM_07_approved_artifact_refinement.
+Print Assumptions FRM_07_exact_sequence_injective_from_left_inverse.
