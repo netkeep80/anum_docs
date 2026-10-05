@@ -375,8 +375,8 @@ same(forward.members.size, 7, "duplicate bare denotation converges extensionally
 assert(
   forward.bindings.some((binding) =>
     binding.coordinate === null &&
-    binding.name === DIRECT_RULE_NAME &&
-    binding.value === DIRECT_RULE
+    binding.name === RULE_NAME &&
+    binding.value === Rule
   ),
   "root Rule binding preserved as metamodel projection",
 );
@@ -652,23 +652,9 @@ const DIRECT_K = absoluteName("K");
 
 const DIRECT_RULE_NAME = absoluteName("Rule");
 const DIRECT_CURRENT_ALIAS = absoluteName("Current");
-const DIRECT_EMPTY_SEQUENCE_NAME = absoluteName("Empty");
 const DIRECT_ONE_R_NAME = absoluteName("OneR");
 const DIRECT_TWO_R_NAME = absoluteName("TwoR");
 const DIRECT_NESTED_EMPTY_NAME = absoluteName("NestedEmpty");
-const DIRECT_ROLE_X_NAME = absoluteName("RoleX");
-const DIRECT_ROLE_Y_NAME = absoluteName("RoleY");
-const DIRECT_PAIR_XY_NAME = absoluteName("PairXY");
-const DIRECT_ANTECEDENT_NAME = absoluteName("Antecedent");
-const DIRECT_OUTPUT_NAME = absoluteName("Output");
-const DIRECT_IMAGE_NAME = absoluteName("Image");
-const DIRECT_META_BODY_NAME = absoluteName("MetaBody");
-const DIRECT_META_RULE_NAME = absoluteName("MetaRule");
-const DIRECT_GROUND_ANTECEDENT_NAME = absoluteName("GroundAntecedent");
-const DIRECT_GROUND_OUTPUT_NAME = absoluteName("GroundOutput");
-const DIRECT_GROUND_IMAGE_NAME = absoluteName("GroundImage");
-const DIRECT_GROUND_BODY_NAME = absoluteName("GroundBody");
-const DIRECT_GROUND_RULE_NAME = absoluteName("GroundRule");
 
 const absoluteTheoryByColon = contextualPath(":Theory");
 const absoluteTheoryByExplicitRoot = contextualPath("R:Theory");
@@ -888,8 +874,8 @@ assert(
 assert(
   direct.bindings.some((binding) =>
     binding.coordinate === null &&
-    binding.name === RULE_NAME &&
-    binding.value === Rule
+    binding.name === DIRECT_RULE_NAME &&
+    binding.value === DIRECT_RULE
   ),
   "direct JSON preserves Rule binding",
 );
