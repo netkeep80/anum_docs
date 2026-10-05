@@ -721,33 +721,63 @@
       "This does not make the presentation names V/Rule/Theory semantically privileged."
     ],
     "jsonSurfaceCandidate": {
-      "status": "AUTHOR_REVIEW_REQUIRED",
-      "parametericExample": {
+      "status": "GREEN_RESEARCH_AUTHOR_REVIEW_REQUIRED",
+      "testedArtifact": {
         "V": {
           "X": null,
           "Y": null
         },
-        "R": "V->((tag->(V:X->V:Y))->[V:Y->V:X])",
-        "Theory->R": null
+        "RoleX": "V->X",
+        "RoleY": "V->Y",
+        "PairXY": "RoleX->RoleY",
+        "Antecedent": "Tag->PairXY",
+        "Output": "RoleY->RoleX",
+        "Image": [
+          "Output"
+        ],
+        "MetaBody": "Antecedent->Image",
+        "MetaRule": "V->MetaBody",
+        "Theory->MetaRule": null
       },
-      "groundedExample": {
-        "V0": {},
-        "R0": "V0->(A->[B])",
-        "Theory->R0": null
+      "exactResolvedTopology": [
+        "RoleX = V->X",
+        "RoleY = V->Y",
+        "PairXY = RoleX->RoleY",
+        "Antecedent = Tag->PairXY",
+        "Output = RoleY->RoleX",
+        "Image = ExactSequence([Output])",
+        "Body = Antecedent->Image",
+        "Rule = V->Body",
+        "Admission = Theory->Rule"
+      ],
+      "denotedSemanticAnet": [
+        "V->X",
+        "V->Y",
+        "Theory->Rule"
+      ],
+      "erasedMetamodelBindings": [
+        "RoleX",
+        "RoleY",
+        "PairXY",
+        "Antecedent",
+        "Output",
+        "Image",
+        "MetaBody",
+        "MetaRule"
+      ],
+      "executableEvidence": {
+        "path": "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "ciRun": "37285206712",
+        "result": "SUCCESS",
+        "behavior": "Tag->(A->B) structurally matches and instantiates B->A"
       },
       "interpretation": [
-        "nested object V is intended as the anchored role bundle",
-        "V:X and V:Y are qualified references to the contextual role-member Links",
-        "Theory->R is a direct bare Aset member/admission, not an active/admitted JSON tag",
-        "empty {} role bundle corresponds to the grounded zero-role refinement"
+        "No Rule/pattern/bind/instantiate/active JSON tags exist.",
+        "Role identity is the ordinary contextual member Link V->name.",
+        "Intermediate names belong to the metamodel and erase before execution.",
+        "The only semantic ANet members required by this isolated rule artifact are the two role Links and the Theory->Rule admission."
       ],
-      "openObligations": [
-        "prove nested object/contextual-name lowering gives exactly the required role-member Links",
-        "prove a bare structured object key with null contributes its denoted Link directly to Aset membership",
-        "prove alpha-renaming/presentation-name changes preserve behavior modulo contextual identity",
-        "falsify collisions with ordinary non-role bundle members",
-        "run full historical A72r execution differential and theorem/proof FORMAL before Author approval; the three-role recursive A72r-like shape is already GREEN research"
-      ]
+      "remainingGate": "Explicit Author approval of this exact meta-rule JSON artifact before canonicalization."
     },
     "loweringOwner": "#2002",
     "authorDecision": {
@@ -848,7 +878,7 @@
         "physical/named E->K without bare membership is not current"
       ]
     },
-    "nextGate": "First concrete native role-bundle meta-rule JSON artifact; explicit Author approval required before canonicalization."
+    "nextGate": "Explicit Author review of the first GREEN native role-bundle meta-rule JSON artifact."
   },
   "jsonArrayCarrier": {
     "status": "AUTHOR_APPROVED_DESIGN_GREEN_RESEARCH",
