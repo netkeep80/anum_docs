@@ -962,7 +962,7 @@
     "remainingGate": "Author gate is closed for this exact JSON source artifact. Full #1978 evidence chain (exact FORMAL + digest -> recursive 8/9/6/1 + digest -> fresh frozen A-memory replay) and theorem/proof closure #2001 remain pending."
   },
   "contextualNameResolution": {
-    "status": "AUTHOR_APPROVED_DESIGN_GREEN_RESEARCH_PROOF_PENDING",
+    "status": "AUTHOR_APPROVED_DESIGN_GREEN_ROOT_FORMAL_SURFACE_PROOF_PENDING",
     "owner": "#1901",
     "requirement": "V15-NAME-01",
     "laws": [
@@ -974,22 +974,34 @@
     ],
     "correctionToCurrentResearchTests": "Superseded by DAS-A2 contextual-name replay: direct JSON no longer obtains Theory/V/X/GA/etc from a host-global atom Map. Local STRING carriers are qualified through explicit Link-native Context coordinates; Root R is the absolute authority. Host Maps remain cache/index structures only, not semantic name authority.",
     "executableEvidence": {
-      "test": "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
-      "run": 37298755977,
-      "evidenceHead": "6834291694318ac3929af220cf64c20c208c689e",
+      "tests": [
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "ts/test/v015-formal-decoder-b2.test.ts"
+      ],
+      "runs": [
+        37298755977,
+        37314219581
+      ],
+      "evidenceHeads": [
+        "6834291694318ac3929af220cf64c20c208c689e",
+        "1f788fd4f6a0ba98ad505f530e109f571fddedd9"
+      ],
       "findings": [
         ":Theory and R:Theory resolve to the same root-qualified name",
         ":Theory -> :GroundRule and R:Theory -> R:GroundRule denote the same Link",
-        "relative K:A and nested (K:B):C use Link-native contextual coordinates",
+        "FORMAL text accepts :A, K:A and K:A:B reference paths",
+        "FORMAL contextual references lower through the same Link-native contextual-name path materializer used by the JSON/DAS evidence",
+        "simple legacy FORMAL local names keep their existing local-definition semantics",
+        "relative K:A and nested K:A:B use Link-native contextual coordinates",
         "same spelling under different Context anchors remains distinct",
         "context:name qualification remains distinct from resolved A->B Link construction",
         "resolve of an existing contextual coordinate is read-only",
         "missing contextual coordinate fails closed without synthesis",
         "approved two-role meta-rule JSON preserves semantic ANet and swap behavior",
-        "grounded zero-role candidate preserves admission-only semantic ANet and exact behavior",
+        "approved grounded zero-role JSON preserves admission-only semantic ANet and exact behavior",
         "no host-global atom namespace is semantic authority"
       ],
-      "remainingBoundary": "This GREEN evidence covers the Link-native coordinate/resolution kernel plus direct-JSON -> native source ANet -> DAS replay. The existing v015-formal-decoder text grammar still rejects ':' inside names; exact FORMAL surface parsing, namespace-path lowering and convergence onto the same resolver remain OPEN under #1901/#1911. The DAS-A2 contextualPath parser is a bounded test fixture, not final FORMAL Grammar authority."
+      "remainingBoundary": "Root/flat FORMAL surface convergence is GREEN. Nested bundle/Aset source contexts still need to supply their own current contextual anchor instead of the flat Root context; full #1978 FORMAL artifact/digest/recursive/A-memory chain and proof closure remain open. No host scope stack is allowed."
     }
   },
   "ruleRoleCardinalityLaw": {
