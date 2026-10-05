@@ -921,7 +921,11 @@
     ]
   },
   "groundedZeroRoleRuleCandidate": {
-    "status": "GREEN_RESEARCH_AUTHOR_REVIEW_REQUIRED",
+    "status": "AUTHOR_APPROVED_SOURCE_ARTIFACT_REGRESSION_EVIDENCE_PENDING",
+    "authorApproval": {
+      "date": "2026-10-05",
+      "decision": "APPROVED_EXACT_JSON_SOURCE_ARTIFACT"
+    },
     "jsonArtifact": {
       "V0": {},
       "GroundAntecedent": "GA",
@@ -955,7 +959,7 @@
       ]
     },
     "implication": "Grounded exact matching is supported as the zero-role refinement of the same Author-approved native role-bundle Rule topology and same generic matcher/constructor.",
-    "remainingGate": "Explicit Author approval of this exact grounded JSON artifact before canonicalization; theorem/proof closure remains #2001."
+    "remainingGate": "Author gate is closed for this exact JSON source artifact. Full #1978 evidence chain (exact FORMAL + digest -> recursive 8/9/6/1 + digest -> fresh frozen A-memory replay) and theorem/proof closure #2001 remain pending."
   },
   "contextualNameResolution": {
     "status": "AUTHOR_APPROVED_DESIGN_GREEN_RESEARCH_PROOF_PENDING",
