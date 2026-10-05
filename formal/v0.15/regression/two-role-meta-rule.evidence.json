@@ -1,0 +1,79 @@
+{
+  "schema": "mts-v015-approved-artifact-evidence/v0.1",
+  "id": "two-role-meta-rule",
+  "status": "FULL_REGRESSION_GREEN",
+  "kind": "EXECUTABLE",
+  "authorJsonReview": {
+    "state": "APPROVED",
+    "artifact": "formal/v0.15/regression/two-role-meta-rule.json",
+    "sha256": "7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56",
+    "decisionEvidence": "netkeep80/anum_docs#1188 issuecomment-5991612725",
+    "date": "2026-10-05"
+  },
+  "formalSource": {
+    "artifact": "formal/v0.15/regression/two-role-meta-rule.formal",
+    "sha256": "f68e8629b5d476f49366f3f59e65ef64d523d5b5f8964dcf918283144ba292f9",
+    "relationToJson": "EXACT_SAME_NATIVE_SOURCE_ANET"
+  },
+  "semanticDenotation": {
+    "members": [
+      "V->X",
+      "V->Y",
+      "Theory->MetaRule"
+    ],
+    "memberCount": 3,
+    "ruleRoleCount": 2,
+    "helperBindingsAreMembers": false,
+    "behavioralWitness": "Tag->(A->B) -> B->A"
+  },
+  "recursive": {
+    "artifact": "formal/v0.15/regression/two-role-meta-rule.recursive",
+    "representation": "canonical extensional member listing; one 8/9/6/1 wire per semantic ANet member; lexicographic line order is representation-only",
+    "alphabet": "8/9/6/1",
+    "memberCount": 3,
+    "sha256": "ca6a6d39913a7a5947edaeaad9d45a43603781e7b2188fd5bc34a59712da8ed9",
+    "twoMemoryParity": "GREEN"
+  },
+  "executableEvidence": {
+    "recursiveTest": "ts/test/v015-two-role-approved-recursive-r3.test.ts",
+    "packageTest": "ts/test/v015-two-role-approved-amemory-package-r4.test.ts",
+    "evidenceHead": "77d82b9244e8fb4a77bfcf01a88ea345d474e13c",
+    "ciRun": 37332835410,
+    "result": "SUCCESS"
+  },
+  "amemoryReplay": {
+    "repository": "netkeep80/amemory",
+    "frozenMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "adapterIssue": 482,
+    "adapter": "experiments/a-circuit/src/bin/formal_recursive_replay.rs",
+    "rustToolchain": "1.98.1",
+    "workflow": ".github/workflows/amemory-v015-regression.yml",
+    "workflowRun": 37333704049,
+    "evidenceArtifact": "formal/v0.15/regression/two-role-meta-rule.amemory-evidence.json",
+    "positive": {
+      "rawRuleMatches": 1,
+      "transitionedMembers": 1,
+      "quiescent": false,
+      "handoffCount": 1,
+      "resultEqualsExpected": true
+    },
+    "negative": {
+      "rawRuleMatches": 0,
+      "transitionedMembers": 0,
+      "quiescent": true,
+      "handoffCount": 0,
+      "resultEqualsExpected": true
+    },
+    "exactPersistedEvidenceMatch": true,
+    "status": "SUCCESS"
+  },
+  "backendCompatibility": {
+    "lowering": "native two-role bundle Rule -> generated legacy StructuralRule with one generated context role plus the two canonical role members",
+    "canonicalSemanticsChanged": false,
+    "programSpecificDispatch": 0,
+    "packageArtifact": "formal/v0.15/regression/two-role-meta-rule.amemory-package.json",
+    "packageSha256": "ce8758fbe3ca6de992c1382db8af543f17aa55495cf0bad542e290c336e4be03",
+    "localDifferential": "GREEN"
+  }
+}
