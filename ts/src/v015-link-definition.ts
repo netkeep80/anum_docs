@@ -332,6 +332,93 @@ export function readV015LinkDefinitionProfile(
   return profile;
 }
 
+
+/**
+ * Materialize one Link-native contextual-name coordinate.
+ *
+ * This is the structural coordinate selected by FORMAL name qualification;
+ * it is not a host identifier and it does not resolve a binding value.
+ * Surface `:` remains a name-resolution role; ordinary `->` expressions
+ * are constructed only after their endpoint names have been resolved.
+ */
+export function materializeV015ContextualNameCoordinate(
+  memory: WriteMemory,
+  context: LinkHandle,
+  localNameCarrier: LinkHandle,
+): LinkHandle {
+  try {
+    return memory.ensure(context, localNameCarrier);
+  } catch (error) {
+    if (error instanceof MemoryError) return fail("unbound-name");
+    throw error;
+  }
+}
+
+/**
+ * Read-only lookup of an already materialized contextual-name coordinate.
+ * Resolve must never synthesize a missing name as a side effect.
+ */
+export function resolveV015ContextualNameCoordinate(
+  memory: ReadMemory,
+  context: LinkHandle,
+  localNameCarrier: LinkHandle,
+): LinkHandle {
+  const before = memory.linkCount;
+  try {
+    let found: LinkHandle | undefined;
+    try {
+      found = memory.find(context, localNameCarrier);
+    } catch (error) {
+      if (error instanceof MemoryError) return fail("unbound-name");
+      throw error;
+    }
+    return found ?? fail("unbound-name");
+  } finally {
+    if (memory.linkCount !== before) fail("replay-wrote");
+  }
+}
+
+/**
+ * Materialize a contextual-name path from local name carriers.
+ *
+ * Relative path starts at `currentContext`.
+ * Absolute path starts at Root `R`.
+ *
+ * Therefore the accepted v0.15 law is structural:
+ *   :A = qualify(R, A)
+ * and explicit root qualification uses the same coordinate:
+ *   R:A = qualify(R, A)
+ *
+ * The path carrier is Link-native; the JS array is only call-site transport.
+ */
+export function materializeV015ContextualNamePath(
+  memory: WriteMemory,
+  basis: RootBasis,
+  currentContext: LinkHandle,
+  localNameCarriers: readonly LinkHandle[],
+  absolute = false,
+): LinkHandle {
+  if (localNameCarriers.length === 0) return fail("unbound-name");
+
+  let verified: RootBasis;
+  try {
+    verified = verifyRootBasis(memory, basis);
+    memory.poles(currentContext);
+  } catch {
+    return fail("invalid-basis");
+  }
+
+  let context = absolute ? verified.R : currentContext;
+  for (const localNameCarrier of localNameCarriers) {
+    context = materializeV015ContextualNameCoordinate(
+      memory,
+      context,
+      localNameCarrier,
+    );
+  }
+  return context;
+}
+
 function occurrenceMap(
   occurrences: readonly SyntaxAsetOccurrence[],
 ): ReadonlyMap<LinkHandle, SyntaxAsetOccurrence> {
