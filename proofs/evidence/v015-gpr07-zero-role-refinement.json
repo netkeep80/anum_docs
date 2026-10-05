@@ -1,0 +1,67 @@
+{
+  "schema": "mts-v015-proof-evidence/v0.1",
+  "id": "GPR-07",
+  "title": "Grounded exact rule is the zero-role refinement of the generic role-bundle rule",
+  "status": "PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
+  "ownerIssue": "#2001",
+  "mtsVersion": "v0.15-candidate",
+  "semanticClaim": [
+    "The generic role-bundle Rule path and the grounded exact Rule path are not two semantic executors.",
+    "When roles(V,M_t)=∅, generic matching reduces to exact antecedent identity with an empty substitution.",
+    "Instantiation under that empty substitution leaves every output template unchanged."
+  ],
+  "explicitPremises": [
+    "For the same generic matcher: match([], template, actual, bindings) iff template=actual and bindings=[].",
+    "For the same generic instantiator: instantiate([], value)=value."
+  ],
+  "exclusions": [
+    "No structural unification power is attributed to classical grounded Modus Ponens.",
+    "The theorem does not derive the generic matcher laws from the v0.14 Foundation alone.",
+    "No RuleKind, grounded opcode, second matcher, or second execution path is introduced.",
+    "This theorem does not close GPR-01..06 or GPR-08..09."
+  ],
+  "externalCrossCheck": {
+    "authority": "external-only",
+    "allowedGlobalAxioms": {
+      "lean4": [],
+      "rocq": []
+    },
+    "manifest": "proofs/v015-external-proof-assurance.json",
+    "lean4": {
+      "path": "proofs/lean4/MtsV015GeneralizedReaction.lean",
+      "gitBlob": "369415d38c30acb1d28b9405f366e7007feb7508",
+      "symbols": [
+        "MTS.V015.External.GPR_07_grounded_zero_role_refinement",
+        "MTS.V015.External.GPR_07_zero_role_has_empty_substitution"
+      ],
+      "result": "SUCCESS"
+    },
+    "rocq": {
+      "path": "proofs/coq/MtsV015GeneralizedReaction.v",
+      "gitBlob": "7cced0068b367b221214025e14ef527ebb8b664f",
+      "symbols": [
+        "GPR_07_grounded_zero_role_refinement",
+        "GPR_07_zero_role_has_empty_substitution"
+      ],
+      "result": "SUCCESS"
+    },
+    "exactHead": "abc367e090bd948c7f2b5328a6ef7c7a0d7e60de",
+    "ciRun": 37335710302
+  },
+  "executableWitnesses": [
+    "formal/v0.15/regression/grounded-zero-role.evidence.json",
+    "formal/v0.15/regression/two-role-meta-rule.evidence.json",
+    "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+  ],
+  "frozenAmemory": {
+    "main": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "groundedArtifact": "FULL_REGRESSION_GREEN",
+    "twoRoleArtifact": "FULL_REGRESSION_GREEN"
+  },
+  "theoremProjection": {
+    "currentV014InventoryUnchanged": true,
+    "v015ResearchDescriptor": "this file",
+    "generatedTheoremCatalogIntegration": "PENDING #1963/#1861"
+  }
+}
