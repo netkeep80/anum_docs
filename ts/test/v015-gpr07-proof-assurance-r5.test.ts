@@ -82,6 +82,25 @@ const gpr03Evidence = JSON.parse(
   };
   theoremProjection: { currentV014InventoryUnchanged: boolean };
 };
+const gpr04Evidence = JSON.parse(
+  readFileSync(
+    resolve(repo, "proofs/v015-evidence/gpr04-partition-schedule-refinement.json"),
+    "utf8",
+  ),
+) as {
+  id: string;
+  status: string;
+  externalCrossCheck: { ciRun: number; exactHead: string };
+  architecturalConsequence: {
+    shardMergeOrderChangesSemanticReduction: boolean;
+    duplicateContributionCreatesSemanticMultiplicity: boolean;
+    twoDimensionalPartitionChangesSemanticReduction: boolean;
+    localNoMatchMayPublishGlobalPreserveCurrent: boolean;
+    runtimeUnionCommandRequired: boolean;
+    concreteHardwareSynchronizationProved: boolean;
+  };
+  theoremProjection: { currentV014InventoryUnchanged: boolean };
+};
 const gpr06Evidence = JSON.parse(
   readFileSync(
     resolve(repo, "proofs/v015-evidence/gpr06-exact-s0-opacity.json"),
@@ -147,14 +166,15 @@ assert(v015.allowedGlobalAxioms.rocq.length === 0, "v0.15 Rocq axiom allowlist e
 const ids = v015.targets.map((target) => target.id);
 assert(new Set(ids).size === ids.length, "v0.15 GPR target ids are unique");
 assert(
-  ids.length === 6 &&
+  ids.length === 7 &&
     ids.includes("GPR-01") &&
     ids.includes("GPR-02") &&
     ids.includes("GPR-03") &&
+    ids.includes("GPR-04") &&
     ids.includes("GPR-06") &&
     ids.includes("GPR-07") &&
     ids.includes("GPR-08"),
-  "current paired proof manifest contains exactly GPR-01, GPR-02, GPR-03, GPR-06, GPR-07 and GPR-08",
+  "current paired proof manifest contains exactly GPR-01, GPR-02, GPR-03, GPR-04, GPR-06, GPR-07 and GPR-08",
 );
 
 function target(id: string): GprTarget {
@@ -188,6 +208,15 @@ assert(
 );
 assert(gpr03.lean4.length === 4, "GPR-03 paired Lean assurance symbols");
 assert(gpr03.rocq.length === 4, "GPR-03 paired Rocq assurance symbols");
+
+const gpr04 = target("GPR-04");
+assert(
+  gpr04.classification ===
+    "PROVED_AS_PARTITION_AND_SCHEDULE_REFINEMENT_UNDER_SNAPSHOT_EXTENTIONAL_REDUCTION",
+  "GPR-04 classification keeps snapshot/extensional-reduction premises explicit",
+);
+assert(gpr04.lean4.length === 5, "GPR-04 paired Lean assurance symbols");
+assert(gpr04.rocq.length === 5, "GPR-04 paired Rocq assurance symbols");
 
 const gpr06 = target("GPR-06");
 assert(
@@ -312,6 +341,34 @@ assert(
   "GPR-03 leaves accepted theorem inventory unchanged",
 );
 
+assert(gpr04Evidence.id === "GPR-04", "GPR-04 evidence id");
+assert(
+  gpr04Evidence.status ===
+    "PROVED_AS_PARTITION_AND_SCHEDULE_REFINEMENT_UNDER_SNAPSHOT_EXTENTIONAL_REDUCTION",
+  "GPR-04 evidence classification",
+);
+assert(gpr04Evidence.externalCrossCheck.ciRun === 37463212259, "GPR-04 exact proof CI is pinned");
+assert(
+  gpr04Evidence.externalCrossCheck.exactHead === "d30bd1958d560921a32f11bd0cefb0805cbd64ed",
+  "GPR-04 proof head is pinned",
+);
+assert(
+  gpr04Evidence.architecturalConsequence.shardMergeOrderChangesSemanticReduction === false &&
+    gpr04Evidence.architecturalConsequence.duplicateContributionCreatesSemanticMultiplicity === false &&
+    gpr04Evidence.architecturalConsequence.twoDimensionalPartitionChangesSemanticReduction === false,
+  "GPR-04 partitioning and merge order are nonsemantic under the stated reduction premises",
+);
+assert(
+  gpr04Evidence.architecturalConsequence.localNoMatchMayPublishGlobalPreserveCurrent === false &&
+    gpr04Evidence.architecturalConsequence.runtimeUnionCommandRequired === false &&
+    gpr04Evidence.architecturalConsequence.concreteHardwareSynchronizationProved === false,
+  "GPR-04 keeps global no-match, runtime UNION and hardware-refinement boundaries explicit",
+);
+assert(
+  gpr04Evidence.theoremProjection.currentV014InventoryUnchanged === true,
+  "GPR-04 leaves accepted theorem inventory unchanged",
+);
+
 assert(gpr06Evidence.id === "GPR-06", "GPR-06 evidence id");
 assert(
   gpr06Evidence.status === "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
@@ -382,10 +439,11 @@ assert(
 console.log([
   "MTS_V015_GPR_PROOF_ASSURANCE=GREEN",
   "V014_ASSURANCE_TARGETS=21_UNCHANGED",
-  "V015_GPR_TARGETS=6",
+  "V015_GPR_TARGETS=7",
   "GPR01=PAIRED_LEAN_ROCQ",
   "GPR02=PAIRED_LEAN_ROCQ",
   "GPR03=PAIRED_LEAN_ROCQ",
+  "GPR04=PAIRED_LEAN_ROCQ",
   "GPR06=PAIRED_LEAN_ROCQ",
   "GPR07=PAIRED_LEAN_ROCQ",
   "GPR08=PAIRED_LEAN_ROCQ",
@@ -393,6 +451,7 @@ console.log([
   "GPR01_CLASSIFICATION=PROVED_AS_PURE_SINGLE_STATE_TRANSFORMER_REFINEMENT",
   "GPR02_CLASSIFICATION=PROVED_FOR_CANONICAL_ANET_MEMBERSHIP_CONVERGENCE_WITH_SEPARATE_PROVENANCE_AND_EXACTSEQUENCE_MULTIPLICITY",
   "GPR03_CLASSIFICATION=PROVED_UNDER_REACTION_START_SNAPSHOT_SEMANTICS_WITH_READ_YOUR_OWN_WRITES_FALSIFIER",
+  "GPR04_CLASSIFICATION=PROVED_AS_PARTITION_AND_SCHEDULE_REFINEMENT_UNDER_SNAPSHOT_EXTENTIONAL_REDUCTION",
   "GPR06_CLASSIFICATION=PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
   "GPR07_CLASSIFICATION=PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
   "GPR08_CLASSIFICATION=PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",

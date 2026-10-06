@@ -89,6 +89,37 @@
       ]
     },
     {
+      "id": "GPR-04",
+      "classification": "PROVED_AS_PARTITION_AND_SCHEDULE_REFINEMENT_UNDER_SNAPSHOT_EXTENTIONAL_REDUCTION",
+      "premises": [
+        "all shard contributions analyze the same immutable reaction-start snapshot established by GPR-03",
+        "global reduction combines matched truth by logical OR and output semantic membership extensionally",
+        "duplicate canonical Link contributions converge by the GPR-02 semantic ANet membership law",
+        "the complete global reduction result is available before the single publication boundary of GPR-01/GPR-03"
+      ],
+      "exclusions": [
+        "does not introduce a runtime UNION opcode or second semantic command",
+        "does not prove concrete CPU/WASM/WebGPU synchronization, memory fences or scheduler implementation",
+        "does not permit a shard-local NO_MATCH to publish global preserve-current without the global match reduction",
+        "does not claim provenance-event ordering is nonsemantic where provenance is separately modeled",
+        "does not require J1 cross-current-member join"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_04_merge_associative_observation",
+        "MTS.V015.External.GPR_04_merge_commutative_observation",
+        "MTS.V015.External.GPR_04_merge_idempotent_observation",
+        "MTS.V015.External.GPR_04_two_dimensional_partition_refinement",
+        "MTS.V015.External.GPR_04_local_no_match_cannot_publish_global_no_match"
+      ],
+      "rocq": [
+        "GPR_04_merge_associative_observation",
+        "GPR_04_merge_commutative_observation",
+        "GPR_04_merge_idempotent_observation",
+        "GPR_04_two_dimensional_partition_refinement",
+        "GPR_04_local_no_match_cannot_publish_global_no_match"
+      ]
+    },
+    {
       "id": "GPR-06",
       "classification": "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
       "premises": [
