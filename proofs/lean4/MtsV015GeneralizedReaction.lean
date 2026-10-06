@@ -238,6 +238,8 @@ theorem GPR_06_structure_sensitive_function_requires_more_than_exact_S0
 end MTS.V015.External
 
 
+namespace MTS.V015.External
+
 /-
 GPR-08 — finite-arity J0 representation and semantic role authority.
 
@@ -409,3 +411,5 @@ theorem GPR_01_same_analysis_same_staging
     D.synthesize a₁ = D.synthesize a₂ := by
   subst a₂
   rfl
+
+end MTS.V015.External
