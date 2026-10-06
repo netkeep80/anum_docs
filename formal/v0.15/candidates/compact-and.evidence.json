@@ -1,31 +1,43 @@
 {
   "schema": "mts-v015-compact-and-candidate/v0.1",
-  "id": "compact-and-two-generic-rules",
-  "status": "AUTHOR_REVIEW_PENDING_RESEARCH_GREEN",
+  "id": "compact-boolean-and-four-grounded-rules",
+  "status": "AUTHOR_REVIEW_PENDING_RESEARCH_RUNNING",
   "ownerIssue": "#1980",
   "canonicalAccepted": false,
+  "supersedesResearchCandidate": "compact-and-two-generic-rules",
+  "decisionRationale": [
+    "role values in the generic structural matcher are intentionally unrestricted",
+    "AND([F,Y])->F / AND([T,Y])->Y therefore defines a broader guard/pass-through law for arbitrary Link Y",
+    "canonical AND is kept as strict Boolean logic over the local T/F domain instead of overloading AND with that broader law",
+    "the broader two-rule law may be modeled later as a distinct operator if required"
+  ],
   "candidate": {
     "formal": "formal/v0.15/candidates/compact-and.formal",
-    "formalSha256": "16fddc9f8245fd7237a67424364d9b1991fa256287d0101509f038158c64edd6",
+    "formalSha256": "4a5bc92e661ee1d4e0c2c5d51769805b5406651bb491345200d088c9ad23e5f3",
     "json": "formal/v0.15/candidates/compact-and.json",
-    "jsonSha256": "efc4d9a04897903b05f5a37b77d5cf12848987049fbb31cb3624756f0bd7eab1",
-    "rootEntryCount": 22
+    "jsonSha256": "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
+    "rootEntryCount": 23
   },
   "semanticModel": {
+    "domain": "ExactSequence([F|T,F|T]); any operand outside the local T/F domain is NO_MATCH",
     "laws": [
-      "AND([F,Y])->F",
-      "AND([T,Y])->Y"
+      "AND([F,F])->F",
+      "AND([F,T])->F",
+      "AND([T,F])->F",
+      "AND([T,T])->T"
     ],
-    "roleMembers": [
-      "V->Y"
-    ],
+    "roleMembers": [],
     "admissions": [
-      "Theory->RuleF",
-      "Theory->RuleT"
+      "Theory->RuleFF",
+      "Theory->RuleFT",
+      "Theory->RuleTF",
+      "Theory->RuleTT"
     ],
-    "semanticMemberCount": 3,
-    "genericRuleCount": 2,
-    "roleCount": 1
+    "semanticMemberCount": 4,
+    "ruleCount": 4,
+    "groundedRuleCount": 4,
+    "roleCount": 0,
+    "executionOperation": "same generalized Γ; zero-role Rules are the grounded refinement of the shared Rule topology"
   },
   "researchEvidence": {
     "localTest": "ts/test/v015-compact-and-role-bundle-a1.test.ts",
@@ -34,29 +46,32 @@
       "repository": "netkeep80/amemory",
       "sha": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
       "version": "0.175.0",
-      "workflowRun": 37505577943,
-      "result": "SUCCESS",
-      "rows": "4/4",
+      "workflowRun": null,
+      "result": "PENDING",
+      "rows": "pending",
       "programSpecificDispatch": 0
     }
   },
   "compatibilityBoundary": {
-    "generatedCanonicalMemberWires": 3,
-    "generatedBackendIndexes": 2,
+    "generatedCanonicalMemberWires": 4,
+    "generatedBackendIndexes": 4,
     "sharedLegacyInterpreter": true,
     "scaffoldInCandidateSource": false,
-    "persistedCompatibilityPackage": false
+    "persistedCompatibilityPackage": false,
+    "note": "backend representation may differ for performance but must preserve the one canonical AND semantics and still execute through generic Γ"
   },
   "falsifiers": [
-    "delete Theory->RuleT disables only T-leading rows",
+    "non-Boolean operand yields NO_MATCH instead of pass-through",
+    "delete Theory->RuleTT disables only TT",
     "foreign Theory is inert",
     "presentation rename preserves semantic ANet",
-    "malformed frozen launch yields zero matches and quiescence"
+    "frozen out-of-domain launch yields zero matches and quiescence"
   ],
   "approvalBoundary": [
     "candidate files are persisted for reproducible review only",
     "not present in approvedJsonCorpus",
     "not canonical accepted AND",
+    "previous two-role candidate was research-only and is superseded, not accepted",
     "no V15-AND-01/02/03 promotion before explicit Author APPROVE",
     "any material source change invalidates this review candidate"
   ]
