@@ -642,7 +642,7 @@
       "ownerIssue": "#2001",
       "state": "COMPONENT_GREEN",
       "mandatory": true,
-      "summary": "One generalized reaction Γ is the shared semantic execution operation for ordinary executable ANets and self-hosted meta/interpreter ANets; no consumer-specific semantic opcode or second semantic runtime is permitted.",
+      "summary": "One repeated universal Γ is the v0.15 semantic execution operation: reaction-start snapshot; J0 structural-unary applicability over one explicit current endpoint; S1 read-only structural match/bind; S2 substitution/canonical Link construction during synthesis; 0/1/N ordered image contribution; complete staged successor and atomic publication. Exact grounded MP is the zero-role refinement. J1 cross-current-member join, external semantic grounder commands, consumer-specific opcodes and a second semantic runtime are not required/permitted by the selected profile.",
       "dependsOn": [
         "V15-CLOSE-03"
       ],
@@ -652,13 +652,25 @@
       "evidence": {
         "positiveVectors": [
           "gpr01-09-paired-lean4-rocq-closure",
+          "a9-structural-unary-one-command-sufficiency",
+          "a10-finite-exact-s0-fresh-structure-opacity-boundary",
+          "a11-snapshot-partition-reduction",
+          "a12-finite-materialized-generation",
           "grounded-zero-role-is-generic-refinement"
         ],
         "negativeVectors": [
+          "finite-exact-s0-alone-cannot-transform-arbitrary-fresh-structure",
+          "j1-cross-current-member-join-not-required",
+          "external-semantic-grounder-command-forbidden",
           "consumer-specific-semantic-opcode-forbidden",
           "second-semantic-runtime-forbidden"
         ],
-        "requiredExecutableGates": []
+        "requiredExecutableGates": [
+          "ts/test/v015-structural-aset-one-command-a9.test.ts",
+          "ts/test/v015-exact-finite-support-necessity-a10.test.ts",
+          "ts/test/v015-parallel-reaction-reduction-a11.test.ts",
+          "ts/test/v015-finite-materialized-reaction-a12.test.ts"
+        ]
       }
     },
     {
