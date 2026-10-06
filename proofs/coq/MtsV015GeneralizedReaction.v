@@ -325,3 +325,87 @@ Qed.
 Print Assumptions GPR_08_exact_sequence_packing_injective.
 Print Assumptions GPR_08_finite_arity_has_one_endpoint.
 Print Assumptions GPR_08_physical_nonmember_has_no_role_authority.
+
+
+(*
+GPR-01 — one semantic Gamma step with analysis/synthesis/publication
+refinement. Analysis and staging values are verifier-side machinery only and
+are not semantic machine states.
+*)
+
+Record ReactionDecomposition
+    (State Analysis Staged : Type) := {
+  analyze : State -> Analysis;
+  synthesize : Analysis -> Staged;
+  publish : State -> Staged -> State
+}.
+
+Definition Gamma
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before : State) : State :=
+  publish _ _ _ D before
+    (synthesize _ _ _ D (analyze _ _ _ D before)).
+
+Definition GammaStep
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before after : State) : Prop :=
+  after = Gamma D before.
+
+Definition DecomposedCycle
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before after : State) : Prop :=
+  exists analysis staged,
+    analysis = analyze _ _ _ D before /\
+    staged = synthesize _ _ _ D analysis /\
+    after = publish _ _ _ D before staged.
+
+Theorem GPR_01_decomposition_iff_single_gamma_step
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before after : State) :
+    DecomposedCycle D before after <->
+    GammaStep D before after.
+Proof.
+  split.
+  - intros [analysis [staged [analysis_eq [staged_eq after_eq]]]].
+    subst analysis.
+    subst staged.
+    exact after_eq.
+  - intro one_step.
+    exists (analyze _ _ _ D before).
+    exists (synthesize _ _ _ D (analyze _ _ _ D before)).
+    repeat split; try reflexivity.
+    exact one_step.
+Qed.
+
+Theorem GPR_01_gamma_successor_unique
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before after1 after2 : State)
+    (step1 : GammaStep D before after1)
+    (step2 : GammaStep D before after2) :
+    after1 = after2.
+Proof.
+  unfold GammaStep in step1, step2.
+  rewrite step1.
+  rewrite step2.
+  reflexivity.
+Qed.
+
+Theorem GPR_01_same_analysis_same_staging
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (a1 a2 : Analysis)
+    (same_analysis : a1 = a2) :
+    synthesize _ _ _ D a1 = synthesize _ _ _ D a2.
+Proof.
+  subst a2.
+  reflexivity.
+Qed.
+
+Print Assumptions GPR_01_decomposition_iff_single_gamma_step.
+Print Assumptions GPR_01_gamma_successor_unique.
+Print Assumptions GPR_01_same_analysis_same_staging.
