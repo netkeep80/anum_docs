@@ -295,34 +295,54 @@
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-JSON-02": {
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "ownerIssue": 1188,
       "dependsOn": [
         "V15-JSON-01",
         "V15-NAME-01"
       ],
       "positiveVectors": [
+        "direct-formal-json-native-source-anet-parity",
         "direct-json-null-to-bare-source-entry",
         "direct-json-string-rhs-to-binding",
         "direct-json-empty-array-to-R-binding",
         "direct-json-nested-object-to-anchored-source-anet",
-        "direct-json-structured-bare-key-to-resolved-membership"
+        "direct-json-structured-bare-key-to-resolved-membership",
+        "root-binding-does-not-publish-membership",
+        "distinct-source-same-denotation",
+        "currentness-follows-membership",
+        "currentness-moves-with-membership",
+        "presentation-rename-membership-invariant",
+        "role-bundle-membership-plus-admission",
+        "grounded-empty-role-bundle-admission-only"
       ],
       "negativeVectors": [
         "duplicate-decoded-json-key-rejects",
         "top-level-null-rejects",
         "array-null-rejects",
-        "json-must-not-bypass-native-source-anet"
+        "json-must-not-bypass-native-source-anet",
+        "physical-link-without-membership-is-not-current",
+        "structured-binding-head-fails-closed-bounded-fragment"
       ],
       "requiredExecutableGates": [
-        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "ts/test/v015-direct-formal-source-b20.test.ts",
+        "ts/test/v015-das-denotation-closure-d1.test.ts"
       ],
       "evidenceRefs": [
+        "formal/v0.15/evidence/das01-10-source-denotation.json",
+        "ts/src/v015-source-anet.ts",
+        "ts/src/v015-direct-source.ts",
+        "ts/src/v015-direct-json-source.ts",
+        "ts/src/v015-direct-formal-source.ts",
         "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "ts/test/v015-direct-formal-source-b20.test.ts",
+        "formal/v0.15/regression/grounded-zero-role.evidence.json",
+        "formal/v0.15/regression/two-role-meta-rule.evidence.json",
         "#1188",
         "#2002"
       ],
-      "authorJsonReview": "GENERIC_MAPPING_APPROVED_ARTIFACTS_PENDING"
+      "authorJsonReview": "APPROVED_ARTIFACTS_FULL_REGRESSION_GREEN"
     },
     "V15-JSON-03": {
       "state": "OPEN",

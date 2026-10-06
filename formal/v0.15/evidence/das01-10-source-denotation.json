@@ -1,0 +1,122 @@
+{
+  "schema": "mts-v015-das-closure-evidence/v0.1",
+  "id": "DAS-01-10",
+  "ownerIssue": "#2002",
+  "status": "COMPONENT_GREEN",
+  "scope": "direct FORMAL/JSON source -> shared native source ANet -> resolved semantic membership denotation",
+  "productionPath": [
+    "ts/src/v015-direct-formal-source.ts",
+    "ts/src/v015-direct-json-source.ts",
+    "ts/src/v015-direct-source.ts",
+    "ts/src/v015-source-anet.ts"
+  ],
+  "laws": [
+    {
+      "id": "DAS-01",
+      "status": "GREEN",
+      "claim": "object/block entries lower through explicit bare/binding/bundle source roles; structured binding heads outside the bounded fragment fail closed"
+    },
+    {
+      "id": "DAS-02",
+      "status": "GREEN",
+      "claim": "JSON null is source bare occurrence only; missing, bare, empty bundle and empty ExactSequence remain distinct"
+    },
+    {
+      "id": "DAS-03",
+      "status": "GREEN",
+      "claim": "named scalar definitions preserve bindings but do not implicitly publish RHS membership"
+    },
+    {
+      "id": "DAS-04",
+      "status": "GREEN",
+      "claim": "structured bare head resolves to a direct semantic member"
+    },
+    {
+      "id": "DAS-05",
+      "status": "GREEN",
+      "claim": "nested objects lower as anchored source ANets; nested bare/binding/bundle entries publish contextual Links by the common denotation law"
+    },
+    {
+      "id": "DAS-06",
+      "status": "GREEN",
+      "claim": "duplicate source denotations converge extensionally at semantic ANet membership"
+    },
+    {
+      "id": "DAS-07",
+      "status": "GREEN",
+      "claim": "source identity and denotational equality remain distinct; no inverse reconstruction from denotation is required"
+    },
+    {
+      "id": "DAS-08",
+      "status": "GREEN",
+      "claim": "currentness follows positive semantic membership; physical existence or an alias alone is insufficient and currentness moves when membership moves"
+    },
+    {
+      "id": "DAS-09",
+      "status": "GREEN",
+      "claim": "Author-approved role-bundle topology lowers to role members plus Theory->Rule admission; zero-role bundle is the same path with zero role members"
+    },
+    {
+      "id": "DAS-10",
+      "status": "GREEN",
+      "claim": "FORMAL and JSON share one native source ANet and one denotation path; no key-order, physical-existence, JSON-only or program-specific membership bridge is authoritative"
+    }
+  ],
+  "mandatoryVectors": {
+    "positive": [
+      "{}",
+      "{\"A\":null}",
+      "{\"A\":{}}",
+      "{\"A\":[]}",
+      "{\"A\":\"R\"}",
+      "{\"A\":\"X\",\"B\":\"X\"}",
+      "{\"E->K\":null}",
+      "{\"W\":\"E->K\"}",
+      "nested role bundle V{X,Y}",
+      "grounded empty role bundle V0{}",
+      "physical currentness move E->K -> E->K1",
+      "member under renamed presentation"
+    ],
+    "failClosed": [
+      "duplicate decoded JSON key",
+      "escaped duplicate decoded JSON key",
+      "top-level null",
+      "array null",
+      "structured binding head in current bounded fragment",
+      "missing contextual name lookup"
+    ]
+  },
+  "executableEvidence": [
+    "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+    "ts/test/v015-direct-formal-source-b20.test.ts"
+  ],
+  "approvedArtifactRegression": [
+    {
+      "id": "grounded-zero-role-rule",
+      "evidence": "formal/v0.15/regression/grounded-zero-role.evidence.json",
+      "status": "FULL_REGRESSION_GREEN",
+      "authorApproval": "APPROVED",
+      "frozenAmemory": "0.175.0"
+    },
+    {
+      "id": "two-role-meta-rule",
+      "evidence": "formal/v0.15/regression/two-role-meta-rule.evidence.json",
+      "status": "FULL_REGRESSION_GREEN",
+      "authorApproval": "APPROVED",
+      "frozenAmemory": "0.175.0"
+    }
+  ],
+  "boundaries": [
+    "COMPONENT_GREEN closes #2002 denotation/layering ownership only; it does not accept MTS v0.15",
+    "V15-JSON-01 and V15-JSON-03 remain separate OPEN requirements under #1188",
+    "structured binding heads remain fail-closed in the current bounded source fragment rather than receiving guessed semantics",
+    "host Set/Map values may be implementation carriers/caches but are not semantic authority; authority comes from Link-native source roles and denotation laws",
+    "accepted MTS v0.14 semantics and theorem inventory are unchanged"
+  ],
+  "exactGreenParent": {
+    "head": "b23e9ded93eada92a8072d2472c4962232bfd7d9",
+    "ciRun": 37497890809,
+    "contractObservatoryRun": 37497890807,
+    "frozenAmemoryRun": 37497890847
+  }
+}
