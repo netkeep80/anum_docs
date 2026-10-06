@@ -581,6 +581,7 @@ Print Assumptions GPR_03_analysis_ignores_staged_candidate.
 Print Assumptions GPR_03_one_generation_stops_at_B.
 Print Assumptions GPR_03_read_your_own_writes_is_not_one_generation.
 
+
 (*
 GPR-04 — partition/schedule refinement.
 
@@ -600,15 +601,16 @@ Definition MergeContribution
     (left right : ReductionContribution Output) :
     ReductionContribution Output :=
   {|
-    rc_matched := rc_matched _ left / rc_matched _ right;
+    rc_matched := rc_matched _ left \/ rc_matched _ right;
     rc_emits := fun output =>
-      rc_emits _ left output / rc_emits _ right output
+      rc_emits _ left output \/ rc_emits _ right output
   |}.
 
 Definition ContributionEquivalent
     {Output : Type}
     (left right : ReductionContribution Output) : Prop :=
-  (rc_matched _ left <-> rc_matched _ right) /  forall output,
+  (rc_matched _ left <-> rc_matched _ right) /\
+  forall output,
     rc_emits _ left output <-> rc_emits _ right output.
 
 Theorem GPR_04_merge_associative_observation
@@ -621,9 +623,25 @@ Proof.
   unfold ContributionEquivalent, MergeContribution.
   simpl.
   split.
-  - tauto.
+  - split.
+    + intros [[ha | hb] | hc].
+      * left. exact ha.
+      * right. left. exact hb.
+      * right. right. exact hc.
+    + intros [ha | [hb | hc]].
+      * left. left. exact ha.
+      * left. right. exact hb.
+      * right. exact hc.
   - intro output.
-    tauto.
+    split.
+    + intros [[ha | hb] | hc].
+      * left. exact ha.
+      * right. left. exact hb.
+      * right. right. exact hc.
+    + intros [ha | [hb | hc]].
+      * left. left. exact ha.
+      * left. right. exact hb.
+      * right. exact hc.
 Qed.
 
 Theorem GPR_04_merge_commutative_observation
@@ -636,9 +654,21 @@ Proof.
   unfold ContributionEquivalent, MergeContribution.
   simpl.
   split.
-  - tauto.
+  - split.
+    + intros [ha | hb].
+      * right. exact ha.
+      * left. exact hb.
+    + intros [hb | ha].
+      * right. exact hb.
+      * left. exact ha.
   - intro output.
-    tauto.
+    split.
+    + intros [ha | hb].
+      * right. exact ha.
+      * left. exact hb.
+    + intros [hb | ha].
+      * right. exact hb.
+      * left. exact ha.
 Qed.
 
 Theorem GPR_04_merge_idempotent_observation
@@ -651,17 +681,31 @@ Proof.
   unfold ContributionEquivalent, MergeContribution.
   simpl.
   split.
-  - tauto.
+  - split.
+    + intros [ha | ha]; exact ha.
+    + intro ha. left. exact ha.
   - intro output.
-    tauto.
+    split.
+    + intros [ha | ha]; exact ha.
+    + intro ha. left. exact ha.
 Qed.
 
 Lemma gpr04_four_way_repartition
     (A B C D : Prop) :
-    ((A / B) / (C / D)) <->
-    ((A / C) / (B / D)).
+    ((A \/ B) \/ (C \/ D)) <->
+    ((A \/ C) \/ (B \/ D)).
 Proof.
-  tauto.
+  split.
+  - intros [[ha | hb] | [hc | hd]].
+    + left. left. exact ha.
+    + right. left. exact hb.
+    + left. right. exact hc.
+    + right. right. exact hd.
+  - intros [[ha | hc] | [hb | hd]].
+    + left. left. exact ha.
+    + right. left. exact hc.
+    + left. right. exact hb.
+    + right. right. exact hd.
 Qed.
 
 Theorem GPR_04_two_dimensional_partition_refinement
