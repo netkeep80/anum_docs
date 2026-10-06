@@ -21,6 +21,7 @@ on:
       - "ts/test/research-v015-p1ad-two-admission-package.ts"
       - "ts/test/research-v015-p1af-proof-validity-package.ts"
       - "ts/test/research-v015-p1ah-packed-substitution-package.ts"
+      - "ts/test/research-v015-p2b-dr-self-verifier-package.ts"
       - ".github/workflows/amemory-v015-regression.yml"
   workflow_dispatch:
 
@@ -681,5 +682,95 @@ jobs:
             "valid=1 repeated_role_conflict=0 swapped_premises=0 "
             "missing_premise=0 extra_premise=0 j1=0 host_substitution=0 "
             "canonical_source_artifact=0"
+          )
+          PY
+
+
+  aprover-dr-self-verifier-research:
+    name: aprover DR self-verifier / frozen A-memory research
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout anum_docs
+        uses: actions/checkout@v6
+
+      - name: Checkout exact frozen A-memory
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/amemory
+          ref: ${{ env.AMEMORY_FROZEN_SHA }}
+          path: _amemory
+
+      - name: Verify frozen A-memory identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C _amemory rev-parse HEAD)" = "$AMEMORY_FROZEN_SHA"
+          test "$(tr -d '\r\n' < _amemory/VERSION)" = "$AMEMORY_FROZEN_VERSION"
+          test -f _amemory/experiments/a-circuit/src/bin/formal_recursive_replay.rs
+          echo "AMEMORY_FROZEN_IDENTITY=PASS sha=$AMEMORY_FROZEN_SHA version=$AMEMORY_FROZEN_VERSION"
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: ts/package-lock.json
+
+      - name: Build temporary DR self-verifier package
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --prefix ts
+          npm run --prefix ts build --silent
+          node ts/dist/test/research-v015-p2b-dr-self-verifier-package.js > /tmp/p2b-package.json
+          python3 - <<'PY'
+          import json
+          data=json.load(open("/tmp/p2b-package.json","r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-recursive-execution-package/v0.1"
+          assert len(data["links"])==1
+          assert isinstance(data["entry"],str) and data["entry"]
+          assert "negativeEntry" not in data
+          assert all(set(x)<=set("8961") for x in data["links"])
+          assert set(data["entry"])<=set("8961")
+          print("P2B_DR_SELF_VERIFIER_PACKAGE=GENERATED_NOT_CANONICAL_JSON")
+          PY
+
+      - name: Replay dynamic DR verifier through real frozen A-memory
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +"$AMEMORY_RUST_TOOLCHAIN" run \
+            --quiet \
+            --locked \
+            --manifest-path _amemory/experiments/a-circuit/Cargo.toml \
+            --bin formal_recursive_replay \
+            -- /tmp/p2b-package.json | tee /tmp/p2b-evidence.json
+
+          python3 - <<'PY'
+          import json
+          data=json.load(open("/tmp/p2b-evidence.json","r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-recursive-execution-evidence/v0.1"
+          runs=data["runs"]
+          assert len(runs)==12
+          expected_matches=[1,1,0] * 4
+          assert [r["raw_rule_matches"] for r in runs]==expected_matches
+          assert [r["transitioned_members"] for r in runs]==expected_matches
+          for r,matches in zip(runs,expected_matches):
+              assert r["result"]==r["expected"]
+              if matches==1:
+                  assert r["handoff_count"]==1
+                  assert r["quiescent"] is False
+              else:
+                  assert r["handoff_count"]==0
+                  assert r["quiescent"] is True
+          assert data["negative_run"] is None
+          print(
+            "FROZEN_AMEMORY_P2B_DR_SELF_VERIFIER=PASS "
+            "tested_arities=0_1_2_3 dynamic_generated_verifier=1 "
+            "next_launch_executes_generated_rule=1 bad_claim_rejected=1 "
+            "j1=0 host_substitution=0 frozen_physical_materialization_compat=1 "
+            "normative_aset_membership_evidence=P2A canonical_source_artifact=0"
           )
           PY
