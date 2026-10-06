@@ -393,10 +393,11 @@
         "V15-ONTO-02"
       ],
       "positiveVectors": [
-        "compact-and-two-generic-rules-4of4"
+        "compact-boolean-and-four-grounded-rules-4of4"
       ],
       "negativeVectors": [
-        "compact-and-delete-ruleT-admission",
+        "compact-and-nonboolean-operands-no-match",
+        "compact-and-delete-ruleTT-admission",
         "compact-and-foreign-theory-inert",
         "compact-and-presentation-rename-invariant"
       ],
@@ -407,6 +408,7 @@
       "evidenceRefs": [
         "formal/v0.15/candidates/compact-and.formal",
         "formal/v0.15/candidates/compact-and.json",
+        "formal/v0.15/candidates/compact-and.evidence.json",
         "ts/test/v015-compact-and-role-bundle-a1.test.ts",
         "ts/test/research-v015-compact-and-package-a2.ts",
         "#1980"
@@ -422,10 +424,11 @@
         "V15-CLOSE-03"
       ],
       "positiveVectors": [
-        "compact-and-two-generic-rules-4of4",
-        "frozen-amemory-compact-and-4of4"
+        "compact-boolean-and-four-grounded-rules-4of4",
+        "frozen-amemory-compact-boolean-and-4of4"
       ],
       "negativeVectors": [
+        "compact-and-nonboolean-operands-no-match",
         "compact-and-foreign-theory-inert",
         "compact-and-malformed-negative-no-match"
       ],
@@ -436,6 +439,7 @@
       "evidenceRefs": [
         "formal/v0.15/candidates/compact-and.formal",
         "formal/v0.15/candidates/compact-and.json",
+        "formal/v0.15/candidates/compact-and.evidence.json",
         "ts/test/v015-compact-and-role-bundle-a1.test.ts",
         "ts/test/research-v015-compact-and-package-a2.ts",
         "#1980"
@@ -450,10 +454,11 @@
         "V15-AND-02"
       ],
       "positiveVectors": [
-        "compact-and-generic-two-rule-compatibility-lowering"
+        "compact-and-four-grounded-rule-compatibility-lowering"
       ],
       "negativeVectors": [
-        "canonical-and-has-no-role-dictionary-index-scope-interpreter-scaffold"
+        "canonical-and-has-no-role-dictionary-index-scope-interpreter-scaffold",
+        "optimized-lowering-must-not-widen-boolean-domain"
       ],
       "requiredExecutableGates": [
         "ts/test/research-v015-compact-and-package-a2.ts"
@@ -461,9 +466,10 @@
       "evidenceRefs": [
         "formal/v0.15/candidates/compact-and.formal",
         "formal/v0.15/candidates/compact-and.json",
+        "formal/v0.15/candidates/compact-and.evidence.json",
+        "ts/test/v015-compact-and-role-bundle-a1.test.ts",
         "ts/test/research-v015-compact-and-package-a2.ts",
-        "#1980",
-        "#2005"
+        "#1980"
       ],
       "authorJsonReview": "AUTHOR_REVIEW_PENDING",
       "candidateSource": "formal/v0.15/candidates/compact-and.formal"
