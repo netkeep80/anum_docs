@@ -115,7 +115,7 @@ theorem GPR_07_zero_role_has_empty_substitution
     template = actual ∧ bindings = [] :=
   (K.emptyRolesMatch).mp matched
 
-end MTS.V015.External
+
 
 
 /-
@@ -234,3 +234,5 @@ theorem GPR_06_structure_sensitive_function_requires_more_than_exact_S0
   GPR_06_fresh_structural_target_unreachable
     support input (derive input) changesInput freshResult
     step stepClosed generations initial initialClosed
+
+end MTS.V015.External
