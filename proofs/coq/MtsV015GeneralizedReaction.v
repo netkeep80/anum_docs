@@ -752,3 +752,115 @@ Print Assumptions GPR_04_merge_commutative_observation.
 Print Assumptions GPR_04_merge_idempotent_observation.
 Print Assumptions GPR_04_two_dimensional_partition_refinement.
 Print Assumptions GPR_04_local_no_match_cannot_publish_global_no_match.
+
+
+(*
+GPR-05 — finite completion boundary.
+
+Link and Rule remain arbitrary Types: there is no finite ambient Link-carrier
+axiom. One concrete reaction is represented by finite materialized/current/
+admission lists, finite explicit images, and Nat-valued local-match cost.
+These Nat/list values are verifier-side execution/refinement budgets only.
+*)
+
+Definition GPR05TotalImageSize
+    {Link Rule : Type}
+    (rules : list Rule)
+    (image : Rule -> list Link) : nat :=
+  fold_right
+    (fun rule total => length (image rule) + total)
+    0
+    rules.
+
+Definition GPR05LocalWork
+    {Link Rule : Type}
+    (currents : list Link)
+    (rules : list Rule)
+    (local_match_cost : Link -> Rule -> nat) : nat :=
+  fold_right
+    (fun current total =>
+      fold_right
+        (fun rule local => local_match_cost current rule + local)
+        0
+        rules + total)
+    0
+    currents.
+
+Definition GPR05ComparisonBound
+    {Link Rule : Type}
+    (currents : list Link)
+    (rules : list Rule) : nat :=
+  length currents * length rules.
+
+Definition GPR05RawStageBound
+    {Link Rule : Type}
+    (currents : list Link)
+    (rules : list Rule)
+    (image : Rule -> list Link) : nat :=
+  length currents * GPR05TotalImageSize rules image.
+
+Definition GPR05SuccessorStageBound
+    {Link Rule : Type}
+    (currents : list Link)
+    (rules : list Rule)
+    (image : Rule -> list Link) : nat :=
+  length currents + GPR05RawStageBound currents rules image.
+
+Theorem GPR_05_current_rule_comparison_product
+    {Link Rule : Type}
+    (currents : list Link)
+    (rules : list Rule) :
+    GPR05ComparisonBound currents rules =
+      length currents * length rules.
+Proof.
+  reflexivity.
+Qed.
+
+Theorem GPR_05_raw_staging_budget
+    {Link Rule : Type}
+    (currents : list Link)
+    (rules : list Rule)
+    (image : Rule -> list Link) :
+    GPR05RawStageBound currents rules image =
+      length currents * GPR05TotalImageSize rules image.
+Proof.
+  reflexivity.
+Qed.
+
+Theorem GPR_05_finite_generation_budget
+    {Link Rule : Type}
+    (materialized : list Link)
+    (currents : list Link)
+    (rules : list Rule)
+    (image : Rule -> list Link)
+    (local_match_cost : Link -> Rule -> nat) :
+    exists comparisonBound localWorkBound rawStageBound
+      successorStageBound materializedCount : nat,
+      comparisonBound = GPR05ComparisonBound currents rules /\
+      localWorkBound = GPR05LocalWork currents rules local_match_cost /\
+      rawStageBound = GPR05RawStageBound currents rules image /\
+      successorStageBound = GPR05SuccessorStageBound currents rules image /\
+      materializedCount = length materialized.
+Proof.
+  exists (GPR05ComparisonBound currents rules).
+  exists (GPR05LocalWork currents rules local_match_cost).
+  exists (GPR05RawStageBound currents rules image).
+  exists (GPR05SuccessorStageBound currents rules image).
+  exists (length materialized).
+  repeat split; reflexivity.
+Qed.
+
+Theorem GPR_05_no_finite_ambient_carrier_required
+    {Link : Type}
+    (materialized : list Link) :
+    exists materializedCount : nat,
+      materializedCount = length materialized.
+Proof.
+  exists (length materialized).
+  reflexivity.
+Qed.
+
+Print Assumptions GPR_05_current_rule_comparison_product.
+Print Assumptions GPR_05_raw_staging_budget.
+Print Assumptions GPR_05_finite_generation_budget.
+Print Assumptions GPR_05_no_finite_ambient_carrier_required.

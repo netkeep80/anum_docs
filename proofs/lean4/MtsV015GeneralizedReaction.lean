@@ -727,4 +727,97 @@ theorem GPR_04_local_no_match_cannot_publish_global_no_match
   intro preserve
   exact preserve (Or.inr rightMatch)
 
+/-
+GPR-05 — finite completion boundary.
+
+This projection deliberately leaves Link and Rule as arbitrary Types. It does
+not assume a finite ambient Link carrier. Finiteness enters only through the
+materialized lists used by one concrete reaction and through Nat-valued local
+match cost (the explicit local-termination premise).
+
+The bounds below are verifier/refinement budgets, not new MTS ontology.
+-/
+
+def GPR05TotalImageSize
+    {Link Rule : Type}
+    (rules : List Rule)
+    (image : Rule → List Link) : Nat :=
+  rules.foldr (fun rule total => (image rule).length + total) 0
+
+def GPR05LocalWork
+    {Link Rule : Type}
+    (currents : List Link)
+    (rules : List Rule)
+    (localMatchCost : Link → Rule → Nat) : Nat :=
+  currents.foldr
+    (fun current total =>
+      rules.foldr
+        (fun rule local => localMatchCost current rule + local)
+        0 + total)
+    0
+
+def GPR05ComparisonBound
+    {Link Rule : Type}
+    (currents : List Link)
+    (rules : List Rule) : Nat :=
+  currents.length * rules.length
+
+def GPR05RawStageBound
+    {Link Rule : Type}
+    (currents : List Link)
+    (rules : List Rule)
+    (image : Rule → List Link) : Nat :=
+  currents.length * GPR05TotalImageSize rules image
+
+def GPR05SuccessorStageBound
+    {Link Rule : Type}
+    (currents : List Link)
+    (rules : List Rule)
+    (image : Rule → List Link) : Nat :=
+  currents.length + GPR05RawStageBound currents rules image
+
+theorem GPR_05_current_rule_comparison_product
+    {Link Rule : Type}
+    (currents : List Link)
+    (rules : List Rule) :
+    GPR05ComparisonBound currents rules =
+      currents.length * rules.length := by
+  rfl
+
+theorem GPR_05_raw_staging_budget
+    {Link Rule : Type}
+    (currents : List Link)
+    (rules : List Rule)
+    (image : Rule → List Link) :
+    GPR05RawStageBound currents rules image =
+      currents.length * GPR05TotalImageSize rules image := by
+  rfl
+
+theorem GPR_05_finite_generation_budget
+    {Link Rule : Type}
+    (materialized : List Link)
+    (currents : List Link)
+    (rules : List Rule)
+    (image : Rule → List Link)
+    (localMatchCost : Link → Rule → Nat) :
+    ∃ comparisonBound localWorkBound rawStageBound
+        successorStageBound materializedCount : Nat,
+      comparisonBound = GPR05ComparisonBound currents rules ∧
+      localWorkBound = GPR05LocalWork currents rules localMatchCost ∧
+      rawStageBound = GPR05RawStageBound currents rules image ∧
+      successorStageBound = GPR05SuccessorStageBound currents rules image ∧
+      materializedCount = materialized.length := by
+  refine ⟨GPR05ComparisonBound currents rules,
+    GPR05LocalWork currents rules localMatchCost,
+    GPR05RawStageBound currents rules image,
+    GPR05SuccessorStageBound currents rules image,
+    materialized.length, rfl, rfl, rfl, rfl, rfl⟩
+
+theorem GPR_05_no_finite_ambient_carrier_required
+    {Link : Type}
+    (materialized : List Link) :
+    ∃ materializedCount : Nat,
+      materializedCount = materialized.length := by
+  exact ⟨materialized.length, rfl⟩
+
 end MTS.V015.External
