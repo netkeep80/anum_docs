@@ -63,23 +63,6 @@ function runCase(
   const alternate = fresh();
   const dependencyActs = Array.from({ length: 6 }, () => fresh());
 
-  // Source DR under test.
-  const X = fresh();
-  const Y = fresh();
-  const sourceDictionary = defineStructuralRoleDictionary(memory, [X, Y]);
-  const bodyTemplate = memory.ensure(X, Y);
-  const premiseTemplates = spec.premiseTemplates(memory, X, Y);
-  const sourceRule = defineStructuralRule(
-    memory,
-    sourceDictionary,
-    bodyTemplate,
-  );
-  const sourceDR = defineStructuralDerivationRule(
-    memory,
-    sourceRule,
-    premiseTemplates,
-  );
-
   const expectedClaim = memory.ensure(A, B);
   let actualClaim = expectedClaim;
   let actualPremiseClaims = [...spec.actualPremises(memory, A, B)];
@@ -91,24 +74,10 @@ function runCase(
     actualPremiseClaims[0] = alternate;
   }
 
-  same(
-    actualPremiseClaims.length,
-    premiseTemplates.length,
-    spec.label + " fixture arity",
-  );
-
-  const dependencyOccurrences = actualPremiseClaims.map(
-    (claim, index) =>
-      memory.ensure(claim, dependencyActs[index] ?? dependencyActs[0]!),
-  );
-  const dependencyOccurrenceSequence =
-    materializeExactSequence(memory, dependencyOccurrences);
-  const proofOccurrence = memory.ensure(
-    actualClaim,
-    memory.ensure(sourceDR, dependencyOccurrenceSequence),
-  );
-
-  // Program constants/tags.
+  // Program constants/tags MUST be allocated before template roles. fresh()
+  // deliberately builds recursive structural names; allocating a fixed tag
+  // after X/Y would make that tag contain X/Y recursively and the structural
+  // matcher would correctly interpret those nested occurrences as roles.
   const executionTheory = memory.ensure(fresh(), fresh());
   const ENTRY = fresh();
   const DR_OK = fresh();
@@ -129,6 +98,41 @@ function runCase(
   // CTX is a role of the GENERATED verifier, but is grounded data from the
   // meta-program's point of view. Allocate it before meta roles.
   const CTX = fresh();
+
+  // Source DR roles are allocated only after all fixed program tags above.
+  // This keeps PACKET_ENTRY/CHECK_APPLICATION/etc. structurally role-free.
+  const X = fresh();
+  const Y = fresh();
+  const sourceDictionary = defineStructuralRoleDictionary(memory, [X, Y]);
+  const bodyTemplate = memory.ensure(X, Y);
+  const premiseTemplates = spec.premiseTemplates(memory, X, Y);
+  const sourceRule = defineStructuralRule(
+    memory,
+    sourceDictionary,
+    bodyTemplate,
+  );
+  const sourceDR = defineStructuralDerivationRule(
+    memory,
+    sourceRule,
+    premiseTemplates,
+  );
+
+  same(
+    actualPremiseClaims.length,
+    premiseTemplates.length,
+    spec.label + " fixture arity",
+  );
+
+  const dependencyOccurrences = actualPremiseClaims.map(
+    (claim, index) =>
+      memory.ensure(claim, dependencyActs[index] ?? dependencyActs[0]!),
+  );
+  const dependencyOccurrenceSequence =
+    materializeExactSequence(memory, dependencyOccurrences);
+  const proofOccurrence = memory.ensure(
+    actualClaim,
+    memory.ensure(sourceDR, dependencyOccurrenceSequence),
+  );
 
   // Entry decomposition roles.
   const CLAIM_R = fresh();
