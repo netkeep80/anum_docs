@@ -142,6 +142,44 @@
           "revisionOrDigest": "7597ac64d98b6243b3ffdc1a9bb5b6022aacb5a30ad134399c8b06457b9adf56",
           "decisionEvidence": "netkeep80/anum_docs#1188 issuecomment-5991612725"
         }
+      },
+      {
+        "id": "compact-boolean-and",
+        "kind": "EXECUTABLE",
+        "authorApprovalEvidence": "netkeep80/anum_docs#1980 issuecomment-6023632594",
+        "formalSourceArtifact": "formal/v0.15/regression/compact-and.formal",
+        "formalSourceDigest": "4a5bc92e661ee1d4e0c2c5d51769805b5406651bb491345200d088c9ad23e5f3",
+        "canonicalJsonArtifact": "formal/v0.15/regression/compact-and.json",
+        "canonicalJsonDigest": "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
+        "jsonProfileRevision": "direct-source-anet@74cd162b2bc251d232f57ae40facc2d556e32726",
+        "grammarProfileRevision": "v015-source-anet:block-bare-binding-bundle@74cd162b2bc251d232f57ae40facc2d556e32726",
+        "metacompilerRevision": "74cd162b2bc251d232f57ae40facc2d556e32726",
+        "metacompilerProfile": "direct source ANet -> semantic ANet -> recursive 8/9/6/1 -> frozen A-memory",
+        "semanticEntry": "Theory->RuleFF;Theory->RuleFT;Theory->RuleTF;Theory->RuleTT",
+        "expectedRecursiveRepresentation": "formal/v0.15/regression/compact-and.recursive",
+        "expectedRecursiveDigest": "37b2c02b927eed6cdd061931b60930d0a31d674a49bc585b075401a5cb5ddcb0",
+        "amemoryExecutionProfile": "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d:formal_recursive_replay",
+        "amemoryReplayPackage": "formal/v0.15/regression/compact-and.amemory-package.json",
+        "amemoryReplayPackageDigest": "749f2eca71bd0e7f5d9ffb6d7d9e9e530b2aea8b3318e2a8bae25a423c347c8a",
+        "amemoryReplayEvidence": "formal/v0.15/regression/compact-and.amemory-evidence.json",
+        "expectedSemanticResult": "FF=F;FT=F;TF=F;TT=T;nonBoolean=NO_MATCH",
+        "externalDependencies": {
+          "amemoryMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+          "amemoryVersion": "0.175.0",
+          "amemoryAdapterIssue": 482
+        },
+        "regressionEvidence": {
+          "manifest": "formal/v0.15/regression/compact-and.evidence.json",
+          "recursiveCiRun": 37518442369,
+          "frozenAmemoryWorkflowRun": 37518442019,
+          "exactPersistedAmemoryEvidenceMatch": true
+        },
+        "authorJsonReview": {
+          "state": "APPROVED",
+          "artifact": "formal/v0.15/regression/compact-and.json",
+          "revisionOrDigest": "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
+          "decisionEvidence": "netkeep80/anum_docs#1980 issuecomment-6023632594"
+        }
       }
     ],
     "rule": "Every explicitly Author-approved JSON artifact becomes a permanent executable regression witness."
