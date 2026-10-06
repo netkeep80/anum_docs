@@ -1,0 +1,27 @@
+{
+  "O": "♂∞",
+  "C": "∞♀",
+  "L": "O->C",
+  "U": "C->O",
+  "T": "L",
+  "F": "U",
+  "NOT_SEED": "U->R",
+  "NOT": "NOT_SEED->O",
+  "V0": {},
+  "ArgsF": [
+    "F"
+  ],
+  "ArgsT": [
+    "T"
+  ],
+  "ImageF": [
+    "F"
+  ],
+  "ImageT": [
+    "T"
+  ],
+  "RuleF": "V0->((NOT->ArgsF)->ImageT)",
+  "RuleT": "V0->((NOT->ArgsT)->ImageF)",
+  "Theory->RuleF": null,
+  "Theory->RuleT": null
+}
