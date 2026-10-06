@@ -144,21 +144,21 @@ function repositoryRoot(): string {
 }
 
 const repoRoot = repositoryRoot();
-const formal = readFileSync(
+const andFormal = readFileSync(
   resolve(repoRoot, "formal/v0.15/regression/compact-and.formal"),
   "utf8",
 );
-const json = readFileSync(
+const andJson = readFileSync(
   resolve(repoRoot, "formal/v0.15/regression/compact-and.json"),
   "utf8",
 );
 same(
-  createHash("sha256").update(formal, "utf8").digest("hex"),
+  createHash("sha256").update(andFormal, "utf8").digest("hex"),
   "4a5bc92e661ee1d4e0c2c5d51769805b5406651bb491345200d088c9ad23e5f3",
   "exact candidate FORMAL digest",
 );
 same(
-  createHash("sha256").update(json, "utf8").digest("hex"),
+  createHash("sha256").update(andJson, "utf8").digest("hex"),
   "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
   "exact candidate JSON digest",
 );
@@ -184,21 +184,25 @@ interface Compiled {
   readonly binding: (name: string) => LinkHandle;
 }
 
-function compile(f: Fixture): Compiled {
+function compile(
+  f: Fixture,
+  formalSource = andFormal,
+  jsonSource = andJson,
+): Compiled {
   const enc = new TextEncoder();
   const ff = compileV015DirectFormalSourceAnet(
     f.memory,
     f.basis,
     f.grammarRoot,
     f.sourceAnetProfileRoot,
-    enc.encode(formal),
+    enc.encode(formalSource),
   );
   const jj = compileV015DirectJsonSourceAnet(
     f.memory,
     f.basis,
     f.grammarRoot,
     f.sourceAnetProfileRoot,
-    enc.encode(json),
+    enc.encode(jsonSource),
   );
   same(ff.sourceAset, jj.sourceAset, "FORMAL/JSON source ANet parity");
 
@@ -334,6 +338,80 @@ function discoverAdmittedRules(
   return Object.freeze(rules);
 }
 
+interface BooleanRowSpec {
+  readonly args: readonly ("F" | "T")[];
+  readonly expected: "F" | "T";
+  readonly label: string;
+}
+
+function exerciseGroundedBooleanCandidate(
+  formalPath: string,
+  jsonPath: string,
+  operatorName: string,
+  rows: readonly BooleanRowSpec[],
+): void {
+  const formalSource = readFileSync(resolve(repoRoot, formalPath), "utf8");
+  const jsonSource = readFileSync(resolve(repoRoot, jsonPath), "utf8");
+  const f = fixture();
+  const compiled = compile(f, formalSource, jsonSource);
+  const theory = compiled.absolute("Theory");
+  const rules = discoverAdmittedRules(f, compiled, theory);
+  const compatibility = lowerRules(f, compiled, theory, rules);
+
+  same(
+    compiled.denotation.members.size,
+    rows.length,
+    operatorName + " semantic member/rule count",
+  );
+  same(rules.length, rows.length, operatorName + " discovered Rule count");
+
+  const op = compiled.binding(operatorName);
+  const F = compiled.binding("F");
+  const T = compiled.binding("T");
+  const value = (bit: "F" | "T"): LinkHandle => bit === "F" ? F : T;
+  const caller = f.memory.ensureStartSelfClosed(compatibility.interpreter);
+
+  for (const row of rows) {
+    const antecedent = f.memory.ensure(
+      op,
+      materializeExactSequence(f.memory, row.args.map(value)),
+    );
+    const current = f.memory.ensure(caller, antecedent);
+    const expected = f.memory.ensure(caller, value(row.expected));
+    const scope = defineV013WorkingScope(
+      f.memory,
+      f.fresh(),
+      compatibility.interpreter,
+      [current],
+    );
+    const cursor = new V013CurrentScopeCursor(f.memory, scope);
+    const local = reactV013StructuralScope(f.memory, cursor, f.fresh());
+    same(local.rawRuleMatches, 1, operatorName + " " + row.label + " match");
+    same(local.transitionedMembers, 1, operatorName + " " + row.label + " transition");
+    same(local.nextMembers.length, 1, operatorName + " " + row.label + " result count");
+    same(local.nextMembers[0], expected, operatorName + " " + row.label + " result");
+  }
+
+  const X = compiled.absolute("NonBooleanOperand");
+  const invalidValues = rows[0]?.args.length === 1 ? [X] : [F, X];
+  assert(invalidValues !== undefined, operatorName + " negative input");
+  const invalidAntecedent = f.memory.ensure(
+    op,
+    materializeExactSequence(f.memory, invalidValues),
+  );
+  const negativeCurrent = f.memory.ensure(caller, invalidAntecedent);
+  const negativeScope = defineV013WorkingScope(
+    f.memory,
+    f.fresh(),
+    compatibility.interpreter,
+    [negativeCurrent],
+  );
+  const negativeCursor = new V013CurrentScopeCursor(f.memory, negativeScope);
+  const negative = reactV013StructuralScope(f.memory, negativeCursor, f.fresh());
+  same(negative.rawRuleMatches, 0, operatorName + " non-Boolean NO_MATCH");
+  same(negative.nextMembers[0], negativeCurrent, operatorName + " negative preserves current");
+}
+
 function buildPackage(noise = 0): PackageResult {
   const f = fixture(noise);
   const compiled = compile(f);
@@ -449,6 +527,42 @@ function buildPackage(noise = 0): PackageResult {
     backendIndexWires: Object.freeze(indexWires),
   });
 }
+
+exerciseGroundedBooleanCandidate(
+  "formal/v0.15/candidates/compact-not.formal",
+  "formal/v0.15/candidates/compact-not.json",
+  "NOT",
+  [
+    { args: ["F"], expected: "T", label: "F" },
+    { args: ["T"], expected: "F", label: "T" },
+  ],
+);
+exerciseGroundedBooleanCandidate(
+  "formal/v0.15/candidates/compact-or.formal",
+  "formal/v0.15/candidates/compact-or.json",
+  "OR",
+  [
+    { args: ["F", "F"], expected: "F", label: "FF" },
+    { args: ["F", "T"], expected: "T", label: "FT" },
+    { args: ["T", "F"], expected: "T", label: "TF" },
+    { args: ["T", "T"], expected: "T", label: "TT" },
+  ],
+);
+exerciseGroundedBooleanCandidate(
+  "formal/v0.15/candidates/compact-xor.formal",
+  "formal/v0.15/candidates/compact-xor.json",
+  "XOR",
+  [
+    { args: ["F", "F"], expected: "F", label: "FF" },
+    { args: ["F", "T"], expected: "T", label: "FT" },
+    { args: ["T", "F"], expected: "T", label: "TF" },
+    { args: ["T", "T"], expected: "F", label: "TT" },
+  ],
+);
+console.error(
+  "BOOLEAN_FAMILY_COMPATIBILITY_LOWERING=GREEN operators=NOT,OR,XOR " +
+  "rule_discovery=semantic_theory_membership program_specific_dispatch=0",
+);
 
 const first = buildPackage(0);
 const second = buildPackage(19);
