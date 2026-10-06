@@ -888,6 +888,65 @@ assert(
   "grounded JSON publishes Theory->GroundRule admission",
 );
 
+// DAS-03 mandatory scalar binding vectors. Bindings preserve metamodel
+// evidence but do not publish their RHS as semantic membership.
+const bindRootSource = compileDirectJsonToNativeSourceAnet(
+  '{"A":"R"}',
+);
+const bindRoot = denoteV015ResolvedSourceAnet(
+  memory,
+  basis,
+  grammarRoot,
+  sourceAnetProfileRoot,
+  bindRootSource,
+);
+same(bindRoot.members.size, 0, "A:R binding does not publish R");
+assert(
+  bindRoot.bindings.some((binding) =>
+    binding.name === DIRECT_A && binding.value === basis.R
+  ),
+  "A:R preserves the explicit binding",
+);
+
+const bindCurrentSource = compileDirectJsonToNativeSourceAnet(
+  '{"W":"E->K"}',
+);
+const bindCurrent = denoteV015ResolvedSourceAnet(
+  memory,
+  basis,
+  grammarRoot,
+  sourceAnetProfileRoot,
+  bindCurrentSource,
+);
+same(
+  bindCurrent.members.size,
+  0,
+  "W:E->K binding does not create currentness",
+);
+assert(
+  bindCurrent.bindings.some((binding) =>
+    binding.value === DIRECT_CURRENT
+  ),
+  "W:E->K preserves the resolved physical Link as binding value",
+);
+
+// DAS-01 structured binding-head boundary. Structured bare heads are supported
+// as direct semantic members; structured binder identities remain outside the
+// current bounded source fragment and must fail closed instead of guessing a
+// host-side binder meaning.
+let structuredBindingHeadRejected = false;
+try {
+  compileDirectJsonToNativeSourceAnet('{"A->B":"R"}');
+} catch (error) {
+  structuredBindingHeadRejected =
+    error instanceof V015DirectJsonSourceError &&
+    error.code === "invalid-shape";
+}
+assert(
+  structuredBindingHeadRejected,
+  "structured binding head fails closed in the current bounded v0.15 fragment",
+);
+
 // DAS-07 mandatory vector: distinct source/model identities may denote the
 // same semantic ANet. Source identity is therefore not recoverable from
 // denotation alone.
@@ -1033,6 +1092,9 @@ console.log([
   "JSON_BYPASS_TO_SEMANTIC_ANET=FALSE",
   "OBJECT_MEMBER_NULL=BARE_SOURCE_ENTRY",
   "STRING_RHS=METAMODEL_BINDING",
+  "SCALAR_BINDING_A_TO_R=METAMODEL_ONLY",
+  "SCALAR_BINDING_W_TO_EK=METAMODEL_ONLY",
+  "STRUCTURED_BINDING_HEAD=FAIL_CLOSED_BOUNDED_FRAGMENT",
   "EMPTY_ARRAY_RHS=EXACT_SEQUENCE_EMPTY_EQUALS_R",
   "NONEMPTY_ARRAY_RHS=EXACT_SEQUENCE",
   "ARRAY_ONE_R_DISTINCT_FROM_EMPTY=TRUE",
