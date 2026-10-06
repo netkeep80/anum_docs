@@ -1,7 +1,7 @@
 {
   "schema": "mts-v015-compact-and-candidate/v0.1",
   "id": "compact-boolean-and-four-grounded-rules",
-  "status": "AUTHOR_REVIEW_PENDING_RESEARCH_GREEN",
+  "status": "AUTHOR_APPROVED_PROMOTION_IN_PROGRESS",
   "ownerIssue": "#1980",
   "canonicalAccepted": false,
   "supersedesResearchCandidate": "compact-and-two-generic-rules",
@@ -57,7 +57,7 @@
     "generatedBackendIndexes": 4,
     "sharedLegacyInterpreter": true,
     "scaffoldInCandidateSource": false,
-    "persistedCompatibilityPackage": false,
+    "persistedCompatibilityPackage": true,
     "note": "backend representation may differ for performance but must preserve the one canonical AND semantics and still execute through generic Γ"
   },
   "falsifiers": [
@@ -74,5 +74,20 @@
     "previous two-role candidate was research-only and is superseded, not accepted",
     "no V15-AND-01/02/03 promotion before explicit Author APPROVE",
     "any material source change invalidates this review candidate"
-  ]
+  ],
+  "authorDecision": {
+    "state": "APPROVED",
+    "jsonSha256": "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
+    "formalSha256": "4a5bc92e661ee1d4e0c2c5d51769805b5406651bb491345200d088c9ad23e5f3",
+    "evidence": "netkeep80/anum_docs#1980 issuecomment-6023632594",
+    "date": "2026-10-06"
+  },
+  "promotedRegressionArtifacts": {
+    "formal": "formal/v0.15/regression/compact-and.formal",
+    "json": "formal/v0.15/regression/compact-and.json",
+    "recursive": "formal/v0.15/regression/compact-and.recursive",
+    "amemoryPackage": "formal/v0.15/regression/compact-and.amemory-package.json",
+    "amemoryEvidence": "formal/v0.15/regression/compact-and.amemory-evidence.json",
+    "manifest": "formal/v0.15/regression/compact-and.evidence.json"
+  }
 }
