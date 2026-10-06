@@ -180,6 +180,129 @@
           "revisionOrDigest": "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
           "decisionEvidence": "netkeep80/anum_docs#1980 issuecomment-6023632594"
         }
+      },
+      {
+        "kind": "EXECUTABLE",
+        "authorApprovalEvidence": "netkeep80/anum_docs#1980 issuecomment-6024720547",
+        "jsonProfileRevision": "direct-source-anet@ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+        "grammarProfileRevision": "v015-source-anet:block-bare-binding-bundle@ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+        "metacompilerRevision": "ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+        "metacompilerProfile": "direct source ANet -> semantic ANet -> recursive 8/9/6/1 -> frozen A-memory",
+        "amemoryExecutionProfile": "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d:formal_recursive_replay",
+        "externalDependencies": {
+          "amemoryMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+          "amemoryVersion": "0.175.0",
+          "amemoryAdapterIssue": 482
+        },
+        "id": "compact-boolean-not",
+        "formalSourceArtifact": "formal/v0.15/regression/compact-not.formal",
+        "formalSourceDigest": "42697be6cad8b522e1b4a7fbfd75fda5f7af5d313a995a42105c82f8ceec2c47",
+        "canonicalJsonArtifact": "formal/v0.15/regression/compact-not.json",
+        "canonicalJsonDigest": "eed9bebaf4ecd34be160da3a9cdf006f7f9c1802b780da0f0fe44d2fb2487da2",
+        "semanticEntry": "Theory->RuleF;Theory->RuleT",
+        "expectedRecursiveRepresentation": "formal/v0.15/regression/compact-not.recursive",
+        "expectedRecursiveDigest": "1728cf457b3d1cc6db132bb7d9e2b312d16999023002f73c3529cf622938c692",
+        "amemoryReplayPackage": "formal/v0.15/regression/compact-not.amemory-package.json",
+        "amemoryReplayPackageDigest": "8ba546035b6c9c2f9b18e87a1d30fb6edcbb9063d76cf9ffb1cb2877d7ebf227",
+        "amemoryReplayEvidence": "formal/v0.15/regression/compact-not.amemory-evidence.json",
+        "amemoryReplayEvidenceDigest": "a8fda00d61957d717b0c57e6b67de7c2b36d909c63a3d10cc42b0111a505f49d",
+        "expectedSemanticResult": "F=T;T=F;nonBoolean=NO_MATCH",
+        "regressionEvidence": {
+          "manifest": "formal/v0.15/regression/compact-not.evidence.json",
+          "ciRun": 37525720828,
+          "frozenAmemoryWorkflowRun": 37525720725,
+          "frozenAmemoryJob": 112482088911,
+          "exactPersistedPackageMatch": true,
+          "exactPersistedAmemoryEvidenceMatch": true
+        },
+        "authorJsonReview": {
+          "state": "APPROVED",
+          "artifact": "formal/v0.15/regression/compact-not.json",
+          "revisionOrDigest": "eed9bebaf4ecd34be160da3a9cdf006f7f9c1802b780da0f0fe44d2fb2487da2",
+          "decisionEvidence": "netkeep80/anum_docs#1980 issuecomment-6024720547"
+        }
+      },
+      {
+        "kind": "EXECUTABLE",
+        "authorApprovalEvidence": "netkeep80/anum_docs#1980 issuecomment-6024720547",
+        "jsonProfileRevision": "direct-source-anet@ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+        "grammarProfileRevision": "v015-source-anet:block-bare-binding-bundle@ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+        "metacompilerRevision": "ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+        "metacompilerProfile": "direct source ANet -> semantic ANet -> recursive 8/9/6/1 -> frozen A-memory",
+        "amemoryExecutionProfile": "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d:formal_recursive_replay",
+        "externalDependencies": {
+          "amemoryMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+          "amemoryVersion": "0.175.0",
+          "amemoryAdapterIssue": 482
+        },
+        "id": "compact-boolean-or",
+        "formalSourceArtifact": "formal/v0.15/regression/compact-or.formal",
+        "formalSourceDigest": "04f794a27c26249c0eb75a5163add1a46ddb5537d6b4b783782e3044db9528ee",
+        "canonicalJsonArtifact": "formal/v0.15/regression/compact-or.json",
+        "canonicalJsonDigest": "3fbcd16fb0e067fa5c84be5d86a39a964da45cf7fdcc03880d2e23c28f5b6c29",
+        "semanticEntry": "Theory->RuleFF;Theory->RuleFT;Theory->RuleTF;Theory->RuleTT",
+        "expectedRecursiveRepresentation": "formal/v0.15/regression/compact-or.recursive",
+        "expectedRecursiveDigest": "7f0253479dacc1d568a1ce931eab943264a42770554c46dd96966a9ed4f85668",
+        "amemoryReplayPackage": "formal/v0.15/regression/compact-or.amemory-package.json",
+        "amemoryReplayPackageDigest": "e49e977ba0dbdcd518db80e26b93cff408c04be4208f688a534640eca76c660d",
+        "amemoryReplayEvidence": "formal/v0.15/regression/compact-or.amemory-evidence.json",
+        "amemoryReplayEvidenceDigest": "626315ecb8662a254201c269e81e2d611b7ab2ea71a3fa7ff50145e7bf50bdb6",
+        "expectedSemanticResult": "FF=F;FT=T;TF=T;TT=T;nonBoolean=NO_MATCH",
+        "regressionEvidence": {
+          "manifest": "formal/v0.15/regression/compact-or.evidence.json",
+          "ciRun": 37525720828,
+          "frozenAmemoryWorkflowRun": 37525720725,
+          "frozenAmemoryJob": 112482088850,
+          "exactPersistedPackageMatch": true,
+          "exactPersistedAmemoryEvidenceMatch": true
+        },
+        "authorJsonReview": {
+          "state": "APPROVED",
+          "artifact": "formal/v0.15/regression/compact-or.json",
+          "revisionOrDigest": "3fbcd16fb0e067fa5c84be5d86a39a964da45cf7fdcc03880d2e23c28f5b6c29",
+          "decisionEvidence": "netkeep80/anum_docs#1980 issuecomment-6024720547"
+        }
+      },
+      {
+        "kind": "EXECUTABLE",
+        "authorApprovalEvidence": "netkeep80/anum_docs#1980 issuecomment-6024720547",
+        "jsonProfileRevision": "direct-source-anet@ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+        "grammarProfileRevision": "v015-source-anet:block-bare-binding-bundle@ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+        "metacompilerRevision": "ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+        "metacompilerProfile": "direct source ANet -> semantic ANet -> recursive 8/9/6/1 -> frozen A-memory",
+        "amemoryExecutionProfile": "netkeep80/amemory@832daa89f15fd0f3b7b40819b6d3670c7fd57e7d:formal_recursive_replay",
+        "externalDependencies": {
+          "amemoryMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+          "amemoryVersion": "0.175.0",
+          "amemoryAdapterIssue": 482
+        },
+        "id": "compact-boolean-xor",
+        "formalSourceArtifact": "formal/v0.15/regression/compact-xor.formal",
+        "formalSourceDigest": "4721b9f02400613ad05a8cc50ac0add3520c6aa72c836f95fdb4edf44bbaa038",
+        "canonicalJsonArtifact": "formal/v0.15/regression/compact-xor.json",
+        "canonicalJsonDigest": "1dc6cb2464f0bb1fc0d54388677ea9136d907caa174ad694388c054c57d24581",
+        "semanticEntry": "Theory->RuleFF;Theory->RuleFT;Theory->RuleTF;Theory->RuleTT",
+        "expectedRecursiveRepresentation": "formal/v0.15/regression/compact-xor.recursive",
+        "expectedRecursiveDigest": "40747a38d8fc3a9025a8576f3632145814c81688385bfc73ee44b64fc98fcd56",
+        "amemoryReplayPackage": "formal/v0.15/regression/compact-xor.amemory-package.json",
+        "amemoryReplayPackageDigest": "821d135c460ccfe74d8e3f89d889375760412a1c9823ebc793f103082e923584",
+        "amemoryReplayEvidence": "formal/v0.15/regression/compact-xor.amemory-evidence.json",
+        "amemoryReplayEvidenceDigest": "2dec5b6e48c60ab382089c639e4ad620bf03166d117db9e7c14036cfcde4fcf9",
+        "expectedSemanticResult": "FF=F;FT=T;TF=T;TT=F;nonBoolean=NO_MATCH",
+        "regressionEvidence": {
+          "manifest": "formal/v0.15/regression/compact-xor.evidence.json",
+          "ciRun": 37525720828,
+          "frozenAmemoryWorkflowRun": 37525720725,
+          "frozenAmemoryJob": 112482088839,
+          "exactPersistedPackageMatch": true,
+          "exactPersistedAmemoryEvidenceMatch": true
+        },
+        "authorJsonReview": {
+          "state": "APPROVED",
+          "artifact": "formal/v0.15/regression/compact-xor.json",
+          "revisionOrDigest": "1dc6cb2464f0bb1fc0d54388677ea9136d907caa174ad694388c054c57d24581",
+          "decisionEvidence": "netkeep80/anum_docs#1980 issuecomment-6024720547"
+        }
       }
     ],
     "rule": "Every explicitly Author-approved JSON artifact becomes a permanent executable regression witness."
@@ -501,7 +624,7 @@
       "candidateSource": "formal/v0.15/candidates/compact-and.formal"
     },
     "V15-AND-04": {
-      "state": "OPEN",
+      "state": "VERTICAL_GREEN",
       "ownerIssue": 1980,
       "dependsOn": [
         "V15-AND-03",
@@ -525,13 +648,15 @@
         "ts/test/research-v015-compact-and-package-a2.ts"
       ],
       "evidenceRefs": [
-        "formal/v0.15/candidates/compact-not.evidence.json",
-        "formal/v0.15/candidates/compact-or.evidence.json",
-        "formal/v0.15/candidates/compact-xor.evidence.json",
+        "formal/v0.15/regression/compact-not.evidence.json",
+        "formal/v0.15/regression/compact-or.evidence.json",
+        "formal/v0.15/regression/compact-xor.evidence.json",
+        "ts/test/v015-boolean-family-b1.test.ts",
+        "ts/test/research-v015-compact-and-package-a2.ts",
         ".github/workflows/amemory-v015-regression.yml",
-        "#1980"
+        "netkeep80/anum_docs#1980 issuecomment-6024720547"
       ],
-      "authorJsonReview": "NOT_OR_XOR_AUTHOR_REVIEW_PENDING"
+      "authorJsonReview": "APPROVED"
     },
     "V15-CTX-01": {
       "state": "OPEN",
