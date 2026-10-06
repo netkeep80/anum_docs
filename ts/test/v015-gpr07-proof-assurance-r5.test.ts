@@ -65,6 +65,23 @@ const gpr02Evidence = JSON.parse(
   };
   theoremProjection: { currentV014InventoryUnchanged: boolean };
 };
+const gpr03Evidence = JSON.parse(
+  readFileSync(
+    resolve(repo, "proofs/v015-evidence/gpr03-generation-isolation.json"),
+    "utf8",
+  ),
+) as {
+  id: string;
+  status: string;
+  externalCrossCheck: { ciRun: number; exactHead: string };
+  architecturalConsequence: {
+    analysisReadsExactlyReactionStart: boolean;
+    stagedEffectsVisibleAsCurrentWithinGeneration: boolean;
+    readYourOwnWritesIsOneGenerationRefinement: boolean;
+    publishedSuccessorMayBeNextGenerationInput: boolean;
+  };
+  theoremProjection: { currentV014InventoryUnchanged: boolean };
+};
 const gpr06Evidence = JSON.parse(
   readFileSync(
     resolve(repo, "proofs/v015-evidence/gpr06-exact-s0-opacity.json"),
@@ -130,13 +147,14 @@ assert(v015.allowedGlobalAxioms.rocq.length === 0, "v0.15 Rocq axiom allowlist e
 const ids = v015.targets.map((target) => target.id);
 assert(new Set(ids).size === ids.length, "v0.15 GPR target ids are unique");
 assert(
-  ids.length === 5 &&
+  ids.length === 6 &&
     ids.includes("GPR-01") &&
     ids.includes("GPR-02") &&
+    ids.includes("GPR-03") &&
     ids.includes("GPR-06") &&
     ids.includes("GPR-07") &&
     ids.includes("GPR-08"),
-  "current paired proof manifest contains exactly GPR-01, GPR-02, GPR-06, GPR-07 and GPR-08",
+  "current paired proof manifest contains exactly GPR-01, GPR-02, GPR-03, GPR-06, GPR-07 and GPR-08",
 );
 
 function target(id: string): GprTarget {
@@ -161,6 +179,15 @@ assert(
 );
 assert(gpr02.lean4.length === 4, "GPR-02 paired Lean assurance symbols");
 assert(gpr02.rocq.length === 4, "GPR-02 paired Rocq assurance symbols");
+
+const gpr03 = target("GPR-03");
+assert(
+  gpr03.classification ===
+    "PROVED_UNDER_REACTION_START_SNAPSHOT_SEMANTICS_WITH_READ_YOUR_OWN_WRITES_FALSIFIER",
+  "GPR-03 classification keeps snapshot semantics and the cascade falsifier explicit",
+);
+assert(gpr03.lean4.length === 4, "GPR-03 paired Lean assurance symbols");
+assert(gpr03.rocq.length === 4, "GPR-03 paired Rocq assurance symbols");
 
 const gpr06 = target("GPR-06");
 assert(
@@ -259,6 +286,32 @@ assert(
   "GPR-02 leaves accepted theorem inventory unchanged",
 );
 
+assert(gpr03Evidence.id === "GPR-03", "GPR-03 evidence id");
+assert(
+  gpr03Evidence.status ===
+    "PROVED_UNDER_REACTION_START_SNAPSHOT_SEMANTICS_WITH_READ_YOUR_OWN_WRITES_FALSIFIER",
+  "GPR-03 evidence classification",
+);
+assert(gpr03Evidence.externalCrossCheck.ciRun === 37460965574, "GPR-03 exact proof CI is pinned");
+assert(
+  gpr03Evidence.externalCrossCheck.exactHead === "299a3965b9aa32e78967f534ddad8a561af508c8",
+  "GPR-03 proof head is pinned",
+);
+assert(
+  gpr03Evidence.architecturalConsequence.analysisReadsExactlyReactionStart === true &&
+    gpr03Evidence.architecturalConsequence.stagedEffectsVisibleAsCurrentWithinGeneration === false,
+  "GPR-03 keeps analysis on the immutable reaction-start snapshot",
+);
+assert(
+  gpr03Evidence.architecturalConsequence.readYourOwnWritesIsOneGenerationRefinement === false &&
+    gpr03Evidence.architecturalConsequence.publishedSuccessorMayBeNextGenerationInput === true,
+  "GPR-03 rejects same-generation cascade but permits the next generation after publication",
+);
+assert(
+  gpr03Evidence.theoremProjection.currentV014InventoryUnchanged === true,
+  "GPR-03 leaves accepted theorem inventory unchanged",
+);
+
 assert(gpr06Evidence.id === "GPR-06", "GPR-06 evidence id");
 assert(
   gpr06Evidence.status === "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
@@ -329,15 +382,17 @@ assert(
 console.log([
   "MTS_V015_GPR_PROOF_ASSURANCE=GREEN",
   "V014_ASSURANCE_TARGETS=21_UNCHANGED",
-  "V015_GPR_TARGETS=5",
+  "V015_GPR_TARGETS=6",
   "GPR01=PAIRED_LEAN_ROCQ",
   "GPR02=PAIRED_LEAN_ROCQ",
+  "GPR03=PAIRED_LEAN_ROCQ",
   "GPR06=PAIRED_LEAN_ROCQ",
   "GPR07=PAIRED_LEAN_ROCQ",
   "GPR08=PAIRED_LEAN_ROCQ",
   "GLOBAL_AXIOM_ALLOWLIST=EMPTY",
   "GPR01_CLASSIFICATION=PROVED_AS_PURE_SINGLE_STATE_TRANSFORMER_REFINEMENT",
   "GPR02_CLASSIFICATION=PROVED_FOR_CANONICAL_ANET_MEMBERSHIP_CONVERGENCE_WITH_SEPARATE_PROVENANCE_AND_EXACTSEQUENCE_MULTIPLICITY",
+  "GPR03_CLASSIFICATION=PROVED_UNDER_REACTION_START_SNAPSHOT_SEMANTICS_WITH_READ_YOUR_OWN_WRITES_FALSIFIER",
   "GPR06_CLASSIFICATION=PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
   "GPR07_CLASSIFICATION=PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
   "GPR08_CLASSIFICATION=PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",
