@@ -177,8 +177,10 @@ export function renderFormalNotationV015Markdown(root: string): string {
   const lines = [
     "# Формальная нотация МТС",
     "<!-- mts-generated-formal-notation: " + FORMAL_NOTATION_V015_MODEL_PATH + " -->",
-    "<!-- версия документа МТС; mts-doc-version: v0.15-candidate -->",
-    "> **Версия модели: v0.15, кандидат. Текущая принятая версия МТС: v0.14.**",
+    "<!-- версия документа МТС; mts-doc-version: v0.14 -->",
+    "<!-- mts-formal-candidate-version: v0.15 -->",
+    "> **Версия МТС: v0.14**",
+    "> **Кандидат FORMAL: v0.15.** Ниже показана автоматически сгенерированная кандидатная проекция; она не меняет текущий принятый выпуск до отдельного Author cutover.",
     "> Этот файл полностью строится командой " + q + "npm --prefix ts run docs:sync" + q + ". Ручная правка семантики здесь не является authority.",
     "",
     "## 1. Назначение",
