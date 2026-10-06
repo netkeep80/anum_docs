@@ -1211,6 +1211,7 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/theorem-catalog-markdown.ts",
   "ts/src/tooling/theorem-projection-contract.ts",
   "ts/src/tooling/theorem-projection-model.ts",
+  "ts/src/tooling/v015-candidate-proof-projection.ts",
   "ts/src/tooling/mts-compiler.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
