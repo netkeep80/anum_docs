@@ -1125,7 +1125,8 @@
         "V15-FORMAL-PROOF-02",
         "V15-GAMMA-01",
         "V15-CTX-02",
-        "V15-GOV-03"
+        "V15-GOV-03",
+        "V15-GOV-04"
       ],
       "positiveVectors": [],
       "negativeVectors": [],
@@ -1540,6 +1541,26 @@
         "proofs/v015-evidence/formal-refinement-frm07-08.json",
         "#1901",
         "#2004"
+      ],
+      "authorJsonReview": "NOT_APPLICABLE"
+    },
+    "V15-GOV-04": {
+      "state": "OPEN",
+      "ownerIssue": 1982,
+      "dependsOn": [
+        "V15-GOV-01",
+        "V15-GOV-02",
+        "V15-GOV-03"
+      ],
+      "positiveVectors": [
+        "required-status-checks-configured-on-protect-main"
+      ],
+      "negativeVectors": [
+        "broad-repository-role-always-bypass-present"
+      ],
+      "requiredExecutableGates": [],
+      "evidenceRefs": [
+        "#1982"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     }
