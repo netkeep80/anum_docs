@@ -690,41 +690,63 @@
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-STAGE-01": {
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "ownerIssue": 1911,
       "dependsOn": [
         "V15-AUTH-01",
         "V15-TERM-01"
       ],
       "positiveVectors": [
-        "resolved-metamodel-can-erase-before-execution",
-        "physical-link-existence-not-semantic-membership"
+        "source-native-anet-denotation-semantic-recursive-backend-replay-stages-observable",
+        "approved-corpus-permanent-artifact-chain",
+        "generic-backend-compatibility-lowering-separated"
       ],
-      "negativeVectors": [],
+      "negativeVectors": [
+        "approved-artifact-cannot-point-to-candidates",
+        "program-specific-rule-discovery-forbidden",
+        "program-specific-compatibility-lowering-forbidden"
+      ],
       "requiredExecutableGates": [
         "ts/test/v015-denoted-anet-membership-das-a1.test.ts",
-        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "ts/test/v015-metacompiler-corpus-closure-c0.test.ts"
       ],
       "evidenceRefs": [
         "ts/src/v015-direct-source.ts",
         "ts/src/v015-source-anet.ts",
+        "ts/test/v015-metacompiler-corpus-closure-c0.test.ts",
+        "traceability/mts-v0.15.json#approvedJsonCorpus",
+        ".github/workflows/amemory-v015-regression.yml",
         "#1911",
-        "#2002"
+        "#2002",
+        "#2006"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-STAGE-02": {
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "ownerIssue": 1911,
       "dependsOn": [
         "V15-STAGE-01"
       ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
+      "positiveVectors": [
+        "contextual-name-resolve-read-only",
+        "source-anet-profile-read-read-only",
+        "duplicate-json-validation-rejects-before-materialization"
+      ],
+      "negativeVectors": [
+        "missing-contextual-name-resolve-no-write",
+        "duplicate-decoded-json-key-no-write"
+      ],
+      "requiredExecutableGates": [
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+      ],
       "evidenceRefs": [
+        "ts/src/v015-link-definition.ts#resolveV015ContextualNameCoordinate",
+        "ts/src/v015-source-anet.ts#readV015SourceAnetProfile",
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
         "#1911",
-        "#2001"
+        "#2002"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
