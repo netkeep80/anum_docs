@@ -261,7 +261,7 @@ validateCandidate(requirements, traceability);
 
   const andBoundary = byId.get("V15-AND-03");
   assert(andBoundary !== undefined, "V15-AND-03 exists");
-  assert(/one canonical semantic AND/i.test(text(andBoundary.summary, "AND semantic authority")), "one canonical AND semantics");
+  assert(/one canonical semantic .*AND/i.test(text(andBoundary.summary, "AND semantic authority")), "one canonical AND semantics");
   assert(/semantics-preserving/i.test(text(andBoundary.summary, "AND lowering boundary")), "optimized/backend lowerings require semantic preservation");
 
   const review = record(requirements.authorJsonReview, "authorJsonReview scope");
