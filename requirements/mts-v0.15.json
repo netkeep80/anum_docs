@@ -1119,6 +1119,31 @@
       }
     },
     {
+      "id": "V15-GOV-04",
+      "group": "GOV",
+      "ownerIssue": "#1982",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "Normal MTS merge paths cannot bypass required CI/repo-guard enforcement: broad always-bypass repository roles are removed or contained to an explicitly audited emergency actor/process, and an intentional RED repo-guard pull request is mechanically blocked from merging until restored GREEN.",
+      "dependsOn": [
+        "V15-GOV-01",
+        "V15-GOV-02",
+        "V15-GOV-03"
+      ],
+      "authority": {
+        "issue": 1982
+      },
+      "evidence": {
+        "positiveVectors": [
+          "required-status-checks-configured-on-protect-main"
+        ],
+        "negativeVectors": [
+          "broad-repository-role-always-bypass-present"
+        ],
+        "requiredExecutableGates": []
+      }
+    },
+    {
       "id": "V15-READY-01",
       "group": "READY",
       "ownerIssue": "#1876",
@@ -1131,7 +1156,8 @@
         "V15-FORMAL-PROOF-02",
         "V15-GAMMA-01",
         "V15-CTX-02",
-        "V15-GOV-03"
+        "V15-GOV-03",
+        "V15-GOV-04"
       ],
       "authority": {
         "issue": 1876
