@@ -409,3 +409,95 @@ Qed.
 Print Assumptions GPR_01_decomposition_iff_single_gamma_step.
 Print Assumptions GPR_01_gamma_successor_unique.
 Print Assumptions GPR_01_same_analysis_same_staging.
+
+
+(*
+GPR-02 — canonical Aset membership convergence.
+
+The laws are pointwise membership laws, not a separate runtime dedup command.
+Distinct provenance events may remain distinct evidence occurrences.
+ExactSequence multiplicity is explicitly not collapsed by Aset idempotence.
+*)
+
+Definition AddAsetMember
+    {Link : Type}
+    (member : Link -> Prop)
+    (derived value : Link) : Prop :=
+  value = derived \/ member value.
+
+Theorem GPR_02_duplicate_membership_idempotent
+    {Link : Type}
+    (member : Link -> Prop)
+    (derived value : Link) :
+    AddAsetMember (AddAsetMember member derived) derived value <->
+    AddAsetMember member derived value.
+Proof.
+  split.
+  - intros [same | nested].
+    + left. exact same.
+    + destruct nested as [same | old].
+      * left. exact same.
+      * right. exact old.
+  - intros [same | old].
+    + left. exact same.
+    + right. right. exact old.
+Qed.
+
+Theorem GPR_02_membership_contribution_commutes
+    {Link : Type}
+    (member : Link -> Prop)
+    (first second value : Link) :
+    AddAsetMember (AddAsetMember member first) second value <->
+    AddAsetMember (AddAsetMember member second) first value.
+Proof.
+  split.
+  - intros [second_eq | nested].
+    + right. left. exact second_eq.
+    + destruct nested as [first_eq | old].
+      * left. exact first_eq.
+      * right. right. exact old.
+  - intros [first_eq | nested].
+    + right. left. exact first_eq.
+    + destruct nested as [second_eq | old].
+      * left. exact second_eq.
+      * right. right. exact old.
+Qed.
+
+Definition EventDerives
+    {Link Provenance : Type}
+    (events : list (Link * Provenance))
+    (value : Link) : Prop :=
+  exists provenance, In (value, provenance) events.
+
+Theorem GPR_02_duplicate_provenance_events_are_preserved
+    {Link Provenance : Type}
+    (value : Link)
+    (first_provenance second_provenance : Provenance) :
+    let events :=
+      [(value, first_provenance); (value, second_provenance)] in
+    length events = 2 /\ EventDerives events value.
+Proof.
+  simpl.
+  split.
+  - reflexivity.
+  - exists first_provenance.
+    left.
+    reflexivity.
+Qed.
+
+Theorem GPR_02_exact_sequence_multiplicity_not_collapsed
+    {Atom : Type}
+    (value : ExactPackedLink Atom) :
+    pack_exact_sequence [value; value] <>
+    pack_exact_sequence [value].
+Proof.
+  intro equal_packed.
+  simpl in equal_packed.
+  injection equal_packed as _ tail_equal.
+  discriminate tail_equal.
+Qed.
+
+Print Assumptions GPR_02_duplicate_membership_idempotent.
+Print Assumptions GPR_02_membership_contribution_commutes.
+Print Assumptions GPR_02_duplicate_provenance_events_are_preserved.
+Print Assumptions GPR_02_exact_sequence_multiplicity_not_collapsed.
