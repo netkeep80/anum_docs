@@ -236,3 +236,92 @@ theorem GPR_06_structure_sensitive_function_requires_more_than_exact_S0
     step stepClosed generations initial initialClosed
 
 end MTS.V015.External
+
+
+/-
+GPR-08 — finite-arity J0 representation and semantic role authority.
+
+The theorem does not claim that every conceivable future relation can avoid J1.
+It proves the narrower v0.15 boundary needed by the current source model:
+
+* any finite ordered/multiplicity-preserving argument/dependency carrier can be
+  encoded losslessly into ONE recursively structured Link endpoint;
+* therefore finite arity alone does not imply a cross-current-member join;
+* role authority is semantic Aset membership, not mere physical materialization.
+-/
+
+inductive ExactPackedLink (Atom : Type) where
+  | root : ExactPackedLink Atom
+  | atom : Atom → ExactPackedLink Atom
+  | pair : ExactPackedLink Atom → ExactPackedLink Atom → ExactPackedLink Atom
+
+def packExactSequence
+    {Atom : Type} :
+    List (ExactPackedLink Atom) → ExactPackedLink Atom
+  | [] => .root
+  | head :: tail => .pair head (packExactSequence tail)
+
+/--
+ExactSequence-style recursive packing preserves order, arity and repetition
+inside one Link endpoint.
+-/
+theorem GPR_08_exact_sequence_packing_injective
+    {Atom : Type}
+    {xs ys : List (ExactPackedLink Atom)}
+    (packedEqual : packExactSequence xs = packExactSequence ys) :
+    xs = ys := by
+  induction xs generalizing ys with
+  | nil =>
+      cases ys with
+      | nil =>
+          rfl
+      | cons head tail =>
+          simp [packExactSequence] at packedEqual
+  | cons head tail ih =>
+      cases ys with
+      | nil =>
+          simp [packExactSequence] at packedEqual
+      | cons other rest =>
+          simp only [packExactSequence] at packedEqual
+          injection packedEqual with headEqual tailEqual
+          subst other
+          have restEqual := ih tailEqual
+          subst rest
+          rfl
+
+/--
+Every finite correlated value sequence therefore has a lossless J0
+representation as one explicit current endpoint. This does not assert that
+J1 can never be useful; it establishes that finite arity/order/multiplicity
+alone is not a justification for J1.
+-/
+theorem GPR_08_finite_arity_has_one_endpoint
+    {Atom : Type}
+    (values : List (ExactPackedLink Atom)) :
+    ∃ endpoint,
+      endpoint = packExactSequence values ∧
+      ∀ otherValues,
+        packExactSequence otherValues = endpoint →
+        otherValues = values := by
+  refine ⟨packExactSequence values, rfl, ?_⟩
+  intro otherValues sameEndpoint
+  exact GPR_08_exact_sequence_packing_injective sameEndpoint
+
+def SemanticRole
+    {Link : Type}
+    (member : Link → Prop)
+    (role : Link) : Prop :=
+  member role
+
+/--
+Physical existence of a Link shaped like a role does not grant semantic role
+authority when that Link is absent from the selected semantic Aset membership.
+-/
+theorem GPR_08_physical_nonmember_has_no_role_authority
+    {Link : Type}
+    (physicalExists semanticMember : Link → Prop)
+    (role : Link)
+    (_materialized : physicalExists role)
+    (notSemanticMember : ¬ semanticMember role) :
+    ¬ SemanticRole semanticMember role :=
+  notSemanticMember
