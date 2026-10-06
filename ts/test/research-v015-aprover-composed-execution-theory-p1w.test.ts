@@ -62,7 +62,9 @@ const staticRuntimeAdmission = admitStructuralRule(
   executionTheory,
   staticRule,
 );
-memory.ensure(memory.poles(PING).start, staticRuntimeAdmission);
+const staticTriggerKey =
+  memory.poles(memory.poles(PING).end).start;
+memory.ensure(staticTriggerKey, staticRuntimeAdmission);
 
 // Independently pinned ObjectTheory membership is projected into a sparse
 // characteristic relation in the same derived ExecutionTheory.
