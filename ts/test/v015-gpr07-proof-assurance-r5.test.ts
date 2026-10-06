@@ -31,6 +31,22 @@ const v015 = JSON.parse(
   allowedGlobalAxioms: { lean4: string[]; rocq: string[] };
   targets: GprTarget[];
 };
+const gpr06Evidence = JSON.parse(
+  readFileSync(
+    resolve(repo, "proofs/v015-evidence/gpr06-exact-s0-opacity.json"),
+    "utf8",
+  ),
+) as {
+  id: string;
+  status: string;
+  externalCrossCheck: { ciRun: number; exactHead: string };
+  architecturalConsequence: {
+    pureExactS0SelfHosting: string;
+    j1CrossCurrentJoinRequired: boolean;
+    externalSemanticGrounderRequired: boolean;
+  };
+  theoremProjection: { currentV014InventoryUnchanged: boolean };
+};
 const evidence = JSON.parse(
   readFileSync(
     resolve(repo, "proofs/v015-evidence/gpr07-zero-role-refinement.json"),
@@ -112,6 +128,34 @@ assert(
     ci.includes("MtsV015GeneralizedReaction.v") &&
     ci.includes("v015-external-proof-assurance.json"),
   "CI compiles and assures the separate v0.15 paired proof lane",
+);
+
+assert(gpr06Evidence.id === "GPR-06", "GPR-06 evidence id");
+assert(
+  gpr06Evidence.status === "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
+  "GPR-06 evidence classification",
+);
+assert(gpr06Evidence.externalCrossCheck.ciRun === 37450135025, "GPR-06 exact proof CI is pinned");
+assert(
+  gpr06Evidence.externalCrossCheck.exactHead === "68a5104f50291c114f068799d0d3e30fcf910d50",
+  "GPR-06 proof head is pinned",
+);
+assert(
+  gpr06Evidence.architecturalConsequence.pureExactS0SelfHosting ===
+    "FALSIFIED_UNDER_EXPLICIT_CLOSURE_LAW",
+  "GPR-06 falsifies pure exact-S0 self-hosting under its explicit closure law",
+);
+assert(
+  gpr06Evidence.architecturalConsequence.j1CrossCurrentJoinRequired === false,
+  "GPR-06 does not require J1",
+);
+assert(
+  gpr06Evidence.architecturalConsequence.externalSemanticGrounderRequired === false,
+  "selected v0.15 architecture keeps structure-sensitive capability inside Gamma",
+);
+assert(
+  gpr06Evidence.theoremProjection.currentV014InventoryUnchanged === true,
+  "GPR-06 leaves accepted theorem inventory unchanged",
 );
 
 assert(evidence.id === "GPR-07", "GPR-07 evidence id");
