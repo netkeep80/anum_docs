@@ -154,12 +154,12 @@ const json = readFileSync(
 );
 same(
   createHash("sha256").update(formal, "utf8").digest("hex"),
-  "16fddc9f8245fd7237a67424364d9b1991fa256287d0101509f038158c64edd6",
+  "4a5bc92e661ee1d4e0c2c5d51769805b5406651bb491345200d088c9ad23e5f3",
   "exact candidate FORMAL digest",
 );
 same(
   createHash("sha256").update(json, "utf8").digest("hex"),
-  "efc4d9a04897903b05f5a37b77d5cf12848987049fbb31cb3624756f0bd7eab1",
+  "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
   "exact candidate JSON digest",
 );
 
@@ -325,22 +325,22 @@ function buildPackage(noise = 0): PackageResult {
   const compiled = compile(f);
 
   const theory = compiled.absolute("Theory");
-  const ruleF = compiled.binding("RuleF");
-  const ruleT = compiled.binding("RuleT");
-  const compatibility = lowerRules(
-    f,
-    compiled,
-    theory,
-    [ruleF, ruleT],
-  );
+  const rules = [
+    compiled.binding("RuleFF"),
+    compiled.binding("RuleFT"),
+    compiled.binding("RuleTF"),
+    compiled.binding("RuleTT"),
+  ] as const;
+  const compatibility = lowerRules(f, compiled, theory, rules);
 
-  const roleY = compiled.binding("RoleY");
-  const canonicalAdmissionF = f.memory.ensure(theory, ruleF);
-  const canonicalAdmissionT = f.memory.ensure(theory, ruleT);
-  same(compiled.denotation.members.size, 3, "canonical member count");
-  assert(compiled.denotation.members.has(roleY), "one canonical role member");
-  assert(compiled.denotation.members.has(canonicalAdmissionF), "RuleF admission");
-  assert(compiled.denotation.members.has(canonicalAdmissionT), "RuleT admission");
+  const admissions = rules.map((rule) => f.memory.ensure(theory, rule));
+  same(compiled.denotation.members.size, 4, "canonical member count");
+  for (const admission of admissions) {
+    assert(
+      compiled.denotation.members.has(admission),
+      "grounded Rule admission is canonical semantic membership",
+    );
+  }
 
   const AND = compiled.binding("AND");
   const F = compiled.binding("F");
@@ -386,8 +386,14 @@ function buildPackage(noise = 0): PackageResult {
     );
   }
 
-  const malformedAntecedent = f.memory.ensure(AND, f.basis.R);
-  const negativeCurrent = f.memory.ensure(caller, malformedAntecedent);
+  // Strong negative: T with an arbitrary non-Boolean Link must not inherit the
+  // broader pass-through behavior of the superseded two-role candidate.
+  const X = compiled.absolute("NonBooleanOperand");
+  const invalidAntecedent = f.memory.ensure(
+    AND,
+    materializeExactSequence(f.memory, [T, X]),
+  );
+  const negativeCurrent = f.memory.ensure(caller, invalidAntecedent);
   const negativeScope = defineV013WorkingScope(
     f.memory,
     f.fresh(),
@@ -400,7 +406,7 @@ function buildPackage(noise = 0): PackageResult {
     negativeCursor,
     f.fresh(),
   );
-  same(negative.rawRuleMatches, 0, "negative no match");
+  same(negative.rawRuleMatches, 0, "non-Boolean negative no match");
   same(negative.nextMembers[0], negativeCurrent, "negative preserves current");
   const negativeLaunch = materializeExactSequence(
     f.memory,
