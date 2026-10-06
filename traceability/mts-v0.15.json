@@ -1042,17 +1042,34 @@
       ],
       "positiveVectors": [
         "gpr01-09-paired-lean4-rocq-closure",
+        "a9-structural-unary-one-command-sufficiency",
+        "a10-finite-exact-s0-fresh-structure-opacity-boundary",
+        "a11-snapshot-partition-reduction",
+        "a12-finite-materialized-generation",
         "grounded-zero-role-is-generic-refinement"
       ],
       "negativeVectors": [
+        "finite-exact-s0-alone-cannot-transform-arbitrary-fresh-structure",
+        "j1-cross-current-member-join-not-required",
+        "external-semantic-grounder-command-forbidden",
         "consumer-specific-semantic-opcode-forbidden",
         "second-semantic-runtime-forbidden"
       ],
-      "requiredExecutableGates": [],
+      "requiredExecutableGates": [
+        "ts/test/v015-structural-aset-one-command-a9.test.ts",
+        "ts/test/v015-exact-finite-support-necessity-a10.test.ts",
+        "ts/test/v015-parallel-reaction-reduction-a11.test.ts",
+        "ts/test/v015-finite-materialized-reaction-a12.test.ts"
+      ],
       "evidenceRefs": [
         "proofs/v015-external-proof-assurance.json",
         "proofs/lean4/MtsV015GeneralizedReaction.lean",
         "proofs/coq/MtsV015GeneralizedReaction.v",
+        "ts/test/v015-structural-aset-one-command-a9.test.ts",
+        "ts/test/v015-exact-finite-support-necessity-a10.test.ts",
+        "ts/test/v015-parallel-reaction-reduction-a11.test.ts",
+        "ts/test/v015-finite-materialized-reaction-a12.test.ts",
+        "#1988",
         "#2001",
         "#2005"
       ],
