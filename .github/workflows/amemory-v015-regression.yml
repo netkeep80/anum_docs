@@ -17,6 +17,7 @@ on:
       - "ts/test/v015-two-role-approved-recursive-r3.test.ts"
       - "ts/test/v015-two-role-approved-amemory-package-r4.test.ts"
       - "ts/test/research-v015-p1q-package.ts"
+      - "ts/test/research-v015-p1aa-composed-package.ts"
       - ".github/workflows/amemory-v015-regression.yml"
   workflow_dispatch:
 
@@ -308,5 +309,107 @@ jobs:
             "FROZEN_AMEMORY_P1Q_CLOSED_MEMBERSHIP_LU=PASS "
             "selected_membership=L closed_absence=U "
             "ambient_physical_admission_authority=0"
+          )
+          PY
+
+
+  aprover-composed-execution-theory-research:
+    name: aprover composed ExecutionTheory / frozen A-memory research
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout anum_docs
+        uses: actions/checkout@v6
+
+      - name: Checkout exact frozen A-memory
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/amemory
+          ref: ${{ env.AMEMORY_FROZEN_SHA }}
+          path: _amemory
+
+      - name: Verify frozen A-memory identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C _amemory rev-parse HEAD)" = "$AMEMORY_FROZEN_SHA"
+          test "$(tr -d '\r\n' < _amemory/VERSION)" = "$AMEMORY_FROZEN_VERSION"
+          test -f _amemory/experiments/a-circuit/src/bin/formal_recursive_replay.rs
+          echo "AMEMORY_FROZEN_IDENTITY=PASS sha=$AMEMORY_FROZEN_SHA version=$AMEMORY_FROZEN_VERSION"
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: ts/package-lock.json
+
+      - name: Build temporary composed research package
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --prefix ts
+          npm run --prefix ts build --silent
+          node ts/dist/test/research-v015-p1aa-composed-package.js > /tmp/p1aa-package.json
+          python3 - <<'PY'
+          import json
+          p="/tmp/p1aa-package.json"
+          data=json.load(open(p,"r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-recursive-execution-package/v0.1"
+          assert len(data["links"])==5
+          assert isinstance(data["entry"],str) and data["entry"]
+          assert isinstance(data["negativeEntry"],str) and data["negativeEntry"]
+          assert all(set(x)<=set("8961") for x in data["links"])
+          assert set(data["entry"])<=set("8961")
+          assert set(data["negativeEntry"])<=set("8961")
+          print("P1AA_COMPOSED_PACKAGE=GENERATED_NOT_CANONICAL_JSON")
+          PY
+
+      - name: Replay composed ExecutionTheory through real frozen A-memory
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +"$AMEMORY_RUST_TOOLCHAIN" run \
+            --quiet \
+            --locked \
+            --manifest-path _amemory/experiments/a-circuit/Cargo.toml \
+            --bin formal_recursive_replay \
+            -- /tmp/p1aa-package.json | tee /tmp/p1aa-evidence.json
+
+          python3 - <<'PY'
+          import json
+          data=json.load(open("/tmp/p1aa-evidence.json","r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-recursive-execution-evidence/v0.1"
+
+          runs=data["runs"]
+          assert len(runs)==2
+
+          static=runs[0]
+          assert static["raw_rule_matches"]==1
+          assert static["transitioned_members"]==1
+          assert static["result"]==static["expected"]
+          assert static["handoff_count"]==1
+          assert static["quiescent"] is False
+
+          membership=runs[1]
+          assert membership["raw_rule_matches"]==1
+          assert membership["transitioned_members"]==1
+          assert membership["result"]==membership["expected"]
+          assert membership["handoff_count"]==1
+          assert membership["quiescent"] is False
+
+          negative=data["negative_run"]
+          assert negative is not None
+          assert negative["raw_rule_matches"]==0
+          assert negative["transitioned_members"]==0
+          assert negative["result"]==negative["expected"]
+          assert negative["handoff_count"]==0
+          assert negative["quiescent"] is True
+
+          print(
+            "FROZEN_AMEMORY_P1AA_COMPOSED_EXECUTION_THEORY=PASS "
+            "static_aprover=1 selected_membership=L closed_absence=U "
+            "same_interpreter=1 canonical_source_artifact=0"
           )
           PY
