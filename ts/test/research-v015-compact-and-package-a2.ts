@@ -320,17 +320,26 @@ interface PackageResult {
   readonly backendIndexWires: readonly string[];
 }
 
+function discoverAdmittedRules(
+  f: Fixture,
+  compiled: Compiled,
+  theory: LinkHandle,
+): readonly LinkHandle[] {
+  const rules: LinkHandle[] = [];
+  for (const member of compiled.denotation.members) {
+    const poles = f.memory.poles(member);
+    if (poles.start === theory) rules.push(poles.end);
+  }
+  assert(rules.length > 0, "semantic Theory has admitted Rules");
+  return Object.freeze(rules);
+}
+
 function buildPackage(noise = 0): PackageResult {
   const f = fixture(noise);
   const compiled = compile(f);
 
   const theory = compiled.absolute("Theory");
-  const rules = [
-    compiled.binding("RuleFF"),
-    compiled.binding("RuleFT"),
-    compiled.binding("RuleTF"),
-    compiled.binding("RuleTT"),
-  ] as const;
+  const rules = discoverAdmittedRules(f, compiled, theory);
   const compatibility = lowerRules(f, compiled, theory, rules);
 
   const admissions = rules.map((rule) => f.memory.ensure(theory, rule));
