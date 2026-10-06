@@ -1,0 +1,74 @@
+{
+  "schema": "mts-v015-proof-evidence/v0.1",
+  "id": "GPR-05",
+  "title": "Finite one-generation execution budget without a finite ambient Link universe",
+  "status": "PROVED_UNDER_FINITE_MATERIALIZATION_AND_LOCAL_TERMINATION_WITHOUT_FINITE_AMBIENT_LINK_CARRIER",
+  "ownerIssue": "#2001",
+  "mtsVersion": "v0.15-candidate",
+  "semanticClaim": [
+    "Finite concrete current and admitted-Rule collections give a finite current×Rule comparison budget.",
+    "Finite explicit Rule images give a finite raw staging-occurrence budget for one concrete generation.",
+    "Nat-valued local-match cost makes local termination an explicit finite execution premise rather than an ambient-universe restriction.",
+    "The proof is polymorphic in Link and Rule Types and therefore assumes no finite ambient Link carrier."
+  ],
+  "explicitPremises": [
+    "one concrete reaction exposes finite materialized/current/admission collections",
+    "each admitted Rule has a finite explicit image for the reaction",
+    "each local current×Rule match terminates with a finite Nat-valued work cost",
+    "staging counts raw finite image occurrences before canonical ANet membership convergence"
+  ],
+  "exclusions": [
+    "No finite ambient Link universe is assumed or derived.",
+    "No claim is made that all semantic ANets or all denotational reactions are finite.",
+    "Atomic publication is not derived from finite work; it remains independently governed by GPR-01/GPR-03.",
+    "Physical resource sufficiency is implementation-only.",
+    "The proof budgets raw occurrences; canonical duplicate convergence remains GPR-02/GPR-04."
+  ],
+  "externalCrossCheck": {
+    "authority": "external-only",
+    "allowedGlobalAxioms": {
+      "lean4": [],
+      "rocq": []
+    },
+    "manifest": "proofs/v015-external-proof-assurance.json",
+    "lean4": {
+      "path": "proofs/lean4/MtsV015GeneralizedReaction.lean",
+      "gitBlob": "3293ebd1de98ee4c645958cdbef084a6814dc70a",
+      "symbols": [
+        "MTS.V015.External.GPR_05_current_rule_comparison_product",
+        "MTS.V015.External.GPR_05_raw_staging_budget",
+        "MTS.V015.External.GPR_05_finite_generation_budget",
+        "MTS.V015.External.GPR_05_no_finite_ambient_carrier_required"
+      ],
+      "result": "SUCCESS"
+    },
+    "rocq": {
+      "path": "proofs/coq/MtsV015GeneralizedReaction.v",
+      "gitBlob": "19f772b6905caf293b3364b2f239232f8b0f7fd6",
+      "symbols": [
+        "GPR_05_current_rule_comparison_product",
+        "GPR_05_raw_staging_budget",
+        "GPR_05_finite_generation_budget",
+        "GPR_05_no_finite_ambient_carrier_required"
+      ],
+      "result": "SUCCESS"
+    },
+    "exactHead": "52657fb3e7b4ccab1a18a967acfeff512e9637dd",
+    "ciRun": 37475441663
+  },
+  "executableWitnesses": [
+    "ts/test/v015-finite-materialized-reaction-a12.test.ts"
+  ],
+  "architecturalConsequence": {
+    "finiteAmbientLinkCarrierRequired": false,
+    "finiteConcreteComparisonBudgetDerived": true,
+    "finiteRawStagingBudgetDerived": true,
+    "atomicPublicationDerivedFromFiniteness": false,
+    "infiniteSemanticReactionRuledOut": false,
+    "physicalResourceCapacityProved": false
+  },
+  "theoremProjection": {
+    "currentV014InventoryUnchanged": true,
+    "generatedTheoremCatalogIntegration": "PENDING #1963/#1861"
+  }
+}

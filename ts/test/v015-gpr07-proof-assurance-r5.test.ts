@@ -101,6 +101,25 @@ const gpr04Evidence = JSON.parse(
   };
   theoremProjection: { currentV014InventoryUnchanged: boolean };
 };
+const gpr05Evidence = JSON.parse(
+  readFileSync(
+    resolve(repo, "proofs/v015-evidence/gpr05-finite-completion-boundary.json"),
+    "utf8",
+  ),
+) as {
+  id: string;
+  status: string;
+  externalCrossCheck: { ciRun: number; exactHead: string };
+  architecturalConsequence: {
+    finiteAmbientLinkCarrierRequired: boolean;
+    finiteConcreteComparisonBudgetDerived: boolean;
+    finiteRawStagingBudgetDerived: boolean;
+    atomicPublicationDerivedFromFiniteness: boolean;
+    infiniteSemanticReactionRuledOut: boolean;
+    physicalResourceCapacityProved: boolean;
+  };
+  theoremProjection: { currentV014InventoryUnchanged: boolean };
+};
 const gpr06Evidence = JSON.parse(
   readFileSync(
     resolve(repo, "proofs/v015-evidence/gpr06-exact-s0-opacity.json"),
@@ -166,15 +185,16 @@ assert(v015.allowedGlobalAxioms.rocq.length === 0, "v0.15 Rocq axiom allowlist e
 const ids = v015.targets.map((target) => target.id);
 assert(new Set(ids).size === ids.length, "v0.15 GPR target ids are unique");
 assert(
-  ids.length === 7 &&
+  ids.length === 8 &&
     ids.includes("GPR-01") &&
     ids.includes("GPR-02") &&
     ids.includes("GPR-03") &&
     ids.includes("GPR-04") &&
+    ids.includes("GPR-05") &&
     ids.includes("GPR-06") &&
     ids.includes("GPR-07") &&
     ids.includes("GPR-08"),
-  "current paired proof manifest contains exactly GPR-01, GPR-02, GPR-03, GPR-04, GPR-06, GPR-07 and GPR-08",
+  "current paired proof manifest contains exactly GPR-01, GPR-02, GPR-03, GPR-04, GPR-05, GPR-06, GPR-07 and GPR-08",
 );
 
 function target(id: string): GprTarget {
@@ -217,6 +237,15 @@ assert(
 );
 assert(gpr04.lean4.length === 5, "GPR-04 paired Lean assurance symbols");
 assert(gpr04.rocq.length === 5, "GPR-04 paired Rocq assurance symbols");
+
+const gpr05 = target("GPR-05");
+assert(
+  gpr05.classification ===
+    "PROVED_UNDER_FINITE_MATERIALIZATION_AND_LOCAL_TERMINATION_WITHOUT_FINITE_AMBIENT_LINK_CARRIER",
+  "GPR-05 classification keeps finite execution premises separate from ambient Link cardinality",
+);
+assert(gpr05.lean4.length === 4, "GPR-05 paired Lean assurance symbols");
+assert(gpr05.rocq.length === 4, "GPR-05 paired Rocq assurance symbols");
 
 const gpr06 = target("GPR-06");
 assert(
@@ -369,6 +398,34 @@ assert(
   "GPR-04 leaves accepted theorem inventory unchanged",
 );
 
+assert(gpr05Evidence.id === "GPR-05", "GPR-05 evidence id");
+assert(
+  gpr05Evidence.status ===
+    "PROVED_UNDER_FINITE_MATERIALIZATION_AND_LOCAL_TERMINATION_WITHOUT_FINITE_AMBIENT_LINK_CARRIER",
+  "GPR-05 evidence classification",
+);
+assert(gpr05Evidence.externalCrossCheck.ciRun === 37475441663, "GPR-05 exact proof CI is pinned");
+assert(
+  gpr05Evidence.externalCrossCheck.exactHead === "52657fb3e7b4ccab1a18a967acfeff512e9637dd",
+  "GPR-05 proof head is pinned",
+);
+assert(
+  gpr05Evidence.architecturalConsequence.finiteAmbientLinkCarrierRequired === false &&
+    gpr05Evidence.architecturalConsequence.finiteConcreteComparisonBudgetDerived === true &&
+    gpr05Evidence.architecturalConsequence.finiteRawStagingBudgetDerived === true,
+  "GPR-05 derives finite concrete work/staging without finite ambient Link carrier",
+);
+assert(
+  gpr05Evidence.architecturalConsequence.atomicPublicationDerivedFromFiniteness === false &&
+    gpr05Evidence.architecturalConsequence.infiniteSemanticReactionRuledOut === false &&
+    gpr05Evidence.architecturalConsequence.physicalResourceCapacityProved === false,
+  "GPR-05 preserves publication, denotational infinity and physical-resource boundaries",
+);
+assert(
+  gpr05Evidence.theoremProjection.currentV014InventoryUnchanged === true,
+  "GPR-05 leaves accepted theorem inventory unchanged",
+);
+
 assert(gpr06Evidence.id === "GPR-06", "GPR-06 evidence id");
 assert(
   gpr06Evidence.status === "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
@@ -439,11 +496,12 @@ assert(
 console.log([
   "MTS_V015_GPR_PROOF_ASSURANCE=GREEN",
   "V014_ASSURANCE_TARGETS=21_UNCHANGED",
-  "V015_GPR_TARGETS=7",
+  "V015_GPR_TARGETS=8",
   "GPR01=PAIRED_LEAN_ROCQ",
   "GPR02=PAIRED_LEAN_ROCQ",
   "GPR03=PAIRED_LEAN_ROCQ",
   "GPR04=PAIRED_LEAN_ROCQ",
+  "GPR05=PAIRED_LEAN_ROCQ",
   "GPR06=PAIRED_LEAN_ROCQ",
   "GPR07=PAIRED_LEAN_ROCQ",
   "GPR08=PAIRED_LEAN_ROCQ",
@@ -452,6 +510,7 @@ console.log([
   "GPR02_CLASSIFICATION=PROVED_FOR_CANONICAL_ANET_MEMBERSHIP_CONVERGENCE_WITH_SEPARATE_PROVENANCE_AND_EXACTSEQUENCE_MULTIPLICITY",
   "GPR03_CLASSIFICATION=PROVED_UNDER_REACTION_START_SNAPSHOT_SEMANTICS_WITH_READ_YOUR_OWN_WRITES_FALSIFIER",
   "GPR04_CLASSIFICATION=PROVED_AS_PARTITION_AND_SCHEDULE_REFINEMENT_UNDER_SNAPSHOT_EXTENTIONAL_REDUCTION",
+  "GPR05_CLASSIFICATION=PROVED_UNDER_FINITE_MATERIALIZATION_AND_LOCAL_TERMINATION_WITHOUT_FINITE_AMBIENT_LINK_CARRIER",
   "GPR06_CLASSIFICATION=PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
   "GPR07_CLASSIFICATION=PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
   "GPR08_CLASSIFICATION=PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",

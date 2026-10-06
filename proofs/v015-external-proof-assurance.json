@@ -120,6 +120,35 @@
       ]
     },
     {
+      "id": "GPR-05",
+      "classification": "PROVED_UNDER_FINITE_MATERIALIZATION_AND_LOCAL_TERMINATION_WITHOUT_FINITE_AMBIENT_LINK_CARRIER",
+      "premises": [
+        "one concrete reaction exposes finite materialized/current/admission collections",
+        "each admitted Rule has a finite explicit image for the reaction",
+        "each local current×Rule match terminates with a finite Nat-valued work cost",
+        "staging counts raw finite image occurrences before canonical ANet membership convergence"
+      ],
+      "exclusions": [
+        "does not add a finite ambient Link-carrier or finite-universe axiom",
+        "does not claim every possible semantic ANet or denotational reaction is finite",
+        "does not derive atomic publication from finiteness; publication remains a separate Gamma law",
+        "does not prove a concrete CPU/GPU/ASIC has enough physical resources for an arbitrary chosen finite slice",
+        "does not change accepted v0.14 infinite ambient-carrier requirements"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_05_current_rule_comparison_product",
+        "MTS.V015.External.GPR_05_raw_staging_budget",
+        "MTS.V015.External.GPR_05_finite_generation_budget",
+        "MTS.V015.External.GPR_05_no_finite_ambient_carrier_required"
+      ],
+      "rocq": [
+        "GPR_05_current_rule_comparison_product",
+        "GPR_05_raw_staging_budget",
+        "GPR_05_finite_generation_budget",
+        "GPR_05_no_finite_ambient_carrier_required"
+      ]
+    },
+    {
       "id": "GPR-06",
       "classification": "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
       "premises": [
