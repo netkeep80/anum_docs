@@ -321,6 +321,119 @@ jobs:
           PY
 
 
+  boolean-family-research:
+    name: Boolean ${{ matrix.operator }} / frozen A-memory research
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - operator: NOT
+            expected_runs: 2
+            expected_links: 4
+          - operator: OR
+            expected_runs: 4
+            expected_links: 8
+          - operator: XOR
+            expected_runs: 4
+            expected_links: 8
+
+    steps:
+      - name: Checkout anum_docs
+        uses: actions/checkout@v6
+
+      - name: Checkout exact frozen A-memory
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/amemory
+          ref: ${{ env.AMEMORY_FROZEN_SHA }}
+          path: _amemory
+
+      - name: Verify frozen A-memory identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C _amemory rev-parse HEAD)" = "$AMEMORY_FROZEN_SHA"
+          test "$(tr -d '\r\n' < _amemory/VERSION)" = "$AMEMORY_FROZEN_VERSION"
+          test -f _amemory/experiments/a-circuit/src/bin/formal_recursive_replay.rs
+          echo "AMEMORY_FROZEN_IDENTITY=PASS sha=$AMEMORY_FROZEN_SHA version=$AMEMORY_FROZEN_VERSION"
+
+      - name: Build generic Boolean research package
+        shell: bash
+        env:
+          V015_BOOLEAN_OPERATOR: ${{ matrix.operator }}
+          EXPECTED_RUNS: ${{ matrix.expected_runs }}
+          EXPECTED_LINKS: ${{ matrix.expected_links }}
+        run: |
+          set -euo pipefail
+          npm ci --prefix ts
+          npm run --prefix ts build --silent
+          node ts/dist/test/research-v015-compact-and-package-a2.js > /tmp/boolean-package.json
+          python3 - <<'PY'
+          import json, os
+          data=json.load(open("/tmp/boolean-package.json","r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-recursive-execution-package/v0.1"
+          assert len(data["links"])==int(os.environ["EXPECTED_LINKS"])
+          assert isinstance(data["entry"],str) and data["entry"]
+          assert isinstance(data["negativeEntry"],str) and data["negativeEntry"]
+          assert all(set(x)<=set("8961") for x in data["links"])
+          assert set(data["entry"])<=set("8961")
+          assert set(data["negativeEntry"])<=set("8961")
+          print(
+              "BOOLEAN_RESEARCH_PACKAGE=GREEN "
+              f"operator={os.environ['V015_BOOLEAN_OPERATOR']} "
+              f"runs={os.environ['EXPECTED_RUNS']} links={os.environ['EXPECTED_LINKS']}"
+          )
+          PY
+
+      - name: Install exact A-memory Rust toolchain
+        run: rustup toolchain install "$AMEMORY_RUST_TOOLCHAIN" --profile minimal
+
+      - name: Replay Boolean candidate through real frozen A-memory
+        shell: bash
+        env:
+          V015_BOOLEAN_OPERATOR: ${{ matrix.operator }}
+          EXPECTED_RUNS: ${{ matrix.expected_runs }}
+        run: |
+          set -euo pipefail
+          cargo +"$AMEMORY_RUST_TOOLCHAIN" run \
+            --quiet \
+            --locked \
+            --manifest-path _amemory/experiments/a-circuit/Cargo.toml \
+            --bin formal_recursive_replay \
+            -- /tmp/boolean-package.json | tee /tmp/boolean-evidence.json
+
+          python3 - <<'PY'
+          import json, os
+          data=json.load(open("/tmp/boolean-evidence.json","r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-recursive-execution-evidence/v0.1"
+          runs=data["runs"]
+          assert len(runs)==int(os.environ["EXPECTED_RUNS"])
+          for run in runs:
+              assert run["raw_rule_matches"]==1
+              assert run["transitioned_members"]==1
+              assert run["result"]==run["expected"]
+              assert run["handoff_count"]==1
+              assert run["quiescent"] is False
+
+          negative=data["negative_run"]
+          assert negative is not None
+          assert negative["raw_rule_matches"]==0
+          assert negative["transitioned_members"]==0
+          assert negative["result"]==negative["expected"]
+          assert negative["handoff_count"]==0
+          assert negative["quiescent"] is True
+
+          print(
+              "FROZEN_AMEMORY_BOOLEAN=PASS "
+              f"operator={os.environ['V015_BOOLEAN_OPERATOR']} "
+              f"rows={os.environ['EXPECTED_RUNS']} "
+              "program_specific_dispatch=0"
+          )
+          PY
+
+
   aprover-closed-membership-lu-research:
     name: aprover closed membership L/U / frozen A-memory research
     runs-on: ubuntu-latest
