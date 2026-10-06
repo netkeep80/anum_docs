@@ -467,7 +467,7 @@
       "ownerIssue": "#1980",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "A compact Author-gated AND source ANet contains only program semantics and native role-bundle Rules; legacy RoleDictionary/index/Scope/interpreter scaffolding is not canonical source.",
+      "summary": "A compact Author-gated Boolean AND source ANet contains only the exact local T/F truth-table semantics expressed as zero-role Rules; legacy RoleDictionary/index/Scope/interpreter scaffolding is not canonical source.",
       "dependsOn": [
         "V15-VERT-02",
         "V15-ONTO-02"
@@ -477,10 +477,11 @@
       },
       "evidence": {
         "positiveVectors": [
-          "compact-and-two-generic-rules-4of4"
+          "compact-boolean-and-four-grounded-rules-4of4"
         ],
         "negativeVectors": [
-          "compact-and-delete-ruleT-admission",
+          "compact-and-nonboolean-operands-no-match",
+          "compact-and-delete-ruleTT-admission",
           "compact-and-foreign-theory-inert",
           "compact-and-presentation-rename-invariant"
         ],
@@ -497,7 +498,7 @@
       "ownerIssue": "#1980",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Compact AND must execute through the shared matcher/Gamma-compatible path and frozen compatibility adapter with zero AND-specific host dispatch.",
+      "summary": "Boolean AND executes through the shared matcher/Γ-compatible path and frozen compatibility adapter with zero AND-specific host dispatch; operands outside the local T/F domain are NO_MATCH rather than pass-through.",
       "dependsOn": [
         "V15-AND-01",
         "V15-CLOSE-03"
@@ -507,10 +508,11 @@
       },
       "evidence": {
         "positiveVectors": [
-          "compact-and-two-generic-rules-4of4",
-          "frozen-amemory-compact-and-4of4"
+          "compact-boolean-and-four-grounded-rules-4of4",
+          "frozen-amemory-compact-boolean-and-4of4"
         ],
         "negativeVectors": [
+          "compact-and-nonboolean-operands-no-match",
           "compact-and-foreign-theory-inert",
           "compact-and-malformed-negative-no-match"
         ],
@@ -527,7 +529,7 @@
       "ownerIssue": "#1980",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "MTS has one canonical semantic AND source/model. Frozen or future A-memory backends may use generated compatibility or optimized AND lowerings only when they are semantics-preserving, generic/backend-owned, and remain outside canonical AND semantic authority.",
+      "summary": "MTS has one canonical semantic Boolean AND source/model. Frozen or future A-memory backends may use generated compatibility or optimized AND lowerings only when they preserve the exact T/F-domain truth table and NO_MATCH boundary, remain generic/backend-owned, and stay outside canonical AND semantic authority.",
       "dependsOn": [
         "V15-AND-02"
       ],
@@ -536,10 +538,11 @@
       },
       "evidence": {
         "positiveVectors": [
-          "compact-and-generic-two-rule-compatibility-lowering"
+          "compact-and-four-grounded-rule-compatibility-lowering"
         ],
         "negativeVectors": [
-          "canonical-and-has-no-role-dictionary-index-scope-interpreter-scaffold"
+          "canonical-and-has-no-role-dictionary-index-scope-interpreter-scaffold",
+          "optimized-lowering-must-not-widen-boolean-domain"
         ],
         "requiredExecutableGates": [
           "ts/test/research-v015-compact-and-package-a2.ts"
