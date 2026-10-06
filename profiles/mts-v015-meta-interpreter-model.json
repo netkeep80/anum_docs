@@ -29,9 +29,18 @@
     "IMPLEMENTATION_ONLY"
   ],
   "coreGoal": {
-    "status": "CANDIDATE",
+    "status": "PROVED_RESEARCH",
     "statement": "A complete A-memory state contains everything required to start, pause, serialize, transfer and resume execution. The external substrate supplies only the generalized parallel MP/reaction implementation and no semantic current-context/program-counter pointer.",
-    "stateTransition": "M_t -> Gamma(M_t) -> M_(t+1)"
+    "stateTransition": "M_t -> Gamma(M_t) -> M_(t+1)",
+    "evidence": [
+      "ts/test/v015-self-contained-context-freeze-resume-a5.test.ts",
+      "ts/test/v015-context-theory-self-contained-a6.test.ts",
+      "ts/test/v015-positive-aset-currentness-a8.test.ts",
+      "ts/test/v015-structural-aset-one-command-a9.test.ts",
+      "ts/test/v015-context-authority-closure-c1.test.ts",
+      "#2001",
+      "#2002"
+    ]
   },
   "knownBoundaries": [
     {
@@ -217,7 +226,7 @@
       "execution entries",
       "temporary Context execution scaffold, branch closure and carrier ancestry; not semantic execution history",
       "all state needed for freeze/resume",
-      "meta-interpreter structures once their exact self-hosted form is proved"
+      "program/meta-interpreter ANets execute through the same Γ; S1/S2 structural match/bind/construct capability belongs to Γ semantics rather than an external semantic grounder command"
     ]
   },
   "contextCandidate": {
@@ -254,32 +263,33 @@
     "forbiddenShortcut": "Do not reintroduce negative leaf tests or an external current-scope cursor as semantic authority."
   },
   "reactionCandidate": {
-    "status": "OPEN",
+    "status": "PROVED_RESEARCH",
     "principle": "One reaction consumes one immutable causal snapshot, computes all applicable MP consequences, and atomically publishes the complete successor state.",
     "implementationIndependence": "The same result must be obtained whether scalar MP instances run sequentially, on CPU threads, on GPU, or on a future associative architecture.",
-    "openProofs": [
-      "fan-out completeness",
-      "order independence",
-      "partition invariance",
-      "generation isolation",
-      "atomic publication",
-      "canonical convergence",
-      "NO_MATCH vs matched-empty distinction",
-      "hardware decomposition/refinement theorem"
-    ],
-    "currentEvidence": "A7/A8 establish pointwise current-state behavior; A11 proves extensional partition/order invariance under the explicit snapshot, global-match reduction, generation-isolation and atomic-publication premises.",
-    "completionBoundary": "Physical completion is derived only for a finite materialized M_t/current/admission/image slice with terminating local matches; ambient Link carrier remains infinite."
+    "openProofs": [],
+    "currentEvidence": "A7/A8/A9 plus A11/A12 are executable evidence; #2001 closes GPR-01..09 in paired Lean4/Rocq with empty global axiom allowlists. Concrete CPU/WASM/WebGPU implementation refinement remains post-acceptance A-memory work, not an open v0.15 semantic law.",
+    "completionBoundary": "Physical completion is derived only for a finite materialized M_t/current/admission/image slice with terminating local matches; ambient Link carrier remains infinite.",
+    "proofClosure": {
+      "owner": "#2001",
+      "status": "CLOSED_GREEN",
+      "manifest": "proofs/v015-external-proof-assurance.json",
+      "targets": "GPR-01..09"
+    }
   },
   "metaInterpreterBoundary": {
-    "status": "OPEN",
-    "question": "Can all meta-grounding/reflection needed for fresh structured inputs be expressed inside the self-contained A-memory and driven by the same generalized reaction, or is extra semantic match/construct power required?",
+    "status": "PROVED_RESEARCH",
+    "question": "RESOLVED for v0.15: self-contained fresh-structure execution uses the selected structural-unary Γ whose internal analysis performs S1 structural match/bind and whose synthesis performs S2 substitution/canonical construction. These are internal phases of the one semantic command, not an external grounder.",
     "knownFalsifier": "Exact S0 grounded MP alone cannot generically bind fresh nested structures and instantiate substituted outputs.",
     "mustNotConflate": [
       "parallel/fan-out MP",
       "structural matching/binding",
       "output instantiation",
       "cross-current-member join"
-    ]
+    ],
+    "decision": "STRUCTURAL_UNARY_GAMMA_WITH_INTERNAL_S1_S2",
+    "proofClosure": "#2001 GPR-01..09",
+    "bootstrapCompilerBoundary": "#2006: the host/bootstrap FORMAL metacompiler remains in anum_docs for source compilation; it is not a runtime semantic grounder and is not a second A-memory command.",
+    "remainingImplementationBoundary": "Production A-memory realization/refinement after explicit v0.15 ACCEPT is owned by netkeep80/amemory#455."
   },
   "formalJsonExamples": [
     {
@@ -376,26 +386,30 @@
     {
       "id": "MI-D02",
       "question": "How is active frontier/currentness represented without an external cursor?",
-      "status": "CANDIDATE",
-      "currentEvidence": "A8 removes the negative-frontier blocker by using positive semantic Aset membership E->K as currentness. MI-J06 gives the direct-JSON candidate: an arbitrary presentation name binds the ordinary RHS Link E->K; renaming that presentation name must not affect execution. Final source-Aset -> denoted-Aset membership lowering and Author acceptance remain open."
+      "status": "PROVED_RESEARCH",
+      "currentEvidence": "RESOLVED: A8 makes currentness positive semantic ANet membership E->K; DAS-08 proves physical existence/naming alone is not currentness and membership moves currentness; C1 binds the no-host-pointer authority boundary.",
+      "decision": "POSITIVE_SEMANTIC_ANET_MEMBERSHIP"
     },
     {
       "id": "MI-D03",
       "question": "How is Theory/admission/current causal authority discovered entirely from A-memory?",
-      "status": "OPEN",
-      "currentEvidence": "v0.15 A6 proves a C->Theory execution-environment candidate can recover Theory from Context ancestry with reaction-start snapshot isolation; final representation and self-hosted relation discovery remain open."
+      "status": "PROVED_RESEARCH",
+      "currentEvidence": "RESOLVED: A6 derives Theory from Link ancestry; A8/A9 make Theory/currentness authority reaction-start semantic ANet membership; foreign Theory remains inert; C1 binds the no-host selected-Theory/current-Scope boundary.",
+      "decision": "LINK_STRUCTURE_AND_SEMANTIC_MEMBERSHIP_AUTHORITY"
     },
     {
       "id": "MI-D04",
       "question": "Is generalized parallel MP derived from scalar MP plus reaction/publication laws, and what exact premises are irreducible?",
-      "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
-      "currentEvidence": "Author-approved v0.15 design: one repeated structural-unary reaction Γ = analysis(read-only M_t snapshot) -> synthesis(materialization/staging) -> atomic publication of M_(t+1). A10/A11/A12 are research evidence; #2001 owns formal closure. Exact grounded MP must be shown as a refinement/special case; no J1 cross-current join is introduced."
+      "status": "PROVED_RESEARCH",
+      "currentEvidence": "RESOLVED: Author-selected one repeated structural-unary Γ is closed by #2001 GPR-01..09 paired Lean4/Rocq evidence; J0 is selected, J1 is not required.",
+      "decision": "AUTHOR_APPROVED_GAMMA_GPR01_09_PROOF_GREEN"
     },
     {
       "id": "MI-D05",
       "question": "Can meta-grounding become fully self-hosted without hidden host structural matcher/constructor semantics?",
-      "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
-      "currentEvidence": "The structural capability is accepted as part of the one repeated Γ reaction semantics, not as an external grounder command. S1/S2 are explanatory analysis/synthesis subphases, not separate opcodes. #2001 must still prove the multi-generation exact-S0 opacity lower bound and grounded-MP refinement; final FORMAL/JSON representation remains Author-gated."
+      "status": "PROVED_RESEARCH",
+      "currentEvidence": "RESOLVED: exact S0 alone is insufficient for arbitrary fresh structure-sensitive transformation; v0.15 selects S1 match/bind + S2 construction as internal phases of the single structural-unary Γ. No external semantic grounder command is permitted. The anum_docs bootstrap metacompiler of #2006 is a source compiler, not runtime grounding authority.",
+      "decision": "STRUCTURAL_UNARY_GAMMA_S1_S2_INTERNAL_NO_EXTERNAL_GROUNDER"
     }
   ],
   "maintenanceLaw": {
