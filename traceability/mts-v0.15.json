@@ -461,9 +461,9 @@
       "evidenceRefs": [
         "formal/v0.15/candidates/compact-and.formal",
         "formal/v0.15/candidates/compact-and.json",
-        "ts/test/v015-compact-and-role-bundle-a1.test.ts",
         "ts/test/research-v015-compact-and-package-a2.ts",
-        "#1980"
+        "#1980",
+        "#2005"
       ],
       "authorJsonReview": "AUTHOR_REVIEW_PENDING",
       "candidateSource": "formal/v0.15/candidates/compact-and.formal"
@@ -491,7 +491,8 @@
       "negativeVectors": [],
       "requiredExecutableGates": [],
       "evidenceRefs": [
-        "#1987"
+        "#1987",
+        "#2005"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
@@ -506,89 +507,14 @@
       "negativeVectors": [],
       "requiredExecutableGates": [],
       "evidenceRefs": [
-        "#1987"
+        "#1987",
+        "#2005"
       ],
-      "authorJsonReview": "NOT_APPLICABLE"
-    },
-    "V15-DUAL-01": {
-      "state": "OPEN",
-      "ownerIssue": 1912,
-      "dependsOn": [
-        "V15-ONTO-01",
-        "V15-AUTH-01"
-      ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
-      "authorJsonReview": "NOT_APPLICABLE"
-    },
-    "V15-DUAL-02": {
-      "state": "OPEN",
-      "ownerIssue": 1912,
-      "dependsOn": [
-        "V15-DUAL-01",
-        "V15-CLOSE-03"
-      ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
-      "authorJsonReview": "NOT_APPLICABLE"
-    },
-    "V15-THM-01": {
-      "state": "OPEN",
-      "ownerIssue": 1963,
-      "dependsOn": [
-        "V15-DUAL-02",
-        "V15-AUTH-02",
-        "V15-JSON-01"
-      ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
-      "authorJsonReview": "NOT_APPLICABLE"
-    },
-    "V15-THM-02": {
-      "state": "OPEN",
-      "ownerIssue": 1963,
-      "dependsOn": [
-        "V15-THM-01"
-      ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
-      "authorJsonReview": "NOT_APPLICABLE"
-    },
-    "V15-THM-03": {
-      "state": "OPEN",
-      "ownerIssue": 1963,
-      "dependsOn": [
-        "V15-THM-01"
-      ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
-      "authorJsonReview": "NOT_APPLICABLE"
-    },
-    "V15-PROOF-01": {
-      "state": "OPEN",
-      "ownerIssue": 1431,
-      "dependsOn": [
-        "V15-DUAL-01"
-      ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-STAGE-01": {
       "state": "OPEN",
-      "ownerIssue": 1901,
+      "ownerIssue": 1911,
       "dependsOn": [
         "V15-AUTH-01",
         "V15-TERM-01"
@@ -603,23 +529,26 @@
         "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
       ],
       "evidenceRefs": [
-        "ts/test/v015-denoted-anet-membership-das-a1.test.ts",
-        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
-        "#1901",
+        "ts/src/v015-direct-source.ts",
+        "ts/src/v015-source-anet.ts",
+        "#1911",
         "#2002"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-STAGE-02": {
       "state": "OPEN",
-      "ownerIssue": 1901,
+      "ownerIssue": 1911,
       "dependsOn": [
         "V15-STAGE-01"
       ],
       "positiveVectors": [],
       "negativeVectors": [],
       "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "#1911",
+        "#2001"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-FALS-01": {
@@ -691,7 +620,14 @@
       "positiveVectors": [],
       "negativeVectors": [],
       "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "formal/v0.15/regression/grounded-zero-role.evidence.json",
+        "formal/v0.15/regression/two-role-meta-rule.evidence.json",
+        ".github/workflows/amemory-v015-regression.yml",
+        "#1910",
+        "#1978",
+        "#2005"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-READY-01": {
@@ -699,10 +635,11 @@
       "ownerIssue": 1876,
       "dependsOn": [
         "V15-CORPUS-01",
-        "V15-THM-03",
         "V15-REG-02",
-        "V15-PROOF-EXEC-03",
-        "V15-FORMAL-PROOF-02"
+        "V15-FORMAL-PROOF-02",
+        "V15-GAMMA-01",
+        "V15-CTX-02",
+        "V15-GOV-03"
       ],
       "positiveVectors": [],
       "negativeVectors": [],
@@ -899,72 +836,27 @@
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-GAMMA-01": {
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "ownerIssue": 2001,
       "dependsOn": [
-        "V15-CLOSE-03",
-        "V15-CTX-01"
+        "V15-CLOSE-03"
       ],
       "positiveVectors": [
+        "gpr01-09-paired-lean4-rocq-closure",
         "grounded-zero-role-is-generic-refinement"
       ],
       "negativeVectors": [
-        "proof-specific-opcode-forbidden"
+        "consumer-specific-semantic-opcode-forbidden",
+        "second-semantic-runtime-forbidden"
       ],
       "requiredExecutableGates": [],
-      "evidenceRefs": [],
-      "authorJsonReview": "NOT_APPLICABLE"
-    },
-    "V15-PROOF-EXEC-01": {
-      "state": "OPEN",
-      "ownerIssue": 2003,
-      "dependsOn": [
-        "V15-DUAL-01",
-        "V15-PROOF-01",
-        "V15-STAGE-01",
-        "V15-STRUCT-01"
+      "evidenceRefs": [
+        "proofs/v015-external-proof-assurance.json",
+        "proofs/lean4/MtsV015GeneralizedReaction.lean",
+        "proofs/coq/MtsV015GeneralizedReaction.v",
+        "#2001",
+        "#2005"
       ],
-      "positiveVectors": [],
-      "negativeVectors": [
-        "host-proof-semantics-forbidden"
-      ],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
-      "authorJsonReview": "NOT_APPLICABLE"
-    },
-    "V15-PROOF-EXEC-02": {
-      "state": "OPEN",
-      "ownerIssue": 2003,
-      "dependsOn": [
-        "V15-PROOF-EXEC-01",
-        "V15-GAMMA-01"
-      ],
-      "positiveVectors": [
-        "fnd07-aprover-anet-amemory-accept"
-      ],
-      "negativeVectors": [
-        "forged-target-reject",
-        "missing-premise-reject",
-        "foreign-theory-reject"
-      ],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
-      "authorJsonReview": "NOT_APPLICABLE"
-    },
-    "V15-PROOF-EXEC-03": {
-      "state": "OPEN",
-      "ownerIssue": 2003,
-      "dependsOn": [
-        "V15-PROOF-EXEC-02"
-      ],
-      "positiveVectors": [],
-      "negativeVectors": [
-        "search-result-is-not-proof",
-        "metadata-accept-forbidden",
-        "theorem-id-dispatch-forbidden"
-      ],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-FORMAL-PROOF-01": {
@@ -972,9 +864,9 @@
       "ownerIssue": 2004,
       "dependsOn": [
         "V15-AUTH-01",
-        "V15-DUAL-01",
         "V15-JSON-04",
-        "V15-STRUCT-01"
+        "V15-STRUCT-01",
+        "V15-NAME-01"
       ],
       "positiveVectors": [],
       "negativeVectors": [],
