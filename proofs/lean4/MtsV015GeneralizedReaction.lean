@@ -278,16 +278,18 @@ theorem GPR_08_exact_sequence_packing_injective
       | nil =>
           rfl
       | cons head tail =>
-          simp [packExactSequence] at packedEqual
+          cases packedEqual
   | cons head tail ih =>
       cases ys with
       | nil =>
-          simp [packExactSequence] at packedEqual
+          cases packedEqual
       | cons other rest =>
-          simp only [packExactSequence] at packedEqual
-          injection packedEqual with headEqual tailEqual
+          have parts := ExactPackedLink.pair.inj packedEqual
+          have headEqual : head = other := parts.1
+          have tailEqual :
+              packExactSequence tail = packExactSequence rest := parts.2
           subst other
-          have restEqual := ih tailEqual
+          have restEqual : tail = rest := ih tailEqual
           subst rest
           rfl
 
