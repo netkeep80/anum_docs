@@ -5,6 +5,7 @@ on:
     branches: ["**"]
     paths:
       - "formal/v0.15/regression/**"
+      - "formal/v0.15/candidates/**"
       - "ts/src/v015-direct-source.ts"
       - "ts/src/v015-direct-formal-source.ts"
       - "ts/src/v015-direct-json-source.ts"
