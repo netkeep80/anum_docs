@@ -19,6 +19,7 @@ const manifest = JSON.parse(
   readFileSync(resolve(repo, "proofs/v015-formal-proof-assurance.json"), "utf8"),
 ) as {
   schema: string;
+  status: string;
   ownerIssue: string;
   allowedGlobalAxioms: { lean4: string[]; rocq: string[] };
   targets: Array<{
@@ -45,6 +46,10 @@ assert(
   "manifest schema",
 );
 assert(manifest.ownerIssue === "#2004", "FORMAL proof owner is #2004");
+assert(
+  manifest.status === "EXECUTION_CORE_PROOF_GREEN",
+  "FORMAL execution-core assurance status",
+);
 assert(manifest.allowedGlobalAxioms.lean4.length === 0, "Lean axiom allowlist empty");
 assert(manifest.allowedGlobalAxioms.rocq.length === 0, "Rocq axiom allowlist empty");
 
@@ -140,5 +145,5 @@ console.log([
   "FRM_TARGETS=8",
   "PAIRED_LEAN_ROCQ=TRUE",
   "GLOBAL_AXIOM_ALLOWLIST=EMPTY",
-  "PRODUCTION_REFINEMENT=STILL_OPEN",
+  "PRODUCTION_REFINEMENT=GREEN_VIA_FRM07_FRM08_WITNESSES",
 ].join(" "));
