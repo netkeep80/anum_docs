@@ -1,0 +1,63 @@
+{
+  "schema": "mts-v015-compact-and-candidate/v0.1",
+  "id": "compact-and-two-generic-rules",
+  "status": "AUTHOR_REVIEW_PENDING_RESEARCH_GREEN",
+  "ownerIssue": "#1980",
+  "canonicalAccepted": false,
+  "candidate": {
+    "formal": "formal/v0.15/candidates/compact-and.formal",
+    "formalSha256": "16fddc9f8245fd7237a67424364d9b1991fa256287d0101509f038158c64edd6",
+    "json": "formal/v0.15/candidates/compact-and.json",
+    "jsonSha256": "efc4d9a04897903b05f5a37b77d5cf12848987049fbb31cb3624756f0bd7eab1",
+    "rootEntryCount": 22
+  },
+  "semanticModel": {
+    "laws": [
+      "AND([F,Y])->F",
+      "AND([T,Y])->Y"
+    ],
+    "roleMembers": [
+      "V->Y"
+    ],
+    "admissions": [
+      "Theory->RuleF",
+      "Theory->RuleT"
+    ],
+    "semanticMemberCount": 3,
+    "genericRuleCount": 2,
+    "roleCount": 1
+  },
+  "researchEvidence": {
+    "localTest": "ts/test/v015-compact-and-role-bundle-a1.test.ts",
+    "frozenPackageGenerator": "ts/test/research-v015-compact-and-package-a2.ts",
+    "frozenBackend": {
+      "repository": "netkeep80/amemory",
+      "sha": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+      "version": "0.175.0",
+      "workflowRun": 37505577943,
+      "result": "SUCCESS",
+      "rows": "4/4",
+      "programSpecificDispatch": 0
+    }
+  },
+  "compatibilityBoundary": {
+    "generatedCanonicalMemberWires": 3,
+    "generatedBackendIndexes": 2,
+    "sharedLegacyInterpreter": true,
+    "scaffoldInCandidateSource": false,
+    "persistedCompatibilityPackage": false
+  },
+  "falsifiers": [
+    "delete Theory->RuleT disables only T-leading rows",
+    "foreign Theory is inert",
+    "presentation rename preserves semantic ANet",
+    "malformed frozen launch yields zero matches and quiescence"
+  ],
+  "approvalBoundary": [
+    "candidate files are persisted for reproducible review only",
+    "not present in approvedJsonCorpus",
+    "not canonical accepted AND",
+    "no V15-AND-01/02/03 promotion before explicit Author APPROVE",
+    "any material source change invalidates this review candidate"
+  ]
+}

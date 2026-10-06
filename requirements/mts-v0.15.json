@@ -466,90 +466,93 @@
     {
       "id": "V15-AND-01",
       "group": "AND",
-      "ownerIssue": "#1975",
-      "state": "COMPONENT_GREEN",
+      "ownerIssue": "#1980",
+      "state": "OPEN",
       "mandatory": true,
-      "summary": "A tracked FORMAL artifact carries the complete executable one-bit AND topology including rule/context structures.",
+      "summary": "A compact Author-gated AND source ANet contains only program semantics and native role-bundle Rules; legacy RoleDictionary/index/Scope/interpreter scaffolding is not canonical source.",
       "dependsOn": [
         "V15-VERT-02",
         "V15-ONTO-02"
       ],
       "authority": {
-        "issue": 1975
+        "issue": 1980
       },
       "evidence": {
         "positiveVectors": [
-          "v015-full-and-formal-4of4"
+          "compact-and-two-generic-rules-4of4"
         ],
         "negativeVectors": [
-          "v015-full-and-formal-foreign-theory-inert",
-          "v015-full-and-formal-missing-tt-index-quiescent"
+          "compact-and-delete-ruleT-admission",
+          "compact-and-foreign-theory-inert",
+          "compact-and-presentation-rename-invariant"
         ],
         "requiredExecutableGates": [
-          "ts/test/v015-full-and-formal-c1-c2.test.ts"
+          "ts/test/v015-compact-and-role-bundle-a1.test.ts",
+          "ts/test/research-v015-compact-and-package-a2.ts"
         ]
       },
-      "authoritativeSource": "formal/v0.15/logic/and.formal"
+      "candidateSource": "formal/v0.15/candidates/compact-and.formal"
     },
     {
       "id": "V15-AND-02",
       "group": "AND",
-      "ownerIssue": "#1975",
-      "state": "COMPONENT_GREEN",
+      "ownerIssue": "#1980",
+      "state": "OPEN",
       "mandatory": true,
-      "summary": "AND acceptance uses no AND-specific host builder, truth-table enumeration or name dispatch.",
+      "summary": "Compact AND must execute through the shared matcher/Gamma-compatible path and frozen compatibility adapter with zero AND-specific host dispatch.",
       "dependsOn": [
         "V15-AND-01",
         "V15-CLOSE-03"
       ],
       "authority": {
-        "issue": 1975
+        "issue": 1980
       },
       "evidence": {
         "positiveVectors": [
-          "v015-full-and-formal-4of4"
+          "compact-and-two-generic-rules-4of4",
+          "frozen-amemory-compact-and-4of4"
         ],
         "negativeVectors": [
-          "v015-full-and-formal-foreign-theory-inert",
-          "v015-full-and-formal-missing-tt-index-quiescent"
+          "compact-and-foreign-theory-inert",
+          "compact-and-malformed-negative-no-match"
         ],
         "requiredExecutableGates": [
-          "ts/test/v015-full-and-formal-c1-c2.test.ts"
+          "ts/test/v015-compact-and-role-bundle-a1.test.ts",
+          "ts/test/research-v015-compact-and-package-a2.ts"
         ]
       },
-      "authoritativeSource": "formal/v0.15/logic/and.formal"
+      "candidateSource": "formal/v0.15/candidates/compact-and.formal"
     },
     {
       "id": "V15-AND-03",
       "group": "AND",
-      "ownerIssue": "#1975",
-      "state": "COMPONENT_GREEN",
+      "ownerIssue": "#1980",
+      "state": "OPEN",
       "mandatory": true,
-      "summary": "Generic builders may only be differential oracles, never the structure under test.",
+      "summary": "Any frozen-backend compatibility scaffold for AND is generated generically and remains outside the Author-approved program source; generic builders are never semantic authority.",
       "dependsOn": [
         "V15-AND-02"
       ],
       "authority": {
-        "issue": 1975
+        "issue": 1980
       },
       "evidence": {
         "positiveVectors": [
-          "v015-full-and-formal-4of4"
+          "compact-and-generic-two-rule-compatibility-lowering"
         ],
         "negativeVectors": [
-          "v015-full-and-formal-foreign-theory-inert",
-          "v015-full-and-formal-missing-tt-index-quiescent"
+          "canonical-and-has-no-role-dictionary-index-scope-interpreter-scaffold"
         ],
         "requiredExecutableGates": [
-          "ts/test/v015-full-and-formal-c1-c2.test.ts"
+          "ts/test/research-v015-compact-and-package-a2.ts"
         ]
       },
-      "authoritativeSource": "formal/v0.15/logic/and.formal"
+      "candidateSource": "formal/v0.15/candidates/compact-and.formal"
     },
     {
       "id": "V15-AND-04",
       "group": "AND",
-      "ownerIssue": "#1975",
+      "ownerIssue": "#1980",
       "state": "OPEN",
       "mandatory": true,
       "summary": "NOT/OR/XOR reuse exactly the same generic source model/materializer without program-specific paths.",
@@ -558,7 +561,7 @@
         "V15-AUTHOR-JSON-01"
       ],
       "authority": {
-        "issue": 1975
+        "issue": 1980
       },
       "evidence": {
         "positiveVectors": [],

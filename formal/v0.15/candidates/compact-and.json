@@ -1,0 +1,36 @@
+{
+  "O": "♂∞",
+  "C": "∞♀",
+  "L": "O->C",
+  "U": "C->O",
+  "T": "L",
+  "F": "U",
+  "AND_SEED": "R->L",
+  "AND": "AND_SEED->O",
+  "V": {
+    "Y": null
+  },
+  "RoleY": "V->Y",
+  "ArgsFY": [
+    "F",
+    "RoleY"
+  ],
+  "ArgsTY": [
+    "T",
+    "RoleY"
+  ],
+  "AnteF": "AND->ArgsFY",
+  "AnteT": "AND->ArgsTY",
+  "ImageF": [
+    "F"
+  ],
+  "ImageY": [
+    "RoleY"
+  ],
+  "BodyF": "AnteF->ImageF",
+  "BodyT": "AnteT->ImageY",
+  "RuleF": "V->BodyF",
+  "RuleT": "V->BodyT",
+  "Theory->RuleF": null,
+  "Theory->RuleT": null
+}

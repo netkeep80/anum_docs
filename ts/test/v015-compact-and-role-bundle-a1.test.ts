@@ -4,6 +4,10 @@
 // Research candidate only. Exact JSON/FORMAL is NOT Author-approved by this
 // test and MUST NOT enter the approved corpus without explicit Author review.
 
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 import {
   materializeExactSequence,
   readExactSequence,
@@ -116,57 +120,25 @@ function fixture(): Fixture {
   return Object.freeze({ memory, basis, grammarRoot, sourceAnetProfileRoot });
 }
 
-const canonicalFormal = [
-  "{",
-  "  O : ♂∞,",
-  "  C : ∞♀,",
-  "  L : O->C,",
-  "  U : C->O,",
-  "  T : L,",
-  "  F : U,",
-  "  AND_SEED : R->L,",
-  "  AND : AND_SEED->O,",
-  "  V : { Y },",
-  "  RoleY : V->Y,",
-  "  ArgsFY : [F,RoleY],",
-  "  ArgsTY : [T,RoleY],",
-  "  AnteF : AND->ArgsFY,",
-  "  AnteT : AND->ArgsTY,",
-  "  ImageF : [F],",
-  "  ImageY : [RoleY],",
-  "  BodyF : AnteF->ImageF,",
-  "  BodyT : AnteT->ImageY,",
-  "  RuleF : V->BodyF,",
-  "  RuleT : V->BodyT,",
-  "  Theory->RuleF,",
-  "  Theory->RuleT",
-  "}",
-].join("\n");
-
-const canonicalJson = JSON.stringify({
-  O: "♂∞",
-  C: "∞♀",
-  L: "O->C",
-  U: "C->O",
-  T: "L",
-  F: "U",
-  AND_SEED: "R->L",
-  AND: "AND_SEED->O",
-  V: { Y: null },
-  RoleY: "V->Y",
-  ArgsFY: ["F", "RoleY"],
-  ArgsTY: ["T", "RoleY"],
-  AnteF: "AND->ArgsFY",
-  AnteT: "AND->ArgsTY",
-  ImageF: ["F"],
-  ImageY: ["RoleY"],
-  BodyF: "AnteF->ImageF",
-  BodyT: "AnteT->ImageY",
-  RuleF: "V->BodyF",
-  RuleT: "V->BodyT",
-  "Theory->RuleF": null,
-  "Theory->RuleT": null,
-}, null, 2);
+const repoRoot = resolve(process.cwd(), "..");
+const canonicalFormal = readFileSync(
+  resolve(repoRoot, "formal/v0.15/candidates/compact-and.formal"),
+  "utf8",
+);
+const canonicalJson = readFileSync(
+  resolve(repoRoot, "formal/v0.15/candidates/compact-and.json"),
+  "utf8",
+);
+same(
+  createHash("sha256").update(canonicalFormal, "utf8").digest("hex"),
+  "16fddc9f8245fd7237a67424364d9b1991fa256287d0101509f038158c64edd6",
+  "exact candidate FORMAL digest",
+);
+same(
+  createHash("sha256").update(canonicalJson, "utf8").digest("hex"),
+  "efc4d9a04897903b05f5a37b77d5cf12848987049fbb31cb3624756f0bd7eab1",
+  "exact candidate JSON digest",
+);
 
 function compileCandidate(
   f: Fixture,
