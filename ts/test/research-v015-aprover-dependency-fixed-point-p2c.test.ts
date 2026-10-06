@@ -608,7 +608,9 @@ function run(reverse: boolean): RunResult {
 
   const certs = new Set<string>();
   for (const name of names) {
-    const endpoint = certEndpoint(memory, program, occurrence[name]);
+    const selected = occurrence[name];
+    assert(selected !== undefined, "named occurrence exists: " + String(name));
+    const endpoint = certEndpoint(memory, program, selected);
     if (hasCurrentEndpoint(memory, state, endpoint)) certs.add(name);
   }
 
