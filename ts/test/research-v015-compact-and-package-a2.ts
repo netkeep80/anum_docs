@@ -1,8 +1,8 @@
 // mts-version-evidence: candidate-v0.15-compact-and-a2
 // owner: #1980
 //
-// Temporary research package only. It deliberately emits no canonical AND
-// source artifact and confers no Author approval.
+// Author-approved compact Boolean AND frozen-backend regression package.
+// Generated compatibility topology has no MTS semantic authority.
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
@@ -136,7 +136,7 @@ function repositoryRoot(): string {
   for (const candidate of [resolve(process.cwd(), ".."), process.cwd()]) {
     if (
       existsSync(
-        resolve(candidate, "formal/v0.15/candidates/compact-and.formal"),
+        resolve(candidate, "formal/v0.15/regression/compact-and.formal"),
       )
     ) return candidate;
   }
@@ -145,11 +145,11 @@ function repositoryRoot(): string {
 
 const repoRoot = repositoryRoot();
 const formal = readFileSync(
-  resolve(repoRoot, "formal/v0.15/candidates/compact-and.formal"),
+  resolve(repoRoot, "formal/v0.15/regression/compact-and.formal"),
   "utf8",
 );
 const json = readFileSync(
-  resolve(repoRoot, "formal/v0.15/candidates/compact-and.json"),
+  resolve(repoRoot, "formal/v0.15/regression/compact-and.json"),
   "utf8",
 );
 same(
@@ -448,6 +448,34 @@ same(
   second.json,
   "compact AND compatibility package is allocation-order deterministic",
 );
+const persistedPackage = readFileSync(
+  resolve(repoRoot, "formal/v0.15/regression/compact-and.amemory-package.json"),
+  "utf8",
+);
+same(first.json, persistedPackage, "persisted compact AND package exact bytes");
+const persistedRecursive = readFileSync(
+  resolve(repoRoot, "formal/v0.15/regression/compact-and.recursive"),
+  "utf8",
+);
+same(
+  first.semanticWires.join("\n") + "\n",
+  persistedRecursive,
+  "persisted compact AND recursive semantic-member set",
+);
+const persistedEvidence = JSON.parse(readFileSync(
+  resolve(repoRoot, "formal/v0.15/regression/compact-and.amemory-evidence.json"),
+  "utf8",
+)) as {
+  readonly schema: string;
+  readonly runs: readonly unknown[];
+  readonly negative_run: unknown;
+};
+same(
+  persistedEvidence.schema,
+  "mts-v015-recursive-execution-evidence/v0.1",
+  "persisted compact AND A-memory evidence schema",
+);
+same(persistedEvidence.runs.length, 4, "persisted compact AND evidence rows");
 console.error(
   "COMPACT_AND_SEMANTIC_WIRES=" + JSON.stringify(first.semanticWires),
 );
