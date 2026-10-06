@@ -218,6 +218,35 @@
         "GPR_08_finite_arity_has_one_endpoint",
         "GPR_08_physical_nonmember_has_no_role_authority"
       ]
+    },
+    {
+      "id": "GPR-09",
+      "classification": "PROVED_AS_COMPOSITIONAL_GAMMA_COVARIANCE_UNDER_EXPLICIT_PHASE_COVARIANCE_AND_ACCEPTED_CTX03_MIRROR_TRANSPORT",
+      "premises": [
+        "accepted v0.14 CTX-03 supplies Link-native mirror transport for the one-sided START/END structural classes and preserves relative chirality under simultaneous inversion",
+        "the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness",
+        "analysis, synthesis and publication of the same Gamma operation each commute with the selected structural mirror transport",
+        "mirror transport is involutive for semantic state and boundary observations"
+      ],
+      "exclusions": [
+        "does not introduce a host reverse-direction flag, reverse executor or second Gamma command",
+        "does not make C or END a Foundation-global preferred orientation; C is a direct-gauge execution-space choice",
+        "does not derive concrete implementation phase covariance from CPU/WASM/WebGPU code; that remains a refinement obligation",
+        "State/Plan/Stage/Boundary types in the proof are verifier machinery, not additional MTS ontology",
+        "does not require J1 cross-current-member join"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_09_gamma_chirality_covariant",
+        "MTS.V015.External.GPR_09_direct_end_boundary_mirrors_to_start",
+        "MTS.V015.External.GPR_09_direct_gauge_mirror_equivalence",
+        "MTS.V015.External.GPR_09_boundary_mirror_roundtrip"
+      ],
+      "rocq": [
+        "GPR_09_gamma_chirality_covariant",
+        "GPR_09_direct_end_boundary_mirrors_to_start",
+        "GPR_09_direct_gauge_mirror_equivalence",
+        "GPR_09_boundary_mirror_roundtrip"
+      ]
     }
   ]
 }

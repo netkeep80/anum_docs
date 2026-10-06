@@ -120,6 +120,26 @@ const gpr05Evidence = JSON.parse(
   };
   theoremProjection: { currentV014InventoryUnchanged: boolean };
 };
+const gpr09Evidence = JSON.parse(
+  readFileSync(
+    resolve(repo, "proofs/v015-evidence/gpr09-c-boundary-chirality.json"),
+    "utf8",
+  ),
+) as {
+  id: string;
+  status: string;
+  externalCrossCheck: { ciRun: number; exactHead: string };
+  architecturalConsequence: {
+    directGaugeBoundary: string;
+    mirrorGaugeUsesSameGamma: boolean;
+    hostReverseDirectionModeRequired: boolean;
+    cIsFoundationGlobalPrivilege: boolean;
+    phaseCovarianceImpliesGammaCovariance: boolean;
+    concreteHardwareCovarianceProved: boolean;
+    j1Required: boolean;
+  };
+  theoremProjection: { currentV014InventoryUnchanged: boolean };
+};
 const gpr06Evidence = JSON.parse(
   readFileSync(
     resolve(repo, "proofs/v015-evidence/gpr06-exact-s0-opacity.json"),
@@ -185,7 +205,7 @@ assert(v015.allowedGlobalAxioms.rocq.length === 0, "v0.15 Rocq axiom allowlist e
 const ids = v015.targets.map((target) => target.id);
 assert(new Set(ids).size === ids.length, "v0.15 GPR target ids are unique");
 assert(
-  ids.length === 8 &&
+  ids.length === 9 &&
     ids.includes("GPR-01") &&
     ids.includes("GPR-02") &&
     ids.includes("GPR-03") &&
@@ -193,8 +213,9 @@ assert(
     ids.includes("GPR-05") &&
     ids.includes("GPR-06") &&
     ids.includes("GPR-07") &&
-    ids.includes("GPR-08"),
-  "current paired proof manifest contains exactly GPR-01, GPR-02, GPR-03, GPR-04, GPR-05, GPR-06, GPR-07 and GPR-08",
+    ids.includes("GPR-08") &&
+    ids.includes("GPR-09"),
+  "current paired proof manifest contains exactly GPR-01 through GPR-09",
 );
 
 function target(id: string): GprTarget {
@@ -263,6 +284,15 @@ assert(
 );
 assert(gpr08.lean4.length === 3, "GPR-08 paired Lean assurance symbols");
 assert(gpr08.rocq.length === 3, "GPR-08 paired Rocq assurance symbols");
+
+const gpr09 = target("GPR-09");
+assert(
+  gpr09.classification ===
+    "PROVED_AS_COMPOSITIONAL_GAMMA_COVARIANCE_UNDER_EXPLICIT_PHASE_COVARIANCE_AND_ACCEPTED_CTX03_MIRROR_TRANSPORT",
+  "GPR-09 classification keeps gauge covariance and CTX-03 premises explicit",
+);
+assert(gpr09.lean4.length === 4, "GPR-09 paired Lean assurance symbols");
+assert(gpr09.rocq.length === 4, "GPR-09 paired Rocq assurance symbols");
 
 const gpr07 = target("GPR-07");
 assert(
@@ -426,6 +456,35 @@ assert(
   "GPR-05 leaves accepted theorem inventory unchanged",
 );
 
+assert(gpr09Evidence.id === "GPR-09", "GPR-09 evidence id");
+assert(
+  gpr09Evidence.status ===
+    "PROVED_AS_COMPOSITIONAL_GAMMA_COVARIANCE_UNDER_EXPLICIT_PHASE_COVARIANCE_AND_ACCEPTED_CTX03_MIRROR_TRANSPORT",
+  "GPR-09 evidence classification",
+);
+assert(gpr09Evidence.externalCrossCheck.ciRun === 37477112802, "GPR-09 exact proof CI is pinned");
+assert(
+  gpr09Evidence.externalCrossCheck.exactHead === "184c00fd9bfd46c86051fe585a8a35ba91567251",
+  "GPR-09 proof head is pinned",
+);
+assert(
+  gpr09Evidence.architecturalConsequence.directGaugeBoundary === "C=END(R)" &&
+    gpr09Evidence.architecturalConsequence.mirrorGaugeUsesSameGamma === true &&
+    gpr09Evidence.architecturalConsequence.hostReverseDirectionModeRequired === false &&
+    gpr09Evidence.architecturalConsequence.cIsFoundationGlobalPrivilege === false,
+  "GPR-09 preserves gauge-relative C boundary and one Gamma",
+);
+assert(
+  gpr09Evidence.architecturalConsequence.phaseCovarianceImpliesGammaCovariance === true &&
+    gpr09Evidence.architecturalConsequence.concreteHardwareCovarianceProved === false &&
+    gpr09Evidence.architecturalConsequence.j1Required === false,
+  "GPR-09 keeps abstract covariance, implementation and J1 boundaries explicit",
+);
+assert(
+  gpr09Evidence.theoremProjection.currentV014InventoryUnchanged === true,
+  "GPR-09 leaves accepted theorem inventory unchanged",
+);
+
 assert(gpr06Evidence.id === "GPR-06", "GPR-06 evidence id");
 assert(
   gpr06Evidence.status === "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
@@ -496,7 +555,7 @@ assert(
 console.log([
   "MTS_V015_GPR_PROOF_ASSURANCE=GREEN",
   "V014_ASSURANCE_TARGETS=21_UNCHANGED",
-  "V015_GPR_TARGETS=8",
+  "V015_GPR_TARGETS=9",
   "GPR01=PAIRED_LEAN_ROCQ",
   "GPR02=PAIRED_LEAN_ROCQ",
   "GPR03=PAIRED_LEAN_ROCQ",
@@ -505,6 +564,7 @@ console.log([
   "GPR06=PAIRED_LEAN_ROCQ",
   "GPR07=PAIRED_LEAN_ROCQ",
   "GPR08=PAIRED_LEAN_ROCQ",
+  "GPR09=PAIRED_LEAN_ROCQ",
   "GLOBAL_AXIOM_ALLOWLIST=EMPTY",
   "GPR01_CLASSIFICATION=PROVED_AS_PURE_SINGLE_STATE_TRANSFORMER_REFINEMENT",
   "GPR02_CLASSIFICATION=PROVED_FOR_CANONICAL_ANET_MEMBERSHIP_CONVERGENCE_WITH_SEPARATE_PROVENANCE_AND_EXACTSEQUENCE_MULTIPLICITY",
@@ -514,4 +574,5 @@ console.log([
   "GPR06_CLASSIFICATION=PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
   "GPR07_CLASSIFICATION=PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
   "GPR08_CLASSIFICATION=PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",
+  "GPR09_CLASSIFICATION=PROVED_AS_COMPOSITIONAL_GAMMA_COVARIANCE_UNDER_EXPLICIT_PHASE_COVARIANCE_AND_ACCEPTED_CTX03_MIRROR_TRANSPORT",
 ].join(" "));

@@ -1,0 +1,83 @@
+{
+  "schema": "mts-v015-proof-evidence/v0.1",
+  "id": "GPR-09",
+  "title": "Direct-gauge C-boundary compatibility with chirality-covariant generalized reaction",
+  "status": "PROVED_AS_COMPOSITIONAL_GAMMA_COVARIANCE_UNDER_EXPLICIT_PHASE_COVARIANCE_AND_ACCEPTED_CTX03_MIRROR_TRANSPORT",
+  "ownerIssue": "#2001",
+  "mtsVersion": "v0.15-candidate",
+  "semanticClaim": [
+    "The Author-selected direct-gauge execution-space boundary C = END(R) remains a gauge-local choice rather than a Foundation-global orientation privilege.",
+    "Accepted v0.14 CTX-03 provides structural mirror transport between the corresponding one-sided START/END classes.",
+    "If analysis, synthesis and publication of the same Gamma commute with that mirror transport, their composition Gamma commutes with it as well.",
+    "Therefore the mirror gauge executes through the same Gamma law without a host reverse-direction mode."
+  ],
+  "explicitPremises": [
+    "accepted v0.14 CTX-03 supplies Link-native mirror transport for the one-sided START/END structural classes and preserves relative chirality under simultaneous inversion",
+    "the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness",
+    "analysis, synthesis and publication of the same Gamma operation each commute with the selected structural mirror transport",
+    "mirror transport is involutive for semantic state and boundary observations"
+  ],
+  "exclusions": [
+    "No second Gamma, reverse opcode, reverseDirection host flag or orientation datatype is introduced.",
+    "Concrete CPU/WASM/WebGPU covariance is not proved merely from the abstract phase laws.",
+    "The proof does not promote C to absolute Foundation authority.",
+    "The abstract State/Plan/Stage/Boundary carriers are verifier-side refinement vocabulary only.",
+    "No J1 capability is introduced."
+  ],
+  "acceptedFoundationDependencies": [
+    "CTX_03_relational_z2_support",
+    "CTX_03_context_selection_induces_local_roles",
+    "CTX_03_simultaneous_inversion_covariance",
+    "CTX_03_direction_witness_inversion"
+  ],
+  "externalCrossCheck": {
+    "authority": "external-only",
+    "allowedGlobalAxioms": {
+      "lean4": [],
+      "rocq": []
+    },
+    "manifest": "proofs/v015-external-proof-assurance.json",
+    "lean4": {
+      "path": "proofs/lean4/MtsV015GeneralizedReaction.lean",
+      "gitBlob": "5b7673d4538171397e55da73028f864cf329b166",
+      "symbols": [
+        "MTS.V015.External.GPR_09_gamma_chirality_covariant",
+        "MTS.V015.External.GPR_09_direct_end_boundary_mirrors_to_start",
+        "MTS.V015.External.GPR_09_direct_gauge_mirror_equivalence",
+        "MTS.V015.External.GPR_09_boundary_mirror_roundtrip"
+      ],
+      "result": "SUCCESS"
+    },
+    "rocq": {
+      "path": "proofs/coq/MtsV015GeneralizedReaction.v",
+      "gitBlob": "b89a0dddb3a800629d7f234bd81b06c6f0d3f0b9",
+      "symbols": [
+        "GPR_09_gamma_chirality_covariant",
+        "GPR_09_direct_end_boundary_mirrors_to_start",
+        "GPR_09_direct_gauge_mirror_equivalence",
+        "GPR_09_boundary_mirror_roundtrip"
+      ],
+      "result": "SUCCESS"
+    },
+    "exactHead": "184c00fd9bfd46c86051fe585a8a35ba91567251",
+    "ciRun": 37477112802
+  },
+  "executableWitnesses": [
+    "ts/test/v015-gpr09-chirality-covariance.test.ts",
+    "ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts",
+    "ts/test/v015-context-theory-self-contained-a6.test.ts"
+  ],
+  "architecturalConsequence": {
+    "directGaugeBoundary": "C=END(R)",
+    "mirrorGaugeUsesSameGamma": true,
+    "hostReverseDirectionModeRequired": false,
+    "cIsFoundationGlobalPrivilege": false,
+    "phaseCovarianceImpliesGammaCovariance": true,
+    "concreteHardwareCovarianceProved": false,
+    "j1Required": false
+  },
+  "theoremProjection": {
+    "currentV014InventoryUnchanged": true,
+    "generatedTheoremCatalogIntegration": "PENDING #1963/#1861"
+  }
+}
