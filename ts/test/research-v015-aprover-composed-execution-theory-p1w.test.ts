@@ -100,8 +100,10 @@ const membershipRuntimeAdmission = admitStructuralRule(
   executionTheory,
   membershipRule,
 );
+const membershipTriggerKey =
+  memory.poles(memory.poles(memberBefore).end).start;
 memory.ensure(
-  memory.poles(memberBefore).start,
+  membershipTriggerKey,
   membershipRuntimeAdmission,
 );
 
