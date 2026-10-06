@@ -80,8 +80,11 @@ assert(v015.allowedGlobalAxioms.rocq.length === 0, "v0.15 Rocq axiom allowlist e
 const ids = v015.targets.map((target) => target.id);
 assert(new Set(ids).size === ids.length, "v0.15 GPR target ids are unique");
 assert(
-  ids.length === 2 && ids.includes("GPR-06") && ids.includes("GPR-07"),
-  "current paired proof manifest contains exactly GPR-06 and GPR-07",
+  ids.length === 3 &&
+    ids.includes("GPR-06") &&
+    ids.includes("GPR-07") &&
+    ids.includes("GPR-08"),
+  "current paired proof manifest contains exactly GPR-06, GPR-07 and GPR-08",
 );
 
 function target(id: string): GprTarget {
@@ -97,6 +100,15 @@ assert(
 );
 assert(gpr06.lean4.length === 3, "GPR-06 paired Lean assurance symbols");
 assert(gpr06.rocq.length === 3, "GPR-06 paired Rocq assurance symbols");
+
+const gpr08 = target("GPR-08");
+assert(
+  gpr08.classification ===
+    "PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",
+  "GPR-08 classification keeps the finite-J0 and semantic-membership boundary explicit",
+);
+assert(gpr08.lean4.length === 3, "GPR-08 paired Lean assurance symbols");
+assert(gpr08.rocq.length === 3, "GPR-08 paired Rocq assurance symbols");
 
 const gpr07 = target("GPR-07");
 assert(
@@ -172,10 +184,12 @@ assert(
 console.log([
   "MTS_V015_GPR_PROOF_ASSURANCE=GREEN",
   "V014_ASSURANCE_TARGETS=21_UNCHANGED",
-  "V015_GPR_TARGETS=2",
+  "V015_GPR_TARGETS=3",
   "GPR06=PAIRED_LEAN_ROCQ",
   "GPR07=PAIRED_LEAN_ROCQ",
+  "GPR08=PAIRED_LEAN_ROCQ",
   "GLOBAL_AXIOM_ALLOWLIST=EMPTY",
   "GPR06_CLASSIFICATION=PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
   "GPR07_CLASSIFICATION=PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
+  "GPR08_CLASSIFICATION=PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",
 ].join(" "));
