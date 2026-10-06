@@ -1,8 +1,8 @@
 // mts-version-evidence: candidate-v0.15-compact-and-a1
 // owner: #1980
 //
-// Research candidate only. Exact JSON/FORMAL is NOT Author-approved by this
-// test and MUST NOT enter the approved corpus without explicit Author review.
+// Author-approved exact Boolean AND regression artifact. This test binds
+// execution semantics to the immutable regression FORMAL/JSON digests.
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
@@ -124,7 +124,7 @@ function repositoryRoot(): string {
   for (const candidate of [resolve(process.cwd(), ".."), process.cwd()]) {
     if (
       existsSync(
-        resolve(candidate, "formal/v0.15/candidates/compact-and.formal"),
+        resolve(candidate, "formal/v0.15/regression/compact-and.formal"),
       )
     ) return candidate;
   }
@@ -133,11 +133,11 @@ function repositoryRoot(): string {
 
 const repoRoot = repositoryRoot();
 const canonicalFormal = readFileSync(
-  resolve(repoRoot, "formal/v0.15/candidates/compact-and.formal"),
+  resolve(repoRoot, "formal/v0.15/regression/compact-and.formal"),
   "utf8",
 );
 const canonicalJson = readFileSync(
-  resolve(repoRoot, "formal/v0.15/candidates/compact-and.json"),
+  resolve(repoRoot, "formal/v0.15/regression/compact-and.json"),
   "utf8",
 );
 same(
@@ -365,6 +365,6 @@ console.log([
   "FOREIGN_THEORY=INERT",
   "PRESENTATION_RENAME=SEMANTIC_INVARIANT",
   "AND_SPECIFIC_RUNTIME_DISPATCH=0",
-  "CANONICAL_FILES_PERSISTED=FALSE",
-  "AUTHOR_REVIEW_PENDING=TRUE",
+  "CANONICAL_FILES_PERSISTED=TRUE",
+  "AUTHOR_APPROVED=TRUE",
 ].join(" "));
