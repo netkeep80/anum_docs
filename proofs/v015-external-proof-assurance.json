@@ -9,6 +9,32 @@
   },
   "targets": [
     {
+      "id": "GPR-06",
+      "classification": "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
+      "premises": [
+        "finite fixed exact support contains every pre-authored exact consequence available to the S0 machine",
+        "the opaque current input identity may be preserved",
+        "each exact-only generation preserves closure: every emitted Link is either the opaque input identity or belongs to the fixed exact support",
+        "no structural reflection/decomposition or fresh structural constructor can escape that closure"
+      ],
+      "exclusions": [
+        "does not prove one particular S1/S2 API or implementation is uniquely necessary",
+        "does not introduce or require J1 cross-current-member join",
+        "does not claim the concrete frozen A-memory implementation satisfies the closure law without separate refinement evidence",
+        "does not forbid carrying the opaque whole input identity"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_06_finite_exact_closure",
+        "MTS.V015.External.GPR_06_fresh_structural_target_unreachable",
+        "MTS.V015.External.GPR_06_structure_sensitive_function_requires_more_than_exact_S0"
+      ],
+      "rocq": [
+        "GPR_06_finite_exact_closure",
+        "GPR_06_fresh_structural_target_unreachable",
+        "GPR_06_structure_sensitive_function_requires_more_than_exact_S0"
+      ]
+    },
+    {
       "id": "GPR-07",
       "classification": "PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
       "premises": [
