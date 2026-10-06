@@ -7,30 +7,35 @@
   "F": "U",
   "AND_SEED": "R->L",
   "AND": "AND_SEED->O",
-  "V": {
-    "Y": null
-  },
-  "RoleY": "V->Y",
-  "ArgsFY": [
+  "V0": {},
+  "ArgsFF": [
     "F",
-    "RoleY"
+    "F"
   ],
-  "ArgsTY": [
+  "ArgsFT": [
+    "F",
+    "T"
+  ],
+  "ArgsTF": [
     "T",
-    "RoleY"
+    "F"
   ],
-  "AnteF": "AND->ArgsFY",
-  "AnteT": "AND->ArgsTY",
+  "ArgsTT": [
+    "T",
+    "T"
+  ],
   "ImageF": [
     "F"
   ],
-  "ImageY": [
-    "RoleY"
+  "ImageT": [
+    "T"
   ],
-  "BodyF": "AnteF->ImageF",
-  "BodyT": "AnteT->ImageY",
-  "RuleF": "V->BodyF",
-  "RuleT": "V->BodyT",
-  "Theory->RuleF": null,
-  "Theory->RuleT": null
+  "RuleFF": "V0->((AND->ArgsFF)->ImageF)",
+  "RuleFT": "V0->((AND->ArgsFT)->ImageF)",
+  "RuleTF": "V0->((AND->ArgsTF)->ImageF)",
+  "RuleTT": "V0->((AND->ArgsTT)->ImageT)",
+  "Theory->RuleFF": null,
+  "Theory->RuleFT": null,
+  "Theory->RuleTF": null,
+  "Theory->RuleTT": null
 }
