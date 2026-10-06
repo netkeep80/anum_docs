@@ -780,7 +780,7 @@ Definition GPR05LocalWork
   fold_right
     (fun current total =>
       fold_right
-        (fun rule local => local_match_cost current rule + local)
+        (fun rule subtotal => local_match_cost current rule + subtotal)
         0
         rules + total)
     0

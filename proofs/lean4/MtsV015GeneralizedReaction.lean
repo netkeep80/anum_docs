@@ -752,7 +752,7 @@ def GPR05LocalWork
   currents.foldr
     (fun current total =>
       rules.foldr
-        (fun rule local => localMatchCost current rule + local)
+        (fun rule subtotal => localMatchCost current rule + subtotal)
         0 + total)
     0
 
