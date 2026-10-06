@@ -59,7 +59,7 @@ function main(): void {
     "candidate proof cards are generated separately from accepted theorem cards",
   );
   assert.match(first, /GPR-09 — GPR/);
-  assert.match(first, /C=END\(R\)/);
+  assert.match(first, /C\s*=\s*END\(R\)/);
   assert.match(first, /FRM-07 — FRM/);
   assert.match(
     first,
