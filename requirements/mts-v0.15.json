@@ -465,7 +465,7 @@
       "id": "V15-AND-01",
       "group": "AND",
       "ownerIssue": "#1980",
-      "state": "OPEN",
+      "state": "VERTICAL_GREEN",
       "mandatory": true,
       "summary": "A compact Author-gated Boolean AND source ANet contains only the exact local T/F truth-table semantics expressed as zero-role Rules; legacy RoleDictionary/index/Scope/interpreter scaffolding is not canonical source.",
       "dependsOn": [
@@ -490,13 +490,15 @@
           "ts/test/research-v015-compact-and-package-a2.ts"
         ]
       },
-      "candidateSource": "formal/v0.15/candidates/compact-and.formal"
+      "canonicalSource": "formal/v0.15/regression/compact-and.formal",
+      "canonicalJson": "formal/v0.15/regression/compact-and.json",
+      "authorApprovalEvidence": "netkeep80/anum_docs#1980 issuecomment-6023632594"
     },
     {
       "id": "V15-AND-02",
       "group": "AND",
       "ownerIssue": "#1980",
-      "state": "OPEN",
+      "state": "VERTICAL_GREEN",
       "mandatory": true,
       "summary": "Boolean AND executes through the shared matcher/Γ-compatible path and frozen compatibility adapter with zero AND-specific host dispatch; operands outside the local T/F domain are NO_MATCH rather than pass-through.",
       "dependsOn": [
@@ -521,13 +523,15 @@
           "ts/test/research-v015-compact-and-package-a2.ts"
         ]
       },
-      "candidateSource": "formal/v0.15/candidates/compact-and.formal"
+      "canonicalSource": "formal/v0.15/regression/compact-and.formal",
+      "canonicalJson": "formal/v0.15/regression/compact-and.json",
+      "authorApprovalEvidence": "netkeep80/anum_docs#1980 issuecomment-6023632594"
     },
     {
       "id": "V15-AND-03",
       "group": "AND",
       "ownerIssue": "#1980",
-      "state": "OPEN",
+      "state": "VERTICAL_GREEN",
       "mandatory": true,
       "summary": "MTS has one canonical semantic Boolean AND source/model. Frozen or future A-memory backends may use generated compatibility or optimized AND lowerings only when they are semantics-preserving with respect to the exact T/F-domain truth table and NO_MATCH boundary, remain generic/backend-owned, and stay outside canonical AND semantic authority.",
       "dependsOn": [
@@ -548,7 +552,9 @@
           "ts/test/research-v015-compact-and-package-a2.ts"
         ]
       },
-      "candidateSource": "formal/v0.15/candidates/compact-and.formal"
+      "canonicalSource": "formal/v0.15/regression/compact-and.formal",
+      "canonicalJson": "formal/v0.15/regression/compact-and.json",
+      "authorApprovalEvidence": "netkeep80/anum_docs#1980 issuecomment-6023632594"
     },
     {
       "id": "V15-AND-04",
