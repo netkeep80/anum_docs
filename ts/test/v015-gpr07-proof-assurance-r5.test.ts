@@ -48,6 +48,23 @@ const gpr01Evidence = JSON.parse(
   };
   theoremProjection: { currentV014InventoryUnchanged: boolean };
 };
+const gpr02Evidence = JSON.parse(
+  readFileSync(
+    resolve(repo, "proofs/v015-evidence/gpr02-canonical-anet-convergence.json"),
+    "utf8",
+  ),
+) as {
+  id: string;
+  status: string;
+  externalCrossCheck: { ciRun: number; exactHead: string };
+  architecturalConsequence: {
+    duplicateCanonicalDerivationCreatesMultipleSemanticMemberships: boolean;
+    membershipContributionOrderIsSemantic: boolean;
+    provenanceOccurrencesMayRemainMultiple: boolean;
+    exactSequenceMultiplicityCollapsedByAnetIdempotence: boolean;
+  };
+  theoremProjection: { currentV014InventoryUnchanged: boolean };
+};
 const gpr06Evidence = JSON.parse(
   readFileSync(
     resolve(repo, "proofs/v015-evidence/gpr06-exact-s0-opacity.json"),
@@ -113,12 +130,13 @@ assert(v015.allowedGlobalAxioms.rocq.length === 0, "v0.15 Rocq axiom allowlist e
 const ids = v015.targets.map((target) => target.id);
 assert(new Set(ids).size === ids.length, "v0.15 GPR target ids are unique");
 assert(
-  ids.length === 4 &&
+  ids.length === 5 &&
     ids.includes("GPR-01") &&
+    ids.includes("GPR-02") &&
     ids.includes("GPR-06") &&
     ids.includes("GPR-07") &&
     ids.includes("GPR-08"),
-  "current paired proof manifest contains exactly GPR-01, GPR-06, GPR-07 and GPR-08",
+  "current paired proof manifest contains exactly GPR-01, GPR-02, GPR-06, GPR-07 and GPR-08",
 );
 
 function target(id: string): GprTarget {
@@ -134,6 +152,15 @@ assert(
 );
 assert(gpr01.lean4.length === 3, "GPR-01 paired Lean assurance symbols");
 assert(gpr01.rocq.length === 3, "GPR-01 paired Rocq assurance symbols");
+
+const gpr02 = target("GPR-02");
+assert(
+  gpr02.classification ===
+    "PROVED_FOR_CANONICAL_ANET_MEMBERSHIP_CONVERGENCE_WITH_SEPARATE_PROVENANCE_AND_EXACTSEQUENCE_MULTIPLICITY",
+  "GPR-02 classification keeps membership, provenance and ExactSequence layers distinct",
+);
+assert(gpr02.lean4.length === 4, "GPR-02 paired Lean assurance symbols");
+assert(gpr02.rocq.length === 4, "GPR-02 paired Rocq assurance symbols");
 
 const gpr06 = target("GPR-06");
 assert(
@@ -206,6 +233,32 @@ assert(
   "GPR-01 leaves accepted theorem inventory unchanged",
 );
 
+assert(gpr02Evidence.id === "GPR-02", "GPR-02 evidence id");
+assert(
+  gpr02Evidence.status ===
+    "PROVED_FOR_CANONICAL_ANET_MEMBERSHIP_CONVERGENCE_WITH_SEPARATE_PROVENANCE_AND_EXACTSEQUENCE_MULTIPLICITY",
+  "GPR-02 evidence classification",
+);
+assert(gpr02Evidence.externalCrossCheck.ciRun === 37454497074, "GPR-02 exact proof CI is pinned");
+assert(
+  gpr02Evidence.externalCrossCheck.exactHead === "7979c3fc64f1beb7859f005c468759deb2c708f3",
+  "GPR-02 proof head is pinned",
+);
+assert(
+  gpr02Evidence.architecturalConsequence.duplicateCanonicalDerivationCreatesMultipleSemanticMemberships === false &&
+    gpr02Evidence.architecturalConsequence.membershipContributionOrderIsSemantic === false,
+  "GPR-02 semantic ANet membership is idempotent and contribution-order independent",
+);
+assert(
+  gpr02Evidence.architecturalConsequence.provenanceOccurrencesMayRemainMultiple === true &&
+    gpr02Evidence.architecturalConsequence.exactSequenceMultiplicityCollapsedByAnetIdempotence === false,
+  "GPR-02 preserves provenance occurrences and ExactSequence multiplicity",
+);
+assert(
+  gpr02Evidence.theoremProjection.currentV014InventoryUnchanged === true,
+  "GPR-02 leaves accepted theorem inventory unchanged",
+);
+
 assert(gpr06Evidence.id === "GPR-06", "GPR-06 evidence id");
 assert(
   gpr06Evidence.status === "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
@@ -276,13 +329,15 @@ assert(
 console.log([
   "MTS_V015_GPR_PROOF_ASSURANCE=GREEN",
   "V014_ASSURANCE_TARGETS=21_UNCHANGED",
-  "V015_GPR_TARGETS=4",
+  "V015_GPR_TARGETS=5",
   "GPR01=PAIRED_LEAN_ROCQ",
+  "GPR02=PAIRED_LEAN_ROCQ",
   "GPR06=PAIRED_LEAN_ROCQ",
   "GPR07=PAIRED_LEAN_ROCQ",
   "GPR08=PAIRED_LEAN_ROCQ",
   "GLOBAL_AXIOM_ALLOWLIST=EMPTY",
   "GPR01_CLASSIFICATION=PROVED_AS_PURE_SINGLE_STATE_TRANSFORMER_REFINEMENT",
+  "GPR02_CLASSIFICATION=PROVED_FOR_CANONICAL_ANET_MEMBERSHIP_CONVERGENCE_WITH_SEPARATE_PROVENANCE_AND_EXACTSEQUENCE_MULTIPLICITY",
   "GPR06_CLASSIFICATION=PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
   "GPR07_CLASSIFICATION=PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
   "GPR08_CLASSIFICATION=PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",

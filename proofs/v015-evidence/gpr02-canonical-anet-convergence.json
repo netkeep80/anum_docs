@@ -1,0 +1,72 @@
+{
+  "schema": "mts-v015-proof-evidence/v0.1",
+  "id": "GPR-02",
+  "title": "Canonical ANet membership convergence keeps provenance occurrences and ExactSequence multiplicity distinct",
+  "status": "PROVED_FOR_CANONICAL_ANET_MEMBERSHIP_CONVERGENCE_WITH_SEPARATE_PROVENANCE_AND_EXACTSEQUENCE_MULTIPLICITY",
+  "ownerIssue": "#2001",
+  "mtsVersion": "v0.15-candidate",
+  "semanticClaim": [
+    "Deriving the same canonical Link more than once yields one semantic ANet membership.",
+    "The order in which independent Link contributions arrive is nonsemantic at the ANet membership level.",
+    "Distinct derivation/provenance events may remain distinct evidence occurrences even when they project to the same semantic Link membership.",
+    "ANet membership idempotence does not collapse repeated positions in ExactSequence: [X,X] remains distinct from [X]."
+  ],
+  "explicitPremises": [
+    "Semantic ANet state is interpreted extensionally as Link membership.",
+    "Contribution convergence is stated only at the semantic membership projection.",
+    "Provenance/evidence is carried separately from semantic membership.",
+    "ExactSequence is a recursive positional Link carrier and preserves order and multiplicity."
+  ],
+  "exclusions": [
+    "No proof is claimed that physical storage has only one record for a canonical Link.",
+    "No runtime deduplication opcode or separate semantic command is introduced.",
+    "No provenance event is erased merely because another event derives the same Link.",
+    "ExactSequence is not treated as ordinary extensional ANet membership.",
+    "This does not close generation isolation or scheduler/partition refinement; those are GPR-03 and GPR-04."
+  ],
+  "externalCrossCheck": {
+    "authority": "external-only",
+    "allowedGlobalAxioms": {
+      "lean4": [],
+      "rocq": []
+    },
+    "manifest": "proofs/v015-external-proof-assurance.json",
+    "lean4": {
+      "path": "proofs/lean4/MtsV015GeneralizedReaction.lean",
+      "gitBlob": "0fec1593a8aeee66bf71f2b9aab74d51648a4bad",
+      "symbols": [
+        "MTS.V015.External.GPR_02_duplicate_membership_idempotent",
+        "MTS.V015.External.GPR_02_membership_contribution_commutes",
+        "MTS.V015.External.GPR_02_duplicate_provenance_events_are_preserved",
+        "MTS.V015.External.GPR_02_exact_sequence_multiplicity_not_collapsed"
+      ],
+      "result": "SUCCESS"
+    },
+    "rocq": {
+      "path": "proofs/coq/MtsV015GeneralizedReaction.v",
+      "gitBlob": "a1299b8db15066f6352e058211b325a12c3f44ba",
+      "symbols": [
+        "GPR_02_duplicate_membership_idempotent",
+        "GPR_02_membership_contribution_commutes",
+        "GPR_02_duplicate_provenance_events_are_preserved",
+        "GPR_02_exact_sequence_multiplicity_not_collapsed"
+      ],
+      "result": "SUCCESS"
+    },
+    "exactHead": "7979c3fc64f1beb7859f005c468759deb2c708f3",
+    "ciRun": 37454497074
+  },
+  "regressionBinding": [
+    "ts/test/v015-gpr07-proof-assurance-r5.test.ts"
+  ],
+  "architecturalConsequence": {
+    "duplicateCanonicalDerivationCreatesMultipleSemanticMemberships": false,
+    "membershipContributionOrderIsSemantic": false,
+    "provenanceOccurrencesMayRemainMultiple": true,
+    "exactSequenceMultiplicityCollapsedByAnetIdempotence": false
+  },
+  "theoremProjection": {
+    "currentV014InventoryUnchanged": true,
+    "generatedTheoremCatalogIntegration": "PENDING #1963/#1861"
+  }
+}

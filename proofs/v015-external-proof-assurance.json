@@ -33,6 +33,35 @@
       ]
     },
     {
+      "id": "GPR-02",
+      "classification": "PROVED_FOR_CANONICAL_ANET_MEMBERSHIP_CONVERGENCE_WITH_SEPARATE_PROVENANCE_AND_EXACTSEQUENCE_MULTIPLICITY",
+      "premises": [
+        "semantic ANet state is extensional Link membership, so deriving the same canonical Link more than once does not create multiple semantic memberships",
+        "order of independent Link contributions is nonsemantic at the ANet membership projection",
+        "provenance/evidence occurrences are represented separately from semantic ANet membership",
+        "ExactSequence is a positional recursive Link carrier whose multiplicity is semantically significant"
+      ],
+      "exclusions": [
+        "does not erase or deduplicate provenance/evidence events that derive the same Link",
+        "does not introduce a separate runtime deduplication command; the result is a membership law",
+        "does not collapse ExactSequence multiplicity such as [X,X] to [X]",
+        "does not claim provenance ordering is semantic ANet membership",
+        "does not alter accepted v0.14 theorem inventory"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_02_duplicate_membership_idempotent",
+        "MTS.V015.External.GPR_02_membership_contribution_commutes",
+        "MTS.V015.External.GPR_02_duplicate_provenance_events_are_preserved",
+        "MTS.V015.External.GPR_02_exact_sequence_multiplicity_not_collapsed"
+      ],
+      "rocq": [
+        "GPR_02_duplicate_membership_idempotent",
+        "GPR_02_membership_contribution_commutes",
+        "GPR_02_duplicate_provenance_events_are_preserved",
+        "GPR_02_exact_sequence_multiplicity_not_collapsed"
+      ]
+    },
+    {
       "id": "GPR-06",
       "classification": "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
       "premises": [
