@@ -216,6 +216,59 @@ validateCandidate(requirements, traceability);
 }
 
 
+
+// Scope-boundary anti-drift: v0.15 execution core must not reacquire v0.16 proof/aprover blockers.
+{
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for v0.15/v0.16 scope boundary");
+  const byId = new Map((list as Json[]).map((item) => [text(item.id, "scope id"), item]));
+  const deferredProofIds = [
+    "V15-DUAL-01",
+    "V15-DUAL-02",
+    "V15-THM-01",
+    "V15-THM-02",
+    "V15-THM-03",
+    "V15-PROOF-01",
+    "V15-PROOF-EXEC-01",
+    "V15-PROOF-EXEC-02",
+    "V15-PROOF-EXEC-03",
+  ];
+  for (const id of deferredProofIds) {
+    assert(!byId.has(id), id + " is v0.16 scope and must not block v0.15");
+  }
+
+  const gamma = byId.get("V15-GAMMA-01");
+  assert(gamma !== undefined, "V15-GAMMA-01 exists");
+  assert(text(gamma.state, "Gamma state") === "COMPONENT_GREEN", "closed #2001 projects to COMPONENT_GREEN");
+  assert(text(gamma.ownerIssue, "Gamma owner") === "#2001", "Gamma owner #2001");
+  assert(!/aprover/i.test(text(gamma.summary, "Gamma summary")), "v0.15 Gamma summary excludes aprover");
+  assert(/meta\/interpreter ANets/i.test(text(gamma.summary, "Gamma summary core")), "Gamma retains self-hosted meta/interpreter scope");
+
+  const ctx = byId.get("V15-CTX-01");
+  assert(ctx !== undefined, "V15-CTX-01 exists");
+  assert(text(ctx.ownerIssue, "CTX owner") === "#1987", "execution authority is owned by #1987");
+  assert(/semantic ANet membership/i.test(text(ctx.summary, "CTX summary")), "execution authority comes from ANet membership");
+  assert(!/launch-manifest authority/i.test(text(ctx.summary, "CTX summary stale host authority")), "launch manifest is not semantic authority");
+
+  const stage = byId.get("V15-STAGE-01");
+  assert(stage !== undefined, "V15-STAGE-01 exists");
+  assert(text(stage.ownerIssue, "STAGE owner") === "#1911", "compiler/metacompiler owns staged compilation boundary");
+
+  const corpus = byId.get("V15-CORPUS-01");
+  assert(corpus !== undefined, "V15-CORPUS-01 exists");
+  assert(/Author-approved v0\.15 executable artifact/i.test(text(corpus.summary, "CORPUS summary")), "frozen harness covers approved executable corpus");
+  assert(!/every semantic item/i.test(text(corpus.summary, "CORPUS stale inventory")), "old A-memory semantic inventory is not v0.15 scope");
+
+  const andBoundary = byId.get("V15-AND-03");
+  assert(andBoundary !== undefined, "V15-AND-03 exists");
+  assert(/one canonical semantic AND/i.test(text(andBoundary.summary, "AND semantic authority")), "one canonical AND semantics");
+  assert(/semantics-preserving/i.test(text(andBoundary.summary, "AND lowering boundary")), "optimized/backend lowerings require semantic preservation");
+
+  const review = record(requirements.authorJsonReview, "authorJsonReview scope");
+  const groups = strings(review.applicableGroups, "authorJsonReview applicable groups");
+  assert(!groups.includes("THM") && !groups.includes("PROOF"), "v0.16 proof groups removed from v0.15 Author JSON scope");
+}
+
 // Negative: a mere state flip cannot promote an R0 requirement to VERTICAL_GREEN.
 {
   const req = { id: "X", state: "VERTICAL_GREEN" };
@@ -300,4 +353,8 @@ console.log([
   "APPROVED_JSON_CORPUS_OWNER=1978",
   "REAL_AMEMORY_REPLAY_OWNER=amemory#482",
   "ANET_TERMINOLOGY=GREEN",
+  "V016_PROOF_SCOPE_REMOVED=TRUE",
+  "GAMMA_SCOPE_CORE_ONLY=TRUE",
+  "CTX_AUTHORITY_SELF_HOSTED=TRUE",
+  "CANONICAL_AND_BACKEND_LOWERING_BOUNDARY=GREEN",
 ].join(" "));
