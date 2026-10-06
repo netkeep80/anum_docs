@@ -14,6 +14,13 @@ function root(): string {
   return found;
 }
 
+interface GprTarget {
+  readonly id: string;
+  readonly classification: string;
+  readonly lean4: readonly string[];
+  readonly rocq: readonly string[];
+}
+
 const repo = root();
 const accepted = JSON.parse(
   readFileSync(resolve(repo, "proofs/external-proof-assurance.json"), "utf8"),
@@ -22,12 +29,7 @@ const v015 = JSON.parse(
   readFileSync(resolve(repo, "proofs/v015-external-proof-assurance.json"), "utf8"),
 ) as {
   allowedGlobalAxioms: { lean4: string[]; rocq: string[] };
-  targets: Array<{
-    id: string;
-    classification: string;
-    lean4: string[];
-    rocq: string[];
-  }>;
+  targets: GprTarget[];
 };
 const evidence = JSON.parse(
   readFileSync(
@@ -56,17 +58,37 @@ assert(
   "v0.15 GPR targets do not leak into accepted v0.14 assurance",
 );
 
-assert(v015.targets.length === 1, "current v0.15 paired proof manifest has one classified target");
-const gpr07 = v015.targets[0]!;
-assert(gpr07.id === "GPR-07", "GPR-07 is the v0.15 proof target");
+assert(v015.allowedGlobalAxioms.lean4.length === 0, "v0.15 Lean axiom allowlist empty");
+assert(v015.allowedGlobalAxioms.rocq.length === 0, "v0.15 Rocq axiom allowlist empty");
+
+const ids = v015.targets.map((target) => target.id);
+assert(new Set(ids).size === ids.length, "v0.15 GPR target ids are unique");
+assert(
+  ids.length === 2 && ids.includes("GPR-06") && ids.includes("GPR-07"),
+  "current paired proof manifest contains exactly GPR-06 and GPR-07",
+);
+
+function target(id: string): GprTarget {
+  const found = v015.targets.find((candidate) => candidate.id === id);
+  assert(found !== undefined, "missing target " + id);
+  return found;
+}
+
+const gpr06 = target("GPR-06");
+assert(
+  gpr06.classification === "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
+  "GPR-06 classification keeps the exact-S0 closure premise explicit",
+);
+assert(gpr06.lean4.length === 3, "GPR-06 paired Lean assurance symbols");
+assert(gpr06.rocq.length === 3, "GPR-06 paired Rocq assurance symbols");
+
+const gpr07 = target("GPR-07");
 assert(
   gpr07.classification === "PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
   "GPR-07 classification keeps its premises explicit",
 );
-assert(v015.allowedGlobalAxioms.lean4.length === 0, "v0.15 Lean axiom allowlist empty");
-assert(v015.allowedGlobalAxioms.rocq.length === 0, "v0.15 Rocq axiom allowlist empty");
-assert(gpr07.lean4.length === 2, "paired Lean assurance symbols");
-assert(gpr07.rocq.length === 2, "paired Rocq assurance symbols");
+assert(gpr07.lean4.length === 2, "GPR-07 paired Lean assurance symbols");
+assert(gpr07.rocq.length === 2, "GPR-07 paired Rocq assurance symbols");
 
 for (const forbidden of ["sorry", "axiom "]) {
   assert(!lean.toLowerCase().includes(forbidden), "Lean source excludes " + forbidden);
@@ -75,14 +97,15 @@ for (const forbidden of ["admitted.", "axiom "]) {
   assert(!rocq.toLowerCase().includes(forbidden), "Rocq source excludes " + forbidden);
 }
 
-assert(
-  lean.includes("GPR_07_grounded_zero_role_refinement"),
-  "Lean contains GPR-07 refinement theorem",
-);
-assert(
-  rocq.includes("GPR_07_grounded_zero_role_refinement"),
-  "Rocq contains GPR-07 refinement theorem",
-);
+for (const proofTarget of v015.targets) {
+  for (const symbol of proofTarget.lean4) {
+    const local = symbol.split(".").at(-1);
+    assert(local !== undefined && lean.includes(local), "Lean contains " + symbol);
+  }
+  for (const symbol of proofTarget.rocq) {
+    assert(rocq.includes(symbol), "Rocq contains " + symbol);
+  }
+}
 
 assert(
   ci.includes("MtsV015GeneralizedReaction.lean") &&
@@ -91,21 +114,24 @@ assert(
   "CI compiles and assures the separate v0.15 paired proof lane",
 );
 
-assert(evidence.id === "GPR-07", "evidence id");
+assert(evidence.id === "GPR-07", "GPR-07 evidence id");
 assert(
   evidence.status === "PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
-  "evidence classification",
+  "GPR-07 evidence classification",
 );
-assert(evidence.externalCrossCheck.ciRun === 37335710302, "exact proof CI is pinned");
+assert(evidence.externalCrossCheck.ciRun === 37335710302, "GPR-07 exact proof CI is pinned");
 assert(
   evidence.theoremProjection.currentV014InventoryUnchanged === true,
   "accepted theorem inventory remains unchanged",
 );
 
 console.log([
-  "MTS_V015_GPR07_PROOF_ASSURANCE=GREEN",
+  "MTS_V015_GPR_PROOF_ASSURANCE=GREEN",
   "V014_ASSURANCE_TARGETS=21_UNCHANGED",
-  "V015_GPR07=PAIRED_LEAN_ROCQ",
+  "V015_GPR_TARGETS=2",
+  "GPR06=PAIRED_LEAN_ROCQ",
+  "GPR07=PAIRED_LEAN_ROCQ",
   "GLOBAL_AXIOM_ALLOWLIST=EMPTY",
+  "GPR06_CLASSIFICATION=PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
   "GPR07_CLASSIFICATION=PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
 ].join(" "));
