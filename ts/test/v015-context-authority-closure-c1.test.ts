@@ -111,6 +111,56 @@ assert(text(context.status, "context status") === "PROVED_RESEARCH", "context ca
 assert(text(context.authorDecision, "context Author decision") === "APPROVED_FOR_V015", "C boundary Author approved");
 assert(text(context.directGaugeBoundary, "direct gauge boundary") === "C", "direct gauge C");
 
+const decisionLedger = model.decisionLedger;
+assert(Array.isArray(decisionLedger), "decisionLedger");
+const decisionById = new Map(
+  (decisionLedger as Json[]).map((item) => [text(item.id, "decision id"), item]),
+);
+const expectedDecisions: Readonly<Record<string, string>> = Object.freeze({
+  "MI-D02": "POSITIVE_SEMANTIC_ANET_MEMBERSHIP",
+  "MI-D03": "LINK_STRUCTURE_AND_SEMANTIC_MEMBERSHIP_AUTHORITY",
+  "MI-D04": "AUTHOR_APPROVED_GAMMA_GPR01_09_PROOF_GREEN",
+  "MI-D05": "STRUCTURAL_UNARY_GAMMA_S1_S2_INTERNAL_NO_EXTERNAL_GROUNDER",
+});
+for (const [id, decision] of Object.entries(expectedDecisions)) {
+  const item = decisionById.get(id);
+  assert(item !== undefined, id + " decision exists");
+  assert(text(item.status, id + " status") === "PROVED_RESEARCH", id + " resolved status");
+  assert(text(item.decision, id + " decision") === decision, id + " decision");
+}
+
+const reaction = record(model.reactionCandidate, "reactionCandidate");
+assert(text(reaction.status, "reactionCandidate status") === "PROVED_RESEARCH", "reaction candidate proof-closed");
+const metaBoundary = record(model.metaInterpreterBoundary, "metaInterpreterBoundary");
+assert(text(metaBoundary.status, "meta boundary status") === "PROVED_RESEARCH", "meta-grounding boundary resolved");
+assert(
+  text(metaBoundary.decision, "meta boundary decision") === "STRUCTURAL_UNARY_GAMMA_WITH_INTERNAL_S1_S2",
+  "meta-grounding selects S1/S2 internal to one Gamma",
+);
+
+const gammaProfile = json(root, "profiles/mts-v015-generalized-reaction-candidate.json");
+assert(
+  text(gammaProfile.status, "generalized reaction profile status") ===
+    "AUTHOR_APPROVED_DESIGN_PROOF_GREEN",
+  "generalized reaction profile is Author-approved and proof-green",
+);
+const gammaDecision = record(gammaProfile.decision, "generalized reaction decision");
+assert(
+  text(gammaDecision.minimalCompleteLocalReaction, "selected local reaction") ===
+    "STRUCTURAL_UNARY_J0_SELECTED",
+  "J0 structural-unary reaction selected",
+);
+assert(
+  text(gammaDecision.trueCrossMemberJoin, "J1 decision") === "J1_NOT_REQUIRED",
+  "J1 remains not required",
+);
+const grounding = record(gammaProfile.metaGroundingBoundary, "metaGroundingBoundary");
+assert(
+  text(grounding.status, "metaGrounding status") === "RESOLVED_STRUCTURAL_UNARY_GAMMA",
+  "metaGrounding boundary resolved",
+);
+assert(grounding.runtimeExternalGrounderCommandAllowed === false, "runtime external grounder forbidden");
+
 const target = record(model.targetOrganization, "targetOrganization");
 const substrate = record(target.externalSubstrate, "externalSubstrate");
 const forbidden = new Set(strings(substrate.forbiddenSemanticInputs, "forbidden semantic inputs"));
@@ -168,4 +218,6 @@ console.log([
   "ONE_GAMMA_STRUCTURAL_EXECUTION=GREEN",
   "EXTERNAL_GROUNDER_COMMAND=0",
   "GPR_PROOF_CLOSURE=GREEN",
+  "META_INTERPRETER_DECISIONS=RESOLVED",
+  "J1_REQUIRED=FALSE",
 ].join(" "));
