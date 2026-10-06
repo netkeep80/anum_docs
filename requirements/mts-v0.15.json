@@ -744,7 +744,7 @@
       "id": "V15-STAGE-01",
       "group": "STAGE",
       "ownerIssue": "#1911",
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "mandatory": true,
       "summary": "Source bytes, native source ANet, resolution/denotation, semantic ANet, recursive metacompilation, backend compatibility lowering, execution/replay and projection remain separately observable.",
       "dependsOn": [
@@ -756,13 +756,19 @@
       },
       "evidence": {
         "positiveVectors": [
-          "resolved-metamodel-can-erase-before-execution",
-          "physical-link-existence-not-semantic-membership"
+          "source-native-anet-denotation-semantic-recursive-backend-replay-stages-observable",
+          "approved-corpus-permanent-artifact-chain",
+          "generic-backend-compatibility-lowering-separated"
         ],
-        "negativeVectors": [],
+        "negativeVectors": [
+          "approved-artifact-cannot-point-to-candidates",
+          "program-specific-rule-discovery-forbidden",
+          "program-specific-compatibility-lowering-forbidden"
+        ],
         "requiredExecutableGates": [
           "ts/test/v015-denoted-anet-membership-das-a1.test.ts",
-          "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+          "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+          "ts/test/v015-metacompiler-corpus-closure-c0.test.ts"
         ]
       }
     },
@@ -770,7 +776,7 @@
       "id": "V15-STAGE-02",
       "group": "STAGE",
       "ownerIssue": "#1911",
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "mandatory": true,
       "summary": "Read/find/validation are read-only; materialization/publication is explicit and failure-safe.",
       "dependsOn": [
@@ -780,9 +786,18 @@
         "issue": 1911
       },
       "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
+        "positiveVectors": [
+          "contextual-name-resolve-read-only",
+          "source-anet-profile-read-read-only",
+          "duplicate-json-validation-rejects-before-materialization"
+        ],
+        "negativeVectors": [
+          "missing-contextual-name-resolve-no-write",
+          "duplicate-decoded-json-key-no-write"
+        ],
+        "requiredExecutableGates": [
+          "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+        ]
       }
     },
     {
