@@ -16,6 +16,7 @@ on:
       - "ts/test/v015-grounded-approved-amemory-package-r2.test.ts"
       - "ts/test/v015-two-role-approved-recursive-r3.test.ts"
       - "ts/test/v015-two-role-approved-amemory-package-r4.test.ts"
+      - "ts/test/research-v015-compact-and-package-a2.ts"
       - "ts/test/research-v015-p1q-package.ts"
       - "ts/test/research-v015-p1aa-composed-package.ts"
       - "ts/test/research-v015-p1ad-two-admission-package.ts"
@@ -218,6 +219,103 @@ jobs:
           print(
               "FROZEN_AMEMORY_TWO_ROLE_REPLAY=PASS "
               "positive_matches=1 negative_matches=0 exact_evidence=1"
+          )
+          PY
+
+
+  compact-and-research:
+    name: compact AND two-rule candidate / frozen A-memory research
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout anum_docs
+        uses: actions/checkout@v6
+
+      - name: Checkout exact frozen A-memory
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/amemory
+          ref: ${{ env.AMEMORY_FROZEN_SHA }}
+          path: _amemory
+
+      - name: Verify frozen A-memory identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C _amemory rev-parse HEAD)" = "$AMEMORY_FROZEN_SHA"
+          test "$(tr -d '\r\n' < _amemory/VERSION)" = "$AMEMORY_FROZEN_VERSION"
+          test -f _amemory/experiments/a-circuit/src/bin/formal_recursive_replay.rs
+          echo "AMEMORY_FROZEN_IDENTITY=PASS sha=$AMEMORY_FROZEN_SHA version=$AMEMORY_FROZEN_VERSION"
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: ts/package-lock.json
+
+      - name: Build temporary compact AND package
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --prefix ts
+          npm run --prefix ts build --silent
+          node ts/dist/test/research-v015-compact-and-package-a2.js > /tmp/compact-and-package.json
+          python3 - <<'PY'
+          import json
+          data=json.load(open("/tmp/compact-and-package.json","r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-recursive-execution-package/v0.1"
+          assert len(data["links"])==5
+          assert isinstance(data["entry"],str) and data["entry"]
+          assert isinstance(data["negativeEntry"],str) and data["negativeEntry"]
+          assert all(set(x)<=set("8961") for x in data["links"])
+          assert set(data["entry"])<=set("8961")
+          assert set(data["negativeEntry"])<=set("8961")
+          print(
+            "COMPACT_AND_RESEARCH_PACKAGE=GENERATED_NOT_CANONICAL "
+            "canonical_members=3 backend_indexes=2 launches=4"
+          )
+          PY
+
+      - name: Install exact A-memory Rust toolchain
+        run: rustup toolchain install "$AMEMORY_RUST_TOOLCHAIN" --profile minimal
+
+      - name: Replay compact AND through real frozen A-memory
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +"$AMEMORY_RUST_TOOLCHAIN" run \
+            --quiet \
+            --locked \
+            --manifest-path _amemory/experiments/a-circuit/Cargo.toml \
+            --bin formal_recursive_replay \
+            -- /tmp/compact-and-package.json | tee /tmp/compact-and-evidence.json
+
+          python3 - <<'PY'
+          import json
+          data=json.load(open("/tmp/compact-and-evidence.json","r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-recursive-execution-evidence/v0.1"
+          runs=data["runs"]
+          assert len(runs)==4
+          for run in runs:
+              assert run["raw_rule_matches"]==1
+              assert run["transitioned_members"]==1
+              assert run["result"]==run["expected"]
+              assert run["handoff_count"]==1
+              assert run["quiescent"] is False
+
+          negative=data["negative_run"]
+          assert negative is not None
+          assert negative["raw_rule_matches"]==0
+          assert negative["transitioned_members"]==0
+          assert negative["result"]==negative["expected"]
+          assert negative["handoff_count"]==0
+          assert negative["quiescent"] is True
+
+          print(
+            "FROZEN_AMEMORY_COMPACT_AND=PASS "
+            "rows=4/4 rules=2 role_members=1 program_specific_dispatch=0"
           )
           PY
 
