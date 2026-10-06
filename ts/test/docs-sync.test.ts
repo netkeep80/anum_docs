@@ -51,8 +51,10 @@ assert.equal(
   renderedFormalNotationV015,
   "v0.15 FORMAL specification must equal its whole-file generated projection",
 );
-assert.ok(renderedFormalNotationV015.includes("mts-doc-version: v0.15-candidate"));
-assert.ok(renderedFormalNotationV015.includes("Текущая принятая версия МТС: v0.14"));
+assert.ok(renderedFormalNotationV015.includes("mts-doc-version: v0.14"));
+assert.ok(renderedFormalNotationV015.includes("mts-formal-candidate-version: v0.15"));
+assert.ok(renderedFormalNotationV015.includes("> **Версия МТС: v0.14**"));
+assert.ok(renderedFormalNotationV015.includes("Кандидат FORMAL: v0.15"));
 assert.ok(renderedFormalNotationV015.includes("compact-boolean-and"));
 assert.ok(renderedFormalNotationV015.includes("GPR-01..09"));
 assert.ok(renderedFormalNotationV015.includes("FRM-01..08"));
