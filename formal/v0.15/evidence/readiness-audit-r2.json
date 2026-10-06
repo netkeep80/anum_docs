@@ -1,0 +1,81 @@
+{
+  "schema": "mts-v015-independent-readiness-audit/v0.1",
+  "ownerIssue": "#1876",
+  "auditBasis": "2ad65f5ad65a15f144d13990eb2cbcd6467fef25",
+  "status": "AUDIT_COMPLETE_BLOCKED_BY_GOVERNANCE",
+  "conclusion": {
+    "semanticExecutionCore": "GREEN",
+    "formalJsonCompiler": "GREEN",
+    "externalAssurance": "GREEN",
+    "approvedExecutableCorpus": "GREEN",
+    "crossRepositoryFreeze": "GREEN",
+    "operationalMergeGovernance": "BLOCKED",
+    "releaseReady": false,
+    "authorAcceptanceReady": false
+  },
+  "requirementSnapshot": {
+    "mandatoryCount": 47,
+    "componentGreenCount": 39,
+    "verticalGreenCount": 4,
+    "open": [
+      "V15-GOV-04",
+      "V15-READY-01",
+      "V15-READY-02",
+      "V15-READY-03"
+    ],
+    "onlyNonReadinessBlocker": "V15-GOV-04"
+  },
+  "liveRepositorySnapshot": {
+    "anumDocs": {
+      "main": "b6c8fa83e92857b17044bb81ea29e230c477d6aa",
+      "workingPr": 1989,
+      "workingPrDraft": true
+    },
+    "amemory": {
+      "main": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+      "version": "0.175.0",
+      "openPrs": [
+        486,
+        489
+      ],
+      "openPrsDraft": true
+    },
+    "aprover": {
+      "main": "98e0152d21d9b492d79aa5017e86a4114d3e5c51",
+      "openPrCount": 0
+    }
+  },
+  "governanceObservation": {
+    "issue": "#1982",
+    "rulesetId": 24087274,
+    "rulesetName": "Protect main",
+    "enforcement": "active",
+    "requiredChecks": [
+      "typescript",
+      "protect-readonly-files",
+      "validate-structure",
+      "repo-guard blocking check"
+    ],
+    "blockingObservation": {
+      "actorId": 5,
+      "actorType": "RepositoryRole",
+      "bypassMode": "always"
+    },
+    "requiredFalsifier": "An intentionally RED repo-guard PR must be mechanically unmergeable through the normal path; after restoration to GREEN, merge becomes available.",
+    "connectorLimitation": "Current GitHub connector exposes ruleset read but no administration mutation; this audit cannot repair the bypass itself."
+  },
+  "semanticEvidence": [
+    "ts/test/v015-release-contract-r1.test.ts",
+    "ts/test/v015-metacompiler-corpus-closure-c0.test.ts",
+    "ts/test/v015-context-authority-closure-c1.test.ts",
+    "proofs/v015-external-proof-assurance.json",
+    "proofs/v015-formal-proof-assurance.json",
+    "traceability/mts-v0.15.json#approvedJsonCorpus"
+  ],
+  "explicitNonClaims": [
+    "MTS v0.15 is not accepted by this audit.",
+    "The audit does not override V15-GOV-04 or #1982.",
+    "A draft PR with skipped repo-guard is not a release merge path.",
+    "Only explicit Author ACCEPT/REJECT may change the accepted/current version."
+  ]
+}
