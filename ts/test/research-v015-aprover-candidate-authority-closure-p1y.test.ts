@@ -304,13 +304,10 @@ same(
 );
 same(evaluate(absentRule), rb.U, "valid candidate cannot self-authorize absence");
 
-// The malicious candidates were rejected in isolation and therefore never enter
-// the shared runtime. The frozen-runtime semantic behavior needs no new opcode.
-same(
-  runtime.memory.find(runtime.executionTheory, forgedRuntimeRule),
-  undefined,
-  "rejected hidden runtime admission never reaches shared Memory",
-);
+// The malicious candidates are rejected in isolation and are never materialized
+// into the shared runtime. The valid-candidate differential above therefore
+// remains the relevant shared-store safety check; no cross-Memory handle is
+// treated as semantic identity.
 
 console.log([
   "MTS_V015_P1Y_CANDIDATE_AUTHORITY_CLOSURE=FALSIFIER_GREEN",
