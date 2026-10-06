@@ -272,6 +272,11 @@ const absentCerts = [
   certFor(occurrence.cycleB),
 ];
 
+const validLeftProbe = memory.ensure(
+  caller,
+  memory.ensure(VALID, occurrence.left),
+);
+
 const packageValue = Object.freeze({
   schema: "mts-v015-p2d-dependency-fixed-point-package/v0.1",
   links: Object.freeze([
@@ -300,6 +305,7 @@ const packageValue = Object.freeze({
     b,
     materializeExactSequence(memory, absentCerts),
   ),
+  validLeftProbe: wire(memory, b, validLeftProbe),
 });
 
 process.stdout.write(JSON.stringify(packageValue));
