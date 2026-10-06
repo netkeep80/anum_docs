@@ -659,32 +659,76 @@
       "authorJsonReview": "APPROVED"
     },
     "V15-CTX-01": {
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "ownerIssue": 1987,
       "dependsOn": [
         "V15-CLOSE-01"
       ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
+      "positiveVectors": [
+        "a5-freeze-resume-no-external-execution-sidecar",
+        "a6-theory-derived-from-link-ancestry",
+        "a8-positive-anet-currentness-membership",
+        "a9-one-gamma-structural-execution-no-external-current-scope-theory-pointer",
+        "gpr01-09-proof-closure"
+      ],
+      "negativeVectors": [
+        "physical-link-existence-alone-is-not-currentness",
+        "foreign-theory-is-inert",
+        "presentation-name-rename-does-not-create-authority",
+        "host-current-scope-theory-pointers-forbidden",
+        "external-grounder-command-forbidden"
+      ],
+      "requiredExecutableGates": [
+        "ts/test/v015-context-authority-closure-c1.test.ts",
+        "ts/test/v015-self-contained-context-freeze-resume-a5.test.ts",
+        "ts/test/v015-context-theory-self-contained-a6.test.ts",
+        "ts/test/v015-positive-aset-currentness-a8.test.ts",
+        "ts/test/v015-structural-aset-one-command-a9.test.ts"
+      ],
       "evidenceRefs": [
+        "ts/test/v015-context-authority-closure-c1.test.ts",
+        "ts/test/v015-self-contained-context-freeze-resume-a5.test.ts",
+        "ts/test/v015-context-theory-self-contained-a6.test.ts",
+        "ts/test/v015-positive-aset-currentness-a8.test.ts",
+        "ts/test/v015-structural-aset-one-command-a9.test.ts",
+        "proofs/v015-external-proof-assurance.json",
         "#1987",
+        "#2001",
+        "#2002",
         "#2005"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-CTX-02": {
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "ownerIssue": 1987,
       "dependsOn": [
         "V15-CTX-01",
         "V15-ONTO-03"
       ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
+      "positiveVectors": [
+        "same-physical-link-can-retain-independent-theory-admission-role-after-currentness-moves",
+        "currentness-follows-semantic-membership-not-physical-topology",
+        "contextual-theory-selection-is-link-structural",
+        "foreign-theory-membership-remains-isolated"
+      ],
+      "negativeVectors": [
+        "host-name-does-not-create-context-role",
+        "host-manifest-pointer-does-not-create-theory-or-currentness",
+        "stale-physical-active-link-is-inert-without-semantic-membership"
+      ],
+      "requiredExecutableGates": [
+        "ts/test/v015-context-authority-closure-c1.test.ts",
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "ts/test/v015-positive-aset-currentness-a8.test.ts"
+      ],
       "evidenceRefs": [
+        "ts/test/v015-context-authority-closure-c1.test.ts",
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "ts/test/v015-positive-aset-currentness-a8.test.ts",
+        "profiles/mts-v015-meta-interpreter-model.json",
         "#1987",
+        "#2002",
         "#2005"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
