@@ -1,0 +1,64 @@
+{
+  "schema": "mts-v015-approved-artifact-evidence/v0.1",
+  "status": "FULL_REGRESSION_GREEN",
+  "canonicalAccepted": true,
+  "authorDecision": {
+    "state": "APPROVED",
+    "decision": "APPROVE ALL",
+    "evidence": "netkeep80/anum_docs#1980 issuecomment-6024720547",
+    "date": "2026-10-06"
+  },
+  "verification": {
+    "head": "ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+    "ciRun": 37525720828,
+    "contractObservatoryRun": 37525721015,
+    "frozenAmemoryRun": 37525720725
+  },
+  "amemory": {
+    "repository": "netkeep80/amemory",
+    "frozenMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "rustToolchain": "1.98.1",
+    "exactPackageParity": true,
+    "exactEvidenceParity": true,
+    "programSpecificDispatch": 0,
+    "jobId": 112482088911,
+    "rows": "2/2"
+  },
+  "id": "compact-boolean-not",
+  "semanticModel": {
+    "strictBooleanDomain": true,
+    "nonBoolean": "NO_MATCH",
+    "roleCount": 0,
+    "groundedRuleCount": 2,
+    "semanticMemberCount": 2,
+    "semantics": [
+      "NOT([F])->T",
+      "NOT([T])->F"
+    ],
+    "ruleDiscovery": "semantic Theory->Rule membership",
+    "execution": "shared generalized Γ-compatible path"
+  },
+  "artifacts": {
+    "formal": {
+      "path": "formal/v0.15/regression/compact-not.formal",
+      "sha256": "42697be6cad8b522e1b4a7fbfd75fda5f7af5d313a995a42105c82f8ceec2c47"
+    },
+    "json": {
+      "path": "formal/v0.15/regression/compact-not.json",
+      "sha256": "eed9bebaf4ecd34be160da3a9cdf006f7f9c1802b780da0f0fe44d2fb2487da2"
+    },
+    "recursive": {
+      "path": "formal/v0.15/regression/compact-not.recursive",
+      "sha256": "1728cf457b3d1cc6db132bb7d9e2b312d16999023002f73c3529cf622938c692"
+    },
+    "amemoryPackage": {
+      "path": "formal/v0.15/regression/compact-not.amemory-package.json",
+      "sha256": "8ba546035b6c9c2f9b18e87a1d30fb6edcbb9063d76cf9ffb1cb2877d7ebf227"
+    },
+    "amemoryEvidence": {
+      "path": "formal/v0.15/regression/compact-not.amemory-evidence.json",
+      "sha256": "a8fda00d61957d717b0c57e6b67de7c2b36d909c63a3d10cc42b0111a505f49d"
+    }
+  }
+}
