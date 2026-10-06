@@ -562,7 +562,7 @@
       "ownerIssue": "#1980",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "NOT/OR/XOR reuse exactly the same generic source model/materializer without program-specific paths.",
+      "summary": "Author-gated strict Boolean NOT/OR/XOR reuse the exact same FORMAL/JSON source model, semantic Theory->Rule discovery, zero-role Rule topology, generic Γ-compatible execution path and generic frozen-backend lowering as approved AND; no operator-specific semantic/runtime path is permitted.",
       "dependsOn": [
         "V15-AND-03",
         "V15-AUTHOR-JSON-01"
@@ -571,10 +571,29 @@
         "issue": 1980
       },
       "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
-      }
+        "positiveVectors": [
+          "boolean-family-and-not-or-xor-one-generic-harness",
+          "boolean-family-semantic-theory-membership-rule-discovery",
+          "boolean-family-generic-zero-role-compatibility-lowering",
+          "frozen-amemory-not-2of2",
+          "frozen-amemory-or-4of4",
+          "frozen-amemory-xor-4of4"
+        ],
+        "negativeVectors": [
+          "boolean-family-nonboolean-operands-no-match",
+          "boolean-family-foreign-theory-inert",
+          "boolean-family-program-specific-runtime-dispatch-zero"
+        ],
+        "requiredExecutableGates": [
+          "ts/test/v015-boolean-family-b1.test.ts",
+          "ts/test/research-v015-compact-and-package-a2.ts"
+        ]
+      },
+      "authorApprovalRequired": [
+        "formal/v0.15/candidates/compact-not.json",
+        "formal/v0.15/candidates/compact-or.json",
+        "formal/v0.15/candidates/compact-xor.json"
+      ]
     },
     {
       "id": "V15-CTX-01",
