@@ -269,6 +269,37 @@ validateCandidate(requirements, traceability);
   assert(!groups.includes("THM") && !groups.includes("PROOF"), "v0.16 proof groups removed from v0.15 Author JSON scope");
 }
 
+// Generated FORMAL specification blocker anti-drift.
+{
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for documentation blocker");
+  const byId = new Map((list as Json[]).map((item) => [text(item.id, "documentation id"), item]));
+
+  const docs = byId.get("V15-DOCS-01");
+  assert(docs !== undefined, "V15-DOCS-01 generated FORMAL specification blocker exists");
+  assert(text(docs.ownerIssue, "V15-DOCS-01 owner") === "#1914", "V15-DOCS-01 owner is #1914");
+  assert(docs.mandatory === true, "V15-DOCS-01 is mandatory");
+  assert(/generated projection/i.test(text(docs.summary, "V15-DOCS-01 summary")), "V15-DOCS-01 requires generated projection");
+  assert(/Формальная нотация МТС\.md/u.test(text(docs.summary, "V15-DOCS-01 target")), "V15-DOCS-01 owns canonical FORMAL document");
+
+  const ready = byId.get("V15-READY-01");
+  assert(ready !== undefined, "V15-READY-01 exists for docs dependency");
+  assert(
+    strings(ready.dependsOn, "V15-READY-01 docs dependsOn").includes("V15-DOCS-01"),
+    "release readiness depends on generated FORMAL specification",
+  );
+
+  const traces = record(traceability.requirements, "trace requirements for documentation blocker");
+  const traced = record(traces["V15-DOCS-01"], "V15-DOCS-01 trace");
+  assert(text(traced.state, "V15-DOCS-01 trace state") === text(docs.state, "V15-DOCS-01 state"), "V15-DOCS-01 trace state");
+  assert(Number(traced.ownerIssue) === 1914, "V15-DOCS-01 trace owner");
+  assert(
+    strings(record(traces["V15-READY-01"], "READY docs trace").dependsOn, "READY docs trace dependsOn")
+      .includes("V15-DOCS-01"),
+    "traceability readiness depends on V15-DOCS-01",
+  );
+}
+
 // Operational governance blocker anti-drift.
 {
   const list = requirements.requirements;
