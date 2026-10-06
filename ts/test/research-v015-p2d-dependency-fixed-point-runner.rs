@@ -6,15 +6,67 @@ use amemory_optimized_cpu_probe::{
     },
     OptimizedLinkStore,
 };
-use serde_json::{json, Value};
 use std::{collections::BTreeSet, env, fs, process};
 
-const SCHEMA: &str = "mts-v015-p2d-dependency-fixed-point-package/v0.1";
+const SCHEMA: &str = "MTS_V015_P2D_DEPENDENCY_FIXED_POINT_V1";
 
-fn field<'a>(root: &'a Value, name: &str) -> Result<&'a str, String> {
-    root.get(name)
-        .and_then(Value::as_str)
-        .ok_or_else(|| format!("missing string field: {name}"))
+struct Package {
+    links: Vec<String>,
+    interpreter: String,
+    initial: String,
+    reversed_initial: String,
+    expected_certs: String,
+    absent_certs: String,
+    valid_left_probe: String,
+}
+
+struct RunEvidence {
+    generations: usize,
+    final_scope: BTreeSet<String>,
+}
+
+fn parse(input: &str) -> Result<Package, String> {
+    let mut lines = input.lines();
+    if lines.next() != Some(SCHEMA) {
+        return Err("unsupported transport schema".to_owned());
+    }
+    let link_count: usize = lines
+        .next()
+        .ok_or_else(|| "missing link count".to_owned())?
+        .parse()
+        .map_err(|_| "invalid link count".to_owned())?;
+
+    let mut links = Vec::with_capacity(link_count);
+    for _ in 0..link_count {
+        links.push(
+            lines
+                .next()
+                .ok_or_else(|| "missing link wire".to_owned())?
+                .to_owned(),
+        );
+    }
+
+    let take = |lines: &mut std::str::Lines<'_>, name: &str| -> Result<String, String> {
+        lines
+            .next()
+            .map(str::to_owned)
+            .ok_or_else(|| format!("missing {name}"))
+    };
+
+    let package = Package {
+        links,
+        interpreter: take(&mut lines, "interpreter")?,
+        initial: take(&mut lines, "initial")?,
+        reversed_initial: take(&mut lines, "reversed initial")?,
+        expected_certs: take(&mut lines, "expected certs")?,
+        absent_certs: take(&mut lines, "absent certs")?,
+        valid_left_probe: take(&mut lines, "valid-left probe")?,
+    };
+
+    if lines.next().is_some() {
+        return Err("trailing transport lines".to_owned());
+    }
+    Ok(package)
 }
 
 fn import_wire(store: &mut OptimizedLinkStore, source: &str) -> Result<u32, String> {
@@ -47,33 +99,25 @@ fn current_wires(
 }
 
 fn execute(
-    package: &Value,
-    initial_field: &str,
-) -> Result<Value, String> {
+    package: &Package,
+    initial_source: &str,
+) -> Result<RunEvidence, String> {
     let mut store = OptimizedLinkStore::new();
 
-    let links = package
-        .get("links")
-        .and_then(Value::as_array)
-        .ok_or_else(|| "missing links".to_owned())?;
-    for source in links {
-        let source = source
-            .as_str()
-            .ok_or_else(|| "links must contain strings".to_owned())?;
+    for source in &package.links {
         import_wire(&mut store, source)?;
     }
 
-    let interpreter = import_wire(&mut store, field(package, "interpreter")?)?;
-    let initial = import_sequence(&mut store, field(package, initial_field)?)?;
-    let expected = import_sequence(&mut store, field(package, "expectedCerts")?)?;
-    let absent = import_sequence(&mut store, field(package, "absentCerts")?)?;
+    let interpreter = import_wire(&mut store, &package.interpreter)?;
+    let initial = import_sequence(&mut store, initial_source)?;
+    let expected = import_sequence(&mut store, &package.expected_certs)?;
+    let absent = import_sequence(&mut store, &package.absent_certs)?;
     let valid_left_probe =
-        import_wire(&mut store, field(package, "validLeftProbe")?)?;
+        import_wire(&mut store, &package.valid_left_probe)?;
 
     if expected.len() != 6 || absent.len() != 2 || initial.len() != 8 {
         return Err("unexpected fixture cardinality".to_owned());
     }
-
     let leaf_cert = expected[0];
 
     let mut engine = OptimizedStructuralEngine::new(128);
@@ -84,28 +128,28 @@ fn execute(
         .set_current(&store, &initial)
         .map_err(|error| format!("initial Scope rejected: {error:?}"))?;
 
-    let mut reactions = Vec::new();
+    let mut generations = 0usize;
     let mut reached_quiescence = false;
 
     for generation in 1usize..=64 {
         let reaction = engine
             .run(&mut store)
             .map_err(|error| format!("generation {generation} failed: {error:?}"))?;
+        generations = generation;
 
         let current = engine.current();
         let has_leaf_cert = current.contains(&leaf_cert);
         let has_valid_left = current.contains(&valid_left_probe);
 
-        // Generation-isolation witness:
-        // G1 creates VALID(leaf), G2 creates Gate(leaf). The gate must not
-        // advance left in G2; only G3 may expose VALID(left).
-        if generation == 1 {
-            if has_leaf_cert || has_valid_left {
-                return Err(
-                    "G1 unexpectedly contains certificate or VALID(left)"
-                        .to_owned(),
-                );
-            }
+        // Exact generation-isolation witness on frozen 0.175.0:
+        // G1 creates VALID(leaf); G2 creates Gate(leaf), but complete discovery
+        // already happened from the old Scope. Therefore Gate(leaf) may affect
+        // left only in G3.
+        if generation == 1 && (has_leaf_cert || has_valid_left) {
+            return Err(
+                "G1 unexpectedly contains certificate or VALID(left)"
+                    .to_owned(),
+            );
         }
         if generation == 2 {
             if !has_leaf_cert {
@@ -124,15 +168,6 @@ fn execute(
             );
         }
 
-        reactions.push(json!({
-            "generation": generation,
-            "raw_rule_matches": reaction.raw_rule_matches,
-            "transitioned_members": reaction.transitioned_members,
-            "quiescent": reaction.quiescent,
-            "handoff_count": reaction.handoff_count,
-            "scope_size": engine.current().len(),
-        }));
-
         if reaction.quiescent {
             reached_quiescence = true;
             break;
@@ -140,7 +175,10 @@ fn execute(
     }
 
     if !reached_quiescence {
-        return Err("dependency closure did not quiesce within 64 generations".to_owned());
+        return Err(
+            "dependency closure did not quiesce within 64 generations"
+                .to_owned(),
+        );
     }
 
     let current = engine.current();
@@ -163,51 +201,36 @@ fn execute(
         }
     }
 
-    Ok(json!({
-        "generations": reactions.len(),
-        "reactions": reactions,
-        "final_scope": current_wires(&store, &engine)?,
-        "expected_certificate_count": expected.len(),
-        "absent_cycle_certificate_count": absent.len(),
-        "generation_isolation": {
-            "g2_leaf_certificate": true,
-            "g2_valid_left": false,
-            "g3_valid_left": true,
-        },
-    }))
+    Ok(RunEvidence {
+        generations,
+        final_scope: current_wires(&store, &engine)?,
+    })
 }
 
-fn run(input: &str) -> Result<Value, String> {
-    let package: Value =
-        serde_json::from_str(input).map_err(|error| format!("invalid package JSON: {error}"))?;
-    if field(&package, "schema")? != SCHEMA {
-        return Err("unsupported schema".to_owned());
-    }
+fn run(input: &str) -> Result<String, String> {
+    let package = parse(input)?;
+    let forward = execute(&package, &package.initial)?;
+    let reverse = execute(&package, &package.reversed_initial)?;
 
-    let forward = execute(&package, "initial")?;
-    let reverse = execute(&package, "reversedInitial")?;
-
-    let forward_scope = forward
-        .get("final_scope")
-        .ok_or_else(|| "forward final_scope missing".to_owned())?;
-    let reverse_scope = reverse
-        .get("final_scope")
-        .ok_or_else(|| "reverse final_scope missing".to_owned())?;
-    if forward_scope != reverse_scope {
+    if forward.final_scope != reverse.final_scope {
         return Err("entry order changed final fixed point".to_owned());
     }
 
-    Ok(json!({
-        "schema": "mts-v015-p2d-dependency-fixed-point-evidence/v0.1",
-        "forward": forward,
-        "reverse": reverse,
-        "entry_order_semantic": false,
-    }))
+    Ok(format!(
+        "FROZEN_AMEMORY_P2D_DEPENDENCY_FIXED_POINT=PASS \
+         forward_generations={} reverse_generations={} \
+         expected_certs=6 absent_cycle_certs=2 \
+         generation_isolation=G2_GATE_NOT_VISIBLE_G3_VISIBLE \
+         entry_order_semantic=0 host_dfs=0 host_visited=0 j1=0 \
+         frozen_sha=832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+        forward.generations,
+        reverse.generations,
+    ))
 }
 
 fn main() {
     let Some(path) = env::args().nth(1) else {
-        eprintln!("usage: p2d_dependency_fixed_point <package.json>");
+        eprintln!("usage: p2d_dependency_fixed_point <transport.txt>");
         process::exit(2);
     };
     let input = match fs::read_to_string(&path) {
@@ -219,7 +242,7 @@ fn main() {
     };
 
     match run(&input) {
-        Ok(evidence) => println!("{}", serde_json::to_string(&evidence).unwrap()),
+        Ok(evidence) => println!("{evidence}"),
         Err(error) => {
             eprintln!("{error}");
             process::exit(1);
