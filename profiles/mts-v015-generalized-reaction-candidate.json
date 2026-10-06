@@ -1,7 +1,7 @@
 {
   "id": "mts-v015-generalized-reaction-candidate",
   "version": "0.1.0-development",
-  "status": "DEVELOPMENT_ONLY_AUTHOR_REVIEW_PENDING",
+  "status": "AUTHOR_APPROVED_DESIGN_PROOF_GREEN",
   "owners": {
     "architectureIssue": 1987,
     "mpNecessityIssue": 1988,
@@ -14,11 +14,11 @@
   },
   "decision": {
     "scalarPositiveLaw": "MP0_RETAINED",
-    "minimalCompleteLocalReaction": "MP1_CANDIDATE",
-    "scopeLift": "MP2_DERIVED_CANDIDATE",
+    "minimalCompleteLocalReaction": "STRUCTURAL_UNARY_J0_SELECTED",
+    "scopeLift": "POINTWISE_N_CURRENT_DERIVED_REFINEMENT",
     "packedStructuralAntecedent": "MP1_ON_EXPLICIT_COMPOSITE_LINK",
-    "trueCrossMemberJoin": "MP4_DEFERRED_NOT_REQUIRED_BY_CURRENT_CORPUS",
-    "strongerHyperReaction": "MP5_NOT_INTRODUCED"
+    "trueCrossMemberJoin": "J1_NOT_REQUIRED",
+    "strongerHyperReaction": "NOT_INTRODUCED"
   },
   "mp0": {
     "form": [
@@ -109,17 +109,17 @@
     "PACKED_ANTECEDENT",
     "UNPACKED_CROSS_MEMBER_NON_MATCH"
   ],
-  "candidateFamily": "GROUNDED_EXACT_REACTION_FLOOR",
+  "candidateFamily": "STRUCTURAL_UNARY_J0_REACTION",
   "capabilityAxes": {
-    "matchPower": "EXACT_ANTECEDENT_IDENTITY",
-    "jointAntecedentArity": "ONE_CURRENT_MEMBER",
+    "matchPower": "STRUCTURAL_TEMPLATE_WITH_SEMANTIC_ROLE_MEMBERSHIP",
+    "jointAntecedentArity": "ONE_CURRENT_ENDPOINT",
     "imageArity": "ZERO_ONE_MANY",
     "scopeLift": "POINTWISE_N_CURRENT_MEMBERS",
-    "eventPublication": "MATCH_AWARE_ATOMIC_SUCCESSOR"
+    "eventPublication": "SNAPSHOT_COMPLETE_SUCCESSOR_ATOMIC_PUBLICATION"
   },
   "competingCandidate": {
     "id": "STRUCTURAL_UNARY_TEMPLATE_REACTION",
-    "status": "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
+    "status": "AUTHOR_APPROVED_PROOF_GREEN",
     "matchPower": "STRUCTURAL_TEMPLATE_WITH_ROLES",
     "jointAntecedentArity": "ONE_CURRENT_MEMBER",
     "imageArity": "ZERO_ONE_MANY",
@@ -131,7 +131,7 @@
       "v015-variadic-grounding-m5",
       "v015-structural-aset-one-command-a9"
     ],
-    "question": "Formalize and prove the Author-approved structural-unary repeated reaction Γ; close the multi-generation exact-S0 opacity/refinement obligations without introducing J1.",
+    "question": "RESOLVED: structural-unary repeated Γ is selected for v0.15; exact grounded MP is its zero-role refinement; J1 is not required.",
     "researchEvidenceStatus": "GREEN_FOR_A9_TESTED_ONE_COMMAND_VECTOR",
     "authorDecision": "APPROVED_STRUCTURAL_UNARY_REPEATED_REACTION",
     "proofClosureOwner": "#2001",
@@ -139,7 +139,9 @@
       "M6B exact-S0 freshness opacity",
       "A10 finite exact support lower-bound pressure",
       "A10 exact-observation opacity"
-    ]
+    ],
+    "selectedForV015": true,
+    "proofClosure": "#2001 GPR-01..09"
   },
   "notEquivalentDimensions": [
     "argument arity",
@@ -149,7 +151,7 @@
     "joint current-member antecedent arity"
   ],
   "metaGroundingBoundary": {
-    "status": "OPEN_ARCHITECTURE_DECISION",
+    "status": "RESOLVED_STRUCTURAL_UNARY_GAMMA",
     "s0ExactMpSelfHostsFreshStructuralGrounding": false,
     "evidence": [
       "v015-matchpower-falsifier-m6",
@@ -174,11 +176,6 @@
       "note": "These accepted Link-native capabilities show that decomposition/construction are legitimate MTS operations, but their current authority-gated host implementation is not evidence that an Aset executed only by S0 exact MP can realize them."
     },
     "metaBCriterion": "META-B is proven only if reflection/decomposition/binding/construction needed for generic grounding are themselves realized as ordinary approved Aset data executed by the selected single generalized-reaction command, without hidden host poles/ensure semantics.",
-    "unresolvedChoices": [
-      "META-A bootstrap/compiler generic grounding + S0 exact MP",
-      "self-hosted grounding with an independently derived Aset-level reflection/construction mechanism",
-      "stronger structural-unary generalized reaction if necessity is author-reviewed"
-    ],
     "trueCrossMemberJoinRequired": false,
     "structuralCapabilityDecomposition": {
       "S1": {
@@ -207,8 +204,8 @@
       }
     },
     "structuralAsetOneCommand": {
-      "status": "GREEN_RESEARCH_AUTHOR_DECISION_PENDING",
-      "result": "For the tested vector, S1+S2 can be treated as internal phases of the single generalized reaction over semantic Aset membership, eliminating a separate pre-grounder command.",
+      "status": "AUTHOR_APPROVED_PROOF_GREEN",
+      "result": "Selected v0.15 profile: S1+S2 are internal phases of the single structural-unary generalized reaction over semantic ANet membership; there is no separate pre-grounder command.",
       "causalBoundary": "S1 complete read-only plan precedes S2 construction/publication; new Theory admissions are visible next reaction only.",
       "evidence": "ts/test/v015-structural-aset-one-command-a9.test.ts",
       "doesNotProve": [
@@ -216,7 +213,8 @@
         "that cross-member join is needed",
         "final accepted FORMAL/JSON representation",
         "hardware refinement proof"
-      ]
+      ],
+      "proofClosure": "#2001 GPR-01..09"
     },
     "finiteExactSupportNecessity": {
       "status": "GREEN_RESEARCH",
@@ -238,7 +236,15 @@
         "that the capability must be primitive rather than derivable by a lower-level Link-native meta-Aset",
         "that cross-current-member join is required"
       ]
-    }
+    },
+    "selectedArchitecture": "S1_STRUCTURAL_MATCH_BIND_PLUS_S2_CANONICAL_CONSTRUCTION_INTERNAL_TO_ONE_GAMMA",
+    "runtimeExternalGrounderCommandAllowed": false,
+    "bootstrapCompilerBoundary": "The bootstrap FORMAL/JSON metacompiler owned by anum_docs#2006 may remain host-implemented for source compilation. It is not runtime semantic grounding authority and is not an A-memory command.",
+    "historicalAlternatives": [
+      "META-A external semantic runtime grounder: rejected for normative v0.15 execution",
+      "ordinary meta-Aset on exact S0 alone: falsified for fresh structural substitution under the tested finite exact boundary",
+      "selected: stronger structural-unary J0 Γ with S1/S2 internal phases"
+    ]
   },
   "sequenceCarrierBoundary": {
     "status": "AUTHOR_REVIEW_REQUIRED",
@@ -344,19 +350,21 @@
     "infiniteDenotationalReaction": "NOT_RULED_OUT"
   },
   "theoremPremiseSplit": {
-    "status": "GREEN_RESEARCH_AUTHOR_REVIEW_PENDING",
+    "status": "PROVED_RESEARCH",
     "localReactionPower": {
-      "classification": "OPEN_ARCHITECTURE_DECISION",
-      "alternatives": [
-        "exact grounded local reaction plus internally derivable/self-hosted meta-grounding",
-        "structural-unary local reaction with S1+S2 inside the one command"
-      ],
+      "classification": "AUTHOR_APPROVED_STRUCTURAL_UNARY_GAMMA_PROOF_GREEN",
       "evidence": [
         "M6B",
         "A9",
         "A10"
       ],
-      "notClaimed": "A10 does not prove one unique primitive API."
+      "notClaimed": "A10 does not prove one unique primitive API.",
+      "selected": "structural-unary local reaction with S1+S2 inside the one repeated Γ",
+      "proofClosure": "#2001 GPR-01..09",
+      "historicalAlternatives": [
+        "exact grounded local reaction plus internally derivable/self-hosted meta-grounding",
+        "structural-unary local reaction with S1+S2 inside the one command"
+      ]
     },
     "derivedTheoremCandidates": {
       "BUNDLE_LIFT": {
