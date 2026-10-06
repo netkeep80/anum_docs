@@ -9,6 +9,7 @@ import {
 import {
   V013CurrentScopeCursor,
   defineV013WorkingScope,
+  discoverV013TriggeredRuleImages,
   reactV013StructuralScope,
 } from "../src/v013-structural-execution.js";
 
@@ -16,7 +17,10 @@ function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 P1w composed aprover execution Theory: " + message);
 }
 function same<T>(actual: T, expected: T, message: string): void {
-  assert(Object.is(actual, expected), message);
+  assert(
+    Object.is(actual, expected),
+    message + ": " + String(actual) + " !== " + String(expected),
+  );
 }
 
 const memory = new Memory();
@@ -123,6 +127,17 @@ const interpreter = defineStructuralInterpreter(
   staticDictionary,
   grammar,
   executionTheory,
+);
+
+same(
+  discoverV013TriggeredRuleImages(memory, executionTheory, PING).length,
+  1,
+  "static aprover current discovers exactly one Rule before composition",
+);
+same(
+  discoverV013TriggeredRuleImages(memory, executionTheory, memberBefore).length,
+  1,
+  "membership current discovers exactly one Rule before composition",
 );
 
 // One ordinary reaction processes both a static aprover current and a
