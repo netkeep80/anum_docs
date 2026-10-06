@@ -1,9 +1,9 @@
 {
   "schema": "mts-v015-boolean-operator-candidate/v0.1",
   "id": "compact-boolean-xor-four-grounded-rules",
-  "status": "AUTHOR_REVIEW_PENDING_RESEARCH_GREEN",
+  "status": "PROMOTED_TO_APPROVED_CORPUS",
   "ownerIssue": "#1980",
-  "canonicalAccepted": false,
+  "canonicalAccepted": true,
   "candidate": {
     "formal": "formal/v0.15/candidates/compact-xor.formal",
     "formalSha256": "4721b9f02400613ad05a8cc50ac0add3520c6aa72c836f95fdb4edf44bbaa038",
@@ -54,11 +54,15 @@
     "programSpecificDispatch": 0
   },
   "approvalBoundary": [
-    "research evidence is GREEN but the artifact is not Author-approved",
-    "not present in approvedJsonCorpus",
-    "not canonical accepted operator",
-    "explicit Author APPROVE / MODIFY / REJECT is required for this exact JSON digest",
-    "V15-AND-04 remains OPEN until all required operator approvals and permanent cumulative regressions are complete",
-    "any material source change invalidates this review candidate"
-  ]
+    "this exact reviewed candidate is Author-approved and promoted",
+    "immutable approved artifacts live under formal/v0.15/regression/",
+    "future replacements require a new explicit Author decision"
+  ],
+  "authorDecision": {
+    "state": "APPROVED",
+    "decision": "APPROVE ALL",
+    "evidence": "netkeep80/anum_docs#1980 issuecomment-6024720547",
+    "date": "2026-10-06"
+  },
+  "promotedRegressionManifest": "formal/v0.15/regression/compact-xor.evidence.json"
 }
