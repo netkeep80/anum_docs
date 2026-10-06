@@ -45,6 +45,7 @@ const a6 = read(root, "ts/test/v015-context-theory-self-contained-a6.test.ts");
 const a8 = read(root, "ts/test/v015-positive-aset-currentness-a8.test.ts");
 const a9 = read(root, "ts/test/v015-structural-aset-one-command-a9.test.ts");
 const das = read(root, "ts/test/v015-native-source-anet-denotation-das-a2.test.ts");
+const m5 = read(root, "ts/test/v015-variadic-grounding-m5.test.ts");
 
 includesAll(a5, [
   "EXTERNAL_CURRENT_CONTEXT_POINTER=0",
@@ -85,6 +86,19 @@ includesAll(a9, [
   "PUBLICATION=ATOMIC_SEMANTIC_MEMBERSHIP_REWRITE",
   "CROSS_MEMBER_JOIN=0",
 ], "A9");
+
+includesAll(m5, [
+  "MTS_V015_META_M5=VARIADIC_GROUNDING_GREEN",
+  "GENERIC_SOURCE_RULE_COUNT=3",
+  "TESTED_ARITIES=1_2_3_5",
+  "GROUNDED_RULE_PER_INPUT_TUPLE_AUTHORED=0",
+  "CROSS_MEMBER_JOIN_REQUIRED=FALSE",
+], "M5");
+
+assert(
+  a9.includes("NATIVE_ROLE_BUNDLE_A72R_SHAPE=GREEN_RESEARCH"),
+  "A9 native role-bundle retains A72r-like recursive shape",
+);
 
 includesAll(das, [
   "PHYSICAL_EXISTENCE_IMPLIES_MEMBERSHIP=FALSE",
@@ -220,4 +234,5 @@ console.log([
   "GPR_PROOF_CLOSURE=GREEN",
   "META_INTERPRETER_DECISIONS=RESOLVED",
   "J1_REQUIRED=FALSE",
+  "VARIADIC_A72R_CLASS=GREEN",
 ].join(" "));
