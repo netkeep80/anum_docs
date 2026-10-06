@@ -651,10 +651,22 @@ theorem GPR_04_merge_idempotent_observation
       a := by
   constructor
   · change (a.matched ∨ a.matched) ↔ a.matched
-    exact or_self
+    constructor
+    · intro duplicated
+      rcases duplicated with value | value
+      · exact value
+      · exact value
+    · intro value
+      exact Or.inl value
   · intro output
     change (a.emits output ∨ a.emits output) ↔ a.emits output
-    exact or_self
+    constructor
+    · intro duplicated
+      rcases duplicated with value | value
+      · exact value
+      · exact value
+    · intro value
+      exact Or.inl value
 
 theorem gpr04_four_way_repartition
     (A B C D : Prop) :
