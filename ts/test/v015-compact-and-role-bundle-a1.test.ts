@@ -302,6 +302,11 @@ const mutatedJson = JSON.stringify(mutatedValue, null, 2);
 const mutatedFormal = canonicalFormal
   .split("\n")
   .filter((line) => !line.includes("Theory->RuleT"))
+  .map((line) =>
+    line.includes("Theory->RuleF,")
+      ? line.replace("Theory->RuleF,", "Theory->RuleF")
+      : line
+  )
   .join("\n");
 const fm = fixture();
 const mutated = compileCandidate(fm, mutatedFormal, mutatedJson);
