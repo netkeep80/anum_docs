@@ -23,10 +23,11 @@ import {
   materializeV013SemanticLinkFromHierarchicalCarrier,
   serializeV013HierarchicalCarrier,
 } from "../src/v013-hierarchical-carrier.js";
-import type {
-  LinkHandle,
+import {
   Memory,
-  RootBasis,
+  ensureRootBasis,
+  type LinkHandle,
+  type RootBasis,
 } from "../src/memory.js";
 
 function assert(value: unknown, message: string): asserts value {
@@ -174,10 +175,8 @@ const candidateEnvelope = memory.ensure(
 const candidateBytes = wire(memory, basis, candidateEnvelope);
 
 // Reconstruct authority-free candidate in an entirely fresh Memory.
-const candidateMemory = new (memory.constructor as new () => Memory)();
-const candidateBasis = (
-  await import("../src/memory.js")
-).ensureRootBasis(candidateMemory);
+const candidateMemory = new Memory();
+const candidateBasis = ensureRootBasis(candidateMemory);
 const reconstructedEnvelope = importWire(
   candidateMemory,
   candidateBasis,
