@@ -86,19 +86,31 @@ assert(
   trace.evidenceRefs.includes("formal/v0.15/evidence/das01-10-source-denotation.json"),
   "machine closure evidence is registered",
 );
+for (const id of ["V15-JSON-01", "V15-JSON-03", "V15-JSON-04"]) {
+  assert(
+    requirements.requirements.find((entry) => entry.id === id)?.state === "COMPONENT_GREEN",
+    id + " broader JSON profile closure",
+  );
+  assert(
+    traceability.requirements[id]?.state === "COMPONENT_GREEN",
+    id + " traceability closure",
+  );
+}
 assert(
-  requirements.requirements.find((entry) => entry.id === "V15-JSON-01")?.state === "OPEN" &&
-  requirements.requirements.find((entry) => entry.id === "V15-JSON-03")?.state === "OPEN",
-  "broader JSON-profile obligations remain open",
+  readFileSync(resolve(repo, "ts/test/v015-release-contract-r1.test.ts"), "utf8")
+    .includes("MTS_V015_RELEASE_CONTRACT_R1=COMPONENT_GREEN_EVIDENCE"),
+  "broader JSON profile is closed by R1 release-contract evidence",
 );
 
 console.log([
   "MTS_V015_DAS_01_10=COMPONENT_GREEN",
   "OWNER_2002=CLOSURE_READY",
+  "JSON01=COMPONENT_GREEN",
   "JSON02=COMPONENT_GREEN",
-  "JSON01=OPEN",
-  "JSON03=OPEN",
-  "APPROVED_ARTIFACTS=2_FULL_REGRESSION_GREEN",
+  "JSON03=COMPONENT_GREEN",
+  "JSON04=COMPONENT_GREEN",
+  "BROADER_JSON_PROFILE=R1_COMPONENT_GREEN",
+  "APPROVED_ARTIFACTS=2_DAS_REFINEMENT_FULL_REGRESSION_GREEN",
   "HOST_MEMBERSHIP_BRIDGE=NONE",
   "ACCEPTED_V014_UNCHANGED=TRUE",
 ].join(" "));
