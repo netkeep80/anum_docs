@@ -493,7 +493,7 @@ Theorem GPR_02_exact_sequence_multiplicity_not_collapsed
 Proof.
   intro equal_packed.
   simpl in equal_packed.
-  injection equal_packed as _ tail_equal.
+  injection equal_packed as tail_equal.
   discriminate tail_equal.
 Qed.
 
