@@ -39,8 +39,8 @@ const audit = JSON.parse(
 assert(text(audit.schema, "audit schema") === "mts-v015-independent-readiness-audit/v0.1", "audit schema");
 assert(text(audit.ownerIssue, "audit owner") === "#1876", "audit owner");
 assert(
-  text(audit.status, "audit status") === "AUDIT_COMPLETE_BLOCKED_BY_DOCS_AND_GOVERNANCE",
-  "audit remains blocked while V15-DOCS-01 or V15-GOV-04 is OPEN",
+  text(audit.status, "audit status") === "AUDIT_COMPLETE_BLOCKED_BY_GOVERNANCE",
+  "audit remains blocked while V15-GOV-04 is OPEN",
 );
 
 assert(requirements.status === "candidate", "v0.15 remains candidate");
@@ -60,7 +60,6 @@ const open = mandatory
   .map((item) => text(item.id, "open id"))
   .sort();
 const expectedOpen = [
-  "V15-DOCS-01",
   "V15-GOV-04",
   "V15-READY-01",
   "V15-READY-02",
@@ -111,18 +110,18 @@ for (const key of [
 ]) {
   assert(text(conclusion[key], "audit " + key) === "GREEN", key + " audit green");
 }
-assert(text(conclusion.generatedFormalSpecification, "generated FORMAL specification") === "BLOCKED", "generated FORMAL specification blocked");
+assert(text(conclusion.generatedFormalSpecification, "generated FORMAL specification") === "GREEN", "generated FORMAL specification green");
 assert(text(conclusion.operationalMergeGovernance, "merge governance") === "BLOCKED", "merge governance blocked");
 assert(conclusion.releaseReady === false, "audit does not claim release ready");
 assert(conclusion.authorAcceptanceReady === false, "audit does not claim Author acceptance ready");
 
 const snapshot = record(audit.requirementSnapshot, "requirement snapshot");
 assert(Number(snapshot.mandatoryCount) === mandatory.length, "mandatory requirement count");
-assert(strings(snapshot.open, "audit open requirements").length === 5, "audit records five open requirements");
+assert(strings(snapshot.open, "audit open requirements").length === 4, "audit records four open requirements");
 const nonReadiness = strings(snapshot.nonReadinessBlockers, "non-readiness blockers").slice().sort();
 assert(
-  JSON.stringify(nonReadiness) === JSON.stringify(["V15-DOCS-01", "V15-GOV-04"].sort()),
-  "docs + governance are the non-readiness blockers",
+  JSON.stringify(nonReadiness) === JSON.stringify(["V15-GOV-04"]),
+  "governance is the only non-readiness blocker",
 );
 
 const governance = record(audit.governanceObservation, "governance observation");
@@ -141,13 +140,13 @@ for (const path of strings(audit.semanticEvidence, "semantic evidence")) {
 }
 
 console.log([
-  "MTS_V015_READINESS_R2=AUDIT_COMPLETE_BLOCKED_BY_DOCS_AND_GOVERNANCE",
+  "MTS_V015_READINESS_R2=AUDIT_COMPLETE_BLOCKED_BY_GOVERNANCE",
   "SEMANTIC_CORE=GREEN",
   "FORMAL_JSON_COMPILER=GREEN",
   "EXTERNAL_ASSURANCE=GREEN",
   "APPROVED_EXECUTABLE_CORPUS=6_GREEN",
   "CROSS_REPOSITORY_FREEZE=GREEN",
-  "NON_READINESS_BLOCKERS=V15-DOCS-01,V15-GOV-04",
+  "NON_READINESS_BLOCKERS=V15-GOV-04",
   "RULESET_BYPASS=BLOCKING",
   "RELEASE_READY=FALSE",
   "AUTHOR_ACCEPTANCE=NOT_REQUESTED",
