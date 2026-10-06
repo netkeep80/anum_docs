@@ -305,7 +305,7 @@ function renderCandidateProofCard(proof: V015CandidateProofProjection): string {
     "**Rocq targets:**",
     ...list(proof.rocq),
     "",
-    "**Связанные источники и исполняемые свидетели:**",
+    "**Связанные proof-source файлы:**",
     ...(proof.sourcePaths.length
       ? proof.sourcePaths.map((path) => "- " + repositoryLink(path))
       : ["- нет"]),

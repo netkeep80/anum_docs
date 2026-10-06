@@ -88,14 +88,9 @@ function sourcePaths(evidence: JsonObject): string[] {
   }
   if (evidence.sources !== undefined) {
     const sources = object(evidence.sources, "candidate evidence.sources");
-    for (const value of Object.values(sources)) {
+    for (const key of ["lean4", "rocq", "assurance"]) {
+      const value = sources[key];
       if (typeof value === "string") result.add(value);
-    }
-  }
-  for (const key of ["executableWitnesses", "approvedArtifactWitnesses"]) {
-    if (evidence[key] === undefined) continue;
-    for (const value of strings(evidence[key], "candidate evidence." + key)) {
-      result.add(value);
     }
   }
   return [...result].sort();
