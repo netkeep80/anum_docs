@@ -1,0 +1,66 @@
+{
+  "schema": "mts-v015-approved-artifact-evidence/v0.1",
+  "status": "FULL_REGRESSION_GREEN",
+  "canonicalAccepted": true,
+  "authorDecision": {
+    "state": "APPROVED",
+    "decision": "APPROVE ALL",
+    "evidence": "netkeep80/anum_docs#1980 issuecomment-6024720547",
+    "date": "2026-10-06"
+  },
+  "verification": {
+    "head": "ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+    "ciRun": 37525720828,
+    "contractObservatoryRun": 37525721015,
+    "frozenAmemoryRun": 37525720725
+  },
+  "amemory": {
+    "repository": "netkeep80/amemory",
+    "frozenMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "rustToolchain": "1.98.1",
+    "exactPackageParity": true,
+    "exactEvidenceParity": true,
+    "programSpecificDispatch": 0,
+    "jobId": 112482088839,
+    "rows": "4/4"
+  },
+  "id": "compact-boolean-xor",
+  "semanticModel": {
+    "strictBooleanDomain": true,
+    "nonBoolean": "NO_MATCH",
+    "roleCount": 0,
+    "groundedRuleCount": 4,
+    "semanticMemberCount": 4,
+    "semantics": [
+      "XOR([F,F])->F",
+      "XOR([F,T])->T",
+      "XOR([T,F])->T",
+      "XOR([T,T])->F"
+    ],
+    "ruleDiscovery": "semantic Theory->Rule membership",
+    "execution": "shared generalized Γ-compatible path"
+  },
+  "artifacts": {
+    "formal": {
+      "path": "formal/v0.15/regression/compact-xor.formal",
+      "sha256": "4721b9f02400613ad05a8cc50ac0add3520c6aa72c836f95fdb4edf44bbaa038"
+    },
+    "json": {
+      "path": "formal/v0.15/regression/compact-xor.json",
+      "sha256": "1dc6cb2464f0bb1fc0d54388677ea9136d907caa174ad694388c054c57d24581"
+    },
+    "recursive": {
+      "path": "formal/v0.15/regression/compact-xor.recursive",
+      "sha256": "40747a38d8fc3a9025a8576f3632145814c81688385bfc73ee44b64fc98fcd56"
+    },
+    "amemoryPackage": {
+      "path": "formal/v0.15/regression/compact-xor.amemory-package.json",
+      "sha256": "821d135c460ccfe74d8e3f89d889375760412a1c9823ebc793f103082e923584"
+    },
+    "amemoryEvidence": {
+      "path": "formal/v0.15/regression/compact-xor.amemory-evidence.json",
+      "sha256": "2dec5b6e48c60ab382089c639e4ad620bf03166d117db9e7c14036cfcde4fcf9"
+    }
+  }
+}
