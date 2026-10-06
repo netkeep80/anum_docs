@@ -463,6 +463,27 @@ function runCase(
     proofOccurrence,
     memory.ensure(LOCAL_OK, proofOccurrence),
   );
+  const expectedClaimSequence =
+    materializeExactSequence(memory, actualPremiseClaims);
+  const expectedPacket = memory.ensure(
+    PACKET_ENTRY,
+    memory.ensure(
+      CHECK_APPLICATION,
+      memory.ensure(actualClaim, expectedClaimSequence),
+    ),
+  );
+  const expectedRequest = memory.ensure(
+    ADMISSIONS_OK,
+    memory.ensure(
+      MAKE_VERIFIER,
+      memory.ensure(
+        sourceDR,
+        memory.ensure(expectedPacket, proofOccurrence),
+      ),
+    ),
+  );
+  const expectedContextualPacket =
+    memory.ensure(proofOccurrence, expectedPacket);
 
   const scope = defineV013WorkingScope(
     memory,
@@ -473,12 +494,22 @@ function runCase(
   const current = new V013CurrentScopeCursor(memory, scope);
 
   let generations = 0;
+  let sawRequest = current.members().includes(expectedRequest);
+  let sawContextualPacket =
+    current.members().includes(expectedContextualPacket);
+  let sawSuccess = current.members().includes(expectedSuccess);
+  const matchTrace: number[] = [];
   for (; generations < 64; generations += 1) {
     const reaction = reactV013StructuralScope(
       memory,
       current,
       fresh(),
     );
+    matchTrace.push(reaction.rawRuleMatches);
+    sawRequest ||= current.members().includes(expectedRequest);
+    sawContextualPacket ||=
+      current.members().includes(expectedContextualPacket);
+    sawSuccess ||= current.members().includes(expectedSuccess);
     if (reaction.quiescent) break;
   }
   assert(generations < 64, spec.label + " reaches quiescence");
@@ -486,7 +517,15 @@ function runCase(
   const success = current.members().includes(expectedSuccess);
 
   if (mutate === "none") {
-    assert(success, spec.label + " valid occurrence reaches LOCAL_OK");
+    assert(
+      success,
+      spec.label + " valid occurrence reaches LOCAL_OK" +
+        " generations=" + String(generations) +
+        " matches=" + matchTrace.join(",") +
+        " sawRequest=" + String(sawRequest) +
+        " sawContextualPacket=" + String(sawContextualPacket) +
+        " sawSuccess=" + String(sawSuccess),
+    );
   } else {
     assert(
       !success,
