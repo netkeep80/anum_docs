@@ -20,6 +20,7 @@ import {
 } from "../src/tooling/docs-sync.js";
 import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
 import { loadRepositoryTheoremProjectionSources } from "../src/tooling/theorem-projection-model.js";
+import { FORMAL_NOTATION_V015_SOURCE_PATHS, FORMAL_NOTATION_V015_TARGET_PATH, renderFormalNotationV015Markdown } from "../src/tooling/formal-notation-v015-markdown.js";
 
 function expectThrow(action: () => unknown, pattern: RegExp): void {
   assert.throws(action, pattern);
@@ -44,6 +45,22 @@ expectThrow(
 );
 
 const repositoryRoot = findRepositoryRoot();
+const renderedFormalNotationV015 = renderFormalNotationV015Markdown(repositoryRoot);
+assert.equal(
+  readFileSync(resolve(repositoryRoot, FORMAL_NOTATION_V015_TARGET_PATH), "utf8"),
+  renderedFormalNotationV015,
+  "v0.15 FORMAL specification must equal its whole-file generated projection",
+);
+assert.ok(renderedFormalNotationV015.includes("mts-doc-version: v0.15-candidate"));
+assert.ok(renderedFormalNotationV015.includes("Текущая принятая версия МТС: v0.14"));
+assert.ok(renderedFormalNotationV015.includes("compact-boolean-and"));
+assert.ok(renderedFormalNotationV015.includes("GPR-01..09"));
+assert.ok(renderedFormalNotationV015.includes("FRM-01..08"));
+assert.equal(
+  renderFormalNotationV015Markdown(repositoryRoot),
+  renderedFormalNotationV015,
+  "v0.15 FORMAL renderer must be deterministic/idempotent",
+);
 const projection = loadCurrentProjection(repositoryRoot);
 assert.equal(projection.currentContract, "mts-contract/v0.14");
 assert.equal(projection.previousContract, "mts-contract/v0.13");
@@ -193,6 +210,7 @@ try {
   copy("traceability/mts-v0.14.json");
   copy("requirements/mts-v0.14.json");
   copy("cutover/typescript-c1-acceptance-v0.7.json");
+  for (const path of FORMAL_NOTATION_V015_SOURCE_PATHS) copy(path);
   for (const path of loadRepositoryTheoremProjectionSources(repositoryRoot).availablePaths) copy(path);
   for (const path of listRepositoryMarkdownSurface(repositoryRoot)) copy(path);
 
