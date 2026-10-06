@@ -206,6 +206,7 @@ const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/v015-formal-recursive-compiler.ts",
   "ts/src/v015-proof-source.ts",
   "ts/src/v015-source-anet.ts",
+  "ts/src/v015-direct-json-source.ts",
   "ts/src/v015-direct-formal-source.ts",
   "ts/src/v015-direct-source.ts",
 ]);
