@@ -127,19 +127,35 @@ for (const native of nativeRules) {
 
 // ---------------------------------------------------------------------------
 // Generic compatibility lowering to the frozen legacy structural executor.
-// This is backend evidence only; the canonical Rule topology above remains the
-// semantic source.
+//
+// Frozen v0.13 execution carries the caller/context K as one generated role:
+//   K->Antecedent => [K->Output]
+//
+// This is the same generic zero-role compatibility pattern already exercised by
+// the approved grounded v0.15 package; it is not characteristic-function
+// semantics.
 // ---------------------------------------------------------------------------
 
-const legacyTheory = fresh();
-const grammar = fresh();
-const legacyEmptyDictionary = defineStructuralRoleDictionary(memory, []);
+const compatibilitySeed = memory.ensure(membershipTheory, MEMBER);
+const contextRole = memory.ensureStartSelfClosed(compatibilitySeed);
+const legacyTheory = memory.ensureEndSelfClosed(compatibilitySeed);
+const grammar = memory.ensure(compatibilitySeed, contextRole);
+const legacyDictionary = defineStructuralRoleDictionary(
+  memory,
+  [contextRole],
+);
 
 for (const native of nativeRules) {
+  const before = memory.ensure(contextRole, native.antecedent);
+  const outputTemplates = [
+    memory.ensure(contextRole, native.output),
+  ];
+  const legacyImage = materializeExactSequence(memory, outputTemplates);
+  const legacyBody = memory.ensure(before, legacyImage);
   const legacyRule = defineStructuralRule(
     memory,
-    legacyEmptyDictionary,
-    native.body,
+    legacyDictionary,
+    legacyBody,
   );
   const legacyAdmission = admitStructuralRule(
     memory,
@@ -152,13 +168,14 @@ for (const native of nativeRules) {
 
 const legacyInterpreter = defineStructuralInterpreter(
   memory,
-  legacyEmptyDictionary,
+  legacyDictionary,
   grammar,
   legacyTheory,
 );
 
 function evaluate(rule: LinkHandle): LinkHandle {
-  const initial = state(objectTheory, rule, b.U);
+  const endpoint = state(objectTheory, rule, b.U);
+  const initial = memory.ensure(contextRole, endpoint);
   const scope = defineV013WorkingScope(
     memory,
     fresh(),
@@ -166,11 +183,26 @@ function evaluate(rule: LinkHandle): LinkHandle {
     [initial],
   );
   const current = new V013CurrentScopeCursor(memory, scope);
-  reactV013StructuralScope(memory, current, fresh());
+  const reaction = reactV013StructuralScope(memory, current, fresh());
   same(current.members().length, 1, "one membership result");
-  const result = current.members()[0]!;
-  same(memory.poles(result).start, application(objectTheory, rule), "application retained");
-  return memory.poles(result).end;
+
+  const resultCurrent = current.members()[0]!;
+  same(
+    memory.poles(resultCurrent).start,
+    contextRole,
+    "compatibility lowering preserves caller/context K",
+  );
+  const resultEndpoint = memory.poles(resultCurrent).end;
+  same(
+    memory.poles(resultEndpoint).start,
+    application(objectTheory, rule),
+    "application retained",
+  );
+
+  if (rule === ruleA || rule === ruleB) {
+    same(reaction.rawRuleMatches, 1, "selected member has one lowered match");
+  }
+  return memory.poles(resultEndpoint).end;
 }
 
 same(evaluate(ruleA), b.L, "pinned A -> L");
