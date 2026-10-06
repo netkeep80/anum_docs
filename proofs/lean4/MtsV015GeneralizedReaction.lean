@@ -587,4 +587,132 @@ theorem GPR_03_read_your_own_writes_is_not_one_generation :
       Gamma gpr03WitnessDecomposition GPR03WitnessState.a := by
   decide
 
+
+/-
+GPR-04 — partition/schedule refinement.
+
+ReductionContribution is external proof machinery for the extensional result
+of independently analyzed work. The merge operation models the A11 law:
+matched flags combine by OR and output membership combines by extensional OR.
+No runtime UNION opcode or second semantic command is introduced.
+-/
+
+structure ReductionContribution (Output : Type) where
+  matched : Prop
+  emits : Output → Prop
+
+def MergeContribution
+    {Output : Type}
+    (left right : ReductionContribution Output) :
+    ReductionContribution Output where
+  matched := left.matched ∨ right.matched
+  emits := fun output => left.emits output ∨ right.emits output
+
+def ContributionEquivalent
+    {Output : Type}
+    (left right : ReductionContribution Output) : Prop :=
+  (left.matched ↔ right.matched) ∧
+  ∀ output, left.emits output ↔ right.emits output
+
+theorem GPR_04_merge_associative_observation
+    {Output : Type}
+    (a b c : ReductionContribution Output) :
+    ContributionEquivalent
+      (MergeContribution (MergeContribution a b) c)
+      (MergeContribution a (MergeContribution b c)) := by
+  constructor
+  · change ((a.matched ∨ b.matched) ∨ c.matched) ↔
+      (a.matched ∨ (b.matched ∨ c.matched))
+    exact or_assoc
+  · intro output
+    change ((a.emits output ∨ b.emits output) ∨ c.emits output) ↔
+      (a.emits output ∨ (b.emits output ∨ c.emits output))
+    exact or_assoc
+
+theorem GPR_04_merge_commutative_observation
+    {Output : Type}
+    (a b : ReductionContribution Output) :
+    ContributionEquivalent
+      (MergeContribution a b)
+      (MergeContribution b a) := by
+  constructor
+  · change (a.matched ∨ b.matched) ↔ (b.matched ∨ a.matched)
+    exact or_comm
+  · intro output
+    change (a.emits output ∨ b.emits output) ↔
+      (b.emits output ∨ a.emits output)
+    exact or_comm
+
+theorem GPR_04_merge_idempotent_observation
+    {Output : Type}
+    (a : ReductionContribution Output) :
+    ContributionEquivalent
+      (MergeContribution a a)
+      a := by
+  constructor
+  · change (a.matched ∨ a.matched) ↔ a.matched
+    exact or_self
+  · intro output
+    change (a.emits output ∨ a.emits output) ↔ a.emits output
+    exact or_self
+
+theorem gpr04_four_way_repartition
+    (A B C D : Prop) :
+    ((A ∨ B) ∨ (C ∨ D)) ↔
+    ((A ∨ C) ∨ (B ∨ D)) := by
+  constructor
+  · intro left
+    rcases left with ab | cd
+    · rcases ab with a | b
+      · exact Or.inl (Or.inl a)
+      · exact Or.inr (Or.inl b)
+    · rcases cd with c | d
+      · exact Or.inl (Or.inr c)
+      · exact Or.inr (Or.inr d)
+  · intro right
+    rcases right with ac | bd
+    · rcases ac with a | c
+      · exact Or.inl (Or.inl a)
+      · exact Or.inr (Or.inl c)
+    · rcases bd with b | d
+      · exact Or.inl (Or.inr b)
+      · exact Or.inr (Or.inr d)
+
+theorem GPR_04_two_dimensional_partition_refinement
+    {Output : Type}
+    (a11 a12 a21 a22 : ReductionContribution Output) :
+    ContributionEquivalent
+      (MergeContribution
+        (MergeContribution a11 a12)
+        (MergeContribution a21 a22))
+      (MergeContribution
+        (MergeContribution a11 a21)
+        (MergeContribution a12 a22)) := by
+  constructor
+  · change
+      ((a11.matched ∨ a12.matched) ∨ (a21.matched ∨ a22.matched)) ↔
+      ((a11.matched ∨ a21.matched) ∨ (a12.matched ∨ a22.matched))
+    exact gpr04_four_way_repartition _ _ _ _
+  · intro output
+    change
+      ((a11.emits output ∨ a12.emits output) ∨
+        (a21.emits output ∨ a22.emits output)) ↔
+      ((a11.emits output ∨ a21.emits output) ∨
+        (a12.emits output ∨ a22.emits output))
+    exact gpr04_four_way_repartition _ _ _ _
+
+def PreserveCurrentAllowed
+    {Output : Type}
+    (contribution : ReductionContribution Output) : Prop :=
+  ¬ contribution.matched
+
+theorem GPR_04_local_no_match_cannot_publish_global_no_match
+    {Output : Type}
+    (left right : ReductionContribution Output)
+    (_leftNoMatch : ¬ left.matched)
+    (rightMatch : right.matched) :
+    ¬ PreserveCurrentAllowed (MergeContribution left right) := by
+  intro preserve
+  exact preserve (Or.inr rightMatch)
+
 end MTS.V015.External

@@ -580,3 +580,131 @@ Print Assumptions GPR_03_prepublication_current_is_reaction_start.
 Print Assumptions GPR_03_analysis_ignores_staged_candidate.
 Print Assumptions GPR_03_one_generation_stops_at_B.
 Print Assumptions GPR_03_read_your_own_writes_is_not_one_generation.
+
+(*
+GPR-04 — partition/schedule refinement.
+
+ReductionContribution is verifier-side machinery for the extensional result of
+independently analyzed work. MergeContribution models the A11 law:
+matched flags combine by OR and output membership combines by extensional OR.
+No runtime UNION opcode is introduced.
+*)
+
+Record ReductionContribution (Output : Type) := {
+  rc_matched : Prop;
+  rc_emits : Output -> Prop
+}.
+
+Definition MergeContribution
+    {Output : Type}
+    (left right : ReductionContribution Output) :
+    ReductionContribution Output :=
+  {|
+    rc_matched := rc_matched _ left / rc_matched _ right;
+    rc_emits := fun output =>
+      rc_emits _ left output / rc_emits _ right output
+  |}.
+
+Definition ContributionEquivalent
+    {Output : Type}
+    (left right : ReductionContribution Output) : Prop :=
+  (rc_matched _ left <-> rc_matched _ right) /  forall output,
+    rc_emits _ left output <-> rc_emits _ right output.
+
+Theorem GPR_04_merge_associative_observation
+    {Output : Type}
+    (a b c : ReductionContribution Output) :
+    ContributionEquivalent
+      (MergeContribution (MergeContribution a b) c)
+      (MergeContribution a (MergeContribution b c)).
+Proof.
+  unfold ContributionEquivalent, MergeContribution.
+  simpl.
+  split.
+  - tauto.
+  - intro output.
+    tauto.
+Qed.
+
+Theorem GPR_04_merge_commutative_observation
+    {Output : Type}
+    (a b : ReductionContribution Output) :
+    ContributionEquivalent
+      (MergeContribution a b)
+      (MergeContribution b a).
+Proof.
+  unfold ContributionEquivalent, MergeContribution.
+  simpl.
+  split.
+  - tauto.
+  - intro output.
+    tauto.
+Qed.
+
+Theorem GPR_04_merge_idempotent_observation
+    {Output : Type}
+    (a : ReductionContribution Output) :
+    ContributionEquivalent
+      (MergeContribution a a)
+      a.
+Proof.
+  unfold ContributionEquivalent, MergeContribution.
+  simpl.
+  split.
+  - tauto.
+  - intro output.
+    tauto.
+Qed.
+
+Lemma gpr04_four_way_repartition
+    (A B C D : Prop) :
+    ((A / B) / (C / D)) <->
+    ((A / C) / (B / D)).
+Proof.
+  tauto.
+Qed.
+
+Theorem GPR_04_two_dimensional_partition_refinement
+    {Output : Type}
+    (a11 a12 a21 a22 : ReductionContribution Output) :
+    ContributionEquivalent
+      (MergeContribution
+        (MergeContribution a11 a12)
+        (MergeContribution a21 a22))
+      (MergeContribution
+        (MergeContribution a11 a21)
+        (MergeContribution a12 a22)).
+Proof.
+  unfold ContributionEquivalent, MergeContribution.
+  simpl.
+  split.
+  - apply gpr04_four_way_repartition.
+  - intro output.
+    apply gpr04_four_way_repartition.
+Qed.
+
+Definition PreserveCurrentAllowed
+    {Output : Type}
+    (contribution : ReductionContribution Output) : Prop :=
+  ~ rc_matched _ contribution.
+
+Theorem GPR_04_local_no_match_cannot_publish_global_no_match
+    {Output : Type}
+    (left right : ReductionContribution Output)
+    (_left_no_match : ~ rc_matched _ left)
+    (right_match : rc_matched _ right) :
+    ~ PreserveCurrentAllowed (MergeContribution left right).
+Proof.
+  unfold PreserveCurrentAllowed, MergeContribution.
+  simpl.
+  intro preserve.
+  apply preserve.
+  right.
+  exact right_match.
+Qed.
+
+Print Assumptions GPR_04_merge_associative_observation.
+Print Assumptions GPR_04_merge_commutative_observation.
+Print Assumptions GPR_04_merge_idempotent_observation.
+Print Assumptions GPR_04_two_dimensional_partition_refinement.
+Print Assumptions GPR_04_local_no_match_cannot_publish_global_no_match.
