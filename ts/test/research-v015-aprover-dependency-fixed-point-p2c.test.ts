@@ -619,21 +619,15 @@ function run(reverse: boolean): RunResult {
   );
 
   // Every successful occurrence has exactly one dynamically generated gate Rule
-  // admitted in the final Theory. Cyclic non-valid occurrences have none.
-  const staticSet = new Set(program.staticAdmissions);
-  const dynamicAdmissions = [...state.members].filter((member) => {
-    if (staticSet.has(member)) return false;
-    const p = memory.poles(member);
-    if (p.start !== program.theory || p.end === member) return false;
-    try {
-      readStructuralRule(memory, p.end);
-      return true;
-    } catch {
-      return false;
-    }
-  });
+  // admitted in the final Theory. Count through the same validated Theory
+  // snapshot used by Gamma; arbitrary Theory->data current Links are not Rules.
+  const staticRules = new Set(
+    program.staticAdmissions.map((admission) => memory.poles(admission).end),
+  );
+  const dynamicRules = theorySnapshot(memory, state, program.theory)
+    .filter((snapshot) => !staticRules.has(snapshot.rule));
   same(
-    dynamicAdmissions.length,
+    dynamicRules.length,
     successful.size,
     "one canonical generated validity gate per successful occurrence",
   );
@@ -647,7 +641,7 @@ function run(reverse: boolean): RunResult {
   return Object.freeze({
     generations,
     certs,
-    gateAdmissionCount: dynamicAdmissions.length,
+    gateAdmissionCount: dynamicRules.length,
     finalMatches,
   });
 }
