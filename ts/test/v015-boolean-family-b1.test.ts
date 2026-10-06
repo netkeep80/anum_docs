@@ -101,7 +101,7 @@ function fixture(): Fixture {
 
 function repositoryRoot(): string {
   for (const candidate of [resolve(process.cwd(), ".."), process.cwd()]) {
-    if (existsSync(resolve(candidate, "formal/v0.15/candidates/compact-not.formal"))) {
+    if (existsSync(resolve(candidate, "formal/v0.15/regression/compact-not.formal"))) {
       return candidate;
     }
   }
@@ -217,8 +217,8 @@ const specs: readonly OperatorSpec[] = [
   },
   {
     id: "NOT",
-    formalPath: "formal/v0.15/candidates/compact-not.formal",
-    jsonPath: "formal/v0.15/candidates/compact-not.json",
+    formalPath: "formal/v0.15/regression/compact-not.formal",
+    jsonPath: "formal/v0.15/regression/compact-not.json",
     formalSha256: "42697be6cad8b522e1b4a7fbfd75fda5f7af5d313a995a42105c82f8ceec2c47",
     jsonSha256: "eed9bebaf4ecd34be160da3a9cdf006f7f9c1802b780da0f0fe44d2fb2487da2",
     arity: 1,
@@ -230,8 +230,8 @@ const specs: readonly OperatorSpec[] = [
   },
   {
     id: "OR",
-    formalPath: "formal/v0.15/candidates/compact-or.formal",
-    jsonPath: "formal/v0.15/candidates/compact-or.json",
+    formalPath: "formal/v0.15/regression/compact-or.formal",
+    jsonPath: "formal/v0.15/regression/compact-or.json",
     formalSha256: "04f794a27c26249c0eb75a5163add1a46ddb5537d6b4b783782e3044db9528ee",
     jsonSha256: "3fbcd16fb0e067fa5c84be5d86a39a964da45cf7fdcc03880d2e23c28f5b6c29",
     arity: 2,
@@ -245,8 +245,8 @@ const specs: readonly OperatorSpec[] = [
   },
   {
     id: "XOR",
-    formalPath: "formal/v0.15/candidates/compact-xor.formal",
-    jsonPath: "formal/v0.15/candidates/compact-xor.json",
+    formalPath: "formal/v0.15/regression/compact-xor.formal",
+    jsonPath: "formal/v0.15/regression/compact-xor.json",
     formalSha256: "4721b9f02400613ad05a8cc50ac0add3520c6aa72c836f95fdb4edf44bbaa038",
     jsonSha256: "1dc6cb2464f0bb1fc0d54388677ea9136d907caa174ad694388c054c57d24581",
     arity: 2,
