@@ -601,7 +601,7 @@
       "id": "V15-CTX-01",
       "group": "CTX",
       "ownerIssue": "#1987",
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "mandatory": true,
       "summary": "Theory, Context/currentness, interpreter/meta-program, entry and result execution roles are represented by Links and semantic ANet membership. Host package/launch code may perform only generic selection/orchestration allowed by the machine contract and cannot supply semantic role authority.",
       "dependsOn": [
@@ -611,16 +611,34 @@
         "issue": 1987
       },
       "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
+        "positiveVectors": [
+          "a5-freeze-resume-no-external-execution-sidecar",
+          "a6-theory-derived-from-link-ancestry",
+          "a8-positive-anet-currentness-membership",
+          "a9-one-gamma-structural-execution-no-external-current-scope-theory-pointer",
+          "gpr01-09-proof-closure"
+        ],
+        "negativeVectors": [
+          "physical-link-existence-alone-is-not-currentness",
+          "foreign-theory-is-inert",
+          "presentation-name-rename-does-not-create-authority",
+          "host-current-scope-theory-pointers-forbidden",
+          "external-grounder-command-forbidden"
+        ],
+        "requiredExecutableGates": [
+          "ts/test/v015-context-authority-closure-c1.test.ts",
+          "ts/test/v015-self-contained-context-freeze-resume-a5.test.ts",
+          "ts/test/v015-context-theory-self-contained-a6.test.ts",
+          "ts/test/v015-positive-aset-currentness-a8.test.ts",
+          "ts/test/v015-structural-aset-one-command-a9.test.ts"
+        ]
       }
     },
     {
       "id": "V15-CTX-02",
       "group": "CTX",
       "ownerIssue": "#1987",
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "mandatory": true,
       "summary": "The same Link may have different execution roles under different selected ANet contexts only because the corresponding contextual Link memberships differ; host names, manifests or pointers cannot create those roles.",
       "dependsOn": [
@@ -631,9 +649,22 @@
         "issue": 1987
       },
       "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
+        "positiveVectors": [
+          "same-physical-link-can-retain-independent-theory-admission-role-after-currentness-moves",
+          "currentness-follows-semantic-membership-not-physical-topology",
+          "contextual-theory-selection-is-link-structural",
+          "foreign-theory-membership-remains-isolated"
+        ],
+        "negativeVectors": [
+          "host-name-does-not-create-context-role",
+          "host-manifest-pointer-does-not-create-theory-or-currentness",
+          "stale-physical-active-link-is-inert-without-semantic-membership"
+        ],
+        "requiredExecutableGates": [
+          "ts/test/v015-context-authority-closure-c1.test.ts",
+          "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+          "ts/test/v015-positive-aset-currentness-a8.test.ts"
+        ]
       }
     },
     {
