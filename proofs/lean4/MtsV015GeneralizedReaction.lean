@@ -415,3 +415,110 @@ theorem GPR_01_same_analysis_same_staging
   rfl
 
 end MTS.V015.External
+
+
+namespace MTS.V015.External
+
+/-
+GPR-02 — canonical Aset membership convergence.
+
+Semantic Aset membership is extensional: deriving the same canonical Link more
+than once does not introduce semantic multiplicity. This is a membership law,
+not a runtime "dedup command". Provenance/event multiplicity may be retained in
+a separate evidence carrier. ExactSequence multiplicity is explicitly outside
+this law.
+-/
+
+def AddAsetMember
+    {Link : Type}
+    (member : Link → Prop)
+    (derived : Link) : Link → Prop :=
+  fun value => value = derived ∨ member value
+
+/--
+Adding the same canonical Link twice changes no Aset-membership query.
+The theorem is pointwise and therefore needs no proposition/function
+extensionality axiom.
+-/
+theorem GPR_02_duplicate_membership_idempotent
+    {Link : Type}
+    (member : Link → Prop)
+    (derived value : Link) :
+    AddAsetMember (AddAsetMember member derived) derived value ↔
+    AddAsetMember member derived value := by
+  constructor
+  · intro duplicated
+    rcases duplicated with same | nested
+    · exact Or.inl same
+    · rcases nested with same | old
+      · exact Or.inl same
+      · exact Or.inr old
+  · intro single
+    rcases single with same | old
+    · exact Or.inl same
+    · exact Or.inr (Or.inr old)
+
+/--
+Order of two semantic membership contributions is nonsemantic at the Aset
+membership level.
+-/
+theorem GPR_02_membership_contribution_commutes
+    {Link : Type}
+    (member : Link → Prop)
+    (first second value : Link) :
+    AddAsetMember (AddAsetMember member first) second value ↔
+    AddAsetMember (AddAsetMember member second) first value := by
+  constructor
+  · intro left
+    rcases left with secondEq | nested
+    · exact Or.inr (Or.inl secondEq)
+    · rcases nested with firstEq | old
+      · exact Or.inl firstEq
+      · exact Or.inr (Or.inr old)
+  · intro right
+    rcases right with firstEq | nested
+    · exact Or.inr (Or.inl firstEq)
+    · rcases nested with secondEq | old
+      · exact Or.inl secondEq
+      · exact Or.inr (Or.inr old)
+
+def EventDerives
+    {Link Provenance : Type}
+    (events : List (Link × Provenance))
+    (value : Link) : Prop :=
+  ∃ provenance, (value, provenance) ∈ events
+
+/--
+Two distinct derivation events may remain two evidence occurrences even when
+they project to one semantic Link membership.
+-/
+theorem GPR_02_duplicate_provenance_events_are_preserved
+    {Link Provenance : Type}
+    (value : Link)
+    (firstProvenance secondProvenance : Provenance) :
+    let events := [(value, firstProvenance), (value, secondProvenance)]
+    events.length = 2 ∧ EventDerives events value := by
+  dsimp
+  constructor
+  · rfl
+  · refine ⟨firstProvenance, ?_⟩
+    exact List.Mem.head _
+
+/--
+Aset idempotence MUST NOT collapse repeated positions inside ExactSequence.
+-/
+theorem GPR_02_exact_sequence_multiplicity_not_collapsed
+    {Atom : Type}
+    (value : ExactPackedLink Atom) :
+    packExactSequence [value, value] ≠
+    packExactSequence [value] := by
+  intro equalPacked
+  change
+    ExactPackedLink.pair value
+        (ExactPackedLink.pair value ExactPackedLink.root) =
+      ExactPackedLink.pair value ExactPackedLink.root
+    at equalPacked
+  have tailEqual := (ExactPackedLink.pair.inj equalPacked).2
+  cases tailEqual
+
+end MTS.V015.External
