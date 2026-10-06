@@ -115,8 +115,8 @@ export function renderFormalNotationV015Markdown(root: string): string {
   }
 
   const requirements = readJson(root, "requirements/mts-v0.15.json");
-  if (string(requirements.mtsVersion, "MTS version") !== "v0.15") {
-    fail("requirements version must be v0.15");
+  if (string(requirements.mtsVersion, "MTS version") !== "v0.15-candidate") {
+    fail("requirements version must be v0.15-candidate");
   }
   if (requirements.accepted !== false) fail("generated candidate spec cannot claim accepted v0.15");
   const currentAccepted = object(requirements.currentAccepted, "currentAccepted");
