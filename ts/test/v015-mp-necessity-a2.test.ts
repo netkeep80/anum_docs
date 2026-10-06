@@ -300,23 +300,23 @@ function run(
     };
   };
 
-  same(candidate.status, "DEVELOPMENT_ONLY_AUTHOR_REVIEW_PENDING", "candidate status");
-  same(candidate.candidateFamily, "GROUNDED_EXACT_REACTION_FLOOR", "grounded candidate family");
-  same(candidate.capabilityAxes.matchPower, "EXACT_ANTECEDENT_IDENTITY", "grounded exact match axis");
-  same(candidate.capabilityAxes.jointAntecedentArity, "ONE_CURRENT_MEMBER", "grounded one-member antecedent");
+  same(candidate.status, "AUTHOR_APPROVED_DESIGN_PROOF_GREEN", "candidate status");
+  same(candidate.candidateFamily, "STRUCTURAL_UNARY_J0_REACTION", "selected candidate family");
+  same(candidate.capabilityAxes.matchPower, "STRUCTURAL_TEMPLATE_WITH_SEMANTIC_ROLE_MEMBERSHIP", "selected structural match axis");
+  same(candidate.capabilityAxes.jointAntecedentArity, "ONE_CURRENT_ENDPOINT", "selected one-endpoint antecedent");
   same(candidate.capabilityAxes.imageArity, "ZERO_ONE_MANY", "grounded image cardinality");
   same(candidate.capabilityAxes.scopeLift, "POINTWISE_N_CURRENT_MEMBERS", "grounded pointwise scope lift");
   same(candidate.competingCandidate.id, "STRUCTURAL_UNARY_TEMPLATE_REACTION", "structural-unary comparison retained");
   same(
     candidate.competingCandidate.status,
-    "AUTHOR_APPROVED_DESIGN_PROOF_PENDING",
-    "structural-unary Γ design approved with proof closure pending",
+    "AUTHOR_APPROVED_PROOF_GREEN",
+    "structural-unary Γ design approved with proof closure green",
   );
   same(candidate.competingCandidate.matchPower, "STRUCTURAL_TEMPLATE_WITH_ROLES", "structural-unary match axis");
   same(candidate.competingCandidate.jointAntecedentArity, "ONE_CURRENT_MEMBER", "structural-unary is not cross-member join");
   same(candidate.decision.scalarPositiveLaw, "MP0_RETAINED", "MP0 retained");
-  same(candidate.decision.minimalCompleteLocalReaction, "MP1_CANDIDATE", "MP1 candidate");
-  same(candidate.decision.scopeLift, "MP2_DERIVED_CANDIDATE", "MP2 derived candidate");
+  same(candidate.decision.minimalCompleteLocalReaction, "STRUCTURAL_UNARY_J0_SELECTED", "structural-unary J0 selected");
+  same(candidate.decision.scopeLift, "POINTWISE_N_CURRENT_DERIVED_REFINEMENT", "pointwise lift derived refinement");
   same(
     candidate.decision.packedStructuralAntecedent,
     "MP1_ON_EXPLICIT_COMPOSITE_LINK",
@@ -324,8 +324,8 @@ function run(
   );
   same(
     candidate.decision.trueCrossMemberJoin,
-    "MP4_DEFERRED_NOT_REQUIRED_BY_CURRENT_CORPUS",
-    "MP4 deferred",
+    "J1_NOT_REQUIRED",
+    "J1 not required",
   );
   same(candidate.crossMemberJoin.implicitPackingForbidden, true, "implicit packing forbidden");
   same(candidate.crossMemberJoin.requiredForV015, false, "MP4 not currently required");
@@ -339,13 +339,13 @@ function run(
 
   same(
     candidate.theoremPremiseSplit.status,
-    "GREEN_RESEARCH_AUTHOR_REVIEW_PENDING",
+    "PROVED_RESEARCH",
     "theorem/premise split status",
   );
   same(
     candidate.theoremPremiseSplit.localReactionPower.classification,
-    "OPEN_ARCHITECTURE_DECISION",
-    "local reaction power remains an Author decision",
+    "AUTHOR_APPROVED_STRUCTURAL_UNARY_GAMMA_PROOF_GREEN",
+    "local reaction power is Author-approved and proof-green",
   );
   same(
     candidate.theoremPremiseSplit.derivedTheoremCandidates.BUNDLE_LIFT.classification,
