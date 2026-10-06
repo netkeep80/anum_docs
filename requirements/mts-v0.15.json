@@ -1163,9 +1163,17 @@
         "issue": 1876
       },
       "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
+        "positiveVectors": [
+          "all-semantic-execution-json-compiler-proof-assurance-corpus-components-green",
+          "independent-r2-audit-complete"
+        ],
+        "negativeVectors": [
+          "v15-gov04-ruleset-bypass-open",
+          "draft-pr-repo-guard-skipped-is-not-release-enforcement"
+        ],
+        "requiredExecutableGates": [
+          "ts/test/v015-independent-readiness-r2.test.ts"
+        ]
       }
     },
     {
@@ -1182,9 +1190,18 @@
         "issue": 1876
       },
       "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
+        "positiveVectors": [
+          "r2-falsifies-hidden-semantic-open-requirements-none-found",
+          "r2-cross-repository-freeze-green",
+          "r2-approved-corpus-six-green",
+          "r2-formal-json-compiler-and-external-assurance-green"
+        ],
+        "negativeVectors": [
+          "r2-detects-operational-merge-governance-blocker-v15-gov04"
+        ],
+        "requiredExecutableGates": [
+          "ts/test/v015-independent-readiness-r2.test.ts"
+        ]
       }
     },
     {
@@ -1202,7 +1219,9 @@
       },
       "evidence": {
         "positiveVectors": [],
-        "negativeVectors": [],
+        "negativeVectors": [
+          "no-final-author-accept-reject-decision-recorded"
+        ],
         "requiredExecutableGates": []
       }
     },
