@@ -560,7 +560,7 @@
       "id": "V15-AND-04",
       "group": "AND",
       "ownerIssue": "#1980",
-      "state": "OPEN",
+      "state": "VERTICAL_GREEN",
       "mandatory": true,
       "summary": "Author-gated strict Boolean NOT/OR/XOR reuse the exact same FORMAL/JSON source model, semantic Theory->Rule discovery, zero-role Rule topology, generic Γ-compatible execution path and generic frozen-backend lowering as approved AND; no operator-specific semantic/runtime path is permitted.",
       "dependsOn": [
@@ -586,13 +586,15 @@
         ],
         "requiredExecutableGates": [
           "ts/test/v015-boolean-family-b1.test.ts",
-          "ts/test/research-v015-compact-and-package-a2.ts"
+          "ts/test/research-v015-compact-and-package-a2.ts",
+          ".github/workflows/amemory-v015-regression.yml@37525720725"
         ]
       },
-      "authorApprovalRequired": [
-        "formal/v0.15/candidates/compact-not.json",
-        "formal/v0.15/candidates/compact-or.json",
-        "formal/v0.15/candidates/compact-xor.json"
+      "authorApprovalEvidence": "netkeep80/anum_docs#1980 issuecomment-6024720547",
+      "canonicalArtifacts": [
+        "formal/v0.15/regression/compact-not.json",
+        "formal/v0.15/regression/compact-or.json",
+        "formal/v0.15/regression/compact-xor.json"
       ]
     },
     {
