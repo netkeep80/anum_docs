@@ -140,7 +140,7 @@
       "classification": "PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",
       "premises": [
         "finite correlated/order-sensitive values are represented by recursive ExactSequence-style Link packing",
-        "role authority is semantic Aset membership selected for the Rule, not physical Link existence"
+        "role authority is semantic ANet membership selected for the Rule, not physical Link existence"
       ],
       "exclusions": [
         "does not prove that J1 can never be useful for any future MTS extension",
