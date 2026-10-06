@@ -78,7 +78,7 @@ function sourcePaths(evidence: JsonObject): string[] {
       "candidate evidence.externalCrossCheck",
     );
     for (const lane of ["lean4", "rocq"]) {
-      if (cross[lane] === undefined) continue;
+      if (cross[lane] === undefined || typeof cross[lane] !== "object") continue;
       const source = object(
         cross[lane],
         "candidate evidence.externalCrossCheck." + lane,
