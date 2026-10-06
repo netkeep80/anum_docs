@@ -9,6 +9,30 @@
   },
   "targets": [
     {
+      "id": "GPR-01",
+      "classification": "PROVED_AS_PURE_SINGLE_STATE_TRANSFORMER_REFINEMENT",
+      "premises": [
+        "analysis is a pure function of the reaction-start state",
+        "synthesis consumes only the analysis result",
+        "publication is a deterministic function of the reaction-start state and staged result"
+      ],
+      "exclusions": [
+        "does not yet prove no-read-your-own-writes across a concrete implementation; that is GPR-03",
+        "does not prove partition or scheduler independence; that is GPR-04",
+        "analysis and staging values are verifier/refinement objects, not additional MTS machine states"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_01_decomposition_iff_single_gamma_step",
+        "MTS.V015.External.GPR_01_gamma_successor_unique",
+        "MTS.V015.External.GPR_01_same_analysis_same_staging"
+      ],
+      "rocq": [
+        "GPR_01_decomposition_iff_single_gamma_step",
+        "GPR_01_gamma_successor_unique",
+        "GPR_01_same_analysis_same_staging"
+      ]
+    },
+    {
       "id": "GPR-06",
       "classification": "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
       "premises": [
