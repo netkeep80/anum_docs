@@ -269,6 +269,37 @@ validateCandidate(requirements, traceability);
   assert(!groups.includes("THM") && !groups.includes("PROOF"), "v0.16 proof groups removed from v0.15 Author JSON scope");
 }
 
+// Operational governance blocker anti-drift.
+{
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for governance blocker");
+  const byId = new Map((list as Json[]).map((item) => [text(item.id, "governance id"), item]));
+
+  const gov = byId.get("V15-GOV-04");
+  assert(gov !== undefined, "V15-GOV-04 operational merge-enforcement blocker exists");
+  assert(text(gov.ownerIssue, "V15-GOV-04 owner") === "#1982", "V15-GOV-04 owner is #1982");
+  assert(gov.mandatory === true, "V15-GOV-04 is mandatory");
+  assert(/repo-guard/i.test(text(gov.summary, "V15-GOV-04 summary")), "V15-GOV-04 covers repo-guard");
+  assert(/bypass/i.test(text(gov.summary, "V15-GOV-04 bypass summary")), "V15-GOV-04 covers bypass containment");
+
+  const ready = byId.get("V15-READY-01");
+  assert(ready !== undefined, "V15-READY-01 exists");
+  assert(
+    strings(ready.dependsOn, "V15-READY-01 dependsOn").includes("V15-GOV-04"),
+    "release readiness depends on operational merge enforcement",
+  );
+
+  const traces = record(traceability.requirements, "trace requirements for governance blocker");
+  const traced = record(traces["V15-GOV-04"], "V15-GOV-04 trace");
+  assert(text(traced.state, "V15-GOV-04 trace state") === text(gov.state, "V15-GOV-04 state"), "V15-GOV-04 trace state");
+  assert(Number(traced.ownerIssue) === 1982, "V15-GOV-04 trace owner");
+  assert(
+    strings(record(traces["V15-READY-01"], "READY trace").dependsOn, "READY trace dependsOn")
+      .includes("V15-GOV-04"),
+    "traceability readiness depends on V15-GOV-04",
+  );
+}
+
 // compact Boolean AND approved corpus lock.
 {
   const corpus = record(traceability.approvedJsonCorpus, "approvedJsonCorpus AND lock");
