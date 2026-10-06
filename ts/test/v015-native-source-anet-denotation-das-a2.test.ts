@@ -24,6 +24,7 @@ import { SyntaxAsetBuilder } from "../src/syntax-aset-contract.js";
 import {
   denoteV015ResolvedSourceAnet,
   materializeV015SourceAnetProfile,
+  readV015SourceAnetProfile,
   type V015SourceAnetProfile,
 } from "../src/v015-source-anet.js";
 import {
@@ -115,6 +116,16 @@ const sourceAnetProfileRoot = materializeV015SourceAnetProfile(
   memory,
   profile,
 );
+
+const profileReadCount = memory.linkCount;
+const profileReadBack = readV015SourceAnetProfile(
+  memory,
+  basis,
+  grammarRoot,
+  sourceAnetProfileRoot,
+);
+same(profileReadBack.blockForm, profile.blockForm, "source ANet profile readback");
+same(memory.linkCount, profileReadCount, "source ANet profile read is read-only");
 
 const Theory = fresh();
 const E = fresh();
@@ -699,6 +710,7 @@ for (const bad of [
   "{\"A\":null,\"A\":null}",
   "{\"A\":null,\"\\u0041\":null}",
 ]) {
+  const beforeInvalidJson = memory.linkCount;
   let rejected = false;
   try {
     compileDirectJsonToNativeSourceAnet(bad);
@@ -707,6 +719,11 @@ for (const bad of [
       error.code === "duplicate-key";
   }
   assert(rejected, "duplicate decoded JSON key fails closed");
+  same(
+    memory.linkCount,
+    beforeInvalidJson,
+    "duplicate-key validation fails before source materialization",
+  );
 }
 
 
