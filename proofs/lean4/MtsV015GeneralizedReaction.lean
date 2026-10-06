@@ -521,4 +521,70 @@ theorem GPR_02_exact_sequence_multiplicity_not_collapsed
   have tailEqual := (ExactPackedLink.pair.inj equalPacked).2
   cases tailEqual
 
+
+/-
+GPR-03 — generation isolation / no read-your-own-writes.
+
+PrePublicationCurrent is verifier-side refinement machinery. It states the
+selected semantic law explicitly: while one Gamma generation is being
+analyzed/staged, the observable current remains the reaction-start State.
+Only publication creates the State that may be analyzed by the next Gamma.
+-/
+
+def PrePublicationCurrent
+    {State Staged : Type}
+    (before : State)
+    (_staged : Staged) : State :=
+  before
+
+theorem GPR_03_prepublication_current_is_reaction_start
+    {State Staged : Type}
+    (before : State)
+    (staged : Staged) :
+    PrePublicationCurrent before staged = before :=
+  rfl
+
+theorem GPR_03_analysis_ignores_staged_candidate
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before : State)
+    (firstStaged secondStaged : Staged) :
+    D.analyze (PrePublicationCurrent before firstStaged) =
+    D.analyze (PrePublicationCurrent before secondStaged) :=
+  rfl
+
+/--
+A concrete A->B->C-style witness. One semantic Gamma maps A to B. Feeding B
+back into analysis immediately computes the second generation C and therefore
+is not a refinement of one isolated generation.
+-/
+inductive GPR03WitnessState
+  | a
+  | b
+  | c
+  deriving DecidableEq
+
+def gpr03WitnessDecomposition :
+    ReactionDecomposition
+      GPR03WitnessState
+      GPR03WitnessState
+      GPR03WitnessState where
+  analyze := fun state => state
+  synthesize := fun
+    | .a => .b
+    | .b => .c
+    | .c => .c
+  publish := fun _before staged => staged
+
+theorem GPR_03_one_generation_stops_at_B :
+    Gamma gpr03WitnessDecomposition GPR03WitnessState.a =
+    GPR03WitnessState.b :=
+  rfl
+
+theorem GPR_03_read_your_own_writes_is_not_one_generation :
+    Gamma gpr03WitnessDecomposition
+        (Gamma gpr03WitnessDecomposition GPR03WitnessState.a) ≠
+      Gamma gpr03WitnessDecomposition GPR03WitnessState.a := by
+  decide
+
 end MTS.V015.External

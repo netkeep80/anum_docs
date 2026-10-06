@@ -501,3 +501,82 @@ Print Assumptions GPR_02_duplicate_membership_idempotent.
 Print Assumptions GPR_02_membership_contribution_commutes.
 Print Assumptions GPR_02_duplicate_provenance_events_are_preserved.
 Print Assumptions GPR_02_exact_sequence_multiplicity_not_collapsed.
+
+(*
+GPR-03 — generation isolation / no read-your-own-writes.
+
+PrePublicationCurrent is verifier-side refinement machinery. During one Gamma
+generation the observable current remains the reaction-start State while
+analysis and synthesis are performed. Publication creates the State that may
+be analyzed by the next Gamma.
+*)
+
+Definition PrePublicationCurrent
+    {State Staged : Type}
+    (before : State)
+    (_staged : Staged) : State :=
+  before.
+
+Theorem GPR_03_prepublication_current_is_reaction_start
+    {State Staged : Type}
+    (before : State)
+    (staged : Staged) :
+    PrePublicationCurrent before staged = before.
+Proof.
+  reflexivity.
+Qed.
+
+Theorem GPR_03_analysis_ignores_staged_candidate
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before : State)
+    (first_staged second_staged : Staged) :
+    analyze _ _ _ D (PrePublicationCurrent before first_staged) =
+    analyze _ _ _ D (PrePublicationCurrent before second_staged).
+Proof.
+  reflexivity.
+Qed.
+
+Inductive GPR03WitnessState : Type :=
+| GPR03_A
+| GPR03_B
+| GPR03_C.
+
+Definition gpr03_witness_synthesize
+    (state : GPR03WitnessState) : GPR03WitnessState :=
+  match state with
+  | GPR03_A => GPR03_B
+  | GPR03_B => GPR03_C
+  | GPR03_C => GPR03_C
+  end.
+
+Definition GPR03WitnessDecomposition :
+    ReactionDecomposition
+      GPR03WitnessState
+      GPR03WitnessState
+      GPR03WitnessState :=
+  {|
+    analyze := fun state => state;
+    synthesize := gpr03_witness_synthesize;
+    publish := fun _before staged => staged
+  |}.
+
+Theorem GPR_03_one_generation_stops_at_B :
+    Gamma GPR03WitnessDecomposition GPR03_A = GPR03_B.
+Proof.
+  reflexivity.
+Qed.
+
+Theorem GPR_03_read_your_own_writes_is_not_one_generation :
+    Gamma GPR03WitnessDecomposition
+      (Gamma GPR03WitnessDecomposition GPR03_A) <>
+    Gamma GPR03WitnessDecomposition GPR03_A.
+Proof.
+  simpl.
+  discriminate.
+Qed.
+
+Print Assumptions GPR_03_prepublication_current_is_reaction_start.
+Print Assumptions GPR_03_analysis_ignores_staged_candidate.
+Print Assumptions GPR_03_one_generation_stops_at_B.
+Print Assumptions GPR_03_read_your_own_writes_is_not_one_generation.
