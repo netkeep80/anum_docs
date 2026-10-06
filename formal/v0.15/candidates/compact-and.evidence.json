@@ -1,7 +1,7 @@
 {
   "schema": "mts-v015-compact-and-candidate/v0.1",
   "id": "compact-boolean-and-four-grounded-rules",
-  "status": "AUTHOR_REVIEW_PENDING_RESEARCH_RUNNING",
+  "status": "AUTHOR_REVIEW_PENDING_RESEARCH_GREEN",
   "ownerIssue": "#1980",
   "canonicalAccepted": false,
   "supersedesResearchCandidate": "compact-and-two-generic-rules",
@@ -46,9 +46,9 @@
       "repository": "netkeep80/amemory",
       "sha": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
       "version": "0.175.0",
-      "workflowRun": null,
-      "result": "PENDING",
-      "rows": "pending",
+      "workflowRun": 37515581243,
+      "result": "SUCCESS",
+      "rows": "4/4",
       "programSpecificDispatch": 0
     }
   },
