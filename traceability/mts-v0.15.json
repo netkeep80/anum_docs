@@ -507,11 +507,31 @@
         "V15-AND-03",
         "V15-AUTHOR-JSON-01"
       ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
-      "authorJsonReview": "BLOCKED_ON_COMPACT_AND_APPROVAL"
+      "positiveVectors": [
+        "boolean-family-and-not-or-xor-one-generic-harness",
+        "boolean-family-semantic-theory-membership-rule-discovery",
+        "boolean-family-generic-zero-role-compatibility-lowering",
+        "frozen-amemory-not-2of2",
+        "frozen-amemory-or-4of4",
+        "frozen-amemory-xor-4of4"
+      ],
+      "negativeVectors": [
+        "boolean-family-nonboolean-operands-no-match",
+        "boolean-family-foreign-theory-inert",
+        "boolean-family-program-specific-runtime-dispatch-zero"
+      ],
+      "requiredExecutableGates": [
+        "ts/test/v015-boolean-family-b1.test.ts",
+        "ts/test/research-v015-compact-and-package-a2.ts"
+      ],
+      "evidenceRefs": [
+        "formal/v0.15/candidates/compact-not.evidence.json",
+        "formal/v0.15/candidates/compact-or.evidence.json",
+        "formal/v0.15/candidates/compact-xor.evidence.json",
+        ".github/workflows/amemory-v015-regression.yml",
+        "#1980"
+      ],
+      "authorJsonReview": "NOT_OR_XOR_AUTHOR_REVIEW_PENDING"
     },
     "V15-CTX-01": {
       "state": "OPEN",
