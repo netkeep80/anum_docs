@@ -54,6 +54,30 @@
         "GPR_07_grounded_zero_role_refinement",
         "GPR_07_zero_role_has_empty_substitution"
       ]
+    },
+    {
+      "id": "GPR-08",
+      "classification": "PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",
+      "premises": [
+        "finite correlated/order-sensitive values are represented by recursive ExactSequence-style Link packing",
+        "role authority is semantic Aset membership selected for the Rule, not physical Link existence"
+      ],
+      "exclusions": [
+        "does not prove that J1 can never be useful for any future MTS extension",
+        "does not prove the complete v0.15 executable corpus requires no J1 before the remaining corpus audit closes",
+        "does not turn ExactSequence into a separate ontology; it is Link topology",
+        "does not grant role authority from physical materialization alone"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_08_exact_sequence_packing_injective",
+        "MTS.V015.External.GPR_08_finite_arity_has_one_endpoint",
+        "MTS.V015.External.GPR_08_physical_nonmember_has_no_role_authority"
+      ],
+      "rocq": [
+        "GPR_08_exact_sequence_packing_injective",
+        "GPR_08_finite_arity_has_one_endpoint",
+        "GPR_08_physical_nonmember_has_no_role_authority"
+      ]
     }
   ]
 }
