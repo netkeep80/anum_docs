@@ -440,7 +440,7 @@ function buildPackage(noise = 0): PackageResult {
     negativeEntry: wire(
       f.memory,
       f.basis,
-      materializeExactSequence(f.memory, [negativeLaunch]),
+      negativeLaunch,
     ),
   });
   return Object.freeze({ json: JSON.stringify(packageValue) });
