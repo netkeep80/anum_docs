@@ -22,6 +22,8 @@ on:
       - "ts/test/research-v015-p1af-proof-validity-package.ts"
       - "ts/test/research-v015-p1ah-packed-substitution-package.ts"
       - "ts/test/research-v015-p2b-dr-self-verifier-package.ts"
+      - "ts/test/research-v015-p2d-dependency-fixed-point-package.ts"
+      - "ts/test/research-v015-p2d-dependency-fixed-point-runner.rs"
       - ".github/workflows/amemory-v015-regression.yml"
   workflow_dispatch:
 
@@ -774,3 +776,123 @@ jobs:
             "normative_aset_membership_evidence=P2A canonical_source_artifact=0"
           )
           PY
+
+
+  aprover-dependency-fixed-point-research:
+    name: aprover dependency fixed point / frozen A-memory research
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout anum_docs
+        uses: actions/checkout@v6
+
+      - name: Checkout exact frozen A-memory
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/amemory
+          ref: ${{ env.AMEMORY_FROZEN_SHA }}
+          path: _amemory
+
+      - name: Verify exact frozen snapshot engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C _amemory rev-parse HEAD)" = "$AMEMORY_FROZEN_SHA"
+          test "$(tr -d '\r\n' < _amemory/VERSION)" = "$AMEMORY_FROZEN_VERSION"
+          test -f _amemory/experiments/optimized-cpu-rust/src/structural.rs
+          grep -F 'Phase 1 is strictly read-only.' _amemory/experiments/optimized-cpu-rust/src/structural.rs
+          grep -F 'discover every old Scope member' _amemory/experiments/optimized-cpu-rust/src/structural.rs
+          grep -F 'Phase 2 is one physical Store transaction.' _amemory/experiments/optimized-cpu-rust/src/structural.rs
+          echo "AMEMORY_FROZEN_SNAPSHOT_ENGINE=PASS sha=$AMEMORY_FROZEN_SHA version=$AMEMORY_FROZEN_VERSION"
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: ts/package-lock.json
+
+      - name: Build temporary P2d dependency package
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --prefix ts
+          npm run --prefix ts build --silent
+          node ts/dist/test/research-v015-p2d-dependency-fixed-point-package.js > /tmp/p2d-package.json
+
+          python3 - <<'PY'
+          import json
+          data=json.load(open("/tmp/p2d-package.json","r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-p2d-dependency-fixed-point-package/v0.1"
+          assert len(data["links"])==3
+          for name in [
+              "interpreter",
+              "initial",
+              "reversedInitial",
+              "expectedCerts",
+              "absentCerts",
+              "validLeftProbe",
+          ]:
+              assert isinstance(data[name],str) and data[name]
+              assert set(data[name])<=set("8961")
+          assert all(set(x)<=set("8961") for x in data["links"])
+
+          with open("/tmp/p2d-transport.txt","w",encoding="ascii",newline="\n") as out:
+              out.write("MTS_V015_P2D_DEPENDENCY_FIXED_POINT_V1\n")
+              out.write(str(len(data["links"]))+"\n")
+              for source in data["links"]:
+                  out.write(source+"\n")
+              for name in [
+                  "interpreter",
+                  "initial",
+                  "reversedInitial",
+                  "expectedCerts",
+                  "absentCerts",
+                  "validLeftProbe",
+              ]:
+                  out.write(data[name]+"\n")
+
+          print(
+            "P2D_DEPENDENCY_PACKAGE=GENERATED_NOT_CANONICAL_JSON "
+            "initial_occurrences=8 expected_certs=6 absent_cycle_certs=2"
+          )
+          PY
+
+      - name: Install exact A-memory Rust toolchain
+        run: rustup toolchain install "$AMEMORY_RUST_TOOLCHAIN" --profile minimal
+
+      - name: Compile external runner against frozen optimized engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/p2d-runner/src
+          cp ts/test/research-v015-p2d-dependency-fixed-point-runner.rs /tmp/p2d-runner/src/main.rs
+          cat > /tmp/p2d-runner/Cargo.toml <<EOF
+          [package]
+          name = "mts-v015-p2d-frozen-runner"
+          version = "0.0.0"
+          edition = "2021"
+          publish = false
+
+          [dependencies]
+          amemory-optimized-cpu-probe = { path = "$GITHUB_WORKSPACE/_amemory/experiments/optimized-cpu-rust" }
+          EOF
+
+          cargo +"$AMEMORY_RUST_TOOLCHAIN" build \
+            --quiet \
+            --manifest-path /tmp/p2d-runner/Cargo.toml
+
+      - name: Replay dependency fixed point through real frozen A-memory
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +"$AMEMORY_RUST_TOOLCHAIN" run \
+            --quiet \
+            --manifest-path /tmp/p2d-runner/Cargo.toml \
+            -- /tmp/p2d-transport.txt | tee /tmp/p2d-evidence.txt
+
+          grep -F 'FROZEN_AMEMORY_P2D_DEPENDENCY_FIXED_POINT=PASS' /tmp/p2d-evidence.txt
+          grep -F 'generation_isolation=G2_GATE_NOT_VISIBLE_G3_VISIBLE' /tmp/p2d-evidence.txt
+          grep -F 'expected_certs=6 absent_cycle_certs=2' /tmp/p2d-evidence.txt
+          grep -F 'entry_order_semantic=0 host_dfs=0 host_visited=0 j1=0' /tmp/p2d-evidence.txt
