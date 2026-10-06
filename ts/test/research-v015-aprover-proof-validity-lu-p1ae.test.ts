@@ -178,10 +178,11 @@ const continuation1Template = memory.ensure(
   memory.ensure(T_ROLE, R2_ROLE),
 );
 
-// Host/program entry contains the proof certificate and a canonical U verdict.
-// The candidate does not supply an L/U result field.
+// Entry contains only the supplied proof certificate. The first ordinary
+// aprover reaction constructs the canonical ValidProof(P)->U state itself.
+// Neither candidate nor host supplies an L/U result field.
 const requestTemplate = memory.ensure(
-  verdictUTemplate,
+  REQUEST,
   memory.ensure(VERIFY_TWO, proofTemplate),
 );
 const firstCheckTemplate = checking(
@@ -271,7 +272,7 @@ function run(
   const certificate = proof(theory, first, second);
   const initialVerdict = verdict(certificate, b.U);
   const request = memory.ensure(
-    initialVerdict,
+    REQUEST,
     memory.ensure(VERIFY_TWO, certificate),
   );
   const scope = defineV013WorkingScope(
@@ -381,7 +382,8 @@ console.log([
   "U_ROLE=SUPPLIED_CERTIFICATE_NOT_ACCEPTED_BY_SELECTED_VERIFIER",
   "U_NE_THEOREM_FALSE=TRUE",
   "CERTIFICATE_VALIDITY_NE_CLAIM_DERIVABILITY=TRUE",
-  "INITIAL_VERDICT=U",
+  "INITIAL_REQUEST_RESULT_BIT=0",
+  "GENERATION_1_CONSTRUCTS_VALID_PROOF_P_TO_U",
   "ONLY_COMPLETE_REPLAY_REWRITES_VERDICT_TO_L",
   "MISSING_FIRST=U",
   "MISSING_SECOND=U",
