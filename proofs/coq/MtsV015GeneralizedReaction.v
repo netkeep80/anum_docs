@@ -864,3 +864,136 @@ Print Assumptions GPR_05_current_rule_comparison_product.
 Print Assumptions GPR_05_raw_staging_budget.
 Print Assumptions GPR_05_finite_generation_budget.
 Print Assumptions GPR_05_no_finite_ambient_carrier_required.
+
+
+(*
+GPR-09 — direct-gauge C-boundary compatibility and chirality covariance.
+
+Accepted v0.14 CTX-03 supplies the Link-native mirror transport for the
+one-sided START/END classes. This v0.15 projection assumes the internal phases
+of the SAME Gamma operation are structurally mirror-covariant, then proves the
+whole composed Gamma is mirror-covariant. No reverse-mode command is added.
+*)
+
+Record GPR09ChiralGammaKernel
+    (State Plan Stage Boundary : Type) := {
+  gpr09_analyze : Boundary -> State -> Plan;
+  gpr09_synthesize : Boundary -> Plan -> Stage;
+  gpr09_publish : Boundary -> State -> Stage -> State;
+  gpr09_mirror_state : State -> State;
+  gpr09_mirror_plan : Plan -> Plan;
+  gpr09_mirror_stage : Stage -> Stage;
+  gpr09_mirror_boundary : Boundary -> Boundary;
+
+  gpr09_mirror_state_involutive :
+    forall state,
+      gpr09_mirror_state (gpr09_mirror_state state) = state;
+
+  gpr09_mirror_boundary_involutive :
+    forall boundary,
+      gpr09_mirror_boundary (gpr09_mirror_boundary boundary) = boundary;
+
+  gpr09_analysis_covariant :
+    forall boundary state,
+      gpr09_mirror_plan (gpr09_analyze boundary state) =
+        gpr09_analyze
+          (gpr09_mirror_boundary boundary)
+          (gpr09_mirror_state state);
+
+  gpr09_synthesis_covariant :
+    forall boundary plan,
+      gpr09_mirror_stage (gpr09_synthesize boundary plan) =
+        gpr09_synthesize
+          (gpr09_mirror_boundary boundary)
+          (gpr09_mirror_plan plan);
+
+  gpr09_publication_covariant :
+    forall boundary state stage,
+      gpr09_mirror_state (gpr09_publish boundary state stage) =
+        gpr09_publish
+          (gpr09_mirror_boundary boundary)
+          (gpr09_mirror_state state)
+          (gpr09_mirror_stage stage)
+}.
+
+Definition GPR09Gamma
+    {State Plan Stage Boundary : Type}
+    (K : GPR09ChiralGammaKernel State Plan Stage Boundary)
+    (boundary : Boundary)
+    (state : State) : State :=
+  gpr09_publish _ _ _ _ K boundary state
+    (gpr09_synthesize _ _ _ _ K boundary
+      (gpr09_analyze _ _ _ _ K boundary state)).
+
+Theorem GPR_09_gamma_chirality_covariant
+    {State Plan Stage Boundary : Type}
+    (K : GPR09ChiralGammaKernel State Plan Stage Boundary)
+    (boundary : Boundary)
+    (state : State) :
+    gpr09_mirror_state _ _ _ _ K (GPR09Gamma K boundary state) =
+      GPR09Gamma K
+        (gpr09_mirror_boundary _ _ _ _ K boundary)
+        (gpr09_mirror_state _ _ _ _ K state).
+Proof.
+  unfold GPR09Gamma.
+  rewrite
+    (gpr09_publication_covariant _ _ _ _ K boundary state
+      (gpr09_synthesize _ _ _ _ K boundary
+        (gpr09_analyze _ _ _ _ K boundary state))).
+  rewrite
+    (gpr09_synthesis_covariant _ _ _ _ K boundary
+      (gpr09_analyze _ _ _ _ K boundary state)).
+  rewrite
+    (gpr09_analysis_covariant _ _ _ _ K boundary state).
+  reflexivity.
+Qed.
+
+Theorem GPR_09_direct_end_boundary_mirrors_to_start
+    {State Plan Stage Boundary : Type}
+    (K : GPR09ChiralGammaKernel State Plan Stage Boundary)
+    (directBoundary rootEnd rootStart : Boundary)
+    (direct_is_end : directBoundary = rootEnd)
+    (end_mirrors_start :
+      gpr09_mirror_boundary _ _ _ _ K rootEnd = rootStart) :
+    gpr09_mirror_boundary _ _ _ _ K directBoundary = rootStart.
+Proof.
+  rewrite direct_is_end.
+  exact end_mirrors_start.
+Qed.
+
+Theorem GPR_09_direct_gauge_mirror_equivalence
+    {State Plan Stage Boundary : Type}
+    (K : GPR09ChiralGammaKernel State Plan Stage Boundary)
+    (directBoundary rootEnd rootStart : Boundary)
+    (direct_is_end : directBoundary = rootEnd)
+    (end_mirrors_start :
+      gpr09_mirror_boundary _ _ _ _ K rootEnd = rootStart)
+    (state : State) :
+    gpr09_mirror_state _ _ _ _ K (GPR09Gamma K directBoundary state) =
+      GPR09Gamma K rootStart
+        (gpr09_mirror_state _ _ _ _ K state).
+Proof.
+  rewrite
+    (GPR_09_gamma_chirality_covariant K directBoundary state).
+  rewrite
+    (GPR_09_direct_end_boundary_mirrors_to_start
+      K directBoundary rootEnd rootStart
+      direct_is_end end_mirrors_start).
+  reflexivity.
+Qed.
+
+Theorem GPR_09_boundary_mirror_roundtrip
+    {State Plan Stage Boundary : Type}
+    (K : GPR09ChiralGammaKernel State Plan Stage Boundary)
+    (boundary : Boundary) :
+    gpr09_mirror_boundary _ _ _ _ K
+      (gpr09_mirror_boundary _ _ _ _ K boundary) =
+    boundary.
+Proof.
+  exact (gpr09_mirror_boundary_involutive _ _ _ _ K boundary).
+Qed.
+
+Print Assumptions GPR_09_gamma_chirality_covariant.
+Print Assumptions GPR_09_direct_end_boundary_mirrors_to_start.
+Print Assumptions GPR_09_direct_gauge_mirror_equivalence.
+Print Assumptions GPR_09_boundary_mirror_roundtrip.

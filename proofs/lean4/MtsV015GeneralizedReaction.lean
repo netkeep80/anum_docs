@@ -820,4 +820,135 @@ theorem GPR_05_no_finite_ambient_carrier_required
       materializedCount = materialized.length := by
   exact ⟨materialized.length, rfl⟩
 
+/-
+GPR-09 — direct-gauge C-boundary compatibility and chirality covariance.
+
+Accepted v0.14 CTX-03 already supplies the Link-native mirror transport:
+one-sided START/END classes exchange under J while relative structural roles
+are preserved. This v0.15 projection isolates the remaining Gamma obligation.
+
+The theorem below does NOT postulate a reverse-execution mode. It assumes each
+internal phase of the SAME Gamma operation commutes with the selected mirror
+transport and proves that their composition commutes as well.
+
+State/Plan/Stage/Boundary are verifier-side types only.
+-/
+
+structure GPR09ChiralGammaKernel
+    (State Plan Stage Boundary : Type) where
+  analyze : Boundary → State → Plan
+  synthesize : Boundary → Plan → Stage
+  publish : Boundary → State → Stage → State
+  mirrorState : State → State
+  mirrorPlan : Plan → Plan
+  mirrorStage : Stage → Stage
+  mirrorBoundary : Boundary → Boundary
+
+  mirrorStateInvolutive :
+    ∀ state, mirrorState (mirrorState state) = state
+
+  mirrorBoundaryInvolutive :
+    ∀ boundary, mirrorBoundary (mirrorBoundary boundary) = boundary
+
+  analysisCovariant :
+    ∀ boundary state,
+      mirrorPlan (analyze boundary state) =
+        analyze (mirrorBoundary boundary) (mirrorState state)
+
+  synthesisCovariant :
+    ∀ boundary plan,
+      mirrorStage (synthesize boundary plan) =
+        synthesize (mirrorBoundary boundary) (mirrorPlan plan)
+
+  publicationCovariant :
+    ∀ boundary state stage,
+      mirrorState (publish boundary state stage) =
+        publish
+          (mirrorBoundary boundary)
+          (mirrorState state)
+          (mirrorStage stage)
+
+def GPR09Gamma
+    {State Plan Stage Boundary : Type}
+    (K : GPR09ChiralGammaKernel State Plan Stage Boundary)
+    (boundary : Boundary)
+    (state : State) : State :=
+  K.publish boundary state
+    (K.synthesize boundary (K.analyze boundary state))
+
+theorem GPR_09_gamma_chirality_covariant
+    {State Plan Stage Boundary : Type}
+    (K : GPR09ChiralGammaKernel State Plan Stage Boundary)
+    (boundary : Boundary)
+    (state : State) :
+    K.mirrorState (GPR09Gamma K boundary state) =
+      GPR09Gamma K (K.mirrorBoundary boundary) (K.mirrorState state) := by
+  calc
+    K.mirrorState (GPR09Gamma K boundary state) =
+        K.publish
+          (K.mirrorBoundary boundary)
+          (K.mirrorState state)
+          (K.mirrorStage
+            (K.synthesize boundary (K.analyze boundary state))) := by
+      exact K.publicationCovariant
+        boundary state
+        (K.synthesize boundary (K.analyze boundary state))
+    _ =
+        K.publish
+          (K.mirrorBoundary boundary)
+          (K.mirrorState state)
+          (K.synthesize
+            (K.mirrorBoundary boundary)
+            (K.mirrorPlan (K.analyze boundary state))) := by
+      rw [K.synthesisCovariant]
+    _ =
+        K.publish
+          (K.mirrorBoundary boundary)
+          (K.mirrorState state)
+          (K.synthesize
+            (K.mirrorBoundary boundary)
+            (K.analyze
+              (K.mirrorBoundary boundary)
+              (K.mirrorState state))) := by
+      rw [K.analysisCovariant]
+    _ = GPR09Gamma K
+        (K.mirrorBoundary boundary)
+        (K.mirrorState state) := by
+      rfl
+
+theorem GPR_09_direct_end_boundary_mirrors_to_start
+    {State Plan Stage Boundary : Type}
+    (K : GPR09ChiralGammaKernel State Plan Stage Boundary)
+    (directBoundary rootEnd rootStart : Boundary)
+    (directIsEnd : directBoundary = rootEnd)
+    (endMirrorsStart : K.mirrorBoundary rootEnd = rootStart) :
+    K.mirrorBoundary directBoundary = rootStart := by
+  rw [directIsEnd, endMirrorsStart]
+
+theorem GPR_09_direct_gauge_mirror_equivalence
+    {State Plan Stage Boundary : Type}
+    (K : GPR09ChiralGammaKernel State Plan Stage Boundary)
+    (directBoundary rootEnd rootStart : Boundary)
+    (directIsEnd : directBoundary = rootEnd)
+    (endMirrorsStart : K.mirrorBoundary rootEnd = rootStart)
+    (state : State) :
+    K.mirrorState (GPR09Gamma K directBoundary state) =
+      GPR09Gamma K rootStart (K.mirrorState state) := by
+  calc
+    K.mirrorState (GPR09Gamma K directBoundary state) =
+        GPR09Gamma K
+          (K.mirrorBoundary directBoundary)
+          (K.mirrorState state) :=
+      GPR_09_gamma_chirality_covariant K directBoundary state
+    _ = GPR09Gamma K rootStart (K.mirrorState state) := by
+      rw [GPR_09_direct_end_boundary_mirrors_to_start
+        K directBoundary rootEnd rootStart directIsEnd endMirrorsStart]
+
+theorem GPR_09_boundary_mirror_roundtrip
+    {State Plan Stage Boundary : Type}
+    (K : GPR09ChiralGammaKernel State Plan Stage Boundary)
+    (boundary : Boundary) :
+    K.mirrorBoundary (K.mirrorBoundary boundary) = boundary :=
+  K.mirrorBoundaryInvolutive boundary
+
 end MTS.V015.External
