@@ -206,6 +206,8 @@ const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/v015-formal-recursive-compiler.ts",
   "ts/src/v015-proof-source.ts",
   "ts/src/v015-source-anet.ts",
+  "ts/src/v015-direct-formal-source.ts",
+  "ts/src/v015-direct-source.ts",
 ]);
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
@@ -752,6 +754,8 @@ setEqual(
     "ts/src/v015-link-definition.ts#materializeExpression",
     "ts/src/v015-link-definition.ts#materializeV015ContextualNameCoordinate",
     "ts/src/v015-link-definition.ts#resolveEqualityOperand",
+    "ts/src/v015-direct-source.ts#StructuralExpressionReader.pairChain",
+    "ts/src/v015-direct-source.ts#StructuralExpressionReader.unary",
     "ts/src/v015-source-anet.ts#walkBlock",
     "ts/src/v015-proof-source.ts#build",
     "ts/src/v015-proof-source.ts#generic",
