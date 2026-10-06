@@ -142,12 +142,12 @@ const canonicalJson = readFileSync(
 );
 same(
   createHash("sha256").update(canonicalFormal, "utf8").digest("hex"),
-  "16fddc9f8245fd7237a67424364d9b1991fa256287d0101509f038158c64edd6",
+  "4a5bc92e661ee1d4e0c2c5d51769805b5406651bb491345200d088c9ad23e5f3",
   "exact candidate FORMAL digest",
 );
 same(
   createHash("sha256").update(canonicalJson, "utf8").digest("hex"),
-  "efc4d9a04897903b05f5a37b77d5cf12848987049fbb31cb3624756f0bd7eab1",
+  "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
   "exact candidate JSON digest",
 );
 
@@ -246,16 +246,19 @@ function reactGeneric(
 const f = fixture();
 const compiled = compileCandidate(f);
 
-const roleY = compiled.binding("RoleY");
 const theory = compiled.absolute("Theory");
-const ruleF = compiled.binding("RuleF");
-const ruleT = compiled.binding("RuleT");
-const admissionF = f.memory.ensure(theory, ruleF);
-const admissionT = f.memory.ensure(theory, ruleT);
+const ruleFF = compiled.binding("RuleFF");
+const ruleFT = compiled.binding("RuleFT");
+const ruleTF = compiled.binding("RuleTF");
+const ruleTT = compiled.binding("RuleTT");
+const admissionFF = f.memory.ensure(theory, ruleFF);
+const admissionFT = f.memory.ensure(theory, ruleFT);
+const admissionTF = f.memory.ensure(theory, ruleTF);
+const admissionTT = f.memory.ensure(theory, ruleTT);
 setSame(
   compiled.denotation.members,
-  [roleY, admissionF, admissionT],
-  "compact AND semantic ANet contains one role + two admissions only",
+  [admissionFF, admissionFT, admissionTF, admissionTT],
+  "strict Boolean AND semantic ANet contains four grounded Rule admissions only",
 );
 
 const AND = compiled.binding("AND");
@@ -277,17 +280,31 @@ for (const [left, right, expected, label] of rows) {
   same(outputs[0], expected, label + " AND result");
 }
 
-// Delete the T-leading rule admission: F-leading rows remain valid, T-leading
-// rows become NO_MATCH. The mutation changes one semantic relation only.
+// Boolean-domain falsifier: the old two-role research candidate accidentally
+// generalized AND(T,Y)=Y to arbitrary Links. Canonical Boolean AND must not.
+const X = compiled.absolute("NonBooleanOperand");
+for (const [left, label] of [[F, "FX"], [T, "TX"]] as const) {
+  const current = f.memory.ensure(
+    AND,
+    materializeExactSequence(f.memory, [left, X]),
+  );
+  same(
+    reactGeneric(f, compiled.denotation, theory, current).length,
+    0,
+    label + " non-Boolean operand is NO_MATCH",
+  );
+}
+
+// Delete exactly the TT admission. Only TT becomes NO_MATCH.
 const mutatedValue = JSON.parse(canonicalJson) as Record<string, unknown>;
-delete mutatedValue["Theory->RuleT"];
+delete mutatedValue["Theory->RuleTT"];
 const mutatedJson = JSON.stringify(mutatedValue, null, 2);
 const mutatedFormal = canonicalFormal
   .split("\n")
-  .filter((line) => !line.includes("Theory->RuleT"))
+  .filter((line) => !line.includes("Theory->RuleTT"))
   .map((line) =>
-    line.includes("Theory->RuleF,")
-      ? line.replace("Theory->RuleF,", "Theory->RuleF")
+    line.includes("Theory->RuleTF,")
+      ? line.replace("Theory->RuleTF,", "Theory->RuleTF")
       : line
   )
   .join("\n");
@@ -301,7 +318,7 @@ const mTheory = mutated.absolute("Theory");
 for (const [left, right, expectedCount, expectedValue, label] of [
   [mF, mF, 1, mF, "mutated FF"],
   [mF, mT, 1, mF, "mutated FT"],
-  [mT, mF, 0, null, "mutated TF"],
+  [mT, mF, 1, mF, "mutated TF"],
   [mT, mT, 0, null, "mutated TT"],
 ] as const) {
   const current = fm.memory.ensure(
@@ -322,12 +339,11 @@ same(
   "foreign Theory is inert",
 );
 
-// Rename only the helper alias RoleY. Semantic member/rule topology remains
-// identical because the alias resolves to the same role Link V->Y.
+// Rename a helper binding only. Semantic Rule/admission topology stays equal.
 const renamedJson = canonicalJson
-  .replaceAll('"RoleY"', '"SecondRole"')
-  .replaceAll('RoleY', 'SecondRole');
-const renamedFormal = canonicalFormal.replaceAll("RoleY", "SecondRole");
+  .replaceAll('"ArgsFF"', '"FalseFalseArgs"')
+  .replaceAll("ArgsFF", "FalseFalseArgs");
+const renamedFormal = canonicalFormal.replaceAll("ArgsFF", "FalseFalseArgs");
 const renamed = compileCandidate(f, renamedFormal, renamedJson);
 setSame(
   renamed.denotation.members,
@@ -337,13 +353,15 @@ setSame(
 
 console.log([
   "MTS_V015_COMPACT_AND_A1=GREEN_RESEARCH",
-  "MODEL=TWO_GENERIC_ROLE_BUNDLE_RULES",
-  "ROLE_COUNT=1",
-  "RULE_COUNT=2",
-  "SEMANTIC_MEMBER_COUNT=3",
+  "MODEL=FOUR_GROUNDED_ZERO_ROLE_RULES",
+  "ROLE_COUNT=0",
+  "RULE_COUNT=4",
+  "SEMANTIC_MEMBER_COUNT=4",
   "TRUTH_TABLE=4_OF_4",
+  "BOOLEAN_DOMAIN=STRICT_T_F",
+  "NON_BOOLEAN_OPERANDS=NO_MATCH",
   "EXACTSEQUENCE_INPUTS=TRUE",
-  "DELETE_RULE_T_ADMISSION=ONLY_T_LEADING_ROWS_DISABLED",
+  "DELETE_RULE_TT_ADMISSION=ONLY_TT_DISABLED",
   "FOREIGN_THEORY=INERT",
   "PRESENTATION_RENAME=SEMANTIC_INVARIANT",
   "AND_SPECIFIC_RUNTIME_DISPATCH=0",
