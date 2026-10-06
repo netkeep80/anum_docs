@@ -116,7 +116,7 @@ assert(conclusion.authorAcceptanceReady === false, "audit does not claim Author 
 
 const snapshot = record(audit.requirementSnapshot, "requirement snapshot");
 assert(Number(snapshot.mandatoryCount) === mandatory.length, "mandatory requirement count");
-assert(Number(snapshot.open?.length) === 4, "audit records four open requirements");
+assert(strings(snapshot.open, "audit open requirements").length === 4, "audit records four open requirements");
 assert(text(snapshot.onlyNonReadinessBlocker, "only non-readiness blocker") === "V15-GOV-04", "only non-readiness blocker");
 
 const governance = record(audit.governanceObservation, "governance observation");
