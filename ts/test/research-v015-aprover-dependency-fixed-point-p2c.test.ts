@@ -465,9 +465,11 @@ function buildFixture(reverse: boolean): Fixture {
     return cursor;
   };
 
-  const program = installProgram(memory, fresh);
-
   // Structural-only dependency graph after local P2a application validation.
+  //
+  // Occurrence identities are allocated BEFORE program roles. This matters:
+  // a grounded occurrence used inside a dynamically generated gate must not
+  // recursively contain that gate's structural placeholder role.
   //
   // leaf                         valid base
   // left  -> leaf
@@ -488,6 +490,8 @@ function buildFixture(reverse: boolean): Fixture {
     cycleA: fresh(),
     cycleB: fresh(),
   });
+
+  const program = installProgram(memory, fresh);
 
   const deps = Object.freeze({
     leaf: materializeExactSequence(memory, []),
