@@ -232,3 +232,96 @@ Qed.
 Print Assumptions GPR_06_finite_exact_closure.
 Print Assumptions GPR_06_fresh_structural_target_unreachable.
 Print Assumptions GPR_06_structure_sensitive_function_requires_more_than_exact_S0.
+
+
+(*
+GPR-08 — finite-arity J0 representation and semantic role authority.
+
+This paired projection proves only the boundary needed by v0.15:
+finite ordered/multiplicity-preserving structure can be packed losslessly into
+one recursive Link endpoint, so finite arity alone does not justify J1.
+Semantic role authority is selected Aset membership, not physical existence.
+*)
+
+Inductive ExactPackedLink (Atom : Type) : Type :=
+| ERoot : ExactPackedLink Atom
+| EAtom : Atom -> ExactPackedLink Atom
+| EPair :
+    ExactPackedLink Atom ->
+    ExactPackedLink Atom ->
+    ExactPackedLink Atom.
+
+Arguments ERoot {Atom}.
+Arguments EAtom {Atom} _.
+Arguments EPair {Atom} _ _.
+
+Fixpoint pack_exact_sequence
+    {Atom : Type}
+    (values : list (ExactPackedLink Atom)) : ExactPackedLink Atom :=
+  match values with
+  | [] => ERoot
+  | head :: tail => EPair head (pack_exact_sequence tail)
+  end.
+
+Theorem GPR_08_exact_sequence_packing_injective
+    {Atom : Type}
+    (xs ys : list (ExactPackedLink Atom))
+    (packed_equal :
+      pack_exact_sequence xs = pack_exact_sequence ys) :
+    xs = ys.
+Proof.
+  revert ys packed_equal.
+  induction xs as [|head tail IH]; intros ys packed_equal.
+  - destruct ys as [|other rest].
+    + reflexivity.
+    + simpl in packed_equal.
+      discriminate.
+  - destruct ys as [|other rest].
+    + simpl in packed_equal.
+      discriminate.
+    + simpl in packed_equal.
+      inversion packed_equal.
+      subst other.
+      f_equal.
+      apply IH.
+      assumption.
+Qed.
+
+Theorem GPR_08_finite_arity_has_one_endpoint
+    {Atom : Type}
+    (values : list (ExactPackedLink Atom)) :
+    exists endpoint,
+      endpoint = pack_exact_sequence values /\
+      forall other_values,
+        pack_exact_sequence other_values = endpoint ->
+        other_values = values.
+Proof.
+  exists (pack_exact_sequence values).
+  split.
+  - reflexivity.
+  - intros other_values same_endpoint.
+    apply
+      (GPR_08_exact_sequence_packing_injective
+        other_values values same_endpoint).
+Qed.
+
+Definition SemanticRole
+    {Link : Type}
+    (member : Link -> Prop)
+    (role : Link) : Prop :=
+  member role.
+
+Theorem GPR_08_physical_nonmember_has_no_role_authority
+    {Link : Type}
+    (physical_exists semantic_member : Link -> Prop)
+    (role : Link)
+    (_materialized : physical_exists role)
+    (not_semantic_member : ~ semantic_member role) :
+    ~ SemanticRole semantic_member role.
+Proof.
+  exact not_semantic_member.
+Qed.
+
+Print Assumptions GPR_08_exact_sequence_packing_injective.
+Print Assumptions GPR_08_finite_arity_has_one_endpoint.
+Print Assumptions GPR_08_physical_nonmember_has_no_role_authority.
