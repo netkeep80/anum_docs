@@ -134,6 +134,13 @@ async function main(): Promise<void> {
     THEOREM_CATALOG_INTEGRATION_CONTRACT.readModel.evidenceLanes,
     ["typescript", "lean4", "coq", "mtsNative", "aprover"],
   );
+  assert.deepEqual(
+    THEOREM_CATALOG_INTEGRATION_CONTRACT.candidateProofFamilies.map(
+      (family) => family.id,
+    ),
+    ["GPR", "FRM"],
+    "candidate proof families are separate from accepted theorem inventory",
+  );
 
   // T0.1 RED: accepted lawRefs must resolve through a declared semantic-law source.
   const acceptedLawIds = new Set(Object.keys(acceptedContract.requiredSemanticLaws ?? {}));
@@ -196,6 +203,9 @@ async function main(): Promise<void> {
     declaration.sources.map((source: any) => source.path),
     [
       ...THEOREM_CATALOG_INTEGRATION_CONTRACT.fixedSources,
+      ...THEOREM_CATALOG_INTEGRATION_CONTRACT.candidateProofFamilies.flatMap(
+        (family) => [family.assurancePath, ...family.evidencePaths],
+      ),
       ...actualEvidence,
     ].sort(),
     "repo-guard projection declaration contains every exact content dependency",

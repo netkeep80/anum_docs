@@ -46,6 +46,25 @@ function main(): void {
   );
   assert.match(first, /кандидатная проекция FORMAL/i);
   assert.match(first, /theorems\/formal-v0\.15\.json/);
+  assert.match(first, /## Кандидатные доказательства MTS v0\.15/);
+  assert.match(first, /candidate-only proof assurance/);
+  assert.match(first, /не изменяет принятый реестр из 21 теорем MTS v0\.14/i);
+  assert.match(first, /external-cross-check-only/);
+  const candidateAnchors = [
+    ...first.matchAll(/<a id="candidate-proof-([^"]+)"><\/a>/g),
+  ].map((match) => match[1]);
+  assert.deepEqual(
+    candidateAnchors,
+    model.candidateProofs.map((proof) => proof.id.toLowerCase()),
+    "candidate proof cards are generated separately from accepted theorem cards",
+  );
+  assert.match(first, /GPR-09 — GPR/);
+  assert.match(first, /C=END\(R\)/);
+  assert.match(first, /FRM-07 — FRM/);
+  assert.match(
+    first,
+    /PROVED_UNDER_EXPLICIT_PRODUCTION_REFINEMENT_PREMISES/,
+  );
 
   const anchors = [...first.matchAll(/<a id="theorem-([^"]+)"><\/a>/g)].map((match) => match[1]);
   assert.deepEqual(
@@ -210,6 +229,7 @@ function main(): void {
 
   console.log("THEOREM_CATALOG_MARKDOWN = DETERMINISTIC_GENERATED_PROJECTION");
   console.log("THEOREM_CARDS = 21/21");
+  console.log("V015_CANDIDATE_PROOFS = 17");
   console.log("LEAN_ROCQ = EXTERNAL_CROSS_CHECK");
   console.log("MTS_NATIVE = ASSURANCE_SOURCED");
   console.log("TYPESCRIPT = EXECUTABLE_WITNESS_ONLY");
