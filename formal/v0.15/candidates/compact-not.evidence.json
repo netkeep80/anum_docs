@@ -1,0 +1,60 @@
+{
+  "schema": "mts-v015-boolean-operator-candidate/v0.1",
+  "id": "compact-boolean-not-two-grounded-rules",
+  "status": "AUTHOR_REVIEW_PENDING_RESEARCH_GREEN",
+  "ownerIssue": "#1980",
+  "canonicalAccepted": false,
+  "candidate": {
+    "formal": "formal/v0.15/candidates/compact-not.formal",
+    "formalSha256": "42697be6cad8b522e1b4a7fbfd75fda5f7af5d313a995a42105c82f8ceec2c47",
+    "json": "formal/v0.15/candidates/compact-not.json",
+    "jsonSha256": "eed9bebaf4ecd34be160da3a9cdf006f7f9c1802b780da0f0fe44d2fb2487da2",
+    "rootEntryCount": 17
+  },
+  "semanticModel": {
+    "domain": "ExactSequence([F|T]); any non-{F,T} operand is NO_MATCH",
+    "laws": [
+      "NOT([F])->T",
+      "NOT([T])->F"
+    ],
+    "roleMembers": [],
+    "admissions": [
+      "Theory->RuleF",
+      "Theory->RuleT"
+    ],
+    "semanticMemberCount": 2,
+    "ruleCount": 2,
+    "groundedRuleCount": 2,
+    "roleCount": 0,
+    "executionOperation": "same generalized Γ; zero-role Rules are the grounded refinement of the shared Rule topology"
+  },
+  "genericityEvidence": {
+    "sharedHarness": "ts/test/v015-boolean-family-b1.test.ts",
+    "sharedCompatibilityBuilder": "ts/test/research-v015-compact-and-package-a2.ts",
+    "sourceModel": "same FORMAL/JSON block-binding-ExactSequence model as approved AND",
+    "ruleDiscovery": "semantic Theory->Rule membership",
+    "backendLowering": "same generic zero-role Rule compatibility lowering as approved AND",
+    "programSpecificDispatch": 0
+  },
+  "frozenAmemory": {
+    "repository": "netkeep80/amemory",
+    "sha": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "workflowRun": 37522993237,
+    "jobId": 112472852629,
+    "packageSha256": "8ba546035b6c9c2f9b18e87a1d30fb6edcbb9063d76cf9ffb1cb2877d7ebf227",
+    "packageLinkCount": 4,
+    "result": "SUCCESS",
+    "rows": "2/2",
+    "nonBoolean": "NO_MATCH",
+    "programSpecificDispatch": 0
+  },
+  "approvalBoundary": [
+    "research evidence is GREEN but the artifact is not Author-approved",
+    "not present in approvedJsonCorpus",
+    "not canonical accepted operator",
+    "explicit Author APPROVE / MODIFY / REJECT is required for this exact JSON digest",
+    "V15-AND-04 remains OPEN until all required operator approvals and permanent cumulative regressions are complete",
+    "any material source change invalidates this review candidate"
+  ]
+}
