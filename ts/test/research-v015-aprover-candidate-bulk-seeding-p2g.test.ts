@@ -132,7 +132,7 @@ function run(reverse: boolean): RunResult {
   //   ENTRY -> FOLD(Cell(prev,item), cont)
   //     ->
   //   ENTRY -> FOLD(prev, cont)
-  //   ATTEMPT -> item
+  //   ENTRY -> (ATTEMPT -> item)
   //
   // ATTEMPT carries no proof classification. Every selected candidate member is
   // offered to the same downstream aprover entry; malformed/unreachable data is
@@ -154,7 +154,10 @@ function run(reverse: boolean): RunResult {
       memory.ensure(PREV, CONT),
     ),
   );
-  const attempt = memory.ensure(ATTEMPT, ITEM);
+  const attempt = memory.ensure(
+    ENTRY,
+    memory.ensure(ATTEMPT, ITEM),
+  );
   indexedRule(
     [PREV, ITEM, CONT],
     foldBefore,
@@ -208,7 +211,10 @@ function run(reverse: boolean): RunResult {
 
   const attemptedLabels = new Set<string>();
   for (const item of selected) {
-    const expected = memory.ensure(ATTEMPT, item.member);
+    const expected = memory.ensure(
+      ENTRY,
+      memory.ensure(ATTEMPT, item.member),
+    );
     if (current.members().includes(expected)) attemptedLabels.add(item.label);
   }
   setSame(
@@ -217,7 +223,10 @@ function run(reverse: boolean): RunResult {
     "all-and-only pinned candidate members are seeded",
   );
 
-  const ambientAttempt = memory.ensure(ATTEMPT, ambient);
+  const ambientAttempt = memory.ensure(
+    ENTRY,
+    memory.ensure(ATTEMPT, ambient),
+  );
   const ambientAttempted = current.members().includes(ambientAttempt);
   same(
     ambientAttempted,
@@ -261,7 +270,8 @@ console.log([
   "TRANSPORT=EXACT_SEQUENCE_ONLY",
   "TRANSPORT_ORDER_SEMANTIC=FALSE",
   "RUNTIME_SEEDING=ONE_GENERIC_STRUCTURAL_FOLD",
-  "DOWNSTREAM_ENTRY=ATTEMPT_MEMBER",
+  "DOWNSTREAM_ENTRY=ENTRY_TO_ATTEMPT_MEMBER",
+  "DOWNSTREAM_STATIC_TRIGGER=ATTEMPT",
   "HOST_OCCURRENCE_CLASSIFICATION=0",
   "HOST_DFS=0",
   "HOST_VISITED_SET=0",
