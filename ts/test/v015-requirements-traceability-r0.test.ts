@@ -269,6 +269,29 @@ validateCandidate(requirements, traceability);
   assert(!groups.includes("THM") && !groups.includes("PROOF"), "v0.16 proof groups removed from v0.15 Author JSON scope");
 }
 
+// compact Boolean AND approved corpus lock.
+{
+  const corpus = record(traceability.approvedJsonCorpus, "approvedJsonCorpus AND lock");
+  const entries = corpus.entries;
+  assert(Array.isArray(entries), "approved corpus entries for AND lock");
+  const andEntry = (entries as Json[]).find(
+    (entry) => entry.id === "compact-boolean-and",
+  );
+  assert(andEntry !== undefined, "approved compact Boolean AND corpus entry");
+  assert(
+    text(andEntry.canonicalJsonDigest, "compact AND JSON digest") ===
+      "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
+    "compact AND exact approved JSON digest",
+  );
+  assert(
+    text(andEntry.expectedRecursiveDigest, "compact AND recursive digest") ===
+      "37b2c02b927eed6cdd061931b60930d0a31d674a49bc585b075401a5cb5ddcb0",
+    "compact AND exact recursive digest",
+  );
+  const review = record(andEntry.authorJsonReview, "compact AND author review");
+  assert(text(review.state, "compact AND approval state") === "APPROVED", "compact AND explicit Author approval");
+}
+
 // Negative: a mere state flip cannot promote an R0 requirement to VERTICAL_GREEN.
 {
   const req = { id: "X", state: "VERTICAL_GREEN" };
