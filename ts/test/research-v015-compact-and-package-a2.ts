@@ -305,6 +305,8 @@ function lowerRules(
 
 interface PackageResult {
   readonly json: string;
+  readonly semanticWires: readonly string[];
+  readonly backendIndexWires: readonly string[];
 }
 
 function buildPackage(noise = 0): PackageResult {
@@ -415,7 +417,11 @@ function buildPackage(noise = 0): PackageResult {
       negativeLaunch,
     ),
   });
-  return Object.freeze({ json: JSON.stringify(packageValue) });
+  return Object.freeze({
+    json: JSON.stringify(packageValue),
+    semanticWires: Object.freeze(canonicalWires),
+    backendIndexWires: Object.freeze(indexWires),
+  });
 }
 
 const first = buildPackage(0);
@@ -424,5 +430,15 @@ same(
   first.json,
   second.json,
   "compact AND compatibility package is allocation-order deterministic",
+);
+console.error(
+  "COMPACT_AND_SEMANTIC_WIRES=" + JSON.stringify(first.semanticWires),
+);
+console.error(
+  "COMPACT_AND_BACKEND_INDEX_WIRES=" + JSON.stringify(first.backendIndexWires),
+);
+console.error(
+  "COMPACT_AND_PACKAGE_SHA256=" +
+    createHash("sha256").update(first.json, "utf8").digest("hex"),
 );
 process.stdout.write(first.json);
