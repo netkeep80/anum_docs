@@ -1126,7 +1126,8 @@
         "V15-GAMMA-01",
         "V15-CTX-02",
         "V15-GOV-03",
-        "V15-GOV-04"
+        "V15-GOV-04",
+        "V15-DOCS-01"
       ],
       "positiveVectors": [
         "all-semantic-execution-json-compiler-proof-assurance-corpus-components-green",
@@ -1592,6 +1593,26 @@
       "requiredExecutableGates": [],
       "evidenceRefs": [
         "#1982"
+      ],
+      "authorJsonReview": "NOT_APPLICABLE"
+    },
+    "V15-DOCS-01": {
+      "state": "OPEN",
+      "ownerIssue": 1914,
+      "dependsOn": [
+        "V15-STAGE-01",
+        "V15-JSON-04",
+        "V15-FORMAL-PROOF-02",
+        "V15-REG-02"
+      ],
+      "positiveVectors": [],
+      "negativeVectors": [
+        "current-formal-spec-is-v014-only-not-generated"
+      ],
+      "requiredExecutableGates": [],
+      "evidenceRefs": [
+        "docs/specs/Формальная нотация МТС.md",
+        "#1914"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     }
