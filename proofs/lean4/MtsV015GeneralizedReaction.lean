@@ -325,3 +325,87 @@ theorem GPR_08_physical_nonmember_has_no_role_authority
     (notSemanticMember : ¬ semanticMember role) :
     ¬ SemanticRole semanticMember role :=
   notSemanticMember
+
+
+/-
+GPR-01 — one semantic Gamma step with analysis/synthesis/publication refinement.
+
+The decomposition is modeled only as internal pure functions of one transition:
+analysis reads the reaction-start state, synthesis consumes only the analysis
+result, and publication produces one successor from the original state plus
+the staged result. No intermediate analysis/staging object is itself a
+semantic machine state.
+-/
+
+structure ReactionDecomposition (State Analysis Staged : Type) where
+  analyze : State → Analysis
+  synthesize : Analysis → Staged
+  publish : State → Staged → State
+
+def Gamma
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before : State) : State :=
+  D.publish before (D.synthesize (D.analyze before))
+
+def GammaStep
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before after : State) : Prop :=
+  after = Gamma D before
+
+def DecomposedCycle
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before after : State) : Prop :=
+  ∃ analysis staged,
+    analysis = D.analyze before ∧
+    staged = D.synthesize analysis ∧
+    after = D.publish before staged
+
+/--
+The internal analysis->synthesis->publication decomposition denotes exactly
+the same transition relation as one Gamma state transformer.
+-/
+theorem GPR_01_decomposition_iff_single_gamma_step
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before after : State) :
+    DecomposedCycle D before after ↔
+    GammaStep D before after := by
+  constructor
+  · intro decomposed
+    rcases decomposed with ⟨analysis, staged, analysisEq, stagedEq, afterEq⟩
+    subst analysis
+    subst staged
+    exact afterEq
+  · intro oneStep
+    refine ⟨D.analyze before, D.synthesize (D.analyze before), rfl, rfl, ?_⟩
+    exact oneStep
+
+/--
+For a fixed reaction-start state the semantic Gamma successor is unique.
+The decomposition therefore does not expose several semantic successor states.
+-/
+theorem GPR_01_gamma_successor_unique
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    (before after₁ after₂ : State)
+    (step₁ : GammaStep D before after₁)
+    (step₂ : GammaStep D before after₂) :
+    after₁ = after₂ := by
+  unfold GammaStep at step₁ step₂
+  rw [step₁, step₂]
+
+/--
+Synthesis is parameterized only by the read-only analysis value; it has no
+semantic access to a staged successor state by construction.
+-/
+theorem GPR_01_same_analysis_same_staging
+    {State Analysis Staged : Type}
+    (D : ReactionDecomposition State Analysis Staged)
+    {a₁ a₂ : Analysis}
+    (sameAnalysis : a₁ = a₂) :
+    D.synthesize a₁ = D.synthesize a₂ := by
+  subst a₂
+  rfl
