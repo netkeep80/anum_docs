@@ -386,7 +386,7 @@
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-AND-01": {
-      "state": "OPEN",
+      "state": "VERTICAL_GREEN",
       "ownerIssue": 1980,
       "dependsOn": [
         "V15-VERT-02",
@@ -406,18 +406,14 @@
         "ts/test/research-v015-compact-and-package-a2.ts"
       ],
       "evidenceRefs": [
-        "formal/v0.15/candidates/compact-and.formal",
-        "formal/v0.15/candidates/compact-and.json",
-        "formal/v0.15/candidates/compact-and.evidence.json",
-        "ts/test/v015-compact-and-role-bundle-a1.test.ts",
-        "ts/test/research-v015-compact-and-package-a2.ts",
-        "#1980"
+        "formal/v0.15/regression/compact-and.evidence.json",
+        "netkeep80/anum_docs#1980 issuecomment-6023632594"
       ],
-      "authorJsonReview": "AUTHOR_REVIEW_PENDING",
+      "authorJsonReview": "APPROVED",
       "candidateSource": "formal/v0.15/candidates/compact-and.formal"
     },
     "V15-AND-02": {
-      "state": "OPEN",
+      "state": "VERTICAL_GREEN",
       "ownerIssue": 1980,
       "dependsOn": [
         "V15-AND-01",
@@ -437,18 +433,14 @@
         "ts/test/research-v015-compact-and-package-a2.ts"
       ],
       "evidenceRefs": [
-        "formal/v0.15/candidates/compact-and.formal",
-        "formal/v0.15/candidates/compact-and.json",
-        "formal/v0.15/candidates/compact-and.evidence.json",
-        "ts/test/v015-compact-and-role-bundle-a1.test.ts",
-        "ts/test/research-v015-compact-and-package-a2.ts",
-        "#1980"
+        "formal/v0.15/regression/compact-and.evidence.json",
+        "netkeep80/anum_docs#1980 issuecomment-6023632594"
       ],
-      "authorJsonReview": "AUTHOR_REVIEW_PENDING",
+      "authorJsonReview": "APPROVED",
       "candidateSource": "formal/v0.15/candidates/compact-and.formal"
     },
     "V15-AND-03": {
-      "state": "OPEN",
+      "state": "VERTICAL_GREEN",
       "ownerIssue": 1980,
       "dependsOn": [
         "V15-AND-02"
@@ -464,14 +456,10 @@
         "ts/test/research-v015-compact-and-package-a2.ts"
       ],
       "evidenceRefs": [
-        "formal/v0.15/candidates/compact-and.formal",
-        "formal/v0.15/candidates/compact-and.json",
-        "formal/v0.15/candidates/compact-and.evidence.json",
-        "ts/test/v015-compact-and-role-bundle-a1.test.ts",
-        "ts/test/research-v015-compact-and-package-a2.ts",
-        "#1980"
+        "formal/v0.15/regression/compact-and.evidence.json",
+        "netkeep80/anum_docs#1980 issuecomment-6023632594"
       ],
-      "authorJsonReview": "AUTHOR_REVIEW_PENDING",
+      "authorJsonReview": "APPROVED",
       "candidateSource": "formal/v0.15/candidates/compact-and.formal"
     },
     "V15-AND-04": {
