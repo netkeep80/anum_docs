@@ -47,6 +47,22 @@ const gpr06Evidence = JSON.parse(
   };
   theoremProjection: { currentV014InventoryUnchanged: boolean };
 };
+const gpr08Evidence = JSON.parse(
+  readFileSync(
+    resolve(repo, "proofs/v015-evidence/gpr08-j0-boundary.json"),
+    "utf8",
+  ),
+) as {
+  id: string;
+  status: string;
+  externalCrossCheck: { ciRun: number; exactHead: string };
+  architecturalConsequence: {
+    finiteArityImpliesJ1: boolean;
+    exactSequenceRemainsLinkTopology: boolean;
+    physicalRoleShapeImpliesAuthority: boolean;
+  };
+  theoremProjection: { currentV014InventoryUnchanged: boolean };
+};
 const evidence = JSON.parse(
   readFileSync(
     resolve(repo, "proofs/v015-evidence/gpr07-zero-role-refinement.json"),
@@ -168,6 +184,34 @@ assert(
 assert(
   gpr06Evidence.theoremProjection.currentV014InventoryUnchanged === true,
   "GPR-06 leaves accepted theorem inventory unchanged",
+);
+
+assert(gpr08Evidence.id === "GPR-08", "GPR-08 evidence id");
+assert(
+  gpr08Evidence.status ===
+    "PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",
+  "GPR-08 evidence classification",
+);
+assert(gpr08Evidence.externalCrossCheck.ciRun === 37451545691, "GPR-08 exact proof CI is pinned");
+assert(
+  gpr08Evidence.externalCrossCheck.exactHead === "a01e6187e58d483ce33184950de0f83a5b43a137",
+  "GPR-08 proof head is pinned",
+);
+assert(
+  gpr08Evidence.architecturalConsequence.finiteArityImpliesJ1 === false,
+  "finite arity does not imply J1",
+);
+assert(
+  gpr08Evidence.architecturalConsequence.exactSequenceRemainsLinkTopology === true,
+  "ExactSequence remains Link topology",
+);
+assert(
+  gpr08Evidence.architecturalConsequence.physicalRoleShapeImpliesAuthority === false,
+  "physical role-shaped Link does not grant semantic role authority",
+);
+assert(
+  gpr08Evidence.theoremProjection.currentV014InventoryUnchanged === true,
+  "GPR-08 leaves accepted theorem inventory unchanged",
 );
 
 assert(evidence.id === "GPR-07", "GPR-07 evidence id");
