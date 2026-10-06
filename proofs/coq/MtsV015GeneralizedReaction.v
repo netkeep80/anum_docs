@@ -115,3 +115,120 @@ Qed.
 
 Print Assumptions GPR_07_grounded_zero_role_refinement.
 Print Assumptions GPR_07_zero_role_has_empty_substitution.
+
+
+(*
+GPR-06 — finite multi-generation opacity of exact-only S0.
+
+This is an explicit lower-bound model, not a claim that Rocq data structures
+are MTS ontology. ExactS0ClosedState states the no-reflection/no-constructor
+boundary: a state may contain the opaque current input identity and Links from
+one fixed finite exact support, but no fresh structure-derived Link outside
+that closure.
+*)
+
+Definition ExactS0Reachable
+    {Link : Type}
+    (support : list Link)
+    (input value : Link) : Prop :=
+  value = input \/ In value support.
+
+Definition ExactS0ClosedState
+    {Link : Type}
+    (support : list Link)
+    (input : Link)
+    (state : list Link) : Prop :=
+  forall value,
+    In value state ->
+    ExactS0Reachable support input value.
+
+Fixpoint ExactOnlyRun
+    {State : Type}
+    (step : State -> State)
+    (generations : nat)
+    (state : State) : State :=
+  match generations with
+  | O => state
+  | S rest => ExactOnlyRun step rest (step state)
+  end.
+
+Theorem GPR_06_finite_exact_closure
+    {Link : Type}
+    (support : list Link)
+    (input : Link)
+    (step : list Link -> list Link)
+    (step_closed :
+      forall state,
+        ExactS0ClosedState support input state ->
+        ExactS0ClosedState support input (step state))
+    (generations : nat)
+    (initial : list Link)
+    (initial_closed : ExactS0ClosedState support input initial) :
+    ExactS0ClosedState support input
+      (ExactOnlyRun step generations initial).
+Proof.
+  revert initial initial_closed.
+  induction generations as [|rest IH]; intros initial initial_closed.
+  - exact initial_closed.
+  - simpl.
+    apply IH.
+    apply step_closed.
+    exact initial_closed.
+Qed.
+
+Theorem GPR_06_fresh_structural_target_unreachable
+    {Link : Type}
+    (support : list Link)
+    (input target : Link)
+    (target_not_input : target <> input)
+    (target_fresh : ~ In target support)
+    (step : list Link -> list Link)
+    (step_closed :
+      forall state,
+        ExactS0ClosedState support input state ->
+        ExactS0ClosedState support input (step state))
+    (generations : nat)
+    (initial : list Link)
+    (initial_closed : ExactS0ClosedState support input initial) :
+    ~ In target (ExactOnlyRun step generations initial).
+Proof.
+  intro emitted.
+  pose proof
+    (GPR_06_finite_exact_closure
+      support input step step_closed generations initial initial_closed)
+    as closed.
+  unfold ExactS0ClosedState in closed.
+  specialize (closed target emitted).
+  destruct closed as [same | supported].
+  - apply target_not_input.
+    exact same.
+  - apply target_fresh.
+    exact supported.
+Qed.
+
+Theorem GPR_06_structure_sensitive_function_requires_more_than_exact_S0
+    {Link : Type}
+    (support : list Link)
+    (input : Link)
+    (derive : Link -> Link)
+    (changes_input : derive input <> input)
+    (fresh_result : ~ In (derive input) support)
+    (step : list Link -> list Link)
+    (step_closed :
+      forall state,
+        ExactS0ClosedState support input state ->
+        ExactS0ClosedState support input (step state))
+    (generations : nat)
+    (initial : list Link)
+    (initial_closed : ExactS0ClosedState support input initial) :
+    ~ In (derive input) (ExactOnlyRun step generations initial).
+Proof.
+  apply
+    (GPR_06_fresh_structural_target_unreachable
+      support input (derive input) changes_input fresh_result
+      step step_closed generations initial initial_closed).
+Qed.
+
+Print Assumptions GPR_06_finite_exact_closure.
+Print Assumptions GPR_06_fresh_structural_target_unreachable.
+Print Assumptions GPR_06_structure_sensitive_function_requires_more_than_exact_S0.
