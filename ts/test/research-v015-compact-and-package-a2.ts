@@ -324,6 +324,78 @@ interface PackageResult {
   readonly backendIndexWires: readonly string[];
 }
 
+interface GroundedPackageSpec {
+  readonly id: "AND" | "NOT" | "OR" | "XOR";
+  readonly formal: string;
+  readonly json: string;
+  readonly rows: readonly BooleanRowSpec[];
+  readonly negative: readonly ("F" | "T" | "X")[];
+}
+
+function packageSpec(id: GroundedPackageSpec["id"]): GroundedPackageSpec {
+  if (id === "AND") {
+    return Object.freeze({
+      id,
+      formal: andFormal,
+      json: andJson,
+      rows: Object.freeze([
+        { args: ["F", "F"], expected: "F", label: "FF" },
+        { args: ["F", "T"], expected: "F", label: "FT" },
+        { args: ["T", "F"], expected: "F", label: "TF" },
+        { args: ["T", "T"], expected: "T", label: "TT" },
+      ]),
+      negative: Object.freeze(["T", "X"]),
+    });
+  }
+  const lower = id.toLowerCase();
+  const formalSource = readFileSync(
+    resolve(repoRoot, "formal/v0.15/candidates/compact-" + lower + ".formal"),
+    "utf8",
+  );
+  const jsonSource = readFileSync(
+    resolve(repoRoot, "formal/v0.15/candidates/compact-" + lower + ".json"),
+    "utf8",
+  );
+  if (id === "NOT") {
+    return Object.freeze({
+      id,
+      formal: formalSource,
+      json: jsonSource,
+      rows: Object.freeze([
+        { args: ["F"], expected: "T", label: "F" },
+        { args: ["T"], expected: "F", label: "T" },
+      ]),
+      negative: Object.freeze(["X"]),
+    });
+  }
+  if (id === "OR") {
+    return Object.freeze({
+      id,
+      formal: formalSource,
+      json: jsonSource,
+      rows: Object.freeze([
+        { args: ["F", "F"], expected: "F", label: "FF" },
+        { args: ["F", "T"], expected: "T", label: "FT" },
+        { args: ["T", "F"], expected: "T", label: "TF" },
+        { args: ["T", "T"], expected: "T", label: "TT" },
+      ]),
+      negative: Object.freeze(["T", "X"]),
+    });
+  }
+  return Object.freeze({
+    id,
+    formal: formalSource,
+    json: jsonSource,
+    rows: Object.freeze([
+      { args: ["F", "F"], expected: "F", label: "FF" },
+      { args: ["F", "T"], expected: "T", label: "FT" },
+      { args: ["T", "F"], expected: "T", label: "TF" },
+      { args: ["T", "T"], expected: "F", label: "TT" },
+    ]),
+    negative: Object.freeze(["T", "X"]),
+  });
+}
+
 function discoverAdmittedRules(
   f: Fixture,
   compiled: Compiled,
@@ -412,41 +484,42 @@ function exerciseGroundedBooleanCandidate(
   same(negative.nextMembers[0], negativeCurrent, operatorName + " negative preserves current");
 }
 
-function buildPackage(noise = 0): PackageResult {
+function buildPackage(
+  noise = 0,
+  selectedId: GroundedPackageSpec["id"] = "AND",
+): PackageResult {
+  const spec = packageSpec(selectedId);
   const f = fixture(noise);
-  const compiled = compile(f);
+  const compiled = compile(f, spec.formal, spec.json);
 
   const theory = compiled.absolute("Theory");
   const rules = discoverAdmittedRules(f, compiled, theory);
   const compatibility = lowerRules(f, compiled, theory, rules);
 
   const admissions = rules.map((rule) => f.memory.ensure(theory, rule));
-  same(compiled.denotation.members.size, 4, "canonical member count");
+  same(compiled.denotation.members.size, spec.rows.length, selectedId + " canonical member count");
+  same(rules.length, spec.rows.length, selectedId + " discovered Rule count");
   for (const admission of admissions) {
     assert(
       compiled.denotation.members.has(admission),
-      "grounded Rule admission is canonical semantic membership",
+      selectedId + " grounded Rule admission is canonical semantic membership",
     );
   }
 
-  const AND = compiled.binding("AND");
+  const op = compiled.binding(selectedId);
   const F = compiled.binding("F");
   const T = compiled.binding("T");
+  const value = (bit: "F" | "T"): LinkHandle => bit === "F" ? F : T;
   const caller = f.memory.ensureStartSelfClosed(compatibility.interpreter);
 
   const launches: LinkHandle[] = [];
-  for (const [left, right, expected, label] of [
-    [F, F, F, "FF"],
-    [F, T, F, "FT"],
-    [T, F, F, "TF"],
-    [T, T, T, "TT"],
-  ] as const) {
+  for (const row of spec.rows) {
     const antecedent = f.memory.ensure(
-      AND,
-      materializeExactSequence(f.memory, [left, right]),
+      op,
+      materializeExactSequence(f.memory, row.args.map(value)),
     );
     const current = f.memory.ensure(caller, antecedent);
-    const result = f.memory.ensure(caller, expected);
+    const result = f.memory.ensure(caller, value(row.expected));
 
     const scope = defineV013WorkingScope(
       f.memory,
@@ -455,15 +528,11 @@ function buildPackage(noise = 0): PackageResult {
       [current],
     );
     const cursor = new V013CurrentScopeCursor(f.memory, scope);
-    const local = reactV013StructuralScope(
-      f.memory,
-      cursor,
-      f.fresh(),
-    );
-    same(local.rawRuleMatches, 1, label + " local match");
-    same(local.transitionedMembers, 1, label + " local transition");
-    same(local.nextMembers.length, 1, label + " local result count");
-    same(local.nextMembers[0], result, label + " local result");
+    const local = reactV013StructuralScope(f.memory, cursor, f.fresh());
+    same(local.rawRuleMatches, 1, selectedId + " " + row.label + " local match");
+    same(local.transitionedMembers, 1, selectedId + " " + row.label + " local transition");
+    same(local.nextMembers.length, 1, selectedId + " " + row.label + " local result count");
+    same(local.nextMembers[0], result, selectedId + " " + row.label + " local result");
 
     launches.push(
       materializeExactSequence(
@@ -473,12 +542,13 @@ function buildPackage(noise = 0): PackageResult {
     );
   }
 
-  // Strong negative: T with an arbitrary non-Boolean Link must not inherit the
-  // broader pass-through behavior of the superseded two-role candidate.
   const X = compiled.absolute("NonBooleanOperand");
+  const negativeValues = spec.negative.map(
+    (item): LinkHandle => item === "X" ? X : value(item),
+  );
   const invalidAntecedent = f.memory.ensure(
-    AND,
-    materializeExactSequence(f.memory, [T, X]),
+    op,
+    materializeExactSequence(f.memory, negativeValues),
   );
   const negativeCurrent = f.memory.ensure(caller, invalidAntecedent);
   const negativeScope = defineV013WorkingScope(
@@ -488,13 +558,9 @@ function buildPackage(noise = 0): PackageResult {
     [negativeCurrent],
   );
   const negativeCursor = new V013CurrentScopeCursor(f.memory, negativeScope);
-  const negative = reactV013StructuralScope(
-    f.memory,
-    negativeCursor,
-    f.fresh(),
-  );
-  same(negative.rawRuleMatches, 0, "non-Boolean negative no match");
-  same(negative.nextMembers[0], negativeCurrent, "negative preserves current");
+  const negative = reactV013StructuralScope(f.memory, negativeCursor, f.fresh());
+  same(negative.rawRuleMatches, 0, selectedId + " non-Boolean negative no match");
+  same(negative.nextMembers[0], negativeCurrent, selectedId + " negative preserves current");
   const negativeLaunch = materializeExactSequence(
     f.memory,
     [compatibility.interpreter, negativeCurrent, negativeCurrent],
@@ -515,11 +581,7 @@ function buildPackage(noise = 0): PackageResult {
       f.basis,
       materializeExactSequence(f.memory, launches),
     ),
-    negativeEntry: wire(
-      f.memory,
-      f.basis,
-      negativeLaunch,
-    ),
+    negativeEntry: wire(f.memory, f.basis, negativeLaunch),
   });
   return Object.freeze({
     json: JSON.stringify(packageValue),
@@ -528,91 +590,62 @@ function buildPackage(noise = 0): PackageResult {
   });
 }
 
-exerciseGroundedBooleanCandidate(
-  "formal/v0.15/candidates/compact-not.formal",
-  "formal/v0.15/candidates/compact-not.json",
-  "NOT",
-  [
-    { args: ["F"], expected: "T", label: "F" },
-    { args: ["T"], expected: "F", label: "T" },
-  ],
+const requested = process.env.V015_BOOLEAN_OPERATOR ?? "AND";
+assert(
+  requested === "AND" || requested === "NOT" || requested === "OR" || requested === "XOR",
+  "V015_BOOLEAN_OPERATOR is AND/NOT/OR/XOR",
 );
-exerciseGroundedBooleanCandidate(
-  "formal/v0.15/candidates/compact-or.formal",
-  "formal/v0.15/candidates/compact-or.json",
-  "OR",
-  [
-    { args: ["F", "F"], expected: "F", label: "FF" },
-    { args: ["F", "T"], expected: "T", label: "FT" },
-    { args: ["T", "F"], expected: "T", label: "TF" },
-    { args: ["T", "T"], expected: "T", label: "TT" },
-  ],
-);
-exerciseGroundedBooleanCandidate(
-  "formal/v0.15/candidates/compact-xor.formal",
-  "formal/v0.15/candidates/compact-xor.json",
-  "XOR",
-  [
-    { args: ["F", "F"], expected: "F", label: "FF" },
-    { args: ["F", "T"], expected: "T", label: "FT" },
-    { args: ["T", "F"], expected: "T", label: "TF" },
-    { args: ["T", "T"], expected: "F", label: "TT" },
-  ],
-);
-console.error(
-  "BOOLEAN_FAMILY_COMPATIBILITY_LOWERING=GREEN operators=NOT,OR,XOR " +
-  "rule_discovery=semantic_theory_membership program_specific_dispatch=0",
-);
-
-const first = buildPackage(0);
-const second = buildPackage(19);
+const selectedId = requested as GroundedPackageSpec["id"];
+const first = buildPackage(0, selectedId);
+const second = buildPackage(19, selectedId);
 same(
   first.json,
   second.json,
-  "compact AND compatibility package is allocation-order deterministic",
+  selectedId + " compatibility package is allocation-order deterministic",
 );
-const persistedPackage = readFileSync(
-  resolve(repoRoot, "formal/v0.15/regression/compact-and.amemory-package.json"),
-  "utf8",
-);
-same(first.json, persistedPackage, "persisted compact AND package exact bytes");
-const persistedRecursive = readFileSync(
-  resolve(repoRoot, "formal/v0.15/regression/compact-and.recursive"),
-  "utf8",
-);
-same(
-  first.semanticWires.join("\n") + "\n",
-  persistedRecursive,
-  "persisted compact AND recursive semantic-member set",
-);
-const persistedEvidence = JSON.parse(readFileSync(
-  resolve(repoRoot, "formal/v0.15/regression/compact-and.amemory-evidence.json"),
-  "utf8",
-)) as {
-  readonly schema: string;
-  readonly runs: readonly unknown[];
-  readonly negative_run: unknown;
-};
-same(
-  persistedEvidence.schema,
-  "mts-v015-recursive-execution-evidence/v0.1",
-  "persisted compact AND A-memory evidence schema",
-);
-same(persistedEvidence.runs.length, 4, "persisted compact AND evidence rows");
+
+if (selectedId === "AND") {
+  const persistedPackage = readFileSync(
+    resolve(repoRoot, "formal/v0.15/regression/compact-and.amemory-package.json"),
+    "utf8",
+  );
+  same(first.json, persistedPackage, "persisted compact AND package exact bytes");
+  const persistedRecursive = readFileSync(
+    resolve(repoRoot, "formal/v0.15/regression/compact-and.recursive"),
+    "utf8",
+  );
+  same(
+    first.semanticWires.join("\n") + "\n",
+    persistedRecursive,
+    "persisted compact AND recursive semantic-member set",
+  );
+  const persistedEvidence = JSON.parse(readFileSync(
+    resolve(repoRoot, "formal/v0.15/regression/compact-and.amemory-evidence.json"),
+    "utf8",
+  )) as {
+    readonly schema: string;
+    readonly runs: readonly unknown[];
+    readonly negative_run: unknown;
+  };
+  same(
+    persistedEvidence.schema,
+    "mts-v015-recursive-execution-evidence/v0.1",
+    "persisted compact AND A-memory evidence schema",
+  );
+  same(persistedEvidence.runs.length, 4, "persisted compact AND evidence rows");
+}
+
 console.error(
-  "COMPACT_AND_SEMANTIC_WIRES=" + JSON.stringify(first.semanticWires),
+  "BOOLEAN_PACKAGE_OPERATOR=" + selectedId +
+  " SEMANTIC_WIRES=" + JSON.stringify(first.semanticWires),
 );
 console.error(
-  "COMPACT_AND_BACKEND_INDEX_WIRES=" + JSON.stringify(first.backendIndexWires),
+  "BOOLEAN_PACKAGE_OPERATOR=" + selectedId +
+  " BACKEND_INDEX_WIRES=" + JSON.stringify(first.backendIndexWires),
 );
 console.error(
-  "COMPACT_AND_PACKAGE_SHA256=" +
-    createHash("sha256").update(first.json, "utf8").digest("hex"),
+  "BOOLEAN_PACKAGE_OPERATOR=" + selectedId +
+  " PACKAGE_SHA256=" + createHash("sha256").update(first.json, "utf8").digest("hex"),
 );
-const firstPackage = JSON.parse(first.json) as {
-  readonly entry: string;
-  readonly negativeEntry: string;
-};
-console.error("COMPACT_AND_ENTRY_WIRE=" + firstPackage.entry);
-console.error("COMPACT_AND_NEGATIVE_ENTRY_WIRE=" + firstPackage.negativeEntry);
 process.stdout.write(first.json);
+
