@@ -29,8 +29,6 @@
     "applicableGroups": [
       "AND",
       "JSON",
-      "THM",
-      "PROOF",
       "CORPUS"
     ],
     "states": [
@@ -71,7 +69,7 @@
       "ownerIssue": "#1976",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "One direction of semantic authority from tracked FORMAL source to model/denotation/compiler/JSON/aprover/execution/projection.",
+      "summary": "One v0.15 execution-core semantic authority path: universal FORMAL and canonical JSON converge to the same native source ANet, then shared resolution/denotation/compiler/Γ execution/projection; no consumer-specific host semantic path is authoritative.",
       "dependsOn": [],
       "authority": {
         "issue": 1976
@@ -231,7 +229,7 @@
       "ownerIssue": "#1976",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Program/theorem-specific host semantic injection budget is exactly zero.",
+      "summary": "Program-specific host semantic injection budget is exactly zero. Generic orchestration and backend compatibility/optimization lowerings may exist but have no MTS semantic authority.",
       "dependsOn": [
         "V15-CLOSE-01"
       ],
@@ -250,7 +248,7 @@
       "ownerIssue": "#1976",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "FORMAL artifact reconstructs executable/proof package in fresh Memory using only fixed generic authorities.",
+      "summary": "A canonical FORMAL executable artifact reconstructs its executable package in fresh Memory using only fixed generic authorities.",
       "dependsOn": [
         "V15-CLOSE-03",
         "V15-NAME-01"
@@ -407,7 +405,7 @@
       "ownerIssue": "#1188",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Semantic JSON mutations must predictably change/reject execution or proof.",
+      "summary": "Semantic JSON mutations must predictably change or reject source/denotation/execution behavior; transport-only mutations must not create semantic authority.",
       "dependsOn": [
         "V15-JSON-01"
       ],
@@ -529,7 +527,7 @@
       "ownerIssue": "#1980",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Any frozen-backend compatibility scaffold for AND is generated generically and remains outside the Author-approved program source; generic builders are never semantic authority.",
+      "summary": "MTS has one canonical semantic AND source/model. Frozen or future A-memory backends may use generated compatibility or optimized AND lowerings only when they are semantics-preserving, generic/backend-owned, and remain outside canonical AND semantic authority.",
       "dependsOn": [
         "V15-AND-02"
       ],
@@ -575,7 +573,7 @@
       "ownerIssue": "#1987",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Selected Interpreter/Theory/Scope/entry/result roots are explicit package or launch-manifest authority.",
+      "summary": "Theory, Context/currentness, interpreter/meta-program, entry and result execution roles are represented by Links and semantic ANet membership. Host package/launch code may perform only generic selection/orchestration allowed by the machine contract and cannot supply semantic role authority.",
       "dependsOn": [
         "V15-CLOSE-01"
       ],
@@ -594,7 +592,7 @@
       "ownerIssue": "#1987",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Same Link under different selected contexts can have different execution roles where specified.",
+      "summary": "The same Link may have different execution roles under different selected ANet contexts only because the corresponding contextual Link memberships differ; host names, manifests or pointers cannot create those roles.",
       "dependsOn": [
         "V15-CTX-01",
         "V15-ONTO-03"
@@ -609,216 +607,26 @@
       }
     },
     {
-      "id": "V15-DUAL-01",
-      "group": "DUAL",
-      "ownerIssue": "#1912",
-      "state": "OPEN",
-      "mandatory": true,
-      "summary": "Programs and proofs share the same canonical Link vocabulary and source/model pipeline.",
-      "dependsOn": [
-        "V15-ONTO-01",
-        "V15-AUTH-01"
-      ],
-      "authority": {
-        "issue": 1912
-      },
-      "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
-      }
-    },
-    {
-      "id": "V15-DUAL-02",
-      "group": "DUAL",
-      "ownerIssue": "#1912",
-      "state": "OPEN",
-      "mandatory": true,
-      "summary": "Generic proof materializers cannot synthesize theorem-specific semantics absent from source.",
-      "dependsOn": [
-        "V15-DUAL-01",
-        "V15-CLOSE-03"
-      ],
-      "authority": {
-        "issue": 1912
-      },
-      "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
-      }
-    },
-    {
-      "id": "V15-THM-01",
-      "group": "THM",
-      "ownerIssue": "#1963",
-      "state": "OPEN",
-      "mandatory": true,
-      "summary": "FORMAL_MIGRATED requires tracked canonical theorem source consumed by compiler/aprover plus full JSON round-trip.",
-      "dependsOn": [
-        "V15-DUAL-02",
-        "V15-AUTH-02",
-        "V15-JSON-01"
-      ],
-      "authority": {
-        "issue": 1963
-      },
-      "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
-      }
-    },
-    {
-      "id": "V15-THM-02",
-      "group": "THM",
-      "ownerIssue": "#1963",
-      "state": "OPEN",
-      "mandatory": true,
-      "summary": "theorems/formal-v0.15.json is a manifest/descriptor, never sole theorem semantic authority.",
-      "dependsOn": [
-        "V15-THM-01"
-      ],
-      "authority": {
-        "issue": 1963
-      },
-      "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
-      }
-    },
-    {
-      "id": "V15-THM-03",
-      "group": "THM",
-      "ownerIssue": "#1963",
-      "state": "OPEN",
-      "mandatory": true,
-      "summary": "Canonical v0.15 theorem source is cross-checked against immutable accepted v0.14 premise/domain/dependency boundaries.",
-      "dependsOn": [
-        "V15-THM-01"
-      ],
-      "authority": {
-        "issue": 1963
-      },
-      "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
-      }
-    },
-    {
-      "id": "V15-PROOF-01",
-      "group": "PROOF",
-      "ownerIssue": "#1431",
-      "state": "OPEN",
-      "mandatory": true,
-      "summary": "Source completeness, native proof, kernel realization, closure, aprover replay, independence and external assurance are separate coordinates.",
-      "dependsOn": [
-        "V15-DUAL-01"
-      ],
-      "authority": {
-        "issue": 1431
-      },
-      "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
-        "requiredExecutableGates": []
-      }
-    },
-    {
       "id": "V15-GAMMA-01",
       "group": "GAMMA",
       "ownerIssue": "#2001",
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "mandatory": true,
-      "summary": "One generalized reaction Γ is the shared semantic execution operation for ordinary executable ANets, meta/interpreter ANets and the native aprover ANet; no consumer-specific semantic opcode is permitted.",
+      "summary": "One generalized reaction Γ is the shared semantic execution operation for ordinary executable ANets and self-hosted meta/interpreter ANets; no consumer-specific semantic opcode or second semantic runtime is permitted.",
       "dependsOn": [
-        "V15-CLOSE-03",
-        "V15-CTX-01"
+        "V15-CLOSE-03"
       ],
       "authority": {
         "issue": 2001
       },
       "evidence": {
         "positiveVectors": [
+          "gpr01-09-paired-lean4-rocq-closure",
           "grounded-zero-role-is-generic-refinement"
         ],
         "negativeVectors": [
-          "proof-specific-opcode-forbidden"
-        ],
-        "requiredExecutableGates": []
-      }
-    },
-    {
-      "id": "V15-PROOF-EXEC-01",
-      "group": "PROOF_EXEC",
-      "ownerIssue": "#2003",
-      "state": "OPEN",
-      "mandatory": true,
-      "summary": "The trusted native aprover is a FORMAL/ANet program compiled through the same source/metacompiler path as executable MTS artifacts; host code is orchestration only.",
-      "dependsOn": [
-        "V15-DUAL-01",
-        "V15-PROOF-01",
-        "V15-STAGE-01",
-        "V15-STRUCT-01"
-      ],
-      "authority": {
-        "issue": 2003
-      },
-      "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [
-          "host-proof-semantics-forbidden"
-        ],
-        "requiredExecutableGates": []
-      }
-    },
-    {
-      "id": "V15-PROOF-EXEC-02",
-      "group": "PROOF_EXEC",
-      "ownerIssue": "#2003",
-      "state": "OPEN",
-      "mandatory": true,
-      "summary": "Proof ANet plus aprover ANet execute in pinned A-memory using the same generalized reaction Γ and produce a structural verdict ANet; no proof-specific A-memory opcode exists.",
-      "dependsOn": [
-        "V15-PROOF-EXEC-01",
-        "V15-GAMMA-01"
-      ],
-      "authority": {
-        "issue": 2003
-      },
-      "evidence": {
-        "positiveVectors": [
-          "fnd07-aprover-anet-amemory-accept"
-        ],
-        "negativeVectors": [
-          "forged-target-reject",
-          "missing-premise-reject",
-          "foreign-theory-reject"
-        ],
-        "requiredExecutableGates": []
-      }
-    },
-    {
-      "id": "V15-PROOF-EXEC-03",
-      "group": "PROOF_EXEC",
-      "ownerIssue": "#2003",
-      "state": "OPEN",
-      "mandatory": true,
-      "summary": "Search/UI/cache/metadata and host replay helpers have zero proof authority; every accepted candidate is replayed from scratch by aprover ANet inside A-memory.",
-      "dependsOn": [
-        "V15-PROOF-EXEC-02"
-      ],
-      "authority": {
-        "issue": 2003
-      },
-      "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [
-          "search-result-is-not-proof",
-          "metadata-accept-forbidden",
-          "theorem-id-dispatch-forbidden"
+          "consumer-specific-semantic-opcode-forbidden",
+          "second-semantic-runtime-forbidden"
         ],
         "requiredExecutableGates": []
       }
@@ -832,9 +640,9 @@
       "summary": "Lean4 and Rocq independently formalize the supported v0.15 FORMAL mathematical core and classify exact premises/domain/exclusions for contextual names, source denotation, DAS and ExactSequence.",
       "dependsOn": [
         "V15-AUTH-01",
-        "V15-DUAL-01",
         "V15-JSON-04",
-        "V15-STRUCT-01"
+        "V15-STRUCT-01",
+        "V15-NAME-01"
       ],
       "authority": {
         "issue": 2004
@@ -905,16 +713,16 @@
     {
       "id": "V15-STAGE-01",
       "group": "STAGE",
-      "ownerIssue": "#1901",
+      "ownerIssue": "#1911",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Bytes, source ANet, model, resolution, denotation, materialization, execution/replay and projection remain separately observable.",
+      "summary": "Source bytes, native source ANet, resolution/denotation, semantic ANet, recursive metacompilation, backend compatibility lowering, execution/replay and projection remain separately observable.",
       "dependsOn": [
         "V15-AUTH-01",
         "V15-TERM-01"
       ],
       "authority": {
-        "issue": 1901
+        "issue": 1911
       },
       "evidence": {
         "positiveVectors": [
@@ -931,7 +739,7 @@
     {
       "id": "V15-STAGE-02",
       "group": "STAGE",
-      "ownerIssue": "#1901",
+      "ownerIssue": "#1911",
       "state": "OPEN",
       "mandatory": true,
       "summary": "Read/find/validation are read-only; materialization/publication is explicit and failure-safe.",
@@ -939,7 +747,7 @@
         "V15-STAGE-01"
       ],
       "authority": {
-        "issue": 1901
+        "issue": 1911
       },
       "evidence": {
         "positiveVectors": [],
@@ -997,7 +805,7 @@
       "ownerIssue": "#1977",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Acceptance corpus audits direct semantic construction and rejects hidden program/theorem-specific host injection.",
+      "summary": "Acceptance corpus audits direct semantic construction and rejects hidden program-specific host injection or backend-specific semantic authority.",
       "dependsOn": [
         "V15-GOV-01",
         "V15-CLOSE-03"
@@ -1037,7 +845,7 @@
       "ownerIssue": "#1910",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Frozen A-memory acceptance inventory classifies every semantic item as FORMAL VERTICAL_GREEN or justified host-only nonsemantic.",
+      "summary": "Every Author-approved v0.15 executable artifact is pinned and replayed through FORMAL/JSON -> native source ANet -> semantic ANet -> recursive 8/9/6/1 -> generic compatibility lowering where required -> frozen A-memory 0.175.0, with zero semantic backend patches.",
       "dependsOn": [
         "V15-AND-04",
         "V15-GOV-02"
@@ -1060,10 +868,11 @@
       "summary": "RELEASE_READY is impossible while any mandatory requirement is below VERTICAL_GREEN or explicitly resolved release state.",
       "dependsOn": [
         "V15-CORPUS-01",
-        "V15-THM-03",
         "V15-REG-02",
-        "V15-PROOF-EXEC-03",
-        "V15-FORMAL-PROOF-02"
+        "V15-FORMAL-PROOF-02",
+        "V15-GAMMA-01",
+        "V15-CTX-02",
+        "V15-GOV-03"
       ],
       "authority": {
         "issue": 1876
@@ -1118,7 +927,7 @@
       "ownerIssue": "#1976",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Every logical/executable or aprover theorem/proof JSON task stops at AUTHOR_REVIEW_PENDING before completion.",
+      "summary": "Every new canonical logical/executable JSON artifact in v0.15 stops at AUTHOR_REVIEW_PENDING before completion. Proof/aprover artifacts are separately Author-gated in v0.16.",
       "dependsOn": [
         "V15-JSON-01"
       ],
@@ -1137,7 +946,7 @@
       "ownerIssue": "#1976",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Author review shows exact FORMAL, exact JSON, semantic mapping, external boundary, round-trip, fresh replay and falsifiers.",
+      "summary": "v0.15 Author review shows exact FORMAL, exact JSON, source/semantic mapping, external/backend boundary, round-trip, fresh executable replay and falsifiers.",
       "dependsOn": [
         "V15-AUTHOR-JSON-01"
       ],
@@ -1213,7 +1022,7 @@
       "ownerIssue": "#1978",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "Every FORMAL/model/JSON/metacompiler/recursive/execution/aprover change replays the complete approved JSON corpus.",
+      "summary": "Every FORMAL/model/JSON/metacompiler/recursive/execution change that can affect v0.15 executable semantics replays the complete Author-approved executable JSON corpus.",
       "dependsOn": [
         "V15-REG-01"
       ],
