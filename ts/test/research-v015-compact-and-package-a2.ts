@@ -329,7 +329,7 @@ interface GroundedPackageSpec {
   readonly formal: string;
   readonly json: string;
   readonly rows: readonly BooleanRowSpec[];
-  readonly negative: readonly ("F" | "T" | "X")[];
+  readonly negative: readonly string[];
 }
 
 function packageSpec(id: GroundedPackageSpec["id"]): GroundedPackageSpec {
@@ -411,8 +411,8 @@ function discoverAdmittedRules(
 }
 
 interface BooleanRowSpec {
-  readonly args: readonly ("F" | "T")[];
-  readonly expected: "F" | "T";
+  readonly args: readonly string[];
+  readonly expected: string;
   readonly label: string;
 }
 
@@ -440,7 +440,10 @@ function exerciseGroundedBooleanCandidate(
   const op = compiled.binding(operatorName);
   const F = compiled.binding("F");
   const T = compiled.binding("T");
-  const value = (bit: "F" | "T"): LinkHandle => bit === "F" ? F : T;
+  const value = (bit: string): LinkHandle => {
+    assert(bit === "F" || bit === "T", operatorName + " row bit is F/T");
+    return bit === "F" ? F : T;
+  };
   const caller = f.memory.ensureStartSelfClosed(compatibility.interpreter);
 
   for (const row of rows) {
@@ -509,7 +512,10 @@ function buildPackage(
   const op = compiled.binding(selectedId);
   const F = compiled.binding("F");
   const T = compiled.binding("T");
-  const value = (bit: "F" | "T"): LinkHandle => bit === "F" ? F : T;
+  const value = (bit: string): LinkHandle => {
+    assert(bit === "F" || bit === "T", selectedId + " package bit is F/T");
+    return bit === "F" ? F : T;
+  };
   const caller = f.memory.ensureStartSelfClosed(compatibility.interpreter);
 
   const launches: LinkHandle[] = [];
@@ -544,7 +550,10 @@ function buildPackage(
 
   const X = compiled.absolute("NonBooleanOperand");
   const negativeValues = spec.negative.map(
-    (item): LinkHandle => item === "X" ? X : value(item),
+    (item): LinkHandle => {
+      assert(item === "F" || item === "T" || item === "X", selectedId + " negative symbol");
+      return item === "X" ? X : value(item);
+    },
   );
   const invalidAntecedent = f.memory.ensure(
     op,
