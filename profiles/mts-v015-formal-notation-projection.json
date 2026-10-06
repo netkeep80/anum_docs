@@ -1,0 +1,55 @@
+{
+  "schema": "mts-v015-formal-notation-projection-model/v0.1",
+  "ownerIssue": "#1914",
+  "mtsVersion": "v0.15",
+  "status": "CANDIDATE_GENERATED_PROJECTION",
+  "target": "docs/specs/Формальная нотация МТС.md",
+  "mode": "WHOLE_FILE_GENERATED",
+  "authorityInputs": [
+    "requirements/mts-v0.15.json",
+    "traceability/mts-v0.15.json",
+    "profiles/mts-v015-meta-interpreter-model.json",
+    "profiles/mts-v015-generalized-reaction-candidate.json",
+    "proofs/v015-external-proof-assurance.json",
+    "proofs/v015-formal-proof-assurance.json"
+  ],
+  "sourceRequirementIds": [
+    "V15-TERM-01",
+    "V15-AUTH-01",
+    "V15-ONTO-01",
+    "V15-STRUCT-01",
+    "V15-NAME-01",
+    "V15-JSON-01",
+    "V15-JSON-04",
+    "V15-CTX-01",
+    "V15-CTX-02",
+    "V15-GAMMA-01",
+    "V15-STAGE-01",
+    "V15-FORMAL-PROOF-02",
+    "V15-CORPUS-01"
+  ],
+  "approvedCorpusSource": "traceability/mts-v0.15.json#approvedJsonCorpus",
+  "historicalAcceptedProjection": {
+    "mtsVersion": "v0.14",
+    "requirementId": "V14-L2",
+    "reason": "Preserve accepted historical documentation ownership and stable anchors until v0.15 cutover."
+  },
+  "stableAnchors": [
+    "mts-law-interpreterSeparation",
+    "mts-law-formalSquareBracketStringChild",
+    "mts-law-formalParentheses",
+    "mts-law-L12",
+    "mts-law-explicitKContext",
+    "mts-law-L2",
+    "mts-law-L3",
+    "mts-law-sourceUseAuthority",
+    "mts-law-formalResultAuthority",
+    "mts-law-associationBoundary"
+  ],
+  "deferredToV016": [
+    "proof metamodel",
+    "canonical proof/aprover JSON",
+    "native aprover replay",
+    "theorem corpus migration"
+  ]
+}
