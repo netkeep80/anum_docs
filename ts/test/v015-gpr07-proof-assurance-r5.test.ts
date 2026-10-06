@@ -96,11 +96,12 @@ assert(v015.allowedGlobalAxioms.rocq.length === 0, "v0.15 Rocq axiom allowlist e
 const ids = v015.targets.map((target) => target.id);
 assert(new Set(ids).size === ids.length, "v0.15 GPR target ids are unique");
 assert(
-  ids.length === 3 &&
+  ids.length === 4 &&
+    ids.includes("GPR-01") &&
     ids.includes("GPR-06") &&
     ids.includes("GPR-07") &&
     ids.includes("GPR-08"),
-  "current paired proof manifest contains exactly GPR-06, GPR-07 and GPR-08",
+  "current paired proof manifest contains exactly GPR-01, GPR-06, GPR-07 and GPR-08",
 );
 
 function target(id: string): GprTarget {
@@ -108,6 +109,14 @@ function target(id: string): GprTarget {
   assert(found !== undefined, "missing target " + id);
   return found;
 }
+
+const gpr01 = target("GPR-01");
+assert(
+  gpr01.classification === "PROVED_AS_PURE_SINGLE_STATE_TRANSFORMER_REFINEMENT",
+  "GPR-01 classification keeps the single-state-transformer boundary explicit",
+);
+assert(gpr01.lean4.length === 3, "GPR-01 paired Lean assurance symbols");
+assert(gpr01.rocq.length === 3, "GPR-01 paired Rocq assurance symbols");
 
 const gpr06 = target("GPR-06");
 assert(
@@ -228,11 +237,13 @@ assert(
 console.log([
   "MTS_V015_GPR_PROOF_ASSURANCE=GREEN",
   "V014_ASSURANCE_TARGETS=21_UNCHANGED",
-  "V015_GPR_TARGETS=3",
+  "V015_GPR_TARGETS=4",
+  "GPR01=PAIRED_LEAN_ROCQ",
   "GPR06=PAIRED_LEAN_ROCQ",
   "GPR07=PAIRED_LEAN_ROCQ",
   "GPR08=PAIRED_LEAN_ROCQ",
   "GLOBAL_AXIOM_ALLOWLIST=EMPTY",
+  "GPR01_CLASSIFICATION=PROVED_AS_PURE_SINGLE_STATE_TRANSFORMER_REFINEMENT",
   "GPR06_CLASSIFICATION=PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
   "GPR07_CLASSIFICATION=PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
   "GPR08_CLASSIFICATION=PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",
