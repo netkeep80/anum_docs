@@ -18,6 +18,7 @@ on:
       - "ts/test/v015-two-role-approved-amemory-package-r4.test.ts"
       - "ts/test/research-v015-p1q-package.ts"
       - "ts/test/research-v015-p1aa-composed-package.ts"
+      - "ts/test/research-v015-p1ad-two-admission-package.ts"
       - ".github/workflows/amemory-v015-regression.yml"
   workflow_dispatch:
 
@@ -411,5 +412,94 @@ jobs:
             "FROZEN_AMEMORY_P1AA_COMPOSED_EXECUTION_THEORY=PASS "
             "static_aprover=1 selected_membership=L closed_absence=U "
             "same_interpreter=1 canonical_source_artifact=0"
+          )
+          PY
+
+
+  aprover-two-admission-verifier-research:
+    name: aprover two-admission verifier / frozen A-memory research
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout anum_docs
+        uses: actions/checkout@v6
+
+      - name: Checkout exact frozen A-memory
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/amemory
+          ref: ${{ env.AMEMORY_FROZEN_SHA }}
+          path: _amemory
+
+      - name: Verify frozen A-memory identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C _amemory rev-parse HEAD)" = "$AMEMORY_FROZEN_SHA"
+          test "$(tr -d '\r\n' < _amemory/VERSION)" = "$AMEMORY_FROZEN_VERSION"
+          test -f _amemory/experiments/a-circuit/src/bin/formal_recursive_replay.rs
+          echo "AMEMORY_FROZEN_IDENTITY=PASS sha=$AMEMORY_FROZEN_SHA version=$AMEMORY_FROZEN_VERSION"
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: ts/package-lock.json
+
+      - name: Build temporary two-admission verifier package
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --prefix ts
+          npm run --prefix ts build --silent
+          node ts/dist/test/research-v015-p1ad-two-admission-package.js > /tmp/p1ad-package.json
+          python3 - <<'PY'
+          import json
+          data=json.load(open("/tmp/p1ad-package.json","r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-recursive-execution-package/v0.1"
+          assert len(data["links"])==11
+          assert isinstance(data["entry"],str) and data["entry"]
+          assert "negativeEntry" not in data
+          assert all(set(x)<=set("8961") for x in data["links"])
+          assert set(data["entry"])<=set("8961")
+          print("P1AD_TWO_ADMISSION_PACKAGE=GENERATED_NOT_CANONICAL_JSON")
+          PY
+
+      - name: Replay five-generation verifier through real frozen A-memory
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +"$AMEMORY_RUST_TOOLCHAIN" run \
+            --quiet \
+            --locked \
+            --manifest-path _amemory/experiments/a-circuit/Cargo.toml \
+            --bin formal_recursive_replay \
+            -- /tmp/p1ad-package.json | tee /tmp/p1ad-evidence.json
+
+          python3 - <<'PY'
+          import json
+          data=json.load(open("/tmp/p1ad-evidence.json","r",encoding="utf-8"))
+          assert data["schema"]=="mts-v015-recursive-execution-evidence/v0.1"
+          runs=data["runs"]
+          assert len(runs)==11
+          expected_matches=[1,1,1,1,1, 1,0, 1,1,1,0]
+          assert [r["raw_rule_matches"] for r in runs]==expected_matches
+          assert [r["transitioned_members"] for r in runs]==expected_matches
+          for r,matches in zip(runs,expected_matches):
+              assert r["result"]==r["expected"]
+              if matches==1:
+                  assert r["handoff_count"]==1
+                  assert r["quiescent"] is False
+              else:
+                  assert r["handoff_count"]==0
+                  assert r["quiescent"] is True
+          assert data["negative_run"] is None
+          print(
+            "FROZEN_AMEMORY_P1AD_TWO_ADMISSION_VERIFIER=PASS "
+            "positive_generations=5 missing_first_fail_closed=1 "
+            "missing_second_fail_closed=1 explicit_final_reject=0 "
+            "canonical_source_artifact=0"
           )
           PY
