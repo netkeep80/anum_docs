@@ -322,7 +322,7 @@ jobs:
 
 
   boolean-family-research:
-    name: Boolean ${{ matrix.operator }} / frozen A-memory research
+    name: Boolean ${{ matrix.operator }} / frozen A-memory approved regression
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -370,6 +370,14 @@ jobs:
           npm ci --prefix ts
           npm run --prefix ts build --silent
           node ts/dist/test/research-v015-compact-and-package-a2.js > /tmp/boolean-package.json
+          lower="$(printf '%s' "$V015_BOOLEAN_OPERATOR" | tr '[:upper:]' '[:lower:]')"
+          cmp /tmp/boolean-package.json "formal/v0.15/regression/compact-${lower}.amemory-package.json"
+          sha256sum \
+            "formal/v0.15/regression/compact-${lower}.formal" \
+            "formal/v0.15/regression/compact-${lower}.json" \
+            "formal/v0.15/regression/compact-${lower}.recursive" \
+            "formal/v0.15/regression/compact-${lower}.amemory-package.json" \
+            "formal/v0.15/regression/compact-${lower}.amemory-evidence.json"
           python3 - <<'PY'
           import json, os
           data=json.load(open("/tmp/boolean-package.json","r",encoding="utf-8"))
@@ -424,6 +432,14 @@ jobs:
           assert negative["result"]==negative["expected"]
           assert negative["handoff_count"]==0
           assert negative["quiescent"] is True
+
+          lower=os.environ["V015_BOOLEAN_OPERATOR"].lower()
+          expected=json.load(open(
+              f"formal/v0.15/regression/compact-{lower}.amemory-evidence.json",
+              "r",
+              encoding="utf-8",
+          ))
+          assert data == expected, "approved Boolean frozen evidence drift"
 
           print(
               "FROZEN_AMEMORY_BOOLEAN=PASS "
