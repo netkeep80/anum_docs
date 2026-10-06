@@ -1,7 +1,7 @@
 {
   "schema": "mts-v015-approved-artifact-evidence/v0.1",
   "id": "compact-boolean-and",
-  "status": "PROMOTION_IN_PROGRESS",
+  "status": "FULL_REGRESSION_GREEN",
   "kind": "EXECUTABLE",
   "authorJsonReview": {
     "state": "APPROVED",
@@ -39,9 +39,9 @@
       "ts/test/v015-compact-and-role-bundle-a1.test.ts",
       "ts/test/research-v015-compact-and-package-a2.ts"
     ],
-    "evidenceHead": null,
-    "ciRun": null,
-    "result": "PENDING_FINAL_APPROVED_REGRESSION"
+    "evidenceHead": "74cd162b2bc251d232f57ae40facc2d556e32726",
+    "ciRun": 37518442369,
+    "result": "SUCCESS"
   },
   "amemoryReplay": {
     "repository": "netkeep80/amemory",
@@ -51,13 +51,13 @@
     "adapter": "experiments/a-circuit/src/bin/formal_recursive_replay.rs",
     "rustToolchain": "1.98.1",
     "workflow": ".github/workflows/amemory-v015-regression.yml",
-    "workflowRun": 37517510163,
+    "workflowRun": 37518442019,
     "evidenceArtifact": "formal/v0.15/regression/compact-and.amemory-evidence.json",
     "evidenceSha256": "9283e135f57629acef84579ff91c374b91bc390ebdc39e5449b344174d17692a",
     "rows": "4/4",
     "nonBoolean": "NO_MATCH",
-    "exactPersistedEvidenceMatch": false,
-    "status": "SUCCESS_RESEARCH_CAPTURE"
+    "exactPersistedEvidenceMatch": true,
+    "status": "SUCCESS"
   },
   "backendCompatibility": {
     "lowering": "four grounded zero-role Rules -> generated legacy StructuralRule/index representation",
