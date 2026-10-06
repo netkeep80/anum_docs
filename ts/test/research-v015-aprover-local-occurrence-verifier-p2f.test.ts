@@ -9,10 +9,7 @@ import {
   defineStructuralInterpreter,
   defineStructuralRoleDictionary,
   defineStructuralRule,
-  readStructuralRoleDictionary,
-  readStructuralRule,
 } from "../src/structural-rule.js";
-import { unifyStructuralRuleTemplate } from "../src/structural-unification.js";
 import { defineStructuralDerivationRule } from "../src/derivation.js";
 import {
   V013CurrentScopeCursor,
@@ -470,28 +467,6 @@ function runCase(
     proofOccurrence,
     memory.ensure(LOCAL_OK, proofOccurrence),
   );
-  const expectedClaimSequence =
-    materializeExactSequence(memory, actualPremiseClaims);
-  const expectedPacket = memory.ensure(
-    PACKET_ENTRY,
-    memory.ensure(
-      CHECK_APPLICATION,
-      memory.ensure(actualClaim, expectedClaimSequence),
-    ),
-  );
-  const expectedRequest = memory.ensure(
-    ADMISSIONS_OK,
-    memory.ensure(
-      MAKE_VERIFIER,
-      memory.ensure(
-        sourceDR,
-        memory.ensure(expectedPacket, proofOccurrence),
-      ),
-    ),
-  );
-  const expectedContextualPacket =
-    memory.ensure(proofOccurrence, expectedPacket);
-
   const scope = defineV013WorkingScope(
     memory,
     fresh(),
@@ -501,106 +476,20 @@ function runCase(
   const current = new V013CurrentScopeCursor(memory, scope);
 
   let generations = 0;
-  let sawRequest = current.members().includes(expectedRequest);
-  let sawContextualPacket =
-    current.members().includes(expectedContextualPacket);
-  let sawSuccess = current.members().includes(expectedSuccess);
-  const matchTrace: number[] = [];
   for (; generations < 64; generations += 1) {
     const reaction = reactV013StructuralScope(
       memory,
       current,
       fresh(),
     );
-    matchTrace.push(reaction.rawRuleMatches);
-    sawRequest ||= current.members().includes(expectedRequest);
-    sawContextualPacket ||=
-      current.members().includes(expectedContextualPacket);
-    sawSuccess ||= current.members().includes(expectedSuccess);
     if (reaction.quiescent) break;
   }
   assert(generations < 64, spec.label + " reaches quiescence");
 
   const success = current.members().includes(expectedSuccess);
 
-  let verifierDiagnostic = "";
-  if (!success && mutate === "none") {
-    const intendedConstraint = memory.ensure(
-      bodyTemplate,
-      materializeExactSequence(memory, premiseTemplates),
-    );
-    const intendedBefore = memory.ensure(
-      CTX,
-      memory.ensure(
-        PACKET_ENTRY,
-        memory.ensure(CHECK_APPLICATION, intendedConstraint),
-      ),
-    );
-    let intendedUnify = "OK";
-    try {
-      unifyStructuralRuleTemplate(
-        memory,
-        intendedBefore,
-        expectedContextualPacket,
-        [X, Y, CTX],
-      );
-    } catch (error) {
-      intendedUnify =
-        error instanceof Error ? error.name + ":" + error.message : String(error);
-    }
-
-    const triggerCandidates = memory.outgoing(PACKET_ENTRY)
-      .filter((trigger) => memory.poles(trigger).start === PACKET_ENTRY);
-    const generatedDetails: string[] = [];
-    for (const trigger of triggerCandidates) {
-      const admission = memory.poles(trigger).end;
-      const ap = memory.poles(admission);
-      if (ap.start !== executionTheory) continue;
-      try {
-        const rule = readStructuralRule(memory, ap.end);
-        const roles = readStructuralRoleDictionary(
-          memory,
-          rule.roleDictionary,
-        ).roles;
-        let match = "OK";
-        try {
-          unifyStructuralRuleTemplate(
-            memory,
-            memory.poles(rule.body).start,
-            expectedContextualPacket,
-            roles,
-          );
-        } catch (error) {
-          match =
-            error instanceof Error ? error.name + ":" + error.message : String(error);
-        }
-        generatedDetails.push(
-          "roles=" + String(roles.length) + "/match=" + match,
-        );
-      } catch (error) {
-        generatedDetails.push(
-          "read=" +
-            (error instanceof Error ? error.name + ":" + error.message : String(error)),
-        );
-      }
-    }
-    verifierDiagnostic =
-      " intendedUnify=" + intendedUnify +
-      " triggerCandidates=" + String(triggerCandidates.length) +
-      " generated=[" + generatedDetails.join(";") + "]";
-  }
-
   if (mutate === "none") {
-    assert(
-      success,
-      spec.label + " valid occurrence reaches LOCAL_OK" +
-        " generations=" + String(generations) +
-        " matches=" + matchTrace.join(",") +
-        " sawRequest=" + String(sawRequest) +
-        " sawContextualPacket=" + String(sawContextualPacket) +
-        " sawSuccess=" + String(sawSuccess) +
-        verifierDiagnostic,
-    );
+    assert(success, spec.label + " valid occurrence reaches LOCAL_OK");
   } else {
     assert(
       !success,
