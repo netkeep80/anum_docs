@@ -1144,6 +1144,30 @@
       }
     },
     {
+      "id": "V15-DOCS-01",
+      "group": "DOCS",
+      "ownerIssue": "#1914",
+      "state": "OPEN",
+      "mandatory": true,
+      "summary": "The canonical «Формальная нотация МТС.md» is a deterministic generated projection of the current v0.15 execution-core FORMAL/JSON model, machine registries, selected Gamma/context profiles and Author-approved executable corpus; hand-maintained semantic prose and stale v0.14-only projection are forbidden.",
+      "dependsOn": [
+        "V15-STAGE-01",
+        "V15-JSON-04",
+        "V15-FORMAL-PROOF-02",
+        "V15-REG-02"
+      ],
+      "authority": {
+        "issue": 1914
+      },
+      "evidence": {
+        "positiveVectors": [],
+        "negativeVectors": [
+          "current-formal-spec-is-v014-only-not-generated"
+        ],
+        "requiredExecutableGates": []
+      }
+    },
+    {
       "id": "V15-READY-01",
       "group": "READY",
       "ownerIssue": "#1876",
@@ -1157,7 +1181,8 @@
         "V15-GAMMA-01",
         "V15-CTX-02",
         "V15-GOV-03",
-        "V15-GOV-04"
+        "V15-GOV-04",
+        "V15-DOCS-01"
       ],
       "authority": {
         "issue": 1876
