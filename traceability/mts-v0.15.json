@@ -474,19 +474,21 @@
     },
     "V15-CTX-01": {
       "state": "OPEN",
-      "ownerIssue": 1901,
+      "ownerIssue": 1987,
       "dependsOn": [
         "V15-CLOSE-01"
       ],
       "positiveVectors": [],
       "negativeVectors": [],
       "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "#1987"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-CTX-02": {
       "state": "OPEN",
-      "ownerIssue": 1901,
+      "ownerIssue": 1987,
       "dependsOn": [
         "V15-CTX-01",
         "V15-ONTO-03"
@@ -494,7 +496,9 @@
       "positiveVectors": [],
       "negativeVectors": [],
       "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "#1987"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-DUAL-01": {
@@ -854,7 +858,7 @@
       "authorJsonReview": "GENERIC_ARRAY_MAPPING_APPROVED_ARTIFACTS_PENDING"
     },
     "V15-NAME-01": {
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "ownerIssue": 1901,
       "dependsOn": [
         "V15-TERM-01",
@@ -868,11 +872,20 @@
         "unqualified-host-global-atom-must-not-be-semantic-authority",
         "same-spelling-name-in-different-contexts-must-not-alias-without-resolution"
       ],
-      "requiredExecutableGates": [],
+      "requiredExecutableGates": [
+        "ts/test/v015-formal-decoder-b2.test.ts",
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "ts/test/v015-direct-formal-source-b20.test.ts"
+      ],
       "evidenceRefs": [
+        "ts/src/v015-link-definition.ts",
+        "ts/src/v015-direct-source.ts",
+        "ts/test/v015-formal-decoder-b2.test.ts",
+        "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+        "ts/test/v015-direct-formal-source-b20.test.ts",
+        "proofs/v015-evidence/formal-refinement-frm07-08.json",
         "#1901",
-        "#2002",
-        "profiles/mts-v015-meta-interpreter-model.json"
+        "#2004"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
@@ -992,7 +1005,7 @@
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-STRUCT-01": {
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "ownerIssue": 1901,
       "dependsOn": [
         "V15-AUTH-01",
@@ -1012,9 +1025,12 @@
         "ts/test/v015-direct-structural-aspects-s1.test.ts"
       ],
       "evidenceRefs": [
-        "proofs/v015-evidence/formal-refinement-frm07-08.json",
+        "ts/src/v015-direct-source.ts",
         "ts/test/v015-direct-structural-aspects-s1.test.ts",
-        "proofs/v015-formal-proof-assurance.json"
+        "proofs/v015-formal-proof-assurance.json",
+        "proofs/v015-evidence/formal-refinement-frm07-08.json",
+        "#1901",
+        "#2004"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     }

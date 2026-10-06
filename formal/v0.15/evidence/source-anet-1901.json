@@ -1,0 +1,61 @@
+{
+  "schema": "mts-v015-source-anet-closure-evidence/v0.1",
+  "id": "SOURCE-ANET-1901",
+  "ownerIssue": "#1901",
+  "status": "COMPONENT_GREEN",
+  "completion": {
+    "formalJsonSameNativeSourceAnet": true,
+    "contextualNamesExecutable": true,
+    "nestedBundleAnchorsExecutable": true,
+    "exactSequenceArrays": true,
+    "structuralRootStartEndPairExecutable": true,
+    "duplicateCycleMalformedFailClosed": true,
+    "singleSemanticPath": true,
+    "productionFixturesRefineIntoFrmModel": true
+  },
+  "production": [
+    "ts/src/v015-link-definition.ts",
+    "ts/src/v015-direct-source.ts",
+    "ts/src/v015-direct-formal-source.ts",
+    "ts/src/v015-direct-json-source.ts",
+    "ts/src/v015-source-anet.ts"
+  ],
+  "executableEvidence": [
+    "ts/test/v015-formal-decoder-b2.test.ts",
+    "ts/test/v015-direct-formal-source-b20.test.ts",
+    "ts/test/v015-direct-structural-aspects-s1.test.ts",
+    "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+    "ts/test/v015-das-denotation-closure-d1.test.ts"
+  ],
+  "externalAssurance": {
+    "manifest": "proofs/v015-formal-proof-assurance.json",
+    "refinementEvidence": "proofs/v015-evidence/formal-refinement-frm07-08.json",
+    "frm07": "PROVED_UNDER_EXPLICIT_PRODUCTION_REFINEMENT_PREMISES",
+    "frm08": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL_WITH_PRODUCTION_WITNESS"
+  },
+  "registry": {
+    "componentGreen": [
+      "V15-NAME-01",
+      "V15-STRUCT-01",
+      "V15-JSON-02"
+    ],
+    "executionAuthorityTransferredTo1987": [
+      "V15-CTX-01",
+      "V15-CTX-02"
+    ]
+  },
+  "boundaries": [
+    "V15-JSON-01, V15-JSON-03 and V15-JSON-04 remain separately owned by #1188",
+    "execution authority/context role selection remains open under #1987",
+    "compiler coverage remains open under #1911",
+    "FORMAL/compiler paired assurance remains open under #2004",
+    "MTS v0.15 remains candidate until explicit Author ACCEPT",
+    "accepted v0.14 remains unchanged"
+  ],
+  "exactGreenParent": {
+    "head": "edf8d8a12ecde543ec99501dd47c5e195f92d9f7",
+    "ciRun": 37502746793,
+    "contractObservatoryRun": 37502746889,
+    "frozenAmemoryRun": 37502746472
+  }
+}

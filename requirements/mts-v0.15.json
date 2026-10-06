@@ -160,7 +160,7 @@
       "id": "V15-STRUCT-01",
       "group": "STRUCT",
       "ownerIssue": "#1901",
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "mandatory": true,
       "summary": "The v0.15 direct FORMAL/JSON source path preserves the already accepted ROOT/START/END/PAIR structural aspect constructors and lowers them to native Link topology / recursive 8/9/6/1 without enabling arbitrary cyclic bindings.",
       "dependsOn": [
@@ -308,7 +308,7 @@
       "id": "V15-NAME-01",
       "group": "NAME",
       "ownerIssue": "#1901",
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "mandatory": true,
       "summary": "Every FORMAL name is contextual. Absolute name :A is shorthand for R:A; no host-global atom namespace is semantic authority. Structured expressions resolve their endpoint names through the same contextual-name resolver before Link construction.",
       "dependsOn": [
@@ -327,7 +327,11 @@
           "unqualified-host-global-atom-must-not-be-semantic-authority",
           "same-spelling-name-in-different-contexts-must-not-alias-without-resolution"
         ],
-        "requiredExecutableGates": []
+        "requiredExecutableGates": [
+          "ts/test/v015-formal-decoder-b2.test.ts",
+          "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+          "ts/test/v015-direct-formal-source-b20.test.ts"
+        ]
       }
     },
     {
@@ -565,7 +569,7 @@
     {
       "id": "V15-CTX-01",
       "group": "CTX",
-      "ownerIssue": "#1901",
+      "ownerIssue": "#1987",
       "state": "OPEN",
       "mandatory": true,
       "summary": "Selected Interpreter/Theory/Scope/entry/result roots are explicit package or launch-manifest authority.",
@@ -573,7 +577,7 @@
         "V15-CLOSE-01"
       ],
       "authority": {
-        "issue": 1901
+        "issue": 1987
       },
       "evidence": {
         "positiveVectors": [],
@@ -584,7 +588,7 @@
     {
       "id": "V15-CTX-02",
       "group": "CTX",
-      "ownerIssue": "#1901",
+      "ownerIssue": "#1987",
       "state": "OPEN",
       "mandatory": true,
       "summary": "Same Link under different selected contexts can have different execution roles where specified.",
@@ -593,7 +597,7 @@
         "V15-ONTO-03"
       ],
       "authority": {
-        "issue": 1901
+        "issue": 1987
       },
       "evidence": {
         "positiveVectors": [],
