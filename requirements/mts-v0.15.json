@@ -708,7 +708,7 @@
       "id": "V15-FORMAL-PROOF-01",
       "group": "FORMAL_PROOF",
       "ownerIssue": "#2004",
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "mandatory": true,
       "summary": "Lean4 and Rocq independently formalize the supported v0.15 FORMAL mathematical core and classify exact premises/domain/exclusions for contextual names, source denotation, DAS and ExactSequence.",
       "dependsOn": [
@@ -721,10 +721,19 @@
         "issue": 2004
       },
       "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [],
+        "positiveVectors": [
+          "frm01-08-paired-lean4-rocq",
+          "empty-global-axiom-allowlists",
+          "contextual-name-source-role-dsa-exactsequence-structural-aspect-laws"
+        ],
+        "negativeVectors": [
+          "arbitrary-cyclic-binding-rejected",
+          "no-proof-specific-grammar-opcodes",
+          "no-global-host-atom-authority"
+        ],
         "requiredExecutableGates": [
-          "ts/test/v015-formal-proof-assurance-f0.test.ts"
+          "ts/test/v015-formal-proof-assurance-f0.test.ts",
+          "ts/test/v015-direct-structural-aspects-s1.test.ts"
         ]
       }
     },
@@ -732,7 +741,7 @@
       "id": "V15-FORMAL-PROOF-02",
       "group": "FORMAL_PROOF",
       "ownerIssue": "#2004",
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "mandatory": true,
       "summary": "Paired external assurance proves/cross-checks semantic preservation of FORMAL/JSON convergence and canonical recursive 8/9/6/1 metacompilation for the declared fragment; corpus GREEN alone is not proof of soundness.",
       "dependsOn": [
@@ -744,12 +753,20 @@
       },
       "evidence": {
         "positiveVectors": [
-          "grounded-zero-role-refinement-witness",
-          "two-role-meta-rule-refinement-witness"
+          "frm07-approved-production-refinement",
+          "frm08-structural-aspect-production-witness",
+          "formal-json-native-source-parity",
+          "recursive-semantic-left-inverse",
+          "approved-corpus-frozen-replay-green"
         ],
-        "negativeVectors": [],
+        "negativeVectors": [
+          "typescript-implementation-mechanized-proof-not-claimed",
+          "v016-proof-aprover-assurance-excluded"
+        ],
         "requiredExecutableGates": [
-          "ts/test/v015-formal-production-refinement-f1.test.ts"
+          "ts/test/v015-formal-production-refinement-f1.test.ts",
+          "ts/test/v015-direct-structural-aspects-s1.test.ts",
+          "ts/test/v015-metacompiler-corpus-closure-c0.test.ts"
         ]
       }
     },
