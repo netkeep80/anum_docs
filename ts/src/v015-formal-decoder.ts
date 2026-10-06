@@ -177,12 +177,28 @@ export function isV015FormalName(name: string): boolean {
   );
 }
 
+/**
+ * A FORMAL reference may be a local name (A), a relative contextual path
+ * (K:A, K:A:B), or an absolute path (:A, :A:B).  ':' here qualifies a name;
+ * it is not the Link constructor.  Declaration binders remain local names in
+ * this flat bootstrap decoder; nested bundle binders are a separate stage.
+ */
+export function isV015FormalNameReference(name: string): boolean {
+  if (isV015FormalName(name)) return true;
+  const absolute = name.startsWith(":");
+  const body = absolute ? name.slice(1) : name;
+  if (body.length === 0) return false;
+  const segments = body.split(":");
+  if (segments.length < 2 && !absolute) return false;
+  return segments.every(isV015FormalName);
+}
+
 function parseEqualityOperand(
   source: string,
 ): ParsedEqualityOperand {
   const [start, end] = trimAsciiBounds(source, 0, source.length);
   const value = source.slice(start, end);
-  if (isV015FormalName(value)) {
+  if (isV015FormalNameReference(value)) {
     return Object.freeze({ kind: "name", name: value });
   }
 
@@ -212,8 +228,8 @@ function parseEqualityOperand(
   const leftName = value.slice(leftStart, leftEnd);
   const rightName = value.slice(rightStart, rightEnd);
   if (
-    !isV015FormalName(leftName) ||
-    !isV015FormalName(rightName)
+    !isV015FormalNameReference(leftName) ||
+    !isV015FormalNameReference(rightName)
   ) {
     return fail("invalid-name");
   }
@@ -247,7 +263,7 @@ function parseExpression(
     const items = inner.split(",").map((raw) => {
       const [start, end] = trimAsciiBounds(raw, 0, raw.length);
       const name = raw.slice(start, end);
-      if (!isV015FormalName(name)) fail("invalid-name");
+      if (!isV015FormalNameReference(name)) fail("invalid-name");
       return name;
     });
     return Object.freeze({
@@ -290,7 +306,7 @@ function parseExpression(
     const [rightStart, rightEnd] = trimAsciiBounds(source, direct + 2, source.length);
     const leftName = source.slice(leftStart, leftEnd);
     const rightName = source.slice(rightStart, rightEnd);
-    if (!isV015FormalName(leftName) || !isV015FormalName(rightName)) fail("invalid-name");
+    if (!isV015FormalNameReference(leftName) || !isV015FormalNameReference(rightName)) fail("invalid-name");
     return Object.freeze({ kind: "pair", leftName, rightName });
   }
 
@@ -311,7 +327,7 @@ function parseExpression(
   const [rightStart, rightEnd] = trimAsciiBounds(source, open + 1, close);
   const leftName = source.slice(leftStart, leftEnd);
   const rightName = source.slice(rightStart, rightEnd);
-  if (!isV015FormalName(leftName) || !isV015FormalName(rightName)) fail("invalid-name");
+  if (!isV015FormalNameReference(leftName) || !isV015FormalNameReference(rightName)) fail("invalid-name");
   return Object.freeze({ kind: "pair", leftName, rightName });
 }
 
@@ -319,7 +335,7 @@ function parseDefinition(line: PhysicalLine): ParsedDefinition {
   const text = decodeLine(line.bytes);
   if (text.length === 0 || /^[ \t]*$/u.test(text)) fail("empty-definition");
   const colon = text.indexOf(":");
-  if (colon < 0 || text.indexOf(":", colon + 1) >= 0) fail("invalid-definition");
+  if (colon < 0) fail("invalid-definition");
 
   const [nameStart, nameEnd] = trimAsciiBounds(text, 0, colon);
   const [bodyStart, bodyEnd] = trimAsciiBounds(text, colon + 1, text.length);
@@ -726,6 +742,12 @@ function name(value: JsonValue): string {
   return result;
 }
 
+function referenceName(value: JsonValue): string {
+  const result = string(value);
+  if (!isV015FormalNameReference(result)) jsonFail("invalid-name");
+  return result;
+}
+
 function utf8Name(
   memory: ReadMemory,
   basis: RootBasis,
@@ -735,6 +757,22 @@ function utf8Name(
     const bytes = readV012StringAnum(memory, basis, carrier).bytes;
     const result = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
     if (!isV015FormalName(result)) jsonFail("invalid-name");
+    return result;
+  } catch (error) {
+    if (error instanceof V015FormalJsonError) throw error;
+    return jsonFail("unsupported-source");
+  }
+}
+
+function utf8ReferenceName(
+  memory: ReadMemory,
+  basis: RootBasis,
+  carrier: LinkHandle,
+): string {
+  try {
+    const bytes = readV012StringAnum(memory, basis, carrier).bytes;
+    const result = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    if (!isV015FormalNameReference(result)) jsonFail("invalid-name");
     return result;
   } catch (error) {
     if (error instanceof V015FormalJsonError) throw error;
@@ -762,7 +800,7 @@ function nameRef(
 ): string {
   const occurrence = occurrences.get(handle) ?? jsonFail("unsupported-source");
   if (occurrence.kind !== profile.nameRefForm) jsonFail("unsupported-source");
-  return utf8Name(
+  return utf8ReferenceName(
     memory,
     basis,
     oneField(occurrence, profile.referencedNameRole),
@@ -988,14 +1026,14 @@ export function decodeV015FormalSourceAsetJson(
       value: nameCarrier(value),
     }]);
   const equalityOperand = (value: JsonValue): LinkHandle => {
-    if (typeof value === "string") return ref(name(value));
+    if (typeof value === "string") return ref(referenceName(value));
     if (!allowsStructuredEqualityOperand) return jsonFail("invalid-shape");
     const operand = object(value);
     exactKeys(operand, ["pair"]);
     const parts = array(operand.get("pair")!);
     if (parts.length !== 2) return jsonFail("invalid-shape");
-    const left = ref(name(parts[0]!));
-    const right = ref(name(parts[1]!));
+    const left = ref(referenceName(parts[0]!));
+    const right = ref(referenceName(parts[1]!));
     return builder.addOccurrence(profile.pairForm, [
       { role: profile.pairLeftRole, value: left },
       { role: profile.pairRightRole, value: right },
@@ -1017,8 +1055,8 @@ export function decodeV015FormalSourceAsetJson(
     if (value.has("pair")) {
       const parts = array(value.get("pair")!);
       if (parts.length !== 2) jsonFail("invalid-shape");
-      const left = ref(name(parts[0]!));
-      const right = ref(name(parts[1]!));
+      const left = ref(referenceName(parts[0]!));
+      const right = ref(referenceName(parts[1]!));
       body = builder.addOccurrence(profile.pairForm, [
         { role: profile.pairLeftRole, value: left },
         { role: profile.pairRightRole, value: right },
@@ -1030,7 +1068,7 @@ export function decodeV015FormalSourceAsetJson(
       ) {
         return jsonFail("unsupported-source");
       }
-      const items = array(value.get("sequence")!).map(name);
+      const items = array(value.get("sequence")!).map(referenceName);
       body = builder.addOccurrence(
         profile.sequenceForm,
         items.map((item) => ({

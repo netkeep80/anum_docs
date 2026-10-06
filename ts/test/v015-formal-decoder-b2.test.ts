@@ -20,6 +20,7 @@ import {
 } from "../src/v015-formal-decoder.js";
 import {
   evaluateV015LinkIdentityEquality,
+  materializeV015ContextualNamePath,
   materializeV015LinkDefinitionProfile,
   materializeV015LinkDefinitions,
   type V015LinkDefinitionRead,
@@ -306,7 +307,7 @@ for (const [label, source, code] of [
   ["missing close", enc.encode("A:A(B"), "invalid-expression"],
   ["missing rhs", enc.encode("A:A->"), "invalid-name"],
   ["missing lhs", enc.encode(":A->B"), "invalid-name"],
-  ["double colon", enc.encode("A::A->A"), "invalid-definition"],
+  ["malformed contextual path", enc.encode("A : ::A->A"), "invalid-name"],
   ["extra close", enc.encode("A:A(B))"), "invalid-expression"],
   ["duplicate", enc.encode("A:A->A\nA:A(A)"), "duplicate-local-name"],
 ] as const) {
@@ -343,6 +344,72 @@ for (const [label, source, code] of [
   same(resolve(f, decoded.sourceAset).definitions[0]?.value, f.basis.R, "spaced form resolves");
 }
 
+{
+  const f = fixture();
+  const source = [
+    "Abs : :Theory->:GroundRule",
+    "Explicit : R:Theory->R:GroundRule",
+    "Relative : K:A->K:A:B",
+  ].join("\n");
+  const decoded = decode(f, source);
+  const read = resolve(f, decoded.sourceAset);
+
+  const rootTheory = materializeV015ContextualNamePath(
+    f.memory,
+    f.basis,
+    f.basis.R,
+    [carrier(f, "Theory")],
+    true,
+  );
+  const rootGroundRule = materializeV015ContextualNamePath(
+    f.memory,
+    f.basis,
+    f.basis.R,
+    [carrier(f, "GroundRule")],
+    true,
+  );
+  const expectedAbsolutePair = f.memory.ensure(rootTheory, rootGroundRule);
+  same(value(f, read, "Abs"), expectedAbsolutePair, ":Theory -> :GroundRule");
+  same(
+    value(f, read, "Explicit"),
+    expectedAbsolutePair,
+    "R:Theory -> R:GroundRule is identical to absolute shorthand",
+  );
+
+  const relativeKA = materializeV015ContextualNamePath(
+    f.memory,
+    f.basis,
+    f.basis.R,
+    [carrier(f, "K"), carrier(f, "A")],
+    false,
+  );
+  const relativeKAB = materializeV015ContextualNamePath(
+    f.memory,
+    f.basis,
+    f.basis.R,
+    [carrier(f, "K"), carrier(f, "A"), carrier(f, "B")],
+    false,
+  );
+  same(
+    value(f, read, "Relative"),
+    f.memory.ensure(relativeKA, relativeKAB),
+    "relative contextual path K:A:B lowers through the shared Link-native resolver",
+  );
+
+  const compact = decode(f, "Compact::Theory->:GroundRule");
+  const spaced = decode(f, "Compact : :Theory->:GroundRule");
+  same(
+    compact.sourceAset,
+    spaced.sourceAset,
+    "binder delimiter remains unambiguous when an absolute reference follows immediately",
+  );
+  same(
+    value(f, resolve(f, compact.sourceAset), "Compact"),
+    expectedAbsolutePair,
+    "compact absolute reference resolves",
+  );
+}
+
 console.log([
   "MTS v0.15 B2 FORMAL decoder:",
   "INPUT=UTF8_TEXT",
@@ -354,4 +421,6 @@ console.log([
   "LF_CRLF_LOGICAL_PARITY=GREEN",
   "PHYSICAL_SOURCE_EVIDENCE=PRESERVED",
   "INVALID_SYNTAX_ZERO_WRITES=GREEN",
+  "CONTEXTUAL_NAME_PATHS=GREEN",
+  "ABSOLUTE_SHORTHAND_EQUIVALENCE=GREEN",
 ].join(" "));
