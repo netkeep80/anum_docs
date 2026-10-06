@@ -292,6 +292,32 @@ validateCandidate(requirements, traceability);
   assert(text(review.state, "compact AND approval state") === "APPROVED", "compact AND explicit Author approval");
 }
 
+// Boolean family Author-approval promotion lock.
+{
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for Boolean family lock");
+  const byId = new Map((list as Json[]).map((item) => [text(item.id, "logic id"), item]));
+  const family = byId.get("V15-AND-04");
+  assert(family !== undefined, "V15-AND-04 exists");
+
+  const corpus = record(traceability.approvedJsonCorpus, "approvedJsonCorpus logic lock");
+  const entries = corpus.entries;
+  assert(Array.isArray(entries), "approved corpus entries for logic lock");
+  const ids = new Set((entries as Json[]).map((entry) => text(entry.id, "corpus id")));
+  const required = [
+    "compact-boolean-not",
+    "compact-boolean-or",
+    "compact-boolean-xor",
+  ];
+  const allApproved = required.every((id) => ids.has(id));
+  const state = text(family.state, "V15-AND-04 state");
+  if (state === "VERTICAL_GREEN") {
+    assert(allApproved, "V15-AND-04 promotion requires approved NOT/OR/XOR corpus");
+  } else {
+    assert(state === "OPEN", "V15-AND-04 is OPEN or VERTICAL_GREEN");
+  }
+}
+
 // Negative: a mere state flip cannot promote an R0 requirement to VERTICAL_GREEN.
 {
   const req = { id: "X", state: "VERTICAL_GREEN" };
