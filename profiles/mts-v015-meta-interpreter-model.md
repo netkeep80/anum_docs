@@ -322,9 +322,9 @@ Gamma(M)
 
 Все semantic roots/authorities/currentness должны быть восстановимы из `M`.
 
-## 12. Meta-interpreter: что пока нельзя смешивать
+## 12. Meta-interpreter: граница теперь разрешена
 
-Отдельные оси:
+Отдельные оси по-прежнему нельзя смешивать:
 
 ```text
 A. parallel/fan-out MP
@@ -333,13 +333,22 @@ C. substitution/instantiation
 D. cross-current-member join
 ```
 
-M6B уже показывает: exact grounded S0-MP сам по себе не умеет на свежей вложенной структуре вывести bindings и построить substituted output.
+M6B/A10 и GPR-06 фиксируют нижнюю границу: exact grounded S0-MP сам по себе не получает информацию о полюсах свежей вложенной Link и потому не может универсально вывести bindings и построить substituted output.
 
-Но это ещё не доказывает, что matching/instantiation должны стать отдельными host-командами.
+Решение v0.15 теперь **закрыто**:
 
-Открытый вопрос #1990:
+```text
+одна structural-unary Γ
+  analysis:  S1 structural match / bind   (read-only)
+  synthesis: S2 substitute / construct
+  publish:   complete atomic M_(t+1)
+```
 
-> могут ли необходимые meta-операции быть представлены внутри самой A-memory как Aset и исполняться той же общей реакцией без скрытой host semantics?
+S1/S2 — внутренние фазы одной Γ, а не отдельные opcode или host-команды. Истинный J1 join между независимыми current-members для текущего v0.15 корпуса не требуется.
+
+Это важно отличать от bootstrap-метакомпилятора из `anum_docs` (#2006). Bootstrap-метакомпилятор компилирует FORMAL/JSON source и пока может быть host-реализацией; он **не является runtime semantic grounder** и не добавляет A-memory вторую команду исполнения.
+
+Формальное замыкание выбранной Γ: **#2001 / GPR-01..09**, paired Lean4/Rocq, глобальные axiom allowlists пусты.
 
 ## 13. Как FORMAL JSON должен использоваться в этом документе
 
@@ -949,17 +958,19 @@ M_t --Γ--> M_(t+1) --Γ--> M_(t+2) ...
 
 Exact grounded Modus Ponens должен быть формально доказан как частный/refinement-случай `Γ`; классическому MP не приписывается скрытая унификация. Истинный J1 cross-current-member join в v0.15 не вводится.
 
-Все универсальные утверждения этого решения имеют release-blocking proof owner **#2001**.
+Все универсальные утверждения этого решения имели release-blocking proof owner **#2001**.
+
+**Proof closure завершён:** GPR-01..09 закрыты в paired Lean4/Rocq с пустыми global axiom allowlists. Exact grounded MP доказан как zero-role refinement общего Rule/Γ kernel; J0 достаточно для текущего корпуса, J1 не требуется. Конкретная CPU/WASM/WebGPU реализация этого контракта остаётся downstream refinement A-memory, а не открытым семантическим вопросом v0.15.
 
 ## 15. Решения, которые нельзя снова потерять
 
 | ID | Вопрос | Текущее состояние |
 |---|---|---|
 | MI-D01 | O или C/END-boundary как execution-space root? | **RESOLVED / AUTHOR-APPROVED:** `C = END(R)` в direct gauge; chirality covariance обязательна |
-| MI-D02 | Как вывести active frontier без host cursor? | **OPEN**, A70e topology works but host absence traversal remains |
-| MI-D03 | Как Theory/admission выбираются из самой A-memory? | **OPEN**, frozen runtime пока получает authority снаружи |
-| MI-D04 | Точный математический generalized reaction | **AUTHOR-APPROVED DESIGN / PROOF PENDING:** единый повторяемый `Γ`, анализ→синтез→atomic publish; formal closure #2001 |
-| MI-D05 | Structural capability без внешнего grounder-командного слоя | **AUTHOR-APPROVED DESIGN / PROOF PENDING:** structural-unary capability внутри `Γ`; S1/S2 не отдельные команды; #2001 закрывает lower bound/refinement |
+| MI-D02 | Как currentness задаётся без host cursor? | **RESOLVED / PROVED_RESEARCH:** positive semantic ANet membership `E->K`; физическое существование без membership authority не даёт |
+| MI-D03 | Как Theory/admission выбираются из самой A-memory? | **RESOLVED / PROVED_RESEARCH:** Link ancestry + reaction-start semantic ANet membership; foreign Theory inert; external selected-Theory pointer не нужен |
+| MI-D04 | Точный математический generalized reaction | **RESOLVED / AUTHOR-APPROVED / PROOF GREEN:** одна structural-unary `Γ`, snapshot→S1→S2→atomic publish; #2001 GPR-01..09 |
+| MI-D05 | Structural capability без внешнего grounder-командного слоя | **RESOLVED / AUTHOR-APPROVED / PROOF GREEN:** S1/S2 находятся внутри одной `Γ`; external semantic grounder запрещён; J1 не требуется |
 
 ## 16. Правило сопровождения
 
@@ -974,7 +985,7 @@ Exact grounded Modus Ponens должен быть формально доказ�
 
 ## 16a. Author-approved native role-bundle design вместо отдельного RoleDictionary
 
-**Author decision 2026-10-05: APPROVED AS v0.15 DESIGN DIRECTION, PROOF PENDING.**
+**Author decision 2026-10-05: APPROVED AS v0.15 DESIGN DIRECTION. Current v0.15 Γ-kernel proof closure is GREEN under #2001/GPR-01..09.**
 
 Одобрена именно Link-native архитектура ниже. Это ещё не утверждение теоремы. Отдельно ниже зафиксирован уже состоявшийся Author approval первого точного two-role meta-rule JSON; он не распространяется на другие JSON-артефакты.
 
