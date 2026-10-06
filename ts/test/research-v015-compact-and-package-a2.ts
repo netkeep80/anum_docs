@@ -656,5 +656,17 @@ console.error(
   "BOOLEAN_PACKAGE_OPERATOR=" + selectedId +
   " PACKAGE_SHA256=" + createHash("sha256").update(first.json, "utf8").digest("hex"),
 );
+const selectedPackage = JSON.parse(first.json) as {
+  readonly entry: string;
+  readonly negativeEntry: string;
+};
+console.error(
+  "BOOLEAN_PACKAGE_OPERATOR=" + selectedId +
+  " ENTRY_WIRE=" + selectedPackage.entry,
+);
+console.error(
+  "BOOLEAN_PACKAGE_OPERATOR=" + selectedId +
+  " NEGATIVE_ENTRY_WIRE=" + selectedPackage.negativeEntry,
+);
 process.stdout.write(first.json);
 
