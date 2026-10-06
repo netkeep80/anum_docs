@@ -2,7 +2,7 @@
   "schema": "mts-v015-independent-readiness-audit/v0.1",
   "ownerIssue": "#1876",
   "auditBasis": "2ad65f5ad65a15f144d13990eb2cbcd6467fef25",
-  "status": "AUDIT_COMPLETE_BLOCKED_BY_GOVERNANCE",
+  "status": "AUDIT_COMPLETE_BLOCKED_BY_DOCS_AND_GOVERNANCE",
   "conclusion": {
     "semanticExecutionCore": "GREEN",
     "formalJsonCompiler": "GREEN",
@@ -11,19 +11,24 @@
     "crossRepositoryFreeze": "GREEN",
     "operationalMergeGovernance": "BLOCKED",
     "releaseReady": false,
-    "authorAcceptanceReady": false
+    "authorAcceptanceReady": false,
+    "generatedFormalSpecification": "BLOCKED"
   },
   "requirementSnapshot": {
-    "mandatoryCount": 47,
+    "mandatoryCount": 48,
     "componentGreenCount": 39,
     "verticalGreenCount": 4,
     "open": [
+      "V15-DOCS-01",
       "V15-GOV-04",
       "V15-READY-01",
       "V15-READY-02",
       "V15-READY-03"
     ],
-    "onlyNonReadinessBlocker": "V15-GOV-04"
+    "nonReadinessBlockers": [
+      "V15-DOCS-01",
+      "V15-GOV-04"
+    ]
   },
   "liveRepositorySnapshot": {
     "anumDocs": {
@@ -74,8 +79,15 @@
   ],
   "explicitNonClaims": [
     "MTS v0.15 is not accepted by this audit.",
-    "The audit does not override V15-GOV-04 or #1982.",
+    "The audit does not override V15-DOCS-01/#1914 or V15-GOV-04/#1982.",
     "A draft PR with skipped repo-guard is not a release merge path.",
     "Only explicit Author ACCEPT/REJECT may change the accepted/current version."
-  ]
+  ],
+  "documentationObservation": {
+    "issue": "#1914",
+    "target": "docs/specs/Формальная нотация МТС.md",
+    "observedVersion": "v0.14",
+    "generatedV015ProjectionPresent": false,
+    "blocker": "The canonical FORMAL specification is still a v0.14 hand-maintained document and does not project the current v0.15 execution-core model."
+  }
 }
