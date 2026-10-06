@@ -47,20 +47,30 @@ function build(noise: number, reverse: boolean): Projection {
   const memory = new Memory();
   const b = ensureRootBasis(memory);
 
-  let cursor = memory.ensure(b.O, b.U);
+  // Allocation noise is structurally unrelated to the semantic fixture.
+  let noiseCursor = memory.ensure(b.O, b.U);
   for (let i = 0; i < noise; i += 1) {
-    cursor = memory.ensure(cursor, i % 2 === 0 ? b.C : b.O);
+    noiseCursor = memory.ensure(
+      memory.ensure(noiseCursor, b.O),
+      i % 2 === 0 ? b.C : b.L,
+    );
   }
-  const fresh = (): LinkHandle => {
-    cursor = memory.ensure(cursor, b.C);
-    return cursor;
+
+  // Deterministic structural names: same topology in every Memory regardless of
+  // allocation order/handles.
+  const named = (depth: number): LinkHandle => {
+    let value = memory.ensure(b.U, b.L);
+    for (let i = 0; i < depth; i += 1) {
+      value = memory.ensureStartSelfClosed(memory.ensure(value, b.C));
+    }
+    return value;
   };
 
-  const objectTheory = memory.ensure(b.L, b.C);
-  const executionTheory = memory.ensure(b.C, b.L);
-  const MEMBER = fresh();
+  const objectTheory = named(1);
+  const executionTheory = named(2);
+  const MEMBER = named(3);
 
-  const rules = [fresh(), fresh(), fresh()];
+  const rules = [named(4), named(5), named(6)];
   const admissions = rules.map((rule) => memory.ensure(objectTheory, rule));
   const selected = reverse ? [...admissions].reverse() : admissions;
 
