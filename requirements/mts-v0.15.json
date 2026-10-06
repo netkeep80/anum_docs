@@ -642,7 +642,7 @@
       "ownerIssue": "#2001",
       "state": "COMPONENT_GREEN",
       "mandatory": true,
-      "summary": "One repeated universal Γ is the v0.15 semantic execution operation: reaction-start snapshot; J0 structural-unary applicability over one explicit current endpoint; S1 read-only structural match/bind; S2 substitution/canonical Link construction during synthesis; 0/1/N ordered image contribution; complete staged successor and atomic publication. Exact grounded MP is the zero-role refinement. J1 cross-current-member join, external semantic grounder commands, consumer-specific opcodes and a second semantic runtime are not required/permitted by the selected profile.",
+      "summary": "One repeated universal Γ is the shared v0.15 semantic execution operation for ordinary executable ANets and self-hosted meta/interpreter ANets: reaction-start snapshot; J0 structural-unary applicability over one explicit current endpoint; S1 read-only structural match/bind; S2 substitution/canonical Link construction during synthesis; 0/1/N ordered image contribution; complete staged successor and atomic publication. Exact grounded MP is the zero-role refinement. J1 cross-current-member join, external semantic grounder commands, consumer-specific opcodes and a second semantic runtime are not required/permitted by the selected profile.",
       "dependsOn": [
         "V15-CLOSE-03"
       ],
