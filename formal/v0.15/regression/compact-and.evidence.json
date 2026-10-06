@@ -1,0 +1,72 @@
+{
+  "schema": "mts-v015-approved-artifact-evidence/v0.1",
+  "id": "compact-boolean-and",
+  "status": "PROMOTION_IN_PROGRESS",
+  "kind": "EXECUTABLE",
+  "authorJsonReview": {
+    "state": "APPROVED",
+    "artifact": "formal/v0.15/regression/compact-and.json",
+    "sha256": "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
+    "decisionEvidence": "netkeep80/anum_docs#1980 issuecomment-6023632594",
+    "date": "2026-10-06"
+  },
+  "formalSource": {
+    "artifact": "formal/v0.15/regression/compact-and.formal",
+    "sha256": "4a5bc92e661ee1d4e0c2c5d51769805b5406651bb491345200d088c9ad23e5f3",
+    "relationToJson": "EXACT_SAME_NATIVE_SOURCE_ANET"
+  },
+  "semanticDenotation": {
+    "members": [
+      "Theory->RuleFF",
+      "Theory->RuleFT",
+      "Theory->RuleTF",
+      "Theory->RuleTT"
+    ],
+    "memberCount": 4,
+    "ruleRoleCount": 0,
+    "booleanDomain": "F/T only; any non-{F,T} operand is NO_MATCH",
+    "truthTable": "FF=F;FT=F;TF=F;TT=T"
+  },
+  "recursive": {
+    "artifact": "formal/v0.15/regression/compact-and.recursive",
+    "alphabet": "8/9/6/1",
+    "sha256": "37b2c02b927eed6cdd061931b60930d0a31d674a49bc585b075401a5cb5ddcb0",
+    "memberCount": 4,
+    "twoMemoryParity": "GREEN"
+  },
+  "executableEvidence": {
+    "tests": [
+      "ts/test/v015-compact-and-role-bundle-a1.test.ts",
+      "ts/test/research-v015-compact-and-package-a2.ts"
+    ],
+    "evidenceHead": null,
+    "ciRun": null,
+    "result": "PENDING_FINAL_APPROVED_REGRESSION"
+  },
+  "amemoryReplay": {
+    "repository": "netkeep80/amemory",
+    "frozenMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "adapterIssue": 482,
+    "adapter": "experiments/a-circuit/src/bin/formal_recursive_replay.rs",
+    "rustToolchain": "1.98.1",
+    "workflow": ".github/workflows/amemory-v015-regression.yml",
+    "workflowRun": 37517510163,
+    "evidenceArtifact": "formal/v0.15/regression/compact-and.amemory-evidence.json",
+    "evidenceSha256": "9283e135f57629acef84579ff91c374b91bc390ebdc39e5449b344174d17692a",
+    "rows": "4/4",
+    "nonBoolean": "NO_MATCH",
+    "exactPersistedEvidenceMatch": false,
+    "status": "SUCCESS_RESEARCH_CAPTURE"
+  },
+  "backendCompatibility": {
+    "lowering": "four grounded zero-role Rules -> generated legacy StructuralRule/index representation",
+    "canonicalSemanticsChanged": false,
+    "programSpecificDispatch": 0,
+    "canonicalMemberCount": 4,
+    "backendIndexCount": 4,
+    "packageArtifact": "formal/v0.15/regression/compact-and.amemory-package.json",
+    "packageSha256": "749f2eca71bd0e7f5d9ffb6d7d9e9e530b2aea8b3318e2a8bae25a423c347c8a",
+    "localDifferential": "GREEN"
+  }
+}
