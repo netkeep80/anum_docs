@@ -31,6 +31,23 @@ const v015 = JSON.parse(
   allowedGlobalAxioms: { lean4: string[]; rocq: string[] };
   targets: GprTarget[];
 };
+const gpr01Evidence = JSON.parse(
+  readFileSync(
+    resolve(repo, "proofs/v015-evidence/gpr01-single-state-transformer.json"),
+    "utf8",
+  ),
+) as {
+  id: string;
+  status: string;
+  externalCrossCheck: { ciRun: number; exactHead: string };
+  architecturalConsequence: {
+    semanticCommandsPerReaction: number;
+    analysisIsSeparateSemanticCommand: boolean;
+    synthesisIsSeparateSemanticCommand: boolean;
+    publicationIsSeparateSemanticCommand: boolean;
+  };
+  theoremProjection: { currentV014InventoryUnchanged: boolean };
+};
 const gpr06Evidence = JSON.parse(
   readFileSync(
     resolve(repo, "proofs/v015-evidence/gpr06-exact-s0-opacity.json"),
@@ -165,6 +182,28 @@ assert(
     ci.includes("MtsV015GeneralizedReaction.v") &&
     ci.includes("v015-external-proof-assurance.json"),
   "CI compiles and assures the separate v0.15 paired proof lane",
+);
+
+assert(gpr01Evidence.id === "GPR-01", "GPR-01 evidence id");
+assert(
+  gpr01Evidence.status === "PROVED_AS_PURE_SINGLE_STATE_TRANSFORMER_REFINEMENT",
+  "GPR-01 evidence classification",
+);
+assert(gpr01Evidence.externalCrossCheck.ciRun === 37453206274, "GPR-01 exact proof CI is pinned");
+assert(
+  gpr01Evidence.externalCrossCheck.exactHead === "5d5b08c3fbdab5a9cfebd86c77cbe7aced37826b",
+  "GPR-01 proof head is pinned",
+);
+assert(gpr01Evidence.architecturalConsequence.semanticCommandsPerReaction === 1, "Gamma is one semantic command");
+assert(
+  gpr01Evidence.architecturalConsequence.analysisIsSeparateSemanticCommand === false &&
+    gpr01Evidence.architecturalConsequence.synthesisIsSeparateSemanticCommand === false &&
+    gpr01Evidence.architecturalConsequence.publicationIsSeparateSemanticCommand === false,
+  "analysis/synthesis/publication are internal refinement phases",
+);
+assert(
+  gpr01Evidence.theoremProjection.currentV014InventoryUnchanged === true,
+  "GPR-01 leaves accepted theorem inventory unchanged",
 );
 
 assert(gpr06Evidence.id === "GPR-06", "GPR-06 evidence id");
