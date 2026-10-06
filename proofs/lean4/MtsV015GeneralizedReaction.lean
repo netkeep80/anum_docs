@@ -249,7 +249,7 @@ It proves the narrower v0.15 boundary needed by the current source model:
 * any finite ordered/multiplicity-preserving argument/dependency carrier can be
   encoded losslessly into ONE recursively structured Link endpoint;
 * therefore finite arity alone does not imply a cross-current-member join;
-* role authority is semantic Aset membership, not mere physical materialization.
+* role authority is semantic ANet membership, not mere physical materialization.
 -/
 
 inductive ExactPackedLink (Atom : Type) where
@@ -319,7 +319,7 @@ def SemanticRole
 
 /--
 Physical existence of a Link shaped like a role does not grant semantic role
-authority when that Link is absent from the selected semantic Aset membership.
+authority when that Link is absent from the selected semantic ANet membership.
 -/
 theorem GPR_08_physical_nonmember_has_no_role_authority
     {Link : Type}
@@ -420,9 +420,9 @@ end MTS.V015.External
 namespace MTS.V015.External
 
 /-
-GPR-02 — canonical Aset membership convergence.
+GPR-02 — canonical ANet membership convergence.
 
-Semantic Aset membership is extensional: deriving the same canonical Link more
+Semantic ANet membership is extensional: deriving the same canonical Link more
 than once does not introduce semantic multiplicity. This is a membership law,
 not a runtime "dedup command". Provenance/event multiplicity may be retained in
 a separate evidence carrier. ExactSequence multiplicity is explicitly outside
@@ -436,7 +436,7 @@ def AddAsetMember
   fun value => value = derived ∨ member value
 
 /--
-Adding the same canonical Link twice changes no Aset-membership query.
+Adding the same canonical Link twice changes no ANet-membership query.
 The theorem is pointwise and therefore needs no proposition/function
 extensionality axiom.
 -/
@@ -459,7 +459,7 @@ theorem GPR_02_duplicate_membership_idempotent
     · exact Or.inr (Or.inr old)
 
 /--
-Order of two semantic membership contributions is nonsemantic at the Aset
+Order of two semantic membership contributions is nonsemantic at the ANet
 membership level.
 -/
 theorem GPR_02_membership_contribution_commutes
@@ -505,7 +505,7 @@ theorem GPR_02_duplicate_provenance_events_are_preserved
     exact List.Mem.head _
 
 /--
-Aset idempotence MUST NOT collapse repeated positions inside ExactSequence.
+ANet idempotence MUST NOT collapse repeated positions inside ExactSequence.
 -/
 theorem GPR_02_exact_sequence_multiplicity_not_collapsed
     {Atom : Type}

@@ -240,7 +240,7 @@ GPR-08 — finite-arity J0 representation and semantic role authority.
 This paired projection proves only the boundary needed by v0.15:
 finite ordered/multiplicity-preserving structure can be packed losslessly into
 one recursive Link endpoint, so finite arity alone does not justify J1.
-Semantic role authority is selected Aset membership, not physical existence.
+Semantic role authority is selected ANet membership, not physical existence.
 *)
 
 Inductive ExactPackedLink (Atom : Type) : Type :=
@@ -412,11 +412,11 @@ Print Assumptions GPR_01_same_analysis_same_staging.
 
 
 (*
-GPR-02 — canonical Aset membership convergence.
+GPR-02 — canonical ANet membership convergence.
 
 The laws are pointwise membership laws, not a separate runtime dedup command.
 Distinct provenance events may remain distinct evidence occurrences.
-ExactSequence multiplicity is explicitly not collapsed by Aset idempotence.
+ExactSequence multiplicity is explicitly not collapsed by ANet idempotence.
 *)
 
 Definition AddAsetMember
