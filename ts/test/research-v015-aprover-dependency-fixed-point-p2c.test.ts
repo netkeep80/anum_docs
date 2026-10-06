@@ -404,8 +404,10 @@ function installProgram(
   //
   // The second output is simultaneously a current truth and a Rule admission
   // because K=Theory for this experiment (One-Link role overlap).
-  const OCC = fresh();
+  // GATE_CONT is allocated before OCC so this grounded generated-rule role
+  // cannot structurally contain the meta-role that will later be substituted.
   const GATE_CONT = fresh();
+  const OCC = fresh();
   const gateDictionary = defineStructuralRoleDictionary(memory, [GATE_CONT]);
   const gateAntecedentTemplate = memory.ensure(
     WAIT,
