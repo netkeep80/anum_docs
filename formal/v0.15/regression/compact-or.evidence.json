@@ -1,0 +1,66 @@
+{
+  "schema": "mts-v015-approved-artifact-evidence/v0.1",
+  "status": "FULL_REGRESSION_GREEN",
+  "canonicalAccepted": true,
+  "authorDecision": {
+    "state": "APPROVED",
+    "decision": "APPROVE ALL",
+    "evidence": "netkeep80/anum_docs#1980 issuecomment-6024720547",
+    "date": "2026-10-06"
+  },
+  "verification": {
+    "head": "ec814eeed4a2045eb32f6079930ddddf4dd986c7",
+    "ciRun": 37525720828,
+    "contractObservatoryRun": 37525721015,
+    "frozenAmemoryRun": 37525720725
+  },
+  "amemory": {
+    "repository": "netkeep80/amemory",
+    "frozenMain": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "rustToolchain": "1.98.1",
+    "exactPackageParity": true,
+    "exactEvidenceParity": true,
+    "programSpecificDispatch": 0,
+    "jobId": 112482088850,
+    "rows": "4/4"
+  },
+  "id": "compact-boolean-or",
+  "semanticModel": {
+    "strictBooleanDomain": true,
+    "nonBoolean": "NO_MATCH",
+    "roleCount": 0,
+    "groundedRuleCount": 4,
+    "semanticMemberCount": 4,
+    "semantics": [
+      "OR([F,F])->F",
+      "OR([F,T])->T",
+      "OR([T,F])->T",
+      "OR([T,T])->T"
+    ],
+    "ruleDiscovery": "semantic Theory->Rule membership",
+    "execution": "shared generalized Γ-compatible path"
+  },
+  "artifacts": {
+    "formal": {
+      "path": "formal/v0.15/regression/compact-or.formal",
+      "sha256": "04f794a27c26249c0eb75a5163add1a46ddb5537d6b4b783782e3044db9528ee"
+    },
+    "json": {
+      "path": "formal/v0.15/regression/compact-or.json",
+      "sha256": "3fbcd16fb0e067fa5c84be5d86a39a964da45cf7fdcc03880d2e23c28f5b6c29"
+    },
+    "recursive": {
+      "path": "formal/v0.15/regression/compact-or.recursive",
+      "sha256": "7f0253479dacc1d568a1ce931eab943264a42770554c46dd96966a9ed4f85668"
+    },
+    "amemoryPackage": {
+      "path": "formal/v0.15/regression/compact-or.amemory-package.json",
+      "sha256": "e49e977ba0dbdcd518db80e26b93cff408c04be4208f688a534640eca76c660d"
+    },
+    "amemoryEvidence": {
+      "path": "formal/v0.15/regression/compact-or.amemory-evidence.json",
+      "sha256": "626315ecb8662a254201c269e81e2d611b7ab2ea71a3fa7ff50145e7bf50bdb6"
+    }
+  }
+}
