@@ -1120,7 +1120,7 @@
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-FORMAL-PROOF-01": {
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "ownerIssue": 2004,
       "dependsOn": [
         "V15-AUTH-01",
@@ -1128,40 +1128,61 @@
         "V15-STRUCT-01",
         "V15-NAME-01"
       ],
-      "positiveVectors": [],
-      "negativeVectors": [],
+      "positiveVectors": [
+        "frm01-08-paired-lean4-rocq",
+        "empty-global-axiom-allowlists",
+        "contextual-name-source-role-dsa-exactsequence-structural-aspect-laws"
+      ],
+      "negativeVectors": [
+        "arbitrary-cyclic-binding-rejected",
+        "no-proof-specific-grammar-opcodes",
+        "no-global-host-atom-authority"
+      ],
       "requiredExecutableGates": [
-        "ts/test/v015-formal-proof-assurance-f0.test.ts"
+        "ts/test/v015-formal-proof-assurance-f0.test.ts",
+        "ts/test/v015-direct-structural-aspects-s1.test.ts"
       ],
       "evidenceRefs": [
-        "proofs/v015-evidence/formal-bootstrap-frm01-06.json",
-        "proofs/v015-evidence/formal-refinement-frm07-08.json",
         "proofs/v015-formal-proof-assurance.json",
-        "ts/test/v015-formal-proof-assurance-f0.test.ts"
+        "proofs/lean4/MtsV015Formal.lean",
+        "proofs/coq/MtsV015Formal.v",
+        "ts/test/v015-formal-proof-assurance-f0.test.ts",
+        "ts/test/v015-direct-structural-aspects-s1.test.ts",
+        "#2004"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-FORMAL-PROOF-02": {
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "ownerIssue": 2004,
       "dependsOn": [
         "V15-FORMAL-PROOF-01",
         "V15-REG-01"
       ],
       "positiveVectors": [
-        "grounded-zero-role-refinement-witness",
-        "two-role-meta-rule-refinement-witness"
+        "frm07-approved-production-refinement",
+        "frm08-structural-aspect-production-witness",
+        "formal-json-native-source-parity",
+        "recursive-semantic-left-inverse",
+        "approved-corpus-frozen-replay-green"
       ],
-      "negativeVectors": [],
+      "negativeVectors": [
+        "typescript-implementation-mechanized-proof-not-claimed",
+        "v016-proof-aprover-assurance-excluded"
+      ],
       "requiredExecutableGates": [
-        "ts/test/v015-formal-production-refinement-f1.test.ts"
+        "ts/test/v015-formal-production-refinement-f1.test.ts",
+        "ts/test/v015-direct-structural-aspects-s1.test.ts",
+        "ts/test/v015-metacompiler-corpus-closure-c0.test.ts"
       ],
       "evidenceRefs": [
-        "proofs/v015-evidence/formal-bootstrap-frm01-06.json",
+        "proofs/v015-formal-proof-assurance.json",
         "proofs/v015-evidence/formal-refinement-frm07-08.json",
         "ts/test/v015-formal-production-refinement-f1.test.ts",
-        "formal/v0.15/regression/grounded-zero-role.evidence.json",
-        "formal/v0.15/regression/two-role-meta-rule.evidence.json"
+        "ts/test/v015-direct-structural-aspects-s1.test.ts",
+        "ts/test/v015-metacompiler-corpus-closure-c0.test.ts",
+        "traceability/mts-v0.15.json#approvedJsonCorpus",
+        "#2004"
       ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
