@@ -750,6 +750,7 @@ setEqual(
     "ts/src/v015-formal-evaluation.ts#materializeV015EvaluationRequest",
     "ts/src/v015-formal-evaluation.ts#materializeV015RootEvaluationBoundary",
     "ts/src/v015-link-definition.ts#materializeExpression",
+    "ts/src/v015-link-definition.ts#materializeV015ContextualNameCoordinate",
     "ts/src/v015-link-definition.ts#resolveEqualityOperand",
     "ts/src/v015-source-anet.ts#walkBlock",
     "ts/src/v015-proof-source.ts#build",
