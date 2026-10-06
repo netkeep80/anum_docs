@@ -301,7 +301,7 @@ function runCase(spec: CaseSpec): void {
   }
 }
 
-const specs: readonly CaseSpec[] = Object.freeze([
+const specs = Object.freeze([
   {
     label: "arity0",
     premiseTemplates: () => [],
@@ -340,7 +340,7 @@ const specs: readonly CaseSpec[] = Object.freeze([
       memory.ensure(A, B),
     ],
   },
-]);
+] satisfies readonly CaseSpec[]);
 
 for (const spec of specs) runCase(spec);
 
