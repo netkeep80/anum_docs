@@ -37,6 +37,7 @@ const executionTheory = memory.ensure(b.C, b.L);
 
 const VALID_PROOF = fresh();
 const MEMBER = fresh();
+const REQUEST = fresh();
 const VERIFY_TWO = fresh();
 const MEMBER_CHECK = fresh();
 const CHECKED = fresh();
