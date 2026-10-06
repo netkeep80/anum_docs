@@ -529,7 +529,7 @@
       "ownerIssue": "#1980",
       "state": "OPEN",
       "mandatory": true,
-      "summary": "MTS has one canonical semantic Boolean AND source/model. Frozen or future A-memory backends may use generated compatibility or optimized AND lowerings only when they preserve the exact T/F-domain truth table and NO_MATCH boundary, remain generic/backend-owned, and stay outside canonical AND semantic authority.",
+      "summary": "MTS has one canonical semantic Boolean AND source/model. Frozen or future A-memory backends may use generated compatibility or optimized AND lowerings only when they are semantics-preserving with respect to the exact T/F-domain truth table and NO_MATCH boundary, remain generic/backend-owned, and stay outside canonical AND semantic authority.",
       "dependsOn": [
         "V15-AND-02"
       ],
