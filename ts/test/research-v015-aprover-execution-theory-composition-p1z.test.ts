@@ -74,17 +74,20 @@ function build(
     return value;
   };
 
-  const objectTheory = named(1);
-  const staticAproverTheory = named(2);
-  const executionTheory = named(3);
-  const MEMBER = named(4);
+  // Keep the three authority anchors structurally independent. They must not
+  // become physical outgoing Links of one another merely because of the naming
+  // fixture used for ordinary data.
+  const objectTheory = memory.ensure(b.L, b.C);
+  const staticAproverTheory = memory.ensure(b.O, b.L);
+  const executionTheory = memory.ensure(b.C, b.L);
+  const MEMBER = named(1);
 
   const empty = defineStructuralRoleDictionary(memory, []);
 
-  const pingA = named(5);
-  const pongA = named(6);
-  const pingB = named(7);
-  const pongB = named(8);
+  const pingA = named(2);
+  const pongA = named(3);
+  const pingB = named(4);
+  const pongB = named(5);
 
   const staticRuleA = defineStructuralRule(
     memory,
@@ -107,9 +110,9 @@ function build(
     staticRuleB,
   );
 
-  const objectRuleA = named(9);
-  const objectRuleB = named(10);
-  const objectRuleAmbient = named(11);
+  const objectRuleA = named(6);
+  const objectRuleB = named(7);
+  const objectRuleAmbient = named(8);
   const objectAdmissionA = memory.ensure(objectTheory, objectRuleA);
   const objectAdmissionB = memory.ensure(objectTheory, objectRuleB);
 
@@ -123,10 +126,10 @@ function build(
   // Safe candidate data may reference authority identities as END values but
   // contributes no outgoing authority Links. It is deliberately irrelevant to
   // package composition.
-  let candidate = named(12);
+  let candidate = named(9);
   for (let i = 0; i < candidateNoise; i += 1) {
     candidate = memory.ensure(
-      memory.ensure(candidate, named(13 + i)),
+      memory.ensure(candidate, named(10 + i)),
       i % 2 === 0 ? objectTheory : staticAproverTheory,
     );
   }
