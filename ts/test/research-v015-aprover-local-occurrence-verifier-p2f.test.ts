@@ -9,7 +9,10 @@ import {
   defineStructuralInterpreter,
   defineStructuralRoleDictionary,
   defineStructuralRule,
+  readStructuralRoleDictionary,
+  readStructuralRule,
 } from "../src/structural-rule.js";
+import { unifyStructuralRuleTemplate } from "../src/structural-unification.js";
 import { defineStructuralDerivationRule } from "../src/derivation.js";
 import {
   V013CurrentScopeCursor,
@@ -516,6 +519,73 @@ function runCase(
 
   const success = current.members().includes(expectedSuccess);
 
+  let verifierDiagnostic = "";
+  if (!success && mutate === "none") {
+    const intendedConstraint = memory.ensure(
+      bodyTemplate,
+      materializeExactSequence(memory, premiseTemplates),
+    );
+    const intendedBefore = memory.ensure(
+      CTX,
+      memory.ensure(
+        PACKET_ENTRY,
+        memory.ensure(CHECK_APPLICATION, intendedConstraint),
+      ),
+    );
+    let intendedUnify = "OK";
+    try {
+      unifyStructuralRuleTemplate(
+        memory,
+        intendedBefore,
+        expectedContextualPacket,
+        [X, Y, CTX],
+      );
+    } catch (error) {
+      intendedUnify =
+        error instanceof Error ? error.name + ":" + error.message : String(error);
+    }
+
+    const triggerCandidates = memory.outgoing(PACKET_ENTRY)
+      .filter((trigger) => memory.poles(trigger).start === PACKET_ENTRY);
+    const generatedDetails: string[] = [];
+    for (const trigger of triggerCandidates) {
+      const admission = memory.poles(trigger).end;
+      const ap = memory.poles(admission);
+      if (ap.start !== executionTheory) continue;
+      try {
+        const rule = readStructuralRule(memory, ap.end);
+        const roles = readStructuralRoleDictionary(
+          memory,
+          rule.roleDictionary,
+        ).roles;
+        let match = "OK";
+        try {
+          unifyStructuralRuleTemplate(
+            memory,
+            memory.poles(rule.body).start,
+            expectedContextualPacket,
+            roles,
+          );
+        } catch (error) {
+          match =
+            error instanceof Error ? error.name + ":" + error.message : String(error);
+        }
+        generatedDetails.push(
+          "roles=" + String(roles.length) + "/match=" + match,
+        );
+      } catch (error) {
+        generatedDetails.push(
+          "read=" +
+            (error instanceof Error ? error.name + ":" + error.message : String(error)),
+        );
+      }
+    }
+    verifierDiagnostic =
+      " intendedUnify=" + intendedUnify +
+      " triggerCandidates=" + String(triggerCandidates.length) +
+      " generated=[" + generatedDetails.join(";") + "]";
+  }
+
   if (mutate === "none") {
     assert(
       success,
@@ -524,7 +594,8 @@ function runCase(
         " matches=" + matchTrace.join(",") +
         " sawRequest=" + String(sawRequest) +
         " sawContextualPacket=" + String(sawContextualPacket) +
-        " sawSuccess=" + String(sawSuccess),
+        " sawSuccess=" + String(sawSuccess) +
+        verifierDiagnostic,
     );
   } else {
     assert(
