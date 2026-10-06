@@ -5,7 +5,7 @@
 // test and MUST NOT enter the approved corpus without explicit Author review.
 
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import {
@@ -120,7 +120,18 @@ function fixture(): Fixture {
   return Object.freeze({ memory, basis, grammarRoot, sourceAnetProfileRoot });
 }
 
-const repoRoot = resolve(process.cwd(), "..");
+function repositoryRoot(): string {
+  for (const candidate of [resolve(process.cwd(), ".."), process.cwd()]) {
+    if (
+      existsSync(
+        resolve(candidate, "formal/v0.15/candidates/compact-and.formal"),
+      )
+    ) return candidate;
+  }
+  throw new Error("v0.15 compact AND: repository root");
+}
+
+const repoRoot = repositoryRoot();
 const canonicalFormal = readFileSync(
   resolve(repoRoot, "formal/v0.15/candidates/compact-and.formal"),
   "utf8",
