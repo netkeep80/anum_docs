@@ -1147,7 +1147,7 @@
       "id": "V15-DOCS-01",
       "group": "DOCS",
       "ownerIssue": "#1914",
-      "state": "OPEN",
+      "state": "COMPONENT_GREEN",
       "mandatory": true,
       "summary": "The canonical «Формальная нотация МТС.md» is a deterministic generated projection of the current v0.15 execution-core FORMAL/JSON model, machine registries, selected Gamma/context profiles and Author-approved executable corpus; hand-maintained semantic prose and stale v0.14-only projection are forbidden.",
       "dependsOn": [
@@ -1160,11 +1160,22 @@
         "issue": 1914
       },
       "evidence": {
-        "positiveVectors": [],
-        "negativeVectors": [
-          "current-formal-spec-is-v014-only-not-generated"
+        "positiveVectors": [
+          "whole-file-formal-v015-projection-generated-from-machine-sources",
+          "accepted-v014-stable-anchors-preserved",
+          "approved-six-artifact-corpus-projected",
+          "gamma-and-formal-proof-status-projected",
+          "docs-sync-idempotent"
         ],
-        "requiredExecutableGates": []
+        "negativeVectors": [
+          "hand-edited-formal-spec-detected-as-stale",
+          "candidate-v015-does-not-relabel-current-accepted-v014"
+        ],
+        "requiredExecutableGates": [
+          "ts/test/docs-sync.test.ts",
+          "ts/test/docs-current-surface.test.ts",
+          "ts/test/docs-size-budget.test.ts"
+        ]
       }
     },
     {
@@ -1190,6 +1201,7 @@
       "evidence": {
         "positiveVectors": [
           "all-semantic-execution-json-compiler-proof-assurance-corpus-components-green",
+          "generated-formal-spec-component-green",
           "independent-r2-audit-complete"
         ],
         "negativeVectors": [
@@ -1217,6 +1229,7 @@
       "evidence": {
         "positiveVectors": [
           "r2-falsifies-hidden-semantic-open-requirements-none-found",
+          "r2-generated-formal-spec-green",
           "r2-cross-repository-freeze-green",
           "r2-approved-corpus-six-green",
           "r2-formal-json-compiler-and-external-assurance-green"
