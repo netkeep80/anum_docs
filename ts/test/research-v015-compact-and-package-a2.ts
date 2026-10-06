@@ -458,4 +458,10 @@ console.error(
   "COMPACT_AND_PACKAGE_SHA256=" +
     createHash("sha256").update(first.json, "utf8").digest("hex"),
 );
+const firstPackage = JSON.parse(first.json) as {
+  readonly entry: string;
+  readonly negativeEntry: string;
+};
+console.error("COMPACT_AND_ENTRY_WIRE=" + firstPackage.entry);
+console.error("COMPACT_AND_NEGATIVE_ENTRY_WIRE=" + firstPackage.negativeEntry);
 process.stdout.write(first.json);
