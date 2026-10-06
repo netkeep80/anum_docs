@@ -320,6 +320,7 @@ for (const spec of specs) {
 
   const foreignTheory = compiled.absolute("ForeignTheory");
   const first = spec.rows[0];
+  assert(first !== undefined, spec.id + " has at least one truth row");
   const firstCurrent = f.memory.ensure(
     op,
     materializeExactSequence(f.memory, first.args.map(byBit)),
