@@ -1,6 +1,6 @@
 {
   "schema": "mts-v015-formal-proof-assurance/v0.1",
-  "status": "bootstrap-proof-active",
+  "status": "EXECUTION_CORE_PROOF_GREEN",
   "ownerIssue": "#2004",
   "authority": "external-cross-check-only",
   "allowedGlobalAxioms": {
@@ -147,5 +147,36 @@
         "FRM_08_structural_aspect_denotation"
       ]
     }
-  ]
+  ],
+  "scope": {
+    "v015": "universal FORMAL/JSON execution core",
+    "includes": [
+      "contextual names",
+      "source role separation",
+      "Direct Sequential Association",
+      "ExactSequence",
+      "FORMAL/JSON shared native source ANet premise",
+      "metacompiler semantic preservation under explicit roundtrip premise",
+      "approved production refinement witnesses",
+      "ROOT/START/END/PAIR structural aspects"
+    ],
+    "excludes": [
+      "v0.16 proof metamodel",
+      "canonical proof/aprover JSON",
+      "native aprover replay",
+      "proof-source-specific assurance"
+    ]
+  },
+  "productionRefinement": {
+    "status": "GREEN_FOR_DECLARED_V015_EXECUTION_FRAGMENT",
+    "witnesses": [
+      "ts/test/v015-formal-production-refinement-f1.test.ts",
+      "ts/test/v015-direct-structural-aspects-s1.test.ts",
+      "ts/test/v015-metacompiler-corpus-closure-c0.test.ts",
+      "formal/v0.15/regression/grounded-zero-role.evidence.json",
+      "formal/v0.15/regression/two-role-meta-rule.evidence.json",
+      "traceability/mts-v0.15.json#approvedJsonCorpus"
+    ],
+    "note": "External theorem lanes prove the mathematical laws under explicit premises; production TypeScript/corpus tests witness those premises and refinements. This does not claim a mechanized proof of the TypeScript implementation itself."
+  }
 }
