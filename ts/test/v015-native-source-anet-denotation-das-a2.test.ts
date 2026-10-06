@@ -888,6 +888,105 @@ assert(
   "grounded JSON publishes Theory->GroundRule admission",
 );
 
+// DAS-07 mandatory vector: distinct source/model identities may denote the
+// same semantic ANet. Source identity is therefore not recoverable from
+// denotation alone.
+const emptyDirectSource = compileDirectJsonToNativeSourceAnet("{}");
+const duplicateAliasDirectSource = compileDirectJsonToNativeSourceAnet(
+  '{"A":"X","B":"X"}',
+);
+assert(
+  emptyDirectSource !== duplicateAliasDirectSource,
+  "distinct source ANets remain distinct even when denotation is equal",
+);
+const emptyDirectDenotation = denoteV015ResolvedSourceAnet(
+  memory,
+  basis,
+  grammarRoot,
+  sourceAnetProfileRoot,
+  emptyDirectSource,
+);
+const duplicateAliasDenotation = denoteV015ResolvedSourceAnet(
+  memory,
+  basis,
+  grammarRoot,
+  sourceAnetProfileRoot,
+  duplicateAliasDirectSource,
+);
+same(emptyDirectDenotation.members.size, 0, "empty source denotes no members");
+same(
+  duplicateAliasDenotation.members.size,
+  0,
+  "two aliases of one resolved Link remain metamodel-only",
+);
+same(
+  duplicateAliasDenotation.bindings.length,
+  2,
+  "distinct A/B source bindings are preserved despite equal RHS denotation",
+);
+same(
+  duplicateAliasDenotation.bindings[0]?.value,
+  duplicateAliasDenotation.bindings[1]?.value,
+  "A:X and B:X resolve to the same semantic Link value",
+);
+
+// DAS-08 mandatory currentness move: semantic currentness follows membership,
+// not physical Link existence or an alias.
+const DIRECT_K1 = absoluteName("K1");
+const DIRECT_CURRENT_1 = memory.ensure(DIRECT_E, DIRECT_K1);
+const movedCurrentSource = compileDirectJsonToNativeSourceAnet(
+  '{"E->K1":null}',
+);
+const movedCurrent = denoteV015ResolvedSourceAnet(
+  memory,
+  basis,
+  grammarRoot,
+  sourceAnetProfileRoot,
+  movedCurrentSource,
+);
+assert(
+  movedCurrent.members.has(DIRECT_CURRENT_1),
+  "replacement E->K1 membership becomes current",
+);
+assert(
+  !movedCurrent.members.has(DIRECT_CURRENT),
+  "old physical E->K loses currentness when its membership is absent",
+);
+same(
+  memory.poles(DIRECT_CURRENT).start,
+  DIRECT_E,
+  "old E->K remains physically materialized after currentness moves",
+);
+same(
+  memory.poles(DIRECT_CURRENT).end,
+  DIRECT_K,
+  "old E->K physical endpoint remains K after currentness moves",
+);
+
+// Mandatory renamed-presentation vector: adding/changing a metamodel alias
+// must not change the explicit bare member set.
+const renamedCurrentSource = compileDirectJsonToNativeSourceAnet(
+  '{"RenamedCurrent":"E->K","E->K":null}',
+);
+const renamedCurrent = denoteV015ResolvedSourceAnet(
+  memory,
+  basis,
+  grammarRoot,
+  sourceAnetProfileRoot,
+  renamedCurrentSource,
+);
+setSame(
+  renamedCurrent.members,
+  [DIRECT_CURRENT],
+  "presentation alias rename does not change semantic member identity",
+);
+assert(
+  renamedCurrent.bindings.some((binding) =>
+    binding.value === DIRECT_CURRENT
+  ),
+  "renamed presentation remains explicit metamodel binding evidence",
+);
+
 for (const bad of [
   "null",
   "[null]",
@@ -923,8 +1022,11 @@ console.log([
   "EMPTY_SEQUENCE_DENOTATION=R",
   "PHYSICAL_EXISTENCE_IMPLIES_MEMBERSHIP=FALSE",
   "DUPLICATE_DENOTATION=EXTENSIONAL_CONVERGENCE",
+  "DISTINCT_SOURCE_SAME_DENOTATION=GREEN",
   "SOURCE_ENTRY_ORDER_SEMANTIC=FALSE",
   "CURRENTNESS_REQUIRES_MEMBERSHIP=TRUE",
+  "CURRENTNESS_MEMBERSHIP_MOVE=GREEN",
+  "PRESENTATION_RENAME_MEMBERSHIP_INVARIANT=GREEN",
   "METAMODEL_BINDINGS_CAN_ERASE_BEFORE_EXECUTION=TRUE",
   "CUSTOM_DAS_A1_SOURCE_CARRIER_REQUIRED=FALSE",
   "DIRECT_JSON_TO_NATIVE_SOURCE_ANET=GREEN_RESEARCH",
