@@ -1128,10 +1128,23 @@
         "V15-GOV-03",
         "V15-GOV-04"
       ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "positiveVectors": [
+        "all-semantic-execution-json-compiler-proof-assurance-corpus-components-green",
+        "independent-r2-audit-complete"
+      ],
+      "negativeVectors": [
+        "v15-gov04-ruleset-bypass-open",
+        "draft-pr-repo-guard-skipped-is-not-release-enforcement"
+      ],
+      "requiredExecutableGates": [
+        "ts/test/v015-independent-readiness-r2.test.ts"
+      ],
+      "evidenceRefs": [
+        "formal/v0.15/evidence/readiness-audit-r2.json",
+        "ts/test/v015-independent-readiness-r2.test.ts",
+        "#1876",
+        "#1982"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-READY-02": {
@@ -1140,10 +1153,24 @@
       "dependsOn": [
         "V15-READY-01"
       ],
-      "positiveVectors": [],
-      "negativeVectors": [],
-      "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "positiveVectors": [
+        "r2-falsifies-hidden-semantic-open-requirements-none-found",
+        "r2-cross-repository-freeze-green",
+        "r2-approved-corpus-six-green",
+        "r2-formal-json-compiler-and-external-assurance-green"
+      ],
+      "negativeVectors": [
+        "r2-detects-operational-merge-governance-blocker-v15-gov04"
+      ],
+      "requiredExecutableGates": [
+        "ts/test/v015-independent-readiness-r2.test.ts"
+      ],
+      "evidenceRefs": [
+        "formal/v0.15/evidence/readiness-audit-r2.json",
+        "ts/test/v015-independent-readiness-r2.test.ts",
+        "#1876",
+        "#1982"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-READY-03": {
@@ -1153,9 +1180,13 @@
         "V15-READY-02"
       ],
       "positiveVectors": [],
-      "negativeVectors": [],
+      "negativeVectors": [
+        "no-final-author-accept-reject-decision-recorded"
+      ],
       "requiredExecutableGates": [],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "#1876"
+      ],
       "authorJsonReview": "NOT_APPLICABLE"
     },
     "V15-AUTHOR-JSON-01": {
