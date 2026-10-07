@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 // Integration provenance: mandatory V15-GAMMA-01 finite materialized-execution boundary copied from GREEN #1989; GREEN_RESEARCH classification is intentionally preserved.
+// Clean-main boundary: finiteness is a physical execution/refinement premise, not a semantic restriction on the ambient Link ontology.
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
