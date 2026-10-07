@@ -8,21 +8,21 @@
     "contract-conformance": {
       "current": {
         "contract": {
-          "path": "contracts/mts-contract-v0.14.json",
+          "path": "contracts/mts-contract-v0.15.json",
           "format": "json"
         },
         "conformance": {
-          "path": "contracts/mts-conformance-v0.14.json",
+          "path": "contracts/mts-conformance-v0.15.json",
           "format": "json"
         }
       },
       "previous": {
         "contract": {
-          "path": "contracts/mts-contract-v0.13.json",
+          "path": "contracts/mts-contract-v0.14.json",
           "format": "json"
         },
         "conformance": {
-          "path": "contracts/mts-conformance-v0.13.json",
+          "path": "contracts/mts-conformance-v0.14.json",
           "format": "json"
         }
       },
@@ -41,7 +41,7 @@
       },
       "acceptance": {
         "document": {
-          "path": "cutover/typescript-c1-acceptance-v0.7.json",
+          "path": "cutover/typescript-c1-acceptance-v0.8.json",
           "format": "json"
         },
         "current_contract_path": "/current/contract",
@@ -576,4 +576,3 @@
     }
   }
 }
-
