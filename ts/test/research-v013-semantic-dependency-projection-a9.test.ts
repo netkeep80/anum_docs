@@ -1207,6 +1207,7 @@ assert(decisionAudit !== undefined, "P1f semantic decision audit is declared");
 // The theorem projection support files enter this audit only through the generated-catalog tooling closure.
 const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/docs-sync.ts",
+  "ts/src/tooling/formal-notation-v015-markdown.ts",
   "ts/src/tooling/markdown-coverage-audit.ts",
   "ts/src/tooling/theorem-catalog-markdown.ts",
   "ts/src/tooling/theorem-projection-contract.ts",
