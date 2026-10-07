@@ -488,8 +488,10 @@ export function upsertRequirementProjection(
 }
 
 export function compileRequirementDocuments(root: string, write: boolean): string[] {
-  const ir = loadMtsSemanticIr(root);
-  if (ir.schema === "mts-requirement-registry/v0.3") return [];
+  const currentIr = loadMtsSemanticIr(root);
+  const ir = currentIr.schema === "mts-requirement-registry/v0.3"
+    ? loadMtsSemanticIr(root, "requirements/mts-v0.14.json")
+    : currentIr;
   if (ir.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585") {
     return [];
   }
