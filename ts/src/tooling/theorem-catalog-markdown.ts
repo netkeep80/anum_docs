@@ -4,6 +4,9 @@ import type {
   TheoremProjectionModel,
   TheoremProjectionTheorem,
 } from "./theorem-projection-model.js";
+import type {
+  V015CandidateProofProjection,
+} from "./v015-candidate-proof-projection.js";
 
 export const THEOREM_CATALOG_PATH = "docs/theory/Теоремы МТС.md";
 
@@ -273,6 +276,72 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
   return lines.join("\n");
 }
 
+function renderCandidateProofCard(proof: V015CandidateProofProjection): string {
+  const lines = [
+    '<a id="candidate-proof-' + proof.id.toLowerCase() + '"></a> <!-- якорь кандидатного доказательства -->',
+    "### " + proof.id + " — " + proof.family,
+    "",
+    "- **Статус проекции:** " + inlineCode(proof.projectionStatus) + ".",
+    "- **Классификация внешнего доказательства:** " + inlineCode(proof.classification) + ".",
+    "- **Доказательный авторитет:** " + inlineCode(proof.authority) + ".",
+    "- **Владелец:** " + inlineCode(proof.ownerIssue) + ".",
+    "- **Assurance manifest:** " + repositoryLink(proof.assurancePath) + ".",
+    "- **Machine evidence:** " + repositoryLink(proof.evidencePath) + ".",
+    "- **Статус evidence-пакета:** " + inlineCode(proof.evidenceStatus) + ".",
+    "- **Зафиксированный proof head:** " +
+      (proof.exactHead === null ? "не указан" : inlineCode(proof.exactHead)) + ".",
+    "- **CI run:** " +
+      (proof.ciRun === null ? "не указан" : inlineCode(String(proof.ciRun))) + ".",
+    "",
+    "**Явные предпосылки:**",
+    ...list(proof.premises),
+    "",
+    "**Исключения / границы вывода:**",
+    ...list(proof.exclusions),
+    "",
+    "**Lean4 targets:**",
+    ...list(proof.lean4),
+    "",
+    "**Rocq targets:**",
+    ...list(proof.rocq),
+    "",
+    "**Связанные proof-source файлы:**",
+    ...(proof.sourcePaths.length
+      ? proof.sourcePaths.map((path) => "- " + repositoryLink(path))
+      : ["- нет"]),
+  ];
+  return lines.join("\n");
+}
+
+function renderCandidateProofSection(model: TheoremProjectionModel): string {
+  const lines = [
+    "## Кандидатные доказательства MTS v0.15",
+    "",
+    "> Этот раздел является генерируемой проекцией candidate-only proof assurance.",
+    "> Он не изменяет принятый реестр из 21 теорем MTS v0.14, не принимает MTS v0.15 и не является MTS-native/aprover доказательством.",
+    "> Источник статусов — отдельные Lean4/Rocq assurance-manifest'ы и machine evidence; доказательный авторитет этого слоя — только " +
+      inlineCode("external-cross-check-only") + ".",
+    "",
+    "| ID | Семейство | Статус проекции | Внешняя классификация | Lean4 | Rocq |",
+    "| --- | --- | --- | --- | --- | --- |",
+  ];
+  for (const proof of model.candidateProofs) {
+    lines.push(
+      "| [" + proof.id + "](#candidate-proof-" + proof.id.toLowerCase() + ")" +
+      " | " + proof.family +
+      " | " + proof.projectionStatus +
+      " | " + inlineCode(tableCell(proof.classification)) +
+      " | " + proof.lean4.length + " targets" +
+      " | " + proof.rocq.length + " targets |",
+    );
+  }
+  lines.push("");
+  for (const proof of model.candidateProofs) {
+    lines.push(renderCandidateProofCard(proof), "");
+  }
+  return lines.join("\n").trimEnd();
+}
+
 export function renderTheoremCatalogMarkdown(model: TheoremProjectionModel): string {
   const lines = [
     "# Теоремы МТС",
@@ -298,5 +367,6 @@ export function renderTheoremCatalogMarkdown(model: TheoremProjectionModel): str
   for (const theorem of model.theorems) {
     lines.push(renderCard(theorem), "");
   }
+  lines.push(renderCandidateProofSection(model), "");
   return `${lines.join("\n").trimEnd()}\n`;
 }
