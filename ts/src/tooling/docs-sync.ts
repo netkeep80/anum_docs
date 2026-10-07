@@ -335,6 +335,16 @@ export function checkRepositorySemanticLawDocumentation(root = findRepositoryRoo
     : MTS_REQUIREMENT_REGISTRY_PATH;
   const registry = readJson(root, registryPath);
   if (!Array.isArray(registry.requirements)) fail(`${registryPath}.requirements must be an array`);
+  if (string(contract.schema, `${currentContractPath}.schema`) === "mts-contract/v0.15") {
+    if (string(registry.schema, `${registryPath}.schema`) !== "mts-requirement-registry/v0.3") fail("accepted v0.15 requires registry v0.3");
+    if (registry.accepted !== true) fail("accepted v0.15 registry must be accepted");
+    const ids = (registry.requirements as unknown[]).map((raw, index) => string(object(raw, `${registryPath}.requirements[${index}]`).id, "v0.15 requirement id")).sort();
+    const lawIds = Object.keys(laws).sort();
+    if (ids.join("\n") !== lawIds.join("\n")) fail("accepted v0.15 contract/registry requirement set mismatch");
+    const generated = readFileSync(resolve(root, "docs/specs/Формальная нотация МТС.md"), "utf8");
+    if (!generated.includes("mts-generated-formal-notation") || !generated.includes("current accepted       = v0.15")) fail("accepted v0.15 generated FORMAL projection is stale");
+    return [];
+  }
 
   const ownerById: Record<string, string> = {};
   const ownerKeys = new Set<string>();
