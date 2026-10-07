@@ -54,14 +54,15 @@ const open = mandatory
   .filter((item) => text(item.state, "state") === "OPEN")
   .map((item) => text(item.id, "open id"))
   .sort();
-const expectedOpen = ["V15-GOV-04", "V15-READY-01", "V15-READY-02", "V15-READY-03"].sort();
-assert(JSON.stringify(open) === JSON.stringify(expectedOpen), "only governance + readiness requirements remain OPEN");
+const auditOpen = ["V15-GOV-04", "V15-READY-01", "V15-READY-02", "V15-READY-03"].sort();
+const currentOpen = ["V15-READY-01", "V15-READY-02", "V15-READY-03"].sort();
+assert(JSON.stringify(open) === JSON.stringify(currentOpen), "after S20 only readiness requirements remain OPEN");
 
 const allowedGreen = new Set(["COMPONENT_GREEN", "VERTICAL_GREEN"]);
 for (const item of mandatory) {
   const id = text(item.id, "id");
-  if (expectedOpen.includes(id)) continue;
-  assert(allowedGreen.has(text(item.state, id + " state")), id + " semantic/component requirement is green");
+  if (currentOpen.includes(id)) continue;
+  assert(allowedGreen.has(text(item.state, id + " state")), id + " semantic/component/governance requirement is green");
 }
 
 const traces = record(traceability.requirements, "trace requirements");
@@ -143,7 +144,7 @@ const snapshot = record(audit.requirementSnapshot, "requirement snapshot");
 assert(Number(snapshot.mandatoryCount) === 48, "audit mandatory count");
 assert(Number(snapshot.componentGreenCount) === 40, "audit component-green count");
 assert(Number(snapshot.verticalGreenCount) === 4, "audit vertical-green count");
-assert(JSON.stringify(strings(snapshot.open, "audit open").slice().sort()) === JSON.stringify(expectedOpen), "audit open set exact");
+assert(JSON.stringify(strings(snapshot.open, "audit open").slice().sort()) === JSON.stringify(auditOpen), "historical S19 audit open set exact");
 assert(
   JSON.stringify(strings(snapshot.nonReadinessBlockers, "non-readiness blockers")) === JSON.stringify(["V15-GOV-04"]),
   "governance only non-readiness blocker",
