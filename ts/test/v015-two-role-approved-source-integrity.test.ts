@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+// Integration provenance: pins already Author-approved two-role artifacts from #1188/#1989; no new JSON approval is introduced.
+
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 two-role approved source integrity: " + message);
 }
