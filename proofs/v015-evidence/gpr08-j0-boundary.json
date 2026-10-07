@@ -1,0 +1,69 @@
+{
+  "schema": "mts-v015-proof-evidence/v0.1",
+  "id": "GPR-08",
+  "title": "Finite correlated structure has a lossless one-endpoint J0 representation and role authority is semantic ANet membership",
+  "status": "PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",
+  "ownerIssue": "#2001",
+  "mtsVersion": "v0.15-candidate",
+  "semanticClaim": [
+    "Any finite ordered and multiplicity-preserving value sequence can be represented losslessly as one recursively structured Link endpoint.",
+    "Therefore finite arity, ordering and repeated values do not by themselves justify a true cross-current-member J1 join.",
+    "A physically materialized Link shaped like a role does not become an authorized role unless it is a semantic member of the selected role ANet."
+  ],
+  "explicitPremises": [
+    "ExactSequence-style source values are represented recursively as Link topology with an explicit empty/root boundary.",
+    "Semantic role authority is defined by selected ANet membership."
+  ],
+  "exclusions": [
+    "This does not prove J1 can never be useful for a future extension.",
+    "This does not yet close the empirical audit that every accepted v0.15 executable artifact avoids J1.",
+    "This does not create an ExactSequence ontology distinct from Links.",
+    "This does not infer semantic role membership from physical incidence/materialization."
+  ],
+  "externalCrossCheck": {
+    "authority": "external-only",
+    "allowedGlobalAxioms": {
+      "lean4": [],
+      "rocq": []
+    },
+    "manifest": "proofs/v015-external-proof-assurance.json",
+    "lean4": {
+      "path": "proofs/lean4/MtsV015GeneralizedReaction.lean",
+      "gitBlob": "95db0f98bac9e5c84c3156749889be40080ca4d0",
+      "symbols": [
+        "MTS.V015.External.GPR_08_exact_sequence_packing_injective",
+        "MTS.V015.External.GPR_08_finite_arity_has_one_endpoint",
+        "MTS.V015.External.GPR_08_physical_nonmember_has_no_role_authority"
+      ],
+      "result": "SUCCESS"
+    },
+    "rocq": {
+      "path": "proofs/coq/MtsV015GeneralizedReaction.v",
+      "gitBlob": "bfcf0a60fbf358e804fca58ce369cd9b2b259464",
+      "symbols": [
+        "GPR_08_exact_sequence_packing_injective",
+        "GPR_08_finite_arity_has_one_endpoint",
+        "GPR_08_physical_nonmember_has_no_role_authority"
+      ],
+      "result": "SUCCESS"
+    },
+    "exactHead": "a01e6187e58d483ce33184950de0f83a5b43a137",
+    "ciRun": 37451545691,
+    "ciJob": 112229249735
+  },
+  "executableWitnesses": [
+    "formal/v0.15/regression/two-role-meta-rule.evidence.json",
+    "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
+    "ts/test/v015-execution-image-carrier-a4.test.ts"
+  ],
+  "architecturalConsequence": {
+    "finiteArityImpliesJ1": false,
+    "exactSequenceRemainsLinkTopology": true,
+    "physicalRoleShapeImpliesAuthority": false,
+    "remainingJ1Gate": "only an irreducible accepted artifact requiring simultaneous separate-current matching may justify J1"
+  },
+  "theoremProjection": {
+    "currentV014InventoryUnchanged": true,
+    "generatedTheoremCatalogIntegration": "PENDING #1963/#1861"
+  }
+}
