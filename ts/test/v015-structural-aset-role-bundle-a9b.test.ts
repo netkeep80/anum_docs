@@ -13,6 +13,7 @@ import { unifyStructuralRuleTemplate } from "../src/structural-unification.js";
 import { instantiateV013StructuralTemplate } from "../src/v013-structural-execution.js";
 
 // Integration split provenance: native role-bundle / grounded-refinement / A72r subset of GREEN #1989 A9; core Gamma execution is a separate clean-main gate.
+// Clean-main boundary: this gate covers only role-bundle/grounded/A72r topology; core Gamma publication semantics are owned by A9a.
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.15 A9 role bundle: ${message}`);
