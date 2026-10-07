@@ -54,15 +54,19 @@ const open = mandatory
   .filter((item) => text(item.state, "state") === "OPEN")
   .map((item) => text(item.id, "open id"))
   .sort();
-const expectedOpen = ["V15-GOV-04", "V15-READY-01", "V15-READY-02", "V15-READY-03"].sort();
-assert(JSON.stringify(open) === JSON.stringify(expectedOpen), "only governance + readiness requirements remain OPEN");
+const auditOpen = ["V15-GOV-04", "V15-READY-01", "V15-READY-02", "V15-READY-03"].sort();
+const readinessIds = new Set(["V15-READY-01", "V15-READY-02", "V15-READY-03"]);
+assert(open.every((id) => readinessIds.has(id)), "after S20 only readiness requirements may remain OPEN");
 
 const allowedGreen = new Set(["COMPONENT_GREEN", "VERTICAL_GREEN"]);
 for (const item of mandatory) {
   const id = text(item.id, "id");
-  if (expectedOpen.includes(id)) continue;
-  assert(allowedGreen.has(text(item.state, id + " state")), id + " semantic/component requirement is green");
+  if (readinessIds.has(id) && text(item.state, id + " readiness state") === "OPEN") continue;
+  assert(allowedGreen.has(text(item.state, id + " state")), id + " completed requirement is green");
 }
+const currentGov = mandatory.find((item) => item.id === "V15-GOV-04");
+assert(currentGov !== undefined, "current GOV-04 exists");
+assert(text(currentGov.state, "current GOV-04 state") === "COMPONENT_GREEN", "S20 governance remains green");
 
 const traces = record(traceability.requirements, "trace requirements");
 for (const item of mandatory) {
@@ -103,9 +107,23 @@ for (const raw of corpus.entries as Json[]) {
 
 const generatedFormal = readFileSync(join(root, "docs/specs/Формальная нотация МТС.md"), "utf8");
 assert(generatedFormal.includes("mts-generated-formal-notation"), "generated FORMAL marker present");
-assert(generatedFormal.includes("COMPONENT_GREEN        = 40"), "generated FORMAL reports 40 component-green");
-assert(generatedFormal.includes("VERTICAL_GREEN         = 4"), "generated FORMAL reports 4 vertical-green");
-assert(generatedFormal.includes("OPEN                   = 4"), "generated FORMAL reports 4 open");
+const currentStateCounts = mandatory.reduce<Record<string, number>>((counts, item) => {
+  const state = text(item.state, "current requirement state");
+  counts[state] = (counts[state] ?? 0) + 1;
+  return counts;
+}, {});
+assert(
+  generatedFormal.includes("COMPONENT_GREEN        = " + String(currentStateCounts.COMPONENT_GREEN ?? 0)),
+  "generated FORMAL reports current component-green count",
+);
+assert(
+  generatedFormal.includes("VERTICAL_GREEN         = " + String(currentStateCounts.VERTICAL_GREEN ?? 0)),
+  "generated FORMAL reports current vertical-green count",
+);
+assert(
+  generatedFormal.includes("OPEN                   = " + String(currentStateCounts.OPEN ?? 0)),
+  "generated FORMAL reports current open count",
+);
 assert(generatedFormal.includes("profiles/mts-v015-meta-interpreter-kernel.json"), "compact kernel projected");
 assert(!generatedFormal.includes("profiles/mts-v015-meta-interpreter-model.json"), "research meta-interpreter monolith not projected");
 
@@ -143,7 +161,7 @@ const snapshot = record(audit.requirementSnapshot, "requirement snapshot");
 assert(Number(snapshot.mandatoryCount) === 48, "audit mandatory count");
 assert(Number(snapshot.componentGreenCount) === 40, "audit component-green count");
 assert(Number(snapshot.verticalGreenCount) === 4, "audit vertical-green count");
-assert(JSON.stringify(strings(snapshot.open, "audit open").slice().sort()) === JSON.stringify(expectedOpen), "audit open set exact");
+assert(JSON.stringify(strings(snapshot.open, "audit open").slice().sort()) === JSON.stringify(auditOpen), "historical S19 audit open set exact");
 assert(
   JSON.stringify(strings(snapshot.nonReadinessBlockers, "non-readiness blockers")) === JSON.stringify(["V15-GOV-04"]),
   "governance only non-readiness blocker",
