@@ -1,18 +1,27 @@
 {
-  "schema": "mts-v015-independent-readiness-audit/v0.1",
+  "schema": "mts-v015-independent-readiness-audit/v0.2",
   "ownerIssue": "#1876",
-  "auditBasis": "469fe47ce6be0d5b9e0c6071b20fa6e38c8dac8b",
+  "integrationOwner": "#2007",
+  "auditBasis": "653c9cff87c8a73c2853a2b17349d87003a2d48a",
+  "researchProvenance": {
+    "aggregatePr": 1989,
+    "frozenHead": "43691ce44b190b8d5316122be095c8a6e4d483ed",
+    "draft": true,
+    "wholeAggregateMergePermitted": false
+  },
   "status": "AUDIT_COMPLETE_BLOCKED_BY_GOVERNANCE",
   "conclusion": {
     "semanticExecutionCore": "GREEN",
     "formalJsonCompiler": "GREEN",
     "externalAssurance": "GREEN",
     "approvedExecutableCorpus": "GREEN",
+    "generatedFormalSpecification": "GREEN",
+    "activeTraceIntegrity": "GREEN",
+    "obsoleteResearchAuthority": "ABSENT",
     "crossRepositoryFreeze": "GREEN",
     "operationalMergeGovernance": "BLOCKED",
     "releaseReady": false,
-    "authorAcceptanceReady": false,
-    "generatedFormalSpecification": "GREEN"
+    "authorAcceptanceReady": false
   },
   "requirementSnapshot": {
     "mandatoryCount": 48,
@@ -30,22 +39,25 @@
   },
   "liveRepositorySnapshot": {
     "anumDocs": {
-      "main": "b6c8fa83e92857b17044bb81ea29e230c477d6aa",
-      "workingPr": 1989,
-      "workingPrDraft": true
+      "auditedMain": "653c9cff87c8a73c2853a2b17349d87003a2d48a",
+      "generatedFormalMerge": "#2068",
+      "s18RegistryMerge": "#2069",
+      "frozenResearchPr": 1989,
+      "frozenResearchHead": "43691ce44b190b8d5316122be095c8a6e4d483ed"
     },
     "amemory": {
       "main": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
       "version": "0.175.0",
-      "openPrs": [
+      "frozenForV015": true,
+      "openDraftPrs": [
         486,
         489
-      ],
-      "openPrsDraft": true
+      ]
     },
     "aprover": {
       "main": "98e0152d21d9b492d79aa5017e86a4114d3e5c51",
-      "openPrCount": 0
+      "openPrCount": 0,
+      "nativeRuntimeDeferredToV016": true
     }
   },
   "governanceObservation": {
@@ -65,20 +77,37 @@
       "bypassMode": "always"
     },
     "requiredFalsifier": "An intentionally RED repo-guard PR must be mechanically unmergeable through the normal path; after restoration to GREEN, merge becomes available.",
-    "connectorLimitation": "Current GitHub connector exposes ruleset read but no administration mutation; this audit cannot repair the bypass itself."
+    "connectorLimitation": "The current connector can read this ruleset but does not expose administration mutation; the audit cannot repair the bypass itself."
   },
   "semanticEvidence": [
-    "ts/test/v015-release-contract-r1.test.ts",
-    "ts/test/v015-metacompiler-corpus-closure-c0.test.ts",
-    "ts/test/v015-context-authority-closure-c1.test.ts",
+    "requirements/mts-v0.15.json",
+    "traceability/mts-v0.15.json",
+    "profiles/mts-v015-meta-interpreter-kernel.json",
+    "profiles/mts-v015-generalized-reaction-candidate.json",
     "proofs/v015-external-proof-assurance.json",
     "proofs/v015-formal-proof-assurance.json",
-    "traceability/mts-v0.15.json#approvedJsonCorpus"
+    "ts/test/v015-context-authority-closure-c1.test.ts",
+    "ts/test/v015-source-anet-denotation-core-das-a2a.test.ts",
+    "ts/test/v015-direct-json-denotation-das-a2b.test.ts",
+    "ts/test/v015-rule-bundle-denotation-das-a2c.test.ts",
+    "ts/test/v015-formal-production-refinement-f1.test.ts",
+    "ts/test/v015-frozen-replay-artifact-integrity.test.ts",
+    "docs/specs/Формальная нотация МТС.md"
   ],
+  "falsifiers": {
+    "exactOpenSet": "PASS — only V15-GOV-04 and READY-01/02/03 remain OPEN",
+    "hiddenOrMissingTraceEvidence": "PASS — active repository evidence paths are required to exist",
+    "staleResearchMonolithAuthority": "PASS — A9/DAS/meta-interpreter monolith paths are forbidden from active authority",
+    "incompleteApprovedJsonCorpus": "PASS — exactly six Author-approved executable artifacts remain registered",
+    "generatedDocumentationDrift": "PASS — generated FORMAL projection is synchronized and reports 40/4/4",
+    "crossRepositorySemanticDrift": "PASS — A-memory remains frozen at 0.175.0 and Aprover runtime remains deferred",
+    "governanceBypass": "FAIL/RELEASE-BLOCKING — broad RepositoryRole always-bypass remains present"
+  },
   "explicitNonClaims": [
     "MTS v0.15 is not accepted by this audit.",
     "The audit does not override V15-GOV-04/#1982 or the explicit Author acceptance gate.",
     "A draft PR with skipped repo-guard is not a release merge path.",
+    "The unresolved sequence-carrier/source-provenance item is not silently accepted by this audit.",
     "Only explicit Author ACCEPT/REJECT may change the accepted/current version."
   ],
   "documentationObservation": {
@@ -86,6 +115,7 @@
     "target": "docs/specs/Формальная нотация МТС.md",
     "observedVersion": "v0.14 current / v0.15 candidate",
     "generatedV015ProjectionPresent": true,
+    "machineStatus": "40 COMPONENT_GREEN / 4 VERTICAL_GREEN / 4 OPEN",
     "blocker": "NONE — whole-file generated v0.15 candidate projection is synchronized; v0.14 remains the accepted/current release."
   }
 }
