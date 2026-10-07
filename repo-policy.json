@@ -269,7 +269,7 @@
           {
             "kind": "regex",
             "glob": "ts/test/v015-requirements-traceability-r0.test.ts",
-            "pattern": "negativeVector\\\\(\\\"([^\\\"]+)\\\""
+            "pattern": "negativeVector\\(\"([^\"]+)\""
           }
         ]
       },
@@ -311,7 +311,7 @@
           {
             "kind": "regex",
             "glob": "requirements/mts-v0.15.json",
-            "pattern": "\\\\\\\"id\\\\\\\"\\\\s*:\\\\s*\\\\\\\"(V15-[A-Z0-9-]+)\\\\\\\""
+            "pattern": "\\\"id\\\"\\s*:\\s*\\\"(V15-[A-Z0-9-]+)\\\""
           }
         ]
       }
