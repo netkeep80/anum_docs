@@ -280,18 +280,18 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
 function renderCandidateProofCard(proof: V015CandidateProofProjection): string {
   const lines = [
     '<a id="candidate-proof-' + proof.id.toLowerCase() + '"></a> <!-- якорь кандидатного доказательства -->',
-    "### " + proof.id + " — " + proof.family,
+    "### Кандидатное доказательство " + proof.id,
     "",
     "- **Статус проекции:** " + inlineCode(proof.projectionStatus) + ".",
     "- **Классификация внешнего доказательства:** " + inlineCode(proof.classification) + ".",
     "- **Доказательный авторитет:** " + inlineCode(proof.authority) + ".",
     "- **Владелец:** " + inlineCode(proof.ownerIssue) + ".",
-    "- **Assurance manifest:** " + repositoryLink(proof.assurancePath) + ".",
-    "- **Machine evidence:** " + repositoryLink(proof.evidencePath) + ".",
-    "- **Статус evidence-пакета:** " + inlineCode(proof.evidenceStatus) + ".",
-    "- **Зафиксированный proof head:** " +
+    "- **Манифест внешней проверки:** " + repositoryLink(proof.assurancePath) + ".",
+    "- **Машинное свидетельство:** " + repositoryLink(proof.evidencePath) + ".",
+    "- **Статус пакета свидетельств:** " + inlineCode(proof.evidenceStatus) + ".",
+    "- **Зафиксированный head доказательства:** " +
       (proof.exactHead === null ? "не указан" : inlineCode(proof.exactHead)) + ".",
-    "- **CI run:** " +
+    "- **CI прогон:** " +
       (proof.ciRun === null ? "не указан" : inlineCode(String(proof.ciRun))) + ".",
     "",
     "**Явные предпосылки:**",
@@ -300,13 +300,13 @@ function renderCandidateProofCard(proof: V015CandidateProofProjection): string {
     "**Исключения / границы вывода:**",
     ...list(proof.exclusions),
     "",
-    "**Lean4 targets:**",
+    "**Цели Lean4:**",
     ...list(proof.lean4),
     "",
-    "**Rocq targets:**",
+    "**Цели Rocq:**",
     ...list(proof.rocq),
     "",
-    "**Связанные proof-source файлы:**",
+    "**Связанные файлы исходного доказательства:**",
     ...(proof.sourcePaths.length
       ? proof.sourcePaths.map((path) => "- " + repositoryLink(path))
       : ["- нет"]),
@@ -318,9 +318,9 @@ function renderCandidateProofSection(model: TheoremProjectionModel): string {
   const lines = [
     "## Кандидатные доказательства MTS v0.15",
     "",
-    "> Этот раздел является генерируемой проекцией candidate-only proof assurance.",
-    "> Он не изменяет принятый реестр из 21 теорем MTS v0.14, не принимает MTS v0.15 и не является MTS-native/aprover доказательством.",
-    "> Источник статусов — отдельные Lean4/Rocq assurance-manifest'ы и machine evidence; доказательный авторитет этого слоя — только " +
+    "> Этот раздел является генерируемой проекцией кандидатных внешних доказательств.",
+    "> Он не изменяет принятый реестр из 21 теорем " + inlineCode("MTS v0.14") + ", не принимает " + inlineCode("MTS v0.15") + " и не является " + inlineCode("MTS-native/aprover") + " доказательством.",
+    "> Источник статусов — отдельные манифесты Lean4/Rocq и машинные свидетельства; доказательный авторитет этого слоя — только " +
       inlineCode("external-cross-check-only") + ".",
     "",
     "| ID | Семейство | Статус проекции | Внешняя классификация | Lean4 | Rocq |",
@@ -329,11 +329,11 @@ function renderCandidateProofSection(model: TheoremProjectionModel): string {
   for (const proof of model.candidateProofs) {
     lines.push(
       "| [" + proof.id + "](#candidate-proof-" + proof.id.toLowerCase() + ")" +
-      " | " + proof.family +
-      " | " + proof.projectionStatus +
+      " | кандидат " + inlineCode(proof.family) +
+      " | " + inlineCode(proof.projectionStatus) +
       " | " + inlineCode(tableCell(proof.classification)) +
-      " | " + proof.lean4.length + " targets" +
-      " | " + proof.rocq.length + " targets |",
+      " | " + proof.lean4.length + " целей" +
+      " | " + proof.rocq.length + " целей |",
     );
   }
   lines.push("");

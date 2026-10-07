@@ -47,8 +47,8 @@ function main(): void {
   assert.match(first, /кандидатная проекция FORMAL/i);
   assert.match(first, /theorems\/formal-v0\.15\.json/);
   assert.match(first, /## Кандидатные доказательства MTS v0\.15/);
-  assert.match(first, /candidate-only proof assurance/);
-  assert.match(first, /не изменяет принятый реестр из 21 теорем MTS v0\.14/i);
+  assert.match(first, /генерируемой проекцией кандидатных внешних доказательств/);
+  assert.match(first, /не изменяет принятый реестр из 21 теорем .*MTS v0\.14/i);
   assert.match(first, /external-cross-check-only/);
   const candidateAnchors = [
     ...first.matchAll(/<a id="candidate-proof-([^"]+)"><\/a>/g),
@@ -58,9 +58,9 @@ function main(): void {
     model.candidateProofs.map((proof) => proof.id.toLowerCase()),
     "candidate proof cards are generated separately from accepted theorem cards",
   );
-  assert.match(first, /GPR-09 — GPR/);
+  assert.match(first, /Кандидатное доказательство GPR-09/);
   assert.match(first, /C\s*=\s*END\(R\)/);
-  assert.match(first, /FRM-07 — FRM/);
+  assert.match(first, /Кандидатное доказательство FRM-07/);
   assert.match(
     first,
     /PROVED_UNDER_EXPLICIT_PRODUCTION_REFINEMENT_PREMISES/,
